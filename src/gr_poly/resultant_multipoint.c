@@ -28,12 +28,9 @@
 #define RESULTANT_MULTIPOINT_BLOCK_WORDS (WORD(1) << 18)
 
 /* When the modulus supports a radix-2 transform long enough for the number of
-   points, the coefficients are evaluated at roots of unity with a single DFT
-   each instead of the Bluestein product of the geometric method; measured on
-   this machine, that phase becomes six to twelve times faster. All the values
-   have to be resident at once, unlike the blocked geometric evaluation, so
-   this is only done when they fit in this many words. */
-#define RESULTANT_MULTIPOINT_DFT_WORDS (WORD(1) << 22)
+   points, the coefficients are evaluated at roots of unity with DFTs instead
+   of the Bluestein product of the geometric method; measured on this machine,
+   that phase becomes six to twelve times faster. */
 
 /* Returns 1 if none of q, q^2, ..., q^(len-1) is one, i.e. if the len
    points 1, q, q^2, ..., q^(len-1) are pairwise distinct. */
@@ -170,56 +167,52 @@ _bit_reverse(ulong i, ulong len)
     return r;
 }
 
-/* Evaluates (poly, plen) at the first npoints powers of the root of unity
-   underlying Q, writing them to vs. The transform enumerates the points in
-   bit-reversed order, so rev[] maps the geometric index to the position
-   holding that value. */
+/* Evaluates (poly, plen), with its k-th coefficient scaled by spow[k], at the
+   M-th roots of unity, writing the values to vs in the order of increasing
+   powers. The transform enumerates them in bit-reversed order, so rev[] maps
+   the power to the position holding its value. plen is at most M, so the
+   coefficients need no reduction modulo x^M - 1 first. */
 static void
-_dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen,
-              const ulong * rev, slong npoints, ulong depth,
+_dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
+              const ulong * rev, slong M, ulong m,
               double * dbuf, sd_fft_ctx_t Q, nmod_t mod)
 {
     slong k;
 
     if (plen == 0)
     {
-        _nmod_vec_zero(vs, npoints);
+        _nmod_vec_zero(vs, M);
         return;
     }
 
     for (k = 0; k < plen; k++)
-        dbuf[k] = (double) poly[k];
+        dbuf[k] = (double) nmod_mul(poly[k], spow[k], mod);
 
-    sd_fft_trunc(Q, dbuf, depth, plen, n_pow2(depth));
+    sd_fft_trunc(Q, dbuf, m, plen, M);
 
-    for (k = 0; k < npoints; k++)
+    for (k = 0; k < M; k++)
         vs[k] = _sd_fft_get_nmod(dbuf[rev[k]], mod.n);
 }
 
 /* res_y(A, B) by evaluation at roots of unity. Returns GR_UNABLE when the
-   modulus does not support a long enough transform, or when the values would
-   not fit the memory target. */
+   modulus does not support a transform long enough for the number of points. */
 static int
 _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
                                   const gr_poly_struct * Ax, slong lenA,
                                   const gr_poly_struct * Bx, slong lenB,
-                                  slong npoints, nmod_t mod, gr_ctx_t cctx)
+                                  slong npoints, slong maxlen, nmod_t mod,
+                                  gr_ctx_t cctx)
 {
     sd_fft_ctx_t Q;
     nmod_geometric_progression_t G;
     ulong * rev;
     double * dbuf;
-    nn_ptr valA, valB, valres, resc, f, g;
-    slong i, j, k, N;
-    ulong depth, w, r;
+    nn_ptr valA, valB, valres, resc, spow, wpow, f, g;
+    slong i, j, k, s, t, N, M, nblocks;
+    ulong depth, m, w, r;
 
     depth = FLINT_MAX(n_clog2((ulong) npoints), 4);
     N = n_pow2(depth);
-
-    /* the transform produces every point at once, so unlike the blocked
-       geometric evaluation all the values have to be resident together */
-    if ((double) (lenA + lenB) * npoints > (double) RESULTANT_MULTIPOINT_DFT_WORDS)
-        return GR_UNABLE;
 
     if (!fft_small_mulmod_satisfies_bounds(mod.n))
         return GR_UNABLE;
@@ -242,35 +235,69 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
         return GR_UNABLE;
     }
 
-    rev = flint_malloc(npoints * sizeof(ulong));
-    for (k = 0; k < npoints; k++)
-        rev[k] = sd_fft_ctx_trunc_index(depth, _bit_reverse(k, depth));
+    /* The N points are split into nblocks = N / M classes modulo nblocks, the
+       block t holding the points w^(t + nblocks s) for 0 <= s < M. Those are
+       the M-th roots of unity scaled by w^t, so the block is evaluated by the
+       substitution x -> w^t x followed by a transform of length M only. The
+       block is a power of two at least maxlen, so that a coefficient always
+       fits in one, and otherwise as large as the memory target allows; the
+       tables of values are then proportional to the input and output sizes
+       instead of to their product, as in the geometric evaluation. */
+    m = FLINT_MAX(n_clog2((ulong) maxlen), 4);
 
-    dbuf = flint_aligned_alloc(32, FLINT_MAX(32, N * sizeof(double)));
-    valA = _nmod_vec_init(lenA * npoints);
-    valB = _nmod_vec_init(lenB * npoints);
+    while (m < depth && (double) (lenA + lenB) * n_pow2(m + 1)
+                            <= (double) RESULTANT_MULTIPOINT_BLOCK_WORDS)
+        m++;
+
+    M = n_pow2(m);
+    nblocks = N / M;
+
+    rev = flint_malloc(M * sizeof(ulong));
+    for (k = 0; k < M; k++)
+        rev[k] = sd_fft_ctx_trunc_index(m, _bit_reverse(k, m));
+
+    dbuf = flint_aligned_alloc(32, FLINT_MAX(32, M * sizeof(double)));
+    valA = _nmod_vec_init(lenA * M);
+    valB = _nmod_vec_init(lenB * M);
     valres = _nmod_vec_init(npoints);
     resc = _nmod_vec_init(npoints);
+    spow = _nmod_vec_init(maxlen);
+    wpow = _nmod_vec_init(maxlen);
     f = _nmod_vec_init(lenA + lenB);
     g = f + lenA;
 
-    for (i = 0; i < lenA; i++)
-        _dft_evaluate(valA + i * npoints, (nn_srcptr) Ax[i].coeffs,
-            Ax[i].length, rev, npoints, depth, dbuf, Q, mod);
+    /* spow[k] = (w^t)^k for the current block; multiplying by wpow[k] = w^k
+       advances it by one block */
+    for (k = 0; k < maxlen; k++)
+        spow[k] = 1;
 
-    for (i = 0; i < lenB; i++)
-        _dft_evaluate(valB + i * npoints, (nn_srcptr) Bx[i].coeffs,
-            Bx[i].length, rev, npoints, depth, dbuf, Q, mod);
+    wpow[0] = 1;
+    for (k = 1; k < maxlen; k++)
+        wpow[k] = nmod_mul(wpow[k - 1], w, mod);
 
-    for (j = 0; j < npoints; j++)
+    for (t = 0; t < nblocks; t++)
     {
         for (i = 0; i < lenA; i++)
-            f[i] = valA[i * npoints + j];
+            _dft_evaluate(valA + i * M, (nn_srcptr) Ax[i].coeffs,
+                Ax[i].length, spow, rev, M, m, dbuf, Q, mod);
 
         for (i = 0; i < lenB; i++)
-            g[i] = valB[i * npoints + j];
+            _dft_evaluate(valB + i * M, (nn_srcptr) Bx[i].coeffs,
+                Bx[i].length, spow, rev, M, m, dbuf, Q, mod);
 
-        _resultant_at_point(valres + j, f, lenA, g, lenB, mod);
+        for (s = 0; s < M && (j = t + nblocks * s) < npoints; s++)
+        {
+            for (i = 0; i < lenA; i++)
+                f[i] = valA[i * M + s];
+
+            for (i = 0; i < lenB; i++)
+                g[i] = valB[i * M + s];
+
+            _resultant_at_point(valres + j, f, lenA, g, lenB, mod);
+        }
+
+        for (k = 1; k < maxlen; k++)
+            spow[k] = nmod_mul(spow[k], wpow[k], mod);
     }
 
     _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
@@ -289,6 +316,8 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     _nmod_vec_clear(valB);
     _nmod_vec_clear(valres);
     _nmod_vec_clear(resc);
+    _nmod_vec_clear(spow);
+    _nmod_vec_clear(wpow);
     _nmod_vec_clear(f);
 
     return GR_SUCCESS;
@@ -348,7 +377,7 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
 
 #if FLINT_HAVE_FFT_SMALL
     if (_gr_poly_resultant_multipoint_dft(resx, Ax, lenA, Bx, lenB,
-            npoints, mod, cctx) == GR_SUCCESS)
+            npoints, maxlen, mod, cctx) == GR_SUCCESS)
         return GR_SUCCESS;
 #endif
 
