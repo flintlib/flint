@@ -21,9 +21,6 @@
 # include "fft_small.h"
 #endif
 
-/* Number of geometric progressions tried before giving up. */
-#define RESULTANT_MULTIPOINT_ATTEMPTS 5
-
 /* Target size, in words, of the tables holding the evaluated coefficients.
    The evaluation points are processed in blocks chosen so that these tables
    stay around this size; the memory usage is then proportional to the input
@@ -57,6 +54,92 @@ _nmod_geometric_points_distinct(ulong q, slong len, nmod_t mod)
     return 1;
 }
 
+/* Returns r such that q = r^2 is of order at least len, or 0 if there is no
+   such r. The group of squares is cyclic of order (n - 1) / 2, so one exists
+   exactly when 2 len <= n - 1, and trying 2, 3, 4, ... in turn then finds one
+   after a couple of candidates: the squares of order exactly (n - 1) / 2 by
+   themselves have density phi(m) / m with m = (n - 1) / 2, which stays above
+   1/8 for every m that fits in a word. Going through the candidates in order
+   rather than at random keeps the algorithm deterministic. */
+static ulong
+_nmod_find_geometric_ratio(slong len, nmod_t mod)
+{
+    ulong r;
+
+    if (mod.n < 2 * (ulong) len + 1)
+        return 0;
+
+    for (r = 2; r < mod.n; r++)
+        if (_nmod_geometric_points_distinct(nmod_mul(r, r, mod), len, mod))
+            return r;
+
+    return 0;
+}
+
+/* Sets res to res_y(A, B) evaluated at one point, given in f and g the values
+   there of the lenA and lenB coefficients in y. A specialisation may drop in
+   degree; res_y(A, B) is nevertheless the determinant of the Sylvester matrix
+   built from the degrees lenA - 1 and lenB - 1, which is what the corrections
+   below reduce to a resultant of the specialisations. */
+static void
+_resultant_at_point(ulong * res, nn_ptr f, slong lenA,
+                    nn_ptr g, slong lenB, nmod_t mod)
+{
+    slong len1 = lenA, len2 = lenB;
+    ulong t;
+
+    MPN_NORM(f, len1);
+    MPN_NORM(g, len2);
+
+    /* one of them vanishes identically: the Sylvester matrix has a zero row */
+    if (len1 == 0 || len2 == 0)
+    {
+        *res = 0;
+        return;
+    }
+
+    if (len1 == lenA)
+    {
+        /* deg_y(A) is preserved:
+           res(A, B) = lc(A)^(deg_y(B) - deg(g)) res(f, g) */
+        t = _nmod_poly_resultant(f, len1, g, len2, mod);
+
+        if (len2 < lenB)
+            t = nmod_mul(t, nmod_pow_ui(f[len1 - 1], lenB - len2, mod), mod);
+    }
+    else if (len2 == lenB)
+    {
+        /* deg_y(B) is preserved instead; the same identity applied to
+           res(B, A) = (-1)^(deg_y(A) deg_y(B)) res(A, B) gives
+           res(A, B) = (-1)^(deg_y(B) (deg_y(A) + deg(f)))
+                           lc(B)^(deg_y(A) - deg(f)) res(f, g) */
+        if (len1 >= len2)
+        {
+            t = _nmod_poly_resultant(f, len1, g, len2, mod);
+        }
+        else
+        {
+            t = _nmod_poly_resultant(g, len2, f, len1, mod);
+
+            if (((len1 - 1) & 1) && ((len2 - 1) & 1))
+                t = nmod_neg(t, mod);
+        }
+
+        t = nmod_mul(t, nmod_pow_ui(g[len2 - 1], lenA - len1, mod), mod);
+
+        if (((lenB - 1) & 1) && ((lenA + len1) & 1))
+            t = nmod_neg(t, mod);
+    }
+    else
+    {
+        /* both drop: the first column of that Sylvester matrix holds only the
+           two leading coefficients, so it is zero and so is the determinant */
+        t = 0;
+    }
+
+    *res = t;
+}
+
 
 #if FLINT_HAVE_FFT_SMALL
 
@@ -87,12 +170,12 @@ _bit_reverse(ulong i, ulong len)
     return r;
 }
 
-/* Evaluates (poly, plen), scaled by the powers in spow, at the first npoints
-   powers of the root of unity underlying Q, writing them to vs. The transform
-   enumerates the points in bit-reversed order, so rev[] maps the geometric
-   index to the position holding that value. */
+/* Evaluates (poly, plen) at the first npoints powers of the root of unity
+   underlying Q, writing them to vs. The transform enumerates the points in
+   bit-reversed order, so rev[] maps the geometric index to the position
+   holding that value. */
 static void
-_dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
+_dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen,
               const ulong * rev, slong npoints, ulong depth,
               double * dbuf, sd_fft_ctx_t Q, nmod_t mod)
 {
@@ -105,7 +188,7 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
     }
 
     for (k = 0; k < plen; k++)
-        dbuf[k] = (double) nmod_mul(poly[k], spow[k], mod);
+        dbuf[k] = (double) poly[k];
 
     sd_fft_trunc(Q, dbuf, depth, plen, n_pow2(depth));
 
@@ -114,25 +197,21 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
 }
 
 /* res_y(A, B) by evaluation at roots of unity. Returns GR_UNABLE when the
-   modulus does not support a long enough transform, when the values would not
-   fit the memory target, or when no scaling avoiding the roots of the leading
-   coefficient of A was found. */
+   modulus does not support a long enough transform, or when the values would
+   not fit the memory target. */
 static int
 _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
                                   const gr_poly_struct * Ax, slong lenA,
                                   const gr_poly_struct * Bx, slong lenB,
-                                  slong npoints, slong maxlen, nmod_t mod,
-                                  gr_ctx_t cctx)
+                                  slong npoints, nmod_t mod, gr_ctx_t cctx)
 {
     sd_fft_ctx_t Q;
     nmod_geometric_progression_t G;
-    flint_rand_t state;
     ulong * rev;
     double * dbuf;
-    nn_ptr valA, valB, valres, resc, spow, f, g;
+    nn_ptr valA, valB, valres, resc, f, g;
     slong i, j, k, N;
-    ulong depth, c, cinv, w, r, t;
-    int attempt, ok;
+    ulong depth, w, r;
 
     depth = 0;
     while (n_pow2(depth) < (ulong) npoints)
@@ -175,99 +254,37 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     valB = _nmod_vec_init(lenB * npoints);
     valres = _nmod_vec_init(npoints);
     resc = _nmod_vec_init(npoints);
-    spow = _nmod_vec_init(maxlen);
     f = _nmod_vec_init(lenA + lenB);
     g = f + lenA;
 
-    flint_rand_init(state);
+    for (i = 0; i < lenA; i++)
+        _dft_evaluate(valA + i * npoints, (nn_srcptr) Ax[i].coeffs,
+            Ax[i].length, rev, npoints, depth, dbuf, Q, mod);
 
-    /* As in the geometric case the points are scaled by a random c, since the
-       progression starts at 1 and the leading coefficient of A in y must not
-       vanish anywhere. */
-    ok = 0;
+    for (i = 0; i < lenB; i++)
+        _dft_evaluate(valB + i * npoints, (nn_srcptr) Bx[i].coeffs,
+            Bx[i].length, rev, npoints, depth, dbuf, Q, mod);
 
-    for (attempt = 0; attempt < RESULTANT_MULTIPOINT_ATTEMPTS; attempt++)
+    for (j = 0; j < npoints; j++)
     {
-        c = 1 + n_randint(state, mod.n - 1);
-
-        spow[0] = 1;
-        for (k = 1; k < maxlen; k++)
-            spow[k] = nmod_mul(spow[k - 1], c, mod);
-
-        _dft_evaluate(valA + (lenA - 1) * npoints, (nn_srcptr) Ax[lenA - 1].coeffs,
-            Ax[lenA - 1].length, spow, rev, npoints, depth, dbuf, Q, mod);
-
-        ok = 1;
-        for (k = 0; k < npoints; k++)
-        {
-            if (valA[(lenA - 1) * npoints + k] == 0)
-            {
-                ok = 0;
-                break;
-            }
-        }
-
-        if (ok)
-            break;
-    }
-
-    if (ok)
-    {
-        for (i = 0; i < lenA - 1; i++)
-            _dft_evaluate(valA + i * npoints, (nn_srcptr) Ax[i].coeffs,
-                Ax[i].length, spow, rev, npoints, depth, dbuf, Q, mod);
+        for (i = 0; i < lenA; i++)
+            f[i] = valA[i * npoints + j];
 
         for (i = 0; i < lenB; i++)
-            _dft_evaluate(valB + i * npoints, (nn_srcptr) Bx[i].coeffs,
-                Bx[i].length, spow, rev, npoints, depth, dbuf, Q, mod);
+            g[i] = valB[i * npoints + j];
 
-        for (j = 0; j < npoints; j++)
-        {
-            slong len2;
-
-            for (i = 0; i < lenA; i++)
-                f[i] = valA[i * npoints + j];
-
-            for (i = 0; i < lenB; i++)
-                g[i] = valB[i * npoints + j];
-
-            len2 = lenB;
-            MPN_NORM(g, len2);
-
-            if (len2 == 0)
-            {
-                valres[j] = 0;
-            }
-            else
-            {
-                t = _nmod_poly_resultant(f, lenA, g, len2, mod);
-
-                if (len2 < lenB)
-                    t = nmod_mul(t, nmod_pow_ui(f[lenA - 1], lenB - len2, mod), mod);
-
-                valres[j] = t;
-            }
-        }
-
-        _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
-        _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
-        nmod_geometric_progression_clear(G);
-
-        cinv = nmod_inv(c, mod);
-        t = 1;
-        for (k = 0; k < npoints; k++)
-        {
-            resc[k] = nmod_mul(resc[k], t, mod);
-            t = nmod_mul(t, cinv, mod);
-        }
-
-        gr_poly_fit_length(resx, npoints, cctx);
-        _gr_poly_set_length(resx, npoints, cctx);
-        _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
-        _gr_poly_normalise(resx, cctx);
+        _resultant_at_point(valres + j, f, lenA, g, lenB, mod);
     }
 
-    flint_rand_clear(state);
+    _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
+    _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
+    nmod_geometric_progression_clear(G);
+
+    gr_poly_fit_length(resx, npoints, cctx);
+    _gr_poly_set_length(resx, npoints, cctx);
+    _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
+    _gr_poly_normalise(resx, cctx);
+
     sd_fft_ctx_clear(Q);
     flint_aligned_free(dbuf);
     flint_free(rev);
@@ -275,10 +292,9 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     _nmod_vec_clear(valB);
     _nmod_vec_clear(valres);
     _nmod_vec_clear(resc);
-    _nmod_vec_clear(spow);
     _nmod_vec_clear(f);
 
-    return ok ? GR_SUCCESS : GR_UNABLE;
+    return GR_SUCCESS;
 }
 
 #endif
@@ -292,12 +308,10 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     gr_poly_struct * resx = res;
     gr_ctx_struct * cctx;
     nmod_geometric_progression_t G;
-    flint_rand_t state;
     nmod_t mod;
     nn_ptr valA, valB, valres, resc, tmp, spow, w, f, g;
     slong i, j, k, blenA, blenB, npoints, maxlen, batch, nblocks, block;
-    ulong c, cinv, r, q, t;
-    int attempt, ok;
+    ulong r, q, t;
 
     if (ctx->which_ring != GR_CTX_GR_POLY)
         return GR_UNABLE;
@@ -310,10 +324,10 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     if (lenB <= 1)
         return _gr_poly_resultant_small(res, A, lenA, B, lenB, ctx);
 
-    /* Leading coefficients in y must be nonzero for the degree bound and the
-       specialisation property to hold. */
-    if (Ax[lenA - 1].length == 0 || Bx[lenB - 1].length == 0)
-        return GR_UNABLE;
+    /* the degree bound and the specialisation property below both read the
+       degrees in y off lenA and lenB */
+    FLINT_ASSERT(Ax[lenA - 1].length != 0);
+    FLINT_ASSERT(Bx[lenB - 1].length != 0);
 
     /* blenA - 1 and blenB - 1 bound the degrees in x */
     blenA = 0;
@@ -331,16 +345,25 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
 
     mod = NMOD_CTX(cctx);
 
-    /* We need an element of multiplicative order at least npoints, and the
-       precomputations assume that the modulus is prime. */
-    if (mod.n <= (ulong) npoints || gr_ctx_is_field(cctx) != T_TRUE)
+    /* The precomputations assume a prime modulus. */
+    if (gr_ctx_is_field(cctx) != T_TRUE)
         return GR_UNABLE;
 
 #if FLINT_HAVE_FFT_SMALL
     if (_gr_poly_resultant_multipoint_dft(resx, Ax, lenA, Bx, lenB,
-            npoints, maxlen, mod, cctx) == GR_SUCCESS)
+            npoints, mod, cctx) == GR_SUCCESS)
         return GR_SUCCESS;
 #endif
+
+    /* The ratio of the progression is a square, so its order divides
+       (n - 1) / 2 and there is nothing to be done when that is less than
+       npoints. */
+    r = _nmod_find_geometric_ratio(npoints, mod);
+
+    if (r == 0)
+        return GR_UNABLE;
+
+    q = nmod_mul(r, r, mod);
 
     /* The points are handled in blocks of `batch` of them. Evaluating a
        coefficient of length maxlen at fewer than maxlen points saves nothing,
@@ -360,141 +383,72 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     f = _nmod_vec_init(lenA + lenB);
     g = f + lenA;
 
-    /* The seed is fixed, so that this function is deterministic. */
-    flint_rand_init(state);
+    /* The evaluation points are 1, q, q^2, ..., q^(npoints-1), where q = r^2.
+       The block starting at index k*batch consists of the points s q^i for
+       0 <= i < batch, with s = q^(k*batch); the substitution x -> s x on the
+       input polynomials turns those into the powers of q that the geometric
+       progression provides, so a single precomputation of length batch serves
+       for all blocks. */
+    _nmod_geometric_progression_init_function(G, r, batch, mod, UWORD(1));
 
-    /* The evaluation points are c, c q, c q^2, ..., c q^(npoints-1), where
-       q = r^2 and both r and c are chosen at random. The block starting at
-       index k*batch consists of the points s q^i for 0 <= i < batch, with
-       s = c q^(k*batch); the substitution x -> s x on the input polynomials
-       turns those into the powers of q that the geometric progression
-       provides, so a single precomputation of length batch serves for all
-       blocks. The leading coefficient of A in y must not vanish at any of
-       the points; if it does, we start over with a new progression, giving
-       up after RESULTANT_MULTIPOINT_ATTEMPTS tries. */
-    ok = 0;
-
-    for (attempt = 0; attempt < RESULTANT_MULTIPOINT_ATTEMPTS; attempt++)
+    /* spow[j] = s^j for the current block, starting with s = 1; multiplying
+       by w[j] = (q^batch)^j advances s by one block */
+    t = nmod_pow_ui(q, batch, mod);
+    spow[0] = 1;
+    w[0] = 1;
+    for (j = 1; j < maxlen; j++)
     {
-        r = 1 + n_randint(state, mod.n - 1);
-        q = nmod_mul(r, r, mod);
+        spow[j] = 1;
+        w[j] = nmod_mul(w[j - 1], t, mod);
+    }
 
-        if (!_nmod_geometric_points_distinct(q, npoints, mod))
-            continue;
+    for (block = 0; block < nblocks; block++)
+    {
+        slong blen = FLINT_MIN(batch, npoints - block * batch);
 
-        c = 1 + n_randint(state, mod.n - 1);
-
-        /* spow[j] = s^j for the current block, starting with s = c;
-           multiplying by w[j] = (q^batch)^j advances s by one block */
-        t = nmod_pow_ui(q, batch, mod);
-        spow[0] = 1;
-        w[0] = 1;
-        for (j = 1; j < maxlen; j++)
+        for (i = 0; i < lenA; i++)
         {
-            spow[j] = nmod_mul(spow[j - 1], c, mod);
-            w[j] = nmod_mul(w[j - 1], t, mod);
+            for (k = 0; k < Ax[i].length; k++)
+                tmp[k] = nmod_mul(((nn_srcptr) Ax[i].coeffs)[k], spow[k], mod);
+
+            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valA + i * batch,
+                tmp, Ax[i].length, G, blen, mod);
         }
 
-        _nmod_geometric_progression_init_function(G, r, batch, mod, UWORD(1));
-
-        ok = 1;
-
-        for (block = 0; block < nblocks; block++)
+        for (i = 0; i < lenB; i++)
         {
-            slong blen = FLINT_MIN(batch, npoints - block * batch);
+            for (k = 0; k < Bx[i].length; k++)
+                tmp[k] = nmod_mul(((nn_srcptr) Bx[i].coeffs)[k], spow[k], mod);
 
+            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valB + i * batch,
+                tmp, Bx[i].length, G, blen, mod);
+        }
+
+        for (j = 0; j < blen; j++)
+        {
             for (i = 0; i < lenA; i++)
-            {
-                for (k = 0; k < Ax[i].length; k++)
-                    tmp[k] = nmod_mul(((nn_srcptr) Ax[i].coeffs)[k], spow[k], mod);
-
-                _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valA + i * batch,
-                    tmp, Ax[i].length, G, blen, mod);
-            }
-
-            for (j = 0; j < blen; j++)
-            {
-                if (valA[(lenA - 1) * batch + j] == 0)
-                {
-                    ok = 0;
-                    break;
-                }
-            }
-
-            if (!ok)
-                break;
+                f[i] = valA[i * batch + j];
 
             for (i = 0; i < lenB; i++)
-            {
-                for (k = 0; k < Bx[i].length; k++)
-                    tmp[k] = nmod_mul(((nn_srcptr) Bx[i].coeffs)[k], spow[k], mod);
+                g[i] = valB[i * batch + j];
 
-                _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valB + i * batch,
-                    tmp, Bx[i].length, G, blen, mod);
-            }
-
-            for (j = 0; j < blen; j++)
-            {
-                slong len2;
-
-                for (i = 0; i < lenA; i++)
-                    f[i] = valA[i * batch + j];
-
-                for (i = 0; i < lenB; i++)
-                    g[i] = valB[i * batch + j];
-
-                len2 = lenB;
-                MPN_NORM(g, len2);
-
-                if (len2 == 0)
-                {
-                    valres[block * batch + j] = 0;
-                }
-                else
-                {
-                    t = _nmod_poly_resultant(f, lenA, g, len2, mod);
-
-                    /* the specialisation of B may drop in degree, in which case
-                       res(A, B)(x) = lc_y(A)(x)^(lenB - len2) res(A(x), B(x)) */
-                    if (len2 < lenB)
-                        t = nmod_mul(t, nmod_pow_ui(f[lenA - 1], lenB - len2, mod), mod);
-
-                    valres[block * batch + j] = t;
-                }
-            }
-
-            for (k = 1; k < maxlen; k++)
-                spow[k] = nmod_mul(spow[k], w[k], mod);
+            _resultant_at_point(valres + block * batch + j, f, lenA, g, lenB, mod);
         }
 
-        nmod_geometric_progression_clear(G);
-
-        if (ok)
-            break;
+        for (k = 1; k < maxlen; k++)
+            spow[k] = nmod_mul(spow[k], w[k], mod);
     }
 
-    if (ok)
-    {
-        _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
-        _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
-        nmod_geometric_progression_clear(G);
+    nmod_geometric_progression_clear(G);
 
-        /* undo the scaling by c */
-        cinv = nmod_inv(c, mod);
-        t = 1;
-        for (k = 0; k < npoints; k++)
-        {
-            resc[k] = nmod_mul(resc[k], t, mod);
-            t = nmod_mul(t, cinv, mod);
-        }
+    _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
+    _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
+    nmod_geometric_progression_clear(G);
 
-        gr_poly_fit_length(resx, npoints, cctx);
-        _gr_poly_set_length(resx, npoints, cctx);
-        _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
-        _gr_poly_normalise(resx, cctx);
-    }
-
-    flint_rand_clear(state);
+    gr_poly_fit_length(resx, npoints, cctx);
+    _gr_poly_set_length(resx, npoints, cctx);
+    _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
+    _gr_poly_normalise(resx, cctx);
 
     _nmod_vec_clear(valA);
     _nmod_vec_clear(valB);
@@ -505,7 +459,7 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     _nmod_vec_clear(w);
     _nmod_vec_clear(f);
 
-    return ok ? GR_SUCCESS : GR_UNABLE;
+    return GR_SUCCESS;
 }
 
 int

@@ -35,6 +35,66 @@ static ulong _fft_prime(flint_rand_t state, int bits)
     return 0;
 }
 
+/* replaces the leading coefficient in y by a product of nroots linear
+   factors, so that specialising x at a root of it drops the degree in y */
+static int
+_split_leading_coeff(gr_poly_t f, flint_rand_t state, slong nroots,
+                     gr_ctx_t ctx, gr_ctx_t cctx)
+{
+    int status = GR_SUCCESS;
+    gr_poly_t lc, lin;
+    slong i;
+
+    if (f->length == 0)
+        return status;
+
+    gr_poly_init(lc, cctx);
+    gr_poly_init(lin, cctx);
+
+    status |= gr_poly_one(lc, cctx);
+    status |= gr_poly_set_coeff_ui(lin, 1, 1, cctx);
+
+    for (i = 0; i < nroots; i++)
+    {
+        status |= gr_poly_set_coeff_ui(lin, 0, n_randint(state, 64), cctx);
+        status |= gr_poly_mul(lc, lc, lin, cctx);
+    }
+
+    status |= gr_poly_set_coeff_scalar(f, f->length - 1, lc, ctx);
+
+    gr_poly_clear(lc, cctx);
+    gr_poly_clear(lin, cctx);
+
+    return status;
+}
+
+/* multiplies the leading coefficient in y by x - root, so that the
+   specialisation at x = root drops in degree */
+static int
+_root_in_leading_coeff(gr_poly_t f, ulong root, gr_ctx_t ctx, gr_ctx_t cctx)
+{
+    int status = GR_SUCCESS;
+    gr_poly_t lc, lin;
+
+    if (f->length == 0)
+        return status;
+
+    gr_poly_init(lc, cctx);
+    gr_poly_init(lin, cctx);
+
+    status |= gr_poly_set_coeff_si(lin, 0, -(slong) root, cctx);
+    status |= gr_poly_set_coeff_ui(lin, 1, 1, cctx);
+
+    status |= gr_poly_mul(lc, (gr_poly_struct *)
+        GR_ENTRY(f->coeffs, f->length - 1, ctx->sizeof_elem), lin, cctx);
+    status |= gr_poly_set_coeff_scalar(f, f->length - 1, lc, ctx);
+
+    gr_poly_clear(lc, cctx);
+    gr_poly_clear(lin, cctx);
+
+    return status;
+}
+
 /* random bivariate polynomial of length at most leny in y whose
    coefficients have length at most lenx in x */
 static int
@@ -97,7 +157,17 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         s1 = gr_poly_resultant_multipoint(x, f, g, ctx);
         status |= gr_poly_resultant_sylvester(y, f, g, ctx);
 
-        if (s1 == GR_SUCCESS && status == GR_SUCCESS && gr_equal(x, y, ctx) == T_FALSE)
+        // if (s1 != GR_SUCCESS)
+        //     flint_printf("p = %lu fail\n", p);
+        // else
+        //     flint_printf("p = %lu good\n", p);
+        // gr_poly_resultant_multipoint is allowed to fail, if the field is too small to find a suitable
+        // primitive root for the geometric progression
+        // gr_poly_resultant_sylvester should never FAIL
+        // So we condition the result only when gr_poly_resultant_multipoint succeeds
+
+        if ((status != GR_SUCCESS) || 
+            ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)))
         {
             flint_printf("FAIL (vs sylvester):\n");
             gr_ctx_println(ctx);
@@ -176,6 +246,110 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
 
         gr_poly_clear(f, ctx);
         gr_poly_clear(g, ctx);
+        gr_heap_clear(x, ctx);
+        gr_heap_clear(y, ctx);
+        gr_ctx_clear(ctx);
+        gr_ctx_clear(cctx);
+    }
+
+    /* The leading coefficients in y of f and of g vanish at many points, and
+       at shared ones, so that the specialisations keep dropping in degree,
+       one of them or both at once. The algorithm has to account for every
+       such point rather than avoid it, so it must succeed whenever the field
+       is large enough for the progression: p >= 2 npoints + 1. */
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t cctx, ctx;
+        gr_poly_t f, g, c;
+        gr_ptr x, y;
+        ulong p;
+        slong lenf, leng, blenf, bleng, npoints, i;
+        const gr_poly_struct * fc, * gc;
+        int status = GR_SUCCESS;
+        int s1;
+
+        p = n_randprime(state, 8 + n_randint(state, 8), 1);
+
+        gr_ctx_init_nmod(cctx, p);
+        gr_ctx_init_gr_poly(ctx, cctx);
+
+        gr_poly_init(f, ctx);
+        gr_poly_init(g, ctx);
+        gr_poly_init(c, cctx);
+        x = gr_heap_init(ctx);
+        y = gr_heap_init(ctx);
+
+        status |= _gr_poly_randtest_bivariate(f, state, 2 + n_randint(state, 5),
+                                              1 + n_randint(state, 5), ctx, cctx);
+        status |= _gr_poly_randtest_bivariate(g, state, 2 + n_randint(state, 5),
+                                              1 + n_randint(state, 5), ctx, cctx);
+
+        status |= _split_leading_coeff(f, state, 1 + n_randint(state, 3), ctx, cctx);
+
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                /* only f can drop in degree */
+                if (g->length != 0)
+                {
+                    status |= gr_poly_set_coeff_ui(c, 0, 1 + n_randint(state, p - 1), cctx);
+                    status |= gr_poly_set_coeff_scalar(g, g->length - 1, c, ctx);
+                }
+                break;
+            case 1:
+                /* both can, and x = 1 is a root of each: the progression
+                   starts there, so both drop at once at that point */
+                status |= _split_leading_coeff(g, state, 1 + n_randint(state, 3), ctx, cctx);
+                status |= _root_in_leading_coeff(f, 1, ctx, cctx);
+                status |= _root_in_leading_coeff(g, 1, ctx, cctx);
+                break;
+            default:
+                break;
+        }
+
+        s1 = gr_poly_resultant_multipoint(x, f, g, ctx);
+        status |= gr_poly_resultant_sylvester(y, f, g, ctx);
+
+        /* the bound on deg_x of the resultant that the algorithm uses */
+        if (f->length >= g->length)
+        {
+            fc = (const gr_poly_struct *) f->coeffs; lenf = f->length;
+            gc = (const gr_poly_struct *) g->coeffs; leng = g->length;
+        }
+        else
+        {
+            fc = (const gr_poly_struct *) g->coeffs; lenf = g->length;
+            gc = (const gr_poly_struct *) f->coeffs; leng = f->length;
+        }
+
+        blenf = 0;
+        for (i = 0; i < lenf; i++)
+            blenf = FLINT_MAX(blenf, fc[i].length);
+
+        bleng = 0;
+        for (i = 0; i < leng; i++)
+            bleng = FLINT_MAX(bleng, gc[i].length);
+
+        npoints = (leng - 1) * (blenf - 1) + (lenf - 1) * (bleng - 1) + 1;
+
+        if ((status != GR_SUCCESS) ||
+            ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)) ||
+            ((s1 != GR_SUCCESS) && leng >= 2 && (p - 1) / 2 >= (ulong) npoints))
+        {
+            flint_printf("FAIL (vs sylvester, degree drop in y):\n");
+            gr_ctx_println(ctx);
+            flint_printf("npoints = %wd, status = %d\n", npoints, s1);
+            flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n\n");
+            flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n\n");
+            flint_printf("x = "); gr_println(x, ctx);
+            flint_printf("y = "); gr_println(y, ctx);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        gr_poly_clear(f, ctx);
+        gr_poly_clear(g, ctx);
+        gr_poly_clear(c, cctx);
         gr_heap_clear(x, ctx);
         gr_heap_clear(y, ctx);
         gr_ctx_clear(ctx);
