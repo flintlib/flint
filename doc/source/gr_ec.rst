@@ -18,18 +18,19 @@ commutative ring *R*, given by a general (long) Weierstrass equation
     E : y^2 + a_1 x y + a_3 y = x^3 + a_2 x^2 + a_4 x + a_6
 
 with coefficients `a_1, a_2, a_3, a_4, a_6 \in R`.
-A :type:`gr_ec_point_t` represents a point of `E`, stored in homogeneous
-projective coordinates over the same ring.
 
 The general Weierstrass equation is used as the interface for all curves
 since it is the form needed over rings of residue characteristic 2 and 3,
 where the short Weierstrass form `y^2 = x^3 + a_4 x + a_6` is not general
 enough.
 
-Since the base ring is not assumed to be a field, no division is performed
-in the point arithmetic: the projective coordinates of a point are only
-inverted on explicit request, for example by :func:`gr_ec_point_get_affine`
-or :func:`gr_ec_point_normalize`.
+Points of `E` are represented by one of three types --
+:type:`gr_ec_point_t`, :type:`gr_ec_aff_point_t` and
+:type:`gr_ec_jac_point_t` -- which differ in the coordinate system used and
+therefore in the cost of the group law; see
+:ref:`the section on point representations <gr-ec-representations>`.
+Each type has its own set of arithmetic functions, and conversions between
+the three are provided.
 
 Like the rest of the *gr* interface, functions return a status flag which
 is ``GR_SUCCESS`` on success, ``GR_DOMAIN`` if the result does not exist,
@@ -39,8 +40,8 @@ coordinate (typically, whether it is zero or invertible) cannot be made in
 the base ring; this happens for rings with inexact representation, and for
 rings where such predicates are not implemented.
 
-Unless otherwise stated, aliasing between input and output objects is
-allowed.
+Unless otherwise stated, aliasing between input and output objects of the
+same type is allowed.
 
 .. _gr-ec-models:
 
@@ -62,14 +63,13 @@ stored coefficients, not of the isomorphism class of the curve.
         This model is valid over any base ring, in particular over rings of
         residue characteristic 2 and 3.
 
-        The group law in this model is not yet implemented:
-        :func:`gr_ec_point_add`, :func:`gr_ec_point_sub`,
-        :func:`gr_ec_point_dbl` and the scalar multiplication functions
-        currently return ``GR_UNABLE``. Everything that does not require
-        the addition formulas is supported, including the curve invariants,
-        :func:`gr_ec_point_neg`, :func:`gr_ec_point_is_on_curve` and,
-        when 2 is invertible in the base ring,
-        :func:`gr_ec_point_lift_x`.
+        The group law in this model is not yet implemented: the ``add``,
+        ``sub``, ``dbl`` and scalar multiplication functions of all three
+        point representations currently return ``GR_UNABLE``. Everything
+        that does not require the addition formulas is supported, including
+        the curve invariants, negation, the ``is_on_curve`` predicates,
+        the conversions between representations and, when 2 is invertible
+        in the base ring, the ``lift_x`` functions.
 
     .. macro:: GR_EC_SHORT_WEIERSTRASS
 
@@ -90,34 +90,110 @@ to `y^2 = x^3 - 27 c_4 x - 54 c_6`. An interface for changes of variables
 `(x, y) \mapsto (u^2 x + r, u^3 y + u^2 s x + t)`, which would also transport
 points between the two models, is planned but not currently provided.
 
-Point representation
+.. _gr-ec-representations:
+
+Point representations
 -------------------------------------------------------------------------------
 
-Points are represented by a triple `(X : Y : Z)` of elements of the base
-ring, satisfying the homogenized curve equation
+Three representations of the points of `E` are provided. They represent the
+same group, and the choice between them is a matter of efficiency:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 22 20 36
+
+   * - Type
+     - Stored data
+     - Base ring
+     - Group law
+   * - :type:`gr_ec_point_t`
+     - `X, Y, Z`
+     - any commutative ring
+     - inversion-free; the interchange representation
+   * - :type:`gr_ec_aff_point_t`
+     - `x, y` and a flag
+     - field only
+     - one inversion per operation
+   * - :type:`gr_ec_jac_point_t`
+     - `X, Y, Z` and a flag
+     - any commutative ring
+     - inversion-free; fastest for scalar multiplication
+
+:type:`gr_ec_point_t` uses homogeneous projective coordinates
+`(X : Y : Z)`, satisfying the homogenized curve equation
 
 .. math::
 
     Y^2 Z + a_1 X Y Z + a_3 Y Z^2 = X^3 + a_2 X^2 Z + a_4 X Z^2 + a_6 Z^3.
 
-The point at infinity `\mathcal{O}`, which is the identity element of the
-group law, is `(0 : 1 : 0)`; a point with `Z` invertible corresponds to the
-affine point `(X/Z, Y/Z)`. The group law is written additively, so the
-identity element is created by :func:`gr_ec_point_zero` and tested for by
-:func:`gr_ec_point_is_zero`.
+The point at infinity `\mathcal{O}` is `(0 : 1 : 0)`, and a point with `Z`
+invertible corresponds to the affine point `(X/Z, Y/Z)`. This is the default
+representation: it works over an arbitrary base ring, it needs no division,
+and it is the one to which the other two convert without loss.
 
-Triples are not normalized automatically: the same point has many
-representations, and :func:`gr_ec_point_equal` compares points by testing
-whether the `2 \times 2` minors
+:type:`gr_ec_aff_point_t` stores the two affine coordinates `x` and `y`
+satisfying the Weierstrass equation, together with a :type:`truth_t` flag
+recording whether the point is `\mathcal{O}`, which has no affine
+coordinates. Since the affine group law divides by `x_2 - x_1`, respectively
+by `2 y_1 + a_1 x_1 + a_3`, every operation on affine points requires the
+base ring to be a field; see the section on affine points below. This
+representation is the most compact and the most convenient for input,
+output and testing, but it is the slowest for repeated arithmetic.
+
+:type:`gr_ec_jac_point_t` uses Jacobian coordinates `(X, Y, Z)`, in which
+the affine point represented is `(X/Z^2, Y/Z^3)`, satisfying
+
+.. math::
+
+    Y^2 + a_1 X Y Z + a_3 Y Z^3 = X^3 + a_2 X^2 Z^2 + a_4 X Z^4 + a_6 Z^6.
+
+As for affine points, the point at infinity is recorded by a separate
+:type:`truth_t` flag rather than by a zero coordinate. Storing the flag
+means that `Z` is nonzero in every valid finite point, so the doubling and
+addition formulas do not have to test `Z` against zero; the cost is one
+machine word per point. Jacobian coordinates give the cheapest doubling of
+the three representations, which is what makes them the representation of
+choice for scalar multiplication.
+
+The infinity flag
+...............................................................................
+
+For :type:`gr_ec_aff_point_t` and :type:`gr_ec_jac_point_t`, the field
+``is_infinity`` has the following meaning:
+
+* ``T_TRUE`` -- the point is `\mathcal{O}`. The stored coordinates are
+  unspecified and must not be read.
+* ``T_FALSE`` -- the point is the finite point given by the stored
+  coordinates.
+* ``T_UNKNOWN`` -- it is not known whether the point is `\mathcal{O}`.
+  Such a point is *invalid*: the stored coordinates are unspecified,
+  predicates applied to it return ``T_UNKNOWN``, and operations taking it
+  as an input return ``GR_UNABLE``.
+
+An invalid point is what a function leaves in its output when it fails, so
+a caller that checks return values never has to think about the third case.
+It arises, for example, when converting from a :type:`gr_ec_point_t` whose
+coordinate `Z` cannot be decided to be zero or not.
+
+Equality of points
+...............................................................................
+
+Points are not normalized automatically, so the same point of `E` has many
+representations and equality is tested by cross-multiplication:
+:func:`gr_ec_point_equal` tests the vanishing of the `2 \times 2` minors
 
 .. math::
 
     X_1 Y_2 - X_2 Y_1, \quad Y_1 Z_2 - Y_2 Z_1, \quad X_1 Z_2 - X_2 Z_1
 
-all vanish. This decides equality of points when the base ring is an
-integral domain. Over a general commutative ring, the vanishing of the
-minors is only a necessary condition for the two triples to define the same
-point, and the result should be interpreted accordingly.
+and :func:`gr_ec_jac_point_equal` tests
+`X_1 Z_2^2 = X_2 Z_1^2` and `Y_1 Z_2^3 = Y_2 Z_1^3`.
+These tests decide equality of points when the base ring is an integral
+domain. Over a general commutative ring they are only necessary conditions
+for the two representations to define the same point, and the result should
+be interpreted accordingly. For :type:`gr_ec_aff_point_t` the
+representation is unique, so :func:`gr_ec_aff_point_equal` simply compares
+the coordinates.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -141,12 +217,29 @@ Types, macros and constants
 .. type:: gr_ec_point_t
 
     Contains a pointer (``coords``) to an array of three elements of the
-    base ring, holding the projective coordinates `X`, `Y`, `Z` of the
-    point.
+    base ring, holding the homogeneous projective coordinates `X`, `Y`, `Z`
+    of the point.
 
-    A ``gr_ec_point_t`` is defined as an array of length one of type
-    ``gr_ec_point_struct``, permitting a ``gr_ec_point_t`` to be passed by
-    reference.
+.. type:: gr_ec_aff_point_struct
+
+.. type:: gr_ec_aff_point_t
+
+    Contains a pointer (``coords``) to an array of two elements of the base
+    ring, holding the affine coordinates `x`, `y` of the point, and a
+    :type:`truth_t` (``is_infinity``) recording whether the point is the
+    point at infinity.
+
+.. type:: gr_ec_jac_point_struct
+
+.. type:: gr_ec_jac_point_t
+
+    Contains a pointer (``coords``) to an array of three elements of the
+    base ring, holding the Jacobian coordinates `X`, `Y`, `Z` of the point,
+    and a :type:`truth_t` (``is_infinity``) recording whether the point is
+    the point at infinity.
+
+    Each of the three point types is defined as an array of length one of
+    the corresponding struct type, permitting it to be passed by reference.
 
 .. macro:: GR_EC_CTX_NUM_COEFFS
 
@@ -182,8 +275,14 @@ Types, macros and constants
 .. macro:: GR_EC_POINT_X(P, ctx)
            GR_EC_POINT_Y(P, ctx)
            GR_EC_POINT_Z(P, ctx)
+           GR_EC_AFF_POINT_X(P, ctx)
+           GR_EC_AFF_POINT_Y(P, ctx)
+           GR_EC_JAC_POINT_X(P, ctx)
+           GR_EC_JAC_POINT_Y(P, ctx)
+           GR_EC_JAC_POINT_Z(P, ctx)
 
-    Pointers to the projective coordinates of the point *P*.
+    Pointers to the stored coordinates of the point *P*, for each of the
+    three point types.
 
 Context object methods
 -------------------------------------------------------------------------------
@@ -250,6 +349,11 @@ Context object methods
 .. function:: gr_ec_model_t gr_ec_ctx_model(gr_ec_ctx_t ctx)
 
     Returns the model of the curve *ctx*.
+
+.. function:: truth_t gr_ec_ctx_is_over_field(gr_ec_ctx_t ctx)
+
+    Returns whether the base ring of *ctx* is a field. This is the
+    condition under which the affine point functions are usable.
 
 .. function:: int gr_ec_ctx_write(gr_stream_t out, gr_ec_ctx_t ctx)
               int gr_ec_ctx_get_str(char ** res, gr_ec_ctx_t ctx)
@@ -329,7 +433,7 @@ Curve invariants
     does not imply that the equation defines a smooth curve over the whole
     base: for that, `\Delta` must be invertible.
 
-Memory management
+Projective points: memory management
 -------------------------------------------------------------------------------
 
 .. function:: void gr_ec_point_init(gr_ec_point_t P, gr_ec_ctx_t ctx)
@@ -357,7 +461,7 @@ Memory management
     the curve; it is the responsibility of the caller to restore a valid
     representation.
 
-Basic manipulation
+Projective points: basic manipulation
 -------------------------------------------------------------------------------
 
 .. function:: int gr_ec_point_set(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
@@ -421,7 +525,7 @@ Basic manipulation
     curve in the model :macro:`GR_EC_LONG_WEIERSTRASS` over a base ring in
     which 2 is not invertible.
 
-Comparisons and properties
+Projective points: comparisons and properties
 -------------------------------------------------------------------------------
 
 .. function:: truth_t gr_ec_point_is_zero(const gr_ec_point_t P, gr_ec_ctx_t ctx)
@@ -442,7 +546,7 @@ Comparisons and properties
     Weierstrass equation of *ctx*. This is checked in the general
     (long) form, and is therefore supported for every model.
 
-Input and output
+Projective points: input, output and random generation
 -------------------------------------------------------------------------------
 
 .. function:: int gr_ec_point_write(gr_stream_t out, const gr_ec_point_t P, gr_ec_ctx_t ctx)
@@ -452,9 +556,6 @@ Input and output
     Writes *P* to the stream *out*, to a string, or to standard output.
     The point is printed as the triple of its projective coordinates
     ``(X : Y : Z)``, without normalizing it first.
-
-Random generation
--------------------------------------------------------------------------------
 
 .. function:: int gr_ec_point_randtest(gr_ec_point_t res, flint_rand_t state, gr_ec_ctx_t ctx)
 
@@ -467,7 +568,7 @@ Random generation
     whenever :func:`gr_ec_point_lift_x` is unable to lift the `x`-coordinates
     that were tried.
 
-Arithmetic
+Projective points: arithmetic
 -------------------------------------------------------------------------------
 
 The functions in this section implement the group law of the curve, written
@@ -504,37 +605,396 @@ dispatch on the model of *ctx*; see :ref:`the section on curve models
     that `n P = (-n)(-P)` for negative *n* and that `0 P` is the point at
     infinity.
 
+    For a curve in the model :macro:`GR_EC_SHORT_WEIERSTRASS`, these
+    functions convert *P* to Jacobian coordinates, run the scalar
+    multiplication there, and convert the result back; both conversions are
+    inversion-free, so this is faster than working in projective
+    coordinates throughout.
+
+Affine points
+-------------------------------------------------------------------------------
+
+Every function in this section, and every conversion producing a
+:type:`gr_ec_aff_point_t`, requires the base ring of *ctx* to be a field:
+they return ``GR_DOMAIN`` if :func:`gr_ec_ctx_is_over_field` returns
+``T_FALSE`` and ``GR_UNABLE`` if it returns ``T_UNKNOWN``. The memory
+management functions, which cannot fail, are exempt from this rule, as are
+the predicates, which return ``T_UNKNOWN`` instead.
+
+.. function:: void gr_ec_aff_point_init(gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              void gr_ec_aff_point_clear(gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              void gr_ec_aff_point_swap(gr_ec_aff_point_t P, gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+
+    Initializes *P* to the point at infinity, clears *P*, respectively
+    swaps *P* and *Q* efficiently.
+
+.. function:: gr_ptr gr_ec_aff_point_x_ptr(gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              gr_ptr gr_ec_aff_point_y_ptr(gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              gr_srcptr gr_ec_aff_point_x_srcptr(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              gr_srcptr gr_ec_aff_point_y_srcptr(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Returns a pointer to the affine coordinate `x` or `y` of *P*. The
+    coordinates are only meaningful when ``P->is_infinity`` is ``T_FALSE``.
+
+.. function:: int gr_ec_aff_point_set(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to a copy of *P*.
+
+.. function:: int gr_ec_aff_point_zero(gr_ec_aff_point_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to the point at infinity, that is, sets ``is_infinity`` to
+    ``T_TRUE``.
+
+.. function:: int gr_ec_aff_point_set_affine(gr_ec_aff_point_t res, gr_srcptr x, gr_srcptr y, gr_ec_ctx_t ctx)
+              int _gr_ec_aff_point_set_affine(gr_ec_aff_point_t res, gr_srcptr x, gr_srcptr y, gr_ec_ctx_t ctx)
+
+    Sets *res* to the finite point with affine coordinates `(x, y)`.
+    The non-underscore version verifies that the point lies on the curve,
+    as for :func:`gr_ec_point_set_affine`; the underscore version performs
+    no check.
+
+.. function:: int gr_ec_aff_point_get_affine(gr_ptr x, gr_ptr y, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *x* and *y* to the affine coordinates of *P*, which for this
+    representation is just a copy. Returns ``GR_DOMAIN`` if *P* is the
+    point at infinity.
+
+.. function:: int gr_ec_aff_point_lift_x(gr_ec_aff_point_t res, gr_srcptr x, gr_ec_ctx_t ctx)
+
+    Sets *res* to a point of the curve with `x`-coordinate *x*, as
+    :func:`gr_ec_point_lift_x`.
+
+.. function:: truth_t gr_ec_aff_point_is_zero(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Returns ``P->is_infinity``, that is, whether *P* is the point at
+    infinity.
+
+.. function:: truth_t gr_ec_aff_point_equal(const gr_ec_aff_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+
+    Returns whether *P* and *Q* are the same point. Since the affine
+    representation is unique, this compares the infinity flags and then the
+    coordinates.
+
+.. function:: truth_t gr_ec_aff_point_is_on_curve(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Returns whether *P* is the point at infinity or its coordinates satisfy
+    the Weierstrass equation of *ctx*, in the general (long) form.
+
+.. function:: int gr_ec_aff_point_write(gr_stream_t out, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_get_str(char ** res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_print(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Writes *P* to the stream *out*, to a string, or to standard output.
+    A finite point is printed as ``(x, y)`` and the point at infinity as
+    ``O``.
+
+.. function:: int gr_ec_aff_point_randtest(gr_ec_aff_point_t res, flint_rand_t state, gr_ec_ctx_t ctx)
+
+    Sets *res* to a random point of the curve *ctx*, for use in test code,
+    as :func:`gr_ec_point_randtest`.
+
+.. function:: int gr_ec_aff_point_neg(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to `-P`, which in affine coordinates is
+    `(x, -y - a_1 x - a_3)`. This is supported for every model and requires
+    no inversion.
+
+.. function:: int gr_ec_aff_point_add(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_sub(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_dbl(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to `P + Q`, `P - Q`, respectively `2 P`, using the
+    chord-and-tangent formulas. Each of these performs one inversion in the
+    base ring, which is why the affine representation should not be used in
+    loops.
+
+    The exceptional cases are decided from the infinity flags and from the
+    equality of the `x`-coordinates, so no comparison of full points is
+    needed.
+
+.. function:: int gr_ec_aff_point_mul_ui(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, ulong n, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_mul_si(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, slong n, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_mul_fmpz(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+
+    Sets *res* to `n P`.
+
+    For a curve in the model :macro:`GR_EC_SHORT_WEIERSTRASS`, these
+    functions convert *P* to Jacobian coordinates, run the scalar
+    multiplication there, and convert the result back, so that only one
+    inversion is performed instead of one per bit of *n*.
+
+Jacobian points
+-------------------------------------------------------------------------------
+
+Jacobian arithmetic is currently implemented only for the model
+:macro:`GR_EC_SHORT_WEIERSTRASS`; the ``add``, ``sub``, ``dbl`` and scalar
+multiplication functions return ``GR_UNABLE`` for a curve in the model
+:macro:`GR_EC_LONG_WEIERSTRASS`. Everything else in this section, including
+the conversions, works for both models.
+
+.. function:: void gr_ec_jac_point_init(gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              void gr_ec_jac_point_clear(gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              void gr_ec_jac_point_swap(gr_ec_jac_point_t P, gr_ec_jac_point_t Q, gr_ec_ctx_t ctx)
+
+    Initializes *P* to the point at infinity, clears *P*, respectively
+    swaps *P* and *Q* efficiently.
+
+.. function:: gr_ptr gr_ec_jac_point_x_ptr(gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              gr_ptr gr_ec_jac_point_y_ptr(gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              gr_ptr gr_ec_jac_point_z_ptr(gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              gr_srcptr gr_ec_jac_point_x_srcptr(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              gr_srcptr gr_ec_jac_point_y_srcptr(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              gr_srcptr gr_ec_jac_point_z_srcptr(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Returns a pointer to the Jacobian coordinate `X`, `Y` or `Z` of *P*.
+    These are the weighted coordinates, not the affine ones: the point
+    represented is `(X/Z^2, Y/Z^3)`. They are only meaningful when
+    ``P->is_infinity`` is ``T_FALSE``.
+
+.. function:: int gr_ec_jac_point_set(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to a copy of *P*.
+
+.. function:: int gr_ec_jac_point_zero(gr_ec_jac_point_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to the point at infinity, that is, sets ``is_infinity`` to
+    ``T_TRUE``.
+
+.. function:: int gr_ec_jac_point_set_affine(gr_ec_jac_point_t res, gr_srcptr x, gr_srcptr y, gr_ec_ctx_t ctx)
+              int _gr_ec_jac_point_set_affine(gr_ec_jac_point_t res, gr_srcptr x, gr_srcptr y, gr_ec_ctx_t ctx)
+
+    Sets *res* to the finite point with affine coordinates `(x, y)`, that
+    is, to the Jacobian triple `(x, y, 1)`. Checking is as for
+    :func:`gr_ec_point_set_affine`.
+
+.. function:: int gr_ec_jac_point_set_jacobian(gr_ec_jac_point_t res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ec_ctx_t ctx)
+              int _gr_ec_jac_point_set_jacobian(gr_ec_jac_point_t res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ec_ctx_t ctx)
+
+    Sets *res* to the finite point with Jacobian coordinates `(x, y, z)`,
+    representing the affine point `(x/z^2, y/z^3)`.
+
+    The non-underscore version verifies that the point lies on the curve
+    and returns ``GR_DOMAIN`` if *z* is provably zero; the point at
+    infinity must be created with :func:`gr_ec_jac_point_zero` instead. The
+    underscore version performs no check.
+
+.. function:: int gr_ec_jac_point_get_affine(gr_ptr x, gr_ptr y, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *x* and *y* to the affine coordinates `X/Z^2` and `Y/Z^3` of *P*.
+    Returns ``GR_DOMAIN`` if *P* is the point at infinity or if `Z` is not
+    invertible in the base ring, and ``GR_UNABLE`` if this cannot be
+    decided or the division cannot be performed. One inversion is
+    performed.
+
+.. function:: int gr_ec_jac_point_normalize(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the normalized representation `(X/Z^2, Y/Z^3, 1)` of *P*,
+    or to the point at infinity if *P* is. Failure is as for
+    :func:`gr_ec_jac_point_get_affine`, and on failure *res* is set to an
+    invalid point.
+
+    Normalizing before a run of mixed additions is worthwhile, since a
+    normalized point can be converted to an affine point for free.
+
+.. function:: truth_t gr_ec_jac_point_is_zero(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Returns ``P->is_infinity``, that is, whether *P* is the point at
+    infinity.
+
+.. function:: truth_t gr_ec_jac_point_equal(const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx)
+
+    Returns whether *P* and *Q* are the same point, by testing
+    `X_1 Z_2^2 = X_2 Z_1^2` and `Y_1 Z_2^3 = Y_2 Z_1^3` for finite points.
+
+.. function:: truth_t gr_ec_jac_point_is_on_curve(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Returns whether *P* is the point at infinity or its coordinates satisfy
+    the weighted-homogeneous curve equation
+
+    .. math::
+
+        Y^2 + a_1 X Y Z + a_3 Y Z^3 = X^3 + a_2 X^2 Z^2 + a_4 X Z^4 + a_6 Z^6.
+
+.. function:: int gr_ec_jac_point_write(gr_stream_t out, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_get_str(char ** res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_print(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Writes *P* to the stream *out*, to a string, or to standard output.
+    A finite point is printed as its Jacobian triple ``(X, Y, Z)``, without
+    normalizing it first, and the point at infinity as ``O``.
+
+.. function:: int gr_ec_jac_point_randtest(gr_ec_jac_point_t res, flint_rand_t state, gr_ec_ctx_t ctx)
+
+    Sets *res* to a random point of the curve *ctx*, for use in test code,
+    as :func:`gr_ec_point_randtest`. The `Z` coordinate of the result is
+    not necessarily 1.
+
+.. function:: int gr_ec_jac_point_neg(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to `-P`, which in Jacobian coordinates is
+    `(X, -Y - a_1 X Z - a_3 Z^3, Z)`. This is supported for every model.
+
+.. function:: int gr_ec_jac_point_add(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_sub(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx)
+
+    Sets *res* to `P + Q`, respectively `P - Q`, using the standard
+    Jacobian addition formulas. As in projective coordinates, the formulas
+    are not uniform: the case `P = \pm Q` is detected from the intermediate
+    quantities and handled separately, and ``GR_UNABLE`` is returned when
+    the base ring cannot decide the corresponding equalities.
+
+.. function:: int gr_ec_jac_point_dbl(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to `2 P`. This is the cheapest doubling of the three
+    representations and is what makes Jacobian coordinates the default for
+    scalar multiplication.
+
+.. function:: int gr_ec_jac_point_add_aff_point(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_sub_aff_point(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+
+    Sets *res* to `P + Q`, respectively `P - Q`, where *Q* is an affine
+    point. These are the mixed-addition formulas: knowing that the second
+    operand has `Z = 1` saves several multiplications compared to
+    :func:`gr_ec_jac_point_add`, which is the reason to keep precomputed
+    tables of affine points.
+
+    Unlike the other affine functions, these do not require the base ring
+    to be a field, since no inversion is performed.
+
+.. function:: int gr_ec_jac_point_mul_ui(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, ulong n, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_mul_si(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, slong n, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_mul_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+
+    Sets *res* to `n P`, with the same conventions as
+    :func:`gr_ec_point_mul_fmpz`.
+
+Conversions between representations
+-------------------------------------------------------------------------------
+
+The conversions to :type:`gr_ec_point_t` and :type:`gr_ec_jac_point_t` are
+inversion-free and work over any base ring; the conversions to
+:type:`gr_ec_aff_point_t` perform one inversion and therefore require the
+base ring to be a field:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 46 24
+
+   * - Conversion
+     - Function
+     - Cost
+   * - affine to projective
+     - :func:`gr_ec_point_set_aff_point`
+     - copy
+   * - affine to Jacobian
+     - :func:`gr_ec_jac_point_set_aff_point`
+     - copy
+   * - Jacobian to projective
+     - :func:`gr_ec_point_set_jac_point`
+     - 2M + 1S
+   * - projective to Jacobian
+     - :func:`gr_ec_jac_point_set_point`
+     - 2M + 1S
+   * - projective to affine
+     - :func:`gr_ec_aff_point_set_point`
+     - 1I + 2M
+   * - Jacobian to affine
+     - :func:`gr_ec_aff_point_set_jac_point`
+     - 1I + 3M + 1S
+
+Here M, S and I denote a multiplication, a squaring and an inversion in the
+base ring.
+
+.. function:: int gr_ec_point_set_aff_point(gr_ec_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the projective point `(x : y : 1)` corresponding to the
+    affine point *P*, or to `(0 : 1 : 0)` if *P* is the point at infinity.
+
+.. function:: int gr_ec_point_set_jac_point(gr_ec_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the projective point `(X Z : Y : Z^3)` corresponding to
+    the Jacobian point *P*, or to `(0 : 1 : 0)` if *P* is the point at
+    infinity.
+
+.. function:: int gr_ec_jac_point_set_point(gr_ec_jac_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the Jacobian point `(X Z, Y Z^2, Z)` corresponding to the
+    projective point *P*, or to the point at infinity if `Z` is zero.
+
+    Returns ``GR_UNABLE``, and sets *res* to an invalid point, if the base
+    ring cannot decide whether `Z` is zero.
+
+.. function:: int gr_ec_jac_point_set_aff_point(gr_ec_jac_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the Jacobian point `(x, y, 1)` corresponding to the
+    affine point *P*, or to the point at infinity if *P* is. This is a copy
+    of the coordinates and the flag, with no arithmetic.
+
+.. function:: int gr_ec_aff_point_set_point(gr_ec_aff_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the affine point `(X/Z, Y/Z)` corresponding to the
+    projective point *P*, or to the point at infinity if `Z` is zero.
+
+.. function:: int gr_ec_aff_point_set_jac_point(gr_ec_aff_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+
+    Sets *res* to the affine point `(X/Z^2, Y/Z^3)` corresponding to the
+    Jacobian point *P*, or to the point at infinity if *P* is.
+
 Model-specific implementations
 -------------------------------------------------------------------------------
 
-The following low-level functions implement the group law for a specific
-model. They assume that the curve *ctx* is given in that model, in
-particular that `a_1 = a_2 = a_3 = 0` for the short Weierstrass versions,
-and they do not check this; the results are undefined otherwise. Use the
-functions of the previous section unless the model is known in advance.
+The following low-level functions implement the group law of one
+representation for one specific model. They assume that the curve *ctx* is
+given in that model, in particular that `a_1 = a_2 = a_3 = 0` for the short
+Weierstrass versions, and they do not check this; the results are undefined
+otherwise. Use the functions of the sections above unless the model is
+known in advance.
 
-.. function:: int _gr_ec_point_neg_long_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
-              int _gr_ec_point_neg_short_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
-
-    Implementations of :func:`gr_ec_point_neg`.
+Negation is not split by model, since the general formula specializes
+correctly when `a_1 = a_3 = 0`.
 
 .. function:: int _gr_ec_point_add_long_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, const gr_ec_point_t Q, gr_ec_ctx_t ctx)
               int _gr_ec_point_add_short_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, const gr_ec_point_t Q, gr_ec_ctx_t ctx)
-
-    Implementations of :func:`gr_ec_point_add`, using the standard
-    homogeneous projective chord-and-tangent formulas for the respective
-    model. The long Weierstrass version is not yet implemented and returns
-    ``GR_UNABLE``.
-
-.. function:: int _gr_ec_point_dbl_long_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
+              int _gr_ec_point_dbl_long_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
               int _gr_ec_point_dbl_short_weierstrass(gr_ec_point_t res, const gr_ec_point_t P, gr_ec_ctx_t ctx)
 
-    Implementations of :func:`gr_ec_point_dbl`. The long Weierstrass
-    version is not yet implemented and returns ``GR_UNABLE``.
+    Implementations of :func:`gr_ec_point_add` and :func:`gr_ec_point_dbl`,
+    using the standard homogeneous projective formulas for the respective
+    model. The long Weierstrass versions are not yet implemented and return
+    ``GR_UNABLE``.
+
+.. function:: int _gr_ec_aff_point_add_long_weierstrass(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+              int _gr_ec_aff_point_add_short_weierstrass(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+              int _gr_ec_aff_point_dbl_long_weierstrass(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+              int _gr_ec_aff_point_dbl_short_weierstrass(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
+
+    Implementations of :func:`gr_ec_aff_point_add` and
+    :func:`gr_ec_aff_point_dbl`. The long Weierstrass versions are not yet
+    implemented and return ``GR_UNABLE``; they are the natural place to add
+    support for curves of characteristic 2 and 3, since the affine
+    chord-and-tangent formulas are valid in the general form over any
+    field.
+
+.. function:: int _gr_ec_jac_point_add_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx)
+              int _gr_ec_jac_point_dbl_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
+              int _gr_ec_jac_point_add_aff_point_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx)
+
+    Implementations of :func:`gr_ec_jac_point_add`,
+    :func:`gr_ec_jac_point_dbl` and
+    :func:`gr_ec_jac_point_add_aff_point` for the short Weierstrass model.
+    There are no long Weierstrass counterparts.
 
 .. function:: int _gr_ec_point_mul_fmpz_binary(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+              int _gr_ec_aff_point_mul_fmpz_binary(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+              int _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
 
-    Implementation of :func:`gr_ec_point_mul_fmpz` using left-to-right
-    binary double-and-add, calling :func:`gr_ec_point_dbl` and
-    :func:`gr_ec_point_add` and therefore working for any model for which
-    those are implemented. Aliasing of *res* and *P* is allowed.
+    Scalar multiplication by left-to-right binary double-and-add, staying
+    in the given representation. Each of these calls the ``dbl`` and
+    ``add`` functions of its representation and therefore works for any
+    model for which those are implemented. Aliasing of *res* and *P* is
+    allowed.
+
+    These are the fallbacks used by the public scalar multiplication
+    functions when converting to Jacobian coordinates is not applicable;
+    the affine one is mostly useful for testing, since it performs an
+    inversion at every step.
