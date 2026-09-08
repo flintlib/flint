@@ -83,11 +83,15 @@ _fmpz_div_qr_small_divisor_ui(fmpz_t q, fmpz_t r, ulong * rem,
     return 1;
 }
 
-/* the same with a signed small divisor */
+/* the same with a signed small divisor; the magnitude is formed with an
+   unsigned negation so that h = WORD_MIN (magnitude 2^(FLINT_BITS-1)) is
+   handled without signed overflow (FLINT_ABS(WORD_MIN) is undefined
+   behaviour, which optimising compilers exploit) */
 static inline int
 _fmpz_div_qr_small_divisor(fmpz_t q, fmpz_t r, const fmpz_t g, slong h, int rnd)
 {
-    return _fmpz_div_qr_small_divisor_ui(q, r, NULL, g, FLINT_ABS(h), h < 0, rnd);
+    ulong ah = (h < 0) ? -(ulong) h : (ulong) h;
+    return _fmpz_div_qr_small_divisor_ui(q, r, NULL, g, ah, h < 0, rnd);
 }
 
 #endif

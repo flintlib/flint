@@ -27,6 +27,13 @@ TEST_FUNCTION_START(fmpz_div, state)
         bits = n_randint(state, 20) == 0 ? 100000 : 300;
         fmpz_randtest(a, state, bits);
         fmpz_randtest(b, state, n_randint(state, 3) == 0 ? 64 : bits);
+        if (n_randint(state, 20) == 0)
+        {
+            /* divisor of magnitude 2^(FLINT_BITS - 1): WORD_MIN as an slong */
+            fmpz_set_si(b, WORD_MIN);
+            if (n_randint(state, 2))
+                fmpz_neg(b, b);
+        }
         if (n_randint(state, 3) == 0)
             fmpz_mul(a, a, b);      /* exact case */
 
