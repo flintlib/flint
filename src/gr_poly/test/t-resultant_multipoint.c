@@ -13,14 +13,19 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-/* a prime p = m 2^16 + 1, for which the evaluation can use a DFT */
-static ulong
-_fft_prime(flint_rand_t state, int bits)
-{
-    ulong m;
+/* a prime p = m*2^16 + 1 of about `bits` bits, for which the evaluation can
+   use a DFT or zero if none exist.*/
 
-    for (m = (UWORD(1) << (bits - 16)) - 1 - n_randint(state, 1000);
-         m > (UWORD(1) << (bits - 17)); m--)
+static ulong _fft_prime(flint_rand_t state, int bits)
+{
+    ulong hi, lo, m;
+
+    FLINT_ASSERT(bits > 17);
+
+    hi = (1UL << (bits - 16)) - 1;
+    lo = 1UL << (bits - 17);
+
+    for (m = hi - n_randint(state, hi - lo); m > lo; m--)
     {
         ulong p = (m << 16) + 1;
         if (n_is_prime(p))
