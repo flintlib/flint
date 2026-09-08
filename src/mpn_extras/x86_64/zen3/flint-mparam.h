@@ -40,4 +40,11 @@
 
 #define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 470
 
+/* Newton division, Hensel exact division and Newton square root beat
+   GMP from these limb counts (divisor / quotient limbs for the first two,
+   input limbs for the square root); tuned by the reviewer on Zen 3 */
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 500
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 500
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 2000
+
 #endif

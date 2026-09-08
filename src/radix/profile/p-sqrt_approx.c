@@ -16,13 +16,6 @@
 #include "fmpz.h"
 #include "arb.h"
 
-/* s = floor(sqrt(a)) and perfect-square detection via mpn, mirroring
-   what int radix_sqrt computes */
-int
-flint_mpn_sqrt(nn_ptr s, nn_srcptr a, slong an, nn_ptr scratch)
-{
-    return mpn_sqrtrem(s, scratch, a, an) == 0;
-}
 
 int main()
 {
@@ -56,9 +49,9 @@ int main()
         flint_mpn_urandomb(a, state, 2 * n1 * FLINT_BITS);
         a[2 * n1 - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
-        exact = flint_mpn_sqrt(c, a, 2 * n1, d);
+        exact = (flint_mpn_sqrtrem(c, NULL, a, 2 * n1) == 0);
         TIMEIT_START;
-        exact = flint_mpn_sqrt(c, a, 2 * n1, d);
+        exact = (flint_mpn_sqrtrem(c, NULL, a, 2 * n1) == 0);
         TIMEIT_STOP_VALUES(tt, tmpn);
 
         radix_rand_limbs(a, state, 2 * n2, radix);

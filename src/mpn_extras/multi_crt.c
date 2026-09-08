@@ -356,7 +356,7 @@ flint_mpn_multi_crt(nn_ptr out, nn_srcptr res, const flint_mpn_crt_t C, int sign
     else
     {
         FLINT_ASSERT(an - pn + 1 <= 3);
-        mpn_tdiv_qr(W.scratch, out, 0, a, an, C->prod, pn);
+        _flint_mpn_tdiv_qr(W.scratch, out, a, an, C->prod, pn);
     }
 
     FLINT_ASSERT(mpn_cmp(out, C->prod, pn) < 0);
@@ -495,7 +495,7 @@ flint_mpn_multi_crt_vec(nn_ptr out, slong out_stride, int * negative, nn_srcptr 
                 {
                     ulong q[4];
                     FLINT_ASSERT(yn - pn + 1 <= 3);
-                    mpn_tdiv_qr(q, o, 0, y, yn, C->prod, pn);
+                    _flint_mpn_tdiv_qr(q, o, y, yn, C->prod, pn);
                 }
                 FLINT_ASSERT(mpn_cmp(o, C->prod, pn) < 0);
 

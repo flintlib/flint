@@ -13,6 +13,7 @@
 
 #include "gmpcompat.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 
 void
@@ -42,11 +43,14 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
         }
         else
         {
-            mpz_ptr mf = _fmpz_promote_val(f);
+            mpz_ptr mf = _fmpz_promote(f);
+            mp_size_t bound = flint_mpn_pow_bound_limbs(&u1, 1, exp), rn;
+            mp_ptr rd = FLINT_MPZ_REALLOC(mf, bound);
 
-            flint_mpz_set_ui(mf, u1);
-            flint_mpz_pow_ui(mf, mf, exp);
+            rn = flint_mpn_pow(rd, &u1, 1, exp);
+            mf->_mp_size = ((c1 < WORD(0)) && (exp & 1)) ? -rn : rn;
             _fmpz_demote_val(f);    /* may actually fit into a small after all */
+            return;
         }
 
         if ((c1 < WORD(0)) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
@@ -54,8 +58,28 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else
     {
-        mpz_ptr mf = _fmpz_promote_val(f);
-        flint_mpz_pow_ui(mf, COEFF_TO_PTR(c1), exp);
+        mpz_srcptr mg = COEFF_TO_PTR(c1);
+        mp_size_t gn = FLINT_ABS(mg->_mp_size), bound, rn;
+        int neg = (mg->_mp_size < 0) && (exp & 1);
+        mpz_ptr mf;
+        mp_ptr rd;
+
+        if (f == g)
+        {
+            /* the base is read during the computation: work in a temporary */
+            fmpz_t t;
+            fmpz_init(t);
+            fmpz_pow_ui(t, g, exp);
+            fmpz_swap(f, t);
+            fmpz_clear(t);
+            return;
+        }
+
+        bound = flint_mpn_pow_bound_limbs(mg->_mp_d, gn, exp);
+        mf = _fmpz_promote(f);
+        rd = FLINT_MPZ_REALLOC(mf, bound);
+        rn = flint_mpn_pow(rd, mg->_mp_d, gn, exp);
+        mf->_mp_size = neg ? -rn : rn;
         /* no need to demote as it can't get smaller */
     }
 }

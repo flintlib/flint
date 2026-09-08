@@ -496,7 +496,7 @@ static slong _fmpz_mpoly_sqrt_heap1(
             if (lc_abs > 0)
                 flint_mpz_fdiv_qr_ui(t, r, acc, lc_abs);
             else
-                mpz_fdiv_qr(t, r, acc, lc_lg);
+                flint_mpz_fdiv_qr(t, r, acc, lc_lg);
 
             _fmpz_demote_val(Qcoeffs + Qlen);
             q_rest_small = q_rest_small && !COEFF_IS_MPZ(Qcoeffs[Qlen]);
@@ -974,7 +974,7 @@ slong _fmpz_mpoly_sqrt_heap(
             if (lc_abs > 0)
                 flint_mpz_fdiv_qr_ui(t, r, acc, lc_abs);
             else
-                mpz_fdiv_qr(t, r, acc, lc_lg);
+                flint_mpz_fdiv_qr(t, r, acc, lc_lg);
 
             _fmpz_demote_val(Qcoeffs + Qlen);
             q_rest_small = q_rest_small && !COEFF_IS_MPZ(Qcoeffs[Qlen]);

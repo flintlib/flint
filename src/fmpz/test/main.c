@@ -61,13 +61,14 @@
 #include "t-divexact.c"
 #include "t-divexact_si.c"
 #include "t-divexact_ui.c"
+#include "t-div.c"
 #include "t-divides.c"
 #include "t-divides_mod_list.c"
 #include "t-divisible.c"
+#include "t-divmod_2exp.c"
 #include "t-divisible_si.c"
 #include "t-divisor_in_residue_class_lenstra.c"
 #include "t-divisor_sigma.c"
-#include "t-div_newton.c"
 #include "t-dlog.c"
 #include "t-equal.c"
 #include "t-equal_si.c"
@@ -112,6 +113,7 @@
 #include "t-init_set_readonly.c"
 #include "t-init_set_ui.c"
 #include "t-invmod.c"
+#include "t-invmod_2exp.c"
 #include "t-is_even.c"
 #include "t-is_perfect_power.c"
 #include "t-is_prime.c"
@@ -171,6 +173,7 @@
 #include "t-smod.c"
 #include "t-sqrt.c"
 #include "t-sqrtmod.c"
+#include "t-sqrtmod_2exp.c"
 #include "t-sqrtrem.c"
 #include "t-sub.c"
 #include "t-submul.c"
@@ -184,6 +187,7 @@
 #include "t-tdiv_q_ui.c"
 #include "t-tdiv_r_2exp.c"
 #include "t-tdiv_ui.c"
+#include "t-perfect_sqrt.c"
 #include "t-tstbit.c"
 #include "t-val2.c"
 #include "t-xgcd.c"
@@ -231,13 +235,14 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_divexact),
     TEST_FUNCTION(fmpz_divexact_si),
     TEST_FUNCTION(fmpz_divexact_ui),
+    TEST_FUNCTION(fmpz_div),
     TEST_FUNCTION(fmpz_divides),
     TEST_FUNCTION(fmpz_divides_mod_list),
     TEST_FUNCTION(fmpz_divisible),
+    TEST_FUNCTION(fmpz_divmod_2exp),
     TEST_FUNCTION(fmpz_divisible_si),
     TEST_FUNCTION(fmpz_divisor_in_residue_class_lenstra),
     TEST_FUNCTION(fmpz_divisor_sigma),
-    TEST_FUNCTION(fmpz_div_newton),
     TEST_FUNCTION(fmpz_dlog),
     TEST_FUNCTION(fmpz_equal),
     TEST_FUNCTION(fmpz_equal_si),
@@ -282,6 +287,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_init_set_readonly),
     TEST_FUNCTION(fmpz_init_set_ui),
     TEST_FUNCTION(fmpz_invmod),
+    TEST_FUNCTION(fmpz_invmod_2exp),
     TEST_FUNCTION(fmpz_is_even),
     TEST_FUNCTION(fmpz_is_perfect_power),
     TEST_FUNCTION(fmpz_is_prime),
@@ -341,6 +347,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_smod),
     TEST_FUNCTION(fmpz_sqrt),
     TEST_FUNCTION(fmpz_sqrtmod),
+    TEST_FUNCTION(fmpz_sqrtmod_2exp),
     TEST_FUNCTION(fmpz_sqrtrem),
     TEST_FUNCTION(fmpz_sub),
     TEST_FUNCTION(fmpz_submul),
@@ -354,6 +361,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_tdiv_q_ui),
     TEST_FUNCTION(fmpz_tdiv_r_2exp),
     TEST_FUNCTION(fmpz_tdiv_ui),
+    TEST_FUNCTION(fmpz_perfect_sqrt),
     TEST_FUNCTION(fmpz_tstbit),
     TEST_FUNCTION(fmpz_val2),
     TEST_FUNCTION(fmpz_xgcd),

@@ -1171,6 +1171,18 @@ mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n
 
 /* division ******************************************************************/
 
+/* FLINT_MPN_TDIV_QR_NEWTON_CUTOFF, FLINT_MPN_DIVEXACT_NEWTON_CUTOFF and
+   FLINT_MPN_SQRTREM_NEWTON_CUTOFF (limbs above which the Newton / Hensel
+   algorithms beat GMP) are defined per architecture in flint-mparam.h */
+
+/* Shapes for which GMP's mpn_tdiv_qr / mpn_div_q are used directly (the
+   general dispatcher only pays off for long divisors or long quotients);
+   inlined so that small divisions cost no more than the GMP call. */
+#define FLINT_MPN_TDIV_QR_SMALL(an, bn) \
+    ((bn) < 4 || ((bn) < FLINT_MPN_TDIV_QR_NEWTON_CUTOFF && (an) < 4 * (bn)))
+
+
+
 #if FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
@@ -1202,14 +1214,19 @@ int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 }
 #endif
 
+/* GMP's internal quotient-only division (always available: configure
+   checks for it); scratch needs nn + 1 limbs */
+#define mpn_div_q __gmpn_div_q
+void mpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+
 FLINT_FORCE_INLINE
 void mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 {
     mp_ptr _scratch;
     TMP_INIT;
     TMP_START;
-    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
-    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    _scratch = (mp_ptr) TMP_ALLOC((nn + 1) * sizeof(mp_limb_t));
+    mpn_div_q(qp, np, nn, dp, dn, _scratch);
     TMP_END;
 }
 
@@ -1225,6 +1242,284 @@ mp_limb_t flint_mpn_divrem_2_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d,
 mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm);
 mp_limb_t flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv);
 mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm);
+
+/* high product with known low limbs *****************************************/
+
+void _flint_mpn_mulhigh_known_low(mp_ptr out, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn, mp_srcptr kl, mp_size_t kl_len, mp_size_t klo, mp_size_t khi, mp_ptr scratch);
+
+/* Hensel (2-adic) division and square root **********************************/
+
+void flint_mpn_binv(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
+
+void flint_mpn_bdiv_qr_1(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_limb_t b, mp_size_t n);
+void flint_mpn_bdiv_qr_classical(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t n);
+void _flint_mpn_bdiv_qr_classical_preinv(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_srcptr binv, mp_size_t n);
+void flint_mpn_bdiv_qr_karp_markstein(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t n);
+void flint_mpn_bdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t n);
+
+MPN_EXTRAS_INLINE void
+flint_mpn_bdiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t n)
+{
+    flint_mpn_bdiv_qr(q, NULL, a, an, b, bn, n);
+}
+
+int flint_mpn_brsqrt(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
+int flint_mpn_bsqrt(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
+
+/* Euclidean division ********************************************************/
+
+void flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n);
+
+#if FLINT_HAVE_NATIVE_mpn_divexact
+# define mpn_divexact __gmpn_divexact
+void mpn_divexact(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_mod_34lsub1
+# define mpn_mod_34lsub1 __gmpn_mod_34lsub1
+mp_limb_t mpn_mod_34lsub1(mp_srcptr, mp_size_t);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_divisible_p
+# define mpn_divisible_p __gmpn_divisible_p
+int mpn_divisible_p(mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
+#endif
+
+int _flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+MPN_EXTRAS_INLINE int
+flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+{
+    if (bn == 1 && an == 1)
+        return a[0] % b[0] == 0;
+#if FLINT_HAVE_NATIVE_mpn_divisible_p
+    if (an < 24)
+        return mpn_divisible_p(a, an, b, bn);
+#endif
+    return _flint_mpn_divisible(a, an, b, bn);
+}
+
+/* powering */
+mp_size_t flint_mpn_pow_bound_limbs(mp_srcptr x, mp_size_t xn, ulong e);
+mp_size_t flint_mpn_pow(mp_ptr res, mp_srcptr x, mp_size_t xn, ulong e);
+
+#if FLINT_BITS == 64
+/* a value congruent to a modulo 2^48 - 1, below 2^50 (like GMP's
+   mpn_mod_34lsub1, which is used for short inputs; AVX2 kernel otherwise) */
+mp_limb_t flint_mpn_mod_2exp48m1(mp_srcptr a, mp_size_t n);
+#endif
+
+void _flint_mpn_tdiv_qr_preinv(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_srcptr binv, mp_size_t binvn);
+void _flint_mpn_tdiv_qr_newton(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void _flint_mpn_tdiv_qr_unbalanced(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void _flint_mpn_tdiv_qr_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void _flint_mpn_tdiv_qr_gmp(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void _flint_mpn_tdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+MPN_EXTRAS_INLINE void
+flint_mpn_tdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+{
+    if (FLINT_MPN_TDIV_QR_SMALL(an, bn))
+        mpn_tdiv_qr(q, r, 0, a, an, b, bn);
+    else
+        _flint_mpn_tdiv_qr(q, r, a, an, b, bn);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_tdiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+{
+    if (FLINT_MPN_TDIV_QR_SMALL(an, bn))
+        mpn_tdiv_q(q, a, an, b, bn);
+    else
+        _flint_mpn_tdiv_qr(q, NULL, a, an, b, bn);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_tdiv_r(mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+{
+    mp_ptr q;
+    TMP_INIT;
+    TMP_START;
+    q = TMP_ALLOC((an - bn + 1) * sizeof(mp_limb_t));
+    flint_mpn_tdiv_qr(q, r, a, an, b, bn);
+    TMP_END;
+}
+
+void flint_mpn_cdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void flint_mpn_cdiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void flint_mpn_cdiv_r(mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+int flint_mpn_ndiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void flint_mpn_ndiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+int flint_mpn_ndiv_r(mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+int flint_mpn_div(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+void _flint_mpn_divexact_hensel(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+void _flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+
+MPN_EXTRAS_INLINE void
+flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+{
+    if (bn == 1)
+        mpn_divexact_1(q, a, an, b[0]);
+#if FLINT_HAVE_NATIVE_mpn_divexact
+    else if (bn < 64)
+        mpn_divexact(q, a, an, b, bn);
+#endif
+    else
+        _flint_mpn_divexact(q, a, an, b, bn);
+}
+
+/* exact division by a fixed divisor with a precomputed 2-adic inverse */
+typedef struct
+{
+    mp_ptr b;           /* odd part b' of the divisor, bn limbs */
+    mp_ptr binv;        /* b'^(-1) mod B^(bn+1) */
+    mp_size_t bn;
+    mp_size_t bn_orig;  /* limbs of the original divisor */
+    mp_size_t k;        /* zero low limbs stripped */
+    unsigned int v;     /* remaining 2-adic valuation */
+}
+flint_mpn_divexact_preinv_struct;
+
+typedef flint_mpn_divexact_preinv_struct flint_mpn_divexact_preinv_t[1];
+
+void flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn);
+void flint_mpn_divexact_preinv_clear(flint_mpn_divexact_preinv_t pre);
+void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_divexact_preinv_t pre);
+
+
+
+/* mpz-like interface ********************************************************/
+
+/* out-of-line implementations; the inline wrappers below hand divisors of
+   at most two limbs (and short square roots) straight to GMP, whose mpz
+   layer has dedicated fast paths there, at no extra call cost */
+void _flint_mpz_tdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_tdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_tdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_fdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_fdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_fdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_cdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_cdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_cdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void _flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a);
+
+/* whenever the mpn layer would just call GMP (see FLINT_MPN_TDIV_QR_SMALL),
+   call GMP's mpz function directly and skip the wrapper entirely */
+#define FLINT_MPZ_SMALL_DIVISOR(a, b) \
+    FLINT_MPN_TDIV_QR_SMALL(FLINT_ABS((a)->_mp_size), FLINT_ABS((b)->_mp_size))
+
+#define FLINT_MPZ_DIV_INLINE(name, ARGS, GMPCALL, FLINTCALL) \
+MPN_EXTRAS_INLINE void flint_mpz_##name ARGS \
+{ \
+    if (FLINT_MPZ_SMALL_DIVISOR(a, b)) \
+        GMPCALL; \
+    else \
+        FLINTCALL; \
+}
+
+FLINT_MPZ_DIV_INLINE(tdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_qr(q, r, a, b), _flint_mpz_tdiv_qr(q, r, a, b))
+FLINT_MPZ_DIV_INLINE(tdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_q(q, a, b), _flint_mpz_tdiv_q(q, a, b))
+FLINT_MPZ_DIV_INLINE(tdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_r(r, a, b), _flint_mpz_tdiv_r(r, a, b))
+FLINT_MPZ_DIV_INLINE(fdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_qr(q, r, a, b), _flint_mpz_fdiv_qr(q, r, a, b))
+FLINT_MPZ_DIV_INLINE(fdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_q(q, a, b), _flint_mpz_fdiv_q(q, a, b))
+FLINT_MPZ_DIV_INLINE(fdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_r(r, a, b), _flint_mpz_fdiv_r(r, a, b))
+FLINT_MPZ_DIV_INLINE(cdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_qr(q, r, a, b), _flint_mpz_cdiv_qr(q, r, a, b))
+FLINT_MPZ_DIV_INLINE(cdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_q(q, a, b), _flint_mpz_cdiv_q(q, a, b))
+FLINT_MPZ_DIV_INLINE(cdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_r(r, a, b), _flint_mpz_cdiv_r(r, a, b))
+FLINT_MPZ_DIV_INLINE(mod, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_mod(r, a, b), _flint_mpz_mod(r, a, b))
+MPN_EXTRAS_INLINE void
+flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
+{
+    if (FLINT_ABS(b->_mp_size) < 64)
+        mpz_divexact(q, a, b);
+    else
+        _flint_mpz_divexact(q, a, b);
+}
+
+mp_size_t _flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
+
+/* one- and two-limb inputs use the hardware square root paths of
+   flint_mpn_sqrtrem (about twice as fast as GMP); the result has one limb,
+   the remainder at most two (the out-of-line version handles aliasing,
+   zero and negative inputs) */
+MPN_EXTRAS_INLINE void
+flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a)
+{
+    mp_size_t an = a->_mp_size;
+
+    if (an >= 1 && an <= 2 && s != a && r != a)
+    {
+        mp_ptr sd = FLINT_MPZ_REALLOC(s, 1), rd = FLINT_MPZ_REALLOC(r, 2);
+        r->_mp_size = _flint_mpn_sqrtrem(sd, rd, a->_mp_d, an);
+        s->_mp_size = 1;
+    }
+    else if (an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+        mpz_sqrtrem(s, r, a);
+    else
+        _flint_mpz_sqrtrem(s, r, a);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a)
+{
+    mp_size_t an = a->_mp_size;
+
+    if (an >= 1 && an <= 2 && s != a)
+    {
+        mp_ptr sd = FLINT_MPZ_REALLOC(s, 1);
+        _flint_mpn_sqrtrem(sd, NULL, a->_mp_d, an);
+        s->_mp_size = 1;
+    }
+    else if (an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+        mpz_sqrt(s, a);
+    else
+        _flint_mpz_sqrtrem(s, NULL, a);
+}
+
+/* square root ***************************************************************/
+
+
+void _flint_mpn_sqrtrem_newton(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
+void _flint_mpn_sqrtrem_gmp(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
+mp_size_t _flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
+
+MPN_EXTRAS_INLINE mp_size_t
+flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
+{
+    /* with no remainder wanted, GMP's routine is called directly below
+       the Newton cutoff (one- and two-limb inputs have faster paths) */
+    if (r == NULL && an > 2 && an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+        return mpn_sqrtrem(s, NULL, a, an) != 0;
+    return _flint_mpn_sqrtrem(s, r, a, an);
+}
+int _flint_mpn_sqrt(mp_ptr s, mp_srcptr a, mp_size_t an);
+int _flint_mpn_is_square(mp_srcptr a, mp_size_t an);
+
+/* bit i set iff i is a square modulo 256 */
+FLINT_DLL extern const unsigned char flint_mpn_sq256_tab[32];
+#define FLINT_MPN_SQUARE_MOD256(x) ((flint_mpn_sq256_tab[((x) & 255) >> 3] >> ((x) & 7)) & 1)
+
+MPN_EXTRAS_INLINE int
+flint_mpn_sqrt(mp_ptr s, mp_srcptr a, mp_size_t an)
+{
+    if (!FLINT_MPN_SQUARE_MOD256(a[0]))
+        return 0;
+    return _flint_mpn_sqrt(s, a, an);
+}
+
+MPN_EXTRAS_INLINE int
+flint_mpn_is_square(mp_srcptr a, mp_size_t an)
+{
+    if (!FLINT_MPN_SQUARE_MOD256(a[0]))
+        return 0;
+    return _flint_mpn_is_square(a, an);
+}
 
 /* composed arithmetic *******************************************************/
 

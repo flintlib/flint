@@ -12,6 +12,19 @@
 /* Include functions *********************************************************/
 
 #include "t-2add_n_inplace.c"
+#include "t-bdiv_qr.c"
+#include "t-binv.c"
+#include "t-brsqrt.c"
+#include "t-bsqrt.c"
+#include "t-cdiv_qr.c"
+#include "t-divexact.c"
+#include "t-divisible.c"
+#include "t-inv.c"
+#include "t-mpz_div.c"
+#include "t-pow.c"
+#include "t-ndiv_qr.c"
+#include "t-sqrtrem.c"
+#include "t-tdiv_qr.c"
 #include "t-divides.c"
 #include "t-divrem_1_preinv.c"
 #include "t-divrem_preinv1.c"
@@ -51,6 +64,19 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(flint_mpn_2add_n_inplace),
+    TEST_FUNCTION(flint_mpn_bdiv_qr),
+    TEST_FUNCTION(flint_mpn_binv),
+    TEST_FUNCTION(flint_mpn_brsqrt),
+    TEST_FUNCTION(flint_mpn_bsqrt),
+    TEST_FUNCTION(flint_mpn_cdiv_qr),
+    TEST_FUNCTION(flint_mpn_divexact),
+    TEST_FUNCTION(flint_mpn_divisible),
+    TEST_FUNCTION(flint_mpn_inv),
+    TEST_FUNCTION(flint_mpz_div),
+    TEST_FUNCTION(flint_mpn_pow),
+    TEST_FUNCTION(flint_mpn_ndiv_qr),
+    TEST_FUNCTION(flint_mpn_sqrtrem),
+    TEST_FUNCTION(flint_mpn_tdiv_qr),
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_1_preinv),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),

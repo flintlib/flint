@@ -12,7 +12,6 @@
 #include "mpn_extras.h"
 #include "arf.h"
 
-void __gmpn_div_q(nn_ptr, nn_srcptr, slong, nn_srcptr, slong, nn_ptr);
 
 static void
 arf_div_special(arf_t z, const arf_t x, const arf_t y)
@@ -50,6 +49,13 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
         return 0;
     }
 
+    if (rnd >= ARF_RND_FAST)
+    {
+        if (arf_is_one(x) ? _arf_want_newton_inv(y, prec) : _arf_want_newton_div(x, y, prec))
+            return _arf_div_newton(z, x, y, prec, rnd);
+        rnd = arf_rnd_relaxed_to_strict(rnd);
+    }
+
     ARF_GET_MPN_READONLY(xptr, xn, x);
     ARF_GET_MPN_READONLY(yptr, yn, y);
 
@@ -77,8 +83,6 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
     tn = xn + sn;
     zn = tn - yn + 1;
     alloc = zn + (tn + 1);
-/* need tn + 1 extra temporary limbs, which we store at the end of tptr */
-    alloc += tn + 1;
 
     ARF_MUL_TMP_ALLOC(tmp, alloc)
 
@@ -87,8 +91,8 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     flint_mpn_zero(tptr, sn);
     flint_mpn_copyi(tptr + sn, xptr, xn);
-/* uses tn + 1 extra temporary limbs, tn limbs after tptr */
-    __gmpn_div_q(zptr, tptr, tn, yptr, yn, tptr + tn);
+    /* exact truncated quotient; dispatches to GMP or to Newton division */
+    flint_mpn_tdiv_q(zptr, tptr, tn, yptr, yn);
 
     if (zptr[zn - 1] == 0)
     {
