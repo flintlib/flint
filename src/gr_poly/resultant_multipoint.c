@@ -213,10 +213,7 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     slong i, j, k, N;
     ulong depth, w, r;
 
-    depth = 0;
-    while (n_pow2(depth) < (ulong) npoints)
-        depth++;
-    depth = FLINT_MAX(depth, 4);
+    depth = FLINT_MAX(n_clog2((ulong) npoints), 4);
     N = n_pow2(depth);
 
     /* the transform produces every point at once, so unlike the blocked
