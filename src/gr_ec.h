@@ -42,7 +42,7 @@ typedef struct
     gr_ctx_struct * base_ring;
     /* a1, a2, a3, a4, a6, b2, b4, b6, b8, disc */
     gr_ptr coeffs;
-    gr_ec_model_t which_model;
+    gr_ec_model_t model;
 }
 gr_ec_ctx_struct;
 
@@ -126,7 +126,7 @@ GR_EC_INLINE gr_ctx_struct * gr_ec_ctx_base_ring(gr_ec_ctx_t ctx)
 
 GR_EC_INLINE gr_ec_model_t gr_ec_ctx_model(gr_ec_ctx_t ctx)
 {
-    return ctx->which_model;
+    return ctx->model;
 }
 
 GR_EC_INLINE truth_t gr_ec_ctx_is_over_field(gr_ec_ctx_t ctx)
@@ -198,7 +198,7 @@ WARN_UNUSED_RESULT int gr_ec_point_lift_x(gr_ec_point_t res, gr_srcptr x, gr_ec_
 
 /* Comparisons and properties */
 
-truth_t gr_ec_point_is_zero(const gr_ec_point_t P, gr_ec_ctx_t ctx);
+truth_t gr_ec_point_is_inf(const gr_ec_point_t P, gr_ec_ctx_t ctx);
 truth_t gr_ec_point_equal(const gr_ec_point_t P, const gr_ec_point_t Q, gr_ec_ctx_t ctx);
 truth_t gr_ec_point_is_on_curve(const gr_ec_point_t P, gr_ec_ctx_t ctx);
 
@@ -261,7 +261,7 @@ WARN_UNUSED_RESULT int gr_ec_aff_point_lift_x(gr_ec_aff_point_t res, gr_srcptr x
 /* Comparisons and properties */
 
 GR_EC_INLINE truth_t
-gr_ec_aff_point_is_zero(const gr_ec_aff_point_t P, gr_ec_ctx_t FLINT_UNUSED(ctx))
+gr_ec_aff_point_is_inf(const gr_ec_aff_point_t P, gr_ec_ctx_t FLINT_UNUSED(ctx))
 {
     return P->is_infinity;
 }
@@ -329,7 +329,7 @@ WARN_UNUSED_RESULT int gr_ec_jac_point_normalize(gr_ec_jac_point_t res, const gr
 /* Comparisons and properties */
 
 GR_EC_INLINE truth_t
-gr_ec_jac_point_is_zero(const gr_ec_jac_point_t P, gr_ec_ctx_t FLINT_UNUSED(ctx))
+gr_ec_jac_point_is_inf(const gr_ec_jac_point_t P, gr_ec_ctx_t FLINT_UNUSED(ctx))
 {
     return P->is_infinity;
 }
@@ -386,10 +386,17 @@ WARN_UNUSED_RESULT int _gr_ec_aff_point_dbl_long_weierstrass(gr_ec_aff_point_t r
 WARN_UNUSED_RESULT int _gr_ec_aff_point_dbl_short_weierstrass(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_aff_point_mul_fmpz_binary(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_ec_jac_point_add_long_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_add_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_jac_point_t Q, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_long_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_long_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+
+/* Simultaneous normalization: one inversion for the whole vector */
+WARN_UNUSED_RESULT int _gr_ec_jac_point_vec_get_aff_point_vec(gr_ec_aff_point_struct * res, const gr_ec_jac_point_struct * P, slong len, gr_ec_ctx_t ctx);
 
 #ifdef __cplusplus
 }
