@@ -17,6 +17,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
+#include "thread_support.h"
 #if FLINT_HAVE_FFT_SMALL
 # include "fft_small.h"
 #endif
@@ -31,6 +32,24 @@
    points, the coefficients are evaluated at roots of unity with DFTs instead
    of the Bluestein product of the geometric method; measured on this machine,
    that phase becomes six to twelve times faster. */
+
+/* The evaluation of the coefficients in y, and the univariate resultants at
+   the points, are both loops of independent iterations, and both are split
+   over several workers when there is enough to do. The work estimates are in
+   units of word operations; under this many, the thread pool costs more than
+   it saves. */
+#define RESULTANT_MULTIPOINT_PARALLEL_CUTOFF (WORD(1) << 16)
+
+static slong
+_num_workers(double work)
+{
+    slong nworkers = flint_get_num_threads();
+
+    if (nworkers <= 1 || work < (double) RESULTANT_MULTIPOINT_PARALLEL_CUTOFF)
+        return 1;
+
+    return nworkers;
+}
 
 /* Returns 1 if none of q, q^2, ..., q^(len-1) is one, i.e. if the len
    points 1, q, q^2, ..., q^(len-1) are pairwise distinct. */
@@ -138,6 +157,120 @@ _resultant_at_point(ulong * res, nn_ptr f, slong lenA,
 }
 
 
+/* One block of univariate resultants. The values of the lenA + lenB
+   coefficients in y at the point held in position s are val[i * stride + s].
+   Where each result goes depends on how the caller interpolates: at the
+   point index base + step * s, or, when the caller is going to run an
+   inverse transform, at position s of its buffer. */
+typedef struct
+{
+    nn_srcptr valA;
+    nn_srcptr valB;
+    slong lenA;
+    slong lenB;
+    slong stride;
+    slong blen;
+    nn_ptr res;
+    double * dres;
+    const ulong * sidx;     /* NULL, or the point index of position s */
+    slong base;
+    slong step;
+    slong npoints;
+    nn_ptr fbuf;
+    slong nworkers;
+    nmod_t mod;
+}
+_multipoint_res_args_t;
+
+static void
+_multipoint_res_worker(slong widx, void * argsv)
+{
+    _multipoint_res_args_t * A = argsv;
+    nn_ptr f = A->fbuf + widx * (A->lenA + A->lenB);
+    nn_ptr g = f + A->lenA;
+    slong i, s;
+
+    for (s = widx; s < A->blen; s += A->nworkers)
+    {
+        slong j = A->base + A->step * (A->sidx == NULL ? s : (slong) A->sidx[s]);
+
+        if (A->sidx != NULL && j >= A->npoints)
+            continue;
+
+        for (i = 0; i < A->lenA; i++)
+            f[i] = A->valA[i * A->stride + s];
+
+        for (i = 0; i < A->lenB; i++)
+            g[i] = A->valB[i * A->stride + s];
+
+        if (A->dres != NULL)
+        {
+            ulong res;
+
+            _resultant_at_point(&res, f, A->lenA, g, A->lenB, A->mod);
+            A->dres[s] = (double) res;
+        }
+        else
+        {
+            _resultant_at_point(A->res + j, f, A->lenA, g, A->lenB, A->mod);
+        }
+    }
+}
+
+/* One block of the geometric evaluation: the i-th coefficient in y, scaled
+   by spow, evaluated at blen points into val + i * stride. One worker takes
+   every nworkers-th coefficient, with its own scratch; the progression G is
+   only read, so all of them can share it. */
+typedef struct
+{
+    nn_ptr valA;
+    nn_ptr valB;
+    const gr_poly_struct * Ax;
+    const gr_poly_struct * Bx;
+    slong lenA;
+    slong lenB;
+    slong stride;
+    slong blen;
+    slong maxlen;
+    nn_srcptr spow;
+    nn_ptr tmpbuf;
+    slong nworkers;
+    nmod_geometric_progression_struct * G;
+    nmod_t mod;
+}
+_geom_eval_args_t;
+
+static void
+_geom_eval_worker(slong widx, void * argsv)
+{
+    _geom_eval_args_t * A = argsv;
+    nn_ptr tmp = A->tmpbuf + widx * A->maxlen;
+    slong i, k;
+
+    for (i = widx; i < A->lenA + A->lenB; i += A->nworkers)
+    {
+        const gr_poly_struct * P;
+        nn_ptr out;
+
+        if (i < A->lenA)
+        {
+            P = A->Ax + i;
+            out = A->valA + i * A->stride;
+        }
+        else
+        {
+            P = A->Bx + (i - A->lenA);
+            out = A->valB + (i - A->lenA) * A->stride;
+        }
+
+        for (k = 0; k < P->length; k++)
+            tmp[k] = nmod_mul(((nn_srcptr) P->coeffs)[k], A->spow[k], A->mod);
+
+        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(out, tmp,
+            P->length, A->G, A->blen, A->mod);
+    }
+}
+
 #if FLINT_HAVE_FFT_SMALL
 
 /* sd_fft leaves its outputs in (-2p, 2p), as exact integers in a double. */
@@ -179,6 +312,55 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
         vs[k] = _sd_fft_get_nmod(dbuf[k], mod.n);
 }
 
+/* One block of the transform evaluation, one worker per every nworkers-th
+   coefficient in y. Each has its own transform buffer; the context Q is only
+   grown under its own lock, so all of them can share it. */
+typedef struct
+{
+    nn_ptr valA;
+    nn_ptr valB;
+    const gr_poly_struct * Ax;
+    const gr_poly_struct * Bx;
+    slong lenA;
+    slong lenB;
+    slong M;
+    ulong m;
+    nn_srcptr spow;
+    double * dbuf;
+    slong nworkers;
+    sd_fft_ctx_struct * Q;
+    nmod_t mod;
+}
+_dft_eval_args_t;
+
+static void
+_dft_eval_worker(slong widx, void * argsv)
+{
+    _dft_eval_args_t * A = argsv;
+    double * dbuf = A->dbuf + widx * A->M;
+    slong i;
+
+    for (i = widx; i < A->lenA + A->lenB; i += A->nworkers)
+    {
+        const gr_poly_struct * P;
+        nn_ptr out;
+
+        if (i < A->lenA)
+        {
+            P = A->Ax + i;
+            out = A->valA + i * A->M;
+        }
+        else
+        {
+            P = A->Bx + (i - A->lenA);
+            out = A->valB + (i - A->lenA) * A->M;
+        }
+
+        _dft_evaluate(out, (nn_srcptr) P->coeffs, P->length, A->spow,
+            A->M, A->m, dbuf, A->Q, A->mod);
+    }
+}
+
 /* res_y(A, B) by evaluation at roots of unity. Returns GR_UNABLE when the
    modulus does not support a transform long enough for the number of points.
 
@@ -194,9 +376,11 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     sd_fft_ctx_t Q;
     nmod_geometric_progression_t G;
     double * dbuf, * d = NULL;
-    nn_ptr valA, valB, valres = NULL, resc = NULL, spow, wpow = NULL, f, g;
+    nn_ptr valA, valB, valres = NULL, resc = NULL, spow, wpow = NULL, f;
     ulong * sidx = NULL;
-    slong i, j = 0, k, s, t, u, N, M, lgnb, nblocks, nblocks_needed, ptrunc;
+    slong k, t, u, N, M, lgnb, nblocks, nblocks_needed, ptrunc, nworkers;
+    _dft_eval_args_t eargs;
+    _multipoint_res_args_t rargs;
     ulong depth, m, v, w, r = 0;
     int use_ifft;
 
@@ -262,12 +446,13 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     lgnb = depth - m;
     nblocks = n_pow2(lgnb);
 
-    dbuf = flint_aligned_alloc(32, FLINT_MAX(32, M * sizeof(double)));
+    nworkers = flint_get_num_threads();
+
+    dbuf = flint_aligned_alloc(32, FLINT_MAX(32, nworkers * M * sizeof(double)));
     valA = _nmod_vec_init(lenA * M);
     valB = _nmod_vec_init(lenB * M);
     spow = _nmod_vec_init(maxlen);
-    f = _nmod_vec_init(lenA + lenB);
-    g = f + lenA;
+    f = _nmod_vec_init(nworkers * (lenA + lenB));
 
     if (use_ifft)
     {
@@ -313,6 +498,21 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
         nblocks_needed = nblocks;
     }
 
+    eargs.Ax = Ax; eargs.Bx = Bx;
+    eargs.lenA = lenA; eargs.lenB = lenB;
+    eargs.valA = valA; eargs.valB = valB;
+    eargs.M = M; eargs.m = m;
+    eargs.spow = spow; eargs.dbuf = dbuf;
+    eargs.Q = Q; eargs.mod = mod;
+
+    rargs.valA = valA; rargs.valB = valB;
+    rargs.lenA = lenA; rargs.lenB = lenB;
+    rargs.stride = M;
+    rargs.res = valres; rargs.dres = NULL;
+    rargs.sidx = sidx; rargs.step = nblocks;
+    rargs.npoints = npoints; rargs.base = 0;
+    rargs.fbuf = f; rargs.mod = mod;
+
     for (u = 0; u < nblocks_needed; u++)
     {
         if (use_ifft)
@@ -337,44 +537,25 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
             t = u;
         }
 
-        for (i = 0; i < lenA; i++)
-            _dft_evaluate(valA + i * M, (nn_srcptr) Ax[i].coeffs,
-                Ax[i].length, spow, M, m, dbuf, Q, mod);
+        eargs.nworkers = FLINT_MIN(nworkers,
+            _num_workers((double) (lenA + lenB) * M * m));
+        flint_parallel_do(_dft_eval_worker, &eargs, eargs.nworkers, 0, 0);
 
-        for (i = 0; i < lenB; i++)
-            _dft_evaluate(valB + i * M, (nn_srcptr) Bx[i].coeffs,
-                Bx[i].length, spow, M, m, dbuf, Q, mod);
-
-        for (s = 0; s < M; s++)
+        if (use_ifft)
         {
-            ulong res;
-
-            if (use_ifft)
-            {
-                if (u * M + s >= ptrunc)
-                    break;
-            }
-            else
-            {
-                j = t + nblocks * (slong) sidx[s];
-
-                if (j >= npoints)
-                    continue;
-            }
-
-            for (i = 0; i < lenA; i++)
-                f[i] = valA[i * M + s];
-
-            for (i = 0; i < lenB; i++)
-                g[i] = valB[i * M + s];
-
-            _resultant_at_point(&res, f, lenA, g, lenB, mod);
-
-            if (use_ifft)
-                d[u * M + s] = (double) res;
-            else
-                valres[j] = res;
+            rargs.blen = FLINT_MIN(M, ptrunc - u * M);
+            rargs.dres = d + u * M;
         }
+        else
+        {
+            rargs.blen = M;
+            rargs.base = t;
+            rargs.dres = NULL;
+        }
+
+        rargs.nworkers = FLINT_MIN(nworkers,
+            _num_workers((double) rargs.blen * lenA * lenB));
+        flint_parallel_do(_multipoint_res_worker, &rargs, rargs.nworkers, 0, 0);
 
         if (!use_ifft)
             for (k = 1; k < maxlen; k++)
@@ -440,9 +621,11 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     gr_ctx_struct * cctx;
     nmod_geometric_progression_t G;
     nmod_t mod;
-    nn_ptr valA, valB, valres, resc, tmp, spow, w, f, g;
-    slong i, j, k, blenA, blenB, npoints, maxlen, batch, nblocks, block;
+    nn_ptr valA, valB, valres, resc, tmp, spow, w, f;
+    slong i, j, k, blenA, blenB, npoints, maxlen, batch, nblocks, block, nworkers;
     ulong r, q, t;
+    _geom_eval_args_t eargs;
+    _multipoint_res_args_t rargs;
 
     if (ctx->which_ring != GR_CTX_GR_POLY)
         return GR_UNABLE;
@@ -504,15 +687,16 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     batch = FLINT_MIN(batch, npoints);
     nblocks = (npoints + batch - 1) / batch;
 
+    nworkers = flint_get_num_threads();
+
     valA = _nmod_vec_init(lenA * batch);
     valB = _nmod_vec_init(lenB * batch);
     valres = _nmod_vec_init(npoints);
     resc = _nmod_vec_init(npoints);
-    tmp = _nmod_vec_init(maxlen);
+    tmp = _nmod_vec_init(nworkers * maxlen);
     spow = _nmod_vec_init(maxlen);
     w = _nmod_vec_init(maxlen);
-    f = _nmod_vec_init(lenA + lenB);
-    g = f + lenA;
+    f = _nmod_vec_init(nworkers * (lenA + lenB));
 
     /* The evaluation points are 1, q, q^2, ..., q^(npoints-1), where q = r^2.
        The block starting at index k*batch consists of the points s q^i for
@@ -533,38 +717,34 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
         w[j] = nmod_mul(w[j - 1], t, mod);
     }
 
+    eargs.Ax = Ax; eargs.Bx = Bx;
+    eargs.lenA = lenA; eargs.lenB = lenB;
+    eargs.valA = valA; eargs.valB = valB;
+    eargs.stride = batch; eargs.maxlen = maxlen;
+    eargs.spow = spow; eargs.tmpbuf = tmp;
+    eargs.G = G; eargs.mod = mod;
+
+    rargs.valA = valA; rargs.valB = valB;
+    rargs.lenA = lenA; rargs.lenB = lenB;
+    rargs.stride = batch;
+    rargs.res = valres; rargs.dres = NULL; rargs.sidx = NULL;
+    rargs.step = 1; rargs.npoints = npoints;
+    rargs.fbuf = f; rargs.mod = mod;
+
     for (block = 0; block < nblocks; block++)
     {
         slong blen = FLINT_MIN(batch, npoints - block * batch);
 
-        for (i = 0; i < lenA; i++)
-        {
-            for (k = 0; k < Ax[i].length; k++)
-                tmp[k] = nmod_mul(((nn_srcptr) Ax[i].coeffs)[k], spow[k], mod);
+        eargs.blen = blen;
+        eargs.nworkers = FLINT_MIN(nworkers, _num_workers((double) (lenA + lenB)
+                                * (maxlen + blen) * FLINT_BIT_COUNT(blen)));
+        flint_parallel_do(_geom_eval_worker, &eargs, eargs.nworkers, 0, 0);
 
-            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valA + i * batch,
-                tmp, Ax[i].length, G, blen, mod);
-        }
-
-        for (i = 0; i < lenB; i++)
-        {
-            for (k = 0; k < Bx[i].length; k++)
-                tmp[k] = nmod_mul(((nn_srcptr) Bx[i].coeffs)[k], spow[k], mod);
-
-            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(valB + i * batch,
-                tmp, Bx[i].length, G, blen, mod);
-        }
-
-        for (j = 0; j < blen; j++)
-        {
-            for (i = 0; i < lenA; i++)
-                f[i] = valA[i * batch + j];
-
-            for (i = 0; i < lenB; i++)
-                g[i] = valB[i * batch + j];
-
-            _resultant_at_point(valres + block * batch + j, f, lenA, g, lenB, mod);
-        }
+        rargs.blen = blen;
+        rargs.base = block * batch;
+        rargs.nworkers = FLINT_MIN(nworkers,
+            _num_workers((double) blen * lenA * lenB));
+        flint_parallel_do(_multipoint_res_worker, &rargs, rargs.nworkers, 0, 0);
 
         for (k = 1; k < maxlen; k++)
             spow[k] = nmod_mul(spow[k], w[k], mod);

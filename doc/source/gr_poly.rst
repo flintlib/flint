@@ -1070,8 +1070,10 @@ of the two polynomials is zero.
     The *multipoint* version is a specialization for bivariate polynomials.
     It evaluates the coefficients of *poly1* and *poly2* at sufficiently 
     many points, computes the resultants of the resulting univariate 
-    polynomials and interpolates the result. When the modulus is "FFT-friendly", 
-    the multipoint uses DFT instead of geometric multipoint.
+    polynomials and interpolates the result. When the modulus is "FFT-friendly",
+    the multipoint uses DFT instead of geometric multipoint. Both the
+    evaluation and the univariate resultants are split over the thread pool
+    when there is enough work for it.
 
     The *modular* version is a specialization for bivariate polynomials over
     `\mathbb{Z}` and `\mathbb{Q}`. It reduces the inputs modulo several word-size
