@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
@@ -153,20 +154,6 @@ _sd_fft_get_nmod(double a, ulong p)
     return (ulong) s;
 }
 
-static ulong
-_bit_reverse(ulong i, ulong len)
-{
-    ulong r = 0, k;
-
-    for (k = 0; k < len; k++)
-    {
-        r = (r << 1) | (i & 1);
-        i >>= 1;
-    }
-
-    return r;
-}
-
 /* Evaluates (poly, plen), with its k-th coefficient scaled by spow[k], at the
    M-th roots of unity, writing the values to vs in the order of increasing
    powers. The transform enumerates them in bit-reversed order, so rev[] maps
@@ -252,9 +239,10 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     M = n_pow2(m);
     nblocks = N / M;
 
+    fprintf(stderr, "DFTBLOCKS %ld\n", (long) nblocks);
     rev = flint_malloc(M * sizeof(ulong));
     for (k = 0; k < M; k++)
-        rev[k] = sd_fft_ctx_trunc_index(m, _bit_reverse(k, m));
+        rev[k] = sd_fft_ctx_trunc_index(m, n_revbin(k, m));
 
     dbuf = flint_aligned_alloc(32, FLINT_MAX(32, M * sizeof(double)));
     valA = _nmod_vec_init(lenA * M);
@@ -398,6 +386,7 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     batch = FLINT_MAX(maxlen, RESULTANT_MULTIPOINT_BLOCK_WORDS / (lenA + lenB));
     batch = FLINT_MIN(batch, npoints);
     nblocks = (npoints + batch - 1) / batch;
+    fprintf(stderr, "GEOMBLOCKS %ld\n", (long) nblocks);
 
     valA = _nmod_vec_init(lenA * batch);
     valB = _nmod_vec_init(lenB * batch);
