@@ -154,14 +154,13 @@ _sd_fft_get_nmod(double a, ulong p)
 }
 
 /* Evaluates (poly, plen), with its k-th coefficient scaled by spow[k], at the
-   M-th roots of unity, writing the values to vs in the order of increasing
-   powers. The transform enumerates them in bit-reversed order, so rev[] maps
-   the power to the position holding its value. plen is at most M, so the
+   M-th roots of unity, leaving the values in the raw order sd_fft_trunc
+   produces them in: the value at the s-th root lands at the position
+   sd_fft_ctx_trunc_index(m, n_revbin(s, m)). plen is at most M, so the
    coefficients need no reduction modulo x^M - 1 first. */
 static void
 _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
-              const ulong * rev, slong M, ulong m,
-              double * dbuf, sd_fft_ctx_t Q, nmod_t mod)
+              slong M, ulong m, double * dbuf, sd_fft_ctx_t Q, nmod_t mod)
 {
     slong k;
 
@@ -177,11 +176,14 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
     sd_fft_trunc(Q, dbuf, m, plen, M);
 
     for (k = 0; k < M; k++)
-        vs[k] = _sd_fft_get_nmod(dbuf[rev[k]], mod.n);
+        vs[k] = _sd_fft_get_nmod(dbuf[k], mod.n);
 }
 
 /* res_y(A, B) by evaluation at roots of unity. Returns GR_UNABLE when the
-   modulus does not support a transform long enough for the number of points. */
+   modulus does not support a transform long enough for the number of points.
+
+   The values are interpolated back either with one inverse transform, or
+   with the geometric interpolation, whichever is cheaper; see below. */
 static int
 _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
                                   const gr_poly_struct * Ax, slong lenA,
@@ -191,11 +193,12 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
 {
     sd_fft_ctx_t Q;
     nmod_geometric_progression_t G;
-    ulong * rev;
-    double * dbuf;
-    nn_ptr valA, valB, valres, resc, spow, wpow, f, g;
-    slong i, j, k, s, t, N, M, nblocks;
-    ulong depth, m, w, r;
+    double * dbuf, * d = NULL;
+    nn_ptr valA, valB, valres = NULL, resc = NULL, spow, wpow = NULL, f, g;
+    ulong * sidx = NULL;
+    slong i, j = 0, k, s, t, u, N, M, lgnb, nblocks, nblocks_needed, ptrunc;
+    ulong depth, m, v, w, r = 0;
+    int use_ifft;
 
     depth = FLINT_MAX(n_clog2((ulong) npoints), 4);
     N = n_pow2(depth);
@@ -203,22 +206,43 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     if (!fft_small_mulmod_satisfies_bounds(mod.n))
         return GR_UNABLE;
 
-    /* A primitive N-th root of unity must exist, and so must a square root r
-       of it. That r is of order 2N, since its order divides 2N but not N, so
-       this needs one power of two more than the transform itself does. */
-    if (n_trailing_zeros(mod.n - 1) < depth + 1)
+    /* A primitive N-th root of unity w must exist. The geometric
+       interpolation additionally needs a square root r of it, which is of
+       order 2N and so costs one more power of two; the inverse transform
+       needs no such thing. */
+    v = n_trailing_zeros(mod.n - 1);
+
+    if (v < depth || depth > SD_FFT_CTX_W2TAB_SIZE)
         return GR_UNABLE;
 
+    /* The inverse transform reads back a whole number of blocks of BLK_SZ
+       values, so it needs ptrunc >= npoints of them where the geometric
+       interpolation needs exactly npoints. Those few extra resultants are
+       all that it costs, and they pay for themselves only when they are a
+       small part of the whole; below BLK_SZ points it would have to invert
+       the full length N, which is never worth it. */
+    if (depth > LG_BLK_SZ)
+        ptrunc = FLINT_MIN(N, (slong) (n_cdiv((ulong) npoints, BLK_SZ) * BLK_SZ));
+    else
+        ptrunc = N;
+
+    use_ifft = ((ptrunc - npoints) * 64 < npoints);
+
+    /* with no square root of w available the transform is the only option */
+    if (v < depth + 1)
+        use_ifft = 1;
+
     sd_fft_ctx_init_prime(Q, mod.n);
-    sd_fft_ctx_fit_depth(Q, depth);
 
-    /* the transform evaluates at powers of w; the geometric interpolation
-       below works with the points q^i for q = r^2, so r is a square root of w,
-       which the test above makes sure exists */
-    w = _sd_fft_get_nmod(sd_fft_ctx_w(Q, N / 2), mod.n);
-    r = n_sqrtmod(w, mod.n);
+    /* The context provides a primitive 2^v-th root, of which w and r are
+       powers, so binary powering gives both. Reading them off the table of
+       roots instead would mean building it up to depth, which is
+       proportional to the number of points, while the transforms below only
+       ever run at depth m and fit the table to that themselves. */
+    w = nmod_pow_ui(Q->primitive_2power_root, n_pow2(v - depth), mod);
 
-    FLINT_ASSERT(r != 0);
+    if (!use_ifft)
+        r = nmod_pow_ui(Q->primitive_2power_root, n_pow2(v - depth - 1), mod);
 
     /* The N points are split into nblocks = N / M classes modulo nblocks, the
        block t holding the points w^(t + nblocks s) for 0 <= s < M. Those are
@@ -235,75 +259,171 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
         m++;
 
     M = n_pow2(m);
-    nblocks = N / M;
-
-    rev = flint_malloc(M * sizeof(ulong));
-    for (k = 0; k < M; k++)
-        rev[k] = sd_fft_ctx_trunc_index(m, n_revbin(k, m));
+    lgnb = depth - m;
+    nblocks = n_pow2(lgnb);
 
     dbuf = flint_aligned_alloc(32, FLINT_MAX(32, M * sizeof(double)));
     valA = _nmod_vec_init(lenA * M);
     valB = _nmod_vec_init(lenB * M);
-    valres = _nmod_vec_init(npoints);
-    resc = _nmod_vec_init(npoints);
     spow = _nmod_vec_init(maxlen);
-    wpow = _nmod_vec_init(maxlen);
     f = _nmod_vec_init(lenA + lenB);
     g = f + lenA;
 
-    /* spow[k] = (w^t)^k for the current block; multiplying by wpow[k] = w^k
-       advances it by one block */
-    for (k = 0; k < maxlen; k++)
-        spow[k] = 1;
-
-    wpow[0] = 1;
-    for (k = 1; k < maxlen; k++)
-        wpow[k] = nmod_mul(wpow[k - 1], w, mod);
-
-    for (t = 0; t < nblocks; t++)
+    if (use_ifft)
     {
+        /* Writing j = t + nblocks s, so that t is the low lgnb bits of j and
+           s the high m bits, n_revbin(j, depth) = n_revbin(s, m)
+           + M n_revbin(t, lgnb); and since M >= 16, trunc_index only shuffles
+           the low four bits, so
+             trunc_index(depth, revbin(j)) = trunc_index(m, revbin(s))
+                                               + M revbin(t).
+           The first term is the position the length-M transform already put
+           that value in, so visiting the blocks in the order t = revbin(u)
+           and copying each block's values verbatim to d[u M ..] builds
+           exactly the buffer the inverse transform expects, with no
+           permutation anywhere. */
+        d = flint_aligned_alloc(32, FLINT_MAX(32, N * sizeof(double)));
+        /* block u fills d[u M .. u M + M), so only the blocks below
+           ptrunc are needed */
+        nblocks_needed = (ptrunc + M - 1) / M;
+    }
+    else
+    {
+        /* sidx[s] is the power of the M-th root whose value the transform
+           leaves in position s, that is the inverse of the map above */
+        sidx = flint_malloc(M * sizeof(ulong));
+        for (k = 0; k < M; k++)
+            sidx[k] = n_revbin(sd_fft_ctx_trunc_index(m, k), m);
+
+        valres = _nmod_vec_init(npoints);
+        resc = _nmod_vec_init(npoints);
+        wpow = _nmod_vec_init(maxlen);
+
+        /* spow[k] = (w^t)^k for the current block; multiplying by
+           wpow[k] = w^k advances it by one block */
+        for (k = 0; k < maxlen; k++)
+            spow[k] = 1;
+
+        wpow[0] = 1;
+        for (k = 1; k < maxlen; k++)
+            wpow[k] = nmod_mul(wpow[k - 1], w, mod);
+
+        /* the points of a block are spread over the whole range, so every
+           block holds some below npoints and all of them are needed */
+        nblocks_needed = nblocks;
+    }
+
+    for (u = 0; u < nblocks_needed; u++)
+    {
+        if (use_ifft)
+        {
+            t = n_revbin(u, lgnb);
+
+            /* the blocks are not visited in increasing order of t, so the
+               scaling is recomputed rather than advanced */
+            spow[0] = 1;
+
+            if (maxlen > 1)
+            {
+                ulong wt = nmod_pow_ui(w, t, mod);
+
+                spow[1] = wt;
+                for (k = 2; k < maxlen; k++)
+                    spow[k] = nmod_mul(spow[k - 1], wt, mod);
+            }
+        }
+        else
+        {
+            t = u;
+        }
+
         for (i = 0; i < lenA; i++)
             _dft_evaluate(valA + i * M, (nn_srcptr) Ax[i].coeffs,
-                Ax[i].length, spow, rev, M, m, dbuf, Q, mod);
+                Ax[i].length, spow, M, m, dbuf, Q, mod);
 
         for (i = 0; i < lenB; i++)
             _dft_evaluate(valB + i * M, (nn_srcptr) Bx[i].coeffs,
-                Bx[i].length, spow, rev, M, m, dbuf, Q, mod);
+                Bx[i].length, spow, M, m, dbuf, Q, mod);
 
-        for (s = 0; s < M && (j = t + nblocks * s) < npoints; s++)
+        for (s = 0; s < M; s++)
         {
+            ulong res;
+
+            if (use_ifft)
+            {
+                if (u * M + s >= ptrunc)
+                    break;
+            }
+            else
+            {
+                j = t + nblocks * (slong) sidx[s];
+
+                if (j >= npoints)
+                    continue;
+            }
+
             for (i = 0; i < lenA; i++)
                 f[i] = valA[i * M + s];
 
             for (i = 0; i < lenB; i++)
                 g[i] = valB[i * M + s];
 
-            _resultant_at_point(valres + j, f, lenA, g, lenB, mod);
+            _resultant_at_point(&res, f, lenA, g, lenB, mod);
+
+            if (use_ifft)
+                d[u * M + s] = (double) res;
+            else
+                valres[j] = res;
         }
 
-        for (k = 1; k < maxlen; k++)
-            spow[k] = nmod_mul(spow[k], wpow[k], mod);
+        if (!use_ifft)
+            for (k = 1; k < maxlen; k++)
+                spow[k] = nmod_mul(spow[k], wpow[k], mod);
     }
-
-    _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
-    _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
-    nmod_geometric_progression_clear(G);
 
     gr_poly_fit_length(resx, npoints, cctx);
     _gr_poly_set_length(resx, npoints, cctx);
-    _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
+
+    if (use_ifft)
+    {
+        /* the inverse transform leaves the result scaled by 2^depth */
+        ulong Ninv = nmod_inv(nmod_pow_ui(UWORD(2), depth, mod), mod);
+
+        sd_ifft_trunc(Q, d, depth, ptrunc);
+
+        for (k = 0; k < npoints; k++)
+            ((nn_ptr) resx->coeffs)[k] =
+                nmod_mul(_sd_fft_get_nmod(d[k], mod.n), Ninv, mod);
+    }
+    else
+    {
+        _nmod_geometric_progression_init_function(G, r, npoints, mod, UWORD(2));
+        _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(resc, valres, G, npoints, mod);
+        nmod_geometric_progression_clear(G);
+
+        _nmod_vec_set((nn_ptr) resx->coeffs, resc, npoints);
+    }
+
     _gr_poly_normalise(resx, cctx);
 
     sd_fft_ctx_clear(Q);
     flint_aligned_free(dbuf);
-    flint_free(rev);
     _nmod_vec_clear(valA);
     _nmod_vec_clear(valB);
-    _nmod_vec_clear(valres);
-    _nmod_vec_clear(resc);
     _nmod_vec_clear(spow);
-    _nmod_vec_clear(wpow);
     _nmod_vec_clear(f);
+
+    if (use_ifft)
+    {
+        flint_aligned_free(d);
+    }
+    else
+    {
+        flint_free(sidx);
+        _nmod_vec_clear(valres);
+        _nmod_vec_clear(resc);
+        _nmod_vec_clear(wpow);
+    }
 
     return GR_SUCCESS;
 }
