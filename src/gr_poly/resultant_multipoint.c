@@ -217,9 +217,9 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     if (!fft_small_mulmod_satisfies_bounds(mod.n))
         return GR_UNABLE;
 
-    /* a primitive N-th root of unity must exist */
-    if (n_trailing_zeros(mod.n - 1) < depth)
-        return GR_UNABLE;
+/* a primitive N-th root of unity must exist, and so must a square root
+   of it: that needs one more power of two */
+    if (n_trailing_zeros(mod.n - 1) < depth + 1)
 
     sd_fft_ctx_init_prime(Q, mod.n);
     sd_fft_ctx_fit_depth(Q, depth);
