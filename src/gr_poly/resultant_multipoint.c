@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
@@ -204,23 +203,22 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     if (!fft_small_mulmod_satisfies_bounds(mod.n))
         return GR_UNABLE;
 
-/* a primitive N-th root of unity must exist, and so must a square root
-   of it: that needs one more power of two */
+    /* A primitive N-th root of unity must exist, and so must a square root r
+       of it. That r is of order 2N, since its order divides 2N but not N, so
+       this needs one power of two more than the transform itself does. */
     if (n_trailing_zeros(mod.n - 1) < depth + 1)
+        return GR_UNABLE;
 
     sd_fft_ctx_init_prime(Q, mod.n);
     sd_fft_ctx_fit_depth(Q, depth);
 
     /* the transform evaluates at powers of w; the geometric interpolation
-       below works with the points q^i for q = r^2, so r is a square root of w */
+       below works with the points q^i for q = r^2, so r is a square root of w,
+       which the test above makes sure exists */
     w = _sd_fft_get_nmod(sd_fft_ctx_w(Q, N / 2), mod.n);
     r = n_sqrtmod(w, mod.n);
 
-    if (r == 0)
-    {
-        sd_fft_ctx_clear(Q);
-        return GR_UNABLE;
-    }
+    FLINT_ASSERT(r != 0);
 
     /* The N points are split into nblocks = N / M classes modulo nblocks, the
        block t holding the points w^(t + nblocks s) for 0 <= s < M. Those are
@@ -239,7 +237,6 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
     M = n_pow2(m);
     nblocks = N / M;
 
-    fprintf(stderr, "DFTBLOCKS %ld\n", (long) nblocks);
     rev = flint_malloc(M * sizeof(ulong));
     for (k = 0; k < M; k++)
         rev[k] = sd_fft_ctx_trunc_index(m, n_revbin(k, m));
@@ -386,7 +383,6 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     batch = FLINT_MAX(maxlen, RESULTANT_MULTIPOINT_BLOCK_WORDS / (lenA + lenB));
     batch = FLINT_MIN(batch, npoints);
     nblocks = (npoints + batch - 1) / batch;
-    fprintf(stderr, "GEOMBLOCKS %ld\n", (long) nblocks);
 
     valA = _nmod_vec_init(lenA * batch);
     valB = _nmod_vec_init(lenB * batch);

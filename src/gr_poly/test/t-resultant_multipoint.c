@@ -257,12 +257,14 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         gr_ctx_clear(cctx);
     }
 
-    /* Enough points that the transform is split into several blocks, which is
-       the other shape of the DFT evaluation. Being short in y and long in x
-       makes the points numerous while each costs little, so the blocking is
-       reached cheaply; the reference is the subresultant algorithm, the
-       Sylvester determinant being far too slow at this size. */
-    for (iter = 0; iter < flint_test_multiplier(); iter++)
+    /* Enough points that the evaluation is split into several blocks, which
+       both paths handle separately: the first prime below admits no DFT and
+       so goes through the geometric progression, the second one does admit a
+       DFT. Being short in y and long in x makes the points numerous while
+       each costs little, so the blocking is reached cheaply; the reference is
+       the subresultant algorithm, the Sylvester determinant being far too
+       slow at this size. */
+    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t cctx, ctx;
         gr_poly_t f, g;
@@ -271,7 +273,19 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         int status = GR_SUCCESS;
         int s1;
 
-        p = _fft_prime(state, 50);
+        if (iter % 2)
+        {
+            p = _fft_prime(state, 50);
+        }
+        else
+        {
+            /* p = 3 mod 4 leaves p - 1 with a 2-valuation of one, too small
+               for any transform, so the geometric progression is used */
+            p = n_randprime(state, 50, 1);
+
+            while (p % 4 != 3)
+                p = n_randprime(state, 50, 1);
+        }
 
         if (p == 0)
             continue;
@@ -297,7 +311,7 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         if ((status != GR_SUCCESS) || 
             ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)))
         {
-            flint_printf("FAIL (vs subresultant, blocked DFT evaluation):\n");
+            flint_printf("FAIL (vs subresultant, blocked evaluation):\n");
             gr_ctx_println(ctx);
             flint_printf("status = %d, multipoint returned %d\n", status, s1);
             fflush(stdout);
