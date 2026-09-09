@@ -51,7 +51,7 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     if (rnd >= ARF_RND_FAST)
     {
-        if (arf_is_one(x) ? _arf_want_newton_inv(y, prec) : _arf_want_newton_div(x, y, prec))
+        if (_arf_want_newton_div(x, y, prec))
             return _arf_div_newton(z, x, y, prec, rnd);
         rnd = arf_rnd_relaxed_to_strict(rnd);
     }

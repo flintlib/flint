@@ -944,13 +944,35 @@ int arf_sosq(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
 
 int arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
 
+#define ARF_INV_NEWTON_CUTOFF 5000
+#define ARF_DIV_NEWTON_CUTOFF 12000
+#define ARF_SQRT_NEWTON_CUTOFF 100000
+#define ARF_RSQRT_NEWTON_CUTOFF 4000
+
 /* Newton iteration backends for the relaxed rounding modes (rnd must be
-   ARF_RND_FAST or ARF_RND_ACCURATE); the want_* predicates tell whether
-   they are expected to beat the standard algorithms */
-int _arf_want_newton_inv(const arf_t x, slong prec);
-int _arf_want_newton_div(const arf_t x, const arf_t y, slong prec);
-int _arf_want_newton_sqrt(const arf_t x, slong prec);
-int _arf_want_newton_rsqrt(const arf_t x, slong prec);
+   ARF_RND_FAST or ARF_RND_ACCURATE). */
+int _arf_want_newton_inv_large(const arf_t x, slong prec);
+int _arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec);
+
+ARF_INLINE int _arf_want_newton_inv(const arf_t x, slong prec)
+{
+    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_inv_large(x, prec);
+}
+
+ARF_INLINE int _arf_want_newton_div(const arf_t x, const arf_t y, slong prec)
+{
+    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_div_large(x, y, prec);
+}
+
+ARF_INLINE int _arf_want_newton_sqrt(const arf_t x, slong prec)
+{
+    return prec >= ARF_SQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+}
+
+ARF_INLINE int _arf_want_newton_rsqrt(const arf_t x, slong prec)
+{
+    return prec >= ARF_RSQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+}
 int _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
 int _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
 int _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);

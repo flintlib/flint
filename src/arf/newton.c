@@ -42,18 +42,6 @@
     standard algorithm, which is then cheaper.
 */
 
-#ifndef ARF_INV_APPROX_NEWTON_CUTOFF
-#define ARF_INV_APPROX_NEWTON_CUTOFF 8000
-#endif
-#ifndef ARF_DIV_APPROX_NEWTON_CUTOFF
-#define ARF_DIV_APPROX_NEWTON_CUTOFF 12000
-#endif
-#ifndef ARF_SQRT_APPROX_NEWTON_CUTOFF
-#define ARF_SQRT_APPROX_NEWTON_CUTOFF 100000
-#endif
-#ifndef ARF_RSQRT_APPROX_NEWTON_CUTOFF
-#define ARF_RSQRT_APPROX_NEWTON_CUTOFF 30000
-#endif
 
 #define NEWTON_GUARD_BITS(rnd) ((rnd) == ARF_RND_ACCURATE ? 11 : 8)
 #define NEWTON_LIMBS(prec, rnd) (((prec) + NEWTON_GUARD_BITS(rnd) + FLINT_BITS - 1) / FLINT_BITS)
@@ -75,32 +63,6 @@ _arf_set_fixed(arf_t res, mp_ptr Q, slong n, const fmpz_t exp, int sgnbit, slong
     return inexact;
 }
 
-int
-_arf_want_newton_inv(const arf_t x, slong prec)
-{
-    return prec >= ARF_INV_APPROX_NEWTON_CUTOFF && !arf_is_special(x)
-        && arf_bits(x) > prec / 2;
-}
-
-int
-_arf_want_newton_div(const arf_t x, const arf_t y, slong prec)
-{
-    return prec >= ARF_DIV_APPROX_NEWTON_CUTOFF && !arf_is_special(x)
-        && !arf_is_special(y) && arf_bits(y) > prec / 2;
-}
-
-int
-_arf_want_newton_sqrt(const arf_t x, slong prec)
-{
-    return prec >= ARF_SQRT_APPROX_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
-}
-
-int
-_arf_want_newton_rsqrt(const arf_t x, slong prec)
-{
-    return prec >= ARF_RSQRT_APPROX_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
-}
-
 /* Space for the n + 2 limb fixed-point result: when res does not alias an
    input, the limbs are computed directly in the buffer of res (sized to
    n + 2 limbs here, normalised afterwards by _arf_set_round_mpn), avoiding
@@ -115,6 +77,25 @@ _arf_approx_scratch(arf_t res, slong len, int aliased)
 
     ARF_GET_MPN_WRITE(Q, len, res);
     return Q;
+}
+
+/* the division predicates also need the divisor to be long relative to
+   the precision, where the standard algorithm is cheaper; checked only
+   above the precision cutoff (see arf.h) */
+int
+_arf_want_newton_inv_large(const arf_t x, slong prec)
+{
+    return !arf_is_special(x) && arf_bits(x) > prec / 2;
+}
+
+int
+_arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec)
+{
+    /* a numerator of one is an inversion, with its own lower cutoff */
+    if (arf_is_one(x))
+        return _arf_want_newton_inv_large(y, prec);
+    return prec >= ARF_DIV_NEWTON_CUTOFF && !arf_is_special(x)
+        && !arf_is_special(y) && arf_bits(y) > prec / 2;
 }
 
 int
