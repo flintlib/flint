@@ -23,6 +23,13 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     int inexact, odd_exp;
     ARF_MUL_TMP_DECL
 
+    if (rnd >= ARF_RND_FAST)
+    {
+        if (_arf_want_newton_rsqrt(x, prec))
+            return _arf_rsqrt_newton(z, x, prec, rnd);
+        rnd = arf_rnd_relaxed_to_strict(rnd);
+    }
+
     if (arf_is_special(x))
     {
         if (arf_is_zero(x))

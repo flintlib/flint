@@ -21,7 +21,6 @@ void divisor_table_odd(unsigned int * tab, slong len);
 void arb_gamma_stirling_eval(arb_t s, const arb_t z, slong nterms, int digamma, slong prec);
 int _arb_log_ui_smooth(arb_t res, ulong n, slong prec);
 void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
-void _arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y, slong exp);
 void _arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn, nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn, int negative, flint_bitcnt_t shift);
 void _arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn, nn_srcptr xptr, slong xn, int negative, flint_bitcnt_t shift);
 void mag_borwein_error(mag_t err, slong n);

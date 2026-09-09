@@ -12,6 +12,7 @@
 
 #include <gmp.h>
 #include "longlong.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -80,7 +81,9 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
     while (limbs != 0 && arr[limbs - 1] == 0)
         limbs--;
 
-    rlimbs = mpn_sqrtrem(arr2, arr3, arr, limbs);
+    /* only exactness matters; flint_mpn_sqrtrem dispatches to Newton for
+       large inputs */
+    rlimbs = (limbs == 0) ? 0 : flint_mpn_sqrtrem(arr2, NULL, arr, limbs);
 
     loglen = FLINT_BIT_COUNT(len2);
 

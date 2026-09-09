@@ -75,6 +75,11 @@ void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
     {
         fmpz_invmod(rop, op, p);
     }
+    else if (fmpz_equal_ui(p, 2))
+    {
+        /* 2-adic Newton iteration on the underlying limb arrays */
+        fmpz_invmod_2exp(rop, op, N);
+    }
     else
     {
         padic_inv_t S;

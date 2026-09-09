@@ -670,6 +670,29 @@ Division
 
 .. function:: int arf_div(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 
+.. macro:: ARF_RND_FAST
+           ARF_RND_ACCURATE
+
+    Relaxed rounding modes, currently supported by :func:`arf_div`,
+    :func:`arf_sqrt`, :func:`arf_rsqrt` and their wrappers (``arf_ui_div``,
+    ``arf_div_ui``, ``arf_fmpz_div_fmpz``, ...). With ``ARF_RND_FAST`` the
+    result may differ from the exact result `f` by at most one ulp
+    (`2^{e - \mathrm{prec}}` with `2^{e-1} \le |f| < 2^e`) in either
+    direction; with ``ARF_RND_ACCURATE`` by at most 0.51 ulp. The functions
+    choose internally between the standard algorithm (rounding down,
+    respectively to nearest) and the Newton iterations of the ``fixed``
+    module (:func:`fixed_inv_newton`, :func:`fixed_div_newton`,
+    :func:`fixed_sqrt_newton`, :func:`fixed_rsqrt_newton`), taking the
+    latter above tuned precision cutoffs (about 8000, 12000, 100000 and
+    30000 bits for inversion, division, square root and reciprocal square
+    root) where they are faster. The Newton results carry 8 (fast) or 11
+    (accurate) guard bits and are rounded to nearest, which gives at most
+    0.5625 respectively 0.508 ulp of error; the returned value always has
+    the exponent of `f` or equals `2^e`, so adding one ulp of the result as
+    an error bound (as ``arb`` does) is valid. The return value of the
+    functions is not a reliable inexact flag with these modes (it is 1 when
+    the Newton path was taken). Passing these modes to other arf functions
+    is not supported.
 .. function:: int arf_div_ui(arf_t res, const arf_t x, ulong y, slong prec, arf_rnd_t rnd)
 
 .. function:: int arf_ui_div(arf_t res, ulong x, const arf_t y, slong prec, arf_rnd_t rnd)

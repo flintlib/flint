@@ -714,8 +714,9 @@ radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, c
     P = TMP_ALLOC((an + 1) * sizeof(ulong));
     t = TMP_ALLOC((sn + 1) * sizeof(ulong));
 
-    flint_mpn_zero(P, an + 1);
     radix_mulmid(P, q, sn, q, sn, 0, FLINT_MIN(2 * sn, an + 1), radix);
+    if (2 * sn == an)
+        P[an] = 0;      /* the only limb the product does not write */
 
     while (P[an] != 0 || mpn_cmp(P, a, an) > 0)
     {

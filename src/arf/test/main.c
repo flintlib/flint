@@ -17,6 +17,7 @@
 #include "t-abs_bound_lt_2exp_fmpz.c"
 #include "t-abs_bound_lt_2exp_si.c"
 #include "t-add.c"
+#include "t-approx.c"
 #include "t-add_fmpz_2exp.c"
 #include "t-add_fmpz.c"
 #include "t-addmul.c"
@@ -82,6 +83,7 @@ test_struct tests[] =
     TEST_FUNCTION(arf_abs_bound_lt_2exp_fmpz),
     TEST_FUNCTION(arf_abs_bound_lt_2exp_si),
     TEST_FUNCTION(arf_add),
+    TEST_FUNCTION(arf_approx),
     TEST_FUNCTION(arf_add_fmpz_2exp),
     TEST_FUNCTION(arf_add_fmpz),
     TEST_FUNCTION(arf_addmul),

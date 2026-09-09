@@ -33,7 +33,13 @@ typedef enum
     ARF_RND_UP    = 1,
     ARF_RND_FLOOR = 2,
     ARF_RND_CEIL  = 3,
-    ARF_RND_NEAR  = 4
+    ARF_RND_NEAR  = 4,
+    /* relaxed modes, supported by arf_div, arf_sqrt, arf_rsqrt and their
+       variants: the result may be off by at most 1 ulp in any direction
+       (FAST) or at most 0.51 ulp (ACCURATE); the return value is not a
+       reliable inexact flag with these modes */
+    ARF_RND_FAST = 5,
+    ARF_RND_ACCURATE = 6
 }
 arf_rnd_t;
 
@@ -937,6 +943,48 @@ int arf_fma(arf_ptr res, arf_srcptr x, arf_srcptr y, arf_srcptr z, slong prec, a
 int arf_sosq(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
 
 int arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
+
+#define ARF_INV_NEWTON_CUTOFF 5000
+#define ARF_DIV_NEWTON_CUTOFF 12000
+#define ARF_SQRT_NEWTON_CUTOFF 100000
+#define ARF_RSQRT_NEWTON_CUTOFF 4000
+
+/* Newton iteration backends for the relaxed rounding modes (rnd must be
+   ARF_RND_FAST or ARF_RND_ACCURATE). */
+int _arf_want_newton_inv_large(const arf_t x, slong prec);
+int _arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec);
+
+ARF_INLINE int _arf_want_newton_inv(const arf_t x, slong prec)
+{
+    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_inv_large(x, prec);
+}
+
+ARF_INLINE int _arf_want_newton_div(const arf_t x, const arf_t y, slong prec)
+{
+    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_div_large(x, y, prec);
+}
+
+ARF_INLINE int _arf_want_newton_sqrt(const arf_t x, slong prec)
+{
+    return prec >= ARF_SQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+}
+
+ARF_INLINE int _arf_want_newton_rsqrt(const arf_t x, slong prec)
+{
+    return prec >= ARF_RSQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+}
+int _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
+int _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
+int _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
+int _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
+
+/* strict mode with which the standard algorithms realise a relaxed mode */
+ARF_INLINE arf_rnd_t arf_rnd_relaxed_to_strict(arf_rnd_t rnd)
+{
+    if (rnd == ARF_RND_FAST) return ARF_RND_DOWN;
+    if (rnd == ARF_RND_ACCURATE) return ARF_RND_NEAR;
+    return rnd;
+}
 
 ARF_INLINE int
 arf_div_ui(arf_ptr z, arf_srcptr x, ulong y, slong prec, arf_rnd_t rnd)

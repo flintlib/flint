@@ -857,6 +857,9 @@ then
     AC_SEARCH_LIBS([__gmpn_rsh1sub_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1sub_n,1,Define if GMP has mpn_rsh1sub_n)])
     AC_SEARCH_LIBS([__gmpn_rsh1add_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1add_n,1,Define if GMP has mpn_rsh1add_n)])
     AC_SEARCH_LIBS([__gmpn_mulmid_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mulmid_n,1,Define if GMP has mpn_mulmid_n)])
+    AC_SEARCH_LIBS([__gmpn_divexact],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divexact,1,Define if GMP has mpn_divexact)])
+    AC_SEARCH_LIBS([__gmpn_mod_34lsub1],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mod_34lsub1,1,Define if GMP has mpn_mod_34lsub1)])
+    AC_SEARCH_LIBS([__gmpn_divisible_p],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divisible_p,1,Define if GMP has mpn_divisible_p)])
 fi
 
 if test "$enable_mpfr_check" = "yes";
