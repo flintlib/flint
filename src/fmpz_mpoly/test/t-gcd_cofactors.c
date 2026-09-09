@@ -1093,6 +1093,12 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd_cofactors, state)
             fmpz_poly_randtest(p, state, 1 + n_randint(state, 5),
                                                      1 + n_randint(state, 20));
         } while (fmpz_poly_is_zero(p));
+
+        /* sometimes reach past UNIVAR_DIVISOR_MAX_DEG, so the fallback runs */
+        if (n_randint(state, 4) == 0)
+            fmpz_poly_set_coeff_si(p, 100 + n_randint(state, 400),
+                                                     1 + n_randint(state, 5));
+
         fmpz_mpoly_set_fmpz_poly(b, p, v, ctx);
         fmpz_mpoly_mul(b, b, t, ctx);
 

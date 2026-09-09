@@ -911,6 +911,16 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd, state)
         fmpz_mpoly_set_str_pretty(t, "y^3*z*q - y^3*z", vars, ctx);
         gcd_check(g, a, b, t, ctx, 0, 3, "univariate times a monomial");
 
+        /* past UNIVAR_DIVISOR_MAX_DEG, so this one takes the general route */
+        fmpz_mpoly_set_str_pretty(a, "q^2*x + 2*q*x*y - q*y*z + x - y*z", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "q^500 - 1", vars, ctx);
+        fmpz_mpoly_one(t, ctx);
+        gcd_check(g, a, b, t, ctx, 0, 4, "univariate of high degree, coprime");
+
+        fmpz_mpoly_set_str_pretty(t, "q - 1", vars, ctx);
+        fmpz_mpoly_mul(a, a, t, ctx);
+        gcd_check(g, a, b, t, ctx, 0, 5, "univariate of high degree, common factor");
+
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(g, ctx);
@@ -958,6 +968,12 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd, state)
             fmpz_poly_randtest(p, state, 1 + n_randint(state, 5),
                                                      1 + n_randint(state, 20));
         } while (fmpz_poly_is_zero(p));
+
+        /* sometimes reach past UNIVAR_DIVISOR_MAX_DEG, so the fallback runs */
+        if (n_randint(state, 4) == 0)
+            fmpz_poly_set_coeff_si(p, 100 + n_randint(state, 400),
+                                                     1 + n_randint(state, 5));
+
         fmpz_mpoly_set_fmpz_poly(b, p, v, ctx);
         fmpz_mpoly_mul(b, b, t, ctx);
 

@@ -121,7 +121,8 @@ int main(int argc, char ** argv)
 {
     static const slong nvars_set[] = {13, 52};
     static const slong terms_set[] = {28, 500};
-    static const slong deg_set[] = {2, 12};
+    /* the last degree is past UNIVAR_DIVISOR_MAX_DEG, so it falls back */
+    static const slong deg_set[] = {2, 12, 1024};
     slong nvars, terms, deg, i, in, it, id;
     int do_univar = (argc < 2) || (strcmp(argv[1], "univar") == 0);
     int do_control = (argc < 2) || (strcmp(argv[1], "control") == 0);
@@ -138,7 +139,7 @@ int main(int argc, char ** argv)
 
     for (in = 0; in < 2; in++)
     for (it = 0; it < 2; it++)
-    for (id = 0; id < 2; id++)
+    for (id = 0; id < 3; id++)
     {
         nvars = nvars_set[in];
         terms = terms_set[it];

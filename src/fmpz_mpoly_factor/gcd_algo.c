@@ -782,6 +782,22 @@ static void _set_coeff(
     fmpz_poly_set_coeff_fmpz(c, e == 0 ? 0 : e/var_stride, A->coeffs + k);
 }
 
+/*
+    The route below stores one coefficient per exponent, so it must not be
+    taken for a sparse input of high degree: gcd(x^(10^7) - 1, ...) would build
+    a polynomial of 10^7 coefficients out of two terms. Measured against the
+    general recursion on the shapes in p-gcd_univar, it wins throughout up to a
+    deflated degree of about 100 and breaks even near 128, whether or not the
+    univariate input is dense.
+*/
+#define UNIVAR_DIVISOR_MAX_DEG 100
+
+static int _univar_divisor_is_cheap(slong v, const mpoly_gcd_info_t I)
+{
+    return I->Adeflate_deg[v] <= UNIVAR_DIVISOR_MAX_DEG &&
+           I->Bdeflate_deg[v] <= UNIVAR_DIVISOR_MAX_DEG;
+}
+
 static int _try_univar_divisor(
     fmpz_mpoly_t G,
     fmpz_mpoly_t Abar,          /* cofactor of A, could be NULL */
@@ -1783,14 +1799,14 @@ skip_monomial_cofactors:
         B_ess_nvars += (I->Bmax_exp[j] > I->Bmin_exp[j]);
     }
 
-    if (B_ess_nvars == 1)
+    if (B_ess_nvars == 1 && _univar_divisor_is_cheap(v_in_both, I))
     {
         success = _try_univar_divisor(G, Abar, Bbar, A, I->Amin_exp,
                                       B, I->Bmin_exp, v_in_both, I, ctx);
         goto cleanup;
     }
 
-    if (A_ess_nvars == 1)
+    if (A_ess_nvars == 1 && _univar_divisor_is_cheap(v_in_both, I))
     {
         success = _try_univar_divisor(G, Bbar, Abar, B, I->Bmin_exp,
                                       A, I->Amin_exp, v_in_both, I, ctx);
