@@ -274,6 +274,42 @@ truth_t gr_series_mod_is_one(const gr_poly_t x, gr_ctx_t ctx)
     return (GR_SERIES_MOD_N(ctx) == 0) ? T_TRUE : gr_poly_is_one(x, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
+truth_t gr_series_mod_is_scalar(const gr_poly_t x, gr_ctx_t ctx)
+{
+    return gr_poly_is_scalar(x, GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
+static truth_t
+_gr_series_mod_is_integer_or_rational(const gr_poly_t x, gr_ctx_t ctx, int rational)
+{
+    gr_ctx_struct * cctx = GR_SERIES_MOD_ELEM_CTX(ctx);
+    truth_t is_scalar;
+
+    is_scalar = gr_series_mod_is_scalar(x, ctx);
+
+    if (is_scalar == T_FALSE)
+        return T_FALSE;
+
+    if (gr_ctx_is_finite_characteristic(ctx) != T_FALSE)
+        return T_UNKNOWN;
+
+    if (x->length == 0)
+        return T_TRUE;
+
+    return truth_and(is_scalar,
+        rational ? gr_is_rational(x->coeffs, cctx) : gr_is_integer(x->coeffs, cctx));
+}
+
+truth_t gr_series_mod_is_integer(const gr_poly_t x, gr_ctx_t ctx)
+{
+    return _gr_series_mod_is_integer_or_rational(x, ctx, 0);
+}
+
+truth_t gr_series_mod_is_rational(const gr_poly_t x, gr_ctx_t ctx)
+{
+    return _gr_series_mod_is_integer_or_rational(x, ctx, 1);
+}
+
 truth_t gr_series_mod_equal(const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_equal(x, y, GR_SERIES_MOD_ELEM_CTX(ctx));
@@ -483,6 +519,8 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) gr_series_mod_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_series_mod_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_series_mod_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) gr_series_mod_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) gr_series_mod_is_rational},
     {GR_METHOD_EQUAL,       (gr_funcptr) gr_series_mod_equal},
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_mod_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
@@ -592,4 +630,3 @@ gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     gr_series_mod_ctx_init(ctx, base_ring, n);
 }
-

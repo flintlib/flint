@@ -107,6 +107,8 @@ WARN_UNUSED_RESULT int gr_generic_gens_recursive(gr_vec_t vec, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT truth_t gr_generic_is_integer(gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT truth_t gr_generic_is_rational(gr_srcptr x, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx);
 

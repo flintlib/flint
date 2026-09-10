@@ -539,6 +539,18 @@ _gr_ca_is_neg_one(const ca_t x, gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_ca_is_integer(const ca_t x, gr_ctx_t ctx)
+{
+    return ca_check_is_integer(x, GR_CA_CTX(ctx));
+}
+
+static truth_t
+_gr_ca_is_rational(const ca_t x, gr_ctx_t ctx)
+{
+    return ca_check_is_rational(x, GR_CA_CTX(ctx));
+}
+
+static truth_t
 _gr_ca_equal(const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     return ca_check_equal(x, y, GR_CA_CTX(ctx));
@@ -1647,6 +1659,8 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_ca_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_ca_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_ca_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_ca_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_ca_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_ca_equal},
 
     {GR_METHOD_SET,             (gr_funcptr) _gr_ca_set},

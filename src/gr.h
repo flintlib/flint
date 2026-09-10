@@ -1127,6 +1127,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }
 GR_INLINE truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ONE)(x, ctx); }
 GR_INLINE truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_NEG_ONE)(x, ctx); }
+GR_INLINE truth_t gr_is_integer(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INTEGER)(x, ctx); }
+GR_INLINE truth_t gr_is_rational(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_RATIONAL)(x, ctx); }
 
 GR_INLINE truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx); }
 GR_INLINE truth_t gr_not_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return truth_not(GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx)); }

@@ -695,6 +695,45 @@ nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx)
     }
 }
 
+truth_t
+nfloat_is_integer(nfloat_srcptr x, gr_ctx_t ctx)
+{
+    slong exp, n;
+    nn_srcptr d;
+
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_NAN(x))
+            return T_UNKNOWN;
+
+        return NFLOAT_IS_ZERO(x) ? T_TRUE : T_FALSE;
+    }
+
+    exp = NFLOAT_EXP(x);
+    if (exp <= 0)
+        return T_FALSE;
+
+    d = NFLOAT_D(x);
+    n = NFLOAT_CTX_NLIMBS(ctx);
+
+    while (d[0] == 0)
+    {
+        d++;
+        n--;
+    }
+
+    return n * FLINT_BITS - flint_ctz(d[0]) <= exp ? T_TRUE : T_FALSE;
+}
+
+truth_t
+nfloat_is_rational(nfloat_srcptr x, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_NAN(x))
+        return T_UNKNOWN;
+
+    return NFLOAT_IS_INF(x) ? T_FALSE : T_TRUE;
+}
+
 int
 nfloat_neg(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 {

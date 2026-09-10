@@ -120,6 +120,7 @@ truth_t gr_ore_poly_ctx_is_ring(gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_ctx_is_zero_ring(gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_ctx_is_commutative_ring(gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_ctx_is_integral_domain(gr_ore_poly_ctx_t ctx);
+truth_t gr_ore_poly_ctx_is_finite_characteristic(gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_ctx_is_threadsafe(gr_ore_poly_ctx_t ctx);
 
 /* Memory management */
@@ -183,6 +184,9 @@ truth_t gr_ore_poly_equal(const gr_ore_poly_t poly1, const gr_ore_poly_t poly2, 
 
 truth_t gr_ore_poly_is_zero(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_is_one(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
+truth_t gr_ore_poly_is_scalar(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
+truth_t gr_ore_poly_is_integer(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
+truth_t gr_ore_poly_is_rational(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
 truth_t gr_ore_poly_is_gen(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
 
 /* Input and output */

@@ -402,6 +402,32 @@ _gr_complex_is_neg_one(gr_srcptr x, gr_complex_ctx_t ctx)
     return truth_and(eq1, eq2);
 }
 
+static truth_t
+_gr_complex_is_integer(gr_srcptr x, gr_complex_ctx_t ctx)
+{
+    gr_ctx_struct * real_ctx = REAL_CTX(ctx);
+    truth_t real;
+
+    real = gr_is_integer(RE(x, ctx), real_ctx);
+    if (real == T_FALSE)
+        return T_FALSE;
+
+    return truth_and(real, gr_is_zero(IM(x, ctx), real_ctx));
+}
+
+static truth_t
+_gr_complex_is_rational(gr_srcptr x, gr_complex_ctx_t ctx)
+{
+    gr_ctx_struct * real_ctx = REAL_CTX(ctx);
+    truth_t real;
+
+    real = gr_is_rational(RE(x, ctx), real_ctx);
+    if (real == T_FALSE)
+        return T_FALSE;
+
+    return truth_and(real, gr_is_zero(IM(x, ctx), real_ctx));
+}
+
 
 static int
 _gr_complex_neg(gr_ptr res, gr_srcptr x, gr_complex_ctx_t ctx)
@@ -658,6 +684,8 @@ gr_method_tab_input _gr_complex_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_complex_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_complex_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_complex_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_complex_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_complex_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_complex_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_complex_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_complex_set_si},

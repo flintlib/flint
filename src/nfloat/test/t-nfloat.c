@@ -32,6 +32,37 @@ TEST_FUNCTION_START(nfloat, state)
         gr_test_floating_point(ctx, 100 * flint_test_multiplier(), 0);
 
         {
+            gr_ptr x;
+            fmpz_t z;
+            slong i;
+
+            x = gr_heap_init(ctx);
+            fmpz_init(z);
+
+            for (i = 0; i < 100 * flint_test_multiplier(); i++)
+            {
+                int status;
+                truth_t is_integer;
+
+                GR_MUST_SUCCEED(gr_randtest(x, state, ctx));
+                status = nfloat_get_fmpz(z, x, ctx);
+                is_integer = nfloat_is_integer(x, ctx);
+
+                if ((status == GR_SUCCESS && is_integer != T_TRUE) ||
+                    ((status & GR_DOMAIN) && is_integer != T_FALSE))
+                {
+                    flint_printf("FAIL: nfloat_is_integer\n");
+                    flint_printf("x = "); gr_println(x, ctx);
+                    flint_printf("status = %d, is_integer = %{truth}\n", status, is_integer);
+                    flint_abort();
+                }
+            }
+
+            gr_heap_clear(x, ctx);
+            fmpz_clear(z);
+        }
+
+        {
             gr_ptr x, x2;
             slong i;
 

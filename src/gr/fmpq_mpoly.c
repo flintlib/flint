@@ -198,6 +198,29 @@ _gr_fmpq_mpoly_is_one(const fmpq_mpoly_t poly, gr_ctx_t ctx)
     return fmpq_mpoly_is_one(poly, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
+static truth_t
+_gr_fmpq_mpoly_is_integer(const fmpq_mpoly_t poly, gr_ctx_t ctx)
+{
+    fmpq_t c;
+    int res;
+
+    if (!fmpq_mpoly_is_fmpq(poly, MPOLYNOMIAL_MCTX(ctx)))
+        return T_FALSE;
+
+    fmpq_init(c);
+    fmpq_mpoly_get_fmpq(c, poly, MPOLYNOMIAL_MCTX(ctx));
+    res = fmpz_is_one(fmpq_denref(c));
+    fmpq_clear(c);
+
+    return res ? T_TRUE : T_FALSE;
+}
+
+static truth_t
+_gr_fmpq_mpoly_is_rational(const fmpq_mpoly_t poly, gr_ctx_t ctx)
+{
+    return fmpq_mpoly_is_fmpq(poly, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
 static int
 _gr_fmpq_mpoly_zero(fmpq_mpoly_t res, gr_ctx_t ctx)
 {
@@ -628,6 +651,8 @@ gr_method_tab_input _gr_fmpq_mpoly_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) _gr_fmpq_mpoly_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_fmpq_mpoly_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_fmpq_mpoly_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) _gr_fmpq_mpoly_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) _gr_fmpq_mpoly_is_rational},
     {GR_METHOD_GENS,        (gr_funcptr) _gr_fmpq_mpoly_gens},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_fmpq_mpoly_equal},
     {GR_METHOD_SET,         (gr_funcptr) _gr_fmpq_mpoly_set},

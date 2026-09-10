@@ -412,6 +412,43 @@ _gr_acb_is_neg_one(const acb_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_acb_is_integer(const acb_t x, const gr_ctx_t ctx)
+{
+    truth_t re, im;
+
+    if (acb_is_int(x))
+        return T_TRUE;
+
+    re = arb_contains_int(acb_realref(x)) ? T_UNKNOWN : T_FALSE;
+    if (re == T_FALSE)
+        return T_FALSE;
+
+    im = arb_contains_zero(acb_imagref(x)) ? T_UNKNOWN : T_FALSE;
+    return truth_and(re, im);
+}
+
+static truth_t
+_gr_acb_is_rational(const acb_t x, const gr_ctx_t ctx)
+{
+    truth_t re, im;
+
+    if (arb_is_exact(acb_realref(x)))
+        re = arb_is_finite(acb_realref(x)) ? T_TRUE : T_FALSE;
+    else
+        re = T_UNKNOWN;
+
+    if (re == T_FALSE)
+        return T_FALSE;
+
+    if (arb_is_zero(acb_imagref(x)))
+        im = T_TRUE;
+    else
+        im = arb_contains_zero(acb_imagref(x)) ? T_UNKNOWN : T_FALSE;
+
+    return truth_and(re, im);
+}
+
+static truth_t
 _gr_acb_equal(const acb_t x, const acb_t y, const gr_ctx_t ctx)
 {
     if (acb_is_exact(x) && acb_equal(x, y))
@@ -2264,6 +2301,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_acb_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_acb_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_acb_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_acb_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_acb_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_acb_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_acb_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_acb_set_si},

@@ -113,6 +113,9 @@ WARN_UNUSED_RESULT int gr_series_set_fmpq(gr_series_t res, const fmpq_t c, gr_ct
 WARN_UNUSED_RESULT int gr_series_set_other(gr_series_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 truth_t gr_series_is_zero(const gr_series_t x, gr_ctx_t ctx);
 truth_t gr_series_is_one(const gr_series_t x, gr_ctx_t ctx);
+truth_t gr_series_is_scalar(const gr_series_t x, gr_ctx_t ctx);
+truth_t gr_series_is_integer(const gr_series_t x, gr_ctx_t ctx);
+truth_t gr_series_is_rational(const gr_series_t x, gr_ctx_t ctx);
 truth_t gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_ctx_t ctx);
 truth_t gr_series_equal(const gr_series_t x, const gr_series_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_add(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_t ctx);
@@ -220,6 +223,9 @@ WARN_UNUSED_RESULT int gr_series_mod_set_fmpz(gr_poly_t res, const fmpz_t c, gr_
 WARN_UNUSED_RESULT int gr_series_mod_set_fmpq(gr_poly_t res, const fmpq_t c, gr_ctx_t ctx);
 truth_t gr_series_mod_is_zero(const gr_poly_t x, gr_ctx_t ctx);
 truth_t gr_series_mod_is_one(const gr_poly_t x, gr_ctx_t ctx);
+truth_t gr_series_mod_is_scalar(const gr_poly_t x, gr_ctx_t ctx);
+truth_t gr_series_mod_is_integer(const gr_poly_t x, gr_ctx_t ctx);
+truth_t gr_series_mod_is_rational(const gr_poly_t x, gr_ctx_t ctx);
 truth_t gr_series_mod_equal(const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_mod_neg(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_mod_add(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx);

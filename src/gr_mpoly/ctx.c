@@ -157,6 +157,12 @@ gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx)
     return gr_ctx_is_threadsafe(GR_MPOLY_CCTX(ctx));
 }
 
+static truth_t
+gr_mpoly_ctx_is_finite_characteristic(gr_mpoly_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_MPOLY_CCTX(ctx));
+}
+
 static gr_ptr _gr_mpoly_ctx_base(gr_ctx_t ctx) { return GR_MPOLY_CCTX(ctx); }
 
 
@@ -334,6 +340,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_mpoly_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_mpoly_ctx_is_field},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_mpoly_ctx_is_threadsafe},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_mpoly_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_complex_vector_space},
@@ -355,6 +362,8 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) gr_mpoly_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_mpoly_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_mpoly_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) gr_mpoly_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) gr_mpoly_is_rational},
     {GR_METHOD_EQUAL,       (gr_funcptr) gr_mpoly_equal},
     {GR_METHOD_SET,         (gr_funcptr) gr_mpoly_set},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) gr_mpoly_set_other},

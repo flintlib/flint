@@ -199,10 +199,28 @@ TEST_FUNCTION_START(padic_radix, state)
             padic_radix_clear(r2, ctx);
         }
 
+        /* A known negative-valuation digit proves non-integrality even when
+           the higher p-adic digits are inexact. */
+        {
+            padic_radix_t x;
+
+            padic_radix_init(x, ctx);
+            radix_integer_one(&x->u, PADIC_RADIX_CTX_RADIX(ctx));
+            x->v = -1 - (slong) n_randint(state, 20);
+            x->N = x->v + 1 + (slong) n_randint(state, 20);
+
+            if (padic_radix_is_integer(x, ctx) != T_FALSE)
+            {
+                flint_printf("FAIL: inexact p-adic with negative valuation is not an integer\n");
+                flint_printf("x = "); gr_println(x, ctx);
+                flint_abort();
+            }
+
+            padic_radix_clear(x, ctx);
+        }
 
         gr_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);
 }
-

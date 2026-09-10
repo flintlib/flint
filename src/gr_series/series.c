@@ -423,6 +423,63 @@ gr_series_is_one(const gr_series_t x, gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+truth_t
+gr_series_is_scalar(const gr_series_t x, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_SERIES_ELEM_CTX(ctx);
+    slong err = GR_SERIES_ERROR(x);
+    slong len = GR_SERIES_POLY(x)->length;
+    slong known_len;
+    truth_t is_scalar;
+
+    if (err == 0)
+        return T_UNKNOWN;
+
+    known_len = FLINT_MIN(err, len);
+    is_scalar = known_len <= 1 ? T_TRUE :
+        _gr_vec_is_zero(GR_ENTRY(GR_SERIES_POLY(x)->coeffs, 1, cctx->sizeof_elem),
+                        known_len - 1, cctx);
+
+    if (is_scalar == T_FALSE || err == GR_SERIES_ERR_EXACT)
+        return is_scalar;
+
+    return T_UNKNOWN;
+}
+
+static truth_t
+_gr_series_is_integer_or_rational(const gr_series_t x, gr_ctx_t ctx, int rational)
+{
+    gr_ctx_struct * cctx = GR_SERIES_ELEM_CTX(ctx);
+    slong len = GR_SERIES_POLY(x)->length;
+    truth_t is_scalar, is_constant;
+
+    is_scalar = gr_series_is_scalar(x, ctx);
+
+    if (is_scalar == T_FALSE)
+        return T_FALSE;
+
+    if (gr_ctx_is_finite_characteristic(ctx) != T_FALSE)
+        return T_UNKNOWN;
+
+    is_constant = len == 0 ? T_TRUE :
+        (rational ? gr_is_rational(GR_SERIES_POLY(x)->coeffs, cctx) :
+                    gr_is_integer(GR_SERIES_POLY(x)->coeffs, cctx));
+
+    return truth_and(is_scalar, is_constant);
+}
+
+truth_t
+gr_series_is_integer(const gr_series_t x, gr_ctx_t ctx)
+{
+    return _gr_series_is_integer_or_rational(x, ctx, 0);
+}
+
+truth_t
+gr_series_is_rational(const gr_series_t x, gr_ctx_t ctx)
+{
+    return _gr_series_is_integer_or_rational(x, ctx, 1);
+}
+
 
 truth_t
 gr_series_equal(const gr_series_t x, const gr_series_t y, gr_ctx_t ctx)
@@ -2202,6 +2259,8 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) gr_series_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_series_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_series_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) gr_series_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) gr_series_is_rational},
     {GR_METHOD_EQUAL,       (gr_funcptr) gr_series_equal},
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
@@ -2316,4 +2375,3 @@ gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     gr_series_ctx_init(ctx, base_ring, n);
 }
-

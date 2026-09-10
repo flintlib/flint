@@ -55,6 +55,8 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) nfloat_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) nfloat_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) nfloat_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) nfloat_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) nfloat_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) nfloat_equal},
     {GR_METHOD_SET,             (gr_funcptr) nfloat_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) nfloat_set_si},

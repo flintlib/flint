@@ -150,6 +150,32 @@ _gr_fexpr_is_neg_one(const fexpr_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_fexpr_is_integer(const fexpr_t x, const gr_ctx_t ctx)
+{
+    return fexpr_is_integer(x) ? T_TRUE : T_UNKNOWN;
+}
+
+static truth_t
+_gr_fexpr_is_rational(const fexpr_t x, const gr_ctx_t ctx)
+{
+    fexpr_t p, q;
+
+    if (fexpr_is_integer(x))
+        return T_TRUE;
+
+    if (fexpr_nargs(x) == 2 && fexpr_is_builtin_call(x, FEXPR_Div))
+    {
+        fexpr_view_arg(p, x, 0);
+        fexpr_view_arg(q, x, 1);
+
+        if (fexpr_is_integer(p) && fexpr_is_integer(q) && !fexpr_equal_ui(q, 0))
+            return T_TRUE;
+    }
+
+    return T_UNKNOWN;
+}
+
+static truth_t
 _gr_fexpr_equal(const fexpr_t x, const fexpr_t y, const gr_ctx_t ctx)
 {
     return fexpr_equal(x, y) ? T_TRUE : T_FALSE;
@@ -288,6 +314,8 @@ gr_method_tab_input _fexpr_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fexpr_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fexpr_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fexpr_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_fexpr_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_fexpr_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fexpr_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_fexpr_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fexpr_set_si},

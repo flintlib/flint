@@ -158,6 +158,12 @@ gr_ore_poly_ctx_is_integral_domain(gr_ore_poly_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+truth_t
+gr_ore_poly_ctx_is_finite_characteristic(gr_ore_poly_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_ORE_POLY_ELEM_CTX(ctx));
+}
+
 static truth_t
 gr_ore_poly_ctx_is_unique_factorization_domain(gr_ore_poly_ctx_t ctx)
 {
@@ -230,6 +236,7 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_ore_poly_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,  (gr_funcptr) gr_ore_poly_ctx_is_unique_factorization_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_ore_poly_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_ore_poly_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_ore_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_ore_poly_ctx_set_gen_names},
@@ -254,6 +261,8 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
 
     {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_ore_poly_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_ore_poly_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) gr_ore_poly_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) gr_ore_poly_is_rational},
 /*
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) gr_ore_poly_is_neg_one},
 */

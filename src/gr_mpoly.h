@@ -213,6 +213,9 @@ int gr_mpoly_zero(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 }
 
 truth_t gr_mpoly_is_zero(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_is_scalar(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_is_integer(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_is_rational(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_gen(gr_mpoly_t A, slong var, gr_mpoly_ctx_t ctx);
 truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, gr_mpoly_ctx_t ctx);

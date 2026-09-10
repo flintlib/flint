@@ -269,6 +269,18 @@ _gr_nf_is_neg_one(const nf_elem_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_nf_is_integer(const nf_elem_t x, const gr_ctx_t ctx)
+{
+    return nf_elem_is_integer(x, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
+_gr_nf_is_rational(const nf_elem_t x, const gr_ctx_t ctx)
+{
+    return nf_elem_is_rational(x, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
 _gr_nf_equal(const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     return nf_elem_equal(x, y, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
@@ -575,6 +587,8 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_nf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_nf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_nf_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_nf_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_nf_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_nf_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_nf_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_nf_set_si},

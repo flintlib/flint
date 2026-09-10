@@ -342,6 +342,19 @@ _gr_fmpq_poly_is_neg_one(const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_fmpq_poly_is_integer(const fmpq_poly_t x, const gr_ctx_t ctx)
+{
+    return (x->length == 0 ||
+            (x->length == 1 && fmpz_is_one(x->den))) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
+_gr_fmpq_poly_is_rational(const fmpq_poly_t x, const gr_ctx_t ctx)
+{
+    return x->length <= 1 ? T_TRUE : T_FALSE;
+}
+
+static truth_t
 _gr_fmpq_poly_equal(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
 {
     return fmpq_poly_equal(x, y) ? T_TRUE : T_FALSE;
@@ -765,6 +778,8 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpq_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpq_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpq_poly_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_fmpq_poly_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_fmpq_poly_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fmpq_poly_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_fmpq_poly_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fmpq_poly_set_si},
