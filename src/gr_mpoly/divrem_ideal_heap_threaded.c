@@ -1151,6 +1151,13 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         ulong * Rexp;
         slong Rlen;
 
+#if FLINT_USES_PTHREAD
+        /* Pairs with the release fence before "next->producer = 1" above:
+           orders this load of L->producer before the loads of
+           (H->polyQ + w)->length below. */
+        atomic_thread_fence(memory_order_acquire);
+#endif
+
         /* process any further quotient terms that trickled in */
         for (w = 0; w < H->len; w++)
             q_prev_length[w] = (H->polyQ + w)->length;
@@ -1278,6 +1285,16 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
 
         next = L->next;
         H->length--;
+
+#if FLINT_USES_PTHREAD
+        /* Publish the producer handoff; see the identical fence in
+           gr_mpoly/divides_heap_threaded.c.  Everything written before this
+           point, including the stores to (H->polyQ + w)->length made by the
+           gr_mpoly_ts_append calls above, must be visible to the thread that
+           observes next->producer == 1. */
+        atomic_thread_fence(memory_order_release);
+#endif
+
         H->cur = next;
 
         if (next != NULL)
@@ -1768,7 +1785,8 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_dispatch(
 
     /* fall back to the single-threaded algorithm for small inputs, or when
        the coefficient ring does not allow concurrent operations */
-    if (A->length < 2 || B[0].length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
+    if (!GR_MPOLY_THREADED_DIVISION ||
+        A->length < 2 || B[0].length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
         return _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
 
     thread_limit = A->length/32;
