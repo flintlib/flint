@@ -309,7 +309,7 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
     sd_fft_trunc(Q, dbuf, m, plen, M);
 
     for (k = 0; k < M; k++)
-        vs[k] = _sd_fft_get_nmod(dbuf[k], mod.n);
+        vs[k] = _sd_fft_get_nmod(dbuf[k], Q->p, Q->pinv);
 }
 
 /* One block of the transform evaluation, one worker per every nworkers-th
