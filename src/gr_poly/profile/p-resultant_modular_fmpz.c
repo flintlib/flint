@@ -64,9 +64,12 @@ int main(void)
     flint_printf("coefficients of length lenx in x and entries of `bits` bits.\n\n");
     flint_printf("The modular algorithm reduces modulo word-size primes, calls the\n");
     flint_printf("multipoint algorithm on each of them and reconstructs by CRT; the\n");
-    flint_printf("subresultant PRS is what the generic resultant uses otherwise.\n\n");
+    flint_printf("subresultant PRS is what the generic resultant uses otherwise.\n");
+    flint_printf("`proved` runs to the coefficient bound, `heuristic` stops once the\n");
+    flint_printf("reconstruction has been stable over 100 bits of primes.\n\n");
 
-    flint_printf("leny  lenx  bits     subres     modular   ratio\n");
+    flint_printf("leny  lenx  bits     subres      proved   ratio"
+                 "   heuristic   ratio\n");
 
     for (leny = 4; leny <= 16; leny *= 2)
     {
@@ -76,8 +79,8 @@ int main(void)
             {
                 gr_ctx_t cctx, ctx;
                 gr_poly_t f, g;
-                gr_ptr x, y;
-                double t1, t2, FLINT_SET_BUT_UNUSED(tt);
+                gr_ptr x, y, z;
+                double t1, t2, t3, FLINT_SET_BUT_UNUSED(tt);
 
                 gr_ctx_init_fmpz(cctx);
                 gr_ctx_init_gr_poly(ctx, cctx);
@@ -86,6 +89,7 @@ int main(void)
                 gr_poly_init(g, ctx);
                 x = gr_heap_init(ctx);
                 y = gr_heap_init(ctx);
+                z = gr_heap_init(ctx);
 
                 _randtest_bivariate(f, state, leny, lenx, bits, ctx, cctx);
                 _randtest_bivariate(g, state, leny, lenx, bits, ctx, cctx);
@@ -95,23 +99,32 @@ int main(void)
                 TIMEIT_STOP_VALUES(tt, t1);
 
                 TIMEIT_START;
-                GR_MUST_SUCCEED(gr_poly_resultant_modular(x, f, g, ctx));
+                GR_MUST_SUCCEED(gr_poly_resultant_modular(x, f, g, 1, ctx));
                 TIMEIT_STOP_VALUES(tt, t2);
 
-                if (gr_equal(x, y, ctx) == T_FALSE)
+                TIMEIT_START;
+                GR_MUST_SUCCEED(gr_poly_resultant_modular(z, f, g, 0, ctx));
+                TIMEIT_STOP_VALUES(tt, t3);
+
+                // for theoratical purposes, the proved version is used by default
+                // but in practice this test must never fail since the probability 
+                // of failing is bounded above by 2^-50
+                if (gr_equal(x, y, ctx) == T_FALSE || gr_equal(z, y, ctx) == T_FALSE)
                 {
-                    flint_printf("\nFAIL: the two algorithms disagree\n");
+                    flint_printf("\nFAIL: the algorithms disagree\n");
                     flint_abort();
                 }
 
-                flint_printf("%4wd  %4wd  %4wu   %8.2es  %8.2es  %6.2fx\n",
-                    leny, lenx, bits, t1, t2, t1 / t2);
+                flint_printf("%4wd  %4wd  %4wu   %8.2es  %8.2es  %6.2fx"
+                             "   %8.2es  %6.2fx\n",
+                    leny, lenx, bits, t1, t2, t1 / t2, t3, t1 / t3);
                 fflush(stdout);
 
                 gr_poly_clear(f, ctx);
                 gr_poly_clear(g, ctx);
                 gr_heap_clear(x, ctx);
                 gr_heap_clear(y, ctx);
+                gr_heap_clear(z, ctx);
                 gr_ctx_clear(ctx);
                 gr_ctx_clear(cctx);
             }

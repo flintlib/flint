@@ -17,10 +17,36 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
+#include "thread_support.h"
+#if FLINT_HAVE_FFT_SMALL
+# include "fft_small.h"
+#endif
 
 /* Bits of the primes used for the modular images. Staying below
    FLINT_BITS - 1 keeps NMOD_CAN_USE_SHOUP true for the images. */
 #define MODULAR_PRIME_BITS (FLINT_BITS - 2)
+
+/* The images may instead be taken at primes p = m 2^k + 1, at which the
+   multipoint algorithm evaluates with a DFT rather than with the Bluestein
+   products of the geometric method. The transforms of fft_small work with
+   doubles and accept no modulus of more than this many bits, so such a prime
+   carries fewer bits and more of them are needed; the trade is worth making
+   only under the conditions in _use_fft_primes below. Their product is
+   bounded below using one bit less, since the primes are only known to be
+   below 2^FFT_PRIME_BITS and above half of it. */
+#define FFT_PRIME_BITS 50
+
+/* Beyond this exponent, too few m remain below 2^FFT_PRIME_BITS for the
+   primes to be found. */
+#define FFT_PRIME_MAX_DEPTH 32
+
+/* Number of points from which the DFT evaluation gains more than the extra
+   primes cost. */
+#define MODULAR_FFT_PRIME_POINTS 2048
+
+/* When the reconstruction is not required to be proved, it stops once it has
+   been left unchanged by primes whose product carries this many bits. */
+#define MODULAR_STABLE_BITS 100
 
 /* Bound for the coefficients of res_y(A, B), where A and B are seen as
    polynomials in y with coefficients in Z[x]:
@@ -131,6 +157,121 @@ _bivariate_resultant_nmod(nn_ptr out, slong outlen,
     return status;
 }
 
+/* The images at the several primes are independent, and are split over the
+   thread pool. Each worker reduces the inputs and runs the multipoint
+   algorithm in its own buffers; the multipoint algorithm is itself threaded,
+   but the pool hands out each thread once, so an inner call simply finds
+   none left and runs serially rather than oversubscribing. */
+typedef struct
+{
+    const fmpz_poly_struct * A;
+    const fmpz_poly_struct * B;
+    slong lenA;
+    slong lenB;
+    slong outlen;
+    slong lo;
+    slong hi;
+    slong nworkers;
+    nn_srcptr primes;
+    nn_ptr residues;
+    gr_poly_struct ** Ap;
+    gr_poly_struct ** Bp;
+    gr_poly_struct * rp;
+    int * status;
+}
+_modular_args_t;
+
+static void
+_modular_worker(slong widx, void * argsv)
+{
+    _modular_args_t * W = argsv;
+    slong i;
+
+    for (i = W->lo + widx; i < W->hi; i += W->nworkers)
+    {
+        int st = _bivariate_resultant_nmod(W->residues + i * W->outlen,
+            W->outlen, W->A, W->lenA, W->B, W->lenB, W->primes[i],
+            W->Ap[widx], W->Bp[widx], W->rp + widx);
+
+        if (st != GR_SUCCESS)
+            W->status[widx] = st;
+    }
+}
+
+/* Lists num primes not dividing l, which the images are then taken at. With
+   fft set they are the largest primes p = m 2^depth + 1 below 2^FFT_PRIME_BITS,
+   at which the multipoint algorithm can evaluate with a transform of depth up
+   to depth; otherwise they are the primes just above 2^MODULAR_PRIME_BITS.
+   Returns the number listed, which is less than num only in the first case,
+   when the exponent leaves too few candidates. */
+static slong
+_modular_primes(nn_ptr primes, slong num, int fft, flint_bitcnt_t depth,
+                const fmpz_t l)
+{
+    slong n = 0;
+
+    if (fft)
+    {
+#if FLINT_HAVE_FFT_SMALL
+        ulong m;
+
+        /* stopping halfway keeps every prime above 2^(FFT_PRIME_BITS - 1) */
+        for (m = (UWORD(1) << (FFT_PRIME_BITS - depth)) - 1;
+             m > (UWORD(1) << (FFT_PRIME_BITS - 1 - depth)) && n < num; m--)
+        {
+            ulong p = (m << depth) + 1;
+
+            if (!n_is_prime(p))
+                continue;
+            if (!fft_small_mulmod_satisfies_bounds(p))
+                continue;
+            if (fmpz_fdiv_ui(l, p) == 0)
+                continue;
+
+            primes[n++] = p;
+        }
+#endif
+    }
+    else
+    {
+        ulong p = UWORD(1) << MODULAR_PRIME_BITS;
+
+        while (n < num)
+        {
+            p = n_nextprime(p, 0);
+
+            if (fmpz_fdiv_ui(l, p) == 0)
+                continue;
+
+            primes[n++] = p;
+        }
+    }
+
+    return n;
+}
+
+/* Whether to spend the extra primes on a modulus admitting a DFT. The images
+   have to be taken by the multipoint algorithm for a DFT to be reachable at
+   all, and the evaluation has to be a large enough share of one: it costs
+   about (lenA + lenB) npoints log(npoints) word operations against the
+   lenA lenB npoints of the resultants at the points, and only the first of
+   the two is made faster. */
+static int
+_use_fft_primes(slong lenA, slong lenB, slong npoints, flint_bitcnt_t depth)
+{
+#if FLINT_HAVE_FFT_SMALL
+    if (depth > FFT_PRIME_MAX_DEPTH)
+        return 0;
+
+    if (!_gr_poly_resultant_multipoint_cutoff(lenA, lenB, npoints))
+        return 0;
+
+    return npoints >= MODULAR_FFT_PRIME_POINTS;
+#else
+    return 0;
+#endif
+}
+
 /* CRT the residues of `len` coefficients, laid out prime-major with the given
    stride, over the first `num` primes. */
 static void
@@ -164,22 +305,22 @@ _crt_reconstruct(fmpz * out, slong len, nn_srcptr residues, slong stride,
 static int
 _fmpz_bivariate_resultant(fmpz_poly_t res,
                           fmpz_poly_struct * A, slong lenA,
-                          fmpz_poly_struct * B, slong lenB)
+                          fmpz_poly_struct * B, slong lenB, int proved)
 {
     fmpz_poly_t pa, pb, t;
-    fmpz_t ca, cb, l, bound, modulus, probe, probe_prev, u;
-    flint_rand_t state;
-    nn_ptr residues, primes, r, v, Abuf, Bbuf;
-    gr_poly_struct * Ap, * Bp;
-    gr_poly_t rp;
+    fmpz_t ca, cb, l, bound, u;
+    nn_ptr residues, primes, Abuf, Bbuf;
+    gr_poly_struct ** Ap, ** Bp;
+    gr_poly_struct * Apbuf, * Bpbuf, * rp;
     gr_ctx_t tctx;
-    fmpz * cand;
-    slong totA, totB;
-    slong i, k, dxA, dxB, outlen, num, alloc;
-    flint_bitcnt_t bound_bits, curr_bits;
-    ulong p;
+    fmpz * cand, * prev;
+    slong totA, totB, totAall, totBall;
+    slong i, j, k, dxA, dxB, outlen, num, nprimes, nworkers, checkpoint;
+    flint_bitcnt_t bound_bits, depth, pbits, stable_bits;
+    int fft;
     int status = GR_SUCCESS;
-    int checking, done;
+    int * wstatus;
+    _modular_args_t wargs;
 
     fmpz_init(ca);
     fmpz_init(cb);
@@ -243,21 +384,6 @@ _fmpz_bivariate_resultant(fmpz_poly_t res,
     _bivariate_resultant_bound(bound, A, lenA, B, lenB);
     bound_bits = fmpz_bits(bound) + 2;
 
-    fmpz_init_set_ui(modulus, 1);
-    fmpz_init(probe);
-    fmpz_init(probe_prev);
-
-    flint_rand_init(state);
-
-    /* Random weights for the probe: instead of reconstructing every
-       coefficient after each prime, only the single integer sum_k v_k res_k is
-       tracked, and a full reconstruction is attempted when it stops changing.
-       A probe can stabilise early by accident, so the candidate is always
-       verified against a fresh prime before being accepted. */
-    v = flint_malloc(outlen * sizeof(ulong));
-    for (k = 0; k < outlen; k++)
-        v[k] = 1 + n_randint(state, UWORD(1) << 20);
-
     /* modular images, reused across primes */
     totA = 0;
     for (i = 0; i < lenA; i++)
@@ -266,112 +392,137 @@ _fmpz_bivariate_resultant(fmpz_poly_t res,
     for (i = 0; i < lenB; i++)
         totB += B[i].length;
 
-    Abuf = _nmod_vec_init(FLINT_MAX(totA, 1));
-    Bbuf = _nmod_vec_init(FLINT_MAX(totB, 1));
-    Ap = flint_malloc(lenA * sizeof(gr_poly_struct));
-    Bp = flint_malloc(lenB * sizeof(gr_poly_struct));
+    totAall = totA;
+    totBall = totB;
 
-    totA = 0;
-    for (i = 0; i < lenA; i++)
-    {
-        Ap[i].coeffs = Abuf + totA;
-        Ap[i].alloc = A[i].length;
-        Ap[i].length = 0;
-        totA += A[i].length;
-    }
-    totB = 0;
-    for (i = 0; i < lenB; i++)
-    {
-        Bp[i].coeffs = Bbuf + totB;
-        Bp[i].alloc = B[i].length;
-        Bp[i].length = 0;
-        totB += B[i].length;
-    }
+    /* The number of primes that reaching the bound takes is known in advance,
+       and so is the list itself; the images at them are independent and are
+       computed in parallel. */
+    depth = FLINT_BIT_COUNT(outlen - 1) + 1;
+    fft = _use_fft_primes(lenA, lenB, outlen, depth);
+    pbits = fft ? FFT_PRIME_BITS - 1 : MODULAR_PRIME_BITS;
+
+    nprimes = (bound_bits + pbits - 1) / pbits;
+    nworkers = FLINT_MIN(nprimes, flint_get_num_threads());
+
+    Abuf = _nmod_vec_init(FLINT_MAX(nworkers * totA, 1));
+    Bbuf = _nmod_vec_init(FLINT_MAX(nworkers * totB, 1));
+    Ap = flint_malloc(nworkers * sizeof(gr_poly_struct *));
+    Bp = flint_malloc(nworkers * sizeof(gr_poly_struct *));
+    Apbuf = flint_malloc(nworkers * lenA * sizeof(gr_poly_struct));
+    Bpbuf = flint_malloc(nworkers * lenB * sizeof(gr_poly_struct));
 
     gr_ctx_init_nmod(tctx, UWORD(2));
-    gr_poly_init(rp, tctx);
+    rp = flint_malloc(nworkers * sizeof(gr_poly_struct));
+    wstatus = flint_malloc(nworkers * sizeof(int));
 
-    alloc = 16;
-    residues = flint_malloc(alloc * outlen * sizeof(ulong));
-    primes = flint_malloc(alloc * sizeof(ulong));
-    cand = _fmpz_vec_init(outlen);
-
-    p = (UWORD(1) << MODULAR_PRIME_BITS) - n_randint(state, UWORD(1) << 20);
-    num = 0;
-    curr_bits = 0;
-    checking = 0;
-    done = 0;
-
-    while (!done && curr_bits < bound_bits)
+    for (j = 0; j < nworkers; j++)
     {
-        nmod_t mod;
-        ulong s;
+        Ap[j] = Apbuf + j * lenA;
+        Bp[j] = Bpbuf + j * lenB;
 
-        p = n_nextprime(p, 0);
-        if (fmpz_fdiv_ui(l, p) == 0)
-            continue;
-
-        if (num == alloc)
+        totA = 0;
+        for (i = 0; i < lenA; i++)
         {
-            alloc *= 2;
-            residues = flint_realloc(residues, alloc * outlen * sizeof(ulong));
-            primes = flint_realloc(primes, alloc * sizeof(ulong));
+            Ap[j][i].coeffs = Abuf + j * totAall + totA;
+            Ap[j][i].alloc = A[i].length;
+            Ap[j][i].length = 0;
+            totA += A[i].length;
+        }
+        totB = 0;
+        for (i = 0; i < lenB; i++)
+        {
+            Bp[j][i].coeffs = Bbuf + j * totBall + totB;
+            Bp[j][i].alloc = B[i].length;
+            Bp[j][i].length = 0;
+            totB += B[i].length;
         }
 
-        r = residues + num * outlen;
-        status = _bivariate_resultant_nmod(r, outlen, A, lenA, B, lenB, p, Ap, Bp, rp);
+        gr_poly_init(rp + j, tctx);
+        wstatus[j] = GR_SUCCESS;
+    }
+
+    residues = flint_malloc(nprimes * outlen * sizeof(ulong));
+    primes = flint_malloc(nprimes * sizeof(ulong));
+    cand = _fmpz_vec_init(outlen);
+    prev = _fmpz_vec_init(outlen);
+
+    if (fft && _modular_primes(primes, nprimes, 1, depth, l) < nprimes)
+    {
+        /* not enough primes of that shape after all */
+        fft = 0;
+        nprimes = (bound_bits + MODULAR_PRIME_BITS - 1) / MODULAR_PRIME_BITS;
+    }
+
+    if (!fft)
+        _modular_primes(primes, nprimes, 0, 0, l);
+
+    /* Proved, primes are used until their product exceeds twice the bound
+       above, which makes the reconstruction exact. Unproved, the images are
+       computed in growing rounds and the reconstruction is stopped once it
+       has been left unchanged by primes whose product carries
+       MODULAR_STABLE_BITS bits, which is a good deal faster whenever the
+       resultant is much smaller than the bound. That test is a heuristic and
+       not a proof: it only fails to detect a wrong candidate when the primes
+       of the last round divide the difference, and since they are picked
+       deterministically an input can be built for which they do. */
+    num = 0;
+    stable_bits = 0;
+    checkpoint = proved ? nprimes : nworkers;
+
+    while (num < nprimes)
+    {
+        slong batch = FLINT_MIN(checkpoint, nprimes) - num;
+
+        wargs.A = A; wargs.B = B;
+        wargs.lenA = lenA; wargs.lenB = lenB;
+        wargs.outlen = outlen;
+        wargs.lo = num; wargs.hi = num + batch;
+        wargs.nworkers = FLINT_MIN(batch, nworkers);
+        wargs.primes = primes; wargs.residues = residues;
+        wargs.Ap = Ap; wargs.Bp = Bp; wargs.rp = rp;
+        wargs.status = wstatus;
+
+        flint_parallel_do(_modular_worker, &wargs, wargs.nworkers, 0, 0);
+
+        for (j = 0; j < nworkers; j++)
+            if (wstatus[j] != GR_SUCCESS)
+                status = wstatus[j];
 
         if (status != GR_SUCCESS)
             break;
 
-        /* the prime just computed verifies the pending candidate */
-        if (checking)
+        num += batch;
+
+        if (proved)
+            break;
+
+        /* prev keeps the reconstruction of the round before, so that cand is
+           the newest one whichever way the loop is left */
+        _fmpz_vec_swap(cand, prev, outlen);
+        _crt_reconstruct(cand, outlen, residues, outlen, primes, num);
+
+        if (num > batch && _fmpz_vec_equal(cand, prev, outlen))
         {
-            int agree = 1;
+            for (j = num - batch; j < num; j++)
+                stable_bits += FLINT_BIT_COUNT(primes[j]);
 
-            for (k = 0; k < outlen; k++)
-            {
-                if (fmpz_fdiv_ui(cand + k, p) != r[k])
-                {
-                    agree = 0;
-                    break;
-                }
-            }
-
-            if (agree)
-            {
-                done = 1;
+            if (stable_bits > MODULAR_STABLE_BITS)
                 break;
-            }
-
-            checking = 0;
         }
-
-        primes[num] = p;
-        num++;
-        curr_bits += MODULAR_PRIME_BITS;
-
-        nmod_init(&mod, p);
-        s = 0;
-        for (k = 0; k < outlen; k++)
-            s = nmod_add(s, nmod_mul(v[k], r[k], mod), mod);
-
-        fmpz_CRT_ui(probe, probe, modulus, s, p, 1);
-        fmpz_mul_ui(modulus, modulus, p);
-
-        if (num >= 2 && fmpz_equal(probe, probe_prev))
+        else
         {
-            _crt_reconstruct(cand, outlen, residues, outlen, primes, num);
-            checking = 1;
+            stable_bits = 0;
         }
 
-        fmpz_set(probe_prev, probe);
+        /* rounds grow geometrically, so that the reconstructions the test
+           costs amount to a bounded multiple of the last of them */
+        checkpoint = FLINT_MAX(2 * checkpoint, num + nworkers);
     }
 
     if (status == GR_SUCCESS)
     {
-        /* the bound was reached without the probe settling */
-        if (!done)
+        if (proved)
             _crt_reconstruct(cand, outlen, residues, outlen, primes, num);
 
         fmpz_poly_fit_length(res, outlen);
@@ -399,28 +550,29 @@ _fmpz_bivariate_resultant(fmpz_poly_t res,
         }
     }
 
-    flint_rand_clear(state);
+    for (j = 0; j < nworkers; j++)
+        gr_poly_clear(rp + j, tctx);
 
-    gr_poly_clear(rp, tctx);
     gr_ctx_clear(tctx);
     _nmod_vec_clear(Abuf);
     _nmod_vec_clear(Bbuf);
     flint_free(Ap);
     flint_free(Bp);
+    flint_free(Apbuf);
+    flint_free(Bpbuf);
+    flint_free(rp);
+    flint_free(wstatus);
 
     _fmpz_vec_clear(cand, outlen);
+    _fmpz_vec_clear(prev, outlen);
     flint_free(residues);
     flint_free(primes);
-    flint_free(v);
 
     fmpz_clear(ca);
     fmpz_clear(cb);
     fmpz_clear(l);
     fmpz_clear(u);
     fmpz_clear(bound);
-    fmpz_clear(modulus);
-    fmpz_clear(probe);
-    fmpz_clear(probe_prev);
     fmpz_poly_clear(pa);
     fmpz_poly_clear(pb);
     fmpz_poly_clear(t);
@@ -430,7 +582,7 @@ _fmpz_bivariate_resultant(fmpz_poly_t res,
 
 int
 _gr_poly_resultant_modular(gr_ptr res, gr_srcptr A, slong lenA,
-                           gr_srcptr B, slong lenB, gr_ctx_t ctx)
+                           gr_srcptr B, slong lenB, int proved, gr_ctx_t ctx)
 {
     const gr_poly_struct * Ax = A;
     const gr_poly_struct * Bx = B;
@@ -520,7 +672,7 @@ _gr_poly_resultant_modular(gr_ptr res, gr_srcptr A, slong lenA,
     }
 
     fmpz_poly_init(R);
-    status = _fmpz_bivariate_resultant(R, Az, lenA, Bz, lenB);
+    status = _fmpz_bivariate_resultant(R, Az, lenA, Bz, lenB, proved);
 
     if (status == GR_SUCCESS)
     {
@@ -564,7 +716,7 @@ _gr_poly_resultant_modular(gr_ptr res, gr_srcptr A, slong lenA,
 
 int
 gr_poly_resultant_modular(gr_ptr r, const gr_poly_t f,
-                          const gr_poly_t g, gr_ctx_t ctx)
+                          const gr_poly_t g, int proved, gr_ctx_t ctx)
 {
     slong len1 = f->length;
     slong len2 = g->length;
@@ -584,11 +736,11 @@ gr_poly_resultant_modular(gr_ptr r, const gr_poly_t f,
 
     if (len1 >= len2)
     {
-        status |= _gr_poly_resultant_modular(r, f->coeffs, len1, g->coeffs, len2, ctx);
+        status |= _gr_poly_resultant_modular(r, f->coeffs, len1, g->coeffs, len2, proved, ctx);
     }
     else
     {
-        status |= _gr_poly_resultant_modular(r, g->coeffs, len2, f->coeffs, len1, ctx);
+        status |= _gr_poly_resultant_modular(r, g->coeffs, len2, f->coeffs, len1, proved, ctx);
 
         if (((len1 | len2) & 1) == 0)
             status |= gr_neg(r, r, ctx);

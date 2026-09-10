@@ -554,9 +554,10 @@ WARN_UNUSED_RESULT int gr_poly_resultant_small(gr_ptr r, const gr_poly_t f, cons
 
 WARN_UNUSED_RESULT int _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant_multipoint(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+int _gr_poly_resultant_multipoint_cutoff(slong len1, slong len2, slong npoints);
 
-WARN_UNUSED_RESULT int _gr_poly_resultant_modular(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_resultant_modular(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_resultant_modular(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, int proved, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_resultant_modular(gr_ptr r, const gr_poly_t f, const gr_poly_t g, int proved, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);

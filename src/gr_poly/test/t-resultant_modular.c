@@ -134,7 +134,9 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
             gr_poly_clear(c, cctx);
         }
 
-        s1 = gr_poly_resultant_modular(x, f, g, ctx);
+        /* the two settings of proved must agree with each other and with
+           the Sylvester determinant */
+        s1 = gr_poly_resultant_modular(x, f, g, n_randint(state, 2), ctx);
         status |= gr_poly_resultant_sylvester(y, f, g, ctx);
 
         if (s1 == GR_SUCCESS && status == GR_SUCCESS && gr_equal(x, y, ctx) == T_FALSE)
@@ -190,9 +192,9 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
 
         status |= gr_poly_mul(fh, f, h, ctx);
 
-        status |= gr_poly_resultant_modular(x, fh, g, ctx);
-        status |= gr_poly_resultant_modular(y, f, g, ctx);
-        status |= gr_poly_resultant_modular(z, h, g, ctx);
+        status |= gr_poly_resultant_modular(x, fh, g, n_randint(state, 2), ctx);
+        status |= gr_poly_resultant_modular(y, f, g, n_randint(state, 2), ctx);
+        status |= gr_poly_resultant_modular(z, h, g, n_randint(state, 2), ctx);
         status |= gr_mul(yz, y, z, ctx);
 
         if (status == GR_SUCCESS && gr_equal(x, yz, ctx) == T_FALSE)

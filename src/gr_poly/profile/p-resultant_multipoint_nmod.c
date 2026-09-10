@@ -14,16 +14,16 @@
 #include "gr_poly.h"
 #include "profiler.h"
 
-/* the largest prime p = m*2^16 + 1 of `bits` bits, for which the evaluation
+/* the largest prime p = m*2^20 + 1 of `bits` bits, for which the evaluation
    can use a DFT rather than the geometric progression */
 static ulong
 _fft_prime(int bits)
 {
     ulong m;
 
-    for (m = (UWORD(1) << (bits - 16)) - 1; m > (UWORD(1) << (bits - 17)); m--)
+    for (m = (UWORD(1) << (bits - 20)) - 1; m > (UWORD(1) << (bits - 21)); m--)
     {
-        ulong p = (m << 16) + 1;
+        ulong p = (m << 20) + 1;
 
         if (n_is_prime(p))
             return p;
@@ -76,9 +76,9 @@ int main(void)
     flint_printf("                        p without a DFT              p with a DFT\n");
     flint_printf("leny  lenx  npoints   subres   multipt  ratio      subres   multipt  ratio\n");
 
-    for (leny = 4; leny <= 64; leny *= 2)
+    for (leny = 4; leny <= 1024; leny *= 4)
     {
-        for (lenx = 4; lenx <= 64; lenx *= 4)
+        for (lenx = 4; lenx <= 1024; lenx *= 8)
         {
             npoints = (leny - 1) * (lenx - 1) + (leny - 1) * (lenx - 1) + 1;
 

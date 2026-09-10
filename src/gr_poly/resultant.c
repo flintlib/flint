@@ -20,10 +20,6 @@
 #define HGCD_CUTOFF 200
 #define HGCD_INNER_CUTOFF 100
 
-/* Cutoff on lenA * lenB for the multipoint algorithm over bivariate
-   polynomial rings over nmod; below this the subresultant PRS is faster. */
-#define MULTIPOINT_CUTOFF 36
-
 /* Tuning for the multimodular algorithm over bivariate polynomial rings over
    Z and Q: it is used when the degree in y of the smaller input, or the degree
    in x of the resultant, reaches these values. */
@@ -41,11 +37,23 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
        univariate resultants, interpolate. Asymptotically faster than the
        subresultant PRS below, which is still ahead at the smallest sizes. */
     if (ctx->which_ring == GR_CTX_GR_POLY &&
-            POLYNOMIAL_ELEM_CTX(ctx)->which_ring == GR_CTX_NMOD &&
-            lenA * lenB >= MULTIPOINT_CUTOFF)
+            POLYNOMIAL_ELEM_CTX(ctx)->which_ring == GR_CTX_NMOD)
     {
-        if (_gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
-            return GR_SUCCESS;
+        const gr_poly_struct * Ax = A;
+        const gr_poly_struct * Bx = B;
+        slong i, blenA = 0, blenB = 0;
+
+        for (i = 0; i < lenA; i++)
+            blenA = FLINT_MAX(blenA, Ax[i].length);
+        for (i = 0; i < lenB; i++)
+            blenB = FLINT_MAX(blenB, Bx[i].length);
+
+        if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB,
+                (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1))
+        {
+            if (_gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+                return GR_SUCCESS;
+        }
     }
 
     /* Bivariate polynomials over Z or Q: reduce to the above modulo several
@@ -68,7 +76,7 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
         if (FLINT_MIN(lenA, lenB) >= MODULAR_MIN_LENGTH ||
                 (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) >= MODULAR_MIN_DEGREE)
         {
-            if (_gr_poly_resultant_modular(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+            if (_gr_poly_resultant_modular(res, A, lenA, B, lenB, 1, ctx) == GR_SUCCESS)
                 return GR_SUCCESS;
         }
     }

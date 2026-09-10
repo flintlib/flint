@@ -98,7 +98,7 @@ int main(void)
                 TIMEIT_STOP_VALUES(tt, t1);
 
                 TIMEIT_START;
-                GR_MUST_SUCCEED(gr_poly_resultant_modular(x, f, g, ctx));
+                GR_MUST_SUCCEED(gr_poly_resultant_modular(x, f, g, 1, ctx));
                 TIMEIT_STOP_VALUES(tt, t2);
 
                 if (gr_equal(x, y, ctx) == T_FALSE)

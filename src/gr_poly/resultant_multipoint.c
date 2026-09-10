@@ -598,6 +598,27 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
 
 #endif
 
+/* Where the subresultant PRS works throughout with polynomials in x of the
+   length of the resultant, this algorithm takes a resultant of two
+   polynomials of lengths lenA and lenB in y at each of npoints points.
+   Measured over nmod, it is ahead as soon as the lengths in y reach
+   MULTIPOINT_CUTOFF, and just below that it still needs a resultant of large
+   enough degree in x to pay for the evaluation. Lengths in y of three and
+   less do not reach here, being handled by _gr_poly_resultant_small. */
+#define MULTIPOINT_CUTOFF 36
+#define MULTIPOINT_CUTOFF_SMALL 16
+#define MULTIPOINT_CUTOFF_POINTS 4096
+
+int
+_gr_poly_resultant_multipoint_cutoff(slong lenA, slong lenB, slong npoints)
+{
+    if (lenA * lenB >= MULTIPOINT_CUTOFF)
+        return 1;
+
+    return lenA * lenB >= MULTIPOINT_CUTOFF_SMALL
+        && npoints >= MULTIPOINT_CUTOFF_POINTS;
+}
+
 int
 _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
                               gr_srcptr B, slong lenB, gr_ctx_t ctx)
