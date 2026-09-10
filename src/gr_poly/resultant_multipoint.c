@@ -574,7 +574,7 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
 
         for (k = 0; k < npoints; k++)
             ((nn_ptr) resx->coeffs)[k] =
-                nmod_mul(_sd_fft_get_nmod(d[k], mod.n), Ninv, mod);
+                nmod_mul(_sd_fft_get_nmod(d[k], Q->p, Q->pinv), Ninv, mod);
     }
     else
     {
