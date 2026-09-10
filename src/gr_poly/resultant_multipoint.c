@@ -273,19 +273,6 @@ _geom_eval_worker(slong widx, void * argsv)
 
 #if FLINT_HAVE_FFT_SMALL
 
-/* sd_fft leaves its outputs in (-2p, 2p), as exact integers in a double. */
-static ulong
-_sd_fft_get_nmod(double a, ulong p)
-{
-    slong s = (slong) a;
-
-    if (s < 0) s += (slong) p;
-    if (s < 0) s += (slong) p;
-    if ((ulong) s >= p) s -= (slong) p;
-
-    return (ulong) s;
-}
-
 /* Evaluates (poly, plen), with its k-th coefficient scaled by spow[k], at the
    M-th roots of unity, leaving the values in the raw order sd_fft_trunc
    produces them in: the value at the s-th root lands at the position
@@ -309,7 +296,7 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
     sd_fft_trunc(Q, dbuf, m, plen, M);
 
     for (k = 0; k < M; k++)
-        vs[k] = _sd_fft_get_nmod(dbuf[k], mod.n);
+        vs[k] = vec1d_reduce_to_0n(dbuf[k], mod.n);
 }
 
 /* One block of the transform evaluation, one worker per every nworkers-th
@@ -574,7 +561,7 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
 
         for (k = 0; k < npoints; k++)
             ((nn_ptr) resx->coeffs)[k] =
-                nmod_mul(_sd_fft_get_nmod(d[k], mod.n), Ninv, mod);
+                nmod_mul(vec1d_reduce_to_0n(d[k], mod.n), Ninv, mod);
     }
     else
     {
