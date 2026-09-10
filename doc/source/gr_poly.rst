@@ -1044,8 +1044,8 @@ of the two polynomials is zero.
               int gr_poly_resultant_small(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_multipoint(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
-              int _gr_poly_resultant_modular(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
-              int gr_poly_resultant_modular(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int _gr_poly_resultant_modular(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, int proved, gr_ctx_t ctx)
+              int gr_poly_resultant_modular(gr_ptr res, const gr_poly_t f, const gr_poly_t g, int proved, gr_ctx_t ctx)
               int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
 
@@ -1078,7 +1078,8 @@ of the two polynomials is zero.
     The *modular* version is a specialization for bivariate polynomials over
     `\mathbb{Z}` and `\mathbb{Q}`. It reduces the inputs modulo several word-size
     primes, calls the *multipoint* algorithm for each of them, and reconstructs 
-    the result by CRT.
+    the result by CRT. If *proved* is set to true, then the conservative bound is use.
+    Otherwise the multimodular stops as soon as the CRT stops affecting the values.
 
     The *subresultant* version uses the subresultant PRS algorithm.
     It is valid whenever the ring is a GCD domain.
