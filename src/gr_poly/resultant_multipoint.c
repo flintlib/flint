@@ -296,7 +296,7 @@ _dft_evaluate(nn_ptr vs, nn_srcptr poly, slong plen, nn_srcptr spow,
     sd_fft_trunc(Q, dbuf, m, plen, M);
 
     for (k = 0; k < M; k++)
-        vs[k] = vec1d_reduce_to_0n(dbuf[k], mod.n);
+        vs[k] = vec1d_reduce_to_0n(dbuf[k], Q->p, Q->pinv);
 }
 
 /* One block of the transform evaluation, one worker per every nworkers-th
@@ -561,7 +561,7 @@ _gr_poly_resultant_multipoint_dft(gr_poly_struct * resx,
 
         for (k = 0; k < npoints; k++)
             ((nn_ptr) resx->coeffs)[k] =
-                nmod_mul(vec1d_reduce_to_0n(d[k], mod.n), Ninv, mod);
+                nmod_mul(vec1d_reduce_to_0n(d[k], Q->p, Q->pinv), Ninv, mod);
     }
     else
     {
