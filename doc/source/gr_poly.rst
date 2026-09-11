@@ -1078,8 +1078,8 @@ of the two polynomials is zero.
     The *modular* version is a specialization for bivariate polynomials over
     `\mathbb{Z}` and `\mathbb{Q}`. It reduces the inputs modulo several word-size
     primes, calls the *multipoint* algorithm for each of them, and reconstructs 
-    the result by CRT. If *proved* is set to true, then the conservative bound is use.
-    Otherwise the multimodular stops as soon as the CRT stops affecting the values.
+    the result by CRT. If ``proved`` is set to `1`, then sufficiently many primes are used to guarantee the correct result.
+    Otherwise, the multimodular strategy stops as soon as the result of the CRT has remained unchanged over a few consecutive primes, which can speed the process up substantially for some input but makes it randomized of Monte Carlo type (with very high probability of success).
 
     The *subresultant* version uses the subresultant PRS algorithm.
     It is valid whenever the ring is a GCD domain.
