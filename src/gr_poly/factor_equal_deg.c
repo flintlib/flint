@@ -296,24 +296,33 @@ _gr_poly_edf_split_minpoly(gr_poly_vec_t res, queue_t Q, int * found,
     const gr_poly_t xp, const fmpz_t q, flint_rand_t state,
     gr_poly_t t, gr_poly_t g, gr_poly_t h, gr_ctx_t ctx)
 {
-    gr_ptr s;
+    gr_ptr s, w;
     gr_poly_vec_t lin;
-    slong i, N = 2 * r;
+    slong i, n = f->length - 1, N = 2 * r;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
 
     *found = 0;
 
     GR_TMP_INIT_VEC(s, N, ctx);
+    GR_TMP_INIT_VEC(w, n, ctx);
     gr_poly_vec_init(lin, 0, ctx);
 
-    /* s_i = [x^0] b^i mod f */
+    /* s_i = <w, b^i mod f> for a random linear functional w: a fixed
+       functional (for example the constant coefficient) can be
+       degenerate on the powers of b, in which case the sequence
+       satisfies a recurrence shorter than the minimal polynomial of b
+       and no splitting is obtained. */
+    for (i = 0; i < n; i++)
+        status |= gr_randtest(GR_ENTRY(w, i, sz), state, ctx);
+
     status |= gr_poly_one(t, ctx);
-    status |= gr_one(s, ctx);
-    for (i = 1; i < N && status == GR_SUCCESS; i++)
+    for (i = 0; i < N && status == GR_SUCCESS; i++)
     {
-        status |= gr_poly_preinv_mulmod(t, t, b, P, ctx);
-        status |= gr_poly_get_coeff_scalar(GR_ENTRY(s, i, sz), t, 0, ctx);
+        if (i != 0)
+            status |= gr_poly_preinv_mulmod(t, t, b, P, ctx);
+        status |= _gr_vec_dot(GR_ENTRY(s, i, sz), NULL, 0, w, t->coeffs,
+            FLINT_MIN(n, t->length), ctx);
     }
 
     status |= _gr_poly_berlekamp_massey(h, s, N, ctx);
@@ -357,6 +366,7 @@ _gr_poly_edf_split_minpoly(gr_poly_vec_t res, queue_t Q, int * found,
     }
 
     GR_TMP_CLEAR_VEC(s, N, ctx);
+    GR_TMP_CLEAR_VEC(w, n, ctx);
     gr_poly_vec_clear(lin, ctx);
 
     return status;

@@ -412,11 +412,25 @@ _gr_nmod_redc_fast_pow_ui(ulong * res, const ulong * x, ulong e, gr_ctx_t ctx)
 
 /* Shallow element storage: truncated coefficients need not be cleared. */
 static void
-_gr_nmod_redc_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+_gr_nmod_redc_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     ulong * coeffs = poly->coeffs;
 
     while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
+}
+
+/* Here zero has the two representatives 0 and n (compare
+   _gr_nmod_redc_fast_vec_normalise). */
+static void
+_gr_nmod_redc_fast_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    ulong * coeffs = poly->coeffs;
+    ulong n = GR_NMOD_REDC_N(ctx);
+
+    while (len > 0 && (coeffs[len - 1] == 0 || coeffs[len - 1] == n))
         len--;
 
     poly->length = len;
@@ -2029,7 +2043,7 @@ gr_method_tab_input __gr_nmod_redc_fast_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mullow},
-    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, GR_FUNCPTR_CAST _gr_nmod_redc_poly_set_length_normalise},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_set_length_normalise},
     {GR_METHOD_POLY_FACTOR,     GR_FUNCPTR_CAST _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_divrem},

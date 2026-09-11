@@ -27,7 +27,7 @@
     the given context, so it must not be cleared.
 */
 
-void
+static void
 TEMPLATE(T, poly_factor_set_gr) (TEMPLATE(T, poly_factor_t) res,
     gr_poly_vec_t fac, const fmpz_vec_t exp, gr_ctx_t gr_ctx,
     const TEMPLATE(T, ctx_t) ctx)
@@ -50,7 +50,10 @@ TEMPLATE(T, poly_factor_set_gr) (TEMPLATE(T, poly_factor_t) res,
     res->num += num;
 }
 
-void
+/* Also used by factor_berlekamp.c, factor_cantor_zassenhaus.c and
+   factor_kaltofen_shoup.c, which this file precedes in the
+   instantiations. */
+static void
 TEMPLATE(T, poly_factor_gr_algorithm) (TEMPLATE(T, poly_factor_t) res,
     TEMPLATE(T, t) leading_coeff, const TEMPLATE(T, poly_t) input,
     int algorithm, const TEMPLATE(T, ctx_t) ctx)

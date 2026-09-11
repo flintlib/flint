@@ -580,7 +580,7 @@ _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
 
 /* Shallow element storage: truncated coefficients need not be cleared. */
 static void
-_gr_nmod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+_gr_nmod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     ulong * coeffs = poly->coeffs;
 
@@ -591,7 +591,7 @@ _gr_nmod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ct
 }
 
 static int
-_gr_nmod_vec_zero(ulong * res, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_zero(ulong * res, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

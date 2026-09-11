@@ -23,7 +23,7 @@
     has the same layout as a gr_poly_struct, so polynomials can be cast;
     the factors are moved (not copied) out of the gr_poly_vec.
 */
-void
+static void
 _fmpz_mod_poly_factor_set_gr(fmpz_mod_poly_factor_t res, gr_poly_vec_t fac,
     const fmpz_vec_t exp, const fmpz_mod_ctx_t ctx, gr_ctx_t gr_ctx)
 {
@@ -45,7 +45,7 @@ _fmpz_mod_poly_factor_set_gr(fmpz_mod_poly_factor_t res, gr_poly_vec_t fac,
     res->num += num;
 }
 
-void
+static void
 _fmpz_mod_poly_factor_gr(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f,
     int algorithm, const fmpz_mod_ctx_t ctx)
 {

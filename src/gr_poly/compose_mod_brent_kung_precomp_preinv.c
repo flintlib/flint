@@ -176,7 +176,7 @@ _gr_poly_preinv_compose_mod_brent_kung_precomp(
 {
     slong len3 = P->lenf;
     gr_mat_t B, C;
-    gr_ptr t, h;
+    gr_ptr h;
     slong i, n, m;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;

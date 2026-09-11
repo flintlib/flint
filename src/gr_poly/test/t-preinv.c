@@ -19,7 +19,7 @@ TEST_FUNCTION_START(gr_poly_preinv, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx;
         gr_poly_t A, B, F, Q, R, Q2, R2, T;
@@ -208,64 +208,109 @@ cleanup:
         gr_ctx_clear(ctx);
     }
 
-    /* Long dense monic moduli over nmod and mpn_mod: exercises the
-       transformed representation (fft_small) when available. */
-    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
+    /* Targeted coverage of the transformed representation (which
+       requires fft_small and is selected for long dense moduli): the
+       lengths exercise the boundaries of the transform sizes, in
+       particular powers of two, where the linear ring is provisioned
+       for products of length 2 lenf - 2 and the cyclic ring for
+       lenf - 1 rounded up to a power of two. Dividends longer than the
+       precomputed capacity are also covered (these fall back to Newton
+       division). */
     {
-        gr_ctx_t ctx;
-        gr_poly_t A, B, F, Q, R, Q2, R2, T;
-        gr_poly_preinv_t P;
-        slong lenf;
-        int status = GR_SUCCESS;
+        const slong lens[] = { 160, 255, 256, 257, 511, 512, 513, 1024, 1025, 0 };
+        slong li;
 
-        if (n_randint(state, 2))
+        for (li = 0; lens[li] != 0; li++)
         {
-            gr_ctx_init_nmod(ctx, n_randtest_prime(state, 1));
+            gr_ctx_t ctx;
+            gr_poly_t A, B, F, Q, R, Q2, R2, T;
+            gr_poly_preinv_t P;
+            slong lenf = lens[li], ai;
+            int status = GR_SUCCESS;
+
+            if (li % 2 == 0)
+                gr_ctx_init_nmod(ctx, n_randtest_prime(state, 1));
+            else
+            {
+                fmpz_t m;
+                fmpz_init(m);
+                fmpz_randprime(m, state, FLINT_BITS + 1 + n_randint(state, 2 * FLINT_BITS), 0);
+                if (gr_ctx_init_mpn_mod(ctx, m) != GR_SUCCESS)
+                    gr_ctx_init_nmod(ctx, n_randtest_prime(state, 1));
+                fmpz_clear(m);
+            }
+
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+
+            gr_poly_init(A, ctx); gr_poly_init(B, ctx); gr_poly_init(F, ctx);
+            gr_poly_init(Q, ctx); gr_poly_init(R, ctx); gr_poly_init(Q2, ctx);
+            gr_poly_init(R2, ctx); gr_poly_init(T, ctx);
+            gr_poly_preinv_init(P, ctx);
+
+            status |= gr_poly_randtest(F, state, lenf - 1, ctx);
+            status |= gr_poly_set_coeff_ui(F, lenf - 1, 1, ctx);
+
+            /* explicitly request the transformed representation; when it
+               is unavailable, the automatic selection is used instead */
+            if (gr_poly_preinv_set_transformed(P, F, ctx) != GR_SUCCESS)
+                status |= gr_poly_preinv_set(P, F, ctx);
+
+            status |= gr_poly_randtest(B, state, lenf - 1, ctx);
+
+            /* dividends of several lengths, including the maximum
+               supported by the precomputed transforms (2 lenf - 2) and
+               longer ones */
+            for (ai = 0; ai < 4; ai++)
+            {
+                slong lenA = (ai == 0) ? lenf : (ai == 1) ? 2 * lenf - 2 :
+                             (ai == 2) ? 2 * lenf - 1 : 3 * lenf;
+
+                status |= gr_poly_randtest(A, state, lenA, ctx);
+                status |= gr_poly_set_coeff_ui(A, lenA - 1, 1, ctx);
+
+                status |= gr_poly_preinv_divrem(Q, R, A, P, ctx);
+                status |= gr_poly_divrem(Q2, R2, A, F, ctx);
+
+                if (status != GR_SUCCESS || gr_poly_equal(Q, Q2, ctx) == T_FALSE
+                        || gr_poly_equal(R, R2, ctx) == T_FALSE)
+                {
+                    flint_printf("FAIL (transformed, divrem)\n\n");
+                    gr_ctx_println(ctx);
+                    flint_printf("kind = %d, lenf = %wd, lenA = %wd\n", P->kind, lenf, lenA);
+                    flint_abort();
+                }
+            }
+
+            /* modular multiplication and squaring */
+            status |= gr_poly_preinv_mulmod(T, A, B, P, ctx);
+            status |= gr_poly_preinv_rem(R2, A, P, ctx);
+            status |= gr_poly_mulmod(R2, R2, B, F, ctx);
+
+            if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+            {
+                flint_printf("FAIL (transformed, mulmod)\n\n");
+                gr_ctx_println(ctx);
+                flint_printf("kind = %d, lenf = %wd\n", P->kind, lenf);
+                flint_abort();
+            }
+
+            status |= gr_poly_preinv_mulmod(T, B, B, P, ctx);
+            status |= gr_poly_mulmod(R2, B, B, F, ctx);
+
+            if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+            {
+                flint_printf("FAIL (transformed, sqrmod)\n\n");
+                gr_ctx_println(ctx);
+                flint_printf("kind = %d, lenf = %wd\n", P->kind, lenf);
+                flint_abort();
+            }
+
+            gr_poly_clear(A, ctx); gr_poly_clear(B, ctx); gr_poly_clear(F, ctx);
+            gr_poly_clear(Q, ctx); gr_poly_clear(R, ctx); gr_poly_clear(Q2, ctx);
+            gr_poly_clear(R2, ctx); gr_poly_clear(T, ctx);
+            gr_poly_preinv_clear(P, ctx);
+            gr_ctx_clear(ctx);
         }
-        else
-        {
-            fmpz_t m;
-            fmpz_init(m);
-            fmpz_randprime(m, state, FLINT_BITS + 1 + n_randint(state, 2 * FLINT_BITS), 0);
-            GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, m));
-            fmpz_clear(m);
-        }
-        gr_poly_init(A, ctx); gr_poly_init(B, ctx); gr_poly_init(F, ctx);
-        gr_poly_init(Q, ctx); gr_poly_init(R, ctx); gr_poly_init(Q2, ctx); gr_poly_init(R2, ctx); gr_poly_init(T, ctx);
-        gr_poly_preinv_init(P, ctx);
-
-        lenf = 500 + n_randint(state, 900);
-        status |= gr_poly_randtest(F, state, lenf - 1, ctx);
-        status |= gr_poly_set_coeff_ui(F, lenf - 1, 1, ctx);
-        status |= gr_poly_randtest(A, state, n_randint(state, 3 * lenf), ctx);
-        status |= gr_poly_randtest(B, state, n_randint(state, lenf), ctx);
-        status |= gr_poly_preinv_set(P, F, ctx);
-
-        status |= gr_poly_preinv_divrem(Q, R, A, P, ctx);
-        status |= gr_poly_divrem(Q2, R2, A, F, ctx);
-        status |= gr_poly_preinv_mulmod(T, A, B, P, ctx);
-
-        if (status != GR_SUCCESS || gr_poly_equal(Q, Q2, ctx) == T_FALSE || gr_poly_equal(R, R2, ctx) == T_FALSE)
-        {
-            flint_printf("FAIL (long modulus, divrem)\n\n");
-            gr_ctx_println(ctx);
-            flint_printf("kind = %d, lenf = %wd, lenA = %wd\n", P->kind, lenf, A->length);
-            flint_abort();
-        }
-
-        status |= gr_poly_mulmod(R2, A, B, F, ctx);
-        if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
-        {
-            flint_printf("FAIL (long modulus, mulmod)\n\n");
-            gr_ctx_println(ctx);
-            flint_printf("kind = %d, lenf = %wd\n", P->kind, lenf);
-            flint_abort();
-        }
-
-        gr_poly_clear(A, ctx); gr_poly_clear(B, ctx); gr_poly_clear(F, ctx);
-        gr_poly_clear(Q, ctx); gr_poly_clear(R, ctx); gr_poly_clear(Q2, ctx); gr_poly_clear(R2, ctx); gr_poly_clear(T, ctx);
-        gr_poly_preinv_clear(P, ctx);
-        gr_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);

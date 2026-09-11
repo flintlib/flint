@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -128,9 +129,12 @@ TEST_FUNCTION_START(gr_poly_is_irreducible, state)
         gr_ctx_clear(ctx);
     }
 
-    /* Large degrees (Rabin's test): irreducible polynomials from
-       nmod_poly_minimal_irreducible, and products of two of them */
-    for (iter = 0; iter < 4 * flint_test_multiplier(); iter++)
+    /* Large degrees, to reach the code path using Rabin's test:
+       irreducible polynomials from nmod_poly_minimal_irreducible, and
+       products of two of them. Two cases suffice to cover the path
+       (irreducible and reducible input); the cost grows quickly with
+       the degree, so the test multiplier only varies the field. */
+    for (iter = 0; iter < 2; iter++)
     {
         gr_ctx_t ctx;
         gr_poly_t P, Q;
@@ -138,7 +142,7 @@ TEST_FUNCTION_START(gr_poly_is_irreducible, state)
         slong n, m, i;
         ulong p;
         truth_t r1, r2, r3;
-        int reducible = n_randint(state, 2);
+        int reducible = iter;
 
         p = n_randprime(state, 2 + n_randint(state, 20), 1);
         gr_ctx_init_nmod(ctx, p);
@@ -147,14 +151,14 @@ TEST_FUNCTION_START(gr_poly_is_irreducible, state)
         gr_poly_init(Q, ctx);
         nmod_poly_init(f, p);
 
-        n = 400 + n_randint(state, 200);
+        n = 601 + n_randint(state, 20);   /* above the cutoff for Rabin's test */
         nmod_poly_minimal_irreducible(f, n);
         for (i = 0; i < f->length; i++)
             GR_MUST_SUCCEED(gr_poly_set_coeff_ui(P, i, f->coeffs[i], ctx));
 
         if (reducible)
         {
-            m = 5 + n_randint(state, 100);
+            m = 5 + n_randint(state, 20);
             nmod_poly_minimal_irreducible(f, m);
             for (i = 0; i < f->length; i++)
                 GR_MUST_SUCCEED(gr_poly_set_coeff_ui(Q, i, f->coeffs[i], ctx));

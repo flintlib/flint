@@ -356,7 +356,7 @@ _nmod32_vec_clear(uint32_t * res, slong len, gr_ctx_t ctx)
 
 /* Shallow element storage: truncated coefficients need not be cleared. */
 static void
-_nmod32_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+_nmod32_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     uint32_t * coeffs = poly->coeffs;
 

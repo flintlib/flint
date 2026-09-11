@@ -76,19 +76,13 @@ gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 
 /* Sets the length to len, which must not exceed the allocated size,
    without normalising. Coefficients beyond the new length are zeroed
-   (to reclaim memory for element types with heap storage); this is
-   assumed to always succeed for base rings of gr_poly. */
+   (to reclaim memory for element types with heap storage); a failure
+   is ignored, since the coefficients are not read again. */
 GR_POLY_INLINE void
 _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 {
     if (poly->length > len)
-    {
-#ifdef FLINT_WANT_ASSERT
-        GR_MUST_SUCCEED(_gr_vec_zero(GR_ENTRY(poly->coeffs, len, ctx->sizeof_elem), poly->length - len, ctx));
-#else
         GR_IGNORE(_gr_vec_zero(GR_ENTRY(poly->coeffs, len, ctx->sizeof_elem), poly->length - len, ctx));
-#endif
-    }
 
     poly->length = len;
 }

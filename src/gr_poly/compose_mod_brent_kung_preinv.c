@@ -26,7 +26,7 @@ _gr_poly_preinv_compose_mod_brent_kung(
     gr_ctx_t ctx)
 {
     gr_mat_t A, B, C;
-    gr_ptr t, h;
+    gr_ptr h;
     slong i, n, m;
     slong len3 = P->lenf;
     int status = GR_SUCCESS;
@@ -53,8 +53,7 @@ _gr_poly_preinv_compose_mod_brent_kung(
     gr_mat_init(B, m, m, ctx);
     gr_mat_init(C, m, n, ctx);
 
-    GR_TMP_INIT_VEC(h, 2 * n, ctx);
-    t = GR_ENTRY(h, n, sz);
+    GR_TMP_INIT_VEC(h, n, ctx);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
@@ -86,7 +85,7 @@ _gr_poly_preinv_compose_mod_brent_kung(
     status |= _gr_poly_preinv_mulmod(h, gr_mat_entry_srcptr(A, m - 1, 0, ctx), n, poly2, n, P, ctx);
     status |= _gr_poly_preinv_mod_matrix_rows_evaluate(res, C, h, n, P, ctx);
 
-    GR_TMP_CLEAR_VEC(h, 2 * n, ctx);
+    GR_TMP_CLEAR_VEC(h, n, ctx);
 
     gr_mat_clear(A, ctx);
     gr_mat_clear(B, ctx);

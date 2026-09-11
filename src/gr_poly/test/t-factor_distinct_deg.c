@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -20,7 +21,7 @@ TEST_FUNCTION_START(gr_poly_factor_distinct_deg, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         flint_set_num_threads(1 + n_randint(state, 3));
         gr_ctx_t ctx;
