@@ -14,6 +14,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+
 int
 _gr_poly_divrem_newton_n_preinv(
     gr_ptr Q,

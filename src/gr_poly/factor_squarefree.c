@@ -25,28 +25,29 @@
 static int
 _gr_poly_pth_root(gr_poly_t h, const gr_poly_t f, ulong p, gr_ctx_t ctx)
 {
-    slong deg, i;
+    slong len, i;
+    slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
-    gr_ptr x;
 
     if (f->length == 0)
         return gr_poly_zero(h, ctx);
 
-    deg = f->length - 1;
-    GR_TMP_INIT(x, ctx);
+    /* f = sum_i f_i x^(ip) (the other coefficients being zero) */
+    len = (f->length - 1) / p + 1;
 
-    gr_poly_fit_length(h, deg / p + 1, ctx);
-
-    for (i = 0; i <= (slong)(deg / p); i++)
+    if (h == f)
     {
-        status |= gr_poly_get_coeff_scalar(x, f, (slong)(i * p), ctx);
-        status |= gr_fq_pth_root(x, x, ctx);
-        status |= gr_poly_set_coeff_scalar(h, i, x, ctx);
+        for (i = 0; i < len; i++)
+            status |= gr_fq_pth_root(GR_ENTRY(h->coeffs, i, sz), GR_ENTRY(f->coeffs, i * p, sz), ctx);
+    }
+    else
+    {
+        gr_poly_fit_length(h, len, ctx);
+        for (i = 0; i < len; i++)
+            status |= gr_fq_pth_root(GR_ENTRY(h->coeffs, i, sz), GR_ENTRY(f->coeffs, i * p, sz), ctx);
     }
 
-    _gr_poly_set_length(h, deg / p + 1, ctx);
-    _gr_poly_normalise(h, ctx);
-    GR_TMP_CLEAR(x, ctx);
+    _gr_poly_set_length_normalise(h, len, ctx);
 
     return status;
 }
@@ -102,7 +103,7 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t e
 
         for (j = 0; j < sub_fac->length; j++)
         {
-            status |= gr_poly_vec_append(fac, sub_fac->entries + j, ctx);
+            gr_poly_vec_append_swap(fac, sub_fac->entries + j, ctx);
             fmpz_vec_append_ui(exp, p_ui * (ulong) (sub_exp->entries[j]));
         }
 
@@ -139,7 +140,7 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t e
             if (w->length > 1)
             {
                 status |= gr_poly_make_monic(w, w, ctx);
-                status |= gr_poly_vec_append(fac, w, ctx);
+                gr_poly_vec_append_swap(fac, w, ctx);
                 fmpz_vec_append_ui(exp, i);
             }
 
@@ -168,7 +169,7 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t e
 
             for (j = 0; j < sub_fac->length; j++)
             {
-                status |= gr_poly_vec_append(fac, sub_fac->entries + j, ctx);
+                gr_poly_vec_append_swap(fac, sub_fac->entries + j, ctx);
                 fmpz_vec_append_ui(exp, p_ui * (ulong) (sub_exp->entries[j]));
             }
 

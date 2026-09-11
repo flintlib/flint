@@ -27,7 +27,7 @@ _TEMPLATE(T, poly_powmod_fmpz_binexp_preinv) (
 {
     gr_ctx_t gr_ctx;
     TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
-    GR_MUST_SUCCEED(_gr_poly_powmod_fmpz_binexp_preinv(res, poly, e, f, lenf, finv, lenfinv, gr_ctx));
+    GR_MUST_SUCCEED(_gr_poly_powmod_fmpz_binexp_preinv(res, poly, lenf - 1, e, f, lenf, finv, lenfinv, gr_ctx));
 }
 
 void

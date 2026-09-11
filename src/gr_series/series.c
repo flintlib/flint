@@ -39,8 +39,7 @@ gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
 
     gr_poly_fit_length(res, max, ctx);
     status |= _gr_poly_add(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
-    _gr_poly_set_length(res, max, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, max, ctx);
     return status;
 }
 
@@ -60,8 +59,7 @@ gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
 
     gr_poly_fit_length(res, max, ctx);
     status |= _gr_poly_sub(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
-    _gr_poly_set_length(res, max, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, max, ctx);
     return status;
 }
 

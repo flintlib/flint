@@ -48,8 +48,7 @@ gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx)
         GR_TMP_CLEAR(t, ctx);
     }
 
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
 
     return status;
 }

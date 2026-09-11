@@ -21,6 +21,7 @@
 #include "nmod_poly.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
@@ -319,9 +320,9 @@ _gr_fq_zech_sqrt(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 }
 
 static int
-_gr_ctx_fq_zech_prime(ulong * p, gr_ctx_t ctx)
+_gr_ctx_fq_zech_prime(fmpz_t p, gr_ctx_t ctx)
 {
-    *p = fq_zech_ctx_prime(FQ_CTX(ctx));
+    fmpz_set_ui(p, fq_zech_ctx_prime(FQ_CTX(ctx)));
     return GR_SUCCESS;
 }
 
@@ -333,9 +334,9 @@ _gr_ctx_fq_zech_degree(slong * deg, gr_ctx_t ctx)
 }
 
 static int
-_gr_ctx_fq_zech_order(ulong * q, gr_ctx_t ctx)
+_gr_ctx_fq_zech_order(fmpz_t q, gr_ctx_t ctx)
 {
-    *q = fq_zech_ctx_order_ui(FQ_CTX(ctx));
+    fmpz_set_ui(q, fq_zech_ctx_order_ui(FQ_CTX(ctx)));
     return GR_SUCCESS;
 }
 
@@ -471,6 +472,21 @@ _gr_fq_zech_vec_submul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, 
 
 
 /* todo: _fq_zech_poly_mullow should do the right thing */
+/* gcd and xgcd of the fq_zech_poly module */
+static int
+_gr_fq_zech_poly_gcd(fq_zech_struct * G, slong * lenG, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_zech_poly_gcd(G, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_zech_poly_xgcd(slong * lenG, fq_zech_struct * G, fq_zech_struct * S, fq_zech_struct * T, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_zech_poly_xgcd(G, S, T, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fq_zech_poly_mullow(fq_zech_struct * res,
     const fq_zech_struct * poly1, slong len1,
@@ -656,6 +672,10 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_VEC_SUBMUL_SCALAR,            (gr_funcptr) _gr_fq_zech_vec_submul_scalar},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_zech_poly_mullow},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fq_zech_poly_gcd},
+    {GR_METHOD_POLY_XGCD,       (gr_funcptr) _gr_fq_zech_poly_xgcd},
+
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_zech_roots_gr_poly},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_zech_mat_mul},

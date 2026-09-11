@@ -93,8 +93,7 @@ gr_poly_pseudo_rem_cohen(gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_c
         status = _gr_poly_pseudo_rem_cohen(R->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
     }
 
-    _gr_poly_set_length(R, B->length - 1, ctx);
-    _gr_poly_normalise(R, ctx);
+    _gr_poly_set_length_normalise(R, B->length - 1, ctx);
     return status;
 }
 #endif

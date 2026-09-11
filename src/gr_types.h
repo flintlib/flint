@@ -111,6 +111,36 @@ gr_poly_vec_struct;
  
 typedef gr_poly_vec_struct gr_poly_vec_t[1];
 
+/* Precomputed data for reduction modulo a fixed polynomial f. */
+#define GR_POLY_PREINV_NEWTON 0        /* inverse of the reversal of f */
+#define GR_POLY_PREINV_SPARSE 1        /* nonzero terms of f */
+#define GR_POLY_PREINV_TRANSFORMED 2   /* transformed (FFT) representation; todo */
+
+typedef struct
+{
+    int kind;
+    int owned;          /* whether f and finv are owned by the object */
+    int monic;
+    slong lenf;
+    gr_srcptr f;        /* the modulus */
+    gr_ptr finv;        /* Newton: inverse of the reversal of f, length lenfinv */
+    slong lenfinv;
+    slong nz;           /* Sparse: number of nonzero coefficients below the leading one */
+    slong * exps;       /* Sparse: their exponents */
+    gr_ptr coeffs;      /* Sparse: the negated coefficients divided by the leading coefficient */
+    gr_ptr lcinv;       /* Sparse: inverse of the leading coefficient (NULL if monic) */
+    gr_ctx_struct * tctx;   /* Transformed: linear ring of transformed polynomials */
+    gr_ptr tfinv;       /* Transformed: transform of the Newton inverse (in tctx) */
+    gr_ctx_struct * cctx;   /* Transformed: ring modulo x^L - 1, L >= deg f */
+    slong L;            /* Transformed: its cyclic length */
+    gr_ptr tf;          /* Transformed: transform of f mod x^L - 1 (in cctx) */
+    void * scratch;     /* Transformed: pool of scratch elements (thread-safe,
+                           see preinv.c); logically mutable */
+}
+gr_poly_preinv_struct;
+
+typedef gr_poly_preinv_struct gr_poly_preinv_t[1];
+
 #ifdef __cplusplus
 }
 #endif

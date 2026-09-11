@@ -18,6 +18,23 @@
 #include "gr_poly.h"
 
 int
+_gr_poly_preinv_compose_mod(
+    gr_ptr res,
+    gr_srcptr poly1, slong len1,
+    gr_srcptr poly2,
+    const gr_poly_preinv_t P,
+    gr_ctx_t ctx)
+{
+    slong len3 = P->lenf;
+
+    /* todo: ring-specific tuning */
+    if (len3 < 6 || len1 >= len3)
+        return _gr_poly_preinv_compose_mod_horner(res, poly1, len1, poly2, P, ctx);
+    else
+        return _gr_poly_preinv_compose_mod_brent_kung(res, poly1, len1, poly2, P, ctx);
+}
+
+int
 _gr_poly_compose_mod_preinv(
     gr_ptr res,
     gr_srcptr poly1, slong len1,
@@ -26,11 +43,65 @@ _gr_poly_compose_mod_preinv(
     gr_srcptr poly3inv, slong len3inv,
     gr_ctx_t ctx)
 {
-    /* todo: ring-specific tuning */
-    if (len3 < 6 || len1 >= len3)
-        return _gr_poly_compose_mod_horner_preinv(res, poly1, len1, poly2, poly3, len3, poly3inv, len3inv, ctx);
-    else
-        return _gr_poly_compose_mod_brent_kung_preinv(res, poly1, len1, poly2, poly3, len3, poly3inv, len3inv, ctx);
+    gr_poly_preinv_t P;
+    _gr_poly_preinv_init_newton_shallow(P, poly3, len3, poly3inv, len3inv, ctx);
+    return _gr_poly_preinv_compose_mod(res, poly1, len1, poly2, P, ctx);
+}
+
+/* gr_poly-level composition with a precomputed modulus */
+int
+gr_poly_preinv_compose_mod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len3 = P->lenf;
+    slong len = len3 - 1;
+    gr_ptr ptr2;
+    int status = GR_SUCCESS;
+
+    if (len3 == 0)
+        return GR_DOMAIN;
+
+    if (len1 >= len3 || len2 >= len3)
+    {
+        gr_poly_t t1, t2;
+        gr_poly_init(t1, ctx);
+        gr_poly_init(t2, ctx);
+        status |= gr_poly_preinv_rem(t1, poly1, P, ctx);
+        status |= gr_poly_preinv_rem(t2, poly2, P, ctx);
+        if (status == GR_SUCCESS)
+            status |= gr_poly_preinv_compose_mod(res, t1, t2, P, ctx);
+        gr_poly_clear(t1, ctx);
+        gr_poly_clear(t2, ctx);
+        return status;
+    }
+
+    if (len1 == 0 || len3 == 1)
+        return gr_poly_zero(res, ctx);
+
+    if (len1 == 1)
+        return gr_poly_set(res, poly1, ctx);
+
+    if (res == poly1 || res == poly2)
+    {
+        gr_poly_t t;
+        gr_poly_init(t, ctx);
+        status |= gr_poly_preinv_compose_mod(t, poly1, poly2, P, ctx);
+        gr_poly_swap(res, t, ctx);
+        gr_poly_clear(t, ctx);
+        return status;
+    }
+
+    GR_TMP_INIT_VEC(ptr2, len, ctx);
+    status |= _gr_vec_set(ptr2, poly2->coeffs, len2, ctx);
+
+    gr_poly_fit_length(res, len, ctx);
+    status |= _gr_poly_preinv_compose_mod(res->coeffs, poly1->coeffs, len1, ptr2, P, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
+
+    GR_TMP_CLEAR_VEC(ptr2, len, ctx);
+
+    return status;
 }
 
 int
@@ -85,8 +156,7 @@ gr_poly_compose_mod_preinv_wrapper(_gr_method_compose_mod_preinv_op _compose_mod
 
     gr_poly_fit_length(res, len, ctx);
     status |= _compose_mod(res->coeffs, poly1->coeffs, len1, ptr2, poly3->coeffs, len3, poly3inv->coeffs, len3inv, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
 
     GR_TMP_CLEAR_VEC(ptr2, vec_len, ctx);
     return status;

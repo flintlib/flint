@@ -969,6 +969,11 @@ Finite field methods
 
 .. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
 
+    Rings `\mathbb{Z}/n\mathbb{Z}` (*nmod*, *fmpz_mod*, *mpn_mod*) implement
+    these methods when `n` is known to be prime (see :func:`gr_ctx_set_is_field`),
+    with :func:`gr_ctx_fq_degree` returning 1 and :func:`gr_ctx_fq_order`
+    returning `n`.
+
 .. function:: int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 
 .. function:: int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
@@ -1025,6 +1030,18 @@ middle products) run substantially faster in such a representation.
     the transform-sized copy, and the element may only be cleared or
     fully overwritten afterwards; representations without the method fall
     back to the copying conversion.
+
+.. function:: int gr_ctx_init_gr_poly_transformed_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+
+    Constructs a ring of transformed polynomials modulo `x^{L} - 1`
+    over *base*, where products wrap around: the implementation may round
+    the requested cyclic length ``*len`` up (for example to a power of
+    two) and writes the actual `L` back. Conversions in require length at
+    most `L`; conversions out give the coefficients of the reduced
+    representative. This is the ``CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR``
+    method of the base ring (returning ``GR_UNABLE`` by default); it is
+    used for middle products and for products whose high part is known,
+    such as the remainder step of division by a precomputed modulus.
 
 .. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy)
 

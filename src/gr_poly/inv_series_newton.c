@@ -107,7 +107,6 @@ gr_poly_inv_series_newton(gr_poly_t Qinv, const gr_poly_t Q, slong len, slong cu
 
     gr_poly_fit_length(Qinv, len, ctx);
     status |= _gr_poly_inv_series_newton(Qinv->coeffs, Q->coeffs, Q->length, len, cutoff, ctx);
-    _gr_poly_set_length(Qinv, len, ctx);
-    _gr_poly_normalise(Qinv, ctx);
+    _gr_poly_set_length_normalise(Qinv, len, ctx);
     return status;
 }

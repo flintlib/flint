@@ -16,6 +16,10 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: tuning (these match _gr_poly_resultant) */
+#define GR_POLY_GCD_HGCD_CUTOFF 200
+#define GR_POLY_GCD_HGCD_INNER_CUTOFF 100
+
 int
 _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
@@ -24,10 +28,13 @@ _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, s
 
     if (gr_ctx_is_field(ctx) == T_TRUE)
     {
-        /* todo: dispatch to hgcd at least over finite fields */
+        /* see _gr_poly_gcd_generic for the selection */
         /* todo: clear denominators + subresultant over fraction fields */
 
-        return _gr_poly_xgcd_euclidean(lenG, G, S, T, A, lenA, B, lenB, ctx);
+        if (FLINT_MIN(lenA, lenB) >= GR_POLY_GCD_HGCD_CUTOFF && gr_ctx_is_finite(ctx) == T_TRUE)
+            return _gr_poly_xgcd_hgcd(lenG, G, S, T, A, lenA, B, lenB, GR_POLY_GCD_HGCD_INNER_CUTOFF, GR_POLY_GCD_HGCD_CUTOFF, ctx);
+        else
+            return _gr_poly_xgcd_euclidean(lenG, G, S, T, A, lenA, B, lenB, ctx);
     }
     else if (gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE)
     {

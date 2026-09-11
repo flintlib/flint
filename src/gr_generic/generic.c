@@ -42,6 +42,40 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
     return T_FALSE;
 }
 
+void gr_generic_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    slong sz = ctx->sizeof_elem;
+
+    /* Zero truncated coefficients to reclaim memory for element types
+       with heap storage; assumed to always succeed. */
+    if (poly->length > len)
+        GR_IGNORE(_gr_vec_zero(GR_ENTRY(poly->coeffs, len, sz), poly->length - len, ctx));
+
+    /* Trailing coefficients that cannot be verified to be zero are kept;
+       the vector normalisation method returns the length at which it
+       stopped in that case. */
+    GR_IGNORE(_gr_vec_normalise(&len, poly->coeffs, len, ctx));
+
+    poly->length = len;
+}
+
+
+/* For rings Z/nZ which are finite fields exactly when n is prime. */
+int gr_generic_ctx_fq_degree_prime_field(slong * res, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) != T_TRUE)
+        return GR_UNABLE;
+    *res = 1;
+    return GR_SUCCESS;
+}
+
+int gr_generic_ctx_fq_order_prime_field(fmpz_t res, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) != T_TRUE)
+        return GR_UNABLE;
+    return gr_ctx_fq_prime(res, ctx);
+}
+
 static truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -3147,8 +3181,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_MULMID,             (gr_funcptr) _gr_poly_mulmid_generic},
     {GR_METHOD_POLY_DIV,                (gr_funcptr) _gr_poly_div_generic},
     {GR_METHOD_POLY_DIVREM,             (gr_funcptr) _gr_poly_divrem_generic},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) gr_generic_poly_set_length_normalise},
+    {GR_METHOD_POLY_DIVREM_PREINV,      (gr_funcptr) gr_generic_poly_divrem_preinv},
+    {GR_METHOD_POLY_PREINV_SET,         (gr_funcptr) gr_generic_poly_preinv_set},
+    {GR_METHOD_POLY_EVALUATE,           (gr_funcptr) gr_generic_poly_evaluate},
     {GR_METHOD_POLY_DIVEXACT,           (gr_funcptr) _gr_poly_divexact_generic},
     {GR_METHOD_POLY_GCD,                (gr_funcptr) _gr_poly_gcd_generic},
+    {GR_METHOD_POLY_FACTOR,             (gr_funcptr) gr_generic_poly_factor},
+    {GR_METHOD_POLY_ROOTS,              (gr_funcptr) gr_generic_poly_roots},
     {GR_METHOD_POLY_XGCD,               (gr_funcptr) _gr_poly_xgcd_generic},
     {GR_METHOD_POLY_TAYLOR_SHIFT,       (gr_funcptr) _gr_poly_taylor_shift_generic},
     {GR_METHOD_POLY_INV_SERIES,         (gr_funcptr) _gr_poly_inv_series_generic},
