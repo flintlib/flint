@@ -749,7 +749,7 @@ typedef enum
     GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
-    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
+    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM, GR_CTX_GR_EC,
     GR_CTX_FEXPR,
     GR_CTX_DEBUG,
     GR_CTX_UNINITIALIZED,
@@ -1686,6 +1686,7 @@ void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable
 /* todo: just have gr_test_structure() */
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
+void gr_test_additive_group(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags);
 
 int gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags);

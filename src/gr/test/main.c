@@ -25,6 +25,7 @@
 #include "t-complex.c"
 #include "t-debug.c"
 #include "t-dirichlet.c"
+#include "t-ec.c"
 #include "t-fmpq.c"
 #include "t-fmpq_mpoly.c"
 #include "t-fmpq_poly.c"
@@ -78,6 +79,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_complex),
     TEST_FUNCTION(gr_debug),
     TEST_FUNCTION(gr_dirichlet),
+    TEST_FUNCTION(gr_ec),
     TEST_FUNCTION(gr_fmpq),
     TEST_FUNCTION(gr_fmpq_mpoly),
     TEST_FUNCTION(gr_fmpq_poly),
