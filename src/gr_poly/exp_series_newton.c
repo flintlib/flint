@@ -166,7 +166,6 @@ gr_poly_exp_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff,
 
     gr_poly_fit_length(f, n, ctx);
     status |= _gr_poly_exp_series_newton(f->coeffs, NULL, h->coeffs, hlen, n, cutoff, ctx);
-    _gr_poly_set_length(f, n, ctx);
-    _gr_poly_normalise(f, ctx);
+    _gr_poly_set_length_normalise(f, n, ctx);
     return status;
 }

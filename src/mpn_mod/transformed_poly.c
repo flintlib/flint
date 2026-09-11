@@ -66,7 +66,9 @@ typedef struct
     fft_small_plan_t P;
     gr_ctx_struct * base;           /* must outlive this context */
     slong nlimbs;
-    slong N;                        /* length capacity */
+    slong N;                        /* length capacity (the cyclic length
+                                       N = 2^depth in cyclic mode) */
+    int cyclic;                     /* products wrap around modulo x^N - 1 */
     ulong terms_bound;              /* accumulation capacity */
     ulong max_depth;                /* multiplicative depth capacity */
     ulong m_orig[MPN_CTX_NCRTS];    /* saved export normalizers */
@@ -85,6 +87,19 @@ typedef struct
 
 #define MTPOLY_CTX(ctx) ((mtpoly_ctx_struct *) GR_CTX_DATA_AS_PTR(ctx))
 #define MTPOLY(x) ((mtpoly_struct *) (x))
+
+/* Tag the operands of a binary operation as unnormalized forward
+   transforms. Writing the tag only when it changes keeps operations on
+   shared, read-only operands (such as precomputed transforms used
+   concurrently by several threads) free of writes. */
+static void
+_mtpoly_inputs_primal(gr_srcptr x, gr_srcptr y)
+{
+    if (MTPOLY(x)->op.domain != FFT_SMALL_OP_PRIMAL)
+        MTPOLY(x)->op.domain = FFT_SMALL_OP_PRIMAL;
+    if (MTPOLY(y)->op.domain != FFT_SMALL_OP_PRIMAL)
+        MTPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+}
 
 /* d = m*d + b over the element's truncation (see the nmod ring);
    flat so that sub-block transforms are simply fewer iterations */
@@ -429,7 +444,7 @@ mtpoly_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (terms < MTPOLY(x)->terms || terms > T->terms_bound)
         return GR_UNABLE;
 
-    MTPOLY(x)->op.domain = MTPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _mtpoly_inputs_primal(x, y);
     fft_small_op_add(&MTPOLY(res)->op, &MTPOLY(x)->op, &MTPOLY(y)->op, T->P);
     MTPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     MTPOLY(res)->len = FLINT_MAX(MTPOLY(x)->len, MTPOLY(y)->len);
@@ -454,7 +469,7 @@ mtpoly_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (terms < MTPOLY(x)->terms || terms > T->terms_bound)
         return GR_UNABLE;
 
-    MTPOLY(x)->op.domain = MTPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _mtpoly_inputs_primal(x, y);
     fft_small_op_sub(&MTPOLY(res)->op, &MTPOLY(x)->op, &MTPOLY(y)->op, T->P);
     MTPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     MTPOLY(res)->len = FLINT_MAX(MTPOLY(x)->len, MTPOLY(y)->len);
@@ -491,13 +506,20 @@ mtpoly_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return mtpoly_zero(res, ctx);
 
     len = MTPOLY(x)->len + MTPOLY(y)->len - 1;
-    if (len > T->N ||
-        !_mtpoly_mul_terms(&terms, MTPOLY(x), MTPOLY(y), T->terms_bound))
+    if (len > T->N)
+    {
+        /* cyclic mode: the product wraps around modulo x^N - 1 */
+        if (T->cyclic)
+            len = T->N;
+        else
+            return GR_UNABLE;
+    }
+    if (!_mtpoly_mul_terms(&terms, MTPOLY(x), MTPOLY(y), T->terms_bound))
         return GR_UNABLE;
     if (MTPOLY(x)->depth + MTPOLY(y)->depth > T->max_depth)
         return GR_UNABLE;
 
-    MTPOLY(x)->op.domain = MTPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _mtpoly_inputs_primal(x, y);
     fft_small_op_mul(&MTPOLY(res)->op, &MTPOLY(x)->op, &MTPOLY(y)->op, T->P);
     MTPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     MTPOLY(res)->len = len;
@@ -542,8 +564,14 @@ mtpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     }
 
     len = MTPOLY(x)->len + MTPOLY(y)->len - 1;
-    if (len > T->N ||
-        !_mtpoly_mul_terms(&t2, MTPOLY(x), MTPOLY(y), T->terms_bound))
+    if (len > T->N)
+    {
+        if (T->cyclic)
+            len = T->N;
+        else
+            return GR_UNABLE;
+    }
+    if (!_mtpoly_mul_terms(&t2, MTPOLY(x), MTPOLY(y), T->terms_bound))
         return GR_UNABLE;
     terms = MTPOLY(res)->terms + t2;
     if (terms < t2 || terms > T->terms_bound)
@@ -551,7 +579,7 @@ mtpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     if (MTPOLY(x)->depth + MTPOLY(y)->depth > T->max_depth)
         return GR_UNABLE;
 
-    MTPOLY(x)->op.domain = MTPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _mtpoly_inputs_primal(x, y);
     MTPOLY(res)->op.domain = FFT_SMALL_OP_PRODUCT;
     if (sub)
         fft_small_op_submul(&MTPOLY(res)->op, &MTPOLY(x)->op,
@@ -674,13 +702,12 @@ static gr_method_tab_input __mtpoly_methods_input[] =
     {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };
 
-int
-_gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
-        slong len_bound, slong terms_bound,
-        const struct gr_transformed_poly_workload_struct * workload)
+static int
+_mtpoly_ctx_init(gr_ctx_t ctx, gr_ctx_t base,
+        slong N, slong terms_bound,
+        const struct gr_transformed_poly_workload_struct * workload, int cyclic)
 {
     mtpoly_ctx_struct * T;
-    slong N = len_bound;
     slong nlimbs;
     ulong nbits, i;
 
@@ -695,6 +722,7 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
     T->base = base;
     T->nlimbs = nlimbs;
     T->N = N;
+    T->cyclic = cyclic;
     T->terms_bound = (ulong) terms_bound;
     T->max_depth = 2;
 
@@ -704,8 +732,20 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        reconstruction requires values below half the prime product */
     T->P->R = get_default_mpn_ctx();
     T->P->sign = 0;
-    _fft_small_plan_set_window(T->P, 0, (ulong) N, (ulong) N,
-                               n_round_up((ulong) N, BLK_SZ), LG_BLK_SZ);
+    if (cyclic)
+    {
+        /* full transforms of length N = 2^depth; products wrap */
+        T->P->depth = n_clog2((ulong) N);
+        T->P->zl = 0;
+        T->P->zh = (ulong) N;
+        T->P->zn = (ulong) N;
+        T->P->ztrunc = (ulong) N;
+    }
+    else
+    {
+        _fft_small_plan_set_window(T->P, 0, (ulong) N, (ulong) N,
+                                   n_round_up((ulong) N, BLK_SZ), LG_BLK_SZ);
+    }
     if (!_fft_small_plan_set_bound(T->P, 4 * (ulong) terms_bound,
                                    2 * nbits, MPN_CTX_NCRTS))
     {
@@ -814,7 +854,43 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
     return GR_SUCCESS;
 }
 
+/* the mpn_mod overload of gr_ctx_init_gr_poly_transformed_repr */
+int
+_gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+        slong len_bound, slong terms_bound,
+        const struct gr_transformed_poly_workload_struct * workload)
+{
+    return _mtpoly_ctx_init(ctx, base, len_bound, terms_bound, workload, 0);
+}
+
+/* the mpn_mod overload of gr_ctx_init_gr_poly_transformed_cyclic_repr */
+int
+_gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base,
+        slong * len, slong terms_bound,
+        const struct gr_transformed_poly_workload_struct * workload)
+{
+    slong N;
+    int status;
+
+    if (*len < 1)
+        return GR_UNABLE;
+
+    N = n_pow2(FLINT_MAX(LG_BLK_SZ, n_clog2(*len)));
+    status = _mtpoly_ctx_init(ctx, base, N, terms_bound, workload, 1);
+    if (status == GR_SUCCESS)
+        *len = N;
+    return status;
+}
+
 #else /* FLINT_HAVE_FFT_SMALL */
+
+int
+_gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t FLINT_UNUSED(ctx), gr_ctx_t FLINT_UNUSED(base),
+        slong * FLINT_UNUSED(len), slong FLINT_UNUSED(terms_bound),
+        const struct gr_transformed_poly_workload_struct * FLINT_UNUSED(workload))
+{
+    return GR_UNABLE;
+}
 
 int
 _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t FLINT_UNUSED(ctx), gr_ctx_t FLINT_UNUSED(base),

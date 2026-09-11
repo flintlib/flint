@@ -96,8 +96,34 @@ Memory management
 .. function:: void gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 
 .. function:: void gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
+              void _gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
+
+    Ensures that *poly* has space for at least *len* coefficients.
+    The non-underscore version is an inline function which only calls
+    the underscore version (which does the reallocation) when the
+    current allocation is insufficient.
 
 .. function:: void _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
+
+    Sets the length of *poly* to *len*, which must not exceed the
+    allocated size, without normalising. If the polynomial is
+    truncated, the coefficients beyond the new length are zeroed
+    (this reclaims memory for element types with heap storage and is
+    assumed to always succeed).
+
+.. function:: void _gr_poly_set_length_normalise(gr_poly_t poly, slong len, gr_ctx_t ctx)
+              void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets the length of *poly* to *len* (respectively, keeps the current
+    length) and then normalises, i.e. reduces the length as long as the
+    leading coefficient can be verified to be zero (using the
+    vector normalisation method of the ring). Together these are the
+    ``GR_METHOD_POLY_SET_LENGTH_NORMALISE`` method of the coefficient
+    ring, which is overloadable: the generic implementation
+    :func:`gr_generic_poly_set_length_normalise` zeroes truncated
+    coefficients as in :func:`_gr_poly_set_length`, whereas rings with
+    shallow element storage (the *nmod* rings, *mpn_mod*) simply
+    compute the normalised length.
 
 
 Vectors of polynomials
@@ -150,11 +176,15 @@ Vectors of polynomials
  
     Appends the polynomial *f* to the end of the vector.
 
+.. function:: void gr_poly_vec_append_swap(gr_poly_vec_t vec, gr_poly_t f, gr_ctx_t ctx)
+
+    Appends the polynomial *f* to the end of the vector by swapping
+    it into place, avoiding a copy. On return, *f* contains whatever
+    (zero) polynomial previously occupied the new slot.
+
 
 Basic manipulation
 -------------------------------------------------------------------------------
-
-.. function:: void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_set(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx)
               int gr_poly_get_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx)
@@ -650,7 +680,13 @@ Evaluation
 .. function:: int _gr_poly_evaluate(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx)
               int gr_poly_evaluate(gr_ptr res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx)
 
-    Set *res* to *poly* evaluated at *x*.
+    Set *res* to *poly* evaluated at *x*. This is the
+    ``GR_METHOD_POLY_EVALUATE`` method of the ring, which defaults to
+    Horner's rule (:func:`gr_generic_poly_evaluate`) and is overloaded
+    by rings with fast inner loops (*nmod* uses
+    ``_nmod_poly_evaluate_nmod``); this matters for trial division by
+    linear factors in :func:`gr_poly_is_irreducible` over small prime
+    fields, which evaluates at every field element.
 
 .. function:: int _gr_poly_evaluate_other_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
               int gr_poly_evaluate_other_horner(gr_ptr res, const gr_poly_t f, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
@@ -962,8 +998,16 @@ GCD
 
     The *gcd_generic* fallback implementation checks if *R* is a field
     or UFD and dispatches to an appropriate algorithm, and otherwise
-    returns ``GR_UNABLE``. The main *gcd* function is synonymous with
-    *gcd_generic* unless overridden by a particular ring.
+    returns ``GR_UNABLE``: over a finite field, the half-gcd algorithm is
+    used when both inputs have length at least 200 (with inner cutoff
+    100, as in :func:`_gr_poly_resultant`), otherwise the Euclidean
+    algorithm; over other fields the Euclidean algorithm is used (the
+    half-gcd algorithm may be unsuitable due to coefficient growth or
+    numerical instability). The same selection is made for *xgcd*.
+    The main *gcd* function is synonymous with *gcd_generic* unless
+    overridden by a particular ring; the *nmod*, *fmpz_mod*, *mpn_mod*,
+    *fq*, *fq_nmod* and *fq_zech* rings override it (and *xgcd*) with
+    the algorithm selection and cutoffs of their polynomial modules.
 
     The non-underscore methods canonicalise the leading coefficient of the output
     by calling ``gr_poly_canonical_associate``. Over a field, this corresponds
@@ -1106,6 +1150,239 @@ Squarefree factorization
 
     Sets *res* to the squarefree part of *poly*. In terms of the squarefree
     factorization, this corresponds to the canonical associate of `\prod_i g_i`.
+
+Deflation
+-------------------------------------------------------------------------------
+
+.. function:: ulong gr_poly_deflation(const gr_poly_t poly, gr_ctx_t ctx)
+
+    Returns the largest integer `m` such that *poly* can be written as
+    `g(x^m)` for some polynomial `g`, or 0 if *poly* is zero.
+    A coefficient that cannot be verified to be zero is treated as nonzero,
+    so the returned value is always valid but need not be maximal in
+    that case.
+
+.. function:: int gr_poly_deflate(gr_poly_t res, const gr_poly_t poly, ulong deflation, gr_ctx_t ctx)
+
+    Sets *res* to `g` where `poly = g(x^m)`, `m` being *deflation*.
+    Assumes that *poly* actually has this form, which can be checked
+    using :func:`gr_poly_deflation`.
+
+.. function:: int gr_poly_inflate(gr_poly_t res, const gr_poly_t poly, ulong inflation, gr_ctx_t ctx)
+
+    Sets *res* to `poly(x^m)`, `m` being *inflation*.
+
+Factorization over finite fields
+-------------------------------------------------------------------------------
+
+The functions in this section assume that *ctx* represents a finite
+field `\mathbb{F}_q`, `q = p^k`, and return ``GR_UNABLE`` if this
+cannot be verified, i.e. unless :func:`gr_ctx_is_field`,
+:func:`gr_ctx_is_finite` and :func:`gr_ctx_is_finite_characteristic`
+all return ``T_TRUE`` and :func:`gr_ctx_fq_order`, :func:`gr_ctx_fq_prime`
+and :func:`gr_ctx_fq_degree` are implemented.
+In particular, this covers the *nmod*, *fmpz_mod* and *mpn_mod*
+rings when the modulus is known to be prime (see
+:func:`gr_ctx_set_is_field`), and the *fq*, *fq_nmod* and *fq_zech* rings.
+
+For the rings listed above, :func:`gr_factor` is implemented for
+elements of the polynomial ring (see :func:`gr_ctx_init_gr_poly`)
+via :func:`gr_poly_factor_finite_field`.
+
+.. function:: truth_t gr_poly_is_squarefree(const gr_poly_t f, gr_ctx_t ctx)
+
+    Returns whether *f* is squarefree. This function returns ``T_UNKNOWN``
+    unless *ctx* is known to be a field. Over a field of characteristic
+    zero, the result is determined by `\gcd(f, f')`. In positive
+    characteristic, the same criterion applies except that a
+    nonconstant polynomial with `f' = 0` is a `p`-th power if the
+    field is finite (or more generally, perfect); ``T_UNKNOWN`` is
+    returned in this case if the field cannot be verified to be finite.
+    Constants are considered squarefree except for zero.
+
+.. function:: truth_t gr_poly_is_irreducible_ben_or(const gr_poly_t f, gr_ctx_t ctx)
+              truth_t gr_poly_is_irreducible_ddf(const gr_poly_t f, gr_ctx_t ctx)
+              truth_t gr_poly_is_irreducible_rabin(const gr_poly_t f, gr_ctx_t ctx)
+              truth_t gr_poly_is_irreducible(const gr_poly_t f, gr_ctx_t ctx)
+
+    Returns whether *f* is irreducible over `\mathbb{F}_q`.
+    Constants are not considered irreducible.
+
+    The *ben_or* version uses Ben-Or's test, computing
+    `\gcd(f, x^{q^i} - x)` for `i \le n/2`, where the Frobenius
+    iterates are computed with modular composition or exponentiation.
+    The *ddf* version uses the coarse phase of the baby-step giant-step
+    distinct degree factorization algorithm (see
+    :func:`gr_poly_factor_distinct_deg`), stopping as soon as a factor
+    is found, which makes it fast on inputs with factors of small degree.
+    The *rabin* version uses Rabin's test: `f` of degree `n` is
+    irreducible iff `x^{q^n} \equiv x` and `\gcd(x^{q^{n/r}} - x, f) = 1`
+    for every prime `r \mid n`; the Frobenius powers are computed by
+    modular composition from the ladder `x^{q^{2^i}}`, so that the test
+    costs `O((1 + \omega(n)) \log n)` compositions independently of `q`
+    (apart from the initial `x^q`), against about `2 \sqrt{n}`
+    compositions for the distinct degree test, but it does not exit
+    early on inputs with small factors.
+    The default version first tests for roots by trial evaluation when
+    the field is a small prime field; for degree below 600 it then calls
+    the *ddf* version, and above that it checks squarefreeness, filters
+    factors of degree at most 4 with a few gcds, and calls the *rabin*
+    version (measured to be 1.2-1.8 times faster than the distinct
+    degree test on irreducible inputs of degree 1000-3000 over
+    *nmod*, and much faster than a distinct degree test without the
+    filter on random inputs).
+
+.. function:: int _gr_poly_iterated_frobenius_preinv(gr_poly_struct * h, slong n, const gr_poly_t frob, const gr_poly_preinv_t P, const fmpz_t q, gr_ctx_t ctx)
+              int gr_poly_iterated_frobenius_preinv(gr_poly_struct * h, slong n, const gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Sets `h_i = x^{q^i} \bmod v` for `0 \le i < n`, where *P* is a
+    precomputed modulus (:type:`gr_poly_preinv_t`) for `v`.
+    The underscore version takes `x^q \bmod v` as an input *frob*.
+    Depending on the size of `q` relative to the degree of *v*, the
+    powers are computed either by repeated exponentiation or by
+    modular composition with a precomputed matrix of powers of *frob*.
+
+.. function:: int _gr_poly_factor_distinct_deg_with_frob(gr_poly_vec_t fac, fmpz_vec_t degs, const gr_poly_t poly, const gr_poly_preinv_t P, const gr_poly_t frob, const fmpz_t q, gr_ctx_t ctx)
+              int gr_poly_factor_distinct_deg(gr_poly_vec_t fac, fmpz_vec_t degs, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Computes the distinct degree factorization of the squarefree
+    polynomial *poly*, i.e. writes `\operatorname{monic}(poly) = \prod_i g_i`
+    where each `g_i` is a product of distinct irreducible polynomials
+    of the same degree `d_i`, with `d_i \ne d_j` for `i \ne j`.
+    The factors `g_i` are written to *fac* (which the user must
+    initialize as a vector of polynomials over *ctx*) and the corresponding
+    degrees `d_i` are written to *degs*. The result is undefined if
+    *poly* is not squarefree.
+
+    The underscore version assumes that *poly* is monic, takes a
+    precomputed modulus *P* for *poly*, `x^q \bmod poly` as
+    *frob* and `q` as input, and appends to *fac* and *degs*
+    instead of overwriting them. The factorization algorithms select
+    the sparse representation of the modulus automatically when
+    applicable (see :func:`gr_poly_preinv_set`), so that factoring
+    and irreducibility testing of sparse polynomials benefits from
+    cheap reductions.
+
+    This uses the baby-step giant-step algorithm of Kaltofen and Shoup
+    [KalSho1998]_ with the baby steps computed using
+    :func:`_gr_poly_iterated_frobenius_preinv` and the giant steps computed
+    using modular composition with a precomputed matrix.
+
+    When more than one thread is available (see :func:`flint_set_num_threads`)
+    and the ring is threadsafe (:func:`gr_ctx_is_threadsafe`), the
+    multithreaded variant :func:`_gr_poly_factor_distinct_deg_with_frob_threaded`
+    is used: the giant steps are computed in blocks of independent
+    compositions sharing one precomputed matrix, the interval polynomials
+    of a block and the fine splitting of the intervals are computed in
+    parallel, and the vector Brent-Kung composition used for the baby
+    steps evaluates its polynomials in parallel. Matrix products are
+    performed outside the parallel sections so that :func:`gr_mat_mul`
+    can use threads itself. The total amount of work exceeds that of the
+    serial algorithm by a few percent (a block reduces the modulus only
+    after its gcd, rather than after each interval).
+
+.. function:: int _gr_poly_factor_distinct_deg_with_frob_threaded(gr_poly_vec_t fac, fmpz_vec_t degs, const gr_poly_t poly, const gr_poly_preinv_t P, const gr_poly_t frob, const fmpz_t q, gr_ctx_t ctx)
+
+    Multithreaded version of :func:`_gr_poly_factor_distinct_deg_with_frob`,
+    with the same interface.
+
+.. function:: int gr_poly_factor_equal_deg_prob(gr_poly_t factor, flint_rand_t state, const gr_poly_t pol, slong d, gr_ctx_t ctx)
+
+    Probabilistic equal degree factorization: assuming that *pol* is
+    a squarefree polynomial of degree `n = rd` with `r \ge 2` and all
+    irreducible factors of degree `d`, attempts to find a proper monic
+    factor of *pol* using a single random trial. If a factor is found,
+    it is written to *factor*; otherwise *factor* is set to 1.
+    The probability of success is roughly `1/2` (at least `4/9` when
+    `r \ge 2`). Returns ``GR_DOMAIN`` if `d` does not divide `n` or
+    if `n < 2`.
+
+.. function:: int _gr_poly_factor_equal_deg_with_frob(gr_poly_vec_t fac, const gr_poly_t f, slong d, const gr_poly_t frob, flint_rand_t state, gr_ctx_t ctx)
+              int gr_poly_factor_equal_deg(gr_poly_vec_t fac, const gr_poly_t pol, slong d, gr_ctx_t ctx)
+
+    Equal degree factorization: assuming that *pol* is a squarefree
+    polynomial whose irreducible factors all have degree `d`,
+    sets *fac* to the vector of the monic irreducible factors.
+    The result is undefined if the input does not have this form.
+
+    The underscore version assumes that *f* is monic and takes
+    `x^q \bmod f` as input *frob* (which is not used when `d = 1`)
+    as well as a random state, and appends to *fac* instead of
+    overwriting it.
+
+    The algorithm is the Cantor-Zassenhaus algorithm in the trace
+    formulation of von zur Gathen and Shoup [GatSho1992]_: given a random
+    `a \in \mathbb{F}_q[x]/(f)`, one computes the trace
+    `b = a + a^q + \ldots + a^{q^{d-1}}` (using modular composition
+    with the Frobenius `x^q`, exponentiation, or a doubling algorithm
+    depending on the size of `q` and `d`)
+    which lies in the Berlekamp subalgebra, and then computes
+    `\gcd(f, b^{(q-1)/2} - 1)` if `q` is odd or
+    `\gcd(f, b + b^2 + \ldots + b^{2^{k-1}})` if `q = 2^k`.
+    This splits `f` with probability roughly `1/2`; the process is
+    repeated on the factors until all factors are irreducible.
+    When `d = 1` (root finding), `a` is chosen to be a random linear
+    polynomial, allowing the exponentiation to be done more cheaply.
+    When several pieces remain to be split and more than one thread is
+    available over a threadsafe ring, the pieces are split in parallel,
+    each worker using its own random state.
+
+.. function:: int gr_poly_factor_cantor_zassenhaus(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, gr_ctx_t ctx)
+              int gr_poly_factor_berlekamp(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, gr_ctx_t ctx)
+              int gr_poly_factor_kaltofen_shoup(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, gr_ctx_t ctx)
+              int _gr_poly_factor_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, int algorithm, gr_ctx_t ctx)
+              int gr_poly_factor_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, gr_ctx_t ctx)
+
+    Computes the factorization of the polynomial *F* over `\mathbb{F}_q`,
+
+    .. math ::
+
+        F = c \prod_i {g_i}^{e_i}
+
+    where `c` is the leading coefficient of *F*, the `g_i` are distinct
+    monic irreducible polynomials (written to *fac*, which the user must
+    initialize as a vector of polynomials over *ctx*)
+    and the `e_i` are positive integers (written to *exp*).
+    The order of the factors is arbitrary.
+    If *F* is zero, `c` is set to zero and the factorization is empty.
+
+    All versions first compute a squarefree factorization
+    (see :func:`gr_poly_factor_squarefree`) and then factor each
+    squarefree factor into irreducibles, using respectively
+    the Cantor-Zassenhaus algorithm (distinct degree factorization
+    via `\gcd(f, x^{q^i} - x)` for `i = 1, 2, \ldots` followed by equal
+    degree factorization), Berlekamp's algorithm (computing a basis of
+    the kernel of the Frobenius map minus the identity using linear algebra,
+    followed by random splitting), or the Kaltofen-Shoup algorithm
+    (baby-step giant-step distinct degree factorization, see
+    :func:`gr_poly_factor_distinct_deg`, followed by equal degree
+    factorization, see :func:`gr_poly_factor_equal_deg`).
+
+    The main function first deflates the input if it has the form
+    `F = G(x^m)` with `m > 1`, and chooses between the
+    Cantor-Zassenhaus and Kaltofen-Shoup algorithms depending on
+    the degree of the input and the size of the field.
+    The underscore version takes an *algorithm* parameter which can
+    be ``GR_POLY_FACTOR_ALGORITHM_DEFAULT``,
+    ``GR_POLY_FACTOR_ALGORITHM_CANTOR_ZASSENHAUS``,
+    ``GR_POLY_FACTOR_ALGORITHM_BERLEKAMP`` or
+    ``GR_POLY_FACTOR_ALGORITHM_KALTOFEN_SHOUP``.
+
+.. function:: int _gr_poly_factor_finite_field_method(gr_ptr c, gr_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, int flags, gr_ctx_t ctx)
+
+    Version of :func:`gr_poly_factor_finite_field` with the signature
+    of the ``GR_METHOD_POLY_FACTOR`` method, for use in method tables of
+    finite field implementations. Here *c* is an element of the
+    polynomial ring, i.e. a *gr_poly_t*, and *fac* is a vector of
+    elements of the polynomial ring.
+
+.. function:: int gr_poly_roots_finite_field(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+
+    Version of :func:`gr_poly_roots` for finite fields, which can
+    be used as the ``GR_METHOD_POLY_ROOTS`` method. Computes the
+    roots in `\mathbb{F}_q` with multiplicities using
+    squarefree factorization followed by `\gcd(f, x^q - x)` and
+    equal degree factorization with `d = 1`.
 
 Shift equivalence
 -------------------------------------------------------------------------------
@@ -1369,6 +1646,170 @@ Power series special functions
     evaluated at the power series *z*, truncated to length *len*. The
     underscore method allows aliasing.
 
+Precomputed moduli
+--------------------------------------------------------------------------------
+
+Arithmetic modulo a fixed polynomial `f` (as in finite field extensions
+and in factorization algorithms) benefits from precomputation. A
+:type:`gr_poly_preinv_t` stores such precomputed data for `f` in one
+of several representations, hiding the choice from the algorithms
+built on top of it:
+
+- ``GR_POLY_PREINV_NEWTON``: the inverse of the reversal of `f` as a power
+  series to length `\operatorname{len}(f)`, for Newton division (two
+  multiplications per reduction). This is the default. The same kind
+  without a stored inverse (``_gr_poly_preinv_set_plain``) means that
+  the ring's ordinary division is used, which is preferable for short
+  moduli.
+- ``GR_POLY_PREINV_SPARSE``: the exponents and (negated, divided by the
+  leading coefficient) coefficients of the nonzero terms of `f` below the
+  leading term. Reduction costs one multiplication per nonzero term for
+  each eliminated coefficient, which beats Newton division when `f` has
+  few terms (for example the trinomials and pentanomials used to
+  define extension fields), and unlike Newton division does not depend
+  on fast multiplication of length `\deg f`.
+- ``GR_POLY_PREINV_TRANSFORMED``: for long dense moduli, precomputed
+  transforms of `f` and of its inverse, as in NTL: the quotient is the
+  low part of `\operatorname{rev}(A_{hi}) \cdot f^{-1}` computed in a
+  linear ring of transformed polynomials
+  (:func:`gr_ctx_init_gr_poly_transformed_repr`) with the transform of
+  the inverse precomputed, and the remainder `A - Q f` is computed
+  modulo `x^L - 1` with `L \ge \deg f` (which loses nothing since the
+  remainder has degree less than `\deg f`) in a cyclic ring of
+  transformed polynomials (:func:`gr_ctx_init_gr_poly_transformed_cyclic_repr`)
+  with the transform of `f \bmod (x^L - 1)` precomputed, so that the
+  second multiplication has half the length. A reduction then costs
+  about one multiplication instead of the two of Newton division.
+  Available only when the base ring provides both transformed
+  representations (currently *nmod* and *mpn_mod* with fft_small;
+  ``GR_UNABLE`` otherwise). These rings select it for dense moduli of
+  length at least 160, the measured crossover for all modulus sizes,
+  except for tiny *nmod* moduli, where the fused multiplication packs
+  two coefficients per transform slot up to a length limit while the
+  transformed representation does not: the latter is used from length
+  262144 on for `p \le 3` and from 16384 on for `4 \le p \le 15`
+  (measured gains of 1.25-1.45 beyond these lengths).
+
+The division by a precomputed modulus is the ``GR_METHOD_POLY_DIVREM_PREINV``
+method of the coefficient ring, which rings can overload to provide
+fast inner loops (the *nmod* ring does so for the sparse
+representation); the generic implementation
+:func:`gr_generic_poly_divrem_preinv` handles all representations.
+The functions taking `f` and its Newton inverse as separate polynomials
+(:func:`gr_poly_mulmod_preinv`, :func:`gr_poly_powmod_fmpz_sliding_preinv`,
+etc.) are wrappers around the versions below, constructed with a shallow
+Newton representation.
+
+.. type:: gr_poly_preinv_struct
+          gr_poly_preinv_t
+
+    Precomputed data for reduction modulo a polynomial. The fields
+    ``kind`` (one of the representations above), ``lenf`` (the length of
+    the modulus), ``f`` (its coefficients) and ``monic`` are public;
+    the remaining fields depend on the representation. An initialized
+    object can be used concurrently from several threads: the
+    transformed representation keeps its (large) scratch elements in a
+    pool inside the object, handed out under a lock and grown on demand.
+
+.. function:: void gr_poly_preinv_init(gr_poly_preinv_t P, gr_ctx_t ctx)
+              void gr_poly_preinv_clear(gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Initializes (to an empty modulus) and clears the object.
+
+.. function:: int _gr_poly_preinv_set_newton(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int _gr_poly_preinv_set_plain(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int _gr_poly_preinv_set_sparse(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int _gr_poly_preinv_set_transformed(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int _gr_poly_preinv_set(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int gr_poly_preinv_set_newton(gr_poly_preinv_t P, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_preinv_set_sparse(gr_poly_preinv_t P, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_preinv_set_transformed(gr_poly_preinv_t P, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_preinv_set(gr_poly_preinv_t P, const gr_poly_t f, gr_ctx_t ctx)
+
+    Sets *P* to the given (nonzero) modulus, storing a copy of it, using
+    respectively the Newton representation, the Newton representation
+    without an inverse (ordinary division), the sparse representation,
+    the transformed representation (``GR_UNABLE`` if unavailable),
+    or a representation selected automatically. The automatic selection
+    is the ``GR_METHOD_POLY_PREINV_SET`` method of the ring, which rings
+    can overload to account for the degree, the sparsity and the size of
+    the coefficients; the default :func:`gr_generic_poly_preinv_set`
+    chooses ordinary division for moduli of length at most 8, the sparse
+    representation when the modulus has at most 8 nonzero terms below
+    the leading term, and the Newton representation otherwise; rings
+    with cheap elements use larger cutoffs for ordinary division in
+    their own selection (32 for *nmod*, where schoolbook division was
+    measured to beat Newton division up to that length; the *nmod* ring
+    also uses a sparse cutoff of 5 terms, matching its inner loops). Returns ``GR_DOMAIN`` if `f` is zero and
+    ``GR_UNABLE`` if the leading coefficient cannot be inverted.
+
+.. function:: void _gr_poly_preinv_init_newton_shallow(gr_poly_preinv_t P, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+
+    Initializes *P* as a Newton representation referencing (without
+    copying) the modulus `f` and its precomputed inverse (which may be
+    empty, ``lenfinv = 0``, meaning that ordinary division will be
+    used). The object must not be cleared, and the referenced
+    polynomials must outlive it.
+
+.. function:: int gr_generic_poly_preinv_set(gr_poly_preinv_struct * P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+
+    Default implementation of the ``GR_METHOD_POLY_PREINV_SET`` method.
+
+.. function:: int _gr_poly_preinv_divrem(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_rem(gr_ptr R, gr_srcptr A, slong lenA, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_divrem(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_rem(gr_poly_t R, const gr_poly_t A, const gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Division with remainder by the precomputed modulus. The underscore
+    *divrem* requires `\operatorname{len}(A) \ge \operatorname{len}(f)`
+    and writes `\operatorname{len}(A) - \operatorname{len}(f) + 1`
+    quotient and `\operatorname{len}(f) - 1` remainder coefficients
+    (unnormalised); *Q* may be ``NULL`` when only the remainder is
+    wanted. Dividends of any length are supported (Newton division is
+    applied blockwise for long dividends).
+
+.. function:: int gr_generic_poly_divrem_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, const gr_poly_preinv_struct * P, gr_ctx_t ctx)
+
+    Generic implementation of the ``GR_METHOD_POLY_DIVREM_PREINV`` method,
+    which rings overloading the method can fall back to for
+    representations they do not handle themselves.
+
+.. function:: int _gr_poly_preinv_mulmod(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_mulmod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Modular multiplication. The underscore version requires reduced
+    inputs (lengths less than `\operatorname{len}(f)`), writes
+    `\operatorname{len}(f) - 1` coefficients and allows aliasing; it
+    skips the reduction when the product has degree less than `\deg f`.
+
+.. function:: int _gr_poly_preinv_powmod_fmpz_binexp(gr_ptr res, gr_srcptr poly, slong len, const fmpz_t e, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_powmod_fmpz_sliding(gr_ptr res, gr_srcptr poly, slong len, const fmpz_t e, ulong k, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_powmod_x_fmpz(gr_ptr res, const fmpz_t e, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_powmod_fmpz_binexp(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_powmod_fmpz_sliding(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, ulong k, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_powmod_x_fmpz(gr_poly_t res, const fmpz_t e, const gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Modular exponentiation with the precomputed modulus; see the
+    corresponding ``gr_poly_powmod_*`` functions for the algorithms and
+    the conventions of the underscore versions.
+
+.. function:: int _gr_poly_preinv_compose_mod_horner(gr_ptr res, gr_srcptr f, slong lenf, gr_srcptr g, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_compose_mod_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_compose_mod(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_compose_mod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_precompute_matrix(gr_mat_t A, gr_srcptr poly1, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_precompute_matrix(gr_mat_t A, const gr_poly_t poly1, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_compose_mod_brent_kung_precomp(gr_ptr res, gr_srcptr poly1, slong len1, const gr_mat_t A, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_compose_mod_brent_kung_precomp(gr_poly_t res, const gr_poly_t poly1, const gr_mat_t A, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_compose_mod_brent_kung_vec(gr_poly_struct * res, const gr_poly_struct * polys, slong lenpolys, slong l, gr_srcptr g, slong glen, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int gr_poly_preinv_compose_mod_brent_kung_vec(gr_poly_struct * res, const gr_poly_struct * polys, slong len1, slong n, const gr_poly_t g, const gr_poly_preinv_t P, gr_ctx_t ctx)
+              int _gr_poly_preinv_mod_matrix_rows_evaluate(gr_ptr res, const gr_mat_t A, gr_srcptr h, slong n, const gr_poly_preinv_t P, gr_ctx_t ctx)
+
+    Modular composition with the precomputed modulus; see the
+    corresponding ``gr_poly_compose_mod_*_preinv`` and
+    ``gr_poly_precompute_matrix`` functions (which are now wrappers around
+    these) for the algorithms and conventions.
+
 Modular arithmetic and composition
 --------------------------------------------------------------------------------
 
@@ -1404,21 +1845,38 @@ Modular arithmetic and composition
     and ``poly2`` upon polynomial division by ``f``. ``finv``
     is the inverse of the reverse of ``f``.
 
-.. function:: int _gr_poly_powmod_fmpz_binexp(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+.. function:: int _gr_poly_powmod_fmpz_binexp(gr_ptr res, gr_srcptr poly, slong len, const fmpz_t e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
               int gr_poly_powmod_fmpz_binexp(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, gr_ctx_t ctx)
-              int _gr_poly_powmod_fmpz_binexp_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_binexp_preinv(gr_ptr res, gr_srcptr poly, slong len, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
               int gr_poly_powmod_fmpz_binexp_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
               int _gr_poly_powmod_x_fmpz_preinv(gr_ptr res, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
               int gr_poly_powmod_x_fmpz_preinv(gr_poly_t res, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
-              int _gr_poly_powmod_ui_binexp(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp(gr_ptr res, gr_srcptr poly, slong len, ulong e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
               int gr_poly_powmod_ui_binexp(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, gr_ctx_t ctx)
-              int _gr_poly_powmod_ui_binexp_preinv(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp_preinv(gr_ptr res, gr_srcptr poly, slong len, ulong e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
               int gr_poly_powmod_ui_binexp_preinv(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
-              int _gr_poly_powmod_fmpz_sliding_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, ulong k, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_sliding_preinv(gr_ptr res, gr_srcptr poly, slong len, const fmpz_t e, ulong k, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
               int gr_poly_powmod_fmpz_sliding_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, ulong k, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e``
     modulo ``f``.
+
+    The underscore versions taking a base ``poly`` require ``poly`` to
+    be reduced, i.e. ``len`` must be smaller than ``lenf``, with
+    ``lenf`` at least 2, and ``e`` must be nonnegative. They write
+    ``lenf - 1`` coefficients to ``res``, zero-padded but not
+    normalised, and allow ``res`` to alias ``poly``. The versions taking
+    a precomputed inverse ``finv`` of the reverse of ``f`` accept
+    ``lenfinv = 0``, in which case ordinary division is used. The
+    intermediate powers are computed with their actual lengths, so that
+    raising a polynomial of small degree (such as `x`) to a power is
+    cheap as long as the degree stays below `\deg f`; in particular
+    the iterated Frobenius `x^{p^i}` costs nothing until `p^i \ge \deg f`.
+    For the *sliding* version, ``k`` is the window size, with ``k = 0``
+    selecting it automatically depending on the size of ``e``.
+    The *x* version computes `x^e` using shifts instead of multiplications
+    for the base, with the same length tracking; its underscore version
+    requires ``lenf`` at least 3.
 
 .. function:: int _gr_poly_compose_mod_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
               int gr_poly_compose_mod_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)
@@ -1444,6 +1902,25 @@ Modular arithmetic and composition
 
     Versions accepting an additional precomputed argument ``poly3inv``
     representing the inverse of the reverse of ``poly3``.
+
+.. function:: int _gr_poly_compose_mod_brent_kung_vec_preinv(gr_poly_struct * res, const gr_poly_struct * polys, slong lenpolys, slong l, gr_srcptr g, slong glen, gr_srcptr poly, slong len, gr_srcptr polyinv, slong leninv, gr_ctx_t ctx)
+              int gr_poly_compose_mod_brent_kung_vec_preinv(gr_poly_struct * res, const gr_poly_struct * polys, slong len1, slong n, const gr_poly_t g, const gr_poly_t poly, const gr_poly_t polyinv, gr_ctx_t ctx)
+
+    Sets ``res[i]`` to ``polys[i]`` composed with `g` modulo ``poly`` for
+    `0 \le i < n` (respectively `0 \le i < l` for the underscore version),
+    where ``polyinv`` is the inverse of the reverse of ``poly``.
+    Here ``polys`` is a vector of ``len1`` (respectively ``lenpolys``)
+    polynomials, each of which must have degree smaller than that of
+    ``poly``. Compared to `n` separate calls to
+    :func:`gr_poly_compose_mod_brent_kung_preinv`, this uses a single
+    matrix product with rectangular splitting parameter
+    `m \approx \sqrt{n \deg(\text{poly})}`, reducing the number of modular
+    multiplications by a factor `\sqrt{n}`.
+    The underscore version assumes that `g` has length at most
+    `\operatorname{len}(\text{poly}) - 1` and that each ``res[i]``
+    has space for `\operatorname{len}(\text{poly}) - 1` coefficients.
+    The non-underscore version does not support aliasing of the output
+    with `g`, ``poly`` or ``polyinv``.
 
 .. function:: int _gr_poly_reduce_matrix_mod_poly(gr_mat_t A, const gr_mat_t B, const gr_poly_t f, gr_ctx_t ctx)
 

@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_generic.h"
 #include "gr_poly.h"
 
 int
-_gr_poly_evaluate(gr_ptr y, gr_srcptr f, slong len, const gr_srcptr x, gr_ctx_t ctx)
+gr_generic_poly_evaluate(gr_ptr y, gr_srcptr f, slong len, gr_srcptr x, gr_ctx_t ctx)
 {
     return _gr_poly_evaluate_horner(y, f, len, x, ctx);
 }

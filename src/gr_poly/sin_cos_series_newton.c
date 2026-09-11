@@ -222,10 +222,8 @@ gr_poly_sin_cos_series_newton(gr_poly_t s, gr_poly_t c,
     gr_poly_fit_length(c, n, ctx);
     status |= _gr_poly_sin_cos_series_newton(s->coeffs, c->coeffs,
         h->coeffs, hlen, n, cutoff, times_pi, ctx);
-    _gr_poly_set_length(s, n, ctx);
-    _gr_poly_normalise(s, ctx);
-    _gr_poly_set_length(c, n, ctx);
-    _gr_poly_normalise(c, ctx);
+    _gr_poly_set_length_normalise(s, n, ctx);
+    _gr_poly_set_length_normalise(c, n, ctx);
 
     return status;
 }

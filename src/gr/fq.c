@@ -17,6 +17,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr/impl.h"
 #include "fq.h"
 #include "fq_poly.h"
@@ -620,6 +621,22 @@ _gr_fq_vec_dot_rev(fq_struct * res, const fq_struct * initial, int subtract, con
 }
 
 /* todo: _fq_poly_mullow should do the right thing */
+/* gcd and xgcd of the fq_poly module (Euclid or half-gcd with its
+   cutoffs) */
+static int
+_gr_fq_poly_gcd(fq_struct * G, slong * lenG, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_poly_gcd(G, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_poly_xgcd(slong * lenG, fq_struct * G, fq_struct * S, fq_struct * T, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_poly_xgcd(G, S, T, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fq_poly_mullow(fq_struct * res,
     const fq_struct * poly1, slong len1,
@@ -817,6 +834,9 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fq_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fq_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_poly_mullow},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fq_poly_gcd},
+    {GR_METHOD_POLY_XGCD,       (gr_funcptr) _gr_fq_poly_xgcd},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,      (gr_funcptr) _gr_fq_mat_nonsingular_solve_tril},

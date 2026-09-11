@@ -37,8 +37,7 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
         gr_poly_fit_length(p, 2, ctx);
         status |= gr_neg(GR_ENTRY(p->coeffs, 0, sz), GR_MAT_ENTRY(X, 0, 0, sz), ctx);
         status |= gr_one(GR_ENTRY(p->coeffs, 1, sz), ctx);
-        _gr_poly_set_length(p, 2, ctx);
-        _gr_poly_normalise(p, ctx);
+        _gr_poly_set_length_normalise(p, 2, ctx);
         return status;
     }
 
@@ -161,8 +160,7 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
             status |= gr_mul(t, GR_MAT_ENTRY(A, r1, n + i, sz), h, ctx);
             status |= gr_poly_set_coeff_scalar(b, i, t, ctx);
         }
-        _gr_poly_set_length(b, r1 + 1, ctx);
-        _gr_poly_normalise(b, ctx);
+        _gr_poly_set_length_normalise(b, r1 + 1, ctx);
 
         /* todo: poly_divexact */
         /* todo: compute as (p * b) / g or (p / g) * b or p * (g / b) ? */

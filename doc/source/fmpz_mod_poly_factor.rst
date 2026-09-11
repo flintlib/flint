@@ -18,6 +18,14 @@ Types, macros and constants
 Factorisation
 --------------------------------------------------------------------------------
 
+The factorization, irreducibility testing and root finding functions in
+this section are wrappers around the generic implementations in the
+``gr_poly`` module (see :func:`gr_poly_factor_finite_field`,
+:func:`gr_poly_is_irreducible` and :func:`gr_poly_roots_finite_field`),
+which select algorithms and cutoffs internally and use several threads
+when these are available.
+
+
 The factorisation, irreducibility and squarefreeness functions in this
 module assume that the modulus is prime. This is not checked.
 
@@ -117,75 +125,6 @@ module assume that the modulus is prime. This is not checked.
     If `fac` returns with the value `1` then the function operates as per
     :func:`fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
     factor of `p`.
-
-.. function:: int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state, const fmpz_mod_poly_t pol, slong d, const fmpz_mod_ctx_t ctx)
-
-    Probabilistic equal degree factorisation of ``pol`` into
-    irreducible factors of degree ``d``. If it passes, a factor is
-    placed in ``factor`` and 1 is returned, otherwise 0 is returned and
-    the value of factor is undetermined.
-
-    Requires that ``pol`` be monic, non-constant and squarefree. These
-    requirements are not checked.
-
-.. function:: void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t pol, slong d, const fmpz_mod_ctx_t ctx)
-
-    Assuming ``pol`` is a product of irreducible factors all of
-    degree ``d``, finds all those factors and places them in factors.
-    Requires that ``pol`` be monic, non-constant and squarefree. These
-    requirements are not checked.
-
-.. function:: void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const * degs, const fmpz_mod_ctx_t ctx)
-
-    Factorises a monic non-constant squarefree polynomial ``poly``
-    of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
-    `f[d]` is the product of the monic irreducible factors of ``poly``
-    of degree `d`. Factors `f[d]` are stored in ``res``, and the degree `d`
-    of the irreducible factors is stored in ``degs`` in the same order
-    as the factors. The monic, non-constant and squarefree assumptions
-    on ``poly`` are not checked.
-
-    Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
-
-.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const * degs, const fmpz_mod_ctx_t ctx)
-
-    Multithreaded version of :func:`fmpz_mod_poly_factor_distinct_deg`.
-
-.. function:: void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to a squarefree factorization of ``f``.
-
-.. function:: void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic irreducible
-    factors choosing the best algorithm for given modulo and degree.
-    Choice is based on heuristic measurements.
-
-.. function:: void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic irreducible
-    factors using the Cantor-Zassenhaus algorithm.
-
-.. function:: void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``poly`` into monic irreducible
-    factors using the fast version of Cantor-Zassenhaus algorithm proposed by
-    Kaltofen and Shoup (1998). More precisely this algorithm uses a
-    baby step/giant step strategy for the distinct-degree factorization
-    step. If :func:`flint_get_num_threads` is greater than one
-    :func:`fmpz_mod_poly_factor_distinct_deg_threaded` is used.
-
-.. function:: void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic irreducible
-    factors using the Berlekamp algorithm.
-
-.. function:: void _fmpz_mod_poly_interval_poly_worker(void * arg_ptr)
-
-    Worker function to compute interval polynomials in distinct degree
-    factorisation. Input/output is stored in
-    :type:`fmpz_mod_poly_interval_poly_arg_t`.
-
 
 Root Finding
 --------------------------------------------------------------------------------

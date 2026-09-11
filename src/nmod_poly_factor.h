@@ -29,17 +29,6 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    nmod_poly_struct * baby;
-    nmod_poly_struct * res;
-    nmod_poly_struct * H;
-    nmod_poly_struct * v;
-    nmod_poly_struct * vinv;
-    nn_ptr tmp;
-    slong m;
-}
-nmod_poly_interval_poly_arg_t;
 
 /* Factoring  ****************************************************************/
 
@@ -79,8 +68,6 @@ void nmod_poly_factor_pow(nmod_poly_factor_t fac, slong exp);
 void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
                                 const nmod_poly_t pol, slong d);
 
-int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, slong d);
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs);
@@ -121,7 +108,6 @@ ulong nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
 ulong nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-void _nmod_poly_interval_poly_worker(void* arg_ptr);
 
 /* Roots *********************************************************************/
 

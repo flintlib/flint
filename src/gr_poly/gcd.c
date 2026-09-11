@@ -14,22 +14,27 @@
 
 #include "gr_poly.h"
 
+/* todo: tuning (these match _gr_poly_resultant) */
+#define GR_POLY_GCD_HGCD_CUTOFF 200
+#define GR_POLY_GCD_HGCD_INNER_CUTOFF 100
+
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
 int
-_gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
-                                gr_srcptr B, slong lenB, gr_ctx_t ctx)
+_gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
-    /* todo:
-        * extract powers of x (see fmpz_poly_gcd)
-        * automaticically use hgcd at least over finite fields
-        * gcd_euclidean shouldn't actually be used over fields with fractions.
-          instead, we want to clear denominators and call the subresultant
-          algorithm.
-    */
     if (gr_ctx_is_field(ctx) == T_TRUE)
     {
-        return _gr_poly_gcd_euclidean(G, lenG, A, lenA, B, lenB, ctx);
+        /* Over finite fields, the half-gcd algorithm is used above a
+           cutoff (as in _gr_poly_resultant; tuning is ring-dependent and
+           rings should overload this method to use their own cutoffs).
+           Over other fields it is not used by default: coefficient
+           growth (exact fields) or numerical stability (approximate
+           fields) may make the Euclidean algorithm preferable. */
+        if (FLINT_MIN(lenA, lenB) >= GR_POLY_GCD_HGCD_CUTOFF && gr_ctx_is_finite(ctx) == T_TRUE)
+            return _gr_poly_gcd_hgcd(G, lenG, A, lenA, B, lenB, GR_POLY_GCD_HGCD_INNER_CUTOFF, GR_POLY_GCD_HGCD_CUTOFF, ctx);
+        else
+            return _gr_poly_gcd_euclidean(G, lenG, A, lenA, B, lenB, ctx);
     }
     else if (gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE)
     {

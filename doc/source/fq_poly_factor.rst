@@ -113,112 +113,14 @@ Irreducibility Testing
 Factorisation
 --------------------------------------------------------------------------------
 
+The factorization, irreducibility testing and root finding functions in
+this section are wrappers around the generic implementations in the
+``gr_poly`` module (see :func:`gr_poly_factor_finite_field`,
+:func:`gr_poly_is_irreducible` and :func:`gr_poly_roots_finite_field`),
+which select algorithms and cutoffs internally and use several threads
+when these are available.
 
-.. function:: int fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state, const fq_poly_t pol, slong d, const fq_ctx_t ctx)
 
-    Probabilistic equal degree factorisation of ``pol`` into
-    irreducible factors of degree ``d``. If it passes, a factor is
-    placed in factor and 1 is returned, otherwise 0 is returned and
-    the value of factor is undetermined.
-
-    Requires that ``pol`` be monic, non-constant and squarefree (this
-    is not checked).
-
-.. function:: void fq_poly_factor_equal_deg(fq_poly_factor_t factors, const fq_poly_t pol, slong d, const fq_ctx_t ctx)
-
-    Assuming ``pol`` is a product of irreducible factors all of
-    degree ``d``, finds all those factors and places them in
-    factors.  Requires that ``pol`` be monic, non-constant and
-    squarefree (this is not checked).
-
-.. function:: void fq_poly_factor_split_single(fq_poly_t linfactor, const fq_poly_t input, const fq_ctx_t ctx)
-
-    Assuming ``input`` is a product of factors all of degree 1, finds a single
-    linear factor of ``input`` and places it in ``linfactor``.
-    Requires that ``input`` be monic and non-constant (this is not
-    checked).
-
-.. function:: void fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly, slong * const * degs, const fq_ctx_t ctx)
-
-    Factorises a monic non-constant squarefree polynomial ``poly``
-    of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
-    `f[d]` is the product of the monic irreducible factors of
-    ``poly`` of degree `d` (squarefreeness is assumed and not
-    checked). Factors are stored in ``res``,
-    associated powers of irreducible polynomials are stored in
-    ``degs`` in the same order as factors.
-
-    Requires that ``degs`` have enough space for irreducible polynomials'
-    powers (maximum space required is ``n * sizeof(slong)``).
-
-.. function:: void fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Sets ``res`` to a squarefree factorization of ``f``.
-
-.. function:: void fq_poly_factor(fq_poly_factor_t res, fq_t lead, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic
-    irreducible factors choosing the best algorithm for given modulo
-    and degree.  The output ``lead`` is set to the leading coefficient of `f`
-    upon return. Choice of algorithm is based on heuristic measurements.
-
-.. function:: void fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic
-    irreducible factors using the Cantor-Zassenhaus algorithm.
-
-.. function:: void fq_poly_factor_kaltofen_shoup(fq_poly_factor_t res, const fq_poly_t poly, const fq_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic
-    irreducible factors using the fast version of Cantor-Zassenhaus
-    algorithm proposed by Kaltofen and Shoup (1998). More precisely
-    this algorithm uses a “baby step/giant step” strategy for the
-    distinct-degree factorization step.
-
-.. function:: void fq_poly_factor_berlekamp(fq_poly_factor_t factors, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a non-constant polynomial ``f`` into monic
-    irreducible factors using the Berlekamp algorithm.
-
-.. function:: void fq_poly_factor_with_berlekamp(fq_poly_factor_t res, fq_t leading_coeff, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a general polynomial ``f`` into monic irreducible
-    factors and sets ``leading_coeff`` to the leading coefficient
-    of ``f``, or 0 if ``f`` is the zero polynomial.
-
-    This function first checks for small special cases, deflates
-    ``f`` if it is of the form `p(x^m)` for some `m > 1`, then
-    performs a square-free factorisation, and finally runs Berlekamp
-    factorisation on all the individual square-free factors.
-
-.. function:: void fq_poly_factor_with_cantor_zassenhaus(fq_poly_factor_t res, fq_t leading_coeff, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a general polynomial ``f`` into monic irreducible
-    factors and sets ``leading_coeff`` to the leading coefficient
-    of ``f``, or 0 if ``f`` is the zero polynomial.
-
-    This function first checks for small special cases, deflates
-    ``f`` if it is of the form `p(x^m)` for some `m > 1`, then
-    performs a square-free factorisation, and finally runs
-    Cantor-Zassenhaus on all the individual square-free factors.
-
-.. function:: void fq_poly_factor_with_kaltofen_shoup(fq_poly_factor_t res, fq_t leading_coeff, const fq_poly_t f, const fq_ctx_t ctx)
-
-    Factorises a general polynomial ``f`` into monic irreducible
-    factors and sets ``leading_coeff`` to the leading coefficient
-    of ``f``, or 0 if ``f`` is the zero polynomial.
-
-    This function first checks for small special cases, deflates
-    ``f`` if it is of the form `p(x^m)` for some `m > 1`, then
-    performs a square-free factorisation, and finally runs
-    Kaltofen-Shoup on all the individual square-free factors.
-
-.. function:: void fq_poly_iterated_frobenius_preinv(fq_poly_t * rop, slong n, const fq_poly_t v, const fq_poly_t vinv, const fq_ctx_t ctx)
-
-    Sets ``rop[i]`` to be `x^{q^i}\bmod v` for `0 \le i < n`.
-
-    It is required that ``vinv`` is the inverse of the reverse of
-    ``v`` mod ``x^lenv``.
 
 Root Finding
 --------------------------------------------------------------------------------

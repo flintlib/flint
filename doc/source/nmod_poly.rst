@@ -1807,11 +1807,6 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void _nmod_poly_precompute_matrix_worker (void * arg_ptr)
-
-    Worker function version of ``_nmod_poly_precompute_matrix``.
-    Input/output is stored in ``nmod_poly_matrix_precompute_arg_t``.
-
 .. function:: void _nmod_poly_precompute_matrix (nmod_mat_t A, nn_srcptr f, nn_srcptr g, slong leng, nn_srcptr ginv, slong lenginv, nmod_t mod)
 
     Sets the ith row of ``A`` to `f^i` modulo `g` for
@@ -1827,13 +1822,6 @@ Modular composition
     `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
-
-    Worker function version of
-    ``_nmod_poly_compose_mod_brent_kung_precomp_preinv``.
-    Input/output is stored in
-    ``nmod_poly_compose_mod_precomp_preinv_arg_t``.
 
 .. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr f, slong lenf, const nmod_mat_t A, nn_srcptr h, slong lenh, nn_srcptr hinv, slong lenhinv, nmod_t mod)
 
@@ -1856,63 +1844,6 @@ Modular composition
     be the inverse of the reverse of ``h``. This version of Brent-Kung
     modular composition is particularly useful if one has to perform several
     modular composition of the form `f(g)` modulo `h` for fixed `g` and `h`.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong l, nn_srcptr g, slong leng, nn_srcptr h, slong lenh, nn_srcptr hinv, slong lenhinv, nmod_t mod)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
-    where `f_i` are the first ``l`` elements of ``polys``. We require that `h`
-    is nonzero and that the length of `g` is less than the length of `h`. We
-    also require that the length of `f_i` is less than the length of `h`. We
-    require ``res`` to have enough memory allocated to hold ``l``
-    ``nmod_poly_struct``'s. The entries of ``res`` need to be initialised and
-    ``l`` needs to be less than ``len1`` Furthermore, we require ``hinv`` to
-    be the inverse of the reverse of ``h``. The output is not allowed to be
-    aliased with any of the inputs.
-
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t h, const nmod_poly_t hinv)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
-    where `f_i` are the first ``n`` elements of ``polys``. We require ``res``
-    to have enough memory allocated to hold ``n`` ``nmod_poly_struct``. The
-    entries of ``res`` need to be initialised and ``n`` needs to be less than
-    ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
-    smaller degree than `h`. Furthermore, we require ``hinv`` to be the inverse
-    of the reverse of ``h``. No aliasing of ``res`` and ``polys`` is allowed.
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, nn_srcptr g, slong glen, nn_srcptr poly, slong len, nn_srcptr polyinv, slong leninv, nmod_t mod, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`_nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv)
-
-    Multithreaded version of
-    :func:`nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void _nmod_poly_compose_mod(nn_ptr res, nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod)
-
-    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
-    `h` is nonzero and that the length of `g` is one less than the
-    length of `h` (possibly with zero padding). The output is not allowed
-    to be aliased with any of the inputs.
-
-.. function:: void nmod_poly_compose_mod(nmod_poly_t res, const nmod_poly_t f, const nmod_poly_t g, const nmod_poly_t h)
-
-    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
-    `h` is nonzero.
-
-
 
 Greatest common divisor
 --------------------------------------------------------------------------------

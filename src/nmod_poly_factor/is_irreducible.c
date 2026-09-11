@@ -1,10 +1,5 @@
 /*
-    Copyright (C) 2007 David Howden
-    Copyright (C) 2007-2010, 2020, 2022 William Hart
-    Copyright (C) 2008 Richard Howell-Peak
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2012 Lina Kulakova
-    Copyright (C) 2013 Martin Lee
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,162 +9,47 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "ulong_extras.h"
-#include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
+#include "ulong_extras.h"
+#include "nmod_poly_factor_gr.h"
 
-/* Return 1 if poly has a trivial factor, otherwise return 0. For small p,
-   this quickly filters out many candidates when testing random polynomials
-   for irreducibility. */
-static int nmod_poly_is_reducible_trial_div(const nmod_poly_t poly)
+/* Note: unlike gr_poly_is_irreducible, this module considers constants
+   (and the zero polynomial) irreducible. */
+static int
+_nmod_poly_irreducible_gr(const nmod_poly_t f, int ddf)
 {
-    ulong x, p = poly->mod.n;
+    gr_ctx_t ctx;
+    gr_poly_t P;
+    nmod_t mod = f->mod;
+    truth_t res;
 
-    if (poly->mod.n > FLINT_MAX(200, 2 * poly->length))
-        return 0;
+    if (f->length <= 2)
+        return 1;
 
-    /* Try all linear factors. To do: check if it is worthwhile to eliminate
-       other low-degree factors too. */
-    /* To do: use multipoint evaluation when p is large enough. */
-    /* To do: use sparse algorithm when poly is sparse. */
-    for (x = 1; x < p; x++)
-        if (nmod_poly_evaluate_nmod(poly, x) == 0)
-            return 1;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+    NMOD_POLY_AS_GR(P, f);
 
-    return 0;
+    res = ddf ? gr_poly_is_irreducible_ddf(P, ctx) : gr_poly_is_irreducible(P, ctx);
+
+    gr_ctx_clear(ctx);
+
+    if (res == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "nmod_poly_is_irreducible: unable to decide\n");
+
+    return (res == T_TRUE);
 }
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {
-
-    nmod_poly_t f, v, vinv, tmp;
-    nmod_poly_struct * h, * H, * I;
-    nmod_mat_t HH;
-    slong i, j, l, m, n, d;
-    double beta;
-    int result = 1;
-    n = nmod_poly_degree(poly);
-
-    if (n < 2)
-        return 1;
-
-    if (!nmod_poly_is_squarefree(poly))
-        return 0;
-
-    beta = 0.5 * (1. - (log(2)/log(n)));
-    l = ceil(pow (n, beta));
-    m = ceil(0.5*n/l);
-
-    /* initialization */
-    nmod_poly_init_mod(f, poly->mod);
-    nmod_poly_init_mod(v, poly->mod);
-    nmod_poly_init_mod(vinv, poly->mod);
-    nmod_poly_init_mod(tmp, poly->mod);
-
-    h =  flint_malloc((2 * m + l + 1) * sizeof(nmod_poly_struct));
-    H = h + (l + 1);
-    I = H + m;
-
-    for (i = 0; i < 2*m + l + 1; i++)
-        nmod_poly_init_mod(h + i, poly->mod);
-
-    nmod_poly_make_monic(v, poly);
-
-    nmod_poly_reverse(vinv, v, v->length);
-    nmod_poly_inv_series(vinv, vinv, v->length);
-
-    /* compute baby steps: h[i] = x^{p^i}mod v */
-    nmod_poly_set_coeff_ui(h + 0, 1, 1);
-    nmod_poly_powmod_x_ui_preinv(h + 1, poly->mod.n, v, vinv);
-
-    if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1)*3)/4)
-    {
-        for (i = 1; i < (slong) FLINT_BIT_COUNT(l); i++)
-            nmod_poly_compose_mod_brent_kung_vec_preinv(h + 1 +
-                            (1 << (i - 1)), h + 1, (1 << (i - 1)),
-                            (1 << (i - 1)), h + (1 << (i - 1)), v, vinv);
-
-        nmod_poly_compose_mod_brent_kung_vec_preinv(h + 1 + (1 << (i - 1)),
-                            h + 1, (1 << (i - 1)), l - (1 << (i - 1)),
-						    h + (1 << (i - 1)), v, vinv);
-    }
-    else
-    {
-        for (i = 2; i < l + 1; i++)
-        {
-            nmod_poly_init_mod(h + i, poly->mod);
-
-            nmod_poly_powmod_ui_binexp_preinv(h + i, h + i - 1, poly->mod.n,
-                                              v, vinv);
-        }
-    }
-
-    /* compute coarse distinct-degree factorisation */
-    nmod_poly_set(H + 0, h + l);
-    nmod_mat_init(HH, n_sqrt(v->length - 1) + 1, v->length - 1, poly->mod.n);
-    nmod_poly_precompute_matrix(HH, H + 0, v, vinv);
-
-    d = 1;
-    for (j = 0; j < m; j++)
-    {
-        /* compute giant steps: H[j] = x^{p^(lj)}mod s */
-        if (j > 0)
-            nmod_poly_compose_mod_brent_kung_precomp_preinv(H + j, H + j - 1, HH,
-                                                            v, vinv);
-        /* compute interval polynomials */
-        nmod_poly_set_coeff_ui(I + j, 0, 1);
-
-        for (i = l - 1; i >= 0 && 2*d <= v->length - 1; i--, d++)
-        {
-            nmod_poly_rem(tmp, h + i, v);
-            nmod_poly_sub(tmp, H + j, tmp);
-            nmod_poly_mulmod_preinv (I + j, tmp, I + j, v, vinv);
-        }
-
-        /* compute F_j=f^{[j*l+1]} * ... * f^{[j*l+l]} */
-        /* F_j is stored on the place of I_j */
-        nmod_poly_gcd(I + j, v, I + j);
-
-        if (I[j].length > 1)
-        {
-            result = 0;
-            break;
-        }
-    }
-
-    nmod_poly_clear(f);
-    nmod_poly_clear(v);
-    nmod_poly_clear(vinv);
-    nmod_poly_clear(tmp);
-
-    nmod_mat_clear (HH);
-
-    for (i = 0; i < l + 1; i++)
-        nmod_poly_clear(h + i);
-
-    for (i = 0; i < m; i++)
-    {
-        nmod_poly_clear(H + i);
-        nmod_poly_clear(I + i);
-    }
-
-    flint_free (h);
-
-    return result;
+    return _nmod_poly_irreducible_gr(poly, 1);
 }
 
 int
 nmod_poly_is_irreducible(const nmod_poly_t f)
 {
-    if (nmod_poly_length(f) <= 2)
-        return 1;
-
-    if (nmod_poly_is_reducible_trial_div(f))
-        return 0;
-
-    return nmod_poly_is_irreducible_ddf(f);
+    return _nmod_poly_irreducible_gr(f, 0);
 }
 
 static void

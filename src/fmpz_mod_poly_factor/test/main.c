@@ -16,10 +16,8 @@
 #include "t-factor_cantor_zassenhaus.c"
 #include "t-factor_distinct_deg.c"
 #include "t-factor_distinct_deg_threaded.c"
-#include "t-factor_equal_deg_prob.c"
 #include "t-factor_kaltofen_shoup.c"
 #include "t-factor_squarefree.c"
-#include "t-interval_threaded.c"
 #include "t-is_irreducible.c"
 #include "t-is_irreducible_ddf.c"
 #include "t-is_irreducible_rabin.c"
@@ -36,10 +34,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_factor_cantor_zassenhaus),
     TEST_FUNCTION(fmpz_mod_poly_factor_distinct_deg),
     TEST_FUNCTION(fmpz_mod_poly_factor_distinct_deg_threaded),
-    TEST_FUNCTION(fmpz_mod_poly_factor_equal_deg_prob),
     TEST_FUNCTION(fmpz_mod_poly_factor_kaltofen_shoup),
     TEST_FUNCTION(fmpz_mod_poly_factor_squarefree),
-    TEST_FUNCTION(fmpz_mod_poly_factor_interval_threaded),
     TEST_FUNCTION(fmpz_mod_poly_factor_is_irreducible),
     TEST_FUNCTION(fmpz_mod_poly_factor_is_irreducible_ddf),
     TEST_FUNCTION(fmpz_mod_poly_factor_is_irreducible_rabin),

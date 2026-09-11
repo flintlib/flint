@@ -48,15 +48,6 @@ typedef struct
 }
 nmod_poly_matrix_precompute_arg_t;
 
-typedef struct
-{
-    nmod_mat_struct * A;
-    nmod_poly_struct * res;
-    nmod_poly_struct * poly1;
-    nmod_poly_struct * poly3;
-    nmod_poly_struct * poly3inv;
-}
-nmod_poly_compose_mod_precomp_preinv_arg_t;
 
 typedef struct
 {
@@ -682,7 +673,6 @@ void _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B, const n
 void _nmod_poly_precompute_matrix(nmod_mat_t A, nn_srcptr poly1, nn_srcptr poly2,
                slong len2, nn_srcptr poly2inv, slong len2inv, nmod_t mod);
 
-void _nmod_poly_precompute_matrix_worker(void * arg_ptr);
 
 void nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
@@ -692,7 +682,6 @@ void _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr poly
                             slong len3, nn_srcptr poly3inv, slong len3inv,
                             nmod_t mod);
 
-void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
 
 void nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_mat_t A,
@@ -705,44 +694,6 @@ void _nmod_poly_compose_mod_brent_kung_preinv(nn_ptr res, nn_srcptr poly1, slong
 void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3, const nmod_poly_t poly3inv);
-
-void
-_nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-        const nmod_poly_struct * polys, slong FLINT_UNUSED(lenpolys), slong l,
-        nn_srcptr g, slong glen, nn_srcptr poly, slong len,
-        nn_srcptr polyinv, slong leninv, nmod_t mod);
-
-void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                    const nmod_poly_struct * polys, slong len1, slong n,
-                    const nmod_poly_t g, const nmod_poly_t poly,
-                    const nmod_poly_t polyinv);
-
-void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
-
-void
-nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
-           const nmod_poly_struct * polys, slong len1, slong n,
-                          const nmod_poly_t g, const nmod_poly_t poly,
-                     const nmod_poly_t polyinv, thread_pool_handle * threads,
-                                                                slong num_threads);
-
-void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
-        nmod_poly_struct * res,
-        const nmod_poly_struct * polys,
-        slong FLINT_UNUSED(lenpolys), slong l,
-        nn_srcptr g, slong glen,
-        nn_srcptr poly, slong len,
-        nn_srcptr polyinv, slong leninv,
-        nmod_t mod,
-        thread_pool_handle * threads,
-        slong num_threads);
-
-void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(
-        nmod_poly_struct * res,
-        const nmod_poly_struct * polys,
-        slong len1, slong n,
-        const nmod_poly_t g, const nmod_poly_t poly,
-        const nmod_poly_t polyinv);
 
 void _nmod_poly_compose_mod_horner(nn_ptr res, nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod);
 void nmod_poly_compose_mod_horner(nmod_poly_t res, const nmod_poly_t f, const nmod_poly_t g, const nmod_poly_t h);
