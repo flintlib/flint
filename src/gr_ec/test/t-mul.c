@@ -24,7 +24,7 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         gr_ec_aff_point_t Pa, Aa;
         gr_ec_jac_point_t Pj, Aj;
         fmpz_t m, n, mn;
-        slong j, small, bits;
+        slong j, nsmall, bits;
         int status;
 
         gr_ec_test_ring(R, state);
@@ -76,18 +76,18 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         /* a small multiple against repeated addition; the accumulator is
            never normalized, so its coordinates grow with every step and
            the chain has to stay short over an infinite ring */
-        small = 1 + n_randint(state,
+        nsmall = 1 + n_randint(state,
                     (gr_ctx_is_finite(R) == T_TRUE) ? 12 : 4);
 
         if (gr_ec_point_zero(B, E) == GR_SUCCESS)
         {
             status = GR_SUCCESS;
 
-            for (j = 0; j < small && status == GR_SUCCESS; j++)
+            for (j = 0; j < nsmall && status == GR_SUCCESS; j++)
                 status = gr_ec_point_add(B, B, P, E);
 
             if (status == GR_SUCCESS
-                    && gr_ec_point_mul_si(A, P, small, E) == GR_SUCCESS)
+                    && gr_ec_point_mul_si(A, P, nsmall, E) == GR_SUCCESS)
             {
                 FLINT_TEST(gr_ec_point_equal(A, B, E) != T_FALSE);
                 FLINT_TEST(gr_ec_point_is_on_curve(A, E) != T_FALSE);

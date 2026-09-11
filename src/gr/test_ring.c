@@ -5455,7 +5455,7 @@ gr_test_mul_scalar_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
     fmpz_t n;
     ulong un;
     slong sn;
-    int small;
+    int small_values;
 
     GR_TMP_INIT3(x, r1, r2, R);
     fmpz_init(n);
@@ -5464,10 +5464,10 @@ gr_test_mul_scalar_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_MUST_SUCCEED(gr_randtest(r1, state, R));
     GR_MUST_SUCCEED(gr_randtest(r2, state, R));
 
-    small = (gr_ctx_is_finite(R) != T_TRUE);
+    small_values = (gr_ctx_is_finite(R) != T_TRUE);
 
-    un = small ? n_randint(state, 16) : n_randtest(state);
-    sn = small ? (slong) n_randint(state, 17) - 8 : (slong) n_randtest(state);
+    un = small_values ? n_randint(state, 16) : n_randtest(state);
+    sn = small_values ? (slong) n_randint(state, 17) - 8 : (slong) n_randtest(state);
 
     status = GR_SUCCESS;
 

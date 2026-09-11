@@ -80,7 +80,11 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_point_randtest, gr_ec_point)
 GR_EC_RANDTEST_WRAPPER(_gr_ec_aff_point_randtest, gr_ec_aff_point)
 GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
 
-/* Entries shared by all three representations. */
+/*
+    Entries shared by all three representations. Nothing here is canonical:
+    the point at infinity has arbitrary coordinates, and (X : Y : Z) names a
+    class rather than a single triple.
+*/
 
 #define GR_EC_CTX_METHODS \
     {GR_METHOD_CTX_WRITE,           (gr_funcptr) gr_ec_ctx_write}, \
@@ -96,7 +100,6 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    /* infinity has arbitrary coordinates, and (X:Y:Z) is a class */ \
     {GR_METHOD_CTX_IS_CANONICAL,    (gr_funcptr) gr_generic_ctx_predicate_false}, \
     {GR_METHOD_CTX_IS_FINITE,       (gr_funcptr) _gr_ec_ctx_is_finite}, \
     {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact}, \
