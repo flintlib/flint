@@ -273,6 +273,10 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         int status = GR_SUCCESS;
         int s1;
 
+        /* large enough for the blocked evaluation to be split over the
+           thread pool */
+        flint_set_num_threads(1 + n_randint(state, 8));
+
         if (iter % 2)
         {
             p = _fft_prime(state, 50);
@@ -497,6 +501,10 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         gr_poly_t f, g;
         gr_ptr x, y;
         int status = GR_SUCCESS;
+
+        /* large enough for the evaluation and the univariate resultants to
+           be split over the thread pool */
+        flint_set_num_threads(1 + n_randint(state, 8));
 
         gr_ctx_init_nmod(cctx, n_randprime(state, FLINT_BITS - 2, 1));
         gr_ctx_init_gr_poly(ctx, cctx);

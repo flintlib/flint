@@ -95,6 +95,9 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
         int status = GR_SUCCESS;
         int s1;
 
+        /* the images at the several primes are split over the thread pool */
+        flint_set_num_threads(1 + n_randint(state, 8));
+
         if (rational)
             gr_ctx_init_fmpq(cctx);
         else
@@ -167,6 +170,8 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
         gr_ptr x, y, z, yz;
         int status = GR_SUCCESS;
 
+        flint_set_num_threads(1 + n_randint(state, 8));
+
         if (n_randint(state, 2))
             gr_ctx_init_fmpq(cctx);
         else
@@ -230,6 +235,8 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
         gr_poly_t f, g;
         gr_ptr x, y;
         int status = GR_SUCCESS;
+
+        flint_set_num_threads(1 + n_randint(state, 8));
 
         if (n_randint(state, 2))
             gr_ctx_init_fmpq(cctx);
