@@ -22,8 +22,8 @@ static ulong _fft_prime(flint_rand_t state, int bits)
 
     FLINT_ASSERT(bits > 17);
 
-    hi = (1UL << (bits - 16)) - 1;
-    lo = 1UL << (bits - 17);
+    hi = (UWORD(1) << (bits - 16)) - 1;
+    lo = UWORD(1) << (bits - 17);
 
     for (m = hi - n_randint(state, hi - lo); m > lo; m--)
     {
@@ -122,6 +122,7 @@ _gr_poly_randtest_bivariate(gr_poly_t f, flint_rand_t state, slong leny,
 TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
 {
     slong iter;
+    slong save_threads = flint_get_num_threads();
 
     /* Compare with the division-free Sylvester determinant over Z/pZ[x][y] */
     for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
@@ -157,16 +158,11 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         s1 = gr_poly_resultant_multipoint(x, f, g, ctx);
         status |= gr_poly_resultant_sylvester(y, f, g, ctx);
 
-        // if (s1 != GR_SUCCESS)
-        //     flint_printf("p = %lu fail\n", p);
-        // else
-        //     flint_printf("p = %lu good\n", p);
-
-        // gr_poly_resultant_multipoint is allowed to fail, if the field is too small to find a suitable
-        // primitive root for the geometric progression
-        // gr_poly_resultant_sylvester should never FAIL
-        // So we condition the result only when gr_poly_resultant_multipoint succeeds
-        if ((status != GR_SUCCESS) || 
+        /* the multipoint algorithm may fail when the field is too small to
+           hold a geometric progression of the required length, so its result
+           is only checked when it succeeded; the Sylvester determinant must
+           always succeed */
+        if ((status != GR_SUCCESS) ||
             ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)))
         {
             flint_printf("FAIL (vs sylvester):\n");
@@ -232,11 +228,8 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         s1 = gr_poly_resultant_multipoint(x, f, g, ctx);
         status |= gr_poly_resultant_sylvester(y, f, g, ctx);
 
-        // gr_poly_resultant_multipoint is allowed to fail, if the field is too small to find a suitable
-        // primitive root for the geometric progression
-        // gr_poly_resultant_sylvester should never FAIL
-        // So we condition the result only when gr_poly_resultant_multipoint succeeds
-        if ((status != GR_SUCCESS) || 
+        /* as above: only a successful multipoint result is checked */
+        if ((status != GR_SUCCESS) ||
             ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)))
         {
             flint_printf("FAIL (vs sylvester, DFT evaluation):\n");
@@ -263,13 +256,20 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
        DFT. Being short in y and long in x makes the points numerous while
        each costs little, so the blocking is reached cheaply; the reference is
        the subresultant algorithm, the Sylvester determinant being far too
-       slow at this size. */
-    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
+       slow at this size.
+
+       The DFT path interpolates either by an inverse transform or by the
+       geometric progression, whichever needs less work, and the two sizes
+       below pick one each: the inverse transform reads back a whole number
+       of blocks of BLK_SZ values, which is a negligible surcharge at 23991
+       points but not at 8779, where the progression wins instead. */
+    for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t cctx, ctx;
         gr_poly_t f, g;
         gr_ptr x, y;
         ulong p;
+        slong leny, lenx;
         int status = GR_SUCCESS;
         int s1;
 
@@ -277,18 +277,30 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
            thread pool */
         flint_set_num_threads(1 + n_randint(state, 8));
 
-        if (iter % 2)
-        {
-            p = _fft_prime(state, 50);
-        }
-        else
-        {
-            /* p = 3 mod 4 leaves p - 1 with a 2-valuation of one, too small
-               for any transform, so the geometric progression is used */
-            p = n_randprime(state, 50, 1);
+        leny = 6;
+        lenx = 2400;
 
-            while (p % 4 != 3)
+        switch (iter % 3)
+        {
+            case 0:
+                /* p = 3 mod 4 leaves p - 1 with a 2-valuation of one, too
+                   small for any transform, so the geometric progression
+                   evaluates as well as interpolates */
                 p = n_randprime(state, 50, 1);
+
+                while (p % 4 != 3)
+                    p = n_randprime(state, 50, 1);
+                break;
+            case 1:
+                /* DFT evaluation, inverse transform to interpolate */
+                p = _fft_prime(state, 50);
+                break;
+            default:
+                /* DFT evaluation, geometric progression to interpolate */
+                p = _fft_prime(state, 50);
+                leny = 12;
+                lenx = 400;
+                break;
         }
 
         if (p == 0)
@@ -302,17 +314,14 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         x = gr_heap_init(ctx);
         y = gr_heap_init(ctx);
 
-        status |= _gr_poly_randtest_bivariate(f, state, 6, 2400, ctx, cctx);
-        status |= _gr_poly_randtest_bivariate(g, state, 6, 2400, ctx, cctx);
+        status |= _gr_poly_randtest_bivariate(f, state, leny, lenx, ctx, cctx);
+        status |= _gr_poly_randtest_bivariate(g, state, leny, lenx, ctx, cctx);
 
         s1 = gr_poly_resultant_multipoint(x, f, g, ctx);
         status |= gr_poly_resultant_subresultant(y, f, g, ctx);
 
-        // gr_poly_resultant_multipoint is allowed to fail, if the field is too small to find a suitable
-        // primitive root for the geometric progression
-        // gr_poly_resultant_sylvester should never FAIL
-        // So we condition the result only when gr_poly_resultant_multipoint succeeds
-        if ((status != GR_SUCCESS) || 
+        /* as above, against the subresultant algorithm this time */
+        if ((status != GR_SUCCESS) ||
             ((s1 == GR_SUCCESS) && (gr_equal(x, y, ctx) != T_TRUE)))
         {
             flint_printf("FAIL (vs subresultant, blocked evaluation):\n");
@@ -554,6 +563,8 @@ TEST_FUNCTION_START(gr_poly_resultant_multipoint, state)
         gr_ctx_clear(ctx);
         gr_ctx_clear(cctx);
     }
+
+    flint_set_num_threads(save_threads);
 
     TEST_FUNCTION_END(state);
 }

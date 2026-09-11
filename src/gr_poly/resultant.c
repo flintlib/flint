@@ -33,53 +33,11 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
     if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
         return GR_SUCCESS;
 
-    /* Bivariate polynomials over a word-size prime field: evaluate, compute
-       univariate resultants, interpolate. Asymptotically faster than the
-       subresultant PRS below, which is still ahead at the smallest sizes. */
-    if (ctx->which_ring == GR_CTX_GR_POLY &&
-            POLYNOMIAL_ELEM_CTX(ctx)->which_ring == GR_CTX_NMOD)
-    {
-        const gr_poly_struct * Ax = A;
-        const gr_poly_struct * Bx = B;
-        slong i, blenA = 0, blenB = 0;
-
-        for (i = 0; i < lenA; i++)
-            blenA = FLINT_MAX(blenA, Ax[i].length);
-        for (i = 0; i < lenB; i++)
-            blenB = FLINT_MAX(blenB, Bx[i].length);
-
-        if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB,
-                (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1))
-        {
-            if (_gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
-                return GR_SUCCESS;
-        }
-    }
-
-    /* Bivariate polynomials over Z or Q: reduce to the above modulo several
-       primes and reconstruct. The subresultant PRS below is still faster for
-       small degrees in y, where few primes do not amortise the cost of the
-       modular images, unless the resultant has a large degree in x. */
-    if (ctx->which_ring == GR_CTX_GR_POLY &&
-            (POLYNOMIAL_ELEM_CTX(ctx)->which_ring == GR_CTX_FMPZ ||
-             POLYNOMIAL_ELEM_CTX(ctx)->which_ring == GR_CTX_FMPQ))
-    {
-        const gr_poly_struct * Ax = A;
-        const gr_poly_struct * Bx = B;
-        slong i, blenA = 0, blenB = 0;
-
-        for (i = 0; i < lenA; i++)
-            blenA = FLINT_MAX(blenA, Ax[i].length);
-        for (i = 0; i < lenB; i++)
-            blenB = FLINT_MAX(blenB, Bx[i].length);
-
-        if (FLINT_MIN(lenA, lenB) >= MODULAR_MIN_LENGTH ||
-                (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) >= MODULAR_MIN_DEGREE)
-        {
-            if (_gr_poly_resultant_modular(res, A, lenA, B, lenB, 1, ctx) == GR_SUCCESS)
-                return GR_SUCCESS;
-        }
-    }
+    /* Rings whose elements are themselves polynomials, that is bivariate
+       polynomials, have dense algorithms of their own; the coefficient ring
+       supplies one through its method table when it has one. */
+    if (GR_POLY_RESULTANT_OP(ctx, POLY_RESULTANT)(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
 
     if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_field(ctx) == T_TRUE)
     {

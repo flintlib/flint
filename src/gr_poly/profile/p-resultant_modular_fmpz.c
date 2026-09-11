@@ -106,9 +106,9 @@ int main(void)
                 GR_MUST_SUCCEED(gr_poly_resultant_modular(z, f, g, 0, ctx));
                 TIMEIT_STOP_VALUES(tt, t3);
 
-                // for theoratical purposes, the proved version is used by default
-                // but in practice this test must never fail since the probability 
-                // of failing is bounded above by 2^-50
+                /* the proved version is the default; the heuristic one is
+                   checked against it here, where it can only differ on an
+                   input built against the primes it happens to pick */
                 if (gr_equal(x, y, ctx) == T_FALSE || gr_equal(z, y, ctx) == T_FALSE)
                 {
                     flint_printf("\nFAIL: the algorithms disagree\n");

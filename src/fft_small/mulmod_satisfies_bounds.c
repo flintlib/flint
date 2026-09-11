@@ -217,3 +217,19 @@ Analysis of the truncated reverse butterflies for 50 bit primes
     A bit tedious because there are so many formulas, but we just need make
     sure that output is in the range (-2*n, 2*n) if input is.
 */
+
+int fft_small_prime_supports_depth(ulong n, ulong depth)
+{
+    if (n <= 2 || n > (UWORD(1) << 50))
+        return 0;
+
+    if (!fft_small_mulmod_satisfies_bounds(n))
+        /* should be implied by the 50-bit bound, but just in case */
+        return 0;
+
+    if (depth > SD_FFT_CTX_W2TAB_SIZE)
+        /* unlikely, the transform length would have to be massive */
+        return 0;
+
+    return n_trailing_zeros(n - 1) >= depth;
+}

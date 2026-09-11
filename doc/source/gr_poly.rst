@@ -102,10 +102,10 @@ Memory management
 
 Vectors of polynomials
 -------------------------------------------------------------------------------
- 
+
 .. type:: gr_poly_vec_struct
           gr_poly_vec_t
- 
+
     A resizable vector of :type:`gr_poly_t` elements. Unlike
     :type:`gr_vec_t`, this type stores actual :type:`gr_poly_struct`
     objects, so no polynomial-ring context object is needed: the *ctx* argument
@@ -114,40 +114,40 @@ Vectors of polynomials
     elements of the correct type) and vice versa.
 
 .. function:: void gr_poly_vec_init(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
- 
+
     Initializes *vec* to a vector of length *len* with all entries
     set to the zero polynomial over *ctx*. The length must be nonnegative.
- 
+
 .. function:: void gr_poly_vec_clear(gr_poly_vec_t vec, gr_ctx_t ctx)
- 
+
     Clears the vector *vec*, freeing all allocated memory.
- 
+
 .. function:: gr_poly_struct * gr_poly_vec_entry_ptr(gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
               const gr_poly_struct * gr_poly_vec_entry_srcptr(const gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
- 
+
     Returns a pointer to the *i*-th polynomial in the vector, indexed from zero.
     The index must be in bounds.
- 
+
 .. function:: slong gr_poly_vec_length(const gr_poly_vec_t vec, gr_ctx_t ctx)
- 
+
     Returns the length of the vector.
- 
+
 .. function:: void gr_poly_vec_fit_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
- 
+
     Allocates space for at least *len* elements. This does not change
     the length of the vector.
- 
+
 .. function:: void gr_poly_vec_set_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
- 
+
     Resizes the vector to length *len*, which must be nonnegative.
     The vector will be extended with zero polynomials if necessary.
- 
+
 .. function:: int gr_poly_vec_set(gr_poly_vec_t res, const gr_poly_vec_t src, gr_ctx_t ctx)
- 
+
     Sets *res* to a copy of *src*.
- 
+
 .. function:: int gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx)
- 
+
     Appends the polynomial *f* to the end of the vector.
 
 
@@ -1067,9 +1067,18 @@ of the two polynomials is zero.
     Currently this function handles the cases where `len1 \le 2`
     or `len2 \le 3`.
 
+    The *multipoint* and *modular* versions are specializations for bivariate
+    polynomials, that is for rings whose elements are themselves polynomials.
+    The algorithms live with the dense bivariate types they work on,
+    ``n_bpoly_mod_resultant`` over a word-size prime field and
+    ``fmpz_bpoly_resultant`` over `\mathbb{Z}`; the functions here convert and
+    call those. A coefficient ring supplies such an algorithm to the default
+    version through ``GR_METHOD_POLY_RESULTANT`` in its method table, which
+    the ``fmpz_poly``, ``fmpq_poly`` and ``gr_poly`` base rings do.
+
     The *multipoint* version is a specialization for bivariate polynomials.
-    It evaluates the coefficients of *poly1* and *poly2* at sufficiently 
-    many points, computes the resultants of the resulting univariate 
+    It evaluates the coefficients of *poly1* and *poly2* at sufficiently
+    many points, computes the resultants of the resulting univariate
     polynomials and interpolates the result. When the modulus is "FFT-friendly",
     the multipoint uses DFT instead of geometric multipoint. Both the
     evaluation and the univariate resultants are split over the thread pool
@@ -1077,7 +1086,7 @@ of the two polynomials is zero.
 
     The *modular* version is a specialization for bivariate polynomials over
     `\mathbb{Z}` and `\mathbb{Q}`. It reduces the inputs modulo several word-size
-    primes, calls the ``nmod`` resultant algorithm for each of them, and reconstructs 
+    primes, calls the ``nmod`` resultant algorithm for each of them, and reconstructs
     the result by CRT. If ``proved`` is set to `1`, then sufficiently many primes are used to guarantee the correct result.
     Otherwise, the multimodular strategy stops as soon as the result of the CRT has remained unchanged over a few consecutive primes, which can speed the process up substantially for some input but makes it randomized of Monte Carlo type (with very high probability of success).
 

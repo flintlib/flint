@@ -12,16 +12,20 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "gr_poly.h"
 
 /* random bivariate polynomial of length at most leny in y whose coefficients
-   have length at most lenx in x and entries of at most `bits` bits */
+   have length at most lenx in x and entries of at most `bits` bits. Over
+   Q the entries are given denominators of their own, which the algorithm has
+   to clear before it can work modulo a prime. */
 static int
 _randtest_bivariate_zq(gr_poly_t f, flint_rand_t state, slong leny,
                             slong lenx, flint_bitcnt_t bits,
                             gr_ctx_t ctx, gr_ctx_t cctx)
 {
     int status = GR_SUCCESS;
+    int rational = (cctx->which_ring == GR_CTX_FMPQ);
     gr_poly_t c;
     slong i, k;
 
@@ -34,11 +38,20 @@ _randtest_bivariate_zq(gr_poly_t f, flint_rand_t state, slong leny,
 
         for (k = 0; k < c->length; k++)
         {
-            fmpz_t v;
-            fmpz_init(v);
-            fmpz_randtest(v, state, bits);
-            status |= gr_set_fmpz(GR_ENTRY(c->coeffs, k, cctx->sizeof_elem), v, cctx);
-            fmpz_clear(v);
+            fmpq_t v;
+            fmpq_init(v);
+            fmpz_randtest(fmpq_numref(v), state, bits);
+
+            if (rational && n_randint(state, 2))
+            {
+                fmpz_randtest_not_zero(fmpq_denref(v), state,
+                                       1 + n_randint(state, 1 + bits));
+                fmpz_abs(fmpq_denref(v), fmpq_denref(v));
+                fmpq_canonicalise(v);
+            }
+
+            status |= gr_set_fmpq(GR_ENTRY(c->coeffs, k, cctx->sizeof_elem), v, cctx);
+            fmpq_clear(v);
         }
 
         _gr_poly_normalise(c, cctx);
@@ -81,6 +94,7 @@ _bivariate_mul_content_zq(gr_poly_t f, const gr_poly_t c,
 TEST_FUNCTION_START(gr_poly_resultant_modular, state)
 {
     slong iter;
+    slong save_threads = flint_get_num_threads();
 
     /* Compare with the division-free Sylvester determinant over Z[x][y] and
        Q[x][y]. The inputs are also given common factors and contents, which
@@ -287,6 +301,80 @@ TEST_FUNCTION_START(gr_poly_resultant_modular, state)
         gr_ctx_clear(ctx);
         gr_ctx_clear(cctx);
     }
+
+    /* Degrees in x large enough that the images are taken at primes
+       p = m 2^k + 1, admitting a DFT, rather than at unconstrained ones: that
+       branch needs a resultant of at least a couple of thousand points, which
+       none of the loops above reaches. The proved and the heuristic settings
+       must agree with each other, and both with the multiplicativity of the
+       resultant in its first argument. */
+    for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t cctx, ctx;
+        gr_poly_t f, fh, g, h;
+        gr_ptr x, y, z, yz, w;
+        int status = GR_SUCCESS;
+
+        flint_set_num_threads(1 + n_randint(state, 8));
+
+        if (n_randint(state, 2))
+            gr_ctx_init_fmpq(cctx);
+        else
+            gr_ctx_init_fmpz(cctx);
+
+        gr_ctx_init_gr_poly(ctx, cctx);
+
+        gr_poly_init(f, ctx);
+        gr_poly_init(fh, ctx);
+        gr_poly_init(g, ctx);
+        gr_poly_init(h, ctx);
+        x = gr_heap_init(ctx);
+        y = gr_heap_init(ctx);
+        z = gr_heap_init(ctx);
+        yz = gr_heap_init(ctx);
+        w = gr_heap_init(ctx);
+
+        /* 2 (leny - 1) (lenx - 1) + 1 points, which is above the cutoff, and
+           leny^2 above the one that sends the images to the multipoint
+           algorithm in the first place */
+        status |= _randtest_bivariate_zq(f, state, 6, 250, 8, ctx, cctx);
+        status |= _randtest_bivariate_zq(g, state, 6, 250, 8, ctx, cctx);
+        status |= _randtest_bivariate_zq(h, state, 3, 250, 8, ctx, cctx);
+
+        status |= gr_poly_mul(fh, f, h, ctx);
+
+        status |= gr_poly_resultant_modular(x, fh, g, 1, ctx);
+        status |= gr_poly_resultant_modular(w, fh, g, 0, ctx);
+        status |= gr_poly_resultant_modular(y, f, g, 1, ctx);
+        status |= gr_poly_resultant_modular(z, h, g, 1, ctx);
+        status |= gr_mul(yz, y, z, ctx);
+
+        if (status == GR_SUCCESS &&
+            (gr_equal(x, yz, ctx) == T_FALSE || gr_equal(x, w, ctx) == T_FALSE))
+        {
+            flint_printf("FAIL (res(f h, g) == res(f, g) res(h, g), DFT primes):\n");
+            gr_ctx_println(ctx);
+            flint_printf("proved    = "); gr_println(x, ctx);
+            flint_printf("heuristic = "); gr_println(w, ctx);
+            flint_printf("product   = "); gr_println(yz, ctx);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        gr_poly_clear(f, ctx);
+        gr_poly_clear(fh, ctx);
+        gr_poly_clear(g, ctx);
+        gr_poly_clear(h, ctx);
+        gr_heap_clear(x, ctx);
+        gr_heap_clear(y, ctx);
+        gr_heap_clear(z, ctx);
+        gr_heap_clear(yz, ctx);
+        gr_heap_clear(w, ctx);
+        gr_ctx_clear(ctx);
+        gr_ctx_clear(cctx);
+    }
+
+    flint_set_num_threads(save_threads);
 
     TEST_FUNCTION_END(state);
 }
