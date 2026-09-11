@@ -45,6 +45,12 @@ extern "C" {
    documented in machine_vectors.h */
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
+/* Whether a transform of the given depth can be run directly modulo n,
+   rather than through several of the fixed primes: n has to be small enough
+   for the double arithmetic, and n - 1 divisible by 2^depth for a primitive
+   root of that order to exist. Primality of n is assumed, not checked. */
+int fft_small_prime_supports_depth(ulong n, ulong depth);
+
 FLINT_FORCE_INLINE ulong n_pow2(int k)
 {
     return UWORD(1) << k;

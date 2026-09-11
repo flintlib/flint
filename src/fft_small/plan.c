@@ -328,21 +328,10 @@ _nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
     if (bn < 1500)
         return 0;
 
-    if (mod.n <= 2 || mod.n > (UWORD(1) << 50))
-        return 0;
-
     if (NMOD_BITS(mod) < 20)
         return 0;
 
-    if (!fft_small_mulmod_satisfies_bounds(mod.n))
-        /* should be implied by the 50-bit bound, but just in case */
-        return 0;
-
-    if (depth > SD_FFT_CTX_W2TAB_SIZE)
-        /* unlikely, the convolution length would have to be massive */
-        return 0;
-
-    if (n_trailing_zeros(mod.n - 1) < depth)
+    if (!fft_small_prime_supports_depth(mod.n, depth))
         return 0;
 
     return n_is_prime(mod.n); /* check the most expensive condition last */

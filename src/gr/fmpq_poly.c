@@ -15,6 +15,9 @@
 #include "fmpq.h"
 #include "fmpq_vec.h"
 #include "fmpq_poly.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
 #include "gr.h"
 #include "gr/impl.h"
 #include "gr_poly.h"
@@ -723,8 +726,109 @@ int _fmpq_poly_methods_initialized = 0;
 
 gr_static_method_table _fmpq_poly_methods;
 
+
+/* Tuning, as in the polynomial base ring. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
+/* res_y(A, B) for bivariate A and B, the coefficients in y being elements of
+   this ring. An fmpq_poly keeps one denominator for the whole polynomial, so
+   the coefficients are cleared of theirs before the dense bivariate algorithm
+   over Z is applied: with A = Az / da and B = Bz / db,
+
+     res(A, B) = res(Az, Bz) / (da^deg_y(B) db^deg_y(A)). */
+static int
+_gr_fmpq_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
+                                gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    const fmpq_poly_struct * Ax = A;
+    const fmpq_poly_struct * Bx = B;
+    fmpz_bpoly_t Ab, Bb;
+    fmpz_poly_t R;
+    fmpz_t da, db, t;
+    slong i, blenA = 0, blenB = 0, npoints;
+    int success;
+
+    if (lenB < 1)
+        return GR_UNABLE;
+
+    for (i = 0; i < lenA; i++)
+        blenA = FLINT_MAX(blenA, Ax[i].length);
+    for (i = 0; i < lenB; i++)
+        blenB = FLINT_MAX(blenB, Bx[i].length);
+
+    if (blenA == 0 || blenB == 0)
+        return GR_UNABLE;
+
+    npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
+
+    if (FLINT_MIN(lenA, lenB) < MODULAR_MIN_LENGTH &&
+            npoints - 1 < MODULAR_MIN_DEGREE)
+        return GR_UNABLE;
+
+    fmpz_init_set_ui(da, 1);
+    fmpz_init_set_ui(db, 1);
+    fmpz_init(t);
+
+    for (i = 0; i < lenA; i++)
+        fmpz_lcm(da, da, fmpq_poly_denref(Ax + i));
+    for (i = 0; i < lenB; i++)
+        fmpz_lcm(db, db, fmpq_poly_denref(Bx + i));
+
+    fmpz_bpoly_init(Ab);
+    fmpz_bpoly_init(Bb);
+    fmpz_poly_init(R);
+
+    fmpz_bpoly_fit_length(Ab, lenA);
+    for (i = 0; i < lenA; i++)
+    {
+        fmpz_divexact(t, da, fmpq_poly_denref(Ax + i));
+        fmpz_poly_fit_length(Ab->coeffs + i, Ax[i].length);
+        _fmpz_vec_scalar_mul_fmpz(Ab->coeffs[i].coeffs, Ax[i].coeffs,
+                                  Ax[i].length, t);
+        _fmpz_poly_set_length(Ab->coeffs + i, Ax[i].length);
+        _fmpz_poly_normalise(Ab->coeffs + i);
+    }
+    Ab->length = lenA;
+
+    fmpz_bpoly_fit_length(Bb, lenB);
+    for (i = 0; i < lenB; i++)
+    {
+        fmpz_divexact(t, db, fmpq_poly_denref(Bx + i));
+        fmpz_poly_fit_length(Bb->coeffs + i, Bx[i].length);
+        _fmpz_vec_scalar_mul_fmpz(Bb->coeffs[i].coeffs, Bx[i].coeffs,
+                                  Bx[i].length, t);
+        _fmpz_poly_set_length(Bb->coeffs + i, Bx[i].length);
+        _fmpz_poly_normalise(Bb->coeffs + i);
+    }
+    Bb->length = lenB;
+
+    success = fmpz_bpoly_resultant(R, Ab, Bb, 1);
+
+    if (success)
+    {
+        fmpz_pow_ui(da, da, lenB - 1);
+        fmpz_pow_ui(db, db, lenA - 1);
+        fmpz_mul(da, da, db);
+
+        fmpq_poly_set_fmpz_poly((fmpq_poly_struct *) res, R);
+        fmpq_poly_scalar_div_fmpz((fmpq_poly_struct *) res,
+                                  (fmpq_poly_struct *) res, da);
+    }
+
+    fmpz_poly_clear(R);
+    fmpz_bpoly_clear(Ab);
+    fmpz_bpoly_clear(Bb);
+    fmpz_clear(da);
+    fmpz_clear(db);
+    fmpz_clear(t);
+
+    return success ? GR_SUCCESS : GR_UNABLE;
+}
+
 gr_method_tab_input _fmpq_poly_methods_input[] =
 {
+    {GR_METHOD_POLY_RESULTANT,  (gr_funcptr) _gr_fmpq_poly_gr_poly_resultant},
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpq_poly_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpq_poly_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},

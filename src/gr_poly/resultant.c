@@ -20,11 +20,23 @@
 #define HGCD_CUTOFF 200
 #define HGCD_INNER_CUTOFF 100
 
+/* Tuning for the multimodular algorithm over bivariate polynomial rings over
+   Z and Q: it is used when the degree in y of the smaller input, or the degree
+   in x of the resultant, reaches these values. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
 int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
 
     if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    /* Rings whose elements are themselves polynomials, that is bivariate
+       polynomials, have dense algorithms of their own; the coefficient ring
+       supplies one through its method table when it has one. */
+    if (GR_POLY_RESULTANT_OP(ctx, POLY_RESULTANT)(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
         return GR_SUCCESS;
 
     if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_field(ctx) == T_TRUE)

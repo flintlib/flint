@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
@@ -838,6 +839,58 @@ int _fmpz_poly_methods_initialized = 0;
 
 gr_static_method_table _fmpz_poly_methods;
 
+
+/* Tuning, as in the polynomial base ring: the multimodular algorithm is used
+   from the degree in y of the smaller input, or the degree in x of the
+   resultant, upwards. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
+/* res_y(A, B) for bivariate A and B, the coefficients in y being elements of
+   this ring. An array of fmpz_poly_struct is what an fmpz_bpoly holds, so the
+   inputs go to the dense bivariate algorithm as they are. */
+static int
+_gr_fmpz_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
+                                gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    const fmpz_poly_struct * Ax = A;
+    const fmpz_poly_struct * Bx = B;
+    fmpz_bpoly_struct Ab, Bb;
+    slong i, blenA = 0, blenB = 0, npoints;
+
+    if (lenB < 1)
+        return GR_UNABLE;
+
+    for (i = 0; i < lenA; i++)
+        blenA = FLINT_MAX(blenA, Ax[i].length);
+    for (i = 0; i < lenB; i++)
+        blenB = FLINT_MAX(blenB, Bx[i].length);
+
+    if (blenA == 0 || blenB == 0)
+        return GR_UNABLE;
+
+    npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
+
+    if (FLINT_MIN(lenA, lenB) < MODULAR_MIN_LENGTH &&
+            npoints - 1 < MODULAR_MIN_DEGREE)
+        return GR_UNABLE;
+
+    /* the front door copies, the algorithm removing the contents of what it
+       is given */
+    Ab.coeffs = (fmpz_poly_struct *) Ax;
+    Ab.alloc = lenA;
+    Ab.length = lenA;
+
+    Bb.coeffs = (fmpz_poly_struct *) Bx;
+    Bb.alloc = lenB;
+    Bb.length = lenB;
+
+    if (!fmpz_bpoly_resultant((fmpz_poly_struct *) res, &Ab, &Bb, 1))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
 gr_method_tab_input _fmpz_poly_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpz_poly_ctx_clear},
@@ -930,6 +983,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mullow},
+    {GR_METHOD_POLY_RESULTANT,  (gr_funcptr) _gr_fmpz_poly_gr_poly_resultant},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mulmid},
     {0,                         (gr_funcptr) NULL},
 };

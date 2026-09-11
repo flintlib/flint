@@ -77,6 +77,8 @@
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
+#include "t-resultant_modular.c"
+#include "t-resultant_multipoint.c"
 #include "t-resultant_subresultant.c"
 #include "t-resultant_sylvester.c"
 #include "t-revert_series.c"
@@ -170,6 +172,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
+    TEST_FUNCTION(gr_poly_resultant_modular),
+    TEST_FUNCTION(gr_poly_resultant_multipoint),
     TEST_FUNCTION(gr_poly_resultant_subresultant),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
     TEST_FUNCTION(gr_poly_revert_series),

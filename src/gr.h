@@ -686,6 +686,7 @@ typedef enum
     GR_METHOD_POLY_FACTOR,
     GR_METHOD_POLY_ROOTS,
     GR_METHOD_POLY_ROOTS_OTHER,
+    GR_METHOD_POLY_RESULTANT,
 
     /* Matrix methods (todo: rename -> GR_MAT) */
     GR_METHOD_MAT_MUL,
@@ -918,6 +919,7 @@ typedef int ((*gr_method_get_gr_poly_window_op)(gr_ptr, gr_srcptr, slong, slong,
 typedef int ((*gr_method_poly_binary_trunc2_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_gcd_op)(gr_ptr, slong *, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_resultant_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
 typedef slong ((*_gr_method_get_si_op)(gr_srcptr, gr_ctx_ptr));
 
@@ -1028,6 +1030,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_RESULTANT_OP(ctx, NAME) (((gr_method_poly_resultant_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define _GR_GET_SI_OP(ctx, NAME) (((_gr_method_get_si_op *) ctx->methods)[_GR_METHOD_ ## NAME])
 #ifdef FEXPR_H

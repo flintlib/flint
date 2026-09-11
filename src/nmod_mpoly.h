@@ -905,6 +905,21 @@ int nmod_mpoly_resultant(nmod_mpoly_t R,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                     slong var, const nmod_mpoly_ctx_t ctx);
 
+/* res_y(A, B) for dense bivariate A, B over a word-size prime field, by
+   evaluation at a geometric progression or at roots of unity, resultants of
+   the univariate specialisations, and interpolation. The modulus must be
+   prime. Returns 0, leaving res untouched, when the field is too small for
+   the required number of points. */
+int _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * A, slong lenA,
+                        const n_poly_struct * B, slong lenB, nmod_t mod);
+
+int n_bpoly_mod_resultant(n_poly_t res, const n_bpoly_t A, const n_bpoly_t B,
+                                                               nmod_t mod);
+
+/* Whether the algorithm above is expected to beat the subresultant PRS at
+   these sizes, npoints being the bound on the degree in x of the resultant. */
+int n_bpoly_mod_resultant_cutoff(slong lenA, slong lenB, slong npoints);
+
 int nmod_mpoly_discriminant(nmod_mpoly_t R,
           const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx);
 
