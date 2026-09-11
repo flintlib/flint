@@ -113,7 +113,7 @@ _gr_poly_preinv_compose_mod_brent_kung_vec(gr_poly_struct * res,
         args.ctx = ctx;
         args.status = flint_calloc(l, sizeof(int));
 
-        if (l > 1 && n > GR_POLY_FACTOR_THREADED_CUTOFF && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
+        if (l > 1 && n > gr_poly_factor_threaded_cutoff && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
             flint_parallel_do(_vec_eval_worker, &args, l, -1, FLINT_PARALLEL_UNIFORM);
         else
             for (j = 0; j < l; j++)

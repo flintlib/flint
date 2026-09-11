@@ -22,6 +22,8 @@
 #include "gr_poly.h"
 #include "factor_impl.h"
 
+FLINT_DLL slong gr_poly_factor_threaded_cutoff = GR_POLY_FACTOR_THREADED_CUTOFF;
+
 /* Should we compute iterated Frobenius powers x^(q^i) mod v using modular
    composition with a precomputed matrix (cost: ~ n^2 + 2 sqrt(n) mulmods
    per step) rather than by repeated exponentiation (cost: ~ log2(q) mulmods
@@ -675,7 +677,7 @@ gr_poly_factor_distinct_deg(gr_poly_vec_t fac, fmpz_vec_t degs,
     status |= gr_poly_preinv_powmod_x_fmpz(frob, q, P, ctx);
     GR_POLY_FACTOR_CHECK_STATUS()
 
-    if (v->length > GR_POLY_FACTOR_THREADED_CUTOFF && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
+    if (v->length > gr_poly_factor_threaded_cutoff && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
         status |= _gr_poly_factor_distinct_deg_with_frob_threaded(fac, degs, v, P, frob, q, ctx);
     else
         status |= _gr_poly_factor_distinct_deg_with_frob(fac, degs, v, P, frob, q, ctx);

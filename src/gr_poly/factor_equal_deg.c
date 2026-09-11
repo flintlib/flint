@@ -783,13 +783,21 @@ _gr_poly_factor_equal_deg_with_frob(gr_poly_vec_t res, const gr_poly_t ff,
         slong Qlen = Q->f->length;
         slong nthreads = flint_get_num_available_threads();
         slong np = FLINT_MIN(Qlen, nthreads);
+        slong work = 0;
+        slong i;
 
-        if (np > 1 && Q->f->entries[Qlen - 1].length > GR_POLY_FACTOR_THREADED_CUTOFF && gr_ctx_is_threadsafe(ctx) == T_TRUE)
+        /* total work in the pieces that would be processed in parallel;
+           the pieces are generally of different sizes, so looking at the
+           top piece alone is not meaningful */
+        for (i = 0; i < np; i++)
+            work += Q->f->entries[Qlen - 1 - i].length - 1;
+
+        if (np > 1 && work > gr_poly_factor_threaded_cutoff && gr_ctx_is_threadsafe(ctx) == T_TRUE)
         {
             /* process the np pieces on top of the stack in parallel,
                each worker splitting its piece into its own output */
             edf_piece_args_t args;
-            slong i, j;
+            slong j;
 
             args.pieces = flint_malloc(np * sizeof(gr_poly_struct));
             args.xps = flint_malloc(np * sizeof(gr_poly_struct));

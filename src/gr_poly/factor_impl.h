@@ -45,8 +45,14 @@ _gr_poly_factor_ff_info(fmpz_t q, fmpz_t p, slong * d, gr_ctx_t ctx)
 /* Polynomials of length at most this are factored serially even when
    threads are available: below it, the cost of waking the threads
    exceeds the parallel work (measured with nmod, 8 threads: parallel
-   sections help from degree ~300 on). */
-#define GR_POLY_FACTOR_THREADED_CUTOFF 200
+   sections help from degree ~300 on). The variable is provided so
+   that the test code can exercise the parallel code paths with small
+   inputs. */
+#ifndef GR_POLY_FACTOR_THREADED_CUTOFF
+# define GR_POLY_FACTOR_THREADED_CUTOFF 200
+#endif
+
+FLINT_DLL extern slong gr_poly_factor_threaded_cutoff;
 
 /* Helper for functions computing a factorization of a monic polynomial:
    abort with GR_UNABLE if the status is not GR_SUCCESS or if the leading

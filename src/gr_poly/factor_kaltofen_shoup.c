@@ -72,7 +72,7 @@ gr_poly_factor_kaltofen_shoup(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp,
 
         gr_poly_vec_set_length(dd, 0, ctx);
         fmpz_vec_set_length(degs, 0);
-        if (f->length > GR_POLY_FACTOR_THREADED_CUTOFF && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
+        if (f->length > gr_poly_factor_threaded_cutoff && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
             status |= _gr_poly_factor_distinct_deg_with_frob_threaded(dd, degs, f, P, frob, q, ctx);
         else
             status |= _gr_poly_factor_distinct_deg_with_frob(dd, degs, f, P, frob, q, ctx);
