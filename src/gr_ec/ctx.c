@@ -12,22 +12,30 @@
 #include <stdio.h>
 #include "gr.h"
 #include "gr_ec.h"
+#include "impl.h"
 
 static void
 _gr_ec_ctx_alloc(gr_ec_ctx_t ctx, gr_ctx_t base_ring)
 {
-    ctx->base_ring = base_ring;
-    ctx->coeffs = flint_malloc(GR_EC_CTX_NUM_COEFFS * base_ring->sizeof_elem);
-    _gr_vec_init(ctx->coeffs, GR_EC_CTX_NUM_COEFFS, base_ring);
-    ctx->model = GR_EC_LONG_WEIERSTRASS;
+    ctx->which_ring = GR_CTX_GR_EC;
+    ctx->size_limit = WORD_MAX;
+
+    GR_EC_CTX(ctx)->base_ring = base_ring;
+    GR_EC_CTX(ctx)->coeffs = flint_malloc(GR_EC_CTX_NUM_COEFFS * base_ring->sizeof_elem);
+    _gr_vec_init(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, base_ring);
+    GR_EC_CTX(ctx)->model = GR_EC_LONG_WEIERSTRASS;
+
+    /* Projective points are the representation that works over any
+       commutative ring; gr_ctx_init_gr_ec overrides this. */
+    _gr_ec_ctx_init_methods(ctx, GR_EC_REPR_PROJECTIVE);
 }
 
 void
 gr_ec_ctx_clear(gr_ec_ctx_t ctx)
 {
-    _gr_vec_clear(ctx->coeffs, GR_EC_CTX_NUM_COEFFS, GR_EC_ELEM_CTX(ctx));
-    flint_free(ctx->coeffs);
-    ctx->coeffs = NULL;
+    _gr_vec_clear(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, GR_EC_ELEM_CTX(ctx));
+    flint_free(GR_EC_CTX(ctx)->coeffs);
+    GR_EC_CTX(ctx)->coeffs = NULL;
 }
 
 /* b-invariants, discriminant and model, from the a-invariants */
@@ -96,9 +104,9 @@ _gr_ec_ctx_derive(gr_ec_ctx_t ctx)
     {
         if (gr_is_zero(a1, R) == T_TRUE && gr_is_zero(a2, R) == T_TRUE
                 && gr_is_zero(a3, R) == T_TRUE)
-            ctx->model = GR_EC_SHORT_WEIERSTRASS;
+            GR_EC_CTX(ctx)->model = GR_EC_SHORT_WEIERSTRASS;
         else
-            ctx->model = GR_EC_LONG_WEIERSTRASS;
+            GR_EC_CTX(ctx)->model = GR_EC_LONG_WEIERSTRASS;
     }
 
     return status;

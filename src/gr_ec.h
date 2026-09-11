@@ -35,7 +35,28 @@ typedef enum
 }
 gr_ec_model_t;
 
-/* Context object (the curve) */
+/* Point representations */
+
+typedef enum
+{
+    GR_EC_REPR_PROJECTIVE,
+    GR_EC_REPR_AFFINE,
+    GR_EC_REPR_JACOBIAN,
+
+    GR_EC_NUM_REPRS
+}
+gr_ec_repr_t;
+
+/* Context object (the curve)
+
+   A curve is a gr domain, so gr_ec_ctx_t is gr_ctx_t and the curve data is
+   stored inline in the context. The representation selects which of the
+   three point types the generic interface operates on; the gr_ec_point_*,
+   gr_ec_aff_point_* and gr_ec_jac_point_* families work on any context. */
+
+typedef gr_ctx_struct gr_ec_ctx_struct;
+
+typedef gr_ec_ctx_struct gr_ec_ctx_t[1];
 
 typedef struct
 {
@@ -43,17 +64,18 @@ typedef struct
     /* a1, a2, a3, a4, a6, b2, b4, b6, b8, disc */
     gr_ptr coeffs;
     gr_ec_model_t model;
+    gr_ec_repr_t repr;
 }
-gr_ec_ctx_struct;
-
-typedef gr_ec_ctx_struct gr_ec_ctx_t[1];
+_gr_ec_ctx_struct;
 
 #define GR_EC_CTX_NUM_COEFFS 10
 
-#define GR_EC_ELEM_CTX(ctx) ((ctx)->base_ring)
+#define GR_EC_CTX(ctx) ((_gr_ec_ctx_struct *) (ctx))
+#define GR_EC_ELEM_CTX(ctx) (GR_EC_CTX(ctx)->base_ring)
+/* size of a base ring element, not of a point */
 #define GR_EC_SIZEOF_ELEM(ctx) (GR_EC_ELEM_CTX(ctx)->sizeof_elem)
 
-#define GR_EC_COEFF(ctx, i) GR_ENTRY((ctx)->coeffs, i, GR_EC_SIZEOF_ELEM(ctx))
+#define GR_EC_COEFF(ctx, i) GR_ENTRY(GR_EC_CTX(ctx)->coeffs, i, GR_EC_SIZEOF_ELEM(ctx))
 
 #define GR_EC_A1(ctx) GR_EC_COEFF(ctx, 0)
 #define GR_EC_A2(ctx) GR_EC_COEFF(ctx, 1)
@@ -117,6 +139,10 @@ WARN_UNUSED_RESULT int gr_ec_ctx_init_short_weierstrass(gr_ec_ctx_t ctx, gr_ctx_
 WARN_UNUSED_RESULT int gr_ec_ctx_init_short_weierstrass_si(gr_ec_ctx_t ctx, gr_ctx_t base_ring, slong a4, slong a6);
 WARN_UNUSED_RESULT int gr_ec_ctx_init_randtest(gr_ec_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring);
 
+WARN_UNUSED_RESULT int gr_ctx_init_gr_ec(gr_ctx_t ctx, gr_ctx_t base_ring, gr_srcptr a1, gr_srcptr a2, gr_srcptr a3, gr_srcptr a4, gr_srcptr a6, gr_ec_repr_t repr);
+
+WARN_UNUSED_RESULT int gr_ec_ctx_set_repr(gr_ec_ctx_t ctx, gr_ec_repr_t repr);
+
 void gr_ec_ctx_clear(gr_ec_ctx_t ctx);
 
 GR_EC_INLINE gr_ctx_struct * gr_ec_ctx_base_ring(gr_ec_ctx_t ctx)
@@ -126,7 +152,12 @@ GR_EC_INLINE gr_ctx_struct * gr_ec_ctx_base_ring(gr_ec_ctx_t ctx)
 
 GR_EC_INLINE gr_ec_model_t gr_ec_ctx_model(gr_ec_ctx_t ctx)
 {
-    return ctx->model;
+    return GR_EC_CTX(ctx)->model;
+}
+
+GR_EC_INLINE gr_ec_repr_t gr_ec_ctx_repr(gr_ec_ctx_t ctx)
+{
+    return GR_EC_CTX(ctx)->repr;
 }
 
 GR_EC_INLINE truth_t gr_ec_ctx_is_over_field(gr_ec_ctx_t ctx)
@@ -222,6 +253,8 @@ WARN_UNUSED_RESULT int gr_ec_point_dbl(gr_ec_point_t res, const gr_ec_point_t P,
 WARN_UNUSED_RESULT int gr_ec_point_mul_ui(gr_ec_point_t res, const gr_ec_point_t P, ulong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_point_mul_si(gr_ec_point_t res, const gr_ec_point_t P, slong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_point_mul_fmpz(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_point_mul_2exp_si(gr_ec_point_t res, const gr_ec_point_t P, slong k, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_point_mul_2exp_fmpz(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t k, gr_ec_ctx_t ctx);
 
 /*
     Affine points
@@ -289,6 +322,8 @@ WARN_UNUSED_RESULT int gr_ec_aff_point_dbl(gr_ec_aff_point_t res, const gr_ec_af
 WARN_UNUSED_RESULT int gr_ec_aff_point_mul_ui(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, ulong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_aff_point_mul_si(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, slong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_aff_point_mul_fmpz(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_aff_point_mul_2exp_si(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, slong k, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_aff_point_mul_2exp_fmpz(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t k, gr_ec_ctx_t ctx);
 
 /*
     Jacobian points
@@ -360,6 +395,8 @@ WARN_UNUSED_RESULT int gr_ec_jac_point_sub_aff_point(gr_ec_jac_point_t res, cons
 WARN_UNUSED_RESULT int gr_ec_jac_point_mul_ui(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, ulong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_jac_point_mul_si(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, slong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_jac_point_mul_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_jac_point_mul_2exp_si(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, slong k, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_jac_point_mul_2exp_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t k, gr_ec_ctx_t ctx);
 
 /* Conversions between representations */
 

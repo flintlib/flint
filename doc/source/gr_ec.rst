@@ -23,6 +23,10 @@ Points of `E` are represented by one of three types --
 Each type has its own set of arithmetic functions, and conversions between
 the three are provided.
 
+A curve is also a :type:`gr_ctx_t` domain, so the group of points can be
+used through the generic interface; see
+:ref:`the section on the generic interface <gr-ec-generic>`.
+
 .. _gr-ec-models:
 
 Curve models
@@ -113,6 +117,18 @@ machine word per point. Jacobian coordinates give the cheapest doubling of
 the three representations, which is what makes them the representation of
 choice for scalar multiplication.
 
+.. type:: gr_ec_repr_t
+
+    Names a representation, for the constructors that take one:
+
+    .. macro:: GR_EC_REPR_PROJECTIVE
+               GR_EC_REPR_AFFINE
+               GR_EC_REPR_JACOBIAN
+
+    This only selects the element type used by the generic interface. The
+    ``gr_ec_point_*``, ``gr_ec_aff_point_*`` and ``gr_ec_jac_point_*``
+    families work on any context, whatever its representation.
+
 The infinity flag
 ...............................................................................
 
@@ -140,6 +156,57 @@ guaranteed only when the base ring is an integral domain. Over a general
 commutative ring they are only necessary conditions for the two representations 
 to define the same point, and the result should be interpreted accordingly. 
 
+.. _gr-ec-generic:
+
+Generic interface
+-------------------------------------------------------------------------------
+
+:type:`gr_ec_ctx_t` is a :type:`gr_ctx_t`, so a curve is a domain of the
+generic interface and points of `E` are its elements. The domain is the
+abelian group `E(R)`, not a ring, and it reports
+:func:`gr_ctx_is_ring` as ``T_FALSE``.
+
+What is available is the group structure: :func:`gr_init`, :func:`gr_clear`,
+:func:`gr_swap`, :func:`gr_set`, :func:`gr_equal`, :func:`gr_randtest`,
+:func:`gr_write`, :func:`gr_zero`, :func:`gr_is_zero`, :func:`gr_neg`,
+:func:`gr_add` and :func:`gr_sub`, together with the `\mathbb{Z}`-module
+scalar multiplication `n \cdot P`: :func:`gr_mul_ui`, :func:`gr_mul_si`,
+:func:`gr_mul_fmpz`, :func:`gr_mul_two` (the doubling) and
+:func:`gr_mul_2exp_si` / :func:`gr_mul_2exp_fmpz` (`2^k P`). That is the same
+thing those methods mean in a ring, where `x \cdot (n \cdot 1)` is `x` added to
+itself `n` times.
+
+:func:`gr_mul_2exp_si` and :func:`gr_mul_2exp_fmpz` return ``GR_DOMAIN`` for a
+negative exponent, for the same reason as :func:`gr_mul_fmpq` below.
+
+The group axioms hold when the base ring is an integral domain. Over a ring
+with zero divisors the operations are still available -- that is what
+elliptic curve factorization needs -- but adding two points can produce a
+projective triple whose `Z` is a zero divisor, which is neither an affine
+point nor `\mathcal{O}`, and nothing the addition law says about it is
+meaningful. Do not expect associativity there.
+
+The ring operations have no meaning on a curve and return ``GR_DOMAIN``
+rather than ``GR_UNABLE``, so that a caller can tell "there is no such
+thing here" from "I could not compute it": :func:`gr_mul`, :func:`gr_sqr`,
+:func:`gr_div`, :func:`gr_inv`, :func:`gr_pow_ui`, :func:`gr_pow_si`,
+:func:`gr_pow_fmpz`, :func:`gr_one`, :func:`gr_neg_one`, :func:`gr_set_ui`,
+:func:`gr_set_si`, :func:`gr_set_fmpz`, :func:`gr_set_fmpq`,
+:func:`gr_set_str` and :func:`gr_mul_fmpq`.
+
+:func:`gr_mul_fmpq` is excluded even though division by `n` is a real
+operation on a curve: computing it needs division polynomials, and it has
+`n^2` answers rather than one.
+
+Since no integer can be read as a point, the only way to build a specific
+point is through the module's own functions --
+:func:`gr_ec_point_set_affine`, :func:`gr_ec_point_lift_x` and their
+counterparts for the other two representations.
+
+A curve can be created either with :func:`gr_ctx_init_gr_ec`, which takes
+the representation as an argument, or with any of the ``gr_ec_ctx_init*``
+functions below, which leave it at :macro:`GR_EC_REPR_PROJECTIVE`.
+
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -147,11 +214,17 @@ Types, macros and constants
 
 .. type:: gr_ec_ctx_t
 
-    Contains a pointer to the base ring (``base_ring``), a pointer to an
-    array of :macro:`GR_EC_CTX_NUM_COEFFS` elements of the base ring
+    A curve, which is a :type:`gr_ctx_t` domain. The curve data is stored
+    inline in the context and is reached through :macro:`GR_EC_CTX`.
+
+.. type:: _gr_ec_ctx_struct
+
+    The curve data: a pointer to the base ring (``base_ring``), a pointer
+    to an array of :macro:`GR_EC_CTX_NUM_COEFFS` elements of the base ring
     (``coeffs``) holding the invariants
     `a_1, a_2, a_3, a_4, a_6, b_2, b_4, b_6, b_8, \Delta` of the curve,
-    and the model of the curve (``model``).
+    the model of the curve (``model``) and the representation used by the
+    generic interface (``repr``).
 
 .. type:: gr_ec_point_struct
 
@@ -187,11 +260,16 @@ Types, macros and constants
     The maximum number of base ring elements cached in a context object, currently
     10.
 
+.. macro:: GR_EC_CTX(ctx)
+
+    The curve data of *ctx*, as a ``_gr_ec_ctx_struct *``.
+
 .. macro:: GR_EC_ELEM_CTX(ctx)
            GR_EC_SIZEOF_ELEM(ctx)
 
     The base ring of *ctx*, respectively the size in bytes of an element of
-    that ring.
+    that ring. Note that ``ctx->sizeof_elem`` is instead the size of a
+    point.
 
 .. macro:: GR_EC_COEFF(ctx, i)
 
@@ -279,7 +357,7 @@ Context object methods
 .. function:: void gr_ec_ctx_clear(gr_ec_ctx_t ctx)
 
     Clears the context object *ctx*, freeing the cached invariants.
-    The base ring is not cleared.
+    The base ring is not cleared. :func:`gr_ctx_clear` does the same thing.
 
 .. function:: gr_ctx_struct * gr_ec_ctx_base_ring(gr_ec_ctx_t ctx)
 
@@ -288,6 +366,20 @@ Context object methods
 .. function:: gr_ec_model_t gr_ec_ctx_model(gr_ec_ctx_t ctx)
 
     Returns the model of the curve *ctx*.
+
+.. function:: gr_ec_repr_t gr_ec_ctx_repr(gr_ec_ctx_t ctx)
+
+    Returns the representation that the generic interface uses for points
+    of *ctx*. The ``gr_ec_ctx_init*`` functions leave it at
+    :macro:`GR_EC_REPR_PROJECTIVE`.
+
+.. function:: int gr_ec_ctx_set_repr(gr_ec_ctx_t ctx, gr_ec_repr_t repr)
+
+    Sets the representation that the generic interface uses for points of
+    *ctx*. This changes the size of an element, so it must be called before
+    any point of *ctx* is initialized. Returns ``GR_DOMAIN`` if *repr* is
+    not a valid representation, or if it is :macro:`GR_EC_REPR_AFFINE` and
+    the base ring is provably not a field.
 
 .. function:: truth_t gr_ec_ctx_is_over_field(gr_ec_ctx_t ctx)
 
@@ -533,6 +625,17 @@ The functions in this section implement the group law of the curve.
     The work is done in Jacobian coordinates, where the ladder needs no
     inversion and the conversions in and out are inversion-free.
 
+.. function:: int gr_ec_point_mul_2exp_si(gr_ec_point_t res, const gr_ec_point_t P, slong k, gr_ec_ctx_t ctx)
+              int gr_ec_point_mul_2exp_fmpz(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t k, gr_ec_ctx_t ctx)
+
+    Sets *res* to `2^k P`, by *k* doublings.
+
+    Returns ``GR_DOMAIN`` if *k* is negative: halving a point is a real
+    operation on a curve, but a point has up to four halves, so it is not
+    a function. The ``fmpz`` version returns ``GR_UNABLE`` if *k* is too
+    large to iterate over, unless *P* is the point at infinity, which is
+    fixed by doubling.
+
 Affine points
 -------------------------------------------------------------------------------
 
@@ -645,6 +748,18 @@ affine point does not exist.
     These convert *P* to Jacobian coordinates, run the scalar
     multiplication there, and convert the result back, so that a single
     inversion is performed instead of one per bit of *n*.
+
+.. function:: int gr_ec_aff_point_mul_2exp_si(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, slong k, gr_ec_ctx_t ctx)
+              int gr_ec_aff_point_mul_2exp_fmpz(gr_ec_aff_point_t res, const gr_ec_aff_point_t P, const fmpz_t k, gr_ec_ctx_t ctx)
+
+    Sets *res* to `2^k P`, by *k* doublings. Each doubling inverts, so for a
+    large *k* it is cheaper to convert to Jacobian coordinates first.
+
+    Returns ``GR_DOMAIN`` if *k* is negative: halving a point is a real
+    operation on a curve, but a point has up to four halves, so it is not
+    a function. The ``fmpz`` version returns ``GR_UNABLE`` if *k* is too
+    large to iterate over, unless *P* is the point at infinity, which is
+    fixed by doubling.
 
 Jacobian points
 -------------------------------------------------------------------------------
@@ -787,6 +902,19 @@ Jacobian points
     :func:`_gr_ec_jac_point_mul_fmpz_naf` and falling back to
     :func:`_gr_ec_jac_point_mul_fmpz_binary` over a base ring where the
     window table cannot be normalized.
+
+.. function:: int gr_ec_jac_point_mul_2exp_si(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, slong k, gr_ec_ctx_t ctx)
+              int gr_ec_jac_point_mul_2exp_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t k, gr_ec_ctx_t ctx)
+
+    Sets *res* to `2^k P`, by *k* doublings. This is the cheapest of the
+    three representations for a power of two, since a doubling in Jacobian
+    coordinates needs no inversion.
+
+    Returns ``GR_DOMAIN`` if *k* is negative: halving a point is a real
+    operation on a curve, but a point has up to four halves, so it is not
+    a function. The ``fmpz`` version returns ``GR_UNABLE`` if *k* is too
+    large to iterate over, unless *P* is the point at infinity, which is
+    fixed by doubling.
 
 Conversions between representations
 -------------------------------------------------------------------------------

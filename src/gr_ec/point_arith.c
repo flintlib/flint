@@ -552,3 +552,44 @@ gr_ec_point_mul_si(gr_ec_point_t res, const gr_ec_point_t P, slong n,
 
     return status;
 }
+
+/*
+    2^k P, by repeated doubling. A negative k would be point halving:
+    that is a real operation on a curve, but it is not single valued (a
+    point has up to four halves) and computing it needs the division
+    polynomials, so it is out of the domain here.
+*/
+int
+gr_ec_point_mul_2exp_si(gr_ec_point_t res, const gr_ec_point_t P, slong k,
+        gr_ec_ctx_t ctx)
+{
+    int status;
+    slong i;
+
+    if (k < 0)
+        return GR_DOMAIN;
+
+    status = gr_ec_point_set(res, P, ctx);
+
+    for (i = 0; i < k && status == GR_SUCCESS; i++)
+        status = gr_ec_point_dbl(res, res, ctx);
+
+    return status;
+}
+
+int
+gr_ec_point_mul_2exp_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
+        const fmpz_t k, gr_ec_ctx_t ctx)
+{
+    if (fmpz_sgn(k) < 0)
+        return GR_DOMAIN;
+
+    /* 2^k O = O for every k, including one too large to iterate over */
+    if (gr_ec_point_is_inf(P, ctx) == T_TRUE)
+        return gr_ec_point_zero(res, ctx);
+
+    if (!fmpz_fits_si(k))
+        return GR_UNABLE;
+
+    return gr_ec_point_mul_2exp_si(res, P, fmpz_get_si(k), ctx);
+}

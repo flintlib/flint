@@ -29,4 +29,8 @@ WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point
 WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ec_ctx_t ctx);
 
+/* Points the context at the method table and element size of a
+   representation. Defined in generic.c; called when a context is created. */
+void _gr_ec_ctx_init_methods(gr_ec_ctx_t ctx, gr_ec_repr_t repr);
+
 #endif

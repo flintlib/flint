@@ -19,6 +19,7 @@
 #include "t-mul.c"
 #include "t-inexact.c"
 #include "t-char23.c"
+#include "t-generic.c"
 
 /* Array of test functions ***************************************************/
 
@@ -31,7 +32,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ec_convert),
     TEST_FUNCTION(gr_ec_mul),
     TEST_FUNCTION(gr_ec_inexact),
-    TEST_FUNCTION(gr_ec_char23)
+    TEST_FUNCTION(gr_ec_char23),
+    TEST_FUNCTION(gr_ec_generic)
 };
 
 /* main function *************************************************************/
