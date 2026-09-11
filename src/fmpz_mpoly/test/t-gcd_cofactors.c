@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
 /* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
@@ -1043,6 +1044,84 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd_cofactors, state)
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    /*
+        One input a monomial times a univariate polynomial, the shape handled
+        by _try_univar_divisor. The cofactors are computed by division there,
+        so the aliasing of G and the cofactors with the inputs matters.
+    */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, abar, bbar, a, b, t, u;
+        fmpz_poly_t p;
+        slong v, nvars;
+        ulong * exps;
+
+        fmpz_mpoly_ctx_init(ctx, 1 + n_randint(state, 6),
+                                              (ordering_t) n_randint(state, 3));
+        nvars = ctx->minfo->nvars;
+
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(abar, ctx);
+        fmpz_mpoly_init(bbar, ctx);
+        fmpz_mpoly_init(t, ctx);
+        fmpz_mpoly_init(u, ctx);
+        fmpz_poly_init(p);
+        exps = FLINT_ARRAY_ALLOC(nvars, ulong);
+
+        v = n_randint(state, nvars);
+
+        /* t = monomial * p(x_v) is forced into both inputs */
+        do {
+            fmpz_poly_randtest(p, state, 1 + n_randint(state, 4),
+                                                     1 + n_randint(state, 20));
+        } while (fmpz_poly_is_zero(p));
+        fmpz_mpoly_set_fmpz_poly(t, p, v, ctx);
+        for (k = 0; k < nvars; k++)
+            exps[k] = n_randint(state, 3);
+        fmpz_mpoly_one(u, ctx);
+        fmpz_mpoly_set_term_exp_ui(u, 0, exps, ctx);
+        fmpz_mpoly_mul(t, t, u, ctx);
+
+        /* b stays a monomial times a univariate polynomial in x_v */
+        do {
+            fmpz_poly_randtest(p, state, 1 + n_randint(state, 5),
+                                                     1 + n_randint(state, 20));
+        } while (fmpz_poly_is_zero(p));
+
+        /* sometimes reach past UNIVAR_DIVISOR_MAX_DEG, so the fallback runs */
+        if (n_randint(state, 4) == 0)
+            fmpz_poly_set_coeff_si(p, 100 + n_randint(state, 400),
+                                                     1 + n_randint(state, 5));
+
+        fmpz_mpoly_set_fmpz_poly(b, p, v, ctx);
+        fmpz_mpoly_mul(b, b, t, ctx);
+
+        do {
+            fmpz_mpoly_randtest_bound(a, state, 1 + n_randint(state, 20),
+                                      1 + n_randint(state, 30), 4, ctx);
+        } while (fmpz_mpoly_is_zero(a, ctx));
+        fmpz_mpoly_mul(a, a, t, ctx);
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
+        gcd_check(g, abar, bbar, a, b, t, ctx, i, 0, "random univariate input");
+        gcd_check(g, abar, bbar, b, a, t, ctx, i, 1,
+                                          "random univariate input, swapped");
+
+        flint_free(exps);
+        fmpz_poly_clear(p);
+        fmpz_mpoly_clear(u, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(bbar, ctx);
+        fmpz_mpoly_clear(abar, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
