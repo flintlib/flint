@@ -63,7 +63,7 @@ static inline void timeit_start(timeit_t t)
     struct timeval tv;
     gettimeofday(&tv, 0);
     t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
-    t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
+    t->cpu = - (slong)(clock() * 1000 / CLOCKS_PER_SEC);
 }
 
 static inline slong timeit_query_wall(timeit_t t)
