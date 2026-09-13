@@ -542,6 +542,7 @@ static void sd_fft_basecase_4_1(const sd_fft_ctx_t Q, double* X)
     vec4d_store(X+4*3, x3);
 }
 
+#if !defined(__AVX512F__)
 static void sd_fft_basecase_4_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulong j_bits)
 {
     vec4d n    = vec4d_set_d(Q->p);
@@ -572,6 +573,7 @@ static void sd_fft_basecase_4_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
     vec4d_store(X+4*2, x2);
     vec4d_store(X+4*3, x3);
 }
+#endif
 
 /*
 The length 32 transform can be broken up as
@@ -689,7 +691,7 @@ static void sd_fft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
 
 
 /* use with n = m-2 and m >= 6 */
-#define EXTEND_BASECASE(n, m) \
+#define EXTEND_BASECASE(n, m, VECND, N) \
 static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 { \
     ulong l = n_pow2(m - 2); \
@@ -714,10 +716,126 @@ static void CAT3(sd_fft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j
     CAT3(sd_fft_basecase, n, 0)(Q, X+2*l, 4*j_r+2, j_bits+2); \
     CAT3(sd_fft_basecase, n, 0)(Q, X+3*l, 4*j_r+3, j_bits+2); \
 }
-EXTEND_BASECASE(4, 6)
-EXTEND_BASECASE(5, 7)
-EXTEND_BASECASE(6, 8)
-EXTEND_BASECASE(7, 9)
+#if defined(__AVX512F__)
+/* For input x0 = {x00,x01,x02,x03,x04,x05,x06,x07} through
+   x7 = {x70,x71,x72,x73,x74,x75,x76,x77}, store
+   X[0..63] = {x00,x40,x01,x41,x10,x50,x11,x51,
+               x20,x60,x21,x61,x30,x70,x31,x71,
+               x02,x42,x03,x43,x12,x52,x13,x53,
+               x22,x62,x23,x63,x32,x72,x33,x73,
+               x04,x44,x05,x45,x14,x54,x15,x55,
+               x24,x64,x25,x65,x34,x74,x35,x75,
+               x06,x46,x07,x47,x16,x56,x17,x57,
+               x26,x66,x27,x67,x36,x76,x37,x77}. */
+FLINT_FORCE_INLINE void
+sd_fft_store_vec8dz_basecase_order(double* X, vec8dz x0, vec8dz x1,
+                                   vec8dz x2, vec8dz x3, vec8dz x4,
+                                   vec8dz x5, vec8dz x6, vec8dz x7)
+{
+    const vec8nz i01 = vec8nz_set_n8(0, 8, 1, 9, 0, 8, 1, 9);
+    const vec8nz i23 = vec8nz_set_n8(2, 10, 3, 11, 2, 10, 3, 11);
+    const vec8nz i45 = vec8nz_set_n8(4, 12, 5, 13, 4, 12, 5, 13);
+    const vec8nz i67 = vec8nz_set_n8(6, 14, 7, 15, 6, 14, 7, 15);
+    vec8dz a01 = vec8dz_permute2var(x0, i01, x4);
+    vec8dz b01 = vec8dz_permute2var(x1, i01, x5);
+    vec8dz c01 = vec8dz_permute2var(x2, i01, x6);
+    vec8dz d01 = vec8dz_permute2var(x3, i01, x7);
+    vec8dz a23 = vec8dz_permute2var(x0, i23, x4);
+    vec8dz b23 = vec8dz_permute2var(x1, i23, x5);
+    vec8dz c23 = vec8dz_permute2var(x2, i23, x6);
+    vec8dz d23 = vec8dz_permute2var(x3, i23, x7);
+    vec8dz a45 = vec8dz_permute2var(x0, i45, x4);
+    vec8dz b45 = vec8dz_permute2var(x1, i45, x5);
+    vec8dz c45 = vec8dz_permute2var(x2, i45, x6);
+    vec8dz d45 = vec8dz_permute2var(x3, i45, x7);
+    vec8dz a67 = vec8dz_permute2var(x0, i67, x4);
+    vec8dz b67 = vec8dz_permute2var(x1, i67, x5);
+    vec8dz c67 = vec8dz_permute2var(x2, i67, x6);
+    vec8dz d67 = vec8dz_permute2var(x3, i67, x7);
+
+    vec8dz_store(X +  0, vec8dz_permute2_128_0_1_4_5(a01, b01));
+    vec8dz_store(X +  8, vec8dz_permute2_128_0_1_4_5(c01, d01));
+    vec8dz_store(X + 16, vec8dz_permute2_128_0_1_4_5(a23, b23));
+    vec8dz_store(X + 24, vec8dz_permute2_128_0_1_4_5(c23, d23));
+    vec8dz_store(X + 32, vec8dz_permute2_128_0_1_4_5(a45, b45));
+    vec8dz_store(X + 40, vec8dz_permute2_128_0_1_4_5(c45, d45));
+    vec8dz_store(X + 48, vec8dz_permute2_128_0_1_4_5(a67, b67));
+    vec8dz_store(X + 56, vec8dz_permute2_128_0_1_4_5(c67, d67));
+}
+
+static void sd_fft_basecase_6_1(const sd_fft_ctx_t Q, double* X)
+{
+    vec8dz n    = vec8dz_set_d(Q->p);
+    vec8dz ninv = vec8dz_set_d(Q->pinv);
+    vec8dz w0, ww0, ww1, www0, www1, www2, www3;
+
+    vec8dz x0 = vec8dz_load(X+8*0);
+    vec8dz x1 = vec8dz_load(X+8*1);
+    vec8dz x2 = vec8dz_load(X+8*2);
+    vec8dz x3 = vec8dz_load(X+8*3);
+    vec8dz x4 = vec8dz_load(X+8*4);
+    vec8dz x5 = vec8dz_load(X+8*5);
+    vec8dz x6 = vec8dz_load(X+8*6);
+    vec8dz x7 = vec8dz_load(X+8*7);
+
+    ww1  = vec8dz_set_d(Q->w2tab[1][0]);
+    www2 = vec8dz_set_d(Q->w2tab[2][0]);
+    www3 = vec8dz_set_d(Q->w2tab[2][1]);
+    LENGTH8_ZERO_J(vec8dz, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, ww1, www2,www3);
+
+    vec8dz_transpose(&x0,&x1,&x2,&x3,&x4,&x5,&x6,&x7, x0,x1,x2,x3,x4,x5,x6,x7);
+
+    w0 = vec8dz_load_aligned(&Q->w2tab[0][0]);
+    vec8dz_load_deinterleave2_aligned(&Q->w2tab[0][0], &ww0, &ww1);
+    vec8dz_load_deinterleave4_aligned(&Q->w2tab[0][0], &www0, &www1, &www2, &www3);
+    LENGTH8_ANY_J(vec8dz, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, w0,ww0,ww1, www0,www1,www2,www3);
+
+    sd_fft_store_vec8dz_basecase_order(X, x0,x1,x2,x3,x4,x5,x6,x7);
+}
+
+static void sd_fft_basecase_6_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulong j_bits)
+{
+    vec8dz n    = vec8dz_set_d(Q->p);
+    vec8dz ninv = vec8dz_set_d(Q->pinv);
+    vec8dz w0, ww0, ww1, www0, www1, www2, www3;
+    ulong j = 8*j_r;
+
+    vec8dz x0 = vec8dz_load(X+8*0);
+    vec8dz x1 = vec8dz_load(X+8*1);
+    vec8dz x2 = vec8dz_load(X+8*2);
+    vec8dz x3 = vec8dz_load(X+8*3);
+    vec8dz x4 = vec8dz_load(X+8*4);
+    vec8dz x5 = vec8dz_load(X+8*5);
+    vec8dz x6 = vec8dz_load(X+8*6);
+    vec8dz x7 = vec8dz_load(X+8*7);
+
+    w0   = vec8dz_set_d(Q->w2tab[0+j_bits][1*j_r+0]);
+    ww0  = vec8dz_set_d(Q->w2tab[1+j_bits][2*j_r+0]);
+    ww1  = vec8dz_set_d(Q->w2tab[1+j_bits][2*j_r+1]);
+    www0 = vec8dz_set_d(Q->w2tab[2+j_bits][4*j_r+0]);
+    www1 = vec8dz_set_d(Q->w2tab[2+j_bits][4*j_r+1]);
+    www2 = vec8dz_set_d(Q->w2tab[2+j_bits][4*j_r+2]);
+    www3 = vec8dz_set_d(Q->w2tab[2+j_bits][4*j_r+3]);
+    LENGTH8_ANY_J(vec8dz, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, w0,ww0,ww1, www0,www1,www2,www3);
+
+    vec8dz_transpose(&x0,&x1,&x2,&x3,&x4,&x5,&x6,&x7, x0,x1,x2,x3,x4,x5,x6,x7);
+
+    w0 = vec8dz_load_aligned(&Q->w2tab[0+(3+j_bits)][j]);
+    vec8dz_load_deinterleave2_aligned(&Q->w2tab[1+(3+j_bits)][2*j], &ww0, &ww1);
+    vec8dz_load_deinterleave4_aligned(&Q->w2tab[2+(3+j_bits)][4*j], &www0, &www1, &www2, &www3);
+    LENGTH8_ANY_J(vec8dz, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, w0,ww0,ww1, www0,www1,www2,www3);
+
+    sd_fft_store_vec8dz_basecase_order(X, x0,x1,x2,x3,x4,x5,x6,x7);
+}
+EXTEND_BASECASE(5, 7, vec16dz, 16)
+EXTEND_BASECASE(6, 8, vec16dz, 16)
+EXTEND_BASECASE(7, 9, vec16dz, 16)
+#else
+EXTEND_BASECASE(4, 6, VECND, N)
+EXTEND_BASECASE(5, 7, VECND, N)
+EXTEND_BASECASE(6, 8, VECND, N)
+EXTEND_BASECASE(7, 9, VECND, N)
+#endif
 #undef EXTEND_BASECASE
 
 /* The `sd_fft_base_{m}_*` functions take `j`, unlike `sd_fft_basecase_{m}_*`
