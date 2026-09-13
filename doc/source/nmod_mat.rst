@@ -415,6 +415,22 @@ Matrix multiplication
     `C` with `A` or `B` is supported (arbitrary partial overlap is
     not).
 
+.. function:: int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using integer SIMD kernels specialized to moduli
+    below `2^{32}`. Kernels exist for AVX-512, AVX2 and AArch64 NEON, with a
+    slower portable fallback in plain C. Several threads are used when
+    available. Returns `1` for success and `0` if the modulus is at least
+    `2^{32}` or FLINT is built with a 32-bit word size. Aliasing of the
+    operands is supported. Dimensions must be compatible for matrix
+    multiplication. Approach: the entries are lifted to signed 32-bit integers
+    of absolute value at most `n/2`, products are accumulated exactly in 64-bit
+    lanes with widening `32 \times 32 \to 64` bit multiplications, and
+    reductions modulo `n` are delayed for as long as the accumulators cannot
+    overflow. So, a single pass suffices for any modulus below `2^{32}`, making
+    this typically faster than `nmod_mat_mul_blas` for input such that the
+    latter needs to use multimodular reduction and CRT.
+
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but

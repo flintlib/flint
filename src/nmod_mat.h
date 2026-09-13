@@ -186,6 +186,8 @@ void _nmod_mat_mul_u8(uint8_t * C, slong Cstride,
                  slong m, slong k, slong n, nmod_t mod);
 void nmod_mat_mul_u8(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
+int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 void
