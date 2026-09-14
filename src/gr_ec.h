@@ -189,6 +189,12 @@ WARN_UNUSED_RESULT int gr_ec_ctx_j_invariant(gr_ptr res, gr_ec_ctx_t ctx);
 
 truth_t gr_ec_ctx_is_smooth(gr_ec_ctx_t ctx);
 
+/* Division polynomials */
+
+WARN_UNUSED_RESULT int gr_ec_ctx_psi2_sqr(gr_poly_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_division_poly(gr_poly_t res, ulong n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_division_poly_vec(gr_poly_struct * res, slong len, gr_ec_ctx_t ctx);
+
 /*
     Projective points
 */

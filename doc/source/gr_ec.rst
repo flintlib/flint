@@ -97,7 +97,7 @@ representation.
 
 :type:`gr_ec_aff_point_t` stores the two affine coordinates `x` and `y`
 satisfying the Weierstrass equation, together with a :type:`truth_t` flag
-recording whether the point is `\mathcal{O}`. This representation requires 
+recording whether the point is `\mathcal{O}`. This representation requires
 the base ring to be a field; see the section on affine points below. This
 representation is the most compact and the most convenient for input,
 output and testing, but it is the slowest for repeated arithmetic.
@@ -151,10 +151,10 @@ Equality of points
 Points are not normalized automatically, so the same point of `E` has many
 representations for `gr_ec_point_t`:
 
-:func:`gr_ec_point_equal` tests equality by cross-multiplying, so equality is 
-guaranteed only when the base ring is an integral domain. Over a general 
-commutative ring they are only necessary conditions for the two representations 
-to define the same point, and the result should be interpreted accordingly. 
+:func:`gr_ec_point_equal` tests equality by cross-multiplying, so equality is
+guaranteed only when the base ring is an integral domain. Over a general
+commutative ring they are only necessary conditions for the two representations
+to define the same point, and the result should be interpreted accordingly.
 
 .. _gr-ec-generic:
 
@@ -464,6 +464,85 @@ Curve invariants
     does not imply that the equation defines a smooth curve over the whole
     base: for that, `\Delta` must be invertible.
 
+Division polynomials
+-------------------------------------------------------------------------------
+
+The division polynomials `\psi_n` of `E` are use to compute `n`-torsion
+(in the generic case) : for a point `P \ne \mathcal{O}`, `\psi_n` vanishes
+at `P` exactly when `n P = \mathcal{O}`. They satisfy
+`\psi_1 = 1`, `\psi_2 = 2y + a_1 x + a_3`, and `\psi_n` is a polynomial in
+`x` alone when `n` is odd, while for even `n` it is `\psi_2` times a polynomial
+in `x`. The functions here always return a univariate polynomial, using the
+standard normalisation
+
+.. math::
+
+    \Psi_n = \begin{cases} \psi_n & n \text{ odd} \\
+                           \psi_n / \psi_2 & n \text{ even.}\end{cases}
+
+In the short Weierstrass model `\psi_2 = 2y`, so for even `n` this gives
+`\psi_n / (2y)`. Then `\Psi_n \in R[x]` for every `n`, with
+
+.. math::
+
+    \deg \Psi_n = \frac{n^2 - 1}{2},\ \ \text{leading coefficient } n
+        \qquad (n \text{ odd})
+
+.. math::
+
+    \deg \Psi_n = \frac{n^2 - 4}{2},\ \ \text{leading coefficient } n/2
+        \qquad (n \text{ even})
+
+so `\Psi_0 = 0` and `\Psi_1 = \Psi_2 = 1`. Note that the degree drops when
+the leading coefficient is zero in the base ring.
+
+.. warning::
+
+    PARI/GP's ``elldivpol`` uses the opposite normalisation for even `n`: it
+    returns `\psi_n \psi_2 = \Psi_n \psi_2^2`, of degree `(n^2+2)/2`. Multiply
+    by :func:`gr_ec_ctx_psi2_sqr` to compare.
+
+Writing `W = \psi_2^2`, which is the univariate cubic
+`4x^3 + b_2 x^2 + 2 b_4 x + b_6`, the recursions are
+
+.. math::
+
+    \Psi_{2m} = \Psi_m \left(\Psi_{m+2} \Psi_{m-1}^2
+                            - \Psi_{m-2} \Psi_{m+1}^2\right)
+
+.. math::
+
+    \Psi_{2m+1} = \begin{cases}
+        \Psi_{m+2}\Psi_m^3 - W^2 \Psi_{m-1}\Psi_{m+1}^3 & m \text{ odd} \\
+        W^2 \Psi_{m+2}\Psi_m^3 - \Psi_{m-1}\Psi_{m+1}^3 & m \text{ even.}
+    \end{cases}
+
+No division occurs, so these hold over any commutative ring, including
+residue characteristic 2 and 3.
+
+.. function:: int gr_ec_ctx_psi2_sqr(gr_poly_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\psi_2^2 = 4x^3 + b_2 x^2 + 2 b_4 x + b_6`, the univariate
+    cubic obtained by completing the square in the curve equation. Its roots
+    are the `x`-coordinates of the 2-torsion.
+
+.. function:: int gr_ec_ctx_division_poly(gr_poly_t res, ulong n, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\Psi_n`.
+
+    This uses a double-and-add algorithm of complexity `O(M(n^2))` rather than the
+    `O(n M(n^2))` of building the while table, where `M` is the cost of
+    multiplication in `R[x]`.
+
+    Returns ``GR_UNABLE`` if `n^2` would overflow, and propagates the flag of
+    the base ring otherwise.
+
+.. function:: int gr_ec_ctx_division_poly_vec(gr_poly_struct * res, slong len, gr_ec_ctx_t ctx)
+
+    Sets *res* to the table `\Psi_0, \ldots, \Psi_{len-1}`, which must have
+    *len* initialized entries. Use this rather than *len* separate calls to
+    `gr_ec_ctx_division_poly` when a whole range is wanted.
+
 Projective points: memory management
 -------------------------------------------------------------------------------
 
@@ -678,7 +757,7 @@ affine point does not exist.
               int _gr_ec_aff_point_set_affine(gr_ec_aff_point_t res, gr_srcptr x, gr_srcptr y, gr_ec_ctx_t ctx)
 
     Sets *res* to the finite point with affine coordinates `(x, y)`.
-    `gr_ec_aff_point_set_affine` verifies that the point lies on the curve; 
+    `gr_ec_aff_point_set_affine` verifies that the point lies on the curve;
     `_gr_ec_aff_point_set_affine` performs no check.
 
 .. function:: int gr_ec_aff_point_get_affine(gr_ptr x, gr_ptr y, const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)

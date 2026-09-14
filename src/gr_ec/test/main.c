@@ -16,6 +16,7 @@
 #include "t-aff_point.c"
 #include "t-jac_point.c"
 #include "t-convert.c"
+#include "t-division_poly.c"
 #include "t-mul.c"
 #include "t-inexact.c"
 #include "t-char23.c"
@@ -30,6 +31,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ec_aff_point),
     TEST_FUNCTION(gr_ec_jac_point),
     TEST_FUNCTION(gr_ec_convert),
+    TEST_FUNCTION(gr_ec_division_poly),
     TEST_FUNCTION(gr_ec_mul),
     TEST_FUNCTION(gr_ec_inexact),
     TEST_FUNCTION(gr_ec_char23),
