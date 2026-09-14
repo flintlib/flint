@@ -218,6 +218,59 @@ TEST_FUNCTION_START(nmod_mat_mul_u32, state)
                                    m, modulus);
         }
 
+        /* the uint32 entry point, on the same data, with row strides
+           larger than the row lengths */
+        if (ret)
+        {
+            slong lda = k + n_randint(state, 3), ldb = n + n_randint(state, 3);
+            slong ldc = n + n_randint(state, 3);
+            uint32_t * a = flint_malloc((m * lda + 1) * sizeof(uint32_t));
+            uint32_t * b = flint_malloc((k * ldb + 1) * sizeof(uint32_t));
+            uint32_t * c = flint_malloc((m * ldc + 1) * sizeof(uint32_t));
+            slong i, j;
+            int ok = 1;
+
+            for (i = 0; i < m; i++)
+                for (j = 0; j < k; j++)
+                    a[i * lda + j] = (uint32_t) nmod_mat_entry(A, i, j);
+            for (i = 0; i < k; i++)
+                for (j = 0; j < n; j++)
+                    b[i * ldb + j] = (uint32_t) nmod_mat_entry(B, i, j);
+            for (i = 0; i < m * ldc + 1; i++)
+                c[i] = (uint32_t) n_randtest(state);
+
+            if (!_nmod_mat_mul_u32(c, ldc, a, lda, b, ldb, m, k, n, C->mod))
+                TEST_FUNCTION_FAIL("_nmod_mat_mul_u32 should have worked\n"
+                                   "m: %wd, k: %wd, n: %wd, mod: %wu\n",
+                                   m, k, n, modulus);
+
+            for (i = 0; i < m; i++)
+                for (j = 0; j < n; j++)
+                    if (c[i * ldc + j] != nmod_mat_entry(D, i, j))
+                        ok = 0;
+
+            /* aliasing, square only */
+            if (ok && m == k && k == n && m > 0 && lda == ldb)
+            {
+                for (i = 0; i < m * lda; i++)
+                    c[i] = a[i];
+                _nmod_mat_mul_u32(c, lda, c, lda, b, ldb, m, k, n, C->mod);
+                for (i = 0; i < m; i++)
+                    for (j = 0; j < n; j++)
+                        if (c[i * lda + j] != nmod_mat_entry(D, i, j))
+                            ok = 0;
+            }
+
+            if (!ok)
+                TEST_FUNCTION_FAIL("uint32 entries: m: %wd, k: %wd, n: %wd, "
+                                   "mod: %wu, threads: %d\n", m, k, n,
+                                   modulus, flint_get_num_threads());
+
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+        }
+
         nmod_mat_clear(A);
         nmod_mat_clear(B);
         nmod_mat_clear(C);

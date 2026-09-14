@@ -57,14 +57,19 @@
     Structure: BLIS-style blocking (NC/KC/MC) with packed A blocks and B panels
     of int32, a register tile microkernel of MR rows by NACC accumulator
     vectors, and for multithreading a plain split of C into independent row or
-    column blocks over FLINT's thread pool.
+    column blocks over FLINT's thread pool. All of this is the template
+    mul_blocked_templ.h (shared with the AVX512-IFMA kernel of mul_u52.c),
+    instantiated here twice: for ulong entries, behind nmod_mat_mul_u32, and
+    for uint32 entries, behind _nmod_mat_mul_u32 (used by the nmod32 ring of
+    gr, and the natural input for multimodular algorithms that hold residues
+    as uint32). The kernels never see the entry type: it only enters the
+    packing and the loads and stores of C.
 
-    Backends: The microkernel, the packing and the blocked core are written
-    once, against a small set of inline primitives (load, splat, widening
-    multiply-accumulate, fold, canonical reduce) that each backend defines:
-    AVX-512 (F+DQ), AVX2, AArch64 NEON, and a plain C fallback whose "vector"
-    is a small struct the compiler is free to vectorize. All four are covered
-    by the same test.
+    Backends: the template is written against a small set of inline
+    primitives (load, splat, widening multiply-accumulate, fold, canonical
+    reduce) that each backend defines: AVX-512 (F+DQ), AVX2, AArch64 NEON,
+    and a plain C fallback whose "vector" is a small struct the compiler is
+    free to vectorize. All four are covered by the same test.
 
     TODO investigations for crafting these BLAS-like functions suggest possible
     changes to machine_vectors.h. In detail, the primitives are local to this
@@ -172,9 +177,16 @@
 # define U32_NC 2048
 #endif
 
-/* products below which threading cannot pay for itself */
+/*
+    products (m*k*n) per thread: the split uses at most work/U32_MT_MIN_WORK
+    threads, so with the value below a second thread joins from about 100^3
+    and a fourth from about 126^3, which is where nmod_mat_mul_blas and
+    nmod_mat_mul_classical_threaded start to gain from their threads too
+    (measured on four machines with 4 threads; below 100^3 the serial
+    kernel still beats them all)
+*/
 #ifndef U32_MT_MIN_WORK
-# define U32_MT_MIN_WORK 4000000.0
+# define U32_MT_MIN_WORK 500000.0
 #endif
 
 /* modulus-derived parameters ************************************************/
@@ -277,6 +289,7 @@ u32_lift(ulong a, ulong n)
       u32_acc_zero     all-zero accumulator
       u32_load_c       U32_VL canonical residues of C -> accumulator
       u32_store_c      accumulator (canonical residues) -> C
+      u32_load_c32, u32_store_c32   the same for uint32 entries
       u32_bslot        where column j of a packed B row is stored
       u32_load_bstep   the U32_NACC B operands of one k step
       u32_load_a       one int32 of a packed A panel
@@ -325,6 +338,19 @@ u32_load_c(const ulong * p) { return _mm512_loadu_si512((const void *) p); }
 
 FLINT_FORCE_INLINE void
 u32_store_c(ulong * p, u32_acc a) { _mm512_storeu_si512((void *) p, a); }
+
+/* uint32 entries: widen on load, narrow on store (vpmovzxdq, vpmovqd) */
+FLINT_FORCE_INLINE u32_acc
+u32_load_c32(const uint32_t * p)
+{
+    return _mm512_cvtepu32_epi64(_mm256_loadu_si256((const __m256i *) p));
+}
+
+FLINT_FORCE_INLINE void
+u32_store_c32(uint32_t * p, u32_acc a)
+{
+    _mm256_storeu_si256((__m256i *) p, _mm512_cvtepi64_epi32(a));
+}
 
 /*
     x86 reads the even 32-bit halves of the 64-bit lanes, so a packed B
@@ -429,6 +455,23 @@ u32_load_c(const ulong * p) { return _mm256_loadu_si256((const __m256i *) p); }
 
 FLINT_FORCE_INLINE void
 u32_store_c(ulong * p, u32_acc a) { _mm256_storeu_si256((__m256i *) p, a); }
+
+/* uint32 entries: widen on load; AVX2 has no narrowing store, so the
+   low halves (the residues are below 2^32) are gathered by a permute */
+FLINT_FORCE_INLINE u32_acc
+u32_load_c32(const uint32_t * p)
+{
+    return _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i *) p));
+}
+
+FLINT_FORCE_INLINE void
+u32_store_c32(uint32_t * p, u32_acc a)
+{
+    const __m256i idx = _mm256_setr_epi32(0, 2, 4, 6, 0, 0, 0, 0);
+
+    _mm_storeu_si128((__m128i *) p,
+            _mm256_castsi256_si128(_mm256_permutevar8x32_epi32(a, idx)));
+}
 
 /* interleaved column groups; see the AVX-512 comment */
 FLINT_FORCE_INLINE slong
@@ -571,6 +614,19 @@ u32_store_c(ulong * p, u32_acc a)
     vst1q_u64((uint64_t *) p, vreinterpretq_u64_s64(a));
 }
 
+/* uint32 entries: widen on load, narrow on store */
+FLINT_FORCE_INLINE u32_acc
+u32_load_c32(const uint32_t * p)
+{
+    return vreinterpretq_s64_u64(vmovl_u32(vld1_u32(p)));
+}
+
+FLINT_FORCE_INLINE void
+u32_store_c32(uint32_t * p, u32_acc a)
+{
+    vst1_u32(p, vmovn_u64(vreinterpretq_u64_s64(a)));
+}
+
 /* NEON takes narrow operands, so the columns stay in order */
 FLINT_FORCE_INLINE slong
 u32_bslot(slong j) { return j; }
@@ -688,6 +744,27 @@ u32_store_c(ulong * p, u32_acc a)
         p[i] = (ulong) a.v[i];
 }
 
+FLINT_FORCE_INLINE u32_acc
+u32_load_c32(const uint32_t * p)
+{
+    u32_acc a;
+    slong i;
+
+    for (i = 0; i < U32_VL; i++)
+        a.v[i] = (slong) p[i];
+
+    return a;
+}
+
+FLINT_FORCE_INLINE void
+u32_store_c32(uint32_t * p, u32_acc a)
+{
+    slong i;
+
+    for (i = 0; i < U32_VL; i++)
+        p[i] = (uint32_t) a.v[i];
+}
+
 FLINT_FORCE_INLINE slong
 u32_bslot(slong j) { return j; }
 
@@ -770,333 +847,58 @@ u32_fold(u32_acc acc, const u32_consts * C, int rounds)
 }
 
 /*
-    pack (rows x kc) of A into MR-wide l-major panels, zero-filled:
-    ap[l*MR + r] = lift(a[r, l])
+    The packing, the microkernel, the blocked core and the thread split
+    come from mul_blocked_templ.h, instantiated once for ulong entries
+    (u32_64_*, behind nmod_mat_mul_u32) and once for uint32 entries
+    (u32_32_*, behind _nmod_mat_mul_u32). Only the C accessors differ.
 */
-static void
-u32_pack_a(int32_t * ap, const ulong * a, slong lda,
-           slong rows, slong kc, ulong n)
-{
-    slong ir, rr, l, r;
+#define BT_PACKED int32_t
+#define BT_CTX u32_ctx_struct
+#define BT_MR U32_MR
+#define BT_VL U32_VL
+#define BT_NACC U32_NACC
+#define BT_KC U32_KC
+#define BT_MC U32_MC
+#define BT_NC U32_NC
+#define BT_MT_MIN_WORK U32_MT_MIN_WORK
+#define BT_LIFT(x, ctx) u32_lift((ulong) (x), (ctx)->n)
+#define BT_BSLOT(j) u32_bslot(j)
+#define BT_ACC u32_acc
+#define BT_BV u32_bv
+#define BT_AV u32_av
+#define BT_CONSTS u32_consts
+#define BT_CONSTS_INIT(ctx) u32_consts_init(ctx)
+#define BT_ACC_ZERO() u32_acc_zero()
+#define BT_LOAD_BSTEP(bv, p) u32_load_bstep(bv, p)
+#define BT_LOAD_A(p) u32_load_a(p)
+#define BT_MUL_ADD(acc, a, b) u32_mul_add(acc, a, b)
+#define BT_CADENCE(ctx) ((ctx)->cadence)
+#define BT_FOLD(acc, C, ctx) u32_fold(acc, C, (ctx)->rounds)
+#define BT_FINISH(acc, C, ctx) u32_reduce(u32_fold(acc, C, (ctx)->rounds), C)
 
-    for (ir = 0; ir < rows; ir += U32_MR)
-    {
-        rr = FLINT_MIN(rows - ir, U32_MR);
+/* ulong entries */
+#define BT_NAME(x) u32_64_##x
+#define BT_ENTRY ulong
+#define BT_LOAD_C(p) u32_load_c(p)
+#define BT_STORE_C(p, acc) u32_store_c(p, acc)
+#include "mul_blocked_templ.h"
+#undef BT_NAME
+#undef BT_ENTRY
+#undef BT_LOAD_C
+#undef BT_STORE_C
 
-        for (l = 0; l < kc; l++)
-        {
-            for (r = 0; r < rr; r++)
-                ap[l * U32_MR + r] = u32_lift(a[(ir + r) * lda + l], n);
-            for (r = rr; r < U32_MR; r++)
-                ap[l * U32_MR + r] = 0;
-        }
+/* uint32 entries */
+#define BT_NAME(x) u32_32_##x
+#define BT_ENTRY uint32_t
+#define BT_LOAD_C(p) u32_load_c32(p)
+#define BT_STORE_C(p, acc) u32_store_c32(p, acc)
+#include "mul_blocked_templ.h"
+#undef BT_NAME
+#undef BT_ENTRY
+#undef BT_LOAD_C
+#undef BT_STORE_C
 
-        ap += kc * U32_MR;
-    }
-}
-
-/*
-    pack (kc x cols) of B into NR-wide l-major panels, zero-filled:
-    column j of the panel going to slot u32_bslot(j) of the row, which
-    is the order the backend's u32_load_bstep wants. Either way
-    accumulator v covers columns v*U32_VL .. v*U32_VL + U32_VL - 1 of
-    C, so the tile loads and stores C with plain vector accesses.
-*/
-static void
-u32_pack_b(int32_t * bp, const ulong * b, slong ldb,
-           slong kc, slong cols, ulong n)
-{
-    slong jr, cc, l, j;
-
-    for (jr = 0; jr < cols; jr += U32_NR)
-    {
-        cc = FLINT_MIN(cols - jr, U32_NR);
-
-        for (l = 0; l < kc; l++)
-        {
-            const ulong * brow = b + l * ldb + jr;
-            int32_t * bpl = bp + l * U32_NR;
-
-            for (j = 0; j < U32_NR; j++)
-                bpl[j] = 0;
-            for (j = 0; j < cc; j++)
-                bpl[u32_bslot(j)] = u32_lift(brow[j], n);
-        }
-
-        bp += kc * U32_NR;
-    }
-}
-
-/*
-    c (MR x NR, row stride ldc, canonical residues) (+)= Ap * Bp over kc,
-    written back as canonical residues
-*/
-static void
-u32_micro(ulong * c, slong ldc, const int32_t * ap, const int32_t * bp,
-          slong kc, int first, const u32_ctx_struct * ctx)
-{
-    u32_acc acc[U32_MR][U32_NACC];
-    const u32_consts C = u32_consts_init(ctx);
-    const slong cadence = ctx->cadence;
-    const int rounds = ctx->rounds;
-    slong l, stop;
-    int r, v;
-
-    for (r = 0; r < U32_MR; r++)
-        for (v = 0; v < U32_NACC; v++)
-            acc[r][v] = first ? u32_acc_zero()
-                              : u32_load_c(c + r * ldc + v * U32_VL);
-
-    l = 0;
-    while (l < kc)
-    {
-        stop = FLINT_MIN(l + cadence, kc);
-
-        for (; l < stop; l++)
-        {
-            u32_bv bv[U32_NACC];
-
-            u32_load_bstep(bv, bp + l * U32_NR);
-
-            for (r = 0; r < U32_MR; r++)
-            {
-                u32_av av = u32_load_a(ap + l * U32_MR + r);
-
-                for (v = 0; v < U32_NACC; v++)
-                    acc[r][v] = u32_mul_add(acc[r][v], av, bv[v]);
-            }
-        }
-
-        if (l < kc)
-            for (r = 0; r < U32_MR; r++)
-                for (v = 0; v < U32_NACC; v++)
-                    acc[r][v] = u32_fold(acc[r][v], &C, rounds);
-    }
-
-    for (r = 0; r < U32_MR; r++)
-        for (v = 0; v < U32_NACC; v++)
-            u32_store_c(c + r * ldc + v * U32_VL,
-                        u32_reduce(u32_fold(acc[r][v], &C, rounds), &C));
-}
-
-/* blocked serial core ******************************************************/
-
-/* C (m x n, stride ldc) = A (m x k, stride lda) * B (k x n, stride ldb) */
-static void
-u32_core(ulong * C, slong ldc, const ulong * A, slong lda,
-         const ulong * B, slong ldb, slong m, slong k, slong n,
-         const u32_ctx_struct * ctx)
-{
-    slong kcap, ncap, mcap, bpsz, apsz;
-    slong jc, pc, ic, jr, ir, nc, kc, mc, cc, rr, r;
-    char * scratch;
-    int32_t * bp, * ap;
-    ulong stage[U32_MR * U32_NR];
-    ulong modn = ctx->n;
-
-    if (m <= 0 || n <= 0)
-        return;
-
-    if (k <= 0)
-    {
-        for (r = 0; r < m; r++)
-            memset(C + r * ldc, 0, n * sizeof(ulong));
-        return;
-    }
-
-    kcap = FLINT_MIN(k, U32_KC);
-    ncap = FLINT_MIN(n, U32_NC);
-    mcap = FLINT_MIN(m, U32_MC);
-
-    /* aligned_alloc wants sizes that are multiples of the alignment */
-    bpsz = (kcap * (ncap + U32_NR) * (slong) sizeof(int32_t) + 63) & ~(slong) 63;
-    apsz = (kcap * (mcap + U32_MR) * (slong) sizeof(int32_t) + 63) & ~(slong) 63;
-    scratch = flint_aligned_alloc(64, bpsz + apsz);
-    bp = (int32_t *) scratch;
-    ap = (int32_t *) (scratch + bpsz);
-
-    for (jc = 0; jc < n; jc += U32_NC)
-    {
-        nc = FLINT_MIN(n - jc, U32_NC);
-
-        for (pc = 0; pc < k; pc += U32_KC)
-        {
-            int first = (pc == 0);
-
-            kc = FLINT_MIN(k - pc, U32_KC);
-            u32_pack_b(bp, B + pc * ldb + jc, ldb, kc, nc, modn);
-
-            for (ic = 0; ic < m; ic += U32_MC)
-            {
-                mc = FLINT_MIN(m - ic, U32_MC);
-                u32_pack_a(ap, A + ic * lda + pc, lda, mc, kc, modn);
-
-                for (jr = 0; jr < nc; jr += U32_NR)
-                {
-                    const int32_t * bpp = bp + (jr / U32_NR) * kc * U32_NR;
-
-                    cc = FLINT_MIN(nc - jr, U32_NR);
-
-                    for (ir = 0; ir < mc; ir += U32_MR)
-                    {
-                        const int32_t * app = ap + (ir / U32_MR) * kc * U32_MR;
-                        ulong * ct = C + (ic + ir) * ldc + jc + jr;
-
-                        rr = FLINT_MIN(mc - ir, U32_MR);
-
-                        if (rr == U32_MR && cc == U32_NR)
-                        {
-                            u32_micro(ct, ldc, app, bpp, kc, first, ctx);
-                        }
-                        else
-                        {
-                            /* edge tile: stage through a full tile whose
-                               padding rows and columns are zero (and stay
-                               zero, since the packed padding is zero) */
-                            if (first)
-                                memset(stage, 0, sizeof(stage));
-                            else
-                            {
-                                for (r = 0; r < rr; r++)
-                                {
-                                    memcpy(stage + r * U32_NR, ct + r * ldc,
-                                           cc * sizeof(ulong));
-                                    memset(stage + r * U32_NR + cc, 0,
-                                           (U32_NR - cc) * sizeof(ulong));
-                                }
-                                for (r = rr; r < U32_MR; r++)
-                                    memset(stage + r * U32_NR, 0,
-                                           U32_NR * sizeof(ulong));
-                            }
-
-                            u32_micro(stage, U32_NR, app, bpp, kc, 0, ctx);
-
-                            for (r = 0; r < rr; r++)
-                                memcpy(ct + r * ldc, stage + r * U32_NR,
-                                       cc * sizeof(ulong));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    flint_aligned_free(scratch);
-}
-
-/* parallel driver **********************************************************/
-
-typedef struct
-{
-    ulong * C; slong ldc;
-    const ulong * A; slong lda;
-    const ulong * B; slong ldb;
-    slong m, k, n;
-    const u32_ctx_struct * ctx;
-}
-u32_split_arg;
-
-static void
-u32_split_worker(void * varg)
-{
-    u32_split_arg * w = (u32_split_arg *) varg;
-    u32_core(w->C, w->ldc, w->A, w->lda, w->B, w->ldb,
-             w->m, w->k, w->n, w->ctx);
-}
-
-/*
-    Split C into independent blocks along its longer side (rows of A or
-    columns of B), one ordinary serial multiplication per thread. Blocks
-    are disjoint, so nothing is shared but read-only inputs. The packing
-    of the shared operand is duplicated across workers, an O(k*(m+n))
-    cost against O(m*k*n/T) per worker.
-*/
-static void
-u32_core_mt(ulong * C, slong ldc, const ulong * A, slong lda,
-            const ulong * B, slong ldb, slong m, slong k, slong n,
-            const u32_ctx_struct * ctx, slong thread_limit)
-{
-    thread_pool_handle * handles = NULL;
-    u32_split_arg * args;
-    slong nw = 0, nt, i, pos, given, len, tcap;
-    int split_rows;
-    double work;
-
-    work = (double) m * (double) n * (double) k;
-    tcap = (slong) (work / U32_MT_MIN_WORK) + 1;
-    thread_limit = FLINT_MIN(thread_limit, tcap);
-
-    split_rows = (m >= n);
-    len = split_rows ? m : n;
-
-    /* each block should be a few tiles */
-    thread_limit = FLINT_MIN(thread_limit,
-                             len / (split_rows ? 2 * U32_MR : 2 * U32_NR));
-
-    if (thread_limit > 1)
-        nw = flint_request_threads(&handles, thread_limit);
-
-    if (nw == 0)
-    {
-        u32_core(C, ldc, A, lda, B, ldb, m, k, n, ctx);
-        if (handles != NULL)
-            flint_give_back_threads(handles, nw);
-        return;
-    }
-
-    nt = nw + 1;
-    args = flint_malloc(nt * sizeof(u32_split_arg));
-
-    pos = 0;
-    for (i = 0; i < nt; i++)
-    {
-        given = len / nt + (i < len % nt ? 1 : 0);
-
-        /* round block boundaries to whole tiles when possible */
-        if (i < nt - 1)
-        {
-            slong tile = split_rows ? U32_MR : U32_NR;
-            given = ((given + tile / 2) / tile) * tile;
-            given = FLINT_MIN(given, len - pos);
-        }
-        else
-            given = len - pos;
-
-        args[i].ctx = ctx;
-        args[i].k = k;
-
-        if (split_rows)
-        {
-            args[i].C = C + pos * ldc; args[i].ldc = ldc;
-            args[i].A = A + pos * lda; args[i].lda = lda;
-            args[i].B = B; args[i].ldb = ldb;
-            args[i].m = given; args[i].n = n;
-        }
-        else
-        {
-            args[i].C = C + pos; args[i].ldc = ldc;
-            args[i].A = A; args[i].lda = lda;
-            args[i].B = B + pos; args[i].ldb = ldb;
-            args[i].m = m; args[i].n = given;
-        }
-
-        pos += given;
-    }
-
-    for (i = 0; i < nw; i++)
-        thread_pool_wake(global_thread_pool, handles[i], 0,
-                         u32_split_worker, &args[i]);
-
-    u32_split_worker(&args[nw]);
-
-    for (i = 0; i < nw; i++)
-        thread_pool_wait(global_thread_pool, handles[i]);
-
-    flint_give_back_threads(handles, nw);
-    flint_free(args);
-}
-
-/* public entry *************************************************************/
+/* public entries ************************************************************/
 
 int
 nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
@@ -1135,9 +937,51 @@ nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     u32_ctx_init(&ctx, modn);
 
-    u32_core_mt(C->entries, C->stride, A->entries, A->stride,
-                B->entries, B->stride, m, k, n, &ctx,
-                flint_get_num_threads());
+    u32_64_core_mt(C->entries, C->stride, A->entries, A->stride,
+                   B->entries, B->stride, m, k, n, &ctx,
+                   flint_get_num_threads());
+
+    return 1;
+}
+
+int
+_nmod_mat_mul_u32(uint32_t * C, slong Cstride,
+                  const uint32_t * A, slong Astride,
+                  const uint32_t * B, slong Bstride,
+                  slong m, slong k, slong n, nmod_t mod)
+{
+    u32_ctx_struct ctx;
+    slong i;
+
+    if (mod.n >= (UWORD(1) << 32))
+        return 0;
+
+    if (m <= 0 || n <= 0)
+        return 1;
+
+    if (k <= 0 || mod.n == 1)
+    {
+        for (i = 0; i < m; i++)
+            memset(C + i * Cstride, 0, n * sizeof(uint32_t));
+        return 1;
+    }
+
+    if (C == A || C == B)
+    {
+        uint32_t * T = flint_malloc(m * n * sizeof(uint32_t));
+
+        _nmod_mat_mul_u32(T, n, A, Astride, B, Bstride, m, k, n, mod);
+        for (i = 0; i < m; i++)
+            memcpy(C + i * Cstride, T + i * n, n * sizeof(uint32_t));
+
+        flint_free(T);
+        return 1;
+    }
+
+    u32_ctx_init(&ctx, mod.n);
+
+    u32_32_core_mt(C, Cstride, A, Astride, B, Bstride, m, k, n, &ctx,
+                   flint_get_num_threads());
 
     return 1;
 }
@@ -1149,6 +993,16 @@ int
 nmod_mat_mul_u32(nmod_mat_t FLINT_UNUSED(C),
                  const nmod_mat_t FLINT_UNUSED(A),
                  const nmod_mat_t FLINT_UNUSED(B))
+{
+    return 0;
+}
+
+int
+_nmod_mat_mul_u32(uint32_t * FLINT_UNUSED(C), slong FLINT_UNUSED(Cstride),
+                  const uint32_t * FLINT_UNUSED(A), slong FLINT_UNUSED(Astride),
+                  const uint32_t * FLINT_UNUSED(B), slong FLINT_UNUSED(Bstride),
+                  slong FLINT_UNUSED(m), slong FLINT_UNUSED(k),
+                  slong FLINT_UNUSED(n), nmod_t FLINT_UNUSED(mod))
 {
     return 0;
 }

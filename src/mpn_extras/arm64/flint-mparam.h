@@ -44,4 +44,27 @@
 #define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 700
 #define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 2000
 
+
+/*
+    nmod_mat_mul: dispatch of the integer SIMD kernels nmod_mat_mul_u32
+    (moduli below 2^32) and nmod_mat_mul_u52 (AVX512-IFMA, moduli up to
+    2^52); see src/nmod_mat/mul.c and the profile p-mul_u32.c
+    (measured on Apple M4 (NEON), FLINT's own gemm).
+      U32_MIN_DIM          use the SIMD kernels from this minimal dimension
+      U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
+                           nmod_mat_mul_blas is preferred to u32 from this
+                           dimension on
+      U32_STRASSEN_CUTOFF  single-threaded, one Strassen level is put on
+                           top of u32 / u52 from this dimension on
+      U52_MIN_BITS         u52 is preferred to u32 from this modulus bit
+                           size on (through 52 bits)
+      U52_LO_MAX_BITS      u52 in its single-IFMA mode is preferred to u32
+                           up to this modulus bit size (0: never)
+*/
+#define FLINT_NMOD_MAT_MUL_U32_MIN_DIM 8
+#define FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF 192
+#define FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF 768
+#define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
+#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
+
 #endif

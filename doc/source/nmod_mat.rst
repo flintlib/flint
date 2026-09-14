@@ -346,7 +346,15 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between classical
-    and Strassen multiplication.
+    and Strassen multiplication. For the classical algorithms, it chooses
+    between several BLAS-like implementations: the byte kernels of
+    `nmod_mat_mul_u8` for moduli up to `255`, the integer SIMD kernels
+    `nmod_mat_mul_u32` (moduli below `2^{32}`) and `nmod_mat_mul_u52` (up to
+    `2^{52}`, when AVX512-IFMA is available), and `nmod_mat_mul_blas`. The
+    crossovers for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*`` and
+    ``FLINT_NMOD_MAT_MUL_U52_*`` parameters of the architecture dependent
+    ``flint-mparam.h``, to be tuned with the profile program
+    ``nmod_mat/profile/p-mul_u32.c``.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 
@@ -430,6 +438,26 @@ Matrix multiplication
     overflow. So, a single pass suffices for any modulus below `2^{32}`, making
     this typically faster than `nmod_mat_mul_blas` for input such that the
     latter needs to use multimodular reduction and CRT.
+
+.. function:: int _nmod_mat_mul_u32(uint32_t * C, slong Cstride, const uint32_t * A, slong Astride, const uint32_t * B, slong Bstride, slong m, slong k, slong n, nmod_t mod)
+
+    The same multiplication on matrices with 32-bit entries: `A` is
+    `m \times k`, `B` is `k \times n` and `C` is `m \times n`, each stored
+    row-major with the given row strides and with entries reduced modulo
+    ``mod.n``, which must be below `2^{32}`. The kernels read and write the
+    32-bit entries directly. Returns `1` for success and `0` in the cases
+    where `nmod_mat_mul_u32` does. Aliasing of `C` with `A` or `B` is
+    supported. Several threads are used when available.
+
+.. function:: int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using the AVX512-IFMA instructions, which multiply
+    52-bit integers exactly into two 64-bit accumulators. Returns `1` for
+    success and `0` if the modulus exceeds `2^{52}`, or if FLINT was not
+    compiled for a target with AVX512-IFMA (or with a 32-bit word size).
+    Aliasing of the operands is supported. This handles any modulus up to
+    `2^{52}`; up to `2^{26}`, a variant with a single IFMA instruction per
+    product is used. Several threads are used when available.
 
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 

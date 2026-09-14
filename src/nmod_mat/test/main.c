@@ -37,6 +37,7 @@
 #include "t-mul_strassen.c"
 #include "t-mul_u8.c"
 #include "t-mul_u32.c"
+#include "t-mul_u52.c"
 #include "t-neg.c"
 #include "t-nmod_vec_mul.c"
 #include "t-nullspace.c"
@@ -88,6 +89,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_mul_strassen),
     TEST_FUNCTION(nmod_mat_mul_u8),
     TEST_FUNCTION(nmod_mat_mul_u32),
+    TEST_FUNCTION(nmod_mat_mul_u52),
     TEST_FUNCTION(nmod_mat_neg),
     TEST_FUNCTION(nmod_mat_nmod_vec_mul),
     TEST_FUNCTION(nmod_mat_nullspace),
