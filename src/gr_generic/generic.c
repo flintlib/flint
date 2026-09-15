@@ -3187,6 +3187,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_EVALUATE,           (gr_funcptr) gr_generic_poly_evaluate},
     {GR_METHOD_POLY_DIVEXACT,           (gr_funcptr) _gr_poly_divexact_generic},
     {GR_METHOD_POLY_GCD,                (gr_funcptr) _gr_poly_gcd_generic},
+    {GR_METHOD_POLY_RESULTANT,          (gr_funcptr) _gr_poly_resultant_generic},
     {GR_METHOD_POLY_FACTOR,             (gr_funcptr) gr_generic_poly_factor},
     {GR_METHOD_POLY_ROOTS,              (gr_funcptr) gr_generic_poly_roots},
     {GR_METHOD_POLY_XGCD,               (gr_funcptr) _gr_poly_xgcd_generic},
