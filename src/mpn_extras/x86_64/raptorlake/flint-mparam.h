@@ -48,12 +48,12 @@
 /*
     nmod_mat_mul: dispatch of the integer SIMD kernels nmod_mat_mul_u32
     (moduli below 2^32) and nmod_mat_mul_u52 (AVX512-IFMA, moduli up to
-    2^52); see src/nmod_mat/mul.c and the profile p-mul_u32.c
+    2^52); see src/nmod_mat/mul.c and the profile p-mul_tune.c
     (not measured on this target: defaults).
       U32_MIN_DIM          use the SIMD kernels from this minimal dimension
       U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
                            nmod_mat_mul_blas is preferred to u32 from this
-                           dimension on
+                           dimension on (0: never)
       U32_STRASSEN_CUTOFF  single-threaded, one Strassen level is put on
                            top of u32 / u52 from this dimension on
       U52_MIN_BITS         u52 is preferred to u32 from this modulus bit

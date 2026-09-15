@@ -25,9 +25,14 @@
     same number of vector operations. When (n-1)^2 < 2^52, that is n <= 2^26,
     the high halves are all zero, and a second microkernel keeps only the
     low accumulator: one instruction per product-vector, twice the rows per
-    tile. On an Intel core with two IFMA ports this is the fastest kernel
-    of the family; on Zen 4 (one 512-bit multiply per cycle) it is expected
-    to be a wash with nmod_mat_mul_u32, see the dispatch in mul.c.
+    tile. Measured against nmod_mat_mul_u32 (single thread, 32 to 2048):
+    the single-IFMA mode is 1.3-1.35x faster on Ice Lake (two IFMA ports,
+    where u32 is issue bound) and 1.1-1.2x on Zen 4 (one 512-bit multiply
+    per cycle, where u32 still pays for its separate add and shift); the
+    two-IFMA mode is 1.2-1.65x slower than u32 up to 30 bits, on par at 31
+    bits on Ice Lake, and 1.3-2.7x faster from 32 bits on where u32 folds
+    every 1-2 products. Hence the U52_* parameters of flint-mparam.h, see
+    the dispatch in mul.c.
 
     The end-of-block reduction takes the two accumulators lo, hi < 2^61 to
     the canonical residue of hi*2^52 + lo:

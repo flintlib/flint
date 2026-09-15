@@ -354,7 +354,7 @@ Matrix multiplication
     crossovers for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*`` and
     ``FLINT_NMOD_MAT_MUL_U52_*`` parameters of the architecture dependent
     ``flint-mparam.h``, to be tuned with the profile program
-    ``nmod_mat/profile/p-mul_u32.c``.
+    ``nmod_mat/profile/p-mul_tune.c``.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 

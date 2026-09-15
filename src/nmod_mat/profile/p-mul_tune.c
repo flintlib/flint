@@ -18,7 +18,7 @@
     The purpose is to tune the dispatch in nmod_mat_mul, whose parameters
     live in flint-mparam.h (FLINT_NMOD_MAT_MUL_U32_* and _U52_*).
 
-        p-mul_u32 [options]
+        p-mul_tune [options]
 
           -bits b,...  modulus bit sizes; for each, the modulus is a
                        fixed "generic" prime of that size (with a large
@@ -34,8 +34,9 @@
                        nmod_mat_mul, and fgemm is nmod_mat_mul_blas forced
                        onto FLINT's own gemm, which only differs from blas
                        when FLINT is built with an external BLAS)
-          -dims d,...  square dimensions (default 32,48,64,96,128,192,
-                       256,384,512,768,1024,1536,2048)
+          -dims d,...  square dimensions (default 32,40,48,56,64,80,96,
+                       112,128,160,192,224,256,320,384,448,512,768,1024,
+                       1536,2048,4096)
           -shape m,k,n a single rectangular shape instead of -dims
           -threads t,..thread counts (default 1)
           -tmax s      once a function takes more than s seconds on some
@@ -49,19 +50,22 @@
     nmod_mat_mul_classical (for dimensions up to 600) so that a timing
     table cannot come from wrong results. Each table row ends with the
     name of the fastest function overall and the ratio
-    time(u32)/time(best base algorithm), where the base algorithms are
-    blas, fgemm, classical and threaded: strassen and mul are excluded
-    from that ratio because they recurse through nmod_mat_mul and so
-    already contain u32 (or whatever the dispatch picks) as their leaf;
-    comparing against them would say nothing about where u32 itself
-    should be used, and nmod32 and u52 are excluded because they are the
-    kernels being tuned (the "best" column does include them). A ratio
-    below 1 means u32 beats every base algorithm.
-    The summary per modulus and thread count gives the smallest dimension
-    from which that holds for all larger dimensions tested, which is the
-    crossover to put in nmod_mat_mul; the strassen and mul columns then
-    show whether a Strassen level on top pays and whether the dispatch
-    currently makes the right choice.
+    time(best SIMD kernel)/time(best base algorithm), where the SIMD
+    kernels are u32, nmod32 and u52 (those that are enabled and handle the
+    modulus) and the base algorithms are blas, fgemm, classical and
+    threaded: strassen and mul are excluded from the ratio because they
+    recurse through nmod_mat_mul and so already contain whatever the
+    dispatch picks as their leaf; comparing against them would say nothing
+    about where the kernels themselves should be used. A ratio below 1
+    means that some SIMD kernel beats every base algorithm, and the "best"
+    column says which. The summary per modulus and thread count gives the
+    smallest dimension from which that holds for all larger dimensions
+    tested, which is the crossover to put in nmod_mat_mul; the strassen
+    and mul columns then show whether a Strassen level on top pays and
+    whether the dispatch currently makes the right choice.
+
+    The dimensions are dense up to 512 so that the crossovers can be
+    read off; 4096 shows the asymptotic regime.
 
     External BLAS: an OpenMP or pthreads BLAS decides its own thread
     count and ignores flint_set_num_threads, which makes a comparison
@@ -106,8 +110,10 @@ static const char * fn_names[NUM_FN] =
     { "u32", "nmod32", "u52", "blas", "fgemm", "classical", "strassen",
       "threaded", "mul" };
 
-/* the functions u32 is compared against for the crossover: those that
-   do not themselves go through nmod_mat_mul and are not SIMD kernels */
+/* the SIMD kernels being tuned, and the functions they are compared
+   against for the crossover: those that do not themselves go through
+   nmod_mat_mul and are not SIMD kernels */
+static const int fn_is_simd[NUM_FN] = { 1, 1, 1, 0, 0, 0, 0, 0, 0 };
 static const int fn_is_base[NUM_FN] = { 0, 0, 0, 1, 1, 1, 0, 1, 0 };
 
 /* uint32 copies of A, B and C for _nmod_mat_mul_u32 */
@@ -265,9 +271,9 @@ main(int argc, char ** argv)
 #endif
     slong nthreads[16] = { 1 };
     slong num_thread_counts = 1;
-    slong dims[64] = { 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024,
-                       1536, 2048 };
-    slong num_dims = 13;
+    slong dims[64] = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224,
+                       256, 320, 384, 448, 512, 768, 1024, 1536, 2048, 4096 };
+    slong num_dims = 22;
     slong shape[3] = { 0, 0, 0 };
     int have_shape = 0;
     double tmax = 4.0;
@@ -332,7 +338,7 @@ main(int argc, char ** argv)
         {
             flint_printf("usage: %s [-bits 16,20,...,32] [-p n,...] "
                          "[-fn u32,nmod32,u52,blas,fgemm,classical,strassen,threaded,mul] "
-                         "[-dims 32,...,2048] [-shape m,k,n] "
+                         "[-dims 32,...,4096] [-shape m,k,n] "
                          "[-threads 1,2,4] [-tmax s] [-reps r] [-csv]\n",
                          argv[0]);
             return 1;
@@ -388,7 +394,7 @@ main(int argc, char ** argv)
                  NMOD_MAT_HAVE_MUL_U52 ? "" : ", not available in this build");
     flint_printf("times in microseconds, best of >= %wd runs; - means declined or "
                  "skipped (slower than %.1f s at a smaller size);\n"
-                 "ratio = time(u32) / time(fastest of blas, fgemm, classical, threaded);\n"
+                 "ratio = time(fastest of u32, nmod32, u52) / time(fastest of blas, fgemm, classical, threaded);\n"
                  "strassen and mul recurse through nmod_mat_mul and are left out of it\n\n",
                  reps, tmax);
 
@@ -400,12 +406,9 @@ main(int argc, char ** argv)
         for (t = 0; t < num_thread_counts; t++)
         {
             int skipped[NUM_FN] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            slong first_win = -1;   /* smallest dim from which u32 wins */
-            int u32_ever_lost_after = 0;
+            slong first_win = -1;   /* smallest dim from which a SIMD kernel wins */
+            int simd_ever_lost_after = 0;
             slong last_dim_measured = 0;
-            slong first_win_u52 = -1;   /* the same for u52 */
-            int u52_ever_lost_after = 0;
-            slong last_dim_measured_u52 = 0;
 
             flint_set_num_threads(nthreads[t]);
 
@@ -423,7 +426,7 @@ main(int argc, char ** argv)
                 nmod_mat_t A, B, C, D;
                 double tm[NUM_FN];
                 int ok[NUM_FN];
-                double best_other = 1e300;
+                double best_other = 1e300, best_simd = 1e300;
                 slong best_fn = -1;
                 slong shape_len;
                 nmod32_data w32;
@@ -543,8 +546,8 @@ main(int argc, char ** argv)
                 }
 
                 /* the fastest function overall (mul excluded, being a
-                   dispatch of the others), and the fastest base algorithm
-                   for the crossover ratio */
+                   dispatch of the others), and the fastest SIMD kernel and
+                   base algorithm for the crossover ratio */
                 for (f = 0; f < NUM_FN; f++)
                 {
                     if (!ok[f] || f == FN_MUL)
@@ -553,6 +556,8 @@ main(int argc, char ** argv)
                         best_fn = f;
                     if (fn_is_base[f] && tm[f] < best_other)
                         best_other = tm[f];
+                    if (fn_is_simd[f] && tm[f] < best_simd)
+                        best_simd = tm[f];
                 }
 
                 flint_printf("%wd x %wd x %wd", m, k, n);
@@ -581,12 +586,12 @@ main(int argc, char ** argv)
                 else
                     flint_printf("   %-10s", "-");
 
-                if (ok[FN_U32] && best_other < 1e300)
+                if (best_simd < 1e300 && best_other < 1e300)
                 {
-                    flint_printf(" %.3f", tm[FN_U32] / best_other);
+                    flint_printf(" %.3f", best_simd / best_other);
 
                     last_dim_measured = FLINT_MIN(FLINT_MIN(m, k), n);
-                    if (tm[FN_U32] < best_other)
+                    if (best_simd < best_other)
                     {
                         if (first_win < 0)
                             first_win = last_dim_measured;
@@ -594,24 +599,8 @@ main(int argc, char ** argv)
                     else
                     {
                         if (first_win >= 0)
-                            u32_ever_lost_after = 1;
+                            simd_ever_lost_after = 1;
                         first_win = -1;
-                    }
-                }
-
-                if (ok[FN_U52] && best_other < 1e300)
-                {
-                    last_dim_measured_u52 = FLINT_MIN(FLINT_MIN(m, k), n);
-                    if (tm[FN_U52] < best_other)
-                    {
-                        if (first_win_u52 < 0)
-                            first_win_u52 = last_dim_measured_u52;
-                    }
-                    else
-                    {
-                        if (first_win_u52 >= 0)
-                            u52_ever_lost_after = 1;
-                        first_win_u52 = -1;
                     }
                 }
 
@@ -625,26 +614,15 @@ main(int argc, char ** argv)
                 nmod_mat_clear(C);
             }
 
-            if (do_fn[FN_U32] && !have_shape)
+            if (!have_shape)
             {
                 if (first_win >= 0)
-                    flint_printf("  => u32 beats blas/fgemm/classical/threaded from dim %wd on%s\n",
-                                 first_win, u32_ever_lost_after ?
+                    flint_printf("  => a SIMD kernel beats blas/fgemm/classical/threaded from dim %wd on%s\n",
+                                 first_win, simd_ever_lost_after ?
                                  " (after winning and losing at smaller sizes)" : "");
                 else if (last_dim_measured > 0)
-                    flint_printf("  => u32 does not beat all of blas/fgemm/classical/threaded at dim %wd\n",
+                    flint_printf("  => no SIMD kernel beats all of blas/fgemm/classical/threaded at dim %wd\n",
                                  last_dim_measured);
-            }
-
-            if (do_fn[FN_U52] && !have_shape)
-            {
-                if (first_win_u52 >= 0)
-                    flint_printf("  => u52 beats blas/fgemm/classical/threaded from dim %wd on%s\n",
-                                 first_win_u52, u52_ever_lost_after ?
-                                 " (after winning and losing at smaller sizes)" : "");
-                else if (last_dim_measured_u52 > 0)
-                    flint_printf("  => u52 does not beat all of blas/fgemm/classical/threaded at dim %wd\n",
-                                 last_dim_measured_u52);
             }
 
             flint_printf("\n");

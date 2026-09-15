@@ -74,6 +74,8 @@ BT_NAME(pack_a)(BT_PACKED * ap, const BT_ENTRY * a, slong lda,
 {
     slong ir, rr, l, r;
 
+    (void) ctx;     /* not every BT_LIFT looks at it */
+
     for (ir = 0; ir < rows; ir += BT_MR)
     {
         rr = FLINT_MIN(rows - ir, BT_MR);
@@ -102,6 +104,8 @@ BT_NAME(pack_b)(BT_PACKED * bp, const BT_ENTRY * b, slong ldb,
                 slong kc, slong cols, const BT_CTX * ctx)
 {
     slong jr, cc, l, j;
+
+    (void) ctx;     /* not every BT_LIFT looks at it */
 
     for (jr = 0; jr < cols; jr += BT_NR)
     {
