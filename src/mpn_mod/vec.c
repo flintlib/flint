@@ -478,15 +478,98 @@ _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_c
 
 #include "gr.h"
 
-/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
+/*
+    Unreduced dot products for the three variants below: computes
+    {s, slimbs} = sum of the products (exactly, given that
+    2 * modulus_bits + bitcount(len) <= 64 slimbs), using the fixed-size
+    kernels when available, and returns slimbs. The strides are in limbs;
+    forward dot products have stride1 = stride2 = n, reversed ones
+    stride2 = -n with vec2 pointing to the last element.
+*/
+FLINT_FORCE_INLINE slong
+_mpn_mod_vec_dot_unreduced(nn_ptr s, nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong slimbs, i;
+    flint_bitcnt_t sbits;
+
+    sbits = 2 * MPN_MOD_CTX_MODULUS_BITS(ctx) + FLINT_BIT_COUNT(len);
+    slimbs = (sbits + FLINT_BITS - 1) / FLINT_BITS;
+    slimbs = FLINT_MAX(slimbs, 2 * n - 1);
+
+    if (n == 2)
+    {
+        /* dedicated fixed-signature kernels for the most common case */
+        if (stride1 == 2 && stride2 == 2)
+            flint_mpn_dot_tab[0][2][2][slimbs - 3](s, vec1, vec2, len);
+        else if (stride1 == 2 && stride2 == -2)
+            flint_mpn_dot_rev_tab[0][2][2][slimbs - 3](s, vec1, vec2 - (len - 1) * 2, len);
+        else
+            flint_mpn_dot_strided_tab[0][2][2][slimbs - 3](s, vec1, stride1, vec2, stride2, len);
+    }
+    else if (n <= FLINT_MPN_DOT_TAB_N && slimbs <= 8)
+    {
+        flint_mpn_dot_strided_tab[0][n][n][slimbs - (2 * n - 1)](s, vec1, stride1, vec2, stride2, len);
+    }
+    else
+    {
+        ulong t[2 * MPN_MOD_MAX_LIMBS];
+
+        slimbs = 2 * n + 1;
+        flint_mpn_mul_n(s, vec1, vec2, n);
+        s[2 * n] = 0;
+        for (i = 1; i < len; i++)
+        {
+            flint_mpn_mul_n(t, vec1 + i * stride1, vec2 + i * stride2, n);
+            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
+        }
+    }
+
+    return slimbs;
+}
+
+/* res = initial +/- (s mod p) */
+FLINT_FORCE_INLINE void
+_mpn_mod_vec_dot_finish(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr s, slong slimbs, gr_ctx_t ctx)
+{
+    ulong t[MPN_MOD_MAX_LIMBS];
+    slong sn = slimbs;
+
+    /* at most the top limb or two can be zero */
+    while (sn > 0 && s[sn - 1] == 0)
+        sn--;
+
+    if (initial == NULL)
+    {
+        if (!subtract)
+        {
+            mpn_mod_set_mpn(res, s, sn, ctx);
+        }
+        else
+        {
+            mpn_mod_set_mpn(t, s, sn, ctx);
+            mpn_mod_neg(res, t, ctx);
+        }
+    }
+    else
+    {
+        /* todo: consider setting initial as a starting value for the sum */
+        mpn_mod_set_mpn(t, s, sn, ctx);
+
+        if (!subtract)
+            mpn_mod_add(res, initial, t, ctx);
+        else
+            mpn_mod_sub(res, initial, t, ctx);
+    }
+}
+
 int
 _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
     ulong t[2 * MPN_MOD_MAX_LIMBS];
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
-    slong sn;
-    slong i;
+    slong slimbs;
 
     if (len <= 2)
     {
@@ -525,94 +608,19 @@ _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn
         return GR_SUCCESS;
     }
 
-    if (n == 2)
-    {
-        ulong A0, A1, B0, B1;
-        ulong p3, p2, p1, p0;
-        ulong s4, s3, s2, s1, s0;
-        ulong u2, u1;
-        ulong v3, v2;
-
-        s4 = s3 = s2 = s1 = s0 = 0;
-        u2 = u1 = 0;
-        v3 = v2 = 0;
-
-        for (i = 0; i < len; i++)
-        {
-            A0 = vec1[2 * i + 0];
-            A1 = vec1[2 * i + 1];
-            B0 = vec2[2 * i + 0];
-            B1 = vec2[2 * i + 1];
-
-            umul_ppmm(p2, p1, A1, B0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p1, p0, B0, A0);
-            add_sssaaaaaa(u2, u1, s0, u2, u1, s0, UWORD(0), p1, p0);
-            umul_ppmm(p2, p1, B1, A0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p3, p2, B1, A1);
-            add_sssaaaaaa(s4, v3, v2, s4, v3, v2, UWORD(0), p3, p2);
-        }
-
-        /* s3 is small, so this doesn't overflow */
-        add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), u2, u1);
-        add_sssaaaaaa(s4, s3, s2, s4, s3, s2, UWORD(0), v3, v2);
-
-        s[0] = s0;
-        s[1] = s1;
-        s[2] = s2;
-        s[3] = s3;
-        s[4] = s4;
-    }
-    else
-    {
-        flint_mpn_mul_n(s, vec1, vec2, n);
-        s[2 * n] = 0;
-        for (i = 1; i < len; i++)
-        {
-            flint_mpn_mul_n(t, vec1 + i * n, vec2 + i * n, n);
-            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-        }
-    }
-
-    sn = 2 * n + (s[2 * n] != 0);
-
-    if (initial == NULL)
-    {
-        if (!subtract)
-        {
-            mpn_mod_set_mpn(res, s, sn, ctx);
-        }
-        else
-        {
-            mpn_mod_set_mpn(t, s, sn, ctx);
-            mpn_mod_neg(res, t, ctx);
-        }
-    }
-    else
-    {
-        /* todo: consider setting initial as a starting value for the sum */
-        mpn_mod_set_mpn(t, s, sn, ctx);
-
-        if (!subtract)
-            mpn_mod_add(res, initial, t, ctx);
-        else
-            mpn_mod_sub(res, initial, t, ctx);
-    }
+    slimbs = _mpn_mod_vec_dot_unreduced(s, vec1, n, vec2, n, len, ctx);
+    _mpn_mod_vec_dot_finish(res, initial, subtract, s, slimbs, ctx);
 
     return GR_SUCCESS;
 }
 
-/* todo: optimize for length 1, 2 */
-/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
     ulong t[2 * MPN_MOD_MAX_LIMBS];
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
-    slong sn;
-    slong i;
+    slong slimbs;
 
     if (len <= 2)
     {
@@ -651,93 +659,19 @@ _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1
         return GR_SUCCESS;
     }
 
-    if (n == 2)
-    {
-        ulong A0, A1, B0, B1;
-        ulong p3, p2, p1, p0;
-        ulong s4, s3, s2, s1, s0;
-        ulong u2, u1;
-        ulong v3, v2;
-
-        s4 = s3 = s2 = s1 = s0 = 0;
-        u2 = u1 = 0;
-        v3 = v2 = 0;
-
-        for (i = 0; i < len; i++)
-        {
-            A0 = vec1[2 * i + 0];
-            A1 = vec1[2 * i + 1];
-            B0 = vec2[2 * (len - 1 - i) + 0];
-            B1 = vec2[2 * (len - 1 - i) + 1];
-
-            umul_ppmm(p2, p1, A1, B0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p1, p0, B0, A0);
-            add_sssaaaaaa(u2, u1, s0, u2, u1, s0, UWORD(0), p1, p0);
-            umul_ppmm(p2, p1, B1, A0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p3, p2, B1, A1);
-            add_sssaaaaaa(s4, v3, v2, s4, v3, v2, UWORD(0), p3, p2);
-        }
-
-        /* s3 is small, so this doesn't overflow */
-        add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), u2, u1);
-        add_sssaaaaaa(s4, s3, s2, s4, s3, s2, UWORD(0), v3, v2);
-
-        s[0] = s0;
-        s[1] = s1;
-        s[2] = s2;
-        s[3] = s3;
-        s[4] = s4;
-    }
-    else
-    {
-        flint_mpn_mul_n(s, vec1, vec2 + (len - 1) * n, n);
-        s[2 * n] = 0;
-        for (i = 1; i < len; i++)
-        {
-            flint_mpn_mul_n(t, vec1 + i * n, vec2 + (len - i - 1) * n, n);
-            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-        }
-    }
-
-    sn = 2 * n + (s[2 * n] != 0);
-
-    if (initial == NULL)
-    {
-        if (!subtract)
-        {
-            mpn_mod_set_mpn(res, s, sn, ctx);
-        }
-        else
-        {
-            mpn_mod_set_mpn(t, s, sn, ctx);
-            mpn_mod_neg(res, t, ctx);
-        }
-    }
-    else
-    {
-        /* todo: consider setting initial as a starting value for the sum */
-        mpn_mod_set_mpn(t, s, sn, ctx);
-
-        if (!subtract)
-            mpn_mod_add(res, initial, t, ctx);
-        else
-            mpn_mod_sub(res, initial, t, ctx);
-    }
+    slimbs = _mpn_mod_vec_dot_unreduced(s, vec1, n, vec2 + (len - 1) * n, -n, len, ctx);
+    _mpn_mod_vec_dot_finish(res, initial, subtract, s, slimbs, ctx);
 
     return GR_SUCCESS;
 }
 
-/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
 {
     ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
     ulong t[2 * MPN_MOD_MAX_LIMBS];
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
-    slong sn;
-    slong i;
+    slong slimbs;
 
     if (len <= 2)
     {
@@ -776,80 +710,8 @@ _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr 
         return GR_SUCCESS;
     }
 
-    if (n == 2)
-    {
-        ulong A0, A1, B0, B1;
-        ulong p3, p2, p1, p0;
-        ulong s4, s3, s2, s1, s0;
-        ulong u2, u1;
-        ulong v3, v2;
-
-        s4 = s3 = s2 = s1 = s0 = 0;
-        u2 = u1 = 0;
-        v3 = v2 = 0;
-
-        for (i = 0; i < len; i++)
-        {
-            A0 = vec1[2 * i * stride1 + 0];
-            A1 = vec1[2 * i * stride1 + 1];
-            B0 = vec2[2 * i * stride2 + 0];
-            B1 = vec2[2 * i * stride2 + 1];
-
-            umul_ppmm(p2, p1, A1, B0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p1, p0, B0, A0);
-            add_sssaaaaaa(u2, u1, s0, u2, u1, s0, UWORD(0), p1, p0);
-            umul_ppmm(p2, p1, B1, A0);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
-            umul_ppmm(p3, p2, B1, A1);
-            add_sssaaaaaa(s4, v3, v2, s4, v3, v2, UWORD(0), p3, p2);
-        }
-
-        /* s3 is small, so this doesn't overflow */
-        add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), u2, u1);
-        add_sssaaaaaa(s4, s3, s2, s4, s3, s2, UWORD(0), v3, v2);
-
-        s[0] = s0;
-        s[1] = s1;
-        s[2] = s2;
-        s[3] = s3;
-        s[4] = s4;
-    }
-    else
-    {
-        flint_mpn_mul_n(s, vec1, vec2, n);
-        s[2 * n] = 0;
-        for (i = 1; i < len; i++)
-        {
-            flint_mpn_mul_n(t, vec1 + i * n * stride1, vec2 + i * n * stride2, n);
-            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-        }
-    }
-
-    sn = 2 * n + (s[2 * n] != 0);
-
-    if (initial == NULL)
-    {
-        if (!subtract)
-        {
-            mpn_mod_set_mpn(res, s, sn, ctx);
-        }
-        else
-        {
-            mpn_mod_set_mpn(t, s, sn, ctx);
-            mpn_mod_neg(res, t, ctx);
-        }
-    }
-    else
-    {
-        /* todo: consider setting initial as a starting value for the sum */
-        mpn_mod_set_mpn(t, s, sn, ctx);
-
-        if (!subtract)
-            mpn_mod_add(res, initial, t, ctx);
-        else
-            mpn_mod_sub(res, initial, t, ctx);
-    }
+    slimbs = _mpn_mod_vec_dot_unreduced(s, vec1, stride1 * n, vec2, stride2 * n, len, ctx);
+    _mpn_mod_vec_dot_finish(res, initial, subtract, s, slimbs, ctx);
 
     return GR_SUCCESS;
 }

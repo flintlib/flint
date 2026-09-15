@@ -91,18 +91,28 @@
     Call for initialization of polynomial, sieving, and scanning of sieve
     for all the possible polynomials for particular hypercube i.e. `A`.
 
-.. function:: void qsieve_write_to_file(qs_t qs_inf, ulong prime, const fmpz_t Y, const qs_poly_t poly)
+.. function:: void qsieve_relations_init(qs_t qs_inf)
 
-    Write a relation to the file in a binary format as follows. First, write
-    large prime of size ``sizeof(ulong)``, in case of full relation it is 1.
-    After this, write the number of small primes with size ``sizeof(slong)``.
-    Then, write the small primes, with a total size of
-    ``number_of_small_primes * sizeof(slong)``. Then, write the number of
-    factors with a size of ``sizeof(slong)``. After that, write the factors and
-    their exponents in the format ``factor_1, exponent_1, factor_2, ...``, all
-    with a total size of ``2 * number_of_factors * sizeof(slong)``. Then write
-    ``Y`` with the size of ``Y`` first (size ``sizeof(slong)``, that may be
-    negative), and then its limbs (size ``Y_size * sizeof(ulong)``).
+    Initialise the store which holds the relations found by sieving. Called by
+    :func:`qsieve_init_with_tune`.
+
+.. function:: void qsieve_relations_clear(qs_t qs_inf)
+
+    Free the relation store. Called by :func:`qsieve_clear`.
+
+.. function:: void qsieve_relations_reset(qs_t qs_inf)
+
+    Discard all the relations found so far, retaining the allocations made for
+    them. Used when the linear algebra fails to split `n` and sieving has to
+    start again with a larger factor base.
+
+.. function:: void qsieve_add_relation(qs_t qs_inf, ulong prime, const fmpz_t Y, const qs_poly_t poly)
+
+    Append a relation to the store, where *prime* is its large prime, or 1 if
+    the relation is full, and *poly* supplies the small prime exponents and the
+    remaining factors. The relations are held in memory for the duration of the
+    run. As this is called from the sieving threads, the caller must hold
+    ``qs_inf->mutex``.
 
 .. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime)
 
@@ -113,10 +123,10 @@
     
     Add 'prime' to the hast table.
 
-.. function:: relation_t qsieve_parse_relation(qs_t qs_inf)
+.. function:: relation_t qsieve_get_relation(qs_t qs_inf, slong i)
 
-    Read a relation from the file associated with *qs_inf* and parse it to
-    obtain all the parameters of the relation.
+    Return a copy of the *i*-th relation in the store. The store retains its
+    own copy; the caller owns, and must free, the one returned.
 
 .. function:: relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 
@@ -139,9 +149,9 @@
 
 .. function:: int qsieve_process_relation(qs_t qs_inf)
 
-    After we have accumulated required number of relations, first process the file by
-    reading all the relations, removes singleton. Then merge all the possible partial
-    to obtain full relations.
+    After we have accumulated required number of relations, first process the
+    relations found so far, removing singletons. Then merge all the possible
+    partials to obtain full relations.
 
 .. function:: void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 

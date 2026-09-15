@@ -683,6 +683,26 @@ Multiplication
     Assumes that ``len1`` and ``len2`` are positive and that
     `0 \le nlo < nhi \le len1 + len2 - 1`.
 
+    :func:`_fmpz_poly_mulmid` is the single dispatcher behind
+    :func:`_fmpz_poly_mul`, :func:`_fmpz_poly_mullow`,
+    :func:`_fmpz_poly_mulhigh`, :func:`_fmpz_poly_sqr` and
+    :func:`_fmpz_poly_sqrlow` (squaring is detected when the operands are
+    the same array). Depending on the lengths, the window and the bit
+    sizes of the coefficients it uses: direct accumulation in words or
+    double words for small coefficients; the classical algorithm on
+    ``fmpz`` values for very short polynomials (further on partial windows
+    and on low squarings, where its cost follows the number of terms in
+    the window); the packed-limb classical, Karatsuba and Karatsuba middle
+    product multiplication (:func:`_fmpz_poly_mulmid_mpn`) for polynomials
+    up to a few dozen terms with coefficients up to about a thousand bits;
+    the Toom-Cook style evaluation/interpolation
+    (:func:`_fmpz_poly_mulmid_toom_karatsuba`) for short polynomials with
+    large coefficients; the fft_small-based classical multiplication for
+    low and high windows with large coefficients; and otherwise the
+    ``fft_small`` based multiplication, Kronecker substitution or
+    Schoenhage-Strassen. The boundaries were tuned for uniformly sized
+    random coefficients.
+
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
               void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
               void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -712,12 +732,59 @@ Multiplication
     Wrapper handling aliasing, zero operands and normalization, with
     the same return convention.
 
+.. function:: void _fmpz_poly_mulmid_mpn(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mul_mpn(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+
+    As :func:`_fmpz_poly_mulmid` (respectively :func:`_fmpz_poly_mul`),
+    computing the coefficients `[\mathtt{nlo}, \mathtt{nhi})` of the product
+    with the coefficient arithmetic done on packed fixed-size limb arrays
+    rather than on ``fmpz`` values, using classical or Karatsuba-based
+    multiplication (:func:`_flint_mpn_poly_mulmid`). These routines are
+    intended for polynomials of small or medium length with small or
+    medium size coefficients (say up to a few hundred bits).
+
+    The coefficients of the inputs that cannot contribute to the requested
+    window are trimmed away first. The representation, the numbers of limbs
+    and the size of the outputs are then chosen by
+    :func:`_flint_mpn_poly_mulmid_params` from the bit bounds of the inputs and
+    the lengths: the input coefficients are packed as contiguous
+    unsigned, two's complement, sign-magnitude or biased `n`-limb integers
+    (when all coefficients are small ``fmpz`` values, the ``fmpz`` arrays
+    are used directly as 1-limb two's complement arrays), and each
+    output coefficient is computed exactly modulo `2^{64 s}` and
+    converted back, applying the bias correction when needed.
+    Squaring is detected when ``poly1`` and ``poly2`` are the same array
+    of the same length.
+
+.. function:: void _fmpz_poly_mulmid_mpn_bits(fmpz * res, const fmpz * poly1, slong len1, slong bits1, const fmpz * poly2, slong len2, slong bits2, slong nlo, slong nhi)
+
+    Version taking as extra inputs the signed bit bounds ``bits1`` and
+    ``bits2`` of the coefficients of the two polynomials as computed
+    by :func:`_fmpz_vec_max_bits`, avoiding recomputation when these
+    are already known. The bounds need not be tight.
+
+.. function:: void fmpz_poly_mulmid_mpn(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+              void fmpz_poly_mul_mpn(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Wrappers handling aliasing, zero operands and normalization.
+
 .. function:: int _fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)`` and
     ``(poly2, len2)`` using one level of Toom-Cook multiplication in the
     polynomial variable, with the pointwise products done as scalar
     integer multiplications.
+
+.. function:: int _fmpz_poly_mul_toom_scalar_nmax(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nmax)
+              int _fmpz_poly_mulmid_toom_scalar_nmax(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi, slong nmax)
+
+    Versions of the above only handling products of length (or window
+    sizes) up to ``nmax`` (clamped to ``FMPZ_POLY_TOOM_SCALAR_N_MAX``)
+    and returning 0 otherwise. The caller chooses ``nmax``; the
+    evaluations and interpolations are only negligible against the
+    multiplications for large coefficients, so the Toom-Karatsuba
+    multiplication limits the number of points depending on the
+    coefficient size. This is what the Karatsuba layer uses.
 
     Evaluation is at the points `0, \pm 1, \ldots, \pm p`, one further
     point when the output length is odd, and infinity, giving exactly
@@ -788,43 +855,56 @@ Multiplication
     `[nlo, nhi)` in the product of ``poly1`` and ``poly2``, with the same
     return convention as above.
 
-.. function:: void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+.. function:: void _fmpz_poly_mul_toom_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
-    zero-padding of the two input polynomials.  No aliasing of inputs with
-    outputs is allowed.
+    and ``(poly2, len2)``, by Karatsuba multiplication recursing to
+    :func:`_fmpz_poly_mul_toom_scalar` as the base case. Assumes that
+    ``len1`` and ``len2`` are positive; the lengths may be given in
+    either order, and squaring is detected when ``poly1 == poly2``.
+    Unbalanced lengths are handled by splitting the longer operand into
+    pieces of the length of the shorter one, so that the cost is
+    proportional to the length ratio. No aliasing of inputs with the
+    output is allowed.
 
-.. function:: void fmpz_poly_mul_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+    Together with the base case this performs `O(L^{1.585})` coefficient
+    multiplications for length `L`, with the Toom base case removing most
+    of the Karatsuba overhead for the lowest levels of the recursion. The
+    linear work is quadratic in the length per level, so this only pays
+    off over Karatsuba multiplication of the packed (mpn) representation
+    once the coefficient multiplications dominate, for coefficients of
+    roughly 2000 bits and more; in that regime the fmpz overhead is
+    negligible.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``.
+.. function:: void fmpz_poly_mul_toom_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-.. function:: void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, slong n)
+    Sets ``res`` to the product of ``poly1`` and ``poly2``. Aliasing of
+    the output with either input is permitted.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates to the given length.  It is assumed that ``poly1`` and
-    ``poly2`` are precisely the given length, possibly zero padded.
-    Assumes `n` is not zero.
+.. function:: void _fmpz_poly_mulmid_toom_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
 
-.. function:: void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[nlo, nhi)` in the full product of ``(poly1, len1)`` and
+    ``(poly2, len2)``, as :func:`_fmpz_poly_mulmid`, with
+    :func:`_fmpz_poly_mulmid_toom_scalar` as the base case throughout.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`; the lengths may be given
+    in either order. No aliasing of inputs with the output is allowed.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates to the given length.
+    Coefficients of the inputs that cannot contribute to the window are
+    trimmed away first. Full windows use Karatsuba multiplication, low
+    windows Mulders' algorithm, high windows a low product of the
+    reversed operands, and windows in the middle range are covered by
+    blocks of the Karatsuba middle product of Hanrot, Quercia and
+    Zimmermann, so that a middle-product-shaped window costs about half
+    of a full product.
 
-.. function:: void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, slong len)
+.. function:: void fmpz_poly_mulmid_toom_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates at the top to the given length.  The first ``len - 1``
-    coefficients are set to zero. It is assumed that ``poly1`` and
-    ``poly2`` are precisely the given length, possibly zero padded.
-    Assumes ``len`` is not zero.
-
-.. function:: void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong len)
-
-    Sets the first ``len - 1`` coefficients of the result to zero and the
-    remaining coefficients to the corresponding coefficients of the product of
-    ``poly1`` and ``poly2``.  Assumes ``poly1`` and ``poly2`` are
-    at most of the given length.
+    Sets ``res`` to the polynomial formed by the coefficients at indices
+    `[nlo, nhi)` in the product of ``poly1`` and ``poly2``. The window
+    is clamped to the length of the product. Aliasing of the output with
+    either input is permitted.
 
 .. function:: void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -884,21 +964,24 @@ Multiplication
 .. function:: void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
+    and ``(poly2, len2)``.  Assumes ``len1, len2 > 0``; the operands may
+    be given in either order.  Allows
     zero-padding of the two input polynomials. Does not support aliasing
     between the inputs and the output.
 
 .. function:: void fmpz_poly_mul(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``.  Chooses
-    an optimal algorithm from the choices above.
+    Sets ``res`` to the product of ``poly1`` and ``poly2``.  The algorithm
+    is chosen by :func:`_fmpz_poly_mulmid`, the single dispatcher behind
+    all the multiplication and squaring functions.
 
 .. function:: void _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong n)
 
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
 
-    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Assumes ``len1, len2 > 0`` (the operands may be given in either
+    order) and ``0 < n <= len1 + len2 - 1``.
     Allows for zero-padding in the inputs.  Does not support aliasing between
     the inputs and the output.
 
@@ -919,7 +1002,8 @@ Multiplication
     Sets all but the low `n` coefficients of `res` to the corresponding
     coefficients of the product of `poly1` of length `len1` and `poly2` of
     length `len2`, the remaining coefficients being arbitrary. It is assumed
-    that `len1 >= len2 > 0` and that `0 < n < len1 + len2 - 1`. Aliasing of
+    that `len1, len2 > 0` (the operands may be given in either order) and
+    that `0 < n < len1 + len2 - 1`. Aliasing of
     inputs is not permitted.
 
 
@@ -1000,18 +1084,6 @@ Squaring
     Sets ``rop`` to the square of the polynomial ``op`` using
     Kronecker segmentation.
 
-.. function:: void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, slong len)
-
-    Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``,
-    assuming that ``len > 0``.
-
-    Supports zero-padding in ``(op, len)``.  Does not support aliasing.
-
-.. function:: void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op)
-
-    Sets ``rop`` to the square of the polynomial ``op`` using
-    the Karatsuba multiplication algorithm.
-
 .. function:: void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, slong len)
 
     Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``,
@@ -1048,17 +1120,6 @@ Squaring
 
     Sets ``res`` to the lowest `n` coefficients
     of the square of ``poly``.
-
-.. function:: void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n)
-
-    Sets ``(res, n)`` to the square of ``(poly, n)`` truncated
-    to length `n`, which is assumed to be positive.  Allows for ``poly``
-    to be zero-padded.
-
-.. function:: void fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
-
-    Sets ``res`` to the square of ``poly`` and
-    truncates to the given length.
 
 .. function:: void _fmpz_poly_sqrlow_classical(fmpz * res, const fmpz * poly, slong len, slong n)
 

@@ -66,8 +66,7 @@ void _gr_poly_test_div(gr_method_poly_binary_op div_impl,
         {
             gr_poly_fit_length(Q, A->length - B->length + 1, ctx);
             status |= div_impl(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
-            _gr_poly_set_length(Q, A->length - B->length + 1, ctx);
-            _gr_poly_normalise(Q, ctx);
+            _gr_poly_set_length_normalise(Q, A->length - B->length + 1, ctx);
 
             status |= gr_poly_mul(R, Q, B, ctx);
             status |= gr_poly_sub(R, A, R, ctx);

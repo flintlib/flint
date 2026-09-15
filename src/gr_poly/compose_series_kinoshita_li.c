@@ -456,8 +456,7 @@ gr_poly_compose_series_kinoshita_li(gr_poly_t res,
     gr_poly_fit_length(res, lenr, ctx);
     status = _gr_poly_compose_series_kinoshita_li(res->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, ctx);
-    _gr_poly_set_length(res, lenr, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, lenr, ctx);
 
     return status;
 }

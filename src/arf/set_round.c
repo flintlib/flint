@@ -29,9 +29,6 @@ arf_set_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
 
         if (y == x)
         {
-            nn_ptr xtmp;
-            TMP_INIT;
-
             ARF_GET_MPN_READONLY(xptr, xn, x);
 
             /* exact */
@@ -45,14 +42,9 @@ arf_set_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
                     return 0;
             }
 
-            /* inexact */
-            TMP_START;
-            xtmp = TMP_ALLOC(xn * sizeof(ulong));
-            flint_mpn_copyi(xtmp, xptr, xn);
-            inexact = _arf_set_round_mpn(y, &fix, xtmp, xn, ARF_SGNBIT(x), prec, rnd);
+            /* inexact: rounded in place */
+            inexact = _arf_set_round_mpn(y, &fix, xptr, xn, ARF_SGNBIT(x), prec, rnd);
             _fmpz_add_fast(ARF_EXPREF(y), ARF_EXPREF(x), fix);
-
-            TMP_END;
             return inexact;
         }
         else
@@ -70,6 +62,7 @@ int
 _arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
     int sgnbit, slong prec, arf_rnd_t rnd)
 {
+    ulong xtmp[ARF_NOPTR_LIMBS + 1];   /* in-place rounding into the inline limbs */
     unsigned int leading;
     flint_bitcnt_t exp, bc, val, val_bits;
     slong yn, val_limbs;
@@ -187,6 +180,56 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
     bc = exp - val;
     yn = (bc + FLINT_BITS - 1) / FLINT_BITS;
 
+    /* x may live inside the buffer of y (in-place rounding, with x at a
+       nonnegative offset from the start of the buffer) */
+    if (ARF_HAS_PTR(y) && x >= ARF_PTR_D(y) && x < ARF_PTR_D(y) + ARF_PTR_ALLOC(y))
+    {
+        if (yn <= ARF_NOPTR_LIMBS)
+        {
+            /* the buffer is about to be freed by ARF_DEMOTE: save the at
+               most yn + 1 limbs still needed (the discarded low limbs only
+               mattered for the rounding decision, already made) */
+            slong k = FLINT_MIN(xn, yn + 1);
+            flint_mpn_copyi(xtmp, x, k);
+            x = xtmp;
+            xn = k;
+        }
+        else
+        {
+            /* same buffer, yptr <= x: shift forwards (low limbs first) */
+            yptr = ARF_PTR_D(y);
+            ARF_XSIZE(y) = ARF_MAKE_XSIZE(yn, 0);
+            ARF_XSIZE(y) |= sgnbit;
+            if (leading == 0)
+            {
+                if (yptr != x)
+                    flint_mpn_copyi(yptr, x, xn);
+            }
+            else if (yptr == x && xn == yn)
+            {
+                mpn_lshift(yptr, x, yn, leading);
+            }
+            else
+            {
+                /* destination strictly below the source limbs: forward
+                   left shift (low limbs first), safe since each source
+                   limb is read before the destination reaches it */
+                nn_srcptr xs = (xn == yn) ? x : x + 1;
+                ulong low = (xn == yn) ? 0 : (x[0] >> (FLINT_BITS - leading));
+                ulong prev = 0;
+                slong i;
+                for (i = 0; i < yn; i++)
+                {
+                    ulong cur = xs[i];
+                    yptr[i] = (cur << leading) | (prev >> (FLINT_BITS - leading));
+                    prev = cur;
+                }
+                yptr[0] |= low;
+            }
+            goto ROUND_LAST_LIMB;
+        }
+    }
+
     ARF_GET_MPN_WRITE(yptr, yn, y);
     ARF_XSIZE(y) |= sgnbit;
 
@@ -204,6 +247,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
         yptr[0] |= (x[0] >> (FLINT_BITS - leading));
     }
 
+ROUND_LAST_LIMB:
     if (increment)
     {
         /* Mask off bits from the last limb. */

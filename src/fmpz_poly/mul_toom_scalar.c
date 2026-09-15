@@ -16,11 +16,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#if FLINT_BITS == 64
-# define TOOM_SCALAR_N_MAX 20
-#else
-# define TOOM_SCALAR_N_MAX 13
-#endif
+#define TOOM_SCALAR_N_MAX FMPZ_POLY_TOOM_SCALAR_N_MAX
 
 static const int32_t toom_m[2][9][9] = {
     {
@@ -997,11 +993,14 @@ toom_mul_generic(fmpz * c, const fmpz * a, slong la,
     }
 }
 
+/* nmax = -1 selects the bit-size dependent limit */
 int
-_fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1,
-                           const fmpz * poly2, slong len2)
+_fmpz_poly_mul_toom_scalar_nmax(fmpz * res, const fmpz * poly1, slong len1,
+                                const fmpz * poly2, slong len2, slong nmax)
 {
-    if (len1 + len2 - 1 > TOOM_SCALAR_N_MAX)
+    nmax = FLINT_MIN(nmax, TOOM_SCALAR_N_MAX);
+
+    if (len1 + len2 - 1 > nmax)
         return 0;
 
     if (len2 == 1)
@@ -1034,6 +1033,13 @@ _fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1,
     toom_mul_generic(res, poly1, len1, poly2, len2,
                      poly1 == poly2 && len1 == len2, 0, 0);
     return 1;
+}
+
+int
+_fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1,
+                           const fmpz * poly2, slong len2)
+{
+    return _fmpz_poly_mul_toom_scalar_nmax(res, poly1, len1, poly2, len2, TOOM_SCALAR_N_MAX);
 }
 
 int
@@ -1391,11 +1397,13 @@ toom_mulmid_engine(fmpz * res, const fmpz * Along, slong L,
 }
 
 int
-_fmpz_poly_mulmid_toom_scalar(fmpz * res,
+_fmpz_poly_mulmid_toom_scalar_nmax(fmpz * res,
                               const fmpz * poly1, slong len1,
                               const fmpz * poly2, slong len2,
-                              slong nlo, slong nhi)
+                              slong nlo, slong nhi, slong nmax)
 {
+    nmax = FLINT_MIN(nmax, TOOM_SCALAR_N_MAX);
+
     slong prodlen = len1 + len2 - 1;
     slong sa, ea, sb, eb, m1, n1, lo, hi, w, cf, cm, r;
     const fmpz *A, *B;
@@ -1438,8 +1446,7 @@ _fmpz_poly_mulmid_toom_scalar(fmpz * res,
 
     cf = m1 + n1 - 1;
     cm = w + S - 1;
-
-    if (cf <= cm && cf <= TOOM_SCALAR_N_MAX)
+    if (cf <= cm && cf <= nmax)
     {
         slong topgap = (cf - 1) - hi;
         int trunc = (cf >= 4 && FLINT_MAX(lo, topgap) > 0);
@@ -1476,13 +1483,13 @@ _fmpz_poly_mulmid_toom_scalar(fmpz * res,
         return 1;
     }
 
-    if (cm <= TOOM_SCALAR_N_MAX)
+    if (cm <= nmax)
     {
         toom_mulmid_engine(res, A, L, lo, B, S, w);
         return 1;
     }
 
-    if (cf <= TOOM_SCALAR_N_MAX)
+    if (cf <= nmax)
     {
         fmpz * scratch;
         slong j;
@@ -1508,6 +1515,13 @@ _fmpz_poly_mulmid_toom_scalar(fmpz * res,
     }
 
     return 0;
+}
+
+int
+_fmpz_poly_mulmid_toom_scalar(fmpz * res, const fmpz * poly1, slong len1,
+                              const fmpz * poly2, slong len2, slong nlo, slong nhi)
+{
+    return _fmpz_poly_mulmid_toom_scalar_nmax(res, poly1, len1, poly2, len2, nlo, nhi, TOOM_SCALAR_N_MAX);
 }
 
 int

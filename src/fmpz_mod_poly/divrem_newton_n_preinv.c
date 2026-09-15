@@ -25,10 +25,7 @@ void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
 
     if (lenB > 1)
     {
-        if (lenQ >= lenB - 1)
-            _fmpz_mod_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
-        else
-            _fmpz_mod_poly_mullow(R, B, lenB - 1, Q, lenQ, lenB - 1, ctx);
+        _fmpz_mod_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
 
         _fmpz_mod_vec_sub(R, A, R, lenB - 1, ctx);
     }

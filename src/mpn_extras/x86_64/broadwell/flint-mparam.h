@@ -39,4 +39,9 @@
 
 #define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
 
+/* see x86_64/flint-mparam.h; not tuned on this microarchitecture */
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 1024
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1024
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 2800
+
 #endif

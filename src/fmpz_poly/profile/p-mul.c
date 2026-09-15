@@ -120,7 +120,7 @@ main(void)
 
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_mul_karatsuba(h, f, g);
+                    _fmpz_poly_mul_toom_karatsuba(h->coeffs, f->coeffs, f->length, g->coeffs, g->length), _fmpz_poly_set_length(h, f->length + g->length - 1);
                 timeit_stop(t[1]);
 
                 timeit_start(t[2]);

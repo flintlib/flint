@@ -182,6 +182,32 @@ TEST_FUNCTION_START(gr_transformed_mpn, state)
                     "need = %wd, given = %wd\n", need, small);
         }
 
+        /* a window holding the value but not the reconstruction is
+           staged inside the ring and must convert exactly */
+        {
+            slong vn = fmpz_size(ref);
+
+            if (vn > 0 && vn < need)
+            {
+                nn_ptr zs = flint_malloc(vn * sizeof(ulong));
+
+                if (gr_transformed_mpn_get(zs, vn, &zn_out, &sign, acc, ctx)
+                        != GR_SUCCESS)
+                    TEST_FUNCTION_FAIL("staged conversion refused\n"
+                        "need = %wd, value = %wd limbs\n", need, vn);
+
+                _get_fmpz(got, zs, zn_out, sign);
+                if (!fmpz_equal(got, ref))
+                    TEST_FUNCTION_FAIL(
+                        "staged conversion wrong\n"
+                        "is_signed = %d, terms_bound = %wd, bits_bound = %wd\n"
+                        "need = %wd, value = %wd limbs\n",
+                        is_signed, terms_bound, bits_bound, need, vn);
+
+                flint_free(zs);
+            }
+        }
+
         if (gr_transformed_mpn_get(z, need, &zn_out, &sign, acc, ctx)
                 != GR_SUCCESS)
             TEST_FUNCTION_FAIL("exact conversion failed\n"
@@ -224,6 +250,56 @@ TEST_FUNCTION_START(gr_transformed_mpn, state)
                         "zn = %wd, sign = %d\n", zn2, sg2);
                 flint_free(z2);
             }
+            gr_heap_clear(c, ctx);
+        }
+
+        /* coinciding operands take the pointwise squaring kernels, in
+           the plain multiply and in both accumulations */
+        {
+            gr_ptr c = gr_heap_init(ctx);
+            fmpz_t fr;
+            slong zn2;
+            int sg2, st2;
+
+            fmpz_init(fr);
+            st2 = gr_sqr(c, x, ctx);
+            fmpz_mul(fr, fx, fx);
+
+            if (st2 == GR_SUCCESS && terms_bound >= 2)
+            {
+                st2 = gr_addmul(c, x, x, ctx);
+                fmpz_addmul(fr, fx, fx);
+            }
+            if (st2 == GR_SUCCESS && is_signed && terms_bound >= 3)
+            {
+                st2 = gr_submul(c, x, x, ctx);
+                fmpz_submul(fr, fx, fx);
+            }
+
+            if (st2 == GR_SUCCESS)
+            {
+                slong nd2 = gr_transformed_mpn_get_limbs(ctx, c);
+                nn_ptr z2 = flint_malloc(FLINT_MAX(nd2, 1) * sizeof(ulong));
+
+                if (gr_transformed_mpn_get(z2, nd2, &zn2, &sg2, c, ctx)
+                        != GR_SUCCESS)
+                    TEST_FUNCTION_FAIL("squaring conversion failed\n"
+                        "is_signed = %d, terms_bound = %wd\n",
+                        is_signed, terms_bound);
+
+                _get_fmpz(got, z2, zn2, sg2);
+                if (!fmpz_equal(got, fr))
+                    TEST_FUNCTION_FAIL("squaring wrong\n"
+                        "is_signed = %d, terms_bound = %wd, bits_bound = %wd\n"
+                        "want bits = %wd, got bits = %wd\n",
+                        is_signed, terms_bound, bits_bound,
+                        (slong) fmpz_bits(fr), (slong) fmpz_bits(got));
+                flint_free(z2);
+            }
+            else if (st2 != GR_UNABLE && st2 != GR_DOMAIN)
+                TEST_FUNCTION_FAIL("unexpected squaring status %d\n", st2);
+
+            fmpz_clear(fr);
             gr_heap_clear(c, ctx);
         }
 
@@ -306,7 +382,10 @@ cleanup:
         slong j, need, zn_out;
         int sign;
 
-        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1, 16,
+        /* three elements are live here (acc, x, y); declaring more
+           reserves slabs that are never used, which at the top of this
+           sweep is tens of megabytes */
+        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1, 4,
                 GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
                 != GR_SUCCESS)
             continue;

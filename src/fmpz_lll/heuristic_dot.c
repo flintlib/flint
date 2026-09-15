@@ -36,7 +36,7 @@ fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
         fmpz_init(sp);
         _fmpz_vec_dot(sp, fmpz_mat_row(B, k), fmpz_mat_row(B, j), len2);
         sum = fmpz_get_d_2exp(&exp, sp);
-        sum = ldexp(sum, sum - exp_adj);
+        sum = ldexp(sum, exp - exp_adj);
         fmpz_clear(sp);
     }
 

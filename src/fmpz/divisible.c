@@ -11,6 +11,7 @@
 */
 
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 
 int
@@ -58,7 +59,9 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
         }
         else
         {
-            return mpz_divisible_p(COEFF_TO_PTR(y), COEFF_TO_PTR(q));
+            mpz_srcptr my = COEFF_TO_PTR(y), mq = COEFF_TO_PTR(q);
+            return flint_mpn_divisible(my->_mp_d, FLINT_ABS(my->_mp_size),
+                                       mq->_mp_d, FLINT_ABS(mq->_mp_size));
         }
     }
 }

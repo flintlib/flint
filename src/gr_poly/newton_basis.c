@@ -104,8 +104,7 @@ gr_poly_newton_basis_interpolate_exact(gr_poly_t res, const gr_vec_t basis, cons
 
     gr_poly_fit_length(res, ys->length, ctx);
     status |= _gr_poly_newton_basis_interpolate_exact(res->coeffs, basis->entries, ys->entries, ys->length, ctx);
-    _gr_poly_set_length(res, ys->length, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, ys->length, ctx);
     return status;
 }
 
@@ -150,8 +149,7 @@ gr_poly_newton_basis_interpolate(gr_poly_t res, const gr_vec_t basis, const gr_v
 
     gr_poly_fit_length(res, ys->length, ctx);
     status |= _gr_poly_newton_basis_interpolate(res->coeffs, basis->entries, ys->entries, ys->length, ctx);
-    _gr_poly_set_length(res, ys->length, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, ys->length, ctx);
     return status;
 }
 

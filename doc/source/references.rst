@@ -117,6 +117,22 @@ References
 
 .. [EHJ2016] \A. Enge, W. Hart and F. Johansson, "Short addition sequences for theta functions", preprint (2016), https://arxiv.org/abs/1608.06810
 
+.. [Enge2024] \A. Enge, "FastECPP over MPI", Mathematical Software - ICMS 2024: 8th International Conference, Durham, UK, July 22-25, 2024, Proceedings, Springer-Verlag, Berlin, Heidelberg, 36-45. https://doi.org/10.1007/978-3-031-64529-7_4
+
+.. [EngeCM] \A. Enge, CM - a library for the computation of class polynomials and elliptic curve primality proving, https://www.multiprecision.org/cm/
+
+.. [EngeMorain2003] \A. Enge and F. Morain, "Fast decomposition of polynomials with known Galois group", Applied Algebra, Algebraic Algorithms and Error-Correcting Codes (AAECC-15), LNCS 2643, Springer (2003), 254-264
+
+.. [FKMW2004] \J. Franke, T. Kleinjung, F. Morain and T. Wirth, "Proving the primality of very large numbers with fastECPP", Algorithmic Number Theory (ANTS-VI), LNCS 3076, Springer (2004), 194-207
+
+.. [Morain2007] \F. Morain, "Implementing the asymptotically fast version of the elliptic curve primality proving algorithm", Mathematics of Computation 76 (2007), 493-505
+
+.. [PARI] \The PARI Group, PARI/GP, https://pari.math.u-bordeaux.fr/ ; the ``primecert`` implementation of FastECPP is by Jared Asuncion
+
+.. [Schertz2002] \R. Schertz, "Weber's class invariants revisited", Journal de Theorie des Nombres de Bordeaux 14 (2002), 325-343
+
+.. [YuiZagier1997] \N. Yui and D. Zagier, "On the singular values of Weber modular functions", Mathematics of Computation 66 (1997), 1645-1662
+
 .. [EM2004] \O. Espinosa and V. Moll, "A generalized polygamma function", Integral Transforms and Special Functions (2004), 101-115.
 
 .. [EK2025] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
@@ -140,6 +156,8 @@ References
 .. [GS2003] \X. Gourdon and P. Sebah, "Numerical evaluation of the Riemann Zeta-function" (2003), http://numbers.computation.free.fr/Constants/Miscellaneous/zetaevaluations.pdf
 
 .. [GVL1996] \G. H. Golub and C. F. Van Loan, *Matrix Computations*, third edition, Johns Hopkins University Press (1996).
+
+.. [GatSho1992] \J. von zur Gathen and V. Shoup, "Computing Frobenius maps and factoring polynomials", Computational Complexity 2 (1992), 187-224. https://doi.org/10.1007/BF01272074
 
 .. [Gas2018] \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
 
@@ -236,6 +254,8 @@ References
 .. [KL2024] \Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
 
 .. [Knu1997] \Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
+
+.. [KalSho1998] \E. Kaltofen and V. Shoup, "Subquadratic-time factoring of polynomials over finite fields", Mathematics of Computation 67 (1998), 1179-1197. https://doi.org/10.1090/S0025-5718-98-00944-2
 
 .. [Kob2010] \A. Kobel, "Certified Complex Numerical Root Finding", Seminar on Computational Geometry and Geometric Computing (2010), http://www.mpi-inf.mpg.de/departments/d1/teaching/ss10/Seminar_CGGC/Slides/02_Kobel_NRS.pdf
 
@@ -387,10 +407,10 @@ All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_,
 [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
 [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,
 [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_,
-[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
+[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GatSho1992]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
 [HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
 [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_,
-[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
+[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [KalSho1998]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
 [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_,
 [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_,
 [NakTurWil1997]_, [NW1978]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_,

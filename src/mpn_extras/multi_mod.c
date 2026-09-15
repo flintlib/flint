@@ -55,7 +55,7 @@ _reduce_node(nn_ptr r, nn_srcptr a, slong an, const flint_mpn_crt_t C,
     }
     else
     {
-        mpn_tdiv_qr(scratch, r, 0, a, an, d, dn);
+        _flint_mpn_tdiv_qr(scratch, r, a, an, d, dn);
     }
 
     MPN_NORM(r, dn);
@@ -360,7 +360,7 @@ flint_mpn_multi_mod(nn_ptr out, nn_srcptr x, slong xn, const flint_mpn_crt_t C, 
         else
             q = tmp_alloc = flint_malloc(qn * sizeof(ulong));
 
-        mpn_tdiv_qr(q, W.bufA, 0, x, xn, C->prod, C->prod_len);
+        _flint_mpn_tdiv_qr(q, W.bufA, x, xn, C->prod, C->prod_len);
         p = W.bufA;
         pn = C->prod_len;
         MPN_NORM(p, pn);

@@ -307,6 +307,7 @@ flint_bitcnt_t fmpz_bits(const fmpz_t f);
 flint_bitcnt_t fmpz_val2(const fmpz_t x);
 
 int fmpz_is_square(const fmpz_t f);
+int fmpz_perfect_sqrt(fmpz_t s, const fmpz_t a);
 int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f);
 
 ulong fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits);
@@ -387,7 +388,15 @@ int fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 int fmpz_divisible(const fmpz_t f, const fmpz_t g);
 int fmpz_divisible_ui(const fmpz_t f, ulong g);
 FMPZ_INLINE int fmpz_divisible_si(const fmpz_t f, slong g) { return fmpz_divisible_ui(f, FLINT_UABS(g)); }
-int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h);
+int fmpz_div(fmpz_t q, const fmpz_t g, const fmpz_t h);
+int fmpz_div_ui(fmpz_t q, const fmpz_t g, ulong h);
+int fmpz_div_si(fmpz_t q, const fmpz_t g, slong h);
+
+/* older name for fmpz_div */
+FMPZ_INLINE int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+{
+    return fmpz_div(q, g, h);
+}
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
@@ -441,23 +450,6 @@ slong fmpz_flog_ui(const fmpz_t x, ulong b);
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
-#if FLINT_HAVE_FFT_SMALL
-#define MPZ_WANT_FLINT_DIVISION(a, b) (mpz_size(b) >= 1250 && mpz_size(a) - mpz_size(b) >= 1250)
-#else
-#define MPZ_WANT_FLINT_DIVISION(a, b) 0
-#endif
-
-void _fmpz_tdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
-void _fmpz_fdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
-void _fmpz_cdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
-void _fmpz_tdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_fdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_cdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_tdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_fdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_cdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_mod_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
-void _fmpz_divexact_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
 
 /* Bitwise operations ********************************************************/
 
@@ -514,6 +506,11 @@ fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
+
+void fmpz_invmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N);
+int fmpz_sqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N);
+int fmpz_rsqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N);
+void fmpz_divmod_2exp(fmpz_t rop, const fmpz_t a, const fmpz_t b, flint_bitcnt_t N);
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);

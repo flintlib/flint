@@ -83,7 +83,6 @@ gr_poly_div_newton_n_preinv(gr_poly_t Q,
         status = _gr_poly_div_newton_n_preinv(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, Binv->coeffs, lenBinv, ctx);
     }
 
-    _gr_poly_set_length(Q, Qlen, ctx);
-    _gr_poly_normalise(Q, ctx);
+    _gr_poly_set_length_normalise(Q, Qlen, ctx);
     return status;
 }

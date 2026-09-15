@@ -30,18 +30,6 @@ extern "C" {
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
-typedef struct
-{
-    fmpz_mod_poly_struct * baby;
-    fmpz_mod_poly_struct * res;
-    fmpz_mod_poly_struct * H;
-    fmpz_mod_poly_struct * v;
-    fmpz_mod_poly_struct * vinv;
-    const fmpz_mod_ctx_struct * ctx;
-    fmpz * tmp;
-    slong m;
-}
-fmpz_mod_poly_interval_poly_arg_t;
 
 void fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac,
                                                      const fmpz_mod_ctx_t ctx);
@@ -104,9 +92,6 @@ int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,
 int fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
-                       flint_rand_t state, const fmpz_mod_poly_t pol, slong d,
-                                                     const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_factor_equal_deg_with_frob(
              fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t f, slong d,
@@ -148,7 +133,6 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_interval_poly_worker(void * arg_ptr);
 
 /* Roots *********************************************************************/
 

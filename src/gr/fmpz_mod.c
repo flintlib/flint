@@ -18,6 +18,7 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
@@ -559,10 +560,7 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, n, FMPZ_MOD_CTX(ctx));
-    else
-        _fmpz_mod_poly_mullow(res, poly2, len2, poly1, len1, n, FMPZ_MOD_CTX(ctx));
+    _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, n, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -572,10 +570,7 @@ _gr_fmpz_mod_poly_mulmid(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fmpz_mod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, FMPZ_MOD_CTX(ctx));
-    else
-        _fmpz_mod_poly_mulmid(res, poly2, len2, poly1, len1, nlo, nhi, FMPZ_MOD_CTX(ctx));
+    _fmpz_mod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -862,6 +857,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_fmpz_mod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
 /*
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_mpn_mod_vec_zero},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_mpn_mod_vec_clear},
@@ -880,6 +877,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_mod_poly_mulmid},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},

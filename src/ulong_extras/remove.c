@@ -37,8 +37,16 @@ n_remove(ulong * n, ulong p)
         rem = (*n) - quot * powp[i];
         if (rem != UWORD(0))
             break;
-        powp[i + 1] = powp[i] * powp[i];
         (*n) = quot;
+
+        /* powp[i]^2 does not fit in a limb, and the quotient is below powp[i] */
+        if (powp[i] >> (FLINT_BITS / 2))
+        {
+            i++;
+            break;
+        }
+
+        powp[i + 1] = powp[i] * powp[i];
     }
 
     exp = (1 << i) - 1;

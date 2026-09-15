@@ -12,6 +12,8 @@
 #include "fmpz.h"
 #include "mpn_mod.h"
 #include "gr.h"
+#include "gr_poly.h"
+#include "gr_generic.h"
 
 static int
 _mpn_mod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
@@ -27,6 +29,52 @@ gr_static_method_table _mpn_mod_methods;
 DIAGNOSTIC_PUSH
 DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
 
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_mpn_mod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_srcptr coeffs = poly->coeffs;
+
+    while (len > 0 && flint_mpn_zero_p(coeffs + (len - 1) * nlimbs, nlimbs))
+        len--;
+
+    poly->length = len;
+}
+
+/* Measured crossover (mulmod, Newton vs transformed) is n ~ 130-190 for
+   100-192 bit moduli; for larger moduli the transformed representation
+   is currently unavailable and the constructor falls back to Newton. */
+#if FLINT_HAVE_FFT_SMALL
+#define MPN_MOD_POLY_PREINV_TRANSFORMED_CUTOFF 160
+#else
+#define MPN_MOD_POLY_PREINV_TRANSFORMED_CUTOFF WORD_MAX
+#endif
+
+/* Selection of the representation of a precomputed modulus: sparse for
+   few terms (generic rule), transformed for long dense moduli. */
+static int
+_mpn_mod_poly_preinv_set(gr_poly_preinv_struct * P, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+{
+    slong i, nz, sz = ctx->sizeof_elem;
+
+    if (lenf <= 16)
+        return _gr_poly_preinv_set_plain(P, f, lenf, ctx);
+
+    nz = 0;
+    for (i = 0; i < lenf - 1 && nz <= 8; i++)
+        nz += (gr_is_zero(GR_ENTRY(f, i, sz), ctx) != T_TRUE);
+
+    if (nz <= 8)
+        return _gr_poly_preinv_set_sparse(P, f, lenf, ctx);
+
+    if (lenf >= MPN_MOD_POLY_PREINV_TRANSFORMED_CUTOFF &&
+        _gr_poly_preinv_set_transformed(P, f, lenf, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_poly_preinv_set_newton(P, f, lenf, ctx);
+}
+
 gr_method_tab_input _mpn_mod_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) mpn_mod_ctx_write},
@@ -40,7 +88,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
-                                (gr_funcptr) gr_generic_ctx_predicate_false},
+                                (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -99,16 +147,17 @@ gr_method_tab_input _mpn_mod_methods_input[] =
 
 
     {GR_METHOD_INV,             (gr_funcptr) mpn_mod_inv},
-/*
-    {GR_METHOD_POW_SI,          (gr_funcptr) mpn_mod_pow_si},
     {GR_METHOD_POW_UI,          (gr_funcptr) mpn_mod_pow_ui},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) mpn_mod_pow_fmpz},
+/*
     {GR_METHOD_SQRT,            (gr_funcptr) mpn_mod_sqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) mpn_mod_is_square},
 */
 
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) mpn_mod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _mpn_mod_ctx_fq_prime},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
 
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _mpn_mod_vec_zero},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _mpn_mod_vec_clear},
@@ -129,8 +178,12 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _mpn_mod_vec_dot_strided},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _mpn_mod_poly_mullow},
+
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
                                 (gr_funcptr) (void (*)(void)) _gr_mpn_mod_ctx_init_transformed_poly_repr},
+    {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR,
+                                (gr_funcptr) (void (*)(void)) _gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _mpn_mod_poly_mulmid},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _mpn_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _mpn_mod_poly_div_series},
@@ -138,9 +191,9 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_POLY_DIV,        (gr_funcptr) _mpn_mod_poly_div},
     {GR_METHOD_POLY_GCD,        (gr_funcptr) _mpn_mod_poly_gcd},
     {GR_METHOD_POLY_XGCD,       (gr_funcptr) _mpn_mod_poly_xgcd},
-/*
-    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) mpn_mod_roots_gr_poly},
-*/
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) gr_poly_roots_finite_field},
+    {GR_METHOD_POLY_PREINV_SET, (gr_funcptr) _mpn_mod_poly_preinv_set},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _mpn_mod_poly_set_length_normalise},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) mpn_mod_mat_mul},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,                 (gr_funcptr) mpn_mod_mat_nonsingular_solve_tril},

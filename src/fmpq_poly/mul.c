@@ -86,14 +86,9 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
 
     fmpq_poly_fit_length(res, len);
 
-    if (poly1->length >= poly2->length)
-        _fmpq_poly_mul(res->coeffs, res->den,
-                       poly1->coeffs, poly1->den, poly1->length,
-                       poly2->coeffs, poly2->den, poly2->length);
-    else
-        _fmpq_poly_mul(res->coeffs, res->den,
-                       poly2->coeffs, poly2->den, poly2->length,
-                       poly1->coeffs, poly1->den, poly1->length);
+    _fmpq_poly_mul(res->coeffs, res->den,
+                   poly1->coeffs, poly1->den, poly1->length,
+                   poly2->coeffs, poly2->den, poly2->length);
 
     _fmpq_poly_set_length(res, len);
 }

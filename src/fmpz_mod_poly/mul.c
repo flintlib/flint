@@ -41,10 +41,7 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     {
         fmpz *t = _fmpz_vec_init(lenr);
 
-        if (len1 >= len2)
-            _fmpz_mod_poly_mul(t, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
-        else
-            _fmpz_mod_poly_mul(t, poly2->coeffs, len2, poly1->coeffs, len1, ctx);
+        _fmpz_mod_poly_mul(t, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
 
         _fmpz_vec_clear(res->coeffs, res->alloc);
         res->alloc  = lenr;
@@ -55,10 +52,7 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     {
         fmpz_mod_poly_fit_length(res, lenr, ctx);
 
-        if (len1 >= len2)
-            _fmpz_mod_poly_mul(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
-        else
-            _fmpz_mod_poly_mul(res->coeffs, poly2->coeffs, len2, poly1->coeffs, len1, ctx);
+        _fmpz_mod_poly_mul(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
 
         _fmpz_mod_poly_set_length(res, lenr);
     }

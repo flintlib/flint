@@ -104,7 +104,6 @@ gr_poly_divexact_basecase(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_
         status = _gr_poly_divexact_basecase(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
     }
 
-    _gr_poly_set_length(Q, Qlen, ctx);
-    _gr_poly_normalise(Q, ctx);
+    _gr_poly_set_length_normalise(Q, Qlen, ctx);
     return status;
 }

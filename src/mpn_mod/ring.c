@@ -675,3 +675,64 @@ mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 
     return status;
 }
+
+/*
+    Powering. For exponents beyond a few bits, mpz_powm (Montgomery
+    representation, sliding windows) is 2-3 times faster than the generic
+    binary powering with mpn_mod multiplications; below that the generic
+    code is used.
+*/
+int
+mpn_mod_pow_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t e, gr_ctx_t ctx)
+{
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    mpz_t xz, nz, rz, ez;
+    slong xn, rn;
+
+    if (fmpz_sgn(e) < 0 || fmpz_bits(e) <= 6)
+        return gr_generic_pow_fmpz(res, x, e, ctx);
+
+    xn = nlimbs;
+    while (xn > 0 && x[xn - 1] == 0)
+        xn--;
+    if (xn == 0)
+    {
+        /* 0^e = 0 for e > 0 */
+        flint_mpn_zero(res, nlimbs);
+        return GR_SUCCESS;
+    }
+
+    mpz_roinit_n(xz, (mp_srcptr) x, xn);
+    mpz_roinit_n(nz, (mp_srcptr) MPN_MOD_CTX_MODULUS(ctx), nlimbs);
+    if (COEFF_IS_MPZ(*e))
+        mpz_roinit_n(ez, COEFF_TO_PTR(*e)->_mp_d, COEFF_TO_PTR(*e)->_mp_size);
+    else
+    {
+        ulong ev = *e;
+        mpz_roinit_n(ez, &ev, 1);
+        mpz_init(rz);
+        mpz_powm(rz, xz, ez, nz);
+        goto done;
+    }
+    mpz_init(rz);
+    mpz_powm(rz, xz, ez, nz);
+done:
+    rn = rz->_mp_size;
+    flint_mpn_copyi(res, rz->_mp_d, rn);
+    flint_mpn_zero(res + rn, nlimbs - rn);
+    mpz_clear(rz);
+    return GR_SUCCESS;
+}
+
+int
+mpn_mod_pow_ui(nn_ptr res, nn_srcptr x, ulong e, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int status;
+    if (e <= 64)
+        return gr_generic_pow_ui(res, x, e, ctx);
+    fmpz_init_set_ui(t, e);
+    status = mpn_mod_pow_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+    return status;
+}

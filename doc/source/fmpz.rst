@@ -873,7 +873,8 @@ Basic arithmetic
     * ``cdiv`` rounds the quotient via ceil rounding.
     * ``tdiv`` rounds the quotient via truncation, i.e. rounding towards zero.
     * ``ndiv`` rounds the quotient such that the remainder has the smallest
-      absolute value. In case of ties, it rounds the quotient towards zero.
+      absolute value. In case of ties, it rounds the quotient to the even
+      integer (round half to even).
 
 .. function:: ulong fmpz_cdiv_ui(const fmpz_t g, ulong h)
 
@@ -909,11 +910,19 @@ Basic arithmetic
     Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
     none.
 
-.. function:: int fmpz_divides(fmpz_t q, const fmpz_t f, const fmpz_t g)
+.. function:: int fmpz_div(fmpz_t q, const fmpz_t g, const fmpz_t h)
+              int fmpz_div_ui(fmpz_t q, const fmpz_t g, ulong h)
+              int fmpz_div_si(fmpz_t q, const fmpz_t g, slong h)
 
-    Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
-    quotient. Otherwise returns `0` and sets `q` to `0`.
+    Checked exact division: if `h` divides `g`, sets `q = g / h` and returns
+    1; otherwise returns 0 and sets `q` to zero. Division by zero counts as
+    exact iff `g` is zero. Large operands go through :func:`flint_mpn_div`.
+    These are the natural implementations of the checked division methods
+    of the ``fmpz`` ring in the generic rings module.
 
+.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+
+    Older name for :func:`fmpz_div`.
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
@@ -997,6 +1006,32 @@ Basic arithmetic
     If `p` is not prime and the return value is `1`, the value of `b` is
     meaningless. Primality of ``p`` is assumed and not checked.
 
+.. function:: void fmpz_invmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    Sets ``rop`` to the inverse of ``op`` modulo `2^N`, reduced to
+    `[0, 2^N)`. Requires ``op`` to be odd. Uses the 2-adic Newton iteration
+    :func:`flint_mpn_binv` on the limb array.
+
+.. function:: int fmpz_sqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    If ``op`` is an odd square modulo `2^N` (for `N \ge 3` this means
+    `\mathrm{op} \equiv 1 \pmod 8`), sets ``rop`` to a square root modulo
+    `2^N`, reduced to `[0, 2^N)`, and returns 1; otherwise returns 0. The root
+    is the one congruent to 1 modulo 4 computed by :func:`flint_mpn_bsqrt`
+    (reduced modulo `2^N`). Even ``op`` is not supported (0 is returned).
+
+.. function:: int fmpz_rsqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    As :func:`fmpz_sqrtmod_2exp`, but computes a 2-adic reciprocal square
+    root `y` with `\mathrm{op} \, y^2 \equiv 1 \pmod{2^N}`, via
+    :func:`flint_mpn_brsqrt`.
+
+.. function:: void fmpz_divmod_2exp(fmpz_t rop, const fmpz_t a, const fmpz_t b, flint_bitcnt_t N)
+
+    Hensel division: sets ``rop`` to the unique `q \in [0, 2^N)` with
+    `q b \equiv a \pmod{2^N}`. Requires ``b`` to be odd. Uses
+    :func:`flint_mpn_bdiv_q`.
+
 .. function:: void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
     Sets `f` to the integer part of the square root of `g`, where
@@ -1013,6 +1048,16 @@ Basic arithmetic
 .. function:: int fmpz_is_square(const fmpz_t f)
 
     Returns nonzero if `f` is a perfect square and zero otherwise.
+
+.. function:: int fmpz_perfect_sqrt(fmpz_t s, const fmpz_t a)
+
+    Checked exact square root: if `a` is a perfect square, sets `s` to its
+    nonnegative square root and returns 1; otherwise returns 0 and leaves
+    `s` undefined. Unlike :func:`fmpz_sqrt` (which computes the truncated
+    square root), no root is computed for nonsquares, which are usually
+    rejected by cheap quadratic residue tests (see :func:`flint_mpn_sqrt`),
+    and for squares this is about twice as fast as :func:`fmpz_is_square`
+    followed by :func:`fmpz_sqrt` for large inputs.
 
 .. function:: int fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 

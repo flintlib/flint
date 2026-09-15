@@ -87,6 +87,14 @@ typedef struct             /* format for relation */
    fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
+typedef struct          /* a relation as held in the relation store */
+{
+   ulong lp;           /* large prime, is 1, if relation is full */
+   slong num_factors;  /* number of factors, excluding small factors */
+   slong factor_offset; /* offset of the factors in qs_inf->rel_factor */
+   fmpz Y;             /* square root of sieve value for relation */
+} qs_rel_s;
+
 typedef struct
 {
    fmpz_t B;          /* current B coeff of poly */
@@ -191,8 +199,20 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FLINT_FILE * siqs;           /* pointer to file for storing relations */
-   char * fname;          /* name of file used for relations */
+   /* Relations are kept in memory, in the order they were found. Every
+      relation has exactly qs_inf->small_primes small prime exponents, so
+      those live at a fixed stride in rel_small. The number of remaining
+      factors varies, so each relation records the offset of its own block of
+      the shared rel_factor array. */
+   qs_rel_s * relations;   /* relations found so far */
+   slong rel_num;          /* number of relations found so far */
+   slong rel_alloc;        /* number of relations we have space for */
+
+   slong * rel_small;      /* small prime exponents, small_primes per relation */
+
+   fac_t * rel_factor;     /* factors of all relations, concatenated */
+   slong rel_factor_num;   /* entries of rel_factor in use */
+   slong rel_factor_alloc; /* entries of rel_factor allocated */
 
    slong full_relation;   /* number of full relations */
    slong num_cycles;      /* number of possible full relations from partials */
@@ -358,14 +378,20 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-void qsieve_write_to_file(qs_t qs_inf, ulong prime,
+void qsieve_relations_init(qs_t qs_inf);
+
+void qsieve_relations_clear(qs_t qs_inf);
+
+void qsieve_relations_reset(qs_t qs_inf);
+
+void qsieve_add_relation(qs_t qs_inf, ulong prime,
                                                      const fmpz_t Y, const qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime);
 
 void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime);
 
-relation_t qsieve_parse_relation(qs_t qs_inf);
+relation_t qsieve_get_relation(qs_t qs_inf, slong i);
 
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 

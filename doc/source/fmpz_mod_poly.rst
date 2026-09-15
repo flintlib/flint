@@ -491,7 +491,8 @@ Multiplication
 .. function:: void _fmpz_mod_poly_mul(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz_mod_ctx_t ctx)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
+    and ``(poly2, len2)``.  Assumes ``len1, len2 > 0``; the operands may
+    be given in either order.  Allows
     zero-padding of the two input polynomials.
 
 .. function:: void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
@@ -503,7 +504,8 @@ Multiplication
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
 
-    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Assumes ``len1, len2 > 0`` (the operands may be given in either
+    order) and ``0 < n <= len1 + len2 - 1``.
     Allows for zero-padding in the inputs.  Does not support aliasing between
     the inputs and the output.
 
@@ -1599,11 +1601,6 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
-
-    Worker function version of ``_fmpz_mod_poly_precompute_matrix``.
-    Input/output is stored in ``fmpz_mod_poly_matrix_precompute_arg_t``.
-
 .. function:: void _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f, const fmpz * g, slong leng, const fmpz * ginv, slong lenginv, const fmpz_mod_ctx_t ctx)
 
     Sets the ith row of ``A`` to `f^i` modulo `g` for
@@ -1619,13 +1616,6 @@ Modular composition
     `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
-
-    Worker function version of
-    :func:`_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv`.
-    Input/output is stored in
-    ``fmpz_mod_poly_compose_mod_precomp_preinv_arg_t``.
 
 .. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res, const fmpz * f, slong lenf, const fmpz_mat_t A, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_mod_ctx_t ctx)
 
@@ -1666,51 +1656,6 @@ Modular composition
     `h` is nonzero and that `f` has smaller degree than `h`. Furthermore,
     we require ``hinv`` to be the inverse of the reverse of ``h``.
     The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz * g, slong glen, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
-    where `f_i` are the ``l`` elements of ``polys``. We require that `h` is
-    nonzero and that the length of `g` is less than the length of `h`. We
-    also require that the length of `f_i` is less than the length of `h`. We
-    require ``res`` to have enough memory allocated to hold ``l``
-    ``fmpz_mod_poly_struct``'s. The entries of ``res`` need to be initialised
-    and ``l`` needs to be less than ``len1`` Furthermore, we require ``hinv``
-    to be the inverse of the reverse of ``h``. The output is not allowed to be
-    aliased with any of the inputs.
-
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
-    where `f_i` are the ``n`` elements of ``polys``. We require ``res`` to
-    have enough memory allocated to hold ``n`` ``fmpz_mod_poly_struct``'s.
-    The entries of ``res`` need to be initialised and ``n`` needs to be less
-    than ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
-    smaller degree than `h`. Furthermore, we require ``hinv`` to be the
-    inverse of the reverse of ``h``. No aliasing of ``res`` and
-    ``polys`` is allowed.
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx)
-
-    Multithreaded version of
-    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
 
 Subproduct trees
 --------------------------------------------------------------------------------
