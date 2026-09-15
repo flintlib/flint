@@ -85,5 +85,55 @@ TEST_FUNCTION_START(n_remove, state)
         mpz_clear(d_p);
     }
 
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test arbitrary p, including p^2 >= 2^FLINT_BITS */
+    {
+        ulong n1, n2, orig_n, p, hi, lo;
+        mpz_t d_n2, d_n1, d_p;
+        int exp1, exp2;
+
+        mpz_init(d_n1);
+        mpz_init(d_n2);
+        mpz_init(d_p);
+
+        /* p^2 is 1, 1 and 0 modulo 2^FLINT_BITS */
+        if (i == 0)
+            p = UWORD_MAX;
+        else if (i == 1)
+            p = (UWORD(1) << (FLINT_BITS - 1)) + 1;
+        else if (i == 2)
+            p = UWORD(1) << (FLINT_BITS / 2);
+        else
+        {
+            do
+                p = n_randtest(state);
+            while (p < 2);
+        }
+
+        /* n1 = r * p^k, multiplying in factors p until a random stop or overflow */
+        n1 = (i < 3) ? p : n_randint(state, 1000) + 1;
+        while (n_randint(state, 4) != 0)
+        {
+            umul_ppmm(hi, lo, n1, p);
+            if (hi != 0)
+                break;
+            n1 = lo;
+        }
+
+        orig_n = n1;
+        flint_mpz_set_ui(d_n1, n1);
+        flint_mpz_set_ui(d_p, p);
+        exp1 = n_remove(&n1, p);
+        exp2 = mpz_remove(d_n2, d_n1, d_p);
+        n2 = flint_mpz_get_ui(d_n2);
+
+        result = ((exp1 == exp2) && (n1 == n2));
+        if (!result)
+            TEST_FUNCTION_FAIL("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %wu\n", orig_n, exp1, exp2, n1, n2, p);
+
+        mpz_clear(d_n1);
+        mpz_clear(d_n2);
+        mpz_clear(d_p);
+    }
+
     TEST_FUNCTION_END(state);
 }
