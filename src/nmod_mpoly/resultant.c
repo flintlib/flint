@@ -13,12 +13,20 @@
 #include "nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
-/* The dense bivariate algorithm works on the whole bounding box of the
-   inputs, so it is only worth converting to when the inputs fill enough of
-   theirs. Both of them must, and the box must stay within a size that can be
-   held at once. */
-#define BIVARIATE_DENSITY 8
-#define BIVARIATE_MAX_AREA (WORD(1) << 24)
+/* The dense bivariate representation holds the whole bounding box of the
+   inputs, so these bound what converting to it can cost. They are also what
+   keeps the size arithmetic below from overflowing, which is why the
+   comparisons are made in double: a box of this many entries is already that
+   many words of input before the resultant is even called.
+
+   There is deliberately no density condition. Measured against the sparse
+   algorithm, how full the box is barely matters: the subresultant PRS over
+   the univariate form pays for the degrees whether or not the coefficients
+   are there, so at degree 16 and above the dense algorithm is ahead even at
+   a few terms per input. What decides is the degree, which
+   n_bpoly_mod_resultant_cutoff already tests. */
+#define BIVARIATE_MAX_AREA 4294967296.0     /* 2^32 */
+#define BIVARIATE_MAX_POINTS 4294967296.0
 
 /* res_var(A, B) through the dense bivariate algorithm, when the inputs are
    bivariate and dense enough for it to pay. Returns 0 when they are not, or
@@ -47,12 +55,12 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     lenA = degAy + 1;
     lenB = degBy + 1;
 
-    if ((double) lenA * (degAx + 1) > (double) BIVARIATE_MAX_AREA ||
-        (double) lenB * (degBx + 1) > (double) BIVARIATE_MAX_AREA)
+    if ((double) lenA * (degAx + 1) > BIVARIATE_MAX_AREA ||
+        (double) lenB * (degBx + 1) > BIVARIATE_MAX_AREA)
         return 0;
 
-    if ((double) A->length * BIVARIATE_DENSITY < (double) lenA * (degAx + 1) ||
-        (double) B->length * BIVARIATE_DENSITY < (double) lenB * (degBx + 1))
+    if ((double) degBy * degAx + (double) degAy * degBx + 1.0
+            > BIVARIATE_MAX_POINTS)
         return 0;
 
     npoints = degBy * degAx + degAy * degBx + 1;

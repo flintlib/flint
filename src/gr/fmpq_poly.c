@@ -749,8 +749,8 @@ _gr_fmpq_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
     slong i, blenA = 0, blenB = 0, npoints;
     int success;
 
-    if (lenB < 1)
-        return GR_UNABLE;
+    if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
 
     for (i = 0; i < lenA; i++)
         blenA = FLINT_MAX(blenA, Ax[i].length);
@@ -758,13 +758,13 @@ _gr_fmpq_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
         blenB = FLINT_MAX(blenB, Bx[i].length);
 
     if (blenA == 0 || blenB == 0)
-        return GR_UNABLE;
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
 
     npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
 
     if (FLINT_MIN(lenA, lenB) < MODULAR_MIN_LENGTH &&
             npoints - 1 < MODULAR_MIN_DEGREE)
-        return GR_UNABLE;
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
 
     fmpz_init_set_ui(da, 1);
     fmpz_init_set_ui(db, 1);
@@ -823,7 +823,10 @@ _gr_fmpq_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
     fmpz_clear(db);
     fmpz_clear(t);
 
-    return success ? GR_SUCCESS : GR_UNABLE;
+    if (!success)
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
+
+    return GR_SUCCESS;
 }
 
 gr_method_tab_input _fmpq_poly_methods_input[] =

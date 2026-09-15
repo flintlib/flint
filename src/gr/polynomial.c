@@ -800,8 +800,8 @@ gr_static_method_table _gr_poly_methods;
    bivariate A and B. Over a word-size prime field the coefficients are
    evaluated, univariate resultants taken at the points and the result
    interpolated; over Z and Q that same algorithm is run modulo several primes
-   and the result reconstructed by CRT. Returns GR_UNABLE at sizes or over
-   rings where neither applies, leaving the caller its generic algorithms. */
+   and the result reconstructed by CRT. At sizes or over rings where neither
+   applies, the generic algorithms take over. */
 static int
 _polynomial_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
                               gr_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -811,32 +811,34 @@ _polynomial_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
     gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
     slong i, blenA = 0, blenB = 0, npoints;
 
-    if (lenB < 1)
-        return GR_UNABLE;
+    if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
 
     for (i = 0; i < lenA; i++)
         blenA = FLINT_MAX(blenA, Ax[i].length);
     for (i = 0; i < lenB; i++)
         blenB = FLINT_MAX(blenB, Bx[i].length);
 
-    if (blenA == 0 || blenB == 0)
-        return GR_UNABLE;
-
-    npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
-
-    if (cctx->which_ring == GR_CTX_NMOD)
+    if (blenA != 0 && blenB != 0)
     {
-        if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB, npoints))
-            return _gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx);
-    }
-    else if (cctx->which_ring == GR_CTX_FMPZ || cctx->which_ring == GR_CTX_FMPQ)
-    {
-        if (FLINT_MIN(lenA, lenB) >= MODULAR_MIN_LENGTH ||
-                npoints - 1 >= MODULAR_MIN_DEGREE)
-            return _gr_poly_resultant_modular(res, A, lenA, B, lenB, 1, ctx);
+        npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
+
+        if (cctx->which_ring == GR_CTX_NMOD)
+        {
+            if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB, npoints) &&
+                _gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+                return GR_SUCCESS;
+        }
+        else if (cctx->which_ring == GR_CTX_FMPZ || cctx->which_ring == GR_CTX_FMPQ)
+        {
+            if ((FLINT_MIN(lenA, lenB) >= MODULAR_MIN_LENGTH ||
+                    npoints - 1 >= MODULAR_MIN_DEGREE) &&
+                _gr_poly_resultant_modular(res, A, lenA, B, lenB, 1, ctx) == GR_SUCCESS)
+                return GR_SUCCESS;
+        }
     }
 
-    return GR_UNABLE;
+    return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
 }
 
 gr_method_tab_input _gr_poly_methods_input[] =

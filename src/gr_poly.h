@@ -70,26 +70,26 @@ void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx);
 
 /* Vector of gr_poly objects (gr_poly_vec_t).
    The ctx argument refers to the coefficient ring of the polynomials. */
- 
+
 void gr_poly_vec_init(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_poly_vec_clear(gr_poly_vec_t vec, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_vec_set(gr_poly_vec_t res, const gr_poly_vec_t src, gr_ctx_t ctx);
 void gr_poly_vec_fit_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_poly_vec_set_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx);
- 
+
 GR_POLY_INLINE slong
 gr_poly_vec_length(const gr_poly_vec_t vec, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return vec->length;
 }
- 
+
 GR_POLY_INLINE gr_poly_struct *
 gr_poly_vec_entry_ptr(gr_poly_vec_t vec, slong i, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return vec->entries + i;
 }
- 
+
 GR_POLY_INLINE const gr_poly_struct *
 gr_poly_vec_entry_srcptr(const gr_poly_vec_t vec, slong i, gr_ctx_t FLINT_UNUSED(ctx))
 {
@@ -559,6 +559,7 @@ int _gr_poly_resultant_multipoint_cutoff(slong len1, slong len2, slong npoints);
 WARN_UNUSED_RESULT int _gr_poly_resultant_modular(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, int proved, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant_modular(gr_ptr r, const gr_poly_t f, const gr_poly_t g, int proved, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_resultant_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
 

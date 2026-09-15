@@ -3149,6 +3149,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_DIVREM,             (gr_funcptr) _gr_poly_divrem_generic},
     {GR_METHOD_POLY_DIVEXACT,           (gr_funcptr) _gr_poly_divexact_generic},
     {GR_METHOD_POLY_GCD,                (gr_funcptr) _gr_poly_gcd_generic},
+    {GR_METHOD_POLY_RESULTANT,          (gr_funcptr) _gr_poly_resultant_generic},
     {GR_METHOD_POLY_XGCD,               (gr_funcptr) _gr_poly_xgcd_generic},
     {GR_METHOD_POLY_TAYLOR_SHIFT,       (gr_funcptr) _gr_poly_taylor_shift_generic},
     {GR_METHOD_POLY_INV_SERIES,         (gr_funcptr) _gr_poly_inv_series_generic},
