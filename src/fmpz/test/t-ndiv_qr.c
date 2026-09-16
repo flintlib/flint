@@ -43,6 +43,18 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
         fmpz_randbits(a, state, n_randint(state, 200));
         fmpz_randbits(b, state, 1 + n_randint(state, 200));
 
+        /* force halfway cases: a = q b + b/2 with b even */
+        if (n_randint(state, 4) == 0)
+        {
+            fmpz_mul_2exp(b, b, 1);
+            fmpz_mul(a, a, b);
+            fmpz_tdiv_q_2exp(tmp, b, 1);
+            if (n_randint(state, 2))
+                fmpz_add(a, a, tmp);
+            else
+                fmpz_sub(a, a, tmp);
+        }
+
         fmpz_ndiv_qr(nquo, nrem, a, b);
         {
             fmpz_set(A, a);
@@ -71,6 +83,17 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
 
         fmpz_set(tmp, nrem);
         fmpz_addmul(tmp, b, nquo);
+        /* on a tie (|2 nrem| = |b|) the quotient must be even */
+        if (fmpz_cmp2abs(b, nrem) == 0 && fmpz_is_odd(nquo))
+        {
+            flint_printf("FAIL: tie not rounded to even\n");
+            fmpz_print(a); flint_printf("\n");
+            fmpz_print(b); flint_printf("\n");
+            fmpz_print(nquo); flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         result = ( fmpz_cmp(tmp, a) == 0
                 && fmpz_cmpabs(nrem, frem) <= 0
                 && fmpz_cmpabs(nrem, crem) <= 0)
@@ -99,7 +122,9 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
         fmpz_clear(crem);
     }
 
-    /* Check that it rounds towards zero for ties */
+    /* Check that ties are rounded to an even quotient: a / b = odd / 2, so
+       the truncated quotient t = (odd - 1) / 2 is kept iff it is even, and
+       otherwise q = t + sgn(a/b). */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t max;
@@ -139,11 +164,22 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
         fmpz_ndiv_qr(nquo, nrem, a, b);
         fmpz_tdiv_qr(tquo, trem, a, b);
 
+        if (fmpz_is_odd(tquo))
+        {
+            slong sgn = fmpz_sgn(a) * fmpz_sgn(b);
+            fmpz_add_si(tquo, tquo, sgn);
+            if (sgn > 0)
+                fmpz_sub(trem, trem, b);
+            else
+                fmpz_add(trem, trem, b);
+        }
+
         fmpz_set(tmp, nrem);
         fmpz_addmul(tmp, b, nquo);
         result = ( fmpz_cmp(tmp, a) == 0
                 && fmpz_cmp(nquo, tquo) == 0
-                && fmpz_cmp(nrem, trem) == 0)
+                && fmpz_cmp(nrem, trem) == 0
+                && fmpz_is_even(nquo))
                 && _fmpz_is_canonical(nquo) && _fmpz_is_canonical(nrem);
         if (!result)
         {

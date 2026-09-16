@@ -35,9 +35,10 @@
 
     Multiplication and squaring first compute the unreduced integer
     polynomial product with delayed reduction (each product coefficient
-    is an accumulated (2 nlimbs + 1)-limb integer), then perform the
-    cyclotomic reduction on the unreduced accumulators, and finally do
-    a single reduction mod n per output coefficient. The cyclotomic
+    is an exact integer of s limbs, with s up to 2 nlimbs + 1, computed
+    by _flint_mpn_poly_mulmid with the classical algorithm or Karatsuba), then
+    perform the cyclotomic reduction on the unreduced accumulators, and
+    finally do a single reduction mod n per output coefficient. The cyclotomic
     reduction uses
 
         c_i' = c_i + c_{i + p^k}                     (x^{p^k} = 1)
@@ -70,6 +71,18 @@ unity_zp_mpn_init(unity_zp_mpn f, ulong p, ulong exp, gr_ctx_t ctx)
     f->ctx = (gr_ctx_struct *) ctx;
     f->coeffs = (nn_ptr) flint_calloc(f->d * MPN_MOD_CTX_NLIMBS(ctx),
                                       sizeof(ulong));
+
+    /* the products are always d x d with the residues as unsigned
+       coefficients: fix the algorithm and the output size once (the
+       squaring cutoff is not below the multiplication one, so the
+       multiplication's choice and size are valid for both) */
+    {
+        slong n = MPN_MOD_CTX_NLIMBS(ctx);
+        int norm = MPN_MOD_CTX_NORM(ctx);
+        slong cutoff = _flint_mpn_poly_mulmid_cutoff(n, n, 0);
+        f->use_karatsuba = _flint_mpn_poly_mulmid_use_karatsuba(f->d, norm, FLINT_MPN_POLY_MUL_UNSIGNED, cutoff);
+        f->slimbs = _flint_mpn_poly_mulmid_slimbs(f->d, n, norm, n, norm, FLINT_MPN_POLY_MUL_UNSIGNED, cutoff);
+    }
 }
 
 void
@@ -149,8 +162,8 @@ unity_zp_mpn_set_unity_zp(unity_zp_mpn f, const unity_zp g)
 
 /*
     Given the unreduced product coefficients c[0], ..., c[2 d - 2] computed
-    by _mpn_mod_poly_mul_unreduced or _mpn_mod_poly_sqr_unreduced, each an
-    s-limb nonnegative integer < B^s with B = 2^FLINT_BITS, performs the cyclotomic
+    by _flint_mpn_poly_mulmid, each an s-limb nonnegative integer < B^s with
+    B = 2^FLINT_BITS, performs the cyclotomic
     reduction
 
         f_i = c_i + c_{i + p^k} - c_{d + (i mod p^(k-1))}
@@ -221,38 +234,45 @@ _unity_zp_mpn_cyclotomic_reduce(unity_zp_mpn f, nn_srcptr c, slong s)
     }
 }
 
-void
-unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h)
+/* f = g h (or g^2 when h == g), computing the exact integer product with
+   delayed reduction via _flint_mpn_poly_mulmid, which chooses between the
+   classical algorithm and Karatsuba. */
+static void
+_unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h)
 {
     slong d = f->d;
-    slong s = _mpn_mod_poly_mul_unreduced_slimbs(d, f->ctx);
+    slong n = UNITY_ZP_MPN_NLIMBS(f);
+    int norm = MPN_MOD_CTX_NORM(f->ctx);
+    slong slimbs = f->slimbs;
     nn_ptr c;
     TMP_INIT;
 
     TMP_START;
-    c = TMP_ALLOC((2 * d - 1) * s * sizeof(ulong));
+    c = TMP_ALLOC((2 * d - 1) * slimbs * sizeof(ulong));
 
-    _mpn_mod_poly_mul_unreduced(c, s, g->coeffs, d, h->coeffs, d, f->ctx);
-    _unity_zp_mpn_cyclotomic_reduce(f, c, s);
+    /* the products are typically tiny (d is usually below 16), so the
+       fixed costs of the general entry point are avoided in the classical
+       range; the algorithm and output size were fixed at initialization */
+    if (!f->use_karatsuba)
+        _flint_mpn_poly_mulmid_classical(c, g->coeffs, d, n, h->coeffs, d, n, 0, 2 * d - 1, slimbs, FLINT_MPN_POLY_MUL_UNSIGNED);
+    else
+        _flint_mpn_poly_mulmid(c, g->coeffs, d, n, norm, h->coeffs, d, n, norm, 0, 2 * d - 1, slimbs, FLINT_MPN_POLY_MUL_UNSIGNED);
+
+    _unity_zp_mpn_cyclotomic_reduce(f, c, slimbs);
 
     TMP_END;
 }
 
 void
+unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h)
+{
+    _unity_zp_mpn_mul(f, g, h);
+}
+
+void
 unity_zp_mpn_sqr(unity_zp_mpn f, const unity_zp_mpn g)
 {
-    slong d = f->d;
-    slong s = _mpn_mod_poly_mul_unreduced_slimbs(d, f->ctx);
-    nn_ptr c;
-    TMP_INIT;
-
-    TMP_START;
-    c = TMP_ALLOC((2 * d - 1) * s * sizeof(ulong));
-
-    _mpn_mod_poly_sqr_unreduced(c, s, g->coeffs, d, f->ctx);
-    _unity_zp_mpn_cyclotomic_reduce(f, c, s);
-
-    TMP_END;
+    _unity_zp_mpn_mul(f, g, g);
 }
 
 void

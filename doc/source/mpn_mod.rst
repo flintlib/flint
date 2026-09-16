@@ -245,14 +245,19 @@ All multiplication algorithms optimize for squaring.
 .. function:: int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
               int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx)
 
-    Polynomial multiplication using the Karatsuba algorithm,
-    implemented without intermediate modular reductions.
-    This algorithm calls itself recursively, switching to
-    basecase multiplication (also without intermediate reductions)
-    when either *len1* or *len2* is smaller than *cutoff*.
+    Polynomial multiplication using the Karatsuba algorithm
+    (:func:`_flint_mpn_poly_mulmid_karatsuba`), implemented without
+    intermediate modular reductions. This algorithm calls itself
+    recursively, switching to basecase multiplication (also without
+    intermediate reductions) when either *len1* or *len2* is smaller
+    than *cutoff*; a *cutoff* of -1 selects the tuned value.
 
-    Currently a full product is computed internally regardless of the
-    output length; truncation only skips the modular reductions.
+.. function:: int _mpn_mod_poly_mulmid_mpn(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+
+    Polynomial multiplication without intermediate modular reductions,
+    choosing between the classical algorithm and Karatsuba via
+    :func:`_flint_mpn_poly_mulmid`, with the size of the unreduced coefficients
+    given by :func:`_flint_mpn_poly_mulmid_params`.
 
 .. function:: int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
               int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
@@ -265,33 +270,6 @@ All multiplication algorithms optimize for squaring.
               int _mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication with automatic algorithm selection.
-
-.. function:: slong _mpn_mod_poly_mul_unreduced_slimbs(slong len, gr_ctx_t ctx)
-
-    Returns the recommended number of limbs for representing, without
-    modular reduction, a sum of at most *len* products of two reduced
-    residues, i.e. the coefficient size to pass to
-    :func:`_mpn_mod_poly_mul_unreduced` and
-    :func:`_mpn_mod_poly_sqr_unreduced` for polynomials with *len* terms.
-
-.. function:: void _mpn_mod_poly_mul_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, gr_ctx_t ctx)
-              void _mpn_mod_poly_sqr_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly, slong len, gr_ctx_t ctx)
-
-    Schoolbook polynomial multiplication (respectively squaring) with
-    delayed reduction: sets the ``len1 + len2 - 1`` coefficients of the
-    product of ``(poly1, len1)`` and ``(poly2, len2)`` exactly, as
-    unreduced nonnegative integers of *slimbs* limbs each, stored
-    contiguously in *res* with stride *slimbs*, performing no modular
-    reductions. This allows the caller to perform further linear
-    operations on the exact coefficients and delay reduction, e.g. to a
-    single reduction per output coefficient as in the cyclotomic
-    arithmetic used by :func:`aprcl_is_prime_jacobi`.
-
-    *slimbs* must be at least the value returned by
-    :func:`_mpn_mod_poly_mul_unreduced_slimbs` for
-    ``len = min(len1, len2)``, and must lie between ``2 * nlimbs - 1``
-    and ``2 * nlimbs + 1``. The lengths must be at least 1.
-
 
 Division
 ..............

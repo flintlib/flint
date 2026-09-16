@@ -69,6 +69,61 @@ typedef union
 
 typedef fmpz_gram_union fmpz_gram_t[1];
 
+/* Packed basis matrix  ******************************************************/
+
+typedef struct
+{
+    nn_ptr entries;     /* d * n * m limbs */
+    nn_ptr * rows;      /* row pointers, permuted by row moves */
+    slong * bits;       /* upper bound on the bit length of the entries of each row */
+    slong d;            /* rows */
+    slong n;            /* columns */
+    slong m;            /* limbs per entry (two's complement) */
+}
+fmpz_lll_packed_struct;
+
+typedef fmpz_lll_packed_struct fmpz_lll_packed_t[1];
+
+/*
+    Only pack if the entries fit in this many limbs. In the multiprecision
+    LLL the Gram matrix is computed exactly from the packed rows, which is
+    only competitive with approximate dot products for small entries.
+*/
+#define FMPZ_LLL_PACKED_MAX_LIMBS 32
+#define FMPZ_LLL_PACKED_MAX_LIMBS_MPF FLINT_MPN_DOT_TAB_N
+
+/* do not pack if the packed matrix would need more limbs than this */
+#define FMPZ_LLL_PACKED_MAX_SIZE (WORD(1) << 26)
+
+slong fmpz_lll_packed_limbs(const fmpz_mat_t B);
+void fmpz_lll_packed_init(fmpz_lll_packed_t P, slong d, slong n, slong m);
+void fmpz_lll_packed_clear(fmpz_lll_packed_t P);
+void fmpz_lll_packed_set_fmpz_mat(fmpz_lll_packed_t P, const fmpz_mat_t B);
+void fmpz_lll_packed_get_fmpz_mat(fmpz_mat_t B, const fmpz_lll_packed_t P);
+void fmpz_lll_packed_tighten(fmpz_lll_packed_t P, slong i);
+void fmpz_lll_packed_grow(fmpz_lll_packed_t P);
+void fmpz_lll_packed_maybe_shrink(fmpz_lll_packed_t P);
+void fmpz_lll_packed_move_row(fmpz_lll_packed_t P, slong i, slong j);
+void fmpz_lll_packed_row_sub(fmpz_lll_packed_t P, slong i, slong j);
+void fmpz_lll_packed_row_add(fmpz_lll_packed_t P, slong i, slong j);
+void fmpz_lll_packed_row_submul_si(fmpz_lll_packed_t P, slong i, slong j, slong x);
+void fmpz_lll_packed_row_submul_fmpz(fmpz_lll_packed_t P, slong i, slong j, const fmpz_t x);
+void fmpz_lll_packed_row_submul_si_2exp(fmpz_lll_packed_t P, slong i, slong j, slong x, ulong e);
+slong fmpz_lll_packed_get_d_vec_2exp(double * appv, fmpz_lll_packed_t P, slong i);
+void fmpz_lll_packed_dot(fmpz_t res, const fmpz_lll_packed_t P, slong i, slong j, slong len);
+double fmpz_lll_packed_heuristic_dot(const double * vec1, const double * vec2, slong len2,
+       const fmpz_lll_packed_t P, slong k, slong j, slong exp_adj);
+
+int fmpz_lll_check_babai_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
+       d_mat_t appB, int *expo, fmpz_gram_t A,
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic);
+int fmpz_lll_advance_check_babai_packed(int cur_kappa, int kappa, fmpz_lll_packed_t P, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
+       d_mat_t appB, int *expo, fmpz_gram_t A,
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic);
+int fmpz_lll_check_babai_heuristic_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U,
+       gr_mat_t mu, gr_mat_t r, gr_ptr s, fmpz_gram_t A, int a, int zeros,
+       int kappamax, int n, gr_ptr tmp, gr_ptr rtmp, gr_ctx_t ctx, const fmpz_lll_t fl);
+
 /* Parameter manipulation  ***************************************************/
 
 void fmpz_lll_context_init_default(fmpz_lll_t fl);

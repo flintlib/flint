@@ -25,7 +25,7 @@ mulmid_supported(slong len1, slong len2, slong nlo, slong nhi)
     slong m1 = ea - sa + 1;
     slong n1 = eb - sb + 1;
     slong w = nhi - nlo;
-    slong nmax = (FLINT_BITS == 64) ? 20 : 13;
+    slong nmax = FMPZ_POLY_TOOM_SCALAR_N_MAX;
 
     if (FLINT_MIN(m1, n1) == 1)
         return 1;

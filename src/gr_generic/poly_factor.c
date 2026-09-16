@@ -76,3 +76,25 @@ cleanup:
 
     return status;
 }
+
+/* Default polynomial factorization: currently only finite fields are
+   supported generically. */
+int
+gr_generic_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) == T_TRUE && gr_ctx_is_finite(ctx) == T_TRUE)
+        return _gr_poly_factor_finite_field_method(c, fac, mult, (const gr_poly_struct *) elt, flags, ctx);
+
+    return GR_UNABLE;
+}
+
+/* Default root finding: currently only finite fields are supported
+   generically. */
+int
+gr_generic_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) == T_TRUE && gr_ctx_is_finite(ctx) == T_TRUE)
+        return gr_poly_roots_finite_field(roots, mult, poly, flags, ctx);
+
+    return GR_UNABLE;
+}

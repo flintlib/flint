@@ -10,100 +10,114 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
-#include <gmp.h>
 #include "fmpz.h"
 #include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> qs_inf->hash_shift))
 
-static void
-_qsieve_read(void * data, size_t size, size_t count, FILE * file)
-{
-    if (fread(data, size, count, file) != count)
-        flint_throw(FLINT_ERROR, "Failed to read relation data\n");
-}
-
 /******************************************************************************
  *
- *  Some helper function, used for debugging
+ *  Relation store
  *
  *****************************************************************************/
 
 /*
-    Write partial or full relation to file
+   The relations found by sieving are kept in memory until the linear algebra
+   consumes them.  See the comment on the store in qsieve.h for the layout.
+*/
 
-    The layout is as follows:
-    total write size of relation (including this write size)
-    large prime             (1 * ulong)
-    number of small primes  (1 * slong)
-    small primes            (number of small primes * slong)
-    number of factors       (1 * slong)
-    (factor, exponent)      (number of factors * fac_t)
-    Y->_mp_size             (1 * slong)
-    Y->_mp_d                (Y->_mp_size * ulong)
- */
-void qsieve_write_to_file(qs_t qs_inf, ulong prime, const fmpz_t Y, const qs_poly_t poly)
+#define QS_REL_ALLOC_MIN 256          /* initial number of relations */
+#define QS_REL_FACTOR_ALLOC_MIN 4096  /* initial number of factor entries */
+
+void qsieve_relations_init(qs_t qs_inf)
+{
+    qs_inf->rel_num = 0;
+    qs_inf->rel_alloc = QS_REL_ALLOC_MIN;
+    qs_inf->relations = flint_malloc(qs_inf->rel_alloc*sizeof(qs_rel_s));
+    qs_inf->rel_small = flint_malloc(qs_inf->rel_alloc*
+                                     qs_inf->small_primes*sizeof(slong));
+
+    qs_inf->rel_factor_num = 0;
+    qs_inf->rel_factor_alloc = QS_REL_FACTOR_ALLOC_MIN;
+    qs_inf->rel_factor = flint_malloc(qs_inf->rel_factor_alloc*sizeof(fac_t));
+}
+
+/* discard all relations found so far, keeping the allocations */
+void qsieve_relations_reset(qs_t qs_inf)
+{
+    slong i;
+
+    for (i = 0; i < qs_inf->rel_num; i++)
+        fmpz_clear(&qs_inf->relations[i].Y);
+
+    qs_inf->rel_num = 0;
+    qs_inf->rel_factor_num = 0;
+}
+
+void qsieve_relations_clear(qs_t qs_inf)
+{
+    qsieve_relations_reset(qs_inf);
+
+    flint_free(qs_inf->relations);
+    flint_free(qs_inf->rel_small);
+    flint_free(qs_inf->rel_factor);
+
+    qs_inf->relations = NULL;
+    qs_inf->rel_small = NULL;
+    qs_inf->rel_factor = NULL;
+    qs_inf->rel_alloc = 0;
+    qs_inf->rel_factor_alloc = 0;
+}
+
+/*
+   Add a full (prime == 1) or partial relation to the store.
+
+   Called from the sieving threads, so the caller must hold qs_inf->mutex.
+*/
+void qsieve_add_relation(qs_t qs_inf, ulong prime, const fmpz_t Y, const qs_poly_t poly)
 {
     slong num_factors = poly->num_factors;
-    slong * small = poly->small;
-    fac_t * factor = poly->factor;
-    slong Ysz;
-    slong write_size;
+    slong small_primes = qs_inf->small_primes;
+    qs_rel_s * rel;
 
-    /* Get size of Y */
-    Ysz = COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_size : FLINT_SGN(*Y);
-
-    /* Write size of relation */
-    write_size =
-        sizeof(slong)                           /* total write size */
-        + sizeof(ulong)                     /* large prime */
-        + sizeof(slong)                         /* number of small primes */
-        + sizeof(slong) * qs_inf->small_primes  /* small primes */
-        + sizeof(slong)                         /* number of factors */
-        + sizeof(fac_t) * num_factors           /* factors */
-        + sizeof(slong)                         /* Y->_mp_size */
-        + sizeof(ulong) * (Ysz != 0 ? FLINT_ABS(Ysz) : 1); /* Y->_mp_d */
-    fwrite(&write_size, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Write large prime */
-    fwrite(&prime, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
-
-    /* NOTE: We do not have to write small primes. */
-    /* Write number of small primes */
-    fwrite(&qs_inf->small_primes, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Write small primes */
-    fwrite(small, sizeof(slong), qs_inf->small_primes, (FILE *) qs_inf->siqs);
-
-    /* Write number of factors */
-    fwrite(&num_factors, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Write factors and exponents */
-    fwrite(factor, sizeof(fac_t), num_factors, (FILE *) qs_inf->siqs);
-
-    /* Write Y->_mp_size (or mock it) */
-    fwrite(&Ysz, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Write Y->_mp_d (or mock it) */
-    if (!COEFF_IS_MPZ(*Y))
+    if (qs_inf->rel_num == qs_inf->rel_alloc)
     {
-        slong abslimb = FLINT_ABS(*Y);
+        slong alloc = 2*qs_inf->rel_alloc;
 
-        /* Write mock Y->_mp_d */
-        fwrite(&abslimb, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
+        qs_inf->relations = flint_realloc(qs_inf->relations,
+                                          alloc*sizeof(qs_rel_s));
+        qs_inf->rel_small = flint_realloc(qs_inf->rel_small,
+                                          alloc*small_primes*sizeof(slong));
+        qs_inf->rel_alloc = alloc;
     }
-    else
+
+    if (qs_inf->rel_factor_num + num_factors > qs_inf->rel_factor_alloc)
     {
-        nn_srcptr Yd = COEFF_TO_PTR(*Y)->_mp_d;
+        slong alloc = FLINT_MAX(2*qs_inf->rel_factor_alloc,
+                                qs_inf->rel_factor_num + num_factors);
 
-        /* Write Y->_mp_d */
-        fwrite(Yd, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        qs_inf->rel_factor = flint_realloc(qs_inf->rel_factor,
+                                           alloc*sizeof(fac_t));
+        qs_inf->rel_factor_alloc = alloc;
     }
+
+    rel = qs_inf->relations + qs_inf->rel_num;
+
+    rel->lp = prime;
+    rel->num_factors = num_factors;
+    rel->factor_offset = qs_inf->rel_factor_num;
+    fmpz_init_set(&rel->Y, Y);
+
+    memcpy(qs_inf->rel_small + qs_inf->rel_num*small_primes, poly->small,
+           small_primes*sizeof(slong));
+    memcpy(qs_inf->rel_factor + qs_inf->rel_factor_num, poly->factor,
+           num_factors*sizeof(fac_t));
+
+    qs_inf->rel_factor_num += num_factors;
+    qs_inf->rel_num++;
 }
 
 /******************************************************************************
@@ -185,65 +199,29 @@ void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime)
  *****************************************************************************/
 
 /*
-   given a string representing a relation, parse it to
-   obtain relation
+   take a copy of the i-th relation in the store
+
+   The store keeps ownership of its own copy: the relation returned here is
+   handed to the merging and filtering code below, which consumes and frees it.
 */
-relation_t qsieve_parse_relation(qs_t qs_inf)
+relation_t qsieve_get_relation(qs_t qs_inf, slong i)
 {
+    qs_rel_s * stored = qs_inf->relations + i;
     relation_t rel;
-    slong Ysz;
 
-    /* NOTE: write_size and large prime is already read in
-     * qsieve_process_relation. */
+    rel.lp = stored->lp;
+    rel.small_primes = qs_inf->small_primes;
+    rel.num_factors = stored->num_factors;
 
-    /* Get large prime (is always one) */
-    rel.lp = UWORD(1);
-
-    /* NOTE: We can use qs_inf->small_primes here instead of reading. */
-    /* Get number of small primes */
-    _qsieve_read(&rel.small_primes, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Get small primes */
     rel.small = flint_malloc(rel.small_primes * sizeof(slong));
-    _qsieve_read(rel.small, sizeof(slong), rel.small_primes, (FILE *) qs_inf->siqs);
+    memcpy(rel.small, qs_inf->rel_small + i*qs_inf->small_primes,
+           rel.small_primes * sizeof(slong));
 
-    /* Get number of factors */
-    _qsieve_read(&rel.num_factors, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Get factors */
     rel.factor = flint_malloc(rel.num_factors * sizeof(fac_t));
-    _qsieve_read(rel.factor, sizeof(fac_t), rel.num_factors, (FILE *) qs_inf->siqs);
+    memcpy(rel.factor, qs_inf->rel_factor + stored->factor_offset,
+           rel.num_factors * sizeof(fac_t));
 
-    /* Get Ysz */
-    Ysz = 0;
-    _qsieve_read(&Ysz, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-    /* Get Y */
-    fmpz_init(rel.Y);
-    if (FLINT_ABS(Ysz) <= 1)
-    {
-        ulong abslimb = 0;
-
-        _qsieve_read(&abslimb, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
-
-#if COEFF_MAX != -COEFF_MIN
-# error
-#endif
-        fmpz_set_ui(rel.Y, abslimb);
-        if (Ysz < 0)
-            fmpz_neg(rel.Y, rel.Y);
-    }
-    else
-    {
-        mpz_ptr mY = _fmpz_new_mpz();
-        mp_ptr ptr;
-
-        mY->_mp_size = Ysz;
-        ptr = FLINT_MPZ_REALLOC(mY, FLINT_ABS(Ysz));
-
-        _qsieve_read(ptr, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
-        *rel.Y = PTR_TO_COEFF(mY);
-    }
+    fmpz_init_set(rel.Y, &stored->Y);
 
     return rel;
 }
@@ -474,7 +452,7 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relati
 }
 
 /*
-   process relations from the file
+   process the relations found so far
 */
 int qsieve_process_relation(qs_t qs_inf)
 {
@@ -489,27 +467,13 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rlist;
     int done = 0;
 
-    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
-        flint_throw(FLINT_ERROR, "fclose fail\n");
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "rb");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fopen fail\n");
-
 #if QS_DEBUG & 64
     flint_printf("Getting relations\n");
 #endif
 
-    while (1)
+    for (i = 0; i < qs_inf->rel_num; i++)
     {
-        int siqs_eof;
-        slong write_size = 0;
-
-        siqs_eof = !fread(&write_size, sizeof(slong), 1, (FILE *) qs_inf->siqs);
-
-        if (siqs_eof)
-            break;
-
-        _qsieve_read(&prime, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
+        prime = qs_inf->relations[i].lp;
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
@@ -518,23 +482,13 @@ int qsieve_process_relation(qs_t qs_inf)
            rel_size *= 2;
         }
 
+        /* skip partials whose large prime was not seen at least twice */
         if (prime == 1 || entry->count >= 2)
         {
-            rel_list[num_relations] = qsieve_parse_relation(qs_inf);
-            rel_list[num_relations].lp = prime;
+            rel_list[num_relations] = qsieve_get_relation(qs_inf, i);
             num_relations++;
         }
-        else
-        {
-            /* We have to get to the next relation in the file. We have already
-             * read write_size (is a slong) and large prime (is an ulong).*/
-            fseek((FILE *) qs_inf->siqs, write_size - sizeof(slong) - sizeof(ulong), SEEK_CUR);
-        }
     }
-
-    if(fclose((FILE *) qs_inf->siqs))
-        flint_throw(FLINT_ERROR, "fclose fail\n");
-    qs_inf->siqs = NULL;
 
 #if QS_DEBUG & 64
     flint_printf("Removing duplicates\n");
@@ -595,13 +549,9 @@ int qsieve_process_relation(qs_t qs_inf)
 
     if (rlist_length < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
     {
+       /* not enough: keep the relations we have and go back to sieving */
        qs_inf->edges -= 100;
        done = 0;
-       if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
-           flint_throw(FLINT_ERROR, "fclose fail\n");
-       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "ab");
-       if (qs_inf->siqs == NULL)
-           flint_throw(FLINT_ERROR, "fopen fail\n");
     } else
     {
        done = 1;

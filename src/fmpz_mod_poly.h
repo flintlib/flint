@@ -73,16 +73,6 @@ typedef struct
 }
 fmpz_mod_poly_matrix_precompute_arg_t;
 
-typedef struct
-{
-    fmpz_mat_struct * A;
-    fmpz_mod_poly_struct * res;
-    fmpz_mod_poly_struct * poly1;
-    fmpz_mod_poly_struct * poly3;
-    fmpz_mod_poly_struct * poly3inv;
-    const fmpz_mod_ctx_struct * ctx;
-}
-fmpz_mod_poly_compose_mod_precomp_preinv_arg_t;
 
 
 /*  Initialisation and memory management *************************************/
@@ -741,7 +731,6 @@ void _fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz * poly1,
                           const fmpz * poly2, slong len2, const fmpz * poly2inv,
                           slong len2inv, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr);
 
 void fmpz_mod_poly_precompute_matrix(fmpz_mat_t A,
                      const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
@@ -751,7 +740,6 @@ void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
          const fmpz * poly1, slong len1, const fmpz_mat_t A, const fmpz * poly3,
          slong len3, const fmpz * poly3inv, slong len3inv, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
 
 void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
                    const fmpz_mod_poly_t poly1, const fmpz_mat_t A,
@@ -773,43 +761,6 @@ void _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, c
 void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
                      const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                         const fmpz_mod_poly_t poly3, const fmpz_mod_ctx_t ctx);
-
-void
-_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
-                                                const fmpz_mod_poly_struct *
-                                                polys, slong FLINT_UNUSED(lenpolys), slong l,
-                                                const fmpz * g, slong glen,
-                                                const fmpz * poly, slong len,
-                                                const fmpz * polyinv,
-                                                slong leninv, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(
-      fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys,
-      slong len1,slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
-                      const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx);
-
-void
-_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
-                                                 const fmpz_mod_poly_struct * polys,
-                                                 slong FLINT_UNUSED(lenpolys), slong l,
-                                                 const fmpz * g, slong glen,
-                                                 const fmpz * poly, slong len,
-                                                 const fmpz * polyinv, slong leninv,
-                                                 const fmpz_mod_ctx_t ctx,
-                                                 thread_pool_handle * threads,
-                                                 slong num_threads);
-
-void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
-            const fmpz_mod_poly_struct * polys, slong len1, slong n,
-            const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
-            const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx,
-                              thread_pool_handle * threads, slong num_threads);
-
-void
-fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res,
-                    const fmpz_mod_poly_struct * polys, slong len1, slong n,
-                    const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
-                      const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx);
 
 /* Norms *********************************************************************/
 

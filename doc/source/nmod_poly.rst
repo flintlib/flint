@@ -1507,8 +1507,7 @@ Multipoint evaluation
     Evaluates (``coeffs``, ``ilen``) at the first ``olen`` powers
     of the square of ``r``, writing the output values to ``ys``.
     The value of ``r`` should be reduced modulo the modulus ``mod``
-    and of sufficient multiplicative order such that none of
-    the first ``olen`` powers of `r^2` is one.
+    and coprime with ``mod``.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -1517,8 +1516,7 @@ Multipoint evaluation
     Evaluates ``poly``  at the first ``olen`` powers
     of the square of ``r``, writing the output values to ``ys``.
     The value of ``r`` should be reduced modulo the modulus of the polynomial
-    and of sufficient multiplicative order such that none of
-    the first ``olen`` powers of `r^2` is one.
+    and coprime with this modulus.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -1809,11 +1807,6 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void _nmod_poly_precompute_matrix_worker (void * arg_ptr)
-
-    Worker function version of ``_nmod_poly_precompute_matrix``.
-    Input/output is stored in ``nmod_poly_matrix_precompute_arg_t``.
-
 .. function:: void _nmod_poly_precompute_matrix (nmod_mat_t A, nn_srcptr f, nn_srcptr g, slong leng, nn_srcptr ginv, slong lenginv, nmod_t mod)
 
     Sets the ith row of ``A`` to `f^i` modulo `g` for
@@ -1829,13 +1822,6 @@ Modular composition
     `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
-
-    Worker function version of
-    ``_nmod_poly_compose_mod_brent_kung_precomp_preinv``.
-    Input/output is stored in
-    ``nmod_poly_compose_mod_precomp_preinv_arg_t``.
 
 .. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr f, slong lenf, const nmod_mat_t A, nn_srcptr h, slong lenh, nn_srcptr hinv, slong lenhinv, nmod_t mod)
 
@@ -1858,63 +1844,6 @@ Modular composition
     be the inverse of the reverse of ``h``. This version of Brent-Kung
     modular composition is particularly useful if one has to perform several
     modular composition of the form `f(g)` modulo `h` for fixed `g` and `h`.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong l, nn_srcptr g, slong leng, nn_srcptr h, slong lenh, nn_srcptr hinv, slong lenhinv, nmod_t mod)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
-    where `f_i` are the first ``l`` elements of ``polys``. We require that `h`
-    is nonzero and that the length of `g` is less than the length of `h`. We
-    also require that the length of `f_i` is less than the length of `h`. We
-    require ``res`` to have enough memory allocated to hold ``l``
-    ``nmod_poly_struct``'s. The entries of ``res`` need to be initialised and
-    ``l`` needs to be less than ``len1`` Furthermore, we require ``hinv`` to
-    be the inverse of the reverse of ``h``. The output is not allowed to be
-    aliased with any of the inputs.
-
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t h, const nmod_poly_t hinv)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
-    where `f_i` are the first ``n`` elements of ``polys``. We require ``res``
-    to have enough memory allocated to hold ``n`` ``nmod_poly_struct``. The
-    entries of ``res`` need to be initialised and ``n`` needs to be less than
-    ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
-    smaller degree than `h`. Furthermore, we require ``hinv`` to be the inverse
-    of the reverse of ``h``. No aliasing of ``res`` and ``polys`` is allowed.
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, nn_srcptr g, slong glen, nn_srcptr poly, slong len, nn_srcptr polyinv, slong leninv, nmod_t mod, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`_nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv)
-
-    Multithreaded version of
-    :func:`nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void _nmod_poly_compose_mod(nn_ptr res, nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod)
-
-    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
-    `h` is nonzero and that the length of `g` is one less than the
-    length of `h` (possibly with zero padding). The output is not allowed
-    to be aliased with any of the inputs.
-
-.. function:: void nmod_poly_compose_mod(nmod_poly_t res, const nmod_poly_t f, const nmod_poly_t g, const nmod_poly_t h)
-
-    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
-    `h` is nonzero.
-
-
 
 Greatest common divisor
 --------------------------------------------------------------------------------
@@ -2651,24 +2580,27 @@ Geometric progression
     Builds a geometric progression multipoint evaluation / interpolation structure.
 
     The variant with ``function`` variant builds precomputation for specific
-    functionalities: currently, one should set ``function`` to `1` for
-    evaluation only, to `2` for interpolation only, and to `3` for both
-    evaluation and interpolation. The variant without ``function`` precomputes
-    for both.
+    functionalities. The lowest 3 bits of ``function`` act as a mask for the
+    three functionalities: bit 0 for evaluation, bit 1 for interpolation, and
+    bit 2 for extrapolation. For example, setting ``function`` to `1` prepares
+    precomputation for evaluation only, setting it to `3` prepares for both
+    evaluation and interpolation, and setting it to `5` prepares for evaluation
+    and extrapolation. The variant without ``function`` precomputes for all
+    three functionalities.
 
     The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
 
-    The value of ``r`` should be reduced modulo the modulus ``mod``
-    and of sufficient multiplicative order such that none of
-    the powers `r^2, r^4, \ldots, r^{2(len-1)}` is one.
+    The value of ``r`` should be reduced modulo the modulus ``mod`` and should
+    be coprime with ``mod``. If ``function`` is `1` (evaluation only), there is
+    no other constraint. For any value of ``function`` other than `1`, this `r`
+    should also have sufficient multiplicative order such that none of the
+    powers `r^2, r^4, \ldots, r^{2(len-1)}` is one; additionally, if ``mod`` is
+    not prime then `r` should be such that the auxiliary values `r^{2k} - 1`
+    are invertible modulo ``mod``.
 
     The value of ``len`` should be both greater than or equal to the number of evaluation points to be
     considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
-    This allocates vectors and polynomials for a total space of `6 len - 1` coefficients.
-
-    If the modulus is not prime, this function will work under the additional
-    assumption that all the used points `r^{2k}` as well as the auxiliary
-    values `r^{2k} - 1` are invertible.
+    This allocates vectors and polynomials for a total space of ``11*len`` coefficients at most (evaluation alone takes ``3*len``; interpolation takes ``3*len``; extrapolation takes ``6*len`` but with ``1*len`` shared with interpolation).
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 

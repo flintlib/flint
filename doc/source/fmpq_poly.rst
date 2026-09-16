@@ -650,7 +650,8 @@ Multiplication
     ``(poly1, den1, len1)`` and ``(poly2, den2, len2)``. If the
     input is provided in canonical form, then so is the output.
 
-    Assumes ``len1 >= len2 > 0``.  Allows zero-padding in the input.
+    Assumes ``len1, len2 > 0``; the operands may be given in either
+    order.  Allows zero-padding in the input.
     Does not allow aliasing between the inputs and outputs.
 
 .. function:: void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
@@ -663,7 +664,8 @@ Multiplication
     ``(poly1, den1)`` and ``(poly2, den2)``.  The output is
     not guaranteed to be in canonical form.
 
-    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Assumes ``len1, len2 > 0`` (the operands may be given in either
+    order) and ``0 < n <= len1 + len2 - 1``.
     Allows for zero-padding in the inputs.  Does not allow aliasing between
     the inputs and outputs.
 

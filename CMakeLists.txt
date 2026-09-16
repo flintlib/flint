@@ -247,7 +247,7 @@ set(_BUILD_DIRS
     fq_nmod_mpoly_factor            fq_zech_mpoly_factor
 
     fft             ${FFT_SMALL}    fmpz_poly_q     fmpz_lll
-    n_poly          arith           qsieve          aprcl
+    n_poly          arith           qsieve          aprcl           ecpp
 
     nf              nf_elem         qfb
 

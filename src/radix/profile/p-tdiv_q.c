@@ -14,35 +14,6 @@
 #include "radix.h"
 #include "fmpz.h"
 
-/* there is no flint_mpn_tdiv_q yet, so mock one up */
-void
-flint_mpn_tdiv_q(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn)
-{
-    if (bn < 1000)
-    {
-        mpn_tdiv_qr(q, r, 0, a, an, b, bn);
-    }
-    else
-    {
-        fmpz_t fa, fb, fq;
-
-        fmpz_init(fa);
-        fmpz_init(fb);
-        fmpz_init(fq);
-
-        fmpz_set_ui_array(fa, a, an);
-        fmpz_set_ui_array(fb, b, bn);
-
-        fmpz_tdiv_q(fq, fa, fb);
-
-        //fmpz_get_ui_array(q, an - bn + 1, fq);
-        //fmpz_get_ui_array(r, bn, fr);
-
-        fmpz_clear(fa);
-        fmpz_clear(fb);
-        fmpz_clear(fq);
-    }
-}
 
 int main()
 {
@@ -76,9 +47,9 @@ int main()
         flint_mpn_urandomb(a, state, 2 * n1 * FLINT_BITS);
         flint_mpn_urandomb(b, state, n1 * FLINT_BITS);
 
-        flint_mpn_tdiv_q(c, d, a, 2 * n1, b, n1);
+        flint_mpn_tdiv_q(c, a, 2 * n1, b, n1);
         TIMEIT_START;
-        flint_mpn_tdiv_q(c, d, a, 2 * n1, b, n1);
+        flint_mpn_tdiv_q(c, a, 2 * n1, b, n1);
         TIMEIT_STOP_VALUES(tt, tmpn);
 
         radix_rand_limbs(a, state, 2 * n2, radix);

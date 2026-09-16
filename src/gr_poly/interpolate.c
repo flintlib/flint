@@ -30,8 +30,7 @@ gr_poly_interpolate_exact(gr_poly_t poly,
 
     gr_poly_fit_length(poly, n, ctx);
     status = _gr_poly_interpolate_exact(poly->coeffs, xs->entries, ys->entries, n, ctx);
-    _gr_poly_set_length(poly, n, ctx);
-    _gr_poly_normalise(poly, ctx);
+    _gr_poly_set_length_normalise(poly, n, ctx);
     return status;
 }
 
@@ -54,8 +53,7 @@ gr_poly_interpolate(gr_poly_t poly,
 
     gr_poly_fit_length(poly, n, ctx);
     status = _gr_poly_interpolate(poly->coeffs, xs->entries, ys->entries, n, ctx);
-    _gr_poly_set_length(poly, n, ctx);
-    _gr_poly_normalise(poly, ctx);
+    _gr_poly_set_length_normalise(poly, n, ctx);
     return status;
 }
 

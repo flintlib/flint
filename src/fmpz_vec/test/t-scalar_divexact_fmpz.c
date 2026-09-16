@@ -24,14 +24,16 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         fmpz *a, *b;
         fmpz_t n;
         slong len = n_randint(state, 100);
+        slong nbits = n_randint(state, 10) == 0 ? 2000 : 100;
+        slong abits = n_randint(state, 10) == 0 ? 20000 : 200;
         fmpz_init(n);
-        fmpz_randtest_not_zero(n, state, 100);
+        fmpz_randtest_not_zero(n, state, nbits);
         if (n_randint(state, 2))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(a, state, len, abits);
 
         _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
         _fmpz_vec_scalar_divexact_fmpz(b, a, len, n);

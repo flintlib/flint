@@ -1,8 +1,5 @@
 /*
-    Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010, 2022 William Hart
-    Copyright (C) 2008 Richard Howell-Peak
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,35 +11,34 @@
 
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
+#include "nmod_poly_factor_gr.h"
 
 void
-nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                           const nmod_poly_t pol, slong d)
+nmod_poly_factor_equal_deg(nmod_poly_factor_t factors, const nmod_poly_t pol,
+    slong d)
 {
-    if (pol->length == d + 1)
-    {
-        nmod_poly_factor_insert(factors, pol, 1);
-    }
-    else
-    {
-        nmod_poly_t f, g;
-        flint_rand_t state;
+    gr_ctx_t ctx;
+    gr_poly_t P;
+    gr_poly_vec_t fac;
+    fmpz_vec_t exp;
+    nmod_t mod = pol->mod;
+    slong i;
 
-        nmod_poly_init_mod(f, pol->mod);
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
 
-        flint_rand_init(state);
+    NMOD_POLY_AS_GR(P, pol);
+    gr_poly_vec_init(fac, 0, ctx);
+    fmpz_vec_init(exp, 0);
 
-        while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d))
-           ;
+    GR_MUST_SUCCEED(gr_poly_factor_equal_deg(fac, P, d, ctx));
 
-        flint_rand_clear(state);
+    for (i = 0; i < fac->length; i++)
+        fmpz_vec_append_ui(exp, 1);
 
-        nmod_poly_init_mod(g, pol->mod);
-        nmod_poly_divexact(g, pol, f);
+    _nmod_poly_factor_set_gr(factors, fac, exp, mod, ctx);
 
-        nmod_poly_factor_equal_deg(factors, f, d);
-        nmod_poly_clear(f);
-        nmod_poly_factor_equal_deg(factors, g, d);
-        nmod_poly_clear(g);
-    }
+    gr_poly_vec_clear(fac, ctx);
+    fmpz_vec_clear(exp);
+    gr_ctx_clear(ctx);
 }

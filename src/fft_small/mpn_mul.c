@@ -1081,6 +1081,8 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
 
     R->buffer = NULL;
     R->buffer_alloc = 0;
+    R->spill = NULL;
+    R->spill_alloc = 0;
 
     for (i = 0; i < MPN_CTX_NCRTS; i++)
     {
@@ -1233,6 +1235,7 @@ void mpn_ctx_clear(mpn_ctx_t R)
     flint_aligned_free(R->vec_two_pow_buffer);
 
     flint_aligned_free(R->buffer);
+    flint_aligned_free(R->spill);
 }
 
 
@@ -1341,16 +1344,22 @@ find_next:
 
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 {
-    /* while a reservation is live, every scratch request must fit
-       the reserved head: growing here would move the reserved tail.
-       The reserving caller is responsible for bounding all scratch
-       used during the reservation's lifetime, so exceeding the head
-       is a hard error, which also serves as the audit that the
-       bound is right. */
+    /* contract in fft_small.h. Under a live reservation the main buffer
+       is pinned, so a request beyond the reserved head goes to the
+       secondary buffer: same no-free contract, same geometric growth,
+       and the same one-outstanding-request rule -- a larger request
+       here reallocates it just as one would the main buffer. */
     if (R->reserved_tail != 0 && n > R->reserved_head)
-        flint_throw(FLINT_ERROR, "mpn_ctx_fit_buffer: request of %wu "
-            "bytes exceeds the reserved head of %wu bytes\n",
-            n, R->reserved_head);
+    {
+        if (n > R->spill_alloc)
+        {
+            flint_aligned_free(R->spill);
+            n = n_round_up(n_max(n, R->spill_alloc*17/16), 4096);
+            R->spill = flint_aligned_alloc(4096, n);
+            R->spill_alloc = n;
+        }
+        return R->spill;
+    }
     if (n > R->buffer_alloc)
     {
         flint_aligned_free(R->buffer);
@@ -1366,8 +1375,10 @@ void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail)
     ulong total = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT)
                   + n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
 
-    /* one reservation at a time: a second requester (a nested ring
-       context) gets NULL and falls back to plain allocation */
+    /* one reservation at a time: a second requester, such as a ring
+       context constructed while another is live, receives NULL and
+       provides its own storage. The growth below invalidates any
+       fit_buffer pointer still outstanding, as any growth does. */
     if (R->reserved_tail != 0)
         return NULL;
     if (total > R->buffer_alloc)

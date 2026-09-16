@@ -11,7 +11,9 @@
 */
 
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
+#include "div_small.h"
 
 void
 fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
@@ -34,6 +36,9 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            if (_fmpz_div_qr_small_divisor(f, NULL, g, c2, 0))
+                return;
+
             mf = _fmpz_promote(f);
 
             if (c2 > 0)  /* h > 0 */
@@ -50,16 +55,9 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else  /* both are large */
         {
-            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
-            {
-                _fmpz_divexact_newton(f, g, h);
-            }
-            else
-            {
-                mf = _fmpz_promote(f);
-                mpz_divexact(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-                _fmpz_demote_val(f);  /* division by h may result in small value */
-            }
+            mf = _fmpz_promote(f);
+            flint_mpz_divexact(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            _fmpz_demote_val(f);  /* division by h may result in small value */
         }
     }
 }
@@ -79,6 +77,8 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
     }
     else  /* g is large */
     {
+        if (_fmpz_div_qr_small_divisor(f, NULL, g, h, 0))
+            return;
         mpz_ptr mf = _fmpz_promote(f);
 
         if (h > 0)
@@ -110,6 +110,8 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
     }
     else  /* g is large */
     {
+        if (_fmpz_div_qr_small_divisor_ui(f, NULL, NULL, g, h, 0, 0))
+            return;
         mpz_ptr mf = _fmpz_promote(f);
 
         flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);

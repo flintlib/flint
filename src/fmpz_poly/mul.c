@@ -15,175 +15,26 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#if FLINT_HAVE_FFT_SMALL
-# include "fft_small.h"
-#endif
-
-static void
-_fmpz_poly_mul_tiny1(fmpz * res, const fmpz * poly1,
-                         slong len1, const fmpz * poly2, slong len2)
-{
-    slong i, j, c;
-
-    _fmpz_vec_zero(res, len1 + len2 - 1);
-
-    for (i = 0; i < len1; i++)
-    {
-        c = poly1[i];
-
-        if (c != 0)
-        {
-            for (j = 0; j < len2; j++)
-                res[i + j] += c * poly2[j];
-        }
-    }
-}
-
-static void
-_fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
-                         slong len1, const fmpz * poly2, slong len2)
-{
-    slong i, j, k, c, d;
-    ulong hi, lo;
-    nn_ptr tmp;
-    TMP_INIT;
-
-    TMP_START;
-
-    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(ulong));
-
-    flint_mpn_zero(tmp, 2 * (len1 + len2 - 1));
-
-    for (i = 0; i < len1; i++)
-    {
-        c = poly1[i];
-
-        if (c != 0)
-        {
-            for (j = 0; j < len2; j++)
-            {
-                k = i + j;
-
-                d = poly2[j];
-
-                if (d != 0)
-                {
-                    smul_ppmm(hi, lo, c, d);
-                    add_ssaaaa(tmp[2 * k + 1], tmp[2 * k],
-                               tmp[2 * k + 1], tmp[2 * k], hi, lo);
-                }
-            }
-        }
-    }
-
-    for (i = 0; i < len1 + len2 - 1; i++)
-    {
-        lo = tmp[2 * i];
-        hi = tmp[2 * i + 1];
-
-        if (((slong) hi) >= 0)
-        {
-            fmpz_set_uiui(res + i, hi, lo);
-        }
-        else
-        {
-            sub_ddmmss(hi, lo, 0, 0, hi, lo);
-            fmpz_neg_uiui(res + i, hi, lo);
-        }
-    }
-
-    TMP_END;
-    return;
-}
 
 void
 _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
-    slong bits1, bits2, rbits;
-
+    /* multiplication by a scalar: avoid the dispatch overhead entirely
+       (Z[x] operations on scalar values are common) */
     if (len2 == 1)
     {
         _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
         return;
     }
-
-    if (poly1 == poly2 && len1 == len2)
+    if (len1 == 1)
     {
-        _fmpz_poly_sqr(res, poly1, len1);
+        _fmpz_vec_scalar_mul_fmpz(res, poly2, len2, poly1);
         return;
     }
 
-    bits1 = _fmpz_vec_max_bits(poly1, len1);
-    bits2 = _fmpz_vec_max_bits(poly2, len2);
-    bits1 = FLINT_ABS(bits1);
-    bits2 = FLINT_ABS(bits2);
-
-#if FLINT_HAVE_FFT_SMALL
-    if (len2 >= 80 && (bits1 + bits2 <= 40 || bits1 + bits2 >= 128 || len2 >= 100))
-        if (_fmpz_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2))
-            return;
-#endif
-
-    if (bits1 <= SMALL_FMPZ_BITCOUNT_MAX && bits2 <= SMALL_FMPZ_BITCOUNT_MAX &&
-        (len2 < 40 + (bits1 + bits2) / 2 || len1 < 70 + (bits1 + bits2) / 2))
-    {
-        rbits = bits1 + bits2 + FLINT_BIT_COUNT(len2);
-
-        if (rbits <= SMALL_FMPZ_BITCOUNT_MAX)
-        {
-            _fmpz_poly_mul_tiny1(res, poly1, len1, poly2, len2);
-            return;
-        }
-        else if (rbits <= 2 * FLINT_BITS - 1)
-        {
-            _fmpz_poly_mul_tiny2(res, poly1, len1, poly2, len2);
-            return;
-        }
-    }
-
-#if FLINT_HAVE_FFT_SMALL
-
-    if (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000)
-        _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
-    else if (len2 <= 4 || (len2 <= 8 && bits1 + bits2 >= 1500 && bits1 + bits2 <= 10000))
-        _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
-    else if
-        /* The fft_small-based KS is so efficient that SS currently
-           only wins in a specific medium-size region and for
-           huge products when using many threads. */
-        ((len2 >= 8 && len2 <= 75 && bits1 + bits2 >= 800 && bits1 + bits2 <= 4000) ||
-            (len1 + len2 >= 5000 && bits1 + bits2 >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4) ||
-            (bits1 + bits2 >= 80000 && (len1 + len2) * (bits1 + bits2) > 4e9))
-        _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
-    else
-        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-
-#else
-
-    if (len2 < 7)
-    {
-        _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
-    }
-    else
-    {
-        slong limbs1, limbs2;
-
-        limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
-        limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
-
-        if (len1 < 16 && (limbs1 > 12 || limbs2 > 12))
-            _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
-        else if (limbs1 + limbs2 <= 8)
-            _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-        else if ((limbs1+limbs2)/2048 > len1 + len2)
-            _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-        else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
-           _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-        else
-           _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
-    }
-#endif
+    /* all the remaining algorithm selection happens in _fmpz_poly_mulmid */
+    _fmpz_poly_mulmid(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1);
 }
 
 void
@@ -206,24 +57,14 @@ fmpz_poly_mul(fmpz_poly_t res,
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, rlen);
-        if (len1 >= len2)
-            _fmpz_poly_mul(t->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2);
-        else
-            _fmpz_poly_mul(t->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1);
+        _fmpz_poly_mul(t->coeffs, poly1->coeffs, len1, poly2->coeffs, len2);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }
     else
     {
         fmpz_poly_fit_length(res, rlen);
-        if (len1 >= len2)
-            _fmpz_poly_mul(res->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2);
-        else
-            _fmpz_poly_mul(res->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1);
+        _fmpz_poly_mul(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2);
     }
 
     _fmpz_poly_set_length(res, rlen);

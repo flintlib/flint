@@ -456,11 +456,27 @@ _gr_fmpz_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     }
     else
     {
-        if (fmpz_divides(res, x, y))
+        if (fmpz_div(res, x, y))
             return GR_SUCCESS;
         else
             return GR_DOMAIN;
     }
+}
+
+static int
+_gr_fmpz_div_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+        return GR_DOMAIN;
+    return fmpz_div_ui(res, x, y) ? GR_SUCCESS : GR_DOMAIN;
+}
+
+static int
+_gr_fmpz_div_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+        return GR_DOMAIN;
+    return fmpz_div_si(res, x, y) ? GR_SUCCESS : GR_DOMAIN;
 }
 
 static int
@@ -683,17 +699,10 @@ _gr_fmpz_is_square(const fmpz_t x, const gr_ctx_t ctx)
 static int
 _gr_fmpz_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    if (fmpz_sgn(x) < 0)
-        return GR_DOMAIN;
-
-    if (fmpz_root(res, x, 2))
-    {
+    if (fmpz_perfect_sqrt(res, x))
         return GR_SUCCESS;
-    }
     else
-    {
         return GR_DOMAIN;
-    }
 }
 
 static int
@@ -1002,11 +1011,7 @@ _gr_fmpz_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fmpz_poly_mullow(res, poly1, len1, poly2, len2, n);
-    else
-        _fmpz_poly_mullow(res, poly2, len2, poly1, len1, n);
-
+    _fmpz_poly_mullow(res, poly1, len1, poly2, len2, n);
     return GR_SUCCESS;
 }
 
@@ -1212,6 +1217,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_fmpz_mul_2exp_si},
     {GR_METHOD_MUL_2EXP_FMPZ,   (gr_funcptr) _gr_fmpz_mul_2exp_fmpz},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_div},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_fmpz_div_ui},
+    {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_fmpz_div_si},
     {GR_METHOD_DIVEXACT,        (gr_funcptr) _gr_fmpz_divexact},
     {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) _gr_fmpz_divexact_ui},
     {GR_METHOD_DIVEXACT_SI,     (gr_funcptr) _gr_fmpz_divexact_si},

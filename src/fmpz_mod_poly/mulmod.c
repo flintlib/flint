@@ -29,10 +29,7 @@ void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
     T = _fmpz_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    if (len1 >= len2)
-        _fmpz_mod_poly_mul(T, poly1, len1, poly2, len2, ctx);
-    else
-        _fmpz_mod_poly_mul(T, poly2, len2, poly1, len1, ctx);
+    _fmpz_mod_poly_mul(T, poly1, len1, poly2, len2, ctx);
 
     fmpz_init(invf);
     fmpz_mod_inv(invf, f + lenf - 1, ctx);

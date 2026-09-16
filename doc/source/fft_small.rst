@@ -34,6 +34,38 @@ Integer multiplication
     for multiplications. Calling :func:`flint_cleanup` or :func:`flint_cleanup_master`
     frees the cache.
 
+.. function:: void * mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
+
+    Returns at least *n* bytes of scratch from the context's buffer,
+    growing it geometrically when needed. The buffer is a single
+    region: a request may reallocate it and invalidate every pointer
+    handed out before, so at most one request is outstanding at a time
+    and the returned pointer is valid only until the next request.
+    Callers never free what they are given; the buffer persists with
+    the context, so a warm thread pays no allocation.
+
+.. function:: void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail)
+              void mpn_ctx_fit_buffer_release(mpn_ctx_t R)
+
+    Pins the scratch buffer: it is grown once to hold *head* + *tail*
+    bytes and the returned tail region keeps its address until the
+    release. While the reservation is live the buffer can neither grow
+    nor move, so :func:`mpn_ctx_fit_buffer` serves requests of up to
+    *head* bytes from it and anything larger from a secondary buffer
+    kept in the context under the same contract. Reserving, like any
+    growth, invalidates a scratch pointer still outstanding.
+
+    A reservation is intended for a caller that is the only user of
+    fft_small on its thread while it holds one; the transformed-mpn
+    ring (:func:`gr_ctx_init_transformed_mpn`) reserves at
+    construction, performs only ring operations and releases at
+    destruction, so in normal use the secondary buffer is never
+    touched. It guarantees that an interleaved multiplication -- test
+    code checking results with ``fmpz`` arithmetic, or an external
+    holder of a ring context -- is served correctly rather than
+    aborted. One reservation exists at a time: a second call returns
+    ``NULL`` and the caller provides its own storage.
+
 .. function:: void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong * r1, const ulong * i1, ulong n1, const ulong * i2, ulong n2)
               void mpn_mul_default_mpn_ctx(nn_ptr r1, nn_srcptr i1, slong n1, nn_srcptr i2, slong n2)
 

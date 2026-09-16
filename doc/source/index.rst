@@ -93,6 +93,7 @@ Integers
    mpn_extras.rst
    fixed.rst
    aprcl.rst
+   ecpp.rst
    arith.rst
    fft.rst
    fft_small.rst

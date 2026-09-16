@@ -234,6 +234,33 @@ Addition and multiplication
     Sets `f` to `g + h`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
+.. function:: void _unity_zp_mul_reduce(unity_zp f, const unity_zp g, const unity_zp h, fmpz * t)
+
+    Sets `f` to `g \cdot h`, or to `g^2` if `h` is `g`, reduced by the
+    cyclotomic polynomial `\Phi_{p^{exp}}` and modulo `n`. The product on
+    the integers is computed by :func:`_fmpz_poly_mul` or
+    :func:`_fmpz_poly_sqr` directly from the coefficients into the
+    temporary space `t`, which must hold at least
+    ``g->poly->length + h->poly->length - 1`` initialized ``fmpz`` values;
+    the cyclotomic reduction is done there with additions and subtractions
+    (first using `x^{p^{exp}} = 1`, then `\Phi_{p^{exp}}(x) = \Phi_p(x^{p^{exp-1}})`),
+    and each of the `\varphi(p^{exp})` remaining coefficients is reduced
+    modulo `n` once. The operands need not be reduced by the cyclotomic
+    polynomial.
+
+.. function:: int _unity_zp_mul_special(unity_zp f, const unity_zp g, const unity_zp h, fmpz * t)
+              int _unity_zp_sqr_special(unity_zp f, const unity_zp g, fmpz * t)
+
+    If a hand-optimized straight-line program is available for
+    `p^{exp}` (currently `3, 4, 5, 7, 8, 9, 16`), the operands have full
+    length `\varphi(p^{exp})` and the modulus is small enough that the
+    reduced number of multiplications beats the generic evaluation/
+    interpolation based path (a few thousand bits), computes the reduced
+    product (or square) and returns 1; otherwise returns 0. The operands'
+    coefficients are read directly and the temporary space `t` (at least
+    ``SQUARING_SPACE`` values) is used for all intermediate results, with
+    each output coefficient reduced modulo `n` once at the end.
+
 .. function:: void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 
     Sets `f` to `g \cdot h`.
@@ -242,20 +269,20 @@ Addition and multiplication
 .. function:: void unity_zp_sqr(unity_zp f, const unity_zp g)
 
     Sets `f` to `g \cdot g`.
-    `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
+    `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 
-    Sets `f` to `g \cdot h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
-    multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
-    used for all computations in this case.
+    Sets `f` to `g \cdot h`, using the preallocated array `t` of
+    ``SQUARING_SPACE`` ``fmpz_t`` values as temporary space when it is large
+    enough (see :func:`_unity_zp_mul_reduce`).
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
 
-    Sets `f` to `g \cdot g`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
-    multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
-    used for all computations in this case.
+    Sets `f` to `g \cdot g`, using the preallocated array `t` of
+    ``SQUARING_SPACE`` ``fmpz_t`` values as temporary space when it is large
+    enough.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 Powering functions
@@ -330,8 +357,8 @@ for moduli of 2 to 16 limbs. Elements are vectors of
 `d = \varphi(p^{exp})` fixed-size residues, kept reduced by the cyclotomic
 polynomial `\Phi_{p^{exp}}` at all times, and products are computed with
 delayed reduction (a single modular reduction per output coefficient) on
-top of :func:`_mpn_mod_poly_mul_unreduced` and
-:func:`_mpn_mod_poly_sqr_unreduced`.
+top of :func:`_flint_mpn_poly_mulmid`, which uses the classical algorithm or
+Karatsuba depending on the size.
 
 .. function:: void unity_zp_mpn_init(unity_zp_mpn f, ulong p, ulong exp, gr_ctx_t ctx)
 

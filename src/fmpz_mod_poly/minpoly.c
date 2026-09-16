@@ -145,14 +145,7 @@ _fmpz_mod_poly_minpoly_hgcd(fmpz * poly, const fmpz * seq, slong len, const fmpz
         fmpz_mod_inv(buf, B + (lenB - 1), ctx);
         _fmpz_mod_poly_divrem(M[2], M[3], A, lenA, B, lenB, buf, ctx);
 
-        if (len_poly >= quo_len)
-        {
-            _fmpz_mod_poly_mul(M[3], poly, len_poly, M[2], quo_len, ctx);
-        }
-        else
-        {
-            _fmpz_mod_poly_mul(M[3], M[2], quo_len, poly, len_poly, ctx);
-        }
+        _fmpz_mod_poly_mul(M[3], poly, len_poly, M[2], quo_len, ctx);
 
         len_poly += quo_len - 1;
         _fmpz_mod_poly_add(poly, M[3], len_poly, M[1], lenM[1], ctx);

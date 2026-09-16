@@ -15,6 +15,7 @@
 #include "t-config_jacobi.c"
 #include "t-f_table.c"
 #include "t-is_prime.c"
+#include "t-is_prime_final_division.c"
 #include "t-is_prime_gauss.c"
 #include "t-is_prime_jacobi.c"
 #include "t-unity_zp_add.c"
@@ -23,13 +24,9 @@
 #include "t-unity_zp_init.c"
 #include "t-unity_zp_is_unity.c"
 #include "t-unity_zp_jacobi_sum.c"
-#include "t-unity_zp_mul11.c"
-#include "t-unity_zp_mul2.c"
-#include "t-unity_zp_mul3.c"
-#include "t-unity_zp_mul5.c"
-#include "t-unity_zp_mul7.c"
 #include "t-unity_zp_mpn.c"
 #include "t-unity_zp_mul.c"
+#include "t-unity_zp_mul_inplace.c"
 #include "t-unity_zp_pow_2k.c"
 #include "t-unity_zp_pow.c"
 #include "t-unity_zp_pow_sliding.c"
@@ -41,11 +38,6 @@
 #include "t-unity_zpq_mul_unity_p.c"
 #include "t-unity_zpq_pow.c"
 #include "t-unity_zp_reduce_cyclotomic.c"
-#include "t-unity_zp_sqr11.c"
-#include "t-unity_zp_sqr2.c"
-#include "t-unity_zp_sqr3.c"
-#include "t-unity_zp_sqr5.c"
-#include "t-unity_zp_sqr7.c"
 #include "t-unity_zp_sqr.c"
 
 /* Array of test functions ***************************************************/
@@ -56,6 +48,7 @@ test_struct tests[] =
     TEST_FUNCTION(aprcl_config_jacobi),
     TEST_FUNCTION(aprcl_f_table),
     TEST_FUNCTION(aprcl_is_prime),
+    TEST_FUNCTION(aprcl_is_prime_final_division),
     TEST_FUNCTION(aprcl_is_prime_gauss),
     TEST_FUNCTION(aprcl_is_prime_jacobi),
     TEST_FUNCTION(aprcl_unity_zp_add),
@@ -64,13 +57,9 @@ test_struct tests[] =
     TEST_FUNCTION(aprcl_unity_zp_init),
     TEST_FUNCTION(aprcl_unity_zp_is_unity),
     TEST_FUNCTION(aprcl_unity_zp_jacobi_sum),
-    TEST_FUNCTION(aprcl_unity_zp_mul11),
-    TEST_FUNCTION(aprcl_unity_zp_mul2),
-    TEST_FUNCTION(aprcl_unity_zp_mul3),
-    TEST_FUNCTION(aprcl_unity_zp_mul5),
-    TEST_FUNCTION(aprcl_unity_zp_mul7),
     TEST_FUNCTION(aprcl_unity_zp_mpn),
     TEST_FUNCTION(aprcl_unity_zp_mul),
+    TEST_FUNCTION(aprcl_unity_zp_mul_inplace),
     TEST_FUNCTION(aprcl_unity_zp_pow_2k),
     TEST_FUNCTION(aprcl_unity_zp_pow),
     TEST_FUNCTION(aprcl_unity_zp_pow_sliding),
@@ -82,11 +71,6 @@ test_struct tests[] =
     TEST_FUNCTION(aprcl_unity_zpq_mul_unity_p),
     TEST_FUNCTION(aprcl_unity_zpq_pow),
     TEST_FUNCTION(aprcl_unity_zp_reduce_cyclotomic),
-    TEST_FUNCTION(aprcl_unity_zp_sqr11),
-    TEST_FUNCTION(aprcl_unity_zp_sqr2),
-    TEST_FUNCTION(aprcl_unity_zp_sqr3),
-    TEST_FUNCTION(aprcl_unity_zp_sqr5),
-    TEST_FUNCTION(aprcl_unity_zp_sqr7),
     TEST_FUNCTION(aprcl_unity_zp_sqr)
 };
 

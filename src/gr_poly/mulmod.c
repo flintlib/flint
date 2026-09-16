@@ -78,8 +78,7 @@ gr_poly_mulmod(gr_poly_t res,
         if (f == res)
             GR_TMP_CLEAR_VEC(fcoeffs, lenf, ctx);
 
-        _gr_poly_set_length(res, lenf - 1, ctx);
-        _gr_poly_normalise(res, ctx);
+        _gr_poly_set_length_normalise(res, lenf - 1, ctx);
         return status;
     }
     else

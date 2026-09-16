@@ -110,10 +110,8 @@ gr_poly_sin_cos_series(gr_poly_t s, gr_poly_t c,
     gr_poly_fit_length(s, n, ctx);
     gr_poly_fit_length(c, n, ctx);
     status |= _gr_poly_sin_cos_series(s->coeffs, c->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(s, n, ctx);
-    _gr_poly_normalise(s, ctx);
-    _gr_poly_set_length(c, n, ctx);
-    _gr_poly_normalise(c, ctx);
+    _gr_poly_set_length_normalise(s, n, ctx);
+    _gr_poly_set_length_normalise(c, n, ctx);
     return status;
 }
 
@@ -144,10 +142,8 @@ gr_poly_sin_cos_pi_series(gr_poly_t s, gr_poly_t c,
     gr_poly_fit_length(s, n, ctx);
     gr_poly_fit_length(c, n, ctx);
     status |= _gr_poly_sin_cos_pi_series(s->coeffs, c->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(s, n, ctx);
-    _gr_poly_normalise(s, ctx);
-    _gr_poly_set_length(c, n, ctx);
-    _gr_poly_normalise(c, ctx);
+    _gr_poly_set_length_normalise(s, n, ctx);
+    _gr_poly_set_length_normalise(c, n, ctx);
     return status;
 }
 
@@ -165,8 +161,7 @@ gr_poly_sin_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
     gr_poly_fit_length(s, n, ctx);
     status |= _gr_poly_sin_series(s->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(s, n, ctx);
-    _gr_poly_normalise(s, ctx);
+    _gr_poly_set_length_normalise(s, n, ctx);
     return status;
 }
 
@@ -184,8 +179,7 @@ gr_poly_sin_pi_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
     gr_poly_fit_length(s, n, ctx);
     status |= _gr_poly_sin_pi_series(s->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(s, n, ctx);
-    _gr_poly_normalise(s, ctx);
+    _gr_poly_set_length_normalise(s, n, ctx);
     return status;
 }
 
@@ -203,8 +197,7 @@ gr_poly_cos_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
     gr_poly_fit_length(c, n, ctx);
     status |= _gr_poly_cos_series(c->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(c, n, ctx);
-    _gr_poly_normalise(c, ctx);
+    _gr_poly_set_length_normalise(c, n, ctx);
     return status;
 }
 
@@ -222,8 +215,7 @@ gr_poly_cos_pi_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
     gr_poly_fit_length(c, n, ctx);
     status |= _gr_poly_cos_pi_series(c->coeffs, h->coeffs, hlen, n, ctx);
-    _gr_poly_set_length(c, n, ctx);
-    _gr_poly_normalise(c, ctx);
+    _gr_poly_set_length_normalise(c, n, ctx);
     return status;
 }
 

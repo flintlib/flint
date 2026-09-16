@@ -19,8 +19,7 @@ gr_poly_truncate(gr_poly_t poly, const gr_poly_t src, slong newlen, gr_ctx_t ctx
     {
         if (poly->length > newlen)
         {
-            _gr_poly_set_length(poly, newlen, ctx);
-            _gr_poly_normalise(poly, ctx);
+            _gr_poly_set_length_normalise(poly, newlen, ctx);
         }
 
         return GR_SUCCESS;

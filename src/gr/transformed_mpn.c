@@ -11,6 +11,7 @@
 */
 
 #include <string.h>
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
@@ -77,6 +78,16 @@ typedef struct
     slong slab_count;
     slong * slab_free;
     slong slab_navail;
+    /* conversion staging, for output windows too short to hold the
+       reconstruction: a region reserved past the slabs, or a free
+       operand slab when the caller has promised one will be dead by
+       conversion time, or a plain allocation cached for the context's
+       lifetime. One conversion may be in flight at a time. */
+    int scratch_from_slab;
+    char * stage_base;              /* inside the reservation, or NULL */
+    ulong stage_size;               /* usable bytes at stage_base */
+    nn_ptr stage_owned;             /* cached fallback, or NULL */
+    ulong stage_owned_size;
 } tmpn_ctx_struct;
 
 typedef struct
@@ -149,20 +160,80 @@ tmpn_ctx_clear(gr_ctx_t ctx)
         mpn_ctx_fit_buffer_release(get_default_mpn_ctx());
         flint_free(T->slab_free);
     }
+    flint_free(T->stage_owned);
     flint_free(T);
+}
+
+/* pop a slab off the pool, or NULL when none is free */
+static char *
+_tmpn_slab_take(tmpn_ctx_struct * T)
+{
+    if (T->slab_navail > 0)
+    {
+        slong slot = T->slab_free[--T->slab_navail];
+        return T->slab_base + (ulong) slot * T->slab_size;
+    }
+    return NULL;
+}
+
+static int
+_tmpn_in_slab_pool(const tmpn_ctx_struct * T, const char * d)
+{
+    return T->slab_base != NULL && d >= T->slab_base
+        && d < T->slab_base + (ulong) T->slab_count * T->slab_size;
+}
+
+static void
+_tmpn_slab_give(tmpn_ctx_struct * T, char * d)
+{
+    FLINT_ASSERT(_tmpn_in_slab_pool(T, d));
+    T->slab_free[T->slab_navail++] =
+        (slong) ((ulong) (d - T->slab_base) / T->slab_size);
+}
+
+/* limb scratch for one conversion, 'need' limbs, never NULL */
+static nn_ptr
+_tmpn_scratch_take(tmpn_ctx_struct * T, slong need)
+{
+    ulong bytes = (ulong) need * sizeof(ulong);
+
+    if (T->stage_base != NULL && bytes <= T->stage_size)
+        return (nn_ptr) T->stage_base;
+
+    if (T->scratch_from_slab && bytes <= T->slab_size)
+    {
+        char * d = _tmpn_slab_take(T);
+        if (d != NULL)
+            return (nn_ptr) d;
+        /* the promise did not hold: fall through to the cached
+           allocation rather than failing the conversion */
+    }
+
+    if (T->stage_owned_size < bytes)
+    {
+        flint_free(T->stage_owned);
+        T->stage_owned = flint_malloc(bytes);
+        T->stage_owned_size = bytes;
+    }
+    return T->stage_owned;
+}
+
+static void
+_tmpn_scratch_give(tmpn_ctx_struct * T, nn_ptr t)
+{
+    /* the reserved region and the cached allocation both persist */
+    if (_tmpn_in_slab_pool(T, (char *) t))
+        _tmpn_slab_give(T, (char *) t);
 }
 
 static void
 tmpn_init(gr_ptr x, gr_ctx_t ctx)
 {
     tmpn_ctx_struct * T = TMPN_CTX(ctx);
+    char * d = _tmpn_slab_take(T);
 
-    if (T->slab_navail > 0)
-    {
-        slong slot = T->slab_free[--T->slab_navail];
-        fft_small_op_init_borrowed(&TMPN(x)->op, T->P,
-            (double *) (T->slab_base + (ulong) slot * T->slab_size));
-    }
+    if (d != NULL)
+        fft_small_op_init_borrowed(&TMPN(x)->op, T->P, (double *) d);
     else
         fft_small_op_init(&TMPN(x)->op, T->P);
     TMPN(x)->nchunks = 0;
@@ -190,14 +261,22 @@ tmpn_clear(gr_ptr x, gr_ctx_t ctx)
     tmpn_ctx_struct * T = TMPN_CTX(ctx);
     char * d = (char *) TMPN(x)->op.data;
 
-    if (T->slab_base != NULL && d >= T->slab_base
-        && d < T->slab_base + (ulong) T->slab_count * T->slab_size)
+    /* a repeat clear is inert. Callers that release elements early,
+       to free a slab for conversion scratch, clear them again through
+       the vector clear at the end; returning a slab twice would hand
+       the same storage to two later elements. */
+    if (d == NULL)
+        return;
+
+    if (_tmpn_in_slab_pool(T, d))
     {
-        T->slab_free[T->slab_navail++] =
-            (slong) ((ulong) (d - T->slab_base) / T->slab_size);
+        _tmpn_slab_give(T, d);
+        TMPN(x)->op.data = NULL;
         return;
     }
     fft_small_op_clear(&TMPN(x)->op);
+    TMPN(x)->op.data = NULL;
+    TMPN(x)->op.owns_data = 0;
 }
 
 static void
@@ -378,6 +457,23 @@ gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
     return GR_SUCCESS;
 }
 
+static int
+tmpn_set_fmpz(gr_ptr elem, const fmpz_t a, gr_ctx_t tctx)
+{
+    fmpz c = *a;
+
+    if (!COEFF_IS_MPZ(c))
+    {
+        ulong v = FLINT_ABS(c);
+        return gr_transformed_mpn_set(elem, &v, c != 0, c < 0, tctx);
+    }
+    else
+    {
+        mpz_srcptr m = COEFF_TO_PTR(c);
+        return gr_transformed_mpn_set(elem, m->_mp_d, FLINT_ABS(m->_mp_size), m->_mp_size < 0, tctx);
+    }
+}
+
 /* number of limbs certainly sufficient for the biased reconstruction of
    an element with m chunks */
 static slong
@@ -428,6 +524,9 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
     slong need = _tmpn_export_limbs(T, m, negs);
     fft_small_op_struct tmp;
     double * sdata;
+    nn_ptr scratch = NULL;
+    nn_ptr zout = z;
+    slong zoutn = zn;
     ulong itr;
     slong i;
 
@@ -449,7 +548,15 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
     }
 
     if (zn < need)
-        return GR_DOMAIN;
+    {
+        /* the window holds the value but not the reconstruction: stage
+           in the context's own scratch and copy the normalized result
+           out below. A window of get_limbs(ctx, x) limbs or more skips
+           both the staging and the copy. */
+        scratch = _tmpn_scratch_take(T, need);
+        zout = scratch;
+        zoutn = need;
+    }
 
     if (destroy)
     {
@@ -493,23 +600,23 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
         /* per-slot centered lifts: signed chunk values convert directly,
            with no bias operand and no precomputation */
         int esign;
-        fft_small_export_mpn_signed(z, (ulong) need, &esign, &tmp,
+        fft_small_export_mpn_signed(zout, (ulong) need, &esign, &tmp,
                                     (ulong) m, P);
         *sign = TMPN(x)->sign ^ esign;
     }
     else
     {
-        fft_small_export_mpn(z, (ulong) need, &tmp, P);
+        fft_small_export_mpn(zout, (ulong) need, &tmp, P);
         *sign = TMPN(x)->sign;
     }
     if (sdata != NULL)
         flint_aligned_free(sdata);
 
-    if (need < zn)
-        flint_mpn_zero(z + need, zn - need);
+    if (need < zoutn)
+        flint_mpn_zero(zout + need, zoutn - need);
 
     i = need;
-    while (i > 0 && z[i - 1] == 0)
+    while (i > 0 && zout[i - 1] == 0)
         i--;
 
     /* fold the small side value in: the element represents
@@ -522,7 +629,7 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
 
         if (i == 0)
         {
-            z[0] = av;
+            zout[0] = av;
             i = 1;
             *sign = ssign;
         }
@@ -530,26 +637,42 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
         {
             /* the export bound's terms headroom guarantees room:
                |T| + terms_bound < 2^(64 need) */
-            ulong cy = mpn_add_1(z, z, i, av);
+            ulong cy = mpn_add_1(zout, zout, i, av);
             if (cy != 0)
             {
                 FLINT_ASSERT(i < need);
-                z[i++] = cy;
+                zout[i++] = cy;
             }
         }
-        else if (i > 1 || z[0] > av)
+        else if (i > 1 || zout[0] > av)
         {
-            mpn_sub_1(z, z, i, av);
-            while (i > 0 && z[i - 1] == 0)
+            mpn_sub_1(zout, zout, i, av);
+            while (i > 0 && zout[i - 1] == 0)
                 i--;
         }
         else
         {
             /* |T| <= |small|: the sign crosses */
-            z[0] = av - z[0];
-            i = (z[0] != 0);
+            zout[0] = av - zout[0];
+            i = (zout[0] != 0);
             *sign = ssign;
         }
+    }
+
+    if (scratch != NULL)
+    {
+        if (i > zn)
+        {
+            /* undersized for the value itself: the same refusal an
+               undersized window has always given, except that for the
+               destructive forms the element is gone by now */
+            _tmpn_scratch_give(T, scratch);
+            return GR_DOMAIN;
+        }
+        if (i > 0)
+            flint_mpn_copyi(z, scratch, i);
+        flint_mpn_zero(z + i, zn - i);
+        _tmpn_scratch_give(T, scratch);
     }
 
     *zn_out = i;
@@ -598,6 +721,9 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
     slong needf = _tmpn_export_limbs(T, m, 1);
     fft_small_op_struct tmp;
     double * sdata;
+    nn_ptr scratch = NULL;
+    nn_ptr zout = z;
+    slong zoutn = zn;
     ulong itr;
     slong i;
     int esign;
@@ -611,7 +737,13 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
     }
 
     if (lo + zn < needf)
-        return GR_DOMAIN;
+    {
+        /* the window does not reach the top of the reconstruction:
+           stage the whole of it and copy the value out below */
+        scratch = _tmpn_scratch_take(T, needf - lo);
+        zout = scratch;
+        zoutn = needf - lo;
+    }
 
     itr = _op_trunc((ulong) m, P);
 
@@ -639,15 +771,15 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
         _tmpn_scale(Q, d, T->m_orig[i], itr);
     }
     tmp.domain = FFT_SMALL_OP_PRODUCT;
-    fft_small_export_mpn_signed_trunc(z, (ulong) zn, &esign, &tmp,
+    fft_small_export_mpn_signed_trunc(zout, (ulong) zoutn, &esign, &tmp,
                                       (ulong) m, (ulong) lo, P);
     if (sdata != NULL)
         flint_aligned_free(sdata);
 
     *sign = TMPN(x)->sign ^ esign;
 
-    i = zn;
-    while (i > 0 && z[i - 1] == 0)
+    i = zoutn;
+    while (i > 0 && zout[i - 1] == 0)
         i--;
         /* fold the small side value in: the element represents
        (-1)^sign * T + small, and the export just produced a window
@@ -665,7 +797,7 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
 
         if (i == 0)
         {
-            z[0] = av;
+            zout[0] = av;
             i = 1;
             *sign = ssign;
         }
@@ -673,27 +805,44 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
         {
             /* the export bound's terms headroom guarantees room:
                |T| + terms_bound < 2^(FLINT_BITS need) */
-            ulong cy = mpn_add_1(z, z, i, av);
+            ulong cy = mpn_add_1(zout, zout, i, av);
             if (cy != 0)
             {
-                FLINT_ASSERT(i < zn);
-                z[i++] = cy;
+                FLINT_ASSERT(i < zoutn);
+                zout[i++] = cy;
             }
         }
-        else if (i > 1 || z[0] > av)
+        else if (i > 1 || zout[0] > av)
         {
-            mpn_sub_1(z, z, i, av);
-            while (i > 0 && z[i - 1] == 0)
+            mpn_sub_1(zout, zout, i, av);
+            while (i > 0 && zout[i - 1] == 0)
                 i--;
         }
         else
         {
             /* |T| <= |small|: the sign crosses */
-            z[0] = av - z[0];
-            i = (z[0] != 0);
+            zout[0] = av - zout[0];
+            i = (zout[0] != 0);
             *sign = ssign;
         }
     }
+
+    if (scratch != NULL)
+    {
+        if (i > zn)
+        {
+            /* undersized for the value itself: the same refusal an
+               undersized window has always given, except that for the
+               destructive forms the element is gone by now */
+            _tmpn_scratch_give(T, scratch);
+            return GR_DOMAIN;
+        }
+        if (i > 0)
+            flint_mpn_copyi(z, scratch, i);
+        flint_mpn_zero(z + i, zn - i);
+        _tmpn_scratch_give(T, scratch);
+    }
+
     *zn_out = i;
     if (i == 0)
         *sign = 0;
@@ -861,7 +1010,13 @@ tmpn_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return GR_UNABLE;
 
     TMPN(x)->op.domain = TMPN(y)->op.domain = FFT_SMALL_OP_PRIMAL;
-    fft_small_op_mul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op, T->P);
+    /* a square is the same pointwise pass over one operand stream
+       instead of two; the bookkeeping below is unchanged, since every
+       field it derives from x and y coincides */
+    if (x == y)
+        fft_small_op_sqr(&TMPN(res)->op, &TMPN(x)->op, T->P);
+    else
+        fft_small_op_mul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op, T->P);
     TMPN(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     TMPN(res)->nchunks = m;
     TMPN(res)->terms = terms;
@@ -985,7 +1140,11 @@ _tmpn_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int subflip,
     {
         /* accumulated product has the accumulator's sign: pointwise
            addmul */
-        fft_small_op_addmul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op, T->P);
+        if (x == y)
+            fft_small_op_addsqr(&TMPN(res)->op, &TMPN(x)->op, T->P);
+        else
+            fft_small_op_addmul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op,
+                                T->P);
         TMPN(res)->negs |= TMPN(x)->negs | TMPN(y)->negs;
     }
     else
@@ -994,7 +1153,11 @@ _tmpn_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int subflip,
            chunk values may go negative */
         if (!T->is_signed)
             return GR_UNABLE;
-        fft_small_op_submul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op, T->P);
+        if (x == y)
+            fft_small_op_subsqr(&TMPN(res)->op, &TMPN(x)->op, T->P);
+        else
+            fft_small_op_submul(&TMPN(res)->op, &TMPN(x)->op, &TMPN(y)->op,
+                                T->P);
         TMPN(res)->negs = 1;
     }
     TMPN(res)->op.domain = FFT_SMALL_OP_PRIMAL;
@@ -1017,6 +1180,15 @@ tmpn_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return _tmpn_addsubmul(res, x, y, 1, ctx);
 }
 
+/* the generic square routes through gr_mul(res, x, x), which the
+   coinciding-operand dispatch inside tmpn_mul already handles; this
+   only removes the indirection and states the intent */
+static int
+tmpn_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return tmpn_mul(res, x, x, ctx);
+}
+
 static gr_funcptr __tmpn_methods[GR_METHOD_TAB_SIZE];
 static int __tmpn_methods_initialized = 0;
 
@@ -1031,6 +1203,7 @@ static gr_method_tab_input __tmpn_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) tmpn_zero},
     {GR_METHOD_WRITE,           (gr_funcptr) (void (*)(void)) tmpn_write},
     {GR_METHOD_ONE,             (gr_funcptr) (void (*)(void)) tmpn_one},
+    {GR_METHOD_SET_FMPZ,        (gr_funcptr) (void (*)(void)) tmpn_set_fmpz},
     {GR_METHOD_RANDTEST,        (gr_funcptr) (void (*)(void)) tmpn_randtest},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) tmpn_is_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) tmpn_equal},
@@ -1038,6 +1211,7 @@ static gr_method_tab_input __tmpn_methods_input[] =
     {GR_METHOD_ADD,             (gr_funcptr) (void (*)(void)) tmpn_add},
     {GR_METHOD_SUB,             (gr_funcptr) (void (*)(void)) tmpn_sub},
     {GR_METHOD_MUL,             (gr_funcptr) (void (*)(void)) tmpn_mul},
+    {GR_METHOD_SQR,             (gr_funcptr) (void (*)(void)) tmpn_sqr},
     {GR_METHOD_ADDMUL,          (gr_funcptr) (void (*)(void)) tmpn_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) (void (*)(void)) tmpn_submul},
     {0,                         (gr_funcptr) (void (*)(void)) NULL},
@@ -1050,23 +1224,51 @@ gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live)
     tmpn_ctx_struct * T = TMPN_CTX(ctx);
     slong i;
 
-    if (T->alloc_strategy == GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
+    /* one reservation per context. The test is on the reservation
+       itself, not on alloc_strategy: gr_ctx_init_transformed_mpn sets
+       the strategy from its argument before calling this, so keying
+       off the strategy made an init-time FIT_BUFFER request return
+       here without ever reserving, leaving every element to fall back
+       to a plain per-element allocation. */
+    if (T->slab_base != NULL)
         return GR_SUCCESS;
     if (num_live < 1)
         return GR_UNABLE;
 
     T->slab_size = fft_small_op_sizeof_data(T->P);
 
-    /* The reserved head bounds every scratch request the ring's
-       operations may make from the context while the reservation is
-       live. Since the two-prime exports run their reconstruction
-       through stack blocks, no ring operation requests any: the head
-       is zero, and any request at all is a hard error in
-       mpn_ctx_fit_buffer, which is the standing audit of this claim. */
+    /* Conversion staging rides along in the same reservation, past the
+       slabs. It is a fraction of one of them -- the reconstruction
+       needs get_limbs_bound limbs against a slab's np * stride doubles
+       -- so the memory cost of covering the ring's own conversions is
+       well under the extra element it would take to do the same from
+       the pool. A caller that has promised a dead element instead (see
+       GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB) pays nothing here. */
+    if (T->scratch_from_slab)
+        T->stage_size = 0;
+    else
+        T->stage_size = n_round_up(
+            (ulong) gr_transformed_mpn_get_limbs_bound(ctx) * sizeof(ulong),
+            FLINT_FFT_SMALL_ALIGNMENT);
+
+    /* The reserved head bounds only the scratch the ring's own
+       operations request from the context, and they request none: the
+       two-prime exports run their reconstruction through stack blocks,
+       so the head is zero. Interleaved requests from unrelated code on
+       this thread -- any integer multiplication large enough to reach
+       fft_small, at any point in this context's lifetime -- are served
+       from the context's secondary buffer instead, so a zero head does
+       not constrain them. */
     T->slab_base = (char *) mpn_ctx_fit_buffer_reserve(
-        get_default_mpn_ctx(), 0, (ulong) num_live * T->slab_size);
+        get_default_mpn_ctx(), 0,
+        (ulong) num_live * T->slab_size + T->stage_size);
     if (T->slab_base == NULL)
+    {
+        T->stage_size = 0;
         return GR_UNABLE;
+    }
+    T->stage_base = (T->stage_size != 0)
+        ? T->slab_base + (ulong) num_live * T->slab_size : NULL;
 
     T->alloc_strategy = GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER;
     T->slab_count = num_live;
@@ -1157,12 +1359,18 @@ gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
         __tmpn_methods_initialized = 1;
     }
 
-    T->alloc_strategy = alloc_strategy;
+    T->alloc_strategy = alloc_strategy & GR_TRANSFORMED_MPN_ALLOC_STRATEGY_MASK;
+    T->scratch_from_slab =
+        (alloc_strategy & GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB) != 0;
     T->slab_base = NULL;
     T->slab_free = NULL;
     T->slab_navail = 0;
     T->slab_count = 0;
-    if (alloc_strategy == GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
+    T->stage_base = NULL;
+    T->stage_size = 0;
+    T->stage_owned = NULL;
+    T->stage_owned_size = 0;
+    if (T->alloc_strategy == GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
     {
         /* ops scratch at the head, the operand slabs in the stable
            reserved tail; ring operations request no scratch from
@@ -1187,6 +1395,44 @@ gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
 }
 
 /* as above but consumes x: only gr_clear may follow */
+/* Convert x out into an fmpz, destructively. The width the
+   reconstruction needs is the ring's own business, so it is taken from
+   the element here and the destination grown to match: the conversion
+   then writes straight into f's limbs, with no staging and no copy of
+   the result. lo_limbs > 0 selects the truncated conversion. */
+int
+gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs,
+                                        gr_ptr x, gr_ctx_t ctx)
+{
+    slong w, zn;
+    int sg, status;
+    mpz_ptr m;
+
+    w = (lo_limbs == 0) ? gr_transformed_mpn_get_limbs(ctx, x)
+                        : gr_transformed_mpn_get_limbs_trunc(ctx, x, lo_limbs);
+    if (w <= 0)
+        w = 1;
+
+    m = _fmpz_promote(f);
+    if (lo_limbs == 0)
+        status = gr_transformed_mpn_get_destructive(FLINT_MPZ_REALLOC(m, w),
+                     w, &zn, &sg, x, ctx);
+    else
+        status = gr_transformed_mpn_get_trunc_destructive(
+                     FLINT_MPZ_REALLOC(m, w), w, &zn, &sg, lo_limbs, x, ctx);
+
+    if (status != GR_SUCCESS)
+    {
+        _fmpz_demote(f);
+        fmpz_zero(f);
+        return status;
+    }
+
+    m->_mp_size = sg ? -zn : zn;
+    _fmpz_demote_val(f);
+    return GR_SUCCESS;
+}
+
 int
 gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
                                    int * sign, gr_ptr x, gr_ctx_t ctx)

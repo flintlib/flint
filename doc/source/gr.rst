@@ -969,6 +969,11 @@ Finite field methods
 
 .. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
 
+    Rings `\mathbb{Z}/n\mathbb{Z}` (*nmod*, *fmpz_mod*, *mpn_mod*) implement
+    these methods when `n` is known to be prime (see :func:`gr_ctx_set_is_field`),
+    with :func:`gr_ctx_fq_degree` returning 1 and :func:`gr_ctx_fq_order`
+    returning `n`.
+
 .. function:: int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 
 .. function:: int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
@@ -1026,6 +1031,18 @@ middle products) run substantially faster in such a representation.
     fully overwritten afterwards; representations without the method fall
     back to the copying conversion.
 
+.. function:: int gr_ctx_init_gr_poly_transformed_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+
+    Constructs a ring of transformed polynomials modulo `x^{L} - 1`
+    over *base*, where products wrap around: the implementation may round
+    the requested cyclic length ``*len`` up (for example to a power of
+    two) and writes the actual `L` back. Conversions in require length at
+    most `L`; conversions out give the coefficients of the reduced
+    representative. This is the ``CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR``
+    method of the base ring (returning ``GR_UNABLE`` by default); it is
+    used for middle products and for products whose high part is known,
+    such as the remainder step of division by a precomputed modulus.
+
 .. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy)
 
     Constructs the ring of transformed big integers: bilinear
@@ -1043,14 +1060,34 @@ middle products) run substantially faster in such a representation.
     *num_live* element slabs, from which ``gr_init`` draws and to
     which ``gr_clear`` returns; initializations beyond *num_live*
     simultaneously live elements fall back to separate allocation.
-    The reservation makes repeated context creation cheap (the
-    region persists in the thread's scratch buffer across contexts)
-    and requires that ring operations request no scratch from the
-    fft_small context while it is live: a violating request is a
-    hard error. If another reservation is already live, for
-    instance from an enclosing context, the context degrades to
-    separate allocation. Elements should be initialized with
-    ``gr_init`` or ``GR_TMP_INIT_VEC`` in every strategy.
+    The reservation makes repeated context creation cheap, since the
+    region persists in the thread's scratch buffer across contexts. It
+    is designed for a context that is the only user of fft_small on its
+    thread while it lives -- construct, perform ring operations,
+    destroy -- and every use in the library follows that pattern. It is
+    an assumption rather than a requirement: while a reservation is
+    live the thread's scratch buffer can neither grow nor move, and an
+    interleaved fft_small operation, such as an integer multiplication
+    large enough to reach it, is served from a secondary buffer instead
+    (see :func:`mpn_ctx_fit_buffer`). A context held across unrelated
+    work, or test code that checks ring results against ``fmpz``
+    arithmetic, therefore stays correct; the secondary buffer is a
+    guarantee, not a fast path. One reservation exists per thread, so a
+    context constructed while another holds it degrades to separate
+    allocation. Elements should be initialized with ``gr_init`` or
+    ``GR_TMP_INIT_VEC`` in every strategy.
+
+    Conversions out whose destination window is too short to hold the
+    reconstruction are staged inside the ring, and that staging is
+    provisioned with the reservation: a region of well under one
+    element's storage, reserved past the slabs. A caller that will
+    always have an element dead by the time it converts may add the bit
+    flag ``GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB`` to *alloc_strategy*,
+    and the ring then takes a free slab for the staging rather than
+    reserving anything. The flag declares a footprint; it is not a correctness
+    contract, and if no slab happens to be free the ring falls back to
+    an allocation cached for the context's lifetime. One conversion may
+    be in flight at a time.
 
 .. function:: int gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live)
 
@@ -1070,7 +1107,17 @@ middle products) run substantially faster in such a representation.
 
     Conversions by limb arrays with an explicit sign. The *destructive*
     get may consume the element, skipping a copy of the transform;
-    *get_limbs* returns the number of limbs the conversion needs.
+    *get_limbs* returns the number of limbs the reconstruction needs,
+    which exceeds the length of the value itself by the top CRT
+    coefficient's length.
+
+    A window of *get_limbs* limbs or more takes the reconstruction
+    directly, with no staging and no copy. A shorter window is also
+    accepted: the ring stages the conversion in its own scratch and
+    copies the result out, succeeding whenever the value fits in *zn*
+    limbs and returning ``GR_DOMAIN`` otherwise. For the destructive
+    forms that refusal arrives with the element already consumed, so it
+    cannot be retried. Limbs of *z* above ``*zn_out`` are zeroed.
 
 .. function:: int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx)
               int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_ptr x, gr_ctx_t ctx)
@@ -1085,10 +1132,23 @@ middle products) run substantially faster in such a representation.
     1 ulp) plus the wholly dropped slots' total mass, under half an ulp
     either way.
 
+.. function:: int gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs, gr_ptr x, gr_ctx_t ctx)
+
+    Converts *x* out into *f*, consuming it. The width the
+    reconstruction needs is taken from the element and *f* is grown to
+    match, so the conversion writes straight into *f*'s own limbs:
+    neither staging nor a copy of the result. A nonzero *lo_limbs*
+    selects the truncated conversion, with the error described above.
+    This is the conversion to use whenever the destination is an
+    ``fmpz``; the caller needs neither *get_limbs* nor a scratch buffer
+    of its own.
+
 .. function:: ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
 
     Size in bytes of one element's transform storage in this
-    context.
+    context. A reserved-slab context occupies *num_live* times this,
+    plus the conversion staging region described above when it is not
+    taken from a slab.
 
     The transformed-mpn context constructor takes a *num_live*
     declaration of the elements expected alive simultaneously, and
@@ -1106,6 +1166,9 @@ middle products) run substantially faster in such a representation.
     *is_signed* itself, so callers must not add either to the bound.
     ``gr_transformed_mpn_get_limbs_bound(ctx)`` returns an upper bound,
     over every element of the context, on what
-    ``gr_transformed_mpn_get_limbs`` can return -- conversion staging
-    should be sized from it rather than from a reconstruction of the
-    representation's limb requirements.
+    ``gr_transformed_mpn_get_limbs`` can return. The ring sizes its own
+    conversion staging from it, so callers converting into an ``fmpz``
+    or into a window of *get_limbs* limbs need not consult it; a caller
+    that does want a buffer of its own should size it from this bound
+    rather than from a reconstruction of the representation's limb
+    requirements.

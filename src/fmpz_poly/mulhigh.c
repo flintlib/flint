@@ -16,24 +16,6 @@ void
 _fmpz_poly_mulhigh(fmpz * res, const fmpz * poly1, slong len1,
                                    const fmpz * poly2, slong len2, slong start)
 {
-    slong limbs1 = _fmpz_vec_max_limbs(poly1, len1);
-    slong limbs2 = _fmpz_vec_max_limbs(poly2, len2);
-    slong limbsx = FLINT_MAX(limbs1, limbs2);
-
-    if (start < 5)
-    {
-        _fmpz_poly_mulhigh_classical(res, poly1, len1, poly2, len2, start);
-        return;
-    }
-
-    if (limbsx > 4 && start < 17 && len1 == start + 1 && len2 == start + 1)
-        _fmpz_poly_mulhigh_karatsuba_n(res, poly1, poly2, start + 1);
-    else if (limbs1 + limbs2 <= 8)
-        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-    else if ((limbs1 + limbs2)/2048 > len1 + len2)
-        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
-       _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-    else
-       _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
+    /* the low coefficients of res are left arbitrary */
+    _fmpz_poly_mulmid(res + start, poly1, len1, poly2, len2, start, len1 + len2 - 1);
 }

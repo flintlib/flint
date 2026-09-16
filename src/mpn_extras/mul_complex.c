@@ -55,8 +55,8 @@
 
     */
 
-slong flint_mpn_mul_complex_fft_cutoff = 700;
-slong flint_mpn_sqr_complex_fft_cutoff = 3000000;
+slong flint_mpn_mul_complex_fft_cutoff = 230;
+slong flint_mpn_sqr_complex_fft_cutoff = 270;
 
 /* Defined here rather than in the fft_small module, which unsupported
    platforms exclude from the build entirely: the budget must be
@@ -81,45 +81,29 @@ ulong flint_fft_small_max_transformed_ring_size = UWORD(1) << 30;
    lowest returned limb, the mulhigh contract); shift = 0 is exact. */
 static int
 _tmpn_out(nn_ptr z, mp_size_t zlimbs, slong * zlen, gr_ptr acc,
-          mp_size_t shift, nn_ptr t, ulong tmax, gr_ctx_t tctx)
+          mp_size_t shift, gr_ctx_t tctx)
 {
-    slong need, tn;
+    slong tn;
     int sg, status;
 
-    /* the accumulators are dead after this, so the conversion may
-       consume them and skip copying the transform; t is a slice of a
-       dead operand's storage, large enough by construction (an element
-       holds np * stride doubles against need ~ zlimbs + a few limbs) */
+    /* The accumulators are dead after this, so the conversion consumes
+       them and skips copying the transform. The window is the caller's
+       result window, which is short of the reconstruction by the top
+       CRT coefficient's length; the ring stages that itself, out of a
+       slab freed by the clears above, and refuses if the value does
+       not fit. */
     if (shift > 0)
-    {
-        need = gr_transformed_mpn_get_limbs_trunc(tctx, acc, shift);
-        if ((ulong) need > tmax)
-            return 0;
-        status = gr_transformed_mpn_get_trunc_destructive(t, need, &tn, &sg,
-                                                          shift, acc, tctx);
-    }
+        status = gr_transformed_mpn_get_trunc_destructive(z, zlimbs, &tn,
+                                                          &sg, shift, acc,
+                                                          tctx);
     else
-    {
-        need = gr_transformed_mpn_get_limbs(tctx, acc);
-        if ((ulong) need > tmax)
-            return 0;
-        status = gr_transformed_mpn_get_destructive(t, need, &tn, &sg, acc,
-                                                    tctx);
-    }
+        status = gr_transformed_mpn_get_destructive(z, zlimbs, &tn, &sg,
+                                                    acc, tctx);
 
-    if (status == GR_SUCCESS)
-    {
-        /* the true value must fit the caller's window */
-        if (tn > zlimbs)
-            status = GR_UNABLE;
-        else
-        {
-            if (tn > 0)
-                flint_mpn_copyi(z, t, tn);
-            *zlen = (tn == 0 || !sg) ? tn : -(slong) tn;
-        }
-    }
-    return status == GR_SUCCESS;
+    if (status != GR_SUCCESS)
+        return 0;
+    *zlen = (tn == 0 || !sg) ? tn : -(slong) tn;
+    return 1;
 }
 
 /* fft path shared by mul and mulhigh: shift = 0 writes 2n+1 limbs,
@@ -138,44 +122,49 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
 #define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
 
     /* the bound is one product's magnitude; the two-term accumulation
-       and the sign are the context's own provisioning */
+       and the sign are the context's own provisioning. Five elements
+       suffice (see the schedule below), and the conversions take their
+       staging from a slab the clears release rather than from a
+       reservation of their own */
     if (gr_ctx_init_transformed_mpn(tctx,
             FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin)),
-            2, 1, 6, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
+            2, 1, 5, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER
+                     | GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB)
             != GR_SUCCESS)
         return 0;
 
-    /* elements come from the slab cache through plain gr_init: the
-       previous carving from the context fit_buffer, which every
-       two-prime export reuses mid-operation, was correct only
-       because the exports run after the last operand use and their
-       scratch stayed below the output elements' offsets */
-    GR_TMP_INIT_VEC(E, 6, tctx);
+    GR_TMP_INIT_VEC(E, 5, tctx);
 
     ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, ar_sgn, tctx) == GR_SUCCESS;
     ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, ai_sgn, tctx) == GR_SUCCESS;
     ok = ok && gr_transformed_mpn_set(E_(2), br, brn, br_sgn, tctx) == GR_SUCCESS;
     ok = ok && gr_transformed_mpn_set(E_(3), bi, bin, bi_sgn, tctx) == GR_SUCCESS;
 
-    /* zr = ar br - ai bi, zi = ar bi + ai br */
+    /*
+        zr = ar br - ai bi, zi = ar bi + ai br. Every input enters both
+        outputs, so nothing is dead until the second is formed and the
+        first output needs a slot of its own -- but only the first: the
+        second is accumulated over ar in place, which dies at its own
+        last use. Hence five elements, and the same two product pairs
+        as a six-element schedule, so the depth agreement the
+        accumulations require is unchanged.
+    */
     ok = ok && gr_mul(E_(4), E_(0), E_(2), tctx) == GR_SUCCESS;
-    ok = ok && gr_submul(E_(4), E_(1), E_(3), tctx) == GR_SUCCESS;
-    ok = ok && gr_mul(E_(5), E_(0), E_(3), tctx) == GR_SUCCESS;
-    ok = ok && gr_addmul(E_(5), E_(1), E_(2), tctx) == GR_SUCCESS;
+    ok = ok && gr_submul(E_(4), E_(1), E_(3), tctx) == GR_SUCCESS;   /* zr */
+    ok = ok && gr_mul(E_(0), E_(0), E_(3), tctx) == GR_SUCCESS;
+    ok = ok && gr_addmul(E_(0), E_(1), E_(2), tctx) == GR_SUCCESS;   /* zi */
 
-    {
-        ulong tmax = gr_transformed_mpn_sizeof_data(tctx)
-                     / sizeof(ulong);
-        nn_ptr tstage = flint_malloc(tmax * sizeof(ulong));
+    /* ai, br and bi are dead; releasing them now returns their slabs,
+       and the conversions below take their staging from one. A repeat
+       clear is inert, so the vector clear at the end stays correct. */
+    gr_clear(E_(1), tctx);
+    gr_clear(E_(2), tctx);
+    gr_clear(E_(3), tctx);
 
-        ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(4), shift,
-                             tstage, tmax, tctx);
-        ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(5), shift,
-                             tstage, tmax, tctx);
-        flint_free(tstage);
-    }
+    ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(4), shift, tctx);
+    ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(0), shift, tctx);
 
-    GR_TMP_CLEAR_VEC(E, 6, tctx);
+    GR_TMP_CLEAR_VEC(E, 5, tctx);
     gr_ctx_clear(tctx);
 #undef E_
     return ok;
@@ -204,11 +193,13 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ar * ar - ai * ai keeps the same geometry as the complex product.
     */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 4, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
+            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 3,
+            GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER
+            | GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB)
             != GR_SUCCESS)
         return 0;
 
-    GR_TMP_INIT_VEC(E, 4, tctx);
+    GR_TMP_INIT_VEC(E, 3, tctx);
 
     /* the operands enter as magnitudes: the squares are sign free and
        2 ar ai has the known sign ar_sgn ^ ai_sgn, applied below -- so
@@ -220,31 +211,31 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, 0, tctx) == GR_SUCCESS;
     ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, 0, tctx) == GR_SUCCESS;
 
-    /* zr = ar ar - ai ai; zi = ar ai doubled by a pointwise addition,
-       which costs a pass over the evaluations against a full pointwise
-       multiplication */
-    ok = ok && gr_mul(E_(2), E_(0), E_(0), tctx) == GR_SUCCESS;
-    ok = ok && gr_submul(E_(2), E_(1), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_mul(E_(3), E_(0), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_add(E_(3), E_(3), E_(3), tctx) == GR_SUCCESS;
+    /*
+        zr = ar ar - ai ai; zi = ar ai doubled by a pointwise addition,
+        which costs a pass over the evaluations against a full pointwise
+        multiplication. Three elements, by the same argument as the
+        product: zr takes the one slot the inputs cannot supply, and zi
+        is accumulated over ar in place at its last use. The two
+        squarings go through the pointwise square, reading one operand
+        stream where a multiply would read two.
+    */
+    ok = ok && gr_sqr(E_(2), E_(0), tctx) == GR_SUCCESS;
+    ok = ok && gr_submul(E_(2), E_(1), E_(1), tctx) == GR_SUCCESS;    /* zr */
+    ok = ok && gr_mul(E_(0), E_(0), E_(1), tctx) == GR_SUCCESS;
+    ok = ok && gr_add(E_(0), E_(0), E_(0), tctx) == GR_SUCCESS;       /* zi */
 
-    {
-        ulong tmax = gr_transformed_mpn_sizeof_data(tctx)
-                     / sizeof(ulong);
-        nn_ptr tstage = flint_malloc(tmax * sizeof(ulong));
+    /* ai is dead; its slab is the conversions' staging */
+    gr_clear(E_(1), tctx);
 
-        ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(2), shift,
-                             tstage, tmax, tctx);
-        ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(3), shift,
-                             tstage, tmax, tctx);
-        flint_free(tstage);
+    ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(2), shift, tctx);
+    ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(0), shift, tctx);
 
-        /* attach the known sign of 2 ar ai */
-        if (ok && (ar_sgn ^ ai_sgn))
-            *zi_len = -*zi_len;
-    }
+    /* attach the known sign of 2 ar ai */
+    if (ok && (ar_sgn ^ ai_sgn))
+        *zi_len = -*zi_len;
 
-    GR_TMP_CLEAR_VEC(E, 4, tctx);
+    GR_TMP_CLEAR_VEC(E, 3, tctx);
     gr_ctx_clear(tctx);
 #undef E_
     return ok;

@@ -208,7 +208,6 @@ gr_mat_charpoly_danilevsky(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
     int status;
     gr_poly_fit_length(cp, mat->r + 1, ctx);
     status = _gr_mat_charpoly_danilevsky(cp->coeffs, mat, ctx);
-    _gr_poly_set_length(cp, mat->r + 1, ctx);
-    _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
+    _gr_poly_set_length_normalise(cp, mat->r + 1, ctx);   /* only needed for the zero ring */
     return status;
 }

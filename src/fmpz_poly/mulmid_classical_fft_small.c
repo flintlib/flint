@@ -18,72 +18,6 @@
 #include "fft_small.h"
 #include "gr.h"
 
-#if FLINT_HAVE_FFT_SMALL
-
-static nn_srcptr
-_coeff_limbs(const fmpz * f, ulong * scratch, slong * n, int * sgn)
-{
-    fmpz c = *f;
-
-    if (!COEFF_IS_MPZ(c))
-    {
-        *scratch = FLINT_ABS(c);
-        *n = 1;
-        *sgn = c < 0;
-        return scratch;
-    }
-    else
-    {
-        mpz_srcptr m = COEFF_TO_PTR(c);
-
-        *n = FLINT_ABS(m->_mp_size);
-        *sgn = m->_mp_size < 0;
-        return m->_mp_d;
-    }
-}
-
-static int
-_set_coeff(gr_ptr elem, const fmpz * f, gr_ctx_t ctx)
-{
-    ulong scratch;
-    slong n;
-    int sgn;
-    nn_srcptr p = _coeff_limbs(f, &scratch, &n, &sgn);
-
-    return gr_transformed_mpn_set(elem, p, n, sgn, ctx);
-}
-
-/* the accumulated element, converted out directly into an fmpz */
-/* converts the accumulator out destructively -- the caller re-initializes
-   it (borrowed storage, so that is free) before the next output */
-static int
-_get_coeff(fmpz * f, gr_ptr elem, gr_ctx_t ctx)
-{
-    slong w = gr_transformed_mpn_get_limbs(ctx, elem);
-    slong zl;
-    int sg, status;
-    mpz_ptr m;
-
-    if (w <= 0)
-        w = 1;
-
-    m = _fmpz_promote(f);
-    status = gr_transformed_mpn_get_destructive(FLINT_MPZ_REALLOC(m, w), w,
-                                                &zl, &sg, elem, ctx);
-    if (status != GR_SUCCESS)
-    {
-        _fmpz_demote(f);
-        fmpz_zero(f);
-        return status;
-    }
-
-    m->_mp_size = sg ? -zl : zl;
-    _fmpz_demote_val(f);
-    return GR_SUCCESS;
-}
-
-#endif
-
 int
 _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
     const fmpz * poly1, slong len1, const fmpz * poly2, slong len2,
@@ -174,7 +108,7 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
 
     /* the kept transforms; when sharing they serve both roles */
     for (j = 0; j < k && status == GR_SUCCESS; j++)
-        status |= _set_coeff(GR_ENTRY(B, j, sz),
+        status |= gr_set_fmpz(GR_ENTRY(B, j, sz),
                              (share ? poly1 : poly2) + j, ctx);
 
 #define A_ELEM(t, out) \
@@ -187,7 +121,7 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
             gr_ptr _e = GR_ENTRY(X, _s, sz); \
             if (xidx[_s] != (t)) \
             { \
-                status |= _set_coeff(_e, poly1 + (t), ctx); \
+                status |= gr_set_fmpz(_e, poly1 + (t), ctx); \
                 xidx[_s] = (t); \
             } \
             (out) = _e; \
@@ -250,7 +184,7 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
         if (status != GR_SUCCESS)
             break;
 
-        status |= _get_coeff(res + (i - nlo), acc, ctx);
+        status |= gr_transformed_mpn_get_fmpz_destructive(res + (i - nlo), 0, acc, ctx);
             /* the destructive get consumed acc: bring it back for the
                next output; under the fit_buffer strategy this is a
                slab-pool round trip */

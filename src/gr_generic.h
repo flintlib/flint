@@ -85,6 +85,13 @@ truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
+int gr_generic_ctx_fq_degree_prime_field(slong * res, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_divrem_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, const gr_poly_preinv_struct * P, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_preinv_set(gr_poly_preinv_struct * P, gr_srcptr f, slong lenf, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_evaluate(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx);
+void gr_generic_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx);
+int gr_generic_ctx_fq_order_prime_field(fmpz_t res, gr_ctx_t ctx);
+
 void gr_generic_ctx_clear(gr_ctx_t ctx);
 
 slong gr_generic_ctx_ngens_0(slong * ngens, gr_ctx_t ctx);
@@ -207,6 +214,8 @@ WARN_UNUSED_RESULT int gr_generic_cmp_other(int * res, gr_srcptr x, gr_srcptr y,
 WARN_UNUSED_RESULT int gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_poly_factor_roots(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_bernoulli_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);

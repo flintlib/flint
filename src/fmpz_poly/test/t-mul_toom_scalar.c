@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
         {
             slong n = len1 + len2 - 1;
 
-            if (n > ((FLINT_BITS == 64) ? 20 : 13))
+            if (n > (FMPZ_POLY_TOOM_SCALAR_N_MAX))
                 continue;
 
             for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -71,7 +71,7 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
         slong len = 1 + n_randint(state, 10);
         slong n = 2 * len - 1;
 
-        if (n > ((FLINT_BITS == 64) ? 20 : 13))
+        if (n > (FMPZ_POLY_TOOM_SCALAR_N_MAX))
             continue;
 
         a = _fmpz_vec_init(len);
@@ -144,7 +144,7 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
             slong n = len1 + len2 - 1;
             fmpz *a, *b, *res;
 
-            if (n <= ((FLINT_BITS == 64) ? 20 : 13))
+            if (n <= (FMPZ_POLY_TOOM_SCALAR_N_MAX))
                 continue;
 
             a = _fmpz_vec_init(len1);

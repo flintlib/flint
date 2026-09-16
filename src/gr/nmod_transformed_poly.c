@@ -95,7 +95,9 @@ typedef struct
 {
     fft_small_plan_t P;
     nmod_t mod;
-    slong N;                        /* length capacity */
+    slong N;                        /* length capacity (the cyclic length
+                                       N = 2^depth in cyclic mode) */
+    int cyclic;                     /* products wrap around modulo x^N - 1 */
     ulong terms_bound;              /* accumulation capacity */
     ulong max_depth;                /* multiplicative depth capacity */
     ulong m_orig[MPN_CTX_NCRTS];    /* saved export normalizers */
@@ -118,6 +120,19 @@ typedef struct
 
 #define TPOLY_CTX(ctx) ((tpoly_ctx_struct *) GR_CTX_DATA_AS_PTR(ctx))
 #define TPOLY(x) ((tpoly_struct *) (x))
+
+/* Tag the operands of a binary operation as unnormalized forward
+   transforms. Writing the tag only when it changes keeps operations on
+   shared, read-only operands (such as precomputed transforms used
+   concurrently by several threads) free of writes. */
+static void
+_tpoly_inputs_primal(gr_srcptr x, gr_srcptr y)
+{
+    if (TPOLY(x)->op.domain != FFT_SMALL_OP_PRIMAL)
+        TPOLY(x)->op.domain = FFT_SMALL_OP_PRIMAL;
+    if (TPOLY(y)->op.domain != FFT_SMALL_OP_PRIMAL)
+        TPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+}
 
 /* d = m*d + b over the element's truncation: applies the saved normalizer
    (and, for values that may be negative, the reconstruction bias) to the
@@ -361,6 +376,20 @@ _gr_nmod_tpoly_get_gr_poly_window_destructive(nn_ptr cc, gr_ptr x,
     return GR_SUCCESS;
 }
 
+/* the GET_GR_POLY_WINDOW_DESTRUCTIVE method */
+static int
+tpoly_get_gr_poly_window_destructive(gr_ptr c, gr_ptr x, slong zl, slong zh,
+                                     gr_ctx_t base_ctx, gr_ctx_t ctx)
+{
+    tpoly_ctx_struct * T = TPOLY_CTX(ctx);
+
+    if (base_ctx->which_ring != GR_CTX_NMOD ||
+            NMOD_CTX(base_ctx).n != T->mod.n)
+        return GR_DOMAIN;
+
+    return _gr_nmod_tpoly_get_gr_poly_window_destructive((nn_ptr) c, x, zl, zh, ctx);
+}
+
 /* the GET_GR_POLY_DESTRUCTIVE method: full-length conversion out on the
    element's own storage */
 static int
@@ -512,7 +541,7 @@ tpoly_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (terms < TPOLY(x)->terms || terms > T->terms_bound)
         return GR_UNABLE;
 
-    TPOLY(x)->op.domain = TPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _tpoly_inputs_primal(x, y);
     fft_small_op_add(&TPOLY(res)->op, &TPOLY(x)->op, &TPOLY(y)->op, T->P);
     TPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     TPOLY(res)->len = FLINT_MAX(TPOLY(x)->len, TPOLY(y)->len);
@@ -537,7 +566,7 @@ tpoly_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (terms < TPOLY(x)->terms || terms > T->terms_bound)
         return GR_UNABLE;
 
-    TPOLY(x)->op.domain = TPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _tpoly_inputs_primal(x, y);
     fft_small_op_sub(&TPOLY(res)->op, &TPOLY(x)->op, &TPOLY(y)->op, T->P);
     TPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     TPOLY(res)->len = FLINT_MAX(TPOLY(x)->len, TPOLY(y)->len);
@@ -575,12 +604,20 @@ tpoly_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return tpoly_zero(res, ctx);
 
     len = TPOLY(x)->len + TPOLY(y)->len - 1;
-    if (len > T->N || !_mul_terms(&terms, TPOLY(x), TPOLY(y), T->terms_bound))
+    if (len > T->N)
+    {
+        /* cyclic mode: the product wraps around modulo x^N - 1 */
+        if (T->cyclic)
+            len = T->N;
+        else
+            return GR_UNABLE;
+    }
+    if (!_mul_terms(&terms, TPOLY(x), TPOLY(y), T->terms_bound))
         return GR_UNABLE;
     if (TPOLY(x)->depth + TPOLY(y)->depth > T->max_depth)
         return GR_UNABLE;
 
-    TPOLY(x)->op.domain = TPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _tpoly_inputs_primal(x, y);
     fft_small_op_mul(&TPOLY(res)->op, &TPOLY(x)->op, &TPOLY(y)->op, T->P);
     TPOLY(res)->op.domain = FFT_SMALL_OP_PRIMAL;
     TPOLY(res)->len = len;
@@ -625,7 +662,14 @@ tpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     }
 
     len = TPOLY(x)->len + TPOLY(y)->len - 1;
-    if (len > T->N || !_mul_terms(&t2, TPOLY(x), TPOLY(y), T->terms_bound))
+    if (len > T->N)
+    {
+        if (T->cyclic)
+            len = T->N;
+        else
+            return GR_UNABLE;
+    }
+    if (!_mul_terms(&t2, TPOLY(x), TPOLY(y), T->terms_bound))
         return GR_UNABLE;
     terms = TPOLY(res)->terms + t2;
     if (terms < t2 || terms > T->terms_bound)
@@ -633,7 +677,7 @@ tpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     if (TPOLY(x)->depth + TPOLY(y)->depth > T->max_depth)
         return GR_UNABLE;
 
-    TPOLY(x)->op.domain = TPOLY(y)->op.domain = FFT_SMALL_OP_PRIMAL;
+    _tpoly_inputs_primal(x, y);
     TPOLY(res)->op.domain = FFT_SMALL_OP_PRODUCT;
     if (sub)
         fft_small_op_submul(&TPOLY(res)->op, &TPOLY(x)->op, &TPOLY(y)->op, T->P);
@@ -745,19 +789,21 @@ static gr_method_tab_input __tpoly_methods_input[] =
     {GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
                                 (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_destructive},
     {GR_METHOD_GET_GR_POLY_WINDOW, (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_window},
+    {GR_METHOD_GET_GR_POLY_WINDOW_DESTRUCTIVE, (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_window_destructive},
     {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };
 
-/* the nmod overload of gr_ctx_init_gr_poly_transformed_repr */
-int
-_gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
-                                        slong len_bound, slong terms_bound,
-                                        const gr_transformed_poly_workload_struct * workload)
+/* shared constructor: cyclic = 0 for the linear representation of
+   length capacity N, cyclic = 1 for the ring modulo x^N - 1 (N must then
+   be a power of two of at least BLK_SZ) */
+static int
+_tpoly_ctx_init(gr_ctx_t ctx, gr_ctx_t base, slong N, slong terms_bound,
+                const gr_transformed_poly_workload_struct * workload, int cyclic)
 {
     tpoly_ctx_struct * T;
     nmod_t mod;
-    slong N = len_bound;
     ulong modbits, i;
+    int ok;
 
     if (base->which_ring != GR_CTX_NMOD || N < 1 || terms_bound < 1 ||
             (ulong) terms_bound > UWORD_MAX / 4)
@@ -769,16 +815,28 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
     T = FLINT_ARRAY_ALLOC(1, tpoly_ctx_struct);
     T->mod = mod;
     T->N = N;
+    T->cyclic = cyclic;
     T->terms_bound = (ulong) terms_bound;
 
     /* provision the chinese remaindering for products of multiplicative
        depth up to 2 in base elements with up to terms_bound elementary
        products, doubled to cover the signed-value bias; the crt's final
        reduction handles three limbs, which bounds the total */
-    if (2 * modbits + 1 + FLINT_BIT_COUNT((ulong) terms_bound) > 3 * FLINT_BITS
-        || !fft_small_plan_init_nmod(T->P, get_default_mpn_ctx(),
+    if (2 * modbits + 1 + FLINT_BIT_COUNT((ulong) terms_bound) > 3 * FLINT_BITS)
+    {
+        flint_free(T);
+        return GR_UNABLE;
+    }
+
+    if (cyclic)
+        ok = fft_small_plan_init_nmod_cyclic(T->P, get_default_mpn_ctx(),
+            n_clog2(N), N, 2 * (ulong) terms_bound, 2 * modbits, mod);
+    else
+        ok = fft_small_plan_init_nmod(T->P, get_default_mpn_ctx(),
             0, N, N, _len_trunc(N), 2 * (ulong) terms_bound,
-            2 * modbits, mod, N))
+            2 * modbits, mod, N);
+
+    if (!ok)
     {
         flint_free(T);
         return GR_UNABLE;
@@ -938,11 +996,50 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
     return GR_SUCCESS;
 }
 
+/* the nmod overload of gr_ctx_init_gr_poly_transformed_repr */
+int
+_gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+                                        slong len_bound, slong terms_bound,
+                                        const gr_transformed_poly_workload_struct * workload)
+{
+    return _tpoly_ctx_init(ctx, base, len_bound, terms_bound, workload, 0);
+}
+
+/* the nmod overload of gr_ctx_init_gr_poly_transformed_cyclic_repr:
+   the cyclic length is rounded up to a power of two of at least BLK_SZ
+   and written back */
+int
+_gr_nmod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base,
+                                        slong * len, slong terms_bound,
+                                        const gr_transformed_poly_workload_struct * workload)
+{
+    slong N;
+    int status;
+
+    if (*len < 1)
+        return GR_UNABLE;
+
+    N = n_pow2(FLINT_MAX(LG_BLK_SZ, n_clog2(*len)));
+    status = _tpoly_ctx_init(ctx, base, N, terms_bound, workload, 1);
+    if (status == GR_SUCCESS)
+        *len = N;
+    return status;
+}
+
 #else /* FLINT_HAVE_FFT_SMALL */
 
 int
 _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t FLINT_UNUSED(ctx),
         gr_ctx_t FLINT_UNUSED(base), slong FLINT_UNUSED(len_bound),
+        slong FLINT_UNUSED(terms_bound),
+        const gr_transformed_poly_workload_struct * FLINT_UNUSED(workload))
+{
+    return GR_UNABLE;
+}
+
+int
+_gr_nmod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t FLINT_UNUSED(ctx),
+        gr_ctx_t FLINT_UNUSED(base), slong * FLINT_UNUSED(len),
         slong FLINT_UNUSED(terms_bound),
         const gr_transformed_poly_workload_struct * FLINT_UNUSED(workload))
 {

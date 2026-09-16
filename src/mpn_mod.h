@@ -132,6 +132,9 @@ int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx);
 
 int mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx);
 
+int mpn_mod_pow_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t e, gr_ctx_t ctx);
+int mpn_mod_pow_ui(nn_ptr res, nn_srcptr x, ulong e, gr_ctx_t ctx);
+
 MPN_MOD_INLINE truth_t
 mpn_mod_is_zero(nn_srcptr x, gr_ctx_t ctx)
 {
@@ -223,6 +226,7 @@ int mpn_mod_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slo
 /* Polynomial algorithms */
 
 int _mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid_mpn(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
@@ -232,9 +236,6 @@ int _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_s
 int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
-slong _mpn_mod_poly_mul_unreduced_slimbs(slong len, gr_ctx_t ctx);
-void _mpn_mod_poly_mul_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, gr_ctx_t ctx);
-void _mpn_mod_poly_sqr_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 
 int _mpn_mod_poly_inv_series(nn_ptr Q, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx);
@@ -266,6 +267,7 @@ struct gr_transformed_poly_workload_struct;
 int _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
         slong len_bound, slong terms_bound,
         const struct gr_transformed_poly_workload_struct * workload);
+int _gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const struct gr_transformed_poly_workload_struct * workload);
 
 #ifdef __cplusplus
 }
