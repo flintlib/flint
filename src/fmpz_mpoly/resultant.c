@@ -32,6 +32,24 @@
 #define BIVARIATE_MAX_AREA 1073741824.0     /* 2^30 */
 #define BIVARIATE_MAX_POINTS 268435456.0    /* 2^28 */
 
+/* A sparse input expands into a box far larger than itself. Below
+   BIVARIATE_FREE_AREA entries that does not matter, the box being small
+   whatever the input; above it the box may exceed the input by at most
+   BIVARIATE_MAX_EXPANSION, so that a few terms of high degree are left to the
+   sparse algorithm rather than materialised. */
+#define BIVARIATE_FREE_AREA 8388608.0       /* 2^23 */
+#define BIVARIATE_MAX_EXPANSION 64.0
+
+/* Two polynomials of only a few terms each have a resultant the subresultant
+   PRS finds almost at once, and at low degree the dense algorithm cannot make
+   back the cost of the whole box. Measured over Z at degree 8, four terms
+   each: three to a hundred times slower, at every coefficient size from 32 to
+   10000 bits. From BIVARIATE_MIN_AREA in the degrees up it wins again, the
+   PRS by then paying for the degrees whether or not the coefficients are
+   there. */
+#define BIVARIATE_MIN_TERMS 5
+#define BIVARIATE_MIN_AREA 256
+
 /* res_var(A, B) through the dense bivariate multimodular algorithm, when the
    inputs are bivariate and dense enough for it to pay. Returns 0 when they
    are not, or when the algorithm declines. */
@@ -41,6 +59,7 @@ _fmpz_mpoly_resultant_bivariate(fmpz_mpoly_t R, const fmpz_mpoly_t A,
 {
     slong other = 1 - var;
     slong degAy, degAx, degBy, degBx, lenA, lenB, npoints;
+    double areaA, areaB;
     fmpz_bpoly_t Ab, Bb, Rb;
     fmpz_poly_t res;
     int success;
@@ -59,12 +78,26 @@ _fmpz_mpoly_resultant_bivariate(fmpz_mpoly_t R, const fmpz_mpoly_t A,
     lenA = degAy + 1;
     lenB = degBy + 1;
 
-    if ((double) lenA * (degAx + 1) > BIVARIATE_MAX_AREA ||
-        (double) lenB * (degBx + 1) > BIVARIATE_MAX_AREA)
+    areaA = (double) lenA * (degAx + 1);
+    areaB = (double) lenB * (degBx + 1);
+
+    if (areaA > BIVARIATE_MAX_AREA || areaB > BIVARIATE_MAX_AREA)
         return 0;
 
     if ((double) degBy * degAx + (double) degAy * degBx + 1.0
             > BIVARIATE_MAX_POINTS)
+        return 0;
+
+    if (areaA > BIVARIATE_FREE_AREA &&
+            areaA > BIVARIATE_MAX_EXPANSION * A->length)
+        return 0;
+
+    if (areaB > BIVARIATE_FREE_AREA &&
+            areaB > BIVARIATE_MAX_EXPANSION * B->length)
+        return 0;
+
+    if (FLINT_MIN(A->length, B->length) < BIVARIATE_MIN_TERMS &&
+            lenA * lenB < BIVARIATE_MIN_AREA)
         return 0;
 
     npoints = degBy * degAx + degAy * degBx + 1;
