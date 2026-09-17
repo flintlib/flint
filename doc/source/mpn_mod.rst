@@ -146,6 +146,8 @@ Basic operations and arithmetic
               int mpn_mod_sqr(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
+              truth_t mpn_mod_is_square(nn_srcptr x, gr_ctx_t ctx)
+              int mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 
     Basic functionality for the ``gr`` method table.
     These methods are interchangeable with their ``gr`` counterparts.
@@ -153,6 +155,14 @@ Basic operations and arithmetic
     ``gr_add(res, x, y, ctx)``.
     The former can be slightly faster as it avoids the indirection of the
     method table lookup.
+
+    :func:`mpn_mod_is_square` and :func:`mpn_mod_sqrt` need a prime modulus,
+    which the context does not establish by itself: unless
+    :func:`gr_ctx_set_is_field` has been used to say so, they return
+    ``T_UNKNOWN`` and ``GR_UNABLE`` respectively, except for 0 and 1. Given a
+    prime modulus, :func:`mpn_mod_is_square` is Euler's criterion and
+    :func:`mpn_mod_sqrt` is Tonelli and Shanks, returning ``GR_DOMAIN`` when
+    the argument is not a square.
 
 Vector functions
 -------------------------------------------------------------------------------
