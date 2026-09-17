@@ -26,8 +26,8 @@
    never carries more than two bits.
 
    Guard limbs: relative errors double per squaring, so the
-   accumulated error is about 2^h (E + h (wn + 3)) ulps of the
-   working precision, with E the reduced call's budget and (wn + 3)
+   accumulated error is about 2^h (E + h (2 wn)) ulps of the
+   working precision, with E the reduced call's budget and 2 wn
    the sqrhigh slack per step; h + lg n + 8 guard BITS cover it, and
    the guard limbs also make the halving shift exact.  With the
    guard in place the amplified component stays below one output

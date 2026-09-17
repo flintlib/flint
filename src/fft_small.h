@@ -394,12 +394,17 @@ typedef struct {
 
     profile_entry_struct profiles[MAX_NPROFILES];
     ulong profiles_size;
+    /* scratch buffer and its reservation state; the contract is with
+       the mpn_ctx_fit_buffer declarations below. reserved_head and
+       reserved_tail are zero when no reservation is live. */
     void* buffer;
-    /* reservation of a stable tail of the scratch buffer (see
-       mpn_ctx_fit_buffer_reserve); zero when none is live */
     ulong reserved_head;
     ulong reserved_tail;
     ulong buffer_alloc;
+    /* secondary scratch, serving requests that exceed the reserved head
+       while a reservation is live; unused otherwise */
+    void* spill;
+    ulong spill_alloc;
 
     /* constants of the two-prime pipeline: inv(p1) mod p2 with 2^-d
        folded in per depth, 2^-d mod p1, and the exact bit size of
@@ -421,13 +426,40 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
+/* The context's scratch buffer.
+
+   mpn_ctx_fit_buffer(R, n) returns at least n bytes of scratch, growing
+   the buffer geometrically when needed. It is one region: a request may
+   reallocate it, invalidating every pointer handed out before, so at
+   most one request is outstanding at a time and a returned pointer is
+   valid only until the next request. Callers never free what they are
+   given. The buffer persists with the context, which is thread-local
+   under get_default_mpn_ctx, so a warm thread pays no allocation.
+
+   mpn_ctx_fit_buffer_reserve(R, head, tail) pins the buffer: it is
+   grown once to hold head + tail bytes, and the returned tail region
+   keeps its address until mpn_ctx_fit_buffer_release. While the
+   reservation is live the buffer can neither grow nor move, so
+   mpn_ctx_fit_buffer serves requests of up to head bytes from the
+   buffer itself and anything larger from a secondary buffer kept in
+   the context under the same contract. Like any growth, reserving
+   invalidates a fit_buffer pointer still outstanding.
+
+   A reservation is meant for a caller that is the only user of
+   fft_small on its thread while it holds one. The gr transformed-mpn
+   ring is such a caller: it reserves at construction, performs only
+   ring operations, and releases at destruction, so in normal use the
+   secondary buffer is never touched. It exists so that an interleaved
+   multiplication -- reference arithmetic in a test, or an external
+   holder of a ring context across unrelated work -- is served
+   correctly rather than aborted; that is a guarantee, not a fast path.
+
+   One reservation at a time: a second requester receives NULL and
+   provides its own storage. A stack of regions would be possible --
+   release would have to be last-in-first-out or carry an ownership
+   token, and no region could grow while any is live -- but no current
+   caller needs it. */
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
-/* Reserve a stable tail region of the scratch buffer: the buffer is
-   grown once to hold head + tail bytes and the returned tail region
-   then stays at a fixed address for as long as the reservation is
-   live, provided every interleaved mpn_ctx_fit_buffer request stays
-   within head bytes - the caller's exclusivity contract, asserted in
-   debug builds. One reservation at a time. */
 void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail);
 void mpn_ctx_fit_buffer_release(mpn_ctx_t R);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
@@ -646,6 +678,12 @@ void fft_small_op_addmul(fft_small_op_t Z, const fft_small_op_t A,
                     const fft_small_op_t B, const fft_small_plan_t P);
 void fft_small_op_submul(fft_small_op_t Z, const fft_small_op_t A,
                     const fft_small_op_t B, const fft_small_plan_t P);
+/* Z +/-= A*A: the B = A cases of the two above, reading one operand
+   stream instead of two */
+void fft_small_op_addsqr(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P);
+void fft_small_op_subsqr(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P);
 void fft_small_op_add(fft_small_op_t Z, const fft_small_op_t A,
                     const fft_small_op_t B, const fft_small_plan_t P);
 void fft_small_op_sub(fft_small_op_t Z, const fft_small_op_t A,

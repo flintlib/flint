@@ -44,9 +44,9 @@ int main()
         flint_mpn_urandomb(a, state, 2 * n1 * FLINT_BITS);
         a[2 * n1 - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
-        mpn_sqrtrem(c, d, a, 2 * n1);
+        flint_mpn_sqrtrem(c, d, a, 2 * n1);
         TIMEIT_START;
-        mpn_sqrtrem(c, d, a, 2 * n1);
+        flint_mpn_sqrtrem(c, d, a, 2 * n1);
         TIMEIT_STOP_VALUES(tt, tmpn);
 
         radix_rand_limbs(a, state, 2 * n2, radix);

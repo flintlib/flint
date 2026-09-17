@@ -33,69 +33,6 @@
 
 #if FLINT_HAVE_FFT_SMALL
 
-static nn_srcptr
-_coeff_limbs(const fmpz * f, ulong * scratch, slong * n, int * sgn)
-{
-    fmpz c = *f;
-
-    if (!COEFF_IS_MPZ(c))
-    {
-        *scratch = FLINT_ABS(c);
-        *n = 1;
-        *sgn = c < 0;
-        return scratch;
-    }
-    else
-    {
-        mpz_srcptr m = COEFF_TO_PTR(c);
-
-        *n = FLINT_ABS(m->_mp_size);
-        *sgn = m->_mp_size < 0;
-        return m->_mp_d;
-    }
-}
-
-static int
-_set_coeff(gr_ptr elem, const fmpz * f, gr_ctx_t ctx)
-{
-    ulong scratch;
-    slong n;
-    int sgn;
-    nn_srcptr p = _coeff_limbs(f, &scratch, &n, &sgn);
-
-    return gr_transformed_mpn_set(elem, p, n, sgn, ctx);
-}
-
-/* the accumulated element, converted out directly into an fmpz */
-/* converts the accumulator out destructively -- the caller re-initializes
-   it (borrowed storage, so that is free) before the next output */
-static int
-_get_coeff(fmpz * f, gr_ptr elem, gr_ctx_t ctx)
-{
-    slong w = gr_transformed_mpn_get_limbs(ctx, elem);
-    slong zl;
-    int sg, status;
-    mpz_ptr m;
-
-    if (w <= 0)
-        w = 1;
-
-    m = _fmpz_promote(f);
-    status = gr_transformed_mpn_get_destructive(FLINT_MPZ_REALLOC(m, w), w,
-                                                &zl, &sg, elem, ctx);
-    if (status != GR_SUCCESS)
-    {
-        _fmpz_demote(f);
-        fmpz_zero(f);
-        return status;
-    }
-
-    m->_mp_size = sg ? -zl : zl;
-    _fmpz_demote_val(f);
-    return GR_SUCCESS;
-}
-
-
 int
 _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
     const fmpzi_struct * poly1, slong len1,
@@ -202,9 +139,9 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
     for (j = 0; j < k && status == GR_SUCCESS; j++)
     {
         const fmpzi_struct * c = (share ? poly1 : poly2) + j;
-        status |= _set_coeff(GR_ENTRY(B, 2 * j, sz),
+        status |= gr_set_fmpz(GR_ENTRY(B, 2 * j, sz),
                              fmpzi_realref(c), ctx);
-        status |= _set_coeff(GR_ENTRY(B, 2 * j + 1, sz),
+        status |= gr_set_fmpz(GR_ENTRY(B, 2 * j + 1, sz),
                              fmpzi_imagref(c), ctx);
     }
 
@@ -222,9 +159,9 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
             gr_ptr _ei = GR_ENTRY(X, 2 * _s + 1, sz); \
             if (xidx[_s] != (t)) \
             { \
-                status |= _set_coeff(_er, \
+                status |= gr_set_fmpz(_er, \
                     fmpzi_realref(poly1 + (t)), ctx); \
-                status |= _set_coeff(_ei, \
+                status |= gr_set_fmpz(_ei, \
                     fmpzi_imagref(poly1 + (t)), ctx); \
                 xidx[_s] = (t); \
             } \
@@ -304,10 +241,8 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
 
         if (status == GR_SUCCESS)
         {
-            status |= _get_coeff(fmpzi_realref(res + i - nlo),
-                                 accR, ctx);
-            status |= _get_coeff(fmpzi_imagref(res + i - nlo),
-                                 accI, ctx);
+            status |= gr_transformed_mpn_get_fmpz_destructive(fmpzi_realref(res + i - nlo), 0, accR, ctx);
+            status |= gr_transformed_mpn_get_fmpz_destructive(fmpzi_imagref(res + i - nlo), 0, accI, ctx);
             /* the destructive gets consumed the accumulators: bring
                them back for the next output; under the fit_buffer
                strategy this is a slab-pool round trip */

@@ -578,6 +578,29 @@ _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
         res[i] = 0;
 }
 
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_gr_nmod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    ulong * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
+}
+
+static int
+_gr_nmod_vec_zero(ulong * res, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+
+    return GR_SUCCESS;
+}
+
 static void
 _gr_nmod_vec_clear(ulong * res, slong len, gr_ctx_t ctx)
 {
@@ -1015,6 +1038,173 @@ _gr_nmod_poly_mulmid(ulong * res,
 }
 
 /* fixme: duplicates _nmod_poly_divrem for error handling */
+/* Division by a precomputed sparse modulus, with the inner loops of
+   _nmod_poly_divrem_try_sparse. Q may be NULL. */
+static int
+_gr_nmod_poly_divrem_preinv(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
+    const gr_poly_preinv_struct * P, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    slong i, j, k, n, nz;
+    const slong * exps;
+    nn_srcptr coeffs;
+    ulong c, lcinv, negcbound;
+    nn_ptr r;
+    TMP_INIT;
+
+    if (P->kind != GR_POLY_PREINV_SPARSE)
+        return gr_generic_poly_divrem_preinv(Q, R, A, lenA, P, ctx);
+
+    n = P->lenf - 1;
+    nz = P->nz;
+    exps = P->exps;
+    coeffs = P->coeffs;
+    lcinv = P->monic ? 1 : *((nn_srcptr) P->lcinv);
+
+    /* all coefficients -1 (i.e. all coefficients of f equal to 1)? */
+    negcbound = 0;
+    for (k = 0; k < nz; k++)
+        negcbound |= (mod.n - coeffs[k]);
+
+    TMP_START;
+    r = TMP_ALLOC(lenA * sizeof(ulong));
+    _nmod_vec_set(r, A, lenA);
+
+    if (mod.n == 2)
+    {
+        for (i = lenA - 1; i >= n; i--)
+        {
+            c = r[i];
+            if (Q != NULL) Q[i - n] = c;
+            for (k = nz - 1; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] ^= c;
+            }
+        }
+    }
+    else if (negcbound == 1 && P->monic)
+    {
+        for (i = lenA - 1; i >= n; i--)
+        {
+            c = r[i];
+            if (Q != NULL) Q[i - n] = c;
+            for (k = nz - 1; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = nmod_sub(r[j + i - n], c, mod);
+            }
+        }
+    }
+    else if (NMOD_BITS(mod) < FLINT_BITS / 2)
+    {
+        ulong ninv = n_barrett_precomp(mod.n);
+
+        for (i = lenA - 1; i >= n; i--)
+        {
+            c = r[i];
+            if (Q != NULL) Q[i - n] = P->monic ? c : nmod_mul(c, lcinv, mod);
+            for (k = nz - 1; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = n_mod_barrett(r[j + i - n] + c * coeffs[k], mod.n, ninv);
+            }
+        }
+    }
+    else
+    {
+        for (i = lenA - 1; i >= n; i--)
+        {
+            c = r[i];
+            if (Q != NULL) Q[i - n] = P->monic ? c : nmod_mul(c, lcinv, mod);
+            for (k = nz - 1; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = nmod_addmul(r[j + i - n], c, coeffs[k], mod);
+            }
+        }
+    }
+
+    _nmod_vec_set(R, r, n);
+    TMP_END;
+
+    return GR_SUCCESS;
+}
+
+/* Long dense moduli use the transformed representation (which needs
+   fft_small). Measured crossover (mulmod, Newton vs transformed) is
+   n ~ 130-190 independently of the modulus size. */
+#if FLINT_HAVE_FFT_SMALL
+#define NMOD_POLY_PREINV_TRANSFORMED_CUTOFF 160
+#else
+#define NMOD_POLY_PREINV_TRANSFORMED_CUTOFF WORD_MAX
+#endif
+
+/* Selection of the representation of a precomputed modulus. The sparse
+   loops above beat Newton division with fft_small multiplication when
+   f has at most about 5 nonzero lower terms (matching the cutoff used
+   by _nmod_poly_divrem_newton_n_preinv), independently of the size of
+   the modulus n. */
+static int
+_gr_nmod_poly_preinv_set(gr_poly_preinv_struct * P, nn_srcptr f, slong lenf, gr_ctx_t ctx)
+{
+    slong i, nz;
+
+    /* schoolbook division beats Newton division with a precomputed
+       inverse up to this length (measured) */
+    if (lenf <= 32)
+        return _gr_poly_preinv_set_plain(P, f, lenf, ctx);
+
+    nz = 0;
+    for (i = 0; i < lenf - 1 && nz <= 5; i++)
+        nz += (f[i] != 0);
+
+    if (nz <= 5)
+        return _gr_poly_preinv_set_sparse(P, f, lenf, ctx);
+
+    /* For tiny moduli the fused multiplication packs two coefficients
+       per transform slot (up to the length where this is possible) while
+       the transformed representation does not, so the latter only wins
+       beyond that: measured crossovers (mulmod, fft_small) are length
+       ~262144 for p <= 3, ~16384 for p in [4, 15], and ~160 for p >= 16. */
+    {
+        ulong bits = NMOD_BITS(NMOD_CTX(ctx));
+        slong cutoff;
+
+        if (bits >= 5)
+            cutoff = NMOD_POLY_PREINV_TRANSFORMED_CUTOFF;
+        else if (bits >= 3)
+            cutoff = 16384;
+        else
+            cutoff = 262144;
+
+        if (lenf >= cutoff && _gr_poly_preinv_set_transformed(P, f, lenf, ctx) == GR_SUCCESS)
+            return GR_SUCCESS;
+    }
+
+    return _gr_poly_preinv_set_newton(P, f, lenf, ctx);
+}
+
+/* gcd with nmod_poly's algorithm selection (Euclid with REDC for short
+   inputs, half-gcd above a modulus-dependent cutoff); the generic
+   fallback handles non-prime moduli */
+static int
+_gr_nmod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) != T_TRUE)
+        return _gr_poly_gcd_generic(G, lenG, A, lenA, B, lenB, ctx);
+
+    *lenG = _nmod_poly_gcd(G, A, lenA, B, lenB, NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_nmod_poly_evaluate(nn_ptr res, nn_srcptr poly, slong len, nn_srcptr x, gr_ctx_t ctx)
+{
+    res[0] = _nmod_poly_evaluate_nmod(poly, len, x[0], NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
                                   nn_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -1318,6 +1508,12 @@ _gr_nmod_roots_gr_poly(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, in
     if (poly->length == 0)
         return GR_DOMAIN;
 
+    /* Prime modulus: use the generic finite field root finder. */
+    if (gr_ctx_is_field(ctx) == T_TRUE)
+        return gr_poly_roots_finite_field(roots, mult, poly, flags, ctx);
+
+    /* Composite modulus: use the fmpz_mod implementation. */
+
     {
         gr_poly_t z_poly;
         gr_vec_t z_roots;
@@ -1482,9 +1678,13 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_nmod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_nmod_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _gr_nmod_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_nmod_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_nmod_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_nmod_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_nmod_vec_zero},
     {GR_METHOD_VEC_NORMALISE,   (gr_funcptr) _gr_nmod_vec_normalise},
     {GR_METHOD_VEC_NORMALISE_WEAK,   (gr_funcptr) _gr_nmod_vec_normalise_weak},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_nmod_vec_neg},
@@ -1511,8 +1711,14 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
                                 (gr_funcptr) (void (*)(void)) _gr_nmod_ctx_init_transformed_poly_repr},
+    {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR,
+                                (gr_funcptr) (void (*)(void)) _gr_nmod_ctx_init_transformed_poly_cyclic_repr},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_nmod_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_nmod_poly_gcd},
+    {GR_METHOD_POLY_EVALUATE,   (gr_funcptr) _gr_nmod_poly_evaluate},
+    {GR_METHOD_POLY_DIVREM_PREINV, (gr_funcptr) _gr_nmod_poly_divrem_preinv},
+    {GR_METHOD_POLY_PREINV_SET, (gr_funcptr) _gr_nmod_poly_preinv_set},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_nmod_poly_divexact},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
     {GR_METHOD_POLY_INV_SERIES_BASECASE, (gr_funcptr) _gr_nmod_poly_inv_series_basecase},
@@ -1522,6 +1728,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
     {GR_METHOD_POLY_EXP_SERIES,  (gr_funcptr) _gr_nmod_poly_exp_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_nmod_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,     (gr_funcptr) _gr_nmod_mat_charpoly},
 

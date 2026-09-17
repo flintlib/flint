@@ -157,6 +157,8 @@ References
 
 .. [GVL1996] \G. H. Golub and C. F. Van Loan, *Matrix Computations*, third edition, Johns Hopkins University Press (1996).
 
+.. [GatSho1992] \J. von zur Gathen and V. Shoup, "Computing Frobenius maps and factoring polynomials", Computational Complexity 2 (1992), 187-224. https://doi.org/10.1007/BF01272074
+
 .. [Gas2018] \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
 
 .. [Gly2010] \D. G. Glynn, "The permanent of a square matrix", European Journal of Combinatorics, Volume 31, Issue 7, October 2010, Pages 1887-1891, https://doi.org/10.1016/j.ejc.2010.01.010
@@ -252,6 +254,8 @@ References
 .. [KL2024] \Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
 
 .. [Knu1997] \Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
+
+.. [KalSho1998] \E. Kaltofen and V. Shoup, "Subquadratic-time factoring of polynomials over finite fields", Mathematics of Computation 67 (1998), 1179-1197. https://doi.org/10.1090/S0025-5718-98-00944-2
 
 .. [Kob2010] \A. Kobel, "Certified Complex Numerical Root Finding", Seminar on Computational Geometry and Geometric Computing (2010), http://www.mpi-inf.mpg.de/departments/d1/teaching/ss10/Seminar_CGGC/Slides/02_Kobel_NRS.pdf
 
@@ -403,10 +407,10 @@ All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_,
 [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
 [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,
 [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_,
-[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
+[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GatSho1992]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
 [HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
 [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_,
-[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
+[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [KalSho1998]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
 [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_,
 [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_,
 [NakTurWil1997]_, [NW1978]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_,

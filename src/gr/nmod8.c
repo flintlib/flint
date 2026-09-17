@@ -16,6 +16,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
 
@@ -351,6 +352,18 @@ _nmod8_vec_init(uint8_t * res, slong len, gr_ctx_t ctx)
 static void
 _nmod8_vec_clear(uint8_t * res, slong len, gr_ctx_t ctx)
 {
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_nmod8_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    uint8_t * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
 }
 
 static int
@@ -902,6 +915,9 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod8_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod8_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod8_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},
@@ -917,6 +933,7 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod8_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod8_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod8_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod8_mat_charpoly},

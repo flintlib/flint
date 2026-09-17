@@ -81,8 +81,7 @@ gr_poly_mulmid(gr_poly_t res, const gr_poly_t poly1,
         status = _gr_poly_mulmid(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, ctx);
     }
 
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 

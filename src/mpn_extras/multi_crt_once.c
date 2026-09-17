@@ -105,7 +105,7 @@ _once_cofactor(nn_ptr r, nn_srcptr R, slong Rn, nn_srcptr d, slong dn, nn_srcptr
     if (Rn > dn || (Rn == dn && mpn_cmp(R, d, dn) >= 0))
     {
         Q = FLINT_ARRAY_ALLOC(Rn - dn + 1, ulong);
-        mpn_tdiv_qr(Q, r, 0, R, Rn, d, dn);
+        _flint_mpn_tdiv_qr(Q, r, R, Rn, d, dn);
         flint_free(Q);
         tn = dn;
         MPN_NORM(r, tn);
@@ -132,7 +132,7 @@ _once_cofactor(nn_ptr r, nn_srcptr R, slong Rn, nn_srcptr d, slong dn, nn_srcptr
     if (un > dn || (un == dn && mpn_cmp(U, d, dn) >= 0))
     {
         Q = FLINT_ARRAY_ALLOC(un - dn + 1, ulong);
-        mpn_tdiv_qr(Q, r, 0, U, un, d, dn);
+        _flint_mpn_tdiv_qr(Q, r, U, un, d, dn);
         flint_free(Q);
         rn = dn;
     }
@@ -187,7 +187,7 @@ _once_leaf(nn_ptr A, nn_ptr v, slong * vn, slong a, slong b, nn_srcptr R, slong 
         MPN_NORM(Mt, Vn);
         flint_mpn_zero(V, cl);
         if (Vn > cl || (Vn == cl && mpn_cmp(Mt, v, cl) >= 0))
-            mpn_tdiv_qr(q, V, 0, Mt, Vn, v, cl);
+            _flint_mpn_tdiv_qr(q, V, Mt, Vn, v, cl);
         else
             flint_mpn_copyi(V, Mt, Vn);
 
@@ -444,7 +444,7 @@ flint_mpn_multi_crt_once(nn_ptr out, slong * outn, nn_ptr prod, nn_srcptr res,
     {
         ulong q[4];
         FLINT_ASSERT(An - vn + 1 <= 4);
-        mpn_tdiv_qr(q, out, 0, A, An, v, vn);
+        _flint_mpn_tdiv_qr(q, out, A, An, v, vn);
     }
 
     if (sign)

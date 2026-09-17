@@ -50,8 +50,7 @@ gr_poly_add(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_
 
     status = _gr_poly_add(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs, poly2->length, ctx);
 
-    _gr_poly_set_length(res, max, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, max, ctx);
 
     return status;
 }

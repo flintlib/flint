@@ -49,7 +49,6 @@ gr_poly_rsqrt_series(gr_poly_t res, const gr_poly_t h, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_rsqrt_series(res->coeffs, h->coeffs, h->length, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }

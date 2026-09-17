@@ -16,6 +16,7 @@
 #include <gmp.h>
 #include "longlong.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -372,9 +373,89 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
     }
     else
     {
+        /* multi-limb divisor: precompute its 2-adic inverse once and do
+           each division as a Hensel division with that inverse */
+        mpz_srcptr mx = COEFF_TO_PTR(c);
+        mp_size_t bn = FLINT_ABS(mx->_mp_size);
+        int xneg = mx->_mp_size < 0;
+        flint_mpn_divexact_preinv_t pre;
         slong i;
+
+        /* the inverse costs about as much as one division, so it only
+           pays off with at least two entries at least as large as x */
+        {
+            slong count = 0;
+            for (i = 0; i < len2 && count < 2; i++)
+                if (COEFF_IS_MPZ(vec2[i]) && FLINT_ABS(COEFF_TO_PTR(vec2[i])->_mp_size) >= bn)
+                    count++;
+
+            if (count < 2)
+            {
+                for (i = 0; i < len2; i++)
+                    fmpz_divexact(vec1 + i, vec2 + i, x);
+                return;
+            }
+        }
+
+        flint_mpn_divexact_preinv_init(pre, mx->_mp_d, bn);
+
         for (i = 0; i < len2; i++)
-            fmpz_divexact(vec1 + i, vec2 + i, x);
+        {
+            fmpz a = vec2[i];
+
+            if (!COEFF_IS_MPZ(a))
+            {
+                /* |a| < |x| and x | a forces a = 0 */
+                fmpz_zero(vec1 + i);
+            }
+            else
+            {
+                mpz_srcptr ma = COEFF_TO_PTR(a);
+                mp_size_t an = FLINT_ABS(ma->_mp_size), qn;
+                int qneg = (ma->_mp_size < 0) ^ xneg;
+                mpz_ptr mq;
+                mp_ptr qd;
+
+                if (an < bn)
+                {
+                    fmpz_zero(vec1 + i);
+                    continue;
+                }
+
+                qn = an - bn + 1;
+
+                if (vec1 + i == vec2 + i)
+                {
+                    /* in place: divide into a temporary limb buffer, then
+                       copy (the pooled mpz keeps its own allocation) */
+                    mp_ptr t;
+                    TMP_INIT;
+                    TMP_START;
+                    t = TMP_ALLOC(qn * sizeof(mp_limb_t));
+                    flint_mpn_divexact_preinv(t, ma->_mp_d, an, pre);
+                    while (qn > 0 && t[qn - 1] == 0)
+                        qn--;
+                    mq = _fmpz_promote(vec1 + i);
+                    qd = FLINT_MPZ_REALLOC(mq, FLINT_MAX(qn, 1));
+                    flint_mpn_copyi(qd, t, qn);
+                    mq->_mp_size = qneg ? -qn : qn;
+                    TMP_END;
+                }
+                else
+                {
+                    mq = _fmpz_promote(vec1 + i);
+                    qd = FLINT_MPZ_REALLOC(mq, qn);
+                    flint_mpn_divexact_preinv(qd, ma->_mp_d, an, pre);
+                    while (qn > 0 && qd[qn - 1] == 0)
+                        qn--;
+                    mq->_mp_size = qneg ? -qn : qn;
+                }
+
+                _fmpz_demote_val(vec1 + i);
+            }
+        }
+
+        flint_mpn_divexact_preinv_clear(pre);
     }
 }
 

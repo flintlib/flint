@@ -316,9 +316,9 @@ _gr_fq_nmod_sqrt(fq_nmod_t res, const fq_nmod_t x, const gr_ctx_t ctx)
 }
 
 static int
-_gr_ctx_fq_nmod_prime(ulong * p, gr_ctx_t ctx)
+_gr_ctx_fq_nmod_prime(fmpz_t p, gr_ctx_t ctx)
 {
-    *p = fq_nmod_ctx_prime(FQ_CTX(ctx));
+    fmpz_set_ui(p, fq_nmod_ctx_prime(FQ_CTX(ctx)));
     return GR_SUCCESS;
 }
 
@@ -581,6 +581,22 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
 }
 
 /* todo: _fq_nmod_poly_mullow should do the right thing */
+/* gcd and xgcd of the fq_nmod_poly module (Euclid or half-gcd with its
+   cutoffs) */
+static int
+_gr_fq_nmod_poly_gcd(fq_nmod_struct * G, slong * lenG, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_nmod_poly_gcd(G, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_poly_xgcd(slong * lenG, fq_nmod_struct * G, fq_nmod_struct * S, fq_nmod_struct * T, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_nmod_poly_xgcd(G, S, T, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fq_nmod_poly_mullow(fq_nmod_struct * res,
     const fq_nmod_struct * poly1, slong len1,
@@ -767,6 +783,10 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_fq_nmod_vec_dot_rev},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_nmod_poly_mullow},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fq_nmod_poly_gcd},
+    {GR_METHOD_POLY_XGCD,       (gr_funcptr) _gr_fq_nmod_poly_xgcd},
+
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_nmod_roots_gr_poly},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_nmod_mat_mul},

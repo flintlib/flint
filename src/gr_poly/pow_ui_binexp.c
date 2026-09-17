@@ -52,16 +52,14 @@ gr_poly_pow_ui_binexp(gr_poly_t res,
         {
             gr_poly_fit_length(res, rlen, ctx);
             status |= _gr_poly_pow_ui_binexp(res->coeffs, poly->coeffs, flen, exp, ctx);
-            _gr_poly_set_length(res, rlen, ctx);
-            _gr_poly_normalise(res, ctx);
+            _gr_poly_set_length_normalise(res, rlen, ctx);
         }
         else
         {
             gr_poly_t t;
             gr_poly_init2(t, rlen, ctx);
             status |= _gr_poly_pow_ui_binexp(t->coeffs, poly->coeffs, flen, exp, ctx);
-            _gr_poly_set_length(t, rlen, ctx);
-            _gr_poly_normalise(t, ctx);
+            _gr_poly_set_length_normalise(t, rlen, ctx);
             gr_poly_swap(res, t, ctx);
             gr_poly_clear(t, ctx);
         }

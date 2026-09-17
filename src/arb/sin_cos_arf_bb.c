@@ -298,7 +298,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     else
         fmpz_mul_2exp(T, T, prec - Qexp[0]);
 
-    arb_fmpz_divapprox(T, T, Q);
+    fmpz_tdiv_q(T, T, Q);
 
     fmpz_mul_2exp(Q, x, prec - r);
     fmpz_add(T, T, Q);

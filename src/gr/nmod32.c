@@ -16,6 +16,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
 
@@ -351,6 +352,18 @@ _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 static void
 _nmod32_vec_clear(uint32_t * res, slong len, gr_ctx_t ctx)
 {
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_nmod32_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    uint32_t * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
 }
 
 static int
@@ -750,9 +763,12 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod32_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
-    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _nmod32_vec_zero},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_set},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
@@ -765,6 +781,7 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod32_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod32_mat_charpoly},

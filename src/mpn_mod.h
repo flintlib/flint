@@ -267,6 +267,7 @@ struct gr_transformed_poly_workload_struct;
 int _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
         slong len_bound, slong terms_bound,
         const struct gr_transformed_poly_workload_struct * workload);
+int _gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const struct gr_transformed_poly_workload_struct * workload);
 
 #ifdef __cplusplus
 }

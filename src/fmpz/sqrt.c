@@ -11,6 +11,7 @@
 
 #include <gmp.h>
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g)
@@ -24,8 +25,20 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g)
         fmpz_set_ui(f, n_sqrt(*g));
     else
     {
-        mpz_ptr mf = _fmpz_promote(f);
-        mpz_sqrt(mf, COEFF_TO_PTR(*g));
+        mpz_srcptr mg = COEFF_TO_PTR(*g);
+        mpz_ptr mf;
+
+        if (mg->_mp_size <= 2)
+        {
+            /* one- or two-limb input: the root fits in a limb */
+            mp_limb_t sd;
+            _flint_mpn_sqrtrem(&sd, NULL, mg->_mp_d, mg->_mp_size);
+            fmpz_set_ui(f, sd);
+            return;
+        }
+
+        mf = _fmpz_promote(f);
+        flint_mpz_sqrt(mf, mg);
         _fmpz_demote_val(f);
     }
 }

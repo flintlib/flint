@@ -262,6 +262,67 @@ static void _point_addmul(const sd_fft_ctx_struct* Q,
         _point_addmul_impl(Q, z, a, b, m_, subtract, depth, 0);
 }
 
+/* z = z +/- a*a*m: _point_addmul over a single load stream, with the
+   by-m-first ordering of _point_sqr for the same range containment */
+FLINT_FORCE_INLINE void _point_addsqr_impl(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, ulong m_, int subtract,
+    ulong depth, int m_is_one)
+{
+    vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    /* flat over the whole transform: below one block the
+       data is simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
+    {
+    double* zx = z;
+    const double* ax = a;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
+            vec8d x0, x1, t0, t1, z0, z1;
+            x0 = vec8d_load(ax+j+0);
+            x1 = vec8d_load(ax+j+8);
+            z0 = vec8d_load(zx+j+0);
+            z1 = vec8d_load(zx+j+8);
+            if (m_is_one)
+            {
+                t0 = vec8d_reduce_to_pm1n(x0, n, ninv);
+                t1 = vec8d_reduce_to_pm1n(x1, n, ninv);
+            }
+            else
+            {
+                t0 = vec8d_mulmod(x0, m, n, ninv);
+                t1 = vec8d_mulmod(x1, m, n, ninv);
+            }
+            x0 = vec8d_mulmod(t0, x0, n, ninv);
+            x1 = vec8d_mulmod(t1, x1, n, ninv);
+            if (subtract)
+            {
+                z0 = vec8d_sub(z0, x0);
+                z1 = vec8d_sub(z1, x1);
+            }
+            else
+            {
+                z0 = vec8d_add(z0, x0);
+                z1 = vec8d_add(z1, x1);
+            }
+            z0 = vec8d_reduce_to_pm1n(z0, n, ninv);
+            z1 = vec8d_reduce_to_pm1n(z1, n, ninv);
+            vec8d_store(zx+j+0, z0);
+            vec8d_store(zx+j+8, z1);
+        } while (j += 16, j < npts);
+    }
+}
+
+static void _point_addsqr(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, ulong m_, int subtract, ulong depth)
+{
+    if (m_ == 1)
+        _point_addsqr_impl(Q, z, a, m_, subtract, depth, 1);
+    else
+        _point_addsqr_impl(Q, z, a, m_, subtract, depth, 0);
+}
+
 /* z = a +/- b, or z = -a for b == NULL */
 static void _point_add(const sd_fft_ctx_struct* Q,
     double* z, const double* a, const double* b, int subtract, ulong depth)
@@ -370,6 +431,37 @@ void fft_small_op_submul(fft_small_op_t Z, const fft_small_op_t A,
         _point_addmul(P->ffts + P->offset + i, Z->data + P->stride*i,
                 A->data + P->stride*i, B->data + P->stride*i,
                 P->m[i], 1, P->depth);
+}
+
+/* Z +/-= A*A. Equivalent to fft_small_op_addmul/submul with B = A and
+   preferable to it: the pointwise pass reads one operand stream instead
+   of two, which matters where it is memory bound. */
+void fft_small_op_addsqr(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P)
+{
+    ulong i;
+
+    FLINT_ASSERT(_op_compatible(A, P) && _op_compatible(Z, P));
+    FLINT_ASSERT(A->domain == FFT_SMALL_OP_PRIMAL);
+    FLINT_ASSERT(Z->domain == FFT_SMALL_OP_PRODUCT);
+
+    for (i = 0; i < P->np; i++)
+        _point_addsqr(P->ffts + P->offset + i, Z->data + P->stride*i,
+                A->data + P->stride*i, P->m[i], 0, P->depth);
+}
+
+void fft_small_op_subsqr(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P)
+{
+    ulong i;
+
+    FLINT_ASSERT(_op_compatible(A, P) && _op_compatible(Z, P));
+    FLINT_ASSERT(A->domain == FFT_SMALL_OP_PRIMAL);
+    FLINT_ASSERT(Z->domain == FFT_SMALL_OP_PRODUCT);
+
+    for (i = 0; i < P->np; i++)
+        _point_addsqr(P->ffts + P->offset + i, Z->data + P->stride*i,
+                A->data + P->stride*i, P->m[i], 1, P->depth);
 }
 
 void fft_small_op_add(fft_small_op_t Z, const fft_small_op_t A,

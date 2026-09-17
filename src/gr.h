@@ -666,12 +666,18 @@ typedef enum
     GR_METHOD_POLY_MULMID,
     GR_METHOD_POLY_HGCD_MAT_MUL,
     GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
+    GR_METHOD_CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR,
     GR_METHOD_SET_GR_POLY,
     GR_METHOD_GET_GR_POLY,
     GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
     GR_METHOD_GET_GR_POLY_WINDOW,
+    GR_METHOD_GET_GR_POLY_WINDOW_DESTRUCTIVE,
     GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
+    GR_METHOD_POLY_SET_LENGTH_NORMALISE,
+    GR_METHOD_POLY_DIVREM_PREINV,
+    GR_METHOD_POLY_PREINV_SET,
+    GR_METHOD_POLY_EVALUATE,
     GR_METHOD_POLY_DIVEXACT,
     GR_METHOD_POLY_GCD,
     GR_METHOD_POLY_XGCD,
@@ -861,6 +867,10 @@ typedef int ((*gr_method_vec_scalar_op_fmpq)(gr_ptr, gr_srcptr, slong, const fmp
 typedef truth_t ((*gr_method_vec_predicate)(gr_srcptr, slong, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_vec_predicate)(gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_factor_op)(gr_ptr, gr_vec_t, fmpz_vec_t, gr_srcptr, int, gr_ctx_ptr));
+typedef void ((*gr_method_poly_set_length_normalise_op)(gr_poly_struct *, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_divrem_preinv_op)(gr_ptr, gr_ptr, gr_srcptr, slong, const gr_poly_preinv_struct *, gr_ctx_ptr));
+typedef int ((*gr_method_poly_preinv_set_op)(gr_poly_preinv_struct *, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_evaluate_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_poly_unary_trunc_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
@@ -896,6 +906,9 @@ typedef gr_transformed_poly_workload_struct gr_transformed_poly_workload_t[1];
 int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
                     slong len_bound, slong terms_bound,
                     const gr_transformed_poly_workload_struct * workload);
+int _gr_nmod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base,
+                    slong * len, slong terms_bound,
+                    const gr_transformed_poly_workload_struct * workload);
 /* windowed conversion out that consumes the element in place of copying
    its transform; the element may only be cleared or fully overwritten
    afterwards */
@@ -907,6 +920,7 @@ int _gr_nmod_tpoly_get_gr_poly_window_destructive(nn_ptr cc, gr_ptr x,
    workload (may be NULL, though implementations will then usually judge
    the switch unprofitable) */
 typedef int ((*gr_method_ctx_init_transformed_poly_repr_op)(gr_ctx_ptr, gr_ctx_ptr, slong, slong, const gr_transformed_poly_workload_struct *));
+typedef int ((*gr_method_ctx_init_transformed_poly_cyclic_repr_op)(gr_ctx_ptr, gr_ctx_ptr, slong *, slong, const gr_transformed_poly_workload_struct *));
 /* conversions between coefficient vectors over the base ring and elements
    of a transformed polynomial ring */
 typedef int ((*gr_method_set_gr_poly_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr, gr_ctx_ptr));
@@ -915,6 +929,7 @@ typedef int ((*gr_method_get_gr_poly_destructive_op)(gr_ptr, slong *, gr_ptr, gr
 /* windowed conversion out: writes the coefficients [zl, zh) of the
    represented polynomial (zeros beyond its length) */
 typedef int ((*gr_method_get_gr_poly_window_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_get_gr_poly_window_destructive_op)(gr_ptr, gr_ptr, slong, slong, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc2_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_gcd_op)(gr_ptr, slong *, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
@@ -1017,14 +1032,20 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_FACTOR_OP(ctx, NAME) (((gr_method_factor_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_UNARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_unary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_SET_LENGTH_NORMALISE_OP(ctx, NAME) (((gr_method_poly_set_length_normalise_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_DIVREM_PREINV_OP(ctx, NAME) (((gr_method_poly_divrem_preinv_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_PREINV_SET_OP(ctx, NAME) (((gr_method_poly_preinv_set_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_EVALUATE_OP(ctx, NAME) (((gr_method_poly_evaluate_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_HGCD_MAT_MUL_OP(ctx, NAME) (((gr_method_poly_hgcd_mat_mul_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(ctx, NAME) (((gr_method_ctx_init_transformed_poly_repr_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR_OP(ctx, NAME) (((gr_method_ctx_init_transformed_poly_cyclic_repr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SET_GR_POLY_OP(ctx, NAME) (((gr_method_set_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_GET_GR_POLY_OP(ctx, NAME) (((gr_method_get_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_GET_GR_POLY_DESTRUCTIVE_OP(ctx, NAME) (((gr_method_get_gr_poly_destructive_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_GET_GR_POLY_WINDOW_OP(ctx, NAME) (((gr_method_get_gr_poly_window_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_WINDOW_DESTRUCTIVE_OP(ctx, NAME) (((gr_method_get_gr_poly_window_destructive_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -1281,6 +1302,9 @@ GR_INLINE WARN_UNUSED_RESULT int gr_big_o_base_fmpz(gr_ptr res, gr_srcptr base, 
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
+
+/* Length (of the modulus) up to which modular reductions with a precomputed inverse
+   fall back to plain division. Returns 0 (never) unless overloaded by the ring. */
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_order(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_ORDER)(res, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, FQ_FROBENIUS)(res, x, e, ctx); }
@@ -1486,6 +1510,15 @@ void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
    sign bit; mixed-sign accumulations switch the pointwise additions and
    subtractions, and the sign of a mixed result is resolved at conversion
    out. Conversions in and out are by limb arrays with an explicit sign;
+   A conversion out needs gr_transformed_mpn_get_limbs limbs of window
+   to reconstruct into, a few more than the value itself occupies; a
+   caller supplying at least that many gets the reconstruction written
+   straight into its own buffer. A shorter window is accepted and the
+   ring stages the conversion internally, at the cost of a copy of the
+   result, succeeding whenever the value fits and returning GR_DOMAIN
+   otherwise, as an undersized window always has -- but for the
+   destructive forms that refusal arrives with the element already
+   consumed, so it cannot be retried.
    gr_transformed_mpn_get_trunc returns the limbs of the value starting
    at a given position, with an error against the exact value within
    (-1.5, +0.5) ulp of the lowest returned limb -- equivalently, at most
@@ -1496,15 +1529,34 @@ void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
    (under half an ulp either way). */
 /* Operand allocation strategies for the transformed ring: plain
    aligned allocation per element, or a pool of num_live slabs in a
-   stable reserved tail of the thread's fft_small scratch buffer.
-   The latter costs no allocation once the thread's buffer is warm
-   and shares its memory with the fft scratch, but requires the
-   caller to be the exclusive user of the thread's fft_small context
-   until the ring context is destroyed (no interleaved fft_small
-   operations outside this ring); elements past num_live fall back
-   to plain allocation. */
+   reserved tail of the thread's fft_small scratch buffer, which costs
+   no allocation once the thread's buffer is warm. Elements past
+   num_live fall back to plain allocation.
+
+   The reservation is designed for a context that is the only user of
+   fft_small on its thread while it lives -- reserve, do ring
+   operations, release -- which is how every library caller uses it.
+   It is a design assumption, not a requirement: fft_small serves an
+   interleaved multiplication from a secondary buffer while a
+   reservation is live (see mpn_ctx_fit_buffer in fft_small.h), so a
+   context held across unrelated work, or test code checking ring
+   results against fmpz arithmetic, stays correct at the cost of that
+   buffer. One reservation exists per thread; a context constructed
+   while another holds it silently uses plain allocation instead. */
+/* Conversions out whose window is too short to hold the reconstruction
+   (which exceeds the value by the top CRT coefficient's length) are
+   staged inside the ring rather than by the caller. The staging is a
+   fraction of one element and rides in the slab reservation; a caller
+   that will always have an element dead by conversion time can pass
+   GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB, OR-ed into alloc_strategy, and
+   the ring takes a free slab instead of reserving anything. The flag
+   is a footprint declaration, not a correctness contract: if no slab
+   is free the ring falls back to an allocation cached for the
+   context's lifetime. One conversion may be in flight at a time. */
 #define GR_TRANSFORMED_MPN_ALLOC_MALLOC 0
 #define GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER 1
+#define GR_TRANSFORMED_MPN_ALLOC_STRATEGY_MASK 1
+#define GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB 2
 
 int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
                     slong terms_bound, int is_signed, slong num_live,
@@ -1513,6 +1565,8 @@ int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
                     gr_ctx_t ctx);
 int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
                     gr_srcptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs,
+                                        gr_ptr x, gr_ctx_t ctx);
 int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
                     int * sign, gr_ptr x, gr_ctx_t ctx);
 int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn,
