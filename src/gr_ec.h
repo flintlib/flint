@@ -195,6 +195,14 @@ WARN_UNUSED_RESULT int gr_ec_ctx_psi2_sqr(gr_poly_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_division_poly(gr_poly_t res, ulong n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_division_poly_vec(gr_poly_struct * res, slong len, gr_ec_ctx_t ctx);
 
+/* Point counting */
+
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_bsgs(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx);
+
 /*
     Projective points
 */

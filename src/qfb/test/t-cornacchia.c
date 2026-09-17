@@ -13,9 +13,9 @@
 #include <math.h>
 #include "test_helpers.h"
 #include "fmpz.h"
-#include "ecpp.h"
+#include "qfb.h"
 
-TEST_FUNCTION_START(ecpp_cornacchia, state)
+TEST_FUNCTION_START(qfb_cornacchia, state)
 {
     slong iter;
 
@@ -42,7 +42,7 @@ TEST_FUNCTION_START(ecpp_cornacchia, state)
         if (!fmpz_sqrtmod(sqrtD, D, n))
             flint_abort();
 
-        r = ecpp_cornacchia(t, v, n, Dv, sqrtD);
+        r = qfb_cornacchia(t, v, n, Dv, sqrtD);
 
         if (r)
         {

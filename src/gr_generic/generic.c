@@ -149,6 +149,28 @@ gr_ptr gr_generic_ctx_base(gr_ctx_t ctx)
     return NULL;
 }
 
+/*
+    An infinite structure has no cardinality as an integer, which is a
+    GR_DOMAIN answer rather than a GR_UNABLE one. Otherwise, every finite
+    ring in the library already knows its own size through fq_order, which
+    for Z/n is n and for a finite field is q; so that is the answer unless
+    the structure overrides this with something of its own, as the group of
+    points of an elliptic curve does.
+*/
+int
+gr_generic_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+{
+    truth_t finite = gr_ctx_is_finite(ctx);
+
+    if (finite == T_FALSE)
+        return GR_DOMAIN;
+
+    if (finite == T_UNKNOWN)
+        return GR_UNABLE;
+
+    return gr_ctx_fq_order(res, ctx);
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -2841,6 +2863,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_0},
     {GR_METHOD_CTX_BASE,                (gr_funcptr) gr_generic_ctx_base},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ,    (gr_funcptr) gr_generic_ctx_cardinality_fmpz},
 
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},

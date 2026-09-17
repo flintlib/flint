@@ -104,7 +104,8 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_CTX_IS_FINITE,       (gr_funcptr) _gr_ec_ctx_is_finite}, \
     {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact}, \
     {GR_METHOD_CTX_IS_THREADSAFE,   (gr_funcptr) _gr_ec_ctx_is_threadsafe}, \
-    {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base},
+    {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base}, \
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) gr_ec_ctx_cardinality},
 
 /*
     Undefined on a curve, as opposed to merely unimplemented: there is no

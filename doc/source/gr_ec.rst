@@ -543,6 +543,105 @@ residue characteristic 2 and 3.
     *len* initialized entries. Use this rather than *len* separate calls to
     `gr_ec_ctx_division_poly` when a whole range is wanted.
 
+Point counting
+-------------------------------------------------------------------------------
+
+For a curve over a finite field `\mathbb{F}_q`, `\#E(\mathbb{F}_q) = q + 1 - t`
+with `|t| \le 2\sqrt{q}` (Hasse). These functions compute that number; the
+curve is a *gr* domain, so :func:`gr_ctx_cardinality_fmpz` applied to it is
+the same thing as :func:`gr_ec_ctx_cardinality`.
+
+All of them return ``GR_DOMAIN`` if the base ring is not a field. Note that
+neither *fmpz_mod* nor *mpn_mod* establishes primality by itself, so for a
+large prime modulus the caller has to say so with :func:`gr_ctx_set_is_field`
+before any of this will run.
+
+.. function:: int gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\#E(\mathbb{F}_q)`, choosing an algorithm.
+
+    Over a very small field it walks the field, as that is both the quickest
+    thing and free of randomness. It then tries
+    :func:`gr_ec_ctx_cardinality_cm`, which costs a `j`-invariant comparison
+    and declines at once unless the curve is one it recognises. Failing that
+    it prefers baby-step giant-step below `2^{80}` and Schoof above it, which
+    is roughly where those two cross over in practice, and falls back to the
+    other -- and finally to the walk, while that is still affordable -- if
+    the first cannot deliver.
+
+.. function:: int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\#E(\mathbb{F}_p)` for a curve with complex
+    multiplication by an order of class number one, or for a supersingular
+    curve. Returns ``GR_UNABLE`` for any other curve, and for a base field
+    that is not prime.
+
+    For the thirteen discriminants `D` with class number one the Hilbert
+    class polynomial `H_D` is linear, so `j(E) = j_D` is exactly the
+    statement that `E` has complex multiplication by the order of
+    discriminant `D`. Then `4p = t^2 + |D| v^2` has a solution whenever `D`
+    is a square modulo `p`, which :func:`qfb_cornacchia` finds, and the trace
+    of `E` is among the traces of the twists that solution gives: `\pm t` in
+    general, also `\pm 2v` for `j = 1728` (quartic twists) and
+    `\pm (t \pm 3v)/2` for `j = 0` (sextic twists). When `D` is not a square
+    modulo `p` the reduction is supersingular, and `t = 0`.
+
+    Which of the candidate traces belongs to this particular twist is settled
+    by elimination: the true order of the group kills every point of it, so
+    it survives every test, and if exactly one candidate survives a few
+    random points then it is the right one. That argument needs no
+    factorisation, which matters because the candidates are the size of `p`,
+    but it does need a random point -- so on a base ring without
+    :func:`gr_sqrt`, such as *mpn_mod*, only the cases with a single
+    candidate (the supersingular ones) can be settled, and the rest is handed
+    on to a general algorithm.
+
+.. function:: int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Counts by walking over every `x \in \mathbb{F}_q` and counting the roots
+    in `y`, in `O(q)` operations in the base ring. The reference
+    implementation: it is the only one of the three that never touches the
+    group law. Away from characteristic 2 it counts the roots from the
+    quadratic character of the discriminant, and in characteristic 2 from
+    the absolute trace, so it is correct for every model and every
+    characteristic.
+
+    Returns ``GR_UNABLE`` if `q` is too large to walk over, and needs
+    :func:`gr_is_square` in the base ring away from characteristic 2.
+
+.. function:: int gr_ec_ctx_cardinality_bsgs(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Shanks and Mestre: for a random point `P`, a multiple of its order
+    inside the Hasse interval is found by baby-step giant-step in
+    `O(q^{1/4})` group operations, the exact order of `P` is taken from it
+    by factoring, and points are drawn until only one multiple of the
+    accumulated lcm is left in the interval.
+
+    Returns ``GR_UNABLE`` when the order cannot be pinned down this way,
+    which happens over a field small enough that the Hasse interval is wide
+    relative to the group exponent. Needs a random point, and so
+    :func:`gr_sqrt` in the base ring.
+
+.. function:: int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Schoof's algorithm, polynomial in `\log q`: `t \bmod \ell` is read off
+    the action of Frobenius on the `\ell`-torsion, working in
+    `\mathbb{F}_q[x]/(\psi_\ell)` where a point is written `(u, v y)`, and
+    enough small `\ell` are used for the Chinese remainder theorem to
+    determine `t`.
+
+    This is a deliberately simple version: it handles the short Weierstrass
+    model in residue characteristic above 3, returning ``GR_DOMAIN``
+    otherwise. Because `\psi_\ell` need not be irreducible, an inversion can
+    fail; the failed extended gcd yields a proper factor of `\psi_\ell`, and
+    since the Frobenius relation still holds modulo that factor, the
+    computation simply restarts with it. Recognising such a factor as a
+    kernel polynomial is what turns Schoof into SEA, which is not attempted
+    here.
+
+    Unlike the other two, this needs no square roots in the base ring, so it
+    is currently the only one of the three that runs over *mpn_mod*.
+
 Projective points: memory management
 -------------------------------------------------------------------------------
 

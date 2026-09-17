@@ -140,6 +140,7 @@ typedef enum
     GR_METHOD_CTX_GEN_NAME,
 
     GR_METHOD_CTX_BASE,
+    GR_METHOD_CTX_CARDINALITY_FMPZ,
 
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
@@ -1299,6 +1300,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR
 GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_big_o_base_fmpz(gr_ptr res, gr_srcptr base, const fmpz_t exp, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, BIG_O_BASE_FMPZ)(res, base, exp, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_CARDINALITY_FMPZ)(res, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
