@@ -543,6 +543,80 @@ gr_test_get_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 static int
+gr_test_is_integer(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    truth_t is_integer;
+    gr_ptr x;
+    fmpz_t a;
+
+    GR_TMP_INIT(x, R);
+    fmpz_init(a);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+    status = gr_get_fmpz(a, x, R);
+    is_integer = gr_is_integer(x, R);
+
+    if ((status == GR_SUCCESS && is_integer == T_FALSE) ||
+        ((status & GR_DOMAIN) && is_integer == T_TRUE))
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("is_integer\n");
+        gr_ctx_println(R);
+        flint_printf("x = "); gr_println(x, R);
+        flint_printf("status = %d, is_integer = %{truth}\n", status, is_integer);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR(x, R);
+    fmpz_clear(a);
+
+    return status;
+}
+
+static int
+gr_test_is_rational(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    truth_t is_rational;
+    gr_ptr x;
+    fmpq_t a;
+
+    GR_TMP_INIT(x, R);
+    fmpq_init(a);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+    status = gr_get_fmpq(a, x, R);
+    is_rational = gr_is_rational(x, R);
+
+    if ((status == GR_SUCCESS && is_rational == T_FALSE) ||
+        ((status & GR_DOMAIN) && is_rational == T_TRUE))
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("is_rational\n");
+        gr_ctx_println(R);
+        flint_printf("x = "); gr_println(x, R);
+        flint_printf("status = %d, is_rational = %{truth}\n", status, is_rational);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR(x, R);
+    fmpq_clear(a);
+
+    return status;
+}
+
+static int
 gr_test_get_fmpz_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -4957,6 +5031,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "get_si", gr_test_get_si, iters, test_flags);
     gr_test_iter(R, state, "get_fmpz", gr_test_get_fmpz, iters, test_flags);
     gr_test_iter(R, state, "get_fmpq", gr_test_get_fmpq, iters, test_flags);
+    gr_test_iter(R, state, "is_integer", gr_test_is_integer, iters, test_flags);
+    gr_test_iter(R, state, "is_rational", gr_test_is_rational, iters, test_flags);
     gr_test_iter(R, state, "get_fmpz_2exp_fmpz", gr_test_get_fmpz_2exp_fmpz, iters, test_flags);
 
     gr_test_iter(R, state, "get_set_d", gr_test_get_set_d, iters, test_flags);

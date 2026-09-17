@@ -125,6 +125,12 @@ _gr_debug_ctx_is_threadsafe(gr_ctx_t ctx)
     return gr_ctx_is_threadsafe(GR_DEBUG_ELEM_CTX(ctx));
 }
 
+static truth_t
+_gr_debug_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_DEBUG_ELEM_CTX(ctx));
+}
+
 static void
 _gr_debug_init(gr_ptr x, gr_ctx_t ctx)
 {
@@ -395,6 +401,18 @@ _gr_debug_is_one(gr_srcptr x, gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_debug_is_integer(gr_srcptr x, gr_ctx_t ctx)
+{
+    DEBUG_UNARY_PREDICATE(gr_is_integer)
+}
+
+static truth_t
+_gr_debug_is_rational(gr_srcptr x, gr_ctx_t ctx)
+{
+    DEBUG_UNARY_PREDICATE(gr_is_rational)
+}
+
+static truth_t
 _gr_debug_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     DEBUG_BINARY_PREDICATE(gr_equal)
@@ -479,6 +497,7 @@ gr_method_tab_input _gr_debug_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_THREADSAFE,  (gr_funcptr) _gr_debug_ctx_is_threadsafe},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) _gr_debug_ctx_is_finite_characteristic},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_debug_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_debug_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_debug_swap},
@@ -490,6 +509,8 @@ gr_method_tab_input _gr_debug_methods_input[] =
     {GR_METHOD_ONE,             (gr_funcptr) _gr_debug_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_debug_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_debug_is_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_debug_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_debug_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_debug_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_debug_set},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_debug_neg},
@@ -529,4 +550,3 @@ gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable_prob
         _gr_debug_methods_initialized = 1;
     }
 }
-

@@ -347,6 +347,18 @@ _gr_acf_is_neg_one(const acf_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_acf_is_integer(const acf_t x, const gr_ctx_t ctx)
+{
+    return (arf_is_int(acf_realref(x)) && arf_is_zero(acf_imagref(x))) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
+_gr_acf_is_rational(const acf_t x, const gr_ctx_t ctx)
+{
+    return (arf_is_finite(acf_realref(x)) && arf_is_zero(acf_imagref(x))) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
 _gr_acf_equal(const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(acf_realref(x)) || arf_is_nan(acf_imagref(x)) ||
@@ -1341,6 +1353,8 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_acf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_acf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_acf_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_acf_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_acf_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_acf_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_acf_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_acf_set_si},

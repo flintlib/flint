@@ -811,8 +811,9 @@ radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix)
     if (an == 1)
     {
         ulong s0 = n_sqrt(a[0]);
+        int exact = s0 * s0 == a[0];
         s[0] = s0;
-        return s0 * s0 == a[0];
+        return exact;
     }
 
     sn = (an + 1) / 2;

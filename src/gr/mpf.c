@@ -254,6 +254,16 @@ static truth_t _gr_mpf_is_neg_one(const mpf_t x, gr_ctx_t ctx)
     return (mpf_cmp_si(x, -1) == 0) ? T_TRUE : T_FALSE;
 }
 
+static truth_t _gr_mpf_is_integer(const mpf_t x, gr_ctx_t ctx)
+{
+    return mpf_integer_p(x) ? T_TRUE : T_FALSE;
+}
+
+static truth_t _gr_mpf_is_rational(const mpf_t x, gr_ctx_t ctx)
+{
+    return T_TRUE;
+}
+
 static int _gr_mpf_neg(mpf_t res, const mpf_t x, gr_ctx_t ctx)
 {
     mpf_neg(res, x);
@@ -371,6 +381,7 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_mpf_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _gr_mpf_ctx_set_real_prec},
@@ -387,6 +398,8 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_mpf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_mpf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_mpf_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_mpf_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_mpf_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_mpf_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_mpf_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_mpf_set_si},
@@ -429,4 +442,3 @@ gr_ctx_init_mpf(gr_ctx_t ctx, slong prec)
         _gr_mpf_methods_initialized = 1;
     }
 }
-

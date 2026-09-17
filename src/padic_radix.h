@@ -113,6 +113,8 @@ truth_t padic_radix_is_square(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_zero(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_one(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_neg_one(const padic_radix_t x, gr_ctx_t ctx);
+truth_t padic_radix_is_integer(const padic_radix_t x, gr_ctx_t ctx);
+truth_t padic_radix_is_rational(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_invertible(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_equal(const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx);
 

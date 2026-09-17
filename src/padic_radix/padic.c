@@ -524,6 +524,11 @@ padic_radix_get_fmpz(fmpz_t res, const padic_radix_t x, gr_ctx_t ctx)
     if (x->v > ctx->size_limit)
         return GR_UNABLE;
 
+#if FLINT_BITS >= 64
+    if (x->v >= ((slong) 1 << 32))
+        return GR_UNABLE;
+#endif
+
     radix_integer_get_fmpz(res, &x->u, radix);
 
     if (x->v != 0)
@@ -1770,6 +1775,24 @@ padic_radix_is_neg_one(const padic_radix_t x, gr_ctx_t ctx)
 }
 
 truth_t
+padic_radix_is_integer(const padic_radix_t x, gr_ctx_t ctx)
+{
+    if (x->u.size != 0 && x->v < 0)
+        return T_FALSE;
+
+    if (x->N != PADIC_RADIX_EXACT)
+        return T_UNKNOWN;
+
+    return T_TRUE;
+}
+
+truth_t
+padic_radix_is_rational(const padic_radix_t x, gr_ctx_t ctx)
+{
+    return x->N == PADIC_RADIX_EXACT ? T_TRUE : T_UNKNOWN;
+}
+
+truth_t
 padic_radix_equal(const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx)
 {
     radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
@@ -2001,6 +2024,8 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) padic_radix_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) padic_radix_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) padic_radix_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) padic_radix_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) padic_radix_is_rational},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) padic_radix_is_invertible},
     {GR_METHOD_EQUAL,           (gr_funcptr) padic_radix_equal},
     {GR_METHOD_SET,             (gr_funcptr) padic_radix_set},
@@ -2074,7 +2099,7 @@ gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec
 {
     ulong p = n_randtest_prime(state, 0);
     slong prec_abs, prec_rel;
-    int flags = 0;
+    int flags = 0, status;
 
     if (n_randint(state, 2))
         flags |= PADIC_RADIX_SIGNED;
@@ -2102,11 +2127,11 @@ gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec
     if (n_randint(state, 2))
         flags |= PADIC_RADIX_TEST_LIMITS;
 
+    status = gr_ctx_init_padic_radix(ctx, p, prec_rel, prec_abs, flags);
+
     /* allow e.g. get_fmpz roundtrip to return unable for huge test values */
     if (flags & PADIC_RADIX_TEST_LIMITS)
         ctx->size_limit = (1 << 16);
 
-    return gr_ctx_init_padic_radix(ctx, p, prec_rel, prec_abs, flags);
+    return status;
 }
-
-

@@ -140,6 +140,12 @@ polynomial_ctx_is_threadsafe(gr_ctx_t ctx)
     return gr_ctx_is_threadsafe(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+static truth_t
+polynomial_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
 
 static void
 polynomial_clear(gr_poly_t res, gr_ctx_t ctx)
@@ -429,6 +435,46 @@ static truth_t
 polynomial_is_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return gr_poly_is_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+static truth_t
+polynomial_is_integer(const gr_poly_t poly, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    truth_t is_scalar;
+
+    is_scalar = gr_poly_is_scalar(poly, cctx);
+
+    if (is_scalar == T_FALSE)
+        return T_FALSE;
+
+    if (gr_ctx_is_finite_characteristic(cctx) != T_FALSE)
+        return T_UNKNOWN;
+
+    if (poly->length == 0)
+        return T_TRUE;
+
+    return truth_and(is_scalar, gr_is_integer(poly->coeffs, cctx));
+}
+
+static truth_t
+polynomial_is_rational(const gr_poly_t poly, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    truth_t is_scalar;
+
+    is_scalar = gr_poly_is_scalar(poly, cctx);
+
+    if (is_scalar == T_FALSE)
+        return T_FALSE;
+
+    if (gr_ctx_is_finite_characteristic(cctx) != T_FALSE)
+        return T_UNKNOWN;
+
+    if (poly->length == 0)
+        return T_TRUE;
+
+    return truth_and(is_scalar, gr_is_rational(poly->coeffs, cctx));
 }
 
 /*
@@ -804,6 +850,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) polynomial_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
@@ -826,6 +873,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_BIG_O_BASE_FMPZ,   (gr_funcptr) polynomial_big_o_base_fmpz},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},
+    {GR_METHOD_IS_INTEGER,  (gr_funcptr) polynomial_is_integer},
+    {GR_METHOD_IS_RATIONAL, (gr_funcptr) polynomial_is_rational},
 /*
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) polynomial_is_neg_one},
 */

@@ -28,7 +28,7 @@ test_chebyshev_fmpz_rec1(flint_rand_t state)
     fmpz_init(n1);
     fmpz_init(n2);
 
-    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite(ctx) == T_TRUE)
         fmpz_randtest(n, state, 100);
     else
         fmpz_randtest(n, state, 5);

@@ -159,6 +159,47 @@ gr_ore_poly_is_one(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 }
 
 truth_t
+gr_ore_poly_is_scalar(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
+{
+    return gr_poly_is_scalar((const gr_poly_struct *) poly, GR_ORE_POLY_ELEM_CTX(ctx));
+}
+
+static truth_t
+_gr_ore_poly_is_integer_or_rational(const gr_ore_poly_t poly,
+                                    gr_ore_poly_ctx_t ctx, int rational)
+{
+    gr_ctx_struct * cctx = GR_ORE_POLY_ELEM_CTX(ctx);
+    truth_t is_scalar;
+
+    is_scalar = gr_ore_poly_is_scalar(poly, ctx);
+
+    if (is_scalar == T_FALSE)
+        return T_FALSE;
+
+    if (gr_ctx_is_finite_characteristic(cctx) != T_FALSE)
+        return T_UNKNOWN;
+
+    if (poly->length == 0)
+        return T_TRUE;
+
+    return truth_and(is_scalar,
+        rational ? gr_is_rational(poly->coeffs, cctx) :
+                   gr_is_integer(poly->coeffs, cctx));
+}
+
+truth_t
+gr_ore_poly_is_integer(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
+{
+    return _gr_ore_poly_is_integer_or_rational(poly, ctx, 0);
+}
+
+truth_t
+gr_ore_poly_is_rational(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
+{
+    return _gr_ore_poly_is_integer_or_rational(poly, ctx, 1);
+}
+
+truth_t
 gr_ore_poly_is_gen(const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 {
     return gr_poly_is_gen((const gr_poly_struct *) poly, GR_ORE_POLY_ELEM_CTX(ctx));

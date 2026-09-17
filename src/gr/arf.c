@@ -353,6 +353,18 @@ _gr_arf_is_neg_one(const arf_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_arf_is_integer(const arf_t x, const gr_ctx_t ctx)
+{
+    return arf_is_int(x) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
+_gr_arf_is_rational(const arf_t x, const gr_ctx_t ctx)
+{
+    return arf_is_finite(x) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
 _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(x) || arf_is_nan(y))
@@ -1368,6 +1380,8 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_arf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_arf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_arf_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_arf_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_arf_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_arf_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_arf_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_arf_set_si},

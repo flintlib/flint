@@ -1997,6 +1997,16 @@ static int _gr_radix_integer_get_fmpz(fmpz_t res, const radix_integer_t x, gr_ct
     return GR_SUCCESS;
 }
 
+static truth_t _gr_radix_integer_is_integer(const radix_integer_t x, gr_ctx_t ctx)
+{
+    return T_TRUE;
+}
+
+static truth_t _gr_radix_integer_is_rational(const radix_integer_t x, gr_ctx_t ctx)
+{
+    return T_TRUE;
+}
+
 static int _gr_radix_integer_get_ui(ulong * res, const radix_integer_t x, gr_ctx_t ctx)
 {
     if (x->size < 0)
@@ -2211,6 +2221,8 @@ gr_method_tab_input _gr_radix_integer_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_radix_integer_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_radix_integer_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_radix_integer_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_radix_integer_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_radix_integer_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_radix_integer_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_radix_integer_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_radix_integer_set_si},

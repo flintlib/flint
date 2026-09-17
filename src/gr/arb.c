@@ -430,6 +430,24 @@ _gr_arb_is_neg_one(const arb_t x, const gr_ctx_t ctx)
 }
 
 static truth_t
+_gr_arb_is_integer(const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_int(x))
+        return T_TRUE;
+
+    return arb_contains_int(x) ? T_UNKNOWN : T_FALSE;
+}
+
+static truth_t
+_gr_arb_is_rational(const arb_t x, const gr_ctx_t ctx)
+{
+    if (!arb_is_exact(x))
+        return T_UNKNOWN;
+
+    return arb_is_finite(x) ? T_TRUE : T_FALSE;
+}
+
+static truth_t
 _gr_arb_equal(const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if (arb_is_exact(x) && arb_equal(x, y))
@@ -1725,6 +1743,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_arb_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_arb_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_arb_is_neg_one},
+    {GR_METHOD_IS_INTEGER,      (gr_funcptr) _gr_arb_is_integer},
+    {GR_METHOD_IS_RATIONAL,     (gr_funcptr) _gr_arb_is_rational},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_arb_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_arb_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_arb_set_si},
