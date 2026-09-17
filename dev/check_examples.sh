@@ -237,7 +237,21 @@ then
     echo "lvalue....SKIPPED"
 elif test "$1" = "machin";
 then
-    echo "machin....SKIPPED"
+    echo -n "machin...."
+    res=$($2/machin 5 2>/dev/null)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo $res | perl -0ne 'if (/A FORMULA IS WRONG/) { $bad=1 } END { exit !!$bad }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 elif test "$1" = "mfcoefs";
 then
     echo -n "mfcoefs...."
