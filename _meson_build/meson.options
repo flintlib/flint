@@ -1,0 +1,42 @@
+option('tests', type : 'feature', value : 'auto',
+        description: 'Configure tests; enabled also builds them by default')
+option('libtool_lock', type : 'feature', value : 'enabled',
+        description: 'Use libtool lock')
+option('pthread', type : 'feature', value : 'enabled',
+        description: 'Use pthread')
+option('reentrant', type : 'feature', value : 'disabled',
+        description: 'Build the reentrant module')
+option('thread_safe', type : 'feature', value : 'enabled',
+        description: 'Build the threadsafe module')
+option('abi', type : 'combo', choices : ['auto', '32', '64'], value : 'auto',
+        description: 'Target ABI')
+option('assert', type : 'feature', value : 'disabled',
+        description: 'Enable assertions')
+option('pretty_tests', type : 'feature', value : 'enabled',
+        description: 'Pretty print test output')
+option('gmp_internals', type : 'feature', value : 'auto',
+        description: 'Use GMP internals')
+option('assembly', type : 'feature', value : 'auto',
+        description: 'Use assembly code')
+option('avx2', type : 'feature', value : 'disabled',
+        description: 'Use AVX2 instructions')
+option('avx512', type : 'feature', value : 'disabled',
+        description: 'Use AVX512 instructions')
+option('fft_small', type : 'feature', value : 'auto',
+        description: 'Build the fft_small module')
+option('blas', type : 'feature', value : 'disabled',
+        description: 'Use BLAS')
+option('gc', type : 'feature', value : 'disabled',
+        description: 'Use the Boehm garbage collector')
+option('ntl', type : 'feature', value : 'disabled',
+        description: 'Use NTL (in tests)')
+# Autotools options covered by Meson built-ins:
+# coverage: -Db_coverage=true
+# debug: -Ddebug=true or -Dbuildtype=debug
+# with-pic: -Db_staticpic=true/false
+# with-sysroot: machine-file sys_root or compiler/pkg-config environment
+# with-gnu-ld: linker selection via compiler/native/cross file
+# dependency_tracking: handled by Meson/Ninja
+#
+# Not currently mirrored:
+# with-aix-soname
