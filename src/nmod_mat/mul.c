@@ -16,6 +16,8 @@
 #include "thread_support.h"
 
 #include "longlong.h"
+#include "flint-mparam.h"
+#include "nmod_mat/impl.h"
 
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
@@ -41,6 +43,89 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     slong flint_num_threads = flint_get_num_threads();
+
+    /*
+        Moduli up to 2^52: integer SIMD kernels with delayed reduction,
+        nmod_mat_mul_u32 (any 64-bit target, moduli below 2^32) and
+        nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52). The parameters
+        come from flint-mparam.h and were measured with
+        src/nmod_mat/profile/p-mul_tune.c; the picture on the machines
+        measured so far (Ice Lake, Meteor Lake, Zen 4, Apple M4) is:
+
+        - Where nmod_mat_mul_blas needs several dgemm passes and a CRT
+          (k*(n/2)^2 >= 2^53, always the case from 25 bits on), the SIMD
+          kernels are 2-5x faster than any other method from dimension 8.
+        - Where one dgemm pass suffices (up to about 23 bits), u32 wins
+          below a dimension of about 100-250 (mul_blas pays O(n^2)
+          conversions and thread hand-offs around its gemm) and is
+          0.7-1.1x of mul_blas above. The single-IFMA mode of u52 (moduli
+          up to 2^26) is 1.1-1.35x faster than u32 and often comparable to or
+          faster than FLINT's own gemm (this conclusion might change with an
+          external BLAS).
+        - u52 removes the 31-32 bit cliff of u32 (whose in-kernel folds
+          then come every 1-2 products) and extends the single pass to
+          52 bits, where the alternative is 4-5 dgemm passes. Its two-IFMA
+          mode is slower than u32 between 27 and 30-31 bits (1.5-1.65x on
+          Zen 4, up to 1.1x on Ice Lake), hence U52_MIN_BITS.
+        - Single-threaded, one Strassen level on top (its recursive
+          calls come back here) pays from somewhere between 512 and 1024,
+          depending on the kernel underneath. With several threads the
+          kernels split C across the pool themselves.
+    */
+#if FLINT_BITS == 64
+    if (min_dim >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
+            && C->mod.n <= (UWORD(1) << 52))
+    {
+        flint_bitcnt_t bits = FLINT_BIT_COUNT(C->mod.n);
+        int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);
+
+        simd_mul = NULL;
+
+        if (NMOD_MAT_HAVE_MUL_U52
+                && (bits >= FLINT_NMOD_MAT_MUL_U52_MIN_BITS
+                    || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS))
+        {
+            simd_mul = nmod_mat_mul_u52;
+        }
+        else if (bits <= 32)
+        {
+            /*
+                mul_blas is preferred from U32_BLAS_CUTOFF on (0: never)
+                when it can do it in one dgemm pass, k*(n/2)^2 < 2^53.
+                Here half < 2^31, so half^2 does not overflow.
+            */
+            ulong half = C->mod.n / 2;
+            int one_pass = (half == 0)
+                    || ((ulong) k <= ((UWORD(1) << 53) - 1) / (half * half));
+
+            if (!one_pass || FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF <= 0
+                    || min_dim < FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF)
+                simd_mul = nmod_mat_mul_u32;
+        }
+
+        if (simd_mul != NULL)
+        {
+            if (flint_num_threads == 1
+                    && min_dim >= FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF)
+            {
+                if (C == A || C == B)
+                {
+                    nmod_mat_t T;
+                    nmod_mat_init(T, m, n, A->mod.n);
+                    nmod_mat_mul_strassen(T, A, B);
+                    nmod_mat_swap_entrywise(C, T);
+                    nmod_mat_clear(T);
+                }
+                else
+                    nmod_mat_mul_strassen(C, A, B);
+                return;
+            }
+
+            if (simd_mul(C, A, B))
+                return;
+        }
+    }
+#endif
 
     /*
         tuning is based on several assumptions:
