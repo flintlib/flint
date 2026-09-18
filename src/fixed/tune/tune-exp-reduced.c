@@ -110,7 +110,8 @@ int main(int argc, char ** argv)
     }
 
     flint_printf("\npaste thresholds after inspecting the grid:\n"
-        "  -D FIXED_EXP_BURST_TERMS=...  (alg 2 -> 3 boundary)\n"
-        "  -D FIXED_EXP_FULLBURST_TERMS=...  (alg 3 -> 4 boundary)\n");
+        "  (the boundaries are tiered by r in exp_reduced.c:\n"
+        "   EXP_USE_SINH, FIXED_EXP_BURST_TERMS(r),\n"
+        "   FIXED_EXP_FULLBURST_TERMS(r); edit them there)\n");
     return 0;
 }

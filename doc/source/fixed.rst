@@ -627,6 +627,114 @@ out of the measurement, and the timing loop cycles over an array of
 random inputs so that the branchy reductions pay their real
 misprediction costs.
 
+Diophantine argument reduction
+-------------------------------------------------------------------------------
+
+The following functions compute the elementary functions on the unit
+interval by *diophantine* (multi-prime) argument reduction, the
+fixed-point counterpart of ``arb_exp_arf_log_reduction`` and
+``arb_sin_cos_arf_atan_reduction``: the argument is reduced by an
+integer combination of the logarithms of the first primes, or of
+`\pi/2` and the doubled arguments `2 \arg(\pi_j)` of the first nonreal
+Gaussian primes `\pi_j`, found by a descent through a table of integer
+relations between these values, and the correction on the value side
+is a rational number (a product of prime powers) or a Gaussian
+rational.  Compared to the bitwise reductions the precomputation is
+much cheaper -- one Machin-type binary splitting per prime instead of
+a table of `r` series -- at the price of a slower evaluation, so they
+pay off for moderate numbers of evaluations at a given precision.
+``profile/p-diophantine`` prints the trade-off across precisions.
+
+.. function:: void fixed_exp_diophantine(nn_ptr y, nn_srcptr x, slong n)
+              void _fixed_exp_diophantine_tune(nn_ptr y, nn_srcptr x, slong n, slong num_primes, double max_weight)
+
+    Sets `(y, n + 1)` to `\exp(x)` for `(x, n)` in `[0, 1)`, within
+    ``FIXED_EXP_DIOPHANTINE_MAX_ERR`` ulps.  Writes
+    `x = c_0 \log 2 + \sum_j c_j \log p_j + t` with `t` tiny and
+    evaluates `\exp(x) = 2^{c_0} (p / q) \exp(t)` with `p, q` products
+    of prime powers (truncated to the working precision once they
+    exceed it), the reduced `\exp(t)` coming from
+    :func:`fixed_exp_reduced`.  The tunable variant takes the number
+    of primes (2 to 64) and the weight budget of the descent
+    (the sum of `|c_j| \log_2 p_j`; larger budgets give deeper
+    reductions and larger products); the default uses 13 primes and
+    a budget equal to the precision, as arb does.  The descent is
+    bit-identical to arb's.
+
+.. function:: void fixed_sin_cos_diophantine(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n)
+              void _fixed_sin_cos_diophantine_tune(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n, slong num_primes, double max_weight)
+              void fixed_tan_diophantine(nn_ptr res, nn_srcptr x, slong n)
+              void _fixed_tan_diophantine_tune(nn_ptr res, nn_srcptr x, slong n, slong num_primes, double max_weight)
+
+    Set `(ysin, n + 1)`, `(ycos, n + 1)` (either may be ``NULL``) to
+    the sine and cosine, respectively `(res, n + 1)` to the tangent,
+    of `(x, n)` in `[0, 1)`, within ``FIXED_SIN_COS_DIOPHANTINE_MAX_ERR``
+    ulps.  Writes `x = c_0 \pi/2 + \sum_j c_j \, 2 \arg(\pi_j) + t` and
+    evaluates `e^{ix} = i^{c_0} e^{it} A^2 / N` for the Gaussian
+    integer `A = \prod \pi_j^{c_j}` (conjugates for negative `c_j`),
+    whose norm `N = |A|^2` is a rational integer: the normalization is
+    one reciprocal of an integer and two multiplications, and the
+    tangent is the ratio of the two parts of `e^{it} A^2` with no
+    normalization at all.  Gaussian products beyond the working
+    precision are carried truncated through the high complex
+    products of ``mpn_extras``.  The reduced sine and cosine come from
+    :func:`fixed_sin_cos_reduced`, whose cost dominates; since it only
+    matches the exponential's efficiency at reductions deeper than
+    about `2^{-300}`, the default uses 32 Gaussian primes and a weight
+    budget of four times the precision.
+
+.. type:: fixed_rel_struct
+
+.. function:: const fixed_rel_struct * fixed_rel_table(int gaussian, slong num)
+              int fixed_rel_table_is_cached(int gaussian, slong num)
+
+    Returns the relation table for the first *num* primes
+    (*gaussian* = 0: `\alpha_j = \log p_j`) or Gaussian primes
+    (*gaussian* = 1: `\alpha_0 = \pi/2`, `\alpha_j = 2 \arg \pi_j`):
+    the rows of ``d`` are integer relations
+    `\sum_j d_{ij} \alpha_j = \epsilon_i` with `|\epsilon_i|`
+    decreasing (an extra row starting with ``FIXED_REL_TERMINATOR``
+    ends the table), and the structure also carries the reciprocals
+    `1/\epsilon_i`, the weights, and the primes.  Tables for
+    *num* = 2, 4, 6, 8, 10, 12, 13, 16, 20, 24, 32, 40, 48 are
+    precomputed; any other size up to ``FIXED_REL_MAX`` is generated
+    on first use (``_arb_log_precompute_reductions``; seconds around
+    48 primes) and cached per thread, which the second function
+    predicts: it returns nonzero when a call would find the table
+    ready.  Tables are freed by :func:`flint_cleanup`.
+
+.. type:: fixed_machin_struct
+
+.. function:: const fixed_machin_struct * fixed_machin_table(int gaussian, slong num)
+              slong fixed_machin_table_max(int gaussian)
+              void fixed_machin_get_x(fmpz_t q, const fixed_machin_struct * tab, slong i)
+              void fixed_machin_get_c(fmpz_t c, const fixed_machin_struct * tab, slong i, slong j)
+              void fixed_machin_get_c_row(fmpz * row, const fixed_machin_struct * tab, slong i)
+
+    Machin-type sets for the logarithms of the first primes,
+    `\log p_i = (1/\mathrm{den}) \sum_j c_{ij} \operatorname{atanh}(1/x_j)`,
+    and for the arguments of the first nonreal Gaussian primes,
+    `\arg \pi_i = (1/\mathrm{den}) \sum_j c_{ij} \operatorname{atan}(1/x_j)`,
+    with square coefficient matrices.  The first function returns the
+    best set for *num* values: the largest one with at most *num*
+    terms, the remaining values being left to one followup series
+    each, unless that would need more followups than the source file's
+    measured limit, in which case the next larger set is used.  Sets
+    exist for
+    every size from 4 (3 for the Gaussian primes) to 32, and for 40
+    and 48, on 32- and 64-bit systems alike; the second function
+    gives the largest.  The
+    arguments are stored as 128-bit values (``FIXED_MACHIN_X_LIMBS``
+    limbs each); the coefficient matrices are not stored but
+    reconstructed on first use from the arguments, the denominator
+    and ``cbits`` (factoring each argument over the primes of the set
+    and inverting the exponent matrix modulo one or two primes), and
+    cached per thread.  The accessors return any argument or
+    coefficient, or a whole row, as ``fmpz``.  These are the
+    tables behind ``arb_log_primes_vec_bsplit`` and
+    ``arb_atan_gauss_primes_vec_bsplit``; new sets can be generated with
+    https://github.com/fredrik-johansson/machin.
+
 Verified constants
 -------------------------------------------------------------------------------
 

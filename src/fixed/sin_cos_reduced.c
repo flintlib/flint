@@ -54,10 +54,11 @@
    numerator NUM = prod (Q_k B^{QE_k} - A_k + i B_k) and the real
    denominator DEN = prod Q_k, both as WINDOWED middle products
    msb-truncated to wn + 3 limbs with dropped-limb exponents
-   (mulmid + ping-pong for DEN; the two-regime complex update in
-   trig_num_mul for NUM), deepest slice first so every complex
-   accumulation multiplication is balanced against the content
-   gathered so far.  The finish is TWO balanced Newton divisions
+   (mulmid + ping-pong for DEN; flint_mpn_mulhigh_n_complex in
+   trig_num_mul for NUM, which shares transforms across its three
+   products above the complex FFT cutoff), deepest slice first so
+   every complex accumulation multiplication is balanced against
+   the content gathered so far.  The finish is TWO balanced Newton divisions
    (sine and cosine) against the single accumulated denominator,
    fed unnormalized (fixed_div_newton needs only a nonzero top
    limb) with quotient placement a limb-offset copy -- where
@@ -67,9 +68,12 @@
    cancellation is harmless because g is only needed to absolute
    2^(-64 wn), like the direct series path.
 
-   Errors: each factor window and product drop is one-sided ulps at
-   the cap per component, with the mulmid boundary slack held three
-   limbs below the kept frames; over at most log2(wn) + 1 levels,
+   Errors: each factor window and product drop is a few ulps at the
+   cap per component (one-sided for the mulmid windows, whose
+   boundary slack is held three limbs below the kept frames;
+   two-sided, below 3 ulps of the lowest returned limb, for the high
+   complex products of the NUM updates); over at most log2(wn) + 1
+   levels,
    plus the Newton divisions' 4 B^{-wn-2}/den and the final
    one-ulp placements, everything lands far inside
    FIXED_SIN_COS_REDUCED_MAX_ERR = 96 ulps, the same budget as
@@ -96,18 +100,39 @@
    high threshold covers all r; the tuning is self-referential
    (each threshold change alters the cascade being measured) and
    these values are the fixed point of that iteration on the
-   development VM. */
-#ifndef FIXED_TRIG_REDUCED_SINSQRT_TERMS
-#define FIXED_TRIG_REDUCED_SINSQRT_TERMS 50
-#endif
+   development VM.
+
+   Re-swept for r >= 64 on the fft_small build over n = 256 .. 15625
+   limbs and r = 32 .. 768 (the diophantine (multi-prime) reduction of
+   sin_cos_diophantine.c lands at r ~ 100-300): the one-step crossover
+   in terms/r grows slowly with n -- about 500 at 512 limbs, 800 at
+   1024, 1300 at 2677, 1500 at 6000, below 1950 at 15625 -- so the
+   earlier 2560 sat above it at every size from 1024 limbs up,
+   choosing the sine+sqrt path in a band where the burst step is
+   5-25% faster.  1500 is the single constant that makes the right
+   call at 2677, 6000 and 15625 limbs and costs about 6% in one cell
+   at 1024 limbs, r = 96; it brings sin_cos_diophantine's default at
+   640k bits from 57.8 to 45.2 ms and its 13-prime configuration at
+   171k bits from 13.0 to 10.9 ms.  The target machine's
+   tune-sin-cos-reduced (wn = 16 .. 131072, r = 16 .. 4096) puts the
+   same crossover in (1365, 2048] for every r >= 64, consistent with
+   1500, and (256, 512] at r = 32, consistent with 320. */
+/* sine + sqrt from this many terms: 50 up to r = 1536; the
+   crossover moves to (64, 128] at r = 2048 .. 3072 and (128, 256]
+   at r = 4096 (tune-sin-cos-reduced on the target machine) */
+#define FIXED_TRIG_REDUCED_SINSQRT_TERMS(r) \
+    (((r) >= 4096) ? 200 : ((r) >= 2048) ? 100 : 50)
 #ifndef FIXED_TRIG_BURST_TERMS_SMALL_R
 #define FIXED_TRIG_BURST_TERMS_SMALL_R 320
 #endif
 #ifndef FIXED_TRIG_BURST_TERMS
-#define FIXED_TRIG_BURST_TERMS 2560
+#define FIXED_TRIG_BURST_TERMS 1500
 #endif
+/* the full bit-burst never won on the target machine up to 524288
+   terms per r (8.4 10^6 bits at r = 16); the one-step cascade covers
+   that range, so the switch sits above it */
 #ifndef FIXED_TRIG_FULLBURST_TERMS
-#define FIXED_TRIG_FULLBURST_TERMS 393216
+#define FIXED_TRIG_FULLBURST_TERMS 1048576
 #endif
 /* Per-slice choice inside the burst: from this many series terms
    the slice's 1 - cos track (two of the four heavy tree
@@ -120,7 +145,7 @@
 #define FIXED_TRIG_SLICE_SQRT_TERMS 64
 #endif
 #define TRIG_USE_SINSQRT(wn, r) \
-    (FLINT_BITS * (wn) >= FIXED_TRIG_REDUCED_SINSQRT_TERMS * (slong) (r))
+    (FLINT_BITS * (wn) >= FIXED_TRIG_REDUCED_SINSQRT_TERMS(r) * (slong) (r))
 #define TRIG_USE_BURST(wn, r) \
     (FLINT_BITS * (wn) >= (((r) < 64) ? FIXED_TRIG_BURST_TERMS_SMALL_R \
         : FIXED_TRIG_BURST_TERMS) * (slong) (r))
@@ -170,24 +195,6 @@ _fixed_g_from_sin(nn_ptr yg, nn_srcptr ss, slong wn)
             mpn_neg(yg, rt + 2, wn);
     }
     TMP_END;
-}
-
-static slong
-nnn_add_local(nn_ptr z, slong zn, nn_srcptr a, slong an)
-{
-    ulong cy;
-    if (an == 0)
-        return zn;
-    if (zn >= an)
-    {
-        cy = mpn_add(z, z, zn, a, an);
-        z[zn] = cy;
-        return zn + (cy != 0);
-    }
-    flint_mpn_zero(z + zn, an - zn);
-    cy = mpn_add(z, a, an, z, zn);
-    z[an] = cy;
-    return an + (cy != 0);
 }
 
 /* Window bottom (in LIMBS) for a slice factor whose real part is
@@ -254,167 +261,113 @@ _trig_qminus(nn_ptr F, slong * fn, nn_srcptr U, slong un,
 static void
 trig_num_mul(nn_ptr nc, slong * ncn, nn_ptr ns, slong * nsn,
     slong * nexp, nn_srcptr fc, slong fcn, nn_srcptr fs, slong fsn,
-    slong fexp, nn_ptr sc, slong cap)
+    slong fexp, slong cap)
 {
-    /* Complex update in mpn magnitudes over WINDOWED middle
-       products with a common limb bottom lo -- only the surviving
-       limbs of each product are computed, the mulmid boundary
-       slack (a deficit under ~B^(lo+3)) and the drop being
-       one-sided ulps at lo, the same class as the factor windows.
+    /* Complex update NUM <- NUM F through flint_mpn_mulhigh_n_complex.
+       Both pairs are brought to a common length n = max(ncn, fcn)
+       by padding the shorter pair BELOW with zeros (its exponent
+       absorbs the pad: the parts of a pair share one exponent, so
+       the sine part is padded like its cosine part and zero-extended
+       on top), the high product gives limbs [n, 2n] of each part --
+       the top n + 1 limbs of a product whose top limb is nonzero
+       since both cosine parts are -- and the frame is closed by the
+       msb truncation to cap keyed to the real part, which dominates
+       (|arg| < 2^-15).  The parts are magnitudes: the real part
+       nc fc - ns fs is positive of full size, the imaginary part
+       nc fs + ns fc nonnegative; a negative sign can only be the
+       two-sided rounding (below 3 ulps of the lowest limb) of a
+       vanishing imaginary part and is read as zero.  Above
+       flint_mpn_mul_complex_fft_cutoff limbs the three products
+       share their transforms. */
+    slong n, pn, pf, k, drop, lr, li;
+    nn_ptr ar, ai, br, bi, rr, ri;
+    int sr, si;
+    TMP_INIT;
 
-       Two regimes, keyed to the size of the sine-sine product:
-
-       - Karatsuba (arb's pmerge) when tot2 = nsn + fsn >= lo + 8:
-         m1 = nc fc, m2 = ns fs, m3 = (nc + ns)(fc + fs);
-         re = m1 - m2, im = m3 - m1 - m2.  The windowed
-         subtractions need the true differences to dominate the
-         slack: im >= ns fc >= B^(lo + 6) under the threshold
-         (fcn >= fsn since cos > sin), three limbs above it, and
-         re is always of full magnitude.
-
-       - direct otherwise (short sine operands, so the extra
-         products are cheap): re = m1 - m2 with m2 computed in
-         full (it is tiny), and im = nc fs + ns fc + ns fs
-         accumulated as a SUM of nonnegative windows -- additions
-         cannot borrow, which is what makes the near-cancelling
-         regime safe.
-
-       All frames are limb counts; both components end
-       msb-truncated at cap in a common frame keyed to the real
-       part, which always dominates (|arg| < 2^-15). */
-    nn_ptr m1 = sc, m2 = sc + (cap + 8),
-           m3 = sc + 2 * (cap + 8),
-           s1 = sc + 3 * (cap + 8),
-           s2 = s1 + (cap + 8);
-    slong tot1 = *ncn + fcn, tot2 = *nsn + fsn, tot3, lo;
-    slong l1, l2, l3, ls1, ls2, lmx, drop;
-    ulong bw;
-
-    /* three limbs of margin below the natural bottom: the mulmid
-       boundary slack then sits entirely below the frame the final
-       truncation keeps, so it stays one-sided ulps there even for
-       the imaginary component, whose own top can run a few limbs
-       short of the real part's */
-    lo = FLINT_MAX(0, tot1 - cap - 3);
-
-    flint_mpn_mulmid(m1, nc, *ncn, fc, fcn, lo, tot1);
-    l1 = tot1 - lo;
-    while (l1 > 1 && m1[l1 - 1] == 0)
-        l1--;
-
-    if (*nsn > 0 && fsn > 0 && tot2 >= lo + 8)
+    /* NUM = 1 (the first factor): NUM F = F exactly -- a high product
+       would drop F's lowest limb, one of the frame's three guard
+       limbs, before anything is gained */
+    if (*ncn == 1 && nc[0] == 1 && (*nsn == 0 || (*nsn == 1 && ns[0] == 0)))
     {
-        /* Karatsuba: s1 = nc + ns, s2 = fc + fs,
-           m3 = s1 s2, m2 = ns fs */
-        flint_mpn_copyi(s1, nc, *ncn);
-        ls1 = nnn_add_local(s1, *ncn, ns, *nsn);
-        flint_mpn_copyi(s2, fc, fcn);
-        ls2 = nnn_add_local(s2, fcn, fs, fsn);
-        tot3 = ls1 + ls2;
-        FLINT_ASSERT(tot3 <= tot1 + 2);
-
-        flint_mpn_mulmid(m2, ns, *nsn, fs, fsn, lo, tot2);
-        l2 = tot2 - lo;
-        while (l2 > 1 && m2[l2 - 1] == 0)
-            l2--;
-
-        flint_mpn_mulmid(m3, s1, ls1, s2, ls2, lo, tot3);
-        l3 = tot3 - lo;
-        while (l3 > 1 && m3[l3 - 1] == 0)
-            l3--;
-
-        /* im: m3 -= m1 + m2; re: m1 -= m2 */
-        bw = mpn_sub(m3, m3, l3, m1, l1);
-        FLINT_ASSERT(bw == 0);
-        bw = mpn_sub(m3, m3, l3, m2, l2);
-        FLINT_ASSERT(bw == 0);
-        bw = mpn_sub(m1, m1, l1, m2, l2);
-        FLINT_ASSERT(bw == 0);
-        (void) bw;
-        while (l3 > 1 && m3[l3 - 1] == 0)
-            l3--;
-        while (l1 > 1 && m1[l1 - 1] == 0)
-            l1--;
-    }
-    else
-    {
-        /* direct: im = nc fs + ns fc as nonnegative windows at
-           the common bottom (additions cannot borrow), and
-           re -= ns fs with its tiny windowed product */
-        slong tota = *ncn + fsn, totb = *nsn + fcn;
-
-        l3 = 0;
-        if (fsn > 0 && tota > lo)
+        /* copy F truncated to cap limbs keyed to its real part (the
+           factor can be longer than the accumulator's frame) */
+        drop = (fcn > cap) ? (fcn - cap) : 0;
+        flint_mpn_copyi(nc, fc + drop, fcn - drop);
+        *ncn = fcn - drop;
+        if (fsn > drop)
         {
-            flint_mpn_mulmid(m3, nc, *ncn, fs, fsn, lo, tota);
-            l3 = tota - lo;
-            while (l3 > 1 && m3[l3 - 1] == 0)
-                l3--;
-        }
-        if (*nsn > 0 && totb > lo)
-        {
-            flint_mpn_mulmid(s1, ns, *nsn, fc, fcn, lo, totb);
-            ls1 = totb - lo;
-            while (ls1 > 1 && s1[ls1 - 1] == 0)
-                ls1--;
-            if (l3 == 0)
-            {
-                flint_mpn_copyi(m3, s1, ls1);
-                l3 = ls1;
-            }
-            else
-                l3 = nnn_add_local(m3, l3, s1, ls1);
-        }
-        if (*nsn > 0 && fsn > 0 && tot2 > lo)
-        {
-            /* the sine-sine term: windowed too (l2 <= 7 under the
-               regime threshold); its mulmid deficit understates
-               both the im addition and the re subtraction --
-               one-sided, the right way */
-            flint_mpn_mulmid(s2, ns, *nsn, fs, fsn, lo, tot2);
-            l2 = tot2 - lo;
-            while (l2 > 1 && s2[l2 - 1] == 0)
-                l2--;
-            if (!(l2 == 1 && s2[0] == 0))
-            {
-                bw = mpn_sub(m1, m1, l1, s2, l2);
-                FLINT_ASSERT(bw == 0);
-                (void) bw;
-                while (l1 > 1 && m1[l1 - 1] == 0)
-                    l1--;
-            }
-        }
-    }
-
-    /* common truncation keyed to the real part, frames in LIMBS */
-    *nexp += fexp + lo;
-    lmx = FLINT_MAX(l1, l3);
-    FLINT_ASSERT(lmx == l1 || l3 <= l1 + 1);
-    drop = (lmx > cap) ? (lmx - cap) : 0;
-    if (drop > 0)
-    {
-        flint_mpn_copyi(nc, m1 + drop, FLINT_MAX(1, l1 - drop));
-        *ncn = FLINT_MAX(1, l1 - drop);
-        if (l3 > drop)
-        {
-            flint_mpn_copyi(ns, m3 + drop, l3 - drop);
-            *nsn = l3 - drop;
+            flint_mpn_copyi(ns, fs + drop, fsn - drop);
+            *nsn = fsn - drop;
         }
         else
         {
             ns[0] = 0;
-            *nsn = 0;
+            *nsn = 1;
         }
-        *nexp += drop;
+        *nexp += fexp + drop;
+        return;
+    }
+
+    /* two limbs of padding below both pairs: the window [n, 2n] loses
+       up to two limbs against the product's true top when the
+       operands' top limbs are partial, and the frame must keep cap */
+    n = FLINT_MAX(*ncn, fcn) + 2;
+    pn = n - *ncn;
+    pf = n - fcn;
+
+    TMP_START;
+    ar = TMP_ALLOC(6 * (n + 2) * sizeof(ulong));
+    ai = ar + (n + 2);
+    br = ai + (n + 2);
+    bi = br + (n + 2);
+    rr = bi + (n + 2);
+    ri = rr + (n + 2);
+
+    flint_mpn_zero(ar, pn);
+    flint_mpn_copyi(ar + pn, nc, *ncn);
+    flint_mpn_zero(ai, n);
+    flint_mpn_copyi(ai + pn, ns, *nsn);
+    flint_mpn_zero(br, pf);
+    flint_mpn_copyi(br + pf, fc, fcn);
+    flint_mpn_zero(bi, n);
+    flint_mpn_copyi(bi + pf, fs, fsn);
+
+    flint_mpn_mulhigh_n_complex(rr, &sr, ri, &si, ar, 0, ai, 0, br, 0, bi, 0, n);
+    FLINT_ASSERT(sr == 0);
+
+    lr = n + 1;
+    while (lr > 1 && rr[lr - 1] == 0)
+        lr--;
+    li = n + 1;
+    while (li > 1 && ri[li - 1] == 0)
+        li--;
+    if (si)
+    {
+        /* a vanishing imaginary part rounded below zero */
+        ri[0] = 0;
+        li = 1;
+    }
+
+    /* NUM F = (rr + i ri) B^(nexp - pn + fexp - pf + n); truncate to
+       cap limbs keyed to the real part */
+    *nexp += fexp - pn - pf + n;
+    drop = (lr > cap) ? (lr - cap) : 0;
+    *nexp += drop;
+
+    k = FLINT_MAX(1, lr - drop);
+    flint_mpn_copyi(nc, rr + drop, k);
+    *ncn = k;
+    if (li > drop)
+    {
+        flint_mpn_copyi(ns, ri + drop, li - drop);
+        *nsn = li - drop;
     }
     else
     {
-        flint_mpn_copyi(nc, m1, l1);
-        *ncn = l1;
-        if (l3 > 0)
-            flint_mpn_copyi(ns, m3, l3);
-        *nsn = l3;
+        ns[0] = 0;
+        *nsn = 1;
     }
+    TMP_END;
 }
 
 /* one balanced Newton division NUM B^nexp / (DEN B^dexp), placed
@@ -470,7 +423,7 @@ _fixed_sin_cos_reduced_burst(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
     slong L[FLINT_BITS + 2];
     slong nb = 0, k, ncn, nsn, dn;
     slong nexp, dexp, QE;
-    nn_ptr nc, ns, den, den2, sc, q, ycos;
+    nn_ptr nc, ns, den, den2, q, ycos;
     TMP_INIT;
 
     /* boundary ladder in LIMBS, TRIPLING (like
@@ -499,13 +452,12 @@ _fixed_sin_cos_reduced_burst(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
 
     TMP_START;
     nc = TMP_ALLOC((4 * (cap + 1)
-        + 5 * (cap + 8) + (wn + 4)
+        + (wn + 4)
         + (wn + 1)) * sizeof(ulong));
     ns = nc + (cap + 1);
     den = ns + (cap + 1);
     den2 = den + (cap + 1);
-    sc = den2 + (cap + 1);
-    q = sc + 5 * (cap + 8);
+    q = den2 + (cap + 1);
     ycos = q + (wn + 4);
 
     nc[0] = 1;
@@ -812,7 +764,7 @@ _fixed_sin_cos_reduced_burst(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
         }
 
         trig_num_mul(nc, &ncn, ns, &nsn, &nexp, fc, fcn, fs, fsn,
-            fexp, sc, cap);
+            fexp, cap);
 
         TMP_END;
     }
