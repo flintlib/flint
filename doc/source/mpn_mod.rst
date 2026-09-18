@@ -156,13 +156,15 @@ Basic operations and arithmetic
     The former can be slightly faster as it avoids the indirection of the
     method table lookup.
 
-    :func:`mpn_mod_is_square` and :func:`mpn_mod_sqrt` need a prime modulus,
-    which the context does not establish by itself: unless
-    :func:`gr_ctx_set_is_field` has been used to say so, they return
-    ``T_UNKNOWN`` and ``GR_UNABLE`` respectively, except for 0 and 1. Given a
-    prime modulus, :func:`mpn_mod_is_square` is Euler's criterion and
-    :func:`mpn_mod_sqrt` is Tonelli and Shanks, returning ``GR_DOMAIN`` when
-    the argument is not a square.
+    :func:`mpn_mod_is_square` is the Jacobi symbol `\left(\frac{x}{n}\right)`.
+    For an odd modulus, a symbol of `-1` gives ``T_FALSE`` whether or not the
+    modulus is prime; a symbol of `+1` gives ``T_TRUE`` for a modulus known to
+    be prime and ``T_UNKNOWN`` otherwise. Likewise :func:`mpn_mod_sqrt` returns
+    ``GR_DOMAIN`` when the Jacobi symbol rules out a root, and ``GR_UNABLE``
+    when a root is not ruled out but the modulus is not known to be prime.
+    Primality is not something the context establishes by itself; use
+    :func:`gr_ctx_set_is_field` to say so. As exceptions, 0 and 1 are squares
+    for any modulus and are recognized as such.
 
 Vector functions
 -------------------------------------------------------------------------------

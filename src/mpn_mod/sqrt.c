@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "mpn_mod.h"
 
@@ -18,66 +19,91 @@ _mpn_mod_modulus_fmpz(fmpz_t p, gr_ctx_t ctx)
     fmpz_set_ui_array(p, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx));
 }
 
-/* Euler's criterion: x^((p-1)/2) is 1 for squares and -1 for nonsquares */
-truth_t
-mpn_mod_is_square(nn_srcptr x, gr_ctx_t ctx)
+/* A length-n mpn read as an mpz; GMP wants the top limb to be nonzero. */
+static void
+_mpn_mod_roinit(mpz_t z, nn_srcptr x, slong n)
 {
-    slong n = MPN_MOD_CTX_NLIMBS(ctx);
-    fmpz_t p, e;
-    nn_ptr t;
-    truth_t res;
+    while (n > 0 && x[n - 1] == 0)
+        n--;
 
-    if (mpn_mod_is_zero(x, ctx) == T_TRUE || mpn_mod_is_one(x, ctx) == T_TRUE)
-        return T_TRUE;
+    mpz_roinit_n(z, (mp_srcptr) x, n);
+}
 
-    if (MPN_MOD_CTX_IS_PRIME(ctx) != T_TRUE)
-        return T_UNKNOWN;
+/* The Jacobi symbol (x/p); the modulus is assumed odd. */
+static int
+_mpn_mod_jacobi(nn_srcptr x, gr_ctx_t ctx)
+{
+    mpz_t xz, pz;
 
-    fmpz_init(p);
-    fmpz_init(e);
-    _mpn_mod_modulus_fmpz(p, ctx);
-    fmpz_sub_ui(e, p, 1);
-    fmpz_tdiv_q_2exp(e, e, 1);
+    _mpn_mod_roinit(xz, x, MPN_MOD_CTX_NLIMBS(ctx));
+    _mpn_mod_roinit(pz, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx));
 
-    t = flint_malloc(n * sizeof(ulong));
+    return mpz_jacobi(xz, pz);
+}
 
-    if (mpn_mod_pow_fmpz(t, x, e, ctx) != GR_SUCCESS)
-        res = T_UNKNOWN;
-    else
-        res = (mpn_mod_is_one(t, ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+/* The same for a small integer, which need not be reduced. */
+static int
+_mpn_mod_jacobi_ui(ulong x, gr_ctx_t ctx)
+{
+    mpz_t xz, pz;
 
-    flint_free(t);
-    fmpz_clear(p);
-    fmpz_clear(e);
+    mpz_roinit_n(xz, (mp_srcptr) &x, x != 0);
+    _mpn_mod_roinit(pz, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx));
 
-    return res;
+    return mpz_jacobi(xz, pz);
 }
 
 /*
-    Tonelli and Shanks. Writing p - 1 = q 2^s with q odd, the case s = 1 is
-    a single exponentiation, and otherwise we walk down the 2-part of the
-    group using a fixed quadratic nonresidue.
+    The Jacobi symbol, which GMP computes in quasi-linear time, rather than
+    Euler's criterion: a symbol of -1 also settles the question for an odd
+    modulus that is not prime, where the criterion says nothing.
+*/
+truth_t
+mpn_mod_is_square(nn_srcptr x, gr_ctx_t ctx)
+{
+    if (mpn_mod_is_zero(x, ctx) == T_TRUE || mpn_mod_is_one(x, ctx) == T_TRUE)
+        return T_TRUE;
+
+    if (MPN_MOD_CTX_MODULUS(ctx)[0] & 1)
+    {
+        if (_mpn_mod_jacobi(x, ctx) == -1)
+            return T_FALSE;
+
+        if (MPN_MOD_CTX_IS_PRIME(ctx) == T_TRUE)
+            return T_TRUE;
+    }
+
+    return T_UNKNOWN;
+}
+
+/*
+    Writing p - 1 = q 2^s with q odd, s = 1 and s = 2 are closed forms and
+    otherwise we walk down the 2-part of the group (Tonelli and Shanks)
+    using the least quadratic nonresidue.
 */
 int
 mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 {
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    ulong tmp[6 * MPN_MOD_MAX_LIMBS];
+    nn_ptr c = tmp, r = c + n, t = r + n, b = t + n, z = b + n, u = z + n;
     fmpz_t p, q, e;
-    nn_ptr scratch, c, r, t, b, z, u;
     slong s, i, j, m;
+    ulong k;
     int status = GR_SUCCESS;
 
     if (mpn_mod_is_zero(x, ctx) == T_TRUE || mpn_mod_is_one(x, ctx) == T_TRUE)
         return mpn_mod_set(res, x, ctx);
 
-    if (MPN_MOD_CTX_IS_PRIME(ctx) != T_TRUE)
-        return GR_UNABLE;
-
-    if (mpn_mod_is_square(x, ctx) != T_TRUE)
+    /* a Jacobi symbol of -1 rules out a root without knowing p to be prime */
+    if (mpn_mod_is_square(x, ctx) == T_FALSE)
     {
         mpn_mod_zero(res, ctx);
         return GR_DOMAIN;
     }
+
+    if (MPN_MOD_CTX_IS_PRIME(ctx) != T_TRUE)
+        return GR_UNABLE;
 
     fmpz_init(p);
     fmpz_init(q);
@@ -90,9 +116,6 @@ mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
     s = fmpz_val2(q);
     fmpz_tdiv_q_2exp(q, q, s);
 
-    scratch = flint_malloc(6 * n * sizeof(ulong));
-    c = scratch; r = c + n; t = r + n; b = t + n; z = b + n; u = z + n;
-
     if (s == 1)
     {
         /* p = 3 mod 4, so the root is x^((p+1)/4) */
@@ -102,18 +125,51 @@ mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
         goto cleanup;
     }
 
-    /* the smallest quadratic nonresidue; there is one well within reach */
-    for (i = 2; ; i++)
+    if (s == 2)
     {
-        status |= mpn_mod_set_ui(z, (ulong) i, ctx);
+        /*
+            p = 5 mod 8. Atkin: with b = (2x)^((p-5)/8) and y = 2 x b^2,
+            a root is x b (y - 1). This is one exponentiation, where the
+            variant in fmpz_sqrtmod needs a second one half of the time.
+        */
+        fmpz_sub_ui(e, p, 5);
+        fmpz_tdiv_q_2exp(e, e, 3);
 
-        if (status != GR_SUCCESS)
-            goto cleanup;
+        status |= mpn_mod_add(t, x, x, ctx);            /* t = 2x */
+        status |= mpn_mod_pow_fmpz(b, t, e, ctx);
+        status |= mpn_mod_sqr(u, b, ctx);
+        status |= mpn_mod_mul(u, u, t, ctx);            /* u = y = 2 x b^2 */
+        status |= mpn_mod_sub_ui(u, u, 1, ctx);
+        status |= mpn_mod_mul(b, b, x, ctx);
+        status |= mpn_mod_mul(res, b, u, ctx);
+        goto cleanup;
+    }
 
-        if (mpn_mod_is_square(z, ctx) == T_FALSE)
+    /*
+        x^((q-1)/2) yields both x^((q+1)/2) and x^q for a multiplication
+        each, so the descent is set up with two exponentiations, not three.
+    */
+    fmpz_sub_ui(e, q, 1);
+    fmpz_tdiv_q_2exp(e, e, 1);
+
+    status |= mpn_mod_pow_fmpz(u, x, e, ctx);           /* u = x^((q-1)/2) */
+    status |= mpn_mod_mul(r, u, x, ctx);                /* r = x^((q+1)/2) */
+    status |= mpn_mod_mul(t, r, u, ctx);                /* t = x^q */
+
+    if (status != GR_SUCCESS)
+        goto cleanup;
+
+    /*
+        The least quadratic nonresidue, which is well within reach. Only
+        odd candidates need testing: 2 is a residue for p = 1 mod 8, and
+        then so is any even number below the first odd nonresidue.
+    */
+    for (k = 3; ; k += 2)
+    {
+        if (_mpn_mod_jacobi_ui(k, ctx) == -1)
             break;
 
-        if (i == WORD(1) << 20)
+        if (k >= (UWORD(1) << 20))
         {
             /* only reachable if the modulus is not actually prime */
             status = GR_UNABLE;
@@ -121,12 +177,8 @@ mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
         }
     }
 
-    status |= mpn_mod_pow_fmpz(c, z, q, ctx);       /* c = z^q */
-    status |= mpn_mod_pow_fmpz(t, x, q, ctx);       /* t = x^q */
-
-    fmpz_add_ui(e, q, 1);
-    fmpz_tdiv_q_2exp(e, e, 1);
-    status |= mpn_mod_pow_fmpz(r, x, e, ctx);       /* r = x^((q+1)/2) */
+    status |= mpn_mod_set_ui(z, k, ctx);
+    status |= mpn_mod_pow_fmpz(c, z, q, ctx);           /* c = z^q */
 
     if (status != GR_SUCCESS)
         goto cleanup;
@@ -177,7 +229,6 @@ cleanup:
     if (status != GR_SUCCESS)
         mpn_mod_zero(res, ctx);
 
-    flint_free(scratch);
     fmpz_clear(p);
     fmpz_clear(q);
     fmpz_clear(e);

@@ -166,6 +166,57 @@ TEST_FUNCTION_START(mpn_mod_sqrt, state)
         fmpz_clear(x);
     }
 
+    /*
+        An odd modulus that is not prime: a Jacobi symbol of -1 still rules
+        out a square, and nothing else about it can be decided.
+    */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t ctx;
+        fmpz_t n, p1, p2, x;
+        nn_ptr a, r;
+        slong nlimbs;
+        truth_t sq;
+        int status, jacobi;
+
+        fmpz_init(n);
+        fmpz_init(p1);
+        fmpz_init(p2);
+        fmpz_init(x);
+
+        fmpz_randprime(p1, state, FLINT_BITS, 0);
+        fmpz_randprime(p2, state, FLINT_BITS + 1, 0);
+        fmpz_mul(n, p1, p2);
+
+        if (gr_ctx_init_mpn_mod(ctx, n) == GR_SUCCESS)
+        {
+            nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+            a = flint_malloc(2 * nlimbs * sizeof(ulong));
+            r = a + nlimbs;
+
+            fmpz_randm(x, state, n);
+            GR_MUST_SUCCEED(mpn_mod_set_fmpz(a, x, ctx));
+
+            sq = mpn_mod_is_square(a, ctx);
+            status = mpn_mod_sqrt(r, a, ctx);
+            jacobi = fmpz_jacobi(x, n);
+
+            if (fmpz_cmp_ui(x, 1) > 0)
+            {
+                FLINT_TEST(sq == ((jacobi == -1) ? T_FALSE : T_UNKNOWN));
+                FLINT_TEST(status == ((jacobi == -1) ? GR_DOMAIN : GR_UNABLE));
+            }
+
+            flint_free(a);
+            gr_ctx_clear(ctx);
+        }
+
+        fmpz_clear(n);
+        fmpz_clear(p1);
+        fmpz_clear(p2);
+        fmpz_clear(x);
+    }
+
     /* without a prime modulus neither question can be answered */
     {
         gr_ctx_t ctx;
