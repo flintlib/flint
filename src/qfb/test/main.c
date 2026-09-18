@@ -11,6 +11,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-cornacchia.c"
 #include "t-exponent.c"
 #include "t-exponent_element.c"
 #include "t-exponent_grh.c"
@@ -27,6 +28,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(qfb_cornacchia),
     TEST_FUNCTION(qfb_exponent),
     TEST_FUNCTION(qfb_exponent_element),
     TEST_FUNCTION(qfb_exponent_grh),

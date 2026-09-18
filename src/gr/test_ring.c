@@ -5150,6 +5150,426 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
     }
 }
 
+static int
+gr_test_zero(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a, b;
+    truth_t equal;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT2(a, b, R);
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_zero(a, R);
+    equal = gr_is_zero(a, R);
+    if (status == GR_SUCCESS && equal == T_FALSE)
+    {
+        flint_printf("zero: is_zero\n");
+        status = GR_TEST_FAIL;
+    }
+
+    /* x + 0 == x */
+    status |= gr_randtest(b, state, R);
+    status |= gr_add(a, b, a, R);
+    if (status == GR_SUCCESS && gr_equal(a, b, R) == T_FALSE)
+    {
+        flint_printf("zero: neutral element\n");
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+    {
+        flint_printf("zero: unable\n");
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        gr_ctx_println(R);
+        flint_printf("x + 0 = "); gr_println(a, R);
+        flint_printf("x = "); gr_println(b, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR2(a, b, R);
+
+    return status;
+}
+
+/* (a + b) x == a x + b x, the additive analogue of
+   gr_test_pow_fmpz_exponent_addition. */
+static int
+gr_test_mul_fmpz_scalar_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    fmpz_t a, b, ab;
+    gr_ptr x, ax, bx, abx, ax_bx;
+
+    GR_TMP_INIT5(x, ax, bx, abx, ax_bx, R);
+
+    fmpz_init(a);
+    fmpz_init(b);
+    fmpz_init(ab);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(ax, state, R));
+    GR_MUST_SUCCEED(gr_randtest(bx, state, R));
+    GR_MUST_SUCCEED(gr_randtest(abx, state, R));
+    GR_MUST_SUCCEED(gr_randtest(ax_bx, state, R));
+
+    /* Over an infinite ring, repeated doubling makes the elements grow. */
+    if (gr_ctx_is_finite(R) == T_TRUE)
+    {
+        fmpz_randtest(a, state, 100);
+        fmpz_randtest(b, state, 100);
+    }
+    else
+    {
+        fmpz_randtest(a, state, 4);
+        fmpz_randtest(b, state, 4);
+    }
+
+    fmpz_add(ab, a, b);
+
+    status = GR_SUCCESS;
+
+    status |= gr_mul_fmpz(ax, x, a, R);
+    status |= gr_mul_fmpz(bx, x, b, R);
+    status |= gr_mul_fmpz(abx, x, ab, R);
+    status |= gr_add(ax_bx, ax, bx, R);
+
+    if (status == GR_SUCCESS && gr_equal(abx, ax_bx, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("mul_fmpz_scalar_addition\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+        flint_printf("b = "); fmpz_print(b); flint_printf("\n");
+        flint_printf("a x = \n"); gr_println(ax, R);
+        flint_printf("b x = \n"); gr_println(bx, R);
+        flint_printf("(a + b) x = \n"); gr_println(abx, R);
+        flint_printf("a x + b x = \n"); gr_println(ax_bx, R);
+        flint_printf("\n");
+    }
+
+    fmpz_clear(a);
+    fmpz_clear(b);
+    fmpz_clear(ab);
+
+    GR_TMP_CLEAR5(x, ax, bx, abx, ax_bx, R);
+
+    return status;
+}
+
+/* For small n, n x must be x added to itself n times, whichever of
+   mul_ui, mul_si and mul_fmpz is used to compute it. This pins down the
+   integer scalar multiplication as the Z-module action. */
+static int
+gr_test_mul_scalar_repeated_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr x, nx, t;
+    fmpz_t n;
+    ulong un;
+    slong i;
+
+    GR_TMP_INIT3(x, nx, t, R);
+    fmpz_init(n);
+
+    un = n_randint(state, 7);
+    fmpz_set_ui(n, un);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(nx, state, R));
+    GR_MUST_SUCCEED(gr_randtest(t, state, R));
+
+    status = GR_SUCCESS;
+
+    status |= gr_zero(nx, R);
+    for (i = 0; i < (slong) un; i++)
+        status |= gr_add(nx, nx, x, R);
+
+    status |= gr_mul_ui(t, x, un, R);
+    if (status == GR_SUCCESS && gr_equal(nx, t, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    status |= gr_mul_si(t, x, (slong) un, R);
+    if (status == GR_SUCCESS && gr_equal(nx, t, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    status |= gr_mul_fmpz(t, x, n, R);
+    if (status == GR_SUCCESS && gr_equal(nx, t, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    /* (-n) x == -(n x) */
+    status |= gr_mul_si(t, x, -(slong) un, R);
+    status |= gr_neg(nx, nx, R);
+    if (status == GR_SUCCESS && gr_equal(nx, t, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("mul_scalar_repeated_addition\n");
+        gr_ctx_println(R);
+        flint_printf("n = %wu\n", un);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("-(x + ... + x) = \n"); gr_println(nx, R);
+        flint_printf("last computed n x = \n"); gr_println(t, R);
+        flint_printf("\n");
+    }
+
+    fmpz_clear(n);
+
+    GR_TMP_CLEAR3(x, nx, t, R);
+
+    return status;
+}
+
+/* mul_two is the doubling of the group. */
+static int
+gr_test_mul_two_additive(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr x, r1, r2;
+
+    GR_TMP_INIT3(x, r1, r2, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r1, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r2, state, R));
+
+    status = GR_SUCCESS;
+
+    status |= gr_mul_two(r1, x, R);
+    status |= gr_add(r2, x, x, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    /* and it aliases */
+    status |= gr_set(r2, x, R);
+    status |= gr_mul_two(r2, r2, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("mul_two_additive\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("2 x = \n"); gr_println(r1, R);
+        flint_printf("x + x = \n"); gr_println(r2, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR3(x, r1, r2, R);
+
+    return status;
+}
+
+/* mul_2exp_si and mul_2exp_fmpz with a nonnegative exponent must agree
+   with multiplication by the integer 2^e. Negative exponents are left
+   alone: they mean division, which is not part of the group structure. */
+static int
+gr_test_mul_2exp_scalar(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr x, r1, r2;
+    fmpz_t e, n;
+    slong se;
+
+    GR_TMP_INIT3(x, r1, r2, R);
+    fmpz_init(e);
+    fmpz_init(n);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r1, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r2, state, R));
+
+    /* over an infinite ring the elements double in size at every step */
+    se = n_randint(state, (gr_ctx_is_finite(R) == T_TRUE) ? 64 : 5);
+
+    fmpz_set_si(e, se);
+    fmpz_one(n);
+    fmpz_mul_2exp(n, n, se);
+
+    status = GR_SUCCESS;
+
+    status |= gr_mul_2exp_si(r1, x, se, R);
+    status |= gr_mul_fmpz(r2, x, n, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    /* the fmpz version agrees, and aliases */
+    status |= gr_set(r2, x, R);
+    status |= gr_mul_2exp_fmpz(r2, r2, e, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("mul_2exp_scalar\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("e = %wd\n", se);
+        flint_printf("2^e x = \n"); gr_println(r1, R);
+        flint_printf("(2^e) x = \n"); gr_println(r2, R);
+        flint_printf("\n");
+    }
+
+    fmpz_clear(e);
+    fmpz_clear(n);
+
+    GR_TMP_CLEAR3(x, r1, r2, R);
+
+    return status;
+}
+
+/* mul_ui, mul_si and mul_fmpz must agree on the same scalar, at the full
+   width of each type and for negative scalars. */
+static int
+gr_test_mul_scalar_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr x, r1, r2;
+    fmpz_t n;
+    ulong un;
+    slong sn;
+    int small_values;
+
+    GR_TMP_INIT3(x, r1, r2, R);
+    fmpz_init(n);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r1, state, R));
+    GR_MUST_SUCCEED(gr_randtest(r2, state, R));
+
+    small_values = (gr_ctx_is_finite(R) != T_TRUE);
+
+    un = small_values ? n_randint(state, 16) : n_randtest(state);
+    sn = small_values ? (slong) n_randint(state, 17) - 8 : (slong) n_randtest(state);
+
+    status = GR_SUCCESS;
+
+    fmpz_set_ui(n, un);
+    status |= gr_mul_ui(r1, x, un, R);
+    status |= gr_mul_fmpz(r2, x, n, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    fmpz_set_si(n, sn);
+    status |= gr_mul_si(r1, x, sn, R);
+    status |= gr_mul_fmpz(r2, x, n, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    /* and mul_si aliases */
+    status |= gr_set(r2, x, R);
+    status |= gr_mul_si(r2, r2, sn, R);
+
+    if (status == GR_SUCCESS && gr_equal(r1, r2, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("mul_scalar_type_variants\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("un = %wu, sn = %wd\n", un, sn);
+        flint_printf("r1 = \n"); gr_println(r1, R);
+        flint_printf("r2 = \n"); gr_println(r2, R);
+        flint_printf("\n");
+    }
+
+    fmpz_clear(n);
+
+    GR_TMP_CLEAR3(x, r1, r2, R);
+
+    return status;
+}
+
+void
+gr_test_additive_group(gr_ctx_t R, slong iters, int test_flags)
+{
+    timeit_t timer;
+    flint_rand_t state;
+
+    /* test_flags |= GR_TEST_VERBOSE; */
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_start(timer);
+
+        flint_printf("===============================================================================\n");
+        flint_printf("Testing "); gr_ctx_println(R);
+        flint_printf("-------------------------------------------------------------------------------\n");
+    }
+
+    flint_rand_init(state);
+
+    gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+
+    gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
+    gr_test_iter(R, state, "equal", gr_test_equal, iters, test_flags);
+    gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
+
+    gr_test_iter(R, state, "get_set_str", gr_test_get_set_str, iters, test_flags);
+    gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
+
+    gr_test_iter(R, state, "zero", gr_test_zero, iters, test_flags);
+    gr_test_iter(R, state, "neg", gr_test_neg, iters, test_flags);
+
+    gr_test_iter(R, state, "add: associative", gr_test_add_associative, iters, test_flags);
+    gr_test_iter(R, state, "add: commutative", gr_test_add_commutative, iters, test_flags);
+    gr_test_iter(R, state, "add: aliasing", gr_test_add_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "add: type variants", gr_test_add_type_variants, iters, test_flags);
+
+    gr_test_iter(R, state, "sub: equal neg add", gr_test_sub_equal_neg_add, iters, test_flags);
+    gr_test_iter(R, state, "sub: aliasing", gr_test_sub_aliasing, iters, test_flags);
+
+    gr_test_iter(R, state, "mul_two", gr_test_mul_two_additive, iters, test_flags);
+    gr_test_iter(R, state, "mul_fmpz: scalar addition", gr_test_mul_fmpz_scalar_addition, iters, test_flags);
+    gr_test_iter(R, state, "mul_ui/si/fmpz: repeated addition", gr_test_mul_scalar_repeated_addition, iters, test_flags);
+    gr_test_iter(R, state, "mul_ui/si/fmpz: type variants", gr_test_mul_scalar_type_variants, iters, test_flags);
+    gr_test_iter(R, state, "mul_2exp_si/fmpz", gr_test_mul_2exp_scalar, iters, test_flags);
+
+    flint_rand_clear(state);
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_stop(timer);
+
+        flint_printf("-------------------------------------------------------------------------------\n");
+        flint_printf("Tests finished in %.3g cpu, %.3g wall\n", timer->cpu*0.001, timer->wall*0.001);
+        flint_printf("===============================================================================\n\n");
+    }
+}
+
 void
 gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
 {

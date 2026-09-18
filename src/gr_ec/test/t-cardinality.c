@@ -1,0 +1,259 @@
+/*
+    Copyright (C) 2026 Maël Hostettler
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
+#include "ulong_extras.h"
+#include "t-helpers.h"
+
+/* |N - (q + 1)| <= 2 sqrt(q), which is Hasse's theorem */
+static void
+check_hasse(const fmpz_t N, const fmpz_t q)
+{
+    fmpz_t t, bound;
+
+    fmpz_init(t);
+    fmpz_init(bound);
+
+    fmpz_sub(t, N, q);
+    fmpz_sub_ui(t, t, 1);           /* -trace */
+    fmpz_mul(t, t, t);
+    fmpz_mul_ui(bound, q, 4);
+
+    FLINT_TEST(fmpz_cmp(t, bound) <= 0);
+
+    fmpz_clear(t);
+    fmpz_clear(bound);
+}
+
+/* the cardinality of the base ring, through the new generic entry point */
+static void
+check_base_ring_cardinality(void)
+{
+    gr_ctx_t R;
+    fmpz_t c;
+
+    fmpz_init(c);
+
+    /* Z/n, prime or not, and without needing a primality test */
+    GR_MUST_SUCCEED(gr_ctx_init_nmod(R, 97));
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+    FLINT_TEST(fmpz_equal_ui(c, 97));
+    gr_ctx_clear(R);
+
+    GR_MUST_SUCCEED(gr_ctx_init_nmod(R, 100));
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+    FLINT_TEST(fmpz_equal_ui(c, 100));
+    gr_ctx_clear(R);
+
+    /* a finite field of prime power order */
+    gr_ctx_init_fq_nmod(R, 7, 3, "a");
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+    FLINT_TEST(fmpz_equal_ui(c, 343));
+    gr_ctx_clear(R);
+
+    gr_ctx_init_fq_nmod(R, 2, 5, "a");
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+    FLINT_TEST(fmpz_equal_ui(c, 32));
+    gr_ctx_clear(R);
+
+    /* a large modulus: no primality test is needed to know the size */
+    {
+        fmpz_t p;
+        fmpz_init(p);
+        fmpz_set_str(p, "115792089237316195423570985008687907853269984665640564039457584007913129640233", 10);
+        gr_ctx_init_fmpz_mod(R, p);
+        FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+        FLINT_TEST(fmpz_equal(c, p));
+        gr_ctx_clear(R);
+
+        FLINT_TEST(gr_ctx_init_mpn_mod(R, p) == GR_SUCCESS);
+        FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_SUCCESS);
+        FLINT_TEST(fmpz_equal(c, p));
+        gr_ctx_clear(R);
+        fmpz_clear(p);
+    }
+
+    /* an infinite structure has no cardinality, which is a domain answer */
+    gr_ctx_init_fmpz(R);
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_DOMAIN);
+    gr_ctx_clear(R);
+
+    gr_ctx_init_fmpq(R);
+    FLINT_TEST(gr_ctx_cardinality_fmpz(c, R) == GR_DOMAIN);
+    gr_ctx_clear(R);
+
+    fmpz_clear(c);
+}
+
+/*
+    The three algorithms must agree with each other, satisfy Hasse, kill
+    every point of the curve, and be what the generic interface reports.
+*/
+static void
+check_algorithms_agree(flint_rand_t state)
+{
+    slong iter;
+
+    for (iter = 0; iter < 120 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t R;
+        gr_ec_ctx_t E;
+        fmpz_t q, nn, nb, ns, ng;
+        slong t;
+        ulong pp;
+        int deg = 1;
+
+        /* small fields, including characteristic 2 and 3 */
+        switch (n_randint(state, 4))
+        {
+            case 0: pp = n_randprime(state, 5 + n_randint(state, 7), 1); break;
+            case 1: pp = n_randprime(state, 4 + n_randint(state, 4), 1); break;
+            case 2: pp = 2; deg = 2 + n_randint(state, 5); break;
+            default: pp = 3; deg = 1 + n_randint(state, 4); break;
+        }
+
+        if (deg == 1)
+        {
+            if (gr_ctx_init_nmod(R, pp) != GR_SUCCESS)
+                continue;
+        }
+        else
+            gr_ctx_init_fq_nmod(R, pp, deg, "a");
+
+        fmpz_init(q); fmpz_init(nn); fmpz_init(nb); fmpz_init(ns); fmpz_init(ng);
+
+        if (gr_ec_ctx_init_randtest(E, state, R) != GR_SUCCESS)
+            goto next;
+
+        FLINT_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS);
+
+        /* naive is the reference: it never touches the group law */
+        if (gr_ec_ctx_cardinality_naive(nn, E) != GR_SUCCESS)
+            goto next_curve;
+
+        check_hasse(nn, q);
+
+        /* BSGS may legitimately fail to disambiguate over a tiny field */
+        if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
+            FLINT_TEST(fmpz_equal(nn, nb));
+
+        /* Schoof only claims the short model away from 2 and 3 */
+        if (gr_ec_ctx_cardinality_schoof(ns, E) == GR_SUCCESS)
+            FLINT_TEST(fmpz_equal(nn, ns));
+
+        /* the CM path declines unless the j-invariant proves it applies */
+        {
+            fmpz_t nc;
+            fmpz_init(nc);
+            if (gr_ec_ctx_cardinality_cm(nc, E) == GR_SUCCESS)
+                FLINT_TEST(fmpz_equal(nn, nc));
+            fmpz_clear(nc);
+        }
+
+        /* and the same number must come out of the generic interface */
+        FLINT_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS);
+        FLINT_TEST(fmpz_equal(nn, ng));
+
+        /* N annihilates the group */
+        for (t = 0; t < 6; t++)
+        {
+            gr_ec_point_t P, Q;
+            gr_ec_point_init(P, E);
+            gr_ec_point_init(Q, E);
+
+            if (gr_ec_point_randtest(P, state, E) == GR_SUCCESS
+                    && gr_ec_point_mul_fmpz(Q, P, nn, E) == GR_SUCCESS)
+                FLINT_TEST(gr_ec_point_is_inf(Q, E) == T_TRUE);
+
+            gr_ec_point_clear(Q, E);
+            gr_ec_point_clear(P, E);
+        }
+
+next_curve:
+        gr_ec_ctx_clear(E);
+next:
+        fmpz_clear(q); fmpz_clear(nn); fmpz_clear(nb); fmpz_clear(ns); fmpz_clear(ng);
+        gr_ctx_clear(R);
+    }
+}
+
+/*
+    Two families whose answer is known in advance. Over F_p with p > 3,
+    y^2 = x^3 + b is supersingular when p = 2 mod 3, and y^2 = x^3 + a x is
+    supersingular when p = 3 mod 4; either way #E = p + 1 exactly.
+*/
+static void
+check_supersingular(flint_rand_t state)
+{
+    slong iter;
+
+    for (iter = 0; iter < 40 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t R;
+        gr_ec_ctx_t E;
+        fmpz_t n;
+        gr_ptr a, z;
+        ulong pp;
+        int j0 = n_randint(state, 2);
+        slong tries;
+
+        /* p = 2 mod 3 for the j = 0 family, p = 3 mod 4 for j = 1728 */
+        for (tries = 0; tries < 200; tries++)
+        {
+            pp = n_randprime(state, 6 + n_randint(state, 12), 1);
+            if (pp > 3 && ((j0 && pp % 3 == 2) || (!j0 && pp % 4 == 3)))
+                break;
+        }
+
+        if (pp <= 3 || gr_ctx_init_nmod(R, pp) != GR_SUCCESS)
+            continue;
+
+        fmpz_init(n);
+        GR_TMP_INIT2(a, z, R);
+
+        if (gr_randtest_not_zero(a, state, R) != GR_SUCCESS
+                || gr_zero(z, R) != GR_SUCCESS)
+            goto next;
+
+        /* y^2 = x^3 + a  or  y^2 = x^3 + a x */
+        if (gr_ec_ctx_init_short_weierstrass(E, R, j0 ? z : a, j0 ? a : z)
+                != GR_SUCCESS)
+            goto next;
+
+        if (gr_ec_ctx_cardinality_naive(n, E) == GR_SUCCESS)
+            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+
+        if (gr_ec_ctx_cardinality_bsgs(n, E) == GR_SUCCESS)
+            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+
+        if (gr_ec_ctx_cardinality_schoof(n, E) == GR_SUCCESS)
+            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+
+        /* these are exactly the curves the CM path is meant to recognise */
+        FLINT_TEST(gr_ec_ctx_cardinality_cm(n, E) == GR_SUCCESS);
+        FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+
+        gr_ec_ctx_clear(E);
+next:
+        GR_TMP_CLEAR2(a, z, R);
+        fmpz_clear(n);
+        gr_ctx_clear(R);
+    }
+}
+
+TEST_FUNCTION_START(gr_ec_cardinality, state)
+{
+    check_base_ring_cardinality();
+    check_algorithms_agree(state);
+    check_supersingular(state);
+
+    TEST_FUNCTION_END(state);
+}

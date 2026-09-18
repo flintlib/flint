@@ -765,6 +765,7 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) nmod32_ctx_fq_prime},
     {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod32_poly_set_length_normalise},
     {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
     {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},

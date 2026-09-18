@@ -21,6 +21,7 @@
 #include "thread_support.h"
 #include "thread_pool.h"
 #include "acb_modular.h"
+#include "qfb.h"
 #include "ecpp.h"
 
 /*
@@ -608,7 +609,7 @@ _corn_worker(slong w, void * varg)
 
     fmpz_init(sqrtD); fmpz_init(t); fmpz_init(v); fmpz_init(u);
 
-    if (_scan_sqrt_disc(sqrtD, s, d) && ecpp_cornacchia(t, v, s->n, d->D, sqrtD))
+    if (_scan_sqrt_disc(sqrtD, s, d) && qfb_cornacchia(t, v, s->n, d->D, sqrtD))
     {
         fmpz_add((ms + 0), s->np1, t);
         fmpz_sub((ms + 1), s->np1, t);
