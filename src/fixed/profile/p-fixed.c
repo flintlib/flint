@@ -77,6 +77,13 @@ static void p_exp_notab(nn_ptr y, nn_srcptr x, slong n, int r)
 static void p_sin_cos_notab(nn_ptr s, nn_ptr c, nn_srcptr x, slong n,
     int r)
 { (void) r; fixed_sin_cos_notab(s, c, x, n); }
+static void p_exp_diophantine(nn_ptr y, nn_srcptr x, slong n, int r)
+{ (void) r; fixed_exp_diophantine(y, x, n); }
+static void p_sin_cos_diophantine(nn_ptr s, nn_ptr c, nn_srcptr x, slong n,
+    int r)
+{ (void) r; fixed_sin_cos_diophantine(s, c, x, n); }
+static void p_tan_diophantine(nn_ptr y, nn_srcptr x, slong n, int r)
+{ (void) r; fixed_tan_diophantine(y, x, n); }
 static int p_notab_r(slong n) { (void) n; return 0; }
 
 static const which_t table[] = {
@@ -93,6 +100,12 @@ static const which_t table[] = {
     { "exp_notab", 1, p_exp_notab, NULL, a_exp, NULL,
       p_notab_r, 1 },
     { "sin_cos_notab", 2, NULL, p_sin_cos_notab, NULL, a_sin_cos,
+      p_notab_r, 1 },
+    { "exp_diophantine", 1, p_exp_diophantine, NULL, a_exp, NULL,
+      p_notab_r, 1 },
+    { "sin_cos_diophantine", 2, NULL, p_sin_cos_diophantine, NULL, a_sin_cos,
+      p_notab_r, 1 },
+    { "tan_diophantine", 1, p_tan_diophantine, NULL, a_tan, NULL,
       p_notab_r, 1 },
 };
 

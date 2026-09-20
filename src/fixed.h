@@ -103,6 +103,171 @@ void fixed_exp_notab(nn_ptr y, nn_srcptr x, slong n);
 void fixed_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
     slong n);
 
+/* exp on [0, 1) by diophantine (multi-prime) argument reduction (the fixed-point
+   port of arb_exp_arf_log_reduction, see exp_diophantine.c):
+   exp(x) = 2^c_0 (p/q) exp(t) with p, q products of the first
+   num_primes primes and t reduced to a tiny residual through a
+   table of integer relations between their logarithms.  Output: n
+   fraction limbs and a unit limb, within
+   FIXED_EXP_DIOPHANTINE_MAX_ERR ulps.  The tunable worker takes the
+   number of primes (2 <= num_primes <= FIXED_LOG_PRIMES_MAX; the
+   relation table comes from fixed_rel_table, precomputed for the
+   common counts) and the weight budget of the reduction
+   (the bound on sum_{j > 0} |c_j| log2(p_j) / log 2, a proxy for
+   the bit size of p q); the public entry uses 13 primes and
+   FLINT_BITS n, as arb does.  Precomputation is one logarithm per
+   prime at the working precision, cached per thread. */
+#define FIXED_EXP_DIOPHANTINE_MAX_ERR 3
+void fixed_exp_diophantine(nn_ptr y, nn_srcptr x, slong n);
+void _fixed_exp_diophantine_tune(nn_ptr y, nn_srcptr x, slong n,
+    slong num_primes, double max_weight);
+
+/* Relation tables for the diophantine reductions (rel_tab.c): for
+   the first num primes (gaussian = 0: alpha_j = log p_j) or the
+   first num nonreal Gaussian primes (gaussian = 1: alpha_0 = pi/2,
+   alpha_j = 2 arg pi_j, with pi_j = a + b i from
+   _fixed_gaussian_primes), the rows of d (num entries each) are
+   integer relations sum_j d_ij alpha_j = epsilon_i with |epsilon_i|
+   decreasing.  Tables for num = 2, 4, 6, 8, 10, 12, 13, 16, 20, 24,
+   32, 40, 48 are precomputed; other sizes are generated on first
+   use (seconds around 48 primes) and cached per thread, which
+   fixed_rel_table_is_cached predicts. */
+#define FIXED_REL_MAX 64
+#define FIXED_LOG_PRIMES_MAX FIXED_REL_MAX
+#define FIXED_REL_TERMINATOR -32768
+typedef struct
+{
+    slong num;
+    slong rows;
+    int gaussian;
+    int is_static;
+    const ulong * primes;        /* the rational primes; NULL if gaussian */
+    const float * weights;       /* log2 p_j, or log N(pi_j); weights[0] = 0 */
+    const short * d;             /* rows x num, then a row starting with
+                                    FIXED_REL_TERMINATOR */
+    const double * epsilon;
+    const double * epsilon_inv;
+    double epsilon_min;          /* |epsilon| of the last row */
+}
+fixed_rel_struct;
+
+const fixed_rel_struct * fixed_rel_table(int gaussian, slong num);
+int fixed_rel_table_is_cached(int gaussian, slong num);
+
+/* Machin-type sets (machin_tab.c): log p_i = (1/den) sum_j c[i][j]
+   atanh(1/x_j) for the first num primes (gaussian = 0), or
+   arg pi_i = (1/den) sum_j c[i][j] atan(1/x_j) for the first num
+   nonreal Gaussian primes (gaussian = 1); c is num x num.
+   fixed_machin_table returns the best set for num values: the largest
+   one with at most num terms (the smallest set when num is below
+   that), the remaining values being left to one followup series each.
+   Sets exist for every num from 4 (3 for the Gaussian primes) to 32,
+   and for 40 and 48; fixed_machin_table_max gives the largest. */
+#define FIXED_MACHIN_X_LIMBS (128 / FLINT_BITS)
+#define FIXED_MACHIN_MAX_NUM 64
+#define FIXED_MACHIN_MAX_PRIMES 8
+typedef struct
+{
+    slong num;
+    const ulong * x;             /* the arguments, FIXED_MACHIN_X_LIMBS
+                                    limbs (128 bits) each */
+    ulong den;
+    int cbits;                   /* one more than the largest bit length
+                                    among the coefficients, which are
+                                    reconstructed on first use */
+    int gaussian;
+}
+fixed_machin_struct;
+
+const fixed_machin_struct * fixed_machin_table(int gaussian, slong num);
+slong fixed_machin_table_max(int gaussian);
+/* the arguments and coefficients as fmpz, whatever their size; the
+   row function fills row[0..num) with c[i][0..num) */
+void fixed_machin_get_x(fmpz_t q, const fixed_machin_struct * tab, slong i);
+void fixed_machin_get_c(fmpz_t c, const fixed_machin_struct * tab, slong i,
+    slong j);
+void fixed_machin_get_c_row(fmpz * row, const fixed_machin_struct * tab,
+    slong i);
+
+/* the precomputed tables (rel_tab_data.c) */
+typedef struct
+{
+    int gaussian;
+    slong num;
+    slong rows;
+    const short * d;
+    const double * epsilon;
+}
+fixed_rel_static_struct;
+FLINT_DLL extern const fixed_rel_static_struct _fixed_rel_static[];
+FLINT_DLL extern const slong _fixed_rel_static_num;
+
+/* real and imaginary parts, consecutively, of the first 64 nonreal
+   Gaussian primes in order of norm: 1+i, 1+2i, 2+3i, ... */
+#define FIXED_ATAN_GAUSS_MAX 64
+/* FLINT_DLL as for the other exported tables: the build exports
+   functions automatically on Windows, but not data symbols */
+FLINT_DLL extern const signed char
+    _fixed_gaussian_primes[2 * FIXED_ATAN_GAUSS_MAX];
+
+/* Internal: thread-local cache of the angles pi/2, 2 arg(pi_j)
+   (atan_gauss.c), laid out like the logarithm cache below;
+   _fixed_atan_gauss_vec gives the angles as arb balls (arb's
+   Machin-type sets of machin_tab.c for up to 48, single
+   arctangents beyond). */
+void _fixed_atan_gauss_vec(arb_ptr res, slong num, slong prec);
+void _fixed_atan_gauss_ensure(slong num, slong nv);
+nn_srcptr _fixed_atan_gauss_entry(slong j, slong nv);
+void _fixed_atan_gauss_clear(void);
+
+/* sin and cos of (x, n) in [0, 1) by diophantine (multi-prime)
+   argument reduction (sin_cos_diophantine.c): x = c_0 pi/2 +
+   sum_j c_j 2 arg(pi_j) + t with t tiny, and e^(ix) = i^c_0 e^(it)
+   A^2 / |A|^2 for the Gaussian integer A = prod pi_j^(c_j)
+   (conjugates for c_j < 0), whose norm is a rational integer.
+   Outputs (either may be NULL) carry n fraction limbs and a unit
+   limb, within FIXED_SIN_COS_DIOPHANTINE_MAX_ERR ulps.  The tunable
+   workers take the number of Gaussian primes and the weight budget
+   (arb uses 13 and half the precision; the default here is 32 and
+   four times the precision). */
+#define FIXED_SIN_COS_DIOPHANTINE_MAX_ERR 4
+void fixed_sin_cos_diophantine(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
+    slong n);
+void _fixed_sin_cos_diophantine_tune(nn_ptr ysin, nn_ptr ycos,
+    nn_srcptr x, slong n, slong num_primes, double max_weight);
+
+/* tan of (x, n) in [0, 1) -> (res, n + 1) by the same reduction: the
+   ratio of the two parts of e^(it) A^2, one division and no
+   normalization at all */
+void fixed_tan_diophantine(nn_ptr res, nn_srcptr x, slong n);
+void _fixed_tan_diophantine_tune(nn_ptr res, nn_srcptr x, slong n,
+    slong num_primes, double max_weight);
+
+/* Internal: the relation-table descent shared by the diophantine (multi-prime)
+   reductions (exp_diophantine.c); the angles (log p_j, or 2 arg of
+   the Gaussian primes) are read as wr + 1 limb entries at
+   alpha + j stride, unit limb on top. */
+slong _fixed_log_reduce(slong * rel, const fixed_rel_struct * tab,
+    nn_srcptr x, slong wr, double max_weight, double eps_min,
+    nn_srcptr alpha, slong stride);
+void _fixed_log_dot(nn_ptr acc, nn_srcptr base, slong len,
+    const slong * rel, slong num, nn_srcptr alpha, slong stride);
+double _fixed_signed_get_d(nn_srcptr a, slong len, nn_ptr tmp);
+
+/* Internal: thread-local cache of fixed-point logarithms of the
+   first primes 2, 3, 5, ... (log_primes.c).  _ensure(num, nv) makes
+   the table cover num primes with at least nv fraction value limbs
+   each (plus a guard limb below and a unit limb above);
+   _entry(j, nv) returns the top nv + 1 limbs of entry j -- nv
+   fraction limbs with the unit limb at index nv -- exactly
+   floor(log(p_j) B^nv) spread over them, valid until the next
+   _ensure call on this thread. */
+void _fixed_log_primes_ensure(slong num, slong nv);
+
+nn_srcptr _fixed_log_primes_entry(slong j, slong nv);
+void _fixed_log_primes_clear(void);
+slong _fixed_log_primes_max_limbs(void);
+
 /* internal forced-depth workers (the public entry points choose r
    from tuned tables; these take it explicitly, for tuning) */
 void _fixed_exp_notab_r(nn_ptr y, nn_srcptr x, slong n, int r);
@@ -415,6 +580,14 @@ extern FLINT_TLS_PREFIX slong _fixed_exp_logs_r;
 extern FLINT_TLS_PREFIX nn_ptr _fixed_atans;
 extern FLINT_TLS_PREFIX slong _fixed_atans_n;
 extern FLINT_TLS_PREFIX slong _fixed_atans_r;
+
+extern FLINT_TLS_PREFIX nn_ptr _fixed_log_primes;
+extern FLINT_TLS_PREFIX slong _fixed_log_primes_n;
+extern FLINT_TLS_PREFIX slong _fixed_log_primes_num;
+
+extern FLINT_TLS_PREFIX nn_ptr _fixed_atan_gauss;
+extern FLINT_TLS_PREFIX slong _fixed_atan_gauss_n;
+extern FLINT_TLS_PREFIX slong _fixed_atan_gauss_num;
 
 /* Static prefixes of the two tables covering all reductions with
    r <= FIXED_STATIC_TAB_R whose per-entry reads fit in
