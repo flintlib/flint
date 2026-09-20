@@ -1568,6 +1568,12 @@ void flint_mpn_fmmamod_precond_matrix(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, 
 
 int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c, flint_bitcnt_t b, mp_ptr tp);
 
+/* square roots modulo an odd prime ******************************************/
+
+int flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n);
+int flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n);
+int flint_mpn_sqrtmod_preinv(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n, nn_srcptr dinv, flint_bitcnt_t norm);
+
 /* miscellaneous *************************************************************/
 
 double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);

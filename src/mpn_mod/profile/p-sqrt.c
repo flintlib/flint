@@ -162,7 +162,7 @@ int main(void)
     slong bi, si, i, nlimbs;
     flint_bitcnt_t bits;
     slong s;
-    double t1, t2, t3, __;
+    double t1, t2, t3, t4, __;
 
     flint_rand_init(state);
     fmpz_init(p);
@@ -178,8 +178,12 @@ int main(void)
     flint_printf("Square roots modulo a prime p with p - 1 = q 2^s, q odd.\n");
     flint_printf("Times are microseconds per call, averaged over %wd inputs.\n\n", (slong) NX);
 
-    flint_printf("                     is_square                      sqrt\n");
-    flint_printf(" bits    s    mpn_mod fmpz_mod     gmp     mpn_mod fmpz_mod     gmp\n");
+    flint_printf("Columns: mpn_mod and fmpz_mod are the gr methods over those\n");
+    flint_printf("rings, sqrtmod is fmpz_sqrtmod, and gmp is the same algorithm\n");
+    flint_printf("written in plain mpz arithmetic.\n\n");
+
+    flint_printf("                    is_square                            sqrt\n");
+    flint_printf(" bits    s   mpn_mod fmpz_mod      gmp    mpn_mod fmpz_mod  sqrtmod      gmp\n");
 
     for (bi = 0; bi < 6; bi++)
     {
@@ -262,7 +266,7 @@ int main(void)
                 sink += mpz_jacobi(xz[i], pz);
             TIMEIT_STOP_VALUES(t3, __);
 
-            flint_printf("%5wd %4wd   %8.3f %8.3f %8.3f",
+            flint_printf("%5wd %4wd  %8.3f %8.3f %8.3f",
                 (slong) bits, s, 1e6 * t1 / NX, 1e6 * t2 / NX, 1e6 * t3 / NX);
 
             TIMEIT_START
@@ -272,16 +276,21 @@ int main(void)
 
             TIMEIT_START
             for (i = 0; i < NX; i++)
-                sink += fmpz_sqrtmod(y, x + i, p);
+                sink += gr_sqrt(y, x + i, ctx2);
             TIMEIT_STOP_VALUES(t2, __);
 
             TIMEIT_START
             for (i = 0; i < NX; i++)
-                sink += gmp_sqrtmod(rz, xz[i], pz);
+                sink += fmpz_sqrtmod(y, x + i, p);
             TIMEIT_STOP_VALUES(t3, __);
 
-            flint_printf("    %8.3f %8.3f %8.3f\n",
-                1e6 * t1 / NX, 1e6 * t2 / NX, 1e6 * t3 / NX);
+            TIMEIT_START
+            for (i = 0; i < NX; i++)
+                sink += gmp_sqrtmod(rz, xz[i], pz);
+            TIMEIT_STOP_VALUES(t4, __);
+
+            flint_printf("   %8.3f %8.3f %8.3f %8.3f\n",
+                1e6 * t1 / NX, 1e6 * t2 / NX, 1e6 * t3 / NX, 1e6 * t4 / NX);
 
             (void) __;
 

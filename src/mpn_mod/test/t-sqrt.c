@@ -143,6 +143,36 @@ TEST_FUNCTION_START(mpn_mod_sqrt, state)
                 flint_abort();
             }
 
+            /* fmpz_mod must reach the same verdict by the same route */
+            {
+                fmpz_t y, z;
+                int status_ref;
+
+                fmpz_init_set(y, x);
+                fmpz_init(z);
+                status_ref = gr_sqrt(z, y, ref);
+
+                if (status_ref != status)
+                {
+                    flint_printf("FAIL: sqrt status %d, fmpz_mod %d\n",
+                            status, status_ref);
+                    flint_printf("p = "); fmpz_print(p); flint_printf("\n");
+                    flint_printf("x = "); fmpz_print(x); flint_printf("\n");
+                    fflush(stdout);
+                    flint_abort();
+                }
+
+                if (status_ref == GR_SUCCESS)
+                {
+                    fmpz_mul(z, z, z);
+                    fmpz_mod(z, z, p);
+                    FLINT_TEST(fmpz_equal(z, x));
+                }
+
+                fmpz_clear(y);
+                fmpz_clear(z);
+            }
+
             /* and when it does, it must square back to x */
             if (status == GR_SUCCESS)
             {

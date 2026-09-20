@@ -156,10 +156,13 @@ Basic operations and arithmetic
     The former can be slightly faster as it avoids the indirection of the
     method table lookup.
 
-    :func:`mpn_mod_is_square` is the Jacobi symbol `\left(\frac{x}{n}\right)`.
-    For an odd modulus, a symbol of `-1` gives ``T_FALSE`` whether or not the
-    modulus is prime; a symbol of `+1` gives ``T_TRUE`` for a modulus known to
-    be prime and ``T_UNKNOWN`` otherwise. Likewise :func:`mpn_mod_sqrt` returns
+    :func:`mpn_mod_sqrt` wraps :func:`flint_mpn_sqrtmod_preinv`, 
+    passing the modulus and the precomputed inverse that the context already holds.
+
+    :func:`mpn_mod_is_square` is therefore the Jacobi symbol
+    `\left(\frac{x}{n}\right)`. For an odd modulus, a symbol of `-1` gives
+    ``T_FALSE`` whether or not the modulus is prime; a symbol of `+1` gives
+    ``T_TRUE`` for a modulus known to be prime and ``T_UNKNOWN`` otherwise. Likewise :func:`mpn_mod_sqrt` returns
     ``GR_DOMAIN`` when the Jacobi symbol rules out a root, and ``GR_UNABLE``
     when a root is not ruled out but the modulus is not known to be prime.
     Primality is not something the context establishes by itself; use
