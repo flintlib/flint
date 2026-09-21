@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,33 +12,24 @@
 
 #include "mpn_extras.h"
 
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
-
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
-                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+mp_limb_t
+flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
+                         mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 {
-   mp_limb_t ret;
-   mp_size_t i;
+    mp_limb_t qh;
+    mp_ptr tp;
+    TMP_INIT;
 
-   /* ensure { a + i, n } < { b, n } */
-   if ((ret = (mpn_cmp(a + m - n, b, n) >= 0)))
-      mpn_sub_n(a + m - n, a + m - n, b, n);
+    FLINT_ASSERT(n >= 2);
+    FLINT_ASSERT(m >= n);
 
-   for (i = m - 1; i >= n; i--)
-   {
-      flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
-      FLINT_ASSERT(n > 0);
-      a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
+    /* the scratch space is only used by the divide and conquer code */
+    if (n < FLINT_MPN_DIV_DC_CUTOFF || m - n < FLINT_MPN_DIV_DC_CUTOFF)
+        return _flint_mpn_divrem_preinv1(q, a, m, b, n, dinv, NULL);
 
-      if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)
-      {
-         q[i - n]++;
-         a[i] -= mpn_sub_n(a + i - n, a + i - n, b, n);
-      }
-   }
-
-   return ret;
+    TMP_START;
+    tp = TMP_ALLOC(n * sizeof(mp_limb_t));
+    qh = _flint_mpn_divrem_preinv1(q, a, m, b, n, dinv, tp);
+    TMP_END;
+    return qh;
 }
-
-DIAGNOSTIC_POP

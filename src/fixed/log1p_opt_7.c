@@ -286,7 +286,7 @@ fixed_log1p_opt_7(nn_ptr res, nn_srcptr x)
     nd[13] = d6;
     flint_mpn_zero(t, 7);
     if (d6 != 0 || d5 != 0 || d4 != 0 || d3 != 0 || d2 != 0 || d1 != 0 || d0 != 0)
-        mpn_tdiv_qr(t, nd, 0, nd, 14, S, 8);
+        flint_mpn_tdiv_qr(t, nd, nd, 14, S, 8);
 
     _fixed_log1p_series_7(y, t);
 

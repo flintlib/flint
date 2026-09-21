@@ -11,16 +11,10 @@
 
 #include "mpn_extras.h"
 
-/* below this divisor length GMP's mpn_divisible_p is used when available */
-#ifndef FLINT_MPN_DIVISIBLE_GMP_CUTOFF
-#define FLINT_MPN_DIVISIBLE_GMP_CUTOFF 2048
-#endif
-
-/* from this dividend length on, a trial division of the divisor and the
-   dividend by a primorial is tried first */
-#ifndef FLINT_MPN_DIVISIBLE_PRIMORIAL_CUTOFF
-#define FLINT_MPN_DIVISIBLE_PRIMORIAL_CUTOFF 32
-#endif
+/* a trial division of the divisor and the dividend by small primes is
+   tried first when both the divisor and the quotient have at least this
+   many limbs; for divisible inputs it costs a few percent there */
+#define DIVISIBLE_SCREEN_CUTOFF 16
 
 #if FLINT_BITS != 64
 /* 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23, for the 32-bit trial division */
@@ -32,25 +26,22 @@
     b[bn-1] != 0; a may have zero top limbs and an may be zero.
 
     Steps: the trivial cases (a = 0, |a| < |b|); 1 x 1 and 2 x 1 by
-    hardware division; all other short inputs by GMP's mpn_divisible_p
-    when available (its basecase has less overhead than the general path
-    below); the 2-adic part (b = 2^v B^k b' with b' odd must divide the
-    corresponding part of a); single-limb divisors via the Hensel remainder
-    mpn_modexact_1_odd; for long dividends a cheap O(an) rejection by trial
-    division: the residues
-    of b and a modulo a primorial reveal a small prime dividing b but not
-    a for roughly 70% of random pairs; then GMP's mpn_divisible_p for short
-    divisors when available, and otherwise the Hensel division with
-    remainder (flint_mpn_bdiv_qr) with n = an - bn + 1 quotient limbs:
-    since 0 <= a, q b' < B^(n+bn), b' divides a iff the Hensel remainder
-    (a - q b') / B^n mod B^bn vanishes.
+    hardware division; the 2-adic part (b = 2^v B^k b' with b' odd must
+    divide the corresponding part of a); divisors b' of one limb via the
+    Hensel remainder mpn_modexact_1_odd; for divisors and quotients of at
+    least DIVISIBLE_SCREEN_CUTOFF limbs a cheap O(an) rejection by trial
+    division: the residues of b and a modulo small primes reveal a prime
+    dividing b but not a for most random pairs; finally the Hensel
+    remainder as in GMP (_flint_mpn_divisible_bdiv), or for huge operands
+    the Newton-based exact division q = a / b mod B^n with n = an - bn + 1,
+    which is the quotient if b divides a, and a comparison of q b with a.
 */
 int
 _flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 {
-    mp_size_t k = 0, n;
+    mp_size_t k = 0, n, qn;
     unsigned int v;
-    mp_ptr as, bs, q, r;
+    mp_ptr q, t;
     int res;
     TMP_INIT;
 
@@ -80,13 +71,6 @@ _flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
             return r0 == 0;
         }
     }
-
-#if FLINT_HAVE_NATIVE_mpn_divisible_p
-    /* GMP's basecase has less overhead than anything below for short
-       inputs; the trial-division filter only pays off for long dividends */
-    if (an < FLINT_MPN_DIVISIBLE_PRIMORIAL_CUTOFF)
-        return mpn_divisible_p(a, an, b, bn);
-#endif
 
     while (an > 0 && a[an - 1] == 0)
         an--;
@@ -123,66 +107,84 @@ _flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
         return flint_mpn_divisible_1_odd(a, an, b0);
     }
 
-    if (bn >= 4)
+    if (bn == 2 && v != 0 && (b[1] >> v) == 0)
     {
-#if FLINT_BITS == 64
-        /* residues modulo 2^48 - 1 = 3^2 5 7 13 17 97 241 257 673 at 0.25
-           ns per limb reveal a small prime dividing b but not a for about
-           60% of random pairs */
-        static const unsigned short ps[] = {3, 5, 7, 13, 17, 97, 241, 257, 673, 0};
-        mp_limb_t rb = flint_mpn_mod_2exp48m1(b, bn) % ((UWORD(1) << 48) - 1), ra = 0;
-#else
-        static const unsigned short ps[] = {3, 5, 7, 11, 13, 17, 19, 23, 0};
-        mp_limb_t rb = mpn_mod_1(b, bn, PRIMORIAL), ra = 0;
-#endif
-        int have_ra = 0, i;
-
-        for (i = 0; ps[i] != 0; i++)
-        {
-            mp_limb_t p = ps[i];
-            if (rb % p == 0)
-            {
-                if (!have_ra)
-                {
-#if FLINT_BITS == 64
-                    ra = flint_mpn_mod_2exp48m1(a, an) % ((UWORD(1) << 48) - 1);
-#else
-                    ra = mpn_mod_1(a, an, PRIMORIAL);
-#endif
-                    have_ra = 1;
-                }
-                if (ra % p != 0)
-                    return 0;
-            }
-        }
+        /* b / 2^v fits in one limb */
+        mp_limb_t b0 = (b[0] >> v) | (b[1] << (FLINT_BITS - v));
+        return flint_mpn_divisible_1_odd(a, an, b0);
     }
 
-#if FLINT_HAVE_NATIVE_mpn_divisible_p
-    if (bn < FLINT_MPN_DIVISIBLE_GMP_CUTOFF)
-        return mpn_divisible_p(a, an, b, bn);
+    /* short odd parts of the divisor: the Hensel remainder in registers */
+    if (bn - ((b[bn - 1] >> v) == 0) <= FLINT_MPN_DIVEXACT_SMALL_BN)
+        return _flint_mpn_divisible_small(a, an, b, bn, v);
+
+    if (bn >= DIVISIBLE_SCREEN_CUTOFF && an - bn >= DIVISIBLE_SCREEN_CUTOFF)
+    {
+        mp_limb_t rb, ra, mask, amask;
+
+        /* residues modulo 2^48 - 1 = 3^2 5 7 13 17 97 241 257 673 at 0.25
+           ns per limb (respectively modulo 3 5 7 11 13 17 19 23 on 32-bit
+           machines) reveal a small prime dividing b but not a for about
+           60% of random pairs; mask gets the primes dividing b, amask those
+           not dividing a (the moduli being constants, the reductions are
+           multiplications) */
+#if FLINT_BITS == 64
+# define SCREEN_PRIMES(X) X(0, 3) X(1, 5) X(2, 7) X(3, 13) X(4, 17) X(5, 97) X(6, 241) X(7, 257) X(8, 673)
+# define SCREEN_RES(x, xn) (flint_mpn_mod_2exp48m1(x, xn) % ((UWORD(1) << 48) - 1))
+#else
+# define SCREEN_PRIMES(X) X(0, 3) X(1, 5) X(2, 7) X(3, 11) X(4, 13) X(5, 17) X(6, 19) X(7, 23)
+# define SCREEN_RES(x, xn) mpn_mod_1(x, xn, PRIMORIAL)
 #endif
+#define SCREEN_BMASK(i, p) mask |= (mp_limb_t) (rb % (p) == 0) << (i);
+#define SCREEN_AMASK(i, p) amask |= (mp_limb_t) (ra % (p) != 0) << (i);
+
+        rb = SCREEN_RES(b, bn);
+        mask = 0;
+        SCREEN_PRIMES(SCREEN_BMASK)
+
+        if (mask != 0)
+        {
+            ra = SCREEN_RES(a, an);
+            amask = 0;
+            SCREEN_PRIMES(SCREEN_AMASK)
+            if ((mask & amask) != 0)
+                return 0;
+        }
+
+#undef SCREEN_PRIMES
+#undef SCREEN_RES
+#undef SCREEN_BMASK
+#undef SCREEN_AMASK
+    }
 
     n = an - bn + 1;
 
+    /* the Hensel remainder as in GMP's mpn_divisible_p, except for huge
+       operands where the Newton-based exact division is faster */
+    if (!(FLINT_MIN(n, bn) >= FLINT_MPN_DIVEXACT_NEWTON_CUTOFF
+            || (bn >= FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF && n >= 8 * bn)))
+        return _flint_mpn_divisible_bdiv(a, an, b, bn, v);
+
+    /* b divides a iff q b = a for the quotient q = a / b mod B^qn given by
+       the exact division, where qn = n, or n - 1 when the top limb of a is
+       below that of b (the exact division then sets q[n - 1] = 0). The
+       low qn limbs of q b agree with a by construction, so only the high
+       limbs of the product are formed (a middle product corrected with
+       the known low limbs) and compared with the high limbs of a. */
+    qn = n - (n > 1 && a[an - 1] < b[bn - 1]);
+
     TMP_START;
-    as = TMP_ALLOC((an + bn + n + bn) * sizeof(mp_limb_t));
-    bs = as + an;
-    q = bs + bn;
-    r = q + n;
+    q = TMP_ALLOC((n + (an + 1 - qn) + an + 1) * sizeof(mp_limb_t));
+    t = q + n;
 
-    if (v != 0)
-    {
-        mpn_rshift(as, a, an, v);
-        mpn_rshift(bs, b, bn, v);
-    }
+    _flint_mpn_divexact(q, a, an, b, bn);
+
+    if (qn >= bn)
+        _flint_mpn_mulhigh_known_low(t, q, qn, b, bn, a, qn, qn, an + 1, t + an + 1 - qn);
     else
-    {
-        flint_mpn_copyi(as, a, an);
-        flint_mpn_copyi(bs, b, bn);
-    }
+        _flint_mpn_mulhigh_known_low(t, b, bn, q, qn, a, qn, qn, an + 1, t + an + 1 - qn);
 
-    flint_mpn_bdiv_qr(q, r, as, an, bs, bn, n);
-    res = flint_mpn_zero_p(r, bn);
+    res = (t[an - qn] == 0) && flint_mpn_equal_p(t, a + qn, an - qn);
 
     TMP_END;
     return res;

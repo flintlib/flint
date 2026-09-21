@@ -99,7 +99,7 @@ void n_ll_small_preinv(nn_ptr minv, nn_srcptr m)
     ulong qq[3];
     ulong nn[4] = { 0, 0, 0, 1 } ;
     ulong rr[2];
-    mpn_tdiv_qr(qq, rr, 0, nn, 4, m, 2);
+    flint_mpn_tdiv_qr(qq, rr, nn, 4, m, 2);
     minv[0] = qq[0];
     minv[1] = qq[1];
 }

@@ -13,6 +13,7 @@
 #include "flint.h"
 #include "mpn_extras.h"
 #include "profiler.h"
+#include "ulong_extras.h"
 
 #define TIME(expr, res) \
     do { timeit_t __t; slong __r; expr; \
@@ -26,7 +27,29 @@ int main(int argc, char * argv[])
     double tg, tn, tg2, tn2, tb;
     flint_rand_init(state);
 
-    flint_printf("Square root: an limbs, times in seconds\n");
+    flint_printf("Small square roots: an limbs, times in seconds (full-size random input)\n");
+    flint_printf("%8s %10s %10s %10s %10s\n", "an", "gmp_qr", "flint_qr", "gmp_q", "flint_q");
+
+    for (an = 1; an <= 6; an++)
+    {
+        mp_limb_t a[6 * 64], s[4 * 64], r[7 * 64];
+        slong i;
+
+        /* 64 inputs per timing, to average over the data dependent paths */
+        flint_mpn_rrandom(a, state, an * 64);
+        for (i = 0; i < 64; i++)
+            a[i * an + an - 1] |= UWORD(1) << (FLINT_BITS - 1 - n_randint(state, 4));
+
+        sn = (an + 1) / 2;
+        TIME(for (i = 0; i < 64; i++) mpn_sqrtrem(s + i * sn, r + i * (an + 1), a + i * an, an), tg);
+        TIME(for (i = 0; i < 64; i++) flint_mpn_sqrtrem(s + i * sn, r + i * (an + 1), a + i * an, an), tn);
+        TIME(for (i = 0; i < 64; i++) mpn_sqrtrem(s + i * sn, NULL, a + i * an, an), tg2);
+        TIME(for (i = 0; i < 64; i++) flint_mpn_sqrtrem(s + i * sn, NULL, a + i * an, an), tn2);
+
+        flint_printf("%8wd %10.3e %10.3e %10.3e %10.3e\n", an, tg / 64, tn / 64, tg2 / 64, tn2 / 64);
+    }
+
+    flint_printf("\nSquare root: an limbs, times in seconds\n");
     flint_printf("%8s %10s %10s %10s %10s %10s\n", "an", "gmp_qr", "newton_qr", "gmp_q", "newton_q", "bsqrt");
 
     for (an = 32; an <= 200000; an = an * 3 / 2)

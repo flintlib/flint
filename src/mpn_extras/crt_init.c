@@ -139,7 +139,7 @@ _crt_rem_worker(slong i, void * varg)
         /* t = r mod d */
         if (rn > dn || (rn == dn && mpn_cmp(r, d, dn) >= 0))
         {
-            mpn_tdiv_qr(Q, T, 0, r, rn, d, dn);
+            flint_mpn_tdiv_qr(Q, T, r, rn, d, dn);
             tn = dn;
             MPN_NORM(T, tn);
         }
@@ -167,7 +167,7 @@ _crt_rem_worker(slong i, void * varg)
         MPN_NORM(U, un);
 
         if (un > dn || (un == dn && mpn_cmp(U, d, dn) >= 0))
-            mpn_tdiv_qr(Q, rc, 0, U, un, d, dn);
+            flint_mpn_tdiv_qr(Q, rc, U, un, d, dn);
         else
             flint_mpn_copyi(rc, U, un);
     }
@@ -260,7 +260,7 @@ _crt_mult_worker(slong i, void * varg)
             Vn = Mtn + 1;
             MPN_NORM(Mt, Vn);
             if (Vn > Min || (Vn == Min && mpn_cmp(Mt, Mi, Min) >= 0))
-                mpn_tdiv_qr(q, V, 0, Mt, Vn, Mi, Min);
+                flint_mpn_tdiv_qr(q, V, Mt, Vn, Mi, Min);
             else
                 flint_mpn_copyi(V, Mt, Vn);
         }

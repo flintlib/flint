@@ -190,7 +190,7 @@ _fixed_trig_opt_4(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
         else
             c = 2;
 
-        mpn_tdiv_qr(R, rem, 0, N, 8, S, 4);
+        flint_mpn_tdiv_qr(R, rem, N, 8, S, 4);
 
         if (ysin != NULL)
         {
@@ -243,7 +243,7 @@ _fixed_trig_opt_4(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
         }
         c += 2;
 
-        mpn_tdiv_qr(R, rem, 0, N, 8, S, 4);
+        flint_mpn_tdiv_qr(R, rem, N, 8, S, 4);
 
         flint_mpn_mulhigh_n(v, A, R, 4);
         ytan[4] = v[3] >> (FLINT_BITS - c);

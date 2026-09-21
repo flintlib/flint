@@ -352,7 +352,7 @@ fixed_atan_opt_7(nn_ptr res, nn_srcptr x)
         nd[11] = y4;
         nd[12] = y5;
         nd[13] = y6;
-        mpn_tdiv_qr(t, nd, 0, nd, 14, S, 8);
+        flint_mpn_tdiv_qr(t, nd, nd, 14, S, 8);
     }
     else
     {

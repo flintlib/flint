@@ -92,6 +92,10 @@ Multiplication
     * FFT multiplication for huge sizes.
     * A GMP fallback for cases where we do currently not have optimized code.
 
+    With ``fft_small``, the FFT is used when `yn` is at least the balanced
+    threshold `T` = ``FLINT_FFT_SMALL_MUL_THRESHOLD``, and for unbalanced
+    operands also when `xn + yn > 2T` and `yn > T/3`.
+
 .. function:: void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
 
     Sets ``z`` to the product of ``(x, n)`` and ``(y, n)``.
@@ -604,31 +608,60 @@ Division
     Truncating (Euclidean) division: sets `(q, an - bn + 1)` to
     `\lfloor a / b \rfloor` and `(r, bn)` to `a - qb`. Requires
     `an \ge bn \ge 1` and `b_{bn-1} \ne 0`; the top limb of `a` may be zero.
-    No aliasing between the output and input arrays is permitted.
+    The quotient must not overlap the inputs; as with GMP's
+    ``mpn_tdiv_qr``, `r` may be equal to `a` (the remainder then overwrites
+    the low `bn` limbs of `a`), but must not overlap `b`.
 
-    For small and medium operands this wraps GMP's ``mpn_tdiv_qr``.
-    When both `bn` and `an - bn + 1` exceed ``FLINT_MPN_TDIV_QR_NEWTON_CUTOFF``
-    the quotient is computed by Karp-Markstein Newton division
-    (:func:`fixed_div_newton`) using FLINT's multiplication, and unbalanced
-    divisions (`an \ge 3 bn` for divisors above
-    ``FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF`` limbs, `an \ge 4 bn` above
-    ``FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF`` limbs) are done as a sequence
-    of `2bn \times bn` block divisions sharing one approximate inverse of `b`
-    (:func:`fixed_inv_newton`). Short divisors with long dividends
-    (`4 \le bn < 64` and `an \ge 32 bn`, or `32 \le bn < 64` and
-    `an \ge 4 bn`) go through :func:`flint_mpn_preinvn` and
-    :func:`flint_mpn_divrem_preinvn` after normalising the divisor, which
-    beats GMP by up to 40% in that regime.
+    The division is done entirely by FLINT, except for GMP's assembly
+    ``mpn_divrem_1`` (and ``mpn_divrem_2`` when limb inversion is not fast,
+    see below). By shape:
+
+    * Divisors of at most ``FLINT_MPN_DIV_SMALL_BN`` (7) limbs with short
+      dividends: :func:`_flint_mpn_tdiv_qr_small`, which keeps the divisor
+      and the partial remainder in registers.
+    * Long quotients (both `bn` and `an - bn + 1` above
+      ``FLINT_MPN_TDIV_QR_NEWTON_CUTOFF``, or `bn \ge`
+      ``FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF`` and `an - bn + 1 \ge 2 bn`):
+      Karp-Markstein Newton division (:func:`fixed_div_newton`) using
+      FLINT's multiplication; unbalanced divisions (`an \ge 3 bn` for
+      divisors above ``FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF`` limbs,
+      `an \ge 4 bn` above ``FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF`` limbs) as
+      a sequence of `2bn \times bn` block divisions sharing one approximate
+      inverse of `b` (:func:`fixed_inv_newton`). Short divisors with long
+      dividends (`4 \le bn < 32` and `an \ge 32 bn`, or `bn \ge 32` and
+      `an \ge 4 bn`) go through :func:`flint_mpn_preinvn` and
+      :func:`flint_mpn_divrem_preinvn`.
+    * Everything else: :func:`_flint_mpn_tdiv_qr_divconquer` and
+      :func:`_flint_mpn_tdiv_q_divconquer`, ports of GMP's ``mpn_tdiv_qr`` and
+      ``mpn_div_q`` built on FLINT's schoolbook, divide and conquer and
+      Newton division and FLINT's multiplication.
+
+    Where hardware division is fast (``FLINT_PREINVERT_LIMB_USE_NATIVE``),
+    limb inverses are computed with it (inline), which makes small
+    divisions up to twice as fast as with GMP. Short dividends then use
+    chains of hardware divisions: for one-limb divisors, below
+    ``FLINT_MPN_DIVREM_1_HW_CUTOFF`` dividend limbs
+    (``FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF`` for normalized divisors), and
+    for two-limb divisors, below ``FLINT_MPN_DIV_2_HW_CUTOFF`` limbs, a 3/2
+    step made of one hardware 2/1 division and a correction by the low
+    divisor limb (Knuth's algorithm D, normalizing on the fly), and for 3-
+    to 7-limb divisors, for quotients of fewer than
+    ``FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF`` limbs, the same step in the
+    register-based division, which saves computing the 3/2 inverse.
+    Two-limb divisors use GMP's assembly ``mpn_divrem_2`` (on a shifted
+    copy of the dividend) from ``FLINT_MPN_DIV_2_GMP_CUTOFF`` dividend
+    limbs where it is available and faster. Otherwise the
+    table-based inversion is used (GMP's assembly ``mpn_invert_limb`` when
+    available).
 
 .. function:: void _flint_mpn_tdiv_qr_newton(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
               void _flint_mpn_tdiv_qr_unbalanced(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
               void _flint_mpn_tdiv_qr_preinv(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_srcptr binv, mp_size_t binvn)
               void _flint_mpn_tdiv_qr_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
-              void _flint_mpn_tdiv_qr_gmp(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
               void _flint_mpn_tdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 
     The individual algorithms behind :func:`flint_mpn_tdiv_qr`; in all of
-    them `r` may be ``NULL``. The Newton version views `a` and `b` as fixed-point
+    them `r` may be ``NULL``, and :func:`_flint_mpn_tdiv_qr` is the dispatcher. The Newton version views `a` and `b` as fixed-point
     numbers and computes `n + 2` fraction limbs of `a/b`, where `n = an - bn + 1`;
     since the error is below `4 B^{-2}` at the integer scale, the integer part is
     certified whenever the first fraction limb lies in `[2, B-2]`, in which
@@ -638,6 +671,148 @@ Division
     ``fixed_inv_newton(binv, b, bn, binvn)`` with `binvn \ge n + 2` and
     `an \ge n + 2`; the unbalanced version requires `an > 2 bn` and
     `bn \ge 3`.
+
+.. function:: void _flint_mpn_tdiv_qr_small(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+
+    Euclidean division for `1 \le bn \le` ``FLINT_MPN_DIV_SMALL_BN`` (7)
+    with the same conventions as :func:`flint_mpn_tdiv_qr` (`r` may be
+    ``NULL``). There is one function per divisor length, in which the
+    (normalized) divisor and the partial remainder are kept in registers
+    and the dividend is normalized on the fly; each quotient limb takes a
+    3/2 division (a 2/1 division for `bn = 1`) and, for `bn \ge 3`, the
+    subtraction of a `1 \times (bn - 2)` product with carry chains, as in
+    GMP's ``mpn_sbpi1_div_qr`` but without function calls or memory
+    traffic. The cost is linear in `an`, but beyond about `3 bn` limbs the
+    schoolbook division using ``mpn_submul_1`` is faster for `bn \ge 4`.
+
+.. function:: void flint_mpn_divapprox(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+
+    Approximate quotient: sets `(q, an - bn + 1)` to `\lfloor a / b \rfloor`
+    or `\lfloor a / b \rfloor + 1` (like GMP's internal ``mpn_divappr_q``).
+    Requires `an \ge bn \ge 1` and `b_{bn-1} \ne 0`; no aliasing is
+    permitted. This follows the algorithm selection of
+    :func:`flint_mpn_tdiv_q` (so that it is never slower) but skips the
+    final corrections of the divide and conquer division, and uses
+    :func:`fixed_div_newton` with one guard limb, rounded up by more than
+    its error bound, instead of the Newton division, and already instead
+    of the divide and conquer or short division when both `bn` and
+    `an - bn + 1` are at least ``FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF``.
+
+.. function:: void flint_mpn_divapprox_fraction(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t f)
+
+    Sets `(q, an - bn + 1 + f)` to `\lfloor a B^f / b \rfloor` or
+    `\lfloor a B^f / b \rfloor + 1`, i.e. the approximate quotient with `f`
+    fraction limbs. The algorithm is that of :func:`flint_mpn_divapprox`
+    on the zero padded numerator, so that short divisors with many
+    fraction limbs cost `O(qn \cdot bn)` (blockwise for longer divisors); the
+    padded numerator is only formed for these (register-based, schoolbook,
+    blockwise and divide and conquer) algorithms, not for the short and
+    Newton divisions. A negative `f` (with
+    `an - bn + 1 + f \ge 1`) gives the top limbs of the quotient,
+    `\lfloor a / (b B^{-f}) \rfloor` or one more. Requires `bn \ge 1` and
+    `b_{bn-1} \ne 0`.
+
+.. function:: void flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
+
+    Approximate reciprocal with the same interface as :func:`flint_mpn_inv`
+    (no normalization requirement; `(q, n - xn + 2)` is written): sets it
+    to `\lfloor B^n / x \rfloor` or `\lfloor B^n / x \rfloor + 1`, i.e. the
+    result of :func:`flint_mpn_divapprox` for the numerator `B^n`. It uses
+    the algorithms of :func:`flint_mpn_inv` (with the same cutoffs) without
+    the correction steps, so that it is never slower: the exact division
+    chains for `xn \le 2` and register-based division for short `x` and
+    quotients, :func:`flint_mpn_divapprox_fraction` of `B^n`
+    (the zero limbs not formed in the short and Newton divisions) below
+    the Newton cutoffs, and above, :func:`fixed_inv_newton` with one guard
+    limb instead of three, rounded up by more than its error bound.
+
+.. function:: mp_limb_t _flint_mpn_divrem_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv)
+              mp_limb_t _flint_mpn_div_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv)
+              mp_limb_t _flint_mpn_divapprox_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv)
+              mp_limb_t _flint_mpn_divrem_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv, mp_ptr tp)
+              mp_limb_t _flint_mpn_divapprox_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv, mp_ptr tp)
+              mp_limb_t _flint_mpn_divrem_n_divconquer_preinv1(mp_ptr qp, mp_ptr np, mp_srcptr dp, mp_size_t n, mp_limb_t dinv, mp_ptr tp)
+              mp_limb_t _flint_mpn_divapprox_n_divconquer_preinv1(mp_ptr qp, mp_ptr np, mp_srcptr dp, mp_size_t n, mp_limb_t dinv, mp_ptr tp)
+              void _flint_mpn_tdiv_qr_divconquer(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+              void _flint_mpn_tdiv_q_divconquer(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
+
+    Division with a normalized divisor and the precomputed 3/2 inverse
+    ``dinv`` given by :func:`flint_mpn_preinv1` from the top two divisor
+    limbs, ported from GMP's internal ``mpn_sbpi1_*``, ``mpn_dcpi1_*``,
+    ``mpn_tdiv_qr`` and ``mpn_div_q`` functions (the divide and conquer
+    and top-level code using FLINT's multiplication).
+
+    The schoolbook functions require `dn \ge 3` and `nn \ge dn`.
+    :func:`_flint_mpn_divrem_basecase_preinv1` divides `(np, nn)` in place by the
+    normalized `(dp, dn)`: the remainder is left in `(np, dn)`, the low
+    `nn - dn` limbs of the quotient are written to `qp` and its high limb is
+    returned. :func:`_flint_mpn_div_basecase_preinv1` computes the same quotient but
+    develops the last `dn - 2` quotient limbs with a truncated divisor
+    (correcting the result when needed), and
+    :func:`_flint_mpn_divapprox_basecase_preinv1` computes an approximate quotient (correct
+    or one too large) the same way; both destroy `(np, nn)`.
+
+    :func:`_flint_mpn_divrem_preinv1` and :func:`_flint_mpn_divapprox_preinv1` are
+    the analogues for `dn \ge 2` with divide and conquer steps above
+    ``FLINT_MPN_DIV_DC_CUTOFF`` and ``FLINT_MPN_DIVAPPR_DC_CUTOFF`` divisor
+    and quotient limbs (ports of GMP's ``mpn_dcpi1_div_qr`` and
+    ``mpn_dcpi1_divappr_q``); `tp` must have room for `dn` limbs. The
+    balanced `2n / n` steps (`n \ge 6`, `tp` of `n` limbs) are
+    :func:`_flint_mpn_divrem_n_divconquer_preinv1` and
+    :func:`_flint_mpn_divapprox_n_divconquer_preinv1`. The latter is not
+    correct up to one unit: dividing the low half by the top half of the
+    divisor, each level of its recursion can make the quotient a few units
+    too large (never too small; at most 8 units too large in tests with
+    `n \le 200`), so it is used with a guard limb, as in
+    :func:`_flint_mpn_divapprox_preinv1`.
+
+    :func:`_flint_mpn_tdiv_qr_divconquer` and :func:`_flint_mpn_tdiv_q_divconquer` are
+    Euclidean divisions for any divisor with `bn \ge 2`; `r` may be
+    ``NULL``. When the quotient is at least about as long as the divisor,
+    a normalized copy is divided as above. Without the remainder, this is
+    the schoolbook division with a truncated divisor, or divide and
+    conquer steps and an approximate quotient with one guard limb that is
+    checked from the low `bn + 1` limbs of a product when the guard limb
+    is zero. For short quotients (`qn` limbs), the top
+    `2 qn` limbs of `a` are divided by the top `qn` limbs of `b` and the
+    quotient (at most two too large) is corrected using the product of the
+    quotient and the ignored divisor limbs; without the remainder, an
+    approximate division of the top `2 qn + 1` limbs by the top `qn + 1`
+    limbs gives the quotient with a guard limb, checked by a multiplication
+    only when the guard limb is small. Divide and conquer is used for the
+    quotient alone when the divisor and the quotient both have at least
+    ``FLINT_MPN_TDIV_Q_DC_CUTOFF`` limbs (the truncated divisor saving most
+    for balanced operands), or when the quotient is at least three times as
+    long as a divisor of at least ``FLINT_MPN_DIV_DC_CUTOFF`` limbs, or one
+    and a half times as long as a divisor of at least twice that length.
+    For long quotients, :func:`_flint_mpn_divapprox_preinv1` uses divide
+    and conquer divisions with remainder for all but the last block from
+    ``FLINT_MPN_DIV_DC_CUTOFF`` divisor limbs.
+
+    Quotients of `qn \le bn + 2` limbs from ``FLINT_MPN_DIVAPPROX_SHORT_CUTOFF``
+    limbs (below the Newton cutoffs) use a short division in the style of
+    Mulders: the quotient with one guard limb is computed from the top
+    `qn + 1` limbs of `a` and `b` only (the numerator limbs below
+    contribute less than two units of the guard limb), recursively, with
+    the top half of the quotient from an exact division by the top half of
+    the divisor and the correction for the rest of the divisor needed only
+    above the current precision, i.e. as a high product
+    (:func:`flint_mpn_mulhigh_n`) instead of the full product of the
+    divide and conquer approximate division. The error is a few units of
+    the guard limb per recursion level (at most 8 in total in tests); with
+    an allowed error of `B^{1/2}` units, the quotient needs a check by a
+    multiplication only when the guard limb is within `B^{1/2}` of a
+    boundary. This is 5 to 15% faster than the previous algorithms for
+    balanced operands.
+
+    The cutoffs are machine-dependent; ``src/mpn_extras/tune/tune-div.c`` measures them
+    (together with ``FLINT_MPN_TDIV_QR_NEWTON_CUTOFF``,
+    ``FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF``,
+    ``FLINT_MPN_SQRTREM_NEWTON_CUTOFF`` and, on machines with fast hardware
+    division, the hardware chain cutoffs ``FLINT_MPN_DIVREM_1_HW_CUTOFF``,
+    ``FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF``, ``FLINT_MPN_DIV_2_HW_CUTOFF`` and
+    ``FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF``, and ``FLINT_MPN_DIV_2_GMP_CUTOFF``)
+    for ``flint-mparam.h``.
 
 .. function:: void flint_mpn_cdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
               void flint_mpn_cdiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
@@ -672,17 +847,22 @@ Division
     Exact division: sets `(q, an - bn + 1)` to `a / b`, assuming that `b`
     divides `a`. Requires `an \ge bn \ge 1` and `b_{bn-1} \ne 0`.
 
-    Single-limb divisors are handled by ``mpn_divexact_1``. When GMP's
-    internal ``mpn_divexact`` is available (``FLINT_HAVE_NATIVE_mpn_divexact``)
-    it is used when `\min(bn, an - bn + 1)` is below
-    ``FLINT_MPN_DIVEXACT_NEWTON_CUTOFF``, unless the quotient is at least four
-    times longer than a divisor of at least
-    ``FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF`` limbs. Otherwise
-    the division is done 2-adically: writing `b = 2^v B^k b'` with `b'` odd,
-    the quotient is `(a / (2^v B^k)) \, b'^{-1} \bmod B^{an - bn + 1}`, computed
-    with :func:`flint_mpn_bdiv_q`. (A bidirectional variant computing the
-    high half of the quotient by Euclidean division was found to be slower
-    and is not used.)
+    Single-limb divisors are handled by ``mpn_divexact_1``. Otherwise the
+    division is done 2-adically: writing `b = 2^v B^k b'` with `b'` odd,
+    the quotient is `(a / (2^v B^k)) \, b'^{-1} \bmod B^{n}` where `n` is the
+    number of quotient limbs (`an - bn + 1`, or one less when the top limb
+    of `a` is below that of `b`). With `d = \min(bn, n)` significant
+    divisor limbs, `d \le 7` uses register-resident code specialized for
+    each `d`, with the shift by `2^v` done on the fly and the limb inverse
+    `b'^{-1} \bmod B` computed inline without a table (two to three times
+    faster than GMP's ``mpn_divexact``). Larger `d` use ports of GMP's
+    schoolbook and divide and conquer Hensel division
+    (``mpn_sbpi1_bdiv_q``, ``mpn_dcpi1_bdiv_q``, the latter from
+    ``FLINT_MPN_DC_BDIV_Q_CUTOFF`` limbs) with FLINT's multiplication, and
+    :func:`flint_mpn_bdiv_q` (Newton iteration) from `d \ge`
+    ``FLINT_MPN_DIVEXACT_NEWTON_CUTOFF``, or already from
+    `bn \ge` ``FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF`` when `n \ge 4 bn`.
+    :func:`_flint_mpn_divexact_hensel` always uses :func:`flint_mpn_bdiv_q`.
 
 .. type:: flint_mpn_divexact_preinv_struct
           flint_mpn_divexact_preinv_t
@@ -699,12 +879,13 @@ Division
     sets `(q, an - bn + 1)` to `a / b`, assuming `b` divides `a`. Quotients
     of at most `bn' + 1` limbs cost a single :func:`flint_mpn_mullow_n`;
     longer ones use the block Hensel division with the stored inverse (one
-    low and one high `bn' \times bn'` product per block). Only the low
+    low and one high `bn' \times bn'` product per block), except for
+    divisors `b'` of at most 7 limbs, where the register-based code of
+    :func:`flint_mpn_divexact` is faster. Only the low
     limbs of `a` that can influence the quotient are read (and shifted when
     `b` is even). Compared with a fresh ``mpn_divexact`` for every division,
     which recomputes an inverse each time, this is 1.5-2.5 times faster for
-    balanced operands and 10-25% faster for long quotients; divisors of
-    2-4 limbs with long quotients are handed to GMP. Used by
+    balanced operands and 10-25% faster for long quotients. Used by
     :func:`_fmpz_vec_scalar_divexact_fmpz` and
     :func:`fmpz_mat_scalar_divexact_fmpz` when at least two entries are as
     large as the divisor.
@@ -715,18 +896,37 @@ Division
     `b_{bn-1} \ne 0`; `a` may have zero top limbs and `an` may be zero.
 
     After the trivial cases and the 2-adic part (`b = 2^v B^k b'` with `b'`
-    odd), single-limb divisors use the Hensel remainder
-    (``mpn_modexact_1_odd``), two-limb divisors of dividends of at most four
-    limbs use inline Hensel steps with a limb inverse, and long dividends
-    are first screened by trial division: the residues of `b` and `a`
-    modulo `2^{48} - 1` (nine small prime factors, computed at a quarter of
-    a nanosecond per limb by :func:`flint_mpn_mod_2exp48m1`) reveal a prime
-    dividing `b` but not `a` for about 60% of random pairs, rejecting them
-    in `O(an)` time. The remaining cases go to GMP's ``mpn_divisible_p``
-    below ``FLINT_MPN_DIVISIBLE_GMP_CUTOFF`` divisor limbs when available,
-    and otherwise to the Hensel division with remainder
-    :func:`flint_mpn_bdiv_qr` with `an - bn + 1` quotient limbs, `b'`
-    dividing `a` iff the remainder vanishes. Used by :func:`fmpz_divisible`.
+    odd), divisors `b'` of one limb use the Hensel remainder
+    (``mpn_modexact_1_odd``). When both the divisor and the quotient have
+    at least 16 limbs, the operands are first screened by trial division:
+    the residues of `b` and `a` modulo `2^{48} - 1` (nine small prime
+    factors, computed at a quarter of a nanosecond per limb by
+    :func:`flint_mpn_mod_2exp48m1`) reveal a prime dividing `b` but not `a`
+    for about 60% of random pairs, rejecting them in `O(an)` time. Then,
+    with `n = an - bn + 1`: divisors `b'` of at most
+    ``FLINT_MPN_DIVEXACT_SMALL_BN`` limbs use
+    :func:`_flint_mpn_divisible_small`; for huge operands
+    (`\min(n, bn) \ge` ``FLINT_MPN_DIVEXACT_NEWTON_CUTOFF``, or
+    `bn \ge` ``FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF`` and `n \ge 8 bn`)
+    the candidate comes from the Newton-based Hensel division and only the
+    high part of its product with `b` is formed
+    (:func:`_flint_mpn_mulhigh_known_low`), the low part being known;
+    otherwise, as in GMP's ``mpn_divisible_p``, a Hensel division with
+    remainder (a port of GMP's schoolbook and divide and conquer
+    ``mpn_sbpi1_bdiv_qr`` / ``mpn_dcpi1_bdiv_qr``, the latter from
+    ``FLINT_MPN_DC_BDIV_QR_CUTOFF`` limbs) is done after padding `a` so
+    that its top limb is below that of `b'`, and `b'` divides `a` iff the
+    remainder equals `b'`. Used by :func:`fmpz_divisible`.
+
+.. function:: int _flint_mpn_divisible_small(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, unsigned int v)
+
+    Divisibility test for `b = 2^v b'` with `b'` odd of at most
+    ``FLINT_MPN_DIVEXACT_SMALL_BN`` limbs, given that `2^v` divides `a`
+    (`bn \ge 2`, `v < 64`, `a_{an-1} \ne 0`). The shifted `a` is streamed
+    through a Hensel remainder computation with `b'` and the running
+    remainder held in registers, padded as in GMP so that no quotient limb
+    beyond the top of `a` is needed; `b'` divides `a` iff the final
+    remainder is zero.
 
 .. function:: mp_limb_t flint_mpn_mod_2exp48m1(mp_srcptr a, mp_size_t n)
 
@@ -767,14 +967,29 @@ Division
     :func:`flint_mpn_sqr` uses ``fft_small``). Used by :func:`fmpz_pow_ui`.
 
 .. function:: void flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
+              void _flint_mpn_inv_basecase(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
 
     Correctly truncated reciprocal: sets `(q, n - xn + 2)` to
     `\lfloor B^n / x \rfloor`. Requires `x_{xn-1} \ne 0` and `n \ge xn`. The
     top output limb is nonzero only when `x` is a power of `B`.
-    For large operands this uses :func:`fixed_inv_newton` with three extra
-    fraction limbs, with the same certification and correction scheme as
-    :func:`flint_mpn_tdiv_qr`, and avoids forming the numerator `B^n`
-    altogether in the common case.
+    One- and two-limb `x` use a chain of 2/1 or 3/2 divisions of zero limbs
+    (GMP's ``mpn_divrem_1`` / ``mpn_divrem_2`` with fraction limbs where
+    hardware division is slow). Otherwise, when `\min(xn, n - xn + 2)` is
+    below ``FLINT_MPN_INV_NEWTON_CUTOFF`` (quotients of at most `xn + 2`
+    limbs, which use the short division),
+    ``FLINT_MPN_INV_NEWTON_LONG_CUTOFF`` (quotients of at most `6 xn`
+    limbs) or ``FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF`` (longer quotients,
+    for which the division by blocks of `x` stays faster up to larger
+    `x`), the quotient is computed by
+    :func:`flint_mpn_tdiv_q` without the remainder (reading only the top
+    `O(n - xn)` limbs of `x` for short quotients), and above it by
+    :func:`fixed_inv_newton` with three extra fraction limbs, with the same
+    certification and correction scheme as :func:`flint_mpn_tdiv_qr`,
+    which avoids forming the numerator `B^n` altogether in the common case.
+    :func:`_flint_mpn_inv_basecase` is the version without Newton
+    inversion. It is used by :func:`fixed_inv_newton_basecase`, so that
+    the mutual calls between the Newton inversion and the division only
+    ever go to lower precisions, whatever the cutoffs.
 
 mpz-like interface
 --------------------------------------------------------------------------------
@@ -796,11 +1011,13 @@ mpz-like interface
     Drop-in replacements for the GMP functions of the same names (identical
     semantics for signs, rounding modes and aliasing), with the limb-level
     work done by :func:`flint_mpn_tdiv_qr`, :func:`flint_mpn_divexact` and
-    :func:`flint_mpn_sqrtrem`. Divisors (respectively square root
-    arguments) of at most two limbs are passed straight to GMP, which has
-    dedicated fast paths for them; otherwise the flint_mpn routines choose
-    between GMP's mpn layer and Newton iteration. These are used by the
-    ``fmpz`` division and square root functions for large operands.
+    :func:`flint_mpn_sqrtrem`, and the floor and ceiling adjustments done on
+    the limbs. There is no dispatch to GMP's mpz functions: these are at
+    least as fast as GMP's for all operand sizes measured, including one-
+    and two-limb divisors and zero quotients (the trivial cases are handled
+    before tail-calling the main code, so that they cost a few
+    instructions). These are used by the ``fmpz`` division and square root
+    functions for large operands.
 
 Hensel (2-adic) division and square root
 --------------------------------------------------------------------------------
@@ -872,6 +1089,7 @@ Square root
 --------------------------------------------------------------------------------
 
 .. function:: mp_size_t flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
+              mp_size_t _flint_mpn_sqrtrem_divconquer(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
               void _flint_mpn_sqrtrem_newton(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
               void _flint_mpn_sqrtrem_gmp(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
 
@@ -883,13 +1101,38 @@ Square root
     return value is 0 if `a` is a perfect square and 1 otherwise (GMP's
     convention). Requires `an \ge 1` and `a_{an-1} \ne 0`.
 
+    On 64-bit machines, inputs of up to four limbs have dedicated code.
     Two-limb inputs use the hardware double-precision square root for the
-    initial approximation, followed by one Newton step with a 128/64-bit
-    division when `a \ge 2^{100}` and a final adjustment; this is about
-    twice as fast as GMP below `2^{100}` and 1.3-1.4 times faster above.
-    Below ``FLINT_MPN_SQRTREM_NEWTON_CUTOFF`` input limbs the function
-    otherwise wraps GMP's ``mpn_sqrtrem`` (which needs `an` limbs of
-    remainder space; the remainder is copied). Above it, `a` is viewed as a
+    initial approximation, followed for `a \ge 2^{108}` by one Newton step
+    and a final adjustment. When the compiler reports a fast fused
+    multiply-add (``FP_FAST_FMA``), the Newton step is evaluated in
+    floating point: the residual `a - D^2` of the integral approximation
+    `D = 2^{32} \sqrt{a_1}` is computed exactly by an FMA from an exact
+    splitting of `a`, so that no 128/64-bit division is needed; otherwise
+    the Newton step uses a 128/64-bit division. Three- and four-limb inputs
+    use one step of the divide and conquer (Karatsuba) square root
+    algorithm as in GMP's ``mpn_dc_sqrtrem``, fully unrolled: after
+    normalization, the two-limb code gives the square root of the top two
+    limbs, one 2/1 division gives the remaining limb of the root (for three
+    limbs, the remaining 32 bits, using an unbalanced split instead of
+    GMP's zero padding), and the remainder is corrected once without
+    branching. These are two to three times faster than GMP.
+
+    Larger inputs below ``FLINT_MPN_SQRTREM_NEWTON_CUTOFF`` limbs use
+    :func:`_flint_mpn_sqrtrem_divconquer` on 64-bit machines (GMP's ``mpn_sqrtrem``
+    on 32-bit machines). This is GMP's divide and conquer algorithm
+    (``mpn_dc_sqrtrem``, and ``mpn_dc_sqrt`` when no remainder is wanted),
+    with the code above as basecases, FLINT's squaring, and the divide and
+    conquer division of :func:`_flint_mpn_divrem_preinv1`. When no remainder is
+    wanted, the last step uses an approximate quotient with a guard limb
+    (:func:`flint_mpn_divapprox`), and only
+    if that is inconclusive (in particular for perfect squares) is the
+    remainder of the division evaluated, from the low part of a product
+    (:func:`flint_mpn_mulmid`). This is 10 to 25 percent faster than GMP.
+    :func:`_flint_mpn_sqrtrem_divconquer` requires `an \ge 5` and needs no
+    remainder space beyond `\lceil an/2 \rceil + 1` limbs.
+
+    Above the cutoff, `a` is viewed as a
     fixed-point number in `[B^{-2}, 1)` and :func:`fixed_sqrt_newton` is used
     with three extra fraction limbs, so that the truncated root is certified
     whenever the first fraction limb lies in `[2, B-2]`; otherwise it is
@@ -924,20 +1167,23 @@ Square root
 Division and modular arithmetic with precomputed inverses
 --------------------------------------------------------------------------------
 
-.. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
+.. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d0)
 
-    Computes a precomputed inverse from the leading two limbs of the
-    divisor ``b, n`` to be used with the ``preinv1`` functions.
-    We require the most significant bit of ``b, n`` to be 1.
+    Returns the 3/2 inverse `\lfloor (B^3 - 1) / (d_1 B + d_0) \rfloor - B`
+    of the leading two limbs `d_1, d_0` of a divisor, to be used with the
+    ``preinv1`` functions. Requires `d_1 \ge B/2`. This is computed inline
+    from the limb inverse of `d_1` as in GMP's ``invert_pi1``.
 
 .. function:: mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 
-    Divide ``a, m`` by ``b, n``, returning the high limb of the 
-    quotient (which will either be 0 or 1), storing the remainder in-place 
+    Divide ``a, m`` by ``b, n``, returning the high limb of the
+    quotient (which will either be 0 or 1), storing the remainder in-place
     in ``a, n`` and the rest of the quotient in ``q, m - n``.
     We require the most significant bit of ``b, n`` to be 1.
-    ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
+    ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
+    This is :func:`_flint_mpn_divrem_preinv1` (schoolbook or divide and
+    conquer division) with scratch space allocated as needed.
 
 .. function:: mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr q, mp_srcptr a, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 
@@ -974,7 +1220,9 @@ Division and modular arithmetic with precomputed inverses
     so that it has the same shift as all the inputs.
 
     We require `a` and `b` to be reduced modulo `n` before calling the
-    function. 
+    function. The product is reduced by :func:`_flint_mpn_divrem_preinv1`.
+    For `n = 1`, ``dinv`` is ``flint_mpn_preinv1(d[0], 0)``, which equals
+    ``n_preinvert_limb(d[0])``.
 
 .. function:: void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 

@@ -194,7 +194,7 @@ fixed_log1p_opt_4(nn_ptr res, nn_srcptr x)
     nd[7] = d3;
     flint_mpn_zero(t, 4);
     if (d3 != 0 || d2 != 0 || d1 != 0 || d0 != 0)
-        mpn_tdiv_qr(t, nd, 0, nd, 8, S, 5);
+        flint_mpn_tdiv_qr(t, nd, nd, 8, S, 5);
 
     _fixed_log1p_series_4(y, t);
 

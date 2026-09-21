@@ -867,6 +867,7 @@ main ()
   int cpu_64bit = 0, cpu_avx = 0;
   int cpu_avx_fma = 0, cpu_avx512f_avx512dq = 0;
   int cpuid_64bit, cpuid_avx, cpuid_osxsave, cpuid_avx512f;
+  int intel_unknown = 0;
 
   CPUID (vendor_string, 0);
   vendor_string[12] = 0;
@@ -959,6 +960,21 @@ main ()
           else if (model == 0xba) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
           else if (model == 0xb7) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
           else if (model == 0xaa) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Meteor Lake H, U */
+          else if (model == 0xac) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Meteor Lake */
+          else if (model == 0xad) cpu_64bit = 1, cpu_avx=1, modelstr = "sapphirerapids"; /* Granite Rapids X */
+          else if (model == 0xae) cpu_64bit = 1, cpu_avx=1, modelstr = "sapphirerapids"; /* Granite Rapids D */
+          else if (model == 0xaf) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Sierra Forest */
+          else if (model == 0xb5) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake U */
+          else if (model == 0xb6) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Grand Ridge */
+          else if (model == 0xbd) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Lunar Lake */
+          else if (model == 0xbe) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Alder Lake N */
+          else if (model == 0xbf) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake S */
+          else if (model == 0xc5) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake H */
+          else if (model == 0xc6) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake S */
+          else if (model == 0xcc) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Panther Lake */
+          else if (model == 0xcf) cpu_64bit = 1, cpu_avx=1, modelstr = "sapphirerapids"; /* Emerald Rapids */
+          else if (model == 0xdd) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Clearwater Forest */
+          else if (model >= 0x8f) cpu_64bit = 1, intel_unknown = 1;                  /* newer than table */
           else                    cpu_64bit = 1,            modelstr = "nehalem";    /* default */
 
           if (strcmp (modelstr, "haswell") == 0 ||
@@ -977,6 +993,27 @@ main ()
         case 15:
           cpu_64bit = 1, modelstr = "pentium4";
           break;
+        default:
+          /* Families 18 (Nova Lake), 19 (Diamond Rapids) and later.  */
+          if (family > 15)
+            cpu_64bit = 1, intel_unknown = 1;
+          break;
+        }
+
+      /* An Intel CPU newer than the tables above: choose by features
+         rather than falling back to generic parameters.  */
+      if (intel_unknown)
+        {
+          int avx2 = (feature_string[0] >> 5) & 1;
+          int bmi2 = (feature_string[1] >> 0) & 1;
+          int adx  = (feature_string[2] >> 3) & 1;
+
+          if (cpuid_avx512f && bmi2 && adx)
+            cpu_avx = 1, modelstr = "icelake_server";
+          else if (avx2 && bmi2 && adx)
+            cpu_avx = 1, modelstr = "alderlake";
+          else
+            modelstr = "nehalem";
         }
     }
   else if (strcmp (vendor_string, "AuthenticAMD") == 0)

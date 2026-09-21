@@ -36,11 +36,48 @@
 
 #define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
 
-/* Newton division, Hensel exact division and Newton square root beat
-   GMP from these limb counts (divisor / quotient limbs for the first two,
+/* Newton division, Newton Hensel (exact) division and Newton square root
+   replace the divide and conquer code from these limb counts (divisor /
+   quotient limbs for the first two, divisor limbs for the next two with
+   a quotient at least as long, respectively at least four times as long,
    input limbs for the square root) */
-#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 1024
-#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1024
-#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 2800
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
+#define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1187
+#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
+
+/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c (on an
+   Emerald Rapids Xeon without FLINT_PREINVERT_LIMB_USE_NATIVE, against
+   GMP 6.3.0 built with --host=skylake) */
+#define FLINT_MPN_DIV_DC_CUTOFF 18
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 32
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 45
+#define FLINT_MPN_TDIV_Q_DC_CUTOFF 72
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 921
+#define FLINT_MPN_INV_NEWTON_CUTOFF 37
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 24
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF 171
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 40
+#define FLINT_MPN_DC_BDIV_Q_CUTOFF 80
+
+/* one-limb division by a chain of hardware divisions below these dividend
+   lengths (unnormalized / normalized divisor); only used with
+   FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3 values) */
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 24
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 14
+
+/* two-limb divisors by hardware 2/1 divisions without an inverse below this
+   dividend length; only used with FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3
+   value) */
+#define FLINT_MPN_DIV_2_HW_CUTOFF 22
+
+/* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
+   quotients shorter than this */
+#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 4
+
+/* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
+   this dividend length (1000000: never) */
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 8
 
 #endif

@@ -162,7 +162,7 @@ _fixed_trig_opt_2(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
         else
             c = 2;
 
-        mpn_tdiv_qr(R, rem, 0, N, 4, S, 2);
+        flint_mpn_tdiv_qr(R, rem, N, 4, S, 2);
 
         if (ysin != NULL)
         {
@@ -207,7 +207,7 @@ _fixed_trig_opt_2(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
         }
         c += 2;
 
-        mpn_tdiv_qr(R, rem, 0, N, 4, S, 2);
+        flint_mpn_tdiv_qr(R, rem, N, 4, S, 2);
 
         _fixed_mulhi_2x2_sloppy(v + 1, v, A[1], A[0], R[1], R[0]);
         ytan[2] = v[1] >> (FLINT_BITS - c);

@@ -529,7 +529,7 @@ dyadic_finish(nn_ptr res, slong n, const fx_t * N, const fx_t * D,
             qn = num_n - den_n + 1;
             q = TMP_ALLOC((qn + 1) * sizeof(ulong));
             r = TMP_ALLOC(den_n * sizeof(ulong));
-            mpn_tdiv_qr(q, r, 0, num, num_n, den, den_n);
+            flint_mpn_tdiv_qr(q, r, num, num_n, den, den_n);
             while (qn > 0 && q[qn - 1] == 0) qn--;
             FLINT_ASSERT(qn <= n);
             flint_mpn_copyi(res, q, qn);
