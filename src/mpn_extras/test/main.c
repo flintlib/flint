@@ -25,6 +25,8 @@
 #include "t-ndiv_qr.c"
 #include "t-sqrtrem.c"
 #include "t-tdiv_qr.c"
+#include "t-divapprox.c"
+#include "t-invapprox.c"
 #include "t-divides.c"
 #include "t-divrem_1_preinv.c"
 #include "t-divrem_preinv1.c"
@@ -77,6 +79,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_ndiv_qr),
     TEST_FUNCTION(flint_mpn_sqrtrem),
     TEST_FUNCTION(flint_mpn_tdiv_qr),
+    TEST_FUNCTION(flint_mpn_divapprox),
+    TEST_FUNCTION(flint_mpn_invapprox),
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_1_preinv),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),

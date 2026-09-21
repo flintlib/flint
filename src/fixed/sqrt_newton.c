@@ -144,7 +144,7 @@ fixed_rsqrt_newton_basecase(nn_ptr Q, nn_srcptr A, slong An, slong n)
     mpn_sqrtrem(br, NULL, W, Wn);       /* sqrt into br as scratch */
     bqn = Un - bsn + 1;
     FLINT_ASSERT(bqn <= n + 2);
-    mpn_tdiv_qr(bq, W, 0, U, Un, br, bsn);   /* remainder into W */
+    flint_mpn_tdiv_qr(bq, W, U, Un, br, bsn);   /* remainder into W */
 
     while (bqn > 0 && bq[bqn - 1] == 0)
         bqn--;

@@ -100,27 +100,27 @@ flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_d
     a += k;
     an -= k;
 
-#if FLINT_HAVE_NATIVE_mpn_divexact
-    if (bn >= 2 && bn <= 4 && n > bn + 1)
+    if (bn >= 2 && bn <= FLINT_MPN_DIVEXACT_SMALL_BN && n > bn + 1)
     {
-        /* long quotients by tiny divisors: GMP's schoolbook Hensel division
-           with a limb inverse beats the block algorithm here; it is given
-           the exactly divisible (fully shifted) operands and writes
-           an - bn + 1 >= n limbs, the extra ones being zero */
+        /* long quotients by short divisors: the register-based Hensel
+           division of _flint_mpn_divexact beats the block algorithm here;
+           it is given the exactly divisible (fully shifted) operands and
+           writes an - bn + 1 >= n limbs, the extra ones being zero */
         mp_ptr qq;
+        /* _flint_mpn_divexact wants a nonzero top limb */
+        mp_size_t bn2 = bn - (pre->b[bn - 1] == 0);
         TMP_START;
-        as = TMP_ALLOC((an + (an - bn + 1)) * sizeof(mp_limb_t));
+        as = TMP_ALLOC((an + (an - bn2 + 1)) * sizeof(mp_limb_t));
         qq = as + an;
         if (pre->v != 0)
             mpn_rshift(as, a, an, pre->v);
         else
             flint_mpn_copyi(as, a, an);
-        mpn_divexact(qq, as, an, pre->b, bn);
+        _flint_mpn_divexact(qq, as, an, pre->b, bn2);
         flint_mpn_copyi(q, qq, n);
         TMP_END;
         return;
     }
-#endif
 
     /* only the low n limbs of a enter a single low product, and the low
        n + bn limbs a block division */

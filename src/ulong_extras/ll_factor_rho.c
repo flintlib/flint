@@ -61,7 +61,7 @@ n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries,
         ulong tmp[5], q[4];
         tmp[0] = tmp[1] = tmp[2] = tmp[3] = 0;
         tmp[4] = 1;                       /* 2^256 */
-        mpn_tdiv_qr(q, r2, 0, tmp, 5, nvec, 2);
+        flint_mpn_tdiv_qr(q, r2, tmp, 5, nvec, 2);
     }
 
     /* 1 in Montgomery form = R mod n */

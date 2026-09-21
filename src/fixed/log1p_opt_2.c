@@ -106,7 +106,7 @@ fixed_log1p_opt_2(nn_ptr res, nn_srcptr x)
     nd[3] = d1;
     t2[0] = t2[1] = 0;
     if (d1 != 0 || d0 != 0)
-        mpn_tdiv_qr(t2, rem, 0, nd, 4, S, 3);
+        flint_mpn_tdiv_qr(t2, rem, nd, 4, S, 3);
 
     /* generated atanh series for t < 2^-16 (single denominator
        division by truncated-inverse multiplication) */

@@ -230,7 +230,7 @@ static void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     slong qn = size1 - size2 + 1;
 
     if (rn <= 3 || (rn >= 15 && qn == 1) || (rn >= 60 && qn <= 40))
-        mpn_tdiv_qr(qp, rp, 0, ap, usize1, dp, usize2);
+        flint_mpn_tdiv_qr(qp, rp, ap, usize1, dp, usize2);
     else {
         if (nm) {
             tp = TMP_ALLOC(usize2*sizeof(ulong));

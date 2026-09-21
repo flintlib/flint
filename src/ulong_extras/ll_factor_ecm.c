@@ -67,7 +67,7 @@ ll_mont_init(ll_mont_t M, ulong n1, ulong n0)
     /* R^2 mod n, where R = 2^(2*FLINT_BITS) */
     num[0] = num[1] = num[2] = num[3] = 0;
     num[4] = 1;
-    mpn_tdiv_qr(quot, M->R2, 0, num, 5, nvec, 2);
+    flint_mpn_tdiv_qr(quot, M->R2, num, 5, nvec, 2);
 
     /* R mod n = R^2 / R */
     LL_MULMOD(M->one[1], M->one[0], M->R2[1], M->R2[0], 0, 1, n1, n0, M->np);

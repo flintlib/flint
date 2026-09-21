@@ -28,28 +28,12 @@
 void
 fixed_inv_newton_basecase(nn_ptr Q, nn_srcptr A, slong An, slong n)
 {
-    nn_ptr U, R;
-    nn_srcptr V;
-    slong Un, Vn;
-    TMP_INIT;
+    slong Vn = FLINT_MIN(An, n + 1);
 
-    Vn = FLINT_MIN(An, n + 1);
-    Un = Vn + n + 1;
-
-    TMP_START;
-    U = TMP_ALLOC((Un + Vn) * sizeof(ulong));
-    R = U + Un;
-    V = A + An - Vn;
-
-    flint_mpn_zero(U, Un - 1);
-    U[Un - 1] = 1;
-
-    if (Vn == 1)
-        mpn_divrem_1(Q, 0, U, Un, V[0]);
-    else
-        mpn_tdiv_qr(Q, R, 0, U, Un, V, Vn);
-
-    TMP_END;
+    /* floor(B^(Vn + n) / V) for the top Vn limbs V of A, with n + 2
+       limbs, by division: unlike flint_mpn_inv, _flint_mpn_inv_basecase
+       never calls fixed_inv_newton at the same or a higher precision */
+    _flint_mpn_inv_basecase(Q, A + An - Vn, Vn, Vn + n);
 }
 
 /* Tuned on this machine (see dev/notes); must be at least 4 for the

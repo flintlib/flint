@@ -40,11 +40,43 @@
 
 #define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 470
 
-/* Newton division, Hensel exact division and Newton square root beat
-   GMP from these limb counts (divisor / quotient limbs for the first two,
-   input limbs for the square root). */
-#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 500
-#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 500
-#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 2000
+/* Newton division, Newton Hensel (exact) division and Newton square root
+   replace the divide and conquer code from these limb counts (divisor /
+   quotient limbs for the first two, divisor limbs for the next two with
+   a quotient at least as long, respectively at least four times as long,
+   input limbs for the square root) */
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 760
+#define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 487
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 950
+#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 340
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 5155
+
+/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c */
+#define FLINT_MPN_DIV_DC_CUTOFF 20
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 64
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 56
+#define FLINT_MPN_TDIV_Q_DC_CUTOFF 112
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 378
+#define FLINT_MPN_INV_NEWTON_CUTOFF 71
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 71
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 64
+#define FLINT_MPN_DC_BDIV_Q_CUTOFF 120
+
+/* one-limb division by a chain of hardware divisions below these dividend
+   lengths (unnormalized / normalized divisor) */
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 20
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 8
+
+/* two-limb divisors by hardware 2/1 divisions without an inverse below this
+   dividend length */
+#define FLINT_MPN_DIV_2_HW_CUTOFF 24
+
+/* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
+   quotients shorter than this */
+#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 6
+
+/* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
+   this dividend length (1000000: never) */
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 24
 
 #endif

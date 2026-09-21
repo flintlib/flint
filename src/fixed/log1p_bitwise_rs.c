@@ -315,7 +315,7 @@ fixed_log1p_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
             /* quotient has ds - wn + 1 = n - qr limbs */
             if (ds - wn + 1 < FIXED_RED_DIV_NEWTON_CUTOFF)
         {
-            mpn_tdiv_qr(t, nd, 0, nd, ds, sh, wn);
+            flint_mpn_tdiv_qr(t, nd, nd, ds, sh, wn);
         }
         else
         {

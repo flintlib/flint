@@ -4,6 +4,10 @@
     2x2 mul code taken from MPFR 2.3.0
     (Copyright (C) 1991-2007 Free Software Foundation, Inc.)
 
+    invert_pi1, udiv_qrnnd_preinv and udiv_qr_3by2 adapted from GMP's
+    gmp-impl.h:
+    Copyright 1991-2018, 2021, 2022 Free Software Foundation, Inc.
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -387,14 +391,6 @@ char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int ne
         add_ssaaaa(r1, r0, s1, s0, __dt1, __dt0); \
     } while (0); \
 
-#define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
-   do { \
-      mp_limb_t __q2, __q3; \
-      umul_ppmm((q), __q2, (a_hi), (dinv)); \
-      __q3 = n_mulhi((a_lo), (dinv)); \
-      add_ssaaaa((q), __q2, (q), __q2, 0, __q3); \
-      add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
-   } while (0)
 
 /* addition ******************************************************************/
 
@@ -1171,17 +1167,59 @@ mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n
 
 /* division ******************************************************************/
 
-/* FLINT_MPN_TDIV_QR_NEWTON_CUTOFF, FLINT_MPN_DIVEXACT_NEWTON_CUTOFF and
-   FLINT_MPN_SQRTREM_NEWTON_CUTOFF (limbs above which the Newton / Hensel
-   algorithms beat GMP) are defined per architecture in flint-mparam.h */
+/* The division and square root cutoffs (FLINT_MPN_TDIV_QR_NEWTON_CUTOFF,
+   FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF, FLINT_MPN_DIVEXACT_NEWTON_CUTOFF,
+   FLINT_MPN_SQRTREM_NEWTON_CUTOFF, FLINT_MPN_DIV_DC_CUTOFF,
+   FLINT_MPN_DIVAPPR_DC_CUTOFF, FLINT_MPN_DIVAPPROX_SHORT_CUTOFF,
+   FLINT_MPN_TDIV_Q_DC_CUTOFF,
+   FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF,
+   FLINT_MPN_INV_NEWTON_CUTOFF, FLINT_MPN_INV_NEWTON_LONG_CUTOFF,
+   FLINT_MPN_DIVREM_1_HW_CUTOFF,
+   FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF, FLINT_MPN_DIV_2_HW_CUTOFF,
+   FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF, FLINT_MPN_DIV_2_GMP_CUTOFF,
+   FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF, FLINT_MPN_DC_BDIV_QR_CUTOFF,
+   FLINT_MPN_DC_BDIV_Q_CUTOFF) are defined per architecture in
+   flint-mparam.h and measured by src/mpn_extras/tune/tune-div.c. The
+   divide and conquer cutoffs must be at least 6.
 
-/* Shapes for which GMP's mpn_tdiv_qr / mpn_div_q are used directly (the
-   general dispatcher only pays off for long divisors or long quotients);
-   inlined so that small divisions cost no more than the GMP call. */
-#define FLINT_MPN_TDIV_QR_SMALL(an, bn) \
-    ((bn) < 4 || ((bn) < FLINT_MPN_TDIV_QR_NEWTON_CUTOFF && (an) < 4 * (bn)))
+   Newton division is used for Bn >= FLINT_MPN_TDIV_QR_NEWTON_CUTOFF with a
+   quotient at least as long, and already for Bn >=
+   FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF when the quotient has >= 2 Bn limbs. */
 
+/* Where hardware division is fast (FLINT_PREINVERT_LIMB_USE_NATIVE),
+   one-limb divisors use a chain of hardware divisions for dividends shorter
+   than FLINT_MPN_DIVREM_1_HW_CUTOFF limbs, respectively
+   FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF limbs for normalized divisors (for
+   which GMP's mpn_divrem_1 needs no shifts), and mpn_divrem_1 otherwise */
+#define FLINT_MPN_DIVREM_1_USE_HW(an, d) \
+    ((an) < (((d) >> (FLINT_BITS - 1)) ? FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF \
+                                       : FLINT_MPN_DIVREM_1_HW_CUTOFF))
 
+/* block division with a shared Newton inverse (_flint_mpn_tdiv_qr_unbalanced)
+   from these divisor lengths when an >= 4 bn, respectively an >= 3 bn */
+#ifndef FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF   /* an >= 4 bn */
+#define FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF 64
+#endif
+#ifndef FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF   /* an >= 3 bn */
+#define FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF 512
+#endif
+
+/* Shapes handled by the register-based division for short divisors
+   (_flint_mpn_tdiv_qr_small, div_qr.c); for divisors of more than three
+   limbs it is used for short dividends, where it beats the schoolbook
+   division with function calls. Without the remainder, the schoolbook
+   division with a truncated divisor (_flint_mpn_div_basecase_preinv1) wins for longer
+   dividends, and for seven-limb divisors unless the limb inversion is
+   fast. */
+#if FLINT_PREINVERT_LIMB_USE_NATIVE
+# define FLINT_MPN_DIV_SMALL_SHAPE(an, bn, want_r) \
+    ((bn) <= 3 || ((bn) <= FLINT_MPN_DIV_SMALL_BN && \
+        ((want_r) ? ((an) <= 3 * (bn)) : ((an) <= (bn) + 2))))
+#else
+# define FLINT_MPN_DIV_SMALL_SHAPE(an, bn, want_r) \
+    ((bn) <= 3 || ((bn) <= FLINT_MPN_DIV_SMALL_BN && \
+        ((want_r) ? ((an) <= 3 * (bn)) : ((bn) <= 6 && (an) <= (bn) + 2))))
+#endif
 
 #if FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
@@ -1193,8 +1231,187 @@ mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
 mp_limb_t mpn_invert_limb(mp_limb_t);
 #endif
 
-mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+
+/* Preinverted division (div_qr.c), as GMP's mpn_sbpi1_* and mpn_dcpi1_*
+   functions with divide and conquer steps using FLINT's multiplication.
+   Cutoffs (divisor limbs) are defined per architecture in flint-mparam.h. */
+
+
+/* floor((B^2 - 1) / d) - B for a normalized limb d, inline: a hardware
+   division where that is fast (FLINT_PREINVERT_LIMB_USE_NATIVE), otherwise
+   the table-based method of n_preinvert_limb_prenorm */
+#if FLINT_BITS == 64
+FLINT_DLL extern const unsigned short flint_invert_limb_tab[256];
+#endif
+
+#if FLINT_PREINVERT_LIMB_USE_NATIVE
+# define FLINT_MPN_INVERT_LIMB(v, d) \
+    do { mp_limb_t __r; udiv_qrnnd((v), __r, ~(d), ~UWORD(0), (d)); (void) __r; } while (0)
+#elif FLINT_HAVE_NATIVE_mpn_invert_limb
+/* GMP's assembly table-based inversion */
+mp_limb_t __gmpn_invert_limb(mp_limb_t);
+# define FLINT_MPN_INVERT_LIMB(v, d) do { (v) = __gmpn_invert_limb(d); } while (0)
+#elif FLINT_BITS == 64
+# define FLINT_MPN_INVERT_LIMB(dinv, d) \
+    do { \
+        mp_limb_t __v0, __v2, __d40, __e, __m0, __d = (d); \
+        __d40 = (__d >> 24) + 1; \
+        __v0 = flint_invert_limb_tab[(__d >> 55) & 0xFF]; \
+        __v0 = (__v0 << 11) - ((__v0 * __v0 * __d40) >> 40) - 1; \
+        __v2 = ((__v0 * ((UWORD(1) << 60) - __v0 * __d40)) >> 47); \
+        __v2 += (__v0 << 13); \
+        __e = -__v2 * (__d >> 1); \
+        __m0 = -(__d & UWORD(1)); \
+        __e -= ((__v2 - (__v2 >> 1)) & __m0); \
+        umul_ppmm(__v0, __d40, __v2, __e); \
+        __v2 = (__v2 << 31) + (__v0 >> 1); \
+        umul_ppmm(__v0, __d40, __v2, __d); \
+        add_ssaaaa(__v0, __d40, __v0, __d40, UWORD(0), __d); \
+        (dinv) = __v2 - (__v0 + __d); \
+    } while (0)
+#else
+# define FLINT_MPN_INVERT_LIMB(v, d) do { (v) = n_preinvert_limb_prenorm(d); } while (0)
+#endif
+
+/* the 3/2 inverse floor((B^3 - 1) / (d1 B + d0)) - B for d1 >= B/2 (GMP's
+   invert_pi1), used by the preinv1 division functions */
+MPN_EXTRAS_INLINE mp_limb_t
+flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d0)
+{
+    mp_limb_t v, p, t1, t0, mask;
+
+    FLINT_ASSERT(d1 >> (FLINT_BITS - 1));
+
+    FLINT_MPN_INVERT_LIMB(v, d1);
+    p = d1 * v + d0;
+    if (p < d0)
+    {
+        v--;
+        mask = -(mp_limb_t) (p >= d1);
+        p -= d1;
+        v += mask;
+        p -= mask & d1;
+    }
+    umul_ppmm(t1, t0, d0, v);
+    p += t1;
+    if (p < t1)
+    {
+        v--;
+        if (p >= d1 && (p > d1 || t0 >= d0))
+            v--;
+    }
+    return v;
+}
+
+/* Moller-Granlund 2/1 division: (nh, nl) = q d + r with nh < d, d normalized
+   and di = floor((B^2 - 1) / d) - B */
+#define FLINT_MPN_UDIV_QR_2BY1(q, r, nh, nl, d, di) \
+    do { \
+        mp_limb_t __q0, __r, __mask; \
+        umul_ppmm((q), __q0, (nh), (di)); \
+        add_ssaaaa((q), __q0, (q), __q0, (nh) + 1, (nl)); \
+        __r = (nl) - (q) * (d); \
+        __mask = -(mp_limb_t) (__r > __q0); \
+        (q) += __mask; \
+        __r += __mask & (d); \
+        if (FLINT_UNLIKELY(__r >= (d))) \
+        { \
+            __r -= (d); \
+            (q)++; \
+        } \
+        (r) = __r; \
+    } while (0)
+
+/* The same 3/2 division without an inverse, by one hardware 2/1 division
+   of (n2, n1) by d1 and at most two corrections (a step of Knuth's
+   algorithm D); only sensible where hardware division is fast
+   (FLINT_PREINVERT_LIMB_USE_NATIVE). If n2 = d1 (so n1 < d0), the
+   quotient is B - 1 or B - 2 and the remainder is (n1, n0) - (d0, 0)
+   + (d1, d0) (mod B^2), plus (d1, d0) again if that is negative. The
+   signs are read off the two-limb values: a candidate remainder y lies
+   in [-d, d) and, before the last correction, above d - B^2, so y is
+   nonnegative iff y mod B^2 < d. */
+#define FLINT_MPN_UDIV_QR_3BY2_HW(q, r1, r0, n2, n1, n0, d1, d0) \
+    do { \
+        mp_limb_t __q, __r, __p1, __p0, __x1, __x0, __n0 = (n0); \
+        if (FLINT_UNLIKELY((n2) == (d1))) \
+        { \
+            __q = ~UWORD(0); \
+            sub_ddmmss(__x1, __x0, (n1), __n0, (d0), 0); \
+            add_ssaaaa(__x1, __x0, __x1, __x0, (d1), (d0)); \
+            if (__x1 > (d1) || (__x1 == (d1) && __x0 >= (d0))) \
+            { \
+                __q--; \
+                add_ssaaaa(__x1, __x0, __x1, __x0, (d1), (d0)); \
+            } \
+        } \
+        else \
+        { \
+            udiv_qrnnd(__q, __r, (n2), (n1), (d1)); \
+            umul_ppmm(__p1, __p0, __q, (d0)); \
+            sub_ddmmss(__x1, __x0, __r, __n0, __p1, __p0); \
+            if (__r < __p1 || (__r == __p1 && __n0 < __p0)) \
+            { \
+                /* negative: add d once or twice */ \
+                __q--; \
+                add_ssaaaa(__x1, __x0, __x1, __x0, (d1), (d0)); \
+                if (__x1 > (d1) || (__x1 == (d1) && __x0 >= (d0))) \
+                { \
+                    __q--; \
+                    add_ssaaaa(__x1, __x0, __x1, __x0, (d1), (d0)); \
+                } \
+            } \
+        } \
+        (q) = __q; \
+        (r1) = __x1; \
+        (r0) = __x0; \
+    } while (0)
+
+/* Moller-Granlund 3/2 division: (n2, n1, n0) = q (d1, d0) + (r1, r0),
+   requires (n2, n1) < (d1, d0), d1 normalized and dinv =
+   flint_mpn_preinv1(d1, d0) */
+#define FLINT_MPN_UDIV_QR_3BY2(q, r1, r0, n2, n1, n0, d1, d0, dinv) \
+    do { \
+        mp_limb_t __q0, __t1, __t0, __mask; \
+        umul_ppmm((q), __q0, (n2), (dinv)); \
+        add_ssaaaa((q), __q0, (q), __q0, (n2), (n1)); \
+        (r1) = (n1) - (d1) * (q); \
+        sub_ddmmss((r1), (r0), (r1), (n0), (d1), (d0)); \
+        umul_ppmm(__t1, __t0, (d0), (q)); \
+        sub_ddmmss((r1), (r0), (r1), (r0), __t1, __t0); \
+        (q)++; \
+        __mask = -(mp_limb_t) ((r1) >= __q0); \
+        (q) += __mask; \
+        add_ssaaaa((r1), (r0), (r1), (r0), __mask & (d1), __mask & (d0)); \
+        if (FLINT_UNLIKELY((r1) >= (d1))) \
+        { \
+            if ((r1) > (d1) || (r0) >= (d0)) \
+            { \
+                (q)++; \
+                sub_ddmmss((r1), (r0), (r1), (r0), (d1), (d0)); \
+            } \
+        } \
+    } while (0)
+
+/* Division with divisors of at most FLINT_MPN_DIV_SMALL_BN limbs, keeping
+   the divisor and the partial remainder in registers (div_qr.c).
+   Writes the an - bn + 1 quotient limbs and, if rp != NULL, the bn
+   remainder limbs; no normalization of b is needed. */
+#define FLINT_MPN_DIV_SMALL_BN 7
+void _flint_mpn_tdiv_qr_small(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+mp_limb_t _flint_mpn_divrem_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv);
+mp_limb_t _flint_mpn_divapprox_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv);
+mp_limb_t _flint_mpn_div_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv);
+mp_limb_t _flint_mpn_divrem_n_divconquer_preinv1(mp_ptr qp, mp_ptr np, mp_srcptr dp, mp_size_t n, mp_limb_t dinv, mp_ptr tp);
+mp_limb_t _flint_mpn_divapprox_n_divconquer_preinv1(mp_ptr qp, mp_ptr np, mp_srcptr dp, mp_size_t n, mp_limb_t dinv, mp_ptr tp);
+mp_limb_t _flint_mpn_divrem_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv, mp_ptr tp);
+mp_limb_t _flint_mpn_divapprox_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv, mp_ptr tp);
+void _flint_mpn_tdiv_qr_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn);
+void _flint_mpn_tdiv_q_divconquer(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn);
+void flint_mpn_divapprox(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn);
+void flint_mpn_divapprox_fraction(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn, mp_size_t f);
+void flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n);
 
 #if defined(mpn_modexact_1_odd)
 MPN_EXTRAS_INLINE
@@ -1214,21 +1431,8 @@ int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 }
 #endif
 
-/* GMP's internal quotient-only division (always available: configure
-   checks for it); scratch needs nn + 1 limbs */
-#define mpn_div_q __gmpn_div_q
-void mpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
-
-FLINT_FORCE_INLINE
-void mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
-{
-    mp_ptr _scratch;
-    TMP_INIT;
-    TMP_START;
-    _scratch = (mp_ptr) TMP_ALLOC((nn + 1) * sizeof(mp_limb_t));
-    mpn_div_q(qp, np, nn, dp, dn, _scratch);
-    TMP_END;
-}
+/* historical name of the quotient-only division */
+#define mpn_tdiv_q(qp, np, nn, dp, dn) flint_mpn_tdiv_q(qp, np, nn, dp, dn)
 
 int flint_mpn_divides(mp_ptr q, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scr);
 
@@ -1269,6 +1473,7 @@ int flint_mpn_bsqrt(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
 /* Euclidean division ********************************************************/
 
 void flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n);
+void _flint_mpn_inv_basecase(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n);
 
 #if FLINT_HAVE_NATIVE_mpn_divexact
 # define mpn_divexact __gmpn_divexact
@@ -1280,22 +1485,15 @@ void mpn_divexact(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 mp_limb_t mpn_mod_34lsub1(mp_srcptr, mp_size_t);
 #endif
 
-#if FLINT_HAVE_NATIVE_mpn_divisible_p
-# define mpn_divisible_p __gmpn_divisible_p
-int mpn_divisible_p(mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
-#endif
-
 int _flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
+int _flint_mpn_divisible_bdiv(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, unsigned int v);
+int _flint_mpn_divisible_small(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, unsigned int v);
 
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 {
     if (bn == 1 && an == 1)
         return a[0] % b[0] == 0;
-#if FLINT_HAVE_NATIVE_mpn_divisible_p
-    if (an < 24)
-        return mpn_divisible_p(a, an, b, bn);
-#endif
     return _flint_mpn_divisible(a, an, b, bn);
 }
 
@@ -1313,25 +1511,18 @@ void _flint_mpn_tdiv_qr_preinv(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp
 void _flint_mpn_tdiv_qr_newton(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 void _flint_mpn_tdiv_qr_unbalanced(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 void _flint_mpn_tdiv_qr_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
-void _flint_mpn_tdiv_qr_gmp(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 void _flint_mpn_tdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 
 MPN_EXTRAS_INLINE void
 flint_mpn_tdiv_qr(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 {
-    if (FLINT_MPN_TDIV_QR_SMALL(an, bn))
-        mpn_tdiv_qr(q, r, 0, a, an, b, bn);
-    else
-        _flint_mpn_tdiv_qr(q, r, a, an, b, bn);
+    _flint_mpn_tdiv_qr(q, r, a, an, b, bn);
 }
 
 MPN_EXTRAS_INLINE void
 flint_mpn_tdiv_q(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 {
-    if (FLINT_MPN_TDIV_QR_SMALL(an, bn))
-        mpn_tdiv_q(q, a, an, b, bn);
-    else
-        _flint_mpn_tdiv_qr(q, NULL, a, an, b, bn);
+    _flint_mpn_tdiv_qr(q, NULL, a, an, b, bn);
 }
 
 MPN_EXTRAS_INLINE void
@@ -1358,15 +1549,15 @@ int flint_mpn_div(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn
 void _flint_mpn_divexact_hensel(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 void _flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn);
 
+/* largest truncated divisor (min(bn, qn) limbs) handled by the
+   register-based Hensel division */
+#define FLINT_MPN_DIVEXACT_SMALL_BN 7
+
 MPN_EXTRAS_INLINE void
 flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 {
     if (bn == 1)
         mpn_divexact_1(q, a, an, b[0]);
-#if FLINT_HAVE_NATIVE_mpn_divexact
-    else if (bn < 64)
-        mpn_divexact(q, a, an, b, bn);
-#endif
     else
         _flint_mpn_divexact(q, a, an, b, bn);
 }
@@ -1393,108 +1584,54 @@ void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_
 
 /* mpz-like interface ********************************************************/
 
-/* out-of-line implementations; the inline wrappers below hand divisors of
-   at most two limbs (and short square roots) straight to GMP, whose mpz
-   layer has dedicated fast paths there, at no extra call cost */
-void _flint_mpz_tdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_tdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_tdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_fdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_fdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_fdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_cdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_cdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_cdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
-void _flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a);
-
-/* whenever the mpn layer would just call GMP (see FLINT_MPN_TDIV_QR_SMALL),
-   call GMP's mpz function directly and skip the wrapper entirely */
-#define FLINT_MPZ_SMALL_DIVISOR(a, b) \
-    FLINT_MPN_TDIV_QR_SMALL(FLINT_ABS((a)->_mp_size), FLINT_ABS((b)->_mp_size))
-
-#define FLINT_MPZ_DIV_INLINE(name, ARGS, GMPCALL, FLINTCALL) \
-MPN_EXTRAS_INLINE void flint_mpz_##name ARGS \
-{ \
-    if (FLINT_MPZ_SMALL_DIVISOR(a, b)) \
-        GMPCALL; \
-    else \
-        FLINTCALL; \
-}
-
-FLINT_MPZ_DIV_INLINE(tdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_qr(q, r, a, b), _flint_mpz_tdiv_qr(q, r, a, b))
-FLINT_MPZ_DIV_INLINE(tdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_q(q, a, b), _flint_mpz_tdiv_q(q, a, b))
-FLINT_MPZ_DIV_INLINE(tdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_tdiv_r(r, a, b), _flint_mpz_tdiv_r(r, a, b))
-FLINT_MPZ_DIV_INLINE(fdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_qr(q, r, a, b), _flint_mpz_fdiv_qr(q, r, a, b))
-FLINT_MPZ_DIV_INLINE(fdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_q(q, a, b), _flint_mpz_fdiv_q(q, a, b))
-FLINT_MPZ_DIV_INLINE(fdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_fdiv_r(r, a, b), _flint_mpz_fdiv_r(r, a, b))
-FLINT_MPZ_DIV_INLINE(cdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_qr(q, r, a, b), _flint_mpz_cdiv_qr(q, r, a, b))
-FLINT_MPZ_DIV_INLINE(cdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_q(q, a, b), _flint_mpz_cdiv_q(q, a, b))
-FLINT_MPZ_DIV_INLINE(cdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_cdiv_r(r, a, b), _flint_mpz_cdiv_r(r, a, b))
-FLINT_MPZ_DIV_INLINE(mod, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), mpz_mod(r, a, b), _flint_mpz_mod(r, a, b))
-MPN_EXTRAS_INLINE void
-flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
-{
-    if (FLINT_ABS(b->_mp_size) < 64)
-        mpz_divexact(q, a, b);
-    else
-        _flint_mpz_divexact(q, a, b);
-}
+void flint_mpz_tdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_tdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_tdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_fdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_fdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_fdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_cdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_cdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_cdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a);
+void flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a);
 
 mp_size_t _flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
 
-/* one- and two-limb inputs use the hardware square root paths of
-   flint_mpn_sqrtrem (about twice as fast as GMP); the result has one limb,
-   the remainder at most two (the out-of-line version handles aliasing,
-   zero and negative inputs) */
-MPN_EXTRAS_INLINE void
-flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a)
-{
-    mp_size_t an = a->_mp_size;
+/* inputs of up to this many limbs have dedicated code in _flint_mpn_sqrtrem
+   (hardware square root and a specialized divide and conquer step, up to
+   three times faster than GMP), which needs sn + 1 limbs of remainder space */
+#if FLINT_BITS == 64
+# define FLINT_MPN_SQRTREM_SMALL 4
+#else
+# define FLINT_MPN_SQRTREM_SMALL 2
+#endif
 
-    if (an >= 1 && an <= 2 && s != a && r != a)
-    {
-        mp_ptr sd = FLINT_MPZ_REALLOC(s, 1), rd = FLINT_MPZ_REALLOC(r, 2);
-        r->_mp_size = _flint_mpn_sqrtrem(sd, rd, a->_mp_d, an);
-        s->_mp_size = 1;
-    }
-    else if (an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
-        mpz_sqrtrem(s, r, a);
-    else
-        _flint_mpz_sqrtrem(s, r, a);
-}
-
-MPN_EXTRAS_INLINE void
-flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a)
-{
-    mp_size_t an = a->_mp_size;
-
-    if (an >= 1 && an <= 2 && s != a)
-    {
-        mp_ptr sd = FLINT_MPZ_REALLOC(s, 1);
-        _flint_mpn_sqrtrem(sd, NULL, a->_mp_d, an);
-        s->_mp_size = 1;
-    }
-    else if (an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
-        mpz_sqrt(s, a);
-    else
-        _flint_mpz_sqrtrem(s, NULL, a);
-}
+/* whether GMP's mpn_sqrtrem is used (on 64-bit machines, FLINT's divide and
+   conquer code is used below the Newton cutoff instead) */
+#if FLINT_BITS == 64
+# define FLINT_MPN_SQRTREM_USE_GMP(an) 0
+#else
+# define FLINT_MPN_SQRTREM_USE_GMP(an) \
+    ((an) > FLINT_MPN_SQRTREM_SMALL && (an) < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+#endif
 
 /* square root ***************************************************************/
 
 
 void _flint_mpn_sqrtrem_newton(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
 void _flint_mpn_sqrtrem_gmp(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
+mp_size_t _flint_mpn_sqrtrem_divconquer(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
 mp_size_t _flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
 
 MPN_EXTRAS_INLINE mp_size_t
 flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
 {
-    /* with no remainder wanted, GMP's routine is called directly below
-       the Newton cutoff (one- and two-limb inputs have faster paths) */
-    if (r == NULL && an > 2 && an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+    /* with no remainder wanted, GMP's routine is called directly where it
+       would be used anyway */
+    if (r == NULL && FLINT_MPN_SQRTREM_USE_GMP(an))
         return mpn_sqrtrem(s, NULL, a, an) != 0;
     return _flint_mpn_sqrtrem(s, r, a, an);
 }

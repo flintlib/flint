@@ -32,7 +32,9 @@ Newton-based division and square root
     approximation of `1/a \in (1, B]` with `n` fraction limbs and two
     integral limbs (the highest limb may be zero). The absolute error is
     bounded by `4 B^{-n} / a`. The *newton* suffix flags that the result
-    is not ulp-accurate. The basecase divides by ``mpn_tdiv_qr``; the
+    is not ulp-accurate. The basecase computes the truncated reciprocal of
+    the top `\min(an, n + 1)` limbs of `a` with
+    :func:`_flint_mpn_inv_basecase`; the
     main function runs a Newton iteration on middle products, ported
     from :func:`radix_inv_approx`.
 

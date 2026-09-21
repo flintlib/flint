@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,49 +12,58 @@
 
 #include "mpn_extras.h"
 
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
-
 void flint_mpn_mulmod_preinv1(mp_ptr r,
         mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_limb_t dinv, ulong norm)
 {
-   mp_limb_t q;
-   mp_limb_t ts[150];
-   mp_ptr t;
-   slong i;
+    mp_limb_t ts[150];
+    mp_ptr t, q;
 
-   FLINT_ASSERT(n > 0);
+    FLINT_ASSERT(n > 0);
 
-   if (n <= 30)
-      t = ts;
-   else
-      t = flint_malloc(5*n*sizeof(mp_limb_t));
+    if (n <= 30)
+        t = ts;
+    else
+        t = flint_malloc(5 * n * sizeof(mp_limb_t));
 
-   if (a == b)
-      flint_mpn_sqr(t, a, n);
-   else
-      flint_mpn_mul_n(t, a, b, n);
+    q = t + 2 * n;
 
-   if (norm)
-      mpn_rshift(t, t, 2*n, norm);
+    if (a == b)
+        flint_mpn_sqr(t, a, n);
+    else
+        flint_mpn_mul_n(t, a, b, n);
 
-   for (i = 2*n - 1; i >= n; i--)
-   {
-      flint_mpn_divrem21_preinv(q, t[i], t[i - 1], dinv);
-      t[i] -= mpn_submul_1(t + i - n, d, n, q);
+    if (norm)
+        mpn_rshift(t, t, 2 * n, norm);
 
-      if (mpn_cmp(t + i - n, d, n) >= 0 || t[i] != 0)
-      {
-         q++;
-         t[i] -= mpn_sub_n(t + i - n, t + i - n, d, n);
-      }
-   }
+    if (n == 1)
+    {
+        /* the 3/2 inverse of (d, 0) is the 2/1 inverse of d */
+        mp_limb_t qq, rr;
+        udiv_qrnnd_preinv(qq, rr, t[1], t[0], d[0], dinv);
+        (void) qq;
+        r[0] = rr;
+    }
+    else if (n == 2)
+    {
+        /* t < d^2, so {t + 2, 2} < d and two 3/2 steps reduce t */
+        mp_limb_t qq, r1 = t[3], r0 = t[2];
+        FLINT_MPN_UDIV_QR_3BY2(qq, r1, r0, r1, r0, t[1], d[1], d[0], dinv);
+        FLINT_MPN_UDIV_QR_3BY2(qq, r1, r0, r1, r0, t[0], d[1], d[0], dinv);
+        (void) qq;
+        r[0] = r0;
+        r[1] = r1;
+    }
+    else
+    {
+        /* q needs n limbs and the divide and conquer code n more */
+        if (n >= 3 && n < FLINT_MPN_DIV_DC_CUTOFF)
+            _flint_mpn_divrem_basecase_preinv1(q, t, 2 * n, d, n, dinv);
+        else
+            _flint_mpn_divrem_preinv1(q, t, 2 * n, d, n, dinv, q + n);
+        flint_mpn_copyi(r, t, n);
+    }
 
-   mpn_copyi(r, t, n);
-
-   if (n > 30)
-       flint_free(t);
+    if (n > 30)
+        flint_free(t);
 }
-
-DIAGNOSTIC_POP

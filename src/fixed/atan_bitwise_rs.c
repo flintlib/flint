@@ -280,7 +280,7 @@ fixed_atan_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
         flint_mpn_copyi(nd + n, Y, n - qr);
         if (ds - wn + 1 < FIXED_RED_DIV_NEWTON_CUTOFF)
         {
-            mpn_tdiv_qr(t, nd, 0, nd, ds, X, wn);
+            flint_mpn_tdiv_qr(t, nd, nd, ds, X, wn);
         }
         else
         {
