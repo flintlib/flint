@@ -54,22 +54,23 @@
 /* division cutoffs (Zen 3 values, not tuned on this target) */
 #define FLINT_MPN_DIV_DC_CUTOFF 20
 #define FLINT_MPN_DIVAPPR_DC_CUTOFF 64
-#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 56
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 80
 #define FLINT_MPN_TDIV_Q_DC_CUTOFF 112
-#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 378
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 737
 #define FLINT_MPN_INV_NEWTON_CUTOFF 71
-#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 71
-#define FLINT_MPN_DC_BDIV_QR_CUTOFF 64
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 37
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF 137
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 36
 #define FLINT_MPN_DC_BDIV_Q_CUTOFF 120
 
 /* one-limb division by a chain of hardware divisions below these dividend
    lengths (unnormalized / normalized divisor) */
-#define FLINT_MPN_DIVREM_1_HW_CUTOFF 20
-#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 8
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 28
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 6
 
 /* two-limb divisors by hardware 2/1 divisions without an inverse below this
    dividend length */
-#define FLINT_MPN_DIV_2_HW_CUTOFF 24
+#define FLINT_MPN_DIV_2_HW_CUTOFF 21
 
 /* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
    quotients shorter than this */
@@ -77,6 +78,6 @@
 
 /* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
    this dividend length (1000000: never) */
-#define FLINT_MPN_DIV_2_GMP_CUTOFF 24
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 21
 
 #endif

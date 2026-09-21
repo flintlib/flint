@@ -14,7 +14,10 @@
    parameters are those of the Ice Lake file (Intel(R) Xeon(R) Gold 6354);
    the division and square root cutoffs were measured on an Emerald Rapids
    Xeon (with FLINT_PREINVERT_LIMB_USE_NATIVE, as these cores have a fast
-   hardware divider). */
+   hardware divider) against GMP 6.3.0 built for the CPU (--host=skylake:
+   GMP's config.guess takes these cores for nehalem, and distribution
+   builds are generic; FLINT's schoolbook and Newton divisions use GMP's
+   multiplication, so the cutoffs depend on it). */
 
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
@@ -50,38 +53,39 @@
    a quotient at least as long, respectively at least four times as long,
    input limbs for the square root); tuned with
    src/mpn_extras/tune/tune-div.c */
-#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 1187
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
 #define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
 #define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1187
-#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 425
+#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
 #define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
 
 /* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c */
-#define FLINT_MPN_DIV_DC_CUTOFF 14
-#define FLINT_MPN_DIVAPPR_DC_CUTOFF 58
-#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 56
+#define FLINT_MPN_DIV_DC_CUTOFF 18
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 34
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 45
 #define FLINT_MPN_TDIV_Q_DC_CUTOFF 72
-#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 1151
-#define FLINT_MPN_INV_NEWTON_CUTOFF 171
-#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 57
-#define FLINT_MPN_DC_BDIV_QR_CUTOFF 16
-#define FLINT_MPN_DC_BDIV_Q_CUTOFF 40
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 921
+#define FLINT_MPN_INV_NEWTON_CUTOFF 37
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 24
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF 171
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 40
+#define FLINT_MPN_DC_BDIV_Q_CUTOFF 80
 
 /* one-limb division by a chain of hardware divisions below these dividend
    lengths (unnormalized / normalized divisor) */
-#define FLINT_MPN_DIVREM_1_HW_CUTOFF 56
-#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 56
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 64
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 64
 
 /* two-limb divisors by hardware 2/1 divisions without an inverse below this
    dividend length */
-#define FLINT_MPN_DIV_2_HW_CUTOFF 40
+#define FLINT_MPN_DIV_2_HW_CUTOFF 44
 
 /* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
    quotients shorter than this */
-#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 7
+#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 9
 
 /* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
    this dividend length (1000000: never) */
-#define FLINT_MPN_DIV_2_GMP_CUTOFF 1000000
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 44
 
 #endif

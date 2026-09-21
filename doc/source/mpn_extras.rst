@@ -976,8 +976,11 @@ Division
     (GMP's ``mpn_divrem_1`` / ``mpn_divrem_2`` with fraction limbs where
     hardware division is slow). Otherwise, when `\min(xn, n - xn + 2)` is
     below ``FLINT_MPN_INV_NEWTON_CUTOFF`` (quotients of at most `xn + 2`
-    limbs, which use the short division) or
-    ``FLINT_MPN_INV_NEWTON_LONG_CUTOFF`` (longer quotients), the quotient is computed by
+    limbs, which use the short division),
+    ``FLINT_MPN_INV_NEWTON_LONG_CUTOFF`` (quotients of at most `6 xn`
+    limbs) or ``FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF`` (longer quotients,
+    for which the division by blocks of `x` stays faster up to larger
+    `x`), the quotient is computed by
     :func:`flint_mpn_tdiv_q` without the remainder (reading only the top
     `O(n - xn)` limbs of `x` for short quotients), and above it by
     :func:`fixed_inv_newton` with three extra fraction limbs, with the same

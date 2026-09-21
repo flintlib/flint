@@ -21,6 +21,7 @@
         FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF   flint_mpn_divapprox -> Newton
         FLINT_MPN_INV_NEWTON_CUTOFF         flint_mpn_inv -> Newton
         FLINT_MPN_INV_NEWTON_LONG_CUTOFF    same, quotient 4 x the length of x
+        FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF   same, quotient 10 x the length of x
         FLINT_MPN_DIVREM_1_HW_CUTOFF        hardware division chain -> mpn_divrem_1
         FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF   same, normalized divisor
         FLINT_MPN_DIV_2_HW_CUTOFF           two-limb divisors: hardware divisions
@@ -73,7 +74,7 @@ static slong tune_div_dc = 16, tune_divappr_dc = 80, tune_tdiv_qr_newton = 1024,
     tune_tdiv_q_dc = 100, tune_divapprox_newton = 500,
     tune_sqrtrem_newton = 4500, tune_dc_bdiv_qr = 24, tune_dc_bdiv_q = 50,
     tune_divexact_newton = 1024, tune_divexact_unbalanced = 64,
-    tune_inv_newton = 256, tune_inv_newton_long = 256, tune_divapprox_short = 58, tune_divrem_1_hw = 24, tune_divrem_1_norm_hw = 14,
+    tune_inv_newton = 256, tune_inv_newton_long = 256, tune_inv_newton_verylong = 256, tune_divapprox_short = 58, tune_divrem_1_hw = 24, tune_divrem_1_norm_hw = 14,
     tune_div_2_hw = 22, tune_div_small_hw_qn = 4, tune_div_2_gmp = 1000000;
 
 #undef FLINT_MPN_DIV_DC_CUTOFF
@@ -83,6 +84,7 @@ static slong tune_div_dc = 16, tune_divappr_dc = 80, tune_tdiv_qr_newton = 1024,
 #undef FLINT_MPN_INV_NEWTON_CUTOFF
 #undef FLINT_MPN_DIVAPPROX_SHORT_CUTOFF
 #undef FLINT_MPN_INV_NEWTON_LONG_CUTOFF
+#undef FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF
 #if !FLINT_PREINVERT_LIMB_USE_NATIVE
 /* not tuned: keep the values of flint-mparam.h */
 static const slong FLINT_MPN_DIVREM_1_HW_CUTOFF_DEFAULT = FLINT_MPN_DIVREM_1_HW_CUTOFF;
@@ -107,6 +109,7 @@ static const slong FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF_DEFAULT = FLINT_MPN_DIV_SMAL
 #define FLINT_MPN_INV_NEWTON_CUTOFF tune_inv_newton
 #define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF tune_divapprox_short
 #define FLINT_MPN_INV_NEWTON_LONG_CUTOFF tune_inv_newton_long
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF tune_inv_newton_verylong
 #define FLINT_MPN_DIVREM_1_HW_CUTOFF tune_divrem_1_hw
 #define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF tune_divrem_1_norm_hw
 #define FLINT_MPN_DIV_2_HW_CUTOFF tune_div_2_hw
@@ -461,6 +464,22 @@ int main(int argc, char ** argv)
     tune_inv_newton_long = (result == -1) ? 600 : result;
     flint_printf("  -> %wd\n\n", tune_inv_newton_long);
 
+    flint_printf("FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF: floor(B^11n / x), n-limb x, division vs Newton\n");
+    flint_printf("  %6s   %10s %10s   %6s\n", "n", "div", "newton", "ratio");
+    num = 0;
+    for (n = 24; n <= 500; n = n * 5 / 4)
+    {
+        flint_mpn_urandomb(b, state, n * FLINT_BITS);
+        b[n - 1] |= 1;
+        TIME2((tune_inv_newton_verylong = WORD_MAX, tune_mpn_inv(q, b, n, 11 * n)), t1,
+              (tune_inv_newton_verylong = 1, tune_mpn_inv(q, b, n, 11 * n)), t2);
+        print_row(n, t1, t2);
+        sizes[num] = n; ratio[num++] = t2 / t1;
+    }
+    result = crossover(sizes, ratio, num);
+    tune_inv_newton_verylong = (result == -1) ? 500 : result;
+    flint_printf("  -> %wd\n\n", tune_inv_newton_verylong);
+
     /* 6c. one-limb divisors: chain of hardware divisions vs GMP's
        mpn_divrem_1, for unnormalized and normalized divisors */
 #if FLINT_PREINVERT_LIMB_USE_NATIVE
@@ -511,39 +530,6 @@ int main(int argc, char ** argv)
         tune_divrem_1_norm_hw = res[1];
     }
 
-    /* 6d. two-limb divisors: hardware divisions vs the 3/2 inverse */
-    flint_printf("FLINT_MPN_DIV_2_HW_CUTOFF: an-limb / 2-limb division, hardware divisions vs 3/2 inverse\n");
-    flint_printf("  %6s   %10s %10s   %6s\n", "an", "hw", "inverse", "ratio");
-    num = 0;
-    for (n = 3; n <= 64; n += (n < 24) ? 1 : 8)
-    {
-        mp_limb_t d[16][2];
-        double u1, u2;
-        int k;
-
-        for (k = 0; k < 16; k++)
-        {
-            d[k][0] = n_randlimb(state);
-            d[k][1] = n_randlimb(state) >> n_randint(state, FLINT_BITS);
-            if (d[k][1] == 0)
-                d[k][1] = 1;
-        }
-        flint_mpn_urandomb(a, state, n * FLINT_BITS);
-        t1 = t2 = 0;
-        for (k = 0; k < 16; k++)
-        {
-            TIME2((tune_div_2_hw = WORD_MAX, tdiv_qr_small(q, r, a, n, d[k], 2)), u1,
-                  (tune_div_2_hw = 0, tdiv_qr_small(q, r, a, n, d[k], 2)), u2);
-            t1 += u1;
-            t2 += u2;
-        }
-        print_row(n, t1, t2);
-        sizes[num] = n; ratio[num++] = t2 / t1;
-    }
-    result = crossover(sizes, ratio, num);
-    tune_div_2_hw = (result == -1) ? 64 : result;
-    flint_printf("  -> %wd\n\n", tune_div_2_hw);
-
     /* 6e. 3- to 7-limb divisors: the same by quotient length (total time
        over the divisor lengths) */
     flint_printf("FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF: 3..7-limb divisors, qn-limb quotient, hardware divisions vs 3/2 inverse\n");
@@ -582,29 +568,37 @@ int main(int argc, char ** argv)
     flint_printf("  -> %wd\n\n", tune_div_small_hw_qn);
 #else
     flint_printf("FLINT_MPN_DIVREM_1_HW_CUTOFF, FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF, "
-        "FLINT_MPN_DIV_2_HW_CUTOFF, FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF: unused (FLINT_PREINVERT_LIMB_USE_NATIVE is 0)\n\n");
+        "FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF: unused (FLINT_PREINVERT_LIMB_USE_NATIVE is 0)\n\n");
     tune_divrem_1_hw = FLINT_MPN_DIVREM_1_HW_CUTOFF_DEFAULT;
     tune_divrem_1_norm_hw = FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF_DEFAULT;
-    tune_div_2_hw = FLINT_MPN_DIV_2_HW_CUTOFF_DEFAULT;
     tune_div_small_hw_qn = FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF_DEFAULT;
 #endif
 
-    /* 6f. two-limb divisors: FLINT (the hardware chain below the cutoff
-       just tuned, then the 3/2 inverse) vs GMP's mpn_divrem_2 */
-#if FLINT_HAVE_NATIVE_mpn_divrem_2
-    flint_printf("FLINT_MPN_DIV_2_GMP_CUTOFF: an-limb / 2-limb division, FLINT vs GMP's mpn_divrem_2\n");
-    flint_printf("  %6s   %10s %10s   %6s\n", "an", "flint", "gmp", "ratio");
-    num = 0;
+    /* 6f. two-limb divisors: the hardware division chain, the 3/2 inverse
+       and GMP's mpn_divrem_2, timed together on one dense grid of dividend
+       lengths. FLINT_MPN_DIV_2_HW_CUTOFF is the crossover hw -> inverse;
+       FLINT_MPN_DIV_2_GMP_CUTOFF the crossover from FLINT's resulting
+       path to GMP. The hardware chain is tested first in the dispatch, so
+       if GMP overtakes it before the inverse does, both cutoffs are set to
+       that point and the inverse is never used. */
+#if FLINT_PREINVERT_LIMB_USE_NATIVE || FLINT_HAVE_NATIVE_mpn_divrem_2
     {
-        slong n0 = 3;
-#if FLINT_PREINVERT_LIMB_USE_NATIVE
-        n0 = FLINT_MAX(n0, tune_div_2_hw);
-#endif
-        for (n = n0; n <= 256; n += (n < n0 + 16) ? 2 : (n < 64 ? 8 : 32))
+        slong nsz = 0, hw_cut, gmp_cut;
+        slong sz[MAXS];
+        double thw[MAXS], tinv[MAXS], tgmp[MAXS], rat[MAXS];
+        int have_hw = FLINT_PREINVERT_LIMB_USE_NATIVE;
+        int have_gmp = FLINT_HAVE_NATIVE_mpn_divrem_2;
+        int i;
+
+        flint_printf("FLINT_MPN_DIV_2_HW_CUTOFF, FLINT_MPN_DIV_2_GMP_CUTOFF: an-limb / 2-limb division\n");
+        flint_printf("  %6s   %10s %10s %10s   %8s %8s %8s\n", "an", "hw", "inverse", "gmp", "inv/hw", "gmp/hw", "gmp/inv");
+
+        for (n = 3; n <= 256; n += (n < 32) ? 1 : (n < 64) ? 2 : (n < 128) ? 8 : 32)
         {
             mp_limb_t d[16][2];
-            double u1, u2;
-            int k;
+            double u[3], b[3], tt, t0;
+            long reps, j;
+            int k, rep, m;
 
             for (k = 0; k < 16; k++)
             {
@@ -614,23 +608,103 @@ int main(int argc, char ** argv)
                     d[k][1] = 1;
             }
             flint_mpn_urandomb(a, state, n * FLINT_BITS);
-            t1 = t2 = 0;
-            for (k = 0; k < 16; k++)
+
+#define DIV2_SET(m) \
+    do { \
+        if ((m) == 0) { tune_div_2_hw = WORD_MAX; tune_div_2_gmp = WORD_MAX; } \
+        else if ((m) == 1) { tune_div_2_hw = 0; tune_div_2_gmp = WORD_MAX; } \
+        else { tune_div_2_hw = 0; tune_div_2_gmp = 0; } \
+    } while (0)
+#define DIV2_RUN \
+    for (j = 0; j < reps; j++) \
+        for (k = 0; k < 16; k++) \
+            tdiv_qr_small(q, r, a, n, d[k], 2)
+
             {
-                TIME2((tune_div_2_gmp = WORD_MAX, tdiv_qr_small(q, r, a, n, d[k], 2)), u1,
-                      (tune_div_2_gmp = 0, tdiv_qr_small(q, r, a, n, d[k], 2)), u2);
-                t1 += u1;
-                t2 += u2;
+                DIV2_SET(1);
+                for (reps = 1; ; reps *= 2)
+                {
+                    t0 = now();
+                    DIV2_RUN;
+                    if (now() - t0 > 0.003)
+                        break;
+                }
+                b[0] = b[1] = b[2] = 1e30;
+                for (rep = 0; rep < 7; rep++)
+                {
+                    for (m = 0; m < 3; m++)
+                    {
+                        if ((m == 0 && !have_hw) || (m == 2 && !have_gmp))
+                            continue;
+                        DIV2_SET(m);
+                        t0 = now();
+                        DIV2_RUN;
+                        tt = (now() - t0) / reps;
+                        if (tt < b[m])
+                            b[m] = tt;
+                    }
+                }
             }
-            print_row(n, t1, t2);
-            sizes[num] = n; ratio[num++] = t2 / t1;
+#undef DIV2_SET
+#undef DIV2_RUN
+            u[0] = b[0]; u[1] = b[1]; u[2] = b[2];
+
+            flint_printf("  %6wd   ", n);
+            if (have_hw) flint_printf("%10.3e ", u[0]); else flint_printf("%10s ", "-");
+            flint_printf("%10.3e ", u[1]);
+            if (have_gmp) flint_printf("%10.3e", u[2]); else flint_printf("%10s", "-");
+            flint_printf("   ");
+            if (have_hw) flint_printf("%8.3f ", u[1] / u[0]); else flint_printf("%8s ", "-");
+            if (have_hw && have_gmp) flint_printf("%8.3f ", u[2] / u[0]); else flint_printf("%8s ", "-");
+            if (have_gmp) flint_printf("%8.3f", u[2] / u[1]); else flint_printf("%8s", "-");
+            flint_printf("\n");
+
+            sz[nsz] = n; thw[nsz] = u[0]; tinv[nsz] = u[1]; tgmp[nsz] = u[2];
+            nsz++;
         }
-    }
-    result = crossover(sizes, ratio, num);
-    tune_div_2_gmp = (result == -1) ? 1000000 : result;
-    flint_printf("  -> %wd\n\n", tune_div_2_gmp);
+
+        hw_cut = 0;
+        if (have_hw)
+        {
+            for (i = 0; i < nsz; i++)
+                rat[i] = tinv[i] / thw[i];
+            hw_cut = crossover(sz, rat, nsz);
+            if (hw_cut == -1)
+                hw_cut = 257;
+        }
+
+        gmp_cut = 1000000;
+        if (have_gmp)
+        {
+            for (i = 0; i < nsz; i++)
+                rat[i] = tgmp[i] / ((sz[i] < hw_cut) ? thw[i] : tinv[i]);
+            gmp_cut = crossover(sz, rat, nsz);
+            if (gmp_cut == -1)
+                gmp_cut = 1000000;
+        }
+
+        if (have_hw && gmp_cut < hw_cut)
+        {
+            /* the hardware chain is dispatched first: GMP takes over
+               from it directly */
+            hw_cut = gmp_cut;
+        }
+
+#if FLINT_PREINVERT_LIMB_USE_NATIVE
+        tune_div_2_hw = hw_cut;
 #else
-    flint_printf("FLINT_MPN_DIV_2_GMP_CUTOFF: unused (no assembly mpn_divrem_2)\n\n");
+        tune_div_2_hw = FLINT_MPN_DIV_2_HW_CUTOFF_DEFAULT;
+#endif
+        tune_div_2_gmp = gmp_cut;
+
+        flint_printf("  -> FLINT_MPN_DIV_2_HW_CUTOFF %wd%s\n", tune_div_2_hw,
+            have_hw ? "" : " (unused: FLINT_PREINVERT_LIMB_USE_NATIVE is 0)");
+        flint_printf("  -> FLINT_MPN_DIV_2_GMP_CUTOFF %wd%s\n\n", tune_div_2_gmp,
+            have_gmp ? "" : " (unused: no assembly mpn_divrem_2)");
+    }
+#else
+    flint_printf("FLINT_MPN_DIV_2_HW_CUTOFF, FLINT_MPN_DIV_2_GMP_CUTOFF: unused\n\n");
+    tune_div_2_hw = FLINT_MPN_DIV_2_HW_CUTOFF_DEFAULT;
 #endif
 
     /* 7. square root: divide and conquer vs Newton (geometric mean of the
@@ -768,6 +842,7 @@ int main(int argc, char ** argv)
     flint_printf("#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF %wd\n", tune_divapprox_newton);
     flint_printf("#define FLINT_MPN_INV_NEWTON_CUTOFF %wd\n", tune_inv_newton);
     flint_printf("#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF %wd\n", tune_inv_newton_long);
+    flint_printf("#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF %wd\n", tune_inv_newton_verylong);
     flint_printf("#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF %wd\n", tune_divapprox_short);
     flint_printf("#define FLINT_MPN_DIVREM_1_HW_CUTOFF %wd\n", tune_divrem_1_hw);
     flint_printf("#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF %wd\n", tune_divrem_1_norm_hw);

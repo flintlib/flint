@@ -41,22 +41,25 @@
    quotient limbs for the first two, divisor limbs for the next two with
    a quotient at least as long, respectively at least four times as long,
    input limbs for the square root) */
-#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 1024
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
 #define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
 #define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1187
-#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 425
-#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 5155
+#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
 
-/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c */
-#define FLINT_MPN_DIV_DC_CUTOFF 14
-#define FLINT_MPN_DIVAPPR_DC_CUTOFF 20
-#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 56
+/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c (on an
+   Emerald Rapids Xeon without FLINT_PREINVERT_LIMB_USE_NATIVE, against
+   GMP 6.3.0 built with --host=skylake) */
+#define FLINT_MPN_DIV_DC_CUTOFF 18
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 32
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 45
 #define FLINT_MPN_TDIV_Q_DC_CUTOFF 72
-#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 1151
-#define FLINT_MPN_INV_NEWTON_CUTOFF 213
-#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 57
-#define FLINT_MPN_DC_BDIV_QR_CUTOFF 16
-#define FLINT_MPN_DC_BDIV_Q_CUTOFF 44
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 921
+#define FLINT_MPN_INV_NEWTON_CUTOFF 37
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 24
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF 171
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 40
+#define FLINT_MPN_DC_BDIV_Q_CUTOFF 80
 
 /* one-limb division by a chain of hardware divisions below these dividend
    lengths (unnormalized / normalized divisor); only used with
@@ -75,6 +78,6 @@
 
 /* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
    this dividend length (1000000: never) */
-#define FLINT_MPN_DIV_2_GMP_CUTOFF 1000000
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 8
 
 #endif

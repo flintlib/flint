@@ -156,6 +156,16 @@ _flint_mpn_inv_basecase(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     TMP_END;
 }
 
+/* Newton cutoff of the reciprocal in min(xn, qn): quotients up to about as
+   long as x use the short division below FLINT_MPN_INV_NEWTON_CUTOFF;
+   longer ones have a lower cutoff, and quotients of more than six times
+   the length of x, for which the division by blocks of x stays faster, a
+   higher one */
+#define INV_NEWTON_CUTOFF(xn, qn) \
+    (((qn) <= (xn) + 2) ? FLINT_MPN_INV_NEWTON_CUTOFF : \
+     ((qn) <= 6 * (xn)) ? FLINT_MPN_INV_NEWTON_LONG_CUTOFF : \
+                          FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF)
+
 /*
     Correctly truncated reciprocal: q = floor(B^n / x) for (x, xn) with
     x[xn-1] != 0 and n >= xn, written to (q, n - xn + 2) (the top limb is
@@ -181,10 +191,7 @@ flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     FLINT_ASSERT(n >= xn);
     FLINT_ASSERT(x[xn - 1] != 0);
 
-    /* quotients up to about as long as x use the short division below
-       FLINT_MPN_INV_NEWTON_CUTOFF; longer ones have a lower cutoff */
-    if (FLINT_MIN(xn, qn) < ((qn <= xn + 2) ? FLINT_MPN_INV_NEWTON_CUTOFF
-                                            : FLINT_MPN_INV_NEWTON_LONG_CUTOFF))
+    if (FLINT_MIN(xn, qn) < INV_NEWTON_CUTOFF(xn, qn))
     {
         _flint_mpn_inv_basecase(q, x, xn, n);
         return;
@@ -276,8 +283,7 @@ flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
         return;
     }
 
-    if (FLINT_MIN(xn, qn) < ((qn <= xn + 2) ? FLINT_MPN_INV_NEWTON_CUTOFF
-                                            : FLINT_MPN_INV_NEWTON_LONG_CUTOFF))
+    if (FLINT_MIN(xn, qn) < INV_NEWTON_CUTOFF(xn, qn))
     {
         mp_limb_t one = 1;
         flint_mpn_divapprox_fraction(q, &one, 1, x, xn, n);
