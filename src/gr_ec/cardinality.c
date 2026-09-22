@@ -933,7 +933,6 @@ _schoof_trace_mod_l_mod(ulong * tl, ulong l, const fmpz_t q, gr_ec_ctx_t ctx,
     tors_struct P, phiP, phi2P, qP, lhs, rhs;
     gr_poly_t xq, yq, tmp, xpoly;
     fmpz_t e;
-    ulong tbar;
     int status = GR_SUCCESS, done = 0;
 
     C.R = R;
@@ -1029,28 +1028,67 @@ _schoof_trace_mod_l_mod(ulong * tl, ulong l, const fmpz_t q, gr_ec_ctx_t ctx,
         done = 1;
     }
 
-    for (tbar = 1; tbar <= (l - 1) / 2 && !done && status == GR_SUCCESS; tbar++)
+    /*
+        Find tbar with lhs = tbar phi(P).
+
+        Trying each candidate in turn would cost one torsion scalar
+        multiplication per candidate, and a torsion addition costs an
+        inversion in F_q[x]/(psi_l) -- an extended gcd on polynomials of
+        degree (l^2-1)/2, which measures some thirty times a multiplication
+        there and is by a wide margin the most expensive thing in the
+        algorithm. Baby-step giant-step turns the O(l) additions that would
+        need into O(sqrt(l)): write tbar = i m + j, tabulate j phi(P) for
+        j < m, and walk lhs down by m phi(P). Comparing against the table
+        is only polynomial equality, which is linear and free by
+        comparison, so the m^2 comparisons cost nothing next to the 2m
+        additions they replace.
+    */
     {
-        status |= tors_mul_ui(&rhs, &phiP, tbar, &C);
+        slong m = (slong) n_sqrt(l) + 1;
+        tors_struct * baby;
+        tors_struct step, cur;
+        slong i, j;
 
-        if (status != GR_SUCCESS)
-            break;
+        baby = flint_malloc(m * sizeof(tors_struct));
 
-        if (tors_equal(&lhs, &rhs, &C) == T_TRUE)
+        for (j = 0; j < m; j++)
+            tors_init(baby + j, &C);
+
+        tors_init(&step, &C);
+        tors_init(&cur, &C);
+
+        /* baby[j] = j phi(P), starting from the point at infinity */
+        for (j = 1; j < m && status == GR_SUCCESS; j++)
+            status |= tors_add(baby + j, baby + j - 1, &phiP, &C);
+
+        /* the giant step is -m phi(P) */
+        status |= tors_add(&step, baby + m - 1, &phiP, &C);
+        status |= tors_neg(&step, &step, &C);
+
+        status |= tors_set(&cur, &lhs, &C);
+
+        for (i = 0; i * m < (slong) l && !done && status == GR_SUCCESS; i++)
         {
-            *tl = tbar;
-            done = 1;
-        }
-        else
-        {
-            status |= tors_neg(&rhs, &rhs, &C);
+            for (j = 0; j < m; j++)
+                if (i * m + j < (slong) l
+                        && tors_equal(&cur, baby + j, &C) == T_TRUE)
+                {
+                    *tl = (ulong) (i * m + j);
+                    done = 1;
+                    break;
+                }
 
-            if (status == GR_SUCCESS && tors_equal(&lhs, &rhs, &C) == T_TRUE)
-            {
-                *tl = l - tbar;
-                done = 1;
-            }
+            if (!done)
+                status |= tors_add(&cur, &cur, &step, &C);
         }
+
+        tors_clear(&cur, &C);
+        tors_clear(&step, &C);
+
+        for (j = 0; j < m; j++)
+            tors_clear(baby + j, &C);
+
+        flint_free(baby);
     }
 
     if (status == GR_SUCCESS && !done)
@@ -1157,13 +1195,223 @@ _schoof_trace_mod_2(ulong * t2, const fmpz_t q, gr_ec_ctx_t ctx)
 
 /* ------------------------------------------------------------------ */
 
+/*
+    How much ambiguity in the trace is worth resolving with the group law
+    rather than with another prime.
+
+    Each leftover candidate costs one point addition to test, while the
+    next prime l costs polynomial arithmetic modulo psi_l, of degree
+    (l^2-1)/2, for the whole length of log q. The largest prime Schoof
+    would otherwise need is by a wide margin the most expensive one, so
+    stopping short and walking the remaining candidates is a very good
+    trade.
+
+    Where to stop depends on the size of the field, because both sides of
+    that trade do: a point addition gets dearer with log q, but the primes
+    being avoided get dearer very much faster. Measured across 48 to 128
+    bits the best cutoff runs from about 2^15 to about 2^20 candidates,
+    which is what this tracks. It is a balance of two costs, so it wants
+    to be roughly right rather than exact -- the optimum is broad, and
+    being a factor of two out either way costs a few per cent.
+*/
+static slong
+_schoof_tail_limit(const fmpz_t q)
+{
+    return WORD(1) << FLINT_MIN(20, fmpz_bits(q) / 16 + 12);
+}
+
+/*
+    t is known modulo M, which is not yet enough to pin it down inside the
+    Hasse interval. Finish with the group law.
+
+    The candidates are lo, lo + M, ..., and for N_k = q + 1 - (lo + k M)
+    the condition N_k P = O reads (q + 1 - lo) P = k (M P), so one scalar
+    multiplication each for A and B and then a walk of k B by repeated
+    addition tests every candidate at one addition apiece. Points are
+    drawn until a single candidate survives all of them.
+
+    This keeps the answer proved rather than merely likely. The true order
+    is one of the candidates -- Schoof's congruence and Hasse's bound both
+    being theorems -- and it kills every point, so it survives every round
+    no matter which points are drawn. A round can therefore only eliminate
+    impostors, never the truth, and when exactly one candidate is left it
+    is the truth. That is why the answer is only taken when nalive is one:
+    "several survived" is not an answer, and neither is "none did", which
+    would mean something upstream is broken.
+*/
+/*
+    The smallest candidate at or above -2 sqrt(q), and how many candidates
+    the Hasse interval leaves. Returns 0 when there are more than a slong
+    can hold, which early on there always are.
+*/
+static int
+_schoof_tail_span(fmpz_t lo, slong * ncand, const fmpz_t t0, const fmpz_t M,
+        const fmpz_t q)
+{
+    fmpz_t sq, n;
+    int ok = 0;
+
+    fmpz_init(sq);
+    fmpz_init(n);
+
+    fmpz_sqrt(sq, q);
+    fmpz_mul_ui(sq, sq, 2);
+    fmpz_add_ui(sq, sq, 2);             /* a safe 2 sqrt(q), rounded up */
+
+    fmpz_add(lo, t0, sq);
+    fmpz_mod(lo, lo, M);
+    fmpz_sub(lo, lo, sq);
+
+    fmpz_sub(n, sq, lo);
+    fmpz_fdiv_q(n, n, M);
+
+    if (fmpz_sgn(n) >= 0 && fmpz_abs_fits_ui(n)
+            && fmpz_cmp_si(n, _schoof_tail_limit(q)) <= 0)
+    {
+        *ncand = (slong) fmpz_get_ui(n) + 1;
+        ok = 1;
+    }
+
+    fmpz_clear(sq);
+    fmpz_clear(n);
+
+    return ok;
+}
+
+static int
+_schoof_finish_with_points(fmpz_t res, const fmpz_t t0, const fmpz_t M,
+        const fmpz_t q, gr_ec_ctx_t ctx)
+{
+    fmpz_t lo, cand;
+    gr_ec_point_t P, A, B, Cp;
+    flint_rand_t state;
+    slong ncand = 0, i, k, nalive, alive_k = 0, round;
+    char * alive = NULL;
+    int status = GR_SUCCESS;
+
+    fmpz_init(lo); fmpz_init(cand);
+
+    if (!_schoof_tail_span(lo, &ncand, t0, M, q))
+    {
+        status = GR_UNABLE;
+        goto cleanup_small;
+    }
+
+    if (ncand == 1)
+    {
+        fmpz_add_ui(res, q, 1);
+        fmpz_sub(res, res, lo);
+        goto cleanup_small;
+    }
+
+    alive = flint_calloc(ncand, 1);
+
+    for (i = 0; i < ncand; i++)
+        alive[i] = 1;
+
+    nalive = ncand;
+
+    gr_ec_point_init(P, ctx);
+    gr_ec_point_init(A, ctx);
+    gr_ec_point_init(B, ctx);
+    gr_ec_point_init(Cp, ctx);
+
+    flint_rand_init(state);
+    flint_rand_set_seed(state, UWORD(0x510e527fade682d1),
+            UWORD(0x9b05688c2b3e6c1f));
+
+    for (round = 0; round < 40 && nalive > 1 && status == GR_SUCCESS; round++)
+    {
+        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS)
+        {
+            status = GR_UNABLE;
+            break;
+        }
+
+        if (gr_ec_point_is_inf(P, ctx) != T_FALSE)
+            continue;
+
+        /* A = (q + 1 - lo) P and B = M P */
+        fmpz_add_ui(cand, q, 1);
+        fmpz_sub(cand, cand, lo);
+
+        if (gr_ec_point_mul_fmpz(A, P, cand, ctx) != GR_SUCCESS
+                || gr_ec_point_mul_fmpz(B, P, M, ctx) != GR_SUCCESS)
+        {
+            status = GR_UNABLE;
+            break;
+        }
+
+        /* Cp = k B, stepped one addition at a time */
+        if (gr_ec_point_zero(Cp, ctx) != GR_SUCCESS)
+        {
+            status = GR_UNABLE;
+            break;
+        }
+
+        nalive = 0;
+
+        for (k = 0; k < ncand; k++)
+        {
+            if (alive[k] && gr_ec_point_equal(A, Cp, ctx) != T_TRUE)
+                alive[k] = 0;
+
+            if (alive[k])
+            {
+                nalive++;
+                alive_k = k;
+            }
+
+            if (k + 1 < ncand
+                    && gr_ec_point_add(Cp, Cp, B, ctx) != GR_SUCCESS)
+            {
+                status = GR_UNABLE;
+                break;
+            }
+        }
+
+        if (nalive == 0)
+        {
+            /* no candidate kills this point, so something upstream is
+               wrong; say so rather than return a number */
+            status = GR_UNABLE;
+            break;
+        }
+    }
+
+    if (status == GR_SUCCESS)
+    {
+        if (nalive != 1)
+            status = GR_UNABLE;
+        else
+        {
+            fmpz_mul_si(cand, M, alive_k);
+            fmpz_add(cand, cand, lo);
+            fmpz_add_ui(res, q, 1);
+            fmpz_sub(res, res, cand);
+        }
+    }
+
+    flint_rand_clear(state);
+    gr_ec_point_clear(Cp, ctx);
+    gr_ec_point_clear(B, ctx);
+    gr_ec_point_clear(A, ctx);
+    gr_ec_point_clear(P, ctx);
+    flint_free(alive);
+
+cleanup_small:
+    fmpz_clear(lo); fmpz_clear(cand);
+
+    return status;
+}
+
 int
 gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     fmpz_t q, p, bound, M, t, sq;
     ulong l, tl;
-    int status = GR_SUCCESS;
+    int status = GR_SUCCESS, tail_usable = 1;
 
     if (gr_ctx_is_field(R) != T_TRUE)
         return GR_DOMAIN;
@@ -1206,6 +1454,34 @@ gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx)
 
     for (l = 3; fmpz_cmp(M, bound) <= 0 && status == GR_SUCCESS; l = n_nextprime(l, 1))
     {
+        /*
+            Before paying for another prime, see whether what is left of
+            the trace is cheap to settle with the group law instead. The
+            primes at the top of the range dominate the whole computation,
+            so this is worth asking every time round.
+        */
+        if (tail_usable)
+        {
+            fmpz_t lo;
+            slong ncand;
+
+            fmpz_init(lo);
+
+            if (_schoof_tail_span(lo, &ncand, t, M, q))
+            {
+                fmpz_clear(lo);
+
+                if (_schoof_finish_with_points(res, t, M, q, ctx) == GR_SUCCESS)
+                    goto cleanup;
+
+                /* it cannot work here -- no random points, most likely --
+                   so stop asking and go back to paying for primes */
+                tail_usable = 0;
+            }
+            else
+                fmpz_clear(lo);
+        }
+
         if (fmpz_cmp_ui(p, l) == 0)
             continue;
 
@@ -1664,7 +1940,20 @@ gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
     }
 
     /*
-        Complex multiplication first: it is a j-invariant comparison and a
+        A curve over F_{p^n} whose coefficients happen to lie in F_p is a
+        base change, and counting it over F_p and lifting the trace is
+        enormously cheaper than counting it where it stands. Detecting
+        that is five conversions, and over a prime field it declines
+        immediately, so it is worth asking first.
+    */
+    if (gr_ec_ctx_cardinality_subfield(res, ctx) == GR_SUCCESS)
+    {
+        fmpz_clear(q);
+        return GR_SUCCESS;
+    }
+
+    /*
+        Complex multiplication next: it is a j-invariant comparison and a
         handful of scalar multiplications, and it gives up at once when the
         curve is not one of the special ones, so it costs almost nothing to
         try and saves everything when it applies.

@@ -223,6 +223,7 @@ WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_bsgs(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx);
 
 /* Order of the group, cached in the context */
 
@@ -501,6 +502,7 @@ WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_long_weierstrass(gr_ec_jac
 WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res, gr_ptr w, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx);
 
 /* Simultaneous normalization: one inversion for the whole vector */
 WARN_UNUSED_RESULT int _gr_ec_jac_point_vec_get_aff_point_vec(gr_ec_aff_point_struct * res, const gr_ec_jac_point_struct * P, slong len, gr_ec_ctx_t ctx);

@@ -29,8 +29,8 @@
     come out as points at infinity.
 */
 int
-_gr_ec_jac_point_vec_get_aff_point_vec(gr_ec_aff_point_struct * res,
-        const gr_ec_jac_point_struct * P, slong len, gr_ec_ctx_t ctx)
+_gr_ec_jac_point_vec_get_aff_point_vec_witness(gr_ec_aff_point_struct * res,
+        const gr_ec_jac_point_struct * P, slong len, gr_ptr w, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -58,6 +58,9 @@ _gr_ec_jac_point_vec_get_aff_point_vec(gr_ec_aff_point_struct * res,
 
         status |= gr_set(GR_ENTRY(c, i, sz), inv, R);
     }
+
+    /* every Z in the product has just been assumed invertible */
+    GR_EC_WITNESS(w, GR_ENTRY(c, len - 1, sz));
 
     if (status == GR_SUCCESS)
         status = gr_inv(inv, GR_ENTRY(c, len - 1, sz), R);
@@ -137,6 +140,13 @@ _gr_ec_wnaf(slong * digits, const fmpz_t n, slong w)
     return len;
 }
 
+int
+_gr_ec_jac_point_vec_get_aff_point_vec(gr_ec_aff_point_struct * res,
+        const gr_ec_jac_point_struct * P, slong len, gr_ec_ctx_t ctx)
+{
+    return _gr_ec_jac_point_vec_get_aff_point_vec_witness(res, P, len, NULL, ctx);
+}
+
 /* window width; the table holds 2^(w-2) affine points */
 static slong
 _gr_ec_naf_window(slong bits)
@@ -159,8 +169,8 @@ _gr_ec_naf_window(slong bits)
     should fall back to _gr_ec_jac_point_mul_fmpz_binary there.
 */
 int
-_gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
-        const fmpz_t n, gr_ec_ctx_t ctx)
+_gr_ec_jac_point_mul_fmpz_naf_witness(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
+        const fmpz_t n, gr_ptr wit, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -226,7 +236,7 @@ _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
 
     /* one inversion normalizes the whole table */
     if (status == GR_SUCCESS)
-        status = _gr_ec_jac_point_vec_get_aff_point_vec(A, T, ntab, ctx);
+        status = _gr_ec_jac_point_vec_get_aff_point_vec_witness(A, T, ntab, wit, ctx);
 
     /* and the negated table, so the ladder never negates */
     for (i = 0; i < ntab && status == GR_SUCCESS; i++)
@@ -248,8 +258,8 @@ _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
             slong d = digits[i];
 
             if (acc->is_infinity == T_FALSE)
-                status |= shrt ? _gr_ec_jac_point_dbl_short_weierstrass_ws(acc, acc, t, ctx)
-                               : _gr_ec_jac_point_dbl_long_weierstrass_ws(acc, acc, t, ctx);
+                status |= shrt ? _gr_ec_jac_point_dbl_short_weierstrass_ws(acc, acc, t, wit, ctx)
+                               : _gr_ec_jac_point_dbl_long_weierstrass_ws(acc, acc, t, wit, ctx);
             else if (acc->is_infinity == T_UNKNOWN)
                 status |= GR_UNABLE;
 
@@ -264,8 +274,8 @@ _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
             if (acc->is_infinity == T_TRUE)
                 status |= gr_ec_jac_point_set_aff_point(acc, S, ctx);
             else
-                status |= shrt ? _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(acc, acc, S, t, ctx)
-                               : _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(acc, acc, S, t, ctx);
+                status |= shrt ? _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(acc, acc, S, t, wit, ctx)
+                               : _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(acc, acc, S, t, wit, ctx);
         }
 
         GR_TMP_CLEAR_VEC(t, GR_EC_JAC_SCRATCH, R);
@@ -284,4 +294,11 @@ _gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
     fmpz_clear(k);
 
     return status;
+}
+
+int
+_gr_ec_jac_point_mul_fmpz_naf(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
+        const fmpz_t n, gr_ec_ctx_t ctx)
+{
+    return _gr_ec_jac_point_mul_fmpz_naf_witness(res, P, n, NULL, ctx);
 }

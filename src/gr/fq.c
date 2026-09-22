@@ -175,6 +175,21 @@ _gr_fq_is_zero(const fq_t x, const gr_ctx_t ctx)
     return fq_is_zero(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
+/*
+    An element of F_q is an integer exactly when it lies in the prime
+    field, in which case it is its own constant coefficient.
+*/
+static int
+_gr_fq_get_fmpz(fmpz_t res, const fq_t x, const gr_ctx_t ctx)
+{
+    /* an fq_t is an fmpz_poly_t, reduced, so this is exact */
+    if (fmpz_poly_length(x) > 1)
+        return GR_DOMAIN;
+
+    fmpz_poly_get_coeff_fmpz(res, x, 0);
+    return GR_SUCCESS;
+}
+
 static truth_t
 _gr_fq_is_one(const fq_t x, const gr_ctx_t ctx)
 {
@@ -792,6 +807,7 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fq_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fq_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fq_set_fmpz},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fq_get_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fq_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fq_add},

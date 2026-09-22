@@ -81,7 +81,7 @@ gr_ec_jac_point_neg(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
 */
 int
 _gr_ec_jac_point_dbl_long_weierstrass_ws(gr_ec_jac_point_t res,
-        const gr_ec_jac_point_t P, gr_ptr t, gr_ec_ctx_t ctx)
+        const gr_ec_jac_point_t P, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -113,6 +113,10 @@ _gr_ec_jac_point_dbl_long_weierstrass_ws(gr_ec_jac_point_t res,
         res->is_infinity = T_UNKNOWN;
         return GR_UNABLE;
     }
+
+    /* the point was taken to be of order greater than two on the strength
+       of this being nonzero */
+    GR_EC_WITNESS(w, T(2));
 
     /* T3 = M = 3 X^2 + 2 a2 X ZZ + a4 ZZ^2 - a1 Y Z */
     status |= gr_sqr(T(4), JX(P), R);
@@ -173,7 +177,7 @@ _gr_ec_jac_point_dbl_long_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_poi
     int status;
 
     GR_TMP_INIT_VEC(t, 9, R);
-    status = _gr_ec_jac_point_dbl_long_weierstrass_ws(res, P, t, ctx);
+    status = _gr_ec_jac_point_dbl_long_weierstrass_ws(res, P, t, NULL, ctx);
     GR_TMP_CLEAR_VEC(t, 9, R);
 
     return status;
@@ -182,7 +186,7 @@ _gr_ec_jac_point_dbl_long_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_poi
 /* dbl-2001-b style; assumes P finite and a1 = a2 = a3 = 0 */
 int
 _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point_t res,
-        const gr_ec_jac_point_t P, gr_ptr t, gr_ec_ctx_t ctx)
+        const gr_ec_jac_point_t P, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -234,6 +238,10 @@ _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point_t res,
         return GR_UNABLE;
     }
 
+    /* the point was taken to be of order greater than two on the strength
+       of 2 Y Z being nonzero */
+    GR_EC_WITNESS(w, JZ(res));
+
     /* X3 = M^2 - 2 S */
     status |= gr_sqr(JX(res), T(1), R);
     status |= gr_sub(JX(res), JX(res), T(3), R);
@@ -258,7 +266,7 @@ _gr_ec_jac_point_dbl_short_weierstrass(gr_ec_jac_point_t res, const gr_ec_jac_po
     int status;
 
     GR_TMP_INIT_VEC(t, 5, R);
-    status = _gr_ec_jac_point_dbl_short_weierstrass_ws(res, P, t, ctx);
+    status = _gr_ec_jac_point_dbl_short_weierstrass_ws(res, P, t, NULL, ctx);
     GR_TMP_CLEAR_VEC(t, 5, R);
 
     return status;
@@ -521,7 +529,8 @@ gr_ec_jac_point_sub(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
 */
 int
 _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res,
-        const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ec_ctx_t ctx)
+        const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t,
+        gr_ptr w, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -557,13 +566,24 @@ _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res,
         same = gr_is_zero(T(2), R);
 
         if (same == T_TRUE)
-            return _gr_ec_jac_point_dbl_long_weierstrass_ws(res, P, t, ctx);
+            return _gr_ec_jac_point_dbl_long_weierstrass_ws(res, P, t, w, ctx);
+
         if (same == T_FALSE)
-            return gr_ec_jac_point_zero(res, ctx);
+        {
+            /* the points were taken to be inverse on the strength of r
+               being nonzero */
+            GR_EC_WITNESS(w, T(2));
+            return (status == GR_SUCCESS) ? gr_ec_jac_point_zero(res, ctx)
+                                          : status;
+        }
 
         res->is_infinity = T_UNKNOWN;
         return GR_UNABLE;
     }
+
+    /* the points were taken to be distinct on the strength of H being
+       nonzero */
+    GR_EC_WITNESS(w, T(3));
 
     /* T4 = v = H Z1 = Z3, T5 = HH */
     status |= gr_mul(T(4), T(3), JZ(P), R);
@@ -613,7 +633,7 @@ _gr_ec_jac_point_add_aff_point_long_weierstrass(gr_ec_jac_point_t res, const gr_
     int status;
 
     GR_TMP_INIT_VEC(t, 9, R);
-    status = _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(res, P, Q, t, ctx);
+    status = _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(res, P, Q, t, NULL, ctx);
     GR_TMP_CLEAR_VEC(t, 9, R);
 
     return status;
@@ -623,7 +643,7 @@ _gr_ec_jac_point_add_aff_point_long_weierstrass(gr_ec_jac_point_t res, const gr_
 int
 _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res,
         const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t,
-        gr_ec_ctx_t ctx)
+        gr_ptr w, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong sz = R->sizeof_elem;
@@ -659,13 +679,24 @@ _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res,
         same = gr_is_zero(T(2), R);
 
         if (same == T_TRUE)
-            return _gr_ec_jac_point_dbl_short_weierstrass_ws(res, P, t, ctx);
+            return _gr_ec_jac_point_dbl_short_weierstrass_ws(res, P, t, w, ctx);
+
         if (same == T_FALSE)
-            return gr_ec_jac_point_zero(res, ctx);
+        {
+            /* the points were taken to be inverse on the strength of r
+               being nonzero */
+            GR_EC_WITNESS(w, T(2));
+            return (status == GR_SUCCESS) ? gr_ec_jac_point_zero(res, ctx)
+                                          : status;
+        }
 
         res->is_infinity = T_UNKNOWN;
         return GR_UNABLE;
     }
+
+    /* the points were taken to be distinct on the strength of H being
+       nonzero */
+    GR_EC_WITNESS(w, T(1));
 
     /* T4 = HH, T5 = HHH, T6 = HHH Y1, T4 = V = X1 HH */
     status |= gr_sqr(T(4), T(1), R);
@@ -702,7 +733,7 @@ _gr_ec_jac_point_add_aff_point_short_weierstrass(gr_ec_jac_point_t res, const gr
     int status;
 
     GR_TMP_INIT_VEC(t, 7, R);
-    status = _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(res, P, Q, t, ctx);
+    status = _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(res, P, Q, t, NULL, ctx);
     GR_TMP_CLEAR_VEC(t, 7, R);
 
     return status;
@@ -797,6 +828,119 @@ _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res,
     falls back to the plain binary ladder over base rings where that is not
     available.
 */
+
+/*
+    Scalar multiplication that also answers whether the group law was
+    entitled to the branches it took.
+
+    Over a ring that is not an integral domain the addition formulas are
+    still computed correctly, but the case distinction -- add, double, or
+    the point at infinity -- is made by testing whether a quantity is
+    zero, and over Z/n a quantity can be zero modulo one prime factor and
+    not another. The branch is then right for one factor and wrong for the
+    other, and the answer is silently meaningless.
+
+    The witness w, which the caller sets to one beforehand, collects every
+    quantity a branch treated as nonzero. If all of them are units the run
+    was sound; over Z/n that is gcd(w, n) = 1, and a gcd greater than one
+    is both a proof that n is composite and a factor of it. This is what
+    elliptic curve primality proving and elliptic curve factorization both
+    need, from opposite directions: the first wants the run to be sound,
+    the second wants it not to be.
+
+    The ladder is the same width-w NAF as the plain version. Its fallback
+    is a binary ladder over the mixed addition rather than the general
+    one, because the mixed addition is both cheaper and already keeps the
+    witness; the one inversion that costs is free on the affine input
+    these callers have.
+*/
+static int
+_gr_ec_jac_point_mul_fmpz_binary_witness(gr_ec_jac_point_t res,
+        const gr_ec_jac_point_t P, const fmpz_t n, gr_ptr w, gr_ec_ctx_t ctx)
+{
+    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
+    gr_ec_aff_point_t S;
+    gr_ec_jac_point_t A;
+    gr_ptr t;
+    fmpz_t k;
+    slong i, bits;
+    int shrt = (gr_ec_ctx_model(ctx) == GR_EC_SHORT_WEIERSTRASS);
+    int status = GR_SUCCESS;
+
+    gr_ec_aff_point_init(S, ctx);
+    gr_ec_jac_point_init(A, ctx);
+    fmpz_init(k);
+    GR_TMP_INIT_VEC(t, GR_EC_JAC_SCRATCH, R);
+
+    fmpz_abs(k, n);
+    status = _gr_ec_jac_point_vec_get_aff_point_vec_witness(S, P, 1, w, ctx);
+
+    if (status == GR_SUCCESS && fmpz_sgn(n) < 0)
+        status = gr_ec_aff_point_neg(S, S, ctx);
+
+    bits = fmpz_bits(k);
+
+    for (i = bits - 1; i >= 0 && status == GR_SUCCESS; i--)
+    {
+        if (A->is_infinity == T_FALSE)
+            status |= shrt ? _gr_ec_jac_point_dbl_short_weierstrass_ws(A, A, t, w, ctx)
+                           : _gr_ec_jac_point_dbl_long_weierstrass_ws(A, A, t, w, ctx);
+        else if (A->is_infinity == T_UNKNOWN)
+            status |= GR_UNABLE;
+
+        if (!fmpz_tstbit(k, i) || status != GR_SUCCESS)
+            continue;
+
+        if (S->is_infinity == T_TRUE)
+            continue;
+
+        if (A->is_infinity == T_TRUE)
+            status |= gr_ec_jac_point_set_aff_point(A, S, ctx);
+        else
+            status |= shrt ? _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(A, A, S, t, w, ctx)
+                           : _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(A, A, S, t, w, ctx);
+    }
+
+    if (status == GR_SUCCESS)
+        status = gr_ec_jac_point_set(res, A, ctx);
+    else
+        res->is_infinity = T_UNKNOWN;
+
+    GR_TMP_CLEAR_VEC(t, GR_EC_JAC_SCRATCH, R);
+    fmpz_clear(k);
+    gr_ec_jac_point_clear(A, ctx);
+    gr_ec_aff_point_clear(S, ctx);
+
+    return status;
+}
+
+int
+gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res, gr_ptr w,
+        const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+{
+    int status;
+
+    if (fmpz_is_zero(n) || P->is_infinity == T_TRUE)
+        return gr_ec_jac_point_zero(res, ctx);
+
+    if (P->is_infinity == T_UNKNOWN)
+    {
+        res->is_infinity = T_UNKNOWN;
+        return GR_UNABLE;
+    }
+
+    /*
+        No reduction against a cached order here, deliberately: this path
+        exists for rings where the points may not form a group at all, and
+        there an annihilator would mean nothing.
+    */
+    status = _gr_ec_jac_point_mul_fmpz_naf_witness(res, P, n, w, ctx);
+
+    if (status != GR_SUCCESS)
+        status = _gr_ec_jac_point_mul_fmpz_binary_witness(res, P, n, w, ctx);
+
+    return status;
+}
 
 /* the ladder itself, on a scalar that is already as short as it will get */
 static int

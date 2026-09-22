@@ -452,6 +452,82 @@ check_extension_fields(flint_rand_t state)
     }
 }
 
+/*
+    A curve over F_{p^n} whose coefficients lie in the prime field is a
+    base change, and the descent has to get the same answer as counting it
+    where it stands. A curve that is not one has to be declined.
+*/
+static void
+check_subfield(flint_rand_t state)
+{
+    slong deg, iter;
+
+    for (deg = 2; deg <= 5; deg++)
+    {
+        for (iter = 0; iter < 4 * flint_test_multiplier(); iter++)
+        {
+            gr_ctx_t R;
+            gr_ec_ctx_t E;
+            gr_ptr a4, a6;
+            fmpz_t ns, nb, dummy;
+            slong tries;
+            ulong p = n_nextprime(4 + n_randint(state, 60), 1);
+            int built = 0;
+
+            gr_ctx_init_fq_nmod(R, p, deg, "a");
+            GR_TMP_INIT2(a4, a6, R);
+
+            /* coefficients drawn from the prime field */
+            for (tries = 0; tries < 30 && !built; tries++)
+                if (gr_set_ui(a4, n_randint(state, p), R) == GR_SUCCESS
+                        && gr_set_ui(a6, n_randint(state, p), R) == GR_SUCCESS
+                        && gr_ec_ctx_init_short_weierstrass(E, R, a4, a6) == GR_SUCCESS)
+                    built = 1;
+
+            GR_TMP_CLEAR2(a4, a6, R);
+
+            if (!built)
+            {
+                gr_ctx_clear(R);
+                continue;
+            }
+
+            fmpz_init(ns);
+            fmpz_init(nb);
+
+            FLINT_TEST(gr_ec_ctx_cardinality_subfield(ns, E) == GR_SUCCESS);
+
+            if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
+                FLINT_TEST(fmpz_equal(ns, nb));
+
+            /* and it must be what the dispatcher reports */
+            FLINT_TEST(gr_ctx_cardinality_fmpz(nb, E) == GR_SUCCESS);
+            FLINT_TEST(fmpz_equal(ns, nb));
+
+            fmpz_clear(ns);
+            fmpz_clear(nb);
+            gr_ec_ctx_clear(E);
+
+            /* over a prime field there is nothing to descend to */
+            fmpz_init(dummy);
+            gr_ctx_clear(R);
+
+            if (gr_ctx_init_nmod(R, p) == GR_SUCCESS)
+            {
+                if (gr_ec_ctx_init_randtest(E, state, R) == GR_SUCCESS)
+                {
+                    FLINT_TEST(gr_ec_ctx_cardinality_subfield(dummy, E) == GR_UNABLE);
+                    gr_ec_ctx_clear(E);
+                }
+
+                gr_ctx_clear(R);
+            }
+
+            fmpz_clear(dummy);
+        }
+    }
+}
+
 TEST_FUNCTION_START(gr_ec_cardinality, state)
 {
     check_base_ring_cardinality();
@@ -459,6 +535,7 @@ TEST_FUNCTION_START(gr_ec_cardinality, state)
     check_supersingular(state);
     check_cm_discriminants(state);
     check_extension_fields(state);
+    check_subfield(state);
 
     TEST_FUNCTION_END(state);
 }

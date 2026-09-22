@@ -24,10 +24,29 @@
 
 #define GR_EC_JAC_SCRATCH 9
 
-WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_long_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ptr t, gr_ec_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ptr t, gr_ec_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ec_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ec_ctx_t ctx);
+/*
+    The group law branches on whether certain quantities vanish, and over a
+    ring that is not an integral domain a nonzero value is not enough to
+    make the branch right: it has to be a unit, or the formula is correct
+    modulo one factor of the modulus and wrong modulo another. The
+    functions below therefore take an optional witness w, which they
+    multiply by every quantity a branch has just treated as nonzero. Where
+    the caller can test it -- gcd(w, n) over Z/n -- a non-unit witness says
+    the computation is not to be trusted, and over Z/n it is a factor.
+
+    Passing NULL asks for none of this and costs nothing.
+*/
+#define GR_EC_WITNESS(w, x) \
+    do { if ((w) != NULL) status |= gr_mul((w), (w), (x), R); } while (0)
+
+WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_long_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const gr_ec_aff_point_t Q, gr_ptr t, gr_ptr w, gr_ec_ctx_t ctx);
+
+/* the ladder and the batch normalisation, both taking a witness */
+WARN_UNUSED_RESULT int _gr_ec_jac_point_mul_fmpz_naf_witness(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, const fmpz_t n, gr_ptr w, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ec_jac_point_vec_get_aff_point_vec_witness(gr_ec_aff_point_struct * res, const gr_ec_jac_point_struct * P, slong len, gr_ptr w, gr_ec_ctx_t ctx);
 
 /* Points the context at the method table and element size of a
    representation. Defined in generic.c; called when a context is created. */

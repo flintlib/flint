@@ -590,6 +590,8 @@ before any of this will run.
 
     Over a very small field it walks the field, as that is both the quickest
     thing and free of randomness. It then tries
+    :func:`gr_ec_ctx_cardinality_subfield`, which costs five conversions and
+    declines at once over a prime field, and then
     :func:`gr_ec_ctx_cardinality_cm`, which costs a `j`-invariant comparison
     and declines at once unless the curve is one it recognises. Failing that
     it prefers baby-step giant-step below `2^{80}` and Schoof above it, which
@@ -649,6 +651,52 @@ before any of this will run.
 
     Unlike the other two, this needs no square roots in the base ring, so it
     is currently the only one of the three that runs over *mpn_mod*.
+
+    Two things keep it from being the textbook version. Finding
+    `t \bmod \ell` is a baby-step giant-step search rather than a scan
+    over the `\ell` candidates, because each candidate costs a torsion
+    addition and a torsion addition costs an inversion in
+    `\mathbb{F}_q[x]/(\psi_\ell)` -- an extended gcd on polynomials of
+    degree `(\ell^2-1)/2`, which is some thirty times a multiplication
+    there and dominates everything else. And the loop over `\ell` stops
+    before the product of the primes covers the Hasse interval, leaving a
+    few thousand candidates for the trace and settling them with the group
+    law instead, at one point addition each. The primes at the top of the
+    range cost far more than the whole tail does, so this is worth doing;
+    together the two are worth about a factor of seven at 128 bits.
+
+    The answer stays proved rather than likely. The true order is among the
+    candidates and kills every point, so it survives every round whatever
+    points are drawn; a round can only eliminate impostors. The result is
+    taken only when exactly one candidate is left.
+
+.. function:: int gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\#E(\mathbb{F}_{p^n})` for a curve whose `a`-invariants
+    all lie in the prime field, by counting it over `\mathbb{F}_p` and
+    lifting. Returns ``GR_UNABLE`` over a prime field, and for a curve that
+    is not defined over one.
+
+    Such a curve is the base change of a curve over `\mathbb{F}_p` and has
+    the same Frobenius, so if `\alpha` and `\beta` are the roots of
+    `X^2 - tX + p` there, the trace over `\mathbb{F}_{p^n}` is
+    `\alpha^n + \beta^n`, which the recurrence
+    `t_k = t\,t_{k-1} - p\,t_{k-2}` with `t_0 = 2` and `t_1 = t` gives in
+    `n` steps. The count over `\mathbb{F}_p` goes through
+    :func:`gr_ec_ctx_cardinality`, so everything that applies there,
+    including the complex multiplication shortcut, applies here too.
+
+    The saving is large: counting over `\mathbb{F}_{p^n}` costs baby-step
+    giant-step in `q^{1/4}` group operations or Schoof in a polynomial in
+    `\log q`, against the same thing in a field `n` times smaller, and the
+    lift is free. At `n = 5` over a 16-bit prime the difference is four
+    orders of magnitude.
+
+    Only descent to the prime field is attempted. A curve defined over an
+    intermediate `\mathbb{F}_{p^d}` with `1 < d < n` deserves the same
+    treatment, but mapping its coefficients down needs an embedding that
+    *gr* does not currently hand out, whereas the prime field needs nothing
+    beyond :func:`gr_get_fmpz`.
 
 Order of the group
 -------------------------------------------------------------------------------
