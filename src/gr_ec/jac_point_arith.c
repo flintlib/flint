@@ -797,6 +797,20 @@ _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res,
     falls back to the plain binary ladder over base rings where that is not
     available.
 */
+
+/* the ladder itself, on a scalar that is already as short as it will get */
+static int
+_gr_ec_jac_point_mul_ladder(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
+        const fmpz_t n, gr_ec_ctx_t ctx)
+{
+    int status = _gr_ec_jac_point_mul_fmpz_naf(res, P, n, ctx);
+
+    if (status != GR_SUCCESS)
+        status = _gr_ec_jac_point_mul_fmpz_binary(res, P, n, ctx);
+
+    return status;
+}
+
 int
 gr_ec_jac_point_mul_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         const fmpz_t n, gr_ec_ctx_t ctx)
@@ -812,12 +826,32 @@ gr_ec_jac_point_mul_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         return GR_UNABLE;
     }
 
-    status = _gr_ec_jac_point_mul_fmpz_naf(res, P, n, ctx);
+    /*
+        An annihilator the context already knows shortens the ladder, since
+        m P = 0 makes n P = (n mod m) P. Nothing is computed to find one:
+        if the context does not know one, the scalar is used as it stands,
+        because counting the points to save a few doublings would be a
+        thoroughly bad trade.
+    */
+    if (GR_EC_CTX(ctx)->order_kind != GR_EC_ORDER_UNKNOWN
+            && fmpz_cmpabs(n, &GR_EC_CTX(ctx)->order) >= 0)
+    {
+        fmpz_t k;
 
-    if (status != GR_SUCCESS)
-        status = _gr_ec_jac_point_mul_fmpz_binary(res, P, n, ctx);
+        fmpz_init(k);
+        fmpz_mod(k, n, &GR_EC_CTX(ctx)->order);
 
-    return status;
+        if (fmpz_is_zero(k))
+            status = gr_ec_jac_point_zero(res, ctx);
+        else
+            status = _gr_ec_jac_point_mul_ladder(res, P, k, ctx);
+
+        fmpz_clear(k);
+
+        return status;
+    }
+
+    return _gr_ec_jac_point_mul_ladder(res, P, n, ctx);
 }
 
 int

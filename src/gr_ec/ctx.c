@@ -10,9 +10,14 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
 #include "gr.h"
 #include "gr_ec.h"
 #include "impl.h"
+
+/* the curve data lives inline in the gr context, so it has to fit there */
+typedef char _gr_ec_ctx_data_fits
+    [(sizeof(_gr_ec_ctx_struct) <= GR_CTX_STRUCT_DATA_BYTES) ? 1 : -1];
 
 static void
 _gr_ec_ctx_alloc(gr_ec_ctx_t ctx, gr_ctx_t base_ring)
@@ -25,6 +30,9 @@ _gr_ec_ctx_alloc(gr_ec_ctx_t ctx, gr_ctx_t base_ring)
     _gr_vec_init(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, base_ring);
     GR_EC_CTX(ctx)->model = GR_EC_LONG_WEIERSTRASS;
 
+    fmpz_init(&GR_EC_CTX(ctx)->order);
+    GR_EC_CTX(ctx)->order_kind = GR_EC_ORDER_UNKNOWN;
+
     /* Projective points are the representation that works over any
        commutative ring; gr_ctx_init_gr_ec overrides this. */
     _gr_ec_ctx_init_methods(ctx, GR_EC_REPR_PROJECTIVE);
@@ -36,6 +44,9 @@ gr_ec_ctx_clear(gr_ec_ctx_t ctx)
     _gr_vec_clear(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, GR_EC_ELEM_CTX(ctx));
     flint_free(GR_EC_CTX(ctx)->coeffs);
     GR_EC_CTX(ctx)->coeffs = NULL;
+
+    fmpz_clear(&GR_EC_CTX(ctx)->order);
+    GR_EC_CTX(ctx)->order_kind = GR_EC_ORDER_UNKNOWN;
 }
 
 /* b-invariants, discriminant and model, from the a-invariants */

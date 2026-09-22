@@ -249,11 +249,216 @@ next:
     }
 }
 
+/*
+    Every class number one discriminant, against baby-step giant-step.
+
+    The CM path reads the trace off a Cornacchia solution together with a
+    handful of Jacobi symbols whose constants are tabulated per
+    discriminant, so each entry of that table wants exercising: primes that
+    split (ordinary, trace of either sign, reached through a random twist)
+    and primes that are inert (supersingular).
+*/
+static const slong cm_test_j[] = {
+    WORD(0), WORD(1728), WORD(-3375), WORD(8000), WORD(-32768),
+    WORD(54000), WORD(287496), WORD(-884736), WORD(-12288000),
+    WORD(16581375), WORD(-884736000), WORD(-147197952000),
+    WORD(-262537412640768000)
+};
+
+static void
+check_cm_discriminants(flint_rand_t state)
+{
+    slong idx, iter;
+
+    for (idx = 0; idx < (slong) (sizeof(cm_test_j) / sizeof(slong)); idx++)
+    {
+        for (iter = 0; iter < 8 * flint_test_multiplier(); iter++)
+        {
+            gr_ctx_t R;
+            gr_ec_ctx_t E;
+            gr_ptr g4, g6;
+            fmpz_t nc, nb;
+            ulong pp, pinv, jm, a4, a6, c, c2, k;
+            int built = 0;
+
+            pp = n_randprime(state, 18 + n_randint(state, 7), 1);
+
+            if (pp <= 2000 || gr_ctx_init_nmod(R, pp) != GR_SUCCESS)
+                continue;
+
+            pinv = n_preinvert_limb(pp);
+
+            {
+                fmpz_t fj, fp;
+                fmpz_init_set_si(fj, cm_test_j[idx]);
+                fmpz_init_set_ui(fp, pp);
+                fmpz_mod(fj, fj, fp);
+                jm = fmpz_get_ui(fj);
+                fmpz_clear(fj);
+                fmpz_clear(fp);
+            }
+
+            if (jm == 0)                            /* sextic twists */
+            {
+                a4 = 0;
+                a6 = 1 + n_randint(state, pp - 1);
+            }
+            else if (jm == 1728 % pp)               /* quartic twists */
+            {
+                a4 = 1 + n_randint(state, pp - 1);
+                a6 = 0;
+            }
+            else
+            {
+                /* a4 = 3 j (1728 - j), a6 = 2 j (1728 - j)^2, then a
+                   random quadratic twist */
+                k = n_submod(1728 % pp, jm, pp);
+                a4 = n_mulmod2_preinv(n_mulmod2_preinv(3, jm, pp, pinv), k, pp, pinv);
+                a6 = n_mulmod2_preinv(n_mulmod2_preinv(2, jm, pp, pinv),
+                        n_mulmod2_preinv(k, k, pp, pinv), pp, pinv);
+
+                c = 1 + n_randint(state, pp - 1);
+                c2 = n_mulmod2_preinv(c, c, pp, pinv);
+                a4 = n_mulmod2_preinv(a4, c2, pp, pinv);
+                a6 = n_mulmod2_preinv(a6, n_mulmod2_preinv(c2, c, pp, pinv), pp, pinv);
+
+                if (a4 == 0 || a6 == 0)
+                {
+                    gr_ctx_clear(R);
+                    continue;
+                }
+            }
+
+            GR_TMP_INIT2(g4, g6, R);
+
+            if (gr_set_ui(g4, a4, R) == GR_SUCCESS
+                    && gr_set_ui(g6, a6, R) == GR_SUCCESS
+                    && gr_ec_ctx_init_short_weierstrass(E, R, g4, g6) == GR_SUCCESS)
+                built = 1;
+
+            GR_TMP_CLEAR2(g4, g6, R);
+
+            if (!built)
+            {
+                gr_ctx_clear(R);
+                continue;
+            }
+
+            fmpz_init(nc);
+            fmpz_init(nb);
+
+            /* the j-invariant proves the complex multiplication, so this
+               one is not allowed to decline */
+            FLINT_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_SUCCESS);
+
+            if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
+                FLINT_TEST(fmpz_equal(nc, nb));
+
+            fmpz_clear(nc);
+            fmpz_clear(nb);
+            gr_ec_ctx_clear(E);
+            gr_ctx_clear(R);
+        }
+    }
+}
+
+/*
+    Counting over F_{p^n} for n = 2 to 5.
+
+    Nothing in baby-step giant-step or in Schoof is tied to a prime field,
+    and the dispatcher should reach both of them over an extension; what is
+    tied to a prime field is the complex multiplication shortcut, whose
+    class number one theory is written for j in F_p, and it has to decline
+    rather than answer. The naive walk is only affordable for the smallest
+    of these.
+*/
+static void
+check_extension_fields(flint_rand_t state)
+{
+    slong deg, iter;
+
+    for (deg = 2; deg <= 5; deg++)
+    {
+        for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
+        {
+            gr_ctx_t R;
+            gr_ec_ctx_t E;
+            gr_ptr a4, a6;
+            fmpz_t q, nn, nb, ns, nc, ng;
+            slong tries;
+            ulong p;
+            int built = 0, have_n = 0, have_b = 0, have_s = 0;
+
+            /* q = p^deg has to stay small: baby-step giant-step costs
+               q^(1/4) group operations and Schoof works in a quotient of
+               degree growing with log q, so a big p here would turn a unit
+               test into a benchmark */
+            p = n_nextprime(4 + n_randint(state, 40), 1);
+
+            gr_ctx_init_fq_nmod(R, p, deg, "a");
+            GR_TMP_INIT2(a4, a6, R);
+
+            for (tries = 0; tries < 20 && !built; tries++)
+                if (gr_randtest(a4, state, R) == GR_SUCCESS
+                        && gr_randtest(a6, state, R) == GR_SUCCESS
+                        && gr_ec_ctx_init_short_weierstrass(E, R, a4, a6) == GR_SUCCESS)
+                    built = 1;
+
+            GR_TMP_CLEAR2(a4, a6, R);
+
+            if (!built)
+            {
+                gr_ctx_clear(R);
+                continue;
+            }
+
+            fmpz_init(q); fmpz_init(nn); fmpz_init(nb);
+            fmpz_init(ns); fmpz_init(nc); fmpz_init(ng);
+
+            FLINT_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS);
+
+            /* the walk is O(q), and q is in the millions here, so only
+               ask for it where it is genuinely cheap */
+            have_n = (fmpz_cmp_ui(q, 100000) <= 0)
+                && (gr_ec_ctx_cardinality_naive(nn, E) == GR_SUCCESS);
+            have_b = (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS);
+            have_s = (gr_ec_ctx_cardinality_schoof(ns, E) == GR_SUCCESS);
+
+            /* over an extension at least one of the two general
+               algorithms has to deliver */
+            FLINT_TEST(have_b || have_s);
+
+            if (have_n) check_hasse(nn, q);
+            if (have_b) check_hasse(nb, q);
+            if (have_s) check_hasse(ns, q);
+
+            if (have_n && have_b) FLINT_TEST(fmpz_equal(nn, nb));
+            if (have_n && have_s) FLINT_TEST(fmpz_equal(nn, ns));
+            if (have_b && have_s) FLINT_TEST(fmpz_equal(nb, ns));
+
+            /* the CM path is for prime fields and must say so */
+            FLINT_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_UNABLE);
+
+            /* and the generic entry point agrees with whichever ran */
+            FLINT_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS);
+            if (have_b) FLINT_TEST(fmpz_equal(ng, nb));
+            if (have_s) FLINT_TEST(fmpz_equal(ng, ns));
+
+            fmpz_clear(q); fmpz_clear(nn); fmpz_clear(nb);
+            fmpz_clear(ns); fmpz_clear(nc); fmpz_clear(ng);
+            gr_ec_ctx_clear(E);
+            gr_ctx_clear(R);
+        }
+    }
+}
+
 TEST_FUNCTION_START(gr_ec_cardinality, state)
 {
     check_base_ring_cardinality();
     check_algorithms_agree(state);
     check_supersingular(state);
+    check_cm_discriminants(state);
+    check_extension_fields(state);
 
     TEST_FUNCTION_END(state);
 }

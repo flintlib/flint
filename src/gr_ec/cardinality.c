@@ -1238,275 +1238,377 @@ cleanup:
 
 /*
     When E/F_p has complex multiplication by an order of small discriminant
-    D, the trace is not something to search for: 4p = t^2 + |D| v^2 has a
-    solution by Cornacchia, and the trace of E is one of the traces of the
-    twists, which that solution determines. Supersingular curves are the
-    same story with t = 0.
+    the trace is not something to search for. For the thirteen discriminants
+    D of class number one the Hilbert class polynomial is linear, so
+    j(E) = j_D is exactly the statement that E has that complex
+    multiplication, and then 4p = t^2 + |D| v^2 has a solution, which
+    qfb_cornacchia finds. Supersingular curves are the same story with
+    t = 0, which is what happens when D is not a square modulo p.
 
-    The orders of discriminant D with class number one, and the j-invariant
-    of the corresponding curve. H_D is linear for these, so j(E) = j_D is
-    exactly the statement that E has CM by that order.
+    Cornacchia only gives |t|, and which of the twists with this
+    j-invariant the curve actually is has to be decided separately. None of
+    the thirteen cases needs a scalar multiplication for that.
+
+    For j = 0 and j = 1728 the curve has sextic and quartic twists, and the
+    sextic (respectively quartic) residue character of the coefficient
+    picks one out, at the cost of one exponentiation. Those characters are
+    classical evaluations of Jacobi sums -- see Ireland and Rosen, A
+    Classical Introduction to Modern Number Theory, chapter 18.
+
+    For the other eleven only the quadratic twist exists, and then two
+    independent bits decide the sign, neither of which costs more than a
+    Jacobi symbol:
+
+      * a sign convention for |t| itself. For odd m = |D| the Jacobi symbol
+        (t | m) does it, because -1 is a non-residue modulo every such m,
+        so exactly one of +-t satisfies (t | m) = 1. Where m is a power of
+        two (D = -8 and D = -16) a congruence on t and v takes its place.
+
+      * which quadratic twist the curve is, which is the Legendre symbol
+        (c_D a6 | p) for a constant c_D attached to the discriminant.
+
+    That this is the shape of the answer is classical; see Rubin and
+    Silverberg, Choosing the correct elliptic curve in the CM method,
+    Math. Comp. 79 (2010). The constants c_D and the overall signs in
+    cm_discs below were determined here by calibration against
+    gr_ec_ctx_cardinality_bsgs over three thousand curves per discriminant,
+    and each resulting rule was then confirmed on twenty thousand further
+    curves.
 */
-typedef struct { slong D; slong j; } cm_disc_struct;
 
-static const cm_disc_struct cm_discs[] = {
-    {  -3, WORD(0)                    },
-    {  -4, WORD(1728)                 },
-    {  -7, WORD(-3375)                },
-    {  -8, WORD(8000)                 },
-    { -11, WORD(-32768)               },
-    { -12, WORD(54000)                },
-    { -16, WORD(287496)               },
-    { -19, WORD(-884736)              },
-    { -27, WORD(-12288000)            },
-    { -28, WORD(16581375)             },
-    { -43, WORD(-884736000)           },
-    { -67, WORD(-147197952000)        },
-    {-163, WORD(-262537412640768000)  },
-};
-
-#define CM_NUM_DISCS (sizeof(cm_discs) / sizeof(cm_disc_struct))
-#define CM_MAX_CANDIDATES 32
-
+/* the representative of x modulo p in (-p/2, p/2] */
 static void
-_cand_push(fmpz * cand, slong * n, const fmpz_t N, const fmpz_t lo, const fmpz_t hi)
+_center(fmpz_t x, const fmpz_t p)
 {
-    slong i;
+    fmpz_t h;
+    fmpz_init(h);
+    fmpz_tdiv_q_2exp(h, p, 1);
 
-    if (*n >= CM_MAX_CANDIDATES)
-        return;
+    if (fmpz_cmp(x, h) > 0)
+        fmpz_sub(x, x, p);
 
-    if (fmpz_sgn(N) <= 0 || fmpz_cmp(N, lo) < 0 || fmpz_cmp(N, hi) > 0)
-        return;
-
-    for (i = 0; i < *n; i++)
-        if (fmpz_equal(cand + i, N))
-            return;
-
-    fmpz_set(cand + *n, N);
-    (*n)++;
-}
-
-/* N = p + 1 - t, kept if it lands in the Hasse interval */
-static void
-_cand_push_trace(fmpz * cand, slong * n, const fmpz_t p, const fmpz_t t,
-        const fmpz_t lo, const fmpz_t hi)
-{
-    fmpz_t N;
-    fmpz_init(N);
-    fmpz_add_ui(N, p, 1);
-    fmpz_sub(N, N, t);
-    _cand_push(cand, n, N, lo, hi);
-    fmpz_clear(N);
+    fmpz_clear(h);
 }
 
 /*
-    Decide between candidate orders by elimination. The true order of the
-    group kills every point of it, so it is never discarded; if exactly one
-    candidate survives a few random points, it is therefore the right one.
-    That argument needs no factoring, which matters because the candidates
-    are the size of p.
+    The trace of y^2 = x^3 + a6 over F_p, which has j = 0.
 
-    It does rely on the true order being in the list to begin with, which is
-    why the caller only builds one when the j-invariant proves the curve has
-    complex multiplication (and always includes the supersingular t = 0).
+    For p = 2 mod 3 the curve is supersingular. Otherwise 4p = A^2 + 27 B^2
+    has a solution, normalised by A = 2 mod 3, and the sextic character of
+    -108 a6 turns |A| into the trace of this particular sextic twist.
 */
 static int
-_cm_resolve(fmpz_t res, fmpz * cand, slong ncand, gr_ec_ctx_t ctx)
+_cm_trace_j0(fmpz_t t, const fmpz_t a6, const fmpz_t p)
 {
-    gr_ec_point_t P, T;
-    flint_rand_t state;
-    slong attempt, i, alive;
-    int status = GR_SUCCESS;
+    fmpz_t D, s, A, B, d, e;
+    int ok = 0;
 
-    if (ncand == 0)
-        return GR_UNABLE;
+    if (fmpz_fdiv_ui(p, 3) != 1)
+        return fmpz_zero(t), 1;                 /* supersingular */
 
-    if (ncand == 1)
-        return fmpz_set(res, cand + 0), GR_SUCCESS;
+    fmpz_init(D); fmpz_init(s); fmpz_init(A);
+    fmpz_init(B); fmpz_init(d); fmpz_init(e);
 
-    gr_ec_point_init(P, ctx);
-    gr_ec_point_init(T, ctx);
-    flint_rand_init(state);
-    flint_rand_set_seed(state, UWORD(0x243f6a8885a308d3), UWORD(0x13198a2e03707344));
+    fmpz_set_si(D, -27);
+    fmpz_mod(D, D, p);
 
-    alive = ncand;
-
-    for (attempt = 0; attempt < 30 && alive > 1 && status == GR_SUCCESS; attempt++)
+    if (fmpz_jacobi(D, p) == 1 && fmpz_sqrtmod(s, D, p)
+            && qfb_cornacchia(A, B, p, -27, s))
     {
-        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS
-                || gr_ec_point_is_inf(P, ctx) != T_FALSE)
-            continue;
+        if (fmpz_fdiv_ui(A, 3) == 1)
+            fmpz_neg(A, A);
 
-        for (i = 0; i < ncand; i++)
-        {
-            if (fmpz_is_zero(cand + i))          /* already discarded */
-                continue;
+        fmpz_mul_si(d, a6, -108);
+        fmpz_mod(d, d, p);
 
-            status |= gr_ec_point_mul_fmpz(T, P, cand + i, ctx);
+        fmpz_sub_ui(e, p, 1);
+        fmpz_divexact_ui(e, e, 6);
+        fmpz_powm(d, d, e, p);
 
-            if (status != GR_SUCCESS)
-                break;
-
-            if (gr_ec_point_is_inf(T, ctx) != T_TRUE)
-            {
-                fmpz_zero(cand + i);
-                alive--;
-            }
-        }
+        fmpz_mul(t, A, d);
+        fmpz_mod(t, t, p);
+        _center(t, p);
+        ok = 1;
     }
 
-    if (status == GR_SUCCESS)
+    fmpz_clear(D); fmpz_clear(s); fmpz_clear(A);
+    fmpz_clear(B); fmpz_clear(d); fmpz_clear(e);
+
+    return ok;
+}
+
+/*
+    The trace of y^2 = x^3 + a4 x over F_p, which has j = 1728.
+
+    For p = 3 mod 4 the curve is supersingular. Otherwise 4p = A^2 + 4 B^2,
+    normalised to the even member of the pair with A = 2 mod 8, and the
+    quartic character of a4 selects the quartic twist.
+*/
+static int
+_cm_trace_j1728(fmpz_t t, const fmpz_t a4, const fmpz_t p)
+{
+    fmpz_t D, s, A, B, e;
+    int ok = 0;
+
+    if (fmpz_fdiv_ui(p, 4) != 1)
+        return fmpz_zero(t), 1;                 /* supersingular */
+
+    fmpz_init(D); fmpz_init(s); fmpz_init(A); fmpz_init(B); fmpz_init(e);
+
+    fmpz_set_si(D, -4);
+    fmpz_mod(D, D, p);
+
+    if (fmpz_jacobi(D, p) == 1 && fmpz_sqrtmod(s, D, p)
+            && qfb_cornacchia(A, B, p, -4, s))
     {
-        if (alive != 1)
-            status = GR_UNABLE;
-        else
-        {
-            for (i = 0; i < ncand; i++)
-                if (!fmpz_is_zero(cand + i))
-                    fmpz_set(res, cand + i);
-        }
+        if (fmpz_fdiv_ui(A, 4) == 0)
+            fmpz_set(A, B);
+
+        if (fmpz_is_odd(A))
+            fmpz_mul_2exp(A, A, 1);
+
+        if (fmpz_fdiv_ui(A, 8) == 6)
+            fmpz_neg(A, A);
+
+        fmpz_sub_ui(e, p, 1);
+        fmpz_tdiv_q_2exp(e, e, 2);
+        fmpz_powm(e, a4, e, p);
+
+        fmpz_mul(t, A, e);
+        fmpz_mod(t, t, p);
+        _center(t, p);
+        ok = 1;
     }
 
-    flint_rand_clear(state);
-    gr_ec_point_clear(T, ctx);
-    gr_ec_point_clear(P, ctx);
+    fmpz_clear(D); fmpz_clear(s); fmpz_clear(A); fmpz_clear(B); fmpz_clear(e);
 
-    return status;
+    return ok;
+}
+
+/* how the sign convention for |t| is pinned down */
+#define CM_SIGN_JACOBI 0        /* by (t | m), m odd */
+#define CM_SIGN_D8     1        /* D = -8:  by t mod 16 and v mod 4 */
+#define CM_SIGN_D16    2        /* D = -16: by t mod 8 */
+
+/*
+    The orders of discriminant D with class number one other than -3 and
+    -4, the j-invariant of the corresponding curve, and the data of the
+    rule above:
+
+      Dc   the discriminant Cornacchia is run on. It is D itself except
+           for -16 and -28, whose own forms do not represent every split
+           p, so the maximal order is used and the normalisation picks the
+           right member of the pair out.
+      m    modulus of the Jacobi symbol on t, 1 when the kind says
+           otherwise. For -27 the symbol modulo 27 is the symbol modulo 3.
+      c    the constant in the Legendre symbol (c a6 | p).
+      eps  the overall sign.
+*/
+typedef struct
+{
+    slong D;
+    slong j;
+    slong Dc;
+    slong m;
+    slong c;
+    slong eps;
+    int kind;
+}
+cm_disc_struct;
+
+static const cm_disc_struct cm_discs[] = {
+    {  -7, WORD(-3375),                  -7,   7, WORD(-2),      1, CM_SIGN_JACOBI },
+    {  -8, WORD(8000),                   -8,   1, WORD(21),      1, CM_SIGN_D8     },
+    { -11, WORD(-32768),                -11,  11, WORD(21),     -1, CM_SIGN_JACOBI },
+    { -12, WORD(54000),                 -12,   3, WORD(22),     -1, CM_SIGN_JACOBI },
+    { -16, WORD(287496),                 -4,   1, WORD(7),       1, CM_SIGN_D16    },
+    { -19, WORD(-884736),               -19,  19, WORD(1),      -1, CM_SIGN_JACOBI },
+    { -27, WORD(-12288000),             -27,   3, WORD(253),    -1, CM_SIGN_JACOBI },
+    { -28, WORD(16581375),               -7,   7, WORD(-114),    1, CM_SIGN_JACOBI },
+    { -43, WORD(-884736000),            -43,  43, WORD(21),     -1, CM_SIGN_JACOBI },
+    { -67, WORD(-147197952000),         -67,  67, WORD(217),    -1, CM_SIGN_JACOBI },
+    {-163, WORD(-262537412640768000),  -163, 163, WORD(185801), -1, CM_SIGN_JACOBI },
+};
+
+#define CM_NUM_DISCS (sizeof(cm_discs) / sizeof(cm_disc_struct))
+
+/*
+    The trace of a curve with j = j_D for one of the entries above, given
+    its a6. Returns 0 if the trace could not be determined, which for a
+    curve that really does have this j-invariant should not happen.
+*/
+static int
+_cm_trace_disc(fmpz_t t, const cm_disc_struct * E, const fmpz_t a6,
+        const fmpz_t p)
+{
+    fmpz_t D, s, a, b, u;
+    slong sgn = E->eps;
+    int ok = 0;
+
+    fmpz_init(D); fmpz_init(s); fmpz_init(a); fmpz_init(b); fmpz_init(u);
+
+    fmpz_set_si(D, E->Dc);
+    fmpz_mod(D, D, p);
+
+    if (fmpz_jacobi(D, p) != 1)
+    {
+        fmpz_zero(t);           /* inert: the reduction is supersingular */
+        ok = 1;
+        goto cleanup;
+    }
+
+    if (!fmpz_sqrtmod(s, D, p) || !qfb_cornacchia(a, b, p, E->Dc, s))
+        goto cleanup;
+
+    if (E->kind == CM_SIGN_JACOBI)
+    {
+        int e = n_jacobi((slong) fmpz_fdiv_ui(a, (ulong) E->m), (ulong) E->m);
+
+        if (e == 0)
+            goto cleanup;
+
+        if (e < 0)
+            sgn = -sgn;
+    }
+    else if (E->kind == CM_SIGN_D8)
+    {
+        /* here 4p = a^2 + 8 b^2 with a = 2 mod 4 */
+        if (fmpz_fdiv_ui(a, 16) >= 8)
+            sgn = -sgn;
+
+        if (fmpz_fdiv_ui(b, 4) == 2)
+            sgn = -sgn;
+    }
+    else
+    {
+        /* here 4p = a^2 + 4 b^2 and exactly one of a/2, b is odd; the
+           trace is twice that one, normalised to 2 mod 4 */
+        if (fmpz_fdiv_ui(a, 4) == 0)
+            fmpz_swap(a, b);
+
+        if (fmpz_is_odd(a))
+            fmpz_mul_2exp(a, a, 1);
+
+        if (fmpz_fdiv_ui(a, 8) == 6)
+            sgn = -sgn;
+    }
+
+    fmpz_mul_si(u, a6, E->c);
+    fmpz_mod(u, u, p);
+
+    if (fmpz_is_zero(u))
+        goto cleanup;
+
+    if (fmpz_jacobi(u, p) < 0)
+        sgn = -sgn;
+
+    if (sgn > 0)
+        fmpz_set(t, a);
+    else
+        fmpz_neg(t, a);
+
+    ok = 1;
+
+cleanup:
+    fmpz_clear(D); fmpz_clear(s); fmpz_clear(a);
+    fmpz_clear(b); fmpz_clear(u);
+
+    return ok;
+}
+
+/*
+    Is j(E) = J, without dividing? For y^2 = x^3 + a4 x + a6 the
+    j-invariant is 6912 a4^3 / (4 a4^3 + 27 a6^2), so the question is
+    whether 6912 a4^3 = J (4 a4^3 + 27 a6^2) in F_p. The numerator is the
+    same for every J in the table, so the caller passes it reduced.
+*/
+static int
+_j_equals(slong J, const fmpz_t num, const fmpz_t den, const fmpz_t p)
+{
+    fmpz_t v;
+    int eq;
+
+    fmpz_init(v);
+
+    fmpz_mul_si(v, den, J);
+    fmpz_mod(v, v, p);
+
+    eq = fmpz_equal(num, v);
+
+    fmpz_clear(v);
+
+    return eq;
 }
 
 int
 gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
-    fmpz cand[CM_MAX_CANDIDATES];
-    fmpz_t p, lo, hi, sq, Dm, sqrtD, t0, v0, t, u;
-    gr_ptr j, jd;
-    slong deg, i, ncand = 0;
-    int status = GR_SUCCESS, matched = 0;
+    fmpz_t p, a4, a6, a4c, den, t;
+    slong deg, i;
+    int status = GR_SUCCESS, found = 0;
 
     if (gr_ctx_is_field(R) != T_TRUE)
         return GR_DOMAIN;
 
-    /* the class number one theory used here is over a prime field */
-    if (gr_ctx_fq_degree(&deg, R) != GR_SUCCESS || deg != 1)
+    /* the class number one theory used here is over a prime field, and the
+       twist characters below are written for the short model */
+    if (gr_ctx_fq_degree(&deg, R) != GR_SUCCESS || deg != 1
+            || gr_ec_ctx_model(ctx) != GR_EC_SHORT_WEIERSTRASS)
         return GR_UNABLE;
 
-    fmpz_init(p); fmpz_init(lo); fmpz_init(hi); fmpz_init(sq);
-    fmpz_init(Dm); fmpz_init(sqrtD); fmpz_init(t0); fmpz_init(v0);
-    fmpz_init(t); fmpz_init(u);
+    fmpz_init(p); fmpz_init(a4); fmpz_init(a6);
+    fmpz_init(a4c); fmpz_init(den); fmpz_init(t);
 
-    for (i = 0; i < CM_MAX_CANDIDATES; i++)
-        fmpz_init(cand + i);
-
-    if (gr_ctx_fq_prime(p, R) != GR_SUCCESS || fmpz_cmp_ui(p, 3) <= 0)
+    if (gr_ctx_fq_prime(p, R) != GR_SUCCESS || fmpz_cmp_ui(p, 3) <= 0
+            || gr_get_fmpz(a4, GR_EC_A4(ctx), R) != GR_SUCCESS
+            || gr_get_fmpz(a6, GR_EC_A6(ctx), R) != GR_SUCCESS)
     {
         status = GR_UNABLE;
         goto cleanup;
     }
 
-    /* the Hasse interval */
-    fmpz_sqrt(sq, p);
-    fmpz_add_ui(sq, sq, 1);
-    fmpz_mul_ui(sq, sq, 2);
-    fmpz_add_ui(hi, p, 1);
-    fmpz_sub(lo, hi, sq);
-    fmpz_add(hi, hi, sq);
-
-    GR_TMP_INIT2(j, jd, R);
-
-    if (gr_ec_ctx_j_invariant(j, ctx) != GR_SUCCESS)
+    if (fmpz_is_zero(a4))
+        found = _cm_trace_j0(t, a6, p);
+    else if (fmpz_is_zero(a6))
+        found = _cm_trace_j1728(t, a4, p);
+    else
     {
-        GR_TMP_CLEAR2(j, jd, R);
-        status = GR_UNABLE;
-        goto cleanup;
-    }
-
-    /* a supersingular curve over F_p has trace zero */
-    fmpz_zero(t);
-    _cand_push_trace(cand, &ncand, p, t, lo, hi);
-
-    for (i = 0; i < (slong) CM_NUM_DISCS; i++)
-    {
-        slong D = cm_discs[i].D;
-
-        if (gr_set_si(jd, cm_discs[i].j, R) != GR_SUCCESS)
-            continue;
-
-        if (gr_equal(j, jd, R) != T_TRUE)
-            continue;
-
-        matched = 1;
-
-        /* 4p = t^2 + |D| v^2, when D is a square modulo p */
-        fmpz_set_si(Dm, D);
-        fmpz_mod(Dm, Dm, p);
-
-        if (fmpz_jacobi(Dm, p) != 1 || !fmpz_sqrtmod(sqrtD, Dm, p))
-            continue;
-
-        if (!qfb_cornacchia(t0, v0, p, D, sqrtD))
-            continue;
-
-        /* the quadratic twist always flips the sign of the trace */
-        _cand_push_trace(cand, &ncand, p, t0, lo, hi);
-        fmpz_neg(u, t0);
-        _cand_push_trace(cand, &ncand, p, u, lo, hi);
-
-        if (D == -4)
+        /* the numerator 6912 a4^3 and the denominator 4 a4^3 + 27 a6^2 of
+           the j-invariant, both reduced once for the whole table */
         {
-            /* j = 1728 has quartic twists: 4p = t0^2 + 4 v0^2 gives +-2 v0 too */
-            fmpz_mul_ui(u, v0, 2);
-            _cand_push_trace(cand, &ncand, p, u, lo, hi);
-            fmpz_neg(u, u);
-            _cand_push_trace(cand, &ncand, p, u, lo, hi);
-        }
-        else if (D == -3)
-        {
-            /* j = 0 has sextic twists: also +-(t0 +- 3 v0) / 2 */
-            slong s1, s2;
+            fmpz_t w;
+            fmpz_init(w);
 
-            for (s1 = -1; s1 <= 1; s1 += 2)
-                for (s2 = -1; s2 <= 1; s2 += 2)
-                {
-                    fmpz_mul_ui(u, v0, 3);
-                    if (s1 < 0)
-                        fmpz_neg(u, u);
-                    fmpz_add(u, u, t0);
+            fmpz_powm_ui(a4c, a4, 3, p);
+            fmpz_mul_ui(den, a4c, 4);
+            fmpz_mul(w, a6, a6);
+            fmpz_mul_ui(w, w, 27);
+            fmpz_add(den, den, w);
+            fmpz_mod(den, den, p);
 
-                    if (fmpz_is_even(u))
-                    {
-                        fmpz_fdiv_q_ui(u, u, 2);
-                        if (s2 < 0)
-                            fmpz_neg(u, u);
-                        _cand_push_trace(cand, &ncand, p, u, lo, hi);
-                    }
-                }
+            fmpz_mul_ui(a4c, a4c, 6912);
+            fmpz_mod(a4c, a4c, p);
+
+            fmpz_clear(w);
         }
+
+        for (i = 0; i < (slong) CM_NUM_DISCS && !found; i++)
+            if (_j_equals(cm_discs[i].j, a4c, den, p))
+                found = _cm_trace_disc(t, cm_discs + i, a6, p);
     }
 
-    GR_TMP_CLEAR2(j, jd, R);
-
-    /*
-        No CM discriminant matched, so the only candidate left is the
-        supersingular one, and accepting it on the strength of a few points
-        would not be a proof. Hand the curve back to a general algorithm.
-    */
-    if (!matched)
+    if (found)
     {
-        status = GR_UNABLE;
-        goto cleanup;
+        fmpz_add_ui(res, p, 1);
+        fmpz_sub(res, res, t);
     }
-
-    status = _cm_resolve(res, cand, ncand, ctx);
+    else
+        status = GR_UNABLE;
 
 cleanup:
-    for (i = 0; i < CM_MAX_CANDIDATES; i++)
-        fmpz_clear(cand + i);
-
-    fmpz_clear(p); fmpz_clear(lo); fmpz_clear(hi); fmpz_clear(sq);
-    fmpz_clear(Dm); fmpz_clear(sqrtD); fmpz_clear(t0); fmpz_clear(v0);
-    fmpz_clear(t); fmpz_clear(u);
+    fmpz_clear(p); fmpz_clear(a4); fmpz_clear(a6);
+    fmpz_clear(a4c); fmpz_clear(den); fmpz_clear(t);
 
     return status;
 }

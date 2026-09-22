@@ -105,15 +105,7 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact}, \
     {GR_METHOD_CTX_IS_THREADSAFE,   (gr_funcptr) _gr_ec_ctx_is_threadsafe}, \
     {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base}, \
-    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) gr_ec_ctx_cardinality},
-
-/*
-    Undefined on a curve, as opposed to merely unimplemented: there is no
-    multiplication, no identity for it, and no way to read an integer or a
-    rational as a point. Division by n is a genuine operation on a curve,
-    but it needs division polynomials and has several answers, so it does
-    not belong in a slot that means "multiply by a rational".
-*/
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) gr_ec_ctx_order},
 
 #define GR_EC_NOT_IN_DOMAIN_METHODS \
     {GR_METHOD_ONE,         (gr_funcptr) gr_not_in_domain}, \
@@ -125,7 +117,6 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_not_in_domain}, \
     {GR_METHOD_MUL,         (gr_funcptr) gr_not_in_domain}, \
     {GR_METHOD_SQR,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_not_in_domain}, \
     {GR_METHOD_DIV,         (gr_funcptr) gr_not_in_domain}, \
     {GR_METHOD_INV,         (gr_funcptr) gr_not_in_domain}, \
     {GR_METHOD_POW_UI,      (gr_funcptr) gr_not_in_domain}, \
@@ -152,7 +143,14 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_MUL_SI,      (gr_funcptr) kind ## _mul_si}, \
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) kind ## _mul_fmpz}, \
     {GR_METHOD_MUL_2EXP_SI,   (gr_funcptr) kind ## _mul_2exp_si}, \
-    {GR_METHOD_MUL_2EXP_FMPZ, (gr_funcptr) kind ## _mul_2exp_fmpz},
+    {GR_METHOD_MUL_2EXP_FMPZ, (gr_funcptr) kind ## _mul_2exp_fmpz}, \
+    {GR_METHOD_MUL_OTHER,   (gr_funcptr) _ ## kind ## _mul_other}, \
+    {GR_METHOD_OTHER_MUL,   (gr_funcptr) _ ## kind ## _other_mul}, \
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) kind ## _mul_fmpq}, \
+    {GR_METHOD_DIV_UI,      (gr_funcptr) kind ## _div_ui}, \
+    {GR_METHOD_DIV_SI,      (gr_funcptr) kind ## _div_si}, \
+    {GR_METHOD_DIV_FMPZ,    (gr_funcptr) kind ## _div_fmpz}, \
+    {GR_METHOD_DIV_FMPQ,    (gr_funcptr) kind ## _div_fmpq},
 
 static int _gr_ec_methods_initialized[GR_EC_NUM_REPRS] = { 0, 0, 0 };
 

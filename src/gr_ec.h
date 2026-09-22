@@ -18,6 +18,7 @@
 #define GR_EC_INLINE static inline
 #endif
 
+#include "fmpq.h"
 #include "gr.h"
 
 #ifdef __cplusplus
@@ -58,6 +59,23 @@ typedef gr_ctx_struct gr_ec_ctx_struct;
 
 typedef gr_ec_ctx_struct gr_ec_ctx_t[1];
 
+/* What the context knows about the size of the group of points.
+
+   An annihilator is any multiple of the group exponent, which is all that
+   reducing a scalar needs; the order of the group is the canonical one.
+   Keeping the weaker notion is what lets a caller hand over a modulus that
+   was checked but not computed. */
+
+typedef enum
+{
+    GR_EC_ORDER_UNKNOWN,
+    GR_EC_ORDER_ANNIHILATOR,
+    GR_EC_ORDER_EXACT,
+
+    GR_EC_NUM_ORDER_KINDS
+}
+gr_ec_order_kind_t;
+
 typedef struct
 {
     gr_ctx_struct * base_ring;
@@ -65,6 +83,9 @@ typedef struct
     gr_ptr coeffs;
     gr_ec_model_t model;
     gr_ec_repr_t repr;
+    /* what order_kind says it is; meaningless when that is UNKNOWN */
+    fmpz order;
+    gr_ec_order_kind_t order_kind;
 }
 _gr_ec_ctx_struct;
 
@@ -202,6 +223,41 @@ WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_bsgs(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx);
+
+/* Order of the group, cached in the context */
+
+WARN_UNUSED_RESULT int gr_ec_ctx_order(fmpz_t res, gr_ec_ctx_t ctx);
+gr_ec_order_kind_t gr_ec_ctx_get_cached_order(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_set_order(gr_ec_ctx_t ctx, const fmpz_t N);
+WARN_UNUSED_RESULT int gr_ec_ctx_set_annihilator(gr_ec_ctx_t ctx, const fmpz_t m);
+void gr_ec_ctx_clear_order(gr_ec_ctx_t ctx);
+
+truth_t gr_ec_ctx_annihilates(gr_ec_ctx_t ctx, const fmpz_t m);
+
+GR_EC_INLINE gr_ec_order_kind_t gr_ec_ctx_order_kind(gr_ec_ctx_t ctx)
+{
+    return GR_EC_CTX(ctx)->order_kind;
+}
+
+/* Division of a point by an integer or a rational
+
+   The solutions of n Q = P form a coset of E[n](F_q), so there are none of
+   them or exactly #E[n](F_q). The plain functions want a single answer and
+   return GR_DOMAIN when there is none or more than one; the nonunique ones
+   return some solution and only fail when there is none. */
+
+#define GR_EC_DIV_DECL(kind) \
+WARN_UNUSED_RESULT int kind ## _div_fmpz(kind ## _t res, const kind ## _t P, const fmpz_t n, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _div_fmpz_nonunique(kind ## _t res, const kind ## _t P, const fmpz_t n, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _div_ui(kind ## _t res, const kind ## _t P, ulong n, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _div_si(kind ## _t res, const kind ## _t P, slong n, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _mul_fmpq(kind ## _t res, const kind ## _t P, const fmpq_t c, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _mul_fmpq_nonunique(kind ## _t res, const kind ## _t P, const fmpq_t c, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int kind ## _div_fmpq(kind ## _t res, const kind ## _t P, const fmpq_t c, gr_ec_ctx_t ctx);
+
+GR_EC_DIV_DECL(gr_ec_point)
+GR_EC_DIV_DECL(gr_ec_aff_point)
+GR_EC_DIV_DECL(gr_ec_jac_point)
 
 /*
     Projective points

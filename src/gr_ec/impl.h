@@ -33,4 +33,20 @@ WARN_UNUSED_RESULT int _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec
    representation. Defined in generic.c; called when a context is created. */
 void _gr_ec_ctx_init_methods(gr_ec_ctx_t ctx, gr_ec_repr_t repr);
 
+/*
+    Scalars taken from another ring. Defined in mul_other.c and wired into
+    the method tables as MUL_OTHER and OTHER_MUL; see that file for which
+    rings are allowed to act and why.
+*/
+
+WARN_UNUSED_RESULT int _gr_ec_scalar_of_other(fmpz_t k, gr_srcptr y, gr_ctx_t y_ctx, gr_ec_ctx_t ctx);
+
+#define GR_EC_MUL_OTHER_DECL(kind) \
+WARN_UNUSED_RESULT int _ ## kind ## _mul_other(kind ## _t res, const kind ## _t P, gr_srcptr y, gr_ctx_t y_ctx, gr_ec_ctx_t ctx); \
+WARN_UNUSED_RESULT int _ ## kind ## _other_mul(kind ## _t res, gr_srcptr y, gr_ctx_t y_ctx, const kind ## _t P, gr_ec_ctx_t ctx);
+
+GR_EC_MUL_OTHER_DECL(gr_ec_point)
+GR_EC_MUL_OTHER_DECL(gr_ec_aff_point)
+GR_EC_MUL_OTHER_DECL(gr_ec_jac_point)
+
 #endif

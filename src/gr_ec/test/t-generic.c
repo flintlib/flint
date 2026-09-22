@@ -56,7 +56,6 @@ check_ring_operations_are_out_of_domain(gr_ec_ctx_t E)
     FLINT_TEST(gr_set_fmpq(P, q, E) == GR_DOMAIN);
     FLINT_TEST(gr_mul(P, P, Q, E) == GR_DOMAIN);
     FLINT_TEST(gr_sqr(P, Q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_mul_fmpq(P, Q, q, E) == GR_DOMAIN);
     FLINT_TEST(gr_div(P, P, Q, E) == GR_DOMAIN);
     FLINT_TEST(gr_inv(P, Q, E) == GR_DOMAIN);
     FLINT_TEST(gr_pow_ui(P, Q, 2, E) == GR_DOMAIN);

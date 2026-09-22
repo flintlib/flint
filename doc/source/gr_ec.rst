@@ -177,7 +177,10 @@ thing those methods mean in a ring, where `x \cdot (n \cdot 1)` is `x` added to
 itself `n` times.
 
 :func:`gr_mul_2exp_si` and :func:`gr_mul_2exp_fmpz` return ``GR_DOMAIN`` for a
-negative exponent, for the same reason as :func:`gr_mul_fmpq` below.
+negative exponent: halving is a real operation on a curve but a point has
+up to four halves, so it is not a function of one. Use
+:func:`gr_ec_point_div_fmpz` or its ``_nonunique`` companion, which say
+which of those two things they are doing.
 
 The group axioms hold when the base ring is an integral domain. Over a ring
 with zero divisors the operations are still available -- that is what
@@ -186,17 +189,35 @@ projective triple whose `Z` is a zero divisor, which is neither an affine
 point nor `\mathcal{O}`, and nothing the addition law says about it is
 meaningful. Do not expect associativity there.
 
+Dividing a point by a scalar is also available, through
+:func:`gr_div_ui`, :func:`gr_div_si`, :func:`gr_div_fmpz` and
+:func:`gr_div_fmpq`, and multiplying by a rational through
+:func:`gr_mul_fmpq`. These are real operations on a curve but they need not
+have a unique answer, so they return ``GR_DOMAIN`` when there is none or
+more than one; see :func:`gr_ec_point_div_fmpz` for what that means and for
+the ``_nonunique`` variants that accept an ambiguous answer.
+
+An element of another ring may act as a scalar when it makes sense for it
+to: :func:`gr_mul_other` and :func:`gr_other_mul` accept an element of
+`\mathbb{Z}/n\mathbb{Z}` -- an *nmod*, *fmpz_mod* or *mpn_mod* -- exactly
+when `n` annihilates `E(R)`, which is the case a caller runs into when the
+scalars are being kept modulo the order of the group. Deciding this never
+counts the points: if the order is already known it is a divisibility test,
+and otherwise the modulus is tested against random points. See
+:func:`gr_ec_ctx_annihilates`.
+
 The ring operations have no meaning on a curve and return ``GR_DOMAIN``
 rather than ``GR_UNABLE``, so that a caller can tell "there is no such
 thing here" from "I could not compute it": :func:`gr_mul`, :func:`gr_sqr`,
 :func:`gr_div`, :func:`gr_inv`, :func:`gr_pow_ui`, :func:`gr_pow_si`,
 :func:`gr_pow_fmpz`, :func:`gr_one`, :func:`gr_neg_one`, :func:`gr_set_ui`,
-:func:`gr_set_si`, :func:`gr_set_fmpz`, :func:`gr_set_fmpq`,
-:func:`gr_set_str` and :func:`gr_mul_fmpq`.
+:func:`gr_set_si`, :func:`gr_set_fmpz`, :func:`gr_set_fmpq` and
+:func:`gr_set_str`.
 
-:func:`gr_mul_fmpq` is excluded even though division by `n` is a real
-operation on a curve: computing it needs division polynomials, and it has
-`n^2` answers rather than one.
+:func:`gr_div` is in that list because it divides one element of the domain
+by another, and there is no such thing as one point divided by another;
+dividing a point by a *scalar* is the operation above, and it is not the
+same slot.
 
 Since no integer can be read as a point, the only way to build a specific
 point is through the module's own functions --
@@ -223,8 +244,15 @@ Types, macros and constants
     to an array of :macro:`GR_EC_CTX_NUM_COEFFS` elements of the base ring
     (``coeffs``) holding the invariants
     `a_1, a_2, a_3, a_4, a_6, b_2, b_4, b_6, b_8, \Delta` of the curve,
-    the model of the curve (``model``) and the representation used by the
-    generic interface (``repr``).
+    the model of the curve (``model``), the representation used by the
+    generic interface (``repr``), and what is known about the size of the
+    group of points (``order`` and ``order_kind``).
+
+.. type:: gr_ec_order_kind_t
+
+    How much is known about the size of the group: one of
+    :macro:`GR_EC_ORDER_UNKNOWN`, :macro:`GR_EC_ORDER_ANNIHILATOR` and
+    :macro:`GR_EC_ORDER_EXACT`. See *Order of the group* below.
 
 .. type:: gr_ec_point_struct
 
@@ -573,28 +601,8 @@ before any of this will run.
 
     Sets *res* to `\#E(\mathbb{F}_p)` for a curve with complex
     multiplication by an order of class number one, or for a supersingular
-    curve. Returns ``GR_UNABLE`` for any other curve, and for a base field
-    that is not prime.
-
-    For the thirteen discriminants `D` with class number one the Hilbert
-    class polynomial `H_D` is linear, so `j(E) = j_D` is exactly the
-    statement that `E` has complex multiplication by the order of
-    discriminant `D`. Then `4p = t^2 + |D| v^2` has a solution whenever `D`
-    is a square modulo `p`, which :func:`qfb_cornacchia` finds, and the trace
-    of `E` is among the traces of the twists that solution gives: `\pm t` in
-    general, also `\pm 2v` for `j = 1728` (quartic twists) and
-    `\pm (t \pm 3v)/2` for `j = 0` (sextic twists). When `D` is not a square
-    modulo `p` the reduction is supersingular, and `t = 0`.
-
-    Which of the candidate traces belongs to this particular twist is settled
-    by elimination: the true order of the group kills every point of it, so
-    it survives every test, and if exactly one candidate survives a few
-    random points then it is the right one. That argument needs no
-    factorisation, which matters because the candidates are the size of `p`,
-    but it does need a random point -- so on a base ring without
-    :func:`gr_sqrt`, such as *mpn_mod*, only the cases with a single
-    candidate (the supersingular ones) can be settled, and the rest is handed
-    on to a general algorithm.
+    curve. Returns ``GR_UNABLE`` for any other curve, for a base field that
+    is not prime, and for a model that is not short Weierstrass.
 
 .. function:: int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx)
 
@@ -641,6 +649,103 @@ before any of this will run.
 
     Unlike the other two, this needs no square roots in the base ring, so it
     is currently the only one of the three that runs over *mpn_mod*.
+
+Order of the group
+-------------------------------------------------------------------------------
+
+Counting the points is expensive and the answer is wanted by almost
+everything else -- shortening a scalar before a multiplication, deciding
+whether a division is unique, accepting a ring of scalars -- so the context
+remembers it. Two strengths are distinguished by :type:`gr_ec_order_kind_t`:
+
+.. macro:: GR_EC_ORDER_UNKNOWN
+
+    Nothing is known.
+
+.. macro:: GR_EC_ORDER_ANNIHILATOR
+
+    The stored value `m` is some multiple of the exponent of the group, so
+    `m P = \mathcal{O}` for every `P`. This is what the arithmetic actually
+    needs -- `k P` depends only on `k` modulo `m`, and `n` is invertible on
+    the group as soon as `\gcd(n, m) = 1` -- and it is the most that can be
+    established without counting.
+
+.. macro:: GR_EC_ORDER_EXACT
+
+    The stored value is `\#E(\mathbb{F}_q)`.
+
+The counting functions above never read or write this cache, so timing one
+of them always measures the algorithm. :func:`gr_ec_ctx_order` is the cached
+entry point, and is what :func:`gr_ctx_cardinality_fmpz` calls on a curve.
+
+.. function:: int gr_ec_ctx_order(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\#E(\mathbb{F}_q)`, counting the points with
+    :func:`gr_ec_ctx_cardinality` if the context does not already know the
+    answer, and remembering it either way.
+
+.. function:: gr_ec_order_kind_t gr_ec_ctx_get_cached_order(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Returns what the context knows, without computing anything. Sets *res*
+    to the stored value unless the answer is :macro:`GR_EC_ORDER_UNKNOWN`,
+    in which case *res* is untouched.
+
+.. function:: gr_ec_order_kind_t gr_ec_ctx_order_kind(gr_ec_ctx_t ctx)
+
+    The same, without the value.
+
+.. function:: int gr_ec_ctx_set_order(gr_ec_ctx_t ctx, const fmpz_t N)
+
+    Tells the context that `\#E(\mathbb{F}_q) = N`, and checks the claim as
+    far as is cheap. Returns ``GR_DOMAIN`` if *N* is refuted.
+
+    A value outside the Hasse interval is rejected immediately. Over a
+    field small enough to walk, the claim is settled against the truth.
+    Otherwise *N* is tested against twenty random points, all of which it
+    must kill; the points killed by *N* form a subgroup, so a wrong *N*
+    survives one point with probability at most one half and all twenty
+    with probability below `10^{-6}`.
+
+    **Above the walk cutoff this is a probabilistic check and not a
+    proof.** It can only refute a wrong *N*, never establish a right one,
+    and a wrong *N* that happens to annihilate the group -- any proper
+    multiple of the group exponent, for instance -- passes every point it
+    is ever shown. Where no random point can be produced at all, over a
+    base ring without :func:`gr_sqrt`, nothing is checked and the claim is
+    taken on trust outright.
+
+    **Supplying a correct value is therefore the caller's responsibility.**
+    Everything downstream -- scalar reduction, the ring of scalars
+    :func:`gr_mul_other` accepts, whether :func:`gr_ec_point_div_fmpz`
+    considers an answer unique -- trusts what it is told, and will return
+    confidently wrong results from a wrong hint rather than failing. A
+    caller who wants the guarantee rather than the speed should let
+    :func:`gr_ec_ctx_order` count instead.
+
+.. function:: int gr_ec_ctx_set_annihilator(gr_ec_ctx_t ctx, const fmpz_t m)
+
+    Tells the context that `m P = \mathcal{O}` for every point, which is
+    weaker than the order and is checked the same way. Returns
+    ``GR_DOMAIN`` if *m* is refuted. Two annihilators combine: the context
+    keeps their gcd, which annihilates as well and reduces scalars further.
+
+.. function:: truth_t gr_ec_ctx_annihilates(gr_ec_ctx_t ctx, const fmpz_t m)
+
+    Whether `m P = \mathcal{O}` for every point. ``T_TRUE`` when *m* is a
+    multiple of what the context already knows, or when it passes the probe
+    above; ``T_FALSE`` when some point survives it; ``T_UNKNOWN`` when no
+    point could be produced. This never counts the points.
+
+.. function:: void gr_ec_ctx_clear_order(gr_ec_ctx_t ctx)
+
+    Forgets what the context knows about the order.
+
+Once an annihilator is known, :func:`gr_ec_point_mul_fmpz` and everything
+built on it reduce the scalar modulo it first, which is free and can save
+most of the ladder. Nothing is computed in order to make that possible: a
+context that has not been told or asked for the order multiplies by the
+scalar as it stands, because counting the points to save a few doublings
+would be a bad trade.
 
 Projective points: memory management
 -------------------------------------------------------------------------------
@@ -813,6 +918,65 @@ The functions in this section implement the group law of the curve.
     a function. The ``fmpz`` version returns ``GR_UNABLE`` if *k* is too
     large to iterate over, unless *P* is the point at infinity, which is
     fixed by doubling.
+
+Projective points: division by a scalar
+-------------------------------------------------------------------------------
+
+The `Q` with `n Q = P`, when there is one, is only determined up to
+`E[n](\mathbb{F}_q)`: the solutions form a coset of it, so there are either
+none of them or exactly `\#E[n](\mathbb{F}_q)`. Hence two operations, one
+that insists on a single answer and one that does not.
+
+The same functions exist for the other two representations, spelled
+``gr_ec_aff_point_`` and ``gr_ec_jac_point_``; they convert and call these,
+since division is root finding rather than a ladder and there is nothing to
+gain from doing it natively.
+
+.. function:: int gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+              int gr_ec_point_div_ui(gr_ec_point_t res, const gr_ec_point_t P, ulong n, gr_ec_ctx_t ctx)
+              int gr_ec_point_div_si(gr_ec_point_t res, const gr_ec_point_t P, slong n, gr_ec_ctx_t ctx)
+
+    Sets *res* to the unique `Q` with `n Q = P`. Returns ``GR_DOMAIN`` if
+    there is no such point or more than one of them, and ``GR_UNABLE`` if
+    that could not be decided.
+
+    Two routes get there. If the context knows an annihilator `m` -- and
+    here, unlike elsewhere in the module, it is worth counting the points
+    to learn one, since the alternative is polynomial root finding -- then
+    `n` splits as `n_1 n_2` with `\gcd(n_1, m) = 1` and every prime of
+    `n_2` dividing `m`. Dividing by `n_1` is multiplying by its inverse
+    modulo `m`, which is one scalar multiplication and is always unique,
+    because `\gcd(n_1, m) = 1` makes `E[n_1](\mathbb{F}_q)` trivial. When
+    `n_2` is `1`, which is the usual case, that is the whole computation.
+
+    What is left is dividing by `n_2`, for which the `x`-coordinates of the
+    solutions are roots of a polynomial of degree `n_2^2` assembled from
+    division polynomials. Each root is lifted and checked, since that
+    polynomial also vanishes at the `n_2`-torsion. This is affordable only
+    for small `n_2`, and above a degree of 4096 the function returns
+    ``GR_UNABLE`` rather than building a polynomial nobody wants to wait
+    for.
+
+    Dividing by zero is ``GR_DOMAIN``: every point solves `0 Q = \mathcal{O}`
+    and none solves `0 Q = P` otherwise, so it is never a single answer.
+
+.. function:: int gr_ec_point_div_fmpz_nonunique(gr_ec_point_t res, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+
+    Sets *res* to some `Q` with `n Q = P`, whichever one it finds first.
+    Returns ``GR_DOMAIN`` only when there is none.
+
+.. function:: int gr_ec_point_mul_fmpq(gr_ec_point_t res, const gr_ec_point_t P, const fmpq_t c, gr_ec_ctx_t ctx)
+              int gr_ec_point_mul_fmpq_nonunique(gr_ec_point_t res, const gr_ec_point_t P, const fmpq_t c, gr_ec_ctx_t ctx)
+
+    Sets *res* to `(a/b) P`, meaning the `Q` with `b Q = a P`, with the
+    same conventions about uniqueness as above. Multiplying by `a` first
+    and dividing after gives the same set of answers as the other order,
+    because `\gcd(a, b) = 1` makes multiplication by `a` a bijection of
+    `E[b]`.
+
+.. function:: int gr_ec_point_div_fmpq(gr_ec_point_t res, const gr_ec_point_t P, const fmpq_t c, gr_ec_ctx_t ctx)
+
+    Sets *res* to `(1/c) P`. Returns ``GR_DOMAIN`` if *c* is zero.
 
 Affine points
 -------------------------------------------------------------------------------
