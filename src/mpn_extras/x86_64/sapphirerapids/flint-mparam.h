@@ -88,4 +88,42 @@
    this dividend length (1000000: never) */
 #define FLINT_MPN_DIV_2_GMP_CUTOFF 44
 
+/*
+    nmod_mat_mul: dispatch of the SIMD kernels nmod_mat_mul_u32 (moduli
+    below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
+    without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
+    / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
+    (not measured on Sapphire Rapids yet: the values of x86_64/icelake, the
+    closest AVX512-IFMA machine that was).
+      U32_MIN_DIM          use the SIMD kernels from this minimal dimension
+      U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
+                           nmod_mat_mul_blas is preferred to u32 from this
+                           dimension on (0: never)
+      U32_STRASSEN_CUTOFF  single-threaded, one Strassen level is put on
+                           top of u32 / u52 from this dimension on
+      U52_MIN_BITS         u52 is preferred to u32 from this modulus bit
+                           size on (through 52 bits)
+      U52_LO_MAX_BITS      u52 in its single-IFMA mode is preferred to u32
+                           up to this modulus bit size (0: never)
+      K52_MIN_BITS         without IFMA, from this modulus bit size on
+                           (through 52 bits) the two-limb integer kernel
+                           nmod_mat_mul_k52 replaces blas + CRT (0: never)
+      FP50_MAX_BITS        in that range, the floating point kernel
+                           nmod_mat_mul_fp50 is preferred to k52 up to
+                           this modulus bit size (through 50; 0: never)
+      K52_BLAS_CUTOFF      in that range, nmod_mat_mul_blas and its CRT are
+                           preferred to k52 / fp50 from this dimension on
+                           (0: never). The crossover grows with the modulus
+                           size, since blas needs more primes; the value is
+                           the one for the bottom of the range.
+*/
+#define FLINT_NMOD_MAT_MUL_U32_MIN_DIM 8
+#define FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF 256
+#define FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF 512
+#define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
+#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 26
+#define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
+#define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
+#define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
+
 #endif
