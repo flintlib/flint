@@ -141,10 +141,18 @@ BT_NAME(micro)(BT_ENTRY * c, slong ldc, const BT_PACKED * ap,
     slong l, stop;
     int r, v;
 
-    for (r = 0; r < BT_MR; r++)
-        for (v = 0; v < BT_NACC; v++)
-            acc[r][v] = first ? BT_ACC_ZERO()
-                              : BT_LOAD_C(c + r * ldc + v * BT_VL);
+    if (first)
+    {
+        for (r = 0; r < BT_MR; r++)
+            for (v = 0; v < BT_NACC; v++)
+                acc[r][v] = BT_ACC_ZERO();
+    }
+    else
+    {
+        for (r = 0; r < BT_MR; r++)
+            for (v = 0; v < BT_NACC; v++)
+                acc[r][v] = BT_LOAD_C(c + r * ldc + v * BT_VL);
+    }
 
     l = 0;
     while (l < kc)

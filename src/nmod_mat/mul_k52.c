@@ -558,7 +558,7 @@ nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     FLINT_ASSERT(C->c == B->c);
     FLINT_ASSERT(A->c == B->r);
 
-    if (modn > (UWORD(1) << 52))
+    if (FPV_DECLINE || modn > (UWORD(1) << 52))
         return 0;
 
     if (m <= 0 || n <= 0)

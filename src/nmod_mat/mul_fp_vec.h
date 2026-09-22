@@ -89,12 +89,27 @@
 #elif defined(__AVX512F__) && defined(__AVX512DQ__) \
         && !defined(NMOD_MAT_FP_FORCE_AVX2)
 # define FPV_AVX512 1
-#elif defined(__AVX2__) && defined(__FMA__)
+#elif defined(__AVX2__) && (defined(__FMA__) || defined(_MSC_VER))
+/* MSVC never defines __FMA__, but /arch:AVX2 enables the FMA instructions
+   (as machine_vectors.h also assumes) */
 # define FPV_AVX2 1
 #elif (defined(__ARM_NEON) && defined(__aarch64__)) || defined(_M_ARM64)
 # define FPV_NEON 1
 #else
 # define FPV_GENERIC 1
+#endif
+
+/*
+    FPV_DECLINE: the kernels built on this header decline every
+    multiplication (return 0, so that nmod_mat_mul uses its other
+    methods). This is set for the plain C backend compiled by MSVC,
+    which gave wrong results in the CI (k52 lost its middle Karatsuba
+    term) while the same code is correct with GCC and Clang.
+*/
+#if defined(FPV_GENERIC) && defined(_MSC_VER) && !defined(__clang__)
+# define FPV_DECLINE 1
+#else
+# define FPV_DECLINE 0
 #endif
 
 /* the rounding constant of fpv_rint_mul, 3*2^51 */
