@@ -10,24 +10,28 @@
 */
 
 /*
-    Benchmark the integer SIMD matrix multiplications nmod_mat_mul_u32
-    (moduli below 2^32), its uint32-entry variant _nmod_mat_mul_u32 and
-    nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) against the other
-    matrix multiplications of nmod_mat, over a range of modulus sizes,
-    dimensions and thread counts, and report where u32 is the fastest.
-    The purpose is to tune the dispatch in nmod_mat_mul, whose parameters
-    live in flint-mparam.h (FLINT_NMOD_MAT_MUL_U32_* and _U52_*).
+    Benchmark the SIMD matrix multiplications nmod_mat_mul_u32 (moduli
+    below 2^32), its uint32-entry variant _nmod_mat_mul_u32,
+    nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52), nmod_mat_mul_k52
+    (two-limb integer Karatsuba, any SIMD, moduli up to 2^52) and
+    nmod_mat_mul_fp50 (double precision with the mulmod of fft_small,
+    moduli below 2^50) against the other matrix multiplications of
+    nmod_mat, over a range of modulus sizes, dimensions and thread counts,
+    and report where a SIMD kernel is the fastest. The purpose is to tune
+    the dispatch in nmod_mat_mul, whose parameters live in flint-mparam.h
+    (FLINT_NMOD_MAT_MUL_U32_*, _U52_*, _K52_* and _FP50_*).
 
         p-mul_tune [options]
 
           -bits b,...  modulus bit sizes; for each, the modulus is a
                        fixed "generic" prime of that size (with a large
                        2^32 mod n, i.e. the slower two-round folding);
-                       default 16,20,22,24,26,28,29,30,31,32 and, when
-                       nmod_mat_mul_u52 is available, 36,40,44,48,52
+                       default 16,20,22,24,26,28,29,30,31,32,36,40,44,
+                       48,50,52
           -p n,...     explicit moduli instead (any n up to 2^52)
-          -fn f,...    subset of u32,nmod32,u52,blas,fgemm,classical,
-                       strassen,threaded,mul (default: all available;
+          -fn f,...    subset of u32,nmod32,u52,k52,fp50,blas,fgemm,
+                       classical,strassen,threaded,mul (default: all
+                       available;
                        nmod32 is _nmod_mat_mul_u32 on uint32 arrays
                        converted beforehand, threaded is
                        nmod_mat_mul_classical_threaded, mul the dispatch
@@ -46,14 +50,14 @@
           -csv         additionally print one machine-readable line per
                        measurement: "csv,bits,modulus,threads,m,k,n,fn,us"
 
-    Every (modulus, shape) first cross-checks u32, nmod32 and u52 against
+    Every (modulus, shape) first cross-checks the SIMD kernels against
     nmod_mat_mul_classical (for dimensions up to 600) so that a timing
     table cannot come from wrong results. Each table row ends with the
     name of the fastest function overall and the ratio
     time(best SIMD kernel)/time(best base algorithm), where the SIMD
-    kernels are u32, nmod32 and u52 (those that are enabled and handle the
-    modulus) and the base algorithms are blas, fgemm, classical and
-    threaded: strassen and mul are excluded from the ratio because they
+    kernels are u32, nmod32, u52, k52 and fp50 (those that are enabled and
+    handle the modulus) and the base algorithms are blas, fgemm, classical
+    and threaded: strassen and mul are excluded from the ratio because they
     recurse through nmod_mat_mul and so already contain whatever the
     dispatch picks as their leaf; comparing against them would say nothing
     about where the kernels themselves should be used. A ratio below 1
@@ -98,23 +102,31 @@
 #define FN_U32       0
 #define FN_NMOD32    1
 #define FN_U52       2
-#define FN_BLAS      3
-#define FN_FGEMM     4
-#define FN_CLASSICAL 5
-#define FN_STRASSEN  6
-#define FN_THREADED  7
-#define FN_MUL       8
-#define NUM_FN       9
+#define FN_K52       3
+#define FN_FP50      4
+#define FN_BLAS      5
+#define FN_FGEMM     6
+#define FN_CLASSICAL 7
+#define FN_STRASSEN  8
+#define FN_THREADED  9
+#define FN_MUL       10
+#define NUM_FN       11
 
 static const char * fn_names[NUM_FN] =
-    { "u32", "nmod32", "u52", "blas", "fgemm", "classical", "strassen",
-      "threaded", "mul" };
+    { "u32", "nmod32", "u52", "k52", "fp50", "blas", "fgemm", "classical",
+      "strassen", "threaded", "mul" };
 
 /* the SIMD kernels being tuned, and the functions they are compared
    against for the crossover: those that do not themselves go through
    nmod_mat_mul and are not SIMD kernels */
-static const int fn_is_simd[NUM_FN] = { 1, 1, 1, 0, 0, 0, 0, 0, 0 };
-static const int fn_is_base[NUM_FN] = { 0, 0, 0, 1, 1, 1, 0, 1, 0 };
+static const int fn_is_simd[NUM_FN] = { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
+static const int fn_is_base[NUM_FN] = { 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0 };
+
+/* the nmod_mat-level SIMD kernels, for the cross-check and the timing */
+typedef int (* simd_fn)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);
+static const simd_fn simd_funcs[NUM_FN] =
+    { nmod_mat_mul_u32, NULL, nmod_mat_mul_u52, nmod_mat_mul_k52,
+      nmod_mat_mul_fp50, NULL, NULL, NULL, NULL, NULL, NULL };
 
 /* uint32 copies of A, B and C for _nmod_mat_mul_u32 */
 typedef struct
@@ -258,16 +270,16 @@ main(int argc, char ** argv)
 {
     slong i, j, t, f, d;
     slong bits_list[64] = { 16, 20, 22, 24, 26, 28, 29, 30, 31, 32,
-                            36, 40, 44, 48, 52 };
-    slong num_bits = NMOD_MAT_HAVE_MUL_U52 ? 15 : 10;
+                            36, 40, 44, 48, 50, 52 };
+    slong num_bits = 16;
     ulong moduli[64];
     slong num_moduli = 0;
     int explicit_moduli = 0;
     /* fgemm would just repeat blas without an external BLAS */
 #if FLINT_USES_BLAS
-    int do_fn[NUM_FN] = { 1, 1, NMOD_MAT_HAVE_MUL_U52, 1, 1, 1, 1, 1, 1 };
+    int do_fn[NUM_FN] = { 1, 1, NMOD_MAT_HAVE_MUL_U52, 1, 1, 1, 1, 1, 1, 1, 1 };
 #else
-    int do_fn[NUM_FN] = { 1, 1, NMOD_MAT_HAVE_MUL_U52, 1, 0, 1, 1, 1, 1 };
+    int do_fn[NUM_FN] = { 1, 1, NMOD_MAT_HAVE_MUL_U52, 1, 1, 1, 0, 1, 1, 1, 1 };
 #endif
     slong nthreads[16] = { 1 };
     slong num_thread_counts = 1;
@@ -337,7 +349,7 @@ main(int argc, char ** argv)
         else
         {
             flint_printf("usage: %s [-bits 16,20,...,32] [-p n,...] "
-                         "[-fn u32,nmod32,u52,blas,fgemm,classical,strassen,threaded,mul] "
+                         "[-fn u32,nmod32,u52,k52,fp50,blas,fgemm,classical,strassen,threaded,mul] "
                          "[-dims 32,...,4096] [-shape m,k,n] "
                          "[-threads 1,2,4] [-tmax s] [-reps r] [-csv]\n",
                          argv[0]);
@@ -387,6 +399,8 @@ main(int argc, char ** argv)
 
     flint_printf("u32 = nmod_mat_mul_u32, nmod32 = _nmod_mat_mul_u32 on uint32 "
                  "arrays, u52 = nmod_mat_mul_u52 (AVX512-IFMA%s),\n"
+                 "k52 = nmod_mat_mul_k52 (two-limb integer Karatsuba, moduli up to 2^52), "
+                 "fp50 = nmod_mat_mul_fp50 (double precision, moduli below 2^50),\n"
                  "blas = nmod_mat_mul_blas, fgemm = blas on FLINT's own gemm, "
                  "classical = nmod_mat_mul_classical,\n"
                  "strassen = nmod_mat_mul_strassen, threaded = "
@@ -394,7 +408,7 @@ main(int argc, char ** argv)
                  NMOD_MAT_HAVE_MUL_U52 ? "" : ", not available in this build");
     flint_printf("times in microseconds, best of >= %wd runs; - means declined or "
                  "skipped (slower than %.1f s at a smaller size);\n"
-                 "ratio = time(fastest of u32, nmod32, u52) / time(fastest of blas, fgemm, classical, threaded);\n"
+                 "ratio = time(fastest of u32, nmod32, u52, k52, fp50) / time(fastest of blas, fgemm, classical, threaded);\n"
                  "strassen and mul recurse through nmod_mat_mul and are left out of it\n\n",
                  reps, tmax);
 
@@ -405,7 +419,7 @@ main(int argc, char ** argv)
 
         for (t = 0; t < num_thread_counts; t++)
         {
-            int skipped[NUM_FN] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            int skipped[NUM_FN] = { 0 };
             slong first_win = -1;   /* smallest dim from which a SIMD kernel wins */
             int simd_ever_lost_after = 0;
             slong last_dim_measured = 0;
@@ -429,7 +443,7 @@ main(int argc, char ** argv)
                 double best_other = 1e300, best_simd = 1e300;
                 slong best_fn = -1;
                 slong shape_len;
-                nmod32_data w32;
+                nmod32_data w32 = { NULL, NULL, NULL, 0, 0, 0, { 0, 0, 0 } };
                 int do_nmod32 = 1;
 
                 if (have_shape)
@@ -455,23 +469,19 @@ main(int argc, char ** argv)
                 {
                     nmod_mat_init(D, m, n, p);
                     nmod_mat_mul_classical(D, A, B);
-                    nmod_mat_randtest(C, state);
-                    if (do_fn[FN_U32] && nmod_mat_mul_u32(C, A, B)
-                            && !nmod_mat_equal(C, D))
+                    for (f = 0; f < NUM_FN; f++)
                     {
-                        flint_printf("FAIL: nmod_mat_mul_u32 disagrees with "
-                                     "classical at p = %wu, %wd x %wd x %wd, "
-                                     "%wd threads\n", p, m, k, n, nthreads[t]);
-                        flint_abort();
-                    }
-                    nmod_mat_randtest(C, state);
-                    if (do_fn[FN_U52] && nmod_mat_mul_u52(C, A, B)
-                            && !nmod_mat_equal(C, D))
-                    {
-                        flint_printf("FAIL: nmod_mat_mul_u52 disagrees with "
-                                     "classical at p = %wu, %wd x %wd x %wd, "
-                                     "%wd threads\n", p, m, k, n, nthreads[t]);
-                        flint_abort();
+                        if (!do_fn[f] || simd_funcs[f] == NULL)
+                            continue;
+                        nmod_mat_randtest(C, state);
+                        if (simd_funcs[f](C, A, B) && !nmod_mat_equal(C, D))
+                        {
+                            flint_printf("FAIL: %s disagrees with classical "
+                                         "at p = %wu, %wd x %wd x %wd, "
+                                         "%wd threads\n", fn_names[f], p,
+                                         m, k, n, nthreads[t]);
+                            flint_abort();
+                        }
                     }
                     if (do_nmod32 && nmod32_mul(&w32) && !nmod32_equal(&w32, D))
                     {
@@ -507,6 +517,16 @@ main(int argc, char ** argv)
                             ok[f] = nmod_mat_mul_u52(C, A, B);
                             if (ok[f])
                                 TIME_BEST(tm[f], reps, nmod_mat_mul_u52(C, A, B));
+                            break;
+                        case FN_K52:
+                            ok[f] = nmod_mat_mul_k52(C, A, B);
+                            if (ok[f])
+                                TIME_BEST(tm[f], reps, nmod_mat_mul_k52(C, A, B));
+                            break;
+                        case FN_FP50:
+                            ok[f] = nmod_mat_mul_fp50(C, A, B);
+                            if (ok[f])
+                                TIME_BEST(tm[f], reps, nmod_mat_mul_fp50(C, A, B));
                             break;
                         case FN_BLAS:
                             ok[f] = nmod_mat_mul_blas(C, A, B);

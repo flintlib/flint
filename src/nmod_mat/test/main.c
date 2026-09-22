@@ -31,6 +31,8 @@
 #include "t-lu_recursive.c"
 #include "t-minpoly.c"
 #include "t-mul_blas.c"
+#include "t-mul_fp50.c"
+#include "t-mul_k52.c"
 #include "t-mul.c"
 #include "t-mul_classical_threaded.c"
 #include "t-mul_nmod_vec.c"
@@ -83,6 +85,8 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_lu_recursive),
     TEST_FUNCTION(nmod_mat_minpoly),
     TEST_FUNCTION(nmod_mat_mul_blas),
+    TEST_FUNCTION(nmod_mat_mul_fp50),
+    TEST_FUNCTION(nmod_mat_mul_k52),
     TEST_FUNCTION(nmod_mat_mul),
     TEST_FUNCTION(nmod_mat_mul_classical_threaded),
     TEST_FUNCTION(nmod_mat_mul_nmod_vec),

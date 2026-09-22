@@ -12,8 +12,8 @@
 /*
     Template for a blocked, packed, multithreaded matrix multiplication
     C = A*B over Z/nZ around a register-tile microkernel. Included by
-    mul_u32.c and mul_u52.c, once per (entry type, kernel) pair, after the
-    macros below have been defined; it generates
+    mul_u32.c, mul_u52.c, mul_fp50.c and mul_k52.c, once per (entry type,
+    kernel) pair, after the macros below have been defined; it generates
 
         BT_NAME(pack_a), BT_NAME(pack_b)   packing into l-major panels
         BT_NAME(micro)                     the MR x NR register tile
@@ -52,7 +52,8 @@
       BT_STORE_C(p, acc)       accumulator holding canonical residues -> C
       BT_LOAD_BSTEP(bv, p)     the NACC B operands of one k step
       BT_LOAD_A(p)             one packed A element as an operand
-      BT_MUL_ADD(acc, a, b)    acc + a*b, lane-wise
+      BT_MUL_ADD(acc, a, b, C) acc + a*b, lane-wise (C for kernels that
+                               reduce each product)
       BT_CADENCE(ctx)          k steps between two BT_FOLD's (>= 1)
       BT_FOLD(acc, C, ctx)     in-loop reduction keeping acc congruent
       BT_FINISH(acc, C, ctx)   accumulator -> canonical residues
@@ -150,6 +151,11 @@ BT_NAME(micro)(BT_ENTRY * c, slong ldc, const BT_PACKED * ap,
     {
         stop = FLINT_MIN(l + cadence, kc);
 
+        /* one iteration is already MR*NACC independent multiply-adds; the
+           unrolling of -funroll-loops would only add register pressure */
+#if defined(__GNUC__)
+# pragma GCC unroll 1
+#endif
         for (; l < stop; l++)
         {
             BT_BV bv[BT_NACC];
@@ -161,7 +167,7 @@ BT_NAME(micro)(BT_ENTRY * c, slong ldc, const BT_PACKED * ap,
                 BT_AV av = BT_LOAD_A(ap + l * BT_MR + r);
 
                 for (v = 0; v < BT_NACC; v++)
-                    acc[r][v] = BT_MUL_ADD(acc[r][v], av, bv[v]);
+                    acc[r][v] = BT_MUL_ADD(acc[r][v], av, bv[v], &C);
             }
         }
 

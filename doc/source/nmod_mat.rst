@@ -348,12 +348,14 @@ Matrix multiplication
     Aliasing is allowed. This function automatically chooses between classical
     and Strassen multiplication. For the classical algorithms, it chooses
     between several BLAS-like implementations: the byte kernels of
-    `nmod_mat_mul_u8` for moduli up to `255`, the integer SIMD kernels
-    `nmod_mat_mul_u32` (moduli below `2^{32}`) and `nmod_mat_mul_u52` (up to
-    `2^{52}`, when AVX512-IFMA is available), and `nmod_mat_mul_blas`. The
-    crossovers for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*`` and
-    ``FLINT_NMOD_MAT_MUL_U52_*`` parameters of the architecture dependent
-    ``flint-mparam.h``, to be tuned with the profile program
+    `nmod_mat_mul_u8` for moduli up to `255`, the SIMD kernels
+    `nmod_mat_mul_u32` (moduli below `2^{32}`), `nmod_mat_mul_u52` (up to
+    `2^{52}`, when AVX512-IFMA is available) and, without AVX512-IFMA,
+    `nmod_mat_mul_k52` or `nmod_mat_mul_fp50` (moduli up to `2^{52}`,
+    respectively below `2^{50}`), and `nmod_mat_mul_blas`. The crossovers
+    for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*``,
+    ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of the architecture
+    dependent ``flint-mparam.h``, to be tuned with the profile program
     ``nmod_mat/profile/p-mul_tune.c``.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
@@ -458,6 +460,27 @@ Matrix multiplication
     Aliasing of the operands is supported. This handles any modulus up to
     `2^{52}`; up to `2^{26}`, a variant with a single IFMA instruction per
     product is used. Several threads are used when available.
+
+.. function:: int nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` with integer SIMD instructions (AVX-512, AVX2,
+    NEON, or plain C otherwise) for a modulus up to `2^{52}`: each entry is
+    split into two 27-bit limbs and the product is formed as a two-limb
+    Karatsuba product, three widening `32b \times 32b \to 64b` multiplications
+    accumulated in three 64-bit accumulators, which are combined modulo `n`
+    in double precision at the end of each block. Returns `1` for success
+    and `0` if the modulus exceeds `2^{52}` (or on a 32-bit word size).
+    Aliasing of the operands is supported. Several threads are used when
+    available.
+
+.. function:: int nmod_mat_mul_fp50(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` in double precision for a modulus below `2^{50}`,
+    reducing each product modulo `n` as it is formed with the floating point
+    modular multiplication of ``fft_small`` (vector FMA on AVX-512, AVX2
+    or NEON, plain C otherwise). Returns `1` for success and `0` if the
+    modulus is `2^{50}` or more (or on a 32-bit word size). Aliasing of
+    the operands is supported. Several threads are used when available.
 
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 

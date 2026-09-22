@@ -285,7 +285,7 @@ u52_load_a(const ulong * p) { return _mm512_set1_epi64(*p); }
 #define BT_ACC u52_acc2
 #define BT_ACC_ZERO() u52_acc2_zero()
 #define BT_LOAD_C(p) u52_acc2_load_c(p)
-#define BT_MUL_ADD(acc, a, b) u52_acc2_mul_add(acc, a, b)
+#define BT_MUL_ADD(acc, a, b, C) u52_acc2_mul_add(acc, a, b)
 #define BT_FINISH(acc, C, ctx) u52_acc2_finish(acc, C)
 #include "mul_blocked_templ.h"
 #undef BT_NAME
@@ -302,7 +302,7 @@ u52_load_a(const ulong * p) { return _mm512_set1_epi64(*p); }
 #define BT_ACC __m512i
 #define BT_ACC_ZERO() _mm512_setzero_si512()
 #define BT_LOAD_C(p) u52_acc1_load_c(p)
-#define BT_MUL_ADD(acc, a, b) u52_acc1_mul_add(acc, a, b)
+#define BT_MUL_ADD(acc, a, b, C) u52_acc1_mul_add(acc, a, b)
 #define BT_FINISH(acc, C, ctx) u52_red(acc, C)
 #include "mul_blocked_templ.h"
 #undef BT_NAME
