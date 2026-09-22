@@ -40,12 +40,6 @@
    FLINT_MPN_TDIV_QR_NEWTON_CUTOFF limbs, where FLINT's multiplication has
    switched to fft_small; block division with a shared approximate inverse
    beats GMP much earlier for unbalanced shapes. */
-#ifndef FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF   /* an >= 4 bn */
-#define FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF 64
-#endif
-#ifndef FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF   /* an >= 3 bn */
-#define FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF 512
-#endif
 
 /* Given the approximate quotient q (n + 1 limbs, the top one 0 or 1, and
    the true quotient within a few units), write the exact quotient to Q and
@@ -325,47 +319,4 @@ _flint_mpn_tdiv_qr_preinvn(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
     }
 
     TMP_END;
-}
-
-void
-_flint_mpn_tdiv_qr_gmp(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
-    mp_srcptr B, mp_size_t Bn)
-{
-    if (R != NULL)
-        mpn_tdiv_qr(Q, R, 0, A, An, B, Bn);
-    else
-        mpn_tdiv_q(Q, A, An, B, Bn);    /* GMP's mpn_div_q, ~30% cheaper */
-}
-
-/* R may be NULL */
-void
-_flint_mpn_tdiv_qr(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
-    mp_srcptr B, mp_size_t Bn)
-{
-    mp_size_t n = An - Bn + 1;
-
-    FLINT_ASSERT(An >= Bn);
-    FLINT_ASSERT(Bn >= 1);
-    FLINT_ASSERT(B[Bn - 1] != 0);
-
-    if (Bn >= FLINT_MPN_TDIV_QR_NEWTON_CUTOFF && n >= FLINT_MPN_TDIV_QR_NEWTON_CUTOFF)
-    {
-        if (An >= 3 * Bn)
-            _flint_mpn_tdiv_qr_unbalanced(Q, R, A, An, B, Bn);
-        else
-            _flint_mpn_tdiv_qr_newton(Q, R, A, An, B, Bn);
-    }
-    else if ((Bn >= FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF && An >= 4 * Bn)
-          || (Bn >= FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF && An >= 3 * Bn))
-    {
-        _flint_mpn_tdiv_qr_unbalanced(Q, R, A, An, B, Bn);
-    }
-    else if ((Bn >= 32 && An >= 4 * Bn) || (Bn >= 4 && An >= 32 * Bn))
-    {
-        _flint_mpn_tdiv_qr_preinvn(Q, R, A, An, B, Bn);
-    }
-    else
-    {
-        _flint_mpn_tdiv_qr_gmp(Q, R, A, An, B, Bn);
-    }
 }

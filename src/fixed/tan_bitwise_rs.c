@@ -42,7 +42,7 @@ _fixed_recip_bn(nn_ptr R, nn_ptr h, nn_srcptr N, nn_srcptr S, slong n)
 {
     if (n < FIXED_TRIG_RECIP_NEWTON_CUTOFF)
     {
-        mpn_tdiv_qr(R, h, 0, N, 2 * n, S, n);
+        flint_mpn_tdiv_qr(R, h, N, 2 * n, S, n);
     }
     else
     {

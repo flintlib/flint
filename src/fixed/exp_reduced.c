@@ -61,8 +61,12 @@
 #define FIXED_EXP_SQRT_NEWTON_CUTOFF 2000
 #endif
 
+/* sinh from this many series terms (64 wn / r): the crossover rises
+   with r (tune-exp-reduced on the target machine: (64, 128] up to
+   r = 256, (171, 256] for r = 384 .. 2048, (256, 512] at 4096) */
 #define EXP_USE_SINH(wn, r) \
-    (FLINT_BITS * (wn) >= (((r) >= 64) ? 128 : 45) * (slong) (r))
+    (FLINT_BITS * (wn) >= (((r) >= 3072) ? 300 : ((r) >= 384) ? 200 \
+        : ((r) >= 64) ? 128 : 45) * (slong) (r))
 
 /* exp(t) of the reduced argument t < 2^-r into y (wn + 1 limbs:
    wn fraction limbs and a units limb); the series functions pick the
@@ -89,24 +93,27 @@
    floored quotient within 2 ulps (shift truncation plus tdiv), the
    middle product adds at most 2 more; all far inside the sinh
    reconstruction budget. */
-#ifndef FIXED_EXP_BURST_TERMS
-#define FIXED_EXP_BURST_TERMS 512
-#endif
 /* terms threshold for one burst step; the slice mechanics work for
-   any r >= 32 since the boundaries sit on limbs */
+   any r >= 32 since the boundaries sit on limbs.  Measured
+   crossovers (tune-exp-reduced on the target machine): (256, 512]
+   at r = 64 and 128, (341, 683] .. (512, 1024] for r = 192 .. 1024,
+   (683, 1365] from r = 1536. */
+#define FIXED_EXP_BURST_TERMS(r) \
+    (((r) >= 1536) ? 1000 : ((r) > 128) ? 600 : 512)
 #define EXP_USE_BURST(wn, r) \
-    (FLINT_BITS * (wn) >= FIXED_EXP_BURST_TERMS * (slong) (r))
+    (FLINT_BITS * (wn) >= FIXED_EXP_BURST_TERMS(r) * (slong) (r))
 
-/* Thresholds from tune-exp-reduced on the development VM after the
-   single-division restructure (terms = 64 wn / r): one burst step
-   from ~512 terms -- LATER than under the per-level divisions,
-   whose small level-0 divisor was cheaper than the generic rational
-   accumulation for one slice -- and the full bit-burst from ~4096
-   terms, EARLIER than before since the cascade is what the
-   restructure optimizes.  Retune on target hardware. */
-#ifndef FIXED_EXP_FULLBURST_TERMS
-#define FIXED_EXP_FULLBURST_TERMS 4096
-#endif
+/* Full bit-burst from this many terms.  The development VM's value
+   (4096) sat below the crossover measured on the target machine at
+   every r: (5461, 8192] for r >= 64, (8192, 16384] at r = 32,
+   (16384, 32768] at r = 16 -- the one-step cascade, which finishes
+   by rectangular splitting, beats the full burst for longer than
+   the earlier tuning found.  (The old rationale: one burst step
+   from ~512 terms, later than under the per-level divisions whose
+   small level-0 divisor was cheaper than the generic rational
+   accumulation for one slice.) */
+#define FIXED_EXP_FULLBURST_TERMS(r) \
+    (((r) >= 64) ? 8192 : ((r) >= 32) ? 16384 : 32768)
 
 /* Assemble the bit-burst factor F = Q 2^Qexp + T as
    value = (F, *fn) 2^(*fexp): exactly when it fits within
@@ -376,7 +383,7 @@ fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, flint_bitcnt_t r,
         /* tuned automatic choice; thresholds from tune-exp-reduced.
            For 16 <= r < 32 only the burst paths apply (the series
            functions require t < 2^-32). */
-        if (FLINT_BITS * (ulong) wn >= FIXED_EXP_FULLBURST_TERMS * r)
+        if (FLINT_BITS * (ulong) wn >= (ulong) FIXED_EXP_FULLBURST_TERMS(r) * r)
             alg = 4;
         else if (r < 32 || EXP_USE_BURST(wn, r))
             alg = 3;
