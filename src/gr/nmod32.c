@@ -703,14 +703,14 @@ _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     slong bc = gr_mat_ncols(B, ctx);
     slong min_dim = FLINT_MIN(FLINT_MIN(ar, ac), bc);
 
-    if (min_dim >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM)
+    if (min_dim >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
     {
         if (ac != gr_mat_nrows(B, ctx) || ar != gr_mat_nrows(C, ctx)
                 || bc != gr_mat_ncols(C, ctx))
             return GR_DOMAIN;
 
         if (flint_get_num_threads() == 1
-                && min_dim >= FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF)
+                && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
             return gr_mat_mul_strassen(C, A, B, ctx);
 
         if (_nmod_mat_mul_u32(C->entries, C->stride, A->entries, A->stride,

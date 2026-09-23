@@ -90,15 +90,18 @@
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
     (not measured on this target: defaults).
-      U32_MIN_DIM          use the SIMD kernels when B has at least this
+      SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
                            dimension
-      U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
+      SIMD_STRASSEN_CUTOFF single-threaded, one Strassen level is put on
+                           top of the SIMD kernels from this dimension on
+      BLAS_1PASS_CUTOFF    when one dgemm pass suffices (k*(n/2)^2 < 2^53),
                            nmod_mat_mul_blas is preferred to u32 from this
-                           dimension on (0: never)
-      U32_STRASSEN_CUTOFF  single-threaded, one Strassen level is put on
-                           top of u32 / u52 from this dimension on
+                           dimension on and, with an external BLAS, also to
+                           the single-IFMA mode of u52 (0: never)
+      BLAS_1PASS_CUTOFF_MT the same with 4 threads or more (with 2 or 3
+                           threads: the geometric mean of the two)
       U52_MIN_BITS         u52 is preferred to u32 from this modulus bit
                            size on (through 52 bits)
       U52_LO_MAX_BITS      u52 in its single-IFMA mode is preferred to u32
@@ -115,9 +118,10 @@
                            size, since blas needs more primes; the value is
                            the one for the bottom of the range.
 */
-#define FLINT_NMOD_MAT_MUL_U32_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF 256
-#define FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF 768
+#define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 256
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 256
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 768
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33

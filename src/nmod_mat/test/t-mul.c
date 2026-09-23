@@ -13,6 +13,7 @@
 #include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_mat.h"
+#include "nmod_mat/impl.h"
 
 /* Defined in t-mul.c and t-mul_classical_threaded.c */
 #ifndef nmod_mat_mul_check
@@ -143,7 +144,9 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         if (n_randint(state, 4) == 0)
             mod = n_randtest_not_zero(state);
         else
-            mod = FLINT_MAX(UWORD(1), n_randbits(state, 1 + n_randint(state, FLINT_MIN(52, FLINT_BITS))));
+            mod = n_randbits(state, 1 + n_randint(state, FLINT_MIN(52, FLINT_BITS)));
+        /* nmod_mat_randfull does not reduce for the modulus 1 */
+        mod = FLINT_MAX(mod, UWORD(2));
 
         ra = win ? n_randint(state, 4) : 0;
         ca = win ? n_randint(state, 4) : 0;
@@ -212,6 +215,73 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_clear(PC);
         nmod_mat_clear(PC0);
     }
+
+#if FLINT_BITS == 64
+    /* Strassen on top of the SIMD kernels with cut dimensions and
+       leftover strips, as nmod_mat_mul uses it for large dimensions;
+       small cutoffs so that several levels and all strip widths occur */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t A, B, C, D, PA, PB, PC;
+        slong m, k, n, cutoff;
+        ulong mod;
+        int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);
+
+        m = 1 + n_randint(state, 130);
+        k = 1 + n_randint(state, 130);
+        n = 1 + n_randint(state, 130);
+        cutoff = 5 + n_randint(state, 40);
+        mod = n_randbits(state, 1 + n_randint(state, 52));
+        mod = FLINT_MAX(mod, UWORD(2));
+
+        switch (n_randint(state, 4))
+        {
+            case 0: simd_mul = NULL; break;
+            case 1: simd_mul = nmod_mat_mul_u32; break;
+            case 2: simd_mul = nmod_mat_mul_k52; break;
+            default: simd_mul = nmod_mat_mul_fp50; break;
+        }
+
+        /* operands as windows of larger matrices */
+        nmod_mat_init(PA, m + 2, k + 3, mod);
+        nmod_mat_init(PB, k + 1, n + 2, mod);
+        nmod_mat_init(PC, m + 3, n + 1, mod);
+        nmod_mat_randfull(PA, state);
+        nmod_mat_randfull(PB, state);
+        nmod_mat_randtest(PC, state);
+        nmod_mat_window_init(A, PA, 1, 2, m + 1, k + 2);
+        nmod_mat_window_init(B, PB, 1, 1, k + 1, n + 1);
+        nmod_mat_window_init(C, PC, 2, 0, m + 2, n);
+        nmod_mat_init(D, m, n, mod);
+
+        flint_set_num_threads(1);
+        _nmod_mat_mul_strassen_aligned(C, A, B, cutoff, simd_mul);
+        nmod_mat_mul_classical(D, A, B);
+
+        if (!nmod_mat_equal(C, D))
+            TEST_FUNCTION_FAIL("strassen aligned: m: %wd, k: %wd, n: %wd, "
+                               "mod: %wu, cutoff: %wd\n",
+                               m, k, n, mod, cutoff);
+
+        /* aliasing */
+        if (k == n)
+        {
+            _nmod_mat_mul_strassen_aligned(A, A, B, cutoff, simd_mul);
+            if (!nmod_mat_equal(A, D))
+                TEST_FUNCTION_FAIL("strassen aligned, aliasing C = A: "
+                                   "m: %wd, k: %wd, mod: %wu, cutoff: %wd\n",
+                                   m, k, mod, cutoff);
+        }
+
+        nmod_mat_window_clear(A);
+        nmod_mat_window_clear(B);
+        nmod_mat_window_clear(C);
+        nmod_mat_clear(D);
+        nmod_mat_clear(PA);
+        nmod_mat_clear(PB);
+        nmod_mat_clear(PC);
+    }
+#endif
 
     /* Test aliasing with windows */
     {

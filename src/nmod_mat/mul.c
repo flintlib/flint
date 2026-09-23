@@ -12,12 +12,142 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "thread_support.h"
 
 #include "longlong.h"
 #include "flint-mparam.h"
 #include "nmod_mat/impl.h"
+
+#if FLINT_BITS == 64
+
+/*
+    Dimension from which nmod_mat_mul_blas is preferred when one dgemm pass
+    suffices (0: never), for the current thread count: BLAS_1PASS_CUTOFF
+    measured with 1 thread, BLAS_1PASS_CUTOFF_MT with 4, their geometric
+    mean for 2 threads, and the latter for 3 threads or more.
+*/
+static slong
+_blas_1pass_cutoff(slong num_threads)
+{
+    slong c1 = FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF;
+    slong c4 = FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT;
+
+    if (num_threads <= 1)
+        return c1;
+    if (num_threads >= 3 || c1 <= 0 || c4 <= 0)
+        return c4;
+    return (slong) n_sqrt((ulong) c1 * (ulong) c4);
+}
+
+/*
+    One or more Strassen levels on top of the SIMD kernel simd_mul (the
+    recursive calls come back to nmod_mat_mul). The dimensions are cut
+    once to multiples of 2^L, where L is the number of levels the recursion
+    will use, so that every level splits evenly, and the leftover strips (fewer
+    than 2^L rows, columns, and inner indices) are done directly:
+      - C[0:ap, 0:np] += A[0:ap, kp:k] * B[kp:k, 0:np] (rank < 2^L update):
+        vector axpys for rank 1, a kernel product and an addition beyond;
+      - C[:, np:n] = A * B[:, np:n] (a few columns): nmod_mat_mul, which
+        does a single column by matrix-vector products;
+      - C[ap:m, 0:np] = A[ap:m, :] * B[:, 0:np] (a few rows): a vector-matrix
+        product for one row, the kernel beyond (whose cost, dominated by
+        packing B, hardly depends on the number of rows).
+    Each strip costs about one pass over A, B or C. Aliasing of C with A or
+    B is allowed. Declared in impl.h for the tests.
+*/
+void
+_nmod_mat_mul_strassen_aligned(nmod_mat_t C, const nmod_mat_t A,
+    const nmod_mat_t B, slong cutoff,
+    int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t))
+{
+    slong m = A->r, k = A->c, n = B->c;
+    slong d = FLINT_MIN(FLINT_MIN(m, k), n);
+    slong q = 1, ap, kp, np, i;
+    nmod_mat_t A1, B1, C1, A2, B2, C2, T;
+
+    while (d >= cutoff)
+    {
+        q *= 2;
+        d /= 2;
+    }
+
+    ap = m - m % q;
+    kp = k - k % q;
+    np = n - n % q;
+
+    if (C == A || C == B)
+    {
+        nmod_mat_init(T, m, n, A->mod.n);
+        _nmod_mat_mul_strassen_aligned(T, A, B, cutoff, simd_mul);
+        nmod_mat_swap_entrywise(C, T);
+        nmod_mat_clear(T);
+        return;
+    }
+
+    if (ap == m && kp == k && np == n)
+    {
+        nmod_mat_mul_strassen(C, A, B);
+        return;
+    }
+
+    nmod_mat_window_init(A1, A, 0, 0, ap, kp);
+    nmod_mat_window_init(B1, B, 0, 0, kp, np);
+    nmod_mat_window_init(C1, C, 0, 0, ap, np);
+    nmod_mat_mul_strassen(C1, A1, B1);
+    nmod_mat_window_clear(A1);
+    nmod_mat_window_clear(B1);
+
+    if (kp < k)
+    {
+        nmod_mat_window_init(A2, A, 0, kp, ap, k);
+        nmod_mat_window_init(B2, B, kp, 0, k, np);
+        if (k - kp == 1)
+        {
+            nn_srcptr b = nmod_mat_entry_ptr(B, kp, 0);
+            for (i = 0; i < ap; i++)
+                _nmod_vec_scalar_addmul_nmod(nmod_mat_entry_ptr(C, i, 0), b,
+                                     np, nmod_mat_entry(A, i, kp), C->mod);
+        }
+        else
+        {
+            nmod_mat_init(T, ap, np, A->mod.n);
+            nmod_mat_mul(T, A2, B2);
+            nmod_mat_add(C1, C1, T);
+            nmod_mat_clear(T);
+        }
+        nmod_mat_window_clear(A2);
+        nmod_mat_window_clear(B2);
+    }
+    nmod_mat_window_clear(C1);
+
+    if (np < n)
+    {
+        nmod_mat_window_init(B2, B, 0, np, k, n);
+        nmod_mat_window_init(C2, C, 0, np, m, n);
+        nmod_mat_mul(C2, A, B2);
+        nmod_mat_window_clear(B2);
+        nmod_mat_window_clear(C2);
+    }
+
+    if (ap < m)
+    {
+        nmod_mat_window_init(A2, A, ap, 0, m, k);
+        nmod_mat_window_init(B2, B, 0, 0, k, np);
+        nmod_mat_window_init(C2, C, ap, 0, m, np);
+        if (m - ap == 1)
+            nmod_mat_nmod_vec_mul(nmod_mat_entry_ptr(C, ap, 0),
+                                  nmod_mat_entry_ptr(A, ap, 0), k, B2);
+        else if (simd_mul == NULL || !simd_mul(C2, A2, B2))
+            nmod_mat_mul(C2, A2, B2);
+        nmod_mat_window_clear(A2);
+        nmod_mat_window_clear(B2);
+        nmod_mat_window_clear(C2);
+    }
+}
+
+#endif
 
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
@@ -83,9 +213,10 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           below a dimension of about 100-250 (mul_blas pays O(n^2)
           conversions and thread hand-offs around its gemm) and is
           0.7-1.1x of mul_blas above. The single-IFMA mode of u52 (moduli
-          up to 2^26) is 1.1-1.35x faster than u32 and often comparable to or
-          faster than FLINT's own gemm (this conclusion might change with an
-          external BLAS).
+          up to 2^26) is 1.1-1.35x faster than u32 and than FLINT's own gemm,
+          but an external BLAS can overtake it at large dimensions. Hence
+          BLAS_1PASS_CUTOFF(_MT), consulted for u32 always and for u52 only
+          with an external BLAS.
         - u52 removes the 31-32 bit cliff of u32 (whose in-kernel folds
           then come every 1-2 products) and extends the single pass to
           52 bits, where the alternative is 4-5 dgemm passes. Its two-IFMA
@@ -95,16 +226,18 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           last tile of C, of MR rows (4-14) and NR columns (8-24), and
           the packing of A and B, whereas the inner dimension k has no
           such cost. So the kernels are used for any k >= 1 as soon as
-          n >= U32_MIN_DIM, and m >= U32_MIN_DIM or m >= U32_MIN_DIM/2
-          with n >= 4*U32_MIN_DIM (1.1-10x faster than the classical
+          n >= SIMD_MIN_DIM, and m >= SIMD_MIN_DIM or m >= SIMD_MIN_DIM/2
+          with n >= 4*SIMD_MIN_DIM (1.1-10x faster than the classical
           code on these shapes on AVX-512, for instance 1000 x 4 times
           4 x 1000 or 4 x 1000 times 1000 x 1000). Below that, notably
           for n < 8 where the padding to NR columns wastes most of the
           tile, the classical code wins.
-        - Single-threaded, one Strassen level on top (its recursive
-          calls come back here) pays from somewhere between 512 and 1024,
-          depending on the kernel underneath. With several threads the
-          kernels split C across the pool themselves.
+        - Single-threaded, Strassen on top (its recursive calls come back
+          here) pays from SIMD_STRASSEN_CUTOFF on (e.g. 320-512 on Zen 4).
+          TODO with 4 threads it did not pay up to 4096 (which is not that
+          large) on several machine, so it is not used with several threads,
+          but of course one may handle multi-threading differently within
+          Strassen: this requires investigation.
         - Without IFMA, k52 and fp50 are the single-pass options from 33
           bits on, and which of the two wins is a property of the
           instruction set rather than of the modulus (FP50_MAX_BITS).
@@ -123,35 +256,46 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     */
 #if FLINT_BITS == 64
     if (C->mod.n <= (UWORD(1) << 52) && k >= 1
-            && n >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
-            && (m >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
-                || (2 * m >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
-                    && n >= 4 * FLINT_NMOD_MAT_MUL_U32_MIN_DIM)))
+            && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+            && (m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                    && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)))
     {
         flint_bitcnt_t bits = FLINT_BIT_COUNT(C->mod.n);
         int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);
+        int blas_1pass = 0;
 
         simd_mul = NULL;
+
+        if (bits <= 32)
+        {
+            /*
+                mul_blas is preferred from BLAS_1PASS_CUTOFF(_MT) on
+                (0: never) when it can do it in one dgemm pass,
+                k*(n/2)^2 < 2^53. Here half < 2^31, so half^2 does not
+                overflow.
+            */
+            ulong half = C->mod.n / 2;
+            slong cut = _blas_1pass_cutoff(flint_num_threads);
+
+            blas_1pass = cut > 0 && min_dim >= cut
+                && (half == 0
+                    || (ulong) k <= ((UWORD(1) << 53) - 1) / (half * half));
+        }
 
         if (NMOD_MAT_HAVE_MUL_U52
                 && (bits >= FLINT_NMOD_MAT_MUL_U52_MIN_BITS
                     || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS))
         {
-            simd_mul = nmod_mat_mul_u52;
+            /* FLINT's own gemm was never measured faster than u52 */
+#if FLINT_USES_BLAS
+            if (!blas_1pass)
+#endif
+                simd_mul = nmod_mat_mul_u52;
         }
         else if (bits <= 32)
         {
-            /*
-                mul_blas is preferred from U32_BLAS_CUTOFF on (0: never)
-                when it can do it in one dgemm pass, k*(n/2)^2 < 2^53.
-                Here half < 2^31, so half^2 does not overflow.
-            */
-            ulong half = C->mod.n / 2;
-            int one_pass = (half == 0)
-                    || ((ulong) k <= ((UWORD(1) << 53) - 1) / (half * half));
-
-            if (!one_pass || FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF <= 0
-                    || min_dim < FLINT_NMOD_MAT_MUL_U32_BLAS_CUTOFF)
+            if (!blas_1pass)
                 simd_mul = nmod_mat_mul_u32;
         }
         else if (FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
@@ -176,18 +320,10 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         if (simd_mul != NULL)
         {
             if (flint_num_threads == 1
-                    && min_dim >= FLINT_NMOD_MAT_MUL_U32_STRASSEN_CUTOFF)
+                    && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
             {
-                if (C == A || C == B)
-                {
-                    nmod_mat_t T;
-                    nmod_mat_init(T, m, n, A->mod.n);
-                    nmod_mat_mul_strassen(T, A, B);
-                    nmod_mat_swap_entrywise(C, T);
-                    nmod_mat_clear(T);
-                }
-                else
-                    nmod_mat_mul_strassen(C, A, B);
+                _nmod_mat_mul_strassen_aligned(C, A, B,
+                        FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF, simd_mul);
                 return;
             }
 
@@ -250,7 +386,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         cutoff = 200;
 
     if (flint_num_threads > 1)
-	    nmod_mat_mul_classical_threaded(C, A, B);
+        nmod_mat_mul_classical_threaded(C, A, B);
     else if (min_dim < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else

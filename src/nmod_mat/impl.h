@@ -28,4 +28,20 @@
 # define NMOD_MAT_HAVE_MUL_U52 0
 #endif
 
+#if FLINT_BITS == 64
+#include "nmod_types.h"
+
+/*
+    Strassen on top of the SIMD kernels, as used by nmod_mat_mul from
+    SIMD_STRASSEN_CUTOFF on (single-threaded): dimensions cut to multiples
+    of 2^L, L the number of Strassen levels that the recursion uses with
+    this cutoff, and leftover strips done directly; simd_mul (may be NULL)
+    is the kernel used for a strip of a few rows. Exposed for the tests,
+    which call it with small cutoffs.
+*/
+void _nmod_mat_mul_strassen_aligned(nmod_mat_t C, const nmod_mat_t A,
+    const nmod_mat_t B, slong cutoff,
+    int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t));
+#endif
+
 #endif

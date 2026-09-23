@@ -353,12 +353,17 @@ Matrix multiplication
     `2^{52}`, when AVX512-IFMA is available) and, without AVX512-IFMA,
     `nmod_mat_mul_k52` or `nmod_mat_mul_fp50` (moduli up to `2^{52}`,
     respectively below `2^{50}`), and `nmod_mat_mul_blas`. The crossovers
-    for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*``,
-    ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of the architecture
-    dependent ``flint-mparam.h``, to be tuned with the profile program
-    ``nmod_mat/profile/p-mul_tune.c``. The SIMD kernels are also used for
-    thin shapes with any inner dimension. Single-threaded, a product
-    by a single column is done with :func:`nmod_mat_mul_nmod_vec`.
+    for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_SIMD_*``,
+    ``_BLAS_1PASS_*``, ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of
+    the architecture dependent ``flint-mparam.h``, to be tuned with the
+    profile program ``nmod_mat/profile/p-mul_tune.c``. Single-threaded,
+    Strassen is put on top of the SIMD kernels for large dimensions, on
+    dimensions cut to multiples of `2^L` (`L` the number of levels) so that
+    every level splits evenly, the few leftover rows, columns and inner
+    indices being handled directly. The
+    SIMD kernels are also used for thin shapes with any inner dimension.
+    Single-threaded, a product by a single column is done with
+    :func:`nmod_mat_mul_nmod_vec`.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 
