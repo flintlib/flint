@@ -57,6 +57,9 @@
       BT_CADENCE(ctx)          k steps between two BT_FOLD's (>= 1)
       BT_FOLD(acc, C, ctx)     in-loop reduction keeping acc congruent
       BT_FINISH(acc, C, ctx)   accumulator -> canonical residues
+      BT_FINISH_TILE(c, ldc, raw, C, ctx)   optional: instead of BT_FINISH
+                               and BT_STORE_C per accumulator, one call
+                               storing the whole tile raw[MR][NACC] to c
 
     The microkernel computes, for an MR x NR tile c of C with row stride
     ldc, c = Ap*Bp over kc if first is set and c += Ap*Bp otherwise, where
@@ -185,9 +188,22 @@ BT_NAME(micro)(BT_ENTRY * c, slong ldc, const BT_PACKED * ap,
                     acc[r][v] = BT_FOLD(acc[r][v], &C, ctx);
     }
 
+#if defined(BT_FINISH_TILE)
+    {
+        /* a copy, so that the address of acc itself never escapes */
+        BT_ACC raw[BT_MR][BT_NACC];
+
+        for (r = 0; r < BT_MR; r++)
+            for (v = 0; v < BT_NACC; v++)
+                raw[r][v] = acc[r][v];
+
+        BT_FINISH_TILE(c, ldc, raw, &C, ctx);
+    }
+#else
     for (r = 0; r < BT_MR; r++)
         for (v = 0; v < BT_NACC; v++)
             BT_STORE_C(c + r * ldc + v * BT_VL, BT_FINISH(acc[r][v], &C, ctx));
+#endif
 }
 
 /* blocked serial core ******************************************************/
@@ -328,7 +344,7 @@ BT_NAME(core_mt)(BT_ENTRY * C, slong ldc, const BT_ENTRY * A, slong lda,
 {
     thread_pool_handle * handles = NULL;
     BT_NAME(split_arg) * args;
-    slong nw = 0, nt, i, pos, given, len, tcap;
+    slong nw = 0, nt, i, pos, given, len, tcap, tile, ntiles;
     int split_rows;
     double work;
 
@@ -357,20 +373,20 @@ BT_NAME(core_mt)(BT_ENTRY * C, slong ldc, const BT_ENTRY * A, slong lda,
     nt = nw + 1;
     args = flint_malloc(nt * sizeof(BT_NAME(split_arg)));
 
+    /*
+        Blocks of whole tiles, as even as possible; the last block also
+        takes the final partial tile. Since nt <= len / (2 * tile), every
+        block gets at least two tiles. (Rounding even shares of len to
+        tiles instead could leave the last block empty.)
+    */
+    tile = split_rows ? BT_MR : BT_NR;
+    ntiles = (len + tile - 1) / tile;
+
     pos = 0;
     for (i = 0; i < nt; i++)
     {
-        given = len / nt + (i < len % nt ? 1 : 0);
-
-        /* round block boundaries to whole tiles when possible */
-        if (i < nt - 1)
-        {
-            slong tile = split_rows ? BT_MR : BT_NR;
-            given = ((given + tile / 2) / tile) * tile;
-            given = FLINT_MIN(given, len - pos);
-        }
-        else
-            given = len - pos;
+        given = (ntiles / nt + (i < ntiles % nt ? 1 : 0)) * tile;
+        given = FLINT_MIN(given, len - pos);
 
         args[i].ctx = ctx;
         args[i].k = k;

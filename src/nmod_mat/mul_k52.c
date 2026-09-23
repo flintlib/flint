@@ -173,7 +173,7 @@ k52_ctx_init(k52_ctx_struct * ctx, ulong n)
 FLINT_FORCE_INLINE ulong
 k52_lift(ulong a, ulong n)
 {
-    slong s = (a > n / 2) ? (slong) a - (slong) n : (slong) a;
+    slong s = (slong) (a - (n & FLINT_SIGN_EXT(n / 2 - a)));
     slong a0 = ((s + (WORD(1) << (K52_L - 1))) & ((WORD(1) << K52_L) - 1))
                    - (WORD(1) << (K52_L - 1));
     slong a1 = (s - a0) >> K52_L;
@@ -481,15 +481,8 @@ k52_red(k52_vi x, const k52_consts * C)
     return fpv_reduce_pm1n(t, C->nv, C->ninvv);
 }
 
-/*
-    acc0 + 2^L (accM - acc0 - acc2) + 2^(2L) acc2 mod n, canonical.
-
-    Kept out of line: inlined, the many vector constants of the reduction
-    stay live across the k loop, and on AVX2 (16 registers) that can make the
-    compiler spill accumulators of the microkernel; the call runs once per
-    accumulator triple per k-block, which is negligible.
-*/
-FLINT_STATIC_NOINLINE fpv
+/* acc0 + 2^L (accM - acc0 - acc2) + 2^(2L) acc2 mod n, canonical */
+FLINT_FORCE_INLINE fpv
 k52_finish(k52_acc acc, const k52_consts * C)
 {
     fpv r0, rM, r2, v;
@@ -509,6 +502,26 @@ k52_finish(k52_acc acc, const k52_consts * C)
     v = fpv_add(fpv_add(r0, rM), r2);
 
     return fpv_reduce_0n(fpv_reduce_pm1n(v, C->nv, C->ninvv), C->nv);
+}
+
+/*
+    The end of a tile's k-block: the MR*NACC accumulator triples, which the
+    microkernel has copied out, to canonical residues in C. Kept out of
+    line and called once per tile: inlined, the vector constants of the
+    reduction stay live across the k loop and on AVX2 (16 registers) the
+    compiler then spills accumulators inside it; called once per triple,
+    every live accumulator is saved and restored around every call, which
+    made this epilogue cost as much as a 256-step k loop at small sizes.
+*/
+FLINT_STATIC_NOINLINE void
+k52_finish_tile(ulong * c, slong ldc, k52_acc raw[K52_MR][K52_NACC],
+                const k52_consts * C)
+{
+    slong r, v;
+
+    for (r = 0; r < K52_MR; r++)
+        for (v = 0; v < K52_NACC; v++)
+            fpv_store_u64(c + r * ldc + v * K52_VL, k52_finish(raw[r][v], C));
 }
 
 /* template instantiation ****************************************************/
@@ -541,6 +554,7 @@ k52_finish(k52_acc acc, const k52_consts * C)
 #define BT_CADENCE(ctx) K52_KC
 #define BT_FOLD(acc, C, ctx) (acc)
 #define BT_FINISH(acc, C, ctx) k52_finish(acc, C)
+#define BT_FINISH_TILE(c, ldc, raw, C, ctx) k52_finish_tile(c, ldc, raw, C)
 #include "mul_blocked_templ.h"
 
 /* public entry *************************************************************/

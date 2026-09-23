@@ -448,8 +448,9 @@ Matrix multiplication
     row-major with the given row strides and with entries reduced modulo
     ``mod.n``, which must be below `2^{32}`. The kernels read and write the
     32-bit entries directly. Returns `1` for success and `0` in the cases
-    where `nmod_mat_mul_u32` does. Aliasing of `C` with `A` or `B` is
-    supported. Several threads are used when available.
+    where `nmod_mat_mul_u32` does. `C` may be equal to `A` or `B` (same
+    pointer and strides) but must not otherwise overlap them. Several
+    threads are used when available.
 
 .. function:: int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
@@ -469,7 +470,8 @@ Matrix multiplication
     Karatsuba product, three widening `32b \times 32b \to 64b` multiplications
     accumulated in three 64-bit accumulators, which are combined modulo `n`
     in double precision at the end of each block. Returns `1` for success
-    and `0` if the modulus exceeds `2^{52}` (or on a 32-bit word size).
+    and `0` if the modulus exceeds `2^{52}` (or on a 32-bit word size, or
+    when compiling with MSVC without AVX2, see ``nmod_mat/mul_fp_vec.h``).
     Aliasing of the operands is supported. Several threads are used when
     available.
 
@@ -479,8 +481,9 @@ Matrix multiplication
     reducing each product modulo `n` as it is formed with the floating point
     modular multiplication of ``fft_small`` (vector FMA on AVX-512, AVX2
     or NEON, plain C otherwise). Returns `1` for success and `0` if the
-    modulus is `2^{50}` or more (or on a 32-bit word size). Aliasing of
-    the operands is supported. Several threads are used when available.
+    modulus is `2^{50}` or more (or on a 32-bit word size, or when
+    compiling with MSVC without AVX2). Aliasing of the operands is
+    supported. Several threads are used when available.
 
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 

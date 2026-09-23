@@ -142,7 +142,7 @@ fp50_ctx_init(fp50_ctx_struct * ctx, ulong n)
 FLINT_FORCE_INLINE double
 fp50_lift(ulong a, ulong n)
 {
-    return (a > n / 2) ? (double) ((slong) a - (slong) n) : (double) a;
+    return (double) (slong) (a - (n & FLINT_SIGN_EXT(n / 2 - a)));
 }
 
 /* primitives ****************************************************************/
