@@ -91,11 +91,7 @@ primary_domain = 'c'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'default'
-
-html_context = {
-    'css_files': ['_static/default.css'],
-}
+html_theme = 'sphinx_clarity_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -103,16 +99,6 @@ html_context = {
 #
 
 html_theme_options = {
-    'sidebarwidth' : 300,
-    'collapsiblesidebar': True,
-    'bodyfont': "'arial', sans-serif",
-    'headfont': "'arial', sans-serif",
-    'sidebarbtncolor': '#666',
-    'sidebarbgcolor': '#444',
-    'sidebarlinkcolor': '#ddd',
-    'relbarbgcolor': '#333',
-    'footerbgcolor': '#333',
-    'headbgcolor': '#fff',
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -129,6 +115,8 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+html_css_files = ["styles/custom.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

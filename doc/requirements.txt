@@ -1,0 +1,3 @@
+# Sphinx documentation dependencies
+sphinx>=9.0
+sphinx_clarity_theme==1.0.2
