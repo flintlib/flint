@@ -356,7 +356,9 @@ Matrix multiplication
     for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_U32_*``,
     ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of the architecture
     dependent ``flint-mparam.h``, to be tuned with the profile program
-    ``nmod_mat/profile/p-mul_tune.c``.
+    ``nmod_mat/profile/p-mul_tune.c``. The SIMD kernels are also used for
+    thin shapes with any inner dimension and single-threaded. A product
+    by a single column is done with :func:`nmod_mat_mul_nmod_vec`.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 

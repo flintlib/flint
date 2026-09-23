@@ -95,7 +95,10 @@
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
     (not measured on Sapphire Rapids yet: the values of x86_64/icelake, the
     closest AVX512-IFMA machine that was).
-      U32_MIN_DIM          use the SIMD kernels from this minimal dimension
+      U32_MIN_DIM          use the SIMD kernels when B has at least this
+                           many columns and A this many rows (or half as
+                           many if B has 4x as many columns), for any inner
+                           dimension
       U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
                            nmod_mat_mul_blas is preferred to u32 from this
                            dimension on (0: never)

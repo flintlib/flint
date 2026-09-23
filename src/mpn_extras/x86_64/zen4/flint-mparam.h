@@ -87,7 +87,10 @@
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
     (measured on AMD Zen 4 (AVX512-IFMA), with an external BLAS (AOCL/BLIS)).
-      U32_MIN_DIM          use the SIMD kernels from this minimal dimension
+      U32_MIN_DIM          use the SIMD kernels when B has at least this
+                           many columns and A this many rows (or half as
+                           many if B has 4x as many columns), for any inner
+                           dimension
       U32_BLAS_CUTOFF      when one dgemm pass suffices (k*(n/2)^2 < 2^53),
                            nmod_mat_mul_blas is preferred to u32 from this
                            dimension on (0: never)

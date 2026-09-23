@@ -45,6 +45,27 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     slong flint_num_threads = flint_get_num_threads();
 
     /*
+        B is a single column: use nmod_mat_mul_nmod_vec
+        TODO handle multithreading in mul_nmod_vec
+    */
+    if (n == 1 && m >= 8 && k >= 1 && flint_num_threads == 1)
+    {
+        ulong * t;
+        slong i;
+        TMP_INIT;
+
+        TMP_START;
+        t = TMP_ARRAY_ALLOC(k + m, ulong);
+        for (i = 0; i < k; i++)
+            t[i] = nmod_mat_entry(B, i, 0);
+        nmod_mat_mul_nmod_vec(t + k, A, t, k);
+        for (i = 0; i < m; i++)
+            nmod_mat_entry(C, i, 0) = t[k + i];
+        TMP_END;
+        return;
+    }
+
+    /*
         Moduli up to 2^52: SIMD kernels with delayed reduction,
         nmod_mat_mul_u32 (any 64-bit target, moduli below 2^32),
         nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and, without
@@ -70,6 +91,16 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           52 bits, where the alternative is 4-5 dgemm passes. Its two-IFMA
           mode is slower than u32 between 27 and 30-31 bits (1.5-1.65x on
           Zen 4, up to 1.1x on Ice Lake), hence U52_MIN_BITS.
+        - Thin shapes: what the kernels pay for is the padding of the
+          last tile of C, of MR rows (4-14) and NR columns (8-24), and
+          the packing of A and B, whereas the inner dimension k has no
+          such cost. So the kernels are used for any k >= 1 as soon as
+          n >= U32_MIN_DIM, and m >= U32_MIN_DIM or m >= U32_MIN_DIM/2
+          with n >= 4*U32_MIN_DIM (1.1-10x faster than the classical
+          code on these shapes on AVX-512, for instance 1000 x 4 times
+          4 x 1000 or 4 x 1000 times 1000 x 1000). Below that, notably
+          for n < 8 where the padding to NR columns wastes most of the
+          tile, the classical code wins.
         - Single-threaded, one Strassen level on top (its recursive
           calls come back here) pays from somewhere between 512 and 1024,
           depending on the kernel underneath. With several threads the
@@ -91,8 +122,11 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           the x86 machines measured it is 768 and beyond, or never.
     */
 #if FLINT_BITS == 64
-    if (min_dim >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
-            && C->mod.n <= (UWORD(1) << 52))
+    if (C->mod.n <= (UWORD(1) << 52) && k >= 1
+            && n >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
+            && (m >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
+                || (2 * m >= FLINT_NMOD_MAT_MUL_U32_MIN_DIM
+                    && n >= 4 * FLINT_NMOD_MAT_MUL_U32_MIN_DIM)))
     {
         flint_bitcnt_t bits = FLINT_BIT_COUNT(C->mod.n);
         int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);

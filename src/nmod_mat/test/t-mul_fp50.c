@@ -89,6 +89,61 @@ random_modulus_fp50(flint_rand_t state)
     return n;
 }
 
+/*
+    The product A*B = D again, through windows at random offsets inside
+    larger matrices (row strides larger than the row lengths, most of the
+    time), with random entries around them: returns 0 if the result is
+    wrong or if an entry of the parent of C outside its window was
+    touched.
+*/
+static int
+mul_window_check_fp50(const nmod_mat_t A, const nmod_mat_t B,
+                     const nmod_mat_t D, flint_rand_t state)
+{
+    nmod_mat_t PA, PB, PC, PC0, WA, WB, WC;
+    slong m = A->r, k = A->c, n = B->c, i, j;
+    slong ra = n_randint(state, 4), ca = n_randint(state, 4);
+    slong rb = n_randint(state, 4), cb = n_randint(state, 4);
+    slong rc = n_randint(state, 4), cc = n_randint(state, 4);
+    ulong modulus = A->mod.n;
+    int ok;
+
+    nmod_mat_init(PA, ra + m + n_randint(state, 4),
+                      ca + k + n_randint(state, 4), modulus);
+    nmod_mat_init(PB, rb + k + n_randint(state, 4),
+                      cb + n + n_randint(state, 4), modulus);
+    nmod_mat_init(PC, rc + m + n_randint(state, 4),
+                      cc + n + n_randint(state, 4), modulus);
+    nmod_mat_randtest(PA, state);
+    nmod_mat_randtest(PB, state);
+    nmod_mat_randtest(PC, state);
+
+    nmod_mat_window_init(WA, PA, ra, ca, ra + m, ca + k);
+    nmod_mat_window_init(WB, PB, rb, cb, rb + k, cb + n);
+    nmod_mat_window_init(WC, PC, rc, cc, rc + m, cc + n);
+    nmod_mat_set(WA, A);
+    nmod_mat_set(WB, B);
+    nmod_mat_init_set(PC0, PC);
+
+    ok = nmod_mat_mul_fp50(WC, WA, WB) && nmod_mat_equal(WC, D);
+
+    for (i = 0; i < PC->r; i++)
+        for (j = 0; j < PC->c; j++)
+            if ((i < rc || i >= rc + m || j < cc || j >= cc + n)
+                    && nmod_mat_entry(PC, i, j) != nmod_mat_entry(PC0, i, j))
+                ok = 0;
+
+    nmod_mat_window_clear(WA);
+    nmod_mat_window_clear(WB);
+    nmod_mat_window_clear(WC);
+    nmod_mat_clear(PA);
+    nmod_mat_clear(PB);
+    nmod_mat_clear(PC);
+    nmod_mat_clear(PC0);
+
+    return ok;
+}
+
 TEST_FUNCTION_START(nmod_mat_mul_fp50, state)
 {
     slong i, max_threads = 5;
@@ -180,6 +235,13 @@ TEST_FUNCTION_START(nmod_mat_mul_fp50, state)
                 TEST_FUNCTION_FAIL("m: %wd, k: %wd, n: %wd, mod: %wu, "
                                    "threads: %d\n", m, k, n, modulus,
                                    flint_get_num_threads());
+
+            /* the same product on windows of larger matrices */
+            if (n_randint(state, 2)
+                    && !mul_window_check_fp50(A, B, D, state))
+                TEST_FUNCTION_FAIL("windows: m: %wd, k: %wd, n: %wd, "
+                                   "mod: %wu, threads: %d\n", m, k, n,
+                                   modulus, flint_get_num_threads());
 
             /* aliasing */
             if (m == k && k == n && m > 0)
