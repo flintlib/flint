@@ -117,11 +117,12 @@
       FP50_MAX_BITS        in that range, the floating point kernel
                            nmod_mat_mul_fp50 is preferred to k52 up to
                            this modulus bit size (through 50; 0: never)
-      K52_BLAS_CUTOFF      in that range, nmod_mat_mul_blas and its CRT are
-                           preferred to k52 / fp50 from this dimension on
-                           (0: never). The crossover grows with the modulus
-                           size, since blas needs more primes; the value is
-                           the one for the bottom of the range.
+      K52_BLAS_CUTOFF      in that range and with an external BLAS,
+                           nmod_mat_mul_blas and its CRT are preferred to
+                           k52 / fp50 from this dimension on (0: never).
+                           The crossover grows with the modulus size, since
+                           blas needs more primes; the value is the one for
+                           the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 0

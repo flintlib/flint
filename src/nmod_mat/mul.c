@@ -143,9 +143,11 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           the only single-pass option.
         - These two are 1.4-3.4x faster than blas + CRT up to a
           dimension that grows with the modulus size, and lose beyond it
-          (K52_BLAS_CUTOFF): on Apple M4 that dimension is 320-448,
-          Accelerate's dgemm being far out of reach of a NEON kernel; on
-          the x86 machines measured it is 768 and beyond, or never.
+          (K52_BLAS_CUTOFF, only with an external BLAS): on Apple M4
+          that dimension is 320-448 with Accelerate, whose dgemm is far
+          out of reach of a NEON kernel; on the x86 machines measured it
+          is 768 and beyond, or never. With FLINT's own gemm, blas + CRT
+          was 1.3-1.8x slower than k52 on Apple M4 at every dimension.
     */
 #if FLINT_BITS == 64
     if (C->mod.n <= (UWORD(1) << 52) && k >= 1
@@ -193,8 +195,13 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         }
         else if (FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
                  && bits >= FLINT_NMOD_MAT_MUL_K52_MIN_BITS
+#if FLINT_USES_BLAS
+                 /* FLINT's own gemm never beats k52 / fp50 with its CRT
+                    (1.3-1.8x slower on Apple M4 at 512-2048) */
                  && (FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF <= 0
-                     || min_dim < FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF))
+                     || min_dim < FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF)
+#endif
+                )
         {
             /*
                 33 to 52 bits without IFMA, where the alternative is
