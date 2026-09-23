@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 
 /* The implemented sequence is not Strassen's nor Winograd's, but the sequence
@@ -131,25 +132,24 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_window_clear(Cc);
     }
 
+    /*
+        remains a vector-matrix product and a rank-1 update:
+        both are done row by row with vector axpys, which stream
+        through B (resp. C) once
+    */
     if (a > 2*anr) /* last row of A by B -> last row of C */
     {
-        nmod_mat_t Ar, Cr;
-        nmod_mat_window_init(Ar, A, 2*anr, 0, a, b);
-        nmod_mat_window_init(Cr, C, 2*anr, 0, a, c);
-        nmod_mat_mul(Cr, Ar, B);
-        nmod_mat_window_clear(Ar);
-        nmod_mat_window_clear(Cr);
+        nmod_mat_nmod_vec_mul(nmod_mat_entry_ptr(C, a - 1, 0),
+                              nmod_mat_entry_ptr(A, a - 1, 0), b, B);
     }
 
     if (b > 2*anc) /* last col of A by last row of B -> C */
     {
-        nmod_mat_t Ac, Br, Cb;
-        nmod_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
-        nmod_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
-        nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
-        nmod_mat_addmul(Cb, Cb, Ac, Br);
-        nmod_mat_window_clear(Ac);
-        nmod_mat_window_clear(Br);
-        nmod_mat_window_clear(Cb);
+        slong i;
+        nn_srcptr Br = nmod_mat_entry_ptr(B, b - 1, 0);
+
+        for (i = 0; i < 2*anr; i++)
+            _nmod_vec_scalar_addmul_nmod(nmod_mat_entry_ptr(C, i, 0), Br,
+                           2*bnc, nmod_mat_entry(A, i, b - 1), C->mod);
     }
 }
