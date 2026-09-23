@@ -1419,9 +1419,15 @@ Greatest common divisor
 
     This function uses the modular GCD algorithm. The basic
     strategy is to remove the content of the polynomials, reduce them
-    modulo sufficiently many primes and do CRT reconstruction until
-    some bound is reached (or we can prove with trial division that
-    we have the GCD).
+    modulo sufficiently many primes and do CRT reconstruction.
+    Primes are processed in batches (in parallel when multiple threads
+    are available), using fast multimodular reduction and a single fast
+    CRT for reconstruction. The number of primes is chosen adaptively
+    by checking when a random linear combination of the coefficients of
+    the reconstructed gcd stabilizes. The result is certified by
+    checking that the candidate divides both inputs, which is done by
+    computing the quotients multimodularly and verifying them by
+    multiplication or by coefficient bounds.
 
 .. function:: void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
