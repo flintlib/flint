@@ -63,6 +63,10 @@ libtool
 flint.pc
 autom4te.cache/
 config.m4
+config.m4.in
 src/flint-mparam.h
 .gdb_history
 vgcore.*
+meson
+meson.build
+meson.options
