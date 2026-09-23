@@ -357,10 +357,7 @@ Matrix multiplication
     ``_BLAS_1PASS_*``, ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of
     the architecture dependent ``flint-mparam.h``, to be tuned with the
     profile program ``nmod_mat/profile/p-mul_tune.c``. Single-threaded,
-    Strassen is put on top of the SIMD kernels for large dimensions, on
-    dimensions cut to multiples of `2^L` (`L` the number of levels) so that
-    every level splits evenly, the few leftover rows, columns and inner
-    indices being handled directly. The
+    Strassen is put on top of the SIMD kernels for large dimensions. The
     SIMD kernels are also used for thin shapes with any inner dimension.
     Single-threaded, a product by a single column is done with
     :func:`nmod_mat_mul_nmod_vec`.
@@ -395,7 +392,10 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
-    multiplication (the Strassen-Winograd variant).
+    multiplication (the Strassen-Winograd variant), one level, the products
+    being done by :func:`nmod_mat_mul` (which may use Strassen again). Odd
+    dimensions are handled by virtual padding: the blocks are seen as padded
+    with a zero row or column, without any copy or extra pass.
 
 .. function:: int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 

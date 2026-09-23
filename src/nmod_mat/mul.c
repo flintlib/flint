@@ -12,7 +12,6 @@
 */
 
 #include "nmod.h"
-#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "thread_support.h"
 
@@ -39,112 +38,6 @@ _blas_1pass_cutoff(slong num_threads)
     if (num_threads >= 3 || c1 <= 0 || c4 <= 0)
         return c4;
     return (slong) n_sqrt((ulong) c1 * (ulong) c4);
-}
-
-/*
-    One or more Strassen levels on top of the SIMD kernel simd_mul (the
-    recursive calls come back to nmod_mat_mul). The dimensions are cut
-    once to multiples of 2^L, where L is the number of levels the recursion
-    will use, so that every level splits evenly, and the leftover strips (fewer
-    than 2^L rows, columns, and inner indices) are done directly:
-      - C[0:ap, 0:np] += A[0:ap, kp:k] * B[kp:k, 0:np] (rank < 2^L update):
-        vector axpys for rank 1, a kernel product and an addition beyond;
-      - C[:, np:n] = A * B[:, np:n] (a few columns): nmod_mat_mul, which
-        does a single column by matrix-vector products;
-      - C[ap:m, 0:np] = A[ap:m, :] * B[:, 0:np] (a few rows): a vector-matrix
-        product for one row, the kernel beyond (whose cost, dominated by
-        packing B, hardly depends on the number of rows).
-    Each strip costs about one pass over A, B or C. Aliasing of C with A or
-    B is allowed. Declared in impl.h for the tests.
-*/
-void
-_nmod_mat_mul_strassen_aligned(nmod_mat_t C, const nmod_mat_t A,
-    const nmod_mat_t B, slong cutoff,
-    int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t))
-{
-    slong m = A->r, k = A->c, n = B->c;
-    slong d = FLINT_MIN(FLINT_MIN(m, k), n);
-    slong q = 1, ap, kp, np, i;
-    nmod_mat_t A1, B1, C1, A2, B2, C2, T;
-
-    while (d >= cutoff)
-    {
-        q *= 2;
-        d /= 2;
-    }
-
-    ap = m - m % q;
-    kp = k - k % q;
-    np = n - n % q;
-
-    if (C == A || C == B)
-    {
-        nmod_mat_init(T, m, n, A->mod.n);
-        _nmod_mat_mul_strassen_aligned(T, A, B, cutoff, simd_mul);
-        nmod_mat_swap_entrywise(C, T);
-        nmod_mat_clear(T);
-        return;
-    }
-
-    if (ap == m && kp == k && np == n)
-    {
-        nmod_mat_mul_strassen(C, A, B);
-        return;
-    }
-
-    nmod_mat_window_init(A1, A, 0, 0, ap, kp);
-    nmod_mat_window_init(B1, B, 0, 0, kp, np);
-    nmod_mat_window_init(C1, C, 0, 0, ap, np);
-    nmod_mat_mul_strassen(C1, A1, B1);
-    nmod_mat_window_clear(A1);
-    nmod_mat_window_clear(B1);
-
-    if (kp < k)
-    {
-        nmod_mat_window_init(A2, A, 0, kp, ap, k);
-        nmod_mat_window_init(B2, B, kp, 0, k, np);
-        if (k - kp == 1)
-        {
-            nn_srcptr b = nmod_mat_entry_ptr(B, kp, 0);
-            for (i = 0; i < ap; i++)
-                _nmod_vec_scalar_addmul_nmod(nmod_mat_entry_ptr(C, i, 0), b,
-                                     np, nmod_mat_entry(A, i, kp), C->mod);
-        }
-        else
-        {
-            nmod_mat_init(T, ap, np, A->mod.n);
-            nmod_mat_mul(T, A2, B2);
-            nmod_mat_add(C1, C1, T);
-            nmod_mat_clear(T);
-        }
-        nmod_mat_window_clear(A2);
-        nmod_mat_window_clear(B2);
-    }
-    nmod_mat_window_clear(C1);
-
-    if (np < n)
-    {
-        nmod_mat_window_init(B2, B, 0, np, k, n);
-        nmod_mat_window_init(C2, C, 0, np, m, n);
-        nmod_mat_mul(C2, A, B2);
-        nmod_mat_window_clear(B2);
-        nmod_mat_window_clear(C2);
-    }
-
-    if (ap < m)
-    {
-        nmod_mat_window_init(A2, A, ap, 0, m, k);
-        nmod_mat_window_init(B2, B, 0, 0, k, np);
-        nmod_mat_window_init(C2, C, ap, 0, m, np);
-        if (m - ap == 1)
-            nmod_mat_nmod_vec_mul(nmod_mat_entry_ptr(C, ap, 0),
-                                  nmod_mat_entry_ptr(A, ap, 0), k, B2);
-        else if (simd_mul == NULL || !simd_mul(C2, A2, B2))
-            nmod_mat_mul(C2, A2, B2);
-        nmod_mat_window_clear(A2);
-        nmod_mat_window_clear(B2);
-        nmod_mat_window_clear(C2);
-    }
 }
 
 #endif
@@ -322,8 +215,16 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             if (flint_num_threads == 1
                     && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
             {
-                _nmod_mat_mul_strassen_aligned(C, A, B,
-                        FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF, simd_mul);
+                if (C == A || C == B)
+                {
+                    nmod_mat_t T;
+                    nmod_mat_init(T, m, n, A->mod.n);
+                    nmod_mat_mul_strassen(T, A, B);
+                    nmod_mat_swap_entrywise(C, T);
+                    nmod_mat_clear(T);
+                }
+                else
+                    nmod_mat_mul_strassen(C, A, B);
                 return;
             }
 
