@@ -13,6 +13,85 @@
 
 #define EBIT(e, i) (((e)[(i) / FLINT_BITS] >> ((i) % FLINT_BITS)) & 1)
 
+/*
+    GMP's Montgomery arithmetic beats Barrett with a precomputed inverse
+    for a small modulus, once the exponent is long enough to pay for its
+    setup. Entry n of the table is the exponent bit length from which
+    mpz_powm wins at n limbs; past the end of the table it never does.
+    Measured on x86-64 over varied bases, which matters: timing one base
+    repeatedly understates the window code's cost. The ratios are flat at
+    each boundary, so the exact cutoffs are not critical. Past 7 limbs the
+    two are within a few percent of each other either way, with no
+    consistent winner, so there is nothing to gain from dispatching.
+*/
+#define POWMOD_MPZ_MAX_LIMBS 7
+
+static const unsigned int powmod_mpz_cutoff_tab[POWMOD_MPZ_MAX_LIMBS + 1] =
+{
+    0,      /* unused */
+    0,      /* 1 limb: always, by a factor 1.5 to 4 */
+    64,     /* 2 limbs */
+    0,      /* 3 limbs: always, we have no unrolled mulmod for this size */
+    16,     /* 4 limbs */
+    192,    /* 5 limbs */
+    192,    /* 6 limbs */
+    192     /* 7 limbs */
+};
+
+/*
+    a^e mod d through mpz_powm. The shift is undone and redone around it;
+    both directions are exact, a and d being shifted values by contract.
+*/
+static void
+_powmod_mpz(mp_ptr res, mp_srcptr a, mp_srcptr e, mp_size_t en, mp_size_t n,
+        mp_srcptr d, ulong norm)
+{
+    mpz_t az, dz, ez, rz;
+    mp_srcptr ap, dp;
+    mp_ptr t;
+    mp_size_t an, dn, rn;
+    TMP_INIT;
+
+    TMP_START;
+
+    if (norm)
+    {
+        t = TMP_ALLOC((2 * n) * sizeof(mp_limb_t));
+        mpn_rshift(t, a, n, norm);
+        mpn_rshift(t + n, d, n, norm);
+        ap = t;
+        dp = t + n;
+    }
+    else
+    {
+        ap = a;
+        dp = d;
+    }
+
+    /* GMP wants the top limb of a read-only view to be nonzero */
+    for (an = n; an > 0 && ap[an - 1] == 0; an--)
+        ;
+    for (dn = n; dn > 0 && dp[dn - 1] == 0; dn--)
+        ;
+
+    mpz_roinit_n(az, ap, an);
+    mpz_roinit_n(dz, dp, dn);
+    mpz_roinit_n(ez, e, en);
+
+    mpz_init(rz);
+    mpz_powm(rz, az, ez, dz);
+
+    rn = rz->_mp_size;
+    flint_mpn_copyi(res, rz->_mp_d, rn);
+    flint_mpn_zero(res + rn, n - rn);
+    mpz_clear(rz);
+
+    if (norm)
+        mpn_lshift(res, res, n, norm);
+
+    TMP_END;
+}
+
 /* Window width, cut back so that the table of odd powers stays modest. */
 static int
 _window_size(flint_bitcnt_t ebits, mp_size_t n)
@@ -64,6 +143,13 @@ flint_mpn_powmod_preinvn(mp_ptr res, mp_srcptr a, mp_srcptr e, mp_size_t en,
     }
 
     ebits = en * FLINT_BITS - flint_clz(e[en - 1]);
+
+    if (n <= POWMOD_MPZ_MAX_LIMBS && ebits >= powmod_mpz_cutoff_tab[n])
+    {
+        _powmod_mpz(res, a, e, en, n, d, norm);
+        return;
+    }
+
     w = _window_size(ebits, n);
     tabn = ((mp_size_t) 1) << (w - 1);
 
