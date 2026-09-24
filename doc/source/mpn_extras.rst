@@ -1272,6 +1272,26 @@ Division and modular arithmetic with precomputed inverses
     We require `a` and `b` to be reduced modulo `d` before calling the
     function. 
 
+.. function:: void flint_mpn_powmod_preinvn(mp_ptr res, mp_srcptr a, mp_srcptr e, mp_size_t en, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+
+    Given a normalised integer `d` of `n` limbs with precomputed inverse
+    ``dinv`` provided by :func:`flint_mpn_preinvn`, computes `a^e \pmod{d}`
+    and stores the result in ``res``. The exponent is the nonnegative integer
+    held in the `en` limbs at `e`, which need not be normalised; `a` and
+    ``res`` have `n` limbs of space.
+
+    The shift convention is that of :func:`flint_mpn_mulmod_preinvn`: if `a`
+    and `d` have been shifted left by ``norm`` bits so that `d` is
+    normalised, then ``res`` carries the same shift. The exponent is not
+    shifted. Aliasing of ``res`` with `a` or `e` is not permitted.
+
+    We require `a` to be reduced modulo `d`, and the unshifted modulus
+    `d 2^{-\mathrm{norm}}` to be at least 2.
+
+    A left to right sliding window is used, with the odd powers
+    `a, a^3, \ldots, a^{2^w - 1}` precomputed for a window width `w` chosen
+    from the size of the exponent.
+
 .. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
 
     Version of :func:`flint_mpn_mulmod_preinv1` specialized for two limbs.
@@ -1284,6 +1304,44 @@ Division and modular arithmetic with precomputed inverses
     Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
     provided by ``flint_mpn_preinvn``, computes `a_1 b_1 + a_2 b_2 \pmod{d}`. We require
     all operands to be reduced modulo `d`.
+
+Square roots modulo an odd prime
+--------------------------------------------------------------------------------
+
+The following take an `n`-limb odd modulus `d` with `d_{n-1} \ne 0` and an
+operand already reduced to `[0, d)`, and are the implementation behind
+:func:`mpn_mod_sqrt`, :func:`gr_sqrt` over :ref:`fmpz_mod <fmpz-mod>` and
+:func:`fmpz_sqrtmod`. Primality of `d` is assumed and never checked.
+
+The ``preinv`` variants take ``dinv``, the precomputed inverse that
+:func:`flint_mpn_preinvn` produces from `d 2^{\mathrm{norm}}`, together with
+`\mathrm{norm} = \mathrm{clz}(d_{n-1})`, in the form a caller such as an
+:type:`mpn_mod` or :type:`fmpz_mod_ctx_t` context already has it. ``dinv`` may
+be ``NULL``, in which case the inverse is computed internally.
+
+Apart from the Jacobi symbol, which GMP exposes only on ``mpz``, the arithmetic
+is :func:`flint_mpn_mulmod_preinvn` and :func:`flint_mpn_powmod_preinvn`
+throughout.
+
+.. function:: int flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n)
+
+    Returns 1 if `a` is a square modulo the odd prime `d`, and 0 if it is not.
+
+    This uses the Jacobi symbol `\left(\frac{a}{d}\right)`, which is computed
+    by GMP in quasi-linear time; a return value of 0 means the symbol is `-1`, 
+    so it also proves that `a` is not a square for an odd `d` that is not prime,
+    while a return value of 1 proves nothing in that case.
+
+.. function:: int flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n)
+              int flint_mpn_sqrtmod_preinv(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n, nn_srcptr dinv, flint_bitcnt_t norm)
+
+    Sets *res* to a square root of `a` modulo the odd prime `d` and returns 1.
+
+    Returns 0, having set *res* to zero, when the Jacobi symbol rules a root
+    out; as above this is conclusive whether or not `d` is prime. Returns
+    `-1`, again setting *res* to zero, when the algorithm itself failed, which
+    happens only for a `d` that is not prime (or, with negligible probability,
+    for a prime whose least quadratic nonresidue exceeds `2^{20}`).
 
 Preconditioned modular multiplication
 --------------------------------------------------------------------------------
