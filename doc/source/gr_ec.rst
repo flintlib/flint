@@ -1026,6 +1026,148 @@ gain from doing it natively.
 
     Sets *res* to `(1/c) P`. Returns ``GR_DOMAIN`` if *c* is zero.
 
+Projective points: the witness
+-------------------------------------------------------------------------------
+
+.. function:: int gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res, gr_ptr w, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+
+    Sets *res* to `n P`, and multiplies *w* by every quantity that the
+    group law treated as nonzero along the way. The caller sets *w* to one
+    beforehand.
+
+    The addition formulas are polynomial and always compute something, but
+    the choice between adding, doubling and returning the point at infinity
+    is made by testing whether a quantity vanishes. Over a ring that is not
+    an integral domain that is not enough: modulo a composite `n` a
+    quantity can vanish for one prime factor and not another, and the
+    branch is then right for one and wrong for the other, so the result is
+    quietly meaningless.
+
+    A witness that is a unit says every branch was entitled to its
+    decision. Over `\mathbb{Z}/n\mathbb{Z}` that is `\gcd(w, n) = 1`, and a
+    gcd greater than one is both a proof that `n` is composite and a factor
+    of it. Primality proving and factorization want this from opposite
+    directions -- the first wants the run to have been sound, the second
+    wants it not to have been -- and :func:`ecpp_point_mul` is built on it.
+
+Montgomery curves: x-only arithmetic
+-------------------------------------------------------------------------------
+
+Points on `B y^2 = x^3 + A x^2 + x` carried as `(X : Z)` with `x = X/Z`,
+and no `y` at all.
+
+Dropping `y` costs the ability to add two arbitrary points -- the sum
+depends on `y`, and `x(P)` and `x(Q)` determine only the pair
+`\{x(P+Q), x(P-Q)\}` -- and buys three things. Doubling and *differential*
+addition, where `x(P-Q)` is supplied, need no inversion and fewer
+multiplications than any Weierstrass formula. The ladder built from them
+does the same work whatever the bits of the scalar are, so it leaks
+nothing through timing. And nothing in it branches on whether a quantity
+vanishes, which is what makes it meaningful over
+`\mathbb{Z}/n\mathbb{Z}` for a composite `n`, where the Weierstrass group
+law is not. Elliptic curve factorization wants all three; measured against
+:func:`gr_ec_jac_point_mul_fmpz` the ladder is also between 1.1 and 1.3
+times quicker.
+
+An `(X : Z)` pair is not a group element, so this is a representation of
+`x`-coordinates rather than a *gr* domain, and the functions take the base
+ring and the curve constant directly rather than a :type:`gr_ec_ctx_t`.
+The only curve datum the formulas read is
+`a_{24} = (A + 2)/4`.
+
+A Montgomery curve is a Weierstrass curve in disguise: `B v^2 = u^3 + A u^2
++ u` becomes `y^2 = x^3 + a x + b` under `x = (u + A/3)/B`, with
+`a = (3 - A^2)/(3B^2)` and `b = (2A^3 - 9A)/(27B^3)`. Everything else in
+this module -- point counting, division polynomials, the generic interface
+-- is reached through that map rather than directly.
+
+.. function:: int gr_ec_ctx_init_from_montgomery(gr_ec_ctx_t ctx, gr_ctx_t R, gr_srcptr A, gr_srcptr B)
+
+    Initializes *ctx* to the short Weierstrass curve corresponding to the
+    Montgomery curve `B y^2 = x^3 + A x^2 + x`, namely
+    `y^2 = x^3 + a x + b` with `a = (3 - A^2)/(3B^2)` and
+    `b = (2A^3 - 9A)/(27B^3)`. Needs 3 and *B* to be invertible.
+
+    This is how a Montgomery curve reaches the rest of the module. Point
+    counting, division polynomials, the generic interface and the group law
+    itself all work on the Weierstrass form; the x-only arithmetic below is
+    for where its speed, or its indifference to zero divisors, is the
+    point.
+
+.. function:: int gr_ec_montgomery_x_to_weierstrass(gr_ptr x, gr_srcptr u, gr_srcptr A, gr_srcptr B, gr_ctx_t R)
+              int gr_ec_weierstrass_x_to_montgomery(gr_ptr u, gr_srcptr x, gr_srcptr A, gr_srcptr B, gr_ctx_t R)
+
+    The x-coordinate half of that change of variables, `x = (u + A/3)/B`
+    and its inverse. Together with the ladder these carry a computation
+    into the x-only world and back.
+
+.. type:: gr_ec_xz_point_struct
+
+.. type:: gr_ec_xz_point_t
+
+    Contains a pointer (``coords``) to an array of two elements of the
+    base ring, holding `X` and `Z`. The point at infinity is `Z = 0`.
+
+.. function:: void gr_ec_xz_point_init(gr_ec_xz_point_t P, gr_ctx_t R)
+              void gr_ec_xz_point_clear(gr_ec_xz_point_t P, gr_ctx_t R)
+              void gr_ec_xz_point_swap(gr_ec_xz_point_t P, gr_ec_xz_point_t Q, gr_ctx_t R)
+
+    Memory management, over the base ring *R*.
+
+.. function:: int gr_ec_xz_point_set(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_ctx_t R)
+              int gr_ec_xz_point_zero(gr_ec_xz_point_t res, gr_ctx_t R)
+              truth_t gr_ec_xz_point_is_zero(const gr_ec_xz_point_t P, gr_ctx_t R)
+
+    Assignment, the point at infinity `(1 : 0)`, and the test for it.
+    Since an `x`-coordinate says nothing about which of `\pm P` it belongs
+    to, this is the only predicate on these points that means what it says.
+
+.. function:: int gr_ec_xz_point_set_x(gr_ec_xz_point_t res, gr_srcptr x, gr_ctx_t R)
+              int gr_ec_xz_point_get_x(gr_ptr x, const gr_ec_xz_point_t P, gr_ctx_t R)
+
+    Conversion to and from an affine `x`-coordinate. The second needs to
+    divide, so it needs `Z` to be invertible.
+
+.. function:: truth_t gr_ec_xz_point_equal(const gr_ec_xz_point_t P, const gr_ec_xz_point_t Q, gr_ctx_t R)
+
+    Whether `x(P) = x(Q)`, which as projective pairs is
+    `X_1 Z_2 = X_2 Z_1`. Note that this identifies `P` with `-P`.
+
+.. function:: int gr_ec_montgomery_a24(gr_ptr a24, gr_srcptr A, gr_ctx_t R)
+
+    Sets *a24* to `(A + 2)/4`, the only curve constant the formulas below
+    read. Returns ``GR_DOMAIN`` where 4 is not invertible, which over
+    `\mathbb{Z}/n\mathbb{Z}` means an even `n`.
+
+.. function:: int gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_srcptr a24, gr_ctx_t R)
+
+    Sets *res* to a representative of `x(2P)`, in two squarings and three
+    multiplications, testing nothing.
+
+.. function:: int gr_ec_xz_point_dadd(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const gr_ec_xz_point_t Q, const gr_ec_xz_point_t PmQ, gr_ctx_t R)
+
+    Sets *res* to a representative of `x(P + Q)`, given *PmQ* holding
+    `x(P - Q)`, in four multiplications and two squarings, testing nothing.
+
+    The formula needs `x(P-Q)` to be neither zero nor infinity, and this is
+    the caller's responsibility: `X = 0` there forces the result to
+    `Z = 0` and `Z = 0` forces it to `X = 0`, so it degenerates to
+    `(0 : 0)` and says nothing.
+
+.. function:: int gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const fmpz_t k, gr_srcptr a24, gr_ctx_t R)
+              int gr_ec_xz_point_mul_ui(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, ulong k, gr_srcptr a24, gr_ctx_t R)
+
+    Sets *res* to a representative of `x(kP)` by the Montgomery ladder.
+    The sign of *k* is immaterial, `x(-P)` being `x(P)`.
+
+    Two points are carried whose difference is always `P`, which is what
+    lets the differential addition be used: at every bit one of them is
+    doubled and the other becomes their sum, so the work per bit does not
+    depend on the bit. The two values of `x(P)` the differential addition
+    cannot take as a difference are settled before the ladder starts:
+    infinity is fixed by every `k`, and `x(P) = 0` is the point of order
+    two at the origin, which `k` fixes or kills according to its parity.
+
 Affine points
 -------------------------------------------------------------------------------
 

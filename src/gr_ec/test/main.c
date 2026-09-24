@@ -15,6 +15,8 @@
 #include "t-point.c"
 #include "t-aff_point.c"
 #include "t-jac_point.c"
+#include "t-xz_point.c"
+#include "t-witness.c"
 #include "t-convert.c"
 #include "t-cardinality.c"
 #include "t-order.c"
@@ -33,6 +35,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ec_point),
     TEST_FUNCTION(gr_ec_aff_point),
     TEST_FUNCTION(gr_ec_jac_point),
+    TEST_FUNCTION(gr_ec_xz_point),
+    TEST_FUNCTION(gr_ec_witness),
     TEST_FUNCTION(gr_ec_convert),
     TEST_FUNCTION(gr_ec_cardinality),
     TEST_FUNCTION(gr_ec_order),

@@ -148,6 +148,24 @@ typedef gr_ec_jac_point_struct gr_ec_jac_point_t[1];
 #define GR_EC_AFF_POINT_X(P, ctx) ((P)->coords)
 #define GR_EC_AFF_POINT_Y(P, ctx) GR_ENTRY((P)->coords, 1, GR_EC_SIZEOF_ELEM(ctx))
 
+/* Points on a Montgomery curve, x-only: (X : Z) with x = X/Z
+
+   An (X : Z) pair is not a group element -- two of them can be added only
+   when the x of their difference is also known -- so this is a
+   representation of x-coordinates rather than a gr domain, and the
+   functions take the base ring and the curve constant directly. */
+
+typedef struct
+{
+    gr_ptr coords;      /* X, Z */
+}
+gr_ec_xz_point_struct;
+
+typedef gr_ec_xz_point_struct gr_ec_xz_point_t[1];
+
+#define GR_EC_XZ_POINT_X(P, R) ((P)->coords)
+#define GR_EC_XZ_POINT_Z(P, R) GR_ENTRY((P)->coords, 1, (R)->sizeof_elem)
+
 #define GR_EC_JAC_POINT_X(P, ctx) ((P)->coords)
 #define GR_EC_JAC_POINT_Y(P, ctx) GR_ENTRY((P)->coords, 1, GR_EC_SIZEOF_ELEM(ctx))
 #define GR_EC_JAC_POINT_Z(P, ctx) GR_ENTRY((P)->coords, 2, GR_EC_SIZEOF_ELEM(ctx))
@@ -209,6 +227,30 @@ WARN_UNUSED_RESULT int gr_ec_ctx_discriminant(gr_ptr res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_j_invariant(gr_ptr res, gr_ec_ctx_t ctx);
 
 truth_t gr_ec_ctx_is_smooth(gr_ec_ctx_t ctx);
+
+/* Montgomery curves, x-only arithmetic */
+
+void gr_ec_xz_point_init(gr_ec_xz_point_t P, gr_ctx_t R);
+void gr_ec_xz_point_clear(gr_ec_xz_point_t P, gr_ctx_t R);
+void gr_ec_xz_point_swap(gr_ec_xz_point_t P, gr_ec_xz_point_t Q, gr_ctx_t R);
+
+WARN_UNUSED_RESULT int gr_ec_xz_point_set(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_zero(gr_ec_xz_point_t res, gr_ctx_t R);
+truth_t gr_ec_xz_point_is_zero(const gr_ec_xz_point_t P, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_set_x(gr_ec_xz_point_t res, gr_srcptr x, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_get_x(gr_ptr x, const gr_ec_xz_point_t P, gr_ctx_t R);
+truth_t gr_ec_xz_point_equal(const gr_ec_xz_point_t P, const gr_ec_xz_point_t Q, gr_ctx_t R);
+
+WARN_UNUSED_RESULT int gr_ec_montgomery_a24(gr_ptr a24, gr_srcptr A, gr_ctx_t R);
+
+WARN_UNUSED_RESULT int gr_ec_ctx_init_from_montgomery(gr_ec_ctx_t ctx, gr_ctx_t R, gr_srcptr A, gr_srcptr B);
+WARN_UNUSED_RESULT int gr_ec_montgomery_x_to_weierstrass(gr_ptr x, gr_srcptr u, gr_srcptr A, gr_srcptr B, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_weierstrass_x_to_montgomery(gr_ptr u, gr_srcptr x, gr_srcptr A, gr_srcptr B, gr_ctx_t R);
+
+WARN_UNUSED_RESULT int gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_srcptr a24, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_dadd(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const gr_ec_xz_point_t Q, const gr_ec_xz_point_t PmQ, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const fmpz_t k, gr_srcptr a24, gr_ctx_t R);
+WARN_UNUSED_RESULT int gr_ec_xz_point_mul_ui(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, ulong k, gr_srcptr a24, gr_ctx_t R);
 
 /* Division polynomials */
 
