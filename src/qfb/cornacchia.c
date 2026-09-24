@@ -11,9 +11,13 @@
 */
 
 #include "fmpz.h"
-#include "ecpp.h"
+#include "qfb.h"
 
 /*
+    Representing 4n by the principal form of discriminant D, which is what
+    Cornacchia's algorithm does: a solution of t^2 + |D| v^2 = 4n is the
+    same thing as a representation of 4n by x^2 + |D| y^2.
+
     Modified Cornacchia (Cohen, Algorithm 1.5.3): given a discriminant
     D < 0, an odd n with gcd(n, D) = 1 and a square root sqrtD of D
     modulo n, finds t, v >= 0 with t^2 + |D| v^2 = 4n. Returns 1 on
@@ -21,7 +25,7 @@
     algorithm fails).
 */
 int
-ecpp_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
+qfb_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
 {
     fmpz_t x0, a, b, l, r, absD;
     int result = 0;

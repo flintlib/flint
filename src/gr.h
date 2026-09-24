@@ -140,6 +140,7 @@ typedef enum
     GR_METHOD_CTX_GEN_NAME,
 
     GR_METHOD_CTX_BASE,
+    GR_METHOD_CTX_CARDINALITY_FMPZ,
 
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
@@ -756,7 +757,7 @@ typedef enum
     GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
-    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
+    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM, GR_CTX_GR_EC,
     GR_CTX_FEXPR,
     GR_CTX_DEBUG,
     GR_CTX_UNINITIALIZED,
@@ -1303,6 +1304,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) {
 
 GR_INLINE WARN_UNUSED_RESULT int gr_big_o_base_fmpz(gr_ptr res, gr_srcptr base, const fmpz_t exp, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, BIG_O_BASE_FMPZ)(res, base, exp, ctx); }
 
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_CARDINALITY_FMPZ)(res, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
 
@@ -1743,6 +1746,7 @@ void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable
 /* todo: just have gr_test_structure() */
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
+void gr_test_additive_group(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags);
 
 int gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags);
