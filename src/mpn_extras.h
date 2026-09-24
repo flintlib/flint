@@ -1548,6 +1548,7 @@ mp_size_t flint_mpn_gcd_full(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp
 
 void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm);
 void flint_mpn_mulmod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_powmod_preinvn(mp_ptr res, mp_srcptr a, mp_srcptr e, mp_size_t en, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
 
 #define MPN_MULMOD_PRECOND_NONE 0
 #define MPN_MULMOD_PRECOND_SHOUP 1

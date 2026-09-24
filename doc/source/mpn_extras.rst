@@ -1024,6 +1024,26 @@ Division and modular arithmetic with precomputed inverses
     We require `a` and `b` to be reduced modulo `d` before calling the
     function. 
 
+.. function:: void flint_mpn_powmod_preinvn(mp_ptr res, mp_srcptr a, mp_srcptr e, mp_size_t en, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+
+    Given a normalised integer `d` of `n` limbs with precomputed inverse
+    ``dinv`` provided by :func:`flint_mpn_preinvn`, computes `a^e \pmod{d}`
+    and stores the result in ``res``. The exponent is the nonnegative integer
+    held in the `en` limbs at `e`, which need not be normalised; `a` and
+    ``res`` have `n` limbs of space.
+
+    The shift convention is that of :func:`flint_mpn_mulmod_preinvn`: if `a`
+    and `d` have been shifted left by ``norm`` bits so that `d` is
+    normalised, then ``res`` carries the same shift. The exponent is not
+    shifted. Aliasing of ``res`` with `a` or `e` is not permitted.
+
+    We require `a` to be reduced modulo `d`, and the unshifted modulus
+    `d 2^{-\mathrm{norm}}` to be at least 2.
+
+    A left to right sliding window is used, with the odd powers
+    `a, a^3, \ldots, a^{2^w - 1}` precomputed for a window width `w` chosen
+    from the size of the exponent.
+
 .. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
 
     Version of :func:`flint_mpn_mulmod_preinv1` specialized for two limbs.
@@ -1049,7 +1069,11 @@ The ``preinv`` variants take ``dinv``, the precomputed inverse that
 :func:`flint_mpn_preinvn` produces from `d 2^{\mathrm{norm}}`, together with
 `\mathrm{norm} = \mathrm{clz}(d_{n-1})`, in the form a caller such as an
 :type:`mpn_mod` or :type:`fmpz_mod_ctx_t` context already has it. ``dinv`` may
-be ``NULL``, in which case an inverse is computed internally if one is needed.
+be ``NULL``, in which case the inverse is computed internally.
+
+Apart from the Jacobi symbol, which GMP exposes only on ``mpz``, the arithmetic
+is :func:`flint_mpn_mulmod_preinvn` and :func:`flint_mpn_powmod_preinvn`
+throughout.
 
 .. function:: int flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n)
 

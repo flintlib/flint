@@ -23,6 +23,7 @@
 #include "t-mpz_div.c"
 #include "t-pow.c"
 #include "t-ndiv_qr.c"
+#include "t-powmod.c"
 #include "t-sqrtmod.c"
 #include "t-sqrtrem.c"
 #include "t-tdiv_qr.c"
@@ -76,6 +77,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpz_div),
     TEST_FUNCTION(flint_mpn_pow),
     TEST_FUNCTION(flint_mpn_ndiv_qr),
+    TEST_FUNCTION(flint_mpn_powmod_preinvn),
     TEST_FUNCTION(flint_mpn_sqrtmod),
     TEST_FUNCTION(flint_mpn_sqrtrem),
     TEST_FUNCTION(flint_mpn_tdiv_qr),

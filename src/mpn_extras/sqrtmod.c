@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmpcompat.h"
 #include "mpn_extras.h"
 
 /* A length-n mpn read as an mpz; GMP wants the top limb to be nonzero. */
@@ -22,16 +21,10 @@ _mpn_roinit(mpz_t z, nn_srcptr x, mp_size_t n)
     mpz_roinit_n(z, (mp_srcptr) x, n);
 }
 
-/* The reverse, zero-padding to exactly n limbs; z must be in [0, 2^(n B)). */
-static void
-_mpn_set_mpz(nn_ptr r, mp_size_t n, mpz_srcptr z)
-{
-    mp_size_t zn = z->_mp_size;
-
-    flint_mpn_copyi(r, z->_mp_d, zn);
-    flint_mpn_zero(r + zn, n - zn);
-}
-
+/*
+    GMP exposes the Jacobi symbol only on mpz, so this is the one place
+    where a read-only view is taken; nothing is copied or allocated.
+*/
 int
 flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n)
 {
@@ -46,6 +39,25 @@ flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n)
     return mpz_jacobi(az, dz) != -1;
 }
 
+/* To and from the representation flint_mpn_mulmod_preinvn works in. */
+static void
+_scale(nn_ptr r, nn_srcptr x, mp_size_t n, flint_bitcnt_t norm)
+{
+    if (norm)
+        mpn_lshift(r, x, n, norm);
+    else
+        flint_mpn_copyi(r, x, n);
+}
+
+static void
+_unscale(nn_ptr r, nn_srcptr x, mp_size_t n, flint_bitcnt_t norm)
+{
+    if (norm)
+        mpn_rshift(r, x, n, norm);
+    else
+        flint_mpn_copyi(r, x, n);
+}
+
 /*
     Writing d - 1 = q 2^s with q odd, s = 1 and s = 2 are closed forms and
     otherwise we walk down the 2-part of the group (Tonelli and Shanks)
@@ -53,57 +65,71 @@ flint_mpn_is_square_mod(nn_srcptr a, nn_srcptr d, mp_size_t n)
 
     Returns 1 on success, 0 when the Jacobi symbol rules out a root, and
     -1 when the algorithm itself failed, which means d is not prime.
-
-    The exponentiations go to mpz_powm, which is hard to beat, but the
-    descent is worth doing in mpn arithmetic with a precomputed inverse.
-    It runs on values scaled by 2^norm, the representation in which
-    flint_mpn_mulmod_preinvn works; scaling is exact in both directions
-    because a scaled value is by construction below the scaled modulus.
 */
 static int
 _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
         nn_srcptr dinv, flint_bitcnt_t norm)
 {
-    mpz_t az, dz, q, e, b, c, r, t, u;
-    slong s, i, j, m, iter;
+    nn_ptr dnormed, dinv_tmp, A, ONE, R, T, C, B, U, q, e;
+    slong i, j, s, m, iter;
+    mp_size_t qn;
     ulong k;
     int success = 1;
-
-    _mpn_roinit(az, a, n);
-    _mpn_roinit(dz, d, n);
+    TMP_INIT;
 
     /* a Jacobi symbol of -1 rules out a root without knowing d to be prime */
-    if (mpz_jacobi(az, dz) == -1)
+    if (!flint_mpn_is_square_mod(a, d, n))
     {
         flint_mpn_zero(res, n);
         return 0;
     }
 
-    if (flint_mpz_cmp_ui(az, 1) <= 0)
+    if (a[0] <= 1 && flint_mpn_zero_p(a + 1, n - 1))
     {
         flint_mpn_copyi(res, a, n);
         return 1;
     }
 
-    mpz_init(q);
-    mpz_init(e);
-    mpz_init(b);
-    mpz_init(c);
-    mpz_init(r);
-    mpz_init(t);
-    mpz_init(u);
+    TMP_START;
+
+    dnormed = TMP_ALLOC((11 * n + 2) * sizeof(ulong));
+    dinv_tmp = dnormed + n;
+    A = dinv_tmp + n; ONE = A + n; R = ONE + n; T = R + n;
+    C = T + n; B = C + n; U = B + n; q = U + n; e = q + n;
+
+    _scale(dnormed, d, n, norm);
+
+    if (dinv == NULL)
+    {
+        flint_mpn_preinvn(dinv_tmp, dnormed, n);
+        dinv = dinv_tmp;
+    }
+
+    flint_mpn_zero(ONE, n);
+    ONE[0] = UWORD(1) << norm;
 
     /* d - 1 = q 2^s, q odd */
-    flint_mpz_sub_ui(q, dz, 1);
-    s = mpz_scan1(q, 0);
-    mpz_tdiv_q_2exp(q, q, s);
+    mpn_sub_1(q, d, n, 1);
+
+    for (i = 0; q[i] == 0; i++)
+        ;
+
+    s = i * FLINT_BITS + flint_ctz(q[i]);
+    qn = n - i;
+
+    if (s % FLINT_BITS)
+        mpn_rshift(q, q + i, qn, s % FLINT_BITS);
+    else
+        flint_mpn_copyi(q, q + i, qn);
 
     if (s == 1)
     {
         /* d = 3 mod 4, so the root is a^((d+1)/4) */
-        flint_mpz_add_ui(e, dz, 1);
-        mpz_tdiv_q_2exp(e, e, 2);
-        mpz_powm(r, az, e, dz);
+        e[n] = mpn_add_1(e, d, n, 1);
+        mpn_rshift(e, e, n + 1, 2);
+
+        _scale(A, a, n, norm);
+        flint_mpn_powmod_preinvn(R, A, e, n + 1, n, dnormed, dinv, norm);
     }
     else if (s == 2)
     {
@@ -113,33 +139,32 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
             variant in the old fmpz_sqrtmod needed a second one half of
             the time.
         */
-        flint_mpz_sub_ui(e, dz, 5);
-        mpz_tdiv_q_2exp(e, e, 3);
+        mpn_sub_1(e, d, n, 5);
+        mpn_rshift(e, e, n, 3);
 
-        mpz_mul_2exp(t, az, 1); mpz_mod(t, t, dz);          /* t = 2a */
-        mpz_powm(b, t, e, dz);
-        mpz_mul(u, b, b); mpz_mod(u, u, dz);
-        mpz_mul(u, u, t); mpz_mod(u, u, dz);                /* u = y */
-        flint_mpz_sub_ui(u, u, 1);
-        mpz_mul(b, b, az); mpz_mod(b, b, dz);
-        mpz_mul(r, b, u); mpz_mod(r, r, dz);
+        _scale(A, a, n, norm);
+        flint_mpn_addmod_n(T, A, A, dnormed, n);                    /* T = 2a */
+        flint_mpn_powmod_preinvn(B, T, e, n, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_preinvn(U, B, B, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_preinvn(U, U, T, n, dnormed, dinv, norm);   /* U = y */
+        flint_mpn_submod_n(U, U, ONE, dnormed, n);
+        flint_mpn_mulmod_preinvn(B, B, A, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_preinvn(R, B, U, n, dnormed, dinv, norm);
     }
     else
     {
-        nn_ptr dnormed, dinv_tmp, R, T, C, B, U, ONE;
-        TMP_INIT;
-
         /*
             a^((q-1)/2) yields both a^((q+1)/2) and a^q for a multiplication
             each, so the descent is set up with two exponentiations, not
             three.
         */
-        flint_mpz_sub_ui(e, q, 1);
-        mpz_tdiv_q_2exp(e, e, 1);
+        mpn_sub_1(e, q, qn, 1);
+        mpn_rshift(e, e, qn, 1);
 
-        mpz_powm(u, az, e, dz);                             /* u = a^((q-1)/2) */
-        mpz_mul(r, u, az); mpz_mod(r, r, dz);               /* r = a^((q+1)/2) */
-        mpz_mul(t, r, u); mpz_mod(t, t, dz);                /* t = a^q */
+        _scale(A, a, n, norm);
+        flint_mpn_powmod_preinvn(U, A, e, qn, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_preinvn(R, U, A, n, dnormed, dinv, norm);   /* a^((q+1)/2) */
+        flint_mpn_mulmod_preinvn(T, R, U, n, dnormed, dinv, norm);   /* a^q */
 
         /*
             The least quadratic nonresidue, which is well within reach.
@@ -149,9 +174,10 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
         */
         for (k = 3; ; k += 2)
         {
-            flint_mpz_set_ui(b, k);
+            flint_mpn_zero(B, n);
+            B[0] = k;
 
-            if (mpz_jacobi(b, dz) == -1)
+            if (!flint_mpn_is_square_mod(B, d, n))
                 break;
 
             if (k >= (UWORD(1) << 20))
@@ -162,38 +188,8 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
             }
         }
 
-        mpz_powm(c, b, q, dz);                              /* c = k^q */
-
-        TMP_START;
-
-        dnormed = TMP_ALLOC((8 * n) * sizeof(ulong));
-        R = dnormed + n; T = R + n; C = T + n;
-        B = C + n; U = B + n; ONE = U + n; dinv_tmp = ONE + n;
-
-        if (norm)
-            mpn_lshift(dnormed, d, n, norm);
-        else
-            flint_mpn_copyi(dnormed, d, n);
-
-        if (dinv == NULL)
-        {
-            flint_mpn_preinvn(dinv_tmp, dnormed, n);
-            dinv = dinv_tmp;
-        }
-
-        _mpn_set_mpz(R, n, r);
-        _mpn_set_mpz(T, n, t);
-        _mpn_set_mpz(C, n, c);
-
-        if (norm)
-        {
-            mpn_lshift(R, R, n, norm);
-            mpn_lshift(T, T, n, norm);
-            mpn_lshift(C, C, n, norm);
-        }
-
-        flint_mpn_zero(ONE, n);
-        ONE[0] = UWORD(1) << norm;
+        _scale(B, B, n, norm);
+        flint_mpn_powmod_preinvn(C, B, q, qn, n, dnormed, dinv, norm);
 
         m = s;
 
@@ -203,7 +199,7 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
             if (iter >= s)
             {
                 success = -1;
-                break;
+                goto cleanup;
             }
 
             /* the least i with 0 < i < m and T^(2^i) = 1 */
@@ -221,7 +217,7 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
             {
                 /* again, only reachable for a modulus that is not prime */
                 success = -1;
-                break;
+                goto cleanup;
             }
 
             /* B = C^(2^(m - i - 1)) */
@@ -235,32 +231,15 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
             flint_mpn_mulmod_preinvn(T, T, C, n, dnormed, dinv, norm);
             flint_mpn_mulmod_preinvn(R, R, B, n, dnormed, dinv, norm);
         }
-
-        if (success == 1)
-        {
-            if (norm)
-                mpn_rshift(R, R, n, norm);
-
-            flint_mpn_copyi(res, R, n);
-        }
-
-        TMP_END;
-        goto cleanup;
     }
 
-    _mpn_set_mpz(res, n, r);
+    _unscale(res, R, n, norm);
 
 cleanup:
     if (success != 1)
         flint_mpn_zero(res, n);
 
-    mpz_clear(q);
-    mpz_clear(e);
-    mpz_clear(b);
-    mpz_clear(c);
-    mpz_clear(r);
-    mpz_clear(t);
-    mpz_clear(u);
+    TMP_END;
 
     return success;
 }
