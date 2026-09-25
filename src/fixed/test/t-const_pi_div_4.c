@@ -50,6 +50,7 @@ TEST_FUNCTION_START(fixed_const_pi_div_4, state)
 
     for (iter = 0; iter < 2; iter++)
     {
+        flint_set_num_threads(1 + n_randint(state, 4));
         for (i = 0; i < 12; i++)
         {
             slong n = sizes[i] + (slong) n_randint(state, 4);
@@ -67,5 +68,6 @@ TEST_FUNCTION_START(fixed_const_pi_div_4, state)
     }
 
     arb_clear(ref);
+    flint_set_num_threads(1);
     TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,6 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
-#include "arb.h"
 #include "fixed.h"
 
 /* Thread-local cache of fixed-point logarithms of the first
@@ -29,15 +28,12 @@
    being one-sided (at most the true value, short by less than one
    ulp of the limbs read).
 
-   The values are computed by arb_log_primes_vec_bsplit (through
-   arb's own log(p) cache for up to 13 primes, which also serves the
-   small precisions from its static table; the Machin-type sets of
-   machin_tab.c cover up to 48 primes) and floored through arb.
-   An mpn binary splitting of the same Machin formulas was
-   prototyped (see the fixed-log-primes-bsplit patch): 5-13% faster
-   than arb's, mostly through a better product dispatch for the
-   short-by-long products of the tree -- a change that belongs in
-   flint_mpn_mul itself, after which the wrapper here inherits it. */
+   The values come from _fixed_log_primes_vec_fball (machin_bsplit.c:
+   the Machin-type sets of machin_tab.c evaluated by binary splitting
+   in fball arithmetic, each atanh term by Zuniga's series [Zun2025]
+   for the logarithm of the same ratio beyond a crossover precision,
+   or arb's static 4608-bit table of the first 13 logarithms at small
+   precisions), floored through the balls. */
 
 FLINT_TLS_PREFIX nn_ptr _fixed_log_primes = NULL;
 FLINT_TLS_PREFIX slong _fixed_log_primes_n = 0;
@@ -54,36 +50,28 @@ _fixed_log_primes_cleanup(void)
     _fixed_log_primes_cleanup_registered = 0;
 }
 
-/* e = floor(x 2^(64 (nc - 1))) into nc limbs if x's radius determines
-   that floor; returns 0 otherwise */
-static int
-_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec)
+/* e_j = floor(v_j B^(nc - 1)) into nc limbs for j < num, if the balls
+   determine these floors; returns 0 otherwise */
+int
+_fixed_store_floors(nn_ptr e, slong nc, fball_struct * v, slong num)
 {
-    arb_t y;
-    fmpz_t f;
-    int ok;
+    slong j;
 
-    arb_init(y);
-    fmpz_init(f);
-    arb_mul_2exp_si(y, x, FLINT_BITS * (nc - 1));
-    arb_floor(y, y, FLINT_MAX(prec, FLINT_BITS * nc) + 64);
-    ok = arb_get_unique_fmpz(f, y);
-    if (ok)
+    for (j = 0; j < num; j++)
     {
-        FLINT_ASSERT(fmpz_sgn(f) > 0 && fmpz_bits(f) <= FLINT_BITS * nc);
-        fmpz_get_ui_array(e, nc, f);
+        /* v_j < B: the floor of (v_j / B) B^nc */
+        fball_mul_2exp_si(v + j, -FLINT_BITS);
+        if (!fball_get_fixed_floor(e + j * nc, nc, v + j))
+            return 0;
     }
-    arb_clear(y);
-    fmpz_clear(f);
-    return ok;
+    return 1;
 }
 
 void
 _fixed_log_primes_ensure(slong num, slong nv)
 {
-    slong nc, j, wp;
-    arb_ptr lp;
-    n_primes_t iter;
+    slong nc, j, guard;
+    fball_struct * v;
 
     FLINT_ASSERT(num >= 1 && num <= FIXED_LOG_PRIMES_MAX);
 
@@ -99,46 +87,22 @@ _fixed_log_primes_ensure(slong num, slong nv)
     _fixed_log_primes_n = nc;
     _fixed_log_primes_num = num;
 
-    wp = FLINT_BITS * nc + 64;
-    if (num <= ARB_LOG_PRIME_CACHE_NUM)
-    {
-        _arb_log_p_ensure_cached(wp);
-        lp = (arb_ptr) _arb_log_p_cache_vec();
-    }
-    else
-    {
-        lp = _arb_vec_init(num);
-        arb_log_primes_vec_bsplit(lp, num, wp);
-    }
-
-    n_primes_init(iter);
+    v = flint_malloc(num * sizeof(fball_struct));
     for (j = 0; j < num; j++)
+        fball_init(v + j);
+
+    /* an undetermined floor (a value within the radius of a grid
+       point: astronomically rare) is retried at higher precision */
+    for (guard = 2; ; guard *= 2)
     {
-        nn_ptr e = _fixed_log_primes + j * nc;
-        ulong p = n_primes_next(iter);
-
-        if (!_store_floor(e, lp + j, nc, wp))
-        {
-            /* the floor sits within the radius of an integer
-               (astronomically rare): recompute at increasing precision
-               until it is determined */
-            arb_t x;
-            slong p2;
-
-            arb_init(x);
-            for (p2 = 2 * wp; ; p2 *= 2)
-            {
-                arb_log_ui(x, p, p2);
-                if (_store_floor(e, x, nc, p2))
-                    break;
-            }
-            arb_clear(x);
-        }
+        _fixed_log_primes_vec_fball(v, num, nc + guard);
+        if (_fixed_store_floors(_fixed_log_primes, nc, v, num))
+            break;
     }
-    n_primes_clear(iter);
 
-    if (num > ARB_LOG_PRIME_CACHE_NUM)
-        _arb_vec_clear(lp, num);
+    for (j = 0; j < num; j++)
+        fball_clear(v + j);
+    flint_free(v);
 
     if (!_fixed_log_primes_cleanup_registered)
     {

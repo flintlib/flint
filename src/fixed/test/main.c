@@ -12,12 +12,16 @@
 /* Include functions *********************************************************/
 
 #include "t-atan_bitwise_rs.c"
+#include "t-atan_frac_bsplit.c"
 #include "t-bitwise_rs_stress.c"
+#include "t-const_euler.c"
 #include "t-const_log2.c"
+#include "t-const_misc.c"
 #include "t-const_pi_div_4.c"
 #include "t-exp_bitwise_rs.c"
 #include "t-exp_rs.c"
 #include "t-log1p_bitwise_rs.c"
+#include "t-machin_caches.c"
 #include "t-sin_cos_bitwise_rs.c"
 #include "t-rel_tab.c"
 #include "t-sin_cos_diophantine.c"
@@ -27,6 +31,8 @@
 #include "t-sqrt_newton.c"
 #include "t-tab_bsplit.c"
 #include "t-fball.c"
+#include "t-hypgeom_series.c"
+#include "t-newton.c"
 #include "t-exp_diophantine.c"
 #include "t-exp_notab.c"
 #include "t-exp_reduced.c"
@@ -41,12 +47,16 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(fixed_atan_bitwise_rs),
+    TEST_FUNCTION(fixed_atan_frac_bsplit),
     TEST_FUNCTION(fixed_bitwise_rs_stress),
+    TEST_FUNCTION(fixed_const_euler),
     TEST_FUNCTION(fixed_const_log2),
+    TEST_FUNCTION(fixed_const_misc),
     TEST_FUNCTION(fixed_const_pi_div_4),
     TEST_FUNCTION(fixed_exp_bitwise_rs),
     TEST_FUNCTION(fixed_exp_rs),
     TEST_FUNCTION(fixed_log1p_bitwise_rs),
+    TEST_FUNCTION(fixed_machin_caches),
     TEST_FUNCTION(fixed_sin_cos_bitwise_rs),
     TEST_FUNCTION(fixed_rel_tab),
     TEST_FUNCTION(fixed_sin_cos_diophantine),
@@ -56,6 +66,8 @@ test_struct tests[] =
     TEST_FUNCTION(fixed_sqrt_newton),
     TEST_FUNCTION(fixed_tab_bsplit),
     TEST_FUNCTION(fixed_fball),
+    TEST_FUNCTION(fixed_hypgeom_series),
+    TEST_FUNCTION(fixed_newton),
     TEST_FUNCTION(fixed_exp_diophantine),
     TEST_FUNCTION(fixed_exp_notab),
     TEST_FUNCTION(fixed_exp_reduced),

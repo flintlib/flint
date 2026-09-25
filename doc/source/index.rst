@@ -213,7 +213,6 @@ Real and complex numbers
    acb_theta.rst
    acb_dirichlet.rst
    bernoulli.rst
-   hypgeom.rst
    partitions.rst
    arb_calc.rst
    acb_calc.rst

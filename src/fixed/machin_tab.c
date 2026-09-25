@@ -1265,6 +1265,20 @@ fixed_machin_get_c_row(fmpz * row, const fixed_machin_struct * tab, slong i)
     }
 }
 
+/* the coefficient magnitudes of row i (num entries of *climbs limbs,
+   row major) and their signs (nonzero for negative), without going
+   through fmpz; valid until the thread's cache is cleared */
+nn_srcptr
+fixed_machin_c_row_raw(const fixed_machin_struct * tab, slong i,
+    slong * climbs, const unsigned char ** csign)
+{
+    const machin_cache_entry * e = machin_coeffs(tab);
+
+    *climbs = e->climbs;
+    *csign = e->csign + i * tab->num;
+    return e->c + i * tab->num * e->climbs;
+}
+
 slong
 fixed_machin_table_max(int gaussian)
 {

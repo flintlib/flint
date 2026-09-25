@@ -56,6 +56,12 @@ TEST_FUNCTION_START(fixed_div_newton, state)
             n = 1 + n_randint(state, 50);
             an = 1 + n_randint(state, 50);
         }
+        else if (n_randint(state, 8) == 0)
+        {
+            /* the third-order steps from 1000 limbs */
+            n = 1000 + n_randint(state, 1500);
+            an = 1 + n_randint(state, 2500);
+        }
         else
         {
             n = 1 + n_randint(state, 600);

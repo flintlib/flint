@@ -14,6 +14,10 @@
 #include "mpn_extras.h"
 #include "fixed.h"
 
+/* subtrees of at least this many terms (~49000 bits of output) run their
+   halves on two threads when the thread budget allows */
+#define FIXED_PAR_TERMS 4096
+
 /* Same hypergeometric series as arb_const_log2 -- this is Zuniga's
    d = 2 Ramanujan-type identity [Zun2025, Eq. 18], the fastest
    known single series for log 2 (binary splitting cost
@@ -72,7 +76,7 @@ _fball_set_mpn2(fball_t x, nn_srcptr d, slong len, int negative)
     x->size = len - t;
     x->exp = len;
     x->negative = negative && (len > t);
-    x->err = 0.0;
+    x->err = 0;
 }
 
 /* exact P, Q, T over [a, b), 1 <= b - a <= L2_BS_BLK */
@@ -209,6 +213,24 @@ log2_bsplit_basecase(fball_t P, fball_t Q, fball_t T, slong a, slong b,
     _fball_set_mpn2(T, S, ls, 0);
 }
 
+typedef struct
+{
+    fball_struct * P, * Q, * T;
+    slong a, b, n;
+    int need_p;
+}
+log2_bsplit_args;
+
+static void log2_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b,
+    slong n, int need_p);
+
+static void
+_log2_bsplit_worker(void * arg)
+{
+    log2_bsplit_args * A = (log2_bsplit_args *) arg;
+    log2_bsplit(A->P, A->Q, A->T, A->a, A->b, A->n, A->need_p);
+}
+
 static void
 log2_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b, slong n,
     int need_p)
@@ -221,21 +243,35 @@ log2_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b, slong n,
     {
         slong m = a + (b - a) / 2;
         fball_t P2, Q2, T2;
+        /* the rule of FIXED_PAR_CAP, with the bits of Q (and T) over
+           [a, b) estimated */
+        int par = b - a >= FIXED_PAR_TERMS && flint_get_num_threads() >= 2;
+        int above = par && (double) (b - a) * (2.0 * log2((double) b) + 18.0)
+            > FIXED_PAR_CAP * FLINT_BITS * (double) n;
 
         fball_init(P2);
         fball_init(Q2);
         fball_init(T2);
 
-        log2_bsplit(P, Q, T, a, m, n, 1);
-        log2_bsplit(P2, Q2, T2, m, b, n, need_p);
+        if (par && !above)
+        {
+            /* the halves on two threads (the right one's locals are
+               its own; the leaves use only the stack) */
+            log2_bsplit_args L, R;
+            L.P = P; L.Q = Q; L.T = T; L.a = a; L.b = m; L.n = n;
+            L.need_p = 1;
+            R.P = P2; R.Q = Q2; R.T = T2; R.a = m; R.b = b; R.n = n;
+            R.need_p = need_p;
+            _fixed_parallel_pair(_log2_bsplit_worker, &L,
+                _log2_bsplit_worker, &R);
+        }
+        else
+        {
+            log2_bsplit(P, Q, T, a, m, n, 1);
+            log2_bsplit(P2, Q2, T2, m, b, n, need_p);
+        }
 
-        fball_mul(T, T, Q2, n);         /* T1 Q2 */
-        fball_mul(T2, T2, P, n);        /* P1 T2 */
-        fball_add(T, T, T2, n);
-
-        fball_mul(Q, Q, Q2, n);
-        if (need_p)
-            fball_mul(P, P, P2, n);
+        _fball_pqt_merge(P, Q, T, P2, Q2, T2, need_p, n, above);
 
         fball_clear(P2);
         fball_clear(Q2);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,10 +13,10 @@
 #include "fixed.h"
 
 static void
-arb_const_apery_eval(arb_t s, slong prec)
+arb_const_zeta5_eval(arb_t s, slong prec)
 {
-    /* Zuniga's 2023-vi series (fixed/const_zeta3.c) */
-    _fixed_constant_arb(s, fball_const_zeta3, prec);
+    /* Zhi-Wei Sun's identity (fixed/const_zeta5.c) */
+    _fixed_constant_arb(s, fball_const_zeta5, prec);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_apery, arb_const_apery_eval)
+ARB_DEF_CACHED_CONSTANT(arb_const_zeta5, arb_const_zeta5_eval)

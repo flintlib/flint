@@ -29,7 +29,7 @@
 
        sin(x) = sqrt(1 - cos^2) = sqrt(2 g - g^2),
 
-   through mpn_sqrtrem at small sizes and fixed_sqrt_newton above
+   through flint_mpn_sqrtrem at small sizes and fixed_sqrt_newton above
    the cutoff, the input taken at a limb position of matching parity
    so that the root placement is a limb copy (the same
    normalization-free shape as the burst driver's slice roots).
@@ -161,7 +161,7 @@ _fixed_sin_cos_notab_r(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
         nn_ptr V = t, S = s;                /* reuse */
         flint_mpn_zero(V, wn);
         flint_mpn_copyi(V + wn, w, l);
-        mpn_sqrtrem(S, NULL, V, wn + l);
+        flint_mpn_sqrtrem(S, NULL, V, wn + l);
         {
             slong sl = (wn + l + 1) / 2;
             flint_mpn_zero(ysin, n + 1);

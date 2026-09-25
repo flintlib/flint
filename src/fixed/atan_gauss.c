@@ -11,7 +11,6 @@
 
 #include "flint.h"
 #include "mpn_extras.h"
-#include "fmpq.h"
 #include "arb.h"
 #include "fixed.h"
 
@@ -22,8 +21,11 @@
    of log_primes.c: _fixed_atan_gauss_n limbs per entry, a unit limb
    on top (theta < pi < 4), the lowest fraction limb a guard, each
    entry the exact floor of theta B^(n-1) so that shorter reads are
-   exact floors too.  The values come from
-   arb_atan_gauss_primes_vec_bsplit (up to 64 angles), doubled. */
+   exact floors too.  The values come from _fixed_atan_gauss_vec_fball
+   (machin_bsplit.c: the Machin-type sets of machin_tab.c by binary
+   splitting in fball arithmetic, single arctangents of small quotients
+   between neighbouring primes beyond, arb's static table of the first
+   13 at small precisions). */
 
 /* real and imaginary parts of the first 64 nonreal Gaussian primes */
 const signed char _fixed_gaussian_primes[2 * FIXED_ATAN_GAUSS_MAX] = {
@@ -50,46 +52,33 @@ _fixed_atan_gauss_cleanup(void)
     _fixed_atan_gauss_cleanup_registered = 0;
 }
 
-static int
-_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec)
-{
-    arb_t y;
-    fmpz_t f;
-    int ok;
-
-    arb_init(y);
-    fmpz_init(f);
-    arb_mul_2exp_si(y, x, FLINT_BITS * (nc - 1));
-    arb_floor(y, y, FLINT_MAX(prec, FLINT_BITS * nc) + 64);
-    ok = arb_get_unique_fmpz(f, y);
-    if (ok)
-    {
-        FLINT_ASSERT(fmpz_sgn(f) > 0 && fmpz_bits(f) <= FLINT_BITS * nc);
-        fmpz_get_ui_array(e, nc, f);
-    }
-    arb_clear(y);
-    fmpz_clear(f);
-    return ok;
-}
-
-
-/* res_j = theta_j = 2 arg(pi_j), j < num, as arb balls at prec bits:
-   arb_atan_gauss_primes_vec_bsplit gives the arguments themselves
-   (from the Machin-type sets of machin_tab.c, up to 48 angles;
-   single arctangents of small quotients between neighbouring primes
-   beyond), doubled here as arb's own cache doubles them */
+/* res_j = theta_j = 2 arg(pi_j), j < num, as arb balls at prec bits */
 void
 _fixed_atan_gauss_vec(arb_ptr res, slong num, slong prec)
 {
-    arb_atan_gauss_primes_vec_bsplit(res, num, prec);
-    _arb_vec_scalar_mul_2exp_si(res, res, num, 1);
+    fball_struct * v;
+    slong j;
+
+    v = flint_malloc(num * sizeof(fball_struct));
+    for (j = 0; j < num; j++)
+        fball_init(v + j);
+
+    _fixed_atan_gauss_vec_fball(v, num, (prec + FLINT_BITS - 1) / FLINT_BITS + 2);
+
+    for (j = 0; j < num; j++)
+    {
+        fball_get_arb(res + j, v + j);
+        arb_set_round(res + j, res + j, prec);
+        fball_clear(v + j);
+    }
+    flint_free(v);
 }
 
 void
 _fixed_atan_gauss_ensure(slong num, slong nv)
 {
-    slong nc, j, wp;
-    arb_ptr th;
+    slong nc, j, guard;
+    fball_struct * v;
 
     FLINT_ASSERT(num >= 1 && num <= FIXED_ATAN_GAUSS_MAX);
 
@@ -104,43 +93,22 @@ _fixed_atan_gauss_ensure(slong num, slong nv)
     _fixed_atan_gauss_n = nc;
     _fixed_atan_gauss_num = num;
 
-    wp = FLINT_BITS * nc + 64;
-    th = _arb_vec_init(num);
-    _fixed_atan_gauss_vec(th, num, wp);
-
+    v = flint_malloc(num * sizeof(fball_struct));
     for (j = 0; j < num; j++)
+        fball_init(v + j);
+
+    /* undetermined floors (astronomically rare) are retried at higher
+       precision */
+    for (guard = 2; ; guard *= 2)
     {
-        nn_ptr e = _fixed_atan_gauss + j * nc;
-
-        if (!_store_floor(e, th + j, nc, wp))
-        {
-            /* undetermined floor (astronomically rare): recompute the
-               angle at increasing precision */
-            arb_t x, y;
-            fmpq_t q;
-            slong p2, a = _fixed_gaussian_primes[2 * j],
-                b = _fixed_gaussian_primes[2 * j + 1];
-
-            arb_init(x);
-            arb_init(y);
-            fmpq_init(q);
-            for (p2 = 2 * wp; ; p2 *= 2)
-            {
-                /* 2 arg(a + b i) = 2 atan(b/a) for a > 0 */
-                fmpq_set_si(q, b, a);
-                arb_set_fmpq(x, q, p2);
-                arb_atan(y, x, p2);
-                arb_mul_2exp_si(y, y, 1);
-                if (_store_floor(e, y, nc, p2))
-                    break;
-            }
-            arb_clear(x);
-            arb_clear(y);
-            fmpq_clear(q);
-        }
+        _fixed_atan_gauss_vec_fball(v, num, nc + guard);
+        if (_fixed_store_floors(_fixed_atan_gauss, nc, v, num))
+            break;
     }
 
-    _arb_vec_clear(th, num);
+    for (j = 0; j < num; j++)
+        fball_clear(v + j);
+    flint_free(v);
 
     if (!_fixed_atan_gauss_cleanup_registered)
     {

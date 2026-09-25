@@ -14,6 +14,10 @@
 #include "mpn_extras.h"
 #include "fixed.h"
 
+/* subtrees of at least this many terms (~48000 bits of output) run their
+   halves on two threads when the thread budget allows */
+#define FIXED_PAR_TERMS 1024
+
 /* Chudnovsky:
 
        1/pi = 12 sum_{k>=0} (-1)^k (6k)! (A0 + A1 k)
@@ -101,7 +105,7 @@ _fball_set_mpn(fball_t x, nn_srcptr d, slong len, int negative)
     x->size = len - t;
     x->exp = len;
     x->negative = negative && (len > t);
-    x->err = 0.0;
+    x->err = 0;
 }
 
 /* exact P, Q, T over [a, b), 1 <= b - a <= PI_BS_BLK; the leftmost
@@ -267,6 +271,25 @@ pi_bsplit_basecase(fball_t P, fball_t Q, fball_t T, slong a, slong b,
    need_p is set: the parent's T merge uses the P of its LEFT child,
    while the P of a right child only feeds the parent's own P product,
    so the entire right spine of the tree skips P. */
+typedef struct
+{
+    fball_struct * P, * Q, * T;
+    slong a, b, n;
+    int need_p;
+    const ulong * q0f;
+}
+pi_bsplit_args;
+
+static void pi_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b,
+    slong n, int need_p, const ulong * q0f);
+
+static void
+_pi_bsplit_worker(void * arg)
+{
+    pi_bsplit_args * A = (pi_bsplit_args *) arg;
+    pi_bsplit(A->P, A->Q, A->T, A->a, A->b, A->n, A->need_p, A->q0f);
+}
+
 static void
 pi_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b, slong n,
     int need_p, const ulong * q0f)
@@ -279,21 +302,36 @@ pi_bsplit(fball_t P, fball_t Q, fball_t T, slong a, slong b, slong n,
     {
         slong m = a + (b - a) / 2;
         fball_t P2, Q2, T2;
+        /* the rule of FIXED_PAR_CAP, with the bits of Q (and T) over
+           [a, b) estimated */
+        int par = b - a >= FIXED_PAR_TERMS && flint_get_num_threads() >= 2;
+        int above = par && (double) (b - a) * (3.0 * log2((double) b) + 54.0)
+            > FIXED_PAR_CAP * FLINT_BITS * (double) n;
 
         fball_init(P2);
         fball_init(Q2);
         fball_init(T2);
 
-        pi_bsplit(P, Q, T, a, m, n, 1, q0f);
-        pi_bsplit(P2, Q2, T2, m, b, n, need_p, q0f);
+        if (par && !above)
+        {
+            /* the halves on two threads (the right one's locals are
+               its own; the leaves use only the stack) */
+            pi_bsplit_args L, R;
+            L.P = P; L.Q = Q; L.T = T; L.a = a; L.b = m; L.n = n;
+            L.need_p = 1;
+            R.P = P2; R.Q = Q2; R.T = T2; R.a = m; R.b = b; R.n = n;
+            R.need_p = need_p;
+            L.q0f = R.q0f = q0f;
+            _fixed_parallel_pair(_pi_bsplit_worker, &L,
+                _pi_bsplit_worker, &R);
+        }
+        else
+        {
+            pi_bsplit(P, Q, T, a, m, n, 1, q0f);
+            pi_bsplit(P2, Q2, T2, m, b, n, need_p, q0f);
+        }
 
-        fball_mul(T, T, Q2, n);         /* T1 Q2 */
-        fball_mul(T2, T2, P, n);        /* P1 T2 */
-        fball_add(T, T, T2, n);
-
-        fball_mul(Q, Q, Q2, n);
-        if (need_p)
-            fball_mul(P, P, P2, n);
+        _fball_pqt_merge(P, Q, T, P2, Q2, T2, need_p, n, above);
 
         fball_clear(P2);
         fball_clear(Q2);

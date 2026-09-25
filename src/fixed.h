@@ -12,6 +12,7 @@
 #ifndef FIXED_H
 #define FIXED_H
 
+#include <stdint.h>
 #include "flint.h"
 #include "arb_types.h"
 
@@ -72,8 +73,9 @@ void fixed_exp_rs(nn_ptr res, nn_srcptr x, slong n);
    (y, wn + 1): wn fraction limbs and a units limb.  alg: 0 = tuned
    automatic choice, 1 = direct rectangular-splitting series,
    2 = sinh series + square root, 3 = one bit-burst step + sinh,
-   4 = full bit-burst.  Error at most FIXED_EXP_REDUCED_MAX_ERR
-   ulps. */
+   4 = full bit-burst; the arithmetic around the series kernels and
+   the exact binary splitting is fball ball arithmetic, with a
+   rigorous bound checked against FIXED_EXP_REDUCED_MAX_ERR. */
 #define FIXED_EXP_REDUCED_MAX_ERR 96
 void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn,
     flint_bitcnt_t r, int alg);
@@ -84,8 +86,8 @@ void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn,
    fixed_exp_reduced.  alg: 0 = tuned automatic choice, 1 = direct
    sine + cosine rectangular-splitting series, 2 = sine series plus
    a squaring and a square root, 3 = one bit-burst step + series,
-   4 = full bit-burst.  Error at most FIXED_SIN_COS_REDUCED_MAX_ERR
-   ulps on each output. */
+   4 = full bit-burst, in fball arithmetic as fixed_exp_reduced.
+   Error at most FIXED_SIN_COS_REDUCED_MAX_ERR ulps on each output. */
 #define FIXED_SIN_COS_REDUCED_MAX_ERR 96
 void fixed_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
     slong wn, flint_bitcnt_t r, int alg);
@@ -188,6 +190,8 @@ void fixed_machin_get_c(fmpz_t c, const fixed_machin_struct * tab, slong i,
     slong j);
 void fixed_machin_get_c_row(fmpz * row, const fixed_machin_struct * tab,
     slong i);
+nn_srcptr fixed_machin_c_row_raw(const fixed_machin_struct * tab, slong i,
+    slong * climbs, const unsigned char ** csign);
 
 /* the precomputed tables (rel_tab_data.c) */
 typedef struct
@@ -212,9 +216,9 @@ FLINT_DLL extern const signed char
 
 /* Internal: thread-local cache of the angles pi/2, 2 arg(pi_j)
    (atan_gauss.c), laid out like the logarithm cache below;
-   _fixed_atan_gauss_vec gives the angles as arb balls (arb's
-   Machin-type sets of machin_tab.c for up to 48, single
-   arctangents beyond). */
+   _fixed_atan_gauss_vec gives the angles as arb balls (from
+   _fixed_atan_gauss_vec_fball: the Machin-type sets of machin_tab.c
+   for up to 48, single arctangents beyond). */
 void _fixed_atan_gauss_vec(arb_ptr res, slong num, slong prec);
 void _fixed_atan_gauss_ensure(slong num, slong nv);
 nn_srcptr _fixed_atan_gauss_entry(slong j, slong nv);
@@ -242,6 +246,36 @@ void _fixed_sin_cos_diophantine_tune(nn_ptr ysin, nn_ptr ycos,
 void fixed_tan_diophantine(nn_ptr res, nn_srcptr x, slong n);
 void _fixed_tan_diophantine_tune(nn_ptr res, nn_srcptr x, slong n,
     slong num_primes, double max_weight);
+
+/* Newton-Taylor inverses from the forward functions (newton.c):
+   -log(x) for (x, n) in [1/2, 1) -> (y, n) and atan(x) for (x, n) in
+   [0, 1) -> (y, n), each one step of order N from a starting value
+   at about 1/(N + 1) (log) resp. 1/(2N) (atan) of the precision --
+   the bitwise function up to FIXED_NEWTON_CUTOFF limbs, the step
+   itself recursively above -- followed by one forward evaluation
+   (exp resp. sin_cos) at the working precision of n + 1 limbs and
+   a short Taylor polynomial in the residual, all in fball
+   arithmetic with a rigorous bound checked on export.  Errors at
+   most the *_MAX_ERR ulps.  The tunable workers take the forward
+   algorithm (0 = diophantine, 1 = bitwise, 2 = notab) and the number N of
+   series terms (0 = default). */
+#define FIXED_NEGLOG_NEWTON_MAX_ERR 2
+#define FIXED_ATAN_NEWTON_MAX_ERR 2
+#ifndef FIXED_NEWTON_CUTOFF
+#define FIXED_NEWTON_CUTOFF 512
+#endif
+void fixed_neglog_newton(nn_ptr y, nn_srcptr x, slong n);
+/* -log(x) for (x, n) in [1/2, 1) by the Sasaki-Kanada formula
+   (log_agm.c): one AGM of theta functions, pi/4 and log 2 from the
+   per-thread caches; within FIXED_NEGLOG_NEWTON_MAX_ERR ulps.  The
+   tunable worker takes the number N of theta_3 terms (0 = default) */
+void fixed_neglog_agm(nn_ptr y, nn_srcptr x, slong n);
+void _fixed_neglog_agm_tune(nn_ptr y, nn_srcptr x, slong n, slong N);
+void fixed_atan_newton(nn_ptr y, nn_srcptr x, slong n);
+void _fixed_neglog_newton_tune(nn_ptr y, nn_srcptr x, slong n, int forward,
+    slong N);
+void _fixed_atan_newton_tune(nn_ptr y, nn_srcptr x, slong n, int forward,
+    slong N);
 
 /* Internal: the relation-table descent shared by the diophantine (multi-prime)
    reductions (exp_diophantine.c); the angles (log p_j, or 2 arg of
@@ -480,8 +514,8 @@ slong _fixed_bitwise_reduce(nn_ptr t, slong wn, int r, slong istart,
 void _fixed_atans_ensure(slong nv, slong rc);
 
 /* Internal: n-limb one-sided fixed-point approximations of the table
-   values by mpn binary splitting (at most the true value, short by a
-   couple of ulps); i >= 1. */
+   values by binary splitting in fball arithmetic (floor(v B^n) or one
+   below it, never above); i >= 1. */
 void fixed_atan_2mexp_ui_bs(nn_ptr res, ulong i, slong n);
 void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n);
 
@@ -508,7 +542,8 @@ void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n);
 
    fixed_sqrt_newton: input as for fixed_rsqrt_newton; sets (q, n+2)
    to sqrt(a) in [1/B, 1) (the value can round up to 1);
-   |error| <= 4 B^-n / sqrt(a). */
+   |error| <= 4 B^-n / sqrt(a).
+*/
 void fixed_inv_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n);
 void fixed_inv_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
 void fixed_div_newton_invmul(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n);
@@ -637,18 +672,18 @@ void _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
    encodes the value 0 (negative == 0 then).  The number represents a
    ball: the true quantity lies within err ulps of the point value,
    one ulp being B^(exp - size) (for size == 0, B^exp).  Low zero
-   limbs are also stripped when err == 0.0, moving them into exp, so
+   limbs are also stripped when err == 0, moving them into exp, so
    exact small integers stay small.
 
-   err is a rigorous bound maintained through every operation.  All
-   error propagation is done in double arithmetic ROUNDING UP: every
-   compound bound is multiplied by FBALL_EPS to absorb the
-   round-to-nearest errors of the bound computation itself, exponent
-   scalings are exact powers of two with explicit underflow/overflow
-   handling (bignum exponents can far exceed the double range), and
-   normalization truncates low mantissa limbs whenever
-   err > 2^(FLINT_BITS + 5), so that err stays small and mantissa
-   length tracks the number of accurate limbs.
+   err is a rigorous bound maintained through every operation, as
+   an integer count of ulps of the mantissa's bottom limb.  Products
+   and sums compose their bounds in limb arithmetic (128-bit
+   intermediate counts at limb anchors, rounded up to whole units);
+   divisions and roots go through doubles, rounding up with the fudge
+   factor FBALL_EPS.  A bound that reaches B units truncates the
+   mantissa by as many limbs as needed, so that err < B and the
+   mantissa length tracks the number of accurate limbs; a bound below
+   one ulp pads the mantissa with zero limbs down to its own scale.
 
    Arithmetic functions take a precision n in limbs (the caller
    includes 2-4 guard limbs); mantissas are truncated to about n
@@ -663,39 +698,31 @@ typedef struct
     slong size;     /* size of mantissa */
     int negative;   /* sign bit */
     slong exp;      /* radix 2^FLINT_BITS exponent */
-    double err;     /* error bound: err ulps at the anchor
-                       B^(exp - size + erra) */
-    slong erra;     /* anchor offset of the error, in limbs below
-                       (or, rarely, above) the mantissa bottom; kept
-                       so that 1 <= err < 2^128 whenever err != 0 --
-                       a plain double at the mantissa bottom cannot
-                       represent radii more than ~1000 bits below
-                       one ulp (they underflow), which matters for
-                       balls like 1 - epsilon with epsilon ~ 2^-2r */
+    ulong err;      /* radius: err ulps of the bottom limb, B^(exp -
+                       size) (B^exp for a zero mantissa); 0 = exact.
+                       A radius below one ulp is expressed by padding
+                       the mantissa with zero limbs down to its scale,
+                       one of B ulps or more by truncating the
+                       mantissa, so that err < B always holds and at
+                       most one limb of noise is carried */
 }
 fball_struct;
 
 typedef fball_struct fball_t[1];
 
-/* fudge factor: absorbs the rounding of the (much shorter) error
-   bound computations themselves */
+/* fudge factor: absorbs the rounding of the error bound computations
+   that go through doubles (division, roots) */
 #define FBALL_EPS (1.0 + 1e-6)
-
-/* normalization threshold: low limbs are truncated away once the
-   bound exceeds this many ulps of the mantissa bottom.  The
-   threshold deliberately sits ~2 limbs above one ulp so that
-   mantissa content is retained a couple of limbs BELOW an
-   accumulated noise floor: interval radii are worst-case bounds
-   over correlated errors (a Karatsuba complex multiply triples the
-   radius of the small component while the true error barely
-   grows), and truncating right at the radius would throw away
-   limbs that are in fact accurate. */
-#define FBALL_ERR_MAX_EXP 197
-#define FBALL_ERR_MAX 0x1p197
 
 void fball_init(fball_t x);
 void fball_clear(fball_t x);
-void fball_fit(fball_t x, slong k);
+void _fball_grow(fball_t x, slong k);
+FLINT_FORCE_INLINE void
+fball_fit(fball_t x, slong k)
+{
+    if (x->alloc < k)
+        _fball_grow(x, k);
+}
 
 void fball_zero(fball_t x);
 void fball_set_ui(fball_t x, ulong c);
@@ -710,17 +737,45 @@ int fball_is_zero_exact(const fball_t x);
    alias operands) */
 void fball_mul(fball_t res, const fball_t a, const fball_t b, slong n);
 void fball_mul_ui(fball_t res, const fball_t a, ulong c, slong n);
+/* rr + i ri = (ar + i ai) (br + i bi) to about n limbs in one frame
+   (relative to the larger part of the result, both parts kept down to
+   the same limb, as the precision of a complex number is that of its
+   modulus), by one transform-sharing complex product instead of four;
+   outputs may alias inputs */
+void fball_mul_complex(fball_t rr, fball_t ri, const fball_t ar, const fball_t ai, const fball_t br, const fball_t bi, slong n);
+void fball_div_ui(fball_t res, const fball_t a, ulong c, slong n);
+/* res = a - b c to n limbs GIVEN |a - b c| < B^E: only the window of
+   the product that reaches the result is computed (a residual of an
+   iteration; wrong if the bound fails) */
+void fball_submul_bounded(fball_t res, const fball_t a, const fball_t b, const fball_t c, slong E, slong n);
 void fball_add(fball_t res, const fball_t a, const fball_t b, slong n);
 void fball_sub(fball_t res, const fball_t a, const fball_t b, slong n);
+/* res = x + y c resp. x - y c for a word c: in place (res == x) by
+   mpn_addmul_1 / mpn_submul_1 in O(|y|) when y c lands inside x's
+   window, else y c formed and added */
+void fball_addmul_ui(fball_t res, const fball_t x, const fball_t y, ulong c, slong n);
+void fball_submul_ui(fball_t res, const fball_t x, const fball_t y, ulong c, slong n);
 
 /* res = a / b resp. 1/sqrt(c) with ~n accurate limbs, by Newton
-   iteration (fixed_div_newton / fixed_rsqrt_ui_newton); b must be
-   nonzero with small relative error, 2 <= c < B */
+   iteration (fixed_div_newton / fixed_rsqrt_ui_newton; division by a
+   short divisor uses flint_mpn_tdiv_qr instead); b must be nonzero
+   with small relative error, 2 <= c < B */
 void fball_div(fball_t res, const fball_t a, const fball_t b, slong n);
 void fball_rsqrt_ui(fball_t res, ulong c, slong n);
 void fball_rsqrt(fball_t res, const fball_t x, slong n);
+/* x^(1/k) (k >= 1) and x^(-1/k) (k >= 1), x > 0, k < 2^40 (root.c);
+   k = 2 and 3 go to the square and cube roots below, other k to a
+   high-order iteration in fball arithmetic whose order r the tuning
+   entry point exposes (r = 0: the default) */
+void fball_root_ui(fball_t res, const fball_t x, ulong k, slong n);
+void fball_rroot_ui(fball_t res, const fball_t x, ulong k, slong n);
+void _fball_root_ui_order(fball_t res, const fball_t x, ulong k, slong n, int r, int recip);
 void fball_sqrt(fball_t res, const fball_t x, slong n);
 void fball_mul_2exp_si(fball_t x, slong e);
+/* the arithmetic-geometric mean of x, y >= 0 to about n limbs (agm.c),
+   finishing with a series of order m (0 = the default) */
+void fball_agm(fball_t res, const fball_t x, const fball_t y, slong n);
+void _fball_agm_order(fball_t res, const fball_t x, const fball_t y, slong n, int m);
 
 /* add extra ulps (at the current anchor) to the radius */
 void fball_add_error_ulps(fball_t x, double e);
@@ -752,20 +807,131 @@ int fball_get_fixed_floor(nn_ptr y, slong n, const fball_t x);
 
 void fball_get_arb(arb_t res, const fball_t x);
 void fball_print(const fball_t x);
+/* e with |x| < 2^e over the whole ball (value plus radius) */
+slong fball_mag_2exp(const fball_t x);
+/* e with the relative radius of x (nonzero mantissa) below 2^e */
+slong fball_rel_2exp(const fball_t x);
+/* x += [-2^e, 2^e] */
+void fball_add_error_2exp(fball_t x, slong e);
+
+/* the ball-valued workers of the Newton-Taylor inverses (newton.c):
+   -log(x) resp. atan(x) for the fixed-point (x, n); forward and N as
+   for the tunable fixed-point entries */
+void _fball_neglog_newton(fball_t res, nn_srcptr x, slong n, int forward, slong N);
+void _fball_atan_newton(fball_t res, nn_srcptr x, slong n, int forward, slong N);
+void _fball_neglog_agm(fball_t res, nn_srcptr x, slong n, slong N);
 
 /* pi to about n limbs (n includes the caller's guard limbs) by
    binary splitting of the Chudnovsky series in fball arithmetic */
 void fball_const_pi_chudnovsky(fball_t pi, slong n);
+
+/* atan(p/q) resp. atanh(p/q) (hyperbolic != 0) for 0 <= p < q (p/q at
+   most about 0.99) given as mpn integers, to about n limbs (n includes
+   the caller's guard limbs), by binary splitting */
+void fball_atan_frac_bsplit(fball_t res, nn_srcptr p, slong pn,
+    nn_srcptr q, slong qn, int hyperbolic, slong n);
+
+/* Hypergeometric series in the format of y-cruncher's
+   SeriesHypergeometric (hypgeom_bsplit.c):
+
+       S = (coefQ + coefP sum_{k>=1} P(k)/Q(k) prod_{j=1}^{k-1} R(j)/Q(j))
+           / coefD,
+
+   raised to power = 1 or -1, for integer polynomials P, Q, R
+   (coefficient i of degree i; Q(k) != 0 for k >= 1; geometric
+   convergence: deg R <= deg Q, |lc R| < |lc Q| if the degrees agree)
+   and integers coefP, coefQ, coefD != 0 of any size, given as signed
+   mpn integers (-1)^neg (d, n) (n = 0 for zero).  res receives a ball
+   for S accurate to about FLINT_BITS (n - 1) bits (n includes the
+   caller's guard limbs), by binary splitting in fball arithmetic with a
+   rigorous bound for the tail; throws if the tail cannot be bounded.
+   The int64 variant takes the coefficients as in y-cruncher's formula
+   files. */
+typedef struct
+{
+    nn_srcptr d;
+    slong n;
+    int neg;
+}
+fixed_hypgeom_int_struct;
+
+typedef struct
+{
+    int power;
+    fixed_hypgeom_int_struct coefP, coefQ, coefD;
+    const fixed_hypgeom_int_struct * P;
+    slong Plen;
+    const fixed_hypgeom_int_struct * Q;
+    slong Qlen;
+    const fixed_hypgeom_int_struct * R;
+    slong Rlen;
+}
+fixed_hypgeom_series_struct;
+
+void fball_hypgeom_series(fball_t res, const fixed_hypgeom_series_struct * s,
+    slong n);
+void fball_hypgeom_series_int64(fball_t res, int power, int64_t coefP,
+    int64_t coefQ, int64_t coefD, const int64_t * P, slong Plen,
+    const int64_t * Q, slong Qlen, const int64_t * R, slong Rlen, slong n);
+
+/* internal (machin_bsplit.c): res_j = log p_j (the first num primes)
+   resp. 2 arg pi_j (the first num nonreal Gaussian primes), j < num,
+   to about n limbs; and the exact floors of such values below B into
+   the nc-limb entries of a cache (log_primes.c), 0 if undetermined */
+void _fixed_log_primes_vec_fball(fball_struct * res, slong num, slong n);
+/* internal (machin_bsplit.c): log(u/v), u > v > 0 integers, by Zuniga's
+   series [Zun2025] through fball_hypgeom_series */
+void _fball_log_ratio_zuniga(fball_t res, const fmpz_t u, const fmpz_t v,
+    slong n);
+void _fixed_atan_gauss_vec_fball(fball_struct * res, slong num, slong n);
+int _fixed_store_floors(nn_ptr e, slong nc, fball_struct * v, slong num);
+/* internal thread helpers (parallel.c): run two functions, the second
+   on a pool thread if one is free (1 if so), splitting the thread
+   budget; run n tasks on up to n threads taking them in order */
+int _fixed_parallel_pair(void (* f1)(void *), void * a1,
+    void (* f2)(void *), void * a2);
+void _fixed_parallel_tasks(void (* f)(slong, void *), void * args, slong n);
+/* T = T1 Q2 + P1 T2, Q = Q1 Q2, P = P1 P2 (need_p) in place, T2
+   destroyed; par: on two threads */
+void _fball_pqt_merge(fball_t P, fball_t Q, fball_t T, fball_t P2,
+    fball_t Q2, fball_t T2, int need_p, slong n, int par);
+/* the forking rule of the splittings: the halves of a node run on two
+   threads (when the budget allows) only if its exact values would stay
+   within FIXED_PAR_CAP times the working precision; above, where the
+   halves would each hold full-size numbers, they run one after the
+   other with the whole budget and the merge runs on two threads */
+#define FIXED_PAR_CAP 4.0
 void fball_const_log2(fball_t res, slong n);
+/* Euler's constant (const_euler.c); set = 0 ... 3 forces log m from
+   log 2 / log 2, log 3 / ... / log 2, log 3, log 5, log 7, -1 chooses */
+void fball_const_euler(fball_t res, slong n);
+/* an fball constant evaluated into an arb ball of prec bits
+   (constant_arb.c): the entry point for the arb wrappers */
+typedef void (* fixed_constant_func)(fball_t, slong);
+void _fixed_constant_arb(arb_t res, fixed_constant_func f, slong prec);
+
+/* the constants of const_e.c, const_log10.c, const_catalan.c,
+   const_zeta3.c, const_zeta5.c and const_gamma.c, each computed from
+   scratch (no cache) to about FLINT_BITS (n - 1) bits */
+void fball_const_e(fball_t res, slong n);
+void fball_const_log10(fball_t res, slong n);
+void fball_const_catalan(fball_t res, slong n);
+void fball_const_zeta3(fball_t res, slong n);
+void fball_const_zeta5(fball_t res, slong n);
+void fball_const_gamma_1_3(fball_t res, slong n);
+void fball_const_gamma_1_4(fball_t res, slong n);
+void _fball_const_euler(fball_t res, slong n, int set);
 
 /* verified floor-truncated cached constants: y receives n limbs,
-   exactly floor(c B^n) for c = pi/4 resp. log(2); computed limbs
-   are cached per thread and extended on demand (floors nest, so a
+   exactly floor(c B^n) for c = pi/4, log(2) resp. Euler's constant;
+   computed limbs are cached per thread and extended on demand (floors nest, so a
    prefix of a longer cached floor is itself the floor) */
 void fixed_const_pi_div_4(nn_ptr y, slong n);
 void fixed_const_log2(nn_ptr y, slong n);
+void fixed_const_euler(nn_ptr y, slong n);
 void _fixed_const_pi_div_4_clear(void);
 void _fixed_const_log2_clear(void);
+void _fixed_const_euler_clear(void);
 
 /* internal: exact-floor entry helpers (tab_exact.c) */
 int _fixed_tab_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec);
