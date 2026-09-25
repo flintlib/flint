@@ -42,6 +42,9 @@ _blas_1pass_cutoff(slong num_threads)
 
 #endif
 
+/* inner dimension from which nmod_mat_mul_u52 is preferred to u32 / fp50 */
+#define NMOD_MAT_MUL_U52_MIN_K 12
+
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -93,10 +96,20 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         streams B once for all of them with delayed reductions where it is vectorized
         This avoids calling the kernels which pad these rows to a whole tile
         of MR rows (MR depends on each kernel and on the ISA, but it can be above
-        10)
+        10).
+
+        NOTE It is single-threaded: with several threads it is still used
+        for the shapes the threaded kernels do not take (below), which
+        would otherwise go to nmod_mat_mul_classical_threaded (observed 2-7x
+        slower than it on Ice Lake, Meteor Lake, 4 threads).
+        TODO thread it (split the columns of B).
     */
     if (m >= 1 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2 && n >= 1
-            && flint_num_threads == 1
+            && (flint_num_threads == 1
+                || !((m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                      && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+                     || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                         && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)))
             && C != A && C != B && NMOD_MAT_NMOD_VEC_MUL_IS_SIMD(C->mod.n))
     {
         ulong * c[NMOD_MAT_MUL_ROWS_MAX];
@@ -149,6 +162,14 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           4 x 1000 or 4 x 1000 times 1000 x 1000). Below that, notably
           for n < 8 where the padding to NR columns wastes most of the
           tile, the classical code wins.
+        - Small inner dimension k on IFMA machines: the per-entry
+          reduction of u52 (Barrett through doubles and a Shoup step)
+          weighs more than its products, so up to k = 8 u32 (<= 32
+          bits) and fp50 (33-50 bits) are 1.15-2.3x faster on Ice Lake
+          (1000 x k x 1000); u52 wins from k = 16 on. Hence U52_MIN_K
+          below
+          TODO measured on one machine so far, could be useful to
+          analyze it more thoroughly
         - Single-threaded, Strassen on top (its recursive calls come back
           here) pays from SIMD_STRASSEN_CUTOFF on (e.g. 320-512 on Zen 4).
           TODO with 4 threads it did not pay up to 4096 (which is not that
@@ -204,7 +225,10 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
         if (NMOD_MAT_HAVE_MUL_U52
                 && (bits >= FLINT_NMOD_MAT_MUL_U52_MIN_BITS
-                    || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS))
+                    || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS)
+                && (k >= NMOD_MAT_MUL_U52_MIN_K
+                    || bits > FLINT_NMOD_MAT_MUL_FP50_MAX_BITS
+                    || (bits > 32 && !NMOD_MAT_HAVE_FPV)))
         {
             /* FLINT's own gemm was never measured faster than u52 */
 #if FLINT_USES_BLAS
@@ -216,6 +240,12 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         {
             if (!blas_1pass)
                 simd_mul = nmod_mat_mul_u32;
+        }
+        else if (NMOD_MAT_HAVE_MUL_U52 && NMOD_MAT_HAVE_FPV
+                 && bits <= FLINT_NMOD_MAT_MUL_FP50_MAX_BITS)
+        {
+            /* small inner dimension on an IFMA machine, 33-50 bits */
+            simd_mul = nmod_mat_mul_fp50;
         }
         else if (FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
                  && bits >= FLINT_NMOD_MAT_MUL_K52_MIN_BITS
