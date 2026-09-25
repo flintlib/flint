@@ -33,7 +33,7 @@ _arb_condense_digits(char * s, slong n)
             for (j = 0; isdigit(s[i + j]); j++)
                 run++;
 
-            if (run > 3 * n)
+            if (run > 2 * n)
             {
                 for (j = 0; j < n; j++)
                 {
@@ -41,13 +41,13 @@ _arb_condense_digits(char * s, slong n)
                     out++;
                 }
 
-                out += flint_sprintf(res + out, "{...%wd digits...}", run - 2 * n);
+                out += flint_sprintf(res + out, "...", run - 2 * n);
 
-                for (j = run - n; j < run; j++)
-                {
-                    res[out] = s[i + j];
-                    out++;
-                }
+                // for (j = run - n; j < run; j++)
+                // {
+                //     res[out] = s[i + j];
+                //     out++;
+                // }
             }
             else
             {
