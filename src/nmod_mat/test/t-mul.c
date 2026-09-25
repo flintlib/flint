@@ -139,6 +139,17 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
             case 2: n = 1 + n_randint(state, 8); break;
             default: n = 1; break;
         }
+        /* a few rows and many columns or a long inner dimension (the
+           products with few rows work by blocks of columns and chunks
+           of rows) */
+        if (n_randint(state, 8) == 0)
+        {
+            m = 1 + n_randint(state, 8);
+            if (n_randint(state, 2))
+                k = 1 + n_randint(state, 1200);
+            else
+                n = 1 + n_randint(state, 4500);
+        }
 
         if (n_randint(state, 4) == 0)
             mod = n_randtest_not_zero(state);

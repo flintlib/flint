@@ -86,5 +86,61 @@ TEST_FUNCTION_START(nmod_mat_nmod_vec_mul, state)
         flint_free(aa);
     }
 
+    /* against one modular multiplication per entry, on the dimensions
+       and moduli of the vectorized paths: rows beyond the chunks of the
+       accumulators, columns beyond the blocks, moduli at the limits of
+       each method, entries n - 1 (largest products) */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t B;
+        ulong * a, * c, * d;
+        ulong n;
+        slong j, k, m;
+        int mode;
+
+        switch (n_randint(state, 8))
+        {
+            case 0: n = UWORD(1) << 26; break;
+            case 1: n = (UWORD(1) << 26) + 1; break;
+            case 2: n = UWORD(1) << 32; break;
+            case 3: n = (UWORD(1) << 50) - 1; break;
+            case 4: n = UWORD(1) << 52; break;
+            case 5: n = (UWORD(1) << 52) + 1; break;
+            default: n = n_randbits(state, 2 + n_randint(state, FLINT_BITS - 1)); break;
+        }
+        n = FLINT_MAX(n, UWORD(2));
+
+        k = 1 + n_randint(state, n_randint(state, 4) ? 80 : 1200);
+        m = 1 + n_randint(state, n_randint(state, 4) ? 80 : 4500);
+        mode = n_randint(state, 3);
+
+        nmod_mat_init(B, k, m, n);
+        a = _nmod_vec_init(k);
+        c = _nmod_vec_init(m + 1);
+        d = _nmod_vec_init(m);
+
+        for (j = 0; j < k * m; j++)
+            B->entries[j] = mode ? n - 1 - (mode == 2 ? n_randint(state, 2) : 0)
+                                 : n_randint(state, n);
+        for (j = 0; j < k; j++)
+            a[j] = mode ? n - 1 - (mode == 2 ? n_randint(state, 2) : 0)
+                        : n_randint(state, n);
+        c[m] = 12345;
+
+        nmod_mat_nmod_vec_mul(c, a, k, B);
+
+        _nmod_vec_scalar_mul_nmod(d, nmod_mat_entry_ptr(B, 0, 0), m, a[0], B->mod);
+        for (j = 1; j < k; j++)
+            _nmod_vec_scalar_addmul_nmod(d, nmod_mat_entry_ptr(B, j, 0), m, a[j], B->mod);
+
+        if (!_nmod_vec_equal(c, d, m) || c[m] != 12345)
+            TEST_FUNCTION_FAIL("k: %wd, m: %wd, n: %wu, mode: %d\n", k, m, n, mode);
+
+        nmod_mat_clear(B);
+        _nmod_vec_clear(a);
+        _nmod_vec_clear(c);
+        _nmod_vec_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

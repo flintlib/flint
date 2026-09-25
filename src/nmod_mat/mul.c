@@ -89,6 +89,30 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     /*
+        A has a few rows (up to NMOD_MAT_MUL_ROWS_MAX): _nmod_mat_mul_rows_simd
+        streams B once for all of them with delayed reductions where it is vectorized
+        This avoids calling the kernels which pad these rows to a whole tile
+        of MR rows (MR depends on each kernel and on the ISA, but it can be above
+        10)
+    */
+    if (m >= 1 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2 && n >= 1
+            && flint_num_threads == 1
+            && C != A && C != B && NMOD_MAT_NMOD_VEC_MUL_IS_SIMD(C->mod.n))
+    {
+        ulong * c[NMOD_MAT_MUL_ROWS_MAX];
+        const ulong * a[NMOD_MAT_MUL_ROWS_MAX];
+
+        for (slong i = 0; i < m; i++)
+        {
+            c[i] = nmod_mat_entry_ptr(C, i, 0);
+            a[i] = nmod_mat_entry_ptr(A, i, 0);
+        }
+
+        if (_nmod_mat_mul_rows_simd(c, a, m, k, B))
+            return;
+    }
+
+    /*
         Moduli up to 2^52: SIMD kernels with delayed reduction,
         nmod_mat_mul_u32 (any 64-bit target, moduli below 2^32),
         nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and, without

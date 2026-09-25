@@ -516,6 +516,12 @@ Matrix multiplication
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
     The number entries written to ``c`` is always equal to the number of columns of ``B``.
+    The rows of ``B`` are accumulated with delayed reductions, in the manner
+    of :func:`nmod_mat_mul_u52` (AVX512-IFMA, moduli up to `2^{52}`), of
+    :func:`nmod_mat_mul_u32` (AVX2 or AVX-512 without IFMA, moduli up to
+    `2^{32}`) or of :func:`nmod_mat_mul_fp50` (AVX2, AVX-512 or NEON, moduli
+    below `2^{50}`) where available, and with one modular multiplication per
+    entry otherwise.
 
 
 Matrix Exponentiation
