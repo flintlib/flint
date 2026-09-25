@@ -680,9 +680,9 @@ Division
     (`2^{e - \mathrm{prec}}` with `2^{e-1} \le |f| < 2^e`) in either
     direction; with ``ARF_RND_ACCURATE`` by at most 0.51 ulp. The functions
     choose internally between the standard algorithm (rounding down,
-    respectively to nearest) and the Newton iterations of the ``fixed``
-    module (:func:`fixed_inv_newton`, :func:`fixed_div_newton`,
-    :func:`fixed_sqrt_newton`, :func:`fixed_rsqrt_newton`), taking the
+    respectively to nearest) and the Newton iterations of the ``mp_real``
+    module (:func:`_mp_real_inv_newton`, :func:`_mp_real_div_newton`,
+    :func:`_mp_real_sqrt_newton`, :func:`_mp_real_rsqrt_newton`), taking the
     latter above tuned precision cutoffs (about 8000, 12000, 100000 and
     30000 bits for inversion, division, square root and reciprocal square
     root) where they are faster. The Newton results carry 8 (fast) or 11

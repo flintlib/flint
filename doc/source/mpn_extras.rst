@@ -622,12 +622,12 @@ Division
     * Long quotients (both `bn` and `an - bn + 1` above
       ``FLINT_MPN_TDIV_QR_NEWTON_CUTOFF``, or `bn \ge`
       ``FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF`` and `an - bn + 1 \ge 2 bn`):
-      Karp-Markstein Newton division (:func:`fixed_div_newton`) using
+      Karp-Markstein Newton division (:func:`_mp_real_div_newton`) using
       FLINT's multiplication; unbalanced divisions (`an \ge 3 bn` for
       divisors above ``FLINT_MPN_TDIV_QR_UNBALANCED3_CUTOFF`` limbs,
       `an \ge 4 bn` above ``FLINT_MPN_TDIV_QR_UNBALANCED4_CUTOFF`` limbs) as
       a sequence of `2bn \times bn` block divisions sharing one approximate
-      inverse of `b` (:func:`fixed_inv_newton`). Short divisors with long
+      inverse of `b` (:func:`_mp_real_inv_newton`). Short divisors with long
       dividends (`4 \le bn < 32` and `an \ge 32 bn`, or `bn \ge 32` and
       `an \ge 4 bn`) go through :func:`flint_mpn_preinvn` and
       :func:`flint_mpn_divrem_preinvn`.
@@ -668,7 +668,7 @@ Division
     case the remainder follows from a low product; otherwise the candidate
     quotient is corrected by `O(1)` steps using a full product.
     The preinv version requires `(binv, binvn + 2)` to be the output of
-    ``fixed_inv_newton(binv, b, bn, binvn)`` with `binvn \ge n + 2` and
+    ``_mp_real_inv_newton(binv, b, bn, binvn)`` with `binvn \ge n + 2` and
     `an \ge n + 2`; the unbalanced version requires `an > 2 bn` and
     `bn \ge 3`.
 
@@ -693,7 +693,7 @@ Division
     permitted. This follows the algorithm selection of
     :func:`flint_mpn_tdiv_q` (so that it is never slower) but skips the
     final corrections of the divide and conquer division, and uses
-    :func:`fixed_div_newton` with one guard limb, rounded up by more than
+    :func:`_mp_real_div_newton` with one guard limb, rounded up by more than
     its error bound, instead of the Newton division, and already instead
     of the divide and conquer or short division when both `bn` and
     `an - bn + 1` are at least ``FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF``.
@@ -723,7 +723,7 @@ Division
     chains for `xn \le 2` and register-based division for short `x` and
     quotients, :func:`flint_mpn_divapprox_fraction` of `B^n`
     (the zero limbs not formed in the short and Newton divisions) below
-    the Newton cutoffs, and above, :func:`fixed_inv_newton` with one guard
+    the Newton cutoffs, and above, :func:`_mp_real_inv_newton` with one guard
     limb instead of three, rounded up by more than its error bound.
 
 .. function:: mp_limb_t _flint_mpn_divrem_basecase_preinv1(mp_ptr qp, mp_ptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn, mp_limb_t dinv)
@@ -983,11 +983,11 @@ Division
     `x`), the quotient is computed by
     :func:`flint_mpn_tdiv_q` without the remainder (reading only the top
     `O(n - xn)` limbs of `x` for short quotients), and above it by
-    :func:`fixed_inv_newton` with three extra fraction limbs, with the same
+    :func:`_mp_real_inv_newton` with three extra fraction limbs, with the same
     certification and correction scheme as :func:`flint_mpn_tdiv_qr`,
     which avoids forming the numerator `B^n` altogether in the common case.
     :func:`_flint_mpn_inv_basecase` is the version without Newton
-    inversion. It is used by :func:`fixed_inv_newton_basecase`, so that
+    inversion. It is used by :func:`_mp_real_inv_newton_basecase`, so that
     the mutual calls between the Newton inversion and the division only
     ever go to lower precisions, whatever the cutoffs.
 
@@ -1133,7 +1133,7 @@ Square root
     remainder space beyond `\lceil an/2 \rceil + 1` limbs.
 
     Above the cutoff, `a` is viewed as a
-    fixed-point number in `[B^{-2}, 1)` and :func:`fixed_sqrt_newton` is used
+    fixed-point number in `[B^{-2}, 1)` and :func:`_mp_real_sqrt_newton` is used
     with three extra fraction limbs, so that the truncated root is certified
     whenever the first fraction limb lies in `[2, B-2]`; otherwise it is
     corrected by `O(1)` steps. With a ``NULL`` remainder the Newton path

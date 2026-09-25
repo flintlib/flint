@@ -10,13 +10,13 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_catalan_eval(arb_t s, slong prec)
 {
-    /* Pilehrood's short series (fixed/const_catalan.c) */
-    _fixed_constant_arb(s, fball_const_catalan, prec);
+    /* Pilehrood's short series (mp_real/const_catalan.c) */
+    _mp_real_const_arb(s, mp_real_const_catalan, prec);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_catalan, arb_const_catalan_eval)

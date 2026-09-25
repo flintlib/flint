@@ -10,13 +10,13 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_e_eval(arb_t s, slong prec)
 {
-    /* e = sum 1/k! by binary splitting (fixed/const_e.c) */
-    _fixed_constant_arb(s, fball_const_e, prec);
+    /* e = sum 1/k! by binary splitting (mp_real/const_e.c) */
+    _mp_real_const_arb(s, mp_real_const_e, prec);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_e, arb_const_e_eval)

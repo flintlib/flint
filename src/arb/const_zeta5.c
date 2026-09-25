@@ -10,13 +10,13 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_zeta5_eval(arb_t s, slong prec)
 {
     /* Zhi-Wei Sun's identity (fixed/const_zeta5.c) */
-    _fixed_constant_arb(s, fball_const_zeta5, prec);
+    _mp_real_const_arb(s, mp_real_const_zeta5, prec);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_zeta5, arb_const_zeta5_eval)

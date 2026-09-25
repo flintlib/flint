@@ -1,6 +1,6 @@
-/* hand-written fixed_log1p_opt_1 / _2 bodies, SPECIALIZED to
+/* hand-written _mp_real_log1p_opt_1 / _2 bodies, SPECIALIZED to
    r = 16 (the runtime-r branches of the originals for
-   r >= 64 were pruned as unreachable).  dev/tune_fixed.py
+   r >= 64 were pruned as unreachable).  dev/tune_mp_real.py
    substitutes @FN@ and @SERIES@ and copies each body into
    log1p_opt_<n>.c on --pin 16 --emit, delimiting them by the
    section comments that open each one. */
@@ -22,14 +22,14 @@ void
     int k;
 
 
-    _fixed_exp_logs_ensure(1, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _mp_real_exp_logs_tab(1, r, &nc);
 
     for (i = 1; i <= r + 1; i++)
     {
         slong ii = FLINT_MIN(i, (slong) r);
         ulong v = MPN_RIGHT_SHIFT_LOW(UWORD(1), p0, (int) ii);
-        ulong lt = _fixed_exp_logs[ii * nc + (nc - 1)];
+        ulong lt = tab[ii * nc + (nc - 1)];
         ulong m = -(ulong) (v <= d0);
 
         d0 -= v & m;
@@ -83,12 +83,12 @@ void
     slong i, nc;
 
 
-    _fixed_exp_logs_ensure(2, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _mp_real_exp_logs_tab(2, r, &nc);
 
 #define STEP2(ii, v1, v0) \
     do { \
-        nn_srcptr Lq = _fixed_exp_logs + (ii) * nc + (nc - 2); \
+        nn_srcptr Lq = tab + (ii) * nc + (nc - 2); \
         ulong bw, e1, e0, m; \
         sub_dddmmmsss(bw, e1, e0, UWORD(0), d1, d0, \
             UWORD(0), v1, v0); \
@@ -124,7 +124,7 @@ void
     nd[3] = d1;
     t2[0] = t2[1] = 0;
     if (d1 != 0 || d0 != 0)
-        mpn_tdiv_qr(t2, rem, 0, nd, 4, S, 3);
+        flint_mpn_tdiv_qr(t2, rem, nd, 4, S, 3);
 
     /* generated atanh series for t < 2^-16 (single denominator
        division by truncated-inverse multiplication) */

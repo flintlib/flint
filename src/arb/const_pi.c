@@ -10,13 +10,14 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_pi_chudnovsky_eval(arb_t s, slong prec)
 {
-    /* the Chudnovsky series (fixed/const_pi.c) */
-    _fixed_constant_arb(s, fball_const_pi_chudnovsky, prec);
+    /* the Chudnovsky series (mp_real/const_pi.c) */
+    _mp_real_const_arb(s, mp_real_const_pi4, prec);
+    arb_mul_2exp_si(s, s, 2);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_const_pi_chudnovsky, arb_const_pi_chudnovsky_eval)

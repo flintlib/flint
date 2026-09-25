@@ -34,7 +34,7 @@
 
 #include "mpn_extras.h"
 #include "ulong_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 /*
     Euclidean and approximate division below the Newton range, and the
@@ -2147,14 +2147,14 @@ divapprox_newton(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn,
        q[-1] (only 4/B at the integer scale). Adding 5 units of q[-1] and
        truncating gives floor(A/B) or floor(A/B) + 1. */
     /* with f fraction limbs: A B^f / B, the zero limbs not formed (the
-       precision of fixed_div_newton is independent of An) */
+       precision of _mp_real_div_newton is independent of An) */
     mp_size_t n = An + f - Bn + 1, n2 = n + 1;
     mp_ptr U, q;
     TMP_INIT;
 
     TMP_START;
     U = TMP_ALLOC((n2 + 2) * sizeof(mp_limb_t));
-    fixed_div_newton(U, A, An, B, Bn, n2);
+    _mp_real_div_newton(U, A, An, B, Bn, n2);
     q = U + n2 + 2 - (n + 1);
     mpn_add_1(q - 1, q - 1, n + 2, 5);
     if (FLINT_UNLIKELY(q[n] != 0))

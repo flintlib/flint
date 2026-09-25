@@ -16,13 +16,13 @@
 #include "arb/impl.h"
 #include "arb_hypgeom.h"
 #include "arb_hypgeom/impl.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_gamma_const_1_3_eval(arb_t s, slong prec)
 {
-    /* Guillera's 2023 series (fixed/const_gamma.c) */
-    _fixed_constant_arb(s, fball_const_gamma_1_3, prec);
+    /* Guillera's 2023 series (mp_real/const_gamma.c) */
+    _mp_real_const_arb(s, mp_real_const_gamma_1_3, prec);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
@@ -30,8 +30,8 @@ _ARB_DEF_CACHED_CONSTANT(static, arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
 static void
 arb_gamma_const_1_4_eval(arb_t s, slong prec)
 {
-    /* Ebisu's lemniscate series (fixed/const_gamma.c) */
-    _fixed_constant_arb(s, fball_const_gamma_1_4, prec);
+    /* Ebisu's lemniscate series (mp_real/const_gamma.c) */
+    _mp_real_const_arb(s, mp_real_const_gamma_1_4, prec);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_gamma_const_1_4, arb_gamma_const_1_4_eval)

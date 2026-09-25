@@ -10,7 +10,7 @@
 */
 
 #include "mpn_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 #if FLINT_HAVE_NATIVE_mpn_divrem_2
 mp_limb_t __gmpn_divrem_2(mp_ptr, mp_size_t, mp_ptr, mp_size_t, mp_srcptr);
@@ -174,7 +174,7 @@ _flint_mpn_inv_basecase(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     Below the Newton cutoff (in the smaller of xn and the quotient length),
     _flint_mpn_inv_basecase. Newton: viewing x as a fixed-point number
     alpha in [1/B, 1) with xn fraction limbs, B^n / x = (1/alpha) B^(n-xn).
-    fixed_inv_newton with p = n - xn + 3 fraction limbs has error at most
+    _mp_real_inv_newton with p = n - xn + 3 fraction limbs has error at most
     4 B^(-p) / alpha <= 4 B^(-p+1), i.e. 4 B^-2 at the integer scale, so
     the integer part is certified when the first fraction limb lies in
     [2, B-2]; otherwise the quotient is corrected against the explicit
@@ -203,7 +203,7 @@ flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     U = TMP_ALLOC((p + 3) * sizeof(mp_limb_t));
     U[p + 2] = 0;
 
-    fixed_inv_newton(U, x, xn, p);
+    _mp_real_inv_newton(U, x, xn, p);
 
     /* integer limb 0 sits at U[p - (n - xn)] = U[3] */
     qq = U + 3;
@@ -260,7 +260,7 @@ flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     register-based division for short x and quotients,
     flint_mpn_divapprox_fraction of B^n (the zero limbs not formed in the
     short and Newton divisions) below the Newton cutoffs of flint_mpn_inv,
-    and above, fixed_inv_newton with one guard limb instead of three,
+    and above, _mp_real_inv_newton with one guard limb instead of three,
     rounded up by more than its error bound.
 */
 void
@@ -298,7 +298,7 @@ flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     TMP_START;
     p = n - xn + 2;
     U = TMP_ALLOC((p + 2) * sizeof(mp_limb_t));
-    fixed_inv_newton(U, x, xn, p);
+    _mp_real_inv_newton(U, x, xn, p);
     mpn_add_1(U + 1, U + 1, p + 1, 5);
     flint_mpn_copyi(q, U + 2, qn);
     TMP_END;

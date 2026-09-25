@@ -91,7 +91,7 @@ Integers
    long_extras.rst
    longlong.rst
    mpn_extras.rst
-   fixed.rst
+   mp_real.rst
    aprcl.rst
    ecpp.rst
    arith.rst

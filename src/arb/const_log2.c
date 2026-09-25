@@ -10,13 +10,13 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_log2_hypgeom_eval(arb_t s, slong prec)
 {
     /* Zuniga's series, 11.9 bits per term (fixed/const_log2.c) */
-    _fixed_constant_arb(s, fball_const_log2, prec);
+    _mp_real_const_arb(s, mp_real_const_log2, prec);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_const_log2_hypgeom, arb_const_log2_hypgeom_eval)

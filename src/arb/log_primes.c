@@ -15,15 +15,15 @@
 #include "ulong_extras.h"
 #include "arb.h"
 #include "fmpz_vec.h"
-#include "fixed.h"
+#include "mp_real.h"
 #include "arb/impl.h"
 
-/* The Machin-type sets live in the fixed module (fixed/machin_tab.c,
-   fixed_machin_table); the Gaussian primes in fixed/atan_gauss.c. */
+/* The Machin-type sets live in the mp_real module (mp_real/machin_tab.c,
+   _mp_real_machin_table); the Gaussian primes in mp_real/atan_gauss.c. */
 
 typedef struct
 {
-    const fixed_machin_struct * tab;
+    const mp_real_machin_struct * tab;
     arb_ptr res;
     slong prec;
     int hyperbolic;
@@ -39,7 +39,7 @@ parallel_atan_worker(slong i, atan_work * work)
     fmpz_init(q);
 
     fmpz_one(p);
-    fixed_machin_get_x(q, work->tab, i);
+    _mp_real_machin_get_x(q, work->tab, i);
 
     arb_atan_frac_bsplit(work->res + i, p, q, work->hyperbolic, work->prec);
 
@@ -53,7 +53,7 @@ arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
     ulong den, prime;
     ulong * primes;
     fmpz * crow;
-    const fixed_machin_struct * mt;
+    const mp_real_machin_struct * mt;
     slong i, j, k, wp, ln;
     arb_ptr y;
     arb_t t;
@@ -62,7 +62,7 @@ arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     wp = prec + 64;
 
-    mt = fixed_machin_table(0, n);
+    mt = _mp_real_machin_table(0, n);
     ln = mt->num; den = mt->den;
     crow = _fmpz_vec_init(ln);
 
@@ -89,7 +89,7 @@ arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     for (i = 0; i < FLINT_MIN(n, ln); i++)
     {
-        fixed_machin_get_c_row(crow, mt, i);
+        _mp_real_machin_get_c_row(crow, mt, i);
         arb_dot_fmpz(res + i, NULL, 0, y, 1, crow, 1, ln, wp);
         if (den == 1)
             arb_set_round(res + i, res + i, prec);
@@ -254,7 +254,7 @@ void
 arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 {
     fmpz * crow;
-    const fixed_machin_struct * mt;
+    const mp_real_machin_struct * mt;
     slong i, j, wp, ln;
     arb_ptr y;
     arb_t t;
@@ -267,7 +267,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     wp = prec + 64;
 
-    mt = fixed_machin_table(1, n);
+    mt = _mp_real_machin_table(1, n);
     ln = mt->num; den = mt->den;
     crow = _fmpz_vec_init(ln);
 
@@ -288,7 +288,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     for (i = 0; i < FLINT_MIN(n, ln); i++)
     {
-        fixed_machin_get_c_row(crow, mt, i);
+        _mp_real_machin_get_c_row(crow, mt, i);
         arb_dot_fmpz(res + i, NULL, 0, y, 1, crow, 1, ln, wp);
         if (den == 1)
             arb_set_round(res + i, res + i, prec);
@@ -302,13 +302,13 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
         slong xa, xb, ya, yb;
         slong best_j = 0;
 
-        xa = _fixed_gaussian_primes[2 * i];
-        xb = _fixed_gaussian_primes[2 * i + 1];
+        xa = _mp_real_gaussian_primes[2 * i];
+        xb = _mp_real_gaussian_primes[2 * i + 1];
 
         for (j = 0; j < FLINT_MIN(i, 100); j++)
         {
-            ya = _fixed_gaussian_primes[2 * j];
-            yb = _fixed_gaussian_primes[2 * j + 1];
+            ya = _mp_real_gaussian_primes[2 * j];
+            yb = _mp_real_gaussian_primes[2 * j + 1];
 
             t = (xb*ya - xa*yb) / (double) (xa*ya + xb*yb);
 
@@ -319,8 +319,8 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
             }
         }
 
-        ya = _fixed_gaussian_primes[2 * best_j];
-        yb = _fixed_gaussian_primes[2 * best_j + 1];
+        ya = _mp_real_gaussian_primes[2 * best_j];
+        yb = _mp_real_gaussian_primes[2 * best_j + 1];
 
         fmpz_set_si(p, xb*ya - xa*yb);
         fmpz_set_si(q, xa*ya + xb*yb);

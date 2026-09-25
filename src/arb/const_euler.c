@@ -11,13 +11,13 @@
 
 #include "arb.h"
 #include "arb_hypgeom.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_euler_eval(arb_t res, slong prec)
 {
-    /* Brent-McMillan in dual numbers (fixed/const_euler.c) */
-    _fixed_constant_arb(res, fball_const_euler, prec);
+    /* Brent-McMillan in dual numbers (mp_real/const_euler.c) */
+    _mp_real_const_arb(res, mp_real_const_euler, prec);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_const_euler_brent_mcmillan, arb_const_euler_eval)

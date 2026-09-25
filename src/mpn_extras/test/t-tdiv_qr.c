@@ -11,7 +11,7 @@
 
 #include "test_helpers.h"
 #include "mpn_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 /* random sizes covering balanced, unbalanced and large shapes */
 static void
@@ -132,7 +132,7 @@ TEST_FUNCTION_START(flint_mpn_tdiv_qr, state)
         else if (alg == 3 && bn >= 3 && an >= n + 2)
         {
             binv = flint_malloc((n + 4) * sizeof(mp_limb_t));
-            fixed_inv_newton(binv, b, bn, n + 2);
+            _mp_real_inv_newton(binv, b, bn, n + 2);
             _flint_mpn_tdiv_qr_preinv(q, r, a, an, b, bn, binv, n + 2);
             flint_free(binv);
         }

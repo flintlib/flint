@@ -12,7 +12,7 @@
 #include <flint/ca_vec.h>
 #include <flint/fmpz.h>
 #include <flint/ulong_extras.h>
-#include <flint/fixed.h>
+#include <flint/mp_real.h>
 
 void
 simple_ca_atan_p_q(ca_t res, ulong p, ulong q, ca_ctx_t ctx)
@@ -80,8 +80,8 @@ slong hyperbolic_machin_formulas[NUM_FORMULAS2][4][2] = {
     {{404, 251}, {152, 449}, {-106, 4801}, {174, 8749}},
 };
 
-/* Verify the Machin-type sets tabulated in FLINT (fixed/machin_tab.c,
-   fixed_machin_table): for the first n primes,
+/* Verify the Machin-type sets tabulated in FLINT (mp_real/machin_tab.c,
+   _mp_real_machin_table): for the first n primes,
 
        den log(p_i) = sum_j C[i][j] atanh(1/x_j),
 
@@ -98,7 +98,7 @@ slong hyperbolic_machin_formulas[NUM_FORMULAS2][4][2] = {
 static int
 check_machin_table(int gaussian, slong num, ca_ctx_t ctx)
 {
-    const fixed_machin_struct * tab = fixed_machin_table(gaussian, num);
+    const mp_real_machin_struct * tab = _mp_real_machin_table(gaussian, num);
     ca_ptr series;
     ca_t x, y;
     fmpz * crow;
@@ -119,7 +119,7 @@ check_machin_table(int gaussian, slong num, ca_ctx_t ctx)
     /* the series of the set, atan(1/x_j) or atanh(1/x_j) */
     for (j = 0; j < n; j++)
     {
-        fixed_machin_get_x(xj, tab, j);
+        _mp_real_machin_get_x(xj, tab, j);
         ca_one(series + j, ctx);
         ca_div_fmpz(series + j, series + j, xj, ctx);
         if (gaussian)
@@ -130,7 +130,7 @@ check_machin_table(int gaussian, slong num, ca_ctx_t ctx)
 
     for (i = 0; i < n; i++)
     {
-        fixed_machin_get_c_row(crow, tab, i);
+        _mp_real_machin_get_c_row(crow, tab, i);
 
         ca_zero(x, ctx);
         for (j = 0; j < n; j++)
@@ -142,8 +142,8 @@ check_machin_table(int gaussian, slong num, ca_ctx_t ctx)
         /* subtract den times the value the row represents */
         if (gaussian)
         {
-            slong a = _fixed_gaussian_primes[2 * i];
-            slong b = _fixed_gaussian_primes[2 * i + 1];
+            slong a = _mp_real_gaussian_primes[2 * i];
+            slong b = _mp_real_gaussian_primes[2 * i + 1];
             ca_set_si(y, b, ctx);
             ca_div_si(y, y, a, ctx);
             ca_atan(y, y, ctx);
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
         ctx2->options[CA_OPT_PREC_LIMIT] = 65536;
 
         flint_printf("\nFLINT's tabulated Machin-type sets"
-            " (fixed_machin_table), sum - den * value:\n");
+            " (_mp_real_machin_table), sum - den * value:\n");
         for (g = 0; g < 2; g++)
             for (num = 2; num <= maxn; num++)
                 check_machin_table(g, num, ctx2);

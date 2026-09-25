@@ -10,13 +10,13 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_apery_eval(arb_t s, slong prec)
 {
     /* Zuniga's 2023-vi series (fixed/const_zeta3.c) */
-    _fixed_constant_arb(s, fball_const_zeta3, prec);
+    _mp_real_const_arb(s, mp_real_const_zeta3, prec);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_apery, arb_const_apery_eval)

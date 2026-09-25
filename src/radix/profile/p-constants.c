@@ -15,13 +15,13 @@
 #include "double_extras.h"
 #include "mag.h"
 #include "profiler.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 /* Don't call arb_const_e because it caches the result. */
 static void
 arb_const_e_eval(arb_t s, slong prec)
 {
-    _fixed_constant_arb(s, fball_const_e, prec);
+    _mp_real_const_arb(s, mp_real_const_e, prec);
 }
 
 char * radix_integer_get_str_decimal(char * s, const radix_integer_t x, const radix_t radix)

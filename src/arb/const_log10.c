@@ -10,14 +10,14 @@
 */
 
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 static void
 arb_const_log10_eval(arb_t s, slong prec)
 {
     /* log 10 = log 2 + log 5 from the three-prime Machin-type set
        with Zuniga's series (fixed/const_log10.c) */
-    _fixed_constant_arb(s, fball_const_log10, prec);
+    _mp_real_const_arb(s, mp_real_const_log10, prec);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_log10, arb_const_log10_eval)

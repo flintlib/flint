@@ -10,7 +10,7 @@
 */
 
 #include "mpn_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 /*
     Euclidean division with quotient and remainder, ported from
@@ -23,7 +23,7 @@
 
     Viewing a as a fixed-point number in [0, 1) with an fraction limbs and b
     as a fixed-point number in [1/B, 1) with bn fraction limbs, the integer
-    quotient is floor((a/b) B^(an-bn)). fixed_div_newton (Karp-Markstein
+    quotient is floor((a/b) B^(an-bn)). _mp_real_div_newton (Karp-Markstein
     division) gives an approximation of a/b with n2 = n + 2 fraction limbs and
     absolute error at most 4 B^(-n2) / b <= 4 B^(-n2+1), i.e. at most 4 B^-2
     at the integer scale. Hence, if the first fraction limb q[-1] of the
@@ -126,7 +126,7 @@ _flint_mpn_tdiv_qr_trivial(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
 
 /*
     Division with a precomputed approximate inverse: (Binv, Binvn + 2 limbs)
-    is the output of fixed_inv_newton(Binv, B, Bn, Binvn), i.e. an
+    is the output of _mp_real_inv_newton(Binv, B, Bn, Binvn), i.e. an
     approximation of B^Bn / b with Binvn fraction limbs and two integral
     limbs. Requires Binvn >= n + 2 and An >= n + 2 where n = An - Bn + 1.
 
@@ -197,7 +197,7 @@ _flint_mpn_tdiv_qr_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
     TMP_START;
     U = TMP_ALLOC((n2 + 2) * sizeof(mp_limb_t));
 
-    fixed_div_newton(U, A, An, B, Bn, n2);
+    _mp_real_div_newton(U, A, An, B, Bn, n2);
     FLINT_ASSERT(U[n2 + 1] == 0);
 
     q = U + n2 + 2 - (n + 1);
@@ -236,7 +236,7 @@ _flint_mpn_tdiv_qr_unbalanced(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_size_t An,
     Rt = Binv + Binvn + 2;
     T = Rt + Bn;
 
-    fixed_inv_newton(Binv, B, Bn, Binvn);
+    _mp_real_inv_newton(Binv, B, Bn, Binvn);
 
     i = (An + Bn - 1) / Bn - 2;
     antop = An - i * Bn;
