@@ -375,15 +375,16 @@ static const int vm_u32_regs_nv[4] = {4, 2, 1, 1};
 /*
     One block of nv vectors of columns j0 <= j < j0 + w for r rows and the
     rows i0 <= i < i1 of B; lo[s * nv + v] starts from the residues in c
-    (zero at first) and the residues of the totals are stored back. With
-    regs = 1, r and nv are constants and the arrays register allocated;
-    otherwise they are the caller's (in L1) and nv is arbitrary. A last
+    (zero at first) and the residues of the totals are stored back. r is a
+    constant at each call site; with nv also constant and the arrays lo,
+    hi local to the caller, they are register allocated (vm_u32_regs),
+    otherwise they are in L1 and nv is arbitrary (vm_u32_wide). A last
     partial vector goes through a zero-padded buffer.
 */
 FLINT_FORCE_INLINE void
 vm_u32_block(ulong * const * c, vmu_t * lo, vmu_t * hi,
              const ulong * const * a, const nmod_mat_t B, slong j0,
-             slong w, slong i0, slong i1, int r, slong nv, int regs)
+             slong w, slong i0, slong i1, int r, slong nv)
 {
     const nmod_t mod = B->mod;
     const slong wl = w - VMU_VL * (nv - 1);   /* columns of the last vector */
@@ -469,7 +470,7 @@ vm_u32_block(ulong * const * c, vmu_t * lo, vmu_t * hi,
 
 #define VM_U32_REGS_CASE(R, NV) \
     case 8 * (R) + (NV): \
-        vm_u32_block(c, lo, hi, a, B, j0, w, i0, i1, R, NV, 1); break;
+        vm_u32_block(c, lo, hi, a, B, j0, w, i0, i1, R, NV); break;
 
 static void
 vm_u32_regs(ulong * const * c, const ulong * const * a, slong len,
@@ -549,10 +550,10 @@ vm_u32_wide(ulong * const * c, const ulong * const * a, slong len,
 
         switch (r)
         {
-            case 1: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 1, nv, 0); break;
-            case 2: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 2, nv, 0); break;
-            case 3: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 3, nv, 0); break;
-            case 4: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 4, nv, 0); break;
+            case 1: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 1, nv); break;
+            case 2: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 2, nv); break;
+            case 3: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 3, nv); break;
+            case 4: vm_u32_block(c, lo, hi, a, B, j0, w, 0, len, 4, nv); break;
             default: FLINT_UNREACHABLE;
         }
 
@@ -695,6 +696,9 @@ _nmod_mat_mul_rows_simd(ulong * const * c, const ulong * const * a, slong r,
 {
     FLINT_ASSERT(1 <= r && r <= NMOD_MAT_MUL_ROWS_MAX);
     FLINT_ASSERT(len >= 1 && len <= B->r && B->c >= 1);
+
+    /* no vectorized path on this target: avoid unused parameter warning */
+    (void) c; (void) a; (void) r; (void) len; (void) B;
 
 #if FLINT_BITS == 64
 #if NMOD_MAT_HAVE_MUL_U52
