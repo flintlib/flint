@@ -29,6 +29,11 @@
 
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 0
 
+/* fft_small: round quotients with the magic constant instead of vroundpd,
+   which is 2 uops with 8 cycle latency on Intel cores since Skylake
+   (Haswell/Broadwell: 2 uops, 6 cycles) */
+#define FLINT_FFT_SMALL_ROUND_USE_NATIVE 0
+
 /* verified on Xeon(R) Gold 6244 (cascade lake) */
 #define FLINT_MULMOD_SHOUP_THRESHOLD 23
 
