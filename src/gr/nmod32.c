@@ -15,6 +15,8 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
+#include "flint-mparam.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_poly.h"
@@ -686,11 +688,38 @@ _nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32
     return _nmod32_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
 }
 
-/* todo: tuning for rectangular matrices */
+/*
+    The integer SIMD kernel of nmod_mat (_nmod_mat_mul_u32) reads and writes
+    uint32 entries directly; single-threaded, one Strassen level is put on
+    top of it from the same dimension as in nmod_mat_mul (the recursive
+    calls come back here). The generic methods remain for tiny matrices and
+    for 32-bit builds, where the kernel declines.
+*/
 static int
 _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
+    slong ar = gr_mat_nrows(A, ctx);
+    slong ac = gr_mat_ncols(A, ctx);
+    slong bc = gr_mat_ncols(B, ctx);
+    slong min_dim = FLINT_MIN(FLINT_MIN(ar, ac), bc);
+
+    if (min_dim >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+    {
+        if (ac != gr_mat_nrows(B, ctx) || ar != gr_mat_nrows(C, ctx)
+                || bc != gr_mat_ncols(C, ctx))
+            return GR_DOMAIN;
+
+        if (flint_get_num_threads() == 1
+                && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
+            return gr_mat_mul_strassen(C, A, B, ctx);
+
+        if (_nmod_mat_mul_u32(C->entries, C->stride, A->entries, A->stride,
+                              B->entries, B->stride, ar, ac, bc,
+                              NMOD32_CTX(ctx)))
+            return GR_SUCCESS;
+    }
+
+    if (min_dim >= 256)
         return gr_mat_mul_strassen(C, A, B, ctx);
     else
         return gr_mat_mul_classical(C, A, B, ctx);

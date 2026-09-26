@@ -16,6 +16,34 @@
 #include "thread_support.h"
 
 #include "longlong.h"
+#include "flint-mparam.h"
+#include "nmod_mat/impl.h"
+
+#if FLINT_BITS == 64
+
+/*
+    Dimension from which nmod_mat_mul_blas is preferred when one dgemm pass
+    suffices (0: never), for the current thread count: BLAS_1PASS_CUTOFF
+    measured with 1 thread, BLAS_1PASS_CUTOFF_MT with 4, their geometric
+    mean for 2 threads, and the latter for 3 threads or more.
+*/
+static slong
+_blas_1pass_cutoff(slong num_threads)
+{
+    slong c1 = FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF;
+    slong c4 = FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT;
+
+    if (num_threads <= 1)
+        return c1;
+    if (num_threads >= 3 || c1 <= 0 || c4 <= 0)
+        return c4;
+    return (slong) n_sqrt((ulong) c1 * (ulong) c4);
+}
+
+#endif
+
+/* inner dimension from which nmod_mat_mul_u52 is preferred to u32 / fp50 */
+#define NMOD_MAT_MUL_U52_MIN_K 12
 
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
@@ -41,6 +69,247 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     slong flint_num_threads = flint_get_num_threads();
+
+    /*
+        B is a single column: use nmod_mat_mul_nmod_vec
+        TODO handle multithreading in mul_nmod_vec
+    */
+    if (n == 1 && m >= 8 && k >= 1 && flint_num_threads == 1)
+    {
+        ulong * t;
+        slong i;
+        TMP_INIT;
+
+        TMP_START;
+        t = TMP_ARRAY_ALLOC(k + m, ulong);
+        for (i = 0; i < k; i++)
+            t[i] = nmod_mat_entry(B, i, 0);
+        nmod_mat_mul_nmod_vec(t + k, A, t, k);
+        for (i = 0; i < m; i++)
+            nmod_mat_entry(C, i, 0) = t[k + i];
+        TMP_END;
+        return;
+    }
+
+    /*
+        A has a few rows (up to NMOD_MAT_MUL_ROWS_MAX): _nmod_mat_mul_rows_simd
+        streams B once for all of them with delayed reductions where it is vectorized
+        This avoids calling the kernels which pad these rows to a whole tile
+        of MR rows (MR depends on each kernel and on the ISA, but it can be above
+        10).
+
+        NOTE It is single-threaded: with several threads it is still used
+        for the shapes the threaded kernels do not take (below), which
+        would otherwise go to nmod_mat_mul_classical_threaded (observed 2-7x
+        slower than it on Ice Lake, Meteor Lake, 4 threads).
+        TODO thread it (split the columns of B).
+    */
+    if (m >= 1 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2 && n >= 1
+            && (flint_num_threads == 1
+                || !((m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                      && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+                     || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                         && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)))
+            && C != A && C != B && NMOD_MAT_NMOD_VEC_MUL_IS_SIMD(C->mod.n))
+    {
+        ulong * c[NMOD_MAT_MUL_ROWS_MAX];
+        const ulong * a[NMOD_MAT_MUL_ROWS_MAX];
+
+        for (slong i = 0; i < m; i++)
+        {
+            c[i] = nmod_mat_entry_ptr(C, i, 0);
+            a[i] = nmod_mat_entry_ptr(A, i, 0);
+        }
+
+        if (_nmod_mat_mul_rows_simd(c, a, m, k, B))
+            return;
+    }
+
+    /*
+        B has a few columns (up to NMOD_MAT_MUL_ROWS_MAX):
+        _nmod_mat_mul_cols_simd multiplies each row of A with all of them at
+        once, as dot products sharing the loads of the row, on the transposed
+        columns. This avoids calling the kernels which would pad them to
+        NR = 8-24 columns; this also avoids reading B column by column as in
+        the classical code.
+    */
+    if (n >= 2 && n <= NMOD_MAT_MUL_COLS_MAX && k >= 1
+            && flint_num_threads == 1 && C != A && C != B
+            && NMOD_MAT_MUL_COLS_IS_SIMD(C->mod.n))
+    {
+        if (_nmod_mat_mul_cols_simd(C, A, B))
+            return;
+    }
+
+    /*
+        Moduli up to 2^52: SIMD kernels with delayed reduction,
+        nmod_mat_mul_u32 (any 64-bit target, moduli below 2^32),
+        nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and, without
+        IFMA, nmod_mat_mul_k52 (two-limb integer Karatsuba, moduli up to
+        2^52) or nmod_mat_mul_fp50 (all in double precision with the
+        mulmod of fft_small, moduli below 2^50). The parameters come from
+        flint-mparam.h and were measured with
+        src/nmod_mat/profile/p-mul_tune.c; the picture on the machines
+        measured so far (Cascade/Ice/Meteor Lake, Zen 4, Apple M4) is:
+
+        - Where nmod_mat_mul_blas needs several dgemm passes and a CRT
+          (k*(n/2)^2 >= 2^53, always the case from 25 bits on), the SIMD
+          kernels are 2-5x faster than any other method from dimension 8.
+        - Where one dgemm pass suffices (up to about 23 bits), u32 wins
+          below a dimension of about 100-250 (mul_blas pays O(n^2)
+          conversions and thread hand-offs around its gemm) and is
+          0.7-1.1x of mul_blas above. The single-IFMA mode of u52 (moduli
+          up to 2^26) is 1.1-1.35x faster than u32 and than FLINT's own gemm,
+          but an external BLAS can overtake it at large dimensions. Hence
+          BLAS_1PASS_CUTOFF(_MT), consulted for u32 always and for u52 only
+          with an external BLAS.
+        - u52 removes the 31-32 bit cliff of u32 (whose in-kernel folds
+          then come every 1-2 products) and extends the single pass to
+          52 bits, where the alternative is 4-5 dgemm passes. Its two-IFMA
+          mode is slower than u32 between 27 and 30-31 bits (1.5-1.65x on
+          Zen 4, up to 1.1x on Ice Lake), hence U52_MIN_BITS.
+        - Thin shapes: what the kernels pay for is the padding of the
+          last tile of C, of MR rows (4-14) and NR columns (8-24), and
+          the packing of A and B, whereas the inner dimension k has no
+          such cost. So the kernels are used for any k >= 1 as soon as
+          n >= SIMD_MIN_DIM, and m >= SIMD_MIN_DIM or m >= SIMD_MIN_DIM/2
+          with n >= 4*SIMD_MIN_DIM (1.1-10x faster than the classical
+          code on these shapes on AVX-512, for instance 1000 x 4 times
+          4 x 1000 or 4 x 1000 times 1000 x 1000). Below that, notably
+          for n < 8 where the padding to NR columns wastes most of the
+          tile, the classical code wins.
+        - Small inner dimension k on IFMA machines: the per-entry
+          reduction of u52 (Barrett through doubles and a Shoup step)
+          weighs more than its products, so up to k = 8 u32 (<= 32
+          bits) and fp50 (33-50 bits) are 1.15-2.3x faster on Ice Lake
+          (1000 x k x 1000); u52 wins from k = 16 on. Hence U52_MIN_K
+          below
+          TODO measured on one machine so far, could be useful to
+          analyze it more thoroughly
+        - Single-threaded, Strassen on top (its recursive calls come back
+          here) pays from SIMD_STRASSEN_CUTOFF on (e.g. 320-512 on Zen 4).
+          TODO with 4 threads it did not pay up to 4096 (which is not that
+          large) on several machine, so it is not used with several threads,
+          but of course one may handle multi-threading differently within
+          Strassen: this requires investigation.
+        - Without IFMA, k52 and fp50 are the single-pass options from 33
+          bits on, and which of the two wins is a property of the
+          instruction set rather than of the modulus (FP50_MAX_BITS).
+          On x86 fp50 wins everywhere measured (1.0-2.1x on Cascade Lake
+          and Meteor Lake): it keeps one accumulator per tile cell where
+          k52 needs three, hence a tile 2.7x wider and fewer operand
+          loads per product. On NEON the single-instruction widening
+          multiply-add (smlal) reverses this and k52 wins from dimension
+          48 on (1.4x on Apple M4). Above 2^50, where fp50 stops, k52 is
+          the only single-pass option.
+        - These two are 1.4-3.4x faster than blas + CRT up to a
+          dimension that grows with the modulus size, and lose beyond it
+          (K52_BLAS_CUTOFF, only with an external BLAS): on Apple M4
+          that dimension is 320-448 with Accelerate, whose dgemm is far
+          out of reach of a NEON kernel; on the x86 machines measured it
+          is 768 and beyond, or never. With FLINT's own gemm, blas + CRT
+          was 1.3-1.8x slower than k52 on Apple M4 at every dimension.
+    */
+#if FLINT_BITS == 64
+    if (C->mod.n <= (UWORD(1) << 52) && k >= 1
+            && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+            && (m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                    && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)))
+    {
+        flint_bitcnt_t bits = FLINT_BIT_COUNT(C->mod.n);
+        int (* simd_mul)(nmod_mat_t, const nmod_mat_t, const nmod_mat_t);
+        int blas_1pass = 0;
+
+        simd_mul = NULL;
+
+        if (bits <= 32)
+        {
+            /*
+                mul_blas is preferred from BLAS_1PASS_CUTOFF(_MT) on
+                (0: never) when it can do it in one dgemm pass,
+                k*(n/2)^2 < 2^53. Here half < 2^31, so half^2 does not
+                overflow.
+            */
+            ulong half = C->mod.n / 2;
+            slong cut = _blas_1pass_cutoff(flint_num_threads);
+
+            blas_1pass = cut > 0 && min_dim >= cut
+                && (half == 0
+                    || (ulong) k <= ((UWORD(1) << 53) - 1) / (half * half));
+        }
+
+        if (NMOD_MAT_HAVE_MUL_U52
+                && (bits >= FLINT_NMOD_MAT_MUL_U52_MIN_BITS
+                    || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS)
+                && (k >= NMOD_MAT_MUL_U52_MIN_K
+                    || bits > FLINT_NMOD_MAT_MUL_FP50_MAX_BITS
+                    || (bits > 32 && !NMOD_MAT_HAVE_FPV)))
+        {
+            /* FLINT's own gemm was never measured faster than u52 */
+#if FLINT_USES_BLAS
+            if (!blas_1pass)
+#endif
+                simd_mul = nmod_mat_mul_u52;
+        }
+        else if (bits <= 32)
+        {
+            if (!blas_1pass)
+                simd_mul = nmod_mat_mul_u32;
+        }
+        else if (NMOD_MAT_HAVE_MUL_U52 && NMOD_MAT_HAVE_FPV
+                 && bits <= FLINT_NMOD_MAT_MUL_FP50_MAX_BITS)
+        {
+            /* small inner dimension on an IFMA machine, 33-50 bits */
+            simd_mul = nmod_mat_mul_fp50;
+        }
+        else if (FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
+                 && bits >= FLINT_NMOD_MAT_MUL_K52_MIN_BITS
+#if FLINT_USES_BLAS
+                 /* FLINT's own gemm never beats k52 / fp50 with its CRT
+                    (1.3-1.8x slower on Apple M4 at 512-2048) */
+                 && (FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF <= 0
+                     || min_dim < FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF)
+#endif
+                )
+        {
+            /*
+                33 to 52 bits without IFMA, where the alternative is
+                4-5 dgemm passes and a CRT: the floating point kernel
+                where the parameters prefer it (it stops below 2^50),
+                the integer two-limb one otherwise. Past
+                K52_BLAS_CUTOFF the multimodular route wins after all
+                and this falls through to the dispatch below.
+            */
+            if (bits <= FLINT_NMOD_MAT_MUL_FP50_MAX_BITS)
+                simd_mul = nmod_mat_mul_fp50;
+            else
+                simd_mul = nmod_mat_mul_k52;
+        }
+
+        if (simd_mul != NULL)
+        {
+            if (flint_num_threads == 1
+                    && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
+            {
+                if (C == A || C == B)
+                {
+                    nmod_mat_t T;
+                    nmod_mat_init(T, m, n, A->mod.n);
+                    nmod_mat_mul_strassen(T, A, B);
+                    nmod_mat_swap_entrywise(C, T);
+                    nmod_mat_clear(T);
+                }
+                else
+                    nmod_mat_mul_strassen(C, A, B);
+                return;
+            }
+
+            if (simd_mul(C, A, B))
+                return;
+        }
+    }
+#endif
 
     /*
         tuning is based on several assumptions:
@@ -95,7 +364,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         cutoff = 200;
 
     if (flint_num_threads > 1)
-	    nmod_mat_mul_classical_threaded(C, A, B);
+        nmod_mat_mul_classical_threaded(C, A, B);
     else if (min_dim < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else

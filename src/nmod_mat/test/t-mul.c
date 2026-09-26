@@ -119,6 +119,124 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_clear(D);
     }
 
+    /* thin shapes (one dimension up to 8, the others larger), which
+       nmod_mat_mul sends to specific code, on windows of larger matrices
+       half of the time */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t A, B, C, D, PA, PB, PC, PC0;
+        slong m, k, n, ra, ca, rb, cb, rc, cc, r, c;
+        ulong mod;
+        int win = n_randint(state, 2);
+
+        m = 1 + n_randint(state, 150);
+        k = 1 + n_randint(state, 150);
+        n = 1 + n_randint(state, 150);
+        switch (n_randint(state, 4))
+        {
+            case 0: m = 1 + n_randint(state, 8); break;
+            case 1: k = 1 + n_randint(state, 8); break;
+            case 2: n = 1 + n_randint(state, 8); break;
+            default: n = 1; break;
+        }
+        /* a few rows and many columns or a long inner dimension (the
+           products with few rows work by blocks of columns and chunks
+           of rows), or a few columns and a long inner dimension (those
+           with few columns accumulate by chunks of the inner dimension) */
+        switch (n_randint(state, 12))
+        {
+            case 0:
+                m = 1 + n_randint(state, 8);
+                k = 1 + n_randint(state, 1200);
+                break;
+            case 1:
+                m = 1 + n_randint(state, 8);
+                n = 1 + n_randint(state, 4500);
+                break;
+            case 2:
+                n = 1 + n_randint(state, 8);
+                k = 1 + n_randint(state, 6000);
+                m = 1 + n_randint(state, 40);
+                break;
+            default:
+                break;
+        }
+
+        if (n_randint(state, 4) == 0)
+            mod = n_randtest_not_zero(state);
+        else
+            mod = n_randbits(state, 1 + n_randint(state, FLINT_MIN(52, FLINT_BITS)));
+        /* nmod_mat_randfull does not reduce for the modulus 1 */
+        mod = FLINT_MAX(mod, UWORD(2));
+
+        ra = win ? n_randint(state, 4) : 0;
+        ca = win ? n_randint(state, 4) : 0;
+        rb = win ? n_randint(state, 4) : 0;
+        cb = win ? n_randint(state, 4) : 0;
+        rc = win ? n_randint(state, 4) : 0;
+        cc = win ? n_randint(state, 4) : 0;
+
+        nmod_mat_init(PA, ra + m + (win ? n_randint(state, 4) : 0),
+                          ca + k + (win ? n_randint(state, 4) : 0), mod);
+        nmod_mat_init(PB, rb + k + (win ? n_randint(state, 4) : 0),
+                          cb + n + (win ? n_randint(state, 4) : 0), mod);
+        nmod_mat_init(PC, rc + m + (win ? n_randint(state, 4) : 0),
+                          cc + n + (win ? n_randint(state, 4) : 0), mod);
+        nmod_mat_randfull(PA, state);
+        nmod_mat_randfull(PB, state);
+        nmod_mat_randtest(PC, state);
+        nmod_mat_init_set(PC0, PC);
+
+        nmod_mat_window_init(A, PA, ra, ca, ra + m, ca + k);
+        nmod_mat_window_init(B, PB, rb, cb, rb + k, cb + n);
+        nmod_mat_window_init(C, PC, rc, cc, rc + m, cc + n);
+        nmod_mat_init(D, m, n, mod);
+
+        flint_set_num_threads(n_randint(state, 2) ? 1 : 1 + n_randint(state, 4));
+
+        nmod_mat_mul(C, A, B);
+        nmod_mat_mul_check(D, A, B);
+
+        if (!nmod_mat_equal(C, D))
+            TEST_FUNCTION_FAIL("thin shapes: m: %wd, k: %wd, n: %wd, "
+                               "mod: %wu, windows: %d, threads: %d\n",
+                               m, k, n, mod, win, flint_get_num_threads());
+
+        for (r = 0; r < PC->r; r++)
+            for (c = 0; c < PC->c; c++)
+                if ((r < rc || r >= rc + m || c < cc || c >= cc + n)
+                        && nmod_mat_entry(PC, r, c) != nmod_mat_entry(PC0, r, c))
+                    TEST_FUNCTION_FAIL("thin shapes: write outside the "
+                                       "window: m: %wd, k: %wd, n: %wd, "
+                                       "mod: %wu, threads: %d\n", m, k, n,
+                                       mod, flint_get_num_threads());
+
+        /* aliasing, when the shapes allow it */
+        if (k == n)
+        {
+            nmod_mat_mul(A, A, B);
+            if (!nmod_mat_equal(A, D))
+                TEST_FUNCTION_FAIL("thin shapes: aliasing C = A: m: %wd, "
+                                   "k: %wd, mod: %wu\n", m, k, mod);
+        }
+        else if (m == k)
+        {
+            nmod_mat_mul(B, A, B);
+            if (!nmod_mat_equal(B, D))
+                TEST_FUNCTION_FAIL("thin shapes: aliasing C = B: m: %wd, "
+                                   "n: %wd, mod: %wu\n", m, n, mod);
+        }
+
+        nmod_mat_window_clear(A);
+        nmod_mat_window_clear(B);
+        nmod_mat_window_clear(C);
+        nmod_mat_clear(D);
+        nmod_mat_clear(PA);
+        nmod_mat_clear(PB);
+        nmod_mat_clear(PC);
+        nmod_mat_clear(PC0);
+    }
+
     /* Test aliasing with windows */
     {
         nmod_mat_t A, B, A_window;

@@ -96,16 +96,21 @@ typedef enum
     _DOT2_SPLIT = 2,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
 #endif  // FLINT_BITS == 64
     _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
-    _DOT2 = 4,           /* 2 limbs */
-    _DOT3_ACC = 5,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
-    _DOT3 = 6,           /* 3 limbs */
-    _DOT_POW2 = 7,       /* mod.n is a power of 2 */
+    _DOT_U52 = 4,        /* 2 limbs, modulus <= 2**52, AVX512-IFMA (64 bits only) */
+    _DOT_SPLIT_LIMBS = 5,  /* 2 limbs, modulus > 2**32, AVX2 (64 bits only) */
+    _DOT_U64 = 6,        /* 2 limbs, modulus > 2**52, AVX512-IFMA (64 bits only) */
+    _DOT2 = 7,           /* 2 limbs */
+    _DOT3_ACC = 8,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
+    _DOT3_U64 = 9,       /* 3 limbs, AVX512-IFMA (64 bits only), same code as _DOT_U64 */
+    _DOT3_SPLIT_LIMBS = 10,  /* 3 limbs, AVX2 (64 bits only), same code as _DOT_SPLIT_LIMBS */
+    _DOT3 = 11,          /* 3 limbs */
+    _DOT_POW2 = 12,      /* mod.n is a power of 2 */
 } dot_method_t;
-// if mod.n is a power of 2, we use _DOT_POW2 in all cases
-// otherwise, number of limbs of unreduced dot product can be deduced:
-// 1 limb  <=>  method <= _DOT1
-// 2 limbs <=>  _DOT1 < method <= _DOT2
-// 3 limbs <=>  _DOT2 < method
+/* if mod.n is a power of 2, we use _DOT_POW2 in all cases             */
+/* otherwise, number of limbs of unreduced dot product can be deduced: */
+/* 1 limb  <=>  method <= _DOT1                                        */
+/* 2 limbs <=>  _DOT1 < method <= _DOT2                                */
+/* 3 limbs <=>  _DOT2 < method                                         */
 
 typedef struct
 {

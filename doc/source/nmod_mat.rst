@@ -346,7 +346,21 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between classical
-    and Strassen multiplication.
+    and Strassen multiplication. For the classical algorithms, it chooses
+    between several BLAS-like implementations: the byte kernels of
+    `nmod_mat_mul_u8` for moduli up to `255`, the SIMD kernels
+    `nmod_mat_mul_u32` (moduli below `2^{32}`), `nmod_mat_mul_u52` (up to
+    `2^{52}`, when AVX512-IFMA is available) and, without AVX512-IFMA,
+    `nmod_mat_mul_k52` or `nmod_mat_mul_fp50` (moduli up to `2^{52}`,
+    respectively below `2^{50}`), and `nmod_mat_mul_blas`. The crossovers
+    for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_SIMD_*``,
+    ``_BLAS_1PASS_*``, ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of
+    the architecture dependent ``flint-mparam.h``, to be tuned with the
+    profile program ``nmod_mat/profile/p-mul_tune.c``. Single-threaded,
+    Strassen is put on top of the SIMD kernels for large dimensions. The
+    SIMD kernels are also used for thin shapes with any inner dimension.
+    Single-threaded, a product by a single column is done with
+    :func:`nmod_mat_mul_nmod_vec`.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 
@@ -378,7 +392,10 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
-    multiplication (the Strassen-Winograd variant).
+    multiplication (the Strassen-Winograd variant), one level, the products
+    being done by :func:`nmod_mat_mul` (which may use Strassen again). Odd
+    dimensions are handled by virtual padding: the blocks are seen as padded
+    with a zero row or column, without any copy or extra pass.
 
 .. function:: int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
@@ -415,6 +432,66 @@ Matrix multiplication
     `C` with `A` or `B` is supported (arbitrary partial overlap is
     not).
 
+.. function:: int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using integer SIMD kernels specialized to moduli
+    below `2^{32}`. Kernels exist for AVX-512, AVX2 and AArch64 NEON, with a
+    slower portable fallback in plain C. Several threads are used when
+    available. Returns `1` for success and `0` if the modulus is at least
+    `2^{32}` or FLINT is built with a 32-bit word size. Aliasing of the
+    operands is supported. Dimensions must be compatible for matrix
+    multiplication. Approach: the entries are lifted to signed 32-bit integers
+    of absolute value at most `n/2`, products are accumulated exactly in 64-bit
+    lanes with widening `32 \times 32 \to 64` bit multiplications, and
+    reductions modulo `n` are delayed for as long as the accumulators cannot
+    overflow. So, a single pass suffices for any modulus below `2^{32}`, making
+    this typically faster than `nmod_mat_mul_blas` for input such that the
+    latter needs to use multimodular reduction and CRT.
+
+.. function:: int _nmod_mat_mul_u32(uint32_t * C, slong Cstride, const uint32_t * A, slong Astride, const uint32_t * B, slong Bstride, slong m, slong k, slong n, nmod_t mod)
+
+    The same multiplication on matrices with 32-bit entries: `A` is
+    `m \times k`, `B` is `k \times n` and `C` is `m \times n`, each stored
+    row-major with the given row strides and with entries reduced modulo
+    ``mod.n``, which must be below `2^{32}`. The kernels read and write the
+    32-bit entries directly. Returns `1` for success and `0` in the cases
+    where `nmod_mat_mul_u32` does. `C` may be equal to `A` or `B` (same
+    pointer and strides) but must not otherwise overlap them. Several
+    threads are used when available.
+
+.. function:: int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using the AVX512-IFMA instructions, which multiply
+    52-bit integers exactly into two 64-bit accumulators. Returns `1` for
+    success and `0` if the modulus exceeds `2^{52}`, or if FLINT was not
+    compiled for a target with AVX512-IFMA (or with a 32-bit word size).
+    Aliasing of the operands is supported. This handles any modulus up to
+    `2^{52}`; up to `2^{26}`, a variant with a single IFMA instruction per
+    product is used. Several threads are used when available.
+
+.. function:: int nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` with integer SIMD instructions (AVX-512, AVX2,
+    NEON, or plain C otherwise) for a modulus up to `2^{52}`: each entry is
+    split into two 27-bit limbs and the product is formed as a two-limb
+    Karatsuba product, three widening `32b \times 32b \to 64b` multiplications
+    accumulated in three 64-bit accumulators, which are combined modulo `n`
+    in double precision at the end of each block. Returns `1` for success
+    and `0` if the modulus exceeds `2^{52}` (or on a 32-bit word size, or
+    when compiling with MSVC without AVX2, see ``nmod_mat/mul_fp_vec.h``).
+    Aliasing of the operands is supported. Several threads are used when
+    available.
+
+.. function:: int nmod_mat_mul_fp50(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` in double precision for a modulus below `2^{50}`,
+    reducing each product modulo `n` as it is formed with the floating point
+    modular multiplication of ``fft_small`` (vector FMA on AVX-512, AVX2
+    or NEON, plain C otherwise). Returns `1` for success and `0` if the
+    modulus is `2^{50}` or more (or on a 32-bit word size, or when
+    compiling with MSVC without AVX2). Aliasing of the operands is
+    supported. Several threads are used when available.
+
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
@@ -439,6 +516,12 @@ Matrix multiplication
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
     The number entries written to ``c`` is always equal to the number of columns of ``B``.
+    The rows of ``B`` are accumulated with delayed reductions, in the manner
+    of :func:`nmod_mat_mul_u52` (AVX512-IFMA, moduli up to `2^{52}`), of
+    :func:`nmod_mat_mul_u32` (AVX2 or AVX-512 without IFMA, moduli up to
+    `2^{32}`) or of :func:`nmod_mat_mul_fp50` (AVX2, AVX-512 or NEON, moduli
+    below `2^{50}`) where available, and with one modular multiplication per
+    entry otherwise.
 
 
 Matrix Exponentiation

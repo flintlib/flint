@@ -86,4 +86,50 @@
    this dividend length (1000000: never) */
 #define FLINT_MPN_DIV_2_GMP_CUTOFF 21
 
+
+/*
+    nmod_mat_mul: dispatch of the SIMD kernels nmod_mat_mul_u32 (moduli
+    below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
+    without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
+    / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
+    (measured on AMD Zen 4 (AVX512-IFMA), with an external BLAS (AOCL/BLIS)).
+      SIMD_MIN_DIM         use the SIMD kernels when B has at least this
+                           many columns and A this many rows (or half as
+                           many if B has 4x as many columns), for any inner
+                           dimension
+      SIMD_STRASSEN_CUTOFF single-threaded, one Strassen level is put on
+                           top of the SIMD kernels from this dimension on
+      BLAS_1PASS_CUTOFF    when one dgemm pass suffices (k*(n/2)^2 < 2^53),
+                           nmod_mat_mul_blas is preferred to u32 from this
+                           dimension on and, with an external BLAS, also to
+                           the single-IFMA mode of u52 (0: never)
+      BLAS_1PASS_CUTOFF_MT the same with 4 threads or more (with 2 or 3
+                           threads: the geometric mean of the two)
+      U52_MIN_BITS         u52 is preferred to u32 from this modulus bit
+                           size on (through 52 bits)
+      U52_LO_MAX_BITS      u52 in its single-IFMA mode is preferred to u32
+                           up to this modulus bit size (0: never)
+      K52_MIN_BITS         without IFMA, from this modulus bit size on
+                           (through 52 bits) the two-limb integer kernel
+                           nmod_mat_mul_k52 replaces blas + CRT (0: never)
+      FP50_MAX_BITS        in that range, the floating point kernel
+                           nmod_mat_mul_fp50 is preferred to k52 up to
+                           this modulus bit size (through 50; 0: never)
+      K52_BLAS_CUTOFF      in that range and with an external BLAS,
+                           nmod_mat_mul_blas and its CRT are preferred to
+                           k52 / fp50 from this dimension on (0: never).
+                           The crossover grows with the modulus size, since
+                           blas needs more primes; the value is the one for
+                           the bottom of the range.
+*/
+#define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 0
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 0
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 320
+#define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 32
+#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 26
+#define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
+#define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
+#define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
+
 #endif
