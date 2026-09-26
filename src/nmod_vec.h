@@ -61,6 +61,20 @@
 #define NMOD_VEC_DOT_U64_MIN_LEN 96
 #define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
 
+/* below their minimal length (parameters computed for a longer length, as
+   for the short dot products of a classical polynomial product), the SIMD
+   methods go directly to the scalar code of their band: _DOT2 (two) or
+   _DOT3_ACC / _DOT3 (three limbs) */
+#if FLINT_BITS == 64
+# define _NMOD_VEC_DOT3_ACC_BOUND UWORD(6521908912666391107)
+#else
+# define _NMOD_VEC_DOT3_ACC_BOUND UWORD(1518500250)
+#endif
+#define _NMOD_VEC_DOT_SCALAR(two, SUF, ...)                              \
+    ((two) ? _nmod_vec_dot2 ## SUF(__VA_ARGS__)                           \
+     : (mod.n <= _NMOD_VEC_DOT3_ACC_BOUND) ? _nmod_vec_dot3_acc ## SUF(__VA_ARGS__) \
+     : _nmod_vec_dot3 ## SUF(__VA_ARGS__))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -544,13 +558,19 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
         return _nmod_vec_dot2(vec1, vec2, len, mod);
 
     if (params.method == _DOT_U52)
-        return _nmod_vec_dot_u52(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_U52_MIN_LEN)
+            ? _nmod_vec_dot_u52(vec1, vec2, len, mod)
+            : _nmod_vec_dot2(vec1, vec2, len, mod);
 
     if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
-        return _nmod_vec_dot_split_limbs(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
+            ? _nmod_vec_dot_split_limbs(vec1, vec2, len, mod)
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, , vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
-        return _nmod_vec_dot_u64(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
+            ? _nmod_vec_dot_u64(vec1, vec2, len, mod)
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, , vec1, vec2, len, mod);
 
     if (params.method == _DOT3_ACC)
         return _nmod_vec_dot3_acc(vec1, vec2, len, mod);
@@ -594,13 +614,19 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
         return _nmod_vec_dot2_rev(vec1, vec2, len, mod);
 
     if (params.method == _DOT_U52)
-        return _nmod_vec_dot_u52_rev(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_U52_MIN_LEN)
+            ? _nmod_vec_dot_u52_rev(vec1, vec2, len, mod)
+            : _nmod_vec_dot2_rev(vec1, vec2, len, mod);
 
     if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
-        return _nmod_vec_dot_split_limbs_rev(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
+            ? _nmod_vec_dot_split_limbs_rev(vec1, vec2, len, mod)
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, _rev, vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
-        return _nmod_vec_dot_u64_rev(vec1, vec2, len, mod);
+        return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
+            ? _nmod_vec_dot_u64_rev(vec1, vec2, len, mod)
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, _rev, vec1, vec2, len, mod);
 
     if (params.method == _DOT3_ACC)
         return _nmod_vec_dot3_acc_rev(vec1, vec2, len, mod);
