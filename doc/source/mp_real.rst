@@ -558,13 +558,17 @@ leaves accumulate iteratively over exact mpn integers with a backward
 recurrence; the tree keeps exact integers until they outgrow the target
 precision, and truncated balls afterwards.
 
-**π and log 2.**  `\pi/4` uses the Chudnovsky series and `\log 2` the
-hypergeometric series of [Zun2025]_ (11.9 bits per term).  The
-reconstruction scalars -- `D = 640320^2/12` with the extra `1/4` for
-`\pi/4`, and the denominator `2160` for `\log 2` -- are baked into
-`q(0)` at the leftmost leaf of the splitting tree.  This scales the
-root `Q` while leaving `T` invariant, so no final scalar multiplication
-or bit shift remains.
+**π and log 2** are hypergeometric series summed by
+:func:`mp_real_hypgeom_series`: `\pi` by the Chudnovsky series (see the
+example under :func:`mp_real_hypgeom_series_int64`), and `\log 2` by the
+series of [Zun2025]_ with 11.9 bits per term,
+
+.. math::
+
+    \log 2 = \frac{1}{2160} \sum_{k \ge 0} (1497 + 1794 k)
+        \prod_{j=1}^{k} \frac{j (2j - 1)}{216 (6j + 1)(6j + 5)}.
+
+At small precision they are read from static tables or the cache.
 
 **Euler's constant** comes from a static 3456-bit table at low
 precision and otherwise from the Brent-McMillan formula ([BM1980]_)
@@ -2030,7 +2034,7 @@ of threads.
   series.  The Machin combination frees each series value as it reads
   it.
 
-* A binary splitting (`\pi`, `\log 2`, both sums for `\gamma`,
+* A binary splitting (both sums for `\gamma`,
   :func:`_mp_real_atan_frac_bsplit` and the generic backend) splits the
   thread budget between the halves of a node, as
   :func:`flint_parallel_binary_splitting` does, with one difference.
