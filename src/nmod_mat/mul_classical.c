@@ -193,7 +193,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
             A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod);
     }
     else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
-        || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
+        /* || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF */  /* small n should go to several vectorized nmod_vec_dot */
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
         _nmod_mat_addmul_basic_op(D->entries, D->stride,

@@ -29,8 +29,8 @@
       the 32-bit halves of the entries, eight accumulators per column,
       two columns per pass over A, three-limb totals every 2000 terms;
     - otherwise a vector backend of mul_fp_vec.h, moduli below 2^50
-      (dot_fp50.c): products reduced in double precision as they are
-      formed, u accumulators per column, reduced every four terms.
+      (as nmod_mat_mul_fp50): products reduced in double precision as
+      they are formed, u accumulators per column, reduced every four terms.
 
     Compared with the kernels, nothing is packed and no tile is padded to
     NR columns; compared with the classical code, the columns of B are
@@ -276,10 +276,10 @@ cols_u64(nmod_mat_t C, const nmod_mat_t A, const ulong * bt, slong kp, int r)
 #define COLS_HAVE_FP50 1
 
 /*
-    Moduli below 2^50 in double precision (dot_fp50.c): every product is
-    in (-9/8 n, 9/8 n), u accumulators per column (r * u <= 8) take four
-    terms each before being brought back to (-0.51 n, 0.51 n). The tail of
-    fewer than FPV_VL terms is scalar. The horizontal sum of a column is an
+    Moduli below 2^50 in double precision (as nmod_mat_mul_fp50): every
+    product is in (-9/8 n, 9/8 n), u accumulators per column (r * u <= 8)
+    take four terms each before being brought back to (-0.51 n, 0.51 n).
+    The tail of fewer than FPV_VL terms is scalar. The horizontal sum of a column is an
     integer offset by 8 n (nonnegative, below 2^54) plus the tail.
 */
 FLINT_FORCE_INLINE void

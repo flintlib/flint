@@ -25,13 +25,17 @@
 
 /*
     SIMD dot products for moduli above 2^32 (see dot_u52.c, dot_u64.c,
-    dot_fp50.c): the strategies of nmod_mat_mul_u52 (AVX512-IFMA, moduli
-    up to 2^52) and nmod_mat_mul_fp50 (double precision, moduli below
-    2^50, on AVX-512, AVX2 + FMA and AArch64 NEON), only selected when the
-    unreduced dot product fits in two limbs, and for moduli above 2^52 on
-    AVX512-IFMA the products of the 32-bit halves of the entries (in the
-    two-limb band as _DOT_U64, in the three-limb one as _DOT3_U64, so that
-    the limb-count convention on dot_method_t is kept).
+    dot_split_limbs.c):
+    - on AVX512-IFMA, the strategy of nmod_mat_mul_u52 for moduli up to 2^52
+      (_DOT_U52, only when the unreduced dot product fits in two limbs), and
+      for larger moduli the products of the 32-bit halves of the entries
+      (_DOT_U64 in the two-limb band, _DOT3_U64 in the three-limb one);
+    - on AVX2 / AVX-512, the entries split into two limbs of at most 32 bits
+      multiplied with vpmuludq (_DOT_SPLIT_LIMBS / _DOT3_SPLIT_LIMBS), for
+      all moduli above 2^32 without IFMA, and with IFMA for moduli of 53 to
+      58 bits.
+    The limb-count convention on dot_method_t is kept: each method appears
+    in the band(s) it can serve.
 */
 #if FLINT_BITS == 64 && defined(__AVX512F__) && defined(__AVX512DQ__) \
         && defined(__AVX512IFMA__) \
@@ -44,23 +48,18 @@
 # define NMOD_VEC_HAVE_DOT_U64 0
 #endif
 
-#if FLINT_BITS == 64 \
-        && ((defined(__AVX512F__) && defined(__AVX512DQ__)) \
-            || (defined(__AVX2__) && (defined(__FMA__) || defined(_MSC_VER))) \
-            || (defined(__ARM_NEON) && defined(__aarch64__)) \
-            || defined(_M_ARM64)) \
+#if FLINT_BITS == 64 && defined(__AVX2__) \
         && !defined(FLINT_MACHINE_VECTORS_FORCE_GENERIC) \
-        && !defined(FLINT_MACHINE_VECTORS_STRICT_C) \
-        && !defined(NMOD_MAT_FP_FORCE_GENERIC)
-# define NMOD_VEC_HAVE_DOT_FP50 1
+        && !defined(FLINT_MACHINE_VECTORS_STRICT_C)
+# define NMOD_VEC_HAVE_DOT_SPLIT_LIMBS 1
 #else
-# define NMOD_VEC_HAVE_DOT_FP50 0
+# define NMOD_VEC_HAVE_DOT_SPLIT_LIMBS 0
 #endif
 
 /* minimal lengths for these to beat the scalar code */
 #define NMOD_VEC_DOT_U52_MIN_LEN 24
-#define NMOD_VEC_DOT_FP50_MIN_LEN 96
 #define NMOD_VEC_DOT_U64_MIN_LEN 96
+#define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
 
 #ifdef __cplusplus
 extern "C" {
@@ -319,15 +318,20 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             dot_params_t params = {_DOT_U52, UWORD(0)};
             return params;
         }
+#endif
+#if NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
+        // with IFMA: only for 53 to 58 bits, _DOT_U64 is faster beyond
+        if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+                && (!NMOD_VEC_HAVE_DOT_U64 || mod.n <= (UWORD(1) << 58)))
+        {
+            dot_params_t params = {_DOT_SPLIT_LIMBS, UWORD(0)};
+            return params;
+        }
+#endif
+#if NMOD_VEC_HAVE_DOT_U64
         if (mod.n > (UWORD(1) << 52) && len >= NMOD_VEC_DOT_U64_MIN_LEN)
         {
             dot_params_t params = {_DOT_U64, UWORD(0)};
-            return params;
-        }
-#elif NMOD_VEC_HAVE_DOT_FP50
-        if (mod.n < (UWORD(1) << 50) && len >= NMOD_VEC_DOT_FP50_MIN_LEN)
-        {
-            dot_params_t params = {_DOT_FP50, UWORD(0)};
             return params;
         }
 #endif
@@ -336,6 +340,14 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     }
 
     // 3 limbs:
+#if NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
+    if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+            && (!NMOD_VEC_HAVE_DOT_U64 || mod.n <= (UWORD(1) << 58)))
+    {
+        dot_params_t params = {_DOT3_SPLIT_LIMBS, UWORD(0)};
+        return params;
+    }
+#endif
 #if NMOD_VEC_HAVE_DOT_U64
     if (len >= NMOD_VEC_DOT_U64_MIN_LEN)
     {
@@ -377,7 +389,7 @@ ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod
 #endif  // FLINT_BITS == 64
 ulong _nmod_vec_dot_u52(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot_u64(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
-ulong _nmod_vec_dot_fp50(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot_split_limbs(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 
 /* vec1[i] * vec2[len-1-i] */
 ulong _nmod_vec_dot_pow2_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
@@ -391,7 +403,7 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 #endif  // FLINT_BITS == 64
 ulong _nmod_vec_dot_u52_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot_u64_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
-ulong _nmod_vec_dot_fp50_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot_split_limbs_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 
 /* vec1[i] * vec2[i][offset] */
 ulong _nmod_vec_dot_pow2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
@@ -405,7 +417,7 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 #endif  // FLINT_BITS == 64
 ulong _nmod_vec_dot_u52_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
 ulong _nmod_vec_dot_u64_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
-ulong _nmod_vec_dot_fp50_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
 
 
 
@@ -476,8 +488,8 @@ ulong _nmod_vec_dot_fp50_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, 
         _NMOD_VEC_DOT_SHORT1(11, expr1, expr2)                          \
     }                                                                   \
                                                                         \
-    else if (method == _DOT2 || method == _DOT_U52 || method == _DOT_FP50 \
-             || method == _DOT_U64)                                     \
+    else if (method == _DOT2 || method == _DOT_U52                      \
+             || method == _DOT_SPLIT_LIMBS || method == _DOT_U64)       \
     {                                                                   \
         if (len ==  1) return nmod_mul((expr1), (expr2), mod);          \
         if (len ==  2) _NMOD_VEC_DOT_SHORT2( 2, expr1, expr2)           \
@@ -492,7 +504,8 @@ ulong _nmod_vec_dot_fp50_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, 
         _NMOD_VEC_DOT_SHORT2(11, expr1, expr2)                          \
     }                                                                   \
                                                                         \
-    else if (method == _DOT3 || method == _DOT3_U64)                    \
+    else if (method == _DOT3 || method == _DOT3_U64                     \
+             || method == _DOT3_SPLIT_LIMBS)                            \
     {                                                                   \
         if (len ==  1) return nmod_mul((expr1), (expr2), mod);          \
         if (len ==  2) _NMOD_VEC_DOT_SHORT3( 2, expr1, expr2)           \
@@ -531,8 +544,8 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
     if (params.method == _DOT_U52)
         return _nmod_vec_dot_u52(vec1, vec2, len, mod);
 
-    if (params.method == _DOT_FP50)
-        return _nmod_vec_dot_fp50(vec1, vec2, len, mod);
+    if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
+        return _nmod_vec_dot_split_limbs(vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
         return _nmod_vec_dot_u64(vec1, vec2, len, mod);
@@ -581,8 +594,8 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
     if (params.method == _DOT_U52)
         return _nmod_vec_dot_u52_rev(vec1, vec2, len, mod);
 
-    if (params.method == _DOT_FP50)
-        return _nmod_vec_dot_fp50_rev(vec1, vec2, len, mod);
+    if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
+        return _nmod_vec_dot_split_limbs_rev(vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
         return _nmod_vec_dot_u64_rev(vec1, vec2, len, mod);
@@ -631,8 +644,8 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, 
     if (params.method == _DOT_U52)
         return _nmod_vec_dot_u52_ptr(vec1, vec2, offset, len, mod);
 
-    if (params.method == _DOT_FP50)
-        return _nmod_vec_dot_fp50_ptr(vec1, vec2, offset, len, mod);
+    if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
+        return _nmod_vec_dot_split_limbs_ptr(vec1, vec2, offset, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
         return _nmod_vec_dot_u64_ptr(vec1, vec2, offset, len, mod);
@@ -723,11 +736,15 @@ do                                                                    \
 } while(0);
 
 // _DOT2   (two limbs, general)
+// two independent accumulators (even / odd terms): the additions with carry
+// of consecutive terms do not wait for each other
 #define _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
 do                                                                    \
 {                                                                     \
     ulong u0zz = UWORD(0);                                            \
     ulong u1zz = UWORD(0);                                            \
+    ulong v0zz = UWORD(0);                                            \
+    ulong v1zz = UWORD(0);                                            \
                                                                       \
     for (i = 0; i+7 < (len); )                                        \
     {                                                                 \
@@ -736,25 +753,25 @@ do                                                                    \
         add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
-        add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
+        add_ssaaaa(v1zz, v0zz, v1zz, v0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
         add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
-        add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
+        add_ssaaaa(v1zz, v0zz, v1zz, v0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
         add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
-        add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
+        add_ssaaaa(v1zz, v0zz, v1zz, v0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
         add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
         i++;                                                          \
         umul_ppmm(s1zz, s0zz, (expr1), (expr2));                      \
-        add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
+        add_ssaaaa(v1zz, v0zz, v1zz, v0zz, s1zz, s0zz);               \
         i++;                                                          \
     }                                                                 \
     for ( ; i < (len); i++)                                           \
@@ -764,6 +781,7 @@ do                                                                    \
         add_ssaaaa(u1zz, u0zz, u1zz, u0zz, s1zz, s0zz);               \
     }                                                                 \
                                                                       \
+    add_ssaaaa(u1zz, u0zz, u1zz, u0zz, v1zz, v0zz);                   \
     NMOD2_RED2(res, u1zz, u0zz, mod);                                 \
 } while(0);
 
@@ -865,11 +883,13 @@ do                                                                    \
     else if (params.method == _DOT2_HALF)                             \
         _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
     else if (params.method == _DOT2 || params.method == _DOT_U52      \
-             || params.method == _DOT_FP50 || params.method == _DOT_U64) \
+             || params.method == _DOT_SPLIT_LIMBS                     \
+             || params.method == _DOT_U64)                            \
         _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
     else if (params.method == _DOT3_ACC)                              \
         _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
-    else if (params.method == _DOT3 || params.method == _DOT3_U64)    \
+    else if (params.method == _DOT3 || params.method == _DOT3_U64     \
+             || params.method == _DOT3_SPLIT_LIMBS)                   \
         _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
 } while(0);
 

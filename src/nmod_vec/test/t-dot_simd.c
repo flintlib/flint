@@ -16,7 +16,7 @@
 
 /*
     The SIMD dot products for moduli above 2^32 (_nmod_vec_dot_u52,
-    _nmod_vec_dot_fp50 and _nmod_vec_dot_u64, forward / reversed / through
+    _nmod_vec_dot_split_limbs and _nmod_vec_dot_u64, forward / reversed / through
     row pointers), called directly on their whole range of moduli, entries
     at the maximum, and lengths beyond the internal chunks of the
     accumulators; on machines where they are not available they fall back
@@ -58,9 +58,9 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
         nn_ptr x, y, store;
         nn_ptr * rows;
         dot_params_t params;
-        int fp50, u52;
+        int u52, split;
 
-        switch (n_randint(state, 7))
+        switch (n_randint(state, 9))
         {
             case 0:
                 m = n_randbits(state, 33 + n_randint(state, 20));
@@ -80,6 +80,15 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
             case 5:
                 m = (UWORD(1) << 52) + 1 + n_randint(state, 4);
                 break;
+            case 6:
+                /* around the limits of _DOT_SPLIT_LIMBS with IFMA (58 bits)
+                   and of its two variants (62 bits) */
+                m = (UWORD(1) << (58 + 4 * n_randint(state, 2)))
+                        + n_randint(state, 5) - 2;
+                break;
+            case 7:
+                m = (UWORD(1) << (60 + n_randint(state, 4))) + n_randint(state, 5) - 2;
+                break;
             default:
                 m = UWORD_MAX - n_randint(state, 4);
                 break;
@@ -87,7 +96,8 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
         if (m < 2)
             m = 2;
         u52 = (m <= (UWORD(1) << 52));
-        fp50 = (m < (UWORD(1) << 50));
+        split = NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
+                && (!NMOD_VEC_HAVE_DOT_U64 || m <= (UWORD(1) << 58));
 
         switch (n_randint(state, 4))
         {
@@ -148,15 +158,12 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
             TEST_FUNCTION_FAIL("u64: m = %wu, len = %wd: %wu %wu %wu, "
                                "expected %wu %wu\n", m, len, a, b, c, r0, r1);
 
-        if (fp50)
-        {
-            a = _nmod_vec_dot_fp50(x, y, len, mod);
-            b = _nmod_vec_dot_fp50_rev(x, y, len, mod);
-            c = _nmod_vec_dot_fp50_ptr(x, rows, offset, len, mod);
-            if (a != r0 || b != r1 || c != r0)
-                TEST_FUNCTION_FAIL("fp50: m = %wu, len = %wd: %wu %wu %wu, "
-                                   "expected %wu %wu\n", m, len, a, b, c, r0, r1);
-        }
+        a = _nmod_vec_dot_split_limbs(x, y, len, mod);
+        b = _nmod_vec_dot_split_limbs_rev(x, y, len, mod);
+        c = _nmod_vec_dot_split_limbs_ptr(x, rows, offset, len, mod);
+        if (a != r0 || b != r1 || c != r0)
+            TEST_FUNCTION_FAIL("split_limbs: m = %wu, len = %wd: %wu %wu %wu, "
+                               "expected %wu %wu\n", m, len, a, b, c, r0, r1);
 
         /* the dispatch, whatever it chooses */
         params = _nmod_vec_dot_params(len, mod);
@@ -169,24 +176,28 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
 
         if ((m & (m - 1)) != 0 && _nmod_vec_dot_bound_limbs(len, mod) <= 2)
         {
-            if (NMOD_VEC_HAVE_DOT_U52 && u52 && len >= NMOD_VEC_DOT_U52_MIN_LEN
-                    && params.method != _DOT_U52)
-                TEST_FUNCTION_FAIL("params: expected _DOT_U52, got %d: "
-                                   "m = %wu, len = %wd\n", params.method, m, len);
-            if (NMOD_VEC_HAVE_DOT_U64 && !u52 && len >= NMOD_VEC_DOT_U64_MIN_LEN
-                    && params.method != _DOT_U64)
-                TEST_FUNCTION_FAIL("params: expected _DOT_U64, got %d: "
-                                   "m = %wu, len = %wd\n", params.method, m, len);
-            if (!NMOD_VEC_HAVE_DOT_U52 && NMOD_VEC_HAVE_DOT_FP50 && fp50
-                    && len >= NMOD_VEC_DOT_FP50_MIN_LEN
-                    && params.method != _DOT_FP50)
-                TEST_FUNCTION_FAIL("params: expected _DOT_FP50, got %d: "
-                                   "m = %wu, len = %wd\n", params.method, m, len);
+            dot_method_t exp = _DOT2;
+            if (NMOD_VEC_HAVE_DOT_U52 && u52 && len >= NMOD_VEC_DOT_U52_MIN_LEN)
+                exp = _DOT_U52;
+            else if (split && len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
+                exp = _DOT_SPLIT_LIMBS;
+            else if (NMOD_VEC_HAVE_DOT_U64 && !u52 && len >= NMOD_VEC_DOT_U64_MIN_LEN)
+                exp = _DOT_U64;
+            if (exp != _DOT2 && params.method != exp)
+                TEST_FUNCTION_FAIL("params: expected %d, got %d: "
+                                   "m = %wu, len = %wd\n", exp, params.method, m, len);
         }
-        else if ((m & (m - 1)) != 0 && NMOD_VEC_HAVE_DOT_U64
-                 && len >= NMOD_VEC_DOT_U64_MIN_LEN && params.method != _DOT3_U64)
-            TEST_FUNCTION_FAIL("params: expected _DOT3_U64, got %d: "
-                               "m = %wu, len = %wd\n", params.method, m, len);
+        else if ((m & (m - 1)) != 0)
+        {
+            dot_method_t exp = _DOT3;
+            if (split && len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
+                exp = _DOT3_SPLIT_LIMBS;
+            else if (NMOD_VEC_HAVE_DOT_U64 && len >= NMOD_VEC_DOT_U64_MIN_LEN)
+                exp = _DOT3_U64;
+            if (exp != _DOT3 && params.method != exp)
+                TEST_FUNCTION_FAIL("params: expected %d, got %d: "
+                                   "m = %wu, len = %wd\n", exp, params.method, m, len);
+        }
 
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);
