@@ -27,7 +27,7 @@
 
     with L, Lh, ... standing for the sums of the lanes.
 
-    For b = 63 or 64 the entries are split into 32-bit halves, and each of
+    For b >= 62 the entries are split into 32-bit halves, and each of
     the four products p (below 2^64) goes as X += p (modulo 2^64) and
     Xh += p >> 32; the sum of the low 32-bit halves of the products is then
     X - 2^32 Xh modulo 2^64, exact while a lane takes less than 2^32
@@ -93,7 +93,7 @@ split_limbs_hsum256(__m256i a)
 /* chunks between two emptyings of the high accumulators (b <= 61): a lane
    of Xh stays below 2^45 */
 #define SPLIT_DUMP 8192
-/* iterations between two emptyings of the accumulators (b >= 63): 2^14
+/* iterations between two emptyings of the accumulators (b >= 62): 2^14
    products per lane of M, sums of the lanes below 2^49 */
 #define H32_CHUNK 8192
 

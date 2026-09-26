@@ -135,9 +135,10 @@ ulong
 _nmod_vec_dot_u64(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
     /* the parameters may come from a longer length: short products are
-       faster with the scalar code */
+       faster with the scalar code, chosen for this length (_DOT2 when the
+       sum fits two limbs, _DOT3_ACC when the modulus allows it) */
     if (len < NMOD_VEC_DOT_U64_MIN_LEN)
-        return _nmod_vec_dot3(vec1, vec2, len, mod);
+        return _nmod_vec_dot(vec1, vec2, len, mod, _nmod_vec_dot_params(len, mod));
 
 #define LOAD2(k) _mm512_loadu_si512((const void *) (vec2 + (k)))
 #define LOAD2_MASKED(k, m) _mm512_maskz_loadu_epi64(m, (const void *) (vec2 + (k)))
@@ -150,7 +151,7 @@ ulong
 _nmod_vec_dot_u64_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
     if (len < NMOD_VEC_DOT_U64_MIN_LEN)
-        return _nmod_vec_dot3_rev(vec1, vec2, len, mod);
+        return _nmod_vec_dot_rev(vec1, vec2, len, mod, _nmod_vec_dot_params(len, mod));
 
     /* as in dot_u52.c */
     const __m512i rev = _mm512_set_epi64(0, 1, 2, 3, 4, 5, 6, 7);
@@ -170,7 +171,7 @@ _nmod_vec_dot_u64_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
                       slong len, nmod_t mod)
 {
     if (len < NMOD_VEC_DOT_U64_MIN_LEN)
-        return _nmod_vec_dot3_ptr(vec1, vec2, offset, len, mod);
+        return _nmod_vec_dot_ptr(vec1, vec2, offset, len, mod, _nmod_vec_dot_params(len, mod));
 
     const void * base = (const void *) (offset * (slong) sizeof(ulong));
 #define LOAD2(k) _mm512_i64gather_epi64( \

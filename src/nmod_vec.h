@@ -57,7 +57,7 @@
 #endif
 
 /* minimal lengths for these to beat the scalar code */
-#define NMOD_VEC_DOT_U52_MIN_LEN 24
+#define NMOD_VEC_DOT_U52_MIN_LEN 56
 #define NMOD_VEC_DOT_U64_MIN_LEN 96
 #define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
 
@@ -469,8 +469,12 @@ ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong o
             return res;                                      \
         }                                                    \
 
-// * supports 1 <= len <= 11, requires method==DOT1|DOT2|DOT3|DOT_POW2
-// * i must be already initialized at the first wanted value
+/* - supports 1 <= len <= 11, requires method==DOT1|DOT2|DOT3|DOT_POW2          */
+/* - the SIMD methods are left out on purpose (a short length with them only    */
+/*   occurs with parameters computed for a longer length, and their functions   */
+/*   fall back to the scalar code): testing them here too made can slow down    */
+/*   the callers' loops (e.g. _nmod_poly_mul_classical) at short lengths        */
+/* - i must be already initialized at the first wanted value                    */
 #define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
 {                                                                       \
     if (method == _DOT1 || method == _DOT_POW2)                         \
@@ -488,8 +492,7 @@ ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong o
         _NMOD_VEC_DOT_SHORT1(11, expr1, expr2)                          \
     }                                                                   \
                                                                         \
-    else if (method == _DOT2 || method == _DOT_U52                      \
-             || method == _DOT_SPLIT_LIMBS || method == _DOT_U64)       \
+    else if (method == _DOT2)                                           \
     {                                                                   \
         if (len ==  1) return nmod_mul((expr1), (expr2), mod);          \
         if (len ==  2) _NMOD_VEC_DOT_SHORT2( 2, expr1, expr2)           \
@@ -504,8 +507,7 @@ ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong o
         _NMOD_VEC_DOT_SHORT2(11, expr1, expr2)                          \
     }                                                                   \
                                                                         \
-    else if (method == _DOT3 || method == _DOT3_U64                     \
-             || method == _DOT3_SPLIT_LIMBS)                            \
+    else if (method == _DOT3)                                           \
     {                                                                   \
         if (len ==  1) return nmod_mul((expr1), (expr2), mod);          \
         if (len ==  2) _NMOD_VEC_DOT_SHORT3( 2, expr1, expr2)           \
@@ -638,23 +640,29 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, 
         return _nmod_vec_dot2_split_ptr(vec1, vec2, offset, len, mod, params.pow2_precomp);
 #endif // FLINT_BITS == 64
 
-    if (params.method == _DOT2)
+    /* the SIMD methods are not used here: their _ptr variants load vec2
+       through gathers, slower than this scalar code on most machines
+       measured (Skylake to Ice Lake, where the microcode mitigation
+       of Gather Data Sampling makes them 2-3x slower; but also Zen4
+       although it was not affected by this mitigation) */
+    if (params.method == _DOT2 || params.method == _DOT_U52
+            || params.method == _DOT_SPLIT_LIMBS || params.method == _DOT_U64)
         return _nmod_vec_dot2_ptr(vec1, vec2, offset, len, mod);
-
-    if (params.method == _DOT_U52)
-        return _nmod_vec_dot_u52_ptr(vec1, vec2, offset, len, mod);
-
-    if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
-        return _nmod_vec_dot_split_limbs_ptr(vec1, vec2, offset, len, mod);
-
-    if (params.method == _DOT_U64 || params.method == _DOT3_U64)
-        return _nmod_vec_dot_u64_ptr(vec1, vec2, offset, len, mod);
 
     if (params.method == _DOT3_ACC)
         return _nmod_vec_dot3_acc_ptr(vec1, vec2, offset, len, mod);
 
-    if (params.method == _DOT3)
+    if (params.method == _DOT3 || params.method == _DOT3_U64
+            || params.method == _DOT3_SPLIT_LIMBS)
+    {
+#if (FLINT_BITS == 64)
+        if (mod.n <= UWORD(6521908912666391107))  /* as in _nmod_vec_dot_params */
+#else
+        if (mod.n <= UWORD(1518500250))
+#endif
+            return _nmod_vec_dot3_acc_ptr(vec1, vec2, offset, len, mod);
         return _nmod_vec_dot3_ptr(vec1, vec2, offset, len, mod);
+    }
 
     if (params.method == _DOT2_HALF)
         return _nmod_vec_dot2_half_ptr(vec1, vec2, offset, len, mod);

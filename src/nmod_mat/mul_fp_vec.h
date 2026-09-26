@@ -28,8 +28,12 @@
     The primitives are not taken from machine_vectors.h because the kernels
     want a fixed lane count per ISA (vec8d is only an emulation on AVX2),
     conversions between 64-bit integers and doubles that it does not
-    provide, and a NEON tier. Folding these back into machine_vectors.h is
-    a possible future perspective.
+    provide, and a NEON tier. fpv_rint_mul, fpv_mulmod and fpv_reduce_pm1n are
+    the counterparts of vec4d_round_mul (constant branch), vec4d_mulmod_fast
+    and vec4d_reduce_to_pm1n in machine_vectors.h, with the same constant and
+    bounds. Rounding is always done with the constant here, because these
+    kernels are limited by throughput, not latency. Folding the primitives here
+    back into machine_vectors.h is a possible future perspective.
 
     Rounding to the nearest integer. Every rounding here is of a product,
     through fpv_rint_mul(x, y) = rint(x*y), which requires |x*y| <= 2^51
