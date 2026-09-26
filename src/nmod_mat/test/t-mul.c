@@ -141,14 +141,25 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         }
         /* a few rows and many columns or a long inner dimension (the
            products with few rows work by blocks of columns and chunks
-           of rows) */
-        if (n_randint(state, 8) == 0)
+           of rows), or a few columns and a long inner dimension (those
+           with few columns accumulate by chunks of the inner dimension) */
+        switch (n_randint(state, 12))
         {
-            m = 1 + n_randint(state, 8);
-            if (n_randint(state, 2))
+            case 0:
+                m = 1 + n_randint(state, 8);
                 k = 1 + n_randint(state, 1200);
-            else
+                break;
+            case 1:
+                m = 1 + n_randint(state, 8);
                 n = 1 + n_randint(state, 4500);
+                break;
+            case 2:
+                n = 1 + n_randint(state, 8);
+                k = 1 + n_randint(state, 6000);
+                m = 1 + n_randint(state, 40);
+                break;
+            default:
+                break;
         }
 
         if (n_randint(state, 4) == 0)

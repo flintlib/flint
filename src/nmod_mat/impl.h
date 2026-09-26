@@ -70,6 +70,23 @@
      || (NMOD_MAT_HAVE_VM_U32 && (n) <= (UWORD(1) << 32)) \
      || (NMOD_MAT_HAVE_FPV && (n) < (UWORD(1) << 50)))
 
+/*
+    Whether the few-columns products of mul_cols.c have a vectorized path
+    for this modulus, and the most columns of B for which nmod_mat_mul
+    uses them: all moduli on AVX512-IFMA (u52 up to 2^52, u64 above),
+    33-49 bits with a vector backend of mul_fp_vec.h otherwise (below
+    2^32 the split dot products of nmod_vec/dot.c serve the classical
+    code well already).
+*/
+#if NMOD_MAT_HAVE_MUL_U52
+# define NMOD_MAT_MUL_COLS_IS_SIMD(n) 1
+# define NMOD_MAT_MUL_COLS_MAX 8
+#else
+# define NMOD_MAT_MUL_COLS_IS_SIMD(n) \
+    (NMOD_MAT_HAVE_FPV && (n) > (UWORD(1) << 32) && (n) < (UWORD(1) << 50))
+# define NMOD_MAT_MUL_COLS_MAX 4
+#endif
+
 /* most rows of A for which nmod_mat_mul uses _nmod_mat_mul_rows_simd */
 #if NMOD_MAT_HAVE_MUL_U52
 # define NMOD_MAT_MUL_ROWS_MAX 8
@@ -99,5 +116,14 @@ void _nmod_mat_mul_strassen_cutoff(nmod_mat_t C, const nmod_mat_t A,
 */
 int _nmod_mat_mul_rows_simd(ulong * const * c, const ulong * const * a,
                             slong r, slong len, const nmod_mat_t B);
+
+/*
+    C = A * B for B with 1 <= B->c <= NMOD_MAT_MUL_COLS_MAX columns and
+    A->c >= 1, each row of A multiplied with all the columns of B at once
+    (mul_cols.c). Returns 0 without doing anything when the modulus has no
+    SIMD path (NMOD_MAT_MUL_COLS_IS_SIMD). C must not alias A or B.
+*/
+int _nmod_mat_mul_cols_simd(nmod_mat_t C, const nmod_mat_t A,
+                            const nmod_mat_t B);
 
 #endif

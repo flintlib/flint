@@ -126,6 +126,22 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     /*
+        B has a few columns (up to NMOD_MAT_MUL_ROWS_MAX):
+        _nmod_mat_mul_cols_simd multiplies each row of A with all of them at
+        once, as dot products sharing the loads of the row, on the transposed
+        columns. This avoids calling the kernels which would pad them to
+        NR = 8-24 columns; this also avoids reading B column by column as in
+        the classical code.
+    */
+    if (n >= 2 && n <= NMOD_MAT_MUL_COLS_MAX && k >= 1
+            && flint_num_threads == 1 && C != A && C != B
+            && NMOD_MAT_MUL_COLS_IS_SIMD(C->mod.n))
+    {
+        if (_nmod_mat_mul_cols_simd(C, A, B))
+            return;
+    }
+
+    /*
         Moduli up to 2^52: SIMD kernels with delayed reduction,
         nmod_mat_mul_u32 (any 64-bit target, moduli below 2^32),
         nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and, without
