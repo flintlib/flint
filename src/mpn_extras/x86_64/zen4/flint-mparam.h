@@ -33,6 +33,12 @@
 
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 1
 
+/* fft_small: round quotients with the hardware round instruction (1),
+   or with the magic constant fmadd(x, y, 1.5*2^52) - 1.5*2^52 (0), which
+   is faster where vroundpd is 2 uops with 8 cycle latency (Intel since
+   Skylake) but slower on Zen 2-5 where it is 1 uop with 3 cycle latency */
+#define FLINT_FFT_SMALL_ROUND_USE_NATIVE 1
+
 #define FLINT_MULMOD_SHOUP_THRESHOLD 0
 
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 300
