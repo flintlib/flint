@@ -174,11 +174,16 @@ _mp_real_signed_get_d(nn_srcptr a, slong len, nn_ptr tmp)
             | ((k > 0) ? (m[k - 1] >> bc) : UWORD(0));
     bits = FLINT_BITS * k + (slong) bc;   /* leading bit position + 1 */
 
+    /* the value is below 2^(bits - FLINT_BITS (len - 1)): under
+       2^-1000 it reduces by no row (every epsilon exceeds 2^-700), so
+       it may as well be zero, and no subnormal arises; else the leading
+       53 bits in [1/2, 1) scaled once, in the normal range */
+    if (bits - FLINT_BITS * (len - 1) < -1000)
+        return 0.0;
+
 #if FLINT_BITS == 64
-    d = (double) (hi >> 11);              /* 53 bits, exact */
-    d = ldexp(d, (int) (bits - 53 - FLINT_BITS * (len - 1)));
+    d = (double) (hi >> 11) * 0x1p-53;    /* 53 bits, exact */
 #else
-    d = (double) hi;
     if (k > 0)
     {
         /* the top 53 bits as an integer: hi (32 bits) followed by the
@@ -186,12 +191,12 @@ _mp_real_signed_get_d(nn_srcptr a, slong len, nn_ptr tmp)
         ulong lo = (bc == FLINT_BITS) ? m[k - 1]
             : ((m[k - 1] << (FLINT_BITS - bc))
                 | ((k > 1) ? (m[k - 2] >> bc) : UWORD(0)));
-        d = ldexp(d, 21) + (double) (lo >> 11);
-        d = ldexp(d, (int) (bits - 53 - FLINT_BITS * (len - 1)));
+        d = ((double) hi * 0x1p21 + (double) (lo >> 11)) * 0x1p-53;
     }
     else
-        d = ldexp(d, (int) (bits - 32 - FLINT_BITS * (len - 1)));
+        d = (double) hi * 0x1p-32;
 #endif
+    d = d_mul_2exp_inrange(d, (int) (bits - FLINT_BITS * (len - 1)));
 
     return neg ? -d : d;
 }
@@ -275,7 +280,7 @@ _mp_real_log_reduce(slong * rel, const mp_real_rel_struct * tab,
            can be astronomically large -- arb never reduces such
            arguments -- and the rows below would need even larger
            multiples, so stop here */
-        if (fabs(dx * epsilon_inv[i]) > ldexp(1.0, FLINT_BITS / 2 - 2))
+        if (fabs(dx * epsilon_inv[i]) > (double) (UWORD(1) << (FLINT_BITS / 2 - 2)))
             break;
 
         n = (slong) floor(dx * epsilon_inv[i] + 0.5);
@@ -338,7 +343,7 @@ _mp_real_log_reduce(slong * rel, const mp_real_rel_struct * tab,
             double ae = fabs(epsilon[i]);
 
             d_row = d + i * num;
-            if (fabs(dx / ae) > ldexp(1.0, FLINT_BITS / 2 - 2))
+            if (fabs(dx / ae) > (double) (UWORD(1) << (FLINT_BITS / 2 - 2)))
                 break;
             n = (slong) floor(dx / ae);
             if (epsilon[i] < 0.0)
@@ -513,7 +518,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
     /* the weight bounds sum |rel_j| log2 p_j: keep the coefficients
        (and their products in the descent) within the slong range
        whatever budget is requested */
-    max_weight = FLINT_MIN(max_weight, ldexp(1.0, FLINT_BITS - 11));
+    max_weight = FLINT_MIN(max_weight, (double) (UWORD(1) << (FLINT_BITS - 11)));
 
     while (xn > 0 && x[xn - 1] == 0)
         xn--;
@@ -557,8 +562,8 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
        error of sum |rel_j| ulps must stay well below the lifting
        relation (matters only for n <= 4; underflows to 0 beyond);
        likewise rows the search precision cannot resolve */
-    eps_min = ldexp(1.0, -(int) FLINT_MIN(FLINT_BITS * n + 32, 2000));
-    eps_min = FLINT_MAX(eps_min, ldexp(1.0, -(int) (FLINT_BITS * wr - 48)));
+    eps_min = _mp_real_d_2exp_neg_or_zero(FLINT_BITS * n + 32);
+    eps_min = FLINT_MAX(eps_min, _mp_real_d_2exp_neg_or_zero(FLINT_BITS * wr - 48));
 
     jfix = _mp_real_log_reduce(rel, tab, base, wr, max_weight, eps_min,
         _mp_real_log_primes_entry(0, wr), _mp_real_log_primes_n);

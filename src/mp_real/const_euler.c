@@ -753,7 +753,7 @@ static void
 _mp_real_add_error_2exp(mp_real_t x, slong e)
 {
     slong q = e >> (FLINT_BITS == 64 ? 6 : 5);
-    _mp_real_add_error_ulps_at(x, ldexp(1.0, (int) (e - q * FLINT_BITS)), q);
+    _mp_real_add_error_ulps_at(x, (double) (UWORD(1) << (e - q * FLINT_BITS)), q);
 }
 
 

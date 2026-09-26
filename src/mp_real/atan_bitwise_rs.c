@@ -86,8 +86,8 @@ _mp_real_atan_bitwise_rs_default_r(slong n)
     /* the compile-time constants of the specialized per-size files:
        keep in sync with the dev/tune_mp_real.py --pin values that
        emitted them */
-    static const int opt_r[] = {0, 4, 6, 22, 20, 18, 20, 19};
-    if (n <= 7)
+    static const int opt_r[] = MP_REAL_ATAN_OPT_R;
+    if (n <= MP_REAL_ATAN_OPT_R_MAX)
         return opt_r[n];
 #endif
 

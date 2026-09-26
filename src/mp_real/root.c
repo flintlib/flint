@@ -285,7 +285,7 @@ _root_step(mp_real_t res, const mp_real_t v, const mp_real_t z0, ulong k,
             else
             {
                 /* D c_j = k^(r-1-j) ((r-1)!/j!) prod_{i<j} (bk + i k)
-                   exactly (up to 20 limbs: k < 2^40, r < 16) */
+                   exactly (up to 20 limbs: k < MP_REAL_ROOT_K_MAX, r < 16) */
                 mp_real_t coef;
                 mp_real_init(coef);
                 mp_real_set_ui(coef, 1);
@@ -333,17 +333,30 @@ _root_step(mp_real_t res, const mp_real_t v, const mp_real_t z0, ulong k,
 
 /* the seed: v^(-1/k) for v = md 2^ep, md in [1/2, 1), 0 <= ep < k,
    from a double (through the logarithm, as v itself reaches 2^k),
-   accurate to 2^-49, as an exact one-limb ball */
+   accurate to 2^-49, as an exact ball of 64 bits */
 static void
 _seed(mp_real_t z, double md, slong ep, ulong k)
 {
     double zd = exp2(-((double) ep + log2(md)) / (double) k);
-    ulong mm;
     int e0;
 
     zd = frexp(zd, &e0);
-    mm = (ulong) ldexp(zd, FLINT_BITS);
-    _mp_real_set_mpn_2exp(z, &mm, 1, (slong) e0 - FLINT_BITS);
+#if FLINT_BITS == 64
+    {
+        ulong mm = (ulong) d_mul_2exp_inrange(zd, FLINT_BITS);
+        _mp_real_set_mpn_2exp(z, &mm, 1, (slong) e0 - FLINT_BITS);
+    }
+#else
+    {
+        /* all 53 bits of the double: two limbs (zd 2^64 is an integer
+           below 2^64, split exactly) */
+        ulong mm[2];
+        double t = d_mul_2exp_inrange(zd, 2 * FLINT_BITS);
+        mm[1] = (ulong) d_mul_2exp_inrange(t, -FLINT_BITS);
+        mm[0] = (ulong) (t - d_mul_2exp_inrange((double) mm[1], FLINT_BITS));
+        _mp_real_set_mpn_2exp(z, mm, 2, (slong) e0 - 2 * FLINT_BITS);
+    }
+#endif
 }
 
 /* the accuracy in bits needed from the approximation before a step of
@@ -410,7 +423,7 @@ _mp_real_root_ui_order(mp_real_t res, const mp_real_t x, ulong k, slong n,
 
     if (x->size == 0 || x->negative)
         flint_throw(FLINT_ERROR, "mp_real_root_ui: need x > 0\n");
-    if (k < 2 || k >= (UWORD(1) << 40))
+    if (k < 2 || k >= MP_REAL_ROOT_K_MAX)
         flint_throw(FLINT_ERROR, "mp_real_root_ui: k out of range\n");
 
     kb = FLINT_BIT_COUNT(k);
@@ -427,8 +440,8 @@ _mp_real_root_ui_order(mp_real_t res, const mp_real_t x, ulong k, slong n,
     E = FLINT_BITS * x->exp;
     md = (double) x->d[x->size - 1];
     if (x->size >= 2)
-        md += ldexp((double) x->d[x->size - 2], -FLINT_BITS);
-    md = ldexp(md, -FLINT_BITS);
+        md += (double) x->d[x->size - 2] * MP_REAL_D_BINV;
+    md = md * MP_REAL_D_BINV;
     q = (E >= 0) ? E / (slong) k : -(((slong) k - 1 - E) / (slong) k);
 
     mp_real_set(v, x);

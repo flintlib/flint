@@ -550,9 +550,8 @@ _mp_real_trig_bitwise_rs_default_r(slong n)
 #if FLINT_BITS == 64
     /* the compile-time constants of trig_opt_<n>.c: keep in sync
        with the dev/tune_mp_real.py --pin values that emitted them */
-    static const int opt_r[] =
-        {0, 4, 5, 9, 14, 15, 18, 16, 16, 16, 19, 23, 25};
-    if (n <= 12)
+    static const int opt_r[] = MP_REAL_TRIG_OPT_R;
+    if (n <= MP_REAL_TRIG_OPT_R_MAX)
         return opt_r[n];
 
     /* the tangent series of series_rs.c (common-denominator chunks,

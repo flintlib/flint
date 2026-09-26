@@ -93,6 +93,25 @@
    after degree d: (d + 1)(FLINT_BITS p0n - NEWTON_SLACK_BITS) >=
    FLINT_BITS wn + 2 leaves the tail |w|^(d+1) / (d + 1) below a
    quarter of a working ulp */
+/* the top p0n limbs of (x, n), zero-extended below when p0n > n (on
+   32-bit machines the bitwise kernels of the starting values need two
+   limbs, and p0n = 2 > n for n = 1); buf holds p0n limbs */
+static nn_srcptr
+_newton_start_top(nn_ptr buf, nn_srcptr x, slong n, slong p0n)
+{
+    if (p0n <= n)
+        return x + (n - p0n);
+    flint_mpn_zero(buf, p0n - n);
+    flint_mpn_copyi(buf + (p0n - n), x, n);
+    return buf;
+}
+
+#if FLINT_BITS == 64
+#define NEWTON_START_MIN 1
+#else
+#define NEWTON_START_MIN 2
+#endif
+
 static slong
 _newton_start_limbs(slong wn, slong d)
 {
@@ -209,6 +228,7 @@ _mp_real_neglog_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     slong wn, p0n, uexp;
     ulong ferr;
     nn_ptr t, E;
+    nn_srcptr xtop;
     mp_real_t xb, tb, w, corr;
     TMP_INIT;
 
@@ -220,10 +240,14 @@ _mp_real_neglog_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
 
     wn = n + 1;
     p0n = FLINT_MIN(_newton_start_limbs(wn, N), n);
+    p0n = FLINT_MAX(p0n, NEWTON_START_MIN);     /* <= wn */
 
     TMP_START;
     t = TMP_ALLOC(wn * sizeof(ulong));
-    E = TMP_ALLOC((wn + 1) * sizeof(ulong));
+    /* wn + 1 limbs below, and the starting value's log 2 and argument
+       side by side (p0n limbs each, p0n <= wn) */
+    E = TMP_ALLOC(FLINT_MAX(wn + 1, 2 * p0n) * sizeof(ulong));
+    xtop = _newton_start_top(TMP_ALLOC(p0n * sizeof(ulong)), x, n, p0n);
     mp_real_init(xb);
     mp_real_init(tb);
     mp_real_init(w);
@@ -236,14 +260,14 @@ _mp_real_neglog_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     {
         nn_ptr l2 = E, arg = E + p0n;
         _mp_real_const_log2(l2, NULL, p0n, 1);
-        mpn_lshift(arg, x + (n - p0n), p0n, 1);   /* 2 x_top - 1 */
+        mpn_lshift(arg, xtop, p0n, 1);   /* 2 x_top - 1 */
         _mp_real_log1p_bitwise_rs(t + (wn - p0n), NULL, arg, p0n, 0);
         if (mpn_sub_n(t + (wn - p0n), l2, t + (wn - p0n), p0n))
             flint_mpn_zero(t + (wn - p0n), p0n);
     }
     else
     {
-        _mp_real_neglog_newton_ball(corr, x + (n - p0n), p0n, forward, 0);
+        _mp_real_neglog_newton_ball(corr, xtop, p0n, forward, 0);
         _mp_real_get_fixed(t + (wn - p0n), NULL, corr, p0n);
     }
     _mp_real_set_mpn_2exp(tb, t, wn, -FLINT_BITS * wn);
@@ -289,6 +313,7 @@ _mp_real_atan_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     slong wn, p0n, uexp, wq;
     ulong ferr;
     nn_ptr t, s, c;
+    nn_srcptr xtop;
     mp_real_t xb, tb, sb, cb, num, den, w, corr;
     TMP_INIT;
 
@@ -300,9 +325,11 @@ _mp_real_atan_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
 
     wn = n + 1;
     p0n = FLINT_MIN(_newton_start_limbs(wn, 2 * N - 1), n);
+    p0n = FLINT_MAX(p0n, NEWTON_START_MIN);     /* <= wn */
 
     TMP_START;
     t = TMP_ALLOC(wn * sizeof(ulong));
+    xtop = _newton_start_top(TMP_ALLOC(p0n * sizeof(ulong)), x, n, p0n);
     s = TMP_ALLOC((wn + 1) * sizeof(ulong));
     c = TMP_ALLOC((wn + 1) * sizeof(ulong));
     mp_real_init(xb);
@@ -317,10 +344,10 @@ _mp_real_atan_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     /* the starting value t = atan(x_top) at p0n limbs */
     flint_mpn_zero(t, wn - p0n);
     if (p0n <= MP_REAL_NEWTON_CUTOFF)
-        _mp_real_atan_bitwise_rs(t + (wn - p0n), NULL, x + (n - p0n), p0n, 0);
+        _mp_real_atan_bitwise_rs(t + (wn - p0n), NULL, xtop, p0n, 0);
     else
     {
-        _mp_real_atan_newton_ball(corr, x + (n - p0n), p0n, forward, 0);
+        _mp_real_atan_newton_ball(corr, xtop, p0n, forward, 0);
         _mp_real_get_fixed(t + (wn - p0n), NULL, corr, p0n);
     }
     _mp_real_set_mpn_2exp(tb, t, wn, -FLINT_BITS * wn);

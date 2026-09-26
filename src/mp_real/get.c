@@ -30,8 +30,8 @@ _mp_real_get_fixed_d(nn_ptr y, slong wn, const mp_real_t x)
        Both saturation directions must OVERestimate: far above, the
        bound is useless anyway (HUGE_VAL); far below, err < B
        at k <= -k0 limbs is at most 2^(FLINT_BITS (1 - k0)), so the
-       clamp constant must exceed that, while the ldexp in the live
-       window (|FLINT_BITS k| <= 900) cannot underflow */
+       clamp constant must exceed that, while the scaling in the live
+       window (|FLINT_BITS k| <= 900) stays in the normal range */
     if (x->err == 0)
         e = 0.0;
     else
@@ -42,7 +42,7 @@ _mp_real_get_fixed_d(nn_ptr y, slong wn, const mp_real_t x)
         else if (FLINT_BITS * k < -900)
             e = 0x1p-700;   /* true bound < 2^(64 - 900) */
         else
-            e = ldexp((double) x->err, (int) (FLINT_BITS * k)) * MP_REAL_EPS;
+            e = d_mul_2exp_inrange((double) x->err, (int) (FLINT_BITS * k)) * MP_REAL_EPS;
     }
 
     if (x->size == 0)
@@ -83,7 +83,7 @@ _mp_real_get_fixed(nn_ptr y, ulong * err, const mp_real_t x, slong n)
     if (err != NULL)
     {
         /* round up to whole output ulps, saturating */
-        if (!(e < 0x1p63))
+        if (!(e < 0.5 * MP_REAL_D_B))
             *err = UWORD_MAX;
         else
         {

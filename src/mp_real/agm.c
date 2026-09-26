@@ -75,7 +75,9 @@ _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slong n,
     int m)
 {
     mp_real_t a, b, t, d;
-    slong p = n + 1, iter;
+    /* at least 128 bits: the relative radii are held below 2^-40
+       over the iterations (n + 1 on 64-bit machines) */
+    slong p = FLINT_MAX(n + 1, 128 / FLINT_BITS), iter;
 
     if (x->negative || y->negative)
         flint_throw(FLINT_ERROR, "mp_real_agm: negative argument\n");

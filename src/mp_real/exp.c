@@ -103,7 +103,10 @@ _ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
     else if (z >= _ex_series_min_z(n))
         _mp_real_exp_reduced(y, err, v, n, (flint_bitcnt_t) z, 0);
     else if (n <= EX_BITWISE_MAX)
-        _mp_real_exp_bitwise_rs(y, err, v, n, 0);
+    {
+        if (!_mp_real_exp_opt(y, err, v, n))
+            _mp_real_exp_bitwise_rs(y, err, v, n, 0);
+    }
     else if (n <= EX_DIOPHANTINE_MAX)
         _mp_real_exp_diophantine(y, err, v, n);
     else
@@ -119,7 +122,7 @@ _ex_limbs(slong p)
     slong n = (p + 14 + FLINT_BITS - 1) / FLINT_BITS, g;
 
     if (n <= EX_BITWISE_MAX)
-        g = FLINT_BIT_COUNT(9 * (ulong) _mp_real_exp_bitwise_rs_default_r(n) + 104) + 3;
+        g = FLINT_BIT_COUNT(9 * (ulong) _mp_real_exp_default_r_inline(n) + 104) + 3;
     else
         g = 10;
     n = (p + g + FLINT_BITS - 1) / FLINT_BITS;
@@ -140,52 +143,6 @@ _ex_limbs(slong p)
 
 /* X -= q L resp. X += q L over N limbs, returning the borrow resp.
    carry limb; unrolled in registers for constant N */
-FLINT_FORCE_INLINE ulong
-_ex_submul(nn_ptr X, nn_srcptr L, slong N, ulong q)
-{
-    ulong cy = 0, hi, lo, b;
-    slong i;
-
-    for (i = 0; i < N; i++)
-    {
-        umul_ppmm(hi, lo, L[i], q);
-        lo += cy;
-        hi += (lo < cy);
-        b = (X[i] < lo);
-        X[i] -= lo;
-        cy = hi + b;
-    }
-    return cy;
-}
-
-FLINT_FORCE_INLINE ulong
-_ex_addmul(nn_ptr X, nn_srcptr L, slong N, ulong q)
-{
-    ulong cy = 0, hi, lo;
-    slong i;
-
-    for (i = 0; i < N; i++)
-    {
-        umul_ppmm(hi, lo, L[i], q);
-        lo += cy;
-        hi += (lo < cy);
-        X[i] += lo;
-        cy = hi + (X[i] < lo);
-    }
-    return cy;
-}
-
-#define EX_MULADD_CASES(fn, X, L, N, q, res) \
-    switch (N) \
-    { \
-        case 2: res = fn(X, L, 2, q); break; \
-        case 3: res = fn(X, L, 3, q); break; \
-        case 4: res = fn(X, L, 4, q); break; \
-        case 5: res = fn(X, L, 5, q); break; \
-        case 6: res = fn(X, L, 6, q); break; \
-        default: res = fn(X, L, N, q); break; \
-    }
-
 /* the limb of |m| at position i of the frame with the mantissa's limb 0
    at position sh */
 FLINT_FORCE_INLINE ulong
@@ -241,7 +198,7 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n)
     {
         /* X = |m| (truncated), t = X - q L */
         _mp_real_elem_copy(X, N + 1, N, m);
-        EX_MULADD_CASES(_ex_submul, X, L, N, (ulong) q, cy);
+        MP_REAL_SUBMUL_1(cy, X, L, N, (ulong) q);
         X[N] -= cy;
         if (X[N] != 0 || mpn_cmp(X, L, N) >= 0)
         {
@@ -262,7 +219,7 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n)
         for (j = lo + len; j <= N; j++)
             X[j] = ~UWORD(0);
         q++;
-        EX_MULADD_CASES(_ex_addmul, X, L, N, (ulong) q, cy);
+        MP_REAL_ADDMUL_1(cy, X, L, N, (ulong) q);
         X[N] += cy;
         if (X[N] != 0)
         {
@@ -353,15 +310,17 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec)
 
     if (m->exp <= 0 && !m->negative)
     {
-        /* m in (0, 1): the kernel directly */
-        nn_ptr v;
+        /* m in (0, 1): the kernel directly, m's limbs read in place
+           when they can be */
+        nn_srcptr v;
+        nn_ptr buf;
         ulong err;
         int trunc;
         TMP_INIT;
 
         TMP_START;
-        v = TMP_ALLOC(n * sizeof(ulong));
-        trunc = _mp_real_elem_copy(v, n, n, m);
+        buf = TMP_ALLOC(n * sizeof(ulong));
+        v = _mp_real_elem_frame(buf, n, m, res->d, NULL, &trunc);
         mp_real_fit_length(res, n + 1);
         _ex_kernel(res->d, &err, v, n);
         /* truncating m costs one ulp, exp(m) < e times that */
@@ -493,8 +452,13 @@ mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
            rho (1 + rho) (rho < 1/4): the radius grows by
            |res| rho (1 + rho), in double arithmetic rounded up */
         double rd = (double) xerr;
-        double rho = ldexp(rd, FLINT_BITS * xanc);
-        double v = rd * (1.0 + rho) * _mp_real_elem_mag_hi(res) * (1.0 + 0x1p-48);
+        double rho, v;
+
+        /* rho = rd B^xanc < 1/4, so xanc <= -1; clamped at 2^-896
+           (normal) from below */
+        FLINT_ASSERT(xanc <= -1);
+        rho = _mp_real_elem_scale_up(rd, xanc);
+        v = rd * (1.0 + rho) * _mp_real_elem_mag_hi(res) * (1.0 + 0x1p-48);
         _mp_real_elem_add_rad_d(res, v, xanc + res->exp - 1);
     }
 }

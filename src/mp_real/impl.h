@@ -19,6 +19,7 @@
 #include <math.h>
 #include <string.h>
 #include "longlong.h"
+#include "double_extras.h"
 #include "mpn_extras.h"
 #include "mp_real.h"
 
@@ -65,6 +66,8 @@ extern "C" {
 #define MP_REAL_D_SQRTBINV 0x1p-16
 #define MP_REAL_LGB 5
 #endif
+/* B^2, the cap of the two-limb counts (hi, lo) */
+#define MP_REAL_D_B2 (MP_REAL_D_B * MP_REAL_D_B)
 
 /* a 128-bit count at a limb anchor */
 typedef struct { ulong hi, lo; slong a; } mp_real_bnd_t;
@@ -132,7 +135,7 @@ _mp_real_mag_lo(const mp_real_t x)
 {
     int s;
     ulong m = _mp_real_lead(x, &s);
-    return ldexp((double) m * (1.0 - 0x1p-52), -s);
+    return d_mul_2exp_inrange((double) m * (1.0 - 0x1p-52), -s);
 }
 
 FLINT_FORCE_INLINE double
@@ -140,7 +143,7 @@ _mp_real_mag_hi(const mp_real_t x)
 {
     int s;
     ulong m = _mp_real_lead(x, &s);
-    return ldexp((double) m * (1.0 + 0x1p-52) + 1.0, -s);
+    return d_mul_2exp_inrange((double) m * (1.0 + 0x1p-52) + 1.0, -s);
 }
 
 /* v |x| B^(a + 1 - exp) bounded: v (m + 1) 2^-s B^a, rounded up */
@@ -203,7 +206,7 @@ _mp_real_bnd_add(mp_real_bnd_t x, mp_real_bnd_t y)
     r.a = x.a;
     if (cy)
     {
-        /* the sum is 2^128 + (r.hi, r.lo): rounded up by a limb */
+        /* the sum is B^2 + (r.hi, r.lo): rounded up by a limb */
         ylo = r.hi + (r.lo != 0);
         r.hi = 1 + (ylo < r.hi);
         r.lo = ylo;
@@ -213,7 +216,7 @@ _mp_real_bnd_add(mp_real_bnd_t x, mp_real_bnd_t y)
 }
 
 /* the count of e as a single limb, rounded up, with its anchor: e is
-   below 2^129 by construction, so at most two limbs move */
+   below 2 B^2 by construction, so at most two limbs move */
 FLINT_FORCE_INLINE ulong
 _mp_real_bnd_reduce(mp_real_bnd_t * e)
 {
@@ -225,7 +228,7 @@ _mp_real_bnd_reduce(mp_real_bnd_t * e)
         {
             v = 1;
             e->a++;
-            /* if e->hi + 1 overflowed, e was in [2^128 - B + 1, 2^128):
+            /* if e->hi + 1 overflowed, e was in [B^2 - B + 1, B^2):
                one unit of B^(a + 2) covers it */
         }
         e->hi = 0;
@@ -238,17 +241,17 @@ _mp_real_bnd_reduce(mp_real_bnd_t * e)
 
 typedef struct { double v; slong a; } mp_real_dbnd_t;
 
-/* v == 0 or 1 <= v < 2^128, restored by rebasing the anchor (exact
+/* v == 0 or 1 <= v < B^2, restored by rebasing the anchor (exact
    power-of-two scalings; a limb pushed below the retained part is
    rounded up to one unit) */
 static inline void
 _mp_real_dbnd_reduce(mp_real_dbnd_t * x)
 {
-    if (x->v >= 0x1p128)
+    if (x->v >= MP_REAL_D_B2)
     {
         x->v = x->v * MP_REAL_D_BINV + 1.0;
         x->a++;
-        while (x->v >= 0x1p128)
+        while (x->v >= MP_REAL_D_B2)
         {
             x->v = x->v * MP_REAL_D_BINV + 1.0;
             x->a++;
@@ -303,7 +306,7 @@ _mp_real_dbnd_add(mp_real_dbnd_t x, mp_real_dbnd_t y)
         r.v = x.v;
     r.v *= MP_REAL_EPS;
     r.a = x.a;
-    if (r.v >= 0x1p128)
+    if (r.v >= MP_REAL_D_B2)
     {
         r.v = r.v * MP_REAL_D_BINV + 1.0;
         r.a++;
@@ -311,7 +314,7 @@ _mp_real_dbnd_add(mp_real_dbnd_t x, mp_real_dbnd_t y)
     return r;
 }
 
-/* a double-anchored bound as a limb count: v < 2^128 is split at
+/* a double-anchored bound as a limb count: v < B^2 is split at
    B, the low part rounded up */
 static inline mp_real_bnd_t
 _mp_real_bnd_of_fberr(mp_real_dbnd_t e)
@@ -332,7 +335,7 @@ _mp_real_bnd_of_fberr(mp_real_dbnd_t e)
         r.hi++;
         if (r.hi == 0)
         {
-            /* 2^128: one unit two limbs up */
+            /* B^2: one unit two limbs up */
             r.lo = 1;
             r.a += 2;
         }
@@ -436,7 +439,7 @@ _mp_real_acc(const mp_real_t x, slong n)
 
 /* rigorous OVERestimate of the relative radius err / |x| of a ball
    with nonzero mantissa: |x| >= top B^(exp - 1), so
-   rel <= (err / top) B^(1 - size); the ldexp window is clamped on
+   rel <= (err / top) B^(1 - size); the scaling window is clamped on
    the small side to a value exceeding anything the invariant
    err < B allows there, keeping the estimate one-sided */
 static inline double
@@ -454,7 +457,7 @@ _mp_real_rel_bound(const mp_real_t x)
         return 0x1p-700;    /* true bound < 2^(FLINT_BITS - 900) */
     /* |x| >= top B^(exp - 1): through the top limb, as the operation
        bounds do (the blanket B^(exp - 1) overstates by up to a limb) */
-    return ldexp((double) x->err / _mp_real_mag_lo(x),
+    return d_mul_2exp_inrange((double) x->err / _mp_real_mag_lo(x),
         (int) (FLINT_BITS * k)) * MP_REAL_EPS;
 }
 
@@ -912,6 +915,204 @@ _mp_real_elem_copy(nn_ptr v, slong len, slong n, const mp_real_t x)
     return 1;
 }
 
+/* the reduction parameters r of the specialized per-size kernels
+   (exp_opt_<n>.c, log1p_opt_<n>.c, atan_opt_<n>.c, trig_opt_<n>.c on
+   64-bit machines): the compile-time constants those files were
+   emitted with by dev/tune_mp_real.py --pin; the kernels' default_r
+   and the wrappers' guard-bit counts read them here */
+#define MP_REAL_EXP_OPT_R_MAX 7
+#define MP_REAL_EXP_OPT_R { 0, 12, 16, 16, 16, 16, 24, 32 }
+#define MP_REAL_LOG1P_OPT_R_MAX 7
+#define MP_REAL_LOG1P_OPT_R { 0, 16, 16, 10, 26, 31, 30, 25 }
+#define MP_REAL_ATAN_OPT_R_MAX 7
+#define MP_REAL_ATAN_OPT_R { 0, 4, 6, 22, 20, 18, 20, 19 }
+#define MP_REAL_TRIG_OPT_R_MAX 12
+#define MP_REAL_TRIG_OPT_R { 0, 4, 5, 9, 14, 15, 18, 16, 16, 16, 19, 23, 25 }
+
+/* default_r without the call for the per-size range */
+#if FLINT_BITS == 64
+#define MP_REAL_DEFAULT_R_INLINE(name, NAME) \
+FLINT_FORCE_INLINE int \
+_mp_real_##name##_default_r_inline(slong n) \
+{ \
+    static const unsigned char tab[] = MP_REAL_##NAME##_OPT_R; \
+    return (n <= MP_REAL_##NAME##_OPT_R_MAX) ? tab[n] \
+        : _mp_real_##name##_bitwise_rs_default_r(n); \
+}
+#else
+#define MP_REAL_DEFAULT_R_INLINE(name, NAME) \
+FLINT_FORCE_INLINE int \
+_mp_real_##name##_default_r_inline(slong n) \
+{ \
+    return _mp_real_##name##_bitwise_rs_default_r(n); \
+}
+#endif
+MP_REAL_DEFAULT_R_INLINE(exp, EXP)
+MP_REAL_DEFAULT_R_INLINE(log1p, LOG1P)
+MP_REAL_DEFAULT_R_INLINE(atan, ATAN)
+MP_REAL_DEFAULT_R_INLINE(trig, TRIG)
+
+/* the per-size kernels called directly, as the bitwise functions'
+   r = 0 dispatch does after its layers of checks: return 0 (nothing
+   done) beyond the per-size range, else 1 with *err the bound those
+   functions return (exp 9 r + 100, log1p 3 r + 64, atan 4 r + 64,
+   sin/cos 6 r + 128) */
+#if FLINT_BITS == 64
+#define MP_REAL_OPT_CASE_1(name, k, res, x) \
+    case k: _mp_real_##name##_opt_##k(res, x); break;
+FLINT_FORCE_INLINE int
+_mp_real_exp_opt(nn_ptr res, ulong * err, nn_srcptr x, slong n)
+{
+    switch (n)
+    {
+        MP_REAL_OPT_CASE_1(exp, 1, res, x) MP_REAL_OPT_CASE_1(exp, 2, res, x)
+        MP_REAL_OPT_CASE_1(exp, 3, res, x) MP_REAL_OPT_CASE_1(exp, 4, res, x)
+        MP_REAL_OPT_CASE_1(exp, 5, res, x) MP_REAL_OPT_CASE_1(exp, 6, res, x)
+        MP_REAL_OPT_CASE_1(exp, 7, res, x)
+        default: return 0;
+    }
+    *err = 9 * (ulong) _mp_real_exp_default_r_inline(n) + 100;
+    return 1;
+}
+
+FLINT_FORCE_INLINE int
+_mp_real_log1p_opt(nn_ptr res, ulong * err, nn_srcptr x, slong n)
+{
+    switch (n)
+    {
+        MP_REAL_OPT_CASE_1(log1p, 1, res, x) MP_REAL_OPT_CASE_1(log1p, 2, res, x)
+        MP_REAL_OPT_CASE_1(log1p, 3, res, x) MP_REAL_OPT_CASE_1(log1p, 4, res, x)
+        MP_REAL_OPT_CASE_1(log1p, 5, res, x) MP_REAL_OPT_CASE_1(log1p, 6, res, x)
+        MP_REAL_OPT_CASE_1(log1p, 7, res, x)
+        default: return 0;
+    }
+    *err = 3 * (ulong) _mp_real_log1p_default_r_inline(n) + 64;
+    return 1;
+}
+
+FLINT_FORCE_INLINE int
+_mp_real_atan_opt(nn_ptr res, ulong * err, nn_srcptr x, slong n)
+{
+    switch (n)
+    {
+        MP_REAL_OPT_CASE_1(atan, 1, res, x) MP_REAL_OPT_CASE_1(atan, 2, res, x)
+        MP_REAL_OPT_CASE_1(atan, 3, res, x) MP_REAL_OPT_CASE_1(atan, 4, res, x)
+        MP_REAL_OPT_CASE_1(atan, 5, res, x) MP_REAL_OPT_CASE_1(atan, 6, res, x)
+        MP_REAL_OPT_CASE_1(atan, 7, res, x)
+        default: return 0;
+    }
+    *err = 4 * (ulong) _mp_real_atan_default_r_inline(n) + 64;
+    return 1;
+}
+
+#define MP_REAL_OPT_CASE_SC(k) \
+    case k: _mp_real_trig_opt_##k(ysin, ycos, NULL, x); break;
+FLINT_FORCE_INLINE int
+_mp_real_sin_cos_opt(nn_ptr ysin, nn_ptr ycos, ulong * err, nn_srcptr x, slong n)
+{
+    switch (n)
+    {
+        MP_REAL_OPT_CASE_SC(1) MP_REAL_OPT_CASE_SC(2) MP_REAL_OPT_CASE_SC(3)
+        MP_REAL_OPT_CASE_SC(4) MP_REAL_OPT_CASE_SC(5) MP_REAL_OPT_CASE_SC(6)
+        MP_REAL_OPT_CASE_SC(7) MP_REAL_OPT_CASE_SC(8) MP_REAL_OPT_CASE_SC(9)
+        MP_REAL_OPT_CASE_SC(10) MP_REAL_OPT_CASE_SC(11) MP_REAL_OPT_CASE_SC(12)
+        default: return 0;
+    }
+    *err = 6 * (ulong) _mp_real_trig_default_r_inline(n) + 128;
+    return 1;
+}
+#else
+#define _mp_real_exp_opt(res, err, x, n) 0
+#define _mp_real_log1p_opt(res, err, x, n) 0
+#define _mp_real_atan_opt(res, err, x, n) 0
+#define _mp_real_sin_cos_opt(ysin, ycos, err, x, n) 0
+#endif
+
+/* X[0, N) += q L[0, N) resp. X[0, N) -= q L[0, N), returning the carry
+   resp. borrow limb, in longlong.h double-limb arithmetic (the sum
+   L[i] q + cy + X[i] < B^2 never overflows two limbs); for a constant
+   N the loop unrolls with everything in registers */
+FLINT_FORCE_INLINE ulong
+_mp_real_addmul_1_small(nn_ptr X, nn_srcptr L, slong N, ulong q)
+{
+    ulong cy = 0, hi, lo;
+    slong i;
+
+    for (i = 0; i < N; i++)
+    {
+        umul_ppmm(hi, lo, L[i], q);
+        add_ssaaaa(hi, lo, hi, lo, 0, cy);
+        add_ssaaaa(cy, X[i], hi, lo, 0, X[i]);
+    }
+    return cy;
+}
+
+FLINT_FORCE_INLINE ulong
+_mp_real_submul_1_small(nn_ptr X, nn_srcptr L, slong N, ulong q)
+{
+    ulong cy = 0, hi, lo, t;
+    slong i;
+
+    for (i = 0; i < N; i++)
+    {
+        umul_ppmm(hi, lo, L[i], q);
+        add_ssaaaa(hi, lo, hi, lo, 0, cy);
+        sub_ddmmss(t, X[i], 0, X[i], hi, lo);
+        cy = -t;
+    }
+    return cy;
+}
+
+/* res = X[0, N) +-= q L[0, N) with the register versions unrolled for
+   N <= 6 and GMP's beyond */
+#define MP_REAL_ADDMUL_1(res, X, L, N, q) \
+    do { \
+        switch (N) \
+        { \
+            case 1: (res) = _mp_real_addmul_1_small(X, L, 1, q); break; \
+            case 2: (res) = _mp_real_addmul_1_small(X, L, 2, q); break; \
+            case 3: (res) = _mp_real_addmul_1_small(X, L, 3, q); break; \
+            case 4: (res) = _mp_real_addmul_1_small(X, L, 4, q); break; \
+            case 5: (res) = _mp_real_addmul_1_small(X, L, 5, q); break; \
+            case 6: (res) = _mp_real_addmul_1_small(X, L, 6, q); break; \
+            default: (res) = mpn_addmul_1(X, L, N, q); break; \
+        } \
+    } while (0)
+
+#define MP_REAL_SUBMUL_1(res, X, L, N, q) \
+    do { \
+        switch (N) \
+        { \
+            case 1: (res) = _mp_real_submul_1_small(X, L, 1, q); break; \
+            case 2: (res) = _mp_real_submul_1_small(X, L, 2, q); break; \
+            case 3: (res) = _mp_real_submul_1_small(X, L, 3, q); break; \
+            case 4: (res) = _mp_real_submul_1_small(X, L, 4, q); break; \
+            case 5: (res) = _mp_real_submul_1_small(X, L, 5, q); break; \
+            case 6: (res) = _mp_real_submul_1_small(X, L, 6, q); break; \
+            default: (res) = mpn_submul_1(X, L, N, q); break; \
+        } \
+    } while (0)
+
+/* |x| < 1 as the fraction (v, n): read in place when x's top limb is
+   the frame's top limb and x has at least n limbs (the common case),
+   unless x shares its limbs with avoid1 or avoid2 (outputs the caller
+   will write); else copied into buf (n limbs).  *trunc as for
+   _mp_real_elem_copy. */
+FLINT_FORCE_INLINE nn_srcptr
+_mp_real_elem_frame(nn_ptr buf, slong n, const mp_real_t x,
+    nn_srcptr avoid1, nn_srcptr avoid2, int * trunc)
+{
+    slong sh = x->exp - x->size + n;
+
+    if (x->exp == 0 && sh <= 0 && x->d != avoid1 && x->d != avoid2)
+    {
+        *trunc = (sh < 0);
+        return x->d - sh;
+    }
+    *trunc = _mp_real_elem_copy(buf, n, n, x);
+    return buf;
+}
+
 /* leading zero bits of the fraction (v, n), WORD_MAX if zero */
 FLINT_FORCE_INLINE slong
 _mp_real_elem_lzb(nn_srcptr v, slong n)
@@ -939,20 +1140,55 @@ _mp_real_elem_add_rad_d(mp_real_t res, double v, slong a)
             _mp_real_bnd_of_fberr(_mp_real_dbnd(v, a))));
 }
 
+/* an upper bound for rad(y) / B^(exp - 1) = err B^(1 - size): exact
+   while FLINT_BITS (size - 1) <= 896 (then at least 2^-896), else the
+   bound 2^-896 (err < B <= 2^64: the true value is below 2^(64 - 960)
+   resp. 2^(32 - 928) on 32-bit), so that no subnormal arises */
+FLINT_FORCE_INLINE double
+_mp_real_elem_rad_rel_top(const mp_real_t y)
+{
+    if (y->err == 0)
+        return 0.0;
+    if (FLINT_BITS * (y->size - 1) > 896)
+        return 0x1p-896;
+    return d_mul_2exp_inrange((double) y->err, (int) (-FLINT_BITS * (y->size - 1)));
+}
+
 /* v >= |y| + rad(y), as v B^(exp - 1) for y with a nonzero mantissa */
 FLINT_FORCE_INLINE double
 _mp_real_elem_mag_hi(const mp_real_t y)
 {
-    return (_mp_real_mag_hi(y) + ldexp((double) y->err, -FLINT_BITS * (y->size - 1)))
-        * (1.0 + 0x1p-52);
+    return (_mp_real_mag_hi(y) + _mp_real_elem_rad_rel_top(y)) * (1.0 + 0x1p-52);
 }
 
 /* v <= |y| - rad(y) (possibly <= 0), as v B^(exp - 1) */
 FLINT_FORCE_INLINE double
 _mp_real_elem_mag_lo(const mp_real_t y)
 {
-    return (_mp_real_mag_lo(y) - ldexp((double) y->err, -FLINT_BITS * (y->size - 1)))
-        * (1.0 - 0x1p-52);
+    return (_mp_real_mag_lo(y) - _mp_real_elem_rad_rel_top(y)) * (1.0 - 0x1p-52);
+}
+
+/* 2^-e for 0 <= e <= 1000, else 0.0: a threshold whose tiny values
+   may as well be zero, without passing through subnormals */
+FLINT_FORCE_INLINE double
+_mp_real_d_2exp_neg_or_zero(slong e)
+{
+    FLINT_ASSERT(e >= 0);
+    return (e <= 1000) ? d_mul_2exp_inrange(1.0, (int) -e) : 0.0;
+}
+
+/* v 2^(FLINT_BITS a) for 2^-64 <= v <= 2^64 when a is at most 1 (larger
+   a is the caller's to exclude), rounded up: exact while
+   FLINT_BITS a > -960 (then at least 2^(-64 - 928), normal, on either
+   word size), else the bound 2^-896 >= 2^64 2^-960 >= v 2^(FLINT_BITS a),
+   so that the result is always a normal double */
+FLINT_FORCE_INLINE double
+_mp_real_elem_scale_up(double v, slong a)
+{
+    FLINT_ASSERT(a <= 1);
+    if (FLINT_BITS * a <= -960)
+        return 0x1p-896;
+    return d_mul_2exp_inrange(v, (int) (FLINT_BITS * a));
 }
 
 /* res = m (exact, nonzero) truncated to its top k limbs, with one ulp

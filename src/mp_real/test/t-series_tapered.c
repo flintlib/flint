@@ -36,6 +36,8 @@ TEST_FUNCTION_START(mp_real_series_tapered, state)
         fmpz_t f;
         double u;
 
+        /* room for r >= rmin below the n limbs (tan, n = 1 on 32-bit) */
+        n = FLINT_MIN(nmax, FLINT_MAX(n, rmin / FLINT_BITS + 1));
         if (r >= FLINT_BITS * n)
             r = FLINT_BITS * n - 1;
 

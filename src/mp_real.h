@@ -170,6 +170,14 @@ void mp_real_div_ui(mp_real_t res, const mp_real_t a, ulong c, slong n);
 void mp_real_sqrt(mp_real_t res, const mp_real_t x, slong n);
 void mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n);
 void mp_real_rsqrt_ui(mp_real_t res, ulong c, slong n);
+/* k-th roots for 1 <= k < MP_REAL_ROOT_K_MAX (the exact series
+   coefficients use the words bk + i k, i < 16, and k fits a slong) */
+#if FLINT_BITS == 64
+#define MP_REAL_ROOT_K_MAX (UWORD(1) << 40)
+#else
+#define MP_REAL_ROOT_K_MAX (UWORD(1) << 27)
+#endif
+
 void mp_real_root_ui(mp_real_t res, const mp_real_t x, ulong k, slong n);
 void mp_real_rroot_ui(mp_real_t res, const mp_real_t x, ulong k, slong n);
 void _mp_real_root_ui_order(mp_real_t res, const mp_real_t x, ulong k, slong n, int r, int recip);

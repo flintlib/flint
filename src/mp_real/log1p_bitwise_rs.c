@@ -96,8 +96,8 @@ _mp_real_log1p_bitwise_rs_default_r(slong n)
     /* the compile-time constants of the specialized per-size files:
        keep in sync with the dev/tune_mp_real.py --pin values that
        emitted them */
-    static const int opt_r[] = {0, 16, 16, 10, 26, 31, 30, 25};
-    if (n <= 7)
+    static const int opt_r[] = MP_REAL_LOG1P_OPT_R;
+    if (n <= MP_REAL_LOG1P_OPT_R_MAX)
         return opt_r[n];
 #endif
 

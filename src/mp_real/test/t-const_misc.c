@@ -114,14 +114,19 @@ TEST_FUNCTION_START(mp_real_const_misc, state)
     /* mp_real_root_ui and mp_real_rroot_ui against arb_root_ui */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        /* k up to 2^40 (every 13th: the series coefficients and their
-           common denominator beyond a word) */
-        ulong k = 1 + n_randint(state, (iter % 13 == 0) ? (UWORD(1) << 40) - 1
+        /* k up to MP_REAL_ROOT_K_MAX (every 13th: the series coefficients
+           and their common denominator beyond a word) */
+        ulong k = 1 + n_randint(state, (iter % 13 == 0) ? MP_REAL_ROOT_K_MAX - 1
             : (iter % 7 == 0) ? 3000 : 20);
         /* many trailing zero bits: the generic denominator
            k^(r-1) (r-1)! then vanishes modulo the word */
         if (iter % 13 == 0)
-            k = FLINT_MAX(2, (k >> 20) << (2 + n_randint(state, 19)));
+        {
+            slong kb = FLINT_BIT_COUNT(MP_REAL_ROOT_K_MAX) - 1;
+            slong h = kb / 2;
+            k = (k >> h) << (2 + n_randint(state, kb - h - 2));
+            k = FLINT_MAX(2, FLINT_MIN(k, MP_REAL_ROOT_K_MAX - 1));
+        }
         slong n = 2 + n_randint(state, (iter % 10 == 0 && k >= 4) ? 200 : 30);
         int recip = n_randint(state, 2);
         mp_real_t x, y;

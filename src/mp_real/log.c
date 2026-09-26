@@ -98,7 +98,7 @@ _lg_limbs(slong p)
     slong n = (p + 12 + FLINT_BITS - 1) / FLINT_BITS, g;
 
     if (n <= LG_BITWISE_MAX)
-        g = FLINT_BIT_COUNT(3 * (ulong) _mp_real_log1p_bitwise_rs_default_r(n) + 72) + 3;
+        g = FLINT_BIT_COUNT(3 * (ulong) _mp_real_log1p_default_r_inline(n) + 72) + 3;
     else
         g = 8;
     n = (p + g + FLINT_BITS - 1) / FLINT_BITS;
@@ -169,32 +169,39 @@ _lg_distance(nn_ptr s, slong n, const mp_real_t m, int E)
     TMP_END;
 }
 
-/* u = m 2^-E in [1/2, 1) as the fraction (v, n), truncated; returns 1
-   if bits were dropped */
+/* u = m 2^-E in [1/2, 1) as the fraction (v, n), truncated, or with
+   sh1 = 1 the fraction 2u - 1 (u's bits below the leading one, shifted
+   up by one more); returns 1 if bits were dropped */
 static int
-_lg_mantissa(nn_ptr v, slong n, const mp_real_t m)
+_lg_mantissa(nn_ptr v, slong n, const mp_real_t m, int sh1)
 {
-    slong j, idx, size = m->size;
-    int c = flint_clz(m->d[size - 1]);
+    slong j, idx, size = m->size, base = size - n;
+    int t = flint_clz(m->d[size - 1]) + sh1;
     ulong hi, lo;
 
-    /* v[j] takes mantissa limb size - n + j shifted left by c */
-    for (j = 0; j < n; j++)
+    if (t == FLINT_BITS)
     {
-        idx = size - n + j;
-        hi = (idx >= 0) ? m->d[idx] : 0;
-        lo = (idx >= 1) ? m->d[idx - 1] : 0;
-        v[j] = (c == 0) ? hi : ((hi << c) | (lo >> (FLINT_BITS - c)));
+        t = 0;
+        base--;
     }
 
-    /* the dropped bits: those of limb size - n - 1 not shifted in, and
+    /* v[j] takes mantissa limb base + j shifted left by t */
+    for (j = 0; j < n; j++)
+    {
+        idx = base + j;
+        hi = (idx >= 0) ? m->d[idx] : 0;
+        lo = (idx >= 1) ? m->d[idx - 1] : 0;
+        v[j] = (t == 0) ? hi : ((hi << t) | (lo >> (FLINT_BITS - t)));
+    }
+
+    /* the dropped bits: those of limb base - 1 not shifted in, and
        everything below */
-    idx = size - n - 1;
+    idx = base - 1;
     if (idx < 0)
         return 0;
-    if (c != 0 && (m->d[idx] << c) != 0)
+    if (t != 0 && (m->d[idx] << t) != 0)
         return 1;
-    if (c == 0 && m->d[idx] != 0)
+    if (t == 0 && m->d[idx] != 0)
         return 1;
     for (j = 0; j < idx; j++)
         if (m->d[j] != 0)
@@ -320,18 +327,18 @@ _lg_mid(mp_real_t res, const mp_real_t m, slong prec)
            (sigma = 1, c = E - 1) or -log u (sigma = -1, c = E), and
            |c| L with L = floor(log 2 B^(n+1)) (read in place), whose error times
            |c| < 2^62 stays below a quarter ulp of B^-n */
-        nn_ptr v, F, T;
-        ulong err, cc;
+        nn_ptr v, T;
+        ulong err, cc, cy;
         slong c;
         int trunc, sigma, neg;
         TMP_INIT;
 
         TMP_START;
-        v = TMP_ALLOC((3 * n + 4) * sizeof(ulong));
-        F = v + n;
-        T = F + n + 1;
+        v = TMP_ALLOC((2 * n + 2) * sizeof(ulong));
+        T = v + n;
 
-        trunc = _lg_mantissa(v, n, m);
+        /* 2u - 1 (bitwise) resp. u (Newton) */
+        trunc = _lg_mantissa(v, n, m, n <= LG_BITWISE_MAX);
 
         /* c = 0 (E = 1 bitwise, E = 0 Newton): the kernel output is
            the result, written straight into res */
@@ -340,8 +347,8 @@ _lg_mid(mp_real_t res, const mp_real_t m, slong prec)
             mp_real_fit_length(res, n + 1);
             if (n <= LG_BITWISE_MAX)
             {
-                mpn_lshift(v, v, n, 1);
-                _mp_real_log1p_bitwise_rs(res->d, &err, v, n, 0);
+                if (!_mp_real_log1p_opt(res->d, &err, v, n))
+                    _mp_real_log1p_bitwise_rs(res->d, &err, v, n, 0);
             }
             else
                 _mp_real_neglog_newton(res->d, &err, v, n);
@@ -351,53 +358,49 @@ _lg_mid(mp_real_t res, const mp_real_t m, slong prec)
             return;
         }
 
+        /* F, written one limb up into T = F B^-n at B^-(n+1) */
         if (n <= LG_BITWISE_MAX)
         {
             /* 2u - 1 is u's bits below the leading one (twice u's
                truncation error), log1p' <= 1 */
-            mpn_lshift(v, v, n, 1);
-            _mp_real_log1p_bitwise_rs(F, &err, v, n, 0);
+            if (!_mp_real_log1p_opt(T + 1, &err, v, n))
+                _mp_real_log1p_bitwise_rs(T + 1, &err, v, n, 0);
             sigma = 1;
             c = E - 1;
         }
         else
         {
             /* (-log)' <= 2 on [1/2, 1) */
-            _mp_real_neglog_newton(F, &err, v, n);
+            _mp_real_neglog_newton(T + 1, &err, v, n);
             sigma = -1;
             c = E;
         }
         err += 2 * trunc;
+        T[0] = 0;
+        T[n + 1] = 0;
 
-        /* T = |c| L + -F at B^-(n+1), n + 2 limbs */
+        /* T = |c| L +- F at B^-(n+1), n + 2 limbs, by one multiply-add
+           resp. -subtract of L (n + 1 limbs, read in place) */
         cc = (c < 0) ? -(ulong) c : (ulong) c;
-        if (cc != 0)
         {
-            T[n + 1] = mpn_mul_1(T, _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, n + 1),
-                n + 1, cc);
-        }
-        else
-            flint_mpn_zero(T, n + 2);
+            nn_srcptr L = _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, n + 1);
 
-        /* F at B^-(n+1): shift up one limb */
-        {
-            slong j;
-            for (j = n; j >= 1; j--)
-                F[j] = F[j - 1];
-            F[0] = 0;
-        }
-
-        if ((sigma > 0 && c >= 0) || (sigma < 0 && c <= 0))
-        {
-            /* |c| L + F; negative for sigma = -1 (c <= 0) */
-            mpn_add(T, T, n + 2, F, n + 1);
-            neg = (sigma < 0);
-        }
-        else
-        {
-            /* |c| L - F >= 0: negative for sigma = 1 (c < 0) */
-            mpn_sub(T, T, n + 2, F, n + 1);
-            neg = (sigma > 0);
+            if ((sigma > 0 && c >= 0) || (sigma < 0 && c <= 0))
+            {
+                /* |c| L + F; negative for sigma = -1 (c <= 0) */
+                MP_REAL_ADDMUL_1(cy, T, L, n + 1, cc);
+                T[n + 1] += cy;
+                neg = (sigma < 0);
+            }
+            else
+            {
+                /* F - |c| L < 0 in two's complement, negated: |c| L - F;
+                   negative for sigma = 1 (c < 0) */
+                MP_REAL_SUBMUL_1(cy, T, L, n + 1, cc);
+                T[n + 1] -= cy;
+                mpn_neg(T, T, n + 2);
+                neg = (sigma > 0);
+            }
         }
 
         /* drop the extra fraction limb (one more ulp) */
@@ -466,7 +469,10 @@ mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec)
         {
             double rd = (double) xerr, mlo = _mp_real_mag_lo(x);
             slong a = xanc - (x->exp - 1);
-            double r = ldexp(rd / mlo, FLINT_BITS * a) * (1.0 + 0x1p-50);
+            /* rd / mlo in [2^-64, 2^64]: from a = 2 on, r >= 2^64 (the
+               ball is wide); below, scaled without over- or underflow */
+            double r = (a >= 2) ? 0x1p64
+                : _mp_real_elem_scale_up(rd / mlo, a) * (1.0 + 0x1p-50);
 
             if (r <= 0.5)
             {

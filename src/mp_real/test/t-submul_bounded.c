@@ -47,8 +47,22 @@ test_submul(flint_rand_t state, slong iters)
         if (n_randint(state, 3) == 0) _mp_real_add_error_ulps(b, 1.0 + n_randint(state, 5));
         if (n_randint(state, 3) == 0) _mp_real_add_error_ulps(c, 1.0 + n_randint(state, 5));
 
-        /* the exact-ish product, and a small d */
-        mp_real_mul(p, b, c, sb + sc + 2);
+        /* the exact product of the midpoints (with inexact b or c, a
+           product of the balls, and a sum with it, would round the
+           midpoint to the accuracy of the radius, above d), and a
+           small d */
+        {
+            mp_real_t bm, cm;
+            mp_real_init(bm);
+            mp_real_init(cm);
+            mp_real_set(bm, b);
+            mp_real_set(cm, c);
+            bm->err = 0;
+            cm->err = 0;
+            mp_real_mul(p, bm, cm, sb + sc + 2);
+            mp_real_clear(bm);
+            mp_real_clear(cm);
+        }
         sd = 1 + n_randint(state, n + 1);
         flint_mpn_rrandom(tmp, state, sd);
         if (tmp[sd - 1] == 0) tmp[sd - 1] = 1;
@@ -60,11 +74,11 @@ test_submul(flint_rand_t state, slong iters)
         }
         if (n_randint(state, 2)) mp_real_neg(d, d);
         if (n_randint(state, 5) == 0) mp_real_zero(d);
-        /* a = p + d, exact when p is */
-        mp_real_add(a, p, d, sb + sc + n + 4);
+        /* a = p + d exactly (p spans sb + sc limbs, d reaches n + 1 + sd
+           <= 2 n + 2 limbs below p's top), the radius added after */
+        mp_real_add(a, p, d, sb + sc + 2 * n + 8);
         if (n_randint(state, 3) == 0) _mp_real_add_error_ulps(a, 1.0 + n_randint(state, 5));
-        /* the bound |a - b c| < B^E: d's magnitude, plus the radii,
-           which are far below it */
+        /* the bound |a - b c| < B^E on the midpoints: d's magnitude */
         E = E + 1;
 
         _mp_real_submul_bounded(r1, a, b, c, E, n);

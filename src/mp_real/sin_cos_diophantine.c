@@ -501,7 +501,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
 
     /* keep the coefficients within the slong range whatever budget
        is requested (see exp_diophantine.c) */
-    max_weight = FLINT_MIN(max_weight, ldexp(1.0, FLINT_BITS - 11));
+    max_weight = FLINT_MIN(max_weight, (double) (UWORD(1) << (FLINT_BITS - 11)));
 
     while (xn > 0 && x[xn - 1] == 0)
         xn--;
@@ -536,8 +536,8 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
         flint_mpn_copyi(base + pad, x + FLINT_MAX(n - wr, 0), wr - pad);
     }
 
-    eps_min = ldexp(1.0, -(int) FLINT_MIN(FLINT_BITS * n + 32, 2000));
-    eps_min = FLINT_MAX(eps_min, ldexp(1.0, -(int) (FLINT_BITS * wr - 48)));
+    eps_min = _mp_real_d_2exp_neg_or_zero(FLINT_BITS * n + 32);
+    eps_min = FLINT_MAX(eps_min, _mp_real_d_2exp_neg_or_zero(FLINT_BITS * wr - 48));
 
     _mp_real_log_reduce(rel, tab, base, wr, max_weight, eps_min,
         _mp_real_atan_gauss_entry(0, wr), _mp_real_atan_gauss_n);

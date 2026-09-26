@@ -57,6 +57,9 @@ mp_real_rel_radius_lt_2exp_si(const mp_real_t x)
 {
     if (x->err == 0)
         return -WORD_MAX / 2;
+    /* a zero midpoint with a radius: no relative accuracy at all */
+    if (x->size == 0)
+        return WORD_MAX / 2;
     return FLINT_BITS * (1 - x->size) + (slong) FLINT_BIT_COUNT(x->err)
         - (FLINT_BIT_COUNT(x->d[x->size - 1]) - 1) + 1;
 }
@@ -66,7 +69,7 @@ void
 mp_real_add_error_2exp_si(mp_real_t x, slong e)
 {
     slong q = e >> MP_REAL_LGB;
-    _mp_real_add_error_ulps_at(x, ldexp(1.0, (int) (e - q * FLINT_BITS)), q);
+    _mp_real_add_error_ulps_at(x, (double) (UWORD(1) << (e - q * FLINT_BITS)), q);
 }
 
 /* e with |x| < 2^e for the ball (value plus radius), -WORD_MAX/2 for

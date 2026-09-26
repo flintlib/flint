@@ -44,6 +44,19 @@ mp_real_rsqrt_ui(mp_real_t res, ulong c, slong n)
 /* shared alignment for sqrt/rsqrt: express x = ahat * B^E with E
    even, ahat in [B^-2, 1) given as an an-limb fraction (aa, an);
    the input radius keeps its anchor: err ulps of B^(E - an) */
+/* res may alias x: the root is formed from x's limbs while res grows,
+   so an aliased call goes through a temporary */
+#define MP_REAL_SQRT_ALIAS(fn)                                      \
+    if ((const void *) res == (const void *) x)                     \
+    {                                                               \
+        mp_real_t _t;                                               \
+        mp_real_init(_t);                                           \
+        fn(_t, x, n);                                               \
+        mp_real_swap(res, _t);                                      \
+        mp_real_clear(_t);                                          \
+        return;                                                     \
+    }
+
 #define MP_REAL_SQRT_ALIGN                                        \
     slong E = x->exp, an = x->size, nd;                         \
     nn_ptr aa;                                                  \
@@ -73,6 +86,7 @@ mp_real_rsqrt_ui(mp_real_t res, ulong c, slong n)
 void
 mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
 {
+    MP_REAL_SQRT_ALIAS(mp_real_rsqrt)
     MP_REAL_SQRT_ALIGN
 
     /* operand error through the derivative: with |x| >= ml B^(E-1-q)
@@ -86,7 +100,9 @@ mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
     if (x->err != 0)
     {
         int q = (int) (x->exp & 1);
-        e = _mp_real_dbnd((double) x->err * 0.51 * pow(ml, -1.5)
+        /* 1/(ml sqrt(ml)) within a few ulps of ml^(-3/2), inside the
+           slack of the 0.51 */
+        e = _mp_real_dbnd((double) x->err * 0.51 / (ml * sqrt(ml))
             * (q ? MP_REAL_D_B * MP_REAL_D_B * MP_REAL_D_B : MP_REAL_D_B * MP_REAL_D_SQRTB),
             -an - E / 2);
     }
@@ -123,6 +139,7 @@ mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
 void
 mp_real_sqrt(mp_real_t res, const mp_real_t x, slong n)
 {
+    MP_REAL_SQRT_ALIAS(mp_real_sqrt)
     MP_REAL_SQRT_ALIGN
 
     /* operand error through the derivative: with |x| >= ml B^(E-1-q)

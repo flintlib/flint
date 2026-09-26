@@ -19,7 +19,8 @@
    ball contains f at a random point of the input ball, for tiny, unit,
    one-limb and many-limb arguments (up to 2^49 for exp), arguments
    near 1 (and near -1 for atan), small integers and powers of two,
-   inexact arguments and aliased outputs; exact arguments give a
+   long mantissas at small precisions, inexact arguments and aliased
+   outputs; exact arguments give a
    relative accuracy of about prec bits; log reports non-positive balls */
 
 TEST_FUNCTION_START(mp_real_exp_log_atan_bits, state)
@@ -53,7 +54,13 @@ TEST_FUNCTION_START(mp_real_exp_log_atan_bits, state)
         arb_init(ty);
         arf_init(pt);
 
-        L = 1 + n_randint(state, prec / FLINT_BITS + 3);
+        /* now and then a long mantissa at any precision: an inexact
+           ball then has its radius far below the leading limb (the
+           clamped double scalings of the radius bounds) */
+        if (n_randint(state, 8) == 0)
+            L = 16 + n_randint(state, 40);
+        else
+            L = 1 + n_randint(state, prec / FLINT_BITS + 3);
         p = flint_malloc(L * sizeof(ulong));
         flint_mpn_rrandom(p, state, L);
         if (p[L - 1] == 0)

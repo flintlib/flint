@@ -74,7 +74,7 @@ _at_limbs(slong p)
     slong n = (p + 12 + FLINT_BITS - 1) / FLINT_BITS, g;
 
     if (n <= AT_BITWISE_MAX)
-        g = FLINT_BIT_COUNT(4 * (ulong) _mp_real_atan_bitwise_rs_default_r(n) + 72) + 3;
+        g = FLINT_BIT_COUNT(4 * (ulong) _mp_real_atan_default_r_inline(n) + 72) + 3;
     else
         g = 8;
     n = (p + g + FLINT_BITS - 1) / FLINT_BITS;
@@ -106,7 +106,10 @@ _at_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
         }
     }
     else if (n <= AT_BITWISE_MAX)
-        _mp_real_atan_bitwise_rs(y, err, v, n, 0);
+    {
+        if (!_mp_real_atan_opt(y, err, v, n))
+            _mp_real_atan_bitwise_rs(y, err, v, n, 0);
+    }
     else
         _mp_real_atan_newton(y, err, v, n);
 }
@@ -122,8 +125,10 @@ _at_recip(nn_ptr v, slong n, const mp_real_t m)
     TMP_INIT;
 
     flint_mpn_zero(v, n);
-    if (a < k - 1)
-        return;                 /* 1/|m| < B^-n */
+    if (a < k)
+        return;                 /* 1/|m| B^n = B^a / M <= 1: v = 0 is
+                                   within one ulp (and invapprox wants
+                                   a >= k) */
 
     TMP_START;
     r = TMP_ALLOC((a - k + 3) * sizeof(ulong));
@@ -188,12 +193,14 @@ _at_mid(mp_real_t res, const mp_real_t m, slong prec)
             int trunc;
             TMP_INIT;
 
+            nn_srcptr vv;
+
             n = _at_limbs(prec + z);
             TMP_START;
             v = TMP_ALLOC(n * sizeof(ulong));
-            trunc = _mp_real_elem_copy(v, n, n, m);
+            vv = _mp_real_elem_frame(v, n, m, res->d, NULL, &trunc);
             mp_real_fit_length(res, n + 1);
-            _at_kernel(res->d, &err, v, n);
+            _at_kernel(res->d, &err, vv, n);
             res->d[n] = 0;
             _mp_real_elem_finish(res, n, err + trunc, neg);
             TMP_END;
@@ -325,9 +332,13 @@ mp_real_atan_bits(mp_real_t res, const mp_real_t x, slong prec)
             double mlo = _mp_real_mag_lo(x), r, lo;
             slong b = xanc - (x->exp - 1);
 
-            r = ldexp(rd / mlo, FLINT_BITS * b) * (1.0 + 0x1p-50);
-            lo = ldexp(mlo * (1.0 - r) * (1.0 - 0x1p-50), FLINT_BITS * (x->exp - 1));
-            if (r < 1.0 && lo >= 1.0)
+            /* as for log: r >= 2^64 from b = 2 on; lo >= 1 means
+               mlo (1 - r) (1 - 2^-50) B^(exp - 1) >= 1, which for
+               exp >= 2 holds whenever r < 1 (then 1 - r >= 2^-53) */
+            r = (b >= 2) ? 0x1p64
+                : _mp_real_elem_scale_up(rd / mlo, b) * (1.0 + 0x1p-50);
+            lo = mlo * (1.0 - r) * (1.0 - 0x1p-50);
+            if (r < 1.0 && (x->exp >= 2 || lo >= 1.0))
             {
                 double d = mlo * (1.0 - r) * (1.0 - 0x1p-50);
                 v = rd / (d * d) * (1.0 + 0x1p-48);

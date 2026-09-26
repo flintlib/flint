@@ -112,7 +112,10 @@ _sc_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
         *err = 6;
     }
     else if (n <= SC_BITWISE_MAX)
-        _mp_real_sin_cos_bitwise_rs(ys, yc, err, v, n, 0);
+    {
+        if (!_mp_real_sin_cos_opt(ys, yc, err, v, n))
+            _mp_real_sin_cos_bitwise_rs(ys, yc, err, v, n, 0);
+    }
     else if (n <= SC_DIOPHANTINE_MAX)
         _mp_real_sin_cos_diophantine(ys, yc, err, v, n);
     else
@@ -129,7 +132,7 @@ _sc_guard(slong p)
     slong n = (p + 12 + FLINT_BITS - 1) / FLINT_BITS;
 
     if (n <= SC_BITWISE_MAX)
-        return FLINT_BIT_COUNT(6 * (ulong) _mp_real_trig_bitwise_rs_default_r(n) + 131) + 3;
+        return FLINT_BIT_COUNT(6 * (ulong) _mp_real_trig_default_r_inline(n) + 131) + 3;
     return 10;
 }
 
@@ -296,13 +299,17 @@ _sc_small2(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong e, slong w,
 static void
 _sc_unit(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
 {
-    nn_ptr v;
+    nn_ptr buf;
+    nn_srcptr v;
     int trunc, xneg = x->negative;
     TMP_INIT;
 
+    /* x's limbs read in place unless an output shares them (_sc_eval
+       may grow the outputs) */
     TMP_START;
-    v = TMP_ALLOC(n * sizeof(ulong));
-    trunc = _mp_real_elem_copy(v, n, n, x);
+    buf = TMP_ALLOC(n * sizeof(ulong));
+    v = _mp_real_elem_frame(buf, n, x, (rs != NULL) ? rs->d : NULL,
+        (rc != NULL) ? rc->d : NULL, &trunc);
     _sc_eval(rs, rc, v, n, trunc, 0, 1, xneg);
     TMP_END;
 }
@@ -331,26 +338,6 @@ static const ulong _sc_pi2_frac[SC_PI2_LIMBS] = {
 #define SC_2_DIV_PI_1 UWORD(0xa2f9836e4e441529)
 #define SC_2_DIV_PI_0 UWORD(0xfc2757d1f534ddc0)
 #define SC_PI4_TOP UWORD(0xc90fdaa22168c234)
-
-/* X[0, N) -= q P[0, N), returning the borrow limb; P, q in registers
-   for constant N */
-FLINT_FORCE_INLINE ulong
-_sc_submul(nn_ptr X, nn_srcptr P, slong N, ulong q)
-{
-    ulong cy = 0, hi, lo, b;
-    slong i;
-
-    for (i = 0; i < N; i++)
-    {
-        umul_ppmm(hi, lo, P[i], q);
-        lo += cy;
-        hi += (lo < cy);
-        b = (X[i] < lo);
-        X[i] -= lo;
-        cy = hi + b;
-    }
-    return cy;
-}
 
 /* one integral limb (x->exp == 1), exact, n + 1 <= SC_PI2_LIMBS:
    q from (x1, x0) (R1, R0) without the low products, a lower
@@ -381,14 +368,7 @@ _sc_reduce1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
     a = (int) (q & 3);
 
     /* t = X - q (1 + P B^-N) */
-    switch (N)
-    {
-        case 2: b = _sc_submul(X, P, 2, q); break;
-        case 3: b = _sc_submul(X, P, 3, q); break;
-        case 4: b = _sc_submul(X, P, 4, q); break;
-        case 5: b = _sc_submul(X, P, 5, q); break;
-        default: b = mpn_submul_1(X, P, N, q); break;
-    }
+    MP_REAL_SUBMUL_1(b, X, P, N, q);
     X[N] = X[N] - q - b;
     FLINT_ASSERT(X[N] <= 1);
 

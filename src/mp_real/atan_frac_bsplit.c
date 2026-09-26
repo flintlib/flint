@@ -504,7 +504,7 @@ _log2_bounds(double * lo, double * hi, nn_srcptr x, slong xn)
 
     if (xn >= 2)
     {
-        t = t * ldexp(1.0, FLINT_BITS) + (double) x[xn - 2];
+        t = t * MP_REAL_D_B + (double) x[xn - 2];
         e -= FLINT_BITS;
     }
 
@@ -679,7 +679,7 @@ _atan_frac_bsplit(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q,
     {
         slong t = (slong) tail;
         slong qq = t >> (FLINT_BITS == 64 ? 6 : 5);
-        _mp_real_add_error_ulps_at(res, ldexp(1.0, (int) (t - qq * FLINT_BITS)), qq);
+        _mp_real_add_error_ulps_at(res, (double) (UWORD(1) << (t - qq * FLINT_BITS)), qq);
     }
 
     mp_real_clear(N);

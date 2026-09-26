@@ -696,8 +696,8 @@ _mp_real_exp_bitwise_rs_default_r(slong n)
 #if FLINT_BITS == 64
     /* the compile-time constants of exp_opt_<n>.c: keep in sync with
        the dev/tune_mp_real.py --pin values that emitted those files */
-    static const int opt_r[] = {0, 12, 16, 16, 16, 16, 24, 32};
-    if (n <= 7)
+    static const int opt_r[] = MP_REAL_EXP_OPT_R;
+    if (n <= MP_REAL_EXP_OPT_R_MAX)
         return opt_r[n];
 #endif
 

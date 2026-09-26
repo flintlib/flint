@@ -1044,10 +1044,10 @@ _ratio_bound(const fmpz_t a, const fmpz_t b, int up)
     e = ea - eb;
 
     if (e > 1000)
-        return up ? HUGE_VAL : ldexp(r, 1000);
+        return up ? HUGE_VAL : d_mul_2exp_inrange(r, 1000);
     if (e < -1000)
-        return up ? ldexp(r, -1000) : 0.0;
-    return ldexp(r, (int) e);
+        return up ? d_mul_2exp_inrange(r, -1000) : 0.0;
+    return d_mul_2exp_inrange(r, (int) e);
 }
 
 /* a / b with the sign, as an estimate within the double range */
@@ -1170,7 +1170,7 @@ tail_choose_K0(tail_struct * t)
 
     while (!_K0_ok(t, (double) K))
     {
-        if (K > (WORD(1) << 40))
+        if (K > (WORD(1) << (FLINT_BITS == 64 ? 40 : 29)))
         {
             t->K0 = WORD_MAX;
             return;
@@ -1265,7 +1265,7 @@ tail_init(tail_struct * t, const fmpz * P, slong Plen, const fmpz * Q,
             m = fmpz_get_d_2exp(&e, (x));                           \
             if (!fmpz_is_zero(x) && e - sh < -900)                  \
                 t->dbl_ok = 0;                                      \
-            (dst) = (e - sh < -1000) ? 0.0 : ldexp(m, (int) (e - sh)); \
+            (dst) = (e - sh < -1000) ? 0.0 : d_mul_2exp(m, (int) (e - sh)); \
         } while (0)
 
         for (i = 0; i < Plen; i++)
@@ -1561,6 +1561,19 @@ tail_bound(tail_struct * t, slong N)
     return tail_log2_closed(t, N);
 }
 
+/* 2^a for the mantissa thresholds of tail_find, whose mantissas stay
+   within [2^-600, 2^600]: beyond +-1000 only the comparison matters,
+   and no subnormal arises */
+static double
+_exp2_thr(double a)
+{
+    if (a < -1000.0)
+        return 0.0;
+    if (a > 1000.0)
+        return HUGE_VAL;
+    return exp2(a);
+}
+
 /* the least N (up to a small excess) with tail bound <= target, by the
    exact scan below K0 - 1 and Newton steps on the closed form beyond;
    returns N and sets *bound */
@@ -1584,7 +1597,7 @@ tail_find(double * bound, tail_struct * t, double target)
         if (t->e != e && extra < HUGE_VAL)
         {
             e = t->e;
-            thr = exp2(target + 0.5 - extra - (double) e);
+            thr = _exp2_thr(target + 0.5 - extra - (double) e);
         }
 
         if (t->terminated || t->N >= next || t->m <= thr)
@@ -1606,7 +1619,7 @@ tail_find(double * bound, tail_struct * t, double target)
             {
                 extra = b - (log2(t->m) + (double) t->e);
                 e = t->e;
-                thr = exp2(target + 0.5 - extra - (double) e);
+                thr = _exp2_thr(target + 0.5 - extra - (double) e);
                 next = 2 * t->N + 1;
             }
             else
@@ -1728,7 +1741,7 @@ static void
 _mp_real_add_error_2exp(mp_real_t x, slong e)
 {
     slong q = e >> (FLINT_BITS == 64 ? 6 : 5);
-    _mp_real_add_error_ulps_at(x, ldexp(1.0, (int) (e - q * FLINT_BITS)), q);
+    _mp_real_add_error_ulps_at(x, (double) (UWORD(1) << (e - q * FLINT_BITS)), q);
 }
 
 /* the content of a polynomial (positive gcd; 1 for the zero
@@ -1905,7 +1918,7 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         if (!(Sest > 0.0) || !isfinite(Sest))
             Sest = 1.0;
         if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
-            Sest = ldexp(1.0, 1000);
+            Sest = 0x1p1000;
         lS = log2(Sest);
         if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
             lS = (double) fmpz_bits(coefQ) - (double) fmpz_bits(coefP);

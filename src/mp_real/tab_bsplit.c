@@ -415,7 +415,7 @@ static void
 _mp_real_add_error_2exp(mp_real_t x, slong t)
 {
     slong q = t >> (FLINT_BITS == 64 ? 6 : 5);    /* floor */
-    _mp_real_add_error_ulps_at(x, ldexp(1.0, (int) (t - q * FLINT_BITS)), q);
+    _mp_real_add_error_ulps_at(x, (double) (UWORD(1) << (t - q * FLINT_BITS)), q);
 }
 
 /* res = n-limb lower bound for v in [0, 1): at most the true value

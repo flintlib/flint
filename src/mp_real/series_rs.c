@@ -121,10 +121,19 @@ _rs_terms(int fam, slong n, slong s)
     {
         if (fam == RS_EXP)
             lg4 += _lg4_lower((ulong) N);
+#if FLINT_BITS == 64
         else if (fam == RS_ODD)
             lg4 += _lg4_lower((ulong) (2 * N + 1) * (ulong) (2 * N));
         else if (fam == RS_EVEN)
             lg4 += _lg4_lower((ulong) (2 * N + 2) * (ulong) (2 * N + 1));
+#else
+        /* the factors separately (lower bounds add), the product
+           possibly beyond a word */
+        else if (fam == RS_ODD)
+            lg4 += _lg4_lower((ulong) (2 * N + 1)) + _lg4_lower((ulong) (2 * N));
+        else if (fam == RS_EVEN)
+            lg4 += _lg4_lower((ulong) (2 * N + 2)) + _lg4_lower((ulong) (2 * N + 1));
+#endif
         else
             lg4 = _lg4_lower((ulong) (2 * N + 1));
         if (lg4 + 4 * s * N > T4)
@@ -181,6 +190,9 @@ _rs_sum(nn_ptr s, nn_srcptr pw, slong pslot, slong n, slong s_bits,
             {
                 ulong F, hi, lw;
 
+                /* F fits a word: 2k + 4 < 2^(FLINT_BITS/2), which the
+                   term counts keep far from (k ~ 64n/s, s >= 8) */
+                FLINT_ASSERT(FLINT_BITS == 64 || 2 * k + 4 < (WORD(1) << 16));
                 if (fam == RS_EXP)
                     F = (ulong) (k + 1);
                 else if (fam == RS_ODD)

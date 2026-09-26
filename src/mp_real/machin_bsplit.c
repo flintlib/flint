@@ -231,7 +231,7 @@ _set_static(mp_real_t x, nn_srcptr tab, slong e)
     slong q = t >> (FLINT_BITS == 64 ? 6 : 5);
 
     _mp_real_set_mpn_2exp(x, tab, STATIC_LIMBS, t);
-    _mp_real_add_error_ulps_at(x, ldexp(1.0, (int) (t - q * FLINT_BITS)), q);
+    _mp_real_add_error_ulps_at(x, (double) (UWORD(1) << (t - q * FLINT_BITS)), q);
 }
 
 /* ---- the combination with the Machin coefficients ---- */
@@ -322,7 +322,7 @@ _machin_combine(mp_real_struct * res, slong num, mp_real_struct * y,
             _acc_addmul(csign[j] ? neg : pos, an, Y + j * wn, wn, c, cn,
                 tmp);
             /* |c| < (top + 1) B^(cn - 1) */
-            err += ldexp((double) c[cn - 1] + 1.0, FLINT_BITS * (cn - 1))
+            err += d_mul_2exp((double) c[cn - 1] + 1.0, FLINT_BITS * (cn - 1))
                 * (1.0 + 0x1p-50) * ey[j];
         }
 

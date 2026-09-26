@@ -1034,7 +1034,7 @@ machin_atan_row(slong * row, nn_srcptr x, slong n)
         double xd = 0.0;
         slong k;
         for (k = MP_REAL_MACHIN_X_LIMBS - 1; k >= 0; k--)
-            xd = xd * ldexp(1.0, FLINT_BITS) + (double) x[k];
+            xd = xd * MP_REAL_D_B + (double) x[k];
         t = atan(1.0 / xd);
         for (j = 1; j < n; j++)
             t -= row[j] * atan2((double) _mp_real_gaussian_primes[2 * j + 1],

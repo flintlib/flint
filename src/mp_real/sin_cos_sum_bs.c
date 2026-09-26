@@ -386,6 +386,27 @@ nnn_combine(const bs_args * args, nn_ptr z, slong zn, slong * ze,
     return zn;
 }
 
+/* (t, returned length) = (x, xn) (2a + 4)(2a + 5): one word when the
+   product fits (always on 64-bit machines), else two multiplications;
+   t has room for xn + 2 limbs */
+static slong
+_mul_f1(nn_ptr t, nn_srcptr x, slong xn, slong a)
+{
+    ulong hi, f, a1 = (ulong) (2 * a + 4), a2 = (ulong) (2 * a + 5);
+    slong l;
+
+    umul_ppmm(hi, f, a1, a2);
+    if (hi == 0)
+    {
+        t[xn] = mpn_mul_1(t, x, xn, f);
+        return nnn_normalize(t, xn + 1);
+    }
+    t[xn] = mpn_mul_1(t, x, xn, a1);
+    l = nnn_normalize(t, xn + 1);
+    t[l] = mpn_mul_1(t, t, l, a2);
+    return nnn_normalize(t, l + 1);
+}
+
 static void
 bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
     slong * be, nn_ptr Q, slong * qn, slong * QE,
@@ -422,7 +443,6 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
            handled by nnn_combine as a pure limb move */
         nn_ptr t1, t2, tt;
         slong l1, l2, e1;
-        ulong f1 = (ulong) (2 * a + 4) * (ulong) (2 * a + 5);
         TMP_INIT;
         TMP_START;
         t1 = TMP_ALLOC((3 * (args->xlen[1] + args->lmax) + 12)
@@ -431,9 +451,7 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
         tt = t2 + args->xlen[1] + args->lmax + 4;
 
         /* B */
-        t1[args->xlen[0]] = mpn_mul_1(t1, args->xpow[0],
-            args->xlen[0], f1);
-        l1 = nnn_normalize(t1, args->xlen[0] + 1);
+        l1 = _mul_f1(t1, args->xpow[0], args->xlen[0], a);
         e1 = args->xe[0] + 2 * args->D;
         flint_mpn_copyi(B, t1, l1);
         *bn = l1;
@@ -445,9 +463,7 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
         /* A */
         if (A != NULL)
         {
-            t1[args->xlen[0]] = mpn_mul_1(t1, args->xpow[0],
-                args->xlen[0], f1);
-            l1 = nnn_normalize(t1, args->xlen[0] + 1);
+            l1 = _mul_f1(t1, args->xpow[0], args->xlen[0], a);
             t1[l1] = mpn_mul_1(t1, t1, l1, (ulong) (2 * a + 3));
             l1 = nnn_normalize(t1, l1 + 1);
             flint_mpn_copyi(A, t1, l1);
