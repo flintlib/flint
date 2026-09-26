@@ -1374,17 +1374,17 @@ flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d0)
    flint_mpn_preinv1(d1, d0) */
 #define FLINT_MPN_UDIV_QR_3BY2(q, r1, r0, n2, n1, n0, d1, d0, dinv) \
     do { \
-        mp_limb_t __q0, __t1, __t0, __mask; \
-        umul_ppmm((q), __q0, (n2), (dinv)); \
-        add_ssaaaa((q), __q0, (q), __q0, (n2), (n1)); \
+        mp_limb_t __u3b2_q0, __u3b2_t1, __u3b2_t0, __u3b2_mask; \
+        umul_ppmm((q), __u3b2_q0, (n2), (dinv)); \
+        add_ssaaaa((q), __u3b2_q0, (q), __u3b2_q0, (n2), (n1)); \
         (r1) = (n1) - (d1) * (q); \
         sub_ddmmss((r1), (r0), (r1), (n0), (d1), (d0)); \
-        umul_ppmm(__t1, __t0, (d0), (q)); \
-        sub_ddmmss((r1), (r0), (r1), (r0), __t1, __t0); \
+        umul_ppmm(__u3b2_t1, __u3b2_t0, (d0), (q)); \
+        sub_ddmmss((r1), (r0), (r1), (r0), __u3b2_t1, __u3b2_t0); \
         (q)++; \
-        __mask = -(mp_limb_t) ((r1) >= __q0); \
-        (q) += __mask; \
-        add_ssaaaa((r1), (r0), (r1), (r0), __mask & (d1), __mask & (d0)); \
+        __u3b2_mask = -(mp_limb_t) ((r1) >= __u3b2_q0); \
+        (q) += __u3b2_mask; \
+        add_ssaaaa((r1), (r0), (r1), (r0), __u3b2_mask & (d1), __u3b2_mask & (d0)); \
         if (FLINT_UNLIKELY((r1) >= (d1))) \
         { \
             if ((r1) > (d1) || (r0) >= (d0)) \

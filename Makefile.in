@@ -174,7 +174,7 @@ HEADER_DIRS	:=	\
 		double_extras		d_vec				d_mat		\
 															\
 		mpn_extras	radix   	mpn_mod		nfloat			\
-		fixed											\
+		mp_real											\
 															\
 		nmod		nmod_vec	nmod_mat	nmod_poly		\
 		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\
@@ -221,7 +221,7 @@ HEADER_DIRS	:=	\
 		arb_fmpz_poly	arb_fpwrap							\
 		acb_dft			acb_elliptic	acb_modular			\
 		acb_dirichlet	acb_theta							\
-		dirichlet		bernoulli		hypgeom				\
+		dirichlet		bernoulli							\
 		bool_mat		partitions							\
 															\
 		gr			gr_generic	gr_vec		gr_mat			\

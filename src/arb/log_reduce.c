@@ -12,7 +12,7 @@
 #include <math.h>
 #include "fmpz_vec.h"
 #include "arb.h"
-#include "fixed.h"
+#include "mp_real.h"
 #include "fmpzi.h"
 #include "acb.h"
 #include "arb/impl.h"
@@ -20,8 +20,8 @@
 #define TERMINATOR -32768
 
 
-/* The relation tables, primes and weights live in the fixed module
-   (fixed/rel_tab.c, fixed_rel_table); the 13-prime tables there are
+/* The relation tables, primes and weights live in the mp_real module
+   (mp_real/rel_tab.c, _mp_real_rel_table); the 13-prime tables there are
    the ones this file used to carry. */
 
 static void
@@ -263,7 +263,7 @@ arb_exp_arf_log_reduction(arb_t res, const arf_t x, slong prec, int minus_one)
     _arb_log_p_ensure_cached(wp);
 
     {
-        const fixed_rel_struct * tab = fixed_rel_table(0, ARB_LOG_PRIME_CACHE_NUM);
+        const mp_real_rel_struct * tab = _mp_real_rel_table(0, ARB_LOG_PRIME_CACHE_NUM);
         _arb_exp_arf_precomp(res, x, prec, minus_one,
             ARB_LOG_PRIME_CACHE_NUM,
             _arb_log_p_cache_vec(),
@@ -465,11 +465,11 @@ arb_sin_cos_arf_atan_reduction(arb_t res1, arb_t res2, const arf_t x, slong prec
     _arb_atan_gauss_p_ensure_cached(wp);
 
     {
-        const fixed_rel_struct * tab = fixed_rel_table(1, ARB_ATAN_GAUSS_PRIME_CACHE_NUM);
+        const mp_real_rel_struct * tab = _mp_real_rel_table(1, ARB_ATAN_GAUSS_PRIME_CACHE_NUM);
         _arb_sin_cos_arf_precomp(res1, res2, x, prec,
             ARB_ATAN_GAUSS_PRIME_CACHE_NUM,
             _arb_atan_gauss_p_cache_vec(),
-            _fixed_gaussian_primes, tab->weights,
+            _mp_real_gaussian_primes, tab->weights,
             tab->d, tab->epsilon, tab->epsilon_inv, 0.5 * prec);
     }
 }

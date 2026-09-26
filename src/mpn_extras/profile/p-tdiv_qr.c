@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "mpn_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 #include "profiler.h"
 
 #define TIME(expr, res) \

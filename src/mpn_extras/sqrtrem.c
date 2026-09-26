@@ -18,7 +18,7 @@
 #include <math.h>
 #include "mpn_extras.h"
 #include "ulong_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 
 /*
     Integer square root with remainder by Newton-Karp-Markstein iteration,
@@ -26,7 +26,7 @@
 
     With sn = ceil(an/2), a is viewed as a fixed-point number alpha in
     [B^-2, 1) with 2 sn fraction limbs (zero-padded on top when an is odd),
-    so that sqrt(a) = sqrt(alpha) B^sn. fixed_sqrt_newton with n2 = sn + 3
+    so that sqrt(a) = sqrt(alpha) B^sn. _mp_real_sqrt_newton with n2 = sn + 3
     fraction limbs has absolute error at most 4 B^(-n2) / sqrt(alpha) <=
     4 B^(-n2+1), i.e. 4 B^-2 at the integer scale, so the integer part is
     certified when the first fraction limb lies in [2, B-2] and the
@@ -67,7 +67,7 @@ _flint_mpn_sqrtrem_newton(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an)
     n2 = sn + 3;
 
     S = TMP_ALLOC((n2 + 2) * sizeof(mp_limb_t));
-    fixed_sqrt_newton(S, Aview, viewn, n2);
+    _mp_real_sqrt_newton(S, Aview, viewn, n2);
 
     FLINT_ASSERT(S[n2 + 1] == 0);
     /* q[0], ..., q[sn-1] are the candidate limbs of floor(sqrt(a)); q[-1]
