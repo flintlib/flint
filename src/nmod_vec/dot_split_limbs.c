@@ -16,7 +16,7 @@
     32 x 32 -> 64 bit products of vpmuludq. Let b be the number of bits of
     n - 1.
 
-    For b <= 62 the entries are split as x = x1 2^s + x0 with s = ceil(b/2)
+    For b <= 61 the entries are split as x = x1 2^s + x0 with s = ceil(b/2)
     (limbs of s and b - s <= 31 bits), and three accumulators receive
     L = sum x0 y0, M = sum x0 y1 + x1 y0, H = sum x1 y1 (schoolbook: 4
     products per term). After every chunk of F iterations, F the largest
@@ -90,7 +90,7 @@ split_limbs_hsum256(__m256i a)
 
 #endif
 
-/* chunks between two emptyings of the high accumulators (b <= 62): a lane
+/* chunks between two emptyings of the high accumulators (b <= 61): a lane
    of Xh stays below 2^45 */
 #define SPLIT_DUMP 8192
 /* iterations between two emptyings of the accumulators (b >= 63): 2^14
@@ -134,7 +134,7 @@ split_limbs_add_shifted(ulong * t2, ulong * t1, ulong * t0, ulong x, int sh)
     slong i = 0, stop;                                                      \
     const slong vecs = len - len % VL;                                      \
                                                                             \
-    if (b <= 62)                                                            \
+    if (b <= 61)                                                            \
     {                                                                       \
         const int s = (b + 1) / 2;                                          \
         const ulong l0 = (UWORD(1) << s) - 1, l1 = (UWORD(1) << (b - s)) - 1; \
