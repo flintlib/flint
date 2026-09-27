@@ -10,8 +10,10 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "qfb.h"
 #include "ulong_extras.h"
+#include "nmod.h"
 #include "gr.h"
 #include "gr_ec.h"
 #include "impl.h"
@@ -324,6 +326,316 @@ _j_equals(slong J, const fmpz_t num, const fmpz_t den, const fmpz_t p)
     return eq;
 }
 
+/* ------------------------------------------------------------------ */
+/* class numbers 2 to 4                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+    For an order O_D of class number h > 1, j(E) is not rational but a root
+    of the Hilbert class polynomial H_D, of degree h, and every root of H_D
+    modulo p is the reduction of a j-invariant with complex multiplication
+    by O_D. So if H_D(j(E)) = 0 in F_p, End(E) contains O_D, and then:
+
+      * if p does not split in K = Q(sqrt(D0)), D0 the fundamental
+        discriminant, E is supersingular and, as p > 3, t = 0 (Deuring);
+
+      * if p splits, Frobenius is an element pi of norm p in O_K, so
+        4p = t^2 + |D0| w^2, and every solution is a unit multiple of the
+        one Cornacchia finds: t is +-a, and for D0 = -4 also +-2b, for
+        D0 = -3 also +-(a + 3b)/2 and +-(a - 3b)/2.
+
+    Which of those few candidates is the trace is settled with points: the
+    true order kills every point, so it survives every test, and the answer
+    is taken only when it is the only survivor. Unlike the class number one
+    table above, this needs no calibration and no twist character, and it
+    costs a couple of scalar multiplications -- nothing next to a count.
+
+    Recognising the curve costs one evaluation of each H_D: some ten
+    microseconds in all while p fits in a word, where the coefficients are
+    reduced a word at a time, and about sixty above. Below
+    GR_EC_CM_HILBERT_MIN_BITS a whole count costs little more than that,
+    CM or not, so the check is not made.
+*/
+
+#include "cm_hilbert_table.h"
+
+#define GR_EC_CM_HILBERT_MIN_BITS 40
+#define GR_EC_CM_SELECT_POINTS 20
+
+/* a coefficient of the table, reduced modulo p */
+static void
+_cm_hilbert_coeff(fmpz_t r, const cm_hilbert_coeff_struct * C, const fmpz_t p)
+{
+    slong i;
+
+    fmpz_zero(r);
+
+    for (i = C->len - 1; i >= 0; i--)
+    {
+        fmpz_mul_2exp(r, r, 32);
+        fmpz_add_ui(r, r, cm_hilbert_words[C->off + i]);
+    }
+
+    if (C->sign < 0)
+        fmpz_neg(r, r);
+
+    fmpz_mod(r, r, p);
+}
+
+/*
+    The order among the candidates q + 1 - t, decided by random points;
+    0 if no single candidate is left standing.
+*/
+static int
+_cm_select_order(fmpz_t res, const fmpz * t, slong n, const fmpz_t p,
+        gr_ec_ctx_t ctx)
+{
+    gr_ec_point_t P, Q;
+    flint_rand_t state;
+    fmpz * N;
+    char * alive;
+    slong i, nalive = n, round;
+    int ok = 0;
+
+    N = _fmpz_vec_init(n);
+    alive = flint_malloc(n);
+
+    for (i = 0; i < n; i++)
+    {
+        fmpz_add_ui(N + i, p, 1);
+        fmpz_sub(N + i, N + i, t + i);
+        alive[i] = 1;
+    }
+
+    gr_ec_point_init(P, ctx);
+    gr_ec_point_init(Q, ctx);
+    flint_rand_init(state);
+
+    for (round = 0; round < GR_EC_CM_SELECT_POINTS && nalive > 1; round++)
+    {
+        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS
+                || gr_ec_point_is_inf(P, ctx) != T_FALSE)
+            continue;
+
+        for (i = 0; i < n; i++)
+        {
+            if (!alive[i])
+                continue;
+
+            if (gr_ec_point_mul_fmpz(Q, P, N + i, ctx) != GR_SUCCESS
+                    || gr_ec_point_is_inf(Q, ctx) != T_TRUE)
+            {
+                alive[i] = 0;
+                nalive--;
+            }
+        }
+    }
+
+    if (nalive == 1)
+        for (i = 0; i < n; i++)
+            if (alive[i])
+            {
+                fmpz_set(res, N + i);
+                ok = 1;
+            }
+
+    flint_rand_clear(state);
+    gr_ec_point_clear(Q, ctx);
+    gr_ec_point_clear(P, ctx);
+    flint_free(alive);
+    _fmpz_vec_clear(N, n);
+
+    return ok;
+}
+
+/* #E for a curve known to have CM by an order of fundamental disc. D0 */
+static int
+_cm_hilbert_count(fmpz_t res, slong D0, const fmpz_t p, gr_ec_ctx_t ctx)
+{
+    fmpz_t D, s, a, b;
+    fmpz t[6];
+    slong n = 0, i;
+    int ok = 0;
+
+    fmpz_init(D); fmpz_init(s); fmpz_init(a); fmpz_init(b);
+    for (i = 0; i < 6; i++)
+        fmpz_init(t + i);
+
+    fmpz_set_si(D, D0);
+    fmpz_mod(D, D, p);
+
+    if (fmpz_jacobi(D, p) != 1)
+    {
+        /* inert or ramified: supersingular */
+        fmpz_add_ui(res, p, 1);
+        ok = 1;
+        goto cleanup;
+    }
+
+    if (!fmpz_sqrtmod(s, D, p) || !qfb_cornacchia(a, b, p, D0, s))
+        goto cleanup;
+
+    /* 4p = a^2 + |D0| b^2 */
+    fmpz_set(t + n++, a);
+
+    if (D0 == -4)
+        fmpz_mul_2exp(t + n++, b, 1);
+    else if (D0 == -3)
+    {
+        fmpz_mul_ui(t + n, b, 3);
+        fmpz_add(t + n, t + n, a);
+        fmpz_fdiv_q_2exp(t + n, t + n, 1);
+        n++;
+        fmpz_mul_ui(t + n, b, 3);
+        fmpz_sub(t + n, a, t + n);
+        fmpz_fdiv_q_2exp(t + n, t + n, 1);
+        n++;
+    }
+
+    for (i = 0, n *= 2; i < n / 2; i++)
+        fmpz_neg(t + n / 2 + i, t + i);
+
+    ok = _cm_select_order(res, t, n, p, ctx);
+
+cleanup:
+    for (i = 0; i < 6; i++)
+        fmpz_clear(t + i);
+    fmpz_clear(D); fmpz_clear(s); fmpz_clear(a); fmpz_clear(b);
+
+    return ok;
+}
+
+/* the general version, for p of any size */
+static int
+_cm_hilbert_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den,
+        const fmpz_t p, gr_ec_ctx_t ctx)
+{
+    fmpz np[5], dp[5];
+    fmpz_t c, v, w;
+    slong i, k;
+    int found = 0;
+
+    for (i = 0; i < 5; i++)
+    {
+        fmpz_init(np + i);
+        fmpz_init(dp + i);
+    }
+    fmpz_init(c); fmpz_init(v); fmpz_init(w);
+
+    fmpz_one(np + 0);
+    fmpz_one(dp + 0);
+    for (i = 1; i < 5; i++)
+    {
+        fmpz_mul(np + i, np + i - 1, num);
+        fmpz_mod(np + i, np + i, p);
+        fmpz_mul(dp + i, dp + i - 1, den);
+        fmpz_mod(dp + i, dp + i, p);
+    }
+
+    for (k = 0; k < CM_HILBERT_NUM && !found; k++)
+    {
+        const cm_hilbert_struct * H = cm_hilbert + k;
+
+        /* den^h H(num/den) = num^h + sum c_i num^i den^(h-i) */
+        fmpz_set(v, np + H->h);
+
+        for (i = 0; i < H->h; i++)
+        {
+            _cm_hilbert_coeff(c, cm_hilbert_coeffs + H->coeff + i, p);
+            fmpz_mul(w, np + i, dp + H->h - i);
+            fmpz_addmul(v, c, w);
+        }
+
+        fmpz_mod(v, v, p);
+
+        if (fmpz_is_zero(v))
+            found = _cm_hilbert_count(res, H->D0, p, ctx);
+    }
+
+    for (i = 0; i < 5; i++)
+    {
+        fmpz_clear(np + i);
+        fmpz_clear(dp + i);
+    }
+    fmpz_clear(c); fmpz_clear(v); fmpz_clear(w);
+
+    return found;
+}
+
+/* the same while p fits in a word: num, den and the result modulo p */
+static slong
+_cm_hilbert_find_ui(ulong num, ulong den, nmod_t mod)
+{
+    ulong np[5], dp[5], two32, c, v;
+    slong i, k, w;
+
+    two32 = nmod_set_ui(UWORD(1) << 16, mod);
+    two32 = nmod_mul(two32, two32, mod);
+
+    np[0] = dp[0] = nmod_set_ui(1, mod);
+    for (i = 1; i < 5; i++)
+    {
+        np[i] = nmod_mul(np[i - 1], num, mod);
+        dp[i] = nmod_mul(dp[i - 1], den, mod);
+    }
+
+    for (k = 0; k < CM_HILBERT_NUM; k++)
+    {
+        const cm_hilbert_struct * H = cm_hilbert + k;
+
+        v = np[H->h];
+
+        for (i = 0; i < H->h; i++)
+        {
+            const cm_hilbert_coeff_struct * C = cm_hilbert_coeffs + H->coeff + i;
+
+            c = 0;
+            for (w = C->len - 1; w >= 0; w--)
+                c = nmod_add(nmod_mul(c, two32, mod),
+                        nmod_set_ui(cm_hilbert_words[C->off + w], mod), mod);
+
+            if (C->sign < 0)
+                c = nmod_neg(c, mod);
+
+            v = nmod_add(v, nmod_mul(c, nmod_mul(np[i], dp[H->h - i], mod), mod), mod);
+        }
+
+        if (v == 0)
+            return k;
+    }
+
+    return -1;
+}
+
+/*
+    Is j = num/den a root of some H_D in the table? Then count. Returns 1
+    and sets res if so.
+*/
+static int
+_cm_hilbert(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t p,
+        gr_ec_ctx_t ctx)
+{
+    if (fmpz_abs_fits_ui(p))
+    {
+        nmod_t mod;
+        slong k;
+
+        nmod_init(&mod, fmpz_get_ui(p));
+        k = _cm_hilbert_find_ui(fmpz_get_ui(num), fmpz_get_ui(den), mod);
+
+        if (k < 0)
+            return 0;
+
+        if (_cm_hilbert_count(res, cm_hilbert[k].D0, p, ctx))
+            return 1;
+
+        /* j is a root of H_D for more than one D modulo p (a rare
+           collision); let the general version look at all of them */
+    }
+
+    return _cm_hilbert_fmpz(res, num, den, p, ctx);
+}
+
 int
 gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
 {
@@ -380,6 +692,11 @@ gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
         for (i = 0; i < (slong) CM_NUM_DISCS && !found; i++)
             if (_j_equals(cm_discs[i].j, a4c, den, p))
                 found = _cm_trace_disc(t, cm_discs + i, a6, p);
+
+        /* class numbers 2 to 4: these give the order directly */
+        if (!found && fmpz_bits(p) >= GR_EC_CM_HILBERT_MIN_BITS
+                && _cm_hilbert(res, a4c, den, p, ctx))
+            goto cleanup;
     }
 
     if (found)

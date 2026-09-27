@@ -607,9 +607,10 @@ called.
 .. function:: int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
 
     Sets *res* to `\#E(\mathbb{F}_p)` for a curve with complex
-    multiplication by an order of class number one, or for a supersingular
-    curve. Returns ``GR_UNABLE`` for any other curve, for a base field that
-    is not prime, and for a model that is not short Weierstrass.
+    multiplication by an order of class number at most four, or for a
+    supersingular curve. Returns ``GR_UNABLE`` for any other curve, for a
+    base field that is not prime, and for a model that is not short
+    Weierstrass.
 
 .. function:: int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx)
 

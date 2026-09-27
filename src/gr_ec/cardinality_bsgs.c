@@ -1211,10 +1211,17 @@ _gr_ec_atkin_plan(int * side, slong * Z1, int * use_atkin,
     /* the z range, split to balance Pb Z1 against Pg nz / Z1 */
     z1 = sqrt(Pg * nz / Pb);
     z1 = FLINT_MAX(1.0, FLINT_MIN(z1, nz));
-    *Z1 = (slong) z1;
+    z1 = floor(z1);
 
     /* each u costs a short scalar multiplication on top */
-    cost = Pb * (*Z1) + Pg * ceil(nz / (*Z1)) + 30.0 * (Pb + Pg);
+    cost = Pb * z1 + Pg * ceil(nz / z1) + 30.0 * (Pb + Pg);
+
+    /*
+        Early on, with little of t known, z1 is far beyond a slong; the
+        cost says so and the caller does not search then, but Z1 must not
+        overflow on the way.
+    */
+    *Z1 = (z1 < 1e15) ? (slong) z1 : WORD(1000000000000000);
 
     flint_free(S);
 

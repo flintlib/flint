@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz_poly.h"
@@ -403,9 +404,44 @@ check_sea(flint_rand_t state)
     }
 }
 
+/*
+    The plan for the final search at the start of a large count: nothing
+    known about t yet, so the search is hopeless and must be costed as
+    such, not overflow into looking cheap (which once disabled the search
+    for the rest of every 256-bit count).
+*/
+static void
+check_plan_large(void)
+{
+    fmpz_t q, M;
+    int side[1], use;
+    slong Z1, bits;
+
+    fmpz_init(q);
+    fmpz_init(M);
+
+    for (bits = 64; bits <= 1024; bits *= 2)
+    {
+        double cost;
+
+        fmpz_one(q);
+        fmpz_mul_2exp(q, q, bits);
+        fmpz_set_ui(M, 2);
+
+        cost = _gr_ec_atkin_plan(side, &Z1, &use, NULL, 0, M, q);
+
+        FLINT_TEST(Z1 >= 1);
+        FLINT_TEST(cost > ldexp(1.0, bits / 4 - 2));
+    }
+
+    fmpz_clear(q);
+    fmpz_clear(M);
+}
+
 TEST_FUNCTION_START(gr_ec_sea, state)
 {
     check_known();
+    check_plan_large();
     check_canonical_identity(state);
     check_elkies_atkin(state);
     check_match_sort(state);
