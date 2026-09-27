@@ -28,15 +28,15 @@ _set_fmpz(nn_ptr r, mp_size_t n, const fmpz_t x)
 }
 
 /*
-    A prime of the given number of limbs. With val2 > 0 the prime is
-    congruent to 1 modulo 2^val2 and not modulo 2^(val2+1), which is what
-    selects the branch taken: val2 = 1 is the p = 3 mod 4 shortcut, val2 = 2
-    is Atkin's formula, and larger values are Tonelli and Shanks.
+    A prime of the given bit length. With val2 > 0 the prime is congruent
+    to 1 modulo 2^val2 and not modulo 2^(val2+1), which is what selects the
+    branch taken: val2 = 1 is the p = 3 mod 4 shortcut, val2 = 2 is Atkin's
+    formula, and larger values are Tonelli and Shanks. The odd cofactor has
+    bits - val2 bits, which must leave enough candidates for a prime.
 */
 static void
-_random_prime(fmpz_t p, flint_rand_t state, mp_size_t n, slong val2)
+_random_prime(fmpz_t p, flint_rand_t state, flint_bitcnt_t bits, slong val2)
 {
-    flint_bitcnt_t bits = n * FLINT_BITS;
     fmpz_t q;
 
     fmpz_init(q);
@@ -47,12 +47,13 @@ _random_prime(fmpz_t p, flint_rand_t state, mp_size_t n, slong val2)
         {
             fmpz_randprime(p, state, bits, 0);
 
-            if (fmpz_size(p) == n && fmpz_is_odd(p))
+            if (fmpz_is_odd(p))
                 break;
 
             continue;
         }
 
+        /* q odd of exactly bits - val2 bits, or q = 1 when that is 1 bit */
         fmpz_randbits(q, state, bits - val2);
         fmpz_abs(q, q);
         fmpz_setbit(q, 0);
@@ -60,7 +61,7 @@ _random_prime(fmpz_t p, flint_rand_t state, mp_size_t n, slong val2)
         fmpz_mul_2exp(p, q, val2);
         fmpz_add_ui(p, p, 1);
 
-        if (fmpz_size(p) == n && fmpz_is_probabprime(p))
+        if (fmpz_is_probabprime(p))
             break;
     }
 
@@ -79,14 +80,35 @@ TEST_FUNCTION_START(flint_mpn_sqrtmod, state)
         slong val2, j;
         flint_bitcnt_t norm;
 
-        n = 1 + n_randint(state, 6);
-        val2 = (slong) n_randint(state, FLINT_MIN(12, n * FLINT_BITS - 8));
+        flint_bitcnt_t bits;
+        ulong band = n_randint(state, 100);
+
+        /* any bit length, so that every shift of the modulus occurs */
+        if (band < 75)
+            bits = 3 + n_randint(state, 6 * FLINT_BITS - 2);
+        else if (band < 98)
+            bits = 6 * FLINT_BITS + n_randint(state, 10 * FLINT_BITS);
+        else
+            bits = 16 * FLINT_BITS + n_randint(state, 8 * FLINT_BITS);
+
+        /*
+            Now and then a large 2-adic valuation, for a long descent. The
+            odd cofactor keeps at least 16 bits, so that there are always
+            primes of the required form to be found.
+        */
+        if (bits < 20)
+            val2 = 0;
+        else if (n_randint(state, 10) == 0 && bits >= 40)
+            val2 = 12 + (slong) n_randint(state, FLINT_MIN(bits - 16, 160) - 11);
+        else
+            val2 = (slong) n_randint(state, 12);
 
         fmpz_init(p);
         fmpz_init(x);
         fmpz_init(y);
 
-        _random_prime(p, state, n, val2);
+        _random_prime(p, state, bits, val2);
+        n = fmpz_size(p);
 
         d = flint_malloc(5 * n * sizeof(ulong));
         dnormed = d + n;
