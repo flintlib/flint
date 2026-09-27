@@ -278,6 +278,10 @@ _schoof_prime_order(slong * n, ulong * lmax, const fmpz_t bound, int use_elkies)
     return ls;
 }
 
+#ifndef GR_EC_SEA_USE_ATKIN
+#define GR_EC_SEA_USE_ATKIN 1
+#endif
+
 #ifndef GR_EC_SEA_SCHOOF_MAX_L
 #define GR_EC_SEA_SCHOOF_MAX_L 11
 #endif
@@ -366,7 +370,8 @@ _schoof_driver(fmpz_t res, gr_ec_ctx_t ctx, int use_elkies)
             int elkies = 0, st;
             ulong r = 0;
 
-            st = _gr_ec_elkies_trace(&tl, &elkies, &r, l, q, ctx);
+            st = _gr_ec_elkies_trace(&tl, &elkies, GR_EC_SEA_USE_ATKIN ? &r : NULL,
+                                     l, q, ctx);
 
             /*
                 Schoof's step at an Atkin prime costs degree (l^2 - 1)/2

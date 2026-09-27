@@ -271,6 +271,7 @@ WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_sea(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_crt(fmpz_t res, gr_ec_ctx_t ctx);
 
 /* Order of the group, cached in the context */
 

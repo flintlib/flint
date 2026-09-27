@@ -528,6 +528,158 @@ check_subfield(flint_rand_t state)
     }
 }
 
+/* #E(Z/NZ) as projective points: unimodular solutions over units */
+static ulong
+_brute_zn(ulong N, const ulong * a)
+{
+    ulong X, Y, Z, S = 0;
+
+    for (X = 0; X < N; X++)
+        for (Y = 0; Y < N; Y++)
+            for (Z = 0; Z < N; Z++)
+            {
+                ulong lhs, rhs;
+
+                if (n_gcd(n_gcd(X, Y), n_gcd(Z, N)) != 1)
+                    continue;
+
+                /* Y^2 Z + a1 X Y Z + a3 Y Z^2 = X^3 + a2 X^2 Z + a4 X Z^2 + a6 Z^3 */
+                lhs = (Y * Y % N * Z + a[0] * X % N * Y % N * Z
+                        + a[2] * Y % N * Z % N * Z) % N;
+                rhs = (X * X % N * X + a[1] * X % N * X % N * Z
+                        + a[3] * X % N * Z % N * Z + a[4] * Z % N * Z % N * Z) % N;
+                S += (lhs == rhs);
+            }
+
+    return S / n_euler_phi(N);
+}
+
+/* curves over Z/NZ: brute force, bad reduction, multiplicativity, p^2 */
+static void
+check_zn(flint_rand_t state)
+{
+    slong iter;
+
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
+    {
+        ulong N = 2 + n_randint(state, 40), a[5], i, g;
+        gr_ctx_t R;
+        gr_ec_ctx_t E;
+        fmpz_t c, d;
+        int st;
+
+        GR_MUST_SUCCEED(gr_ctx_init_nmod(R, N));
+
+        for (i = 0; i < 5; i++)
+            a[i] = n_randint(state, N);
+
+        if (gr_ec_ctx_init_si(E, R, a[0], a[1], a[2], a[3], a[4]) != GR_SUCCESS)
+        {
+            gr_ctx_clear(R);
+            continue;
+        }
+
+        fmpz_init(c);
+        fmpz_init(d);
+
+        GR_MUST_SUCCEED(gr_get_fmpz(d, GR_EC_DISC(E), R));
+        g = fmpz_fdiv_ui(d, N);
+        st = gr_ec_ctx_cardinality(c, E);
+
+        if (n_gcd(g, N) != 1)
+            FLINT_TEST(st == GR_DOMAIN);
+        else
+        {
+            FLINT_TEST(st == GR_SUCCESS);
+            FLINT_TEST(fmpz_equal_ui(c, _brute_zn(N, a)));
+        }
+
+        fmpz_clear(c);
+        fmpz_clear(d);
+        gr_ec_ctx_clear(E);
+        gr_ctx_clear(R);
+    }
+
+    /* #E(Z/m1 m2 Z) = #E(Z/m1 Z) #E(Z/m2 Z), and p^2 on fmpz_mod and mpn_mod */
+    for (iter = 0; iter < 4 * flint_test_multiplier(); iter++)
+    {
+        fmpz_t p, q, N, c, c1, c2, cp;
+        gr_ctx_t R, R1, R2, Rp;
+        gr_ec_ctx_t E, E1, E2, Ep;
+        slong a4 = n_randint(state, 1000), a6 = n_randint(state, 1000);
+        int kind = n_randint(state, 2);
+
+        fmpz_init(p); fmpz_init(q); fmpz_init(N);
+        fmpz_init(c); fmpz_init(c1); fmpz_init(c2); fmpz_init(cp);
+
+        fmpz_randprime(p, state, 20 + n_randint(state, 50), 1);
+        fmpz_randprime(q, state, 20 + n_randint(state, 30), 1);
+
+        /* N = p q */
+        fmpz_mul(N, p, q);
+        gr_ctx_init_fmpz_mod(R, N);
+        gr_ctx_init_fmpz_mod(R1, p);
+        gr_ctx_init_fmpz_mod(R2, q);
+
+        if (!fmpz_equal(p, q)
+                && gr_ec_ctx_init_short_weierstrass_si(E, R, a4, a6) == GR_SUCCESS)
+        {
+            int st = gr_ec_ctx_cardinality(c, E);
+
+            if (st == GR_SUCCESS)
+            {
+                GR_MUST_SUCCEED(gr_ec_ctx_init_short_weierstrass_si(E1, R1, a4, a6));
+                GR_MUST_SUCCEED(gr_ec_ctx_init_short_weierstrass_si(E2, R2, a4, a6));
+                FLINT_TEST(gr_ec_ctx_cardinality(c1, E1) == GR_SUCCESS);
+                FLINT_TEST(gr_ec_ctx_cardinality(c2, E2) == GR_SUCCESS);
+                fmpz_mul(c1, c1, c2);
+                FLINT_TEST(fmpz_equal(c, c1));
+                gr_ec_ctx_clear(E1);
+                gr_ec_ctx_clear(E2);
+            }
+            else
+                FLINT_TEST(st == GR_DOMAIN);
+
+            gr_ec_ctx_clear(E);
+        }
+
+        gr_ctx_clear(R);
+        gr_ctx_clear(R2);
+
+        /* N = p^2: p #E(F_p), over fmpz_mod or mpn_mod */
+        fmpz_mul(N, p, p);
+
+        if (kind == 0)
+            gr_ctx_init_fmpz_mod(Rp, N);
+        else if (gr_ctx_init_mpn_mod(Rp, N) != GR_SUCCESS)
+            gr_ctx_init_fmpz_mod(Rp, N);
+
+        if (gr_ec_ctx_init_short_weierstrass_si(Ep, Rp, a4, a6) == GR_SUCCESS)
+        {
+            int st = gr_ec_ctx_cardinality(c, Ep);
+
+            if (st == GR_SUCCESS)
+            {
+                GR_MUST_SUCCEED(gr_ec_ctx_init_short_weierstrass_si(E1, R1, a4, a6));
+                FLINT_TEST(gr_ec_ctx_cardinality(cp, E1) == GR_SUCCESS);
+                fmpz_mul(cp, cp, p);
+                FLINT_TEST(fmpz_equal(c, cp));
+                gr_ec_ctx_clear(E1);
+            }
+            else
+                FLINT_TEST(st == GR_DOMAIN);
+
+            gr_ec_ctx_clear(Ep);
+        }
+
+        gr_ctx_clear(Rp);
+        gr_ctx_clear(R1);
+
+        fmpz_clear(p); fmpz_clear(q); fmpz_clear(N);
+        fmpz_clear(c); fmpz_clear(c1); fmpz_clear(c2); fmpz_clear(cp);
+    }
+}
+
 TEST_FUNCTION_START(gr_ec_cardinality, state)
 {
     check_base_ring_cardinality();
@@ -536,6 +688,7 @@ TEST_FUNCTION_START(gr_ec_cardinality, state)
     check_cm_discriminants(state);
     check_extension_fields(state);
     check_subfield(state);
+    check_zn(state);
 
     TEST_FUNCTION_END(state);
 }

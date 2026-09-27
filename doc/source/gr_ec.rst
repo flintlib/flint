@@ -579,14 +579,18 @@ with `|t| \le 2\sqrt{q}` (Hasse). These functions compute that number; the
 curve is a *gr* domain, so :func:`gr_ctx_cardinality_fmpz` applied to it is
 the same thing as :func:`gr_ec_ctx_cardinality`.
 
-All of them return ``GR_DOMAIN`` if the base ring is not a field. Note that
-neither *fmpz_mod* nor *mpn_mod* establishes primality by itself, so for a
-large prime modulus the caller has to say so with :func:`gr_ctx_set_is_field`
-before any of this will run.
+The algorithms below return ``GR_DOMAIN`` if the base ring is not a field.
+Note that neither *fmpz_mod* nor *mpn_mod* establishes primality by itself;
+:func:`gr_ec_ctx_cardinality` handles such a ring through
+:func:`gr_ec_ctx_cardinality_crt`, which proves the primes it uses, while
+the individual algorithms need :func:`gr_ctx_set_is_field` to have been
+called.
 
 .. function:: int gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
 
-    Sets *res* to `\#E(\mathbb{F}_q)`, choosing an algorithm.
+    Sets *res* to `\#E(\mathbb{F}_q)`, choosing an algorithm. Over a base
+    ring `\mathbb{Z}/N\mathbb{Z}` not known to be a field, it hands over to
+    :func:`gr_ec_ctx_cardinality_crt`.
 
     Over a very small field it walks the field, as that is both the quickest
     thing and free of randomness. It then tries
@@ -594,10 +598,11 @@ before any of this will run.
     declines at once over a prime field, and then
     :func:`gr_ec_ctx_cardinality_cm`, which costs a `j`-invariant comparison
     and declines at once unless the curve is one it recognises. Failing that
-    it prefers baby-step giant-step below `2^{80}` and Schoof above it, which
-    is roughly where those two cross over in practice, and falls back to the
-    other -- and finally to the walk, while that is still affordable -- if
-    the first cannot deliver.
+    it runs :func:`gr_ec_ctx_cardinality_sea`, which is faster than
+    baby-step giant-step from the smallest fields up, and falls back to
+    :func:`gr_ec_ctx_cardinality_bsgs` -- which also covers the long models
+    of characteristic 2 and 3 -- and finally to the walk, while that is
+    still affordable.
 
 .. function:: int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx)
 
@@ -627,6 +632,12 @@ before any of this will run.
     by factoring, and points are drawn until only one multiple of the
     accumulated lcm is left in the interval.
 
+    The steps are taken in affine coordinates on many walks at once, so that
+    their chord slopes share a single inversion (Montgomery's trick); a step
+    then costs about six multiplications in the base ring instead of a
+    projective addition followed by the inversion that hashing the
+    `x`-coordinate needs.
+
     Returns ``GR_UNABLE`` when the order cannot be pinned down this way,
     which happens over a field small enough that the Hasse interval is wide
     relative to the group exponent. Needs a random point, and so
@@ -645,30 +656,61 @@ before any of this will run.
     otherwise. Because `\psi_\ell` need not be irreducible, an inversion can
     fail; the failed extended gcd yields a proper factor of `\psi_\ell`, and
     since the Frobenius relation still holds modulo that factor, the
-    computation simply restarts with it. Recognising such a factor as a
-    kernel polynomial is what turns Schoof into SEA, which is not attempted
-    here.
+    computation simply restarts with it.
 
-    Unlike the other two, this needs no square roots in the base ring, so it
-    is currently the only one of the three that runs over *mpn_mod*.
+.. function:: int gr_ec_ctx_cardinality_sea(fmpz_t res, gr_ec_ctx_t ctx)
 
-    Two things keep it from being the textbook version. Finding
-    `t \bmod \ell` is a baby-step giant-step search rather than a scan
-    over the `\ell` candidates, because each candidate costs a torsion
-    addition and a torsion addition costs an inversion in
-    `\mathbb{F}_q[x]/(\psi_\ell)` -- an extended gcd on polynomials of
-    degree `(\ell^2-1)/2`, which is some thirty times a multiplication
-    there and dominates everything else. And the loop over `\ell` stops
-    before the product of the primes covers the Hasse interval, leaving a
-    few thousand candidates for the trace and settling them with the group
-    law instead, at one point addition each. The primes at the top of the
-    range cost far more than the whole tail does, so this is worth doing;
-    together the two are worth about a factor of seven at 128 bits.
+    The Schoof--Elkies--Atkin algorithm, with the same scope as
+    :func:`gr_ec_ctx_cardinality_schoof` and the same guarantee: the result
+    is proved, not probable.
 
-    The answer stays proved rather than likely. The true order is among the
-    candidates and kills every point, so it survives every round whatever
-    points are drawn; a round can only eliminate impostors. The result is
-    taken only when exactly one candidate is left.
+    For each small prime `\ell`, the canonical modular polynomial of
+    Müller, the minimal polynomial of
+    `f = \ell^s (\eta(\ell\tau)/\eta(\tau))^{2s}` with
+    `s = 12/\gcd(12, \ell - 1)`, is computed directly in the base ring from
+    `q`-expansions. It has degree `\ell + 1` in `X` like the classical
+    `\Phi_\ell`, but only degree `(\ell-1)/\gcd(12, \ell-1)` in `j`, which
+    makes it several times cheaper. Its roots at `j(E)` in `\mathbb{F}_q`
+    decide what `\ell` is:
+
+    * an *Elkies* prime when there is one: the isogenous curve and the sum
+      of the kernel abscissas follow from the partial derivatives of the
+      modular polynomial at the root, the kernel polynomial of degree
+      `(\ell-1)/2` from Vélu's formulas, and `t \bmod \ell = \lambda +
+      q/\lambda` from the eigenvalue `\lambda` of Frobenius on the kernel,
+      which is a discrete logarithm in a ring of degree `(\ell-1)/2` instead
+      of `(\ell^2-1)/2`;
+
+    * an *Atkin* prime when there is none: all its irreducible factors
+      then have one degree `r`, and `t^2/q = \gamma + \gamma^{-1} + 2` for
+      some `\gamma` of order `r` in `\mathbb{F}_{\ell^2}`, which restricts
+      `t \bmod \ell` to at most `\varphi(r)` values. Schoof's step is run
+      there only for small `\ell`; above that the restriction is kept for
+      the final search and `\ell` is otherwise skipped.
+
+.. function:: int gr_ec_ctx_cardinality_crt(fmpz_t res, gr_ec_ctx_t ctx)
+
+    Sets *res* to `\#E(\mathbb{Z}/N\mathbb{Z})`, the number of points of
+    `E` in the projective plane over `\mathbb{Z}/N\mathbb{Z}`, for a base
+    ring of type *nmod*, *fmpz_mod* or *mpn_mod*, prime or not.
+
+    This needs the discriminant to be a unit modulo `N`, which is exactly
+    when `E` is an elliptic curve over `\mathbb{Z}/N\mathbb{Z}`; otherwise
+    the result is ``GR_DOMAIN``. The group then splits by the Chinese
+    remainder theorem, and over `\mathbb{Z}/p^k\mathbb{Z}` reduction modulo
+    `p` is onto `E(\mathbb{F}_p)` with a kernel of `p^{k-1}` elements, so
+
+    .. math ::
+
+        \#E(\mathbb{Z}/N\mathbb{Z}) = \prod_{p^k \| N} p^{k-1} \, \#E(\mathbb{F}_p),
+
+    with each `\#E(\mathbb{F}_p)` counted by :func:`gr_ec_ctx_cardinality`.
+
+    The cost is that of factoring `N`. A prime power `p^k` (a prime
+    included) is always recognised; any other `N` is factored in full when
+    it has at most 128 bits, and above that only when splitting off its
+    small primes leaves a prime power. Returns ``GR_UNABLE`` when `N` is
+    not factored that way. Every prime used is proved prime.
 
 .. function:: int gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx)
 

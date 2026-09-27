@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include <gmp.h>
 #include <string.h>
 #include "fmpz.h"
 #include "fmpz_factor.h"
@@ -17,6 +18,7 @@
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
 #include "fq_zech.h"
+#include "nmod.h"
 #include <math.h>
 #include "ulong_extras.h"
 #include "gr.h"
@@ -50,7 +52,31 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
     slong i;
     fmpz_t z;
 
-    /* the finite field types, read directly */
+    /* the common types, read directly */
+    if (R->which_ring == GR_CTX_NMOD)
+    {
+        h = *(const ulong *) x * UWORD(0x9e3779b97f4a7c15);
+        return h ^ (h >> 29);
+    }
+
+    if (R->which_ring == GR_CTX_FMPZ_MOD)
+    {
+        const fmpz * f = x;
+
+        if (!COEFF_IS_MPZ(*f))
+            h = (ulong) *f;
+        else
+        {
+            const __mpz_struct * m = COEFF_TO_PTR(*f);
+
+            for (i = 0; i < FLINT_ABS(m->_mp_size); i++)
+                h = (h ^ m->_mp_d[i]) * UWORD(0x100000001b3);
+        }
+
+        h *= UWORD(0x9e3779b97f4a7c15);
+        return h ^ (h >> 29);
+    }
+
     if (R->which_ring == GR_CTX_FQ_ZECH)
     {
         h = ((const fq_zech_struct *) x)->value * UWORD(0x9e3779b97f4a7c15);
@@ -106,38 +132,73 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
     return h;
 }
 
-static int
-_baby_cmp(const void * a, const void * b)
+/*
+    The baby steps, in an open addressing table keyed on the hash: no
+    sorting, and a lookup is a probe or two. Entries with equal hashes all
+    stay, and every one of them is a candidate for the caller to confirm.
+*/
+typedef struct
 {
-    ulong x = ((const baby_struct *) a)->hash;
-    ulong y = ((const baby_struct *) b)->hash;
-    return (x < y) ? -1 : (x > y) ? 1 : 0;
+    baby_struct * slot;
+    slong mask;
+}
+_htab_struct;
+
+static void
+_htab_init(_htab_struct * T, slong n)
+{
+    slong size = 16, i;
+
+    while (size < 2 * n)
+        size *= 2;
+
+    T->slot = flint_malloc(size * sizeof(baby_struct));
+    T->mask = size - 1;
+
+    for (i = 0; i < size; i++)
+        T->slot[i].j = -1;
 }
 
-/* first index with this hash, or -1 */
+static void
+_htab_reset(_htab_struct * T)
+{
+    slong i;
+
+    for (i = 0; i <= T->mask; i++)
+        T->slot[i].j = -1;
+}
+
+static void
+_htab_clear(_htab_struct * T)
+{
+    flint_free(T->slot);
+}
+
+static void
+_htab_insert(_htab_struct * T, ulong h, slong j)
+{
+    slong i = h & T->mask;
+
+    while (T->slot[i].j >= 0)
+        i = (i + 1) & T->mask;
+
+    T->slot[i].hash = h;
+    T->slot[i].j = j;
+}
+
+/* for (i = first; i >= 0; i = next) visits the entries with hash h */
 static slong
-_baby_find(const baby_struct * tab, slong len, ulong h)
+_htab_next(const _htab_struct * T, ulong h, slong i)
 {
-    slong lo = 0, hi = len - 1, best = -1;
+    for ( ; T->slot[i].j >= 0; i = (i + 1) & T->mask)
+        if (T->slot[i].hash == h)
+            return i;
 
-    while (lo <= hi)
-    {
-        slong mid = lo + (hi - lo) / 2;
-
-        if (tab[mid].hash == h)
-        {
-            best = mid;
-            hi = mid - 1;
-        }
-        else if (tab[mid].hash < h)
-            lo = mid + 1;
-        else
-            hi = mid - 1;
-    }
-
-    return best;
+    return -1;
 }
 
+#define HTAB_FIRST(T, h) _htab_next((T), (h), (h) & (T)->mask)
+#define HTAB_NEXT(T, h, i) _htab_next((T), (h), ((i) + 1) & (T)->mask)
 
 /* ------------------------------------------------------------------ */
 /* walks in affine coordinates, many at once                          */
@@ -151,6 +212,92 @@ _baby_find(const baby_struct * tab, slong len, ulong h)
     side by side in affine coordinates, their chord slopes share a single
     inversion (Montgomery's trick), and a step costs about six.
 */
+
+/*
+    The step below over nmod, where going through the generic interface costs
+    several times the arithmetic: the elements are words, read directly.
+*/
+static int
+_aff_add_batch_nmod(gr_ec_aff_point_struct * P, slong n,
+        const gr_ec_aff_point_t D, gr_ec_ctx_t ctx)
+{
+    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
+    nmod_t mod = NMOD_CTX(R);
+    ulong xd = *(const ulong *) GR_EC_AFF_POINT_X(D, ctx);
+    ulong yd = *(const ulong *) GR_EC_AFF_POINT_Y(D, ctx);
+    ulong a1 = *(const ulong *) GR_EC_A1(ctx);
+    ulong a2 = *(const ulong *) GR_EC_A2(ctx);
+    ulong a3 = *(const ulong *) GR_EC_A3(ctx);
+    ulong * u, * w, inv, lam, nu, x3;
+    slong i;
+    int is_short = (gr_ec_ctx_model(ctx) == GR_EC_SHORT_WEIERSTRASS);
+    int status = GR_SUCCESS;
+
+    u = flint_malloc(2 * n * sizeof(ulong));
+    w = u + n;
+
+    /* u_i = x_i - x_D, or 1 where the chord formula does not apply */
+    for (i = 0; i < n; i++)
+    {
+        u[i] = 1;
+
+        if (P[i].is_infinity == T_FALSE)
+        {
+            ulong d = nmod_sub(*(ulong *) GR_EC_AFF_POINT_X(P + i, ctx), xd, mod);
+
+            if (d != 0)
+                u[i] = d;
+            else
+                u[i] = 0;
+        }
+
+        w[i] = (i == 0) ? (u[i] ? u[i] : 1)
+                        : nmod_mul(w[i - 1], u[i] ? u[i] : 1, mod);
+    }
+
+    inv = n_invmod(w[n - 1], mod.n);
+
+    for (i = n - 1; i >= 0; i--)
+    {
+        ulong * X = (ulong *) GR_EC_AFF_POINT_X(P + i, ctx);
+        ulong * Y = (ulong *) GR_EC_AFF_POINT_Y(P + i, ctx);
+        ulong ui = u[i] ? u[i] : 1;
+
+        lam = (i > 0) ? nmod_mul(inv, w[i - 1], mod) : inv;
+        inv = nmod_mul(inv, ui, mod);
+
+        if (P[i].is_infinity != T_FALSE || u[i] == 0)
+        {
+            status |= gr_ec_aff_point_add(P + i, P + i, D, ctx);
+            continue;
+        }
+
+        lam = nmod_mul(lam, nmod_sub(*Y, yd, mod), mod);
+
+        if (is_short)
+        {
+            x3 = nmod_sub(nmod_mul(lam, lam, mod), nmod_add(*X, xd, mod), mod);
+            *Y = nmod_sub(nmod_mul(lam, nmod_sub(*X, x3, mod), mod), *Y, mod);
+            *X = x3;
+            continue;
+        }
+
+        nu = nmod_sub(*Y, nmod_mul(lam, *X, mod), mod);
+
+        /* x3 = lam^2 + a1 lam - a2 - x_i - x_D */
+        x3 = nmod_mul(lam, nmod_add(lam, a1, mod), mod);
+        x3 = nmod_sub(x3, nmod_add(a2, nmod_add(*X, xd, mod), mod), mod);
+
+        /* y3 = -(lam + a1) x3 - nu - a3 */
+        *Y = nmod_neg(nmod_add(nmod_mul(nmod_add(lam, a1, mod), x3, mod),
+                    nmod_add(nu, a3, mod), mod), mod);
+        *X = x3;
+    }
+
+    flint_free(u);
+
+    return status;
+}
 
 /* P[i] += D for i < n, with one inversion; t has room for 2n elements */
 static int
@@ -167,6 +314,9 @@ _aff_add_batch(gr_ec_aff_point_struct * P, slong n, const gr_ec_aff_point_t D,
 
     if (n == 0 || gr_ec_aff_point_is_inf(D, ctx) == T_TRUE)
         return GR_SUCCESS;
+
+    if (R->which_ring == GR_CTX_NMOD)
+        return _aff_add_batch_nmod(P, n, D, ctx);
 
     reg = flint_malloc(n);
     GR_TMP_INIT4(inv, lam, nu, x3, R);
@@ -213,9 +363,24 @@ _aff_add_batch(gr_ec_aff_point_struct * P, slong n, const gr_ec_aff_point_t D,
             continue;
         }
 
-        /* lam = (y_i - y_D) / (x_i - x_D), nu = y_i - lam x_i */
+        /* lam = (y_i - y_D) / (x_i - x_D) */
         status |= gr_sub(nu, GR_EC_AFF_POINT_Y(Pi, ctx), GR_EC_AFF_POINT_Y(D, ctx), R);
         status |= gr_mul(lam, lam, nu, R);
+
+        if (is_short)
+        {
+            /* x3 = lam^2 - x_i - x_D, y3 = lam (x_i - x3) - y_i */
+            status |= gr_sqr(x3, lam, R);
+            status |= gr_sub(x3, x3, GR_EC_AFF_POINT_X(Pi, ctx), R);
+            status |= gr_sub(x3, x3, GR_EC_AFF_POINT_X(D, ctx), R);
+            status |= gr_sub(nu, GR_EC_AFF_POINT_X(Pi, ctx), x3, R);
+            status |= gr_mul(nu, nu, lam, R);
+            status |= gr_sub(GR_EC_AFF_POINT_Y(Pi, ctx), nu, GR_EC_AFF_POINT_Y(Pi, ctx), R);
+            gr_swap(GR_EC_AFF_POINT_X(Pi, ctx), x3, R);
+            continue;
+        }
+
+        /* nu = y_i - lam x_i */
         status |= gr_mul(nu, lam, GR_EC_AFF_POINT_X(Pi, ctx), R);
         status |= gr_sub(nu, GR_EC_AFF_POINT_Y(Pi, ctx), nu, R);
 
@@ -569,8 +734,7 @@ _unique_in_interval(fmpz_t res, const fmpz_t r, const fmpz_t M,
 
 typedef struct
 {
-    baby_struct * tab;
-    slong ntab;
+    _htab_struct * tab;
     int found;
     gr_ec_point_struct * P;
     gr_ec_point_struct * T;
@@ -598,11 +762,45 @@ _prog_baby(void * data, slong FLINT_UNUSED(k), slong z, ulong h,
         return 1;
     }
 
-    D->tab[D->ntab].hash = h;
-    D->tab[D->ntab].j = z + 1;
-    D->ntab++;
+    _htab_insert(D->tab, h, z + 1);
 
     return 0;
+}
+
+/* Q - im B = +- jv B, so k = im +- jv; confirm N_k P = O */
+static void
+_prog_try(_prog_struct * D, slong im, slong jv, int * status)
+{
+    gr_ec_ctx_struct * ctx = D->ctx;
+    fmpz_t t;
+    int sj;
+
+    fmpz_init(t);
+
+    for (sj = -1; sj <= 1 && !D->found; sj += 2)
+    {
+        slong k = im + sj * jv;
+
+        if (k < D->klo || k > D->khi)
+            continue;
+
+        fmpz_set_si(t, k);
+        fmpz_set(D->cand, D->c);
+        fmpz_submul(D->cand, t, D->M);
+
+        if (fmpz_sgn(D->cand) <= 0)
+            continue;
+
+        *status |= gr_ec_point_mul_fmpz(D->T, D->P, D->cand, ctx);
+
+        if (*status == GR_SUCCESS && gr_ec_point_is_inf(D->T, ctx) == T_TRUE)
+        {
+            fmpz_set(D->n, D->cand);
+            D->found = 1;
+        }
+    }
+
+    fmpz_clear(t);
 }
 
 /* a giant step equal to Q - im B: is it +- j B for some baby j? */
@@ -610,60 +808,13 @@ static int
 _prog_giant(_prog_struct * D, slong im, ulong h,
         const gr_ec_aff_point_struct * pt, int * status)
 {
-    gr_ec_ctx_struct * ctx = D->ctx;
-    slong idx, nj, jj;
-    fmpz_t t;
-    int sj;
+    slong i;
 
     if (pt->is_infinity == T_TRUE)
-    {
-        idx = -1;
-        nj = 1;
-    }
+        _prog_try(D, im, 0, status);
     else
-    {
-        idx = _baby_find(D->tab, D->ntab, h);
-
-        if (idx < 0)
-            return 0;
-
-        nj = 0;
-        while (idx + nj < D->ntab && D->tab[idx + nj].hash == h)
-            nj++;
-    }
-
-    fmpz_init(t);
-
-    /* Q - im B = +- j B, so k = im +- j; confirm N_k P = O */
-    for (jj = 0; jj < nj && !D->found; jj++)
-    {
-        slong jv = (idx < 0) ? 0 : D->tab[idx + jj].j;
-
-        for (sj = -1; sj <= 1 && !D->found; sj += 2)
-        {
-            slong k = im + sj * jv;
-
-            if (k < D->klo || k > D->khi)
-                continue;
-
-            fmpz_set_si(t, k);
-            fmpz_set(D->cand, D->c);
-            fmpz_submul(D->cand, t, D->M);
-
-            if (fmpz_sgn(D->cand) <= 0)
-                continue;
-
-            *status |= gr_ec_point_mul_fmpz(D->T, D->P, D->cand, ctx);
-
-            if (*status == GR_SUCCESS && gr_ec_point_is_inf(D->T, ctx) == T_TRUE)
-            {
-                fmpz_set(D->n, D->cand);
-                D->found = 1;
-            }
-        }
-    }
-
-    fmpz_clear(t);
+        for (i = HTAB_FIRST(D->tab, h); i >= 0 && !D->found; i = HTAB_NEXT(D->tab, h, i))
+            _prog_try(D, im, D->tab->slot[i].j, status);
 
     return D->found;
 }
@@ -717,7 +868,7 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     gr_ec_point_t P, Q, B, mB, S, Sp, Sm, T;
     gr_ptr xc, yc;
-    baby_struct * tab = NULL;
+    _htab_struct tab;
     flint_rand_t state;
     fmpz_t q, W, lo, hi, L, n, ord, t, tc, c, r, cand, kmin, kmax;
     slong m, attempt, ngiant, klo, khi;
@@ -807,7 +958,7 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     gr_ec_point_init(T, ctx);
     GR_TMP_INIT2(xc, yc, R);
 
-    tab = flint_malloc(m * sizeof(baby_struct));
+    _htab_init(&tab, m);
 
     prog.P = P;
     prog.T = T;
@@ -838,8 +989,8 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
             break;
 
         /* baby steps: the x-coordinates of j B for j = 1, ..., m - 1 */
-        prog.tab = tab;
-        prog.ntab = 0;
+        _htab_reset(&tab);
+        prog.tab = &tab;
         prog.found = 0;
         status |= _walk(B, NULL, 1, 1, B, B, m - 1, _prog_baby, &prog, ctx);
 
@@ -848,8 +999,6 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
 
         if (!prog.found)
         {
-            qsort(tab, prog.ntab, sizeof(baby_struct), _baby_cmp);
-
             fmpz_set_si(t, m);
             status |= gr_ec_point_mul_fmpz(Q, P, c, ctx);
             status |= gr_ec_point_mul_fmpz(mB, B, t, ctx);
@@ -887,7 +1036,7 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     if (status == GR_SUCCESS && !resolved)
         status = GR_UNABLE;
 
-    flint_free(tab);
+    _htab_clear(&tab);
     GR_TMP_CLEAR2(xc, yc, R);
     gr_ec_point_clear(T, ctx);
     gr_ec_point_clear(Sm, ctx);
@@ -1124,8 +1273,8 @@ _atkin_side_values(slong * len, fmpz_t m, const gr_ec_atkin_struct * A,
 
 typedef struct
 {
-    baby_struct * tab;
-    slong ntab, Z1;
+    _htab_struct * tab;
+    slong Z1;
     const fmpz * tc;
     const fmpz * M;
     const fmpz * zmin;
@@ -1149,9 +1298,7 @@ _ms_baby(void * data, slong k, slong z, ulong h,
 {
     _ms_struct * D = data;
 
-    D->tab[D->ntab].hash = h;
-    D->tab[D->ntab].j = k * D->Z1 + z;
-    D->ntab++;
+    _htab_insert(D->tab, h, k * D->Z1 + z);
 
     return 0;
 }
@@ -1163,7 +1310,7 @@ _ms_giant(void * data, slong k, slong z, ulong h,
 {
     _ms_struct * D = data;
     gr_ec_ctx_struct * ctx = D->ctx;
-    slong idx = _baby_find(D->tab, D->ntab, h);
+    slong idx = HTAB_FIRST(D->tab, h);
     fmpz_t t, e;
 
     if (idx < 0)
@@ -1172,9 +1319,9 @@ _ms_giant(void * data, slong k, slong z, ulong h,
     fmpz_init(t);
     fmpz_init(e);
 
-    for ( ; idx < D->ntab && D->tab[idx].hash == h; idx++)
+    for ( ; idx >= 0; idx = HTAB_NEXT(D->tab, h, idx))
     {
-        slong k1 = D->tab[idx].j / D->Z1, z1 = D->tab[idx].j % D->Z1;
+        slong k1 = D->tab->slot[idx].j / D->Z1, z1 = D->tab->slot[idx].j % D->Z1;
 
         /* t = tc + M (zmin + z1 + Z1 z) + m3 m2 u1 + m3 m1 u2 */
         fmpz_set(t, D->tc);
@@ -1239,7 +1386,8 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     gr_ec_point_t P, Q, B1, B2, Cz, D, Ab, S, T;
     _ms_struct ms;
     gr_ptr xc, yc;
-    baby_struct * tab = NULL;
+    _htab_struct tab;
+    int have_tab = 0;
     flint_rand_t state;
 
     if (gr_ctx_is_field(R) != T_TRUE)
@@ -1324,7 +1472,8 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     gr_ec_point_init(T, ctx);
     GR_TMP_INIT2(xc, yc, R);
 
-    tab = flint_malloc(n1 * Z1 * sizeof(baby_struct));
+    _htab_init(&tab, n1 * Z1);
+    have_tab = 1;
 
     ms.Z1 = Z1;
     ms.tc = tc;
@@ -1363,8 +1512,8 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
         status |= gr_ec_point_mul_fmpz(B2, P, e, ctx);
         status |= gr_ec_point_mul_si(D, Cz, Z1, ctx);
 
-        ms.tab = tab;
-        ms.ntab = 0;
+        _htab_reset(&tab);
+        ms.tab = &tab;
         ms.P = P;
         ms.T = T;
 
@@ -1375,7 +1524,6 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
         if (status != GR_SUCCESS)
             break;
 
-        qsort(tab, ms.ntab, sizeof(baby_struct), _baby_cmp);
 
         /* giant side: u2 B2 + z2 D, every match confirmed by N P = O */
         status |= gr_ec_point_zero(Ab, ctx);
@@ -1410,7 +1558,8 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     for (i = 0; i < alloc; i++)
         fmpz_clear(cand + i);
     flint_free(cand);
-    flint_free(tab);
+    if (have_tab)
+        _htab_clear(&tab);
     GR_TMP_CLEAR2(xc, yc, R);
     gr_ec_point_clear(T, ctx);
     gr_ec_point_clear(S, ctx);

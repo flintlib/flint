@@ -39,6 +39,9 @@
       cardinality_subfield.c  curves over F_{p^n} defined over F_p:
                               counted over F_p and lifted.
 
+      cardinality_crt.c       curves over Z/NZ: counted modulo each prime
+                              of N, lifted to p^k and multiplied.
+
     This file only chooses between them.
 */
 
@@ -67,8 +70,13 @@ gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
     fmpz_t q;
     int status;
 
+    /*
+        Over Z/NZ that is not known to be a field -- composite, or a prime
+        nobody has vouched for -- count modulo each prime of N and put the
+        counts together.
+    */
     if (gr_ctx_is_field(R) != T_TRUE)
-        return GR_DOMAIN;
+        return gr_ec_ctx_cardinality_crt(res, ctx);
 
     fmpz_init(q);
 
