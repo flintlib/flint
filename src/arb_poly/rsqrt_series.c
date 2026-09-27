@@ -43,27 +43,52 @@ _arb_poly_rsqrt_series(arb_ptr g,
     }
     else
     {
-        arb_ptr t, u;
-        slong tlen;
-        t = _arb_vec_init(2 * len);
+        /* Third-order Newton iteration: with e = 1 - h g^2 = O(x^m),
+           h^(-1/2) = g (1 + e/2 + 3e^2/8) + O(x^(3m)). */
+        arb_ptr t, u, v;
+        slong a[FLINT_BITS];
+        slong i, m, n, k, tlen, hnlen, plen;
+
+        t = _arb_vec_init(2 * len + (len + 2) / 3);
         u = t + len;
+        v = u + len;
 
         arb_rsqrt(g, h, prec);
 
-        NEWTON_INIT(1, len)
+        a[i = 0] = n = len;
+        while (n > 1)
+            a[++i] = (n = (n + 2) / 3);
 
-        NEWTON_LOOP(m, n)
-        tlen = FLINT_MIN(2 * m - 1, n);
-        _arb_poly_mullow(t, g, m, g, m, tlen, prec);
-        _arb_poly_mullow(u, g, m, t, tlen, n, prec);
-        _arb_poly_mulmid(g + m, u, n, h, hlen, m, n, prec);
-        _arb_vec_scalar_mul_2exp_si(g + m, g + m, n - m, -1);
-        _arb_vec_neg(g + m, g + m, n - m);
-        NEWTON_END_LOOP
+        for (i--; i >= 0; i--)
+        {
+            m = n;
+            n = a[i];
+            k = n - 2 * m;
 
-        NEWTON_END
+            tlen = FLINT_MIN(2 * m - 1, n);
+            _arb_poly_mullow(t, g, m, g, m, tlen, prec);
 
-        _arb_vec_clear(t, 2 * len);
+            /* u = (h g^2)[m, n) = -e / x^m */
+            hnlen = FLINT_MIN(hlen, n);
+            plen = FLINT_MIN(n, tlen + hnlen - 1);
+            _arb_poly_mulmid(u, t, tlen, h, hnlen, m, plen, prec);
+            _arb_vec_zero(u + plen - m, n - plen);
+
+            if (k > 0)
+            {
+                /* e/2 + 3e^2/8 = -(4u - 3 x^m u^2) / 8 */
+                _arb_poly_mullow(v, u, k, u, k, k, prec);
+                _arb_vec_scalar_mul_si(v, v, k, 3, prec);
+                _arb_vec_scalar_mul_2exp_si(u, u, n - m, 2);
+                _arb_vec_sub(u + m, u + m, v, k, prec);
+            }
+
+            _arb_poly_mullow(g + m, g, FLINT_MIN(m, n - m), u, n - m, n - m, prec);
+            _arb_vec_scalar_mul_2exp_si(g + m, g + m, n - m, (k > 0) ? -3 : -1);
+            _arb_vec_neg(g + m, g + m, n - m);
+        }
+
+        _arb_vec_clear(t, 2 * len + (len + 2) / 3);
     }
 }
 

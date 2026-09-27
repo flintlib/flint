@@ -12,6 +12,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+#define INV_BINOMIAL_BLOCK 32
+
 /* Ainv is the inverse constant term of A; it is allowed to be aliased
    with res[0]. */
 int
@@ -44,40 +46,72 @@ _gr_poly_inv_series_basecase_preinv1(gr_ptr res, gr_srcptr A, slong Alen, gr_src
     else if (Alen == 2 || _gr_vec_is_zero(GR_ENTRY(A, 1, sz), Alen - 2, ctx) == T_TRUE)
     {
         /* Special-case binomials */
-        /* todo: implement using vector functions (geometric series + inflate) */
-        slong i, j, step;
+        slong i, j, k, step;
 
         step = Alen - 1;
 
-        if (gr_is_one(res, ctx) == T_TRUE)
+        if (step == 1 && len > INV_BINOMIAL_BLOCK)
         {
-            status |= gr_neg(GR_ENTRY(res, step, sz), GR_ENTRY(A, step, sz), ctx);
-            for (i = 2 * step; i < len; i += step)
-                status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), GR_ENTRY(res, step, sz), ctx);
-        }
-        else if (gr_is_neg_one(res, ctx) == T_TRUE)
-        {
-            status |= gr_neg(GR_ENTRY(res, step, sz), GR_ENTRY(A, step, sz), ctx);
-            for (i = 2 * step; i < len; i += step)
-                status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), GR_ENTRY(A, step, sz), ctx);
-        }
-        else
-        {
+            /* 1/(a + c x) = (1/a) sum_k t^k x^k with t = -c/a. Compute
+               the first B terms serially and then blockwise by scalar
+               multiplication by t^B; this avoids a serial chain of
+               multiplications and vectorizes in rings with vector
+               arithmetic. (For step > 1, the extra data movement makes
+               this slower than the direct loop in rings without fast
+               vector arithmetic.) */
+            slong B = INV_BINOMIAL_BLOCK;
             gr_ptr t;
+
             GR_TMP_INIT(t, ctx);
 
-            status |= gr_mul(t, res, GR_ENTRY(A, step, sz), ctx);
+            status |= gr_mul(t, res, GR_ENTRY(A, 1, sz), ctx);
             status |= gr_neg(t, t, ctx);
 
-            for (i = step; i < len; i += step)
-                status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), t, ctx);
+            for (k = 1; k < B; k++)
+                status |= gr_mul(GR_ENTRY(res, k, sz), GR_ENTRY(res, k - 1, sz), t, ctx);
+
+            /* t^B = res[B - 1] t a */
+            status |= gr_mul(t, GR_ENTRY(res, B - 1, sz), t, ctx);
+            if (gr_is_one(A, ctx) != T_TRUE)
+                status |= gr_mul(t, t, A, ctx);
+
+            for (k = B; k < len; k += B)
+                status |= _gr_vec_mul_scalar(GR_ENTRY(res, k, sz), GR_ENTRY(res, k - B, sz), FLINT_MIN(B, len - k), t, ctx);
 
             GR_TMP_CLEAR(t, ctx);
         }
+        else
+        {
+            if (gr_is_one(res, ctx) == T_TRUE)
+            {
+                status |= gr_neg(GR_ENTRY(res, step, sz), GR_ENTRY(A, step, sz), ctx);
+                for (i = 2 * step; i < len; i += step)
+                    status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), GR_ENTRY(res, step, sz), ctx);
+            }
+            else if (gr_is_neg_one(res, ctx) == T_TRUE)
+            {
+                status |= gr_neg(GR_ENTRY(res, step, sz), GR_ENTRY(A, step, sz), ctx);
+                for (i = 2 * step; i < len; i += step)
+                    status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), GR_ENTRY(A, step, sz), ctx);
+            }
+            else
+            {
+                gr_ptr t;
+                GR_TMP_INIT(t, ctx);
 
-        for (i = 0; i < len; i += step)
-            for (j = i + 1; j < FLINT_MIN(len, i + step); j++)
-                status |= gr_zero(GR_ENTRY(res, j, sz), ctx);
+                status |= gr_mul(t, res, GR_ENTRY(A, step, sz), ctx);
+                status |= gr_neg(t, t, ctx);
+
+                for (i = step; i < len; i += step)
+                    status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - step, sz), t, ctx);
+
+                GR_TMP_CLEAR(t, ctx);
+            }
+
+            for (i = 0; i < len; i += step)
+                for (j = i + 1; j < FLINT_MIN(len, i + step); j++)
+                    status |= gr_zero(GR_ENTRY(res, j, sz), ctx);
+        }
     }
     else
     {

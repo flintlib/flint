@@ -12,6 +12,18 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/*
+    Third-order Newton iteration: given g = h^(-1/2) + O(x^m), let
+    e = 1 - h g^2 = O(x^m). Then
+
+        h^(-1/2) = g (1 - e)^(-1/2) = g (1 + e/2 + 3e^2/8) + O(x^(3m)).
+
+    Compared to the second-order iteration, each step requires one extra
+    short squaring but triples the precision, and in practice this is
+    faster since the square g^2 and the middle product (h g^2) are
+    shared among more new coefficients. When n <= 2m the step reduces
+    to the ordinary second-order update.
+*/
 int
 _gr_poly_rsqrt_series_newton(gr_ptr g,
     gr_srcptr h, slong hlen, slong len, slong cutoff, gr_ctx_t ctx)
@@ -19,7 +31,7 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
     slong a[FLINT_BITS];
-    slong i, m, n;
+    slong i, m, n, k;
 
     hlen = FLINT_MIN(hlen, len);
 
@@ -35,64 +47,75 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
     }
 
     cutoff = FLINT_MAX(cutoff, 2);
+
     a[i = 0] = n = len;
     while (n >= cutoff)
-        a[++i] = (n = (n + 1) / 2);
+        a[++i] = (n = (n + 2) / 3);
 
     status |= _gr_poly_rsqrt_series_basecase(g, h, FLINT_MIN(hlen, n), n, ctx);
 
     if (status != GR_SUCCESS)
         return status;
 
-    /* Alternative: if the basecase fails in small characteristic, fall
-       back to doing Newton iteration all the way. */
-#if 0
-    if (status != GR_SUCCESS)
-    {
-        if (n == 1)
-            return status;
-        else
-            return _gr_poly_rsqrt_series_newton(g, h, hlen, len, 2, ctx);
-    }
-#endif
-
     if (len > n)
     {
-        gr_ptr t, u;
-        slong tlen, ualloc;
+        gr_ptr t, u, v;
+        slong tlen, hnlen, plen, ualloc, valloc;
 
         /* Hack: until all rings have a good mulmid, implement both with and without. */
         int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
 
-        ualloc = have_mulmid ? (len / 2) : len;
+        ualloc = have_mulmid ? len - (len + 2) / 3 : len;
+        valloc = (len + 2) / 3;
 
-        GR_TMP_INIT_VEC(t, len + ualloc, ctx);
+        GR_TMP_INIT_VEC(t, len + ualloc + valloc, ctx);
         u = GR_ENTRY(t, len, sz);
+        v = GR_ENTRY(u, ualloc, sz);
 
         for (i--; i >= 0; i--)
         {
+            gr_ptr w;
+
             m = n;
             n = a[i];
+            k = n - 2 * m;
 
             tlen = FLINT_MIN(2 * m - 1, n);
             status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
 
+            /* w = (h g^2)[m, n) = -e / x^m */
+            hnlen = FLINT_MIN(hlen, n);
+            plen = FLINT_MIN(n, tlen + hnlen - 1);
+
             if (have_mulmid)
             {
-                status |= _gr_poly_mulmid(u, t, tlen, h, FLINT_MIN(hlen, n), m, n, ctx);
-                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, u, n - m, n - m, ctx);
+                status |= _gr_poly_mulmid(u, t, tlen, h, hnlen, m, plen, ctx);
+                w = u;
             }
             else
             {
-                status |= _gr_poly_mullow(u, t, tlen, h, FLINT_MIN(hlen, n), n, ctx);
-                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, GR_ENTRY(u, m, sz), n - m, n - m, ctx);
+                status |= _gr_poly_mullow(u, t, tlen, h, hnlen, plen, ctx);
+                w = GR_ENTRY(u, m, sz);
             }
 
-            status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, -1, ctx);
+            if (plen < n)
+                status |= _gr_vec_zero(GR_ENTRY(w, plen - m, sz), n - plen, ctx);
+
+            if (k > 0)
+            {
+                /* e/2 + 3e^2/8 = -(4w - 3 x^m w^2) / 8 */
+                status |= _gr_poly_mullow(v, w, k, w, k, k, ctx);
+                status |= _gr_vec_mul_scalar_si(v, v, k, 3, ctx);
+                status |= _gr_vec_mul_scalar_2exp_si(w, w, n - m, 2, ctx);
+                status |= _gr_vec_sub(GR_ENTRY(w, m, sz), GR_ENTRY(w, m, sz), v, k, ctx);
+            }
+
+            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, FLINT_MIN(m, n - m), w, n - m, n - m, ctx);
+            status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, (k > 0) ? -3 : -1, ctx);
             status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
         }
 
-        GR_TMP_CLEAR_VEC(t, len + ualloc, ctx);
+        GR_TMP_CLEAR_VEC(t, len + ualloc + valloc, ctx);
     }
 
     return status;
