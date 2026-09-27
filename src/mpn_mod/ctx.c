@@ -149,10 +149,8 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) mpn_mod_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) mpn_mod_pow_ui},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) mpn_mod_pow_fmpz},
-/*
     {GR_METHOD_SQRT,            (gr_funcptr) mpn_mod_sqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) mpn_mod_is_square},
-*/
 
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) mpn_mod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _mpn_mod_ctx_fq_prime},
