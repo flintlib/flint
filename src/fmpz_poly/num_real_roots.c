@@ -10,7 +10,9 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 FLINT_FORCE_INLINE
 slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol)
@@ -139,14 +141,59 @@ slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
     }
     else
     {
-        slong n_zero, n_neg, n_pos;
-        if (fmpz_is_zero(pol))
-            n_zero = 1;
-        else
-            n_zero = 0;
+        slong bits, n_neg, n_pos, res, j;
+        int s, sp, sn;
 
-        _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol + n_zero, len - n_zero);
-        return i + n_zero + n_neg + n_pos;
+        /* Note: pol[0] != 0 here. */
+
+        /* Descartes' rule of signs: if pol(x) and pol(-x) both have at most
+           one sign variation, it gives the exact number of roots. */
+        sp = sn = fmpz_sgn(pol);
+        n_pos = n_neg = 0;
+        for (j = 1; j < len && n_pos + n_neg <= 2; j++)
+        {
+            s = fmpz_sgn(pol + j);
+            if (s != 0)
+            {
+                if (s != sp)
+                {
+                    n_pos++;
+                    sp = s;
+                }
+                if (j % 2 == 1)
+                    s = -s;
+                if (s != sn)
+                {
+                    n_neg++;
+                    sn = s;
+                }
+            }
+        }
+
+        if (n_pos <= 1 && n_neg <= 1)
+            return i + n_pos + n_neg;
+
+        bits = FLINT_ABS(_fmpz_vec_max_bits(pol, len));
+
+        /* For small input, the subresultant Sturm sequence is fastest. */
+        if (len <= NUM_REAL_ROOTS_STURM_MAX_LEN &&
+            bits <= NUM_REAL_ROOTS_STURM_MAX_SIZE / len)
+        {
+            _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol, len);
+            return i + n_neg + n_pos;
+        }
+
+        /* Otherwise, try a primitive Sturm sequence, which wins when the
+           remainders stay small (structured or sparse input; VCA can be
+           extremely slow for sparse input with close roots). Abort as soon
+           as the remainders grow, and fall back on VCA. */
+        res = _fmpz_poly_num_real_roots_sturm_bounded(pol, len, 0,
+            _fmpz_poly_num_real_roots_sturm_bound(len, bits));
+
+        if (res < 0)
+            res = _fmpz_poly_num_real_roots_vca(pol, len);
+
+        return i + res;
     }
 
     /* unreachable! */

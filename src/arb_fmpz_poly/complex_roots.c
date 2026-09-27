@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "profiler.h"
 #include "fmpz_poly.h"
+#include "arb_poly.h"
 #include "acb_poly.h"
 #include "arb_fmpz_poly.h"
 
@@ -50,12 +51,131 @@ static int check_isolation(acb_srcptr roots, slong len)
     return 1;
 }
 
+
+/* Whether the sorted vector contains two entries x, y with
+   |x - y| < max(|x|, |y|) / (16 n). */
+static int
+_arb_vec_has_close_pair(arb_srcptr x, slong len, slong n)
+{
+    arb_t d, e, m;
+    slong i;
+    int res = 0;
+
+    arb_init(d);
+    arb_init(e);
+    arb_init(m);
+
+    for (i = 0; i + 1 < len && !res; i++)
+    {
+        arb_sub(d, x + i + 1, x + i, 30);
+        arb_abs(d, d);
+        arb_mul_ui(d, d, 16 * n, 30);
+        arb_abs(m, x + i);
+        arb_abs(e, x + i + 1);
+        arb_max(m, m, e, 30);
+        if (!arb_gt(d, m))
+            res = 1;
+    }
+
+    arb_clear(d);
+    arb_clear(e);
+    arb_clear(m);
+
+    return res;
+}
+
+/* Normwise relative accuracy (in bits) of the coefficients of poly. */
+static slong
+_arb_poly_normwise_accuracy(const arb_poly_t poly)
+{
+    mag_t mx, mr, t;
+    slong i, acc;
+
+    mag_init(mx);
+    mag_init(mr);
+    mag_init(t);
+
+    for (i = 0; i < poly->length; i++)
+    {
+        arb_get_mag(t, poly->coeffs + i);
+        mag_max(mx, mx, t);
+        mag_max(mr, mr, arb_radref(poly->coeffs + i));
+    }
+
+    if (mag_is_zero(mr))
+        acc = ARF_PREC_EXACT;
+    else if (mag_is_zero(mx) || mag_is_inf(mr))
+        acc = -ARF_PREC_EXACT;
+    else
+        acc = (slong) (mag_get_d_log2_approx(mx) - mag_get_d_log2_approx(mr));
+
+    mag_clear(mx);
+    mag_clear(mr);
+    mag_clear(t);
+
+    return acc;
+}
+
+/* Given enclosures real[0], ..., real[nreal - 1] of the real roots of poly
+   (to be refined in place as needed), set Q to an enclosure of the
+   exact quotient poly / prod (x - real[i]), whose roots are the nonreal
+   roots of poly, with a normwise accuracy of about prec bits.
+   The precision needed to compensate for cancellation is tracked in *loss.
+   Returns 0 if this appears to be hopeless. */
+static int
+_arb_fmpz_poly_deflate_real_roots(arb_poly_t Q, const fmpz_poly_t poly,
+    arb_ptr real, slong nreal, slong prec, slong * loss, slong max_loss)
+{
+    arb_poly_t F, D, R;
+    slong i, dprec, acc;
+    int success = 0;
+
+    arb_poly_init(F);
+    arb_poly_init(D);
+    arb_poly_init(R);
+
+    for (;;)
+    {
+        dprec = prec + *loss + 10;
+
+        for (i = 0; i < nreal; i++)
+            if (arb_rel_accuracy_bits(real + i) < dprec + 10)
+                arb_fmpz_poly_refine_root_arb(real + i, poly, real + i, dprec + 10);
+
+        arb_poly_set_fmpz_poly(F, poly, dprec);
+        arb_poly_product_roots(D, real, nreal, dprec);
+        arb_poly_divrem(Q, R, F, D, dprec);
+
+        acc = _arb_poly_normwise_accuracy(Q);
+
+        if (acc >= prec)
+        {
+            success = 1;
+            break;
+        }
+
+        *loss = FLINT_MAX(*loss + 10, dprec - acc);
+
+        if (*loss > max_loss)
+            break;
+    }
+
+    arb_poly_clear(F);
+    arb_poly_clear(D);
+    arb_poly_clear(R);
+
+    return success;
+}
+
 void
 arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec)
 {
     slong i, j, prec, deg, deg_deflated, isolated, maxiter, deflation;
-    slong initial_prec, num_real;
+    slong initial_prec, num_real, nreal_deflated, loss, max_prec;
     acb_poly_t cpoly, cpoly_deflated;
+    arb_poly_t Q;
+    arb_ptr real_deflated;
+    timeit_t timer;
     fmpz_poly_t poly_deflated;
     acb_ptr roots_deflated;
     int removed_zero;
@@ -90,11 +210,50 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
        as scratch space */
     roots_deflated = _acb_vec_init(deg);
 
+    arb_poly_init(Q);
+    real_deflated = _arb_vec_init(deg_deflated);
+
+    /* Isolate the real roots first. Real root isolation is usually much
+       cheaper than complex root isolation. If all roots are real, we are
+       done. Otherwise, we divide out the real roots and only need to
+       compute the nonreal roots numerically. This also removes
+       any clusters of real roots which would slow down the Durand-Kerner
+       iteration. */
+    nreal_deflated = 0;
+    if (deg_deflated >= 2)
+    {
+        nreal_deflated = arb_fmpz_poly_real_roots(real_deflated,
+            poly_deflated, 0, FLINT_MAX(target_prec, initial_prec));
+
+        /* Dividing out a few real roots does not reduce the work much,
+           and makes the polynomial dense and inexact; it is only
+           worthwhile if the real roots are clustered. */
+        if (nreal_deflated != deg_deflated && 4 * nreal_deflated < deg_deflated &&
+            !_arb_vec_has_close_pair(real_deflated, nreal_deflated, deg_deflated))
+        {
+            nreal_deflated = 0;
+        }
+    }
+
+    loss = 0;
+    max_prec = 16 * FLINT_MAX(target_prec, 64) + 4 * deg_deflated;
+
     for (prec = initial_prec; ; prec *= 2)
     {
         if (prec == 106)
             prec = 128;
-        acb_poly_set_fmpz_poly(cpoly_deflated, poly_deflated, prec);
+
+        if (nreal_deflated != 0 && nreal_deflated != deg_deflated &&
+                prec > max_prec)
+        {
+            /* Give up using the real roots and start over (should
+               not happen). */
+            if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
+                flint_printf("giving up on real roots\n");
+            nreal_deflated = 0;
+            prec = initial_prec;
+        }
+
         maxiter = FLINT_MIN(4 * deg_deflated + 64, prec);
 
         /* don't reuse the roots computed with double in case of failure */
@@ -102,17 +261,63 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
 
         if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
         {
-            TIMEIT_ONCE_START;
             flint_printf("prec=%wd: ", prec);
-            isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
-                new_initial ? NULL : roots_deflated, maxiter, prec);
-            flint_printf("%wd isolated roots | ", isolated);
-            TIMEIT_ONCE_STOP;
+            timeit_start(timer);
+        }
+
+        if (nreal_deflated == deg_deflated)
+        {
+            for (i = 0; i < deg_deflated; i++)
+                acb_set_arb(roots_deflated + i, real_deflated + i);
+            isolated = deg_deflated;
+        }
+        else if (nreal_deflated != 0)
+        {
+            slong m = deg_deflated - nreal_deflated;
+
+            isolated = 0;
+
+            if (_arb_fmpz_poly_deflate_real_roots(Q, poly_deflated,
+                real_deflated, nreal_deflated, prec, &loss, max_prec))
+            {
+                acb_poly_set_arb_poly(cpoly_deflated, Q);
+                maxiter = FLINT_MIN(4 * m + 64, prec);
+
+                isolated = acb_poly_find_roots(roots_deflated + nreal_deflated,
+                    cpoly_deflated, new_initial ? NULL : roots_deflated + nreal_deflated,
+                    maxiter, prec);
+
+                /* the roots of Q are known to be nonreal */
+                for (i = 0; i < isolated; i++)
+                    if (arb_contains_zero(acb_imagref(roots_deflated + nreal_deflated + i)))
+                        isolated = 0;
+
+                if (isolated == m)
+                {
+                    for (i = 0; i < nreal_deflated; i++)
+                        acb_set_arb(roots_deflated + i, real_deflated + i);
+                    isolated = deg_deflated;
+                }
+                else
+                    isolated = 0;
+            }
         }
         else
         {
+            acb_poly_set_fmpz_poly(cpoly_deflated, poly_deflated, prec);
             isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
                 new_initial ? NULL : roots_deflated, maxiter, prec);
+        }
+
+        if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
+        {
+            timeit_stop(timer);
+            /* (the format of this line is checked by dev/check_examples.sh) */
+            if (nreal_deflated != 0)
+                flint_printf("%wd isolated roots (%wd real) | ", isolated, nreal_deflated);
+            else
+                flint_printf("%wd isolated roots | ", isolated);
+            timeit_print(timer, 1);
         }
 
         if (isolated == deg_deflated)
@@ -168,10 +373,15 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
             if (!check_accuracy(roots, deg, target_prec))
                 continue;
 
-            acb_poly_set_fmpz_poly(cpoly, poly, prec);
+            /* The real roots are already known if we did real root
+               isolation (and did not deflate). */
+            if (nreal_deflated == 0 || deflation != 1)
+            {
+                acb_poly_set_fmpz_poly(cpoly, poly, prec);
 
-            if (!acb_poly_validate_real_roots(roots, cpoly, prec))
-                continue;
+                if (!acb_poly_validate_real_roots(roots, cpoly, prec))
+                    continue;
+            }
 
             for (i = 0; i < deg; i++)
             {
@@ -221,6 +431,8 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
         }
     }
 
+    arb_poly_clear(Q);
+    _arb_vec_clear(real_deflated, deg_deflated);
     fmpz_poly_clear(poly_deflated);
     acb_poly_clear(cpoly);
     acb_poly_clear(cpoly_deflated);

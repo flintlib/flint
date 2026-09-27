@@ -1001,44 +1001,23 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly,
             gr_vec_set_length(roots, 0, ctx);
             fmpz_vec_set_length(mult, 0);
         }
-        else /* todo: special cases */
+        else
         {
-            /* todo: better algorithm */
-            fmpz_poly_factor_t fac;
-            slong i, j, num;
-            fmpq * res_entries;
-            fmpz * mult_entries;
+            slong i, num;
+            slong * exp;
 
-            fmpz_poly_factor_init(fac);
-            fmpz_poly_factor(fac, (const fmpz_poly_struct *) poly);
+            gr_vec_set_length(roots, deg, ctx);
+            exp = flint_malloc(sizeof(slong) * deg);
 
-            num = 0;
-            for (i = 0; i < fac->num; i++)
-                if (fac->p[i].length == 2)
-                    num++;
+            num = fmpz_poly_roots_fmpq(roots->entries, exp,
+                (const fmpz_poly_struct *) poly);
 
             gr_vec_set_length(roots, num, ctx);
             fmpz_vec_set_length(mult, num);
+            for (i = 0; i < num; i++)
+                fmpz_set_si(mult->entries + i, exp[i]);
 
-            res_entries = roots->entries;
-            mult_entries = mult->entries;
-
-            for (i = j = 0; i < fac->num; i++)
-            {
-                if (fac->p[i].length == 2)
-                {
-                    fmpz_neg(fmpq_numref(res_entries + j), fac->p[i].coeffs);
-                    fmpz_swap(fmpq_denref(res_entries + j), fac->p[i].coeffs + 1);
-
-                    if (fmpz_sgn(fmpq_denref(res_entries + j)) <= 0)
-                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-                    fmpz_set_ui(mult_entries + j, fac->exp[i]);
-                    j++;
-                }
-            }
-
-            fmpz_poly_factor_clear(fac);
+            flint_free(exp);
         }
 
         return status;
