@@ -19,12 +19,12 @@
     multiply-adds: 32 terms per loop iteration, two IFMA per 8 terms, and
     the loop is bound by the two loads per 8 terms. Every U52_DOT_CHUNK
     iterations the four pairs are added (each lane then holds at most
-    4 * U52_DOT_CHUNK + 4 halves, below 2^61) and summed across the lanes
-    into a two-limb total, reduced at the very end: the total is at most
-    len * 2^104, which fits two limbs for any practical length (len below
-    2^24), and _nmod_vec_dot_params selects this method only when the
-    unreduced dot product fits two limbs. The tail of fewer than 8 terms
-    goes through masked loads.
+    4 * U52_DOT_CHUNK + 4 = 508 halves, and the eight lanes together
+    8 * 508 * (2^52 - 1) < 2^64) and summed across the lanes into a
+    two-limb total, reduced at the very end. That total is the unreduced
+    dot product, which _nmod_vec_dot_params only sends here when it fits
+    two limbs (a direct caller must ensure the same). The tail of fewer than 8
+    terms goes through masked loads.
 
     The three variants (vec1[i] * vec2[i], vec1[i] * vec2[len-1-i] and
     vec1[i] * vec2[i][offset]) differ only in how the 8 entries of vec2

@@ -66,7 +66,7 @@ random_modulus(flint_rand_t state)
         case 1:
             /* just below a power of two: small 2^32 mod n, single fold
                round */
-            bits = 2 + n_randint(state, 31);
+            bits = 2 + n_randint(state, FLINT_BITS == 64 ? 31 : 30);
             n = (UWORD(1) << bits) - 1 - n_randint(state, 16);
             break;
         case 2:
@@ -321,8 +321,8 @@ TEST_FUNCTION_START(nmod_mat_mul_u32, state)
             if (c[m * ldc] != c0[m * ldc])
                 ok = 0;
 
-            /* aliasing, square only */
-            if (ok && m == k && k == n && m > 0 && lda == ldb)
+            /* aliasing, square only (c must hold m rows of stride lda) */
+            if (ok && m == k && k == n && m > 0 && lda == ldb && lda <= ldc)
             {
                 for (i = 0; i < m * lda; i++)
                     c[i] = a[i];

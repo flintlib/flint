@@ -359,8 +359,8 @@ Matrix multiplication
     profile program ``nmod_mat/profile/p-mul_tune.c``. Single-threaded,
     Strassen is put on top of the SIMD kernels for large dimensions. The
     SIMD kernels are also used for thin shapes with any inner dimension.
-    Single-threaded, a product by a single column is done with
-    :func:`nmod_mat_mul_nmod_vec`.
+    Single-threaded (and when `C` is not aliased with `A` or `B`), shapes
+    with few rows or few columns go to dedicated routines.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 

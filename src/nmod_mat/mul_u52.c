@@ -44,8 +44,8 @@
       C  = (r + lo) mod n               (Barrett again).
 
     The Barrett quotients are off by less than one: the argument t is
-    either exact in double precision (t <= 3n + 256 n^2 is below 2^53 when
-    n < 2^9) or below 2^61 with n >= 2^9, where the absolute error of its
+    either exact in double precision (t <= 3n + KC n^2, KC = 256, is below
+    2^53 when n < 2^9) or below 2^61 with n >= 2^9, where the absolute error of its
     double approximation, at most 2^8, is below n/2; with the rounding to
     the nearest quotient the remainder lies in [-n, n] and one correction on
     each side suffices. This runs once per output entry per k-block.
@@ -97,9 +97,11 @@
 # define U52_MT_MIN_WORK 500000.0
 #endif
 
-/* KC + 1 products of 52 bits (the +1 for the entry of C) must fit 64 bits */
-#if U52_KC > 2048
-# error "U52_KC too large for the 64-bit accumulators"
+/* the end-of-block reduction (mul_u52_vec.h) is analysed for accumulators
+   below 2^61, i.e. KC + 1 halves (the +1 for the entry of C) with
+   KC <= 511 */
+#if U52_KC > 511
+# error "U52_KC too large for the end-of-block reduction"
 #endif
 
 /* primitives: mul_u52_vec.h (shared with nmod_vec_mul.c) */

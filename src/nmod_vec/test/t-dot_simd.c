@@ -14,6 +14,9 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
+/* the moduli of these tests (above 2^32) need 64-bit limbs */
+#if FLINT_BITS == 64
+
 /*
     The SIMD dot products for moduli above 2^32 (_nmod_vec_dot_u52,
     _nmod_vec_dot_split_limbs and _nmod_vec_dot_u64, forward / reversed / through
@@ -81,9 +84,9 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
                 m = (UWORD(1) << 52) + 1 + n_randint(state, 4);
                 break;
             case 6:
-                /* around the limits of _DOT_SPLIT_LIMBS with IFMA (58 bits)
-                   and of its two variants (62 bits) */
-                m = (UWORD(1) << (58 + 4 * n_randint(state, 2)))
+                /* around the limits of _DOT_SPLIT_LIMBS with IFMA
+                   (n = 2^58) and of its two variants (n = 2^61) */
+                m = (UWORD(1) << (58 + 3 * n_randint(state, 2)))
                         + n_randint(state, 5) - 2;
                 break;
             case 7:
@@ -174,6 +177,24 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
             TEST_FUNCTION_FAIL("dispatch (method %d): m = %wu, len = %wd\n",
                                params.method, m, len);
 
+        /* parameters computed for a longer length, as callers do (e.g.
+           the classical polynomial product), and the macro NMOD_VEC_DOT */
+        {
+            dot_params_t lparams = _nmod_vec_dot_params(
+                    len + (n_randint(state, 2) ? n_randint(state, 200)
+                                               : n_randint(state, 100000)), mod);
+            ulong d;
+
+            a = _nmod_vec_dot(x, y, len, mod, lparams);
+            b = _nmod_vec_dot_rev(x, y, len, mod, lparams);
+            c = _nmod_vec_dot_ptr(x, rows, offset, len, mod, lparams);
+            NMOD_VEC_DOT(d, j, len, x[j], y[j], mod, lparams);
+            if (a != r0 || b != r1 || c != r0 || d != r0)
+                TEST_FUNCTION_FAIL("dispatch, longer parameters (method %d): "
+                                   "m = %wu, len = %wd\n",
+                                   lparams.method, m, len);
+        }
+
         if ((m & (m - 1)) != 0 && _nmod_vec_dot_bound_limbs(len, mod) <= 2)
         {
             dot_method_t exp = _DOT2;
@@ -207,3 +228,12 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#else
+
+TEST_FUNCTION_START(nmod_vec_dot_simd, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+
+#endif

@@ -63,9 +63,11 @@
                                     for n < 2^50 and |a*b| < 2 n^2 the result
                                     lies in (-9/8 n, 9/8 n) (fft_small); for
                                     any n <= 2^52, |a*b| <= 2^31 n gives
-                                    (-0.51 n, 0.51 n) and |a*b| <= 0.51 n^2
-                                    gives (-1.26 n, 1.26 n). (The quotient is
-                                    off by at most |a*b| 2^-53 / n from the
+                                    (-0.51 n, 0.51 n) and |a*b| <= n^2 / 2
+                                    (quotient at most 2^51, as the rounding
+                                    requires) gives (-1.26 n, 1.26 n). (The
+                                    quotient is off by at most
+                                    |a*b| 2^-53 / n from the
                                     error of ninv, 2^(e-54) / n from the low
                                     part when |a*b| < 2^e, and 1/2 + 2^-(B+1)
                                     from the rounding when |h*ninv| < 2^(52-B).)
@@ -176,7 +178,8 @@ fpv_pm1n_to_pmhn(fpv x, fpv n)
     return x;
 }
 
-/* unsigned 64-bit lanes below 2^53 <-> doubles */
+/* unsigned 64-bit lanes <-> doubles; the contract of all backends is
+   values in [0, 2^52) (the AVX2 conversions rely on it) */
 FLINT_FORCE_INLINE fpv
 fpv_load_u64(const ulong * p)
 {

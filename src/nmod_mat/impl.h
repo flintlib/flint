@@ -74,9 +74,8 @@
     Whether the few-columns products of mul_cols.c have a vectorized path
     for this modulus, and the most columns of B for which nmod_mat_mul
     uses them: all moduli on AVX512-IFMA (u52 up to 2^52, u64 above),
-    33-49 bits with a vector backend of mul_fp_vec.h otherwise (below
-    2^32 the split dot products of nmod_vec/dot.c serve the classical
-    code well already).
+    2^32 < n < 2^50 with a vector backend of mul_fp_vec.h otherwise
+    (other moduli go to mul_classical: transposed columns + nmod_vec_dot).
 */
 #if NMOD_MAT_HAVE_MUL_U52
 # define NMOD_MAT_MUL_COLS_IS_SIMD(n) 1

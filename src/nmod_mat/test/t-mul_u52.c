@@ -13,15 +13,14 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
+/* the moduli of these tests (above 2^32) need 64-bit limbs */
 #if FLINT_BITS == 64
-# define TWO52 (UWORD(1) << 52)
-#else
-# define TWO52 UWORD(0)
-#endif
+
+#define TWO52 (UWORD(1) << 52)
 
 /* all entries n - 1: every product is the largest possible one */
 static void
-nmod_mat_randfull_max(nmod_mat_t mat, flint_rand_t state, int mixed)
+randfull_max_u52(nmod_mat_t mat, flint_rand_t state, int mixed)
 {
     slong i, j;
     ulong n = mat->mod.n;
@@ -197,12 +196,12 @@ TEST_FUNCTION_START(nmod_mat_mul_u52, state)
                 nmod_mat_randfull(B, state);
                 break;
             case 1:
-                nmod_mat_randfull_max(A, state, 0);
-                nmod_mat_randfull_max(B, state, 0);
+                randfull_max_u52(A, state, 0);
+                randfull_max_u52(B, state, 0);
                 break;
             case 2:
-                nmod_mat_randfull_max(A, state, 1);
-                nmod_mat_randfull_max(B, state, 1);
+                randfull_max_u52(A, state, 1);
+                randfull_max_u52(B, state, 1);
                 break;
             default:
                 nmod_mat_randtest(A, state);
@@ -284,3 +283,12 @@ TEST_FUNCTION_START(nmod_mat_mul_u52, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#else
+
+TEST_FUNCTION_START(nmod_mat_mul_u52, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+
+#endif

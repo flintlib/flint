@@ -237,6 +237,8 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_clear(PC0);
     }
 
+    flint_set_num_threads(1);
+
     /* Test aliasing with windows */
     {
         nmod_mat_t A, B, A_window;

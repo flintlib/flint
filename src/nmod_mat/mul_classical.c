@@ -173,6 +173,9 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
+    if (m == 0 || n == 0)
+        return;
+
     if (k == 0 || mod.n == 1)  // covers params.method == _DOT0
     {
         if (op == 0)
@@ -192,8 +195,8 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
             (op == 0) ? 0 : C->stride,
             A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod);
     }
+    /* few columns (small n) use transpose + nmod_vec_dot */
     else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
-        /* || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF */  /* small n should go to several vectorized nmod_vec_dot */
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
         _nmod_mat_addmul_basic_op(D->entries, D->stride,

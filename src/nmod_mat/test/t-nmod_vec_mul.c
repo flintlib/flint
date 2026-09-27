@@ -102,10 +102,12 @@ TEST_FUNCTION_START(nmod_mat_nmod_vec_mul, state)
         {
             case 0: n = UWORD(1) << 26; break;
             case 1: n = (UWORD(1) << 26) + 1; break;
+#if FLINT_BITS == 64
             case 2: n = UWORD(1) << 32; break;
             case 3: n = (UWORD(1) << 50) - 1; break;
             case 4: n = UWORD(1) << 52; break;
             case 5: n = (UWORD(1) << 52) + 1; break;
+#endif
             default: n = n_randbits(state, 2 + n_randint(state, FLINT_BITS - 1)); break;
         }
         n = FLINT_MAX(n, UWORD(2));

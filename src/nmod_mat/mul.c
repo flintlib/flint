@@ -126,7 +126,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     /*
-        B has a few columns (up to NMOD_MAT_MUL_ROWS_MAX):
+        B has a few columns (up to NMOD_MAT_MUL_COLS_MAX):
         _nmod_mat_mul_cols_simd multiplies each row of A with all of them at
         once, as dot products sharing the loads of the row, on the transposed
         columns. This avoids calling the kernels which would pad them to
@@ -234,7 +234,9 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             ulong half = C->mod.n / 2;
             slong cut = _blas_1pass_cutoff(flint_num_threads);
 
-            blas_1pass = cut > 0 && min_dim >= cut
+            /* min_dim > 100: the BLAS branch below requires it,
+               and u32 must not be skipped without BLAS taking over */
+            blas_1pass = cut > 0 && min_dim >= cut && min_dim > 100
                 && (half == 0
                     || (ulong) k <= ((UWORD(1) << 53) - 1) / (half * half));
         }
@@ -263,7 +265,8 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             /* small inner dimension on an IFMA machine, 33-50 bits */
             simd_mul = nmod_mat_mul_fp50;
         }
-        else if (FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
+        else if (NMOD_MAT_HAVE_FPV
+                 && FLINT_NMOD_MAT_MUL_K52_MIN_BITS > 0
                  && bits >= FLINT_NMOD_MAT_MUL_K52_MIN_BITS
 #if FLINT_USES_BLAS
                  /* FLINT's own gemm never beats k52 / fp50 with its CRT
@@ -289,7 +292,10 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
         if (simd_mul != NULL)
         {
+            /* the cutoff must exceed 4: _nmod_mat_mul_strassen_rec sends
+               dimensions <= 4 back to nmod_mat_mul (0: never) */
             if (flint_num_threads == 1
+                    && FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF > 4
                     && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
             {
                 if (C == A || C == B)

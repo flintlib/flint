@@ -70,10 +70,11 @@
 #else
 # define _NMOD_VEC_DOT3_ACC_BOUND UWORD(1518500250)
 #endif
-#define _NMOD_VEC_DOT_SCALAR(two, SUF, ...)                              \
+#define _NMOD_VEC_DOT_SCALAR(two, mod, SUF, ...)                         \
     ((two) ? _nmod_vec_dot2 ## SUF(__VA_ARGS__)                           \
-     : (mod.n <= _NMOD_VEC_DOT3_ACC_BOUND) ? _nmod_vec_dot3_acc ## SUF(__VA_ARGS__) \
-     : _nmod_vec_dot3 ## SUF(__VA_ARGS__))
+     : ((mod).n <= _NMOD_VEC_DOT3_ACC_BOUND)                              \
+       ? _nmod_vec_dot3_acc ## SUF(__VA_ARGS__)                           \
+       : _nmod_vec_dot3 ## SUF(__VA_ARGS__))
 
 #ifdef __cplusplus
 extern "C" {
@@ -565,12 +566,12 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
     if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
         return (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
             ? _nmod_vec_dot_split_limbs(vec1, vec2, len, mod)
-            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, , vec1, vec2, len, mod);
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, mod, , vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
         return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
             ? _nmod_vec_dot_u64(vec1, vec2, len, mod)
-            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, , vec1, vec2, len, mod);
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, mod, , vec1, vec2, len, mod);
 
     if (params.method == _DOT3_ACC)
         return _nmod_vec_dot3_acc(vec1, vec2, len, mod);
@@ -621,12 +622,12 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
     if (params.method == _DOT_SPLIT_LIMBS || params.method == _DOT3_SPLIT_LIMBS)
         return (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
             ? _nmod_vec_dot_split_limbs_rev(vec1, vec2, len, mod)
-            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, _rev, vec1, vec2, len, mod);
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, mod, _rev, vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
         return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
             ? _nmod_vec_dot_u64_rev(vec1, vec2, len, mod)
-            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, _rev, vec1, vec2, len, mod);
+            : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, mod, _rev, vec1, vec2, len, mod);
 
     if (params.method == _DOT3_ACC)
         return _nmod_vec_dot3_acc_rev(vec1, vec2, len, mod);
@@ -681,11 +682,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, 
     if (params.method == _DOT3 || params.method == _DOT3_U64
             || params.method == _DOT3_SPLIT_LIMBS)
     {
-#if (FLINT_BITS == 64)
-        if (mod.n <= UWORD(6521908912666391107))  /* as in _nmod_vec_dot_params */
-#else
-        if (mod.n <= UWORD(1518500250))
-#endif
+        if (mod.n <= _NMOD_VEC_DOT3_ACC_BOUND)  /* as in _nmod_vec_dot_params */
             return _nmod_vec_dot3_acc_ptr(vec1, vec2, offset, len, mod);
         return _nmod_vec_dot3_ptr(vec1, vec2, offset, len, mod);
     }
@@ -920,7 +917,10 @@ do                                                                    \
              || params.method == _DOT_SPLIT_LIMBS                     \
              || params.method == _DOT_U64)                            \
         _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT3_ACC)                              \
+    else if (params.method == _DOT3_ACC                               \
+             || ((params.method == _DOT3_U64                          \
+                  || params.method == _DOT3_SPLIT_LIMBS)              \
+                 && (mod).n <= _NMOD_VEC_DOT3_ACC_BOUND))             \
         _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
     else if (params.method == _DOT3 || params.method == _DOT3_U64     \
              || params.method == _DOT3_SPLIT_LIMBS)                   \

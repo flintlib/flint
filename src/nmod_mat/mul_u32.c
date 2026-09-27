@@ -30,7 +30,7 @@
     Delayed reduction. With P = floor(n/2)^2 the accumulator can absorb about
     2^63/P products before a reduction is needed, from 2 at 32-bit moduli
     through 8 at 31 bits, 32 at 30 bits, 128 at 29 bits, to more than a block's
-    worth of k below 27 bits (where the microkernel then runs with no reduction
+    worth of k below 28 bits (where the microkernel then runs with no reduction
     at all). The in-kernel reduction is not towards the canonical remainder:
     writing acc = hi*2^32 + lo with hi the signed high word, acc is congruent
     to hi*c + lo where c = 2^32 mod n, and this replacement costs a shift, a
@@ -46,7 +46,7 @@
     temporary for C. That reduction is a Barrett step through double precision
     (measured at 1-5% of the total, since it runs once per output element per
     k-block rather than once per product).
-    TODO : alternatives with an integer Barrett could be considered, see the
+    TODO alternatives with an integer Barrett could be considered, see the
     discussion in
     https://github.com/flintlib/flint/issues/2597
     The straightforward version with a precomputed floor(2^64/n) is not much
@@ -58,7 +58,7 @@
     of int32, a register tile microkernel of MR rows by NACC accumulator
     vectors, and for multithreading a plain split of C into independent row or
     column blocks over FLINT's thread pool. All of this is the template
-    mul_blocked_templ.h (shared with the AVX512-IFMA kernel of mul_u52.c),
+    mul_blocked_templ.h (shared with mul_u52.c, mul_k52.c and mul_fp50.c),
     instantiated here twice: for ulong entries, behind nmod_mat_mul_u32, and
     for uint32 entries, behind _nmod_mat_mul_u32 (used by the nmod32 ring of
     gr, and the natural input for multimodular algorithms that hold residues
@@ -69,7 +69,8 @@
     primitives (load, splat, widening multiply-accumulate, fold, canonical
     reduce) that each backend defines: AVX-512 (F+DQ), AVX2, AArch64 NEON,
     and a plain C fallback whose "vector" is a small struct the compiler is
-    free to vectorize. All four are covered by the same test.
+    free to vectorize. The same test covers each of them (the one compiled
+    for the target, or the one chosen by NMOD_MAT_U32_FORCE_*).
 
     TODO investigations for crafting these BLAS-like functions suggest possible
     changes to machine_vectors.h. In detail, the primitives are local to this
@@ -192,7 +193,7 @@
 /* modulus-derived parameters ************************************************/
 
 /*
-    c32      2^32 mod n, which is <= most 2^31 - 1, so it is
+    c32      2^32 mod n, which is at most 2^31 - 1, so it is
              nonnegative as a signed 32-bit multiplier.
     rounds   number of fold rounds (1 or 2) applied at each in-kernel
              reduction and at the end of a block.
@@ -513,10 +514,13 @@ u32_fold1(u32_acc acc, const u32_consts * C)
     AVX2 has no int64 <-> double conversion, so v = hi*2^32 + lo is
     converted in halves with the 2^52 exponent trick (hi is signed and
     is offset by 2^31 first). The quotient q = round(v/n) satisfies
-    |q| < 2^31 (fold_bound/n is below 2^30 + 2^32/n), so it is exact in
-    32 bits and q*n is computed by vpmuldq; that reads n as a signed
-    32-bit value, which for n >= 2^31 is n - 2^32, corrected by adding
-    q*2^32. The error in d is at most 2^9 absolute and the double bound
+    |q| < 2^31: for most n this follows from fold_bound/n < 2^30 + 2^32/n,
+    and for the three n where that inequality fails (2, 3 and 6) the
+    cadence is capped at KC, so the actual accumulator stays below
+    n + KC*P and v below about 2^32 after the fold. So q is exact in 32
+    bits and q*n is computed by vpmuldq; that reads n as a signed 32-bit
+    value, which for n >= 2^31 is n - 2^32, corrected by adding q*2^32. The
+    error in d is at most 2^9 absolute and the double bound
     is exact below 2^53, so |q - v/n| < 1/2 + 2^9/n, which keeps
     r = v - q*n in (-n, n); a second correction is included anyway, it
     is cheap here.

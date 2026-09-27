@@ -138,7 +138,8 @@ split_limbs_add_shifted(ulong * t2, ulong * t1, ulong * t0, ulong x, int sh)
     {                                                                       \
         const int s = (b + 1) / 2;                                          \
         const ulong l0 = (UWORD(1) << s) - 1, l1 = (UWORD(1) << (b - s)) - 1; \
-        const ulong pmax = FLINT_MAX(l0 * l0, 2 * l0 * l1);                 \
+        /* (at least 1: n = 1 gives b = 0 when called directly) */         \
+        const ulong pmax = FLINT_MAX(FLINT_MAX(l0 * l0, 2 * l0 * l1), 1);   \
         const slong F = (slong) FLINT_MIN((UWORD_MAX - UWORD(0xFFFFFFFF)) / pmax, \
                                           UWORD(1) << 40);                  \
         const VT mk = V_SET1(l0), sv = V_SET1(s);                           \

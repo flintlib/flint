@@ -13,15 +13,36 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
+/* the moduli of these tests (above 2^32) need 64-bit limbs */
 #if FLINT_BITS == 64
-# define TWO52 (UWORD(1) << 52)
-# define TWO50 (UWORD(1) << 50)
-#else
-# define TWO52 UWORD(0)
-# define TWO50 UWORD(0)
-#endif
 
-/* all entries n - 1: every product is the largest possible one */
+#define TWO52 (UWORD(1) << 52)
+#define TWO50 (UWORD(1) << 50)
+
+/*
+    Extreme entries: the kernel lifts them to (-n/2, n/2], where n - 1
+    becomes -1 (small products, but the most reductions of negative
+    values) and entries near n/2 give the largest products; for k52 also
+    the largest limbs, with offsets up to 2^27 from n/2.
+*/
+static ulong
+extreme_entry_k52(flint_rand_t state, ulong n)
+{
+    ulong t;
+
+    if (n < 4)
+        return n - 1;
+
+    t = n_randint(state, 2) ? 0 : n_randint(state, FLINT_MIN(n / 2, UWORD(1) << 27));
+
+    switch (n_randint(state, 3))
+    {
+        case 0: return n - 1;
+        case 1: return n / 2 - t;
+        default: return (n + 1) / 2 + t;
+    }
+}
+
 static void
 randfull_max_k52(nmod_mat_t mat, flint_rand_t state, int mixed)
 {
@@ -30,8 +51,8 @@ randfull_max_k52(nmod_mat_t mat, flint_rand_t state, int mixed)
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)
-            nmod_mat_entry(mat, i, j) =
-                (mixed && n_randint(state, 2)) ? n_randint(state, n) : n - 1;
+            nmod_mat_entry(mat, i, j) = (mixed && n_randint(state, 2))
+                ? n_randint(state, n) : extreme_entry_k52(state, n);
 }
 
 static ulong
@@ -286,3 +307,12 @@ TEST_FUNCTION_START(nmod_mat_mul_k52, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#else
+
+TEST_FUNCTION_START(nmod_mat_mul_k52, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+
+#endif

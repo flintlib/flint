@@ -22,11 +22,12 @@
     sums of the halves of up to KC products of residues, plus a residue).
 */
 
-#include <immintrin.h>
 #include "longlong.h"
 #include "nmod_mat/impl.h"
 
 #if NMOD_MAT_HAVE_MUL_U52
+
+#include <immintrin.h>
 
 typedef struct
 {

@@ -19,7 +19,7 @@
     nmod_mat, over a range of modulus sizes, dimensions and thread counts,
     and report where a SIMD kernel is the fastest. The purpose is to tune
     the dispatch in nmod_mat_mul, whose parameters live in flint-mparam.h
-    (FLINT_NMOD_MAT_MUL_U32_*, _U52_*, _K52_* and _FP50_*).
+    (the FLINT_NMOD_MAT_MUL_* macros).
 
         p-mul_tune [options]
 
