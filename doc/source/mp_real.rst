@@ -558,7 +558,7 @@ leaves accumulate iteratively over exact mpn integers with a backward
 recurrence; the tree keeps exact integers until they outgrow the target
 precision, and truncated balls afterwards.
 
-**π and log 2** are hypergeometric series summed by
+**Pi and log 2** are hypergeometric series summed by
 :func:`mp_real_hypgeom_series`: `\pi` by the Chudnovsky series (see the
 example under :func:`mp_real_hypgeom_series_int64`), and `\log 2` by the
 series of [Zun2025]_ with 11.9 bits per term,
