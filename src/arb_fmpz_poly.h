@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #define ARB_FMPZ_POLY_ROOTS_VERBOSE 1
+#define ARB_FMPZ_POLY_ROOTS_RATIONAL 2
 
 void _arb_fmpz_poly_evaluate_acb_horner(acb_t res, const fmpz * f, slong len, const acb_t x, slong prec);
 void arb_fmpz_poly_evaluate_acb_horner(acb_t res, const fmpz_poly_t f, const acb_t a, slong prec);

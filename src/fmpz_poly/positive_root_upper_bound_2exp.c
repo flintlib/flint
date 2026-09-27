@@ -15,7 +15,9 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slong len)
 {
@@ -80,6 +82,36 @@ slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slon
 slong _fmpz_poly_positive_root_upper_bound_2exp(const fmpz * pol, slong len)
 {
     return _fmpz_poly_positive_root_upper_bound_2exp_local_max(pol, len);
+}
+
+/* Replaces (pol, len) by pol(2^k x) (divided by its 2-content) where k is
+   chosen so that all positive roots of the result lie in the open interval
+   (0, 1), and returns k. Returns WORD_MIN (leaving pol unchanged) if pol
+   has no positive roots. */
+slong _fmpz_poly_scale_positive_roots_0_1(fmpz * pol, slong len)
+{
+    slong k;
+    fmpz_t s;
+
+    k = _fmpz_poly_positive_root_upper_bound_2exp(pol, len);
+
+    if (k != WORD_MIN)
+    {
+        _fmpz_poly_scale_2exp(pol, len, k);
+
+        /* 2^k is a (not necessarily strict) upper bound; if it happens to
+           be a root, scale once more so that it is not an endpoint. */
+        fmpz_init(s);
+        _fmpz_vec_sum(s, pol, len);
+        if (fmpz_is_zero(s))
+        {
+            _fmpz_poly_scale_2exp(pol, len, 1);
+            k++;
+        }
+        fmpz_clear(s);
+    }
+
+    return k;
 }
 
 slong fmpz_poly_positive_root_upper_bound_2exp(const fmpz_poly_t pol)

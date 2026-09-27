@@ -152,6 +152,7 @@
 #include "t-print_read.c"
 #include "t-print_read_pretty.c"
 #include "t-product_roots_fmpq_vec.c"
+#include "t-roots_fmpq.c"
 #include "t-product_roots_fmpz_vec.c"
 #include "t-pseudo_div.c"
 #include "t-pseudo_divrem_basecase.c"
@@ -344,6 +345,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_print_read),
     TEST_FUNCTION(fmpz_poly_print_read_pretty),
     TEST_FUNCTION(fmpz_poly_product_roots_fmpq_vec),
+    TEST_FUNCTION(fmpz_poly_roots_fmpq),
     TEST_FUNCTION(fmpz_poly_product_roots_fmpz_vec),
     TEST_FUNCTION(fmpz_poly_pseudo_div),
     TEST_FUNCTION(fmpz_poly_pseudo_divrem_basecase),

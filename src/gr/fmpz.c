@@ -1069,32 +1069,20 @@ _gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, in
     }
     else
     {
-        /* todo: better algorithm */
-        fmpz_poly_factor_t fac;
-        slong i, j, num;
+        slong i, num;
+        slong * exp;
 
-        fmpz_poly_factor_init(fac);
-        fmpz_poly_factor(fac, poly);
+        gr_vec_set_length(roots, poly->length - 1, ctx);
+        exp = flint_malloc(sizeof(slong) * (poly->length - 1));
 
-        num = 0;
-        for (i = 0; i < fac->num; i++)
-            if (fac->p[i].length == 2 && fmpz_is_one(fac->p[i].coeffs + 1))
-                num++;
+        num = fmpz_poly_roots_fmpz(roots->entries, exp, poly);
 
         gr_vec_set_length(roots, num, ctx);
         gr_vec_set_length(mult, num, ctx);
+        for (i = 0; i < num; i++)
+            fmpz_set_si(((fmpz *) mult->entries) + i, exp[i]);
 
-        for (i = j = 0; i < fac->num; i++)
-        {
-            if (fac->p[i].length == 2 && fmpz_is_one(fac->p[i].coeffs + 1))
-            {
-                fmpz_neg(((fmpz *) roots->entries) + j, fac->p[i].coeffs);
-                fmpz_set_ui(((fmpz *) mult->entries) + j, fac->exp[i]);
-                j++;
-            }
-        }
-
-        fmpz_poly_factor_clear(fac);
+        flint_free(exp);
     }
 
     return GR_SUCCESS;

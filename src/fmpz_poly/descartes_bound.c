@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 slong fmpz_poly_num_real_roots_upper_bound(const fmpz_poly_t pol)
 {
@@ -34,24 +35,18 @@ slong fmpz_poly_num_real_roots_upper_bound(const fmpz_poly_t pol)
     /* positive roots */
     _fmpz_vec_set(pol2, pol->coeffs + i0, len);
 
-    k = _fmpz_poly_positive_root_upper_bound_2exp(pol2, len);
+    k = _fmpz_poly_scale_positive_roots_0_1(pol2, len);
     if (k != WORD_MIN)
-    {
-        _fmpz_poly_scale_2exp(pol2, len, k);
         ret += _fmpz_poly_descartes_bound_0_1(pol2, len, len);
-    }
 
     /* negative roots */
     _fmpz_vec_set(pol2, pol->coeffs + i0, len);
     for (i = 1; i < len; i += 2)
         fmpz_neg(pol2 + i, pol2 + i);
 
-    k = _fmpz_poly_positive_root_upper_bound_2exp(pol2, len);
+    k = _fmpz_poly_scale_positive_roots_0_1(pol2, len);
     if (k != WORD_MIN)
-    {
-        _fmpz_poly_scale_2exp(pol2, len, k);
         ret += _fmpz_poly_descartes_bound_0_1(pol2, len, len);
-    }
 
     _fmpz_vec_clear(pol2, len);
     return ret;

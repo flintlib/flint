@@ -12,7 +12,30 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
+#include "fmpz.h"
 #include "fmpq_vec.h"
+#include "fmpz_poly/impl.h"
+
+/* check that (c 2^k, (c+1) 2^k) contains exactly one root of p */
+static int
+check_one_root(const fmpz_poly_t p, const fmpz_t c, slong k)
+{
+    fmpz_poly_t r;
+    fmpz_t one;
+    slong n;
+
+    fmpz_poly_init(r);
+    fmpz_init(one);
+    fmpz_one(one);
+    fmpz_poly_set(r, p);
+    /* r(x) = p(2^k x), then r(x + c) */
+    _fmpz_poly_scale_2exp(r->coeffs, r->length, k);
+    fmpz_poly_taylor_shift(r, r, c);
+    n = fmpz_poly_num_real_roots_0_1_vca(r);
+    fmpz_poly_clear(r);
+    fmpz_clear(one);
+    return n == 1;
+}
 
 /* check that a (= approximation of polynomial root) is in between */
 /* c 2^k and (c+1) 2^k (c and k are produced by root isolation).   */
@@ -380,6 +403,418 @@ TEST_FUNCTION_START(fmpz_poly_isolate_real_roots, state)
                 fmpz_clear(c_array + i);
                 fmpq_clear(exact_array + i);
             }
+        }
+    }
+
+    /* Sturm isolation with rational roots */
+    {
+        int iter;
+
+        for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+        {
+            fmpq vec[30];
+            fmpz c_array[30];
+            slong k_array[30];
+            fmpq exact_array[30];
+            fmpz_poly_t p, q;
+            /* small, since the Sturm sequence grows quickly for such input */
+            slong n = (slong) n_randint(state, 16);
+            slong nc = 1 + (slong) n_randint(state, 8);
+            slong i, n_exact, n_interval;
+
+            for (i = 0; i < 30; ++i)
+            {
+                fmpq_init(vec + i);
+                fmpz_init(c_array + i);
+                fmpq_init(exact_array + i);
+            }
+
+            _fmpq_vec_randtest_uniq_sorted(vec, state, n, 16);
+            fmpz_poly_init(p);
+            fmpz_poly_from_fmpq_roots(p, vec, n);
+            fmpz_poly_init(q);
+            fmpz_poly_randtest_no_real_root(q, state, nc, 20);
+            fmpz_poly_mul(p, p, q);
+
+            if (_fmpz_poly_isolate_real_roots_sturm(exact_array, &n_exact,
+                c_array, k_array, &n_interval, p->coeffs, p->length, 0, WORD_MAX))
+            {
+                check_intervals(vec, n, exact_array, n_exact, c_array, k_array, n_interval);
+            }
+
+            else if (fmpz_poly_is_squarefree(p))
+            {
+                flint_printf("FAIL: Sturm isolation failed without size bound\n");
+                flint_printf("p = %{fmpz_poly}\n", p);
+                flint_abort();
+            }
+
+            /* the sign change method must either fail or be correct
+               (a small budget suffices to exercise both outcomes) */
+            if (_fmpz_poly_isolate_real_roots_signs(exact_array, &n_exact,
+                c_array, k_array, &n_interval, p->coeffs, p->length, 0, 100))
+            {
+                check_intervals(vec, n, exact_array, n_exact, c_array, k_array, n_interval);
+            }
+
+            fmpz_poly_clear(p);
+            fmpz_poly_clear(q);
+            for (i = 0; i < 30; ++i)
+            {
+                fmpq_clear(vec + i);
+                fmpz_clear(c_array + i);
+                fmpq_clear(exact_array + i);
+            }
+        }
+    }
+
+    /* sign change method for real-rooted polynomials (products of linear
+       factors), which must succeed given a large enough budget; we use
+       well-separated roots (the number of evaluations grows like the
+       inverse of the root separation) */
+    {
+        int iter;
+
+        for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+        {
+            fmpq vec[30];
+            fmpz c_array[30];
+            slong k_array[30];
+            fmpq exact_array[30];
+            fmpz_poly_t p;
+            slong n = (slong) n_randint(state, 30);
+            slong i, n_exact, n_interval;
+
+            for (i = 0; i < 30; ++i)
+            {
+                fmpq_init(vec + i);
+                fmpz_init(c_array + i);
+                fmpq_init(exact_array + i);
+            }
+
+            /* roots +/- m 2^e with 1 <= m <= 20, -20 <= e <= 20 */
+            for (i = 0; i < n; i++)
+            {
+                fmpq_set_si(vec + i, 1 + n_randint(state, 20), 1);
+                if (n_randint(state, 2))
+                    fmpq_neg(vec + i, vec + i);
+                slong e = (slong) n_randint(state, 41) - 20;
+                if (e >= 0)
+                    fmpq_mul_2exp(vec + i, vec + i, e);
+                else
+                    fmpq_div_2exp(vec + i, vec + i, -e);
+            }
+            _fmpq_vec_sort(vec, n);
+            for (i = 0; i + 1 < n; i++)
+            {
+                if (fmpq_equal(vec + i, vec + i + 1))
+                {
+                    slong j;
+                    for (j = i + 1; j + 1 < n; j++)
+                        fmpq_swap(vec + j, vec + j + 1);
+                    n--;
+                    i--;
+                }
+            }
+            fmpz_poly_init(p);
+            fmpz_poly_from_fmpq_roots(p, vec, n);
+
+            if (!_fmpz_poly_isolate_real_roots_signs(exact_array, &n_exact,
+                c_array, k_array, &n_interval, p->coeffs, p->length, 0, 1000000))
+            {
+                flint_printf("FAIL: sign change method failed for a real-rooted polynomial\n");
+                flint_printf("p = %{fmpz_poly}\n", p);
+                flint_abort();
+            }
+
+            check_intervals(vec, n, exact_array, n_exact, c_array, k_array, n_interval);
+
+            fmpz_poly_clear(p);
+            for (i = 0; i < 30; ++i)
+            {
+                fmpq_clear(vec + i);
+                fmpz_clear(c_array + i);
+                fmpq_clear(exact_array + i);
+            }
+        }
+    }
+
+    /* the default budget for the sign change method must suffice for
+       Eulerian polynomials (which are real-rooted, with roots spread over
+       many orders of magnitude, and need about len^2 / 4 evaluations) */
+    {
+        int iter;
+
+        for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
+        {
+            fmpz_poly_t p;
+            fmpq * ex;
+            fmpz * c_array;
+            slong * k_array;
+            slong i, len, n_exact, n_interval;
+
+            fmpz_poly_init(p);
+            fmpz_poly_eulerian_polynomial(p, 2 + n_randint(state, 80));
+            len = p->length;
+
+            ex = _fmpq_vec_init(len);
+            c_array = _fmpz_vec_init(len);
+            k_array = flint_malloc(len * sizeof(slong));
+
+            if (!_fmpz_poly_isolate_real_roots_signs(ex, &n_exact, c_array,
+                    k_array, &n_interval, p->coeffs, len, 0,
+                    _fmpz_poly_isolate_real_roots_signs_budget(len)) ||
+                n_exact + n_interval != len - 1)
+            {
+                flint_printf("FAIL: sign change method with the default budget (Eulerian)\n");
+                flint_printf("p = %{fmpz_poly}\n", p);
+                flint_abort();
+            }
+
+            for (i = 0; i < n_interval; i++)
+            {
+                if (!check_one_root(p, c_array + i, k_array[i]))
+                {
+                    flint_printf("FAIL: interval (Eulerian)\n");
+                    flint_printf("p = %{fmpz_poly}\n", p);
+                    flint_abort();
+                }
+            }
+
+            _fmpq_vec_clear(ex, len);
+            _fmpz_vec_clear(c_array, len);
+            flint_free(k_array);
+            fmpz_poly_clear(p);
+        }
+    }
+
+    /* regression test: exact positive roots when there is a root at zero */
+    {
+        fmpz_poly_t p;
+        fmpq * ex = _fmpq_vec_init(3);
+        fmpz * c = _fmpz_vec_init(3);
+        slong k[3], ne, ni, i;
+
+        fmpz_poly_init(p);
+        fmpz_poly_set_str(p, "4  0 2 -3 1");   /* x (x - 1) (x - 2) */
+        fmpz_poly_isolate_positive_roots(ex, &ne, c, k, &ni, p);
+        if (ne + ni != 2)
+        {
+            flint_printf("FAIL: positive roots with a root at zero\n");
+            flint_abort();
+        }
+        for (i = 0; i < ne; i++)
+        {
+            fmpq_t y;
+            fmpq_init(y);
+            fmpz_poly_evaluate_fmpq(y, p, ex + i);
+            if (!fmpq_is_zero(y))
+            {
+                flint_printf("FAIL: exact positive root with a root at zero\n");
+                flint_abort();
+            }
+            fmpq_clear(y);
+        }
+        fmpz_poly_clear(p);
+        _fmpq_vec_clear(ex, 3);
+        _fmpz_vec_clear(c, 3);
+    }
+
+    /* the sign change method must fail when Descartes' rule is not exact:
+       x^4 - 3x^2 + 9 = (x^2 - 3x + 3)(x^2 + 3x + 3) has no real roots but
+       two sign variations for x and -x */
+    {
+        fmpz_poly_t p;
+        slong ne, ni;
+        fmpz_poly_init(p);
+        fmpz_poly_set_str(p, "5  9 0 -3 0 1");
+        if (_fmpz_poly_isolate_real_roots_signs(NULL, &ne, NULL, NULL, &ni,
+                p->coeffs, p->length, 0, 1000))
+        {
+            flint_printf("FAIL: sign change method on polynomial without real roots\n");
+            flint_abort();
+        }
+        fmpz_poly_clear(p);
+    }
+
+    /* polynomials with irrational roots where the Sturm method is used */
+    {
+        int iter;
+
+        for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
+        {
+            fmpz_poly_t p, q;
+            fmpq * ex;
+            fmpz * c_array;
+            slong * k_array;
+            slong i, n, n_exact, n_interval, count;
+            int positive_only = n_randint(state, 4) == 0;
+
+            fmpz_poly_init(p);
+            fmpz_poly_init(q);
+
+            switch (n_randint(state, 5))
+            {
+                case 3:
+                    /* real roots spread over many orders of magnitude
+                       (plain VCA, used for checking, is slow here) */
+                    fmpz_poly_eulerian_polynomial(p, 1 + n_randint(state, 40));
+                    break;
+                case 4:
+                    /* prod (x + 2^e_i + 1) for distinct e_i in [-25, 25],
+                       with some roots made positive */
+                    fmpz_poly_one(p);
+                    for (n = -25; n <= 25; n++)
+                    {
+                        if (n_randint(state, 2) != 0)
+                            continue;
+                        fmpz_poly_zero(q);
+                        fmpz_poly_set_coeff_si(q, 0, 1);
+                        fmpz_poly_set_coeff_si(q, 1, 1);
+                        if (n >= 0)
+                            fmpz_mul_2exp(q->coeffs, q->coeffs, n);
+                        else
+                            fmpz_mul_2exp(q->coeffs + 1, q->coeffs + 1, -n);
+                        fmpz_add(q->coeffs, q->coeffs, q->coeffs + 1);
+                        if (n_randint(state, 4) == 0)
+                            fmpz_neg(q->coeffs, q->coeffs);
+                        fmpz_poly_mul(p, p, q);
+                    }
+                    fmpz_poly_zero(q);
+                    break;
+                case 0:
+                    fmpz_poly_chebyshev_t(p, 1 + n_randint(state, 100));
+                    break;
+                case 1:
+                    /* x^n - 2 (a x - 1)^2 */
+                    /* (plain VCA, used for checking, is slow here) */
+                    n = 5 + n_randint(state, 60);
+                    fmpz_poly_set_coeff_si(q, 1, 3 + n_randint(state, 50));
+                    fmpz_poly_set_coeff_si(q, 0, -1);
+                    fmpz_poly_mul(p, q, q);
+                    fmpz_poly_scalar_mul_si(p, p, -2);
+                    fmpz_poly_set_coeff_si(q, 0, 0);
+                    fmpz_poly_set_coeff_si(q, 1, 0);
+                    fmpz_poly_set_coeff_si(q, n, 1);
+                    fmpz_poly_add(p, p, q);
+                    break;
+                default:
+                {
+                    fmpq_poly_t r;
+                    fmpq_poly_init(r);
+                    fmpq_poly_laguerre_l(r, 1 + n_randint(state, 80));
+                    fmpq_poly_get_numerator(p, r);
+                    fmpq_poly_clear(r);
+                }
+            }
+
+            /* random scaling and shift of the roots */
+            _fmpz_poly_scale_2exp(p->coeffs, p->length, (slong) n_randint(state, 5) - 2);
+            if (n_randint(state, 2))
+            {
+                fmpz_t c;
+                fmpz_init(c);
+                fmpz_set_si(c, (slong) n_randint(state, 5) - 2);
+                fmpz_poly_taylor_shift(p, p, c);
+                fmpz_clear(c);
+            }
+
+            /* times a factor without real roots */
+            if (n_randint(state, 2))
+            {
+                fmpz_poly_randtest_no_real_root(q, state, 1 + n_randint(state, 10), 10);
+                if (!fmpz_poly_is_zero(q))
+                    fmpz_poly_mul(p, p, q);
+            }
+
+            if (fmpz_poly_is_zero(p) || !fmpz_poly_is_squarefree(p))
+            {
+                fmpz_poly_clear(p);
+                fmpz_poly_clear(q);
+                continue;
+            }
+
+            n = p->length;
+            ex = _fmpq_vec_init(n);
+            c_array = _fmpz_vec_init(n);
+            k_array = flint_malloc(n * sizeof(slong));
+
+            if (positive_only)
+                fmpz_poly_isolate_positive_roots(ex, &n_exact, c_array, k_array, &n_interval, p);
+            else
+                fmpz_poly_isolate_real_roots(ex, &n_exact, c_array, k_array, &n_interval, p);
+
+            /* expected count, computed with VCA */
+            if (positive_only)
+            {
+                slong ne2, ni2;
+                _fmpz_poly_isolate_real_roots_vca(NULL, &ne2, NULL, NULL, &ni2, p, 1);
+                count = ne2 + ni2;
+            }
+            else
+                count = fmpz_poly_num_real_roots_vca(p);
+
+            if (n_exact + n_interval != count)
+            {
+                flint_printf("FAIL: wrong number of roots\n");
+                flint_printf("p = %{fmpz_poly}\n", p);
+                flint_printf("%wd + %wd, expected %wd\n", n_exact, n_interval, count);
+                flint_abort();
+            }
+
+            for (i = 0; i < n_exact; i++)
+            {
+                fmpq_t y;
+                fmpq_init(y);
+                fmpz_poly_evaluate_fmpq(y, p, ex + i);
+                if (!fmpq_is_zero(y) || (i > 0 && fmpq_cmp(ex + i - 1, ex + i) >= 0) ||
+                    (positive_only && fmpq_sgn(ex + i) <= 0))
+                {
+                    flint_printf("FAIL: exact root\n");
+                    flint_printf("p = %{fmpz_poly}\n", p);
+                    flint_abort();
+                }
+                fmpq_clear(y);
+            }
+
+            for (i = 0; i < n_interval; i++)
+            {
+                if (!check_one_root(p, c_array + i, k_array[i]) ||
+                    (positive_only && fmpz_sgn(c_array + i) < 0))
+                {
+                    flint_printf("FAIL: interval\n");
+                    flint_printf("p = %{fmpz_poly}\n", p);
+                    flint_printf("c = %{fmpz}, k = %wd\n", c_array + i, k_array[i]);
+                    flint_abort();
+                }
+
+                /* intervals are sorted and disjoint */
+                if (i > 0)
+                {
+                    fmpq_t a, b;
+                    fmpq_init(a);
+                    fmpq_init(b);
+                    fmpz_add_ui(fmpq_numref(a), c_array + i - 1, 1);
+                    fmpq_mul_2exp(a, a, 0);
+                    if (k_array[i - 1] >= 0) fmpq_mul_2exp(a, a, k_array[i - 1]); else fmpq_div_2exp(a, a, -k_array[i - 1]);
+                    fmpz_set(fmpq_numref(b), c_array + i);
+                    if (k_array[i] >= 0) fmpq_mul_2exp(b, b, k_array[i]); else fmpq_div_2exp(b, b, -k_array[i]);
+                    if (fmpq_cmp(a, b) > 0)
+                    {
+                        flint_printf("FAIL: intervals not sorted\n");
+                        flint_printf("p = %{fmpz_poly}\n", p);
+                        flint_abort();
+                    }
+                    fmpq_clear(a);
+                    fmpq_clear(b);
+                }
+            }
+
+            _fmpq_vec_clear(ex, n);
+            _fmpz_vec_clear(c_array, n);
+            flint_free(k_array);
+            fmpz_poly_clear(p);
+            fmpz_poly_clear(q);
         }
     }
 
