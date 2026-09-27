@@ -383,19 +383,47 @@ cleanup:
     l + 2 coefficients of X^0, ..., X^(l+1), polynomials in J, and *s_out
     the exponent s.
 */
-int
-_gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
-        ulong l, gr_ctx_t R)
+/*
+    The l classes of t^(-w) F modulo l, as series in q = t^l of length Ls:
+    out[r Ls + k] is the coefficient of t^(l (k - ceil(w / l)) + r), or of
+    t^(l (k - ceil(w / l)) - r) when neg is set.
+*/
+static int
+_sections(gr_ptr out, const gr_poly_t F, slong w, int neg, ulong l,
+        slong Ls, gr_ctx_t R)
 {
     slong sz = R->sizeof_elem;
-    slong L, v, s, k, i, d, m, u, Ld;
-    gr_poly_struct * Bpow;
+    slong base = -(slong) ((w + l - 1) / l), r, k;
+    int status = GR_SUCCESS;
+
+    for (r = 0; r < (slong) l; r++)
+        for (k = 0; k < Ls; k++)
+        {
+            gr_ptr dst = GR_ENTRY(out, r * Ls + k, sz);
+            slong i = (slong) l * (base + k) + (neg ? -r : r) + w;
+
+            if (i < 0 || i >= F->length)
+                status |= gr_zero(dst, R);
+            else
+                status |= gr_set(dst, GR_ENTRY(F->coeffs, i, sz), R);
+        }
+
+    return status;
+}
+
+static int
+_canonical_direct(gr_poly_struct * phi, ulong * s_out, ulong l, gr_ctx_t R)
+{
+    slong sz = R->sizeof_elem;
+    slong L, v, s, k, i, d, m, Ld, K, G, Ls, r, n;
+    gr_poly_struct * baby;
+    gr_poly_struct * giant;
     gr_poly_struct * P;
     gr_poly_struct * e;
     gr_poly_struct * Jpow;
     gr_poly_t num, den, tmp;
     fmpz_poly_t z;
-    gr_ptr a, c, w;
+    gr_ptr a, c, w, xs, ys;
     fmpz_t ch;
     int status = GR_SUCCESS;
 
@@ -414,20 +442,27 @@ _gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
 
     s = 12 / n_gcd(12, l - 1);
     v = s * (l - 1) / 12;
-    L = l * v + l;                  /* B^m below t^(l v + l) */
+    Ls = v + 4;                     /* the length of a class, see below */
+    L = l * Ls;                     /* B^a, B^(K b) below t^(l (v + 4)) */
+    K = n_sqrt(l);
+    G = l / K;
     *s_out = s;
 
-    Bpow = flint_malloc((l + 1) * sizeof(gr_poly_struct));
+    baby = flint_malloc(K * sizeof(gr_poly_struct));
+    giant = flint_malloc((G + 1) * sizeof(gr_poly_struct));
     P = flint_malloc((l + 1) * sizeof(gr_poly_struct));
     e = flint_malloc((l + 1) * sizeof(gr_poly_struct));
     Jpow = flint_malloc((v + 1) * sizeof(gr_poly_struct));
 
     for (m = 0; m <= (slong) l; m++)
     {
-        gr_poly_init(Bpow + m, R);
         gr_poly_init(P + m, R);
         gr_poly_init(e + m, R);
     }
+    for (m = 0; m < K; m++)
+        gr_poly_init(baby + m, R);
+    for (m = 0; m <= G; m++)
+        gr_poly_init(giant + m, R);
     for (d = 0; d <= v; d++)
         gr_poly_init(Jpow + d, R);
 
@@ -437,6 +472,8 @@ _gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
     fmpz_poly_init(z);
 
     a = gr_heap_init_vec(v + 1, R);
+    xs = gr_heap_init_vec(K * l * Ls, R);
+    ys = gr_heap_init_vec((G + 1) * l * Ls, R);
     GR_TMP_INIT2(c, w, R);
 
     /* B = prod (1 - t^n)^(2s) / prod (1 - t^(l n))^(2s) to length L */
@@ -453,11 +490,17 @@ _gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
     _gr_poly_normalise(den, R);
 
     status |= gr_poly_inv_series(den, den, L, R);
-    status |= gr_poly_mullow(Bpow + 1, num, den, L, R);
-    status |= gr_poly_one(Bpow + 0, R);
+    status |= gr_poly_mullow(num, num, den, L, R);
 
-    for (m = 2; m <= (slong) l && status == GR_SUCCESS; m++)
-        status |= gr_poly_mullow(Bpow + m, Bpow + m - 1, Bpow + 1, L, R);
+    /* baby[a] = B^a for a < K, giant[b] = B^(K b) for b <= G = floor(l / K) */
+    status |= gr_poly_one(baby + 0, R);
+    for (m = 1; m < K && status == GR_SUCCESS; m++)
+        status |= gr_poly_mullow(baby + m, baby + m - 1, num, L, R);
+
+    status |= gr_poly_one(giant + 0, R);
+    status |= gr_poly_mullow(giant + 1, baby + K - 1, num, L, R);
+    for (m = 2; m <= G && status == GR_SUCCESS; m++)
+        status |= gr_poly_mullow(giant + m, giant + m - 1, giant + 1, L, R);
 
     if (status != GR_SUCCESS)
         goto cleanup;
@@ -478,26 +521,60 @@ _gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
 #define HI(k) ((slong) ((((slong) l - (k)) * v + l - 1) / l))
 #define WLEN(k) (HI(k) - LO(k) + 1)
 
-    for (m = 1; m <= (slong) l; m++)
+    /*
+        P_m only wants the exponents of H^m = t^(-v m) B^m divisible by l,
+        and with m = a + K b those come from H^a H^(K b): split H^a into
+        its classes x_r (exponents r mod l) and H^(K b) into y_r (exponents
+        -r mod l), each a series in q = t^l from the exponent -ceil(v a / l),
+        resp. -ceil(v K b / l), and they are sum_r x_r y_r. So the l powers
+        of length l v cost 2 sqrt(l) products of length l (v + 4) and l^2
+        products of length at most v + 4: counting from those starting
+        exponents, hi(m) sits at most v + 3 places in, since the two
+        offsets add up to less than m v / l + 2.
+    */
+    for (m = 0; m < K; m++)
+        status |= _sections(GR_ENTRY(xs, m * l * Ls, sz), baby + m,
+                v * m, 0, l, Ls, R);
+    for (m = 0; m <= G; m++)
+        status |= _sections(GR_ENTRY(ys, m * l * Ls, sz), giant + m,
+                v * K * m, 1, l, Ls, R);
+
+    gr_poly_fit_length(tmp, Ls, R);
+
+    for (m = 1; m <= (slong) l && status == GR_SUCCESS; m++)
     {
-        gr_poly_fit_length(P + m, WLEN(m), R);
+        slong ia = m % K, ib = m / K;
+        slong base = -(slong) ((v * ia + l - 1) / l)
+                     - (slong) ((v * K * ib + l - 1) / l);
+        gr_srcptr x = GR_ENTRY(xs, ia * l * Ls, sz);
+        gr_srcptr y = GR_ENTRY(ys, ib * l * Ls, sz);
 
-        for (u = LO(m); u <= HI(m); u++)
+        n = HI(m) - base + 1;
+
+        if (n > Ls || LO(m) < base)
         {
-            gr_ptr dst = GR_ENTRY(P[m].coeffs, u - LO(m), sz);
-            slong idx = l * u + v * m;
-
-            if (idx < 0 || idx >= L)
-                status |= gr_zero(dst, R);
-            else
-            {
-                status |= gr_poly_get_coeff_scalar(dst, Bpow + m, idx, R);
-                status |= gr_mul_ui(dst, dst, l, R);
-            }
+            status = GR_UNABLE;
+            break;
         }
 
+        gr_poly_fit_length(num, n, R);
+        status |= _gr_vec_zero(num->coeffs, n, R);
+
+        for (r = 0; r < (slong) l; r++)
+        {
+            status |= _gr_poly_mullow(tmp->coeffs, GR_ENTRY(x, r * Ls, sz), n,
+                    GR_ENTRY(y, r * Ls, sz), n, n, R);
+            status |= _gr_vec_add(num->coeffs, num->coeffs, tmp->coeffs, n, R);
+        }
+
+        gr_poly_fit_length(P + m, WLEN(m), R);
+        status |= _gr_vec_mul_scalar_ui(P[m].coeffs,
+                GR_ENTRY(num->coeffs, LO(m) - base, sz), WLEN(m), l, R);
         _gr_poly_set_length(P + m, WLEN(m), R);
     }
+
+    if (status != GR_SUCCESS)
+        goto cleanup;
 
     /* e_0 = 1, window [0, v] */
     gr_poly_fit_length(e + 0, WLEN(0), R);
@@ -618,6 +695,8 @@ _gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
 cleanup:
     GR_TMP_CLEAR2(c, w, R);
     gr_heap_clear_vec(a, v + 1, R);
+    gr_heap_clear_vec(xs, K * l * Ls, R);
+    gr_heap_clear_vec(ys, (G + 1) * l * Ls, R);
 
     fmpz_poly_clear(z);
     gr_poly_clear(tmp, R);
@@ -628,15 +707,90 @@ cleanup:
         gr_poly_clear(Jpow + d, R);
     for (m = 0; m <= (slong) l; m++)
     {
-        gr_poly_clear(Bpow + m, R);
         gr_poly_clear(P + m, R);
         gr_poly_clear(e + m, R);
     }
+    for (m = 0; m < K; m++)
+        gr_poly_clear(baby + m, R);
+    for (m = 0; m <= G; m++)
+        gr_poly_clear(giant + m, R);
 
     flint_free(Jpow);
     flint_free(e);
     flint_free(P);
-    flint_free(Bpow);
+    flint_free(giant);
+    flint_free(baby);
+
+    return status;
+}
+
+/*
+    Phi^c_l has integer coefficients, so over F_{p^n} it lies in F_p and
+    is computed there, where the arithmetic is several times cheaper, and
+    only then moved into the base ring.
+*/
+int
+_gr_ec_modular_polynomial_canonical(gr_poly_struct * phi, ulong * s_out,
+        ulong l, gr_ctx_t R)
+{
+    gr_ctx_t F;
+    gr_poly_struct * psi;
+    fmpz_t ch, c;
+    slong k, i;
+    int status = GR_SUCCESS;
+
+    if (R->which_ring != GR_CTX_FQ && R->which_ring != GR_CTX_FQ_NMOD
+            && R->which_ring != GR_CTX_FQ_ZECH)
+        return _canonical_direct(phi, s_out, l, R);
+
+    fmpz_init(ch);
+
+    if (gr_ctx_fq_prime(ch, R) != GR_SUCCESS)
+    {
+        fmpz_clear(ch);
+        return GR_UNABLE;
+    }
+
+    if (fmpz_abs_fits_ui(ch))
+    {
+        if (gr_ctx_init_nmod(F, fmpz_get_ui(ch)) != GR_SUCCESS)
+        {
+            fmpz_clear(ch);
+            return GR_UNABLE;
+        }
+    }
+    else
+        gr_ctx_init_fmpz_mod(F, ch);
+
+    fmpz_init(c);
+    psi = flint_malloc((l + 2) * sizeof(gr_poly_struct));
+
+    for (k = 0; k < (slong) l + 2; k++)
+        gr_poly_init(psi + k, F);
+
+    status = _canonical_direct(psi, s_out, l, F);
+
+    for (k = 0; k < (slong) l + 2 && status == GR_SUCCESS; k++)
+    {
+        gr_poly_fit_length(phi + k, psi[k].length, R);
+
+        for (i = 0; i < psi[k].length; i++)
+        {
+            status |= gr_get_fmpz(c, GR_ENTRY(psi[k].coeffs, i, F->sizeof_elem), F);
+            status |= gr_set_fmpz(GR_ENTRY(phi[k].coeffs, i, R->sizeof_elem), c, R);
+        }
+
+        _gr_poly_set_length(phi + k, psi[k].length, R);
+        _gr_poly_normalise(phi + k, R);
+    }
+
+    for (k = 0; k < (slong) l + 2; k++)
+        gr_poly_clear(psi + k, F);
+
+    flint_free(psi);
+    fmpz_clear(c);
+    fmpz_clear(ch);
+    gr_ctx_clear(F);
 
     return status;
 }

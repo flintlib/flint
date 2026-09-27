@@ -150,6 +150,7 @@ typedef struct
 gr_ec_atkin_struct;
 
 double _gr_ec_atkin_plan(int * side, slong * Z1, int * use_atkin, const gr_ec_atkin_struct * A, slong nA, const fmpz_t m3, const fmpz_t q);
+WARN_UNUSED_RESULT int _gr_ec_cardinality_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3, const gr_ec_atkin_struct * A, slong nA, gr_ec_ctx_t ctx);
 
 #endif

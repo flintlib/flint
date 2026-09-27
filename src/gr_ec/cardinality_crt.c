@@ -39,6 +39,7 @@
 
 #include "fmpz.h"
 #include "fmpz_factor.h"
+#include "mpn_mod.h"
 #include "gr.h"
 #include "gr_ec.h"
 #include "impl.h"
@@ -137,9 +138,14 @@ _factor(fmpz_factor_t fac, const fmpz_t n)
     return ok;
 }
 
-/* #E(F_p) for E reduced modulo p */
-static int
-_count_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx)
+/*
+    #E(F_p) for E reduced modulo the prime p, counted over the quickest
+    representation of F_p: nmod in a word, mpn_mod up to its limit, and
+    fmpz_mod beyond. The coefficients of E only need to be integers
+    modulo p, so this also moves a curve over any Z/pZ type to that one.
+*/
+int
+_gr_ec_cardinality_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     gr_ctx_t F;
@@ -154,10 +160,11 @@ _count_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx)
         if (gr_ctx_init_nmod(F, fmpz_get_ui(p)) != GR_SUCCESS)
             return GR_UNABLE;
     }
-    else
+    else if (fmpz_size(p) > MPN_MOD_MAX_LIMBS
+            || gr_ctx_init_mpn_mod(F, p) != GR_SUCCESS)
         gr_ctx_init_fmpz_mod(F, p);
 
-    /* p is proved prime */
+    /* the callers know p to be prime */
     status |= gr_ctx_set_is_field(F, T_TRUE);
 
     fmpz_init(c);
@@ -175,7 +182,7 @@ _count_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx)
                 GR_ENTRY(a, 1, F->sizeof_elem), GR_ENTRY(a, 2, F->sizeof_elem),
                 GR_ENTRY(a, 3, F->sizeof_elem), GR_ENTRY(a, 4, F->sizeof_elem));
 
-        /* the discriminant is a unit modulo N, so the reduction is smooth */
+        /* the discriminant is a unit modulo p, so the reduction is smooth */
         if (status == GR_SUCCESS)
         {
             status = gr_ec_ctx_cardinality(res, Ep);
@@ -245,7 +252,7 @@ gr_ec_ctx_cardinality_crt(fmpz_t res, gr_ec_ctx_t ctx)
 
     for (i = 0; i < fac->num && status == GR_SUCCESS; i++)
     {
-        status |= _count_mod_p(Np, fac->p + i, ctx);
+        status |= _gr_ec_cardinality_mod_p(Np, fac->p + i, ctx);
 
         if (status == GR_SUCCESS)
         {

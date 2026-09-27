@@ -598,7 +598,9 @@ called.
     declines at once over a prime field, and then
     :func:`gr_ec_ctx_cardinality_cm`, which costs a `j`-invariant comparison
     and declines at once unless the curve is one it recognises. Failing that
-    it runs :func:`gr_ec_ctx_cardinality_sea`, which is faster than
+    -- after copying a curve over *fmpz_mod* to *nmod* or *mpn_mod* when
+    `p` fits one of them, as those are up to twice as fast -- it runs
+    :func:`gr_ec_ctx_cardinality_sea`, which is faster than
     baby-step giant-step from the smallest fields up, and falls back to
     :func:`gr_ec_ctx_cardinality_bsgs` -- which also covers the long models
     of characteristic 2 and 3 -- and finally to the walk, while that is
@@ -670,9 +672,13 @@ called.
     `f = \ell^s (\eta(\ell\tau)/\eta(\tau))^{2s}` with
     `s = 12/\gcd(12, \ell - 1)`, is computed directly in the base ring from
     `q`-expansions. It has degree `\ell + 1` in `X` like the classical
-    `\Phi_\ell`, but only degree `(\ell-1)/\gcd(12, \ell-1)` in `j`, which
-    makes it several times cheaper. Its roots at `j(E)` in `\mathbb{F}_q`
-    decide what `\ell` is:
+    `\Phi_\ell`, but only degree `v = (\ell-1)/\gcd(12, \ell-1)` in `j`,
+    which makes it several times cheaper. The power sums of the conjugates
+    of `f` each need a single residue class modulo `\ell` of a power of an
+    eta quotient; splitting the powers into about `\sqrt{\ell}` baby and
+    giant steps turns the `\ell` products of length `\ell v` this would
+    take into `2\sqrt{\ell}` of them and `\ell^2` of length `v`. Its roots
+    at `j(E)` in `\mathbb{F}_q` decide what `\ell` is:
 
     * an *Elkies* prime when there is one: the isogenous curve and the sum
       of the kernel abscissas follow from the partial derivatives of the

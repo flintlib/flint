@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "mpn_mod.h"
 #include "gr.h"
 #include "gr_ec.h"
 #include "impl.h"
@@ -120,6 +121,19 @@ gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
     {
         fmpz_clear(q);
         return GR_SUCCESS;
+    }
+
+    /*
+        What is left is a real count, and fmpz_mod is the slowest
+        representation of F_p for it -- half the speed of mpn_mod at 256
+        bits -- so the curve is copied over to nmod or mpn_mod when p fits
+        one of them, and counted there.
+    */
+    if (R->which_ring == GR_CTX_FMPZ_MOD && fmpz_size(q) <= MPN_MOD_MAX_LIMBS)
+    {
+        status = _gr_ec_cardinality_mod_p(res, q, ctx);
+        fmpz_clear(q);
+        return status;
     }
 
     status = gr_ec_ctx_cardinality_sea(res, ctx);
