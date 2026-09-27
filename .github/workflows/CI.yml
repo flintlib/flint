@@ -74,6 +74,16 @@ jobs:
       - name: "Test Nemo.jl"
         run: |
           git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
+          # Temporary workaround: fmpz_ndiv_qr now rounds ties to even, which
+          # changes the expected results of Nemo's ndivrem/ntdivrem tests at
+          # ties. Patch these tests until Nemo is updated; remove this once it is.
+          sed -i \
+            -e 's/ndivrem(ZZRingElem(6), ZZRingElem(-4)) == (ZZRingElem(-1), ZZRingElem(2))/ndivrem(ZZRingElem(6), ZZRingElem(-4)) == (ZZRingElem(-2), ZZRingElem(-2))/' \
+            -e 's/ntdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)/ntdivrem(ZZ(-6), ZZ(+4)) == (-2, +2)/' \
+            -e 's/ntdivrem(ZZ(+6), ZZ(+4)) == (+1, +2)/ntdivrem(ZZ(+6), ZZ(+4)) == (+2, -2)/' \
+            -e 's/ntdivrem(ZZ(+6), ZZ(-4)) == (-1, +2)/ntdivrem(ZZ(+6), ZZ(-4)) == (-2, -2)/' \
+            -e 's/ntdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)/ntdivrem(ZZ(-6), ZZ(-4)) == (+2, +2)/' \
+            Nemo.jl/test/flint/fmpz-test.jl
           mkdir -p ~/.julia/artifacts
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)\"" > ~/.julia/artifacts/Overrides.toml
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
