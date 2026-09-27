@@ -12,9 +12,13 @@
 /*
     Scalar multiplication k P on y^2 = x^3 + a x + b over F_p, for a scalar
     of the same size as p. Compares the three point representations of
-    gr_ec against each other and against ecpp_point_mul_gr, which uses the
-    same modular arithmetic and the same Jacobian formulas but a width-4
-    NAF window instead of a plain binary ladder.
+    gr_ec against each other, against the plain binary Jacobian ladder,
+    and against the witness-taking ladder, whose extra cost is what it buys
+    a caller who needs to know the group law was entitled to its branches.
+
+    There is no longer an ecpp column: ecpp_point_mul_gr now calls
+    gr_ec_jac_point_mul_fmpz_witness, so timing it here would be timing
+    this file's own witness column plus a context setup.
 
     The unit is microseconds per k P, so the numbers can be compared
     directly with what other libraries report at the same modulus size.
@@ -48,7 +52,7 @@
 #include "fmpz_mod.h"
 #include "gr.h"
 #include "gr_ec.h"
-#include "ecpp.h"
+#include "mpn_mod.h"
 
 #define TIME_US(dest, stmt) \
     do { \
@@ -72,7 +76,7 @@ int main(void)
     flint_printf("gr_ec: scalar multiplication k P over F_p, k of the size of p\n");
     flint_printf("microseconds per k P (lower is better)\n\n");
     flint_printf("%9s %10s %10s %10s %10s %12s\n",
-            "bits(p)", "proj", "affine", "jacobian", "jac-binary", "ecpp-naf4");
+            "bits(p)", "proj", "affine", "jacobian", "jac-binary", "jac-witness");
 
     for (bi = 0; bi < num_sizes; bi++)
     {
@@ -85,9 +89,8 @@ int main(void)
         gr_ec_aff_point_t Pa, Aa;
         gr_ec_jac_point_t Pj, Aj;
         gr_ptr a4, a6, x, y, t;
-        gr_ptr gP, gR, ga, gacc;
-        double t_proj, t_aff, t_jac, t_jacbin, t_ecpp;
-        slong sz;
+        gr_ptr gacc;
+        double t_proj, t_aff, t_jac, t_jacbin, t_wit;
         int status;
 
         fmpz_init(p);
@@ -95,10 +98,10 @@ int main(void)
         fmpz_randprime(p, state, bits, 0);
         fmpz_mod_ctx_init(mod, p);
 
-        /* the same ring ecpp would pick: mpn_mod when it applies, else fmpz_mod */
-        ecpp_gr_ctx_init(R, mod);
-        sz = R->sizeof_elem;
-
+        /* mpn_mod when it applies, else fmpz_mod */
+        if (fmpz_size(p) < MPN_MOD_MIN_LIMBS || fmpz_size(p) > MPN_MOD_MAX_LIMBS
+                || gr_ctx_init_mpn_mod(R, p) != GR_SUCCESS)
+            gr_ctx_init_fmpz_mod(R, p);
         GR_TMP_INIT5(a4, a6, x, y, t, R);
 
         /* a random point (x, y) on a random curve: pick a4, x, y and solve for a6 */
@@ -141,15 +144,7 @@ int main(void)
         fmpz_abs(k, k);
 
         /* the ecpp reference works on a raw (X, Y, Z) triple with Z = 1 */
-        gP = gr_heap_init_vec(3, R);
-        gR = gr_heap_init_vec(3, R);
-        ga = gr_heap_init(R);
         gacc = gr_heap_init(R);
-        GR_MUST_SUCCEED(gr_set(gP, x, R));
-        GR_MUST_SUCCEED(gr_set(GR_ENTRY(gP, 1, sz), y, R));
-        GR_MUST_SUCCEED(gr_one(GR_ENTRY(gP, 2, sz), R));
-        GR_MUST_SUCCEED(gr_set(ga, a4, R));
-        GR_MUST_SUCCEED(gr_one(gacc, R));
 
         /* check that all five compute the same point before timing them */
         GR_MUST_SUCCEED(gr_ec_point_mul_fmpz(A, P, k, E));
@@ -179,15 +174,18 @@ int main(void)
             if (gr_ec_point_equal(A, B, E) != T_TRUE)
                 flint_throw(FLINT_ERROR, "jacobian ladder differs at %wd bits\n", bits);
 
-            if (!ecpp_point_mul_gr(gR, gP, k, ga, gacc, R))
-                flint_throw(FLINT_ERROR, "ecpp reference failed at %wd bits\n", bits);
-
-            GR_MUST_SUCCEED(_gr_ec_jac_point_set_jacobian(Bj, gR,
-                        GR_ENTRY(gR, 1, sz), GR_ENTRY(gR, 2, sz), E));
+            /* the witness ladder has its own fallback, so it is worth
+               checking that it lands on the same point */
+            GR_MUST_SUCCEED(gr_one(gacc, R));
+            GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Bj, gacc, Pj, k, E));
             GR_MUST_SUCCEED(gr_ec_point_set_jac_point(B, Bj, E));
 
             if (gr_ec_point_equal(A, B, E) != T_TRUE)
-                flint_throw(FLINT_ERROR, "ecpp result differs at %wd bits\n", bits);
+                flint_throw(FLINT_ERROR, "witness result differs at %wd bits\n", bits);
+
+            /* over a prime modulus no branch can have been ambiguous */
+            if (gr_is_zero(gacc, R) == T_TRUE)
+                flint_throw(FLINT_ERROR, "witness vanished at %wd bits\n", bits);
 
             gr_ec_jac_point_clear(Bj, E);
             gr_ec_point_clear(B, E);
@@ -197,15 +195,13 @@ int main(void)
         TIME_US(t_aff, GR_MUST_SUCCEED(gr_ec_aff_point_mul_fmpz(Aa, Pa, k, E)));
         TIME_US(t_jac, GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz(Aj, Pj, k, E)));
         TIME_US(t_jacbin, GR_MUST_SUCCEED(_gr_ec_jac_point_mul_fmpz_binary(Aj, Pj, k, E)));
-        TIME_US(t_ecpp, (void) ecpp_point_mul_gr(gR, gP, k, ga, gacc, R));
+        TIME_US(t_wit, { GR_MUST_SUCCEED(gr_one(gacc, R));
+                GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Aj, gacc, Pj, k, E)); });
 
         flint_printf("%9wd %10.2f %10.2f %10.2f %10.2f %12.2f\n",
-                bits, t_proj, t_aff, t_jac, t_jacbin, t_ecpp);
+                bits, t_proj, t_aff, t_jac, t_jacbin, t_wit);
         fflush(stdout);
 
-        gr_heap_clear_vec(gP, 3, R);
-        gr_heap_clear_vec(gR, 3, R);
-        gr_heap_clear(ga, R);
         gr_heap_clear(gacc, R);
         gr_ec_jac_point_clear(Pj, E);
         gr_ec_jac_point_clear(Aj, E);

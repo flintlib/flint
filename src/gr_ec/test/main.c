@@ -19,6 +19,7 @@
 #include "t-witness.c"
 #include "t-convert.c"
 #include "t-cardinality.c"
+#include "t-sea.c"
 #include "t-order.c"
 #include "t-div.c"
 #include "t-division_poly.c"
@@ -39,6 +40,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ec_witness),
     TEST_FUNCTION(gr_ec_convert),
     TEST_FUNCTION(gr_ec_cardinality),
+    TEST_FUNCTION(gr_ec_sea),
     TEST_FUNCTION(gr_ec_order),
     TEST_FUNCTION(gr_ec_div),
     TEST_FUNCTION(gr_ec_division_poly),

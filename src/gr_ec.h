@@ -163,6 +163,9 @@ gr_ec_xz_point_struct;
 
 typedef gr_ec_xz_point_struct gr_ec_xz_point_t[1];
 
+/* scratch the x-only formulas want from a caller that has a loop */
+#define GR_EC_XZ_SCRATCH 4
+
 #define GR_EC_XZ_POINT_X(P, R) ((P)->coords)
 #define GR_EC_XZ_POINT_Z(P, R) GR_ENTRY((P)->coords, 1, (R)->sizeof_elem)
 
@@ -248,6 +251,7 @@ WARN_UNUSED_RESULT int gr_ec_montgomery_x_to_weierstrass(gr_ptr x, gr_srcptr u, 
 WARN_UNUSED_RESULT int gr_ec_weierstrass_x_to_montgomery(gr_ptr u, gr_srcptr x, gr_srcptr A, gr_srcptr B, gr_ctx_t R);
 
 WARN_UNUSED_RESULT int gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_srcptr a24, gr_ctx_t R);
+WARN_UNUSED_RESULT int _gr_ec_xz_point_dbl_ws(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, gr_srcptr a24, gr_ptr t, gr_ctx_t R);
 WARN_UNUSED_RESULT int gr_ec_xz_point_dadd(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const gr_ec_xz_point_t Q, const gr_ec_xz_point_t PmQ, gr_ctx_t R);
 WARN_UNUSED_RESULT int gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, const fmpz_t k, gr_srcptr a24, gr_ctx_t R);
 WARN_UNUSED_RESULT int gr_ec_xz_point_mul_ui(gr_ec_xz_point_t res, const gr_ec_xz_point_t P, ulong k, gr_srcptr a24, gr_ctx_t R);
@@ -265,6 +269,7 @@ WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_naive(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_bsgs(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_cm(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_schoof(fmpz_t res, gr_ec_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_sea(fmpz_t res, gr_ec_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx);
 
 /* Order of the group, cached in the context */

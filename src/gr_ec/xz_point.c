@@ -255,15 +255,20 @@ gr_ec_montgomery_a24(gr_ptr a24, gr_srcptr A, gr_ctx_t R)
 
     with 4 X Z = (X + Z)^2 - (X - Z)^2. Two squarings, three
     multiplications, and no test of any kind.
+
+    The _ws form takes GR_EC_XZ_SCRATCH ring elements from the caller.
+    Initialising three temporaries is a fair share of the cost of five
+    multiplications over a two-limb modulus, so the ladder hoists them out
+    of its loop and calls these; it is the same arrangement the Jacobian
+    ladder uses, for the same reason.
 */
 int
-gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
-        gr_srcptr a24, gr_ctx_t R)
+_gr_ec_xz_point_dbl_ws(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
+        gr_srcptr a24, gr_ptr t, gr_ctx_t R)
 {
-    gr_ptr t0, t1, t2;
+    slong sz = R->sizeof_elem;
+    gr_ptr t0 = t, t1 = GR_ENTRY(t, 1, sz), t2 = GR_ENTRY(t, 2, sz);
     int status = GR_SUCCESS;
-
-    GR_TMP_INIT3(t0, t1, t2, R);
 
     status |= gr_add(t0, XX(P), XZ(P), R);
     status |= gr_sqr(t0, t0, R);
@@ -271,13 +276,26 @@ gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
     status |= gr_sqr(t1, t1, R);
     status |= gr_sub(t2, t0, t1, R);             /* 4 X Z */
 
+    /* the last read of P, so res may alias it from here on */
     status |= gr_mul(XX(res), t0, t1, R);
 
     status |= gr_mul(t0, t2, a24, R);
     status |= gr_add(t0, t0, t1, R);
     status |= gr_mul(XZ(res), t2, t0, R);
 
-    GR_TMP_CLEAR3(t0, t1, t2, R);
+    return status;
+}
+
+int
+gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
+        gr_srcptr a24, gr_ctx_t R)
+{
+    gr_ptr t;
+    int status;
+
+    GR_TMP_INIT_VEC(t, GR_EC_XZ_SCRATCH, R);
+    status = _gr_ec_xz_point_dbl_ws(res, P, a24, t, R);
+    GR_TMP_CLEAR_VEC(t, GR_EC_XZ_SCRATCH, R);
 
     return status;
 }
@@ -305,14 +323,19 @@ gr_ec_xz_point_dbl(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
     callers normally have it -- this is one multiplication in seven saved
     on the whole scalar multiplication.
 */
+/*
+    The same, for a difference already scaled to Z = 1 and with the
+    caller's scratch. *res* may alias *P* or *Q* but not the difference,
+    which is written past; the ladder keeps the difference in a point of
+    its own, so that costs it nothing.
+*/
 static int
-_gr_ec_xz_point_dadd_z1(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
-        const gr_ec_xz_point_t Q, gr_srcptr xPmQ, gr_ctx_t R)
+_gr_ec_xz_point_dadd_z1_ws(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
+        const gr_ec_xz_point_t Q, gr_srcptr xPmQ, gr_ptr t, gr_ctx_t R)
 {
-    gr_ptr t0, t1, t2, t3;
+    slong sz = R->sizeof_elem;
+    gr_ptr t0 = t, t1 = GR_ENTRY(t, 1, sz), t2 = GR_ENTRY(t, 2, sz);
     int status = GR_SUCCESS;
-
-    GR_TMP_INIT4(t0, t1, t2, t3, R);
 
     status |= gr_sub(t0, XX(P), XZ(P), R);
     status |= gr_add(t1, XX(Q), XZ(Q), R);
@@ -322,17 +345,14 @@ _gr_ec_xz_point_dadd_z1(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
     status |= gr_sub(t2, XX(Q), XZ(Q), R);
     status |= gr_mul(t1, t1, t2, R);
 
-    status |= gr_add(t2, t0, t1, R);
+    /* the last read of P and Q, so res may alias either from here on */
+    status |= gr_sub(t2, t0, t1, R);
+    status |= gr_add(t0, t0, t1, R);
+
+    status |= gr_sqr(XX(res), t0, R);
+
     status |= gr_sqr(t2, t2, R);
-    status |= gr_sub(t3, t0, t1, R);
-    status |= gr_sqr(t3, t3, R);
-
-    status |= gr_mul(t3, t3, xPmQ, R);
-
-    status |= gr_set(XX(res), t2, R);
-    status |= gr_set(XZ(res), t3, R);
-
-    GR_TMP_CLEAR4(t0, t1, t2, t3, R);
+    status |= gr_mul(XZ(res), t2, xPmQ, R);
 
     return status;
 }
@@ -384,6 +404,7 @@ gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
         const fmpz_t k, gr_srcptr a24, gr_ctx_t R)
 {
     gr_ec_xz_point_t R0, R1, base;
+    gr_ptr t;
     fmpz_t n;
     slong i, bits;
     int z1, status = GR_SUCCESS;
@@ -433,10 +454,11 @@ gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
     gr_ec_xz_point_init(R0, R);
     gr_ec_xz_point_init(R1, R);
     gr_ec_xz_point_init(base, R);
+    GR_TMP_INIT_VEC(t, GR_EC_XZ_SCRATCH, R);
 
     status |= gr_ec_xz_point_set(base, P, R);
     status |= gr_ec_xz_point_set(R0, P, R);
-    status |= gr_ec_xz_point_dbl(R1, P, a24, R);
+    status |= _gr_ec_xz_point_dbl_ws(R1, P, a24, t, R);
 
     /* the difference is the same point at every step, so whether it is
        already scaled is worth asking once rather than per step */
@@ -446,21 +468,22 @@ gr_ec_xz_point_mul_fmpz(gr_ec_xz_point_t res, const gr_ec_xz_point_t P,
     {
         if (fmpz_tstbit(n, i))
         {
-            status |= z1 ? _gr_ec_xz_point_dadd_z1(R0, R0, R1, XX(base), R)
+            status |= z1 ? _gr_ec_xz_point_dadd_z1_ws(R0, R0, R1, XX(base), t, R)
                          : gr_ec_xz_point_dadd(R0, R0, R1, base, R);
-            status |= gr_ec_xz_point_dbl(R1, R1, a24, R);
+            status |= _gr_ec_xz_point_dbl_ws(R1, R1, a24, t, R);
         }
         else
         {
-            status |= z1 ? _gr_ec_xz_point_dadd_z1(R1, R0, R1, XX(base), R)
+            status |= z1 ? _gr_ec_xz_point_dadd_z1_ws(R1, R0, R1, XX(base), t, R)
                          : gr_ec_xz_point_dadd(R1, R0, R1, base, R);
-            status |= gr_ec_xz_point_dbl(R0, R0, a24, R);
+            status |= _gr_ec_xz_point_dbl_ws(R0, R0, a24, t, R);
         }
     }
 
     if (status == GR_SUCCESS)
         status = gr_ec_xz_point_set(res, R0, R);
 
+    GR_TMP_CLEAR_VEC(t, GR_EC_XZ_SCRATCH, R);
     gr_ec_xz_point_clear(base, R);
     gr_ec_xz_point_clear(R1, R);
     gr_ec_xz_point_clear(R0, R);
