@@ -560,6 +560,7 @@ void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec);
 void arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec);
 
 void arb_const_apery(arb_t s, slong prec);
+void arb_const_zeta5(arb_t s, slong prec);
 
 void arb_zeta_ui_asymp(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_borwein_bsplit(arb_t x, ulong s, slong prec);

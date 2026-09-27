@@ -43,7 +43,7 @@ jobs:
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
-          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk lmodern
 
       - name: "Build PDF documentation"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'

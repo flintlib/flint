@@ -12,294 +12,335 @@
 #include "mpn_extras.h"
 
 /*
-    Thin mpz-like interface to the flint_mpn division and square root
-    routines: the same semantics as the corresponding GMP mpz functions
-    (signs, rounding modes, aliasing), with the limb-level work done by
-    flint_mpn_tdiv_qr & co, which dispatch to GMP's mpn layer for small
-    operands and to Newton iteration with FLINT's multiplication for large
-    ones.
+    mpz-like interface to the flint_mpn division and square root routines:
+    the same semantics as the corresponding GMP mpz functions (signs,
+    rounding modes, aliasing), with the limb-level work done by
+    _flint_mpn_tdiv_qr, flint_mpn_divexact and flint_mpn_sqrtrem. Each
+    function is a single out-of-line function with the rounding mode and
+    the wanted outputs as compile-time constants, and the rounding is done
+    at the limb level, so that the overhead is no larger than that of GMP's
+    mpz layer for any operand size.
 */
 
-#define ROUND_T 0
-#define ROUND_F 1
-#define ROUND_C 2
+#define ROUND_T 0   /* truncate */
+#define ROUND_F 1   /* floor */
+#define ROUND_C 2   /* ceiling */
+#define ROUND_M 3   /* floor with |b|: 0 <= r < |b| (mpz_mod) */
 
-/* q = round(a / b), r = a - q b (either may be NULL), q, r not aliased
-   with a, b */
-static void
-_flint_mpz_div_qr_noalias(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b, int mode)
+/* The case an < bn (truncated quotient 0) and division by zero, handled
+   in the exported functions before tail-calling the main code, whose stack
+   frame is heavier. q and r may alias a and b (but not each other). */
+FLINT_FORCE_INLINE void
+_mpz_div_qr_short(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b,
+    const int MODE, const int WANT_Q, const int WANT_R)
 {
-    mp_size_t an = FLINT_ABS(a->_mp_size), bn = FLINT_ABS(b->_mp_size);
-    mp_size_t qn = an - bn + 1, rn;
-    int asgn = (a->_mp_size < 0) ? -1 : 1;
-    int bsgn = (b->_mp_size < 0) ? -1 : 1;
-    int qsgn = asgn * bsgn;
-    mp_ptr qd = NULL, rd;
-    mpz_t rtmp;
-    int rtmp_used = 0;
+    mp_size_t as = a->_mp_size, bs = b->_mp_size;
+    mp_size_t an = FLINT_ABS(as), bn = FLINT_ABS(bs), rn;
+    mp_ptr qd, rd;
+    int adjust;
 
-    FLINT_ASSERT(bn >= 1);
-
-    if (an < bn)
-    {
-        /* truncated quotient 0, remainder a */
-        if (q != NULL)
-            q->_mp_size = 0;
-
-        if (r != NULL)
-        {
-            mpz_set(r, a);
-        }
-        else if (mode != ROUND_T && an != 0)
-        {
-            /* need the sign of the remainder only: it is that of a */
-            if ((mode == ROUND_F && asgn != bsgn) || (mode == ROUND_C && asgn == bsgn))
-                mpz_set_si(q, (mode == ROUND_F) ? -1 : 1);
-            return;
-        }
-        else
-        {
-            return;
-        }
-
-        goto adjust;
-    }
-
-    if (q != NULL)
-        qd = FLINT_MPZ_REALLOC(q, qn + 1);   /* +1 for the rounding carry */
-
-    if (r == NULL)
-    {
-        if (mode == ROUND_T)
-        {
-            flint_mpn_tdiv_q(qd, a->_mp_d, an, b->_mp_d, bn);
-            while (qn > 0 && qd[qn - 1] == 0)
-                qn--;
-            q->_mp_size = (qsgn < 0) ? -qn : qn;
-            return;
-        }
-
-        /* the remainder is needed to decide the rounding */
-        mpz_init2(rtmp, FLINT_BITS * bn);
-        rtmp_used = 1;
-        r = rtmp;
-    }
-
-    rd = FLINT_MPZ_REALLOC(r, bn);
-
-    if (q != NULL)
-        _flint_mpn_tdiv_qr(qd, rd, a->_mp_d, an, b->_mp_d, bn);
-    else
-        flint_mpn_tdiv_r(rd, a->_mp_d, an, b->_mp_d, bn);
-
-    if (q != NULL)
-    {
-        while (qn > 0 && qd[qn - 1] == 0)
-            qn--;
-        q->_mp_size = (qsgn < 0) ? -qn : qn;
-    }
-
-    rn = bn;
-    while (rn > 0 && rd[rn - 1] == 0)
-        rn--;
-    r->_mp_size = (asgn < 0) ? -rn : rn;
-
-adjust:
-    /* truncated division leaves r with the sign of a; floor wants the sign
-       of b, ceiling the opposite sign */
-    if (mode != ROUND_T && r->_mp_size != 0)
-    {
-        int rsgn = (r->_mp_size < 0) ? -1 : 1;
-
-        if (mode == ROUND_F && rsgn != bsgn)
-        {
-            if (q != NULL)
-                mpz_sub_ui(q, q, 1);
-            if (!rtmp_used)
-                mpz_add(r, r, b);
-        }
-        else if (mode == ROUND_C && rsgn == bsgn)
-        {
-            if (q != NULL)
-                mpz_add_ui(q, q, 1);
-            if (!rtmp_used)
-                mpz_sub(r, r, b);
-        }
-    }
-
-    if (rtmp_used)
-        mpz_clear(rtmp);
-}
-
-static void
-_flint_mpz_div_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b, int mode)
-{
-    mpz_t qt, rt;
-    mpz_ptr qq = q, rr = r;
-    int qalias = (q != NULL) && (q == a || q == b);
-    int ralias = (r != NULL) && (r == a || r == b);
-
-    if (b->_mp_size == 0)
+    if (FLINT_UNLIKELY(bn == 0))
         flint_throw(FLINT_DIVZERO, "flint_mpz division by zero\n");
 
-    /* GMP's mpz layer has dedicated fast paths for one- and two-limb
-       divisors which the generic mpn code cannot match */
-    if (FLINT_ABS(b->_mp_size) <= 2)
+    /* truncated quotient 0, remainder a */
+    adjust = (an != 0) &&
+        ((MODE == ROUND_F && (as ^ bs) < 0) ||
+         (MODE == ROUND_C && (as ^ bs) >= 0) ||
+         (MODE == ROUND_M && as < 0));
+
+    if (WANT_R)
     {
-        if (q != NULL && r != NULL)
+        if (adjust)
         {
-            if (mode == ROUND_T) mpz_tdiv_qr(q, r, a, b);
-            else if (mode == ROUND_F) mpz_fdiv_qr(q, r, a, b);
-            else mpz_cdiv_qr(q, r, a, b);
+            /* |r| = |b| - |a|; r is written before q, which may alias
+               a or b */
+            rd = FLINT_MPZ_REALLOC(r, bn);
+            mpn_sub(rd, b->_mp_d, bn, a->_mp_d, an);
+            rn = bn;
+            while (rd[rn - 1] == 0)
+                rn--;
+            if (MODE == ROUND_F)
+                r->_mp_size = (bs < 0) ? -rn : rn;
+            else if (MODE == ROUND_C)
+                r->_mp_size = (bs < 0) ? rn : -rn;
+            else
+                r->_mp_size = rn;
         }
-        else if (q != NULL)
+        else if (r != a)
         {
-            if (mode == ROUND_T) mpz_tdiv_q(q, a, b);
-            else if (mode == ROUND_F) mpz_fdiv_q(q, a, b);
-            else mpz_cdiv_q(q, a, b);
+            rd = FLINT_MPZ_REALLOC(r, an);
+            flint_mpn_copyi(rd, a->_mp_d, an);
+            r->_mp_size = as;
+        }
+    }
+
+    if (WANT_Q)
+    {
+        if (adjust)
+        {
+            qd = FLINT_MPZ_REALLOC(q, 1);
+            qd[0] = 1;
+            q->_mp_size = (MODE == ROUND_F) ? -1 : 1;
         }
         else
         {
-            if (mode == ROUND_T) mpz_tdiv_r(r, a, b);
-            else if (mode == ROUND_F) mpz_fdiv_r(r, a, b);
-            else mpz_cdiv_r(r, a, b);
+            q->_mp_size = 0;
         }
-        return;
-    }
-
-    if (qalias)
-    {
-        mpz_init(qt);
-        qq = qt;
-    }
-    if (ralias)
-    {
-        mpz_init(rt);
-        rr = rt;
-    }
-
-    _flint_mpz_div_qr_noalias(qq, rr, a, b, mode);
-
-    /* copy rather than swap: the outputs may be fmpz-pooled mpz's, which
-       must keep their own allocation */
-    if (qalias)
-    {
-        mpz_set(q, qt);
-        mpz_clear(qt);
-    }
-    if (ralias)
-    {
-        mpz_set(r, rt);
-        mpz_clear(rt);
     }
 }
 
-void _flint_mpz_tdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, r, a, b, ROUND_T); }
-void _flint_mpz_tdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, NULL, a, b, ROUND_T); }
-void _flint_mpz_tdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(NULL, r, a, b, ROUND_T); }
-void _flint_mpz_fdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, r, a, b, ROUND_F); }
-void _flint_mpz_fdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, NULL, a, b, ROUND_F); }
-void _flint_mpz_fdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(NULL, r, a, b, ROUND_F); }
-void _flint_mpz_cdiv_qr(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, r, a, b, ROUND_C); }
-void _flint_mpz_cdiv_q(mpz_ptr q, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(q, NULL, a, b, ROUND_C); }
-void _flint_mpz_cdiv_r(mpz_ptr r, mpz_srcptr a, mpz_srcptr b) { _flint_mpz_div_qr(NULL, r, a, b, ROUND_C); }
-
-/* r = a mod b with 0 <= r < |b| */
-void
-_flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b)
+/* q = round(a / b), r = a - q b for an >= bn >= 1, computing q only if
+   WANT_Q and r only if WANT_R; q and r may alias a and b (but not each
+   other) */
+FLINT_FORCE_INLINE void
+_mpz_div_qr_main(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b,
+    const int MODE, const int WANT_Q, const int WANT_R)
 {
-    _flint_mpz_div_qr(NULL, r, a, b, (b->_mp_size < 0) ? ROUND_C : ROUND_F);
-}
-
-void
-_flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
-{
-    mp_size_t an = FLINT_ABS(a->_mp_size), bn = FLINT_ABS(b->_mp_size), qn;
-    int qsgn = ((a->_mp_size < 0) ? -1 : 1) * ((b->_mp_size < 0) ? -1 : 1);
-    mp_ptr qd;
-
-    if (bn == 0)
-        flint_throw(FLINT_DIVZERO, "flint_mpz_divexact: division by zero\n");
-
-    if (bn <= 2)
-    {
-        mpz_divexact(q, a, b);
-        return;
-    }
-
-    if (an < bn)
-    {
-        q->_mp_size = 0;
-        return;
-    }
-
-    if (q == a || q == b)
-    {
-        mpz_t t;
-        mpz_init(t);
-        _flint_mpz_divexact(t, a, b);
-        mpz_set(q, t);      /* not swap: q may be an fmpz-pooled mpz */
-        mpz_clear(t);
-        return;
-    }
+    mp_size_t as = a->_mp_size, bs = b->_mp_size;
+    mp_size_t an = FLINT_ABS(as), bn = FLINT_ABS(bs), qn, rn;
+    mp_srcptr ad, bd;
+    mp_ptr qd, rd;
+    int adjust, need_r;
+    TMP_INIT;
 
     qn = an - bn + 1;
+    need_r = WANT_R || MODE != ROUND_T;
+    ad = a->_mp_d;
+    bd = b->_mp_d;
+
+    TMP_START;
+
+    /* inputs overwritten by an output are copied first */
+    if ((WANT_Q && q == a) || (WANT_R && r == a))
+    {
+        mp_ptr t = TMP_ALLOC(an * sizeof(mp_limb_t));
+        flint_mpn_copyi(t, ad, an);
+        ad = t;
+    }
+    if ((WANT_Q && q == b) || (WANT_R && r == b))
+    {
+        mp_ptr t = TMP_ALLOC(bn * sizeof(mp_limb_t));
+        flint_mpn_copyi(t, bd, bn);
+        bd = t;
+    }
+
+    if (WANT_Q)
+        qd = FLINT_MPZ_REALLOC(q, qn + (MODE != ROUND_T));
+    else
+        qd = TMP_ALLOC(qn * sizeof(mp_limb_t));
+
+    if (WANT_R)
+        rd = FLINT_MPZ_REALLOC(r, bn);
+    else if (need_r)
+        rd = TMP_ALLOC(bn * sizeof(mp_limb_t));
+    else
+        rd = NULL;
+
+    _flint_mpn_tdiv_qr(qd, rd, ad, an, bd, bn);
+
+    rn = 0;
+    adjust = 0;
+    if (need_r)
+    {
+        rn = bn;
+        while (rn > 0 && rd[rn - 1] == 0)
+            rn--;
+        adjust = (rn != 0) &&
+            ((MODE == ROUND_F && (as ^ bs) < 0) ||
+             (MODE == ROUND_C && (as ^ bs) >= 0) ||
+             (MODE == ROUND_M && as < 0));
+    }
+
+    if (WANT_Q)
+    {
+        /* the top quotient limb may be zero, and only that one */
+        qn -= (qd[qn - 1] == 0);
+
+        if (adjust)
+        {
+            if (qn == 0)
+                qd[qn++] = 1;
+            else if (mpn_add_1(qd, qd, qn, 1))
+                qd[qn++] = 1;
+        }
+
+        q->_mp_size = ((as ^ bs) < 0) ? -qn : qn;
+    }
+
+    if (WANT_R)
+    {
+        if (adjust)
+        {
+            /* |r| = |b| - |r| */
+            mpn_sub(rd, bd, bn, rd, rn);
+            rn = bn;
+            while (rd[rn - 1] == 0)
+                rn--;
+
+            if (MODE == ROUND_F)
+                r->_mp_size = (bs < 0) ? -rn : rn;
+            else if (MODE == ROUND_C)
+                r->_mp_size = (bs < 0) ? rn : -rn;
+            else
+                r->_mp_size = rn;
+        }
+        else
+        {
+            r->_mp_size = (MODE != ROUND_M && as < 0) ? -rn : rn;
+        }
+    }
+
+    TMP_END;
+}
+
+#define DEF_DIV(name, PARAMS, Q, R, MODE, WANT_Q, WANT_R) \
+FLINT_STATIC_NOINLINE void \
+_mpz_##name(mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b) \
+{ \
+    _mpz_div_qr_main(q, r, a, b, MODE, WANT_Q, WANT_R); \
+} \
+void flint_mpz_##name PARAMS \
+{ \
+    if (FLINT_ABS(a->_mp_size) < FLINT_ABS(b->_mp_size) || b->_mp_size == 0) \
+        _mpz_div_qr_short(Q, R, a, b, MODE, WANT_Q, WANT_R); \
+    else \
+        _mpz_##name(Q, R, a, b); \
+}
+
+DEF_DIV(tdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), q, r, ROUND_T, 1, 1)
+DEF_DIV(tdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), q, NULL, ROUND_T, 1, 0)
+DEF_DIV(tdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), NULL, r, ROUND_T, 0, 1)
+DEF_DIV(fdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), q, r, ROUND_F, 1, 1)
+DEF_DIV(fdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), q, NULL, ROUND_F, 1, 0)
+DEF_DIV(fdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), NULL, r, ROUND_F, 0, 1)
+DEF_DIV(cdiv_qr, (mpz_ptr q, mpz_ptr r, mpz_srcptr a, mpz_srcptr b), q, r, ROUND_C, 1, 1)
+DEF_DIV(cdiv_q, (mpz_ptr q, mpz_srcptr a, mpz_srcptr b), q, NULL, ROUND_C, 1, 0)
+DEF_DIV(cdiv_r, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), NULL, r, ROUND_C, 0, 1)
+DEF_DIV(mod, (mpz_ptr r, mpz_srcptr a, mpz_srcptr b), NULL, r, ROUND_M, 0, 1)
+
+FLINT_STATIC_NOINLINE void
+_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
+{
+    mp_size_t as = a->_mp_size, bs = b->_mp_size;
+    mp_size_t an = FLINT_ABS(as), bn = FLINT_ABS(bs), qn;
+    mp_srcptr ad, bd;
+    mp_ptr qd;
+    TMP_INIT;
+
+    qn = an - bn + 1;
+    ad = a->_mp_d;
+    bd = b->_mp_d;
+
+    TMP_START;
+
+    if (q == a)
+    {
+        mp_ptr t = TMP_ALLOC(an * sizeof(mp_limb_t));
+        flint_mpn_copyi(t, ad, an);
+        ad = t;
+    }
+    else if (q == b)
+    {
+        mp_ptr t = TMP_ALLOC(bn * sizeof(mp_limb_t));
+        flint_mpn_copyi(t, bd, bn);
+        bd = t;
+    }
+
     qd = FLINT_MPZ_REALLOC(q, qn);
-    flint_mpn_divexact(qd, a->_mp_d, an, b->_mp_d, bn);
-    while (qn > 0 && qd[qn - 1] == 0)
-        qn--;
-    q->_mp_size = (qsgn < 0) ? -qn : qn;
+    flint_mpn_divexact(qd, ad, an, bd, bn);
+    qn -= (qd[qn - 1] == 0);
+    q->_mp_size = ((as ^ bs) < 0) ? -qn : qn;
+
+    TMP_END;
+}
+
+void
+flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
+{
+    mp_size_t an = FLINT_ABS(a->_mp_size), bn = FLINT_ABS(b->_mp_size);
+
+    if (FLINT_UNLIKELY(bn == 0))
+        flint_throw(FLINT_DIVZERO, "flint_mpz_divexact: division by zero\n");
+
+    if (an < bn)
+        q->_mp_size = 0;
+    else
+        _mpz_divexact(q, a, b);
 }
 
 /* s = floor(sqrt(a)), r = a - s^2 (r may be NULL); a >= 0 */
-void
-_flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a)
+FLINT_FORCE_INLINE void
+_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a)
 {
     mp_size_t an = a->_mp_size, sn, rn;
+    mp_srcptr ad;
     mp_ptr sd, rd;
+    TMP_INIT;
 
-    if (an < 0)
-        flint_throw(FLINT_ERROR, "flint_mpz_sqrtrem: negative input\n");
-
-    if (an == 0)
+    if (FLINT_UNLIKELY(an <= 0))
     {
+        if (an < 0)
+            flint_throw(FLINT_ERROR, "flint_mpz_sqrtrem: negative input\n");
         s->_mp_size = 0;
         if (r != NULL)
             r->_mp_size = 0;
         return;
     }
 
-    if (s == a || r == a)
+    sn = (an + 1) / 2;
+    ad = a->_mp_d;
+
+    /* inputs of at most FLINT_MPN_SQRTREM_SMALL limbs: dedicated code
+       needing sn + 1 limbs of remainder space */
+    if (an <= FLINT_MPN_SQRTREM_SMALL && s != a && r != a)
     {
-        mpz_t t;
-        mpz_init(t);
-        mpz_set(t, a);
-        _flint_mpz_sqrtrem(s, r, t);
-        mpz_clear(t);
+        sd = FLINT_MPZ_REALLOC(s, sn);
+        if (r != NULL)
+        {
+            rd = FLINT_MPZ_REALLOC(r, sn + 1);
+            r->_mp_size = _flint_mpn_sqrtrem(sd, rd, ad, an);
+        }
+        else
+        {
+            _flint_mpn_sqrtrem(sd, NULL, ad, an);
+        }
+        s->_mp_size = sn;
         return;
     }
 
-    sn = (an + 1) / 2;
+    TMP_START;
+
+    if (s == a || r == a)
+    {
+        mp_ptr t = TMP_ALLOC(an * sizeof(mp_limb_t));
+        flint_mpn_copyi(t, ad, an);
+        ad = t;
+    }
+
     sd = FLINT_MPZ_REALLOC(s, sn);
 
     if (r == NULL)
     {
-        flint_mpn_sqrtrem(sd, NULL, a->_mp_d, an);
+        flint_mpn_sqrtrem(sd, NULL, ad, an);
     }
-    else if (an > 2 && an < FLINT_MPN_SQRTREM_NEWTON_CUTOFF)
+    else if (FLINT_MPN_SQRTREM_USE_GMP(an))
     {
-        /* GMP writes the remainder in place given an limbs of room, so no
-           temporary and copy are needed here */
+        /* GMP writes the remainder in place given an limbs of room */
         rd = FLINT_MPZ_REALLOC(r, an);
-        rn = mpn_sqrtrem(sd, rd, a->_mp_d, an);
+        rn = mpn_sqrtrem(sd, rd, ad, an);
         r->_mp_size = rn;
     }
     else
     {
         rd = FLINT_MPZ_REALLOC(r, FLINT_MAX(an, sn + 1));
-        rn = flint_mpn_sqrtrem(sd, rd, a->_mp_d, an);
+        rn = flint_mpn_sqrtrem(sd, rd, ad, an);
         r->_mp_size = rn;
     }
 
     s->_mp_size = sn;   /* the root has exactly sn limbs */
+
+    TMP_END;
 }
+
+void flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a) { _mpz_sqrtrem(s, r, a); }
+void flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a) { _mpz_sqrtrem(s, NULL, a); }

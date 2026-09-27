@@ -58,7 +58,10 @@ _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1,
         b1 = FLINT_ABS(b1);
         b2 = FLINT_ABS(b2);
 
-        if (b1 + b2 < 2 * FLINT_BITS)
+        /* The heuristic gcd is faster for very small coefficients; it
+           also frequently needs to fall back on the modular algorithm
+           when the coefficients are large. */
+        if (b1 + b2 <= 40)
         {
             if (_fmpz_poly_gcd_heuristic(res, poly1, len1, poly2, len2))
                 return;

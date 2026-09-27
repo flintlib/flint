@@ -29,6 +29,12 @@ TEST_FUNCTION_START(flint_mpn_divexact, state)
             bn = 1 + n_randint(state, 800);
             n = 1 + n_randint(state, 800);
         }
+        else if (n_randint(state, 100) == 0)
+        {
+            /* long quotients, reaching the unbalanced Newton cutoff */
+            bn = 1 + n_randint(state, 500);
+            n = bn * (1 + n_randint(state, 6));
+        }
 
         b = flint_malloc(bn * sizeof(mp_limb_t));
         q = flint_malloc((n + 1) * sizeof(mp_limb_t));

@@ -321,31 +321,34 @@ have_choice:
    Direct computation requires `mod.n` to be prime and `mod.n - 1`
    to have sufficiently high 2-valuation.
    This is usually faster when CRT would need multiple primes, but it pays
-   the setup cost of initializing and clearing a temporary `sd_fft_ctx_t`.  */
+   the setup cost of initializing and clearing a temporary `sd_fft_ctx_t`,
+   which is only significant for very short operands.  */
 static int
 _nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
 {
-    if (bn < 1500)
-        return 0;
+    /* cache the last modulus found to be prime */
+    static FLINT_TLS_PREFIX ulong last_prime = 0;
 
-    if (mod.n <= 2 || mod.n > (UWORD(1) << 50))
+    if (bn < 100)
         return 0;
 
     if (NMOD_BITS(mod) < 20)
         return 0;
 
-    if (!fft_small_mulmod_satisfies_bounds(mod.n))
-        /* should be implied by the 50-bit bound, but just in case */
+    if (!fft_small_prime_supports_depth(mod.n, depth))
         return 0;
 
-    if (depth > SD_FFT_CTX_W2TAB_SIZE)
-        /* unlikely, the convolution length would have to be massive */
-        return 0;
+    /* check the most expensive condition last */
+    if (mod.n == last_prime)
+        return 1;
 
-    if (n_trailing_zeros(mod.n - 1) < depth)
-        return 0;
+    if (n_is_prime(mod.n))
+    {
+        last_prime = mod.n;
+        return 1;
+    }
 
-    return n_is_prime(mod.n); /* check the most expensive condition last */
+    return 0;
 }
 
 /* np/offset selection shared by the nmod plans. len_bound * 2^prod_bits

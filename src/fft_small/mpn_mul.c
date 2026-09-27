@@ -1708,19 +1708,9 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
     depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
 #if MPN_MUL_USE_WRAPAROUND
     {
-        /*
-            Largest power of two w = 2^d with w <= zlen.  Note that this file's
-            n_flog2(x) returns nbits(x) = floor(log2 x) + 1 (not floor(log2 x)),
-            so n_pow2(n_flog2(zlen)) is the power of two *above* zlen; halve it
-            to land at or below zlen.
-        */
+        /* largest power of two w = 2^d with w <= zlen */
         ulong d = n_flog2(zlen);
         ulong w = n_pow2(d);
-        if (w > zlen)
-        {
-            w >>= 1;
-            d -= 1;
-        }
         if (d >= LG_BLK_SZ &&
             atrunc <= w && btrunc <= w && c_hi <= w && w <= zlen && zlen <= c_lo + w)
         {

@@ -91,7 +91,7 @@ Integers
    long_extras.rst
    longlong.rst
    mpn_extras.rst
-   fixed.rst
+   mp_real.rst
    aprcl.rst
    ecpp.rst
    arith.rst
@@ -213,7 +213,6 @@ Real and complex numbers
    acb_theta.rst
    acb_dirichlet.rst
    bernoulli.rst
-   hypgeom.rst
    partitions.rst
    arb_calc.rst
    acb_calc.rst

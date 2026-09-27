@@ -63,7 +63,7 @@
     y0 = V##_add(x0, x1); \
     y1 = V##_sub(x1, x0); \
     y0 = V##_reduce_to_pm1n(y0, n, ninv); \
-    y1 = V##_mulmod(y1, W, n, ninv); \
+    y1 = V##_mulmod_fast(y1, W, n, ninv); \
     V##_store(X0, y0); \
     V##_store(X1, y1); \
 }
@@ -113,7 +113,7 @@ static void radix_2_moth_inv_trunc_block_1_2_1(
         VECND a, b, u, v;
         a = VECNOP(load)(X0 + i);
         b = VECNOP(load)(X1 + i);
-        b = VECNOP(nmulmod)(b, w, n, ninv);
+        b = VECNOP(nmulmod_fast)(b, w, n, ninv);
         u = VECNOP(fmadd)(c, a, b);
         v = VECNOP(add)(a, b);
         u = VECNOP(reduce_to_pm1n)(u, n, ninv);
@@ -138,7 +138,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
         VECND a, b, u;
         a = VECNOP(load)(X0 + i);
         b = VECNOP(load)(X1 + i);
-        b = VECNOP(mulmod)(b, w, n, ninv);
+        b = VECNOP(mulmod_fast)(b, w, n, ninv);
         u = VECNOP(fmsub)(c, a, b);
         u = VECNOP(reduce_to_pm1n)(u, n, ninv);
         VECNOP(store)(X0 + i, u);
@@ -197,9 +197,9 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
         VECND a, b;
         a = VECNOP(load)(X0 + i);
         b = VECNOP(load)(X1 + i);
-        b = VECNOP(mulmod)(b, w, n, ninv);
+        b = VECNOP(mulmod_fast)(b, w, n, ninv);
         a = VECNOP(add)(a, b);
-        a = VECNOP(mulmod)(a, c, n, ninv);
+        a = VECNOP(mulmod_fast)(a, c, n, ninv);
         VECNOP(store)(X0 + i, a);
     } while (i += N, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
@@ -217,7 +217,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     ulong i = 0; do {
         VECND a;
         a = VECNOP(load)(X0 + i);
-        a = VECNOP(mulmod)(a, c, n, ninv);
+        a = VECNOP(mulmod_fast)(a, c, n, ninv);
         VECNOP(store)(X0 + i, a);
     } while (i += N, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
@@ -251,7 +251,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     y0 = V##_reduce_to_pm1n(y0, n, ninv); \
     y1 = V##_reduce_to_pm1n(y1, n, ninv); \
     y2 = V##_reduce_to_pm1n(y2, n, ninv); \
-    y3 = V##_mulmod(y3, IW, n, ninv); \
+    y3 = V##_mulmod_fast(y3, IW, n, ninv); \
     V##_store(X0, V##_add(y0, y1)); \
     V##_store(X2, V##_sub(y0, y1)); \
     V##_store(X1, V##_sub(y2, y3)); \
@@ -276,16 +276,17 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     y1 = V##_add(x2, x3); \
     y2 = V##_sub(x0, x1); \
     y3 = V##_sub(x3, x2); \
-    y2 = V##_mulmod(y2, W, n, ninv); \
-    y3 = V##_mulmod(y3, IW, n, ninv); \
+    y2 = V##_mulmod_fast(y2, W, n, ninv); \
+    y3 = V##_mulmod_fast(y3, IW, n, ninv); \
     x0 = V##_add(y0, y1); \
     x1 = V##_sub(y3, y2); \
     V##_store(X1, x1); \
     x2 = V##_sub(y1, y0); \
     x3 = V##_add(y3, y2); \
     x0 = V##_reduce_to_pm1n(x0, n, ninv); \
+    /* |x2| < 8n: may exceed the mulmod_fast range */ \
     x2 = V##_mulmod(x2, W2, n, ninv); \
-    x3 = V##_mulmod(x3, W2, n, ninv); \
+    x3 = V##_mulmod_fast(x3, W2, n, ninv); \
     V##_store(X0, x0); \
     V##_store(X2, x2); \
     V##_store(X3, x3); \
@@ -301,7 +302,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
 { \
    T Z0 = x0, Z1 = x1; \
    x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
-   x1 = CAT(T, mulmod)(CAT(T, sub)(Z1, Z0), w0, n, ninv); \
+   x1 = CAT(T, mulmod_fast)(CAT(T, sub)(Z1, Z0), w0, n, ninv); \
 }
 
 #define LENGTH2INV_ZERO_J(T, x0, x1, n, ninv) \
@@ -318,16 +319,17 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     Y1 = CAT(T, add)(X2, X3); \
     Y2 = CAT(T, sub)(X0, X1); \
     Y3 = CAT(T, sub)(X3, X2); \
-    Y2 = CAT(T, mulmod)(Y2, ww0, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, ww1, n, ninv); \
+    Y2 = CAT(T, mulmod_fast)(Y2, ww0, n, ninv); \
+    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
     Z0 = CAT(T, add)(Y0, Y1); \
     Z1 = CAT(T, sub)(Y3, Y2); \
     Z2 = CAT(T, sub)(Y1, Y0); \
     Z3 = CAT(T, add)(Y3, Y2); \
     x0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
     x1 = Z1; \
+    /* |Z2| < 8n: may exceed the mulmod_fast range */ \
     x2 = CAT(T, mulmod)(Z2, w0, n, ninv); \
-    x3 = CAT(T, mulmod)(Z3, w0, n, ninv); \
+    x3 = CAT(T, mulmod_fast)(Z3, w0, n, ninv); \
 }
 
 #define LENGTH4INV_ZERO_J(T, x0, x1, x2, x3, n, ninv, ww1) \
@@ -340,7 +342,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     Y0 = CAT(T, reduce_to_pm1n)(Y0, n, ninv); \
     Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
     Y2 = CAT(T, reduce_to_pm1n)(Y2, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, ww1, n, ninv); \
+    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
     x0 = CAT(T, add)(Y0, Y1); \
     x2 = CAT(T, sub)(Y0, Y1); \
     x1 = CAT(T, sub)(Y2, Y3); \
@@ -704,7 +706,7 @@ static void radix_4_moth_inv_trunc_block_3_4_1(
     double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     VECMD fr = VECMOP(set_d)(rw);                         /* r*w */
     VECMD fq = VECMOP(set_d)(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
-    VECMD fp_ = VECMOP(mulmod)(fr, fq, n, ninv);
+    VECMD fp_ = VECMOP(mulmod_fast)(fr, fq, n, ninv);
     VECMD fp = VECMOP(reduce_pm1n_to_pmhn)(fp_, n);       /* r*w^3 */
     ulong i = 0; do {
         VECMD a, b, c, d, u, v, p, q, r;
@@ -714,18 +716,18 @@ static void radix_4_moth_inv_trunc_block_3_4_1(
         d = VECMOP(load)(X3+i);
         u = VECMOP(add)(a, b);
         v = VECMOP(sub)(a, b);
-        p = VECMOP(mulmod)(d, fp, n, ninv);
-        q = VECMOP(mulmod)(d, fq, n, ninv);
-        r = VECMOP(mulmod)(d, fr, n, ninv);
+        p = VECMOP(mulmod_fast)(d, fp, n, ninv);
+        q = VECMOP(mulmod_fast)(d, fq, n, ninv);
+        r = VECMOP(mulmod_fast)(d, fr, n, ninv);
         c = VECMOP(reduce_to_pm1n)(c, n, ninv);
         u = VECMOP(reduce_to_pm1n)(u, n, ninv);
-        b = VECMOP(mulmod)(v, f1, n, ninv);
-        v = VECMOP(mulmod)(v, f0, n, ninv);
+        b = VECMOP(mulmod_fast)(v, f1, n, ninv);
+        v = VECMOP(mulmod_fast)(v, f0, n, ninv);
         d = VECMOP(sub)(c, v);
         c = VECMOP(fmsub)(f2, c, v);
         a = VECMOP(add)(c, u);
         c = VECMOP(sub)(c, u);
-        c = VECMOP(mulmod)(c, f3, n, ninv);
+        c = VECMOP(mulmod_fast)(c, f3, n, ninv);
         VECMOP(store)(X0+i, VECMOP(add)(a, p));
         VECMOP(store)(X1+i, VECMOP(sub)(b, q));
         VECMOP(store)(X2+i, VECMOP(sub)(c, r));
@@ -759,7 +761,7 @@ static void radix_4_moth_inv_trunc_block_3_4_0(
     double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     VECMD fr = VECMOP(set_d)(rw);                         /* r*w */
     VECMD fq = VECMOP(set_d)(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
-    VECMD fp_ = VECMOP(mulmod)(fr, fq, n, ninv);
+    VECMD fp_ = VECMOP(mulmod_fast)(fr, fq, n, ninv);
     VECMD fp = VECMOP(reduce_pm1n_to_pmhn)(fp_, n);       /* r*w^3 */
     ulong i = 0; do {
         VECMD a, b, c, d, u, v, p, q, r;
@@ -769,17 +771,17 @@ static void radix_4_moth_inv_trunc_block_3_4_0(
         d = VECMOP(load)(X3+i);
         u = VECMOP(add)(a, b);
         v = VECMOP(sub)(a, b);
-        p = VECMOP(mulmod)(d, fp, n, ninv);
-        q = VECMOP(mulmod)(d, fq, n, ninv);
-        r = VECMOP(mulmod)(d, fr, n, ninv);
+        p = VECMOP(mulmod_fast)(d, fp, n, ninv);
+        q = VECMOP(mulmod_fast)(d, fq, n, ninv);
+        r = VECMOP(mulmod_fast)(d, fr, n, ninv);
         c = VECMOP(reduce_to_pm1n)(c, n, ninv);
         u = VECMOP(reduce_to_pm1n)(u, n, ninv);
-        b = VECMOP(mulmod)(v, f1, n, ninv);
-        v = VECMOP(mulmod)(v, f0, n, ninv);
+        b = VECMOP(mulmod_fast)(v, f1, n, ninv);
+        v = VECMOP(mulmod_fast)(v, f0, n, ninv);
         c = VECMOP(fmsub)(f2, c, v);
         a = VECMOP(add)(c, u);
         c = VECMOP(sub)(c, u);
-        c = VECMOP(mulmod)(c, f3, n, ninv);
+        c = VECMOP(mulmod_fast)(c, f3, n, ninv);
         a = VECMOP(add)(a, p);
         b = VECMOP(sub)(b, q);
         c = VECMOP(sub)(c, r);
@@ -823,15 +825,15 @@ static void radix_4_moth_inv_trunc_block_3_3_1(
         b = VECNOP(load)(X1+i);
         c = VECNOP(load)(X2+i);
         v = VECNOP(sub)(a, b);
-        VECNOP(store)(X1+i, VECNOP(mulmod)(v, f1, n, ninv));
+        VECNOP(store)(X1+i, VECNOP(mulmod_fast)(v, f1, n, ninv));
         c = VECNOP(reduce_to_pm1n)(c, n, ninv);
-        v = VECNOP(mulmod)(v, f0, n, ninv);
+        v = VECNOP(mulmod_fast)(v, f0, n, ninv);
         VECNOP(store)(X3+i, VECNOP(sub)(c, v));
         u = VECNOP(reduce_to_pm1n)(VECNOP(add)(a, b), n, ninv);
         c = VECNOP(fnmadd)(f2, c, v);
         a = VECNOP(sub)(u, c);
         c = VECNOP(add)(u, c);
-        c = VECNOP(nmulmod)(c, f3, n, ninv);
+        c = VECNOP(nmulmod_fast)(c, f3, n, ninv);
         VECNOP(store)(X0+i, a);
         VECNOP(store)(X2+i, c);
     } while (i += N, i < BLK_SZ);
@@ -873,15 +875,15 @@ static void radix_4_moth_inv_trunc_block_3_3_0(
         b = VECNOP(load)(X1+i);
         c = VECNOP(load)(X2+i);
         v = VECNOP(sub)(a, b);
-        VECNOP(store)(X1+i, VECNOP(mulmod)(v, f1, n, ninv));
+        VECNOP(store)(X1+i, VECNOP(mulmod_fast)(v, f1, n, ninv));
         c = VECNOP(reduce_to_pm1n)(c, n, ninv);
-        v = VECNOP(mulmod)(v, f0, n, ninv);
+        v = VECNOP(mulmod_fast)(v, f0, n, ninv);
         u = VECNOP(add)(a, b);
         u = VECNOP(reduce_to_pm1n)(u, n, ninv);
         c = VECNOP(fnmadd)(f2, c, v);
         a = VECNOP(sub)(u, c);
         c = VECNOP(add)(u, c);
-        c = VECNOP(nmulmod)(c, f3, n, ninv);
+        c = VECNOP(nmulmod_fast)(c, f3, n, ninv);
         VECNOP(store)(X0+i, a);
         VECNOP(store)(X2+i, c);
     } while (i += N, i < BLK_SZ);
@@ -907,7 +909,7 @@ static void radix_4_moth_inv_trunc_block_2_4_1(
     double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     double w = Q->w2tab[j_bits][j_r];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
-    double rw3 = vec1d_mulmod(w, rw, Q->p, Q->pinv);
+    double rw3 = vec1d_mulmod_fast(w, rw, Q->p, Q->pinv);
     VECMD f0 = VECMOP(set_d)(2);
     VECMD f1 = VECMOP(set_d)(twoW);                                   /* 2*w^-1 */
     VECMD f2 = VECMOP(set_d)(vec1d_fnmadd(0.5, Q->p, 0.5));           /* 1/2 */
@@ -920,21 +922,21 @@ static void radix_4_moth_inv_trunc_block_2_4_1(
         v = VECMOP(load)(X1+i);
         a = VECMOP(load)(X2+i);
         b = VECMOP(load)(X3+i);
-        p = VECMOP(mulmod)(a, f4, n, ninv);
-        q = VECMOP(mulmod)(b, f4, n, ninv);
-        r = VECMOP(mulmod)(b, f5, n, ninv);
+        p = VECMOP(mulmod_fast)(a, f4, n, ninv);
+        q = VECMOP(mulmod_fast)(b, f4, n, ninv);
+        r = VECMOP(mulmod_fast)(b, f5, n, ninv);
         s = VECMOP(add)(u, v);
         s = VECMOP(reduce_to_pm1n)(s, n, ninv);
         t = VECMOP(sub)(u, v);
-        g = VECMOP(mulmod)(s, f0, n, ninv);
-        h = VECMOP(mulmod)(t, f1, n, ninv);
-        t = VECMOP(mulmod)(t, f3, n, ninv);
+        g = VECMOP(mulmod_fast)(s, f0, n, ninv);
+        h = VECMOP(mulmod_fast)(t, f1, n, ninv);
+        t = VECMOP(mulmod_fast)(t, f3, n, ninv);
         VECMOP(store)(X0+i, VECMOP(sub)(g, p));
         VECMOP(store)(X1+i, VECMOP(sub)(h, q));
         u = VECMOP(add)(s, t);
         v = VECMOP(add)(p, r);
         u = VECMOP(sub)(u, v);
-        u = VECMOP(mulmod)(u, f2, n, ninv);
+        u = VECMOP(mulmod_fast)(u, f2, n, ninv);
         VECMOP(store)(X2+i, u);
     } while (i += M, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
@@ -963,13 +965,13 @@ static void radix_4_moth_inv_trunc_block_2_4_0(
         b = VECNOP(load)(X1+i);
         c = VECNOP(load)(X2+i);
         d = VECNOP(load)(X3+i);
-        c = VECNOP(mulmod)(c, w2, n, ninv);
-        d = VECNOP(mulmod)(d, w2, n, ninv);
+        c = VECNOP(mulmod_fast)(c, w2, n, ninv);
+        d = VECNOP(mulmod_fast)(d, w2, n, ninv);
         u = VECNOP(add)(a, b);
         v = VECNOP(sub)(a, b);
         u = VECNOP(add)(u, u);
         u = VECNOP(reduce_to_pm1n)(u, n, ninv);
-        v = VECNOP(mulmod)(v, twowi, n, ninv);
+        v = VECNOP(mulmod_fast)(v, twowi, n, ninv);
         u = VECNOP(sub)(u, c);
         v = VECNOP(sub)(v, d);
         VECNOP(store)(X0+i, u);
@@ -1006,9 +1008,10 @@ static void radix_4_moth_inv_trunc_block_2_2_1(
         t = VECNOP(sub)(u, v);
         u = VECNOP(add)(s, s);
         u = VECNOP(reduce_to_pm1n)(u, n, ninv);
-        v = VECNOP(mulmod)(t, c1, n, ninv);
-        t = VECNOP(mulmod)(t, c3, n, ninv);
+        v = VECNOP(mulmod_fast)(t, c1, n, ninv);
+        t = VECNOP(mulmod_fast)(t, c3, n, ninv);
         s = VECNOP(add)(s, t);
+        /* |s| < 5n: may exceed the mulmod_fast range */
         s = VECNOP(mulmod)(s, c2, n, ninv);
         VECNOP(store)(X0+i, u);
         VECNOP(store)(X1+i, v);
@@ -1039,8 +1042,8 @@ static void radix_4_moth_inv_trunc_block_2_2_0(
         v = VECNOP(load)(X1+i);
         s = VECNOP(add)(u, v);
         t = VECNOP(sub)(u, v);
-        u = VECNOP(mulmod)(s, c0, n, ninv);
-        v = VECNOP(mulmod)(t, c1, n, ninv);
+        u = VECNOP(mulmod_fast)(s, c0, n, ninv);
+        v = VECNOP(mulmod_fast)(t, c1, n, ninv);
         VECNOP(store)(X0+i, u);
         VECNOP(store)(X1+i, v);
     } while (i += N, i < BLK_SZ);
@@ -1066,7 +1069,7 @@ static void radix_4_moth_inv_trunc_block_1_4_1(
     VECMD f2 = VECMOP(set_d)(2);
     VECMD w2 = VECMOP(set_d)(W2);
     double ha = vec1d_fnmadd(0.5, Q->p, 0.5);
-    double haW = vec1d_mulmod(W, ha, Q->p, Q->pinv);
+    double haW = vec1d_mulmod_fast(W, ha, Q->p, Q->pinv);
     VECMD wo2 = VECMOP(set_d)(vec1d_reduce_pm1n_to_pmhn(haW, Q->p));
     ulong i = 0; do {
         VECMD a, b, c, d, u;
@@ -1075,10 +1078,10 @@ static void radix_4_moth_inv_trunc_block_1_4_1(
         b = VECMOP(load)(X1+i);
         c = VECMOP(load)(X2+i);
         d = VECMOP(load)(X3+i);
-        c = VECMOP(nmulmod)(c, w2, n, ninv);
-        d = VECMOP(mulmod)(d, w2, n, ninv);
+        c = VECMOP(nmulmod_fast)(c, w2, n, ninv);
+        d = VECMOP(mulmod_fast)(d, w2, n, ninv);
         b = VECMOP(add)(b, d);
-        b = VECMOP(mulmod)(b, wo2, n, ninv);
+        b = VECMOP(mulmod_fast)(b, wo2, n, ninv);
         u = VECMOP(fnmadd)(f2, a, b);
         b = VECMOP(sub)(a, b);
         a = VECMOP(reduce_to_pm1n)(VECMOP(add)(u, u), n, ninv);
@@ -1111,12 +1114,12 @@ static void radix_4_moth_inv_trunc_block_1_4_0(
         c = VECNOP(load)(X2+i);
         d = VECNOP(load)(X3+i);
         a = VECNOP(mul)(a, f1);
-        d = VECNOP(mulmod)(d, w, n, ninv);
+        d = VECNOP(mulmod_fast)(d, w, n, ninv);
         a = VECNOP(reduce_to_pm1n)(a, n, ninv);
-        b = VECNOP(mulmod)(b, w, n, ninv);
+        b = VECNOP(mulmod_fast)(b, w, n, ninv);
         a = VECNOP(sub)(a, b);
         c = VECNOP(add)(c, d);
-        c = VECNOP(mulmod)(c, w2, n, ninv);
+        c = VECNOP(mulmod_fast)(c, w2, n, ninv);
         a = VECNOP(sub)(a, c);
         VECNOP(store)(X0+i, a);
     } while (i += N, i < BLK_SZ);
@@ -1188,13 +1191,13 @@ static void radix_4_moth_inv_trunc_block_0_4_1(
         b = VECNOP(load)(X1+i);
         c = VECNOP(load)(X2+i);
         d = VECNOP(load)(X3+i);
-        b = VECNOP(mulmod)(b, w, n, ninv);
-        d = VECNOP(mulmod)(d, w, n, ninv);
+        b = VECNOP(mulmod_fast)(b, w, n, ninv);
+        d = VECNOP(mulmod_fast)(d, w, n, ninv);
         a = VECNOP(add)(a, b);
         c = VECNOP(add)(c, d);
-        c = VECNOP(mulmod)(c, w2, n, ninv);
+        c = VECNOP(mulmod_fast)(c, w2, n, ninv);
         a = VECNOP(add)(a, c);
-        VECNOP(store)(X0+i, VECNOP(mulmod)(a, one4th, n, ninv));
+        VECNOP(store)(X0+i, VECNOP(mulmod_fast)(a, one4th, n, ninv));
     } while (i += N, i < BLK_SZ);
     FLINT_ASSERT(i == BLK_SZ);
 }

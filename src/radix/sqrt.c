@@ -257,7 +257,7 @@ radix_rsqrt_approx_basecase(nn_ptr Q, nn_srcptr A, slong An, slong n, const radi
     bUn = radix_get_mpn(bU, U, Un, radix);
     bqn = bUn - bsn + 1;
     FLINT_ASSERT(bUn >= bsn);
-    mpn_tdiv_qr(bq, br, 0, bU, bUn, bs, bsn);
+    flint_mpn_tdiv_qr(bq, br, bU, bUn, bs, bsn);
 
     /* Need to do radix conversion in temporary space as radix conversion may
        need an extra output scratch limb. */
@@ -779,11 +779,13 @@ radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
 
     if (an == 1)
     {
-        ulong s0 = n_sqrt(a[0]);
+        /* read a[0] before writing s[0], which may alias it */
+        ulong a0 = a[0];
+        ulong s0 = n_sqrt(a0);
         s[0] = s0;
         if (r != NULL)
         {
-            r[0] = a[0] - s0 * s0;
+            r[0] = a0 - s0 * s0;
             r[1] = 0;
         }
         return;
@@ -810,9 +812,11 @@ radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix)
 
     if (an == 1)
     {
-        ulong s0 = n_sqrt(a[0]);
+        /* read a[0] before writing s[0], which may alias it */
+        ulong a0 = a[0];
+        ulong s0 = n_sqrt(a0);
         s[0] = s0;
-        return s0 * s0 == a[0];
+        return s0 * s0 == a0;
     }
 
     sn = (an + 1) / 2;

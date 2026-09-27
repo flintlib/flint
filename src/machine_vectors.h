@@ -673,6 +673,40 @@ FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
 }
 
 
+/*
+    round_mul(a, b): round(a*b) to the nearest integer.
+
+    With FLINT_FFT_SMALL_ROUND_USE_NATIVE (set per architecture in
+    flint-mparam.h) this is round(mul(a, b)) using vroundpd. Otherwise it
+    uses the magic constant R = 1.5*2^52: fmadd(a, b, R) is the exact a*b + R
+    correctly rounded to an integer (single rounding), then R is subtracted
+    exactly. This requires |a*b| <= 2^51 and round-to-nearest mode, has
+    q_error = 1/2 exactly, and avoids vroundpd, which is 2 uops with 8 cycles
+    latency on Intel cores since Skylake (but 1 uop, 3 cycles on Zen 2-5).
+
+    FLINT_ROUND_MUL_USE_ROUND / FLINT_ROUND_MUL_USE_MAGIC force either
+    choice, for testing and profiling.
+*/
+#include "flint-mparam.h"
+
+#ifndef FLINT_FFT_SMALL_ROUND_USE_NATIVE
+# define FLINT_FFT_SMALL_ROUND_USE_NATIVE 1
+#endif
+
+#if defined(FLINT_ROUND_MUL_USE_ROUND) \
+    || (FLINT_FFT_SMALL_ROUND_USE_NATIVE && !defined(FLINT_ROUND_MUL_USE_MAGIC))
+FLINT_FORCE_INLINE vec1d vec1d_round_mul(vec1d a, vec1d b) { return vec1d_round(vec1d_mul(a, b)); }
+FLINT_FORCE_INLINE vec4d vec4d_round_mul(vec4d a, vec4d b) { return vec4d_round(vec4d_mul(a, b)); }
+#else
+FLINT_FORCE_INLINE vec1d vec1d_round_mul(vec1d a, vec1d b) {
+    return vec1d_sub(vec1d_fmadd(a, b, 6755399441055744.0), 6755399441055744.0);
+}
+FLINT_FORCE_INLINE vec4d vec4d_round_mul(vec4d a, vec4d b) {
+    vec4d R = vec4d_set_d(6755399441055744.0);
+    return vec4d_sub(vec4d_fmadd(a, b, R), R);
+}
+#endif
+
 /* reduce_pm1no_to_0n(a, n): return a mod n in [0,n) assuming a in (-n,n) */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_pm1no_to_0n(V a, V n) { \
@@ -685,7 +719,7 @@ DEFINE_IT(vec4d)
 /* reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n] */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1n(V a, V n, V ninv) { \
-    return V##_fnmadd(V##_round(V##_mul(a, ninv)), n, a); \
+    return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
 }
 DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
@@ -694,7 +728,7 @@ DEFINE_IT(vec4d)
 /* reduce_to_pm1n(a, n, ninv): return a mod n in (-n,n) */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1no(V a, V n, V ninv) { \
-    return V##_fnmadd(V##_round(V##_mul(a, ninv)), n, a); \
+    return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
 }
 DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
@@ -743,6 +777,25 @@ FLINT_FORCE_INLINE V V##_nmulmod(V a, V b, V n, V ninv) { \
     return V##_sub(l, V##_fnmadd(q, n, h)); \
 }
 
+DEFINE_IT(vec1d)
+DEFINE_IT(vec4d)
+#undef DEFINE_IT
+
+/* same as mulmod but requires |a*b| <= 2^51*n, i.e. |a*b| < 2*n^2 for n < 2^50 */
+#define DEFINE_IT(V) \
+FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
+    V h = V##_mul(a, b); \
+    V q = V##_round_mul(h, ninv); \
+    V l = V##_fmsub(a, b, h); \
+    return V##_add(V##_fnmadd(q, n, h), l); \
+} \
+ \
+FLINT_FORCE_INLINE V V##_nmulmod_fast(V a, V b, V n, V ninv) { \
+    V h = V##_mul(a, b); \
+    V q = V##_round_mul(h, ninv); \
+    V l = V##_fnmadd(a, b, h); \
+    return V##_sub(l, V##_fnmadd(q, n, h)); \
+}
 DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
@@ -814,6 +867,8 @@ EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
 EXTEND_VEC_DEF3(vec4n, vec8n, _addmod_limited)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
+EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod_fast)
+EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod_fast)
 
 
 #undef EXTEND_VEC_DEF4
@@ -1555,6 +1610,20 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec2d)
 #undef DEFINE_IT
 
+/* mulmod_fast: see the AVX2 section. frintn is cheap on ARM cores, so here it
+   is simply mulmod. */
+#define DEFINE_IT(V) \
+FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
+    return V##_mulmod(a, b, n, ninv); \
+} \
+ \
+FLINT_FORCE_INLINE V V##_nmulmod_fast(V a, V b, V n, V ninv) { \
+    return V##_nmulmod(a, b, n, ninv); \
+}
+DEFINE_IT(vec1d)
+DEFINE_IT(vec2d)
+#undef DEFINE_IT
+
 
 
 /* vec4d -- NEON/ARM64 *********************************************/
@@ -1696,6 +1765,8 @@ EXTEND_VEC_DEF3(vec2d, vec4d, _fnmsub)
 EXTEND_VEC_DEF3(vec2d, vec4d, _blendv)
 EXTEND_VEC_DEF4(vec2d, vec4d, _mulmod)
 EXTEND_VEC_DEF4(vec2d, vec4d, _nmulmod)
+EXTEND_VEC_DEF4(vec2d, vec4d, _mulmod_fast)
+EXTEND_VEC_DEF4(vec2d, vec4d, _nmulmod_fast)
 
 
 /* vec8d -- NEON/ARM64 *********************************************/
@@ -1787,6 +1858,8 @@ EXTEND_VEC_DEF3(vec4d, vec8d, _fnmsub)
 EXTEND_VEC_DEF3(vec4d, vec8d, _blendv)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
+EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod_fast)
+EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod_fast)
 
 
 

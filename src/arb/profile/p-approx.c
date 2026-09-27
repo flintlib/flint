@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Timing of arf_*_approx (fixed_*_newton) against the previous arb Newton
+/* Timing of arf_*_approx (_mp_real_*_newton) against the previous arb Newton
    iterations in arf arithmetic and against the plain arf (MPFR/GMP)
    functions. */
 

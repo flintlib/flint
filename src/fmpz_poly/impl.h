@@ -18,6 +18,7 @@ void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
 void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
 void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 double _fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly, const slong * poly_exp, slong n, double d, slong dexp);
+void _fmpz_poly_gcd_modular_primes(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, ulong first_prime);
 int _checked_nmod_poly_interpolate(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod_t mod);
 
 /* Internal helpers for the mpn-based multiplication routines ****************/

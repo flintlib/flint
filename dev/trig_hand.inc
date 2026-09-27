@@ -1,4 +1,4 @@
-/* hand-written n = 1 half-angle body; dev/tune_fixed.py
+/* hand-written n = 1 half-angle body; dev/tune_mp_real.py
    substitutes @FN@, @R@, @SERIES@ and copies it into
    trig_opt_1.c on --emit */
 
@@ -24,15 +24,15 @@ void
     slong * used;
     TMP_INIT;
 
-    _fixed_atans_ensure(1, r);
-    nc = _fixed_atans_n;
+    nn_srcptr tab;
+    tab = _mp_real_atans_tab(1, r, &nc);
 
     TMP_START;
-    used = TMP_ALLOC(FIXED_BITWISE_REDUCE_USED_ALLOC(r) * sizeof(slong));
+    used = TMP_ALLOC(MP_REAL_BITWISE_REDUCE_USED_ALLOC(r) * sizeof(slong));
 
     t[0] = x[0] >> 1;
-    num = _fixed_bitwise_reduce(t, 1, r, 1, _fixed_atans, nc, used);
-    _fixed_tan_rotate_tab[1](wx, wy, used, num);
+    num = _mp_real_bitwise_reduce(t, 1, r, 1, tab, nc, used);
+    _mp_real_tan_rotate_tab[1](wx, wy, used, num);
 
     @SERIES@(t, t);          /* u = tan(t') */
     U = t[0];

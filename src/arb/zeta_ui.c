@@ -61,6 +61,12 @@ arb_zeta_ui(arb_t x, ulong n, slong prec)
             {
                 arb_const_apery(x, prec);
             }
+            else if (n == 5 && prec >= 400)
+            {
+                /* Zhi-Wei Sun's identity; faster than the Borwein
+                   algorithms from a few hundred bits up */
+                arb_const_zeta5(x, prec);
+            }
             else if (n < prec * 0.0006)
             {
                 /* small odd n, extremely high precision */

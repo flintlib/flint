@@ -537,7 +537,9 @@ Modular arithmetic
 
     Assuming that `n` is odd, returns the multiplicative inverse modulo
     `2^{\mathtt{FLINT\_BITS}}`. If `n` is even, some arbitrary
-    value is returned.
+    value is returned. This is an inline function using Hurchalla's
+    variant of Newton iteration (arXiv:2204.04342), started from an 8-bit
+    inverse read from a table of 128 bytes.
 
 .. function:: ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 

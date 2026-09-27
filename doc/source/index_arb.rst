@@ -106,7 +106,6 @@
        dirichlet.rst
        acb_dirichlet.rst
        bernoulli.rst
-       hypgeom.rst
        partitions.rst
 
     Calculus
