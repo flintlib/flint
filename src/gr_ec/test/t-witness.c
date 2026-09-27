@@ -58,9 +58,13 @@ build(gr_ctx_t R, gr_ec_ctx_t E, gr_ec_jac_point_t P, const fmpz_t n,
         if (gr_set_fmpz(GR_EC_JAC_POINT_X(P, E), x, R) != GR_SUCCESS
                 || gr_set_fmpz(GR_EC_JAC_POINT_Y(P, E), y, R) != GR_SUCCESS
                 || gr_one(GR_EC_JAC_POINT_Z(P, E), R) != GR_SUCCESS)
+        {
+            gr_ec_jac_point_clear(P, E);
+            gr_ec_ctx_clear(E);
             ok = 0;
-
-        P->is_infinity = T_FALSE;
+        }
+        else
+            P->is_infinity = T_FALSE;
     }
 
     return ok;
@@ -120,6 +124,7 @@ check_sound_over_a_prime(flint_rand_t state)
 
             gr_heap_clear(w, R);
             gr_ec_jac_point_clear(Q, E);
+            gr_ec_jac_point_clear(P, E);
             gr_ec_ctx_clear(E);
         }
 
@@ -170,7 +175,10 @@ check_detects_over_a_composite(flint_rand_t state)
         fmpz_randm(y, state, n);
 
         if (!build(R, E, P, n, a, x, y))
+        {
+            gr_ctx_clear(R);
             goto next;
+        }
 
         gr_ec_jac_point_init(T, E);
         w = gr_heap_init(R);
@@ -210,6 +218,7 @@ check_detects_over_a_composite(flint_rand_t state)
 
         gr_heap_clear(w, R);
         gr_ec_jac_point_clear(T, E);
+        gr_ec_jac_point_clear(P, E);
         gr_ec_ctx_clear(E);
         gr_ctx_clear(R);
 
