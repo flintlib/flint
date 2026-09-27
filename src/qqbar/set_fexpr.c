@@ -475,10 +475,15 @@ static void
 qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root_index)
 {
     qqbar_ptr roots;
-    slong d;
+    slong d, r;
     d = fmpz_poly_degree(poly);
     roots = _qqbar_vec_init(d);
-    qqbar_roots_fmpz_poly(roots, poly, 0);
+    /* The real roots come first in the canonical order, so we only
+       need the complex roots if the index exceeds the number of
+       real roots. */
+    r = qqbar_real_roots_fmpz_poly(roots, poly, 0);
+    if (root_index > r)
+        qqbar_roots_fmpz_poly(roots, poly, 0);
     qqbar_set(res, roots + root_index - 1);
     _qqbar_vec_clear(roots, d);
 }
