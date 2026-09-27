@@ -545,7 +545,7 @@ gauss:
     FLINT_ASSERT(mpn_cmp(m11, m12, m_len) >= 0);
 
     /* (A, B) = (B, A mod B) */
-    mpn_tdiv_qr(Q, R, 0, A, Alen, B, Blen);
+    flint_mpn_tdiv_qr(Q, R, A, Alen, B, Blen);
     Qlen = Alen - Blen + 1;
     MPN_NORM(Q, Qlen);
     Rlen = Blen;

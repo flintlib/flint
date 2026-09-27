@@ -14,7 +14,19 @@
 int
 _gr_poly_rsqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {
-    if (flen <= 8 || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
+    flen = FLINT_MIN(flen, len);
+
+    /* For short input, the basecase algorithm is quadratic in len
+       while Miller's recurrence is linear. The recurrence requires
+       division by small integers and is not used for inexact rings
+       where it may be numerically unstable. */
+    if (flen <= 8 && len > 8 && gr_ctx_is_exact(ctx) == T_TRUE)
+    {
+        if (_gr_poly_rsqrt_series_miller(res, f, flen, len, ctx) == GR_SUCCESS)
+            return GR_SUCCESS;
+    }
+
+    if (len <= 8 || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
         return _gr_poly_rsqrt_series_basecase(res, f, flen, len, ctx);
     else
         return _gr_poly_rsqrt_series_newton(res, f, flen, len, FLINT_MIN(10, len / 2), ctx);

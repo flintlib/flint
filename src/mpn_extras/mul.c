@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2023 Albin Ahlbäck
-    Copyright (C) 2023, 2024 Fredrik Johansson
+    Copyright (C) 2023, 2024, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -42,11 +42,19 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 # define FFT_MUL mpn_mul_default_mpn_ctx
 # define FFT_MUL_THRESHOLD FLINT_FFT_SMALL_MUL_THRESHOLD
 # define FFT_SQR_THRESHOLD FLINT_FFT_SMALL_SQR_THRESHOLD
+/* Unbalanced operands (xn >= yn): the cost of GMP's multiplication grows
+   like (xn / yn) M(yn) while that of fft_small depends on xn + yn, so
+   fft_small wins from shorter yn than the balanced threshold T: roughly
+   when xn + yn > 2 T and yn > T / 3 (measured on Emerald Rapids; for
+   yn just below T and long xn, GMP was up to 1.9 times slower). */
+# define FFT_MUL_USE_FFT(xn, yn) ((yn) >= FFT_MUL_THRESHOLD || \
+    ((xn) + (yn) > 2 * FFT_MUL_THRESHOLD && 3 * (yn) > FFT_MUL_THRESHOLD))
 #else
 # include "fft.h"
 # define FFT_MUL flint_mpn_mul_fft_main
 # define FFT_MUL_THRESHOLD FLINT_FFT_MUL_THRESHOLD
 # define FFT_SQR_THRESHOLD FLINT_FFT_SQR_THRESHOLD
+# define FFT_MUL_USE_FFT(xn, yn) ((yn) >= FFT_MUL_THRESHOLD)
 #endif
 
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
@@ -66,7 +74,7 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
 #endif
     else if (WANT_TOOM22 && yn <= TOOM22_LIMIT && 5 * yn >= 4 * xn)
         flint_mpn_mul_toom22(r, x, xn, y, yn, NULL);
-    else if (yn < FFT_MUL_THRESHOLD)
+    else if (!FFT_MUL_USE_FFT(xn, yn))
         mpn_mul(r, x, xn, y, yn);
     else
         FFT_MUL(r, x, xn, y, yn);

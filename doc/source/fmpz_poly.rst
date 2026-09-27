@@ -1419,9 +1419,15 @@ Greatest common divisor
 
     This function uses the modular GCD algorithm. The basic
     strategy is to remove the content of the polynomials, reduce them
-    modulo sufficiently many primes and do CRT reconstruction until
-    some bound is reached (or we can prove with trial division that
-    we have the GCD).
+    modulo sufficiently many primes and do CRT reconstruction.
+    Primes are processed in batches (in parallel when multiple threads
+    are available), using fast multimodular reduction and a single fast
+    CRT for reconstruction. The number of primes is chosen adaptively
+    by checking when a random linear combination of the coefficients of
+    the reconstructed gcd stabilizes. The result is certified by
+    checking that the candidate divides both inputs, which is done by
+    computing the quotients multimodularly and verifying them by
+    multiplication or by coefficient bounds.
 
 .. function:: void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -3407,6 +3413,36 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: slong fmpz_poly_roots_fmpz(fmpz * res, slong * exp, const fmpz_poly_t poly)
+              slong fmpz_poly_roots_fmpq(fmpq * res, slong * exp, const fmpz_poly_t poly)
+
+    Computes the distinct integer (respectively rational) roots of the
+    nonzero polynomial ``poly``, writes them to ``res`` in increasing order,
+    and returns the number of roots. If ``exp`` is not ``NULL``, the
+    multiplicities of the roots are written to ``exp``. The arrays must have
+    room for at least `\deg(\operatorname{poly})` entries.
+    Throws an exception if ``poly`` is zero.
+
+    If the constant and leading coefficients (after removing roots at zero)
+    are small with few divisors, the candidate roots `a/b` with `a` dividing
+    the constant coefficient and `b` dividing the leading coefficient are
+    simply tested. Otherwise, the roots are found by computing the roots
+    modulo a suitable prime `p`, lifting them `p`-adically using
+    Newton iteration to the precision necessary to recover rational roots
+    of bounded height, and verifying the candidates.
+    This is typically much faster than factoring the polynomial.
+    Multiplicities are handled using a squarefree factorization, which is
+    only computed if the polynomial is not squarefree.
+
+.. function:: slong _fmpz_poly_roots_fmpz_squarefree(fmpz * res, const fmpz * poly, slong len)
+              slong _fmpz_poly_roots_fmpq_squarefree(fmpq * res, const fmpz * poly, slong len)
+
+    Writes the integer (respectively rational) roots of ``(poly, len)``
+    to ``res`` (in no particular order) and returns the number of roots.
+    Assumes that ``poly`` is squarefree, that ``len`` is at least 1 and that
+    the constant coefficient is nonzero.
+    The array ``res`` must have room for ``len - 1`` entries.
+
 .. function:: void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len)
               void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 
@@ -3448,6 +3484,26 @@ Roots
     The polynomial is assumed to be squarefree, of degree larger than 1
     and with non-zero constant coefficient.
 
+.. function:: slong _fmpz_poly_num_real_roots_sturm_bounded(const fmpz * pol, slong len, int on_0_1, slong max_size)
+
+    Counts the real roots of the polynomial ``(pol, len)`` using a Sturm
+    sequence computed as a primitive polynomial remainder sequence
+    (removing the content after each pseudo-division).
+    If ``on_0_1`` is zero, counts all real roots; otherwise, counts
+    the roots on the same interval as :func:`fmpz_poly_num_real_roots_0_1`.
+    The polynomial is assumed to be squarefree.
+
+    If some remainder in the sequence has length times maximum coefficient
+    bit size exceeding ``max_size``, the computation is aborted and
+    `-1` is returned. Pass ``WORD_MAX`` to always complete the computation.
+
+    The primitive remainder sequence is much cheaper than the subresultant
+    sequence for polynomials with special structure (for example, classical
+    orthogonal polynomials, or sparse polynomials where the degree drops
+    quickly), but typically more expensive for generic polynomials,
+    where the coefficients grow along the sequence. The bound ``max_size``
+    allows detecting the latter case cheaply.
+
 .. function:: slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
               slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len)
               slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol)
@@ -3457,6 +3513,13 @@ Roots
     Returns the number of real roots of the polynomial ``pol``.
     The polynomial is assumed to be squarefree.
 
+    The default version uses closed formulas for degree at most 4.
+    Otherwise, it uses the subresultant Sturm sequence for input of small
+    length and bit size, and for larger input first attempts
+    :func:`_fmpz_poly_num_real_roots_sturm_bounded`
+    with a bound that detects coefficient growth,
+    falling back on the Vincent-Collins-Akritas (VCA) algorithm.
+
 .. function:: slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol)
               slong fmpz_poly_num_real_roots_0_1_vca(const fmpz_poly_t pol)
               slong fmpz_poly_num_real_roots_0_1(const fmpz_poly_t pol)
@@ -3464,6 +3527,13 @@ Roots
     Returns the number of real roots of the polynomial ``pol`` on the
     interval `(0, 1)` (excluding the endpoints).
     The polynomial is assumed to be squarefree.
+
+    The default version first applies the Descartes rule of signs on
+    `(0, 1)`, which immediately determines the result for most
+    generic polynomials. If this fails, it attempts
+    :func:`_fmpz_poly_num_real_roots_sturm_bounded` with a bound that
+    detects coefficient growth, falling back on the
+    Vincent-Collins-Akritas (VCA) algorithm.
 
 .. function:: int _fmpz_poly_has_real_root(const fmpz * p, slong len)
               int fmpz_poly_has_real_root(const fmpz_poly_t pol)
@@ -3493,6 +3563,28 @@ Roots
     ``n_interval`` is updated accordingly. The data
     ``c = c_array + i`` and ``k = k_array[i]`` represents the
     open interval `(c 2^k, (c + 1) 2^k)`.
+    The polynomial is assumed to be squarefree.
+
+    Three algorithms are used. For polynomials of large degree,
+    we first attempt bisection using a Sturm sequence (computed as
+    a primitive remainder sequence, which is evaluated at each bisection
+    point in `O(n)` operations using the pseudo-quotients).
+    This is typically much faster than VCA for polynomials with many
+    real roots whose Sturm sequence has small coefficients
+    (e.g. classical orthogonal polynomials), and for sparse polynomials
+    with clusters of close roots.
+    Otherwise, if the polynomial appears to have only real roots
+    (Newton's inequalities hold and the numbers of sign variations of
+    `p(x)` and `p(-x)` add up to the degree) which are spread
+    over many orders of magnitude (e.g. Eulerian polynomials), we locate
+    sign changes by evaluating the polynomial at dyadic points
+    using ball arithmetic; the result is certified by checking that the
+    number of sign changes equals the number of sign variations
+    (Descartes' rule of signs). This avoids the huge coefficients that
+    arise in VCA for such polynomials.
+    If these methods do not apply or fail, we use
+    the Vincent-Collins-Akritas (VCA) algorithm
+    based on Descartes' rule of signs.
 
 .. function:: void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
 

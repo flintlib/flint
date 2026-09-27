@@ -41,7 +41,13 @@ flint_mpn_mulmid(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn,
 
     if (FLINT_MIN(FLINT_MIN(an, bn), zhi - zlo) < 48)
     {
-        flint_mpn_mulmid_classical(z, a, an, b, bn, zlo, zhi);
+        /* the low part of a product, with both operands about as long as
+           the window: a mullow beats the quadratic basecase from about
+           eight limbs */
+        if (zlo == 0 && zhi >= 8 && FLINT_MIN(an, bn) >= 7 * zhi / 8)
+            flint_mpn_mulmid_via_mullow_n(z, a, an, b, bn, zlo, zhi);
+        else
+            flint_mpn_mulmid_classical(z, a, an, b, bn, zlo, zhi);
         return;
     }
 

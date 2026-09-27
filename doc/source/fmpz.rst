@@ -1004,7 +1004,10 @@ Basic arithmetic
     If `p` is not prime the return value is with high probability `0`,
     indicating that `p` is not prime, or `a` is not a square modulo `p`.
     If `p` is not prime and the return value is `1`, the value of `b` is
-    meaningless. Primality of ``p`` is assumed and not checked.
+    meaningless. Primality of ``p`` is assumed and not checked. On a return
+    value of `0`, `b` is set to zero.
+
+    This wraps :func:`flint_mpn_sqrtmod`; see there for the algorithm.
 
 .. function:: void fmpz_invmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
 

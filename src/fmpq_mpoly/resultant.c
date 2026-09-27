@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly.h"
 #include "fmpq_mpoly.h"
 
 int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
@@ -23,7 +24,9 @@ int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
     fmpz_mpoly_to_univar(Ax, A->zpoly, var, ctx->zctx);
     fmpz_mpoly_to_univar(Bx, B->zpoly, var, ctx->zctx);
 
-    success = fmpz_mpoly_univar_resultant(R->zpoly, Ax, Bx, ctx->zctx);
+    /* the same resultant as of the two univariates above, but going through
+       fmpz_mpoly_resultant lets the dense bivariate algorithm take it */
+    success = fmpz_mpoly_resultant(R->zpoly, A->zpoly, B->zpoly, var, ctx->zctx);
 
     if (success && Ax->length > 0 && Bx->length > 0)
     {

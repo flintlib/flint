@@ -91,6 +91,7 @@ do a full squarefree factorization to obtain the multiplicities of the roots::
     Currently this method assumes that the root lies in the interior
     of *initial* unless *initial* is exact; it may fail to converge
     if the root is either endpoint of *initial*.
+    The output enclosure is contained in *initial*.
 
 .. function:: slong arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)
               void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)
@@ -115,9 +116,28 @@ do a full squarefree factorization to obtain the multiplicities of the roots::
     depending on the precision needed for isolation and the
     precision used internally by the algorithm.
 
+    The *complex* version starts by isolating the real roots
+    with the *real* version. If all roots are real, it is done. Otherwise,
+    if there are many real roots or if some real roots are clustered,
+    the real roots are divided out (in ball arithmetic) and only the
+    nonreal roots are computed using the Durand-Kerner method
+    (:func:`acb_poly_find_roots`). This is much faster for polynomials
+    with many real roots or with clusters of real roots,
+    and typically costs little extra time otherwise.
+
     The following *flags* are supported:
 
     * *ARB_FMPZ_POLY_ROOTS_VERBOSE*
+
+    * *ARB_FMPZ_POLY_ROOTS_RATIONAL* (only for the *real* version):
+      first compute the rational roots exactly using
+      :func:`fmpz_poly_roots_fmpq`, divide them out, and compute the
+      remaining roots using the general algorithm. The rational roots are
+      output as exact balls if they are dyadic numbers (and otherwise as
+      balls with *prec* accurate bits). This is much faster
+      when the polynomial has many rational roots (e.g. 150 times faster
+      for `\prod_{i=1}^{512} (b_i x - a_i)` with small `a_i, b_i`),
+      but adds some overhead otherwise.
 
 Special polynomials
 -------------------------------------------------------------------------------

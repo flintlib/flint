@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
@@ -443,50 +444,113 @@ _gr_fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx
     return fmpz_mod_pow_fmpz(res, x, exp, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
+/*
+    A Jacobi symbol, not a square root: a symbol of -1 rules out a square
+    whether or not the modulus is prime, and for a prime it decides.
+*/
+static truth_t
+_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_mod_ctx_struct * mctx = FMPZ_MOD_CTX(ctx);
+    slong n;
+    nn_ptr d, a;
+    int square;
+    TMP_INIT;
+
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+        return T_TRUE;
+
+    if (fmpz_is_even(mctx->n))
+        return T_UNKNOWN;
+
+    n = fmpz_size(mctx->n);
+
+    TMP_START;
+
+    d = TMP_ALLOC((2 * n) * sizeof(ulong));
+    a = d + n;
+
+    fmpz_get_ui_array(d, n, mctx->n);
+    fmpz_get_ui_array(a, n, x);
+
+    square = flint_mpn_is_square_mod(a, d, n);
+
+    TMP_END;
+
+    if (!square)
+        return T_FALSE;
+
+    return (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE) ? T_TRUE : T_UNKNOWN;
+}
+
 static int
 _gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
+    fmpz_mod_ctx_struct * mctx = FMPZ_MOD_CTX(ctx);
+    slong n;
+    nn_ptr d, a, r;
+    nn_srcptr dinv;
+    flint_bitcnt_t norm;
+    int success;
+    TMP_INIT;
+
     if (fmpz_is_zero(x) || fmpz_is_one(x))
     {
         fmpz_set(res, x);
         return GR_SUCCESS;
     }
-    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+
+    /* an even modulus is not prime here, whatever the context claims */
+    if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE || fmpz_is_even(mctx->n))
     {
-        int status = fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
-        /* fmpz_sqrtmod may have set res to an unreduced value on failure */
-        if (status != GR_SUCCESS)
+        /* the Jacobi symbol can still rule a root out */
+        if (_gr_fmpz_mod_is_square(x, ctx) == T_FALSE)
+        {
             fmpz_zero(res);
-        return status;
-    }
-    else
-    {
-        /* todo: implement the general case */
+            return GR_DOMAIN;
+        }
+
         return GR_UNABLE;
     }
-}
 
-static truth_t
-_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
-{
-    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    n = fmpz_size(mctx->n);
+
+    TMP_START;
+
+    d = TMP_ALLOC((3 * n) * sizeof(ulong));
+    a = d + n;
+    r = a + n;
+
+    fmpz_get_ui_array(d, n, mctx->n);
+    fmpz_get_ui_array(a, n, x);
+
+    /* the context only keeps a precomputed inverse for a huge modulus */
+    if (mctx->ninv_huge != NULL && mctx->ninv_huge->n == n)
     {
-        return T_TRUE;
-    }
-    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
-    {
-        fmpz_t t;
-        truth_t ans;
-        fmpz_init(t);
-        ans = fmpz_sqrtmod(t, x, FMPZ_MOD_CTX(ctx)->n) ? T_TRUE : T_FALSE;
-        fmpz_clear(t);
-        return ans;
+        dinv = mctx->ninv_huge->dinv;
+        norm = mctx->ninv_huge->norm;
     }
     else
     {
-        /* todo: implement the general case */
-        return T_UNKNOWN;
+        dinv = NULL;
+        norm = flint_clz(d[n - 1]);
     }
+
+    /* the symbol is computed once, inside */
+    success = flint_mpn_sqrtmod_preinv(r, a, d, n, dinv, norm);
+
+    if (success == 1)
+        fmpz_set_ui_array(res, r, n);
+    else
+        fmpz_zero(res);
+
+    TMP_END;
+
+    if (success == 1)
+        return GR_SUCCESS;
+
+    /* a failure of the algorithm means the modulus is not prime after all */
+    return (success == 0) ? GR_DOMAIN : GR_UNABLE;
 }
 
 static int

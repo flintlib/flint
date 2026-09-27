@@ -9,48 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
 #include "arb.h"
-#include "hypgeom.h"
+#include "mp_real.h"
 
 static void
 arb_const_log2_hypgeom_eval(arb_t s, slong prec)
 {
-    hypgeom_t series;
-    arb_t t;
-
-    arb_init(t);
-    hypgeom_init(series);
-
-    fmpz_poly_set_str(series->A, "2  1497 1794");
-    fmpz_poly_set_str(series->B, "1  1");
-    fmpz_poly_set_str(series->P, "3  0 -1 2");
-    fmpz_poly_set_str(series->Q, "3  1080 7776 7776");
-
-    prec += FLINT_CLOG2(prec);
-    arb_hypgeom_infsum(s, t, series, prec, prec);
-    arb_mul_ui(t, t, 2160, prec);
-    arb_div(s, s, t, prec);
-
-    hypgeom_clear(series);
-    arb_clear(t);
+    /* Zuniga's series, 11.9 bits per term (fixed/const_log2.c) */
+    _mp_real_const_arb(s, mp_real_const_log2, prec);
 }
-
-/*
-Note: we ought to share the log(2) cache with the log(p) cache.
-
-Note: for log(3) the corresponding formula is
-
-    fmpz_poly_set_str(series->A, "2  74 88");
-    fmpz_poly_set_str(series->B, "1  1");
-    fmpz_poly_set_str(series->P, "3  0 -2 4");
-    fmpz_poly_set_str(series->Q, "3  135 972 972");
-    ...
-    arb_mul_2exp_si(s, s, 1);
-    arb_mul_ui(t, t, 135, prec);
-
-but currently we do not have a use for this as a standalone constant.
-*/
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_const_log2_hypgeom, arb_const_log2_hypgeom_eval)
 

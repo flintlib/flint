@@ -5874,7 +5874,7 @@ class gr_poly(gr_elem):
         If ``domain`` is given, returns roots in that ring instead.
 
             >>> (ZZx([3,2]) * ZZx([15,1])**2 * ZZx([-10,1])).roots()
-            ([10, -15], [1, 2])
+            ([-15, 10], [2, 1])
             >>> ZZx([1]).roots()
             ([], [])
 
@@ -6969,7 +6969,7 @@ class gr_mat(gr_elem):
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues()
             ([], [])
             >>> Mat(ZZ)([[1,2],[3,-4]]).eigenvalues()
-            ([2, -5], [1, 1])
+            ([-5, 2], [1, 1])
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=QQbar)
             ([Root a = 5.37228 of a^2-5*a-2, Root a = -0.372281 of a^2-5*a-2], [1, 1])
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=RR)
@@ -7010,10 +7010,10 @@ class gr_mat(gr_elem):
             >>> A = Mat(QQ)([[1,2],[-1,4]])
             >>> D, L, R = A.diagonalization()
             >>> L*A*R
-            [[3, 0],
-            [0, 2]]
+            [[2, 0],
+            [0, 3]]
             >>> D
-            [3, 2]
+            [2, 3]
             >>> L*R
             [[1, 0],
             [0, 1]]

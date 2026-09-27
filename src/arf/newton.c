@@ -10,7 +10,7 @@
 */
 
 #include "mpn_extras.h"
-#include "fixed.h"
+#include "mp_real.h"
 #include "arf.h"
 
 /*
@@ -20,7 +20,7 @@
     where an ulp is 2^(e - prec) with e the exponent of the exact result f
     (2^(e-1) <= |f| < 2^e).
 
-    The mantissas are fed to the fixed_*_newton routines with n fraction
+    The mantissas are fed to the _mp_real_*_newton routines with n fraction
     limbs. Their results have absolute error at most 8 B^-n on values of
     magnitude at least 1/2, i.e. relative error below 2^(4 - 64 n); with
     64 n >= prec + g this is at most 2^-(prec + g - 4) <= ulp / 2^(g-4).
@@ -113,7 +113,7 @@ _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
     fmpz_init(e);
     fmpz_neg(e, ARF_EXPREF(x));
     Q = _arf_approx_scratch(res, n + 2, res == x);
-    fixed_inv_newton(Q, xptr, xn, n);
+    _mp_real_inv_newton(Q, xptr, xn, n);
     inexact = _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x), prec);
     if (res == x)
         flint_free(Q);
@@ -140,7 +140,7 @@ _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t r
     fmpz_init(e);
     fmpz_sub(e, ARF_EXPREF(x), ARF_EXPREF(y));
     Q = _arf_approx_scratch(res, n + 2, res == x || res == y);
-    fixed_div_newton(Q, xptr, xn, yptr, yn, n);
+    _mp_real_div_newton(Q, xptr, xn, yptr, yn, n);
     inexact = _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x) ^ ARF_SGNBIT(y), prec);
     if (res == x || res == y)
         flint_free(Q);
@@ -210,11 +210,11 @@ _arf_sqrt_operand(mp_srcptr * Aptr, mp_ptr A, fmpz_t e, const arf_t x, slong n)
 int
 _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    SQRT_NEWTON_BODY(fixed_sqrt_newton, 0)
+    SQRT_NEWTON_BODY(_mp_real_sqrt_newton, 0)
 }
 
 int
 _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    SQRT_NEWTON_BODY(fixed_rsqrt_newton, 1)
+    SQRT_NEWTON_BODY(_mp_real_rsqrt_newton, 1)
 }

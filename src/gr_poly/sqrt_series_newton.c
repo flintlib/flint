@@ -18,8 +18,7 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
-    slong a[FLINT_BITS];
-    slong i, m, n, alloc;
+    slong m, n, alloc;
     gr_ptr t, u, v;
     slong tlen, r1, r2, rlen;
 
@@ -38,12 +37,11 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
         return status;
     }
 
-    cutoff = FLINT_MAX(cutoff, 2);
-    a[i = 0] = n = len;
-    while (n >= cutoff)
-        a[++i] = (n = (n + 1) / 2);
+    m = (len + 1) / 2;
+    n = len;
 
-    status |= _gr_poly_rsqrt_series_basecase(g, h, FLINT_MIN(hlen, n), n, ctx);
+    /* g = h^(-1/2) + O(x^m), using the third-order rsqrt iteration */
+    status |= _gr_poly_rsqrt_series_newton(g, h, hlen, m, cutoff, ctx);
 
     if (status != GR_SUCCESS)
         return status;
@@ -52,41 +50,12 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
     int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
 
     alloc = (have_mulmid ? (len + 1) / 2 : len) + 2 * ((len + 1) / 2);
-
     GR_TMP_INIT_VEC(t, alloc, ctx);
     u = GR_ENTRY(t, have_mulmid ? (len + 1) / 2 : len, sz);
     v = GR_ENTRY(u, (len + 1) / 2, sz);
 
-    for (i--; i >= 1; i--)
-    {
-        m = n;
-        n = a[i];
-
-        tlen = FLINT_MIN(2 * m - 1, n);
-
-        status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
-
-        if (have_mulmid)
-        {
-            status |= _gr_poly_mulmid(u, t, tlen, h, FLINT_MIN(hlen, n), m, n, ctx);
-            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, u, n - m, n - m, ctx);
-        }
-        else
-        {
-            status |= _gr_poly_mullow(u, t, tlen, h, FLINT_MIN(hlen, n), n, ctx);
-            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, GR_ENTRY(u, m, sz), n - m, n - m, ctx);
-        }
-
-        status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, -1, ctx);
-        status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
-    }
-
-    m = (len + 1) / 2;
-    n = len;
-
     /* Karp-Markstein */
     tlen = FLINT_MIN(2 * m - 1, n);
-
     status |= _gr_poly_mullow(v, g, m, h, FLINT_MIN(hlen, m), m, ctx);
 
     r1 = FLINT_MAX(0, FLINT_MIN(hlen - m, n - m));

@@ -1290,17 +1290,38 @@ _gr_nmod_poly_inv_series_basecase(ulong * res,
     return GR_SUCCESS;
 }
 
+/* for n >= inv_series_cutoff_tab, the basecase algorithm is used when
+   flen is smaller than this */
+#if FLINT_HAVE_FFT_SMALL
+
+static const short inv_series_short_cutoff_tab[64] = {
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 138,
+    141, 141, 141, 141, 141, 141, 101, 97, 46, 40, 39, 39, 39, 48, 48, 48,
+    49, 51, 51, 51, 52, 52, 52, 64, 66, 67, 72, 75, 76, 83, 83, 85, 87, 87,
+    87, 87, 85, 85, 77, 76, 77 };
+
+#else
+
+static const short inv_series_short_cutoff_tab[64] = {
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 11, 13, 19, 19,
+    19, 19, 19, 26, 40, 48, 56, 56, 89, 89, 52, 52, 50, 50, 54, 63, 69,
+    145, 89, 152, 152, 106, 106, 116, 116, 145, 145, 152, 152, 191, 191,
+    210, 220, 220, 220, 242, 242, 448, 493, 493, 470, 493 };
+
+#endif
+
 static int
 _gr_nmod_poly_inv_series(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
 {
-    slong cutoff;
+    slong cutoff, bits;
 
     flen = FLINT_MIN(flen, n);
 
-    cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+    bits = NMOD_BITS(NMOD_CTX(ctx));
+    cutoff = inv_series_cutoff_tab[bits - 1];
 
-    if (flen < cutoff)
+    if (n < cutoff || flen < inv_series_short_cutoff_tab[bits - 1])
         return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
     else
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
@@ -1323,7 +1344,6 @@ _gr_nmod_poly_div_series_basecase(ulong * res,
     return GR_SUCCESS;
 }
 
-/* todo: unbalanced cutoffs */
 
 #if FLINT_HAVE_FFT_SMALL
 
@@ -1344,41 +1364,99 @@ static const short div_series_cutoff_tab[64] = {
 
 #endif
 
+/* for n >= div_series_cutoff_tab, the basecase algorithm is used when
+   glen is smaller than this */
+#if FLINT_HAVE_FFT_SMALL
+
+static const short div_series_short_cutoff_tab[64] = {
+    5, 5, 20, 28, 38, 38, 41, 31, 39, 39, 32, 48, 55, 55, 58, 62, 65, 67,
+    188, 201, 211, 225, 225, 225, 220, 220, 220, 220, 210, 159, 156, 116,
+    108, 108, 108, 102, 102, 102, 104, 109, 116, 121, 163, 166, 170, 191,
+    195, 195, 195, 195, 195, 195, 200, 183, 187, 187, 187, 187, 191, 191,
+    205, 205, 211, 220 };
+
+#else
+
+static const short div_series_short_cutoff_tab[64] = {
+    64, 64, 64, 65, 77, 84, 140, 158, 197, 208, 243, 254, 321, 337, 370,
+    407, 407, 407, 407, 427, 427, 427, 448, 493, 517, 569, 626, 835, 876,
+    876, 876, 626, 597, 597, 597, 689, 689, 689, 689, 689, 689, 689, 689,
+    796, 835, 876, 919, 919, 919, 964, 964, 964, 964, 1062, 1062, 1062,
+    1115, 1115, 1420, 1420, 1643, 1643, 1684, 1643 };
+
+#endif
+
 static int
 _gr_nmod_poly_div_series(ulong * res,
     const ulong * f, slong flen, const ulong * g, slong glen, slong n, gr_ctx_t ctx)
 {
-    slong cutoff;
+    slong cutoff, bits;
 
     flen = FLINT_MIN(flen, n);
     glen = FLINT_MIN(glen, n);
 
-    cutoff = div_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+    bits = NMOD_BITS(NMOD_CTX(ctx));
+    cutoff = div_series_cutoff_tab[bits - 1];
 
-    if (glen < cutoff)
+    if (n < cutoff || glen < div_series_short_cutoff_tab[bits - 1])
         return _gr_poly_div_series_basecase(res, f, flen, g, glen, n, ctx);
     else
         return _gr_poly_div_series_newton(res, f, flen, g, glen, n, cutoff, ctx);
 }
 
 
-/* todo: unbalanced cutoffs */
 
 #if FLINT_HAVE_FFT_SMALL
 
-static const short rsqrt_series_cutoff_tab[64] = {3, 22, 24, 42, 36, 40, 44,
-    52, 89, 106, 139, 166, 174, 200, 191, 200, 191, 191, 191, 200, 306, 370,
-    353, 337, 337, 370, 370, 370, 292, 292, 279, 292, 231, 231, 220, 279,
-    292, 292, 279, 292, 292, 279, 292, 292, 292, 370, 370, 370, 370, 370,
-    370, 388, 407, 448, 427, 407, 427, 427, 427, 427, 388, 370, 370, 353, };
+static const short rsqrt_series_cutoff_tab[64] = {
+    3, 15, 15, 15, 15, 16, 16, 16, 15, 14, 14, 14, 14, 14, 127, 127, 127,
+    127, 127, 210, 220, 427, 448, 470, 470, 470, 470, 470, 353, 337, 337,
+    166, 152, 152, 152, 210, 210, 220, 220, 220, 220, 220, 220, 220, 220,
+    279, 279, 279, 279, 279, 279, 279, 159, 166, 166, 166, 166, 166, 174,
+    182, 266, 266, 272, 279 };
 
 #else
 
-static const short rsqrt_series_cutoff_tab[64] = {6, 22, 22, 24, 27, 28, 28, 58,
-  77, 96, 116, 160, 232, 270, 315, 387, 402, 472, 502, 580, 627, 760, 824, 940,
-  988, 1018, 1155, 1182, 938, 932, 925, 1016, 836, 891, 915, 960, 1038, 1101,
-  1203, 1236, 1255, 1311, 1386, 1422, 1489, 1592, 1624, 1879, 1828, 2055, 2227,
-  2369, 2156, 2361, 2415, 2472, 2581, 2719, 2679, 2302, 2199, 2455, 2440, 2356, };
+static const short rsqrt_series_cutoff_tab[64] = {
+    6, 30, 27, 24, 23, 23, 23, 24, 26, 26, 34, 34, 34, 39, 44, 66, 66, 66,
+    48, 48, 48, 101, 101, 101, 89, 89, 89, 231, 321, 321, 321, 427, 279,
+    279, 292, 306, 306, 306, 407, 448, 493, 493, 493, 493, 493, 517, 569,
+    796, 796, 796, 796, 796, 835, 796, 835, 876, 876, 876, 1170, 1170,
+    1170, 1170, 1170, 1170 };
+
+#endif
+
+/* Miller's recurrence (linear in n for fixed flen) is used when flen
+   is smaller than this, provided that 1, ..., n - 1 are invertible */
+#if FLINT_HAVE_FFT_SMALL
+
+static const short rsqrt_series_miller_cutoff_tab[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 73, 86, 112,
+    112, 112, 112, 117, 117, 117, 117, 102, 98, 49, 49, 49, 40, 43, 57, 57,
+    59, 64, 64, 64, 64, 112, 134, 134, 134, 134, 140, 140, 146, 146, 140,
+    146, 146, 146, 146, 153, 153, 175, 175, 153, 164, 175 };
+
+static const short sqrt_series_miller_cutoff_tab[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 73, 102, 140,
+    160, 160, 160, 160, 160, 146, 146, 140, 128, 86, 86, 79, 79, 79, 79, 79,
+    86, 86, 102, 117, 117, 128, 140, 160, 167, 167, 175, 183, 183, 183, 192,
+    192, 192, 192, 192, 192, 192, 183, 183, 175, 175, 175 };
+
+#else
+
+static const short rsqrt_series_miller_cutoff_tab[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 86, 86, 90, 98, 117, 117,
+    134, 134, 140, 160, 167, 192, 192, 255, 255, 293, 293, 293, 293, 293,
+    293, 280, 293, 293, 293, 293, 322, 322, 354, 354, 354, 371, 371, 389,
+    408, 449, 449, 471, 471, 494, 494, 494, 543, 724, 1013, 1013, 1013,
+    1013, 1013 };
+
+static const short sqrt_series_miller_cutoff_tab[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 102, 117, 122, 134, 146,
+    153, 160, 160, 167, 192, 201, 211, 232, 293, 293, 293, 280, 280, 280,
+    293, 307, 322, 322, 354, 354, 371, 389, 389, 389, 408, 428, 428, 449,
+    449, 471, 518, 518, 543, 543, 543, 570, 598, 598, 598, 1013, 1013,
+    1013, 1013, 1013 };
 
 #endif
 
@@ -1386,13 +1464,23 @@ static int
 _gr_nmod_poly_rsqrt_series(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
 {
-    slong cutoff;
+    slong cutoff, bits;
 
     flen = FLINT_MIN(flen, n);
+    bits = NMOD_BITS(NMOD_CTX(ctx));
 
-    cutoff = rsqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+    /* The recurrence costs O(n flen); for flen close to n the O(n^2)
+       basecase is faster. */
+    if (flen < rsqrt_series_miller_cutoff_tab[bits - 1] && 2 * flen < n &&
+        NMOD_CTX(ctx).n > (ulong) n)
+    {
+        if (_gr_poly_rsqrt_series_miller(res, f, flen, n, ctx) == GR_SUCCESS)
+            return GR_SUCCESS;
+    }
 
-    if (flen < cutoff)
+    cutoff = rsqrt_series_cutoff_tab[bits - 1];
+
+    if (n < cutoff)
         return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
     else
         return _gr_poly_rsqrt_series_newton(res, f, flen, n, cutoff, ctx);
@@ -1400,41 +1488,51 @@ _gr_nmod_poly_rsqrt_series(ulong * res,
 
 #if FLINT_HAVE_FFT_SMALL
 
-static const short sqrt_series_cutoff_tab[] = { 32767, 1353, 1353, 919,
-    1289, 1228, 1491, 1228, 1491, 1289, 1420, 1420, 1228, 1289, 1420,
-    1353, 1289, 1289, 1353, 4345, 4345, 2423, 2544, 4345, 4562, 2423,
-    4345, 2671, 1725, 1811, 1725, 3577, 1643, 1643, 1725, 1725, 1725,
-    3407, 3407, 1725, 1643, 1811, 3407, 3407, 4562, 3755, 3755, 3577,
-    3577, 4562, 3755, 3942, 3755, 3755, 4562, 4562, 4562, 4562, 3755,
-    3245, 3245, 2944, 3091, 2423, };
+static const short sqrt_series_cutoff_tab[64] = {
+    32767, 58, 80, 102, 158, 212, 332, 608, 608, 656, 656, 656, 656, 656,
+    656, 656, 656, 656, 656, 656, 1774, 1774, 1774, 1774, 1774, 1774, 1774,
+    1774, 1774, 1774, 1774, 708, 608, 608, 608, 608, 608, 608, 608, 608, 608,
+    608, 608, 608, 608, 891, 891, 891, 891, 891, 891, 891, 962, 962, 962,
+    962, 962, 891, 962, 891, 891, 891, 891, 891 };
 
 #else
 
-static const short sqrt_series_cutoff_tab[] = { 32767, 632, 732, 928, 1443,
-  1731, 2364, 2490, 2893, 3173, 5316, 5412, 5727, 6123, 6613, 7290, 7572,
-  8023, 9114, 9105, 8656, 10645, 11290, 13223, 11507, 15489, 12328, 9338,
-  9517, 9795, 9596, 13162, 10168, 8013, 9949, 10654, 9932, 12222, 11287,
-  11623, 11971, 12577, 12207, 13886, 14160, 12200, 13207, 15943, 15320,
-  14290, 15933, 15463, 14281, 15457, 15302, 17929, 18106, 17058, 14844,
-  17740, 17916, 18640, 18093, 18638, };
+static const short sqrt_series_cutoff_tab[64] = {
+    32767, 71, 73, 71, 76, 95, 102, 137, 147, 158, 170, 228, 228, 246, 386,
+    522, 608, 891, 891, 891, 962, 1038, 1306, 1410, 1522, 1774, 2603, 4127,
+    4457, 4457, 4457, 2811, 2811, 2603, 2811, 2811, 3035, 3035, 3277, 3277,
+    3539, 3539, 3822, 3822, 3822, 4457, 4813, 4813, 4813, 5198, 5198, 5613,
+    5613, 6062, 6062, 6062, 6062, 6546, 7069, 10000, 10000, 10000, 10000,
+    10000 };
 
 #endif
 
-/* todo: unbalanced cutoffs */
 static int
 _gr_nmod_poly_sqrt_series(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
 {
-    slong cutoff;
+    slong bits;
 
     flen = FLINT_MIN(flen, n);
+    bits = NMOD_BITS(NMOD_CTX(ctx));
 
-    cutoff = sqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+    /* The recurrence costs O(n flen); for flen close to n the O(n^2)
+       basecase is faster. */
+    if (flen < sqrt_series_miller_cutoff_tab[bits - 1] && 8 * flen < n &&
+        NMOD_CTX(ctx).n > (ulong) n)
+    {
+        if (_gr_poly_sqrt_series_miller(res, f, flen, n, ctx) == GR_SUCCESS)
+            return GR_SUCCESS;
+    }
 
-    if (flen < cutoff)
+    /* The Newton iteration computes the reciprocal square root with
+       the rsqrt cutoff; sqrt_series_cutoff_tab only decides between
+       the basecase and Newton at the top level. */
+    if (n < sqrt_series_cutoff_tab[bits - 1])
         return _gr_poly_sqrt_series_basecase(res, f, flen, n, ctx);
     else
-        return _gr_poly_sqrt_series_newton(res, f, flen, n, cutoff, ctx);
+        return _gr_poly_sqrt_series_newton(res, f, flen, n,
+            rsqrt_series_cutoff_tab[bits - 1], ctx);
 }
 
 #if FLINT_HAVE_FFT_SMALL
@@ -1622,6 +1720,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_nmod_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_nmod_ctx_is_field},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+                                        (gr_funcptr) _gr_nmod_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,

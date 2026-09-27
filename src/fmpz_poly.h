@@ -1116,6 +1116,11 @@ void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, slong n);
 
+slong _fmpz_poly_roots_fmpz_squarefree(fmpz * res, const fmpz * poly, slong len);
+slong _fmpz_poly_roots_fmpq_squarefree(fmpq * res, const fmpz * poly, slong len);
+slong fmpz_poly_roots_fmpq(fmpq * res, slong * exp, const fmpz_poly_t poly);
+slong fmpz_poly_roots_fmpz(fmpz * res, slong * exp, const fmpz_poly_t poly);
+
 void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
                                         const fmpq * xs, slong n);
 
@@ -1222,6 +1227,7 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len);
 slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
 slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len);
+slong _fmpz_poly_num_real_roots_sturm_bounded(const fmpz * pol, slong len, int on_0_1, slong max_size);
 slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol);
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
 slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);

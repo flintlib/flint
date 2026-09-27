@@ -588,7 +588,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/meteorlake"
         ;;
       sapphirerapids)
-        gcc_cflags_arch="-march=sapphirerapids"; param_path="x86_64/icelake"
+        gcc_cflags_arch="-march=sapphirerapids"; param_path="x86_64/sapphirerapids"
         have_avx512="yes";;
       *)
         AC_MSG_ERROR([Error in deciding flags for $host.
@@ -842,11 +842,10 @@ then
     dnl The following functions should exist in the GMP library regardless.
     AC_SEARCH_LIBS([__gmpn_gcd_11],[gmp],[],
                    [AC_MSG_ERROR(["Could not find `mpn_gcd_11' in GMP"])])
-    AC_SEARCH_LIBS([__gmpn_div_q],[gmp],[],
-                   [AC_MSG_ERROR(["Could not find `mpn_div_q' in GMP"])])
 
     dnl The following functions may or may not exist
     AC_SEARCH_LIBS([__gmpn_invert_limb],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_invert_limb,1,Define if GMP has mpn_invert_limb)])
+    AC_SEARCH_LIBS([__gmpn_divrem_2],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divrem_2,1,Define if GMP has mpn_divrem_2)])
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if GMP has mpn_modexact_1_odd)])
     AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addmul_2,1,Define if GMP has mpn_addmul_2)])
     AC_SEARCH_LIBS([__gmpn_add_n_sub_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_add_n_sub_n,1,Define if GMP has mpn_add_n_sub_n)])
@@ -859,7 +858,6 @@ then
     AC_SEARCH_LIBS([__gmpn_mulmid_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mulmid_n,1,Define if GMP has mpn_mulmid_n)])
     AC_SEARCH_LIBS([__gmpn_divexact],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divexact,1,Define if GMP has mpn_divexact)])
     AC_SEARCH_LIBS([__gmpn_mod_34lsub1],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mod_34lsub1,1,Define if GMP has mpn_mod_34lsub1)])
-    AC_SEARCH_LIBS([__gmpn_divisible_p],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divisible_p,1,Define if GMP has mpn_divisible_p)])
 fi
 
 if test "$enable_mpfr_check" = "yes";

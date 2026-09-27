@@ -253,7 +253,7 @@
     x0 = CAT(V, load)(X0); \
     x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
     x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
+    x1 = CAT(V, mulmod_fast)(x1, w, n, ninv); \
     CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
     CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
 }
@@ -276,7 +276,7 @@
     x0 = CAT(V, load)(X0); \
     x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
     x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
+    x1 = CAT(V, mulmod_fast)(x1, w, n, ninv); \
     CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
 }
 
@@ -309,7 +309,7 @@
     y2 = CAT(V, sub)(x0, x2); \
     y3 = CAT(V, sub)(x1, x3); \
     y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
-    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
+    y3 = CAT(V, mulmod_fast)(y3, iw, n, ninv); \
     x0 = CAT(V, add)(y0, y1); \
     x1 = CAT(V, sub)(y0, y1); \
     x2 = CAT(V, add)(y2, y3); \
@@ -336,14 +336,14 @@
     x1 = CAT(V, load)(X1); \
     x2 = CAT(V, load)(X2); \
     x3 = CAT(V, load)(X3); \
-    x2 = CAT(V, mulmod)(x2, w2, n, ninv); \
-    x3 = CAT(V, mulmod)(x3, w2, n, ninv); \
+    x2 = CAT(V, mulmod_fast)(x2, w2, n, ninv); \
+    x3 = CAT(V, mulmod_fast)(x3, w2, n, ninv); \
     y0 = CAT(V, add)(x0, x2); \
     y1 = CAT(V, add)(x1, x3); \
     y2 = CAT(V, sub)(x0, x2); \
     y3 = CAT(V, sub)(x1, x3); \
-    y1 = CAT(V, mulmod)(y1, w, n, ninv); \
-    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
+    y1 = CAT(V, mulmod_fast)(y1, w, n, ninv); \
+    y3 = CAT(V, mulmod_fast)(y3, iw, n, ninv); \
     x0 = CAT(V, add)(y0, y1); \
     x1 = CAT(V, sub)(y0, y1); \
     x2 = CAT(V, add)(y2, y3); \
@@ -358,14 +358,14 @@
 { \
     T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
     X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X2 = CAT(T, mulmod)(X2, w2, n, ninv); \
-    X3 = CAT(T, mulmod)(X3, w2, n, ninv); \
+    X2 = CAT(T, mulmod_fast)(X2, w2, n, ninv); \
+    X3 = CAT(T, mulmod_fast)(X3, w2, n, ninv); \
     Y0 = CAT(T, add)(X0, X2); \
     Y1 = CAT(T, add)(X1, X3); \
     Y2 = CAT(T, sub)(X0, X2); \
     Y3 = CAT(T, sub)(X1, X3); \
-    Y1 = CAT(T, mulmod)(Y1, w, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, iw, n, ninv); \
+    Y1 = CAT(T, mulmod_fast)(Y1, w, n, ninv); \
+    Y3 = CAT(T, mulmod_fast)(Y3, iw, n, ninv); \
     x0 = CAT(T, add)(Y0, Y1); \
     x1 = CAT(T, sub)(Y0, Y1); \
     x2 = CAT(T, add)(Y2, Y3); \
@@ -383,7 +383,7 @@
     Y2 = CAT(T, sub)(X0, X2); \
     Y3 = CAT(T, sub)(X1, X3); \
     Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, e14, n, ninv); \
+    Y3 = CAT(T, mulmod_fast)(Y3, e14, n, ninv); \
     x0 = CAT(T, add)(Y0, Y1); \
     x1 = CAT(T, sub)(Y0, Y1); \
     x2 = CAT(T, add)(Y2, Y3); \
@@ -398,10 +398,10 @@
     T Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7, Z0, Z1, Z2, Z3, Z4, Z5, Z6, Z7; \
     X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
     X1 = CAT(T, reduce_to_pm1n)(X1, n, ninv); \
-    X4 = CAT(T, mulmod)(X4, w2, n, ninv); \
-    X5 = CAT(T, mulmod)(X5, w2, n, ninv); \
-    X6 = CAT(T, mulmod)(X6, w2, n, ninv); \
-    X7 = CAT(T, mulmod)(X7, w2, n, ninv); \
+    X4 = CAT(T, mulmod_fast)(X4, w2, n, ninv); \
+    X5 = CAT(T, mulmod_fast)(X5, w2, n, ninv); \
+    X6 = CAT(T, mulmod_fast)(X6, w2, n, ninv); \
+    X7 = CAT(T, mulmod_fast)(X7, w2, n, ninv); \
     Y0 = CAT(T, add)(X0, X4); \
     Y1 = CAT(T, add)(X1, X5); \
     Y2 = CAT(T, add)(X2, X6); \
@@ -410,10 +410,10 @@
     Y5 = CAT(T, sub)(X1, X5); \
     Y6 = CAT(T, sub)(X2, X6); \
     Y7 = CAT(T, sub)(X3, X7); \
-    Y2 = CAT(T, mulmod)(Y2, w, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, w, n, ninv); \
-    Y6 = CAT(T, mulmod)(Y6, iw, n, ninv); \
-    Y7 = CAT(T, mulmod)(Y7, iw, n, ninv); \
+    Y2 = CAT(T, mulmod_fast)(Y2, w, n, ninv); \
+    Y3 = CAT(T, mulmod_fast)(Y3, w, n, ninv); \
+    Y6 = CAT(T, mulmod_fast)(Y6, iw, n, ninv); \
+    Y7 = CAT(T, mulmod_fast)(Y7, iw, n, ninv); \
     Z0 = CAT(T, add)(Y0, Y2); \
     Z1 = CAT(T, add)(Y1, Y3); \
     Z2 = CAT(T, sub)(Y0, Y2); \
@@ -423,13 +423,13 @@
     Z6 = CAT(T, sub)(Y4, Y6); \
     Z7 = CAT(T, sub)(Y5, Y7); \
     Z0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
-    Z1 = CAT(T, mulmod)(Z1, ww0, n, ninv); \
+    Z1 = CAT(T, mulmod_fast)(Z1, ww0, n, ninv); \
     Z2 = CAT(T, reduce_to_pm1n)(Z2, n, ninv); \
-    Z3 = CAT(T, mulmod)(Z3, ww1, n, ninv); \
+    Z3 = CAT(T, mulmod_fast)(Z3, ww1, n, ninv); \
     Z4 = CAT(T, reduce_to_pm1n)(Z4, n, ninv); \
-    Z5 = CAT(T, mulmod)(Z5, ww2, n, ninv); \
+    Z5 = CAT(T, mulmod_fast)(Z5, ww2, n, ninv); \
     Z6 = CAT(T, reduce_to_pm1n)(Z6, n, ninv); \
-    Z7 = CAT(T, mulmod)(Z7, ww3, n, ninv); \
+    Z7 = CAT(T, mulmod_fast)(Z7, ww3, n, ninv); \
     x0 = CAT(T, add)(Z0, Z1); \
     x1 = CAT(T, sub)(Z0, Z1); \
     x2 = CAT(T, add)(Z2, Z3); \
@@ -456,17 +456,17 @@
     Z1 = CAT(T, add)(Y1, Y3); \
     Z2 = CAT(T, sub)(Y0, Y2); \
     Z3 = CAT(T, sub)(Y1, Y3); \
-    Y6 = CAT(T, mulmod)(e14, Y6, n, ninv); \
-    Y7 = CAT(T, mulmod)(e14, Y7, n, ninv); \
+    Y6 = CAT(T, mulmod_fast)(e14, Y6, n, ninv); \
+    Y7 = CAT(T, mulmod_fast)(e14, Y7, n, ninv); \
     Z4 = CAT(T, add)(Y4, Y6); \
     Z5 = CAT(T, add)(Y5, Y7); \
     Z6 = CAT(T, sub)(Y4, Y6); \
     Z7 = CAT(T, sub)(Y5, Y7); \
     x0 = CAT(T, add)(Z0, Z1); \
     x1 = CAT(T, sub)(Z0, Z1); \
-    Z3 = CAT(T, mulmod)(e14, Z3, n, ninv); \
-    Z5 = CAT(T, mulmod)(e18, Z5, n, ninv); \
-    Z7 = CAT(T, mulmod)(e38, Z7, n, ninv); \
+    Z3 = CAT(T, mulmod_fast)(e14, Z3, n, ninv); \
+    Z5 = CAT(T, mulmod_fast)(e18, Z5, n, ninv); \
+    Z7 = CAT(T, mulmod_fast)(e38, Z7, n, ninv); \
     x2 = CAT(T, add)(Z2, Z3); \
     x3 = CAT(T, sub)(Z2, Z3); \
     x4 = CAT(T, add)(Z4, Z5); \
@@ -800,7 +800,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
         y1 = VECNOP(reduce_to_pm1n)(y1, n, ninv); \
-        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
+        y3 = VECNOP(mulmod_fast)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \
@@ -825,15 +825,15 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
         if (0 < itrunc) x0 = VECNOP(reduce_to_pm1n)(x0, n, ninv); \
         if (1 < itrunc) x1 = VECNOP(load)(X1+i); \
         if (2 < itrunc) x2 = VECNOP(load)(X2+i); \
-        if (2 < itrunc) x2 = VECNOP(mulmod)(x2, w2, n, ninv); \
+        if (2 < itrunc) x2 = VECNOP(mulmod_fast)(x2, w2, n, ninv); \
         if (3 < itrunc) x3 = VECNOP(load)(X3+i); \
-        if (3 < itrunc) x3 = VECNOP(mulmod)(x3, w2, n, ninv); \
+        if (3 < itrunc) x3 = VECNOP(mulmod_fast)(x3, w2, n, ninv); \
         y0 = (2 < itrunc) ? VECNOP(add)(x0, x2) : x0; \
         y1 = (3 < itrunc) ? VECNOP(add)(x1, x3) : x1; \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
-        y1 = VECNOP(mulmod)(y1, w, n, ninv); \
-        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
+        y1 = VECNOP(mulmod_fast)(y1, w, n, ninv); \
+        y3 = VECNOP(mulmod_fast)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \
