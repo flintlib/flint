@@ -30,6 +30,15 @@ _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_
 {
     int status;
 
+    flen = FLINT_MIN(flen, len);
+
+    /* See _gr_poly_rsqrt_series_generic. */
+    if (flen <= 8 && len > 8 && gr_ctx_is_exact(ctx) == T_TRUE)
+    {
+        if (_gr_poly_sqrt_series_miller(res, f, flen, len, ctx) == GR_SUCCESS)
+            return GR_SUCCESS;
+    }
+
     status = _gr_poly_sqrt_series_newton(res, f, flen, len, 2, ctx);
 
     if (status == GR_DOMAIN && (gr_ctx_is_field(ctx) != T_TRUE || _char_two(ctx) != T_FALSE))

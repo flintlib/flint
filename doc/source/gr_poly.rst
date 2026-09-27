@@ -665,6 +665,16 @@ Square roots
               int _gr_poly_rsqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
               int gr_poly_rsqrt_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
+    Power series square root and reciprocal square root.
+    The *newton* versions use a third-order Newton iteration for the
+    reciprocal square root (each step triples the precision); the square
+    root is obtained from the reciprocal square root to half the
+    length followed by a Karp-Markstein step.
+    The *miller* versions use J. C. P. Miller's recurrence, which costs
+    `O(\operatorname{flen} \cdot \operatorname{len})` operations but requires
+    that `1, \ldots, \operatorname{len} - 1` are invertible (or that
+    division by these integers is possible) in the ring.
+
 Evaluation
 -------------------------------------------------------------------------------
 

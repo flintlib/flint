@@ -15,71 +15,84 @@
 
 #include "templates.h"
 
-static void
-_TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g,
-                        const TEMPLATE(T, struct) * h, TEMPLATE(T, struct) * t,
-                        TEMPLATE(T, struct) * u, slong n, const TEMPLATE(T, ctx_t) ctx)
+/*
+    Third-order Newton iteration: given g = h^(-1/2) + O(x^m), let
+    e = 1 - h g^2 = O(x^m). Then
+
+        h^(-1/2) = g (1 + e/2 + 3e^2/8) + O(x^(3m)).
+
+    Assumes that h has length n.
+*/
+void _TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, struct) * g,
+           const TEMPLATE(T, struct) * h, slong n, TEMPLATE(T, ctx_t) ctx)
 {
-    const int alloc = (t == NULL);
-    const slong m   = (n + 1) / 2;
-    TEMPLATE(T, t) c, inv2, one;
+    slong a[FLINT_BITS];
+    slong i, m, k, L, len, tlen;
+    TEMPLATE(T, struct) * t, * u, * v, * w;
+    TEMPLATE(T, t) inv2, inv8;
+
+    TEMPLATE(T, one)(g, ctx);
 
     if (n == 1)
-    {
-        TEMPLATE(T, set_ui)(g + 0, 1, ctx);
         return;
-    }
 
-    if (alloc)
-    {
-        t = _TEMPLATE(T, vec_init)(n, ctx);
-        u = _TEMPLATE(T, vec_init)(n, ctx);
-    }
+    len = n;
+    a[i = 0] = n;
+    while (n > 1)
+        a[++i] = (n = (n + 2) / 3);
 
-    TEMPLATE(T, init)(c, ctx);
+    t = _TEMPLATE(T, vec_init)(3 * len, ctx);
+    u = t + len;
+    v = u + len;
+
     TEMPLATE(T, init)(inv2, ctx);
-    TEMPLATE(T, init)(one, ctx);
+    TEMPLATE(T, init)(inv8, ctx);
 
-    TEMPLATE(T, set_ui)(one, 1, ctx);
-
-    TEMPLATE(T, set_ui)(inv2, 2, ctx);
+    /* -1/2 and -1/8; these are zero (the result is undefined) in
+       characteristic 2 */
 #if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
     if (TEMPLATE(T, ctx_prime)(ctx) != 2)
 #else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
 #endif
-        TEMPLATE(T, inv)(inv2, inv2, ctx);
-
-    _TEMPLATE(T, poly_invsqrt_series_prealloc)(g, h, t, u, m, ctx);
-
-    _TEMPLATE(T, vec_zero)(g + m, n - m, ctx);
-
-    _TEMPLATE(T, poly_mul)(t, g, m, g, m, ctx);
-    if (2*m - 1 < n)
-        TEMPLATE(T, zero)(t + n - 1, ctx);
-
-    _TEMPLATE(T, poly_mullow)(u, t, n, g, n, n, ctx);
-    _TEMPLATE(T, poly_mullow)(t, u, n, h, n, n, ctx);
-
-    TEMPLATE(T, sub)(c, c, one, ctx);
-    TEMPLATE(T, mul)(c, c, inv2, ctx);
-    _TEMPLATE3(T, vec_scalar_mul, T)(g + m, t + m, n - m, c, ctx);
-
-    if (alloc)
     {
-        _TEMPLATE(T, vec_clear)(t, n, ctx);
-        _TEMPLATE(T, vec_clear)(u, n, ctx);
+        TEMPLATE(T, set_ui)(inv2, 2, ctx);
+        TEMPLATE(T, inv)(inv2, inv2, ctx);
+        TEMPLATE(T, neg)(inv2, inv2, ctx);
+        TEMPLATE(T, set_ui)(inv8, 8, ctx);
+        TEMPLATE(T, inv)(inv8, inv8, ctx);
+        TEMPLATE(T, neg)(inv8, inv8, ctx);
     }
 
-    TEMPLATE(T, clear)(one, ctx);
-    TEMPLATE(T, clear)(inv2, ctx);
-    TEMPLATE(T, clear)(c, ctx);
-}
+    for (i--; i >= 0; i--)
+    {
+        m = n;
+        n = a[i];
+        k = n - 2 * m;
+        L = n - m;
 
-void _TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, struct) * g,
-           const TEMPLATE(T, struct) * h, slong n, TEMPLATE(T, ctx_t) ctx)
-{
-    _TEMPLATE(T, poly_invsqrt_series_prealloc)(g, h, NULL, NULL, n, ctx);
+        /* w = (h g^2)[m, n) = -e / x^m */
+        tlen = FLINT_MIN(2 * m - 1, n);
+        _TEMPLATE(T, poly_mullow)(t, g, m, g, m, tlen, ctx);
+        _TEMPLATE(T, poly_mullow)(u, t, tlen, h, n, n, ctx);
+        w = u + m;
+
+        if (k > 0)
+        {
+            /* e/2 + 3e^2/8 = -(4w - 3 x^m w^2) / 8 */
+            _TEMPLATE(T, poly_mullow)(v, w, k, w, k, k, ctx);
+            _TEMPLATE(T, vec_scalar_mul_ui)(v, v, k, 3, ctx);
+            _TEMPLATE(T, vec_scalar_mul_ui)(w, w, L, 4, ctx);
+            _TEMPLATE(T, vec_sub)(w + m, w + m, v, k, ctx);
+        }
+
+        _TEMPLATE(T, poly_mullow)(g + m, g, FLINT_MIN(m, L), w, L, L, ctx);
+        _TEMPLATE3(T, vec_scalar_mul, T)(g + m, g + m, L, (k > 0) ? inv8 : inv2, ctx);
+    }
+
+    TEMPLATE(T, clear)(inv2, ctx);
+    TEMPLATE(T, clear)(inv8, ctx);
+    _TEMPLATE(T, vec_clear)(t, 3 * len, ctx);
 }
 
 void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,

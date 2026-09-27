@@ -696,8 +696,8 @@ Elementary functions
 .. function:: void acb_poly_sqrt_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
     Sets *g* to the power series square root of *h*, truncated to length *n*.
-    Uses division-free Newton iteration for the reciprocal square root,
-    followed by a multiplication.
+    Uses the division-free Newton iteration for the reciprocal square root
+    to half the length, followed by a Karp-Markstein step.
 
     The underscore method does not support aliasing of the input and output
     arrays. It requires that *hlen* and *n* are greater than zero.
@@ -707,7 +707,7 @@ Elementary functions
 .. function:: void acb_poly_rsqrt_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
     Sets *g* to the reciprocal power series square root of *h*, truncated to length *n*.
-    Uses division-free Newton iteration.
+    Uses a division-free third-order Newton iteration.
 
     The underscore method does not support aliasing of the input and output
     arrays. It requires that *hlen* and *n* are greater than zero.
