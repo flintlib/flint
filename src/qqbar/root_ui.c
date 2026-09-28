@@ -121,7 +121,21 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
             fmpz_poly_set_coeff_fmpz(H, i * n, QQBAR_COEFFS(x) + i);
         }
 
-        fmpz_poly_factor(fac, H);
+        /* H = P(x^n) where P is irreducible; try to certify that H is
+           irreducible (Capelli) instead of factoring it, since
+           fmpz_poly_factor would refactor P after deflating H. */
+        if (fmpz_poly_factor_inflation_is_irreducible_capelli(QQBAR_POLY(x), n))
+        {
+            fmpz_poly_factor_fit_length(fac, 1);
+            fmpz_poly_set(fac->p, H);
+            fac->exp[0] = 1;
+            fac->num = 1;
+        }
+        else
+        {
+            fmpz_poly_factor(fac, H);
+        }
+
         acb_set(z, QQBAR_ENCLOSURE(x));
         pure_real = qqbar_is_real(x);
 

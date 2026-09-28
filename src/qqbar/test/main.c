@@ -22,6 +22,7 @@
 #include "t-asec_pi.c"
 #include "t-asin_pi.c"
 #include "t-atan_pi.c"
+#include "t-binary_op_structured.c"
 #include "t-ceil.c"
 #include "t-cmpabs.c"
 #include "t-cmpabs_im.c"
@@ -41,6 +42,7 @@
 #include "t-express_in_field.c"
 #include "t-floor.c"
 #include "t-fmpz_poly_composed_op.c"
+#include "t-fmpz_poly_symmetric_composed_op.c"
 #include "t-get_acb.c"
 #include "t-get_fexpr.c"
 #include "t-get_fexpr_formula.c"
@@ -56,6 +58,7 @@
 #include "t-pow_si.c"
 #include "t-pow_ui.c"
 #include "t-randtest.c"
+#include "t-real_roots_fmpz_poly.c"
 #include "t-re_im.c"
 #include "t-root_of_unity.c"
 #include "t-roots_fmpz_poly.c"
@@ -83,6 +86,7 @@ test_struct tests[] =
     TEST_FUNCTION(qqbar_asec_pi),
     TEST_FUNCTION(qqbar_asin_pi),
     TEST_FUNCTION(qqbar_atan_pi),
+    TEST_FUNCTION(qqbar_binary_op_structured),
     TEST_FUNCTION(qqbar_ceil),
     TEST_FUNCTION(qqbar_cmpabs),
     TEST_FUNCTION(qqbar_cmpabs_im),
@@ -102,6 +106,7 @@ test_struct tests[] =
     TEST_FUNCTION(qqbar_express_in_field),
     TEST_FUNCTION(qqbar_floor),
     TEST_FUNCTION(qqbar_fmpz_poly_composed_op),
+    TEST_FUNCTION(qqbar_fmpz_poly_symmetric_composed_op),
     TEST_FUNCTION(qqbar_get_acb),
     TEST_FUNCTION(qqbar_get_fexpr),
     TEST_FUNCTION(qqbar_get_fexpr_formula),
@@ -117,6 +122,7 @@ test_struct tests[] =
     TEST_FUNCTION(qqbar_pow_si),
     TEST_FUNCTION(qqbar_pow_ui),
     TEST_FUNCTION(qqbar_randtest),
+    TEST_FUNCTION(qqbar_real_roots_fmpz_poly),
     TEST_FUNCTION(qqbar_re_im),
     TEST_FUNCTION(qqbar_root_of_unity),
     TEST_FUNCTION(qqbar_roots_fmpz_poly),
