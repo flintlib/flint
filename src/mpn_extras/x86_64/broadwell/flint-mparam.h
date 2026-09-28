@@ -91,7 +91,7 @@
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (not measured on this target: defaults).
+    (measured on Intel Xeon E7-4820 v4 (Broadwell), with an external BLAS).
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -123,13 +123,21 @@
                            the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 256
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 256
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 768
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 128
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 512
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 256
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
 #define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
-#define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
+#define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 512
+
+/*
+    nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
+    above 2^32) is used from this length on (0: never); see src/nmod_vec.h
+    (measured on Intel Xeon E7-4820 v4 (Broadwell): split limbs never beat
+    the scalar code there)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 0
 
 #endif

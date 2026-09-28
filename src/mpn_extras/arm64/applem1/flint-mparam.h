@@ -125,13 +125,20 @@
                            the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 100
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 0
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 600
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 400
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
 #define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 384
+
+/*
+    nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
+    above 2^32) is used from this length on (0: never); see src/nmod_vec.h
+    (unused: no AVX2 on this target)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
 
 #endif

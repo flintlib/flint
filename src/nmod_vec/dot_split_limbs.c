@@ -12,7 +12,7 @@
 
 /*
     Dot products for moduli above 2^32 on x86-64 with AVX2 or AVX-512
-    (without IFMA, or with IFMA for moduli of 53 to 58 bits), through the
+    (without IFMA, or with IFMA for moduli of 53 to 60 bits), through the
     32 x 32 -> 64 bit products of vpmuludq. Let b be the number of bits of
     n - 1.
 

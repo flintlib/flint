@@ -212,7 +212,9 @@ FLINT_FORCE_INLINE k52_vi k52_load_c(const ulong * p) { return _mm512_loadu_si51
 FLINT_FORCE_INLINE k52_vi k52_sub(k52_vi a, k52_vi b) { return _mm512_sub_epi64(a, b); }
 
 /* vpmuldq reads the low 32 bits of each lane: the a0 limb as loaded, the
-   a1 limb after a shift, and the sum of the two in the low half */
+   a1 limb after a shift, and the sum of the two in the low half.
+   p points into the packed B panel, which is aligned to the vector width (see
+   BT_LOAD_BSTEP in mul_blocked_templ.h), hence the aligned loads */
 FLINT_FORCE_INLINE void
 k52_load_bstep(k52_bv * bv, const ulong * p)
 {
@@ -231,7 +233,7 @@ FLINT_FORCE_INLINE k52_av
 k52_load_a(const ulong * p)
 {
     k52_av a;
-    a.a0 = _mm512_set1_epi64((long long) *p);
+    a.a0 = _mm512_set1_epi64(*p);
     a.a1 = _mm512_srli_epi64(a.a0, 32);
     a.as = _mm512_add_epi32(a.a0, a.a1);
     return a;
@@ -259,6 +261,7 @@ FLINT_FORCE_INLINE k52_vi k52_vi_zero(void) { return _mm256_setzero_si256(); }
 FLINT_FORCE_INLINE k52_vi k52_load_c(const ulong * p) { return _mm256_loadu_si256((const __m256i *) p); }
 FLINT_FORCE_INLINE k52_vi k52_sub(k52_vi a, k52_vi b) { return _mm256_sub_epi64(a, b); }
 
+/* aligned loads from the packed B panel, as above */
 FLINT_FORCE_INLINE void
 k52_load_bstep(k52_bv * bv, const ulong * p)
 {
@@ -277,7 +280,7 @@ FLINT_FORCE_INLINE k52_av
 k52_load_a(const ulong * p)
 {
     k52_av a;
-    a.a0 = _mm256_set1_epi64x((long long) *p);
+    a.a0 = _mm256_set1_epi64x(*p);
     a.a1 = _mm256_srli_epi64(a.a0, 32);
     a.as = _mm256_add_epi32(a.a0, a.a1);
     return a;

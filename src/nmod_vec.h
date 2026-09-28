@@ -21,7 +21,8 @@
 #endif
 
 #include "flint.h"
-#include "nmod.h"  // nmod_mul, nmod_fmma
+#include "nmod.h"  /* nmod_mul, nmod_fmma */
+#include "flint-mparam.h"  /* FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN */
 
 /*
     SIMD dot products for moduli above 2^32 (see dot_u52.c, dot_u64.c,
@@ -33,7 +34,7 @@
     - on AVX2 / AVX-512, the entries split into two limbs of at most 32 bits
       multiplied with vpmuludq (_DOT_SPLIT_LIMBS / _DOT3_SPLIT_LIMBS), for
       all moduli above 2^32 without IFMA, and with IFMA for moduli of 53 to
-      58 bits.
+      NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS bits.
     The limb-count convention on dot_method_t is kept: each method appears
     in the band(s) it can serve.
 */
@@ -56,10 +57,37 @@
 # define NMOD_VEC_HAVE_DOT_SPLIT_LIMBS 0
 #endif
 
-/* minimal lengths for these to beat the scalar code */
-#define NMOD_VEC_DOT_U52_MIN_LEN 56
-#define NMOD_VEC_DOT_U64_MIN_LEN 96
-#define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+/*
+    Minimal lengths for these to beat the scalar code, measured on Ice Lake,
+    Zen 4, Cascade Lake, Broadwell and a Sapphire Rapids-class virtual machine.
+    u52 and u64 agree across the IFMA machines measured, once the two bands of
+    u64 are separated (u64 against _DOT2 in the two-limb band, against
+    _DOT3_ACC / _DOT3 in the three-limb one); the split-limbs crossover varies
+    from 48 (Zen 4) to 128 (Cascade Lake) and never (Broadwell), hence a
+    parameter of flint-mparam.h, where 0 means never.
+*/
+#define NMOD_VEC_DOT_U52_MIN_LEN 40
+#define NMOD_VEC_DOT_U64_MIN_LEN 80
+#define NMOD_VEC_DOT3_U64_MIN_LEN 48
+#ifndef FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+# define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+#endif
+#define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+#define NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED \
+    (NMOD_VEC_HAVE_DOT_SPLIT_LIMBS && NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN > 0)
+
+/* with AVX512-IFMA, split limbs are faster than u64 up to 60 bits (Ice
+   Lake; 61 on Zen 4, a tie at 61 bits there) */
+#define NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS 60
+
+/*
+    AArch64: the scalar _DOT2_SPLIT is faster than the two-chain _DOT2 up
+    to about this length only, and _DOT2_HALF (scalar without AVX2) never
+    (Apple M4); on x86 _DOT2_SPLIT and _DOT2_HALF are vectorized with AVX2
+*/
+#if FLINT_BITS == 64 && defined(__aarch64__)
+# define NMOD_VEC_DOT2_SPLIT_MAX_LEN 160
+#endif
 
 /* below their minimal length (parameters computed for a longer length, as
    for the short dot products of a classical polynomial product), the SIMD
@@ -297,6 +325,13 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         }
 
         // u1 != 0 <=> 2 limbs
+#if defined(NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        if (len >= NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        {
+            dot_params_t params = {_DOT2, UWORD(0)};
+            return params;
+        }
+#endif
 #if (FLINT_BITS == 64) // _SPLIT: see end of file for these constraints
         if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
         {
@@ -310,6 +345,9 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         ulong pow2_precomp;
         NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
         dot_params_t params = {_DOT2_HALF, pow2_precomp};
+        return params;
+#elif defined(NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        dot_params_t params = {_DOT2, UWORD(0)};
         return params;
 #else // (FLINT_BITS == 64) && defined(__AVX2__)
         dot_params_t params = {_DOT2_HALF, UWORD(0)};
@@ -334,10 +372,12 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             return params;
         }
 #endif
-#if NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
-        // with IFMA: only for 53 to 58 bits, _DOT_U64 is faster beyond
+#if NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
+        // with IFMA: only up to NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS bits,
+        // _DOT_U64 is faster beyond
         if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
-                && (!NMOD_VEC_HAVE_DOT_U64 || mod.n <= (UWORD(1) << 58)))
+                && (!NMOD_VEC_HAVE_DOT_U64
+                    || mod.n <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS)))
         {
             dot_params_t params = {_DOT_SPLIT_LIMBS, UWORD(0)};
             return params;
@@ -355,16 +395,17 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     }
 
     // 3 limbs:
-#if NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
+#if NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
     if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
-            && (!NMOD_VEC_HAVE_DOT_U64 || mod.n <= (UWORD(1) << 58)))
+            && (!NMOD_VEC_HAVE_DOT_U64
+                || mod.n <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS)))
     {
         dot_params_t params = {_DOT3_SPLIT_LIMBS, UWORD(0)};
         return params;
     }
 #endif
 #if NMOD_VEC_HAVE_DOT_U64
-    if (len >= NMOD_VEC_DOT_U64_MIN_LEN)
+    if (len >= NMOD_VEC_DOT3_U64_MIN_LEN)
     {
         dot_params_t params = {_DOT3_U64, UWORD(0)};
         return params;
@@ -569,7 +610,8 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
             : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, mod, , vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
-        return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
+        return (len >= ((params.method == _DOT_U64) ? NMOD_VEC_DOT_U64_MIN_LEN
+                                                    : NMOD_VEC_DOT3_U64_MIN_LEN))
             ? _nmod_vec_dot_u64(vec1, vec2, len, mod)
             : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, mod, , vec1, vec2, len, mod);
 
@@ -625,7 +667,8 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
             : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_SPLIT_LIMBS, mod, _rev, vec1, vec2, len, mod);
 
     if (params.method == _DOT_U64 || params.method == _DOT3_U64)
-        return (len >= NMOD_VEC_DOT_U64_MIN_LEN)
+        return (len >= ((params.method == _DOT_U64) ? NMOD_VEC_DOT_U64_MIN_LEN
+                                                    : NMOD_VEC_DOT3_U64_MIN_LEN))
             ? _nmod_vec_dot_u64_rev(vec1, vec2, len, mod)
             : _NMOD_VEC_DOT_SCALAR(params.method == _DOT_U64, mod, _rev, vec1, vec2, len, mod);
 

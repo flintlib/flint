@@ -36,6 +36,13 @@
 
 #include <immintrin.h>
 
+/* the smaller of the minimal lengths of the two bands */
+#if NMOD_VEC_DOT3_U64_MIN_LEN <= NMOD_VEC_DOT_U64_MIN_LEN
+# define U64_DIRECT_MIN_LEN NMOD_VEC_DOT3_U64_MIN_LEN
+#else
+# define U64_DIRECT_MIN_LEN NMOD_VEC_DOT_U64_MIN_LEN
+#endif
+
 /* iterations between two dumps: 250 + 1 (masked tail) halves per lane,
    so that the sums of two accumulators stay below 2^61 */
 #define U64_DOT_CHUNK 250
@@ -136,8 +143,10 @@ _nmod_vec_dot_u64(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
     /* the parameters may come from a longer length: short products are
        faster with the scalar code, chosen for this length (_DOT2 when the
-       sum fits two limbs, _DOT3_ACC when the modulus allows it) */
-    if (len < NMOD_VEC_DOT_U64_MIN_LEN)
+       sum fits two limbs, _DOT3_ACC when the modulus allows it); below
+       U64_DIRECT_MIN_LEN _nmod_vec_dot_params never returns u64, so this
+       cannot come back here */
+    if (len < U64_DIRECT_MIN_LEN)
         return _nmod_vec_dot(vec1, vec2, len, mod, _nmod_vec_dot_params(len, mod));
 
 #define LOAD2(k) _mm512_loadu_si512((const void *) (vec2 + (k)))
@@ -150,7 +159,7 @@ _nmod_vec_dot_u64(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 ulong
 _nmod_vec_dot_u64_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    if (len < NMOD_VEC_DOT_U64_MIN_LEN)
+    if (len < U64_DIRECT_MIN_LEN)
         return _nmod_vec_dot_rev(vec1, vec2, len, mod, _nmod_vec_dot_params(len, mod));
 
     /* as in dot_u52.c */
@@ -170,7 +179,7 @@ ulong
 _nmod_vec_dot_u64_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
                       slong len, nmod_t mod)
 {
-    if (len < NMOD_VEC_DOT_U64_MIN_LEN)
+    if (len < U64_DIRECT_MIN_LEN)
         return _nmod_vec_dot_ptr(vec1, vec2, offset, len, mod, _nmod_vec_dot_params(len, mod));
 
     const void * base = (const void *) (offset * (slong) sizeof(ulong));

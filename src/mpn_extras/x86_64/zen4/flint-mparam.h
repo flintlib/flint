@@ -127,4 +127,11 @@
 #define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
 
+/*
+    nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
+    above 2^32) is used from this length on (0: never); see src/nmod_vec.h
+    (measured on AMD Ryzen 7 PRO 7840U (Zen 4))
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 48
+
 #endif

@@ -50,7 +50,14 @@
       BT_ACC_ZERO()
       BT_LOAD_C(p)             VL canonical entries of C -> accumulator
       BT_STORE_C(p, acc)       accumulator holding canonical residues -> C
+                               (p points into the caller's C, or into the
+                               stage tile for edge tiles: no alignment)
       BT_LOAD_BSTEP(bv, p)     the NACC B operands of one k step
+                               (p points into the packed B panel: the scratch
+                               buffer is 64-byte aligned and every k step
+                               starts at a multiple of NR packed entries, i.e.
+                               of the width of these loads, so aligned loads
+                               are fine)
       BT_LOAD_A(p)             one packed A element as an operand
       BT_MUL_ADD(acc, a, b, C) acc + a*b, lane-wise (C for kernels that
                                reduce each product)

@@ -93,6 +93,16 @@
 # define NMOD_MAT_MUL_ROWS_MAX 4
 #endif
 
+/* whether, for this modulus, nmod_mat_mul prefers the SIMD kernels to
+   _nmod_mat_mul_rows_simd for the shapes both can take: moduli below 2^32
+   when the rows engine only has its floating point tier for them (no
+   IFMA, no x86 integer tier), where nmod_mat_mul_u32 is faster */
+#if !NMOD_MAT_HAVE_MUL_U52 && !NMOD_MAT_HAVE_VM_U32
+# define NMOD_MAT_MUL_ROWS_PREFER_KERNEL(n) ((n) <= (UWORD(1) << 32))
+#else
+# define NMOD_MAT_MUL_ROWS_PREFER_KERNEL(n) 0
+#endif
+
 #include "nmod_types.h"
 
 /*

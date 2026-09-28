@@ -98,7 +98,7 @@ typedef enum
     _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
     _DOT_U52 = 4,        /* 2 limbs, modulus <= 2**52, AVX512-IFMA (64 bits only) */
     _DOT_SPLIT_LIMBS = 5,  /* 2 limbs, modulus > 2**32, AVX2 (64 bits only) */
-    _DOT_U64 = 6,        /* 2 limbs, modulus > 2**58, AVX512-IFMA (64 bits only) */
+    _DOT_U64 = 6,        /* 2 limbs, modulus > 2**52, AVX512-IFMA, see nmod_vec.h */
     _DOT2 = 7,           /* 2 limbs */
     _DOT3_ACC = 8,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
     _DOT3_U64 = 9,       /* 3 limbs, AVX512-IFMA (64 bits only), same code as _DOT_U64 */

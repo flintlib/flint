@@ -132,4 +132,11 @@
 #define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
 
+/*
+    nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
+    above 2^32) is used from this length on (0: never); see src/nmod_vec.h
+    (not measured on this target: default)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+
 #endif

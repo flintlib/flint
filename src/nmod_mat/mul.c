@@ -98,6 +98,11 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         of MR rows (MR depends on each kernel and on the ISA, but it can be above
         10).
 
+        Where the rows engine only has its floating point tier for moduli
+        below 2^32 (no AVX512-IFMA and no x86 integer tier: NEON), the u32
+        kernel is faster whenever it takes the shape (Apple M4: 2.0-2.5x
+        at 4 rows), see NMOD_MAT_MUL_ROWS_PREFER_KERNEL.
+
         NOTE It is single-threaded: with several threads it is still used
         for the shapes the threaded kernels do not take (below), which
         would otherwise go to nmod_mat_mul_classical_threaded (observed 2-7x
@@ -105,7 +110,8 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         TODO thread it (split the columns of B).
     */
     if (m >= 1 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2 && n >= 1
-            && (flint_num_threads == 1
+            && ((flint_num_threads == 1
+                 && !NMOD_MAT_MUL_ROWS_PREFER_KERNEL(C->mod.n))
                 || !((m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
                       && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
                      || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM

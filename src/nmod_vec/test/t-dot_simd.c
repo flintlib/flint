@@ -84,9 +84,11 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
                 m = (UWORD(1) << 52) + 1 + n_randint(state, 4);
                 break;
             case 6:
-                /* around the limits of _DOT_SPLIT_LIMBS with IFMA
-                   (n = 2^58) and of its two variants (n = 2^61) */
-                m = (UWORD(1) << (58 + 3 * n_randint(state, 2)))
+                /* around the limit of _DOT_SPLIT_LIMBS with IFMA
+                   (NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS) and that of
+                   its two variants (n = 2^61) */
+                m = (UWORD(1) << (n_randint(state, 2)
+                                  ? NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS : 61))
                         + n_randint(state, 5) - 2;
                 break;
             case 7:
@@ -99,8 +101,11 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
         if (m < 2)
             m = 2;
         u52 = (m <= (UWORD(1) << 52));
-        split = NMOD_VEC_HAVE_DOT_SPLIT_LIMBS
-                && (!NMOD_VEC_HAVE_DOT_U64 || m <= (UWORD(1) << 58));
+        /* whether _nmod_vec_dot_params selects split limbs (the functions
+           themselves are tested whenever they are compiled) */
+        split = NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
+                && (!NMOD_VEC_HAVE_DOT_U64
+                    || m <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS));
 
         switch (n_randint(state, 4))
         {
@@ -213,7 +218,7 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
             dot_method_t exp = _DOT3;
             if (split && len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN)
                 exp = _DOT3_SPLIT_LIMBS;
-            else if (NMOD_VEC_HAVE_DOT_U64 && len >= NMOD_VEC_DOT_U64_MIN_LEN)
+            else if (NMOD_VEC_HAVE_DOT_U64 && len >= NMOD_VEC_DOT3_U64_MIN_LEN)
                 exp = _DOT3_U64;
             if (exp != _DOT3 && params.method != exp)
                 TEST_FUNCTION_FAIL("params: expected %d, got %d: "
