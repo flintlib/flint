@@ -10,34 +10,14 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_reverse(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
 {
-    if (res == poly)
-    {
-        slong i;
-
-        for (i = 0; i < n / 2; i++)
-        {
-            ca_struct t = res[i];
-            res[i] = res[n - 1 - i];
-            res[n - 1 - i] = t;
-        }
-
-        for (i = 0; i < n - len; i++)
-            ca_zero(res + i, ctx);
-    }
-    else
-    {
-        slong i;
-
-        for (i = 0; i < n - len; i++)
-            ca_zero(res + i, ctx);
-
-        for (i = 0; i < len; i++)
-            ca_set(res + (n - len) + i, poly + (len - 1) - i, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_reverse(res, poly, len, n, gr_ctx));
 }
 
 void

@@ -564,7 +564,8 @@ Multiplication
     and ``poly2`` upon polynomial division by ``f``.
 
     It is required that ``finv`` is the inverse of the reverse of
-    ``f`` mod ``x^lenf``.
+    ``f`` mod ``x^lenf`` and that ``len1 + len2 - 1 <= 2*lenf - 2``;
+    ``poly1`` and ``poly2`` need not be reduced modulo ``f``.
 
     Aliasing of ``res`` with any of the inputs is not permitted.
 
@@ -1130,22 +1131,26 @@ Square root
     Set the first `n` terms of `g` to the series expansion of `1/\sqrt{h}`.
     It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
     is zero-padded as necessary to length `n`. Aliasing is not permitted.
+    An exception is raised in characteristic 2 when `n > 1`.
 
 .. function:: void fq_nmod_poly_invsqrt_series(fq_nmod_poly_t g, const fq_nmod_poly_t h, slong n, fq_nmod_ctx_t ctx)
 
     Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
+    An exception is raised in characteristic 2 when `n > 1`.
 
 .. function:: void _fq_nmod_poly_sqrt_series(fq_nmod_struct * g, const fq_nmod_struct * h, slong n, fq_nmod_ctx_t ctx)
 
     Set the first `n` terms of `g` to the series expansion of `\sqrt{h}`.
     It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
     is zero-padded as necessary to length `n`. Aliasing is not permitted.
+    An exception is raised in characteristic 2 when `n > 1`.
 
 .. function:: void fq_nmod_poly_sqrt_series(fq_nmod_poly_t g, const fq_nmod_poly_t h, slong n, fq_nmod_ctx_t ctx)
 
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
+    An exception is raised in characteristic 2 when `n > 1`.
 
 .. function:: int _fq_nmod_poly_sqrt(fq_nmod_struct * s, const fq_nmod_struct * p, slong n, fq_nmod_ctx_t mod)
 

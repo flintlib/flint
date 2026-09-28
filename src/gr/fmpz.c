@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include <string.h>
 #include <gmp.h>
 #include "fexpr.h"
 #include "qqbar.h"
@@ -23,6 +24,7 @@
 #include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
+#include "gr_poly.h"
 #include "gr_special.h"
 #include "gmpcompat.h"
 
@@ -57,6 +59,62 @@ static void
 _gr_fmpz_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     *res = *x;
+}
+
+static void
+_gr_fmpz_vec_init(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    if (len > 0)
+        memset(vec, 0, len * sizeof(fmpz));
+}
+
+static void
+_gr_fmpz_vec_clear(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpz_clear(vec + i);
+}
+
+static void
+_gr_fmpz_vec_swap(fmpz * vec1, fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    fmpz t;
+
+    for (i = 0; i < len; i++)
+    {
+        t = vec1[i];
+        vec1[i] = vec2[i];
+        vec2[i] = t;
+    }
+}
+
+static int
+_gr_fmpz_vec_zero(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    _fmpz_vec_zero(vec, len);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_set(fmpz * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (res != vec)
+    {
+        for (i = 0; i < len; i++)
+        {
+            if (!COEFF_IS_MPZ(vec[i]) && !COEFF_IS_MPZ(res[i]))
+                res[i] = vec[i];
+            else
+                fmpz_set(res + i, vec + i);
+        }
+    }
+
+    return GR_SUCCESS;
 }
 
 /* todo: limits */
@@ -894,9 +952,34 @@ _gr_fmpz_vec_mul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c
 }
 
 static int
+_gr_fmpz_scalar_mul_vec(fmpz * res, const fmpz_t c, const fmpz * vec1, slong len, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_mul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
 _gr_fmpz_vec_addmul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
 {
     _fmpz_vec_scalar_addmul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_submul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_submul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_add_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        _fmpz_add_inline(res + i, vec1 + i, c);
+
     return GR_SUCCESS;
 }
 
@@ -1021,6 +1104,33 @@ _gr_fmpz_poly_mulmid(fmpz * res,
     const fmpz * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     _fmpz_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_poly_taylor_shift(fmpz * res, const fmpz * poly, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    if (res != poly)
+        _fmpz_vec_set(res, poly, len);
+
+    _fmpz_poly_taylor_shift(res, c, len);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_poly_inv_series_basecase(fmpz * res,
+    const fmpz * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    if (n == 0)
+        return GR_SUCCESS;
+
+    if (flen == 0)
+        return GR_DOMAIN;
+
+    if (!fmpz_is_pm1(f))
+        return _gr_poly_inv_series_basecase_generic(res, f, flen, n, ctx);
+
+    _fmpz_poly_inv_series_basecase(res, f, flen, n);
     return GR_SUCCESS;
 }
 
@@ -1244,14 +1354,23 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
     {GR_METHOD_FIB_UI,          (gr_funcptr) _gr_fmpz_fib_ui},
     {GR_METHOD_FIB_FMPZ,        (gr_funcptr) _gr_fmpz_fib_fmpz},
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_fmpz_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_fmpz_vec_clear},
+    {GR_METHOD_VEC_SWAP,        (gr_funcptr) _gr_fmpz_vec_swap},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fmpz_vec_zero},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fmpz_vec_set},
     {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpz_vec_is_zero},
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
     {GR_METHOD_VEC_MUL_SCALAR,             (gr_funcptr) _gr_fmpz_vec_mul_scalar},
     {GR_METHOD_VEC_MUL_SCALAR_FMPZ,        (gr_funcptr) _gr_fmpz_vec_mul_scalar},
+    {GR_METHOD_SCALAR_MUL_VEC,             (gr_funcptr) _gr_fmpz_scalar_mul_vec},
     {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,     (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,          (gr_funcptr) _gr_fmpz_vec_submul_scalar},
+    {GR_METHOD_VEC_ADD_SCALAR,             (gr_funcptr) _gr_fmpz_vec_add_scalar},
+    {GR_METHOD_VEC_ADD_SCALAR_FMPZ,        (gr_funcptr) _gr_fmpz_vec_add_scalar},
     {GR_METHOD_VEC_DIVEXACT_SCALAR,        (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
     {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ,   (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
     {GR_METHOD_VEC_DIVEXACT_SCALAR_UI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_ui},
@@ -1262,6 +1381,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_poly_mulmid},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_fmpz_poly_divexact2},
+    {GR_METHOD_POLY_TAYLOR_SHIFT, (gr_funcptr) _gr_fmpz_poly_taylor_shift},
+    {GR_METHOD_POLY_INV_SERIES_BASECASE, (gr_funcptr) _gr_fmpz_poly_inv_series_basecase},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_roots_gr_poly},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpz_roots_gr_poly_other},

@@ -9,32 +9,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 truth_t
 ca_mat_nonsingular_solve_lu(ca_mat_t X, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 {
-    truth_t result;
-    slong n, m, *perm;
-    ca_mat_t LU;
+    int status;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
 
-    n = ca_mat_nrows(A);
-    m = ca_mat_ncols(X);
+    status = gr_mat_nonsingular_solve_lu((gr_mat_struct *) X,
+        (const gr_mat_struct *) A, (const gr_mat_struct *) B, gr_ctx);
 
-    if (n == 0)
+    if (status & GR_UNABLE)
+        return T_UNKNOWN;
+    else if (status & GR_DOMAIN)
+        return T_FALSE;
+    else
         return T_TRUE;
-
-    perm = _perm_init(n);
-    ca_mat_init(LU, n, n, ctx);
-
-    result = ca_mat_nonsingular_lu(perm, LU, A, ctx);
-
-    if (result == T_TRUE && m != 0)
-        ca_mat_solve_lu_precomp(X, perm, LU, B, ctx);
-
-    ca_mat_clear(LU, ctx);
-    _perm_clear(perm);
-
-    return result;
 }

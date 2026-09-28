@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+#include <gmp.h>
 #include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
@@ -97,6 +99,113 @@ static void
 _gr_fmpz_mod_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     *res = *x;
+}
+
+/* Elements are plain fmpz: vector methods avoiding per-element dispatch. */
+static void
+_gr_fmpz_mod_vec_init(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    if (len > 0)
+        memset(vec, 0, len * sizeof(fmpz));
+}
+
+static void
+_gr_fmpz_mod_vec_clear(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpz_clear(vec + i);
+}
+
+static void
+_gr_fmpz_mod_vec_swap(fmpz * vec1, fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    fmpz t;
+
+    for (i = 0; i < len; i++)
+    {
+        t = vec1[i];
+        vec1[i] = vec2[i];
+        vec2[i] = t;
+    }
+}
+
+static int
+_gr_fmpz_mod_vec_zero(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpz_zero(vec + i);
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_set(fmpz * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (res != vec)
+    {
+        for (i = 0; i < len; i++)
+        {
+            if (!COEFF_IS_MPZ(vec[i]) && !COEFF_IS_MPZ(res[i]))
+                res[i] = vec[i];
+            else
+                fmpz_set(res + i, vec + i);
+        }
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_normalise(slong * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && fmpz_is_zero(vec + len - 1))
+        len--;
+
+    res[0] = len;
+    return GR_SUCCESS;
+}
+
+static void
+_gr_fmpz_mod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    fmpz * coeffs = poly->coeffs;
+    slong i;
+
+    for (i = len; i < poly->length; i++)
+        fmpz_zero(coeffs + i);
+
+    while (len > 0 && fmpz_is_zero(coeffs + len - 1))
+        len--;
+
+    poly->length = len;
+}
+
+static int
+_gr_fmpz_mod_vec_neg(fmpz * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_neg(res, vec, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_add(res, vec1, vec2, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_sub(res, vec1, vec2, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
 }
 
 static int
@@ -203,6 +312,20 @@ _gr_fmpz_mod_is_neg_one(const fmpz_t x, const gr_ctx_t ctx)
 {
     truth_t res;
     fmpz_t t;
+    const fmpz * n = FMPZ_MOD_CTX(ctx)->n;
+    ulong xlo, nlo;
+
+    /* x = n - 1 implies x + 1 = n mod 2^FLINT_BITS */
+    xlo = COEFF_IS_MPZ(*x) ? COEFF_TO_PTR(*x)->_mp_d[0] : (ulong) *x;
+    nlo = COEFF_IS_MPZ(*n) ? COEFF_TO_PTR(*n)->_mp_d[0] : (ulong) *n;
+
+    if (xlo + 1 != nlo)
+        return T_FALSE;
+
+    /* for small n this is exact */
+    if (!COEFF_IS_MPZ(*n) && !COEFF_IS_MPZ(*x))
+        return T_TRUE;
+
     fmpz_init(t);
     fmpz_mod_set_si(t, -1, FMPZ_MOD_CTX(ctx));
     res = fmpz_equal(t, x) ? T_TRUE : T_FALSE;
@@ -219,7 +342,21 @@ _gr_fmpz_mod_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 static int
 _gr_fmpz_mod_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    fmpz_set(res, x);
+    if (!COEFF_IS_MPZ(*x))
+    {
+        if (!COEFF_IS_MPZ(*res))
+            *res = *x;
+        else
+            fmpz_set(res, x);
+    }
+    else if (COEFF_IS_MPZ(*res))
+    {
+        mpz_set(COEFF_TO_PTR(*res), COEFF_TO_PTR(*x));
+    }
+    else
+    {
+        fmpz_set(res, x);
+    }
     return GR_SUCCESS;
 }
 
@@ -699,7 +836,6 @@ _gr_fmpz_mod_poly_inv_series(fmpz * Q, const fmpz * B, slong lenB, slong len, gr
         return _gr_poly_inv_series_newton(Q, B, lenB, len, cutoff, ctx);
 }
 
-/* todo: the fmpz_mod_poly module has better basecase code */
 static int
 _gr_fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, slong len, gr_ctx_t ctx)
 {
@@ -718,6 +854,27 @@ _gr_fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong lenA, const fmpz * 
         return _gr_poly_div_series_basecase(Q, A, lenA, B, lenB, len, ctx);
     else
         return _gr_poly_div_series_newton(Q, A, lenA, B, lenB, len, cutoff, ctx);
+}
+
+/* Newton division with a precomputed inverse beats ordinary division
+   (the generic choice for short moduli) at all lengths, and the generic
+   sparse reduction only wins for very sparse, long moduli (measured) */
+static int
+_gr_fmpz_mod_poly_preinv_set(gr_poly_preinv_struct * P, const fmpz * f, slong lenf, gr_ctx_t ctx)
+{
+    slong i, nz;
+
+    if (lenf > 32)
+    {
+        nz = 0;
+        for (i = 0; i < lenf - 1 && nz <= 2; i++)
+            nz += !fmpz_is_zero(f + i);
+
+        if (nz <= 2)
+            return _gr_poly_preinv_set_sparse(P, f, lenf, ctx);
+    }
+
+    return _gr_poly_preinv_set_newton(P, f, lenf, ctx);
 }
 
 static int _gr_fmpz_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -923,17 +1080,16 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
     {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
     {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
-/*
-    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_mpn_mod_vec_zero},
-    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_mpn_mod_vec_clear},
-    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_mpn_mod_vec_set},
-    {GR_METHOD_VEC_SWAP,        (gr_funcptr) _gr_mpn_mod_vec_swap},
-    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_mpn_mod_vec_zero},
-    {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_mpn_mod_vec_neg},
-    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_mpn_mod_vec_add},
-    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_mpn_mod_vec_sub},
-    {GR_METHOD_VEC_MUL,         (gr_funcptr) _gr_mpn_mod_vec_mul},
-*/
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_fmpz_mod_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_fmpz_mod_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fmpz_mod_vec_set},
+    {GR_METHOD_VEC_SWAP,        (gr_funcptr) _gr_fmpz_mod_vec_swap},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fmpz_mod_vec_zero},
+    {GR_METHOD_VEC_NORMALISE,   (gr_funcptr) _gr_fmpz_mod_vec_normalise},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _gr_fmpz_mod_poly_set_length_normalise},
+    {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_fmpz_mod_vec_neg},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_mod_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_mod_vec_sub},
     {GR_METHOD_VEC_MUL_SCALAR,  (gr_funcptr) _gr_fmpz_mod_vec_mul_scalar},
     {GR_METHOD_SCALAR_MUL_VEC,  (gr_funcptr) _gr_fmpz_mod_scalar_mul_vec},
     {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_fmpz_mod_vec_addmul_scalar},
@@ -947,6 +1103,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
     {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fmpz_mod_poly_gcd},
+    {GR_METHOD_POLY_PREINV_SET, (gr_funcptr) _gr_fmpz_mod_poly_preinv_set},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},

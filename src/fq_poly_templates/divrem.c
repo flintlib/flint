@@ -25,13 +25,26 @@ _TEMPLATE(T, poly_divrem) (TEMPLATE(T, struct) * Q,
                                     const TEMPLATE(T, ctx_t) ctx)
 {
     gr_ctx_t gr_ctx;
+    slong lenQ = lenA - lenB + 1;
+    int basecase;
+
     TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-    /* todo: tuning, and make sure it is also used in gr_poly_divrem */
-    if (lenB <= 10 || lenA - lenB <= 1)
+    /* Where the basecase algorithm is preferable, use it with the
+       precomputed inverse; otherwise the ring's divrem method in gr
+       (which does its own tuning) is used. */
+#if defined(FQ_ZECH_POLY_H)
+    /* the first test avoids computing the threshold for small input */
+    basecase = FLINT_MIN(lenQ, lenB) < 4 * FQ_ZECH_POLY_MUL_UNIVARIATE_MIN_LEN(ctx) ||
+               FLINT_MIN(lenQ, lenB) < 4 * _fq_zech_poly_mul_univariate_threshold(ctx);
+#else
+    basecase = (lenQ <= 2) || (lenQ == 3 && lenB < 32);
+#endif
+
+    if (basecase)
         GR_MUST_SUCCEED(_gr_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, gr_ctx));
     else
-        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, gr_ctx));  /* todo: pass invB */
+        GR_MUST_SUCCEED(_gr_poly_divrem(Q, R, A, lenA, B, lenB, gr_ctx));
 }
 
 void

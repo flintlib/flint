@@ -1589,6 +1589,31 @@ _gr_arb_poly_mulmid(arb_ptr res,
     return GR_SUCCESS;
 }
 
+/* Division with remainder via power series division, as in
+   _arb_poly_divrem (which never calls back into gr). That function does
+   not allow R to be aliased with A, so we use a temporary in that case. */
+static int
+_gr_arb_poly_divrem(arb_ptr Q, arb_ptr R,
+    arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    if (arb_contains_zero(B + lenB - 1))
+        return GR_UNABLE;
+
+    if (R == A && lenB > 1)
+    {
+        arb_ptr T = _arb_vec_init(lenB - 1);
+        _arb_poly_divrem(Q, T, A, lenA, B, lenB, ARB_CTX_PREC(ctx));
+        _arb_vec_swap(R, T, lenB - 1);
+        _arb_vec_clear(T, lenB - 1);
+    }
+    else
+    {
+        _arb_poly_divrem(Q, R, A, lenA, B, lenB, ARB_CTX_PREC(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
 static int
 _gr_arb_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
@@ -1914,6 +1939,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_arb_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_arb_poly_mulmid},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_arb_poly_divrem},
     {GR_METHOD_POLY_TAYLOR_SHIFT,   (gr_funcptr) _gr_arb_poly_taylor_shift},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_arb_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arb_poly_roots_other},

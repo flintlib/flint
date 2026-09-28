@@ -14,21 +14,16 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
-void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
-                              slong lenA, const fmpz* B, slong lenB,
-                              const fmpz* Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
+void _fmpz_mod_poly_divrem_newton_n_preinv(fmpz * Q, fmpz * R, const fmpz * A,
+                              slong lenA, const fmpz * B, slong lenB,
+                              const fmpz * Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
 {
-    const slong lenQ = lenA - lenB + 1;
-
-    _fmpz_mod_poly_div_newton_n_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, ctx);
-
-    if (lenB > 1)
-    {
-        _fmpz_mod_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
-
-        _fmpz_mod_vec_sub(R, A, R, lenB - 1, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_divrem_newton_n_preinv(Q, R, A, lenA, B, lenB, Binv, lenBinv, gr_ctx));
 }
 
 void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,

@@ -283,9 +283,8 @@ gr_poly_is_irreducible_rabin(const gr_poly_t f, gr_ctx_t ctx)
     if (_gr_poly_factor_ff_info(NULL, NULL, NULL, ctx) != GR_SUCCESS)
         return T_UNKNOWN;
 
-    res = gr_poly_is_squarefree(f, ctx);
-    if (res != T_TRUE)
-        return res;
+    /* No squarefreeness check is needed: x^(q^n) = x mod f implies that
+       f divides the squarefree polynomial x^(q^n) - x. */
 
     nbits = FLINT_BIT_COUNT(n);
 

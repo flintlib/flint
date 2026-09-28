@@ -32,6 +32,7 @@
 #include "t-hessenberg.c"
 #include "t-hessenberg_gauss.c"
 #include "t-hessenberg_householder.c"
+#include "t-hilbert.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
 #include "t-is_orthogonal.c"
@@ -99,6 +100,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
     TEST_FUNCTION(gr_mat_hessenberg_householder),
+    TEST_FUNCTION(gr_mat_hilbert),
     TEST_FUNCTION(gr_mat_inv),
     TEST_FUNCTION(gr_mat_invert_rows_cols),
     TEST_FUNCTION(gr_mat_is_orthogonal),

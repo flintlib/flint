@@ -42,9 +42,11 @@ _gr_poly_div_series_basecase_noinv(gr_ptr Q,
     {
         if (Alen == 1)
         {
+            /* Q[1] = -(Q[0] B[1]) / B[0]; multiply before dividing
+               so that exact division works when B[0] does not divide Q[0] */
             status |= gr_div(Q, A, B, ctx);
-            status |= gr_div(GR_ENTRY(Q, 1, sz), Q, B, ctx);
-            status |= gr_mul(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_div(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), B, ctx);
             status |= gr_neg(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
         }
         else
@@ -158,14 +160,34 @@ _gr_poly_div_series_basecase_generic(gr_ptr Q,
 
     if (Blen == 1)
     {
-        status |= _gr_vec_div_scalar(Q, A, Alen, B, ctx);
+        /* In exact rings, invert B[0] only once. */
+        if (Alen > 1 && gr_ctx_is_exact(ctx) == T_TRUE)
+        {
+            gr_ptr q;
+
+            GR_TMP_INIT(q, ctx);
+
+            if (gr_inv(q, B, ctx) == GR_SUCCESS)
+                status |= _gr_vec_mul_scalar(Q, A, Alen, q, ctx);
+            else
+                status |= _gr_vec_div_scalar(Q, A, Alen, B, ctx);
+
+            GR_TMP_CLEAR(q, ctx);
+        }
+        else
+        {
+            status |= _gr_vec_div_scalar(Q, A, Alen, B, ctx);
+        }
+
         status |= _gr_vec_zero(GR_ENTRY(Q, Alen, sz), len - Alen, ctx);
         return status;
     }
 
-    if (len == 2)
+    /* In exact rings, invert B[0] only once (the general code below
+       does this too). In inexact rings, dividing twice gives
+       better results. */
+    if (len == 2 && gr_ctx_is_exact(ctx) != T_TRUE)
     {
-        /* todo: in appropriate cases, don't do a division */
         status |= gr_div(Q, A, B, ctx);
         status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
 

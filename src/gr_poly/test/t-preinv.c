@@ -313,5 +313,195 @@ cleanup:
         }
     }
 
+    /* Automatic selection over fmpz_mod: sparse representation for long
+       moduli with at most two nonzero terms below the leading one,
+       Newton otherwise. Prime and composite moduli (with a unit leading
+       coefficient). */
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t ctx;
+        gr_poly_t A, B, F, Q, R, Q2, R2, T;
+        gr_poly_preinv_t P;
+        fmpz_t m, e;
+        gr_ptr c;
+        slong i, lenf, nterms, expected_nz;
+        int status = GR_SUCCESS, expected_kind;
+
+        fmpz_init(m);
+        fmpz_init(e);
+
+        if (n_randint(state, 2))
+            fmpz_randprime(m, state, 2 + n_randint(state, 150), 0);
+        else
+        {
+            fmpz_randtest_unsigned(m, state, 2 + n_randint(state, 150));
+            fmpz_add_ui(m, m, 2);
+        }
+
+        gr_ctx_init_fmpz_mod(ctx, m);
+
+        gr_poly_init(A, ctx); gr_poly_init(B, ctx); gr_poly_init(F, ctx);
+        gr_poly_init(Q, ctx); gr_poly_init(R, ctx); gr_poly_init(Q2, ctx);
+        gr_poly_init(R2, ctx); gr_poly_init(T, ctx);
+        gr_poly_preinv_init(P, ctx);
+        c = gr_heap_init(ctx);
+
+        /* lenf in 30..101 straddles the threshold lenf > 32 */
+        lenf = 30 + n_randint(state, 72);
+        nterms = n_randint(state, 5);   /* 0..4 nonzero terms below the lead */
+
+        status |= gr_poly_zero(F, ctx);
+        for (i = 0; i < nterms; i++)
+        {
+            do {
+                status |= gr_randtest(c, state, ctx);
+            } while (gr_is_zero(c, ctx) != T_FALSE);
+
+            /* distinct exponents: the constant term, then random ones */
+            if (i == 0)
+                status |= gr_poly_set_coeff_scalar(F, 0, c, ctx);
+            else
+            {
+                slong k;
+                do {
+                    k = n_randint(state, lenf - 1);
+                    status |= gr_poly_get_coeff_scalar(c, F, k, ctx);
+                } while (gr_is_zero(c, ctx) != T_TRUE);
+
+                do {
+                    status |= gr_randtest(c, state, ctx);
+                } while (gr_is_zero(c, ctx) != T_FALSE);
+
+                status |= gr_poly_set_coeff_scalar(F, k, c, ctx);
+            }
+        }
+
+        /* leading coefficient: 1 or a unit */
+        if (n_randint(state, 2))
+            status |= gr_poly_set_coeff_ui(F, lenf - 1, 1, ctx);
+        else
+        {
+            do {
+                status |= gr_randtest(c, state, ctx);
+            } while (gr_is_invertible(c, ctx) != T_TRUE);
+            status |= gr_poly_set_coeff_scalar(F, lenf - 1, c, ctx);
+        }
+
+        if (status != GR_SUCCESS)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, setup)\n");
+            flint_abort();
+        }
+
+        expected_nz = nterms;
+        expected_kind = (lenf > 32 && nterms <= 2) ? GR_POLY_PREINV_SPARSE : GR_POLY_PREINV_NEWTON;
+
+        status |= gr_poly_preinv_set(P, F, ctx);
+
+        if (status != GR_SUCCESS || P->kind != expected_kind ||
+            (expected_kind == GR_POLY_PREINV_SPARSE && P->nz != expected_nz))
+        {
+            flint_printf("FAIL (fmpz_mod sparse, kind)\n");
+            gr_ctx_println(ctx);
+            flint_printf("lenf = %wd, nterms = %wd, kind = %d, expected = %d, status = %d\n",
+                lenf, nterms, P->kind, expected_kind, status);
+            flint_abort();
+        }
+
+        status |= gr_poly_randtest(A, state, n_randint(state, 3 * lenf), ctx);
+        status |= gr_poly_randtest(B, state, n_randint(state, lenf), ctx);
+
+        /* divrem */
+        status |= gr_poly_preinv_divrem(Q, R, A, P, ctx);
+        status |= gr_poly_divrem(Q2, R2, A, F, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(Q, Q2, ctx) == T_FALSE || gr_poly_equal(R, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, divrem)\n");
+            gr_ctx_println(ctx);
+            flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_abort();
+        }
+
+        /* rem, aliased */
+        status |= gr_poly_set(R, A, ctx);
+        status |= gr_poly_preinv_rem(R, R, P, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(R, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, rem)\n");
+            gr_ctx_println(ctx);
+            flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_abort();
+        }
+
+        /* mulmod */
+        status |= gr_poly_preinv_mulmod(T, R, B, P, ctx);
+        status |= gr_poly_mulmod(R2, R, B, F, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, mulmod)\n");
+            gr_ctx_println(ctx);
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_abort();
+        }
+
+        /* powmod */
+        fmpz_randtest_unsigned(e, state, 40);
+        status |= gr_poly_preinv_powmod_fmpz_binexp(T, B, e, P, ctx);
+        status |= gr_poly_powmod_fmpz_binexp(R2, B, e, F, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, powmod)\n");
+            gr_ctx_println(ctx);
+            flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_printf("e = %{fmpz}\n", e);
+            flint_abort();
+        }
+
+        status |= gr_poly_preinv_powmod_x_fmpz(T, e, P, ctx);
+        status |= gr_poly_gen(Q, ctx);
+        status |= gr_poly_powmod_fmpz_binexp(R2, Q, e, F, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, powmod x)\n");
+            gr_ctx_println(ctx);
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_printf("e = %{fmpz}\n", e);
+            flint_abort();
+        }
+
+        /* compose_mod: reference computed as compose followed by rem */
+        status |= gr_poly_randtest(A, state, n_randint(state, lenf), ctx);
+        status |= gr_poly_preinv_compose_mod(T, A, B, P, ctx);
+        status |= gr_poly_compose(Q, A, B, ctx);
+        status |= gr_poly_rem(R2, Q, F, ctx);
+
+        if (status != GR_SUCCESS || gr_poly_equal(T, R2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (fmpz_mod sparse, compose_mod)\n");
+            gr_ctx_println(ctx);
+            flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+            flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
+            flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+            flint_abort();
+        }
+
+        gr_heap_clear(c, ctx);
+        gr_poly_clear(A, ctx); gr_poly_clear(B, ctx); gr_poly_clear(F, ctx);
+        gr_poly_clear(Q, ctx); gr_poly_clear(R, ctx); gr_poly_clear(Q2, ctx);
+        gr_poly_clear(R2, ctx); gr_poly_clear(T, ctx);
+        gr_poly_preinv_clear(P, ctx);
+        gr_ctx_clear(ctx);
+        fmpz_clear(m);
+        fmpz_clear(e);
+    }
+
     TEST_FUNCTION_END(state);
 }

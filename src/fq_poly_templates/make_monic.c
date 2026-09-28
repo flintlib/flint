@@ -15,17 +15,16 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_make_monic) (TEMPLATE(T, struct) * rop,
                                const TEMPLATE(T, struct) * op, slong length,
                                const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, t) inv;
-    TEMPLATE(T, init) (inv, ctx);
-    TEMPLATE(T, inv) (inv, &op[length - 1], ctx);
-    _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop, op, length, inv, ctx);
-    TEMPLATE(T, clear) (inv, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_make_monic(rop, op, length, gr_ctx));
 }
 
 void

@@ -9,31 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
                       const fmpz * diag, slong n)
 {
     int parity;
-    slong i;
-    slong * rows;
-    slong * cols;
-
-    rows = _perm_init(mat->r);
-    cols = _perm_init(mat->c);
-
-    parity = _perm_randtest(rows, mat->r, state);
-    parity ^= _perm_randtest(cols, mat->c, state);
-
-    fmpz_mat_zero(mat);
-    for (i = 0; i < n; i++)
-        fmpz_set(fmpz_mat_entry(mat, rows[i], cols[i]), diag + i);
-
-    _perm_clear(rows);
-    _perm_clear(cols);
-
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(gr_mat_randpermdiag(&parity, (gr_mat_struct *) mat, state, (gr_ptr) diag, n, ctx));
     return parity;
 }

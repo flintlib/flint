@@ -10,37 +10,15 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 truth_t
 _ca_poly_check_equal(ca_srcptr poly1, slong len1,
         ca_srcptr poly2, slong len2, ca_ctx_t ctx)
 {
-    truth_t eq, res;
-    slong i;
-
-    res = T_TRUE;
-
-    for (i = 0; i < len2; i++)
-    {
-        eq = ca_check_equal(poly1 + i, poly2 + i, ctx);
-
-        if (eq == T_FALSE)
-            return T_FALSE;
-        if (eq == T_UNKNOWN)
-            res = T_UNKNOWN;
-    }
-
-    for (i = len2; i < len1; i++)
-    {
-        eq = ca_check_is_zero(poly1 + i, ctx);
-
-        if (eq == T_FALSE)
-            return T_FALSE;
-        if (eq == T_UNKNOWN)
-            res = T_UNKNOWN;
-    }
-
-    return res;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    return _gr_poly_equal(poly1, len1, poly2, len2, gr_ctx);
 }
 
 truth_t

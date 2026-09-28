@@ -12,9 +12,7 @@
 #include "longlong.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-
-/* todo */
-#define _gr_poly_mul_monic _gr_poly_mul
+#include "gr_poly/impl.h"
 
 int
 _gr_poly_interpolation_weights(gr_ptr w,

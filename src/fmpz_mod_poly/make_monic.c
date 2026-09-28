@@ -9,29 +9,25 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
                                                       const fmpz_mod_ctx_t ctx)
 {
-    const slong len = poly->length;
-    fmpz_t inv;
+    gr_ctx_t gr_ctx;
 
-    if (len == 0)
+    if (poly->length == 0)
     {
         fmpz_mod_poly_zero(res, ctx);
         return;
     }
 
-    fmpz_init(inv);
-    fmpz_invmod(inv, fmpz_mod_poly_lead(poly, ctx), fmpz_mod_ctx_modulus(ctx));
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
 
-    fmpz_mod_poly_fit_length(res, len, ctx);
-    _fmpz_mod_poly_set_length(res, len);
-
-    _fmpz_mod_poly_scalar_mul_fmpz(res->coeffs, poly->coeffs, len, inv, ctx);
-
-    fmpz_clear(inv);
+    if (gr_poly_make_monic((gr_poly_struct *) res,
+            (const gr_poly_struct *) poly, gr_ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception in fmpz_mod_poly_make_monic: "
+                                  "leading coefficient is not invertible.\n");
 }

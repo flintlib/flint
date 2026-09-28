@@ -9,32 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
-/* todo: different algorithms... */
 int
 ca_mat_rank(slong * rank, const ca_mat_t A, ca_ctx_t ctx)
 {
-    slong n, m;
-    slong * P;
-    int success;
-    ca_mat_t T;
-
-    n = ca_mat_nrows(A);
-    m = ca_mat_ncols(A);
-
-    if (n == 0 || m == 0)
-    {
-        *rank = 0;
-        return 1;
-    }
-
-    ca_mat_init(T, n, m, ctx);
-    P = _perm_init(n);
-    success = ca_mat_lu(rank, P, T, A, 0, ctx);
-    ca_mat_clear(T, ctx);
-    _perm_clear(P);
-
-    return success;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    return gr_mat_rank_lu(rank, (const gr_mat_struct *) A, gr_ctx) == GR_SUCCESS;
 }

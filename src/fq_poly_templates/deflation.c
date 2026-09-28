@@ -14,36 +14,15 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 ulong
 TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
                              const TEMPLATE(T, ctx_t) ctx)
 {
-    slong deflation;
-    slong i, coeff;
-
-    if (input->length <= 1)
-        return input->length;
-
-    coeff = 1;
-    while (TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
-        coeff++;
-
-    deflation = n_gcd(input->length - 1, coeff);
-
-    while ((deflation > 1) && (coeff + deflation < input->length))
-    {
-        for (i = 0; i < deflation - 1; i++)
-        {
-            coeff++;
-            if (!TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
-                deflation = n_gcd(coeff, deflation);
-        }
-        if (i == deflation - 1)
-            coeff++;
-    }
-
-    return deflation;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    return gr_poly_deflation((const gr_poly_struct *) input, gr_ctx);
 }
 
 

@@ -37,6 +37,7 @@
 #include "t-fmpz_poly.c"
 #include "t-fq.c"
 #include "t-fq_nmod.c"
+#include "t-fq_special.c"
 #include "t-fq_zech.c"
 #include "t-fraction.c"
 #include "t-matrix_acb.c"
@@ -90,6 +91,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_fmpz_poly),
     TEST_FUNCTION(gr_fq),
     TEST_FUNCTION(gr_fq_nmod),
+    TEST_FUNCTION(gr_fq_special),
     TEST_FUNCTION(gr_fq_zech),
     TEST_FUNCTION(gr_fraction),
     TEST_FUNCTION(gr_matrix_acb),
