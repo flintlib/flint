@@ -966,12 +966,12 @@ main ()
           else if (model == 0xaf) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Sierra Forest */
           else if (model == 0xb5) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake U */
           else if (model == 0xb6) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Grand Ridge */
-          else if (model == 0xbd) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Lunar Lake */
+          else if (model == 0xbd) cpu_64bit = 1, cpu_avx=1, modelstr = "arrowlake";  /* Lunar Lake */
           else if (model == 0xbe) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Alder Lake N */
           else if (model == 0xbf) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake S */
-          else if (model == 0xc5) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake H */
-          else if (model == 0xc6) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Arrow Lake S */
-          else if (model == 0xcc) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Panther Lake */
+          else if (model == 0xc5) cpu_64bit = 1, cpu_avx=1, modelstr = "arrowlake";  /* Arrow Lake H */
+          else if (model == 0xc6) cpu_64bit = 1, cpu_avx=1, modelstr = "arrowlake";  /* Arrow Lake S */
+          else if (model == 0xcc) cpu_64bit = 1, cpu_avx=1, modelstr = "arrowlake";  /* Panther Lake */
           else if (model == 0xcf) cpu_64bit = 1, cpu_avx=1, modelstr = "sapphirerapids"; /* Emerald Rapids */
           else if (model == 0xdd) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Clearwater Forest */
           else if (model >= 0x8f) cpu_64bit = 1, intel_unknown = 1;                  /* newer than table */

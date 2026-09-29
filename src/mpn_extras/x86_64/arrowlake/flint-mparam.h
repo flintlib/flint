@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025 Vincent Neiger
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* parameters found for Intel(R) Core(TM) Ultra 7 165H (Meteor Lake); also
-   used for Arrow Lake U, which has the same Redwood Cove cores */
+/* Arrow Lake H / S, Lunar Lake and Panther Lake (Lion Cove / Cougar Cove
+   cores). The nmod_mat_mul and nmod_vec_dot parameters were measured on an
+   Intel(R) Core(TM) Ultra 9 285H (Arrow Lake H); the others are those of
+   x86_64/meteorlake, not tuned on this target. */
 
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
@@ -92,8 +94,11 @@
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (measured on Intel Core Ultra 7 165H, with OpenBLAS; AVX2 only, so the
-    u52 values are unused).
+    (measured on Intel Core Ultra 9 285H, AVX2 only, so the u52 values are
+    unused; the machine measured had the reference netlib BLAS, far slower
+    than the kernels, so BLAS_1PASS_CUTOFF(_MT) are the values of
+    x86_64/meteorlake, measured with OpenBLAS; K52_BLAS_CUTOFF is 0 on both,
+    since blas + CRT was never faster than fp50 / k52).
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -127,7 +132,7 @@
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 600
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 800
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 256
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
@@ -137,8 +142,8 @@
 /*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
-    (measured on Intel Core Ultra 7 165H, gcc 13)
+    (measured on Intel Core Ultra 9 285H, gcc 16)
 */
-#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 160
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 64
 
 #endif
