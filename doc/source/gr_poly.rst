@@ -1878,6 +1878,10 @@ Modular arithmetic and composition
     It is required that ``finv`` is the inverse of the reverse of
     ``f`` mod ``x^lenf``.
 
+    The inputs need not be reduced modulo ``f``, but the quotient
+    length ``len1 + len2 - lenf`` must not exceed ``lenf``; otherwise
+    ``GR_UNABLE`` is returned.
+
     Aliasing of ``res`` with any of the inputs is not permitted.
 
 .. function:: int gr_poly_mulmod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)

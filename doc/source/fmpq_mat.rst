@@ -425,8 +425,8 @@ Trace
 .. function:: void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat)
 
     Computes the trace of the matrix, i.e. the sum of the entries on
-    the main diagonal. The matrix is required to be square, which is not
-    checked.
+    the main diagonal. The matrix is required to be square;
+    an exception is raised otherwise.
 
 
 Determinant

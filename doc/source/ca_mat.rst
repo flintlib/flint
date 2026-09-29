@@ -334,6 +334,8 @@ Gaussian elimination and LU decomposition
     The *classical* version uses iterative Gaussian elimination.
     The *recursive* version uses a block recursive algorithm
     to take advantage of fast matrix multiplication.
+    The default version uses the classical algorithm for small
+    matrices and the recursive algorithm otherwise.
 
 .. function:: int ca_mat_fflu(slong * rank, slong * P, ca_mat_t LU, ca_t den, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
     

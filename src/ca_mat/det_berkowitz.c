@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ca_vec.h"
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 ca_mat_det_berkowitz(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 {
-    ca_ptr t;
-    t = _ca_vec_init(ca_mat_nrows(A) + 1, ctx);
-
-    _ca_mat_charpoly(t, A, ctx);
-    ca_swap(res, t, ctx);
-    if (ca_mat_nrows(A) % 2)
-        ca_neg(res, res, ctx);
-
-    _ca_vec_clear(t, ca_mat_nrows(A) + 1, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_det_berkowitz(res, (const gr_mat_struct *) A, gr_ctx));
 }

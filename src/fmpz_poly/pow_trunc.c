@@ -13,79 +13,15 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)
 {
-    ulong bit = ~((~UWORD(0)) >> 1);
-    fmpz *v = _fmpz_vec_init(n);
-    fmpz *R, *S, *T;
-
-    /*
-       Set bits to the bitmask with a 1 one place lower than the msb of e
-     */
-
-    while ((bit & e) == UWORD(0))
-        bit >>= 1;
-
-    bit >>= 1;
-
-    /*
-       Trial run without any polynomial arithmetic to determine the parity
-       of the number of swaps;  then set R and S accordingly
-     */
-
-    {
-        unsigned int swaps = 0U;
-        ulong bit2 = bit;
-        if ((bit2 & e))
-            swaps = ~swaps;
-        while (bit2 >>= 1)
-            if ((bit2 & e) == UWORD(0))
-                swaps = ~swaps;
-
-        if (swaps == 0U)
-        {
-            R = res;
-            S = v;
-        }
-        else
-        {
-            R = v;
-            S = res;
-        }
-    }
-
-    /*
-       We unroll the first step of the loop, referring to {poly, n}
-     */
-
-    _fmpz_poly_sqrlow(R, poly, n, n);
-    if ((bit & e))
-    {
-        _fmpz_poly_mullow(S, R, n, poly, n, n);
-        T = R;
-        R = S;
-        S = T;
-    }
-
-    while ((bit >>= 1))
-    {
-        if ((bit & e))
-        {
-            _fmpz_poly_sqrlow(S, R, n, n);
-            _fmpz_poly_mullow(R, S, n, poly, n, n);
-        }
-        else
-        {
-            _fmpz_poly_sqrlow(S, R, n, n);
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-
-    _fmpz_vec_clear(v, n);
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, poly, n, e, n, ctx));
 }
 
 void

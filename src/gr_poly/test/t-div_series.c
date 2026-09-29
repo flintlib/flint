@@ -138,6 +138,62 @@ test_div_series(flint_rand_t state, int which)
     return status;
 }
 
+/* Exact division by a series whose constant term is not a unit
+   (e.g. 2 in Z): the quotient must be recovered exactly. */
+static void
+test_div_series_exact_nonunit(flint_rand_t state)
+{
+    gr_ctx_t ctx;
+    gr_ptr A, B, Q, Q2;
+    slong len, Alen, Blen, sz;
+    int status;
+
+    gr_ctx_init_fmpz(ctx);
+    sz = ctx->sizeof_elem;
+    len = 1 + n_randint(state, 4);
+    Blen = 1 + n_randint(state, 4);
+
+    GR_TMP_INIT_VEC(A, len, ctx);
+    GR_TMP_INIT_VEC(B, Blen, ctx);
+    GR_TMP_INIT_VEC(Q, len, ctx);
+    GR_TMP_INIT_VEC(Q2, len, ctx);
+
+    GR_MUST_SUCCEED(_gr_vec_randtest(B, state, Blen, ctx));
+    GR_MUST_SUCCEED(_gr_vec_randtest(Q, state, len, ctx));
+    GR_MUST_SUCCEED(gr_set_si(B, (2 + (slong) n_randint(state, 5)) * (n_randint(state, 2) ? 1 : -1), ctx));
+
+    /* sometimes make the product shorter than len, with a quotient
+       whose coefficients are not divisible by B[0] */
+    if (n_randint(state, 2))
+    {
+        GR_MUST_SUCCEED(_gr_vec_zero(GR_ENTRY(B, 1, sz), Blen - 1, ctx));
+        GR_MUST_SUCCEED(_gr_vec_zero(GR_ENTRY(Q, 1, sz), len - 1, ctx));
+        GR_MUST_SUCCEED(gr_set_si(Q, 1 + n_randint(state, 100), ctx));
+    }
+
+    GR_MUST_SUCCEED(_gr_poly_mullow(A, B, Blen, Q, len, len, ctx));
+    GR_MUST_SUCCEED(_gr_vec_normalise(&Alen, A, len, ctx));
+
+    status = _gr_poly_div_series(Q2, A, Alen, B, Blen, len, ctx);
+
+    if (status != GR_SUCCESS || _gr_vec_equal(Q, Q2, len, ctx) != T_TRUE)
+    {
+        flint_printf("FAIL (exact division, non-unit constant term)\n");
+        flint_printf("len = %wd, Blen = %wd, status = %d\n", len, Blen, status);
+        flint_printf("B = "); _gr_vec_print(B, Blen, ctx); flint_printf("\n");
+        flint_printf("Q = "); _gr_vec_print(Q, len, ctx); flint_printf("\n");
+        flint_printf("Q2 = "); _gr_vec_print(Q2, len, ctx); flint_printf("\n");
+        flint_abort();
+    }
+
+    GR_TMP_CLEAR_VEC(A, len, ctx);
+    GR_TMP_CLEAR_VEC(B, Blen, ctx);
+    GR_TMP_CLEAR_VEC(Q, len, ctx);
+    GR_TMP_CLEAR_VEC(Q2, len, ctx);
+
+    gr_ctx_clear(ctx);
+}
+
 TEST_FUNCTION_START(gr_poly_div_series, state)
 {
     slong iter;
@@ -146,6 +202,9 @@ TEST_FUNCTION_START(gr_poly_div_series, state)
     {
         test_div_series(state, n_randint(state, 15));
     }
+
+    for (iter = 0; iter < 1000; iter++)
+        test_div_series_exact_nonunit(state);
 
     TEST_FUNCTION_END(state);
 }

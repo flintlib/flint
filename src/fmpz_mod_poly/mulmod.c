@@ -14,30 +14,19 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
                            const fmpz * poly2, slong len2, const fmpz * f,
                            slong lenf, const fmpz_mod_ctx_t ctx)
 {
-    fmpz * T, * Q;
-    fmpz_t invf;
-    slong lenT, lenQ;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
 
-    lenT = len1 + len2 - 1;
-    lenQ = lenT - lenf + 1;
-
-    T = _fmpz_vec_init(lenT + lenQ);
-    Q = T + lenT;
-
-    _fmpz_mod_poly_mul(T, poly1, len1, poly2, len2, ctx);
-
-    fmpz_init(invf);
-    fmpz_mod_inv(invf, f + lenf - 1, ctx);
-
-    _fmpz_mod_poly_divrem(Q, res, T, lenT, f, lenf, invf, ctx);
-
-    _fmpz_vec_clear(T, lenT + lenQ);
-    fmpz_clear(invf);
+    /* the only possible failure is a non-invertible leading coefficient of f */
+    if (_gr_poly_mulmod(res, poly1, len1, poly2, len2, f, lenf, gr_ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception (fmpz_mod_poly_mulmod). Cannot invert leading coefficient.\n");
 }
 
 void

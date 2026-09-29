@@ -10,9 +10,7 @@
 */
 
 #include "gr_poly.h"
-
-/* todo */
-#define _gr_poly_mul_monic _gr_poly_mul
+#include "gr_poly/impl.h"
 
 /* todo: parallel version; better temporary management */
 int

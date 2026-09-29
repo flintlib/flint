@@ -14,87 +14,40 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
+
+/* Below this length, the basecase algorithm is faster than Newton
+   iteration. */
+#if defined(FQ_ZECH_POLY_H)
+#define FQ_POLY_DIV_SERIES_NEWTON_CUTOFF 64
+#elif defined(FQ_NMOD_POLY_H)
+#define FQ_POLY_DIV_SERIES_NEWTON_CUTOFF 16
+#else
+#define FQ_POLY_DIV_SERIES_NEWTON_CUTOFF 32
+#endif
 
 void
 _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong Alen,
     const TEMPLATE(T, struct) * B, slong Blen, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, t) u, d;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-    TEMPLATE(T, init)(d, ctx);
-    TEMPLATE(T, init)(u, ctx);
-
-    if (!TEMPLATE(T, is_one)(B + 0, ctx))
-       TEMPLATE(T, inv)(u, B + 0, ctx);
-    else
-       TEMPLATE(T, set_si)(u, 1, ctx);
-
-    Alen = FLINT_MIN(Alen, n);
-    Blen = FLINT_MIN(Blen, n);
-
-    if (Blen == 1)
+    if (n < FQ_POLY_DIV_SERIES_NEWTON_CUTOFF || FLINT_MIN(Blen, n) < 10)
     {
-        if (TEMPLATE(T, is_one)(B + 0, ctx))
-            _TEMPLATE(T, vec_set)(Q, A, Alen, ctx);
-        else
-           _TEMPLATE3(T, poly_scalar_mul, T)(Q, A, Alen, u, ctx);
-
-       _TEMPLATE(T, vec_zero)(Q + Alen, n - Alen, ctx);
-    }
-    else if (n < 16 || Blen < 10)
-    {
-        slong i, j;
-        TEMPLATE(T, t) temp;
-
-        TEMPLATE(T, init)(temp, ctx);
-
-        if (TEMPLATE(T, is_one)(B + 0, ctx))
-            TEMPLATE(T, set)(Q + 0, A + 0, ctx);
-        else
-           TEMPLATE(T, mul)(Q + 0, u, A + 0, ctx);
-
-        for (i = 1; i < n; i++)
-        {
-            TEMPLATE(T, mul)(Q + i, B + 1, Q + i - 1, ctx);
-
-            for (j = 2; j < FLINT_MIN(i + 1, Blen); j++)
-            {
-               TEMPLATE(T, mul)(temp, B + j, Q + i - j, ctx);
-               TEMPLATE(T, add)(Q + i, Q + i, temp, ctx);
-            }
-
-            if (i < Alen)
-               TEMPLATE(T, sub)(Q + i, A + i, Q + i, ctx);
-            else
-               TEMPLATE(T, neg)(Q + i, Q + i, ctx);
-
-            if (!TEMPLATE(T, is_one)(B + 0, ctx))
-               TEMPLATE(T, mul)(Q + i, Q + i, u, ctx);
-        }
-
-        TEMPLATE(T, clear)(temp, ctx);
+        TEMPLATE(T, t) u;
+        TEMPLATE(T, init)(u, ctx);
+        TEMPLATE(T, inv)(u, B + 0, ctx);
+        GR_MUST_SUCCEED(_gr_poly_div_series_basecase_preinv1(Q, A, Alen, B, Blen, u, n, gr_ctx));
+        TEMPLATE(T, clear)(u, ctx);
     }
     else
     {
-        TEMPLATE(T, struct) * B2, * Binv = _TEMPLATE(T, vec_init)(n, ctx);
+        if (TEMPLATE(T, is_zero)(B + 0, ctx))
+            TEMPLATE(T, inv)(Q, B + 0, ctx);  /* throws */
 
-        if (n > Blen)
-        {
-           B2 = _TEMPLATE(T, vec_init)(n, ctx);
-           _TEMPLATE(T, vec_set)(B2, B, Blen, ctx);
-        } else
-           B2 = (TEMPLATE(T, struct) *) B;
-
-        _TEMPLATE(T, poly_inv_series)(Binv, B2, n, u, ctx);
-        _TEMPLATE(T, poly_mullow)(Q, Binv, n, A, Alen, n, ctx);
-
-        _TEMPLATE(T, vec_clear)(Binv, n, ctx);
-        if (n > Blen)
-           _TEMPLATE(T, vec_clear)(B2, n, ctx);
+        GR_MUST_SUCCEED(_gr_poly_div_series_newton(Q, A, Alen, B, Blen, n, FQ_POLY_DIV_SERIES_NEWTON_CUTOFF, gr_ctx));
     }
-
-    TEMPLATE(T, clear)(d, ctx);
-    TEMPLATE(T, clear)(u, ctx);
 }
 
 void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,

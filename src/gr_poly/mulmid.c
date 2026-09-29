@@ -31,14 +31,25 @@ _gr_poly_mulmid_generic(gr_ptr res,
         if (nlo == 0)
             return _gr_poly_mullow(res, poly1, len1, poly2, len2, nhi, ctx);
 
+        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
         gr_ptr tmp;
-        slong sz = ctx->sizeof_elem;
+        slong i, sz = ctx->sizeof_elem;
         int status;
 
-        GR_TMP_INIT_VEC(tmp, nhi, ctx);
+        /* Only the low part of the temporary product needs new elements:
+           the high part borrows the elements of res (moved shallowly back
+           and forth) so that their storage is reused. */
+        tmp = GR_TMP_ALLOC(nhi * sz);
+        _gr_vec_init(tmp, nlo, ctx);
+        for (i = 0; i < nhi - nlo; i++)
+            set_shallow(GR_ENTRY(tmp, nlo + i, sz), GR_ENTRY(res, i, sz), ctx);
+
         status = _gr_poly_mullow(tmp, poly1, len1, poly2, len2, nhi, ctx);
-        _gr_vec_swap(res, GR_ENTRY(tmp, nlo, sz), nhi - nlo, ctx);
-        GR_TMP_CLEAR_VEC(tmp, nhi, ctx);
+
+        for (i = 0; i < nhi - nlo; i++)
+            set_shallow(GR_ENTRY(res, i, sz), GR_ENTRY(tmp, nlo + i, sz), ctx);
+        _gr_vec_clear(tmp, nlo, ctx);
+        GR_TMP_FREE(tmp, nhi * sz);
 
         return status;
     }

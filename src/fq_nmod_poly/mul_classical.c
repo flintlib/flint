@@ -13,6 +13,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
+#include "gr_poly.h"
 
 void
 _fq_nmod_poly_mul_classical(fq_nmod_struct * rop,
@@ -20,40 +21,9 @@ _fq_nmod_poly_mul_classical(fq_nmod_struct * rop,
                                   const fq_nmod_struct * op2, slong len2,
                                   const fq_nmod_ctx_t ctx)
 {
-    if (len1 == 1 && len2 == 1)
-    {
-        fq_nmod_mul(rop, op1, op2, ctx);
-    }
-    else
-    {
-        slong i, j;
-        nmod_poly_t t;
-
-	nmod_poly_init_mod(t, (rop + 0)->mod);
-
-        /* Set res[i] = poly1[i]*poly2[0] */
-	for (j = 0; j < len1; j++)
-	   nmod_poly_mul(rop + j, op1 + j, op2 + 0);
-
-        /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        for (j = 0; j < len2 - 1; j++)
-	   nmod_poly_mul(rop + len1 + j, op2 + j + 1, op1 + len1 - 1);
-
-        /* out[i+j] += in1[i]*in2[j] */
-        for (i = 0; i < len1 - 1; i++)
-	{
-	    for (j = 0; j < len2 - 1; j++)
-	    {
-		 nmod_poly_mul(t, op2 + j + 1, op1 + i);
-		 nmod_poly_add(rop + i + j + 1, rop + i + j + 1, t);
-	    }
-	}
-
-	for (i = 0; i < len1 + len2 - 1; i++)
-	   fq_nmod_reduce(rop + i, ctx);
-
-	nmod_poly_clear(t);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fq_nmod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_mullow_classical(rop, op1, len1, op2, len2, len1 + len2 - 1, gr_ctx));
 }
 
 void

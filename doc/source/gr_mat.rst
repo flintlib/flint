@@ -928,6 +928,8 @@ Similarity transformations
     If `P` is the `n\times n` identity matrix the zero entries of whose row
     `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent
     to `M = P^{-1}MP`.
+    Requires `0 \le r < n`; returns ``GR_DOMAIN`` if `M` is not square
+    or `r` is out of range.
 
     Similarity transforms preserve the determinant, characteristic polynomial
     and minimal polynomial.

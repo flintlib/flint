@@ -59,6 +59,62 @@ TEST_FUNCTION_START(ca_mat_nonsingular_solve_lu, state)
                 flint_printf("AX = "); ca_mat_print(AX, ctx); flint_printf("\n");
                 flint_abort();
             }
+
+            /* Test ca_mat_solve_lu_precomp, with and without aliasing */
+            {
+                ca_mat_t LU, Y;
+                slong * P;
+                truth_t lu_success;
+                int alias;
+
+                ca_mat_init(LU, n, n, ctx);
+                ca_mat_init(Y, n, c, ctx);
+                P = flint_malloc(sizeof(slong) * FLINT_MAX(n, 1));
+
+                lu_success = ca_mat_nonsingular_lu(P, LU, A, ctx);
+
+                if (lu_success == T_FALSE)
+                {
+                    flint_printf("FAIL (nonsingular_lu)\n\n");
+                    flint_printf("A = "); ca_mat_print(A, ctx); flint_printf("\n");
+                    flint_abort();
+                }
+
+                if (lu_success == T_TRUE)
+                {
+                    for (alias = 0; alias < 2; alias++)
+                    {
+                        if (alias)
+                        {
+                            ca_mat_set(Y, B, ctx);
+                            ca_mat_solve_lu_precomp(Y, P, LU, Y, ctx);
+                        }
+                        else
+                        {
+                            ca_mat_randtest_rational(Y, state, 5, ctx);
+                            ca_mat_solve_lu_precomp(Y, P, LU, B, ctx);
+                        }
+
+                        ca_mat_mul(AX, A, Y, ctx);
+
+                        if (ca_mat_check_equal(AX, B, ctx) == T_FALSE ||
+                            ca_mat_check_equal(Y, X, ctx) == T_FALSE)
+                        {
+                            flint_printf("FAIL (solve_lu_precomp, alias = %d)\n\n", alias);
+                            flint_printf("A = "); ca_mat_print(A, ctx); flint_printf("\n");
+                            flint_printf("B = "); ca_mat_print(B, ctx); flint_printf("\n");
+                            flint_printf("X = "); ca_mat_print(X, ctx); flint_printf("\n");
+                            flint_printf("Y = "); ca_mat_print(Y, ctx); flint_printf("\n");
+                            flint_printf("AY = "); ca_mat_print(AX, ctx); flint_printf("\n");
+                            flint_abort();
+                        }
+                    }
+                }
+
+                ca_mat_clear(LU, ctx);
+                ca_mat_clear(Y, ctx);
+                flint_free(P);
+            }
         }
         else if (success == T_FALSE)
         {

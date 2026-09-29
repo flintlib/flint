@@ -216,10 +216,35 @@ _gr_fq_nmod_mul_si(fq_nmod_t res, const fq_nmod_t x, slong y, const gr_ctx_t ctx
     return GR_SUCCESS;
 }
 
+/* fq_nmod_mul_ui without the normalisation (used for example by
+   _gr_poly_derivative) */
 static int
 _gr_fq_nmod_mul_ui(fq_nmod_t res, const fq_nmod_t x, ulong y, const gr_ctx_t ctx)
 {
-    fq_nmod_mul_ui(res, x, y, FQ_CTX(ctx));
+    nmod_t mod = FQ_CTX(ctx)->mod;
+    slong len = x->length;
+
+    if (y >= mod.n)
+        NMOD_RED(y, y, mod);
+
+    if (y == 0 || len == 0)
+    {
+        res->length = 0;
+    }
+    else if (y == 1)
+    {
+        nmod_poly_set(res, x);
+    }
+    else
+    {
+        if (res->alloc < len)
+            nmod_poly_fit_length(res, len);
+
+        /* no cancellation as the characteristic is prime */
+        _nmod_vec_scalar_mul_nmod(res->coeffs, x->coeffs, len, y, mod);
+        res->length = len;
+    }
+
     return GR_SUCCESS;
 }
 
@@ -228,6 +253,48 @@ _gr_fq_nmod_mul_fmpz(fq_nmod_t res, const fq_nmod_t x, const fmpz_t y, const gr_
 {
     fq_nmod_mul_fmpz(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_vec_mul_scalar_2exp_si(fq_nmod_struct * res, const fq_nmod_struct * vec, slong len, slong c, gr_ctx_t ctx)
+{
+    nmod_t mod = FQ_CTX(ctx)->mod;
+    ulong t;
+    slong i;
+
+    if (c == 0)
+    {
+        for (i = 0; i < len; i++)
+            fq_nmod_set(res + i, vec + i, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (mod.n == 2)
+    {
+        if (c < 0)
+            return GR_DOMAIN;
+
+        for (i = 0; i < len; i++)
+            fq_nmod_zero(res + i, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    /* 1/2 = (p + 1) / 2 */
+    if (c > 0)
+        t = nmod_pow_ui(2, c, mod);
+    else
+        t = nmod_pow_ui((mod.n + 1) / 2, -(ulong) c, mod);
+
+    for (i = 0; i < len; i++)
+        nmod_poly_scalar_mul_nmod(res + i, vec + i, t);
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_mul_2exp_si(fq_nmod_t res, const fq_nmod_t x, slong c, gr_ctx_t ctx)
+{
+    return _gr_fq_nmod_vec_mul_scalar_2exp_si(res, x, 1, c, ctx);
 }
 
 static int
@@ -622,6 +689,84 @@ _gr_fq_nmod_poly_mullow(fq_nmod_struct * res,
     return GR_SUCCESS;
 }
 
+/* The middle product is computed by the classical algorithm in the range
+   where the classical full or low product would be used anyway. */
+static int
+_gr_fq_nmod_poly_mulmid(fq_nmod_struct * res,
+    const fq_nmod_struct * poly1, slong len1,
+    const fq_nmod_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (nlo != 0 && (nhi < FQ_NMOD_MULLOW_CLASSICAL_CUTOFF ||
+                     FLINT_MAX(len1, len2) < FQ_NMOD_MUL_CLASSICAL_CUTOFF))
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    else
+        return _gr_poly_mulmid_generic(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
+static int
+_gr_fq_nmod_poly_divrem(fq_nmod_struct * Q, fq_nmod_struct * R,
+    const fq_nmod_struct * A, slong lenA,
+    const fq_nmod_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    /* The Newton division only involves products of length about lenQ and
+       lenB, which are fast (Kronecker substitution), and in this ring it
+       beats the basecase division already for tiny lengths. */
+    return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+}
+
+/* Horner's rule */
+static int
+_gr_fq_nmod_poly_evaluate(fq_nmod_t res, const fq_nmod_struct * f, slong len,
+    const fq_nmod_t x, gr_ctx_t ctx)
+{
+    const fq_nmod_ctx_struct * fctx = FQ_CTX(ctx);
+
+    if (len == 0)
+    {
+        fq_nmod_zero(res, fctx);
+    }
+    else if (len == 1 || fq_nmod_is_zero(x, fctx))
+    {
+        fq_nmod_set(res, f, fctx);
+    }
+    else
+    {
+        fq_nmod_t t, u;
+        fq_nmod_struct * s;
+        slong i;
+
+        fq_nmod_init(t, fctx);
+
+        if (res == x)
+        {
+            fq_nmod_init(u, fctx);
+            s = u;
+        }
+        else
+        {
+            s = res;
+        }
+
+        fq_nmod_set(s, f + len - 1, fctx);
+
+        for (i = len - 2; i >= 0; i--)
+        {
+            fq_nmod_mul(t, s, x, fctx);
+            fq_nmod_add(s, f + i, t, fctx);
+        }
+
+        if (res == x)
+        {
+            fq_nmod_swap(res, u, fctx);
+            fq_nmod_clear(u, fctx);
+        }
+
+        fq_nmod_clear(t, fctx);
+    }
+
+    return GR_SUCCESS;
+}
+
 /* todo: also need the _other version ... ? */
 /* todo: implement generically */
 
@@ -706,6 +851,87 @@ _gr_fq_nmod_mat_reduce_row(slong * column, fq_nmod_mat_t mat, slong * P, slong *
     return GR_SUCCESS;
 }
 
+/* Vector methods avoiding per-element dispatch through the method table */
+
+static int
+_gr_fq_nmod_vec_set(fq_nmod_struct * res, const fq_nmod_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_nmod_set(res + i, vec + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_vec_zero(fq_nmod_struct * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_nmod_zero(res + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_vec_add(fq_nmod_struct * res, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_nmod_add(res + i, vec1 + i, vec2 + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_vec_sub(fq_nmod_struct * res, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_nmod_sub(res + i, vec1 + i, vec2 + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_nmod_vec_add_scalar(fq_nmod_struct * res, const fq_nmod_struct * vec, slong len, const fq_nmod_struct * c, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_nmod_add(res + i, vec + i, c, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static truth_t
+_gr_fq_nmod_vec_is_zero(const fq_nmod_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fq_nmod_is_zero(vec + i, FQ_CTX(ctx)))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
+static truth_t
+_gr_fq_nmod_vec_equal(const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fq_nmod_equal(vec1 + i, vec2 + i, FQ_CTX(ctx)))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
 int _fq_nmod_methods_initialized = 0;
 
 gr_static_method_table _fq_nmod_methods;
@@ -759,6 +985,7 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_fq_nmod_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fq_nmod_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fq_nmod_mul_fmpz},
+    {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_fq_nmod_mul_2exp_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_nmod_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_nmod_div},
@@ -781,8 +1008,19 @@ gr_method_tab_input _fq_nmod_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_fq_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_fq_nmod_vec_dot_rev},
+    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,  (gr_funcptr) _gr_fq_nmod_vec_mul_scalar_2exp_si},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fq_nmod_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fq_nmod_vec_zero},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fq_nmod_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fq_nmod_vec_sub},
+    {GR_METHOD_VEC_ADD_SCALAR,  (gr_funcptr) _gr_fq_nmod_vec_add_scalar},
+    {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fq_nmod_vec_is_zero},
+    {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fq_nmod_vec_equal},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_nmod_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fq_nmod_poly_mulmid},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fq_nmod_poly_divrem},
+    {GR_METHOD_POLY_EVALUATE,   (gr_funcptr) _gr_fq_nmod_poly_evaluate},
     {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fq_nmod_poly_gcd},
     {GR_METHOD_POLY_XGCD,       (gr_funcptr) _gr_fq_nmod_poly_xgcd},
 

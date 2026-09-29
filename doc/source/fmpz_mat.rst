@@ -718,7 +718,8 @@ Trace
 .. function:: void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat)
 
     Computes the trace of the matrix, i.e. the sum of the entries on
-    the main diagonal. The matrix is required to be square.
+    the main diagonal. The matrix is required to be square;
+    an exception is raised otherwise.
 
 
 

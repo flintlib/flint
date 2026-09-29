@@ -12,24 +12,14 @@
 */
 
 #include "acb_poly.h"
+#include "gr_poly.h"
 
 void
 _acb_poly_shift_right(acb_ptr res, acb_srcptr poly, slong len, slong n)
 {
-    slong i;
-
-    /* Copy in forward order to avoid writing over unshifted coefficients */
-    if (res != poly)
-    {
-        for (i = 0; i < len - n; i++)
-            acb_set(res + i, poly + n + i);
-    }
-    else
-    {
-        for (i = 0; i < len - n; i++)
-            acb_swap(res + i, res + n + i);
-    }
-
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, 53);
+    GR_MUST_SUCCEED(_gr_poly_shift_right(res, poly, len, n, ctx));
 }
 
 void

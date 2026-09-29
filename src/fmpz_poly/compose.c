@@ -13,20 +13,30 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
                                const fmpz * poly2, slong len2)
 {
+    gr_ctx_t ctx;
+
     if (len1 == 1)
-        fmpz_set(res, poly1);
-    else if (len2 == 1)
-        _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
-    else if (len1 <= 4)
-        _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
-    else if (len2 == 2)
     {
+        fmpz_set(res, poly1);
+    }
+    else if (len2 == 1)
+    {
+        _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
+    }
+    else if (len2 == 2 && len1 > 4)
+    {
+        /* Taylor shift followed by scaling; this is faster than the
+           corresponding path in _gr_poly_compose at small lengths. */
         slong i;
+        fmpz_t temp;
+
         _fmpz_vec_set(res, poly1, len1);
         _fmpz_poly_taylor_shift(res, poly2, len1);
 
@@ -34,18 +44,16 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         {
             for (i = 1; i < len1; i += 2)
                 fmpz_neg(res + i, res + i);
-            return;
         }
         else if (!fmpz_is_one(poly2 + 1))
         {
             fmpz_mul(res + 1, res + 1, poly2 + 1);
 
-            fmpz_t temp;
             fmpz_init(temp);
             fmpz_mul(temp, poly2 + 1, poly2 + 1);
             fmpz_mul(res + 2, res + 2, temp);
 
-            for (i = 3; i < len1; i++) // len1 > 4
+            for (i = 3; i < len1; i++)
             {
                 /* no need to reverse signs manually as if poly2 + 1 negative
                 then signs alternate automatically*/
@@ -54,10 +62,19 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
             }
             fmpz_clear(temp);
         }
-        return;
     }
     else
-        _fmpz_poly_compose_divconquer(res, poly1, len1, poly2, len2);
+    {
+        gr_ctx_init_fmpz(ctx);
+
+        /* _gr_poly_compose handles poly2 = a*x^n + c using a Taylor shift. */
+        if (_fmpz_vec_is_zero(poly2 + 1, len2 - 2))
+            GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, ctx));
+        else if (len1 <= 4)
+            GR_MUST_SUCCEED(_gr_poly_compose_horner(res, poly1, len1, poly2, len2, ctx));
+        else
+            GR_MUST_SUCCEED(_gr_poly_compose_divconquer(res, poly1, len1, poly2, len2, ctx));
+    }
 }
 
 void

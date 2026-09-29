@@ -1046,8 +1046,10 @@ Greatest common divisor
 .. function:: void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 
     If ``poly`` is non-zero, sets ``res`` to ``poly`` divided
-    by its leading coefficient.  This assumes that the leading coefficient
-    of ``poly`` is invertible modulo `p`.
+    by its leading coefficient.  If the leading coefficient
+    of ``poly`` is not invertible modulo `p`, an exception
+    (``FLINT_IMPINV``) is raised; use :func:`fmpz_mod_poly_make_monic_f`
+    to obtain a factor of `p` instead.
 
     Otherwise, if ``poly`` is zero, sets ``res`` to zero.
 

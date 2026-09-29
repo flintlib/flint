@@ -32,8 +32,10 @@ _gr_poly_mulmod_preinv(
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
 
-    /* FIXME: should not require that poly1 and poly2 are already reduced */
-    if (len1 >= lenf || len2 >= lenf)
+    /* The inputs need not be reduced, but finv (the inverse of the
+       reverse of f mod x^lenf) only determines quotients of length
+       at most lenf. */
+    if (lenQ > lenf)
         return GR_UNABLE;
 
     if (len1 + len2 > lenf) /* reduction necessary */

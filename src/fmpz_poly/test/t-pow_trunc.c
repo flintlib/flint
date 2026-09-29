@@ -12,6 +12,7 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
@@ -75,6 +76,51 @@ TEST_FUNCTION_START(fmpz_poly_pow_trunc, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("n   = %wd\n", n);
+            flint_printf("exp = %wu\n", exp);
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    /* Check the underscore method against powering followed by
+       truncation, including e = 1 and zero-padded input */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, b, c;
+        slong n, len;
+        ulong exp;
+
+        n   = 1 + n_randint(state, 20);
+        exp = 1 + n_randint(state, 10);
+        len = n_randint(state, n + 1);
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, state, len, 1 + n_randint(state, 100));
+
+        fmpz_poly_pow(a, b, exp);
+        fmpz_poly_truncate(a, n);
+
+        fmpz_poly_fit_length(b, n);
+        _fmpz_vec_zero(b->coeffs + b->length, n - b->length);
+        fmpz_poly_fit_length(c, n);
+        _fmpz_poly_pow_trunc(c->coeffs, b->coeffs, exp, n);
+        _fmpz_poly_set_length(c, n);
+        _fmpz_poly_normalise(c);
+
+        result = (fmpz_poly_equal(a, c));
+        if (!result)
+        {
+            flint_printf("FAIL (underscore):\n");
             flint_printf("n   = %wd\n", n);
             flint_printf("exp = %wu\n", exp);
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");

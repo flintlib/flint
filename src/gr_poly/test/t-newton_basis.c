@@ -88,6 +88,35 @@ TEST_FUNCTION_START(gr_poly_newton_basis, state)
                 flint_abort();
             }
 
+            /* non-aliased underscore versions */
+            if (status == GR_SUCCESS && R->length >= F->length - 1)
+            {
+                gr_ptr T, U;
+                slong len = F->length;
+                int st = GR_SUCCESS;
+
+                T = gr_heap_init_vec(len, ctx);
+                U = gr_heap_init_vec(len, ctx);
+
+                st |= _gr_poly_newton_basis_from_monomial(T, R->entries, F->coeffs, len, ctx);
+                st |= _gr_poly_newton_basis_to_monomial(U, R->entries, T, len, ctx);
+
+                if (st == GR_SUCCESS &&
+                    (_gr_poly_equal(T, len, G->coeffs, G->length, ctx) == T_FALSE ||
+                     _gr_vec_equal(U, F->coeffs, len, ctx) == T_FALSE))
+                {
+                    flint_printf("FAIL (non-aliased)\n\n");
+                    gr_ctx_println(ctx);
+                    flint_printf("R = "); gr_vec_print(R, ctx); flint_printf("\n");
+                    flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
+                    flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
+                    flint_abort();
+                }
+
+                gr_heap_clear_vec(T, len, ctx);
+                gr_heap_clear_vec(U, len, ctx);
+            }
+
             if (R->length >= F->length && gr_ctx_is_integral_domain(ctx) == T_TRUE)
             {
                 gr_vec_init(Y, F->length, ctx);

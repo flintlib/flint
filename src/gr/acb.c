@@ -1976,6 +1976,31 @@ _gr_acb_poly_mulmid(acb_ptr res,
     return GR_SUCCESS;
 }
 
+/* Division with remainder via power series division, as in
+   _acb_poly_divrem (which never calls back into gr). That function does
+   not allow R to be aliased with A, so we use a temporary in that case. */
+static int
+_gr_acb_poly_divrem(acb_ptr Q, acb_ptr R,
+    acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    if (acb_contains_zero(B + lenB - 1))
+        return GR_UNABLE;
+
+    if (R == A && lenB > 1)
+    {
+        acb_ptr T = _acb_vec_init(lenB - 1);
+        _acb_poly_divrem(Q, T, A, lenA, B, lenB, ACB_CTX_PREC(ctx));
+        _acb_vec_swap(R, T, lenB - 1);
+        _acb_vec_clear(T, lenB - 1);
+    }
+    else
+    {
+        _acb_poly_divrem(Q, R, A, lenA, B, lenB, ACB_CTX_PREC(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
 
 /* xxx */
 static int
@@ -2482,6 +2507,7 @@ gr_method_tab_input _acb_methods_input[] =
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acb_poly_mulmid},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_acb_poly_divrem},
     {GR_METHOD_POLY_TAYLOR_SHIFT,   (gr_funcptr) _gr_acb_poly_taylor_shift},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_acb_poly_roots},

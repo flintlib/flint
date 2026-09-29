@@ -31,6 +31,10 @@ gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     if (r == 0 || c == 0)
         return T_TRUE;
 
+    /* contiguous storage */
+    if ((mat1->stride == c && mat2->stride == c) || r == 1)
+        return _gr_vec_equal(mat1->entries, mat2->entries, r * c, ctx);
+
     eq = T_TRUE;
 
     for (i = 0; i < r; i++)

@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "gmpcompat.h"
+#include "ulong_extras.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
@@ -327,6 +328,50 @@ _gr_fmpq_div(fmpq_t res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
     else
     {
         fmpq_div(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+static int
+_gr_fmpq_div_ui(fmpq_t res, const fmpq_t x, ulong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz f = *fmpq_numref(x);
+        ulong g;
+
+        if (f == 0)
+        {
+            fmpq_zero(res);
+            return GR_SUCCESS;
+        }
+
+        if (!COEFF_IS_MPZ(f))
+            g = n_gcd(FLINT_ABS(f), y);
+        else
+        {
+            fmpz_t t;
+            fmpz_init(t);
+            fmpz_gcd_ui(t, fmpq_numref(x), y);
+            g = fmpz_get_ui(t);
+            fmpz_clear(t);
+        }
+
+        if (g == 1)
+        {
+            fmpz_set(fmpq_numref(res), fmpq_numref(x));
+            fmpz_mul_ui(fmpq_denref(res), fmpq_denref(x), y);
+        }
+        else
+        {
+            fmpz_divexact_ui(fmpq_numref(res), fmpq_numref(x), g);
+            fmpz_mul_ui(fmpq_denref(res), fmpq_denref(x), y / g);
+        }
+
         return GR_SUCCESS;
     }
 }
@@ -720,6 +765,42 @@ _gr_fmpq_vec_equal(const fmpq * vec1, const fmpq * vec2, slong len, gr_ctx_t ctx
             return T_FALSE;
 
     return T_TRUE;
+}
+
+static int
+_gr_fmpq_vec_set(fmpq * res, const fmpq * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (res == vec)
+        return GR_SUCCESS;
+
+    /* avoid function calls for small values */
+    for (i = 0; i < len; i++)
+    {
+        if (!COEFF_IS_MPZ(vec[i].num) && !COEFF_IS_MPZ(res[i].num))
+            res[i].num = vec[i].num;
+        else
+            fmpz_set(fmpq_numref(res + i), fmpq_numref(vec + i));
+
+        if (!COEFF_IS_MPZ(vec[i].den) && !COEFF_IS_MPZ(res[i].den))
+            res[i].den = vec[i].den;
+        else
+            fmpz_set(fmpq_denref(res + i), fmpq_denref(vec + i));
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpq_vec_zero(fmpq * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpq_zero(res + i);
+
+    return GR_SUCCESS;
 }
 
 static int
@@ -1141,6 +1222,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpq_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpq_mul_si},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpq_div},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_fmpq_div_ui},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
@@ -1172,6 +1254,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpq_vec_is_zero},
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpq_vec_equal},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fmpq_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fmpq_vec_zero},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpq_vec_sum},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpq_poly_mulmid},

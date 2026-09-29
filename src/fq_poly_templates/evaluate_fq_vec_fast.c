@@ -14,6 +14,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
@@ -125,12 +126,9 @@ _TEMPLATE4(T, poly_evaluate, T, vec_fast)(TEMPLATE(T, struct) * ys,
                                           const TEMPLATE(T, struct) * xs, slong n,
                                           const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, poly_struct) ** tree;
-
-    tree = _TEMPLATE(T, poly_tree_alloc)(n, ctx);
-    _TEMPLATE(T, poly_tree_build)(tree, xs, n, ctx);
-    _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)(ys, poly, plen, tree, n, ctx);
-    _TEMPLATE(T, poly_tree_free)(tree, n, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate_vec_fast(ys, poly, plen, xs, n, gr_ctx));
 }
 
 void

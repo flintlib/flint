@@ -10,6 +10,7 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_rsqrt_series(arb_ptr g,
@@ -43,52 +44,10 @@ _arb_poly_rsqrt_series(arb_ptr g,
     }
     else
     {
-        /* Third-order Newton iteration: with e = 1 - h g^2 = O(x^m),
-           h^(-1/2) = g (1 + e/2 + 3e^2/8) + O(x^(3m)). */
-        arb_ptr t, u, v;
-        slong a[FLINT_BITS];
-        slong i, m, n, k, tlen, hnlen, plen;
-
-        t = _arb_vec_init(2 * len + (len + 2) / 3);
-        u = t + len;
-        v = u + len;
-
-        arb_rsqrt(g, h, prec);
-
-        a[i = 0] = n = len;
-        while (n > 1)
-            a[++i] = (n = (n + 2) / 3);
-
-        for (i--; i >= 0; i--)
-        {
-            m = n;
-            n = a[i];
-            k = n - 2 * m;
-
-            tlen = FLINT_MIN(2 * m - 1, n);
-            _arb_poly_mullow(t, g, m, g, m, tlen, prec);
-
-            /* u = (h g^2)[m, n) = -e / x^m */
-            hnlen = FLINT_MIN(hlen, n);
-            plen = FLINT_MIN(n, tlen + hnlen - 1);
-            _arb_poly_mulmid(u, t, tlen, h, hnlen, m, plen, prec);
-            _arb_vec_zero(u + plen - m, n - plen);
-
-            if (k > 0)
-            {
-                /* e/2 + 3e^2/8 = -(4u - 3 x^m u^2) / 8 */
-                _arb_poly_mullow(v, u, k, u, k, k, prec);
-                _arb_vec_scalar_mul_si(v, v, k, 3, prec);
-                _arb_vec_scalar_mul_2exp_si(u, u, n - m, 2);
-                _arb_vec_sub(u + m, u + m, v, k, prec);
-            }
-
-            _arb_poly_mullow(g + m, g, FLINT_MIN(m, n - m), u, n - m, n - m, prec);
-            _arb_vec_scalar_mul_2exp_si(g + m, g + m, n - m, (k > 0) ? -3 : -1);
-            _arb_vec_neg(g + m, g + m, n - m);
-        }
-
-        _arb_vec_clear(t, 2 * len + (len + 2) / 3);
+        gr_ctx_t ctx;
+        gr_ctx_init_real_arb(ctx, prec);
+        if (_gr_poly_rsqrt_series_newton(g, h, hlen, len, 2, ctx) != GR_SUCCESS)
+            _arb_vec_indeterminate(g, len);
     }
 }
 

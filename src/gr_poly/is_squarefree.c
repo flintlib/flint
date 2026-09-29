@@ -12,13 +12,61 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-truth_t
-gr_poly_is_squarefree(const gr_poly_t f, gr_ctx_t ctx)
+/* f of length len >= 3 with nonzero leading coefficient, over a field */
+static truth_t
+_gr_poly_is_squarefree_field(gr_srcptr f, slong len, gr_ctx_t ctx)
 {
-    gr_poly_t d, g;
+    gr_ptr d, g;
+    slong dlen, glen, sz = ctx->sizeof_elem;
     truth_t res;
     int status = GR_SUCCESS;
 
+    /* derivative and gcd share one temporary vector */
+    GR_TMP_INIT_VEC(d, 2 * (len - 1), ctx);
+    g = GR_ENTRY(d, len - 1, sz);
+
+    status |= _gr_poly_derivative(d, f, len, ctx);
+    dlen = len - 1;
+    status |= _gr_vec_normalise(&dlen, d, dlen, ctx);
+
+    if (status != GR_SUCCESS || (dlen > 0 &&
+            gr_is_zero(GR_ENTRY(d, dlen - 1, sz), ctx) != T_FALSE))
+    {
+        res = T_UNKNOWN;
+    }
+    else if (dlen == 0)
+    {
+        if (gr_ctx_is_finite_characteristic(ctx) == T_FALSE)
+            res = T_UNKNOWN;  /* should not happen */
+        else if (gr_ctx_is_finite(ctx) == T_TRUE)
+            res = T_FALSE;
+        else
+            res = T_UNKNOWN;  /* possibly imperfect field */
+    }
+    else
+    {
+        /* the gcd need not be made monic: only its length is used
+           (both inputs have nonzero leading coefficients) */
+        status |= _gr_poly_gcd(g, &glen, f, len, d, dlen, ctx);
+
+        if (status != GR_SUCCESS)
+            res = T_UNKNOWN;
+        else if (glen == 1)
+            res = T_TRUE;
+        else if (glen > 1 && gr_is_zero(GR_ENTRY(g, glen - 1, sz), ctx) == T_FALSE)
+            res = T_FALSE;
+        else
+            res = T_UNKNOWN;
+    }
+
+    GR_TMP_CLEAR_VEC(d, 2 * (len - 1), ctx);
+
+    return res;
+}
+
+truth_t
+gr_poly_is_squarefree(const gr_poly_t f, gr_ctx_t ctx)
+{
     if (f->length == 0)
         return T_FALSE;
 
@@ -34,41 +82,5 @@ gr_poly_is_squarefree(const gr_poly_t f, gr_ctx_t ctx)
     if (gr_ctx_is_field(ctx) != T_TRUE)
         return T_UNKNOWN;
 
-    gr_poly_init(d, ctx);
-    gr_poly_init(g, ctx);
-
-    status |= gr_poly_derivative(d, f, ctx);
-
-    if (status != GR_SUCCESS || (d->length > 0 &&
-            gr_is_zero(gr_poly_coeff_srcptr(d, d->length - 1, ctx), ctx) != T_FALSE))
-    {
-        res = T_UNKNOWN;
-    }
-    else if (d->length == 0)
-    {
-        if (gr_ctx_is_finite_characteristic(ctx) == T_FALSE)
-            res = T_UNKNOWN;  /* should not happen */
-        else if (gr_ctx_is_finite(ctx) == T_TRUE)
-            res = T_FALSE;
-        else
-            res = T_UNKNOWN;  /* possibly imperfect field */
-    }
-    else
-    {
-        status |= gr_poly_gcd(g, f, d, ctx);
-
-        if (status != GR_SUCCESS)
-            res = T_UNKNOWN;
-        else if (g->length == 1)
-            res = T_TRUE;
-        else if (g->length > 1 && gr_is_zero(gr_poly_coeff_srcptr(g, g->length - 1, ctx), ctx) == T_FALSE)
-            res = T_FALSE;
-        else
-            res = T_UNKNOWN;
-    }
-
-    gr_poly_clear(d, ctx);
-    gr_poly_clear(g, ctx);
-
-    return res;
+    return _gr_poly_is_squarefree_field(f->coeffs, f->length, ctx);
 }

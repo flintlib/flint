@@ -16,21 +16,16 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
-void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
-                                   const fmpz* FLINT_UNUSED(B), slong lenB, const fmpz* Binv,
+void _fmpz_mod_poly_div_newton_n_preinv(fmpz * Q, const fmpz * A, slong lenA,
+                                   const fmpz * B, slong lenB, const fmpz * Binv,
                                    slong lenBinv, const fmpz_mod_ctx_t ctx)
 {
-    const slong lenQ = lenA - lenB + 1;
-    fmpz * Arev;
-    slong i;
- 
-    Arev = flint_malloc(lenQ * sizeof(fmpz));
-    for (i = 0; i < lenQ; i++)
-        Arev[i] = A[lenA - 1 - i];
-    _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
-    _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
-    flint_free(Arev);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_div_newton_n_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, gr_ctx));
 }
 
 
