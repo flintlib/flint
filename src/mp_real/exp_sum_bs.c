@@ -393,6 +393,61 @@ tbound(const bs_args * args, slong D, slong a, slong b)
     return (b - a) * (D + 2) + 4;
 }
 
+static void bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
+    const bs_args * args, slong D, slong a, slong b);
+
+/* THREADS.  A subtree whose T bound reaches EXP_BS_PAR_LIMBS limbs
+   runs its two halves on two threads (_mp_real_parallel_pair, which
+   splits the budget between them for the forks below), and then its
+   merge as two jobs, {T Q2, Q Q2} and {x^step T2}, into separate
+   scratch -- the in-place merge below reads T while writing it, so
+   the parallel merge trades one copy of the low product for the
+   overlap.  Below the threshold, or without threads, the serial
+   in-place code runs. */
+#ifndef EXP_BS_PAR_LIMBS
+#define EXP_BS_PAR_LIMBS 2048
+#endif
+
+typedef struct
+{
+    nn_ptr T, Q;
+    slong * tn, * qn, * QE;
+    const bs_args * args;
+    slong D, a, b;
+}
+exp_bs_job;
+
+static void
+_exp_bs_job(void * arg)
+{
+    exp_bs_job * J = (exp_bs_job *) arg;
+    bsplit(J->T, J->tn, J->Q, J->qn, J->QE, J->args, J->D, J->a, J->b);
+}
+
+typedef struct
+{
+    nn_srcptr T, Q, T2, Q2, P;
+    slong tn, qn, t2n, q2n, Pl;
+    nn_ptr sc, qsc, sc2;
+    slong l1, lq, l2;
+}
+exp_merge_struct;
+
+static void
+_exp_merge_x(void * arg)
+{
+    exp_merge_struct * M = (exp_merge_struct *) arg;
+    M->l1 = nnn_mul(M->sc, M->T, M->tn, M->Q2, M->q2n);
+    M->lq = nnn_mul(M->qsc, M->Q, M->qn, M->Q2, M->q2n);
+}
+
+static void
+_exp_merge_y(void * arg)
+{
+    exp_merge_struct * M = (exp_merge_struct *) arg;
+    M->l2 = nnn_mul(M->sc2, M->P, M->Pl, M->T2, M->t2n);
+}
+
 static void
 bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
     const bs_args * args, slong D, slong a, slong b)
@@ -433,6 +488,51 @@ bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
         *qn = 1 + (hi != 0);
         *QE = 2 * D;
     }
+    else if (flint_get_num_threads() >= 2
+        && tbound(args, D, a, b) >= EXP_BS_PAR_LIMBS)
+    {
+        slong step, m, i, t2n, q2n, Q2E;
+        nn_ptr T2, Q2, sc, qsc, sc2;
+        exp_bs_job L, R;
+        exp_merge_struct M;
+        TMP_INIT;
+
+        step = (b - a) / 2;
+        m = a + step;
+
+        TMP_START;
+        T2 = TMP_ALLOC((tbound(args, D, m, b) + qbound(args, m, b)
+            + 2 * tbound(args, D, a, b) + qbound(args, a, b) + 16)
+            * sizeof(ulong));
+        Q2 = T2 + tbound(args, D, m, b);
+        sc = Q2 + qbound(args, m, b);
+        sc2 = sc + tbound(args, D, a, b) + 4;
+        qsc = sc2 + tbound(args, D, a, b) + 4;
+
+        L.T = T; L.tn = tn; L.Q = Q; L.qn = qn; L.QE = QE;
+        L.args = args; L.D = D; L.a = a; L.b = m;
+        R.T = T2; R.tn = &t2n; R.Q = Q2; R.qn = &q2n; R.QE = &Q2E;
+        R.args = args; R.D = D; R.a = m; R.b = b;
+        _mp_real_parallel_pair(_exp_bs_job, &L, _exp_bs_job, &R);
+
+        i = get_exp_pos(args->xexp, step);
+        M.T = T; M.tn = *tn; M.Q = Q; M.qn = *qn;
+        M.T2 = T2; M.t2n = t2n; M.Q2 = Q2; M.q2n = q2n;
+        M.P = args->xpow[i]; M.Pl = args->xlen[i];
+        M.sc = sc; M.qsc = qsc; M.sc2 = sc2;
+        _mp_real_parallel_pair(_exp_merge_x, &M, _exp_merge_y, &M);
+
+        /* T = (T Q2) B^Q2E + x^step T2, Q = Q Q2 */
+        flint_mpn_zero(T, args->xoff[i]);
+        flint_mpn_copyi(T + args->xoff[i], sc2, M.l2);
+        *tn = nnn_add_shifted(T, args->xoff[i] + M.l2, sc, M.l1, Q2E);
+        flint_mpn_copyi(Q, qsc, M.lq);
+        *QE = *QE + Q2E;
+        *qn = nnn_strip_low(Q, M.lq, QE);
+        if (mp_real_get_verbose())
+            _mp_real_progress("exp bsplit: merged terms [%wd, %wd), T has %wd limbs", a, b, *tn);
+        TMP_END;
+    }
     else
     {
         slong step, m, i, t2n, q2n, l, Q2E;
@@ -468,6 +568,8 @@ bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
         flint_mpn_copyi(Q, sc, l);
         *QE = *QE + Q2E;
         *qn = nnn_strip_low(Q, l, QE);
+        if (*tn >= MP_REAL_VERBOSE_MIN_LIMBS && mp_real_get_verbose())
+            _mp_real_progress("exp bsplit: merged terms [%wd, %wd), T has %wd limbs", a, b, *tn);
         TMP_END;
     }
 }

@@ -24,7 +24,8 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
 
     for (iter = 0; iter < 20 + 20 * flint_test_multiplier(); iter++)
     {
-        slong wn = 1 + n_randint(state, (iter % 17 == 0) ? 700 : 60);
+        slong wn = 1 + n_randint(state, (iter % 17 == 0) ? 700
+            : (iter % 3 == 0) ? 300 : 60);
         flint_bitcnt_t r = 16 + n_randint(state,
             FLINT_MIN(FLINT_BITS * (ulong) wn, 3000));
         slong i, alg;
@@ -36,6 +37,7 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
         y = flint_malloc((wn + 2) * sizeof(ulong));
         arb_init(ta); arb_init(ref); arb_init(got); fmpz_init(f);
 
+        flint_set_num_threads(1 + n_randint(state, 4));
         flint_mpn_urandomb(t, state, FLINT_BITS * wn);
         /* clear the top r bits so t < 2^-r */
         for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
@@ -119,6 +121,7 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             else if (cases[c].fill == 1)
                 flint_mpn_store(t, wn, ~UWORD(0));
             else
+                flint_set_num_threads(1 + n_randint(state, 4));
                 flint_mpn_urandomb(t, state, FLINT_BITS * wn);
             for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
                 t[wn - 1 - i] = 0;
@@ -149,6 +152,8 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             flint_free(t); flint_free(y);
         }
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

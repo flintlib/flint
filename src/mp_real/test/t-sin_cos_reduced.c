@@ -69,7 +69,8 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
 
     for (iter = 0; iter < 20 + 20 * flint_test_multiplier(); iter++)
     {
-        slong wn = 1 + n_randint(state, (iter % 17 == 0) ? 700 : 60);
+        slong wn = 1 + n_randint(state, (iter % 17 == 0) ? 700
+            : (iter % 3 == 0) ? 300 : 60);
         flint_bitcnt_t r = 16 + n_randint(state,
             FLINT_MIN(FLINT_BITS * (ulong) wn, 3000));
         slong i, alg;
@@ -79,6 +80,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
         ysin = flint_malloc((wn + 2) * sizeof(ulong));
         yg = flint_malloc((wn + 2) * sizeof(ulong));
 
+        flint_set_num_threads(1 + n_randint(state, 4));
         flint_mpn_urandomb(t, state, FLINT_BITS * wn);
         /* clear the top r bits so t < 2^-r */
         for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
@@ -154,6 +156,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
                 t[wn - 1] = n_randtest(state);
             }
             else
+                flint_set_num_threads(1 + n_randint(state, 4));
                 flint_mpn_urandomb(t, state, FLINT_BITS * wn);
             for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
                 t[wn - 1 - i] = 0;
@@ -169,6 +172,8 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
             flint_free(t); flint_free(ysin); flint_free(yg);
         }
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }
