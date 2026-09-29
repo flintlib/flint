@@ -768,6 +768,37 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
         {
             if (s + 2 < send && s[1] == '/' && s[2] == '-')
             {
+                const char * p = s + 3;
+
+                while (p < send && *p == ' ')
+                    p++;
+
+                /* "m +/- inf" or "+/- inf": an infinite radius, split off
+                   syntactically (like O(x^n)) and handed to
+                   gr_set_interval_mid_inf, since infinity need not be an
+                   element of the ring */
+                if (p + 3 <= send && (0 == strncmp(p, "inf", 3) || 0 == strncmp(p, "Inf", 3)) && (p + 3 == send || !isalpha(p[3])))
+                {
+                    if (!gr_parse_top_is_expr(E))
+                    {
+                        if (GR_SUCCESS != gr_zero(E->tmp, E->R))
+                            goto failed;
+                        if (_gr_parse_push_expr(E))
+                            goto failed;
+                    }
+                    else
+                    {
+                        if (_gr_parse_pop_prec(E, PREC_PLUSMINUS))
+                            goto failed;
+                    }
+
+                    if (GR_SUCCESS != gr_set_interval_mid_inf(gr_parse_top_expr(E), gr_parse_top_expr(E), E->R))
+                        goto failed;
+
+                    s = p + 3;
+                    goto continue_outer;
+                }
+
                 if (!gr_parse_top_is_expr(E))
                 {
                     _gr_parse_push_op(E, _op_make(OP_PLUSMINUS, FIX_PREFIX, PREC_UPLUSMINUS));
@@ -1005,6 +1036,26 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
                 if (_gr_parse_push_expr(E))
                     goto failed;
                 s += 1;
+                goto continue_outer;
+            }
+
+            if ((0 == strncmp(s, "inf", 3) || 0 == strncmp(s, "Inf", 3)) && !isalpha(s[3]))
+            {
+                if (GR_SUCCESS != gr_pos_inf(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 3;
+                goto continue_outer;
+            }
+
+            if ((0 == strncmp(s, "nan", 3) || 0 == strncmp(s, "NaN", 3)) && !isalpha(s[3]))
+            {
+                if (GR_SUCCESS != gr_undefined(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 3;
                 goto continue_outer;
             }
 

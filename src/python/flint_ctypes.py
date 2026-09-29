@@ -1,4 +1,5 @@
 import ctypes
+import random
 import ctypes.util
 import sys
 import functools
@@ -162,6 +163,26 @@ class padic_radix_struct(ctypes.Structure):
                 ('v', c_slong),
                 ('N', c_slong)]
 
+class decfloat_struct(ctypes.Structure):
+    _fields_ = [('m', radix_integer_struct),
+                ('exp', fmpz_struct)]
+
+class decmag_struct(ctypes.Structure):
+    _fields_ = [('m', c_ulong),
+                ('exp', fmpz_struct)]
+
+class decball_struct(ctypes.Structure):
+    _fields_ = [('mid', decfloat_struct),
+                ('rad', decmag_struct)]
+
+class deccfloat_struct(ctypes.Structure):
+    _fields_ = [('re', decfloat_struct),
+                ('im', decfloat_struct)]
+
+class deccball_struct(ctypes.Structure):
+    _fields_ = [('re', decball_struct),
+                ('im', decball_struct)]
+
 # todo: actually a union
 class nf_elem_struct(ctypes.Structure):
     _fields_ = [('poly', fmpq_poly_struct)]
@@ -279,7 +300,7 @@ def fmpq_set_python(cref, x):
 
 
 class Undecidable(NotImplementedError):
-    pass
+    __module__ = Exception.__module__
 
 class gr_ctx_struct(ctypes.Structure):
     _fields_ = [('content', ctypes.c_char * libgr.gr_ctx_sizeof_ctx())]
@@ -319,6 +340,32 @@ libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_ctx_init_nmod.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_padic_radix.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong, c_slong, c_slong, ctypes.c_int)
+
+libgr._gr_ctx_init_decimal.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int, ctypes.c_uint, c_slong, ctypes.c_int, ctypes.c_int)
+libgr.decimal_ctx_set_prec.argtypes = (ctypes.POINTER(gr_ctx_struct), c_slong)
+libgr.decimal_ctx_set_rnd.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.decimal_ctx_set_rad_prec.argtypes = (ctypes.POINTER(gr_ctx_struct), c_slong)
+libgr.decimal_ctx_set_exp_limits.argtypes = (ctypes.POINTER(gr_ctx_struct), c_slong, c_slong)
+libgr.decimal_ctx_set_flags.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.decimal_ctx_get_prec.restype = c_slong
+libgr.decimal_ctx_get_rad_prec.restype = c_slong
+libgr.decimal_ctx_get_limb_digits.restype = c_slong
+libgr.decimal_ctx_get_exp_limits.argtypes = (ctypes.POINTER(c_slong), ctypes.POINTER(c_slong), ctypes.POINTER(gr_ctx_struct))
+libgr.decfloat_set_round.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.c_int, ctypes.POINTER(gr_ctx_struct))
+libgr.decfloat_digits.restype = c_slong
+libgr.decfloat_limbs.restype = c_slong
+libgr.decfloat_get_digit_si.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.decfloat_get_digit_si.restype = c_ulong
+libgr.decfloat_set_digit_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, c_ulong, ctypes.POINTER(gr_ctx_struct))
+libgr.decfloat_get_sci_exp_si.argtypes = (ctypes.POINTER(c_slong), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.decfloat_get_str_sci.restype = ctypes.c_void_p
+libgr.decball_set_round.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.decball_add_error_10exp_si.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.decball_rel_accuracy_digits.restype = c_slong
+libgr.decimal_ctx_set_rnd_im.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.deccfloat_set_round.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.c_int, ctypes.c_int, ctypes.POINTER(gr_ctx_struct))
+libgr.deccball_add_error_decmag.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.deccball_rel_accuracy_digits.restype = c_slong
 
 _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_other, libgr.gr_other_add]
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
@@ -625,6 +672,36 @@ class gr_ctx:
 
         """
         return self._ctx_predicate(libflint.gr_ctx_is_complex_vector_space, "is_complex_vector_space")
+
+    def is_exact(self):
+        """
+        Return whether elements of this structure are represented exactly.
+
+            >>> QQ.is_exact()
+            True
+            >>> RR.is_exact()
+            False
+            >>> RealFloat_decfloat(None).is_exact(), RealFloat_decfloat(10).is_exact()
+            (True, False)
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_exact, "is_exact")
+
+    def is_canonical(self):
+        """
+        Return whether equal elements of this structure are guaranteed to
+        have a unique representation (so that structural equality is
+        mathematical equality).
+
+            >>> QQ.is_canonical()
+            True
+            >>> RR.is_canonical()
+            False
+            >>> RealFloat_decfloat(10).is_canonical(), ComplexFloat_deccfloat(10).is_canonical()
+            (True, True)
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_canonical, "is_canonical")
 
 
     def _set_gen_name(self, s):
@@ -1667,7 +1744,7 @@ class gr_ctx:
             >>> RR.sinc_pi(0.5)
             [0.636619772367581 +/- 4.04e-16]
             >>> CC.sinc_pi(1j)
-            [3.67607791037498 +/- 3.11e-15]
+            [3.676077910374977 +/- 9.92e-16]
         """
         return ctx._unary_op(x, libgr.gr_sinc_pi, "sinc_pi($x)")
 
@@ -2144,13 +2221,13 @@ class gr_ctx:
     def log_integral(ctx, x, offset=False):
         """
             >>> RR.log_integral(2)
-            [1.04516378011749 +/- 3.31e-15]
+            [1.045163780117493 +/- 9.71e-16]
             >>> RR.log_integral(2, offset=True)
             0
             >>> RRser.log_integral(RRser("2+x", error=2))
-            [1.04516378011749 +/- 3.31e-15] + [1.442695040888963 +/- 8.70e-16]*x + O(x^2)
+            [1.045163780117493 +/- 9.71e-16] + [1.442695040888963 +/- 8.70e-16]*x + O(x^2)
             >>> CCser.log_integral(CCser("2+x", error=2))
-            [1.04516378011749 +/- 3.31e-15] + [1.442695040888963 +/- 8.70e-16]*x + O(x^2)
+            [1.045163780117493 +/- 9.71e-16] + [1.442695040888963 +/- 8.70e-16]*x + O(x^2)
             >>> CCser.log_integral(CCser("2+x", error=2), offset=True)
             [1.442695040888963 +/- 8.70e-16]*x + O(x^2)
         """
@@ -2228,7 +2305,7 @@ class gr_ctx:
             >>> RR.airy_ai(1)
             [0.1352924163128814 +/- 4.17e-17]
             >>> CC.airy_ai(1j)
-            ([0.3314933054321412 +/- 8.35e-17] + [-0.317449858968444 +/- 3.13e-16]*I)
+            ([0.3314933054321412 +/- 8.35e-17] + [-0.3174498589684437 +/- 9.89e-17]*I)
             >>> RRser.airy_ai(RRser(1))
             [0.1352924163128814 +/- 4.17e-17]
             >>> RRser.airy_ai(RRser("1+x", error=2))
@@ -2417,9 +2494,9 @@ class gr_ctx:
         Associated Legendre function of the second kind.
 
             >>> RR.legendre_q(3, 1, 0.5)
-            [2.4918525917090 +/- 5.45e-14]
+            [2.49185259170895 +/- 9.81e-15]
             >>> CC.legendre_q(3, 1, 0.5)
-            [2.4918525917090 +/- 5.45e-14]
+            [2.49185259170895 +/- 9.81e-15]
             >>> CC.legendre_q(3, 1, 0.5, 1)
             ([0.51013107119087 +/- 4.02e-15] + [-2.4918525917090 +/- 5.73e-14]*I)
         """
@@ -2728,7 +2805,7 @@ class gr_ctx:
             >>> RR.gamma(QQ(1) / 3)
             [2.678938534707747 +/- 8.99e-16]
             >>> CC.gamma(1+1j) / CC.gamma(1j)
-            ([+/- 6.32e-16] + [1.0000000000000 +/- 1.03e-15]*I)
+            ([+/- 6.32e-16] + [1.00000000000000 +/- 1.03e-15]*I)
             >>> RRser.gamma(RRser("1+x",error=2))
             1 + [-0.577215664901533 +/- 3.58e-16]*x + O(x^2)
             >>> CCser.gamma(CCser("1+I*x",error=2))
@@ -3505,7 +3582,7 @@ class gr_ctx:
         Note that G_2(tau) is omitted.
 
             >>> CC.eisenstein_g_vec(1j, 3)
-            [[3.1512120021539 +/- 3.41e-14], [+/- 4.40e-14], [4.255773035365 +/- 2.12e-13]]
+            [[3.1512120021539 +/- 3.41e-14], [+/- 4.40e-14], [4.2557730353652 +/- 9.85e-14]]
         """
         return ctx._op_vec_arg_len(tau, n, libgr.gr_eisenstein_g_vec, "eisenstein_g_vec($tau, $n)")
 
@@ -3514,7 +3591,7 @@ class gr_ctx:
         Arithmetic-geometric mean.
 
             >>> RR.agm(2)
-            [1.45679103104691 +/- 3.98e-15]
+            [1.456791031046907 +/- 9.72e-16]
             >>> RR.agm(2, 3)
             [2.47468043623630 +/- 4.68e-15]
             >>> CCser.agm(CCser("1+x", error=3))
@@ -3625,7 +3702,7 @@ class gr_ctx:
             >>> g2, g3 = CC.elliptic_invariants(1j)
             >>> CC.weierstrass_p_prime(0.25, 1j)**2; 4*CC.weierstrass_p(0.25, 1j)**3 - g2*CC.weierstrass_p(0.25, 1j) - g3
             [15152.862386715 +/- 7.03e-10]
-            [15152.86238672 +/- 5.09e-9]
+            [15152.862386715 +/- 9.62e-10]
         """
         return ctx._unary_unary_op(tau, libgr.gr_elliptic_invariants, "elliptic_invariants($tau)")
 
@@ -5073,6 +5150,901 @@ class Qp_padic_radix(gr_ctx):
             raise FlintUnableError("p must be a word-size prime")
         libgr.gr_ctx_init_padic_radix(self._ref, p, prec_rel, prec_abs, flags)
         self._elem_type = padic_radix
+
+DECIMAL_RND_DOWN = 0
+DECIMAL_RND_UP = 1
+DECIMAL_RND_FLOOR = 2
+DECIMAL_RND_CEIL = 3
+DECIMAL_RND_NEAR = 4
+DECIMAL_RND_NEAR_AWAY = 5
+DECIMAL_RND_NEAR_ZERO = 6
+
+_decimal_rnd_names = ["down", "up", "floor", "ceil", "near", "near_away", "near_zero"]
+
+DECIMAL_ALLOW_INF = 1
+DECIMAL_ALLOW_NAN = 2
+DECIMAL_ALLOW_UNDERFLOW = 4
+DECIMAL_SLOPPY_RADIUS = 8
+DECIMAL_WRITE_SCIENTIFIC = 16
+
+DECIMAL_PREC_EXACT = WORD_MAX
+
+def _decimal_rnd(rnd):
+    if isinstance(rnd, str):
+        return _decimal_rnd_names.index(rnd)
+    rnd = int(rnd)
+    if not 0 <= rnd < len(_decimal_rnd_names):
+        raise ValueError("invalid rounding mode")
+    return rnd
+
+class gr_decimal_ctx(gr_ctx):
+    r"""
+    Base class for the decimal floating-point and decimal ball contexts.
+    The keyword arguments common to both constructors are:
+
+    * ``prec``: the working precision in decimal digits, or ``None`` for
+      exact arithmetic (an operation whose result is not exactly
+      representable then fails with ``FlintUnableError``).
+    * ``rnd``: the rounding mode, one of ``"down"`` (toward zero),
+      ``"up"`` (away from zero), ``"floor"``, ``"ceil"``, ``"near"``
+      (ties to even), ``"near_away"`` or ``"near_zero"``.
+    * ``inf``, ``nan``: whether infinities and NaN are representable
+      (for balls, infinite midpoints and indeterminate values are
+      always representable; the flag only decides whether overflow
+      with exponent limits produces an infinity).
+    * ``underflow``: whether results below the smallest exponent are
+      flushed to zero (otherwise they fail).
+    * ``exp_limits``: a pair ``(emin, emax)`` bounding the scientific
+      exponent `E` (where `10^E \le |x| < 10^{E+1}`) of nonzero values,
+      or ``None`` for unbounded exponents.
+    * ``scientific``: always print in scientific notation.
+    * ``limb_digits``: the number of digits per internal limb (0 selects
+      the largest possible value, 19 on 64-bit machines).
+    """
+
+    def _init(self, which, prec, rnd, rad_prec, inf, nan, underflow, sloppy_radius, scientific, exp_limits, limb_digits, rnd_im=None):
+        gr_ctx.__init__(self)
+        flags = 0
+        if inf: flags |= DECIMAL_ALLOW_INF
+        if nan: flags |= DECIMAL_ALLOW_NAN
+        if underflow: flags |= DECIMAL_ALLOW_UNDERFLOW
+        if sloppy_radius: flags |= DECIMAL_SLOPPY_RADIUS
+        if scientific: flags |= DECIMAL_WRITE_SCIENTIFIC
+        prec = DECIMAL_PREC_EXACT if prec is None else int(prec)
+        libgr._gr_ctx_init_decimal(self._ref, which, int(limb_digits), prec, _decimal_rnd(rnd), flags)
+        if rnd_im is not None:
+            libgr.decimal_ctx_set_rnd_im(self._ref, _decimal_rnd(rnd_im))
+        if rad_prec is not None:
+            libgr.decimal_ctx_set_rad_prec(self._ref, int(rad_prec))
+        if exp_limits is not None:
+            self.exp_limits = exp_limits
+
+    @property
+    def digits(self):
+        """
+        The working precision in digits (``None`` for exact arithmetic).
+        Unlike ``prec``, which is measured in bits, this can be assigned
+        exactly.
+
+            >>> R = RealFloat_decfloat(10)
+            >>> R.digits, R.prec
+            (10, 32)
+            >>> R.digits = 3
+            >>> R(1) / 3
+            0.333
+            >>> R.digits = None
+            >>> R(1) / 3
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: ...
+        """
+        p = libgr.decimal_ctx_get_prec(self._ref)
+        return None if p == DECIMAL_PREC_EXACT else p
+
+    @digits.setter
+    def digits(self, prec):
+        libgr.decimal_ctx_set_prec(self._ref, DECIMAL_PREC_EXACT if prec is None else int(prec))
+
+    @property
+    def rnd(self):
+        """
+        The rounding mode, as a string.
+
+            >>> R = RealFloat_decfloat(3)
+            >>> R.rnd
+            'near'
+            >>> R(2) / 3, R(-2) / 3
+            (0.667, -0.667)
+            >>> R.rnd = "down"
+            >>> R(2) / 3, R(-2) / 3
+            (0.666, -0.666)
+            >>> R.rnd = "floor"
+            >>> R(2) / 3, R(-2) / 3
+            (0.666, -0.667)
+            >>> R.rnd = "ceil"
+            >>> R(2) / 3, R(-2) / 3
+            (0.667, -0.666)
+            >>> R.rnd = "up"
+            >>> R(2) / 3, R(-2) / 3
+            (0.667, -0.667)
+        """
+        return _decimal_rnd_names[libgr.decimal_ctx_get_rnd(self._ref)]
+
+    @rnd.setter
+    def rnd(self, rnd):
+        libgr.decimal_ctx_set_rnd(self._ref, _decimal_rnd(rnd))
+
+    @property
+    def rnd_im(self):
+        """
+        The rounding mode for imaginary parts (complex contexts), as a
+        string. Setting ``rnd`` also sets ``rnd_im``.
+
+            >>> C = ComplexFloat_deccfloat(3)
+            >>> C.rnd, C.rnd_im
+            ('near', 'near')
+            >>> C.rnd_im = "floor"
+            >>> C
+            Complex decimal floating-point numbers (prec 3, rnd near, rnd im floor)
+            >>> C("(2 + 2*I) / 3"), C("(-2 - 2*I) / 3")
+            ((0.667 + 0.666*I), (-0.667 - 0.667*I))
+            >>> C.rnd = "ceil"
+            >>> C.rnd, C.rnd_im
+            ('ceil', 'ceil')
+        """
+        return _decimal_rnd_names[libgr.decimal_ctx_get_rnd_im(self._ref)]
+
+    @rnd_im.setter
+    def rnd_im(self, rnd):
+        libgr.decimal_ctx_set_rnd_im(self._ref, _decimal_rnd(rnd))
+
+    @property
+    def exp_limits(self):
+        """
+        The exponent limits as a pair ``(emin, emax)``, or ``None``.
+
+            >>> R = RealFloat_decfloat(5, exp_limits=(-3, 3), inf=True, underflow=True)
+            >>> R.exp_limits
+            (-3, 3)
+            >>> R("1234"), R("12345")
+            (1234, inf)
+            >>> R("0.001"), R("0.0001")
+            (0.001, 0)
+            >>> R.exp_limits = None
+            >>> R("12345"), R("0.0001")
+            (12345, 0.0001)
+        """
+        emin = c_slong(); emax = c_slong()
+        libgr.decimal_ctx_get_exp_limits(ctypes.byref(emin), ctypes.byref(emax), self._ref)
+        if emin.value == WORD_MIN and emax.value == WORD_MAX:
+            return None
+        return (emin.value, emax.value)
+
+    @exp_limits.setter
+    def exp_limits(self, limits):
+        if limits is None:
+            emin, emax = WORD_MIN, WORD_MAX
+        else:
+            emin, emax = limits
+            emin = WORD_MIN if emin is None else int(emin)
+            emax = WORD_MAX if emax is None else int(emax)
+        libgr.decimal_ctx_set_exp_limits(self._ref, emin, emax)
+
+    @property
+    def flags(self):
+        return libgr.decimal_ctx_get_flags(self._ref)
+
+    @flags.setter
+    def flags(self, flags):
+        libgr.decimal_ctx_set_flags(self._ref, int(flags))
+
+    @property
+    def limb_digits(self):
+        """
+        The number of decimal digits per internal limb.
+
+            >>> RealFloat_decfloat(limb_digits=4).limb_digits
+            4
+        """
+        return libgr.decimal_ctx_get_limb_digits(self._ref)
+
+    def _float_context(self):
+        """A real floating-point context with the same settings."""
+        return RealFloat_decfloat(prec=self.digits, rnd=self.rnd, inf=bool(self.flags & DECIMAL_ALLOW_INF),
+            nan=bool(self.flags & DECIMAL_ALLOW_NAN), underflow=bool(self.flags & DECIMAL_ALLOW_UNDERFLOW),
+            scientific=bool(self.flags & DECIMAL_WRITE_SCIENTIFIC), exp_limits=self.exp_limits, limb_digits=self.limb_digits)
+
+    def _complex_float_context(self):
+        """A complex floating-point context with the same settings."""
+        return ComplexFloat_deccfloat(prec=self.digits, rnd=self.rnd, rnd_im=self.rnd_im, inf=bool(self.flags & DECIMAL_ALLOW_INF),
+            nan=bool(self.flags & DECIMAL_ALLOW_NAN), underflow=bool(self.flags & DECIMAL_ALLOW_UNDERFLOW),
+            scientific=bool(self.flags & DECIMAL_WRITE_SCIENTIFIC), exp_limits=self.exp_limits, limb_digits=self.limb_digits)
+
+    def _ball_context(self):
+        """A real ball context with the same settings."""
+        return RealField_decball(prec=self.digits, rad_prec=libgr.decimal_ctx_get_rad_prec(self._ref), rnd=self.rnd,
+            inf=bool(self.flags & DECIMAL_ALLOW_INF), nan=bool(self.flags & DECIMAL_ALLOW_NAN),
+            underflow=bool(self.flags & DECIMAL_ALLOW_UNDERFLOW), sloppy_radius=bool(self.flags & DECIMAL_SLOPPY_RADIUS),
+            scientific=bool(self.flags & DECIMAL_WRITE_SCIENTIFIC), exp_limits=self.exp_limits, limb_digits=self.limb_digits)
+
+
+class RealFloat_decfloat(gr_decimal_ctx):
+    r"""
+    Decimal floating-point numbers with a given number of significant
+    digits and correctly rounded arithmetic (decfloat). Values are stored
+    with leading and trailing zeros stripped, so exactly representable
+    numbers print exactly regardless of the precision:
+
+        >>> R = RealFloat_decfloat(10)
+        >>> R
+        Decimal floating-point numbers (prec 10, rnd near)
+        >>> R(1), R(-2), R("0.5"), R("1e100"), R("123.4500")
+        (1, -2, 0.5, 1e100, 123.45)
+        >>> R(1) / 3
+        0.3333333333
+        >>> R(2) / 3
+        0.6666666667
+        >>> R(10) ** 30
+        1e30
+        >>> R("1e-7") + 1
+        1.0000001
+        >>> R("1e-10") + 1
+        1
+        >>> R("1e-10") + 1 - 1
+        0
+        >>> R(2).sqrt()
+        1.414213562
+        >>> R(2).sqrt() ** 2
+        1.999999999
+        >>> R(2).sqrt() ** 2 - 2
+        -1e-9
+
+    Numbers print in positional notation when the scientific exponent is
+    between -6 and 20 and in scientific notation otherwise; both forms are
+    accepted as input, as are arithmetic expressions:
+
+        >>> R("0.000001"), R("0.0000001")
+        (0.000001, 1e-7)
+        >>> R("1" + "0" * 20), R("1" + "0" * 21)
+        (100000000000000000000, 1e21)
+        >>> R("1.5e3 * 2 + 1/4")
+        3000.25
+        >>> RealFloat_decfloat(10, scientific=True)("123.5")
+        1.235e2
+
+    The precision and rounding mode can be given in the constructor or
+    changed later:
+
+        >>> RealFloat_decfloat(3, rnd="floor")(1) / 3
+        0.333
+        >>> RealFloat_decfloat(3, rnd="ceil")(1) / 3
+        0.334
+
+    Rounding to a given number of digits is done with :meth:`decfloat.round`;
+    with ``prec=None`` the context is exact and inexact operations fail:
+
+        >>> X = RealFloat_decfloat(None)
+        >>> X("1e20") + X("1e-20")
+        100000000000000000000.00000000000000000001
+        >>> X(1) / 4
+        0.25
+        >>> X(1) / 3
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+
+    Infinities and NaN are not representable unless enabled:
+
+        >>> R(1) / 0
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> R.inf()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> Rx = RealFloat_decfloat(10, inf=True, nan=True)
+        >>> Rx(1) / 0, Rx(-1) / 0, Rx(0) / 0
+        (inf, -inf, nan)
+        >>> Rx("1e400") ** 3, Rx("inf") - Rx("inf")
+        (1e1200, nan)
+
+    Exponents are unbounded by default, but limits on the scientific
+    exponent can be imposed; values beyond the limits overflow to infinity
+    or underflow to zero if permitted by the ``inf`` and ``underflow`` flags:
+
+        >>> Rl = RealFloat_decfloat(10, exp_limits=(-99, 99))
+        >>> Rl("1e99") * 10
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+        >>> Rl = RealFloat_decfloat(10, exp_limits=(-99, 99), inf=True, underflow=True)
+        >>> Rl("1e99") * 10, Rl("1e-99") / 10, Rl("-9.999999999e99") * 2
+        (inf, 0, -inf)
+
+    Conversions to and from other types round to the context precision
+    (binary fractions are converted exactly in an exact context):
+
+        >>> R(QQ(1)/8), R(ZZ(10)**25), R(2**70), R(0.1)
+        (0.125, 1e25, 1.180591621e21, 0.1)
+        >>> X = RealFloat_decfloat(None)
+        >>> X(2**70), X(0.1)
+        (1.180591620717411303424e21, 0.1000000000000000055511151231257827021181583404541015625)
+        >>> QQ(R("0.125")), ZZ(R("1e5")), float(R("0.125"))
+        (1/8, 100000, 0.125)
+        >>> QQ(R("0.1")), int(R("3.7")), R("3.7").floor(), R("-3.7").ceil(), R("3.5").nint(), R("2.5").nint()
+        (1/10, 3, 3, -3, 4, 2)
+        >>> ZZ(R("0.5"))
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> RR(R("0.1")), RF(R("0.1"))
+        ([0.100000000000000 +/- 2.23e-17], 0.1000000000000000)
+        >>> R(RR("0.1")), R(RF("0.1")), X(RF("0.1"))
+        (0.1, 0.1, 0.1000000000000000055511151231257827021181583404541015625)
+        >>> R(RR(1) / 3)             # the midpoint is used
+        0.3333333333
+        >>> X(RR(1) / 3)             # not allowed in an exact context
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+        >>> CC(R("0.1")), RealFloat_arf(20)(R(1) / 3)
+        ([0.100000000000000 +/- 2.23e-17], 0.3333335)
+
+    Elementary functions are computed with correct rounding, via arb:
+
+        >>> R.pi()
+        3.141592654
+        >>> R(1).exp(), R(2).log(), R(1).sin(), R(1).atan()
+        (2.718281828, 0.6931471806, 0.8414709848, 0.7853981634)
+        >>> RealFloat_decfloat(50).pi()
+        3.1415926535897932384626433832795028841971693993751
+        >>> R(2) ** R("0.5")
+        1.414213562
+        >>> R(1).tan(), R(1).sinh(), R(1).cosh(), R(1).tanh(), R("1e-5").expm1(), R("1e-5").log1p()
+        (1.557407725, 1.175201194, 1.543080635, 0.761594156, 0.00001000005, 0.00000999995)
+
+    Correct rounding is guaranteed even for tiny arguments, where the
+    result lies extremely close to a representable number (a case where
+    Ziv's strategy alone would not terminate), and for exact powers,
+    which ``arb`` does not detect:
+
+        >>> Rd = RealFloat_decfloat(10, rnd="down")
+        >>> Rd("1e-1000000000").sin(), Rd("-1e-1000000000").sin(), Rd("1e-1000000000").exp(), Rd("-1e-1000000000").exp()
+        (9.999999999e-1000000001, -9.999999999e-1000000001, 1, 0.9999999999)
+        >>> Rd("1e-1000000000").cos(), Rd("1e-1000000000").sinh(), Rd("1e-1000000000").atan()
+        (0.9999999999, 1e-1000000000, 9.999999999e-1000000001)
+        >>> Rd("1e100") ** Rd("0.5"), Rd(8) ** Rd("0.125"), Rd("0.0001") ** Rd("0.25"), Rd("1.5") ** 3, Rd("1.5") ** -3
+        (1e50, 1.296839554, 0.1, 3.375, 0.2962962962)
+        >>> Rd(4) ** Rd("1e-1000000000"), Rd("0.25") ** Rd("1e-1000000000")
+        (1, 0.9999999999)
+
+    The full table of elementary and special functions of ``arb`` is
+    available with correct rounding, including exact special values
+    (which ``arb`` does not detect) and asymptotic cases:
+
+        >>> R.gamma(5), R.gamma(R("0.5")), R.zeta(-3), R.zeta(2), R.log10(1000), R.log2(R("0.125")), R.sin_pi(R("0.25")), R.tan_pi(R("0.25")), R.asin_pi(R("0.5"))
+        (24, 1.772453851, 0.008333333333, 1.644934067, 3, -3, 0.7071067812, 1, 0.1666666667)
+        >>> Rd.gamma(Rd("1e-1000000000")), Rd.gamma(Rd("-1e-1000000000")), Rd.digamma(Rd("1e-1000000000")), Rd.cot(Rd("1e-1000000000"))
+        (9.999999999e999999999, -1e1000000000, -1e1000000000, 9.999999999e999999999)
+        >>> Rd.tanh(1000000), Rd.tanh(-1000000), Rd.erf(1000000), Rd.erfc(-1000000), Rd.expm1(-1000000), Rd.zeta(1000000), Rd.acot(Rd("1e1000000000"))
+        (0.9999999999, -0.9999999999, 0.9999999999, 1.999999999, -0.9999999999, 1, 9.999999999e-1000000001)
+        >>> R.euler(), R.catalan(), R.erf(1), R.erfinv(R("0.5")), R.lambertw(1), R.dilog(1), R.bessel_j(1, 2), R.agm(R("0.5"), 1), R.hurwitz_zeta(2, 3), R.polylog(2, R("0.5")), R.atan2(1, 1), R.atan2(0, -1)
+        (0.5772156649, 0.9159655942, 0.8427007929, 0.4769362762, 0.5671432904, 1.644934067, 0.5767248078, 0.7283955155, 0.3949340668, 0.5822405265, 0.7853981634, 3.141592654)
+        >>> R.fac(20), R.fac(100), R.gamma(QQ(1)/3), R.rising(R("0.5"), 5), R.lambertw(R("-0.25"), -1), R.fresnel_s(1), R.airy_ai(1)
+        (2432902008000000000, 9.332621544e157, 2.678938535, 29.53125, -2.153292364, 0.3102683017, 0.1352924163)
+        >>> R.gamma(0)
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> R.zeta(1)
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+
+    Polynomials and matrices work with decimal coefficients (the
+    matrix computations are done with floating-point Gaussian elimination,
+    without any error control):
+
+        >>> Mat(R)([[1, 2], [3, 4]]).det()
+        -2
+        >>> Mat(R, 3, 3)().hilbert().inv()
+        [[9.00000017, -36.00000101, 30.00000097],
+        [-36.00000101, 192.0000056, -180.0000054],
+        [30.00000098, -180.0000054, 180.0000052]]
+        >>> Mat(RealFloat_decfloat(30), 3, 3)().hilbert().inv()
+        [[9.0000000000000000000000000017, -36.0000000000000000000000000101, 30.0000000000000000000000000097],
+        [-36.0000000000000000000000000101, 192.000000000000000000000000056, -180.000000000000000000000000054],
+        [30.0000000000000000000000000098, -180.000000000000000000000000054, 180.000000000000000000000000052]]
+        >>> Mat(R, 4, 4)().hilbert().det()
+        1.6534431e-7
+        >>> QQ(1) / 6048000
+        1/6048000
+        >>> Mat(RealFloat_decfloat(None), 2, 2)([[1, 2], [3, 4]]).inv()
+        [[-2, 1],
+        [1.5, -0.5]]
+        >>> Mat(RealFloat_decfloat(None), 2, 2)([[1, 2], [3, 5]]).inv()
+        [[-5, 2],
+        [3, -1]]
+        >>> Mat(RealFloat_decfloat(None), 2, 2)([[1, 2], [3, 6]]).inv()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> Mat(RealFloat_decfloat(None), 2, 2)([[1, 2], [3, 9]]).inv()
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+        >>> P = PolynomialRing(R)
+        >>> P([1, R("0.5")]) ** 2
+        1 + x + 0.25*x^2
+        >>> P("(x - 1.5) * (x + 0.25)")
+        -0.375 - 1.25*x + x^2
+        >>> P("(x - 1.5) * (x + 0.25)")(R("1.5"))
+        0
+        >>> P("x^3 - 2")(R(2).sqrt())
+        0.828427123
+
+    """
+
+    def __init__(self, prec=20, rnd="near", inf=False, nan=False, underflow=False, scientific=False, exp_limits=None, limb_digits=0):
+        self._init(0, prec, rnd, None, inf, nan, underflow, False, scientific, exp_limits, limb_digits)
+        self._elem_type = decfloat
+
+
+class RealField_decball(gr_decimal_ctx):
+    r"""
+    Real numbers represented as decimal balls (decball): a midpoint that is
+    a decimal floating-point number with a given number of digits and a
+    radius with a small fixed number of digits (``rad_prec``, between 1 and
+    9). Operations produce balls that are guaranteed to contain the exact
+    result.
+
+        >>> R = RealField_decball(10)
+        >>> R
+        Decimal balls (prec 10, rad prec 4)
+        >>> R(1), R("0.5"), R("1e100")
+        (1, 0.5, 1e100)
+        >>> R(1) / 3
+        [0.3333333333 +/- 3.334e-11]
+        >>> R(2).sqrt()
+        [1.414213562 +/- 3.731e-10]
+        >>> R(2).sqrt() ** 2
+        [1.999999999 +/- 1.113e-9]
+        >>> R.pi()
+        [3.141592654 +/- 4.104e-10]
+        >>> R.pi().sin()
+        [-4.102067611e-10 +/- 4.106e-10]
+        >>> R(10) ** 20 + 1
+        [100000000000000000000 +/- 1]
+        >>> RealField_decball(21)(10) ** 20 + 1
+        100000000000000000001
+        >>> (R(1) / 3) * 3
+        [0.9999999999 +/- 1.001e-10]
+        >>> (R(1) / 3) * 3 == 1
+        Traceback (most recent call last):
+          ...
+        Undecidable: ...
+        >>> (R(1) / 3) * 3 == 2
+        False
+        >>> R(1) / 3 == R(1) / 3
+        Traceback (most recent call last):
+          ...
+        Undecidable: ...
+        >>> R(1) / 4 == R(2) / 8
+        True
+        >>> (R(1) / 3) * 3 != 2, R(1) / 3 < R(1) / 2, R(1) / 3 > R(1) / 2
+        (True, True, False)
+        >>> R(1) / 3 < R(1) / 3
+        Traceback (most recent call last):
+          ...
+        Undecidable: ...
+
+    Balls can be written as ``mid +/- rad`` or ``[mid +/- rad]``, which
+    is also the output format, and as arbitrary arithmetic expressions:
+
+        >>> R("[1.5 +/- 0.01]")
+        [1.5 +/- 0.01]
+        >>> R("1.5 +/- 0.01")
+        [1.5 +/- 0.01]
+        >>> R("+/- 1e-30")
+        [0 +/- 1e-30]
+        >>> R("(1 +/- 0.1) * (2 +/- 0.1)")
+        [2 +/- 0.31]
+        >>> R("1.23456789012345 +/- 1e-20")
+        [1.23456789 +/- 1.236e-10]
+        >>> R("1.2345678901 +/- 1e-20")
+        [1.23456789 +/- 1.001e-10]
+        >>> R("123456789012345 +/- 1e-20")
+        [123456789000000 +/- 12360]
+        >>> R("1e100 +/- 1e50"), R("[-1e-100 +/- 1e-150]")
+        ([1e100 +/- 1e50], [-1e-100 +/- 1e-150])
+        >>> R("[1.5 +/- 0.01]") + R("[2.5 +/- 0.02]")
+        [4 +/- 0.03]
+        >>> R("1 +/- 0.001").contains(R("1.0005 +/- 0.0001")), R("1 +/- 0.001").contains(R("1.0005 +/- 0.001"))
+        (True, False)
+        >>> R("1 +/- 0.001").overlaps(R("1.0005 +/- 0.001")), R("1 +/- 0.001").overlaps(R("1.01"))
+        (True, False)
+        >>> R("1 +/- 0.001").contains(1), R("1 +/- 0.001").contains(QQ(1)/2)
+        (True, False)
+
+    The radius precision can be chosen between 1 and 9 digits; radii
+    are always rounded up. By default the actual rounding error of each
+    operation is tracked (rounded up to the radius precision); with
+    ``sloppy_radius=True`` it is instead bounded by half an ulp of the
+    midpoint (or a full ulp in directed rounding modes), which is
+    marginally cheaper:
+
+        >>> RealField_decball(10, rad_prec=1)(1) / 3
+        [0.3333333333 +/- 4e-11]
+        >>> RealField_decball(10, rad_prec=9)(1) / 3
+        [0.3333333333 +/- 3.33333334e-11]
+        >>> RealField_decball(10, rad_prec=2)(1) / 3
+        [0.3333333333 +/- 3.4e-11]
+        >>> RealField_decball(10, rad_prec=9, sloppy_radius=True)(1) / 3
+        [0.3333333333 +/- 5e-11]
+        >>> RealField_decball(10)("1e-25") + 1
+        [1 +/- 1e-25]
+        >>> RealField_decball(10, sloppy_radius=True)("1e-25") + 1
+        [1 +/- 5e-10]
+
+    The midpoint and radius are available separately, as decimal
+    floating-point numbers, and the radius can be enlarged:
+
+        >>> x = R(1) / 3
+        >>> x.mid(), x.rad()
+        (0.3333333333, 3.334e-11)
+        >>> x.mid().parent()
+        Decimal floating-point numbers (prec 10, rnd near)
+        >>> x.is_exact(), R(1).is_exact()
+        (False, True)
+        >>> x.add_error(R("0.001"))
+        [0.3333333333 +/- 0.001001]
+        >>> R(1).add_error_10exp(-5)
+        [1 +/- 1e-5]
+        >>> R("[1.234567890 +/- 0.01]").trim()
+        [1.234568 +/- 0.01001]
+        >>> R("[1.234567890 +/- 0.01]").rel_accuracy_digits()
+        2
+
+    Conversions to and from ``arb`` balls are rigorous:
+
+        >>> RR(R(1) / 3)
+        [0.3333333333 +/- 3.34e-11]
+        >>> R(RR(1) / 3)
+        [0.3333333333 +/- 3.335e-11]
+        >>> R(RR.pi())
+        [3.141592654 +/- 4.104e-10]
+        >>> R(RR("[1.5 +/- 1e-20]"))
+        [1.5 +/- 1.001e-20]
+        >>> RealField_decball(30)(RR.pi())
+        [3.14159265358979311599796346854 +/- 2.222e-16]
+        >>> RealField_decball(30)(RealField_arb(200).pi())
+        [3.14159265358979323846264338328 +/- 4.973e-31]
+        >>> RealField_arb(200)(RealField_decball(30).pi())
+        [3.141592653589793238462643383280 +/- 4.98e-31]
+        >>> RR(R("[1e100 +/- 1e90]")), R(RR("[1e100 +/- 1e90]"))
+        ([1.00000000e+100 +/- 1.01e+90], [1e100 +/- 1.002e90])
+        >>> CC(R("[1 +/- 0.1]")), RF(R("[1 +/- 0.1]")), QQ(R("[0.5 +/- 0]")), ZZ(R("1e10"))
+        ([1e+0 +/- 0.101], 1.000000000000000, 1/2, 10000000000)
+        >>> QQ(R("[0.5 +/- 0.1]"))
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+
+    Elementary and special functions are computed via arb:
+
+        >>> R(1).exp(), R(2).log(), R(1).sin(), R(1).atan()
+        ([2.718281828 +/- 4.592e-10], [0.6931471806 +/- 4.007e-11], [0.8414709848 +/- 7.898e-12], [0.7853981634 +/- 2.553e-12])
+        >>> R("0.5").gamma(), R(2).zeta()
+        ([1.772453851 +/- 9.45e-11], [1.644934067 +/- 1.519e-10])
+        >>> R(2) ** R("0.5"), R(2) ** (R(1)/2) - R(2).sqrt()
+        ([1.414213562 +/- 3.732e-10], [0 +/- 7.463e-10])
+        >>> RealField_decball(40).pi()
+        [3.141592653589793238462643383279502884197 +/- 1.695e-40]
+        >>> R("[1 +/- 0.001]").exp()
+        [2.718283188 +/- 0.00272]
+        >>> R("[1000 +/- 1]").sin()
+        [0.4867696208 +/- 0.5134]
+
+    Polynomials and matrices over decimal balls, including string
+    conversions in both directions:
+
+        >>> P = PolynomialRing(R)
+        >>> f = P([R(1)/3, R(1)/7, 1])
+        >>> f
+        [0.3333333333 +/- 3.334e-11] + [0.1428571429 +/- 4.286e-11]*x + x^2
+        >>> P(str(f))
+        [0.3333333333 +/- 3.334e-11] + [0.1428571429 +/- 4.286e-11]*x + x^2
+        >>> P("(x + [1 +/- 0.001])^2")
+        [1 +/- 0.002001] + [2 +/- 0.002]*x + x^2
+        >>> P("x^2 - 2")(R(2).sqrt())
+        [-1e-9 +/- 1.113e-9]
+        >>> M = Mat(R, 2, 2)([[R(1)/3, 2], [3, 4]])
+        >>> M
+        [[[0.3333333333 +/- 3.334e-11], 2],
+        [3, 4]]
+        >>> str(Mat(R, 2, 2)(str(M))) == str(M)
+        True
+        >>> M.det()
+        [-4.666666667 +/- 3.334e-10]
+        >>> Mat(R, 4, 4)().hilbert().det()
+        [1.6534431e-7 +/- 5.939e-12]
+        >>> Mat(RealField_decball(30), 4, 4)().hilbert().det()
+        [1.653439153439153439153439197e-7 +/- 4.824e-32]
+        >>> Mat(RealField_decball(30), 4, 4)().hilbert().inv()[3, 3]
+        [2800.00000000000000000000001954 +/- 9.595e-23]
+
+    """
+
+    def __init__(self, prec=20, rad_prec=4, rnd="near", inf=False, nan=False, underflow=False, sloppy_radius=False, scientific=False, exp_limits=None, limb_digits=0):
+        self._init(1, prec, rnd, rad_prec, inf, nan, underflow, sloppy_radius, scientific, exp_limits, limb_digits)
+        self._elem_type = decball
+
+    @property
+    def rad_prec(self):
+        """
+        The number of digits used for radii. Like the precision, it can be
+        changed at any time; existing balls keep their radii, which are
+        rounded to the new radius precision by subsequent operations.
+
+            >>> R = RealField_decball(10, rad_prec=2)
+            >>> R.rad_prec
+            2
+            >>> x = R("1 +/- 0.123456")
+            >>> x
+            [1 +/- 0.13]
+            >>> R.rad_prec = 4
+            >>> y = R("1 +/- 0.123456")
+            >>> x, y, x + y, x.union(y), x.contains(y)
+            ([1 +/- 0.13], [1 +/- 0.1235], [2 +/- 0.2535], [1 +/- 0.13], True)
+            >>> R.rad_prec = 1
+            >>> x + y, x.union(y), x.contains(y)
+            ([2 +/- 0.4], [1 +/- 0.2], True)
+        """
+        return libgr.decimal_ctx_get_rad_prec(self._ref)
+
+    @rad_prec.setter
+    def rad_prec(self, rad_prec):
+        libgr.decimal_ctx_set_rad_prec(self._ref, int(rad_prec))
+
+
+class ComplexFloat_deccfloat(gr_decimal_ctx):
+    r"""
+    Complex numbers represented as pairs of decimal floating-point numbers
+    (deccfloat), with correctly rounded arithmetic: each operation rounds
+    the real and imaginary parts of the exact result. The rounding mode
+    for imaginary parts (``rnd_im``) can differ from that of real parts.
+
+        >>> C = ComplexFloat_deccfloat(10)
+        >>> C
+        Complex decimal floating-point numbers (prec 10, rnd near)
+        >>> C(1), C.i(), C("1 + 2*I"), C("(1.5 - 2*I)"), C("-3*I")
+        (1, 1*I, (1 + 2*I), (1.5 - 2*I), -3*I)
+        >>> C("(1 + 2*I) * (3 - 4*I)"), C("(1 + 2*I) / (3 - 4*I)")
+        ((11 + 2*I), (-0.2 + 0.4*I))
+        >>> C("1 + I") / 3
+        (0.3333333333 + 0.3333333333*I)
+        >>> C("(1 + I) / 3") * 3
+        (0.9999999999 + 0.9999999999*I)
+        >>> C.i() ** 2, C.i() ** 3, C("1+I") ** 100
+        (-1, -1*I, -1125899907000000)
+        >>> ComplexFloat_deccfloat(None)("(1+I)^100")
+        -1125899906842624
+
+    Square roots and integer powers are exact when the result is a
+    Gaussian decimal number, and otherwise correctly rounded
+    componentwise:
+
+        >>> C("3 + 4*I").sqrt(), C("-4").sqrt(), C("2*I").sqrt(), C("1 + I").sqrt()
+        ((2 + 1*I), 2*I, (1 + 1*I), (1.098684113 + 0.4550898606*I))
+        >>> C("3 + 4*I").abs(), C("1 + I").abs(), C("3 + 4*I").sgn(), C("3 + 4*I").arg()
+        (5, 1.414213562, (0.6 + 0.8*I), 0.927295218)
+        >>> C("3 + 4*I") ** -3, C("3 + 4*I") ** C("0.5"), C("-8") ** (QQ(1) / 3)
+        ((-0.007488 - 0.002816*I), (2 + 1*I), (1 + 1.732050807*I))
+        >>> C(2) ** C("1 + I"), C("1 + I") ** C("1 + I")
+        ((1.538477803 + 1.277922553*I), (0.2739572538 + 0.5837007588*I))
+        >>> C("1 + I").re(), C("1 + I").im(), C("1 + I").conj(), C("1 + I").real(), C("1 + I").imag()
+        (1, 1, (1 - 1*I), 1, 1)
+        >>> C("1 + I").real().parent()
+        Decimal floating-point numbers (prec 10, rnd near)
+
+    Elementary and special functions are computed with correct rounding
+    of both parts, via acb. Real arguments are handled by the real
+    functions (so the imaginary part is exactly zero), purely imaginary
+    arguments are reduced to real functions where possible, and tiny
+    arguments are handled with Taylor expansions:
+
+        >>> C.i().exp(), C(1).exp(), C("1 + I").exp()
+        ((0.5403023059 + 0.8414709848*I), 2.718281828, (1.46869394 + 2.287355287*I))
+        >>> C(-1).log(), C("-1e-100").log(), C.i().log(), C("1 + I").log()
+        (3.141592654*I, (-230.2585093 + 3.141592654*I), 1.570796327*I, (0.3465735903 + 0.7853981634*I))
+        >>> C(2).acos(), C(-2).acos(), C("0.5").acosh(), C(-2).acosh(), C(2).asin(), C(2).atanh()
+        (1.316957897*I, (3.141592654 - 1.316957897*I), 1.047197551*I, (1.316957897 + 3.141592654*I), (1.570796327 - 1.316957897*I), (0.5493061443 - 1.570796327*I))
+        >>> C("3*I").sin(), C("3*I").cos(), C("3*I").tan(), C("3*I").atan(), C("0.5*I").atan()
+        (10.01787493*I, 10.067662, 0.9950547537*I, (1.570796327 + 0.3465735903*I), 0.5493061443*I)
+        >>> C("1 + I").gamma(), C("1 + I").zeta(), C("1 + I").erf(), C("2*I").erf(), C.lambertw(C("1 + I"))
+        ((0.4980156681 - 0.1549498283*I), (0.5821580598 - 0.9268485643*I), (1.316151282 + 0.1904534692*I), 18.56480241*I, (0.6569660692 + 0.3254503394*I))
+        >>> C.exp_pi_i(QQ(1)/2), C.exp_pi_i(QQ(-3)/2), C.exp_pi_i(QQ(1)/4), C.exp_pi_i(C("1 + I"))
+        (1*I, 1*I, (0.7071067812 + 0.7071067812*I), -0.04321391826)
+        >>> C.gamma(5), C.zeta(2), C.pi(), C.bessel_j(1, C.i()), C.agm(C("1 + I"), 2), C.hurwitz_zeta(2, C("1+I"))
+        (24, 1.644934067, 3.141592654, 0.565159104*I, (1.527316275 + 0.5710047826*I), (0.4630000966 - 0.7942335428*I))
+        >>> C.rising(C("1 + I"), 3), C.fac(10), C.lambertw(C("1 + I"), -1)
+        (10*I, 3628800, (-0.9869695732 - 3.663857003*I))
+
+    Tiny nonreal arguments are handled without Ziv's loop (which would
+    not terminate in the directed rounding modes):
+
+        >>> Cd = ComplexFloat_deccfloat(10, rnd="down")
+        >>> z = Cd("1e-1000000000 + 1e-1000000000*I")
+        >>> z.sin(), z.exp(), z.gamma()
+        ((1e-1000000000 + 9.999999999e-1000000001*I), (1 + 1e-1000000000*I), (4.999999999e999999999 - 4.999999999e999999999*I))
+        >>> z.cos(), z.log1p(), z.tan(), z.atan()
+        ((0.9999999999 - 9.999999999e-2000000001*I), (9.999999999e-1000000001 + 9.999999999e-1000000001*I), (9.999999999e-1000000001 + 1e-1000000000*I), (1e-1000000000 + 9.999999999e-1000000001*I))
+        >>> Cd.acot(1 / z)
+        (1e-1000000000 + 9.999999999e-1000000001*I)
+
+    Comparisons of nonreal numbers fail, except for equality and
+    comparisons of absolute values:
+
+        >>> C("1 + I") == C("1 + I"), C("1 + I") != C("1 - I"), C(1) < C(2)
+        (True, True, True)
+        >>> C("1 + I") < C(2)
+        Traceback (most recent call last):
+          ...
+        ValueError: ...
+        >>> abs(C("1 + I")) < abs(C("1.5")), abs(C("3 + 4*I")) == abs(C(-5))
+        (True, True)
+
+    Conversions:
+
+        >>> C(CC("1 + 2*I")), C(CF("0.5 - I")), C(RR_decball("1 +/- 0.1")), C(RF_decfloat(1) / 3)
+        ((1 + 2*I), (0.5 - 1*I), 1, 0.3333333333)
+        >>> x = QQbar(2).sqrt() + QQbar("0.0023") * QQbar.i()
+        >>> ComplexFloat_deccfloat(2, rnd="floor")(x), ComplexFloat_deccfloat(3, rnd="ceil")(QQbar("0.125") + x)
+        ((1.4 + 0.0023*I), (1.54 + 0.0023*I))
+        >>> CC(C("1 + 2*I")), CF(C("1 + 2*I")), ZZ(C(3)), QQ(C("0.5")), RF_decfloat(C(2))
+        ((1.000000000000000 + 2.000000000000000*I), (1.000000000000000 + 2.000000000000000*I), 3, 1/2, 2)
+        >>> ZZ(C("1 + 2*I"))
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> C(1) / 0
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+        >>> Cx = ComplexFloat_deccfloat(10, inf=True, nan=True)
+        >>> Cx(1) / 0, Cx.i() / 0, Cx("inf*I"), Cx("inf") * Cx.i(), Cx(0) / 0
+        (inf, inf*I, inf*I, inf*I, (nan + nan*I))
+
+    Polynomials and matrices:
+
+        >>> P = PolynomialRing(C)
+        >>> P("(x - I) * (x + I)")
+        1 + x^2
+        >>> P("x^2 + 1")(C.i())
+        0
+        >>> Mat(C)([[1, C.i()], [C.i(), 1]]).det()
+        2
+        >>> Mat(C)([[1, C.i()], [C.i(), 1]]).inv()
+        [[0.5, -0.5*I],
+        [-0.5*I, 0.5]]
+
+    """
+
+    def __init__(self, prec=20, rnd="near", rnd_im=None, inf=False, nan=False, underflow=False, scientific=False, exp_limits=None, limb_digits=0):
+        self._init(2, prec, rnd, None, inf, nan, underflow, False, scientific, exp_limits, limb_digits, rnd_im=rnd_im)
+        self._elem_type = deccfloat
+
+
+class ComplexField_deccball(gr_decimal_ctx):
+    r"""
+    Complex numbers represented as pairs of decimal balls (deccball):
+    rectangular enclosures with a real and an imaginary ball, like ``acb``.
+
+        >>> C = ComplexField_deccball(10)
+        >>> C
+        Complex decimal balls (prec 10, rad prec 4)
+        >>> C(1), C.i(), C("1 + 2*I")
+        (1, 1*I, (1 + 2*I))
+        >>> C("1 + I") / 3
+        ([0.3333333333 +/- 3.334e-11] + [0.3333333333 +/- 3.334e-11]*I)
+        >>> C("1 + I") / 3 * 3
+        ([0.9999999999 +/- 1.001e-10] + [0.9999999999 +/- 1.001e-10]*I)
+        >>> C("1 + I") / 3 * 3 == C("1 + I")
+        Traceback (most recent call last):
+          ...
+        Undecidable: ...
+        >>> C("1 + I") / 3 * 3 == 1, C("1 + I") / 3 * 3 != 1
+        (False, True)
+        >>> C.i() ** 2, C.i() ** 3, C("3 + 4*I").sqrt(), C("-4").sqrt()
+        (-1, -1*I, (2 + 1*I), 2*I)
+        >>> C("[1 +/- 0.1] + [2 +/- 0.2]*I")
+        ([1 +/- 0.1] + [2 +/- 0.2]*I)
+        >>> C("[1 + 2*I +/- 0.01]")
+        ([1 +/- 0.01] + 2*I)
+        >>> C("([1 +/- 0.1] + [2 +/- 0.2]*I) * (3 - I)")
+        ([5 +/- 0.5] + [5 +/- 0.7]*I)
+        >>> C("1 + I").sqrt(), C("1 + I").abs(), C("1 + I").arg(), C("1 + I").sgn()
+        (([1.098684113 +/- 4.68e-10] + [0.4550898606 +/- 3.779e-11]*I), [1.414213562 +/- 3.732e-10], [0.7853981634 +/- 2.553e-12], ([0.7071067812 +/- 1.347e-11] + [0.7071067812 +/- 1.347e-11]*I))
+
+    Elementary and special functions are computed via acb, with real
+    arguments handled by the real functions:
+
+        >>> C.i().exp(), C(1).exp(), C(-1).log(), C("1 + I").gamma()
+        (([0.5403023059 +/- 3.188e-11] + [0.8414709848 +/- 7.898e-12]*I), [2.718281828 +/- 4.592e-10], [3.141592654 +/- 4.104e-10]*I, ([0.4980156681 +/- 1.837e-11] + [-0.1549498283 +/- 1.812e-12]*I))
+        >>> C.gamma(5), C.zeta(C("0.5 + 14.13472514*I"))
+        (24, ([2.163160215e-10 +/- 1.056e-17] + [-1.358779596e-9 +/- 1.226e-17]*I))
+        >>> ComplexField_deccball(30).zeta(ComplexField_deccball(30)("0.5 + 14.134725141734693790*I"))
+        ([5.70192445022535683266896974805e-20 +/- 2.741e-37] + [-3.58163883768763925565723762546e-19 +/- 3.021e-37]*I)
+
+    The parts, midpoints and radii are available separately:
+
+        >>> x = C("1 + I") / 3
+        >>> x.mid(), x.real(), x.imag()
+        ((0.3333333333 + 0.3333333333*I), [0.3333333333 +/- 3.334e-11], [0.3333333333 +/- 3.334e-11])
+        >>> x.mid().parent(), x.real().parent()
+        (Complex decimal floating-point numbers (prec 10, rnd near), Decimal balls (prec 10, rad prec 4))
+        >>> x.is_exact(), C(1).is_exact(), x.rel_accuracy_digits(), C(1).rel_accuracy_digits() is None
+        (False, True, 10, True)
+        >>> x.contains(QQ(1)/3 + QQ(1)/3 * C.i()), x.contains(1), x.overlaps(C("0.3333 + 0.3333*I")), x.overlaps(C("[0.3333 +/- 0.0001] + [0.3333 +/- 0.0001]*I"))
+        (True, False, False, True)
+        >>> C(1).add_error(C("0.001")), C(1).add_error_10exp(-5), C("1 + I").add_error(C("0.1 + 0.2*I"))
+        ([1 +/- 0.001], ([1 +/- 1e-5] + [0 +/- 1e-5]*I), ([1 +/- 0.1] + [1 +/- 0.2]*I))
+        >>> (C(1) / 3 + C("+/- 0.001")).trim()
+        [0.3333333 +/- 0.001002]
+
+    Conversions:
+
+        >>> C(CC("1 + 2*I")), C(CC(1) / 3), C(RR(1) / 3 * CC.i()), C(RF_decfloat(1) / 3), C(RR_decball(1) / 3)
+        ((1 + 2*I), [0.3333333333 +/- 3.335e-11], [0.3333333333 +/- 3.335e-11]*I, [0.3333333333 +/- 3.334e-11], [0.3333333333 +/- 3.335e-11])
+        >>> x = QQbar(2).sqrt() + QQbar("0.0023") * QQbar.i()
+        >>> ComplexField_deccball(1)(x), ComplexField_deccball(2)(x), ComplexField_deccball(2)(QQbar.exp_pi_i(QQ(1) / 3))
+        (([1 +/- 0.4144] + [0.002 +/- 3.002e-4]*I), ([1.4 +/- 0.01423] + 0.0023*I), (0.5 + [0.87 +/- 0.003976]*I))
+        >>> RealField_decball(5)(QQbar(2).sqrt()), RealFloat_decfloat(5)(QQbar(2).sqrt())
+        ([1.4142 +/- 1.358e-5], 1.4142)
+        >>> CC(C("1 + I") / 3), CF(C("1 + I") / 3), ZZ(C(3)), QQ(C("0.5"))
+        (([0.3333333333 +/- 3.34e-11] + [0.3333333333 +/- 3.34e-11]*I), (0.3333333333000000 + 0.3333333333000000*I), 3, 1/2)
+        >>> ZZ(C("3 +/- 0.1"))
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+        >>> ZZ(C("3 + I"))
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: ...
+
+    Polynomials and matrices:
+
+        >>> P = PolynomialRing(C)
+        >>> f = P("(x - I) * (x + [1 +/- 0.001])")
+        >>> f
+        ([-1 +/- 0.001]*I) + ([1 +/- 0.001] - 1*I)*x + x^2
+        >>> P(str(f))
+        ([-1 +/- 0.001]*I) + ([1 +/- 0.001] - 1*I)*x + x^2
+        >>> f(C.i())
+        [0 +/- 0.002]*I
+        >>> Mat(C)([[1, C.i()], [C.i(), C(1) / 3]]).det()
+        [1.333333333 +/- 3.334e-10]
+
+    """
+
+    def __init__(self, prec=20, rad_prec=4, rnd="near", inf=False, nan=False, underflow=False, sloppy_radius=False, scientific=False, exp_limits=None, limb_digits=0):
+        self._init(3, prec, rnd, rad_prec, inf, nan, underflow, sloppy_radius, scientific, exp_limits, limb_digits)
+        self._elem_type = deccball
+
+    @property
+    def rad_prec(self):
+        """
+        The number of digits used for radii.
+
+            >>> ComplexField_deccball(10, rad_prec=2).rad_prec
+            2
+        """
+        return libgr.decimal_ctx_get_rad_prec(self._ref)
+
+    @rad_prec.setter
+    def rad_prec(self, rad_prec):
+        libgr.decimal_ctx_set_rad_prec(self._ref, int(rad_prec))
 
 
 class PolynomialRing_gr_poly(gr_ctx):
@@ -7667,6 +8639,627 @@ class padic_radix(gr_elem):
             return None
         return int(self._data.N)
 
+class decfloat(gr_elem):
+    """
+    Element of a :class:`RealFloat_decfloat` context.
+    """
+
+    _struct_type = decfloat_struct
+
+    @staticmethod
+    def _default_context():
+        return RF_decfloat
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def round(self, prec, rnd="near"):
+        """
+        Round to *prec* significant digits with the given rounding mode.
+
+            >>> x = RF_decfloat(1) / 7
+            >>> x
+            0.14285714285714285714
+            >>> x.round(5), x.round(5, "down"), x.round(5, "up"), x.round(1)
+            (0.14286, 0.14285, 0.14286, 0.1)
+            >>> x.round(50)
+            0.14285714285714285714
+            >>> RF_decfloat("123456789").round(3), RF_decfloat("-0.5").round(1, "floor")
+            (123000000, -0.5)
+        """
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decfloat_set_round(res._ref, self._ref, DECIMAL_PREC_EXACT if prec is None else int(prec), _decimal_rnd(rnd), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "round(x)", self)
+        return res
+
+    def digits(self):
+        """
+        Number of digits of the integer mantissa `M` in `x = \\pm M 10^v`
+        (`M` not divisible by 10), i.e. the precision needed to represent
+        *x* exactly (zero for zero and special values).
+
+            >>> RF_decfloat("123.4500").digits(), RF_decfloat("1e100").digits(), RF_decfloat(0).digits()
+            (5, 1, 0)
+        """
+        return libgr.decfloat_digits(self._ref, self._ctx)
+
+    def limbs(self):
+        """
+        Number of limbs of the mantissa.
+
+            >>> RealFloat_decfloat(30, limb_digits=3)("123.45").limbs(), RF_decfloat(0).limbs()
+            (2, 0)
+        """
+        return libgr.decfloat_limbs(self._ref, self._ctx)
+
+    def digit(self, k):
+        """
+        The digit of `|x|` at position `10^k`.
+
+            >>> x = RF_decfloat("-123.45")
+            >>> [x.digit(k) for k in range(3, -4, -1)]
+            [0, 1, 2, 3, 4, 5, 0]
+        """
+        return libgr.decfloat_get_digit_si(self._ref, k, self._ctx)
+
+    def set_digit(self, k, d):
+        """
+        A copy of *x* with the digit of `|x|` at position `10^k` replaced by
+        *d* (exactly, without rounding to the context precision).
+
+            >>> x = RF_decfloat("-123.45")
+            >>> x.set_digit(1, 9), x.set_digit(-5, 7), x.set_digit(2, 0).set_digit(1, 0).set_digit(0, 0)
+            (-193.45, -123.45007, -0.45)
+        """
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decfloat_set_digit_si(res._ref, self._ref, k, d, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "set_digit(x)", self)
+        return res
+
+    def exponent(self):
+        """
+        The scientific exponent `E` such that `10^E \\le |x| < 10^{E+1}`,
+        or ``None`` for zero and special values.
+
+            >>> RF_decfloat("123.45").exponent(), RF_decfloat("0.001").exponent(), RF_decfloat("1e100").exponent()
+            (2, -3, 100)
+            >>> RF_decfloat(0).exponent() is None
+            True
+        """
+        if self._data.m.size == 0:
+            return None
+        E = c_slong()
+        if libgr.decfloat_get_sci_exp_si(ctypes.byref(E), self._ref, self._ctx):
+            return E.value
+        return None
+
+    def str_sci(self):
+        """
+        String representation in scientific notation.
+
+            >>> RF_decfloat("123.45").str_sci(), RF_decfloat(1).str_sci(), RF_decfloat("0.001").str_sci()
+            ('1.2345e2', '1', '1e-3')
+        """
+        ptr = libgr.decfloat_get_str_sci(self._ref, self._ctx)
+        try:
+            return ctypes.cast(ptr, ctypes.c_char_p).value.decode("ascii")
+        finally:
+            libflint.flint_free(ptr)
+
+    def is_finite(self):
+        """
+            >>> R = RealFloat_decfloat(inf=True, nan=True)
+            >>> R(1).is_finite(), R("inf").is_finite(), R("nan").is_finite()
+            (True, False, False)
+        """
+        return bool(libgr._decfloat_is_finite(self._ref))
+
+
+class decball(gr_elem):
+    """
+    Element of a :class:`RealField_decball` context.
+    """
+
+    _struct_type = decball_struct
+
+    @staticmethod
+    def _default_context():
+        return RR_decball
+
+    def mid(self):
+        """
+        The midpoint, as a decimal floating-point number.
+
+            >>> (RR_decball(1) / 3).mid()
+            0.33333333333333333333
+        """
+        ctx = self._ctx_python._float_context()
+        res = decfloat(context=ctx)
+        status = libgr.decball_get_mid(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "mid(x)", self)
+        return res
+
+    def rad(self):
+        """
+        The radius, as a decimal floating-point number.
+
+            >>> (RR_decball(1) / 3).rad()
+            3.334e-21
+            >>> RR_decball(1).rad()
+            0
+        """
+        ctx = self._ctx_python._float_context()
+        ctx.digits = None
+        res = decfloat(context=ctx)
+        status = libgr._decmag_get_decfloat(res._ref, ctypes.byref(self._data.rad), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "rad(x)", self)
+        return res
+
+    def is_exact(self):
+        """
+            >>> RR_decball(1).is_exact(), (RR_decball(1) / 3).is_exact()
+            (True, False)
+        """
+        return self._data.rad.m == 0
+
+    def contains(self, other):
+        """
+        Whether this ball contains every point of *other* (converted to a
+        ball in the same context).
+
+            >>> R = RealField_decball(10)
+            >>> x = R("1 +/- 0.001")
+            >>> x.contains(1), x.contains(R("1.001")), x.contains(R("1.0011")), x.contains(QQ(1000)/999)
+            (True, True, False, False)
+            >>> x.contains(R("[1 +/- 0.001]")), x.contains(R("[1 +/- 0.0011]")), x.contains(R("[1.0005 +/- 0.0005]"))
+            (True, False, True)
+            >>> R("[1 +/- 1e-5]").contains(R("[1 +/- 1e-5]") ** 2)
+            False
+            >>> R("[1 +/- 1e-5]").contains(R("[1 +/- 1e-5]").sqrt())
+            True
+        """
+        if not isinstance(other, decball) or other._ctx_python is not self._ctx_python:
+            other = type(self)(other, context=self._ctx_python)
+        return bool(libgr._decball_contains(self._ref, other._ref, self._ctx))
+
+    def overlaps(self, other):
+        """
+        Whether this ball and *other* have a common point.
+
+            >>> R = RealField_decball(10)
+            >>> R("[1 +/- 0.1]").overlaps(R("[1.2 +/- 0.1]")), R("[1 +/- 0.1]").overlaps(R("[1.2 +/- 0.09]"))
+            (True, False)
+        """
+        if not isinstance(other, decball) or other._ctx_python is not self._ctx_python:
+            other = type(self)(other, context=self._ctx_python)
+        return bool(libgr._decball_overlaps(self._ref, other._ref, self._ctx))
+
+    def add_error(self, err):
+        """
+        Return a copy with the radius increased by an upper bound for
+        `|err|`.
+
+            >>> RR_decball(1).add_error(RR_decball("0.001")), RR_decball(1).add_error(RR_decball("-1e-30"))
+            ([1 +/- 0.001], [1 +/- 1e-30])
+            >>> RR_decball("[1 +/- 0.1]").add_error(RR_decball("0.1 +/- 0.01"))
+            [1 +/- 0.21]
+        """
+        if not isinstance(err, decball) or err._ctx_python is not self._ctx_python:
+            err = type(self)(err, context=self._ctx_python)
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decball_set_interval_mid_rad(res._ref, self._ref, err._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "x.add_error(err)", self, err)
+        return res
+
+    def add_error_10exp(self, e):
+        """
+        Return a copy with the radius increased by `10^e`.
+
+            >>> RR_decball(1).add_error_10exp(-5), RR_decball(1).add_error_10exp(2)
+            ([1 +/- 1e-5], [1 +/- 100])
+        """
+        res = type(self)(self, context=self._ctx_python)
+        status = libgr.decball_add_error_10exp_si(res._ref, int(e), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "x.add_error_10exp(e)", self)
+        return res
+
+    def trim(self):
+        """
+        Round the midpoint to the number of digits justified by the radius.
+
+            >>> R = RealField_decball(20)
+            >>> x = R(1) / 3 + R("+/- 0.001")
+            >>> x
+            [0.33333333333333333333 +/- 0.001001]
+            >>> x.trim()
+            [0.3333333 +/- 0.001002]
+            >>> x.trim().contains(x)
+            True
+        """
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decball_trim(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "trim(x)", self)
+        return res
+
+    def _unary_ball(self, func, name):
+        res = type(self)(context=self._ctx_python)
+        status = func(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, name, self)
+        return res
+
+    def lower(self):
+        """
+        Lower endpoint rounded toward `-\\infty` to the context precision,
+        as an exact ball.
+
+            >>> R = RealField_decball(5)
+            >>> x = R("[1.23456 +/- 0.001]")
+            >>> x.lower(), x.upper(), x.abs_lower(), x.abs_upper()
+            (1.2335, 1.2357, 1.2335, 1.2357)
+            >>> (-x).lower(), (-x).upper(), (-x).abs_lower(), (-x).abs_upper()
+            (-1.2357, -1.2335, 1.2335, 1.2357)
+            >>> R("[0.5 +/- 1]").abs_lower(), R("[0.5 +/- 1]").abs_upper()
+            (0, 1.5)
+        """
+        return self._unary_ball(libgr.decball_lower, "lower(x)")
+
+    def upper(self):
+        """
+        Upper endpoint rounded toward `+\\infty` to the context precision,
+        as an exact ball. See :meth:`.lower`.
+        """
+        return self._unary_ball(libgr.decball_upper, "upper(x)")
+
+    def abs_lower(self):
+        """
+        Lower bound for the absolute value, rounded toward zero to the
+        context precision, as an exact ball. See :meth:`.lower`.
+        """
+        return self._unary_ball(libgr.decball_abs_lower, "abs_lower(x)")
+
+    def abs_upper(self):
+        """
+        Upper bound for the absolute value, rounded toward `+\\infty` to the
+        context precision, as an exact ball. See :meth:`.lower`.
+        """
+        return self._unary_ball(libgr.decball_abs_upper, "abs_upper(x)")
+
+    def shell(self):
+        """
+        The ball with the same radius centered at zero.
+
+            >>> RR_decball("[1.5 +/- 0.25]").shell(), RR_decball("[1.5 +/- 0.25]").mid_ball()
+            ([0 +/- 0.25], 1.5)
+        """
+        return self._unary_ball(libgr.decball_shell, "shell(x)")
+
+    def mid_ball(self):
+        """
+        The midpoint as an exact ball. See :meth:`.shell`.
+        """
+        return self._unary_ball(libgr.decball_mid, "mid_ball(x)")
+
+    def rad_ball(self):
+        """
+        The radius as an exact ball.
+
+            >>> RR_decball("[1.5 +/- 0.25]").rad_ball()
+            0.25
+        """
+        return self._unary_ball(libgr.decball_rad, "rad_ball(x)")
+
+    def union(self, other):
+        """
+        The smallest ball containing both balls.
+
+            >>> RR_decball("[1 +/- 0.5]").union(RR_decball(3))
+            [1.75 +/- 1.25]
+            >>> RR_decball(3).union(RR_decball("[1 +/- 0.5]"))
+            [1.75 +/- 1.25]
+        """
+        other = self.parent()(other)
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decball_set_interval(res._ref, self._ref, other._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "union(x, y)", self, other)
+        return res
+
+    def add_rad(self, other):
+        """
+        Adds the absolute value of *other* (a ball) to the radius.
+
+            >>> RR_decball("[1 +/- 0.5]").add_rad(RR_decball("[-1 +/- 0.5]"))
+            [1 +/- 2]
+        """
+        other = self.parent()(other)
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decball_add_rad(res._ref, self._ref, other._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "add_rad(x, y)", self, other)
+        return res
+
+    def round2(self, prec, rad_prec):
+        """
+        Rounds the midpoint to *prec* digits and then the radius to
+        *rad_prec* digits.
+
+            >>> x = RR_decball(1) / 3
+            >>> x.round2(5, 1), x.round2(5, 3), x.round2(None, 1), x.round2(1, 3)
+            ([0.33333 +/- 4e-6], [0.33333 +/- 3.34e-6], [0.33333333333333333333 +/- 4e-21], [0.3 +/- 0.0334])
+        """
+        if prec is None:
+            prec = libgr.decimal_ctx_get_prec(self._ctx)
+        res = type(self)(context=self._ctx_python)
+        status = libgr.decball_set_round2(res._ref, self._ref, prec, rad_prec, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "round2(x, prec, rad_prec)", self)
+        return res
+
+    def rel_accuracy_digits(self):
+        """
+        Number of correct significant digits of the midpoint given the
+        radius: the difference between the scientific exponents of the
+        midpoint and the radius. Returns ``None`` for an exact ball.
+
+            >>> R = RealField_decball(20)
+            >>> (R(1) / 3).rel_accuracy_digits(), R("[1 +/- 0.01]").rel_accuracy_digits(), R("[123.4 +/- 0.01]").rel_accuracy_digits()
+            (20, 2, 4)
+            >>> R("[+/- 1]").rel_accuracy_digits(), R("[1 +/- 10]").rel_accuracy_digits(), R("[+/- 0.001]").rel_accuracy_digits()
+            (0, -1, 3)
+            >>> R(1).rel_accuracy_digits() is None
+            True
+        """
+        acc = libgr.decball_rel_accuracy_digits(self._ref, self._ctx)
+        if acc == DECIMAL_PREC_EXACT:
+            return None
+        return acc
+
+
+class deccfloat(gr_elem):
+    """
+    Element of a :class:`ComplexFloat_deccfloat` context.
+    """
+
+    _struct_type = deccfloat_struct
+
+    @staticmethod
+    def _default_context():
+        return CF_deccfloat
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def round(self, prec, rnd="near", rnd_im=None):
+        """
+        Round both parts to *prec* significant digits with the given
+        rounding modes (*rnd_im* defaults to *rnd*).
+
+            >>> x = CF_deccfloat("(1 + 2*I) / 7")
+            >>> x
+            (0.14285714285714285714 + 0.28571428571428571429*I)
+            >>> x.round(5), x.round(5, "down"), x.round(5, "up", "floor"), x.round(1)
+            ((0.14286 + 0.28571*I), (0.14285 + 0.28571*I), (0.14286 + 0.28571*I), (0.1 + 0.3*I))
+        """
+        if rnd_im is None:
+            rnd_im = rnd
+        res = type(self)(context=self._ctx_python)
+        status = libgr.deccfloat_set_round(res._ref, self._ref, DECIMAL_PREC_EXACT if prec is None else int(prec), _decimal_rnd(rnd), _decimal_rnd(rnd_im), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "round(x)", self)
+        return res
+
+    def real(self):
+        """
+        The real part, as a decimal floating-point number.
+
+            >>> CF_deccfloat("1.5 - 2*I").real()
+            1.5
+        """
+        ctx = self._ctx_python._float_context()
+        res = decfloat(context=ctx)
+        status = libgr.deccfloat_get_re(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "real(x)", self)
+        return res
+
+    def imag(self):
+        """
+        The imaginary part, as a decimal floating-point number.
+
+            >>> CF_deccfloat("1.5 - 2*I").imag()
+            -2
+        """
+        ctx = self._ctx_python._float_context()
+        res = decfloat(context=ctx)
+        status = libgr.deccfloat_get_im(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "imag(x)", self)
+        return res
+
+    def is_real(self):
+        """
+            >>> CF_deccfloat("1.5 - 2*I").is_real(), CF_deccfloat("1.5").is_real()
+            (False, True)
+        """
+        return bool(libgr._deccfloat_is_real(self._ref))
+
+    def is_finite(self):
+        """
+            >>> C = ComplexFloat_deccfloat(inf=True, nan=True)
+            >>> C(1).is_finite(), C("inf*I").is_finite(), C("nan").is_finite()
+            (True, False, False)
+        """
+        return bool(libgr._deccfloat_is_finite(self._ref))
+
+
+class deccball(gr_elem):
+    """
+    Element of a :class:`ComplexField_deccball` context.
+    """
+
+    _struct_type = deccball_struct
+
+    @staticmethod
+    def _default_context():
+        return CC_deccball
+
+    def mid(self):
+        """
+        The midpoint, as a complex decimal floating-point number.
+
+            >>> (CC_deccball("1 + I") / 3).mid()
+            (0.33333333333333333333 + 0.33333333333333333333*I)
+        """
+        ctx = self._ctx_python._complex_float_context()
+        res = deccfloat(context=ctx)
+        status = libgr.deccball_get_mid(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "mid(x)", self)
+        return res
+
+    def real(self):
+        """
+        The real part, as a decimal ball.
+
+            >>> (CC_deccball("1 + I") / 3).real()
+            [0.33333333333333333333 +/- 3.334e-21]
+        """
+        ctx = self._ctx_python._ball_context()
+        res = decball(context=ctx)
+        status = libgr.decball_set(res._ref, ctypes.byref(self._data.re), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "real(x)", self)
+        return res
+
+    def imag(self):
+        """
+        The imaginary part, as a decimal ball.
+
+            >>> (CC_deccball("1 + 2*I") / 3).imag()
+            [0.66666666666666666667 +/- 3.334e-21]
+        """
+        ctx = self._ctx_python._ball_context()
+        res = decball(context=ctx)
+        status = libgr.decball_set(res._ref, ctypes.byref(self._data.im), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "imag(x)", self)
+        return res
+
+    def is_exact(self):
+        """
+            >>> CC_deccball("1 + I").is_exact(), (CC_deccball("1 + I") / 3).is_exact()
+            (True, False)
+        """
+        return self._data.re.rad.m == 0 and self._data.im.rad.m == 0
+
+    def is_real(self):
+        """
+        Whether the imaginary part is exactly zero.
+
+            >>> CC_deccball("1 + I").is_real(), CC_deccball("[1 +/- 0.1]").is_real(), CC_deccball("[+/- 0.1]*I").is_real()
+            (False, True, False)
+        """
+        return bool(libgr._deccball_is_real(self._ref, self._ctx))
+
+    def contains(self, other):
+        """
+        Whether this ball contains every point of *other* (converted to a
+        ball in the same context).
+
+            >>> C = ComplexField_deccball(10)
+            >>> x = C("[1 +/- 0.001] + [2 +/- 0.001]*I")
+            >>> x.contains(C("1 + 2*I")), x.contains(C("1.001 + 2*I")), x.contains(C("1.0011 + 2*I")), x.contains(1)
+            (True, True, False, False)
+        """
+        if not isinstance(other, deccball) or other._ctx_python is not self._ctx_python:
+            other = type(self)(other, context=self._ctx_python)
+        return bool(libgr._deccball_contains(self._ref, other._ref, self._ctx))
+
+    def overlaps(self, other):
+        """
+        Whether this ball and *other* have a common point.
+
+            >>> C = ComplexField_deccball(10)
+            >>> C("[1 +/- 0.1] + I").overlaps(C("[1.2 +/- 0.1] + I")), C("[1 +/- 0.1] + I").overlaps(C("[1.2 +/- 0.1] + 1.01*I"))
+            (True, False)
+        """
+        if not isinstance(other, deccball) or other._ctx_python is not self._ctx_python:
+            other = type(self)(other, context=self._ctx_python)
+        return bool(libgr._deccball_overlaps(self._ref, other._ref, self._ctx))
+
+    def add_error(self, err):
+        """
+        Return a copy with the radii increased by upper bounds for the
+        absolute values of the real and imaginary parts of *err*.
+
+            >>> CC_deccball(1).add_error(CC_deccball("0.001")), CC_deccball(1).add_error(CC_deccball("-1e-30 + 1e-20*I"))
+            ([1 +/- 0.001], ([1 +/- 1e-30] + [0 +/- 1e-20]*I))
+        """
+        if not isinstance(err, deccball) or err._ctx_python is not self._ctx_python:
+            err = type(self)(err, context=self._ctx_python)
+        res = type(self)(context=self._ctx_python)
+        status = libgr.deccball_set_interval_mid_rad(res._ref, self._ref, err._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "x.add_error(err)", self, err)
+        return res
+
+    def add_error_10exp(self, e):
+        """
+        Return a copy with both radii increased by `10^e`.
+
+            >>> CC_deccball("1 + I").add_error_10exp(-5)
+            ([1 +/- 1e-5] + [1 +/- 1e-5]*I)
+        """
+        res = type(self)(self, context=self._ctx_python)
+        status = libgr.decball_add_error_10exp_si(ctypes.byref(res._data.re), int(e), self._ctx)
+        status |= libgr.decball_add_error_10exp_si(ctypes.byref(res._data.im), int(e), self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "x.add_error_10exp(e)", self)
+        return res
+
+    def trim(self):
+        """
+        Round the midpoints to the number of digits justified by the radii.
+
+            >>> C = ComplexField_deccball(20)
+            >>> x = C("1 + I") / 3 + C("+/- 0.001")
+            >>> x
+            ([0.33333333333333333333 +/- 0.001001] + [0.33333333333333333333 +/- 3.334e-21]*I)
+            >>> x.trim()
+            ([0.3333333 +/- 0.001002] + [0.33333333333333333333 +/- 3.334e-21]*I)
+            >>> x.trim().contains(x)
+            True
+        """
+        res = type(self)(context=self._ctx_python)
+        status = libgr.deccball_trim(res._ref, self._ref, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, "trim(x)", self)
+        return res
+
+    def rel_accuracy_digits(self):
+        """
+        Number of correct significant digits of the larger part given the
+        larger radius. Returns ``None`` for an exact ball.
+
+            >>> C = ComplexField_deccball(20)
+            >>> (C("1 + I") / 3).rel_accuracy_digits(), C("[1 +/- 0.01] + [1000 +/- 0.1]*I").rel_accuracy_digits(), C("[+/- 1]*I").rel_accuracy_digits()
+            (20, 4, 0)
+            >>> C("1 + I").rel_accuracy_digits() is None
+            True
+        """
+        acc = libgr.deccball_rel_accuracy_digits(self._ref, self._ctx)
+        if acc == DECIMAL_PREC_EXACT:
+            return None
+        return acc
+
 
 class fexpr(gr_elem):
 
@@ -8191,6 +9784,11 @@ CC_ca = ComplexField_ca()
 
 RF = RealFloat_arf()
 CF = ComplexFloat_acf()
+
+RF_decfloat = RealFloat_decfloat()
+RR_decball = RealField_decball()
+CF_deccfloat = ComplexFloat_deccfloat()
+CC_deccball = ComplexField_deccball()
 
 def ZZmod(n):
     # todo: selection
@@ -9330,6 +10928,350 @@ def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
     assert CF(2+3j).mul_2exp(-1) == CF(1+1.5j)
 
+
+def test_decimal_extreme():
+    # found by out-of-tree fuzzing: no crashes, hangs or blowups
+    import time
+    def unable(f):
+        try:
+            f()
+        except (FlintUnableError, FlintDomainError):
+            return True
+        return False
+    t0 = time.time()
+    R = RealField_decball(10)
+    assert str(R("+/- inf").ceil()) == "[0 +/- inf]"
+    assert str(ComplexField_deccball(10)(R("+/- inf")).floor()) == "[0 +/- inf]"
+    assert str(RealFloat_decfloat(10)(3).mul_2exp(10**15)) == "4.702567019e301029995663981"
+    assert str(R(3).mul_2exp(-10**15)) == "[1.913848322e-301029995663981 +/- 4.879e-301029995663991]"
+    assert unable(lambda: RealFloat_decfloat(None)(3).mul_2exp(10**15))
+    assert unable(lambda: RealFloat_decfloat(None)(3) ** (10**15))
+    assert unable(lambda: ComplexFloat_deccfloat(None)(3) ** (10**15))
+    C = ComplexFloat_deccfloat(20)
+    assert unable(lambda: C("(0.5 + 1e20*I)").zeta())
+    assert unable(lambda: C.riemann_xi(C("(0.5 + 1e7*I)")))
+    assert unable(lambda: C("(1e100 + 1*I)").zeta())
+    assert unable(lambda: C("1e10000000").gamma())
+    RR.polylog(RR("1e25"), RR("1e-100"))
+    assert time.time() - t0 < 10
+
+def test_deccomplex():
+    C = ComplexFloat_deccfloat(10)
+    X = ComplexFloat_deccfloat(None)
+    B = ComplexField_deccball(10)
+    I = C.i()
+
+    # parsing and printing
+    for s, t in [("0", "0"), ("1", "1"), ("I", "1*I"), ("-I", "-1*I"), ("2*I", "2*I"), ("1+2*I", "(1 + 2*I)"),
+                 ("1 - 2*I", "(1 - 2*I)"), ("(1 - 2*I)", "(1 - 2*I)"), ("-1.5e-7 + 2.5e3*I", "(-1.5e-7 + 2500*I)"),
+                 ("(1+2*I)*(3-4*I)", "(11 + 2*I)"), ("(1+2*I)/(3-4*I)", "(-0.2 + 0.4*I)"), ("I^2", "-1"), ("I^3", "-1*I"),
+                 ("(1+I)^2", "2*I"), ("(1+I)^-2", "-0.5*I"), ("sqrt(-4)", "2*I"), ("sqrt(2*I)", "(1 + 1*I)"),
+                 ("(3+4*I)^(1/2)", "(2 + 1*I)"), ("(-3+4*I)^(1/2)", "(1 + 2*I)"), ("(-3-4*I)^(1/2)", "(1 - 2*I)"),
+                 ("1/(1+I)", "(0.5 - 0.5*I)"), ("(1+I)/I", "(1 - 1*I)"), ("I*I*I*I", "1"), ("1e100*I", "1e100*I")]:
+        assert str(X(s)) == t, (s, str(X(s)), t)
+        assert str(X(str(X(s)))) == t
+        assert str(C(s)) == t
+        assert str(B(s)) == t
+    for s in ["", "I I", "1 +", "(1 + I", "J"]:
+        assert raises(lambda: C(s), (FlintUnableError, FlintDomainError, ValueError)), s
+    assert str(X("1/(1+2*I)")) == "(0.2 - 0.4*I)" and str(X("1/(1+3*I)")) == "(0.1 - 0.3*I)"
+    assert raises(lambda: X("1/(1+4*I)"), FlintUnableError)
+    assert str(C("1/(1+4*I)")) == "(0.05882352941 - 0.2352941176*I)"
+    Ci = ComplexFloat_deccfloat(10, inf=True, nan=True)
+    assert str(Ci("inf*I")) == "inf*I" and str(Ci("-inf")) == "-inf" and str(Ci("(1 + nan*I)")) == "(nan + nan*I)"
+    assert str(Ci("inf") * Ci.i()) == "inf*I" and str(Ci("inf*I") * Ci("inf*I")) == "-inf"
+    assert not Ci("inf*I").is_finite() and Ci("1+I").is_finite()
+    assert str(Ci(1) / 0) == "inf" and str(Ci.i() / 0) == "inf*I" and str(Ci(0) / 0) == "(nan + nan*I)"
+    assert raises(lambda: C(1) / 0, FlintDomainError)
+
+    # rounding modes, separately for the parts
+    for rnd, rnd_im, expected in [("near", None, "(0.667 + 0.667*I)"), ("down", None, "(0.666 + 0.666*I)"),
+                                  ("floor", "ceil", "(0.666 + 0.667*I)"), ("ceil", "floor", "(0.667 + 0.666*I)"),
+                                  ("up", "down", "(0.667 + 0.666*I)")]:
+        C3 = ComplexFloat_deccfloat(3, rnd=rnd, rnd_im=rnd_im)
+        assert str(C3("(2 + 2*I) / 3")) == expected, (rnd, rnd_im)
+        assert C3.rnd == rnd and C3.rnd_im == (rnd if rnd_im is None else rnd_im)
+        assert str(C3("2 + 2*I") / 3) == expected
+    C3 = ComplexFloat_deccfloat(3)
+    C3.rnd_im = "floor"
+    assert str(C3("(-2 - 2*I) / 3")) == "(-0.667 - 0.667*I)"
+    assert str(C3("(2 + 2*I) / 3")) == "(0.667 + 0.666*I)"
+    C3.rnd = "ceil"
+    assert C3.rnd_im == "ceil"
+    x = C("(1 + 2*I) / 7")
+    assert str(x.round(3)) == "(0.143 + 0.286*I)"
+    assert str(x.round(3, "down")) == "(0.142 + 0.285*I)"
+    assert str(x.round(3, "down", "up")) == "(0.142 + 0.286*I)"
+    assert str(x.round(None)) == str(x)
+
+    # exact arithmetic: correct rounding against rationals
+    Q = QQ
+    for a, b, c, d, exact in [(1, 2, 3, 4, True), (Q(1)/3, Q(2)/7, Q(-5)/11, Q(3)/13, False), (10**20, 1, -1, Q(10)**-20, True), (0, 1, 0, 1, True), (7, 0, 0, 3, True), (Q(1)/4, Q(3)/8, Q(-5)/16, Q(1)/1000, True)]:
+        if exact:
+            Xa = X(a) + X(b) * X.i()
+            Xc = X(c) + X(d) * X.i()
+            prod = Xa * Xc
+            assert str(prod) == str(X(Q(a)*Q(c) - Q(b)*Q(d)) + X(Q(a)*Q(d) + Q(b)*Q(c)) * X.i())
+        Ca = C(Q(a)) + C(Q(b)) * I
+        Cc = C(Q(c)) + C(Q(d)) * I
+        # the inputs are rounded to 10 digits; the products and quotients
+        # of the rounded inputs must be correctly rounded
+        a, b, c, d = QQ(Ca.real()), QQ(Ca.imag()), QQ(Cc.real()), QQ(Cc.imag())
+        pr = Q(a)*Q(c) - Q(b)*Q(d)
+        pi = Q(a)*Q(d) + Q(b)*Q(c)
+        assert str((Ca * Cc).real()) == str(RealFloat_decfloat(10)(pr))
+        assert str((Ca * Cc).imag()) == str(RealFloat_decfloat(10)(pi))
+        if c != 0 or d != 0:
+            den = Q(c)**2 + Q(d)**2
+            qr = (Q(a)*Q(c) + Q(b)*Q(d)) / den
+            qi = (Q(b)*Q(c) - Q(a)*Q(d)) / den
+            assert str((Ca / Cc).real()) == str(RealFloat_decfloat(10)(qr))
+            assert str((Ca / Cc).imag()) == str(RealFloat_decfloat(10)(qi))
+    assert str(C("3+4*I") * C("3+4*I")) == "(-7 + 24*I)" and str(C("3+4*I") ** 2) == "(-7 + 24*I)"
+    assert str(C("3+4*I") ** 3) == "(-117 + 44*I)" and str(C("3+4*I") ** -3) == "(-0.007488 - 0.002816*I)"
+    assert str(C("3+4*I") ** 0) == "1" and str(C("3+4*I") ** 1) == "(3 + 4*I)"
+    assert str(C(0) ** 0) == "1" and str(C(0) ** C("1+I")) == "0"
+    assert raises(lambda: C(0) ** C("-1+I"), FlintDomainError)
+    assert str(C("2*I") ** 3) == "-8*I" and str(C("2*I") ** 4) == "16" and str(C("-2*I") ** -1) == "0.5*I"
+    assert str(C("1+I") ** 100) == "-1125899907000000" and str(X("(1+I)^100")) == "-1125899906842624"
+    assert str(C("1+I") ** 1000000) == "1.024e150515" or str(C("1+I") ** 1000000).endswith("e150514")
+    assert str(C(2) ** C("0.5")) == "1.414213562" and str(C(-2) ** C("0.5")) == "1.414213562*I"
+    assert str(C(-4) ** C("1.5")) == "-8*I" and str(C(-4) ** C("-0.5")) == "-0.5*I" and str(C(-8) ** C("2.5")) == "181.019336*I"
+    assert str(C("3+4*I") ** C("-0.5")) == "(0.4 - 0.2*I)"
+
+    # exact and rounded square roots, abs, sgn, arg
+    assert str(C("3+4*I").sqrt()) == "(2 + 1*I)" and str(C("-3+4*I").sqrt()) == "(1 + 2*I)"
+    assert str(C("3-4*I").sqrt()) == "(2 - 1*I)" and str(C("-3-4*I").sqrt()) == "(1 - 2*I)"
+    assert str(C("0.0625*I").sqrt()) == "(0.1767766953 + 0.1767766953*I)"
+    assert str(C("-0.0625*I").sqrt()) == "(0.1767766953 - 0.1767766953*I)"
+    assert str(C("0.5*I").sqrt()) == "(0.5 + 0.5*I)" and str(C("-4").sqrt()) == "2*I" and str(C("-2").sqrt()) == "1.414213562*I"
+    assert str(C("3+4*I").rsqrt()) == "(0.4 - 0.2*I)" and str(C(-4).rsqrt()) == "-0.5*I" and str(C(4).rsqrt()) == "0.5"
+    assert str(C("3+4*I").abs()) == "5" and str(C("-4*I").abs()) == "4" and str(C("1+I").abs()) == "1.414213562"
+    assert str(abs(C("1e100+1e100*I"))) == "1.414213562e100" and str(abs(C("1e-100+1e-100*I"))) == "1.414213562e-100"
+    assert str(C("3+4*I").sgn()) == "(0.6 + 0.8*I)" and str(C("-2*I").sgn()) == "-1*I" and str(C(-3).sgn()) == "-1" and str(C(0).sgn()) == "0"
+    assert str(C("1+I").sgn()) == "(0.7071067812 + 0.7071067812*I)"
+    assert str(C("3+4*I").csgn()) == "1" and str(C("-3+4*I").csgn()) == "-1" and str(C("4*I").csgn()) == "1" and str(C("-4*I").csgn()) == "-1"
+    assert str(C(1).arg()) == "0" and str(C(-1).arg()) == "3.141592654" and str(C.i().arg()) == "1.570796327" and str(C("-1-I").arg()) == "-2.35619449"
+    assert raises(lambda: C(0).arg(), FlintDomainError)
+    assert str(C("1+2*I").conj()) == "(1 - 2*I)" and str(C("1+2*I").re()) == "1" and str(C("1+2*I").im()) == "2"
+    assert str(C("1+2*I").real()) == "1" and str(C("1+2*I").imag()) == "2" and str(C("1+2*I").real().parent()) == str(RealFloat_decfloat(10))
+    assert str(-C("1+2*I")) == "(-1 - 2*I)" and str(C("1+2*I") - C("1+2*I")) == "0"
+    assert C("1+2*I") == C("1+2*I") and C("1+2*I") != C("1-2*I") and C(1) == 1 and C.i() != 1
+    assert raises(lambda: C("1+I") < C(1), ValueError)
+    assert C(1) < C(2) and C(-1) <= C(-1)
+    assert abs(C("1+I")) < abs(C("1.5")) and abs(C("3+4*I")) == abs(C(-5))
+    assert str(C("3.7 + 0*I").floor()) == "3" and raises(lambda: C("3.7 + I").floor(), FlintDomainError)
+    for K in [C, B]:
+        assert [str(getattr(K(s), f)()) for s, f in [("3.7", "floor"), ("3.2", "ceil"), ("-3.7", "trunc"), ("2.5", "nint")]] == ["3", "4", "-3", "2"]
+        assert str(K("-3+4*I").csgn()) == "-1" and not K.is_exact()
+    assert str(Ci.neg_inf()) == "-inf" and raises(B.neg_inf, FlintDomainError) and raises(C.neg_inf, FlintDomainError)
+    assert str(Ci.undefined()) == "(nan + nan*I)" and raises(B.undefined, FlintDomainError) and raises(B.unknown, FlintDomainError)
+    # complex balls represent complex numbers; an infinite radius is the whole plane
+    assert str(B("([+/- inf] + [0 +/- inf]*I)")) == "([0 +/- inf] + [0 +/- inf]*I)" and str(B("[1 +/- inf]*I")) == "[1 +/- inf]*I"
+    assert str(B("([+/- inf] + 2*I)") * B.i()) == "(-2 + [0 +/- inf]*I)" and raises(lambda: B("(inf + 2*I)"), FlintUnableError)
+    assert raises(lambda: B("[3.7 +/- 0.1] + [+/- 0.1]*I").floor(), FlintUnableError) and str(RR_decball("[3.7 +/- 0.1]").nint()) == "4"
+
+    # conversions
+    assert str(C(CC("1+2*I"))) == "(1 + 2*I)" and str(C(CF("0.5-I"))) == "(0.5 - 1*I)"
+    assert str(C(RR_decball("1 +/- 0.1"))) == "1" and str(C(RF_decfloat(1) / 3)) == "0.3333333333"
+    assert str(CC(C("1+2*I"))) == "(1.000000000000000 + 2.000000000000000*I)"
+    assert str(CF(C("1+2*I"))) == "(1.000000000000000 + 2.000000000000000*I)"
+    assert ZZ(C(3)) == 3 and QQ(C("0.5")) == QQ(1)/2 and str(RF_decfloat(C(2))) == "2" and str(RR_decball(C(2))) == "2"
+    assert raises(lambda: ZZ(C("1+2*I")), FlintDomainError) and raises(lambda: RF_decfloat(C("1+2*I")), FlintDomainError)
+    assert raises(lambda: RR(C("1+2*I")), (FlintDomainError, FlintUnableError))
+    assert str(X(CF("0.1"))) == "0.1000000000000000055511151231257827021181583404541015625"
+    assert str(ComplexFloat_deccfloat(5)(C("1.23456789 + 9.87654321*I"))) == "(1.2346 + 9.8765*I)"
+    assert str(ComplexFloat_deccfloat(5, limb_digits=2)(C("1.23456789 + 9.87654321*I"))) == "(1.2346 + 9.8765*I)"
+    assert str(C(QQbar(-1) ** (QQ(1)/2))) == "1*I"
+    assert str(C(B("1 + I") / 3)) == "(0.3333333333 + 0.3333333333*I)"
+    assert raises(lambda: X(B("1 + I") / 3), FlintUnableError)
+    assert str(B(C("1 + I") / 3)) == "(0.3333333333 + 0.3333333333*I)"
+
+    # functions: real and imaginary arguments, tiny arguments
+    assert str(C(1).exp()) == "2.718281828" and str(C.i().exp()) == "(0.5403023059 + 0.8414709848*I)"
+    assert str(C("3*I").sin()) == "10.01787493*I" and str(C("3*I").cos()) == "10.067662" and str(C("3*I").sinh()) == "0.1411200081*I"
+    assert str(C("3*I").cosh()) == "-0.9899924966" and str(C("0.5*I").tan()) == "0.4621171573*I" and str(C("0.5*I").tanh()) == "0.5463024898*I"
+    assert str(C("0.5*I").asin()) == "0.4812118251*I" and str(C("0.5*I").atan()) == "0.5493061443*I" and str(C("2*I").atan()) == "(1.570796327 + 0.5493061443*I)"
+    assert str(C("0.5*I").asinh()) == "0.5235987756*I" and str(C("2*I").asinh()) == "(1.316957897 + 1.570796327*I)" and str(C("0.5*I").atanh()) == "0.463647609*I"
+    assert str(C("2*I").erf()) == "18.56480241*I" and str(C("2*I").erfi()) == "0.995322265*I"
+    assert str(C(-1).log()) == "3.141592654*I" and str(C(-2).log()) == "(0.6931471806 + 3.141592654*I)" and str(C.i().log()) == "1.570796327*I"
+    assert str(C(2).acos()) == "1.316957897*I" and str(C(-2).acos()) == "(3.141592654 - 1.316957897*I)"
+    assert str(C("0.5").acosh()) == "1.047197551*I" and str(C(-2).acosh()) == "(1.316957897 + 3.141592654*I)" and str(C(-1).acosh()) == "3.141592654*I"
+    assert str(C(4).atanh()) == "(0.2554128119 - 1.570796327*I)" and str(C(4).asin()) == "(1.570796327 - 2.063437069*I)"
+    assert str(C(-4).sqrt()) == "2*I" and str(C(-1).sqrt()) == "1*I"
+    assert str(C.gamma(5)) == "24" and str(C("0.5").gamma()) == "1.772453851" and raises(lambda: C(0).gamma(), (FlintDomainError, FlintUnableError))
+    assert str(C.zeta(-3)) == "0.008333333333" and str(C.log10(1000)) == "3" and str(C.sin_pi(QQ(1)/2)) == "1" and str(C.sin_pi(QQ(1)/6)) == "0.5000000001"
+    assert str(C.exp_pi_i(QQ(1)/2)) == "1*I" and str(C.exp_pi_i(1)) == "-1" and str(C.exp_pi_i(QQ(1)/4)) == "(0.7071067812 + 0.7071067812*I)"
+    assert str(C.exp_pi_i(C.i())) == "0.04321391826" and str(C.exp_pi_i(C("1+I"))) == "-0.04321391826"
+    assert str(C.fac(20)) == "2432902008000000000" and str(C.rising(C("1+I"), 3)) == "10*I" and str(C.rising(C("1+I"), 0)) == "1"
+    assert str(C.rising(C("0.5"), 5)) == "29.53125" and str(C.rising(C("1+I"), C("0.5"))) == "(1.003009581 + 0.4891951308*I)"
+    assert str(C.lambertw(C("1+I"))) == "(0.6569660692 + 0.3254503394*I)" and str(C.lambertw(1)) == "0.5671432904"
+    assert str(C.pi()) == "3.141592654" and str(C.euler()) == "0.5772156649"
+    assert str(C.bessel_j(0, C.i())) == "1.266065878" and str(C.hurwitz_zeta(2, C("1+I"))) == "(0.4630000966 - 0.7942335428*I)"
+    assert str(C.polylog(2, C("0.5"))) == "0.5822405265" and str(C.dilog(C.i())) == "(-0.2056167584 + 0.9159655942*I)"
+    assert str(C.agm(C("1+I"), 2)) == "(1.527316275 + 0.5710047826*I)" and str(C.agm(1, C.i())) == "(0.5990701174 + 0.5990701174*I)"
+    assert str(C("1+I").gamma()) == "(0.4980156681 - 0.1549498283*I)" and str(C("1+I").zeta()) == "(0.5821580598 - 0.9268485643*I)"
+    assert str(C("1+I").erf()) == "(1.316151282 + 0.1904534692*I)" and str(C("1+I").lgamma()) == "(-0.6509231993 - 0.3016403205*I)"
+    assert str(C("1+I").digamma()) == "(0.09465032062 + 1.076674047*I)" and str(C("1+I").exp()) == "(1.46869394 + 2.287355287*I)"
+    assert str(C("1+I").sin()) == "(1.298457581 + 0.6349639148*I)" and str(C("1+I").cos()) == "(0.8337300251 - 0.9888977058*I)"
+    assert str(C("1+I").tan()) == "(0.2717525853 + 1.083923327*I)" and str(C("1+I").atan()) == "(1.017221968 + 0.4023594781*I)"
+    assert str(C("1+I").log()) == "(0.3465735903 + 0.7853981634*I)" and str(C("1+I").sqrt()) == "(1.098684113 + 0.4550898606*I)"
+    assert str(C.sec(C("2+I"))) == "(-0.4131493443 + 0.6875274387*I)" and str(C.acot(C("2+I"))) == "(0.3926990817 - 0.1732867951*I)"
+    assert str(C.csc(C("2+I"))) == "(0.6354937993 + 0.2215009309*I)" and str(C.sech(C("2+I"))) == "(0.1511762983 - 0.2269736754*I)"
+    assert str(C.csch(C("2+I"))) == "(0.1413630216 - 0.2283750656*I)" and str(C.cot(C("2+I"))) == "(-0.1713836129 - 0.8213297975*I)"
+    Cd = ComplexFloat_deccfloat(10, rnd="down")
+    Cu = ComplexFloat_deccfloat(10, rnd="up")
+    Cc = ComplexFloat_deccfloat(10, rnd="ceil")
+    z = Cd("1e-1000000000 + 1e-1000000000*I")
+    assert str(z.sin()) == "(1e-1000000000 + 9.999999999e-1000000001*I)"
+    assert str(Cu(z).sin()) == "(1.000000001e-1000000000 + 1e-1000000000*I)"
+    assert str(Cc(z).sin()) == "(1.000000001e-1000000000 + 1e-1000000000*I)"
+    assert str(Cc(-z).sin()) == "(-1e-1000000000 - 9.999999999e-1000000001*I)"
+    assert str(z.exp()) == "(1 + 1e-1000000000*I)" and str(Cu(z).exp()) == "(1.000000001 + 1.000000001e-1000000000*I)"
+    assert str(z.cos()) == "(0.9999999999 - 9.999999999e-2000000001*I)" and str(Cu(z).cos()) == "(1 - 1e-2000000000*I)"
+    assert str(z.gamma()) == "(4.999999999e999999999 - 4.999999999e999999999*I)"
+    assert str(Cu(z).gamma()) == "(5e999999999 - 5e999999999*I)"
+    assert str(z.log1p()) == "(9.999999999e-1000000001 + 9.999999999e-1000000001*I)"
+    assert str(z.tan()) == "(9.999999999e-1000000001 + 1e-1000000000*I)" and str(z.atan()) == "(1e-1000000000 + 9.999999999e-1000000001*I)"
+    assert str(Cd.zeta(z + 1)) == "(0.5772156649 - 9.999999999e999999999*I)"    # z + 1 rounds to 1 + 1e-1000000000*I
+    assert str(Cd.acot(1 / z)) == "(1e-1000000000 + 9.999999999e-1000000001*I)"
+    assert str(Cd.acsc(1 / z)) == "(9.999999999e-1000000001 + 1e-1000000000*I)"
+    assert str(Cd.lambertw(z)) == "(9.999999999e-1000000001 + 9.999999999e-1000000001*I)"
+    assert str(Cd.rgamma(z)) == "(1e-1000000000 + 1e-1000000000*I)"
+    assert str(Cd.sinc(z)) == "(0.9999999999 - 3.333333333e-2000000001*I)"
+    w = Cd("1e-1000000000 + 1e-2000000000*I")
+    assert str(w.sin()) == "(9.999999999e-1000000001 + 9.999999999e-2000000001*I)"
+    assert str(w.exp()) == "(1 + 1e-2000000000*I)" and str(w.cos()) == "(0.9999999999 - 9.999999999e-3000000001*I)"
+    assert str(Cu(w).exp()) == "(1.000000001 + 1.000000001e-2000000000*I)"
+    assert str(Cd("1e-2000000000 + 1e-1000000000*I").sin()) == "(1e-2000000000 + 1e-1000000000*I)"
+
+    # balls
+    x = B("1 + I") / 3
+    assert str(x) == "([0.3333333333 +/- 3.334e-11] + [0.3333333333 +/- 3.334e-11]*I)"
+    assert str(x * 3) == "([0.9999999999 +/- 1.001e-10] + [0.9999999999 +/- 1.001e-10]*I)"
+    assert raises(lambda: x * 3 == B("1+I"), Undecidable) and x * 3 != 1 and not (x * 3 == 1)
+    assert str(x.mid()) == "(0.3333333333 + 0.3333333333*I)" and str(x.mid().parent()) == str(ComplexFloat_deccfloat(10))
+    assert str(x.real()) == "[0.3333333333 +/- 3.334e-11]" and str(x.imag()) == "[0.3333333333 +/- 3.334e-11]"
+    assert str(x.real().parent()) == str(RealField_decball(10))
+    assert not x.is_exact() and B("1+I").is_exact() and x.rel_accuracy_digits() == 10 and B("1+I").rel_accuracy_digits() is None
+    assert x.contains(QQ(1)/3 + QQ(1)/3 * B.i()) and not x.contains(1) and x.overlaps(x) and not x.overlaps(B("0.3333 + 0.3333*I"))
+    assert B("1+I").is_real() == False and B("1").is_real() and B("[1 +/- 0.1]").is_real() and not B("[+/- 0.1]*I").is_real()
+    assert str(B("[1 +/- 0.1] + [2 +/- 0.2]*I")) == "([1 +/- 0.1] + [2 +/- 0.2]*I)"
+    assert str(B("[1 + 2*I +/- 0.01]")) == "([1 +/- 0.01] + 2*I)" and str(B("[1 + 2*I +/- (0.01 + 0.02*I)]")) == "([1 +/- 0.01] + [2 +/- 0.02]*I)"
+    assert str(B("[1 +/- 0.1]*I")) == "[1 +/- 0.1]*I" and str(B("[1 +/- 0.1] - 2*I")) == "([1 +/- 0.1] - 2*I)"
+    assert str(B("([1 +/- 0.1] + [2 +/- 0.2]*I) * (3 - I)")) == "([5 +/- 0.5] + [5 +/- 0.7]*I)"
+    assert str(B("([1 +/- 0.1] + [2 +/- 0.2]*I) / (3 - I)")) == "([0.1 +/- 0.05] + [0.7 +/- 0.07]*I)"
+    assert str(B("(1+I)^2")) == "2*I" and str(B("(3+4*I)^(1/2)")) == "(2 + 1*I)" and str(B("I^3")) == "-1*I"
+    assert str(B.i() ** 100) == "1" and str(B("(1+I)") ** 100) == "[-1125899907000000 +/- 157400]"
+    assert str(B("1+I").sqrt()) == "([1.098684113 +/- 4.68e-10] + [0.4550898606 +/- 3.779e-11]*I)"
+    assert str(B("1+I").abs()) == "[1.414213562 +/- 3.732e-10]" and str(B("3+4*I").abs()) == "5" and str(B("-4*I").abs()) == "4"
+    assert str(B(-4).sqrt()) == "2*I" and str(B("-2").sqrt()) == "[1.414213562 +/- 3.731e-10]*I"
+    assert str(B(-1).log()) == "[3.141592654 +/- 4.104e-10]*I" and str(B.i().exp()) == "([0.5403023059 +/- 3.188e-11] + [0.8414709848 +/- 7.898e-12]*I)"
+    assert str(B.gamma(5)) == "24" and str(B("0.5").gamma()) == "[1.772453851 +/- 9.45e-11]"
+    assert str(B("1+I").gamma()) == "([0.4980156681 +/- 1.837e-11] + [-0.1549498283 +/- 1.812e-12]*I)"
+    assert str(B(2).acos()) == "[1.316957897 +/- 7.52e-11]*I"
+    assert B("[1 +/- 0.001] + [2 +/- 0.001]*I").contains(B("1.001 + 2*I")) and not B("[1 +/- 0.001] + [2 +/- 0.001]*I").contains(B("1.0011 + 2*I"))
+    assert str(B(1).add_error(B("0.001"))) == "[1 +/- 0.001]" and str(B("1+I").add_error(B("0.1 + 0.2*I"))) == "([1 +/- 0.1] + [1 +/- 0.2]*I)"
+    assert str(B("1+I").add_error_10exp(-5)) == "([1 +/- 1e-5] + [1 +/- 1e-5]*I)"
+    assert str((B(1) / 3 + B("+/- 0.001")).trim()) == "[0.3333333 +/- 0.001002]"
+    assert str(B(CC("1+2*I"))) == "(1 + 2*I)" and str(B(CC(1) / 3)) == "[0.3333333333 +/- 3.335e-11]"
+    assert str(CC(B("1+I") / 3)) == "([0.3333333333 +/- 3.34e-11] + [0.3333333333 +/- 3.34e-11]*I)"
+    assert str(CF(B("1+I") / 3)) == "(0.3333333333000000 + 0.3333333333000000*I)"
+    assert ZZ(B(3)) == 3 and QQ(B("0.5")) == QQ(1)/2 and raises(lambda: ZZ(B("3 +/- 0.1")), FlintUnableError) and raises(lambda: ZZ(B("3+I")), FlintDomainError)
+    assert str(RR_decball(B(2))) == "2" and raises(lambda: RR_decball(B("2+I")), FlintDomainError) and raises(lambda: RR_decball(B("2 + [+/- 1]*I")), FlintUnableError)
+    assert str(ComplexField_deccball(10, rad_prec=2)("1+I") / 3) == "([0.3333333333 +/- 3.4e-11] + [0.3333333333 +/- 3.4e-11]*I)"
+    assert str(ComplexField_deccball(10, sloppy_radius=True)("1+I") / 3) == "([0.3333333333 +/- 5e-11] + [0.3333333333 +/- 5e-11]*I)"
+    P = PolynomialRing(B)
+    f = P("(x - I) * (x + [1 +/- 0.001])")
+    assert str(f) == "([-1 +/- 0.001]*I) + ([1 +/- 0.001] - 1*I)*x + x^2" and str(P(str(f))) == str(f)
+    assert str(f(B.i())) == "[0 +/- 0.002]*I"
+    assert str(Mat(B)([[1, B.i()], [B.i(), B(1) / 3]]).det()) == "[1.333333333 +/- 3.334e-10]"
+    P = PolynomialRing(C)
+    assert str(P("(x - I) * (x + I)")) == "1 + x^2" and str(P("x^2 + 1")(C.i())) == "0"
+    assert str(Mat(C)([[1, C.i()], [C.i(), 1]]).inv()) == "[[0.5, -0.5*I],\n[-0.5*I, 0.5]]"
+    assert str(Mat(C)([[1, C.i()], [C.i(), 1]]).det()) == "2"
+
+def test_decimal_functions():
+    # Every elementary and special function on real and complex decimal
+    # floats and balls, compared with 200-bit arb/acb: floats must be
+    # correctly rounded (within half an ulp in each component, tested with
+    # one ulp) and balls must contain the value. The complex contexts are
+    # also given a non-real last argument.
+    D = 15
+    R2, C2 = RealField_arb(200), ComplexField_acb(200)
+    x, y, z = "0.375", "1.25", "2.5"
+    real = [("pi", ()), ("euler", ()), ("catalan", ()), ("khinchin", ()), ("glaisher", ()),
+        ("exp", (x,)), ("expm1", (x,)), ("exp2", (x,)), ("exp10", (x,)), ("log", (z,)), ("log1p", (x,)),
+        ("log2", (z,)), ("log10", (z,)), ("sin", (x,)), ("cos", (x,)), ("tan", (x,)), ("cot", (x,)),
+        ("sec", (x,)), ("csc", (x,)), ("sinc", (x,)), ("sin_pi", (x,)), ("cos_pi", (x,)), ("tan_pi", (x,)),
+        ("cot_pi", (x,)), ("sec_pi", (x,)), ("csc_pi", (x,)), ("sinc_pi", (x,)), ("sin_cos", (x,)),
+        ("sin_cos_pi", (x,)), ("asin", (x,)), ("acos", (x,)), ("atan", (x,)), ("acot", (z,)), ("asec", (z,)),
+        ("acsc", (z,)), ("asin_pi", (x,)), ("acos_pi", (x,)), ("atan_pi", (y,)), ("acot_pi", (y,)),
+        ("asec_pi", (z,)), ("acsc_pi", (z,)), ("sinh", (x,)), ("cosh", (x,)), ("sinh_cosh", (x,)),
+        ("tanh", (x,)), ("coth", (x,)), ("sech", (x,)), ("csch", (x,)), ("asinh", (x,)), ("acosh", (z,)),
+        ("atanh", (x,)), ("acoth", (z,)), ("asech", (x,)), ("acsch", (x,)), ("lambertw", (x,)),
+        ("gamma", (z,)), ("rgamma", (z,)), ("lgamma", (z,)), ("digamma", (z,)), ("barnes_g", (z,)),
+        ("log_barnes_g", (z,)), ("zeta", (z,)), ("erf", (x,)), ("erfc", (x,)), ("erfi", (x,)),
+        ("fresnel", (x,)), ("fresnel_s", (x,)), ("fresnel_c", (x,)), ("exp_integral_ei", (z,)),
+        ("sin_integral", (z,)), ("cos_integral", (z,)), ("sinh_integral", (z,)), ("cosh_integral", (z,)),
+        ("log_integral", (z,)), ("dilog", (x,)), ("agm", (y, z)), ("airy", (x,)), ("airy_ai", (x,)),
+        ("airy_bi", (x,)), ("airy_ai_prime", (x,)), ("airy_bi_prime", (x,)), ("rising", (x, z)),
+        ("bessel_j", (y, z)), ("bessel_y", (y, z)), ("bessel_i", (y, z)), ("bessel_k", (y, z)),
+        ("polylog", (z, x)), ("hurwitz_zeta", (z, y)), ("exp_integral", (y, z)), ("gamma_upper", (y, z)),
+        ("gamma_lower", (y, z)), ("beta_lower", (y, z, x)), ("chebyshev_t", (z, x)), ("chebyshev_u", (z, x)),
+        ("hermite_h", (z, x)), ("gegenbauer_c", (z, y, x)), ("laguerre_l", (z, y, x)), ("jacobi_p", (z, x, y, x)),
+        ("legendre_p", (z, y, x)), ("legendre_q", (z, y, x)), ("hypgeom_0f1", (y, x)), ("hypgeom_1f1", (y, z, x)),
+        ("hypgeom_u", (y, z, x)), ("hypgeom_2f1", (y, x, z, x)), ("coulomb_f", (y, x, z)), ("coulomb_g", (y, x, z))]
+    real = [(f, a, {}) for (f, a) in real] + [("bessel_i", (y, z), {"scaled": True}), ("bessel_k", (y, z), {"scaled": True}),
+        ("fresnel", (x,), {"normalized": True}), ("log_integral", (z,), {"offset": True}),
+        ("gamma_upper", (y, z), {"regularized": 1}), ("hypgeom_2f1", (y, x, z, x), {"regularized": True}),
+        ("lambertw", ("-0.25",), {"k": -1}), ("erfinv", (x,), {}), ("erfcinv", (y,), {}), ("atan2", (x, "-1.25"), {})]
+    tau = "0.25 + 1.5*I"
+    cplx = [("modular_j", (tau,)), ("modular_lambda", (tau,)), ("modular_delta", (tau,)), ("dedekind_eta", (tau,)),
+        ("exp_pi_i", (x,)), ("log_pi_i", (z,)), ("dirichlet_eta", (z,)), ("riemann_xi", (z,)), ("polygamma", (y, z)),
+        ("lerch_phi", (x, z, y)), ("elliptic_k", (x,)), ("elliptic_e", (x,)), ("elliptic_pi", (x, z)),
+        ("elliptic_f", (x, z)), ("elliptic_e_inc", (x, z))]
+    cplx = [(f, a, {}) for (f, a) in cplx]
+    # functions with only real arguments supported in the complex types
+    # (and atan2, which is not provided for complex numbers)
+    only_real = ["erfinv", "erfcinv"]
+
+    def check(ctx, name, args, kw):
+        ref_ctx = C2 if ctx.is_complex_vector_space() else R2
+        try:
+            ref = getattr(ref_ctx, name)(*[ref_ctx(a) for a in args], **kw)
+        except (FlintUnableError, FlintDomainError):
+            ref_ctx = R2
+            ref = getattr(ref_ctx, name)(*[ref_ctx(a) for a in args], **kw)
+        val = getattr(ctx, name)(*[ctx(a) for a in args], **kw)
+        if not isinstance(ref, tuple):
+            ref, val = (ref,), (val,)
+        for r, v in zip(ref, val):
+            if ctx.is_canonical():
+                size = R2(abs(r.re()) + abs(r.im())) if ref_ctx is C2 else abs(r)
+                assert R2(abs(ref_ctx(v) - r)) < size * R2(10) ** (1 - D) + R2(10) ** -100, (ctx, name, args, v, r)
+            else:
+                assert ref_ctx(v).overlaps(r), (ctx, name, args, v, r)
+
+    for ctx in [RealFloat_decfloat(D), RealField_decball(D), ComplexFloat_deccfloat(D), ComplexField_deccball(D)]:
+        is_complex = ctx.is_complex_vector_space()
+        for (name, args, kw) in real + (cplx if is_complex else []):
+            if is_complex and name == "atan2":
+                continue
+            check(ctx, name, args, kw)
+            if is_complex and args and name not in only_real:
+                check(ctx, name, args[:-1] + (args[-1] + " + 0.125*I",), kw)
+    # exact and special-argument cases through the same interface
+    F, B, C, CB = RealFloat_decfloat(D), RealField_decball(D), ComplexFloat_deccfloat(D), ComplexField_deccball(D)
+    assert F.fac(20) == 2432902008176640000 and C.fac(ZZ(20)) == 2432902008176640000 and str(B.rising(B(3), 4)) == "360"
+    assert B.fac(ZZ(20)) == 2432902008176640000 and CB.fac(ZZ(20)) == 2432902008176640000 and str(CB.rising(CB(3), 4)) == "360"
+    assert str(B.gamma(QQ(1)/2)) == "[1.77245385090552 +/- 3.974e-15]" and str(CB.gamma(QQ(-1)/2)) == "[-3.54490770181103 +/- 2.056e-15]"
+    assert str(F.gamma(QQ(1)/2)) == "1.77245385090552" and str(C.gamma(QQ(-1)/2)) == "-3.54490770181103"
+    assert str(F.sec_pi(QQ(1)/3)) == "2" and str(C.asin_pi(QQ(1)/2)) == "0.166666666666667" and str(F.acos_pi(-1)) == "1"
+    assert str(C.hermite_h(3, 4)) == "464" and str(CB.hermite_h(3, CB("I"))) == "-20*I"
+    assert raises(lambda: C.erfinv(C("0.5 + 0.5*I")), FlintUnableError) and raises(lambda: C.atan2(C.i(), 1), FlintUnableError)
+    assert str(C.lambertw(C("0.5 + I"), k=-1)) == "(-1.1303865182239 - 3.27266733025251*I)"
+
 def test_special():
     a = ZZ.fib_vec(100)
     for i in range(100):
@@ -9513,6 +11455,13 @@ def test_set_str():
     assert R("(4+4*x-y*(-4))^2 / (1+x+y) / 16") == 1+x+y
 
     assert RRx("1 +/- 0") == RR(1)
+    # "+/- inf" is parsed without evaluating inf as an element of the ring
+    assert str(RR("1 +/- inf")) == "[+/- inf]" and str(RR("[+/- inf]")) == "[+/- inf]" and str(RR("+/- Inf + 2")) == "[+/- inf]"
+    assert str(CC("1 + 2*i +/- inf")) == "([+/- inf] + 2.000000000000000*I)" and str(CC("(1+i) * [0 +/- inf]*i")) == "([+/- inf] + [+/- inf]*I)"
+    assert str(RRx("x^2 + 1 +/- inf")) == "[+/- inf] + x^2" and str(RRx("[1 +/- inf]*x")) == "[+/- inf] + [+/- inf]*x"
+    assert raises(lambda: RR("1 +/- infx"), FlintUnableError) and raises(lambda: QQ("1 +/- inf"), FlintUnableError)
+    assert raises(lambda: ZZ("+/- inf"), FlintUnableError) and raises(lambda: QQ("2 +/- 1"), FlintUnableError)
+    assert str(RealField_decball(10)("3 +/- inf")) == "[3 +/- inf]" and str(ComplexField_deccball(10)("(3 + 4*I) +/- inf")) == "([3 +/- inf] + 4*I)"
 
     assert raises(lambda: RR("foo"), FlintUnableError)
     assert raises(lambda: RR("expexp2"), FlintUnableError)
@@ -9625,7 +11574,7 @@ def test_ca_notebook_examples():
     assert ZZ("0e-100000000000000") == 0
     assert raises(lambda: ZZ("0.1"), FlintUnableError)
 
-    assert str(RR("(+/- 1e-3) + 0.1")) == "[0.1 +/- 1.01e-3]"
+    assert str(RR("(+/- 1e-3) + 0.1")) == "[0.10 +/- 1.01e-3]"
     assert str(RR("1/2 +/- 1/100000")) == "[0.5000 +/- 1.01e-5]"
     assert str(CC("(1+i) +/- (1e-5 + 1e-7*i)")) == "([1.0000 +/- 1.01e-5] + [1.000000 +/- 1.01e-7]*I)"
     assert str(CC("-1e23 +/- -5e12")) == "[-1.000000000e+23 +/- 5.01e+12]"
@@ -9944,6 +11893,661 @@ def test_padic():
     assert str(ef) == stref
     assert str((PowerSeriesRing(Q5))(stref)) == stref
     assert str(f.exp() * (-f).exp()) == "(1 + O(5^10)) + (0 + O(5^10))*x + (0 + O(5^10))*x^2 + (0 + O(5^10))*x^3 + (0 + O(5^10))*x^4 + (0 + O(5^9))*x^5 + O(x^6)"
+
+
+def test_decimal():
+    R = RealFloat_decfloat(10)
+    R40 = RealFloat_decfloat(40)
+    X = RealFloat_decfloat(None)
+    B = RealField_decball(10)
+
+    # parsing and printing
+    for s, t in [("0", "0"), ("-0", "0"), ("1", "1"), ("-1", "-1"), ("1.0", "1"), ("0.50", "0.5"),
+                 ("000123.4500", "123.45"), ("1e3", "1000"), ("1.5E3", "1500"), ("-2.5e-3", "-0.0025"),
+                 ("1e20", "100000000000000000000"), ("1e21", "1e21"), ("123e19", "1.23e21"),
+                 ("0.000001", "0.000001"), ("0.0000001", "1e-7"), ("123.456e-9", "1.23456e-7"),
+                 ("1e-100", "1e-100"), ("1e+100", "1e100"), ("+7", "7"), ("  3.25  ", "3.25"),
+                 ("1/8", "0.125"), ("2^10", "1024"), ("(1+2)*3", "9"), ("10^-3", "0.001"),
+                 ("1e1000000000000000000000", "1e1000000000000000000000"),
+                 ("12345678901234567890123456789", "1.2345678901234567890123456789e28"),
+                 ("1234567890123456789012", "1.234567890123456789012e21"),
+                 ("123456789012345678901", "123456789012345678901")]:
+        assert str(X(s)) == t, (s, str(X(s)), t)
+        assert str(X(str(X(s)))) == t
+    assert str(X("123.5").str_sci()) == "1.235e2"
+    assert str(RealFloat_decfloat(None, scientific=True)("123.5")) == "1.235e2"
+    assert str(RealFloat_decfloat(None, scientific=True)("0")) == "0"
+    for s in ["", "abc", "1..2", "1e", "e5", "[1", "1 +/- 2", "1 +", "*1"]:
+        assert raises(lambda: X(s), (FlintUnableError, FlintDomainError, ValueError)), s
+    assert raises(lambda: R("inf"), (FlintUnableError, FlintDomainError, ValueError))
+    assert raises(lambda: R("nan"), (FlintUnableError, FlintDomainError, ValueError))
+    # exact values and domain errors detected from the digits, for any size
+    X = RealFloat_decfloat(None); F = RealFloat_decfloat(20); Fd = RealFloat_decfloat(20, rnd="down"); Fu = RealFloat_decfloat(20, rnd="up")
+    assert F.zeta(X("-1.5e1000000")) == 0 and str(F.zeta(-3)) == "0.0083333333333333333333" and raises(lambda: F.zeta(1), FlintDomainError)
+    assert F.log2(X(2) ** -1000) == -1000 and F.log2(X(2) ** 1000) == 1000 and F.log10(X("1e-1000000")) == -1000000
+    assert F.sin_pi(X("1234567890123.5")) == -1 and F.cos_pi(X("-98765432109876543211")) == -1 and F.tan_pi(X("12345678901.25")) == 1
+    assert raises(lambda: F.cot_pi(X("-5e999")), FlintDomainError) and F.sinc_pi(X("7e1000000")) == 0 and raises(lambda: F.gamma(X("-7e1000000")), FlintDomainError)
+    for f, t in [("asin_pi", "1.5"), ("acos_pi", "-7e1000000"), ("acosh", "0.5"), ("log", "-2"), ("atanh", "-3"), ("asec", "0.5"), ("erfinv", "2")]:
+        assert raises(lambda: getattr(F, f)(X(t)), FlintDomainError), f
+    # directed rounding with exactly representable leading terms
+    t = X("3.25e-1000000")
+    assert str(Fd.barnes_g(t)) == "3.25e-1000000" and str(Fu.barnes_g(t)) == "3.2500000000000000001e-1000000"
+    assert str(Fd.zeta(t)) == "-0.5" and str(Fu.zeta(t)) == "-0.50000000000000000001" and str(Fu.sec_pi(t)) == "1.0000000000000000001"
+    assert str(Fd.acos_pi(t)) == "0.49999999999999999999" and str(Fu.acot_pi(-t)) == "-0.5" and str(Fd.atan_pi(X("4e1000000"))) == "0.49999999999999999999"
+    assert str(Fu.asec_pi(X("-4e1000000"))) == "0.50000000000000000001"
+    # digits and limbs
+    y = RealFloat_decfloat(30, limb_digits=3)("-123.45")
+    assert y.digits() == 5 and y.limbs() == 2 and [y.digit(k) for k in range(3, -4, -1)] == [0, 1, 2, 3, 4, 5, 0]
+    assert str(y.set_digit(3, 9)) == "-9123.45" and str(y.set_digit(-1, 0)) == "-123.05" and str(y.set_digit(-2, 0).set_digit(-1, 0)) == "-123"
+    Ri = RealFloat_decfloat(10, inf=True, nan=True)
+    assert str(Ri("inf")) == "inf" and str(Ri("-inf")) == "-inf" and str(Ri("nan")) == "nan"
+    assert str(Ri("Infinity")) == "inf"
+    assert not Ri("inf").is_finite() and Ri(1).is_finite()
+    assert [str(Ri(t).rsqrt()) for t in ["inf", "0", "nan"]] == ["0", "inf", "nan"] and raises(lambda: Ri("-inf").rsqrt(), FlintDomainError)
+
+    # rounding
+    cases = [("1/3", {"near": "0.3333333333", "down": "0.3333333333", "up": "0.3333333334", "floor": "0.3333333333", "ceil": "0.3333333334"}),
+             ("-1/3", {"near": "-0.3333333333", "down": "-0.3333333333", "up": "-0.3333333334", "floor": "-0.3333333334", "ceil": "-0.3333333333"}),
+             ("2/3", {"near": "0.6666666667", "down": "0.6666666666", "up": "0.6666666667", "floor": "0.6666666666", "ceil": "0.6666666667"}),
+             ("12345678905", {"near": "12345678900", "near_away": "12345678910", "near_zero": "12345678900", "down": "12345678900", "up": "12345678910"}),
+             ("12345678915", {"near": "12345678920", "near_away": "12345678920", "near_zero": "12345678910"}),
+             ("-12345678915", {"near": "-12345678920", "near_away": "-12345678920", "near_zero": "-12345678910", "floor": "-12345678920", "ceil": "-12345678910"}),
+             ("12345678905e20", {"near": "1.23456789e30", "near_away": "1.234567891e30", "near_zero": "1.23456789e30", "down": "1.23456789e30", "up": "1.234567891e30"}),
+             ("-12345678915e20", {"near": "-1.234567892e30", "near_away": "-1.234567892e30", "near_zero": "-1.234567891e30", "floor": "-1.234567892e30", "ceil": "-1.234567891e30"}),
+             ("9999999999.5", {"near": "10000000000", "down": "9999999999", "up": "10000000000", "near_zero": "9999999999"}),
+             ("9999999999.5e20", {"near": "1e30", "down": "9.999999999e29", "up": "1e30", "near_zero": "9.999999999e29"}),
+             ("1.00000000001", {"near": "1", "down": "1", "up": "1.000000001", "floor": "1", "ceil": "1.000000001"}),
+             ("-1.00000000001", {"near": "-1", "down": "-1", "up": "-1.000000001", "floor": "-1.000000001", "ceil": "-1"}),
+             ("123", {"near": "123", "up": "123", "down": "123"})]
+    for s, d in cases:
+        for rnd, t in d.items():
+            Rr = RealFloat_decfloat(10, rnd=rnd)
+            assert str(Rr(s)) == t, (s, rnd, str(Rr(s)), t)
+            assert str(R40(s).round(10, rnd)) == t, (s, rnd)
+            assert str(R40(s).round(10, rnd)) == str(Rr(R40(s)))
+    assert str(R40("1/3").round(3)) == "0.333"
+    assert str(R40("1/3").round(1)) == "0.3"
+    assert str(X("0.5").round(1, "up")) == "0.5"
+    assert str(X("0.95").round(1, "near")) == "1"
+    assert str(X("0.95").round(1, "down")) == "0.9"
+    assert str(X("999").round(2, "up")) == "1000"
+    assert str(X("999").round(2, "down")) == "990"
+    assert str(X("-999").round(2, "floor")) == "-1000"
+    assert str(X("-999").round(2, "ceil")) == "-990"
+    assert R40("1/3").round(None) == R40("1/3")
+    assert raises(lambda: X("1").round(1, "sideways"), ValueError)
+
+    # exact arithmetic
+    assert str(X("0.1") + X("0.2")) == "0.3"
+    assert str(X("0.1") * X("0.2")) == "0.02"
+    assert str(X("1e20") + X("1e-20")) == "100000000000000000000.00000000000000000001"
+    assert str(X("1e20") - X("1e-20")) == "99999999999999999999.99999999999999999999"
+    assert str(X("1e-20") - X("1e20")) == "-99999999999999999999.99999999999999999999"
+    assert str(X("1e20") * X("1e-20")) == "1"
+    assert str(X("1e20") / X("1e-20")) == "1e40"
+    assert str(X("1") / X("1e-20")) == "100000000000000000000"
+    assert str(X("1") / X("1e-21")) == "1e21"
+    assert str(X("125") / X("1000")) == "0.125"
+    assert str(X("1") / X("64")) == "0.015625"
+    assert str(X(0) / 3) == "0" and str(X(0) * X("1e100")) == "0"
+    assert raises(lambda: X(1) / 3, FlintUnableError)
+    assert raises(lambda: X(1) / 0, FlintDomainError)
+    assert str(X("1e100") ** 20) == "1e2000"
+    assert str(X("1.5") ** 40) == "11057332.3209400121422731899656355381011962890625"
+    assert QQ(X("1.5") ** 40) == QQ(3) ** 40 / 2 ** 40
+    assert str(X("0.0001").sqrt()) == "0.01"
+    assert str(X("1e-40").sqrt()) == "1e-20"
+    assert str(X("225").sqrt()) == "15"
+    assert raises(lambda: X(2).sqrt(), FlintUnableError)
+    assert raises(lambda: X(-1).sqrt(), FlintDomainError)
+    assert str(X("12345.678") - X("12345.678")) == "0"
+    assert str(X("1e300") * X("1e-300") - 1) == "0"
+
+    # rounded arithmetic and correct rounding
+    assert str(R(2).sqrt()) == "1.414213562"
+    assert str(RealFloat_decfloat(10, rnd="up")(2).sqrt()) == "1.414213563"
+    assert str(RealFloat_decfloat(50)(2).sqrt()) == "1.4142135623730950488016887242096980785696718753769"
+    assert str(RealFloat_decfloat(50, rnd="down")(2).sqrt()) == "1.4142135623730950488016887242096980785696718753769"
+    assert str(RealFloat_decfloat(50, rnd="up")(2).sqrt()) == "1.414213562373095048801688724209698078569671875377"
+    assert str(R("1e10") + 1) == "10000000000"
+    assert str(RealFloat_decfloat(10, rnd="up")("1e10") + 1) == "10000000010"
+    assert str(RealFloat_decfloat(10, rnd="floor")("-1e10") - 1) == "-10000000010"
+    assert str(R("1e10") + R("0.5")) == "10000000000"
+    assert str(R("1e10") + R("5")) == "10000000000"
+    assert str(R("1e10") + R("5.000000001")) == "10000000010"
+    assert str(R("1e10") + R("15")) == "10000000020"
+    assert str(R("9999999999") + 1) == "10000000000"
+    assert str(R("9999999999") + R("0.5")) == "10000000000"
+    assert str(R("1e30") + 1) == "1e30"
+    assert str(RealFloat_decfloat(10, rnd="up")("1e30") + 1) == "1.000000001e30"
+    assert str(RealFloat_decfloat(10, rnd="floor")("-1e30") - 1) == "-1.000000001e30"
+    assert str(R("1e30") + R("5e20")) == "1e30"
+    assert str(R("1e30") + R("5.000000001e20")) == "1.000000001e30"
+    assert str(R("1e30") + R("1.5e21")) == "1.000000002e30"
+    assert str(R("9.999999999e29") + R("1e20")) == "1e30"
+    assert str(R("9999999999") + R("0.4")) == "9999999999"
+    assert str(R("1.5") * R("1.5")) == "2.25"
+    assert str(R("1234567890") * R("9876543210")) == "12193263110000000000"
+    assert str(RealFloat_decfloat(10, rnd="down")("1234567890") * R("9876543210")) == "12193263110000000000"
+    assert str(RealFloat_decfloat(10, rnd="up")("1234567890") * R("9876543210")) == "12193263120000000000"
+    assert str(R("1234567890e10") * R("9876543210")) == "1.219326311e29"
+    assert str(RealFloat_decfloat(10, rnd="up")("1234567890e10") * R("9876543210")) == "1.219326312e29"
+    assert str(X("1234567890") * X("9876543210")) == "12193263111263526900"
+    assert str(R(1) / 7) == "0.1428571429"
+    assert str(R(22) / 7) == "3.142857143"
+    assert str(R(1) / R("1e-30")) == "1e30"
+    assert str(R("1e30").inv()) == "1e-30"
+    assert str(R(3).inv()) == "0.3333333333"
+    assert str(-R(3).inv()) == "-0.3333333333"
+    assert str(abs(-R(3).inv())) == "0.3333333333"
+    assert str(R(3).inv() * 3) == "0.9999999999"
+    assert str(R("1e100") * R("1e100")) == "1e200"
+    assert str(R(1) / 3 - R(1) / 3) == "0"
+    assert str(R("1e-100") + R("1e100") - R("1e100")) == "0"
+
+    # properties and comparisons
+    assert R("123.4500").digits() == 5
+    assert R("123.45").exponent() == 2 and R("0.00123").exponent() == -3 and R("1e100").exponent() == 100
+    assert R(0).exponent() is None and R(0).digits() == 0
+    assert R(1) < R(2) and R(-1) < R(1) and not (R(1) < R(1)) and R(1) <= R(1)
+    assert R("1e100") > R("9.99e99") and R("-1e100") < R("-9.99e99")
+    assert R("0.1") == R("0.10") and R("1e2") == 100 and R("0.5") == QQ(1) / 2
+    assert R(1) != R(2) and R("1e-30") != 0 and R("1e-30") > 0
+    assert R("1e-30").sgn() == 1 and R("-1e-30").sgn() == -1 and R(0).sgn() == 0
+    assert Ri("inf") > Ri("1e1000") and Ri("-inf") < Ri("-1e1000")
+    assert hash(R(1)) == hash(R("1.0"))
+
+    # conversions
+    assert int(R("123.9")) == 123 and int(R("-123.9")) == -123
+    assert ZZ(R("1e10")) == 10 ** 10 and ZZ(X("1e100")) == 10 ** 100
+    assert QQ(R("0.1")) == QQ(1) / 10 and QQ(X("1e-100")) == QQ(1) / 10 ** 100
+    assert float(R("0.5")) == 0.5 and float(R("0.1")) == 0.1 and float(R("1e300")) == 1e300
+    assert float(R(1) / 3) == 0.3333333333
+    assert str(X(0.1)) == "0.1000000000000000055511151231257827021181583404541015625"
+    assert str(X(2.0 ** 100)) == "1.267650600228229401496703205376e30"
+    assert str(X(2 ** 100)) == "1.267650600228229401496703205376e30"
+    assert str(X(-2 ** 100)) == "-1.267650600228229401496703205376e30"
+    assert str(X(QQ(1) / 1024)) == "0.0009765625"
+    assert raises(lambda: X(QQ(1) / 3), FlintUnableError)
+    assert str(R(QQ(1) / 3)) == "0.3333333333"
+    assert str(R(2 ** 100)) == "1.2676506e30"
+    assert str(RealFloat_decfloat(10, rnd="up")(2 ** 100)) == "1.267650601e30"
+    assert str(R(RF("0.1"))) == "0.1"
+    assert str(X(RF("0.1"))) == "0.1000000000000000055511151231257827021181583404541015625"
+    assert str(RF(R("0.1"))) == "0.1000000000000000"
+    assert RealFloat_arf(200)(X("1e-100")) < RF("1e-100") and RealFloat_arf(200)(X("1e-100")) > RF("0.999e-100")
+    assert RR(X("0.125")) == QQ(1) / 8 and str(RR(X("0.125"))) == "0.1250000000000000" and RR(X(2**100)) == 2**100
+    assert str(RR(R("0.1"))) == "[0.100000000000000 +/- 2.23e-17]" and RR(R("0.1")).overlaps(RR(1) / 10)
+    assert str(R(RR("0.1"))) == "0.1"
+    assert raises(lambda: X(RR(1) / 3), FlintUnableError)
+    assert raises(lambda: ZZ(R("0.5")), FlintDomainError)
+    assert raises(lambda: ZZ(X("1e1000000000000")), FlintUnableError)
+    assert str(R(1) + 1) == "2" and str(1 + R(1)) == "2" and str(R(1) + QQ(1) / 2) == "1.5"
+    assert str(R("0.5") * ZZ(3)) == "1.5" and str(ZZ(3) * R("0.5")) == "1.5"
+    assert str(R(1) / ZZ(3)) == "0.3333333333"
+    assert str(R(2) ** 3) == "8" and str(R(2) ** -3) == "0.125" and str(R(2) ** QQ(1)/2) == "1"
+    assert str(R(2) ** (QQ(1) / 2)) == "1.414213562"
+    assert str(R(9) ** (QQ(1) / 2)) == "3"
+    assert str(R(2) ** R("0.5")) == "1.414213562"
+    assert str(R(2) ** R(10)) == "1024"
+    assert str(R(3).floor()) == "3" and str(R("3.7").floor()) == "3" and str(R("-3.7").floor()) == "-4"
+    assert str(R("3.2").ceil()) == "4" and str(R("-3.2").ceil()) == "-3"
+    assert str(R("3.5").nint()) == "4" and str(R("2.5").nint()) == "2" and str(R("-2.5").nint()) == "-2"
+    assert str(R("3.7").trunc()) == "3" and str(R("-3.7").trunc()) == "-3"
+    assert str(R("1e100").floor()) == "1e100"
+    assert str(R("123456789012345").floor()) == "123456789000000"
+
+    # exponent limits
+    Rl = RealFloat_decfloat(5, exp_limits=(-10, 10))
+    assert str(Rl("1e10")) == "10000000000" and str(Rl("9.9999e10")) == "99999000000" and str(Rl("1e-10")) == "1e-10"
+    assert raises(lambda: Rl("1e11"), FlintUnableError)
+    assert raises(lambda: Rl("1e-11"), FlintUnableError)
+    assert raises(lambda: Rl("1e10") * 10, FlintUnableError)
+    assert raises(lambda: Rl("9.9999e10") + Rl("1e6"), FlintUnableError)
+    assert str(Rl("9.9999e10") + Rl("1e5")) == "99999000000"
+    assert raises(lambda: Rl("1e-10") / 10, FlintUnableError)
+    assert raises(lambda: Rl("1e-10") / 2, FlintUnableError)
+    assert str(Rl("1e-10") * 2) == "2e-10"
+    assert str(Rl.exp_limits) == "(-10, 10)"
+    Rl = RealFloat_decfloat(5, exp_limits=(-10, 10), inf=True, underflow=True)
+    assert str(Rl("1e11")) == "inf" and str(Rl("-1e11")) == "-inf" and str(Rl("1e-11")) == "0"
+    assert str(Rl("1e10") * 10) == "inf" and str(Rl("1e-10") / 10) == "0" and str(Rl("1e-10") / 2) == "0"
+    assert str(Rl("99999e6") + Rl("1e6")) == "inf"
+    assert str(Rl(2) ** 100) == "inf" and str(Rl(2) ** -100) == "0"
+    Rl.exp_limits = (None, 3)
+    assert str(Rl("1e-100")) == "1e-100" and str(Rl("1e4")) == "inf"
+    Rl.exp_limits = None
+    assert str(Rl("1e4")) == "10000"
+    Ru = RealFloat_decfloat(5, exp_limits=(-10, 10), underflow=True)
+    assert str(Ru("1e-11")) == "0" and raises(lambda: Ru("1e11"), FlintUnableError)
+
+    # special values
+    inf = Ri("inf"); nan = Ri("nan")
+    assert str(inf + 1) == "inf" and str(inf - 1) == "inf" and str(1 - inf) == "-inf" and str(-inf) == "-inf"
+    assert str(inf - inf) == "nan" and str(inf * 0) == "nan" and str(inf * -2) == "-inf" and str(inf / inf) == "nan"
+    assert str(1 / inf) == "0" and str(Ri(1) / 0) == "inf" and str(Ri(-1) / 0) == "-inf" and str(Ri(0) / 0) == "nan"
+    assert str(inf.sqrt()) == "inf" and str(nan + 1) == "nan" and str(nan * 0) == "nan"
+    assert raises(lambda: nan == nan, Undecidable)
+    assert inf == inf and inf != -inf and inf > Ri(1) and -inf < Ri(1)
+    assert str(Ri("1e400") * Ri("1e400")) == "1e800"
+    assert str(Ri(0).inv()) == "inf"
+    assert raises(lambda: R(0).inv(), FlintDomainError)
+
+    # elementary functions with correct rounding
+    assert str(R.pi()) == "3.141592654"
+    assert str(RealFloat_decfloat(10, rnd="down").pi()) == "3.141592653"
+    assert str(RealFloat_decfloat(10, rnd="up").pi()) == "3.141592654"
+    assert str(RealFloat_decfloat(30).pi()) == "3.14159265358979323846264338328"
+    assert str(RealFloat_decfloat(30, rnd="down").pi()) == "3.14159265358979323846264338327"
+    assert str(R(1).exp()) == "2.718281828"
+    assert str(RealFloat_decfloat(10, rnd="up")(1).exp()) == "2.718281829"
+    assert str(R(0).exp()) == "1" and str(R(0).sin()) == "0" and str(R(1).log()) == "0" and str(R(0).atan()) == "0"
+    assert str(R(2).log()) == "0.6931471806" and str(R(10).log()) == "2.302585093"
+    assert str(R("1e100").log()) == "230.2585093"
+    assert str(R("1e-100").exp()) == "1"
+    assert str(RealFloat_decfloat(10, rnd="up")("1e-100").exp()) == "1.000000001"
+    assert str(RealFloat_decfloat(10, rnd="down")("-1e-100").exp()) == "0.9999999999"
+    assert str(R(100).exp()) == "2.688117142e43" and str(R(-100).exp()) == "3.720075976e-44"
+    assert str(R(1).sin()) == "0.8414709848" and str(R(1).cos()) == "0.5403023059"
+    assert str(R("1e20").sin()) == "-0.6452512853"
+    assert str(R(1).atan()) == "0.7853981634" and str(R("1e30").atan()) == "1.570796327"
+    assert raises(lambda: R(0).log(), FlintDomainError)
+    assert raises(lambda: R(-1).log(), FlintDomainError)
+    # tiny arguments (Ziv's strategy alone cannot decide these in directed modes)
+    for rnd, sinp, sinn, expp, expn, cosp, atanp, atann in [
+            ("near", "1e-1000000000", "-1e-1000000000", "1", "1", "1", "1e-1000000000", "-1e-1000000000"),
+            ("down", "9.999999999e-1000000001", "-9.999999999e-1000000001", "1", "0.9999999999", "0.9999999999", "9.999999999e-1000000001", "-9.999999999e-1000000001"),
+            ("up", "1e-1000000000", "-1e-1000000000", "1.000000001", "1", "1", "1e-1000000000", "-1e-1000000000"),
+            ("floor", "9.999999999e-1000000001", "-1e-1000000000", "1", "0.9999999999", "0.9999999999", "9.999999999e-1000000001", "-1e-1000000000"),
+            ("ceil", "1e-1000000000", "-9.999999999e-1000000001", "1.000000001", "1", "1", "1e-1000000000", "-9.999999999e-1000000001")]:
+        Rt = RealFloat_decfloat(10, rnd=rnd)
+        x = Rt("1e-1000000000"); xn = -x
+        assert str(x.sin()) == sinp and str(xn.sin()) == sinn and str(x.exp()) == expp and str(xn.exp()) == expn
+        assert str(x.cos()) == cosp and str(xn.cos()) == cosp and str(x.atan()) == atanp and str(xn.atan()) == atann
+        assert str(x.tan()) == str(x.sinh()) == str(x.expm1()) and str(x.tanh()) == str(x.atan()) == str(x.log1p()) == str(x.sin())
+        assert str(x.cosh()) == ("1.000000001" if rnd in ("up", "ceil") else "1")
+        assert str(Rt(2) ** x) == expp and str(Rt("0.5") ** x) == expn and str(Rt(2) ** xn) == expn and str(Rt("0.5") ** xn) == expp
+        assert str(Rt("1e-100000000000000000000").sin()) == sinp.replace("1000000000", "100000000000000000000").replace("1000000001", "100000000000000000001")
+        assert str(Rt("123456789e-1000000000").sin()) in ("1.23456789e-999999992", "1.234567889e-999999992", "1.23456789e-999999992")
+        assert str(Rt("-123456789e-1000000000").cos()) == cosp
+    x = RealFloat_decfloat(3, rnd="down")("1e-100")
+    assert str(x.sin()) == "9.99e-101" and str((x + 1).log()) == "0" and str(x.log1p()) == "9.99e-101" and str(x.expm1()) == "1e-100"
+    assert str(RealFloat_decfloat(3, rnd="up")("1e-100").sin()) == "1e-100" and str(RealFloat_decfloat(3, rnd="up")("1e-100").expm1()) == "1.01e-100"
+    assert str(R("1e-30").sin()) == "1e-30" and str(R("1e-30").exp()) == "1" and str(RealFloat_decfloat(10, rnd="up")("1e-30").exp()) == "1.000000001"
+    assert str(RealFloat_decfloat(10, rnd="up")("1e-9").sin()) == "1e-9" and str(RealFloat_decfloat(10, rnd="down")("1e-9").sin()) == "9.999999999e-10"
+    assert str(RealFloat_decfloat(10, rnd="down")("1e-6").sin()) == "9.999999999e-7" and str(RealFloat_decfloat(10, rnd="down")("1e-6").tan()) == "0.000001"
+    # exact powers
+    for rnd in _decimal_rnd_names:
+        Rt = RealFloat_decfloat(10, rnd=rnd)
+        assert str(Rt(8) ** Rt("0.125")) == ("1.296839555" if rnd in ("up", "ceil", "near", "near_away", "near_zero") else "1.296839554")
+        assert str(Rt(256) ** Rt("0.125")) == "2" and str(Rt(256) ** Rt("-0.125")) == "0.5" and str(Rt("0.0001") ** Rt("0.25")) == "0.1"
+        assert str(Rt("1e100") ** Rt("0.5")) == "1e50" and str(Rt("1e100") ** Rt("-0.5")) == "1e-50" and str(Rt("1e-100") ** Rt("0.5")) == "1e-50"
+        assert str(Rt("1.5") ** 3) == "3.375" and str(Rt("1.5") ** 4) == "5.0625" and str(Rt("6.25") ** Rt("1.5")) == "15.625"
+        assert str(Rt("1.5") ** -3) == ("0.2962962963" if rnd in ("up", "ceil", "near", "near_away", "near_zero") else "0.2962962962")
+        assert str(Rt("-1.5") ** -3) == ("-0.2962962963" if rnd in ("up", "floor", "near", "near_away", "near_zero") else "-0.2962962962")
+        assert str(Rt("1e-5") ** -(10**15)) == "1e5000000000000000" and str(Rt("1e-10") ** 10**8) == "1e-1000000000"
+        assert str(Rt(3) ** 10**9) == ("5.243997032e477121254" if rnd in ("down", "floor") else "5.243997033e477121254")
+        assert str(Rt(3) ** -10**9) == ("1.906942346e-477121255" if rnd in ("up", "ceil") else "1.906942345e-477121255")
+        assert str(Rt(4) ** Rt("1e-1000000000")) == ("1.000000001" if rnd in ("up", "ceil") else "1")
+        assert str(RealFloat_decfloat(40, rnd=rnd)("1.0000000000000000000000000000001") ** RealFloat_decfloat(40, rnd=rnd)("1e10")) == ("1.000000000000000000001000000000000000001" if rnd in ("up", "ceil") else "1.000000000000000000001")
+        assert str(Rt("1.000000001") ** Rt("1e100"))[:11] == ("5.601255459" if rnd in ("up", "ceil") else "5.601255458")
+        assert str(Rt("0.9999999999") ** Rt("1e100"))[:11] == ("2.049262995" if rnd in ("down", "floor") else "2.049262996")
+        assert str(Rt("0.9999999999") ** Rt("1e100"))[11:] == "e-434294481924966551747739158572280941286215521827993337769370509468333092239211207443855568"
+        assert str(Rt(1) ** Rt("1e100")) == "1" and str(Rt(1) ** Rt("-1e100")) == "1" and str(Rt(10) ** 1000000000) == "1e1000000000"
+        assert str(Rt(2) ** 100) == ("1.267650601e30" if rnd in ("up", "ceil") else "1.2676506e30")
+        assert str(Rt(2) ** -100) == ("7.888609053e-31" if rnd in ("up", "ceil") else "7.888609052e-31")
+    assert str(X(2) ** 100) == "1.267650600228229401496703205376e30" and raises(lambda: X("1.5") ** -4, FlintUnableError)
+    assert str(X("0.5") ** -4) == "16" and str(X(2) ** -4) == "0.0625" and str(X(256) ** X("0.125")) == "2" and str(X("0.0001") ** X("0.25")) == "0.1"
+    assert raises(lambda: X(2) ** X("0.5"), FlintUnableError) and raises(lambda: X(3) ** -1, FlintUnableError)
+    # special functions and special points
+    assert str(R.gamma(5)) == "24" and str(R.gamma(3000)) == "1.383119868e9127" and str(R.rgamma(5)) == "0.04166666667" and str(R.rgamma(-4)) == "0"
+    assert str(R.zeta(-1)) == "-0.08333333333" and str(R.zeta(-3)) == "0.008333333333" and str(R.zeta(-4)) == "0" and str(R.zeta(0)) == "-0.5" and str(R.zeta(-1001)) == "-1.348590824e1771"
+    assert str(R.log10(R("1e100"))) == "100" and str(R.log10(R("1e-100"))) == "-100" and str(R.log2(2 ** 100)) == "100" and str(R.log2(R("0.5") ** 100)) == "-100"
+    assert str(R.lgamma(1)) == "0" and str(R.lgamma(2)) == "0" and str(R.barnes_g(1)) == "1" and str(R.barnes_g(4)) == "2" and str(R.barnes_g(6)) == "288"
+    assert str(R.sin_pi(R("0.5"))) == "1" and str(R.sin_pi(1)) == "0" and str(R.sin_pi(R("1.5"))) == "-1" and str(R.cos_pi(R("0.5"))) == "0" and str(R.cos_pi(1)) == "-1"
+    assert str(R.tan_pi(R("0.25"))) == "1" and str(R.tan_pi(R("0.75"))) == "-1" and str(R.cot_pi(R("0.25"))) == "1" and str(R.csc_pi(R("0.5"))) == "1" and str(R.sec_pi(1)) == "-1"
+    assert str(R.asin_pi(1)) == "0.5" and str(R.asin_pi(R("-0.5"))) == "-0.1666666667" and str(R.acos_pi(-1)) == "1" and str(R.acos_pi(0)) == "0.5" and str(R.atan_pi(-1)) == "-0.25"
+    assert str(R.acos(1)) == "0" and str(R.acosh(1)) == "0" and str(R.sinc(0)) == "1" and str(R.sinc_pi(3)) == "0" and str(R.lambertw(0)) == "0" and str(R.erfinv(0)) == "0"
+    assert raises(lambda: R.tan_pi(R("0.5")), FlintDomainError) and raises(lambda: R.cot_pi(1), FlintDomainError) and raises(lambda: R.gamma(-2), FlintDomainError)
+    assert raises(lambda: R.zeta(1), FlintDomainError) and raises(lambda: R.lgamma(0), FlintDomainError) and raises(lambda: R.log2(0), FlintDomainError)
+    for rnd in ["down", "up", "floor", "ceil", "near"]:
+        Rt = RealFloat_decfloat(10, rnd=rnd)
+        # S + tiny rounds to S + ulp only when rounding away; S - tiny rounds to S - ulp only when rounding toward zero
+        up = rnd in ("up", "ceil")            # S + tiny, S > 0
+        upn = rnd in ("up", "ceil", "near")   # S - tiny, S > 0: rounds to S unless toward zero
+        neg_away = rnd in ("up", "floor")     # for S < 0: away from zero
+        neg_stay = rnd in ("up", "floor", "near")   # S < 0, S + tiny (toward zero): stays at S unless toward zero
+        x = Rt("1e-1000000000")
+        assert str(Rt.gamma(x)) == ("1e1000000000" if upn else "9.999999999e999999999")
+        assert str(Rt.gamma(-x)) == ("-1.000000001e1000000000" if neg_away else "-1e1000000000")
+        assert str(Rt.digamma(x)) == ("-1.000000001e1000000000" if neg_away else "-1e1000000000")
+        assert str(Rt.cot(x)) == ("1e1000000000" if upn else "9.999999999e999999999")
+        assert str(Rt.csc(x)) == ("1.000000001e1000000000" if up else "1e1000000000")
+        assert str(Rt.coth(x)) == ("1.000000001e1000000000" if up else "1e1000000000")
+        assert str(Rt.csch(x)) == ("1e1000000000" if upn else "9.999999999e999999999")
+        assert str(Rt.rgamma(x)) == ("1.000000001e-1000000000" if up else "1e-1000000000")
+        assert str(Rt.sec(x)) == str(Rt.cosh(x)) == ("1.000000001" if up else "1")
+        assert str(Rt.sech(x)) == str(Rt.cos_pi(x)) == str(Rt.sinc(x)) == str(Rt.sinc_pi(x)) == ("1" if upn else "0.9999999999")
+        assert str(Rt.lambertw(x)) == str(Rt.asinh(x)) == str(Rt.sin_integral(x)) == ("1e-1000000000" if upn else "9.999999999e-1000000001")
+        assert str(Rt.asin(x)) == str(Rt.atanh(x)) == str(Rt.dilog(x)) == str(Rt.sinh_integral(x)) == ("1.000000001e-1000000000" if up else "1e-1000000000")
+        assert str(Rt.tanh(1000000)) == ("1" if upn else "0.9999999999") and str(Rt.tanh(-1000000)) == ("-1" if neg_stay else "-0.9999999999")
+        assert str(Rt.coth(1000000)) == ("1.000000001" if up else "1") and str(Rt.erf(-1000000)) == ("-1" if neg_stay else "-0.9999999999")
+        assert str(Rt.erfc(-1000000)) == ("2" if upn else "1.999999999") and str(Rt.expm1(-1000000)) == ("-1" if neg_stay else "-0.9999999999")
+        assert str(Rt.zeta(10 ** 9)) == ("1.000000001" if up else "1") and str(Rt.acot(Rt("1e100"))) == ("1e-100" if upn else "9.999999999e-101")
+        assert str(Rt.acoth(Rt("1e100"))) == str(Rt.acsc(Rt("1e100"))) == ("1.000000001e-100" if up else "1e-100") and str(Rt.acsch(Rt("-1e100"))) == ("-1e-100" if neg_stay else "-9.999999999e-101")
+    R110 = RealFloat_decfloat(110, rnd="down")
+    assert str(R110.zeta(R110("1e-100") + 1)) == "1.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000577215664e100"
+    assert str(R110.gamma(R110("1e-100"))) == "9.999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999422784335e99"
+    assert str(Ri(0).log()) == "-inf" and str(Ri("inf").exp()) == "inf" and str(Ri("-inf").exp()) == "0"
+    assert str(Ri("inf").log()) == "inf" and str(Ri("inf").atan()) == "1.570796327"
+    assert raises(lambda: Ri("inf").sin(), FlintUnableError)
+
+    # polynomials and matrices
+    P = PolynomialRing(R)
+    f = P("x^2 - 3*x + 1.25")
+    assert str(f) == "1.25 - 3*x + x^2"
+    assert str(P(str(f))) == str(f)
+    assert str(f(R("0.5"))) == "0" and str(f(R(2.5))) == "0"
+    assert str(f * f) == "1.5625 - 7.5*x + 11.5*x^2 - 6*x^3 + x^4"
+    assert str(P("(x + 1/3)^2")) == "0.1111111111 + 0.6666666666*x + x^2"
+    assert str(P("(x + 1/3) * (x - 1/3)")) == "-0.1111111111 + x^2"
+    assert str(P("x^2 - 2") % P("x - 1.5")) == "0.25"
+    assert str(P("x^3 + 2*x") / P("x")) == "2 + x^2"
+    assert str(P("x^2-2").derivative()) == "2*x"
+    M = Mat(R, 2, 2)([[1, 2], [3, 4]])
+    assert str(M.det()) == "-2" and str(M.inv()) == "[[-1.999999998, 0.9999999992],\n[1.499999999, -0.4999999996]]"
+    assert str(Mat(R, 2, 2)(str(M))) == str(M)
+    assert str(Mat(R, 2, 2)("[[1/3, 2], [3, 4]]")) == "[[0.3333333333, 2],\n[3, 4]]"
+    assert str(M * M.inv()) == "[[1, 0],\n[2e-9, 1]]"
+    assert str(Mat(R, 3, 3)().hilbert().det()) == "0.000462962953"
+    assert str(Mat(RealFloat_decfloat(20), 3, 3)().hilbert().det()) == "0.000462962962962962962"
+    assert str(Mat(X, 2, 2)([[1, 2], [3, 5]]).inv()) == "[[-5, 2],\n[3, -1]]"
+    assert str(Mat(X, 2, 2)([[1, 2], [3, 4]]).inv()) == "[[-2, 1],\n[1.5, -0.5]]"
+    assert raises(lambda: Mat(X, 2, 2)([[1, 2], [3, 9]]).inv(), FlintUnableError)
+    assert raises(lambda: Mat(X, 2, 2)([[1, 2], [2, 4]]).inv(), FlintDomainError)
+    S = PowerSeriesRing(R, 6)
+    assert str(S("(1 + x/3)^2")) == "1 + 0.6666666666*x + 0.1111111111*x^2"
+    assert str(S("1/(1 - x/3)")) == "1 + 0.3333333333*x + 0.1111111111*x^2 + 0.03703703703*x^3 + 0.01234567901*x^4 + 0.004115226336*x^5 + O(x^6)"
+    assert str(S("1 + x").exp()) == "2.718281828 + 2.718281828*x + 1.359140914*x^2 + 0.4530469713*x^3 + 0.1132617428*x^4 + 0.02265234856*x^5 + O(x^6)"
+    assert str(S("1 + x").log()) == "x - 0.5*x^2 + 0.3333333333*x^3 - 0.25*x^4 + 0.2*x^5 + O(x^6)"
+    assert str(S("(1 + x)^10")) == "1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + 252*x^5 + O(x^6)"
+
+    # context settings
+    Rc = RealFloat_decfloat(7, rnd="floor", limb_digits=3)
+    assert str(Rc) == "Decimal floating-point numbers (prec 7, rnd floor, limb 10^3)"
+    assert Rc.digits == 7 and Rc.rnd == "floor" and Rc.limb_digits == 3 and Rc.exp_limits is None
+    assert str(Rc(1) / 3) == "0.3333333" and str(Rc(-1) / 3) == "-0.3333334"
+    assert str(Rc("1e100") + Rc("1e-100")) == "1e100"
+    Rc.digits = 3; Rc.rnd = "up"
+    assert str(Rc(1) / 3) == "0.334" and str(Rc(2).sqrt()) == "1.42" and str(Rc(2).sqrt() ** 2) == "2.02"
+    assert Rc.prec == 8
+    Rc.prec = 100
+    assert Rc.digits == 31
+    Rc.digits = None
+    assert Rc.digits is None
+    assert raises(lambda: Rc(1) / 3, FlintUnableError)
+    for e in [1, 2, 3, 5, 9, 18]:
+        Re = RealFloat_decfloat(25, limb_digits=e)
+        assert str(Re("1e100") + Re("1e-100")) == "1e100"
+        assert str(Re(1) / 7) == "0.1428571428571428571428571"
+        assert str(Re(2).sqrt()) == "1.414213562373095048801689"
+        assert str(Re("1e-100").exp()) == "1"
+        assert str(Re("123456789.123456789") * Re("987654321.987654321")) == "121932631356500531.3472032"
+        assert str(RealFloat_decfloat(None, limb_digits=e)("123456789.123456789") * Re("987654321.987654321")) == "121932631356500531.347203169112635269"
+        assert str(Re("123456789.123456789") - Re("123456789.123456788")) == "1e-9"
+        assert str(Re.pi()) == "3.141592653589793238462643"
+        assert str(PolynomialRing(Re)("(x - 1/3) * (x + 1/3)")) == "-0.1111111111111111111111111 + x^2"
+
+    # balls
+    assert str(B) == "Decimal balls (prec 10, rad prec 4)"
+    x = B(1) / 3
+    assert str(x) == "[0.3333333333 +/- 3.334e-11]"
+    assert str(x.mid()) == "0.3333333333" and str(x.rad()) == "3.334e-11"
+    assert x.mid().parent().digits == 10 and x.rad().parent().digits is None
+    assert not x.is_exact() and B(1).is_exact() and B("1e100").is_exact()
+    assert x.contains(QQ(1) / 3) and not x.contains(QQ(1) / 2) and x.contains(x)
+    assert (x * 3).contains(1) and (x * 3).overlaps(1) and not (x * 3).contains(2)
+    assert x.overlaps(x) and not x.overlaps(x + 1)
+    assert raises(lambda: x == x, Undecidable) and raises(lambda: x != x, Undecidable)
+    assert x != x + 1 and x < x + 1 and x > x - 1 and raises(lambda: x < x, Undecidable)
+    assert B(1) / 3 * 3 != 2 and not (B(1) / 3 * 3 == 2)
+    assert B(1) == B(1) and B("0.5") == QQ(1) / 2
+    assert B("[1 +/- 0.1]").contains(B("[1 +/- 0.1]")) and not B("[1 +/- 0.1]").contains(B("[1 +/- 0.11]"))
+    assert B("[1 +/- 0.1]").contains(B("[1.05 +/- 0.05]")) and not B("[1 +/- 0.1]").contains(B("[1.05 +/- 0.06]"))
+    assert B("[1 +/- 0.1]").overlaps(B("[1.2 +/- 0.1]")) and not B("[1 +/- 0.1]").overlaps(B("[1.2 +/- 0.09]"))
+    assert B("[1 +/- 0.1]").contains(B("[1 +/- 0.1]").mid())
+    assert str(B("[1 +/- 0.1]").mid()) == "1" and str(B("[1 +/- 0.1]").rad()) == "0.1"
+    assert str(B("[1 +/- 0.1]").add_error(B("0.05"))) == "[1 +/- 0.15]"
+    assert str(B("[1 +/- 0.1]").add_error(B("[0.05 +/- 0.01]"))) == "[1 +/- 0.16]"
+    assert str(B("[1 +/- 0.1]").add_error(-B("0.05"))) == "[1 +/- 0.15]"
+    assert str(B(1).add_error_10exp(-3)) == "[1 +/- 0.001]" and str(B(1).add_error_10exp(-30)) == "[1 +/- 1e-30]"
+    assert str(B(0).add_error_10exp(5)) == "[0 +/- 100000]"
+    assert str(B("[1234.5678 +/- 0.5]").trim()) == "[1234.5678 +/- 0.5]"
+    assert str(B("[1234.56789012 +/- 0.5]").trim()) == "[1234.56789 +/- 0.5001]"
+    assert B("[1234.56789012 +/- 0.5]").trim().contains(B("[1234.56789012 +/- 0.5]"))
+    assert B("[1234.5678 +/- 0.5]").rel_accuracy_digits() == 4
+    assert B("[1234.5678 +/- 0.001]").rel_accuracy_digits() == 6
+    assert B("[1e100 +/- 1e90]").rel_accuracy_digits() == 10
+    assert B("[1e100 +/- 1e120]").rel_accuracy_digits() == -20
+    assert B("[0 +/- 1e-20]").rel_accuracy_digits() == 20
+    assert B(1).rel_accuracy_digits() is None
+    assert (B(1) / 3).rel_accuracy_digits() == 10
+    # string roundtrips
+    for s, t in [("[1 +/- 0.1]", "[1 +/- 0.1]"), ("1 +/- 0.1", "[1 +/- 0.1]"), ("[1+/-0.1]", "[1 +/- 0.1]"),
+                 ("+/- 0.1", "[0 +/- 0.1]"), ("[+/- 0.1]", "[0 +/- 0.1]"), ("[-1.5e3 +/- 1e-3]", "[-1500 +/- 0.001]"),
+                 ("[1 +/- 0.123456]", "[1 +/- 0.1235]"), ("[1 +/- 1e-100]", "[1 +/- 1e-100]"),
+                 ("[1 +/- 0]", "1"), ("[1]", "1"), ("(1)", "1"), ("1e100 +/- 1e50", "[1e100 +/- 1e50]"),
+                 ("1/3 +/- 1e-30", "[0.3333333333 +/- 3.335e-11]"), ("(1/3) +/- 1e-30", "[0.3333333333 +/- 3.335e-11]"),
+                 ("1/3", "[0.3333333333 +/- 3.334e-11]"), ("1/4", "0.25"), ("1e-30 + 1", "[1 +/- 1e-30]"),
+                 ("(1 +/- 0.1)^2", "[1 +/- 0.21]"), ("(1 +/- 0.1)*(1 +/- 0.1)", "[1 +/- 0.21]"),
+                 ("[1 +/- [0.1 +/- 0.01]]", "[1 +/- 0.11]"), ("[[1 +/- 0.1] +/- 0.1]", "[1 +/- 0.2]"),
+                 ("-[1 +/- 0.1]", "[-1 +/- 0.1]"), ("2 - [1 +/- 0.1]", "[1 +/- 0.1]"),
+                 ("123456789012 +/- 1", "[123456789000 +/- 13]"), ("12345678901234567890", "[12345678900000000000 +/- 1.235e9]"),
+                 ("123456789012345678901", "[123456789000000000000 +/- 1.235e10]"), ("-1234567890123456789012 +/- 1e5", "[-1.23456789e21 +/- 1.236e11]"),
+                 ("[1 +/- 0.001]", "[1 +/- 0.001]"), ("[1 +/- 0.0001]", "[1 +/- 1e-4]"), ("[1 +/- 12345]", "[1 +/- 12350]"), ("[1 +/- 123456]", "[1 +/- 123500]"), ("[1 +/- 1234567]", "[1 +/- 1.235e6]")]:
+        assert str(B(s)) == t, (s, str(B(s)), t)
+        assert B(str(B(s))).contains(B(s)), s
+    for s in ["[1 +/- x]", "[1 +/-]", "[1 +/- 1", "+/-", "[]", "[1 +/- 1e]"]:
+        assert raises(lambda: B(s), (FlintUnableError, FlintDomainError, ValueError)), s
+    # balls represent real numbers: no infinite or undefined midpoints (an
+    # infinite radius denotes the whole real line)
+    assert str(B("[1 +/- inf]")) == "[1 +/- inf]" and str(B("[+/- inf]")) == "[0 +/- inf]" and str(B("+/- inf")) == "[0 +/- inf]"
+    assert str(B("[+/- inf]") + 1) == "[1 +/- inf]" and str(B("[+/- inf]") * 0) == "0" and str(B("[1 +/- inf]") + 1) == "[2 +/- inf]"
+    assert B("[1 +/- inf]").contains(10 ** 100) and B("[1 +/- inf]").contains(B("[+/- inf]")) and not B("[1 +/- inf]").is_exact()
+    assert str(B(B("[+/- inf]"))) == "[0 +/- inf]" and str(RR(B("[+/- inf]"))) == "[+/- inf]" and str(B(RR("[+/- inf]"))) == "[0 +/- inf]"
+    for s in ["inf", "-inf", "nan", "[inf +/- 1]", "1/0", "0/0", "[+/- inf] * 0 + inf"]:
+        assert raises(lambda: B(s), (FlintUnableError, FlintDomainError)), s
+    assert raises(B.neg_inf, FlintDomainError) and raises(B.undefined, FlintDomainError) and raises(B.unknown, FlintDomainError)
+    assert raises(lambda: B("[+/- inf]").lower(), FlintDomainError) and raises(lambda: B("[+/- inf]").abs_upper(), FlintDomainError)
+    assert str(B("[+/- inf]").abs_lower()) == "0" and raises(lambda: B("[+/- inf]").rad_ball(), FlintDomainError)
+    assert raises(lambda: B(0).log(), FlintDomainError) and raises(lambda: B(0).rsqrt(), FlintDomainError) and raises(lambda: B.gamma(B(0)), FlintDomainError)
+    assert raises(lambda: B("[0 +/- 0.1]").log(), FlintUnableError) and raises(lambda: B(1) / B("[0 +/- 0.1]"), FlintUnableError)
+    Bi = RealField_decball(10, inf=True)   # the inf and nan flags have no effect on balls
+    assert raises(lambda: Bi("1/0"), (FlintUnableError, FlintDomainError)) and raises(lambda: Bi("inf"), (FlintUnableError, FlintDomainError))
+    assert str(Bi("1e400") ** 3) == "1e1200" and str(Bi) == "Decimal balls (prec 10, rad prec 4, inf)"
+    # containment through arithmetic
+    third = QQ(1) / 3
+    for a, b in [(B(1) / 3, third), (B(1) / 3 + B(1) / 7, third + QQ(1) / 7), (B(1) / 3 * (B(1) / 7), third / 7),
+                 ((B(1) / 3) / (B(1) / 7), third * 7), (B(2).sqrt() ** 2, 2), (B(1) / 3 - B(1) / 3, 0),
+                 (B("1e-30") + 1, QQ(10) ** -30 + 1), (B("1e30") + 1, QQ(10) ** 30 + 1), ((B(1) / 3) ** 10, third ** 10),
+                 (B(2).sqrt().inv(), None), ((B(1) / 3).abs(), third), (-(B(1) / 3), -third), ((B(1) / 3) * 3 - 1, 0),
+                 (B("[1 +/- 0.5]") * B("[1 +/- 0.5]"), QQ(9) / 4), (B("[1 +/- 0.5]") - B("[1 +/- 0.5]"), 1),
+                 (B("[1 +/- 0.5]") / B("[1 +/- 0.5]"), 3), (B("[1 +/- 0.5]").sqrt(), QQ(3) / 4),
+                 (B("[1 +/- 0.5]").sqrt(), 1), (B(10) ** -20, QQ(10) ** -20), (B(3).inv(), third)]:
+        if b is not None:
+            assert a.contains(b), (a, b)
+    assert not (B(1) / 3 + B(1) / 7).contains(third + QQ(1) / 7 + QQ(1) / 10 ** 9)
+    assert B(2).sqrt().inv().overlaps(B(2).sqrt() / 2)
+    assert raises(lambda: B("[1 +/- 2]").sqrt(), FlintUnableError)
+    assert raises(lambda: B(0) / B("[1 +/- 2]"), FlintUnableError)
+    assert raises(lambda: B(1) / B("[1 +/- 1]"), FlintUnableError)
+    assert raises(lambda: B("[-1 +/- 0.5]").sqrt(), FlintDomainError)
+    assert raises(lambda: B(-1).sqrt(), FlintDomainError)
+    assert raises(lambda: B(1) / B(0), FlintDomainError)
+    assert str(B(0).sqrt()) == "0" and raises(lambda: B("[0 +/- 1e-20]").sqrt(), FlintUnableError)
+    assert str(B("[4 +/- 1e-20]").sqrt()) == "[2 +/- 2.502e-21]"
+    assert str(B(4).sqrt()) == "2" and str(B("1e-40").sqrt()) == "1e-20" and str(B(2).sqrt()) == "[1.414213562 +/- 3.731e-10]"
+    assert str(B(1) / 4) == "0.25" and str(B(1) / 8) == "0.125" and str(B("1e20") + B("1e-20")) == "[100000000000000000000 +/- 1e-20]"
+    assert str(B("1e30") + B("1e-20")) == "[1e30 +/- 1e-20]"
+    assert str(B(1) / 3 - B(1) / 3) == "[0 +/- 6.668e-11]"
+    assert str(B("[1 +/- 0.5]") * 0) == "0" and str(B("[1 +/- 0.5]") - B("[1 +/- 0.5]")) == "[0 +/- 1]"
+    assert str(B("[0 +/- 1]") ** 2) == "[0 +/- 1]" and str(B("[0 +/- 1]") ** 3) == "[0 +/- 1]"
+    assert str(B("[0 +/- 1]") * B("[0 +/- 2]")) == "[0 +/- 2]"
+    assert str(B("[1 +/- 1]") ** 2) == "[1 +/- 3]"
+    assert str(B("[-1 +/- 1]").abs()) == "[1 +/- 1]" and str(B("[-1 +/- 0.5]").abs()) == "[1 +/- 0.5]"
+    assert str(B("[10 +/- 1]").floor()) == "[10 +/- 2]" and str(B("[10.5 +/- 0.2]").floor()) == "10"
+    assert str(B("[10.5 +/- 0.2]").ceil()) == "11" and str(B("[10.5 +/- 0.2]").nint()) == "[10 +/- 1.2]"
+    assert str(B("[10.4 +/- 0.05]").nint()) == "10" and str(B("[10.4 +/- 0.05]").trunc()) == "10" and str(B("[-10.4 +/- 0.05]").trunc()) == "-10"
+    assert B("[10 +/- 1]").floor().contains(9) and B("[10 +/- 1]").floor().contains(11)
+    # radius precision and precise mode
+    for rp in range(1, 10):
+        Bp = RealField_decball(10, rad_prec=rp)
+        assert Bp.rad_prec == rp
+        assert str(Bp(1) / 3) == "[0.3333333333 +/- %se-11]" % ("4" if rp == 1 else "3." + "3" * (rp - 2) + "4")
+        assert str(Bp("[1 +/- 0.123456789]")) == "[1 +/- %s]" % ("0.123456789" if rp == 9 else "0." + "123456789"[:rp - 1] + str(int("123456789"[rp - 1]) + 1))
+        assert (Bp(1) / 3).contains(third) and (Bp(2).sqrt() ** 2).contains(2)
+        assert (Bp(1) / 3 + Bp(1) / 7).contains(third + QQ(1) / 7)
+        assert (Bp("[1 +/- 0.5]") ** 5).contains(QQ(3) ** 5 / 2 ** 5)
+    assert str(RealField_decball(10, rad_prec=0)) == "Decimal balls (prec 10, rad prec 1)"
+    assert str(RealField_decball(10, rad_prec=100)) == "Decimal balls (prec 10, rad prec 9)"
+    Bq = RealField_decball(10, rad_prec=9, sloppy_radius=False)
+    assert str(Bq(1) / 3) == "[0.3333333333 +/- 3.33333334e-11]"
+    assert str(Bq(2) / 3) == "[0.6666666667 +/- 3.33333334e-11]"
+    assert str(Bq(1) / 4) == "0.25" and str(Bq(2).sqrt()) == "[1.414213562 +/- 3.73095049e-10]"
+    assert str(Bq("1e-30") + 1) == "[1 +/- 1e-30]" and str(Bq("1e30") + 1) == "[1e30 +/- 1]"
+    assert str(Bq("12345678901") * 1) == "[12345678900 +/- 1]" and str(Bq("12345678905") * 1) == "[12345678900 +/- 5]"
+    assert str(Bq("12345678905.0001") * 1) == "[12345678910 +/- 4.9999]"
+    assert str(Bq(1) / 3 * 3) == "[0.9999999999 +/- 1.00000001e-10]"
+    assert (Bq(1) / 3 * 3).contains(1)
+    Bd = RealField_decball(10, rnd="down")
+    assert str(Bd(1) / 3) == "[0.3333333333 +/- 3.334e-11]" and str(Bd(2) / 3) == "[0.6666666666 +/- 6.667e-11]"
+    assert (Bd(2) / 3).contains(QQ(2) / 3)
+    Bd = RealField_decball(10, rnd="up", sloppy_radius=False)
+    assert str(Bd(2) / 3) == "[0.6666666667 +/- 3.334e-11]" and (Bd(2) / 3).contains(QQ(2) / 3)
+    # exponent limits for balls
+    Bl = RealField_decball(10, exp_limits=(-20, 20), inf=True, underflow=True)
+    assert str(Bl("1e-30")) == "[0 +/- 1e-20]" and raises(lambda: Bl("1e30"), FlintUnableError) and raises(lambda: Bl("-1e30"), FlintUnableError)
+    assert str(Bl("1e-15") * Bl("1e-15")) == "[0 +/- 1e-20]" and raises(lambda: Bl("1e-15") * Bl("1e-15") != 0, Undecidable)
+    assert (Bl("1e-15") * Bl("1e-15")).contains(RealField_decball(10)("1e-30")) and Bl("1e-30").contains(RealField_decball(10)("1e-30"))
+    assert raises(lambda: Bl("1e15") * Bl("1e15"), FlintUnableError)
+    assert str(Bl("[1 +/- 1e-30]")) == "[1 +/- 1e-20]" and Bl("[1 +/- 1e-30]").contains(1) and Bl("[1 +/- 1e-30]").overlaps(RealField_decball(40)("1 + 1e-30"))
+    assert raises(lambda: Bl(2) ** 100, FlintUnableError) and str(Bl(2) ** -100) == "[0 +/- 1e-20]"
+    Bl = RealField_decball(10, exp_limits=(-20, 20))
+    assert raises(lambda: Bl("1e-30"), FlintUnableError) and raises(lambda: Bl("1e30"), FlintUnableError)
+    assert raises(lambda: Bl("[1 +/- 1e-30]"), FlintUnableError)
+    # conversions
+    assert str(RR(B(1) / 3)) == "[0.3333333333 +/- 3.34e-11]"
+    assert RR(B(1) / 3).overlaps(RR(1) / 3) and RR(B("[1 +/- 0.1]")).overlaps(RR("[1 +/- 0.1]"))
+    assert RR(B("[1e100 +/- 1e90]")).overlaps(RR("1e100") + RR("1e90")) and not RR(B("[1e100 +/- 1e90]")).overlaps(RR("1e100") + RR("1.1e90"))
+    assert B(RR(1) / 3).contains(third) and B(RR.pi()).contains(B.pi()) and B.pi().contains(RealField_decball(50).pi())
+    assert RealField_decball(50)(RealField_arb(300).pi()).contains(RealField_decball(60).pi())
+    assert str(B(RR("[1 +/- 1e-30]"))) == "[1 +/- 1.001e-30]" and str(B(RR("[1e100 +/- 1e50]"))) == "[1e100 +/- 3.205e83]"
+    assert str(B(RR("[1e-100 +/- 1e-150]"))) == "[1e-100 +/- 4.021e-117]"
+    assert B(RR("[1e-100 +/- 1e-150]")).contains(QQ(10) ** -100 + QQ(10) ** -150)
+    assert str(RealField_decball(40)(RR("1e-100"))) == "[1.000000000000000019991899802602883619648e-100 +/- 2.022e-117]"
+    assert str(RealField_decball(40)(RealField_arb(300)("1e-100"))) == "[1e-100 +/- 8.991e-192]"
+    assert str(B(2 ** 100)) == "[1.2676506e30 +/- 2.283e20]" and str(RealField_decball(31)(2 ** 100)) == "1.267650600228229401496703205376e30"
+    assert str(B(QQ(1) / 3)) == "[0.3333333333 +/- 3.334e-11]" and str(B(QQ(1) / 4)) == "0.25"
+    assert str(B(0.1)) == "[0.1 +/- 5.552e-18]" and str(RealField_decball(60)(0.1)) == "0.1000000000000000055511151231257827021181583404541015625"
+    assert str(B(RF("0.1"))) == "[0.1 +/- 5.552e-18]"
+    assert QQ(B("0.125")) == QQ(1) / 8 and ZZ(B("1e5")) == 100000 and float(B("0.5")) == 0.5
+    assert raises(lambda: QQ(B(1) / 3), FlintUnableError) and raises(lambda: ZZ(B("0.5")), FlintDomainError)
+    assert raises(lambda: ZZ(B("[1 +/- 0.1]")), FlintUnableError) and raises(lambda: ZZ(B("[1.5 +/- 0.1]")), FlintDomainError)
+    assert int(B("3.7")) == 3
+    assert str(B(R(1) / 3)) == "0.3333333333" and str(R(B(1) / 3)) == "0.3333333333"
+    assert str(X(B("0.125"))) == "0.125" and raises(lambda: X(B(1) / 3), FlintUnableError)
+    assert str(RF(B(1) / 3)) == "0.3333333333000000" and str(CC(B(1) / 3)) == "[0.3333333333 +/- 3.34e-11]"
+    assert str(RealFloat_decfloat(5)(B(1) / 3)) == "0.33333"
+    assert str(RealField_decball(5)(B(1) / 3)) == "[0.33333 +/- 3.335e-6]"
+    assert str(RealField_decball(5)(R(1) / 3)) == "[0.33333 +/- 3.334e-6]"
+    assert str(RealField_decball(5, limb_digits=2)(B(1) / 3)) == "[0.33333 +/- 3.341e-6]"
+    assert str(RealField_decball(5, limb_digits=2, rad_prec=2)(B(1) / 3)) == "[0.33333 +/- 3.5e-6]"
+    assert str(RealField_decball(12, limb_digits=7)(B(1) / 3)) == "[0.3333333333 +/- 3.334e-11]"
+    assert str(B(1) + 1) == "2" and str(1 + B(1)) == "2" and str(B(1) + QQ(1) / 2) == "1.5" and str(B(1) + R("0.5")) == "1.5"
+    assert str(B(1) / 3 + R(1) / 3) == "[0.6666666666 +/- 3.334e-11]" and str(R(1) / 3 + B(1) / 3) == "[0.6666666666 +/- 3.334e-11]"
+    # functions
+    assert str(B.pi()) == "[3.141592654 +/- 4.104e-10]"
+    assert str(RealField_decball(10, sloppy_radius=False, rad_prec=9).pi()) == "[3.141592654 +/- 4.10206763e-10]"
+    assert str(RealField_decball(30).pi()) == "[3.14159265358979323846264338328 +/- 4.973e-31]"
+    assert RealField_decball(10, rad_prec=9, sloppy_radius=False).pi().contains(RealField_decball(50).pi())
+    assert str(B(1).exp()) == "[2.718281828 +/- 4.592e-10]" and str(B(0).exp()) == "1" and str(B(1).log()) == "0"
+    assert str(B(2).log()) == "[0.6931471806 +/- 4.007e-11]" and str(B(1).sin()) == "[0.8414709848 +/- 7.898e-12]"
+    assert str(B(0).sin()) == "0" and str(B(0).cos()) == "1" and str(B(0).atan()) == "0" and str(B(0).sinh()) == "0"
+    assert str(B("[0 +/- 1e-20]").sin()) == "[0 +/- 1.001e-20]" and str(B("[0 +/- 1e-20]").exp()) == "[1 +/- 1.001e-20]"
+    assert str(B("[1e30 +/- 1]").sin()) == "[0 +/- 1]" and str(B("1e30").sin()) == "[0 +/- 1]"
+    assert str(RealField_decball(40)("1e30").sin()) == "[-0.0901169019121380580303864289529873302744 +/- 3.669e-42]"
+    assert str(B(100).exp()) == "[2.688117142e43 +/- 1.84e33]" and str(B(-100).exp()) == "[3.720075976e-44 +/- 2.085e-55]"
+    assert str(B("[1 +/- 1e-5]").exp()) == "[2.718281828 +/- 2.72e-5]" or B("[1 +/- 1e-5]").exp().contains(B(1).exp())
+    assert B("[1 +/- 1e-5]").exp().contains(B(1 + QQ(1) / 10 ** 5).exp())
+    assert B(3).gamma().contains(2) and B(5).gamma().contains(24) and B(QQ(1) / 2).gamma().overlaps(B.pi().sqrt())
+    assert B(2).zeta().overlaps(B.pi() ** 2 / 6) and B(-1).zeta().contains(QQ(-1) / 12) and B(0).zeta().contains(QQ(-1) / 2)
+    assert str(B(1).tan()) == "[1.557407725 +/- 3.452e-10]" and str(B(1).tanh()) == "[0.761594156 +/- 4.425e-11]"
+    assert str(B(1).cosh()) == "[1.543080635 +/- 1.849e-10]" and str(B(1).sinh()) == "[1.175201194 +/- 3.563e-10]"
+    assert str(B("1e-20").expm1()) == "[1e-20 +/- 3.339e-39]" and str(B("1e-20").log1p()) == "[1e-20 +/- 4.802e-39]"
+    assert str(B(2) ** B("0.5")) == "[1.414213562 +/- 3.732e-10]" and str(B(2) ** 10) == "1024" and str(B(2) ** -1) == "0.5"
+    assert str(B(2) ** (QQ(1) / 2)) == "[1.414213562 +/- 3.731e-10]" and str(B(4) ** (QQ(1) / 2)) == "2"
+    assert str(B(9) ** (B(1) / 2)) == "3" and raises(lambda: B(-8) ** (QQ(1) / 3), FlintDomainError) and str(B(-8) ** 3) == "-512"
+    assert (B(2) ** B(3)).contains(8) and str(B(2) ** B(3)) == "8"
+    assert raises(lambda: B(0).log(), FlintDomainError) and raises(lambda: B("[0 +/- 1]").log(), (FlintDomainError, FlintUnableError))
+    assert raises(lambda: B(-1).log(), FlintDomainError) and raises(lambda: B("[1 +/- 2]").log(), (FlintDomainError, FlintUnableError))
+    assert raises(lambda: B(-2) ** B("0.5"), FlintDomainError)
+    # polynomials, matrices, series over balls
+    P = PolynomialRing(B)
+    f = P("x^2 - [3 +/- 0.001]*x + 1.25")
+    assert str(f) == "1.25 + [-3 +/- 0.001]*x + x^2"
+    assert str(P(str(f))) == str(f)
+    assert str(P(str(f * f))) == str(f * f)
+    assert str(P("(x - 1/3)^3")) == "[-0.03703703703 +/- 1.523e-11] + [0.3333333333 +/- 1.001e-10]*x + [-0.9999999999 +/- 1.001e-10]*x^2 + x^3"
+    assert str(P("(x - 1/3)^3")(B(1) / 3)) == "[0 +/- 8.238e-11]"
+    assert str(P("x^2 - 2") % P("x - [1.5 +/- 0.1]")) == "[0.25 +/- 0.31]"
+    assert str(P("x^2 - 2")(B(2).sqrt())) == "[-1e-9 +/- 1.113e-9]"
+    assert P("x^2 - 2")(B(2).sqrt()).contains(0)
+    assert P("x^3 - 2")(B(2) ** (QQ(1) / 3)).contains(0)
+    assert str(P("x^2 - 2").derivative()) == "2*x"
+    M = Mat(B, 2, 2)([[B(1) / 3, 2], [3, 4]])
+    assert str(M) == "[[[0.3333333333 +/- 3.334e-11], 2],\n[3, 4]]"
+    assert str(Mat(B, 2, 2)(str(M))) == str(M)
+    assert str(M.det()) == "[-4.666666667 +/- 3.334e-10]" and M.det().contains(QQ(-14) / 3)
+    assert (M * M.inv() - 1)[1, 1].contains(0) and (M * M.inv())[0, 1].contains(0)
+    assert Mat(B, 3, 3)().hilbert().det().contains(QQ(1) / 2160)
+    assert Mat(B, 4, 4)().hilbert().det().contains(QQ(1) / 6048000)
+    assert Mat(RealField_decball(40), 6, 6)().hilbert().det().contains(QQ(1) / 186313420339200000)
+    assert str(Mat(B, 2, 2)("[[1 +/- 0.1, 2], [3, 4 +/- 0.1]]")) == "[[[1 +/- 0.1], 2],\n[3, [4 +/- 0.1]]]"
+    assert str(Mat(B, 2, 2)("[[[1 +/- 0.1], 2], [3, [4 +/- 0.1]]]")) == "[[[1 +/- 0.1], 2],\n[3, [4 +/- 0.1]]]"
+    assert str(Mat(B, 2, 2)("[[1 +/- 0.1, 2], [3, 4 +/- 0.1]]").det()) == "[-2 +/- 0.51]"
+    assert str(Mat(B, 1, 1)("[[1/3]]")) == "[[[0.3333333333 +/- 3.334e-11]]]"
+    assert str(Mat(B, 1, 1)("[[[1/3]]]")) == "[[[0.3333333333 +/- 3.334e-11]]]"
+    assert str(Mat(B, 1, 1)("[[[1/3 +/- 1e-20]]]")) == "[[[0.3333333333 +/- 3.335e-11]]]"
+    S = PowerSeriesRing(B, 4)
+    assert str(S("1 + x").exp()) == "[2.718281828 +/- 4.592e-10] + [2.718281828 +/- 4.592e-10]*x + [1.359140914 +/- 2.296e-10]*x^2 + [0.4530469713 +/- 1.099e-10]*x^3 + O(x^4)"
+    assert str(S("1 + x").log()) == "x - 0.5*x^2 + [0.3333333333 +/- 3.334e-11]*x^3 + O(x^4)"
+    ef = S("[1 +/- 1e-20] + x").exp()
+    assert str(S(str(ef))) == str(ef)
+    assert str(S("1/(1 - x)")) == "1 + x + x^2 + x^3 + O(x^4)"
+    assert str(S("1/(1 - x/3)")) == "1 + [0.3333333333 +/- 3.334e-11]*x + [0.1111111111 +/- 3.337e-11]*x^2 + [0.03703703703 +/- 1.523e-11]*x^3 + O(x^4)"
+    PP = PolynomialRing(PolynomialRing(B, "x"), "y")
+    g = PP("(x + [1 +/- 0.1]*y)^2 + [1/3]")
+    assert str(PP(str(g))) == str(g)
+    assert PP(str(g)) - g != 1
+    # random string roundtrips through polynomials
+    for i in range(30):
+        h = P(random=True)
+        assert str(P(str(h))) == str(h), str(h)
+        h = P("1 + x") ** 3 * P(random=True) + P(random=True)
+        assert str(P(str(h))) == str(h), str(h)
+    for i in range(30):
+        h = PolynomialRing(R)(random=True)
+        assert str(PolynomialRing(R)(str(h))) == str(h), str(h)
+    for i in range(30):
+        Bx = RealField_decball(random.randint(9, 30), rad_prec=random.randint(1, 9), sloppy_radius=random.randint(0, 1))
+        Px = PolynomialRing(Bx)
+        h = Px(random=True) * Px(random=True) + Px(random=True)
+        assert str(Px(str(h))) == str(h), str(h)
+        Mx = Mat(Bx, 2, 2)(random=True) * Mat(Bx, 2, 2)(random=True)
+        assert str(Mat(Bx, 2, 2)(str(Mx))) == str(Mx), str(Mx)
+        Rx = RealFloat_decfloat(random.randint(1, 30), rnd=random.choice(_decimal_rnd_names))
+        Mx = Mat(Rx, 2, 2)(random=True) * Mat(Rx, 2, 2)(random=True)
+        assert str(Mat(Rx, 2, 2)(str(Mx))) == str(Mx), str(Mx)
 
 
 def test_big_o():

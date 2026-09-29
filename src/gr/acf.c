@@ -16,6 +16,7 @@
 #include "arb_fmpz_poly.h"
 #include "acf.h"
 #include "acb.h"
+#include "decimal.h"
 #include "gr.h"
 #include "gr/impl.h"
 #include "gr_generic.h"
@@ -232,6 +233,25 @@ _gr_acf_set_other(acf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             arf_set_round(acf_realref(res), arb_midref(acb_realref((acb_srcptr) x)), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
             arf_set_round(acf_imagref(res), arb_midref(acb_imagref((acb_srcptr) x)), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_DECFLOAT:
+            arf_zero(acf_imagref(res));
+            return decfloat_get_arf(acf_realref(res), x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECBALL:
+            arf_zero(acf_imagref(res));
+            return decfloat_get_arf(acf_realref(res), DECBALL_MIDREF((decball_srcptr) x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            return deccfloat_get_acf(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCBALL:
+            {
+                int status;
+                status = decfloat_get_arf(acf_realref(res), DECBALL_MIDREF(DECCBALL_REALREF((deccball_srcptr) x)), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx), x_ctx);
+                status |= decfloat_get_arf(acf_imagref(res), DECBALL_MIDREF(DECCBALL_IMAGREF((deccball_srcptr) x)), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx), x_ctx);
+                return status;
+            }
 
         default:
             {

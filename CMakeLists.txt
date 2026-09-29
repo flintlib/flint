@@ -231,6 +231,7 @@ set(_BUILD_DIRS
     padic                           padic_mat       padic_poly
     qadic
     padic_radix
+    decimal
 
     nmod_poly_factor                fmpz_factor
     fmpz_poly_factor                fmpz_mod_poly_factor

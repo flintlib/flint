@@ -16,6 +16,8 @@
 #include "arb_poly.h"
 #include "arb_poly/impl.h"
 #include "acb_poly.h"
+#include "acb_dirichlet.h"
+#include "acb_elliptic.h"
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
 #include "arb_hypgeom.h"
@@ -27,6 +29,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "nfloat.h"
+#include "decimal.h"
 
 typedef struct
 {
@@ -306,6 +309,22 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 return GR_SUCCESS;
             }
 
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_arb(res, x, ARB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decball_get_arb(res, x, ARB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            if (!_deccfloat_is_real((deccfloat_srcptr) x))
+                return GR_DOMAIN;
+            return decfloat_get_arb(res, DECCFLOAT_REALREF((deccfloat_srcptr) x), ARB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECCBALL:
+            if (!_deccball_is_real((deccball_srcptr) x, x_ctx))
+                return GR_DOMAIN;
+            return decball_get_arb(res, DECCBALL_REALREF((deccball_srcptr) x), ARB_CTX_PREC(ctx), x_ctx);
+
         case GR_CTX_RR_ARB:
             arb_set_round(res, x, ARB_CTX_PREC(ctx));
             return GR_SUCCESS;
@@ -338,6 +357,14 @@ _gr_arb_set_interval_mid_rad(arb_t res, const arb_t m, const arb_t r, const gr_c
     arb_set(res, m);
     arb_add_error_mag(res, rad);
     mag_clear(rad);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_arb_set_interval_mid_inf(arb_t res, const arb_t m, const gr_ctx_t ctx)
+{
+    arb_set(res, m);
+    mag_inf(arb_radref(res));
     return GR_SUCCESS;
 }
 
@@ -1332,6 +1359,101 @@ _gr_arb_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
+/* Real functions of real arguments evaluated with the complex
+   implementation: the result is accepted when the imaginary part is exactly
+   zero (as it is when acb evaluates a function in its real domain), and the
+   value is known to be non-real when the imaginary part excludes zero. */
+static int
+_gr_arb_set_acb_real(arb_t res, acb_t t)
+{
+    if (!acb_is_finite(t))
+        return GR_UNABLE;
+
+    if (arb_is_zero(acb_imagref(t)))
+    {
+        arb_swap(res, acb_realref(t));
+        return GR_SUCCESS;
+    }
+
+    return arb_contains_zero(acb_imagref(t)) ? GR_UNABLE : GR_DOMAIN;
+}
+
+#define DEF_VIA_ACB_1(fname, acb_func) \
+static int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    acb_t t; \
+    int status; \
+    acb_init(t); \
+    acb_set_arb(t, x); \
+    acb_func(t, t, ARB_CTX_PREC(ctx)); \
+    status = _gr_arb_set_acb_real(res, t); \
+    acb_clear(t); \
+    return status; \
+}
+
+#define DEF_VIA_ACB_2(fname, acb_func) \
+static int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
+{ \
+    acb_t t, u; \
+    int status; \
+    acb_init(t); \
+    acb_init(u); \
+    acb_set_arb(t, x); \
+    acb_set_arb(u, y); \
+    acb_func(t, t, u, ARB_CTX_PREC(ctx)); \
+    status = _gr_arb_set_acb_real(res, t); \
+    acb_clear(t); \
+    acb_clear(u); \
+    return status; \
+}
+
+#define DEF_VIA_ACB_2_FLAG(fname, acb_func) \
+static int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, int flag, const gr_ctx_t ctx) \
+{ \
+    acb_t t, u; \
+    int status; \
+    acb_init(t); \
+    acb_init(u); \
+    acb_set_arb(t, x); \
+    acb_set_arb(u, y); \
+    acb_func(t, t, u, flag, ARB_CTX_PREC(ctx)); \
+    status = _gr_arb_set_acb_real(res, t); \
+    acb_clear(t); \
+    acb_clear(u); \
+    return status; \
+}
+
+DEF_VIA_ACB_1(dirichlet_eta, acb_dirichlet_eta)
+DEF_VIA_ACB_1(riemann_xi, acb_dirichlet_xi)
+DEF_VIA_ACB_2(polygamma, acb_polygamma)
+DEF_VIA_ACB_1(elliptic_k, acb_elliptic_k)
+DEF_VIA_ACB_1(elliptic_e, acb_elliptic_e)
+DEF_VIA_ACB_2(elliptic_pi, acb_elliptic_pi)
+DEF_VIA_ACB_2_FLAG(elliptic_f, acb_elliptic_f)
+DEF_VIA_ACB_2_FLAG(elliptic_e_inc, acb_elliptic_e_inc)
+
+static int
+_gr_arb_lerch_phi(arb_t res, const arb_t z, const arb_t s, const arb_t a, const gr_ctx_t ctx)
+{
+    acb_t t, u, v;
+    int status;
+    acb_init(t);
+    acb_init(u);
+    acb_init(v);
+    acb_set_arb(t, z);
+    acb_set_arb(u, s);
+    acb_set_arb(v, a);
+    acb_dirichlet_lerch_phi(t, t, u, v, ARB_CTX_PREC(ctx));
+    status = _gr_arb_set_acb_real(res, t);
+    acb_clear(t);
+    acb_clear(u);
+    acb_clear(v);
+    return status;
+}
+
 static int
 _gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
@@ -1735,6 +1857,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_arb_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arb_set_other},
     {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_arb_set_interval_mid_rad},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) _gr_arb_set_interval_mid_inf},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_arb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_arb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_arb_get_fmpz},
@@ -1842,6 +1965,15 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
     {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_arb_barnes_g},
     {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_arb_log_barnes_g},
+    {GR_METHOD_DIRICHLET_ETA,   (gr_funcptr) _gr_arb_dirichlet_eta},
+    {GR_METHOD_RIEMANN_XI,      (gr_funcptr) _gr_arb_riemann_xi},
+    {GR_METHOD_POLYGAMMA,       (gr_funcptr) _gr_arb_polygamma},
+    {GR_METHOD_LERCH_PHI,       (gr_funcptr) _gr_arb_lerch_phi},
+    {GR_METHOD_ELLIPTIC_K,      (gr_funcptr) _gr_arb_elliptic_k},
+    {GR_METHOD_ELLIPTIC_E,      (gr_funcptr) _gr_arb_elliptic_e},
+    {GR_METHOD_ELLIPTIC_PI,     (gr_funcptr) _gr_arb_elliptic_pi},
+    {GR_METHOD_ELLIPTIC_F,      (gr_funcptr) _gr_arb_elliptic_f},
+    {GR_METHOD_ELLIPTIC_E_INC,  (gr_funcptr) _gr_arb_elliptic_e_inc},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
     {GR_METHOD_EULERNUM_UI,     (gr_funcptr) _gr_arb_eulernum_ui},

@@ -334,6 +334,7 @@ typedef enum
     GR_METHOD_IS_NONPOSITIVE_REAL,
 
     GR_METHOD_SET_INTERVAL_MID_RAD,
+    GR_METHOD_SET_INTERVAL_MID_INF,
 
     /* todo: roots of unity */
     GR_METHOD_IS_ROOT_OF_UNITY,
@@ -744,6 +745,7 @@ typedef enum
     GR_CTX_RR_ARB, GR_CTX_CC_ACB,
     GR_CTX_REAL_FLOAT_ARF, GR_CTX_COMPLEX_FLOAT_ACF,
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
+    GR_CTX_DECFLOAT, GR_CTX_DECBALL, GR_CTX_DECCFLOAT, GR_CTX_DECCBALL,
     GR_CTX_MPF,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_GR_TRANSFORMED_POLY,
@@ -1318,6 +1320,7 @@ GR_INLINE WARN_UNUSED_RESULT truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ct
 GR_INLINE WARN_UNUSED_RESULT int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FQ_PTH_ROOT)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SET_INTERVAL_MID_RAD)(res, m, r, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET_INTERVAL_MID_INF)(res, m, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }

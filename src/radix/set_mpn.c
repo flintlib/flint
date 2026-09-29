@@ -295,6 +295,26 @@ _radix_set_mpn_recursive(nn_ptr res, nn_srcptr a, slong an_words, slong abits, s
     return len_res;
 }
 
+/* single-entry thread-local cache of the powers table (up to about
+   RADIX_SET_MPN_CACHE_MAX_EXP limbs of input) */
+#define RADIX_SET_MPN_CACHE_MAX_EXP 100000
+
+FLINT_TLS_PREFIX radix_powers_t _radix_set_mpn_cache_powers;
+FLINT_TLS_PREFIX ulong _radix_set_mpn_cache_B = 0;
+FLINT_TLS_PREFIX slong _radix_set_mpn_cache_abits = 0;
+FLINT_TLS_PREFIX slong _radix_set_mpn_cache_e = 0;
+FLINT_TLS_PREFIX int _radix_set_mpn_cache_initialized = 0;
+
+static void
+_radix_set_mpn_cache_cleanup(void)
+{
+    if (_radix_set_mpn_cache_initialized)
+    {
+        radix_powers_clear(_radix_set_mpn_cache_powers);
+        _radix_set_mpn_cache_initialized = 0;
+    }
+}
+
 slong
 radix_set_mpn_divconquer(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 {
@@ -333,9 +353,35 @@ radix_set_mpn_divconquer(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 
     slong e = FLINT_MAX((abits_limbs + 1) / 2, 1);
 
+    /* The table of powers is the dominant cost for moderate sizes; cache
+       the most recent one (per thread), which helps when many numbers of
+       the same size are converted (e.g. printing) */
+    if (_radix_set_mpn_cache_initialized && _radix_set_mpn_cache_B == B
+        && _radix_set_mpn_cache_abits == abits && _radix_set_mpn_cache_e == e)
+    {
+        rn = _radix_set_mpn_recursive(res, a, an, abits, 0, abits_limbs, _radix_set_mpn_cache_powers, 0, radix);
+        return rn;
+    }
+
     radix_powers_init_ui_radix(powers, UWORD(1) << abits, e, radix);
     rn = _radix_set_mpn_recursive(res, a, an, abits, 0, abits_limbs, powers, 0, radix);
-    radix_powers_clear(powers);
+
+    if (e <= RADIX_SET_MPN_CACHE_MAX_EXP)
+    {
+        if (_radix_set_mpn_cache_initialized)
+            radix_powers_clear(_radix_set_mpn_cache_powers);
+        else
+            flint_register_cleanup_function(_radix_set_mpn_cache_cleanup);
+        *_radix_set_mpn_cache_powers = *powers;
+        _radix_set_mpn_cache_B = B;
+        _radix_set_mpn_cache_abits = abits;
+        _radix_set_mpn_cache_e = e;
+        _radix_set_mpn_cache_initialized = 1;
+    }
+    else
+    {
+        radix_powers_clear(powers);
+    }
 
     return rn;
 }

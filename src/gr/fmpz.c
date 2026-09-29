@@ -13,6 +13,7 @@
 #include <gmp.h>
 #include "fexpr.h"
 #include "qqbar.h"
+#include "decimal.h"
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
@@ -154,6 +155,18 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
         case GR_CTX_FMPQ:
             return _gr_fmpz_set_fmpq(res, x, ctx);
+
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_fmpz(res, x, x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decball_get_fmpz(res, x, x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            return deccfloat_get_fmpz(res, x, x_ctx);
+
+        case GR_CTX_DECCBALL:
+            return deccball_get_fmpz(res, x, x_ctx);
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:

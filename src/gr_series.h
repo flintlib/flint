@@ -77,6 +77,7 @@ void gr_series_ctx_clear(gr_ctx_t ctx);
 int gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx);
 truth_t gr_series_ctx_is_ring(gr_ctx_t ctx);
 truth_t gr_series_ctx_is_commutative_ring(gr_ctx_t ctx);
+truth_t gr_series_ctx_is_approx_commutative_ring(gr_ctx_t ctx);
 truth_t gr_series_ctx_is_integral_domain(gr_ctx_t ctx);
 truth_t gr_series_ctx_is_rational_vector_space(gr_ctx_t ctx);
 truth_t gr_series_ctx_is_real_vector_space(gr_ctx_t ctx);
@@ -125,6 +126,7 @@ WARN_UNUSED_RESULT int gr_series_sqrt(gr_series_t res, const gr_series_t x, gr_c
 WARN_UNUSED_RESULT int gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_series_exp(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_series_set_interval_mid_rad(gr_series_t res, const gr_series_t m, const gr_series_t r, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_log(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_sin(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_cos(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
