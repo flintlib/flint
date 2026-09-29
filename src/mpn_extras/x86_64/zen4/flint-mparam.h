@@ -134,4 +134,11 @@
 */
 #define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 48
 
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h
+    (measured on AMD Ryzen 7 PRO 7840U (Zen 4))
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
+
 #endif

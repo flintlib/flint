@@ -22,7 +22,7 @@
 
 #include "flint.h"
 #include "nmod.h"  /* nmod_mul, nmod_fmma */
-#include "flint-mparam.h"  /* FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN */
+#include "flint-mparam.h"  /* FLINT_NMOD_VEC_DOT_{U52,SPLIT_LIMBS}_MIN_LEN */
 
 /*
     SIMD dot products for moduli above 2^32 (see dot_u52.c, dot_u64.c,
@@ -59,14 +59,19 @@
 
 /*
     Minimal lengths for these to beat the scalar code, measured on Ice Lake,
-    Zen 4, Cascade Lake, Broadwell and a Sapphire Rapids-class virtual machine.
-    u52 and u64 agree across the IFMA machines measured, once the two bands of
-    u64 are separated (u64 against _DOT2 in the two-limb band, against
-    _DOT3_ACC / _DOT3 in the three-limb one); the split-limbs crossover varies
-    from 48 (Zen 4) to 128 (Cascade Lake) and never (Broadwell), hence a
-    parameter of flint-mparam.h, where 0 means never.
+    Zen 4, Cascade Lake, Broadwell and Emerald Rapids. For u64, measured
+    against _DOT2 in the two-limb band and against _DOT3_ACC / _DOT3 in the
+    three-limb one, the crossovers are 40-80 and 32-56 on the IFMA machines
+    measured, around these compromises. The split-limbs crossover varies from 48 (Zen 4) to 128 (Cascade
+    Lake) and never (Broadwell), and the u52 one from 32 (Ice Lake, Emerald
+    Rapids: 1.1x and 1.5x faster than _DOT2 at lengths 32 to 39) to 40 (Zen
+    4: 1.1x slower at 32), hence parameters of flint-mparam.h (for split
+    limbs, 0 means never).
 */
-#define NMOD_VEC_DOT_U52_MIN_LEN 40
+#ifndef FLINT_NMOD_VEC_DOT_U52_MIN_LEN
+# define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
+#endif
+#define NMOD_VEC_DOT_U52_MIN_LEN FLINT_NMOD_VEC_DOT_U52_MIN_LEN
 #define NMOD_VEC_DOT_U64_MIN_LEN 80
 #define NMOD_VEC_DOT3_U64_MIN_LEN 48
 #ifndef FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN

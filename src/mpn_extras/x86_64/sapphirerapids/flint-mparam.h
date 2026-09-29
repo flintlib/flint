@@ -93,8 +93,8 @@
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (not measured on Sapphire Rapids yet: the values of x86_64/icelake, the
-    closest AVX512-IFMA machine that was).
+    (measured on Intel Xeon Silver 4514Y (Emerald Rapids), with an external
+    BLAS (OpenBLAS)).
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -128,7 +128,7 @@
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 0
 #define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 0
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 512
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 600
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 26
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
@@ -138,9 +138,16 @@
 /*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
-    (measured on an Emerald Rapids virtual machine; with IFMA it only
-    serves 53 to 60 bits)
+    (measured on Intel Xeon Silver 4514Y (Emerald Rapids); with IFMA it
+    only serves 53 to 60 bits)
 */
-#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 88
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 80
+
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h
+    (measured on Intel Xeon Silver 4514Y (Emerald Rapids))
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 32
 
 #endif

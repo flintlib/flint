@@ -73,12 +73,15 @@
 /*
     Whether the few-columns products of mul_cols.c have a vectorized path
     for this modulus, and the most columns of B for which nmod_mat_mul
-    uses them: all moduli on AVX512-IFMA (u52 up to 2^52, u64 above),
-    2^32 < n < 2^50 with a vector backend of mul_fp_vec.h otherwise
-    (other moduli go to mul_classical: transposed columns + nmod_vec_dot).
+    uses them: n <= 2^52 on AVX512-IFMA (u52; u64 when the inner dimension
+    is too large for u52), 2^32 < n < 2^50 with a vector backend of
+    mul_fp_vec.h otherwise (other moduli go to mul_classical: transposed
+    columns + nmod_vec_dot). Above 2^52, the u64 tier of mul_cols.c is not
+    faster than mul_classical, whose dot products are the split-limbs / u64
+    ones.
 */
 #if NMOD_MAT_HAVE_MUL_U52
-# define NMOD_MAT_MUL_COLS_IS_SIMD(n) 1
+# define NMOD_MAT_MUL_COLS_IS_SIMD(n) ((n) <= (UWORD(1) << 52))
 # define NMOD_MAT_MUL_COLS_MAX 8
 #else
 # define NMOD_MAT_MUL_COLS_IS_SIMD(n) \

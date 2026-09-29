@@ -141,4 +141,11 @@
 */
 #define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 88
 
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h
+    (measured on Intel Xeon Gold 6354 (Ice Lake))
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 32
+
 #endif
