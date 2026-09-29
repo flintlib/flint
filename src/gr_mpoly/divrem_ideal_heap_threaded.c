@@ -1151,6 +1151,14 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         ulong * Rexp;
         slong Rlen;
 
+#if FLINT_USES_PTHREAD
+        /* pairs with the release fence before "next->producer = 1" below:
+           having observed that we are the producer, we must also observe
+           everything the previous producer did before handing the role
+           over -- in particular the final polyQ[w]->length values. */
+        atomic_thread_fence(memory_order_acquire);
+#endif
+
         /* process any further quotient terms that trickled in */
         for (w = 0; w < H->len; w++)
             q_prev_length[w] = (H->polyQ + w)->length;
@@ -1277,8 +1285,20 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         }
 
         next = L->next;
+
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         H->length--;
         H->cur = next;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+
+        /* pairs with the acquire fence at the top of the producer branch
+           above: everything this chunk produced must be visible to whoever
+           observes that it is now the producer. */
+        atomic_thread_fence(memory_order_release);
+#endif
 
         if (next != NULL)
             next->producer = 1;

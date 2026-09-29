@@ -1730,6 +1730,19 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         ulong * Rexp;
         slong Rlen;
 
+#if FLINT_USES_PTHREAD
+        /* pairs with the release fence before "next->producer = 1" below:
+           having observed that we are the producer, we must also observe
+           everything the previous producer did before handing the role
+           over -- in particular the final value of Q->length.  Without
+           this fence a weakly-ordered machine may satisfy the load of
+           Q->length below with a value older than the one the previous
+           producer published, and we would then compute this chunk's
+           remainder from an incomplete quotient (reporting a spurious
+           GR_DOMAIN, or a wrong quotient). */
+        atomic_thread_fence(memory_order_acquire);
+#endif
+
         /* process the remaining quotient terms */
         q_prev_length = Q->length;
 #if FLINT_USES_PTHREAD
@@ -1877,8 +1890,22 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         }
 
         next = L->next;
+
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         H->length--;
         H->cur = next;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+
+        /* pairs with the acquire fence at the top of the producer branch
+           above: everything this chunk produced (the quotient terms
+           appended to H->polyQ, and the H->polyQ->length store that
+           publishes them) must be visible to whoever observes that it is
+           now the producer. */
+        atomic_thread_fence(memory_order_release);
+#endif
 
         if (next != NULL)
             next->producer = 1;
