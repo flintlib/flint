@@ -30,7 +30,7 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 {
     slong t, m;
 #if FLINT_HAVE_FFT_SMALL
-    slong s, l;
+    slong s, l, bits;
 #endif
 
     len1 = FLINT_MIN(len1, nhi);
@@ -79,14 +79,22 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 #if FLINT_HAVE_FFT_SMALL
     s = FLINT_MIN(len2, m);
     l = FLINT_MAX(len2, m);
+    bits = NMOD_BITS(mod);
 
-    if (_nmod_poly_mullow_want_fft_small(l, s, l + s - 1, 0, mod))
+    /* fft_mul_tab is the crossover of mul with KS, KS2 and KS4; with
+       classical as the alternative, fft_small is better from about 100
+       for 9-15 bits and from 32 bits (22-31 bits: the table is kept) */
+    if (_nmod_poly_mullow_want_fft_small(l, s, l + s - 1, 0, mod)
+            || (((bits >= 9 && bits <= 15) || bits >= 32)
+                && FLINT_MIN(l, 2 * s) >= 100))
     {
         _nmod_poly_mulmid_fft_small(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
 
-    if (NMOD_BITS(mod) <= 8 && len2 >= 8 && m >= len2)
+    /* KS computes the whole product: worth it for tiny moduli, and for
+       16 bits or less when the output is much longer than len2 */
+    if (len2 >= 8 && ((bits <= 8 && m >= len2) || (bits <= 16 && m >= 8 * len2)))
         _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
     else
         _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
