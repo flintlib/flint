@@ -111,9 +111,17 @@ _mp_real_const_gamma_1_3_compute(mp_real_t res, slong n)
            prod ... ,
 
    S in the hypergeometric form of y-cruncher's formula file (the
-   eighth root is three square roots).  Ebisu's and Zuniga's 2023-x
-   series measured within 1% of each other and both about 3 times
-   faster than the AGM the old arb code used. */
+   eighth root is three square roots).  Zuniga's 2023-x lemniscate
+   series, Gamma(1/4) = (pi^2 / (4173281000 S^4))^(1/8) with S of
+   P = [0, 0, -26768, 27648], Q = [0, 0, 1658944], R = [21, -80, 64]
+   (y-cruncher's "Gamma(1d4) - Lemniscate Zuniga (2023-x)"), was
+   measured against both this series and the AGM from 10^5 to 10^7 bits
+   on one and two threads.  It has twice the terms of Ebisu's, each
+   gaining half as much: about 7% slower at 10^5 bits and 3-8% faster
+   from 10^6 bits, in the generic splitting as in a plain exact
+   splitting (neither series is in content mode), and the whole, which
+   needs pi^2 instead of pi^6, within the noise (+-10%) of both Ebisu's
+   formula and the AGM. */
 /* from this many limbs Gamma(1/4) = sqrt((2 pi)^(3/2) / agm(1, sqrt 2)),
    the AGM (O(M(n) log n)) in parallel with pi, rather than the series
    (O(M(n) log^2 n)): measured equal from 10^5 to 4 10^6 bits on one

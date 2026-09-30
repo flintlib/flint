@@ -834,6 +834,7 @@ extern FLINT_TLS_PREFIX slong _mp_real_atan_gauss_num;
 void _mp_real_log_primes_vec(mp_real_struct * res, slong num, slong n);
 void _mp_real_atan_gauss_vec(mp_real_struct * res, slong num, slong n);
 void _mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n);
+void _mp_real_atan_ratio_zuniga(mp_real_t res, const fmpz_t d, const fmpz_t t, slong n);
 int _mp_real_store_floors(nn_ptr e, slong nc, mp_real_struct * v, slong num);
 
 /* threads (parallel.c): run two functions, the second on a pool thread
