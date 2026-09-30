@@ -15,17 +15,56 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+/*
+    After trimming, the middle product computes nhi - nlo coefficients from
+    operands of lengths len1 >= len2. It is the transpose of the product of
+    lengths len2 and nhi - nlo, and costs about the same as that product
+    with each algorithm except KS, which computes the full len1 x len2
+    product. So the choice of fft_small is the one _nmod_poly_mul would
+    make for lengths len2 and nhi - nlo; where mul would use KS, classical
+    is used, except for very small moduli.
+*/
 void
 _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
-    slong bits;
-    slong n;
+    slong t, m;
+#if FLINT_HAVE_FFT_SMALL
+    slong s, l;
+#endif
 
     len1 = FLINT_MIN(len1, nhi);
     len2 = FLINT_MIN(len2, nhi);
 
-    if (len1 <= 5 || len2 <= 5 || nhi - nlo <= 5)
+    /* drop the low coefficients that no output coefficient uses */
+    t = nlo - (len2 - 1);
+    if (t > 0)
+    {
+        poly1 += t;
+        len1 -= t;
+        nlo -= t;
+        nhi -= t;
+    }
+
+    t = nlo - (len1 - 1);
+    if (t > 0)
+    {
+        poly2 += t;
+        len2 -= t;
+        nlo -= t;
+        nhi -= t;
+    }
+
+    /* longer operand first: fft_small reads the second length */
+    if (len1 < len2)
+    {
+        FLINT_SWAP(nn_srcptr, poly1, poly2);
+        FLINT_SWAP(slong, len1, len2);
+    }
+
+    m = nhi - nlo;
+
+    if (len2 <= 5 || m <= 5)
     {
         _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
@@ -33,27 +72,35 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 
     if (nlo == 0 && nhi == len1 + len2 - 1)
     {
-        if (len1 >= len2)
-            _nmod_poly_mul(res, poly1, len1, poly2, len2, mod);
-        else
-            _nmod_poly_mul(res, poly2, len2, poly1, len1, mod);
+        _nmod_poly_mul(res, poly1, len1, poly2, len2, mod);
         return;
     }
 
-    n = FLINT_MIN(nhi, len1 + len2 - 1 - nlo);
+#if FLINT_HAVE_FFT_SMALL
+    s = FLINT_MIN(len2, m);
+    l = FLINT_MAX(len2, m);
 
-    if (_nmod_poly_mullow_want_fft_small(len1, len2, n, (poly1 == poly2 && len1 == len2), mod))
+    if (_nmod_poly_mullow_want_fft_small(l, s, l + s - 1, 0, mod))
     {
         _nmod_poly_mulmid_fft_small(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
 
-    bits = NMOD_BITS(mod);
-
-    if (n < 10 + bits * bits / 10)
-        _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
-    else
+    if (NMOD_BITS(mod) <= 8 && len2 >= 8 && m >= len2)
         _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+    else
+        _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+#else
+    {
+        slong bits = NMOD_BITS(mod);
+        slong n = FLINT_MIN(nhi, len1 + len2 - 1 - nlo);
+
+        if (n < 10 + bits * bits / 10)
+            _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        else
+            _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+    }
+#endif
 }
 
 void
