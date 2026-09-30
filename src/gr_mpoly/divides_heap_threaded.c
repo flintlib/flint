@@ -1730,6 +1730,17 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         ulong * Rexp;
         slong Rlen;
 
+#if FLINT_USES_PTHREAD
+        /* Pairs with the release fence before "next->producer = 1" in the
+           previous chunk's producer.  Having observed L->producer == 1 we
+           are entitled to assume that every quotient term of every earlier
+           chunk is already in Q; that assumption is only sound if this load
+           of L->producer is ordered before the load of Q->length below.
+           The two are plain loads from different addresses, so on weakly
+           ordered hardware they may otherwise be satisfied out of order. */
+        atomic_thread_fence(memory_order_acquire);
+#endif
+
         /* process the remaining quotient terms */
         q_prev_length = Q->length;
 #if FLINT_USES_PTHREAD
@@ -1878,6 +1889,24 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
 
         next = L->next;
         H->length--;
+
+#if FLINT_USES_PTHREAD
+        /* Publish the producer handoff.  Everything this thread wrote before
+           this point -- in particular the gr_mpoly_ts_append calls above,
+           including their stores to H->polyQ->length -- must be visible to
+           the thread that later observes next->producer == 1 (see the
+           matching acquire fence in trychunk).  Without this, on weakly
+           ordered hardware the store to next->producer can become visible
+           to another core before the store to H->polyQ->length, so the next
+           producer starts reducing its chunk against a quotient that is
+           missing our final terms; the leftover terms are then not divisible
+           by B and the division is wrongly reported as inexact (GR_DOMAIN).
+           The release fence in gr_mpoly_ts_append does not help here: it
+           orders the term data before the length store, not the length store
+           before the producer store. */
+        atomic_thread_fence(memory_order_release);
+#endif
+
         H->cur = next;
 
         if (next != NULL)
@@ -2252,7 +2281,8 @@ int gr_mpoly_divides_heap_threaded(
 
     /* fall back to the single-threaded algorithm for small inputs, or when
        the coefficient ring does not allow concurrent operations */
-    if (B->length < 2 || A->length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
+    if (!GR_MPOLY_THREADED_DIVISION ||
+        B->length < 2 || A->length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
         return gr_mpoly_divides_heap(Q, A, B, ctx);
 
     thread_limit = A->length/32;

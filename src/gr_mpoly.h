@@ -64,6 +64,21 @@ typedef struct
 typedef gr_ctx_struct gr_mpoly_ctx_struct;
 typedef gr_mpoly_ctx_struct gr_mpoly_ctx_t[1];
 
+/*
+    The chunked producer/consumer pipeline shared by the threaded gr_mpoly
+    division functions communicates between threads through plain volatile
+    fields (the chunk "producer" flags, the chunk list head, and the lengths
+    of the append-only quotient/remainder arrays) rather than through
+    atomics, and is only known to be correct on strongly ordered hardware.
+    Set this to 0 to make every threaded division entry point fall back to
+    its serial counterpart, as fmpz_mpoly/nmod_mpoly already do.
+*/
+#if FLINT_KNOW_STRONG_ORDER
+# define GR_MPOLY_THREADED_DIVISION 1
+#else
+# define GR_MPOLY_THREADED_DIVISION 0
+#endif
+
 #define GR_MPOLY_MCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->mctx)
 #define GR_MPOLY_CCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->cctx)
 #define GR_MPOLY_VARS(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->vars)
