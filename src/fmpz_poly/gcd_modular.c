@@ -23,6 +23,7 @@
 
 #if FLINT_HAVE_FFT_SMALL
 #include "fft_small.h"
+#include "fft_small/impl.h"
 #endif
 
 /*
@@ -201,7 +202,6 @@ _prime_iter_next(_prime_iter_t * it)
     {
         mpn_ctx_struct * R = get_default_mpn_ctx();
         ulong q;
-        slong i;
 
         /* First the primes of the default fft_small context (for which
            multiplication needs a single transform), then other 50-bit
@@ -215,11 +215,8 @@ _prime_iter_next(_prime_iter_t * it)
             q = it->fft_c * (UWORD(1) << 32) + 1;
             it->fft_c--;
 
-            for (i = 0; i < it->fft_count; i++)
-                if (q == R->ffts[i].mod.n)
-                    break;
-
-            if (i == it->fft_count && n_is_prime(q))
+            /* the context primes were returned already */
+            if (_fft_small_mpn_ctx_prime_index(R, q) < 0 && n_is_prime(q))
                 return q;
         }
 
