@@ -995,6 +995,40 @@ For 2 and 3 primes the set of 4 primes is used; the best dedicated
 sets, `x = 7, 17` and `x = 31, 49, 161`, are no faster with Zuniga's
 series.
 
+**Arctangents.**  The same series with `u, v = t \pm i d` gives
+`\log(u/v) = 2i \operatorname{atan}(d/t)` [Zun2025b]_: in terms of
+`s = u + v = 2t` and `p = uv = t^2 + d^2`, which are real,
+
+.. math::
+
+    \rho = -\frac{4 d^6}{27\, t^2 p^2}, \qquad
+    \frac{\mathrm{num}}{\mathrm{den}} = -\frac{8 d^6}{3\, t^2 p^2}, \qquad
+    \frac{c_P}{c_D} = \frac{t\, \mathrm{num}}{64\, d^5},
+
+.. math::
+
+    P = [-s^2 (s^2 - 10p),\; 2 (s^2 - 16p)(s^2 + 2p)],
+
+an alternating series which for `\operatorname{atan}(1/x)` gains the
+same `6 \log_2 x + \log_2(27/4)` bits per term as for
+`\operatorname{atanh}(1/x)` (:func:`_mp_real_atan_ratio_zuniga`).  The
+terms of the Machin formulas for the arguments of Gaussian primes (and
+their followup terms `\operatorname{atan}(p/q)`) use it under the same
+rule, from about `b^2/2` limbs for arguments of `b` bits.  Measured on
+the angles of the first *num* Gaussian primes
+(:func:`_mp_real_atan_gauss_vec`, 64-bit, one thread), the speedup over
+the Taylor series:
+
+    ===========  ===========  ===========  ===========
+    *num*        `10^5` bits  `10^6` bits  `10^7` bits
+    ===========  ===========  ===========  ===========
+    4            1.9          1.9          1.7
+    8            1.2          1.2
+    13           1.3          1.2          1.2
+    20           1.0          1.4
+    32--48       0.9--1.2     1.0          1.0
+    ===========  ===========  ===========  ===========
+
 Fixed-point Newton inverses and roots
 -------------------------------------------------------------------------------
 
@@ -1718,7 +1752,7 @@ data:
   under `Reduction tables`_).  They are computed together by one
   Machin-type formula per set of primes, a small number of fast
   `\operatorname{atanh}(1/x_j)` (resp. `\operatorname{atan}(1/x_j)`)
-  series with large `x_j`, the atanh terms by Zuniga's series (see
+  series with large `x_j`, evaluated by Zuniga's series (see
   `Machin terms as Zuniga series`_).  The formulas were found with
   https://github.com/fredrik-johansson/machin.
 * A table of integer relations (:func:`_mp_real_rel_table`), independent
@@ -1997,11 +2031,10 @@ These tables are shared with arb (``arb_exp_arf_log_reduction``,
     primes and angles of Gaussian primes of the diophantine reductions,
     whose exact floors are read off the balls (the first 13 values of
     each, up to 4608 bits, come from static tables).  The
-    `\operatorname{atan}` terms are evaluated by
-    :func:`_mp_real_atan_frac_bsplit`, and the `\operatorname{atanh}`
-    terms of the logarithms by Zuniga's series from a precision of about
-    `b^2/2` limbs for arguments of `b` bits, by
-    :func:`_mp_real_atanh_frac_bsplit` below.
+    `\operatorname{atanh}` and `\operatorname{atan}` terms are
+    evaluated by Zuniga's series from a precision of about `b^2/2` limbs
+    for arguments of `b` bits, and by :func:`_mp_real_atanh_frac_bsplit`
+    resp. :func:`_mp_real_atan_frac_bsplit` below.
 
 .. macro:: MP_REAL_ATAN_GAUSS_MAX
 

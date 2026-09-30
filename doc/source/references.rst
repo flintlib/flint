@@ -177,6 +177,8 @@ References
 
 .. [Zun2025] \J. Zuniga, "Fast Ramanujan-type Series for Logarithms. Part I", 2025, https://arxiv.org/abs/2506.08245
 
+.. [Zun2025b] \J. Zuniga, "Fast Ramanujan-type Series for Logarithms. Part II", 2025, https://arxiv.org/abs/2506.10321
+
 .. [HM2017] \J. van der Hoeven and B. Mourrain. "Efficient certification of numeric solutions to eigenproblems", MACIS 2017, 81-94, (2017), https://hal.archives-ouvertes.fr/hal-01579079
 
 .. [HS1967] \E. Hansen and R. Smith, "Interval Arithmetic in Matrix Computations, Part II", SIAM Journal of Numerical Analysis, 4(1):1-9 (1967). https://doi.org/10.1137/0704001
