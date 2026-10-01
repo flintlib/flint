@@ -136,7 +136,7 @@ TEST_FUNCTION_START(gr_poly_quotient, state)
         ulong e = n_randint(state, 100);
         int sparse = n_randint(state, 2);
 
-        GR_MUST_SUCCEED(gr_ctx_init_nmod(Fp, n_randprime(state, 2 + n_randint(state, 62), 1)));
+        GR_MUST_SUCCEED(gr_ctx_init_nmod(Fp, n_randprime(state, 2 + n_randint(state, FLINT_BITS - 2), 1)));
         GR_MUST_SUCCEED(gr_ctx_set_is_field(Fp, T_TRUE));
 
         gr_poly_init(m, Fp);

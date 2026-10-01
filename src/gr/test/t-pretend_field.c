@@ -104,7 +104,8 @@ TEST_FUNCTION_START(gr_pretend_field, state)
            often; sometimes n prime */
         fmpz_set_ui(p, small[n_randint(state, 5)]);
         if (which == 0 || which == 3)
-            fmpz_set_ui(q, n_randprime(state, 2 + n_randint(state, which == 3 ? 10 : 40), 1));
+            fmpz_set_ui(q, n_randprime(state, 2 + n_randint(state,
+                which == 3 ? 10 : FLINT_MIN(40, FLINT_BITS - 5)), 1));
         else
         {
             fmpz_randprime(q, state, (which == 2 ? 2 * FLINT_BITS : 2) + n_randint(state, 100), 1);
