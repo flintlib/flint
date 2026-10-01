@@ -82,6 +82,7 @@ WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, 
 #endif
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);
+truth_t gr_generic_ctx_is_pretend_field(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 

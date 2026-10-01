@@ -133,6 +133,82 @@ _gr_nmod_get_fmpz(fmpz_t res, const ulong * x, const gr_ctx_t ctx)
 }
 
 
+/*
+    Pretending to be a field: an operation which needs the inverse of a
+    nonzero non-unit x records the factor gcd(x, n) of the modulus (the
+    first one found) and fails with GR_UNABLE instead of GR_DOMAIN.
+*/
+static truth_t
+_gr_nmod_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    ulong p;
+    _gr_ctx_zero_divisor_lock();
+    p = NMOD_PRETEND(ctx);
+    _gr_ctx_zero_divisor_unlock();
+    if (p != 0)
+        return T_TRUE;
+    return (gr_ctx_is_field(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
+static int
+_gr_nmod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+{
+    _gr_ctx_zero_divisor_lock();
+    if (is_pretend_field == T_TRUE)
+    {
+        if (NMOD_PRETEND(ctx) == 0)
+            NMOD_PRETEND(ctx) = 1;
+    }
+    else
+    {
+        NMOD_PRETEND(ctx) = 0;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return GR_SUCCESS;
+}
+
+/* the status for a failed inversion of x: GR_DOMAIN for zero (or when
+   not pretending), otherwise GR_UNABLE with gcd(x, n) recorded */
+static int
+_gr_nmod_nonunit(ulong x, const gr_ctx_t ctx)
+{
+    ulong g;
+    int status = GR_DOMAIN;
+
+    if (x == 0)
+        return GR_DOMAIN;
+
+    _gr_ctx_zero_divisor_lock();
+    if (NMOD_PRETEND(ctx) != 0)
+    {
+        if (NMOD_PRETEND(ctx) == 1)
+        {
+            g = n_gcd(x, NMOD_CTX(ctx).n);
+            if (g != 1 && g != NMOD_CTX(ctx).n)
+                NMOD_PRETEND((gr_ctx_struct *) ctx) = g;
+        }
+        status = GR_UNABLE;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return status;
+}
+
+static int
+_gr_nmod_ctx_recover_zero_divisor(ulong * res, gr_ctx_t ctx)
+{
+    ulong p;
+    _gr_ctx_zero_divisor_lock();
+    p = NMOD_PRETEND(ctx);
+    _gr_ctx_zero_divisor_unlock();
+    if (p > 1)
+    {
+        res[0] = p;
+        return GR_SUCCESS;
+    }
+    res[0] = 0;
+    return GR_UNABLE;
+}
+
 static int
 _gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
 {
@@ -154,7 +230,7 @@ _gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
     else
     {
         res[0] = 0;
-        return GR_DOMAIN;
+        return _gr_nmod_nonunit(x[0], ctx);
     }
 }
 
@@ -432,13 +508,21 @@ _gr_nmod_is_invertible(const ulong * x, const gr_ctx_t ctx)
 {
     ulong r, g;
     g = n_gcdinv(&r, x[0], NMOD_CTX(ctx).n);
-    return (g == 1) ? T_TRUE : T_FALSE;
+    if (g == 1)
+        return T_TRUE;
+    return (_gr_nmod_nonunit(x[0], ctx) == GR_UNABLE) ? T_UNKNOWN : T_FALSE;
 }
 
 static truth_t
 _gr_nmod_divides(const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
     ulong t;
+
+    /* (pretending: a nonzero non-unit x is a zero divisor to report) */
+    if (x[0] != 0 && n_gcd(x[0], NMOD_CTX(ctx).n) != 1 &&
+        _gr_nmod_nonunit(x[0], ctx) == GR_UNABLE)
+        return T_UNKNOWN;
+
     return nmod_divides(&t, y[0], x[0], NMOD_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
@@ -454,7 +538,7 @@ _gr_nmod_div_nonunique(ulong * res, const ulong * x, const ulong * y, const gr_c
     {
         _gr_nmod_mul(res, x, &t, ctx);
     }
-    else
+    else if (status == GR_DOMAIN)
     {
         status = nmod_divides(res, *x, *y, NMOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
     }
@@ -488,7 +572,7 @@ _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
         }
 
         if (m % 2 == 0)
-            return GR_DOMAIN;
+            return _gr_nmod_nonunit(2 % m, ctx);
 
         /* quickly construct 1/2 */
         c = (m - 1) / 2 + 1;
@@ -980,8 +1064,12 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    if (mod.n <= (ulong) len || mod.n % 2 == 0)
+    /* (1/n is undefined: a domain error also in a field) */
+    if (mod.n <= (ulong) len)
         return GR_DOMAIN;
+
+    if (mod.n % 2 == 0)
+        return _gr_nmod_nonunit(2, ctx);
 
     res[0] = 1;
     res[1] = c2 = (mod.n - 1) / 2 + 1;;
@@ -989,7 +1077,7 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
     for (k = 3; k <= len; k += 2)
     {
         if (n_gcdinv(res + k - 1, k, mod.n) != 1)
-            return GR_DOMAIN;
+            return _gr_nmod_nonunit(k, ctx);
     }
 
     for (k = 4; k <= len; k += 2)
@@ -1283,7 +1371,7 @@ _gr_nmod_poly_inv_series_basecase(ulong * res,
     if (q != 1)
     {
         if (n_gcdinv(&q, q, NMOD_CTX(ctx).n) != 1)
-            return GR_DOMAIN;
+            return _gr_nmod_nonunit(f[0], ctx);
     }
 
     _nmod_poly_inv_series_basecase_preinv1(res, f, flen, n, q, NMOD_CTX(ctx));
@@ -1337,7 +1425,7 @@ _gr_nmod_poly_div_series_basecase(ulong * res,
     if (q != 1)
     {
         if (n_gcdinv(&q, q, NMOD_CTX(ctx).n) != 1)
-            return GR_DOMAIN;
+            return _gr_nmod_nonunit(g[0], ctx);
     }
 
     _nmod_poly_div_series_basecase_preinv1(res, f, flen, g, glen, n, q, NMOD_CTX(ctx));
@@ -1730,6 +1818,9 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) _gr_nmod_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) _gr_nmod_ctx_is_pretend_field},
+    {GR_METHOD_CTX_SET_IS_PRETEND_FIELD,(gr_funcptr) _gr_nmod_ctx_set_is_pretend_field},
+    {GR_METHOD_CTX_RECOVER_ZERO_DIVISOR,(gr_funcptr) _gr_nmod_ctx_recover_zero_divisor},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_nmod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_nmod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_nmod_swap},
@@ -1845,6 +1936,7 @@ gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
     ctx->sizeof_elem = sizeof(ulong);
     ctx->size_limit = WORD_MAX;
     NMOD_IS_PRIME(ctx) = T_UNKNOWN;
+    NMOD_PRETEND(ctx) = 0;
 
     nmod_init(NMOD_CTX_REF(ctx), n);
 
@@ -1866,6 +1958,7 @@ _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
     ctx->sizeof_elem = sizeof(ulong);
     ctx->size_limit = WORD_MAX;
     NMOD_IS_PRIME(ctx) = T_UNKNOWN;
+    NMOD_PRETEND(ctx) = 0;
 
     *NMOD_CTX_REF(ctx) = ((nmod_t *) nmod_t_ref)[0];
     ctx->methods = __gr_nmod_methods;

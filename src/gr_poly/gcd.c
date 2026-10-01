@@ -23,7 +23,9 @@
 int
 _gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    /* (also for rings pretending to be fields: the algorithms propagate
+       the failure to invert a zero divisor) */
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         /* Over finite fields, the half-gcd algorithm is used above a
            cutoff (as in _gr_poly_resultant; tuning is ring-dependent and

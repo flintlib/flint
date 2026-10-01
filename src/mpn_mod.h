@@ -44,6 +44,8 @@ typedef struct
     ulong dnormed[MPN_MOD_MAX_LIMBS];
     flint_bitcnt_t norm;
     truth_t is_prime;
+    int pretend;        /* pretending to be a field */
+    nn_ptr factor;      /* a factor of the modulus found while pretending (nlimbs limbs; NULL: none) */
 }
 _mpn_mod_ctx_struct;
 
@@ -54,6 +56,8 @@ _mpn_mod_ctx_struct;
 #define MPN_MOD_CTX_MODULUS_PREINV(ctx) (MPN_MOD_CTX(ctx)->dinv)
 #define MPN_MOD_CTX_NORM(ctx) (MPN_MOD_CTX(ctx)->norm)
 #define MPN_MOD_CTX_IS_PRIME(ctx) (MPN_MOD_CTX(ctx)->is_prime)
+#define MPN_MOD_CTX_PRETEND(ctx) (MPN_MOD_CTX(ctx)->pretend)
+#define MPN_MOD_CTX_FACTOR(ctx) (MPN_MOD_CTX(ctx)->factor)
 #define MPN_MOD_CTX_MODULUS_BITS(ctx) ((MPN_MOD_CTX_NLIMBS(ctx) - 1) * FLINT_BITS + (FLINT_BITS - MPN_MOD_CTX_NORM(ctx)))
 
 MPN_MOD_INLINE int
@@ -64,6 +68,11 @@ mpn_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
 }
 
 /* Basic operations and arithmetic */
+
+truth_t mpn_mod_ctx_is_pretend_field(gr_ctx_t ctx);
+int mpn_mod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field);
+int mpn_mod_ctx_recover_zero_divisor(nn_ptr res, gr_ctx_t ctx);
+int _mpn_mod_nonunit(nn_srcptr x, nn_srcptr g, slong gsize, gr_ctx_t ctx);
 
 int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n);
 int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs);

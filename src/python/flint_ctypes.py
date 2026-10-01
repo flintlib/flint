@@ -633,6 +633,51 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_field, "is_field")
 
+    def is_pretend_field(self):
+        """
+        Return whether this structure is a field or pretends to be one
+        (see :meth:`set_is_pretend_field`).
+
+            >>> QQ.is_pretend_field()
+            True
+            >>> ZZ.is_pretend_field()
+            False
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_pretend_field, "is_pretend_field")
+
+    def set_is_pretend_field(self, flag=True):
+        """
+        Make this ring compute as if it were a field: an operation which
+        meets a nonzero non-invertible element raises
+        ``FlintUnableError`` after recording a zero divisor, which
+        :meth:`recover_zero_divisor` returns.
+
+            >>> R = IntegersMod_fmpz_mod(91)
+            >>> R.set_is_pretend_field()
+            >>> R.is_pretend_field()
+            True
+            >>> R(14).inv()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute inv(x) in {Integers mod 91 (fmpz)} for {x = 14}
+            >>> R.recover_zero_divisor()
+            7
+            >>> R(5).inv()
+            73
+
+        """
+        status = libflint.gr_ctx_set_is_pretend_field(self._ref, T_TRUE if flag else T_FALSE)
+        if status:
+            _handle_error(self, status, "set_is_pretend_field")
+
+    def recover_zero_divisor(self):
+        """
+        Return the zero divisor recorded by a ring pretending to be a
+        field (see :meth:`set_is_pretend_field`).
+        """
+        return self._constant(self, libflint.gr_ctx_recover_zero_divisor, "recover_zero_divisor")
+
     def is_rational_vector_space(self):
         """
         Return whether this structure is a vector space over the rational numbers.

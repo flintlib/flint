@@ -160,6 +160,36 @@ Residue rings and finite fields
     enable some functions to complete that otherwise would
     return ``GR_UNABLE``.
 
+.. function:: truth_t gr_ctx_is_pretend_field(gr_ctx_t ctx)
+              int gr_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+              int gr_ctx_recover_zero_divisor(gr_ptr res, gr_ctx_t ctx)
+
+    A ring may *pretend* to be a field without being known to be one,
+    in the style of dynamic evaluation: computations proceed as if
+    it were a field, and an operation which encounters a nonzero
+    element that is not invertible fails with ``GR_UNABLE`` (not
+    ``GR_DOMAIN``, which keeps its meaning in a field: for example,
+    division by zero) after recording a zero divisor in the context.
+    The zero divisor can then be retrieved with
+    :func:`gr_ctx_recover_zero_divisor`, which returns ``GR_UNABLE``
+    if none has been recorded. For `\mathbb{Z}/n\mathbb{Z}`, the zero
+    divisor is a nontrivial factor of `n` (the first one found). A
+    typical use is to attempt a computation as if `n` were prime and to
+    split `n` when this fails.
+
+    :func:`gr_ctx_is_pretend_field` returns ``T_TRUE`` if the ring is
+    a field or pretends to be one; :func:`gr_ctx_is_field` is not
+    affected by the pretense. Algorithms for fields which
+    propagate the failure of an inversion (the Euclidean and half-gcd
+    algorithms for polynomial gcds, LU decomposition, ...) check
+    :func:`gr_ctx_is_pretend_field`; algorithms whose correctness
+    depends on the ring being a field (root finding and factorization,
+    for example) check :func:`gr_ctx_is_field`. Setting the pretense
+    to ``T_FALSE`` forgets any recorded zero divisor.
+
+    Supported by :func:`gr_ctx_init_nmod`, :func:`gr_ctx_init_fmpz_mod`
+    and :func:`gr_ctx_init_mpn_mod`. The recording is thread-safe.
+
 See:
 
 * :func:`gr_ctx_init_nmod`
@@ -400,6 +430,81 @@ in :ref:`gr-series`.
 .. function:: void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random power series ring.
+
+Quotient rings of polynomial rings
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_poly_quotient(gr_ctx_t ctx, gr_ctx_t base, const gr_poly_t modulus)
+
+    Initializes *ctx* to the quotient ring `F[x] / (m)` where *F* is
+    the commutative ring *base* and *m* is the monic polynomial *modulus*.
+    Elements are represented as polynomials over *base*
+    (type :type:`gr_poly_struct`) reduced modulo *m*.
+    The context stores precomputed data for reduction modulo *m*
+    (a :type:`gr_poly_preinv_t`, whose representation is selected by the
+    method ``GR_METHOD_POLY_PREINV_SET`` of the base ring), which is used
+    for multiplication and for powers (modular exponentiation).
+
+    If *F* is a field and *m* is irreducible, the quotient ring is a field,
+    but this is not assumed by default: :func:`gr_ctx_is_field` returns
+    ``T_UNKNOWN`` unless the user declares *m* irreducible with
+    :func:`gr_ctx_set_is_field` (it then returns ``T_TRUE`` if *F*
+    is known to be a field).
+
+    The ring can also be told to pretend to be a field with
+    :func:`gr_ctx_set_is_pretend_field` even if *m* is only
+    conjecturally irreducible (*dynamic evaluation*), provided that
+    *F* is a field or pretends to be one.
+    All operations remain correct as ring operations, and an inversion
+    of a zero divisor fails with ``GR_UNABLE`` while recording a
+    nontrivial monic factor of *m* in a table in the context.
+    The first recorded factor can be retrieved as an element with
+    :func:`gr_ctx_recover_zero_divisor`, and the whole table with
+    the functions below, from which the user can recover a refined
+    modulus. A failure in a base ring that pretends to be a field
+    propagates as ``GR_UNABLE`` as well; the zero divisor is then
+    recorded in that ring.
+    A modulus which is known to be reducible can also be used without
+    the pretense, in which case the context represents a genuine
+    (non-integral) quotient ring in which zero divisors are simply
+    not invertible (``GR_DOMAIN``).
+
+.. function:: const gr_poly_struct * gr_poly_quotient_ctx_modulus(gr_ctx_t ctx)
+              gr_ctx_struct * gr_poly_quotient_ctx_base(gr_ctx_t ctx)
+              slong gr_poly_quotient_ctx_degree(gr_ctx_t ctx)
+
+    Accessors for the modulus, the base ring and the degree of the modulus.
+
+.. function:: int gr_poly_quotient_ctx_refine(gr_ctx_t ctx, const gr_poly_t new_modulus)
+
+    Replaces the modulus by *new_modulus*, which must be a monic polynomial
+    of positive degree. If it divides the current modulus (for instance,
+    a factor recovered from a zero divisor), existing elements remain valid
+    representatives of their images in the new quotient ring: they are
+    reduced on the fly by subsequent operations, so no conversion is needed.
+    The previous modulus is kept alive until the context is cleared, so
+    that a pointer obtained from :func:`gr_poly_quotient_ctx_modulus`
+    remains valid. Returns ``GR_DOMAIN`` if *new_modulus* is not monic
+    or has degree less than one.
+
+.. function:: ulong gr_poly_quotient_ctx_version(gr_ctx_t ctx)
+
+    Returns a counter which is incremented on each refinement.
+
+.. function:: slong gr_poly_quotient_ctx_num_zero_divisors(gr_ctx_t ctx)
+              const gr_poly_struct * gr_poly_quotient_ctx_zero_divisor(gr_ctx_t ctx, slong i)
+              void gr_poly_quotient_ctx_clear_zero_divisors(gr_ctx_t ctx)
+
+    Access to the table of nontrivial monic factors of the modulus
+    discovered by failed inversions while the ring pretends to be a field.
+    Recording is thread-safe, but these accessors must not be used
+    concurrently with operations that may record a new factor.
+
+.. function:: int gr_poly_quotient_get_poly(gr_poly_t res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_poly_quotient_set_poly(gr_ptr res, const gr_poly_t x, gr_ctx_t ctx)
+
+    Conversion between elements and polynomials over the base ring;
+    the output is always reduced modulo the current modulus.
 
 Fraction fields
 -------------------------------------------------------------------------------

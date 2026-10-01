@@ -33,7 +33,7 @@ int _gr_poly_resultant_generic(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B,
     if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
         return GR_SUCCESS;
 
-    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         if (FLINT_MIN(lenA, lenB) >= HGCD_CUTOFF && gr_ctx_is_finite(ctx) == T_TRUE)
             status = _gr_poly_resultant_hgcd(res, A, lenA, B, lenB, HGCD_INNER_CUTOFF, HGCD_CUTOFF, ctx);
