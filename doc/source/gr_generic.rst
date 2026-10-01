@@ -52,7 +52,12 @@ Generic string parsing
               int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx)
 
     Parses expression string. Generators returned by :func:`gr_gens_recursive` are handled
-    automatically. We have the following flags:
+    automatically, as are the constants ``pi``, ``i``, ``inf`` and ``nan``
+    (when the ring supports them) and the operator ``+/-`` which
+    constructs a ball or interval via :func:`gr_set_interval_mid_rad`
+    (via :func:`gr_set_interval_mid_inf` for the special form ``+/- inf``,
+    which does not require ``inf`` to be an element of the ring).
+    We have the following flags:
 
     * ``GR_PARSE_RING_EXPONENTS`` - by default, only (nonnegative) integer literals are allowed
       for exponents. If this flag is set, exponents are parsed as arbitrary subexpressions

@@ -257,6 +257,30 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 }
 
+/* m +/- inf where inf is the constant polynomial: the constant coefficient
+   gets an infinite radius */
+static int
+polynomial_set_interval_mid_inf(gr_poly_t res, const gr_poly_t m, gr_ctx_t ctx)
+{
+    gr_ctx_ptr cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    int status;
+
+    status = gr_poly_set(res, m, cctx);
+    if (status != GR_SUCCESS)
+        return status;
+
+    if (res->length == 0)
+    {
+        gr_poly_fit_length(res, 1, cctx);
+        _gr_poly_set_length(res, 1, cctx);
+        status = gr_zero(gr_poly_coeff_ptr(res, 0, cctx), cctx);
+    }
+
+    status |= gr_set_interval_mid_inf(gr_poly_coeff_ptr(res, 0, cctx), gr_poly_coeff_ptr(res, 0, cctx), cctx);
+    _gr_poly_normalise(res, cctx);
+    return status;
+}
+
 static int
 polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_t r, gr_ctx_t ctx)
 {
@@ -889,6 +913,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) polynomial_set_other},
     {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) polynomial_set_interval_mid_rad},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) polynomial_set_interval_mid_inf},
     /* todo: we actually want parse using sparse polynomials
              before converting to the dense representation, to avoid O(n^2) behavior */
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},

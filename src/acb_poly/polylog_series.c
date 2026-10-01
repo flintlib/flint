@@ -13,22 +13,38 @@
 #include "acb_poly/impl.h"
 #include "acb_hypgeom.h"
 
-/* note: will not return a wrong value, as arf_get_si aborts on overflow */
-static slong
-arb_get_si_lower(const arb_t x)
+/* Sets v to a lower bound for x, clamped from above to 2^30 (still a lower
+   bound). Returns 0 if x is not finite or is possibly below -2^30. */
+static int
+arb_get_si_lower(slong * v, const arb_t x)
 {
     arf_t t;
-    slong v;
+    int ok;
+
+    if (!arb_is_finite(x))
+        return 0;
 
     arf_init(t);
     arf_set_mag(t, arb_radref(x));
     arf_sub(t, arb_midref(x), t, 2 * FLINT_BITS, ARF_RND_FLOOR);
 
-    v = arf_get_si(t, ARF_RND_FLOOR);
+    if (arf_cmp_si(t, WORD(1) << 30) > 0)
+    {
+        *v = WORD(1) << 30;
+        ok = 1;
+    }
+    else if (arf_cmp_si(t, -(WORD(1) << 30)) < 0)
+    {
+        ok = 0;
+    }
+    else
+    {
+        *v = arf_get_si(t, ARF_RND_FLOOR);
+        ok = 1;
+    }
 
     arf_clear(t);
-
-    return v;
+    return ok;
 }
 
 static slong
@@ -237,7 +253,16 @@ _acb_poly_polylog_cpx_small(acb_ptr w, const acb_t s, const acb_t z, slong len, 
 
     is_real = polylog_is_real(s, z);
     acb_get_mag(zmag, z);
-    sigma = arb_get_si_lower(acb_realref(s));
+
+    if (!arb_get_si_lower(&sigma, acb_realref(s)))
+    {
+        _acb_vec_indeterminate(w, len);
+        acb_clear(a);
+        mag_clear(zmag);
+        mag_clear(err);
+        mag_clear(errf);
+        return;
+    }
 
     N = polylog_choose_terms(err, sigma, zmag, len - 1, prec);
 

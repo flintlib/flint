@@ -1206,6 +1206,23 @@ static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 }
 
 
+/* [m +/- inf] via an infinite radius, when the ring has one */
+int
+gr_generic_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    GR_TMP_INIT(t, ctx);
+    status = gr_pos_inf(t, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_set_interval_mid_rad(res, m, t, ctx);
+    else
+        status = GR_UNABLE;
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
 /* at least catch square roots -- todo: generalize to nth roots */
 int
 gr_generic_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
@@ -2879,6 +2896,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
 
     {GR_METHOD_SET_STR,                 (gr_funcptr) gr_generic_set_str},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) gr_generic_set_interval_mid_inf},
 
     {GR_METHOD_GET_FEXPR_SERIALIZE,     (gr_funcptr) gr_generic_get_fexpr_serialize},
     {GR_METHOD_SET_FEXPR,               (gr_funcptr) gr_generic_set_fexpr},
@@ -2996,6 +3014,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_ASINH,                   (gr_funcptr) gr_generic_asinh},
     {GR_METHOD_ATANH,                   (gr_funcptr) gr_generic_atanh},
 
+    {GR_METHOD_SEC_PI,                  (gr_funcptr) gr_generic_sec_pi},
+    {GR_METHOD_CSC_PI,                  (gr_funcptr) gr_generic_csc_pi},
+    {GR_METHOD_ASIN_PI,                 (gr_funcptr) gr_generic_asin_pi},
+    {GR_METHOD_ACOS_PI,                 (gr_funcptr) gr_generic_acos_pi},
+    {GR_METHOD_ATAN_PI,                 (gr_funcptr) gr_generic_atan_pi},
+    {GR_METHOD_ACOT_PI,                 (gr_funcptr) gr_generic_acot_pi},
+    {GR_METHOD_ASEC_PI,                 (gr_funcptr) gr_generic_asec_pi},
+    {GR_METHOD_ACSC_PI,                 (gr_funcptr) gr_generic_acsc_pi},
     {GR_METHOD_ACOT,                    (gr_funcptr) gr_generic_acot},
     {GR_METHOD_ASEC,                    (gr_funcptr) gr_generic_asec},
     {GR_METHOD_ACSC,                    (gr_funcptr) gr_generic_acsc},

@@ -127,6 +127,7 @@ WARN_UNUSED_RESULT int gr_generic_set_str_expr(gr_ptr res, const char * s, int f
 WARN_UNUSED_RESULT int gr_generic_set_str(gr_ptr res, const char * s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_str_balance_additions(gr_ptr res, const char * s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx);
 
 #ifdef FEXPR_H
 WARN_UNUSED_RESULT int gr_generic_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t expr, gr_ctx_t ctx);

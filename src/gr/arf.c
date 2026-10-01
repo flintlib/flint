@@ -21,6 +21,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "nfloat.h"
+#include "decimal.h"
 
 typedef struct
 {
@@ -200,6 +201,22 @@ _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             nfloat_get_arf(res, x, x_ctx);
             arf_set_round(res, res, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_arf(res, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decfloat_get_arf(res, DECBALL_MIDREF((decball_srcptr) x), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            if (!_deccfloat_is_real((deccfloat_srcptr) x))
+                return GR_DOMAIN;
+            return decfloat_get_arf(res, DECCFLOAT_REALREF((deccfloat_srcptr) x), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCBALL:
+            if (!_deccball_is_real((deccball_srcptr) x, x_ctx))
+                return GR_DOMAIN;
+            return decfloat_get_arf(res, DECBALL_MIDREF(DECCBALL_REALREF((deccball_srcptr) x)), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
 
         default:
             {

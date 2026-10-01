@@ -206,6 +206,50 @@ gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     return status;
 }
 
+/* [m +/- r] coefficientwise; the error term is the smaller of the two */
+int
+gr_series_set_interval_mid_rad(gr_series_t res, const gr_series_t m, const gr_series_t r, gr_ctx_t ctx)
+{
+    gr_ctx_ptr cctx = GR_SERIES_ELEM_CTX(ctx);
+    slong i, mlen, rlen, len, err, trunc;
+    int status = GR_SUCCESS;
+    gr_poly_t t;
+    gr_ptr zero;
+
+    err = FLINT_MIN(GR_SERIES_ERROR(m), GR_SERIES_ERROR(r));
+    trunc = FLINT_MIN(GR_SERIES_PREC(ctx), err);
+
+    mlen = FLINT_MIN(GR_SERIES_POLY(m)->length, trunc);
+    rlen = FLINT_MIN(GR_SERIES_POLY(r)->length, trunc);
+    len = FLINT_MAX(mlen, rlen);
+
+    gr_poly_init(t, cctx);
+    gr_poly_fit_length(t, len, cctx);
+    _gr_poly_set_length(t, len, cctx);
+
+    zero = gr_heap_init(cctx);
+
+    for (i = 0; i < len; i++)
+    {
+        gr_srcptr mi = (i < mlen) ? gr_poly_coeff_srcptr(GR_SERIES_POLY(m), i, cctx) : zero;
+        gr_srcptr ri = (i < rlen) ? gr_poly_coeff_srcptr(GR_SERIES_POLY(r), i, cctx) : zero;
+
+        if (i < rlen)
+            status |= gr_set_interval_mid_rad(gr_poly_coeff_ptr(t, i, cctx), mi, ri, cctx);
+        else
+            status |= gr_set(gr_poly_coeff_ptr(t, i, cctx), mi, cctx);
+    }
+
+    gr_heap_clear(zero, cctx);
+    _gr_poly_normalise(t, cctx);
+
+    gr_poly_swap(GR_SERIES_POLY(res), t, cctx);
+    gr_poly_clear(t, cctx);
+    GR_SERIES_ERROR(res) = (err > GR_SERIES_PREC(ctx) && err != GR_SERIES_ERR_EXACT) ? GR_SERIES_PREC(ctx) : err;
+
+    return status;
+}
+
 int
 gr_series_gen(gr_series_t res, gr_ctx_t ctx)
 {
@@ -1958,6 +2002,12 @@ gr_series_ctx_is_ring(gr_ctx_t ctx)
 }
 
 truth_t
+gr_series_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_approx_commutative_ring(GR_SERIES_ELEM_CTX(ctx));
+}
+
+truth_t
 gr_series_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     return gr_ctx_is_commutative_ring(GR_SERIES_ELEM_CTX(ctx));
@@ -2184,6 +2234,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_series_ctx_gen_name},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_series_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_series_ctx_is_commutative_ring},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_series_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) gr_series_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_real_vector_space},
@@ -2211,6 +2262,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) gr_series_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) gr_series_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) gr_series_set_other},
+    {GR_METHOD_SET_INTERVAL_MID_RAD, (gr_funcptr) gr_series_set_interval_mid_rad},
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) gr_series_neg},
     {GR_METHOD_ADD,         (gr_funcptr) gr_series_add},

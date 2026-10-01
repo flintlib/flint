@@ -21,6 +21,7 @@
 #include "fmpq_mat.h"
 #include "fexpr.h"
 #include "qqbar.h"
+#include "decimal.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -159,6 +160,18 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_FMPQ:
             fmpq_set(res, x);
             return GR_SUCCESS;
+
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decball_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            return deccfloat_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECCBALL:
+            return deccball_get_fmpq(res, x, x_ctx);
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:

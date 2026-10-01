@@ -161,11 +161,64 @@ void radix_mulmid_classical(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slon
 void radix_mulmid_KS(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_naive(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 
+/* Number of pairs (i, j) with 0 <= i < an, 0 <= j < bn and i + j < k;
+   this counts the limb products the classical algorithm performs. It is
+   computed in floating point since it can exceed the range of an slong on
+   32-bit systems (and it is only used for tuning decisions). */
+RADIX_INLINE double
+_radix_mulmid_pairs_below(slong an, slong bn, slong k)
+{
+    double a, b, t;
+
+    if (an < bn)
+        FLINT_SWAP(slong, an, bn);
+
+    a = (double) an;
+    b = (double) bn;
+
+    if (k <= 0)
+        return 0.0;
+    if (k <= bn)
+        return (double) k * ((double) k + 1.0) * 0.5;
+    if (k <= an)
+        return b * (b + 1.0) * 0.5 + ((double) k - b) * b;
+    if (k >= an + bn)
+        return a * b;
+    t = (double) (an + bn - k);
+    return a * b - t * (t + 1.0) * 0.5;
+}
+
+/* Tuning: the classical algorithm costs about one unit per limb product
+   while the FFT (or Kronecker) algorithm costs roughly a constant number
+   of units per input limb regardless of the requested slice. The ratio
+   is chosen so that a balanced full product switches at 80 limbs; a
+   truncated product (a high product for a floating-point multiplication,
+   or a product with a short operand) needs proportionally fewer limb
+   products and stays classical for longer. */
+#if FLINT_HAVE_FFT_SMALL
+#define RADIX_MULMID_FFT_CUTOFF_RATIO 40
+#else
+/* Kronecker substitution pads each limb to two words, so the crossover
+   is much later (about 350 limbs for a balanced full product). */
+#define RADIX_MULMID_FFT_CUTOFF_RATIO 175
+#endif
+
 RADIX_INLINE void
 radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix)
 {
-    /* todo: tuning */
+    double work;
+
     if (FLINT_MIN(an, bn) < 80 || hi - lo < 80)
+    {
+        radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
+        return;
+    }
+
+    /* limb products needed for the slice, including the ones just
+       below lo which the classical algorithm computes for carries */
+    work = _radix_mulmid_pairs_below(an, bn, hi) - _radix_mulmid_pairs_below(an, bn, FLINT_MAX(lo - 1, 0));
+
+    if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) (an + bn))
         radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
     else
 #if FLINT_HAVE_FFT_SMALL

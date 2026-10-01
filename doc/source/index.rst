@@ -196,6 +196,7 @@ Real and complex numbers
    examples_arb.rst
    mag.rst
    nfloat.rst
+   decimal.rst
    arf.rst
    acf.rst
    arb.rst

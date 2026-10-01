@@ -211,6 +211,16 @@ Except where otherwise noted, the following rules apply:
     * *naive* is an unoptimized reference implementation which does a polynomial
       multiplication using ``fmpz_poly``.
 
+    The dispatching function :func:`radix_mulmid` uses the classical
+    algorithm when either operand or the requested slice is shorter than
+    80 limbs, and otherwise when the number of limb products in the
+    requested slice is smaller than
+    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot (xn + yn)`, since
+    the cost of the FFT algorithm depends essentially on the input lengths
+    only while the classical algorithm benefits from short slices (for
+    example, a truncated high product needs about half as many limb
+    products as the full product).
+
 .. function:: ulong radix_divrem_1(nn_ptr res, nn_srcptr x, slong xn, ulong d, const radix_t radix)
 
     Sets *(res, xn)* to the quotient of *(x, xn)* divided by *d*, returning the
@@ -383,7 +393,10 @@ Radix conversion
     to *res* and returning the exact size of the result in the target radix.
     Leading zero limbs are omitted from the output size and may or may not be written.
     Requires that *res* has space for at least ``radix_set_mpn_need_alloc(an, radix)``
-    limbs.
+    limbs. The divide and conquer version caches (per thread) the table
+    of powers used most recently, so that repeated conversions of inputs
+    of the same size (for example when printing many numbers) do not
+    recompute it.
 
 .. function:: slong radix_set_mpn_need_alloc(slong n, const radix_t radix)
 
