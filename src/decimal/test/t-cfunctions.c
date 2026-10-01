@@ -425,5 +425,29 @@ cleanup2:
         }
     }
 
+    /* regression: the tiny-argument tail bound must include the leading
+       tail term (sinc(z) = 1 - z^2/6 + ..., with a small limb radix) */
+    {
+        gr_ctx_t ctx;
+        gr_ptr x, y, z;
+
+        _gr_ctx_init_decimal(ctx, DECIMAL_CTX_CFLOAT, 1, 11, DECIMAL_RND_CEIL, 0);
+        x = gr_heap_init(ctx);
+        y = gr_heap_init(ctx);
+        z = gr_heap_init(ctx);
+        GR_MUST_SUCCEED(gr_set_str(x, "-0.00036857*I", ctx));
+        GR_MUST_SUCCEED(gr_set_str(z, "1.0000000227", ctx));
+        if (gr_sinc(y, x, ctx) != GR_SUCCESS || gr_equal(y, z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: sinc (tiny argument)\n");
+            flint_printf("y = %{gr}\n", y, ctx);
+            flint_abort();
+        }
+        gr_heap_clear(x, ctx);
+        gr_heap_clear(y, ctx);
+        gr_heap_clear(z, ctx);
+        gr_ctx_clear(ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }

@@ -890,6 +890,9 @@ int _decball_arb_gr(decball_ptr * res, slong nres, decball_srcptr * args, slong 
 int _decfloat_round_with_tail(decfloat_t res, const decfloat_t S, int tail_sign, slong tail_exp, slong prec, int rnd, gr_ctx_t ctx);
 slong _decfloat_sci_exp_clamped(const decfloat_t x, gr_ctx_t ctx);
 int _decfloat_round_ball(decfloat_t res, const decball_t Y, slong prec, int rnd, gr_ctx_t bctx, gr_ctx_t ctx);
+int _decfloat_round_arb(decfloat_t res, const arb_t x, slong prec, int rnd, gr_ctx_t ctx);
+int _decfloat_set_round_arf_small(decfloat_t res, const arf_t x, slong prec, int rnd, decimal_rounding_info * info, gr_ctx_t ctx);
+int _decfloat_round_arb_small(decfloat_t res, const arf_t mid, const mag_t rad, slong prec, int rnd, gr_ctx_t ctx);
 slong _decimal_digits_to_bits(slong prec);
 int _decimal_arb_args_infeasible(int method, decfloat_srcptr * re, decfloat_srcptr * im, slong nargs, slong prec, gr_ctx_t ctx);
 
