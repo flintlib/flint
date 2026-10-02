@@ -12,6 +12,11 @@
 #include <math.h>
 #include "acb.h"
 #include "acb_dirichlet.h"
+#include "dfloat.h"
+
+int acb_dirichlet_zeta_rs_use_dfloat = 1;
+
+#define ZETA_RS_DFLOAT_CUTOFF 16
 
 void
 acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)
@@ -204,10 +209,27 @@ acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)
     if (fmpz_is_even(N))
         acb_neg(S, S);
 
-    if (_acb_vec_estimate_allocated_bytes(fmpz_get_ui(N) / 6, wp) < 4e9)
-        acb_dirichlet_powsum_sieved(u, s, fmpz_get_ui(N), 1, wp);
-    else
-        acb_dirichlet_powsum_smooth(u, s, fmpz_get_ui(N), 1, wp);
+    /* The main sum with dfloat balls when possible (dfloat module),
+       with an absolute accuracy of prec + 6 - log2|t| bits: the
+       precision to which the phase of a point s given with prec bits
+       is determined (theta and the factor U have t log t in the
+       exponent), plus 6 bits. This is what the callers that isolate
+       and refine zeros count on (hardy_z_zero works at prec + log2|t|
+       + 8 for prec bits of the zero); for an exact s, the acb version
+       gives about log2|t| more bits. dfloat_powsum_sieved returns 0
+       when it cannot, and the arb versions are used. Below about 16
+       terms, the fixed cost of the dfloat version (a few microseconds)
+       makes the acb version faster. */
+    if (!(acb_dirichlet_zeta_rs_use_dfloat &&
+        fmpz_cmp_ui(N, ZETA_RS_DFLOAT_CUTOFF) >= 0 &&
+        dfloat_powsum_sieved(u, s, fmpz_get_ui(N),
+            FLINT_MAX(prec + 6 - arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(s))), 20))))
+    {
+        if (_acb_vec_estimate_allocated_bytes(fmpz_get_ui(N) / 6, wp) < 4e9)
+            acb_dirichlet_powsum_sieved(u, s, fmpz_get_ui(N), 1, wp);
+        else
+            acb_dirichlet_powsum_smooth(u, s, fmpz_get_ui(N), 1, wp);
+    }
 
     acb_add(S, S, u, wp);
 

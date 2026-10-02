@@ -13,9 +13,14 @@
 #ifndef MACHINE_VECTORS_H
 #define MACHINE_VECTORS_H
 
-#define ALIGN_STRUCT(x) __attribute__((aligned(x)))
+#if defined(_MSC_VER) && !defined(__clang__)
+# define ALIGN_STRUCT(x) __declspec(align(x))
+#else
+# define ALIGN_STRUCT(x) __attribute__((aligned(x)))
+#endif
 
 #include <math.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "flint.h"
@@ -406,7 +411,10 @@ FLINT_FORCE_INLINE vec4d CAT6(vec4d, permute, i0, i1, i2, i3)(vec4d a) { \
     return vec4d_set_d4(a[i0], a[i1], a[i2], a[i3]); \
 }
 #endif
+DEFINE_IT(0,1,1,0)
+DEFINE_IT(0,2,0,2)
 DEFINE_IT(0,2,1,3)
+DEFINE_IT(1,3,1,3)
 DEFINE_IT(3,1,2,0)
 DEFINE_IT(3,2,1,0)
 #undef DEFINE_IT
@@ -459,6 +467,149 @@ FLINT_FORCE_INLINE vec4d vec4d_cmp_ge(vec4d a, vec4d b) {
 
 FLINT_FORCE_INLINE vec4d vec4d_cmp_gt(vec4d a, vec4d b) {
     return _mm256_cmp_pd(a, b, _CMP_GT_OQ);
+}
+
+/*
+    Masks, bitwise operations and integer lanes (every backend provides
+    these with the same semantics):
+
+    vec4d_cmp_xx(a, b) returns a mask with all bits set in the lanes
+    where the predicate holds and all bits clear elsewhere. eq, lt, le,
+    gt, ge are ordered (false if a lane of a or b is a NaN); ne, nlt,
+    nle, ngt, nge are their negations (true on a NaN).
+    vec4d_blendv(a, b, c) takes the lane from b where the sign bit of c
+    is set and from a elsewhere, so a mask works as c.
+    vec4d_movemask(a) collects the sign bits: lane i gives bit i.
+    vec4d_bit_and/or/xor act on the bits; vec4d_bit_andnot(a, b) is
+    (~a) & b.
+    vec4d_bits_* view each lane as a uint64_t: add and sub are modulo
+    2^64 and the shifts are logical.
+    vec4d_fmadd_fused, vec4d_fmsub_fused and vec4d_fnmadd_fused round
+    a*b+c, a*b-c and -a*b+c once on every backend (unlike vec4d_fmadd
+    etc., which the generic backends compute unfused).
+    vec4di holds 4 table indices: vec4d_to_index(a) converts lanes
+    holding integers in [0, 2^31), and vec4d_gather(t, i) returns
+    {t[i0], t[i1], t[i2], t[i3]}.
+*/
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_eq(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_EQ_OQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_ne(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_NEQ_UQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_lt(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_LT_OQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_le(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_LE_OQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_nlt(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_NLT_UQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_nle(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_NLE_UQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_ngt(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_NGT_UQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_cmp_nge(vec4d a, vec4d b) {
+    return _mm256_cmp_pd(a, b, _CMP_NGE_UQ);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bit_and(vec4d a, vec4d b) {
+    return _mm256_and_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bit_or(vec4d a, vec4d b) {
+    return _mm256_or_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bit_xor(vec4d a, vec4d b) {
+    return _mm256_xor_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bit_andnot(vec4d a, vec4d b) {
+    return _mm256_andnot_pd(a, b);
+}
+
+FLINT_FORCE_INLINE int vec4d_movemask(vec4d a) {
+    return _mm256_movemask_pd(a);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_sqrt(vec4d a) {
+    return _mm256_sqrt_pd(a);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_set_u64(uint64_t a) {
+    return _mm256_castsi256_pd(_mm256_set1_epi64x((long long) a));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_add(vec4d a, vec4d b) {
+    return _mm256_castsi256_pd(_mm256_add_epi64(_mm256_castpd_si256(a), _mm256_castpd_si256(b)));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_sub(vec4d a, vec4d b) {
+    return _mm256_castsi256_pd(_mm256_sub_epi64(_mm256_castpd_si256(a), _mm256_castpd_si256(b)));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shl(vec4d a, int n) {
+    return _mm256_castsi256_pd(_mm256_slli_epi64(_mm256_castpd_si256(a), n));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shr(vec4d a, int n) {
+    return _mm256_castsi256_pd(_mm256_srli_epi64(_mm256_castpd_si256(a), n));
+}
+
+#if defined(__FMA__) || defined(_MSC_VER)
+FLINT_FORCE_INLINE vec4d vec4d_fmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return _mm256_fmadd_pd(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fmsub_fused(vec4d a, vec4d b, vec4d c) {
+    return _mm256_fmsub_pd(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fnmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return _mm256_fnmadd_pd(a, b, c);
+}
+#else
+/* AVX2 without FMA (e.g. -mavx2 without -mfma): the library fma() */
+FLINT_FORCE_INLINE vec4d _vec4d_fma_lanes(vec4d a, vec4d b, vec4d c) {
+    double x[4], y[4], z[4];
+    _mm256_storeu_pd(x, a); _mm256_storeu_pd(y, b); _mm256_storeu_pd(z, c);
+    return _mm256_set_pd(fma(x[3], y[3], z[3]), fma(x[2], y[2], z[2]),
+                         fma(x[1], y[1], z[1]), fma(x[0], y[0], z[0]));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return _vec4d_fma_lanes(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fmsub_fused(vec4d a, vec4d b, vec4d c) {
+    return _vec4d_fma_lanes(a, b, _mm256_xor_pd(c, _mm256_set1_pd(-0.0)));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fnmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return _vec4d_fma_lanes(_mm256_xor_pd(a, _mm256_set1_pd(-0.0)), b, c);
+}
+#endif
+
+typedef __m128i vec4di;
+
+FLINT_FORCE_INLINE vec4di vec4d_to_index(vec4d a) {
+    return _mm256_cvtpd_epi32(a);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_gather(const double * t, vec4di i) {
+    return _mm256_i32gather_pd(t, i, 8);
 }
 
 FLINT_FORCE_INLINE vec4d vec4d_reduce_0n_to_pmhn(vec4d a, vec4d n) {
@@ -1475,17 +1626,97 @@ FLINT_FORCE_INLINE vec2d vec2d_max(vec2d a, vec2d b)
     return vmaxq_f64(a, b);
 }
 
+/* masks and bits: see the AVX2 section for the semantics */
+
+#define VEC2D_U(a) vreinterpretq_u64_f64(a)
+#define VEC2D_F(a) vreinterpretq_f64_u64(a)
+
+FLINT_FORCE_INLINE vec2d vec2d_cmp_eq(vec2d a, vec2d b) {
+    return VEC2D_F(vceqq_f64(a, b));
+}
+
 FLINT_FORCE_INLINE vec2d vec2d_cmp_lt(vec2d a, vec2d b) {
-    return vcvtq_f64_u64(vcltq_f64(a, b));
+    return VEC2D_F(vcltq_f64(a, b));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_cmp_le(vec2d a, vec2d b) {
+    return VEC2D_F(vcleq_f64(a, b));
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_cmp_gt(vec2d a, vec2d b) {
-    return vcvtq_f64_u64(vcgtq_f64(a, b));
+    return VEC2D_F(vcgtq_f64(a, b));
 }
 
-FLINT_FORCE_INLINE vec2d vec2d_blendv(vec2d a, vec2d b, vec2d c) {
-    return vbslq_f64(vcvtq_u64_f64(c), b, a);
+FLINT_FORCE_INLINE vec2d vec2d_cmp_ge(vec2d a, vec2d b) {
+    return VEC2D_F(vcgeq_f64(a, b));
 }
+
+FLINT_FORCE_INLINE vec2d vec2d_cmp_ne(vec2d a, vec2d b) {
+    return VEC2D_F(vreinterpretq_u64_u32(vmvnq_u32(vreinterpretq_u32_u64(vceqq_f64(a, b)))));
+}
+
+#define VEC2D_CMP_NOT(name, op) \
+FLINT_FORCE_INLINE vec2d vec2d_cmp_##name(vec2d a, vec2d b) { \
+    return VEC2D_F(vreinterpretq_u64_u32(vmvnq_u32(vreinterpretq_u32_u64(op(a, b))))); \
+}
+VEC2D_CMP_NOT(nlt, vcltq_f64)
+VEC2D_CMP_NOT(nle, vcleq_f64)
+VEC2D_CMP_NOT(ngt, vcgtq_f64)
+VEC2D_CMP_NOT(nge, vcgeq_f64)
+#undef VEC2D_CMP_NOT
+
+FLINT_FORCE_INLINE vec2d vec2d_blendv(vec2d a, vec2d b, vec2d c) {
+    uint64x2_t m = vreinterpretq_u64_s64(vshrq_n_s64(vreinterpretq_s64_f64(c), 63));
+    return vbslq_f64(m, b, a);
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bit_and(vec2d a, vec2d b) {
+    return VEC2D_F(vandq_u64(VEC2D_U(a), VEC2D_U(b)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bit_or(vec2d a, vec2d b) {
+    return VEC2D_F(vorrq_u64(VEC2D_U(a), VEC2D_U(b)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bit_xor(vec2d a, vec2d b) {
+    return VEC2D_F(veorq_u64(VEC2D_U(a), VEC2D_U(b)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bit_andnot(vec2d a, vec2d b) {
+    return VEC2D_F(vbicq_u64(VEC2D_U(b), VEC2D_U(a)));
+}
+
+FLINT_FORCE_INLINE int vec2d_movemask(vec2d a) {
+    uint64x2_t s = vshrq_n_u64(VEC2D_U(a), 63);
+    return (int) (vgetq_lane_u64(s, 0) | (vgetq_lane_u64(s, 1) << 1));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_sqrt(vec2d a) {
+    return vsqrtq_f64(a);
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bits_set_u64(uint64_t a) {
+    return VEC2D_F(vdupq_n_u64(a));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bits_add(vec2d a, vec2d b) {
+    return VEC2D_F(vaddq_u64(VEC2D_U(a), VEC2D_U(b)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bits_sub(vec2d a, vec2d b) {
+    return VEC2D_F(vsubq_u64(VEC2D_U(a), VEC2D_U(b)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bits_shl(vec2d a, int n) {
+    return VEC2D_F(vshlq_u64(VEC2D_U(a), vdupq_n_s64(n)));
+}
+
+FLINT_FORCE_INLINE vec2d vec2d_bits_shr(vec2d a, int n) {
+    return VEC2D_F(vshlq_u64(VEC2D_U(a), vdupq_n_s64(-n)));
+}
+
+#undef VEC2D_U
+#undef VEC2D_F
 
 FLINT_FORCE_INLINE vec2d vec2d_add(vec2d a, vec2d b)
 {
@@ -1767,6 +1998,87 @@ EXTEND_VEC_DEF4(vec2d, vec4d, _mulmod)
 EXTEND_VEC_DEF4(vec2d, vec4d, _nmulmod)
 EXTEND_VEC_DEF4(vec2d, vec4d, _mulmod_fast)
 EXTEND_VEC_DEF4(vec2d, vec4d, _nmulmod_fast)
+EXTEND_VEC_DEF1(vec2d, vec4d, _abs)
+EXTEND_VEC_DEF1(vec2d, vec4d, _sqrt)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_eq)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_ne)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_lt)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_le)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_gt)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_ge)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_nlt)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_nle)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_ngt)
+EXTEND_VEC_DEF2(vec2d, vec4d, _cmp_nge)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bit_and)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bit_or)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bit_xor)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bit_andnot)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bits_add)
+EXTEND_VEC_DEF2(vec2d, vec4d, _bits_sub)
+
+FLINT_FORCE_INLINE int vec4d_movemask(vec4d a) {
+    return vec2d_movemask(a.e1) | (vec2d_movemask(a.e2) << 2);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_set_u64(uint64_t a) {
+    vec2d z = vec2d_bits_set_u64(a);
+    return vec4d_set_vec2d2(z, z);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shl(vec4d a, int n) {
+    return vec4d_set_vec2d2(vec2d_bits_shl(a.e1, n), vec2d_bits_shl(a.e2, n));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shr(vec4d a, int n) {
+    return vec4d_set_vec2d2(vec2d_bits_shr(a.e1, n), vec2d_bits_shr(a.e2, n));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return vec4d_fmadd(a, b, c);
+}
+
+/* (a b + (-c), unlike vec2d_fmsub, which is -(c - a b) and differs
+   in the sign of an exact zero) */
+FLINT_FORCE_INLINE vec4d vec4d_fmsub_fused(vec4d a, vec4d b, vec4d c) {
+    return vec4d_set_vec2d2(vfmaq_f64(vnegq_f64(c.e1), a.e1, b.e1),
+                            vfmaq_f64(vnegq_f64(c.e2), a.e2, b.e2));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_fnmadd_fused(vec4d a, vec4d b, vec4d c) {
+    return vec4d_fnmadd(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_permute_0_1_1_0(vec4d a) {
+    return vec4d_set_vec2d2(a.e1, vextq_f64(a.e1, a.e1, 1));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_permute_0_2_0_2(vec4d a) {
+    vec2d t = vec2d_unpacklo(a.e1, a.e2);
+    return vec4d_set_vec2d2(t, t);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_permute_1_3_1_3(vec4d a) {
+    vec2d t = vec2d_unpackhi(a.e1, a.e2);
+    return vec4d_set_vec2d2(t, t);
+}
+
+typedef struct {int64x2_t e1, e2;} vec4di;
+
+FLINT_FORCE_INLINE vec4di vec4d_to_index(vec4d a) {
+    vec4di z;
+    z.e1 = vcvtq_s64_f64(a.e1);
+    z.e2 = vcvtq_s64_f64(a.e2);
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_gather(const double * t, vec4di i) {
+    vec2d z1 = vld1q_dup_f64(t + vgetq_lane_s64(i.e1, 0));
+    vec2d z2 = vld1q_dup_f64(t + vgetq_lane_s64(i.e2, 0));
+    z1 = vld1q_lane_f64(t + vgetq_lane_s64(i.e1, 1), z1, 1);
+    z2 = vld1q_lane_f64(t + vgetq_lane_s64(i.e2, 1), z2, 1);
+    return vec4d_set_vec2d2(z1, z2);
+}
 
 
 /* vec8d -- NEON/ARM64 *********************************************/
@@ -2150,6 +2462,8 @@ FLINT_FORCE_INLINE vec2d vec2d_floor(vec2d a) {
     return vrndmq_f64(a);
 }
 
+EXTEND_VEC_DEF1(vec2d, vec4d, _floor)
+
 /* vec8f -- NEON/ARM64 (pair of vec4f) *************************************/
 
 EXTEND_VEC_DEF0(vec4f, vec8f, _zero)
@@ -2220,9 +2534,13 @@ FLINT_FORCE_INLINE void vec8f_store(float* z, vec8f a) {
     These tiers currently implement the subset of the interface needed by
     flint_sgemm/flint_dgemm: load/store (plain, aligned, unaligned), zero,
     set_d/set_f, add, sub, mul, fmadd, fnmadd, floor, for
-    vec1d/vec2d/vec4d/vec8d and vec1f/vec4f/vec8f/vec16f. Other operations are
-    deliberately absent rather than emulated badly; add them here as
-    callers need them.
+    vec1d/vec2d/vec4d/vec8d and vec1f/vec4f/vec8f/vec16f, and for vec4d
+    also the operations used by dfloat (masks, bitwise operations,
+    integer lanes, fused multiply-adds, permutes, gathers; see the AVX2
+    section). Note that fmadd and fnmadd round twice here, whereas the
+    _fused variants always round once. Other operations are deliberately
+    absent rather than emulated badly; add them here as callers need
+    them.
 */
 
 typedef double vec1d;
@@ -2239,7 +2557,15 @@ typedef float vec1f;
     warning about passing such types across function boundaries does not
     apply to any code we actually generate.
 */
-# if defined(__GNUC__) && !defined(__clang__)
+# if defined(__clang__)
+#  if defined(__has_warning)
+#   if __has_warning("-Wpsabi")
+#    define FLINT_MACHINE_VECTORS_CLANG_PSABI 1
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wpsabi"
+#   endif
+#  endif
+# elif defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wpsabi"
 # endif
@@ -2269,7 +2595,9 @@ FLINT_FORCE_INLINE void V##_store(S* z, V a) { \
     V##_store_aligned(z, a); \
 } \
 FLINT_FORCE_INLINE V V##_zero(void) { V z = {0}; return z; } \
-FLINT_FORCE_INLINE V V##_set_##SUF(S a) { V z = {0}; return z + a; } \
+FLINT_FORCE_INLINE V V##_set_##SUF(S a) { \
+    V z = {0}; int i; for (i = 0; i < N; i++) z[i] = a; return z; \
+} \
 FLINT_FORCE_INLINE V V##_add(V a, V b) { return a + b; } \
 FLINT_FORCE_INLINE V V##_sub(V a, V b) { return a - b; } \
 FLINT_FORCE_INLINE V V##_mul(V a, V b) { return a * b; } \
@@ -2465,9 +2793,193 @@ VEC_GENERIC_PAIR_DEF(vec8f, vec16f, float, f)
 
 #undef VEC_GENERIC_PAIR_DEF
 
+/* vec4d, further operations -- generic ************************************/
+
+/*
+    The rest of the vec4d interface used outside gemm (by dfloat), with the
+    semantics documented in the AVX2 section, written lane by lane. Where
+    a lane holds a mask or an integer, its bits are accessed with memcpy.
+    min and max follow the AVX2 convention of returning b when a lane is
+    unordered, and round rounds to nearest with ties to even (in the
+    default rounding mode).
+*/
+
+# if defined(FLINT_MACHINE_VECTORS_GNU_VECTOR_EXTENSIONS)
+#  define VEC4D_LANE(a, i) ((a)[i])
+# else
+#  define VEC4D_LANE(a, i) ((a).v[i])
+# endif
+
+# define VEC4D_GEN1(name, expr) \
+FLINT_FORCE_INLINE vec4d vec4d_##name(vec4d a) { \
+    vec4d z; int i; \
+    for (i = 0; i < 4; i++) { \
+        double x = VEC4D_LANE(a, i); \
+        VEC4D_LANE(z, i) = (expr); \
+    } \
+    return z; \
+}
+
+# define VEC4D_GEN2(name, expr) \
+FLINT_FORCE_INLINE vec4d vec4d_##name(vec4d a, vec4d b) { \
+    vec4d z; int i; \
+    for (i = 0; i < 4; i++) { \
+        double x = VEC4D_LANE(a, i), y = VEC4D_LANE(b, i); \
+        VEC4D_LANE(z, i) = (expr); \
+    } \
+    return z; \
+}
+
+# define VEC4D_GEN3(name, expr) \
+FLINT_FORCE_INLINE vec4d vec4d_##name(vec4d a, vec4d b, vec4d c) { \
+    vec4d z; int i; \
+    for (i = 0; i < 4; i++) { \
+        double x = VEC4D_LANE(a, i), y = VEC4D_LANE(b, i), w = VEC4D_LANE(c, i); \
+        VEC4D_LANE(z, i) = (expr); \
+    } \
+    return z; \
+}
+
+FLINT_FORCE_INLINE uint64_t _vec4d_d2u(double x) {
+    uint64_t u; memcpy(&u, &x, sizeof(u)); return u;
+}
+
+FLINT_FORCE_INLINE double _vec4d_u2d(uint64_t u) {
+    double x; memcpy(&x, &u, sizeof(x)); return x;
+}
+
+# define VEC4D_TRUE _vec4d_u2d(~UINT64_C(0))
+
+FLINT_FORCE_INLINE vec4d vec4d_set_d4(double a0, double a1, double a2, double a3) {
+    vec4d z;
+    VEC4D_LANE(z, 0) = a0; VEC4D_LANE(z, 1) = a1;
+    VEC4D_LANE(z, 2) = a2; VEC4D_LANE(z, 3) = a3;
+    return z;
+}
+
+FLINT_FORCE_INLINE double vec4d_get_index(vec4d a, int i) {
+    return VEC4D_LANE(a, i);
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_one(void) {
+    return vec4d_set_d(1.0);
+}
+
+VEC4D_GEN1(neg, -x)
+VEC4D_GEN1(abs, fabs(x))
+VEC4D_GEN1(sqrt, sqrt(x))
+VEC4D_GEN1(round, nearbyint(x))
+VEC4D_GEN2(div, x / y)
+VEC4D_GEN2(min, x < y ? x : y)
+VEC4D_GEN2(max, x > y ? x : y)
+VEC4D_GEN3(fmsub, x * y - w)
+VEC4D_GEN3(fmadd_fused, fma(x, y, w))
+VEC4D_GEN3(fmsub_fused, fma(x, y, -w))
+VEC4D_GEN3(fnmadd_fused, fma(-x, y, w))
+VEC4D_GEN3(blendv, (_vec4d_d2u(w) >> 63) ? y : x)
+
+VEC4D_GEN2(cmp_eq, x == y ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_ne, !(x == y) ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_lt, x < y ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_le, x <= y ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_gt, x > y ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_ge, x >= y ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_nlt, !(x < y) ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_nle, !(x <= y) ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_ngt, !(x > y) ? VEC4D_TRUE : 0.0)
+VEC4D_GEN2(cmp_nge, !(x >= y) ? VEC4D_TRUE : 0.0)
+
+VEC4D_GEN2(bit_and, _vec4d_u2d(_vec4d_d2u(x) & _vec4d_d2u(y)))
+VEC4D_GEN2(bit_or, _vec4d_u2d(_vec4d_d2u(x) | _vec4d_d2u(y)))
+VEC4D_GEN2(bit_xor, _vec4d_u2d(_vec4d_d2u(x) ^ _vec4d_d2u(y)))
+VEC4D_GEN2(bit_andnot, _vec4d_u2d(~_vec4d_d2u(x) & _vec4d_d2u(y)))
+VEC4D_GEN2(bits_add, _vec4d_u2d(_vec4d_d2u(x) + _vec4d_d2u(y)))
+VEC4D_GEN2(bits_sub, _vec4d_u2d(_vec4d_d2u(x) - _vec4d_d2u(y)))
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_set_u64(uint64_t a) {
+    return vec4d_set_d(_vec4d_u2d(a));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shl(vec4d a, int n) {
+    vec4d z; int i;
+    for (i = 0; i < 4; i++)
+        VEC4D_LANE(z, i) = _vec4d_u2d(_vec4d_d2u(VEC4D_LANE(a, i)) << n);
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_bits_shr(vec4d a, int n) {
+    vec4d z; int i;
+    for (i = 0; i < 4; i++)
+        VEC4D_LANE(z, i) = _vec4d_u2d(_vec4d_d2u(VEC4D_LANE(a, i)) >> n);
+    return z;
+}
+
+FLINT_FORCE_INLINE int vec4d_movemask(vec4d a) {
+    int i, m = 0;
+    for (i = 0; i < 4; i++)
+        m |= (int) (_vec4d_d2u(VEC4D_LANE(a, i)) >> 63) << i;
+    return m;
+}
+
+/* {a[i0], a[i1], a[i2], a[i3]} */
+# define VEC4D_GEN_PERMUTE(i0, i1, i2, i3) \
+FLINT_FORCE_INLINE vec4d vec4d_permute_##i0##_##i1##_##i2##_##i3(vec4d a) { \
+    return vec4d_set_d4(VEC4D_LANE(a, i0), VEC4D_LANE(a, i1), \
+                        VEC4D_LANE(a, i2), VEC4D_LANE(a, i3)); \
+}
+VEC4D_GEN_PERMUTE(0, 1, 1, 0)
+VEC4D_GEN_PERMUTE(0, 2, 0, 2)
+VEC4D_GEN_PERMUTE(0, 2, 1, 3)
+VEC4D_GEN_PERMUTE(1, 3, 1, 3)
+VEC4D_GEN_PERMUTE(3, 1, 2, 0)
+VEC4D_GEN_PERMUTE(3, 2, 1, 0)
+# undef VEC4D_GEN_PERMUTE
+
+FLINT_FORCE_INLINE vec4d vec4d_permute2_0_2(vec4d a, vec4d b) {
+    return vec4d_set_d4(VEC4D_LANE(a, 0), VEC4D_LANE(a, 1),
+                        VEC4D_LANE(b, 0), VEC4D_LANE(b, 1));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_permute2_1_3(vec4d a, vec4d b) {
+    return vec4d_set_d4(VEC4D_LANE(a, 2), VEC4D_LANE(a, 3),
+                        VEC4D_LANE(b, 2), VEC4D_LANE(b, 3));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_unpacklo(vec4d a, vec4d b) {
+    return vec4d_set_d4(VEC4D_LANE(a, 0), VEC4D_LANE(b, 0),
+                        VEC4D_LANE(a, 2), VEC4D_LANE(b, 2));
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_unpackhi(vec4d a, vec4d b) {
+    return vec4d_set_d4(VEC4D_LANE(a, 1), VEC4D_LANE(b, 1),
+                        VEC4D_LANE(a, 3), VEC4D_LANE(b, 3));
+}
+
+typedef struct {int v[4];} vec4di;
+
+FLINT_FORCE_INLINE vec4di vec4d_to_index(vec4d a) {
+    vec4di z; int i;
+    for (i = 0; i < 4; i++)
+        z.v[i] = (int) VEC4D_LANE(a, i);
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4d vec4d_gather(const double * t, vec4di i) {
+    return vec4d_set_d4(t[i.v[0]], t[i.v[1]], t[i.v[2]], t[i.v[3]]);
+}
+
+# undef VEC4D_GEN1
+# undef VEC4D_GEN2
+# undef VEC4D_GEN3
+# undef VEC4D_TRUE
+
 #if defined(FLINT_MACHINE_VECTORS_GNU_VECTOR_EXTENSIONS) \
         && defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
+#endif
+#if defined(FLINT_MACHINE_VECTORS_CLANG_PSABI)
+# pragma clang diagnostic pop
+# undef FLINT_MACHINE_VECTORS_CLANG_PSABI
 #endif
 
 #endif

@@ -338,6 +338,7 @@ typedef enum
 
     GR_METHOD_SET_INTERVAL_MID_RAD,
     GR_METHOD_SET_INTERVAL_MID_INF,
+    GR_METHOD_GET_INTERVAL_MID_RAD,
 
     /* todo: roots of unity */
     GR_METHOD_IS_ROOT_OF_UNITY,
@@ -665,6 +666,19 @@ typedef enum
     GR_METHOD_VEC_SET_POWERS,
     GR_METHOD_VEC_RECIPROCALS,
 
+    GR_METHOD_VEC_SET_OTHER,
+    GR_METHOD_VEC_GATHER,
+    GR_METHOD_VEC_SCATTER,
+    GR_METHOD_VEC_GET_INTERVAL_MID_RAD,
+
+    GR_METHOD_VEC_SQRT,
+    GR_METHOD_VEC_RSQRT,
+    GR_METHOD_VEC_EXP,
+    GR_METHOD_VEC_LOG,
+    GR_METHOD_VEC_SIN,
+    GR_METHOD_VEC_COS,
+    GR_METHOD_VEC_SIN_COS,
+
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
     GR_METHOD_POLY_MULMID,
@@ -749,6 +763,8 @@ typedef enum
     GR_CTX_REAL_FLOAT_ARF, GR_CTX_COMPLEX_FLOAT_ACF,
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
     GR_CTX_DECFLOAT, GR_CTX_DECBALL, GR_CTX_DECCFLOAT, GR_CTX_DECCBALL,
+    GR_CTX_DFLOAT, GR_CTX_DFLOAT_BALL,
+    GR_CTX_DFLOAT_COMPLEX, GR_CTX_DFLOAT_COMPLEX_BALL,
     GR_CTX_MPF,
     GR_CTX_GR_POLY_QUOTIENT,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
@@ -860,6 +876,10 @@ typedef void ((*gr_method_vec_init_clear_op)(gr_ptr, slong, gr_ctx_ptr));
 typedef void ((*gr_method_vec_swap_op)(gr_ptr, gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_constant_op)(gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_binary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_set_other_op)(gr_ptr, gr_srcptr, gr_ctx_ptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_gather_op)(gr_ptr, gr_srcptr, const slong *, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_scatter_op)(gr_ptr, const slong *, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_scalar_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_scalar_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
@@ -1024,6 +1044,10 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_VEC_SWAP_OP(ctx, NAME) (((gr_method_vec_swap_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_OP(ctx, NAME) (((gr_method_vec_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_BINARY_UNARY_OP(ctx, NAME) (((gr_method_vec_binary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SET_OTHER_OP(ctx, NAME) (((gr_method_vec_set_other_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_GATHER_OP(ctx, NAME) (((gr_method_vec_gather_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCATTER_OP(ctx, NAME) (((gr_method_vec_scatter_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_VEC_OP(ctx, NAME) (((gr_method_vec_vec_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_SCALAR_OP(ctx, NAME) (((gr_method_vec_scalar_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SCALAR_VEC_OP(ctx, NAME) (((gr_method_scalar_vec_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -1333,6 +1357,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_
 
 GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SET_INTERVAL_MID_RAD)(res, m, r, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET_INTERVAL_MID_INF)(res, m, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, GET_INTERVAL_MID_RAD)(m, r, x, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }

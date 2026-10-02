@@ -1027,6 +1027,42 @@ else
 fi
 
 ###############################################################################
+# dfloat module
+###############################################################################
+
+# The error-free transformations in dfloat break if the compiler
+# contracts a separate multiply and add into an fma, and its small
+# exported functions call each other, which -fno-semantic-interposition
+# lets the compiler inline in a shared library.
+dfloat_cflags=""
+for flag in -ffp-contract=off -fno-semantic-interposition;
+do
+    AX_CHECK_COMPILE_FLAG([$flag],[dfloat_cflags="$dfloat_cflags $flag"])
+done
+
+# The error-free transformations also need every operation on doubles
+# rounded once to double precision. On 32-bit x86, GCC evaluates in
+# the x87 registers by default (FLT_EVAL_METHOD 2); when the target has
+# SSE2 (CFLAGS include -msse2, or a -march that implies it), the dfloat
+# module is compiled with -mfpmath=sse. Otherwise dfloat_is_supported()
+# returns 0 and the module declines to work.
+AC_MSG_CHECKING([whether double arithmetic has excess precision])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <float.h>
+#if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
+#error excess precision
+#endif]], [])],
+    [AC_MSG_RESULT([no])],
+    [AC_MSG_RESULT([yes])
+     AC_MSG_CHECKING([whether SSE2 is available for the dfloat module])
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __SSE2__
+#error no SSE2
+#endif]], [])],
+        [AC_MSG_RESULT([yes])
+         AX_CHECK_COMPILE_FLAG([-mfpmath=sse],[dfloat_cflags="$dfloat_cflags -mfpmath=sse"])],
+        [AC_MSG_RESULT([no; dfloat will be unavailable (configure with CFLAGS=-msse2 to enable it)])])])
+AC_SUBST(DFLOAT_CFLAGS,$dfloat_cflags)
+
+###############################################################################
 # fft_small module
 ###############################################################################
 
