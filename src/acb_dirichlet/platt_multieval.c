@@ -15,6 +15,8 @@
 #include "acb_dirichlet/impl.h"
 #include "arb_hypgeom.h"
 #include "acb_dft.h"
+#include "thread_support.h"
+#include "dfloat.h"
 
 FLINT_FORCE_INLINE void
 _acb_vec_kronecker_mul(acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong prec)
@@ -128,51 +130,66 @@ platt_g_base(acb_t out, const acb_t t, slong prec)
 }
 
 
-static void
-platt_g_table(acb_ptr table, slong A, slong B,
-        const arb_t t0, const arb_t h, slong K, slong prec)
+/* The gamma-exponential factors: the table of the multi-evaluation
+   has the entries coeff_i base_i^k (row k, i < N); only coeff and base
+   are stored, rounded to the transform precision tprec (the rows are
+   generated where they are transformed). */
+typedef struct
 {
-    slong N = A*B;
-    slong i, n, k;
-    acb_t t, base;
-    acb_t gamma_term, exp_term, coeff;
-    acb_ptr precomputed_powers;
+    acb_ptr coeff, base;
+    slong A, B, prec, tprec, chunk;
+    arb_srcptr t0, h;
+}
+platt_g_table_arg;
+
+static void
+platt_g_table_worker(slong c, void * arg_ptr)
+{
+    const platt_g_table_arg * a = arg_ptr;
+    slong A = a->A, N = a->A * a->B, prec = a->prec;
+    slong i, n, i0 = c * a->chunk, i1 = FLINT_MIN(N, (c + 1) * a->chunk);
+    acb_t t, gamma_term, exp_term;
 
     acb_init(t);
-    acb_init(base);
     acb_init(gamma_term);
     acb_init(exp_term);
-    acb_init(coeff);
 
-    precomputed_powers = _acb_vec_init(K);
-
-    for (i=0; i<N; i++)
+    for (i = i0; i < i1; i++)
     {
         n = i - N/2;
 
         acb_set_si(t, n);
         acb_div_si(t, t, A, prec);
 
-        platt_g_base(base, t, prec);
-        _acb_vec_set_powers(precomputed_powers, base, K, prec);
+        platt_g_base(a->base + i, t, a->tprec);
 
-        platt_g_gamma_term(gamma_term, t0, t, prec);
-        platt_g_exp_term(exp_term, t0, h, t, prec);
-        acb_mul(coeff, gamma_term, exp_term, prec);
-
-        for (k=0; k<K; k++)
-        {
-            acb_mul(table + k*N + i, coeff, precomputed_powers + k, prec);
-        }
+        platt_g_gamma_term(gamma_term, a->t0, t, prec);
+        platt_g_exp_term(exp_term, a->t0, a->h, t, prec);
+        acb_mul(a->coeff + i, gamma_term, exp_term, a->tprec);
     }
 
     acb_clear(t);
-    acb_clear(base);
     acb_clear(gamma_term);
     acb_clear(exp_term);
-    acb_clear(coeff);
+}
 
-    _acb_vec_clear(precomputed_powers, K);
+static void
+platt_g_table(acb_ptr coeff, acb_ptr base, slong A, slong B,
+        const arb_t t0, const arb_t h, slong prec, slong tprec)
+{
+    platt_g_table_arg a;
+    slong N = A*B;
+    a.coeff = coeff;
+    a.base = base;
+    a.A = A;
+    a.B = B;
+    a.prec = prec;
+    a.tprec = tprec;
+    a.t0 = t0;
+    a.h = h;
+    a.chunk = 256;
+    flint_parallel_do(platt_g_table_worker, &a, (N + a.chunk - 1) / a.chunk, 0,
+        FLINT_PARALLEL_STRIDED);
 }
 
 static void
@@ -479,56 +496,150 @@ _platt_smk(acb_ptr table, acb_ptr startvec, acb_ptr stopvec,
 }
 
 
-static void
-do_convolutions(acb_ptr out_table,
-        acb_srcptr table, acb_srcptr S_table,
-        slong N, slong K, slong prec)
-{
-    slong i, k;
-    acb_ptr padded_table_row, padded_S_table_row, padded_out_table;
-    acb_ptr fp, gp;
-    acb_dft_pre_t pre;
+/* The K convolutions are summed in the frequency domain, so that a
+   single inverse transform is needed (2K + 1 transforms of length 2N
+   instead of 3K); the products are accumulated over fixed groups of
+   PLATT_CONV_GROUP consecutive k in parallel, and the group sums added
+   in order, so that the result does not depend on the number of
+   threads. */
+#define PLATT_CONV_GROUP 4
 
-    padded_table_row = _acb_vec_init(N*2);
-    padded_S_table_row = _acb_vec_init(N*2);
-    padded_out_table = _acb_vec_init(N*2);
+/* the row k of the sums over j, into row (N entries) at prec */
+typedef void (* platt_S_row_func)(acb_ptr row, slong k, const void * ctx, slong prec);
+
+typedef struct
+{
+    acb_ptr * partial;
+    acb_srcptr coeff, base;
+    arb_srcptr A7;                      /* the Lemma A7 bounds, k < K */
+    platt_S_row_func S_row;
+    const void * S_ctx;
+    arb_srcptr inv_fac;
+    const acb_dft_pre_struct * pre;     /* length 2N */
+    const acb_dft_pre_struct * pre_N;   /* length N */
+    arb_srcptr t0, h;
+    slong A, B, N, K, sigma, prec, g0;
+}
+platt_conv_arg;
+
+/* The rows k of the group g: the table row coeff_i base_i^k with the
+   truncation bound of Lemma A5, its DFT (after swapping the halves)
+   divided by A, the bound of Lemma A7 (precomputed for all k) and the
+   division by k! (a multiplication by 1/k!); then its convolution with the row k of S, in the frequency
+   domain (zero-padded transforms of length 2N), accumulated over the
+   group. */
+static void
+platt_conv_worker(slong gg, void * arg_ptr)
+{
+    const platt_conv_arg * a = arg_ptr;
+    slong N = a->N, prec = a->prec, i, k, g = a->g0 + gg;
+    slong k0 = g * PLATT_CONV_GROUP, k1 = FLINT_MIN(a->K, k0 + PLATT_CONV_GROUP);
+    acb_ptr row, pw, fp, gp, acc;
+    arb_t err;
+
+    arb_init(err);
+    row = _acb_vec_init(N);
+    pw = _acb_vec_init(N);
     fp = _acb_vec_init(N*2);
     gp = _acb_vec_init(N*2);
+    acc = _acb_vec_init(N*2);
 
-    acb_dft_precomp_init(pre, N*2, prec);
+    for (i = 0; i < N; i++)
+        acb_pow_ui(pw + i, a->base + i, k0, prec);
 
-    for (k = 0; k < K; k++)
+    for (k = k0; k < k1; k++)
     {
-        _acb_vec_zero(padded_table_row, N*2);
-        _acb_vec_zero(padded_S_table_row, N*2);
-        _acb_vec_zero(padded_out_table, N*2);
+        if (k > k0)
+            _acb_vec_kronecker_mul(pw, pw, a->base, N, prec);
+        _acb_vec_kronecker_mul(row, a->coeff, pw, N, prec);
 
-        _acb_vec_set(padded_table_row, table + k*N, N);
-        _acb_vec_set(padded_S_table_row, S_table + k*N, N);
+        acb_dirichlet_platt_lemma_A5(err, a->B, a->h, k, prec);
+        _acb_vec_scalar_add_error_arb_mag(row, N, err);
+        for (i = 0; i < N/2; i++)
+            acb_swap(row + i, row + i + N/2);
+        acb_dft_precomp(row, row, a->pre_N, prec);
+        _acb_vec_scalar_div_ui(row, row, N, (ulong) a->A, prec);
+        _acb_vec_scalar_add_error_arb_mag(row, N, a->A7 + k);
+        if (k >= 2)
+            _acb_vec_scalar_mul_arb(row, row, N, a->inv_fac + k, prec);
 
+        /* the S row, zero-padded and reversed (index i -> 2N - i) */
+        a->S_row(gp, k, a->S_ctx, prec);
+        _acb_vec_zero(fp, N*2);
+        acb_set(fp, gp);
         for (i = 1; i < N; i++)
-        {
-            acb_swap(padded_S_table_row + i, padded_S_table_row + N*2 - i);
-        }
+            acb_set(fp + N*2 - i, gp + i);
+        /* the table row, zero-padded */
+        _acb_vec_set(gp, row, N);
+        _acb_vec_zero(gp + N, N);
 
-        acb_dft_precomp(fp, padded_S_table_row, pre, prec);
-        acb_dft_precomp(gp, padded_table_row, pre, prec);
-        _acb_vec_kronecker_mul(gp, gp, fp, N*2, prec);
-        acb_dft_inverse_precomp(padded_out_table, gp, pre, prec);
-
-        for (i = 0; i <= N/2; i++)
+        acb_dft_precomp(fp, fp, a->pre, prec);
+        acb_dft_precomp(gp, gp, a->pre, prec);
+        if (k == k0)
+            _acb_vec_kronecker_mul(acc, gp, fp, N*2, prec);
+        else
         {
-            acb_add(out_table + i,
-                    out_table + i, padded_out_table + i, prec);
+            _acb_vec_kronecker_mul(gp, gp, fp, N*2, prec);
+            _acb_vec_add(acc, acc, gp, N*2, prec);
         }
     }
 
-    _acb_vec_clear(padded_table_row, N*2);
-    _acb_vec_clear(padded_S_table_row, N*2);
-    _acb_vec_clear(padded_out_table, N*2);
+    a->partial[g] = acc;
+
+    arb_clear(err);
+    _acb_vec_clear(row, N);
+    _acb_vec_clear(pw, N);
     _acb_vec_clear(fp, N*2);
     _acb_vec_clear(gp, N*2);
+}
 
+/* The groups run in waves of as many groups as threads, whose partial
+   sums are added (in the order of the groups) before the next wave,
+   so that at most one partial sum per thread is alive. */
+static void
+do_convolutions(acb_ptr out_table, platt_conv_arg * a_in)
+{
+    slong i, g, G, W, g0, g1, N = a_in->N, K = a_in->K, prec = a_in->prec;
+    acb_ptr total, padded_out_table;
+    acb_dft_pre_t pre;
+    platt_conv_arg a = *a_in;
+
+    G = (K + PLATT_CONV_GROUP - 1) / PLATT_CONV_GROUP;
+    W = FLINT_MAX(1, flint_get_num_threads());
+    total = NULL;
+    acb_dft_precomp_init(pre, N*2, prec);
+
+    a.partial = flint_calloc(G, sizeof(acb_ptr));
+    a.pre = pre;
+
+    for (g0 = 0; g0 < G; g0 = g1)
+    {
+        g1 = FLINT_MIN(G, g0 + W);
+        a.g0 = g0;
+        flint_parallel_do(platt_conv_worker, &a, g1 - g0, 0, FLINT_PARALLEL_STRIDED);
+        for (g = g0; g < g1; g++)
+        {
+            if (total == NULL)
+                total = a.partial[g];
+            else
+            {
+                _acb_vec_add(total, total, a.partial[g], N*2, prec);
+                _acb_vec_clear(a.partial[g], N*2);
+            }
+        }
+    }
+
+    padded_out_table = _acb_vec_init(N*2);
+    acb_dft_inverse_precomp(padded_out_table, total, pre, prec);
+    _acb_vec_clear(total, N*2);
+    flint_free(a.partial);
+
+    for (i = 0; i <= N/2; i++)
+    {
+        acb_add(out_table + i, out_table + i, padded_out_table + i, prec);
+    }
+
+    _acb_vec_clear(padded_out_table, N*2);
     acb_dft_precomp_clear(pre);
 }
 
@@ -555,15 +666,96 @@ remove_gaussian_window(arb_ptr out, slong A, slong B, const arb_t h, slong prec)
     arb_clear(x);
 }
 
+typedef struct
+{
+    acb_srcptr S;
+    slong N;
+}
+platt_S_acb_ctx;
+
+typedef struct
+{
+    const double * S5;
+    slong N;
+    acb_t c;
+}
+platt_S_dd_ctx;
+
+static slong
+_platt_transform_prec(const arb_t t0, slong prec)
+{
+    slong dprec;
+    dprec = prec - FLINT_MAX(0, arf_abs_bound_lt_2exp_si(arb_midref(t0))) + 16;
+    dprec = FLINT_MAX(dprec, 64);
+    return FLINT_MIN(dprec, prec);
+}
+
+static void
+_platt_S_row_acb(acb_ptr row, slong k, const void * ctx, slong prec)
+{
+    const platt_S_acb_ctx * c = ctx;
+    _acb_vec_set(row, c->S + k * c->N, c->N);
+}
+
+static void
+_platt_S_row_dd(acb_ptr row, slong k, const void * ctx, slong prec)
+{
+    const platt_S_dd_ctx * c = ctx;
+    slong i;
+    for (i = 0; i < c->N; i++)
+    {
+        const double * e = c->S5 + 5 * (k * c->N + i);
+        mag_t r;
+        arf_t t;
+        mag_init(r);
+        arf_init(t);
+        arf_set_d(arb_midref(acb_realref(row + i)), e[0]);
+        arf_set_d(t, e[1]);
+        arf_add(arb_midref(acb_realref(row + i)), arb_midref(acb_realref(row + i)), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+        arf_set_d(arb_midref(acb_imagref(row + i)), e[2]);
+        arf_set_d(t, e[3]);
+        arf_add(arb_midref(acb_imagref(row + i)), arb_midref(acb_imagref(row + i)), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+        mag_set_d(r, e[4]);
+        mag_set(arb_radref(acb_realref(row + i)), r);
+        mag_set(arb_radref(acb_imagref(row + i)), r);
+        acb_mul(row + i, row + i, c->c, prec);
+        mag_clear(r);
+        arf_clear(t);
+    }
+}
+
+static void
+_platt_multieval_rows(arb_ptr out, platt_S_row_func S_row, const void * S_ctx,
+        const arb_t t0, slong A, slong B, const arb_t h, const fmpz_t J,
+        slong K, slong sigma, slong prec);
+
 void
 _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
         const arb_t t0, slong A, slong B, const arb_t h, const fmpz_t J,
         slong K, slong sigma, slong prec)
 {
+    platt_S_acb_ctx c;
+    c.S = S_table;
+    c.N = A * B;
+    _platt_multieval_rows(out, _platt_S_row_acb, &c, t0, A, B, h, J, K, sigma, prec);
+}
+
+static void
+_platt_multieval_rows(arb_ptr out, platt_S_row_func S_row, const void * S_ctx,
+        const arb_t t0, slong A, slong B, const arb_t h, const fmpz_t J,
+        slong K, slong sigma, slong prec)
+{
+    /* The transforms and convolutions work on the gamma factors and
+       sums already computed at prec bits, of size about 1, whose
+       phases (of size t0 log t0) carry about prec - log2(t0) bits: the
+       transforms are done at that precision plus 16 bits (at least 64,
+       at most prec); with the heuristic parameters, this gives the
+       same grid as prec (2 limbs instead of 3 at the zeros from 1e15
+       on). */
+    slong dprec;
     slong N = A*B;
     slong i, k;
-    acb_ptr table, out_a, out_b;
-    acb_ptr row;
+    acb_ptr coeff, base, out_a, out_b;
     arb_t t, x, k_factorial, err, ratio, c, xi;
     acb_t z;
     acb_dft_pre_t pre_N;
@@ -576,48 +768,54 @@ _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
     arb_init(c);
     arb_init(xi);
     acb_init(z);
-    table = _acb_vec_init(K*N);
+    coeff = _acb_vec_init(N);
+    base = _acb_vec_init(N);
     out_a = _acb_vec_init(N);
     out_b = _acb_vec_init(N);
-    acb_dft_precomp_init(pre_N, N, prec);
+    dprec = _platt_transform_prec(t0, prec);
+    acb_dft_precomp_init(pre_N, N, dprec);
 
     _arb_inv_si(xi, B, prec);
     arb_mul_2exp_si(xi, xi, -1);
 
-    platt_g_table(table, A, B, t0, h, K, prec);
+    platt_g_table(coeff, base, A, B, t0, h, prec, dprec);
 
-    for (k = 0; k < K; k++)
     {
-        acb_dirichlet_platt_lemma_A5(err, B, h, k, prec);
-        _acb_vec_scalar_add_error_arb_mag(table + N*k, N, err);
-    }
+        platt_conv_arg ca;
+        arb_ptr A7, inv_fac = _arb_vec_init(K);
 
-    for (k = 0; k < K; k++)
-    {
-        row = table + N*k;
-        for (i = 0; i < N/2; i++)
+        /* 1/k! */
+        arb_one(k_factorial);
+        for (k = 0; k < K; k++)
         {
-            acb_swap(row + i, row + i + N/2);
+            if (k >= 2)
+                arb_mul_ui(k_factorial, k_factorial, (ulong) k, prec);
+            arb_inv(inv_fac + k, k_factorial, prec);
         }
-        acb_dft_precomp(row, row, pre_N, prec);
-    }
-    _acb_vec_scalar_div_ui(table, table, N*K, (ulong) A, prec);
 
-    for (k = 0; k < K; k++)
-    {
-        acb_dirichlet_platt_lemma_A7(err, sigma, t0, h, k, A, prec);
-        _acb_vec_scalar_add_error_arb_mag(table + N*k, N, err);
-    }
+        /* the Lemma A7 bounds (an upper bound, and tiny: at 64 bits) */
+        A7 = _arb_vec_init(K);
+        _acb_dirichlet_platt_lemma_A7_vec(A7, sigma, t0, h, K, A, FLINT_MIN(prec, 64));
 
-    arb_one(k_factorial);
-    for (k = 2; k < K; k++)
-    {
-        row = table + N*k;
-        arb_mul_ui(k_factorial, k_factorial, (ulong) k, prec);
-        _acb_vec_scalar_div_arb(row, row, N, k_factorial, prec);
+        ca.coeff = coeff;
+        ca.base = base;
+        ca.A7 = A7;
+        ca.inv_fac = inv_fac;
+        ca.pre_N = pre_N;
+        ca.t0 = t0;
+        ca.h = h;
+        ca.A = A;
+        ca.B = B;
+        ca.N = N;
+        ca.K = K;
+        ca.sigma = sigma;
+        ca.prec = dprec;
+        ca.S_row = S_row;
+        ca.S_ctx = S_ctx;
+        do_convolutions(out_a, &ca);
+        _arb_vec_clear(inv_fac, K);
+        _arb_vec_clear(A7, K);
     }
-
-    do_convolutions(out_a, table, S_table, N, K, prec);
 
     for (i = 0; i < N/2 + 1; i++)
     {
@@ -645,7 +843,7 @@ _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
     acb_dirichlet_platt_lemma_A9(err, sigma, t0, h, A, prec);
     _acb_vec_scalar_add_error_arb_mag(out_a, N, err);
 
-    acb_dft_inverse_precomp(out_b, out_a, pre_N, prec);
+    acb_dft_inverse_precomp(out_b, out_a, pre_N, dprec);
     _acb_vec_scalar_mul_ui(out_b, out_b, N, (ulong) A, prec);
     for (i = 0; i < N/2; i++)
     {
@@ -670,16 +868,77 @@ _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
     arb_clear(c);
     arb_clear(xi);
     acb_clear(z);
-    _acb_vec_clear(table, K*N);
+    _acb_vec_clear(coeff, N);
+    _acb_vec_clear(base, N);
     _acb_vec_clear(out_a, N);
     _acb_vec_clear(out_b, N);
     acb_dft_precomp_clear(pre_N);
+}
+
+int acb_dirichlet_platt_use_dfloat = 1;
+
+/* The sums over j with dfloat balls (dfloat module): the terms in
+   triple-double balls with phases in quad-double balls and the moments
+   in triple-double balls, double-double and double arithmetic give a
+   grid about as accurate as the arb version at prec = log2(T) + 106
+   (about 75 bits after the binary point: the moment k is amplified by
+   about 2^(24 + 8.6 k) with the heuristic parameters), for which the
+   default precision of the zeta_zeros example asks; the arb version is
+   used above that precision, or if the dfloat version fails. */
+static int
+_platt_multieval_dfloat(arb_ptr out, const fmpz_t T, slong A, slong B,
+        const arb_t h, const fmpz_t J, slong K, slong sigma, slong prec)
+{
+    slong N = A*B;
+    platt_S_dd_ctx c;
+    double * S5;
+    arb_t t0, w;
+    fmpz * smk_points;
+    int ok;
+
+    if (!acb_dirichlet_platt_use_dfloat || !fmpz_abs_fits_ui(J) ||
+        fmpz_sgn(T) <= 0 || prec > (slong) fmpz_bits(T) + 110)
+        return 0;
+
+    smk_points = _fmpz_vec_init(N);
+    get_smk_points(smk_points, A, B);
+    arb_init(t0);
+    arb_set_fmpz(t0, T);
+    S5 = flint_malloc(sizeof(double) * 5 * K * N);
+
+    /* the sums as compact balls (5 doubles each), without the factor
+       c = exp(-i t0 log sqrt(pi)), which is applied as the rows are
+       read */
+    ok = _dfloat_platt_smk_dd(S5, smk_points, t0, A, B, fmpz_get_ui(J), K, 4, 0);
+    if (ok)
+    {
+        acb_init(c.c);
+        arb_init(w);
+        arb_const_sqrt_pi(w, prec + 64);
+        arb_log(w, w, prec + 64);
+        arb_mul(w, w, t0, prec + 64);
+        arb_neg(w, w);
+        arb_sin_cos(acb_imagref(c.c), acb_realref(c.c), w, prec);
+        c.S5 = S5;
+        c.N = N;
+        _platt_multieval_rows(out, _platt_S_row_dd, &c, t0, A, B, h, J, K, sigma, prec);
+        acb_clear(c.c);
+        arb_clear(w);
+    }
+
+    arb_clear(t0);
+    flint_free(S5);
+    _fmpz_vec_clear(smk_points, N);
+    return ok;
 }
 
 void
 acb_dirichlet_platt_multieval(arb_ptr out, const fmpz_t T, slong A, slong B,
         const arb_t h, const fmpz_t J, slong K, slong sigma, slong prec)
 {
+    if (_platt_multieval_dfloat(out, T, A, B, h, J, K, sigma, prec))
+        return;
+
     if (flint_get_num_threads() > 1)
     {
         acb_dirichlet_platt_multieval_threaded(
