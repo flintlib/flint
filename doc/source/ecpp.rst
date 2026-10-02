@@ -303,8 +303,3 @@ Discriminants and Cornacchia
     of a root of `H_D`. Returns 1 on success, 0 if `g < 2` or the
     coefficients could not be identified. Requires `D` fundamental.
 
-.. function:: int ecpp_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
-
-    Given `D < 0`, `n` odd with `\gcd(n, D) = 1` and a square root of `D`
-    modulo `n`, finds `t, v \ge 0` with `t^2 + |D| v^2 = 4n` and returns 1,
-    or returns 0 if there is no solution.

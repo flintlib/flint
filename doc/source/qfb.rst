@@ -90,6 +90,24 @@ Computing with forms
     Set `D` to the discriminant of the binary quadratic form `f`, i.e. to
     `b^2 - 4ac`, where `f = (a, b, c)`.
 
+.. function:: int qfb_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
+
+    Given `D < 0`, `n` odd with `\gcd(n, D) = 1` and a square root *sqrtD*
+    of `D` modulo `n`, sets `t, v \ge 0` with `t^2 + |D| v^2 = 4n` and
+    returns 1, or returns 0 if there is no solution. That is, it represents
+    `4n` by the principal form of discriminant `D`, by Cornacchia's
+    algorithm in the form given by Cohen, Algorithm 1.5.3.
+
+    A return value of 0 is only conclusive for prime `n`; for composite `n`
+    the algorithm may fail to find a representation that exists.
+
+    This is the step that turns a discriminant with `\left(\frac{D}{p}\right) = 1`
+    into the trace of Frobenius of a curve with complex multiplication by
+    the order of discriminant `D`, since `4p = t^2 + |D| v^2` gives
+    `\#E(\mathbb{F}_p) = p + 1 \mp t`. It is used that way both by elliptic
+    curve primality proving (see :ref:`ecpp`) and by point counting (see
+    :func:`gr_ec_ctx_cardinality`).
+
 .. function:: void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 
     Set `r` to a reduced form equivalent to the binary quadratic form `f`
