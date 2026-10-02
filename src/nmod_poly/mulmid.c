@@ -20,9 +20,10 @@
     operands of lengths len1 >= len2. It is the transpose of the product of
     lengths len2 and nhi - nlo, and costs about the same as that product
     with each algorithm except KS, which computes the full len1 x len2
-    product. So the choice of fft_small is the one _nmod_poly_mul would
-    make for lengths len2 and nhi - nlo; where mul would use KS, classical
-    is used, except for very small moduli.
+    product. So fft_small is used where _nmod_poly_mul would use it for
+    lengths len2 and nhi - nlo, and also from shorter lengths for some
+    moduli where mul has KS variants in between; otherwise classical is
+    used, or KS for small moduli and outputs much longer than len2.
 */
 void
 _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,

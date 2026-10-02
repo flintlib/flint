@@ -13,9 +13,6 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
-#if FLINT_HAVE_FFT_SMALL
-#  include "fft_small.h"
-#endif
 
 void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen,
                                                          const nmod_geometric_progression_t G, slong len,
@@ -23,6 +20,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
 {
     FLINT_ASSERT(G->function & 1);
     FLINT_ASSERT(len <= G->len);
+    FLINT_ASSERT(plen <= G->len);
 
     /* val = valuation of poly */
     slong val = 0;
@@ -57,15 +55,14 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     TMP_INIT;
     TMP_START;
     nn_ptr a = TMP_ALLOC(alen * sizeof(ulong));
-    nn_ptr b = TMP_ALLOC((alen - 1 + len) * sizeof(ulong));
 
     for (slong i = val; i < plen; i++)
         a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
 
-    _nmod_poly_mulmid(b, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
+    _nmod_poly_mulmid(vs, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
 
     for (slong i = 0; i < len; i++)
-        vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
+        vs[i] = nmod_mul(G->ev_s[i], vs[i], mod);
 
     TMP_END;
 }

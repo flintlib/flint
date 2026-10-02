@@ -1500,7 +1500,7 @@ Multipoint evaluation
 
     Evaluates (``poly``, ``ilen``) at the first ``olen`` values given by the
     precomputed geometric progression ``G``, which are the first ``olen`` powers
-    of the square of ``r``. Requires ``olen <= G->len``.
+    of the square of ``r``. Requires ``ilen <= G->len`` and ``olen <= G->len``.
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong ilen, ulong r, slong olen, nmod_t mod)
 

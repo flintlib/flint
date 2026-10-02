@@ -13,10 +13,23 @@
     For deciding tuning thresholds, the three following runs can be useful
     (a few minutes each):
 
-    ./build/nmod_poly/profile/p-mul_mulmid_tune -q -n 3 -b 0,20,30,50,60,64 -f 16:1024:x1.25 -r 0.1,1,10
-    ./build/nmod_poly/profile/p-mul_mulmid_tune -q -n 3 -b 0,12,16,20,24,28,31,32,36,40,44,48,50,52,56,60,62,64 -f 8:400:x1.1 -r 1
-    ./build/nmod_poly/profile/p-mul_mulmid_tune -q -n 3 -b 0,16,20,24,28,31,32,40,50,60,64 -f 4:256:x1.2 -o 1024,4096
-    P=./build/nmod_poly/profile/p-mul_mulmid_tune; RANDOM=2660; B=(20 30 50 60 64 0); for i in $(seq 120); do b=${B[RANDOM%6]}; fn=$((2+RANDOM%1500)); gn=$((2+RANDOM%1500)); z=$((fn+gn-1)); lo=$((RANDOM%z)); hi=$((lo+1+RANDOM%(z-lo))); $P $b $fn $gn $lo $hi | awk -v s="$b $fn $gn $lo $hi" '$1=="mulmid"||$1=="mul"{printf "%s %s", (++k==1?s" ":" "), $2} END{print ""}'; done
+    P=./build/nmod_poly/profile/p-mul_mulmid_tune
+    $P -q -n 3 -b 0,20,30,50,60,64 -f 16:1024:x1.25 -r 0.1,1,10
+    $P -q -n 3 -b 0,12,16,20,24,28,31,32,36,40,44,48,50,52,56,60,62,64 \
+        -f 8:400:x1.1 -r 1
+    $P -q -n 3 -b 0,16,20,24,28,31,32,40,50,60,64 -f 4:256:x1.2 -o 1024,4096
+
+    and, to compare the two dispatchers on random windows nlo, nhi (one
+    line "nbits fn gn nlo nhi t_mulmid t_mul" per window):
+
+    RANDOM=2660; B=(20 30 50 60 64 0)
+    for i in $(seq 120); do
+        b=${B[RANDOM%6]}; fn=$((2+RANDOM%1500)); gn=$((2+RANDOM%1500))
+        z=$((fn+gn-1)); lo=$((RANDOM%z)); hi=$((lo+1+RANDOM%(z-lo)))
+        $P $b $fn $gn $lo $hi | awk -v s="$b $fn $gn $lo $hi" \
+            '$1=="mulmid"||$1=="mul"{printf "%s %s", (++k==1?s" ":" "), $2}
+             END{print ""}'
+    done
 */
 
 /*
