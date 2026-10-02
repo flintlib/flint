@@ -32,9 +32,10 @@
 
     The BLAS thread count is set to match FLINT's, so that the two are
     compared at equal parallelism. This uses vendor entry points looked
-    up as weak symbols, since there is no portable way to do it; if none
-    is found, the program says so, and the environment variable for the
-    BLAS in use (e.g. OPENBLAS_NUM_THREADS) must be set to get a
+    up as weak symbols (with dlsym on macOS), since there is no portable
+    way to do it; if none is found, the program says so, and the
+    environment variable for the BLAS in use (e.g. OPENBLAS_NUM_THREADS,
+    or VECLIB_MAXIMUM_THREADS for Accelerate) must be set to get a
     meaningful comparison.
 */
 
@@ -49,8 +50,17 @@
 /*
     Vendor thread controls, declared weak so that this links whether or
     not the BLAS in use provides them (and when there is no BLAS at all).
+
+    This does not work on macOS: there, a weak reference to a function must
+    still be resolved by some library at (static) link time, so linking
+    fails as soon as one of these entry points is missing from the BLAS in
+    use (e.g. mkl_set_num_threads with OpenBLAS, or all of them with
+    Accelerate). Look them up at run time with dlsym instead.
 */
-#if defined(__GNUC__) && FLINT_USES_BLAS
+#if FLINT_USES_BLAS && defined(__APPLE__)
+#include <dlfcn.h>
+# define HAVE_DLSYM_BLAS_THREADS 1
+#elif defined(__GNUC__) && FLINT_USES_BLAS
 extern void openblas_set_num_threads(int) __attribute__((weak));
 extern void goto_set_num_threads(int) __attribute__((weak));
 extern void mkl_set_num_threads(int) __attribute__((weak));
@@ -61,7 +71,33 @@ extern void bli_thread_set_num_threads(long) __attribute__((weak));
 static int
 blas_set_num_threads(slong n)
 {
-#if defined(HAVE_WEAK_BLAS_THREADS)
+#if defined(HAVE_DLSYM_BLAS_THREADS)
+    static const char * const int_names[] = {
+        "openblas_set_num_threads",
+        "goto_set_num_threads",
+        "mkl_set_num_threads",
+    };
+    void (*set_int)(int);
+    void (*set_long)(long);
+    size_t i;
+
+    for (i = 0; i < sizeof(int_names) / sizeof(int_names[0]); i++)
+    {
+        *(void **) (&set_int) = dlsym(RTLD_DEFAULT, int_names[i]);
+        if (set_int != NULL)
+        {
+            set_int((int) n);
+            return 1;
+        }
+    }
+
+    *(void **) (&set_long) = dlsym(RTLD_DEFAULT, "bli_thread_set_num_threads");
+    if (set_long != NULL)
+    {
+        set_long((long) n);
+        return 1;
+    }
+#elif defined(HAVE_WEAK_BLAS_THREADS)
     if (openblas_set_num_threads != NULL)
     {
         openblas_set_num_threads((int) n);
