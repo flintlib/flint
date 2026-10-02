@@ -18,6 +18,7 @@
 #if FLINT_HAVE_FFT_SMALL
 
 #include "fft_small.h"
+#include "fft_small/impl.h"
 
 /* Repacking for tiny moduli: given polynomials
 
@@ -480,6 +481,13 @@ _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, 
 
         bits = NMOD_BITS(mod);
         cutoff_len = FLINT_MIN(len1, 2 * len2);
+
+        /* modulo a prime of the fft_small context, fft_small needs a single
+           prime and no chinese remaindering, and wins much earlier than the
+           table says for other 50-bit moduli */
+        if (bits == 50 && cutoff_len >= 24 &&
+            _fft_small_mpn_ctx_prime_index(get_default_mpn_ctx(), mod.n) >= 0)
+            return 1;
 
         if (squaring)
             return cutoff_len >= fft_sqr_tab[bits - 1];

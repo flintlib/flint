@@ -13,9 +13,6 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
-#if FLINT_HAVE_FFT_SMALL
-#  include "fft_small.h"
-#endif
 
 void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen,
                                                          const nmod_geometric_progression_t G, slong len,
@@ -23,6 +20,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
 {
     FLINT_ASSERT(G->function & 1);
     FLINT_ASSERT(len <= G->len);
+    FLINT_ASSERT(plen <= G->len);
 
     /* val = valuation of poly */
     slong val = 0;
@@ -52,52 +50,21 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * [rev(a) * (G->ev_f >> x**val)]_{alen - 1}^{len}  (that is, coeffs [alen - 1, alen - 1 + len))
      */
 
-    /* below are 2 different versions (one requiring fft_small) */
-    /* TODO some optimization needed in mulmid: */
-    /* mulmid is often excellent, but fft_small variant still useful */
-
     const slong alen = plen - val;
 
-    /* this uses a middle product to compute [rev(p) * G->ev_f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
-#if FLINT_HAVE_FFT_SMALL
-    if (2 * (plen - val) - 2 + len > 192)
-    {
-        /* uses fft_small directly */
-        /* 2025-12-04: fastest in medium and large lengths, like 100 and more */
-        /* 2026-05-03: still useful for some short range where mulmid is not yet good */
-        nn_ptr b = _nmod_vec_init(alen + len - 1);
+    TMP_INIT;
+    TMP_START;
+    nn_ptr a = TMP_ALLOC(alen * sizeof(ulong));
 
-        for (slong i = val; i < plen; i++)
-            b[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
+    for (slong i = val; i < plen; i++)
+        a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
 
-        _nmod_poly_mul_mid_default_mpn_ctx(b, alen - 1, alen - 1 + len, G->ev_f->coeffs + val, alen - 1 + len, b, alen, mod);
+    _nmod_poly_mulmid(vs, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
 
-        for (slong i = 0; i < len; i++)
-            vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
+    for (slong i = 0; i < len; i++)
+        vs[i] = nmod_mul(G->ev_s[i], vs[i], mod);
 
-        _nmod_vec_clear(b);
-    }
-    else
-#endif
-    {
-        /* uses nmod_poly_mulmid */
-        /* 2025-12-04: disabled: nmod_poly_mulhigh/mulmid not yet optimized */
-        /* 2026-05-03: best method, much better than fft_small for small parameters, */
-        /*             but also sometimes quite slower for some parameter ranges    */
-        nn_ptr a = _nmod_vec_init(alen);
-        nn_ptr b = _nmod_vec_init(alen - 1 + len);
-
-        for (slong i = val; i < plen; i++)
-            a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
-
-        _nmod_poly_mulmid(b, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
-
-        for (slong i = 0; i < len; i++)
-            vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
-
-        _nmod_vec_clear(a);
-        _nmod_vec_clear(b);
-    }
+    TMP_END;
 }
 
 void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong plen, ulong r, slong n, nmod_t mod)
