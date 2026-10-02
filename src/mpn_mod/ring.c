@@ -34,7 +34,89 @@ mpn_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 void
 mpn_mod_ctx_clear(gr_ctx_t ctx)
 {
+    flint_free(MPN_MOD_CTX_FACTOR(ctx));
     flint_free(MPN_MOD_CTX(ctx));
+}
+
+/*
+    Pretending to be a field: an operation which needs the inverse of a
+    nonzero non-unit x records the factor gcd(x, n) of the modulus (the
+    first one found, allocated once under the zero divisor lock) and fails
+    with GR_UNABLE instead of GR_DOMAIN.
+*/
+truth_t
+mpn_mod_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    int p;
+    _gr_ctx_zero_divisor_lock();
+    p = MPN_MOD_CTX_PRETEND(ctx);
+    _gr_ctx_zero_divisor_unlock();
+    if (p)
+        return T_TRUE;
+    return (MPN_MOD_CTX_IS_PRIME(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
+int
+mpn_mod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+{
+    _gr_ctx_zero_divisor_lock();
+    MPN_MOD_CTX_PRETEND(ctx) = (is_pretend_field == T_TRUE);
+    /* (turning the pretense off forgets the zero divisor) */
+    if (!MPN_MOD_CTX_PRETEND(ctx) && MPN_MOD_CTX_FACTOR(ctx) != NULL)
+    {
+        flint_free(MPN_MOD_CTX_FACTOR(ctx));
+        MPN_MOD_CTX_FACTOR(ctx) = NULL;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return GR_SUCCESS;
+}
+
+/* the status for a failed inversion of the residue x, with g (gsize limbs)
+   = gcd(x, n): GR_DOMAIN for zero (or when not pretending), otherwise
+   GR_UNABLE with g recorded */
+int
+_mpn_mod_nonunit(nn_srcptr x, nn_srcptr g, slong gsize, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    int status = GR_DOMAIN;
+
+    if (flint_mpn_zero_p(x, n))
+        return GR_DOMAIN;
+
+    _gr_ctx_zero_divisor_lock();
+    if (MPN_MOD_CTX_PRETEND(ctx))
+    {
+        if (MPN_MOD_CTX_FACTOR(ctx) == NULL && !(gsize == 1 && g[0] == 1) && gsize <= n)
+        {
+            nn_ptr f = flint_malloc(n * sizeof(ulong));
+            flint_mpn_copyi(f, g, gsize);
+            flint_mpn_zero(f + gsize, n - gsize);
+            if (mpn_cmp(f, MPN_MOD_CTX_MODULUS(ctx), n) != 0)
+                MPN_MOD_CTX_FACTOR(ctx) = f;
+            else
+                flint_free(f);
+        }
+        status = GR_UNABLE;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return status;
+}
+
+int
+mpn_mod_ctx_recover_zero_divisor(nn_ptr res, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    int status = GR_UNABLE;
+    _gr_ctx_zero_divisor_lock();
+    if (MPN_MOD_CTX_FACTOR(ctx) != NULL)
+    {
+        flint_mpn_copyi(res, MPN_MOD_CTX_FACTOR(ctx), n);
+        status = GR_SUCCESS;
+    }
+    else
+        flint_mpn_zero(res, n);
+    _gr_ctx_zero_divisor_unlock();
+    return status;
 }
 
 int
@@ -163,7 +245,9 @@ typedef struct
 {
     fmpz_mod_ctx_struct * ctx;
     truth_t is_prime;
+    int pretend;
     fmpz a;    /* when used as finite field with defining polynomial x - a */
+    fmpz * factor;
 }
 _gr_fmpz_mod_ctx_struct;
 
@@ -649,7 +733,7 @@ mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
     gsize = mpn_gcdext(g, s, &ssize, t, n, u, n);
 
     if (gsize != 1 || g[0] != 1)
-        return GR_DOMAIN;
+        return _mpn_mod_nonunit(x, g, gsize, ctx);
 
     flint_mpn_zero(s + FLINT_ABS(ssize), n - FLINT_ABS(ssize));
 

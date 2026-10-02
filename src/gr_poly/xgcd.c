@@ -26,7 +26,7 @@ _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, s
     FLINT_ASSERT(lenA >= lenB);
     FLINT_ASSERT(lenB >= 1);
 
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         /* see _gr_poly_gcd_generic for the selection */
         /* todo: clear denominators + subresultant over fraction fields */

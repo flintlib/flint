@@ -32,6 +32,12 @@ truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+/* by default, a ring pretends to be a field exactly when it is one */
+truth_t gr_generic_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    return (gr_ctx_is_field(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
 truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx)
 {
     return T_TRUE;
@@ -1171,8 +1177,10 @@ static truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr
         return T_TRUE;
 
     /* In an integral domain, div should find the unique quotient
-       or assert that none exists. */
-    if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
+       or assert that none exists. The same holds in a ring pretending
+       to be a field, where div fails with GR_DOMAIN only for y = 0
+       (and with GR_UNABLE if y is a zero divisor). */
+    if (gr_ctx_is_integral_domain(ctx) == T_TRUE || gr_ctx_is_pretend_field(ctx) == T_TRUE)
         return status;
 
     /* The ring would need to implement this case. */
@@ -1196,7 +1204,8 @@ static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (status == GR_SUCCESS)
         return T_TRUE;
 
-    if (gr_ctx_is_integral_domain(ctx) != T_TRUE)
+    /* (in a ring pretending to be a field, GR_DOMAIN means x = 0) */
+    if (gr_ctx_is_integral_domain(ctx) != T_TRUE && gr_ctx_is_pretend_field(ctx) != T_TRUE)
         return T_UNKNOWN;
 
     if (status == GR_DOMAIN)
@@ -1393,7 +1402,9 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 static int
 gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    /* (in a ring pretending to be a field, a zero divisor makes the
+       inversion fail with GR_UNABLE, which is propagated) */
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         int status = gr_inv(u, x, ctx);
 
@@ -1420,7 +1431,7 @@ gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 static int
 gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         truth_t x_zero, y_zero;
 
@@ -1431,7 +1442,21 @@ gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
             return gr_zero(res, ctx);
 
         if (x_zero == T_FALSE || y_zero == T_FALSE)
+        {
+            /* (pretending: the nonzero element must be invertible, which
+               is checked by inverting it) */
+            if (gr_ctx_is_field(ctx) != T_TRUE)
+            {
+                gr_ptr t;
+                int status;
+                GR_TMP_INIT(t, ctx);
+                status = gr_inv(t, (x_zero == T_FALSE) ? x : y, ctx);
+                GR_TMP_CLEAR(t, ctx);
+                if (status != GR_SUCCESS)
+                    return status;
+            }
             return gr_one(res, ctx);
+        }
 
         return GR_UNABLE;
     }
@@ -2839,6 +2864,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) gr_generic_ctx_is_pretend_field},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,      (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FINITE,           (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,        (gr_funcptr) gr_generic_ctx_predicate},

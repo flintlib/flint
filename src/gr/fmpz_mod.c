@@ -30,13 +30,17 @@ typedef struct
 {
     fmpz_mod_ctx_struct * ctx;
     truth_t is_prime;
+    int pretend;   /* pretending to be a field */
     fmpz a;    /* when used as finite field with defining polynomial x - a */
+    fmpz * factor;   /* a factor of the modulus found while pretending (NULL: none) */
 }
 _gr_fmpz_mod_ctx_struct;
 
 #define FMPZ_MOD_CTX(ring_ctx) ((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->ctx))
 #define FMPZ_MOD_IS_PRIME(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->is_prime)
 #define FMPZ_MOD_CTX_A(ring_ctx) (&((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->a)))
+#define FMPZ_MOD_PRETEND(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->pretend)
+#define FMPZ_MOD_FACTOR(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->factor)
 
 static int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -54,6 +58,100 @@ _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
     fmpz_mod_ctx_clear(FMPZ_MOD_CTX(ctx));
     flint_free(FMPZ_MOD_CTX(ctx));
     fmpz_clear(FMPZ_MOD_CTX_A(ctx));
+    if (FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_clear(FMPZ_MOD_FACTOR(ctx));
+        flint_free(FMPZ_MOD_FACTOR(ctx));
+    }
+}
+
+/*
+    Pretending to be a field: an operation which needs the inverse of a
+    nonzero non-unit x records the factor gcd(x, n) of the modulus (the
+    first one found, allocated once under the zero divisor lock) and fails
+    with GR_UNABLE instead of GR_DOMAIN.
+*/
+static truth_t _gr_fmpz_mod_ctx_is_field(gr_ctx_t ctx);
+
+static truth_t
+_gr_fmpz_mod_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    int p;
+    _gr_ctx_zero_divisor_lock();
+    p = FMPZ_MOD_PRETEND(ctx);
+    _gr_ctx_zero_divisor_unlock();
+    if (p)
+        return T_TRUE;
+    return (_gr_fmpz_mod_ctx_is_field(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
+static int
+_gr_fmpz_mod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+{
+    _gr_ctx_zero_divisor_lock();
+    FMPZ_MOD_PRETEND(ctx) = (is_pretend_field == T_TRUE);
+    /* (turning the pretense off forgets the zero divisor) */
+    if (!FMPZ_MOD_PRETEND(ctx) && FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_clear(FMPZ_MOD_FACTOR(ctx));
+        flint_free(FMPZ_MOD_FACTOR(ctx));
+        FMPZ_MOD_FACTOR(ctx) = NULL;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return GR_SUCCESS;
+}
+
+/* the status for a failed inversion of x (d = gcd(x, n), or NULL to
+   compute it): GR_DOMAIN for zero (or when not pretending), otherwise
+   GR_UNABLE with a factor recorded */
+static int
+_gr_fmpz_mod_nonunit(const fmpz_t x, const fmpz_t d, const gr_ctx_t ctx)
+{
+    int status = GR_DOMAIN;
+
+    if (fmpz_is_zero(x))
+        return GR_DOMAIN;
+
+    _gr_ctx_zero_divisor_lock();
+    if (FMPZ_MOD_PRETEND(ctx))
+    {
+        if (FMPZ_MOD_FACTOR(ctx) == NULL)
+        {
+            fmpz_t g;
+            fmpz_init(g);
+            if (d != NULL)
+                fmpz_set(g, d);
+            else
+                fmpz_gcd(g, x, FMPZ_MOD_CTX(ctx)->n);
+            if (!fmpz_is_one(g) && !fmpz_equal(g, FMPZ_MOD_CTX(ctx)->n))
+            {
+                fmpz * f = flint_malloc(sizeof(fmpz));
+                fmpz_init(f);
+                fmpz_swap(f, g);
+                FMPZ_MOD_FACTOR((gr_ctx_struct *) ctx) = f;
+            }
+            fmpz_clear(g);
+        }
+        status = GR_UNABLE;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return status;
+}
+
+static int
+_gr_fmpz_mod_ctx_recover_zero_divisor(fmpz_t res, gr_ctx_t ctx)
+{
+    int status = GR_UNABLE;
+    _gr_ctx_zero_divisor_lock();
+    if (FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_set(res, FMPZ_MOD_FACTOR(ctx));
+        status = GR_SUCCESS;
+    }
+    else
+        fmpz_zero(res);
+    _gr_ctx_zero_divisor_unlock();
+    return status;
 }
 
 static int
@@ -499,7 +597,7 @@ _gr_fmpz_mod_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
         if (fmpz_is_one(d))
             status = GR_SUCCESS;
         else
-            status = GR_DOMAIN;
+            status = _gr_fmpz_mod_nonunit(x, d, ctx);
 
         fmpz_clear(d);
         return status;
@@ -529,6 +627,10 @@ _gr_fmpz_mod_div_nonunique(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_
     int status;
 
 #if 1
+    if (FMPZ_MOD_PRETEND(ctx) && !fmpz_is_zero(y) && !fmpz_mod_is_invertible(y, FMPZ_MOD_CTX(ctx)) &&
+        _gr_fmpz_mod_nonunit(y, NULL, ctx) == GR_UNABLE)
+        return GR_UNABLE;
+
     status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 #else
     if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE)
@@ -556,6 +658,11 @@ _gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     truth_t res;
     fmpz_t t;
+
+    if (FMPZ_MOD_PRETEND(ctx) && !fmpz_is_zero(x) && !fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)) &&
+        _gr_fmpz_mod_nonunit(x, NULL, ctx) == GR_UNABLE)
+        return T_UNKNOWN;
+
     fmpz_init(t);
     res = fmpz_mod_divides(t, y, x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
     fmpz_clear(t);
@@ -565,7 +672,9 @@ _gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 static truth_t
 _gr_fmpz_mod_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
 {
-    return fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
+    if (fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)))
+        return T_TRUE;
+    return (_gr_fmpz_mod_nonunit(x, NULL, ctx) == GR_UNABLE) ? T_UNKNOWN : T_FALSE;
 }
 
 static int
@@ -1035,6 +1144,9 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) _gr_fmpz_mod_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) _gr_fmpz_mod_ctx_is_pretend_field},
+    {GR_METHOD_CTX_SET_IS_PRETEND_FIELD,(gr_funcptr) _gr_fmpz_mod_ctx_set_is_pretend_field},
+    {GR_METHOD_CTX_RECOVER_ZERO_DIVISOR,(gr_funcptr) _gr_fmpz_mod_ctx_recover_zero_divisor},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_mod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_mod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpz_mod_swap},
@@ -1122,6 +1234,8 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
     FMPZ_MOD_CTX(ctx) = flint_malloc(sizeof(fmpz_mod_ctx_struct));
     fmpz_mod_ctx_init(FMPZ_MOD_CTX(ctx), n);
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    FMPZ_MOD_PRETEND(ctx) = 0;
+    FMPZ_MOD_FACTOR(ctx) = NULL;
     fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;
@@ -1143,6 +1257,8 @@ _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fctx)
 
     FMPZ_MOD_CTX(ctx) = (fmpz_mod_ctx_struct *) fctx;
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    FMPZ_MOD_PRETEND(ctx) = 0;
+    FMPZ_MOD_FACTOR(ctx) = NULL;
     fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;

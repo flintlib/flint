@@ -134,6 +134,9 @@ typedef enum
     GR_METHOD_CTX_GET_REAL_PREC,
 
     GR_METHOD_CTX_SET_IS_FIELD,
+    GR_METHOD_CTX_IS_PRETEND_FIELD,
+    GR_METHOD_CTX_SET_IS_PRETEND_FIELD,
+    GR_METHOD_CTX_RECOVER_ZERO_DIVISOR,
     GR_METHOD_CTX_SET_GEN_NAME,
     GR_METHOD_CTX_SET_GEN_NAMES,
     GR_METHOD_CTX_NGENS,
@@ -747,6 +750,7 @@ typedef enum
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
     GR_CTX_DECFLOAT, GR_CTX_DECBALL, GR_CTX_DECCFLOAT, GR_CTX_DECCBALL,
     GR_CTX_MPF,
+    GR_CTX_GR_POLY_QUOTIENT,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_GR_TRANSFORMED_POLY,
     GR_CTX_GR_TRANSFORMED_MPN,
@@ -1094,6 +1098,14 @@ GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field) { return GR_CTX_SET_TRUTH(ctx, CTX_SET_IS_FIELD)(ctx, is_field); }
+GR_INLINE truth_t gr_ctx_is_pretend_field(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_PRETEND_FIELD)(ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field) { return GR_CTX_SET_TRUTH(ctx, CTX_SET_IS_PRETEND_FIELD)(ctx, is_pretend_field); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_recover_zero_divisor(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, CTX_RECOVER_ZERO_DIVISOR)(res, ctx); }
+
+/* (serializes the recording of zero divisors by rings pretending to be
+   fields; a single lock, as this happens rarely) */
+void _gr_ctx_zero_divisor_lock(void);
+void _gr_ctx_zero_divisor_unlock(void);
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_name(gr_ctx_t ctx, const char * s) { return GR_CTX_SET_STR(ctx, CTX_SET_GEN_NAME)(ctx, s); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_names(gr_ctx_t ctx, const char ** s) { return GR_CTX_SET_STRS(ctx, CTX_SET_GEN_NAMES)(ctx, s); }
 GR_INLINE int gr_ctx_ngens(slong * ngens, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_NGENS)(ngens, ctx); }
@@ -1653,6 +1665,20 @@ polynomial_ctx_t;
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
 void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring);
+
+/* Quotient ring F[x]/(m) by a monic polynomial */
+
+void gr_ctx_init_gr_poly_quotient(gr_ctx_t ctx, gr_ctx_t base, const gr_poly_t modulus);
+const gr_poly_struct * gr_poly_quotient_ctx_modulus(gr_ctx_t ctx);
+gr_ctx_struct * gr_poly_quotient_ctx_base(gr_ctx_t ctx);
+slong gr_poly_quotient_ctx_degree(gr_ctx_t ctx);
+ulong gr_poly_quotient_ctx_version(gr_ctx_t ctx);
+int gr_poly_quotient_ctx_refine(gr_ctx_t ctx, const gr_poly_t new_modulus);
+slong gr_poly_quotient_ctx_num_zero_divisors(gr_ctx_t ctx);
+const gr_poly_struct * gr_poly_quotient_ctx_zero_divisor(gr_ctx_t ctx, slong i);
+void gr_poly_quotient_ctx_clear_zero_divisors(gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_quotient_get_poly(gr_poly_t res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_quotient_set_poly(gr_ptr res, const gr_poly_t x, gr_ctx_t ctx);
 
 /* Multivariate */
 
