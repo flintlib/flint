@@ -741,8 +741,9 @@ mpmath [Joh2018b]_ by Juan Arias de Reyna, described in [Ari2012]_.
     cheaper to evaluate, in particular in the dfloat range), then
     finished by one secant step through the endpoints of that bracket
     and the signs of *Z* at a quarter of the tolerance on either side of
-    the result: four evaluations at the target precision instead of a
-    dozen (at the 10^15-th zero to 192 bits, 12 s instead of 31 s).
+    the result: four evaluations at the target precision rather than
+    the dozen of the Illinois method alone (at the 10^15-th zero to 192
+    bits, 12 s against 31 s).
     Above `4 \log_2 t + 40` bits, Newton's method is used.
 
 .. function:: void _acb_dirichlet_refine_hardy_z_zero_ball(arb_t res, const arb_t z, slong prec)

@@ -292,8 +292,8 @@ r_0 / y_0` is a single division, whose head `q_k y_0` is cancelled
 exactly against the remainder by a TwoProd and Sterbenz's lemma, so
 that no accuracy is lost at the cancellation) and are 1.5-4x faster
 than ``nfloat``. A Newton-Karp-Markstein division (a reciprocal at
-half precision, one product and one correction) was tried and is
-slower at every `N` (75 vs 49 ns at `N = 4` in the same run): the
+half precision, one product and one correction) is slower at every
+`N` (75 vs 49 ns at `N = 4` in the same run): the
 long division's steps are cheap products of a single double with
 the divisor, and it has no full-precision square. Precomputing
 `1/y_0` and multiplying does not help either: the divisions in the
@@ -1365,8 +1365,8 @@ return nothing. Aliasing of inputs and outputs is allowed everywhere.
     Classical multiplication of two polynomials of length 256 costs, per
     coefficient product, 0.54, 3.4, 9.0, 18 ns for ``d1`` to ``d4`` and
     3.5, 9.2, 16, 25 ns for ``d1b`` to ``d4b`` (against 1.0, 12, 25, 61
-    and 8.4, 9.7, 16, 27 ns with the scalar ``vec_dot_rev`` of the
-    first version); the gains start at length 16, and the short
+    and 8.4, 9.7, 16, 27 ns with a scalar ``vec_dot_rev`` loop);
+    the gains start at length 16, and the short
     lengths are within a few percent of the scalar loop. Nanoseconds per element, one
     run on a machine going about twice slower than in the tables
     above (the ``vec_div`` and ``vec_exp`` columns for reference):
@@ -1571,9 +1571,7 @@ complex ``gr_mul`` and ``gr_add``):
 vectors, the dot products, their gr methods and the thin wrappers of
 the functions of ``complex.c``, and the table of real operations)
 adds about 27 KB of text per `N`, and ``complex.c`` 22 KB, together
-about 13% of the real code. The first
-version, with everything compiled per format and the real arithmetic
-inlined into the complex functions, added 320 KB.
+about 13% of the real code.
 
 Types and functions
 ...............................................................................
@@ -2208,25 +2206,19 @@ Application: the sieved power sum
     against 25 s at `10^{17}`), and 8-9 times faster at twice that
     precision; above what `(3, 4)` can deliver (about 140 bits after
     the binary point at `10^{15}`) the arb version is used. Isolating
-    the `10^{15}`-th zero takes 3.6 s instead of 56 s, the
-    `10^{16}`-th 15 s instead of 259 s, and computing the
-    `10^{15}`-th zero to 64 bits 5.6 s instead of 78 s.
+    the `10^{15}`-th zero takes 3.6 s against 56 s with the arb
+    version, the `10^{16}`-th 15 s against 259 s, and computing the
+    `10^{15}`-th zero to 64 bits 5.6 s against 78 s.
 
     The refinement of a zero to the default precision of the
     ``zeta_zeros`` example (`64 + \log_2 n` bits) evaluates *Z* at the
     target precision plus 12 bits (see
     :func:`_acb_dirichlet_refine_hardy_z_zero`), which asks the main
     sum for about 84 bits after the binary point at any height, so
-    ``(2, 4)`` up to about the `10^{17}`-th zero and ``(3, 4)`` beyond
-    (before, the Illinois iteration evaluated *Z* at the target
-    precision plus `\log_2 t + 8` bits, i.e. 128-140 bits after the
-    binary point, which needed ``(3, 4)`` with the tolerance above and
-    fell back to arb from about the `10^{18}`-th zero on). ``zeta_zeros
-    -count 1 -noplatt`` on two threads of the 2-core test machine:
-    2.3 s at `n = 10^{15}`, 8.5 s at `10^{16}`, 18.5 s at `10^{17}`,
-    81 s at `10^{18}` (40 s, 13 s with arb fallbacks, 325 s and over
-    1000 s before these changes); the Platt method takes 57 s, 111 s
-    and 257 s at `10^{15}`, `10^{16}` and `10^{17}`. The rest of the
+    ``(2, 4)`` up to about the `10^{17}`-th zero and ``(3, 4)`` beyond.
+    ``zeta_zeros -count 1 -noplatt`` on two threads of the 2-core test
+    machine: 2.3 s at `n = 10^{15}`, 8.5 s at `10^{16}`, 18.5 s at
+    `10^{17}`, 81 s at `10^{18}`. The rest of the
     time is the isolation (Gram points and Turing's method, about 20-35
     evaluations at 20-25 bits after the binary point, ``(1, 2)``).
 
@@ -2350,7 +2342,8 @@ Application: the sieved power sum
     factor above `M`) are computed directly (as the prime terms of the
     power sum); at the `10^{18}`-th zero (`M/J \approx 1/42`), about
     80% of the `j` beyond `M` come from the table (the multi-evaluation
-    takes 163 s instead of 197 s on one thread). The
+    takes 163 s on one thread, against 197 s with all of them computed
+    directly). The
     `j` are processed in dyadic ranges `[2^i, 2^{i+1})` while
     `2^i \le M` (the cofactors of a range lie in the previous ones), then
     `(2^i, J]`, each in chunks of a fixed length (at least `2^{18}`)
@@ -2361,14 +2354,13 @@ Application: the sieved power sum
     **Performance.** At the `10^{15}`-th zero (`J = 7.75 \cdot 10^6`,
     `K = 37`), one thread: 0.42 microseconds per `j` (0.23 for the terms,
     0.19 for the moments), against 7.7 for the arb version at 228 bits.
-    Together with the changes to :func:`acb_dirichlet_platt_multieval`
-    (the transforms at `\text{prec} - \log_2 t_0 + 16` bits, the table
-    rows generated per group of `k`, the convolutions in waves), the
-    Platt method in ``zeta_zeros`` on two threads takes: 6.9 s for 300
-    zeros from `10^{12}` (20 s with arb), 5.3 s for a zero at `10^{15}`
-    (44 s), 9.4 s at `10^{16}` (111 s), 24 s at `10^{17}` (257 s) and
-    109 s at `10^{18}` in 0.87 GB (3.4 GB with the first dfloat version),
-    with the same digits as before and as the Riemann-Siegel method.
+    With :func:`acb_dirichlet_platt_multieval` (the transforms at
+    `\text{prec} - \log_2 t_0 + 16` bits, the table rows generated per
+    group of `k`, the convolutions in waves), the Platt method in
+    ``zeta_zeros`` on two threads takes: 6.9 s for 300 zeros from
+    `10^{12}`, 5.3 s for a zero at `10^{15}`, 9.4 s at `10^{16}`, 24 s
+    at `10^{17}` and 109 s at `10^{18}` in 0.87 GB, with the same digits
+    as with the arb sums and as the Riemann-Siegel method.
 
 .. function:: void dfloat_set_dfloat(double * res, int nres, const double * x, int nx)
               void dfloat_ball_set_ball(double * res, int nres, const double * x, int nx)
@@ -2418,8 +2410,8 @@ and the kernels are fully unrolled, so the object code is large
 (about 1 MB of text for the four types, most of it the scalar and
 vector cores of the elementary functions and the division and square
 root kernels). The following keep it from growing further, at no
-measurable cost in speed (each was checked against the fully inlined
-version, operation by operation): the general renormalization with a
+measurable cost in speed against fully inlined code (operation by
+operation): the general renormalization with a
 run-time number of terms, used only by slow paths and conversions, is
 implemented once for all `N` (``scaled.c``); the ball operations take
 their error mode (automatic or fast context) as a run-time argument
@@ -2430,9 +2422,8 @@ product, ``inv``, and the cores of ``expm1`` (`N \ge 2`) and
 ``log1p`` (`N \ge 3`) are shared out of line; the public elementary
 functions are never inlined into their gr wrappers; and the
 comparisons and predicates share one out-of-line bound on the
-difference. Relative to inlining everything (the first version),
-this removes 36% of the text and 30% of the object file with debug
-information.
+difference. Relative to inlining everything, this saves 36% of the
+text and 30% of the object file with debug information.
 
 **Benchmarking.** On Skylake-family processors, whose JCC erratum
 microcode keeps jumps that cross or end on a 32-byte boundary out of
