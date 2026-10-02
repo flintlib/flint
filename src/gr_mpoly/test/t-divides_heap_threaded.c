@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
@@ -175,6 +176,72 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
         gr_ctx_clear(cctx);
         if (used_debug_base)
             gr_ctx_clear(debug_base_ctx);
+    }
+
+    /* Exact division with a long quotient (> 256 terms), so that the
+       thread-safe quotient array is reallocated while other threads are
+       reading it (see gr_mpoly_ts_append) */
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    {
+        gr_ctx_t cctx;
+        gr_mpoly_ctx_t ctx;
+        gr_mpoly_t f, g, h, q1, q2;
+        int status, dstatus1, dstatus2;
+
+        if (n_randint(state, 2))
+            gr_ctx_init_fmpz(cctx);
+        else
+            gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1));
+
+        /* at least two variables, so that f really gets > 256 terms */
+        gr_mpoly_ctx_init(ctx, cctx, 2 + n_randint(state, 2),
+                                            mpoly_ordering_randtest(state));
+
+        gr_mpoly_init(f, ctx);
+        gr_mpoly_init(g, ctx);
+        gr_mpoly_init(h, ctx);
+        gr_mpoly_init(q1, ctx);
+        gr_mpoly_init(q2, ctx);
+
+        flint_set_num_threads(2 + n_randint(state, 3));
+
+        status = GR_SUCCESS;
+        status |= gr_mpoly_randtest_bits(f, state, 400 + n_randint(state, 400),
+                                                n_randint(state, 4) + 10, ctx);
+        status |= gr_mpoly_randtest_bits(g, state, n_randint(state, 20) + 2,
+                                                n_randint(state, 4) + 4, ctx);
+        if (gr_mpoly_is_zero(g, ctx) != T_FALSE)
+            status |= gr_mpoly_one(g, ctx);
+        status |= gr_mpoly_mul(h, f, g, ctx);
+
+        if (status == GR_SUCCESS)
+        {
+            dstatus1 = gr_mpoly_divides_heap(q1, h, g, ctx);
+            dstatus2 = gr_mpoly_divides_heap_threaded(q2, h, g, ctx);
+
+            if (dstatus1 != GR_SUCCESS || dstatus2 != GR_SUCCESS ||
+                gr_mpoly_equal(q1, f, ctx) == T_FALSE ||
+                gr_mpoly_equal(q2, f, ctx) == T_FALSE)
+            {
+                flint_printf("FAIL: long quotient\n");
+                flint_printf("i = %wd, dstatus1 = %d, dstatus2 = %d, flen = %wd\n",
+                                         i, dstatus1, dstatus2, f->length);
+                gr_ctx_println(cctx);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            gr_mpoly_assert_canonical(q2, ctx);
+        }
+
+        gr_mpoly_clear(f, ctx);
+        gr_mpoly_clear(g, ctx);
+        gr_mpoly_clear(h, ctx);
+        gr_mpoly_clear(q1, ctx);
+        gr_mpoly_clear(q2, ctx);
+
+        gr_mpoly_ctx_clear(ctx);
+        gr_ctx_clear(cctx);
     }
 
     /* Also check on arbitrary (not necessarily divisible) inputs that the

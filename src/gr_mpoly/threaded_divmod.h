@@ -188,7 +188,6 @@ typedef struct
     gr_mpoly_ts_t polyR;       /* only used/initialised if want_remainder */
     gr_mpoly_ctx_struct * ctx;
     gr_ctx_struct * cctx;
-    slong length;
     slong N;
     flint_bitcnt_t bits;
     ulong * cmpmask;
