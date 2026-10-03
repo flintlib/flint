@@ -144,37 +144,12 @@ _deccball_acb_gr_extra(deccball_ptr * res, slong nres, deccball_srcptr * args, s
     return status;
 }
 
-/* rounds one part of an acb result; returns 1 if decided, 0 to retry
-   at higher precision, -1 on error */
-static int
-_decfloat_round_arb_part(decfloat_t res, const arb_t r, slong prec, int rnd, gr_ctx_t bctx, gr_ctx_t ctx)
-{
-    decball_t Y;
-    int rr;
-
-    if (!arb_is_finite(r))
-    {
-        if (arf_is_pos_inf(arb_midref(r)) && mag_is_finite(arb_radref(r)))
-            return (decfloat_pos_inf(res, ctx) == GR_SUCCESS) ? 1 : -1;
-        if (arf_is_neg_inf(arb_midref(r)) && mag_is_finite(arb_radref(r)))
-            return (decfloat_neg_inf(res, ctx) == GR_SUCCESS) ? 1 : -1;
-        return 0;
-    }
-
-    decball_init(Y, bctx);
-    rr = (decball_set_arb(Y, r, bctx) == GR_SUCCESS) ? 1 : -1;
-    if (rr == 1)
-        rr = _decfloat_round_ball(res, Y, prec, rnd, bctx, ctx);
-    decball_clear(Y, bctx);
-    return rr;
-}
-
 /* rounds an acb result to a deccfloat; returns 1 if decided, 0 to retry
    at higher precision, -1 on error */
 /* mask: bit 0 = real part, bit 1 = imaginary part; unmasked parts of
    res are left untouched */
 static int
-_deccfloat_round_acb(deccfloat_t res, const acb_t r, slong prec, int mask, gr_ctx_t bctx, gr_ctx_t ctx)
+_deccfloat_round_acb(deccfloat_t res, const acb_t r, slong prec, int mask, gr_ctx_t ctx)
 {
     decfloat_t tre, tim;
     int rr = 1;
@@ -183,9 +158,9 @@ _deccfloat_round_acb(deccfloat_t res, const acb_t r, slong prec, int mask, gr_ct
     decfloat_init(tim, ctx);
 
     if (mask & 1)
-        rr = _decfloat_round_arb_part(tre, acb_realref(r), prec, RND(ctx), bctx, ctx);
+        rr = _decfloat_round_arb(tre, acb_realref(r), prec, RND(ctx), ctx);
     if (rr == 1 && (mask & 2))
-        rr = _decfloat_round_arb_part(tim, acb_imagref(r), prec, RND_IM(ctx), bctx, ctx);
+        rr = _decfloat_round_arb(tim, acb_imagref(r), prec, RND_IM(ctx), ctx);
     if (rr == 1)
     {
         if (mask & 1)
@@ -212,7 +187,7 @@ DECIMAL_DRIVER int
 _deccfloat_acb_gr_masked(deccfloat_ptr * res, slong nres, deccfloat_srcptr * args, slong nargs, int has_flag, int flag, const extra_arg * extra, int method, int mask, gr_ctx_t ctx)
 {
     slong prec = PREC(ctx);
-    gr_ctx_t actx, bctx;
+    gr_ctx_t actx;
     acb_struct a[MAX_ARGS], r[MAX_RES];
     gr_ptr rp[MAX_RES];
     gr_srcptr asp[MAX_ARGS];
@@ -244,9 +219,6 @@ _deccfloat_acb_gr_masked(deccfloat_ptr * res, slong nres, deccfloat_srcptr * arg
             return GR_UNABLE;
     }
 
-    _gr_ctx_init_decimal(bctx, DECIMAL_CTX_BALL, DECIMAL_CTX_E(ctx), prec, DECIMAL_RND_DOWN, 0);
-    decimal_ctx_set_rad_prec(bctx, DECMAG_MAX_PREC);
-
     for (i = 0; i < nargs; i++)
     {
         acb_init(a + i);
@@ -277,7 +249,6 @@ _deccfloat_acb_gr_masked(deccfloat_ptr * res, slong nres, deccfloat_srcptr * arg
     for (wp = prec + 10; wp <= wp_max; wp *= 2)
     {
         wpbits = _decimal_digits_to_bits(wp);
-        decimal_ctx_set_prec(bctx, wp);
         gr_ctx_init_complex_acb(actx, wpbits);
 
         status = GR_SUCCESS;
@@ -298,7 +269,7 @@ _deccfloat_acb_gr_masked(deccfloat_ptr * res, slong nres, deccfloat_srcptr * arg
 
         rr = 1;
         for (i = 0; i < nres && rr == 1; i++)
-            rr = _deccfloat_round_acb(tmp + i, r + i, prec, (i == 0) ? mask : 3, bctx, ctx);
+            rr = _deccfloat_round_acb(tmp + i, r + i, prec, (i == 0) ? mask : 3, ctx);
 
         if (rr == 1)
         {
@@ -320,7 +291,6 @@ _deccfloat_acb_gr_masked(deccfloat_ptr * res, slong nres, deccfloat_srcptr * arg
         acb_clear(r + i);
         deccfloat_clear(tmp + i, ctx);
     }
-    gr_ctx_clear(bctx);
     return status;
 }
 
@@ -850,6 +820,7 @@ _deccfloat_tiny_arg(deccfloat_t res, const deccfloat_t z, const ctail_info * ti,
         decfloat_ptr out = comp ? tim : tre;
         int crnd = comp ? rnd_im : rnd;
         int sgn[3], found = 0, tsign = 0, rr;
+        slong jfound = 0;
         decmag_struct lbc[3], ubc[3], after[3];
         slong j, n = ti->nterms;
 
@@ -933,13 +904,27 @@ _deccfloat_tiny_arg(deccfloat_t res, const deccfloat_t z, const ctail_info * ti,
             {
                 tsign = T->csign * sgn[j];
                 found = 1;
+                jfound = j;
             }
             break;
         }
 
         if (found == 1)
         {
-            rr = _decfloat_round_with_tail(out, Sc, tsign, _decmag_exp_bound(after + 0, bctx), prec, crnd, ctx);
+            /* the tail is term jfound plus everything after it */
+            const cterm * T = ti->terms + jfound;
+            decmag_t tb;
+            slong tail_exp;
+
+            _decmag_init(tb, bctx);
+            _decmag_set_ui(tb, T->exact ? T->clo_num : 2 * T->clo_num, bctx);
+            _decmag_div_ui(tb, tb, T->clo_den, bctx);
+            _decmag_mul(tb, tb, ubc + jfound, bctx);
+            _decmag_add(tb, tb, after + jfound, bctx);
+            tail_exp = _decmag_exp_bound(tb, bctx);
+            _decmag_clear(tb, bctx);
+
+            rr = _decfloat_round_with_tail(out, Sc, tsign, tail_exp, prec, crnd, ctx);
             if (rr == -1) { r = -1; goto cleanup2; }
             if (rr == 1) r |= (1 << comp);
         }

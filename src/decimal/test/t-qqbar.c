@@ -195,7 +195,8 @@ TEST_FUNCTION_START(decimal_qqbar, state)
                 decball_srcptr bp = k ? &b->im : &b->re;
                 slong d = k ? dim : dre;
 
-                qqbar_get_arb(v, k ? im : re, 2 * _decimal_digits_to_bits(prec) + 100);
+                /* v much narrower than w, so that v is inside w */
+                qqbar_get_arb(v, k ? im : re, 4 * _decimal_digits_to_bits(prec) + 200);
                 GR_MUST_SUCCEED(decball_get_arb(w, bp, 2 * _decimal_digits_to_bits(prec) + 100, bctx));
 
                 if (!arb_contains(w, v) || (d <= prec && !DECIMAL_CTX_HAS_EXP_LIMITS(bctx) && !DECMAG_IS_ZERO(&bp->rad)))
