@@ -29,29 +29,25 @@
 #define MP_REAL_MULMID_CUTOFF 64
 #endif
 
-/* the radius of a product: the cross terms |a| errb + |b| erra +
-   erra errb, valid also for zero mantissas, magnitudes through the
-   leading bits (see _mp_real_lead: bounding through the top limb alone
-   overstates by a factor up to 2 for a top limb of 1, and that
-   pessimism compounds across a chain of multiplications) */
+/* the radius of a product: the cross terms |mid a| errb + |mid b| erra
+   + erra errb, magnitudes through the leading bits (see _mp_real_lead:
+   bounding through the top limb alone overstates by a factor up to 2
+   for a top limb of 1, and that pessimism compounds across a chain of
+   multiplications).  A zero midpoint contributes no cross term (its
+   radius is covered by erra errb); bounding it by the anchor B^exp
+   instead, as an earlier version did, made an exact zero times an
+   inexact ball an inexact zero. */
 static mp_real_bnd_t
 _mp_real_mul_bnd(const mp_real_t a, const mp_real_t b)
 {
     mp_real_bnd_t e = _mp_real_bnd_zero;
 
-    if (b->err != 0)
-    {
-        if (a->size == 0)
-            e = _mp_real_bnd_add(e, _mp_real_bnd(0, b->err, a->exp + b->exp - b->size));
-        else
-            e = _mp_real_bnd_add(e, _mp_real_bnd_mul_mag(b->err, a,
-                    (a->exp - 1) + b->exp - b->size));
-    }
+    if (b->err != 0 && a->size != 0)
+        e = _mp_real_bnd_add(e, _mp_real_bnd_mul_mag(b->err, a,
+                (a->exp - 1) + b->exp - b->size));
     if (a->err != 0)
     {
-        if (b->size == 0)
-            e = _mp_real_bnd_add(e, _mp_real_bnd(0, a->err, b->exp + a->exp - a->size));
-        else
+        if (b->size != 0)
             e = _mp_real_bnd_add(e, _mp_real_bnd_mul_mag(a->err, b,
                     (b->exp - 1) + a->exp - a->size));
         if (b->err != 0)
@@ -339,11 +335,18 @@ _mp_real_set_product(mp_real_t res, nn_srcptr z, slong zl, slong bot,
     _mp_real_apply_bnd(res, e);
 }
 
-/* |x| < B^mexp(x), for a zero mantissa through the radius */
+/* |x| < B^mexp(x), for a zero mantissa through the radius; an exact
+   zero has no magnitude (its exponent is arbitrary), so it gets a
+   value below any real one -- as B^(exp + 1) it had made the noise
+   floor of the complex product follow the exponent of an exact zero
+   part, keeping as few as 2 limbs of a product of 8 */
+#define MP_REAL_MEXP_NONE (WORD_MIN / 4)
 static slong
 _mp_real_mexp(const mp_real_t x)
 {
-    return x->size ? x->exp : x->exp + 1;
+    if (x->size)
+        return x->exp;
+    return (x->err != 0) ? x->exp + 1 : MP_REAL_MEXP_NONE;
 }
 
 /* rr + i ri = (ar + i ai) (br + i bi) to about n limbs IN ONE FRAME:

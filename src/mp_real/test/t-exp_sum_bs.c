@@ -36,6 +36,15 @@ TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
         fmpq_t qa, qb;
         flint_bitcnt_t Qexpa;
 
+        /* large trees reach the threaded subtrees and merges */
+        if (iter % 20 == 0)
+        {
+            D = 1 + n_randint(state, 40);
+            xn = 1 + n_randint(state, D);
+            N = 64 + n_randint(state, 2000);
+        }
+        flint_set_num_threads(1 + n_randint(state, 4));
+
         xp = flint_malloc(xn * sizeof(ulong));
         flint_mpn_urandomb(xp, state, FLINT_BITS * xn);
         xp[xn - 1] |= (UWORD(1) << n_randint(state, FLINT_BITS));
@@ -80,6 +89,8 @@ TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
         fmpq_clear(qa); fmpq_clear(qb);
         flint_free(xp); flint_free(T); flint_free(Q);
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

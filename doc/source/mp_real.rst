@@ -1716,6 +1716,36 @@ precision, the selected `r` and per-call timings.  Each size is called
 once before timing so that table precomputation stays out of the
 measurement, and the timing loop cycles over an array of random inputs
 so that the branchy reductions pay their real misprediction costs.
+``profile/p-threads [FUNCS] [MINBITS] [MAXBITS] [THREADS] [SECONDS]``
+times :func:`mp_real_exp_bits`, :func:`mp_real_sin_cos_bits`,
+:func:`mp_real_log_bits` and :func:`mp_real_atan_bits` against arb at
+large precisions for each thread count in the list (default
+``1,2,4,8``), printing the ratio and each library's scaling over its
+one-thread time; ``p-threads reduced ...`` instead times the algorithms
+of :func:`_mp_real_exp_reduced` and :func:`_mp_real_sin_cos_reduced` at
+several reduction depths per thread count, the data for retuning the
+burst thresholds, which were tuned on one thread.
+
+Progress reports
+-------------------------------------------------------------------------------
+
+.. function:: void mp_real_set_verbose(int level)
+
+.. function:: int mp_real_get_verbose(void)
+
+    Sets or reads the level of progress reports on ``stderr`` for huge
+    computations: 0 is silent (the default, unless the environment
+    variable ``FLINT_MP_REAL_VERBOSE`` sets another level, which is read
+    once, when nothing has been set), 1 prints at most one line every
+    two seconds from the long loops (the merges of the binary
+    splittings, the slices of the bit-burst evaluations) plus the end
+    of every phase that took at least that long, and 2 prints the start
+    and end of every phase of an evaluation above a few thousand limbs
+    with its size, thread budget and time, and (on Linux) the resident
+    memory of the process and its high-water mark.  Each line carries the time
+    since the first message and the id of the calling thread; the
+    messages are serialized, so lines from different threads never
+    interleave.
 
 Diophantine argument reduction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2052,10 +2082,16 @@ These tables are shared with arb (``arb_exp_arf_log_reduction``,
 Multithreading
 -------------------------------------------------------------------------------
 
-The constants, the sets of logarithms and Gaussian-prime arguments and
-:func:`mp_real_hypgeom_series` use the threads of
-:func:`flint_set_num_threads`.  The results are identical for any number
-of threads.
+The constants, the sets of logarithms and Gaussian-prime arguments,
+:func:`mp_real_hypgeom_series` and the bit-burst evaluations behind the
+elementary functions (:func:`_mp_real_exp_reduced` and
+:func:`_mp_real_sin_cos_reduced`, hence the diophantine and table-free
+kernels and everything above them at large precision, including the
+Newton iterations for `\log` and `\operatorname{atan}`) use the threads of
+:func:`flint_set_num_threads`.  The constants and series are identical
+for any number of threads; the elementary functions at large precision
+choose between a burst step and a series by the thread count (below),
+so their rounding may differ.
 
 * A set of series (the Machin terms of :func:`_mp_real_log_primes_vec`
   and :func:`_mp_real_atan_gauss_vec` together with their followup
@@ -2080,6 +2116,67 @@ of threads.
   `\{P_1 T_2, P_1 P_2\}`, and each group's multiplications can use its
   half of the threads for the FFT.  A thread started on a subtree gets
   its own leaf buffers and level temporaries, freed when it is done.
+
+* The bit-burst loops use the two strategies of ``arb_exp_arf_bb``.
+  The slices of the argument, and the series remainder that ends a
+  cascade of single steps, are independent, so they run as tasks on up
+  to one thread per task, and the numerator and denominator of the
+  result are product trees whose halves fork.  The tasks are listed
+  costliest first, and the threads' budgets for the parallelism inside
+  a task (the FFT, the forks of the splitting) follow the estimated
+  costs, so that a series remainder much costlier than the slices does
+  not run on a single thread while the others idle.  A burst step's
+  slice parallelizes while the series it replaces does not, so with
+  `t` threads the cascade takes a step from about `1/t` of the serial
+  crossover (``MP_REAL_EXP_BURST_TERMS``, ``MP_REAL_TRIG_BURST_TERMS``
+  terms): the algorithm, and hence the exact rounding of the result,
+  depends on the thread count, as in arb.
+
+  Each slice's splitting integers and power table come to several
+  times the working precision, and every factor is a full-precision
+  number.  The tasks are therefore dealt in advance to one lane per
+  thread (greedily by estimated cost), and each lane folds its factors
+  into its own running numerator and denominator as they complete:
+  the live full-precision numbers are then two per lane plus those
+  being computed, independently of the number of slices, and the
+  lanes' products are combined by product trees at the end.  The
+  assignment depends only on the thread setting, not on timing or on
+  how many threads the pool grants, so the result is the same on every
+  run.  From ``MP_REAL_EXP_BURST_SERIAL_LIMBS`` (`10^9` bits) for the
+  exponential and ``MP_REAL_TRIG_BURST_SERIAL_LIMBS`` (`4 \cdot 10^8`
+  bits) for the sine and cosine, the switches of arb's bit-burst
+  functions, there is a single lane, and the threads go to the binary splitting
+  inside each slice, whose subtrees above a size threshold fork and
+  whose merges run their independent products (`\{T_1 Q_2, Q_1 Q_2\}`
+  and `\{x^m T_2\}` for the exponential; the two tracks of the
+  trigonometric tree) on two threads.
+
+  The slices keep the ratio of the growth of their splitting integers
+  (the frame, 64 `D` bits per term, or 128 `D` for the `x^2` of the
+  sine and cosine) to the decay of their terms at 2 (3 for the
+  tripling ladder of the sine and cosine).  Below a limb of reduction
+  (`r < 64`, as in the table-free kernels at `r = 24, 32`) the first
+  slice is the top limb alone for that reason: a first slice of two
+  (three) limbs has ratio `128 / r` (`384 / 2r`) and was both the
+  costliest slice and the peak of the memory.
+
+  The complex products of the trigonometric accumulation share
+  transforms (:func:`mp_real_mul_complex`) and so need an FFT buffer
+  about twice a real product's; fft_small keeps its buffers per
+  thread, so at `10^9` bits the first accumulation raised the peak by
+  about 1.2 GB.  Beyond the transform-storage budget of
+  ``flint_fft_small_max_transformed_ring_size`` the complex product
+  falls back to three real products by itself.
+
+  Memory above the persistent FFT buffers, on the development VM at
+  `10^8` bits, in multiples of the size of one number (arb in
+  parentheses): sin_cos 20 (15) on one thread, 29 (46) on two.  What
+  remains of the difference on one thread is mostly the `m` stored
+  powers of the rectangular-splitting series that ends the cascade.
+  A smaller block size, `m \approx \sqrt{N/3}` instead of
+  `\sqrt{N/1.5}`, would store `\sqrt 2` times fewer (0.7 GB less at
+  `10^9` bits) but made that series about 10% slower at `10^8` bits,
+  so it is not used.
 
 With the cap, the peak memory stays close to the one-thread peak plus
 the FFT's own per-thread tables, which every thread that multiplies at
