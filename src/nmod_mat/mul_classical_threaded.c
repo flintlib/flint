@@ -24,29 +24,6 @@ with op = 1, computes D = C + A*B
 with op = -1, computes D = C - A*B
 */
 
-static inline void
-_nmod_mat_addmul_basic_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstride, nn_srcptr A, slong Astride,
-    nn_srcptr B, slong Bstride, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
-{
-    slong i, j, l;
-    ulong c;
-
-    for (i = 0; i < m; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            NMOD_VEC_DOT(c, l, k, A[i * Astride + l], B[l * Bstride + j], mod, params);
-
-            if (op == 1)
-                c = nmod_add(C[i * Cstride + j], c, mod);
-            else if (op == -1)
-                c = nmod_sub(C[i * Cstride + j], c, mod);
-
-            D[i * Dstride + j] = c;
-        }
-    }
-}
-
 typedef struct
 {
     slong block;
@@ -483,17 +460,12 @@ _nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C,
         return;
     }
 
+    /* small dimensions: single-threaded, with the choice of the serial classical code */
     if (A->r < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || A->c < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || B->c < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        dot_params_t params = _nmod_vec_dot_params(A->c, D->mod);
-
-        _nmod_mat_addmul_basic_op(D->entries, D->stride,
-            (op == 0) ? NULL : C->entries,
-            (op == 0) ? 0 : C->stride,
-            A->entries, A->stride, B->entries, B->stride, A->r, A->c, B->c, op, D->mod, params);
-
+        _nmod_mat_mul_classical_op(D, C, A, B, op);
         return;
     }
 

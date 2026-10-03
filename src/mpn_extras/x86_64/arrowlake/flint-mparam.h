@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2024 Vincent Neiger
-    Copyright (C) 2026 Fredrik Johansson
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -10,14 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Sapphire Rapids, Emerald Rapids and Granite Rapids. The multiplication
-   parameters are those of the Ice Lake file (Intel(R) Xeon(R) Gold 6354);
-   the division and square root cutoffs were measured on an Emerald Rapids
-   Xeon (with FLINT_PREINVERT_LIMB_USE_NATIVE, as these cores have a fast
-   hardware divider) against GMP 6.3.0 built for the CPU (--host=skylake:
-   GMP's config.guess takes these cores for nehalem, and distribution
-   builds are generic; FLINT's schoolbook and Newton divisions use GMP's
-   multiplication, so the cutoffs depend on it). */
+/* Arrow Lake H / S, Lunar Lake and Panther Lake (Lion Cove / Cougar Cove
+   cores). The nmod_mat_mul and nmod_vec_dot parameters were measured on an
+   Intel(R) Core(TM) Ultra 9 285H (Arrow Lake H); the others are those of
+   x86_64/meteorlake, not tuned on this target. */
 
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
@@ -41,11 +36,6 @@
 
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 1
 
-/* fft_small: round quotients with the magic constant instead of vroundpd,
-   which is 2 uops with 8 cycle latency on Intel cores since Skylake
-   (Haswell/Broadwell: 2 uops, 6 cycles) */
-#define FLINT_FFT_SMALL_ROUND_USE_NATIVE 0
-
 #define FLINT_MULMOD_SHOUP_THRESHOLD 0
 
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
@@ -56,17 +46,20 @@
    replace the divide and conquer code from these limb counts (divisor /
    quotient limbs for the first two, divisor limbs for the next two with
    a quotient at least as long, respectively at least four times as long,
-   input limbs for the square root); tuned with
-   src/mpn_extras/tune/tune-div.c */
+   input limbs for the square root). Not tuned on this target: Skylake values
+   from src/mpn_extras/tune/tune-div.c, except for
+   FLINT_MPN_DIVEXACT_NEWTON_CUTOFF (measured against GMP's mpn_divexact
+   before FLINT had its own schoolbook and divide and conquer Hensel
+   division). */
 #define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
 #define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
-#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1187
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1024
 #define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
 #define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
 
-/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c */
+/* division cutoffs (Skylake values, not tuned on this target) */
 #define FLINT_MPN_DIV_DC_CUTOFF 18
-#define FLINT_MPN_DIVAPPR_DC_CUTOFF 34
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 32
 #define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 45
 #define FLINT_MPN_TDIV_Q_DC_CUTOFF 72
 #define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 921
@@ -77,29 +70,35 @@
 #define FLINT_MPN_DC_BDIV_Q_CUTOFF 80
 
 /* one-limb division by a chain of hardware divisions below these dividend
-   lengths (unnormalized / normalized divisor) */
-#define FLINT_MPN_DIVREM_1_HW_CUTOFF 64
-#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 64
+   lengths (unnormalized / normalized divisor); only used with
+   FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3 values) */
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 24
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 14
 
 /* two-limb divisors by hardware 2/1 divisions without an inverse below this
-   dividend length */
-#define FLINT_MPN_DIV_2_HW_CUTOFF 44
+   dividend length; only used with FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3
+   value) */
+#define FLINT_MPN_DIV_2_HW_CUTOFF 22
 
 /* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
    quotients shorter than this */
-#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 9
+#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 4
 
 /* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
    this dividend length (1000000: never) */
-#define FLINT_MPN_DIV_2_GMP_CUTOFF 44
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 1000000
+
 
 /*
     nmod_mat_mul: dispatch of the SIMD kernels nmod_mat_mul_u32 (moduli
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (measured on Intel Xeon Silver 4514Y (Emerald Rapids), with an external
-    BLAS (OpenBLAS)).
+    (measured on Intel Core Ultra 9 285H, AVX2 only, so the u52 values are
+    unused; the machine measured had the reference netlib BLAS, far slower
+    than the kernels, so BLAS_1PASS_CUTOFF(_MT) are the values of
+    x86_64/meteorlake, measured with OpenBLAS; K52_BLAS_CUTOFF is 0 on both,
+    since blas + CRT was never faster than fp50 / k52).
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -131,11 +130,11 @@
                            the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 0
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 0
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 600
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 600
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 800
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
-#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 26
+#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
 #define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
@@ -143,16 +142,8 @@
 /*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
-    (measured on Intel Xeon Silver 4514Y (Emerald Rapids); with IFMA it
-    only serves 53 to 60 bits)
+    (measured on Intel Core Ultra 9 285H, gcc 16)
 */
-#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 80
-
-/*
-    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
-    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h
-    (measured on Intel Xeon Silver 4514Y (Emerald Rapids))
-*/
-#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 32
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 64
 
 #endif

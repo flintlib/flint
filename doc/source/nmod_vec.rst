@@ -203,9 +203,27 @@ performed at the very end of the computation.
 - other moduli up to `2^{32}`: implemented via single limb integer
   multiplication combined with accumulation in two limbs;
 
-- moduli more than `2^{32}`, unreduced dot product fits in two limbs:
+- moduli more than `2^{32}`, unreduced dot product fits in two limbs: on
+  machines with AVX512-IFMA, for moduli up to `2^{52}` and lengths from a
+  machine-dependent minimum on (``FLINT_NMOD_VEC_DOT_U52_MIN_LEN`` in
+  ``flint-mparam.h``, 32 to 40), the products are accumulated as their low
+  and high 52-bit halves in vector lanes (the strategy of ``nmod_mat_mul_u52``), with a
+  final reduction; on x86-64 machines with AVX2 or AVX-512, without IFMA
+  or with IFMA for moduli of `53` to `60` bits, and lengths from a
+  machine-dependent minimum on (``FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN`` in
+  ``flint-mparam.h``, between about 50 and 130, or never), the entries are
+  split into two limbs of at most 32 bits whose products (32 x 32 -> 64
+  bits) are accumulated in vector lanes, with a final reduction; on
+  machines with AVX512-IFMA, for moduli above `2^{60}` (or `2^{52}` if the
+  previous strategy is disabled) and lengths from about 50 to 80 on, the
+  products of the 32-bit halves of the entries are
+  accumulated as their low and high 52-bit halves in vector lanes; otherwise,
   implemented via two limbs integer multiplication, with a final modular
   reduction;
+
+- unreduced dot product fits in three limbs, lengths from about 50 on: the
+  same two vectorized strategies as in the previous case, under the same
+  conditions on the machine and the modulus, into a three-limb total;
 
 - unreduced dot product fits in three limbs, moduli up to about `2^{62.5}`:
   implemented via two limbs integer multiplication, with intermediate
