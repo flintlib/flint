@@ -60,10 +60,16 @@ static const _dfloat_ops_struct * const _dfloat_ops_tab[2][DFLOAT_MAX_N + 1] = {
     {NULL, &_d1b_ops, &_d2b_ops, &_d3b_ops, &_d4b_ops},
 };
 
+FLINT_FORCE_INLINE _dfloat_ops_t
+_dfloat_ops_inline(int n, int ball)
+{
+    return _dfloat_ops_tab[ball != 0][n];
+}
+
 _dfloat_ops_t
 _dfloat_ops(int n, int ball)
 {
-    return _dfloat_ops_tab[ball != 0][n];
+    return _dfloat_ops_inline(n, ball);
 }
 
 /* ---- real parts ---- */
@@ -1140,7 +1146,7 @@ _dfloat_complex_randtest(_dfloat_ops_t ops, double * res, flint_rand_t state, in
 /* Generic ring methods                                                */
 /* ------------------------------------------------------------------ */
 
-#define OPS(ctx) _dfloat_ops(DFLOAT_CTX_N(ctx), DFLOAT_CTX_BALL(ctx))
+#define OPS(ctx) _dfloat_ops_inline(DFLOAT_CTX_N(ctx), DFLOAT_CTX_BALL(ctx))
 #define MODE(ctx) (DFLOAT_CTX_FAST(ctx) ? DFLOAT_MODE_FAST : DFLOAT_MODE_AUTO)
 
 /* the real ring of the parts */

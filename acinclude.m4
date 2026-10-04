@@ -561,11 +561,6 @@ dnl    transformations also need every operation on doubles rounded once
 dnl    to double precision, and GCC evaluates in the x87 registers by
 dnl    default there (FLT_EVAL_METHOD 2). Without SSE2,
 dnl    dfloat_is_supported() returns 0.
-dnl
-dnl  * -fno-semantic-interposition, optional (performance only): lets GCC
-dnl    inline the small exported functions into each other and into their
-dnl    gr wrappers when building a shared library, instead of calling them
-dnl    through the PLT (clang does this by default).
 
 AC_DEFUN([FLINT_DFLOAT_CFLAGS],
 [flint_dfloat_cflags=""
@@ -574,9 +569,6 @@ AX_CHECK_COMPILE_FLAG([-ffp-contract=off],
     [flint_dfloat_cflags="-ffp-contract=off -DDFLOAT_FP_CONTRACT_OFF"],
     [FLINT_CC_IS_CLANG([],
         [AC_MSG_WARN([the compiler does not take -ffp-contract=off; the dfloat module will be unavailable])])])
-
-AX_CHECK_COMPILE_FLAG([-fno-semantic-interposition],
-    [flint_dfloat_cflags="$flint_dfloat_cflags -fno-semantic-interposition"])
 
 AC_MSG_CHECKING([whether double arithmetic has excess precision])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <float.h>

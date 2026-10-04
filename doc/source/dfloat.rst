@@ -210,13 +210,7 @@ met (another compiler that does not take ``-ffp-contract=off``, or
 32-bit x86 without SSE2), the module declines to work:
 :func:`dfloat_is_supported` returns 0, :func:`gr_ctx_init_dfloat`
 returns ``GR_UNABLE`` and the power sums return 0, so that their
-callers fall back to other code. The module is also compiled with
-``-fno-semantic-interposition`` where available, which only affects
-speed: it lets GCC inline the small exported functions into each
-other and into the generic ring wrappers in the shared library
-(2-4x faster scalar ``d1`` operations and 1.4x ``d2`` additions and
-products through the generic ring) instead of calling them through
-the PLT.
+callers fall back to other code.
 
 The vector code is written against ``machine_vectors.h`` (``vec4d``
 with masks, bitwise and integer-lane operations, fused multiply-adds
@@ -2413,17 +2407,29 @@ rest, once for all formats).
 
 **Code size.** Everything that depends on `N` is compiled four times,
 and the kernels are fully unrolled, so the object code is large
-(about 1 MB of text for the four types, most of it the scalar and
-vector cores of the elementary functions and the division and square
-root kernels). The following keep it from growing further, at no
-measurable cost in speed against fully inlined code (operation by
-operation): the general renormalization with a
+(about 0.9 MB of text for the four types and their complex versions,
+most of it the scalar and vector cores of the elementary functions and
+the division and square root kernels). The small operations are
+kernels (``_inline``, ``_impl``) that the public functions wrap and
+that the rest of the module calls, so that no call within a shared
+library goes through the PLT (a call to an exported function can be
+interposed, so it is neither inlined nor made directly): the trivial
+ones are always inlined, the arithmetic (and the division and square
+roots) only for `N = 1`, and otherwise each is one static copy called
+directly, its cost dominating that of a call. The following keep the
+code from growing further, at no measurable cost in speed against
+fully inlined code (operation by operation): the general
+renormalization with a
 run-time number of terms, used only by slow paths and conversions, is
 implemented once for all `N` (``scaled.c``); the ball operations take
 their error mode (automatic or fast context) as a run-time argument
-of one out-of-line body, except where specialising the mode in a hot
-loop is measurably faster (the dot products, and ``vec_sqrt`` for
-`N = 1`); the scalar fallbacks of the vector loops, the reversed dot
+of one out-of-line body (the products for `N \ge 2` as well), except
+where specialising the mode in a hot loop is measurably faster (the
+dot products, and ``vec_sqrt`` for `N = 1`); the division kernel for
+`N \ge 3` is one copy shared by the plain division and the
+elementary functions, and ``_dN_sqrt_approx`` and
+``_dN_rsqrt_approx`` go through the full functions rather than
+another copy of their kernels; the scalar fallbacks of the vector loops, the reversed dot
 product, ``inv``, and the cores of ``expm1`` (`N \ge 2`) and
 ``log1p`` (`N \ge 3`) are shared out of line; the public elementary
 functions are never inlined into their gr wrappers; and the

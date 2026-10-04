@@ -41,12 +41,17 @@
 /* Plain complex numbers                                               */
 /* ------------------------------------------------------------------ */
 
-void DC(zero)(DC(t) res) { DF(zero)(&res->re); DF(zero)(&res->im); }
-void DC(one)(DC(t) res) { DF(one)(&res->re); DF(zero)(&res->im); }
-void DC(onei)(DC(t) res) { DF(zero)(&res->re); DF(one)(&res->im); }
-void DC(set)(DC(t) res, DC(srcptr) x) { *res = *x; }
-void DC(set_d)(DC(t) res, double x) { DF(set_d)(&res->re, x); DF(zero)(&res->im); }
-void DC(set_d_d)(DC(t) res, double x, double y) { DF(set_d)(&res->re, x); DF(set_d)(&res->im, y); }
+FLINT_FORCE_INLINE void DC(_zero_inline)(DC(t) res) { DF(_zero_inline)(&res->re); DF(_zero_inline)(&res->im); }
+void DC(zero)(DC(t) res) { DC(_zero_inline)(res); }
+FLINT_FORCE_INLINE void DC(_one_inline)(DC(t) res) { DF(_one_inline)(&res->re); DF(_zero_inline)(&res->im); }
+void DC(one)(DC(t) res) { DC(_one_inline)(res); }
+FLINT_FORCE_INLINE void DC(_onei_inline)(DC(t) res) { DF(_zero_inline)(&res->re); DF(_one_inline)(&res->im); }
+void DC(onei)(DC(t) res) { DC(_onei_inline)(res); }
+FLINT_FORCE_INLINE void DC(_set_inline)(DC(t) res, DC(srcptr) x) { *res = *x; }
+void DC(set)(DC(t) res, DC(srcptr) x) { DC(_set_inline)(res, x); }
+FLINT_FORCE_INLINE void DC(_set_d_inline)(DC(t) res, double x) { DF(_set_d_inline)(&res->re, x); DF(_zero_inline)(&res->im); }
+void DC(set_d)(DC(t) res, double x) { DC(_set_d_inline)(res, x); }
+void DC(set_d_d)(DC(t) res, double x, double y) { DF(_set_d_inline)(&res->re, x); DF(_set_d_inline)(&res->im, y); }
 void DC(set_re_im)(DC(t) res, DF(srcptr) x, DF(srcptr) y)
 {
     DF(struct) t = *y;
@@ -54,82 +59,92 @@ void DC(set_re_im)(DC(t) res, DF(srcptr) x, DF(srcptr) y)
     res->im = t;
 }
 
-void DC(neg)(DC(t) res, DC(srcptr) x) { DF(neg)(&res->re, &x->re); DF(neg)(&res->im, &x->im); }
-void DC(conj)(DC(t) res, DC(srcptr) x) { res->re = x->re; DF(neg)(&res->im, &x->im); }
-void DC(add)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DF(add)(&res->re, &x->re, &y->re); DF(add)(&res->im, &x->im, &y->im); }
-void DC(sub)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DF(sub)(&res->re, &x->re, &y->re); DF(sub)(&res->im, &x->im, &y->im); }
+FLINT_FORCE_INLINE void DC(_neg_inline)(DC(t) res, DC(srcptr) x) { DF(_neg_inline)(&res->re, &x->re); DF(_neg_inline)(&res->im, &x->im); }
+void DC(neg)(DC(t) res, DC(srcptr) x) { DC(_neg_inline)(res, x); }
+FLINT_FORCE_INLINE void DC(_conj_inline)(DC(t) res, DC(srcptr) x) { res->re = x->re; DF(_neg_inline)(&res->im, &x->im); }
+void DC(conj)(DC(t) res, DC(srcptr) x) { DC(_conj_inline)(res, x); }
+FLINT_FORCE_INLINE void DC(_add_inline)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DF(_add_impl)(&res->re, &x->re, &y->re); DF(_add_impl)(&res->im, &x->im, &y->im); }
+void DC(add)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DC(_add_inline)(res, x, y); }
+FLINT_FORCE_INLINE void DC(_sub_inline)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DF(_sub_impl)(&res->re, &x->re, &y->re); DF(_sub_impl)(&res->im, &x->im, &y->im); }
+void DC(sub)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DC(_sub_inline)(res, x, y); }
 
 void DC(mul_re)(DC(t) res, DC(srcptr) x, DF(srcptr) y)
 {
     DF(struct) c = *y;
-    DF(mul)(&res->re, &x->re, &c);
-    DF(mul)(&res->im, &x->im, &c);
+    DF(_mul_impl)(&res->re, &x->re, &c);
+    DF(_mul_impl)(&res->im, &x->im, &c);
 }
 
 /* (a + b i) i = -b + a i */
 void DC(mul_onei)(DC(t) res, DC(srcptr) x)
 {
     DF(struct) t = x->re;
-    DF(neg)(&res->re, &x->im);
+    DF(_neg_inline)(&res->re, &x->im);
     res->im = t;
 }
 
-void DC(mul_2exp_si)(DC(t) res, DC(srcptr) x, slong e)
+FLINT_FORCE_INLINE void
+DC(_mul_2exp_si_inline)(DC(t) res, DC(srcptr) x, slong e)
 {
-    DF(mul_2exp_si)(&res->re, &x->re, e);
-    DF(mul_2exp_si)(&res->im, &x->im, e);
+    DF(_mul_2exp_si_impl)(&res->re, &x->re, e);
+    DF(_mul_2exp_si_impl)(&res->im, &x->im, e);
 }
+void DC(mul_2exp_si)(DC(t) res, DC(srcptr) x, slong e) { DC(_mul_2exp_si_inline)(res, x, e); }
 
 /* a real (or imaginary) factor takes two real products; otherwise
    (a c - b d) + (a d + b c) i */
-void DC(mul)(DC(t) res, DC(srcptr) x, DC(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DC(_mul_impl)(DC(t) res, DC(srcptr) x, DC(srcptr) y)
 {
     DF(t) p, q, r, s;
     if (DC_EXACT_ZERO(&y->im))
     {
-        DF(mul)(r, &x->re, &y->re);
-        DF(mul)(s, &x->im, &y->re);
+        DF(_mul_impl)(r, &x->re, &y->re);
+        DF(_mul_impl)(s, &x->im, &y->re);
     }
     else if (DC_EXACT_ZERO(&x->im))
     {
-        DF(mul)(r, &y->re, &x->re);
-        DF(mul)(s, &y->im, &x->re);
+        DF(_mul_impl)(r, &y->re, &x->re);
+        DF(_mul_impl)(s, &y->im, &x->re);
     }
     else
     {
-        DF(mul)(p, &x->re, &y->re);
-        DF(mul)(q, &x->im, &y->im);
-        DF(mul)(r, &x->re, &y->im);
-        DF(mul)(s, &x->im, &y->re);
-        DF(add)(s, s, r);
-        DF(sub)(r, p, q);
+        DF(_mul_impl)(p, &x->re, &y->re);
+        DF(_mul_impl)(q, &x->im, &y->im);
+        DF(_mul_impl)(r, &x->re, &y->im);
+        DF(_mul_impl)(s, &x->im, &y->re);
+        DF(_add_impl)(s, s, r);
+        DF(_sub_impl)(r, p, q);
     }
     res->re = *r;
     res->im = *s;
 }
+void DC(mul)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { DC(_mul_impl)(res, x, y); }
 
 /* (a + b)(a - b) + 2 a b i (the real part with a relative error) */
-void DC(sqr)(DC(t) res, DC(srcptr) x)
+DFLOAT_ARITH_IMPL void
+DC(_sqr_impl)(DC(t) res, DC(srcptr) x)
 {
     DF(t) p, q, r;
     if (DC_EXACT_ZERO(&x->im))
     {
-        DF(sqr)(&res->re, &x->re);
-        DF(zero)(&res->im);
+        DF(_sqr_impl)(&res->re, &x->re);
+        DF(_zero_inline)(&res->im);
         return;
     }
-    DF(add)(p, &x->re, &x->im);
-    DF(sub)(q, &x->re, &x->im);
-    DF(mul)(r, &x->re, &x->im);
-    DF(mul)(&res->re, p, q);
-    DF(mul_2exp_si)(&res->im, r, 1);
+    DF(_add_impl)(p, &x->re, &x->im);
+    DF(_sub_impl)(q, &x->re, &x->im);
+    DF(_mul_impl)(r, &x->re, &x->im);
+    DF(_mul_impl)(&res->re, p, q);
+    DF(_mul_2exp_si_impl)(&res->im, r, 1);
 }
+void DC(sqr)(DC(t) res, DC(srcptr) x) { DC(_sqr_impl)(res, x); }
 
-int DC(is_zero)(DC(srcptr) x) { return DF(is_zero)(&x->re) && DF(is_zero)(&x->im); }
-int DC(is_one)(DC(srcptr) x) { return DF(is_one)(&x->re) && DF(is_zero)(&x->im); }
-int DC(is_real)(DC(srcptr) x) { return DF(is_zero)(&x->im); }
-int DC(is_finite)(DC(srcptr) x) { return DF(is_finite)(&x->re) && DF(is_finite)(&x->im); }
-int DC(equal)(DC(srcptr) x, DC(srcptr) y) { return DF(equal)(&x->re, &y->re) && DF(equal)(&x->im, &y->im); }
+int DC(is_zero)(DC(srcptr) x) { return DF(_is_zero_inline)(&x->re) && DF(_is_zero_inline)(&x->im); }
+int DC(is_one)(DC(srcptr) x) { return DF(_is_one_inline)(&x->re) && DF(_is_zero_inline)(&x->im); }
+int DC(is_real)(DC(srcptr) x) { return DF(_is_zero_inline)(&x->im); }
+int DC(is_finite)(DC(srcptr) x) { return DF(_is_finite_inline)(&x->re) && DF(_is_finite_inline)(&x->im); }
+int DC(equal)(DC(srcptr) x, DC(srcptr) y) { return DF(_equal_inline)(&x->re, &y->re) && DF(_equal_inline)(&x->im, &y->im); }
 
 
 /* ---- through complex.c ---- */
@@ -162,26 +177,21 @@ void DC(randtest_special)(DC(t) res, flint_rand_t state) { _dfloat_complex_randt
 /* Complex balls                                                       */
 /* ------------------------------------------------------------------ */
 
-/* the real products with a run-time error mode (see template.inc); the
-   square in the fast mode as a product (whose bound is slightly larger),
-   which saves an out-of-line copy of the square */
-static DC_COLD void DB(_sqr_ool)(DB(t) res, DB(srcptr) x, int mode)
-{
-    if (mode == DFLOAT_MODE_FAST)
-        DB(_mul_ool)(res, x, x, mode);
-    else
-        DB(sqr)(res, x);
-}
+/* the real products with a run-time error mode (see template.inc) */
 #define DCB_RMUL(r, x, y) DB(_mul_ool)(r, x, y, mode)
 #define DCB_RSQR(r, x) DB(_sqr_ool)(r, x, mode)
 
-void DCB(zero)(DCB(t) res) { DB(zero)(&res->re); DB(zero)(&res->im); }
-void DCB(one)(DCB(t) res) { DB(one)(&res->re); DB(zero)(&res->im); }
-void DCB(onei)(DCB(t) res) { DB(zero)(&res->re); DB(one)(&res->im); }
-void DCB(indeterminate)(DCB(t) res) { DB(indeterminate)(&res->re); DB(indeterminate)(&res->im); }
+FLINT_FORCE_INLINE void DCB(_zero_inline)(DCB(t) res) { DB(_zero_inline)(&res->re); DB(_zero_inline)(&res->im); }
+void DCB(zero)(DCB(t) res) { DCB(_zero_inline)(res); }
+FLINT_FORCE_INLINE void DCB(_one_inline)(DCB(t) res) { DB(_one_inline)(&res->re); DB(_zero_inline)(&res->im); }
+void DCB(one)(DCB(t) res) { DCB(_one_inline)(res); }
+FLINT_FORCE_INLINE void DCB(_onei_inline)(DCB(t) res) { DB(_zero_inline)(&res->re); DB(_one_inline)(&res->im); }
+void DCB(onei)(DCB(t) res) { DCB(_onei_inline)(res); }
+void DCB(indeterminate)(DCB(t) res) { DB(_indeterminate_inline)(&res->re); DB(_indeterminate_inline)(&res->im); }
 void DCB(set)(DCB(t) res, DCB(srcptr) x) { *res = *x; }
-void DCB(set_d)(DCB(t) res, double x) { DB(set_d)(&res->re, x); DB(zero)(&res->im); }
-void DCB(set_d_d)(DCB(t) res, double x, double y) { DB(set_d)(&res->re, x); DB(set_d)(&res->im, y); }
+FLINT_FORCE_INLINE void DCB(_set_d_inline)(DCB(t) res, double x) { DB(_set_d_inline)(&res->re, x); DB(_zero_inline)(&res->im); }
+void DCB(set_d)(DCB(t) res, double x) { DCB(_set_d_inline)(res, x); }
+void DCB(set_d_d)(DCB(t) res, double x, double y) { DB(_set_d_inline)(&res->re, x); DB(_set_d_inline)(&res->im, y); }
 void DCB(set_re_im)(DCB(t) res, DB(srcptr) x, DB(srcptr) y)
 {
     DB(struct) t = *y;
@@ -189,38 +199,45 @@ void DCB(set_re_im)(DCB(t) res, DB(srcptr) x, DB(srcptr) y)
     res->im = t;
 }
 
-void DCB(neg)(DCB(t) res, DCB(srcptr) x) { DB(neg)(&res->re, &x->re); DB(neg)(&res->im, &x->im); }
-void DCB(conj)(DCB(t) res, DCB(srcptr) x)
+FLINT_FORCE_INLINE void DCB(_neg_inline)(DCB(t) res, DCB(srcptr) x) { DB(_neg_inline)(&res->re, &x->re); DB(_neg_inline)(&res->im, &x->im); }
+void DCB(neg)(DCB(t) res, DCB(srcptr) x) { DCB(_neg_inline)(res, x); }
+FLINT_FORCE_INLINE void
+DCB(_conj_inline)(DCB(t) res, DCB(srcptr) x)
 {
     res->re = x->re;
     if (FLINT_UNLIKELY(DB(_is_W)(&res->re)))
-        DB(indeterminate)(&res->re);
-    DB(neg)(&res->im, &x->im);
+        DB(_indeterminate_inline)(&res->re);
+    DB(_neg_inline)(&res->im, &x->im);
 }
-void DCB(add)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DB(add)(&res->re, &x->re, &y->re); DB(add)(&res->im, &x->im, &y->im); }
-void DCB(sub)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DB(sub)(&res->re, &x->re, &y->re); DB(sub)(&res->im, &x->im, &y->im); }
+void DCB(conj)(DCB(t) res, DCB(srcptr) x) { DCB(_conj_inline)(res, x); }
+FLINT_FORCE_INLINE void DCB(_add_inline)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DB(_add_impl)(&res->re, &x->re, &y->re); DB(_add_impl)(&res->im, &x->im, &y->im); }
+void DCB(add)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DCB(_add_inline)(res, x, y); }
+FLINT_FORCE_INLINE void DCB(_sub_inline)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DB(_sub_impl)(&res->re, &x->re, &y->re); DB(_sub_impl)(&res->im, &x->im, &y->im); }
+void DCB(sub)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y) { DCB(_sub_inline)(res, x, y); }
 
 void DCB(mul_re)(DCB(t) res, DCB(srcptr) x, DB(srcptr) y)
 {
     DB(struct) c = *y;
-    DB(mul)(&res->re, &x->re, &c);
-    DB(mul)(&res->im, &x->im, &c);
+    DB(_mul_impl)(&res->re, &x->re, &c);
+    DB(_mul_impl)(&res->im, &x->im, &c);
 }
 
 void DCB(mul_onei)(DCB(t) res, DCB(srcptr) x)
 {
     DB(struct) t = x->re;
-    DB(neg)(&res->re, &x->im);
+    DB(_neg_inline)(&res->re, &x->im);
     res->im = t;
     if (FLINT_UNLIKELY(DB(_is_W)(&res->im)))
-        DB(indeterminate)(&res->im);
+        DB(_indeterminate_inline)(&res->im);
 }
 
-void DCB(mul_2exp_si)(DCB(t) res, DCB(srcptr) x, slong e)
+FLINT_FORCE_INLINE void
+DCB(_mul_2exp_si_inline)(DCB(t) res, DCB(srcptr) x, slong e)
 {
-    DB(mul_2exp_si)(&res->re, &x->re, e);
-    DB(mul_2exp_si)(&res->im, &x->im, e);
+    DB(_mul_2exp_si_impl)(&res->re, &x->re, e);
+    DB(_mul_2exp_si_impl)(&res->im, &x->im, e);
 }
+void DCB(mul_2exp_si)(DCB(t) res, DCB(srcptr) x, slong e) { DCB(_mul_2exp_si_inline)(res, x, e); }
 
 /* as the plain version; an exactly real or imaginary factor takes two
    real products (which is also tighter) */
@@ -228,28 +245,28 @@ static DFLOAT_NOINLINE void
 DCB(_mul_m)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y, int mode)
 {
     DB(t) p, q, r, s;
-    if (DB(is_zero)(&y->im))
+    if (DB(_is_zero_inline)(&y->im))
     {
         DCB_RMUL(r, &x->re, &y->re);
         DCB_RMUL(s, &x->im, &y->re);
     }
-    else if (DB(is_zero)(&x->im))
+    else if (DB(_is_zero_inline)(&x->im))
     {
         DCB_RMUL(r, &y->re, &x->re);
         DCB_RMUL(s, &y->im, &x->re);
     }
-    else if (DB(is_zero)(&y->re))
+    else if (DB(_is_zero_inline)(&y->re))
     {
         /* (a + b i) (d i) = -b d + a d i */
         DCB_RMUL(p, &x->im, &y->im);
         DCB_RMUL(s, &x->re, &y->im);
-        DB(neg)(r, p);
+        DB(_neg_inline)(r, p);
     }
-    else if (DB(is_zero)(&x->re))
+    else if (DB(_is_zero_inline)(&x->re))
     {
         DCB_RMUL(p, &y->im, &x->im);
         DCB_RMUL(s, &y->re, &x->im);
-        DB(neg)(r, p);
+        DB(_neg_inline)(r, p);
     }
     else
     {
@@ -257,8 +274,8 @@ DCB(_mul_m)(DCB(t) res, DCB(srcptr) x, DCB(srcptr) y, int mode)
         DCB_RMUL(q, &x->im, &y->im);
         DCB_RMUL(r, &x->re, &y->im);
         DCB_RMUL(s, &x->im, &y->re);
-        DB(add)(s, s, r);
-        DB(sub)(r, p, q);
+        DB(_add_impl)(s, s, r);
+        DB(_sub_impl)(r, p, q);
     }
     res->re = *r;
     res->im = *s;
@@ -271,40 +288,40 @@ static DFLOAT_NOINLINE void
 DCB(_sqr_m)(DCB(t) res, DCB(srcptr) x, int mode)
 {
     DB(t) p, q, r;
-    if (DB(is_zero)(&x->im))
+    if (DB(_is_zero_inline)(&x->im))
     {
         DCB_RSQR(&res->re, &x->re);
-        DB(zero)(&res->im);
+        DB(_zero_inline)(&res->im);
         return;
     }
-    if (DB(is_zero)(&x->re))
+    if (DB(_is_zero_inline)(&x->re))
     {
         DCB_RSQR(p, &x->im);
-        DB(neg)(&res->re, p);
-        DB(zero)(&res->im);
+        DB(_neg_inline)(&res->re, p);
+        DB(_zero_inline)(&res->im);
         return;
     }
     DCB_RSQR(p, &x->re);
     DCB_RSQR(q, &x->im);
     DCB_RMUL(r, &x->re, &x->im);
-    DB(sub)(&res->re, p, q);
-    DB(mul_2exp_si)(&res->im, r, 1);
+    DB(_sub_impl)(&res->re, p, q);
+    DB(_mul_2exp_si_impl)(&res->im, r, 1);
 }
 
 void DCB(sqr)(DCB(t) res, DCB(srcptr) x) { DCB(_sqr_m)(res, x, DFLOAT_MODE_AUTO); }
 
-int DCB(is_zero)(DCB(srcptr) x) { return DB(is_zero)(&x->re) && DB(is_zero)(&x->im); }
+int DCB(is_zero)(DCB(srcptr) x) { return DB(_is_zero_inline)(&x->re) && DB(_is_zero_inline)(&x->im); }
 int DCB(is_one)(DCB(srcptr) x)
 {
-    return x->re.rad == 0.0 && x->re.d[0] == 1.0 && DF(_tail_abs_sum)(x->re.d) == 0.0 && DB(is_zero)(&x->im);
+    return x->re.rad == 0.0 && x->re.d[0] == 1.0 && DF(_tail_abs_sum)(x->re.d) == 0.0 && DB(_is_zero_inline)(&x->im);
 }
-int DCB(is_real)(DCB(srcptr) x) { return DB(is_zero)(&x->im); }
+int DCB(is_real)(DCB(srcptr) x) { return DB(_is_zero_inline)(&x->im); }
 int DCB(is_exact)(DCB(srcptr) x) { return DB(is_exact)(&x->re) && DB(is_exact)(&x->im); }
 int DCB(is_finite)(DCB(srcptr) x) { return DB(is_finite)(&x->re) && DB(is_finite)(&x->im); }
-int DCB(contains_zero)(DCB(srcptr) x) { return DB(contains_zero)(&x->re) && DB(contains_zero)(&x->im); }
+int DCB(contains_zero)(DCB(srcptr) x) { return DB(_contains_zero_inline)(&x->re) && DB(_contains_zero_inline)(&x->im); }
 int DCB(contains)(DCB(srcptr) x, DCB(srcptr) y) { return DB(contains)(&x->re, &y->re) && DB(contains)(&x->im, &y->im); }
-int DCB(overlaps)(DCB(srcptr) x, DCB(srcptr) y) { return DB(overlaps)(&x->re, &y->re) && DB(overlaps)(&x->im, &y->im); }
-int DCB(equal)(DCB(srcptr) x, DCB(srcptr) y) { return DB(equal)(&x->re, &y->re) && DB(equal)(&x->im, &y->im); }
+int DCB(overlaps)(DCB(srcptr) x, DCB(srcptr) y) { return DB(_overlaps_inline)(&x->re, &y->re) && DB(_overlaps_inline)(&x->im, &y->im); }
+int DCB(equal)(DCB(srcptr) x, DCB(srcptr) y) { return DB(_equal_inline)(&x->re, &y->re) && DB(_equal_inline)(&x->im, &y->im); }
 
 
 /* ---- through complex.c ---- */
@@ -347,7 +364,7 @@ DFLOAT_FUNC_NOINLINE void DCV(vec_mul)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, 
 {
     slong i;
     for (i = 0; i < len; i++)
-        DC(mul)(res + i, x + i, y + i);
+        DC(_mul_impl)(res + i, x + i, y + i);
 }
 
 DFLOAT_FUNC_NOINLINE void DCV(vec_mul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c)
@@ -358,7 +375,7 @@ DFLOAT_FUNC_NOINLINE void DCV(vec_mul_scalar)(DC(ptr) res, DC(srcptr) x, slong l
         DFV(vec_mul_scalar)((DF(ptr)) res, (DF(srcptr)) x, 2 * len, &cc.re);
     else
         for (i = 0; i < len; i++)
-            DC(mul)(res + i, x + i, &cc);
+            DC(_mul_impl)(res + i, x + i, &cc);
 }
 
 static void
@@ -377,11 +394,11 @@ DCV(_vec_addmul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c, int 
     }
     for (i = 0; i < len; i++)
     {
-        DC(mul)(t, x + i, &cc);
+        DC(_mul_impl)(t, x + i, &cc);
         if (sub)
-            DC(sub)(res + i, res + i, t);
+            DC(_sub_inline)(res + i, res + i, t);
         else
-            DC(add)(res + i, res + i, t);
+            DC(_add_inline)(res + i, res + i, t);
     }
 }
 
@@ -451,9 +468,9 @@ DCV(_vec_dot)(DC(t) res, DC(srcptr) initial, int subtract, DC(srcptr) x, DC(srcp
     if (len <= 0)
     {
         if (initial == NULL)
-            DC(zero)(res);
+            DC(_zero_inline)(res);
         else
-            DC(set)(res, initial);
+            DC(_set_inline)(res, initial);
         return;
     }
 
@@ -540,7 +557,7 @@ DCBV(_vec_mul_scalar_m)(DCB(ptr) res, DCB(srcptr) x, slong len, DCB(srcptr) c, i
 {
     DCB(struct) cc = *c;
     slong i;
-    if (DB(is_zero)(&cc.im))
+    if (DB(_is_zero_inline)(&cc.im))
         DBV(_vec_mul_scalar_m)((DB(ptr)) res, (DB(srcptr)) x, 2 * len, &cc.re, mode);
     else
         for (i = 0; i < len; i++)
@@ -553,7 +570,7 @@ DCBV(_vec_addmul_scalar_m)(DCB(ptr) res, DCB(srcptr) x, slong len, DCB(srcptr) c
     DCB(struct) cc = *c;
     DCB(t) t;
     slong i;
-    if (DB(is_zero)(&cc.im))
+    if (DB(_is_zero_inline)(&cc.im))
     {
         DBV(_vec_addmul_scalar_m)((DB(ptr)) res, (DB(srcptr)) x, 2 * len, &cc.re, sub, mode);
         return;
@@ -562,9 +579,9 @@ DCBV(_vec_addmul_scalar_m)(DCB(ptr) res, DCB(srcptr) x, slong len, DCB(srcptr) c
     {
         DCB(_mul_m)(t, x + i, &cc, mode);
         if (sub)
-            DCB(sub)(res + i, res + i, t);
+            DCB(_sub_inline)(res + i, res + i, t);
         else
-            DCB(add)(res + i, res + i, t);
+            DCB(_add_inline)(res + i, res + i, t);
     }
 }
 
@@ -661,10 +678,10 @@ DFLOAT_FUNC_NOINLINE void DCBV(vec_exp)(DCB(ptr) res, DCB(srcptr) x, slong len)
 /* (the plain functions that differ in signature, through wrappers; the
    others are the functions themselves, whose pointer arguments are
    pointers to the doubles of the structs) */
-static DC_COLD void DF(_op_mul)(double * r, const double * x, const double * y, int mode) { DF(mul)((DF(ptr)) r, (DF(srcptr)) x, (DF(srcptr)) y); }
-static DC_COLD void DF(_op_sqr)(double * r, const double * x, int mode) { DF(sqr)((DF(ptr)) r, (DF(srcptr)) x); }
-static DC_COLD int DF(_op_div)(double * r, const double * x, const double * y, int mode) { DF(div)((DF(ptr)) r, (DF(srcptr)) x, (DF(srcptr)) y); return GR_SUCCESS; }
-static DC_COLD int DF(_op_sqrt)(double * r, const double * x, int mode) { DF(sqrt)((DF(ptr)) r, (DF(srcptr)) x); return GR_SUCCESS; }
+static DC_COLD void DF(_op_mul)(double * r, const double * x, const double * y, int mode) { DF(_mul_impl)((DF(ptr)) r, (DF(srcptr)) x, (DF(srcptr)) y); }
+static DC_COLD void DF(_op_sqr)(double * r, const double * x, int mode) { DF(_sqr_impl)((DF(ptr)) r, (DF(srcptr)) x); }
+static DC_COLD int DF(_op_div)(double * r, const double * x, const double * y, int mode) { DF(_div_inline)((DF(ptr)) r, (DF(srcptr)) x, (DF(srcptr)) y); return GR_SUCCESS; }
+static DC_COLD int DF(_op_sqrt)(double * r, const double * x, int mode) { DF(_sqrt_inline)((DF(ptr)) r, (DF(srcptr)) x); return GR_SUCCESS; }
 static DC_COLD int DF(_op_log)(double * r, const double * x) { DF(log)((DF(ptr)) r, (DF(srcptr)) x); return GR_SUCCESS; }
 static DC_COLD int DF(_op_log1p)(double * r, const double * x) { DF(log1p)((DF(ptr)) r, (DF(srcptr)) x); return GR_SUCCESS; }
 static DC_COLD int DF(_op_tan)(double * r, const double * x) { DF(tan)((DF(ptr)) r, (DF(srcptr)) x); return GR_SUCCESS; }
@@ -673,15 +690,15 @@ static DC_COLD int DF(_op_cmp_all_d)(const double * x, double c, int sign, int s
 {
     DF(t) t;
     int r;
-    if (DF(is_nan)((DF(srcptr)) x))
+    if (DF(_is_nan_inline)((DF(srcptr)) x))
         return 0;
-    DF(set_d)(t, c);
-    r = DF(cmp)((DF(srcptr)) x, t);
+    DF(_set_d_inline)(t, c);
+    r = DF(_cmp_inline)((DF(srcptr)) x, t);
     return (sign > 0) ? (strict ? r > 0 : r >= 0) : (strict ? r < 0 : r <= 0);
 }
 static DC_COLD int DF(_op_get_fmpz)(fmpz_t r, const double * x) { return GRF(get_fmpz)(r, (DF(srcptr)) x, NULL); }
-static DC_COLD void DF(_op_cmul)(double * r, const double * x, const double * y, int mode) { DC(mul)((DC(ptr)) r, (DC(srcptr)) x, (DC(srcptr)) y); }
-static DC_COLD void DF(_op_csqr)(double * r, const double * x, int mode) { DC(sqr)((DC(ptr)) r, (DC(srcptr)) x); }
+static DC_COLD void DF(_op_cmul)(double * r, const double * x, const double * y, int mode) { DC(_mul_impl)((DC(ptr)) r, (DC(srcptr)) x, (DC(srcptr)) y); }
+static DC_COLD void DF(_op_csqr)(double * r, const double * x, int mode) { DC(_sqr_impl)((DC(ptr)) r, (DC(srcptr)) x); }
 
 #define DC_OP1(f) ((void (*)(double *)) (f))
 #define DC_OP2(f) ((void (*)(double *, const double *)) (f))
@@ -782,34 +799,34 @@ DC(_truth_and)(truth_t a, truth_t b)
 
 /* ---- plain ---- */
 
-static void GRC(init)(DC(ptr) x, gr_ctx_t ctx) { DC(zero)(x); }
+static void GRC(init)(DC(ptr) x, gr_ctx_t ctx) { DC(_zero_inline)(x); }
 static void GRC(clear)(DC(ptr) x, gr_ctx_t ctx) { }
 static void GRC(swap)(DC(ptr) x, DC(ptr) y, gr_ctx_t ctx) { DC(struct) t = *x; *x = *y; *y = t; }
-static int GRC(zero)(DC(ptr) res, gr_ctx_t ctx) { DC(zero)(res); return GR_SUCCESS; }
-static int GRC(one)(DC(ptr) res, gr_ctx_t ctx) { DC(one)(res); return GR_SUCCESS; }
-static int GRC(neg_one)(DC(ptr) res, gr_ctx_t ctx) { DC(set_d)(res, -1.0); return GR_SUCCESS; }
-static int GRC(i)(DC(ptr) res, gr_ctx_t ctx) { DC(onei)(res); return GR_SUCCESS; }
+static int GRC(zero)(DC(ptr) res, gr_ctx_t ctx) { DC(_zero_inline)(res); return GR_SUCCESS; }
+static int GRC(one)(DC(ptr) res, gr_ctx_t ctx) { DC(_one_inline)(res); return GR_SUCCESS; }
+static int GRC(neg_one)(DC(ptr) res, gr_ctx_t ctx) { DC(_set_d_inline)(res, -1.0); return GR_SUCCESS; }
+static int GRC(i)(DC(ptr) res, gr_ctx_t ctx) { DC(_onei_inline)(res); return GR_SUCCESS; }
 static truth_t GRC(is_zero)(DC(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRF(is_zero)(&x->re, ctx), GRF(is_zero)(&x->im, ctx)); }
 static truth_t GRC(is_one)(DC(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRF(is_one)(&x->re, ctx), GRF(is_zero)(&x->im, ctx)); }
 static truth_t GRC(is_neg_one)(DC(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRF(is_neg_one)(&x->re, ctx), GRF(is_zero)(&x->im, ctx)); }
 static truth_t GRC(equal)(DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { return DC(_truth_and)(GRF(equal)(&x->re, &y->re, ctx), GRF(equal)(&x->im, &y->im, ctx)); }
-static int GRC(set)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(set)(res, x); return GR_SUCCESS; }
-static int GRC(neg)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(neg)(res, x); return GR_SUCCESS; }
-static int GRC(add)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(add)(res, x, y); return GR_SUCCESS; }
-static int GRC(sub)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(sub)(res, x, y); return GR_SUCCESS; }
-static int GRC(mul)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(mul)(res, x, y); return GR_SUCCESS; }
-static int GRC(sqr)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(sqr)(res, x); return GR_SUCCESS; }
-static int GRC(mul_two)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(mul_2exp_si)(res, x, 1); return GR_SUCCESS; }
-static int GRC(mul_2exp_si)(DC(ptr) res, DC(srcptr) x, slong e, gr_ctx_t ctx) { DC(mul_2exp_si)(res, x, e); return GR_SUCCESS; }
-static int GRC(conj)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(conj)(res, x); return GR_SUCCESS; }
-static int GRC(re)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->re; DF(zero)(&res->im); return GR_SUCCESS; }
-static int GRC(im)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->im; DF(zero)(&res->im); return GR_SUCCESS; }
+static int GRC(set)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_set_inline)(res, x); return GR_SUCCESS; }
+static int GRC(neg)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_neg_inline)(res, x); return GR_SUCCESS; }
+static int GRC(add)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(_add_inline)(res, x, y); return GR_SUCCESS; }
+static int GRC(sub)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(_sub_inline)(res, x, y); return GR_SUCCESS; }
+static int GRC(mul)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx) { DC(_mul_impl)(res, x, y); return GR_SUCCESS; }
+static int GRC(sqr)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_sqr_impl)(res, x); return GR_SUCCESS; }
+static int GRC(mul_two)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_mul_2exp_si_inline)(res, x, 1); return GR_SUCCESS; }
+static int GRC(mul_2exp_si)(DC(ptr) res, DC(srcptr) x, slong e, gr_ctx_t ctx) { DC(_mul_2exp_si_inline)(res, x, e); return GR_SUCCESS; }
+static int GRC(conj)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_conj_inline)(res, x); return GR_SUCCESS; }
+static int GRC(re)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->re; DF(_zero_inline)(&res->im); return GR_SUCCESS; }
+static int GRC(im)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->im; DF(_zero_inline)(&res->im); return GR_SUCCESS; }
 
 static void GRC(vec_init)(DC(ptr) vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        DC(zero)(vec + i);
+        DC(_zero_inline)(vec + i);
 }
 static void GRC(vec_clear)(DC(ptr) vec, slong len, gr_ctx_t ctx) { }
 static int GRC(vec_set)(DC(ptr) res, DC(srcptr) x, slong len, gr_ctx_t ctx)
@@ -955,13 +972,13 @@ gr_method_tab_input DCV(gr_methods_input)[] =
 
 /* ---- balls ---- */
 
-static void GRCB(init)(DCB(ptr) x, gr_ctx_t ctx) { DCB(zero)(x); }
+static void GRCB(init)(DCB(ptr) x, gr_ctx_t ctx) { DCB(_zero_inline)(x); }
 static void GRCB(clear)(DCB(ptr) x, gr_ctx_t ctx) { }
 static void GRCB(swap)(DCB(ptr) x, DCB(ptr) y, gr_ctx_t ctx) { DCB(struct) t = *x; *x = *y; *y = t; }
-static int GRCB(zero)(DCB(ptr) res, gr_ctx_t ctx) { DCB(zero)(res); return GR_SUCCESS; }
-static int GRCB(one)(DCB(ptr) res, gr_ctx_t ctx) { DCB(one)(res); return GR_SUCCESS; }
-static int GRCB(neg_one)(DCB(ptr) res, gr_ctx_t ctx) { DCB(set_d)(res, -1.0); return GR_SUCCESS; }
-static int GRCB(i)(DCB(ptr) res, gr_ctx_t ctx) { DCB(onei)(res); return GR_SUCCESS; }
+static int GRCB(zero)(DCB(ptr) res, gr_ctx_t ctx) { DCB(_zero_inline)(res); return GR_SUCCESS; }
+static int GRCB(one)(DCB(ptr) res, gr_ctx_t ctx) { DCB(_one_inline)(res); return GR_SUCCESS; }
+static int GRCB(neg_one)(DCB(ptr) res, gr_ctx_t ctx) { DCB(_set_d_inline)(res, -1.0); return GR_SUCCESS; }
+static int GRCB(i)(DCB(ptr) res, gr_ctx_t ctx) { DCB(_onei_inline)(res); return GR_SUCCESS; }
 static truth_t GRCB(is_zero)(DCB(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRB(is_zero)(&x->re, ctx), GRB(is_zero)(&x->im, ctx)); }
 static truth_t GRCB(is_one)(DCB(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRB(is_one)(&x->re, ctx), GRB(is_zero)(&x->im, ctx)); }
 static truth_t GRCB(is_neg_one)(DCB(srcptr) x, gr_ctx_t ctx) { return DC(_truth_and)(GRB(is_neg_one)(&x->re, ctx), GRB(is_zero)(&x->im, ctx)); }
@@ -973,22 +990,22 @@ static int GRCB(set)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx)
     GRB(set)(&res->im, &x->im, ctx);
     return GR_SUCCESS;
 }
-static int GRCB(neg)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(neg)(res, x); return GR_SUCCESS; }
-static int GRCB(add)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(add)(res, x, y); return GR_SUCCESS; }
-static int GRCB(sub)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(sub)(res, x, y); return GR_SUCCESS; }
+static int GRCB(neg)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(_neg_inline)(res, x); return GR_SUCCESS; }
+static int GRCB(add)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_add_inline)(res, x, y); return GR_SUCCESS; }
+static int GRCB(sub)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_sub_inline)(res, x, y); return GR_SUCCESS; }
 static int GRCB(mul)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_mul_m)(res, x, y, DFLOAT_MODE_AUTO); return GR_SUCCESS; }
 static int GRCB(sqr)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(_sqr_m)(res, x, DFLOAT_MODE_AUTO); return GR_SUCCESS; }
-static int GRCB(mul_two)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(mul_2exp_si)(res, x, 1); return GR_SUCCESS; }
-static int GRCB(mul_2exp_si)(DCB(ptr) res, DCB(srcptr) x, slong e, gr_ctx_t ctx) { DCB(mul_2exp_si)(res, x, e); return GR_SUCCESS; }
-static int GRCB(conj)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(conj)(res, x); return GR_SUCCESS; }
-static int GRCB(re)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { GRB(set)(&res->re, &x->re, ctx); DB(zero)(&res->im); return GR_SUCCESS; }
-static int GRCB(im)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { GRB(set)(&res->re, &x->im, ctx); DB(zero)(&res->im); return GR_SUCCESS; }
+static int GRCB(mul_two)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(_mul_2exp_si_inline)(res, x, 1); return GR_SUCCESS; }
+static int GRCB(mul_2exp_si)(DCB(ptr) res, DCB(srcptr) x, slong e, gr_ctx_t ctx) { DCB(_mul_2exp_si_inline)(res, x, e); return GR_SUCCESS; }
+static int GRCB(conj)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(_conj_inline)(res, x); return GR_SUCCESS; }
+static int GRCB(re)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { GRB(set)(&res->re, &x->re, ctx); DB(_zero_inline)(&res->im); return GR_SUCCESS; }
+static int GRCB(im)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { GRB(set)(&res->re, &x->im, ctx); DB(_zero_inline)(&res->im); return GR_SUCCESS; }
 
 static void GRCB(vec_init)(DCB(ptr) vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        DCB(zero)(vec + i);
+        DCB(_zero_inline)(vec + i);
 }
 static void GRCB(vec_clear)(DCB(ptr) vec, slong len, gr_ctx_t ctx) { }
 static int GRCB(vec_set)(DCB(ptr) res, DCB(srcptr) x, slong len, gr_ctx_t ctx)
@@ -1048,8 +1065,8 @@ gr_method_tab_input DCBV(gr_fast_methods_input)[] =
 /* strong variants */
 static DFLOAT_NOINLINE void DCB(_canon)(DCB(ptr) x) { DF(_canonicalise_inplace)(x->re.d); DF(_canonicalise_inplace)(x->im.d); }
 #define DCB_MODE(ctx) (DFLOAT_CTX_FAST(ctx) ? DFLOAT_MODE_FAST : DFLOAT_MODE_AUTO)
-static DC_COLD int GRCB(add_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(add)(res, x, y); DCB(_canon)(res); return GR_SUCCESS; }
-static DC_COLD int GRCB(sub_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(sub)(res, x, y); DCB(_canon)(res); return GR_SUCCESS; }
+static DC_COLD int GRCB(add_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_add_inline)(res, x, y); DCB(_canon)(res); return GR_SUCCESS; }
+static DC_COLD int GRCB(sub_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_sub_inline)(res, x, y); DCB(_canon)(res); return GR_SUCCESS; }
 static DC_COLD int GRCB(mul_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, gr_ctx_t ctx) { DCB(_mul_m)(res, x, y, DCB_MODE(ctx)); DCB(_canon)(res); return GR_SUCCESS; }
 static DC_COLD int GRCB(sqr_strong)(DCB(ptr) res, DCB(srcptr) x, gr_ctx_t ctx) { DCB(_sqr_m)(res, x, DCB_MODE(ctx)); DCB(_canon)(res); return GR_SUCCESS; }
 static DC_COLD int GRCB(vec_add_strong)(DCB(ptr) res, DCB(srcptr) x, DCB(srcptr) y, slong len, gr_ctx_t ctx)

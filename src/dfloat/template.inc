@@ -91,6 +91,24 @@
 #define DFLOAT_FUNC_NOINLINE
 #endif
 
+/* The small operations are written as kernels, with the public
+   functions as wrappers, and the code in this file (the gr wrappers,
+   the vector loops, the dot products, the complex arithmetic) calls the
+   kernels: in a shared library, a call to a public function from the
+   same file cannot be inlined, or even made directly, since the symbol
+   might be interposed; it goes through the PLT.  The trivial kernels
+   DF(_name_inline) are always inlined (FLINT_FORCE_INLINE), as are the
+   division and square roots for N = 1.  The arithmetic DF(_name_impl)
+   (DFLOAT_ARITH_IMPL) is inlined for N = 1, where it is a few
+   instructions; for N >= 2, where its bodies are larger (0.3-4 KB) and
+   their cost dominates a call, it is a single static copy that is
+   called directly. */
+#if N == 1
+#define DFLOAT_ARITH_IMPL FLINT_FORCE_INLINE
+#else
+#define DFLOAT_ARITH_IMPL static DFLOAT_NOINLINE
+#endif
+
 /* ------------------------------------------------------------------ */
 /* Core kernels                                                        */
 /* ------------------------------------------------------------------ */
@@ -957,13 +975,15 @@ void DFV(sqr_tracked)(double * res, double * err, const double * x)
 /* Plain arithmetic                                                    */
 /* ------------------------------------------------------------------ */
 
-void DF(set_d)(DF(t) res, double x)
+FLINT_FORCE_INLINE void
+DF(_set_d_inline)(DF(t) res, double x)
 {
     int i;
     res->d[0] = x;
     for (i = 1; i < N; i++)
         res->d[i] = 0.0;
 }
+void DF(set_d)(DF(t) res, double x) { DF(_set_d_inline)(res, x); }
 
 void DF(set_dd)(DF(t) res, double x0, double x1)
 {
@@ -971,28 +991,36 @@ void DF(set_dd)(DF(t) res, double x0, double x1)
     DF(renorm)(res, t, 2);
 }
 
-void DF(zero)(DF(t) res) { DF(set_d)(res, 0.0); }
-void DF(one)(DF(t) res) { DF(set_d)(res, 1.0); }
+FLINT_FORCE_INLINE void DF(_zero_inline)(DF(t) res) { DF(_set_d_inline)(res, 0.0); }
+void DF(zero)(DF(t) res) { DF(_zero_inline)(res); }
+FLINT_FORCE_INLINE void DF(_one_inline)(DF(t) res) { DF(_set_d_inline)(res, 1.0); }
+void DF(one)(DF(t) res) { DF(_one_inline)(res); }
 
-void DF(set)(DF(t) res, DF(srcptr) x)
+FLINT_FORCE_INLINE void
+DF(_set_inline)(DF(t) res, DF(srcptr) x)
 {
     *res = *x;
 }
+void DF(set)(DF(t) res, DF(srcptr) x) { DF(_set_inline)(res, x); }
 
-void DF(neg)(DF(t) res, DF(srcptr) x)
+FLINT_FORCE_INLINE void
+DF(_neg_inline)(DF(t) res, DF(srcptr) x)
 {
     int i;
     for (i = 0; i < N; i++)
         res->d[i] = -x->d[i];
 }
+void DF(neg)(DF(t) res, DF(srcptr) x) { DF(_neg_inline)(res, x); }
 
-void DF(abs)(DF(t) res, DF(srcptr) x)
+FLINT_FORCE_INLINE void
+DF(_abs_inline)(DF(t) res, DF(srcptr) x)
 {
     if (x->d[0] < 0.0 || (x->d[0] == 0.0 && signbit(x->d[0])))
-        DF(neg)(res, x);
+        DF(_neg_inline)(res, x);
     else
-        DF(set)(res, x);
+        DF(_set_inline)(res, x);
 }
+void DF(abs)(DF(t) res, DF(srcptr) x) { DF(_abs_inline)(res, x); }
 
 FLINT_FORCE_INLINE void
 DF(_canonicalise_inplace)(double * x)
@@ -1001,46 +1029,58 @@ DF(_canonicalise_inplace)(double * x)
         DF(_canonicalise)(x);
 }
 
-void DF(canonicalise)(DF(t) res, DF(srcptr) x)
+FLINT_FORCE_INLINE void
+DF(_canonicalise_inline)(DF(t) res, DF(srcptr) x)
 {
-    DF(set)(res, x);
+    DF(_set_inline)(res, x);
     DF(_canonicalise_inplace)(res->d);
 }
+void DF(canonicalise)(DF(t) res, DF(srcptr) x) { DF(_canonicalise_inline)(res, x); }
 
-void DF(add)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DF(_add_impl)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
 {
     double v = x->d[0] + y->d[0];
     DF(_add_kernel)(res->d, NULL, x->d, y->d, 0);
     DF(_fix_nonfinite_v)(res->d, v);
 }
+void DF(add)(DF(t) res, DF(srcptr) x, DF(srcptr) y) { DF(_add_impl)(res, x, y); }
 
-void DF(sub)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DF(_sub_impl)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
 {
     double v = x->d[0] - y->d[0];
     DF(_sub_kernel)(res->d, NULL, x->d, y->d, 0);
     DF(_fix_nonfinite_v)(res->d, v);
 }
+void DF(sub)(DF(t) res, DF(srcptr) x, DF(srcptr) y) { DF(_sub_impl)(res, x, y); }
 
-void DF(mul)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DF(_mul_impl)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
 {
     double v = x->d[0] * y->d[0];
     DF(_mul_kernel)(res->d, NULL, x->d, y->d, 0);
     DF(_fix_nonfinite_v)(res->d, v);
 }
+void DF(mul)(DF(t) res, DF(srcptr) x, DF(srcptr) y) { DF(_mul_impl)(res, x, y); }
 
-void DF(sqr)(DF(t) res, DF(srcptr) x)
+DFLOAT_ARITH_IMPL void
+DF(_sqr_impl)(DF(t) res, DF(srcptr) x)
 {
     double v = x->d[0] * x->d[0];
     DF(_sqr_kernel)(res->d, NULL, x->d, 0);
     DF(_fix_nonfinite_v)(res->d, v);
 }
+void DF(sqr)(DF(t) res, DF(srcptr) x) { DF(_sqr_impl)(res, x); }
 
-void DF(mul_d)(DF(t) res, DF(srcptr) x, double y)
+DFLOAT_ARITH_IMPL void
+DF(_mul_d_impl)(DF(t) res, DF(srcptr) x, double y)
 {
     double v = x->d[0] * y;
     DF(_mul_d_kernel)(res->d, NULL, x->d, y, 0);
     DF(_fix_nonfinite_v)(res->d, v);
 }
+void DF(mul_d)(DF(t) res, DF(srcptr) x, double y) { DF(_mul_d_impl)(res, x, y); }
 
 void DF(renorm)(DF(t) res, const double * t, slong len)
 {
@@ -1134,21 +1174,28 @@ DF(_div_level)(double * q, const double * x, const double * y, int L, int D)
     }
 }
 
-FLINT_FORCE_INLINE void
+/* The kernel of the division is inlined for N <= 2; for N >= 3, where
+   it is large (1-2 KB) and expensive, it is a single static copy shared
+   by the plain division, the approximate entry point and the elementary
+   functions that use it (the ball division inlines its own). */
+#if N <= 2
+#define DFLOAT_DIV_KERNEL FLINT_FORCE_INLINE
+#else
+#define DFLOAT_DIV_KERNEL static DFLOAT_NOINLINE
+#endif
+
+DFLOAT_DIV_KERNEL void
 DF(_div_kernel)(double * q, const double * x, const double * y)
 {
     DF(_div_level)(q, x, y, N, N);
 }
 
-void DF(div)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
+static DFLOAT_NOINLINE void
+DF(_div_ool)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
 {
-    if (N == 1)
+    if (y->d[0] == 0.0 || !DF(_is_finite)(x->d) || !DF(_is_finite)(y->d))
     {
-        res->d[0] = x->d[0] / y->d[0];
-    }
-    else if (y->d[0] == 0.0 || !DF(_is_finite)(x->d) || !DF(_is_finite)(y->d))
-    {
-        DF(set_d)(res, x->d[0] / y->d[0]);
+        DF(_set_d_inline)(res, x->d[0] / y->d[0]);
     }
     else
     {
@@ -1157,12 +1204,24 @@ void DF(div)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
     }
 }
 
-void DF(inv)(DF(t) res, DF(srcptr) x)
+FLINT_FORCE_INLINE void
+DF(_div_inline)(DF(t) res, DF(srcptr) x, DF(srcptr) y)
+{
+    if (N == 1)
+        res->d[0] = x->d[0] / y->d[0];
+    else
+        DF(_div_ool)(res, x, y);
+}
+void DF(div)(DF(t) res, DF(srcptr) x, DF(srcptr) y) { DF(_div_inline)(res, x, y); }
+
+FLINT_FORCE_INLINE void
+DF(_inv_inline)(DF(t) res, DF(srcptr) x)
 {
     DF(t) one;
-    DF(one)(one);
-    DF(div)(res, one, x);
+    DF(_one_inline)(one);
+    DF(_div_inline)(res, one, x);
 }
+void DF(inv)(DF(t) res, DF(srcptr) x) { DF(_inv_inline)(res, x); }
 
 /* Newton iteration for the square root: s <- s + (x - s^2) / (2 s),
    starting from the double square root and doubling the number of
@@ -1236,15 +1295,12 @@ DF(_sqrt_kernel)(double * s, const double * x)
     }
 }
 
-void DF(sqrt)(DF(t) res, DF(srcptr) x)
+static DFLOAT_NOINLINE void
+DF(_sqrt_ool)(DF(t) res, DF(srcptr) x)
 {
-    if (N == 1)
+    if (!(x->d[0] > 0.0) || !DF(_is_finite)(x->d))
     {
-        res->d[0] = sqrt(x->d[0]);
-    }
-    else if (!(x->d[0] > 0.0) || !DF(_is_finite)(x->d))
-    {
-        DF(set_d)(res, sqrt(x->d[0]));
+        DF(_set_d_inline)(res, sqrt(x->d[0]));
     }
     else
     {
@@ -1253,14 +1309,26 @@ void DF(sqrt)(DF(t) res, DF(srcptr) x)
     }
 }
 
+FLINT_FORCE_INLINE void
+DF(_sqrt_inline)(DF(t) res, DF(srcptr) x)
+{
+    if (N == 1)
+        res->d[0] = sqrt(x->d[0]);
+    else
+        DF(_sqrt_ool)(res, x);
+}
+void DF(sqrt)(DF(t) res, DF(srcptr) x) { DF(_sqrt_inline)(res, x); }
+
 void DFV(div_approx)(double * q, const double * x, const double * y)
 {
     DF(_div_kernel)(q, x, y);
 }
 
+/* (through the full function, which is the kernel for x > 0, so that
+   the kernel is not compiled a second time) */
 void DFV(sqrt_approx)(double * s, const double * x)
 {
-    DF(_sqrt_kernel)(s, x);
+    DF(_sqrt_inline)((DF(ptr)) s, (DF(srcptr)) x);
 }
 
 /* Newton iteration for the reciprocal square root: r <- r + r (1 - x
@@ -1319,15 +1387,12 @@ DF(_rsqrt_kernel)(double * r, const double * x)
     }
 }
 
-void DF(rsqrt)(DF(t) res, DF(srcptr) x)
+static DFLOAT_NOINLINE void
+DF(_rsqrt_ool)(DF(t) res, DF(srcptr) x)
 {
-    if (N == 1)
+    if (!(x->d[0] > 0.0) || !DF(_is_finite)(x->d))
     {
-        res->d[0] = 1.0 / sqrt(x->d[0]);
-    }
-    else if (!(x->d[0] > 0.0) || !DF(_is_finite)(x->d))
-    {
-        DF(set_d)(res, 1.0 / sqrt(x->d[0]));
+        DF(_set_d_inline)(res, 1.0 / sqrt(x->d[0]));
     }
     else
     {
@@ -1336,12 +1401,23 @@ void DF(rsqrt)(DF(t) res, DF(srcptr) x)
     }
 }
 
+FLINT_FORCE_INLINE void
+DF(_rsqrt_inline)(DF(t) res, DF(srcptr) x)
+{
+    if (N == 1)
+        res->d[0] = 1.0 / sqrt(x->d[0]);
+    else
+        DF(_rsqrt_ool)(res, x);
+}
+void DF(rsqrt)(DF(t) res, DF(srcptr) x) { DF(_rsqrt_inline)(res, x); }
+
 void DFV(rsqrt_approx)(double * r, const double * x)
 {
-    DF(_rsqrt_kernel)(r, x);
+    DF(_rsqrt_inline)((DF(ptr)) r, (DF(srcptr)) x);
 }
 
-void DF(mul_2exp_si)(DF(t) res, DF(srcptr) x, slong e)
+DFLOAT_ARITH_IMPL void
+DF(_mul_2exp_si_impl)(DF(t) res, DF(srcptr) x, slong e)
 {
     int i;
     if (e >= -1000 && e <= 1000)
@@ -1357,10 +1433,13 @@ void DF(mul_2exp_si)(DF(t) res, DF(srcptr) x, slong e)
     }
     DF(_fix_nonfinite)(res->d);
 }
+void DF(mul_2exp_si)(DF(t) res, DF(srcptr) x, slong e) { DF(_mul_2exp_si_impl)(res, x, e); }
 
-int DF(is_zero)(DF(srcptr) x) { return x->d[0] == 0.0; }
+FLINT_FORCE_INLINE int DF(_is_zero_inline)(DF(srcptr) x) { return x->d[0] == 0.0; }
+int DF(is_zero)(DF(srcptr) x) { return DF(_is_zero_inline)(x); }
 
-int DF(is_one)(DF(srcptr) x)
+FLINT_FORCE_INLINE int
+DF(_is_one_inline)(DF(srcptr) x)
 {
     int i;
     if (x->d[0] != 1.0)
@@ -1370,9 +1449,12 @@ int DF(is_one)(DF(srcptr) x)
             return 0;
     return 1;
 }
+int DF(is_one)(DF(srcptr) x) { return DF(_is_one_inline)(x); }
 
-int DF(is_finite)(DF(srcptr) x) { return DF(_is_finite)(x->d); }
-int DF(is_nan)(DF(srcptr) x) { return x->d[0] != x->d[0]; }
+FLINT_FORCE_INLINE int DF(_is_finite_inline)(DF(srcptr) x) { return DF(_is_finite)(x->d); }
+int DF(is_finite)(DF(srcptr) x) { return DF(_is_finite_inline)(x); }
+FLINT_FORCE_INLINE int DF(_is_nan_inline)(DF(srcptr) x) { return x->d[0] != x->d[0]; }
+int DF(is_nan)(DF(srcptr) x) { return DF(_is_nan_inline)(x); }
 
 /* The comparisons and predicates: bounds on the difference x - y (or
    x - c), computed once by a tracked subtraction d + [-e, e]:
@@ -1406,7 +1488,8 @@ DF(_diff_bounds_d)(double * lo, double * hi, double * d0, const double * x, doub
 
 /* exact comparison through a tracked subtraction: the difference is
    d + [-e, e] */
-int DF(cmp)(DF(srcptr) x, DF(srcptr) y)
+FLINT_FORCE_INLINE int
+DF(_cmp_inline)(DF(srcptr) x, DF(srcptr) y)
 {
     double lo, hi, d0;
     if (N == 1)
@@ -1427,13 +1510,16 @@ int DF(cmp)(DF(srcptr) x, DF(srcptr) y)
         return c;
     }
 }
+int DF(cmp)(DF(srcptr) x, DF(srcptr) y) { return DF(_cmp_inline)(x, y); }
 
-int DF(equal)(DF(srcptr) x, DF(srcptr) y)
+FLINT_FORCE_INLINE int
+DF(_equal_inline)(DF(srcptr) x, DF(srcptr) y)
 {
     if (!DF(_is_finite)(x->d) || !DF(_is_finite)(y->d))
         return x->d[0] == y->d[0];
-    return DF(cmp)(x, y) == 0;
+    return DF(_cmp_inline)(x, y) == 0;
 }
+int DF(equal)(DF(srcptr) x, DF(srcptr) y) { return DF(_equal_inline)(x, y); }
 
 int DF(sgn)(DF(srcptr) x)
 {
@@ -1596,14 +1682,14 @@ void DFV(vec_add)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
     for (; i + 4 <= len; i += 4)
         if (FLINT_UNLIKELY(DF(_vaddsub4)(res + i, x + i, y + i, 0)))
         {
-            DF(add)(res + i, x + i, y + i);
-            DF(add)(res + i + 1, x + i + 1, y + i + 1);
-            DF(add)(res + i + 2, x + i + 2, y + i + 2);
-            DF(add)(res + i + 3, x + i + 3, y + i + 3);
+            DF(_add_impl)(res + i, x + i, y + i);
+            DF(_add_impl)(res + i + 1, x + i + 1, y + i + 1);
+            DF(_add_impl)(res + i + 2, x + i + 2, y + i + 2);
+            DF(_add_impl)(res + i + 3, x + i + 3, y + i + 3);
         }
 #endif
     for (; i < len; i++)
-        DF(add)(res + i, x + i, y + i);
+        DF(_add_impl)(res + i, x + i, y + i);
 }
 
 void DFV(vec_sub)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
@@ -1613,14 +1699,14 @@ void DFV(vec_sub)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
     for (; i + 4 <= len; i += 4)
         if (FLINT_UNLIKELY(DF(_vaddsub4)(res + i, x + i, y + i, 1)))
         {
-            DF(sub)(res + i, x + i, y + i);
-            DF(sub)(res + i + 1, x + i + 1, y + i + 1);
-            DF(sub)(res + i + 2, x + i + 2, y + i + 2);
-            DF(sub)(res + i + 3, x + i + 3, y + i + 3);
+            DF(_sub_impl)(res + i, x + i, y + i);
+            DF(_sub_impl)(res + i + 1, x + i + 1, y + i + 1);
+            DF(_sub_impl)(res + i + 2, x + i + 2, y + i + 2);
+            DF(_sub_impl)(res + i + 3, x + i + 3, y + i + 3);
         }
 #endif
     for (; i < len; i++)
-        DF(sub)(res + i, x + i, y + i);
+        DF(_sub_impl)(res + i, x + i, y + i);
 }
 
 void DFV(vec_mul)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
@@ -1630,21 +1716,21 @@ void DFV(vec_mul)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
     for (; i + 4 <= len; i += 4)
         if (FLINT_UNLIKELY(DF(_vmul4)(res + i, x + i, y + i)))
         {
-            DF(mul)(res + i, x + i, y + i);
-            DF(mul)(res + i + 1, x + i + 1, y + i + 1);
-            DF(mul)(res + i + 2, x + i + 2, y + i + 2);
-            DF(mul)(res + i + 3, x + i + 3, y + i + 3);
+            DF(_mul_impl)(res + i, x + i, y + i);
+            DF(_mul_impl)(res + i + 1, x + i + 1, y + i + 1);
+            DF(_mul_impl)(res + i + 2, x + i + 2, y + i + 2);
+            DF(_mul_impl)(res + i + 3, x + i + 3, y + i + 3);
         }
 #endif
     for (; i < len; i++)
-        DF(mul)(res + i, x + i, y + i);
+        DF(_mul_impl)(res + i, x + i, y + i);
 }
 
 void DFV(vec_mul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
 {
     slong i;
     for (i = 0; i < len; i++)
-        DF(mul)(res + i, x + i, c);
+        DF(_mul_impl)(res + i, x + i, c);
 }
 
 void DFV(vec_addmul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
@@ -1653,8 +1739,8 @@ void DFV(vec_addmul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
     DF(t) t;
     for (i = 0; i < len; i++)
     {
-        DF(mul)(t, x + i, c);
-        DF(add)(res + i, res + i, t);
+        DF(_mul_impl)(t, x + i, c);
+        DF(_add_impl)(res + i, res + i, t);
     }
 }
 
@@ -1664,8 +1750,8 @@ void DFV(vec_submul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
     DF(t) t;
     for (i = 0; i < len; i++)
     {
-        DF(mul)(t, x + i, c);
-        DF(sub)(res + i, res + i, t);
+        DF(_mul_impl)(t, x + i, c);
+        DF(_sub_impl)(res + i, res + i, t);
     }
 }
 
@@ -1698,8 +1784,8 @@ void DFV(vec_submul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
             DF(_vstore4)(a4->d, ACC, N); \
             for (_k = 0; _k < 4; _k++) \
             { \
-                DF(mul)(t, x + (I) + _k, rev ? y + len - 1 - (I) - _k : y + (I) + _k); \
-                DF(add)(a4 + _k, a4 + _k, t); \
+                DF(_mul_impl)(t, x + (I) + _k, rev ? y + len - 1 - (I) - _k : y + (I) + _k); \
+                DF(_add_impl)(a4 + _k, a4 + _k, t); \
             } \
             DF(_vload4)(ACC, a4->d, N); \
         } \
@@ -1718,9 +1804,9 @@ DFV(_vec_dot_m)(DF(t) res, DF(srcptr) initial, int subtract, DF(srcptr) x, DF(sr
     slong i = 0;
     DF(t) s, t;
     if (initial == NULL)
-        DF(zero)(s);
+        DF(_zero_inline)(s);
     else
-        DF(set)(s, initial);
+        DF(_set_inline)(s, initial);
 #ifdef DFLOAT_HAVE_SIMD
     if (len >= DFLOAT_DOT_PLAIN_SIMD_MIN)
     {
@@ -1732,24 +1818,24 @@ DFV(_vec_dot_m)(DF(t) res, DF(srcptr) initial, int subtract, DF(srcptr) x, DF(sr
         for (; i + 4 <= len; i += 4)
             DFV_DOT_BLOCK(acc, i);
         DF(_vstore4)(a4->d, acc, N);
-        DF(add)(a4, a4, a4 + 1);
-        DF(add)(a4 + 2, a4 + 2, a4 + 3);
-        DF(add)(a4, a4, a4 + 2);
+        DF(_add_impl)(a4, a4, a4 + 1);
+        DF(_add_impl)(a4 + 2, a4 + 2, a4 + 3);
+        DF(_add_impl)(a4, a4, a4 + 2);
         if (subtract)
-            DF(sub)(s, s, a4);
+            DF(_sub_impl)(s, s, a4);
         else
-            DF(add)(s, s, a4);
+            DF(_add_impl)(s, s, a4);
     }
 #endif
     for (; i < len; i++)
     {
-        DF(mul)(t, x + i, rev ? y + len - 1 - i : y + i);
+        DF(_mul_impl)(t, x + i, rev ? y + len - 1 - i : y + i);
         if (subtract)
-            DF(sub)(s, s, t);
+            DF(_sub_impl)(s, s, t);
         else
-            DF(add)(s, s, t);
+            DF(_add_impl)(s, s, t);
     }
-    DF(set)(res, s);
+    DF(_set_inline)(res, s);
 }
 
 #undef DFV_DOT_BLOCK
@@ -1770,21 +1856,21 @@ DFV(_vec_dot_short)(DF(t) res, DF(srcptr) initial, int subtract, DF(srcptr) x, D
     slong i;
     DF(t) s, t;
     if (initial == NULL)
-        DF(zero)(s);
+        DF(_zero_inline)(s);
     else
-        DF(set)(s, initial);
+        DF(_set_inline)(s, initial);
     /* (no unrolling: knowing len < DFLOAT_DOT_PLAIN_SIMD_MIN, GCC would
        otherwise unroll this fully, which costs a stack frame per call) */
     DFLOAT_NO_UNROLL
     for (i = 0; i < len; i++)
     {
-        DF(mul)(t, x + i, rev ? y + len - 1 - i : y + i);
+        DF(_mul_impl)(t, x + i, rev ? y + len - 1 - i : y + i);
         if (subtract)
-            DF(sub)(s, s, t);
+            DF(_sub_impl)(s, s, t);
         else
-            DF(add)(s, s, t);
+            DF(_add_impl)(s, s, t);
     }
-    DF(set)(res, s);
+    DF(_set_inline)(res, s);
 }
 
 /* the SIMD bodies return GR_SUCCESS, so that the gr wrappers reach them
@@ -1824,7 +1910,18 @@ void DFV(vec_dot_rev)(DF(t) res, DF(srcptr) initial, int subtract, DF(srcptr) x,
 /* Ball arithmetic                                                     */
 /* ------------------------------------------------------------------ */
 
-void DB(set_d)(DB(t) res, double x)
+FLINT_FORCE_INLINE void
+DB(_indeterminate_inline)(DB(t) res)
+{
+    int i;
+    for (i = 0; i < N; i++)
+        res->d[i] = 0.0;
+    res->rad = D_INF;
+}
+void DB(indeterminate)(DB(t) res) { DB(_indeterminate_inline)(res); }
+
+FLINT_FORCE_INLINE void
+DB(_set_d_inline)(DB(t) res, double x)
 {
     int i;
     if (x == x && fabs(x) <= DBL_MAX)
@@ -1835,8 +1932,9 @@ void DB(set_d)(DB(t) res, double x)
         res->rad = 0.0;
     }
     else
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
 }
+void DB(set_d)(DB(t) res, double x) { DB(_set_d_inline)(res, x); }
 
 void DB(set_dd)(DB(t) res, double x0, double x1)
 {
@@ -1849,24 +1947,19 @@ void DB(set_dd)(DB(t) res, double x0, double x1)
 
 void DB(set_d_rad)(DB(t) res, double x, double rad)
 {
-    DB(set_d)(res, x);
+    DB(_set_d_inline)(res, x);
     /* (a nonfinite x or rad, or rad < 0, gives the whole line) */
     res->rad = (rad >= 0.0 && fabs(x) <= DBL_MAX) ? rad : D_INF;
     DB(_fix_nonfinite)(res->d, &res->rad);
 }
 
-void DB(zero)(DB(t) res) { DB(set_d)(res, 0.0); }
-void DB(one)(DB(t) res) { DB(set_d)(res, 1.0); }
+FLINT_FORCE_INLINE void DB(_zero_inline)(DB(t) res) { DB(_set_d_inline)(res, 0.0); }
+void DB(zero)(DB(t) res) { DB(_zero_inline)(res); }
+FLINT_FORCE_INLINE void DB(_one_inline)(DB(t) res) { DB(_set_d_inline)(res, 1.0); }
+void DB(one)(DB(t) res) { DB(_one_inline)(res); }
 
-void DB(indeterminate)(DB(t) res)
-{
-    int i;
-    for (i = 0; i < N; i++)
-        res->d[i] = 0.0;
-    res->rad = D_INF;
-}
-
-void DB(set)(DB(t) res, DB(srcptr) x) { *res = *x; }
+FLINT_FORCE_INLINE void DB(_set_inline)(DB(t) res, DB(srcptr) x) { *res = *x; }
+void DB(set)(DB(t) res, DB(srcptr) x) { DB(_set_inline)(res, x); }
 
 /* [0 +/- b] */
 FLINT_FORCE_INLINE void
@@ -1878,53 +1971,63 @@ DB(_set_zero_pm)(DB(t) res, double b)
     res->rad = b;
 }
 
-void DB(neg)(DB(t) res, DB(srcptr) x)
+FLINT_FORCE_INLINE void
+DB(_neg_inline)(DB(t) res, DB(srcptr) x)
 {
     int i;
     for (i = 0; i < N; i++)
         res->d[i] = -x->d[i];
     res->rad = x->rad;
     if (FLINT_UNLIKELY(DB(_is_W)(res)))
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
 }
+void DB(neg)(DB(t) res, DB(srcptr) x) { DB(_neg_inline)(res, x); }
 
 /* | [m +/- r] | is contained in [|m| +/- r] */
-void DB(abs)(DB(t) res, DB(srcptr) x)
+FLINT_FORCE_INLINE void
+DB(_abs_inline)(DB(t) res, DB(srcptr) x)
 {
     if (x->d[0] < 0.0)
-        DB(neg)(res, x);
+        DB(_neg_inline)(res, x);
     else if (FLINT_UNLIKELY(DB(_is_W)(x)))
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
     else
-        DB(set)(res, x);
+        DB(_set_inline)(res, x);
 }
+void DB(abs)(DB(t) res, DB(srcptr) x) { DB(_abs_inline)(res, x); }
 
-void DB(canonicalise)(DB(t) res, DB(srcptr) x)
+FLINT_FORCE_INLINE void
+DB(_canonicalise_inline)(DB(t) res, DB(srcptr) x)
 {
     if (FLINT_UNLIKELY(DB(_is_W)(x)))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
-    DB(set)(res, x);
+    DB(_set_inline)(res, x);
     DF(_canonicalise_inplace)(res->d);
 }
+void DB(canonicalise)(DB(t) res, DB(srcptr) x) { DB(_canonicalise_inline)(res, x); }
 
-void DB(add)(DB(t) res, DB(srcptr) x, DB(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DB(_add_impl)(DB(t) res, DB(srcptr) x, DB(srcptr) y)
 {
     double err = 0.0;
     DF(_add_kernel)(res->d, &err, x->d, y->d, 1);
     res->rad = _dfloat_rad_finish((x->rad + y->rad) + err);
     DB(_fix_nonfinite)(res->d, &res->rad);
 }
+void DB(add)(DB(t) res, DB(srcptr) x, DB(srcptr) y) { DB(_add_impl)(res, x, y); }
 
-void DB(sub)(DB(t) res, DB(srcptr) x, DB(srcptr) y)
+DFLOAT_ARITH_IMPL void
+DB(_sub_impl)(DB(t) res, DB(srcptr) x, DB(srcptr) y)
 {
     double err = 0.0;
     DF(_sub_kernel)(res->d, &err, x->d, y->d, 1);
     res->rad = _dfloat_rad_finish((x->rad + y->rad) + err);
     DB(_fix_nonfinite)(res->d, &res->rad);
 }
+void DB(sub)(DB(t) res, DB(srcptr) x, DB(srcptr) y) { DB(_sub_impl)(res, x, y); }
 
 /* |x' y' - x y| <= |x| ry + |y'| rx <= |x| ry + |y| rx + rx ry */
 /* Error modes of the products: the rounding error of the midpoint
@@ -1958,9 +2061,9 @@ DB(_mul_m)(DB(t) res, DB(srcptr) x, DB(srcptr) y, int mode)
         /* the whole line, except that an exact zero (ax = 0 only for
            zero components) times anything is zero */
         if ((ax == 0.0 && rx == 0.0) || (ay == 0.0 && ry == 0.0))
-            DB(zero)(res);
+            DB(_zero_inline)(res);
         else
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
     }
 }
 
@@ -1985,12 +2088,39 @@ DB(_sqr_m)(DB(t) res, DB(srcptr) x, int mode)
     DB(_fix_nonfinite)(res->d, &res->rad);
 }
 
-void DB(mul)(DB(t) res, DB(srcptr) x, DB(srcptr) y) { DB(_mul_m)(res, x, y, DFLOAT_MODE_AUTO); }
-void DB(sqr)(DB(t) res, DB(srcptr) x) { DB(_sqr_m)(res, x, DFLOAT_MODE_AUTO); }
-
 /* out-of-line versions with a run-time mode, for the scalar fallbacks
-   of the vector functions and the fast contexts */
+   of the vector functions, the complex products and, for N >= 2, all
+   the products outside the dot products (in either mode: the automatic
+   mode's body contains both kernels, so one copy serves both) */
 static DFLOAT_NOINLINE void DB(_mul_ool)(DB(t) res, DB(srcptr) x, DB(srcptr) y, int mode) { DB(_mul_m)(res, x, y, mode); }
+static DFLOAT_NOINLINE void DB(_sqr_ool)(DB(t) res, DB(srcptr) x, int mode) { DB(_sqr_m)(res, x, mode); }
+
+/* the products in a given mode: inlined for N = 1, where they are
+   small, and otherwise the out-of-line versions */
+FLINT_FORCE_INLINE void
+DB(_mul_mode)(DB(t) res, DB(srcptr) x, DB(srcptr) y, int mode)
+{
+    if (N == 1)
+        DB(_mul_m)(res, x, y, mode);
+    else
+        DB(_mul_ool)(res, x, y, mode);
+}
+
+FLINT_FORCE_INLINE void
+DB(_sqr_mode)(DB(t) res, DB(srcptr) x, int mode)
+{
+    if (N == 1)
+        DB(_sqr_m)(res, x, mode);
+    else
+        DB(_sqr_ool)(res, x, mode);
+}
+
+FLINT_FORCE_INLINE void
+DB(_mul_impl)(DB(t) res, DB(srcptr) x, DB(srcptr) y) { DB(_mul_mode)(res, x, y, DFLOAT_MODE_AUTO); }
+void DB(mul)(DB(t) res, DB(srcptr) x, DB(srcptr) y) { DB(_mul_impl)(res, x, y); }
+FLINT_FORCE_INLINE void
+DB(_sqr_impl)(DB(t) res, DB(srcptr) x) { DB(_sqr_mode)(res, x, DFLOAT_MODE_AUTO); }
+void DB(sqr)(DB(t) res, DB(srcptr) x) { DB(_sqr_impl)(res, x); }
 
 void DB(mul_d)(DB(t) res, DB(srcptr) x, double y)
 {
@@ -2014,13 +2144,14 @@ void DB(mul_d)(DB(t) res, DB(srcptr) x, double y)
     if (FLINT_UNLIKELY(!(_dfloat_abs_sum(res->d, N) + res->rad <= DBL_MAX)))
     {
         if (y == 0.0)
-            DB(zero)(res);      /* anything times an exact zero */
+            DB(_zero_inline)(res);      /* anything times an exact zero */
         else
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
     }
 }
 
-void DB(mul_2exp_si)(DB(t) res, DB(srcptr) x, slong e)
+DFLOAT_ARITH_IMPL void
+DB(_mul_2exp_si_impl)(DB(t) res, DB(srcptr) x, slong e)
 {
     double err = 0.0, r[N], rad;
     int i;
@@ -2053,6 +2184,7 @@ void DB(mul_2exp_si)(DB(t) res, DB(srcptr) x, slong e)
     res->rad = _dfloat_rad_finish(rad + err);
     DB(_fix_nonfinite)(res->d, &res->rad);
 }
+void DB(mul_2exp_si)(DB(t) res, DB(srcptr) x, slong e) { DB(_mul_2exp_si_impl)(res, x, e); }
 
 void DB(add_error_d)(DB(t) res, double err)
 {
@@ -2071,7 +2203,8 @@ void DB(get_mid_d)(double * mid, DB(srcptr) x)
 int DB(is_exact)(DB(srcptr) x) { return x->rad == 0.0 && !DB(_is_W)(x); }
 int DB(is_finite)(DB(srcptr) x) { return !DB(_is_W)(x); }
 /* (the sum of the absolute values is 0 only for finite zeros) */
-int DB(is_zero)(DB(srcptr) x) { return x->rad == 0.0 && _dfloat_abs_sum(x->d, N) == 0.0; }
+FLINT_FORCE_INLINE int DB(_is_zero_inline)(DB(srcptr) x) { return x->rad == 0.0 && _dfloat_abs_sum(x->d, N) == 0.0; }
+int DB(is_zero)(DB(srcptr) x) { return DB(_is_zero_inline)(x); }
 
 /* lower bound on |mid| */
 FLINT_FORCE_INLINE double
@@ -2085,10 +2218,12 @@ DB(_abs_mid_lower)(DB(srcptr) x)
    lower bound cannot flip a borderline verdict */
 /* (every form of the whole line fails the test: a nonfinite tail or
    radius makes the comparison false, and the head is checked) */
-int DB(contains_zero)(DB(srcptr) x)
+FLINT_FORCE_INLINE int
+DB(_contains_zero_inline)(DB(srcptr) x)
 {
     return !(DB(_abs_mid_lower)(x) > _dfloat_rad_finish(x->rad) && fabs(x->d[0]) <= DBL_MAX);
 }
+int DB(contains_zero)(DB(srcptr) x) { return DB(_contains_zero_inline)(x); }
 
 /* c in [mid +/- rad]?  (certainly: |mid - c| <= rad up to slack);
    the whole line contains every finite c */
@@ -2139,7 +2274,8 @@ int DB(contains)(DB(srcptr) x, DB(srcptr) y)
 
 /* certainly overlapping: |mx - my| <= rx + ry; answers 1 in doubtful
    cases (the negation "certainly disjoint" is what the predicates use) */
-int DB(overlaps)(DB(srcptr) x, DB(srcptr) y)
+FLINT_FORCE_INLINE int
+DB(_overlaps_inline)(DB(srcptr) x, DB(srcptr) y)
 {
     double lo, hi, d0;
     if (DB(_is_W)(x) || DB(_is_W)(y))
@@ -2147,14 +2283,17 @@ int DB(overlaps)(DB(srcptr) x, DB(srcptr) y)
     DF(_diff_bounds)(&lo, &hi, &d0, x->d, y->d);
     return !(lo > _dfloat_rad_finish(x->rad + y->rad));
 }
+int DB(overlaps)(DB(srcptr) x, DB(srcptr) y) { return DB(_overlaps_inline)(x, y); }
 
-int DB(equal)(DB(srcptr) x, DB(srcptr) y)
+FLINT_FORCE_INLINE int
+DB(_equal_inline)(DB(srcptr) x, DB(srcptr) y)
 {
     double lo, hi, d0;
     if (x->rad != 0.0 || y->rad != 0.0 || DB(_is_W)(x) || DB(_is_W)(y))
         return 0;
     return DF(_diff_bounds)(&lo, &hi, &d0, x->d, y->d);
 }
+int DB(equal)(DB(srcptr) x, DB(srcptr) y) { return DB(_equal_inline)(x, y); }
 
 /* -1, 0, 1 with success when decidable */
 int DB(cmp)(int * res, DB(srcptr) x, DB(srcptr) y)
@@ -2198,7 +2337,7 @@ void DB(set_arf)(DB(t) res, const arf_t x)
     double err = 0.0;
     if (!arf_is_finite(x))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     _dfloat_set_arf(res->d, N, &err, x);
@@ -2279,7 +2418,7 @@ DB(_div_m)(DB(t) res, DB(srcptr) x, DB(srcptr) y, int mode)
 
     /* (a zero head with a nonzero tail only occurs in the whole line) */
     if (FLINT_UNLIKELY(y->d[0] == 0.0 && y->rad == 0.0))
-        return DB(is_zero)(y) ? GR_DOMAIN : GR_UNABLE;
+        return DB(_is_zero_inline)(y) ? GR_DOMAIN : GR_UNABLE;
     /* contains zero: the test of contains_zero without its check of the
        head, which the range check below does (a whole line y that
        passes this test has an infinite head) */
@@ -2298,7 +2437,9 @@ DB(_div_m)(DB(t) res, DB(srcptr) x, DB(srcptr) y, int mode)
     /* |y| - ry > 0 was checked by contains_zero */
     ylo = _dfloat_lower(fabs(y->d[0]) - _dfloat_rad_finish(DF(_tail_abs_sum)(y->d) + y->rad));
 
-    DF(_div_kernel)(q, x->d, y->d);
+    /* (the kernel inlined: as a call, the ball division is 5-15% slower
+       for N >= 3) */
+    DF(_div_level)(q, x->d, y->d, N, N);
     UNROLL
     for (i = 1; i < N; i++)
         if (fabs(q[i]) < TINY_THRESHOLD)
@@ -2335,7 +2476,7 @@ static DFLOAT_NOINLINE int
 DB(_inv_m)(DB(t) res, DB(srcptr) x, int mode)
 {
     DB(t) one;
-    DB(one)(one);
+    DB(_one_inline)(one);
     return DB(_div_m)(res, one, x, mode);
 }
 
@@ -2433,11 +2574,9 @@ DB(_rsqrt_m)(DB(t) res, DB(srcptr) x, int mode)
     return GR_SUCCESS;
 }
 
-/* one out-of-line body with a run-time mode, except that N = 3 keeps an
-   inlined copy for the automatic mode (the shared body is 12% slower
-   there, for no apparent reason; N = 1, 2, 4 are unaffected) */
+/* one out-of-line body with a run-time mode */
 static DFLOAT_NOINLINE int DB(_rsqrt_ool)(DB(t) res, DB(srcptr) x, int mode) { return DB(_rsqrt_m)(res, x, mode); }
-int DB(rsqrt)(DB(t) res, DB(srcptr) x) { return (N == 3) ? DB(_rsqrt_m)(res, x, DFLOAT_MODE_AUTO) : DB(_rsqrt_ool)(res, x, DFLOAT_MODE_AUTO); }
+int DB(rsqrt)(DB(t) res, DB(srcptr) x) { return DB(_rsqrt_ool)(res, x, DFLOAT_MODE_AUTO); }
 
 /* an upper bound on exp(r) - 1 for r >= 0 (r may be +inf) */
 static double
@@ -2471,7 +2610,7 @@ DB(_exp_hi_upper)(const double * xc, double rx)
         return 0x1p-1074;           /* exp(-745) < 2^-1074 */
     if (!(hi <= 709.0))
         return D_INF;
-    DF(set_d)(h, hi);
+    DF(_set_d_inline)(h, hi);
     DF(exp)(e, h);
     t = _dfloat_rad_finish(_dfloat_abs_sum(e->d, N) * (1.0 + 0x1p-40));
     return t + 0x1p-1069;           /* (a subnormal result) */
@@ -2486,7 +2625,7 @@ DFLOAT_FUNC_NOINLINE void DB(exp)(DB(t) res, DB(srcptr) x)
     rx = x->rad;
     if (DB(_is_W)(x))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
 
@@ -2500,20 +2639,20 @@ DFLOAT_FUNC_NOINLINE void DB(exp)(DB(t) res, DB(srcptr) x)
 
     if (m0 > 709.9)
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     if (m0 < -746.0)
     {
         /* exp(m) < 2^-1075: [0 +/- exp(m + r)] */
-        DB(zero)(res);
+        DB(_zero_inline)(res);
         res->rad = DB(_exp_hi_upper)(xc, rx);
         return;
     }
     if (m0 == 0.0)
     {
         /* exp(0) = 1 exactly; the radius covers exp([-r, r]) - 1 */
-        DF(one)((DF(ptr)) res->d);
+        DF(_one_inline)((DF(ptr)) res->d);
         res->rad = (rx == 0.0) ? 0.0 : DB(_expm1_upper)(rx);
         DB(_fix_nonfinite)(res->d, &res->rad);
         return;
@@ -2539,7 +2678,7 @@ DFLOAT_FUNC_NOINLINE void DB(exp)(DB(t) res, DB(srcptr) x)
         /* a wide ball: [0 +/- exp(m + r)] unless that overflows too */
         rad = DB(_exp_hi_upper)(xc, rx);
         if (rad <= DBL_MAX)
-            DB(zero)(res);
+            DB(_zero_inline)(res);
     }
     res->rad = rad;
     DB(_fix_nonfinite)(res->d, &res->rad);
@@ -2557,7 +2696,7 @@ DFLOAT_FUNC_NOINLINE void DB(expm1)(DB(t) res, DB(srcptr) x)
     rx = x->rad;
     if (DB(_is_W)(x))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     UNROLL
@@ -2567,20 +2706,20 @@ DFLOAT_FUNC_NOINLINE void DB(expm1)(DB(t) res, DB(srcptr) x)
     m0 = xc[0];
     if (m0 > 709.9)
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     if (m0 < -746.0)
     {
         /* -1 + exp(m) with exp(m) < 2^-1075: [-1 +/- exp(m + r)] */
-        DF(set_d)((DF(ptr)) res->d, -1.0);
+        DF(_set_d_inline)((DF(ptr)) res->d, -1.0);
         res->rad = DB(_exp_hi_upper)(xc, rx);
         DB(_fix_nonfinite)(res->d, &res->rad);
         return;
     }
     if (m0 == 0.0 && _dfloat_abs_sum(xc, N) == 0.0)
     {
-        DB(zero)(res);
+        DB(_zero_inline)(res);
         res->rad = (rx == 0.0) ? 0.0 : DB(_expm1_upper)(rx);
         return;
     }
@@ -2597,7 +2736,7 @@ DFLOAT_FUNC_NOINLINE void DB(expm1)(DB(t) res, DB(srcptr) x)
         /* a wide ball: [-1 +/- exp(m + r)] unless that overflows too */
         rad = DB(_exp_hi_upper)(xc, rx);
         if (rad <= DBL_MAX)
-            DF(set_d)((DF(ptr)) res->d, -1.0);
+            DF(_set_d_inline)((DF(ptr)) res->d, -1.0);
     }
     res->rad = rad;
     DB(_fix_nonfinite)(res->d, &res->rad);
@@ -2612,14 +2751,14 @@ void DBV(vec_add)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, slong len)
     for (; i + 4 <= len; i += 4)
         if (FLINT_UNLIKELY(DB(_vaddsub4)(res + i, x + i, y + i, 0)))
         {
-            DB(add)(res + i, x + i, y + i);
-            DB(add)(res + i + 1, x + i + 1, y + i + 1);
-            DB(add)(res + i + 2, x + i + 2, y + i + 2);
-            DB(add)(res + i + 3, x + i + 3, y + i + 3);
+            DB(_add_impl)(res + i, x + i, y + i);
+            DB(_add_impl)(res + i + 1, x + i + 1, y + i + 1);
+            DB(_add_impl)(res + i + 2, x + i + 2, y + i + 2);
+            DB(_add_impl)(res + i + 3, x + i + 3, y + i + 3);
         }
 #endif
     for (; i < len; i++)
-        DB(add)(res + i, x + i, y + i);
+        DB(_add_impl)(res + i, x + i, y + i);
 }
 
 void DBV(vec_sub)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, slong len)
@@ -2629,14 +2768,14 @@ void DBV(vec_sub)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, slong len)
     for (; i + 4 <= len; i += 4)
         if (FLINT_UNLIKELY(DB(_vaddsub4)(res + i, x + i, y + i, 1)))
         {
-            DB(sub)(res + i, x + i, y + i);
-            DB(sub)(res + i + 1, x + i + 1, y + i + 1);
-            DB(sub)(res + i + 2, x + i + 2, y + i + 2);
-            DB(sub)(res + i + 3, x + i + 3, y + i + 3);
+            DB(_sub_impl)(res + i, x + i, y + i);
+            DB(_sub_impl)(res + i + 1, x + i + 1, y + i + 1);
+            DB(_sub_impl)(res + i + 2, x + i + 2, y + i + 2);
+            DB(_sub_impl)(res + i + 3, x + i + 3, y + i + 3);
         }
 #endif
     for (; i < len; i++)
-        DB(sub)(res + i, x + i, y + i);
+        DB(_sub_impl)(res + i, x + i, y + i);
 }
 
 /* res[i] = x[i] y[i] (ystep = 1), or x[i] y[0] (ystep = 0, in which
@@ -2703,9 +2842,9 @@ DBV(_vec_dot_m)(DB(t) res, DB(srcptr) initial, int subtract, DB(srcptr) x, DB(sr
     slong i = 0;
     DB(t) s, t;
     if (initial == NULL)
-        DB(zero)(s);
+        DB(_zero_inline)(s);
     else
-        DB(set)(s, initial);
+        DB(_set_inline)(s, initial);
 #ifdef DFLOAT_HAVE_SIMD
     if (len >= DFLOAT_DOT_SIMD_MIN)
     {
@@ -2743,33 +2882,33 @@ DBV(_vec_dot_m)(DB(t) res, DB(srcptr) initial, int subtract, DB(srcptr) x, DB(sr
                 for (k = 0; k < 4; k++)
                 {
                     DB(_mul_m)(t, x + i + k, rev ? y + len - 1 - i - k : y + i + k, mode);
-                    DB(add)(a4 + k, a4 + k, t);
+                    DB(_add_impl)(a4 + k, a4 + k, t);
                 }
                 DF(_vload4)(acc, a4->d, N + 1);
                 DB(_vload_rad)(&accrad, a4);
             }
         }
         DB(_vstore4)(a4, acc, accrad);
-        DB(add)(a4, a4, a4 + 1);
-        DB(add)(a4 + 2, a4 + 2, a4 + 3);
-        DB(add)(a4, a4, a4 + 2);
+        DB(_add_impl)(a4, a4, a4 + 1);
+        DB(_add_impl)(a4 + 2, a4 + 2, a4 + 3);
+        DB(_add_impl)(a4, a4, a4 + 2);
         if (subtract)
-            DB(sub)(s, s, a4);
+            DB(_sub_impl)(s, s, a4);
         else
-            DB(add)(s, s, a4);
+            DB(_add_impl)(s, s, a4);
     }
 #endif
     for (; i < len; i++)
     {
         DB(_mul_m)(t, x + i, rev ? y + len - 1 - i : y + i, mode);
         if (subtract)
-            DB(sub)(s, s, t);
+            DB(_sub_impl)(s, s, t);
         else
-            DB(add)(s, s, t);
+            DB(_add_impl)(s, s, t);
     }
-    DB(set)(res, s);
+    DB(_set_inline)(res, s);
     if (FLINT_UNLIKELY(DB(_is_W)(res)))    /* (an initial value of any form) */
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
 }
 
 /* short dot products: a lean scalar loop (see DFV(_vec_dot_short)) */
@@ -2779,20 +2918,20 @@ DBV(_vec_dot_short_m)(DB(t) res, DB(srcptr) initial, int subtract, DB(srcptr) x,
     slong i;
     DB(t) s, t;
     if (initial == NULL)
-        DB(zero)(s);
+        DB(_zero_inline)(s);
     else
-        DB(set)(s, initial);
+        DB(_set_inline)(s, initial);
     for (i = 0; i < len; i++)
     {
         DB(_mul_m)(t, x + i, y + i * ystep, mode);
         if (subtract)
-            DB(sub)(s, s, t);
+            DB(_sub_impl)(s, s, t);
         else
-            DB(add)(s, s, t);
+            DB(_add_impl)(s, s, t);
     }
-    DB(set)(res, s);
+    DB(_set_inline)(res, s);
     if (FLINT_UNLIKELY(DB(_is_W)(res)))    /* (an initial value of any form) */
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
 }
 
 static DFLOAT_NOINLINE int DBV(_vec_dot_short_auto)(DB(t) res, DB(srcptr) initial, int subtract, DB(srcptr) x, DB(srcptr) y, slong ystep, slong len)
@@ -2932,11 +3071,11 @@ void DFV(vec_div)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(div)(res + i + l, x + i + l, y + i + l);
+                    DF(_div_inline)(res + i + l, x + i + l, y + i + l);
     }
 #endif
     for (; i < len; i++)
-        DF(div)(res + i, x + i, y + i);
+        DF(_div_inline)(res + i, x + i, y + i);
 }
 
 static DFLOAT_NOINLINE void
@@ -3178,11 +3317,11 @@ void DFV(vec_sqrt)(DF(ptr) res, DF(srcptr) x, slong len)
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(sqrt)(res + i + l, x + i + l);
+                    DF(_sqrt_inline)(res + i + l, x + i + l);
     }
 #endif
     for (; i < len; i++)
-        DF(sqrt)(res + i, x + i);
+        DF(_sqrt_inline)(res + i, x + i);
 }
 
 void DFV(vec_rsqrt)(DF(ptr) res, DF(srcptr) x, slong len)
@@ -3206,11 +3345,11 @@ void DFV(vec_rsqrt)(DF(ptr) res, DF(srcptr) x, slong len)
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(rsqrt)(res + i + l, x + i + l);
+                    DF(_rsqrt_inline)(res + i + l, x + i + l);
     }
 #endif
     for (; i < len; i++)
-        DF(rsqrt)(res + i, x + i);
+        DF(_rsqrt_inline)(res + i, x + i);
 }
 
 /* the ball versions: the fast range of the scalar functions, a
@@ -3727,6 +3866,7 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
         res[0] = ldexp(y, (int) k);
     return 0;
 }
+
 FLINT_FORCE_INLINE int
 DF(_exp_core)(double * res, const double * xc)
 {
@@ -3755,12 +3895,12 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
         c[idx] = _dfloat_exp_T1[i + 89][idx];
         A[idx] = _dfloat_exp_T2[j + 128][idx];
     }
-    DF(mul)((DF(ptr)) T, (DF(srcptr)) c, (DF(srcptr)) A);
+    DF(_mul_impl)((DF(ptr)) T, (DF(srcptr)) c, (DF(srcptr)) A);
     if (m1)
     {
         /* C = E1 + T1 E2 */
-        DF(mul)((DF(ptr)) C, (DF(srcptr)) c, (DF(srcptr)) _dfloat_exp_E2[j + 128]);
-        DF(add)((DF(ptr)) C, (DF(srcptr)) _dfloat_exp_E1[i + 89], (DF(srcptr)) C);
+        DF(_mul_impl)((DF(ptr)) C, (DF(srcptr)) c, (DF(srcptr)) _dfloat_exp_E2[j + 128]);
+        DF(_add_impl)((DF(ptr)) C, (DF(srcptr)) _dfloat_exp_E1[i + 89], (DF(srcptr)) C);
     }
 
     /* Kt = k (L1 + ... + LN), the tail of k log 2, as N components */
@@ -3779,9 +3919,9 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
     DF(_add_kernel)(s, NULL, A, Y, 0);
 
     /* w = s^2, T s and T w, off the critical path of the chains */
-    DF(sqr)((DF(ptr)) w, (DF(srcptr)) s);
-    DF(mul)((DF(ptr)) Ts, (DF(srcptr)) T, (DF(srcptr)) s);
-    DF(mul)((DF(ptr)) Ts2, (DF(srcptr)) T, (DF(srcptr)) w);
+    DF(_sqr_impl)((DF(ptr)) w, (DF(srcptr)) s);
+    DF(_mul_impl)((DF(ptr)) Ts, (DF(srcptr)) T, (DF(srcptr)) s);
+    DF(_mul_impl)((DF(ptr)) Ts2, (DF(srcptr)) T, (DF(srcptr)) w);
 
 #ifdef DFLOAT_HAVE_SIMD
     {
@@ -3793,9 +3933,9 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
         double v[N], Tsw[N], Tw2[N], v2[N], v3[N];
         double t4[4];
 
-        DF(sqr)((DF(ptr)) v, (DF(srcptr)) w);
-        DF(mul)((DF(ptr)) Tsw, (DF(srcptr)) Ts, (DF(srcptr)) w);
-        DF(mul)((DF(ptr)) Tw2, (DF(srcptr)) Ts2, (DF(srcptr)) w);
+        DF(_sqr_impl)((DF(ptr)) v, (DF(srcptr)) w);
+        DF(_mul_impl)((DF(ptr)) Tsw, (DF(srcptr)) Ts, (DF(srcptr)) w);
+        DF(_mul_impl)((DF(ptr)) Tw2, (DF(srcptr)) Ts2, (DF(srcptr)) w);
         for (kk = 0; kk <= EXP_J4; kk++)
         {
             /* lane 0: E0 = c_1, c_5, c_9, ...; lane 1: E1 = c_3, c_7, ...;
@@ -3851,8 +3991,8 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
             DF(_exp_mul_level)(u, w, O, M);
             DF(_exp_add_level)(O, c, u, M);
         }
-        DF(mul)((DF(ptr)) v0, (DF(srcptr)) Ts, (DF(srcptr)) E);
-        DF(mul)((DF(ptr)) v1, (DF(srcptr)) Ts2, (DF(srcptr)) O);
+        DF(_mul_impl)((DF(ptr)) v0, (DF(srcptr)) Ts, (DF(srcptr)) E);
+        DF(_mul_impl)((DF(ptr)) v1, (DF(srcptr)) Ts2, (DF(srcptr)) O);
     }
 #endif
 
@@ -3867,7 +4007,7 @@ DF(_exp_core_m)(double * res, const double * xc, int m1)
             res[idx] = y[idx];
         return 0;
     }
-    DF(mul_2exp_si)((DF(ptr)) res, (DF(srcptr)) y, k);
+    DF(_mul_2exp_si_impl)((DF(ptr)) res, (DF(srcptr)) y, k);
     return 0;
 }
 static int
@@ -4043,12 +4183,12 @@ DF(_trig_table)(double * SA, double * CA, int i, int j)
         sb[idx] = _dfloat_trig_B[aj][0][idx] * sj;
         cb[idx] = _dfloat_trig_B[aj][1][idx];
     }
-    DF(mul)((DF(ptr)) p1, (DF(srcptr)) sa, (DF(srcptr)) cb);
-    DF(mul)((DF(ptr)) p2, (DF(srcptr)) ca, (DF(srcptr)) sb);
-    DF(add)((DF(ptr)) SA, (DF(srcptr)) p1, (DF(srcptr)) p2);
-    DF(mul)((DF(ptr)) p1, (DF(srcptr)) ca, (DF(srcptr)) cb);
-    DF(mul)((DF(ptr)) p2, (DF(srcptr)) sa, (DF(srcptr)) sb);
-    DF(sub)((DF(ptr)) CA, (DF(srcptr)) p1, (DF(srcptr)) p2);
+    DF(_mul_impl)((DF(ptr)) p1, (DF(srcptr)) sa, (DF(srcptr)) cb);
+    DF(_mul_impl)((DF(ptr)) p2, (DF(srcptr)) ca, (DF(srcptr)) sb);
+    DF(_add_impl)((DF(ptr)) SA, (DF(srcptr)) p1, (DF(srcptr)) p2);
+    DF(_mul_impl)((DF(ptr)) p1, (DF(srcptr)) ca, (DF(srcptr)) cb);
+    DF(_mul_impl)((DF(ptr)) p2, (DF(srcptr)) sa, (DF(srcptr)) sb);
+    DF(_sub_impl)((DF(ptr)) CA, (DF(srcptr)) p1, (DF(srcptr)) p2);
 }
 #endif
 
@@ -4087,7 +4227,7 @@ DF(_trig_core)(double * sn, double * cs, const double * xc, int want)
     need_st = ((want & 1) && !(q & 1)) || ((want & 2) && (q & 1));
     need_ct = ((want & 2) && !(q & 1)) || ((want & 1) && (q & 1));
 
-    DF(sqr)((DF(ptr)) w, (DF(srcptr)) s);
+    DF(_sqr_impl)((DF(ptr)) w, (DF(srcptr)) s);
 
 #ifdef DFLOAT_HAVE_SIMD
     {
@@ -4104,7 +4244,7 @@ DF(_trig_core)(double * sn, double * cs, const double * xc, int want)
         double t4[4];
         int kk, pass;
 
-        DF(sqr)((DF(ptr)) v, (DF(srcptr)) w);
+        DF(_sqr_impl)((DF(ptr)) v, (DF(srcptr)) w);
         for (kk = 0; kk <= TRIG_J4; kk++)
         {
             /* P0: c1, c5, ...; P1: c3, c7, ...; Q0: c2, c6, ...; Q1: c4, c8, ... */
@@ -4214,12 +4354,12 @@ DF(_trig_core)(double * sn, double * cs, const double * xc, int want)
             double * out = (pass == 0) ? st : ct;
             if (!((pass == 0) ? need_st : need_ct))
                 continue;
-            DF(mul)((DF(ptr)) m0, (DF(srcptr)) X, (DF(srcptr)) w);
-            DF(mul)((DF(ptr)) m1, (DF(srcptr)) Y, (DF(srcptr)) s);
+            DF(_mul_impl)((DF(ptr)) m0, (DF(srcptr)) X, (DF(srcptr)) w);
+            DF(_mul_impl)((DF(ptr)) m1, (DF(srcptr)) Y, (DF(srcptr)) s);
             if (pass == 1)
-                DF(neg)((DF(ptr)) m1, (DF(srcptr)) m1);
-            DF(mul)((DF(ptr)) l0, (DF(srcptr)) m0, (DF(srcptr)) Q);
-            DF(mul)((DF(ptr)) l1, (DF(srcptr)) m1, (DF(srcptr)) P);
+                DF(_neg_inline)((DF(ptr)) m1, (DF(srcptr)) m1);
+            DF(_mul_impl)((DF(ptr)) l0, (DF(srcptr)) m0, (DF(srcptr)) Q);
+            DF(_mul_impl)((DF(ptr)) l1, (DF(srcptr)) m1, (DF(srcptr)) P);
             if (FLINT_UNLIKELY(DF(_s_add3_kernel)(out, NULL, X, l0, l1, 0, 0)))
                 DF(_shift_zero_head)(out);
         }
@@ -4845,6 +4985,7 @@ DF(_log_kernel)(double * res, double m, double t, int e, int ix)
     res[0] = fma(w, P, d);
     return 0;
 }
+
 FLINT_FORCE_INLINE int
 DF(_log_core)(double * res, const double * xc)
 {
@@ -5133,7 +5274,7 @@ DFLOAT_FUNC_NOINLINE int DB(log)(DB(t) res, DB(srcptr) x)
            accuracy to underflow */
         if (m0 == 1.0 && rx == 0.0 && DF(_tail_abs_sum)(xc) == 0.0)
         {
-            DB(zero)(res);
+            DB(_zero_inline)(res);
             rr = 0.0;
         }
         else
@@ -5169,7 +5310,7 @@ DFLOAT_FUNC_NOINLINE int DB(log1p)(DB(t) res, DB(srcptr) x)
     {
         /* |log1p(x')| <= r / (1 - r); tiny r needs the bump, since
            r (1 + r) rounds to r */
-        DB(zero)(res);
+        DB(_zero_inline)(res);
         rr = (rx == 0.0) ? 0.0 : _dfloat_rad_finish(rx / mlow);
         if (FLINT_UNLIKELY(rr != 0.0 && rr < DFLOAT_RAD_UNDERFLOW_THRESHOLD))
             rr += 0x1p-1069;
@@ -5856,10 +5997,10 @@ DB(_set_table_row)(DB(t) res, const double * row)
 DFLOAT_FUNC_NOINLINE void DF(tan)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) s, c;
     DF(sin_cos)(s, c, x);
-    DF(div)(res, s, c);
+    DF(_div_inline)(res, s, c);
 }
 
 DFLOAT_FUNC_NOINLINE int DB(tan)(DB(t) res, DB(srcptr) x_)
@@ -5867,7 +6008,7 @@ DFLOAT_FUNC_NOINLINE int DB(tan)(DB(t) res, DB(srcptr) x_)
     if (FLINT_UNLIKELY(DB(_is_W)(x_)))
         return GR_UNABLE;
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) s, c;
     DB(sin_cos)(s, c, x);
     if (FLINT_UNLIKELY(DB(div)(res, s, c) != GR_SUCCESS))
@@ -5895,102 +6036,102 @@ DFLOAT_FUNC_NOINLINE int DB(tan)(DB(t) res, DB(srcptr) x_)
 DFLOAT_FUNC_NOINLINE void DF(sinh)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) a, e, t, u, v, w;
-    DF(abs)(a, x);
+    DF(_abs_inline)(a, x);
     if (a->d[0] < 1.0)
     {
         DF(expm1)(e, a);
-        DF(set_d)(t, 2.0);
-        DF(add)(u, e, t);
-        DF(mul)(v, e, u);
-        DF(set_d)(t, 1.0);
-        DF(add)(u, e, t);
-        DF(mul_2exp_si)(w, u, 1);
-        DF(div)(res, v, w);
+        DF(_set_d_inline)(t, 2.0);
+        DF(_add_impl)(u, e, t);
+        DF(_mul_impl)(v, e, u);
+        DF(_set_d_inline)(t, 1.0);
+        DF(_add_impl)(u, e, t);
+        DF(_mul_2exp_si_impl)(w, u, 1);
+        DF(_div_inline)(res, v, w);
     }
     else
     {
         DF(exp)(e, a);
-        DF(inv)(t, e);
-        DF(sub)(u, e, t);
-        DF(mul_2exp_si)(res, u, -1);
+        DF(_inv_inline)(t, e);
+        DF(_sub_impl)(u, e, t);
+        DF(_mul_2exp_si_impl)(res, u, -1);
     }
     if (x->d[0] < 0.0)
-        DF(neg)(res, res);
+        DF(_neg_inline)(res, res);
 }
 
 DFLOAT_FUNC_NOINLINE void DB(sinh)(DB(t) res, DB(srcptr) x_)
 {
     if (FLINT_UNLIKELY(DB(_is_W)(x_)))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) a, e, t, u, v, w;
     int neg = (x->d[0] < 0.0);
-    DB(abs)(a, x);
+    DB(_abs_inline)(a, x);
     if (a->d[0] < 1.0)
     {
         DB(expm1)(e, a);
-        DB(set_d)(t, 2.0);
-        DB(add)(u, e, t);
-        DB(mul)(v, e, u);
-        DB(set_d)(t, 1.0);
-        DB(add)(u, e, t);
-        DB(mul_2exp_si)(w, u, 1);
+        DB(_set_d_inline)(t, 2.0);
+        DB(_add_impl)(u, e, t);
+        DB(_mul_impl)(v, e, u);
+        DB(_set_d_inline)(t, 1.0);
+        DB(_add_impl)(u, e, t);
+        DB(_mul_2exp_si_impl)(w, u, 1);
         if (DB(div)(res, v, w) != GR_SUCCESS)
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
     }
     else
     {
         DB(exp)(e, a);
         if (DB(inv)(t, e) != GR_SUCCESS)
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
         else
         {
-            DB(sub)(u, e, t);
-            DB(mul_2exp_si)(res, u, -1);
+            DB(_sub_impl)(u, e, t);
+            DB(_mul_2exp_si_impl)(res, u, -1);
         }
     }
     if (neg)
-        DB(neg)(res, res);
+        DB(_neg_inline)(res, res);
 }
 
 /* cosh x = (E + 1/E)/2 with E = exp |x| */
 DFLOAT_FUNC_NOINLINE void DF(cosh)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) a, e, t, u;
-    DF(abs)(a, x);
+    DF(_abs_inline)(a, x);
     DF(exp)(e, a);
-    DF(inv)(t, e);
-    DF(add)(u, e, t);
-    DF(mul_2exp_si)(res, u, -1);
+    DF(_inv_inline)(t, e);
+    DF(_add_impl)(u, e, t);
+    DF(_mul_2exp_si_impl)(res, u, -1);
 }
 
 DFLOAT_FUNC_NOINLINE void DB(cosh)(DB(t) res, DB(srcptr) x_)
 {
     if (FLINT_UNLIKELY(DB(_is_W)(x_)))
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) a, e, t, u;
-    DB(abs)(a, x);
+    DB(_abs_inline)(a, x);
     DB(exp)(e, a);
     if (DB(inv)(t, e) != GR_SUCCESS)
     {
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
         return;
     }
-    DB(add)(u, e, t);
-    DB(mul_2exp_si)(res, u, -1);
+    DB(_add_impl)(u, e, t);
+    DB(_mul_2exp_si_impl)(res, u, -1);
 }
 
 /* tanh |x| = expm1(2|x|) / (expm1(2|x|) + 2) for |x| < 1 (relative
@@ -5998,29 +6139,29 @@ DFLOAT_FUNC_NOINLINE void DB(cosh)(DB(t) res, DB(srcptr) x_)
 DFLOAT_FUNC_NOINLINE void DF(tanh)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) a, b, e, t, u, v;
-    DF(abs)(a, x);
-    DF(mul_2exp_si)(b, a, 1);
+    DF(_abs_inline)(a, x);
+    DF(_mul_2exp_si_impl)(b, a, 1);
     if (b->d[0] < 2.0)
     {
         DF(expm1)(e, b);
-        DF(set_d)(t, 2.0);
-        DF(add)(u, e, t);
-        DF(div)(res, e, u);
+        DF(_set_d_inline)(t, 2.0);
+        DF(_add_impl)(u, e, t);
+        DF(_div_inline)(res, e, u);
     }
     else
     {
         DF(exp)(e, b);
-        DF(set_d)(t, 1.0);
-        DF(add)(u, e, t);
-        DF(set_d)(t, 2.0);
-        DF(div)(v, t, u);
-        DF(set_d)(t, 1.0);
-        DF(sub)(res, t, v);
+        DF(_set_d_inline)(t, 1.0);
+        DF(_add_impl)(u, e, t);
+        DF(_set_d_inline)(t, 2.0);
+        DF(_div_inline)(v, t, u);
+        DF(_set_d_inline)(t, 1.0);
+        DF(_sub_impl)(res, t, v);
     }
     if (x->d[0] < 0.0)
-        DF(neg)(res, res);
+        DF(_neg_inline)(res, res);
 }
 
 DFLOAT_FUNC_NOINLINE void DB(tanh)(DB(t) res, DB(srcptr) x_)
@@ -6031,32 +6172,32 @@ DFLOAT_FUNC_NOINLINE void DB(tanh)(DB(t) res, DB(srcptr) x_)
         return;
     }
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) a, b, e, t, u, v;
     int neg = (x->d[0] < 0.0), status;
-    DB(abs)(a, x);
-    DB(mul_2exp_si)(b, a, 1);
+    DB(_abs_inline)(a, x);
+    DB(_mul_2exp_si_impl)(b, a, 1);
     if (b->d[0] < 2.0)
     {
         DB(expm1)(e, b);
-        DB(set_d)(t, 2.0);
-        DB(add)(u, e, t);
+        DB(_set_d_inline)(t, 2.0);
+        DB(_add_impl)(u, e, t);
         status = DB(div)(res, e, u);
     }
     else
     {
         DB(exp)(e, b);
-        DB(set_d)(t, 1.0);
-        DB(add)(u, e, t);
-        DB(set_d)(t, 2.0);
+        DB(_set_d_inline)(t, 1.0);
+        DB(_add_impl)(u, e, t);
+        DB(_set_d_inline)(t, 2.0);
         status = DB(div)(v, t, u);
-        DB(set_d)(t, 1.0);
-        DB(sub)(res, t, v);
+        DB(_set_d_inline)(t, 1.0);
+        DB(_sub_impl)(res, t, v);
     }
     if (status != GR_SUCCESS)
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
     if (neg)
-        DB(neg)(res, res);
+        DB(_neg_inline)(res, res);
 }
 
 /* asin x = atan(x / sqrt((1 - x)(1 + x))) (1 - x and 1 + x are exact
@@ -6064,14 +6205,14 @@ DFLOAT_FUNC_NOINLINE void DB(tanh)(DB(t) res, DB(srcptr) x_)
 DFLOAT_FUNC_NOINLINE void DF(asin)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) one, a, b, t, u, v;
-    DF(set_d)(one, 1.0);
-    DF(sub)(a, one, x);
-    DF(add)(b, one, x);
-    DF(mul)(t, a, b);
-    DF(sqrt)(u, t);
-    DF(div)(v, x, u);
+    DF(_set_d_inline)(one, 1.0);
+    DF(_sub_impl)(a, one, x);
+    DF(_add_impl)(b, one, x);
+    DF(_mul_impl)(t, a, b);
+    DF(_sqrt_inline)(u, t);
+    DF(_div_inline)(v, x, u);
     DF(atan)(res, v);
 }
 
@@ -6170,13 +6311,13 @@ DFLOAT_FUNC_NOINLINE int DB(asin)(DB(t) res, DB(srcptr) x_)
     if (FLINT_UNLIKELY(DB(_is_W)(x_)))
         return GR_UNABLE;
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) one, a, b, t, u, v;
     int status;
-    DB(set_d)(one, 1.0);
-    DB(sub)(a, one, x);
-    DB(add)(b, one, x);
-    DB(mul)(t, a, b);
+    DB(_set_d_inline)(one, 1.0);
+    DB(_sub_impl)(a, one, x);
+    DB(_add_impl)(b, one, x);
+    DB(_mul_impl)(t, a, b);
     status = DB(sqrt)(u, t);
     if (status == GR_SUCCESS)
         status = DB(div)(v, x, u);
@@ -6189,15 +6330,15 @@ DFLOAT_FUNC_NOINLINE int DB(asin)(DB(t) res, DB(srcptr) x_)
 DFLOAT_FUNC_NOINLINE void DF(acos)(DF(t) res, DF(srcptr) x_)
 {
     DF(t) x;
-    DF(canonicalise)(x, x_);
+    DF(_canonicalise_inline)(x, x_);
     DF(t) one, a, b, t, u, v;
-    DF(set_d)(one, 1.0);
-    DF(sub)(a, one, x);
-    DF(add)(b, one, x);
-    DF(div)(t, a, b);
-    DF(sqrt)(u, t);
+    DF(_set_d_inline)(one, 1.0);
+    DF(_sub_impl)(a, one, x);
+    DF(_add_impl)(b, one, x);
+    DF(_div_inline)(t, a, b);
+    DF(_sqrt_inline)(u, t);
     DF(atan)(v, u);
-    DF(mul_2exp_si)(res, v, 1);
+    DF(_mul_2exp_si_impl)(res, v, 1);
 }
 
 DFLOAT_FUNC_NOINLINE int DB(acos)(DB(t) res, DB(srcptr) x_)
@@ -6205,19 +6346,19 @@ DFLOAT_FUNC_NOINLINE int DB(acos)(DB(t) res, DB(srcptr) x_)
     if (FLINT_UNLIKELY(DB(_is_W)(x_)))
         return GR_UNABLE;
     DB(t) x;
-    DB(canonicalise)(x, x_);
+    DB(_canonicalise_inline)(x, x_);
     DB(t) one, a, b, t, u, v;
     int status;
-    DB(set_d)(one, 1.0);
-    DB(sub)(a, one, x);
-    DB(add)(b, one, x);
+    DB(_set_d_inline)(one, 1.0);
+    DB(_sub_impl)(a, one, x);
+    DB(_add_impl)(b, one, x);
     status = DB(div)(t, a, b);
     if (status == GR_SUCCESS)
         status = DB(sqrt)(u, t);
     if (status != GR_SUCCESS)
         return DB(_asin_acos_fallback)(res, x, 1);
     DB(atan)(v, u);
-    DB(mul_2exp_si)(res, v, 1);
+    DB(_mul_2exp_si_impl)(res, v, 1);
     return GR_SUCCESS;
 }
 
@@ -6227,35 +6368,35 @@ DFLOAT_FUNC_NOINLINE int DB(acos)(DB(t) res, DB(srcptr) x_)
 DFLOAT_FUNC_NOINLINE void DF(atan2)(DF(t) res, DF(srcptr) y_, DF(srcptr) x_)
 {
     DF(t) x, y;
-    DF(canonicalise)(x, x_);
-    DF(canonicalise)(y, y_);
+    DF(_canonicalise_inline)(x, x_);
+    DF(_canonicalise_inline)(y, y_);
     DF(t) q, p, r;
     double x0 = x->d[0], y0 = y->d[0];
-    if (!(fabs(x0) <= DBL_MAX) || !(fabs(y0) <= DBL_MAX) || (x0 == 0.0 && DF(is_zero)(x)))
+    if (!(fabs(x0) <= DBL_MAX) || !(fabs(y0) <= DBL_MAX) || (x0 == 0.0 && DF(_is_zero_inline)(x)))
     {
         double v = atan2(y0, x0);
         if (v != v)
-            DF(set_d)(res, v);
+            DF(_set_d_inline)(res, v);
         else
         {
-            DF(set)((DF(ptr)) p, (DF(srcptr)) _dfloat_pi_2[0]);
-            DF(mul_d)(res, p, v / 1.5707963267948966);   /* an exact multiple of 1/2 */
+            DF(_set_inline)((DF(ptr)) p, (DF(srcptr)) _dfloat_pi_2[0]);
+            DF(_mul_d_impl)(res, p, v / 1.5707963267948966);   /* an exact multiple of 1/2 */
         }
         return;
     }
-    DF(div)(q, y, x);
+    DF(_div_inline)(q, y, x);
     DF(atan)(r, q);
     if (x0 < 0.0)
     {
-        DF(set)((DF(ptr)) q, (DF(srcptr)) _dfloat_pi_2[0]);
-        DF(mul_2exp_si)(p, q, 1);
+        DF(_set_inline)((DF(ptr)) q, (DF(srcptr)) _dfloat_pi_2[0]);
+        DF(_mul_2exp_si_impl)(p, q, 1);
         if (y0 < 0.0 || (y0 == 0.0 && DF(sgn)(y) < 0))
-            DF(sub)(res, r, p);
+            DF(_sub_impl)(res, r, p);
         else
-            DF(add)(res, r, p);
+            DF(_add_impl)(res, r, p);
     }
     else
-        DF(set)(res, r);
+        DF(_set_inline)(res, r);
 }
 
 /* the ball version always returns a finite enclosure: for x away from
@@ -6272,59 +6413,59 @@ DFLOAT_FUNC_NOINLINE void DB(atan2)(DB(t) res, DB(srcptr) y_, DB(srcptr) x_)
     }
     DB(t) x, y, q, p, r;
     int xz, yz;
-    DB(canonicalise)(x, x_);
-    DB(canonicalise)(y, y_);
-    xz = DB(contains_zero)(x);
-    yz = DB(contains_zero)(y);
+    DB(_canonicalise_inline)(x, x_);
+    DB(_canonicalise_inline)(y, y_);
+    xz = DB(_contains_zero_inline)(x);
+    yz = DB(_contains_zero_inline)(y);
     if (!xz)
     {
         if (DB(div)(q, y, x) != GR_SUCCESS)
         {
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
             return;
         }
         DB(atan)(r, q);
         if (x->d[0] > 0.0)
-            DB(set)(res, r);
-        else if (DB(is_zero)(y))
+            DB(_set_inline)(res, r);
+        else if (DB(_is_zero_inline)(y))
         {
             /* atan2(0, x) = pi for x < 0 */
             DB(_set_table_row)(q, _dfloat_pi_2[0]);
-            DB(mul_2exp_si)(res, q, 1);
+            DB(_mul_2exp_si_impl)(res, q, 1);
         }
         else if (yz)
         {
-            DB(zero)(res);
+            DB(_zero_inline)(res);
             res->rad = 0x1.921fb54442d19p+1;   /* pi rounded up */
         }
         else
         {
             DB(_set_table_row)(q, _dfloat_pi_2[0]);
-            DB(mul_2exp_si)(p, q, 1);
+            DB(_mul_2exp_si_impl)(p, q, 1);
             if (y->d[0] < 0.0)
-                DB(sub)(res, r, p);
+                DB(_sub_impl)(res, r, p);
             else
-                DB(add)(res, r, p);
+                DB(_add_impl)(res, r, p);
         }
     }
     else if (!yz)
     {
         if (DB(div)(q, x, y) != GR_SUCCESS)
         {
-            DB(indeterminate)(res);
+            DB(_indeterminate_inline)(res);
             return;
         }
         DB(atan)(r, q);
         DB(_set_table_row)(p, _dfloat_pi_2[0]);
         if (y->d[0] < 0.0)
-            DB(neg)(p, p);
-        DB(sub)(res, p, r);
+            DB(_neg_inline)(p, p);
+        DB(_sub_impl)(res, p, r);
     }
-    else if (DB(is_zero)(x) && DB(is_zero)(y))
-        DB(zero)(res);
+    else if (DB(_is_zero_inline)(x) && DB(_is_zero_inline)(y))
+        DB(_zero_inline)(res);
     else
     {
-        DB(zero)(res);
+        DB(_zero_inline)(res);
         res->rad = 0x1.921fb54442d19p+1;
     }
 }
@@ -6338,25 +6479,25 @@ DF(_pow_si)(DF(t) res, DF(srcptr) x, slong e)
     ulong a = (e < 0) ? (ulong) (-e) : (ulong) e;
     /* (1/x)^|e| for e < 0: a tiny x is the more common case */
     if (e < 0)
-        DF(inv)(b, x);
+        DF(_inv_inline)(b, x);
     else
-        DF(set)(b, x);
-    DF(one)(r);
+        DF(_set_inline)(b, x);
+    DF(_one_inline)(r);
     while (a)
     {
         if (a & 1)
         {
-            DF(mul)(t, r, b);
-            DF(set)(r, t);
+            DF(_mul_impl)(t, r, b);
+            DF(_set_inline)(r, t);
         }
         a >>= 1;
         if (a)
         {
-            DF(sqr)(t, b);
-            DF(set)(b, t);
+            DF(_sqr_impl)(t, b);
+            DF(_set_inline)(b, t);
         }
     }
-    DF(set)(res, r);
+    DF(_set_inline)(res, r);
 }
 
 /* pow(x, y): an integer y (|y| < 2^40) by binary powering, otherwise
@@ -6366,8 +6507,8 @@ DFLOAT_FUNC_NOINLINE void DF(pow)(DF(t) res, DF(srcptr) x_, DF(srcptr) y_)
 {
     DF(t) x, y, l, m;
     double x0, y0;
-    DF(canonicalise)(x, x_);
-    DF(canonicalise)(y, y_);
+    DF(_canonicalise_inline)(x, x_);
+    DF(_canonicalise_inline)(y, y_);
     x0 = x->d[0];
     y0 = y->d[0];
     if (fabs(y0) < 0x1p40 && y0 == rint(y0) && DF(_tail_abs_sum)(y->d) == 0.0 && fabs(x0) <= DBL_MAX)
@@ -6378,13 +6519,13 @@ DFLOAT_FUNC_NOINLINE void DF(pow)(DF(t) res, DF(srcptr) x_, DF(srcptr) y_)
     if (!(x0 > 0.0) || !(x0 <= DBL_MAX) || !(fabs(y0) <= DBL_MAX))
     {
         if (x0 == 0.0)
-            DF(set_d)(res, (y0 > 0.0) ? 0.0 : (y0 == 0.0) ? 1.0 : D_INF);
+            DF(_set_d_inline)(res, (y0 > 0.0) ? 0.0 : (y0 == 0.0) ? 1.0 : D_INF);
         else
-            DF(set_d)(res, pow(x0, y0));
+            DF(_set_d_inline)(res, pow(x0, y0));
         return;
     }
     DF(log)(l, x);
-    DF(mul)(m, l, y);
+    DF(_mul_impl)(m, l, y);
     DF(exp)(res, m);
 }
 
@@ -6401,14 +6542,14 @@ DFLOAT_FUNC_NOINLINE int DB(pow)(DB(t) res, DB(srcptr) x_, DB(srcptr) y_)
     DB(t) x, y, l, m;
     fmpz_t e;
     int status, ystat;
-    DB(canonicalise)(x, x_);     /* (the whole line becomes [0 +/- inf]) */
-    DB(canonicalise)(y, y_);
+    DB(_canonicalise_inline)(x, x_);     /* (the whole line becomes [0 +/- inf]) */
+    DB(_canonicalise_inline)(y, y_);
     fmpz_init(e);
     ystat = DB(_get_fmpz)(e, y);
     if (ystat == GR_SUCCESS)
     {
-        if (fmpz_sgn(e) < 0 && DB(contains_zero)(x))
-            status = DB(is_zero)(x) ? GR_DOMAIN : GR_UNABLE;
+        if (fmpz_sgn(e) < 0 && DB(_contains_zero_inline)(x))
+            status = DB(_is_zero_inline)(x) ? GR_DOMAIN : GR_UNABLE;
         else if (fmpz_bits(e) <= 40)
         {
             DB(t) b, r, t;
@@ -6416,23 +6557,23 @@ DFLOAT_FUNC_NOINLINE int DB(pow)(DB(t) res, DB(srcptr) x_, DB(srcptr) y_)
             if (fmpz_sgn(e) < 0)
                 DB(inv)(b, x);           /* succeeds: x does not contain 0 */
             else
-                DB(set)(b, x);
-            DB(one)(r);                  /* (x^0 = 1 for every x) */
+                DB(_set_inline)(b, x);
+            DB(_one_inline)(r);                  /* (x^0 = 1 for every x) */
             while (a)
             {
                 if (a & 1)
                 {
-                    DB(mul)(t, r, b);
-                    DB(set)(r, t);
+                    DB(_mul_impl)(t, r, b);
+                    DB(_set_inline)(r, t);
                 }
                 a >>= 1;
                 if (a)
                 {
-                    DB(sqr)(t, b);
-                    DB(set)(b, t);
+                    DB(_sqr_impl)(t, b);
+                    DB(_set_inline)(b, t);
                 }
             }
-            DB(set)(res, r);
+            DB(_set_inline)(res, r);
             status = GR_SUCCESS;
         }
         else
@@ -6455,16 +6596,16 @@ DFLOAT_FUNC_NOINLINE int DB(pow)(DB(t) res, DB(srcptr) x_, DB(srcptr) y_)
         status = DB(log)(l, x);
         if (status == GR_SUCCESS)
         {
-            DB(mul)(m, l, y);
+            DB(_mul_impl)(m, l, y);
             DB(exp)(res, m);
         }
     }
-    else if (DB(is_zero)(x))
+    else if (DB(_is_zero_inline)(x))
     {
         /* 0^y = 0 for y > 0, undefined for y < 0 */
         if (DB_ALL_GT(y, 0.0))
         {
-            DB(zero)(res);
+            DB(_zero_inline)(res);
             status = GR_SUCCESS;
         }
         else
@@ -6573,8 +6714,8 @@ static int GRF(log1p)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
     if (!(x->d[0] > -1.0))
     {
-        if (x->d[0] == -1.0 && DF(_tail_abs_sum)(x->d) == 0.0) { DF(set_d)(res, -D_INF); return GR_SUCCESS; }
-        if (DF(is_nan)(x)) { DF(set_d)(res, D_NAN); return GR_SUCCESS; }
+        if (x->d[0] == -1.0 && DF(_tail_abs_sum)(x->d) == 0.0) { DF(_set_d_inline)(res, -D_INF); return GR_SUCCESS; }
+        if (DF(_is_nan_inline)(x)) { DF(_set_d_inline)(res, D_NAN); return GR_SUCCESS; }
         if (x->d[0] < -1.0) return GR_DOMAIN;
     }
     DF(log1p)(res, x);
@@ -6630,9 +6771,9 @@ static int GRF(pow)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx)
         DF(pow)(res, x, y);
         status = GR_SUCCESS;
     }
-    else if (DF(is_nan)(x) || DF(is_nan)(y))
+    else if (DF(_is_nan_inline)(x) || DF(_is_nan_inline)(y))
     {
-        DF(set_d)(res, D_NAN);
+        DF(_set_d_inline)(res, D_NAN);
         status = GR_SUCCESS;
     }
     else
@@ -6658,7 +6799,7 @@ static int GRF(ctx_write)(gr_stream_t out, gr_ctx_t ctx)
 static int GRF(ctx_get_real_prec)(slong * res, gr_ctx_t ctx) { *res = 53 * N; return GR_SUCCESS; }
 static int GRF(ctx_set_real_prec)(gr_ctx_t ctx, slong prec) { return GR_UNABLE; }
 
-static void GRF(init)(DF(ptr) x, gr_ctx_t ctx) { DF(zero)(x); }
+static void GRF(init)(DF(ptr) x, gr_ctx_t ctx) { DF(_zero_inline)(x); }
 static void GRF(clear)(DF(ptr) x, gr_ctx_t ctx) { }
 static void GRF(swap)(DF(ptr) x, DF(ptr) y, gr_ctx_t ctx) { DF(struct) t = *x; *x = *y; *y = t; }
 
@@ -6681,15 +6822,15 @@ static int GRF(write_n)(gr_stream_t out, DF(srcptr) x, slong n, gr_ctx_t ctx)
     return gr_stream_write_free(out, DF(get_str)(x, FLINT_MAX(n, 1)));
 }
 
-static int GRF(zero)(DF(ptr) res, gr_ctx_t ctx) { DF(zero)(res); return GR_SUCCESS; }
-static int GRF(one)(DF(ptr) res, gr_ctx_t ctx) { DF(one)(res); return GR_SUCCESS; }
-static int GRF(neg_one)(DF(ptr) res, gr_ctx_t ctx) { DF(set_d)(res, -1.0); return GR_SUCCESS; }
-static int GRF(set)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(set)(res, x); return GR_SUCCESS; }
+static int GRF(zero)(DF(ptr) res, gr_ctx_t ctx) { DF(_zero_inline)(res); return GR_SUCCESS; }
+static int GRF(one)(DF(ptr) res, gr_ctx_t ctx) { DF(_one_inline)(res); return GR_SUCCESS; }
+static int GRF(neg_one)(DF(ptr) res, gr_ctx_t ctx) { DF(_set_d_inline)(res, -1.0); return GR_SUCCESS; }
+static int GRF(set)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_set_inline)(res, x); return GR_SUCCESS; }
 static int GRF(set_si)(DF(ptr) res, slong x, gr_ctx_t ctx)
 {
     fmpz_t t;
     if (DFLOAT_ULONG_IS_EXACT(FLINT_UABS(x)))
-        DF(set_d)(res, (double) x);
+        DF(_set_d_inline)(res, (double) x);
     else
     {
         fmpz_init_set_si(t, x);
@@ -6702,7 +6843,7 @@ static int GRF(set_ui)(DF(ptr) res, ulong x, gr_ctx_t ctx)
 {
     fmpz_t t;
     if (DFLOAT_ULONG_IS_EXACT(x))
-        DF(set_d)(res, (double) x);
+        DF(_set_d_inline)(res, (double) x);
     else
     {
         fmpz_init_set_ui(t, x);
@@ -6713,7 +6854,7 @@ static int GRF(set_ui)(DF(ptr) res, ulong x, gr_ctx_t ctx)
 }
 static int GRF(set_fmpz)(DF(ptr) res, const fmpz_t x, gr_ctx_t ctx) { DF(set_fmpz)(res, x); return GR_SUCCESS; }
 static int GRF(set_fmpq)(DF(ptr) res, const fmpq_t x, gr_ctx_t ctx) { DF(set_fmpq)(res, x); return GR_SUCCESS; }
-static int GRF(set_d)(DF(ptr) res, double x, gr_ctx_t ctx) { DF(set_d)(res, x); return GR_SUCCESS; }
+static int GRF(set_d)(DF(ptr) res, double x, gr_ctx_t ctx) { DF(_set_d_inline)(res, x); return GR_SUCCESS; }
 static int GRF(set_str)(DF(ptr) res, const char * s, gr_ctx_t ctx) { return DF(set_str)(res, s); }
 
 static int GRF(set_other)(DF(ptr) res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
@@ -6763,7 +6904,7 @@ static int GRF(get_fmpz)(fmpz_t res, DF(srcptr) x, gr_ctx_t ctx)
 {
     arf_t t;
     int status;
-    if (!DF(is_finite)(x))
+    if (!DF(_is_finite_inline)(x))
         return GR_DOMAIN;
     arf_init(t);
     DF(get_arf)(t, x);
@@ -6816,105 +6957,105 @@ static int GRF(get_d)(double * res, DF(srcptr) x, gr_ctx_t ctx) { *res = x->d[0]
 
 static truth_t GRF(is_zero)(DF(srcptr) x, gr_ctx_t ctx)
 {
-    if (DF(is_nan)(x)) return T_UNKNOWN;
-    return DF(is_zero)(x) ? T_TRUE : T_FALSE;
+    if (DF(_is_nan_inline)(x)) return T_UNKNOWN;
+    return DF(_is_zero_inline)(x) ? T_TRUE : T_FALSE;
 }
 static truth_t GRF(is_one)(DF(srcptr) x, gr_ctx_t ctx)
 {
-    if (DF(is_nan)(x)) return T_UNKNOWN;
-    return DF(is_one)(x) ? T_TRUE : T_FALSE;
+    if (DF(_is_nan_inline)(x)) return T_UNKNOWN;
+    return DF(_is_one_inline)(x) ? T_TRUE : T_FALSE;
 }
 static truth_t GRF(is_neg_one)(DF(srcptr) x, gr_ctx_t ctx)
 {
     DF(t) t;
-    if (DF(is_nan)(x)) return T_UNKNOWN;
-    DF(neg)(t, x);
-    return DF(is_one)(t) ? T_TRUE : T_FALSE;
+    if (DF(_is_nan_inline)(x)) return T_UNKNOWN;
+    DF(_neg_inline)(t, x);
+    return DF(_is_one_inline)(t) ? T_TRUE : T_FALSE;
 }
 static truth_t GRF(equal)(DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx)
 {
-    if (DF(is_nan)(x) || DF(is_nan)(y)) return T_UNKNOWN;
-    return DF(equal)(x, y) ? T_TRUE : T_FALSE;
+    if (DF(_is_nan_inline)(x) || DF(_is_nan_inline)(y)) return T_UNKNOWN;
+    return DF(_equal_inline)(x, y) ? T_TRUE : T_FALSE;
 }
 
-static int GRF(neg)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(neg)(res, x); return GR_SUCCESS; }
-static int GRF(add)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(add)(res, x, y); return GR_SUCCESS; }
-static int GRF(sub)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(sub)(res, x, y); return GR_SUCCESS; }
-static int GRF(mul)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(mul)(res, x, y); return GR_SUCCESS; }
-static int GRF(sqr)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(sqr)(res, x); return GR_SUCCESS; }
-static int GRF(mul_two)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(mul_2exp_si)(res, x, 1); return GR_SUCCESS; }
-static int GRF(mul_2exp_si)(DF(ptr) res, DF(srcptr) x, slong e, gr_ctx_t ctx) { DF(mul_2exp_si)(res, x, e); return GR_SUCCESS; }
+static int GRF(neg)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_neg_inline)(res, x); return GR_SUCCESS; }
+static int GRF(add)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(_add_impl)(res, x, y); return GR_SUCCESS; }
+static int GRF(sub)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(_sub_impl)(res, x, y); return GR_SUCCESS; }
+static int GRF(mul)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx) { DF(_mul_impl)(res, x, y); return GR_SUCCESS; }
+static int GRF(sqr)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_sqr_impl)(res, x); return GR_SUCCESS; }
+static int GRF(mul_two)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_mul_2exp_si_impl)(res, x, 1); return GR_SUCCESS; }
+static int GRF(mul_2exp_si)(DF(ptr) res, DF(srcptr) x, slong e, gr_ctx_t ctx) { DF(_mul_2exp_si_impl)(res, x, e); return GR_SUCCESS; }
 static int GRF(div)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx)
 {
-    if (DF(is_zero)(y))
+    if (DF(_is_zero_inline)(y))
         return GR_DOMAIN;
-    DF(div)(res, x, y);
+    DF(_div_inline)(res, x, y);
     return GR_SUCCESS;
 }
 static int GRF(inv)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
-    if (DF(is_zero)(x))
+    if (DF(_is_zero_inline)(x))
         return GR_DOMAIN;
-    DF(inv)(res, x);
+    DF(_inv_inline)(res, x);
     return GR_SUCCESS;
 }
 static int GRF(sqrt)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
     if (x->d[0] < 0.0)
         return GR_DOMAIN;
-    DF(sqrt)(res, x);
+    DF(_sqrt_inline)(res, x);
     return GR_SUCCESS;
 }
 static int GRF(rsqrt)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
-    if (x->d[0] < 0.0 || DF(is_zero)(x))
+    if (x->d[0] < 0.0 || DF(_is_zero_inline)(x))
         return GR_DOMAIN;
-    DF(rsqrt)(res, x);
+    DF(_rsqrt_inline)(res, x);
     return GR_SUCCESS;
 }
-static int GRF(abs)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(abs)(res, x); return GR_SUCCESS; }
+static int GRF(abs)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_abs_inline)(res, x); return GR_SUCCESS; }
 static int GRF(sgn)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
-    if (DF(is_nan)(x)) return GR_UNABLE;
-    DF(set_d)(res, (double) DF(sgn)(x));
+    if (DF(_is_nan_inline)(x)) return GR_UNABLE;
+    DF(_set_d_inline)(res, (double) DF(sgn)(x));
     return GR_SUCCESS;
 }
 static int GRF(cmp)(int * res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx)
 {
-    if (DF(is_nan)(x) || DF(is_nan)(y)) { *res = 0; return GR_UNABLE; }
-    *res = DF(cmp)(x, y);
+    if (DF(_is_nan_inline)(x) || DF(_is_nan_inline)(y)) { *res = 0; return GR_UNABLE; }
+    *res = DF(_cmp_inline)(x, y);
     return GR_SUCCESS;
 }
 static int GRF(cmpabs)(int * res, DF(srcptr) x, DF(srcptr) y, gr_ctx_t ctx)
 {
     DF(t) a, b;
-    DF(abs)(a, x);
-    DF(abs)(b, y);
+    DF(_abs_inline)(a, x);
+    DF(_abs_inline)(b, y);
     return GRF(cmp)(res, a, b, ctx);
 }
-static int GRF(pos_inf)(DF(ptr) res, gr_ctx_t ctx) { DF(set_d)(res, D_INF); return GR_SUCCESS; }
-static int GRF(neg_inf)(DF(ptr) res, gr_ctx_t ctx) { DF(set_d)(res, -D_INF); return GR_SUCCESS; }
-static int GRF(nan)(DF(ptr) res, gr_ctx_t ctx) { DF(set_d)(res, D_NAN); return GR_SUCCESS; }
+static int GRF(pos_inf)(DF(ptr) res, gr_ctx_t ctx) { DF(_set_d_inline)(res, D_INF); return GR_SUCCESS; }
+static int GRF(neg_inf)(DF(ptr) res, gr_ctx_t ctx) { DF(_set_d_inline)(res, -D_INF); return GR_SUCCESS; }
+static int GRF(nan)(DF(ptr) res, gr_ctx_t ctx) { DF(_set_d_inline)(res, D_NAN); return GR_SUCCESS; }
 static int GRF(exp)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(exp)(res, x); return GR_SUCCESS; }
 static int GRF(log)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx)
 {
     if (!(x->d[0] > 0.0))
     {
-        if (DF(is_zero)(x)) { DF(set_d)(res, -D_INF); return GR_SUCCESS; }
-        if (DF(is_nan)(x)) { DF(set_d)(res, D_NAN); return GR_SUCCESS; }
+        if (DF(_is_zero_inline)(x)) { DF(_set_d_inline)(res, -D_INF); return GR_SUCCESS; }
+        if (DF(_is_nan_inline)(x)) { DF(_set_d_inline)(res, D_NAN); return GR_SUCCESS; }
         return GR_DOMAIN;
     }
     DF(log)(res, x);
     return GR_SUCCESS;
 }
 static int GRF(atan)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(atan)(res, x); return GR_SUCCESS; }
-static int GRF(im)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(zero)(res); return GR_SUCCESS; }
+static int GRF(im)(DF(ptr) res, DF(srcptr) x, gr_ctx_t ctx) { DF(_zero_inline)(res); return GR_SUCCESS; }
 
 static void GRF(vec_init)(DF(ptr) vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        DF(zero)(vec + i);
+        DF(_zero_inline)(vec + i);
 }
 static void GRF(vec_clear)(DF(ptr) vec, slong len, gr_ctx_t ctx) { }
 static int GRF(vec_set)(DF(ptr) res, DF(srcptr) x, slong len, gr_ctx_t ctx)
@@ -6934,7 +7075,7 @@ static int GRF(vec_div)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len, gr_c
 {
     slong i;
     for (i = 0; i < len; i++)
-        if (DF(is_zero)(y + i))
+        if (DF(_is_zero_inline)(y + i))
             return GR_DOMAIN;
     DFV(vec_div)(res, x, y, len);
     return GR_SUCCESS;
@@ -6960,7 +7101,7 @@ static int GRF(vec_rsqrt)(DF(ptr) res, DF(srcptr) x, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        if (x[i].d[0] < 0.0 || DF(is_zero)(x + i))
+        if (x[i].d[0] < 0.0 || DF(_is_zero_inline)(x + i))
             return GR_DOMAIN;
     DFV(vec_rsqrt)(res, x, len);
     return GR_SUCCESS;
@@ -6969,7 +7110,7 @@ static int GRF(vec_log)(DF(ptr) res, DF(srcptr) x, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        if (!(x[i].d[0] > 0.0) && !DF(is_zero)(x + i) && !DF(is_nan)(x + i))
+        if (!(x[i].d[0] > 0.0) && !DF(_is_zero_inline)(x + i) && !DF(_is_nan_inline)(x + i))
             return GR_DOMAIN;
     DFV(vec_log)(res, x, len);
     return GR_SUCCESS;
@@ -7253,7 +7394,7 @@ static int GRB(ctx_write)(gr_stream_t out, gr_ctx_t ctx)
     return status;
 }
 
-static void GRB(init)(DB(ptr) x, gr_ctx_t ctx) { DB(zero)(x); }
+static void GRB(init)(DB(ptr) x, gr_ctx_t ctx) { DB(_zero_inline)(x); }
 static void GRB(clear)(DB(ptr) x, gr_ctx_t ctx) { }
 static void GRB(swap)(DB(ptr) x, DB(ptr) y, gr_ctx_t ctx) { DB(struct) t = *x; *x = *y; *y = t; }
 
@@ -7270,7 +7411,7 @@ static int GRB(write)(gr_stream_t out, DB(srcptr) x, gr_ctx_t ctx)
 {
     if (x->rad == 0.0)
     {
-        if (DB(is_zero)(x)) return gr_stream_write(out, "0");
+        if (DB(_is_zero_inline)(x)) return gr_stream_write(out, "0");
         if (x->d[0] == 1.0 && DF(_tail_abs_sum)(x->d) == 0.0) return gr_stream_write(out, "1");
         if (x->d[0] == -1.0 && DF(_tail_abs_sum)(x->d) == 0.0) return gr_stream_write(out, "-1");
     }
@@ -7284,21 +7425,21 @@ static int GRB(write_n)(gr_stream_t out, DB(srcptr) x, slong n, gr_ctx_t ctx)
     return gr_stream_write_free(out, _dfloat_get_str(x->d, N, -1.0, FLINT_MAX(n, 1)));
 }
 
-static int GRB(zero)(DB(ptr) res, gr_ctx_t ctx) { DB(zero)(res); return GR_SUCCESS; }
-static int GRB(one)(DB(ptr) res, gr_ctx_t ctx) { DB(one)(res); return GR_SUCCESS; }
-static int GRB(neg_one)(DB(ptr) res, gr_ctx_t ctx) { DB(set_d)(res, -1.0); return GR_SUCCESS; }
+static int GRB(zero)(DB(ptr) res, gr_ctx_t ctx) { DB(_zero_inline)(res); return GR_SUCCESS; }
+static int GRB(one)(DB(ptr) res, gr_ctx_t ctx) { DB(_one_inline)(res); return GR_SUCCESS; }
+static int GRB(neg_one)(DB(ptr) res, gr_ctx_t ctx) { DB(_set_d_inline)(res, -1.0); return GR_SUCCESS; }
 static int GRB(set)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx)
 {
-    DB(set)(res, x);
+    DB(_set_inline)(res, x);
     if (FLINT_UNLIKELY(DB(_is_W)(res)))
-        DB(indeterminate)(res);
+        DB(_indeterminate_inline)(res);
     return GR_SUCCESS;
 }
 static int GRB(set_si)(DB(ptr) res, slong x, gr_ctx_t ctx)
 {
     fmpz_t t;
     if (DFLOAT_ULONG_IS_EXACT(FLINT_UABS(x)))
-        DB(set_d)(res, (double) x);
+        DB(_set_d_inline)(res, (double) x);
     else
     {
         fmpz_init_set_si(t, x);
@@ -7311,7 +7452,7 @@ static int GRB(set_ui)(DB(ptr) res, ulong x, gr_ctx_t ctx)
 {
     fmpz_t t;
     if (DFLOAT_ULONG_IS_EXACT(x))
-        DB(set_d)(res, (double) x);
+        DB(_set_d_inline)(res, (double) x);
     else
     {
         fmpz_init_set_ui(t, x);
@@ -7326,7 +7467,7 @@ static int GRB(set_d)(DB(ptr) res, double x, gr_ctx_t ctx)
 {
     if (!(fabs(x) <= DBL_MAX))
         return GR_DOMAIN;
-    DB(set_d)(res, x);
+    DB(_set_d_inline)(res, x);
     return GR_SUCCESS;
 }
 static int GRB(set_str)(DB(ptr) res, const char * s, gr_ctx_t ctx) { return DB(set_str)(res, s); }
@@ -7402,7 +7543,7 @@ static int GRB(set_other)(DB(ptr) res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx
 static int GRB(set_interval_mid_rad)(DB(ptr) res, DB(srcptr) m, DB(srcptr) r, gr_ctx_t ctx)
 {
     double rad = fabs(r->d[0]) + _dfloat_rad_finish(DF(_tail_abs_sum)(r->d) + r->rad);
-    DB(set)(res, m);
+    DB(_set_inline)(res, m);
     res->rad = _dfloat_rad_finish(res->rad + rad);
     DB(_fix_nonfinite)(res->d, &res->rad);
     return GR_SUCCESS;
@@ -7448,8 +7589,8 @@ static int GRB(get_d)(double * res, DB(srcptr) x, gr_ctx_t ctx) { *res = DB(get_
 
 static truth_t GRB(is_zero)(DB(srcptr) x, gr_ctx_t ctx)
 {
-    if (DB(is_zero)(x)) return T_TRUE;
-    if (DB(contains_zero)(x)) return T_UNKNOWN;
+    if (DB(_is_zero_inline)(x)) return T_TRUE;
+    if (DB(_contains_zero_inline)(x)) return T_UNKNOWN;
     return T_FALSE;
 }
 static truth_t GRB(_is_d)(DB(srcptr) x, double c)
@@ -7476,56 +7617,56 @@ static truth_t GRB(is_one)(DB(srcptr) x, gr_ctx_t ctx) { return GRB(_is_d)(x, 1.
 static truth_t GRB(is_neg_one)(DB(srcptr) x, gr_ctx_t ctx) { return GRB(_is_d)(x, -1.0); }
 static truth_t GRB(equal)(DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx)
 {
-    if (DB(equal)(x, y)) return T_TRUE;
-    if (DB(overlaps)(x, y)) return T_UNKNOWN;
+    if (DB(_equal_inline)(x, y)) return T_TRUE;
+    if (DB(_overlaps_inline)(x, y)) return T_UNKNOWN;
     return T_FALSE;
 }
 
-static int GRB(neg)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(neg)(res, x); return GR_SUCCESS; }
-static int GRB(add)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(add)(res, x, y); return GR_SUCCESS; }
-static int GRB(sub)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(sub)(res, x, y); return GR_SUCCESS; }
-static int GRB(mul)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(mul)(res, x, y); return GR_SUCCESS; }
-static int GRB(sqr)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(sqr)(res, x); return GR_SUCCESS; }
-static int GRB(mul_two)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(mul_2exp_si)(res, x, 1); return GR_SUCCESS; }
-static int GRB(mul_2exp_si)(DB(ptr) res, DB(srcptr) x, slong e, gr_ctx_t ctx) { DB(mul_2exp_si)(res, x, e); return GR_SUCCESS; }
-static int GRB(div)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { return DB(div)(res, x, y); }
-static int GRB(inv)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(inv)(res, x); }
+static int GRB(neg)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_neg_inline)(res, x); return GR_SUCCESS; }
+static int GRB(add)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(_add_impl)(res, x, y); return GR_SUCCESS; }
+static int GRB(sub)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(_sub_impl)(res, x, y); return GR_SUCCESS; }
+static int GRB(mul)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(_mul_impl)(res, x, y); return GR_SUCCESS; }
+static int GRB(sqr)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_sqr_impl)(res, x); return GR_SUCCESS; }
+static int GRB(mul_two)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_mul_2exp_si_impl)(res, x, 1); return GR_SUCCESS; }
+static int GRB(mul_2exp_si)(DB(ptr) res, DB(srcptr) x, slong e, gr_ctx_t ctx) { DB(_mul_2exp_si_impl)(res, x, e); return GR_SUCCESS; }
+static int GRB(div)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { return DB(_div_ool)(res, x, y, DFLOAT_MODE_AUTO); }
+static int GRB(inv)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(_inv_m)(res, x, DFLOAT_MODE_AUTO); }
 static truth_t GRB(is_invertible)(DB(srcptr) x, gr_ctx_t ctx)
 {
-    if (DB(is_zero)(x)) return T_FALSE;
-    if (DB(contains_zero)(x)) return T_UNKNOWN;
+    if (DB(_is_zero_inline)(x)) return T_FALSE;
+    if (DB(_contains_zero_inline)(x)) return T_UNKNOWN;
     return T_TRUE;
 }
-static int GRB(sqrt)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(sqrt)(res, x); }
-static int GRB(rsqrt)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(rsqrt)(res, x); }
-static int GRB(abs)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(abs)(res, x); return GR_SUCCESS; }
+static int GRB(sqrt)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(_sqrt_m)(res, x, DFLOAT_MODE_AUTO); }
+static int GRB(rsqrt)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(_rsqrt_ool)(res, x, DFLOAT_MODE_AUTO); }
+static int GRB(abs)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_abs_inline)(res, x); return GR_SUCCESS; }
 static int GRB(sgn)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx)
 {
     /* the sign function is defined everywhere: [0 +/- 1] encloses its
        values on a ball that contains zero (or is the whole line) */
-    if (DB(is_zero)(x)) { DB(zero)(res); return GR_SUCCESS; }
-    if (DB(contains_zero)(x)) { DB(_set_zero_pm)(res, 1.0); return GR_SUCCESS; }
-    DB(set_d)(res, (x->d[0] > 0.0) ? 1.0 : -1.0);
+    if (DB(_is_zero_inline)(x)) { DB(_zero_inline)(res); return GR_SUCCESS; }
+    if (DB(_contains_zero_inline)(x)) { DB(_set_zero_pm)(res, 1.0); return GR_SUCCESS; }
+    DB(_set_d_inline)(res, (x->d[0] > 0.0) ? 1.0 : -1.0);
     return GR_SUCCESS;
 }
 static int GRB(cmp)(int * res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { return DB(cmp)(res, x, y); }
 static int GRB(cmpabs)(int * res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx)
 {
     DB(t) a, b;
-    DB(abs)(a, x);
-    DB(abs)(b, y);
+    DB(_abs_inline)(a, x);
+    DB(_abs_inline)(b, y);
     return DB(cmp)(res, a, b);
 }
 static int GRB(exp)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(exp)(res, x); return GR_SUCCESS; }
 static int GRB(log)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(log)(res, x); }
 static int GRB(atan)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(atan)(res, x); return GR_SUCCESS; }
-static int GRB(im)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(zero)(res); return GR_SUCCESS; }
+static int GRB(im)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_zero_inline)(res); return GR_SUCCESS; }
 
 static void GRB(vec_init)(DB(ptr) vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        DB(zero)(vec + i);
+        DB(_zero_inline)(vec + i);
 }
 static void GRB(vec_clear)(DB(ptr) vec, slong len, gr_ctx_t ctx) { }
 static int GRB(vec_set)(DB(ptr) res, DB(srcptr) x, slong len, gr_ctx_t ctx)
@@ -7547,9 +7688,9 @@ static int GRB(_vec_div_status)(DB(srcptr) y, slong len)
     int status = GR_SUCCESS;
     for (i = 0; i < len; i++)
     {
-        if (FLINT_UNLIKELY(DB(contains_zero)(y + i)))
+        if (FLINT_UNLIKELY(DB(_contains_zero_inline)(y + i)))
         {
-            if (DB(is_zero)(y + i))
+            if (DB(_is_zero_inline)(y + i))
                 return GR_DOMAIN;
             status = GR_UNABLE;
         }
@@ -7581,8 +7722,8 @@ static int GRB(get_interval_mid_rad)(DB(ptr) m, DB(ptr) r, DB(srcptr) x, gr_ctx_
     if (DB(_is_W)(x))
     {
         /* the radius is not a real number */
-        DB(zero)(m);
-        DB(indeterminate)(r);
+        DB(_zero_inline)(m);
+        DB(_indeterminate_inline)(r);
         return GR_UNABLE;
     }
     for (i = 0; i < N; i++)
@@ -7681,8 +7822,8 @@ static int GRB(vec_scatter)(DB(ptr) vec, const slong * idx, DB(srcptr) src, slon
 /* ---- fast variants (DFLOAT_FAST): products bound their rounding
    errors instead of tracking them ---- */
 
-static int GRB(mul_fast)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(_mul_m)(res, x, y, DFLOAT_MODE_FAST); return GR_SUCCESS; }
-static int GRB(sqr_fast)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_sqr_m)(res, x, DFLOAT_MODE_FAST); return GR_SUCCESS; }
+static int GRB(mul_fast)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { DB(_mul_mode)(res, x, y, DFLOAT_MODE_FAST); return GR_SUCCESS; }
+static int GRB(sqr_fast)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { DB(_sqr_mode)(res, x, DFLOAT_MODE_FAST); return GR_SUCCESS; }
 static int GRB(div_fast)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, gr_ctx_t ctx) { return DB(_div_ool)(res, x, y, DFLOAT_MODE_FAST); }
 static int GRB(inv_fast)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(_inv_m)(res, x, DFLOAT_MODE_FAST); }
 static int GRB(sqrt_fast)(DB(ptr) res, DB(srcptr) x, gr_ctx_t ctx) { return DB(_sqrt_m)(res, x, DFLOAT_MODE_FAST); }
