@@ -440,15 +440,19 @@ if (HAS_FLAG_UNROLL_LOOPS)
 endif()
 
 # The dfloat module relies on error-free transformations, which break
-# if the compiler contracts a separate multiply and add into an fma;
-# its small exported functions also call each other, which
-# -fno-semantic-interposition lets the compiler inline in a shared
-# library
+# if the compiler contracts a separate multiply and add into an fma:
+# -ffp-contract=off is required (see FLINT_DFLOAT_CFLAGS in acinclude.m4;
+# without it, the module is unavailable except with MSVC and clang,
+# which honour a pragma). -fno-semantic-interposition is only for speed:
+# it lets GCC inline the small exported functions into each other in a
+# shared library.
 check_c_compiler_flag("-ffp-contract=off" HAS_FLAG_FP_CONTRACT_OFF)
 check_c_compiler_flag("-fno-semantic-interposition" HAS_FLAG_NO_SEMANTIC_INTERPOSITION)
 set(DFLOAT_COMPILE_OPTIONS "")
 if (HAS_FLAG_FP_CONTRACT_OFF)
-    list(APPEND DFLOAT_COMPILE_OPTIONS "-ffp-contract=off")
+    list(APPEND DFLOAT_COMPILE_OPTIONS "-ffp-contract=off" "-DDFLOAT_FP_CONTRACT_OFF")
+elseif (NOT MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    message(WARNING "The compiler does not take -ffp-contract=off; the dfloat module will be unavailable")
 endif()
 if (HAS_FLAG_NO_SEMANTIC_INTERPOSITION)
     list(APPEND DFLOAT_COMPILE_OPTIONS "-fno-semantic-interposition")

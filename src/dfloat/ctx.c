@@ -81,11 +81,14 @@ _dfloat_fma_is_correct(void)
 /* The error-free transformations need every double operation rounded
    once to double precision (with x87 excess precision, FLT_EVAL_METHOD
    2, they fail; this is evaluated with the flags the module is compiled
-   with) and a correctly rounded fma(). */
+   with), no contraction of multiplications and additions into fma (see
+   fp_contract.h) and a correctly rounded fma(). */
 int
 dfloat_is_supported(void)
 {
-#if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
+#if !DFLOAT_NO_CONTRACTION
+    return 0;
+#elif defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
     return 0;
 #else
     /* 0: not yet known, 1: supported, -1: not supported (the race of

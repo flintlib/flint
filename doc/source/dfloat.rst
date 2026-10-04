@@ -199,18 +199,24 @@ once to double precision. Hardware FMA (x86-64-v3 or later, or any
 slow library call but the results are still correct. The error-free
 transformations break if the compiler contracts a separate multiply
 and add into an ``fma``; the module is compiled with
-``-ffp-contract=off`` (and ``-fno-semantic-interposition``, so that
-its small exported functions can be inlined into each other in the
-shared library), as detected by ``configure`` and CMake, and its
+``-ffp-contract=off``, as detected by ``configure`` and CMake, and its
 sources also turn contraction off with a pragma for MSVC and clang
 (``src/dfloat/fp_contract.h``). They also break with the excess
 precision of x87 arithmetic (``FLT_EVAL_METHOD`` 2, the GCC default
 for 32-bit x86): there ``configure`` compiles the module with
 ``-mfpmath=sse`` if the target has SSE2 (``CFLAGS`` with ``-msse2``,
-or a ``-march`` that implies it), and otherwise the module declines to
-work: :func:`dfloat_is_supported` returns 0,
-:func:`gr_ctx_init_dfloat` returns ``GR_UNABLE`` and the power sums
-return 0, so that their callers fall back to other code.
+or a ``-march`` that implies it). When either requirement cannot be
+met (another compiler that does not take ``-ffp-contract=off``, or
+32-bit x86 without SSE2), the module declines to work:
+:func:`dfloat_is_supported` returns 0, :func:`gr_ctx_init_dfloat`
+returns ``GR_UNABLE`` and the power sums return 0, so that their
+callers fall back to other code. The module is also compiled with
+``-fno-semantic-interposition`` where available, which only affects
+speed: it lets GCC inline the small exported functions into each
+other and into the generic ring wrappers in the shared library
+(2-4x faster scalar ``d1`` operations and 1.4x ``d2`` additions and
+products through the generic ring) instead of calling them through
+the PLT.
 
 The vector code is written against ``machine_vectors.h`` (``vec4d``
 with masks, bitwise and integer-lane operations, fused multiply-adds
