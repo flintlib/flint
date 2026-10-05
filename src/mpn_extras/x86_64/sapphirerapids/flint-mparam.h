@@ -136,6 +136,23 @@
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
 
 /*
+    nmod_mat_mul: for moduli up to 2^32, fp50 is preferred to u32 for these
+    inner dimensions (default: k = 1..3 on AVX2, k = 1 with AVX-512); see
+    src/nmod_mat/impl.h.
+    fp50 / u32 at k = 1, 2, 3: 1.07, 0.73, 0.84 on Intel Xeon Silver 4514Y
+*/
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 2
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 3
+
+/*
+    nmod_mat_mul: inner dimension from which u52 is preferred to fp50
+    (33-50 bits) and, in its single-IFMA mode, to u32 (only used with
+    AVX512-IFMA); see src/nmod_mat/mul.c (not measured on this target:
+    default)
+*/
+#define FLINT_NMOD_MAT_MUL_U52_MIN_K 12
+
+/*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
     (measured on Intel Xeon Silver 4514Y (Emerald Rapids); with IFMA it
@@ -149,5 +166,12 @@
     (measured on Intel Xeon Silver 4514Y (Emerald Rapids))
 */
 #define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 32
+
+/*
+    nmod_vec_dot: split limbs are used for moduli up to 2^this; see
+    src/nmod_vec.h (not measured on this target: default; with
+    AVX512-IFMA, u64 takes over above)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 60
 
 #endif

@@ -135,10 +135,40 @@
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 384
 
 /*
+    nmod_mat_mul: inner dimension from which u52 is preferred to fp50
+    (33-50 bits) and, in its single-IFMA mode, to u32 (only used with
+    AVX512-IFMA); see src/nmod_mat/mul.c (not measured on this target:
+    default)
+*/
+#define FLINT_NMOD_MAT_MUL_U52_MIN_K 12
+
+/*
+    nmod_mat_mul: for moduli up to 2^32, fp50 is preferred to u32 for these
+    inner dimensions (MIN_K > MAX_K: never); see src/nmod_mat/impl.h (not
+    measured on this target: default, k = 1)
+*/
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 1
+
+/*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
     (unused: no AVX2 on this target)
 */
 #define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+
+/*
+    nmod_vec_dot: split limbs are used for moduli up to 2^this; see
+    src/nmod_vec.h (not measured on this target: default, no
+    limit)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 64
+
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h (not
+    measured on this target: default)
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
 
 #endif

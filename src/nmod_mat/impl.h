@@ -13,6 +13,7 @@
 #define NMOD_MAT_IMPL_H
 
 #include "flint.h"
+#include "flint-mparam.h"  /* FLINT_NMOD_MAT_MUL_FP50_U32_{MIN,MAX}_K */
 
 /*
     Whether nmod_mat_mul_u52 has a kernel: it needs AVX512-IFMA (with F and
@@ -104,6 +105,36 @@
 # define NMOD_MAT_MUL_ROWS_PREFER_KERNEL(n) ((n) <= (UWORD(1) << 32))
 #else
 # define NMOD_MAT_MUL_ROWS_PREFER_KERNEL(n) 0
+#endif
+
+/*
+    Inner dimensions k for which nmod_mat_mul prefers nmod_mat_mul_fp50 to
+    nmod_mat_mul_u32 for moduli up to 2^32 (flint-mparam.h parameters
+    FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K / _MAX_K, empty range if MIN > MAX):
+    with so few products per entry the per-entry work of u32 dominates (it
+    costs the same at 20 and 31 bits). 1000 x k x 1000, fp50 / u32 at
+    k = 1, 2, 3: 0.5-0.9 on the AVX2 machines measured (Broadwell to Arrow
+    Lake); with AVX-512 0.61-0.94 on Zen 4, 0.77-0.82 on Cascade Lake, 0.84,
+    0.79, 0.88 on Ice Lake (Xeon), but 1.07, 0.73, 0.84 on Emerald Rapids
+    and 0.77, 1.09, 1.39 on Tiger Lake (a single 512-bit FMA unit); 0.82,
+    1.06, 1.27 on Apple M4. Typical values: k = 1..3 on AVX2, k = 1 with
+    AVX-512 or NEON. Not used without vector code (no NMOD_MAT_HAVE_FPV).
+*/
+
+/* the parameters of nmod_mat_mul, which every flint-mparam.h must define */
+#if !defined(FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM) \
+    || !defined(FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF) \
+    || !defined(FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT) \
+    || !defined(FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF) \
+    || !defined(FLINT_NMOD_MAT_MUL_U52_MIN_BITS) \
+    || !defined(FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS) \
+    || !defined(FLINT_NMOD_MAT_MUL_U52_MIN_K) \
+    || !defined(FLINT_NMOD_MAT_MUL_K52_MIN_BITS) \
+    || !defined(FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF) \
+    || !defined(FLINT_NMOD_MAT_MUL_FP50_MAX_BITS) \
+    || !defined(FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K) \
+    || !defined(FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K)
+# error "flint-mparam.h must define all FLINT_NMOD_MAT_MUL_* parameters (see src/mpn_extras/generic/flint-mparam.h)"
 #endif
 
 #include "nmod_types.h"

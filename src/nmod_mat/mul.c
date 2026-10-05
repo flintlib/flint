@@ -42,9 +42,6 @@ _blas_1pass_cutoff(slong num_threads)
 
 #endif
 
-/* inner dimension from which nmod_mat_mul_u52 is preferred to u32 / fp50 */
-#define NMOD_MAT_MUL_U52_MIN_K 12
-
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -188,10 +185,14 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
           reduction of u52 (Barrett through doubles and a Shoup step)
           weighs more than its products, so up to k = 8 u32 (<= 32
           bits) and fp50 (33-50 bits) are 1.15-2.3x faster on Ice Lake
-          (1000 x k x 1000); u52 wins from k = 16 on. Hence U52_MIN_K
-          below
+          (1000 x k x 1000); u52 wins from k = 16 on. Hence the
+          parameter FLINT_NMOD_MAT_MUL_U52_MIN_K of flint-mparam.h
           TODO measured on one machine so far, could be useful to
           analyze it more thoroughly
+        - Tiny inner dimension, moduli up to 2^32: fp50 is 1.1-2x faster
+          than u32 at k = 1..3 on AVX2; with AVX-512 and on NEON the range
+          depends on the machine (FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K / _MAX_K,
+          see impl.h).
         - Single-threaded, Strassen on top (its recursive calls come back
           here) pays from SIMD_STRASSEN_CUTOFF on (e.g. 320-512 on Zen 4).
           TODO with 4 threads it did not pay up to 4096 (which is not that
@@ -250,7 +251,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         if (NMOD_MAT_HAVE_MUL_U52
                 && (bits >= FLINT_NMOD_MAT_MUL_U52_MIN_BITS
                     || bits <= FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS)
-                && (k >= NMOD_MAT_MUL_U52_MIN_K
+                && (k >= FLINT_NMOD_MAT_MUL_U52_MIN_K
                     || bits > FLINT_NMOD_MAT_MUL_FP50_MAX_BITS
                     || (bits > 32 && !NMOD_MAT_HAVE_FPV)))
         {
@@ -262,7 +263,11 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         }
         else if (bits <= 32)
         {
-            if (!blas_1pass)
+            if (NMOD_MAT_HAVE_FPV
+                    && k >= FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K
+                    && k <= FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K)
+                simd_mul = nmod_mat_mul_fp50;  /* tiny inner dimension */
+            else if (!blas_1pass)
                 simd_mul = nmod_mat_mul_u32;
         }
         else if (NMOD_MAT_HAVE_MUL_U52 && NMOD_MAT_HAVE_FPV

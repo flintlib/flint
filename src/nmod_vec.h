@@ -22,7 +22,7 @@
 
 #include "flint.h"
 #include "nmod.h"  /* nmod_mul, nmod_fmma */
-#include "flint-mparam.h"  /* FLINT_NMOD_VEC_DOT_{U52,SPLIT_LIMBS}_MIN_LEN */
+#include "flint-mparam.h"  /* FLINT_NMOD_VEC_DOT_{U52,SPLIT_LIMBS}_MIN_LEN, ..._MAX_BITS */
 
 /*
     SIMD dot products for moduli above 2^32 (see dot_u52.c, dot_u64.c,
@@ -33,8 +33,8 @@
       (_DOT_U64 in the two-limb band, _DOT3_U64 in the three-limb one);
     - on AVX2 / AVX-512, the entries split into two limbs of at most 32 bits
       multiplied with vpmuludq (_DOT_SPLIT_LIMBS / _DOT3_SPLIT_LIMBS), for
-      all moduli above 2^32 without IFMA, and with IFMA for moduli of 53 to
-      NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS bits.
+      moduli above 2^32 up to 2^NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS (with IFMA,
+      from 53 bits on).
     The limb-count convention on dot_method_t is kept: each method appears
     in the band(s) it can serve.
 */
@@ -68,22 +68,38 @@
     4: 1.1x slower at 32), hence parameters of flint-mparam.h (for split
     limbs, 0 means never).
 */
-#ifndef FLINT_NMOD_VEC_DOT_U52_MIN_LEN
-# define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
+#if !defined(FLINT_NMOD_VEC_DOT_U52_MIN_LEN) \
+    || !defined(FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN) \
+    || !defined(FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS)
+# error "flint-mparam.h must define FLINT_NMOD_VEC_DOT_U52_MIN_LEN, FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN and FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS"
 #endif
 #define NMOD_VEC_DOT_U52_MIN_LEN FLINT_NMOD_VEC_DOT_U52_MIN_LEN
 #define NMOD_VEC_DOT_U64_MIN_LEN 80
 #define NMOD_VEC_DOT3_U64_MIN_LEN 48
-#ifndef FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
-# define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
-#endif
 #define NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
 #define NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED \
     (NMOD_VEC_HAVE_DOT_SPLIT_LIMBS && NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN > 0)
 
-/* with AVX512-IFMA, split limbs are faster than u64 up to 60 bits (Ice
-   Lake; 61 on Zen 4, a tie at 61 bits there) */
+/* with AVX512-IFMA, typical largest modulus size for split limbs: they
+   are faster than u64 up to 60 bits on Ice Lake (61 on Zen 4, a tie at 61
+   bits there); used by the tests */
 #define NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS 60
+
+/*
+    Largest modulus bit size for split limbs, a parameter of flint-mparam.h
+    (FLINT_BITS or more for no limit). Without IFMA the alternative is the
+    scalar code: on Meteor Lake and Raptor Lake the split-limbs variant used
+    from 62 bits on is 1.1-1.2x slower than _DOT3_ACC at every length, and
+    on Meteor Lake the one of 61 bits too. With IFMA it is u64, which takes over between 59
+    (Emerald Rapids) and 62 bits (Tiger Lake).
+*/
+#define NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS
+/* largest modulus for split limbs */
+#if NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS >= FLINT_BITS
+# define NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N UWORD_MAX
+#else
+# define NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS)
+#endif
 
 /*
     AArch64: the scalar _DOT2_SPLIT is faster than the two-chain _DOT2 up
@@ -378,11 +394,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         }
 #endif
 #if NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
-        // with IFMA: only up to NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS bits,
-        // _DOT_U64 is faster beyond
+        // up to NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS bits (with IFMA, _DOT_U64
+        // is faster beyond)
         if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
-                && (!NMOD_VEC_HAVE_DOT_U64
-                    || mod.n <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS)))
+                && mod.n <= NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N)
         {
             dot_params_t params = {_DOT_SPLIT_LIMBS, UWORD(0)};
             return params;
@@ -402,8 +417,7 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     // 3 limbs:
 #if NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
     if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
-            && (!NMOD_VEC_HAVE_DOT_U64
-                || mod.n <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS)))
+            && mod.n <= NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N)
     {
         dot_params_t params = {_DOT3_SPLIT_LIMBS, UWORD(0)};
         return params;

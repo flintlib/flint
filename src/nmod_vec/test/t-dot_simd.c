@@ -85,11 +85,16 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
                 break;
             case 6:
                 /* around the limit of _DOT_SPLIT_LIMBS with IFMA
-                   (NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS) and that of
-                   its two variants (n = 2^61) */
-                m = (UWORD(1) << (n_randint(state, 2)
-                                  ? NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS : 61))
-                        + n_randint(state, 5) - 2;
+                   (NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS), that of
+                   its two variants (n = 2^61) and the one of
+                   flint-mparam.h (NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS) */
+                switch (n_randint(state, 3))
+                {
+                    case 0: j = NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS; break;
+                    case 1: j = 61; break;
+                    default: j = FLINT_MIN(NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS, 63); break;
+                }
+                m = (UWORD(1) << j) + n_randint(state, 5) - 2;
                 break;
             case 7:
                 m = (UWORD(1) << (60 + n_randint(state, 4))) + n_randint(state, 5) - 2;
@@ -104,8 +109,7 @@ TEST_FUNCTION_START(nmod_vec_dot_simd, state)
         /* whether _nmod_vec_dot_params selects split limbs (the functions
            themselves are tested whenever they are compiled) */
         split = NMOD_VEC_DOT_SPLIT_LIMBS_ENABLED
-                && (!NMOD_VEC_HAVE_DOT_U64
-                    || m <= (UWORD(1) << NMOD_VEC_DOT_SPLIT_LIMBS_IFMA_MAX_BITS));
+                && m <= NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N;
 
         switch (n_randint(state, 4))
         {

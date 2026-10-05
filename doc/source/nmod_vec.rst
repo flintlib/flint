@@ -209,7 +209,9 @@ performed at the very end of the computation.
   ``flint-mparam.h``, 32 to 40), the products are accumulated as their low
   and high 52-bit halves in vector lanes (the strategy of ``nmod_mat_mul_u52``), with a
   final reduction; on x86-64 machines with AVX2 or AVX-512, without IFMA
-  or with IFMA for moduli of `53` to `60` bits, and lengths from a
+  or with IFMA for moduli of `53` to `60` bits, for moduli up to a
+  machine-dependent size (``FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS`` in
+  ``flint-mparam.h``, `60` to `64` bits) and lengths from a
   machine-dependent minimum on (``FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN`` in
   ``flint-mparam.h``, between about 50 and 130, or never), the entries are
   split into two limbs of at most 32 bits whose products (32 x 32 -> 64

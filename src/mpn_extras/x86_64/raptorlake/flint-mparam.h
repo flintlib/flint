@@ -91,7 +91,9 @@
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (not measured on this target: defaults).
+    (measured on Intel Core i7-13850HX (Raptor Lake HX), with OpenBLAS;
+    AVX2 only, so the u52 values are unused; multithreaded measurements
+    were not perfectly done so BLAS_1PASS_CUTOFF_MT might be slightly off)
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -123,9 +125,9 @@
                            the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 256
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 256
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 768
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 512
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 1600
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
@@ -133,10 +135,41 @@
 #define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 0
 
 /*
+    nmod_mat_mul: inner dimension from which u52 is preferred to fp50
+    (33-50 bits) and, in its single-IFMA mode, to u32 (only used with
+    AVX512-IFMA); see src/nmod_mat/mul.c (not measured on this target:
+    default)
+*/
+#define FLINT_NMOD_MAT_MUL_U52_MIN_K 12
+
+/*
+    nmod_mat_mul: for moduli up to 2^32, fp50 is preferred to u32 for these
+    inner dimensions (MIN_K > MAX_K: never); see src/nmod_mat/impl.h (not
+    measured on this target: default, k = 1..3)
+*/
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 3
+
+/*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
-    (not measured on this target: default)
+    (measured on Intel Core i7-13850HX)
 */
-#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 112
+
+/*
+    nmod_vec_dot: split limbs are used for moduli up to 2^this (default:
+    FLINT_BITS). At 62-63 bits they are 1.1-1.14x slower than _DOT3_ACC
+    from length 96 on, and at most 3% faster than _DOT3 at 63-64 bits
+    (Intel Core i7-13850HX)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 61
+
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h (not
+    measured on this target: default)
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
 
 #endif
