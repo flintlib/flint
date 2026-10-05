@@ -232,6 +232,13 @@ void _mp_real_const_2_div_pi(nn_ptr res, ulong * err, slong n, int cache);
 /* frees this thread's cache of constants */
 void _mp_real_const_clear_cache(void);
 
+/* verbose progress reports on stderr for huge computations: 0 silent
+   (the default, unless the environment variable FLINT_MP_REAL_VERBOSE
+   sets another level), 1 a line every few seconds from the long
+   loops, 2 every phase with its size and time */
+void mp_real_set_verbose(int level);
+int mp_real_get_verbose(void);
+
 /* a constant as an arb ball of prec bits (computed with cache = 0) */
 typedef void (* mp_real_const_func)(mp_real_t, slong, int);
 void _mp_real_const_arb(arb_t res, mp_real_const_func f, slong prec);

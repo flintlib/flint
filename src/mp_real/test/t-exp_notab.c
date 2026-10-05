@@ -63,6 +63,7 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
         yc = flint_malloc((n + 1) * sizeof(ulong));
         arb_init(xa); arb_init(e); fmpz_init(f);
 
+        flint_set_num_threads(1 + n_randint(state, 4));
         flint_mpn_urandomb(x, state, FLINT_BITS * n);
         if (iter % 11 == 4)
             flint_mpn_store(x, n, ~UWORD(0));
@@ -158,6 +159,7 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
         yc = flint_malloc((n + 1) * sizeof(ulong));
         arb_init(xa); arb_init(e); fmpz_init(f);
 
+        flint_set_num_threads(1 + n_randint(state, 4));
         flint_mpn_urandomb(x, state, FLINT_BITS * n);
         x[n - 1] >>= 1;
 
@@ -184,6 +186,8 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
         arb_clear(xa); arb_clear(e); fmpz_clear(f);
         flint_free(x); flint_free(y); flint_free(ys); flint_free(yc);
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

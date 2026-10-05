@@ -89,8 +89,20 @@
    (683, 1365] from r = 1536. */
 #define MP_REAL_EXP_BURST_TERMS(r) \
     (((r) >= 1536) ? 1000 : ((r) > 128) ? 600 : 512)
+/* THREADS.  A burst step's slice runs on as many threads as its
+   splitting tree can use, while the series it replaces is one
+   indivisible piece (its products use the FFT's threads, at best);
+   with t threads the step therefore pays from about 1/t of the
+   serial crossover, and the threshold is divided by the thread count
+   (capped at MP_REAL_BURST_THREADS_MAX).  The choice thus depends on
+   the thread count, as in arb_exp_arf_bb, and so does the exact
+   rounding of the result (its accuracy does not). */
+#define MP_REAL_BURST_THREADS_MAX 16
+#define MP_REAL_BURST_THREADS() \
+    FLINT_MIN(flint_get_num_threads(), MP_REAL_BURST_THREADS_MAX)
 #define EXP_USE_BURST(wn, r) \
-    (FLINT_BITS * (wn) >= MP_REAL_EXP_BURST_TERMS(r) * (slong) (r))
+    (FLINT_BITS * (wn) * MP_REAL_BURST_THREADS() \
+        >= MP_REAL_EXP_BURST_TERMS(r) * (slong) (r))
 
 /* Full bit-burst from this many terms.  The development VM's value
    (4096) sat below the crossover measured on the target machine at
@@ -140,13 +152,205 @@ _exp_reduced_alg(slong wn, flint_bitcnt_t r)
    reconstruction sinh + sqrt(1 + sinh^2) is a ball squaring, sum and
    square root, and in the burst each slice's exact splitting output
    T / (Q B^QEk) becomes the factor Q B^QEk + T by one ball addition
-   (which reads only the top cap + 2 limbs of either operand), the
-   products NUM *= factor and DEN *= Q are ball products at cap limbs
-   (their operands truncated to the precision that contributes), the
-   series remainder of the one-step variant is this function again
-   at the doubled rate (the cascade), and the finish is one ball
-   division.  The bound of the result is rigorous, and checked
-   against the documented budget on export (it lands far below). */
+   (which reads only the top cap + 2 limbs of either operand),
+   NUM = prod factor and DEN = prod Q are product trees of ball
+   products at cap limbs (their operands truncated to the precision
+   that contributes), the series remainder of the one-step variant is
+   this function again at the rate the cascade ends at, and the finish
+   is one ball division.  The bound of the result is rigorous, and
+   checked against the documented budget on export (it lands far
+   below).
+
+   THREADS.  The slices and the series remainder are independent, so
+   they run as tasks on the available threads (_mp_real_parallel_tasks,
+   costliest first), the cascade of one-step reductions being
+   flattened into the list of slices beforehand so that its levels
+   are tasks too rather than a chain of nested calls; the product
+   trees fork their halves, and NUM and DEN run side by side.  Above
+   MP_REAL_EXP_BURST_SERIAL_LIMBS the slices run one at a time (memory),
+   the threads then going to the binary splitting inside each slice
+   (exp_sum_bs.c), which forks its subtrees and merges.  This is the
+   pair of strategies of arb_exp_arf_bb: parallel exponentials, and
+   a serial loop over parallel binary splittings at the largest
+   precisions.  The results do not depend on the thread count. */
+/* the burst's factors as parallel tasks: tasks 0 .. nb - 2 are the
+   slices, in order of decreasing cost (the leading slice has the most
+   terms), f[k] = Q B^QE + T of slice k with fq[k] = Q B^QE its
+   denominator; a slice of zero bits leaves f[k] = 1.  With series_alg
+   nonzero, the last task is exp of the residual below limb depth
+   L[nb - 1] by that series algorithm, with fq = 0 meaning no
+   denominator.  The series task comes first in the order, being the
+   one indivisible piece. */
+typedef struct
+{
+    nn_srcptr t;
+    slong wn, cap;
+    const slong * L;
+    slong nb;
+    int series_alg;
+    mp_real_struct * f, * fq;
+}
+exp_burst_struct;
+
+static void _mp_real_exp_reduced_ball(mp_real_t res, nn_srcptr t, slong wn,
+    flint_bitcnt_t r, int alg);
+
+static void
+_exp_burst_task(slong i, void * arg)
+{
+    exp_burst_struct * S = (exp_burst_struct *) arg;
+    slong wn = S->wn, cap = S->cap, k;
+    nn_srcptr t = S->t;
+    const slong * L = S->L;
+    mp_real_struct * f, * fq;
+    mp_real_phase_t ph;
+    TMP_INIT;
+
+    TMP_START;
+
+    if (S->series_alg && i == 0)
+    {
+        /* the residual below limb depth L[nb - 1] by the series */
+        nn_ptr xres;
+
+        k = S->nb - 1;
+        f = S->f + k;
+        fq = S->fq + k;
+        MP_REAL_PHASE_START(ph, "exp burst: series remainder", wn);
+        xres = TMP_ALLOC(wn * sizeof(ulong));
+        flint_mpn_copyi(xres, t, wn);
+        flint_mpn_zero(xres + wn - L[k], L[k]);
+        _mp_real_exp_reduced_ball(f, xres, wn,
+            (flint_bitcnt_t) (FLINT_BITS * L[k]), S->series_alg);
+        mp_real_zero(fq);
+        MP_REAL_PHASE_END(ph);
+    }
+    else
+    {
+        slong D, xn, N, tn, qn, QEk;
+        nn_srcptr u;
+        nn_ptr T, Q;
+
+        k = S->series_alg ? i - 1 : i;
+        f = S->f + k;
+        fq = S->fq + k;
+        D = L[k + 1];
+        u = t + (wn - D);
+        xn = D - (k ? L[k] : 0);
+
+        while (xn > 0 && u[xn - 1] == 0)
+            xn--;
+        if (xn == 0)
+        {
+            mp_real_set_ui(f, 1);
+            mp_real_zero(fq);
+            TMP_END;
+            return;
+        }
+        while (xn > 1 && u[0] == 0)
+        {
+            u++;
+            xn--;
+            D--;
+        }
+
+        N = _mp_real_exp_bs_num_terms((flint_bitcnt_t)
+            (FLINT_BITS * D - mpn_bits(u, xn)),
+            FLINT_BITS * wn + 64);
+
+        {
+            slong t_alloc = N * (D + 2) + 4;
+            slong q_alloc2 = (N * FLINT_BIT_COUNT((ulong) N + 1))
+                / FLINT_BITS + 3;
+
+            T = TMP_ALLOC((t_alloc + q_alloc2) * sizeof(ulong));
+            Q = T + t_alloc;
+        }
+
+        if (mp_real_get_verbose() >= 2 && wn >= MP_REAL_VERBOSE_MIN_LIMBS)
+            _mp_real_log("exp burst: slice %wd of %wd: %wd limbs at depth %wd, %wd terms",
+                k, S->nb - 1, xn, D, N);
+        MP_REAL_PHASE_START(ph, "exp burst: slice tree", wn);
+        _mp_real_exp_sum_bs_powtab(T, &tn, Q, &qn, &QEk, u, xn, D, N);
+        MP_REAL_PHASE_END(ph);
+        MP_REAL_PHASE_START(ph, "exp burst: slice factor", wn);
+
+        /* the factor Q B^QEk + T over the denominator Q B^QEk */
+        _mp_real_set_mpn_2exp(fq, Q, qn, FLINT_BITS * QEk);
+        _mp_real_set_mpn_2exp(f, T, tn, 0);
+        mp_real_add(f, f, fq, cap);
+        MP_REAL_PHASE_END(ph);
+    }
+
+    TMP_END;
+}
+
+/* NUM = prod nums and DEN = prod dens as two jobs */
+typedef struct
+{
+    mp_real_struct * num, * den, * nums, * dens;
+    slong nn, nd, n;
+}
+exp_burst_prod_struct;
+
+static void
+_exp_burst_prod_num(void * arg)
+{
+    exp_burst_prod_struct * P = (exp_burst_prod_struct *) arg;
+    _mp_real_vec_prod(P->num, P->nums, P->nn, P->n);
+}
+
+static void
+_exp_burst_prod_den(void * arg)
+{
+    exp_burst_prod_struct * P = (exp_burst_prod_struct *) arg;
+    _mp_real_vec_prod(P->den, P->dens, P->nd, P->n);
+}
+
+/* res *= x at n limbs, x destroyed (cleared); a unit res takes x by a
+   swap */
+static void
+_burst_fold(mp_real_t res, mp_real_t x, slong n)
+{
+    if (res->size == 1 && res->d[0] == 1 && res->exp == 1 && res->err == 0
+        && !res->negative)
+        mp_real_swap(res, x);
+    else
+        mp_real_mul(res, res, x, n);
+    mp_real_clear(x);
+    mp_real_init(x);
+}
+
+/* task i in lane w: its factor, folded at once into the lane's running
+   products numw[w], denw[w], so that at most two factors per thread
+   are ever alive (not one per slice); the lanes and the order within
+   each are fixed in advance (_mp_real_parallel_lanes), so the result
+   does not depend on timing */
+typedef struct
+{
+    exp_burst_struct * S;
+    mp_real_struct * numw, * denw;
+}
+exp_burst_acc_struct;
+
+static void
+_exp_burst_task_acc(slong i, slong w, void * arg)
+{
+    exp_burst_acc_struct * A = (exp_burst_acc_struct *) arg;
+    exp_burst_struct * S = A->S;
+    slong j = S->series_alg ? (i ? i - 1 : S->nb - 1) : i;
+    mp_real_phase_t ph;
+
+    _exp_burst_task(i, S);
+    MP_REAL_PHASE_START(ph, "exp burst: accumulate", S->wn);
+    if (!(S->f[j].size == 1 && S->f[j].d[0] == 1 && S->f[j].exp == 1
+        && S->f[j].err == 0))
+        _burst_fold(A->numw + w, S->f + j, S->cap);
+    if (S->fq[j].size != 0)
+        _burst_fold(A->denw + w, S->fq + j, S->cap);
+    MP_REAL_PHASE_END(ph);
+}
+
 static void
 _mp_real_exp_reduced_ball(mp_real_t res, nn_srcptr t, slong wn, flint_bitcnt_t r,
     int alg)
@@ -193,108 +397,156 @@ _mp_real_exp_reduced_ball(mp_real_t res, nn_srcptr t, slong wn, flint_bitcnt_t r
     }
     else
     {
-        int levels = (alg == 4) ? 0 : 1;
         slong L[FLINT_BITS + 2];
-        slong nb = 0, k;
-        mp_real_t num, den, f, fq;
+        slong nb = 0, k, nn, nd, ntasks, nw, maxw;
+        int series_alg = 0, mode = alg, serial;
+        mp_real_struct * f, * fq, * nums, * dens, * numw, * denw;
+        mp_real_t num, den;
+        exp_burst_struct S;
+        exp_burst_acc_struct A;
+        exp_burst_prod_struct P;
+        mp_real_phase_t ph;
 
+        /* The ladder of limb depths: slice k covers the limbs between
+           depths L[k] and L[k + 1], the depths doubling.  A single step
+           (alg 3) is followed by the tuned choice for the residual
+           below L[1]; the cascade of steps that choice produces is
+           flattened here into the same ladder, ending either at wn
+           (the full burst) or with the residual below L[nb - 1] left
+           to a series algorithm -- so that all the slices and the
+           series remainder can run as tasks side by side. */
         L[nb++] = FLINT_MAX((slong) r / FLINT_BITS, 1);
+        /* Below a limb of reduction the first slice is the top limb
+           alone: a slice's splitting integers grow by its frame (64 D
+           bits, 128 D for the sine and cosine's x^2) per term while its
+           argument decays by r bits per term, and the ladder keeps
+           that ratio at 2 (3 for the tripling ladder) except for a
+           first slice of 2 resp. 3 limbs at r < 64, where it is
+           128 / r resp. 384 / (2 r) -- at r = 32 the leading slice then
+           held integers twice (resp. three times) as large as needed,
+           and was both the costliest slice and the peak of the memory. */
+        if ((slong) r < FLINT_BITS && wn > 1)
+            L[nb++] = 1;
         while (L[nb - 1] < wn)
         {
-            slong nxt = FLINT_MIN(2 * L[nb - 1], wn);
-            if (levels > 0 && nb > levels)
-                nxt = wn;
-            L[nb] = nxt;
+            if (nb >= 2 && mode == 3)
+            {
+                mode = _exp_reduced_alg(wn,
+                    (flint_bitcnt_t) (FLINT_BITS * L[nb - 1]));
+                if (mode <= 2)
+                {
+                    series_alg = mode;
+                    break;
+                }
+            }
+            L[nb] = FLINT_MIN(2 * L[nb - 1], wn);
             nb++;
         }
-        nb--;
-        if (nb == 0)
+        if (nb == 1)
         {
             L[1] = wn;
-            nb = 1;
+            nb = 2;
         }
+        ntasks = (nb - 1) + (series_alg != 0);
 
+        /* The factors, as tasks in order of decreasing cost (the
+           series remainder first, being indivisible, then the slices,
+           the leading one having the most terms), with cost estimates
+           in full products: a slice's tree has about log2 N levels,
+           the series about 2 sqrt(N) products.  The tasks are dealt
+           to one lane per thread by estimated cost, and each lane
+           folds its factors into its own running numerator and
+           denominator as they complete, so that the live
+           full-precision numbers are two per lane plus the ones being
+           computed, independently of the number of slices; the lanes'
+           products are then combined by product trees.  In the serial mode -- above
+           MP_REAL_EXP_BURST_SERIAL_LIMBS, where a slice's splitting
+           integers are large enough for memory to matter, and below
+           MP_REAL_PAR_MIN_LIMBS, where a thread is not worth waking --
+           a single worker runs the slices one at a time, the threads
+           going to the binary splitting and the products inside. */
+        serial = (wn > MP_REAL_EXP_BURST_SERIAL_LIMBS || wn < MP_REAL_PAR_MIN_LIMBS);
+        maxw = serial ? 1 : ntasks;
+        nw = _mp_real_parallel_lanes_count(ntasks, maxw);
+
+        f = flint_malloc((2 * nb + 4 * nw) * sizeof(mp_real_struct));
+        fq = f + nb;
+        numw = fq + nb;
+        denw = numw + nw;
+        nums = denw + nw;
+        dens = nums + nw;
+        for (k = 0; k < 2 * nb + 4 * nw; k++)
+            mp_real_init(f + k);
+        for (k = 0; k < nw; k++)
+        {
+            mp_real_set_ui(numw + k, 1);
+            mp_real_set_ui(denw + k, 1);
+        }
         mp_real_init(num);
         mp_real_init(den);
-        mp_real_init(f);
-        mp_real_init(fq);
-        mp_real_set_ui(num, 1);
-        mp_real_set_ui(den, 1);
 
-        for (k = nb - 1; k >= 0; k--)
+        S.t = t;
+        S.wn = wn;
+        S.cap = cap;
+        S.L = L;
+        S.nb = nb;
+        S.series_alg = series_alg;
+        S.f = f;
+        S.fq = fq;
+        A.S = &S;
+        A.numw = numw;
+        A.denw = denw;
+        if (mp_real_get_verbose() >= 2 && wn >= MP_REAL_VERBOSE_MIN_LIMBS)
+            _mp_real_log("exp burst: %wd limbs, r = %wd, %wd slices%s, %wd workers",
+                wn, (slong) r, nb - 1, series_alg ? " and a series remainder" : "",
+                nw);
+
         {
-            int series = (levels > 0 && k >= levels);
-            TMP_INIT;
+            double cost[FLINT_BITS + 2];
+            slong j = 0;
 
-            TMP_START;
+            if (series_alg)
+                cost[j++] = 2.0 * sqrt((double) wn / (double) L[nb - 1]) + 4.0;
+            for (k = 0; k < nb - 1; k++)
+                cost[j++] = log((double) wn / (double) L[k] + 2.0) * 1.5 + 2.0;
 
-            if (series)
-            {
-                /* the residual below limb depth L[k], at the doubled
-                   rate by the tuned choice */
-                nn_ptr xres;
-
-                xres = TMP_ALLOC(wn * sizeof(ulong));
-                flint_mpn_copyi(xres, t, wn);
-                flint_mpn_zero(xres + wn - L[k], L[k]);
-                _mp_real_exp_reduced_ball(f, xres, wn,
-                    (flint_bitcnt_t) (FLINT_BITS * L[k]), 0);
-            }
-            else
-            {
-                slong D = L[k + 1];
-                nn_srcptr u = t + (wn - D);
-                slong xn = D - (k ? L[k] : 0);
-                slong N, tn, qn, QEk;
-                nn_ptr T, Q;
-
-                while (xn > 0 && u[xn - 1] == 0)
-                    xn--;
-                if (xn == 0)
-                {
-                    TMP_END;
-                    continue;
-                }
-                while (xn > 1 && u[0] == 0)
-                {
-                    u++;
-                    xn--;
-                    D--;
-                }
-
-                N = _mp_real_exp_bs_num_terms((flint_bitcnt_t)
-                    (FLINT_BITS * D - mpn_bits(u, xn)),
-                    FLINT_BITS * wn + 64);
-
-                {
-                    slong t_alloc = N * (D + 2) + 4;
-                    slong q_alloc2 = (N * FLINT_BIT_COUNT((ulong) N + 1))
-                        / FLINT_BITS + 3;
-
-                    T = TMP_ALLOC((t_alloc + q_alloc2) * sizeof(ulong));
-                    Q = T + t_alloc;
-                }
-
-                _mp_real_exp_sum_bs_powtab(T, &tn, Q, &qn, &QEk,
-                    u, xn, D, N);
-
-                /* the factor Q B^QEk + T over the denominator Q B^QEk */
-                _mp_real_set_mpn_2exp(fq, Q, qn, FLINT_BITS * QEk);
-                _mp_real_set_mpn_2exp(f, T, tn, 0);
-                mp_real_add(f, f, fq, cap);
-                mp_real_mul(den, den, fq, cap);
-            }
-
-            mp_real_mul(num, num, f, cap);
-            TMP_END;
+            _mp_real_parallel_lanes(_exp_burst_task_acc, &A, ntasks, nw, cost);
         }
 
-        mp_real_div(res, num, den, wn + 2);
+        /* NUM = prod numw, DEN = prod denw over the lanes (skipping the unit ones), the
+           two trees on two threads */
+        nn = nd = 0;
+        for (k = 0; k < nw; k++)
+        {
+            if (!(numw[k].size == 1 && numw[k].d[0] == 1 && numw[k].exp == 1
+                && numw[k].err == 0))
+                mp_real_swap(nums + nn++, numw + k);
+            if (!(denw[k].size == 1 && denw[k].d[0] == 1 && denw[k].exp == 1
+                && denw[k].err == 0))
+                mp_real_swap(dens + nd++, denw + k);
+        }
+        P.num = num; P.den = den; P.nums = nums; P.dens = dens;
+        P.nn = nn; P.nd = nd; P.n = cap;
+        MP_REAL_PHASE_START(ph, "exp burst: product trees", wn);
+        if (nn >= 2 && nd >= 2 && flint_get_num_threads() >= 2)
+            _mp_real_parallel_pair(_exp_burst_prod_num, &P,
+                _exp_burst_prod_den, &P);
+        else
+        {
+            _exp_burst_prod_num(&P);
+            _exp_burst_prod_den(&P);
+        }
+        MP_REAL_PHASE_END(ph);
 
+        MP_REAL_PHASE_START(ph, "exp burst: final division", wn);
+        mp_real_div(res, num, den, wn + 2);
+        MP_REAL_PHASE_END(ph);
+
+        for (k = 0; k < 2 * nb + 4 * nw; k++)
+            mp_real_clear(f + k);
         mp_real_clear(num);
         mp_real_clear(den);
-        mp_real_clear(f);
-        mp_real_clear(fq);
+        flint_free(f);
     }
 }
 
