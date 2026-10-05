@@ -160,54 +160,41 @@ static const ulong _pow5_tab[DECIMAL_POW5_MAX_EXP + 1] = {
 #endif
 };
 
-/* Fast path for the scaled conversion: |m| fits in two limbs, 0 <= s and
-   the scaled integer fits in six limbs. Computes q = floor(|m| 5^s
-   2^(t+s)) with a sticky flag and rounds. Returns 0 if not applicable. */
-#define SMALL_LIMBS 6
+/* Fast path for the scaled conversion: |m| fits in SMALL_MN limbs, 0 <= s
+   (at most 12 DECIMAL_POW5_MAX_EXP) and the scaled integer fits in
+   SMALL_LIMBS limbs (a few hundred digits). Computes q = floor(|m| 5^s
+   2^(t+s)) with a sticky flag and rounds, using stack buffers. */
+#define SMALL_LIMBS 16
+#define SMALL_MN 8
 
-static int
-_decfloat_set_round_fmpz_2exp_small(decfloat_t res, const fmpz_t m, slong t, slong s, slong prec, int rnd,
-    decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
+/* Sets q (with room for SMALL_LIMBS + 1 limbs) to floor(m 5^s 2^(t+s))
+   where m = {mp, mn} with mn <= SMALL_MN and 0 <= s, and sticky to whether the
+   floor is inexact. Returns the length of q (0 if q = 0), or -1 if the
+   sizes are not small. */
+static slong
+_scaled_floor(nn_ptr q, int * sticky, nn_srcptr mp, slong mn, slong t, slong s)
 {
-    ulong q[SMALL_LIMBS + 1];
     slong qn, sh, bits, i, ss;
-    int negative, sticky, status;
-    fmpz sexp;
-    slong e = DECIMAL_CTX_E(ctx);
 
-    if (s < 0 || s > 4 * DECIMAL_POW5_MAX_EXP)
-        return 0;
+    if (s < 0 || s > 12 * DECIMAL_POW5_MAX_EXP || mn > SMALL_MN)
+        return -1;
 
-    negative = fmpz_sgn(m) < 0;
-
-    if (!COEFF_IS_MPZ(*m))
-    {
-        q[0] = FLINT_ABS(*m);
-        qn = 1;
-    }
-    else
-    {
-        __mpz_struct * mz = COEFF_TO_PTR(*m);
-        qn = FLINT_ABS(mz->_mp_size);
-        if (qn > 2)
-            return 0;
-        q[0] = mz->_mp_d[0];
-        q[1] = (qn == 2) ? mz->_mp_d[1] : 0;
-    }
+    flint_mpn_copyi(q, mp, mn);
+    qn = mn;
 
     /* q = |m| 5^s, in chunks of 5^DECIMAL_POW5_MAX_EXP */
     for (ss = s; ss > 0; )
     {
         slong c = FLINT_MIN(ss, DECIMAL_POW5_MAX_EXP);
         if (qn == SMALL_LIMBS)
-            return 0;
+            return -1;
         q[qn] = mpn_mul_1(q, q, qn, _pow5_tab[c]);
         qn += (q[qn] != 0);
         ss -= c;
     }
 
     sh = t + s;
-    sticky = 0;
+    *sticky = 0;
 
     if (sh > 0)
     {
@@ -215,7 +202,7 @@ _decfloat_set_round_fmpz_2exp_small(decfloat_t res, const fmpz_t m, slong t, slo
 
         bits = (qn - 1) * FLINT_BITS + FLINT_BIT_COUNT(q[qn - 1]);
         if (bits + sh > SMALL_LIMBS * FLINT_BITS)
-            return 0;
+            return -1;
 
         if (limbs > 0)
         {
@@ -236,9 +223,12 @@ _decfloat_set_round_fmpz_2exp_small(decfloat_t res, const fmpz_t m, slong t, slo
         slong limbs = (-sh) / FLINT_BITS, r = (-sh) % FLINT_BITS;
 
         if (limbs >= qn)
-            return 0;   /* q would be zero: bad exponent estimate */
+        {
+            *sticky = 1;
+            return 0;
+        }
         for (i = 0; i < limbs; i++)
-            sticky |= (q[i] != 0);
+            *sticky |= (q[i] != 0);
         if (limbs > 0)
         {
             for (i = 0; i < qn - limbs; i++)
@@ -247,44 +237,52 @@ _decfloat_set_round_fmpz_2exp_small(decfloat_t res, const fmpz_t m, slong t, slo
         }
         if (r > 0)
         {
-            sticky |= ((q[0] & ((UWORD(1) << r) - 1)) != 0);
+            *sticky |= ((q[0] & ((UWORD(1) << r) - 1)) != 0);
             mpn_rshift(q, q, qn, r);
             qn -= (q[qn - 1] == 0);
         }
-        if (qn == 0)
-            return 0;
     }
 
-    {
-        nn_ptr rd = radix_integer_fit_limbs(&res->m, radix_set_mpn_need_alloc(qn, DECIMAL_CTX_RADIX(ctx)) + 1, DECIMAL_CTX_RADIX(ctx));
-        slong rn = radix_set_mpn(rd, q, qn, DECIMAL_CTX_RADIX(ctx));
-        sexp = -s / e;
-        status = _decfloat_set_round_limbs(res, rd, rn, negative, &sexp, sticky, prec, rnd, info, err, ctx);
-    }
-
-    return (status == GR_SUCCESS) ? 1 : -1;
+    return qn;
 }
 
-/* Rounds x = m 2^t (m nonzero) to prec digits (prec != DECIMAL_PREC_EXACT),
-   using exact integer arithmetic on a scaled truncation of x when the sizes
-   are moderate. Returns 0 if the sizes are too large (the caller should
-   then use arb). */
+/* Rounds (q + sticky epsilon) 10^-s (q nonzero, s a multiple of e) to
+   res. Returns 1 on success and -1 on error. */
 static int
-_decfloat_set_round_fmpz_2exp_scaled_guard(decfloat_t res, const fmpz_t m, slong t, slong prec, int rnd,
-    slong guard, decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
+_round_scaled(decfloat_t res, nn_srcptr q, slong qn, int negative, int sticky, slong s, slong prec, int rnd,
+    decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
 {
-    slong e = DECIMAL_CTX_E(ctx);
-    slong p, n2, E0, s, sh, limit, size;
-    fmpz_t q, r, u, am;
-    fmpz sexp;
-    int negative, sticky, status;
+    nn_ptr rd = radix_integer_fit_limbs(&res->m, radix_set_mpn_need_alloc(qn, DECIMAL_CTX_RADIX(ctx)) + 1, DECIMAL_CTX_RADIX(ctx));
+    slong rn = radix_set_mpn(rd, q, qn, DECIMAL_CTX_RADIX(ctx));
+    fmpz sexp = -s / (slong) DECIMAL_CTX_E(ctx);
+    return (_decfloat_set_round_limbs(res, rd, rn, negative, &sexp, sticky, prec, rnd, info, err, ctx) == GR_SUCCESS) ? 1 : -1;
+}
 
-    limit = DECIMAL_EXACT_CONV_LIMIT(prec);
-    p = fmpz_bits(m);
-    negative = fmpz_sgn(m) < 0;
+static int
+_decfloat_set_round_mpn_2exp_small(decfloat_t res, nn_srcptr mp, slong mn, int negative, slong t, slong s, slong prec, int rnd,
+    decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
+{
+    ulong q[SMALL_LIMBS + 1];
+    slong qn;
+    int sticky;
 
-    if (FLINT_ABS(t) > limit)
+    qn = _scaled_floor(q, &sticky, mp, mn, t, s);
+
+    /* q = 0: bad exponent estimate */
+    if (qn <= 0)
         return 0;
+
+    return _round_scaled(res, q, qn, negative, sticky, s, prec, rnd, info, err, ctx);
+}
+
+/* Scaling for the conversion of x = m 2^t with p = bits(m) to prec +
+   guard digits: sets s (a multiple of e) so that x 10^s has at least
+   prec + guard digits (or is an integer), and returns the size in bits
+   of the exact computation. */
+static slong
+_scaled_params(slong * sp, slong p, slong t, slong prec, slong guard, slong e)
+{
+    slong n2, E0, s;
 
     /* digits to compute: prec plus guard digits, so that the sticky bit
        falls well below the rounding position and the rounding error
@@ -311,14 +309,50 @@ _decfloat_set_round_fmpz_2exp_scaled_guard(decfloat_t res, const fmpz_t m, slong
             s = s_exact;
     }
 
+    *sp = s;
+
     /* size of the exact computation */
-    size = p + (slong) (2.33 * FLINT_ABS(s)) + FLINT_MAX(t + s, 0);
+    return p + (slong) (2.33 * FLINT_ABS(s)) + FLINT_MAX(t + s, 0);
+}
+
+/* Rounds x = m 2^t (m nonzero) to prec digits (prec != DECIMAL_PREC_EXACT),
+   using exact integer arithmetic on a scaled truncation of x when the sizes
+   are moderate. Returns 0 if the sizes are too large (the caller should
+   then use arb). */
+static int
+_decfloat_set_round_fmpz_2exp_scaled_guard(decfloat_t res, const fmpz_t m, slong t, slong prec, int rnd,
+    slong guard, decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
+{
+    slong e = DECIMAL_CTX_E(ctx);
+    slong p, s, sh, limit, size;
+    fmpz_t q, r, u, am;
+    fmpz sexp;
+    int negative, sticky, status;
+
+    limit = DECIMAL_EXACT_CONV_LIMIT(prec);
+    p = fmpz_bits(m);
+    negative = fmpz_sgn(m) < 0;
+
+    if (FLINT_ABS(t) > limit)
+        return 0;
+
+    size = _scaled_params(&s, p, t, prec, guard, e);
     if (size > limit)
         return 0;
 
-    if (size <= SMALL_LIMBS * FLINT_BITS - 2)
+    if (size <= SMALL_LIMBS * FLINT_BITS - 2 && fmpz_size(m) <= 2)
     {
-        int r = _decfloat_set_round_fmpz_2exp_small(res, m, t, s, prec, rnd, info, err, ctx);
+        int r;
+        if (!COEFF_IS_MPZ(*m))
+        {
+            ulong m0 = FLINT_ABS(*m);
+            r = _decfloat_set_round_mpn_2exp_small(res, &m0, 1, negative, t, s, prec, rnd, info, err, ctx);
+        }
+        else
+        {
+            __mpz_struct * mz = COEFF_TO_PTR(*m);
+            r = _decfloat_set_round_mpn_2exp_small(res, mz->_mp_d, FLINT_ABS(mz->_mp_size), negative, t, s, prec, rnd, info, err, ctx);
+        }
         if (r != 0)
             return r;
     }
@@ -620,6 +654,147 @@ decfloat_set_fmpq(decfloat_t res, const fmpq_t x, gr_ctx_t ctx)
     return decfloat_set_round_fmpq(res, x, DECIMAL_CTX_PREC(ctx), DECIMAL_CTX_RND(ctx), ctx);
 }
 
+/* Fast path for rounding a finite nonzero arf x with a short mantissa
+   and a moderate exponent to prec != DECIMAL_PREC_EXACT digits (without
+   an error bound). Returns 1 on success, -1 on error and 0 if not
+   applicable. */
+int
+_decfloat_set_round_arf_small(decfloat_t res, const arf_t x, slong prec, int rnd, decimal_rounding_info * info, gr_ctx_t ctx)
+{
+    nn_srcptr xp;
+    slong xn, t, s, size;
+
+    if (ARF_SIZE(x) > SMALL_MN || arf_is_special(x) || COEFF_IS_MPZ(ARF_EXP(x))
+        || FLINT_ABS(ARF_EXP(x)) >= (WORD(1) << 20))
+        return 0;
+
+    ARF_GET_MPN_READONLY(xp, xn, x);
+    t = ARF_EXP(x) - xn * FLINT_BITS;
+    /* no error bound is needed, so two guard digits suffice */
+    size = _scaled_params(&s, xn * FLINT_BITS, t, prec, 2, DECIMAL_CTX_E(ctx));
+
+    if (size > SMALL_LIMBS * FLINT_BITS - 2)
+        return 0;
+
+    return _decfloat_set_round_mpn_2exp_small(res, xp, xn, ARF_SGNBIT(x), t, s, prec, rnd, info, NULL, ctx);
+}
+
+/* Rounds the ball [mid +/- rad] (mid nonzero, rad nonzero, both with
+   small exponents and a short mid) to prec digits using a
+   single scaled integer conversion: with Q = floor(|mid| 10^s) and
+   R = ceil(rad 10^s), |x| 10^s lies in [Q - R, Q + R + 1], where s is
+   chosen as described below. Returns 1
+   if both ends round to the same value (set in res), 0 if undecided
+   and -2 if not applicable. */
+int
+_decfloat_round_arb_small(decfloat_t res, const arf_t mid, const mag_t rad, slong prec, int rnd, gr_ctx_t ctx)
+{
+    ulong Q[SMALL_LIMBS + 2], R[SMALL_LIMBS + 2], m;
+    nn_srcptr xp;
+    slong xn, t, s, size, qn, rn, d, guard;
+    int sq, sr, r1, r2, negative;
+    decfloat_t rh;
+
+    if (ARF_SIZE(mid) > SMALL_MN || COEFF_IS_MPZ(ARF_EXP(mid)) || COEFF_IS_MPZ(MAG_EXP(rad))
+        || FLINT_ABS(ARF_EXP(mid)) >= (WORD(1) << 20) || FLINT_ABS(MAG_EXP(rad)) >= (WORD(1) << 20))
+        return -2;
+
+    d = ARF_EXP(mid) - MAG_EXP(rad);
+    if (d < 8)
+        return -2;
+
+    ARF_GET_MPN_READONLY(xp, xn, mid);
+    negative = ARF_SGNBIT(mid);
+    t = ARF_EXP(mid) - xn * FLINT_BITS;
+
+    /* Scale by 10^s (s a multiple of e) so that the unit is comparable
+       to rad (about d log10(2) digits relative to mid; this resolution
+       is not limited by the exactness of mid), rounding s down to a
+       multiple of e when that leaves at least prec + 8 digits: the
+       widening by a few units only slightly increases the chance of an
+       undecided result, while the sizes stay small. */
+    {
+        slong e = DECIMAL_CTX_E(ctx), E0, st;
+
+        guard = FLINT_MAX((slong) (d * 0.30102999566398119521) - prec, 2);
+        /* 10^E0 <= |mid| < 10^(E0+2) */
+        E0 = (slong) floor((double) (ARF_EXP(mid) - 1) * 0.30102999566398119521);
+        st = prec + guard - 1 - E0;
+        s = (st >= 0) ? e * (st / e) : -e * ((-st + e - 1) / e);
+        if (E0 + s + 1 < prec + 8)
+            s += e;
+        size = xn * FLINT_BITS + (slong) (2.33 * FLINT_ABS(s)) + FLINT_MAX(t + s, 0);
+        if (s < 0 || size > SMALL_LIMBS * FLINT_BITS - 2)
+            return -2;
+    }
+
+    qn = _scaled_floor(Q, &sq, xp, xn, t, s);
+    if (qn <= 0)
+        return -2;
+
+    m = MAG_MAN(rad);
+    rn = _scaled_floor(R, &sr, &m, 1, MAG_EXP(rad) - MAG_BITS, s);
+    if (rn < 0 || rn > qn)
+        return (rn < 0) ? -2 : 0;
+
+    /* R = ceil(rad 10^s) + 1 when mid 10^s was inexact, so that
+       C = Q + R bounds |x| 10^s from above */
+    R[rn] = 0;
+    if (sr + sq != 0)
+    {
+        if (rn == 0)
+        {
+            R[0] = sr + sq;
+            rn = 1;
+        }
+        else
+        {
+            R[rn] = mpn_add_1(R, R, rn, sr + sq);
+            rn += (R[rn] != 0);
+        }
+    }
+
+    /* A = Q - ceil(rad 10^s) <= |x| 10^s */
+    {
+        ulong A[SMALL_LIMBS + 2], C[SMALL_LIMBS + 2];
+        slong an, cn;
+
+        flint_mpn_copyi(C, Q, qn);
+        C[qn] = (rn == 0) ? 0 : mpn_add(C, C, qn, R, rn);
+        cn = qn + (C[qn] != 0);
+
+        /* undo the inexactness unit of mid for the lower end */
+        if (sq != 0)
+        {
+            if (rn == 0 || mpn_sub_1(R, R, rn, 1))
+                return -2;
+            while (rn > 0 && R[rn - 1] == 0)
+                rn--;
+        }
+
+        if (rn > qn || (rn == qn && mpn_cmp(Q, R, qn) <= 0))
+            return 0;   /* the interval reaches zero */
+
+        flint_mpn_copyi(A, Q, qn);
+        if (rn != 0)
+            mpn_sub(A, A, qn, R, rn);
+        an = qn;
+        while (A[an - 1] == 0)
+            an--;
+
+        r1 = _round_scaled(res, A, an, negative, 0, s, prec, rnd, NULL, NULL, ctx);
+        if (r1 != 1)
+            return 0;
+
+        decfloat_init(rh, ctx);
+        r2 = _round_scaled(rh, C, cn, negative, 0, s, prec, rnd, NULL, NULL, ctx);
+        r1 = (r2 == 1) && (decfloat_equal(res, rh, ctx) == T_TRUE);
+        decfloat_clear(rh, ctx);
+    }
+
+    return r1;
+}
+
 int
 decfloat_set_round_arf(decfloat_t res, const arf_t x, slong prec, int rnd, gr_ctx_t ctx)
 {
@@ -635,6 +810,13 @@ decfloat_set_round_arf(decfloat_t res, const arf_t x, slong prec, int rnd, gr_ct
         if (arf_is_neg_inf(x))
             return decfloat_neg_inf(res, ctx);
         return decfloat_nan(res, ctx);
+    }
+
+    if (prec != DECIMAL_PREC_EXACT)
+    {
+        int r = _decfloat_set_round_arf_small(res, x, prec, rnd, NULL, ctx);
+        if (r != 0)
+            return (r == 1) ? GR_SUCCESS : GR_UNABLE;
     }
 
     fmpz_init(m);
@@ -866,6 +1048,8 @@ _decfloat_maybe_dyadic(const decfloat_t x, gr_ctx_t ctx)
 
     k = COEFF_IS_MPZ(x->exp) ? e : FLINT_MIN(e, -x->exp * e);
     d = x->m.d[0];
+    if (k <= DECIMAL_POW5_MAX_EXP)
+        return (d % _pow5_tab[k]) == 0;
     for (j = 0, p = 1; j < k; j++)
         p *= 5;
     return (d % p) == 0;

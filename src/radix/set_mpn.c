@@ -97,6 +97,22 @@ flint_mpn_slice_bits(nn_ptr res, nn_srcptr x, mp_bitcnt_t start, mp_bitcnt_t sto
         res[res_limbs - 1] &= ((UWORD(1) << rem) - 1);
 }
 
+/* q, r = (hi B^FLINT_BITS + lo) divrem B, assuming hi < B */
+static inline void
+_radix_divrem_B(ulong * q, ulong * r, ulong hi, ulong lo, const radix_t radix)
+{
+    ulong norm = radix->B.norm;
+
+    if (norm != 0)
+    {
+        hi = (hi << norm) | (lo >> (FLINT_BITS - norm));
+        lo <<= norm;
+    }
+
+    udiv_qrnnd_preinv(*q, *r, hi, lo, radix->B.n << norm, radix->B.ninv);
+    *r >>= norm;
+}
+
 slong
 radix_set_mpn_basecase(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 {
@@ -115,6 +131,30 @@ radix_set_mpn_basecase(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     {
         res[0] = a[0];
         return 1;
+    }
+
+    /* one or two limbs and a large limb radix (B^3 > 2^(2 FLINT_BITS)):
+       at most three digits, by 2-by-1 divisions */
+    if (an <= 2 && FLINT_BIT_COUNT(B) > (2 * FLINT_BITS) / 3 + 1)
+    {
+        ulong a1 = (an == 2) ? a[1] : 0, a0 = a[0], q1 = 0, q0, q2, r;
+
+        if (a1 >= B)
+            _radix_divrem_B(&q1, &a1, 0, a1, radix);
+        _radix_divrem_B(&q0, &r, a1, a0, radix);
+        res[0] = r;
+
+        /* the quotient is q1 2^FLINT_BITS + q0, with q1 < B */
+        if (q1 == 0 && q0 < B)
+        {
+            res[1] = q0;
+            return 2;
+        }
+
+        _radix_divrem_B(&q2, &r, q1, q0, radix);
+        res[1] = r;
+        res[2] = q2;
+        return (q2 != 0) ? 3 : 2;
     }
 
     TMP_START;

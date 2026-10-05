@@ -69,6 +69,50 @@ decfloat_get_arb(arb_t res, const decfloat_t x, slong prec_bits, gr_ctx_t ctx)
 
     n = FLINT_ABS(x->m.size);
 
+    /* fast path for short numbers with a fractional part of at most two
+       limbs which are not dyadic rationals (so the result is inexact):
+       x = M B^-k with M < B^2 and k in {1, 2}. We compute
+       q = floor(M 2^(L FLINT_BITS) / B^k) by single-limb divisions, with
+       enough bits that its truncation to prec_bits bits is that of x;
+       the result is the same as for the general path below. */
+    if (n <= 2 && !COEFF_IS_MPZ(x->exp) && (x->exp == -1 || x->exp == -2)
+        && prec_bits <= 4 * FLINT_BITS - 2 && !_decfloat_maybe_dyadic(x, ctx))
+    {
+        const radix_struct * radix = DECIMAL_CTX_RADIX(ctx);
+        ulong X[8];
+        slong i, k = -x->exp, L, xn;
+
+        L = k + (prec_bits + 2 + FLINT_BITS - 1) / FLINT_BITS;
+        for (i = 0; i < L; i++)
+            X[i] = 0;
+        if (n == 1)
+        {
+            X[L] = x->m.d[0];
+            xn = L + 1;
+        }
+        else
+        {
+            umul_ppmm(X[L + 1], X[L], x->m.d[1], LIMB_RADIX(radix));
+            add_ssaaaa(X[L + 1], X[L], X[L + 1], X[L], 0, x->m.d[0]);
+            xn = L + 1 + (X[L + 1] != 0);
+        }
+
+        for (i = 0; i < k; i++)
+        {
+            flint_mpn_divrem_1_preinv(X, X, xn, radix->B.n, radix->B.ninv, radix->B.norm);
+            xn -= (X[xn - 1] == 0);
+        }
+
+        {
+            slong fix;
+            _arf_set_round_mpn(arb_midref(res), &fix, X, xn, x->m.size < 0, prec_bits, ARF_RND_DOWN);
+            _fmpz_demote(ARF_EXPREF(arb_midref(res)));
+            ARF_EXP(arb_midref(res)) = (xn - L) * FLINT_BITS + fix;
+        }
+        mag_set_ui_2exp_si(arb_radref(res), 1, ARF_EXP(arb_midref(res)) - prec_bits);
+        return GR_SUCCESS;
+    }
+
     /* size of the exact binary representation of M 10^t, in bits */
     if (COEFF_IS_MPZ(x->exp) || FLINT_ABS(x->exp) > WORD_MAX / (4 * e) - n)
         T = WORD_MAX / 4;
@@ -424,6 +468,20 @@ decball_set_arb(decball_t res, const arb_t x, gr_ctx_t ctx)
 
     if (arf_is_zero(arb_midref(x)) || prec == DECIMAL_PREC_EXACT)
         return _decball_set_arb_direct(res, x, ctx);
+
+    /* fast path: short midpoint, no precise radius */
+    if (!DECIMAL_CTX_PRECISE_RADIUS(ctx))
+    {
+        r = _decfloat_set_round_arf_small(&res->mid, arb_midref(x), prec, DECIMAL_CTX_RND(ctx), &info, ctx);
+        if (r == 1)
+        {
+            _decmag_set_mag(&res->rad, arb_radref(x), ctx);
+            _decball_add_rounding_error(res, &info, NULL, prec, ctx);
+            return GR_SUCCESS;
+        }
+        if (r == -1)
+            return GR_UNABLE;
+    }
 
     fmpz_init(m);
     fmpz_init(t);
@@ -887,6 +945,103 @@ _decfloat_round_ball(decfloat_t res, const decball_t Y, slong prec, int rnd, gr_
     decfloat_clear(r, ctx);
     decfloat_clear(rl, ctx);
     decfloat_clear(rh, ctx);
+    return ok;
+}
+
+/* Rounding of an arb ball via a decimal ball (general sizes). */
+static int
+_decfloat_round_arb_via_ball(decfloat_t res, const arb_t x, slong prec, int rnd, gr_ctx_t ctx)
+{
+    gr_ctx_t bctx;
+    decball_t Y;
+    slong wp;
+    int rr;
+
+    wp = FLINT_MAX(prec, (slong) (arf_bits(arb_midref(x)) * 0.30103)) + 10;
+    _gr_ctx_init_decimal(bctx, DECIMAL_CTX_BALL, DECIMAL_CTX_E(ctx), wp, DECIMAL_RND_DOWN, 0);
+    decimal_ctx_set_rad_prec(bctx, DECMAG_MAX_PREC);
+    decball_init(Y, bctx);
+
+    if (decball_set_arb(Y, x, bctx) != GR_SUCCESS)
+        rr = -1;
+    else
+        rr = _decfloat_round_ball(res, Y, prec, rnd, bctx, ctx);
+
+    decball_clear(Y, bctx);
+    gr_ctx_clear(bctx);
+    return rr;
+}
+
+/* Given an arb ball x, attempts to round to prec digits: returns 1 if
+   both endpoints round to the same value (set in res), 0 if undecided
+   and -1 on error. Short balls are handled directly with the binary
+   endpoints, without a ball context. */
+int
+_decfloat_round_arb(decfloat_t res, const arb_t x, slong prec, int rnd, gr_ctx_t ctx)
+{
+    arf_t lo, hi;
+    decfloat_t rh;
+    slong bits;
+    int r1, r2, ok;
+
+    if (!arb_is_finite(x))
+    {
+        if (arf_is_pos_inf(arb_midref(x)) && mag_is_finite(arb_radref(x)))
+            return (decfloat_pos_inf(res, ctx) == GR_SUCCESS) ? 1 : -1;
+        if (arf_is_neg_inf(arb_midref(x)) && mag_is_finite(arb_radref(x)))
+            return (decfloat_neg_inf(res, ctx) == GR_SUCCESS) ? 1 : -1;
+        return 0;
+    }
+
+    if (mag_is_zero(arb_radref(x)) && !arf_is_zero(arb_midref(x)))
+    {
+        r1 = _decfloat_set_round_arf_small(res, arb_midref(x), prec, rnd, NULL, ctx);
+        if (r1 != 0)
+            return r1;
+    }
+
+    if (arf_is_zero(arb_midref(x)) || mag_is_zero(arb_radref(x)) ||
+        COEFF_IS_MPZ(ARF_EXP(arb_midref(x))) || COEFF_IS_MPZ(MAG_EXP(arb_radref(x))))
+        return _decfloat_round_arb_via_ball(res, x, prec, rnd, ctx);
+
+    /* short balls: a single scaled conversion */
+    r1 = _decfloat_round_arb_small(res, arb_midref(x), arb_radref(x), prec, rnd, ctx);
+    if (r1 != -2)
+        return r1;
+
+    /* outward rounded endpoints: rounding is monotone, so equal
+       roundings of these imply the same rounding for all of x; the
+       widening is at most about rad / 256 */
+    bits = ARF_EXP(arb_midref(x)) - MAG_EXP(arb_radref(x));
+    bits = FLINT_MAX(bits, 0) + 10;
+
+    /* the fast path below only handles short endpoints */
+    if (bits > 8 * FLINT_BITS)
+        return _decfloat_round_arb_via_ball(res, x, prec, rnd, ctx);
+
+    arf_init(lo);
+    arf_init(hi);
+    decfloat_init(rh, ctx);
+    arb_get_lbound_arf(lo, x, bits);
+    arb_get_ubound_arf(hi, x, bits);
+
+    r1 = arf_is_zero(lo) ? 0 : _decfloat_set_round_arf_small(res, lo, prec, rnd, NULL, ctx);
+    r2 = (r1 != 1 || arf_is_zero(hi)) ? 0 : _decfloat_set_round_arf_small(rh, hi, prec, rnd, NULL, ctx);
+
+    if (r1 == 1 && r2 == 1)
+        ok = (decfloat_equal(res, rh, ctx) == T_TRUE);
+    else if (r1 == -1 || r2 == -1)
+        ok = 0;
+    else
+        ok = -2;
+
+    arf_clear(lo);
+    arf_clear(hi);
+    decfloat_clear(rh, ctx);
+
+    if (ok == -2)
+        return _decfloat_round_arb_via_ball(res, x, prec, rnd, ctx);
+
     return ok;
 }
 

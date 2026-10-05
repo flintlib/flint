@@ -905,6 +905,49 @@ _decmag_set_ui_2exp_exact(decmag_t res, ulong m, slong k, gr_ctx_t ctx)
         return;
     }
 
+    /* the same with 5^s in two factors (typical radii of balls computed
+       to a few dozen digits): m 5^s < 2^156 in three limbs, shifted
+       right to a single word */
+    if (s > 27 && s <= 54 && m < (UWORD(1) << 30) && k + s < 0)
+    {
+        ulong q[3], qq;
+        slong limbs, r, i;
+
+        umul_ppmm(q[1], q[0], m, _pow5_tab[27]);
+        q[2] = mpn_mul_1(q, q, 2, _pow5_tab[s - 27]);
+
+        sh = -(k + s);
+        limbs = sh / FLINT_BITS;
+        r = sh % FLINT_BITS;
+        if (limbs > 2)
+            goto generic;
+
+        for (i = 0; i < limbs; i++)
+            sticky |= (q[i] != 0);
+        if (r != 0)
+            sticky |= ((q[limbs] & ((UWORD(1) << r) - 1)) != 0);
+
+        if (limbs + 1 < 3 && r != 0)
+        {
+            if ((q[limbs + 1] >> r) != 0 || (limbs + 2 < 3 && q[limbs + 2] != 0))
+                goto generic;
+            qq = (q[limbs] >> r) | (q[limbs + 1] << (FLINT_BITS - r));
+        }
+        else
+        {
+            for (i = limbs + 1; i < 3; i++)
+                if (q[i] != 0)
+                    goto generic;
+            qq = (r != 0) ? (q[limbs] >> r) : q[limbs];
+        }
+
+        if (qq == 0)
+            goto generic;
+        sexp = -s;
+        _decmag_set_uiui_10exp_fmpz(res, 0, qq, 10, sticky, &sexp, ctx);
+        return;
+    }
+
 generic:
 #endif
 

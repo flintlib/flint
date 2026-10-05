@@ -20,6 +20,161 @@ TEST_FUNCTION_START(decimal_via_arb, state)
 {
     slong iter;
 
+    /* rounding of arb balls: a decided result is the rounding of both
+       exact endpoints, and narrow balls are decided */
+    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t ctx;
+        decfloat_t r, u;
+        arb_t x;
+        arf_t lo, hi;
+        slong prec, bits;
+        int res, rnd;
+
+        gr_ctx_init_decfloat_randtest(ctx, state, 40);
+        decimal_ctx_set_exp_limits(ctx, WORD_MIN, WORD_MAX);
+        prec = DECIMAL_CTX_PREC(ctx);
+        if (prec == DECIMAL_PREC_EXACT)
+            prec = 1 + n_randint(state, 40);
+        rnd = DECIMAL_CTX_RND(ctx);
+        decfloat_init(r, ctx);
+        decfloat_init(u, ctx);
+        arb_init(x);
+        arf_init(lo);
+        arf_init(hi);
+
+        bits = 2 + n_randint(state, n_randint(state, 2) ? 130 : 700);
+        arf_randtest(arb_midref(x), state, bits, 1 + n_randint(state, 12));
+        if (n_randint(state, 4) == 0)
+        {
+            /* near a decimal number with prec digits */
+            decfloat_t c;
+            decfloat_init(c, ctx);
+            GR_IGNORE(decfloat_set_round_arf(c, arb_midref(x), prec, DECIMAL_RND_NEAR | DECIMAL_RND_NOLIMITS, ctx));
+            GR_IGNORE(decfloat_get_arf(arb_midref(x), c, bits, ARF_RND_NEAR, ctx));
+            decfloat_clear(c, ctx);
+        }
+        if (!arf_is_zero(arb_midref(x)))
+            mag_set_ui_2exp_si(arb_radref(x), 1 + n_randint(state, 1000),
+                ARF_EXP(arb_midref(x)) - 10 - (slong) n_randint(state, 400));
+
+        res = _decfloat_round_arb(r, x, prec, rnd, ctx);
+
+        if (res == 1 && arb_is_finite(x))
+        {
+            arb_get_lbound_arf(lo, x, ARF_PREC_EXACT);
+            arb_get_ubound_arf(hi, x, ARF_PREC_EXACT);
+            GR_MUST_SUCCEED(decfloat_set_round_arf(u, lo, prec, rnd, ctx));
+            if (decfloat_equal(r, u, ctx) != T_TRUE)
+                res = -10;
+            GR_MUST_SUCCEED(decfloat_set_round_arf(u, hi, prec, rnd, ctx));
+            if (decfloat_equal(r, u, ctx) != T_TRUE)
+                res = -10;
+        }
+        else if (res == 0 && arb_is_finite(x) && !arf_is_zero(arb_midref(x))
+            && arb_rel_accuracy_bits(x) > _decimal_digits_to_bits(prec) + 40)
+        {
+            /* decidable unless an endpoint is very close to a boundary */
+            arb_get_lbound_arf(lo, x, ARF_PREC_EXACT);
+            arb_get_ubound_arf(hi, x, ARF_PREC_EXACT);
+            GR_MUST_SUCCEED(decfloat_set_round_arf(r, lo, prec, rnd, ctx));
+            GR_MUST_SUCCEED(decfloat_set_round_arf(u, hi, prec, rnd, ctx));
+            if (decfloat_equal(r, u, ctx) == T_TRUE)
+            {
+                arb_t y;
+                mag_t w;
+                arb_init(y);
+                mag_init(w);
+                arb_set(y, x);
+                /* the fast path may widen the ball by a few units of
+                   about prec + 8 digits */
+                mag_mul_2exp_si(arb_radref(y), arb_radref(y), 8);
+                arf_get_mag(w, arb_midref(x));
+                mag_mul_2exp_si(w, w, -((slong) (prec * 3.3219280948873623) + 20));
+                mag_max(arb_radref(y), arb_radref(y), w);
+                mag_clear(w);
+                arb_get_lbound_arf(lo, y, ARF_PREC_EXACT);
+                arb_get_ubound_arf(hi, y, ARF_PREC_EXACT);
+                GR_MUST_SUCCEED(decfloat_set_round_arf(r, lo, prec, rnd, ctx));
+                GR_MUST_SUCCEED(decfloat_set_round_arf(u, hi, prec, rnd, ctx));
+                /* still decided with a wider ball: x is not a hard case */
+                if (decfloat_equal(r, u, ctx) == T_TRUE)
+                    res = -11;
+                arb_clear(y);
+            }
+        }
+
+        if (res < -1)
+        {
+            flint_printf("FAIL: round_arb (%d)\n", res);
+            gr_ctx_println(ctx);
+            flint_printf("prec = %wd, x = %{arb}\n", prec, x);
+            arb_printd(x, 200); flint_printf("\n");
+            flint_abort();
+        }
+
+        decfloat_clear(r, ctx);
+        decfloat_clear(u, ctx);
+        arb_clear(x);
+        arf_clear(lo);
+        arf_clear(hi);
+        gr_ctx_clear(ctx);
+    }
+
+    /* get_arb of short numbers (fast path) agrees with the truncation
+       to prec_bits bits and a radius of one ulp */
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t ctx;
+        decfloat_t x;
+        arb_t a;
+        arf_t m;
+        fmpz_t M, E;
+        slong pb, e;
+
+        gr_ctx_init_decfloat_randtest(ctx, state, 40);
+        decimal_ctx_set_exp_limits(ctx, WORD_MIN, WORD_MAX);
+        e = DECIMAL_CTX_E(ctx);
+        decfloat_init(x, ctx);
+        arb_init(a);
+        arf_init(m);
+        fmpz_init(M);
+        fmpz_init(E);
+
+        fmpz_ui_pow_ui(M, 10, 1 + n_randint(state, 2 * e));
+        fmpz_randm(M, state, M);
+        if (n_randint(state, 2))
+            fmpz_neg(M, M);
+        fmpz_set_si(E, -(slong) n_randint(state, 2 * e + 2));
+        GR_MUST_SUCCEED(decfloat_set_round_fmpz_10exp_fmpz(x, M, E, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN, ctx));
+        pb = 2 + n_randint(state, 300);
+
+        GR_MUST_SUCCEED(decfloat_get_arb(a, x, pb, ctx));
+
+        if (!DECFLOAT_IS_SPECIAL(x) && !_decfloat_maybe_dyadic(x, ctx))
+        {
+            mag_t r;
+            mag_init(r);
+            GR_MUST_SUCCEED(decfloat_get_arf(m, x, pb, ARF_RND_DOWN, ctx));
+            mag_set_ui_2exp_si(r, 1, ARF_EXP(m) - pb);
+            if (!arf_equal(m, arb_midref(a)) || !mag_equal(r, arb_radref(a)))
+            {
+                flint_printf("FAIL: get_arb (short)\n");
+                gr_ctx_println(ctx);
+                flint_printf("x = %{gr}, pb = %wd\na = %{arb}\nm = %{arf}\n", x, ctx, pb, a, m);
+                flint_abort();
+            }
+            mag_clear(r);
+        }
+
+        decfloat_clear(x, ctx);
+        arb_clear(a);
+        arf_clear(m);
+        fmpz_clear(M);
+        fmpz_clear(E);
+        gr_ctx_clear(ctx);
+    }
+
     /* ball <-> arb conversions are rigorous */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {

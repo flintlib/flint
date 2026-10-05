@@ -149,11 +149,10 @@ _decfloat_arb_gr_extra(decfloat_ptr * res, slong nres, decfloat_srcptr * args, s
 {
     slong prec = DECIMAL_CTX_PREC(ctx);
     int rnd = DECIMAL_CTX_RND(ctx);
-    gr_ctx_t actx, bctx;
+    gr_ctx_t actx;
     arb_struct a[MAX_ARGS], r[MAX_RES];
     arb_ptr rp[MAX_RES];
     arb_srcptr asp[MAX_ARGS];
-    decball_t Y;
     decfloat_struct tmp[MAX_RES];
     slong i, wp, wpbits, wp_max;
     int status = GR_UNABLE, rr;
@@ -174,10 +173,6 @@ _decfloat_arb_gr_extra(decfloat_ptr * res, slong nres, decfloat_srcptr * args, s
 
     if (_decimal_arb_args_infeasible(method, args, NULL, nargs, prec, ctx))
         return GR_UNABLE;
-
-    _gr_ctx_init_decimal(bctx, DECIMAL_CTX_BALL, DECIMAL_CTX_E(ctx), prec, DECIMAL_RND_DOWN, 0);
-    decimal_ctx_set_rad_prec(bctx, DECMAG_MAX_PREC);
-    decball_init(Y, bctx);
 
     for (i = 0; i < nargs; i++)
     {
@@ -200,7 +195,6 @@ _decfloat_arb_gr_extra(decfloat_ptr * res, slong nres, decfloat_srcptr * args, s
     for (wp = prec + 10; wp <= wp_max; wp *= 2)
     {
         wpbits = _decimal_digits_to_bits(wp);
-        decimal_ctx_set_prec(bctx, wp);
         gr_ctx_init_real_arb(actx, wpbits);
 
         status = GR_SUCCESS;
@@ -224,25 +218,8 @@ _decfloat_arb_gr_extra(decfloat_ptr * res, slong nres, decfloat_srcptr * args, s
         rr = 1;
         for (i = 0; i < nres && rr == 1; i++)
         {
-            if (!arb_is_finite(r + i))
-            {
-                if (arf_is_pos_inf(arb_midref(r + i)) && mag_is_finite(arb_radref(r + i)))
-                    rr = (decfloat_pos_inf(tmp + i, ctx) == GR_SUCCESS) ? 1 : -1;
-                else if (arf_is_neg_inf(arb_midref(r + i)) && mag_is_finite(arb_radref(r + i)))
-                    rr = (decfloat_neg_inf(tmp + i, ctx) == GR_SUCCESS) ? 1 : -1;
-                else
-                    rr = 0;   /* intermediate overflow: try again */
-                continue;
-            }
-
-            if (decball_set_arb(Y, r + i, bctx) != GR_SUCCESS)
-            {
-                rr = -1;
-                break;
-            }
-
-            rr = _decfloat_round_ball(tmp + i, Y, prec, rnd, bctx, ctx);
-            if (rr == 1)
+            rr = _decfloat_round_arb(tmp + i, r + i, prec, rnd, ctx);
+            if (rr == 1 && arb_is_finite(r + i))
                 rr = (_decfloat_finalize(tmp + i, ctx) == GR_SUCCESS) ? 1 : -1;
         }
 
@@ -266,8 +243,6 @@ _decfloat_arb_gr_extra(decfloat_ptr * res, slong nres, decfloat_srcptr * args, s
         arb_clear(r + i);
         decfloat_clear(tmp + i, ctx);
     }
-    decball_clear(Y, bctx);
-    gr_ctx_clear(bctx);
     return status;
 }
 
