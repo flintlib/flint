@@ -56,9 +56,22 @@ _nmod_mat_addmul_transpose_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstrid
 
     tmp = flint_malloc(sizeof(ulong) * k * n);
 
-    for (i = 0; i < k; i++)
-        for (j = 0; j < n; j++)
-            tmp[j*k + i] = B[i * Bstride + j];
+    /* transpose B by blocks of 16 x 16, so that neither the reads nor the
+       writes stride through more lines than the caches hold */
+    /* TODO improve nmod_mat_transpose and use here? */
+    for (i = 0; i < k; i += 16)
+    {
+        slong ii, jj, ie = FLINT_MIN(i + 16, k);
+
+        for (j = 0; j < n; j += 16)
+        {
+            slong je = FLINT_MIN(j + 16, n);
+
+            for (ii = i; ii < ie; ii++)
+                for (jj = j; jj < je; jj++)
+                    tmp[jj*k + ii] = B[ii * Bstride + jj];
+        }
+    }
 
     for (i = 0; i < m; i++)
     {
@@ -173,6 +186,9 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
+    if (m == 0 || n == 0)
+        return;
+
     if (k == 0 || mod.n == 1)  // covers params.method == _DOT0
     {
         if (op == 0)
@@ -192,9 +208,15 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
             (op == 0) ? 0 : C->stride,
             A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod);
     }
-    else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
-        || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
-        || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
+    /*
+        few rows (or a small inner dimension), or few columns:
+        use transpose + nmod_vec_dot to benefit from contiguous dot products
+        (vectorized for most moduli), instead of the basic code with many cache
+        misses (it reads the columns of B with stride n)
+    */
+    else if (k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
+        || (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
+            && !(m >= 4 && k >= 256) && !(m >= 2 && k >= 1000)))
     {
         _nmod_mat_addmul_basic_op(D->entries, D->stride,
             (op == 0) ? NULL : C->entries,

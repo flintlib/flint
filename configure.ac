@@ -587,6 +587,10 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         gcc_cflags_arch="-march=meteorlake -march=alderlake"
         param_path="x86_64/meteorlake"
         ;;
+      arrowlake)
+        gcc_cflags_arch="-march=arrowlake -march=meteorlake -march=alderlake"
+        param_path="x86_64/arrowlake"
+        ;;
       sapphirerapids)
         gcc_cflags_arch="-march=sapphirerapids"; param_path="x86_64/sapphirerapids"
         have_avx512="yes";;

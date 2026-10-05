@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Albin Ahlbäck
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -9,35 +9,34 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Tuning for generic CPU. Is probably far from optimal. */
+/* Arrow Lake H / S, Lunar Lake and Panther Lake (Lion Cove / Cougar Cove
+   cores). The nmod_mat_mul and nmod_vec_dot parameters were measured on an
+   Intel(R) Core(TM) Ultra 9 285H (Arrow Lake H); the others are those of
+   x86_64/meteorlake, not tuned on this target. */
 
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
-#define FLINT_FFT_SMALL_MUL_THRESHOLD           1000
-#define FLINT_FFT_SMALL_SQR_THRESHOLD           1400
+/* TODO these were taken directly from skylake flint-mparam.h  ----> */
+#define FLINT_FFT_SMALL_MUL_THRESHOLD           500
+#define FLINT_FFT_SMALL_SQR_THRESHOLD           500
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
+/* <---- these were taken directly from skylake flint-mparam.h  */
 
 #define FFT_TAB \
-   { {4, 4}, {4, 3}, {3, 2}, {2, 1}, {2, 1} }
+   { { 4, 4 }, { 4, 3 }, { 3, 2 }, { 2, 2 }, { 2, 1 } }
 
 #define MULMOD_TAB \
-   { 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1 }
+   { 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1 }
 
-#define FFT_N_NUM                                 19
-#define FFT_MULMOD_2EXPP1_CUTOFF                 128
+#define FFT_N_NUM 19
+#define FFT_MULMOD_2EXPP1_CUTOFF 128
 
-#define FLINT_PREINVERT_LIMB_USE_NATIVE 0
+#define FLINT_PREINVERT_LIMB_USE_NATIVE 1
 
-/* fft_small: round quotients with the hardware round instruction (1),
-   or with the magic constant fmadd(x, y, 1.5*2^52) - 1.5*2^52 (0), which
-   is faster where vroundpd is 2 uops with 8 cycle latency (Intel since
-   Skylake) but slower on Zen 2-5 where it is 1 uop with 3 cycle latency */
-#define FLINT_FFT_SMALL_ROUND_USE_NATIVE 1
-
-#define FLINT_MULMOD_SHOUP_THRESHOLD 10
+#define FLINT_MULMOD_SHOUP_THRESHOLD 0
 
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
 
@@ -54,7 +53,7 @@
    division). */
 #define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
 #define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
-#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 700
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1024
 #define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
 #define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
 
@@ -87,7 +86,7 @@
 
 /* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
    this dividend length (1000000: never) */
-#define FLINT_MPN_DIV_2_GMP_CUTOFF 3
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 1000000
 
 
 /*
@@ -95,7 +94,11 @@
     below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
     without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
     / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
-    (not measured on this target: defaults).
+    (measured on Intel Core Ultra 9 285H, AVX2 only, so the u52 values are
+    unused; the machine measured had the reference netlib BLAS, far slower
+    than the kernels, so BLAS_1PASS_CUTOFF(_MT) are the values of
+    x86_64/meteorlake, measured with OpenBLAS; K52_BLAS_CUTOFF is 0 on both,
+    since blas + CRT was never faster than fp50 / k52).
       SIMD_MIN_DIM         use the SIMD kernels when B has at least this
                            many columns and A this many rows (or half as
                            many if B has 4x as many columns), for any inner
@@ -127,9 +130,9 @@
                            the bottom of the range.
 */
 #define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 256
-#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 256
-#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 768
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 600
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 800
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
 #define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
 #define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
 #define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
@@ -147,34 +150,24 @@
 /*
     nmod_mat_mul: for moduli up to 2^32, fp50 is preferred to u32 for these
     inner dimensions (MIN_K > MAX_K: never); see src/nmod_mat/impl.h (not
-    measured on this target: default, k = 1..3 on AVX2, k = 1
-    otherwise)
+    measured on this target: default, k = 1..3)
 */
-#if defined(__AVX2__) && !defined(__AVX512F__)
-# define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
-# define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 3
-#else
-# define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
-# define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 1
-#endif
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 3
 
 /*
     nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
     above 2^32) is used from this length on (0: never); see src/nmod_vec.h
-    (not measured on this target: default)
+    (measured on Intel Core Ultra 9 285H, gcc 16)
 */
-#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 96
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 64
 
 /*
     nmod_vec_dot: split limbs are used for moduli up to 2^this; see
-    src/nmod_vec.h (not measured on this target: default, 60 with
-    AVX512-IFMA, where u64 takes over, 64 otherwise)
+    src/nmod_vec.h (not measured on this target: default, no
+    limit)
 */
-#if defined(__AVX512IFMA__)
-# define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 60
-#else
-# define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 64
-#endif
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 64
 
 /*
     nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
