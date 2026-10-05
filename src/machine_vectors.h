@@ -654,6 +654,45 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     _mm256_storeu_si256((__m256i*) z, a);
 }
 
+/* same, as two 16-byte stores (see nmod_mat/transpose.c) */
+FLINT_FORCE_INLINE void vec4n_store_unaligned_halves(ulong* z, vec4n a) {
+    _mm_storeu_si128((__m128i*) z, _mm256_castsi256_si128(a));
+    _mm_storeu_si128((__m128i*) (z + 2), _mm256_extracti128_si256(a, 1));
+}
+
+/* return {a[0], b[0], a[2], b[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_unpacklo(vec4n a, vec4n b) {
+    return _mm256_unpacklo_epi64(a, b);
+}
+
+/* return {a[1], b[1], a[3], b[3]} */
+FLINT_FORCE_INLINE vec4n vec4n_unpackhi(vec4n a, vec4n b) {
+    return _mm256_unpackhi_epi64(a, b);
+}
+
+/* permute2_i0_i1(a, b): return {v[i0], v[i1]}, as for vec4d */
+#define DEFINE_IT(i0, i1) \
+FLINT_FORCE_INLINE vec4n CAT4(vec4n, permute2, i0, i1)(vec4n a, vec4n b) { \
+    return _mm256_permute2x128_si256(a, b, i0 + 16*i1); \
+}
+DEFINE_IT(0,2)
+DEFINE_IT(1,3)
+#undef DEFINE_IT
+
+/* view the 4 vectors as the rows of a 4x4 matrix, as VEC4D_TRANSPOSE */
+#define VEC4N_TRANSPOSE(z0, z1, z2, z3, a0, a1, a2, a3) \
+{ \
+    vec4n _t0, _t1, _t2, _t3; \
+    _t0 = vec4n_unpacklo(a0, a1); \
+    _t1 = vec4n_unpackhi(a0, a1); \
+    _t2 = vec4n_unpacklo(a2, a3); \
+    _t3 = vec4n_unpackhi(a2, a3); \
+    z0 = vec4n_permute2_0_2(_t0, _t2); \
+    z1 = vec4n_permute2_0_2(_t1, _t3); \
+    z2 = vec4n_permute2_1_3(_t0, _t2); \
+    z3 = vec4n_permute2_1_3(_t1, _t3); \
+}
+
 /* permute_i0_i1_i2_i3(a): return {a[i0], a[i1], a[i2], a[i3]} */
 #ifndef AVOID_AVX2
 #define DEFINE_IT(i0, i1, i2, i3)                                        \
@@ -2238,6 +2277,14 @@ FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a) {
     return vld1q_u64((const uint64_t *) a);
 }
 
+FLINT_FORCE_INLINE vec2n vec2n_unpacklo(vec2n a, vec2n b) {
+    return vtrn1q_u64(a, b);
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_unpackhi(vec2n a, vec2n b) {
+    return vtrn2q_u64(a, b);
+}
+
 // Right shift 32bits
 FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right_32(vec2n a) {
     return vshrq_n_u64(a, 32);
@@ -2290,6 +2337,10 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     vec2n_store_unaligned(z+2, a.e2);
 }
 
+FLINT_FORCE_INLINE void vec4n_store_unaligned_halves(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
     vec2n z1 = vec2d_convert_limited_vec2n(a.e1);
     vec2n z2 = vec2d_convert_limited_vec2n(a.e2);
@@ -2308,6 +2359,29 @@ FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
     vec4n z = {z1, z2}; return z;
 }
 
+FLINT_FORCE_INLINE vec4n vec4n_permute2_0_2(vec4n a, vec4n b) {
+    vec4n z = {a.e1, b.e1}; return z;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_permute2_1_3(vec4n a, vec4n b) {
+    vec4n z = {a.e2, b.e2}; return z;
+}
+
+#define VEC4N_TRANSPOSE(z0, z1, z2, z3, a0, a1, a2, a3) \
+{ \
+    vec4n _t0, _t1, _t2, _t3; \
+    _t0 = vec4n_unpacklo(a0, a1); \
+    _t1 = vec4n_unpackhi(a0, a1); \
+    _t2 = vec4n_unpacklo(a2, a3); \
+    _t3 = vec4n_unpackhi(a2, a3); \
+    z0 = vec4n_permute2_0_2(_t0, _t2); \
+    z1 = vec4n_permute2_0_2(_t1, _t3); \
+    z2 = vec4n_permute2_1_3(_t0, _t2); \
+    z3 = vec4n_permute2_1_3(_t1, _t3); \
+}
+
+EXTEND_VEC_DEF2(vec2n, vec4n, _unpacklo)
+EXTEND_VEC_DEF2(vec2n, vec4n, _unpackhi)
 EXTEND_VEC_DEF1(vec2n, vec4n, _bit_shift_right_32)
 EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
 EXTEND_VEC_DEF2(vec2n, vec4n, _add)
