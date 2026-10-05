@@ -225,6 +225,19 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_reciprocals(gr_ptr res, slong len, 
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET_POWERS)(res, x, len, ctx); }
 
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, slong len, gr_ctx_t ctx) { return GR_VEC_SET_OTHER_OP(ctx, VEC_SET_OTHER)(res, x, x_ctx, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_gather(gr_ptr res, gr_srcptr vec, const slong * idx, slong len, gr_ctx_t ctx) { return GR_VEC_GATHER_OP(ctx, VEC_GATHER)(res, vec, idx, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_scatter(gr_ptr vec, const slong * idx, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_SCATTER_OP(ctx, VEC_SCATTER)(vec, idx, src, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_BINARY_UNARY_OP(ctx, VEC_GET_INTERVAL_MID_RAD)(m, r, x, len, ctx); }
+
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SQRT)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_rsqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_RSQRT)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_exp(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_EXP)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_log(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_LOG)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sin(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SIN)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_cos(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_COS)(res, x, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_BINARY_UNARY_OP(ctx, VEC_SIN_COS)(res1, res2, x, len, ctx); }
+
 /* todo: could allow overloading this as well */
 /* todo: worth warning about unused result? */
 WARN_UNUSED_RESULT int _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx);

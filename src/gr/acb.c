@@ -32,6 +32,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "nfloat.h"
+#include <float.h>
+#include "dfloat.h"
 
 typedef struct
 {
@@ -314,9 +316,38 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             arb_zero(acb_imagref(res));
             return GR_SUCCESS;
 
+        case GR_CTX_DFLOAT:
+            /* a nonfinite approximation is not a complex number */
+            if (!(_dfloat_abs_sum(x, DFLOAT_CTX_N(x_ctx)) <= DBL_MAX))
+                return GR_DOMAIN;
+            _dfloat_get_arb(acb_realref(res), x, DFLOAT_CTX_N(x_ctx), 0.0);
+            arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
+            arb_zero(acb_imagref(res));
+            return GR_SUCCESS;
+
+        case GR_CTX_DFLOAT_BALL:
+            if (_dfloat_ball_is_whole(x, DFLOAT_CTX_N(x_ctx), ((const double *) x)[DFLOAT_CTX_N(x_ctx)]))
+                arb_zero_pm_inf(acb_realref(res));
+            else
+                _dfloat_get_arb(acb_realref(res), x, DFLOAT_CTX_N(x_ctx), ((const double *) x)[DFLOAT_CTX_N(x_ctx)]);
+            arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
+            arb_zero(acb_imagref(res));
+            return GR_SUCCESS;
+
         case GR_CTX_CC_ACB:
             acb_set_round(res, x, ACB_CTX_PREC(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_DFLOAT_COMPLEX:
+        case GR_CTX_DFLOAT_COMPLEX_BALL:
+        {
+            int n = DFLOAT_CTX_N(x_ctx), ball = DFLOAT_CTX_BALL(x_ctx);
+            if (!_dfloat_part_get_arb(acb_realref(res), x, n, ball) ||
+                !_dfloat_part_get_arb(acb_imagref(res), (const double *) x + n + ball, n, ball))
+                return GR_DOMAIN;
+            acb_set_round(res, res, ACB_CTX_PREC(ctx));
+            return GR_SUCCESS;
+        }
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
@@ -329,6 +360,17 @@ _gr_acb_set_interval_mid_inf(acb_t res, const acb_t m, const gr_ctx_t ctx)
 {
     acb_set(res, m);
     mag_inf(arb_radref(acb_realref(res)));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_acb_get_interval_mid_rad(acb_t m, acb_t r, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_get_mid(m, x);
+    arf_set_mag(arb_midref(acb_realref(r)), arb_radref(acb_realref(x)));
+    arf_set_mag(arb_midref(acb_imagref(r)), arb_radref(acb_imagref(x)));
+    mag_zero(arb_radref(acb_realref(r)));
+    mag_zero(arb_radref(acb_imagref(r)));
     return GR_SUCCESS;
 }
 
@@ -2333,6 +2375,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acb_set_d},
     {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_acb_set_interval_mid_rad},
     {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) _gr_acb_set_interval_mid_inf},
+    {GR_METHOD_GET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_acb_get_interval_mid_rad},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_acb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_acb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acb_get_fmpz},

@@ -978,6 +978,17 @@ Enclosure and interval methods
     In ring implementations that provide this method, :func:`gr_set_str`
     allows parsing strings containing subexpressions with the syntax ``a +/- b``.
 
+.. function:: int gr_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx)
+
+    The inverse of :func:`gr_set_interval_mid_rad`: in ball
+    representations, sets *m* to the midpoint of *x* and *r* to its
+    radius, as exact elements of the ring (both are then balls of
+    radius zero), so that ``gr_set_interval_mid_rad(y, m, r)``
+    reproduces *x*. In a vector space over the real numbers
+    represented using balls, the radii are handled independently for
+    the generators, as in the setter. In exact representations,
+    *m* is set to *x* and *r* to zero (the generic implementation).
+
 Finite field methods
 ........................................................................
 

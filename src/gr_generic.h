@@ -258,6 +258,19 @@ WARN_UNUSED_RESULT int gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, in
 WARN_UNUSED_RESULT int gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_generic_vec_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_gather(gr_ptr res, gr_srcptr vec, const slong * idx, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_scatter(gr_ptr vec, const slong * idx, gr_srcptr src, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_sqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_rsqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_exp(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_log(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_sin(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_cos(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, slong len, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_generic_pow_fmpz_sliding(gr_ptr f, gr_srcptr g, const fmpz_t pow, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_pow_ui_sliding(gr_ptr f, gr_srcptr g, ulong pow, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx);

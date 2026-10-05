@@ -14,8 +14,10 @@ structs elsewhere. The AVX2 and NEON backends require a 64-bit word
 size, since their integer vectors have :type:`ulong` lanes; a 32-bit
 build uses the generic backends, which provide only the floating-point
 types. The generic backends implement only the subset of the
-interface required by ``flint_sgemm``/``flint_dgemm``; the full
-interface, as used by ``fft_small``, still requires AVX2 or NEON.
+interface required by ``flint_sgemm``/``flint_dgemm`` and, for
+:type:`vec4d`, the operations used by ``dfloat`` (see
+:ref:`machine-vectors-vec4d-extra`); the full interface, as used by
+``fft_small``, still requires AVX2 or NEON.
 
 For the vector operations to use the target's instructions, FLINT must
 be built with appropriate compiler flags. ``configure`` chooses these
@@ -35,14 +37,15 @@ compilers and compiler versions, unlike the other backends. It exists
 so that the header works on compilers without GNU vector extensions,
 and is not the fallback used on GCC or clang.
 
-The generic backends express a fused multiply-add as ``a * b + c``,
+The generic backends express a fused multiply-add (``fmadd``, ``fnmadd``) as ``a * b + c``,
 which a compiler fuses into an FMA instruction only when floating-point
 contraction is enabled. GCC in a strict ISO mode, which is how FLINT is
 built, does not contract by default; code using these operations in a
 performance-critical loop should request contraction, as
 ``machine_vectors/gemm.c`` does with ``#pragma GCC optimize
 ("fp-contract=fast")``. The AVX2, AVX512 and NEON backends use fused
-intrinsics and are unaffected.
+intrinsics and are unaffected. The ``_fused`` variants below round once
+on every backend.
 
 Some functions may require that vectors are aligned in memory.
 
@@ -186,7 +189,7 @@ Comparisons
 .. function:: vec4d vec4d_cmp_ge(vec4d a, vec4d b)
               vec4d vec4d_cmp_gt(vec4d a, vec4d b)
 
-    Entrywise comparisons.
+    Entrywise comparisons (see below for the full set).
 
 Arithmetic and basic operations
 -------------------------------------------------------------------------------
@@ -265,6 +268,83 @@ Arithmetic and basic operations
 
 .. function:: vec4n vec4n_bit_and(vec4n a, vec4n b)
               vec8n vec8n_bit_and(vec8n a, vec8n b)
+
+.. _machine-vectors-vec4d-extra:
+
+Masks, bits, fused operations and gathers for vec4d
+-------------------------------------------------------------------------------
+
+These are provided by every backend (AVX2, NEON and both generic
+tiers) with the same results, and are tested lane by lane against
+scalar code in ``machine_vectors/test/t-vec4d.c``.
+
+.. function:: vec4d vec4d_cmp_eq(vec4d a, vec4d b)
+              vec4d vec4d_cmp_ne(vec4d a, vec4d b)
+              vec4d vec4d_cmp_lt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_le(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nlt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nle(vec4d a, vec4d b)
+              vec4d vec4d_cmp_ngt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nge(vec4d a, vec4d b)
+
+    With ``vec4d_cmp_gt`` and ``vec4d_cmp_ge``: a mask with all bits
+    set in the lanes where the predicate holds and all bits clear
+    elsewhere. The predicates ``eq``, ``lt``, ``le``, ``gt``, ``ge``
+    are false when a lane of *a* or *b* is a NaN, and their negations
+    ``ne``, ``nlt``, ``nle``, ``ngt``, ``nge`` are true.
+
+.. function:: int vec4d_movemask(vec4d a)
+
+    The sign bits of the lanes, lane `i` giving bit `i`. (For
+    ``vec4d_blendv``, which selects *b* where the sign bit of *c* is
+    set, a mask from a comparison selects *b* where it holds.)
+
+.. function:: vec4d vec4d_bit_and(vec4d a, vec4d b)
+              vec4d vec4d_bit_or(vec4d a, vec4d b)
+              vec4d vec4d_bit_xor(vec4d a, vec4d b)
+              vec4d vec4d_bit_andnot(vec4d a, vec4d b)
+
+    Bitwise operations; ``andnot`` computes ``(~a) & b``.
+
+.. function:: vec4d vec4d_bits_set_u64(uint64_t a)
+              vec4d vec4d_bits_add(vec4d a, vec4d b)
+              vec4d vec4d_bits_sub(vec4d a, vec4d b)
+              vec4d vec4d_bits_shl(vec4d a, int n)
+              vec4d vec4d_bits_shr(vec4d a, int n)
+
+    Operations on the lanes viewed as ``uint64_t`` bit patterns: a
+    broadcast, addition and subtraction modulo `2^{64}`, and logical
+    shifts by `0 \le n < 64`.
+
+.. function:: vec4d vec4d_sqrt(vec4d a)
+
+    The correctly rounded square root.
+
+.. function:: vec4d vec4d_fmadd_fused(vec4d a, vec4d b, vec4d c)
+              vec4d vec4d_fmsub_fused(vec4d a, vec4d b, vec4d c)
+              vec4d vec4d_fnmadd_fused(vec4d a, vec4d b, vec4d c)
+
+    `ab + c`, `ab - c` and `-ab + c` with a single rounding, like
+    ``fma(a, b, c)``, ``fma(a, b, -c)`` and ``fma(-a, b, c)``
+    (including the sign of an exact zero).
+
+.. function:: vec4d vec4d_permute_0_1_1_0(vec4d a)
+              vec4d vec4d_permute_0_2_0_2(vec4d a)
+              vec4d vec4d_permute_1_3_1_3(vec4d a)
+
+    Further permutations, like ``vec4d_permute_0_2_1_3``.
+
+.. type:: vec4di
+
+.. function:: vec4di vec4d_to_index(vec4d a)
+              vec4d vec4d_gather(const double * t, vec4di i)
+
+    Table indices converted from lanes holding integers in `[0, 2^{31})`,
+    and the lanes ``t[i0], t[i1], t[i2], t[i3]`` at those indices.
+
+In the generic backends, ``vec4d_min`` and ``vec4d_max`` return *b*
+where a lane is unordered, as the AVX2 instructions do; NEON returns a
+NaN.
 
 
 Modular arithmetic

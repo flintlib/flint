@@ -102,6 +102,8 @@ ASM_PIC_FLAG:=$(filter-out -D%,$(PIC_FLAG))
 endif
 
 UNROLL_LOOPS:=@UNROLL_LOOPS@
+dfloat_CFLAGS:=@DFLOAT_CFLAGS@
+
 ifeq ($(UNROLL_LOOPS), 1)
 ulong_extras_CFLAGS:=-funroll-loops
 nmod_CFLAGS:=-funroll-loops
@@ -174,7 +176,7 @@ HEADER_DIRS	:=	\
 		double_extras		d_vec				d_mat		\
 															\
 		mpn_extras	radix   	mpn_mod		nfloat			\
-		mp_real											\
+		mp_real		dfloat									\
 															\
 		nmod		nmod_vec	nmod_mat	nmod_poly		\
 		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\

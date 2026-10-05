@@ -545,6 +545,49 @@ AS_VAR_IF([flint_cv_check_fft_small],"yes",
 ])
 
 
+dnl  FLINT_DFLOAT_CFLAGS
+dnl  -----------------------
+dnl  Sets flint_dfloat_cflags to the extra flags for the dfloat module.
+dnl
+dnl  * -ffp-contract=off, required: the error-free transformations break
+dnl    if the compiler contracts a separate multiply and add into an fma
+dnl    (GCC does so by default and ignores the standard pragma). The
+dnl    module is only enabled (DFLOAT_FP_CONTRACT_OFF) when the compiler
+dnl    takes the flag; otherwise dfloat_is_supported() returns 0, except
+dnl    with clang and MSVC, which honour the pragmas in fp_contract.h.
+dnl
+dnl  * -mfpmath=sse, required on 32-bit x86 with SSE2: the error-free
+dnl    transformations also need every operation on doubles rounded once
+dnl    to double precision, and GCC evaluates in the x87 registers by
+dnl    default there (FLT_EVAL_METHOD 2). Without SSE2,
+dnl    dfloat_is_supported() returns 0.
+
+AC_DEFUN([FLINT_DFLOAT_CFLAGS],
+[flint_dfloat_cflags=""
+
+AX_CHECK_COMPILE_FLAG([-ffp-contract=off],
+    [flint_dfloat_cflags="-ffp-contract=off -DDFLOAT_FP_CONTRACT_OFF"],
+    [FLINT_CC_IS_CLANG([],
+        [AC_MSG_WARN([the compiler does not take -ffp-contract=off; the dfloat module will be unavailable])])])
+
+AC_MSG_CHECKING([whether double arithmetic has excess precision])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <float.h>
+#if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
+#error excess precision
+#endif]], [])],
+    [AC_MSG_RESULT([no])],
+    [AC_MSG_RESULT([yes])
+     AC_MSG_CHECKING([whether SSE2 is available for the dfloat module])
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __SSE2__
+#error no SSE2
+#endif]], [])],
+        [AC_MSG_RESULT([yes])
+         AX_CHECK_COMPILE_FLAG([-mfpmath=sse],
+            [flint_dfloat_cflags="$flint_dfloat_cflags -mfpmath=sse"])],
+        [AC_MSG_RESULT([no; dfloat will be unavailable (configure with CFLAGS=-msse2 to enable it)])])])
+])
+
+
 dnl  GMP specific autoconf macros
 dnl  (Taken from GMP 6.3.0)
 dnl
