@@ -56,22 +56,7 @@ _nmod_mat_addmul_transpose_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstrid
 
     tmp = flint_malloc(sizeof(ulong) * k * n);
 
-    /* transpose B by blocks of 16 x 16, so that neither the reads nor the
-       writes stride through more lines than the caches hold */
-    /* TODO improve nmod_mat_transpose and use here? */
-    for (i = 0; i < k; i += 16)
-    {
-        slong ii, jj, ie = FLINT_MIN(i + 16, k);
-
-        for (j = 0; j < n; j += 16)
-        {
-            slong je = FLINT_MIN(j + 16, n);
-
-            for (ii = i; ii < ie; ii++)
-                for (jj = j; jj < je; jj++)
-                    tmp[jj*k + ii] = B[ii * Bstride + jj];
-        }
-    }
+    _nmod_mat_transpose(tmp, k, B, Bstride, k, n);
 
     for (i = 0; i < m; i++)
     {

@@ -272,6 +272,14 @@ Transposition and permutations
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     Aliasing is allowed for square matrices.
 
+.. function:: void _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m, slong n)
+
+    Sets `B` to the transpose of `A`, where `A` is an `m \times n` array of
+    words with row stride ``Astride`` and `B` is an `n \times m` array with
+    row stride ``Bstride``. The entries are copied as they are (no modulus is
+    involved). The two arrays must not overlap; for an in-place
+    transposition of a square matrix, use :func:`nmod_mat_transpose`.
+
 .. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
