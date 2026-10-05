@@ -495,6 +495,19 @@ Arithmetic expressions
     Sets *res* to an expression for the complex number with real part
     *x* and imaginary part *y*.
 
+.. function:: void fexpr_set_arb_decimal(fexpr_t res, const arb_t x, slong digits)
+              void fexpr_set_acb_decimal(fexpr_t res, const acb_t z, slong digits)
+
+    Sets *res* to a decimal approximation of the ball *x* (respectively
+    the complex ball *z*, as ``Add(Decimal(re), Mul(Decimal(im), NumberI))``,
+    omitting a zero part), ``Decimal(str)`` where *str* is the output of
+    :func:`arb_get_str` with at most *digits* digits and the flag
+    ``ARB_STR_NO_RADIUS`` (so that all printed digits are correct and
+    the radius is not represented). An exact zero becomes the integer 0,
+    an infinite midpoint ``Infinity`` with a sign, and a NaN or a ball
+    with infinite radius (in either part, for a complex ball)
+    ``Undefined``.
+
 .. function:: void fexpr_neg(fexpr_t res, const fexpr_t a)
               void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b)
               void fexpr_sub(fexpr_t res, const fexpr_t a, const fexpr_t b)

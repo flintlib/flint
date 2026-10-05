@@ -125,6 +125,7 @@ WARN_UNUSED_RESULT int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t 
 #define GR_PARSE_RING_EXPONENTS 2
 
 WARN_UNUSED_RESULT int gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_str_expr_terminals(gr_ptr res, const char * s, int flags, const char ** names, gr_srcptr values, slong num, int use_gens, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_str(gr_ptr res, const char * s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_str_balance_additions(gr_ptr res, const char * s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx);

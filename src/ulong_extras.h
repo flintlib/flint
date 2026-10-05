@@ -35,6 +35,7 @@ ulong n_randlimb(flint_rand_t state);
 ulong n_urandint(flint_rand_t state, ulong limit);
 ulong n_randbits(flint_rand_t state, unsigned int bits);
 ulong n_randprime(flint_rand_t state, ulong bits, int proved);
+ulong n_randprime_mod(flint_rand_t state, ulong bits, ulong r, ulong m, int proved);
 
 ulong n_randtest_bits(flint_rand_t state, int bits);
 ulong n_randtest(flint_rand_t state);

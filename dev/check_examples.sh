@@ -281,6 +281,9 @@ then
 elif test "$1" = "multi_crt";
 then
     echo "multi_crt....SKIPPED"
+elif test "$1" = "number_field_bench";
+then
+    echo "number_field_bench....SKIPPED"
 elif test "$1" = "padic";
 then
     echo "padic....SKIPPED"

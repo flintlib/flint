@@ -615,6 +615,12 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
+fmpz_mpoly_ctx_struct *
+gr_ctx_fmpz_mpoly_q_mctx(gr_ctx_t ctx)
+{
+    return MPOLYNOMIAL_MCTX(ctx);
+}
+
 void
 gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 {

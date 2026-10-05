@@ -131,6 +131,16 @@ Random functions
     with ``bits`` bits, where ``bits`` must be at least 2 and
     at most ``FLINT_BITS``.
 
+.. function:: ulong n_randprime_mod(flint_rand_t state, ulong bits, ulong r, ulong m, int proved)
+
+    Returns a random prime number ``(proved = 1)`` or probable prime
+    ``(proved = 0)`` with ``bits`` bits which is congruent to `r`
+    modulo `m`, where `0 \le r < m` and `\gcd(r, m) = 1` (an
+    exception is thrown otherwise, or if there is no such prime, which
+    can happen when `m` is large relative to `2^{\text{bits}}`). Such
+    primes are the primes which split completely in the cyclotomic field
+    of order `m` when `r = 1`.
+
 .. function:: ulong n_randtest_prime(flint_rand_t state, int proved)
 
     Returns a random prime number ``(proved = 1)`` or probable

@@ -364,7 +364,14 @@ _gr_poly_quotient_init(gr_poly_t x, gr_ctx_t ctx)
 static void
 _gr_poly_quotient_clear(gr_poly_t x, gr_ctx_t ctx)
 {
-    gr_poly_clear(x, BASE(ctx));
+    /* (not gr_poly_clear, which asserts that x is normalized: after a
+       refinement of a base ring pretending to be a field, a leading
+       coefficient may have become zero, see _is_normalized) */
+    if (x->coeffs != NULL)
+    {
+        _gr_vec_clear(x->coeffs, x->alloc, BASE(ctx));
+        flint_free(x->coeffs);
+    }
 }
 
 static void
@@ -1274,6 +1281,80 @@ gr_poly_quotient_set_poly(gr_ptr res, const gr_poly_t x, gr_ctx_t ctx)
     return status | _reduce(res, ctx);
 }
 
+/* The norm of a polynomial M over R[a]/(m) down to R[x]: the resultant
+   with respect to a of m and M, the latter viewed as a polynomial in a
+   with coefficients in R[x]. Its degree is deg(M) deg(m) when M is
+   monic. */
+int
+gr_poly_quotient_norm_poly(gr_poly_t res, const gr_poly_t M, gr_ctx_t ctx)
+{
+    gr_ctx_struct * base = BASE(ctx);
+    const gr_poly_struct * m = MODULUS(ctx);
+    gr_ctx_t R;              /* base[x] */
+    gr_poly_t A, B, ci;      /* polynomials in a over R */
+    slong i, e, d = m->length - 1;
+    int status = GR_SUCCESS;
+
+    if (d < 1)
+        return GR_DOMAIN;
+
+    gr_ctx_init_gr_poly(R, base);
+    gr_poly_init(A, R);
+    gr_poly_init(B, R);
+    gr_poly_init(ci, base);
+
+    /* A = sum_e (sum_i c_{ie} x^i) a^e, where c_i = sum_e c_{ie} a^e is
+       the i-th coefficient of M */
+    gr_poly_fit_length(A, d, R);
+    for (e = 0; e < d; e++)
+        status |= gr_poly_zero(gr_poly_entry_ptr(A, e, R), R);
+    for (i = 0; i < M->length && status == GR_SUCCESS; i++)
+    {
+        status |= gr_poly_quotient_get_poly(ci, gr_poly_coeff_srcptr(M, i, ctx), ctx);
+        for (e = 0; e < ci->length && status == GR_SUCCESS; e++)
+            status |= gr_poly_set_coeff_scalar(gr_poly_entry_ptr(A, e, R), i, gr_poly_coeff_srcptr(ci, e, base), base);
+    }
+    _gr_poly_set_length(A, d, R);
+    _gr_poly_normalise(A, R);
+
+    /* B = m with constant coefficients */
+    gr_poly_fit_length(B, d + 1, R);
+    for (e = 0; e <= d; e++)
+        status |= gr_poly_set_scalar(gr_poly_entry_ptr(B, e, R), gr_poly_coeff_srcptr(m, e, base), base);
+    _gr_poly_set_length(B, d + 1, R);
+    _gr_poly_normalise(B, R);
+
+    /* (the resultant of the monic m first: the product of A over the
+       roots of m, invariant under reduction of A modulo m) */
+    if (status == GR_SUCCESS)
+        status = gr_poly_resultant(res, B, A, R);
+
+    gr_poly_clear(A, R);
+    gr_poly_clear(B, R);
+    gr_poly_clear(ci, base);
+    gr_ctx_clear(R);
+    return status;
+}
+
+/* the norm of an element: the resultant of its polynomial with m */
+int
+gr_poly_quotient_norm(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ctx_struct * base = BASE(ctx);
+    gr_poly_t p;
+    int status;
+
+    if (MODULUS(ctx)->length < 2)
+        return GR_DOMAIN;
+
+    gr_poly_init(p, base);
+    status = gr_poly_quotient_get_poly(p, x, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_poly_resultant(res, MODULUS(ctx), p, base);
+    gr_poly_clear(p, base);
+    return status;
+}
+
 /* -------------------------------------------------------------------- */
 /* method table and init                                                 */
 /* -------------------------------------------------------------------- */
@@ -1290,6 +1371,7 @@ gr_method_tab_input _gr_poly_quotient_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_poly_quotient_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_poly_quotient_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_poly_quotient_ctx_is_field},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) _gr_poly_quotient_ctx_is_field},
     {GR_METHOD_CTX_SET_IS_FIELD,        (gr_funcptr) _gr_poly_quotient_ctx_set_is_field},
     {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) _gr_poly_quotient_ctx_is_pretend_field},
     {GR_METHOD_CTX_SET_IS_PRETEND_FIELD, (gr_funcptr) _gr_poly_quotient_ctx_set_is_pretend_field},

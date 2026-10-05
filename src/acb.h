@@ -938,6 +938,9 @@ void _acb_vec_sort_pretty(acb_ptr vec, slong len);
 void acb_unit_root(acb_t res, ulong order, slong prec);
 void _acb_vec_unit_roots(acb_ptr z, slong order, slong len, slong prec);
 
+slong acb_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, slong prec);
+void _acb_lindep_combination(acb_t s, acb_srcptr vec, const fmpz * c, slong len, slong prec);
+
 ACB_INLINE slong
 acb_allocated_bytes(const acb_t x)
 {

@@ -1,5 +1,7 @@
 import ctypes
+import math
 import random
+import weakref
 import ctypes.util
 import sys
 import functools
@@ -212,6 +214,20 @@ class qqbar_struct(ctypes.Structure):
 class ca_struct(ctypes.Structure):
     _fields_ = [('data', c_slong * 5)]
 
+class gr_tower_lazy_elem_struct(ctypes.Structure):
+    # a lazy tower element: pointer to the tower, level, versions, the
+    # representation tag and a union of an fmpq, an fmpz_mpoly_q with its
+    # context pointer, or the dense form (17 words in total); allocated
+    # with slack (the size is checked when a context is created)
+    _fields_ = [('data', c_slong * 24)]
+
+class gr_tower_field_struct(ctypes.Structure):
+    # an element of the top field of a fixed tower: a gr_poly (nested
+    # representation), or an element of the base field for the trivial
+    # tower (an fmpq, or a rational function: an fmpz_mpoly_q, 12 words);
+    # allocated with slack
+    _fields_ = [('data', c_slong * 14)]
+
 class nmod_struct(ctypes.Structure):
     _fields_ = [('val', c_ulong)]
 
@@ -336,6 +352,48 @@ libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+
+libgr.gr_tower_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
+libgr.gr_tower_heap_init.restype = ctypes.c_void_p
+libgr.gr_tower_heap_clear.argtypes = (ctypes.c_void_p,)
+libgr.gr_tower_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p)
+libgr.gr_tower_degree.argtypes = (ctypes.c_void_p,)
+libgr.gr_tower_degree.restype = c_slong
+libgr.gr_tower_length_si.argtypes = (ctypes.c_void_p,)
+libgr.gr_tower_length_si.restype = c_slong
+libgr.gr_tower_num_gens_si.argtypes = (ctypes.c_void_p,)
+libgr.gr_tower_num_gens_si.restype = c_slong
+libgr.gr_tower_lazy_ctx_num_towers.restype = c_slong
+libgr.gr_tower_lazy_ctx_num_towers.argtypes = (ctypes.c_void_p,)
+libgr.gr_tower_gen_name.argtypes = (ctypes.c_void_p, c_slong)
+libgr.gr_tower_gen_name.restype = ctypes.c_void_p
+libgr.gr_tower_gen_get.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong)
+libgr.gr_tower_adjoin_root_ui.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_ulong, ctypes.c_char_p)
+libgr.gr_tower_adjoin_qqbar.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
+libgr.gr_tower_adjoin_root_of_unity.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_char_p)
+libgr.gr_tower_adjoin_algebraic.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_char_p)
+libgr.gr_tower_adjoin_pi.argtypes = (ctypes.c_void_p, ctypes.c_char_p)
+libgr.gr_tower_adjoin_exp.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
+libgr.gr_tower_adjoin_log.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
+libgr.gr_ctx_init_tower_field.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_void_p)
+libgr.gr_ctx_init_tower_lazy.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.gr_ctx_init_tower_lazy_view.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.gr_tower_lazy_ctx_set_print.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int, c_slong)
+libgr.gr_tower_lazy_ctx_print_flags.argtypes = (ctypes.POINTER(gr_ctx_struct),)
+libgr.gr_tower_lazy_ctx_set_gen_flags.argtypes = (ctypes.POINTER(gr_ctx_struct), ctypes.c_int)
+libgr.gr_tower_lazy_ctx_gen_flags.argtypes = (ctypes.POINTER(gr_ctx_struct),)
+libgr.gr_tower_lazy_ctx_set_option.argtypes = (ctypes.POINTER(gr_ctx_struct), c_slong, c_slong)
+libgr.gr_tower_lazy_ctx_set_option.restype = ctypes.c_int
+libgr.gr_tower_option_name.argtypes = (c_slong,)
+libgr.gr_tower_option_name.restype = ctypes.c_char_p
+libgr.gr_tower_option_find.argtypes = (ctypes.c_char_p,)
+libgr.gr_tower_option_find.restype = c_slong
+libgr.gr_tower_option_default.argtypes = (c_slong,)
+libgr.gr_tower_option_default.restype = c_slong
+libgr.gr_tower_lazy_ctx_get_option.argtypes = (ctypes.POINTER(gr_ctx_struct), c_slong)
+libgr.gr_tower_lazy_ctx_get_option.restype = c_slong
+libgr.gr_tower_lazy_get_tower.argtypes = (ctypes.POINTER(c_slong), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_tower_lazy_get_tower.restype = ctypes.c_void_p
 
 libgr.gr_ctx_init_nmod.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
@@ -5071,6 +5129,759 @@ class ComplexExtended_ca(gr_ctx_ca):
         self._elem_type = ca
         self._set_options(kwargs)
 
+GR_TOWER_MERGE_EXPRESS = 1
+GR_TOWER_LAZY_REAL = 2
+GR_TOWER_LAZY_ALGEBRAIC = 4
+
+GR_TOWER_PRINT_NUMERIC = 1
+GR_TOWER_PRINT_SYMBOLIC = 2
+GR_TOWER_PRINT_DEFS = 4
+GR_TOWER_GENS_SPLIT_IMAGINARY = 1
+GR_TOWER_GENS_COMPOSITE_ROOTS = 2
+GR_TOWER_GENS_COMPOSITE_RADICALS = 4
+
+# tuning options of lazy tower fields (GR_TOWER_OPT_*, in order), from the library
+def _gr_tower_option_names():
+    names = []
+    k = 0
+    while True:
+        name = libgr.gr_tower_option_name(k)
+        if name is None:
+            return names
+        names.append(name.decode('ascii'))
+        k += 1
+GR_TOWER_OPTION_NAMES = _gr_tower_option_names()
+GR_TOWER_TRIG_EXPONENTIAL = 0
+GR_TOWER_TRIG_TANGENT = 1
+
+class gr_tower_lazy_ctx(gr_ctx):
+    r"""
+    Base class of the lazy tower fields (``gr_ctx_init_tower_lazy``):
+    elements live in towers of algebraic and transcendental extensions
+    of QQ which grow as needed, with complete zero tests (Richardson's
+    algorithm, assuming Schanuel's conjecture for termination).
+
+    Every extension element created during the lifetime of the context
+    gets a unique symbol (``a1``, ``a2``, ... for algebraic definitions,
+    ``t1``, ``t2``, ... for exponentials and logarithms, and ``pi``,
+    ``i``), listed by :meth:`gens`:
+
+        >>> C = ComplexField_tower()
+        >>> [C(2).sqrt(), C(3).sqrt(), C(1).exp().exp(), C(2).log().log()]
+        [a1 {a1 = sqrt(2)}, a2 {a2 = sqrt(3)}, t2 {t1 = exp(1); t2 = exp(t1)}, t4 {t3 = log(2); t4 = log(t3)}]
+        >>> C.gens()
+        [a1 {a1 = sqrt(2)}, a2 {a2 = sqrt(3)}, t1 {t1 = exp(1)}, t2 {t1 = exp(1); t2 = exp(t1)}, t3 {t3 = log(2)}, t4 {t3 = log(2); t4 = log(t3)}]
+
+    The printing of elements is controlled by :meth:`set_print`: a
+    numerical value, the expression in the generators, and the
+    definitions of the generators involved, in any combination:
+
+        >>> x = 2 + C(2).exp() + 3*C(2).exp().exp()
+        >>> x
+        3*t6+t5+2 {t5 = exp(2); t6 = exp(t5)}
+        >>> C.set_print(numeric=True, symbolic=True, defs=False); x
+        4863.92 {3*t6+t5+2}
+        >>> C.set_print(numeric=True, symbolic=False); x
+        4863.92
+        >>> C.set_print(numeric=True, symbolic=True, defs=True, digits=10); x
+        4863.923032 {3*t6+t5+2 where t5 = exp(2); t6 = exp(t5)}
+        >>> C.set_print(); x
+        3*t6+t5+2 {t5 = exp(2); t6 = exp(t5)}
+
+    The printed form (with the definitions) can be read back, in the
+    same context or in another one -- the definitions are evaluated in
+    order, and the names are local to the string -- which is also how
+    elements convert between lazy contexts:
+
+        >>> D = ComplexField_tower()
+        >>> D("3*t2+t1+2 {t1 = exp(2); t2 = exp(t1)}") == 2 + D(2).exp() + 3*D(2).exp().exp()
+        True
+        >>> D(x)
+        3*t2+t1+2 {t1 = exp(2); t2 = exp(t1)}
+        >>> r = PolynomialRing(C)([-1, -1, 0, 0, 0, 1]).roots()[0][1]; r     # doctest: +ELLIPSIS
+        a... {a... = root(-1 - a... + a...^5, 0.181232 + 1.08395*i)}
+        >>> D(str(r)) == D(r), D(r) ** 5 - D(r) - 1
+        (True, 0)
+        >>> RealField_tower()(C(2).sqrt()), RealAlgebraicField_tower()(C(2).sqrt() + C(3).sqrt())
+        (a1 {a1 = sqrt(2)}, a1+a2 {a1 = sqrt(2); a2 = sqrt(3)})
+
+    Symbolic expressions (:meth:`gr_elem.fexpr`) and LaTeX are available
+    for elements:
+
+        >>> x.fexpr()
+        Where(Add(Mul(3, t_6), t_5, 2), Def(t_5, Exp(2)), Def(t_6, Exp(t_5)))
+        >>> C(2).sqrt().latex()
+        'a_{1}\\; \\text{ where } a_{1} = \\sqrt{2}'
+        >>> C.acos(C(1)/2), C.log((C(3).sqrt() + C.i())/2)
+        (pi/3, pi*i/6)
+
+    Special functions apply their functional equations and special
+    values before creating generators (for canonical arguments only),
+    and Lambert W values take part in the relation search:
+
+        >>> C = ComplexField_tower()
+        >>> (C(1)/3).gamma() * (C(2)/3).gamma() == 2*C.pi()/C(3).sqrt()
+        True
+        >>> C(2).sqrt().gamma()
+        t2*a2-t2 {a2 = sqrt(2); t2 = gamma(a2-1)}
+        >>> (C(1)/4).digamma()
+        (-pi-6*t4-2*t3)/2 {t3 = euler; t4 = log(2)}
+        >>> C.lambertw(3*C(3).exp()), C.polylog(2, C(1)/2)
+        (3, (pi^2-6*t4^2)/12 {t4 = log(2)})
+        >>> C.lambertw(C(1)).exp() * C.lambertw(C(1))
+        1
+        >>> C.polygamma(1, C(3)/4), C.polylog(2, C.i())
+        (pi^2-8*t10 {t10 = catalan}, (-pi^2+48*t10*i)/48 {t10 = catalan})
+    """
+    _flags = GR_TOWER_MERGE_EXPRESS
+
+    def __init__(self, flags=None, parent=None, **options):
+        """
+        With *parent* (a lazy field), the new field is a view of it: it
+        shares its towers and elements (conversions between the two are
+        free) and restricts it further to the real or algebraic
+        subfield. Keyword arguments set tuning options (``set_option``).
+        """
+        gr_ctx.__init__(self)
+        self._base = QQ
+        if flags is None:
+            flags = self._flags
+        if parent is None:
+            libgr.gr_ctx_init_tower_lazy(self._ref, QQ._ref, flags)
+        else:
+            libgr.gr_ctx_init_tower_lazy_view(self._ref, parent._ref, flags & (GR_TOWER_LAZY_REAL | GR_TOWER_LAZY_ALGEBRAIC))
+            self._parent = parent
+        self._elem_type = gr_tower_lazy
+        assert libgr.gr_ctx_sizeof_elem(self._ref) <= ctypes.sizeof(gr_tower_lazy_elem_struct)
+        for name, value in options.items():
+            self.set_option(name, value)
+
+    def _view_class(self, flags):
+        return {0: ComplexField_tower, GR_TOWER_LAZY_REAL: RealField_tower,
+                GR_TOWER_LAZY_ALGEBRAIC: ComplexAlgebraicField_tower,
+                GR_TOWER_LAZY_REAL | GR_TOWER_LAZY_ALGEBRAIC: RealAlgebraicField_tower}[flags]
+
+    def real_field(self):
+        """
+        The real subfield of this field, as a view sharing its elements.
+
+            >>> C = ComplexField_tower(); R = C.real_field(); R
+            Real field (lazy towers)
+            >>> x = C(2).sqrt() + C.pi()
+            >>> R(x)
+            pi+a1 {a1 = sqrt(2)}
+            >>> R(C.i())     # doctest: +IGNORE_EXCEPTION_DETAIL
+            Traceback (most recent call last):
+              ...
+            FlintDomainError
+        """
+        flags = libgr.gr_tower_lazy_ctx_field_flags(self._ref) | GR_TOWER_LAZY_REAL
+        return self._view_class(flags)(parent=self)
+
+    def algebraic_field(self):
+        """
+        The algebraic subfield of this field, as a view sharing its
+        elements.
+        """
+        flags = libgr.gr_tower_lazy_ctx_field_flags(self._ref) | GR_TOWER_LAZY_ALGEBRAIC
+        return self._view_class(flags)(parent=self)
+
+    def stats(self):
+        """
+        Prints statistics about the towers of the context (with the
+        environment variable ``GR_TOWER_STATS_VERBOSE``, the sizes of
+        their moduli).
+        """
+        libgr.gr_tower_lazy_ctx_stats(self._ref)
+
+    def num_towers(self):
+        """
+        The number of towers of the context. Towers in which no element
+        lives any more are collected (except those holding canonical
+        definitions: pi, roots of unity, radicals of integers), so this
+        stays bounded in long sessions:
+
+            >>> C = ComplexField_tower()
+            >>> x = PolynomialRing(C).gen()
+            >>> for k in range(200):
+            ...     r = (x**3 - C(2).sqrt()*x - k).roots()
+            >>> C.num_towers() < 20
+            True
+        """
+        return libgr.gr_tower_lazy_ctx_num_towers(self._ref)
+
+    def set_print(self, numeric=False, symbolic=True, defs=True, digits=6):
+        """
+        Sets the printing of elements: a numerical value with the
+        given number of digits, the symbolic expression in the
+        generators, and the definitions of the generators involved.
+        Called without arguments, restores the default (expression with
+        definitions).
+        """
+        flags = 0
+        if numeric: flags |= GR_TOWER_PRINT_NUMERIC
+        if symbolic: flags |= GR_TOWER_PRINT_SYMBOLIC
+        if defs: flags |= GR_TOWER_PRINT_DEFS
+        libgr.gr_tower_lazy_ctx_set_print(self._ref, flags, digits)
+
+    @property
+    def print_flags(self):
+        return libgr.gr_tower_lazy_ctx_print_flags(self._ref)
+
+    def set_gens(self, split_imaginary=False, composite_roots=False, composite_radicals=False):
+        """
+        Sets how new generators are chosen. By default, the square
+        root of a negative rational number is a single generator
+        sqrt(-A) (except sqrt(-1) = i and sqrt(-3) = 2*exp(2*pi*i/3)+1).
+        With ``split_imaginary=True``, it is instead i*sqrt(A), whose
+        generators are shared with the real square roots:
+
+            >>> C = ComplexField_tower()
+            >>> C(-163).sqrt(), C(-12).sqrt()
+            (a1 {a1 = sqrt(-163)}, 4*a2+2 {a2 = exp(2*pi*i/3)})
+            >>> C.set_gens(split_imaginary=True)
+            >>> C(-163).sqrt()
+            a3*i {a3 = sqrt(163)}
+
+        By default, roots of unity of composite orders are products of
+        roots of unity of prime power orders, and square roots of
+        positive rationals are products of square roots of primes. With
+        ``composite_roots=True``, a root of unity is a power of one
+        generator exp(2*pi*i/N) for N the least common multiple of the
+        orders requested (Calcium's choice: faster arithmetic within one
+        cyclotomic field, slower when many orders occur; the same as
+        ``set_option("cyclotomic_degree_limit", 128)``), and with ``composite_radicals=True`` the square root of
+        A B^2 (A squarefree) is B sqrt(A):
+
+            >>> C = ComplexField_tower()
+            >>> C.set_gens(composite_roots=True, composite_radicals=True)
+            >>> C.i() * C("exp(2*pi*i/15)")
+            a1^15+a1^13-a1^7-a1^5+a1 {a1 = exp(2*pi*i/60)}
+            >>> C(24).sqrt()
+            2*a2 {a2 = sqrt(6)}
+
+        Elements created before the change are unaffected (and remain
+        compatible with those created after it).
+        """
+        flags = 0
+        if split_imaginary: flags |= GR_TOWER_GENS_SPLIT_IMAGINARY
+        if composite_roots: flags |= GR_TOWER_GENS_COMPOSITE_ROOTS
+        if composite_radicals: flags |= GR_TOWER_GENS_COMPOSITE_RADICALS
+        libgr.gr_tower_lazy_ctx_set_gen_flags(self._ref, flags)
+
+    @property
+    def gen_flags(self):
+        return libgr.gr_tower_lazy_ctx_gen_flags(self._ref)
+
+    @staticmethod
+    def _option_index(name):
+        if isinstance(name, int):
+            return name
+        try:
+            return GR_TOWER_OPTION_NAMES.index(name)
+        except ValueError:
+            raise ValueError("unknown option: %s" % name)
+
+    def set_option(self, name, value):
+        r"""
+        Sets a tuning option, shared with the views of this field (see
+        ``options`` for the names). It affects elements created
+        afterwards. For example, ``cyclotomic_degree_limit`` (default 0)
+        is the largest degree phi(N) of a root of unity exp(2*pi*i/N)
+        of composite order N used as one generator (the roots of unity
+        requested are its powers); beyond it, roots of unity of prime
+        power orders are used. ``trig_form`` selects the form of sin,
+        cos and tan of real arguments in the complex field:
+        GR_TOWER_TRIG_EXPONENTIAL (through exp) or GR_TOWER_TRIG_TANGENT
+        (through tangents, as in the real field). Elements of number
+        fields of one generator of degree up to ``dense_form_degree_limit``
+        (default 2^20) also have a dense form (a polynomial in the
+        generator, multiplied with FLINT's polynomial arithmetic), on which
+        arithmetic needs no lock; polynomials longer than 256 with fewer
+        than one nonzero coefficient in ``dense_form_sparsity`` (default 8)
+        stay sparse. With ``primitive_degree_limit`` (default 0), merged
+        number fields of several steps up to that degree become
+        QQ(theta) for a primitive element (worthwhile for small degrees
+        only):
+
+            >>> C = ComplexField_tower(cyclotomic_degree_limit=16)
+            >>> C.i() * C("exp(2*pi*i/15)")
+            a1^15+a1^13-a1^7-a1^5+a1 {a1 = exp(2*pi*i/60)}
+            >>> C.get_option("cyclotomic_degree_limit")
+            16
+            >>> C.set_option("trig_form", GR_TOWER_TRIG_TANGENT)
+            >>> C.cos(C.pi() / 5)
+            (-a2^2+7)/8 {a2 = tan(pi/5)}
+            >>> D = ComplexField_tower(primitive_degree_limit=4)
+            >>> D.sqrt(2) + D.sqrt(3)
+            a3 {a3 = root(1 - 10*a3^2 + a3^4, 3.14626)}
+        """
+        if libgr.gr_tower_lazy_ctx_set_option(self._ref, self._option_index(name), value) != GR_SUCCESS:
+            raise ValueError("value %s out of range for option %s" % (value, name))
+
+    def get_option(self, name):
+        return libgr.gr_tower_lazy_ctx_get_option(self._ref, self._option_index(name))
+
+    @property
+    def options(self):
+        r"""
+        The tuning options and their values:
+
+            >>> C = ComplexField_tower()
+            >>> C.options["cyclotomic_degree_limit"], C.options["prec_limit"]
+            (0, 256)
+        """
+        return {name: self.get_option(k) for k, name in enumerate(GR_TOWER_OPTION_NAMES)}
+
+
+class ComplexField_tower(gr_tower_lazy_ctx):
+    r"""
+    Field of exactly represented complex numbers (algebraic numbers,
+    exponentials and logarithms and what is built from them), with
+    specific embeddings in the complex numbers.
+
+        >>> C = ComplexField_tower()
+        >>> C
+        Complex field (lazy towers)
+        >>> C.exp(C.pi() * C.i()) + 1
+        0
+        >>> C.sqrt(2) * C.sqrt(3) == C.sqrt(6)
+        True
+        >>> (C.log(3) - C.log(2)) - C.log(C(3)/2)
+        0
+        >>> C.sqrt(C(1)/2)
+        a1/2 {a1 = sqrt(2)}
+        >>> C.sqrt(C(1)/2) ** 2
+        1/2
+        >>> C(-1).sqrt(), C.i()
+        (i, i)
+    """
+    _flags = GR_TOWER_MERGE_EXPRESS
+
+class RealField_tower(gr_tower_lazy_ctx):
+    r"""
+    The real subfield of :class:`ComplexField_tower`: an operation whose
+    result is not real fails with a domain error.
+
+        >>> R = RealField_tower()
+        >>> R
+        Real field (lazy towers)
+        >>> R(2).sqrt() + R(2).exp()
+        t1+a1 {a1 = sqrt(2); t1 = exp(2)}
+        >>> R(-2).sqrt()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: sqrt(x) is not an element of {Real field (lazy towers)} for {x = -2}
+        >>> R.i()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: i is not an element of {Real field (lazy towers)}
+        >>> R.log(-1)
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: log(x) is not an element of {Real field (lazy towers)} for {x = -1}
+        >>> R.asin(2)
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: asin(x) is not an element of {Real field (lazy towers)} for {x = 2}
+        >>> R.acos(R(1)/2)
+        pi/3
+        >>> R(QQbar(-1).sqrt())
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: Root a = 1.00000*I of a^2+1 is not defined in Real field (lazy towers)
+        >>> (R.pi().sqrt() - 1).sgn()
+        1
+
+    Values are computed through the complex numbers where that is the
+    natural way (the representation may then involve nonreal
+    generators, as for ``cos(1)`` below); values involving roots of unity
+    are rewritten in real terms, and read back only when they are real.
+    The real trigonometric constants at rational multiples of pi are
+    polynomials in one generator tan(pi/M) per level (the tangent normal
+    form; square roots when it is quadratic):
+
+        >>> R = ComplexField_tower().real_field()
+        >>> R.cos(R.pi() / 5), R.sin(R.pi() / 12)
+        ((-a1^2+7)/8 {a1 = tan(pi/5)}, (a2^2+8*a2+1)/8 {a2 = tan(pi/24)})
+        >>> R.tan(R.pi() / 12)
+        -a3+2 {a3 = sqrt(3)}
+        >>> PolynomialRing(R, "x")([1, 0, 0, 0, 1]).factor()
+        (1, [1 + (-a5 {a5 = sqrt(2)})*x + x^2, 1 + (a5 {a5 = sqrt(2)})*x + x^2], [1, 1])
+        >>> R("a1 {a1 = exp(2*pi*i/8)}")     # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+          ...
+        FlintDomainError
+        >>> R("a1^2+a1^6 {a1 = exp(2*pi*i/8)}")
+        0
+
+    The trigonometric functions of real arguments (other than rational
+    multiples of pi) are expressed through the real generators tan and
+    atan, whose relations Richardson's algorithm finds on their angles:
+
+        >>> R.cos(R(1)), R.atan(R(2))
+        ((-t1^2+1)/(t1^2+1) {t1 = tan(1/2)}, t2 {t2 = atan(2)})
+        >>> 4 * R.atan(R(1)/5) - R.atan(R(1)/239) == R.pi() / 4
+        True
+        >>> R.atan(R.tan(R(2))), R.tan(R.atan(R(2)))
+        (-pi+2, 2)
+        >>> R.sin(R(1) + R(2).sqrt()) == R.sin(1) * R.cos(R(2).sqrt()) + R.cos(1) * R.sin(R(2).sqrt())
+        True
+    """
+    _flags = GR_TOWER_MERGE_EXPRESS | GR_TOWER_LAZY_REAL
+
+class ComplexAlgebraicField_tower(gr_tower_lazy_ctx):
+    r"""
+    The algebraic numbers, represented in towers: exponentials,
+    logarithms, trigonometric functions and pi are available only at
+    the arguments where their values are algebraic (which is decided by
+    the Lindemann-Weierstrass and Gelfond-Schneider theorems).
+
+        >>> A = ComplexAlgebraicField_tower()
+        >>> A
+        Complex algebraic field (lazy towers)
+        >>> A(-2).sqrt(), A(2)**(QQ(1)/3)
+        (a1 {a1 = sqrt(-2)}, a2 {a2 = root(2, 3)})
+        >>> A.exp(0), A.log(1), A.cos(0), A(1) ** A(2).sqrt()
+        (1, 0, 1, 1)
+        >>> A.exp(1)
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: exp(x) is not an element of {Complex algebraic field (lazy towers)} for {x = 1}
+        >>> A.pi()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: pi is not an element of {Complex algebraic field (lazy towers)}
+        >>> A(2).sqrt() ** A(2).sqrt()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: x ** y is not an element of {Complex algebraic field (lazy towers)} for {x = a3 {a3 = sqrt(2)}}, {y = a3 {a3 = sqrt(2)}}
+        >>> A(QQbar(2).sqrt() + QQbar(3).sqrt()) == A(2).sqrt() + A(3).sqrt()
+        True
+    """
+    _flags = GR_TOWER_MERGE_EXPRESS | GR_TOWER_LAZY_ALGEBRAIC
+
+class RealAlgebraicField_tower(gr_tower_lazy_ctx):
+    r"""
+    The real algebraic numbers, represented in towers.
+
+        >>> A = RealAlgebraicField_tower()
+        >>> A
+        Real algebraic field (lazy towers)
+        >>> (1 + A(5).sqrt()) / 2
+        (a1+1)/2 {a1 = sqrt(5)}
+        >>> A(-2).sqrt()
+        Traceback (most recent call last):
+          ...
+        FlintDomainError: sqrt(x) is not an element of {Real algebraic field (lazy towers)} for {x = -2}
+        >>> PolynomialRing(A)([-1, -1, 0, 0, 0, 1]).roots()
+        ([a2 {a2 = root(-1 - a2 + a2^5, 1.16730)}], [1])
+    """
+    _flags = GR_TOWER_MERGE_EXPRESS | GR_TOWER_LAZY_REAL | GR_TOWER_LAZY_ALGEBRAIC
+
+
+class gr_tower:
+    r"""
+    A fixed tower of fields `\mathbb{Q}(t_1, \ldots)(a_1)(a_2)\cdots`
+    (``gr_tower_t``), built step by step by adjoining square roots,
+    roots, algebraic numbers, exponentials, logarithms and pi, and the
+    field of its top level (:meth:`field`), a ``gr`` context with
+    complete zero tests (dynamic evaluation refines the tower when a
+    defining polynomial turns out to be reducible). Elements of the field
+    are polynomials in the last generator over the field below, printed
+    in nested form.
+
+        >>> T = gr_tower()
+        >>> a1 = T.adjoin_sqrt(2); a1
+        a1
+        >>> a2 = T.adjoin_sqrt(3); a2
+        a2
+        >>> K = T.field(); K
+        Tower field Rational field (fmpq)(a1, a2)
+        >>> a1, a2 = K.gens()
+        >>> (a1 + a2) ** 2
+        5 + (2*a1)*a2
+        >>> 1 / (a1 + a2)
+        -a1 + a2
+        >>> a3 = T.adjoin_sqrt(a1 + a2)
+        >>> a3 ** 4
+        (5 + (2*a1)*a2)
+        >>> a3 + a1      # elements of the earlier field convert to the new one
+        a1 + a3
+        >>> T
+        Tower of degree 8 over Rational field (fmpq)
+          a1 = 1.414213562  root_2(2)  =  root of  -2 + a1^2  (irreducible)
+          a2 = 1.732050808  root_2(3)  =  root of  -3 + a2^2  (irreducible)
+          a3 = 1.773771228  root_2(a2+a1)  =  root of  (-a1 - a2) + a3^2  (irreducible)
+
+    A step adjoined with a polynomial which is not irreducible is
+    refined when an operation exposes the factorization (the field
+    context always represents a field):
+
+        >>> T = gr_tower()
+        >>> a1 = T.adjoin_sqrt(2)
+        >>> K = T.field()
+        >>> a2 = T.adjoin_algebraic(PolynomialRing(K)([-2, 0, 1]), CC(1.4142))    # x^2 - 2 again, dynamic
+        >>> T.degree()
+        4
+        >>> a2 == a1     # the zero test exposes the factorization
+        True
+        >>> T.degree()   # and the tower was refined
+        2
+        >>> a2 - a1
+        0
+
+    Transcendental generators make the base a rational function field
+    (the tower is rebuilt: field objects and elements created before
+    become stale):
+
+        >>> T = gr_tower()
+        >>> pi = T.adjoin_pi(); pi
+        pi
+        >>> a1 = T.adjoin_sqrt(2)
+        >>> t2 = T.adjoin_exp(a1)
+        >>> t2.parent()
+        Tower field Fraction field of multivariate polynomials over Integer ring (fmpz) in 2 variables, lex order(a1)
+        >>> T
+        Tower of degree 2 over Fraction field of multivariate polynomials over Integer ring (fmpz) in 2 variables, lex order
+          pi = 3.141592654  pi  (transcendental)
+          a1 = 1.414213562  root_2(2)  =  root of  -2 + a1^2  (irreducible)
+          t2 = 4.113250379  exp(a1)  (conjecturally transcendental)
+        >>> a1.parent()(1)
+        Traceback (most recent call last):
+          ...
+        ValueError: this field object is stale: the tower was rebuilt (transcendental generator adjoined); use tower.field() again
+        >>> pi, a1, t2 = T.gens()
+        >>> (t2 - pi) * a1
+        (-pi+t2)*a1
+
+    Polynomials over the field of a tower factor into irreducibles
+    (Trager's method), and their roots in the field are the linear
+    factors:
+
+        >>> T = gr_tower()
+        >>> a1 = T.adjoin_sqrt(2); a2 = T.adjoin_sqrt(3)
+        >>> R = PolynomialRing(T.field(), "x"); x = R.gen()
+        >>> (x**4 + 1).factor()
+        (1, [1 + a1*x + x^2, 1 - a1*x + x^2], [1, 1])
+        >>> (x**4 - 10*x**2 + 1).roots()
+        ([-a1 + a2, -a1 - a2, a1 - a2, a1 + a2], [1, 1, 1, 1])
+        >>> (x**3 - 2).factor()
+        (1, [-2 + x^3], [1])
+
+    Over the lazy fields, polynomials split into linear factors (and
+    quadratic factors for the pairs of nonreal roots over the real
+    fields):
+
+        >>> x = PolynomialRing(RR_tower, "x").gen()
+        >>> ((x**2 - 2) * (x**2 + 1)).factor()
+        (1, [(-a1 {a1 = sqrt(2)}) + x, (a1 {a1 = sqrt(2)}) + x, 1 + x^2], [1, 1, 1])
+
+    The tower of an element of a lazy field can be inspected the same way:
+
+        >>> x = CC_tower(2).sqrt() + CC_tower(3).sqrt()
+        >>> x.tower()      # doctest: +ELLIPSIS
+        Tower of degree 4 over Rational field (fmpq)
+          a... = 1.414213562  root_2(2)  =  root of  -2 + a...^2  (irreducible)
+          a... = 1.732050808  root_2(3)  =  root of  -3 + a...^2  (irreducible)
+    """
+
+    def __init__(self, _ptr=None, _owned=True):
+        if _ptr is None:
+            self._ptr = libgr.gr_tower_heap_init(QQ._ref)
+            self._owned = True
+        else:
+            self._ptr = _ptr
+            self._owned = _owned
+        self._fields = []
+
+    def __del__(self):
+        if getattr(self, "_owned", False):
+            libgr.gr_tower_heap_clear(self._ptr)
+
+    def __repr__(self):
+        arr = ctypes.c_char_p()
+        libgr.gr_tower_get_str(ctypes.byref(arr), self._ptr)
+        try:
+            s = ctypes.cast(arr, ctypes.c_char_p).value.decode("ascii")
+        finally:
+            libflint.flint_free(arr)
+        return s.rstrip("\n")
+
+    def field(self):
+        """
+        The field of the top level of the tower, as a context object.
+        A field object remains valid when algebraic generators are
+        adjoined afterwards (its elements then lie in a subfield of the
+        new top field, and convert to it), but not when a transcendental
+        generator is adjoined, which rebuilds the tower over a new base
+        field: field objects created before are then stale, and their
+        elements unusable.
+        """
+        K = TowerField(self)
+        self._fields.append(weakref.ref(K))
+        return K
+
+    def _rebuilt(self):
+        for r in self._fields:
+            K = r()
+            if K is not None:
+                K._stale = True
+        self._fields = []
+
+    def degree(self):
+        return libgr.gr_tower_degree(self._ptr)
+
+    def length(self):
+        """
+        The number of algebraic generators.
+        """
+        return libgr.gr_tower_length_si(self._ptr)
+
+    def num_gens(self):
+        return libgr.gr_tower_num_gens_si(self._ptr)
+
+    def gen_names(self):
+        return [ctypes.cast(libgr.gr_tower_gen_name(self._ptr, d), ctypes.c_char_p).value.decode("ascii") for d in range(self.num_gens())]
+
+    def gen(self, d):
+        """
+        The generator with definition order *d* (0-based, in the order
+        of adjunction), as an element of the current top field.
+        """
+        K = self.field()
+        x = K(0)
+        status = libgr.gr_tower_gen_get(x._ref, self._ptr, d)
+        if status:
+            raise FlintUnableError("unable to get the generator")
+        return x
+
+    def gens(self):
+        """
+        All generators (algebraic and transcendental) in the order of
+        adjunction, as elements of the current top field.
+        """
+        return [self.gen(d) for d in range(self.num_gens())]
+
+    def _last_gen(self):
+        return self.gen(self.num_gens() - 1)
+
+    def _element(self, x):
+        return self.field()(x)
+
+    def _check(self, status, what):
+        if status:
+            if status & GR_DOMAIN: raise FlintDomainError(f"cannot adjoin {what}")
+            raise FlintUnableError(f"unable to adjoin {what}")
+
+    def adjoin_sqrt(self, x, name=None):
+        """
+        Adjoins the principal square root of *x* (an element of the top
+        field, or something convertible to it) and returns its name.
+        """
+        K = self.field()
+        x = K(x)
+        self._check(libgr.gr_tower_adjoin_root_ui(self._ptr, x._ref, 2, _name_arg(name)), "sqrt(%s)" % x)
+        return self._last_gen()
+
+    def adjoin_root(self, x, n, name=None):
+        """
+        Adjoins the principal *n*-th root of *x*.
+        """
+        K = self.field()
+        x = K(x)
+        self._check(libgr.gr_tower_adjoin_root_ui(self._ptr, x._ref, n, _name_arg(name)), "root(%s, %s)" % (x, n))
+        return self._last_gen()
+
+    def adjoin_qqbar(self, x, name=None):
+        """
+        Adjoins the algebraic number *x* (a ``qqbar``, or something
+        convertible to one) through its minimal polynomial over QQ.
+        """
+        x = QQbar(x)
+        self._check(libgr.gr_tower_adjoin_qqbar(self._ptr, x._ref, _name_arg(name)), "%s" % x)
+        return self._last_gen()
+
+    def adjoin_root_of_unity(self, n, name=None):
+        self._check(libgr.gr_tower_adjoin_root_of_unity(self._ptr, n, _name_arg(name)), "exp(2 pi i / %s)" % n)
+        return self._last_gen()
+
+    def adjoin_algebraic(self, poly, z, proven=False, name=None):
+        """
+        Adjoins the root of the polynomial *poly* (over the top field)
+        isolated by the complex enclosure *z* (an ``acb``, or something
+        convertible). The polynomial need not be known irreducible
+        (``proven=False``): the tower is refined later if it is not.
+        """
+        K = self.field()
+        poly = PolynomialRing(K)(poly)
+        z = CC(z)
+        status = GR_TOWER_STATUS_PROVEN if proven else GR_TOWER_STATUS_DYNAMIC
+        self._check(libgr.gr_tower_adjoin_algebraic(self._ptr, poly._ref, z._ref, status, _name_arg(name)), "root of %s near %s" % (poly, z))
+        return self._last_gen()
+
+    def adjoin_pi(self, name=None):
+        """
+        Adjoins pi as a transcendental generator (this rebuilds the
+        tower: see :meth:`field`).
+        """
+        self._check(libgr.gr_tower_adjoin_pi(self._ptr, _name_arg(name)), "pi")
+        self._rebuilt()
+        return self._last_gen()
+
+    def adjoin_exp(self, x, name=None):
+        """
+        Adjoins exp(*x*) as a transcendental generator (conjecturally
+        transcendental over the tower unless a relation is found; this
+        rebuilds the tower: see :meth:`field`).
+        """
+        K = self.field()
+        x = K(x)
+        status = libgr.gr_tower_adjoin_exp(self._ptr, x._ref, _name_arg(name))
+        self._rebuilt()
+        self._check(status, "exp(...)")
+        return self._last_gen()
+
+    def adjoin_log(self, x, name=None):
+        """
+        Adjoins log(*x*) as a transcendental generator (see :meth:`adjoin_exp`).
+        """
+        K = self.field()
+        x = K(x)
+        status = libgr.gr_tower_adjoin_log(self._ptr, x._ref, _name_arg(name))
+        self._rebuilt()
+        self._check(status, "log(...)")
+        return self._last_gen()
+
+GR_TOWER_STATUS_PROVEN = 0
+GR_TOWER_STATUS_DYNAMIC = 1
+
+def _name_arg(name):
+    if name is None:
+        return ctypes.c_char_p(None)
+    return ctypes.c_char_p(name.encode("ascii"))
+
+class TowerField(gr_ctx):
+    r"""
+    The field of the top level of a :class:`gr_tower`
+    (``gr_ctx_init_tower_field``). See :class:`gr_tower`.
+    """
+    def __init__(self, tower):
+        gr_ctx.__init__(self)
+        self._tower = tower
+        self._stale = False
+        libgr.gr_ctx_init_tower_field(self._ref, tower._ptr)
+        self._elem_type = gr_tower_field_elem
+        assert libgr.gr_ctx_sizeof_elem(self._ref) <= ctypes.sizeof(gr_tower_field_struct)
+
+    def __call__(self, *args, **kwargs):
+        if self._stale:
+            raise ValueError("this field object is stale: the tower was rebuilt (transcendental generator adjoined); use tower.field() again")
+        return gr_ctx.__call__(self, *args, **kwargs)
+
+    def tower(self):
+        return self._tower
+
 
 
 
@@ -6305,6 +7116,32 @@ class ca(gr_elem):
     @staticmethod
     def _default_context():
         return CC_ca
+
+class gr_tower_lazy(gr_elem):
+    _struct_type = gr_tower_lazy_elem_struct
+
+    @staticmethod
+    def _default_context():
+        return CC_tower
+
+    def tower(self):
+        """
+        The tower (a :class:`gr_tower`, owned by the context) in which
+        this element is represented. (The tower object keeps the element
+        alive: the context collects towers in which no element lives.)
+        """
+        level = c_slong()
+        ptr = libgr.gr_tower_lazy_get_tower(ctypes.byref(level), self._ref, self._ctx)
+        t = gr_tower(_ptr=ptr, _owned=False)
+        t._keep = self
+        return t
+
+class gr_tower_field_elem(gr_elem):
+    _struct_type = gr_tower_field_struct
+
+    @staticmethod
+    def _default_context():
+        return None
 
 class arb(gr_elem):
     _struct_type = arb_struct
@@ -9826,6 +10663,10 @@ RR = RR_arb = RealField_arb()
 CC = CC_acb = ComplexField_acb()
 RR_ca = RealField_ca()
 CC_ca = ComplexField_ca()
+CC_tower = ComplexField_tower()
+RR_tower = CC_tower.real_field()
+QQbar_tower = ComplexAlgebraicField_tower()
+AA_tower = QQbar_tower.real_field()
 
 RF = RealFloat_arf()
 CF = ComplexFloat_acf()
@@ -10789,6 +11630,434 @@ def test_ca_trigonometric():
     assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
     assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
 
+
+def test_tower():
+    """
+    The ca test cases, run against the lazy tower field (gamma, erf and
+    the extended values are not available there).
+    """
+    C = ComplexField_tower()
+    sqrt = C.sqrt
+    exp = C.exp
+    log = C.log
+    tan = C.tan
+    sin = C.sin
+    cos = C.cos
+    acos = C.acos
+    arg = C.arg
+    atan = C.atan
+    re = C.re
+    im = C.im
+    floor = C.floor
+    ceil = C.ceil
+    pi = C.pi()
+    i = C.i()
+    e = C.exp(1)
+
+    def gd(x):
+        return 2*atan(exp(x))-pi/2
+
+    def cosh(x):
+        y = exp(x)
+        return (y + 1/y)/2
+
+    def sinh(x):
+        y = exp(x)
+        return (y - 1/y)/2
+
+    def tanh(x):
+        return sinh(x)/cosh(x)
+
+    assert floor(sqrt(2)) == 1
+    assert ceil(sqrt(2)) == 2
+    assert C.nint(C(5)/2) == 2
+    assert C.trunc(-sqrt(2)) == -1
+
+    assert (sqrt(2)**sqrt(2))**sqrt(2) == 2
+    assert (sqrt(-2)**sqrt(2))**sqrt(2) == -2
+    assert (sqrt(3)**sqrt(3))**sqrt(3) == 3*sqrt(3)
+    assert sqrt(-pi)**2 == -pi
+
+    assert log(1+pi) - log(pi) - log(1+1/pi) == 0
+    assert log(log(-log(log(exp(exp(-exp(exp(3)))))))) == 3
+
+    assert exp(pi*i) + 1 == 0
+    assert exp(pi*i) == -1
+    assert exp(log(2)*log(3)) > 2
+    assert e**2 == exp(2)
+
+    assert sin(gd(1)) == tanh(1)
+    assert tan(gd(1)) == sinh(1)
+    assert sin(gd(sqrt(2))) == tanh(sqrt(2))
+    assert tan(gd(1)/2) - tanh(C(1)/2) == 0
+
+    assert C(qqbar(sqrt(2))) == sqrt(2)
+    assert C(QQbar(2).sqrt()) == sqrt(2)
+
+    assert sqrt(2)*(1+i)/2 * pi - exp(pi*i/4) * pi == 0
+    assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
+    assert arg(sqrt(-pi*i)) == -pi/4
+    assert (pi + sqrt(2) + sqrt(3)) / (pi + sqrt(5 + 2*sqrt(6))) == 1
+    assert log(1/exp(sqrt(2)+1)) == -sqrt(2)-1
+    assert abs(exp(sqrt(1+i))) == exp(re(sqrt(1+i)))
+    assert tan(pi*sqrt(2))*tan(pi*sqrt(3)) == (cos(pi*sqrt(5-2*sqrt(6))) - cos(pi*sqrt(5+2*sqrt(6))))/(cos(pi*sqrt(5-2*sqrt(6))) + cos(pi*sqrt(5+2*sqrt(6))))
+    assert log(exp(i) / exp(-i)) == 2*i
+
+    v = cos(acos(sqrt(2) - sqrt(3))/3)
+    assert 1 - 90*v**2 + 321*v**4 - 592*v**6 + 864*v**8 - 768*v**10 + 256*v**12 == 0
+
+    # the tower field decides these (ca does not)
+    assert acos(cos(1)) == 1
+    assert acos(cos(sqrt(2) - 1)) == sqrt(2) - 1
+    assert tan(sqrt(pi*2))*tan(sqrt(pi*3)) == \
+        (cos(sqrt(pi*(5-2*sqrt(6)))) - cos(sqrt(pi*(5+2*sqrt(6)))))/(cos(sqrt(pi*(5-2*sqrt(6)))) + cos(sqrt(pi*(5+2*sqrt(6)))))
+    assert sqrt(exp(2*sqrt(2)) + exp(-2*sqrt(2)) - 2) == (exp(2*sqrt(2))-1)/sqrt(exp(2*sqrt(2)))
+
+    # Some examples from Stoutemyer
+    z = pi
+    assert i*((3-5*i)*z+1)/(((5+3*i)*z+i)*z) == 1/pi
+    assert C(-1)**(C(1)/8) * sqrt(i+1) / C(2)**(C(3)/4) + i*exp(i*pi/2) == (i-1)/2
+    assert sin(2*atan(z)) + (15*sqrt(3)+26)**(C(1)/3) == 2*z/(z**2+1) + sqrt(3) + 2
+
+    # roots of unity and radicals
+    assert exp(2*pi*i/3) * exp(2*pi*i/5) == exp(16*pi*i/15)
+    assert C(6)**(C(1)/6) == sqrt(2) / C(2)**(C(1)/3) * C(3)**(C(1)/6)
+    assert sqrt(-2) == i*sqrt(2)
+    assert log(1+i) == log(2)/2 + pi*i/4
+    assert log(-1) == pi*i
+    assert log(3-4*i) == log(5) - 2*i*atan(C(1)/2)
+
+    # polynomial roots: symmetric functions of the roots of an irreducible
+    # polynomial reduce to the coefficients
+    x = PolynomialRing(C).gen()
+    f = x**5 - x - 1
+    roots = f.roots()
+    assert len(roots[0]) == 5
+    assert sum(r for r in roots[0]) == 0
+    prod = C(1)
+    for r in roots[0]:
+        prod = prod * r
+    assert prod == 1
+    assert sum(r**2 for r in roots[0]) == 0
+    assert sum(1/r for r in roots[0]) == -1
+    assert (x**2 - 2).roots()[0] == [sqrt(2), -sqrt(2)]
+
+    # radicals of primes over fields unramified at them are new steps
+    # (no search); over Q(zeta_12), sqrt(3) is found
+    z16 = exp(2*pi*i/16)
+    u = z16 + sqrt(2) + sqrt(3) + sqrt(5) + sqrt(7)
+    v = sqrt(11) * u
+    assert v**2 == 11 * u**2
+    assert v != u * sqrt(13)
+    z12 = exp(2*pi*i/12)
+    assert sqrt(3) == z12 + 1/z12
+    assert sqrt(3) * z12 == z12**2 + 1
+
+    # square roots of written-out squares, without searching the tower
+    assert sqrt((1-pi)**2) == pi-1
+    assert sqrt(-(pi+1)**2) == i*(pi+1)
+    assert sqrt((i*pi - C.exp(1))**2) == C.exp(1) - i*pi
+
+    # roots over the field of the coefficients only, even when the towers
+    # of the coefficients are shared with unrelated generators (the roots
+    # of other polynomials, other radicals): a splitting tower of degree
+    # 240 for x^5 - sqrt(2) x - 1, rather than a tower of degree 5760
+    s = sum(sqrt(p) for p in [3,5,7,11,13]) + C(2)**(C(1)/3)
+    c = (s + sqrt(2)) - s
+    for f, n in [(x**4 - c*x - 1, 4), (x**3 - (1+c)*x**2 + 1, 3), (x**5 - c*x - 1, 5)]:
+        rts = f.roots()[0]
+        assert len(rts) == n
+        assert all(f(r) == 0 for r in rts)
+        assert sum(rts) == -f[n-1]
+        # the roots live in a splitting tower over the small tower of
+        # sqrt(2) (of degree at most 2 n! over it), not over the tower of
+        # s (the last root, by Vieta's formula, may involve the latter)
+        assert sum(r.tower().degree() <= 4 * math.factorial(n) for r in rts) >= n - 1
+
+def test_tower_trigonometric():
+    C = ComplexField_tower()
+    sqrt = C.sqrt
+    pi = C.pi()
+    xsin = C.sin
+    xcos = C.cos
+    xtan = C.tan
+
+    a = 1+sqrt(2)
+    b = 2+sqrt(2)
+
+    assert xsin(a)**2 + xcos(a)**2 == 1
+    assert xsin(-a)**2 + xcos(a)**2 == 1
+    assert xsin(a) == -xsin(-a)
+    assert xcos(a) == xcos(-a)
+    assert xtan(a) == -xtan(-a)
+    assert xsin(a+2*pi) == xsin(a)
+    assert xcos(a+2*pi) == xcos(a)
+    assert xtan(a+pi) == xtan(a)
+    assert xsin(a+pi) == -xsin(a)
+    assert xcos(a+pi) == -xcos(a)
+    assert xtan(a+pi/2) == -1/xtan(a)
+    assert xsin(a+pi/2) == xcos(a)
+    assert xcos(a+pi/2) == -xsin(a)
+    assert xsin(a-pi/2) == -xcos(a)
+    assert xcos(a-pi/2) == xsin(a)
+    assert xtan(a+pi/4) == (xtan(a)+1)/(1-xtan(a))
+    assert xtan(a-pi/4) == (xtan(a)-1)/(1+xtan(a))
+    assert xsin(pi/2 - a) == xcos(a)
+    assert xcos(pi/2 - a) == xsin(a)
+    assert xtan(pi/2 - a) == 1 / xtan(a)
+    assert xsin(pi - a) == xsin(a)
+    assert xcos(pi - a) == -xcos(a)
+    assert xtan(pi - a) == -xtan(a)
+    assert xsin(2*pi - a) == -xsin(a)
+    assert xcos(2*pi - a) == xcos(a)
+    assert xsin(a+b) == xsin(a)*xcos(b) + xcos(a)*xsin(b)
+    assert xsin(a-b) == xsin(a)*xcos(b) - xcos(a)*xsin(b)
+    assert xcos(a+b) == xcos(a)*xcos(b) - xsin(a)*xsin(b)
+    assert xcos(a-b) == xcos(a)*xcos(b) + xsin(a)*xsin(b)
+    assert xtan(a+b) == (xtan(a)+xtan(b)) / (1 - xtan(a)*xtan(b))
+    assert xtan(a-b) == (xtan(a)-xtan(b)) / (1 + xtan(a)*xtan(b))
+    assert xsin(2*a) == 2*xsin(a)*xcos(a)
+    assert xsin(2*a) == 2*xtan(a)/(1+xtan(a)**2)
+    assert xcos(2*a) == xcos(a)**2 - xsin(a)**2
+    assert xcos(2*a) == 2*xcos(a)**2 - 1
+    assert xcos(2*a) == 1 - 2*xsin(a)**2
+    assert xcos(2*a) == (1 - xtan(a)**2) / (1 + xtan(a)**2)
+    assert xtan(2*a) == (2*xtan(a)) / (1 - xtan(a)**2)
+
+    assert xsin(3*a) == 3*xsin(a) - 4*xsin(a)**3
+    assert xcos(3*a) == 4*xcos(a)**3 - 3*xcos(a)
+    assert xtan(3*a) == (3*xtan(a) - xtan(a)**3) / (1 - 3*xtan(a)**2)
+    assert xsin(a/2)**2 == (1-xcos(a))/2
+    assert xcos(a/2)**2 == (1+xcos(a))/2
+    assert xtan((a-b)/2) == (xsin(a) - xsin(b)) / (xcos(a) + xcos(b))
+
+    assert 2*xcos(a)*xcos(b) == xcos(a-b) + xcos(a+b)
+    assert 2*xsin(a)*xsin(b) == xcos(a-b) - xcos(a+b)
+    assert 2*xsin(a)*xcos(b) == xsin(a+b) + xsin(a-b)
+    assert 2*xcos(a)*xsin(b) == xsin(a+b) - xsin(a-b)
+
+    assert xsin(a) + xsin(b) == 2*xsin((a+b)/2)*xcos((a-b)/2)
+    assert xsin(a) - xsin(b) == 2*xsin((a-b)/2)*xcos((a+b)/2)
+
+    assert xcos(a) + xcos(b) == 2*xcos((a+b)/2)*xcos((a-b)/2)
+    assert xcos(a) - xcos(b) == -2*xsin((a+b)/2)*xsin((a-b)/2)
+    assert xsin(a) == sqrt(1 - xcos(a)**2)
+
+    for N in range(1,17):
+        assert sum(xcos(n*a) for n in range(1,N+1)) == xsin((N+C(1)/2)*a)/(2*xsin(a/2)) - C(1)/2
+
+    assert xcos(a) == -sqrt(1 - xsin(a)**2)
+    assert xsin(a/2) == sqrt((1-xcos(a))/2)
+
+    assert xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a)
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
+
+
+def test_tower_trigonometric_real():
+    # the same identities in the real field, where the trigonometric
+    # functions of real arguments are tangents and arctangents
+
+    C = ComplexField_tower().real_field()
+    sqrt = C.sqrt
+    pi = C.pi()
+    xsin = C.sin
+    xcos = C.cos
+    xtan = C.tan
+
+    a = 1+sqrt(2)
+    b = 2+sqrt(2)
+
+    assert xsin(a)**2 + xcos(a)**2 == 1
+    assert xsin(-a)**2 + xcos(a)**2 == 1
+    assert xsin(a) == -xsin(-a)
+    assert xcos(a) == xcos(-a)
+    assert xtan(a) == -xtan(-a)
+    assert xsin(a+2*pi) == xsin(a)
+    assert xcos(a+2*pi) == xcos(a)
+    assert xtan(a+pi) == xtan(a)
+    assert xsin(a+pi) == -xsin(a)
+    assert xcos(a+pi) == -xcos(a)
+    assert xtan(a+pi/2) == -1/xtan(a)
+    assert xsin(a+pi/2) == xcos(a)
+    assert xcos(a+pi/2) == -xsin(a)
+    assert xsin(a-pi/2) == -xcos(a)
+    assert xcos(a-pi/2) == xsin(a)
+    assert xtan(a+pi/4) == (xtan(a)+1)/(1-xtan(a))
+    assert xtan(a-pi/4) == (xtan(a)-1)/(1+xtan(a))
+    assert xsin(pi/2 - a) == xcos(a)
+    assert xcos(pi/2 - a) == xsin(a)
+    assert xtan(pi/2 - a) == 1 / xtan(a)
+    assert xsin(pi - a) == xsin(a)
+    assert xcos(pi - a) == -xcos(a)
+    assert xtan(pi - a) == -xtan(a)
+    assert xsin(2*pi - a) == -xsin(a)
+    assert xcos(2*pi - a) == xcos(a)
+    assert xsin(a+b) == xsin(a)*xcos(b) + xcos(a)*xsin(b)
+    assert xsin(a-b) == xsin(a)*xcos(b) - xcos(a)*xsin(b)
+    assert xcos(a+b) == xcos(a)*xcos(b) - xsin(a)*xsin(b)
+    assert xcos(a-b) == xcos(a)*xcos(b) + xsin(a)*xsin(b)
+    assert xtan(a+b) == (xtan(a)+xtan(b)) / (1 - xtan(a)*xtan(b))
+    assert xtan(a-b) == (xtan(a)-xtan(b)) / (1 + xtan(a)*xtan(b))
+    assert xsin(2*a) == 2*xsin(a)*xcos(a)
+    assert xsin(2*a) == 2*xtan(a)/(1+xtan(a)**2)
+    assert xcos(2*a) == xcos(a)**2 - xsin(a)**2
+    assert xcos(2*a) == 2*xcos(a)**2 - 1
+    assert xcos(2*a) == 1 - 2*xsin(a)**2
+    assert xcos(2*a) == (1 - xtan(a)**2) / (1 + xtan(a)**2)
+    assert xtan(2*a) == (2*xtan(a)) / (1 - xtan(a)**2)
+
+    assert xsin(3*a) == 3*xsin(a) - 4*xsin(a)**3
+    assert xcos(3*a) == 4*xcos(a)**3 - 3*xcos(a)
+    assert xtan(3*a) == (3*xtan(a) - xtan(a)**3) / (1 - 3*xtan(a)**2)
+    assert xsin(a/2)**2 == (1-xcos(a))/2
+    assert xcos(a/2)**2 == (1+xcos(a))/2
+    assert xtan((a-b)/2) == (xsin(a) - xsin(b)) / (xcos(a) + xcos(b))
+
+    assert 2*xcos(a)*xcos(b) == xcos(a-b) + xcos(a+b)
+    assert 2*xsin(a)*xsin(b) == xcos(a-b) - xcos(a+b)
+    assert 2*xsin(a)*xcos(b) == xsin(a+b) + xsin(a-b)
+    assert 2*xcos(a)*xsin(b) == xsin(a+b) - xsin(a-b)
+
+    assert xsin(a) + xsin(b) == 2*xsin((a+b)/2)*xcos((a-b)/2)
+    assert xsin(a) - xsin(b) == 2*xsin((a-b)/2)*xcos((a+b)/2)
+
+    assert xcos(a) + xcos(b) == 2*xcos((a+b)/2)*xcos((a-b)/2)
+    assert xcos(a) - xcos(b) == -2*xsin((a+b)/2)*xsin((a-b)/2)
+    assert xsin(a) == sqrt(1 - xcos(a)**2)
+
+    for N in range(1,17):
+        assert sum(xcos(n*a) for n in range(1,N+1)) == xsin((N+C(1)/2)*a)/(2*xsin(a/2)) - C(1)/2
+
+    assert xcos(a) == -sqrt(1 - xsin(a)**2)
+    assert xsin(a/2) == sqrt((1-xcos(a))/2)
+
+    assert xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a)
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
+
+def test_tower_calcium_issues():
+    """
+    Open issues from the Calcium issue tracker
+    (https://github.com/flintlib/calcium/issues), on the lazy tower field.
+    """
+    C = ComplexField_tower()
+    sqrt = C.sqrt
+    exp = C.exp
+    log = C.log
+    cos = C.cos
+    acos = C.acos
+    pi = C.pi()
+    i = C.i()
+
+    # #38: cancellation of powers with a large denominator
+    a = 417 / (962 * pi + 80808)
+    assert a**50 - a**51 * a**-1 == 0
+
+    # #24: exp((log(2i) - pi i/2)/2) = sqrt(2)
+    assert exp((log(2*i) - pi*i/2)/2) == sqrt(2)
+
+    # #33: cos(acos(sqrt2-sqrt3)/3) is an algebraic number of degree 12
+    v = cos(acos(sqrt(2) - sqrt(3))/3)
+    assert 1 - 90*v**2 + 321*v**4 - 592*v**6 + 864*v**8 - 768*v**10 + 256*v**12 == 0
+    assert str(QQbar(v)).endswith("256*a^12-768*a^10+864*a^8-592*a^6+321*a^4-90*a^2+1")
+
+    # #23: identities that ca cannot decide
+    a = exp(2*sqrt(2)); b = exp(-2*sqrt(2))
+    assert sqrt(a + b - 2) - (a-1)/sqrt(a) == 0
+    assert (pi-1) / (sqrt(pi) - 1) == sqrt(pi) + 1
+    M = Mat(C)([[1,-1],[-1,-1]])
+    assert M.exp().log() == M
+
+    # #25: normalization of sqrt(-3) and roots of unity
+    z = (-1 + sqrt(-3))/2
+    assert z**3 == 1 and z != 1 and sqrt(-3) == i*sqrt(3)
+
+def test_tower_sage_examples():
+    """
+    Examples from the documentation of Sage's QQbar (sage.rings.qqbar)
+    and related tickets, on the lazy tower field and on qqbar.
+    """
+    for R in [ComplexField_tower(), ComplexAlgebraicField_qqbar()]:
+        sqrt = R.sqrt
+        i = R.i()
+        Rx = PolynomialRing(R)
+        x = Rx.gen()
+
+        # golden ratio
+        s5 = sqrt(5); phi = (1 + s5)/2; tau = (1 - s5)/2
+        assert phi**2 == phi + 1 and tau**2 == tau + 1 and phi + tau == 1
+
+        # nested radicals
+        assert (sqrt(5 + 2*sqrt(6)) - sqrt(3))**2 == 2
+        assert sqrt(R(2)/3) * sqrt(R(3)/5) == sqrt(R(2)/5)
+
+        # (-8)^(1/3): principal branch, absolute value, norm
+        r = R(-8)**(R(1)/3)
+        assert r**3 == -8 and abs(r) == 2 and r * r.conj() == 4
+        assert r != -2
+
+        # a cube root of unity
+        z = -R(1)/2 + i*sqrt(3)/2
+        assert z**3 == 1 and z**2 != 1
+
+        # the roots of x^5 - x - 1
+        f = x**5 - x - 1
+        rts = f.roots()[0]
+        assert len(rts) == 5
+        assert all(r**5 - r - 1 == 0 for r in rts)
+        assert sum(rts, R(0)) == 0
+
+        # (sqrt2 + sqrt3)^5
+        assert (sqrt(2) + sqrt(3))**5 == 109*sqrt(2) + 89*sqrt(3)
+
+        # |3/5 + 4i/5| = 1
+        assert abs(R(3)/5 + 4*i/5) == 1
+
+        # a symbolic identity: (2/(3 sqrt3) + 10/27)^(1/3) - 2/(9 t) + 1/3 = 1
+        s3 = sqrt(3)
+        t = (2/(3*s3) + R(10)/27)**(R(1)/3)
+        assert t - 2/(9*t) + R(1)/3 == 1
+
+        # discriminant of a cubic: formula versus roots
+        def disc1(b, c, d): return b**2*c**2 - 4*b**3*d - 4*c**3 + 18*b*c*d - 27*d**2
+        def disc2(s1, s2, s3): return ((s1-s2)*(s1-s3)*(s2-s3))**2
+        polys = [x*(x-2)*(x-4), x*(x-2)*(x-4) + 1]
+        if not isinstance(R, ComplexAlgebraicField_qqbar):   # takes ~40 seconds with qqbar
+            polys.append((x - sqrt(2))*(x - R(2)**(R(1)/3))*(x - sqrt(3)))
+        for p in polys:
+            rts = p.roots()[0]
+            assert disc1(p[2], p[1], p[0]) == disc2(rts[0], rts[1], rts[2])
+
+        # the regular 34-gon: rotating (1,0) 34 times by the angle 2pi/34,
+        # expressed in radicals, gives (1,0) back
+        rt17 = sqrt(17); rt2 = sqrt(2)
+        eps = sqrt(17 + rt17); epss = sqrt(17 - rt17)
+        delta = rt17 - 1
+        alpha = sqrt(34 + 6*rt17 + rt2*delta*epss - 8*rt2*eps)
+        cx = rt2*sqrt(15 + rt17 + rt2*(alpha + epss))/8
+        cy = rt2*sqrt(epss**2 - rt2*(alpha + epss))/8
+        px, py = R(1), R(0)
+        for n in range(34):
+            px, py = cx*px - cy*py, cx*py + cy*px
+        assert px == 1 and py == 0
+
+        # the same cos(2pi/34) as a root of a polynomial
+        p = 256*x**8 - 128*x**7 - 448*x**6 + 192*x**5 + 240*x**4 - 80*x**3 - 40*x**2 + 8*x + 1
+        cx2 = [r for r in p.roots()[0] if abs(complex(r) - 0.98297) < 1e-3][0]
+        assert cx == cx2 and cy == sqrt(1 - cx2**2)
+
+    # an identity from the ARPREC documentation: alpha^630 - 1 as a product
+    # of cyclotomic-like factors, alpha the largest real root of a
+    # degree-10 polynomial (Lehmer's polynomial)
+    C = ComplexField_tower()
+    x = PolynomialRing(C).gen()
+    p = x**10 + x**9 - x**7 - x**6 - x**5 - x**4 - x**3 + x + 1
+    a = [r for r in p.roots()[0] if abs(complex(r) - 1.17628) < 1e-3][0]
+    lhs = a**630 - 1
+    num = (a**315 - 1) * (a**210 - 1) * (a**126 - 1)**2 * (a**90 - 1) * (a**3 - 1)**3 * (a**2 - 1)**5 * (a - 1)**3
+    den = (a**35 - 1) * (a**15 - 1)**2 * (a**14 - 1)**2 * (a**5 - 1)**6 * a**68
+    assert lhs == num / den
 
 def test_arb():
     a = arb(2.5)

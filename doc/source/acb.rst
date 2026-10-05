@@ -1307,3 +1307,45 @@ Vector functions
 
     Prints *vec* in decimal using :func:`acb_printd` or :func:`acb_printn` on
     each entry.
+
+Integer relations
+-------------------------------------------------------------------------------
+
+.. function:: slong acb_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, slong prec)
+
+    Searches for integer linear relations between the entries of the
+    real or complex vector *vec* of length *len*, using the LLL algorithm.
+    The matrix *rel* must be initialized with *len* rows and *len*
+    columns; the relations found are stored in its first rows (the
+    remaining rows being zero) and their number is returned.
+
+    The working precision is the minimum of *prec* and the relative
+    accuracy of *vec* (the difference between the largest magnitude and
+    the largest error magnitude within *vec*). The lattice spanned by
+    the identity matrix extended with the scaled real (and, for a
+    nonreal vector, imaginary) parts rounded to integers is LLL-reduced
+    (with 95% of the bits of the working precision, keeping the rest
+    to validate the relations), and the rows of the reduced basis whose
+    linear combination of *vec* contains zero are returned in order.
+    The combinations are evaluated by :func:`_acb_lindep_combination`,
+    so that rounding errors cannot make a row with a nonzero residual
+    pass the validation.
+    This validation does not prove the existence or nonexistence of
+    a linear relation: the output is a heuristic candidate set, to be
+    verified by exact means, and nonzero relations may be missed when
+    their coefficients are large relative to the precision. The first
+    row is the relation found by :func:`_qqbar_acb_lindep`; the
+    subsequent rows give the further independent relations of the
+    reduced basis, which are useful when the dimension of the relation
+    lattice is larger than one. An infinite or NaN entry gives no
+    relations; if all midpoints are zero, the unit vectors are returned.
+
+.. function:: void _acb_lindep_combination(acb_t s, acb_srcptr vec, const fmpz * c, slong len, slong prec)
+
+    Sets *s* to the linear combination of the entries of *vec* with the
+    integer coefficients *c*, as evaluated for the validation in
+    :func:`acb_lindep`: exactly (only the radii of *vec* contribute to
+    the radius of *s*) when the midpoints of *vec* span a range of
+    binary exponents of at most about `16 \cdot \mathit{prec}` bits,
+    and otherwise at a precision exceeding *prec* by the size of the
+    coefficients and of *len*.

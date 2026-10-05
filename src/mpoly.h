@@ -1414,6 +1414,9 @@ void mpoly_univar_swap(mpoly_univar_t A, mpoly_univar_t B);
 
 void mpoly_univar_fit_length(mpoly_univar_t A, slong len, mpoly_void_ring_t R);
 
+void mpoly_univar_prem(mpoly_univar_t A, const mpoly_univar_t B,
+                                      mpoly_univar_t C, mpoly_void_ring_t R);
+
 int mpoly_univar_pseudo_gcd_ducos(mpoly_univar_t G,
                       mpoly_univar_t B, mpoly_univar_t A, mpoly_void_ring_t R);
 

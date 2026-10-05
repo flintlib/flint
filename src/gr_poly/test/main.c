@@ -28,6 +28,7 @@
 #include "t-div_divconquer.c"
 #include "t-divexact.c"
 #include "t-div_newton.c"
+#include "t-div_root.c"
 #include "t-div_newton_n_preinv.c"
 #include "t-divrem_basecase.c"
 #include "t-divrem.c"
@@ -132,6 +133,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_div_divconquer),
     TEST_FUNCTION(gr_poly_divexact),
     TEST_FUNCTION(gr_poly_div_newton),
+    TEST_FUNCTION(gr_poly_div_root),
     TEST_FUNCTION(gr_poly_div_newton_n_preinv),
     TEST_FUNCTION(gr_poly_divrem_basecase),
     TEST_FUNCTION(gr_poly_divrem),

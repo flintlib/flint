@@ -79,5 +79,45 @@ TEST_FUNCTION_START(qqbar_pow_fmpq, state)
         fmpq_clear(mn);
     }
 
+    /* Check that x^(1/n) is the principal root, also for roots of unity
+       (which take a fast path) */
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        qqbar_t x, y, z;
+        fmpq_t e;
+        ulong n;
+
+        qqbar_init(x);
+        qqbar_init(y);
+        qqbar_init(z);
+        fmpq_init(e);
+
+        if (n_randint(state, 2))
+            qqbar_root_of_unity(x, n_randint(state, 100), 1 + n_randint(state, 10));
+        else
+            qqbar_randtest(x, state, 4, 10);
+
+        n = 1 + n_randint(state, 4);
+        fmpq_set_si(e, 1, n);
+
+        qqbar_pow_fmpq(y, x, e);
+        qqbar_root_ui(z, x, n);
+
+        if (!qqbar_equal(y, z))
+        {
+            flint_printf("FAIL (principal root)!\n");
+            flint_printf("x = "); qqbar_print(x); flint_printf("\n\n");
+            flint_printf("n = %wu\n\n", n);
+            flint_printf("y = "); qqbar_print(y); flint_printf("\n\n");
+            flint_printf("z = "); qqbar_print(z); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        qqbar_clear(x);
+        qqbar_clear(y);
+        qqbar_clear(z);
+        fmpq_clear(e);
+    }
+
     TEST_FUNCTION_END(state);
 }

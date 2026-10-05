@@ -81,11 +81,26 @@ static const function1 functions1[] = {
     { "asin", 4, GR_METHOD_ASIN },
     { "acos", 4, GR_METHOD_ACOS },
     { "atan", 4, GR_METHOD_ATAN },
+    { "sinh", 4, GR_METHOD_SINH },
+    { "cosh", 4, GR_METHOD_COSH },
+    { "tanh", 4, GR_METHOD_TANH },
+    { "asinh", 5, GR_METHOD_ASINH },
+    { "acosh", 5, GR_METHOD_ACOSH },
+    { "atanh", 5, GR_METHOD_ATANH },
     { "sinpi", 5, GR_METHOD_SIN_PI },
     { "cospi", 5, GR_METHOD_COS_PI },
     { "tanpi", 5, GR_METHOD_TAN_PI },
     { "gamma", 5, GR_METHOD_GAMMA },
+    { "rgamma", 6, GR_METHOD_RGAMMA },
+    { "digamma", 7, GR_METHOD_DIGAMMA },
     { "zeta", 4, GR_METHOD_ZETA },
+    { "erf", 3, GR_METHOD_ERF },
+    { "erfc", 4, GR_METHOD_ERFC },
+    { "erfi", 4, GR_METHOD_ERFI },
+    { "lambertw", 8, GR_METHOD_LAMBERTW },
+    { "dilog", 5, GR_METHOD_DILOG },
+    { "elliptic_k", 10, GR_METHOD_ELLIPTIC_K },
+    { "elliptic_e", 10, GR_METHOD_ELLIPTIC_E },
 };
 
 #define NUM_FUNCTIONS1 (sizeof(functions1) / sizeof(function1))
@@ -176,6 +191,19 @@ static void _gr_parse_clear(gr_parse_t E)
         flint_free(E->terminal_strings[i].str);
 
     flint_free(E->terminal_strings);
+}
+
+/* Whether s is already a terminal with a value equal to val (then the
+   generator need not be added: a context may list one value twice, e.g.
+   a definition which became expressible through other generators). */
+static int _gr_parse_has_equal_terminal(gr_parse_t E, const char * s, const void * val)
+{
+    slong i, len = strlen(s), sz = E->R->sizeof_elem;
+    for (i = 0; i < E->terminals_len; i++)
+        if (E->terminal_strings[i].str_len == len && memcmp(E->terminal_strings[i].str, s, len) == 0 &&
+            gr_equal(GR_ENTRY(E->terminal_values, i, sz), val, E->R) == T_TRUE)
+            return 1;
+    return 0;
 }
 
 static void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * val)
@@ -1029,6 +1057,26 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
                 goto continue_outer;
             }
 
+            if (0 == strncmp(s, "euler", 5) && !isalpha(s[5]) && s[5] != '_')
+            {
+                if (GR_SUCCESS != gr_euler(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 5;
+                goto continue_outer;
+            }
+
+            if (0 == strncmp(s, "catalan", 7) && !isalpha(s[7]) && s[7] != '_')
+            {
+                if (GR_SUCCESS != gr_catalan(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 7;
+                goto continue_outer;
+            }
+
             if ((0 == strncmp(s, "i", 1) || 0 == strncmp(s, "I", 1)) && !isalpha(s[1]))
             {
                 if (GR_SUCCESS != gr_i(E->tmp, E->R))
@@ -1136,7 +1184,8 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
             {
                 GR_MUST_SUCCEED(gr_get_str(&g, gr_vec_entry_srcptr(gens, i, ctx), ctx));
                 /* todo: version that consumes s and x */
-                _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
+                if (!_gr_parse_has_equal_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx)))
+                    _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
                 flint_free(g);
             }
             if (!_gr_parse_check_duplicates(parse))
@@ -1152,6 +1201,58 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
 
     fmpz_clear(c);
 
+    return status;
+}
+
+/*
+    Parses with the given named terminals (values a vector of num
+    elements of ctx) in addition to (use_gens) or instead of the
+    generators of ctx; a generator whose printed form is one of the
+    given names is shadowed.
+*/
+int
+gr_generic_set_str_expr_terminals(gr_ptr res, const char * s, int flags,
+    const char ** names, gr_srcptr values, slong num, int use_gens, gr_ctx_t ctx)
+{
+    gr_parse_t parse;
+    gr_vec_t gens;
+    slong i, j;
+    char * g;
+    slong sz = ctx->sizeof_elem;
+    int status = GR_SUCCESS;
+
+    parse->R = ctx;
+    _gr_parse_init(parse);
+    parse->flags = flags;
+
+    for (i = 0; i < num; i++)
+        _gr_parse_add_terminal(parse, names[i], GR_ENTRY(values, i, sz));
+
+    if (use_gens)
+    {
+        gr_vec_init(gens, 0, ctx);
+        if (gr_gens_recursive(gens, ctx) == GR_SUCCESS)
+        {
+            for (i = 0; i < gens->length; i++)
+            {
+                GR_MUST_SUCCEED(gr_get_str(&g, gr_vec_entry_srcptr(gens, i, ctx), ctx));
+                for (j = 0; j < num; j++)
+                    if (strcmp(names[j], g) == 0)
+                        break;
+                if (j == num && !_gr_parse_has_equal_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx)))
+                    _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
+                flint_free(g);
+            }
+        }
+        gr_vec_clear(gens, ctx);
+    }
+
+    if (!_gr_parse_check_duplicates(parse))
+        status = GR_UNABLE;
+
+    status |= _gr_parse_parse(parse, res, s, strlen(s)) ? GR_UNABLE : GR_SUCCESS;
+
+    _gr_parse_clear(parse);
     return status;
 }
 
