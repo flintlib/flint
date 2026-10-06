@@ -203,34 +203,40 @@ _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m
 static void
 _nmod_mat_transpose_inplace(nn_ptr A, slong stride, slong n)
 {
-#if defined(VEC4N_TRANSPOSE)
-    slong i, j, k, n4 = n - n % 4;
-
-    for (i = 0; i < n4; i += 4)
-    {
-        _transpose_4x4(A + i * stride + i, stride, A + i * stride + i, stride);
-
-        for (j = i + 4; j < n4; j += 4)
-            _transpose_swap_4x4(A + i * stride + j, A + j * stride + i, stride);
-
-        for (k = i; k < i + 4; k++)     /* the last n % 4 columns */
-            for (j = n4; j < n; j++)
-                FLINT_SWAP(ulong, A[k * stride + j], A[j * stride + k]);
-    }
-
-    for (k = n4; k < n; k++)            /* the bottom-right corner */
-        for (j = k + 1; j < n; j++)
-            FLINT_SWAP(ulong, A[k * stride + j], A[j * stride + k]);
-#else
-    /* swap the tiles (i0, j0) and (j0, i0) */
     slong i0, j0, i, j;
 
+#if defined(VEC4N_TRANSPOSE)
+    /* below 8 x 8, the loop below is as fast or faster (2x at 4 x 4 on M4) */
+    if (n >= 8)
+    {
+        slong k, n4 = n - n % 4;
+
+        for (i = 0; i < n4; i += 4)
+        {
+            _transpose_4x4(A + i * stride + i, stride, A + i * stride + i, stride);
+
+            for (j = i + 4; j < n4; j += 4)
+                _transpose_swap_4x4(A + i * stride + j, A + j * stride + i, stride);
+
+            for (k = i; k < i + 4; k++)     /* the last n % 4 columns */
+                for (j = n4; j < n; j++)
+                    FLINT_SWAP(ulong, A[k * stride + j], A[j * stride + k]);
+        }
+
+        for (k = n4; k < n; k++)            /* the bottom-right corner */
+            for (j = k + 1; j < n; j++)
+                FLINT_SWAP(ulong, A[k * stride + j], A[j * stride + k]);
+
+        return;
+    }
+#endif
+
+    /* swap the tiles (i0, j0) and (j0, i0) */
     for (i0 = 0; i0 < n; i0 += TRANSPOSE_BLOCK)
         for (j0 = i0; j0 < n; j0 += TRANSPOSE_BLOCK)
             for (i = i0; i < FLINT_MIN(i0 + TRANSPOSE_BLOCK, n); i++)
                 for (j = FLINT_MAX(j0, i + 1); j < FLINT_MIN(j0 + TRANSPOSE_BLOCK, n); j++)
                     FLINT_SWAP(ulong, A[i * stride + j], A[j * stride + i]);
-#endif
 }
 
 void
