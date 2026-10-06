@@ -5694,10 +5694,19 @@ class gr_tower:
             self._ptr = _ptr
             self._owned = _owned
         self._fields = []
+        # (the field contexts of the tower hold references to it: the
+        # tower is freed when the Python object and all of them are gone,
+        # whatever the order of finalization at interpreter shutdown)
+        self._refcount = 1
+
+    def _decrement_refcount(self):
+        self._refcount -= 1
+        if not self._refcount and getattr(self, "_owned", False):
+            libgr.gr_tower_heap_clear(self._ptr)
 
     def __del__(self):
-        if getattr(self, "_owned", False):
-            libgr.gr_tower_heap_clear(self._ptr)
+        if hasattr(self, "_refcount"):
+            self._decrement_refcount()
 
     def __repr__(self):
         arr = ctypes.c_char_p()
@@ -5871,8 +5880,15 @@ class TowerField(gr_ctx):
         self._tower = tower
         self._stale = False
         libgr.gr_ctx_init_tower_field(self._ref, tower._ptr)
+        tower._refcount += 1
         self._elem_type = gr_tower_field_elem
         assert libgr.gr_ctx_sizeof_elem(self._ref) <= ctypes.sizeof(gr_tower_field_struct)
+
+    def _decrement_refcount(self):
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._tower._decrement_refcount()
 
     def __call__(self, *args, **kwargs):
         if self._stale:
@@ -6917,8 +6933,13 @@ class PolynomialRing_gr_poly(gr_ctx):
         if var is not None:
             self._set_gen_name(var)
 
-    def __del__(self):
-        self._coefficient_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._coefficient_ring._decrement_refcount()
 
 
 class PowerSeriesRing_gr_series(gr_ctx):
@@ -6937,8 +6958,13 @@ class PowerSeriesRing_gr_series(gr_ctx):
         if var is not None:
             self._set_gen_name(var)
 
-    def __del__(self):
-        self._coefficient_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._coefficient_ring._decrement_refcount()
 
 class PowerSeriesModRing_gr_poly(gr_ctx):
     """
@@ -6963,8 +6989,13 @@ class PowerSeriesModRing_gr_poly(gr_ctx):
         if var is not None:
             self._set_gen_name(var)
 
-    def __del__(self):
-        self._coefficient_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._coefficient_ring._decrement_refcount()
 
 
 
@@ -8153,8 +8184,13 @@ class Mat(gr_ctx):
         self._elem_type = gr_mat
         self._element_ring._refcount += 1
 
-    def __del__(self):
-        self._element_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._element_ring._decrement_refcount()
 
 
 def MatrixRing(element_ring, n):
@@ -9067,8 +9103,13 @@ class Vec(gr_ctx):
         self._elem_type = gr_vec
         self._element_ring._refcount += 1
 
-    def __del__(self):
-        self._element_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._element_ring._decrement_refcount()
 
 
 
@@ -9321,8 +9362,13 @@ class PolynomialRing_gr_mpoly(gr_ctx):
             assert len(vars) == nvars
             self._set_gen_names(vars)
 
-    def __del__(self):
-        self._coefficient_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._coefficient_ring._decrement_refcount()
 
 
 
@@ -9407,8 +9453,13 @@ class Fraction_gr_fraction(gr_ctx):
         self._base_ring = base_ring
         self._elem_type = gr_fraction
 
-    def __del__(self):
-        self._base_ring._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._base_ring._decrement_refcount()
 
 
 
@@ -9471,8 +9522,13 @@ class Complex_gr_complex(gr_ctx):
         self._real_ctx = real_ctx
         self._elem_type = gr_complex
 
-    def __del__(self):
-        self._real_ctx._decrement_refcount()
+    def _decrement_refcount(self):
+        # (the base context is released when this context is cleared,
+        # after its last element, not when the Python object dies)
+        self._refcount -= 1
+        if not self._refcount:
+            libgr.gr_ctx_clear(self._ref)
+            self._real_ctx._decrement_refcount()
 
 
 class padic_radix(gr_elem):
@@ -11769,10 +11825,12 @@ def test_tower():
         assert len(rts) == n
         assert all(f(r) == 0 for r in rts)
         assert sum(rts) == -f[n-1]
-        # the roots live in a splitting tower over the small tower of
-        # sqrt(2) (of degree at most 2 n! over it), not over the tower of
-        # s (the last root, by Vieta's formula, may involve the latter)
-        assert sum(r.tower().degree() <= 4 * math.factorial(n) for r in rts) >= n - 1
+        # the roots live in a splitting tower over the small field of the
+        # generators of c (of degree at most n! over it): Q(sqrt(2)), or
+        # Q(zeta_16) when sqrt(2) is written through the roots of unity
+        # of the shared tower, not over the tower of s (the last root, by
+        # Vieta's formula, may involve the latter)
+        assert sum(r.tower().degree() <= 8 * math.factorial(n) for r in rts) >= n - 1
 
 def test_tower_trigonometric():
     C = ComplexField_tower()

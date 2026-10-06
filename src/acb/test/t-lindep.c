@@ -38,9 +38,14 @@ TEST_FUNCTION_START(acb_lindep, state)
 
         for (i = 0; i < k; i++)
         {
-            acb_randtest(vec + i, state, prec, 3);
+            /* (generic entries: acb_randtest gives small dyadic numbers
+               such as 1/2 and 1/16, which have further relations) */
+            arb_urandom(acb_realref(vec + i), state, prec);
+            arb_mul_2exp_si(acb_realref(vec + i), acb_realref(vec + i), (slong) n_randint(state, 7) - 3);
             if (n_randint(state, 2))
                 arb_zero(acb_imagref(vec + i));
+            else
+                arb_urandom(acb_imagref(vec + i), state, prec);
             mag_zero(arb_radref(acb_realref(vec + i)));
             mag_zero(arb_radref(acb_imagref(vec + i)));
         }
@@ -69,11 +74,13 @@ TEST_FUNCTION_START(acb_lindep, state)
         {
             acb_t s;
             acb_init(s);
-            /* (evaluated as acb_lindep validates: exactly here, since
-               the entries span a small range of exponents; at precision
-               prec the rounding error of a combination with large
-               coefficients could hide a nonzero residual or not) */
-            _acb_lindep_combination(s, vec, fmpz_mat_row(rel, i), len, prec);
+            /* (evaluated exactly, as acb_lindep validates when the
+               entries span a small range of exponents; at precision prec
+               the rounding error of a combination with large coefficients
+               could hide a nonzero residual or not) */
+            acb_zero(s);
+            for (j = 0; j < len; j++)
+                acb_addmul_fmpz(s, vec + j, fmpz_mat_entry(rel, i, j), ARF_PREC_EXACT);
             if (!acb_contains_zero(s) || _fmpz_vec_is_zero(fmpz_mat_row(rel, i), len))
             {
                 flint_printf("FAIL: relation does not hold\n");

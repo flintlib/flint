@@ -15,12 +15,12 @@
 #include "fmpz_lll.h"
 #include "acb.h"
 
-/* The precision at which the combinations of vec with coefficients of
-   at most coeff_bits bits are evaluated for validation: exact (the
-   midpoints are then exact sums and only the radii of vec contribute)
-   when the midpoints span a moderate range of exponents, otherwise
-   enough bits beyond the working precision that rounding errors stay
-   below the resolution of the lattice. */
+/* The precision at which acb_dot_fmpz evaluates the combinations of vec
+   with coefficients of at most coeff_bits bits for validation: enough
+   for the midpoint to be the exact sum (so that only the radii of vec
+   contribute to the radius) when the midpoints span a moderate range of
+   exponents, otherwise enough bits beyond the working precision that
+   rounding errors stay below the resolution of the lattice. */
 static slong
 _acb_lindep_check_prec(acb_srcptr vec, slong len, slong coeff_bits, slong prec)
 {
@@ -55,9 +55,12 @@ _acb_lindep_check_prec(acb_srcptr vec, slong len, slong coeff_bits, slong prec)
 
     if (any)
     {
+        /* the products c_j x_j are integers times 2^emin of at most
+           emax - emin + coeff_bits bits, and their sum has at most
+           FLINT_BIT_COUNT(len) more */
         fmpz_sub(t, emax, emin);
         if (fmpz_cmp_si(t, 16 * FLINT_MIN(prec, WORD(1) << 24) + 4096) <= 0)
-            wp = ARF_PREC_EXACT;
+            wp = FLINT_MAX(wp, fmpz_get_si(t) + coeff_bits + FLINT_BIT_COUNT(len) + 2);
     }
 
     fmpz_clear(emin);
@@ -65,24 +68,6 @@ _acb_lindep_check_prec(acb_srcptr vec, slong len, slong coeff_bits, slong prec)
     fmpz_clear(t);
 
     return wp;
-}
-
-void
-_acb_lindep_combination(acb_t s, acb_srcptr vec, const fmpz * c, slong len, slong prec)
-{
-    acb_t t;
-    slong j, wp;
-
-    wp = _acb_lindep_check_prec(vec, len, FLINT_ABS(_fmpz_vec_max_bits(c, len)), prec);
-
-    acb_init(t);
-    acb_zero(s);
-    for (j = 0; j < len; j++)
-    {
-        acb_mul_fmpz(t, vec + j, c + j, wp);
-        acb_add(s, s, t, wp);
-    }
-    acb_clear(t);
 }
 
 slong
@@ -182,7 +167,8 @@ acb_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, slong prec)
         if (_fmpz_vec_is_zero(fmpz_mat_row(A, i), len))
             continue;
 
-        _acb_lindep_combination(s, vec, fmpz_mat_row(A, i), len, prec);
+        acb_dot_fmpz(s, NULL, 0, vec, 1, fmpz_mat_row(A, i), 1, len,
+            _acb_lindep_check_prec(vec, len, FLINT_ABS(_fmpz_vec_max_bits(fmpz_mat_row(A, i), len)), prec));
 
         if (acb_contains_zero(s))
         {

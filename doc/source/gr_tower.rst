@@ -1736,9 +1736,14 @@ Lazy field (gr_tower_lazy.h)
     factored into roots of primes (`\sqrt{6} = \sqrt{2} \sqrt{3}`,
     `\sqrt{-2} = i \sqrt{2}`), and `\exp(r \pi i)` with rational `r`
     is a root of unity: both are products of powers of canonical
-    generators of prime power orders kept in a registry of the context
-    (see :func:`gr_tower_adjoin_root_of_unity`), `i` being
-    `\exp(2 \pi i / 4)`; `\exp(\sum_j c_j \log p_j + r \pi i)` with
+    generators of prime power orders, each the generator of a tower of
+    its own registered in the context (see
+    :func:`gr_tower_adjoin_root_of_unity`), `i` being
+    `\exp(2 \pi i / 4)`. A root of a smaller order is not a power of a
+    root of a larger order created earlier (`\sqrt{2}` computed after
+    `2^{1/128}` lives in `\mathbb{Q}(\sqrt{2})`, not in a field of
+    degree 128) until elements of the two towers meet in an operation,
+    when the towers are merged; `\exp(\sum_j c_j \log p_j + r \pi i)` with
     rational `c_j`, `r` and positive rational `p_j` is the product
     `\prod_j p_j^{c_j} \exp(r \pi i)` of structured radicals and a root
     of unity (`\exp((\log(2i) - \pi i/2)/2)` is `\sqrt{2}`).

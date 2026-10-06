@@ -454,6 +454,100 @@ TEST_FUNCTION_START(gr_tower_lazy_api, state)
         fmpz_poly_clear(N);
     }
 
+    /* a root of an integer or of unity lives in a tower of its own, not
+       as a power of a root of a larger order created before (sqrt(2)
+       after 2^(1/128) is not a2^64 in a field of degree 128); the towers
+       are merged when the elements meet */
+    {
+        gr_ctx_t L;
+        gr_ptr x, y, z;
+        fmpq_poly_t P;
+        fmpz_poly_t M;
+        slong level;
+
+        gr_ctx_init_tower_lazy(L, QQ, 0);
+        GR_TMP_INIT3(x, y, z, L);
+        fmpq_poly_init(P);
+        fmpz_poly_init(M);
+
+        GR_MUST_SUCCEED(gr_set_str(x, "2^(1/128)", L));
+        GR_MUST_SUCCEED(gr_set_ui(y, 2, L));
+        GR_MUST_SUCCEED(gr_sqrt(y, y, L));
+        GR_MUST_SUCCEED(gr_tower_lazy_get_fmpq_poly(P, M, y, L));
+        CHECK(fmpz_poly_degree(M) == 2 && fmpq_poly_degree(P) == 1, "sqrt(2) after 2^(1/128)");
+        CHECK(gr_tower_degree(gr_tower_lazy_get_tower(&level, y, L)) == 2, "tower of sqrt(2)");
+        GR_MUST_SUCCEED(gr_mul(z, x, y, L));
+        GR_MUST_SUCCEED(gr_pow_ui(y, x, 65, L));
+        CHECK(gr_equal(z, y, L) == T_TRUE, "sqrt(2) 2^(1/128) = 2^(65/128)");
+        GR_MUST_SUCCEED(gr_tower_lazy_get_fmpq_poly(P, M, z, L));
+        CHECK(fmpz_poly_degree(M) == 128 && fmpq_poly_length(P) == 66, "the product in Q(2^(1/128))");
+
+        GR_MUST_SUCCEED(gr_set_str(x, "exp(2*pi*i/1024)", L));
+        GR_MUST_SUCCEED(gr_set_str(y, "exp(2*pi*i/8)", L));
+        GR_MUST_SUCCEED(gr_tower_lazy_get_fmpq_poly(P, M, y, L));
+        CHECK(fmpz_poly_degree(M) == 4, "zeta_8 after zeta_1024");
+        GR_MUST_SUCCEED(gr_pow_ui(z, x, 128, L));
+        CHECK(gr_equal(z, y, L) == T_TRUE, "zeta_1024^128 = zeta_8");
+
+        fmpq_poly_clear(P);
+        fmpz_poly_clear(M);
+        GR_TMP_CLEAR3(x, y, z, L);
+        gr_ctx_clear(L);
+    }
+
+    /* printed forms read back after a merge (the definitions are listed
+       in dependency order: here a root of x^3 - x - 1 created first is
+       defined over the root created later), and exp(1) is not duplicated
+       when it meets exp(2) after exp(1)^2 */
+    {
+        gr_ctx_t L, L2;
+        gr_ptr x, y, z;
+        gr_ptr r;
+        gr_poly_t f;
+        gr_vec_t roots;
+        fmpz_vec_t mult;
+        char * s;
+        slong level;
+
+        gr_ctx_init_tower_lazy(L, QQ, 0);
+        gr_ctx_init_tower_lazy(L2, QQ, 0);
+        GR_TMP_INIT3(x, y, z, L);
+        gr_poly_init(f, L);
+        gr_vec_init(roots, 0, L);
+        fmpz_vec_init(mult, 0);
+
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(f, 3, 1, L));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(f, 1, -1, L));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(f, 0, -1, L));
+        GR_MUST_SUCCEED(gr_poly_roots(roots, mult, f, 0, L));
+        CHECK(roots->length == 3, "roots of x^3 - x - 1");
+        GR_MUST_SUCCEED(gr_sub(x, gr_vec_entry_ptr(roots, 1, L), gr_vec_entry_ptr(roots, 0, L), L));
+        GR_MUST_SUCCEED(gr_get_str(&s, x, L));
+        r = gr_heap_init(L2);
+        CHECK(gr_set_str(r, s, L2) == GR_SUCCESS, "printed form reads back");
+        GR_MUST_SUCCEED(gr_set_other(y, r, L2, L));
+        CHECK(gr_equal(x, y, L) == T_TRUE, "printed form round trip");
+        flint_free(s);
+        gr_heap_clear(r, L2);
+
+        GR_MUST_SUCCEED(gr_set_ui(x, 1, L));
+        GR_MUST_SUCCEED(gr_exp(x, x, L));
+        GR_MUST_SUCCEED(gr_sqr(x, x, L));
+        GR_MUST_SUCCEED(gr_set_ui(y, 2, L));
+        GR_MUST_SUCCEED(gr_exp(y, y, L));
+        GR_MUST_SUCCEED(gr_add(z, x, y, L));
+        CHECK(gr_tower_lazy_get_tower(&level, z, L)->num_gens == 2, "exp(1) and exp(2): two generators");
+        GR_MUST_SUCCEED(gr_sub(z, y, x, L));
+        CHECK(gr_is_zero(z, L) == T_TRUE, "exp(2) = exp(1)^2");
+
+        gr_poly_clear(f, L);
+        gr_vec_clear(roots, L);
+        fmpz_vec_clear(mult);
+        GR_TMP_CLEAR3(x, y, z, L);
+        gr_ctx_clear(L2);
+        gr_ctx_clear(L);
+    }
+
     gr_ctx_clear(R);
     gr_ctx_clear(K);
     gr_ctx_clear(QQ);

@@ -2387,8 +2387,22 @@ _absorb_alg(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong k, slong d, in
                modulus. The enclosure of the step isolates a root of its
                modulus in B, which need not isolate it among the roots of
                q (a conjugate divided out in B but not in U may be close),
-               so the root is certified against q. */
-            if (q->length >= 3 && gr_tower_adjoin_algebraic(U, q, z, GR_TOWER_STATUS_DYNAMIC, step->name) == GR_SUCCESS)
+               so the root is certified against q, unless the modulus in
+               B is the origin polynomial itself (no conjugate divided out
+               there): the roots of q are roots of the origin polynomial.
+               (The certification at high precision in deep splitting
+               towers dominated the eigenvalue identities of Hilbert
+               matrices.) */
+            int pushed = 0;
+            if (q->length >= 3 && gr_tower_step_minpoly(B, k)->length == step->origin->length)
+            {
+                slong prec = FLINT_MAX(GR_TOWER_DEFAULT_PREC, acb_rel_accuracy_bits(z));
+                _gr_tower_push_step(U, q, z, FLINT_MIN(prec, 100000), GR_TOWER_STATUS_DYNAMIC, step->name);
+                pushed = 1;
+            }
+            else if (q->length >= 3 && gr_tower_adjoin_algebraic(U, q, z, GR_TOWER_STATUS_DYNAMIC, step->name) == GR_SUCCESS)
+                pushed = 1;
+            if (pushed)
             {
                 gr_tower_gen_struct * ng = GR_TOWER_STEP(U, U->length - 1);
                 ng->def_id = step->def_id;

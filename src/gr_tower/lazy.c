@@ -1076,75 +1076,46 @@ _gr_tower_lazy_set_gen_pow(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, s
 }
 
 /*
-    The canonical root of unity of order l^e (p = NULL) or the principal
-    l^e-th root of the positive integer p, where l is prime: the
-    generator of the largest order l^f (f >= e) of its kind, raised to
-    the power l^(f-e). Each kind has an entry in the registry of the
-    context, whose tower may have grown (and whose canonical generator
-    may have been replaced by one of a larger order when towers were
-    merged, see _structured_image in map.c); a root of a larger order
-    than any present replaces the entry by a new tower.
+    The canonical root of unity of order q = l^e (p = NULL) or the
+    principal q-th root of the positive integer p, where l is prime: the
+    generator of a tower of its own, pinned and registered in the
+    context, whatever roots of other orders of the same kind exist. (A
+    root of a smaller order is not taken as a power of a root of a larger
+    order in another tower: the element would then live in a field of a
+    larger degree, sqrt(2) after 2^(1/128) being a2^64 in a field of
+    degree 128. When towers meet in an operation, the roots of the same
+    kind become powers of the one of the largest order in the merged
+    tower; see _gr_tower_structured_image in map.c.)
 */
 int
 _gr_tower_lazy_prime_power_root(gr_tower_lazy_elem_t res, const fmpz_t p, ulong l, ulong e, gr_ctx_t ctx)
 {
     gr_tower_lazy_ctx_struct * L = LAZY(ctx);
     gr_tower_lazy_root_entry_struct * ent = NULL;
-    slong i;
+    gr_tower_flat_struct * F;
+    ulong q = n_pow(l, e);
+    slong i, gid;
     int status;
 
     for (i = 0; i < L->num_roots; i++)
     {
-        if (L->roots[i].l == l && ((p == NULL) ? fmpz_is_zero(&L->roots[i].p) : fmpz_equal(&L->roots[i].p, p)))
+        if (L->roots[i].q == q && ((p == NULL) ? fmpz_is_zero(&L->roots[i].p) : fmpz_equal(&L->roots[i].p, p)))
         {
             ent = L->roots + i;
             break;
         }
     }
 
-    if (ent != NULL)
+    /* (the generator is normally still in the tower of the entry; a
+       tower grown in place by a merge may have replaced it) */
+    if (ent != NULL && gr_tower_gid_order(ent->F->T, ent->gid) >= 0)
     {
-        /* the generator of the largest order l^f in the entry's tower */
-        gr_tower_struct * T = ent->F->T;
-        fmpz_t pu;
-        ulong m, best_f = 0;
-        slong d, best_gid = -1;
-        int kind = (p == NULL) ? 1 : 2;
-
-        fmpz_init(pu);
-        for (d = 0; d < T->num_gens; d++)
-        {
-            if (_gr_tower_gen_const_root(GR_TOWER_GEN(T, d), pu, &m) == kind && (kind == 1 || fmpz_equal(p, pu)))
-            {
-                ulong f = 0;
-                while (m % l == 0)
-                {
-                    m /= l;
-                    f++;
-                }
-                if (m == 1 && f > best_f)
-                {
-                    best_f = f;
-                    best_gid = GR_TOWER_GEN(T, d)->gid;
-                }
-            }
-        }
-        fmpz_clear(pu);
-
-        if (best_gid >= 0 && best_f >= e)
-        {
-            ent->gid = best_gid;
-            _gr_tower_lazy_set_gen_pow(res, ent->F, best_gid, n_pow(l, best_f - e), ctx);
-            return GR_SUCCESS;
-        }
+        _gr_tower_lazy_set_gen_pow(res, ent->F, ent->gid, 1, ctx);
+        return GR_SUCCESS;
     }
 
-    /* a new canonical generator of order l^e */
     {
-        gr_tower_flat_struct * F;
         qqbar_t x;
-        slong gid;
-        ulong q = n_pow(l, e);
 
         qqbar_init(x);
         if (p == NULL)
@@ -1159,31 +1130,31 @@ _gr_tower_lazy_prime_power_root(gr_tower_lazy_elem_t res, const fmpz_t p, ulong 
         qqbar_clear(x);
         if (status != GR_SUCCESS)
             return status;
-
-        if (ent == NULL)
-        {
-            if (L->num_roots == L->alloc_roots)
-            {
-                L->alloc_roots = FLINT_MAX(4, 2 * L->alloc_roots);
-                L->roots = flint_realloc(L->roots, L->alloc_roots * sizeof(gr_tower_lazy_root_entry_struct));
-            }
-            ent = L->roots + L->num_roots;
-            fmpz_init(&ent->p);
-            L->num_roots++;
-        }
-
-        if (p != NULL)
-            fmpz_set(&ent->p, p);
-        else
-            fmpz_zero(&ent->p);
-        ent->l = l;
-        ent->F = F;
-        ent->gid = gid;
-        F->gc |= GR_TOWER_GC_PINNED;
-
-        _gr_tower_lazy_set_gen_pow(res, F, gid, 1, ctx);
-        return GR_SUCCESS;
     }
+
+    if (ent == NULL)
+    {
+        if (L->num_roots == L->alloc_roots)
+        {
+            L->alloc_roots = FLINT_MAX(4, 2 * L->alloc_roots);
+            L->roots = flint_realloc(L->roots, L->alloc_roots * sizeof(gr_tower_lazy_root_entry_struct));
+        }
+        ent = L->roots + L->num_roots;
+        fmpz_init(&ent->p);
+        L->num_roots++;
+    }
+
+    if (p != NULL)
+        fmpz_set(&ent->p, p);
+    else
+        fmpz_zero(&ent->p);
+    ent->q = q;
+    ent->F = F;
+    ent->gid = gid;
+    F->gc |= GR_TOWER_GC_PINNED;
+
+    _gr_tower_lazy_set_gen_pow(res, F, gid, 1, ctx);
+    return GR_SUCCESS;
 }
 
 /*
@@ -1643,17 +1614,28 @@ _gr_tower_lazy_randtest(gr_tower_lazy_elem_t res, flint_rand_t state, gr_ctx_t c
     }
 }
 
-/* the definition orders of the marked generators, sorted by creation
-   (definition id): a definition depends only on earlier ones */
+static void _gr_tower_gen_direct_deps(int * deps, gr_tower_t T, slong d);
+
+/* the definition orders of the marked generators (closed under the
+   dependencies of the definitions), in order of creation (definition id;
+   unassigned ids last, in tower order) as far as the dependencies allow:
+   a definition is listed after the definitions it involves. (After a
+   merge, a generator created earlier may be defined over one created
+   later: a root of x^3 - x - 1 adjoined over another root, with the
+   Cauchy modulus.) */
 slong *
 _gr_tower_lazy_marked_by_creation(slong * count, const int * mark, gr_tower_t T)
 {
-    slong d, n = 0, i, j;
+    slong d, e, n = 0, i, j, done;
     slong * order = flint_malloc(sizeof(slong) * FLINT_MAX(T->num_gens, 1));
+    slong * res = flint_malloc(sizeof(slong) * FLINT_MAX(T->num_gens, 1));
+    int * emitted = flint_calloc(FLINT_MAX(T->num_gens, 1), sizeof(int));
+
     for (d = 0; d < T->num_gens; d++)
         if (mark[d])
             order[n++] = d;
-    /* insertion sort by def_id (unassigned ids last, in tower order) */
+
+    /* insertion sort by def_id */
     for (i = 1; i < n; i++)
     {
         slong x = order[i];
@@ -1667,8 +1649,58 @@ _gr_tower_lazy_marked_by_creation(slong * count, const int * mark, gr_tower_t T)
         }
         order[j + 1] = x;
     }
+
+    /* (creation order agreeing with the tower order, the usual case:
+       nothing to check, since every dependency precedes in the tower) */
+    for (i = 1; i < n; i++)
+        if (order[i] < order[i - 1])
+            break;
+    if (i >= n)
+    {
+        flint_free(res);
+        flint_free(emitted);
+        *count = n;
+        return order;
+    }
+
+    /* the direct dependencies of each, once */
+    {
+        slong G = FLINT_MAX(T->num_gens, 1);
+        int * dep = flint_calloc(n * G, sizeof(int));
+
+        for (i = 0; i < n; i++)
+            _gr_tower_gen_direct_deps(dep + i * G, T, order[i]);
+
+        /* repeatedly the first one in this order whose marked
+           dependencies are listed (the dependencies precede in the
+           tower, so there is always one) */
+        for (done = 0; done < n; done++)
+        {
+            for (i = 0; i < n; i++)
+            {
+                int ready = 1;
+                d = order[i];
+                if (emitted[d])
+                    continue;
+                for (e = 0; e < T->num_gens && ready; e++)
+                    if (dep[i * G + e] && mark[e] && !emitted[e] && e != d)
+                        ready = 0;
+                if (ready)
+                    break;
+            }
+            if (i == n)   /* (not expected) */
+                for (i = 0; emitted[order[i]]; i++) ;
+            emitted[order[i]] = 1;
+            res[done] = order[i];
+        }
+
+        flint_free(dep);
+    }
+
+    flint_free(order);
+    flint_free(emitted);
     *count = n;
-    return order;
+    return res;
 }
 
 /* pi and i print as themselves */
@@ -1718,66 +1750,72 @@ _gr_tower_lazy_involved_gens(int * mark, const gr_tower_lazy_elem_t x, gr_tower_
     _gr_tower_involved_gens_closure(mark, T);
 }
 
+/* marks (in deps[], zero on entry) the generators which the definition
+   of the generator with definition order d involves directly: those in
+   its argument, and those in the coefficients of its minimal polynomial
+   for an algebraic generator (also for a generator with a definition:
+   the modulus may involve others, after a refinement or a relation,
+   sqrt(c) = an expression); all of them precede d */
+static void
+_gr_tower_gen_direct_deps(int * deps, gr_tower_t T, slong d)
+{
+    const gr_tower_gen_struct * g = GR_TOWER_GEN(T, d);
+
+    if (g->arg.mctx != NULL)
+        _gr_tower_lazy_mark_used_gens(deps, &g->arg.data, g->arg.mctx, T);
+
+    if (g->kind == GR_TOWER_ALGEBRAIC)
+    {
+        slong e, k = g->index;
+        const gr_poly_struct * m = gr_tower_step_minpoly(T, k);
+        fmpz_mpoly_q_t c;
+
+        fmpz_mpoly_q_init(c, T->flat.mctx);
+        for (e = 0; e < m->length; e++)
+        {
+            if (gr_tower_flat_set_nested_at(c, gr_poly_coeff_srcptr(m, e, gr_tower_field_at(T, k - 1)), k - 1, &T->flat) == GR_SUCCESS)
+                _gr_tower_lazy_mark_used_gens(deps, c, T->flat.mctx, T);
+            else
+            {
+                /* (not expected for a polynomial conversion;
+                   conservatively, every generator the coefficient may
+                   involve) */
+                slong e2;
+                for (e2 = 0; e2 < d; e2++)
+                    deps[e2] = 1;
+            }
+        }
+        fmpz_mpoly_q_clear(c, T->flat.mctx);
+    }
+}
+
 /* adds to the marked generators those their definitions involve */
 void
 _gr_tower_involved_gens_closure(int * mark, gr_tower_t T)
 {
-    slong d;
+    slong d, e;
     int progress = 1;
+    int * deps = flint_malloc(sizeof(int) * FLINT_MAX(T->num_gens, 1));
 
     while (progress)
     {
         progress = 0;
         for (d = 0; d < T->num_gens; d++)
         {
-            const gr_tower_gen_struct * g = GR_TOWER_GEN(T, d);
-            if (mark[d] == 1 && g->arg.mctx != NULL)
-            {
-                slong e;
-                int * mark2 = flint_calloc(T->num_gens, sizeof(int));
-                _gr_tower_lazy_mark_used_gens(mark2, &g->arg.data, g->arg.mctx, T);
-                for (e = 0; e < T->num_gens; e++)
-                    if (mark2[e] && !mark[e])
-                        mark[e] = 1, progress = 1;
-                flint_free(mark2);
-            }
-            if (mark[d] == 1 && g->kind == GR_TOWER_ALGEBRAIC)
-            {
-                /* a root of its minimal polynomial: the generators in
-                   the coefficients (also for a generator with a
-                   definition: the modulus may involve others, after a
-                   refinement or a relation, sqrt(c) = an expression) */
-                slong e, k = g->index;
-                const gr_poly_struct * m = gr_tower_step_minpoly(T, k);
-                int * mark2 = flint_calloc(T->num_gens, sizeof(int));
-                fmpz_mpoly_q_t c;
-
-                fmpz_mpoly_q_init(c, T->flat.mctx);
-                for (e = 0; e < m->length; e++)
-                {
-                    if (gr_tower_flat_set_nested_at(c, gr_poly_coeff_srcptr(m, e, gr_tower_field_at(T, k - 1)), k - 1, &T->flat) == GR_SUCCESS)
-                        _gr_tower_lazy_mark_used_gens(mark2, c, T->flat.mctx, T);
-                    else
-                    {
-                        /* (not expected for a polynomial conversion;
-                           conservatively, every generator the
-                           coefficient may involve) */
-                        slong e2;
-                        for (e2 = 0; e2 < d; e2++)
-                            mark2[e2] = 1;
-                    }
-                }
-                fmpz_mpoly_q_clear(c, T->flat.mctx);
-
-                for (e = 0; e < T->num_gens; e++)
-                    if (mark2[e] && !mark[e])
-                        mark[e] = 1, progress = 1;
-                flint_free(mark2);
-            }
             if (mark[d] == 1)
+            {
+                for (e = 0; e < T->num_gens; e++)
+                    deps[e] = 0;
+                _gr_tower_gen_direct_deps(deps, T, d);
+                for (e = 0; e < T->num_gens; e++)
+                    if (deps[e] && !mark[e])
+                        mark[e] = 1, progress = 1;
                 mark[d] = 2;   /* processed */
+            }
         }
     }
+
+    flint_free(deps);
 }
 
 /* -------------------------------------------------------------------- */

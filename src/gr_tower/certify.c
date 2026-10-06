@@ -801,6 +801,51 @@ _primitive_exp(const fmpz * c, slong jt, const logside_entry_struct * L, slong n
     gid_j = T->gens[L[jo].gen].gid;
     gid_g = T->gens[L[jt].gen].gid;
 
+    /* With e = +-1 the primitive exponential is exp(u_g)^e itself (exp(2)
+       and exp(1), in this order: c = (-1, 2)): rather than a duplicate of
+       exp(u_g), the generator g is moved in front of j, which becomes
+       exp(u_g)^(e m), when the argument of g allows it. */
+    if (FLINT_ABS(e) == 1)
+    {
+        slong dg = gr_tower_gid_order(T, gid_g), k;
+        int * deps = flint_calloc(FLINT_MAX(T->num_gens, 1), sizeof(int));
+        int ok = 1;
+
+        p = gr_tower_gid_order(T, gid_j);
+        deps[dg] = 1;
+        _gr_tower_involved_gens_closure(deps, T);
+        for (k = p; k < dg && ok; k++)
+            if (deps[k])
+                ok = 0;
+        flint_free(deps);
+
+        if (ok)
+        {
+            slong me = e * m;
+
+            _gr_tower_move_gen(T, dg, p);
+
+            /* exp(u_j) = exp(u_g)^(e m) */
+            gr_tower_flat_ensure(F);
+            fmpz_mpoly_q_init(mm + 0, F->mctx);
+            fmpz_mpoly_q_init(mm + 1, F->mctx);
+            fmpz_mpoly_q_gen(mm + 0, GR_TOWER_FLAT_VAR_D(F, gr_tower_gid_order(T, gid_g)), F->mctx);
+            if (me >= 0)
+                fmpz_mpoly_pow_ui(fmpz_mpoly_q_numref(mm + 0), fmpz_mpoly_q_numref(mm + 0), me, F->mctx);
+            else
+            {
+                fmpz_mpoly_q_inv(mm + 0, mm + 0, F->mctx);
+                fmpz_mpoly_pow_ui(fmpz_mpoly_q_denref(mm + 0), fmpz_mpoly_q_denref(mm + 0), -me, F->mctx);
+            }
+            fmpz_mpoly_q_neg(mm + 0, mm + 0, F->mctx);
+            fmpz_mpoly_q_one(mm + 1, F->mctx);
+            _gr_tower_make_algebraic(T, gr_tower_gid_order(T, gid_j), mm, 2, F->mctx, GR_TOWER_STATUS_PROVEN);
+            fmpz_mpoly_q_clear(mm + 0, F->mctx);
+            fmpz_mpoly_q_clear(mm + 1, F->mctx);
+            return 1;
+        }
+    }
+
     fmpz_mpoly_q_init(ustar, F->mctx);
     fmpz_mpoly_q_div_si(ustar, &L[jo].val, m, F->mctx);
     status = gr_tower_adjoin_exp_flat(T, ustar, F->mctx, NULL);

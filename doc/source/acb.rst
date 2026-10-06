@@ -1327,9 +1327,13 @@ Integer relations
     (with 95% of the bits of the working precision, keeping the rest
     to validate the relations), and the rows of the reduced basis whose
     linear combination of *vec* contains zero are returned in order.
-    The combinations are evaluated by :func:`_acb_lindep_combination`,
-    so that rounding errors cannot make a row with a nonzero residual
-    pass the validation.
+    The combinations are evaluated with :func:`acb_dot_fmpz`, exactly
+    (only the radii of *vec* contribute to the radius) when the midpoints
+    of *vec* span a range of binary exponents of at most about
+    `16 \cdot \mathit{prec}` bits, so that rounding errors cannot make a
+    row with a nonzero residual pass the validation, and otherwise at a
+    precision exceeding the working precision by the size of the
+    coefficients and of *len*.
     This validation does not prove the existence or nonexistence of
     a linear relation: the output is a heuristic candidate set, to be
     verified by exact means, and nonzero relations may be missed when
@@ -1339,13 +1343,3 @@ Integer relations
     reduced basis, which are useful when the dimension of the relation
     lattice is larger than one. An infinite or NaN entry gives no
     relations; if all midpoints are zero, the unit vectors are returned.
-
-.. function:: void _acb_lindep_combination(acb_t s, acb_srcptr vec, const fmpz * c, slong len, slong prec)
-
-    Sets *s* to the linear combination of the entries of *vec* with the
-    integer coefficients *c*, as evaluated for the validation in
-    :func:`acb_lindep`: exactly (only the radii of *vec* contribute to
-    the radius of *s*) when the midpoints of *vec* span a range of
-    binary exponents of at most about `16 \cdot \mathit{prec}` bits,
-    and otherwise at a precision exceeding *prec* by the size of the
-    coefficients and of *len*.

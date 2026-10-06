@@ -14,32 +14,52 @@
 int
 _gr_poly_div_root(gr_ptr Q, gr_ptr R, gr_srcptr A, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
-    gr_ptr r, t;
+    gr_ptr t, u;
     slong i, sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
+
+    /* Q_{len-2} = A_{len-1}, Q_{i-1} = A_i + c Q_i, R = A_0 + c Q_0 */
 
     if (len < 2)
         return gr_zero(R, ctx);
 
-    GR_TMP_INIT2(r, t, ctx);
+    GR_TMP_INIT2(t, u, ctx);
 
-    /* (the extra assignments support aliasing of Q and A) */
-    status |= gr_set(t, GR_ENTRY(A, len - 2, sz), ctx);
-    status |= gr_set(GR_ENTRY(Q, len - 2, sz), GR_ENTRY(A, len - 1, sz), ctx);
-    status |= gr_set(r, GR_ENTRY(Q, len - 2, sz), ctx);
-
-    for (i = len - 2; i > 0; i--)
+    if (Q != A)
     {
-        status |= gr_mul(r, r, c, ctx);
-        status |= gr_add(r, r, t, ctx);
-        status |= gr_set(t, GR_ENTRY(A, i - 1, sz), ctx);
-        status |= gr_set(GR_ENTRY(Q, i - 1, sz), r, ctx);
+        status |= gr_set(GR_ENTRY(Q, len - 2, sz), GR_ENTRY(A, len - 1, sz), ctx);
+
+        for (i = len - 2; i > 0; i--)
+        {
+            status |= gr_mul(GR_ENTRY(Q, i - 1, sz), GR_ENTRY(Q, i, sz), c, ctx);
+            status |= gr_add(GR_ENTRY(Q, i - 1, sz), GR_ENTRY(Q, i - 1, sz), GR_ENTRY(A, i, sz), ctx);
+        }
+
+        status |= gr_mul(u, Q, c, ctx);
+        status |= gr_add(R, A, u, ctx);
+    }
+    else
+    {
+        /* In place: t holds the coefficient of A overwritten last, and
+           the entries move by swaps (the entry len - 1, beyond Q, is
+           left with an unspecified value). */
+        gr_swap(t, GR_ENTRY(Q, len - 2, sz), ctx);
+        gr_swap(GR_ENTRY(Q, len - 2, sz), GR_ENTRY(Q, len - 1, sz), ctx);
+
+        for (i = len - 2; i > 0; i--)
+        {
+            /* t = A_i; entry i - 1 holds A_{i-1} */
+            gr_swap(t, GR_ENTRY(Q, i - 1, sz), ctx);
+            status |= gr_mul(u, GR_ENTRY(Q, i, sz), c, ctx);
+            status |= gr_add(GR_ENTRY(Q, i - 1, sz), GR_ENTRY(Q, i - 1, sz), u, ctx);
+        }
+
+        status |= gr_mul(u, Q, c, ctx);
+        status |= gr_add(t, t, u, ctx);
+        gr_swap(R, t, ctx);
     }
 
-    status |= gr_mul(r, r, c, ctx);
-    status |= gr_add(R, r, t, ctx);
-
-    GR_TMP_CLEAR2(r, t, ctx);
+    GR_TMP_CLEAR2(t, u, ctx);
     return status;
 }
 

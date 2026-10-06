@@ -165,14 +165,14 @@ typedef struct
 }
 gr_tower_lazy_qqbar_entry_struct;
 
-/* The canonical root of unity of order a power of the prime l (p = 0),
-   or the principal (power of l)-th root of the positive integer p: the
-   generator of the largest such order created so far, of which the
-   roots of smaller orders are powers. */
+/* The canonical root of unity of order q = l^e for a prime l (p = 0),
+   or the principal q-th root of the positive integer p: the generator
+   of a tower of its own (avoiding the construction of the algebraic
+   number for the cache of algebraic numbers at every request). */
 typedef struct
 {
     fmpz p;
-    ulong l;
+    ulong q;
     gr_tower_flat_struct * F;
     slong gid;
 }

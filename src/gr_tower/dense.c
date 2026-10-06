@@ -780,8 +780,9 @@ _mul_dense_univar(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_q
     in which the power of a root of unity of odd prime power order
     q = p^f with e >= d = q - q/p appears reduced as
     -a^(e - d) (1 + a^(q/p) + ... + a^((p-2) q/p)), as zeta_n^j does in the
-    canonical decomposition (zeta_105 = zeta_3^2 zeta_5^2 zeta_7^3 has
-    eight terms). Sets ey and c.
+    canonical decomposition (zeta_15^7 = zeta_3^2 zeta_5^4 =
+    (1 + zeta_3)(1 + zeta_5 + zeta_5^2 + zeta_5^3) has eight terms). Sets
+    ey and c.
 */
 #define ROOT_MONOMIAL_MAX_TERMS 256
 

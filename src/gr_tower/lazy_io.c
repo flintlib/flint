@@ -154,7 +154,10 @@ _write_gen_def(gr_stream_t out, const gr_tower_gen_struct * g, gr_tower_t T, slo
         if (gr_tower_step_get_acb(z, T, k, (slong) (digits * 3.33) + 30) != GR_SUCCESS)
             acb_set(z, &g->enclosure);
         status |= gr_stream_write_free(out, arb_get_str(acb_realref(z), digits, ARB_STR_NO_RADIUS));
-        if (!arb_is_zero(acb_imagref(z)))
+        /* (the enclosure of a real root may have an imaginary part
+           containing zero; a nonreal root is separated from its
+           conjugate at this precision) */
+        if (!arb_contains_zero(acb_imagref(z)))
         {
             status |= gr_stream_write(out, (arf_sgn(arb_midref(acb_imagref(z))) < 0) ? " - " : " + ");
             arb_abs(acb_imagref(z), acb_imagref(z));
