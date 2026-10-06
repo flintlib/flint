@@ -15,6 +15,7 @@
 int
 gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
 {
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
     slong i, r, c;
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
@@ -31,11 +32,11 @@ gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     if (r == 1)
         return gr_set(res, GR_MAT_ENTRY(mat, 0, 0, sz), ctx);
 
-    status |= gr_add(res, GR_MAT_ENTRY(mat, 0, 0, sz),
+    status |= add(res, GR_MAT_ENTRY(mat, 0, 0, sz),
         GR_MAT_ENTRY(mat, 1, 1, sz), ctx);
 
     for (i = 2; i < r; i++)
-        status |= gr_add(res, res, GR_MAT_ENTRY(mat, i, i, sz), ctx);
+        status |= add(res, res, GR_MAT_ENTRY(mat, i, i, sz), ctx);
 
     return status;
 }

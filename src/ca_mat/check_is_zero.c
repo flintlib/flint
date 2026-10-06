@@ -10,27 +10,13 @@
 */
 
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 truth_t
 ca_mat_check_is_zero(const ca_mat_t A, ca_ctx_t ctx)
 {
-    slong i, j;
-    truth_t res, eq;
-
-    res = T_TRUE;
-
-    for (i = 0; i < ca_mat_nrows(A); i++)
-    {
-        for (j = 0; j < ca_mat_ncols(A); j++)
-        {
-            eq = ca_check_is_zero(ca_mat_entry(A, i, j), ctx);
-
-            if (eq == T_FALSE)
-                return T_FALSE;
-            if (eq == T_UNKNOWN)
-                res = T_UNKNOWN;
-        }
-    }
-
-    return res;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    return gr_mat_is_zero((const gr_mat_struct *) A, gr_ctx);
 }

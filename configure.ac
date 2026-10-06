@@ -587,6 +587,10 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         gcc_cflags_arch="-march=meteorlake -march=alderlake"
         param_path="x86_64/meteorlake"
         ;;
+      arrowlake)
+        gcc_cflags_arch="-march=arrowlake -march=meteorlake -march=alderlake"
+        param_path="x86_64/arrowlake"
+        ;;
       sapphirerapids)
         gcc_cflags_arch="-march=sapphirerapids"; param_path="x86_64/sapphirerapids"
         have_avx512="yes";;
@@ -1025,6 +1029,13 @@ else
                          AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
     AC_SUBST(UNROLL_LOOPS,0)
 fi
+
+###############################################################################
+# dfloat module
+###############################################################################
+
+FLINT_DFLOAT_CFLAGS
+AC_SUBST(DFLOAT_CFLAGS,$flint_dfloat_cflags)
 
 ###############################################################################
 # fft_small module

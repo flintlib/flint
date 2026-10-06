@@ -29,108 +29,57 @@
    small precisions read arb's 4608-bit tables of the first 13 values
    directly.
 
-   The atan terms of the Gaussian primes are evaluated by
-   _mp_real_atan_frac_bsplit.  The atanh terms of the logarithms are not
-   evaluated by their Taylor series but by Zuniga's Ramanujan-type
-   series [Zun2025] for log(u/v) = 2 atanh(1/x), u/v = (x+1)/(x-1), in
-   the generic mp_real_hypgeom_series: it gains 6 log2(x) + log2(27/4)
+   The atanh terms of the logarithms are not evaluated by their Taylor
+   series but by Zuniga's Ramanujan-type series [Zun2025] for
+   log(u/v) = 2 atanh(1/x), u/v = (x+1)/(x-1), and likewise the atan
+   terms of the Gaussian primes by the same series at u, v = x +- i
+   ([Zun2025b], see _mp_real_atan_ratio_zuniga), in the generic
+   mp_real_hypgeom_series: it gains 6 log2(x) + log2(27/4)
    bits per term against 2 log2(x), while its numbers grow only about
    as much faster, so that the per-term overhead of binary splitting
    (the log2 k bits by which the numbers outgrow the precision gained)
    is about two thirds as large relative to the terms, and much
    smaller for small x (see _zuniga_atanh_inv), from a crossover
-   precision growing with x (see _atanh_inv). */
+   precision growing with x (see _atanh_inv and _atan_frac). */
 
 /* ---- Zuniga's series ---- */
 
-/* log(u/v) for integers u > v > 0, by Zuniga's series [Zun2025]
+/* The series of Zuniga's family [Zun2025] in the format of
+   mp_real_hypgeom_series:
 
-       log(u/v) = sum_{k>=1} rho^k (alpha k + beta) / (gamma k (2k-1))
-                  (1)_k (1/2)_k / ((1/6)_k (5/6)_k),
+       P = [P0, P1],  Q = den [5, -36, 36],  R = num [0, -1, 2],
+       coefP / coefD = c,  coefQ = 0,
 
-       rho = (u-v)^6 / (108 u^2 v^2 (u+v)^2),
-       alpha = -2 (u+v)(u^2 - 14uv + v^2)(u^2 + 4uv + v^2),
-       beta = (u+v)^3 (u^2 - 8uv + v^2),  gamma = 2 (u-v)^5,
-
-   (rho = 4 / (27 x^2 (x^2-1)^2) in terms of x), in the format of
-   mp_real_hypgeom_series: with num/den = (u-v)^6 / (6 u^2 v^2 (u+v)^2)
-   in lowest terms,
-
-       P = [-(u+v)^2 (u^2 - 8uv + v^2), 2 (u^2 - 14uv + v^2)(u^2 + 4uv + v^2)],
-       Q = den [5, -36, 36],  R = num [0, -1, 2],
-       coefP / coefD = -(u+v) num / (2 (u-v)^5),  coefQ = 0.
-
-   Used for atanh(1/x) = (1/2) log(u/v), u/v = (x+1)/(x-1) in lowest
-   terms (_zuniga_atanh_inv). */
-void
-_mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n)
+   whose ratio of consecutive terms R(k)/Q(k) = (num/den) k (2k - 1) /
+   ((6k - 1)(6k - 5)) tends to rho = num / (18 den). */
+static void
+_zuniga_series(mp_real_t res, const fmpz_t P0, const fmpz_t P1,
+    const fmpz_t num, const fmpz_t den, const fmpq_t c, slong n)
 {
-    fmpz_t d, s, t, g, num, den, uu, vv, uv, a, b, zero;
-    fmpz P[2], Q[3], R[3];
-    fmpq_t c;
+    fmpz_t t, zero;
+    fmpz Q[3], R[3];
     mp_real_hypgeom_int_struct ci[11];
     mp_real_hypgeom_series_struct ser;
     const fmpz * all[11];
     nn_ptr buf, bp;
     slong i, limbs;
 
-    fmpz_init(d); fmpz_init(s); fmpz_init(t);
-    fmpz_init(g); fmpz_init(num); fmpz_init(den); fmpz_init(uu);
-    fmpz_init(vv); fmpz_init(uv); fmpz_init(a); fmpz_init(b);
+    fmpz_init(t);
     fmpz_init(zero);
-    fmpq_init(c);
-    for (i = 0; i < 2; i++)
-        fmpz_init(P + i);
     for (i = 0; i < 3; i++)
     {
         fmpz_init(Q + i);
         fmpz_init(R + i);
     }
 
-    fmpz_sub(d, u, v);
-    fmpz_add(s, u, v);
-    fmpz_mul(uu, u, u);
-    fmpz_mul(vv, v, v);
-    fmpz_mul(uv, u, v);
-
-    /* num / den */
-    fmpz_pow_ui(num, d, 6);
-    fmpz_mul(den, uv, s);
-    fmpz_mul(den, den, den);
-    fmpz_mul_ui(den, den, 6);
-    fmpz_gcd(g, num, den);
-    fmpz_divexact(num, num, g);
-    fmpz_divexact(den, den, g);
-
-    /* P */
-    fmpz_add(a, uu, vv);
-    fmpz_submul_ui(a, uv, 8);
-    fmpz_mul(t, s, s);
-    fmpz_mul(P + 0, t, a);
-    fmpz_neg(P + 0, P + 0);
-    fmpz_add(a, uu, vv);
-    fmpz_submul_ui(a, uv, 14);
-    fmpz_add(b, uu, vv);
-    fmpz_addmul_ui(b, uv, 4);
-    fmpz_mul(P + 1, a, b);
-    fmpz_mul_2exp(P + 1, P + 1, 1);
-
-    /* Q, R */
     fmpz_mul_ui(Q + 0, den, 5);
     fmpz_mul_si(Q + 1, den, -36);
     fmpz_mul_ui(Q + 2, den, 36);
     fmpz_neg(R + 1, num);
     fmpz_mul_2exp(R + 2, num, 1);
 
-    /* coefP / coefD = -(u+v) num / (2 (u-v)^5) */
-    fmpz_mul(t, s, num);
-    fmpz_neg(t, t);
-    fmpz_pow_ui(g, d, 5);
-    fmpz_mul_2exp(g, g, 1);
-    fmpq_set_fmpz_frac(c, t, g);
-
     /* as signed mpn integers */
-    all[0] = P; all[1] = P + 1;
+    all[0] = P0; all[1] = P1;
     all[2] = Q; all[3] = Q + 1; all[4] = Q + 2;
     all[5] = R; all[6] = R + 1; all[7] = R + 2;
     all[8] = fmpq_numref(c); all[9] = zero; all[10] = fmpq_denref(c);
@@ -164,18 +113,149 @@ _mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n
     mp_real_hypgeom_series(res, &ser, n);
 
     flint_free(buf);
-    fmpz_clear(d); fmpz_clear(s); fmpz_clear(t);
-    fmpz_clear(g); fmpz_clear(num); fmpz_clear(den); fmpz_clear(uu);
-    fmpz_clear(vv); fmpz_clear(uv); fmpz_clear(a); fmpz_clear(b);
+    fmpz_clear(t);
     fmpz_clear(zero);
-    fmpq_clear(c);
-    for (i = 0; i < 2; i++)
-        fmpz_clear(P + i);
     for (i = 0; i < 3; i++)
     {
         fmpz_clear(Q + i);
         fmpz_clear(R + i);
     }
+}
+
+/* log(u/v) for integers u > v > 0, by Zuniga's series [Zun2025]
+
+       log(u/v) = sum_{k>=1} rho^k (alpha k + beta) / (gamma k (2k-1))
+                  (1)_k (1/2)_k / ((1/6)_k (5/6)_k),
+
+       rho = (u-v)^6 / (108 u^2 v^2 (u+v)^2),
+       alpha = -2 (u+v)(u^2 - 14uv + v^2)(u^2 + 4uv + v^2),
+       beta = (u+v)^3 (u^2 - 8uv + v^2),  gamma = 2 (u-v)^5,
+
+   (rho = 4 / (27 x^2 (x^2-1)^2) in terms of x): with
+   num/den = (u-v)^6 / (6 u^2 v^2 (u+v)^2) in lowest terms,
+
+       P = [-(u+v)^2 (u^2 - 8uv + v^2), 2 (u^2 - 14uv + v^2)(u^2 + 4uv + v^2)],
+       coefP / coefD = -(u+v) num / (2 (u-v)^5).
+
+   Used for atanh(1/x) = (1/2) log(u/v), u/v = (x+1)/(x-1) in lowest
+   terms (_zuniga_atanh_inv). */
+void
+_mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n)
+{
+    fmpz_t d, s, t, g, num, den, uu, vv, uv, a, b, P0, P1;
+    fmpq_t c;
+
+    fmpz_init(d); fmpz_init(s); fmpz_init(t);
+    fmpz_init(g); fmpz_init(num); fmpz_init(den); fmpz_init(uu);
+    fmpz_init(vv); fmpz_init(uv); fmpz_init(a); fmpz_init(b);
+    fmpz_init(P0); fmpz_init(P1);
+    fmpq_init(c);
+
+    fmpz_sub(d, u, v);
+    fmpz_add(s, u, v);
+    fmpz_mul(uu, u, u);
+    fmpz_mul(vv, v, v);
+    fmpz_mul(uv, u, v);
+
+    /* num / den */
+    fmpz_pow_ui(num, d, 6);
+    fmpz_mul(den, uv, s);
+    fmpz_mul(den, den, den);
+    fmpz_mul_ui(den, den, 6);
+    fmpz_gcd(g, num, den);
+    fmpz_divexact(num, num, g);
+    fmpz_divexact(den, den, g);
+
+    /* P */
+    fmpz_add(a, uu, vv);
+    fmpz_submul_ui(a, uv, 8);
+    fmpz_mul(t, s, s);
+    fmpz_mul(P0, t, a);
+    fmpz_neg(P0, P0);
+    fmpz_add(a, uu, vv);
+    fmpz_submul_ui(a, uv, 14);
+    fmpz_add(b, uu, vv);
+    fmpz_addmul_ui(b, uv, 4);
+    fmpz_mul(P1, a, b);
+    fmpz_mul_2exp(P1, P1, 1);
+
+    /* coefP / coefD = -(u+v) num / (2 (u-v)^5) */
+    fmpz_mul(t, s, num);
+    fmpz_neg(t, t);
+    fmpz_pow_ui(g, d, 5);
+    fmpz_mul_2exp(g, g, 1);
+    fmpq_set_fmpz_frac(c, t, g);
+
+    _zuniga_series(res, P0, P1, num, den, c, n);
+
+    fmpz_clear(d); fmpz_clear(s); fmpz_clear(t);
+    fmpz_clear(g); fmpz_clear(num); fmpz_clear(den); fmpz_clear(uu);
+    fmpz_clear(vv); fmpz_clear(uv); fmpz_clear(a); fmpz_clear(b);
+    fmpz_clear(P0); fmpz_clear(P1);
+    fmpq_clear(c);
+}
+
+/* atan(d/t) for integers 0 < d < t, by the same series at u, v =
+   t +- i d ([Zun2025b], Eqs. 5-6): log(u/v) = 2 i atan(d/t), and in
+   terms of s = u + v = 2t and p = u v = t^2 + d^2 (real),
+
+       rho = -4 d^6 / (27 t^2 p^2)  (alternating),
+       num/den = -8 d^6 / (3 t^2 p^2) in lowest terms,
+       P = [-s^2 (s^2 - 10 p), 2 (s^2 - 16 p)(s^2 + 2 p)],
+       coefP / coefD = t num / (64 d^5)
+
+   (for d = 1 one term gains 6 log2(t) + log2(27/4) bits, as for
+   atanh(1/t)). */
+void
+_mp_real_atan_ratio_zuniga(mp_real_t res, const fmpz_t d, const fmpz_t t, slong n)
+{
+    fmpz_t s, ss, p, g, num, den, a, b, P0, P1;
+    fmpq_t c;
+
+    fmpz_init(s); fmpz_init(ss); fmpz_init(p); fmpz_init(g);
+    fmpz_init(num); fmpz_init(den); fmpz_init(a); fmpz_init(b);
+    fmpz_init(P0); fmpz_init(P1);
+    fmpq_init(c);
+
+    fmpz_mul_2exp(s, t, 1);
+    fmpz_mul(ss, s, s);
+    fmpz_mul(p, t, t);
+    fmpz_addmul(p, d, d);
+
+    /* num / den = -8 d^6 / (3 t^2 p^2) */
+    fmpz_pow_ui(num, d, 6);
+    fmpz_mul_si(num, num, -8);
+    fmpz_mul(den, t, p);
+    fmpz_mul(den, den, den);
+    fmpz_mul_ui(den, den, 3);
+    fmpz_gcd(g, num, den);
+    fmpz_divexact(num, num, g);
+    fmpz_divexact(den, den, g);
+
+    /* P0 = -s^2 (s^2 - 10 p), P1 = 2 (s^2 - 16 p)(s^2 + 2 p) */
+    fmpz_set(a, ss);
+    fmpz_submul_ui(a, p, 10);
+    fmpz_mul(P0, ss, a);
+    fmpz_neg(P0, P0);
+    fmpz_set(a, ss);
+    fmpz_submul_ui(a, p, 16);
+    fmpz_set(b, ss);
+    fmpz_addmul_ui(b, p, 2);
+    fmpz_mul(P1, a, b);
+    fmpz_mul_2exp(P1, P1, 1);
+
+    /* coefP / coefD = t num / (64 d^5) */
+    fmpz_mul(a, t, num);
+    fmpz_pow_ui(b, d, 5);
+    fmpz_mul_2exp(b, b, 6);
+    fmpq_set_fmpz_frac(c, a, b);
+
+    _zuniga_series(res, P0, P1, num, den, c, n);
+
+    fmpz_clear(s); fmpz_clear(ss); fmpz_clear(p); fmpz_clear(g);
+    fmpz_clear(num); fmpz_clear(den); fmpz_clear(a); fmpz_clear(b);
+    fmpz_clear(P0); fmpz_clear(P1);
+    fmpq_clear(c);
 }
 
 /* atanh(1/x) = (1/2) log(u/v), u/v = (x+1)/(x-1) in lowest terms */
@@ -215,6 +295,28 @@ _atanh_inv(mp_real_t res, nn_srcptr x, slong xn, slong n)
         _zuniga_atanh_inv(res, x, xn, n);
     else
         _mp_real_atanh_frac_bsplit(res, &one, 1, x, xn, n);
+}
+
+/* atan(p/x) for a word p < x: Zuniga's series under the same rule as
+   atanh (measured crossovers: x of 12-16 bits at 64-128 limbs, 32 bits
+   at 512, 64 bits at 1000-2000), the Taylor series below */
+static void
+_atan_frac(mp_real_t res, ulong p, nn_srcptr x, slong xn, slong n)
+{
+    slong b = (xn - 1) * FLINT_BITS + FLINT_BIT_COUNT(x[xn - 1]);
+
+    if (2 * n >= b * b)
+    {
+        fmpz_t d, t;
+        fmpz_init_set_ui(d, p);
+        fmpz_init(t);
+        fmpz_set_ui_array(t, x, xn);
+        _mp_real_atan_ratio_zuniga(res, d, t, n);
+        fmpz_clear(d);
+        fmpz_clear(t);
+    }
+    else
+        _mp_real_atan_frac_bsplit(res, &p, 1, x, xn, n);
 }
 
 /* ---- the static tables ---- */
@@ -383,8 +485,7 @@ _machin_worker(slong i, void * arg)
     if (J->kind == 0)
         _atanh_inv(J->res, J->x, J->xn, w->n);
     else
-        _mp_real_atan_frac_bsplit(J->res, J->kind == 2 ? &J->p : &one, 1,
-            J->x, J->xn, w->n);
+        _atan_frac(J->res, J->kind == 2 ? J->p : one, J->x, J->xn, w->n);
 }
 
 static void

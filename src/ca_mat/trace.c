@@ -10,27 +10,19 @@
 */
 
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
 {
-    slong i;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
 
     if (!ca_mat_is_square(mat))
     {
         flint_throw(FLINT_ERROR, "ca_mat_trace: a square matrix is required!\n");
     }
 
-    if (ca_mat_is_empty(mat))
-    {
-        ca_zero(trace, ctx);
-        return;
-    }
-
-    ca_set(trace, ca_mat_entry(mat, 0, 0), ctx);
-
-    for (i = 1; i < ca_mat_nrows(mat); i++)
-    {
-        ca_add(trace, trace, ca_mat_entry(mat, i, i), ctx);
-    }
+    GR_MUST_SUCCEED(gr_mat_trace(trace, (const gr_mat_struct *) mat, gr_ctx));
 }

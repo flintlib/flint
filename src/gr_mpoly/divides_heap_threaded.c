@@ -231,6 +231,15 @@ void gr_mpoly_ts_append(gr_mpoly_ts_t A,
             mpoly_monomial_set(newexps + N*(oldlength + i), Bexps + N*i, N);
         }
 
+#if FLINT_USES_PTHREAD
+        /* A reader that still sees the old A->length may nevertheless pick
+           up the new A->coeffs/A->exps pointers below (see chunk_mulsub).
+           The copies made above must be visible to it before the pointers
+           are: this fence pairs with the acquire fence taken in
+           chunk_mulsub / ideal_chunk_mulsub after loading the pointers. */
+        atomic_thread_fence(memory_order_release);
+#endif
+
         A->alloc = newalloc;
         A->exps = newexps;
         A->coeffs = newcoeffs;
@@ -249,7 +258,9 @@ void gr_mpoly_ts_append(gr_mpoly_ts_t A,
        reallocated, the A->exps/A->coeffs/A->alloc/A->idx updates too) could
        otherwise become visible to another core *after* the A->length store
        below, letting a concurrent reader see a length that claims more terms
-       are available than are actually visible yet.
+       are available than are actually visible yet.  (A reader that sees
+       the *old* length together with the *new* arrays is covered by the
+       separate fence in the reallocation branch above.)
 
        TODO: port this guard to fmpz_mpoly / nmod_mpoly (where threaded
        division is currently disabled on ARM). */
@@ -273,7 +284,6 @@ void divides_heap_base_init(divides_heap_base_t H)
     H->tail = NULL;
     H->cur = NULL;
     H->ctx = NULL;
-    H->length = 0;
     H->N = 0;
     H->bits = 0;
     H->cmpmask = NULL;
@@ -302,7 +312,6 @@ int divides_heap_base_clear(gr_mpoly_t Q, gr_mpoly_t R, divides_heap_base_t H)
     H->head = NULL;
     H->tail = NULL;
     H->cur = NULL;
-    H->length = 0;
     H->N = 0;
     H->bits = 0;
     H->cmpmask = NULL;
@@ -351,7 +360,6 @@ void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chunk_t L)
         tail->next = L;
         H->tail = L;
     }
-    H->length++;
 }
 
 
@@ -1592,8 +1600,20 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
     gr_mpoly_ts_struct * Q = H->polyQ;
     gr_mpoly_struct * T1 = W->polyT1;
     _gr_mpoly_stripe_struct * S = W->S;
+    gr_srcptr Qcoeffs;
+    const ulong * Qexps;
     int status;
     int overflowed;
+
+    /* Q may be reallocated concurrently by the producer (gr_mpoly_ts_append);
+       read each array pointer once, then fence, so that the entries
+       [0, q_prev_length) of whichever arrays we got are visible.  Pairs with
+       the release fence in the reallocation branch of gr_mpoly_ts_append. */
+    Qcoeffs = Q->coeffs;
+    Qexps = Q->exps;
+#if FLINT_USES_PTHREAD
+    atomic_thread_fence(memory_order_acquire);
+#endif
 
     S->startidx = &L->startidx;
     S->endidx = &L->endidx;
@@ -1610,7 +1630,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
             T1->length = _gr_mpoly_mulsub_stripe1(
                     &T1->coeffs, &T1->exps, &T1->coeffs_alloc, &T1->exps_alloc,
                     C->coeffs, C->exps, C->length, 1,
-                    GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
+                    GR_ENTRY(Qcoeffs, L->mq, cctx->sizeof_elem), Qexps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1619,7 +1639,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
             T1->length = _gr_mpoly_mulsub_stripe(
                     &T1->coeffs, &T1->exps, &T1->coeffs_alloc, &T1->exps_alloc,
                     C->coeffs, C->exps, C->length, 1,
-                    GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
+                    GR_ENTRY(Qcoeffs, L->mq, cctx->sizeof_elem), Qexps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1648,7 +1668,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
             C->length = _gr_mpoly_mulsub_stripe1(
                     &C->coeffs, &C->exps, &C->coeffs_alloc, &C->exps_alloc,
                     GR_ENTRY(A->coeffs, startidx, cctx->sizeof_elem), A->exps + N*startidx, stopidx - startidx, 1,
-                    GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
+                    GR_ENTRY(Qcoeffs, L->mq, cctx->sizeof_elem), Qexps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1657,7 +1677,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
             C->length = _gr_mpoly_mulsub_stripe(
                     &C->coeffs, &C->exps, &C->coeffs_alloc, &C->exps_alloc,
                     GR_ENTRY(A->coeffs, startidx, cctx->sizeof_elem), A->exps + N*startidx, stopidx - startidx, 1,
-                    GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
+                    GR_ENTRY(Qcoeffs, L->mq, cctx->sizeof_elem), Qexps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1729,6 +1749,19 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         gr_srcptr Rcoeff;
         ulong * Rexp;
         slong Rlen;
+
+#if FLINT_USES_PTHREAD
+        /* pairs with the release fence before "next->producer = 1" below:
+           having observed that we are the producer, we must also observe
+           everything the previous producer did before handing the role
+           over -- in particular the final value of Q->length.  Without
+           this fence a weakly-ordered machine may satisfy the load of
+           Q->length below with a value older than the one the previous
+           producer published, and we would then compute this chunk's
+           remainder from an incomplete quotient (reporting a spurious
+           GR_DOMAIN, or a wrong quotient). */
+        atomic_thread_fence(memory_order_acquire);
+#endif
 
         /* process the remaining quotient terms */
         q_prev_length = Q->length;
@@ -1877,8 +1910,21 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         }
 
         next = L->next;
-        H->length--;
+
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         H->cur = next;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+
+        /* pairs with the acquire fence at the top of the producer branch
+           above: everything this chunk produced (the quotient terms
+           appended to H->polyQ, and the H->polyQ->length store that
+           publishes them) must be visible to whoever observes that it is
+           now the producer. */
+        atomic_thread_fence(memory_order_release);
+#endif
 
         if (next != NULL)
             next->producer = 1;
@@ -1928,7 +1974,13 @@ void worker_loop(void * varg)
     while (!H->failed)
     {
         divides_heap_chunk_struct * L;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         L = H->cur;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+#endif
 
         if (L == NULL)
             break;

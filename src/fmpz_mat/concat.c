@@ -11,55 +11,23 @@
 
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    slong i, j;
-    slong r1 = mat1->r;
-    slong c1 = mat1->c;
-    slong r2 = mat2->r;
-    slong c2 = mat2->c;
-
-    for (i = 0; i < r1; i++)
-    {
-        for (j = 0; j < c1; j++)
-        {
-            fmpz_set(fmpz_mat_entry(res, i, j), fmpz_mat_entry(mat1, i, j));
-        }
-    }
-
-    for (i = 0; i < r2; i++)
-    {
-        for (j = 0; j < c2; j++)
-        {
-            fmpz_set(fmpz_mat_entry(res, i, j + c1), fmpz_mat_entry(mat2, i, j));
-        }
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(gr_mat_concat_horizontal((gr_mat_struct *) res,
+        (const gr_mat_struct *) mat1, (const gr_mat_struct *) mat2, ctx));
 }
 
 void
 fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    slong i, j;
-    slong r1 = mat1->r;
-    slong c1 = mat1->c;
-    slong r2 = mat2->r;
-    slong c2 = mat2->c;
-
-    for (i = 0; i < r1; i++)
-    {
-        for (j = 0; j < c1; j++)
-        {
-            fmpz_set(fmpz_mat_entry(res, i, j), fmpz_mat_entry(mat1, i, j));
-        }
-    }
-
-    for (i = 0; i < r2; i++)
-    {
-        for (j = 0; j < c2; j++)
-        {
-            fmpz_set(fmpz_mat_entry(res, i + r1, j), fmpz_mat_entry(mat2, i, j));
-        }
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(gr_mat_concat_vertical((gr_mat_struct *) res,
+        (const gr_mat_struct *) mat1, (const gr_mat_struct *) mat2, ctx));
 }

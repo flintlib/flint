@@ -225,6 +225,22 @@ Assignment and rounding
     brackets indicating the number of digits omitted
     (useful when computing values to extremely high precision).
 
+    The conversion is done exactly (through the :ref:`decimal <decimal>`
+    module): the midpoint is correctly rounded to the printed number of
+    digits (to nearest, with ties away from zero), the number of digits
+    is the largest for which the printed radius is at most 1 ulp, and the
+    printed radius is the true radius plus the exact rounding error,
+    rounded up to three significant digits. In particular, an exact
+    midpoint which is exactly representable with *n* digits is printed
+    without a radius (``arb_get_str`` of the exact integer `10^{100}`
+    with `n = 31` gives ``1.000000000000000000000000000000e+100``), and
+    a tiny radius is never inflated (`[1 \pm 2^{-1000}]` prints as
+    ``[1.00000000000000000000000000000 +/- 9.34e-302]`` with `n = 30`).
+    Arguments with huge exponents are handled by scaling with a power of
+    ten computed in ball arithmetic, which cannot decide whether the
+    value is an exact decimal number; an exact midpoint with a huge
+    exponent is therefore tested for exact representability directly.
+
 Assignment of special values
 -------------------------------------------------------------------------------
 

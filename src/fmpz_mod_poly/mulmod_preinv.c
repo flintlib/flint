@@ -14,26 +14,18 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
                     const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
                     const fmpz* finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 {
-    fmpz * T, * Q;
-    slong lenT, lenQ;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
 
-    lenT = len1 + len2 - 1;
-    lenQ = lenT - lenf + 1;
-
-    T = _fmpz_vec_init(lenT + lenQ);
-    Q = T + lenT;
-
-    _fmpz_mod_poly_mul(T, poly1, len1, poly2, len2, ctx);
-
-    _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, lenT, f, lenf,
-                                          finv, lenfinv, ctx);
-
-    _fmpz_vec_clear(T, lenT + lenQ);
+    GR_MUST_SUCCEED(_gr_poly_mulmod_preinv(res, poly1, len1, poly2, len2,
+                                            f, lenf, finv, lenfinv, gr_ctx));
 }
 
 void

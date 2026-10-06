@@ -23,7 +23,7 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
 {
     acb_ptr zpow;
     int found;
-    slong i, j, fac_bits, prec2;
+    slong i, j, fac_bits, prec2, num;
     fmpz_poly_t poly;
     fmpz_poly_factor_t fac;
     acb_t z2;
@@ -93,9 +93,16 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
                     deg = fmpz_poly_degree(fac->p + i);
                     roots = _qqbar_vec_init(deg);
 
-                    qqbar_roots_fmpz_poly(roots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                    /* If z is real, only real roots can overlap */
+                    if (arb_is_zero(acb_imagref(z)))
+                        num = qqbar_real_roots_fmpz_poly(roots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE | QQBAR_ROOTS_UNSORTED);
+                    else
+                    {
+                        qqbar_roots_fmpz_poly(roots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                        num = deg;
+                    }
 
-                    for (j = 0; j < deg; j++)
+                    for (j = 0; j < num; j++)
                     {
                         qqbar_get_acb(z2, roots + j, prec);
                         if (acb_overlaps(z, z2))

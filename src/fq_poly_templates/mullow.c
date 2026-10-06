@@ -15,12 +15,34 @@
 
 #include "templates.h"
 
+#if defined(FQ_ZECH_POLY_H)
+/* Kept out of line so that the fast path for small products
+   in _fq_zech_poly_mullow does not need a stack frame. */
+FLINT_STATIC_NOINLINE void
+_fq_zech_poly_mullow_large(fq_zech_struct * rop,
+                           const fq_zech_struct * op1, slong len1,
+                           const fq_zech_struct * op2, slong len2,
+                           slong n, const fq_zech_ctx_t ctx)
+{
+    if (_fq_zech_poly_mulmid_want_univariate(len1, len2, 0, n, ctx))
+        _fq_zech_poly_mullow_univariate(rop, op1, len1, op2, len2, n, ctx);
+    else
+        _fq_zech_poly_mullow_classical(rop, op1, len1, op2, len2, n, ctx);
+}
+#endif
+
 void
 _TEMPLATE(T, poly_mullow) (TEMPLATE(T, struct) * rop,
                            const TEMPLATE(T, struct) * op1, slong len1,
                            const TEMPLATE(T, struct) * op2, slong len2,
                            slong n, const TEMPLATE(T, ctx_t) ctx)
 {
+#if defined(FQ_ZECH_POLY_H)
+    if (FLINT_MIN(len1, len2) < FQ_ZECH_POLY_MUL_UNIVARIATE_MIN_LEN(ctx))
+        _fq_zech_poly_mullow_classical(rop, op1, len1, op2, len2, n, ctx);
+    else
+        _fq_zech_poly_mullow_large(rop, op1, len1, op2, len2, n, ctx);
+#else
     if (n < TEMPLATE(CAP_T, MULLOW_CLASSICAL_CUTOFF)
         || FLINT_MAX(len1, len2) < 6)
     {
@@ -31,6 +53,7 @@ _TEMPLATE(T, poly_mullow) (TEMPLATE(T, struct) * rop,
     {
         _TEMPLATE(T, poly_mullow_KS) (rop, op1, len1, op2, len2, n, ctx);
     }
+#endif
 }
 
 void

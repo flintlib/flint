@@ -12,24 +12,15 @@
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
                                const fmpz_mod_ctx_t ctx)
 {
-    slong j, k = 1;
-
-	for (j = 1; j < len; j++)
-	{
-        if (k == 0)
-            fmpz_zero(res + (j - 1));
-        else if (k == 1)
-            fmpz_set(res + (j - 1), poly + j);
-        else
-            fmpz_mod_mul_ui(res + (j - 1), poly + j, k, ctx);
-
-        if (fmpz_equal_ui(fmpz_mod_ctx_modulus(ctx), ++k))
-            k = 0;
-	}
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_derivative(res, poly, len, gr_ctx));
 }
 
 void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,

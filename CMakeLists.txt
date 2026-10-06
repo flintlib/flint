@@ -13,6 +13,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 include(CheckCCompilerFlag)
+include(CheckCSourceCompiles)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
 include(CMakePackageConfigHelpers)
@@ -215,6 +216,7 @@ set(_BUILD_DIRS
     nfloat
     mpn_extras      radix
     mp_real
+    dfloat
     nmod            nmod_vec        nmod_mat        nmod_poly
     mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
@@ -231,6 +233,7 @@ set(_BUILD_DIRS
     padic                           padic_mat       padic_poly
     qadic
     padic_radix
+    decimal
 
     nmod_poly_factor                fmpz_factor
     fmpz_poly_factor                fmpz_mod_poly_factor
@@ -434,6 +437,44 @@ if (HAS_FLAG_MPOPCNT)
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
+
+# The dfloat module relies on error-free transformations, which break
+# if the compiler contracts a separate multiply and add into an fma:
+# -ffp-contract=off is required (see FLINT_DFLOAT_CFLAGS in acinclude.m4;
+# without it, the module is unavailable except with MSVC and clang,
+# which honour a pragma).
+check_c_compiler_flag("-ffp-contract=off" HAS_FLAG_FP_CONTRACT_OFF)
+set(DFLOAT_COMPILE_OPTIONS "")
+if (HAS_FLAG_FP_CONTRACT_OFF)
+    list(APPEND DFLOAT_COMPILE_OPTIONS "-ffp-contract=off" "-DDFLOAT_FP_CONTRACT_OFF")
+elseif (NOT MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    message(WARNING "The compiler does not take -ffp-contract=off; the dfloat module will be unavailable")
+endif()
+# the error-free transformations also need every operation on doubles
+# rounded once to double precision: on 32-bit x86 with SSE2, compile
+# dfloat with -mfpmath=sse instead of the default x87 arithmetic
+# (without SSE2, dfloat_is_supported() returns 0)
+check_c_source_compiles("
+#include <float.h>
+#if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
+#error excess precision
+#endif
+int main(void) { return 0; }" DFLOAT_NO_EXCESS_PRECISION)
+if (NOT DFLOAT_NO_EXCESS_PRECISION)
+    check_c_source_compiles("
+#ifndef __SSE2__
+#error no SSE2
+#endif
+int main(void) { return 0; }" DFLOAT_HAVE_SSE2)
+    check_c_compiler_flag("-mfpmath=sse" HAS_FLAG_FPMATH_SSE)
+    if (DFLOAT_HAVE_SSE2 AND HAS_FLAG_FPMATH_SSE)
+        list(APPEND DFLOAT_COMPILE_OPTIONS "-mfpmath=sse")
+    endif()
+endif()
+if (DFLOAT_COMPILE_OPTIONS)
+    file(GLOB DFLOAT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/dfloat/*.c")
+    set_source_files_properties(${DFLOAT_SOURCES} PROPERTIES COMPILE_OPTIONS "${DFLOAT_COMPILE_OPTIONS}")
 endif()
 
 if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO")

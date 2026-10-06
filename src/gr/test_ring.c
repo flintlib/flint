@@ -3622,9 +3622,10 @@ gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
             status |= gr_mul(xu1, x, u1, R);
             status |= gr_mul(xvu2, xv, u2, R);
 
-            if (gr_equal(y1, y2, R) == T_FALSE ||
+            if (status == GR_SUCCESS &&
+                (gr_equal(y1, y2, R) == T_FALSE ||
                 gr_equal(xu1, y1, R) == T_FALSE ||
-                gr_equal(xvu2, y2, R) == T_FALSE)
+                gr_equal(xvu2, y2, R) == T_FALSE))
             {
                 status = GR_TEST_FAIL;
             }

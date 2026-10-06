@@ -16,6 +16,43 @@ TEST_FUNCTION_START(radix_set_mpn, state)
 {
     slong iter;
 
+    /* short inputs: digits are reduced and the conversion round-trips */
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        ulong a[3], b[3 * FLINT_BITS], c[4];
+        slong n, l1, l2, i;
+
+        radix_init_randtest(radix, state);
+        n = n_randint(state, 4);
+        for (i = 0; i < n; i++)
+            a[i] = n_randtest(state);
+        while (n > 0 && a[n - 1] == 0)
+            n--;
+
+        l1 = radix_set_mpn(b, a, n, radix);
+
+        for (i = 0; i < l1; i++)
+        {
+            if (b[i] >= LIMB_RADIX(radix) || (i == l1 - 1 && b[i] == 0))
+            {
+                flint_printf("FAIL (short, digits)\n");
+                flint_printf("%{ulong*}\n%{ulong*}\n", a, n, b, l1);
+                flint_abort();
+            }
+        }
+
+        l2 = (l1 == 0) ? 0 : radix_get_mpn(c, b, l1, radix);
+        if (l2 != n || (n != 0 && mpn_cmp(a, c, n) != 0))
+        {
+            flint_printf("FAIL (short, roundtrip)\n");
+            flint_printf("%{ulong*}\n%{ulong*}\n", a, n, b, l1);
+            flint_abort();
+        }
+
+        radix_clear(radix);
+    }
+
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         radix_t radix;

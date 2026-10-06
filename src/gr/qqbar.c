@@ -1175,7 +1175,11 @@ _gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt,
     return GR_UNABLE;
 }
 
-/* todo: quickly skip nonreal roots over the real algebraic numbers */
+static int
+_gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx);
+
+/* todo: quickly skip nonreal roots over the real algebraic numbers
+   also when the coefficients are irrational */
 static int
 _gr_qqbar_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
@@ -1187,6 +1191,43 @@ _gr_qqbar_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int 
 
     if (poly->length == 0)
         return GR_DOMAIN;
+
+    /* Over the real algebraic numbers with rational coefficients, use the
+       integer version, which only isolates real roots. */
+    if (QQBAR_CTX(ctx)->real_only)
+    {
+        qqbar_srcptr coeffs = poly->coeffs;
+        int rational = 1;
+
+        for (i = 0; i < poly->length && rational; i++)
+            rational = qqbar_is_rational(coeffs + i);
+
+        if (rational)
+        {
+            fmpz_poly_t f;
+            fmpq * q;
+            fmpz_t den;
+            gr_ctx_t ZZ;
+
+            q = _fmpq_vec_init(poly->length);
+            for (i = 0; i < poly->length; i++)
+                qqbar_get_fmpq(q + i, coeffs + i);
+
+            fmpz_init(den);
+            fmpz_poly_init2(f, poly->length);
+            _fmpz_poly_set_length(f, poly->length);
+            _fmpq_vec_get_fmpz_vec_fmpz(f->coeffs, den, q, poly->length);
+
+            gr_ctx_init_fmpz(ZZ);
+            status = _gr_qqbar_poly_roots_other(roots, mult, (gr_poly_struct *) f, ZZ, flags, ctx);
+            gr_ctx_clear(ZZ);
+
+            fmpz_poly_clear(f);
+            fmpz_clear(den);
+            _fmpq_vec_clear(q, poly->length);
+            return status;
+        }
+    }
 
     /* todo: fast numerical check to avoid an exact squarefree factorization */
 
@@ -1243,7 +1284,6 @@ _gr_qqbar_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int 
     return status;
 }
 
-/* todo: quickly skip nonreal roots over the real algebraic numbers */
 static int
 _gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
@@ -1252,7 +1292,7 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        slong i, j, deg, deg2;
+        slong i, j, deg, deg2, num;
         qqbar_struct * croots;
         int status = GR_SUCCESS;
 
@@ -1272,13 +1312,20 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly
                 deg2 = fmpz_poly_degree(fac->p + i);
 
                 croots = _qqbar_vec_init(deg2);
-                qqbar_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
 
-                for (j = 0; j < deg2; j++)
+                if (QQBAR_CTX(ctx)->real_only)
                 {
-                    if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(croots + j))
-                        continue;
+                    /* only isolate the real roots */
+                    num = qqbar_real_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                }
+                else
+                {
+                    qqbar_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                    num = deg2;
+                }
 
+                for (j = 0; j < num; j++)
+                {
                     GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
                     fmpz_vec_append_ui(mult, fac->exp[i]);
                 }

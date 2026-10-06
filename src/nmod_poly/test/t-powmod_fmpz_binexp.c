@@ -169,5 +169,48 @@ TEST_FUNCTION_START(nmod_poly_powmod_fmpz_binexp, state)
         nmod_poly_clear(t);
     }
 
+    /* Modulus of length 2 (constant result), including exponents
+       which do not fit in a word */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        ulong n, c, r;
+        ulong poly[1], f[2], res[1];
+        nmod_t mod;
+        fmpz_t exp, nf, t;
+
+        n = n_randtest_not_zero(state);
+        nmod_init(&mod, n);
+
+        fmpz_init(exp);
+        fmpz_init_set_ui(nf, n);
+        fmpz_init(t);
+
+        fmpz_randtest_unsigned(exp, state, n_randint(state, 200) + 1);
+        c = n_randint(state, n);
+        poly[0] = c;
+        f[0] = n_randint(state, n);
+        f[1] = 1;
+
+        _nmod_poly_powmod_fmpz_binexp(res, poly, exp, f, 2, mod);
+
+        fmpz_set_ui(t, c);
+        fmpz_powm(t, t, exp, nf);
+        r = fmpz_get_ui(t);
+
+        result = (res[0] == r);
+        if (!result)
+        {
+            flint_printf("FAIL (lenf == 2):\n");
+            flint_printf("n = %wu, c = %wu, exp = ", n, c); fmpz_print(exp);
+            flint_printf("\nres = %wu, expected %wu\n", res[0], r);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_clear(exp);
+        fmpz_clear(nf);
+        fmpz_clear(t);
+    }
+
     TEST_FUNCTION_END(state);
 }

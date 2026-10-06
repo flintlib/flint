@@ -612,6 +612,7 @@ typedef struct
 {
     nmod_t nmod;
     ulong a;   /* when used as finite field with defining polynomial x - a */
+    ulong pretend;  /* 0: no pretense; 1: pretending to be a field; d > 1: pretending, d a factor found */
     truth_t is_prime;
 }
 _gr_nmod_ctx_struct;
@@ -619,6 +620,7 @@ _gr_nmod_ctx_struct;
 #define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
 #define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
+#define NMOD_PRETEND(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->pretend)
 /* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
 #define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
 

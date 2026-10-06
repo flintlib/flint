@@ -109,7 +109,7 @@ mp_real_mul_2exp_si(mp_real_t res, const mp_real_t xin, slong e)
         mp_real_set(res, xin);
 
     slong q = e >> MP_REAL_LGB;             /* floor limb division */
-    int r = (int) (e - (q << MP_REAL_LGB)); /* 0 <= r < FLINT_BITS */
+    int r = (int) (e - q * FLINT_BITS);     /* 0 <= r < FLINT_BITS */
 
     if (x->size == 0)
     {

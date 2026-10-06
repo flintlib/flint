@@ -93,6 +93,9 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) mpn_mod_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) mpn_mod_ctx_is_pretend_field},
+    {GR_METHOD_CTX_SET_IS_PRETEND_FIELD,(gr_funcptr) mpn_mod_ctx_set_is_pretend_field},
+    {GR_METHOD_CTX_RECOVER_ZERO_DIVISOR,(gr_funcptr) mpn_mod_ctx_recover_zero_divisor},
     {GR_METHOD_INIT,            (gr_funcptr) mpn_mod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) mpn_mod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) mpn_mod_swap},
@@ -230,6 +233,8 @@ _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs)
     flint_mpn_preinvn(MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_MODULUS_NORMED(ctx), nlimbs);
 
     MPN_MOD_CTX_IS_PRIME(ctx) = T_UNKNOWN;
+    MPN_MOD_CTX_PRETEND(ctx) = 0;
+    MPN_MOD_CTX_FACTOR(ctx) = NULL;
 
     ctx->size_limit = WORD_MAX;
 

@@ -10,6 +10,7 @@
 */
 
 #include "qqbar.h"
+#include "impl.h"
 
 void
 qqbar_im(qqbar_t res, const qqbar_t x)
@@ -31,12 +32,20 @@ qqbar_im(qqbar_t res, const qqbar_t x)
         }
         else
         {
+            /* im(x) = (x - conj(x)) / (2i) */
             qqbar_conj(t, x);
-            qqbar_sub(res, x, t);
-            qqbar_i(t);
-            qqbar_mul(res, res, t);
-            qqbar_neg(res, res);
-            qqbar_mul_2exp_si(res, res, -1);
+
+            if (qqbar_degree(x) >= 9 && _qqbar_binary_op_structured(res, x, t, 6))
+            {
+                /* conj(x) is in Q(x); we have computed im(x)^2 */
+                qqbar_sqrt(res, res);
+                if (qqbar_sgn_im(x) < 0)
+                    qqbar_neg(res, res);
+            }
+            else
+            {
+                _qqbar_conjugate_pair_op(res, x, t, 5);
+            }
         }
 
         arb_zero(acb_imagref(QQBAR_ENCLOSURE(res)));

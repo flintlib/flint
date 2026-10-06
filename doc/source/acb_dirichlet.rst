@@ -183,6 +183,15 @@ the evaluation.
     otherwise chooses the number of terms automatically based on *s* and the
     precision.
 
+    The main sum is computed with :func:`dfloat_powsum_sieved` (double
+    expansion balls, see the dfloat module) when it can deliver about
+    `\text{prec} + 10 - \log_2 |t|` bits after the binary point, and
+    and the sum has at least 16 terms (below that, the fixed cost of
+    the dfloat version exceeds the whole arb computation), and
+    with :func:`acb_dirichlet_powsum_sieved` otherwise; the global
+    variable ``acb_dirichlet_zeta_rs_use_dfloat`` (default 1) can be set
+    to 0 to always use the latter.
+
 .. function:: void acb_dirichlet_zeta_rs(acb_t res, const acb_t s, slong K, slong prec)
 
     Computes `\zeta(s)` using the Riemann-Siegel formula. Uses precisely
@@ -718,7 +727,32 @@ mpmath [Joh2018b]_ by Juan Arias de Reyna, described in [Ari2012]_.
 .. function:: void _acb_dirichlet_refine_hardy_z_zero(arb_t res, const arf_t a, const arf_t b, slong prec)
 
     Sets *res* to the unique zero of the Hardy Z-function in the
-    interval `(a, b)`.
+    interval `(a, b)`. Below `4 \log_2 t + 40` bits, this uses the
+    Illinois method, with the iterates computed at `\text{prec} + \log_2
+    t + 8` bits but *Z* evaluated at only `\text{prec} + 12` bits (its
+    value near the zero is needed to about `\text{prec} - \log_2 t`
+    bits after the binary point), so that the Riemann-Siegel main sum
+    stays within reach of :func:`dfloat_powsum_sieved`; when an iterate
+    falls so close to the zero that the sign of *Z* is undetermined,
+    the zero is bracketed by the two points at a quarter of the
+    tolerance on either side instead of raising the precision.
+    From `\log_2 t + 96` bits, the zero is first refined to
+    `p_1 = (\text{prec} + \log_2 t)/2 + 16` bits (where *Z* is much
+    cheaper to evaluate, in particular in the dfloat range), then
+    finished by one secant step through the endpoints of that bracket
+    and the signs of *Z* at a quarter of the tolerance on either side of
+    the result: four evaluations at the target precision rather than
+    the dozen of the Illinois method alone (at the 10^15-th zero to 192
+    bits, 12 s against 31 s).
+    Above `4 \log_2 t + 40` bits, Newton's method is used.
+
+.. function:: void _acb_dirichlet_refine_hardy_z_zero_ball(arb_t res, const arb_t z, slong prec)
+
+    Sets *res* to the zero of the Hardy Z-function in the ball *z*,
+    which must contain a unique zero (for example a zero computed by the
+    large height method), to *prec* bits: the ball rounded if it is
+    accurate enough, else the last stage of the refinement above if *z*
+    is accurate to about half the precision, else the full refinement.
 
 .. function:: void acb_dirichlet_hardy_z_zero(arb_t res, const fmpz_t n, slong prec)
 
@@ -728,6 +762,60 @@ mpmath [Joh2018b]_ by Juan Arias de Reyna, described in [Ari2012]_.
 
     Sets the entries of *res* to *len* consecutive zeros of the
     Hardy Z-function, beginning with the *n*-th zero. Requires positive *n*.
+
+    The zeros are computed by the Riemann-Siegel method
+    (:func:`_acb_dirichlet_hardy_z_zeros_rs`), or by the large height
+    method :func:`acb_dirichlet_platt_hardy_z_zeros` at the working
+    precision returned by :func:`_acb_dirichlet_hardy_z_zeros_use_platt`
+    when this is expected to be faster, each zero then being finished
+    (if the large height method does not deliver it to *prec* bits) by
+    :func:`_acb_dirichlet_refine_hardy_z_zero_ball`, and any zero it does
+    not find by the Riemann-Siegel method. The results are accurate to
+    about *prec* bits either way. The functions below for single zeros
+    and for the zeros of `\zeta(s)` call this function.
+
+.. function:: void _acb_dirichlet_hardy_z_zeros_rs(arb_ptr res, const fmpz_t n, slong len, slong prec)
+
+    The same, always by the Riemann-Siegel method (isolation by Gram
+    points and Turing's method, refinement by
+    :func:`_acb_dirichlet_refine_hardy_z_zero`).
+
+.. function:: slong _acb_dirichlet_hardy_z_zeros_use_platt(const fmpz_t n, slong len, slong prec)
+
+    Returns 0 if :func:`acb_dirichlet_hardy_z_zeros` uses the
+    Riemann-Siegel method for *len* zeros from the *n*-th at the target
+    precision *prec* (or at the default precision
+    `64 + \lceil \log_2 n \rceil` of the ``zeta_zeros`` example program
+    if *prec* is not positive), otherwise the working precision of the
+    large height method. The choice is the cheapest of three options
+    by a cost model measured with 2 threads (see ``hardy_z_zeros.c``):
+
+    * The Riemann-Siegel method costs about the same per zero; beyond the
+      default precision, the last stage of the refinement takes four
+      evaluations of *Z* at the target precision (about 6 times the cost
+      of a zero at the default precision at 192 bits, 12 times at 320
+      bits).
+
+    * The large height method with the dfloat sums over `j`, at a working
+      precision of at most `\log_2 n + 104` bits (about `\log_2 n + 68`
+      bits of accuracy), has a fixed cost (one multi-evaluation isolates
+      thousands of zeros) of a few seconds up to `n = 10^{15}`, then about
+      10 ms per zero, plus the last stage of the refinement for each zero
+      if a higher precision is requested.
+
+    * The large height method with arb sums at the working precision
+      *prec* + 48 costs 3 to 12 times as much per call, and is limited in
+      accuracy (its parameters depend only on the height) to about 253,
+      234, 219, 201, 187, 170 and 155 bits at `n = 10^{11}, \ldots, 10^{17}`.
+
+    At the default precision, the large height method is used from 158
+    zeros at `n = 10^{11}`, 51 at `10^{12}`, 14 at `10^{13}`, 10 at
+    `10^{14}`, 3 at `10^{15}`, 2 from `10^{16}`, and (extrapolated) for a
+    single zero from `10^{20}`. For 100 zeros at `10^{15}` to 180 bits,
+    the arb version takes 31 s (2 threads), against about 1200 s for
+    the Riemann-Siegel method. Without dfloat (x87 arithmetic), the
+    large height method is used from `10^{15}`, or from `10^{11}` for more
+    than 100 zeros. It is only used for `10^{11} \le n < 10^{23}`.
 
 .. function:: void acb_dirichlet_zeta_zero(acb_t res, const fmpz_t n, slong prec)
 
@@ -824,6 +912,21 @@ and formulas described by David J. Platt in [Pla2017]_.
     computation over the number of threads returned by
     *flint_get_num_threads()*, while the default multieval version chooses
     whether to use multithreading automatically.
+
+    The default multieval version computes the sums over `j \le J`
+    (the bulk of the work) with :func:`_dfloat_platt_smk_dd` when *prec*
+    is at most `\log_2 T + 110` bits (which gives a grid about as
+    accurate as the arb version at `\log_2 T + 106` bits; the global
+    variable ``acb_dirichlet_platt_use_dfloat`` (default 1) can be set
+    to 0 to always use arb). In both versions, the part after these
+    sums works at `\text{prec} - \log_2 T + 16` bits (its inputs, of
+    size about 1, carry that accuracy; this is two limbs instead of
+    three at the heights where the method is used), generates the rows
+    of the gamma factor table for each group of four `k` from `N`
+    stored factors and bases instead of storing `KN` entries, and sums
+    the `K` convolutions in the frequency domain, in parallel over the
+    groups in waves of one group per thread, with a result that does
+    not depend on the number of threads.
 
 .. function:: void acb_dirichlet_platt_ws_interpolation(arb_t res, arf_t deriv, const arb_t t0, arb_srcptr p, const fmpz_t T, slong A, slong B, slong Ns_max, const arb_t H, slong sigma, slong prec)
 

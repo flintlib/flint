@@ -127,7 +127,6 @@ typedef struct
     gr_mpoly_ctx_struct * ctx;
     gr_ctx_struct * cctx;
     slong len;                        /* number of divisors */
-    slong length;                     /* number of chunks (unrelated to len) */
     slong N;
     flint_bitcnt_t bits;
     ulong * cmpmask;
@@ -169,7 +168,6 @@ static void ideal_base_init(ideal_base_t H)
     H->tail = NULL;
     H->cur = NULL;
     H->ctx = NULL;
-    H->length = 0;
     H->N = 0;
     H->bits = 0;
     H->cmpmask = NULL;
@@ -200,7 +198,6 @@ static int ideal_base_clear(gr_mpoly_struct * const * Q, gr_mpoly_t R, ideal_bas
     H->head = NULL;
     H->tail = NULL;
     H->cur = NULL;
-    H->length = 0;
 
     status = (H->have_unable || H->overflowed) ? GR_UNABLE : GR_SUCCESS;
 
@@ -241,7 +238,6 @@ static void ideal_base_add_chunk(ideal_base_t H, ideal_chunk_t L)
         tail->next = L;
         H->tail = L;
     }
-    H->length++;
 }
 
 
@@ -1036,11 +1032,21 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
         gr_mpoly_ts_struct * Q = H->polyQ + w;
         slong mq = L->mq[w];
         slong new_length = q_prev_length[w];
+        gr_srcptr Qcoeffs;
+        const ulong * Qexps;
         int status;
         int overflowed;
 
         if (new_length <= mq)
             continue;
+
+        /* see chunk_mulsub: snapshot the (possibly concurrently
+           reallocated) arrays, then fence */
+        Qcoeffs = Q->coeffs;
+        Qexps = Q->exps;
+#if FLINT_USES_PTHREAD
+        atomic_thread_fence(memory_order_acquire);
+#endif
 
         stripe_fit_length(S, new_length - mq);
         S->startidx = &L->startidx[w];
@@ -1051,7 +1057,7 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
             T1->length = _gr_mpoly_mulsub_stripe1(
                     &T1->coeffs, &T1->exps, &T1->coeffs_alloc, &T1->exps_alloc,
                     C->coeffs, C->exps, C->length, 1,
-                    GR_ENTRY(Q->coeffs, mq, sz), Q->exps + N*mq, new_length - mq,
+                    GR_ENTRY(Qcoeffs, mq, sz), Qexps + N*mq, new_length - mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1060,7 +1066,7 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
             T1->length = _gr_mpoly_mulsub_stripe(
                     &T1->coeffs, &T1->exps, &T1->coeffs_alloc, &T1->exps_alloc,
                     C->coeffs, C->exps, C->length, 1,
-                    GR_ENTRY(Q->coeffs, mq, sz), Q->exps + N*mq, new_length - mq,
+                    GR_ENTRY(Qcoeffs, mq, sz), Qexps + N*mq, new_length - mq,
                     B->coeffs, B->exps, B->length,
                     S, &status, &overflowed);
         }
@@ -1150,6 +1156,14 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         gr_srcptr Rcoeff;
         ulong * Rexp;
         slong Rlen;
+
+#if FLINT_USES_PTHREAD
+        /* pairs with the release fence before "next->producer = 1" below:
+           having observed that we are the producer, we must also observe
+           everything the previous producer did before handing the role
+           over -- in particular the final polyQ[w]->length values. */
+        atomic_thread_fence(memory_order_acquire);
+#endif
 
         /* process any further quotient terms that trickled in */
         for (w = 0; w < H->len; w++)
@@ -1277,8 +1291,19 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         }
 
         next = L->next;
-        H->length--;
+
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         H->cur = next;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+
+        /* pairs with the acquire fence at the top of the producer branch
+           above: everything this chunk produced must be visible to whoever
+           observes that it is now the producer. */
+        atomic_thread_fence(memory_order_release);
+#endif
 
         if (next != NULL)
             next->producer = 1;
@@ -1329,7 +1354,13 @@ static void ideal_worker_loop(void * varg)
     while (!H->failed)
     {
         ideal_chunk_struct * L;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
         L = H->cur;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+#endif
 
         if (L == NULL)
             break;

@@ -13,60 +13,32 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
-/*
-    Karp-Markstein: with g = h^(-1/2) + O(x^m) and v = h g mod x^m,
-    sqrt(h) = v + g (h - v^2) / 2 + O(x^(2m)).
+/* Below this length, the basecase algorithm is faster than Newton
+   iteration. */
+#if defined(FQ_ZECH_POLY_H)
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 200
+#elif defined(FQ_NMOD_POLY_H)
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 48
+#else
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 48
+#endif
 
-    Assumes that h has length n.
-*/
 void
 _TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, struct) * g, const TEMPLATE(T, struct) * h, slong n, TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) * r, * t;
-    TEMPLATE(T, t) inv2;
-    slong m, L, tlen;
+    gr_ctx_t gr_ctx;
 
-    if (n <= 2)
-    {
-        t = _TEMPLATE(T, vec_init)(n, ctx);
-        _TEMPLATE(T, poly_invsqrt_series)(t, h, n, ctx);
-        _TEMPLATE(T, poly_mullow)(g, t, n, h, n, n, ctx);
-        _TEMPLATE(T, vec_clear)(t, n, ctx);
-        return;
-    }
-
-    m = (n + 1) / 2;
-    L = n - m;
-    tlen = FLINT_MIN(2 * m - 1, n);
-
-    r = _TEMPLATE(T, vec_init)(m + n, ctx);
-    t = r + m;
-
-    TEMPLATE(T, init)(inv2, ctx);
 #if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
-    if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+    if (n > 1 && TEMPLATE(T, ctx_prime)(ctx) == 2)
 #else
-    if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
+    if (n > 1 && fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
 #endif
-    {
-        TEMPLATE(T, set_ui)(inv2, 2, ctx);
-        TEMPLATE(T, inv)(inv2, inv2, ctx);
-    }
+        flint_throw(FLINT_ERROR, "(%s): Not supported in characteristic 2.\n", __func__);
 
-    _TEMPLATE(T, poly_invsqrt_series)(r, h, m, ctx);
-    _TEMPLATE(T, poly_mullow)(g, r, m, h, m, m, ctx);
-
-    /* t[m, n) = h[m, n) - (v^2)[m, n) */
-    _TEMPLATE(T, poly_mullow)(t, g, m, g, m, tlen, ctx);
-    _TEMPLATE(T, vec_sub)(t + m, h + m, t + m, tlen - m, ctx);
-    _TEMPLATE(T, vec_set)(t + tlen, h + tlen, n - tlen, ctx);
-
-    _TEMPLATE(T, poly_mullow)(g + m, r, L, t + m, L, L, ctx);
-    _TEMPLATE3(T, vec_scalar_mul, T)(g + m, g + m, L, inv2, ctx);
-
-    TEMPLATE(T, clear)(inv2, ctx);
-    _TEMPLATE(T, vec_clear)(r, m + n, ctx);
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_sqrt_series_newton(g, h, n, n, FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF, gr_ctx));
 }
 
 void

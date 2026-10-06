@@ -9,8 +9,29 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "gr.h"
 #include "gr_mat.h"
+
+/* Swap entries (i, j) and (j, i) bytewise; nw is a constant number of words
+   so that the copies can be inlined. */
+#define GR_MAT_TRANSPOSE_SWAP_WORDS(nw) \
+    { \
+        ulong t[nw]; \
+        char * x; \
+        char * y; \
+        for (i = 0; i < A->r - 1; i++) \
+        { \
+            for (j = i + 1; j < A->c; j++) \
+            { \
+                x = GR_ENTRY(a, i * stride + j, sz); \
+                y = GR_ENTRY(a, j * stride + i, sz); \
+                memcpy(t, x, (nw) * sizeof(ulong)); \
+                memcpy(x, y, (nw) * sizeof(ulong)); \
+                memcpy(y, t, (nw) * sizeof(ulong)); \
+            } \
+        } \
+    }
 
 int
 gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
@@ -38,13 +59,31 @@ gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
                 for (j = i + 1; j < A->c; j++)
                     FLINT_SWAP(ulong, a[i * stride + j], a[j * stride + i]);
         }
+        else if (sz == 2 * sizeof(ulong) || sz == 3 * sizeof(ulong) ||
+                 sz == 4 * sizeof(ulong) || sz == 6 * sizeof(ulong))
+        {
+            /* Swap the element structs bytewise (as in the case above,
+               elements are assumed to be relocatable). Covers e.g. fmpq,
+               fmpz_poly, fq, fq_nmod and arb. */
+            gr_ptr a = A->entries;
+
+            if (sz == 2 * sizeof(ulong))
+                GR_MAT_TRANSPOSE_SWAP_WORDS(2)
+            else if (sz == 3 * sizeof(ulong))
+                GR_MAT_TRANSPOSE_SWAP_WORDS(3)
+            else if (sz == 4 * sizeof(ulong))
+                GR_MAT_TRANSPOSE_SWAP_WORDS(4)
+            else
+                GR_MAT_TRANSPOSE_SWAP_WORDS(6)
+        }
         else
         {
             gr_ptr a = A->entries;
+            gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
 
             for (i = 0; i < A->r - 1; i++)
                 for (j = i + 1; j < A->c; j++)
-                    gr_swap(GR_ENTRY(a, i * stride + j, sz), GR_ENTRY(a, j * stride + i, sz), ctx);
+                    swap(GR_ENTRY(a, i * stride + j, sz), GR_ENTRY(a, j * stride + i, sz), ctx);
         }
     }
     else  /* Not aliased; general case */

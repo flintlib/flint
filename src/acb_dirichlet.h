@@ -25,6 +25,10 @@ void acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
     const acb_t s, ulong k, int integer, int critical_line, slong len, slong prec);
 
 void acb_dirichlet_powsum_sieved(acb_ptr z, const acb_t s, ulong n, slong len, slong prec);
+/* use dfloat_powsum_sieved in the Riemann-Siegel main sum (default 1) */
+FLINT_DLL extern int acb_dirichlet_zeta_rs_use_dfloat;
+/* use the dfloat sums over j in acb_dirichlet_platt_multieval (default 1) */
+FLINT_DLL extern int acb_dirichlet_platt_use_dfloat;
 void acb_dirichlet_powsum_smooth(acb_ptr z, const acb_t s, ulong n, slong len, slong prec);
 
 void acb_dirichlet_zeta_bound(mag_t res, const acb_t s);
@@ -176,6 +180,9 @@ void _acb_dirichlet_isolate_turing_hardy_z_zero(arf_t a, arf_t b, const fmpz_t n
 void acb_dirichlet_isolate_hardy_z_zero(arf_t a, arf_t b, const fmpz_t n);
 void _acb_dirichlet_refine_hardy_z_zero(arb_t res, const arf_t a, const arf_t b, slong prec);
 void acb_dirichlet_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, slong prec);
+slong _acb_dirichlet_hardy_z_zeros_use_platt(const fmpz_t n, slong len, slong prec);
+void _acb_dirichlet_hardy_z_zeros_rs(arb_ptr res, const fmpz_t n, slong len, slong prec);
+void _acb_dirichlet_refine_hardy_z_zero_ball(arb_t res, const arb_t z, slong prec);
 void acb_dirichlet_zeta_zeros(acb_ptr res, const fmpz_t n, slong len, slong prec);
 slong acb_dirichlet_platt_zeta_zeros(acb_ptr res, const fmpz_t n, slong len, slong prec);
 void _acb_dirichlet_exact_zeta_nzeros(fmpz_t res, const arf_t t);

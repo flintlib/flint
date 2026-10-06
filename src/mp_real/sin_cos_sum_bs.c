@@ -265,6 +265,19 @@ qbound(const bs_args * args, slong a, slong b)
         / FLINT_BITS + 3;
 }
 
+/* room for an A or B track over [a, b): the exact value spans at most
+   (b - a) terms of 2D limbs plus its factorial content, and the
+   truncation caps it at lmax (the scratch of a merge was sized by
+   lmax alone at first, which made every node of the tree, down to
+   the leaves, malloc and touch a full-precision buffer: at 3 10^7 bits
+   a third of the tree's time went to those page faults) */
+static slong
+ebound(const bs_args * args, slong a, slong b)
+{
+    return FLINT_MIN(args->lmax, (b - a) * 2 * args->D + 2)
+        + qbound(args, a, b) + 4;
+}
+
 /* normalize (z, zn) B^(ze): first strip trailing zero LIMBS into
    the exponent (exact -- the limb-granular 2-valuation rule, which
    also catches sparse arguments whose powers carry dead low
@@ -307,7 +320,7 @@ static slong
 nnn_combine(const bs_args * args, nn_ptr z, slong zn, slong * ze,
     nn_srcptr p, slong pn, slong pe, int sub, nn_ptr tmp)
 {
-    slong tb, f, q, pl, i;
+    slong tb, f, q, pl;
 
     if (pn == 0)
         return zn;
@@ -329,8 +342,7 @@ nnn_combine(const bs_args * args, nn_ptr z, slong zn, slong * ze,
     if (*ze > f)
     {
         q = *ze - f;
-        for (i = zn - 1; i >= 0; i--)
-            z[i + q] = z[i];
+        memmove(z + q, z, zn * sizeof(ulong));
         flint_mpn_zero(z, q);
         zn = zn + q;
     }
@@ -407,6 +419,78 @@ _mul_f1(nn_ptr t, nn_srcptr x, slong xn, slong a)
     return nnn_normalize(t, l + 1);
 }
 
+static void bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
+    slong * be, nn_ptr Q, slong * qn, slong * QE,
+    const bs_args * args, slong a, slong b);
+
+/* THREADS.  A subtree of at least TRIG_BS_PAR_TERMS terms whose
+   merge products reach TRIG_BS_PAR_LIMBS limbs runs its two halves on
+   two threads (_mp_real_parallel_pair, which splits the budget between
+   them for the forks below), and then its merge as two jobs, the A
+   track and the B track with the Q product, each on its own scratch.
+   Below the thresholds, or without threads, the serial code runs. */
+#ifndef TRIG_BS_PAR_LIMBS
+#define TRIG_BS_PAR_LIMBS 2048
+#endif
+#ifndef TRIG_BS_PAR_TERMS
+#define TRIG_BS_PAR_TERMS 16
+#endif
+
+typedef struct
+{
+    nn_ptr A, B, Q;
+    slong * an, * ae, * bn, * be, * qn, * QE;
+    const bs_args * args;
+    slong a, b;
+}
+trig_bs_job;
+
+static void
+_trig_bs_job(void * arg)
+{
+    trig_bs_job * J = (trig_bs_job *) arg;
+    bsplit(J->A, J->an, J->ae, J->B, J->bn, J->be, J->Q, J->qn, J->QE,
+        J->args, J->a, J->b);
+}
+
+/* the merge as two jobs: with the A track, {A Q2, P A2} and
+   {B Q2, P B2, Q Q2}; without it (the sine-only trees), {P B2} and
+   {B Q2, Q Q2} -- the two products of a track being independent, the
+   combine follows the jobs */
+typedef struct
+{
+    nn_ptr A, B, Q, sca, scpa, scb, scpb, scq;
+    slong * an, * ae, * bn, * be, * qn, * QE;
+    nn_srcptr A2, B2, Q2, P;
+    slong a2n, b2n, q2n, Q2exp, Pl;
+    slong la, lpa, lb, lpb, lq;
+    const bs_args * args;
+}
+trig_merge_struct;
+
+static void
+_trig_merge_x(void * arg)
+{
+    trig_merge_struct * M = (trig_merge_struct *) arg;
+    if (M->A != NULL)
+    {
+        M->la = nnn_mul(M->sca, M->A, *M->an, M->Q2, M->q2n);
+        M->lpa = nnn_mul(M->scpa, M->P, M->Pl, M->A2, M->a2n);
+    }
+    else
+        M->lpb = nnn_mul(M->scpb, M->P, M->Pl, M->B2, M->b2n);
+}
+
+static void
+_trig_merge_y(void * arg)
+{
+    trig_merge_struct * M = (trig_merge_struct *) arg;
+    M->lb = nnn_mul(M->scb, M->B, *M->bn, M->Q2, M->q2n);
+    if (M->A != NULL)
+        M->lpb = nnn_mul(M->scpb, M->P, M->Pl, M->B2, M->b2n);
+    M->lq = nnn_mul(M->scq, M->Q, *M->qn, M->Q2, M->q2n);
+}
+
 static void
 bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
     slong * be, nn_ptr Q, slong * qn, slong * QE,
@@ -445,10 +529,12 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
         slong l1, l2, e1;
         TMP_INIT;
         TMP_START;
-        t1 = TMP_ALLOC((3 * (args->xlen[1] + args->lmax) + 12)
+        /* the leaf values are a few limbs (y and y^2 with their
+           factors), and the frame gap 2D of the combine */
+        t1 = TMP_ALLOC((args->xlen[0] + args->xlen[1] * 2 + 2 * args->D + 24)
             * sizeof(ulong));
-        t2 = t1 + args->xlen[1] + args->lmax + 4;
-        tt = t2 + args->xlen[1] + args->lmax + 4;
+        t2 = t1 + args->xlen[0] + 6;
+        tt = t2 + args->xlen[1] + 6;
 
         /* B */
         l1 = _mul_f1(t1, args->xpow[0], args->xlen[0], a);
@@ -493,6 +579,84 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
             *qn = nnn_mul(Q, q1, ln1, q2, ln2);
         }
     }
+    else if (b - a >= TRIG_BS_PAR_TERMS && flint_get_num_threads() >= 2
+        && args->lmax >= TRIG_BS_PAR_LIMBS)
+    {
+        slong step, m, i, a2n, b2n, q2n, a2e, b2e, pe, Q2exp;
+        slong scl, ttl, e2l;
+        nn_ptr A2, B2, Q2, sca, scpa, scb, scpb, scq, tt;
+        trig_bs_job L, R;
+        trig_merge_struct M;
+        TMP_INIT;
+
+        step = (b - a) / 2;
+        m = a + step;
+
+        /* the five products of the merge each in their own scratch:
+           X Q2 up to lmax + q2n limbs, P X2 up to 2 lmax, Q Q2 within
+           qbound(a, b); the right half's tracks sized for [m, b) */
+        scl = 2 * ebound(args, a, b) + 8;
+        ttl = ebound(args, a, b) + 6;
+        e2l = ebound(args, m, b) + qbound(args, m, b) + 4;
+
+        TMP_START;
+        A2 = TMP_ALLOC((2 * e2l + qbound(args, m, b) + 5 * scl + ttl)
+            * sizeof(ulong));
+        B2 = A2 + e2l;
+        Q2 = B2 + e2l;
+        sca = Q2 + qbound(args, m, b);
+        scpa = sca + scl;
+        scb = scpa + scl;
+        scpb = scb + scl;
+        scq = scpb + scl;
+        tt = scq + scl;
+
+        L.A = A; L.an = an; L.ae = ae; L.B = B; L.bn = bn; L.be = be;
+        L.Q = Q; L.qn = qn; L.QE = QE; L.args = args; L.a = a; L.b = m;
+        R.A = (A == NULL) ? NULL : A2; R.an = &a2n; R.ae = &a2e;
+        R.B = B2; R.bn = &b2n; R.be = &b2e; R.Q = Q2; R.qn = &q2n;
+        R.QE = &Q2exp; R.args = args; R.a = m; R.b = b;
+        _mp_real_parallel_pair(_trig_bs_job, &L, _trig_bs_job, &R);
+
+        i = get_exp_pos(args->xexp, step);
+        pe = args->xe[i];
+
+        M.A = A; M.an = an; M.ae = ae; M.B = B; M.bn = bn; M.be = be;
+        M.Q = Q; M.qn = qn; M.QE = QE;
+        M.sca = sca; M.scpa = scpa; M.scb = scb; M.scpb = scpb;
+        M.scq = scq;
+        M.A2 = A2; M.a2n = a2n; M.B2 = B2; M.b2n = b2n;
+        M.Q2 = Q2; M.q2n = q2n; M.Q2exp = Q2exp;
+        M.P = args->xpow[i]; M.Pl = args->xlen[i];
+        M.args = args;
+        _mp_real_parallel_pair(_trig_merge_x, &M, _trig_merge_y, &M);
+
+        /* A = (A Q2) B^Q2exp -+ P A2, B likewise, truncated to lmax */
+        if (A != NULL)
+        {
+            flint_mpn_copyi(A, sca, M.la);
+            *an = M.la;
+            *ae += Q2exp;
+            *an = nnn_combine(args, A, *an, ae, scpa, M.lpa, pe + a2e,
+                (int) (step & 1), tt);
+            *an = nnn_trunc(args, A, *an, ae);
+        }
+        flint_mpn_copyi(B, scb, M.lb);
+        *bn = M.lb;
+        *be += Q2exp;
+        *bn = nnn_combine(args, B, *bn, be, scpb, M.lpb, pe + b2e,
+            (int) (step & 1), tt);
+        *bn = nnn_trunc(args, B, *bn, be);
+
+        /* Q = Q Q2, exact */
+        flint_mpn_copyi(Q, scq, M.lq);
+        *qn = M.lq;
+        *QE = *QE + Q2exp;
+        *qn = nnn_strip_low(Q, *qn, QE);
+        if (mp_real_get_verbose())
+            _mp_real_progress("trig bsplit: merged terms [%wd, %wd), B has %wd limbs", a, b, *bn);
+        TMP_END;
+    }
     else
     {
         slong step, m, i, a2n, b2n, q2n, l, a2e, b2e, pe;
@@ -514,15 +678,16 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
            them at lmax + 4 alone lets that copy spill into the Q
            slot and clobber the left child's accumulated Q before
            the Q update reads it */
-        A2 = TMP_ALLOC((2 * (args->lmax + qbound(args, m, b) + 4)
-            + qbound(args, m, b)
-            + (2 * args->lmax + qbound(args, a, b) + 8)
-            + (args->lmax + qbound(args, a, b) + 6))
-            * sizeof(ulong));
-        B2 = A2 + (args->lmax + qbound(args, m, b) + 4);
-        Q2 = B2 + (args->lmax + qbound(args, m, b) + 4);
-        sc = Q2 + qbound(args, m, b);
-        tt = sc + (2 * args->lmax + qbound(args, a, b) + 8);
+        {
+            slong e2l = ebound(args, m, b) + qbound(args, m, b) + 4;
+            slong scl = 2 * ebound(args, a, b) + 8;
+            A2 = TMP_ALLOC((2 * e2l + qbound(args, m, b) + scl
+                + ebound(args, a, b) + 6) * sizeof(ulong));
+            B2 = A2 + e2l;
+            Q2 = B2 + e2l;
+            sc = Q2 + qbound(args, m, b);
+            tt = sc + scl;
+        }
 
         bsplit(A, an, ae, B, bn, be, Q, qn, QE, args, a, m);
         bsplit((A == NULL) ? NULL : A2, &a2n, &a2e, B2, &b2n,
@@ -563,6 +728,8 @@ bsplit(nn_ptr A, slong * an, slong * ae, nn_ptr B, slong * bn,
         *qn = l;
         *QE = *QE + Q2exp;
         *qn = nnn_strip_low(Q, *qn, QE);
+        if (*bn >= MP_REAL_VERBOSE_MIN_LIMBS && mp_real_get_verbose())
+            _mp_real_progress("trig bsplit: merged terms [%wd, %wd), B has %wd limbs", a, b, *bn);
         TMP_END;
     }
 }

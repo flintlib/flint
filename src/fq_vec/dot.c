@@ -9,35 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
 #include "fq.h"
 #include "fq_vec.h"
+#include "gr_vec.h"
 
 void _fq_vec_dot(fq_t res, const fq_struct * vec1,
          const fq_struct * vec2, slong len2, const fq_ctx_t ctx)
 {
-   slong i;
-   fmpz_poly_t t;
-
-   if (len2 == 0)
-   {
-      fq_zero(res, ctx);
-
-      return;
-   }
-
-   fmpz_poly_init(t);
-
-   fmpz_poly_mul(res, vec1 + 0, vec2 + 0);
-
-   for (i = 1; i < len2; i++)
-   {
-      fmpz_poly_mul(t, vec1 + i, vec2 + i);
-
-      fmpz_poly_add(res, res, t);
-   }
-
-   fq_reduce(res, ctx);
-
-   fmpz_poly_clear(t);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fq_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_vec_dot(res, NULL, 0, vec1, vec2, len2, gr_ctx));
 }

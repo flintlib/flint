@@ -12,7 +12,9 @@ best when thread local storage is also available on the system.)
 
 By default, FLINT will just use one thread. To control the maximum number of
 threads FLINT uses, one can call the function ``flint_set_num_threads(n)``,
-where `n` is the maximum number of threads to use.
+where `n` is the maximum number of threads to use. Note that the limit only
+applies to threads started directly by FLINT; external libraries such as
+OpenBLAS may start more than `n` threads even when called from FLINT.
 
 One can also query the current thread limit by calling
 ``flint_get_num_threads()``.

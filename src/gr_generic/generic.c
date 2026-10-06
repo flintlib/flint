@@ -32,6 +32,12 @@ truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+/* by default, a ring pretends to be a field exactly when it is one */
+truth_t gr_generic_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    return (gr_ctx_is_field(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
 truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx)
 {
     return T_TRUE;
@@ -1193,8 +1199,10 @@ static truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr
         return T_TRUE;
 
     /* In an integral domain, div should find the unique quotient
-       or assert that none exists. */
-    if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
+       or assert that none exists. The same holds in a ring pretending
+       to be a field, where div fails with GR_DOMAIN only for y = 0
+       (and with GR_UNABLE if y is a zero divisor). */
+    if (gr_ctx_is_integral_domain(ctx) == T_TRUE || gr_ctx_is_pretend_field(ctx) == T_TRUE)
         return status;
 
     /* The ring would need to implement this case. */
@@ -1218,7 +1226,8 @@ static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     if (status == GR_SUCCESS)
         return T_TRUE;
 
-    if (gr_ctx_is_integral_domain(ctx) != T_TRUE)
+    /* (in a ring pretending to be a field, GR_DOMAIN means x = 0) */
+    if (gr_ctx_is_integral_domain(ctx) != T_TRUE && gr_ctx_is_pretend_field(ctx) != T_TRUE)
         return T_UNKNOWN;
 
     if (status == GR_DOMAIN)
@@ -1227,6 +1236,23 @@ static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
+
+/* [m +/- inf] via an infinite radius, when the ring has one */
+int
+gr_generic_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+
+    GR_TMP_INIT(t, ctx);
+    status = gr_pos_inf(t, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_set_interval_mid_rad(res, m, t, ctx);
+    else
+        status = GR_UNABLE;
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
 
 /* at least catch square roots -- todo: generalize to nth roots */
 int
@@ -1398,7 +1424,9 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 static int
 gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    /* (in a ring pretending to be a field, a zero divisor makes the
+       inversion fail with GR_UNABLE, which is propagated) */
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         int status = gr_inv(u, x, ctx);
 
@@ -1425,7 +1453,7 @@ gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 static int
 gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         truth_t x_zero, y_zero;
 
@@ -1436,7 +1464,21 @@ gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
             return gr_zero(res, ctx);
 
         if (x_zero == T_FALSE || y_zero == T_FALSE)
+        {
+            /* (pretending: the nonzero element must be invertible, which
+               is checked by inverting it) */
+            if (gr_ctx_is_field(ctx) != T_TRUE)
+            {
+                gr_ptr t;
+                int status;
+                GR_TMP_INIT(t, ctx);
+                status = gr_inv(t, (x_zero == T_FALSE) ? x : y, ctx);
+                GR_TMP_CLEAR(t, ctx);
+                if (status != GR_SUCCESS)
+                    return status;
+            }
             return gr_one(res, ctx);
+        }
 
         return GR_UNABLE;
     }
@@ -2835,6 +2877,107 @@ gr_generic_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx)
     return status;
 }
 
+/* Elementwise conversions and data movement */
+
+int
+gr_generic_vec_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_op_other set_other = GR_UNARY_OP_OTHER(ctx, SET_OTHER);
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem, xsz = x_ctx->sizeof_elem;
+
+    if (x_ctx == ctx)
+        return _gr_vec_set(res, x, len, ctx);
+
+    for (i = 0; i < len; i++)
+        status |= set_other(GR_ENTRY(res, i, sz), GR_ENTRY(x, i, xsz), x_ctx, ctx);
+
+    return status;
+}
+
+int
+gr_generic_vec_gather(gr_ptr res, gr_srcptr vec, const slong * idx, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_op set = GR_UNARY_OP(ctx, SET);
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem;
+
+    for (i = 0; i < len; i++)
+        status |= set(GR_ENTRY(res, i, sz), GR_ENTRY(vec, idx[i], sz), ctx);
+
+    return status;
+}
+
+int
+gr_generic_vec_scatter(gr_ptr vec, const slong * idx, gr_srcptr src, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_op set = GR_UNARY_OP(ctx, SET);
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem;
+
+    for (i = 0; i < len; i++)
+        status |= set(GR_ENTRY(vec, idx[i], sz), GR_ENTRY(src, i, sz), ctx);
+
+    return status;
+}
+
+/* Elementwise elementary functions */
+
+#define GR_GENERIC_VEC_UNARY(func, NAME) \
+int \
+gr_generic_vec_ ## func(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_unary_op f = GR_UNARY_OP(ctx, NAME); \
+    int status = GR_SUCCESS; \
+    slong i, sz = ctx->sizeof_elem; \
+    for (i = 0; i < len; i++) \
+        status |= f(GR_ENTRY(res, i, sz), GR_ENTRY(x, i, sz), ctx); \
+    return status; \
+}
+
+GR_GENERIC_VEC_UNARY(sqrt, SQRT)
+GR_GENERIC_VEC_UNARY(rsqrt, RSQRT)
+GR_GENERIC_VEC_UNARY(exp, EXP)
+GR_GENERIC_VEC_UNARY(log, LOG)
+GR_GENERIC_VEC_UNARY(sin, SIN)
+GR_GENERIC_VEC_UNARY(cos, COS)
+
+int
+gr_generic_vec_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_unary_op f = GR_BINARY_UNARY_OP(ctx, SIN_COS);
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res1, i, sz), GR_ENTRY(res2, i, sz), GR_ENTRY(x, i, sz), ctx);
+
+    return status;
+}
+
+/* Exact representations have no radius */
+int
+gr_generic_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status;
+    status = gr_set(m, x, ctx);
+    status |= gr_zero(r, ctx);
+    return status;
+}
+
+int
+gr_generic_vec_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_unary_op f = GR_BINARY_UNARY_OP(ctx, GET_INTERVAL_MID_RAD);
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(m, i, sz), GR_ENTRY(r, i, sz), GR_ENTRY(x, i, sz), ctx);
+
+    return status;
+}
+
 /* Generic method implementations */
 const gr_method_tab_input _gr_generic_methods[] =
 {
@@ -2844,6 +2987,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) gr_generic_ctx_is_pretend_field},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,      (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FINITE,           (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,        (gr_funcptr) gr_generic_ctx_predicate},
@@ -2902,6 +3046,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
 
     {GR_METHOD_SET_STR,                 (gr_funcptr) gr_generic_set_str},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) gr_generic_set_interval_mid_inf},
 
     {GR_METHOD_GET_FEXPR_SERIALIZE,     (gr_funcptr) gr_generic_get_fexpr_serialize},
     {GR_METHOD_SET_FEXPR,               (gr_funcptr) gr_generic_set_fexpr},
@@ -3019,6 +3164,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_ASINH,                   (gr_funcptr) gr_generic_asinh},
     {GR_METHOD_ATANH,                   (gr_funcptr) gr_generic_atanh},
 
+    {GR_METHOD_SEC_PI,                  (gr_funcptr) gr_generic_sec_pi},
+    {GR_METHOD_CSC_PI,                  (gr_funcptr) gr_generic_csc_pi},
+    {GR_METHOD_ASIN_PI,                 (gr_funcptr) gr_generic_asin_pi},
+    {GR_METHOD_ACOS_PI,                 (gr_funcptr) gr_generic_acos_pi},
+    {GR_METHOD_ATAN_PI,                 (gr_funcptr) gr_generic_atan_pi},
+    {GR_METHOD_ACOT_PI,                 (gr_funcptr) gr_generic_acot_pi},
+    {GR_METHOD_ASEC_PI,                 (gr_funcptr) gr_generic_asec_pi},
+    {GR_METHOD_ACSC_PI,                 (gr_funcptr) gr_generic_acsc_pi},
     {GR_METHOD_ACOT,                    (gr_funcptr) gr_generic_acot},
     {GR_METHOD_ASEC,                    (gr_funcptr) gr_generic_asec},
     {GR_METHOD_ACSC,                    (gr_funcptr) gr_generic_acsc},
@@ -3198,6 +3351,21 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_RECIPROCALS,         (gr_funcptr) gr_generic_vec_reciprocals},
     {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
+
+    {GR_METHOD_VEC_SET_OTHER,           (gr_funcptr) gr_generic_vec_set_other},
+    {GR_METHOD_VEC_GATHER,              (gr_funcptr) gr_generic_vec_gather},
+    {GR_METHOD_VEC_SCATTER,             (gr_funcptr) gr_generic_vec_scatter},
+    {GR_METHOD_VEC_GET_INTERVAL_MID_RAD, (gr_funcptr) gr_generic_vec_get_interval_mid_rad},
+
+    {GR_METHOD_VEC_SQRT,                (gr_funcptr) gr_generic_vec_sqrt},
+    {GR_METHOD_VEC_RSQRT,               (gr_funcptr) gr_generic_vec_rsqrt},
+    {GR_METHOD_VEC_EXP,                 (gr_funcptr) gr_generic_vec_exp},
+    {GR_METHOD_VEC_LOG,                 (gr_funcptr) gr_generic_vec_log},
+    {GR_METHOD_VEC_SIN,                 (gr_funcptr) gr_generic_vec_sin},
+    {GR_METHOD_VEC_COS,                 (gr_funcptr) gr_generic_vec_cos},
+    {GR_METHOD_VEC_SIN_COS,             (gr_funcptr) gr_generic_vec_sin_cos},
+
+    {GR_METHOD_GET_INTERVAL_MID_RAD,    (gr_funcptr) gr_generic_get_interval_mid_rad},
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
     {GR_METHOD_POLY_HGCD_MAT_MUL,       (gr_funcptr) _gr_poly_hgcd_mat_mul_generic},

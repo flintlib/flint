@@ -21,6 +21,7 @@
 #include "t-compose_mod_precomp_preinv.c"
 #include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
+#include "t-deflate_inflate.c"
 #include "t-dispersion.c"
 #include "t-div_basecase.c"
 #include "t-div.c"
@@ -124,6 +125,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose_mod_precomp_preinv),
     TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
+    TEST_FUNCTION(gr_poly_deflate_inflate),
     TEST_FUNCTION(gr_poly_dispersion),
     TEST_FUNCTION(gr_poly_div_basecase),
     TEST_FUNCTION(gr_poly_div),

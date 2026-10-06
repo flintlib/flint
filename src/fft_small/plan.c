@@ -14,6 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod.h"
 #include "fft_small.h"
+#include "fft_small/impl.h"
 
 int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max)
 {
@@ -361,27 +362,21 @@ static int _fft_small_plan_set_bound_nmod(fft_small_plan_t P,
                     ulong direct_len)
 {
     mpn_ctx_struct * R = P->R;
-    ulong modbits = FLINT_BITS - mod.norm;
-    ulong i;
+    slong i;
 
     P->bound_c = len_bound;
     P->bound_e = prod_bits;
 
     /* first see if mod.n is one of R->ffts[i].mod.n */
-    if (modbits == 50)
+    i = _fft_small_mpn_ctx_prime_index(R, mod.n);
+    if (i >= 0)
     {
-        for (i = 0; i < MPN_CTX_NCRTS; i++)
-        {
-            if (mod.n == R->ffts[i].mod.n)
-            {
-                P->np = 1;
-                P->offset = i;
-                P->ffts = R->ffts;
-                P->crts = R->crts;
-                P->use_direct_fft = 0;
-                return 1;
-            }
-        }
+        P->np = 1;
+        P->offset = i;
+        P->ffts = R->ffts;
+        P->crts = R->crts;
+        P->use_direct_fft = 0;
+        return 1;
     }
 
     if (direct_len != 0 &&

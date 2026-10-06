@@ -42,8 +42,18 @@ TEST_FUNCTION_START(mp_real_sin_cos_sum_bs, state)
         slong an, bn, qn, ae, be, qb2, QE;
         fmpz_t fx, fa, fb, fq;
         arb_t va, vb, ra, rb, t, tol, tail;
-        slong prec = 2 * FLINT_BITS * D + FLINT_BITS * lmax
+        slong prec;
+
+        /* large truncated trees reach the threaded subtrees and
+           merges */
+        if (iter % 25 == 0)
+        {
+            N = 16 + n_randint(state, 200);
+            lmax = 2048 + n_randint(state, 1024);
+        }
+        prec = 2 * FLINT_BITS * D + FLINT_BITS * lmax
             + FLINT_BITS * N + 512;
+        flint_set_num_threads(1 + n_randint(state, 4));
 
         x = flint_malloc((xn + 1) * sizeof(ulong));
         flint_mpn_urandomb(x, state, (flint_bitcnt_t) xbits);
@@ -120,6 +130,8 @@ TEST_FUNCTION_START(mp_real_sin_cos_sum_bs, state)
         arb_clear(va); arb_clear(vb); arb_clear(ra); arb_clear(rb);
         arb_clear(t); arb_clear(tol); arb_clear(tail);
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

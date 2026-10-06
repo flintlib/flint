@@ -947,6 +947,24 @@ Enclosure and interval methods
     Such expressions are parsed specially and the components *x* and *n*
     are passed to this function without eagerly evaluating the power `x^n`.
 
+.. function:: int gr_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+
+    In ball representations of the real numbers, sets *res* to the
+    interval `m \pm \infty`, i.e. the whole real line. In vector spaces
+    over the real numbers, this is `m \pm \infty` with the infinity
+    regarded as a real (or constant) element, so that only the real part
+    of a complex number, respectively the constant coefficient of a
+    polynomial, gets an infinite radius, consistently with
+    :func:`gr_set_interval_mid_rad`.
+
+    :func:`gr_set_str` parses subexpressions of the form ``m +/- inf``
+    (and ``+/- inf`` with `m = 0`) by passing *m* to this function
+    without evaluating ``inf``, so that intervals with an infinite radius
+    can be read back in rings where infinity is not an element.
+    The generic implementation uses :func:`gr_pos_inf` and
+    :func:`gr_set_interval_mid_rad`, returning ``GR_UNABLE`` when
+    the ring has no infinity.
+
 .. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
 
     In ball representations of the real numbers, sets *res* to
@@ -960,6 +978,17 @@ Enclosure and interval methods
     In ring implementations that provide this method, :func:`gr_set_str`
     allows parsing strings containing subexpressions with the syntax ``a +/- b``.
 
+.. function:: int gr_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx)
+
+    The inverse of :func:`gr_set_interval_mid_rad`: in ball
+    representations, sets *m* to the midpoint of *x* and *r* to its
+    radius, as exact elements of the ring (both are then balls of
+    radius zero), so that ``gr_set_interval_mid_rad(y, m, r)``
+    reproduces *x*. In a vector space over the real numbers
+    represented using balls, the radii are handled independently for
+    the generators, as in the setter. In exact representations,
+    *m* is set to *x* and *r* to zero (the generic implementation).
+    
 Cardinality
 ........................................................................
 

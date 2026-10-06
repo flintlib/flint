@@ -10,35 +10,35 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
-#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 int
 _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 {
-    fmpz * fd, * g;
-    slong dlen;
-    int res;
+    gr_ctx_t gr_ctx;
+    gr_poly_struct t;
+    truth_t res;
 
     if (len <= 2)
         return len != 0;
 
-    fd = _fmpz_vec_init(2 * (len - 1));
-    g = fd + len - 1;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(gr_ctx, T_TRUE));
 
-    _fmpz_mod_poly_derivative(fd, f, len, ctx);
-    dlen = len - 1;
-    FMPZ_VEC_NORM(fd, dlen);
+    t.coeffs = (fmpz *) f;
+    t.length = len;
+    t.alloc = len;
 
-    if (dlen)
-        res = (_fmpz_mod_poly_gcd(g, f, len, fd, dlen, ctx) == 1);
-    else
-        res = 0;   /* gcd(f, 0) = f, and len(f) > 2 */
+    res = gr_poly_is_squarefree(&t, gr_ctx);
 
-    _fmpz_vec_clear(fd, 2 * (len - 1));
-    return res;
+    if (res == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "Exception in _fmpz_mod_poly_is_squarefree: "
+                                 "unable to decide\n");
+
+    return res == T_TRUE;
 }
 
 int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,

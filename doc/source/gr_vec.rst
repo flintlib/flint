@@ -215,6 +215,45 @@ Arithmetic
 
 .. function:: int _gr_vec_mul_scalar_2exp_si(gr_ptr res, gr_srcptr vec, slong len, slong c, gr_ctx_t ctx)
 
+Elementary functions
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_vec_sqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_rsqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_exp(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_log(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_sin(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_cos(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, slong len, gr_ctx_t ctx)
+
+    Elementwise square roots and elementary functions (methods
+    ``GR_METHOD_VEC_SQRT``, ``GR_METHOD_VEC_EXP`` etc.). The generic
+    implementations loop over the scalar methods; rings with
+    vectorized kernels (``dfloat``) override them.
+
+Conversions and data movement
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_vec_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, slong len, gr_ctx_t ctx)
+
+    Sets ``res[i]`` to ``x[i]`` converted from the ring *x_ctx*, as
+    :func:`gr_set_other` elementwise (method ``GR_METHOD_VEC_SET_OTHER``).
+
+.. function:: int _gr_vec_gather(gr_ptr res, gr_srcptr vec, const slong * idx, slong len, gr_ctx_t ctx)
+              int _gr_vec_scatter(gr_ptr vec, const slong * idx, gr_srcptr src, slong len, gr_ctx_t ctx)
+
+    Indexed copies: ``res[i] = vec[idx[i]]``, respectively
+    ``vec[idx[i]] = src[i]``, for `0 \le i < len` (methods
+    ``GR_METHOD_VEC_GATHER``, ``GR_METHOD_VEC_SCATTER``). The indices
+    need not be distinct; when they repeat in a scatter, the last
+    write wins. The generic implementations loop over :func:`gr_set`;
+    rings whose elements are plain data override them with copies.
+
+.. function:: int _gr_vec_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, slong len, gr_ctx_t ctx)
+
+    :func:`gr_get_interval_mid_rad` elementwise (method
+    ``GR_METHOD_VEC_GET_INTERVAL_MID_RAD``).
+
 Sums and products
 --------------------------------------------------------------------------------
 

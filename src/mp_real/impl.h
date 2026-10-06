@@ -834,12 +834,21 @@ extern FLINT_TLS_PREFIX slong _mp_real_atan_gauss_num;
 void _mp_real_log_primes_vec(mp_real_struct * res, slong num, slong n);
 void _mp_real_atan_gauss_vec(mp_real_struct * res, slong num, slong n);
 void _mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n);
+void _mp_real_atan_ratio_zuniga(mp_real_t res, const fmpz_t d, const fmpz_t t, slong n);
 int _mp_real_store_floors(nn_ptr e, slong nc, mp_real_struct * v, slong num);
 
 /* threads (parallel.c): run two functions, the second on a pool thread
-   if one is free (returns 1 if so); run n tasks on up to n threads */
+   if one is free (returns 1 if so); run n tasks on up to n resp.
+   max_workers threads; products of vectors (destroyed) by forking
+   product trees */
 int _mp_real_parallel_pair(void (* f1)(void *), void * a1, void (* f2)(void *), void * a2);
 void _mp_real_parallel_tasks(void (* f)(slong, void *), void * args, slong n);
+void _mp_real_parallel_tasks_max(void (* f)(slong, void *), void * args, slong n, slong max_workers);
+void _mp_real_parallel_tasks_cost(void (* f)(slong, void *), void * args, slong n, slong max_workers, const double * cost);
+void _mp_real_parallel_lanes(void (* f)(slong, slong, void *), void * args, slong n, slong nlanes, const double * cost);
+slong _mp_real_parallel_lanes_count(slong n, slong max_workers);
+void _mp_real_vec_prod(mp_real_t res, mp_real_struct * vec, slong len, slong n);
+void _mp_real_vec_prod_complex(mp_real_t rre, mp_real_t rim, mp_real_struct * re, mp_real_struct * im, slong len, slong n);
 
 /* T = T1 Q2 + P1 T2, Q = Q1 Q2, P = P1 P2 (need_p) in place, T2
    destroyed; par: on two threads.  A splitting forks its halves only
@@ -848,6 +857,48 @@ void _mp_real_parallel_tasks(void (* f)(slong, void *), void * args, slong n);
 void _mp_real_pqt_merge(mp_real_t P, mp_real_t Q, mp_real_t T, mp_real_t P2,
     mp_real_t Q2, mp_real_t T2, int need_p, slong n, int par);
 #define MP_REAL_PAR_CAP 4.0
+
+/* The bit-burst loops (exp_reduced.c, sin_cos_reduced.c) evaluate
+   their slices as parallel tasks; the concurrency is capped to one (a
+   serial loop, the parallelism then coming from the binary splitting
+   inside each slice) from these many working limbs, the switches of
+   arb_exp_arf_bb (10^9 bits) and arb_sin_cos_arf_bb (4 10^8 bits): a
+   slice's splitting integers and power table come to several times
+   the working precision, so running the slices side by side multiplies
+   the peak memory by the thread count.  (A single switch at 2^22
+   limbs, 2.7 10^8 bits, left both functions at parity with arb on 8
+   threads at 3 10^8 bits.) */
+#ifndef MP_REAL_EXP_BURST_SERIAL_LIMBS
+#define MP_REAL_EXP_BURST_SERIAL_LIMBS (1000000000 / FLINT_BITS)
+#endif
+#ifndef MP_REAL_TRIG_BURST_SERIAL_LIMBS
+#define MP_REAL_TRIG_BURST_SERIAL_LIMBS (400000000 / FLINT_BITS)
+#endif
+/* below this many working limbs the burst's tasks and the product
+   trees stay on the calling thread (a wake-up costs microseconds) */
+#ifndef MP_REAL_PAR_MIN_LIMBS
+#define MP_REAL_PAR_MIN_LIMBS 64
+#endif
+
+/* verbose reports (verbose.c): _mp_real_log prints unconditionally
+   (the caller checks the level), _mp_real_progress at most once per
+   MP_REAL_VERBOSE_INTERVAL seconds across all threads; a phase logs
+   its start at level 2 and its end at level 2 or when it took at
+   least the interval at level 1 */
+#define MP_REAL_VERBOSE_INTERVAL 2.0
+typedef struct { double t0; const char * name; slong n; } mp_real_phase_t;
+void _mp_real_log(const char * fmt, ...);
+void _mp_real_progress(const char * fmt, ...);
+double _mp_real_verbose_time(void);
+void _mp_real_phase_start(mp_real_phase_t * ph, const char * name, slong n);
+void _mp_real_phase_end(mp_real_phase_t * ph);
+/* phases are reported from this many limbs on */
+#define MP_REAL_VERBOSE_MIN_LIMBS 4096
+#define MP_REAL_PHASE_START(ph, nm, n) \
+    do { if (mp_real_get_verbose() && (n) >= MP_REAL_VERBOSE_MIN_LIMBS) \
+        _mp_real_phase_start(&(ph), nm, n); else (ph).name = NULL; } while (0)
+#define MP_REAL_PHASE_END(ph) \
+    do { if ((ph).name != NULL) _mp_real_phase_end(&(ph)); } while (0)
 
 /* helpers of the elementary functions (sin_cos.c, exp.c, log.c,
    atan.c) ******************************************************************/

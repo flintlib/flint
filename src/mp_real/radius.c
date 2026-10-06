@@ -46,7 +46,7 @@ mp_real_add_rel_error_2exp_si(mp_real_t x, slong e2)
        2^(e2 mod FLINT_BITS) B^(exp + e2/FLINT_BITS), flooring the
        limb division so the bit remainder is >= 0 */
     slong q = e2 >> MP_REAL_LGB;
-    int r = (int) (e2 - (q << MP_REAL_LGB));
+    int r = (int) (e2 - q * FLINT_BITS);
     _mp_real_apply_bnd(x, _mp_real_bnd_add(_mp_real_bnd_of(x), _mp_real_bnd(0, UWORD(1) << r, x->exp + q)));
 }
 
