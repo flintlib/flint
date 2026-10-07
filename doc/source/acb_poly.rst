@@ -992,6 +992,51 @@ Power sums
     The *threaded* version splits the computation
     over the number of threads returned by *flint_get_num_threads()*.
 
+.. function:: void _acb_poly_powsum_series_tree(acb_ptr z, const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec)
+
+    Computes the same sum as :func:`_acb_poly_powsum_series_naive` using a
+    transposed multipoint evaluation. Writing `L_k = \log(a+k)`,
+    `w_k = q^k (a+k)^{-s}` and `b_k = c - L_k` for a suitable centre `c`,
+    we have `\sum_k w_k e^{-L_k t} = e^{-c t} \sum_j p_j t^j / j!` where
+    the weighted power sums `p_j = \sum_k w_k b_k^j` are the coefficients
+    of the rational function `\sum_k w_k / (1 - b_k t) = P(t) / Q(t)`.
+    The numerator and denominator are computed using a subproduct tree
+    (with every node truncated to length *len*), followed by a single power
+    series division. This costs `\tilde O(\max(n, len))` arithmetic
+    operations instead of `O(n \cdot len)`, i.e. `\tilde O(m^2)` instead of
+    `O(m^3)` bit operations when `n, len, prec = \Theta(m)`.
+
+    The algorithm is numerically unstable, and the working precision is
+    increased by a heuristic number of guard bits (typically some constant
+    times `\min(n, len)`, plus a term depending on the variation
+    of the weights) chosen so that the output radii are comparable to those
+    produced by the naive algorithm; see
+    :func:`_acb_poly_powsum_series_tree_guard_bits`. The computation
+    is done at the midpoints of *s*, *a* and *q*; the propagated
+    error for inexact input is bounded separately term by term.
+    We require that `\operatorname{Re}(a) > 0` and that *q* is bounded
+    away from zero; otherwise this function falls back to the naive
+    algorithm. The tree is evaluated in parallel when
+    *flint_get_num_threads()* is greater than one.
+
+.. function:: slong _acb_poly_powsum_series_tree_guard_bits(const acb_t s, const acb_t a, const acb_t q, const acb_t c, slong n, slong len)
+
+    Returns the number of guard bits used by
+    :func:`_acb_poly_powsum_series_tree` with the exact parameters
+    *s*, *a*, *q* and centre *c*. The estimate is computed in
+    double precision from a sample of the terms.
+
+.. function:: int _acb_poly_powsum_series_tree_is_faster(const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec, int naive_threaded)
+
+    Returns nonzero if :func:`_acb_poly_powsum_series_tree` is predicted
+    to be faster than :func:`_acb_poly_powsum_series_naive` (or
+    :func:`_acb_poly_powsum_series_naive_threaded` if *naive_threaded* is
+    set) for the given parameters. This uses empirical cost models
+    together with :func:`_acb_poly_powsum_series_tree_guard_bits`. It is
+    used to select the algorithm in the Euler-Maclaurin summation for
+    the Hurwitz zeta function and in the direct summation of the
+    polylogarithm series for small `|z|`.
+
 .. function:: void _acb_poly_powsum_one_series_sieved(acb_ptr z, const acb_t s, slong n, slong len, slong prec)
 
     Computes
