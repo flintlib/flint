@@ -127,6 +127,8 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
                                      across the two shapes) */
             { 5100, 16, 3, 0 },   /* N > 10000: the high-2-adic
                                      re-padding of the term count */
+            { 4542, 16, 0, 0 },   /* a two-level cascade (the guard
+                                     limb of the series remainder) */
             { 60, 3820, 3, 0 },   /* r within a limb of 64 wn: the
                                      degenerate single-slice
                                      ladder */

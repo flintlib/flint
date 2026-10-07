@@ -1713,29 +1713,6 @@ _fmpz_set_signed_mpn(fmpz_t f, const mp_real_hypgeom_int_struct * x)
         fmpz_neg(f, f);
 }
 
-static void
-_mp_real_set_fmpz(mp_real_t x, const fmpz_t f)
-{
-    slong n = fmpz_size(f);
-    fmpz_t a;
-    nn_ptr d;
-
-    if (n == 0)
-    {
-        mp_real_zero(x);
-        return;
-    }
-    fmpz_init(a);
-    fmpz_abs(a, f);
-    d = flint_malloc(n * sizeof(ulong));
-    fmpz_get_ui_array(d, n, a);
-    _mp_real_set_mpn_2exp(x, d, n, 0);
-    if (fmpz_sgn(f) < 0)
-        mp_real_neg(x, x);
-    flint_free(d);
-    fmpz_clear(a);
-}
-
 /* x += [-2^e, 2^e] */
 static void
 _mp_real_add_error_2exp(mp_real_t x, slong e)
@@ -1811,7 +1788,7 @@ _mp_real_mul_fmpz(mp_real_t res, const mp_real_t x, const fmpz_t c, slong wp)
     {
         mp_real_t t;
         mp_real_init(t);
-        _mp_real_set_fmpz(t, c);
+        mp_real_set_fmpz(t, c);
         mp_real_mul(res, x, t, wp);
         mp_real_clear(t);
     }
@@ -1885,8 +1862,8 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     /* the trivial sum */
     if (Plen == 0 || fmpz_is_zero(coefP))
     {
-        _mp_real_set_fmpz(res, coefQ);
-        _mp_real_set_fmpz(t, coefD);
+        mp_real_set_fmpz(res, coefQ);
+        mp_real_set_fmpz(t, coefD);
         if (s->power == 1)
             mp_real_div(res, res, t, wp);
         else
@@ -2047,7 +2024,7 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
             for (i = 0; i < 2 * J; i++)
                 mp_real_init(H.cQpow + i);
             fmpz_pow_ui(c, H.cQ, L);
-            _mp_real_set_fmpz(H.cQpow, c);
+            mp_real_set_fmpz(H.cQpow, c);
             for (i = 1; i < J; i++)
                 mp_real_mul(H.cQpow + i, H.cQpow + i - 1, H.cQpow + i - 1, wp);
             /* the same rule for R: separate its content only when that
@@ -2060,7 +2037,7 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
             if (H.have_cR)
             {
                 fmpz_pow_ui(c, H.cR, L);
-                _mp_real_set_fmpz(H.cRpow, c);
+                mp_real_set_fmpz(H.cRpow, c);
                 for (i = 1; i < J; i++)
                     mp_real_mul(H.cRpow + i, H.cRpow + i - 1, H.cRpow + i - 1, wp);
             }

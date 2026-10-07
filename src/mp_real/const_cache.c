@@ -164,6 +164,16 @@ _mp_real_const_cached_ptr(int id, slong n)
     return _const_d[id] + (_const_n[id] - n);
 }
 
+/* the number of limbs the per-thread cache holds for id (0 if none;
+   the static tables cover MP_REAL_CONST_STATIC_N limbs of pi/4, log 2
+   and 2/pi regardless): lets a caller choose an algorithm that avoids
+   a constant not yet computed */
+slong
+_mp_real_const_cached_limbs(int id)
+{
+    return _const_n[id];
+}
+
 static void
 _const_ball(mp_real_t res, int id, slong n, int cache)
 {

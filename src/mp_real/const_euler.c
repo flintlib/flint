@@ -62,37 +62,6 @@
 
 /* ---- mp_real helpers ---- */
 
-static void
-_mp_real_set_fmpz(mp_real_t x, const fmpz_t f)
-{
-    slong n = fmpz_size(f);
-    fmpz_t a;
-    nn_ptr d;
-
-    if (n == 0)
-    {
-        mp_real_zero(x);
-        return;
-    }
-    if (!COEFF_IS_MPZ(*f))
-    {
-        ulong u = FLINT_UABS(*f);
-        _mp_real_set_mpn_2exp(x, &u, 1, 0);
-        if (*f < 0)
-            mp_real_neg(x, x);
-        return;
-    }
-    fmpz_init(a);
-    fmpz_abs(a, f);
-    d = flint_malloc(n * sizeof(ulong));
-    fmpz_get_ui_array(d, n, a);
-    _mp_real_set_mpn_2exp(x, d, n, 0);
-    if (fmpz_sgn(f) < 0)
-        mp_real_neg(x, x);
-    flint_free(d);
-    fmpz_clear(a);
-}
-
 static mp_real_struct *
 _tmp_init(slong k)
 {
@@ -401,11 +370,11 @@ e1_bsplit(e1_struct * s, slong a, slong b, ulong m, int need, slong wp,
         e1z_bsplit(&z, a, b, m);
         /* P = m^(2 (b - a)) is stored without its power of two */
         fmpz_fdiv_q_2exp(z.P, z.P, 2 * flint_ctz(m) * (b - a));
-        _mp_real_set_fmpz(&s->P, z.P);
-        _mp_real_set_fmpz(&s->D0, z.D0);
-        _mp_real_set_fmpz(&s->D1, z.D1);
-        _mp_real_set_fmpz(&s->T0, z.T0);
-        _mp_real_set_fmpz(&s->T1, z.T1);
+        mp_real_set_fmpz(&s->P, z.P);
+        mp_real_set_fmpz(&s->D0, z.D0);
+        mp_real_set_fmpz(&s->D1, z.D1);
+        mp_real_set_fmpz(&s->T0, z.T0);
+        mp_real_set_fmpz(&s->T1, z.T1);
         e1z_clear(&z);
     }
     else
@@ -531,9 +500,9 @@ e2_bsplit(mp_real_t P, mp_real_t Q, mp_real_t T, slong a, slong b, ulong m,
         fmpz_init(zQ);
         fmpz_init(zT);
         e2z_bsplit(zP, zQ, zT, a, b, m);
-        _mp_real_set_fmpz(P, zP);
-        _mp_real_set_fmpz(Q, zQ);
-        _mp_real_set_fmpz(T, zT);
+        mp_real_set_fmpz(P, zP);
+        mp_real_set_fmpz(Q, zQ);
+        mp_real_set_fmpz(T, zT);
         fmpz_clear(zP);
         fmpz_clear(zQ);
         fmpz_clear(zT);

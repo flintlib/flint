@@ -75,8 +75,14 @@ _sc_series_min_z(slong n)
 }
 
 /* (ys, n + 1), (yc, n + 1) = sin v, cos v for v in [0, 1) at n
-   fraction limbs */
-static void
+   fraction limbs (both outputs required).  The kernel, the evaluation
+   and the reduction are forced inline into mp_real_sin_cos_bits, as
+   they were with their single call sites there (an exported function
+   is an interposable call with -fPIC, and a static one with a second
+   caller is not inlined): measured, 25-70 instructions per call at one
+   or two limbs.  The other files reach them through the _mp_real_
+   wrappers at the end. */
+FLINT_FORCE_INLINE void
 _sc_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
 {
     slong top = n - 1, z;
@@ -150,7 +156,7 @@ _sc_limbs(slong p)
 /* sin x and cos x from v in [0, 1) at n fraction limbs, for
    x = a pi/2 + s v (s = +-1) up to eps ulps of B^-n, with the sine
    negated for a negative x.  v must not alias the outputs' limbs. */
-static void
+FLINT_FORCE_INLINE void
 _sc_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n, ulong eps,
     int a, int s, int xneg)
 {
@@ -304,7 +310,7 @@ _sc_unit(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
     int trunc, xneg = x->negative;
     TMP_INIT;
 
-    /* x's limbs read in place unless an output shares them (_sc_eval
+    /* x's limbs read in place unless an output shares them (the eval
        may grow the outputs) */
     TMP_START;
     buf = TMP_ALLOC(n * sizeof(ulong));
@@ -339,20 +345,21 @@ static const ulong _sc_pi2_frac[SC_PI2_LIMBS] = {
 #define SC_2_DIV_PI_0 UWORD(0xfc2757d1f534ddc0)
 #define SC_PI4_TOP UWORD(0xc90fdaa22168c234)
 
-/* one integral limb (x->exp == 1), exact, n + 1 <= SC_PI2_LIMBS:
+/* one integral limb (x->exp == 1), exact, n + 1 <= SC_PI2_LIMBS (the
+   result as for _sc_reduce):
    q from (x1, x0) (R1, R0) without the low products, a lower
    approximation of x 2/pi within 5/B; P = pi/2 at N = n + 1 fraction
    limbs, truncated, t = X - q P in [0, pi/2 (1 + 5/B)).  Errors:
    (q + 1)(pi/2 - P) < B^-n, x truncated below B^-N, v truncated to n
    limbs: under 3 ulps of B^-n. */
-static void
-_sc_reduce1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
+FLINT_FORCE_INLINE int
+_sc_reduce1(nn_ptr W, const mp_real_t x, slong n)
 {
     ulong X[SC_PI2_LIMBS + 1], V[SC_PI2_LIMBS + 1];
     nn_srcptr P;
     slong N = n + 1;
     ulong q, h11, l11, h10, l10, h01, l01, c, u, top, b;
-    int a, s = 1, fold, xneg = x->negative;
+    int a, s = 1, fold;
 
     _mp_real_elem_copy(X, N + 1, N, x);
     P = _sc_pi2_frac + SC_PI2_LIMBS - N;
@@ -391,30 +398,31 @@ _sc_reduce1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
             s = -1;
         a = (a + 1) & 3;
         FLINT_ASSERT(V[N] == 0);
-        _sc_eval(rs, rc, V + 1, n, 3, a, s, xneg);
+        flint_mpn_copyi(W, V + 1, n);
     }
     else
-        _sc_eval(rs, rc, X + 1, n, 3, a, s, xneg);
+        flint_mpn_copyi(W, X + 1, n);
+
+    return a | ((s < 0) << 2);
 }
 
 #endif
 
-/* |x| >= 1 (m = exp >= 1 integral limbs), exact: reduce mod pi/2 and
-   evaluate at n fraction limbs */
-static void
-_sc_reduce(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
+/* |x| >= 1 (m = exp >= 1 integral limbs), exact: |x| = a pi/2 + s v,
+   (W, n) = v in [0, pi/4 (1 + 2/B)] within 3 ulps; returns a + 4 [s < 0] */
+FLINT_FORCE_INLINE int
+_sc_reduce(nn_ptr W, const mp_real_t x, slong n)
 {
     slong m = x->exp, N = m + n + 1, xl;
     nn_ptr X, P, V, q;
-    int a, s = 1, xneg = x->negative;
+    int a, s = 1;
     TMP_INIT;
+
+    FLINT_ASSERT(x->exp >= 1 && x->err == 0);
 
 #if FLINT_BITS == 64
     if (m == 1 && n + 1 <= SC_PI2_LIMBS)
-    {
-        _sc_reduce1(rs, rc, x, n);
-        return;
-    }
+        return _sc_reduce1(W, x, n);
 #endif
 
     TMP_START;
@@ -503,8 +511,10 @@ _sc_reduce(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
     /* v in [0, pi/4] at n fraction limbs: the reduction error
        q (pi/2 - P) (twice for the fold) < 2 B^(m - N) = 2 B^-(n+1), the
        truncations of x and v: 3 ulps of B^-n in all */
-    _sc_eval(rs, rc, V + (N - n), n, 3, a, s, xneg);
+    flint_mpn_copyi(W, V + (N - n), n);
     TMP_END;
+
+    return a | ((s < 0) << 2);
 }
 
 void
@@ -578,8 +588,8 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
 
         if (x->exp <= 0)
             acc = -rel;                                 /* relative, for sin */
-        else
-            acc = -(rel + FLINT_BITS * x->exp);         /* absolute */
+        else                                            /* absolute, |x| < 2^emid */
+            acc = -(rel + FLINT_BITS * (x->exp - 1) + FLINT_BIT_COUNT(x->d[x->size - 1]));
 
         if (acc < 2)
         {
@@ -619,7 +629,17 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
     }
     else
     {
-        _sc_reduce(rs, rc, &mid, _sc_limbs(prec));
+        slong n = _sc_limbs(prec);
+        nn_ptr W;
+        int code;
+        TMP_INIT;
+
+        TMP_START;
+        W = TMP_ALLOC(n * sizeof(ulong));
+        code = _sc_reduce(W, &mid, n);
+        _sc_eval(rs, rc, W, n, 3, code & 3,
+            (code & 4) ? -1 : 1, mid.negative);
+        TMP_END;
     }
 
     /* the radius of x */
@@ -630,4 +650,31 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
         if (rc != NULL)
             _mp_real_elem_add_rad(rc, xerr, xanc);
     }
+}
+
+/* the wrappers for the other files (see impl.h) */
+
+void
+_mp_real_sin_cos_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
+{
+    _sc_kernel(ys, yc, err, v, n);
+}
+
+slong
+_mp_real_sin_cos_limbs(slong p)
+{
+    return _sc_limbs(p);
+}
+
+void
+_mp_real_sin_cos_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n,
+    ulong eps, int a, int s, int xneg)
+{
+    _sc_eval(rs, rc, v, n, eps, a, s, xneg);
+}
+
+int
+_mp_real_trig_reduce(nn_ptr W, const mp_real_t x, slong n)
+{
+    return _sc_reduce(W, x, n);
 }

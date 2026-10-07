@@ -43,6 +43,7 @@
 #include "t-special.c"
 #include "t-trig.c"
 #include "t-vec.c"
+#include "t-vec_aliasing.c"
 
 /* Array of test functions ***************************************************/
 
@@ -63,6 +64,7 @@ test_struct tests[] =
     TEST_FUNCTION(special),
     TEST_FUNCTION(trig),
     TEST_FUNCTION(vec),
+    TEST_FUNCTION(vec_aliasing),
 };
 
 /* main function *************************************************************/

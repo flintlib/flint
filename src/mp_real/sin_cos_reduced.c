@@ -64,7 +64,13 @@
    the ~2r-bit cancellation is harmless because g is only needed to
    absolute 2^(-64 wn), like the direct series path.  The bounds are
    rigorous, checked against SIN_COS_REDUCED_MAX_ERR = 96 ulps
-   on export (they come to a few dozen).  An earlier driver in
+   on export: 1 ulp for the burst variants, and the series kernels'
+   own for the sine + sqrt path.  The series remainder of the
+   one-step variant runs one guard limb deeper than the output, as in
+   _mp_real_exp_reduced: multiplied into the product of the slice
+   factors, its radius is requantized at a coarser limb anchor
+   (up to three times per level), which without the guard limb
+   compounded to 70 ulps (5901 limbs, r = 31).  An earlier driver in
    hand-written mpn arithmetic (windowed middle products, limb
    frames, flint_mpn_mulhigh_n_complex, an informal error accounting)
    measured the same speed phase for phase and was dropped. */
@@ -235,10 +241,13 @@ _trig_burst_task(slong i, void * arg)
         fs = S->fs + k;
         fq = S->fq + k;
         MP_REAL_PHASE_START(ph, "trig burst: series remainder", wn);
-        xres = TMP_ALLOC(wn * sizeof(ulong));
-        flint_mpn_copyi(xres, t, wn);
-        flint_mpn_zero(xres + wn - L[k], L[k]);
-        _mp_real_sin_cos_reduced_ball(fs, fc, xres, wn,
+        /* one guard limb deeper than the output (a zero limb below
+           t): see the notes at the top */
+        xres = TMP_ALLOC((wn + 1) * sizeof(ulong));
+        xres[0] = 0;
+        flint_mpn_copyi(xres + 1, t, wn);
+        flint_mpn_zero(xres + 1 + wn - L[k], L[k]);
+        _mp_real_sin_cos_reduced_ball(fs, fc, xres, wn + 1,
             (flint_bitcnt_t) (FLINT_BITS * L[k]), S->series_alg);
         mp_real_zero(fq);
         MP_REAL_PHASE_END(ph);

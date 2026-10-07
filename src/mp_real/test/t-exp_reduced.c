@@ -83,7 +83,7 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
 
     /* targeted precision regimes that random sampling misses */
     {
-        struct { slong wn; flint_bitcnt_t r; int alg; int fill; }
+        struct { slong wn; flint_bitcnt_t r; int alg; int fill; ulong maxb; }
         cases[] = {
             { 64,   16, 0, 0 },   /* r < 32 forces a burst in auto */
             { 48,   16, 4, 1 },   /* extraction masks, all-ones */
@@ -99,6 +99,11 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             { 2100, 128, 2, 0 },  /* sinh square root above the
                                      Newton cutoff */
             { 40,  256, 0, 2 },   /* t = 0: y = 1 on every path */
+            { 12288, 25, 0, 0, 2 },   /* the deepest cascade (five
+                                     levels): 1 ulp with the guard
+                                     limb on the series remainder,
+                                     up to 93 without */
+            { 4504, 119, 3, 0, 2 },   /* reached 99 without */
         };
         slong c, i;
 
@@ -142,7 +147,8 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             arb_mul_2exp_si(got, got, FLINT_BITS * wn);
             arb_abs(got, got);
             arb_set_d(bnd, TEST_ERR(DOC_EXP_REDUCED_MAX_ERR));
-            if (!arb_le(got, bnd))
+            if (!arb_le(got, bnd) || (cases[c].maxb != 0
+                    && test_err_out > cases[c].maxb))
                 TEST_FUNCTION_FAIL("targeted case %wd: wn = %wd, "
                     "r = %wd, alg = %d\n", c, wn, (slong) r,
                     cases[c].alg);

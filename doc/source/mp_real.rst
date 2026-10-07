@@ -176,6 +176,21 @@ Memory management and assignment
 
     Sets the ball to zero, a copy of *x*, or the exact integer *c*.
 
+.. function:: void mp_real_set_fmpz(mp_real_t x, const fmpz_t f)
+
+    Sets *x* to the integer *f* exactly.  The limbs of *f* above its
+    valuation (the low zero limbs) are copied directly into the mantissa,
+    without temporaries.
+
+.. function:: void mp_real_set_trunc(mp_real_t res, const mp_real_t x, slong n)
+
+    Sets *res* to *x* rounded to its top `n \ge 1` limbs, for any input
+    (a copy if *x* has at most *n* limbs).  The dropped tail and the old
+    radius are each below one ulp of the new bottom limb, so the new
+    radius is `(\text{tail} \ne 0) + (\text{radius} \ne 0)` ulps; the
+    result is exact if nothing nonzero is dropped from an exact input.
+    *res* may alias *x*.
+
 .. function:: void _mp_real_set_mpn_2exp(mp_real_t x, nn_srcptr p, slong len, slong e)
 
     Sets *x* exactly to `(p, \mathrm{len}) \cdot 2^e` for the unsigned
@@ -371,12 +386,52 @@ Roots and the AGM
     enclosure `(a+b)/2 \pm |a-b|/2` (valid since
     `b \le \operatorname{agm}(a, b) \le a`).
 
+    The working set is four numbers of `n` limbs (the finish reuses the
+    storage of two of them, and frees each power of `x` after its last
+    use); an input aliased by *res* is taken over rather than copied.
+
 Conversions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: void mp_real_get_arb(arb_t res, const mp_real_t x)
 
     Sets *res* to the ball *x*, losslessly.
+
+.. function:: int mp_real_unique_integer(mp_real_t res, const mp_real_t x)
+
+    If the ball *x* contains exactly one integer, sets *res* to that
+    integer (exactly) and returns 1; otherwise returns 0 and leaves
+    *res* unchanged.  This is :func:`arb_get_unique_fmpz` with the result
+    kept as an :type:`mp_real_t`, free of the size limits of
+    :type:`fmpz_t` (the result of a huge computation such as a value of
+    the partition function can exceed the `2^{31}` limbs of an ``mpz``).
+    With a fractional part of `f` limbs and a radius below one ulp, the
+    candidates follow from the carry of the fraction plus the radius and
+    the borrow of the fraction less the radius, which are decided by
+    scanning the fraction from its top limb until a limb is neither all
+    zeros nor all ones; the integer part is then moved down (and
+    incremented if needed), in place when *res* aliases *x*, without a
+    reallocation.
+
+.. function:: void mp_real_set_dfloat(mp_real_t res, const double * x, slong n, double rad)
+              void mp_real_get_dfloat(double * res, double * rad, slong n, const mp_real_t x)
+
+    Conversions to and from the double expansions of the dfloat module,
+    given as arrays of `n \le 8` doubles (the midpoint components) and a
+    double radius, without going through :type:`arb_t` (about half the
+    cost).  :func:`mp_real_set_dfloat` sets *res* to the ball
+    `\sum_i x_i \pm \mathrm{rad}`: the sum is exact (accumulated in a
+    two's complement frame spanning the components' exponents) and the
+    radius is installed as an ulp count, rounded up when it does not fit
+    exactly.  Nonfinite components or radius throw (mp_real has no whole
+    line).  :func:`mp_real_get_dfloat` rounds greedily, each component the
+    double nearest to the remainder (so `|x_{i+1}| \le
+    \operatorname{ulp}(x_i)/2`), and sets *rad* (if not ``NULL``) to an
+    upper bound for the remainder, the truncated tail of the mantissa and
+    the radius of *x*.  Components that would be subnormal are not
+    produced (their value goes to the radius), and a value beyond the
+    double range gives dfloat's whole line: zero components and an
+    infinite radius.
 
 .. function:: void mp_real_print(const mp_real_t x)
 
@@ -707,6 +762,123 @@ Elementary functions
     :func:`_mp_real_sin_cos_diophantine` (32 primes) up to 65536 limbs
     and :func:`_mp_real_sin_cos_notab` above.
 
+.. function:: int mp_real_tan_bits(mp_real_t res, const mp_real_t x, slong prec)
+
+    Sets *res* to a ball containing `\tan y` for every `y` in the ball
+    *x*, to a relative accuracy of about `2^{-\mathrm{prec}}`, and returns
+    1; or returns 0 with *res* set to zero when the ball may contain a
+    pole (or `|x| \ge 2^{\max(65536, 4 \mathrm{prec})}`, where the
+    reduction is not attempted).  *res* may alias *x*.
+
+    The midpoint `m` is evaluated exactly as given, as by
+    :func:`mp_real_sin_cos_bits`: for `|m| < 1` as `m` itself when
+    `2z \ge \mathrm{prec} + 3` for its leading zero bits `z` (beyond,
+    the kernel's series for small arguments is faster than a Taylor
+    polynomial in ball arithmetic), else by the tan kernel on `|m|` at
+    `z` bits more precision; otherwise after the reduction
+    `|m| = a \pi/2 + s v`, `v \in [0, \pi/4]`, as `\tan m = s \tan v`
+    (`a` even) or `-s / \tan v` (`a` odd, by one Newton reciprocal of the
+    kernel's fixed-point output, :func:`_mp_real_inv_newton`).  The
+    reduction is absolute, and near a zero or pole of the tangent `v` is
+    small: an absolute error is then a relative one of the result, so
+    the kernel runs at the leading zero bits of `v` more precision, the
+    reduction being repeated at those limbs when the first pass had
+    fewer.  An exact `m` is never a
+    multiple of `\pi/2`, and by the irrationality measure of `\pi` a
+    `b`-bit `m` lies about `2^{-7.2 b}` away from one at least; the
+    repetition is capped at `8b + 1024` more bits (status 0 beyond).
+    For an inexact `x` no repetition is made once `v` falls below the
+    radius.
+
+    The kernel on `v \in [0, 1)` is the tangent series
+    (:func:`_mp_real_series_rs_tan`) where its tables reach, else from a
+    size-dependent number of leading zero bits the reduced sine and
+    `1 - \cos` of :func:`_mp_real_sin_cos_reduced` and a division, else
+    :func:`_mp_real_tan_bitwise_rs` up to 600 limbs,
+    :func:`_mp_real_tan_diophantine` up to 65536 limbs and the sine and
+    cosine of :func:`_mp_real_sin_cos_notab` and a division above.  It
+    costs about as much as :func:`mp_real_sin_cos_bits` at every size.
+
+    The radius `r` of `x` enters through a pole test: with `T`
+    enclosing `\tan m` and `U = r (1 + |T|) \ge r / |\cos m|`, `U < 1`
+    means that `|\cos|` (which is 1-Lipschitz) stays above
+    `|\cos m| - r > 0` over the ball, which then contains no pole, and
+
+    .. math::
+
+        |\tan y - \tan m| \le \frac{r}{(|\cos m| - r)^2}
+                          \le \frac{r (1 + T^2)}{(1 - U)^2},
+
+    evaluated in two-limb balls.  Otherwise the status is 0; the test is
+    conservative by a factor below `\sqrt 2`, where the output would
+    have almost no accuracy anyway.  *prec* is first lowered to a few
+    bits beyond the accuracy the radius allows, as for
+    :func:`mp_real_sin_cos_bits`.
+
+.. function:: void mp_real_sin_cos_pi_bits(mp_real_t res1, mp_real_t res2, const mp_real_t x, slong prec)
+              int mp_real_tan_pi_bits(mp_real_t res, const mp_real_t x, slong prec)
+
+    The same as :func:`mp_real_sin_cos_bits` and :func:`mp_real_tan_bits`
+    for `\sin(\pi y)`, `\cos(\pi y)` and `\tan(\pi y)`, with an exact
+    argument reduction: the midpoint is dyadic, and its units bit and
+    fraction bits give
+
+    .. math::
+
+        |m| = \frac{a}{2} + s t, \qquad a \in \{0, 1, 2, 3\}, \;
+        s = \pm 1, \; t \in [0, 1/4]
+
+    exactly, after which `v = \pi t` enters the same formulas as after the
+    reduction mod `\pi/2`.  `t = 0` gives the exact values `0`, `\pm 1`
+    (and a pole of the tangent for odd `a`, status 0), `t = 1/4` the
+    exact `\tan(\pi/4) = 1`.  Otherwise `t` has `z` leading zero bits,
+    and `v = (\pi/4) \cdot 4t` goes to the kernel at `z` more bits of
+    absolute precision, or for `2z \ge \mathrm{prec} + 3` to the
+    first-order values `\sin v = \tan v = v`, `\cos v = 1` with the
+    Taylor remainders in the radius: the outputs keep their relative
+    accuracy near every zero and pole, at any magnitude of the argument
+    (whose reduction costs nothing).  `t` is kept in a buffer the size of
+    the argument's mantissa and the results are written into the outputs
+    directly, with no temporary balls.  The radius `r` of `x` is a radius `\pi r` of the argument:
+    added to the sine and cosine, and through the pole test for the
+    tangent.  A radius `\pi r \ge 1/4` gives `[0 \pm 1]` for the sine and
+    cosine.
+
+.. function:: void mp_real_sin_cos_pi_ui_div_ui(mp_real_t res1, mp_real_t res2, ulong p, ulong q, slong n)
+
+    Sets *res1* and *res2* to balls containing `\sin(\pi p/q)` and
+    `\cos(\pi p/q)` for words `p \ge 0` and `q \ge 1` (throws for
+    `q = 0`), to a relative accuracy of about `B^{-n}`.  Either output
+    may be ``NULL``; the two must be distinct.  The rational values
+    `0, \pm 1, \pm 1/2` are exact.
+
+    The fraction is reduced to lowest terms and folded by the symmetries
+    to `\pi p/q = \pi a \pm \pi t/q` with `0 \le 2t \le q`; the
+    nonzero values of `\sin(\pi t/q) \ge 2t/q` and
+    `\cos(\pi t/q) \ge (q - 2t)/q` are at least `1/q`, so
+    :func:`_mp_real_sin_cos_pi_ui_div_ui` at
+    `n + \lceil (\operatorname{bits}(q) + 16) / \mathrm{FLINT\_BITS} \rceil`
+    limbs gives the relative accuracy, its bound becoming the radius.
+    The values `0, \pm 1, \pm 1/2` are set directly (only the other
+    output, if any, is computed).
+
+.. function:: int mp_real_tan_pi_ui_div_ui(mp_real_t res, ulong p, ulong q, slong n)
+
+    Sets *res* to a ball containing `\tan(\pi p/q)` for words `p \ge 0`
+    and `q \ge 1` (throws for `q = 0`), to a relative accuracy of about
+    `B^{-n}`, and returns 1; or returns 0 with *res* set to zero at a pole
+    (`p/q` a half-integer).  The values `0` and `\pm 1` are exact.
+
+    With the fraction in lowest terms, `\tan(\pi p/q) = \pm \tan(\pi t/q)`,
+    `0 < 2t < q`, is computed at the working precision of
+    :func:`mp_real_sin_cos_pi_ui_div_ui`: by the closed forms
+    `\sqrt 3`, `1/\sqrt 3`, `\sqrt 2 \mp 1`, `2 \mp \sqrt 3` for
+    `q = 3, 6, 8, 12` and `\sqrt{5 \mp 2\sqrt 5}`, `\sqrt{1 \mp 2/\sqrt 5}`
+    for `q = 5, 10` (from 12 limbs); by the Chebyshev sine and cosine and
+    one division for the denominators where they beat the kernel for sine
+    and cosine; else by the tan kernel on `\pi t/q`, or on its complement
+    `\pi/2 - \pi t/q` for `4t > q` followed by one reciprocal.
+
 .. function:: void mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
               int mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec)
               void mp_real_atan_bits(mp_real_t res, const mp_real_t x, slong prec)
@@ -795,6 +967,95 @@ Elementary functions
     normal range: scalings by powers of `B` go through
     ``d_mul_2exp_inrange`` with clamped exponents, so no call raises
     ``FE_UNDERFLOW``.
+
+.. function:: void mp_real_exp_notab_log2(mp_real_t res, const mp_real_t x, slong n)
+              void mp_real_exp_notab_squaring(mp_real_t res, const mp_real_t x, slong n)
+              void mp_real_exp_agm(mp_real_t res, const mp_real_t x, slong n)
+
+    Set *res* to a ball containing `\exp(y)` for every `y` in the ball
+    *x*, to a relative accuracy of about `B^{-n}`, without building the
+    tables of the bitwise and diophantine kernels: intended for a single
+    exponential at huge precision, where the tables of
+    :func:`mp_real_exp_bits` do not pay for themselves.  The ball
+    handling (the radius factor, the lowered precision, the range
+    `|y| < 2^{\mathrm{FLINT\_BITS} - 5}`) is that of
+    :func:`mp_real_exp_bits`; any midpoint is accepted.
+
+    :func:`mp_real_exp_notab_log2` is :func:`mp_real_exp_bits` with
+    :func:`_mp_real_exp_notab` as the kernel: `m = k \log 2 + t`, so it
+    computes (and caches) `\log 2` at the working precision; the fastest
+    choice when `\log 2` is already cached.
+
+    :func:`mp_real_exp_notab_squaring` needs no `\log 2`:
+    `\exp(|m|) = \exp(|m| 2^{-s})^{2^s}` with `|m| 2^{-s} < 1/2`,
+    :func:`_mp_real_exp_notab` on the reduced argument and `s` ball
+    squarings (with `s + 16` guard bits for the doubling relative
+    error), one reciprocal for `m < 0`.  It is 1.2-1.7 times faster than
+    the reduction when `\log 2` must be computed.
+
+    :func:`mp_real_exp_agm` takes one Newton-Taylor step on the AGM
+    logarithm: `y_0 = \exp(m)` to about `P/(N+1)` limbs (`N = 8` Taylor
+    terms, 12 from 20000 limbs) by the squarings, then with
+    `s = y_0 2^j \ge 2^{p/2 + 16}`,
+    `\log s = \pi / (2 \operatorname{agm}(1, 4/s)) + \varepsilon`,
+    `|\varepsilon| \le 64 (\log s + 8)/s^2` (Borwein and Borwein, *Pi and
+    the AGM*, Thm. 7.2), `\log y_0 = \log s - j \log 2`, and
+    `\exp(m) = y_0 \exp(m - \log y_0)` with the correction by the Taylor
+    series of the Newton steps of `-\log` and `\operatorname{atan}`
+    (``newton.c``).  When `y_0` is already large (`j = 0`, as for the
+    `\exp(C)` of the partition function) no `\log 2` is needed at all.
+    Below about 30 limbs it calls the squarings.  It overtakes them at
+    about 15000 limbs (1.0-1.2 times faster at 18000-180000 limbs).
+
+The partition function
+-------------------------------------------------------------------------------
+
+.. function:: void mp_real_partitions_hrr(mp_real_t res, ulong nhi, ulong nlo)
+              void _mp_real_partitions_hrr(mp_real_t res, const fmpz_t n, int flags)
+
+    Sets *res* to the exact value of the number of partitions `p(n)`,
+    `n = n_{lo} + n_{hi} 2^{\mathrm{FLINT\_BITS}}`.  The result is an
+    exact :type:`mp_real_t`, so its size is not limited by that of an
+    :type:`fmpz_t` (an ``mpz`` holds at most `2^{31}` limbs, exceeded from
+    `n \approx 1.4 \cdot 10^{21}`).  For `n < 128` it is read from a
+    table; for `n < 417` (on 64-bit machines, while `p(n) < 2^{64}`) it is
+    computed by the pentagonal recurrence, which costs less than the
+    formula below up to about `n = 500` so that no method gluing the
+    two pays off; otherwise by the Hardy-Ramanujan-Rademacher formula
+
+    .. math::
+
+        p(n) = \sum_{k=1}^N A_k(n) \sqrt{\frac{3}{k}} \frac{4}{24n-1}
+            \left(\cosh z_k - \frac{\sinh z_k}{z_k}\right) + R_N,
+        \qquad z_k = \frac{\pi \sqrt{24n-1}}{6k},
+
+    with `A_k(n)` from :func:`arith_hrr_expsum_factored`, `N` and the
+    bound for `R_N` (:func:`partitions_rademacher_bound`) as in the
+    previous arb implementation, and each term to the precision it
+    contributes at.  The terms of at most about 200 bits are evaluated
+    in batches of dfloat balls (double to quad-double, with the vector
+    exponential, cosine, sine and square roots) when dfloat is
+    supported; the others in mp_real balls, with `\exp(z_k)` as the
+    `k`-th root of `\exp(z_1)` (computed without tables, by the
+    squarings or the AGM Newton-Taylor step of :func:`mp_real_exp_agm`
+    at huge precision).  The ball containing `p(n)` is resolved by
+    :func:`mp_real_unique_integer`.
+
+    With several threads (:func:`flint_set_num_threads`, from
+    `n = 10^8`), the constants are computed once with the whole thread
+    budget (the parallelism inside the binary splitting, the exponential
+    and the multiplications), and the terms are then summed in ranges of
+    `k` of about equal estimated cost taken from a queue, each into its
+    own accumulator.  The peak memory is about that of computing `\pi` to
+    the same precision (about 24 numbers of the size of `p(n)` on one
+    thread at `n = 10^{16}` and `10^{17}`).
+
+    The second function always uses the formula for `n \ge 2` (and gives
+    `p(n)` for any *n*); *flags* is a combination of
+    ``MP_REAL_PARTITIONS_NO_DFLOAT`` (all terms in mp_real) and
+    ``MP_REAL_PARTITIONS_TEST`` (the rarely taken paths at any `n`:
+    several tasks and threads, the division by an inverse of `24n - 1`,
+    the dfloat square roots of products beyond `2^{53}`), for testing.
 
 Series
 -------------------------------------------------------------------------------
@@ -1988,6 +2249,129 @@ terms.
     `7 \cdot 10^5` limbs.  Without any precomputed tables, i.e. against
     the Newton-Taylor logarithm over :func:`_mp_real_exp_notab`, the
     AGM logarithm is faster from about 20000 limbs.
+
+Sine and cosine of rational multiples of `\pi`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The values `\sin(\pi t/q)` and `\cos(\pi t/q)` are algebraic numbers
+of degree at most `q`, and past a few hundred limbs it is cheaper to
+refine them as roots of a polynomial than to evaluate the sine and
+cosine of `\pi t/q`: the root iteration costs `O(M(n) \log q)`, the
+elementary function `O(M(n) \log^2 n)` with a much larger constant.
+
+**The Chebyshev iteration.** For `\varphi^* = \pi R/Q \in (0, \pi/2)`
+in lowest terms, `x^* = \cos \varphi^*` is a simple root of the
+Chebyshev polynomial `U_{Q-1}`, with `T_Q(x^*) = \varepsilon =
+(-1)^R`.  Given an exact approximation `x_0 = \cos \varphi_0`,
+`\varphi_0 = \varphi^* + \delta`, the order-doubling (Montgomery
+ladder) evaluation of the pair `(T_k(x_0), T_{k+1}(x_0))` -- one
+squaring and one multiplication per bit of `Q`, in the form
+`V_k = 2 T_k` with `V_{2k} = V_k^2 - 2`,
+`V_{2k+1} = V_k V_{k+1} - V_1` -- gives
+
+.. math::
+
+    C = T_Q(x_0) = \varepsilon \cos(Q\delta), \qquad
+    A = x_0 T_Q(x_0) - T_{Q+1}(x_0) = \varepsilon s_0 \sin(Q \delta),
+    \quad s_0 = \sin \varphi_0
+
+(for odd `Q = 2k + 1`, `A = (V_k - V_{k+1})(V_k + V_{k+1})/4` replaces
+the last doubling and the product by `x_0`).  With `a = \varepsilon A`,
+`\sigma = \sin(Q\delta) = a / s_0`, `y = \sigma^2 = 1 - C^2` and
+`b = 1/Q`, exactly
+
+.. math::
+
+    x^* = x_0 \cos \delta + s_0 \sin \delta
+        = x_0 + x_0 G(y) + \frac{a}{Q} F(y),
+
+    G(y) = {}_2F_1\left(-\tfrac{b}{2}, \tfrac{b}{2}; \tfrac12; y\right) - 1,
+    \qquad
+    F(y) = {}_2F_1\left(\tfrac{1-b}{2}, \tfrac{1+b}{2}; \tfrac32; y\right),
+
+the hypergeometric forms of `\cos(b \operatorname{asin} \sigma)` and
+`Q \sin(b \operatorname{asin} \sigma) / \sigma`, valid on asin's
+principal branch, `|Q \delta| < \pi/2`.  No division or square root
+enters, `s_0` appearing only through `a` and `y`.  The coefficients of
+`G` (from `-1/(2Q^2)`) and of `F` (from 1) decrease in magnitude, so
+for `|y| \le 1/2` the tails after `y^J` are below `|y|^J / Q^2`
+resp. `2 |y|^J`.  In `z = y / (4Q^2)` both series have integer
+coefficients over the common denominators `m! (2m-1)!!` resp.
+`m! (2m+1)!!` for `m` terms, and share the powers of `z`.
+
+With `x_0` correct to `e` bits, `\sigma \approx Q 2^{-e}` and summing
+until the terms fall below the target makes a step of any order `r`:
+`x_0` is needed to about `(p + (r - 1) \log_2 Q) / r` bits of the
+target `p`.  A step costs the ladder at full precision, about
+`(\log_2 Q - \log_2 r) (S + M)(n)` (the first `\log_2 r` doublings of
+the short `x_0` are short products) and a few products for the series
+(about `3 M(n)` at order 12).  The steps are written in ``mp_real_t``
+arithmetic, which carries the rounding errors of the ladder (its
+radius grows by about two bits per doubling, paid for in guard bits);
+each level's radius is discarded after its midpoint is truncated to
+`x_0`, but serves as the rigorous bound `|x_0 - x^*| \le \rho` from
+which the step checks the branch condition (sufficiently,
+`\rho \le \min(s^2/8, s/Q)` for `s = \sin \varphi^* \ge 2R/Q`, by
+Jordan's inequality).  The recursion ends in the kernel below as soon
+as the kernel is cheaper at the level's precision, so for large `Q`
+the result is the kernel at `n/r` limbs followed by one step.  The
+order is 12: 8, 12 and 16 are within a few percent of each other, 6
+about 9% and 4 about 17% slower.
+
+Of the targets `\cos(\pi t/q)` (denominator `q`) and
+`\sin(\pi t/q) = \cos(\pi (q - 2t)/(2q))` (denominator `2q` in lowest
+terms, `q` or `q/2` for even `q`), the one with the smaller
+denominator is iterated, its conditioning (`\sin \varphi^*` small near
+`\varphi^* = 0`) paid for in guard bits.  The other value is
+`\sqrt{1 - x^{*2}}`, about `3 M(n)`.
+
+**The complex alternative.** Newton-Taylor steps for the reciprocal
+`Q`-th root `w = e^{-i \varphi^*}` of `\varepsilon`, as
+`w = w_0 (1 - u)^{-1/Q}` with `u = 1 - \varepsilon w_0^Q` (the
+complex analogue of :func:`mp_real_rroot_ui`), give both values at
+once but need a complex squaring (two products) per bit of `Q` and a
+complex product by the short `w_0` per set bit.  Written in the same
+ball arithmetic (``tune/tune-sin-cos-pi.c``), it measured 1.4 to 2
+times slower than the Chebyshev iteration including its square root,
+from `Q = 5` up.
+
+**Choice.**  The Chebyshev iteration is used for denominators up to a
+bit length measured against the kernel (``tune/tune-sin-cos-pi.c``,
+x86-64): none below 48 limbs, 3 bits at 64 limbs, 7 at 128, 9 at 256,
+12 at 512, 17 at 1024, 20 at 2048, 25 at 4096, 30 at 8192, 40 at
+16384, 43 at 32768, 48 at 65536, and any admissible denominator
+(below `2^{\mathrm{FLINT\_BITS} - 8}`) beyond, where the kernel no longer
+uses tables.  For comparison, the kernel costs about 16 `M(n)` at 64
+limbs, 20 at 256, 40 at 1024, 50 at 4096 and 150 at 65536.
+
+.. function:: void _mp_real_sin_cos_pi_ui_div_ui(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n)
+              void _mp_real_sin_cos_pi_ui_div_ui_tune(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n, int alg, int r)
+
+    Sets `(ys, n + 1)` and `(yc, n + 1)` (either may be ``NULL``) to
+    `\sin(\pi p/q)` and `\cos(\pi p/q)`, requiring `q \ge 1` and
+    `0 \le p \le q/2` (so that both lie in `[0, 1]`).  The fraction is
+    reduced first; `q \le 2` gives the exact values, `q = 3, 4, 6` the
+    quadratic ones from :func:`_mp_real_rsqrt_ui_newton` (*err* at most
+    4).  For `q = 5, 10` (`(\sqrt 5 \pm 1)/4` and
+    `\sqrt{(5 \mp \sqrt 5)/8}`), `q = 12` (`(\sqrt 6 \pm \sqrt 2)/4`)
+    and `q = 8` (`\sqrt{2 \pm \sqrt 2}/2`, from one reciprocal square
+    root of `2 + \sqrt 2`) the closed forms in ball arithmetic beat the
+    kernel from about 12 limbs (24 for `q = 8`) and the Chebyshev
+    iteration by 1.4 to 5 times.  Otherwise *err* is at most 4, computed
+    at run time, for the Chebyshev iteration and the closed forms, and
+    the kernel's bound plus 2 (at most `6r + 130` with `r \le 768`) for
+    the kernel.
+
+    The kernel path forms `v = (\pi/4) \cdot 4t/q` (or its complement
+    `(\pi/4) \cdot 2(q - 2t)/q` for `4t > q`, the outputs swapping) from
+    the cached floor of `\pi/4` by one ``mpn_mul_1`` and one
+    ``mpn_divrem_1``, two ulps below the exact value, and calls the
+    kernel of :func:`mp_real_sin_cos_bits`.  The tunable variant takes
+    the algorithm (*alg* = 0: the tuned choice, 1: the kernel, 2: the
+    Chebyshev iteration for `q < 2^{\mathrm{FLINT\_BITS} - 8}`, whose
+    recursion still ends in the kernel, 3: the closed forms for
+    `q = 5, 8, 10, 12`, the kernel otherwise) and the order *r* (0: the
+    default; at most 16, 10 on 32-bit machines).
 
 Reduction tables
 -------------------------------------------------------------------------------

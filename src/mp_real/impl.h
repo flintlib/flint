@@ -674,6 +674,7 @@ _mp_real_series_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n, flint_bitc
    the static tables up to MP_REAL_CONST_STATIC_N limbs, the per-thread
    cache beyond (valid until the next growth of that entry) */
 nn_srcptr _mp_real_const_cached_ptr(int which, slong n);
+slong _mp_real_const_cached_limbs(int which);
 #define MP_REAL_CONST_ID_PI4 0
 #define MP_REAL_CONST_ID_LOG2 1
 #define MP_REAL_CONST_ID_2_DIV_PI 10
@@ -902,6 +903,69 @@ void _mp_real_phase_end(mp_real_phase_t * ph);
 
 /* helpers of the elementary functions (sin_cos.c, exp.c, log.c,
    atan.c) ******************************************************************/
+
+/* (ys, n + 1), (yc, n + 1) = sin v, cos v for v in [0, 1) at n fraction
+   limbs, both outputs required, by the kernel mp_real_sin_cos_bits
+   uses (per-size, bitwise, diophantine or notab by n, or a reduced
+   series for small v); err <= 6r + 128 with r <= 768 the bitwise
+   parameter, at most 128 for the others (sin_cos.c) */
+void _mp_real_sin_cos_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n);
+
+/* the kernel limbs for a sine and cosine accurate to about 2^-p
+   (absolute), including the guard bits for the kernel's bound and a
+   reduction error of a few ulps (sin_cos.c) */
+slong _mp_real_sin_cos_limbs(slong p);
+
+/* sin x and cos x (rs, rc, either may be NULL) from v in [0, 1) at n
+   fraction limbs, for x = a pi/2 + s v (s = +-1) up to eps ulps of
+   B^-n, with the sine negated for xneg; v must not alias the outputs'
+   limbs (sin_cos.c) */
+void _mp_real_sin_cos_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n,
+    ulong eps, int a, int s, int xneg);
+
+/* reduction of an exact x with |x| >= 1 (x->exp >= 1) mod pi/2:
+   |x| = a pi/2 + s v with v in [0, pi/4 (1 + 2/B)], (W, n) = v within
+   3 ulps; returns a + 4 [s < 0] (sin_cos.c) */
+int _mp_real_trig_reduce(nn_ptr W, const mp_real_t x, slong n);
+
+/* (y, n + 1) = tan v for v in [0, 1) at n fraction limbs (the tangent
+   series or sin and 1 - cos of the reduced argument and a division for
+   small v, else the per-size, bitwise or diophantine kernels, or sin,
+   cos and a division beyond 65536 limbs); err <= 8r + 256 with r <= 768
+   the bitwise parameter, 4 for the diophantine kernel, computed at run
+   time (below 1000) for the divisions (tan.c) */
+void _mp_real_tan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n);
+
+/* res = (-1)^neg / y for y = (Y, L) B^ey (L limbs, top zero limbs
+   ignored), known within err B^ey and a further relative factor
+   1 +- 2^rx (WORD_MIN: none), to about wn limbs by one Newton inverse
+   (or, when y is known to a relative accuracy below 2^-12 only, by the
+   reciprocal of its ball): returns 1, or 0 (res untouched) if the ball
+   is not strictly positive.  Y must not alias res's limbs (tan.c) */
+int _mp_real_inv_mpn(mp_real_t res, nn_srcptr Y, slong L, slong ey, ulong err,
+    slong rx, slong wn, int neg);
+
+/* res = 1/x at n limbs for a strictly positive ball x of any width
+   (res may alias x): returns 0 (res untouched) if x is not strictly
+   positive, else 1 (tan.c) */
+int _mp_real_ball_inv_pos(mp_real_t res, const mp_real_t x, slong n);
+
+/* (y, n + 1) with a units limb from a ball enclosing a value in [0, 2)
+   (clamped at 0 from below); returns the bound in ulps of B^-n,
+   UWORD_MAX when none fits a word (tan.c) */
+ulong _mp_real_ball_get_fixed1(nn_ptr y, const mp_real_t x, slong n);
+
+/* the kernel limbs for a tangent accurate to about 2^-p (absolute),
+   including the guard bits for the kernel's bound and a reduction
+   error of a few ulps (tan.c) */
+slong _mp_real_tan_limbs(slong p);
+
+/* the propagation of an argument radius R (a ball enclosing it) through
+   the tangent, res enclosing tan m for the midpoint m: returns 0 if the
+   ball [m +- R] may contain a pole, else adds a bound for
+   |tan y - tan m| over the ball to the radius of res and returns 1
+   (tan.c) */
+int _mp_real_tan_add_arg_rad(mp_real_t res, const mp_real_t R);
 
 /* the radius of res += err B^anc, exactly */
 FLINT_FORCE_INLINE void
@@ -1280,6 +1344,13 @@ _mp_real_elem_set_error(mp_real_t res, int one, slong e)
         mp_real_zero(res);
     mp_real_add_error_2exp_si(res, e);
 }
+
+/* res = w sum_{k=1}^{N} s_k c_{k-1} v^(k-1) to p limbs, v = w (odd = 0) or
+   w^2 (odd = 1), s_k = (-1)^(k+1) if alternating else 1, |w| < 2^uexp,
+   N <= 16 (newton.c); the caller divides by the common denominator of
+   the coefficients and adds the tail */
+void _mp_real_newton_series(mp_real_t res, const mp_real_t w, slong uexp,
+    slong p, const ulong * c, slong N, int odd, int alternating);
 
 #ifdef __cplusplus
 }
