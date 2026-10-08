@@ -35,6 +35,9 @@
    zero components and an infinite radius. */
 
 #define DFC_FRAME_LIMBS ((1024 + 1074 + 53 + 2 * FLINT_BITS) / FLINT_BITS + 2)
+/* the frame of mp_real_get_dfloat: K + 1 limbs for up to 8 components
+   (17 on 32-bit machines) */
+#define DFC_GET_LIMBS ((53 * 8 + 2 * FLINT_BITS) / FLINT_BITS + 2)
 
 /* (m, 1 or 2 limbs) 2^r: m < 2^53, 0 <= r < FLINT_BITS, into t; returns
    the number of limbs */
@@ -78,27 +81,37 @@ _dfc_decode(double x, slong * e, int * neg)
 }
 
 /* res += [+- rad], rad > 0 finite: as an ulp count of the bottom limb
-   directly when that is exact or within 2^-20 (rounded up), else through
-   the bound arithmetic (which pads or truncates the mantissa) */
+   directly when that is exact or within 2^-20 (rounded up) and the count
+   fits a limb (on 32-bit machines a 53-bit mantissa usually does not),
+   else through the bound arithmetic (which pads or truncates the
+   mantissa) */
 static void
 _dfc_add_rad(mp_real_t res, double rad)
 {
     slong re, sh;
     int neg;
-    uint64_t rm = _dfc_decode(rad, &re, &neg);
+    uint64_t rm = _dfc_decode(rad, &re, &neg), v;
 
     if (res->size != 0 && res->err == 0)
     {
         sh = re - FLINT_BITS * (res->exp - res->size);
         if (sh >= 0 && sh < 10)
         {
-            res->err = (ulong) (rm << sh);
-            return;
+            v = rm << sh;
+            if (v <= (uint64_t) UWORD_MAX)
+            {
+                res->err = (ulong) v;
+                return;
+            }
         }
-        if (sh < 0 && sh > -33 && (rm >> (-sh)) >= ((uint64_t) 1 << 20))
+        else if (sh < 0 && sh > -33 && (rm >> (-sh)) >= ((uint64_t) 1 << 20))
         {
-            res->err = (ulong) ((rm >> (-sh)) + ((rm & (((uint64_t) 1 << (-sh)) - 1)) != 0));
-            return;
+            v = (rm >> (-sh)) + ((rm & (((uint64_t) 1 << (-sh)) - 1)) != 0);
+            if (v <= (uint64_t) UWORD_MAX)
+            {
+                res->err = (ulong) v;
+                return;
+            }
         }
     }
     {
@@ -262,7 +275,7 @@ void
 mp_real_get_dfloat(double * res, double * rad, slong n, const mp_real_t x)
 {
     slong K, L, be, i, bl;
-    ulong V[16], M[16], t[4];
+    ulong V[DFC_GET_LIMBS], M[DFC_GET_LIMBS], t[4];
     double r = 0.0;
     int neg;
 
@@ -299,7 +312,7 @@ mp_real_get_dfloat(double * res, double * rad, slong n, const mp_real_t x)
        L = K + 1 limbs with bit 0 at 2^be; the tail below goes to the
        radius as 2^be */
     K = FLINT_MIN(x->size, (53 * n + 2 * FLINT_BITS) / FLINT_BITS + 1);
-    FLINT_ASSERT(K + 1 <= 16);
+    FLINT_ASSERT(K + 1 <= DFC_GET_LIMBS);
     L = K + 1;
     flint_mpn_copyi(V, x->d + x->size - K, K);
     V[K] = 0;

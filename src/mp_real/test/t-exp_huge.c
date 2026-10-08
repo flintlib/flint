@@ -17,7 +17,8 @@
 /* mp_real_exp_notab_log2, mp_real_exp_notab_squaring and mp_real_exp_agm
    against arb_exp: the outputs contain exp of the input ball, and for
    exact inputs have a relative accuracy of about n limbs, for arguments
-   from tiny to 2^31 in absolute value of either sign, at precisions
+   from tiny to 2^31 (2^26 on 32-bit machines) in absolute value of
+   either sign, at precisions
    where the AGM step is taken (from about 30 limbs) and where it falls
    back to the squarings. */
 
@@ -67,8 +68,10 @@ TEST_FUNCTION_START(mp_real_exp_huge, state)
             case 0:
                 arf_randtest(m, state, FLINT_BITS * n + 10, 4);
                 break;
-            case 1:     /* |m| < 2^31 */
+            case 1:     /* |m| < 2^31, within the safe range 2^(FLINT_BITS - 5) */
                 arf_randtest(m, state, FLINT_BITS * n + 10, 5);
+                if (!arf_is_zero(m) && arf_cmpabs_2exp_si(m, FLINT_BITS - 6) >= 0)
+                    arf_mul_2exp_si(m, m, FLINT_BITS - 6 - fmpz_get_si(ARF_EXPREF(m)));
                 break;
             case 2:     /* tiny */
                 arf_randtest(m, state, FLINT_BITS * n + 10, 3);
