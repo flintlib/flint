@@ -157,6 +157,7 @@ int nmod_mat_is_square(const nmod_mat_t mat)
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
+void _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m, slong n);
 
 /* Addition and subtraction */
 
