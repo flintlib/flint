@@ -68,6 +68,7 @@
 #include "t-pow_series.c"
 #include "t-powsum_one_series_sieved.c"
 #include "t-powsum_series_naive_threaded.c"
+#include "t-powsum_series_tree.c"
 #include "t-pow_ui.c"
 #include "t-pow_ui_trunc_binexp.c"
 #include "t-product_roots.c"
@@ -157,6 +158,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_pow_series),
     TEST_FUNCTION(acb_poly_powsum_one_series_sieved),
     TEST_FUNCTION(acb_poly_powsum_series_naive_threaded),
+    TEST_FUNCTION(acb_poly_powsum_series_tree),
     TEST_FUNCTION(acb_poly_pow_ui),
     TEST_FUNCTION(acb_poly_pow_ui_trunc_binexp),
     TEST_FUNCTION(acb_poly_product_roots),
