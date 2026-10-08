@@ -90,7 +90,7 @@ _ex_neg_series_min_z(slong n)
 
 /* (y, n + 1) = exp(v), v in [0, 1) at n fraction limbs */
 static void
-_ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
+_ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n, int notab)
 {
     slong z = _mp_real_elem_lzb(v, n);
 
@@ -100,6 +100,8 @@ _ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
         y[n] = 1;
         *err = 0;
     }
+    else if (notab)
+        _mp_real_exp_notab(y, err, v, n);
     else if (z >= _ex_series_min_z(n))
         _mp_real_exp_reduced(y, err, v, n, (flint_bitcnt_t) z, 0);
     else if (n <= EX_BITWISE_MAX)
@@ -161,7 +163,7 @@ _ex_frame_limb(const mp_real_t m, slong sh, slong i)
    t in [0, L], k = q resp. -(q + 1).  L = floor(log 2 B^N) is read in
    place (static or cached). */
 static void
-_ex_reduce(mp_real_t res, const mp_real_t m, slong n)
+_ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
 {
     slong N = n + 1, sh, q, k, j;
     nn_ptr X;
@@ -235,7 +237,7 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n)
        reduction errs by (q + 1)(log 2 - L) < 2^60 B^-N, the truncations
        of m and of t: under two ulps of B^-n in t, four in exp(t) < 2 */
     mp_real_fit_length(res, n + 1);
-    _ex_kernel(res->d, &err, X + 1, n);
+    _ex_kernel(res->d, &err, X + 1, n, notab);
     _mp_real_elem_finish(res, n, err + 4, 0);
     mp_real_mul_2exp_si(res, res, k);
 
@@ -245,7 +247,7 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n)
 /* exp(m), m exact, nonzero, |m| < 2^(FLINT_BITS - 5), to about prec
    bits */
 static void
-_ex_mid(mp_real_t res, const mp_real_t m, slong prec)
+_ex_mid(mp_real_t res, const mp_real_t m, slong prec, int notab)
 {
     slong emid, z, n;
 
@@ -322,7 +324,7 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec)
         buf = TMP_ALLOC(n * sizeof(ulong));
         v = _mp_real_elem_frame(buf, n, m, res->d, NULL, &trunc);
         mp_real_fit_length(res, n + 1);
-        _ex_kernel(res->d, &err, v, n);
+        _ex_kernel(res->d, &err, v, n, notab);
         /* truncating m costs one ulp, exp(m) < e times that */
         _mp_real_elem_finish(res, n, err + 3 * trunc, 0);
         TMP_END;
@@ -361,11 +363,212 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec)
         return;
     }
 
-    _ex_reduce(res, m, n);
+    _ex_reduce(res, m, n, notab);
 }
 
-void
-mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
+/* ==== exp for huge precision without tables ================================
+
+   Three ways to exp(m) for exact m != 0, |m| < 2^(FLINT_BITS - 5), none
+   of which builds the tables of the bitwise or diophantine kernels (one
+   evaluation at millions of bits does not pay for them):
+
+   NOTAB_LOG2: the evaluation of mp_real_exp_bits (its short series for
+   small |m|, else the reduction m = k log 2 + t with t in [0, log 2))
+   with _mp_real_exp_notab as the kernel; log 2 at the working precision
+   comes from (and fills) the constant cache.
+
+   NOTAB_SQUARING: exp(|m|) = exp(|m| 2^-s)^(2^s) with |m| 2^-s < 1/2,
+   _mp_real_exp_notab on the reduced argument and s ball squarings, one
+   reciprocal for m < 0; no log 2.  The relative error doubles per
+   squaring: s + 16 guard bits.  arb uses the same scheme above 10^6
+   bits; it pays when log 2 is not already cached.
+
+   AGM: one Newton-Taylor step on the AGM logarithm.  y0 = exp(m) to
+   about P/(N + 1) limbs by NOTAB_SQUARING, taken as exact; with
+   s = y0 2^j >= 2^(p/2 + 16) (j >= 0, p = FLINT_BITS P the working
+   precision),
+
+       log s = pi / (2 agm(1, 4/s)) + eps,  |eps| <= 64 (log s + 8) / s^2
+
+   (Borwein & Borwein, Pi and the AGM, Thm. 7.2), so log y0 = log s - j
+   log 2 (no log 2 at all when y0 is already large enough, as for the
+   exp(C) of the partition function), d = m - log y0 with |d| < B^-(P /
+   (N + 1)), and exp(m) = y0 exp(d), expm1(d) by the N-term Taylor
+   series of the Newton steps of -log and atan (newton.c), coefficients
+   N!/k! over the common denominator N!.  If y0 turns out too
+   inaccurate for the series (not expected), the squaring result at full
+   precision is used. */
+
+#define EX_METHOD_AUTO 0
+#define EX_METHOD_NOTAB_LOG2 1
+#define EX_METHOD_SQUARING 2
+#define EX_METHOD_AGM 3
+
+/* |m| < 2^emid, |m| >= 2^(emid - 1) */
+static slong
+_ex_bitexp(const mp_real_t m)
+{
+    return FLINT_BITS * (m->exp - 1) + FLINT_BIT_COUNT(m->d[m->size - 1]);
+}
+
+static void
+_ex_mid_squaring(mp_real_t res, const mp_real_t m, slong prec)
+{
+    slong emid = _ex_bitexp(m), s, nk, i;
+    mp_real_t t;
+    nn_ptr v;
+    ulong er, e2;
+    TMP_INIT;
+
+    s = FLINT_MAX(0, emid + 1);
+    /* the notab bound (128 ulps), the truncation of the argument, s
+       doublings of the relative error and s + 1 roundings */
+    nk = (prec + s + FLINT_BIT_COUNT(s + 1) + 24 + FLINT_BITS - 1) / FLINT_BITS;
+
+    mp_real_init(t);
+    TMP_START;
+    v = TMP_ALLOC(nk * sizeof(ulong));
+
+    /* v = |m| 2^-s in [0, 1/2), truncated (er ulps) */
+    mp_real_mul_2exp_si(t, m, -s);
+    t->negative = 0;
+    _mp_real_get_fixed(v, &er, t, nk);
+
+    mp_real_fit_length(res, nk + 1);
+    _mp_real_exp_notab(res->d, &e2, v, nk);
+    /* the truncation of v moves exp(v) < 2 by twice as many ulps */
+    _mp_real_elem_finish(res, nk, e2 + 2 * er, 0);
+
+    for (i = 0; i < s; i++)
+        mp_real_mul(res, res, res, nk + 1);
+
+    if (m->negative)
+    {
+        mp_real_set_ui(t, 1);
+        mp_real_div(res, t, res, nk + 1);
+    }
+
+    TMP_END;
+    mp_real_clear(t);
+}
+
+#if FLINT_BITS == 64
+#define EX_AGM_MAX_N 16         /* 16! < 2^64 */
+#else
+#define EX_AGM_MAX_N 12         /* 12! < 2^32 */
+#endif
+
+static slong
+_ex_agm_default_N(slong P)
+{
+    return FLINT_MIN((P <= 20000) ? 8 : 12, EX_AGM_MAX_N);
+}
+
+static void
+_ex_mid_agm(mp_real_t res, const mp_real_t m, slong prec)
+{
+    slong P, N, w0, lg, j, T, uexp, k, emid = _ex_bitexp(m);
+    mp_real_t y0, b, a, L, u, d;
+    ulong c[EX_AGM_MAX_N], den;
+
+    /* d = m - log y0 is computed as m - (log s - j log 2), terms of
+       magnitude up to about |m| + p: their absolute errors need
+       log2(|m| + p) guard bits on top of prec */
+    P = (prec + FLINT_BITS - 1) / FLINT_BITS + 1;
+    P += (FLINT_MAX(emid, 0) + FLINT_BIT_COUNT((ulong) (FLINT_BITS * P)) + 16) / FLINT_BITS + 1;
+
+    N = _ex_agm_default_N(P);
+    w0 = (P + N) / (N + 1) + 1;
+
+    /* nothing to gain from the step at small precision */
+    if (w0 + 2 >= P)
+    {
+        _ex_mid_squaring(res, m, prec);
+        return;
+    }
+
+    mp_real_init(y0); mp_real_init(b); mp_real_init(a);
+    mp_real_init(L); mp_real_init(u); mp_real_init(d);
+
+    /* y0 ~ exp(m), exact */
+    _ex_mid_squaring(y0, m, FLINT_BITS * w0);
+    y0->err = 0;
+    _mp_real_norm(y0);
+    lg = _ex_bitexp(y0) - 1;                    /* y0 >= 2^lg */
+
+    /* s = y0 2^j >= 2^T */
+    T = FLINT_BITS * P / 2 + 16;
+    j = FLINT_MAX(0, T - lg);
+
+    /* L = pi / (2 agm(1, 4/s)) - j log 2 = log y0 + eps */
+    mp_real_mul_2exp_si(u, y0, j);
+    mp_real_set_ui(b, 4);
+    mp_real_div(b, b, u, P);
+    mp_real_set_ui(a, 1);
+    mp_real_agm(b, a, b, P);            /* takes over b */
+    mp_real_clear(a);
+    mp_real_const_pi4(u, P, 1);
+    mp_real_div(L, u, b, P);
+    mp_real_clear(b);
+    mp_real_mul_2exp_si(L, L, 1);
+    /* 64 (log s + 8) / s^2 with log s < lg + j + 1 */
+    mp_real_add_error_2exp_si(L, 6 + FLINT_BIT_COUNT((ulong) (lg + j + 9)) - 2 * (lg + j));
+    if (j > 0)
+    {
+        mp_real_const_log2(u, P, 1);
+        mp_real_mul_ui(u, u, (ulong) j, P);
+        mp_real_sub(L, L, u, P);
+    }
+
+    /* d = m - log y0 (the full-length temporaries are freed as soon as
+       they are dead: this is the peak of a huge-precision exp) */
+    mp_real_sub(d, m, L, P);
+    mp_real_clear(L);
+    uexp = mp_real_abs_bound_lt_2exp_si(d);
+
+    if ((N + 1) * (-uexp) < FLINT_BITS * P + 8)
+    {
+        /* y0 too inaccurate for the series (not expected) */
+        _ex_mid_squaring(res, m, prec);
+    }
+    else
+    {
+        /* expm1(d) = d sum_{k=1}^N d^(k-1)/k! + tail, the tail below
+           2 |d|^(N+1) / (N+1)! < 2^((N+1) uexp + 1) */
+        den = 1;
+        for (k = 2; k <= N; k++)
+            den *= (ulong) k;
+        c[N - 1] = 1;
+        for (k = N - 1; k >= 1; k--)
+            c[k - 1] = c[k] * (ulong) (k + 1);      /* N!/k! */
+        _mp_real_newton_series(u, d, uexp, P, c, N, 0, 0);
+        mp_real_div_ui(u, u, den, P);
+        mp_real_add_error_2exp_si(u, (N + 1) * uexp + 1);
+        mp_real_clear(d);
+        mp_real_init(d);
+        mp_real_set_ui(d, 1);           /* d no longer needed: 1 */
+        mp_real_add(u, u, d, P);
+        mp_real_mul(res, y0, u, P);
+    }
+
+    mp_real_clear(y0); mp_real_clear(u); mp_real_clear(d);
+}
+
+static void
+_ex_mid_method(mp_real_t res, const mp_real_t m, slong prec, int method)
+{
+    if (method == EX_METHOD_NOTAB_LOG2)
+        _ex_mid(res, m, prec, 1);
+    else if (method == EX_METHOD_SQUARING)
+        _ex_mid_squaring(res, m, prec);
+    else if (method == EX_METHOD_AGM)
+        _ex_mid_agm(res, m, prec);
+    else
+        _ex_mid(res, m, prec, 0);
+}
+
+static void
+_ex_ball(mp_real_t res, const mp_real_t x, slong prec, int method)
 {
     mp_real_struct mid;
     slong e;
@@ -384,7 +587,7 @@ mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
     e = mp_real_abs_bound_lt_2exp_si(x);
 
     if (e > FLINT_BITS - 5)
-        flint_throw(FLINT_ERROR, "mp_real_exp_bits: |x| >= 2^%wd, the result "
+        flint_throw(FLINT_ERROR, "mp_real_exp: |x| >= 2^%wd, the result "
             "exponent would leave the safe range\n", (slong) (FLINT_BITS - 5));
 
     /* a ball around zero: exp in [1 +- 2^(e+1)] for |x| < 2^e <= 1/4
@@ -444,7 +647,7 @@ mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
         prec = FLINT_MIN(prec, acc + 8);
     }
 
-    _ex_mid(res, &mid, prec);
+    _ex_mid_method(res, &mid, prec, method);
 
     if (xerr != 0)
     {
@@ -461,4 +664,28 @@ mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
         v = rd * (1.0 + rho) * _mp_real_elem_mag_hi(res) * (1.0 + 0x1p-48);
         _mp_real_elem_add_rad_d(res, v, xanc + res->exp - 1);
     }
+}
+
+void
+mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec)
+{
+    _ex_ball(res, x, prec, EX_METHOD_AUTO);
+}
+
+void
+mp_real_exp_notab_log2(mp_real_t res, const mp_real_t x, slong n)
+{
+    _ex_ball(res, x, FLINT_BITS * FLINT_MAX(n, 1), EX_METHOD_NOTAB_LOG2);
+}
+
+void
+mp_real_exp_notab_squaring(mp_real_t res, const mp_real_t x, slong n)
+{
+    _ex_ball(res, x, FLINT_BITS * FLINT_MAX(n, 1), EX_METHOD_SQUARING);
+}
+
+void
+mp_real_exp_agm(mp_real_t res, const mp_real_t x, slong n)
+{
+    _ex_ball(res, x, FLINT_BITS * FLINT_MAX(n, 1), EX_METHOD_AGM);
 }

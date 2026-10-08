@@ -162,29 +162,45 @@ _atan_default_N(slong n)
    w sum_k s_k v^(k-1) / d_k with v = w (log: d_k = k) or v = w^2
    (atan: d_k = 2k - 1), s_k = (-1)^(k+1) when alternating; the
    powers of v by squaring at the precision they contribute at, from
-   uexp with |w| < 2^uexp; W accumulated at the precision of the
-   leading term; the caller divides by den and adds the tail */
-static void
+   uexp with |w| < 2^uexp, each freed after its last use (so that at
+   huge precision only about two full-length powers are live, rather
+   than N - 2); W accumulated at the precision of the leading term; the
+   caller divides by den and adds the tail */
+
+/* v^j (j >= 2) serves v^(2j) and, for even j, v^(j+1) (both odd
+   powers v^(j+1) = v^j v and even ones v^(2j) = (v^j)^2) */
+static slong
+_newton_last_use(slong j, slong N)
+{
+    if (2 * j < N)
+        return 2 * j;
+    if (j % 2 == 0 && j + 1 < N)
+        return j + 1;
+    return j;
+}
+
+void
 _mp_real_newton_series(mp_real_t res, const mp_real_t w, slong uexp, slong p,
     const ulong * c, slong N, int odd, int alternating)
 {
     mp_real_struct pw[NEWTON_MAX_N + 1];
-    mp_real_t v, W, T;
-    slong k, cp, vexp = odd ? 2 * uexp : uexp;
+    mp_real_t v, W;
+    const mp_real_struct * vp = w;
+    slong k, j, cp, vexp = odd ? 2 * uexp : uexp;
     slong cw = FLINT_MAX(2, p + uexp / FLINT_BITS + 2);   /* W is then multiplied by w */
 
     mp_real_init(v);
     mp_real_init(W);
-    mp_real_init(T);
 
     /* the sum over v: W = sum_{k=1}^N s_k c_k v^(k-1) */
     mp_real_set_ui(W, c[0]);
     if (N > 1)
     {
         if (odd)
+        {
             mp_real_mul(v, w, w, FLINT_MAX(2, p + vexp / FLINT_BITS + 2));
-        else
-            mp_real_set(v, w);
+            vp = v;
+        }
         for (k = 1; k < N; k++)
         {
             const mp_real_struct * vk;
@@ -192,31 +208,32 @@ _mp_real_newton_series(mp_real_t res, const mp_real_t w, slong uexp, slong p,
             /* v^k needed to p + (k vexp + uexp) / B limbs */
             cp = FLINT_MAX(2, p + (k * vexp + uexp) / FLINT_BITS + 2);
             if (k == 1)
-                vk = v;
+                vk = vp;
             else
             {
                 mp_real_init(pw + k);
                 if (k % 2 == 0)
-                    mp_real_mul(pw + k, (k / 2 == 1) ? v : pw + k / 2,
-                        (k / 2 == 1) ? v : pw + k / 2, cp);
+                    mp_real_mul(pw + k, (k / 2 == 1) ? vp : pw + k / 2,
+                        (k / 2 == 1) ? vp : pw + k / 2, cp);
                 else
-                    mp_real_mul(pw + k, pw + k - 1, v, cp);
+                    mp_real_mul(pw + k, pw + k - 1, vp, cp);
                 vk = pw + k;
             }
             if (alternating && (k & 1))
                 mp_real_submul_ui(W, W, vk, c[k], cw);
             else
                 mp_real_addmul_ui(W, W, vk, c[k], cw);
+
+            for (j = 2; j <= k; j++)
+                if (_newton_last_use(j, N) == k)
+                    mp_real_clear(pw + j);
         }
-        for (k = 2; k < N; k++)
-            mp_real_clear(pw + k);
     }
 
     mp_real_mul(res, W, w, p);
 
     mp_real_clear(v);
     mp_real_clear(W);
-    mp_real_clear(T);
 }
 
 /* -log(x) as a ball for (x, n) in [1/2, 1); forward, N as for the

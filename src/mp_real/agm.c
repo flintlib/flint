@@ -100,8 +100,23 @@ _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slong n,
     mp_real_init(b);
     mp_real_init(t);
     mp_real_init(d);
-    mp_real_set(a, x);
-    mp_real_set(b, y);
+    /* an input aliased by res is taken over rather than copied (at huge
+       precision, one full-length number less) */
+    if (x == res && y != res)
+    {
+        mp_real_swap(a, res);
+        mp_real_set(b, y);
+    }
+    else if (y == res && x != res)
+    {
+        mp_real_set(a, x);
+        mp_real_swap(b, res);
+    }
+    else
+    {
+        mp_real_set(a, x);
+        mp_real_set(b, y);
+    }
 
     for (iter = 0; ; iter++)
     {
@@ -136,12 +151,12 @@ _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slong n,
         {
             /* the finish: x = z^2, 1 - sum_{j<m} c_j x^j over the
                common denominator 2^E, tail below x^m */
-            mp_real_t z, W, T;
+            /* z and W in the storage of a and b, which are dead */
+            mp_real_struct * z = a, * W = b;
+            mp_real_t T;
             mp_real_struct pw[AGM_MAX_ORDER];
-            slong xe, cp, j, E = agm_exp[m - 2];
+            slong xe, cp, i, j, E = agm_exp[m - 2];
 
-            mp_real_init(z);
-            mp_real_init(W);
             mp_real_init(T);
 
             mp_real_div(z, d, t, FLINT_MAX(2, p + (de - tl) / FLINT_BITS + 2));
@@ -170,9 +185,12 @@ _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slong n,
                 else
                     mp_real_addmul_ui(W, W, xj, (ulong) (agm_num[j - 1] << (E - agm_exp[j - 1])),
                         FLINT_MAX(2, p + xe / FLINT_BITS + 2));
+                /* x^i (i >= 2) serves x^(2i) and, for even i, x^(i+1):
+                   freed after its last use */
+                for (i = 2; i <= j; i++)
+                    if (((2 * i < m) ? 2 * i : (i % 2 == 0 && i + 1 < m) ? i + 1 : i) == j)
+                        mp_real_clear(pw + i);
             }
-            for (j = 2; j < m; j++)
-                mp_real_clear(pw + j);
 
             mp_real_mul_2exp_si(W, W, -E);
             mp_real_set_ui(T, 1);
@@ -182,8 +200,6 @@ _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slong n,
             mp_real_mul_2exp_si(t, t, -1);
             mp_real_mul(res, t, W, p);
 
-            mp_real_clear(z);
-            mp_real_clear(W);
             mp_real_clear(T);
             break;
         }

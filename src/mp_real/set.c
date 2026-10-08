@@ -14,6 +14,7 @@
 #include "flint.h"
 #include "longlong.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
 #include "impl.h"
@@ -42,6 +43,69 @@ mp_real_set_si(mp_real_t x, slong c)
 {
     mp_real_set_ui(x, (c >= 0) ? (ulong) c : -(ulong) c);
     x->negative = (c < 0);
+}
+
+/* x = f exactly: the limbs above the valuation (the low zero limbs) are
+   copied straight from the fmpz */
+void
+mp_real_set_fmpz(mp_real_t x, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        mp_real_set_si(x, *f);
+    }
+    else
+    {
+        const mpz_ptr z = COEFF_TO_PTR(*f);
+        slong n = FLINT_ABS(z->_mp_size), v;
+        nn_srcptr d = z->_mp_d;
+
+        for (v = 0; d[v] == 0; v++)
+            ;
+        mp_real_fit_length(x, n - v);
+        flint_mpn_copyi(x->d, d + v, n - v);
+        x->size = n - v;
+        x->negative = (z->_mp_size < 0);
+        x->exp = n;
+        x->err = 0;
+    }
+}
+
+/* res = x rounded to its top n limbs (n >= 1): the dropped tail D and
+   the old radius r (at most B - 1 ulps of a limb at least one below the
+   new bottom) are each below one new ulp, so the new radius is
+   (D != 0) + (r != 0) ulps; exact when nothing nonzero is dropped */
+void
+mp_real_set_trunc(mp_real_t res, const mp_real_t x, slong n)
+{
+    slong size = x->size, drop, j;
+    int dropped = 0;
+
+    FLINT_ASSERT(n >= 1);
+
+    if (size <= n)
+    {
+        mp_real_set(res, x);
+        return;
+    }
+
+    drop = size - n;
+    for (j = 0; j < drop && !dropped; j++)
+        dropped = (x->d[j] != 0);
+
+    if (res == x)
+    {
+        memmove(res->d, x->d + drop, n * sizeof(ulong));
+    }
+    else
+    {
+        mp_real_fit_length(res, n);
+        flint_mpn_copyi(res->d, x->d + drop, n);
+        res->exp = x->exp;
+        res->negative = x->negative;
+    }
+    res->err = (ulong) dropped + (x->err != 0);
+    res->size = n;
 }
 
 void

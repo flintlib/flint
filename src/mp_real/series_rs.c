@@ -623,7 +623,25 @@ _mp_real_series_rs_tan(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r)
 
     if (K < 2)
     {
-        _mp_real_series_tapered(res, x, n, r, MP_REAL_SERIES_TAN);
+        if (n <= MP_REAL_SERIES_TAN_NMAX)
+        {
+            _mp_real_series_tapered(res, x, n, r, MP_REAL_SERIES_TAN);
+            return;
+        }
+
+        /* beyond the tables of the tapered Horner scheme the chunks cover
+           every term, so K < 2 means N = 1: tan t = t + t^3/3 (+ a tail
+           below the ulp), by exact products truncated to n limbs: below
+           by less than 1 ulp for z, 1 + 2^-r for t^3 = z t and 1 for the
+           division, within the 3 ulps */
+        FLINT_ASSERT(N == 1);
+        TMP_START;
+        z = TMP_ALLOC(4 * n * sizeof(ulong));
+        flint_mpn_sqr(z, x, n);
+        flint_mpn_mul_n(z + 2 * n, z + n, x, n);
+        mpn_divrem_1(z + 3 * n, 0, z + 3 * n, n, 3);
+        mpn_add_n(res, x, z + 3 * n, n);    /* no carry: t < 2^-32 */
+        TMP_END;
         return;
     }
 
