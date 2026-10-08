@@ -11,12 +11,17 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 #include "mp_real.h"
 #include "impl.h"
 
@@ -83,6 +88,34 @@
    for the Chudnovsky constant, whose content is about half of Q), and
    the same rule decides separately for R.
 
+   CONTENT REMOVAL.  A node only represents the ratios T/Q and R/Q, and
+   g = gcd(R1, Q2) divides all of T = T1 Q2 + R1 T2, Q = Q1 Q2 and
+   R = R1 R2, so R1 and Q2 can be divided by g before the products, as
+   in Cheng, Hanrot, Thome, Zima and Zimmermann, "Time- and
+   space-efficient evaluation of some hypergeometric constants" (ISSAC
+   2007).  The cancellation is large: for zeta(3) the final Q shrinks
+   from 230 to 50 bits per term, for Catalan's constant from 64 to 19,
+   for log 2 from 34 to 14, for pi from 91 to 58.  The gcd is not
+   computed by mpn_gcd but read off factor lists, partial
+   factorizations of Q and R over the primes below 2^32 kept with every
+   node: Q and R are factored over Z, the values of their linear factors
+   are factored by a segmented sieve (see hyp_sieve_info) in O(sqrt(N))
+   memory, as Bellard did for his pi record, and the lists of a node are
+   merged from its children's.  Three things keep this cheap.  (1) A
+   prime shared by R(j) (left) and Q(k) (right) divides
+   u_Q u_R (k - j) + (u_R v_Q - u_Q v_R) for some pair of linear factors
+   u k + v, so only the primes below a bound linear in the node's size
+   are scanned, and the entries of a larger prime (most of the sieve's
+   cofactors) wait in per-level buffers until the first level at which
+   they can cancel instead of riding up through every merge.  (2) The
+   removal is done where it pays (_hyp_remove_pays): an exact division
+   costs up to about two products of its size, against the products it
+   shrinks at this node and every node above; near the root it does not
+   pay, and the lists are dropped from there up.  (3) Only exact values
+   take part (the top levels are truncated to the working precision).
+   At smaller precisions the sieve and the lists cost about as much as
+   the removal saves, and it is not done (_hyp_gcd_min_limbs).
+
    TERMS AND TAIL.  The tail after N terms is bounded rigorously (see
    tail_struct): the product of the ratios |R(j)/Q(j)| is accumulated
    exactly (up to double rounding, bounded) for small j and bounded in
@@ -96,6 +129,9 @@
    Zuniga series with multi-limb coefficients): short leaves of long terms
    cost more in merges than they save in the leaf */
 #define HYP_LEAF_TERMS_MIN 24
+/* the same with the content removal */
+#define HYP_GCD_LEAF_LIMBS 40
+#define HYP_GCD_LEAF_TERMS_MIN 12
 
 /* ---- polynomials ---- */
 
@@ -407,6 +443,1560 @@ _add_signed(nn_ptr x, slong * xn, int * xneg, nn_srcptr y, slong yn,
     }
 }
 
+/* ---- content removal: factor lists and the sieve ---- */
+
+/* A factor list is a partial factorization of an exact integer X: a list
+   of (p, e) sorted by p, the product of the p^e dividing X, with p < 2^32
+   a prime or an unsplit cofactor (see the sieve; either way the entries
+   come from disjoint parts of X), and exponents saturating at
+   2^32 - 1, so that sums and differences keep them lower bounds.  An
+   integer whose list is not tracked (ok = 0) takes part in no
+   removal. */
+typedef struct
+{
+    uint32_t p, e;
+}
+hyp_fe;
+
+typedef struct
+{
+    hyp_fe * d;
+    slong len, alloc;
+    int ok;
+}
+hyp_flist;
+
+static void
+flist_init(hyp_flist * l)
+{
+    l->d = NULL;
+    l->len = l->alloc = 0;
+    l->ok = 0;
+}
+
+static void
+flist_clear(hyp_flist * l)
+{
+    flint_free(l->d);
+    flist_init(l);
+}
+
+static void
+flist_fit(hyp_flist * l, slong n)
+{
+    if (l->alloc < n)
+    {
+        n = FLINT_MAX(n, 2 * l->alloc);
+        l->d = flint_realloc(l->d, n * sizeof(hyp_fe));
+        l->alloc = n;
+    }
+}
+
+static inline uint32_t
+_esat(uint64_t e)
+{
+    return (e > UINT32_MAX) ? UINT32_MAX : (uint32_t) e;
+}
+
+/* a <- a + b (exponents of the product), entries of exponent 0 (left
+   by flist_gcd_remove) dropped; b unchanged; the result is formed in
+   the scratch list t and swapped into a */
+static void
+flist_add(hyp_flist * a, const hyp_flist * b, hyp_flist * t)
+{
+    slong i, j, n, na, nb;
+    const hyp_fe * A, * Bp;
+    hyp_fe * r;
+
+    if (!a->ok || !b->ok)
+    {
+        a->ok = 0;
+        a->len = 0;
+        return;
+    }
+
+    na = a->len;
+    nb = b->len;
+    flist_fit(t, na + nb + 1);
+    A = a->d;
+    Bp = b->d;
+    r = t->d;
+
+    i = j = n = 0;
+    if (nb == 0)
+    {
+        for (i = 0; i < na; i++)
+        {
+            r[n] = A[i];
+            n += (A[i].e != 0);
+        }
+    }
+    else
+    {
+        /* branch-free (the merge of random primes defeats prediction):
+           both heads loaded, the exponents masked */
+        while (i < na && j < nb)
+        {
+            hyp_fe x = A[i], y = Bp[j];
+            uint32_t p = FLINT_MIN(x.p, y.p);
+            uint64_t ta = (x.p == p), tb = (y.p == p);
+            uint64_t e = ((uint64_t) x.e & (0 - ta))
+                + ((uint64_t) y.e & (0 - tb));
+            r[n].p = p;
+            r[n].e = (uint32_t) FLINT_MIN(e, (uint64_t) UINT32_MAX);
+            n += (e != 0);
+            i += ta;
+            j += tb;
+        }
+        for ( ; i < na; i++)
+        {
+            r[n] = A[i];
+            n += (A[i].e != 0);
+        }
+        for ( ; j < nb; j++)
+        {
+            r[n] = Bp[j];
+            n += (Bp[j].e != 0);
+        }
+    }
+
+    FLINT_SWAP(hyp_fe *, a->d, t->d);
+    FLINT_SWAP(slong, a->alloc, t->alloc);
+    a->len = n;
+}
+
+/* a <- a + b + c with c short (merged into the pass as a third
+   source), entries of exponent 0 dropped; the result is formed in t */
+static void
+flist_add3(hyp_flist * a, const hyp_flist * b, const hyp_flist * c,
+    hyp_flist * t)
+{
+    slong i = 0, j = 0, k = 0, n = 0, na, nb, nc;
+    const hyp_fe * A, * Bp, * C;
+    hyp_fe * r;
+
+    if (c->len == 0)
+    {
+        flist_add(a, b, t);
+        return;
+    }
+    if (!a->ok || !b->ok)
+    {
+        a->ok = 0;
+        a->len = 0;
+        return;
+    }
+
+    na = a->len;
+    nb = b->len;
+    nc = c->len;
+    flist_fit(t, na + nb + nc);
+    A = a->d;
+    Bp = b->d;
+    C = c->d;
+    r = t->d;
+
+    /* the two long lists by the two-way loop; the short one is checked
+       against the smaller head, a branch rarely taken */
+    {
+        uint32_t pc = C[0].p;
+        while (i < na && j < nb)
+        {
+            hyp_fe x = A[i], y = Bp[j];
+            uint32_t p = FLINT_MIN(x.p, y.p);
+            uint64_t ta = (x.p == p), tb = (y.p == p), e;
+            if (pc <= p)
+            {
+                if (pc < p)
+                {
+                    r[n++] = C[k++];
+                    pc = (k < nc) ? C[k].p : UINT32_MAX;
+                    continue;
+                }
+                e = C[k++].e;
+                pc = (k < nc) ? C[k].p : UINT32_MAX;
+            }
+            else
+                e = 0;
+            e += ((uint64_t) x.e & (0 - ta)) + ((uint64_t) y.e & (0 - tb));
+            r[n].p = p;
+            r[n].e = (uint32_t) FLINT_MIN(e, (uint64_t) UINT32_MAX);
+            n += (e != 0);
+            i += ta;
+            j += tb;
+        }
+        /* the rest, three-way */
+        while (i < na || j < nb || k < nc)
+        {
+            uint32_t pa = (i < na) ? A[i].p : UINT32_MAX;
+            uint32_t pb = (j < nb) ? Bp[j].p : UINT32_MAX;
+            uint32_t pcc = (k < nc) ? C[k].p : UINT32_MAX;
+            uint32_t p = FLINT_MIN(FLINT_MIN(pa, pb), pcc);
+            uint64_t e = 0;
+            if (pa == p)
+                e += A[i++].e;
+            if (pb == p)
+                e += Bp[j++].e;
+            if (pcc == p)
+                e += C[k++].e;
+            r[n].p = p;
+            r[n].e = _esat(e);
+            n += (e != 0);
+        }
+    }
+
+    FLINT_SWAP(hyp_fe *, a->d, t->d);
+    FLINT_SWAP(slong, a->alloc, t->alloc);
+    a->len = n;
+}
+
+/* g = gcd(a + a2, b + b2) entrywise over the primes p <= bound, removed
+   from the sources (a before a2, b before b2), leaving entries of
+   exponent 0 (dropped by the next flist_add) */
+static void
+flist_gcd_remove(hyp_flist * g, hyp_flist * a, hyp_flist * a2,
+    hyp_flist * b, hyp_flist * b2, ulong bound)
+{
+    slong i = 0, i2 = 0, j = 0, j2 = 0;
+    slong na = a->len, na2 = a2->len, nb = b->len, nb2 = b2->len;
+    hyp_fe * A = a->d, * A2 = a2->d, * Bp = b->d, * B2 = b2->d;
+
+    g->len = 0;
+    if (!a->ok || !b->ok)
+        return;
+
+    for (;;)
+    {
+        uint32_t pa = (i < na) ? A[i].p : UINT32_MAX;
+        uint32_t qa = (i2 < na2) ? A2[i2].p : UINT32_MAX;
+        uint32_t pb = (j < nb) ? Bp[j].p : UINT32_MAX;
+        uint32_t qb = (j2 < nb2) ? B2[j2].p : UINT32_MAX;
+        uint32_t ra = FLINT_MIN(pa, qa), rb = FLINT_MIN(pb, qb);
+
+        /* UINT32_MAX (not a prime) marks an exhausted side */
+        if (ra > bound || rb > bound || ra == UINT32_MAX
+            || rb == UINT32_MAX)
+            break;
+        if (ra < rb)
+        {
+            i += (pa == ra);
+            i2 += (qa == ra);
+        }
+        else if (rb < ra)
+        {
+            j += (pb == rb);
+            j2 += (qb == rb);
+        }
+        else
+        {
+            uint64_t ea = ((pa == ra) ? A[i].e : 0)
+                + (uint64_t) ((qa == ra) ? A2[i2].e : 0);
+            uint64_t eb = ((pb == rb) ? Bp[j].e : 0)
+                + (uint64_t) ((qb == rb) ? B2[j2].e : 0);
+            uint64_t m = FLINT_MIN(ea, eb), x;
+
+            if (m != 0)
+            {
+                flist_fit(g, g->len + 1);
+                g->d[g->len].p = ra;
+                g->d[g->len++].e = _esat(m);
+                /* subtract m: a first, then a2; b first, then b2 */
+                x = m;
+                if (pa == ra)
+                {
+                    uint32_t y = (uint32_t) FLINT_MIN(x, (uint64_t) A[i].e);
+                    A[i].e -= y;
+                    x -= y;
+                }
+                if (x != 0 && qa == ra)
+                    A2[i2].e -= (uint32_t) FLINT_MIN(x, (uint64_t) A2[i2].e);
+                x = m;
+                if (pb == rb)
+                {
+                    uint32_t y = (uint32_t) FLINT_MIN(x, (uint64_t) Bp[j].e);
+                    Bp[j].e -= y;
+                    x -= y;
+                }
+                if (x != 0 && qb == rb)
+                    B2[j2].e -= (uint32_t) FLINT_MIN(x, (uint64_t) B2[j2].e);
+            }
+            i += (pa == ra);
+            i2 += (qa == ra);
+            j += (pb == rb);
+            j2 += (qb == rb);
+        }
+    }
+}
+
+/* the product of n words, n >= 1, by a balanced tree; (z, return value)
+   with z room for n limbs; t scratch of n limbs */
+static slong
+_words_prod(nn_ptr z, const ulong * w, slong n, nn_ptr t)
+{
+    slong zn, m, an, bn;
+
+    if (n <= 16)
+    {
+        z[0] = w[0];
+        zn = 1;
+        for (m = 1; m < n; m++)
+        {
+            ulong cy = mpn_mul_1(z, z, zn, w[m]);
+            z[zn] = cy;
+            zn += (cy != 0);
+        }
+        return zn;
+    }
+
+    m = n / 2;
+    an = _words_prod(t, w, m, z);
+    bn = _words_prod(t + m, w + m, n - m, z);
+    if (an >= bn)
+        flint_mpn_mul(z, t, an, t + m, bn);
+    else
+        flint_mpn_mul(z, t + m, bn, t, an);
+    zn = an + bn;
+    return zn - (z[zn - 1] == 0);
+}
+
+/* an upper estimate of log2 prod p^e over the list */
+static double
+flist_bits(const hyp_flist * g)
+{
+    double b = 0.0;
+    slong i;
+    for (i = 0; i < g->len; i++)
+        b += (double) g->d[i].e * FLINT_BIT_COUNT(g->d[i].p);
+    return b;
+}
+
+#define HYP_SMALL_G 64
+
+/* prod p^e over the list, as (G, return value): in sbuf (HYP_SMALL_G
+   limbs) when it fits there, else freshly allocated */
+static slong
+flist_expand(nn_ptr * G, const hyp_flist * g, nn_ptr sbuf)
+{
+    slong i, n = 0, alloc = HYP_SMALL_G, gn;
+    ulong wbuf[HYP_SMALL_G], * w = wbuf, acc = 1, hi, lo, k;
+    nn_ptr t;
+
+    for (i = 0; i < g->len; i++)
+    {
+        ulong p = g->d[i].p;
+        for (k = 0; k < g->d[i].e; k++)
+        {
+            umul_ppmm(hi, lo, acc, p);
+            if (hi == 0)
+                acc = lo;
+            else
+            {
+                if (n == alloc)
+                {
+                    alloc *= 2;
+                    if (w == wbuf)
+                    {
+                        w = flint_malloc(alloc * sizeof(ulong));
+                        memcpy(w, wbuf, n * sizeof(ulong));
+                    }
+                    else
+                        w = flint_realloc(w, alloc * sizeof(ulong));
+                }
+                w[n++] = acc;
+                acc = p;
+            }
+        }
+    }
+    if (n == alloc)
+    {
+        if (w == wbuf)
+        {
+            w = flint_malloc((alloc + 1) * sizeof(ulong));
+            memcpy(w, wbuf, n * sizeof(ulong));
+        }
+        else
+            w = flint_realloc(w, (alloc + 1) * sizeof(ulong));
+    }
+    w[n++] = acc;
+
+    if (n <= HYP_SMALL_G / 2)
+    {
+        *G = sbuf;
+        gn = _words_prod(sbuf, w, n, sbuf + n);
+    }
+    else
+    {
+        *G = flint_malloc(n * sizeof(ulong));
+        t = flint_malloc((n + 1) * sizeof(ulong));
+        gn = _words_prod(*G, w, n, t);
+        flint_free(t);
+    }
+    if (w != wbuf)
+        flint_free(w);
+    return gn;
+}
+
+/* x / G for an exact integer x divisible by G, with the precomputed
+   inverse pre when not NULL */
+static void
+_mp_real_divexact_mpn_pre(mp_real_t x, nn_srcptr G, slong gn,
+    const flint_mpn_divexact_preinv_struct * pre)
+{
+    slong z = x->exp - x->size, an = x->exp, qn;
+    nn_ptr a, q;
+    int neg = x->negative;
+    ulong sbuf[2 * HYP_SMALL_G + 2];
+
+    if (gn == 1 && G[0] == 1)
+        return;
+
+    FLINT_ASSERT(x->err == 0 && z >= 0 && an >= gn);
+
+    qn = an - gn + 1;
+    if (qn + (z ? an : 0) <= 2 * HYP_SMALL_G + 2)
+        q = sbuf;
+    else
+        q = flint_malloc((qn + (z ? an : 0)) * sizeof(ulong));
+    if (z == 0)
+        a = x->d;
+    else
+    {
+        a = q + qn;
+        flint_mpn_zero(a, z);
+        flint_mpn_copyi(a + z, x->d, x->size);
+    }
+    if (pre != NULL)
+        flint_mpn_divexact_preinv(q, a, an, pre);
+    else
+        flint_mpn_divexact(q, a, an, G, gn);
+    _mp_real_set_mpn_2exp(x, q, qn, 0);
+    if (neg)
+        mp_real_neg(x, x);
+    if (q != sbuf)
+        flint_free(q);
+}
+
+static inline int
+_mp_real_is_exact_int(const mp_real_t x)
+{
+    return x->size != 0 && x->err == 0 && x->exp >= x->size;
+}
+
+/* The sieve.  Q and R are factored over Z; their linear factors
+   f_i(k) = u_i k + v_i (u_i > 0, gcd(u_i, v_i) = 1, of multiplicity
+   mQ_i in Q and mR_i in R) are sieved over windows of consecutive
+   terms with the primes p <= sqrt(M), M the largest |f_i(k)|, from
+   the roots -v_i / u_i mod p, and the cofactors left (primes beyond
+   sqrt(M)) are recorded too; the contents are factored by trial
+   division (a cofactor left unfactored is just not tracked, as are
+   factors of degree > 1).  The memory is O(sqrt(M)): the primes and
+   roots (read-only, shared by the threads) and one window per thread,
+   refilled as the depth-first traversal reaches its leaves in
+   increasing order, of a few thousand terms (enough that the roots,
+   visited once per window, cost a few operations per term) within
+   about 8 MB; there is no table of all the values as in the sieve of
+   gmp-chudnovsky. */
+typedef struct
+{
+    slong nf;
+    ulong * u;
+    slong * v;
+    uint32_t * mQ, * mR;
+    slong np;
+    uint32_t * primes;
+    ulong * pinv, * plim;       /* p^-1 mod 2^FLINT_BITS, floor(UWORD_MAX/p) */
+    uint32_t * roots;           /* np * nf; UINT32_MAX: p | u_i */
+    hyp_flist cq, cr;           /* content primes */
+    slong L, N, nleaves, segleaves;
+    /* a prime shared by R(j) and Q(k), j < k, from linear factors
+       divides u_Q u_R (k - j) + (u_R v_Q - u_Q v_R), so it is at most
+       cmul (k - j) + cadd unless that vanishes (a telescoping pair:
+       nobound), or it is a content prime (at most cmaxp) */
+    double cmul, cadd, cmaxp;
+    int nobound;
+    double lb[64];              /* the bound at a node of 2^lev leaves,
+                                   lev < 63 (see HYP_LB_INV) */
+    slong cQ, cR, dQ, dR;       /* per-leaf capacities of a window */
+    /* the same bound for the entries of one factor, as an entry of Q
+       (lbq) or of R (lbr): nf rows of 64, like lb */
+    double * lbq, * lbr;
+    /* an entry of Q (R) with a prime beyond every R (Q) value cannot
+       cancel */
+    ulong qprune, rprune;
+}
+hyp_sieve_info;
+
+/* one thread's window: leaves j0 <= j < j1.  For the leaf of index l =
+   j - j0, the sieved primes form a list sorted by p, sQ + l cQ (nQ[l]
+   entries): the sieve visits the primes in increasing order and appends
+   to the leaf's list, or adds to its last entry; the cofactors (primes
+   beyond the sieve bound, nearly all deferred to higher levels) are
+   kept unsorted in fQ + l dQ (mQ[l] entries).  The same for R. */
+typedef struct
+{
+    slong j0, j1;
+    ulong * vals;               /* nf * (terms of the window) */
+    hyp_fe * sQ, * sR, * fQ, * fR;
+    uint32_t * nQ, * nR, * mQ, * mR;
+}
+hyp_sieve_seg;
+
+#define HYP_NO_ROOT UINT32_MAX
+
+static void
+seg_init(hyp_sieve_seg * S)
+{
+    memset(S, 0, sizeof(hyp_sieve_seg));
+}
+
+static void
+seg_clear(hyp_sieve_seg * S)
+{
+    flint_free(S->vals);
+    flint_free(S->sQ);
+    flint_free(S->nQ);
+    seg_init(S);
+}
+
+/* sort the triples (leaf, p, e) ev[lo, hi) by p, stably: by insertion
+   when short, else by LSD radix (8- or 11-bit digits up to the top bit
+   of the largest p) */
+static void
+_ev_radix_sort_p(uint32_t * ev, slong lo, slong hi)
+{
+    slong n = hi - lo, i, d, nd;
+    uint32_t maxp = 0, * a = ev + 3 * lo, * b, * t, mask;
+    slong cnt[2048];
+    int shift, bits;
+
+    if (n < 2)
+        return;
+
+    /* short: insertion sort (stable) */
+    if (n <= 48)
+    {
+        for (i = 1; i < n; i++)
+        {
+            uint32_t x0 = a[3 * i], x1 = a[3 * i + 1], x2 = a[3 * i + 2];
+            slong j = i;
+            while (j > 0 && a[3 * (j - 1) + 1] > x1)
+            {
+                a[3 * j] = a[3 * (j - 1)];
+                a[3 * j + 1] = a[3 * (j - 1) + 1];
+                a[3 * j + 2] = a[3 * (j - 1) + 2];
+                j--;
+            }
+            a[3 * j] = x0;
+            a[3 * j + 1] = x1;
+            a[3 * j + 2] = x2;
+        }
+        return;
+    }
+
+    for (i = 0; i < n; i++)
+        maxp = FLINT_MAX(maxp, a[3 * i + 1]);
+
+    bits = (n < 4096) ? 8 : 11;
+    nd = WORD(1) << bits;
+    mask = (uint32_t) nd - 1;
+    b = flint_malloc(3 * n * sizeof(uint32_t));
+    t = a;
+    for (shift = 0; shift < 32 && (maxp >> shift) != 0; shift += bits)
+    {
+        slong pos = 0;
+        memset(cnt, 0, nd * sizeof(slong));
+        for (i = 0; i < n; i++)
+            cnt[(t[3 * i + 1] >> shift) & mask]++;
+        for (d = 0; d < nd; d++)
+        {
+            slong c = cnt[d];
+            cnt[d] = pos;
+            pos += c;
+        }
+        for (i = 0; i < n; i++)
+        {
+            slong j = cnt[(t[3 * i + 1] >> shift) & mask]++;
+            b[3 * j] = t[3 * i];
+            b[3 * j + 1] = t[3 * i + 1];
+            b[3 * j + 2] = t[3 * i + 2];
+        }
+        FLINT_SWAP(uint32_t *, t, b);
+    }
+    if (t != a)
+    {
+        memcpy(a, t, 3 * n * sizeof(uint32_t));
+        b = t;
+    }
+    flint_free(b);
+}
+
+/* append (p, e) to a leaf's list of capacity cap, or add to its last
+   entry; an entry beyond the capacity is dropped (a list is a lower
+   bound, so this only loses some cancellation) */
+static inline void
+_leaf_append(hyp_fe * lst, uint32_t * n, uint32_t p, uint64_t e, slong cap)
+{
+    uint32_t k = *n;
+    if (k != 0 && lst[k - 1].p == p)
+        lst[k - 1].e = _esat((uint64_t) lst[k - 1].e + e);
+    else if (k < cap)
+    {
+        lst[k].p = p;
+        lst[k].e = _esat(e);
+        *n = k + 1;
+    }
+}
+
+static inline slong _hyp_level_row(const hyp_sieve_info * I,
+    const double * lb, uint32_t p);
+
+/* sieve the window of the leaves j0, ... (up to segleaves of them) */
+static void
+seg_fill(hyp_sieve_seg * S, const hyp_sieve_info * I, slong j0)
+{
+    slong j1 = FLINT_MIN(j0 + I->segleaves, I->nleaves);
+    slong L = I->L, nf = I->nf, nl = j1 - j0, i, t, pi, l, c;
+    slong k0 = 1 + j0 * L, k1 = FLINT_MIN(1 + j1 * L, I->N + 1), K = k1 - k0;
+    slong cQ = I->cQ, cR = I->cR, dQ = I->dQ, dR = I->dR;
+    slong cqi = 0, cri = 0;
+
+    if (S->vals == NULL)
+    {
+        slong sl = I->segleaves;
+        S->vals = flint_malloc((nf * sl * L + 1) * sizeof(ulong));
+        S->sQ = flint_malloc((sl * (cQ + cR + dQ + dR) + 1) * sizeof(hyp_fe));
+        S->sR = S->sQ + sl * cQ;
+        S->fQ = S->sR + sl * cR;
+        S->fR = S->fQ + sl * dQ;
+        S->nQ = flint_malloc((4 * sl + 1) * sizeof(uint32_t));
+        S->nR = S->nQ + sl;
+        S->mQ = S->nR + sl;
+        S->mR = S->mQ + sl;
+    }
+
+    S->j0 = j0;
+    S->j1 = j1;
+    memset(S->nQ, 0, 4 * I->segleaves * sizeof(uint32_t));
+
+    for (i = 0; i < nf; i++)
+    {
+        ulong * vi = S->vals + i * K;
+        for (t = 0; t < K; t++)
+        {
+            slong x = (slong) I->u[i] * (k0 + t) + I->v[i];
+            vi[t] = FLINT_UABS(x);
+        }
+    }
+
+    for (pi = 0; pi < I->np; pi++)
+    {
+        ulong p = I->primes[pi], pinv = I->pinv[pi], plim = I->plim[pi];
+        ulong k0p = (ulong) k0 % p, stl = p / L, sto = p % L;
+        const uint32_t * rt = I->roots + pi * nf;
+        int okq = (p <= I->qprune), okr = (p <= I->rprune);
+
+        for (i = 0; i < nf; i++)
+        {
+            ulong * vi = S->vals + i * K;
+            ulong r = rt[i];
+            uint32_t mq = okq ? I->mQ[i] : 0, mr = okr ? I->mR[i] : 0;
+            slong off;
+
+            if (r == HYP_NO_ROOT)
+                continue;
+            t = (slong) ((r >= k0p) ? r - k0p : r + p - k0p);
+            l = t / L;
+            off = t % L;
+            for ( ; t < K; t += p)
+            {
+                ulong x = vi[t];
+                uint64_t e = 0;
+                if (p == 2)
+                {
+                    e = flint_ctz(x);
+                    x >>= e;
+                }
+                else
+                {
+                    do
+                    {
+                        x *= pinv;
+                        e++;
+                    }
+                    while (x * pinv <= plim);
+                }
+                vi[t] = x;
+                if (mq)
+                    _leaf_append(S->sQ + l * cQ, S->nQ + l, (uint32_t) p,
+                        e * mq, cQ);
+                if (mr)
+                    _leaf_append(S->sR + l * cR, S->nR + l, (uint32_t) p,
+                        e * mr, cR);
+                l += stl;
+                off += sto;
+                if (off >= L)
+                {
+                    off -= L;
+                    l++;
+                }
+            }
+        }
+
+        /* content primes among the sieve primes */
+        if (cqi < I->cq.len && I->cq.d[cqi].p == p)
+        {
+            for (l = 0; l < nl; l++)
+                _leaf_append(S->sQ + l * cQ, S->nQ + l, (uint32_t) p,
+                    (uint64_t) I->cq.d[cqi].e * FLINT_MIN(L, K - l * L), cQ);
+            cqi++;
+        }
+        if (cri < I->cr.len && I->cr.d[cri].p == p)
+        {
+            for (l = 0; l < nl; l++)
+                _leaf_append(S->sR + l * cR, S->nR + l, (uint32_t) p,
+                    (uint64_t) I->cr.d[cri].e * FLINT_MIN(L, K - l * L), cR);
+            cri++;
+        }
+    }
+
+    /* content primes beyond the sieve primes */
+    for (c = cqi; c < I->cq.len; c++)
+        for (l = 0; l < nl; l++)
+            _leaf_append(S->sQ + l * cQ, S->nQ + l, I->cq.d[c].p,
+                (uint64_t) I->cq.d[c].e * FLINT_MIN(L, K - l * L), cQ);
+    for (c = cri; c < I->cr.len; c++)
+        for (l = 0; l < nl; l++)
+            _leaf_append(S->sR + l * cR, S->nR + l, I->cr.d[c].p,
+                (uint64_t) I->cr.d[c].e * FLINT_MIN(L, K - l * L), cR);
+
+    /* the cofactors: primes beyond the sieve bound, written branch-free
+       (each value is stored and kept or not; the slots have one to
+       spare): whether a value has one is unpredictable */
+    for (i = 0; i < nf; i++)
+    {
+        const ulong * vi = S->vals + i * K;
+        uint32_t mq = I->mQ[i], mr = I->mR[i];
+        const double * lq = I->lbq + 64 * i, * lr = I->lbr + 64 * i;
+        for (l = 0, t = 0; l < nl; l++)
+        {
+            slong te = FLINT_MIN(t + L, K);
+            if (mq)
+            {
+                hyp_fe * d = S->fQ + l * dQ;
+                uint32_t k = S->mQ[l];
+                slong u;
+                for (u = t; u < te; u++)
+                {
+                    ulong x = vi[u];
+                    d[k].p = (uint32_t) x;
+                    d[k].e = mq | ((uint32_t) _hyp_level_row(I, lq,
+                        (uint32_t) x) << 24);
+                    k += (x > 1) & (x <= I->qprune);
+                }
+                S->mQ[l] = k;
+            }
+            if (mr)
+            {
+                hyp_fe * d = S->fR + l * dR;
+                uint32_t k = S->mR[l];
+                slong u;
+                for (u = t; u < te; u++)
+                {
+                    ulong x = vi[u];
+                    d[k].p = (uint32_t) x;
+                    d[k].e = mr | ((uint32_t) _hyp_level_row(I, lr,
+                        (uint32_t) x) << 24);
+                    k += (x > 1) & (x <= I->rprune);
+                }
+                S->mR[l] = k;
+            }
+            t = te;
+        }
+    }
+}
+
+/* Deferral.  At a node of m terms, a prime of an R entry of the left
+   child and a Q entry of the right child divides u_Q u_R d + w for some
+   d < m (or is a content prime), so the entries of a prime p cannot
+   cancel below the first level lev with cmul 2^lev L + cadd >= p.  The
+   leaf lists keep the entries that can cancel at level 1 (most of the
+   small primes); the others (most of the cofactors) wait in per-level
+   buffers, as (leaf, p, e), and join the lists of the two children of
+   the node of their level just before its removal.  Without this, the
+   cofactors would be carried through every merge from the leaves up,
+   which dominated the cost of the lists. */
+typedef struct
+{
+    uint32_t * d;               /* triples (leaf, p, e) */
+    slong len, alloc;
+}
+hyp_pend;
+
+typedef struct
+{
+    hyp_sieve_seg seg;
+    hyp_pend * pq, * pr;        /* per level, 0 <= lev <= nlev - 1 */
+    slong nlev;
+    slong lc;                   /* entries for levels >= lc are discarded */
+    hyp_flist scr, ins;         /* scratch lists */
+    hyp_flist pl[4];            /* a merge's pending lists */
+}
+hyp_thread;
+
+static void
+pend_push(hyp_pend * P, uint32_t leaf, uint32_t p, uint32_t e)
+{
+    if (P->len == P->alloc)
+    {
+        P->alloc = FLINT_MAX(16, 2 * P->alloc);
+        P->d = flint_realloc(P->d, 3 * P->alloc * sizeof(uint32_t));
+    }
+    P->d[3 * P->len] = leaf;
+    P->d[3 * P->len + 1] = p;
+    P->d[3 * P->len + 2] = e;
+    P->len++;
+}
+
+static void
+pend_append(hyp_pend * P, const hyp_pend * Q)
+{
+    if (Q->len == 0)
+        return;
+    if (P->len + Q->len > P->alloc)
+    {
+        P->alloc = FLINT_MAX(P->len + Q->len, 2 * P->alloc);
+        P->d = flint_realloc(P->d, 3 * P->alloc * sizeof(uint32_t));
+    }
+    memcpy(P->d + 3 * P->len, Q->d, 3 * Q->len * sizeof(uint32_t));
+    P->len += Q->len;
+}
+
+static void
+pend_free(hyp_pend * P)
+{
+    flint_free(P->d);
+    P->d = NULL;
+    P->len = P->alloc = 0;
+}
+
+static void
+thread_init(hyp_thread * t, slong nlev)
+{
+    slong i;
+    seg_init(&t->seg);
+    t->nlev = nlev;
+    t->lc = nlev;
+    t->pq = flint_calloc(2 * nlev, sizeof(hyp_pend));
+    t->pr = t->pq + nlev;
+    flist_init(&t->scr);
+    flist_init(&t->ins);
+    for (i = 0; i < 4; i++)
+        flist_init(t->pl + i);
+}
+
+static void
+thread_clear(hyp_thread * t)
+{
+    slong i;
+    seg_clear(&t->seg);
+    for (i = 0; i < 2 * t->nlev; i++)
+        pend_free(t->pq + i);
+    flint_free(t->pq);
+    flist_clear(&t->scr);
+    flist_clear(&t->ins);
+    for (i = 0; i < 4; i++)
+        flist_clear(t->pl + i);
+}
+
+/* lower the cutoff: removal stopped paying below lc */
+static void
+thread_cut(hyp_thread * t, slong lc)
+{
+    slong i;
+    if (lc >= t->lc)
+        return;
+    for (i = lc; i < t->nlev; i++)
+    {
+        pend_free(t->pq + i);
+        pend_free(t->pr + i);
+    }
+    t->lc = lc;
+}
+
+/* after a job's subtree below level lev: its entries for the levels
+   >= lev belong to the ancestors (and its cutoff applies to them) */
+static void
+thread_join(hyp_thread * t, hyp_thread * u, slong lev)
+{
+    slong i;
+    thread_cut(t, u->lc);
+    for (i = lev; i < t->lc; i++)
+    {
+        pend_append(t->pq + i, u->pq + i);
+        pend_append(t->pr + i, u->pr + i);
+    }
+}
+
+/* the largest prime that can cancel at a node of 2^lev leaves */
+static inline double
+_hyp_lev_bound(const hyp_sieve_info * I, slong lev)
+{
+    return I->lb[FLINT_MIN(lev, 62)];
+}
+
+/* the first level >= 1 at which entries of p can cancel, by the bounds
+   lb of their factor (a row of lbq or lbr) or of any factor (lb of I);
+   HYP_NEVER when none applies (no factor of the other side) */
+#define HYP_NEVER 63
+/* the last slot of a row of bounds holds 1 / (lb[1] - lb[0]) */
+#define HYP_LB_INV 63
+
+static inline slong
+_hyp_level_row(const hyp_sieve_info * I, const double * lb, uint32_t p)
+{
+    slong lev;
+    double x = (double) p, A, y;
+    if (x <= I->cmaxp || x <= lb[1])
+        return 1;
+    if (!(x <= lb[HYP_NEVER - 1]))
+        return HYP_NEVER;
+    /* lb[t] = A 2^t + w: the least t with 2^t >= (x - w) / A, from the
+       exponent of the quotient, then corrected by a step at most */
+    A = lb[1] - lb[0];
+    y = (x - (lb[0] - A)) * lb[HYP_LB_INV];
+    {
+        /* the exponent of y >= 1 (x > lb[1]), read off its bits rather
+           than by ilogb, a library call */
+        union { double d; uint64_t u; } c;
+        c.d = y;
+        lev = (slong) ((c.u >> 52) & 0x7ff) - 1023 + 1;
+    }
+    lev = FLINT_MAX(lev, 2);
+    while (lev > 2 && x <= lb[lev - 1])
+        lev--;
+    while (lev < HYP_NEVER && x > lb[lev])
+        lev++;
+    return lev;
+}
+
+static inline slong
+_hyp_level(const hyp_sieve_info * I, uint32_t p)
+{
+    if (I->nobound)
+        return 1;
+    return _hyp_level_row(I, I->lb, p);
+}
+
+static int
+_fe_cmp(const void * a, const void * b)
+{
+    uint32_t x = ((const hyp_fe *) a)->p, y = ((const hyp_fe *) b)->p;
+    return (x > y) - (x < y);
+}
+
+/* the lists of leaf j, a node at level lev (0 unless it ends a range
+   short of its level): the entries of the levels <= max(lev, 1) in the
+   list, the others deferred */
+static void
+_seg_take(hyp_flist * l, hyp_pend * pend, hyp_thread * ts,
+    const hyp_sieve_info * I, const hyp_fe * src, slong n,
+    const hyp_fe * cof, slong nc, slong j, slong lev)
+{
+    slong i, k, lv = FLINT_MAX(lev, 1);
+    double b = I->nobound ? 1e300 : FLINT_MAX(_hyp_lev_bound(I, lv),
+        I->cmaxp);
+    hyp_flist * x = &ts->ins;
+
+    /* the active prefix of the sorted list */
+    for (k = 0; k < n && (double) src[k].p <= b; k++)
+        ;
+    flist_fit(l, k);
+    memcpy(l->d, src, k * sizeof(hyp_fe));
+    l->len = k;
+    l->ok = 1;
+
+    for (i = k; i < n; i++)
+    {
+        slong v = _hyp_level(I, src[i].p);
+        if (v < ts->lc)
+            pend_push(pend + v, (uint32_t) j, src[i].p, src[i].e);
+    }
+
+    /* the cofactors: deferred, or (a leaf above level 0) sorted into the
+       list */
+    x->len = 0;
+    for (i = 0; i < nc; i++)
+    {
+        slong v = cof[i].e >> 24;
+        uint32_t e = cof[i].e & 0xffffff;
+        if (v <= lev)
+        {
+            flist_fit(x, x->len + 1);
+            x->d[x->len].p = cof[i].p;
+            x->d[x->len++].e = e;
+        }
+        else if (v < ts->lc)
+            pend_push(pend + v, (uint32_t) j, cof[i].p, e);
+    }
+    if (x->len != 0)
+    {
+        slong a, w;
+        qsort(x->d, x->len, sizeof(hyp_fe), _fe_cmp);
+        for (a = 1, w = 1; a < x->len; a++)
+        {
+            if (x->d[a].p == x->d[w - 1].p)
+                x->d[w - 1].e = _esat((uint64_t) x->d[w - 1].e + x->d[a].e);
+            else
+                x->d[w++] = x->d[a];
+        }
+        x->len = w;
+        x->ok = 1;
+        flist_add(l, x, &ts->scr);
+    }
+}
+
+static void
+seg_get(hyp_flist * fq, hyp_flist * fr, int need_r, hyp_thread * ts,
+    const hyp_sieve_info * I, slong j, slong lev)
+{
+    hyp_sieve_seg * S = &ts->seg;
+    slong l;
+
+    if (j < S->j0 || j >= S->j1)
+        seg_fill(S, I, j);
+
+    l = j - S->j0;
+    _seg_take(fq, ts->pq, ts, I, S->sQ + l * I->cQ, S->nQ[l],
+        S->fQ + l * I->dQ, S->mQ[l], j, lev);
+
+    if (need_r)
+        _seg_take(fr, ts->pr, ts, I, S->sR + l * I->cR, S->nR[l],
+            S->fR + l * I->dR, S->mR[l], j, lev);
+    else
+    {
+        fr->ok = 0;
+        fr->len = 0;
+    }
+}
+
+/* the deferred entries of this level (leaves of the node, split at leaf
+   jm) as sorted lists for the left and right child */
+static void
+_pend_split(hyp_flist * left, hyp_flist * right, hyp_pend * P, slong jm)
+{
+    slong i;
+
+    left->len = right->len = 0;
+    left->ok = right->ok = 1;
+    if (P->len == 0)
+        return;
+
+    _ev_radix_sort_p(P->d, 0, P->len);
+    flist_fit(left, P->len);
+    flist_fit(right, P->len);
+    for (i = 0; i < P->len; i++)
+    {
+        hyp_flist * t = ((slong) P->d[3 * i] >= jm) ? right : left;
+        uint32_t p = P->d[3 * i + 1], e = P->d[3 * i + 2];
+        if (t->len > 0 && t->d[t->len - 1].p == p)
+            t->d[t->len - 1].e = _esat((uint64_t) t->d[t->len - 1].e + e);
+        else
+        {
+            t->d[t->len].p = p;
+            t->d[t->len++].e = e;
+        }
+    }
+    P->len = 0;
+}
+
+/* the pending lists of a merge: Q left, Q right, R left, R right */
+static void
+hyp_pending(hyp_flist * pl, slong lev, slong jm, hyp_thread * ts)
+{
+    if (lev >= ts->nlev)
+    {
+        pl[0].len = pl[1].len = pl[2].len = pl[3].len = 0;
+        pl[0].ok = pl[1].ok = pl[2].ok = pl[3].ok = 1;
+        return;
+    }
+    _pend_split(pl + 0, pl + 1, ts->pq + lev, jm);
+    _pend_split(pl + 2, pl + 3, ts->pr + lev, jm);
+}
+
+/* partial factorization of |c| into l (sorted): complete when c is a
+   word, else trial division by the sieve primes */
+static void
+_content_factor(hyp_flist * l, const fmpz_t c, const hyp_sieve_info * I)
+{
+    slong i;
+
+    l->len = 0;
+    l->ok = 1;
+
+    if (fmpz_abs_fits_ui(c))
+    {
+        n_factor_t fac;
+        ulong a;
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_abs(t, c);
+        a = fmpz_get_ui(t);
+        fmpz_clear(t);
+        if (a <= 1)
+            return;
+        n_factor_init(&fac);
+        n_factor(&fac, a, 0);
+        flist_fit(l, fac.num);
+        for (i = 0; i < fac.num; i++)
+            if (fac.p[i] <= UINT32_MAX)
+            {
+                l->d[l->len].p = (uint32_t) fac.p[i];
+                l->d[l->len++].e = (uint32_t) fac.exp[i];
+            }
+    }
+    else
+    {
+        fmpz_t t, p;
+        fmpz_init(t);
+        fmpz_init(p);
+        fmpz_abs(t, c);
+        for (i = 0; i < I->np; i++)
+        {
+            slong e;
+            fmpz_set_ui(p, I->primes[i]);
+            e = fmpz_remove(t, t, p);
+            if (e > 0)
+            {
+                flist_fit(l, l->len + 1);
+                l->d[l->len].p = I->primes[i];
+                l->d[l->len++].e = _esat(e);
+            }
+        }
+        fmpz_clear(t);
+        fmpz_clear(p);
+    }
+}
+
+static void
+sieve_info_clear(hyp_sieve_info * I)
+{
+    flint_free(I->lbq);
+    flint_free(I->u);
+    flint_free(I->primes);
+    flist_clear(&I->cq);
+    flist_clear(&I->cr);
+}
+
+/* The automatic choice.  The removal can take out at most the tracked
+   bits of R per term (and of Q), and pays in proportion to their share
+   r of the bits Q gains per term, against an overhead per term (the
+   sieve and the lists) that only the larger precisions amortize.  The
+   measured break-even: about 3-5 10^5 digits for zeta(3) (r = 0.85)
+   and Catalan's constant (0.91), 3-6 10^5 for log 2 (0.75), 1-1.5 10^6
+   for pi (0.52); Zuniga's log series (about 0.3) were not seen to gain
+   below 2 10^6. */
+static slong
+_hyp_gcd_min_limbs(double r)
+{
+    if (r >= 0.8)
+        return 24576;
+    if (r >= 0.65)
+        return 32768;
+    if (r >= 0.45)
+        return 98304;
+    return WORD_MAX;
+}
+
+static double
+_log2_abs_fmpz(const fmpz_t c)
+{
+    slong e;
+    double m;
+    if (fmpz_is_zero(c))
+        return 0.0;
+    m = fmpz_get_d_2exp(&e, c);
+    return log2(fabs(m)) + (double) e;
+}
+
+/* the share r of the bits of Q per term (at the middle term of N) that
+   the tracked bits of R and Q could cancel: their linear factors, and
+   their contents when inc_cr resp. inc_cq */
+static double
+_hyp_gcd_share(const fmpz * Q, slong Qlen, const fmpz * R, slong Rlen,
+    slong N, int inc_cq, int inc_cr)
+{
+    fmpz_poly_t f;
+    fmpz_poly_factor_t fac;
+    fmpz_t kk, val;
+    double km = (double) FLINT_MAX(N / 2, 1), b[2] = { 0.0, 0.0 }, qt;
+    slong i, j;
+
+    if (Rlen == 0)
+        return 0.0;
+
+    fmpz_poly_init(f);
+    fmpz_init_set_ui(kk, (ulong) km);
+    fmpz_init(val);
+    _fmpz_poly_evaluate_fmpz(val, Q, Qlen, kk);
+    qt = _log2_abs_fmpz(val);
+
+    for (j = 0; j < 2; j++)
+    {
+        const fmpz * F = j ? R : Q;
+        slong len = j ? Rlen : Qlen;
+        fmpz_poly_factor_init(fac);
+        fmpz_poly_fit_length(f, len);
+        _fmpz_vec_set(f->coeffs, F, len);
+        _fmpz_poly_set_length(f, len);
+        _fmpz_poly_normalise(f);
+        fmpz_poly_factor(fac, f);
+        for (i = 0; i < fac->num; i++)
+            if (fac->p[i].length == 2)
+            {
+                fmpz_mul_ui(val, fac->p[i].coeffs + 1, (ulong) km);
+                fmpz_add(val, val, fac->p[i].coeffs);
+                b[j] += fac->exp[i] * _log2_abs_fmpz(val);
+            }
+        if (j ? inc_cr : inc_cq)
+            b[j] += _log2_abs_fmpz(&fac->c);
+        fmpz_poly_factor_clear(fac);
+    }
+
+    fmpz_poly_clear(f);
+    fmpz_clear(kk);
+    fmpz_clear(val);
+    return (qt > 0.0) ? FLINT_MIN(b[0], b[1]) / qt : 0.0;
+}
+
+/* set up the sieve for Q and R (as tracked: the contents of Q resp. R
+   included when inc_cq resp. inc_cr); returns 0 when there is nothing
+   to gain or the values exceed the supported range */
+static int
+sieve_info_init(hyp_sieve_info * I, const fmpz * Q, slong Qlen,
+    const fmpz * R, slong Rlen, int inc_cq, int inc_cr, slong N, slong L)
+{
+    fmpz_poly_t f;
+    fmpz_poly_factor_t fq, fr;
+    slong i, j, nf, B, cap;
+    double M = 0.0;
+    int ok = 0;
+    fmpz_t cq, cr;
+
+    memset(I, 0, sizeof(hyp_sieve_info));
+    flist_init(&I->cq);
+    flist_init(&I->cr);
+    if (Rlen == 0)
+        return 0;
+
+    fmpz_poly_factor_init(fq);
+    fmpz_poly_factor_init(fr);
+    fmpz_poly_init(f);
+    fmpz_init(cq);
+    fmpz_init(cr);
+
+    fmpz_poly_fit_length(f, Qlen);
+    _fmpz_vec_set(f->coeffs, Q, Qlen);
+    _fmpz_poly_set_length(f, Qlen);
+    fmpz_poly_factor(fq, f);
+    fmpz_poly_fit_length(f, Rlen);
+    _fmpz_vec_set(f->coeffs, R, Rlen);
+    _fmpz_poly_set_length(f, Rlen);
+    _fmpz_poly_normalise(f);
+    fmpz_poly_factor(fr, f);
+    fmpz_set(cq, &fq->c);
+    fmpz_set(cr, &fr->c);
+
+    /* the distinct linear factors */
+    cap = fq->num + fr->num;
+    I->u = flint_malloc((cap + 1) * (2 * sizeof(ulong) + 2 * sizeof(uint32_t)));
+    I->v = (slong *) (I->u + cap + 1);
+    I->mQ = (uint32_t *) (I->v + cap + 1);
+    I->mR = I->mQ + cap + 1;
+    nf = 0;
+    for (j = 0; j < 2; j++)
+    {
+        fmpz_poly_factor_struct * F = j ? fr : fq;
+        for (i = 0; i < F->num; i++)
+        {
+            const fmpz * c = F->p[i].coeffs;
+            slong t;
+            if (F->p[i].length != 2)
+                continue;
+            /* primitive, positive leading coefficient */
+            if (!fmpz_fits_si(c + 1) || !fmpz_fits_si(c)
+                || fmpz_bits(c + 1) > FLINT_BITS - 4
+                || fmpz_bits(c) > FLINT_BITS - 4)
+                continue;
+            for (t = 0; t < nf; t++)
+                if (I->u[t] == fmpz_get_ui(c + 1)
+                    && I->v[t] == fmpz_get_si(c))
+                    break;
+            if (t == nf)
+            {
+                I->u[nf] = fmpz_get_ui(c + 1);
+                I->v[nf] = fmpz_get_si(c);
+                I->mQ[nf] = I->mR[nf] = 0;
+                nf++;
+            }
+            if (j)
+                I->mR[t] += F->exp[i];
+            else
+                I->mQ[t] += F->exp[i];
+        }
+    }
+    I->nf = nf;
+
+    /* the largest value, and no zero values (a terminating series) */
+    for (i = 0; i < nf; i++)
+    {
+        double m = fabs((double) I->u[i] * (double) N + (double) I->v[i]);
+        M = FLINT_MAX(M, m);
+        M = FLINT_MAX(M, fabs((double) I->u[i] + (double) I->v[i]));
+        if (I->v[i] < 0 && (ulong) (-I->v[i]) % I->u[i] == 0
+            && (ulong) (-I->v[i]) / I->u[i] <= (ulong) N)
+            goto cleanup;
+    }
+    if (M > 0x1p60)
+        goto cleanup;
+
+    /* the matching bound and the pruning thresholds */
+    {
+        double qmax = 0.0, rmax = 0.0;
+        I->cmul = I->cadd = 0.0;
+        I->nobound = 0;
+        for (i = 0; i < nf; i++)
+        {
+            double m = FLINT_MAX(fabs((double) I->u[i] * (double) N
+                + (double) I->v[i]), fabs((double) I->u[i]
+                + (double) I->v[i]));
+            if (I->mQ[i])
+                qmax = FLINT_MAX(qmax, m);
+            if (I->mR[i])
+                rmax = FLINT_MAX(rmax, m);
+        }
+        for (i = 0; i < nf; i++)
+            for (j = 0; j < nf; j++)
+                if (I->mQ[i] && I->mR[j])
+                {
+                    /* u_Q u_R d + (u_R v_Q - u_Q v_R), Q factor i, R
+                       factor j, d = k - j >= 1 */
+                    double a = (double) I->u[i] * (double) I->u[j];
+                    double w = (double) I->u[j] * (double) I->v[i]
+                        - (double) I->u[i] * (double) I->v[j];
+                    if (w <= -a && fmod(-w, a) == 0.0)
+                        I->nobound = 1;
+                    I->cmul = FLINT_MAX(I->cmul, a);
+                    I->cadd = FLINT_MAX(I->cadd, fabs(w));
+                }
+        /* entries are kept below 2^32 */
+        I->qprune = (ulong) FLINT_MIN(rmax, (double) UINT32_MAX);
+        I->rprune = (ulong) FLINT_MIN(qmax, (double) UINT32_MAX);
+    }
+
+    /* multiplicities are packed with a level in the cofactor entries */
+    for (i = 0; i < nf; i++)
+        if (I->mQ[i] >= (1u << 24) || I->mR[i] >= (1u << 24))
+            goto cleanup;
+
+    /* something to remove: a tracked factor on both sides */
+    {
+        int hq = 0, hr = 0;
+        for (i = 0; i < nf; i++)
+        {
+            hq |= (I->mQ[i] != 0);
+            hr |= (I->mR[i] != 0);
+        }
+        hq |= inc_cq && !fmpz_is_pm1(cq);
+        hr |= inc_cr && !fmpz_is_pm1(cr);
+        if (!hq || !hr)
+            goto cleanup;
+    }
+
+    /* the primes up to sqrt(M), with their roots; at most max(4096, 16 N)
+       and 2^24 (factors with huge coefficients): a cofactor may then be
+       composite, which only makes it an opaque label (entries are
+       disjoint parts of the values, so equal labels still divide both
+       sides, and the bounds on shared divisors hold for any of them) */
+    B = (slong) n_sqrt((ulong) M) + 1;
+    B = FLINT_MIN(B, FLINT_MAX(4096, 16 * N));
+    B = FLINT_MIN(B, WORD(1) << 24);
+    {
+        char * comp = flint_calloc(B + 2, 1);
+        slong np = 0, pw;
+        for (i = 2; i <= B; i++)
+            if (!comp[i])
+            {
+                np++;
+                for (j = i * i; j <= B; j += i)
+                    comp[j] = 1;
+            }
+        /* primes (uint32), then pinv, plim (words), then the roots */
+        pw = (np * sizeof(uint32_t) + sizeof(ulong) - 1)
+            / sizeof(ulong);
+        I->np = np;
+        I->primes = flint_malloc((pw + 2 * np) * sizeof(ulong)
+            + np * nf * sizeof(uint32_t) + 1);
+        I->pinv = (ulong *) I->primes + pw;
+        I->plim = I->pinv + np;
+        I->roots = (uint32_t *) (I->plim + np);
+        np = 0;
+        for (i = 2; i <= B; i++)
+            if (!comp[i])
+                I->primes[np++] = (uint32_t) i;
+        flint_free(comp);
+    }
+    for (i = 0; i < I->np; i++)
+    {
+        ulong p = I->primes[i], inv = 1;
+        /* p^-1 mod 2^FLINT_BITS by Newton (p odd) */
+        if (p != 2)
+        {
+            inv = p;
+            for (j = 0; j < 6; j++)
+                inv *= 2 - p * inv;
+        }
+        I->pinv[i] = inv;
+        I->plim[i] = UWORD_MAX / p;
+        for (j = 0; j < nf; j++)
+        {
+            ulong um = I->u[j] % p, vm;
+            if (um == 0)
+            {
+                I->roots[i * nf + j] = HYP_NO_ROOT;
+                continue;
+            }
+            vm = (I->v[j] >= 0) ? (ulong) I->v[j] % p
+                : (p - (ulong) (-I->v[j]) % p) % p;
+            /* root of u k + v: k = -v / u mod p */
+            I->roots[i * nf + j] = (uint32_t) n_mulmod2((p - vm) % p,
+                n_invmod(um, p), p);
+        }
+    }
+
+    if (inc_cq)
+        _content_factor(&I->cq, cq, I);
+    else
+        I->cq.ok = 1;
+    if (inc_cr)
+        _content_factor(&I->cr, cr, I);
+    else
+        I->cr.ok = 1;
+
+    /* content primes cancel at any distance */
+    I->cmaxp = 0.0;
+    if (I->cq.len)
+    {
+        I->cmaxp = FLINT_MAX(I->cmaxp, (double) I->cq.d[I->cq.len - 1].p);
+        I->rprune = FLINT_MAX(I->rprune, I->cq.d[I->cq.len - 1].p);
+    }
+    if (I->cr.len)
+    {
+        I->cmaxp = FLINT_MAX(I->cmaxp, (double) I->cr.d[I->cr.len - 1].p);
+        I->qprune = FLINT_MAX(I->qprune, I->cr.d[I->cr.len - 1].p);
+    }
+
+    I->L = L;
+    I->N = N;
+    I->nleaves = (N + L - 1) / L;
+    /* Per leaf: the distinct sieve primes, about E = sum over the primes
+       p of 1 - (1 - min(1, L/p))^f (f the factors with a root mod p),
+       given 1.5 E + 64 slots (at most every sieve prime), the content
+       primes, and one cofactor per value.  Slots sized for every sieve
+       prime would make a window several times larger than the lists
+       it holds (and shorter, for a given memory). */
+    {
+        slong nq = 0, nr = 0, per, want, t;
+        double eq = 0.0, er = 0.0;
+        for (i = 0; i < nf; i++)
+        {
+            nq += (I->mQ[i] != 0);
+            nr += (I->mR[i] != 0);
+        }
+        for (t = 0; t < I->np; t++)
+        {
+            double x = FLINT_MIN(1.0, (double) L / I->primes[t]);
+            slong fq = 0, fr = 0;
+            for (i = 0; i < nf; i++)
+                if (I->roots[t * nf + i] != HYP_NO_ROOT)
+                {
+                    fq += (I->mQ[i] != 0);
+                    fr += (I->mR[i] != 0);
+                }
+            eq += 1.0 - pow(1.0 - x, (double) fq);
+            er += 1.0 - pow(1.0 - x, (double) fr);
+        }
+        I->cQ = FLINT_MIN(I->np, (slong) (1.5 * eq) + 64) + I->cq.len + 1;
+        I->cR = FLINT_MIN(I->np, (slong) (1.5 * er) + 64) + I->cr.len + 1;
+        I->dQ = L * nq + 1;
+        I->dR = L * nr + 1;
+        /* windows long enough that the roots (np nf per window) cost a
+           few operations per term, within about 4 MB (1 MB was measured
+           10-20% slower at 10^8 digits, 8 MB no faster) */
+        per = (I->cQ + I->cR + I->dQ + I->dR) * sizeof(hyp_fe)
+            + nf * L * sizeof(ulong) + 4 * sizeof(uint32_t);
+        want = FLINT_MAX(64 * L, I->np * nf / 4);
+        I->segleaves = (want + L - 1) / L;
+        I->segleaves = FLINT_MIN(I->segleaves, (WORD(1) << 22) / per);
+        I->segleaves = FLINT_MAX(I->segleaves, 8);
+    }
+    for (i = 0; i < 63; i++)
+        I->lb[i] = I->cmul * ldexp((double) L, (int) i) + I->cadd;
+    I->lb[63] = 1.0 / FLINT_MAX(I->lb[1] - I->lb[0], 1e-300);
+
+    /* per factor: against the factors of the other side */
+    I->lbq = flint_malloc(2 * 64 * (nf + 1) * sizeof(double));
+    I->lbr = I->lbq + 64 * (nf + 1);
+    for (i = 0; i < nf; i++)
+    {
+        double aq = 0.0, wq = 0.0, ar = 0.0, wr = 0.0;
+        int nbq = 0, nbr = 0;
+        slong t;
+        for (j = 0; j < nf; j++)
+        {
+            double a = (double) I->u[i] * (double) I->u[j];
+            if (I->mQ[i] && I->mR[j])
+            {
+                double w = (double) I->u[j] * (double) I->v[i]
+                    - (double) I->u[i] * (double) I->v[j];
+                nbq |= (w <= -a && fmod(-w, a) == 0.0);
+                aq = FLINT_MAX(aq, a);
+                wq = FLINT_MAX(wq, fabs(w));
+            }
+            if (I->mR[i] && I->mQ[j])
+            {
+                double w = (double) I->u[i] * (double) I->v[j]
+                    - (double) I->u[j] * (double) I->v[i];
+                nbr |= (w <= -a && fmod(-w, a) == 0.0);
+                ar = FLINT_MAX(ar, a);
+                wr = FLINT_MAX(wr, fabs(w));
+            }
+        }
+        for (t = 0; t < 63; t++)
+        {
+            I->lbq[64 * i + t] = nbq ? 1e300
+                : aq * ldexp((double) L, (int) t) + wq;
+            I->lbr[64 * i + t] = nbr ? 1e300
+                : ar * ldexp((double) L, (int) t) + wr;
+        }
+        I->lbq[64 * i + 63] = 1.0 / FLINT_MAX(aq * L, 1e-300);
+        I->lbr[64 * i + 63] = 1.0 / FLINT_MAX(ar * L, 1e-300);
+    }
+    ok = 1;
+
+cleanup:
+    if (!ok)
+    {
+        sieve_info_clear(I);
+        memset(I, 0, sizeof(hyp_sieve_info));
+    }
+    fmpz_poly_factor_clear(fq);
+    fmpz_poly_factor_clear(fr);
+    fmpz_poly_clear(f);
+    fmpz_clear(cq);
+    fmpz_clear(cr);
+    return ok;
+}
+
 /* ---- the series ---- */
 
 typedef struct
@@ -426,6 +2016,10 @@ typedef struct
     mp_real_struct * cRpow;
     mp_real_struct * tmp;     /* 5 per level */
     double tbits;           /* estimated bits per term of T, Q */
+    int gcd;                /* content removal */
+    const hyp_sieve_info * si;
+    hyp_thread * ts;        /* this thread's sieve window and buffers */
+    hyp_flist * ftmp;       /* 3 per level: fq2, fr2, g */
 }
 hyp_struct;
 
@@ -814,10 +2408,183 @@ merge(mp_real_t T, mp_real_t Q, mp_real_t R, mp_real_t T2, mp_real_t Q2, mp_real
     }
 }
 
-static void bsplit_pow2(mp_real_t T, mp_real_t Q, mp_real_t R, slong a0, slong k,
-    slong lev, int need_r, const hyp_struct * H);
-static void bsplit_range(mp_real_t T, mp_real_t Q, mp_real_t R, slong a, slong b,
-    slong lev, int need_r, const hyp_struct * H);
+/* the content removal at a node: g = gcd(R1, Q2) read off the lists,
+   R1 and Q2 divided by it (T = T1 Q2 + R1 T2, Q = Q1 Q2 and R = R1 R2
+   all have the factor g, and the node only represents the ratios T/Q,
+   R/Q), when both are exact integers */
+typedef struct
+{
+    mp_real_struct * x;
+    nn_srcptr G;
+    slong gn;
+    const flint_mpn_divexact_preinv_struct * pre;
+}
+hyp_div_struct;
+
+static void
+_hyp_div_job(void * arg)
+{
+    hyp_div_struct * D = (hyp_div_struct *) arg;
+    _mp_real_divexact_mpn_pre(D->x, D->G, D->gn, D->pre);
+}
+
+/* from this size of G, its 2-adic inverse is computed once for both
+   divisions (measured 10-30% faster beyond a few thousand limbs, no
+   gain below) */
+#define HYP_PREINV_LIMBS 1000
+
+/* The removal pays when the bits it takes out of the products of this
+   node and its h ancestors (about four products each, with one operand
+   g bits shorter) exceed the cost of the two exact divisions.  A 2-adic
+   division costs in proportion to its quotient (n - g limbs for n by g;
+   near the root R1 is often nearly all g, and its division nearly
+   free), plus an inverse of about the divisor's size, and per limb
+   about 0.15-0.4 products of the same size below a few hundred limbs
+   (a short divisor makes it nearly linear) and 1.5-2.4 beyond a few
+   thousand (measured); rho is that, doubled (a product of two n-limb
+   operands counted as 2n), times 1.5, the best of the factors tried
+   (1, 1.5, 2, 2.5) at 10^5 to 3 10^6 digits.  Counting the quotients
+   rather than the dividends was measured 2-3% faster at 10^7 digits.
+   Returns 0 when the removal does not pay here, and the lists of the
+   node can then be dropped: the ancestors have larger operands and
+   fewer levels above. */
+static int
+_hyp_remove_pays(double gbits, slong qn, slong rn, slong h)
+{
+    double gl = gbits / FLINT_BITS;
+    double q = FLINT_MAX((double) qn - gl, 0.0);
+    double r = FLINT_MAX((double) rn - gl, 0.0);
+    double n = FLINT_MAX(q, r), rho;
+
+    if (n < 64)
+        rho = 0.45;
+    else if (n < 512)
+        rho = 0.9;
+    else if (n < 2048)
+        rho = 2.25;
+    else
+        rho = 4.5;
+
+    return gbits * 4.0 * (double) (h + 1)
+        >= rho * (double) FLINT_BITS * (q + r + gl);
+}
+
+static int
+hyp_remove(mp_real_t R1, mp_real_t Q2, hyp_flist * fr1, hyp_flist * fq2,
+    hyp_flist * pl, hyp_flist * g, slong h, slong terms,
+    const hyp_sieve_info * I, int par)
+{
+    nn_ptr G;
+    slong gn;
+    ulong sbuf[HYP_SMALL_G];
+    double gb;
+
+    if (!fr1->ok || !fq2->ok || !_mp_real_is_exact_int(R1)
+        || !_mp_real_is_exact_int(Q2))
+        return 0;
+    if (fr1->len + pl[2].len == 0 || fq2->len + pl[1].len == 0)
+        return 1;
+
+    /* only primes up to the bound for this node can be shared */
+    {
+        double b = I->nobound ? (double) UINT32_MAX
+            : FLINT_MAX(I->cmul * (double) terms + I->cadd, I->cmaxp);
+        flist_gcd_remove(g, fr1, pl + 2, fq2, pl + 1,
+            (ulong) FLINT_MIN(b, (double) UINT32_MAX));
+    }
+    if (g->len == 0)
+        return 1;
+
+    gb = flist_bits(g);
+    if (!_hyp_remove_pays(gb, Q2->size, R1->size, h))
+        return 0;
+
+    gn = flist_expand(&G, g, sbuf);
+    {
+        flint_mpn_divexact_preinv_t pre;
+        const flint_mpn_divexact_preinv_struct * pp = NULL;
+        if (gn >= HYP_PREINV_LIMBS)
+        {
+            flint_mpn_divexact_preinv_init(pre, G, gn);
+            pp = pre;
+        }
+        if (par)
+        {
+            hyp_div_struct A, B;
+            A.x = R1; A.G = G; A.gn = gn; A.pre = pp;
+            B.x = Q2; B.G = G; B.gn = gn; B.pre = pp;
+            _mp_real_parallel_pair(_hyp_div_job, &A, _hyp_div_job, &B);
+        }
+        else
+        {
+            _mp_real_divexact_mpn_pre(R1, G, gn, pp);
+            _mp_real_divexact_mpn_pre(Q2, G, gn, pp);
+        }
+        if (pp != NULL)
+            flint_mpn_divexact_preinv_clear(pre);
+    }
+    if (G != sbuf)
+        flint_free(G);
+    return 1;
+}
+
+static void
+_flist_drop(hyp_flist * l)
+{
+    flist_clear(l);
+}
+
+/* the lists of the merged node (Q = Q1 Q2, R = R1 R2), dropped when the
+   values have become inexact; the right child's lists are emptied */
+static void
+hyp_lists_merge(hyp_flist * FQ, hyp_flist * FR, hyp_flist * fq2,
+    hyp_flist * fr2, hyp_flist * pl, const mp_real_t Q, const mp_real_t R,
+    int need_r, hyp_flist * scr)
+{
+    /* the pending lists are short: pl[0] + pl[1] (resp. pl[2] + pl[3])
+       first, then one pass over the long lists */
+    if (_mp_real_is_exact_int(Q) && FQ->ok && fq2->ok)
+    {
+        flist_add(pl + 0, pl + 1, scr);
+        flist_add3(FQ, fq2, pl + 0, scr);
+    }
+    else
+        _flist_drop(FQ);
+
+    if (need_r && _mp_real_is_exact_int(R) && FR->ok && fr2->ok)
+    {
+        flist_add(pl + 2, pl + 3, scr);
+        flist_add3(FR, fr2, pl + 2, scr);
+    }
+    else
+        _flist_drop(FR);
+
+    fq2->len = 0;
+    fq2->ok = 0;
+    fr2->len = 0;
+    fr2->ok = 0;
+}
+
+/* the removal stops at this node (it does not pay, or the values are no
+   longer exact): the lists are dropped here and above, and the entries
+   deferred to the levels above are discarded */
+static void
+hyp_stop(hyp_flist * FQ, hyp_flist * FR, hyp_flist * f2, slong lev,
+    hyp_thread * ts)
+{
+    _flist_drop(FQ);
+    _flist_drop(FR);
+    _flist_drop(f2);
+    _flist_drop(f2 + 1);
+    thread_cut(ts, lev + 1);
+}
+
+static void bsplit_pow2(mp_real_t T, mp_real_t Q, mp_real_t R, hyp_flist * FQ,
+    hyp_flist * FR, slong a0, slong k, slong lev, int need_r,
+    const hyp_struct * H);
+static void bsplit_range(mp_real_t T, mp_real_t Q, mp_real_t R, hyp_flist * FQ,
+    hyp_flist * FR, slong a, slong b, slong lev, int need_r,
+    const hyp_struct * H);
 
 /* a subtree as a job for _mp_real_parallel_pair; with own set it runs on
    private leaf buffers and level temporaries (the shared H only
@@ -826,9 +2593,11 @@ static void bsplit_range(mp_real_t T, mp_real_t Q, mp_real_t R, slong a, slong b
 typedef struct
 {
     mp_real_struct * T, * Q, * R;
+    hyp_flist * FQ, * FR;
     slong a, b, lev;
     int need_r, pow2, own;
     const hyp_struct * H;
+    hyp_thread * ts;            /* own: this job's thread state */
 }
 hyp_job;
 
@@ -838,7 +2607,7 @@ _hyp_job(void * arg)
     hyp_job * J = (hyp_job *) arg;
     hyp_struct H2;
     const hyp_struct * H = J->H;
-    slong i, nt = 5 * (J->lev + 1);
+    slong i, nt = 5 * (J->lev + 1), nf = 3 * (J->lev + 1);
 
     if (J->own)
     {
@@ -847,13 +2616,22 @@ _hyp_job(void * arg)
         H2.tmp = flint_malloc(nt * sizeof(mp_real_struct));
         for (i = 0; i < nt; i++)
             mp_real_init(H2.tmp + i);
+        if (H2.gcd)
+        {
+            H2.ts = J->ts;
+            H2.ftmp = flint_malloc(nf * sizeof(hyp_flist));
+            for (i = 0; i < nf; i++)
+                flist_init(H2.ftmp + i);
+        }
         H = &H2;
     }
 
     if (J->pow2)
-        bsplit_pow2(J->T, J->Q, J->R, J->a, J->b, J->lev, J->need_r, H);
+        bsplit_pow2(J->T, J->Q, J->R, J->FQ, J->FR, J->a, J->b, J->lev,
+            J->need_r, H);
     else
-        bsplit_range(J->T, J->Q, J->R, J->a, J->b, J->lev, J->need_r, H);
+        bsplit_range(J->T, J->Q, J->R, J->FQ, J->FR, J->a, J->b, J->lev,
+            J->need_r, H);
 
     if (J->own)
     {
@@ -861,6 +2639,12 @@ _hyp_job(void * arg)
             mp_real_clear(H2.tmp + i);
         flint_free(H2.tmp);
         flint_free(H2.buf);
+        if (H2.gcd)
+        {
+            for (i = 0; i < nf; i++)
+                flist_clear(H2.ftmp + i);
+            flint_free(H2.ftmp);
+        }
     }
 }
 
@@ -880,28 +2664,47 @@ _hyp_par(slong leaves, slong terms, const hyp_struct * H)
 
 static void
 _hyp_halves(mp_real_struct * T, mp_real_struct * Q, mp_real_struct * R_,
-    mp_real_struct * T2, slong a, slong m, slong b,
+    hyp_flist * FQ, hyp_flist * FR, mp_real_struct * T2, hyp_flist * f2,
+    slong a, slong m, slong b,
     slong lev, int need_r, int pow2, int fork, const hyp_struct * H)
 {
+    hyp_flist * fq2 = f2, * fr2 = (f2 == NULL) ? NULL : f2 + 1;
+
     if (fork)
     {
         hyp_job L, R;
-        L.T = T; L.Q = Q; L.R = R_; L.a = a; L.b = m;
+        L.T = T; L.Q = Q; L.R = R_; L.FQ = FQ; L.FR = FR; L.a = a; L.b = m;
         L.lev = lev - 1; L.need_r = 1; L.pow2 = pow2; L.own = 0; L.H = H;
-        R.T = T2; R.Q = T2 + 1; R.R = T2 + 2; R.a = pow2 ? a + m : m;
+        R.T = T2; R.Q = T2 + 1; R.R = T2 + 2; R.FQ = fq2; R.FR = fr2;
+        R.a = pow2 ? a + m : m;
         R.b = pow2 ? m : b; R.lev = lev - 1; R.need_r = need_r;
         R.pow2 = pow2; R.own = 1; R.H = H;
+        L.ts = NULL;
+        R.ts = NULL;
+        if (H->gcd)
+        {
+            R.ts = flint_malloc(sizeof(hyp_thread));
+            thread_init(R.ts, H->ts->nlev);
+            R.ts->lc = H->ts->lc;
+        }
         _mp_real_parallel_pair(_hyp_job, &L, _hyp_job, &R);
+        if (H->gcd)
+        {
+            thread_join(H->ts, R.ts, lev);
+            thread_clear(R.ts);
+            flint_free(R.ts);
+        }
     }
     else if (pow2)
     {
-        bsplit_pow2(T, Q, R_, a, m, lev - 1, 1, H);
-        bsplit_pow2(T2, T2 + 1, T2 + 2, a + m, m, lev - 1, need_r, H);
+        bsplit_pow2(T, Q, R_, FQ, FR, a, m, lev - 1, 1, H);
+        bsplit_pow2(T2, T2 + 1, T2 + 2, fq2, fr2, a + m, m, lev - 1, need_r,
+            H);
     }
     else
     {
-        bsplit_range(T, Q, R_, a, m, lev - 1, 1, H);
-        bsplit_range(T2, T2 + 1, T2 + 2, m, b, lev - 1, need_r, H);
+        bsplit_range(T, Q, R_, FQ, FR, a, m, lev - 1, 1, H);
+        bsplit_range(T2, T2 + 1, T2 + 2, fq2, fr2, m, b, lev - 1, need_r, H);
     }
 }
 
@@ -954,7 +2757,7 @@ merge_par(mp_real_t T, mp_real_t Q, mp_real_t R, mp_real_t T2, mp_real_t Q2,
 #define HYP_KEEP 2048
 
 static void
-_hyp_release(mp_real_struct * T2)
+_hyp_release(mp_real_struct * T2, hyp_flist * f2)
 {
     slong i;
     if (T2[0].alloc > HYP_KEEP || T2[1].alloc > HYP_KEEP)
@@ -963,56 +2766,98 @@ _hyp_release(mp_real_struct * T2)
             mp_real_clear(T2 + i);
             mp_real_init(T2 + i);
         }
+    if (f2 != NULL)
+        for (i = 0; i < 3; i++)
+            if (f2[i].alloc > HYP_KEEP)
+                flist_clear(f2 + i);
+}
+
+/* a leaf, with its lists */
+static void
+hyp_leaf(mp_real_t T, mp_real_t Q, mp_real_t R, hyp_flist * FQ,
+    hyp_flist * FR, slong a, slong b, slong lev, int need_r, int full,
+    const hyp_struct * H)
+{
+    leaf(T, Q, R, a, b, need_r, full, H);
+    if (H->gcd)
+        seg_get(FQ, FR, need_r, H->ts, H->si, (a - 1) / H->L, lev);
 }
 
 /* content mode: k leaves (a power of two) from leaf a0, at level
    lev = log2(k) */
 static void
-bsplit_pow2(mp_real_t T, mp_real_t Q, mp_real_t R, slong a0, slong k, slong lev,
-    int need_r, const hyp_struct * H)
+bsplit_pow2(mp_real_t T, mp_real_t Q, mp_real_t R, hyp_flist * FQ,
+    hyp_flist * FR, slong a0, slong k, slong lev, int need_r,
+    const hyp_struct * H)
 {
     if (k == 1)
     {
-        leaf(T, Q, R, 1 + a0 * H->L, 1 + (a0 + 1) * H->L, need_r, 0, H);
+        hyp_leaf(T, Q, R, FQ, FR, 1 + a0 * H->L, 1 + (a0 + 1) * H->L, 0,
+            need_r, 0, H);
     }
     else
     {
         mp_real_struct * T2 = H->tmp + 5 * lev;
+        hyp_flist * f2 = H->gcd ? H->ftmp + 3 * lev : NULL;
         slong h = k / 2;
 
         int par = _hyp_par(k, k * H->L, H);
 
-        _hyp_halves(T, Q, R, T2, a0, h, 0, lev, need_r, 1, par == 1, H);
+        _hyp_halves(T, Q, R, FQ, FR, T2, f2, a0, h, 0, lev, need_r, 1,
+            par == 1, H);
+        if (H->gcd)
+        {
+            hyp_pending(H->ts->pl, lev, a0 + h, H->ts);
+            if (!hyp_remove(R, T2 + 1, FR, f2, H->ts->pl, f2 + 2,
+                    H->J - lev, k * H->L, H->si, par == 2))
+                hyp_stop(FQ, FR, f2, lev, H->ts);
+        }
         (par == 2 ? merge_par : merge)(T, Q, R, T2, T2 + 1, T2 + 2,
             T2 + 3, T2 + 4, H->cQpow + (lev - 1),
             H->have_cR ? H->cRpow + (lev - 1) : NULL, need_r, H->wp);
-        _hyp_release(T2);
+        if (H->gcd)
+            hyp_lists_merge(FQ, FR, f2, f2 + 1, H->ts->pl, Q, R, need_r,
+                &H->ts->scr);
+        _hyp_release(T2, f2);
     }
 }
 
 /* carry mode: the terms [a, b), in leaves of L terms (the last one
    possibly shorter), at most 2^lev leaves */
 static void
-bsplit_range(mp_real_t T, mp_real_t Q, mp_real_t R, slong a, slong b, slong lev,
-    int need_r, const hyp_struct * H)
+bsplit_range(mp_real_t T, mp_real_t Q, mp_real_t R, hyp_flist * FQ,
+    hyp_flist * FR, slong a, slong b, slong lev, int need_r,
+    const hyp_struct * H)
 {
     slong L = H->L;
 
     if (b - a <= L)
     {
-        leaf(T, Q, R, a, b, need_r, 1, H);
+        hyp_leaf(T, Q, R, FQ, FR, a, b, lev, need_r, 1, H);
     }
     else
     {
         mp_real_struct * T2 = H->tmp + 5 * lev;
+        hyp_flist * f2 = H->gcd ? H->ftmp + 3 * lev : NULL;
         slong nl = (b - a + L - 1) / L, m = a + ((nl + 1) / 2) * L;
 
         int par = _hyp_par(nl, b - a, H);
 
-        _hyp_halves(T, Q, R, T2, a, m, b, lev, need_r, 0, par == 1, H);
+        _hyp_halves(T, Q, R, FQ, FR, T2, f2, a, m, b, lev, need_r, 0,
+            par == 1, H);
+        if (H->gcd)
+        {
+            hyp_pending(H->ts->pl, lev, (m - 1) / L, H->ts);
+            if (!hyp_remove(R, T2 + 1, FR, f2, H->ts->pl, f2 + 2,
+                    H->J - lev, b - a, H->si, par == 2))
+                hyp_stop(FQ, FR, f2, lev, H->ts);
+        }
         (par == 2 ? merge_par : merge)(T, Q, R, T2, T2 + 1, T2 + 2,
             T2 + 3, T2 + 4, NULL, NULL, need_r, H->wp);
-        _hyp_release(T2);
+        if (H->gcd)
+            hyp_lists_merge(FQ, FR, f2, f2 + 1, H->ts->pl, Q, R, need_r,
+                &H->ts->scr);
+        _hyp_release(T2, f2);
     }
 }
 
@@ -1810,7 +3655,17 @@ void
 mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     slong n)
 {
+    _mp_real_hypgeom_series(res, s, n, -1);
+}
+
+void
+_mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
+    slong n, int gcd)
+{
     hyp_struct H;
+    hyp_sieve_info si;
+    hyp_thread ts;
+    hyp_flist FQt, FRt;
     tail_struct tl;
     fmpz * P, * Q, * R, * Qc, * Rc, * A = NULL;
     double * Pd, * Qd, * Rd;
@@ -1927,6 +3782,34 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         H.content = (N > Lmax && wp >= 64 && cbits >= 8.0 * qbits);
     }
 
+    /* in content mode, the same rule for R: separate its content only
+       when that dominates (otherwise R stays short against Q and T) */
+    H.have_cR = 0;
+    if (H.content)
+    {
+        double rc = (double) fmpz_bits(H.cR) - 0.5, rbits;
+        rbits = _log2_bound_fmpz(R, Rlen, N) - rc;
+        H.have_cR = !fmpz_is_one(H.cR) && rc >= 8.0 * rbits;
+    }
+
+    /* content removal: forced, or chosen by the precision and the share
+       of the bits that can cancel; it makes the levels cheaper relative
+       to the leaves, so that the leaves are shorter: about
+       HYP_GCD_LEAF_LIMBS limbs, at least HYP_GCD_LEAF_TERMS_MIN terms
+       (zeta(3), whose terms have five-limb factors, was measured 4%
+       faster at 12 terms than at 24; Catalan, log 2 and pi about the
+       same) */
+    if (gcd < 0)
+        gcd = (wp >= _hyp_gcd_min_limbs(1.0) && N > Lmax
+            && wp >= _hyp_gcd_min_limbs(_hyp_gcd_share(Q, Qlen, R, Rlen, N,
+                !H.content, !H.have_cR)));
+    if (gcd && !H.content)
+    {
+        Lmax = (slong) ((FLINT_BITS * HYP_GCD_LEAF_LIMBS) / pt);
+        Lmax = FLINT_MAX(Lmax, HYP_GCD_LEAF_TERMS_MIN);
+        Lmax = FLINT_MIN(Lmax, HYP_LEAF_TERMS_MAX);
+    }
+
     if (H.content)
     {
         /* a balanced tree of 2^J leaves, N rounded up to K L */
@@ -1942,7 +3825,13 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         J = (K <= 1) ? 0 : FLINT_BIT_COUNT(K - 1);
     }
 
-    H.have_cR = 0;
+    H.gcd = 0;
+    H.si = NULL;
+    H.ts = NULL;
+    H.ftmp = NULL;
+    if (J >= 1 && gcd)
+        H.gcd = sieve_info_init(&si, Q, Qlen, R, Rlen, !H.content,
+            !H.have_cR, N, L);
 
     /* factored mode: P = A R */
     H.factored = 0;
@@ -2014,6 +3903,17 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         H.tmp = flint_malloc(5 * depth * sizeof(mp_real_struct));
         for (i = 0; i < 5 * depth; i++)
             mp_real_init(H.tmp + i);
+        flist_init(&FQt);
+        flist_init(&FRt);
+        if (H.gcd)
+        {
+            H.si = &si;
+            thread_init(&ts, depth);
+            H.ts = &ts;
+            H.ftmp = flint_malloc(3 * depth * sizeof(hyp_flist));
+            for (i = 0; i < 3 * depth; i++)
+                flist_init(H.ftmp + i);
+        }
 
         if (H.content)
         {
@@ -2027,13 +3927,6 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
             mp_real_set_fmpz(H.cQpow, c);
             for (i = 1; i < J; i++)
                 mp_real_mul(H.cQpow + i, H.cQpow + i - 1, H.cQpow + i - 1, wp);
-            /* the same rule for R: separate its content only when that
-               dominates (otherwise R stays short against Q and T) */
-            {
-                double rc = (double) fmpz_bits(H.cR) - 0.5, rbits;
-                rbits = _log2_bound_fmpz(R, Rlen, N) - rc;
-                H.have_cR = !fmpz_is_one(H.cR) && rc >= 8.0 * rbits;
-            }
             if (H.have_cR)
             {
                 fmpz_pow_ui(c, H.cR, L);
@@ -2043,7 +3936,7 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
             }
             fmpz_clear(c);
 
-            bsplit_pow2(T, Qt, Rt, 0, K, J, 0, &H);
+            bsplit_pow2(T, Qt, Rt, &FQt, &FRt, 0, K, J, 0, &H);
 
             /* Q = Q' cQ^N, cQ^N = (cQ^(N/2))^2 */
             mp_real_mul(t, H.cQpow + (J - 1), H.cQpow + (J - 1), wp);
@@ -2055,14 +3948,24 @@ mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         }
         else
         {
-            H.have_cR = 0;
-            bsplit_range(T, Qt, Rt, 1, N + 1, J, 0, &H);
+            bsplit_range(T, Qt, Rt, &FQt, &FRt, 1, N + 1, J, 0, &H);
         }
 
         for (i = 0; i < 5 * depth; i++)
             mp_real_clear(H.tmp + i);
         flint_free(H.tmp);
+        flist_clear(&FQt);
+        flist_clear(&FRt);
+        if (H.gcd)
+        {
+            for (i = 0; i < 3 * depth; i++)
+                flist_clear(H.ftmp + i);
+            flint_free(H.ftmp);
+            thread_clear(&ts);
+        }
     }
+    if (H.gcd)
+        sieve_info_clear(&si);
 
     flint_free(H.buf);
 
