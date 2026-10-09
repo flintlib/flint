@@ -104,6 +104,7 @@
 #include "t-scalar_addmul_nmod_mat_ui.c"
 #include "t-scalar_addmul_si.c"
 #include "t-scalar_addmul_ui.c"
+#include "t-scalar_divexact_fmpz.c"
 #include "t-scalar_mod_fmpz.c"
 #include "t-scalar_mul_2exp.c"
 #include "t-scalar_mul_fmpz.c"
@@ -213,6 +214,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_scalar_addmul_nmod_mat_ui),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_si),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_ui),
+    TEST_FUNCTION(fmpz_mat_scalar_divexact_fmpz),
     TEST_FUNCTION(fmpz_mat_scalar_mod_fmpz),
     TEST_FUNCTION(fmpz_mat_scalar_mul_2exp),
     TEST_FUNCTION(fmpz_mat_scalar_mul_fmpz),

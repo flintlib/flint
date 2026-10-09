@@ -1567,7 +1567,8 @@ flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t b
 typedef struct
 {
     mp_ptr b;           /* odd part b' of the divisor, bn limbs */
-    mp_ptr binv;        /* b'^(-1) mod B^(bn+1) */
+    mp_ptr binv;        /* b'^(-1) mod B^binvn */
+    mp_size_t binvn;    /* limbs of binv: bn + 1, or fewer with init_prec */
     mp_size_t bn;
     mp_size_t bn_orig;  /* limbs of the original divisor */
     mp_size_t k;        /* zero low limbs stripped */
@@ -1578,6 +1579,7 @@ flint_mpn_divexact_preinv_struct;
 typedef flint_mpn_divexact_preinv_struct flint_mpn_divexact_preinv_t[1];
 
 void flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn);
+void flint_mpn_divexact_preinv_init_prec(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn, mp_size_t qn);
 void flint_mpn_divexact_preinv_clear(flint_mpn_divexact_preinv_t pre);
 void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_divexact_preinv_t pre);
 

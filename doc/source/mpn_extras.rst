@@ -869,9 +869,11 @@ Division
 
     Precomputed data for repeated exact division by a fixed divisor: its
     odd part `b'` (with `b = 2^v B^k b'`) and the 2-adic inverse
-    `b'^{-1} \bmod B^{bn'+1}`.
+    `b'^{-1} \bmod B^{m}`, where `m = bn' + 1` unless a smaller precision
+    was requested with :func:`flint_mpn_divexact_preinv_init_prec`.
 
 .. function:: void flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn)
+              void flint_mpn_divexact_preinv_init_prec(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn, mp_size_t qn)
               void flint_mpn_divexact_preinv_clear(flint_mpn_divexact_preinv_t pre)
               void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_divexact_preinv_t pre)
 
@@ -885,10 +887,19 @@ Division
     limbs of `a` that can influence the quotient are read (and shifted when
     `b` is even). Compared with a fresh ``mpn_divexact`` for every division,
     which recomputes an inverse each time, this is 1.5-2.5 times faster for
-    balanced operands and 10-25% faster for long quotients. Used by
+    balanced operands and 10-25% faster for long quotients.
+
+    A quotient of `n` limbs only needs the inverse modulo `B^n`, which
+    depends only on the low `n` limbs of `b'`. The *init_prec* version
+    computes the inverse only to `\min(bn' + 1, qn)` limbs, which is much
+    cheaper when all quotients are known to have at most `qn \ll bn'`
+    limbs (the cost of the inverse is then that of about one division
+    rather than several `bn'`-limb products). Longer quotients remain
+    correct but are not accelerated by the inverse. Used by
     :func:`_fmpz_vec_scalar_divexact_fmpz` and
     :func:`fmpz_mat_scalar_divexact_fmpz` when at least two entries are as
-    large as the divisor.
+    large as the divisor, with the inverse computed to the precision of
+    the longest quotient.
 
 .. function:: int flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 
