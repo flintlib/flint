@@ -503,6 +503,12 @@ _mp_real_bnd_div_ui_B(ulong v, ulong c, slong a)
 #define MP_REAL_SIN_COS_NOTAB_SQRT_NEWTON_CUTOFF 2000
 #endif
 
+/* mp_real_hypgeom_series with the content removal (hypgeom_bsplit.c)
+   forced on (gcd = 1) or off (gcd = 0), or chosen by the precision
+   (gcd = -1, the default) */
+void _mp_real_hypgeom_series(mp_real_t res,
+    const mp_real_hypgeom_series_struct * s, slong n, int gcd);
+
 /* from-scratch ball evaluations of the constants (cached and exported
    by const_cache.c; pi itself for the formulas that need it) */
 void _mp_real_const_pi_compute(mp_real_t res, slong n);

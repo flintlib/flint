@@ -136,6 +136,20 @@ _reference(arb_t res, int power, const fmpz_t cP, const fmpz_t cQ,
     mag_clear(e);
 }
 
+/* fmpz_set_si truncates to 32 bits on 32-bit platforms */
+static void
+_fmpz_set_int64(fmpz_t x, int64_t v)
+{
+    uint64_t u = (v < 0) ? -(uint64_t) v : (uint64_t) v;
+#if FLINT_BITS == 64
+    fmpz_set_ui(x, u);
+#else
+    fmpz_set_uiui(x, (ulong) (u >> 32), (ulong) u);
+#endif
+    if (v < 0)
+        fmpz_neg(x, x);
+}
+
 static void
 _randbig(fmpz_t x, flint_rand_t state, slong bits)
 {
@@ -243,7 +257,7 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
         fmpz_mul_ui(Q + 1, q2, 2);
 
         test_series_init(&t, 1, p, p, q, P, 2, Q, 2, P, 2);
-        mp_real_hypgeom_series(x, &t.s, n);
+        _mp_real_hypgeom_series(x, &t.s, n, (int) n_randint(state, 3) - 1);
         test_series_clear(&t);
 
         mp_real_get_arb(a, x);
@@ -401,7 +415,7 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
             fmpz_neg(cD, cD);
 
         test_series_init(&t, power, cP, cQ, cD, P, Plen, Q, Qlen, R, Rlen);
-        mp_real_hypgeom_series(x, &t.s, n);
+        _mp_real_hypgeom_series(x, &t.s, n, (int) n_randint(state, 3) - 1);
         test_series_clear(&t);
 
         M = FLINT_BITS * n + fmpz_bits(cP) + fmpz_bits(cD) + 100;
@@ -432,6 +446,283 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
         fmpz_clear(cP); fmpz_clear(cQ); fmpz_clear(cD);
         fmpz_clear(c); fmpz_clear(u);
         mp_real_clear(x);
+        arb_clear(a); arb_clear(b);
+    }
+
+    /* the content removal: series whose Q and R are products of linear
+       factors (with multiplicities, factors shared by Q and R, telescoping
+       pairs u k + v, u k + v + u, terminating R) and contents (sometimes
+       of several limbs), computed with the removal forced on and off;
+       |R(k)/Q(k)| <= 1/2 and |P(k)/Q(k)| <= 1 as above: R and Q are
+       paired factor by factor with |a k + b| <= u k + v for k >= 1 */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        flint_set_num_threads(1 + n_randint(state, 4));
+        slong n = 1 + n_randint(state, (iter % 10 == 0) ? 40 : 12);
+        slong nfac = 1 + n_randint(state, 3), i, j, M;
+        int power = n_randint(state, 3) == 0 ? -1 : 1;
+        int kind = n_randint(state, 4);
+        fmpz_poly_t Pp, Qp, Rp, f;
+        fmpz_t cP, cQ, cD, c, u;
+        test_series_t t;
+        mp_real_t x, y;
+        arb_t a, b, a2;
+
+        fmpz_poly_init(Pp); fmpz_poly_init(Qp); fmpz_poly_init(Rp);
+        fmpz_poly_init(f);
+        fmpz_init(cP); fmpz_init(cQ); fmpz_init(cD);
+        fmpz_init(c); fmpz_init(u);
+        mp_real_init(x); mp_real_init(y);
+        arb_init(a); arb_init(b); arb_init(a2);
+
+        /* contents: |cR| <= |cQ| / 2 */
+        if (n_randint(state, 3) == 0)
+            fmpz_randbits(cQ, state, 2 + n_randint(state, 150));
+        else
+            fmpz_set_ui(cQ, n_randint(state, 1000));
+        fmpz_abs(cQ, cQ);
+        fmpz_add_ui(cQ, cQ, 2);
+        fmpz_fdiv_q_2exp(u, cQ, 1);
+        fmpz_randm(c, state, u);
+        fmpz_add_ui(c, c, 1);
+        if (n_randint(state, 2))
+            fmpz_neg(c, c);
+        fmpz_poly_set_fmpz(Qp, cQ);
+        fmpz_poly_set_fmpz(Rp, c);
+
+        for (i = 0; i < nfac; i++)
+        {
+            /* Q factor u k + v (u >= 1, v >= 0), with multiplicity; an R
+               factor a k + b with a <= u, |b| <= v (or as below) has
+               |a k + b| <= u k + v for k >= 1 */
+            slong uq = 1 + n_randint(state, 12);
+            slong vq = n_randint(state, 30);
+            slong ur, vr, e = 1 + n_randint(state, 2);
+
+            if (kind == 1 && i == 0)
+            {
+                /* telescoping: R factor u k + v - u, Q factor u k + v */
+                vq = FLINT_MAX(vq, 1);
+                ur = uq;
+                vr = vq - uq;
+            }
+            else if (kind == 2 && i == 0)
+            {
+                /* shared factor */
+                ur = uq;
+                vr = vq;
+            }
+            else if (kind == 3 && i == 0)
+            {
+                /* terminating: R factor k - j0, Q factor u k + v with
+                   v >= j0 */
+                slong j0 = 1 + n_randint(state, 40);
+                ur = 1;
+                vr = -j0;
+                vq = FLINT_MAX(vq, j0);
+            }
+            else
+            {
+                ur = 1 + n_randint(state, uq);
+                vr = (slong) n_randint(state, 2 * FLINT_ABS(vq) + 1)
+                    - FLINT_ABS(vq);
+            }
+
+            for (j = 0; j < e; j++)
+            {
+                fmpz_poly_zero(f);
+                fmpz_poly_set_coeff_si(f, 0, vq);
+                fmpz_poly_set_coeff_si(f, 1, uq);
+                fmpz_poly_mul(Qp, Qp, f);
+                fmpz_poly_zero(f);
+                fmpz_poly_set_coeff_si(f, 0, vr);
+                fmpz_poly_set_coeff_si(f, 1, ur);
+                fmpz_poly_mul(Rp, Rp, f);
+            }
+        }
+
+        /* an extra factor of Q only, sometimes */
+        if (n_randint(state, 2))
+        {
+            fmpz_poly_zero(f);
+            fmpz_poly_set_coeff_si(f, 0, 1 + n_randint(state, 5));
+            fmpz_poly_set_coeff_si(f, 1, 1 + n_randint(state, 5));
+            fmpz_poly_mul(Qp, Qp, f);
+        }
+
+        /* P: a multiple of R (|s| <= 2), or a constant with |P| <= |cQ| */
+        if (n_randint(state, 2))
+            fmpz_poly_scalar_mul_si(Pp, Rp, (slong) n_randint(state, 2) + 1);
+        else
+        {
+            fmpz_randm(c, state, cQ);
+            fmpz_add_ui(c, c, 1);
+            fmpz_poly_set_fmpz(Pp, c);
+        }
+
+        _randbig(cP, state, 20);
+        fmpz_add_ui(cP, cP, 1);
+        _randbig(cQ, state, 40);
+        fmpz_addmul_ui(cQ, cP, 4);
+        if (n_randint(state, 2))
+            fmpz_neg(cQ, cQ);
+        _randbig(cD, state, 20);
+        fmpz_add_ui(cD, cD, 1);
+
+        test_series_init(&t, power, cP, cQ, cD, Pp->coeffs, Pp->length,
+            Qp->coeffs, Qp->length, Rp->coeffs, Rp->length);
+        _mp_real_hypgeom_series(x, &t.s, n, 1);
+        _mp_real_hypgeom_series(y, &t.s, n, 0);
+        test_series_clear(&t);
+
+        M = FLINT_BITS * n + fmpz_bits(cP) + fmpz_bits(cD) + 100;
+        _reference(b, power, cP, cQ, cD, Pp->coeffs, Pp->length,
+            Qp->coeffs, Qp->length, Rp->coeffs, Rp->length, M, M);
+        mp_real_get_arb(a, x);
+        mp_real_get_arb(a2, y);
+
+        if (!arb_overlaps(a, b) || !arb_overlaps(a2, b)
+            || arb_rel_accuracy_bits(a) < FLINT_BITS * (n - 1) - 40)
+        {
+            flint_printf("FAIL: factored series, iter = %wd, n = %wd, "
+                "kind = %d, power = %d\n", iter, n, kind, power);
+            flint_printf("P = "); fmpz_poly_print(Pp);
+            flint_printf("\nQ = "); fmpz_poly_print(Qp);
+            flint_printf("\nR = "); fmpz_poly_print(Rp);
+            flint_printf("\n");
+            arb_printd(a, 50); flint_printf("\n");
+            arb_printd(a2, 50); flint_printf("\n");
+            arb_printd(b, 50); flint_printf("\n");
+            flint_abort();
+        }
+
+        fmpz_poly_clear(Pp); fmpz_poly_clear(Qp); fmpz_poly_clear(Rp);
+        fmpz_poly_clear(f);
+        fmpz_clear(cP); fmpz_clear(cQ); fmpz_clear(cD);
+        fmpz_clear(c); fmpz_clear(u);
+        mp_real_clear(x); mp_real_clear(y);
+        arb_clear(a); arb_clear(b); arb_clear(a2);
+    }
+
+    /* the content removal on the constants, at sizes where the tree has
+       parallel forks and the removal stops below the root */
+    for (iter = 0; iter < 4 * flint_test_multiplier(); iter++)
+    {
+        static const int64_t piP[] = {-67957045, -2100495856,
+            INT64_C(23608573992), INT64_C(-57896553024),
+            INT64_C(39250089648)};
+        static const int64_t piQ[] = {0, 0, 0, INT64_C(-10939058860032000)};
+        static const int64_t piR[] = {-5, 46, -108, 72};
+        static const int64_t l2P[] = {0, -1497, 1200, 3588};
+        static const int64_t l2Q[] = {1080, 7776, 7776};
+        static const int64_t l2R[] = {0, -1, 2};
+        static const int64_t caP[] = {15, -184, 580};
+        static const int64_t caQ[] = {225, -3240, 14904, -23328, 11664};
+        static const int64_t caR[] = {0, 0, 0, -32, 64};
+        static const int64_t z3P[] = {
+            INT64_C(-3143448000), INT64_C(156286859400),
+            INT64_C(-3292502315430), INT64_C(38721705264979),
+            INT64_C(-282805786014979), INT64_C(1352700034136826),
+            INT64_C(-4348596587040104), INT64_C(9451223531851808),
+            INT64_C(-13684352515879536), INT64_C(12632254526031264),
+            INT64_C(-6719460725627136), INT64_C(1565994397644288) };
+        static const int64_t z3Q[] = {
+            INT64_C(44008272000), INT64_C(-2334151436400),
+            INT64_C(53522442803340), INT64_C(-703273183134030),
+            INT64_C(5931859745397870), INT64_C(-34140867105175650),
+            INT64_C(139058868850409430), INT64_C(-409481300311614720),
+            INT64_C(880500176512163280), INT64_C(-1382139595517666400),
+            INT64_C(1565294958171053280), INT64_C(-1244539247650560000),
+            INT64_C(658690593528960000), INT64_C(-208277254886400000),
+            INT64_C(29753893555200000) };
+        static const int64_t z3R[] = {
+            0, 0, 0, 0, 0, 30, -691, 6781, -37374, 127976, -283232, 406224,
+            -364896, 186624, -41472 };
+        const int64_t * P, * Q, * R;
+        slong Plen, Qlen, Rlen, n, prec, i;
+        int which = iter % 4;
+        int64_t cP = 1, cQ = 0, cD = 1;
+        fmpz * Pz, * Qz, * Rz;
+        fmpz_t zP, zQ, zD;
+        test_series_t t;
+        mp_real_t x, y;
+        arb_t a, b;
+
+        flint_set_num_threads(1 + n_randint(state, 4));
+        n = 50 + n_randint(state, 1500);
+        prec = FLINT_BITS * n + 64;
+
+        if (which == 0)
+        {
+            P = piP; Plen = 5; Q = piQ; Qlen = 4; R = piR; Rlen = 4;
+            cQ = 13591409; cD = INT64_C(4270934400);
+        }
+        else if (which == 1)
+        {
+            P = l2P; Plen = 4; Q = l2Q; Qlen = 3; R = l2R; Rlen = 3;
+            cQ = 1497; cD = 2160;
+        }
+        else if (which == 2)
+        {
+            P = caP; Plen = 3; Q = caQ; Qlen = 5; R = caR; Rlen = 5;
+            cD = 2;
+        }
+        else
+        {
+            P = z3P; Plen = 12; Q = z3Q; Qlen = 15; R = z3R; Rlen = 15;
+            cD = 48;
+        }
+
+        Pz = _fmpz_vec_init(Plen);
+        Qz = _fmpz_vec_init(Qlen);
+        Rz = _fmpz_vec_init(Rlen);
+        for (i = 0; i < Plen; i++)
+            _fmpz_set_int64(Pz + i, P[i]);
+        for (i = 0; i < Qlen; i++)
+            _fmpz_set_int64(Qz + i, Q[i]);
+        for (i = 0; i < Rlen; i++)
+            _fmpz_set_int64(Rz + i, R[i]);
+        fmpz_init(zP); fmpz_init(zQ); fmpz_init(zD);
+        _fmpz_set_int64(zP, cP);
+        _fmpz_set_int64(zQ, cQ);
+        _fmpz_set_int64(zD, cD);
+        mp_real_init(x); mp_real_init(y);
+        arb_init(a); arb_init(b);
+
+        test_series_init(&t, which == 0 ? -1 : 1, zP, zQ, zD, Pz, Plen, Qz,
+            Qlen, Rz, Rlen);
+        _mp_real_hypgeom_series(x, &t.s, n, 1);
+        test_series_clear(&t);
+
+        if (which == 0)
+        {
+            mp_real_rsqrt_ui(y, 10005, n);
+            mp_real_mul(x, x, y, n);
+            arb_const_pi(b, prec);
+        }
+        else if (which == 1)
+            arb_const_log2(b, prec);
+        else if (which == 2)
+            arb_const_catalan(b, prec);
+        else
+            arb_const_apery(b, prec);
+
+        mp_real_get_arb(a, x);
+        if (!arb_overlaps(a, b)
+            || arb_rel_accuracy_bits(a) < FLINT_BITS * (n - 2) - 32)
+        {
+            flint_printf("FAIL: constant %d with removal, n = %wd\n",
+                which, n);
+            arb_printd(a, 50); flint_printf("\n");
+            arb_printd(b, 50); flint_printf("\n");
+            flint_abort();
+        }
+
+        _fmpz_vec_clear(Pz, Plen);
+        _fmpz_vec_clear(Qz, Qlen);
+        _fmpz_vec_clear(Rz, Rlen);
+        fmpz_clear(zP); fmpz_clear(zQ); fmpz_clear(zD);
+        mp_real_clear(x); mp_real_clear(y);
         arb_clear(a); arb_clear(b);
     }
 
