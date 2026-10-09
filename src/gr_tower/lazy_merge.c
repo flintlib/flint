@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* -------------------------------------------------------------------- */
 /* common towers                                                         */
 /* -------------------------------------------------------------------- */
@@ -318,6 +321,484 @@ _gr_tower_lazy_trans_gens_independent(gr_tower_flat_struct * U, gr_ctx_t ctx)
 }
 
 
+/* -------------------------------------------------------------------- */
+/* rebasing: definitions which are rational functions of later ones      */
+/* -------------------------------------------------------------------- */
+
+/*
+    A generator g (the theta functions at a point u, say) may turn out to
+    be a rational function of generators defined after it (the theta
+    functions at u/3, through the multiplication formulas), while in the
+    other direction g gives these only as roots of polynomials of high
+    degree (the division by 3). The context then records the value of g
+    in the later generators; when elements involving g and the trigger
+    (one of the later generators, or either of two) meet in a tower (see
+    _gr_tower_lazy_rebase_check), the generators of the value are moved
+    before g and g becomes algebraic with the linear modulus X - value. The towers keep one representation of each number: the
+    elements built on g, before or after, meet those built on the later
+    generators as rational functions of these.
+*/
+
+ulong
+_gr_tower_lazy_gen_def_of(const gr_tower_lazy_elem_t x_in, gr_ctx_t ctx)
+{
+    gr_tower_lazy_elem_struct * x = _gr_tower_lazy_flat_view(x_in);
+    gr_tower_flat_struct * F = x->F;
+    const fmpz_mpoly_struct * num, * den;
+    ulong * exp;
+    slong v, nvars, d = -1;
+    ulong res = 0;
+
+    if (F == LAZY(ctx)->trivial)
+        return 0;
+    num = fmpz_mpoly_q_numref(&x->elem.flat.data);
+    den = fmpz_mpoly_q_denref(&x->elem.flat.data);
+    if (num->length != 1 || !fmpz_mpoly_is_one(den, x->elem.flat.mctx) || !fmpz_is_one(num->coeffs))
+        return 0;
+
+    nvars = x->elem.flat.mctx->minfo->nvars;
+    exp = flint_malloc(sizeof(ulong) * nvars);
+    fmpz_mpoly_get_term_exp_ui(exp, num, 0, x->elem.flat.mctx);
+    for (v = 0; v < nvars; v++)
+    {
+        if (exp[v] == 0)
+            continue;
+        if (exp[v] != 1 || d != -1)
+        {
+            d = -2;
+            break;
+        }
+        d = F->cap - 1 - v;
+    }
+    flint_free(exp);
+
+    if (d >= 0 && d < F->T->num_gens && x->elem.flat.mctx == F->mctx)
+    {
+        _gr_tower_lazy_assign_def_ids(F, ctx);
+        res = GR_TOWER_GEN(F->T, d)->def_id;
+    }
+    return res;
+}
+
+/* whether the record r applies to T: its generator in T, not yet made
+   linear, and a trigger */
+static int
+_rebase_applies(gr_tower_struct * T, const gr_tower_lazy_rebase_struct * r)
+{
+    slong d = gr_tower_find_def_order(T, r->def_id);
+    const gr_tower_gen_struct * g;
+
+    if (d < 0 || !(gr_tower_find_def_order(T, r->trigger[0]) >= 0 ||
+                   (r->trigger[1] != 0 && gr_tower_find_def_order(T, r->trigger[1]) >= 0)))
+        return 0;
+    g = GR_TOWER_GEN(T, d);
+    return !(g->kind == GR_TOWER_ALGEBRAIC && gr_tower_step_degree(T, g->index) == 1);
+}
+
+/* the definitions of the value of r in F (its prefix absorbed in place,
+   if needed) */
+static int
+_rebase_absorb(gr_tower_flat_struct * F, gr_tower_lazy_rebase_struct * r, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    gr_tower_struct * T = F->T;
+    gr_tower_lazy_elem_struct * v = _gr_tower_lazy_flat_view(&r->value);
+    gr_tower_map_t my;
+    slong k;
+    int ok;
+
+    if (v->F == F || _tower_contains_prefix(F, v->F, v->level, ctx))
+        return 1;
+
+    gr_tower_map_init(my, v->F->T, T);
+    ok = (gr_tower_absorb_prefix(T, my, v->F->T, v->level, L->merge_flags) == GR_SUCCESS);
+    if (ok)
+    {
+        gr_tower_map_sync(my);
+        for (k = 0; k < T->num_gens; k++)
+            if (GR_TOWER_GEN(T, k)->def_id == 0)
+                _gr_tower_lazy_new_def(GR_TOWER_GEN(T, k), T, ctx);
+        /* (definitions expressed rather than adjoined) */
+        for (k = 0; k < v->level; k++)
+        {
+            ulong id = _gen_def_id(v->F->T, k);
+            if (gr_tower_find_def(T, id) == 0 && gr_tower_find_trans_def(T, id) == 0)
+                _add_alias(F, id, gr_tower_map_image(my, k), ctx);
+        }
+    }
+    gr_tower_map_clear(my);
+    gr_tower_flat_ensure(F);
+    return ok && _tower_contains_prefix(F, v->F, v->level, ctx);
+}
+
+/* the value of r in F (res in F->mctx) */
+static int
+_rebase_image(fmpz_mpoly_q_t res, gr_tower_flat_struct * F, gr_tower_lazy_rebase_struct * r, gr_ctx_t ctx)
+{
+    gr_tower_lazy_elem_struct * v = _gr_tower_lazy_flat_view(&r->value);
+    if (v->F == F)
+    {
+        gr_tower_flat_convert(res, &v->elem.flat.data, v->elem.flat.mctx, F);
+        return 1;
+    }
+    return _gr_tower_lazy_map_element(res, &v->elem.flat.data, v->elem.flat.mctx, v->F, v->level, F, ctx) == GR_SUCCESS;
+}
+
+/* applies the records of the indices idx[0], ..., idx[n - 1] (their
+   values' definitions in F) to F at once */
+static int
+_rebase_apply(gr_tower_flat_struct * F, const slong * idx, slong n, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    fmpz_mpoly_ctx_struct * mctx;
+    fmpz_mpoly_q_struct * img;
+    slong * d, i;
+    int ok = 1;
+
+    gr_tower_flat_ensure(F);
+    mctx = F->mctx;
+    img = flint_malloc(sizeof(fmpz_mpoly_q_struct) * n);
+    d = flint_malloc(sizeof(slong) * n);
+    for (i = 0; i < n; i++)
+        fmpz_mpoly_q_init(img + i, mctx);
+    for (i = 0; i < n && ok; i++)
+    {
+        d[i] = gr_tower_find_def_order(F->T, L->rebases[idx[i]].def_id);
+        ok = (d[i] >= 0) && _rebase_image(img + i, F, L->rebases + idx[i], ctx);
+    }
+    /* (the context the images are in) */
+    if (F->mctx != mctx)
+        ok = 0;
+    if (ok)
+        ok = _gr_tower_set_linear_gens(F->T, n, d, img, F->mctx);
+    for (i = 0; i < n; i++)
+        fmpz_mpoly_q_clear(img + i, mctx);
+    flint_free(img);
+    flint_free(d);
+    gr_tower_flat_ensure(F);
+    return ok;
+}
+
+static int _rebase_ready(slong i, gr_ctx_t ctx);
+
+void
+_gr_tower_lazy_rebase_tower(gr_tower_flat_struct * F, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    slong i, n, n0;
+    slong * idx;
+    char * failed;
+
+    if (L->rebasing || L->num_rebases == 0 || F == L->trivial)
+        return;
+
+    L->rebasing = 1;
+    n0 = L->num_rebases;
+    idx = flint_malloc(sizeof(slong) * n0);
+    failed = flint_calloc(n0, 1);
+    _gr_tower_lazy_assign_def_ids(F, ctx);
+
+    /* (the definitions absorbed for one record may bring the trigger of
+       another: repeated until none applies) */
+    for (;;)
+    {
+        n = 0;
+        for (i = 0; i < n0; i++)
+            if (!failed[i] && _rebase_applies(F->T, L->rebases + i))
+            {
+                if (_rebase_ready(i, ctx) && _rebase_absorb(F, L->rebases + i, ctx))
+                    idx[n++] = i;
+                else
+                    failed[i] = 1;
+            }
+        if (n == 0)
+            break;
+        /* (the absorptions may have made more records apply, or the
+           generator of one linear: checked again) */
+        {
+            slong m = 0;
+            for (i = 0; i < n; i++)
+                if (_rebase_applies(F->T, L->rebases + idx[i]))
+                    idx[m++] = idx[i];
+            n = m;
+        }
+        if (n == 0)
+            continue;
+        if (_rebase_apply(F, idx, n, ctx))
+            continue;
+        /* one at a time (a cycle among the values) */
+        for (i = 0; i < n; i++)
+            if (_rebase_applies(F->T, L->rebases + idx[i]) && !_rebase_apply(F, idx + i, 1, ctx))
+                failed[idx[i]] = 1;
+    }
+
+    flint_free(idx);
+    flint_free(failed);
+    L->rebasing = 0;
+}
+
+/* stores the value (a copy in a tower of its prefix: the record should
+   not keep a large tower alive) */
+static void
+_rebase_set_value(gr_tower_lazy_rebase_struct * r, gr_srcptr value, gr_ctx_t ctx)
+{
+    gr_tower_lazy_elem_struct * v;
+    GR_MUST_SUCCEED(_gr_tower_lazy_set(&r->value, value, ctx));
+    v = _gr_tower_lazy_flat_view(&r->value);
+    if (v->level > 0 && v->F->T->num_gens - v->level >= LAZY_FORK_SUFFIX)
+    {
+        gr_tower_lazy_elem_struct y;
+        _gr_tower_lazy_init(&y, ctx);
+        _gr_tower_lazy_prefix_copy(&y, v, ctx);
+        _gr_tower_lazy_swap(&r->value, &y, ctx);
+        _gr_tower_lazy_clear(&y, ctx);
+    }
+    r->have_value = 1;
+}
+
+static gr_tower_lazy_rebase_struct *
+_rebase_new(ulong def_id, ulong trigger, ulong trigger2, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    gr_tower_lazy_rebase_struct * r;
+    slong i;
+
+    for (i = 0; i < L->num_rebases; i++)
+        if (L->rebases[i].def_id == def_id)
+            return NULL;
+
+    if (L->num_rebases == L->alloc_rebases)
+    {
+        L->alloc_rebases = FLINT_MAX(4, 2 * L->alloc_rebases);
+        L->rebases = flint_realloc(L->rebases, L->alloc_rebases * sizeof(gr_tower_lazy_rebase_struct));
+    }
+    r = L->rebases + L->num_rebases;
+    r->def_id = def_id;
+    r->trigger[0] = trigger;
+    r->trigger[1] = trigger2;
+    _gr_tower_lazy_init(&r->value, ctx);
+    r->have_value = 0;
+    r->fn = NULL;
+    r->data = NULL;
+    r->data_clear = NULL;
+    r->data_refs = NULL;
+    L->num_rebases++;
+    L->rebase_serial++;
+    return r;
+}
+
+void
+_gr_tower_lazy_rebase_add(ulong def_id, ulong trigger, ulong trigger2, const gr_tower_lazy_elem_t value, gr_ctx_t ctx)
+{
+    gr_tower_lazy_rebase_struct * r = _rebase_new(def_id, trigger, trigger2, ctx);
+    if (r != NULL)
+        _rebase_set_value(r, value, ctx);
+}
+
+void
+_gr_tower_lazy_rebase_add_lazy(ulong def_id, ulong trigger, int (*fn)(gr_ptr, void *, gr_ctx_t), void * data, void (*data_clear)(void *, gr_tower_lazy_ctx_struct *), void (*data_refs)(void *, slong), gr_ctx_t ctx)
+{
+    gr_tower_lazy_rebase_struct * r = _rebase_new(def_id, trigger, 0, ctx);
+    if (r == NULL)
+    {
+        data_clear(data, LAZY(ctx));
+        return;
+    }
+    r->fn = fn;
+    r->data = data;
+    r->data_clear = data_clear;
+    r->data_refs = data_refs;
+}
+
+void
+_gr_tower_lazy_rebase_clear(gr_tower_lazy_rebase_struct * r, gr_ctx_t ctx)
+{
+    _gr_tower_lazy_clear(&r->value, ctx);
+    if (r->data != NULL)
+        r->data_clear(r->data, LAZY(ctx));
+}
+
+/* the value of the record i, computed if needed (0 on failure) */
+static int
+_rebase_ready(slong i, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    gr_tower_lazy_elem_struct t;
+    int ok;
+
+    if (L->rebases[i].have_value)
+        return 1;
+    if (L->rebases[i].fn == NULL)
+        return 0;
+    _gr_tower_lazy_init(&t, ctx);
+    ok = (L->rebases[i].fn(&t, L->rebases[i].data, ctx) == GR_SUCCESS);
+    /* (the records may have moved: by the index) */
+    if (ok)
+        _rebase_set_value(L->rebases + i, &t, ctx);
+    else
+        L->rebases[i].fn = NULL;
+    _gr_tower_lazy_clear(&t, ctx);
+    return ok;
+}
+
+/*
+    The records are applied to a tower when two of its elements which
+    involve a definition and a trigger of a record meet (_gr_tower_lazy_
+    rebase_check), not when the tower merely contains both: a tower of a
+    long session often holds the generators of unrelated computations,
+    and a record whose value is costly (a value through a long chain of
+    modular equations, see lazy_modular.c) is then not paid for.
+*/
+
+/* whether records apply to F (cached by the serial of the records and
+   the version of the tower) */
+static int
+_rebase_pending(gr_tower_flat_struct * F, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    slong i;
+    int p = 0;
+
+    if (F->rebase_key[0] == L->rebase_serial + 1 && F->rebase_key[1] == F->T->version)
+        return F->rebase_pending;
+    _gr_tower_lazy_assign_def_ids(F, ctx);
+    for (i = 0; i < L->num_rebases && !p; i++)
+        p = _rebase_applies(F->T, L->rebases + i);
+    F->rebase_pending = p;
+    F->rebase_key[0] = L->rebase_serial + 1;
+    F->rebase_key[1] = F->T->version;
+    return p;
+}
+
+/* the generators of F the flat elements x[0..n-1] involve, with those of
+   their moduli and arguments (need[d] = 1) */
+static void
+_rebase_deps(char * need, const fmpz_mpoly_q_struct * x, slong n, gr_tower_flat_struct * F)
+{
+    gr_tower_struct * T = F->T;
+    slong nvars = F->mctx->minfo->nvars, v, e, k, j;
+    int * used = flint_malloc(sizeof(int) * FLINT_MAX(nvars, 1));
+
+    for (k = 0; k < 2 * n; k++)
+    {
+        fmpz_mpoly_used_vars(used, (k % 2) ? fmpz_mpoly_q_denref(x + k / 2) : fmpz_mpoly_q_numref(x + k / 2), F->mctx);
+        for (v = 0; v < nvars; v++)
+        {
+            e = F->cap - 1 - v;
+            if (used[v] && e >= 0 && e < T->num_gens)
+                need[e] = 1;
+        }
+    }
+    /* (dependencies come earlier in the definition order) */
+    for (e = T->num_gens - 1; e >= 0; e--)
+    {
+        const gr_tower_gen_struct * g = GR_TOWER_GEN(T, e);
+        slong na;
+        if (!need[e])
+            continue;
+        if (g->kind == GR_TOWER_ALGEBRAIC)
+        {
+            fmpz_mpoly_used_vars(used, _gr_tower_flat_ideal_elem(F, g->index), F->mctx);
+            for (v = 0; v < nvars; v++)
+                if (used[v] && F->cap - 1 - v < e)
+                    need[F->cap - 1 - v] = 1;
+        }
+        na = _gr_tower_gen_num_args(g);
+        for (j = 0; j < na; j++)
+        {
+            const gr_tower_flat_elem_struct * a = _gr_tower_gen_arg_ptr(g, j);
+            fmpz_mpoly_q_t t;
+            if (a->mctx == NULL)
+                continue;
+            fmpz_mpoly_q_init(t, F->mctx);
+            gr_tower_flat_convert(t, &a->data, a->mctx, F);
+            for (k = 0; k < 2; k++)
+            {
+                fmpz_mpoly_used_vars(used, k ? fmpz_mpoly_q_denref(t) : fmpz_mpoly_q_numref(t), F->mctx);
+                for (v = 0; v < nvars; v++)
+                    if (used[v] && F->cap - 1 - v < e)
+                        need[F->cap - 1 - v] = 1;
+            }
+            fmpz_mpoly_q_clear(t, F->mctx);
+        }
+    }
+    flint_free(used);
+}
+
+/*
+    Applies the records to F if the flat elements x[0..n-1] of F (in its
+    current context mctx) involve together a definition of a record and
+    one of its triggers (a definition in one, the trigger in another, or
+    both in one). Returns 1 if F changed: its context then differs from
+    mctx, to which the elements still belong.
+*/
+int
+_gr_tower_lazy_rebase_check(gr_tower_flat_struct * F, const fmpz_mpoly_q_struct * x, slong n, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    gr_tower_struct * T = F->T;
+    char * need;
+    slong i, d, t0, t1;
+    int mix = 0;
+    ulong version;
+
+    if (L->num_rebases == 0 || L->rebasing || F == L->trivial)
+        return 0;
+    gr_tower_flat_ensure(F);
+    if (!_rebase_pending(F, ctx))
+        return 0;
+
+    need = flint_calloc(T->num_gens + 1, 1);
+    _rebase_deps(need, x, n, F);
+    for (i = 0; i < L->num_rebases && !mix; i++)
+    {
+        const gr_tower_lazy_rebase_struct * r = L->rebases + i;
+        if (!_rebase_applies(T, r))
+            continue;
+        d = gr_tower_find_def_order(T, r->def_id);
+        t0 = gr_tower_find_def_order(T, r->trigger[0]);
+        t1 = (r->trigger[1] != 0) ? gr_tower_find_def_order(T, r->trigger[1]) : -1;
+        mix = d >= 0 && need[d] && ((t0 >= 0 && need[t0]) || (t1 >= 0 && need[t1]));
+    }
+    flint_free(need);
+    if (!mix)
+        return 0;
+
+    version = T->version;
+    _gr_tower_lazy_rebase_tower(F, ctx);
+    return T->version != version;
+}
+
+/* The number of generators of V which elements involving the first lx
+   definitions of Fx and the first ly of Fy would carry in their prefix
+   without involving them (generators of other computations interleaved
+   in V). */
+static slong
+_tower_prefix_extra(gr_tower_flat_struct * V, gr_tower_flat_struct * Fx, slong lx, gr_tower_flat_struct * Fy, slong ly)
+{
+    gr_tower_struct * T = V->T;
+    char * used;
+    slong k, o, m = -1, extra = 0;
+
+    if (T->num_gens == 0)
+        return 0;
+    used = flint_calloc(T->num_gens, 1);
+    for (k = 0; k < lx + ly; k++)
+    {
+        const gr_tower_flat_struct * S = (k < lx) ? Fx : Fy;
+        o = gr_tower_find_def_order(T, _gen_def_id(S->T, (k < lx) ? k : k - lx));
+        if (o >= 0)
+        {
+            used[o] = 1;
+            m = FLINT_MAX(m, o);
+        }
+    }
+    for (o = 0; o <= m; o++)
+        extra += !used[o];
+    flint_free(used);
+    return extra;
+}
+
 /*
     Finds a tower containing the first lx definitions of Fx and the first
     ly definitions of Fy, creating one if necessary.
@@ -332,10 +813,14 @@ _gr_tower_lazy_common_tower(gr_tower_flat_struct * Fx, slong lx, gr_tower_flat_s
     _gr_tower_lazy_assign_def_ids(Fx, ctx);
     _gr_tower_lazy_assign_def_ids(Fy, ctx);
 
-    /* one of the towers already contains the other prefix */
-    if (_tower_contains_prefix(Fx, Fy, ly, ctx))
+    /* one of the towers already contains the other prefix, without
+       generators of other computations between the definitions (a
+       tower of common constants, i say, grown in place by one
+       computation: i pi would otherwise carry its generators in the
+       prefix, and the relation searches of later merges visit them) */
+    if (_tower_contains_prefix(Fx, Fy, ly, ctx) && _tower_prefix_extra(Fx, Fx, lx, Fy, ly) == 0)
         return Fx;
-    if (_tower_contains_prefix(Fy, Fx, lx, ctx))
+    if (_tower_contains_prefix(Fy, Fx, lx, ctx) && _tower_prefix_extra(Fy, Fx, lx, Fy, ly) == 0)
         return Fy;
 
     for (i = 0; i < L->num_towers; i++)
@@ -421,6 +906,7 @@ _gr_tower_lazy_common_tower(gr_tower_flat_struct * Fx, slong lx, gr_tower_flat_s
            logarithms of distinct primes, which are independent) */
         if (ntrans0 > 0 && U->T->num_trans > ntrans0 && !_gr_tower_lazy_trans_gens_independent(U, ctx))
             _gr_tower_search_relations(U, GR_TOWER_DEFAULT_PREC);
+
     }
 
     return U;
@@ -793,6 +1279,33 @@ _gr_tower_lazy_primitive_tower(gr_tower_flat_struct * U, gr_ctx_t ctx)
     return V;
 }
 
+/* the rebase records for the operands xx, yy of an operation in U
+   (both in U's context, converted to the new one if U changes) */
+static void
+_common_rebase(gr_tower_flat_struct * U, fmpz_mpoly_q_t xx, fmpz_mpoly_q_t yy, gr_ctx_t ctx)
+{
+    fmpz_mpoly_ctx_struct * old_mctx = U->mctx;
+    fmpz_mpoly_q_struct v[2];
+
+    v[0] = *xx;
+    v[1] = *yy;
+    if (_gr_tower_lazy_rebase_check(U, v, 2, ctx) && U->mctx != old_mctx)
+    {
+        fmpz_mpoly_q_t a;
+        gr_tower_flat_ensure(U);
+        fmpz_mpoly_q_init(a, U->mctx);
+        gr_tower_flat_convert(a, xx, old_mctx, U);
+        fmpz_mpoly_q_clear(xx, old_mctx);
+        fmpz_mpoly_q_init(xx, U->mctx);
+        fmpz_mpoly_q_swap(xx, a, U->mctx);
+        gr_tower_flat_convert(a, yy, old_mctx, U);
+        fmpz_mpoly_q_clear(yy, old_mctx);
+        fmpz_mpoly_q_init(yy, U->mctx);
+        fmpz_mpoly_q_swap(yy, a, U->mctx);
+        fmpz_mpoly_q_clear(a, U->mctx);
+    }
+}
+
 int
 _gr_tower_lazy_common(gr_tower_flat_struct ** U, fmpz_mpoly_q_t xx, fmpz_mpoly_q_t yy,
     gr_tower_lazy_elem_t x, gr_tower_lazy_elem_t y, gr_ctx_t ctx)
@@ -809,6 +1322,7 @@ _gr_tower_lazy_common(gr_tower_flat_struct ** U, fmpz_mpoly_q_t xx, fmpz_mpoly_q
         fmpz_mpoly_q_init(yy, (*U)->mctx);
         fmpz_mpoly_q_set(xx, &x->elem.flat.data, (*U)->mctx);
         fmpz_mpoly_q_set(yy, &y->elem.flat.data, (*U)->mctx);
+        _common_rebase(*U, xx, yy, ctx);
     }
     else if (x->level == 0 || y->level == 0)
     {
@@ -862,6 +1376,9 @@ _gr_tower_lazy_common(gr_tower_flat_struct ** U, fmpz_mpoly_q_t xx, fmpz_mpoly_q
         else
             status |= _gr_tower_lazy_map_element(yy, &y->elem.flat.data, y->elem.flat.mctx, y->F, y->level, *U, ctx);
 
+        if (status == GR_SUCCESS)
+            _common_rebase(*U, xx, yy, ctx);
+
         /* a number field of several steps: its primitive element tower */
         if (status == GR_SUCCESS && LAZY(ctx)->options[GR_TOWER_OPT_PRIMITIVE_DEGREE_LIMIT] > 0)
         {
@@ -906,3 +1423,5 @@ _gr_tower_lazy_common(gr_tower_flat_struct ** U, fmpz_mpoly_q_t xx, fmpz_mpoly_q
 
     return status;
 }
+
+POP_OPTIONS

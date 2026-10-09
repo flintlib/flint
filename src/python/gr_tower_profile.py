@@ -11,10 +11,14 @@ cases) and SymPy.
     python3 gr_tower_profile.py --json out.json --html report.html
     python3 gr_tower_profile.py --from-json out.json --html report.html
     python3 gr_tower_profile.py --list                # list the cases
+    python3 gr_tower_profile.py mf. --shared --reverse   # one long session
 
 Each case runs once per engine, in a fresh field, in a subprocess with a
-time limit (--jobs N runs N subprocesses at a time). The result of a run
-is one of
+time limit (--jobs N runs N subprocesses at a time); with --shared, the
+cases run in order (--reverse: in reverse order) in one field per engine,
+as in a long session, where the caches, anchors and towers left by the
+earlier cases should not make the later ones slower (a case beyond the
+time limit stops the sequence). The result of a run is one of
 
     ok          the engine gives the right answer
     wrong       the engine gives the wrong answer (never acceptable: a near
@@ -38,7 +42,9 @@ imaginary unit, principal branches throughout; real_root(a, n) is the real
 n-th root, RootOf(p, k) the k-th root of p in SymPy's CRootOf order (real
 roots ascending, then the others by real part, then imaginary part; the
 roots are sorted by exact comparisons in the field), zeta(s, a) the Hurwitz
-zeta function, Eq/Ne/Lt/Le/Gt/Ge relations. They are evaluated in the
+zeta function, loggamma(z) and lerchphi(z, s, a) as in SymPy,
+dirichlet_l(s, q, n) the Dirichlet L-function of the character of Conrey
+label n modulo q (not in SymPy), Eq/Ne/Lt/Le/Gt/Ge relations. They are evaluated in the
 field through Python's ast, operation by operation (expand() is ignored:
 the value is the same), and parsed by SymPy for the SymPy engine. The
 expectations:
@@ -79,7 +85,17 @@ parts), cmp (comparisons), pt (real and imaginary parts, absolute values),
 sg (signs), br (branch cuts), rich (Richardson-type exp-log problems,
 algebraic arguments), mix (algebraic and transcendental extensions
 together), mac (Machin-like formulas in non-Gaussian number fields), sf
-(special function identities), asy (inequalities in asymptotic regimes),
+(special function identities: Gamma, log Gamma and digamma, polylogarithms
+of all orders, Hurwitz zeta, Dirichlet L-functions and the Lerch
+transcendent), hg (hypergeometric functions: summation
+theorems, transformations, contiguity, reductions to elementary functions,
+erf, K and E), mf (modular forms and theta functions: CM values,
+Chowla-Selberg, transformation laws, identities between theta functions,
+Eisenstein series and eta, commensurable points, theta functions at
+related points of z: duplication, multiplication, division, torsion
+points, the addition formulas whatever the order of evaluation), asy
+(inequalities in
+asymptotic regimes),
 rad (Cardano and Ferrari root formulas of cubics and quartics with
 rational, algebraic and transcendental coefficients: in the polynomial,
 Vieta's formulas, against closed forms; prog.rad_* against root finding),
@@ -92,6 +108,9 @@ through the Jordan form), prog.veech* (Veech group relations).
 Programs may carry a SymPy version (root finding with CRootOf or roots,
 Matrix.exp, log and powers).
 The C test src/gr_tower/test/t-catalog.c runs most of the zero tests.
+The environment variable GR_TOWER_PROFILE_OPTIONS="name=value,..." sets
+options of the tower field (for comparisons:
+power_check_degree_limit=0, say).
 """
 
 import sys, os, time, ast, math, json, html, functools, threading
@@ -475,6 +494,8 @@ CASES = [
 ]
 
 _G = "gr_tower profile"
+_H = "classical (DLMF 15, 16, 19; Fungrim)"
+_M = "classical (DLMF 20, 23; Fungrim)"
 CASES += [
 # --- integer parts --------------------------------------------------------
 ("fl.heegner_floor", "floor", "true", "Eq(floor(exp(pi*sqrt(163))), 262537412640768743)", None, _G, "near-integer from below, 7.5e-13 away"),
@@ -586,6 +607,11 @@ CASES += [
 ("rich.exp_mixed", "exp-log", "zero", "exp(pi + sqrt(2)*log(2)) - exp(pi)*2**sqrt(2)", None, _G, ""),
 ("rich.nonzero_alg", "exp-log", "nonzero", "exp(sqrt(2)*log(3)) - 3**(14142/10000)", "7.0458e-5", _G, "an algebraic exponent against a rational approximation"),
 ("rich.stress_nested", "exp-log", "zero", "exp(exp(exp(log(log(log(sqrt(2) + 20)))))) - sqrt(2) - 20", None, _G, "three levels each way"),
+("rich.torsion2", "exp-log", "zero", "exp((16 + 30*pi*I)/225)**75 - exp((5 + 42*pi*I)/60)**64*exp(-174*pi*I/5)", None, _G, "two exponentials related modulo roots of unity: exp(1/900) and zeta_60"),
+("rich.torsion2_pi", "exp-log", "zero", "exp(pi*(16 + 30*I)/225)**75 - exp(pi*(5 + 42*I)/60)**64*exp(-174*pi*I/5)", None, _G, "the same with C = pi: exp(pi/900) and zeta_60"),
+("rich.torsion2_sqrt2", "exp-log", "zero", "exp((16*sqrt(2) + 30*pi*I)/225)**75 - exp((5*sqrt(2) + 42*pi*I)/60)**64*exp(-174*pi*I/5)", None, _G, ""),
+("rich.torsion3", "exp-log", "zero", "exp((16 + 30*pi*I)/225)**2*exp(1/12 + 7*pi*I/10)*exp(3/40 + 5*pi*I/8) - exp(32/225 + 1/12 + 3/40 + pi*I*(4/15 + 7/10 + 5/8))", None, _G, "three exponentials modulo roots of unity: zeta_240"),
+("rich.torsion_near", "exp-log", "nonzero", "exp((16 + 30*pi*I)/225)**75 - exp((5 + 42*pi*I)/60)**64*exp(-174*pi*I/5) + 1/10**40", "1e-40", _G, "near miss of rich.torsion2"),
 
 # --- algebraic and transcendental extensions together --------------------
 ("mix.denest_pi", "mixed", "zero", "sqrt(pi + 2*sqrt(2)*sqrt(pi) + 2) - sqrt(pi) - sqrt(2)", None, _G, "denesting over Q(pi)"),
@@ -642,6 +668,131 @@ CASES += [
 ("sf.digamma_third", "special", "zero", "digamma(1/3) + EulerGamma + pi/(2*sqrt(3)) + 3*log(3)/2", None, _G, "Gauss's digamma theorem"),
 ("sf.digamma_quarter", "special", "zero", "digamma(1/4) + EulerGamma + pi/2 + 3*log(2)", None, _G, ""),
 ("sf.gamma_near", "special", "nonzero", "gamma(1/3)*gamma(2/3) - 2*pi/sqrt(3) + 1/10**30", "1e-30", _G, "near miss of sf.gamma_thirds"),
+("sf.lgamma_shift", "special", "zero", "(loggamma(z + 1) - loggamma(z) - log(z)).subs(z, -3/2 + 2*I)", None, _G, "log Gamma off the negative axis: the branch from that of Gamma"),
+("sf.lgamma_exp", "special", "zero", "(exp(loggamma(z)) - gamma(z)).subs(z, -7/2 + 3*I/2)", None, _G, ""),
+("sf.lgamma_half", "special", "zero", "loggamma(1/2) - log(pi)/2", None, _G, ""),
+("sf.digamma_mult", "special", "zero", "digamma(2*sqrt(2)) - (digamma(sqrt(2)) + digamma(sqrt(2) + 1/2))/2 - log(2)", None, _G, "multiplication theorem of digamma (the logarithms of the primes)"),
+("sf.li3_half", "special", "zero", "polylog(3, 1/2) - 7*zeta(3)/8 + pi**2*log(2)/12 - log(2)**3/6", None, _G, "Li_3(1/2) in closed form"),
+("sf.li3_inversion", "special", "zero", "polylog(3, -2) - polylog(3, -1/2) + pi**2*log(2)/6 + log(2)**3/6", None, _G, "inversion formula of Li_3"),
+("sf.li4_distribution", "special", "zero", "polylog(4, 1/9) - 8*polylog(4, 1/3) - 8*polylog(4, -1/3)", None, _G, "distribution relation of Li_4"),
+("sf.li2_abel", "special", "zero", "(polylog(2, x) + polylog(2, y) - polylog(2, x*y) - polylog(2, (x - x*y)/(1 - x*y)) - polylog(2, (y - x*y)/(1 - x*y)) - log((1 - x)/(1 - x*y))*log((1 - y)/(1 - x*y))).subs(x, 1/3).subs(y, 1/5)", None, _G, "Abel's five-term relation"),
+("sf.hurwitz_neg", "special", "zero", "zeta(-3, 1/3) + ((1/3)**4 - 2*(1/3)**3 + (1/3)**2 - 1/30)/4", None, _G, "Hurwitz zeta at a negative integer: a Bernoulli polynomial"),
+("sf.zeta_neg_half", "special", "zero", "zeta(-1/2) + zeta(3/2)/(4*pi)", None, _G, "the functional equation at s = -1/2"),
+("sf.zeta_fe", "special", "zero", "(zeta(s) - 2**s*pi**(s - 1)*sin(pi*s/2)*gamma(1 - s)*zeta(1 - s)).subs(s, 3/4 + I)", None, _G, "the functional equation at a complex point"),
+("sf.dirichlet_l1", "special", "zero", "dirichlet_l(1, 4, 3) - pi/4", None, _G, "L(1, chi_-4) (Leibniz)"),
+("sf.dirichlet_catalan", "special", "zero", "dirichlet_l(2, 4, 3) - Catalan", None, _G, "L(2, chi_-4) = G"),
+("sf.dirichlet_l1_mod3", "special", "zero", "dirichlet_l(1, 3, 2) - pi/(3*sqrt(3))", None, _G, "L(1, chi_-3)"),
+("sf.dirichlet_hurwitz", "special", "zero", "dirichlet_l(5/2, 4, 3) - 4**(-5/2)*(zeta(5/2, 1/4) - zeta(5/2, 3/4))", None, _G, "L(s, chi) as a combination of Hurwitz zeta values"),
+("sf.dirichlet_fe", "special", "zero", "((4/pi)**((s + 1)/2)*gamma((s + 1)/2)*dirichlet_l(s, 4, 3) - (4/pi)**((2 - s)/2)*gamma((2 - s)/2)*dirichlet_l(1 - s, 4, 3)).subs(s, 1/3)", None, _G, "the functional equation of L(s, chi_-4)"),
+("sf.lerch_zeta", "special", "zero", "lerchphi(1, 3, 1/4) - zeta(3, 1/4)", None, _G, "Phi(1, s, a) = zeta(s, a)"),
+("sf.lerch_li", "special", "zero", "lerchphi(1/2, 2, 1) - 2*polylog(2, 1/2)", None, _G, "Phi(z, s, 1) = Li_s(z)/z"),
+("sf.lerch_m1", "special", "zero", "lerchphi(-1, 1, 1/2) - pi/2", None, _G, "Phi(-1, 1, a) through digamma"),
+("sf.dirichlet_orth", "special", "zero", "dirichlet_l(3, 5, 1) + dirichlet_l(3, 5, 2) + dirichlet_l(3, 5, 3) + dirichlet_l(3, 5, 4) - 4*5**(-3)*zeta(3, 1/5)", None, _G, "orthogonality of the characters modulo 5 (two complex ones)"),
+("sf.hurwitz_irr", "special", "zero", "zeta(3/2, sqrt(2)) - zeta(3/2, sqrt(2) + 1) - sqrt(2)**(-3/2)", None, _G, "Hurwitz zeta at an irrational parameter: the shift"),
+("sf.lerch_m1_3", "special", "zero", "lerchphi(-1, 3, 1/3) - (zeta(3, 1/6) - zeta(3, 2/3))/8", None, _G, "Phi(-1, s, a) = 2^-s (zeta(s, a/2) - zeta(s, (a + 1)/2))"),
+("sf.li2_i", "special", "zero", "polylog(2, I) + pi**2/48 - I*Catalan", None, _G, "Li_2 at a root of unity"),
+("sf.li_half_m1", "special", "zero", "polylog(1/2, -1) + (1 - sqrt(2))*zeta(1/2)", None, _G, "Li_s(-1) = -(1 - 2^(1-s)) zeta(s) at a non-integer order"),
+("sf.near_li3", "special", "nonzero", "polylog(3, 1/2) - 7*zeta(3)/8 + pi**2*log(2)/12 - log(2)**3/6 + 1/10**40", "1e-40", _G, "near miss of sf.li3_half"),
+
+# --- hypergeometric functions ----------------------------------------------
+("hg.gauss", "hypergeometric", "zero", "hyper([1/3, 1/4], [2], 1) - gamma(2)*gamma(2 - 1/3 - 1/4)/(gamma(2 - 1/3)*gamma(2 - 1/4))", None, _H, "Gauss's sum at z = 1"),
+("hg.kummer", "hypergeometric", "zero", "hyper([1/3, 1/5], [1 + 1/3 - 1/5], -1) - gamma(1 + 1/3 - 1/5)*gamma(1 + 1/6)/(gamma(1 + 1/3)*gamma(1 + 1/6 - 1/5))", None, _H, "Kummer's sum at z = -1"),
+("hg.kummer_contig", "hypergeometric", "zero", "hyper([1/3, 6/5], [1 + 1/3 - 1/5], -1) - hyper([1/3, 1/5], [1 + 1/3 - 1/5], -1) + 1/(1 + 1/3 - 1/5)*hyper([4/3, 6/5], [2 + 1/3 - 1/5], -1)/3", None, _H, "a contiguous function of a Kummer-summable one, against the derivative"),
+("hg.contiguous", "hypergeometric", "zero", "(3/7 - 1/3)*hyper([-2/3, 1/5], [3/7], 1/7) + (2/3 - 3/7 + (1/5 - 1/3)/7)*hyper([1/3, 1/5], [3/7], 1/7) + (1/3)*(1/7 - 1)*hyper([4/3, 1/5], [3/7], 1/7)", None, _H, "Gauss's contiguous relation in a (contiguity module, generic parameters)"),
+("hg.contiguous_far", "hypergeometric", "zero", "hyper([1/3 + 6, 1/5 - 4], [3/7 + 5], 1/7)*hyper([1/3, 1/5], [3/7 + 1], 1/7) - hyper([1/3 + 6, 1/5 - 4], [3/7 + 5], 1/7)*hyper([1/3, 1/5], [3/7 + 1], 1/7)", None, _H, "two far contiguous values in one basis (tautology: exercises the shifts)"),
+("hg.euler", "hypergeometric", "zero", "hyper([1/3, 1/5], [3/7], 1/3) - (2/3)**(3/7 - 1/3 - 1/5)*hyper([3/7 - 1/3, 3/7 - 1/5], [3/7], 1/3)", None, _H, "Euler's transformation"),
+("hg.pfaff", "hypergeometric", "zero", "hyper([1/3, 1/5], [3/7], -3) - 4**(-1/3)*hyper([1/3, 3/7 - 1/5], [3/7], 3/4)", None, _H, "Pfaff's transformation"),
+("hg.pfaff_complex", "hypergeometric", "zero", "hyper([1/3, 1/5], [3/7], 2*I) - (1 - 2*I)**(-1/5)*hyper([3/7 - 1/3, 1/5], [3/7], 2*I/(2*I - 1))", None, _H, "Pfaff at a complex argument, the other numerator"),
+("hg.reduce", "hypergeometric", "zero", "hyper([7/3, 1/5], [4/3], 1/4) - (1 - (1 - (1/5)/(4/3))/4)*(3/4)**(-1/5 - 1)", None, _H, "a - c = 1: reduction of the order"),
+("hg.reduce2", "hypergeometric", "zero", "hyper([10/3, 1/5], [4/3], 1/4) - (3/4)**(-1/5 - 2)*(1 - 2*(4/3 - 1/5)*(1/4)/(4/3) + (4/3 - 1/5)*(7/3 - 1/5)*(1/4)**2/((4/3)*(7/3)))", None, _H, "a - c = 2: reduction of the order"),
+("hg.kummer1f1", "hypergeometric", "zero", "hyper([1/3], [5/7], 2) - exp(2)*hyper([5/7 - 1/3], [5/7], -2)", None, _H, "Kummer's transformation of 1F1"),
+("hg.erf", "hypergeometric", "zero", "2*sqrt(2)/sqrt(pi)*hyper([1/2], [3/2], -2) - erf(sqrt(2))", None, _H, "erf as 1F1"),
+("hg.erf_contig", "hypergeometric", "zero", "hyper([3/2], [5/2], -2) - 3*(sqrt(pi)*erf(sqrt(2))/(2*sqrt(2)) - exp(-2))/4", None, _H, "a contiguous function of erf"),
+("hg.bessel_half", "hypergeometric", "zero", "hyper([], [5/2], 1) - 3*(2*cosh(2) - sinh(2))/8", None, _H, "0F1(; 5/2; z): spherical Bessel"),
+("hg.bessel_half_far", "hypergeometric", "zero", "hyper([], [11/2], 1/4) - 945*(18*exp(1) - 133*exp(-1))", None, _H, "0F1(; 11/2; z): far contiguous to cosh, sinh"),
+("hg.kummer2", "hypergeometric", "zero", "hyper([1/3], [2/3], 4) - exp(2)*hyper([], [5/6], 1)", None, _H, "Kummer's second formula 1F1(a; 2a; z) = exp(z/2) 0F1(; a + 1/2; z^2/16)"),
+("hg.dixon", "hypergeometric", "zero", "hyper([1/3, 1/5, 1/7], [1 + 1/3 - 1/5, 1 + 1/3 - 1/7], 1) - gamma(1 + 1/6)*gamma(1 + 1/3 - 1/5)*gamma(1 + 1/3 - 1/7)*gamma(1 + 1/6 - 1/5 - 1/7)/(gamma(1 + 1/3)*gamma(1 + 1/6 - 1/5)*gamma(1 + 1/6 - 1/7)*gamma(1 + 1/3 - 1/5 - 1/7))", None, _H, "Dixon's sum (3F2 at 1)"),
+("hg.watson", "hypergeometric", "zero", "hyper([1/3, 1/5, 1/7], [(1/3 + 1/5 + 1)/2, 2/7], 1) - sqrt(pi)*gamma(1/2 + 1/7)*gamma((1 + 1/3 + 1/5)/2)*gamma((1 - 1/3 - 1/5)/2 + 1/7)/(gamma((1 + 1/3)/2)*gamma((1 + 1/5)/2)*gamma((1 - 1/3)/2 + 1/7)*gamma((1 - 1/5)/2 + 1/7))", None, _H, "Watson's sum"),
+("hg.gauss_half", "hypergeometric", "zero", "hyper([1/3, 2/3 + 1], [(1/3 + 2/3 + 2)/2], 1/2) - sqrt(pi)*gamma((1/3 + 2/3 + 2)/2)/(gamma((1/3 + 1)/2)*gamma((2/3 + 2)/2))", None, _H, "Gauss's second sum at z = 1/2"),
+("hg.near_gauss", "hypergeometric", "nonzero", "hyper([1/3, 1/4], [2], 1) - gamma(2)*gamma(2 - 1/3 - 1/4)/(gamma(2 - 1/3)*gamma(2 - 1/4)) + 1/10**40", "1e-40", _H, "near miss of hg.gauss"),
+("hg.K_2f1", "hypergeometric", "zero", "hyper([1/2, 1/2], [1], 1/3) - 2*elliptic_k(1/3)/pi", None, _H, "K as 2F1"),
+("hg.K_derivative", "hypergeometric", "zero", "hyper([3/2, 3/2], [2], 1/3) - 4/pi*(elliptic_e(1/3) - (2/3)*elliptic_k(1/3))/((1/3)*(2/3))", None, _H, "dK/dm: 2F1 contiguous to K, reduced to K and E"),
+("hg.K_half", "hypergeometric", "zero", "elliptic_k(1/2) - gamma(1/4)**2/(4*sqrt(pi))", None, _H, "K at the lemniscatic modulus"),
+("hg.K_imag", "hypergeometric", "zero", "elliptic_k(-3) - elliptic_k(3/4)/2", None, _H, "imaginary modulus transformation"),
+("hg.legendre", "hypergeometric", "zero", "elliptic_e(1/5)*elliptic_k(4/5) + elliptic_e(4/5)*elliptic_k(1/5) - elliptic_k(1/5)*elliptic_k(4/5) - pi/2", None, _H, "Legendre's relation"),
+("hg.landen", "hypergeometric", "zero", "elliptic_k(4*sqrt(1/3)/(1 + sqrt(1/3))**2) - (1 + sqrt(1/3))*elliptic_k(1/3)", None, _H, "Landen's transformation"),
+("hg.K_singular3", "hypergeometric", "zero", "elliptic_k((2 - sqrt(3))/4) - 3**(1/4)*gamma(1/3)**3/(2**(7/3)*pi)", None, _H, "singular value k_3"),
+("hg.quad_2b", "hypergeometric", "zero", "hyper([1/3, 1/5], [2/5], 1/7) - (13/14)**(-1/3)*hyper([1/6, 2/3], [7/10], 1/169)", None, _H, "quadratic transformation F(a, b; 2b; z), as a link to the generator"),
+("hg.quad_up", "hypergeometric", "zero", "hyper([1/6, 2/3], [7/10], 1/169) - (13/14)**(1/3)*hyper([1/3, 1/5], [2/5], 1/7)", None, _H, "the same, the other order (the inverse transformation)"),
+("hg.quad_koebe", "hypergeometric", "zero", "hyper([1/3, 1/5], [17/15], 1/7) - (8/7)**(-1/3)*hyper([1/6, 2/3], [17/15], 7/16)", None, _H, "quadratic transformation F(a, b; 1 + a - b; z)"),
+("hg.quad_4z1z", "hypergeometric", "zero", "hyper([1/3, 1/5], [23/30], 1/7) - hyper([1/6, 1/10], [23/30], 24/49)", None, _H, "quadratic transformation F(a, b; (a + b + 1)/2; z)"),
+("hg.quad_K", "hypergeometric", "zero", "2*sqrt(8/7)*elliptic_k(1/7)/pi - hyper([1/4, 3/4], [1], 7/16)", None, _H, "2F1(1/4, 3/4; 1) through K"),
+("hg.quad_K4", "hypergeometric", "zero", "2*elliptic_k(1/7)/pi - hyper([1/4, 1/4], [1], 24/49)", None, _H, "2F1(1/4, 1/4; 1) through K"),
+("hg.landen2", "hypergeometric", "zero", "(elliptic_k(m) - (1 + k1)*(1 + k2)*elliptic_k(k2**2)).subs(k2, (1 - sqrt(1 - k1**2))/(1 + sqrt(1 - k1**2))).subs(k1, (1 - sqrt(1 - m))/(1 + sqrt(1 - m))).subs(m, 1/7)", None, _H, "two steps of Landen's transformation"),
+("hg.landen_E", "hypergeometric", "zero", "(elliptic_e(m) - (1 + sqrt(1 - m))*elliptic_e(k1**2) + sqrt(1 - m)*elliptic_k(m)).subs(k1, (1 - sqrt(1 - m))/(1 + sqrt(1 - m))).subs(m, 2/7 + I/3)", None, _H, "Landen's transformation of E, complex modulus"),
+("hg.near_quad", "hypergeometric", "nonzero", "hyper([1/3, 1/5], [2/5], 1/7) - (13/14)**(-1/3)*hyper([1/6, 2/3], [7/10], 1/169) + 1/10**30", "1e-30", _H, "near miss of hg.quad_2b"),
+# --- modular forms, theta functions ---------------------------------------
+("mf.j_i", "modular", "zero", "modular_j(I) - 1728", None, _M, "j at i (CM)"),
+("mf.j_rho_tau", "modular", "zero", "modular_j((2*r + 1)/(3*r + 2)).subs(r, (1 + sqrt(-3))/2)", None, _M, "reduction to rho, j = 0"),
+("mf.j_163", "modular", "zero", "modular_j((1 + sqrt(-163))/2) + 640320**3", None, _M, "Heegner number 163"),
+("mf.j_163_near", "modular", "nonzero", "modular_j((1 + sqrt(-163))/2) + exp(pi*sqrt(163)) - 744", "-7.4993e-13", _M, "j = 1/q + 744 + 196884 q + ...: q-expansion near miss"),
+("mf.j_sqrtm5", "modular", "zero", "modular_j(sqrt(-5)) - 632000 - 282880*sqrt(5)", None, _M, "class number 2"),
+("mf.j_sqrtm14", "modular", "minpoly:x**4 - 16220384512*x**3 + 2059647197077504*x**2 + 2257767342088912896*x + 10064086044321563803648", "modular_j(sqrt(-14))", None, _M, "class number 4"),
+("mf.lambda_sqrtm2", "modular", "zero", "modular_lambda(sqrt(-2)) - (sqrt(2) - 1)**2", None, _M, "singular modulus"),
+("mf.eta_i", "modular", "zero", "dedekind_eta(I) - gamma(1/4)/(2*pi**(3/4))", None, _M, "Chowla-Selberg"),
+("mf.eta_rho", "modular", "zero", "dedekind_eta((1 + sqrt(-3))/2)**24 + 27*gamma(1/3)**36/(2**24*pi**24)", None, _M, "Chowla-Selberg at rho"),
+("mf.E4_i", "modular", "zero", "eisenstein_e(4, I) - 3*gamma(1/4)**8/(64*pi**6)", None, _M, ""),
+("mf.E2_i", "modular", "zero", "eisenstein_e(2, I) - 3/pi", None, _M, "quasimodular E2 at i"),
+("mf.eta_S", "modular", "zero", "(dedekind_eta(-1/t) - sqrt(-I*t)*dedekind_eta(t)).subs(t, 1/3 + pi*I/4)", None, _M, "eta(-1/tau), a generic point"),
+("mf.eta_gamma", "modular", "zero", "(dedekind_eta((2*t + 1)/(7*t + 4))**24 - (7*t + 4)**12*dedekind_eta(t)**24).subs(t, 1/3 + pi*I/4)", None, _M, "Delta is a modular form of weight 12"),
+("mf.E2_S", "modular", "zero", "(eisenstein_e(2, -1/t) - t**2*eisenstein_e(2, t) - 6*t/(pi*I)).subs(t, 2/5 + exp(1)*I/2)", None, _M, "E2(-1/tau)"),
+("mf.jacobi_identity", "modular", "zero", "(jacobi_theta(3, 0, t)**4 - jacobi_theta(2, 0, t)**4 - jacobi_theta(4, 0, t)**4).subs(t, 1/5 + pi*I/3)", None, _M, "Jacobi's identity"),
+("mf.theta_eta", "modular", "zero", "(jacobi_theta(2, 0, t)*jacobi_theta(3, 0, t)*jacobi_theta(4, 0, t) - 2*dedekind_eta(t)**3).subs(t, 1/5 + pi*I/3)", None, _M, ""),
+("mf.e4e6", "modular", "zero", "(eisenstein_e(4, t)**3 - eisenstein_e(6, t)**2 - 1728*dedekind_eta(t)**24).subs(t, 2 + exp(1)*I)", None, _M, "E4^3 - E6^2 = 1728 Delta"),
+("mf.j_e4", "modular", "zero", "(modular_j(t)*dedekind_eta(t)**24 - eisenstein_e(4, t)**3).subs(t, 2 + exp(1)*I)", None, _M, ""),
+("mf.E8_E10", "modular", "zero", "(eisenstein_e(10, t) - eisenstein_e(4, t)*eisenstein_e(6, t)).subs(t, -1/3 + sqrt(5)*I/2)", None, _M, "M_10 has dimension 1"),
+("mf.landen_lambda", "modular", "zero", "(modular_lambda(2*t) - ((1 - (jacobi_theta(4, 0, t)/jacobi_theta(3, 0, t))**2)/(1 + (jacobi_theta(4, 0, t)/jacobi_theta(3, 0, t))**2))**2).subs(t, 1/5 + pi*I/3)", None, _M, "lambda(2 tau): commensurable points"),
+("mf.phi2", "modular", "zero", "(x**3 + y**3 - x**2*y**2 + 1488*(x**2*y + x*y**2) - 162000*(x**2 + y**2) + 40773375*x*y + 8748000000*(x + y) - 157464000000000).subs(x, modular_j(t)).subs(y, modular_j(2*t)).subs(t, 1/5 + pi*I/3)", None, _M, "modular polynomial of level 2"),
+("mf.eta_quotient", "modular", "zero", "(jacobi_theta(4, 0, 2*t) - dedekind_eta(t)**2/dedekind_eta(2*t)).subs(t, 1/5 + pi*I/3)", None, _M, ""),
+("mf.E2_dup", "modular", "zero", "(2*eisenstein_e(2, 2*t) - eisenstein_e(2, t) - jacobi_theta(3, 0, 2*t)**4 - jacobi_theta(2, 0, 2*t)**4).subs(t, 1/5 + pi*I/3)", None, _M, ""),
+("mf.lambda_quarter", "modular", "zero", "(modular_lambda((3*t + 1)/4) - modular_lambda((3*t + 1)/4 + 2)).subs(t, 1/5 + pi*I/3)", None, _M, "level 4 from an anchor"),
+("mf.theta_quasi", "modular", "zero", "(jacobi_theta(1, z + t, t) + exp(-pi*I*(t + 2*z))*jacobi_theta(1, z, t)).subs(z, sqrt(2)/5 + I/3).subs(t, pi*I/4)", None, _M, "quasi-periodicity of theta_1"),
+("mf.theta_quartic", "modular", "zero", "(jacobi_theta(2, z, t)**2*jacobi_theta(4, 0, t)**2 - jacobi_theta(4, z, t)**2*jacobi_theta(2, 0, t)**2 + jacobi_theta(1, z, t)**2*jacobi_theta(3, 0, t)**2).subs(z, sqrt(2)/5 + I/3).subs(t, 1/3 + pi*I/4)", None, _M, "Jacobi's quartic relation in z"),
+("mf.theta_zero", "modular", "zero", "jacobi_theta(2, 2 + 3*I, 1/2 + I)", None, _M, "a zero of theta_2: z = 1/2 + (half) periods"),
+("mf.theta_S", "modular", "zero", "(jacobi_theta(3, -I*z, I) - exp(pi*z**2)*jacobi_theta(3, z, I)).subs(z, (1 + I)/3)", None, _M, "the stabilizer of i acting on z"),
+("mf.near_landen", "modular", "nonzero", "(modular_lambda(2*t) - ((1 - (jacobi_theta(4, 0, t)/jacobi_theta(3, 0, t))**2)/(1 + (jacobi_theta(4, 0, t)/jacobi_theta(3, 0, t))**2))**2 + 1/10**30).subs(t, 1/5 + pi*I/3)", "1e-30", _M, "near miss of mf.landen_lambda"),
+("mf.j3_hauptmodul", "modular", "zero", "(modular_j(t)*x**3 - (x + 27)*(x + 243)**3).subs(x, (dedekind_eta(t)/dedekind_eta(3*t))**12).subs(t, 1/5 + pi*I/3)", None, _M, "level 3: j in the Hauptmodul of Gamma_0(3)"),
+("mf.j3_up", "modular", "zero", "(modular_j(3*t)*x - (x + 27)*(x + 3)**3).subs(x, (dedekind_eta(t)/dedekind_eta(3*t))**12).subs(t, 1/5 + pi*I/3)", None, _M, "level 3: j(3 tau) in the Hauptmodul"),
+("mf.lambda_third", "modular", "zero", "(modular_lambda((2*t + 1)/3) - modular_lambda((2*t + 1)/3 + 2)).subs(t, 1/5 + pi*I/3)", None, _M, "level 6 from an anchor (Jacobi's modular equation of degree 3)"),
+("mf.near_j3", "modular", "nonzero", "(modular_j(3*t)*x - (x + 27)*(x + 3)**3 + 1/10**20).subs(x, (dedekind_eta(t)/dedekind_eta(3*t))**12).subs(t, 1/5 + pi*I/3)", "1e-20", _M, "near miss of mf.j3_up"),
+("mf.wp_ode", "modular", "zero", "(weierstrass_p_prime(z, t)**2 - 4*weierstrass_p(z, t)**3 + weierstrass_invariant(2, t)*weierstrass_p(z, t) + weierstrass_invariant(3, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "the differential equation of wp"),
+("mf.wp_roots", "modular", "zero", "(4*(weierstrass_p(z, t) - weierstrass_root(1, t))*(weierstrass_p(z, t) - weierstrass_root(2, t))*(weierstrass_p(z, t) - weierstrass_root(3, t)) - weierstrass_p_prime(z, t)**2).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "wp'^2 = 4 (wp - e1)(wp - e2)(wp - e3)"),
+("mf.wp_half", "modular", "zero", "(weierstrass_p(t/2, t) - weierstrass_root(3, t)).subs(t, 1/3 + pi*I/4)", None, _M, "wp at a half period"),
+("mf.wp_period", "modular", "zero", "(weierstrass_p(z + 1 + t, t) - weierstrass_p(-z, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "periodicity and parity of wp"),
+("mf.sigma_quasi", "modular", "zero", "(weierstrass_sigma(z + 1, t) + exp(pi**2*eisenstein_e(2, t)*(2*z + 1)/6)*weierstrass_sigma(z, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "quasi-periodicity of sigma"),
+("mf.near_wp", "modular", "nonzero", "(weierstrass_p_prime(z, t)**2 - 4*weierstrass_p(z, t)**3 + weierstrass_invariant(2, t)*weierstrass_p(z, t) + weierstrass_invariant(3, t) + 1/10**25).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", "1e-25", _M, "near miss of mf.wp_ode"),
+("mf.theta_dup", "modular", "zero", "(jacobi_theta(1, 2*z, t)*jacobi_theta(2, 0, t)*jacobi_theta(3, 0, t)*jacobi_theta(4, 0, t) - 2*jacobi_theta(1, z, t)*jacobi_theta(2, z, t)*jacobi_theta(3, z, t)*jacobi_theta(4, z, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "duplication, theta(2z) first: z gets the generators, 2z rebased onto them (rather than z by the division by 2)"),
+("mf.theta_dup_rev", "modular", "zero", "(2*jacobi_theta(1, z, t)*jacobi_theta(2, z, t)*jacobi_theta(3, z, t)*jacobi_theta(4, z, t) - jacobi_theta(1, 2*z, t)*jacobi_theta(2, 0, t)*jacobi_theta(3, 0, t)*jacobi_theta(4, 0, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "duplication, theta(z) first: 2z by the multiplication formulas"),
+("mf.theta_triple", "modular", "zero", "(jacobi_theta(1, z, t)*jacobi_theta(1, 3*z, t)*jacobi_theta(4, 0, t)**2 - jacobi_theta(4, z, t)**2*jacobi_theta(1, 2*z, t)**2 + jacobi_theta(1, z, t)**2*jacobi_theta(4, 2*z, t)**2).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "theta_1(3z) theta_1(z) theta_4^2 = theta_1(2z)^2 theta_4(z)^2 - theta_4(2z)^2 theta_1(z)^2, theta(z) first: 2z, 3z by the multiplication formulas"),
+("mf.theta_triple_div", "modular", "zero", "(jacobi_theta(1, 3*z, t)*jacobi_theta(1, z, t)*jacobi_theta(4, 0, t)**2 - jacobi_theta(1, 2*z, t)**2*jacobi_theta(4, z, t)**2 + jacobi_theta(4, 2*z, t)**2*jacobi_theta(1, z, t)**2).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "the same with theta(3z) first: z gets the generators and 3z is rebased onto them (the division by 3, a root of degree 9 over the values at 3z with large coefficients, took minutes)"),
+("mf.theta_add", "modular", "zero", "(-((jacobi_theta(4, z, t)*jacobi_theta(4, w, t))**2 - (jacobi_theta(1, z, t)*jacobi_theta(1, w, t))**2) + jacobi_theta(4, z + w, t)*jacobi_theta(4, z - w, t)*jacobi_theta(4, 0, t)**2).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "addition formula, theta(z), theta(w) first"),
+("mf.theta_add_sum_first", "modular", "zero", "(jacobi_theta(4, z + w, t)*jacobi_theta(4, z - w, t)*jacobi_theta(4, 0, t)**2 - ((jacobi_theta(4, z, t)*jacobi_theta(4, w, t))**2 - (jacobi_theta(1, z, t)*jacobi_theta(1, w, t))**2)).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "addition formula, theta(z + w), theta(z - w) first: z and w get the generators, z + w and z - w are rebased onto them"),
+("mf.theta_add_sum_first_2", "modular", "zero", "(jacobi_theta(2, z + w, t)*jacobi_theta(2, z - w, t)*jacobi_theta(4, 0, t)**2 - ((jacobi_theta(2, z, t)*jacobi_theta(4, w, t))**2 - (jacobi_theta(3, z, t)*jacobi_theta(1, w, t))**2)).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "the same for theta_2 (square roots of the forms S_ab without the rebasing; minutes by the halving of P + Q)"),
+("mf.theta_add_sum_first_3", "modular", "zero", "(jacobi_theta(3, z + w, t)*jacobi_theta(3, z - w, t)*jacobi_theta(4, 0, t)**2 - ((jacobi_theta(3, z, t)*jacobi_theta(4, w, t))**2 - (jacobi_theta(2, z, t)*jacobi_theta(1, w, t))**2)).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "the same for theta_3"),
+("mf.theta_add_mixed", "modular", "zero", "(jacobi_theta(1, z + w, t)*jacobi_theta(4, z - w, t)*jacobi_theta(2, 0, t)*jacobi_theta(3, 0, t) - jacobi_theta(1, z, t)*jacobi_theta(4, z, t)*jacobi_theta(2, w, t)*jacobi_theta(3, w, t) - jacobi_theta(2, z, t)*jacobi_theta(3, z, t)*jacobi_theta(1, w, t)*jacobi_theta(4, w, t)).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "theta_1(z + w) theta_4(z - w) theta_2 theta_3 = theta_1 theta_4(z) theta_2 theta_3(w) + theta_2 theta_3(z) theta_1 theta_4(w): odd in the values at w"),
+("mf.theta_half_ratio", "modular", "zero", "(jacobi_theta(2, z, t)*jacobi_theta(3, z, t)*(jacobi_theta(1, z + w, t)*jacobi_theta(4, z - w, t) + jacobi_theta(4, z + w, t)*jacobi_theta(1, z - w, t)) - jacobi_theta(1, z, t)*jacobi_theta(4, z, t)*(jacobi_theta(2, z + w, t)*jacobi_theta(3, z - w, t) + jacobi_theta(3, z + w, t)*jacobi_theta(2, z - w, t))).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "theta_1 theta_4(z) / theta_2 theta_3(z) = S_14 / S_23 for z = ((z + w) + (z - w))/2"),
+("mf.wp_add_sum_first", "modular", "zero", "(weierstrass_p(z + w, t) - (weierstrass_p_prime(z, t) - weierstrass_p_prime(w, t))**2/(4*(weierstrass_p(z, t) - weierstrass_p(w, t))**2) + weierstrass_p(z, t) + weierstrass_p(w, t)).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "the addition theorem of wp, wp(z + w) first"),
+("mf.wp_add_sum_first_2", "modular", "zero", "(weierstrass_p(z + w, t) + weierstrass_p(z - w, t) - ((2*weierstrass_p(z, t)*weierstrass_p(w, t) - weierstrass_invariant(2, t)/2)*(weierstrass_p(z, t) + weierstrass_p(w, t)) - weierstrass_invariant(3, t))/(weierstrass_p(z, t) - weierstrass_p(w, t))**2).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", None, _M, "wp(z + w) + wp(z - w) in wp(z), wp(w), with the values at z + w, z - w first: the theta functions are rebased, but wp(z +- w), rational in the generators at z +- w, become large rational functions of the values at z and w (the reduction of the numerator of the difference to zero dominates; 0.1 s with wp(z), wp(w) first)"),
+("mf.wp_dup", "modular", "zero", "(weierstrass_p(2*z, t) - ((6*weierstrass_p(z, t)**2 - weierstrass_invariant(2, t)/2)/(2*weierstrass_p_prime(z, t)))**2 + 2*weierstrass_p(z, t)).subs(z, 1/5 + I/7).subs(t, 1/3 + pi*I/4)", None, _M, "the duplication formula of wp"),
+("mf.wp_torsion3", "modular", "zero", "(3*x**4 - 3*weierstrass_invariant(2, t)*x**2/2 - 3*weierstrass_invariant(3, t)*x - weierstrass_invariant(2, t)**2/16).subs(x, weierstrass_p(1/3, t)).subs(t, 1/3 + pi*I/4)", None, _M, "wp(1/3) is a root of the division polynomial psi_3 (a torsion point: algebraic over the theta constants)"),
+("mf.theta_torsion4", "modular", "zero", "(jacobi_theta(2, 0, t)**2*jacobi_theta(3, 0, t)*jacobi_theta(4, 0, t) - 2*jacobi_theta(1, 1/4, t)*jacobi_theta(2, 1/4, t)*jacobi_theta(3, 1/4, t)*jacobi_theta(4, 1/4, t)).subs(t, 1/3 + pi*I/4)", None, _M, "the duplication formula at the 4-torsion point 1/4 (theta_1(1/2) = theta_2): values algebraic over the theta constants"),
+("mf.E2_rho", "modular", "zero", "eisenstein_e(2, (1 + sqrt(-3))/2) - 2*sqrt(3)/pi", None, _M, "E2 at rho: E2* vanishes on the orbit of rho (E(m) at the CM modulus exp(pi i/3))"),
+("mf.E2_rho_S", "modular", "zero", "(eisenstein_e(2, -1/t) - t**2*eisenstein_e(2, t) - 6*t/(pi*I)).subs(t, (1 + sqrt(-3))/2)", None, _M, "E2(-1/tau) at rho: a relation under the stabilizer of rho"),
+("mf.ellipe_cm", "modular", "zero", "(elliptic_e(m) - elliptic_k(m)*(2 - m)/3 - pi/(2*sqrt(3)*elliptic_k(m))).subs(m, exp(pi*I/3))", None, _M, "E at the CM modulus of rho in K: E = K (2 - m)/3 + pi/(4 Im(tau) K)"),
+("mf.ellipe_cm_m1", "modular", "zero", "elliptic_e(-1) - elliptic_k(-1) - pi/(4*elliptic_k(-1))", None, _M, "E(-1) = K(-1) + pi/(4 K(-1)) (tau = 1 + i)"),
+("mf.theta_quasi_cm", "modular", "zero", "(jacobi_theta(1, z + t, t) + exp(-pi*I*(t + 2*z))*jacobi_theta(1, z, t)).subs(z, 2*I - 1).subs(t, 4/3 + sqrt(-3)/2)", None, _M, "quasi-periodicity at a CM point of conductor 36: |c tau + d|^2 = 31/36 brings exp(2 pi i/31) and sqrt(31) (a Gauss sum) into the multipliers"),
+("mf.cache_order", "modular", "zero", "(eisenstein_e(4, t)**3 - eisenstein_e(6, t)**2 - 1728*dedekind_eta(t)**24).subs(t, 7/6 + 5*I/4)", None, _M, "E4 before eta at a point whose cached theta_3 was once evicted while being read (eta = 0 exactly)"),
+("mf.near_add_sum_first", "modular", "nonzero", "(jacobi_theta(2, z + w, t)*jacobi_theta(2, z - w, t)*jacobi_theta(4, 0, t)**2 - ((jacobi_theta(2, z, t)*jacobi_theta(4, w, t))**2 - (jacobi_theta(3, z, t)*jacobi_theta(1, w, t))**2) + 1/10**25).subs(z, 1/5 + I/7).subs(w, -1/9 + I/11).subs(t, 1/3 + pi*I/4)", "1e-25", _M, "near miss of mf.theta_add_sum_first_2"),
 
 # --- inequalities in asymptotic regimes -----------------------------------
 ("asy.tan_100i_upper", "asymptotic", "true", "Lt(Abs(tan(1 + 100*I) - I), 3*exp(-200))", None, _G, "tan(x + iy) - i ~ 2 exp(-2y)"),
@@ -922,7 +1073,7 @@ _FUNCS = {"exp": "exp", "log": "log", "sin": "sin", "cos": "cos", "tan": "tan", 
           "asinh": "asinh", "acosh": "acosh", "atanh": "atanh", "abs": "abs", "Abs": "abs",
           "arg": "arg", "re": "re", "im": "im", "conjugate": "conj", "floor": "floor",
           "ceiling": "ceil", "erf": "erf", "erfc": "erfc", "erfi": "erfi", "gamma": "gamma",
-          "sqrt": "sqrt", "sign": "sgn", "digamma": "digamma"}
+          "sqrt": "sqrt", "sign": "sgn", "digamma": "digamma", "loggamma": "lgamma"}
 
 _RELATIONS = {"Eq": lambda a, b: a == b, "Ne": lambda a, b: a != b, "Lt": lambda a, b: a < b,
               "Le": lambda a, b: a <= b, "Gt": lambda a, b: a > b, "Ge": lambda a, b: a >= b}
@@ -930,7 +1081,11 @@ _RELATIONS = {"Eq": lambda a, b: a == b, "Ne": lambda a, b: a != b, "Lt": lambda
 # functions whose value at an algebraic number is (in general) transcendental
 _TRANSCENDENTAL = {"exp", "log", "sin", "cos", "tan", "atan", "asin", "acos", "sinh", "cosh",
                    "tanh", "asinh", "acosh", "atanh", "arg", "erf", "erfc", "erfi", "gamma",
-                   "digamma", "polygamma", "polylog", "zeta", "LambertW"}
+                   "digamma", "polygamma", "polylog", "zeta", "LambertW", "hyper", "elliptic_k",
+                   "loggamma", "lerchphi", "dirichlet_l",
+                   "elliptic_e", "modular_j", "modular_lambda", "dedekind_eta", "eisenstein_e",
+                   "jacobi_theta", "weierstrass_p", "weierstrass_p_prime", "weierstrass_sigma",
+                   "weierstrass_root", "weierstrass_invariant"}
 
 class Unsupported(Exception):
     pass
@@ -1193,8 +1348,45 @@ def evaluate(s, R, rational_pi=False):
                 return R.polylog(ev(args[0], sub), ev(args[1], sub))
             if fn == "polygamma":
                 return R.polygamma(ev(args[0], sub), ev(args[1], sub))
+            if fn == "lerchphi":
+                # lerchphi(z, s, a) (SymPy's notation)
+                return R.lerch_phi(ev(args[0], sub), ev(args[1], sub), ev(args[2], sub))
+            if fn == "dirichlet_l":
+                # dirichlet_l(s, q, n): L(s, chi) for the character of Conrey
+                # label n modulo q
+                from flint_ctypes import DirichletGroup
+                return R.dirichlet_l(ev(args[0], sub), DirichletGroup(int(num(args[1])))(int(num(args[2]))))
             if fn == "RootOf":
                 return rootof(args[0], int(num(args[1])))
+            if fn == "hyper":
+                # hyper([a...], [b...], z) (SymPy's notation)
+                a = [ev(x, sub) for x in args[0].elts]
+                b = [ev(x, sub) for x in args[1].elts]
+                z = ev(args[2], sub)
+                if len(a) == 0 and len(b) == 1:
+                    return R.hypgeom_0f1(b[0], z)
+                if len(a) == 1 and len(b) == 1:
+                    return R.hypgeom_1f1(a[0], b[0], z)
+                if len(a) == 2 and len(b) == 1:
+                    return R.hypgeom_2f1(a[0], a[1], b[0], z)
+                return R.hypgeom_pfq(a, b, z)
+            if fn in ("elliptic_k", "elliptic_e", "modular_j", "modular_lambda", "dedekind_eta"):
+                return getattr(R, fn)(ev(args[0], sub))
+            if fn == "eisenstein_e":
+                return R.eisenstein_e(int(num(args[0])), ev(args[1], sub))
+            if fn == "jacobi_theta":
+                # jacobi_theta(j, z, tau), j = 1, 2, 3, 4 (q = exp(pi i tau))
+                j = int(num(args[0]))
+                return getattr(R, "jacobi_theta_%d" % j)(ev(args[1], sub), ev(args[2], sub))
+            if fn in ("weierstrass_p", "weierstrass_p_prime", "weierstrass_sigma"):
+                # the lattice Z + tau Z: weierstrass_p(z, tau)
+                return getattr(R, fn)(ev(args[0], sub), ev(args[1], sub))
+            if fn == "weierstrass_root":
+                # e_k, k = 1, 2, 3
+                return R.elliptic_roots(ev(args[1], sub))[int(num(args[0])) - 1]
+            if fn == "weierstrass_invariant":
+                # g_k, k = 2, 3
+                return R.elliptic_invariants(ev(args[1], sub))[int(num(args[0])) - 2]
             raise Unsupported("function " + fn)
         raise Unsupported(type(node).__name__)
 
@@ -2180,7 +2372,13 @@ STATUSES = ("ok", "wrong", "undecided", "unable", "error", "timeout", "n/a")
 
 def _field(name):
     import flint_ctypes as F
-    return {"tower": F.ComplexField_tower, "ca": F.ComplexField_ca, "qqbar": F.ComplexAlgebraicField_qqbar}[name]()
+    K = {"tower": F.ComplexField_tower, "ca": F.ComplexField_ca, "qqbar": F.ComplexAlgebraicField_qqbar}[name]()
+    # (options of the tower field for comparisons: GR_TOWER_PROFILE_OPTIONS="name=value,...")
+    if name == "tower" and os.environ.get("GR_TOWER_PROFILE_OPTIONS"):
+        for kv in os.environ["GR_TOWER_PROFILE_OPTIONS"].split(","):
+            k, v = kv.split("=")
+            K.set_option(k.strip(), int(v))
+    return K
 
 def _sympy_zero(e):
     z = e.is_zero
@@ -2211,15 +2409,17 @@ def sympy_check(case):
         return None
     return z if expect != "nonzero" else not z
 
-def _run_case(case, engine):
-    """(status, seconds, detail); runs in the subprocess"""
+def _run_case(case, engine, R=None):
+    """(status, seconds, detail); runs in the subprocess (in the field R
+    if given, else a new one)"""
     import flint_ctypes as F
     t = time.time()
     try:
         if engine == "sympy":
             r = case["sympy_func"]() if case["kind"] == "program" else sympy_check(case)
         else:
-            R = _field(engine)
+            if R is None:
+                R = _field(engine)
             if case["kind"] == "program":
                 r = case["func"](R)
             else:
@@ -2252,9 +2452,23 @@ def _worker(case, engine, conn):
     conn.send(out[0] if out else ("error", 0.0, "no result"))
     conn.close()
 
+# functions SymPy does not define (it would treat them as undefined
+# functions, and any answer would be meaningless)
+_SYMPY_MISSING = {"modular_j", "modular_lambda", "dedekind_eta", "eisenstein_e", "jacobi_theta",
+                  "weierstrass_p", "weierstrass_p_prime", "weierstrass_sigma", "weierstrass_root",
+                  "weierstrass_invariant", "dirichlet_l"}
+
+def _uses_functions(expr, names):
+    for n in ast.walk(ast.parse(_expand_big(expr), mode="eval")):
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id in names:
+            return True
+    return False
+
 def applicable(case, engine):
     if engine == "sympy":
-        return case["kind"] == "expr" or case.get("sympy_func") is not None
+        if case["kind"] == "expr":
+            return not _uses_functions(case["expr"], _SYMPY_MISSING)
+        return case.get("sympy_func") is not None
     if engine == "qqbar":
         return case["algebraic"] if case["kind"] == "program" else is_algebraic(case["expr"])
     return True
@@ -2266,6 +2480,69 @@ def _fmt(res):
     if st in ("n/a", "timeout"):
         return st
     return "%s %.3f" % (st.upper() if st == "wrong" else st, dt or 0.0)
+
+def _worker_shared(cases, engine, conn):
+    """the cases in order in one field (one result sent per case)"""
+    sys.setrecursionlimit(200000)
+    if hasattr(sys, "set_int_max_str_digits"):
+        sys.set_int_max_str_digits(0)
+    def go():
+        R = _field(engine) if engine != "sympy" else None
+        for c in cases:
+            conn.send(_run_case(c, engine, R))
+    threading.stack_size(1 << 29)
+    th = threading.Thread(target=go)
+    th.start(); th.join()
+    conn.close()
+
+def run_shared(cases, engines=("tower",), timeout=60.0, verbose=True):
+    """run the cases in order in one context per engine (a long session:
+    the caches, anchors and towers of the earlier cases are those of the
+    later ones); a case running beyond the timeout stops the sequence
+    (it and the following cases: timeout)"""
+    ctx = mp.get_context("fork")
+    for c in cases:
+        c["results"] = {}
+        if c["expr"] and "BIG:" in c["expr"]:
+            c["expr"] = _expand_big(c["expr"])
+    for e in engines:
+        todo = [c for c in cases if applicable(c, e)]
+        for c in cases:
+            if not applicable(c, e):
+                c["results"][e] = dict(status="n/a", time=None, detail="")
+        a, b = ctx.Pipe(duplex=False)
+        p = ctx.Process(target=_worker_shared, args=(todo, e, b))
+        p.start(); b.close()
+        k = 0
+        crashed = False
+        while k < len(todo):
+            t0 = time.time()
+            if a.poll(timeout):
+                try:
+                    st, dt, det = a.recv()
+                except EOFError:
+                    crashed = True
+                    break
+                todo[k]["results"][e] = dict(status=st, time=dt, detail=det)
+                k += 1
+            else:
+                break
+        if p.is_alive():
+            p.kill()
+        p.join()
+        a.close()
+        for c in todo[k:]:
+            if c is not todo[k]:
+                c["results"][e] = dict(status="error", time=None, detail="not run (an earlier case stopped the sequence)")
+            elif crashed:
+                c["results"][e] = dict(status="error", time=time.time() - t0, detail="crashed (exit code %s)" % p.exitcode)
+            else:
+                c["results"][e] = dict(status="timeout", time=timeout, detail="")
+    if verbose:
+        print("case | " + " | ".join(engines))
+        for c in cases:
+            print(c["id"] + " | " + " | ".join(_fmt(c["results"][e]) for e in engines))
+    return cases
 
 def run(cases, engines=("tower", "ca"), timeout=60.0, jobs=1, verbose=True):
     """run the cases on the engines; fills case["results"][engine]"""
@@ -2298,7 +2575,9 @@ def run(cases, engines=("tower", "ca"), timeout=60.0, jobs=1, verbose=True):
         still = []
         for (p, a, i, e, t0) in running:
             res = None
-            if a.poll():
+            # (a worker which has just sent its result and exited: the
+            # result is read before the exit is taken for a crash)
+            if a.poll() or not p.is_alive() and a.poll():
                 try:
                     st, dt, det = a.recv()
                     res = dict(status=st, time=dt, detail=det)
@@ -2358,7 +2637,14 @@ _FEXPR_FUNCS = {"exp": "Exp", "log": "Log", "sin": "Sin", "cos": "Cos", "tan": "
                 "sqrt": "Sqrt", "sign": "Sign", "digamma": "DigammaFunction", "LambertW": "LambertW",
                 "polylog": "PolyLog", "fibonacci": "Fibonacci", "factorial": "Factorial",
                 "Eq": "Equal", "Ne": "NotEqual", "Lt": "Less", "Le": "LessEqual", "Gt": "Greater",
-                "Ge": "GreaterEqual", "real_root": "RealRoot", "RootOf": "RootOf"}
+                "Ge": "GreaterEqual", "real_root": "RealRoot", "RootOf": "RootOf",
+                "elliptic_k": "EllipticK", "elliptic_e": "EllipticE", "modular_j": "ModularJ",
+                "modular_lambda": "ModularLambda", "dedekind_eta": "DedekindEta",
+                "eisenstein_e": "EisensteinE", "jacobi_theta": "JacobiTheta",
+                "weierstrass_p": "WeierstrassP", "weierstrass_sigma": "WeierstrassSigma",
+                "weierstrass_p_prime": "WeierstrassPPrime", "weierstrass_root": "WeierstrassRoot",
+                "weierstrass_invariant": "WeierstrassInvariant",
+                "loggamma": "LogGamma", "lerchphi": "LerchPhi"}
 
 def to_fexpr(s):
     """the expression s (Python syntax) as an fexpr"""
@@ -2389,7 +2675,7 @@ def to_fexpr(s):
             if isinstance(n.func, ast.Attribute) and n.func.attr == "subs":
                 return F("Where")(c(n.func.value), F("Def")(c(n.args[0]), c(n.args[1])))
             fn = n.func.id
-            args = [c(a) for a in n.args]
+            args = [c(a) for a in n.args if not isinstance(a, ast.List)]
             if fn == "expand":
                 return args[0]
             if fn == "cbrt":
@@ -2398,6 +2684,14 @@ def to_fexpr(s):
                 return F("RiemannZeta")(*args) if len(args) == 1 else F("HurwitzZeta")(*args)
             if fn == "polygamma":
                 return F("DigammaFunction")(args[1], args[0])
+            if fn == "dirichlet_l":
+                return F("DirichletL")(args[0], F("DirichletCharacter")(args[1], args[2]))
+            if fn == "hyper":
+                p, q = len(n.args[0].elts), len(n.args[1].elts)
+                name = "Hypergeometric%dF%d" % (p, q) if (p, q) in ((0, 1), (1, 1), (2, 1), (3, 2)) else None
+                if name is None:
+                    raise Unsupported("hyper")
+                return F(name)(*([c(x) for x in n.args[0].elts] + [c(x) for x in n.args[1].elts] + [c(n.args[2])]))
             return F(_FEXPR_FUNCS[fn])(*args)
         raise Unsupported(type(n).__name__)
     return c(ast.parse(s, mode="eval").body)
@@ -2410,7 +2704,9 @@ def to_latex(s, limit=700):
         t = to_fexpr(s).latex()
     except Exception:
         return None
-    for a, b in ((r"\operatorname{ConstGamma}", r"\gamma"), (r"\operatorname{RealRoot}", r"\operatorname{realroot}")):
+    for a, b in ((r"\operatorname{ConstGamma}", r"\gamma"), (r"\operatorname{RealRoot}", r"\operatorname{realroot}"),
+                 (r"\operatorname{WeierstrassPPrime}", r"\wp'"), (r"\operatorname{WeierstrassRoot}", r"e"),
+                 (r"\operatorname{WeierstrassInvariant}", r"g")):
         t = t.replace(a, b)
     return t
 
@@ -2788,6 +3084,10 @@ def main(argv=None):
     ap.add_argument("--from-json", default=None, help="read results from this file instead of running")
     ap.add_argument("--fragment", action="store_true", help="HTML without the document skeleton")
     ap.add_argument("--list", action="store_true", help="list the cases and exit")
+    ap.add_argument("--shared", action="store_true",
+                    help="run the cases in order in one context per engine (a long session), "
+                         "rather than each in a new process")
+    ap.add_argument("--reverse", action="store_true", help="run the cases in reverse order")
     args = ap.parse_args(argv)
 
     if args.from_json:
@@ -2806,7 +3106,12 @@ def main(argv=None):
             print("%-28s %-18s %-8s %s" % (c["id"], c["category"], c["expect"].split(":")[0],
                                            (c["expr"] or c["tex"])[:100]))
         return
-    run(cases, engines, args.timeout, args.jobs)
+    if args.reverse:
+        cases = cases[::-1]
+    if args.shared:
+        run_shared(cases, engines, args.timeout)
+    else:
+        run(cases, engines, args.timeout, args.jobs)
     print_summary(cases, engines)
     data = to_json(cases, _meta(engines, args.timeout, args.jobs))
     if args.json:

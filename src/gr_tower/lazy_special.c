@@ -41,10 +41,10 @@
     - polylogarithms: rational functions for s <= 0, logarithms for s = 1,
       zeta values at z = 1 and z = -1; at other roots of unity, sums of
       Hurwitz zeta values (in their normal form).
-    - complete elliptic integrals: K(0), E(0), E(1), the lemniscatic
-      value K(1/2) (through Gamma(1/4)), the singular values for r = 2,
-      3, 4 and their complements, and the imaginary-modulus
-      transformation to |m - 1| <= 1 (Legendre's relation and Landen's
+    - complete elliptic integrals: through 2F1 (lazy_hypgeom.c), which
+      gives K(0), E(0), E(1), K(1/2), E(1/2) and the imaginary-modulus
+      transformation to |m - 1| <= 1; the singular values for r = 2, 3, 4
+      and their complements here (Legendre's relation and Landen's
       transformation are found by the zero test, elliptic_relations.c).
 
     Functions of real arguments are real where the function is: the
@@ -69,6 +69,9 @@
 #include "gr_tower.h"
 #include "gr_tower_lazy.h"
 #include "gr_tower/impl.h"
+
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 /* recurrences (shifts of the argument) over at most this many steps;
    beyond, the generator of the unshifted argument is used */
@@ -165,73 +168,6 @@ _trig_pi_fmpq(gr_ptr res, const fmpq_t c, int which, gr_ctx_t ctx)
     return status;
 }
 
-/* sign of the real number x (exact, with a numerical fast path) */
-static int
-_real_sign(int * sgn, gr_srcptr x, gr_ctx_t ctx)
-{
-    acb_t z;
-    int status;
-
-    acb_init(z);
-    status = gr_tower_lazy_get_acb(z, x, CHECK_PREC, ctx);
-    if (status == GR_SUCCESS && arb_is_positive(acb_realref(z)))
-        *sgn = 1;
-    else if (status == GR_SUCCESS && arb_is_negative(acb_realref(z)))
-        *sgn = -1;
-    else
-        status = _gr_tower_lazy_real_sign_locked(sgn, x, ctx);
-    acb_clear(z);
-    return status;
-}
-
-/* sign of Re(x) - c, respectively Im(x) */
-static int
-_re_cmp_fmpq(int * sgn, gr_srcptr x, const fmpq_t c, gr_ctx_t ctx)
-{
-    gr_ptr t;
-    acb_t z;
-    arb_t d;
-    int status;
-
-    acb_init(z);
-    arb_init(d);
-    status = gr_tower_lazy_get_acb(z, x, CHECK_PREC, ctx);
-    if (status == GR_SUCCESS)
-    {
-        arb_set_fmpq(d, c, CHECK_PREC);
-        arb_sub(d, acb_realref(z), d, CHECK_PREC);
-    }
-    if (status == GR_SUCCESS && arb_is_positive(d))
-        *sgn = 1;
-    else if (status == GR_SUCCESS && arb_is_negative(d))
-        *sgn = -1;
-    else
-    {
-        GR_TMP_INIT(t, ctx);
-        status = gr_re(t, x, ctx);
-        status |= gr_sub_fmpq(t, t, c, ctx);
-        if (status == GR_SUCCESS)
-            status = _gr_tower_lazy_real_sign_locked(sgn, t, ctx);
-        GR_TMP_CLEAR(t, ctx);
-    }
-    acb_clear(z);
-    arb_clear(d);
-    return status;
-}
-
-static int
-_im_sign(int * sgn, gr_srcptr x, gr_ctx_t ctx)
-{
-    gr_ptr t;
-    int status;
-    GR_TMP_INIT(t, ctx);
-    status = gr_im(t, x, ctx);
-    if (status == GR_SUCCESS)
-        status = _real_sign(sgn, t, ctx);
-    GR_TMP_CLEAR(t, ctx);
-    return status;
-}
-
 /* n = floor(Re(x)) */
 static int
 _re_floor(slong * n, gr_srcptr x, gr_ctx_t ctx)
@@ -313,7 +249,7 @@ _shift_reflect(gr_ptr z0, slong * n, int * reflect, int * pole, gr_srcptr z, gr_
     fmpq_init(half);
     fmpq_set_si(half, 1, 2);
 
-    status = _re_cmp_fmpq(&c, z0, half, ctx);
+    status = _gr_tower_lazy_re_cmp(&c, z0, half, ctx);
     if (status == GR_SUCCESS)
     {
         if (c > 0)
@@ -325,14 +261,14 @@ _shift_reflect(gr_ptr z0, slong * n, int * reflect, int * pole, gr_srcptr z, gr_
             if (!line)
             {
                 fmpq_zero(half);
-                status = _re_cmp_fmpq(&c, z0, half, ctx);
+                status = _gr_tower_lazy_re_cmp(&c, z0, half, ctx);
                 if (status == GR_SUCCESS && c == 0)
                     line = 2;
             }
 
             if (status == GR_SUCCESS && line)
             {
-                status = _im_sign(&s, z0, ctx);
+                status = _gr_tower_lazy_im_sign(&s, z0, ctx);
                 if (status == GR_SUCCESS)
                 {
                     if (s < 0)
@@ -356,35 +292,44 @@ _shift_reflect(gr_ptr z0, slong * n, int * reflect, int * pole, gr_srcptr z, gr_
     return status;
 }
 
-/* The view restrictions on a result: in a real view, the result must be
-   real; in an algebraic view, algebraic (special function values at
-   algebraic points are usually transcendental, but this is not known
-   in general: GR_UNABLE). */
-static int
-_finish(int status, gr_ptr res, int real, int alg, gr_ctx_t ctx)
-{
-    if (status != GR_SUCCESS)
-        return status;
-
-    if (alg && _gr_tower_lazy_is_algebraic_repr_locked(res, ctx) != T_TRUE)
-        return GR_UNABLE;
-
-    if (real)
-    {
-        truth_t t = _gr_tower_lazy_is_real_exact(res, ctx);
-        if (t == T_FALSE)
-            return GR_DOMAIN;
-        if (t == T_UNKNOWN)
-            return GR_UNABLE;
-        status = _gr_tower_lazy_realify_locked(res, ctx);
-    }
-
-    return status;
-}
-
 /* -------------------------------------------------------------------- */
 /* Gamma                                                                 */
 /* -------------------------------------------------------------------- */
+
+/*
+    The column order of the unknowns k = 1, ..., q - 1 of the lattices at
+    level q (gamma and Hurwitz zeta values at k/q): the non-candidates
+    for the basis (k/q > 1/2) first; then the candidates by decreasing
+    (denominator, numerator), so that a reduced row echelon form prefers
+    small denominators in the basis.
+*/
+static void
+_lattice_order(slong * order, slong q)
+{
+    slong m = 0, nc = 0, a, b, k;
+    slong * cand = order + (q - 1) / 2;
+
+    for (k = 1; k < q; k++)
+        if (2 * k > q)
+            order[m++] = k;
+    /* (the candidates, k <= q/2, sorted in place after them) */
+    for (k = 1; 2 * k <= q; k++)
+        cand[nc++] = k;
+    for (a = 1; a < nc; a++)
+    {
+        slong x = cand[a], gx = n_gcd(x, q);
+        slong dx = q / gx, nx = x / gx;
+        for (b = a - 1; b >= 0; b--)
+        {
+            slong y = cand[b], gy = n_gcd(y, q);
+            slong dy = q / gy, ny = y / gy;
+            if (dy > dx || (dy == dx && ny > nx))
+                break;
+            cand[b + 1] = cand[b];
+        }
+        cand[b + 1] = x;
+    }
+}
 
 /*
     Gamma at rational arguments: a normal form modulo all the relations
@@ -427,7 +372,7 @@ _gamma_lattice(int * is_basis, slong * num_free, slong * free_k, fmpz * free_exp
     slong nvar = q - 1, nsin = (q - 1) / 2;
     slong cpi = GR_TOWER_GAMMA_CPI(q), cint = GR_TOWER_GAMMA_CINT(q), csin = GR_TOWER_GAMMA_CSIN(q), ncols = GR_TOWER_GAMMA_NCOLS(q);
     slong * order, * col_of_k, * k_of_col;
-    slong nrows = 0, i, j, k, r, rank;
+    slong nrows = 0, i, j, r, rank;
     fmpq_mat_t A, B;
     int ok = 1;
 
@@ -435,42 +380,11 @@ _gamma_lattice(int * is_basis, slong * num_free, slong * free_k, fmpz * free_exp
     order = flint_malloc(sizeof(slong) * nvar);
     col_of_k = flint_malloc(sizeof(slong) * q);
     k_of_col = flint_malloc(sizeof(slong) * nvar);
+    _lattice_order(order, q);
+    for (i = 0; i < nvar; i++)
     {
-        /* keys: non-candidates (k/q > 1/2) first; then candidates by
-           decreasing (denominator, numerator) */
-        slong m = 0;
-        for (k = 1; k < q; k++)
-            if (2 * k > q)
-                order[m++] = k;
-        {
-            slong * cand = flint_malloc(sizeof(slong) * nvar);
-            slong nc = 0, a, b;
-            for (k = 1; 2 * k <= q; k++)
-                cand[nc++] = k;
-            /* sort by (den, num) decreasing: insertion sort */
-            for (a = 1; a < nc; a++)
-            {
-                slong x = cand[a], gx = n_gcd(x, q);
-                slong dx = q / gx, nx = x / gx;
-                for (b = a - 1; b >= 0; b--)
-                {
-                    slong y = cand[b], gy = n_gcd(y, q);
-                    slong dy = q / gy, ny = y / gy;
-                    if (dy > dx || (dy == dx && ny > nx))
-                        break;
-                    cand[b + 1] = cand[b];
-                }
-                cand[b + 1] = x;
-            }
-            for (a = 0; a < nc; a++)
-                order[m++] = cand[a];
-            flint_free(cand);
-        }
-        for (i = 0; i < nvar; i++)
-        {
-            col_of_k[order[i]] = i;
-            k_of_col[i] = order[i];
-        }
+        col_of_k[order[i]] = i;
+        k_of_col[i] = order[i];
     }
 
     fmpq_mat_init(A, _gr_tower_gamma_relations_rows(q), ncols);
@@ -938,7 +852,7 @@ _gamma(gr_ptr res, gr_srcptr z_in, gr_ctx_t ctx)
         int c0;
         fmpq_t zero;
         fmpq_init(zero);
-        status = _re_cmp_fmpq(&c0, z0, zero, ctx);
+        status = _gr_tower_lazy_re_cmp(&c0, z0, zero, ctx);
         fmpq_clear(zero);
 
         status |= gr_neg(t, z0, ctx);
@@ -990,7 +904,7 @@ gr_tower_lazy_gamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_gamma(res, x, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_gamma(res, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1007,7 +921,93 @@ gr_tower_lazy_rgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_
         status = gr_zero(res, ctx);    /* at the poles */
     else if (status == GR_SUCCESS)
         status = gr_inv(res, res, ctx);
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
+    _gr_tower_lazy_unlock(ctx);
+    return status;
+}
+
+/*
+    log Gamma(x) (the analytic continuation from the positive reals, with
+    the branch cut on the negative reals, as acb_lgamma) = log(Gamma(x))
+    + 2 pi i k, the integer k from enclosures
+*/
+static int
+_lgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr g, t;
+    acb_t a, b, c;
+    slong prec;
+    int status, found = 0;
+    fmpz_t k;
+
+    GR_TMP_INIT2(g, t, ctx);
+    acb_init(a);
+    acb_init(b);
+    acb_init(c);
+    fmpz_init(k);
+
+    status = _gamma(g, x, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_log(g, g, ctx);
+
+    for (prec = 64; status == GR_SUCCESS && !found && prec <= 4096; prec *= 2)
+    {
+        status = gr_tower_lazy_get_acb(a, x, prec, ctx);
+        status |= gr_tower_lazy_get_acb(b, g, prec, ctx);
+        if (status != GR_SUCCESS)
+            break;
+        acb_lgamma(a, a, prec);
+        acb_sub(a, a, b, prec);
+        acb_const_pi(c, prec);
+        acb_mul_2exp_si(c, c, 1);
+        acb_div_onei(a, a);
+        acb_div(a, a, c, prec);
+        /* (a = k, an integer, with a real part enclosure free of other integers) */
+        if (arb_contains_zero(acb_imagref(a)) && mag_cmp_2exp_si(arb_radref(acb_realref(a)), -2) < 0)
+        {
+            arf_get_fmpz(k, arb_midref(acb_realref(a)), ARF_RND_NEAR);
+            found = arb_contains_fmpz(acb_realref(a), k);
+            if (!found)
+                status = GR_UNABLE;
+        }
+    }
+    if (status == GR_SUCCESS && !found)
+        status = GR_UNABLE;
+
+    if (status == GR_SUCCESS && !fmpz_is_zero(k))
+    {
+        /* + 2 pi i k */
+        status = gr_pi(t, ctx);
+        status |= gr_mul_fmpz(t, t, k, ctx);
+        status |= gr_mul_2exp_si(t, t, 1, ctx);
+        {
+            gr_ptr u;
+            GR_TMP_INIT(u, ctx);
+            status |= gr_i(u, ctx);
+            status |= gr_mul(t, t, u, ctx);
+            GR_TMP_CLEAR(u, ctx);
+        }
+        status |= gr_add(g, g, t, ctx);
+    }
+    if (status == GR_SUCCESS)
+        status = gr_set(res, g, ctx);
+
+    GR_TMP_CLEAR2(g, t, ctx);
+    acb_clear(a);
+    acb_clear(b);
+    acb_clear(c);
+    fmpz_clear(k);
+    return status;
+}
+
+int
+gr_tower_lazy_lgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
+{
+    int status, real, alg;
+    _gr_tower_lazy_lock(ctx);
+    real = REAL(ctx);
+    alg = ALG(ctx);
+    status = _gr_tower_lazy_view_finish(_lgamma(res, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1039,7 +1039,7 @@ gr_tower_lazy_beta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, const
         }
     }
     GR_TMP_CLEAR3(a, b, c, ctx);
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1063,10 +1063,10 @@ _erf(gr_ptr res, gr_srcptr z, gr_ctx_t ctx)
 
     /* odd: a canonical argument has Re(z) > 0, or Re(z) = 0 and Im(z) > 0 */
     fmpq_init(zero);
-    status = _re_cmp_fmpq(&c, z, zero, ctx);
+    status = _gr_tower_lazy_re_cmp(&c, z, zero, ctx);
     fmpq_clear(zero);
     if (status == GR_SUCCESS && c == 0)
-        status = _im_sign(&c, z, ctx);
+        status = _gr_tower_lazy_im_sign(&c, z, ctx);
     if (status != GR_SUCCESS)
         return status;
 
@@ -1085,7 +1085,7 @@ _erf(gr_ptr res, gr_srcptr z, gr_ctx_t ctx)
         if (status == GR_SUCCESS)
         {
             int r;
-            status = _re_cmp_fmpq(&r, w, zero, ctx);
+            status = _gr_tower_lazy_re_cmp(&r, w, zero, ctx);
             imag = (status == GR_SUCCESS && r == 0);
         }
         fmpq_clear(zero);
@@ -1116,7 +1116,7 @@ gr_tower_lazy_erf(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_erf(res, x, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_erf(res, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1134,7 +1134,7 @@ gr_tower_lazy_erfc(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ct
         status = gr_neg(res, res, ctx);
         status |= gr_add_si(res, res, 1, ctx);
     }
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1156,7 +1156,7 @@ gr_tower_lazy_erfi(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ct
     status |= gr_mul(res, t, i, ctx);
     status |= gr_neg(res, res, ctx);
     GR_TMP_CLEAR2(i, t, ctx);
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1228,7 +1228,7 @@ gr_tower_lazy_lambertw_fmpz(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_lambertw(res, x, fmpz_get_si(k), ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_lambertw(res, x, fmpz_get_si(k), ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1240,7 +1240,7 @@ gr_tower_lazy_lambertw(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, g
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_lambertw(res, x, 0, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_lambertw(res, x, 0, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1321,7 +1321,7 @@ _zeta(gr_ptr res, gr_srcptr s, gr_ctx_t ctx)
             status = GR_UNABLE;
     }
     else
-        status = _gr_tower_lazy_special_gen_locked(res, s, GR_TOWER_ZETA, 0, ctx);
+        status = _gr_tower_lazy_dirichlet_l_prim(res, s, 1, 1, ctx);   /* (the functional equation) */
     fmpq_clear(c);
     return status;
 }
@@ -1333,7 +1333,7 @@ gr_tower_lazy_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ct
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_zeta(res, x, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_zeta(res, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -1558,7 +1558,7 @@ _cot_pi_derivative_fmpq(gr_ptr res, slong p, slong q, ulong m, gr_ctx_t ctx)
 static void
 _hurwitz_lattice_init(gr_tower_hurwitz_lattice_struct * L, slong s, slong q)
 {
-    slong nvar = q, i, j, k, r, nrows;
+    slong nvar = q, i, j, r, nrows;
     slong * order;
     fmpq_mat_t A;
 
@@ -1570,33 +1570,8 @@ _hurwitz_lattice_init(gr_tower_hurwitz_lattice_struct * L, slong s, slong q)
     L->row_of_col = flint_malloc(sizeof(slong) * L->ncols);
     order = flint_malloc(sizeof(slong) * nvar);
 
-    {
-        slong m = 0, nc = 0, a, b;
-        slong * cand = flint_malloc(sizeof(slong) * nvar);
-        for (k = 1; k < q; k++)
-            if (2 * k > q)
-                order[m++] = k;
-        for (k = 1; 2 * k <= q; k++)
-            cand[nc++] = k;
-        for (a = 1; a < nc; a++)
-        {
-            slong x = cand[a], gx = n_gcd(x, q);
-            slong dx = q / gx, nx = x / gx;
-            for (b = a - 1; b >= 0; b--)
-            {
-                slong y = cand[b], gy = n_gcd(y, q);
-                slong dy = q / gy, ny = y / gy;
-                if (dy > dx || (dy == dx && ny > nx))
-                    break;
-                cand[b + 1] = cand[b];
-            }
-            cand[b + 1] = x;
-        }
-        for (a = 0; a < nc; a++)
-            order[m++] = cand[a];
-        order[m++] = q;
-        flint_free(cand);
-    }
+    _lattice_order(order, q);
+    order[q - 1] = q;
     for (i = 0; i < nvar; i++)
     {
         L->col_of_k[order[i]] = i;
@@ -2199,7 +2174,7 @@ _polygamma(gr_ptr res, ulong m, gr_srcptr z_in, gr_ctx_t ctx)
         int c0;
         fmpq_t zero;
         fmpq_init(zero);
-        status = _re_cmp_fmpq(&c0, z0, zero, ctx);
+        status = _gr_tower_lazy_re_cmp(&c0, z0, zero, ctx);
         fmpq_clear(zero);
 
         status |= gr_neg(t, z0, ctx);
@@ -2245,7 +2220,7 @@ gr_tower_lazy_digamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_polygamma(res, 0, x, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_polygamma(res, 0, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -2277,7 +2252,7 @@ gr_tower_lazy_polygamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, 
     status = _get_order(&m, s, 0, ctx);
     if (status == GR_SUCCESS)
         status = _polygamma(res, m, x, ctx);
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -2292,8 +2267,30 @@ gr_tower_lazy_hurwitz_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t 
     real = REAL(ctx);
     alg = ALG(ctx);
     status = _get_order(&m, s, 2, ctx);
-    if (status == GR_SUCCESS)
-        status = _polygamma(res, m - 1, a, ctx);
+    if (status != GR_SUCCESS)
+    {
+        /* other s: Bernoulli polynomials, character sums */
+        status = _gr_tower_lazy_hurwitz_general(res, s, a, ctx);
+        status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
+        _gr_tower_lazy_unlock(ctx);
+        return status;
+    }
+    status = _gr_tower_lazy_hurwitz_zeta_int(res, m, a, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
+    _gr_tower_lazy_unlock(ctx);
+    return status;
+}
+
+/* zeta(s, a) for an integer s >= 2 (GR_UNABLE above EXACT_LIMIT) */
+int
+_gr_tower_lazy_hurwitz_zeta_int(gr_ptr res, slong m, gr_srcptr a, gr_ctx_t ctx)
+{
+    int status;
+    if (m < 2)
+        return GR_DOMAIN;
+    if (m > EXACT_LIMIT)
+        return GR_UNABLE;
+    status = _polygamma(res, m - 1, a, ctx);
     if (status == GR_SUCCESS)
     {
         fmpz_t f;
@@ -2304,8 +2301,6 @@ gr_tower_lazy_hurwitz_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t 
         status = gr_div_fmpz(res, res, f, ctx);
         fmpz_clear(f);
     }
-    status = _finish(status, res, real, alg, ctx);
-    _gr_tower_lazy_unlock(ctx);
     return status;
 }
 
@@ -2430,7 +2425,7 @@ _dilog_in_region(int * in, gr_srcptr w, gr_ctx_t ctx)
     fmpq_set_si(half, 1, 2);
 
     *in = 0;
-    status = _re_cmp_fmpq(&sg, w, half, ctx);
+    status = _gr_tower_lazy_re_cmp(&sg, w, half, ctx);
     if (status == GR_SUCCESS && sg <= 0)
     {
         /* |w|^2 <= 1 */
@@ -2438,7 +2433,7 @@ _dilog_in_region(int * in, gr_srcptr w, gr_ctx_t ctx)
         status |= gr_mul(a, a, w, ctx);
         status |= gr_sub_ui(a, a, 1, ctx);
         if (status == GR_SUCCESS)
-            status = _real_sign(&sg, a, ctx);
+            status = _gr_tower_lazy_real_sign_fast(&sg, a, ctx);
         if (status == GR_SUCCESS && sg <= 0)
         {
             /* |w - 1|^2 <= 1 */
@@ -2447,7 +2442,7 @@ _dilog_in_region(int * in, gr_srcptr w, gr_ctx_t ctx)
             status |= gr_mul(a, a, b, ctx);
             status |= gr_sub_ui(a, a, 1, ctx);
             if (status == GR_SUCCESS)
-                status = _real_sign(&sg, a, ctx);
+                status = _gr_tower_lazy_real_sign_fast(&sg, a, ctx);
             if (status == GR_SUCCESS && sg <= 0)
                 *in = 1;
         }
@@ -2480,10 +2475,10 @@ _dilog_reduce(gr_ptr res, gr_srcptr z_in, gr_ctx_t ctx)
         int s0, s1;
         fmpq_init(c);
         /* z < 0: r; z > 1: c; 1/2 < z < 1: s; then possibly s */
-        status = _real_sign(&s0, z, ctx);
+        status = _gr_tower_lazy_real_sign_fast(&s0, z, ctx);
         fmpq_one(c);
         if (status == GR_SUCCESS)
-            status = _re_cmp_fmpq(&s1, z, c, ctx);
+            status = _gr_tower_lazy_re_cmp(&s1, z, c, ctx);
         if (status == GR_SUCCESS)
         {
             if (s0 < 0)
@@ -2529,7 +2524,7 @@ _dilog_reduce(gr_ptr res, gr_srcptr z_in, gr_ctx_t ctx)
                 status = _dilog_in_region(&in, w, ctx);
             if (status == GR_SUCCESS && in)
             {
-                status = _im_sign(&im, w, ctx);
+                status = _gr_tower_lazy_im_sign(&im, w, ctx);
                 if (status == GR_SUCCESS && im > 0)
                 {
                     found = k;
@@ -2569,7 +2564,7 @@ _dilog_reduce(gr_ptr res, gr_srcptr z_in, gr_ctx_t ctx)
             int sg;
             fmpq_init(half);
             fmpq_set_si(half, 1, 2);
-            status = _re_cmp_fmpq(&sg, w, half, ctx);
+            status = _gr_tower_lazy_re_cmp(&sg, w, half, ctx);
             if (status == GR_SUCCESS && sg > 0)
             {
                 status = _dilog_step(w, E, 's', w, ctx);
@@ -2599,6 +2594,162 @@ _dilog_reduce(gr_ptr res, gr_srcptr z_in, gr_ctx_t ctx)
     }
 
     GR_TMP_CLEAR4(z, w, E, Etot, ctx);
+    return status;
+}
+
+/*
+    Li_s(z) for s >= 3 at z not 0, +-1, not a root of unity of the
+    expanded orders: by the inversion formula
+
+        Li_s(z) + (-1)^s Li_s(1/z) = -(2 pi i)^s / s! B_s(1/2 + log(-z) / (2 pi i))
+
+    (z not in [0, 1]; on the cut z > 1, where Li_s is continuous from
+    below, log(-z) = log(z) + pi i), the generators are kept at |z| < 1,
+    or |z| = 1 with Im(z) > 0. Li_3(1/2) = 7 zeta(3)/8 - pi^2 log(2)/12 +
+    log(2)^3/6 (Landen's identity at 1/2).
+*/
+static int _polylog(gr_ptr res, slong s, gr_srcptr z, gr_ctx_t ctx);
+
+static int
+_polylog_high(gr_ptr res, slong s, gr_srcptr z_in, gr_ctx_t ctx)
+{
+    gr_ptr z, w, u, v, L, E;
+    fmpq_t c;
+    int status, sg = 0, inv = 0, cut = 0;
+    truth_t real;
+
+    GR_TMP_INIT5(z, w, u, v, L, ctx);
+    GR_TMP_INIT(E, ctx);
+    fmpq_init(c);
+
+    status = gr_set(z, z_in, ctx);      /* (res may alias z) */
+
+    if (s == 3 && _is_rational(c, z, ctx) && fmpz_is_one(fmpq_numref(c)) && fmpz_equal_ui(fmpq_denref(c), 2))
+    {
+        status = _zeta_si(u, 3, ctx);
+        status |= gr_mul_ui(u, u, 7, ctx);
+        status |= gr_div_ui(u, u, 8, ctx);
+        status |= gr_set_ui(L, 2, ctx);
+        status |= gr_log(L, L, ctx);
+        status |= gr_pi(v, ctx);
+        status |= gr_sqr(v, v, ctx);
+        status |= gr_mul(v, v, L, ctx);
+        status |= gr_div_ui(v, v, 12, ctx);
+        status |= gr_sub(u, u, v, ctx);
+        status |= gr_pow_ui(v, L, 3, ctx);
+        status |= gr_div_ui(v, v, 6, ctx);
+        status |= gr_add(res, u, v, ctx);
+        goto cleanup;
+    }
+
+    real = gr_tower_lazy_is_real(z, ctx);
+    if (real == T_TRUE)
+    {
+        /* |z| > 1: z > 1 (the cut) or z < -1 */
+        fmpq_one(c);
+        status = _gr_tower_lazy_re_cmp(&sg, z, c, ctx);
+        if (status == GR_SUCCESS && sg > 0)
+            inv = cut = 1;
+        else if (status == GR_SUCCESS)
+        {
+            fmpq_set_si(c, -1, 1);
+            status = _gr_tower_lazy_re_cmp(&sg, z, c, ctx);
+            inv = (status == GR_SUCCESS && sg < 0);
+        }
+    }
+    else if (real == T_FALSE)
+    {
+        /* |z|^2 - 1 */
+        status = gr_conj(u, z, ctx);
+        status |= gr_mul(u, u, z, ctx);
+        status |= gr_sub_ui(u, u, 1, ctx);
+        if (status == GR_SUCCESS)
+            status = _gr_tower_lazy_real_sign_fast(&sg, u, ctx);
+        if (status == GR_SUCCESS && sg > 0)
+            inv = 1;
+        else if (status == GR_SUCCESS && sg == 0)
+        {
+            status = _gr_tower_lazy_im_sign(&sg, z, ctx);
+            inv = (status == GR_SUCCESS && sg < 0);
+        }
+    }
+    else
+        status = GR_UNABLE;
+
+    if (status != GR_SUCCESS)
+        goto cleanup;
+
+    if (!inv)
+    {
+        status = _gr_tower_lazy_special_gen_locked(res, z, GR_TOWER_POLYLOG, s, ctx);
+        goto cleanup;
+    }
+
+    /* L = log(-z), or log(z) + pi i on the cut */
+    if (cut)
+    {
+        status = gr_log(L, z, ctx);
+        status |= gr_pi(u, ctx);
+        status |= gr_i(v, ctx);
+        status |= gr_mul(u, u, v, ctx);
+        status |= gr_add(L, L, u, ctx);
+    }
+    else
+    {
+        status = gr_neg(L, z, ctx);
+        status |= gr_log(L, L, ctx);
+    }
+
+    /* E = -(2 pi i)^s / s! B_s(1/2 + L / (2 pi i)) */
+    if (status == GR_SUCCESS)
+    {
+        fmpq_poly_t B;
+        slong k;
+        fmpz_t f;
+        fmpq_poly_init(B);
+        fmpz_init(f);
+        arith_bernoulli_polynomial(B, s);
+        /* v = 2 pi i, u = 1/2 + L / v */
+        status = gr_pi(v, ctx);
+        status |= gr_mul_2exp_si(v, v, 1, ctx);
+        status |= gr_i(u, ctx);
+        status |= gr_mul(v, v, u, ctx);
+        status |= gr_div(u, L, v, ctx);
+        fmpq_set_si(c, 1, 2);
+        status |= gr_add_fmpq(u, u, c, ctx);
+        status |= gr_zero(E, ctx);
+        for (k = fmpq_poly_degree(B); k >= 0 && status == GR_SUCCESS; k--)
+        {
+            status = gr_mul(E, E, u, ctx);
+            fmpq_poly_get_coeff_fmpq(c, B, k);
+            status |= gr_add_fmpq(E, E, c, ctx);
+        }
+        status |= gr_pow_ui(v, v, s, ctx);
+        status |= gr_mul(E, E, v, ctx);
+        fmpz_fac_ui(f, s);
+        status |= gr_div_fmpz(E, E, f, ctx);
+        status |= gr_neg(E, E, ctx);
+        fmpq_poly_clear(B);
+        fmpz_clear(f);
+    }
+
+    /* Li_s(z) = E - (-1)^s Li_s(1/z) */
+    if (status == GR_SUCCESS)
+        status = gr_inv(w, z, ctx);
+    if (status == GR_SUCCESS)
+        status = _polylog(u, s, w, ctx);
+    if (status == GR_SUCCESS)
+    {
+        if (s % 2 == 0)
+            status = gr_sub(res, E, u, ctx);
+        else
+            status = gr_add(res, E, u, ctx);
+    }
+
+cleanup:
+    GR_TMP_CLEAR5(z, w, u, v, L, ctx);
+    GR_TMP_CLEAR(E, ctx);
+    fmpq_clear(c);
     return status;
 }
 
@@ -2709,7 +2860,7 @@ _polylog(gr_ptr res, slong s, gr_srcptr z, gr_ctx_t ctx)
         if (!done && s == 2)
             status = _dilog_reduce(res, z, ctx);
         else if (!done)
-            status = _gr_tower_lazy_special_gen_locked(res, z, GR_TOWER_POLYLOG, s, ctx);
+            status = _polylog_high(res, s, z, ctx);
     }
 
     GR_TMP_CLEAR2(u, v, ctx);
@@ -2728,9 +2879,30 @@ gr_tower_lazy_polylog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, co
     if (_is_rational(c, s, ctx) && fmpz_is_one(fmpq_denref(c)) && !_abs_gt_ui(fmpq_numref(c), EXACT_LIMIT))
         status = _polylog(res, fmpz_get_si(fmpq_numref(c)), x, ctx);
     else
-        status = GR_UNABLE;
+    {
+        /* other s: zeta(s) at 1, (2^(1-s) - 1) zeta(s) at -1, the Lerch
+           transcendent z Phi(z, s, 1) at other roots of unity */
+        fmpq_t r;
+        gr_ptr t;
+        fmpq_init(r);
+        GR_TMP_INIT(t, ctx);
+        if (gr_is_one(x, ctx) == T_TRUE)
+            status = _zeta(res, s, ctx);
+        else if (_gr_tower_lazy_root_of_unity_angle_locked(r, x, ctx))
+        {
+            status = gr_one(t, ctx);
+            if (status == GR_SUCCESS)
+                status = gr_lerch_phi(t, x, s, t, ctx);
+            if (status == GR_SUCCESS)
+                status = gr_mul(res, t, x, ctx);
+        }
+        else
+            status = GR_UNABLE;
+        GR_TMP_CLEAR(t, ctx);
+        fmpq_clear(r);
+    }
     fmpq_clear(c);
-    status = _finish(status, res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(status, res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -2742,7 +2914,7 @@ gr_tower_lazy_dilog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_polylog(res, 2, x, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_polylog(res, 2, x, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -2750,28 +2922,6 @@ gr_tower_lazy_dilog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
 /* -------------------------------------------------------------------- */
 /* complete elliptic integrals                                           */
 /* -------------------------------------------------------------------- */
-
-/* K(1/2) = Gamma(1/4)^2 / (4 sqrt(pi)) */
-static int
-_elliptic_k_half(gr_ptr res, gr_ctx_t ctx)
-{
-    gr_ptr t;
-    fmpq_t q;
-    int status;
-    GR_TMP_INIT(t, ctx);
-    fmpq_init(q);
-    fmpq_set_si(q, 1, 4);
-    status = _gamma_fmpq(res, q, ctx);
-    status |= gr_sqr(res, res, ctx);
-    status |= gr_pi(t, ctx);
-    status |= gr_sqrt(t, t, ctx);
-    status |= gr_mul_ui(t, t, 4, ctx);
-    if (status == GR_SUCCESS)
-        status = gr_div(res, res, t, ctx);
-    fmpq_clear(q);
-    GR_TMP_CLEAR(t, ctx);
-    return status;
-}
 
 static int _elliptic(gr_ptr res, gr_srcptr m, int kind, gr_ctx_t ctx);
 
@@ -2846,7 +2996,9 @@ _elliptic_singular(gr_ptr res, int * done, gr_srcptr m, int kind, gr_ctx_t ctx)
 
     *done = 0;
     acb_init(z);
-    if (gr_tower_lazy_get_acb(z, m, 64, ctx) != GR_SUCCESS || !arb_is_zero(acb_imagref(z)) ||
+    /* (a real m written through nonreal generators has an imaginary
+       part only containing zero; the exact comparison decides) */
+    if (gr_tower_lazy_get_acb(z, m, 64, ctx) != GR_SUCCESS || !arb_contains_zero(acb_imagref(z)) ||
         !arb_is_finite(acb_realref(z)))
     {
         acb_clear(z);
@@ -2920,128 +3072,264 @@ _elliptic_singular(gr_ptr res, int * done, gr_srcptr m, int kind, gr_ctx_t ctx)
     return status;
 }
 
+/* -------------------------------------------------------------------- */
+/* anchors: values linked to the generators of the context               */
+/* -------------------------------------------------------------------- */
+
+/*
+    Landen's transformation: with k' = sqrt(1 - m) and k1 = (1 - k') /
+    (1 + k'),
+
+        K(m) = (1 + k1) K(k1^2),  E(m) = (1 + k') E(k1^2) - k' K(m)
+
+    for m off the cut [1, inf). A new K(m) or E(m) is linked to a
+    generator K, E at a point of the Landen chain of m, down (m -> k1^2)
+    or up (m -> 4 s / (1 + s)^2 with s = +-sqrt(m), |s| < 1, the inverse),
+    within LANDEN_STEPS steps: one step is taken exactly, and the value
+    at the neighbour comes through the hypergeometric evaluation, which
+    takes the next one. (Landen's transformation is the modular equation
+    of level 2: these values are those of the duplication formulas at
+    commensurable points of the modular layer.)
+*/
+#define LANDEN_STEPS 3
+#define LANDEN_DEPTH 6
+
+/* the direction of a chain from am reaching an anchor: -1 (down), +1 (up,
+   with the sign *sg of the first root), 0 (none) */
+static int
+_landen_search(int * sg, const acb_t am, gr_ctx_t ctx)
+{
+    acb_t c, kp, s;
+    slong step, prec = 128;
+    int dir = 0;
+
+    acb_init(c);
+    acb_init(kp);
+    acb_init(s);
+
+    /* down */
+    acb_set(c, am);
+    for (step = 0; step < LANDEN_STEPS && dir == 0; step++)
+    {
+        acb_sub_ui(kp, c, 1, prec);
+        acb_neg(kp, kp);
+        acb_sqrt(kp, kp, prec);
+        acb_sub_ui(s, kp, 1, prec);
+        acb_neg(s, s);
+        acb_add_ui(kp, kp, 1, prec);
+        acb_div(c, s, kp, prec);
+        acb_sqr(c, c, prec);
+        if (_gr_tower_lazy_hyp_anchor_present(c, 1, ctx))
+            dir = -1;
+    }
+
+    /* up: the signs of the roots as the bits of b */
+    {
+        ulong b;
+        for (b = 0; b < (UWORD(1) << LANDEN_STEPS) && dir == 0; b++)
+        {
+            acb_set(c, am);
+            for (step = 0; step < LANDEN_STEPS && dir == 0; step++)
+            {
+                mag_t r;
+                acb_sqrt(s, c, prec);
+                if ((b >> step) & 1)
+                    acb_neg(s, s);
+                mag_init(r);
+                acb_get_mag(r, s);
+                if (mag_cmp_2exp_si(r, 0) >= 0)
+                {
+                    mag_clear(r);
+                    break;
+                }
+                mag_clear(r);
+                acb_add_ui(kp, s, 1, prec);
+                acb_sqr(kp, kp, prec);
+                acb_mul_2exp_si(c, s, 2);
+                acb_div(c, c, kp, prec);
+                if (_gr_tower_lazy_hyp_anchor_present(c, 1, ctx))
+                {
+                    dir = 1;
+                    *sg = (b & 1) ? -1 : 1;
+                }
+            }
+        }
+    }
+
+    acb_clear(c);
+    acb_clear(kp);
+    acb_clear(s);
+    return dir;
+}
+
+static int _elliptic(gr_ptr res, gr_srcptr m, int kind, gr_ctx_t ctx);
+
+static int
+_elliptic_landen(gr_ptr res, int * done, gr_srcptr m, int kind, gr_ctx_t ctx)
+{
+    acb_t am;
+    int dir, sg = 1, status = GR_SUCCESS;
+
+    *done = 0;
+    if (_gr_tower_lazy_hyp_anchored(ctx, 0) >= LANDEN_DEPTH)
+        return GR_SUCCESS;
+
+    acb_init(am);
+    if (gr_tower_lazy_get_acb(am, m, 128, ctx) != GR_SUCCESS || !acb_is_finite(am))
+    {
+        acb_clear(am);
+        return GR_SUCCESS;
+    }
+    dir = _landen_search(&sg, am, ctx);
+
+    if (dir < 0)
+    {
+        /* off the cut [1, inf) */
+        arb_t t;
+        arb_init(t);
+        arb_sub_ui(t, acb_realref(am), 1, 128);
+        if (arb_contains_zero(acb_imagref(am)) && !arb_is_negative(t))
+            dir = 0;
+        arb_clear(t);
+    }
+
+    if (dir != 0)
+    {
+        gr_ptr kp, k1, m1, K1, E1, t;
+        GR_TMP_INIT3(kp, k1, m1, ctx);
+        GR_TMP_INIT3(K1, E1, t, ctx);
+
+        if (dir < 0)
+        {
+            /* k' = sqrt(1 - m), k1 = (1 - k') / (1 + k'), m1 = k1^2 */
+            status = gr_sub_ui(kp, m, 1, ctx);
+            status |= gr_neg(kp, kp, ctx);
+            status |= gr_sqrt(kp, kp, ctx);
+            status |= gr_sub_ui(k1, kp, 1, ctx);
+            status |= gr_neg(k1, k1, ctx);
+            status |= gr_add_ui(t, kp, 1, ctx);
+            status |= gr_div(k1, k1, t, ctx);
+            status |= gr_sqr(m1, k1, ctx);
+        }
+        else
+        {
+            /* s = +-sqrt(m) (k1 of m1), m1 = 4 s / (1 + s)^2, k' of m1 = (1 - s) / (1 + s) */
+            status = gr_sqrt(k1, m, ctx);
+            if (sg < 0)
+                status |= gr_neg(k1, k1, ctx);
+            status |= gr_add_ui(t, k1, 1, ctx);
+            status |= gr_sqr(m1, t, ctx);
+            status |= gr_div(m1, k1, m1, ctx);
+            status |= gr_mul_2exp_si(m1, m1, 2, ctx);
+            status |= gr_sub_ui(kp, k1, 1, ctx);
+            status |= gr_neg(kp, kp, ctx);
+            status |= gr_div(kp, kp, t, ctx);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            _gr_tower_lazy_hyp_anchored(ctx, 1);
+            status = _elliptic(K1, m1, GR_TOWER_ELLIPTIC_K, ctx);
+            if (status == GR_SUCCESS && kind == GR_TOWER_ELLIPTIC_E)
+                status = _elliptic(E1, m1, GR_TOWER_ELLIPTIC_E, ctx);
+            _gr_tower_lazy_hyp_anchored(ctx, -1);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            if (dir < 0)
+            {
+                /* K(m) = (1 + k1) K(m1), E(m) = (1 + k') E(m1) - k' K(m) */
+                status = gr_add_ui(t, k1, 1, ctx);
+                status |= gr_mul(K1, K1, t, ctx);
+                if (kind == GR_TOWER_ELLIPTIC_K)
+                    status |= gr_set(res, K1, ctx);
+                else
+                {
+                    status |= gr_add_ui(t, kp, 1, ctx);
+                    status |= gr_mul(E1, E1, t, ctx);
+                    status |= gr_mul(t, kp, K1, ctx);
+                    status |= gr_sub(res, E1, t, ctx);
+                }
+            }
+            else
+            {
+                /* K(m1) = (1 + s) K(m), E(m1) = (1 + k'_1) E(m) - k'_1 K(m1) */
+                if (kind == GR_TOWER_ELLIPTIC_K)
+                {
+                    status = gr_add_ui(t, k1, 1, ctx);
+                    status |= gr_div(res, K1, t, ctx);
+                }
+                else
+                {
+                    status = gr_mul(t, kp, K1, ctx);
+                    status |= gr_add(E1, E1, t, ctx);
+                    status |= gr_add_ui(t, kp, 1, ctx);
+                    status |= gr_div(res, E1, t, ctx);
+                }
+            }
+            if (status == GR_SUCCESS)
+                *done = 1;
+        }
+
+        /* (a failure leaves the generator to be created) */
+        if (status != GR_SUCCESS)
+            status = GR_SUCCESS;
+
+        GR_TMP_CLEAR3(kp, k1, m1, ctx);
+        GR_TMP_CLEAR3(K1, E1, t, ctx);
+    }
+
+    acb_clear(am);
+    return status;
+}
+
+/*
+    K(m), E(m) are evaluated as hypergeometric functions (lazy_hypgeom.c):
+    the special values K(0), E(0), E(1), K(1/2), E(1/2) are summation
+    theorems, the imaginary-modulus transformation (to a canonical
+    argument with |m - 1| <= 1, Im(m) >= 0 on its boundary) is Pfaff's
+    transformation, and 2F1 with parameters in (1/2, 1/2, 1) + Z^3 reduce
+    to K and E. The generators themselves are created here, at the
+    canonical arguments, after the singular values.
+*/
 static int
 _elliptic(gr_ptr res, gr_srcptr m, int kind, gr_ctx_t ctx)
 {
-    fmpq_t c;
-    int status = GR_SUCCESS, done = 0;
-
-    fmpq_init(c);
-    if (_is_rational(c, m, ctx))
+    /* at algebraic m, the singular values (Chowla-Selberg) first: the
+       hypergeometric normal form would first compare the transforms of m
+       with the arguments of the context, which costs much at algebraic
+       numbers of high degree (lambda at a CM point, say) */
+    if (_gr_tower_lazy_is_algebraic_repr_locked(m, ctx) == T_TRUE)
     {
-        if (fmpq_is_zero(c))
-        {
-            /* K(0) = E(0) = pi/2 */
-            status = gr_pi(res, ctx);
-            status |= gr_div_ui(res, res, 2, ctx);
-            done = 1;
-        }
-        else if (fmpq_is_one(c))
-        {
-            status = (kind == GR_TOWER_ELLIPTIC_K) ? GR_DOMAIN : gr_one(res, ctx);
-            done = 1;
-        }
-        else if (fmpz_is_one(fmpq_numref(c)) && fmpz_equal_ui(fmpq_denref(c), 2))
-        {
-            /* E(1/2) = pi / (4 K(1/2)) + K(1/2) / 2 (Legendre's relation) */
-            status = _elliptic_k_half(res, ctx);
-            if (status == GR_SUCCESS && kind == GR_TOWER_ELLIPTIC_E)
-            {
-                gr_ptr t;
-                GR_TMP_INIT(t, ctx);
-                status = gr_pi(t, ctx);
-                status |= gr_div_ui(t, t, 4, ctx);
-                if (status == GR_SUCCESS)
-                    status = gr_div(t, t, res, ctx);
-                status |= gr_div_ui(res, res, 2, ctx);
-                status |= gr_add(res, res, t, ctx);
-                GR_TMP_CLEAR(t, ctx);
-            }
-            done = 1;
-        }
-        else if (fmpq_sgn(c) < 0)
-        {
-            /* imaginary modulus: K(m) = K(m/(m-1)) / sqrt(1-m),
-               E(m) = sqrt(1-m) E(m/(m-1)) */
-            fmpq_t d, w;
-            gr_ptr t;
-            fmpq_init(d);
-            fmpq_init(w);
-            GR_TMP_INIT(t, ctx);
-            fmpq_sub_si(d, c, 1);
-            fmpq_div(w, c, d);
-            fmpq_neg(d, d);
-            status = gr_set_fmpq(res, w, ctx);
-            if (status == GR_SUCCESS)
-                status = _elliptic(res, res, kind, ctx);
-            status |= gr_set_fmpq(t, d, ctx);
-            status |= gr_sqrt(t, t, ctx);
-            if (status == GR_SUCCESS)
-                status = (kind == GR_TOWER_ELLIPTIC_K) ? gr_div(res, res, t, ctx) : gr_mul(res, res, t, ctx);
-            GR_TMP_CLEAR(t, ctx);
-            fmpq_clear(d);
-            fmpq_clear(w);
-            done = 1;
-        }
-    }
-    fmpq_clear(c);
-
-    /* singular values */
-    if (!done)
-    {
+        int done = 0, status;
+        _gr_tower_lazy_lock(ctx);
         status = _elliptic_singular(res, &done, m, kind, ctx);
-        if (status != GR_SUCCESS)
-            done = 1;
+        if (status == GR_SUCCESS && !done)
+            status = _gr_tower_lazy_elliptic_cm(res, &done, m, kind, ctx);
+        _gr_tower_lazy_unlock(ctx);
+        if (status != GR_SUCCESS || done)
+            return status;
     }
+    return _gr_tower_lazy_elliptic_hypgeom(res, m, kind, ctx);
+}
 
-    /* the imaginary-modulus transformation in general: m -> m/(m - 1)
-       when |m - 1| > 1 (or |m - 1| = 1 and Im(m) < 0, where m/(m - 1) =
-       conj(m)), off the cut m >= 1: canonical arguments have
-       |m - 1| <= 1 */
-    if (!done)
-    {
-        gr_ptr u, v;
-        int sg = 0, im = 0, transform = 0;
-        truth_t real;
-        GR_TMP_INIT2(u, v, ctx);
-        real = gr_tower_lazy_is_real(m, ctx);
-        if (real == T_FALSE)
-        {
-            status = gr_sub_ui(u, m, 1, ctx);
-            status |= gr_conj(v, u, ctx);
-            status |= gr_mul(u, u, v, ctx);
-            status |= gr_sub_ui(u, u, 1, ctx);
-            if (status == GR_SUCCESS)
-                status = _real_sign(&sg, u, ctx);
-            if (status == GR_SUCCESS && sg == 0)
-                status = _im_sign(&im, m, ctx);
-            transform = (status == GR_SUCCESS) && (sg > 0 || (sg == 0 && im < 0));
-        }
-        else if (real == T_TRUE)
-        {
-            /* m < 0 */
-            status = _real_sign(&sg, m, ctx);
-            transform = (status == GR_SUCCESS && sg < 0);
-        }
-        if (status == GR_SUCCESS && transform)
-        {
-            /* K(m) = K(m/(m-1)) / sqrt(1-m), E(m) = sqrt(1-m) E(m/(m-1)) */
-            status = gr_sub_ui(u, m, 1, ctx);
-            status |= gr_div(v, m, u, ctx);
-            status |= gr_neg(u, u, ctx);
-            status |= gr_sqrt(u, u, ctx);
-            if (status == GR_SUCCESS)
-                status = _elliptic(res, v, kind, ctx);
-            if (status == GR_SUCCESS)
-                status = (kind == GR_TOWER_ELLIPTIC_K) ? gr_div(res, res, u, ctx) : gr_mul(res, res, u, ctx);
-            done = 1;
-        }
-        GR_TMP_CLEAR2(u, v, ctx);
-    }
+int
+_gr_tower_lazy_elliptic_gen(gr_ptr res, gr_srcptr m, int kind, gr_ctx_t ctx)
+{
+    int status, done = 0;
 
-    if (!done && status == GR_SUCCESS)
+    _gr_tower_lazy_lock(ctx);
+    status = _elliptic_singular(res, &done, m, kind, ctx);
+    /* K at the other CM moduli of class number one (Chowla-Selberg) */
+    if (status == GR_SUCCESS && !done)
+        status = _gr_tower_lazy_elliptic_cm(res, &done, m, kind, ctx);
+    /* through Landen's transformation from a generator of the context */
+    if (status == GR_SUCCESS && !done)
+        status = _elliptic_landen(res, &done, m, kind, ctx);
+    if (status == GR_SUCCESS && !done)
         status = _gr_tower_lazy_special_gen_locked(res, m, kind, 0, ctx);
-
+    _gr_tower_lazy_unlock(ctx);
     return status;
 }
 
@@ -3052,7 +3340,7 @@ gr_tower_lazy_elliptic_k(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x,
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_elliptic(res, x, GR_TOWER_ELLIPTIC_K, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_elliptic(res, x, GR_TOWER_ELLIPTIC_K, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -3064,7 +3352,7 @@ gr_tower_lazy_elliptic_e(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x,
     _gr_tower_lazy_lock(ctx);
     real = REAL(ctx);
     alg = ALG(ctx);
-    status = _finish(_elliptic(res, x, GR_TOWER_ELLIPTIC_E, ctx), res, real, alg, ctx);
+    status = _gr_tower_lazy_view_finish(_elliptic(res, x, GR_TOWER_ELLIPTIC_E, ctx), res, real, alg, ctx);
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
@@ -3126,11 +3414,17 @@ _gr_tower_lazy_special(gr_tower_lazy_elem_t res, int kind, slong param, const gr
         case GR_TOWER_POLYGAMMA: status = _polygamma(res, param, x, ctx); break;
         case GR_TOWER_POLYLOG: status = _polylog(res, param, x, ctx); break;
         case GR_TOWER_ZETA: status = _zeta(res, x, ctx); break;
+        case GR_TOWER_DIRICHLET_L:
+            status = _gr_tower_lazy_dirichlet_l_prim(res, x, GR_TOWER_DIRICHLET_Q(param), GR_TOWER_DIRICHLET_K(param), ctx);
+            break;
         case GR_TOWER_ELLIPTIC_K:
         case GR_TOWER_ELLIPTIC_E: status = _elliptic(res, x, kind, ctx); break;
+        case GR_TOWER_MODULAR_LAMBDA: status = _gr_tower_lazy_modular_lambda(res, x, ctx); break;
         case GR_TOWER_CONSTANT: status = _gr_tower_lazy_special_gen_locked(res, NULL, kind, param, ctx); break;
         default: status = GR_UNABLE;
     }
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
+
+POP_OPTIONS

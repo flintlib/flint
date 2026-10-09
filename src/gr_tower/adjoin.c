@@ -15,6 +15,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 int
 gr_tower_adjoin_algebraic(gr_tower_t T, const gr_poly_t m, const acb_t z, int status, const char * name)
 {
@@ -63,7 +66,10 @@ gr_tower_adjoin_qqbar(gr_tower_t T, const qqbar_t x, const char * name)
        x^20 - 2 (101 x - 1)^2 near 1/101 differ by 1.3e-22) */
     {
         slong acc = acb_rel_accuracy_bits(QQBAR_ENCLOSURE(x));
-        qqbar_get_acb(z, x, FLINT_MAX(GR_TOWER_DEFAULT_PREC, 2 * FLINT_MAX(acc, 0) + 64));
+        /* (an exact enclosure: ARF_PREC_EXACT) */
+        if (acc < 0 || acc > WORD(1) << 20)
+            acc = 0;
+        qqbar_get_acb(z, x, FLINT_MAX(GR_TOWER_DEFAULT_PREC, 2 * acc + 64));
         if (!acb_contains(QQBAR_ENCLOSURE(x), z))
             acb_set(z, QQBAR_ENCLOSURE(x));
     }
@@ -91,8 +97,10 @@ gr_tower_adjoin_qqbar(gr_tower_t T, const qqbar_t x, const char * name)
 /* (zx: an enclosure of x, or NULL; the caller may know that x is real
    when its enclosure straddles the real axis, which decides the
    principal root of a negative x) */
+/* (known: the status of X^n - x when the caller has decided it, -1 to
+   decide it here) */
 int
-_gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb_t zx, const char * name)
+_gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb_t zx, int known, const char * name)
 {
     gr_ctx_struct * top = gr_tower_field(T);
     gr_poly_t m;
@@ -129,7 +137,8 @@ _gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb
             /* Capelli: X^n - x is irreducible when x is not a p-th power
                for any prime p | n (and not in -4 K^4 when 4 | n), which
                a place of the tower can certify */
-            int st = gr_tower_binomial_irreducible_modular(T, arg, actx, n, GR_TOWER_OPTION(T, GR_TOWER_OPT_MODULAR_TRIES))
+            int st = (known >= 0) ? known :
+                     gr_tower_binomial_irreducible_modular(T, arg, actx, n, GR_TOWER_OPTION(T, GR_TOWER_OPT_MODULAR_TRIES))
                         ? GR_TOWER_STATUS_PROVEN : GR_TOWER_STATUS_DYNAMIC;
             status = gr_tower_adjoin_algebraic(T, m, z, st, name);
         }
@@ -155,7 +164,7 @@ _gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb
 int
 gr_tower_adjoin_root_ui(gr_tower_t T, gr_srcptr x, ulong n, const char * name)
 {
-    return _gr_tower_adjoin_root_ui_enclosure(T, x, n, NULL, name);
+    return _gr_tower_adjoin_root_ui_enclosure(T, x, n, NULL, -1, name);
 }
 
 int
@@ -223,3 +232,5 @@ gr_tower_adjoin_root_fmpz(gr_tower_t T, const fmpz_t p, ulong n, const char * na
     qqbar_clear(z);
     return status;
 }
+
+POP_OPTIONS

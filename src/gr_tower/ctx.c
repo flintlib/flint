@@ -27,6 +27,9 @@
 #include "gr_poly.h"
 #include "gr_tower.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* the context data: the tower, and the level (number of algebraic
    generators) and number of transcendental generators the context was
    made for; a context stays valid when algebraic steps are appended to
@@ -353,3 +356,5 @@ gr_ctx_init_tower_field(gr_ctx_t ctx, gr_tower_t T)
         _gr_tower_field_methods_initialized = 1;
     }
 }
+
+POP_OPTIONS

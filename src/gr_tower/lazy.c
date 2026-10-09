@@ -14,7 +14,11 @@
 /* (for recursive mutexes: pthread_mutexattr_settype) */
 #define _GNU_SOURCE
 
+#include "fmpq_vec.h"
 #include "gr_tower/lazy_impl.h"
+
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 /* the depth of the lazy field operations in progress in this thread
    (dense forms are made and used only outside of them: the
@@ -52,6 +56,14 @@ _gr_tower_lazy_ref(gr_tower_flat_struct * F)
         F->refs++;
 }
 
+/* (for the collection only: see _gr_tower_lazy_gc_pass) */
+void
+_gr_tower_lazy_ref_adjust(gr_tower_flat_struct * F, slong delta)
+{
+    if (!(F->gc & GR_TOWER_GC_PINNED))
+        F->refs += delta;
+}
+
 void
 _gr_tower_lazy_unref(gr_tower_lazy_ctx_struct * L, gr_tower_flat_struct * F)
 {
@@ -70,29 +82,48 @@ _gr_tower_lazy_unref(gr_tower_lazy_ctx_struct * L, gr_tower_flat_struct * F)
     }
 }
 
-/* a tower of T's context containing the definition id (NULL if none) */
+/* a live tower of the context containing the definition id (NULL if
+   none): of those, one where it comes first in the definition order
+   (the elements of the cache entries moved there have short prefixes,
+   rather than those of a large tower of other computations) */
 static gr_tower_flat_struct *
 _gr_tower_lazy_find_live_def(gr_tower_lazy_ctx_struct * L, ulong def_id, slong * gid)
 {
-    slong i;
-    for (i = L->num_towers - 1; i >= 0; i--)
+    gr_tower_flat_struct * best = NULL;
+    slong i, best_d = WORD_MAX;
+    for (i = L->num_towers - 1; i >= 0 && best_d > 0; i--)
     {
         gr_tower_flat_struct * F = L->towers[i];
         slong d;
         if (F->gc & GR_TOWER_GC_DEAD)
             continue;
+        /* (refs == 0 here: while the rebase records are pruned, a tower
+           held only by records, see below) */
+        if (F->refs == 0 && !(F->gc & GR_TOWER_GC_PINNED) && F != L->trivial)
+            continue;
         d = gr_tower_find_def_order(F->T, def_id);
-        if (d >= 0)
+        if (d >= 0 && d < best_d)
         {
+            best = F;
+            best_d = d;
             *gid = GR_TOWER_GEN(F->T, d)->gid;
-            return F;
         }
     }
-    return NULL;
+    return best;
+}
+
+/* the references held by the value and data of a record, added to the
+   counts of their towers (delta = -1, then +1 to restore them) */
+static void
+_gr_tower_lazy_rebase_refs(gr_tower_lazy_rebase_struct * r, slong delta)
+{
+    _gr_tower_lazy_ref_adjust(r->value.F, delta);
+    if (r->data != NULL && r->data_refs != NULL)
+        r->data_refs(r->data, delta);
 }
 
 static void
-_gr_tower_lazy_gc(gr_tower_lazy_ctx_struct * L)
+_gr_tower_lazy_gc_pass(gr_tower_lazy_ctx_struct * L)
 {
     slong i, j, ndead = 0;
 
@@ -144,6 +175,45 @@ _gr_tower_lazy_gc(gr_tower_lazy_ctx_struct * L)
     }
     L->num_aliases = j;
 
+    /* rebase records of definitions no longer in any tower (a generator
+       with the definition, adjoined again, would have a new id). The
+       value and the data of a record often lie in a tower with its own
+       definition: the references of the records are left out while the
+       live towers are looked for, so that the records do not keep each
+       other (and their towers) alive. */
+    if (L->num_rebases > 0)
+    {
+        char * keep = flint_malloc(L->num_rebases);
+
+        for (i = 0; i < L->num_rebases; i++)
+            _gr_tower_lazy_rebase_refs(L->rebases + i, -1);
+        for (i = 0; i < L->num_rebases; i++)
+        {
+            slong gid;
+            keep[i] = (_gr_tower_lazy_find_live_def(L, L->rebases[i].def_id, &gid) != NULL);
+        }
+        for (i = 0; i < L->num_rebases; i++)
+            _gr_tower_lazy_rebase_refs(L->rebases + i, 1);
+
+        for (i = j = 0; i < L->num_rebases; i++)
+        {
+            gr_tower_lazy_rebase_struct * r = L->rebases + i;
+            if (keep[i])
+                L->rebases[j++] = *r;
+            else
+            {
+                _gr_tower_lazy_clear_data(&r->value);
+                _gr_tower_lazy_unref(L, r->value.F);
+                if (r->data != NULL)
+                    r->data_clear(r->data, L);
+            }
+        }
+        if (j < L->num_rebases)
+            L->rebase_serial++;
+        L->num_rebases = j;
+        flint_free(keep);
+    }
+
     for (i = j = 0; i < L->num_towers; i++)
     {
         gr_tower_flat_struct * F = L->towers[i];
@@ -158,6 +228,14 @@ _gr_tower_lazy_gc(gr_tower_lazy_ctx_struct * L)
             L->towers[j++] = F;
     }
     L->num_towers = j;
+}
+
+/* (a pass may release further towers: those of the pruned records) */
+static void
+_gr_tower_lazy_gc(gr_tower_lazy_ctx_struct * L)
+{
+    while (L->gc_len > 0)
+        _gr_tower_lazy_gc_pass(L);
 }
 
 /* -------------------------------------------------------------------- */
@@ -191,6 +269,126 @@ _gr_tower_lazy_new_def(gr_tower_gen_struct * g, gr_tower_t T, gr_ctx_t ctx)
     else
         flint_sprintf(buf, "t%wd", ++L->num_trans_names);
     _gr_tower_gen_rename(T, g, buf);
+}
+
+/*
+    The definition id (with its name, to be freed) of a generator
+    kind(param) at args[0], ..., args[n - 1] in a tower of the context
+    other than skip, or 0. A new generator normally goes into the tower of
+    its arguments, where an existing one is found by the caller; but the
+    same function value may already be a generator of another tower (one
+    adjoined to a fork of a prefix, or to a tower which the argument has
+    left since), and must then keep that definition, so that merges
+    identify the two. (Enclosures first; the arguments are compared
+    exactly when they overlap.)
+*/
+ulong
+_gr_tower_lazy_find_def(char ** name, int kind, slong param, const gr_tower_lazy_elem_struct * args, slong n,
+    const gr_tower_struct * skip, gr_ctx_t ctx)
+{
+    gr_tower_lazy_ctx_struct * L = LAZY(ctx);
+    gr_tower_lazy_elem_struct e;
+    acb_ptr a;
+    acb_t b;
+    ulong * seen = NULL, res = 0;
+    slong nseen = 0, i, j, k;
+    int ok = 1;
+
+    *name = NULL;
+
+    a = _acb_vec_init(n);
+    acb_init(b);
+    for (k = 0; k < n && ok; k++)
+        ok = (_gr_tower_lazy_get_acb_impl(a + k, args + k, 64, ctx) == GR_SUCCESS);
+
+    _gr_tower_lazy_init(&e, ctx);
+
+    for (i = 0; i < L->num_towers && ok && res == 0; i++)
+    {
+        gr_tower_flat_struct * F = L->towers[i];
+
+        if ((F->gc & GR_TOWER_GC_DEAD) || F->T == skip)
+            continue;
+
+        for (j = 0; j < F->T->num_gens && res == 0; j++)
+        {
+            const gr_tower_gen_struct * g = GR_TOWER_GEN(F->T, j);
+            ulong id = g->def_id;
+            char * nm;
+            slong s;
+            int match;
+
+            if (!((g->kind == kind) || (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == kind)) || id == 0)
+                continue;
+            if (GR_TOWER_KIND_IS_SPECIAL(kind) && g->def_param != param)
+                continue;
+            if (_gr_tower_gen_num_args(g) != n || g->arg.mctx == NULL)
+                continue;
+            for (s = 0; s < nseen && seen[s] != id; s++) ;
+            if (s < nseen)
+                continue;
+
+            /* the enclosures of the arguments */
+            match = 1;
+            for (k = 0; k < n && match; k++)
+            {
+                const gr_tower_flat_elem_struct * x = _gr_tower_gen_arg_ptr(g, k);
+                _gr_tower_lazy_set_flat(&e, F, &x->data, x->mctx, ctx);
+                match = (_gr_tower_lazy_get_acb_impl(b, &e, 64, ctx) == GR_SUCCESS) && acb_overlaps(a + k, b);
+            }
+            if (!match)
+                continue;
+
+            seen = flint_realloc(seen, sizeof(ulong) * (nseen + 1));
+            seen[nseen++] = id;
+
+            nm = flint_malloc(strlen(g->name) + 1);
+            strcpy(nm, g->name);
+
+            /* exactly (the zero tests may restructure F: the generator
+               is found again by its definition) */
+            for (k = 0; k < n && match; k++)
+            {
+                slong d = gr_tower_find_def_order(F->T, id);
+                const gr_tower_flat_elem_struct * x;
+                if (d < 0)
+                {
+                    match = 0;
+                    break;
+                }
+                x = _gr_tower_gen_arg_ptr(GR_TOWER_GEN(F->T, d), k);
+                _gr_tower_lazy_set_flat(&e, F, &x->data, x->mctx, ctx);
+                match = (_gr_tower_lazy_equal(&e, args + k, ctx) == T_TRUE);
+            }
+
+            if (match)
+            {
+                res = id;
+                *name = nm;
+            }
+            else
+                flint_free(nm);
+        }
+    }
+
+    _gr_tower_lazy_clear(&e, ctx);
+    _acb_vec_clear(a, n);
+    acb_clear(b);
+    flint_free(seen);
+    return res;
+}
+
+/* the definition id def_id (with the name) for g, or a new one if 0 */
+void
+_gr_tower_lazy_set_def(gr_tower_gen_struct * g, gr_tower_t T, ulong def_id, const char * name, gr_ctx_t ctx)
+{
+    if (def_id == 0)
+        _gr_tower_lazy_new_def(g, T, ctx);
+    else
+    {
+        g->def_id = def_id;
+        _gr_tower_gen_rename(T, g, name);
+    }
 }
 
 static int
@@ -288,9 +486,42 @@ _gr_tower_lazy_ctx_clear(gr_ctx_t ctx)
     if (--L->refcount > 0)
         return;
 
+    /* (the recorded points of the theta functions hold elements) */
+    for (i = 0; i < L->num_theta_pts; i++)
+    {
+        slong k;
+        _gr_tower_lazy_clear(&L->theta_pts[i].z0, ctx);
+        _gr_tower_lazy_clear(&L->theta_pts[i].tau0, ctx);
+        if (L->theta_pts[i].have_vals)
+            for (k = 0; k < 4; k++)
+                _gr_tower_lazy_clear(&L->theta_pts[i].vals[k], ctx);
+    }
+    flint_free(L->theta_pts);
+    for (i = 0; i < L->num_mod_pts; i++)
+    {
+        slong k, m;
+        _gr_tower_lazy_clear(&L->mod_pts[i].tau0, ctx);
+        for (m = 0; m < 2; m++)
+            for (k = 0; k < 5; k++)
+                if (L->mod_pts[i].have[m][k])
+                    _gr_tower_lazy_clear(&L->mod_pts[i].v[m][k], ctx);
+        /* (anchored: 1, 2 to be linked, 3 linked) */
+        if (L->mod_pts[i].anchor >= 1)
+        {
+            _gr_tower_lazy_clear(&L->mod_pts[i].tau1, ctx);
+            for (k = 0; k < 4; k++)
+                fmpz_clear(L->mod_pts[i].gam + k);
+        }
+    }
+    flint_free(L->mod_pts);
+
     for (i = 0; i < L->num_aliases; i++)
         fmpz_mpoly_q_clear(&L->aliases[i].data, L->aliases[i].mctx);
     flint_free(L->aliases);
+
+    for (i = 0; i < L->num_rebases; i++)
+        _gr_tower_lazy_rebase_clear(L->rebases + i, ctx);
+    flint_free(L->rebases);
 
     for (i = 0; i < L->num_qqbars; i++)
         qqbar_clear(&L->qqbars[i].x);
@@ -304,6 +535,8 @@ _gr_tower_lazy_ctx_clear(gr_ctx_t ctx)
     {
         fmpq_clear(&L->const_trans[i].x);
         fmpq_clear(&L->const_trans[i].y);
+        if (L->const_trans[i].nxs > 0)
+            _fmpq_vec_clear(L->const_trans[i].xs, L->const_trans[i].nxs);
     }
     flint_free(L->const_trans);
 
@@ -431,9 +664,12 @@ _gr_tower_lazy_set_shallow(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t 
 }
 
 /* Replaces the content of res by a zero element of (F, level): rational
-   for the trivial tower, flat otherwise. */
-void
-_gr_tower_lazy_fresh(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, slong level, gr_ctx_t ctx)
+   for the trivial tower, flat otherwise. (Not inlined in this file:
+   inlined, the stores to the members of the union of the element make
+   GCC 13 warn -Wstringop-overflow about the later accesses to the flat
+   data, wrongly.) */
+FLINT_STATIC_NOINLINE void
+_fresh(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, slong level, gr_ctx_t ctx)
 {
     gr_tower_flat_ensure(F);
     /* (res is an output, so it owns its data, also when it is a shallow
@@ -461,6 +697,12 @@ _gr_tower_lazy_fresh(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, slong l
         fmpz_mpoly_q_init(&res->elem.flat.data, res->elem.flat.mctx);
         LAZY_POISON_DENSE(res);
     }
+}
+
+void
+_gr_tower_lazy_fresh(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, slong level, gr_ctx_t ctx)
+{
+    _fresh(res, F, level, ctx);
 }
 
 /* Makes the representation of x (which must not be read concurrently:
@@ -794,8 +1036,7 @@ void
 _gr_tower_lazy_set_gen(gr_tower_lazy_elem_t res, gr_tower_flat_struct * F, slong k, gr_ctx_t ctx)
 {
     _gr_tower_lazy_fresh(res, F, k, ctx);
-    fmpz_mpoly_gen(fmpz_mpoly_q_numref(&res->elem.flat.data), GR_TOWER_FLAT_VAR(F, k), res->elem.flat.mctx);
-    fmpz_mpoly_one(fmpz_mpoly_q_denref(&res->elem.flat.data), res->elem.flat.mctx);
+    fmpz_mpoly_q_gen(&res->elem.flat.data, GR_TOWER_FLAT_VAR(F, k), res->elem.flat.mctx);
     GR_MUST_SUCCEED(gr_tower_flat_reduce(&res->elem.flat.data, F));
     res->reduced_version = F->ideal_version;
     _gr_tower_lazy_shrink(res);
@@ -1462,27 +1703,48 @@ _gr_tower_lazy_get_qqbar_inner(qqbar_t res, gr_tower_lazy_elem_t x, gr_ctx_t ctx
         int * used;
         slong i;
         fmpz_mpoly_q_t xu;
+        int * need;
         int ok = 1;
 
         gr_tower_flat_ensure(F);
         GR_MUST_SUCCEED(gr_tower_flat_reduce(&x->elem.flat.data, F));
 
+        /* the algebraic steps x needs: those it involves, and the steps
+           in their moduli, recursively (other moduli may involve the
+           transcendental generators: roots of polynomials over pi) */
+        need = flint_calloc(T->length + 1, sizeof(int));
         used = flint_malloc(sizeof(int) * F->cap);
         fmpz_mpoly_q_used_vars(used, &x->elem.flat.data, F->mctx);
         for (i = 1; i <= T->num_trans; i++)
             if (used[GR_TOWER_FLAT_TVAR(F, i)])
                 ok = 0;
-        for (k = 1; k <= T->length && ok; k++)
+        for (k = 1; k <= T->length; k++)
+            if (used[GR_TOWER_FLAT_VAR(F, k)])
+                need[k] = 1;
+        for (k = T->length; k >= 1 && ok; k--)
         {
+            slong k2;
+            if (!need[k])
+                continue;
             fmpz_mpoly_used_vars(used, (fmpz_mpoly_struct *) _gr_tower_flat_ideal_elem(F, k), F->mctx);
             for (i = 1; i <= T->num_trans; i++)
                 if (used[GR_TOWER_FLAT_TVAR(F, i)])
                     ok = 0;
+            for (k2 = 1; k2 <= T->length; k2++)
+                if (k2 != k && used[GR_TOWER_FLAT_VAR(F, k2)])
+                {
+                    if (k2 > k)
+                        ok = 0;   /* (not triangular: not expected) */
+                    need[k2] = 1;
+                }
         }
         flint_free(used);
 
         if (!ok)
+        {
+            flint_free(need);
             return GR_UNABLE;
+        }
 
         /* variable c[v] of U for variable v of F */
         gr_tower_init(U, T->consts);
@@ -1490,15 +1752,20 @@ _gr_tower_lazy_get_qqbar_inner(qqbar_t res, gr_tower_lazy_elem_t x, gr_ctx_t ctx
         U->options = T->options;
         gr_tower_flat_ensure(&U->flat);
         {
-            slong cap = FLINT_MAX(T->length, 1);
+            slong cap, j;
+            for (k = 1, cap = 0; k <= T->length; k++)
+                cap += need[k];
+            cap = FLINT_MAX(cap, 1);
             c = flint_malloc(sizeof(slong) * F->cap);
             for (i = 0; i < F->cap; i++)
                 c[i] = 0;
-            /* U will have T->length generators: definition order k - 1 for step k */
+            /* U has one generator per needed step, in tower order:
+               definition order j for the j-th one */
             gr_tower_flat_clear(&U->flat);
             gr_tower_flat_init(&U->flat, U, cap);
-            for (k = 1; k <= T->length; k++)
-                c[GR_TOWER_FLAT_VAR(F, k)] = cap - 1 - (k - 1);
+            for (k = 1, j = 0; k <= T->length; k++)
+                if (need[k])
+                    c[GR_TOWER_FLAT_VAR(F, k)] = cap - 1 - (j++);
         }
 
         status = GR_SUCCESS;
@@ -1511,6 +1778,9 @@ _gr_tower_lazy_get_qqbar_inner(qqbar_t res, gr_tower_lazy_elem_t x, gr_ctx_t ctx
             slong v = c[GR_TOWER_FLAT_VAR(F, k)];
             fmpz_mpoly_univar_t uni;
             fmpz_mpoly_t coeff;
+
+            if (!need[k])
+                continue;
 
             fmpz_mpoly_init(mu, U->flat.mctx);
             fmpz_mpoly_compose_fmpz_mpoly_gen(mu, _gr_tower_flat_ideal_elem(F, k), c, F->mctx, U->flat.mctx);
@@ -1556,6 +1826,7 @@ _gr_tower_lazy_get_qqbar_inner(qqbar_t res, gr_tower_lazy_elem_t x, gr_ctx_t ctx
         }
 
         flint_free(c);
+        flint_free(need);
         gr_tower_clear(U);
         return status;
     }
@@ -1763,6 +2034,12 @@ _gr_tower_gen_direct_deps(int * deps, gr_tower_t T, slong d)
 
     if (g->arg.mctx != NULL)
         _gr_tower_lazy_mark_used_gens(deps, &g->arg.data, g->arg.mctx, T);
+
+    {
+        slong i;
+        for (i = 0; i < g->num_xargs; i++)
+            _gr_tower_lazy_mark_used_gens(deps, &g->xargs[i].data, g->xargs[i].mctx, T);
+    }
 
     if (g->kind == GR_TOWER_ALGEBRAIC)
     {
@@ -2648,6 +2925,7 @@ gr_method_tab_input _gr_tower_lazy_methods_input[] =
     {GR_METHOD_ATAN,            (gr_funcptr) gr_tower_lazy_atan},
     {GR_METHOD_GAMMA,           (gr_funcptr) gr_tower_lazy_gamma},
     {GR_METHOD_RGAMMA,          (gr_funcptr) gr_tower_lazy_rgamma},
+    {GR_METHOD_LGAMMA,          (gr_funcptr) gr_tower_lazy_lgamma},
     {GR_METHOD_BETA,            (gr_funcptr) gr_tower_lazy_beta},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) gr_tower_lazy_digamma},
     {GR_METHOD_POLYGAMMA,       (gr_funcptr) gr_tower_lazy_polygamma},
@@ -2659,9 +2937,30 @@ gr_method_tab_input _gr_tower_lazy_methods_input[] =
     {GR_METHOD_ZETA,            (gr_funcptr) gr_tower_lazy_zeta},
     {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) gr_tower_lazy_hurwitz_zeta},
     {GR_METHOD_POLYLOG,         (gr_funcptr) gr_tower_lazy_polylog},
+    {GR_METHOD_LERCH_PHI,       (gr_funcptr) gr_tower_lazy_lerch_phi},
     {GR_METHOD_DILOG,           (gr_funcptr) gr_tower_lazy_dilog},
     {GR_METHOD_ELLIPTIC_K,      (gr_funcptr) gr_tower_lazy_elliptic_k},
     {GR_METHOD_ELLIPTIC_E,      (gr_funcptr) gr_tower_lazy_elliptic_e},
+    {GR_METHOD_HYPGEOM_0F1,     (gr_funcptr) gr_tower_lazy_hypgeom_0f1},
+    {GR_METHOD_HYPGEOM_1F1,     (gr_funcptr) gr_tower_lazy_hypgeom_1f1},
+    {GR_METHOD_HYPGEOM_2F1,     (gr_funcptr) gr_tower_lazy_hypgeom_2f1},
+    {GR_METHOD_HYPGEOM_PFQ,     (gr_funcptr) gr_tower_lazy_hypgeom_pfq},
+    {GR_METHOD_MODULAR_LAMBDA,  (gr_funcptr) gr_tower_lazy_modular_lambda},
+    {GR_METHOD_MODULAR_J,       (gr_funcptr) gr_tower_lazy_modular_j},
+    {GR_METHOD_MODULAR_DELTA,   (gr_funcptr) gr_tower_lazy_modular_delta},
+    {GR_METHOD_DEDEKIND_ETA,    (gr_funcptr) gr_tower_lazy_dedekind_eta},
+    {GR_METHOD_EISENSTEIN_E,    (gr_funcptr) gr_tower_lazy_eisenstein_e},
+    {GR_METHOD_EISENSTEIN_G,    (gr_funcptr) gr_tower_lazy_eisenstein_g},
+    {GR_METHOD_JACOBI_THETA,    (gr_funcptr) gr_tower_lazy_jacobi_theta},
+    {GR_METHOD_JACOBI_THETA_1,  (gr_funcptr) gr_tower_lazy_jacobi_theta_1},
+    {GR_METHOD_JACOBI_THETA_2,  (gr_funcptr) gr_tower_lazy_jacobi_theta_2},
+    {GR_METHOD_JACOBI_THETA_3,  (gr_funcptr) gr_tower_lazy_jacobi_theta_3},
+    {GR_METHOD_JACOBI_THETA_4,  (gr_funcptr) gr_tower_lazy_jacobi_theta_4},
+    {GR_METHOD_WEIERSTRASS_P,   (gr_funcptr) gr_tower_lazy_weierstrass_p},
+    {GR_METHOD_WEIERSTRASS_P_PRIME, (gr_funcptr) gr_tower_lazy_weierstrass_p_prime},
+    {GR_METHOD_WEIERSTRASS_SIGMA, (gr_funcptr) gr_tower_lazy_weierstrass_sigma},
+    {GR_METHOD_ELLIPTIC_ROOTS,  (gr_funcptr) gr_tower_lazy_elliptic_roots},
+    {GR_METHOD_ELLIPTIC_INVARIANTS, (gr_funcptr) gr_tower_lazy_elliptic_invariants},
     {GR_METHOD_EULER,           (gr_funcptr) gr_tower_lazy_euler},
     {GR_METHOD_CATALAN,         (gr_funcptr) gr_tower_lazy_catalan},
     {GR_METHOD_ASINH,           (gr_funcptr) gr_tower_lazy_asinh},
@@ -2706,6 +3005,15 @@ gr_ctx_init_tower_lazy(gr_ctx_t ctx, gr_ctx_t base, int flags)
     L->depth = 0;
     L->num_alg_names = L->num_trans_names = 0;
     L->conj_depth = 0;
+    L->hyp_anchored = 0;
+    L->rebases = NULL;
+    L->num_rebases = L->alloc_rebases = 0;
+    L->rebasing = 0;
+    L->theta_pts = NULL;
+    L->num_theta_pts = L->alloc_theta_pts = 0;
+    L->mod_pts = NULL;
+    L->num_mod_pts = L->alloc_mod_pts = 0;
+    L->cache_clock = 0;
 #if FLINT_USES_PTHREAD
     {
         pthread_mutexattr_t attr;
@@ -2866,3 +3174,5 @@ _gr_tower_lazy_ctx_stats_impl(gr_ctx_t ctx)
         }
     }
 }
+
+POP_OPTIONS

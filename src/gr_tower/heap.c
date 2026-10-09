@@ -12,6 +12,9 @@
 #include "gr_vec.h"
 #include "gr_tower.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* Heap-allocated towers and non-inline accessors, for language bindings. */
 
 gr_tower_struct *
@@ -81,3 +84,5 @@ gr_tower_gen_get(gr_ptr res, const gr_tower_t T, slong d)
         return status;
     }
 }
+
+POP_OPTIONS

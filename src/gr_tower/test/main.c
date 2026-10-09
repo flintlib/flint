@@ -36,6 +36,10 @@
 #include "t-special.c"
 #include "t-catalog.c"
 #include "t-options.c"
+#include "t-hypgeom.c"
+#include "t-modforms.c"
+#include "t-zero_content.c"
+#include "t-exp_torsion.c"
 
 /* Array of test functions ***************************************************/
 
@@ -65,7 +69,11 @@ test_struct tests[] =
     TEST_FUNCTION(gr_tower_trig),
     TEST_FUNCTION(gr_tower_special),
     TEST_FUNCTION(gr_tower_catalog),
-    TEST_FUNCTION(gr_tower_options)
+    TEST_FUNCTION(gr_tower_options),
+    TEST_FUNCTION(gr_tower_hypgeom),
+    TEST_FUNCTION(gr_tower_modforms),
+    TEST_FUNCTION(gr_tower_zero_content),
+    TEST_FUNCTION(gr_tower_exp_torsion)
 };
 
 /* main function *************************************************************/

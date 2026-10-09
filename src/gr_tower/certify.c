@@ -47,6 +47,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 int
 _gr_tower_has_conjectural(const gr_tower_t T)
 {
@@ -567,6 +570,40 @@ _hnf_by_level(fmpz_mat_t rows, const fmpz_mat_t cands, const logside_entry_struc
     return num;
 }
 
+/*
+    _hnf_by_level for the first num_cands rows of cands (an integer
+    relation per row), discarding those with unreasonably large
+    coefficients: a genuine relation among n numbers known to prec bits
+    has coefficients of about prec / n bits at most, and verifying a
+    spurious one with large coefficients (powers of large elements) is
+    expensive; more precision admits larger coefficients. The rows of
+    cands are permuted.
+*/
+static slong
+_filtered_hnf_by_level(fmpz_mat_t rows, fmpz_mat_t cands, slong num_cands, slong prec, const logside_entry_struct * L, slong n, gr_tower_t T)
+{
+    slong maxbits = FLINT_MAX(3, prec / (2 * n)), kept = 0, i, j, num_rows;
+    fmpz_mat_t win;
+
+    for (i = 0; i < num_cands; i++)
+    {
+        slong bits = 0;
+        for (j = 0; j < n; j++)
+            bits = FLINT_MAX(bits, fmpz_bits(fmpz_mat_entry(cands, i, j)));
+        if (bits <= maxbits)
+        {
+            if (kept != i)
+                fmpz_mat_swap_rows(cands, NULL, kept, i);
+            kept++;
+        }
+    }
+
+    fmpz_mat_window_init(win, cands, 0, 0, kept, n);
+    num_rows = _hnf_by_level(rows, win, L, n, T);
+    fmpz_mat_window_clear(win);
+    return num_rows;
+}
+
 /* -------------------------------------------------------------------- */
 /* elimination                                                           */
 /* -------------------------------------------------------------------- */
@@ -762,15 +799,20 @@ _rational_radical_factor_scaled(fmpz_mpoly_q_struct * m, slong c, const fmpz_mpo
     u_g = e u* with e = -sign(c_g) c_j / gcd. The new generator is
     inserted before the generator j; the two exponentials get moduli of
     degree 1, so the degree of the tower does not grow (as it would with
-    exp(x/2) adjoined over exp(x)). Returns 1 if this was done.
+    exp(x/2) adjoined over exp(x)). Returns 1 if this was done, or if the
+    tower changed anyway (the log side L is then stale).
 */
+static int _primitive_exp_torsion(const fmpz * c, slong jt, slong jo, slong jk, const logside_entry_struct * L, gr_tower_flat_t F);
+static int _split_torsion(const fmpz * c, slong jt, const logside_entry_struct * L, slong n, gr_tower_flat_t F);
+
 static int
 _primitive_exp(const fmpz * c, slong jt, const logside_entry_struct * L, slong n, gr_tower_flat_t F)
 {
     gr_tower_struct * T = F->T;
-    slong j, jo = -1, others = 0;
+    slong j, jo = -1, jk = -1, others = 0;
     slong cg, cj, s, m, e, gid_j, gid_g, gid_new, p;
-    ulong dd;
+    ulong dd, version, structure_version;
+    const fmpz_mpoly_ctx_struct * mctx;
     fmpz_mpoly_q_t ustar;
     fmpz_mpoly_q_struct mm[2];
     int status;
@@ -779,13 +821,40 @@ _primitive_exp(const fmpz * c, slong jt, const logside_entry_struct * L, slong n
     {
         if (j != jt && !fmpz_is_zero(c + j))
         {
+            if (L[j].gen < 0)
+            {
+                jk = j;     /* 2 pi i */
+                continue;
+            }
             others++;
-            if (L[j].gen >= 0 && T->gens[L[j].gen].kind == GR_TOWER_EXP)
+            if (T->gens[L[j].gen].kind == GR_TOWER_EXP)
                 jo = j;
         }
     }
 
+    /* (a failed attempt below may still have changed the tower, with a
+       root of unity adjoined or moved: then the log side, by definition
+       orders in the old context, is stale; the caller restarts) */
+    version = T->version;
+    structure_version = T->structure_version;
+    mctx = F->mctx;
+
+    /* several exponentials, with roots of unity in their arguments */
+    if (others >= 2)
+        return _split_torsion(c, jt, L, n, F) ||
+            T->version != version || T->structure_version != structure_version || F->mctx != mctx;
+
     if (others != 1 || jo < 0 || !fmpz_fits_si(c + jt) || !fmpz_fits_si(c + jo))
+        return 0;
+
+    /* arguments with parts r pi i (r rational), or a 2 pi i term: the
+       exponentials are powers of the exponential of a primitive argument
+       free of pi i, times roots of unity */
+    if (_primitive_exp_torsion(c, jt, jo, jk, L, F))
+        return 1;
+    if (T->version != version || T->structure_version != structure_version || F->mctx != mctx)
+        return 1;
+    if (jk >= 0)
         return 0;
 
     cg = fmpz_get_si(c + jt);
@@ -888,6 +957,550 @@ _primitive_exp(const fmpz * c, slong jt, const logside_entry_struct * L, slong n
     fmpz_mpoly_q_clear(mm + 1, F->mctx);
 
     return 1;
+}
+
+/*
+    Writes u = y + r pi i with r rational: when u is a polynomial in pi
+    over a denominator free of pi, r is the constant term of the
+    coefficient of pi divided by i (exact when that coefficient is a
+    rational multiple of i plus a part without a constant term: (16 + 30
+    i)/225 for u = (16 + 30 i) pi / 225), otherwise r = 0. Any r gives a
+    valid decomposition (y is defined as u - r pi i); the choice only
+    decides which roots of unity are split off. Sets y and r.
+*/
+static void
+_flat_pi_i_split(fmpq_t r, fmpz_mpoly_q_t y, const fmpz_mpoly_q_t u, slong dpi, slong di, gr_tower_flat_t F)
+{
+    slong v;
+    fmpz_mpoly_t a;
+    fmpz_mpoly_q_t w, ii;
+    const fmpz_mpoly_struct * num = fmpz_mpoly_q_numref(u), * den = fmpz_mpoly_q_denref(u);
+
+    fmpq_zero(r);
+    fmpz_mpoly_q_set(y, u, F->mctx);
+    if (dpi < 0 || di < 0)
+        return;
+
+    v = GR_TOWER_FLAT_VAR_D(F, dpi);
+    if (fmpz_mpoly_degree_si(den, v, F->mctx) > 0 || fmpz_mpoly_degree_si(num, v, F->mctx) <= 0)
+        return;
+
+    fmpz_mpoly_init(a, F->mctx);
+    fmpz_mpoly_q_init(w, F->mctx);
+    fmpz_mpoly_q_init(ii, F->mctx);
+    {
+        ulong one = 1;
+        fmpz_mpoly_get_coeff_vars_ui(a, num, &v, &one, 1, F->mctx);
+    }
+
+    /* w = -i a / den */
+    fmpz_mpoly_set(fmpz_mpoly_q_numref(w), a, F->mctx);
+    fmpz_mpoly_set(fmpz_mpoly_q_denref(w), den, F->mctx);
+    fmpz_mpoly_q_canonicalise(w, F->mctx);
+    _flat_i(ii, F, di);
+    fmpz_mpoly_q_mul(w, w, ii, F->mctx);
+    fmpz_mpoly_q_neg(w, w, F->mctx);
+    if (gr_tower_flat_reduce(w, F) == GR_SUCCESS && fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(w), F->mctx))
+    {
+        ulong * zero = flint_calloc(F->mctx->minfo->nvars, sizeof(ulong));
+        fmpz_mpoly_get_coeff_fmpz_ui(fmpq_numref(r), fmpz_mpoly_q_numref(w), zero, F->mctx);
+        flint_free(zero);
+        fmpz_mpoly_get_fmpz(fmpq_denref(r), fmpz_mpoly_q_denref(w), F->mctx);
+        fmpq_canonicalise(r);
+    }
+
+    if (!fmpq_is_zero(r))
+    {
+        /* y = u - r pi i */
+        _flat_i(ii, F, di);
+        fmpz_mpoly_q_mul_fmpq(ii, ii, r, F->mctx);
+        fmpz_mpoly_q_gen(w, v, F->mctx);
+        fmpz_mpoly_q_mul(ii, ii, w, F->mctx);
+        fmpz_mpoly_q_sub(y, u, ii, F->mctx);
+        GR_MUST_SUCCEED(gr_tower_flat_reduce(y, F));
+    }
+
+    fmpz_mpoly_clear(a, F->mctx);
+    fmpz_mpoly_q_clear(w, F->mctx);
+    fmpz_mpoly_q_clear(ii, F->mctx);
+}
+
+/* res = exp(r pi i) as a power of a root of unity generator of the tower
+   with definition order dz and order N (2 * den(r) divides N), or +-1 */
+static void
+_flat_exp_pi_i(fmpz_mpoly_q_t res, const fmpq_t r, slong dz, ulong N, gr_tower_flat_t F)
+{
+    fmpz_t k;
+    fmpz_init(k);
+    /* exp(pi i p / q) = zeta_N^(p N / (2 q)) */
+    fmpz_mul_ui(k, fmpq_numref(r), N);
+    fmpz_divexact(k, k, fmpq_denref(r));
+    fmpz_fdiv_q_2exp(k, k, 1);
+    if (dz < 0)
+    {
+        /* r is an integer: (-1)^r */
+        fmpz_mpoly_q_set_si(res, fmpz_is_even(fmpq_numref(r)) ? 1 : -1, F->mctx);
+    }
+    else
+    {
+        ulong kk = fmpz_fdiv_ui(k, N);
+        fmpz_mpoly_q_gen(res, GR_TOWER_FLAT_VAR_D(F, dz), F->mctx);
+        fmpz_mpoly_pow_ui(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_numref(res), kk, F->mctx);
+        GR_MUST_SUCCEED(gr_tower_flat_reduce(res, F));
+    }
+    fmpz_clear(k);
+}
+
+/* whether a root of unity generator of order a multiple of N is present
+   (or N <= 2) */
+static int
+_root_of_unity_present(gr_tower_t T, ulong N)
+{
+    slong d;
+    if (N <= 2)
+        return 1;
+    for (d = 0; d < T->num_gens; d++)
+    {
+        const gr_tower_gen_struct * g = T->gens + d;
+        if (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_ROOT_OF_UNITY && g->def_param > 0 &&
+            (ulong) g->def_param % N == 0)
+            return 1;
+    }
+    return 0;
+}
+
+/*
+    Moves the generator with gid gz in front of the generator with gid gt
+    (when it is after it), provided it does not depend on the generators
+    in between. Returns 1 on success.
+*/
+static int
+_move_before(gr_tower_t T, slong gz, slong gt)
+{
+    slong oz = gr_tower_gid_order(T, gz), ot = gr_tower_gid_order(T, gt), k;
+    int * deps;
+    int ok = 1;
+
+    if (oz < ot)
+        return 1;
+
+    /* (the tower's own flat context must follow the generators adjoined
+       and moved since: the closure converts the moduli through it) */
+    gr_tower_flat_ensure(&T->flat);
+    deps = flint_calloc(FLINT_MAX(T->num_gens, 1), sizeof(int));
+    deps[oz] = 1;
+    _gr_tower_involved_gens_closure(deps, T);
+    for (k = ot; k < oz && ok; k++)
+        if (deps[k])
+            ok = 0;
+    flint_free(deps);
+
+    if (ok)
+        _gr_tower_move_gen(T, oz, ot);
+    return ok;
+}
+
+/*
+    A root of unity generator of order a multiple of *N (set to its
+    order): an existing one, or a new one first in the tower, of order
+    lcm(*N, the orders of the root of unity steps of the tower), of
+    which those become powers (rather than steps of reducible cyclotomic
+    moduli: zeta_60 next to i). Returns its gid, or -1 on failure.
+*/
+static slong
+_torsion_root_of_unity(ulong * Np, gr_tower_flat_t F)
+{
+    gr_tower_struct * T = F->T;
+    ulong N = *Np;
+    slong d, dz = -1, gid_z = -1;
+
+    for (d = 0; d < T->num_gens; d++)
+    {
+        const gr_tower_gen_struct * g = T->gens + d;
+        if (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_ROOT_OF_UNITY && g->def_param > 0 &&
+            (ulong) g->def_param % N == 0)
+        {
+            dz = d;
+            N = g->def_param;
+            break;
+        }
+    }
+    if (dz < 0)
+    {
+        /* a root of unity of the order N2 = lcm(N, the orders of the
+           root of unity generators of the tower), first in the
+           tower, of which those become powers (rather than steps
+           of reducible cyclotomic moduli: zeta_60 next to i) */
+        ulong N2 = N;
+        slong * old = flint_malloc(sizeof(slong) * FLINT_MAX(T->num_gens, 1));
+        slong nold = 0, k;
+
+        for (d = 0; d < T->num_gens; d++)
+        {
+            const gr_tower_gen_struct * g = T->gens + d;
+            if (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_ROOT_OF_UNITY && g->def_param > 2 &&
+                gr_tower_step_degree(T, g->index) > 1)
+            {
+                ulong M = g->def_param;
+                N2 = (N2 / n_gcd(N2, M)) * M;
+                old[nold++] = g->gid;
+            }
+        }
+        if (N2 > (ulong) GR_TOWER_OPTION(T, GR_TOWER_OPT_ROOT_OF_UNITY_ORDER_LIMIT))
+        {
+            N2 = N;
+            nold = 0;
+        }
+
+        if (gr_tower_adjoin_root_of_unity(T, N2, NULL) != GR_SUCCESS)
+        {
+            flint_free(old);
+            return -1;
+        }
+        gid_z = T->gens[T->num_gens - 1].gid;
+        N = N2;
+
+        if (nold > 0)
+        {
+            _gr_tower_move_gen(T, T->num_gens - 1, 0);
+            _gr_tower_gen_set_status(T->gens + 0, GR_TOWER_STATUS_PROVEN);
+            for (k = 0; k < nold; k++)
+            {
+                slong o = gr_tower_gid_order(T, old[k]);
+                ulong M = T->gens[o].def_param;
+                fmpz_mpoly_q_struct mz[2];
+
+                /* zeta_M = zeta_N2^(N2 / M) */
+                gr_tower_flat_ensure(F);
+                fmpz_mpoly_q_init(mz + 0, F->mctx);
+                fmpz_mpoly_q_init(mz + 1, F->mctx);
+                fmpz_mpoly_q_gen(mz + 0, GR_TOWER_FLAT_VAR_D(F, gr_tower_gid_order(T, gid_z)), F->mctx);
+                fmpz_mpoly_pow_ui(fmpz_mpoly_q_numref(mz + 0), fmpz_mpoly_q_numref(mz + 0), N2 / M, F->mctx);
+                fmpz_mpoly_q_neg(mz + 0, mz + 0, F->mctx);
+                fmpz_mpoly_q_one(mz + 1, F->mctx);
+                _gr_tower_make_algebraic(T, o, mz, 2, F->mctx, GR_TOWER_STATUS_PROVEN);
+                fmpz_mpoly_q_clear(mz + 0, F->mctx);
+                fmpz_mpoly_q_clear(mz + 1, F->mctx);
+            }
+        }
+        flint_free(old);
+    }
+    else
+        gid_z = T->gens[dz].gid;
+
+    *Np = N;
+    return gid_z;
+}
+
+/*
+    A relation sum c_j u_j + c_k 2 pi i = 0 between several exponentials
+    (jk = -1 if there is no 2 pi i term) whose arguments are u_j = y_j +
+    r_j pi i (_flat_pi_i_split) with sum c_j r_j + 2 c_k = 0, some r_j
+    nonzero: each exp(u_j) with r_j != 0 becomes exp(y_j) exp(r_j pi i),
+    a new exponential (free of pi i) times a root of unity, so that the
+    relation sum c_j y_j = 0, found by the next search, involves no roots
+    of unity (otherwise: a radical of degree c_g over the other
+    exponentials and a root of unity of order c_g / gcd(c_g, c_k)).
+    Returns 1 if this was done.
+*/
+static int
+_split_torsion(const fmpz * c, slong jt, const logside_entry_struct * L, slong n, gr_tower_flat_t F)
+{
+    gr_tower_struct * T = F->T;
+    slong j, jk = -1, dpi, di, gid_z = -1;
+    slong * gid;
+    fmpq * r;
+    fmpz_mpoly_q_struct * y;
+    fmpq_t sum, t;
+    ulong N = 1;
+    const fmpz_mpoly_ctx_struct * mctx0;
+    int ok = 0, nonzero = 0;
+
+    for (j = 0; j < n; j++)
+    {
+        if (fmpz_is_zero(c + j))
+            continue;
+        if (L[j].gen < 0)
+            jk = j;
+        else if (T->gens[L[j].gen].kind != GR_TOWER_EXP)
+            return 0;
+    }
+
+    dpi = _find_pi(T, T->num_gens);
+    di = _find_i(T);
+    if (dpi < 0 || di < 0)
+        return 0;
+
+    gr_tower_flat_ensure(F);
+    mctx0 = F->mctx;
+    gid = flint_malloc(sizeof(slong) * n);
+    r = _fmpq_vec_init(n);
+    y = flint_malloc(sizeof(fmpz_mpoly_q_struct) * n);
+    fmpq_init(sum);
+    fmpq_init(t);
+    for (j = 0; j < n; j++)
+    {
+        fmpz_mpoly_q_init(y + j, mctx0);
+        gid[j] = -1;
+        if (fmpz_is_zero(c + j) || j == jk)
+            continue;
+        gid[j] = T->gens[L[j].gen].gid;
+        _flat_pi_i_split(r + j, y + j, &L[j].val, dpi, di, F);
+        fmpq_mul_fmpz(t, r + j, c + j);
+        fmpq_add(sum, sum, t);
+        if (!fmpq_is_zero(r + j))
+            nonzero = 1;
+    }
+    if (jk >= 0)
+    {
+        fmpz_mul_ui(fmpq_numref(t), c + jk, 2);
+        fmpz_one(fmpq_denref(t));
+        fmpq_add(sum, sum, t);
+    }
+    if (!nonzero || !fmpq_is_zero(sum))
+        goto cleanup;
+
+    /* the root of unity */
+    {
+        fmpz_t l, l2;
+        fmpz_init(l);
+        fmpz_init(l2);
+        fmpz_one(l);
+        for (j = 0; j < n; j++)
+        {
+            if (gid[j] >= 0 && !fmpq_is_zero(r + j))
+            {
+                fmpz_mul_ui(l2, fmpq_denref(r + j), 2);
+                fmpz_lcm(l, l, l2);
+            }
+        }
+        ok = fmpz_abs_fits_ui(l) && fmpz_cmp_ui(l, GR_TOWER_OPTION(T, GR_TOWER_OPT_ROOT_OF_UNITY_ORDER_LIMIT)) <= 0;
+        if (ok)
+            N = fmpz_get_ui(l);
+        fmpz_clear(l);
+        fmpz_clear(l2);
+        if (!ok)
+            goto cleanup;
+        ok = 0;
+    }
+    /* (a new root of unity must cost less than the radical of degree
+       |c_g| it replaces) */
+    if (!_root_of_unity_present(T, N) && (!fmpz_fits_si(c + jt) || n_euler_phi(N) >= (ulong) FLINT_ABS(fmpz_get_si(c + jt))))
+        goto cleanup;
+    if (N > 2)
+    {
+        slong first = -1;
+        gid_z = _torsion_root_of_unity(&N, F);
+        if (gid_z < 0)
+            goto cleanup;
+        /* the root of unity before all the generators involved */
+        for (j = 0; j < n; j++)
+            if (gid[j] >= 0 && !fmpq_is_zero(r + j) &&
+                (first < 0 || gr_tower_gid_order(T, gid[j]) < gr_tower_gid_order(T, first)))
+                first = gid[j];
+        if (!_move_before(T, gid_z, first))
+            goto cleanup;
+    }
+
+    for (j = 0; j < n; j++)
+    {
+        fmpz_mpoly_q_t e;
+        fmpz_mpoly_q_struct mm[2];
+        slong gid_new;
+        int status;
+
+        if (gid[j] < 0 || fmpq_is_zero(r + j))
+            continue;
+
+        /* E = exp(y_j), before the generator j */
+        gr_tower_flat_ensure(F);
+        fmpz_mpoly_q_init(e, F->mctx);
+        gr_tower_flat_convert(e, y + j, mctx0, F);
+        status = gr_tower_adjoin_exp_flat(T, e, F->mctx, NULL);
+        fmpz_mpoly_q_clear(e, F->mctx);
+        if (status != GR_SUCCESS)
+            break;
+        gid_new = T->gens[T->num_gens - 1].gid;
+        _gr_tower_move_gen(T, T->num_gens - 1, gr_tower_gid_order(T, gid[j]));
+
+        /* exp(u_j) = E exp(r_j pi i) */
+        gr_tower_flat_ensure(F);
+        fmpz_mpoly_q_init(mm + 0, F->mctx);
+        fmpz_mpoly_q_init(mm + 1, F->mctx);
+        fmpz_mpoly_q_init(e, F->mctx);
+        fmpz_mpoly_q_gen(mm + 0, GR_TOWER_FLAT_VAR_D(F, gr_tower_gid_order(T, gid_new)), F->mctx);
+        _flat_exp_pi_i(e, r + j, (gid_z >= 0) ? gr_tower_gid_order(T, gid_z) : -1, N, F);
+        fmpz_mpoly_q_mul(mm + 0, mm + 0, e, F->mctx);
+        fmpz_mpoly_q_neg(mm + 0, mm + 0, F->mctx);
+        fmpz_mpoly_q_one(mm + 1, F->mctx);
+        _gr_tower_make_algebraic(T, gr_tower_gid_order(T, gid[j]), mm, 2, F->mctx, GR_TOWER_STATUS_PROVEN);
+        fmpz_mpoly_q_clear(mm + 0, F->mctx);
+        fmpz_mpoly_q_clear(mm + 1, F->mctx);
+        fmpz_mpoly_q_clear(e, F->mctx);
+        ok = 1;
+    }
+
+cleanup:
+    for (j = 0; j < n; j++)
+        fmpz_mpoly_q_clear(y + j, mctx0);
+    flint_free(y);
+    flint_free(gid);
+    _fmpq_vec_clear(r, n);
+    fmpq_clear(sum);
+    fmpq_clear(t);
+    return ok;
+}
+
+/*
+    The relation c_g u_g + c_j u_j + c_k 2 pi i = 0 between two
+    exponentials (jk = -1 if there is no 2 pi i term) whose arguments are
+    u = y + r pi i with r rational and y free of pi: then c_g y_g + c_j
+    y_j = 0 (checked: the rational parts must cancel), and with the
+    primitive y* = y_j / m (as in _primitive_exp), exp(u_j) = exp(y*)^m
+    exp(r_j pi i) and exp(u_g) = exp(y*)^e exp(r_g pi i), monomials
+    times roots of unity (of the orders of the arguments themselves),
+    instead of a radical of degree c_g over a root of unity of the order
+    c_g / gcd(c_g, c_k) (for exp((16 + 30 pi i)/225) and exp((5 + 42 pi
+    i)/60): a modulus of degree 300, against zeta_60 and exp(1/900)).
+    Returns 1 if this was done; does nothing (returning 0) when there is
+    no pi i part and no 2 pi i term.
+*/
+static int
+_primitive_exp_torsion(const fmpz * c, slong jt, slong jo, slong jk, const logside_entry_struct * L, gr_tower_flat_t F)
+{
+    gr_tower_struct * T = F->T;
+    slong dpi, di, cg, cj, m, e, sgn, gid_j, gid_g, gid_new, gid_z = -1, p, d;
+    ulong dd, N = 1;
+    fmpq_t rg, rj, t, sum;
+    fmpz_mpoly_q_t yg, yj, ystar, z;
+    fmpz_mpoly_q_struct mm[2];
+    const fmpz_mpoly_ctx_struct * mctx0;
+    int ok = 0, status;
+
+    dpi = _find_pi(T, T->num_gens);
+    di = _find_i(T);
+
+    fmpq_init(rg); fmpq_init(rj); fmpq_init(t); fmpq_init(sum);
+    gr_tower_flat_ensure(F);
+    mctx0 = F->mctx;   /* (the context of the log side; F->mctx may change below) */
+    fmpz_mpoly_q_init(yg, mctx0);
+    fmpz_mpoly_q_init(yj, mctx0);
+
+    /* (the generators by gid: the definition orders change below) */
+    gid_j = T->gens[L[jo].gen].gid;
+    gid_g = T->gens[L[jt].gen].gid;
+
+    _flat_pi_i_split(rg, yg, &L[jt].val, dpi, di, F);
+    _flat_pi_i_split(rj, yj, &L[jo].val, dpi, di, F);
+    if (jk < 0 && fmpq_is_zero(rg) && fmpq_is_zero(rj))
+        goto cleanup;
+
+    cg = fmpz_get_si(c + jt);
+    cj = fmpz_get_si(c + jo);
+
+    /* c_g r_g + c_j r_j + 2 c_k = 0, so that c_g y_g + c_j y_j = 0 */
+    fmpq_mul_fmpz(sum, rg, c + jt);
+    fmpq_mul_fmpz(t, rj, c + jo);
+    fmpq_add(sum, sum, t);
+    if (jk >= 0)
+    {
+        fmpz_mul_ui(fmpq_numref(t), c + jk, 2);
+        fmpz_one(fmpq_denref(t));
+        fmpq_add(sum, sum, t);
+    }
+    if (!fmpq_is_zero(sum))
+        goto cleanup;
+
+    /* the root of unity: order N = lcm(2 den(r_g), 2 den(r_j)) */
+    {
+        fmpz_t l, l2;
+        fmpz_init(l);
+        fmpz_init(l2);
+        fmpz_mul_ui(l, fmpq_denref(rg), 2);
+        fmpz_mul_ui(l2, fmpq_denref(rj), 2);
+        fmpz_lcm(l, l, l2);
+        ok = fmpz_abs_fits_ui(l) && fmpz_cmp_ui(l, GR_TOWER_OPTION(T, GR_TOWER_OPT_ROOT_OF_UNITY_ORDER_LIMIT)) <= 0;
+        if (ok)
+            N = fmpz_get_ui(l);
+        fmpz_clear(l);
+        fmpz_clear(l2);
+        if (!ok)
+            goto cleanup;
+        ok = 0;
+    }
+    /* (a new root of unity must cost less than the radical of degree
+       |c_g| it replaces) */
+    if (!_root_of_unity_present(T, N) && n_euler_phi(N) >= (ulong) FLINT_ABS(cg))
+        goto cleanup;
+    if (N > 2)
+    {
+        gid_z = _torsion_root_of_unity(&N, F);
+        if (gid_z < 0)
+            goto cleanup;
+    }
+
+    dd = n_gcd(FLINT_ABS(cg), FLINT_ABS(cj));
+    m = FLINT_ABS(cg) / dd;
+    sgn = (cg > 0) ? 1 : -1;
+    e = -sgn * (cj / (slong) dd);
+
+    /* the root of unity before the generators j and g */
+    if (gid_z >= 0)
+    {
+        slong first = (gr_tower_gid_order(T, gid_j) < gr_tower_gid_order(T, gid_g)) ? gid_j : gid_g;
+        if (!_move_before(T, gid_z, first))
+            goto cleanup;
+    }
+
+    /* exp(y*), y* = y_j / m, before j */
+    gr_tower_flat_ensure(F);
+    fmpz_mpoly_q_init(ystar, F->mctx);
+    gr_tower_flat_convert(ystar, yj, mctx0, F);
+    fmpz_mpoly_q_div_si(ystar, ystar, m, F->mctx);
+    status = gr_tower_adjoin_exp_flat(T, ystar, F->mctx, NULL);
+    fmpz_mpoly_q_clear(ystar, F->mctx);
+    if (status != GR_SUCCESS)
+        goto cleanup;
+    gid_new = T->gens[T->num_gens - 1].gid;
+    p = gr_tower_gid_order(T, gid_j);
+    _gr_tower_move_gen(T, T->num_gens - 1, p);
+
+    /* exp(u_j) = exp(y*)^m exp(r_j pi i), exp(u_g) = exp(y*)^e exp(r_g pi i) */
+    for (d = 0; d < 2; d++)
+    {
+        slong gid = (d == 0) ? gid_j : gid_g;
+        slong ex = (d == 0) ? m : e;
+        const fmpq * r = (d == 0) ? rj : rg;
+
+        gr_tower_flat_ensure(F);
+        fmpz_mpoly_q_init(mm + 0, F->mctx);
+        fmpz_mpoly_q_init(mm + 1, F->mctx);
+        fmpz_mpoly_q_init(z, F->mctx);
+        fmpz_mpoly_q_gen(mm + 0, GR_TOWER_FLAT_VAR_D(F, gr_tower_gid_order(T, gid_new)), F->mctx);
+        if (ex >= 0)
+            fmpz_mpoly_pow_ui(fmpz_mpoly_q_numref(mm + 0), fmpz_mpoly_q_numref(mm + 0), ex, F->mctx);
+        else
+        {
+            fmpz_mpoly_q_inv(mm + 0, mm + 0, F->mctx);
+            fmpz_mpoly_pow_ui(fmpz_mpoly_q_denref(mm + 0), fmpz_mpoly_q_denref(mm + 0), -ex, F->mctx);
+        }
+        _flat_exp_pi_i(z, r, (gid_z >= 0) ? gr_tower_gid_order(T, gid_z) : -1, N, F);
+        fmpz_mpoly_q_mul(mm + 0, mm + 0, z, F->mctx);
+        fmpz_mpoly_q_neg(mm + 0, mm + 0, F->mctx);
+        fmpz_mpoly_q_one(mm + 1, F->mctx);
+        _gr_tower_make_algebraic(T, gr_tower_gid_order(T, gid), mm, 2, F->mctx, GR_TOWER_STATUS_PROVEN);
+        fmpz_mpoly_q_clear(mm + 0, F->mctx);
+        fmpz_mpoly_q_clear(mm + 1, F->mctx);
+        fmpz_mpoly_q_clear(z, F->mctx);
+    }
+
+    ok = 1;
+
+cleanup:
+    fmpq_clear(rg); fmpq_clear(rj); fmpq_clear(t); fmpq_clear(sum);
+    fmpz_mpoly_q_clear(yg, mctx0);
+    fmpz_mpoly_q_clear(yj, mctx0);
+    return ok;
 }
 
 /*
@@ -1283,8 +1896,12 @@ _try_eliminate(const fmpz * c, const logside_entry_struct * L, slong n, gr_tower
         }
         else if (_primitive_exp(c, jt, L, n, F))
         {
-            /* c_g u_g + c_j u_j = 0 with two exponentials: both are
-               powers of the new generator exp(u_j / (c_g / gcd)) */
+            /* done by _primitive_exp: two exponentials, powers of a
+               primitive exponential (exp(u_j / (c_g / gcd)), or exp(u_g)
+               itself moved first), times roots of unity with parts pi i
+               in the arguments; several exponentials, split over roots
+               of unity (_split_torsion); or the tower changed anyway,
+               progress: the caller restarts */
         }
         else
         {
@@ -1292,6 +1909,89 @@ _try_eliminate(const fmpz * c, const logside_entry_struct * L, slong n, gr_tower
             fmpz_mpoly_q_t u;
             slong cc = FLINT_ABS(cg), i;
             fmpz_mpoly_q_struct * m;
+            int linear = (cc > 1);
+            fmpz_t k2pi;
+
+            /* when c_g divides the coefficients of the generators, x_g =
+               zeta prod_{j != jt} e^{l_j}^{-c_j / c_g} with zeta =
+               exp(-2 pi i k / c_g) (k the coefficient of 2 pi i): a
+               modulus of degree one when zeta is -1 or +/- i with i in
+               the tower (exp(a + pi i / 2) = i exp(a), say), rather than
+               the reducible X^{c_g} - u */
+            fmpz_init(k2pi);
+            for (j = 0; j < n && linear; j++)
+            {
+                if (j == jt || fmpz_is_zero(c + j))
+                    continue;
+                if (L[j].gen < 0)
+                    fmpz_set(k2pi, c + j);
+                else if (!fmpz_divisible_si(c + j, cg))
+                    linear = 0;
+            }
+            if (linear)
+            {
+                /* zeta = exp(2 pi i r), r = -k / c_g mod 1 */
+                slong r = fmpz_fdiv_ui(k2pi, cc);
+                if (cg > 0)
+                    r = (cc - r) % cc;
+                r = (4 * r) % (4 * cc);
+                if (r % cc != 0)
+                    linear = 0;   /* (zeta not a fourth root of unity) */
+                else
+                {
+                    r = r / cc;   /* zeta = i^r */
+                    if ((r & 1) && _find_i(T) < 0)
+                        linear = 0;
+                    if (linear)
+                    {
+                        fmpz_mpoly_q_init(u, F->mctx);
+                        fmpz_mpoly_q_one(u, F->mctx);
+                        for (j = 0; j < n; j++)
+                        {
+                            if (j != jt && !fmpz_is_zero(c + j) && L[j].gen >= 0)
+                            {
+                                fmpz_t q;
+                                fmpz_init(q);
+                                fmpz_divexact_si(q, c + j, cg);
+                                _expside(t, L + j, F);
+                                _mul_pow_si(u, t, -fmpz_get_si(q), F);
+                                fmpz_clear(q);
+                            }
+                        }
+                        if (r & 1)
+                        {
+                            _flat_i(t, F, _find_i(T));
+                            fmpz_mpoly_q_mul(u, u, t, F->mctx);
+                        }
+                        if (r >= 2)
+                            fmpz_mpoly_q_neg(u, u, F->mctx);
+                        GR_MUST_SUCCEED(gr_tower_flat_reduce(u, F));
+
+                        if (gr_tower_flat_has_alg_var(fmpz_mpoly_q_denref(u), F) &&
+                            gr_tower_flat_rationalize(u, F) != GR_SUCCESS)
+                        {
+                            ok = 0;
+                        }
+                        else
+                        {
+                            fmpz_mpoly_q_struct mm[2];
+                            fmpz_mpoly_q_init(mm + 0, F->mctx);
+                            fmpz_mpoly_q_init(mm + 1, F->mctx);
+                            fmpz_mpoly_q_neg(mm + 0, u, F->mctx);
+                            fmpz_mpoly_q_one(mm + 1, F->mctx);
+                            ok = _gr_tower_make_algebraic(T, d, mm, 2, F->mctx, GR_TOWER_STATUS_PROVEN);
+                            fmpz_mpoly_q_clear(mm + 0, F->mctx);
+                            fmpz_mpoly_q_clear(mm + 1, F->mctx);
+                        }
+                        fmpz_mpoly_q_clear(u, F->mctx);
+                        fmpz_clear(k2pi);
+                        fmpz_mpoly_q_clear(relation, mctx);
+                        fmpz_mpoly_q_clear(t, mctx);
+                        return ok;
+                    }
+                }
+            }
+            fmpz_clear(k2pi);
 
             fmpz_mpoly_q_init(u, F->mctx);
             fmpz_mpoly_q_one(u, F->mctx);
@@ -2125,32 +2825,7 @@ _angle_round(gr_tower_flat_t F, slong limit, slong prec, slong depth, const int 
 
     num_cands = _lindep_all(cands, vals, n, prec);
 
-    {
-        slong maxbits = FLINT_MAX(3, prec / (2 * n)), kept = 0;
-        for (i = 0; i < num_cands; i++)
-        {
-            slong bits = 0;
-            for (j = 0; j < n; j++)
-                bits = FLINT_MAX(bits, fmpz_bits(fmpz_mat_entry(cands, i, j)));
-            if (bits <= maxbits)
-            {
-                if (kept != i)
-                    fmpz_mat_swap_rows(cands, NULL, kept, i);
-                kept++;
-            }
-        }
-        num_cands = kept;
-    }
-
-    {
-        fmpz_mat_t cands2;
-        fmpz_mat_init(cands2, num_cands, n);
-        for (i = 0; i < num_cands; i++)
-            for (j = 0; j < n; j++)
-                fmpz_set(fmpz_mat_entry(cands2, i, j), fmpz_mat_entry(cands, i, j));
-        num_rows = _hnf_by_level(rows, cands2, L, n, T);
-        fmpz_mat_clear(cands2);
-    }
+    num_rows = _filtered_hnf_by_level(rows, cands, num_cands, prec, L, n, T);
 
     for (i = 0; i < num_rows && !eliminated; i++)
     {
@@ -2249,6 +2924,9 @@ _search_round(gr_tower_flat_t F, slong limit, slong prec, slong depth, const int
     if (_gr_tower_dilog_round(F, limit, depth))
         return 1;
     gr_tower_flat_ensure(F);
+    if (_gr_tower_polylog_round(F, limit, depth))
+        return 1;
+    gr_tower_flat_ensure(F);
     if (_gr_tower_gamma_round(F, limit, depth))
         return 1;
     gr_tower_flat_ensure(F);
@@ -2268,37 +2946,7 @@ _search_round(gr_tower_flat_t F, slong limit, slong prec, slong depth, const int
 
     num_cands = _lindep_all(cands, vals, n, prec);
 
-    /* discard relations with unreasonably large coefficients: a
-       genuine relation among n numbers known to prec bits has
-       coefficients of about prec / n bits at most, and verifying a
-       spurious one with large coefficients (powers of large elements)
-       is expensive; more precision admits larger coefficients */
-    {
-        slong maxbits = FLINT_MAX(3, prec / (2 * n)), kept = 0;
-        for (i = 0; i < num_cands; i++)
-        {
-            slong bits = 0;
-            for (j = 0; j < n; j++)
-                bits = FLINT_MAX(bits, fmpz_bits(fmpz_mat_entry(cands, i, j)));
-            if (bits <= maxbits)
-            {
-                if (kept != i)
-                    fmpz_mat_swap_rows(cands, NULL, kept, i);
-                kept++;
-            }
-        }
-        num_cands = kept;
-    }
-
-    {
-        fmpz_mat_t cands2;
-        fmpz_mat_init(cands2, num_cands, n);
-        for (i = 0; i < num_cands; i++)
-            for (j = 0; j < n; j++)
-                fmpz_set(fmpz_mat_entry(cands2, i, j), fmpz_mat_entry(cands, i, j));
-        num_rows = _hnf_by_level(rows, cands2, L, n, T);
-        fmpz_mat_clear(cands2);
-    }
+    num_rows = _filtered_hnf_by_level(rows, cands, num_cands, prec, L, n, T);
 
     for (i = 0; i < num_rows && !eliminated; i++)
     {
@@ -2450,18 +3098,7 @@ _gr_tower_decide_zero_flat(const fmpz_mpoly_q_t x_in, gr_tower_flat_t F, slong l
         }
 
         /* exact test over the algebraic part (may refine the tower) */
-        {
-            slong k = gr_tower_flat_alg_level(x, F);
-            gr_ctx_struct * Fk = gr_tower_field_at(T, k);
-            gr_ptr t;
-
-            GR_TMP_INIT(t, Fk);
-            if (gr_tower_flat_poly_get_nested_at(t, fmpz_mpoly_q_numref(x), k, F) == GR_SUCCESS)
-                code = _gr_tower_field_is_zero_at(t, k, T);
-            else
-                code = GR_TOWER_UNKNOWN;
-            GR_TMP_CLEAR(t, Fk);
-        }
+        code = _gr_tower_flat_nested_zero_code(x, F);
 
         if (code == GR_TOWER_ZERO)
         {
@@ -2616,3 +3253,5 @@ _gr_tower_flat_eliminate_gen(slong d, fmpz_mpoly_q_t expr, gr_tower_flat_t F)
     fmpz_mpoly_q_clear(mod + 1, F->mctx);
     return ok;
 }
+
+POP_OPTIONS

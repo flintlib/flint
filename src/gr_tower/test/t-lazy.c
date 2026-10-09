@@ -611,6 +611,157 @@ TEST_FUNCTION_START(gr_tower_lazy, state)
         gr_ctx_clear(K);
     }
 
+    /* Roots in the field of the radicand: the radicand is a power at all
+       the places of the proof of irreducibility of X^n - x, and the
+       principal root is found by factoring (no new generator; with
+       GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT = 0, a new generator, equal
+       to it by the zero test) */
+    {
+        static const char * radicand[] = {
+            "1/((pi^(1/6))^6 + 1 + (pi^(1/6))^6 + pi^(1/6))^2",
+            "pi^3 + 3*pi^2*2^(1/3) + 3*pi*2^(2/3) + 2",
+            "exp(2) - 2*exp(1)*sqrt(2) + 2",
+            "(1 + pi^(1/3))^4",
+            "(1 - pi^(1/3))^4",
+            "(-1 - pi^(1/3))^6",
+            "-(1 + pi^(1/3))^2",
+            "(2*sqrt(3) - 1)^2*(1 + sqrt(3))^4",
+        };
+        static const ulong order[] = { 2, 3, 2, 4, 4, 6, 2, 2 };
+        /* (the root of -(1 + pi^(1/3))^2 needs i) */
+        static const int in_field[] = { 1, 1, 1, 1, 1, 1, 0, 1 };
+        static const char * root[] = {
+            "1/(2*pi + 1 + pi^(1/6))",
+            "pi + 2^(1/3)",
+            "exp(1) - sqrt(2)",
+            "1 + pi^(1/3)",
+            "pi^(1/3) - 1",
+            "1 + pi^(1/3)",
+            "i*(1 + pi^(1/3))",
+            "(2*sqrt(3) - 1)*(4 + 2*sqrt(3))",
+        };
+        slong k, off;
+
+        for (off = 0; off < 2; off++)
+        {
+            for (k = 0; k < (slong) (sizeof(order) / sizeof(ulong)); k++)
+            {
+                gr_ptr x, r, y;
+                slong lx, lr;
+                gr_tower_struct * Tx, * Tr;
+
+                gr_ctx_init_tower_lazy(K, QQ, 0);
+                if (off)
+                    GR_MUST_SUCCEED(gr_tower_lazy_ctx_set_option(K, GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT, 0));
+                GR_TMP_INIT3(x, r, y, K);
+
+                GR_MUST_SUCCEED(gr_set_str(x, radicand[k], K));
+                GR_MUST_SUCCEED((order[k] == 2) ? gr_sqrt(r, x, K) : gr_tower_lazy_root_ui(r, x, order[k], K));
+                GR_MUST_SUCCEED(gr_set_str(y, root[k], K));
+
+                if (gr_equal(r, y, K) != T_TRUE)
+                {
+                    flint_printf("FAIL: root in the field (%s, n = %wu, off = %wd)\n", radicand[k], order[k], off);
+                    gr_println(r, K); gr_println(y, K);
+                    flint_abort();
+                }
+
+                Tx = gr_tower_lazy_get_tower(&lx, x, K);
+                Tr = gr_tower_lazy_get_tower(&lr, r, K);
+                if (!off && in_field[k] && (Tr != Tx || lr > lx))
+                {
+                    flint_printf("FAIL: root in the field: new generator (%s, n = %wu)\n", radicand[k], order[k]);
+                    gr_println(x, K); gr_println(r, K);
+                    flint_abort();
+                }
+
+                GR_TMP_CLEAR3(x, r, y, K);
+                gr_ctx_clear(K);
+            }
+        }
+
+        /* random powers: y in Q(pi^(1/3), sqrt(2)) (an element of small
+           height), x = +-y^n, the root principal and in the field when
+           X^n - x has its principal root there */
+        for (iter = 0; iter < 4 * flint_test_multiplier(); iter++)
+        {
+            gr_ptr c, s2, x, y, r, t;
+            ulong n = 2 + n_randint(state, 5);
+            slong i, lx, lr;
+            int with_s2;
+            acb_t ax, ar;
+            gr_tower_struct * Tx, * Tr;
+
+            gr_ctx_init_tower_lazy(K, QQ, 0);
+            GR_TMP_INIT4(c, s2, x, y, K);
+            GR_TMP_INIT2(r, t, K);
+            acb_init(ax);
+            acb_init(ar);
+
+            GR_MUST_SUCCEED(gr_set_str(c, "pi^(1/3)", K));
+            GR_MUST_SUCCEED(gr_set_ui(s2, 2, K));
+            GR_MUST_SUCCEED(gr_sqrt(s2, s2, K));
+            GR_MUST_SUCCEED(gr_set_si(y, n_randint(state, 7) - 3, K));
+            with_s2 = n_randint(state, 2);
+            for (i = 0; i < 1 + with_s2; i++)
+            {
+                GR_MUST_SUCCEED(gr_mul_si(t, (i == 0) ? c : s2, n_randint(state, 5) - 2, K));
+                GR_MUST_SUCCEED(gr_add(y, y, t, K));
+            }
+            if (with_s2 && n_randint(state, 2))
+            {
+                GR_MUST_SUCCEED(gr_mul(t, c, s2, K));
+                GR_MUST_SUCCEED(gr_add(y, y, t, K));
+            }
+            if (gr_is_zero(y, K) == T_TRUE)
+                GR_MUST_SUCCEED(gr_add(y, y, c, K));
+
+            GR_MUST_SUCCEED(gr_pow_ui(x, y, n, K));
+            if (n_randint(state, 3) == 0)
+                GR_MUST_SUCCEED(gr_neg(x, x, K));
+            if (n_randint(state, 3) == 0)
+                GR_MUST_SUCCEED(gr_inv(x, x, K));
+
+            GR_MUST_SUCCEED(gr_tower_lazy_root_ui(r, x, n, K));
+
+            /* r^n = x, and r is the principal root */
+            GR_MUST_SUCCEED(gr_pow_ui(t, r, n, K));
+            GR_MUST_SUCCEED(gr_tower_lazy_get_acb(ax, x, 128, K));
+            GR_MUST_SUCCEED(gr_tower_lazy_get_acb(ar, r, 128, K));
+            acb_root_ui(ax, ax, n, 128);
+            if (gr_equal(t, x, K) != T_TRUE || !acb_overlaps(ax, ar))
+            {
+                flint_printf("FAIL: random power, n = %wu\n", n);
+                gr_println(x, K); gr_println(r, K);
+                flint_abort();
+            }
+
+            /* y in Q(pi^(1/3)) and r = +-y or +-1/y: the root is in the
+               field of x, without a new generator (with sqrt(2) in y, x
+               may lie in a smaller field: 2 (pi^(1/3) + 2)^2); Tx, Tr
+               taken before the products below, which may move r to
+               another tower */
+            Tx = gr_tower_lazy_get_tower(&lx, x, K);
+            Tr = gr_tower_lazy_get_tower(&lr, r, K);
+            GR_MUST_SUCCEED(gr_div(t, r, y, K));
+            i = (gr_is_one(t, K) == T_TRUE || gr_is_neg_one(t, K) == T_TRUE);
+            GR_MUST_SUCCEED(gr_mul(t, r, y, K));
+            i = i || (gr_is_one(t, K) == T_TRUE || gr_is_neg_one(t, K) == T_TRUE);
+            if (i && !with_s2 && (Tr != Tx || lr > lx))
+            {
+                flint_printf("FAIL: random power, new generator, n = %wu\n", n);
+                gr_println(x, K); gr_println(r, K);
+                flint_abort();
+            }
+
+            acb_clear(ax);
+            acb_clear(ar);
+            GR_TMP_CLEAR4(c, s2, x, y, K);
+            GR_TMP_CLEAR2(r, t, K);
+            gr_ctx_clear(K);
+        }
+    }
+
     /* Transfer between two lazy contexts and string round trips must be
        exact even for roots that are closer than their printed approximations
        would suggest: x^20 - 2 (101 x - 1)^2 has two real roots about

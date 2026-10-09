@@ -100,6 +100,8 @@ gr_tower_flat_init(gr_tower_flat_t F, gr_tower_t T, slong cap)
     F->gc = 0;
     F->dense_fields = NULL;
     F->primitive_tried[0] = F->primitive_tried[1] = 0;
+    F->rebase_key[0] = F->rebase_key[1] = 0;
+    F->rebase_pending = 0;
 }
 
 void
@@ -1098,6 +1100,12 @@ gr_tower_flat_reduce(fmpz_mpoly_q_t x, gr_tower_flat_t F)
                in the variables of steps below k) */
             fmpq_init(scale);
             _flat_reduce_sequential(fmpz_mpoly_q_numref(x), fmpq_denref(scale), F);
+            if (fmpz_mpoly_is_zero(fmpz_mpoly_q_numref(x), F->mctx))
+            {
+                fmpz_mpoly_q_zero(x, F->mctx);
+                fmpq_clear(scale);
+                return GR_SUCCESS;
+            }
             _flat_reduce_sequential(fmpz_mpoly_q_denref(x), fmpq_numref(scale), F);
             fmpz_mpoly_q_canonicalise(x, F->mctx);
             if (!fmpq_is_one(scale))
@@ -1121,7 +1129,12 @@ gr_tower_flat_reduce(fmpz_mpoly_q_t x, gr_tower_flat_t F)
         fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, R, fmpz_mpoly_q_numref(x), F->ideal, n, F->mctx);
         fmpz_mpoly_swap(R, fmpz_mpoly_q_numref(x), F->mctx);
 
-        if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(x), F->mctx))
+        if (fmpz_mpoly_is_zero(fmpz_mpoly_q_numref(x), F->mctx))
+        {
+            fmpz_mpoly_q_zero(x, F->mctx);
+            fmpq_one(scale);
+        }
+        else if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(x), F->mctx))
         {
             fmpz_one(fmpq_numref(scale));
         }
@@ -1153,6 +1166,17 @@ gr_tower_flat_reduce(fmpz_mpoly_q_t x, gr_tower_flat_t F)
     fmpz_mpoly_init(mult, F->mctx);
 
     _flat_reduce_poly(fmpz_mpoly_q_numref(x), mult, F);
+
+    /* a zero (the common case of a zero test): the denominator, often
+       the larger part (the product of those of the operands), is not
+       needed */
+    if (fmpz_mpoly_is_zero(fmpz_mpoly_q_numref(x), F->mctx))
+    {
+        fmpz_mpoly_clear(mult, F->mctx);
+        fmpz_mpoly_q_zero(x, F->mctx);
+        return GR_SUCCESS;
+    }
+
     if (!fmpz_mpoly_is_one(mult, F->mctx))
     {
         fmpz_mpoly_mul(fmpz_mpoly_q_denref(x), fmpz_mpoly_q_denref(x), mult, F->mctx);
@@ -2041,6 +2065,61 @@ _flat_num_lindemann_nonzero(const fmpz_mpoly_q_t x, gr_tower_flat_t F)
 }
 
 /*
+    The exact test of the numerator of x (reduced) via the nested
+    representation, at the lowest possible level: a code of
+    _gr_tower_field_is_zero_at (the tower may be refined). The monomial
+    content of x is removed first when it is nonzero: x = sqrt(u) (exp(a)
+    - exp(b)) is tested as exp(a) - exp(b), below sqrt(u), whose modulus
+    can be large.
+*/
+int
+_gr_tower_flat_nested_zero_code(const fmpz_mpoly_q_t x, gr_tower_flat_t F)
+{
+    gr_tower_struct * T = F->T;
+    fmpz_mpoly_t M;
+    fmpz_mpoly_q_t y;
+    gr_ctx_struct * Fk;
+    gr_ptr t;
+    slong k;
+    int split = 0, code;
+
+    fmpz_mpoly_init(M, F->mctx);
+    fmpz_mpoly_q_init(y, F->mctx);
+    fmpz_mpoly_term_content(M, fmpz_mpoly_q_numref(x), F->mctx);
+    if (!fmpz_mpoly_is_fmpz(M, F->mctx))
+    {
+        acb_t w;
+        acb_init(w);
+        fmpz_mpoly_one(fmpz_mpoly_q_denref(y), F->mctx);
+        fmpz_mpoly_set(fmpz_mpoly_q_numref(y), M, F->mctx);
+        if (gr_tower_flat_get_acb(w, y, GR_TOWER_DEFAULT_PREC, F) == GR_SUCCESS && !acb_contains_zero(w) &&
+            fmpz_mpoly_divides(fmpz_mpoly_q_numref(y), fmpz_mpoly_q_numref(x), M, F->mctx))
+            split = 1;
+        acb_clear(w);
+    }
+    if (!split)
+        fmpz_mpoly_q_set(y, x, F->mctx);
+
+    k = gr_tower_flat_alg_level(y, F);
+    Fk = gr_tower_field_at(T, k);
+    GR_TMP_INIT(t, Fk);
+    if (gr_tower_flat_poly_get_nested_at(t, fmpz_mpoly_q_numref(y), k, F) == GR_SUCCESS)
+    {
+        fmpz_mpoly_q_clear(y, F->mctx);
+        fmpz_mpoly_clear(M, F->mctx);
+        code = _gr_tower_field_is_zero_at(t, k, T);
+    }
+    else
+    {
+        fmpz_mpoly_q_clear(y, F->mctx);
+        fmpz_mpoly_clear(M, F->mctx);
+        code = GR_TOWER_UNKNOWN;
+    }
+    GR_TMP_CLEAR(t, Fk);
+    return code;
+}
+
+/*
     Complete zero test of the numerator of x (in place: x is reduced,
     and the tower may be refined).
 */
@@ -2049,10 +2128,8 @@ _flat_num_is_zero(fmpz_mpoly_q_t x, gr_tower_flat_t F, int fixed)
 {
     gr_tower_struct * T = F->T;
     truth_t res;
-    slong prec, k;
+    slong prec;
     acb_t z;
-    gr_ptr t;
-    gr_ctx_struct * Fk;
 
     if (gr_tower_flat_reduce(x, F) != GR_SUCCESS)
         return T_UNKNOWN;
@@ -2099,13 +2176,9 @@ _flat_num_is_zero(fmpz_mpoly_q_t x, gr_tower_flat_t F, int fixed)
         }
     }
 
-    /* exact test via the nested representation, at the lowest possible level */
-    k = gr_tower_flat_alg_level(x, F);
-    Fk = gr_tower_field_at(T, k);
-    GR_TMP_INIT(t, Fk);
-    if (gr_tower_flat_poly_get_nested_at(t, fmpz_mpoly_q_numref(x), k, F) == GR_SUCCESS)
+    /* exact test via the nested representation */
     {
-        int code = _gr_tower_field_is_zero_at(t, k, T);
+        int code = _gr_tower_flat_nested_zero_code(x, F);
 
         if (code == GR_TOWER_ZERO)
             res = T_TRUE;
@@ -2116,9 +2189,6 @@ _flat_num_is_zero(fmpz_mpoly_q_t x, gr_tower_flat_t F, int fixed)
         else
             res = T_UNKNOWN;
     }
-    else
-        res = T_UNKNOWN;
-    GR_TMP_CLEAR(t, Fk);
 
     /* the tower may have been refined: x is reduced (a zero is set to
        zero directly, rather than reduced modulo moduli which may have

@@ -45,6 +45,9 @@
 #include "fmpq.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 #define DILOG_MAX_N 4
 
 /* the generators Li_2(x) */
@@ -511,6 +514,62 @@ _dl_rat_canonical(fmpz_t h, fmpz_t p, fmpz_t q)
     fmpz_clear(t);
 }
 
+/*
+    expr = R (the relation, flat): solved for the latest transcendental
+    generator among gens occurring linearly in it, which is eliminated
+    after a numerical check; returns 1 if eliminated
+*/
+static int
+_dl_solve_eliminate(fmpz_mpoly_q_t expr, gr_tower_flat_t F, const slong * gens, slong ngens)
+{
+    gr_tower_struct * T = F->T;
+    fmpz_mpoly_t C, R0, t;
+    slong j, dtop = -1, v;
+    int ok;
+
+    gr_tower_flat_ensure(F);
+    fmpz_mpoly_init(C, F->mctx);
+    fmpz_mpoly_init(R0, F->mctx);
+    fmpz_mpoly_init(t, F->mctx);
+    ok = (gr_tower_flat_reduce(expr, F) == GR_SUCCESS);
+    for (j = 0; j < ngens && ok; j++)
+    {
+        slong d = gens[j];
+        if (T->gens[d].kind == GR_TOWER_ALGEBRAIC || d <= dtop)
+            continue;
+        v = GR_TOWER_FLAT_VAR_D(F, d);
+        if (fmpz_mpoly_degree_si(fmpz_mpoly_q_numref(expr), v, F->mctx) == 1 &&
+            fmpz_mpoly_degree_si(fmpz_mpoly_q_denref(expr), v, F->mctx) <= 0)
+            dtop = d;
+    }
+    if (dtop < 0)
+        ok = 0;
+    if (ok)
+    {
+        v = GR_TOWER_FLAT_VAR_D(F, dtop);
+        fmpz_mpoly_derivative(C, fmpz_mpoly_q_numref(expr), v, F->mctx);
+        fmpz_mpoly_gen(t, v, F->mctx);
+        fmpz_mpoly_mul(t, t, C, F->mctx);
+        fmpz_mpoly_sub(R0, fmpz_mpoly_q_numref(expr), t, F->mctx);
+        fmpz_mpoly_neg(R0, R0, F->mctx);
+        fmpz_mpoly_swap(fmpz_mpoly_q_numref(expr), R0, F->mctx);
+        fmpz_mpoly_swap(fmpz_mpoly_q_denref(expr), C, F->mctx);
+        ok = !fmpz_mpoly_is_zero(fmpz_mpoly_q_denref(expr), F->mctx);
+        if (ok)
+        {
+            fmpz_mpoly_q_canonicalise(expr, F->mctx);
+            ok = (gr_tower_flat_reduce(expr, F) == GR_SUCCESS) && _gr_tower_flat_max_dep(expr, F) < dtop;
+        }
+    }
+    fmpz_mpoly_clear(C, F->mctx);
+    fmpz_mpoly_clear(R0, F->mctx);
+    fmpz_mpoly_clear(t, F->mctx);
+
+    if (ok)
+        ok = _gr_tower_flat_matches_gen(expr, dtop, F);
+    return ok && _gr_tower_flat_eliminate_gen(dtop, expr, F);
+}
+
 /* the relation for y (flat, |y| <= 1) and n: eliminates a generator
    (returns 1, also when the tower changed otherwise), or returns 0 */
 static int
@@ -728,13 +787,8 @@ _dl_relation(gr_tower_flat_t F, const fmpz_mpoly_q_t y_in, slong n, const slong 
            generators substituted); then solved for the latest
            transcendental generator occurring linearly in it */
         fmpz_mpoly_q_t x;
-        fmpz_mpoly_t C, R0, t;
-        slong v = 0;
         gr_tower_flat_ensure(F);
         fmpz_mpoly_q_init(x, F->mctx);
-        fmpz_mpoly_init(C, F->mctx);
-        fmpz_mpoly_init(R0, F->mctx);
-        fmpz_mpoly_init(t, F->mctx);
         for (j = 0; j < ngens; j++)
         {
             if (coef[j] == 0)
@@ -743,50 +797,12 @@ _dl_relation(gr_tower_flat_t F, const fmpz_mpoly_q_t y_in, slong n, const slong 
             fmpz_mpoly_q_mul_si(x, x, coef[j], F->mctx);
             fmpz_mpoly_q_add(expr, expr, x, F->mctx);
         }
-        ok = (gr_tower_flat_reduce(expr, F) == GR_SUCCESS);
-        dtop = -1;
-        for (j = 0; j < ngens && ok; j++)
-        {
-            slong d = gens[j];
-            if (T->gens[d].kind == GR_TOWER_ALGEBRAIC || d <= dtop)
-                continue;
-            v = GR_TOWER_FLAT_VAR_D(F, d);
-            if (fmpz_mpoly_degree_si(fmpz_mpoly_q_numref(expr), v, F->mctx) == 1 &&
-                fmpz_mpoly_degree_si(fmpz_mpoly_q_denref(expr), v, F->mctx) <= 0)
-                dtop = d;
-        }
-        if (dtop < 0)
-            ok = 0;
-        if (ok)
-        {
-            v = GR_TOWER_FLAT_VAR_D(F, dtop);
-            fmpz_mpoly_derivative(C, fmpz_mpoly_q_numref(expr), v, F->mctx);
-            fmpz_mpoly_gen(t, v, F->mctx);
-            fmpz_mpoly_mul(t, t, C, F->mctx);
-            fmpz_mpoly_sub(R0, fmpz_mpoly_q_numref(expr), t, F->mctx);
-            fmpz_mpoly_neg(R0, R0, F->mctx);
-            fmpz_mpoly_swap(fmpz_mpoly_q_numref(expr), R0, F->mctx);
-            fmpz_mpoly_swap(fmpz_mpoly_q_denref(expr), C, F->mctx);
-            ok = !fmpz_mpoly_is_zero(fmpz_mpoly_q_denref(expr), F->mctx);
-            if (ok)
-            {
-                fmpz_mpoly_q_canonicalise(expr, F->mctx);
-                ok = (gr_tower_flat_reduce(expr, F) == GR_SUCCESS) && _gr_tower_flat_max_dep(expr, F) < dtop;
-            }
-        }
         fmpz_mpoly_q_clear(x, F->mctx);
-        fmpz_mpoly_clear(C, F->mctx);
-        fmpz_mpoly_clear(R0, F->mctx);
-        fmpz_mpoly_clear(t, F->mctx);
+        if (_dl_solve_eliminate(expr, F, gens, ngens))
+            changed = 1;
     }
 
-    /* safeguard: the value of expr is that of the generator */
-    if (ok)
-        ok = _gr_tower_flat_matches_gen(expr, dtop, F);
-
-    if (ok && _gr_tower_flat_eliminate_gen(dtop, expr, F))
-        changed = 1;
-    else if (st > 0)
+    if (st > 0)
         changed = 1;
 
     /* (the flat context may have changed: clear in the current one) */
@@ -799,6 +815,234 @@ _dl_relation(gr_tower_flat_t F, const fmpz_mpoly_q_t y_in, slong n, const slong 
     fmpz_mpoly_q_clear(expr, F->mctx);
     fmpz_mpoly_q_clear(E, F->mctx);
     flint_free(coef);
+    return changed;
+}
+
+
+/*
+    Abel's five-term relation, for real x, y in (0, 1):
+
+        Li_2(x) + Li_2(y) - Li_2(x y) - Li_2(x (1 - y)/(1 - x y)) - Li_2(y (1 - x)/(1 - x y))
+            = log((1 - x)/(1 - x y)) log((1 - y)/(1 - x y)),
+
+    with x and y among the points in (0, 1) of the orbits of the
+    generators' arguments, and every value found in an orbit (or
+    special): the latest generator occurring linearly is eliminated, as
+    for the distribution relations.
+*/
+static int
+_dl_five(gr_tower_flat_t F, const slong * gens, slong ngens)
+{
+    gr_tower_struct * T = F->T;
+    fmpz_mpoly_q_struct * pts;
+    acb_ptr apts;
+    slong npts = 0, i, j, k;
+    int changed = 0;
+
+    gr_tower_flat_ensure(F);
+    pts = flint_malloc(sizeof(fmpz_mpoly_q_struct) * 2 * ngens);
+    apts = _acb_vec_init(2 * ngens);
+    for (j = 0; j < ngens; j++)
+    {
+        const gr_tower_gen_struct * g = T->gens + gens[j];
+        fmpz_mpoly_q_struct * x = pts + npts;
+        arb_t u;
+        fmpz_mpoly_q_init(x, F->mctx);
+        gr_tower_flat_convert(x, &g->arg.data, g->arg.mctx, F);
+        arb_init(u);
+        if (gr_tower_flat_get_acb(apts + npts, x, 128, F) == GR_SUCCESS && arb_is_zero(acb_imagref(apts + npts)) &&
+            arb_is_positive(acb_realref(apts + npts)))
+        {
+            arb_sub_ui(u, acb_realref(apts + npts), 1, 128);
+            if (arb_is_negative(u))
+            {
+                /* x and 1 - x */
+                fmpz_mpoly_q_init(pts + npts + 1, F->mctx);
+                fmpz_mpoly_q_sub_si(pts + npts + 1, x, 1, F->mctx);
+                fmpz_mpoly_q_neg(pts + npts + 1, pts + npts + 1, F->mctx);
+                acb_sub_ui(apts + npts + 1, apts + npts, 1, 128);
+                acb_neg(apts + npts + 1, apts + npts + 1);
+                npts += 2;
+                arb_clear(u);
+                continue;
+            }
+        }
+        arb_clear(u);
+        fmpz_mpoly_q_clear(x, F->mctx);
+    }
+
+    for (i = 0; i < npts && !changed; i++)
+    {
+        for (j = i; j < npts && !changed; j++)
+        {
+            acb_t a, b, c;
+            fmpz_mpoly_q_struct vals[5];
+            const char * words[5];
+            slong idx[5];
+            int ok = 1, st = 0;
+            static const slong cf[5] = { 1, 1, -1, -1, -1 };
+
+            /* numerically: x y, x (1 - y)/(1 - x y), y (1 - x)/(1 - x y) */
+            acb_init(a);
+            acb_init(b);
+            acb_init(c);
+            acb_mul(a, apts + i, apts + j, 128);
+            acb_sub_ui(c, a, 1, 128);
+            acb_neg(c, c);
+            ok = _dl_match_numeric(a, F, gens, ngens) || _dl_special_numeric(a);
+            if (ok)
+            {
+                acb_sub_ui(b, apts + j, 1, 128);
+                acb_neg(b, b);
+                acb_mul(b, b, apts + i, 128);
+                acb_div(b, b, c, 128);
+                ok = _dl_match_numeric(b, F, gens, ngens) || _dl_special_numeric(b);
+            }
+            if (ok)
+            {
+                acb_sub_ui(b, apts + i, 1, 128);
+                acb_neg(b, b);
+                acb_mul(b, b, apts + j, 128);
+                acb_div(b, b, c, 128);
+                ok = _dl_match_numeric(b, F, gens, ngens) || _dl_special_numeric(b);
+            }
+            acb_clear(a);
+            acb_clear(b);
+            acb_clear(c);
+            if (!ok)
+                continue;
+
+            /* exactly */
+            gr_tower_flat_ensure(F);
+            for (k = 0; k < 5; k++)
+                fmpz_mpoly_q_init(vals + k, F->mctx);
+            {
+                fmpz_mpoly_q_t d, t;
+                fmpz_mpoly_q_init(d, F->mctx);
+                fmpz_mpoly_q_init(t, F->mctx);
+                fmpz_mpoly_q_set(vals + 0, pts + i, F->mctx);
+                fmpz_mpoly_q_set(vals + 1, pts + j, F->mctx);
+                fmpz_mpoly_q_mul(vals + 2, pts + i, pts + j, F->mctx);
+                fmpz_mpoly_q_sub_si(d, vals + 2, 1, F->mctx);
+                fmpz_mpoly_q_neg(d, d, F->mctx);        /* 1 - x y */
+                fmpz_mpoly_q_sub_si(t, pts + j, 1, F->mctx);
+                fmpz_mpoly_q_neg(t, t, F->mctx);
+                fmpz_mpoly_q_mul(t, t, pts + i, F->mctx);
+                fmpz_mpoly_q_div(vals + 3, t, d, F->mctx);
+                fmpz_mpoly_q_sub_si(t, pts + i, 1, F->mctx);
+                fmpz_mpoly_q_neg(t, t, F->mctx);
+                fmpz_mpoly_q_mul(t, t, pts + j, F->mctx);
+                fmpz_mpoly_q_div(vals + 4, t, d, F->mctx);
+                fmpz_mpoly_q_clear(d, F->mctx);
+                fmpz_mpoly_q_clear(t, F->mctx);
+            }
+            for (k = 0; k < 5 && ok; k++)
+            {
+                int code;
+                ok = (gr_tower_flat_reduce(vals + k, F) == GR_SUCCESS);
+                if (!ok)
+                    break;
+                idx[k] = _dl_find(words + k, vals + k, F, gens, ngens);
+                if (idx[k] < 0)
+                {
+                    if (_dl_special(&code, vals + k, F))
+                        idx[k] = -1 - code;
+                    else
+                        ok = 0;
+                }
+            }
+
+            if (ok)
+            {
+                /* sum_k c_k (sigma_k g_k + E_k) - L1 L2 */
+                fmpz_mpoly_q_t expr, E, x, L1, L2;
+                slong dtop = -1, dl;
+                gr_tower_flat_ensure(F);
+                fmpz_mpoly_q_init(expr, F->mctx);
+                fmpz_mpoly_q_init(E, F->mctx);
+                fmpz_mpoly_q_init(x, F->mctx);
+                fmpz_mpoly_q_init(L1, F->mctx);
+                fmpz_mpoly_q_init(L2, F->mctx);
+
+                for (k = 0; k < 5; k++)
+                    if (idx[k] >= 0 && T->gens[gens[idx[k]]].kind != GR_TOWER_ALGEBRAIC)
+                        dtop = FLINT_MAX(dtop, gens[idx[k]]);
+                if (dtop < 0)
+                    ok = 0;
+
+                for (k = 0; k < 5 && ok && st == 0; k++)
+                {
+                    int sigma;
+                    gr_tower_flat_ensure(F);
+                    if (idx[k] < 0)
+                        st = _dl_special_value(E, -1 - idx[k], F, dtop);
+                    else
+                    {
+                        st = _dl_elementary(E, &sigma, vals + k, words[k], F, dtop);
+                        if (st == 0)
+                        {
+                            fmpz_mpoly_q_gen(x, GR_TOWER_FLAT_VAR_D(F, gens[idx[k]]), F->mctx);
+                            if (sigma < 0)
+                                fmpz_mpoly_q_neg(x, x, F->mctx);
+                            fmpz_mpoly_q_add(E, E, x, F->mctx);
+                        }
+                    }
+                    if (st == 0)
+                    {
+                        fmpz_mpoly_q_mul_si(E, E, cf[k], F->mctx);
+                        fmpz_mpoly_q_add(expr, expr, E, F->mctx);
+                    }
+                }
+
+                /* L1 = log((1 - x)/(1 - x y)), L2 = log((1 - y)/(1 - x y)) */
+                for (k = 0; k < 2 && ok && st == 0; k++)
+                {
+                    fmpz_mpoly_q_t u, d;
+                    gr_tower_flat_ensure(F);
+                    fmpz_mpoly_q_init(u, F->mctx);
+                    fmpz_mpoly_q_init(d, F->mctx);
+                    fmpz_mpoly_q_mul(d, pts + i, pts + j, F->mctx);
+                    fmpz_mpoly_q_sub_si(d, d, 1, F->mctx);
+                    fmpz_mpoly_q_sub_si(u, (k == 0) ? pts + i : pts + j, 1, F->mctx);
+                    fmpz_mpoly_q_div(u, u, d, F->mctx);
+                    if (gr_tower_flat_reduce(u, F) != GR_SUCCESS)
+                        st = -1;
+                    else
+                        st = _gr_tower_special_trans_gen(&dl, F, GR_TOWER_LOG, u, dtop);
+                    if (st == 0)
+                        fmpz_mpoly_q_gen((k == 0) ? L1 : L2, GR_TOWER_FLAT_VAR_D(F, dl), F->mctx);
+                    fmpz_mpoly_q_clear(u, F->mctx);
+                    fmpz_mpoly_q_clear(d, F->mctx);
+                }
+
+                if (ok && st == 0)
+                {
+                    fmpz_mpoly_q_mul(x, L1, L2, F->mctx);
+                    fmpz_mpoly_q_sub(expr, expr, x, F->mctx);
+                    changed = _dl_solve_eliminate(expr, F, gens, ngens);
+                }
+                else if (st > 0)
+                    changed = 1;
+
+                gr_tower_flat_ensure(F);
+                fmpz_mpoly_q_clear(expr, F->mctx);
+                fmpz_mpoly_q_clear(E, F->mctx);
+                fmpz_mpoly_q_clear(x, F->mctx);
+                fmpz_mpoly_q_clear(L1, F->mctx);
+                fmpz_mpoly_q_clear(L2, F->mctx);
+            }
+
+            gr_tower_flat_ensure(F);
+            for (k = 0; k < 5; k++)
+                fmpz_mpoly_q_clear(vals + k, F->mctx);
+        }
+    }
+
+    gr_tower_flat_ensure(F);
+    for (i = 0; i < npts; i++)
+        fmpz_mpoly_q_clear(pts + i, F->mctx);
+    flint_free(pts);
+    _acb_vec_clear(apts, 2 * ngens);
     return changed;
 }
 
@@ -883,6 +1127,223 @@ _gr_tower_dilog_round(gr_tower_flat_t F, slong limit, slong depth)
         fmpz_mpoly_q_clear(y, F->mctx);
     }
 
+    if (!changed && ngens >= 2)
+        changed = _dl_five(F, gens, ngens);
+
     flint_free(gens);
     return changed;
 }
+
+/* -------------------------------------------------------------------- */
+/* higher polylogarithms                                                 */
+/* -------------------------------------------------------------------- */
+
+/*
+    The distribution relations of Li_s for s >= 3,
+
+        Li_s(y^n) = n^(s-1) sum_{k<n} Li_s(zeta_n^k y)       (|y| <= 1),
+
+    between generators: the lazy field keeps them at |x| <= 1 (inversion
+    formula, lazy_special.c), so that the relation is linear in the
+    generators with no elementary part. (The other functional equations,
+    Landen's for Li_3 say, are not used.)
+    The candidate y runs over the generators' arguments and n over 2, 3,
+    4 (zeta_n present); when every value is a generator (or 0), the latest
+    generator with a nonzero coefficient is eliminated (degree one). The
+    result is checked numerically.
+*/
+
+#define POLYLOG_MAX_N 4
+
+static int
+_pl_gen(const gr_tower_gen_struct * g, slong s)
+{
+    return (g->kind == GR_TOWER_POLYLOG || (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_POLYLOG)) &&
+        g->def_param == s && g->arg.mctx != NULL;
+}
+
+/* the generator (index into gens) with argument v exactly; -2 for v = 0;
+   -1 if none */
+static slong
+_pl_find(const fmpz_mpoly_q_t v, gr_tower_flat_t F, const slong * gens, slong ngens)
+{
+    fmpz_mpoly_q_t x;
+    acb_t a, b;
+    slong j, res = -1;
+
+    if (fmpz_mpoly_q_is_zero(v, F->mctx))
+        return -2;
+
+    fmpz_mpoly_q_init(x, F->mctx);
+    acb_init(a);
+    acb_init(b);
+    if (gr_tower_flat_get_acb(a, v, 128, F) == GR_SUCCESS)
+    {
+        for (j = 0; j < ngens && res < 0; j++)
+        {
+            const gr_tower_gen_struct * g = F->T->gens + gens[j];
+            gr_tower_flat_convert(x, &g->arg.data, g->arg.mctx, F);
+            if (gr_tower_flat_get_acb(b, x, 128, F) != GR_SUCCESS || !acb_overlaps(a, b))
+                continue;
+            fmpz_mpoly_q_sub(x, x, v, F->mctx);
+            if (gr_tower_flat_reduce(x, F) == GR_SUCCESS && fmpz_mpoly_q_is_zero(x, F->mctx))
+                res = j;
+        }
+    }
+    fmpz_mpoly_q_clear(x, F->mctx);
+    acb_clear(a);
+    acb_clear(b);
+    return res;
+}
+
+/* the relation of order s for y = the argument of gens[iy] and n */
+static int
+_pl_relation(gr_tower_flat_t F, slong s, slong iy, slong n, const slong * gens, slong ngens)
+{
+    gr_tower_struct * T = F->T;
+    fmpz_mpoly_q_t y, z, v, expr, x;
+    fmpz * coef;
+    fmpz_t npow;
+    slong k, j, idx, top = -1, dtop = -1;
+    int ok = 1, changed = 0;
+
+    gr_tower_flat_ensure(F);
+    fmpz_mpoly_q_init(y, F->mctx);
+    fmpz_mpoly_q_init(z, F->mctx);
+    fmpz_mpoly_q_init(v, F->mctx);
+    fmpz_mpoly_q_init(expr, F->mctx);
+    fmpz_mpoly_q_init(x, F->mctx);
+    coef = _fmpz_vec_init(ngens);
+    fmpz_init(npow);
+
+    gr_tower_flat_convert(y, &T->gens[gens[iy]].arg.data, T->gens[gens[iy]].arg.mctx, F);
+
+    /* zeta_n present (not adjoined: the values must be generators) */
+    ok = _gr_tower_special_flat_zeta(z, n, F);
+
+    /* Li_s(y^n) */
+    if (ok)
+    {
+        fmpz_mpoly_q_one(v, F->mctx);
+        for (k = 0; k < n; k++)
+            fmpz_mpoly_q_mul(v, v, y, F->mctx);
+        ok = (gr_tower_flat_reduce(v, F) == GR_SUCCESS);
+    }
+    if (ok)
+    {
+        idx = _pl_find(v, F, gens, ngens);
+        if (idx == -1)
+            ok = 0;
+        else if (idx >= 0)
+            fmpz_add_ui(coef + idx, coef + idx, 1);
+    }
+
+    /* - n^(s-1) Li_s(zeta^k y) */
+    fmpz_set_ui(npow, n);
+    fmpz_pow_ui(npow, npow, s - 1);
+    fmpz_mpoly_q_set(v, y, F->mctx);
+    for (k = 0; k < n && ok; k++)
+    {
+        idx = _pl_find(v, F, gens, ngens);
+        if (idx == -1)
+            ok = 0;
+        else if (idx >= 0)
+            fmpz_sub(coef + idx, coef + idx, npow);
+        fmpz_mpoly_q_mul(v, v, z, F->mctx);
+        ok = ok && (gr_tower_flat_reduce(v, F) == GR_SUCCESS);
+    }
+
+    /* the latest transcendental generator, solved for */
+    for (j = 0; j < ngens && ok; j++)
+        if (!fmpz_is_zero(coef + j) && T->gens[gens[j]].kind != GR_TOWER_ALGEBRAIC && gens[j] > dtop)
+        {
+            dtop = gens[j];
+            top = j;
+        }
+    if (top < 0)
+        ok = 0;
+
+    if (ok)
+    {
+        fmpq_t c;
+        fmpq_init(c);
+        fmpz_mpoly_q_zero(expr, F->mctx);
+        for (j = 0; j < ngens && ok; j++)
+        {
+            if (j == top || fmpz_is_zero(coef + j))
+                continue;
+            if (gens[j] >= dtop)
+            {
+                ok = 0;
+                break;
+            }
+            fmpq_set_fmpz_frac(c, coef + j, coef + top);
+            fmpq_neg(c, c);
+            fmpz_mpoly_q_gen(x, GR_TOWER_FLAT_VAR_D(F, gens[j]), F->mctx);
+            fmpz_mpoly_q_mul_fmpq(x, x, c, F->mctx);
+            fmpz_mpoly_q_add(expr, expr, x, F->mctx);
+        }
+        fmpq_clear(c);
+        if (ok)
+            ok = (gr_tower_flat_reduce(expr, F) == GR_SUCCESS) && _gr_tower_flat_max_dep(expr, F) < dtop;
+    }
+
+    /* safeguard: the value of expr is that of the generator */
+    if (ok)
+        ok = _gr_tower_flat_matches_gen(expr, dtop, F);
+
+    if (ok && _gr_tower_flat_eliminate_gen(dtop, expr, F))
+        changed = 1;
+
+    gr_tower_flat_ensure(F);
+    fmpz_mpoly_q_clear(y, F->mctx);
+    fmpz_mpoly_q_clear(z, F->mctx);
+    fmpz_mpoly_q_clear(v, F->mctx);
+    fmpz_mpoly_q_clear(expr, F->mctx);
+    fmpz_mpoly_q_clear(x, F->mctx);
+    _fmpz_vec_clear(coef, ngens);
+    fmpz_clear(npow);
+    return changed;
+}
+
+int
+_gr_tower_polylog_round(gr_tower_flat_t F, slong limit, slong depth)
+{
+    gr_tower_struct * T = F->T;
+    slong * gens, ngens, j, i, n, s;
+    int changed = 0;
+
+    (void) depth;
+
+    gens = flint_malloc(sizeof(slong) * FLINT_MAX(limit, 1));
+
+    /* each order s >= 3 present (the latest generator of that order) */
+    for (i = limit - 1; i >= 0 && !changed; i--)
+    {
+        int seen = 0;
+        s = T->gens[i].def_param;
+        if (!_pl_gen(T->gens + i, s) || s < 3)
+            continue;
+        for (j = i + 1; j < limit && !seen; j++)
+            if (_pl_gen(T->gens + j, s))
+                seen = 1;
+        if (seen)
+            continue;
+
+        ngens = 0;
+        for (j = 0; j < limit; j++)
+            if (_pl_gen(T->gens + j, s))
+                gens[ngens++] = j;
+        if (ngens < 2)
+            continue;
+
+        for (j = ngens - 1; j >= 0 && !changed; j--)
+            for (n = 2; n <= POLYLOG_MAX_N && !changed; n++)
+                changed = _pl_relation(F, s, j, n, gens, ngens);
+    }
+
+    flint_free(gens);
+    return changed;
+}
+
+POP_OPTIONS

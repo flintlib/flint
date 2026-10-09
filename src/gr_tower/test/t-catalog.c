@@ -24,7 +24,9 @@
     Wester's problem set, denesting papers, near-miss collections), parsed
     with gr_set_str in the lazy tower field (src/python/gr_tower_profile.py
     has the sources and the cases not included here: RootOf, relations,
-    special functions, programs, the big expressions). The prefix of each name says where the case comes from
+    most special functions (those with several arguments, which the parser
+    does not read: hypergeometric and theta functions, Eisenstein series),
+    programs, the big expressions). The prefix of each name says where the case comes from
     (ca: Calcium/FLINT examples, sp: SymPy, mp: SymPy minpoly, dn:
     denesting, w: Wester, tr: trigonometric values, el: elementary
     functions, nm: near misses, sage: Sage QQbar).
@@ -568,6 +570,63 @@ static const catalog_case_struct catalog_cases[] =
      "qrt(17)))))-((8*sqrt(2))*sqrt((17+sqrt(17))))))+sqrt((17-sqrt(17))))))))/8)-cos((pi/17)))"},
     {"sage.cardano", 'Z', NULL, NULL, NULL,
      "((((((2/(3*sqrt(3)))+(10/27))^(1/3))-(2/(9*(((2/(3*sqrt(3)))+(10/27))^(1/3)))))+(1/3))-1)"},
+    /* special functions (hg, mf: elliptic integrals, modular functions;
+       rich.torsion: exponentials related modulo roots of unity) */
+    {"hg.K_half", 'Z', NULL, NULL, NULL,
+     "(elliptic_k((1/2))-((gamma((1/4))^2)/(4*sqrt(pi))))"},
+    {"hg.K_imag", 'Z', NULL, NULL, NULL,
+     "(elliptic_k((-3))-(elliptic_k((3/4))/2))"},
+    {"hg.legendre", 'Z', NULL, NULL, NULL,
+     "((((elliptic_e((1/5))*elliptic_k((4/5)))+(elliptic_e((4/5))*elliptic_k((1/5))))-(elliptic_k((1/5))*e"
+     "lliptic_k((4/5))))-(pi/2))"},
+    {"hg.landen", 'Z', NULL, NULL, NULL,
+     "(elliptic_k(((4*sqrt((1/3)))/((1+sqrt((1/3)))^2)))-((1+sqrt((1/3)))*elliptic_k((1/3))))"},
+    {"hg.K_singular3", 'Z', NULL, NULL, NULL,
+     "(elliptic_k(((2-sqrt(3))/4))-(((3^(1/4))*(gamma((1/3))^3))/((2^(7/3))*pi)))"},
+    {"mf.j_i", 'Z', NULL, NULL, NULL,
+     "(modular_j(i)-1728)"},
+    {"mf.j_rho_tau", 'Z', NULL, NULL, NULL,
+     "modular_j((((2*((1+sqrt((-3)))/2))+1)/((3*((1+sqrt((-3)))/2))+2)))"},
+    {"mf.j_163", 'Z', NULL, NULL, NULL,
+     "(modular_j(((1+sqrt((-163)))/2))+(640320^3))"},
+    {"mf.j_163_near", 'N', "-7.4993e-13", "0", NULL,
+     "((modular_j(((1+sqrt((-163)))/2))+exp((pi*sqrt(163))))-744)"},
+    {"mf.j_sqrtm5", 'Z', NULL, NULL, NULL,
+     "((modular_j(sqrt((-5)))-632000)-(282880*sqrt(5)))"},
+    {"mf.j_sqrtm14", 'P', NULL, NULL, "10064086044321563803648 2257767342088912896 2059647197077504 -16220384512 1",
+     "modular_j(sqrt((-14)))"},
+    {"mf.lambda_sqrtm2", 'Z', NULL, NULL, NULL,
+     "(modular_lambda(sqrt((-2)))-((sqrt(2)-1)^2))"},
+    {"mf.eta_i", 'Z', NULL, NULL, NULL,
+     "(dedekind_eta(i)-(gamma((1/4))/(2*(pi^(3/4)))))"},
+    {"mf.eta_rho", 'Z', NULL, NULL, NULL,
+     "((dedekind_eta(((1+sqrt((-3)))/2))^24)+((27*(gamma((1/3))^36))/((2^24)*(pi^24))))"},
+    {"mf.eta_S", 'Z', NULL, NULL, NULL,
+     "(dedekind_eta(((-1)/((1/3)+((pi*i)/4))))-(sqrt(((-i)*((1/3)+((pi*i)/4))))*dedekind_eta(((1/3)+((pi*i"
+     ")/4)))))"},
+    {"mf.eta_gamma", 'Z', NULL, NULL, NULL,
+     "((dedekind_eta((((2*((1/3)+((pi*i)/4)))+1)/((7*((1/3)+((pi*i)/4)))+4)))^24)-((((7*((1/3)+((pi*i)/4))"
+     ")+4)^12)*(dedekind_eta(((1/3)+((pi*i)/4)))^24)))"},
+    {"mf.phi2", 'Z', NULL, NULL, NULL,
+     "((((((((modular_j(((1/5)+((pi*i)/3)))^3)+(modular_j((2*((1/5)+((pi*i)/3))))^3))-((modular_j(((1/5)+("
+     "(pi*i)/3)))^2)*(modular_j((2*((1/5)+((pi*i)/3))))^2)))+(1488*(((modular_j(((1/5)+((pi*i)/3)))^2)*mod"
+     "ular_j((2*((1/5)+((pi*i)/3)))))+(modular_j(((1/5)+((pi*i)/3)))*(modular_j((2*((1/5)+((pi*i)/3))))^2)"
+     "))))-(162000*((modular_j(((1/5)+((pi*i)/3)))^2)+(modular_j((2*((1/5)+((pi*i)/3))))^2))))+((40773375*"
+     "modular_j(((1/5)+((pi*i)/3))))*modular_j((2*((1/5)+((pi*i)/3))))))+(8748000000*(modular_j(((1/5)+((p"
+     "i*i)/3)))+modular_j((2*((1/5)+((pi*i)/3)))))))-157464000000000)"},
+    {"rich.torsion2", 'Z', NULL, NULL, NULL,
+     "((exp(((16+((30*pi)*i))/225))^75)-((exp(((5+((42*pi)*i))/60))^64)*exp(((((-174)*pi)*i)/5))))"},
+    {"rich.torsion2_pi", 'Z', NULL, NULL, NULL,
+     "((exp(((pi*(16+(30*i)))/225))^75)-((exp(((pi*(5+(42*i)))/60))^64)*exp(((((-174)*pi)*i)/5))))"},
+    {"rich.torsion2_sqrt2", 'Z', NULL, NULL, NULL,
+     "((exp((((16*sqrt(2))+((30*pi)*i))/225))^75)-((exp((((5*sqrt(2))+((42*pi)*i))/60))^64)*exp(((((-174)*"
+     "pi)*i)/5))))"},
+    {"rich.torsion3", 'Z', NULL, NULL, NULL,
+     "((((exp(((16+((30*pi)*i))/225))^2)*exp(((1/12)+(((7*pi)*i)/10))))*exp(((3/40)+(((5*pi)*i)/8))))-exp("
+     "((((32/225)+(1/12))+(3/40))+((pi*i)*(((4/15)+(7/10))+(5/8))))))"},
+    {"rich.torsion_near", 'N', "1e-40", "0", NULL,
+     "(((exp(((16+((30*pi)*i))/225))^75)-((exp(((5+((42*pi)*i))/60))^64)*exp(((((-174)*pi)*i)/5))))+(1/(10"
+     "^40)))"},
 };
 
 #define NUM_CATALOG_CASES (sizeof(catalog_cases) / sizeof(catalog_case_struct))
@@ -920,6 +979,13 @@ _cat_dft(slong N, int kind, gr_ctx_t K)
     GR_TMP_CLEAR2(w, t, K);
 }
 
+static int
+_cat_is_special(const catalog_case_struct * c)
+{
+    return strncmp(c->name, "hg.", 3) == 0 || strncmp(c->name, "mf.", 3) == 0 ||
+           strncmp(c->name, "rich.torsion", 12) == 0;
+}
+
 TEST_FUNCTION_START(gr_tower_catalog, state)
 {
     gr_ctx_t QQ, K;
@@ -944,20 +1010,30 @@ TEST_FUNCTION_START(gr_tower_catalog, state)
         gr_ctx_clear(K);
     }
 
-    /* all cases in a shared field, in a random order */
-    for (iter = 0; iter < flint_test_multiplier(); iter++)
+    /* all cases in a shared field, in a random order: the algebraic and
+       elementary cases together, and the special function cases (hg, mf,
+       rich.torsion) together. (Mixed, the cyclotomic fields of the
+       latter absorb the radicals of the former: the near miss nm.rootred,
+       which needs 66000 bits when sqrt(5 + 2 sqrt(6)) is not denested,
+       then takes minutes in a field of degree 128.) Each pass runs the
+       whole catalog: their number grows slowly with the multiplier. */
+    for (iter = 0; iter < 2 + flint_test_multiplier() / 2; iter++)
     {
+        slong n = 0, k;
+        int special = iter % 2;
+
         for (i = 0; i < (slong) NUM_CATALOG_CASES; i++)
-            perm[i] = i;
-        for (i = NUM_CATALOG_CASES - 1; i > 0; i--)
+            if (_cat_is_special(catalog_cases + i) == special)
+                perm[n++] = i;
+        for (k = n - 1; k > 0; k--)
         {
-            slong r = n_randint(state, i + 1);
-            FLINT_SWAP(slong, perm[i], perm[r]);
+            slong r = n_randint(state, k + 1);
+            FLINT_SWAP(slong, perm[k], perm[r]);
         }
 
         gr_ctx_init_tower_lazy(K, QQ, GR_TOWER_MERGE_EXPRESS);
         _cat_order = perm;
-        for (i = 0; i < (slong) NUM_CATALOG_CASES; i++)
+        for (i = 0; i < n; i++)
         {
             _cat_order_len = i;
             _cat_check(catalog_cases + perm[i], K);

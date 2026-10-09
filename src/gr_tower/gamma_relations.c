@@ -31,6 +31,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* -------------------------------------------------------------------- */
 /* gamma values at rational arguments                                   */
 /* -------------------------------------------------------------------- */
@@ -62,32 +65,26 @@
 static int
 _gamma_gen_rational(slong * p, slong * q, const gr_tower_gen_struct * g, slong level_limit)
 {
-    fmpz_t a, b;
+    fmpq_t r;
     int ok;
 
     if (g->kind != GR_TOWER_GAMMA || g->arg.mctx == NULL)
         return 0;
-    if (!fmpz_mpoly_is_fmpz(fmpz_mpoly_q_numref(&g->arg.data), g->arg.mctx) ||
-        !fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(&g->arg.data), g->arg.mctx))
-        return 0;
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_mpoly_get_fmpz(a, fmpz_mpoly_q_numref(&g->arg.data), g->arg.mctx);
-    fmpz_mpoly_get_fmpz(b, fmpz_mpoly_q_denref(&g->arg.data), g->arg.mctx);
-    if (fmpz_sgn(b) < 0)
-    {
-        fmpz_neg(a, a);
-        fmpz_neg(b, b);
-    }
-    ok = fmpz_sgn(a) > 0 && fmpz_cmp(a, b) < 0 && fmpz_cmp_ui(b, level_limit) <= 0;
+    fmpq_init(r);
+    ok = fmpz_mpoly_q_get_fmpq(r, &g->arg.data, g->arg.mctx);
     if (ok)
     {
-        *p = fmpz_get_si(a);
-        *q = fmpz_get_si(b);
+        fmpq_canonicalise(r);
+        ok = fmpz_sgn(fmpq_numref(r)) > 0 && fmpz_cmp(fmpq_numref(r), fmpq_denref(r)) < 0 &&
+             fmpz_cmp_ui(fmpq_denref(r), level_limit) <= 0;
     }
-    fmpz_clear(a);
-    fmpz_clear(b);
+    if (ok)
+    {
+        *p = fmpz_get_si(fmpq_numref(r));
+        *q = fmpz_get_si(fmpq_denref(r));
+    }
+    fmpq_clear(r);
     return ok;
 }
 
@@ -208,9 +205,12 @@ _gamma_prepare_constants(gr_tower_t T, ulong m, int need_pi, slong before)
     return 0;
 }
 
-/* res = zeta_m as a flat element (the generators must be present) */
+/* res = zeta_m^k as a flat element (the generators must be present):
+   a product of powers of the roots of prime power orders, reduced once
+   (rather than a power of zeta_m, a sum when some root has an exponent
+   beyond the degree of its modulus) */
 static int
-_flat_zeta(fmpz_mpoly_q_t res, ulong m, gr_tower_flat_t F)
+_flat_zeta_pow(fmpz_mpoly_q_t res, ulong m, ulong k, gr_tower_flat_t F)
 {
     gr_tower_struct * T = F->T;
     n_factor_t fac;
@@ -230,7 +230,7 @@ _flat_zeta(fmpz_mpoly_q_t res, ulong m, gr_tower_flat_t F)
     {
         ulong pe = n_pow(fac.p[i], fac.exp[i]);
         /* zeta_m = prod zeta_{p^e}^{a_p} with a_p = (m / p^e)^(-1) mod p^e */
-        ulong a = n_invmod((m / pe) % pe, pe);
+        ulong a = n_mulmod2_preinv(n_invmod((m / pe) % pe, pe), k % pe, pe, n_preinvert_limb(pe));
 
         if (pe == 2)
         {
@@ -254,6 +254,41 @@ _flat_zeta(fmpz_mpoly_q_t res, ulong m, gr_tower_flat_t F)
     return (gr_tower_flat_reduce(res, F) == GR_SUCCESS);
 }
 
+static int
+_flat_zeta(fmpz_mpoly_q_t res, ulong m, gr_tower_flat_t F)
+{
+    return _flat_zeta_pow(res, m, 1, F);
+}
+
+/* res *= x^e (e >= 0) by repeated squaring, reduced after each product
+   (the powers of a sum of roots of unity, unreduced, have exponents
+   and terms growing with e) */
+static int
+_mul_pow_reduced(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, ulong e, gr_tower_flat_t F)
+{
+    fmpz_mpoly_q_t b;
+    int ok = 1;
+
+    fmpz_mpoly_q_init(b, F->mctx);
+    fmpz_mpoly_q_set(b, x, F->mctx);
+    while (e != 0 && ok)
+    {
+        if (e & 1)
+        {
+            fmpz_mpoly_q_mul(res, res, b, F->mctx);
+            ok = (gr_tower_flat_reduce(res, F) == GR_SUCCESS);
+        }
+        e >>= 1;
+        if (e != 0 && ok)
+        {
+            fmpz_mpoly_q_mul(b, b, b, F->mctx);
+            ok = (gr_tower_flat_reduce(b, F) == GR_SUCCESS);
+        }
+    }
+    fmpz_mpoly_q_clear(b, F->mctx);
+    return ok;
+}
+
 /* res = prod_k sin(pi k/N)^(f_k) (1 <= k <= nsin, k < N/2) as a flat
    element: sin(pi k/N) = (z^k - z^(2N - k)) / (2i), z = zeta_m^(m/(2N))
    (zeta_m and pi must be present: m = 2N, or 4N when the sum of the
@@ -264,6 +299,7 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
     fmpz_mpoly_q_t x, y, z, zi;
     fmpq_t t;
     slong j, fsum = 0, ee;
+    ulong s2;
     int ok = 1;
 
     for (j = 1; j <= nsin; j++)
@@ -280,13 +316,9 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
     fmpq_pow_si(t, t, -fsum);
     fmpz_mpoly_q_set_fmpq(res, t, F->mctx);
 
+    /* (z^e = zeta_m^(e m / (2N)) directly) */
     ok = _flat_zeta(zi, m, F);
-    if (ok)
-    {
-        fmpz_mpoly_q_one(z, F->mctx);
-        _gr_tower_certify_mul_pow_si(z, zi, m / (2 * N), F);
-        GR_MUST_SUCCEED(gr_tower_flat_reduce(z, F));
-    }
+    s2 = m / (2 * N);
 
     for (j = 1; j <= nsin && ok; j++)
     {
@@ -295,10 +327,7 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
         if (f[j] > 0)
         {
             /* z^j - z^(-j) */
-            fmpz_mpoly_q_one(x, F->mctx);
-            _gr_tower_certify_mul_pow_si(x, z, j, F);
-            fmpz_mpoly_q_one(y, F->mctx);
-            _gr_tower_certify_mul_pow_si(y, z, 2 * N - j, F);
+            ok = _flat_zeta_pow(x, m, j * s2, F) && _flat_zeta_pow(y, m, (2 * N - j) * s2, F);
             fmpz_mpoly_q_sub(x, x, y, F->mctx);
         }
         else
@@ -310,9 +339,7 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
             fmpz_mpoly_q_t w, wp;
             fmpz_mpoly_q_init(w, F->mctx);
             fmpz_mpoly_q_init(wp, F->mctx);
-            fmpz_mpoly_q_one(w, F->mctx);
-            _gr_tower_certify_mul_pow_si(w, z, 2 * j, F);
-            GR_MUST_SUCCEED(gr_tower_flat_reduce(w, F));
+            ok = _flat_zeta_pow(w, m, 2 * j * s2, F);
             fmpz_mpoly_q_zero(x, F->mctx);
             fmpz_mpoly_q_one(wp, F->mctx);
             for (ii = 1; ii < r; ii++)
@@ -323,16 +350,16 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
                 fmpz_mpoly_q_add(x, x, y, F->mctx);
             }
             fmpz_mpoly_q_div_si(x, x, r, F->mctx);
-            fmpz_mpoly_q_one(y, F->mctx);
-            _gr_tower_certify_mul_pow_si(y, z, j, F);
+            ok = ok && _flat_zeta_pow(y, m, j * s2, F);
             fmpz_mpoly_q_mul(x, x, y, F->mctx);
             fmpz_mpoly_q_clear(w, F->mctx);
             fmpz_mpoly_q_clear(wp, F->mctx);
         }
-        GR_MUST_SUCCEED(gr_tower_flat_reduce(x, F));
-        _gr_tower_certify_mul_pow_si(res, x, FLINT_ABS(f[j]), F);
-        if (gr_tower_flat_reduce(res, F) != GR_SUCCESS)
-            ok = 0;
+        if (ok)
+        {
+            GR_MUST_SUCCEED(gr_tower_flat_reduce(x, F));
+            ok = _mul_pow_reduced(res, x, FLINT_ABS(f[j]), F);
+        }
     }
 
     /* i^(-fsum) */
@@ -341,8 +368,7 @@ _sine_product_flat(fmpz_mpoly_q_t res, slong N, const slong * f, slong nsin, ulo
         fmpz_mpoly_q_neg(res, res, F->mctx);
     else if (ok && (ee == 1 || ee == 3))
     {
-        fmpz_mpoly_q_one(x, F->mctx);
-        _gr_tower_certify_mul_pow_si(x, zi, m / 4, F);         /* i */
+        ok = _flat_zeta_pow(x, m, m / 4, F);         /* i */
         if (ee == 3)
             fmpz_mpoly_q_neg(x, x, F->mctx);
         fmpz_mpoly_q_mul(res, res, x, F->mctx);
@@ -580,17 +606,23 @@ _mul_root_power(fmpz_mpoly_q_t res, gr_tower_flat_t F, const fmpz_mpoly_q_t c, s
         }
 
         /* (gg = 1 since gcd(L / n_i) = 1) */
+        fmpz_zero(s);
         for (i = 0; i < nr; i++)
         {
-            /* k_i = num (L / den) u_i, reduced modulo n_i */
+            /* k_i = num (L / den) u_i, reduced modulo n_i: x_i^(k_i) =
+               x_i^(r_i) c^(q_i) with x_i^(n_i) = c */
             fmpz_mul_si(k, u + i, num * (L / den));
             fmpz_set_si(t, nn[i]);
             fmpz_fdiv_qr(q, r, k, t);
             fmpz_mpoly_q_gen(x, GR_TOWER_FLAT_VAR_D(F, dd[i]), F->mctx);
             _gr_tower_certify_mul_pow_si(res, x, fmpz_get_si(r), F);
-            if (!fmpz_is_zero(q))
-                _gr_tower_certify_mul_pow_si(res, c, fmpz_get_si(q), F);
+            fmpz_add(s, s, q);
         }
+        /* the powers of c at once: the q_i (from the Bezout coefficients
+           u_i) may be large, their sum is num / den - sum r_i / n_i,
+           small */
+        if (!fmpz_is_zero(s))
+            _gr_tower_certify_mul_pow_si(res, c, fmpz_get_si(s), F);
 
         _fmpz_vec_clear(u, nr);
         fmpz_clear(gg); fmpz_clear(s); fmpz_clear(t); fmpz_clear(a); fmpz_clear(b);
@@ -736,34 +768,134 @@ _gamma_eliminate_linear(gr_tower_flat_t F, slong dtop, slong ns, const slong * s
     before the scaling: the relations holding modulo 2 pi i, the scaled
     row holds modulo 2 pi i / P.
 */
-static int
-_gamma_integral_relation(fmpq_mat_t B, slong row, const fmpq_mat_t A, slong nrows, slong nvar, slong ncols, slong pivot, fmpz_t P)
+/*
+    The Hermite normal form of (A_u | I) for the unknown part A_u of the
+    relation matrix at level N with the unknowns in their natural order
+    (x_k in column k - 1): it depends only on N, and the generators of a
+    tower select a column order (col_of_k), which only permutes the
+    unknown columns (the rows of _gr_tower_gamma_relations do not depend
+    on it). The forms are cached per thread: in a long session the
+    towers come back to the same levels (a merge of two computations with
+    gamma values at one level repeats the eliminations at that level),
+    and the form is the expensive part of a relation (seconds at level
+    210).
+*/
+#define GAMMA_HNF_CACHE_SIZE 4
+
+static FLINT_TLS_PREFIX fmpz_mat_struct _gamma_hnf_cache[GAMMA_HNF_CACHE_SIZE];
+static FLINT_TLS_PREFIX slong _gamma_hnf_cache_N[GAMMA_HNF_CACHE_SIZE];
+static FLINT_TLS_PREFIX slong _gamma_hnf_cache_next = 0;
+static FLINT_TLS_PREFIX int _gamma_hnf_cache_registered = 0;
+
+static void
+_gamma_hnf_cache_cleanup(void)
 {
-    fmpz_mat_t Z, H;
+    slong i;
+    for (i = 0; i < GAMMA_HNF_CACHE_SIZE; i++)
+    {
+        if (_gamma_hnf_cache_N[i] != 0)
+            fmpz_mat_clear(_gamma_hnf_cache + i);
+        _gamma_hnf_cache_N[i] = 0;
+    }
+    _gamma_hnf_cache_next = 0;
+    _gamma_hnf_cache_registered = 0;
+}
+
+/* (valid until the next call) */
+static const fmpz_mat_struct *
+_gamma_level_hnf(slong N)
+{
+    slong i, j, nvar = N - 1, nrows;
+    slong * col_of_k;
+    fmpq_mat_t A;
+    fmpz_mat_t Z;
+    fmpz_mat_struct * H;
+
+    for (i = 0; i < GAMMA_HNF_CACHE_SIZE; i++)
+        if (_gamma_hnf_cache_N[i] == N)
+            return _gamma_hnf_cache + i;
+
+    if (!_gamma_hnf_cache_registered)
+    {
+        flint_register_cleanup_function(_gamma_hnf_cache_cleanup);
+        _gamma_hnf_cache_registered = 1;
+    }
+
+    col_of_k = flint_malloc(sizeof(slong) * N);
+    for (i = 1; i < N; i++)
+        col_of_k[i] = i - 1;
+    fmpq_mat_init(A, _gr_tower_gamma_relations_rows(N), GR_TOWER_GAMMA_NCOLS(N));
+    nrows = _gr_tower_gamma_relations(A, col_of_k, N);
+
+    fmpz_mat_init(Z, nrows, nvar + nrows);
+    for (i = 0; i < nrows; i++)
+    {
+        for (j = 0; j < nvar; j++)
+            fmpz_set(fmpz_mat_entry(Z, i, j), fmpq_numref(fmpq_mat_entry(A, i, j)));
+        fmpz_one(fmpz_mat_entry(Z, i, nvar + i));
+    }
+
+    i = _gamma_hnf_cache_next;
+    _gamma_hnf_cache_next = (i + 1) % GAMMA_HNF_CACHE_SIZE;
+    H = _gamma_hnf_cache + i;
+    if (_gamma_hnf_cache_N[i] != 0)
+        fmpz_mat_clear(H);
+    fmpz_mat_init(H, nrows, nvar + nrows);
+    /* (the entries stay small: the classical algorithm is several times
+       faster on these sparse matrices than the default, which is
+       tuned for dense ones; 0.3 s instead of 1.5 s at level 210) */
+    fmpz_mat_hnf_classical(H, Z);
+    _gamma_hnf_cache_N[i] = N;
+
+    fmpz_mat_clear(Z);
+    fmpq_mat_clear(A);
+    flint_free(col_of_k);
+    return H;
+}
+
+/*
+    With Hc not NULL, the Hermite normal form is that of
+    _gamma_level_hnf, and the unknown in column perm[j] of A is the one in
+    column j of Hc (the entries of A_u being integers).
+*/
+static int
+_gamma_integral_relation(fmpq_mat_t B, slong row, const fmpq_mat_t A, slong nrows, slong nvar, slong ncols, slong pivot, fmpz_t P, const fmpz_mat_struct * Hc, const slong * perm)
+{
+    fmpz_mat_t Z, H0;
+    const fmpz_mat_struct * H;
     fmpq * res, * c;
     fmpz * r;
     fmpz_t den;
     slong i, j, k;
     int ok = 1;
 
-    fmpz_mat_init(Z, nrows, nvar + nrows);
-    fmpz_mat_init(H, nrows, nvar + nrows);
     res = _fmpq_vec_init(nvar);
     c = _fmpq_vec_init(nrows);
     r = _fmpz_vec_init(nvar);
     fmpz_init(den);
 
-    for (i = 0; i < nrows && ok; i++)
+    if (Hc != NULL)
     {
-        for (j = 0; j < nvar && ok; j++)
+        H = Hc;
+    }
+    else
+    {
+        fmpz_mat_init(Z, nrows, nvar + nrows);
+        fmpz_mat_init(H0, nrows, nvar + nrows);
+        H = H0;
+
+        for (i = 0; i < nrows && ok; i++)
         {
-            const fmpq * x = fmpq_mat_entry(A, i, j);
-            if (!fmpz_is_one(fmpq_denref(x)))
-                ok = 0;
-            else
-                fmpz_set(fmpz_mat_entry(Z, i, j), fmpq_numref(x));
+            for (j = 0; j < nvar && ok; j++)
+            {
+                const fmpq * x = fmpq_mat_entry(A, i, j);
+                if (!fmpz_is_one(fmpq_denref(x)))
+                    ok = 0;
+                else
+                    fmpz_set(fmpz_mat_entry(Z, i, j), fmpq_numref(x));
+            }
+            fmpz_one(fmpz_mat_entry(Z, i, nvar + i));
         }
-        fmpz_one(fmpz_mat_entry(Z, i, nvar + i));
     }
 
     /* the target: the unknown part of the row, as a primitive integer
@@ -777,11 +909,12 @@ _gamma_integral_relation(fmpq_mat_t B, slong row, const fmpq_mat_t A, slong nrow
         fmpz_divexact(r + j, r + j, fmpq_denref(fmpq_mat_entry(B, row, j)));
     }
     for (j = 0; j < nvar; j++)
-        fmpq_set_fmpz(res + j, r + j);
+        fmpq_set_fmpz(res + j, r + (perm != NULL ? perm[j] : j));
 
     if (ok)
     {
-        fmpz_mat_hnf(H, Z);
+        if (Hc == NULL)
+            fmpz_mat_hnf(H0, Z);
 
         /* r = sum_i c_i H_i (unknown parts), H in echelon form */
         for (i = 0; i < nrows && ok; i++)
@@ -861,8 +994,11 @@ _gamma_integral_relation(fmpq_mat_t B, slong row, const fmpq_mat_t A, slong nrow
         _fmpq_vec_clear(v, ncols);
     }
 
-    fmpz_mat_clear(Z);
-    fmpz_mat_clear(H);
+    if (Hc == NULL)
+    {
+        fmpz_mat_clear(Z);
+        fmpz_mat_clear(H0);
+    }
     _fmpq_vec_clear(res, nvar);
     _fmpq_vec_clear(c, nrows);
     _fmpz_vec_clear(r, nvar);
@@ -994,7 +1130,11 @@ _gamma_round_level(gr_tower_flat_t F, slong N, const slong * sel_d, const slong 
         for (pivot = 0; pivot < ncols; pivot++)
             if (!fmpq_is_zero(fmpq_mat_entry(B, row, pivot)))
                 break;
-        (void) _gamma_integral_relation(B, row, A, nrows, nvar, ncols, pivot, NULL);
+        slong * perm = flint_malloc(sizeof(slong) * FLINT_MAX(nvar, 1));
+        for (j = 0; j < nvar; j++)
+            perm[j] = col_of_k[j + 1];
+        (void) _gamma_integral_relation(B, row, A, nrows, nvar, ncols, pivot, NULL, _gamma_level_hnf(N), perm);
+        flint_free(perm);
     }
 
     if (row >= 0)
@@ -1269,6 +1409,175 @@ _qvec_zero(fmpq * r, slong n)
 }
 #define GAMMA_LINE_UNKNOWNS_LIMIT 600
 
+/*
+    By the multiplication formula (and the reflection formula for a < 0),
+    Gamma(a w + b) is a constant times the product of the Gamma(w + r) for
+    r in R = {(b + i)/a mod 1 : 0 <= i < |a|} (likewise the Hurwitz zeta
+    function, with a sum), and the systems of the lines relate the values
+    at w + r for distinct r mod 1 only through such constants. A generator
+    with a residue in no other R_j thus takes no part in a relation; this
+    returns 1 when every generator has one (there is then no relation:
+    two values on a line from unrelated computations of a long session,
+    say Gamma(4w) and Gamma(3w - 19/8), would otherwise cost a large
+    reduced row echelon form). (A relation derived from the rows of a
+    system maps to a cancellation of the formal sums of the Gamma(w + r),
+    with the sign of a_j, since every row does; the residues need not be
+    multiples of 1/N, the unknowns of the system at other residues being
+    then unrelated to the others.)
+*/
+static int
+_line_all_private(slong ns, const slong * a, const fmpq * b)
+{
+    slong * cnt, * res, * off, i, j, k, tot = 0, N = 1;
+    int all_private = 1;
+    fmpq_t t;
+    fmpz_t u;
+
+    /* the residues in (1/N) Z / Z */
+    for (j = 0; j < ns; j++)
+    {
+        slong q;
+        if (!fmpz_fits_si(fmpq_denref(b + j)))
+            return 0;
+        q = fmpz_get_si(fmpq_denref(b + j)) * FLINT_ABS(a[j]);
+        N = (N / n_gcd(N, q)) * q;
+        if (N > 1000000)
+            return 0;
+        tot += FLINT_ABS(a[j]);
+    }
+
+    cnt = flint_calloc(N, sizeof(slong));
+    res = flint_malloc(sizeof(slong) * FLINT_MAX(tot, 1));
+    off = flint_malloc(sizeof(slong) * (ns + 1));
+    fmpq_init(t);
+    fmpz_init(u);
+
+    off[0] = 0;
+    for (j = 0; j < ns && all_private; j++)
+    {
+        slong aa = FLINT_ABS(a[j]);
+        off[j + 1] = off[j] + aa;
+        for (i = 0; i < aa; i++)
+        {
+            fmpq_add_si(t, b + j, i);
+            fmpq_mul_si(t, t, N);
+            fmpz_mul_si(fmpq_denref(t), fmpq_denref(t), a[j]);
+            fmpq_canonicalise(t);
+            if (!fmpz_is_one(fmpq_denref(t)))
+            {
+                all_private = 0;    /* (not reached) */
+                break;
+            }
+            fmpz_mod_ui(u, fmpq_numref(t), N);
+            res[off[j] + i] = fmpz_get_si(u);
+        }
+        /* each residue once per generator */
+        for (i = 0; i < aa && all_private; i++)
+        {
+            for (k = 0; k < i; k++)
+                if (res[off[j] + k] == res[off[j] + i])
+                    break;
+            if (k == i)
+                cnt[res[off[j] + i]]++;
+        }
+    }
+
+    for (j = 0; j < ns && all_private; j++)
+    {
+        int private_res = 0;
+        for (i = off[j]; i < off[j + 1] && !private_res; i++)
+            if (cnt[res[i]] == 1)
+                private_res = 1;
+        if (!private_res)
+            all_private = 0;
+    }
+
+    fmpq_clear(t);
+    fmpz_clear(u);
+    flint_free(cnt);
+    flint_free(res);
+    flint_free(off);
+    return all_private;
+}
+
+/*
+    The common part of the systems of a line (gamma and Hurwitz zeta):
+    the multipliers Sa (the divisors of the |a_j|, with both signs) and
+    the level N (the denominators of the b_j and the ratios of the
+    multipliers). Returns 0 (Sa not allocated) when the system would be
+    too large, or has no relation (_line_all_private).
+*/
+static int
+_line_setup(slong ** Sa_out, slong * nSa_out, slong * N_out, slong ns, const slong * a, const fmpq * b, gr_tower_flat_t F)
+{
+    slong limit = GR_TOWER_OPTION(F->T, GR_TOWER_OPT_GAMMA_LINE_LIMIT);
+    slong * Sa, nSa = 0, N = 1, i, j, n;
+
+    for (j = 0; j < ns; j++)
+        if (FLINT_ABS(a[j]) > limit || a[j] == 0 ||
+            !fmpz_fits_si(fmpq_denref(b + j)) || fmpz_cmp_ui(fmpq_denref(b + j), 1000) > 0)
+            return 0;
+
+    Sa = flint_malloc(sizeof(slong) * 4 * limit);
+    for (j = 0; j < ns; j++)
+    {
+        slong aa = FLINT_ABS(a[j]), dd, q;
+        for (dd = 1; dd <= aa; dd++)
+        {
+            if (aa % dd == 0)
+            {
+                for (i = 0; i < nSa; i++)
+                    if (Sa[i] == dd)
+                        break;
+                if (i == nSa)
+                {
+                    Sa[nSa++] = dd;
+                    Sa[nSa++] = -dd;
+                }
+            }
+        }
+        q = fmpz_get_si(fmpq_denref(b + j));
+        N = (N / n_gcd(N, q)) * q;
+    }
+    for (i = 0; i < nSa; i++)
+        for (j = 0; j < nSa; j++)
+            if (Sa[i] > 0 && Sa[j] > Sa[i] && Sa[j] % Sa[i] == 0)
+            {
+                n = Sa[j] / Sa[i];
+                N = (N / n_gcd(N, n)) * n;
+            }
+
+    if (nSa * N > GAMMA_LINE_UNKNOWNS_LIMIT || _line_all_private(ns, a, b))
+    {
+        flint_free(Sa);
+        return 0;
+    }
+
+    *Sa_out = Sa;
+    *nSa_out = nSa;
+    *N_out = N;
+    return 1;
+}
+
+/* b = mm + kk/N with 0 <= kk < N, and the index ia of the multiplier aj */
+static void
+_line_position(slong * mm, slong * kk, slong * ia, const fmpq_t b, slong aj, slong N, const slong * Sa, slong nSa)
+{
+    fmpz_t fl;
+    fmpq_t beta;
+    fmpz_init(fl);
+    fmpq_init(beta);
+    fmpz_fdiv_q(fl, fmpq_numref(b), fmpq_denref(b));
+    fmpq_sub_fmpz(beta, b, fl);
+    *mm = fmpz_get_si(fl);
+    *kk = fmpz_get_si(fmpq_numref(beta)) * (N / fmpz_get_si(fmpq_denref(beta)));
+    for (*ia = 0; *ia < nSa; (*ia)++)
+        if (Sa[*ia] == aj)
+            break;
+    fmpz_clear(fl);
+    fmpq_clear(beta);
+}
+
 typedef struct
 {
     int type;
@@ -1440,6 +1749,22 @@ _gl_finish_row(gl_system_struct * S)
 
     _qvec_zero(S->cur0, S->ncols0);
     _qvec_zero(S->curc, S->curc_alloc);
+}
+
+/* the matrix of the system (A initialised here), the constants in the
+   columns cperm (NULL: in their order) after the others */
+static void
+_gl_matrix(fmpq_mat_t A, const gl_system_struct * S, const slong * cperm)
+{
+    slong r, j, n0 = S->ncols0;
+    fmpq_mat_init(A, S->nrows, n0 + S->nconst);
+    for (r = 0; r < S->nrows; r++)
+    {
+        for (j = 0; j < n0; j++)
+            fmpq_set(fmpq_mat_entry(A, r, j), S->rows0[r] + j);
+        for (j = 0; j < S->nconst && j < S->rowsc_len[r]; j++)
+            fmpq_set(fmpq_mat_entry(A, r, n0 + (cperm != NULL ? cperm[j] : j)), S->rowsc[r] + j);
+    }
 }
 
 /* the flat element i (the generator must be present) */
@@ -1758,58 +2083,8 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
 
     (void) depth;
 
-    /* S: the divisors of the |a_j|, with both signs */
-    Sa = flint_malloc(sizeof(slong) * 4 * GR_TOWER_OPTION(F->T, GR_TOWER_OPT_GAMMA_LINE_LIMIT));
-    for (j = 0; j < ns; j++)
-    {
-        slong aa = FLINT_ABS(a[j]), dd;
-        if (aa > GR_TOWER_OPTION(F->T, GR_TOWER_OPT_GAMMA_LINE_LIMIT) || aa == 0)
-        {
-            flint_free(Sa);
-            return 0;
-        }
-        for (dd = 1; dd <= aa; dd++)
-        {
-            if (aa % dd == 0)
-            {
-                int present = 0;
-                for (i = 0; i < nSa; i++)
-                    if (Sa[i] == dd)
-                        present = 1;
-                if (!present)
-                {
-                    Sa[nSa++] = dd;
-                    Sa[nSa++] = -dd;
-                }
-            }
-        }
-    }
-
-    /* the level: denominators of the b_j and the multipliers */
-    for (j = 0; j < ns; j++)
-    {
-        slong q;
-        if (!fmpz_fits_si(fmpq_denref(b + j)) || fmpz_cmp_ui(fmpq_denref(b + j), 1000) > 0)
-        {
-            flint_free(Sa);
-            return 0;
-        }
-        q = fmpz_get_si(fmpq_denref(b + j));
-        N = (N / n_gcd(N, q)) * q;
-    }
-    for (i = 0; i < nSa; i++)
-        for (j = 0; j < nSa; j++)
-            if (Sa[i] > 0 && Sa[j] > Sa[i] && Sa[j] % Sa[i] == 0)
-            {
-                n = Sa[j] / Sa[i];
-                N = (N / n_gcd(N, n)) * n;
-            }
-
-    if (nSa * N > GAMMA_LINE_UNKNOWNS_LIMIT)
-    {
-        flint_free(Sa);
+    if (!_line_setup(&Sa, &nSa, &N, ns, a, b, F))
         return 0;
-    }
 
     nX = nSa * N;
     nG = ns;
@@ -1820,18 +2095,8 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
     /* generators: G_j = x(a_j, beta_j) + shifts */
     for (j = 0; j < ns; j++)
     {
-        fmpz_t fl;
-        fmpq_t beta;
         slong mm, kk;
-        fmpz_init(fl);
-        fmpq_init(beta);
-        fmpz_fdiv_q(fl, fmpq_numref(b + j), fmpq_denref(b + j));
-        fmpq_sub_fmpz(beta, b + j, fl);
-        mm = fmpz_get_si(fl);
-        kk = fmpz_get_si(fmpq_numref(beta)) * (N / fmpz_get_si(fmpq_denref(beta)));
-        for (ia = 0; ia < nSa; ia++)
-            if (Sa[ia] == a[j])
-                break;
+        _line_position(&mm, &kk, &ia, b + j, a[j], N, Sa, nSa);
         _gl_add0(&S, nX + j, 1, 1);
         _gl_add0(&S, XCOL(ia, kk), -1, 1);
         if (mm > 0)
@@ -1841,8 +2106,6 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
             for (i = 0; i < -mm; i++)
                 _gl_add_lin(&S, a[j], kk, N, i - (-mm), 1);
         _gl_finish_row(&S);
-        fmpz_clear(fl);
-        fmpq_clear(beta);
     }
 
     /* reflection: x(a, k) + x(-a, N - k) (+ log(-a w) for k = 0)
@@ -1942,14 +2205,7 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
                     cperm[i] = c++;
 
         ncols = nX + nG + S.nconst;
-        fmpq_mat_init(A, S.nrows, ncols);
-        for (r = 0; r < S.nrows; r++)
-        {
-            for (j = 0; j < nX + nG; j++)
-                fmpq_set(fmpq_mat_entry(A, r, j), S.rows0[r] + j);
-            for (j = 0; j < S.nconst && j < S.rowsc_len[r]; j++)
-                fmpq_set(fmpq_mat_entry(A, r, nX + nG + cperm[j]), S.rowsc[r] + j);
-        }
+        _gl_matrix(A, &S, cperm);
 
         fmpq_mat_init(B, S.nrows, ncols);
         rank = fmpq_mat_rref(B, A);
@@ -1980,7 +2236,7 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
                ambiguity of the exponentiated relation to a P-th root of
                unity, which the numerical check below excludes) */
             fmpz_init(P);
-            ok = _gamma_integral_relation(B, row, A, S.nrows, nX + nG, ncols, nX + top, P);
+            ok = _gamma_integral_relation(B, row, A, S.nrows, nX + nG, ncols, nX + top, P, NULL, NULL);
 
             /* log G_top = - sum r_j log G_j - sum kappa_t C_t */
             fmpq_init(t);
@@ -2059,6 +2315,12 @@ _gamma_line_level(gr_tower_flat_t F, slong ns, const slong * sd, const slong * a
         zeta(s, z + 1) = zeta(s, z) - z^(-s),
         zeta(s, z) + (-1)^s zeta(s, 1 - z) = (-1)^(s-1) pi^s P_{s-1}(cot(pi z)) / (s-1)!,
         sum_{j<n} zeta(s, z + j/n) = n^s zeta(s, n z).
+
+    The digamma function (m = 0) is included with s = 1 and y = -psi
+    (the same shift and reflection relations, with P_0(x) = x), the
+    multiplication theorem then having the constant term n log n
+    (sum_{j<n} psi(z + j/n) = n psi(n z) - n log n), through the
+    generators log p.
 
     These are exact (no 2 pi i ambiguity, no exponential factors), so the
     system is the additive analogue of the gamma lines: unknowns y(a, k),
@@ -2189,56 +2451,8 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
     fmpq_t alpha;
     int changed = 0;
 
-    Sa = flint_malloc(sizeof(slong) * 4 * GR_TOWER_OPTION(F->T, GR_TOWER_OPT_GAMMA_LINE_LIMIT));
-    for (j = 0; j < ns; j++)
-    {
-        slong aa = FLINT_ABS(a[j]), dd;
-        if (aa > GR_TOWER_OPTION(F->T, GR_TOWER_OPT_GAMMA_LINE_LIMIT) || aa == 0)
-        {
-            flint_free(Sa);
-            return 0;
-        }
-        for (dd = 1; dd <= aa; dd++)
-        {
-            if (aa % dd == 0)
-            {
-                int present = 0;
-                for (i = 0; i < nSa; i++)
-                    if (Sa[i] == dd)
-                        present = 1;
-                if (!present)
-                {
-                    Sa[nSa++] = dd;
-                    Sa[nSa++] = -dd;
-                }
-            }
-        }
-    }
-
-    for (j = 0; j < ns; j++)
-    {
-        slong q;
-        if (!fmpz_fits_si(fmpq_denref(b + j)) || fmpz_cmp_ui(fmpq_denref(b + j), 1000) > 0)
-        {
-            flint_free(Sa);
-            return 0;
-        }
-        q = fmpz_get_si(fmpq_denref(b + j));
-        N = (N / n_gcd(N, q)) * q;
-    }
-    for (i = 0; i < nSa; i++)
-        for (j = 0; j < nSa; j++)
-            if (Sa[i] > 0 && Sa[j] > Sa[i] && Sa[j] % Sa[i] == 0)
-            {
-                n = Sa[j] / Sa[i];
-                N = (N / n_gcd(N, n)) * n;
-            }
-
-    if (nSa * N > GAMMA_LINE_UNKNOWNS_LIMIT)
-    {
-        flint_free(Sa);
+    if (!_line_setup(&Sa, &nSa, &N, ns, a, b, F))
         return 0;
-    }
 
     nX = nSa * N;
     nG = ns;
@@ -2259,18 +2473,8 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
     /* generators: alpha G_j - y(a_j, kk) + shifts = 0 */
     for (j = 0; j < ns; j++)
     {
-        fmpz_t fl;
-        fmpq_t beta;
         slong mm, kk;
-        fmpz_init(fl);
-        fmpq_init(beta);
-        fmpz_fdiv_q(fl, fmpq_numref(b + j), fmpq_denref(b + j));
-        fmpq_sub_fmpz(beta, b + j, fl);
-        mm = fmpz_get_si(fl);
-        kk = fmpz_get_si(fmpq_numref(beta)) * (N / fmpz_get_si(fmpq_denref(beta)));
-        for (ia = 0; ia < nSa; ia++)
-            if (Sa[ia] == a[j])
-                break;
+        _line_position(&mm, &kk, &ia, b + j, a[j], N, Sa, nSa);
         fmpq_add(S.cur0 + nX + j, S.cur0 + nX + j, alpha);
         _gl_add0(&S, XCOL(ia, kk), -1, 1);
         /* zeta(s, u + mm) = zeta(s, u) - sum_{i<mm} (u + i)^(-s);
@@ -2282,8 +2486,6 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
             for (i = 1; i <= -mm; i++)
                 _hl_add_lin(&S, a[j], kk, N, -i, -1);
         _gl_finish_row(&S);
-        fmpz_clear(fl);
-        fmpq_clear(beta);
     }
 
     /* reflection: y(a, k) + (-1)^s zeta(s, 1 - a w - k/N) - E(a, k/N) = 0 */
@@ -2347,6 +2549,16 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
                 }
                 qq = (n * k) / N;
                 rr = (n * k) % N;
+                /* (s = 1, with y = -psi: - n log n) */
+                if (s == 1)
+                {
+                    n_factor_t fac;
+                    slong f;
+                    n_factor_init(&fac);
+                    n_factor(&fac, n, 1);
+                    for (f = 0; f < fac.num; f++)
+                        _gl_addc_si(&S, GL_PRIME, 0, NULL, fac.p[f], -n * (slong) fac.exp[f], 1);
+                }
                 /* - n^s (y(na, rr) - sum_{i<qq} (n a w + rr/N + i)^(-s)) */
                 fmpq_set_fmpz(v, ns_pow);
                 fmpq_sub(S.cur0 + XCOL(ib, rr), S.cur0 + XCOL(ib, rr), v);
@@ -2367,14 +2579,7 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
 #undef XCOL
 
     ncols = nX + nG + S.nconst;
-    fmpq_mat_init(A, S.nrows, ncols);
-    for (r = 0; r < S.nrows; r++)
-    {
-        for (j = 0; j < nX + nG; j++)
-            fmpq_set(fmpq_mat_entry(A, r, j), S.rows0[r] + j);
-        for (j = 0; j < S.nconst && j < S.rowsc_len[r]; j++)
-            fmpq_set(fmpq_mat_entry(A, r, nX + nG + j), S.rowsc[r] + j);
-    }
+    _gl_matrix(A, &S, NULL);
     fmpq_mat_init(B, S.nrows, ncols);
     rank = fmpq_mat_rref(B, A);
 
@@ -2439,6 +2644,26 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
                 fmpz_mpoly_q_clear(x, F->mctx);
             }
         }
+        /* (s = 1) the logarithms of the primes, likewise */
+        for (j = 0; j < S.nconst && st == 0; j++)
+        {
+            int used = 0;
+            if (S.consts[j].type != GL_PRIME)
+                continue;
+            for (i = 0; i < nrel; i++)
+                if (!fmpq_is_zero(fmpq_mat_entry(B, rows[i], nX + nG + j)))
+                    used = 1;
+            if (used)
+            {
+                slong dl;
+                gr_tower_flat_ensure(F);
+                fmpz_mpoly_q_init(x, F->mctx);
+                fmpz_mpoly_q_set_si(x, S.consts[j].p, F->mctx);
+                st = _gl_trans_gen(&dl, F, GR_TOWER_LOG, x, dmin);
+                fmpz_mpoly_q_clear(x, F->mctx);
+            }
+        }
+
         if (st != 0)
         {
             changed = (st > 0);
@@ -2492,7 +2717,17 @@ _hurwitz_line_level(gr_tower_flat_t F, slong s, slong ns, const slong * sd, cons
                 if (fmpq_is_zero(fmpq_mat_entry(B, row, nX + nG + j)))
                     continue;
                 fmpq_mul(cj, fmpq_mat_entry(B, row, nX + nG + j), bt);
-                if (kc->type == GL_HLIN)
+                if (kc->type == GL_PRIME)
+                {
+                    /* log p (present before dmin) */
+                    slong dl;
+                    fmpz_mpoly_q_set_si(y, kc->p, F->mctx);
+                    if (_gl_trans_gen(&dl, F, GR_TOWER_LOG, y, dtop) != 0)
+                        ok = 0;
+                    else
+                        fmpz_mpoly_q_gen(x, GR_TOWER_FLAT_VAR_D(F, dl), F->mctx);
+                }
+                else if (kc->type == GL_HLIN)
                 {
                     /* (a w + c)^(-s) */
                     gr_tower_flat_convert(y, w, F->mctx, F);
@@ -2910,7 +3145,7 @@ _gr_tower_hurwitz_line_round(gr_tower_flat_t F, slong limit, slong depth)
     {
         const gr_tower_gen_struct * g = T->gens + j;
         int seen = 0;
-        if (g->kind != GR_TOWER_POLYGAMMA || g->def_param < 1 || g->def_param + 1 > 64)
+        if (g->kind != GR_TOWER_POLYGAMMA || g->def_param < 0 || g->def_param + 1 > 64)
             continue;
         /* (each order once: the latest generator of that order) */
         for (i = j + 1; i < limit && !seen; i++)
@@ -2938,3 +3173,5 @@ _gr_tower_special_trans_gen(slong * d, gr_tower_flat_t F, int kind, const fmpz_m
 {
     return _gl_trans_gen(d, F, kind, u, before + 1);
 }
+
+POP_OPTIONS

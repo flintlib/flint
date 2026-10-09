@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* -------------------------------------------------------------------- */
 /* transcendental functions                                              */
 /* -------------------------------------------------------------------- */
@@ -54,7 +57,7 @@ _gr_tower_lazy_const_trans2_param(gr_tower_lazy_elem_t res, int kind, slong para
 
     for (i = 0; i < L->num_const_trans; i++)
     {
-        if (L->const_trans[i].kind == kind && L->const_trans[i].param == param &&
+        if (L->const_trans[i].kind == kind && L->const_trans[i].param == param && L->const_trans[i].nxs == 0 &&
             fmpq_equal(&L->const_trans[i].x, x) && fmpq_equal(&L->const_trans[i].y, y))
         {
             _gr_tower_lazy_set_gen_d(res, L->const_trans[i].F, gr_tower_gid_order(L->const_trans[i].F->T, L->const_trans[i].gid), ctx);
@@ -142,6 +145,8 @@ _gr_tower_lazy_const_trans2_param(gr_tower_lazy_elem_t res, int kind, slong para
     }
     L->const_trans[L->num_const_trans].kind = kind;
     L->const_trans[L->num_const_trans].param = param;
+    L->const_trans[L->num_const_trans].nxs = 0;
+    L->const_trans[L->num_const_trans].xs = NULL;
     fmpq_init(&L->const_trans[L->num_const_trans].x);
     fmpq_init(&L->const_trans[L->num_const_trans].y);
     fmpq_set(&L->const_trans[L->num_const_trans].x, x);
@@ -631,25 +636,18 @@ _gr_tower_lazy_has_root_of_unity(gr_tower_t T, ulong n)
 }
 
 /*
-    x = r pi i + y with r rational nonzero and y free of pi (x affine in
-    pi, the coefficient of pi being a rational multiple of i): sets r and
-    y and returns 1, otherwise 0. Used so that exponentials are not
-    adjoined with pi i in their arguments: exp(r pi i + y) is a root of
-    unity times exp(y).
+    For x (flat) affine in pi, pi not in the denominator: sets v to the
+    variable of pi, initialises a to the coefficient of pi in the
+    numerator, and returns 1; otherwise returns 0 (a not initialised).
 */
 static int
-_gr_tower_lazy_pi_i_split(fmpq_t r, gr_tower_lazy_elem_t y, gr_tower_lazy_elem_t x, gr_ctx_t ctx)
+_pi_coeff(slong * v, fmpz_mpoly_t a, const gr_tower_lazy_elem_struct * x)
 {
-    gr_tower_flat_struct * F;
-    gr_tower_struct * T;
-    slong d, dpi = -1, v;
-    fmpz_mpoly_t a;
-    const fmpz_mpoly_struct * num, * den;
-    int ok = 0;
-
-    x = _gr_tower_lazy_flat_view(x);
-    F = x->F;
-    T = F->T;
+    gr_tower_struct * T = x->F->T;
+    const fmpz_mpoly_struct * num = fmpz_mpoly_q_numref(&x->elem.flat.data);
+    const fmpz_mpoly_struct * den = fmpz_mpoly_q_denref(&x->elem.flat.data);
+    slong d, dpi = -1;
+    ulong one = 1;
 
     for (d = 0; d < T->num_gens; d++)
         if (T->gens[d].kind == GR_TOWER_PI)
@@ -657,17 +655,41 @@ _gr_tower_lazy_pi_i_split(fmpq_t r, gr_tower_lazy_elem_t y, gr_tower_lazy_elem_t
     if (dpi < 0)
         return 0;
 
-    v = GR_TOWER_FLAT_VAR_D(F, dpi);
-    num = fmpz_mpoly_q_numref(&x->elem.flat.data);
-    den = fmpz_mpoly_q_denref(&x->elem.flat.data);
-    if (fmpz_mpoly_degree_si(den, v, x->elem.flat.mctx) > 0 || fmpz_mpoly_degree_si(num, v, x->elem.flat.mctx) != 1)
+    *v = GR_TOWER_FLAT_VAR_D(x->F, dpi);
+    if (fmpz_mpoly_degree_si(den, *v, x->elem.flat.mctx) > 0 || fmpz_mpoly_degree_si(num, *v, x->elem.flat.mctx) != 1)
         return 0;
 
     fmpz_mpoly_init(a, x->elem.flat.mctx);
-    {
-        ulong one = 1;
-        fmpz_mpoly_get_coeff_vars_ui(a, num, &v, &one, 1, x->elem.flat.mctx);
-    }
+    fmpz_mpoly_get_coeff_vars_ui(a, num, v, &one, 1, x->elem.flat.mctx);
+    return 1;
+}
+
+/*
+    x = r pi i + y with r rational nonzero, the part of x affine in pi
+    whose coefficient is free of transcendental generators being r pi i
+    (y is free of pi except for terms pi t with t involving other
+    transcendental generators: x = pi (i log(3) - 9 i) gives r = -9 and
+    y = pi i log(3)): sets r and y and returns 1, otherwise 0. Used so
+    that exponentials are not adjoined with pi i in their arguments:
+    exp(r pi i + y) is a root of unity times exp(y).
+*/
+static int
+_gr_tower_lazy_pi_i_split(fmpq_t r, gr_tower_lazy_elem_t y, gr_tower_lazy_elem_t x, gr_ctx_t ctx)
+{
+    gr_tower_flat_struct * F;
+    gr_tower_struct * T;
+    slong v;
+    fmpz_mpoly_t a;
+    const fmpz_mpoly_struct * den;
+    int ok = 0;
+
+    x = _gr_tower_lazy_flat_view(x);
+    F = x->F;
+    T = F->T;
+    den = fmpz_mpoly_q_denref(&x->elem.flat.data);
+
+    if (!_pi_coeff(&v, a, x))
+        return 0;
 
     /* only the part of the coefficient of pi free of transcendental
        generators can be a rational multiple of i (in pi (i log(3) - 9 i),
@@ -1209,16 +1231,15 @@ _gr_tower_lazy_trans_gen(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x, int k
     return _gr_tower_lazy_trans_gen_param(res, x, kind, 0, ctx);
 }
 
-static int
-_gr_tower_lazy_trans_gen_param(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x, int kind, slong param, gr_ctx_t ctx)
+/* the generator of the tower of x (by its gid) kind(param) at x, or -1
+   (exact comparisons, which may restructure the tower) */
+static slong
+_trans_gen_find(gr_tower_lazy_elem_t x, int kind, slong param)
 {
     gr_tower_flat_struct * F;
     gr_tower_struct * T;
     slong j, found_gid = -1;
-    ulong def_id = 0;
-    char * name = NULL;
     truth_t t;
-    int status;
 
     x = _gr_tower_lazy_flat_view(x);
     F = x->F;
@@ -1245,6 +1266,49 @@ _gr_tower_lazy_trans_gen_param(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x,
 
         if (t == T_TRUE)
             found_gid = gid;
+    }
+
+    /* (a relation found by a later zero test may have eliminated it) */
+    if (found_gid >= 0 && gr_tower_gid_order(T, found_gid) < 0)
+        found_gid = -1;
+
+    return found_gid;
+}
+
+static int
+_gr_tower_lazy_trans_gen_param(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x, int kind, slong param, gr_ctx_t ctx)
+{
+    gr_tower_flat_struct * F;
+    gr_tower_struct * T;
+    slong found_gid = -1;
+    ulong def_id = 0;
+    char * name = NULL;
+    int status;
+
+    x = _gr_tower_lazy_flat_view(x);
+    F = x->F;
+    T = F->T;
+    found_gid = _trans_gen_find(x, kind, param);
+
+    /* the same definition in another tower */
+    if (found_gid < 0)
+    {
+        def_id = _gr_tower_lazy_find_def(&name, kind, param, x, 1, T, ctx);
+        x = _gr_tower_lazy_flat_view(x);
+        /* (the comparisons may have merged x into another tower: a
+           generator there with this definition) */
+        if (x->F != F)
+        {
+            F = x->F;
+            T = F->T;
+            found_gid = _trans_gen_find(x, kind, param);
+            if (found_gid >= 0 && name != NULL)
+            {
+                flint_free(name);
+                name = NULL;
+                def_id = 0;
+            }
+        }
     }
 
     x = _gr_tower_lazy_flat_view(x);
@@ -1302,13 +1366,7 @@ _gr_tower_lazy_trans_gen_param(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x,
         {
             gr_tower_gen_struct * ng = GR_TOWER_GEN(T, T->num_gens - 1);
             slong gid = ng->gid;
-            if (def_id != 0)
-            {
-                ng->def_id = def_id;
-                _gr_tower_gen_rename(T, ng, name);
-            }
-            else
-                _gr_tower_lazy_new_def(ng, T, ctx);
+            _gr_tower_lazy_set_def(ng, T, def_id, name, ctx);
             _gr_tower_search_relations(F, GR_TOWER_DEFAULT_PREC);
             _gr_tower_lazy_set_gen_d(res, F, gr_tower_gid_order(T, gid), ctx);
         }
@@ -1328,12 +1386,16 @@ _gr_tower_lazy_trans_gen_param(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x,
         status = gr_tower_adjoin_atan_flat(T, &x->elem.flat.data, x->elem.flat.mctx, NULL);
 
     if (status != GR_SUCCESS)
+    {
+        flint_free(name);
         return status;
+    }
 
     {
         slong gid = GR_TOWER_GEN(T, T->num_gens - 1)->gid;
 
-        _gr_tower_lazy_new_def(GR_TOWER_GEN(T, T->num_gens - 1), T, ctx);
+        _gr_tower_lazy_set_def(GR_TOWER_GEN(T, T->num_gens - 1), T, def_id, name, ctx);
+        flint_free(name);
 
         /* a cheap relation search at adjunction time keeps the towers
            small (exp(log(x)) becomes x at once); it may reorder the
@@ -1650,34 +1712,21 @@ _gr_tower_lazy_pi_part(fmpq_t r, gr_tower_lazy_elem_t y, const gr_tower_lazy_ele
     gr_tower_lazy_elem_struct * x = (gr_tower_lazy_elem_struct *) x_in;
     gr_tower_flat_struct * F;
     gr_tower_struct * T;
-    slong d, v, dpi = -1;
+    slong v;
     fmpz_mpoly_t a;
-    const fmpz_mpoly_struct * num, * den;
+    const fmpz_mpoly_struct * den;
     int ok = 0;
 
     fmpq_zero(r);
     x = _gr_tower_lazy_flat_view(x);
     F = x->F;
     T = F->T;
-
-    for (d = 0; d < T->num_gens; d++)
-        if (T->gens[d].kind == GR_TOWER_PI)
-            dpi = d;
-    if (dpi < 0)
-        return 0;
-
-    v = GR_TOWER_FLAT_VAR_D(F, dpi);
-    num = fmpz_mpoly_q_numref(&x->elem.flat.data);
     den = fmpz_mpoly_q_denref(&x->elem.flat.data);
-    if (fmpz_mpoly_degree_si(den, v, x->elem.flat.mctx) > 0 || fmpz_mpoly_degree_si(num, v, x->elem.flat.mctx) != 1)
+
+    if (!_pi_coeff(&v, a, x))
         return 0;
 
     /* the coefficient of pi: a / den must be rational */
-    fmpz_mpoly_init(a, x->elem.flat.mctx);
-    {
-        ulong one = 1;
-        fmpz_mpoly_get_coeff_vars_ui(a, num, &v, &one, 1, x->elem.flat.mctx);
-    }
     if (fmpz_mpoly_is_fmpz(a, x->elem.flat.mctx) && fmpz_mpoly_is_fmpz(den, x->elem.flat.mctx))
     {
         fmpz_mpoly_q_t t;
@@ -1805,3 +1854,5 @@ _gr_tower_lazy_log(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ct
 {
     return _gr_tower_lazy_exp_log(res, x, GR_TOWER_LOG, ctx);
 }
+
+POP_OPTIONS

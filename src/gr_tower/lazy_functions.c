@@ -30,6 +30,9 @@
 #include "gr_tower_lazy.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 #define LAZY_CHECK_PREC 64
 
 /* Whether the enclosures of x and y (at a modest precision) overlap. */
@@ -1301,3 +1304,107 @@ truth_t _gr_tower_lazy_is_real_exact(const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
 int _gr_tower_lazy_real_sign_locked(int * sign, const gr_tower_lazy_elem_t x, gr_ctx_t ctx) { LOCKED(_gr_tower_lazy_real_sign_impl(sign, x, ctx)) }
 int gr_tower_lazy_cmp(int * res, const gr_tower_lazy_elem_t x, const gr_tower_lazy_elem_t y, gr_ctx_t ctx) { LOCKED(_gr_tower_lazy_cmp_impl(res, x, y, ctx)) }
 int gr_tower_lazy_get_d(double * res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx) { LOCKED(_gr_tower_lazy_get_d_impl(res, x, ctx)) }
+
+/* -------------------------------------------------------------------- */
+/* helpers of the special functions (lazy_special.c, lazy_hypgeom.c,    */
+/* lazy_modular.c, lazy_dirichlet.c)                                     */
+/* -------------------------------------------------------------------- */
+
+/* the sign of the real number x: numerically if the enclosure decides,
+   else exactly */
+int
+_gr_tower_lazy_real_sign_fast(int * sgn, gr_srcptr x, gr_ctx_t ctx)
+{
+    acb_t z;
+    int status;
+
+    acb_init(z);
+    status = gr_tower_lazy_get_acb(z, x, LAZY_CHECK_PREC, ctx);
+    if (status == GR_SUCCESS && arb_is_positive(acb_realref(z)))
+        *sgn = 1;
+    else if (status == GR_SUCCESS && arb_is_negative(acb_realref(z)))
+        *sgn = -1;
+    else
+        status = _gr_tower_lazy_real_sign_locked(sgn, x, ctx);
+    acb_clear(z);
+    return status;
+}
+
+/* the sign of Re(x) - c (c = NULL: 0), likewise */
+int
+_gr_tower_lazy_re_cmp(int * sgn, gr_srcptr x, const fmpq_t c, gr_ctx_t ctx)
+{
+    acb_t z;
+    arb_t d;
+    int status;
+
+    acb_init(z);
+    arb_init(d);
+    status = gr_tower_lazy_get_acb(z, x, LAZY_CHECK_PREC, ctx);
+    if (status == GR_SUCCESS)
+    {
+        if (c != NULL)
+            arb_set_fmpq(d, c, LAZY_CHECK_PREC);
+        arb_sub(d, acb_realref(z), d, LAZY_CHECK_PREC);
+    }
+    if (status == GR_SUCCESS && arb_is_positive(d))
+        *sgn = 1;
+    else if (status == GR_SUCCESS && arb_is_negative(d))
+        *sgn = -1;
+    else
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, ctx);
+        status = gr_re(t, x, ctx);
+        if (c != NULL)
+            status |= gr_sub_fmpq(t, t, c, ctx);
+        if (status == GR_SUCCESS)
+            status = _gr_tower_lazy_real_sign_locked(sgn, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+    }
+    acb_clear(z);
+    arb_clear(d);
+    return status;
+}
+
+/* the sign of Im(x) */
+int
+_gr_tower_lazy_im_sign(int * sgn, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_INIT(t, ctx);
+    status = gr_im(t, x, ctx);
+    if (status == GR_SUCCESS)
+        status = _gr_tower_lazy_real_sign_fast(sgn, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+/* The view restrictions on a result: in a real view, the result must be
+   real; in an algebraic view, algebraic (special function values at
+   algebraic points are usually transcendental, but this is not known
+   in general: GR_UNABLE). */
+int
+_gr_tower_lazy_view_finish(int status, gr_ptr res, int real, int alg, gr_ctx_t ctx)
+{
+    if (status != GR_SUCCESS)
+        return status;
+
+    if (alg && _gr_tower_lazy_is_algebraic_repr_locked(res, ctx) != T_TRUE)
+        return GR_UNABLE;
+
+    if (real)
+    {
+        truth_t t = _gr_tower_lazy_is_real_exact(res, ctx);
+        if (t == T_FALSE)
+            return GR_DOMAIN;
+        if (t == T_UNKNOWN)
+            return GR_UNABLE;
+        status = _gr_tower_lazy_realify_locked(res, ctx);
+    }
+
+    return status;
+}
+
+POP_OPTIONS

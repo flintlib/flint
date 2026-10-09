@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* -------------------------------------------------------------------- */
 /* polynomial roots                                                      */
 /* -------------------------------------------------------------------- */
@@ -294,6 +297,30 @@ static int _gr_tower_lazy_roots_squarefree(gr_vec_t roots, const gr_poly_t f_in,
    (smaller over rational function fields, where the norms are factored
    as multivariate polynomials) */
 
+/* After a new algebraic step on top of T (top: the previous top field):
+   its definition, and g (over top) promoted to the new top field */
+static int
+_promote_to_new_top(gr_poly_t g, gr_ctx_struct * top, gr_tower_t T, gr_ctx_t ctx)
+{
+    gr_poly_t g2;
+    gr_ctx_struct * newtop = gr_tower_field(T);
+    slong i;
+    int status = GR_SUCCESS;
+
+    _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
+
+    gr_poly_init(g2, newtop);
+    gr_poly_fit_length(g2, g->length, newtop);
+    for (i = 0; i < g->length && status == GR_SUCCESS; i++)
+        status |= gr_tower_promote(gr_poly_coeff_ptr(g2, i, newtop), gr_poly_coeff_srcptr(g, i, top), T->length - 1, T->length, T);
+    _gr_poly_set_length(g2, g->length, newtop);
+    gr_poly_clear(g, top);
+    gr_poly_init(g, newtop);
+    gr_poly_swap(g, g2, newtop);
+    gr_poly_clear(g2, newtop);
+    return status;
+}
+
 /*
     One step of root finding by exact factorization of the monic
     squarefree g over the top field of U->T (whose steps are proven, or
@@ -449,20 +476,8 @@ _gr_tower_lazy_roots_factor_step(gr_vec_t roots, gr_poly_t g, gr_ptr * r, gr_tow
 
             if (status == GR_SUCCESS)
             {
-                gr_poly_t g2;
                 gr_ctx_struct * newtop = gr_tower_field(T);
-
-                _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
-
-                gr_poly_init(g2, newtop);
-                gr_poly_fit_length(g2, g->length, newtop);
-                for (i = 0; i < g->length && status == GR_SUCCESS; i++)
-                    status |= gr_tower_promote(gr_poly_coeff_ptr(g2, i, newtop), gr_poly_coeff_srcptr(g, i, top), T->length - 1, T->length, T);
-                _gr_poly_set_length(g2, g->length, newtop);
-                gr_poly_clear(g, top);
-                gr_poly_init(g, newtop);
-                gr_poly_swap(g, g2, newtop);
-                gr_poly_clear(g2, newtop);
+                status = _promote_to_new_top(g, top, T, ctx);
 
                 gr_heap_clear(*r, top);
                 *r = gr_heap_init(newtop);
@@ -490,20 +505,28 @@ _gr_tower_lazy_roots_factor_step(gr_vec_t roots, gr_poly_t g, gr_ptr * r, gr_tow
     return result;
 }
 
+/*
+    The polynomial f (of degree n >= 1) over the top field of a tower U
+    of its coefficients, made monic: *Uout = U and g initialized over the
+    top field (on success; *Uout = NULL when the coefficients have no
+    common tower, g is then not initialized). When the coefficients
+    involve only some of the generators of U (a tower shared with earlier
+    computations: the roots of other polynomials, unrelated radicals), U
+    is a tower of those generators (with the generators their definitions
+    involve), so that neither the factorizations nor the new steps
+    involve the others.
+*/
 static int
-_gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * factor_only, gr_ctx_t ctx)
+_gr_tower_lazy_roots_prepare(gr_tower_flat_struct ** Uout, gr_poly_t g, const gr_poly_t f, gr_ctx_t ctx)
 {
     gr_tower_lazy_ctx_struct * L = LAZY(ctx);
     gr_tower_flat_struct * U;
     gr_tower_struct * T;
     gr_ctx_struct * top;
-    gr_poly_t g;
     slong i, n = f->length - 1;
-    slong roots_len0 = roots->length;
     int status = GR_SUCCESS;
 
-    if (n < 1)
-        return GR_SUCCESS;
+    *Uout = NULL;
 
     /* common tower of the coefficients */
     {
@@ -519,17 +542,9 @@ _gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * f
             else
             {
                 U = _gr_tower_lazy_common_tower(U, lu, c->F, c->level, ctx);
-                if (U != NULL)
-                    lu = U->T->num_gens;
                 if (U == NULL)
-                {
-                    if (factor_only != NULL)
-                    {
-                        *factor_only = 0;
-                        return GR_SUCCESS;
-                    }
                     return GR_UNABLE;
-                }
+                lu = U->T->num_gens;
             }
         }
         if (U == L->trivial)
@@ -616,6 +631,43 @@ _gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * f
             status |= _gr_vec_mul_scalar(g->coeffs, g->coeffs, n + 1, lc, top);
         GR_TMP_CLEAR(lc, top);
     }
+
+    if (status != GR_SUCCESS)
+    {
+        gr_poly_clear(g, top);
+        return status;
+    }
+
+    *Uout = U;
+    return GR_SUCCESS;
+}
+
+static int
+_gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * factor_only, gr_ctx_t ctx)
+{
+    gr_tower_flat_struct * U;
+    gr_tower_struct * T;
+    gr_ctx_struct * top;
+    gr_poly_t g;
+    slong i, n = f->length - 1;
+    slong roots_len0 = roots->length;
+    int status = GR_SUCCESS;
+
+    if (n < 1)
+        return GR_SUCCESS;
+
+    status = _gr_tower_lazy_roots_prepare(&U, g, f, ctx);
+    if (U == NULL)
+    {
+        if (status == GR_UNABLE && factor_only != NULL)
+        {
+            *factor_only = 0;
+            return GR_SUCCESS;
+        }
+        return status;
+    }
+    T = U->T;
+    top = gr_tower_field(T);
 
     while (status == GR_SUCCESS && g->length >= 2)
     {
@@ -736,21 +788,9 @@ _gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * f
                     status = gr_tower_adjoin_algebraic(T, g, z, GR_TOWER_STATUS_DYNAMIC, NULL);
                     if (status == GR_SUCCESS)
                     {
-                        gr_poly_t g2;
                         gr_ctx_struct * newtop = gr_tower_field(T);
-
-                        _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
-
-                        /* promote g to the new top field; the root is the generator */
-                        gr_poly_init(g2, newtop);
-                        gr_poly_fit_length(g2, g->length, newtop);
-                        for (i = 0; i < g->length && status == GR_SUCCESS; i++)
-                            status |= gr_tower_promote(gr_poly_coeff_ptr(g2, i, newtop), gr_poly_coeff_srcptr(g, i, top), T->length - 1, T->length, T);
-                        _gr_poly_set_length(g2, g->length, newtop);
-                        gr_poly_clear(g, top);
-                        gr_poly_init(g, newtop);
-                        gr_poly_swap(g, g2, newtop);
-                        gr_poly_clear(g2, newtop);
+                        /* (the root is the generator) */
+                        status = _promote_to_new_top(g, top, T, ctx);
 
                         gr_heap_clear(r, top);
                         top = newtop;
@@ -792,6 +832,100 @@ _gr_tower_lazy_roots_squarefree_tower(gr_vec_t roots, const gr_poly_t f, int * f
         acb_clear(z);
     }
 
+    gr_poly_clear(g, top);
+    return status;
+}
+
+/*
+    res = the root of the squarefree polynomial f (of degree >= 1, with
+    coefficients in the field) which overlaps ref, or (with pm set) one
+    of ref and -ref; exactly one root must match, numerically. The root
+    is adjoined as an algebraic step of the tower of the coefficients
+    (with dynamic status: the polynomial may be reducible over it),
+    without the factorizations and lattice searches of the general root
+    finding: for callers which know that the root is generically new
+    (the values of modular functions at a new point, from a modular
+    equation). Copies of the step made by separate calls are identified
+    when the towers are merged. GR_UNABLE when the roots cannot be
+    isolated or the match is not unique.
+*/
+int
+_gr_tower_lazy_poly_root_near(gr_tower_lazy_elem_t res, const gr_poly_t f, const acb_t ref, int pm, gr_ctx_t ctx)
+{
+    gr_tower_flat_struct * U;
+    gr_tower_struct * T;
+    gr_ctx_struct * top;
+    gr_poly_t g;
+    acb_ptr zs;
+    acb_t mref;
+    slong j, m, prec, found = -1;
+    int status, isolated = 0;
+
+    if (f->length < 2)
+        return GR_DOMAIN;
+
+    status = _gr_tower_lazy_roots_prepare(&U, g, f, ctx);
+    if (U == NULL)
+        return (status == GR_SUCCESS) ? GR_UNABLE : status;
+
+    T = U->T;
+    top = gr_tower_field(T);
+    m = g->length - 1;
+
+    if (m == 1)
+    {
+        gr_ptr r;
+        GR_TMP_INIT(r, top);
+        status = gr_neg(r, gr_poly_coeff_srcptr(g, 0, top), top);
+        if (status == GR_SUCCESS)
+            status = _gr_tower_lazy_set_nested_top(res, U, r, ctx);
+        GR_TMP_CLEAR(r, top);
+        gr_poly_clear(g, top);
+        return status;
+    }
+
+    zs = _acb_vec_init(m);
+    acb_init(mref);
+    acb_neg(mref, ref);
+
+    for (prec = GR_TOWER_DEFAULT_PREC; prec <= 4096 && !isolated; prec *= 2)
+    {
+        acb_poly_t gz;
+        acb_poly_init(gz);
+        if (_gr_tower_poly_get_acb_poly(gz, g, T->length, prec, T) == GR_SUCCESS)
+            isolated = (acb_poly_find_roots(zs, gz, NULL, 0, prec) == m);
+        acb_poly_clear(gz);
+    }
+
+    if (isolated)
+    {
+        for (j = 0; j < m; j++)
+        {
+            if (acb_overlaps(zs + j, ref) || (pm && acb_overlaps(zs + j, mref)))
+            {
+                if (found != -1)
+                {
+                    found = -2;
+                    break;
+                }
+                found = j;
+            }
+        }
+    }
+
+    if (found < 0)
+        status = GR_UNABLE;
+    else
+        status = gr_tower_adjoin_algebraic(T, g, zs + found, GR_TOWER_STATUS_DYNAMIC, NULL);
+
+    if (status == GR_SUCCESS)
+    {
+        _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
+        _gr_tower_lazy_set_gen(res, U, T->length, ctx);
+    }
+
+    _acb_vec_clear(zs, m);
+    acb_clear(mref);
     gr_poly_clear(g, top);
     return status;
 }
@@ -1198,3 +1332,5 @@ _gr_tower_lazy_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly,
 
     return status;
 }
+
+POP_OPTIONS

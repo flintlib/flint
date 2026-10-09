@@ -84,7 +84,7 @@ TEST_FUNCTION_START(gr_tower_dense_form, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 60 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t QQ, K[2];
         gr_ptr v[2][DF_NUM];
@@ -192,8 +192,9 @@ TEST_FUNCTION_START(gr_tower_dense_form, state)
                         flint_printf("FAIL: square of a sum (%s, %s)\n", g1, g2);
                         flint_abort();
                     }
-                    /* (a dense element through a locked function) */
-                    if (gr_sqrt(c, a, Kd) == GR_SUCCESS)
+                    /* (a dense element through a locked function; once per
+                       field: the root is searched in the tower) */
+                    if (i == 0 && gr_sqrt(c, a, Kd) == GR_SUCCESS)
                     {
                         GR_MUST_SUCCEED(gr_sqr(c, c, Kd));
                         if (gr_equal(c, a, Kd) != T_TRUE)

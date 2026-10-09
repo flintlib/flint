@@ -101,6 +101,10 @@ static const function1 functions1[] = {
     { "dilog", 5, GR_METHOD_DILOG },
     { "elliptic_k", 10, GR_METHOD_ELLIPTIC_K },
     { "elliptic_e", 10, GR_METHOD_ELLIPTIC_E },
+    { "modular_lambda", 14, GR_METHOD_MODULAR_LAMBDA },
+    { "modular_j", 9, GR_METHOD_MODULAR_J },
+    { "modular_delta", 13, GR_METHOD_MODULAR_DELTA },
+    { "dedekind_eta", 12, GR_METHOD_DEDEKIND_ETA },
 };
 
 #define NUM_FUNCTIONS1 (sizeof(functions1) / sizeof(function1))

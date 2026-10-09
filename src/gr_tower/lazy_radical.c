@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* trial division by the first GR_TOWER_OPT_SMOOTH_LIMIT primes (the
    option is a number of primes); 1 when complete, otherwise the last
    factor is the unfactored cofactor */
@@ -277,6 +280,64 @@ _gr_tower_lazy_root_fmpq(gr_tower_lazy_elem_t res, const fmpq_t c, ulong n, gr_c
     return status;
 }
 
+/*
+    The principal p-th root of xt (the top field of T) when it lies in the
+    field: the roots of X^p - xt by factoring (all the steps of T proven),
+    the principal one identified by the isolating enclosure of the
+    principal root (zx: the enclosure of xt, as for the adjunction).
+    Returns 1 if found (res set).
+*/
+static int
+_principal_root_in_field(gr_ptr res, gr_srcptr xt, ulong p, const acb_t zx, gr_tower_t T)
+{
+    gr_ctx_struct * top = gr_tower_field(T);
+    gr_poly_t q;
+    gr_vec_t roots;
+    fmpz_vec_t mult;
+    acb_t zp, w;
+    slong i, prec, found = -1;
+    int ok = 0;
+
+    gr_poly_init(q, top);
+    gr_vec_init(roots, 0, top);
+    fmpz_vec_init(mult, 0);
+    acb_init(zp);
+    acb_init(w);
+
+    if (gr_poly_set_coeff_si(q, p, 1, top) == GR_SUCCESS &&
+        gr_neg(gr_poly_coeff_ptr(q, 0, top), xt, top) == GR_SUCCESS &&
+        _gr_tower_principal_root_enclosure(zp, xt, p, zx, T) == GR_SUCCESS &&
+        gr_tower_poly_roots(roots, mult, q, T->length, T) == GR_SUCCESS)
+    {
+        /* (zp contains exactly one root of X^p - xt) */
+        for (prec = GR_TOWER_DEFAULT_PREC; prec <= GR_TOWER_OPTION(T, GR_TOWER_OPT_CERTIFY_PREC_LIMIT) && found < 0 && roots->length > 0; prec *= 2)
+            for (i = 0; i < roots->length && found < 0; i++)
+                if (gr_tower_get_acb(w, gr_vec_entry_srcptr(roots, i, top), prec, T) == GR_SUCCESS && acb_contains(zp, w))
+                    found = i;
+        if (found >= 0)
+            ok = (gr_set(res, gr_vec_entry_srcptr(roots, found, top), top) == GR_SUCCESS);
+    }
+
+    acb_clear(zp);
+    acb_clear(w);
+    fmpz_vec_clear(mult);
+    gr_vec_clear(roots, top);
+    gr_poly_clear(q, top);
+    return ok;
+}
+
+/* the bound on p [K : F_0] for the check for powers: the option, 3/8 of
+   it with transcendental generators (over which the norms of the
+   factorization are multivariate), halved for each further one */
+static slong
+_power_check_limit(gr_tower_t T)
+{
+    slong lim = GR_TOWER_OPTION(T, GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT);
+    if (T->num_trans > 0)
+        lim = (T->num_trans > FLINT_BITS / 2) ? 0 : ((lim / 8) * 3) >> (T->num_trans - 1);
+    return lim;
+}
+
 int
 _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in, ulong n, gr_ctx_t ctx)
 {
@@ -288,6 +349,9 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
     gr_poly_t q;
     acb_t z, zx;
     int status, real_cut = 0;
+    ulong outer = 1;     /* (> 1: the result is the principal outer-th root of the one found) */
+    int power_check;
+    slong power_limit;
 
     if (n == 0)
         return GR_DOMAIN;
@@ -311,6 +375,22 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
         status = _gr_tower_lazy_root_ui(res, &t, n, ctx);
         _gr_tower_lazy_clear(&t, ctx);
         fmpq_clear(c);
+        return status;
+    }
+
+    if (x->F != LAZY(ctx)->trivial && x->level > 0 &&
+        x->F->T->num_gens - x->level >= LAZY_ROOT_FORK_SUFFIX)
+    {
+        /* x in the prefix of a tower continuing with many generators
+           (those of other computations, in a long session): the root
+           goes into a copy of the prefix, rather than after them (the
+           root would carry them in its prefix, and the relation
+           searches with its later uses would visit them) */
+        gr_tower_lazy_elem_struct t;
+        _gr_tower_lazy_init(&t, ctx);
+        _gr_tower_lazy_prefix_copy(&t, x, ctx);
+        status = _gr_tower_lazy_root_ui(res, &t, n, ctx);
+        _gr_tower_lazy_clear(&t, ctx);
         return status;
     }
 
@@ -545,7 +625,7 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
             /* the principal root: the sign agreeing with sqrt(x) */
             for (prec = GR_TOWER_DEFAULT_PREC; prec <= LAZY(ctx)->options[GR_TOWER_OPT_PREC_LIMIT] && sign == 0; prec *= 2)
             {
-                if (gr_tower_flat_get_acb(zx, &x->elem.flat.data, prec, x->F) != GR_SUCCESS ||
+                if (gr_tower_lazy_get_acb(zx, x, prec, ctx) != GR_SUCCESS ||
                     gr_tower_flat_get_acb(zs, sq, prec, x->F) != GR_SUCCESS)
                     break;
                 if (imag)
@@ -591,7 +671,9 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
         fmpz_mpoly_q_clear(sq, x->elem.flat.mctx);
     }
 
-    /* the same root already adjoined to this tower? */
+    /* the same root already adjoined to this tower? (or a root of a
+       multiple order: root_n(y) = root_(k n)(y)^k for principal roots,
+       sqrt(y) = root_4(y)^2) */
     {
         slong d;
         for (d = 0; d < T->num_gens; d++)
@@ -601,7 +683,8 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
             truth_t t;
             slong gid;
 
-            if (g->def_kind != GR_TOWER_ROOT || g->def_param != (slong) n || g->arg.mctx == NULL)
+            if (g->def_kind != GR_TOWER_ROOT || g->def_param < (slong) n ||
+                g->def_param % (slong) n != 0 || g->arg.mctx == NULL)
                 continue;
 
             gid = g->gid;
@@ -614,8 +697,9 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
 
             if (t == T_TRUE)
             {
+                ulong k = g->def_param / n;
                 _gr_tower_lazy_set_gen_d(res, F, gr_tower_gid_order(T, gid), ctx);
-                return GR_SUCCESS;
+                return (k == 1) ? GR_SUCCESS : gr_pow_ui(res, res, k, ctx);
             }
         }
     }
@@ -635,13 +719,40 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
         acb_clear(w);
     }
 
-    /* (roots are adjoined to x's tower even when it is long: the
-       lattice search sees all of it, and finds roots among its later
-       generators, sqrt(pi (5 - 2 sqrt 6)) = sqrt(3 pi) - sqrt(2 pi) say,
-       which a copy of the prefix would have to rediscover) */
+    /* (roots are adjoined to x's tower even when it is long, up to
+       LAZY_ROOT_FORK_SUFFIX: the lattice search sees all of it, and
+       finds roots among its later generators, sqrt(pi (5 - 2 sqrt 6)) =
+       sqrt(3 pi) - sqrt(2 pi) say, which a copy of the prefix would
+       have to rediscover) */
     x = _gr_tower_lazy_flat_view(x);
     F = x->F;
     T = F->T;
+
+    /* the check for powers below (in fields of degree at most the limit
+       over p, p the smallest prime factor of n: _power_check_limit) needs
+       the steps proven: the proofs are attempted once per version of the
+       moduli, before the nested form of x is taken (they may refine the
+       tower) */
+    {
+        ulong p = 2;
+        while (n % p != 0)
+            p++;
+        power_limit = _power_check_limit(T);
+        power_check = (gr_tower_degree(T) <= power_limit / (slong) p);
+    }
+    if (power_check)
+    {
+        slong k;
+        for (k = 1; k <= T->length; k++)
+        {
+            if (GR_TOWER_STEP(T, k - 1)->status != GR_TOWER_STATUS_PROVEN)
+            {
+                gr_tower_prove_modular(T, GR_TOWER_OPTION(T, GR_TOWER_OPT_MODULAR_TRIES));
+                break;
+            }
+        }
+    }
+
     top = gr_tower_field(T);
 
     /* nested representation of x in the top field */
@@ -713,11 +824,56 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
         }
         else
         {
-            status = _gr_tower_adjoin_root_ui_enclosure(T, xt, n, zx, NULL);
-            if (status == GR_SUCCESS)
+            int known = -1;
+
+            /*
+                The radical a likely p-th power for a prime p | n (by the
+                places of the proof of irreducibility of X^n - x, which
+                fails then): the principal p-th root y found in the field
+                (not left to the zero tests, as a generator with a
+                reducible modulus), and root_n(x) = root_(n/p)(y) for
+                principal roots (the argument of y is in (-pi/p, pi/p]).
+            */
+            if (power_check)
             {
-                _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
-                _gr_tower_lazy_set_gen(res, F, T->length, ctx);
+                fmpz_mpoly_q_t arg;
+                const fmpz_mpoly_ctx_struct * actx;
+                ulong p = 0;
+
+                gr_tower_flat_ensure(&T->flat);
+                actx = T->flat.mctx;
+                fmpz_mpoly_q_init(arg, actx);
+                if (gr_tower_flat_set_nested_at(arg, xt, T->length, &T->flat) == GR_SUCCESS)
+                    known = _gr_tower_binomial_modular_evidence(T, arg, actx, n, GR_TOWER_OPTION(T, GR_TOWER_OPT_MODULAR_TRIES), &p)
+                            ? GR_TOWER_STATUS_PROVEN : GR_TOWER_STATUS_DYNAMIC;
+                fmpz_mpoly_q_clear(arg, actx);
+
+                if (p != 0 && (slong) p * gr_tower_degree(T) <= power_limit &&
+                    _principal_root_in_field(r, xt, p, zx, T))
+                {
+                    fmpz_mpoly_q_t t;
+                    gr_tower_flat_ensure(F);
+                    fmpz_mpoly_q_init(t, F->mctx);
+                    status = gr_tower_flat_set_nested_at(t, r, T->length, F);
+                    if (status == GR_SUCCESS)
+                    {
+                        _gr_tower_lazy_install(res, F, t, ctx);
+                        res->reduced_version = 0;
+                        outer = n / p;
+                    }
+                    fmpz_mpoly_q_clear(t, F->mctx);
+                    known = -2;
+                }
+            }
+
+            if (known != -2)
+            {
+                status = _gr_tower_adjoin_root_ui_enclosure(T, xt, n, zx, known, NULL);
+                if (status == GR_SUCCESS)
+                {
+                    _gr_tower_lazy_new_def(GR_TOWER_STEP(T, T->length - 1), T, ctx);
+                    _gr_tower_lazy_set_gen(res, F, T->length, ctx);
+                }
             }
         }
     }
@@ -728,5 +884,10 @@ _gr_tower_lazy_root_ui(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_in
     acb_clear(zx);
     GR_TMP_CLEAR(xt, top);
 
+    if (status == GR_SUCCESS && outer > 1)
+        status = _gr_tower_lazy_root_ui(res, res, outer, ctx);
+
     return status;
 }
+
+POP_OPTIONS

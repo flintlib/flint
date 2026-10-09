@@ -1238,7 +1238,10 @@ _flat_inv_linear(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, gr_tower_flat_struc
 /* 1/x for x = c g_1^e_1 ... g_r^e_r / d with roots of unity g_j of
    orders N_j: (d/c) g_1^(N_1 - e_1) ... (exp(-2 pi i k/p) in a cosine,
    which the inversion through the modulus Phi_p of degree p - 1 would
-   otherwise compute by a resultant); returns 1 on success */
+   otherwise compute by a resultant); likewise with roots g = p^(1/n) of
+   positive integers, g^(-e) = g^(n - e) / p (rather than an inversion
+   in the tower of the radicals, which may be large); returns 1 on
+   success */
 static int
 _flat_inv_root_of_unity_monomial(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, gr_tower_flat_struct * F)
 {
@@ -1256,29 +1259,52 @@ _flat_inv_root_of_unity_monomial(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, gr_
     nvars = F->mctx->minfo->nvars;
     exp = flint_malloc(sizeof(ulong) * nvars);
     fmpz_mpoly_get_term_exp_ui(exp, num, 0, F->mctx);
+    fmpz_init(c);
+    fmpz_one(c);
     {
         slong v, covered = 0, nonzero = 0;
+        fmpz_t p, t;
+        fmpz_init(p);
+        fmpz_init(t);
         for (v = 0; v < nvars; v++)
             nonzero += (exp[v] != 0);
         for (d = 0; d < T->num_gens && ok; d++)
         {
             const gr_tower_gen_struct * g = T->gens + d;
+            ulong n;
+            int kind;
             v = GR_TOWER_FLAT_VAR_D(F, d);
             if (exp[v] == 0)
                 continue;
             covered++;
-            if (g->kind != GR_TOWER_ALGEBRAIC || g->def_kind != GR_TOWER_ROOT_OF_UNITY || g->def_param <= 0)
-                ok = 0;
+            kind = _gr_tower_gen_const_root(g, p, &n);
+            if (kind == 1 && n > 0)
+                exp[v] = (n - exp[v] % n) % n;
+            else if (kind == 2 && n > 0)
+            {
+                /* g^n = p: g^(-e) = g^(n - r) / p^(q + 1), e = q n + r, r > 0 */
+                ulong q = exp[v] / n, r = exp[v] % n;
+                fmpz_pow_ui(t, p, q + (r != 0));
+                fmpz_mul(c, c, t);
+                exp[v] = (r == 0) ? 0 : n - r;
+            }
             else
-                exp[v] = ((ulong) g->def_param - exp[v] % (ulong) g->def_param) % (ulong) g->def_param;
+                ok = 0;
         }
         ok = ok && (covered == nonzero);
+        fmpz_clear(p);
+        fmpz_clear(t);
     }
 
     if (ok)
     {
-        fmpz_init(c);
-        fmpz_mpoly_get_term_coeff_fmpz(c, num, 0, F->mctx);
+        {
+            fmpz_t k;
+            fmpz_init(k);
+            fmpz_mpoly_get_term_coeff_fmpz(k, num, 0, F->mctx);
+            fmpz_mul(c, c, k);
+            fmpz_clear(k);
+        }
         fmpz_mpoly_set(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_denref(x), F->mctx);
         fmpz_mpoly_one(fmpz_mpoly_q_denref(res), F->mctx);
         {
@@ -1290,10 +1316,10 @@ _flat_inv_root_of_unity_monomial(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, gr_
         }
         fmpz_mpoly_set_fmpz(fmpz_mpoly_q_denref(res), c, F->mctx);
         fmpz_mpoly_q_canonicalise(res, F->mctx);
-        fmpz_clear(c);
         ok = (gr_tower_flat_reduce(res, F) == GR_SUCCESS);
     }
 
+    fmpz_clear(c);
     flint_free(exp);
     return ok;
 }

@@ -22,6 +22,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 int
 gr_tower_promote(gr_ptr res, gr_srcptr x, slong j, slong k, gr_tower_t T)
 {
@@ -303,10 +306,10 @@ _map_set_image_gen(gr_tower_map_t map, slong d, slong du)
 */
 static slong
 _absorb_find_definition(gr_tower_t U, gr_tower_map_t map, int kind, slong param,
-    fmpz_mpoly_q_t arg, fmpz_mpoly_ctx_struct ** actx)
+    fmpz_mpoly_q_struct * args, slong nargs, fmpz_mpoly_ctx_struct ** actx)
 {
     gr_tower_flat_struct * F = &U->flat;
-    slong du;
+    slong du, i;
 
     for (du = 0; du < U->num_gens; du++)
     {
@@ -321,36 +324,104 @@ _absorb_find_definition(gr_tower_t U, gr_tower_map_t map, int kind, slong param,
             continue;
         if (GR_TOWER_KIND_IS_SPECIAL(kind) && g->def_param != param)
             continue;
+        if (_gr_tower_gen_num_args(g) != nargs)
+            continue;
 
-        gr_tower_flat_ensure(F);
-        fmpz_mpoly_q_init(diff, F->mctx);
-        fmpz_mpoly_q_init(a, F->mctx);
-        gr_tower_flat_convert(diff, &g->arg.data, g->arg.mctx, F);
-        gr_tower_flat_convert(a, arg, *actx, F);
-        fmpz_mpoly_q_sub(diff, diff, a, F->mctx);
-        eq = gr_tower_flat_num_is_zero(diff, F);
-        fmpz_mpoly_q_clear(diff, F->mctx);
-        fmpz_mpoly_q_clear(a, F->mctx);
+        eq = T_TRUE;
+        for (i = 0; i < nargs && eq == T_TRUE; i++)
+        {
+            const gr_tower_flat_elem_struct * ga;
+            /* (the zero test of the previous argument may have moved or
+               reallocated the generators: g by its id) */
+            if (i > 0)
+            {
+                slong d = gr_tower_gid_order(U, gid);
+                if (d < 0)
+                {
+                    eq = T_UNKNOWN;
+                    break;
+                }
+                g = GR_TOWER_GEN(U, d);
+            }
+            ga = _gr_tower_gen_arg_ptr(g, i);
+            gr_tower_flat_ensure(F);
+            fmpz_mpoly_q_init(diff, F->mctx);
+            fmpz_mpoly_q_init(a, F->mctx);
+            gr_tower_flat_convert(diff, &ga->data, ga->mctx, F);
+            gr_tower_flat_convert(a, args + i, *actx, F);
+            fmpz_mpoly_q_sub(diff, diff, a, F->mctx);
+            eq = gr_tower_flat_num_is_zero(diff, F);
+            fmpz_mpoly_q_clear(diff, F->mctx);
+            fmpz_mpoly_q_clear(a, F->mctx);
+        }
 
         if (eq == T_TRUE)
             return gr_tower_gid_order(U, gid);
 
-        /* the zero test may have restructured U */
+        /* the zero tests may have restructured U */
         gr_tower_map_sync(map);
         if (*actx != map->mctx)
         {
-            fmpz_mpoly_q_t tmp;
-            fmpz_mpoly_q_init(tmp, map->mctx);
-            gr_tower_flat_convert(tmp, arg, *actx, &U->flat);
-            fmpz_mpoly_q_clear(arg, *actx);
+            for (i = 0; i < nargs; i++)
+            {
+                fmpz_mpoly_q_t tmp;
+                fmpz_mpoly_q_init(tmp, map->mctx);
+                gr_tower_flat_convert(tmp, args + i, *actx, &U->flat);
+                fmpz_mpoly_q_clear(args + i, *actx);
+                fmpz_mpoly_q_init(args + i, map->mctx);
+                fmpz_mpoly_q_swap(args + i, tmp, map->mctx);
+                fmpz_mpoly_q_clear(tmp, map->mctx);
+            }
             *actx = map->mctx;
-            fmpz_mpoly_q_init(arg, *actx);
-            fmpz_mpoly_q_swap(arg, tmp, *actx);
-            fmpz_mpoly_q_clear(tmp, *actx);
         }
     }
 
     return -1;
+}
+
+/* The images of the arguments of t (arg, then xargs) under the map, in
+   *actx (= map->mctx): an array of *nargs initialized elements (none for
+   a generator without arguments). Returns GR_UNABLE if an argument
+   cannot be mapped (nothing is allocated then). */
+static int
+_absorb_map_args(fmpz_mpoly_q_struct ** args, slong * nargs, fmpz_mpoly_ctx_struct ** actx,
+    const gr_tower_gen_struct * t, gr_tower_map_t map)
+{
+    slong i, n = _gr_tower_gen_num_args(t);
+    int status = GR_SUCCESS;
+
+    gr_tower_map_sync(map);
+    *actx = map->mctx;
+    *nargs = n;
+    *args = flint_malloc(sizeof(fmpz_mpoly_q_struct) * FLINT_MAX(n, 1));
+    for (i = 0; i < n; i++)
+        fmpz_mpoly_q_init(*args + i, *actx);
+    for (i = 0; i < n && status == GR_SUCCESS; i++)
+    {
+        const gr_tower_flat_elem_struct * a = _gr_tower_gen_arg_ptr(t, i);
+        status = gr_tower_map_apply_flat(*args + i, &a->data, a->mctx, map);
+    }
+
+    if (status != GR_SUCCESS || map->mctx != *actx)
+    {
+        for (i = 0; i < n; i++)
+            fmpz_mpoly_q_clear(*args + i, *actx);
+        flint_free(*args);
+        *args = NULL;
+        *nargs = 0;
+        return GR_UNABLE;
+    }
+
+    return GR_SUCCESS;
+}
+
+static void
+_absorb_args_clear(fmpz_mpoly_q_struct * args, slong nargs, fmpz_mpoly_ctx_struct * actx)
+{
+    slong i;
+    for (i = 0; i < nargs; i++)
+        fmpz_mpoly_q_clear(args + i, actx);
+    flint_free(args);
 }
 
 static int
@@ -388,26 +459,26 @@ _absorb_trans(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong j, slong d)
     }
 
     {
-        /* adjoin, with the image of the argument */
-        fmpz_mpoly_q_t arg;
+        /* adjoin, with the images of the arguments */
+        fmpz_mpoly_q_struct * args = NULL;
+        slong nargs = 0;
         fmpz_mpoly_ctx_struct * actx;
         gr_tower_gen_struct * nt;
 
         gr_tower_map_sync(map);
         actx = map->mctx;
-        fmpz_mpoly_q_init(arg, actx);
 
         if (GR_TOWER_KIND_HAS_ARG(t->kind))
-            status = gr_tower_map_apply_flat(arg, &t->arg.data, t->arg.mctx, map);
+            status = _absorb_map_args(&args, &nargs, &actx, t, map);
 
-        /* the same function of the same argument already in U (possibly
+        /* the same function of the same arguments already in U (possibly
            as a generator which became algebraic) */
         if (status == GR_SUCCESS && GR_TOWER_KIND_HAS_ARG(t->kind))
         {
-            slong du = _absorb_find_definition(U, map, t->kind, t->def_param, arg, &actx);
+            slong du = _absorb_find_definition(U, map, t->kind, t->def_param, args, nargs, &actx);
             if (du >= 0)
             {
-                fmpz_mpoly_q_clear(arg, actx);
+                _absorb_args_clear(args, nargs, actx);
                 _map_set_image_gen(map, d, du);
                 return GR_SUCCESS;
             }
@@ -418,24 +489,25 @@ _absorb_trans(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong j, slong d)
             if (t->kind == GR_TOWER_PI)
                 status = gr_tower_adjoin_pi(U, t->name);
             else if (t->kind == GR_TOWER_EXP)
-                status = gr_tower_adjoin_exp_flat(U, arg, actx, t->name);
+                status = gr_tower_adjoin_exp_flat(U, args, actx, t->name);
             else if (t->kind == GR_TOWER_LOG)
-                status = gr_tower_adjoin_log_flat(U, arg, actx, t->name);
+                status = gr_tower_adjoin_log_flat(U, args, actx, t->name);
             else if (t->kind == GR_TOWER_TAN)
-                status = gr_tower_adjoin_tan_flat(U, arg, actx, t->name);
+                status = gr_tower_adjoin_tan_flat(U, args, actx, t->name);
             else if (t->kind == GR_TOWER_ATAN)
-                status = gr_tower_adjoin_atan_flat(U, arg, actx, t->name);
+                status = gr_tower_adjoin_atan_flat(U, args, actx, t->name);
             else if (GR_TOWER_KIND_IS_SPECIAL(t->kind))
-                status = _gr_tower_adjoin_special_flat_nocheck(U, t->kind, t->def_param, arg, actx, t->name);
+                status = _gr_tower_adjoin_special_multi_flat_nocheck(U, t->kind, t->def_param, args, nargs, actx, t->name);
             else
                 status = GR_UNABLE;
         }
 
         if (status == GR_DOMAIN && GR_TOWER_KIND_IS_SPECIAL(t->kind) &&
-            !(t->kind == GR_TOWER_ERF || (t->kind == GR_TOWER_LAMBERTW && t->def_param == 0) || t->kind == GR_TOWER_POLYLOG))
+            !(t->kind == GR_TOWER_ERF || (t->kind == GR_TOWER_LAMBERTW && t->def_param == 0) || t->kind == GR_TOWER_POLYLOG ||
+              t->kind == GR_TOWER_HYPGEOM))
         {
             /* (a pole: cannot occur for a valid generator) */
-            fmpz_mpoly_q_clear(arg, actx);
+            _absorb_args_clear(args, nargs, actx);
             return GR_UNABLE;
         }
 
@@ -443,18 +515,19 @@ _absorb_trans(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong j, slong d)
         {
             /* the image of the argument is trivial in U: exp(0) = 1 or
                log(1) = 0, tan(0) = atan(0) = 0, erf(0) = W_0(0) =
-               Li_s(0) = 0 (log(0) cannot occur for a valid generator) */
+               Li_s(0) = 0, pFq(a; b; 0) = 1 (log(0) cannot occur for a
+               valid generator) */
             gr_tower_map_sync(map);
             gr_tower_map_fit_length(map, d + 1);
-            if (t->kind == GR_TOWER_EXP)
+            if (t->kind == GR_TOWER_EXP || t->kind == GR_TOWER_HYPGEOM)
                 fmpz_mpoly_q_one(map->images + d, map->mctx);
             else
                 fmpz_mpoly_q_zero(map->images + d, map->mctx);
-            fmpz_mpoly_q_clear(arg, actx);
+            _absorb_args_clear(args, nargs, actx);
             return GR_SUCCESS;
         }
 
-        fmpz_mpoly_q_clear(arg, actx);
+        _absorb_args_clear(args, nargs, actx);
 
         if (status != GR_SUCCESS)
             return status;
@@ -1989,22 +2062,7 @@ _absorb_real_first(gr_tower_t U, gr_tower_map_t map, gr_tower_gen_struct * step,
         if (step->origin != NULL)
             _gr_tower_gen_set_origin(ng, step->origin);
         if (step->def_kind != GR_TOWER_ALGEBRAIC)
-        {
-            ng->def_kind = step->def_kind;
-            ng->def_param = step->def_param;
-            if (step->arg.mctx != NULL)
-            {
-                gr_tower_map_sync(map);
-                ng->arg.mctx = map->mctx;
-                fmpz_mpoly_q_init(&ng->arg.data, ng->arg.mctx);
-                if (gr_tower_map_apply_flat(&ng->arg.data, &step->arg.data, step->arg.mctx, map) != GR_SUCCESS)
-                {
-                    fmpz_mpoly_q_clear(&ng->arg.data, ng->arg.mctx);
-                    ng->arg.mctx = NULL;
-                    ng->def_kind = GR_TOWER_ALGEBRAIC;
-                }
-            }
-        }
+            _gr_tower_gen_copy_def_map(ng, step, map);
         gid = ng->gid;
     }
 
@@ -2282,18 +2340,18 @@ _absorb_alg(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong k, slong d, in
     if (step->arg.mctx != NULL && step->def_kind != GR_TOWER_ROOT &&
         step->def_kind != GR_TOWER_ROOT_OF_UNITY && GR_TOWER_KIND_HAS_ARG(step->def_kind))
     {
-        fmpz_mpoly_q_t arg;
+        fmpz_mpoly_q_struct * args;
+        slong nargs;
         fmpz_mpoly_ctx_struct * actx;
         slong du;
 
-        gr_tower_map_sync(map);
-        actx = map->mctx;
-        fmpz_mpoly_q_init(arg, actx);
-        if (gr_tower_map_apply_flat(arg, &step->arg.data, step->arg.mctx, map) == GR_SUCCESS)
-            du = _absorb_find_definition(U, map, step->def_kind, step->def_param, arg, &actx);
+        if (_absorb_map_args(&args, &nargs, &actx, step, map) == GR_SUCCESS)
+        {
+            du = _absorb_find_definition(U, map, step->def_kind, step->def_param, args, nargs, &actx);
+            _absorb_args_clear(args, nargs, actx);
+        }
         else
             du = -1;
-        fmpz_mpoly_q_clear(arg, actx);
 
         if (du >= 0)
         {
@@ -2534,22 +2592,7 @@ _absorb_alg(gr_tower_t U, gr_tower_map_t map, gr_tower_t B, slong k, slong d, in
 
                 /* keep the definition of a generator which became algebraic */
                 if (step->def_kind != GR_TOWER_ALGEBRAIC)
-                {
-                    ng->def_kind = step->def_kind;
-                    ng->def_param = step->def_param;
-                    if (step->arg.mctx != NULL)
-                    {
-                        gr_tower_map_sync(map);
-                        ng->arg.mctx = map->mctx;
-                        fmpz_mpoly_q_init(&ng->arg.data, ng->arg.mctx);
-                        if (gr_tower_map_apply_flat(&ng->arg.data, &step->arg.data, step->arg.mctx, map) != GR_SUCCESS)
-                        {
-                            fmpz_mpoly_q_clear(&ng->arg.data, ng->arg.mctx);
-                            ng->arg.mctx = NULL;
-                            ng->def_kind = GR_TOWER_ALGEBRAIC;
-                        }
-                    }
-                }
+                    _gr_tower_gen_copy_def_map(ng, step, map);
 
                 _map_set_image_gen(map, d, ng->def_order);
             }
@@ -2628,3 +2671,5 @@ gr_tower_eliminate(gr_tower_t U, gr_tower_map_t map, gr_tower_t T)
     status = gr_tower_absorb(U, map, T, 0);
     return status;
 }
+
+POP_OPTIONS

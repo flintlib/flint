@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* -------------------------------------------------------------------- */
 /* conversions to rationals                                              */
 /* -------------------------------------------------------------------- */
@@ -665,6 +668,91 @@ _gr_tower_lazy_conj_attempt(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t
                 else
                     status = GR_UNABLE;
             }
+            else if ((g->kind == GR_TOWER_JACOBI_THETA || (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_JACOBI_THETA)) &&
+                     g->arg.mctx != NULL && g->num_xargs == 1)
+            {
+                /* conj(theta_j(z, tau)) = theta_j(conj(z), -conj(tau)) */
+                slong param = g->def_param;
+                gr_tower_lazy_elem_struct cargs[2];
+                _gr_tower_lazy_init(cargs, ctx);
+                _gr_tower_lazy_init(cargs + 1, ctx);
+                _gr_tower_lazy_set_flat(cargs, F, &g->arg.data, g->arg.mctx, ctx);
+                _gr_tower_lazy_set_flat(cargs + 1, F, &g->xargs[0].data, g->xargs[0].mctx, ctx);
+                status = _gr_tower_lazy_conj(cargs, cargs, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_conj(cargs + 1, cargs + 1, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_neg(cargs + 1, cargs + 1, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_special_multi(limgs[v], GR_TOWER_JACOBI_THETA, param, cargs, 2, ctx);
+                _gr_tower_lazy_clear(cargs, ctx);
+                _gr_tower_lazy_clear(cargs + 1, ctx);
+            }
+            else if ((g->kind == GR_TOWER_HURWITZ_ZETA || (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_HURWITZ_ZETA)) &&
+                     g->arg.mctx != NULL && g->num_xargs == 1)
+            {
+                /* conj(zeta(s, a)) = zeta(conj(s), conj(a)) (Re(a) > 0) */
+                gr_tower_lazy_elem_struct cargs[2];
+                _gr_tower_lazy_init(cargs, ctx);
+                _gr_tower_lazy_init(cargs + 1, ctx);
+                _gr_tower_lazy_set_flat(cargs, F, &g->arg.data, g->arg.mctx, ctx);
+                _gr_tower_lazy_set_flat(cargs + 1, F, &g->xargs[0].data, g->xargs[0].mctx, ctx);
+                status = _gr_tower_lazy_conj(cargs, cargs, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_conj(cargs + 1, cargs + 1, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_special_multi(limgs[v], GR_TOWER_HURWITZ_ZETA, 0, cargs, 2, ctx);
+                _gr_tower_lazy_clear(cargs, ctx);
+                _gr_tower_lazy_clear(cargs + 1, ctx);
+            }
+            else if ((g->kind == GR_TOWER_HYPGEOM || (g->kind == GR_TOWER_ALGEBRAIC && g->def_kind == GR_TOWER_HYPGEOM)) &&
+                     g->arg.mctx != NULL)
+            {
+                /* conj(pFq(a; b; z)) = pFq(conj(a); conj(b); conj(z)) off
+                   the branch cut z >= 1 (p = q + 1) */
+                slong i, n = _gr_tower_gen_num_args(g);
+                slong param = g->def_param;
+                gr_tower_lazy_elem_struct * cargs;
+                int ok = 1;
+
+                cargs = flint_malloc(sizeof(gr_tower_lazy_elem_struct) * n);
+                for (i = 0; i < n; i++)
+                    _gr_tower_lazy_init(cargs + i, ctx);
+                /* (g may be a dangling pointer after a recursive
+                   conjugation: the arguments are read first) */
+                for (i = 0; i < n; i++)
+                {
+                    const gr_tower_flat_elem_struct * a = _gr_tower_gen_arg_ptr(g, i);
+                    _gr_tower_lazy_set_flat(cargs + i, F, &a->data, a->mctx, ctx);
+                }
+
+                if (GR_TOWER_HYPGEOM_P(param) == GR_TOWER_HYPGEOM_Q(param) + 1)
+                {
+                    acb_t z;
+                    acb_init(z);
+                    if (_gr_tower_lazy_get_acb_impl(z, cargs, GR_TOWER_DEFAULT_PREC, ctx) != GR_SUCCESS)
+                        ok = 0;
+                    else if (arb_contains_zero(acb_imagref(z)))
+                    {
+                        arb_t t;
+                        arb_init(t);
+                        arb_sub_ui(t, acb_realref(z), 1, GR_TOWER_DEFAULT_PREC);
+                        ok = (_gr_tower_lazy_is_real_exact(cargs, ctx) == T_TRUE) && arb_is_negative(t);
+                        arb_clear(t);
+                    }
+                    acb_clear(z);
+                }
+
+                status = ok ? GR_SUCCESS : GR_UNABLE;
+                for (i = 0; i < n && status == GR_SUCCESS; i++)
+                    status = _gr_tower_lazy_conj(cargs + i, cargs + i, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_special_multi(limgs[v], GR_TOWER_HYPGEOM, param, cargs, n, ctx);
+
+                for (i = 0; i < n; i++)
+                    _gr_tower_lazy_clear(cargs + i, ctx);
+                flint_free(cargs);
+            }
             else if ((GR_TOWER_KIND_IS_SPECIAL(g->kind) || (g->kind == GR_TOWER_ALGEBRAIC && GR_TOWER_KIND_IS_SPECIAL(g->def_kind))) &&
                      (g->arg.mctx != NULL || g->def_kind == GR_TOWER_CONSTANT))
             {
@@ -705,9 +793,23 @@ _gr_tower_lazy_conj_attempt(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t
                     status = GR_UNABLE;
                 else if (kind == GR_TOWER_CONSTANT)
                     status = _gr_tower_lazy_special(limgs[v], kind, param, NULL, ctx);
+                else if (kind == GR_TOWER_MODULAR_LAMBDA)
+                {
+                    /* conj(lambda(tau)) = lambda(-conj(tau)) */
+                    status = _gr_tower_lazy_conj(&cu, &u, ctx);
+                    if (status == GR_SUCCESS)
+                        status = _gr_tower_lazy_neg(&cu, &cu, ctx);
+                    if (status == GR_SUCCESS)
+                        status = _gr_tower_lazy_special(limgs[v], kind, param, &cu, ctx);
+                }
                 else
                 {
                     status = _gr_tower_lazy_conj(&cu, &u, ctx);
+                    /* (L(s, chi): conj = L(conj(s), conj(chi)), the
+                       conjugate character chi_q(k^(-1))) */
+                    if (kind == GR_TOWER_DIRICHLET_L)
+                        param = GR_TOWER_DIRICHLET_PARAM(GR_TOWER_DIRICHLET_Q(param),
+                            n_invmod(GR_TOWER_DIRICHLET_K(param), GR_TOWER_DIRICHLET_Q(param)));
                     if (status == GR_SUCCESS)
                         status = _gr_tower_lazy_special(limgs[v], kind, (kind == GR_TOWER_LAMBERTW) ? -param : param, &cu, ctx);
                 }
@@ -844,6 +946,8 @@ typedef struct
     slong param;
     int has_arg;
     fmpz_mpoly_q_struct arg;    /* in the snapshot context */
+    slong num_xargs;            /* functions of several arguments: the others (in the snapshot context) */
+    fmpz_mpoly_q_struct * xargs;
     int absolute;               /* an absolute algebraic number: q */
     qqbar_struct q;
     fmpz_mpoly_struct modulus;  /* a root of this polynomial (in the snapshot context, in variable var) */
@@ -933,6 +1037,17 @@ _gr_tower_lazy_transfer(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_i
             fmpz_mpoly_q_init(&r->arg, mctx);
             gr_tower_flat_convert(&r->arg, &g->arg.data, g->arg.mctx, F);
             r->has_arg = 1;
+            if (g->num_xargs > 0)
+            {
+                slong i;
+                r->num_xargs = g->num_xargs;
+                r->xargs = flint_malloc(sizeof(fmpz_mpoly_q_struct) * g->num_xargs);
+                for (i = 0; i < g->num_xargs; i++)
+                {
+                    fmpz_mpoly_q_init(r->xargs + i, mctx);
+                    gr_tower_flat_convert(r->xargs + i, &g->xargs[i].data, g->xargs[i].mctx, F);
+                }
+            }
         }
         else if (g->def_kind == GR_TOWER_ROOT && g->arg.mctx != NULL)
         {
@@ -1094,7 +1209,29 @@ _gr_tower_lazy_transfer(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_i
                         status = GR_UNABLE;
                     break;
                 default:
-                    if (GR_TOWER_KIND_IS_SPECIAL(r->kind) && r->has_arg)
+                    if (GR_TOWER_KIND_IS_SPECIAL(r->kind) && r->has_arg && r->num_xargs > 0)
+                    {
+                        /* the other arguments, evaluated at the images */
+                        slong i, n = 1 + r->num_xargs;
+                        gr_tower_lazy_elem_struct * xa = flint_malloc(sizeof(gr_tower_lazy_elem_struct) * n);
+                        for (i = 0; i < n; i++)
+                            _gr_tower_lazy_init(xa + i, ctx);
+                        status = _gr_tower_lazy_set(xa, &u, ctx);
+                        for (i = 1; i < n && status == GR_SUCCESS; i++)
+                        {
+                            status = _gr_tower_lazy_eval_poly(&num, fmpz_mpoly_q_numref(r->xargs + i - 1), mctx, nvars, imgs, ctx);
+                            if (status == GR_SUCCESS)
+                                status = _gr_tower_lazy_eval_poly(&den, fmpz_mpoly_q_denref(r->xargs + i - 1), mctx, nvars, imgs, ctx);
+                            if (status == GR_SUCCESS)
+                                status = _gr_tower_lazy_div(xa + i, &num, &den, ctx);
+                        }
+                        if (status == GR_SUCCESS)
+                            status = _gr_tower_lazy_special_multi(img, r->kind, r->param, xa, n, ctx);
+                        for (i = 0; i < n; i++)
+                            _gr_tower_lazy_clear(xa + i, ctx);
+                        flint_free(xa);
+                    }
+                    else if (GR_TOWER_KIND_IS_SPECIAL(r->kind) && r->has_arg)
                         status = _gr_tower_lazy_special(img, r->kind, r->param, &u, ctx);
                     else
                         status = GR_UNABLE;
@@ -1127,6 +1264,13 @@ _gr_tower_lazy_transfer(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x_i
         transfer_gen_struct * r = gens + d;
         if (r->has_arg)
             fmpz_mpoly_q_clear(&r->arg, mctx);
+        if (r->num_xargs > 0)
+        {
+            slong i;
+            for (i = 0; i < r->num_xargs; i++)
+                fmpz_mpoly_q_clear(r->xargs + i, mctx);
+            flint_free(r->xargs);
+        }
         if (r->absolute)
             qqbar_clear(&r->q);
         if (r->has_modulus)
@@ -1181,6 +1325,32 @@ _gr_tower_lazy_pow(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, const
         fmpq_init(q);
         (void) fmpz_mpoly_q_get_fmpq(q, &y->elem.flat.data, y->elem.flat.mctx);
 
+        /* a positive rational x to a negative fractional power: (1/x)^(-q),
+           the root of a rational number (rather than the inverse of a
+           root, a division in the tower of the radicals, which may be
+           large) */
+        if (fmpq_sgn(q) < 0 && !fmpz_is_one(fmpq_denref(q)))
+        {
+            fmpq_t c;
+            fmpq_init(c);
+            if (_gr_tower_lazy_rational_repr_locked(c, x, ctx) && fmpq_sgn(c) > 0)
+            {
+                fmpq_inv(c, c);
+                fmpq_neg(q, q);
+                _gr_tower_lazy_init(&t, ctx);
+                status = _gr_tower_lazy_set_fmpq(&t, c, ctx);
+                if (status == GR_SUCCESS)
+                    status = _gr_tower_lazy_root_ui(&t, &t, fmpz_get_ui(fmpq_denref(q)), ctx);
+                if (status == GR_SUCCESS)
+                    status = gr_pow_fmpz(res, &t, fmpq_numref(q), ctx);
+                _gr_tower_lazy_clear(&t, ctx);
+                fmpq_clear(c);
+                fmpq_clear(q);
+                return status;
+            }
+            fmpq_clear(c);
+        }
+
         if (fmpz_is_one(fmpq_denref(q)))
         {
             status = gr_pow_fmpz(res, x, fmpq_numref(q), ctx);
@@ -1218,3 +1388,5 @@ _gr_tower_lazy_sqrt(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
 {
     return _gr_tower_lazy_root_ui(res, x, 2, ctx);
 }
+
+POP_OPTIONS

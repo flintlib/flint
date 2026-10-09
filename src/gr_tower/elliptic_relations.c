@@ -48,6 +48,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* S = sqrt(c) (principal) as a flat element: a rational square directly,
    otherwise through a root generator with definition order < before
    (returns 1 if the tower changed, -1 if impossible, 0 when S is set) */
@@ -337,7 +340,8 @@ _ell_value(fmpz_mpoly_q_t m, const fmpz_mpoly_q_t a, int t, gr_tower_flat_t F)
 /*
     Landen's transformation between the generators at a and b standing
     for m and m1 (ta, tb: transformed, m = a/(a - 1), with K(m) = A K(a),
-    E(m) = E(a)/A, A = sqrt(1 - a); likewise B for b):
+    E(m) = E(a)/A, A = sqrt(1 - a); likewise B for b; K(a) may be absent,
+    its value from the first relation then in the second):
 
         A K(a) = (1 + k1) B K(b),
         E(a)/A = (1 + s) E(b)/B - s A K(a),
@@ -359,11 +363,16 @@ _ell_landen(gr_tower_flat_t F, slong dKa, slong dKb, slong dEa, slong dEb,
     dtop = -1;
     if (dKa >= 0 && dKb >= 0 && T->gens[FLINT_MAX(dKa, dKb)].kind != GR_TOWER_ALGEBRAIC)
         dtop = FLINT_MAX(dKa, dKb);
-    else if (dEa >= 0 && dEb >= 0 && dKa >= 0)
+    else if (dEa >= 0 && dEb >= 0 && (dKa >= 0 || dKb >= 0))
     {
+        /* (without K(a): K(a) = (1 + k1) B K(b) / A in the E relation) */
         dtop = FLINT_MAX(FLINT_MAX(dEa, dEb), dKa);
         useE = 1;
         if (T->gens[dtop].kind == GR_TOWER_ALGEBRAIC)
+            return 0;
+        /* (the expression must be free of the generators after dtop:
+           without K(a), K(b) enters it) */
+        if (dKa < 0 && dKb > dtop)
             return 0;
     }
     if (dtop < 0)
@@ -497,7 +506,17 @@ _ell_landen(gr_tower_flat_t F, slong dKa, slong dKb, slong dEa, slong dEb,
             fmpz_mpoly_q_init(Ka, F->mctx);
             fmpz_mpoly_q_gen(Ea, GR_TOWER_FLAT_VAR_D(F, dEa), F->mctx);
             fmpz_mpoly_q_gen(Eb, GR_TOWER_FLAT_VAR_D(F, dEb), F->mctx);
-            fmpz_mpoly_q_gen(Ka, GR_TOWER_FLAT_VAR_D(F, dKa), F->mctx);
+            if (dKa >= 0)
+                fmpz_mpoly_q_gen(Ka, GR_TOWER_FLAT_VAR_D(F, dKa), F->mctx);
+            else
+            {
+                /* K(a) = (1 + k1) B K(b) / A */
+                fmpz_mpoly_q_gen(Ka, GR_TOWER_FLAT_VAR_D(F, dKb), F->mctx);
+                fmpz_mpoly_q_add_si(x, k1, 1, F->mctx);
+                fmpz_mpoly_q_mul(Ka, Ka, x, F->mctx);
+                fmpz_mpoly_q_mul(Ka, Ka, B, F->mctx);
+                fmpz_mpoly_q_div(Ka, Ka, A, F->mctx);
+            }
             fmpz_mpoly_q_add_si(x, S, 1, F->mctx);       /* 1 + s */
             fmpz_mpoly_q_mul(y, S, A, F->mctx);          /* s A */
             if (dtop == dEa)
@@ -750,3 +769,5 @@ _gr_tower_elliptic_round(gr_tower_flat_t F, slong limit, slong depth)
 
     return changed;
 }
+
+POP_OPTIONS

@@ -18,6 +18,7 @@
 #include "gr_special.h"
 #include "gr_tower.h"
 #include "gr_tower_lazy.h"
+#include "acb_dirichlet.h"
 
 #define SP_PREC 128
 
@@ -155,6 +156,13 @@ _sp_check_equal(gr_srcptr a, gr_srcptr b, const char * what, gr_srcptr z, gr_ctx
         flint_abort();
     }
 }
+
+#define SP_FRESH_CTX(K) \
+    do { \
+        gr_ctx_clear(K); \
+        gr_ctx_init_tower_lazy(K, QQ, GR_TOWER_MERGE_EXPRESS); \
+        gr_tower_lazy_ctx_set_print(K, GR_TOWER_PRINT_NUMERIC | GR_TOWER_PRINT_SYMBOLIC | GR_TOWER_PRINT_DEFS, 10); \
+    } while (0)
 
 TEST_FUNCTION_START(gr_tower_special, state)
 {
@@ -391,6 +399,11 @@ TEST_FUNCTION_START(gr_tower_special, state)
         acb_clear(z);
         acb_clear(v);
         acb_clear(w);
+
+        /* (a fresh context now and then: the generators of all earlier
+           iterations would make the searches ever slower) */
+        if (iter % 10 == 9)
+            SP_FRESH_CTX(K);
     }
 
     if (total >= 8 && successes < total / 4)
@@ -490,6 +503,8 @@ skip_reflection:
         }
 
         GR_TMP_CLEAR5(z, a, b, c, d, K);
+        if (iter % 5 == 4)
+            SP_FRESH_CTX(K);
     }
 
     /* Gamma at rationals: Gauss's multiplication theorem holds exactly
@@ -1269,6 +1284,319 @@ skip_reflection:
         GR_MUST_SUCCEED(gr_polygamma(y, mm, x, K));
         GR_MUST_SUCCEED(gr_gamma(y, x, K));
         GR_TMP_CLEAR3(x, y, mm, K);
+    }
+
+    /* log Gamma, the multiplication theorem of digamma, the higher
+       polylogarithms (inversion, distribution, Li_3(1/2)) and the
+       five-term relation of the dilogarithm */
+    {
+        gr_ctx_t K2;
+        gr_ptr a, b, c, d, w, m;
+        acb_t r, t;
+        static const char * lg[4] = { "-5/2 + 3*i", "pi*i", "-7 + i/3", "-10/3" };
+        static const char * pl[4] = { "5/2", "-7/3", "2 + i", "(3 - 4*i)/5" };
+        slong k;
+
+        gr_ctx_init_tower_lazy(K2, QQ, GR_TOWER_MERGE_EXPRESS);
+        GR_TMP_INIT5(a, b, c, d, w, K2);
+        GR_TMP_INIT(m, K2);
+        acb_init(r);
+        acb_init(t);
+
+        /* lgamma against acb (the branch), lgamma(pi + 1) = lgamma(pi) + log(pi) */
+        for (k = 0; k < 4; k++)
+        {
+            GR_MUST_SUCCEED(gr_set_str(a, lg[k], K2));
+            GR_MUST_SUCCEED(gr_lgamma(b, a, K2));
+            GR_MUST_SUCCEED(gr_tower_lazy_get_acb(r, a, 128, K2));
+            acb_lgamma(r, r, 128);
+            GR_MUST_SUCCEED(gr_tower_lazy_get_acb(t, b, 128, K2));
+            if (!acb_overlaps(r, t))
+            {
+                flint_printf("FAIL: lgamma(%s)\n", lg[k]);
+                flint_abort();
+            }
+        }
+        GR_MUST_SUCCEED(gr_pi(a, K2));
+        GR_MUST_SUCCEED(gr_lgamma(b, a, K2));
+        GR_MUST_SUCCEED(gr_log(c, a, K2));
+        GR_MUST_SUCCEED(gr_add(b, b, c, K2));
+        GR_MUST_SUCCEED(gr_add_ui(a, a, 1, K2));
+        GR_MUST_SUCCEED(gr_lgamma(c, a, K2));
+        _sp_check_equal(b, c, "lgamma(pi + 1)", a, K2);
+
+        /* psi(3 pi) = (psi(pi) + psi(pi + 1/3) + psi(pi + 2/3))/3 + log(3) */
+        GR_MUST_SUCCEED(gr_pi(w, K2));
+        GR_MUST_SUCCEED(gr_zero(b, K2));
+        for (k = 0; k < 3; k++)
+        {
+            GR_MUST_SUCCEED(gr_set_si(a, k, K2));
+            GR_MUST_SUCCEED(gr_div_ui(a, a, 3, K2));
+            GR_MUST_SUCCEED(gr_add(a, a, w, K2));
+            GR_MUST_SUCCEED(gr_digamma(c, a, K2));
+            GR_MUST_SUCCEED(gr_add(b, b, c, K2));
+        }
+        GR_MUST_SUCCEED(gr_div_ui(b, b, 3, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "log(3)", K2));
+        GR_MUST_SUCCEED(gr_add(b, b, c, K2));
+        GR_MUST_SUCCEED(gr_mul_ui(a, w, 3, K2));
+        GR_MUST_SUCCEED(gr_digamma(c, a, K2));
+        _sp_check_equal(b, c, "psi(3 pi)", a, K2);
+
+        /* Li_s against acb (the inversion formula, also on the cut) */
+        for (k = 0; k < 4; k++)
+        {
+            slong ss;
+            for (ss = 3; ss <= 4; ss++)
+            {
+                GR_MUST_SUCCEED(gr_set_si(m, ss, K2));
+                GR_MUST_SUCCEED(gr_set_str(a, pl[k], K2));
+                GR_MUST_SUCCEED(gr_polylog(b, m, a, K2));
+                GR_MUST_SUCCEED(gr_tower_lazy_get_acb(r, a, 128, K2));
+                acb_polylog_si(r, ss, r, 128);
+                GR_MUST_SUCCEED(gr_tower_lazy_get_acb(t, b, 128, K2));
+                if (!acb_overlaps(r, t))
+                {
+                    flint_printf("FAIL: polylog(%wd, %s)\n", ss, pl[k]);
+                    flint_abort();
+                }
+            }
+        }
+
+        /* Li_3(1/2) = 7 zeta(3)/8 - pi^2 log(2)/12 + log(2)^3/6 */
+        GR_MUST_SUCCEED(gr_set_si(m, 3, K2));
+        GR_MUST_SUCCEED(gr_set_str(a, "1/2", K2));
+        GR_MUST_SUCCEED(gr_polylog(b, m, a, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "7*zeta(3)/8 - pi^2*log(2)/12 + log(2)^3/6", K2));
+        _sp_check_equal(b, c, "Li_3(1/2)", a, K2);
+
+        /* Li_4(1/9) = 8 (Li_4(1/3) + Li_4(-1/3)), Li_3(-3) - Li_3(-1/3) */
+        GR_MUST_SUCCEED(gr_set_si(m, 4, K2));
+        GR_MUST_SUCCEED(gr_set_str(a, "1/3", K2));
+        GR_MUST_SUCCEED(gr_polylog(b, m, a, K2));
+        GR_MUST_SUCCEED(gr_neg(a, a, K2));
+        GR_MUST_SUCCEED(gr_polylog(c, m, a, K2));
+        GR_MUST_SUCCEED(gr_add(b, b, c, K2));
+        GR_MUST_SUCCEED(gr_mul_ui(b, b, 8, K2));
+        GR_MUST_SUCCEED(gr_sqr(a, a, K2));
+        GR_MUST_SUCCEED(gr_polylog(c, m, a, K2));
+        _sp_check_equal(b, c, "Li_4(1/9)", a, K2);
+        GR_MUST_SUCCEED(gr_set_si(m, 3, K2));
+        GR_MUST_SUCCEED(gr_set_str(a, "-3", K2));
+        GR_MUST_SUCCEED(gr_polylog(b, m, a, K2));
+        GR_MUST_SUCCEED(gr_inv(a, a, K2));
+        GR_MUST_SUCCEED(gr_polylog(c, m, a, K2));
+        GR_MUST_SUCCEED(gr_sub(b, b, c, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "-pi^2*log(3)/6 - log(3)^3/6", K2));
+        _sp_check_equal(b, c, "Li_3(-3) - Li_3(-1/3)", a, K2);
+
+        /* Li_2(x) + Li_2(y) - Li_2(x y) - Li_2(x (1 - y)/(1 - x y)) - Li_2(y (1 - x)/(1 - x y))
+           = log((1 - x)/(1 - x y)) log((1 - y)/(1 - x y)), x = 1/3, y = sqrt(2) - 1 */
+        {
+            gr_ptr x, y, e;
+            GR_TMP_INIT3(x, y, e, K2);
+            GR_MUST_SUCCEED(gr_set_str(x, "1/3", K2));
+            GR_MUST_SUCCEED(gr_set_str(y, "sqrt(2) - 1", K2));
+            GR_MUST_SUCCEED(gr_mul(e, x, y, K2));
+            GR_MUST_SUCCEED(gr_sub_ui(e, e, 1, K2));
+            GR_MUST_SUCCEED(gr_neg(e, e, K2));                  /* 1 - x y */
+            GR_MUST_SUCCEED(gr_dilog(a, x, K2));
+            GR_MUST_SUCCEED(gr_dilog(b, y, K2));
+            GR_MUST_SUCCEED(gr_add(a, a, b, K2));
+            GR_MUST_SUCCEED(gr_mul(b, x, y, K2));
+            GR_MUST_SUCCEED(gr_dilog(b, b, K2));
+            GR_MUST_SUCCEED(gr_sub(a, a, b, K2));
+            GR_MUST_SUCCEED(gr_sub_ui(b, y, 1, K2));
+            GR_MUST_SUCCEED(gr_neg(b, b, K2));
+            GR_MUST_SUCCEED(gr_mul(b, b, x, K2));
+            GR_MUST_SUCCEED(gr_div(b, b, e, K2));
+            GR_MUST_SUCCEED(gr_dilog(b, b, K2));
+            GR_MUST_SUCCEED(gr_sub(a, a, b, K2));
+            GR_MUST_SUCCEED(gr_sub_ui(b, x, 1, K2));
+            GR_MUST_SUCCEED(gr_neg(b, b, K2));
+            GR_MUST_SUCCEED(gr_mul(b, b, y, K2));
+            GR_MUST_SUCCEED(gr_div(b, b, e, K2));
+            GR_MUST_SUCCEED(gr_dilog(b, b, K2));
+            GR_MUST_SUCCEED(gr_sub(a, a, b, K2));
+            GR_MUST_SUCCEED(gr_sub_ui(b, x, 1, K2));
+            GR_MUST_SUCCEED(gr_neg(b, b, K2));
+            GR_MUST_SUCCEED(gr_div(b, b, e, K2));
+            GR_MUST_SUCCEED(gr_log(b, b, K2));
+            GR_MUST_SUCCEED(gr_sub_ui(c, y, 1, K2));
+            GR_MUST_SUCCEED(gr_neg(c, c, K2));
+            GR_MUST_SUCCEED(gr_div(c, c, e, K2));
+            GR_MUST_SUCCEED(gr_log(c, c, K2));
+            GR_MUST_SUCCEED(gr_mul(b, b, c, K2));
+            _sp_check_equal(a, b, "five-term relation", x, K2);
+            GR_TMP_CLEAR3(x, y, e, K2);
+        }
+
+        GR_TMP_CLEAR5(a, b, c, d, w, K2);
+        GR_TMP_CLEAR(m, K2);
+        acb_clear(r);
+        acb_clear(t);
+        gr_ctx_clear(K2);
+    }
+
+    /* Dirichlet L-functions, Hurwitz zeta at non-integer s, Lerch */
+    {
+        gr_ctx_t K2;
+        gr_ptr a, b, c, s, z;
+        acb_t r, t;
+        dirichlet_group_t G;
+        dirichlet_char_t chi;
+        static const ulong qk[6][2] = { {4, 3}, {5, 2}, {7, 3}, {12, 5}, {15, 2}, {1, 1} };
+        static const char * ss[5] = { "2", "0", "1/3", "-1/2 + i", "1/2 - 2*i" };
+        slong i, j;
+
+        gr_ctx_init_tower_lazy(K2, QQ, GR_TOWER_MERGE_EXPRESS);
+        GR_TMP_INIT5(a, b, c, s, z, K2);
+        acb_init(r);
+        acb_init(t);
+
+        /* against acb */
+        for (i = 0; i < 6; i++)
+        {
+            dirichlet_group_init(G, qk[i][0]);
+            dirichlet_char_init(chi, G);
+            dirichlet_char_log(chi, G, qk[i][1]);
+            for (j = 0; j < 5; j++)
+            {
+                GR_MUST_SUCCEED(gr_set_str(s, ss[j], K2));
+                GR_MUST_SUCCEED(gr_dirichlet_l(a, G, chi, s, K2));
+                GR_MUST_SUCCEED(gr_tower_lazy_get_acb(r, s, 128, K2));
+                acb_dirichlet_l(r, r, G, chi, 128);
+                GR_MUST_SUCCEED(gr_tower_lazy_get_acb(t, a, 128, K2));
+                if (!acb_overlaps(r, t))
+                {
+                    flint_printf("FAIL: L(%s, chi_%wu(%wu))\n", ss[j], qk[i][0], qk[i][1]);
+                    flint_abort();
+                }
+            }
+            dirichlet_char_clear(chi);
+            dirichlet_group_clear(G);
+        }
+
+        /* L(1, chi_4(3)) = pi/4, L(2, chi_4(3)) = catalan */
+        dirichlet_group_init(G, 4);
+        dirichlet_char_init(chi, G);
+        dirichlet_char_log(chi, G, 3);
+        GR_MUST_SUCCEED(gr_set_ui(s, 1, K2));
+        GR_MUST_SUCCEED(gr_dirichlet_l(a, G, chi, s, K2));
+        GR_MUST_SUCCEED(gr_set_str(b, "pi/4", K2));
+        _sp_check_equal(a, b, "L(1, chi_4)", s, K2);
+        GR_MUST_SUCCEED(gr_set_ui(s, 2, K2));
+        GR_MUST_SUCCEED(gr_dirichlet_l(a, G, chi, s, K2));
+        GR_MUST_SUCCEED(gr_catalan(b, K2));
+        _sp_check_equal(a, b, "L(2, chi_4)", s, K2);
+        /* zeta(1/3, 1/4) - zeta(1/3, 3/4) = 4^(1/3) L(1/3, chi_4) */
+        GR_MUST_SUCCEED(gr_set_str(s, "1/3", K2));
+        GR_MUST_SUCCEED(gr_dirichlet_l(a, G, chi, s, K2));
+        GR_MUST_SUCCEED(gr_set_str(b, "4^(1/3)", K2));
+        GR_MUST_SUCCEED(gr_mul(a, a, b, K2));
+        GR_MUST_SUCCEED(gr_set_str(z, "1/4", K2));
+        GR_MUST_SUCCEED(gr_hurwitz_zeta(b, s, z, K2));
+        GR_MUST_SUCCEED(gr_set_str(z, "3/4", K2));
+        GR_MUST_SUCCEED(gr_hurwitz_zeta(c, s, z, K2));
+        GR_MUST_SUCCEED(gr_sub(b, b, c, K2));
+        _sp_check_equal(a, b, "zeta(1/3, 1/4) - zeta(1/3, 3/4)", s, K2);
+        dirichlet_char_clear(chi);
+        dirichlet_group_clear(G);
+
+        /* the functional equation: zeta(1/3) = 2^(1/3) pi^(-2/3) sin(pi/6) Gamma(2/3) zeta(2/3) */
+        GR_MUST_SUCCEED(gr_set_str(s, "1/3", K2));
+        GR_MUST_SUCCEED(gr_zeta(a, s, K2));
+        GR_MUST_SUCCEED(gr_set_str(s, "2/3", K2));
+        GR_MUST_SUCCEED(gr_zeta(b, s, K2));
+        GR_MUST_SUCCEED(gr_gamma(c, s, K2));
+        GR_MUST_SUCCEED(gr_mul(b, b, c, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "2^(1/3) * pi^(-2/3) / 2", K2));
+        GR_MUST_SUCCEED(gr_mul(b, b, c, K2));
+        _sp_check_equal(a, b, "zeta(1/3)", s, K2);
+
+        /* distribution: sum_{k<3} zeta(1/3, (1 + 3k)/9) = 3^(1/3) zeta(1/3, 1/3) */
+        GR_MUST_SUCCEED(gr_set_str(s, "1/3", K2));
+        GR_MUST_SUCCEED(gr_zero(a, K2));
+        for (i = 0; i < 3; i++)
+        {
+            GR_MUST_SUCCEED(gr_set_si(z, 1 + 3 * i, K2));
+            GR_MUST_SUCCEED(gr_div_ui(z, z, 9, K2));
+            GR_MUST_SUCCEED(gr_hurwitz_zeta(c, s, z, K2));
+            GR_MUST_SUCCEED(gr_add(a, a, c, K2));
+        }
+        GR_MUST_SUCCEED(gr_set_str(z, "1/3", K2));
+        GR_MUST_SUCCEED(gr_hurwitz_zeta(b, s, z, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "3^(1/3)", K2));
+        GR_MUST_SUCCEED(gr_mul(b, b, c, K2));
+        _sp_check_equal(a, b, "Hurwitz distribution at s = 1/3", s, K2);
+
+        /* irrational parameter: zeta(s, a) - zeta(s, a + 1) = a^(-s); Lerch at -1 */
+        GR_MUST_SUCCEED(gr_set_str(z, "sqrt(2)", K2));
+        GR_MUST_SUCCEED(gr_hurwitz_zeta(a, s, z, K2));
+        GR_MUST_SUCCEED(gr_add_ui(c, z, 1, K2));
+        GR_MUST_SUCCEED(gr_hurwitz_zeta(b, s, c, K2));
+        GR_MUST_SUCCEED(gr_sub(a, a, b, K2));
+        GR_MUST_SUCCEED(gr_neg(c, s, K2));
+        GR_MUST_SUCCEED(gr_pow(b, z, c, K2));
+        _sp_check_equal(a, b, "zeta(1/3, sqrt(2)) - zeta(1/3, sqrt(2) + 1)", s, K2);
+        GR_MUST_SUCCEED(gr_set_si(c, -1, K2));
+        GR_MUST_SUCCEED(gr_one(z, K2));
+        GR_MUST_SUCCEED(gr_lerch_phi(a, c, s, z, K2));
+        GR_MUST_SUCCEED(gr_zeta(b, s, K2));
+        GR_MUST_SUCCEED(gr_set_str(c, "1 - 2^(2/3)", K2));
+        GR_MUST_SUCCEED(gr_mul(b, b, c, K2));
+        _sp_check_equal(a, b, "Phi(-1, 1/3, 1)", s, K2);
+
+        GR_TMP_CLEAR5(a, b, c, s, z, K2);
+        acb_clear(r);
+        acb_clear(t);
+        gr_ctx_clear(K2);
+    }
+
+    /* limits: zeta(s, a) at an integer s beyond the exact range, without
+       recursion; L(1/3, chi) for a conductor above the bound of the
+       expansions */
+    {
+        gr_ctx_t K2;
+        gr_ptr a, s, x;
+        dirichlet_group_t G;
+        dirichlet_char_t chi;
+        int st;
+
+        gr_ctx_init_tower_lazy(K2, QQ, GR_TOWER_MERGE_EXPRESS);
+        GR_TMP_INIT3(a, s, x, K2);
+
+        GR_MUST_SUCCEED(gr_set_str(a, "1/3", K2));
+        GR_MUST_SUCCEED(gr_set_ui(s, 100001, K2));
+        st = gr_hurwitz_zeta(x, s, a, K2);
+        if (st != GR_UNABLE)
+        {
+            flint_printf("FAIL: zeta(100001, 1/3): %d\n", st);
+            flint_abort();
+        }
+        GR_MUST_SUCCEED(gr_set_str(s, "2^70", K2));
+        st = gr_hurwitz_zeta(x, s, a, K2);
+        if (st != GR_UNABLE)
+        {
+            flint_printf("FAIL: zeta(2^70, 1/3): %d\n", st);
+            flint_abort();
+        }
+
+        dirichlet_group_init(G, 251);
+        dirichlet_char_init(chi, G);
+        dirichlet_char_log(chi, G, 2);
+        GR_MUST_SUCCEED(gr_set_str(s, "1/3", K2));
+        st = gr_dirichlet_l(x, G, chi, s, K2);
+        if (st != GR_UNABLE)
+        {
+            flint_printf("FAIL: L(1/3, chi mod 251): %d\n", st);
+            flint_abort();
+        }
+        dirichlet_char_clear(chi);
+        dirichlet_group_clear(G);
+
+        GR_TMP_CLEAR3(a, s, x, K2);
+        gr_ctx_clear(K2);
     }
 
     gr_ctx_clear(K);

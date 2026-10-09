@@ -17,6 +17,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* Enclosures of the monomial basis elements of F_n over F_0, in the
    same order as gr_tower_get_coeffs_at. */
 static int
@@ -255,3 +258,5 @@ gr_tower_express_qqbar(gr_ptr res, const qqbar_t x, gr_tower_t T)
 
     return status;
 }
+
+POP_OPTIONS

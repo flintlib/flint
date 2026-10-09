@@ -68,10 +68,35 @@ extern "C" {
 #define GR_TOWER_TAN_PI 18            /* def_kind only: tan(pi / def_param), a real algebraic number (the tangent
                                          normal form of the real trigonometric constants) */
 
+#define GR_TOWER_HYPGEOM 19           /* pFq(a_1, ..., a_p; b_1, ..., b_q; arg) (not regularized): def_param =
+                                         GR_TOWER_HYPGEOM_PARAM(p, q), the parameters a, b are the
+                                         additional arguments xargs (in that order) */
+
+#define GR_TOWER_MODULAR_LAMBDA 20   /* lambda(arg) = theta_2^4 / theta_3^4 at tau = arg in the fundamental domain
+                                         (-1/2 < Re(tau) <= 1/2, |tau| > 1 or |tau| = 1, Re(tau) >= 0) */
+
+#define GR_TOWER_JACOBI_THETA 21     /* theta_j(arg, tau), j = def_param (1 or 4), tau the additional argument, for
+                                         tau in the fundamental domain and arg reduced (see lazy_modular.c) */
+
+#define GR_TOWER_DIRICHLET_L 22      /* L(arg, chi) for the primitive Dirichlet character chi = chi_q(k) (Conrey
+                                         label) of conductor q >= 3: def_param = GR_TOWER_DIRICHLET_PARAM(q, k) */
+
+#define GR_TOWER_HURWITZ_ZETA 23     /* zeta(arg, a), a the additional argument, for arg not an integer and
+                                         0 < Re(a) <= 1, a not rational (see lazy_dirichlet.c) */
+
+/* (q, k < 2^(FLINT_BITS / 2 - 1)) */
+#define GR_TOWER_DIRICHLET_PARAM(q, k) ((slong) (((ulong) (q) << (FLINT_BITS / 2)) | (ulong) (k)))
+#define GR_TOWER_DIRICHLET_Q(param) ((ulong) (param) >> (FLINT_BITS / 2))
+#define GR_TOWER_DIRICHLET_K(param) ((ulong) (param) & ((UWORD(1) << (FLINT_BITS / 2)) - 1))
+
+#define GR_TOWER_HYPGEOM_PARAM(p, q) (((slong) (p) << 16) | (slong) (q))
+#define GR_TOWER_HYPGEOM_P(param) ((slong) ((param) >> 16))
+#define GR_TOWER_HYPGEOM_Q(param) ((slong) ((param) & 0xffff))
+
 #define GR_TOWER_CONST_EULER 1        /* Euler's constant gamma */
 #define GR_TOWER_CONST_CATALAN 2      /* Catalan's constant G */
 
-#define GR_TOWER_KIND_IS_SPECIAL(kind) ((kind) >= GR_TOWER_GAMMA && (kind) <= GR_TOWER_CONSTANT)
+#define GR_TOWER_KIND_IS_SPECIAL(kind) (((kind) >= GR_TOWER_GAMMA && (kind) <= GR_TOWER_CONSTANT) || (kind) == GR_TOWER_HYPGEOM || (kind) == GR_TOWER_MODULAR_LAMBDA || (kind) == GR_TOWER_JACOBI_THETA || (kind) == GR_TOWER_DIRICHLET_L || (kind) == GR_TOWER_HURWITZ_ZETA)
 
 /* the transcendental kinds with an argument */
 #define GR_TOWER_KIND_HAS_ARG(kind) ((kind) == GR_TOWER_EXP || (kind) == GR_TOWER_LOG || (kind) == GR_TOWER_TAN || (kind) == GR_TOWER_ATAN || \
@@ -123,6 +148,8 @@ typedef struct
     slong index;                  /* k (algebraic) or j (transcendental), 1-based */
     gr_ctx_struct * ctx;          /* algebraic: F_k = F_{k-1}[x]/(m_k), owned */
     gr_tower_flat_elem_struct arg;    /* EXP/LOG/...: the argument, a flat element of the tower (arg.mctx NULL if none) */
+    slong num_xargs;              /* functions of several arguments: the number of arguments besides arg */
+    gr_tower_flat_elem_struct * xargs;  /* ... and those arguments (owned; NULL if none) */
     fmpz_poly_struct * origin;    /* an integer polynomial the generator is a root of (NULL if unknown); conjugate
                                      roots of one polynomial are recognized by it when towers are merged */
     acb_struct enclosure;
@@ -175,6 +202,8 @@ typedef struct
     int gc;                       /* lazy fields: GR_TOWER_GC_* flags */
     void * dense_fields;          /* lazy fields: descriptors of the dense forms of elements (_gr_tower_dense_field_struct), freed with F */
     ulong primitive_tried[2];     /* lazy fields: version + 1 and length of the tower when a primitive element was last sought (0: never) */
+    ulong rebase_key[2];          /* lazy fields: the number of rebase records + 1 and the version of the tower when rebase_pending was set */
+    int rebase_pending;           /* lazy fields: rebase records apply to the tower (applied when its elements meet) */
 }
 gr_tower_flat_struct;
 
@@ -286,6 +315,7 @@ enum
     GR_TOWER_OPT_SPLIT_DEGREE_LIMIT,        /* lazy fields: zero tests in towers of algebraic numbers beyond this degree split independent parts (0: never) */
     GR_TOWER_OPT_MINPOLY_DEGREE_LIMIT,      /* lazy fields: equality of split parts by the minimal polynomial of one of degree up to this */
     GR_TOWER_OPT_INV_DENSE_ALG,             /* dense inverses in fields of several generators: 0 automatic, 1 modular only, 2 linear algebra only (testing) */
+    GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT,  /* lazy fields: roots found in the field when the radicand is likely a power, up to this degree (0: never) */
     GR_TOWER_OPT_NUM_OPTIONS
 };
 
@@ -506,8 +536,22 @@ int gr_tower_adjoin_atan_flat(gr_tower_t T, const fmpz_mpoly_q_t u, const fmpz_m
 int gr_tower_adjoin_special(gr_tower_t T, int kind, slong param, gr_srcptr u, const char * name);
 int gr_tower_adjoin_special_flat(gr_tower_t T, int kind, slong param, const fmpz_mpoly_q_t u, const fmpz_mpoly_ctx_t mctx, const char * name);
 
+/*
+    The same for a function of several arguments u[0], ..., u[nargs - 1]
+    (flat elements; u[0] becomes the argument arg of the generator and the
+    others its additional arguments xargs): GR_TOWER_HYPGEOM with
+    u = (z, a_1, ..., a_p, b_1, ..., b_q). nargs must match the kind
+    (_gr_tower_special_num_args).
+*/
+int gr_tower_adjoin_special_multi_flat(gr_tower_t T, int kind, slong param, const fmpz_mpoly_q_struct * u, slong nargs, const fmpz_mpoly_ctx_t mctx, const char * name);
+
+/* The number of arguments of a special function generator (0 for named
+   constants, 1 + p + q for pFq). */
+slong _gr_tower_special_num_args(int kind, slong param);
+
 /* Enclosure of a special function value (kind and param as above). */
 int _gr_tower_special_eval(acb_t res, int kind, slong param, const acb_t u, slong prec);
+int _gr_tower_special_eval_multi(acb_t res, int kind, slong param, acb_srcptr u, slong nargs, slong prec);
 
 /* Writes the definition of a special function value, with the argument
    given as a string (ignored for constants). */
@@ -516,6 +560,7 @@ int _gr_tower_special_write(gr_stream_t out, int kind, slong param, const char *
 /* Whether the special function is real at the real point u (u with an
    exactly zero imaginary part), certainly. */
 int _gr_tower_special_real_at(int kind, slong param, const acb_t u, slong prec);
+int _gr_tower_special_real_at_multi(int kind, slong param, acb_srcptr u, slong nargs, slong prec);
 
 /* Index (1-based) of the transcendental generator with the given definition id, or 0. */
 slong gr_tower_find_trans_def(const gr_tower_t T, ulong def_id);

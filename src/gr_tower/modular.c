@@ -23,6 +23,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /*
     Modular irreducibility proofs.
 
@@ -214,6 +217,108 @@ _modulus_flat(gr_tower_flat_t F, slong j)
 }
 
 /*
+    Values of the transcendental generators are drawn again when a modulus
+    has no simple root at the place, up to this many times per place:
+    those first occurring in the moduli from the earliest step whose
+    modulus shares a generator with the failing one, the chain being
+    taken back to that step. (A radical X^n - a(t) has a root at the
+    place for about one value of t in n; with the radicals of t and 1 - t,
+    say, of several orders, a single random draw rarely gives a place of
+    degree one, and the proofs of absence of roots then fail.)
+*/
+#define PLACE_REDRAWS 48
+
+/* the transcendental generators occurring in the modulus of step j:
+   bit i - 1 of the mask for generator i (the first 64) */
+static ulong
+_modulus_trans_mask(gr_tower_flat_t F, slong j)
+{
+    gr_tower_struct * T = F->T;
+    const fmpz_mpoly_struct * m = _modulus_flat(F, j);
+    int * used;
+    slong i;
+    ulong mask = 0;
+
+    if (m == NULL)
+        return 0;
+    used = flint_calloc(F->mctx->minfo->nvars, sizeof(int));
+    fmpz_mpoly_used_vars(used, m, F->mctx);
+    for (i = 1; i <= T->num_trans && i <= FLINT_BITS; i++)
+        if (used[GR_TOWER_FLAT_TVAR(F, i)])
+            mask |= UWORD(1) << (i - 1);
+    flint_free(used);
+    return mask;
+}
+
+/* the chain of the place truncated to the steps below j */
+static void
+_place_truncate(place_struct * P, slong j, gr_tower_t T)
+{
+    slong s, e;
+    for (s = j; s <= P->k; s++)
+    {
+        if (P->pow[s - 1] != NULL)
+        {
+            for (e = 0; e < gr_tower_step_degree(T, s); e++)
+                fq_nmod_clear(P->pow[s - 1] + e, P->fqctx);
+            flint_free(P->pow[s - 1]);
+            P->pow[s - 1] = NULL;
+        }
+    }
+    P->k = FLINT_MIN(P->k, j - 1);
+}
+
+/*
+    After a failure at step j: the step from which to continue with new
+    values (0 if none can be drawn), the values redrawn.
+*/
+static slong
+_place_redraw(place_struct * P, slong j, slong k0, gr_tower_t T, flint_rand_t state)
+{
+    gr_tower_flat_struct * F = &T->flat;
+    ulong need, fresh;
+    slong i, s, start;
+
+    if (P->tval == NULL || T->num_trans > FLINT_BITS)
+        return 0;
+
+    need = _modulus_trans_mask(F, j);
+    if (need == 0)
+        return 0;
+
+    /* the earliest step after k0 whose modulus involves one of them;
+       none at or below k0 (those values are fixed) */
+    for (s = 1; s <= k0; s++)
+        if (_modulus_trans_mask(F, s) & need)
+            return 0;
+    start = j;
+    for (s = k0 + 1; s < j; s++)
+    {
+        if (_modulus_trans_mask(F, s) & need)
+        {
+            start = s;
+            break;
+        }
+    }
+
+    /* the generators first occurring from that step on (not below) */
+    fresh = 0;
+    for (s = start; s <= j; s++)
+        fresh |= _modulus_trans_mask(F, s);
+    for (s = 1; s < start; s++)
+        fresh &= ~_modulus_trans_mask(F, s);
+    if (fresh == 0)
+        return 0;
+
+    for (i = 1; i <= T->num_trans && i <= FLINT_BITS; i++)
+        if (fresh & (UWORD(1) << (i - 1)))
+            fq_nmod_set_ui(P->tval + i - 1, n_randint(state, P->l), P->fqctx);
+
+    _place_truncate(P, start, T);
+    return start;
+}
+
+/*
     Extends the chain of roots of the place to the steps up to k, choosing
     a random simple root of each modulus (when there are several, a
     different chain gives a different place). Returns 1 on success.
@@ -222,7 +327,7 @@ static int
 _place_extend(place_struct * P, slong k, gr_tower_t T, flint_rand_t state)
 {
     gr_tower_flat_struct * F = &T->flat;
-    slong j;
+    slong j, k0 = P->k, redraws = (P->tval != NULL && P->m == 1) ? PLACE_REDRAWS : 0;
     int ok = 1;
 
     for (j = P->k + 1; j <= k && ok; j++)
@@ -308,6 +413,18 @@ _place_extend(place_struct * P, slong k, gr_tower_t T, flint_rand_t state)
         }
 
         fq_nmod_poly_clear(f, P->fqctx);
+
+        /* new values for the transcendental generators of this modulus */
+        if (!ok && redraws > 0)
+        {
+            slong start = _place_redraw(P, j, k0, T, state);
+            redraws--;
+            if (start > 0)
+            {
+                ok = 1;
+                j = start - 1;   /* (continue at start) */
+            }
+        }
     }
 
     return ok;
@@ -398,11 +515,8 @@ _residue_degrees(gr_tower_t T, ulong l)
 static int
 _modular_applicable(gr_tower_t T)
 {
-    /* with transcendental generators, the places are places of the
-       algebraic subtower: a modulus or element involving a
-       transcendental variable fails to evaluate (and the tower, being
-       purely transcendental over the algebraic subtower, does not
-       change irreducibility over it) */
+    /* (with transcendental generators, the places give them random
+       values: see _place_iter_next) */
     return GR_TOWER_HAS_CAP(T, GR_TOWER_CAP_PLACES);
 }
 
@@ -758,17 +872,18 @@ gr_tower_prove_modular(gr_tower_t T, slong tries)
     return all;
 }
 
-/* phi(a)^((q-1)/p) != 1 for phi(a) != 0, where p | q - 1: a is not a p-th
-   power in the residue field */
+/* for phi(a) != 0 and p | q - 1: 1 if a is not a p-th power in the
+   residue field (phi(a)^((q-1)/p) != 1), 0 if it is; -1 when the place
+   says nothing (a zero, or p not dividing q - 1) */
 static int
-_not_pth_power(const fq_nmod_t a, ulong p, const place_struct * P)
+_pth_power_test(const fq_nmod_t a, ulong p, const place_struct * P)
 {
     fmpz_t e;
     fq_nmod_t t;
     int res;
 
     if (fq_nmod_is_zero(a, P->fqctx))
-        return 0;
+        return -1;
 
     fmpz_init(e);
     fmpz_set_ui(e, P->l);
@@ -777,7 +892,7 @@ _not_pth_power(const fq_nmod_t a, ulong p, const place_struct * P)
     if (!fmpz_divisible_ui(e, p))
     {
         fmpz_clear(e);
-        return 0;
+        return -1;
     }
     fmpz_divexact_ui(e, e, p);
     fq_nmod_init(t, P->fqctx);
@@ -789,21 +904,30 @@ _not_pth_power(const fq_nmod_t a, ulong p, const place_struct * P)
 }
 
 /*
-    Proves that X^n - a is irreducible over the field of the tower, for
-    the element a given in the flat representation, by Capelli's theorem
-    with the modular test of p-th powers. Returns 1 on success.
+    Places at which a p-th power test which does not settle (a p-th
+    power at every informative place: p | q - 1, a a unit) must have been
+    informative before a is taken to be a p-th power (an element which is
+    not one is a p-th power at about one informative place in p, a
+    square at one in two), and the extra places tried for that.
 */
-int
-gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, const fmpz_mpoly_ctx_t actx, ulong n, slong tries)
+#define POWER_EVIDENCE 8
+#define POWER_EVIDENCE_TRIES 8
+
+static int
+_binomial_modular(gr_tower_t T, const fmpz_mpoly_q_t a, const fmpz_mpoly_ctx_t actx, ulong n, slong tries, ulong * power_prime)
 {
     gr_tower_flat_struct * F = &T->flat;
     fmpz_mpoly_q_t x;
     n_factor_t fac;
-    slong i, num_conditions, done;
+    slong i, num_conditions, done, phase;
     int * settled;
+    slong * informative;
     flint_rand_t state;
     int res = 0;
     ulong prog_L;
+
+    if (power_prime != NULL)
+        *power_prime = 0;
 
     if (n <= 1 || !_modular_applicable(T))
         return n == 1;
@@ -832,9 +956,8 @@ gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, cons
     n_factor(&fac, n, 1);
     num_conditions = fac.num + ((n % 4 == 0) ? 1 : 0);
     settled = flint_calloc(num_conditions, sizeof(int));
+    informative = flint_calloc(fac.num, sizeof(slong));
     done = 0;
-
-    _seed(state, T, T->length, (slong) n);
 
     /* every other attempt uses a prime l = 1 mod L, with L the lcm of n
        and of the orders of the roots of unity of the tower: the
@@ -844,14 +967,34 @@ gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, cons
        over Q(zeta_53)) */
     prog_L = _progression_modulus(T, T->length, n);
 
+    /* phase 0: the proof; phase 1 (power_prime wanted, a test not
+       settled, and its informative places too few): more places, until
+       the tests settle or are informative at POWER_EVIDENCE places */
+    for (phase = 0; phase < 2; phase++)
     {
         place_iter_struct it;
         place_struct P;
-        _place_iter_init(&it, T, T->length, prog_L, tries, state);
+
+        if (phase == 1)
+        {
+            int more = 0;
+            if (power_prime == NULL || done == num_conditions)
+                break;
+            for (i = 0; i < fac.num; i++)
+                if (!settled[i] && informative[i] < POWER_EVIDENCE)
+                    more = 1;
+            if (!more)
+                break;
+        }
+
+        _seed(state, T, T->length, (slong) n + 7919 * phase);
+        _place_iter_init(&it, T, T->length, prog_L, (phase == 0) ? tries : POWER_EVIDENCE_TRIES, state);
+
         while (done < num_conditions && _place_iter_next(&P, &it))
         {
             fq_nmod_poly_t num, den;
             fq_nmod_t va, t;
+            int enough = (phase == 1);
 
             fq_nmod_poly_init(num, P.fqctx);
             fq_nmod_poly_init(den, P.fqctx);
@@ -869,8 +1012,16 @@ gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, cons
                 fq_nmod_mul(va, va, t, P.fqctx);
 
                 for (i = 0; i < fac.num; i++)
-                    if (!settled[i] && _not_pth_power(va, fac.p[i], &P))
+                {
+                    int r;
+                    if (settled[i])
+                        continue;
+                    r = _pth_power_test(va, fac.p[i], &P);
+                    if (r == 1)
                         settled[i] = 1, done++;
+                    else if (r == 0)
+                        informative[i]++;
+                }
 
                 if (n % 4 == 0 && !settled[fac.num] && P.l != 2)
                 {
@@ -879,25 +1030,64 @@ gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, cons
                     fq_nmod_inv(t, t, P.fqctx);
                     fq_nmod_mul(t, t, va, P.fqctx);
                     fq_nmod_neg(t, t, P.fqctx);
-                    if (_not_pth_power(t, 4, &P))
+                    if (_pth_power_test(t, 4, &P) == 1)
                         settled[fac.num] = 1, done++;
                 }
             }
+
+            for (i = 0; i < fac.num && enough; i++)
+                if (!settled[i] && informative[i] < POWER_EVIDENCE)
+                    enough = 0;
 
             fq_nmod_clear(va, P.fqctx);
             fq_nmod_clear(t, P.fqctx);
             fq_nmod_poly_clear(num, P.fqctx);
             fq_nmod_poly_clear(den, P.fqctx);
             _place_clear(&P, T->length, T);
+
+            if (enough)
+                break;
         }
+
+        flint_rand_clear(state);
     }
 
     res = (done == num_conditions);
 
-    flint_rand_clear(state);
+    /* the smallest prime p | n of a test which did not settle, with
+       enough informative places */
+    if (!res && power_prime != NULL)
+        for (i = 0; i < fac.num && *power_prime == 0; i++)
+            if (!settled[i] && informative[i] >= POWER_EVIDENCE)
+                *power_prime = fac.p[i];
+
     flint_free(settled);
+    flint_free(informative);
     fmpz_mpoly_q_clear(x, F->mctx);
     return res;
+}
+
+/*
+    Proves that X^n - a is irreducible over the field of the tower, for
+    the element a given in the flat representation, by Capelli's theorem
+    with the modular test of p-th powers. Returns 1 on success.
+*/
+int
+gr_tower_binomial_irreducible_modular(gr_tower_t T, const fmpz_mpoly_q_t a, const fmpz_mpoly_ctx_t actx, ulong n, slong tries)
+{
+    return _binomial_modular(T, a, actx, n, tries, NULL);
+}
+
+/*
+    The same, and when it fails, the smallest prime p | n such that a is
+    a p-th power at all of many informative places (*power_prime = 0 if
+    none): then a is likely a p-th power in K (a heuristic, to be
+    confirmed by finding the root).
+*/
+int
+_gr_tower_binomial_modular_evidence(gr_tower_t T, const fmpz_mpoly_q_t a, const fmpz_mpoly_ctx_t actx, ulong n, slong tries, ulong * power_prime)
+{
+    return _binomial_modular(T, a, actx, n, tries, power_prime);
 }
 
 /*
@@ -1021,3 +1211,5 @@ gr_tower_poly_no_roots_modular(const gr_poly_t g, gr_tower_t T, slong tries)
     flint_free(c);
     return res;
 }
+
+POP_OPTIONS

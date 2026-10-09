@@ -18,6 +18,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /*
     Trager's method: the norm N(M) of a polynomial M over the field
     F_{k-1} of a tower over QQ is the iterated resultant of M with the
@@ -166,3 +169,5 @@ gr_tower_prove_step_trager(gr_tower_t T, slong k, slong degree_limit)
     gr_ctx_clear(pctx);
     return result;
 }
+
+POP_OPTIONS

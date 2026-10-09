@@ -165,6 +165,28 @@ typedef struct
 }
 gr_tower_lazy_qqbar_entry_struct;
 
+struct gr_tower_lazy_ctx_struct_tag;
+
+/* A definition found to be a rational function of later definitions
+   (lazy_merge.c): wherever elements involving the generator def_id and
+   one of the generators trigger[0], trigger[1] (0: none) meet, the
+   generator def_id becomes the value in their tower (a linear modulus),
+   the generators of the value being moved before it. */
+typedef struct
+{
+    ulong def_id;
+    ulong trigger[2];
+    gr_tower_lazy_elem_struct value;
+    int have_value;     /* (0: computed by fn(value, data, ctx) on first use) */
+    int (*fn)(gr_ptr, void *, gr_ctx_t);
+    void * data;
+    void (*data_clear)(void *, struct gr_tower_lazy_ctx_struct_tag *);
+    /* (adds delta to the reference counts of the towers of the elements
+       the data holds, by _gr_tower_lazy_ref_adjust: NULL if none) */
+    void (*data_refs)(void *, slong delta);
+}
+gr_tower_lazy_rebase_struct;
+
 /* The canonical root of unity of order q = l^e for a prime l (p = 0),
    or the principal q-th root of the positive integer p: the generator
    of a tower of its own (avoiding the construction of the algebraic
@@ -186,13 +208,15 @@ typedef struct
     slong param;                    /* parameter of a special function (def_param) */
     fmpq x;
     fmpq y;                         /* imaginary part of the argument (log of a Gaussian rational) */
+    slong nxs;                      /* functions of several arguments: the other (rational) arguments */
+    fmpq * xs;
     gr_tower_flat_struct * F;
     slong gid;                      /* the generator in F */
     ulong def_id;                   /* its definition id (the same generator in other towers) */
 }
 gr_tower_lazy_const_trans_entry_struct;
 
-typedef struct
+typedef struct gr_tower_lazy_ctx_struct_tag
 {
     gr_ctx_struct * base;
     gr_tower_flat_struct * trivial;
@@ -209,6 +233,11 @@ typedef struct
     gr_tower_lazy_alias_struct * aliases;
     slong num_aliases;
     slong alloc_aliases;
+    gr_tower_lazy_rebase_struct * rebases;
+    slong num_rebases;
+    slong alloc_rebases;
+    ulong rebase_serial; /* (changed whenever the records change: the key of the caches of _rebase_pending) */
+    int rebasing;        /* (a rebase in progress: the merges inside it do not start another) */
     gr_tower_lazy_qqbar_entry_struct * qqbars;
     slong num_qqbars;
     slong alloc_qqbars;
@@ -224,11 +253,51 @@ typedef struct
     slong options[GR_TOWER_OPT_NUM_OPTIONS];   /* GR_TOWER_OPT_*, shared by the towers of the context */
     slong depth;         /* nesting of operations in progress (the subfield restrictions apply to the outermost) */
     int conj_depth;      /* nesting of conjugations in progress */
+    int hyp_anchored;    /* nesting of the linking steps (Landen, quadratic transformations) in progress */
+    struct gr_tower_lazy_theta_point_struct * theta_pts;   /* the points of the theta functions of z (lazy_modular.c) */
+    slong num_theta_pts;
+    slong alloc_theta_pts;
+    struct gr_tower_lazy_mod_point_struct * mod_pts;   /* the values at the reduced points tau0 (lazy_modular.c) */
+    slong num_mod_pts;
+    slong alloc_mod_pts;
+    ulong cache_clock;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;   /* recursive: every operation on the context holds it */
 #endif
 }
 gr_tower_lazy_ctx_struct;
+
+/* a point of the theta functions of z and the method of its evaluation
+   (lazy_modular.c) */
+typedef struct gr_tower_lazy_theta_point_struct
+{
+    gr_tower_lazy_elem_struct tau0;
+    gr_tower_lazy_elem_struct z0;
+    int kind;
+    slong i, j, l;
+    slong n, dv;
+    int s, s2;
+    int have_vals;
+    gr_tower_lazy_elem_struct vals[4];
+    ulong stamp;
+    int pinned;     /* the values are in use: not evicted */
+}
+gr_tower_lazy_theta_point_struct;
+
+/* the values at a reduced point tau0 (lazy_modular.c): for the ratios
+   (0, 1) theta_2, theta_3, theta_4, lambda, E_2 */
+typedef struct gr_tower_lazy_mod_point_struct
+{
+    gr_tower_lazy_elem_struct tau0;
+    int have[2][5];
+    gr_tower_lazy_elem_struct v[2][5];
+    int anchor;                         /* 0: not chosen, 1: the anchor tau1, gam; 2: a new generator to be linked to it, 3: linked; -1: none */
+    ulong root;                         /* the definition of the generator lambda the values come from (0: none, or not known) */
+    ulong stamp;                        /* the last use (the values of the least recently used points are dropped) */
+    gr_tower_lazy_elem_struct tau1;
+    fmpz gam[4];
+}
+gr_tower_lazy_mod_point_struct;
 
 /*
     The context data: the shared state (towers, registry, names, lock)
@@ -253,6 +322,11 @@ gr_tower_lazy_view_struct;
    the generators the element involves was tried and is slower, since
    the relations with the skipped generators are then rediscovered) */
 #define LAZY_FORK_SUFFIX 4
+
+/* the same for the roots of an element (_gr_tower_lazy_root_ui), with a
+   longer suffix: roots are found among the later generators of the
+   tower, which a copy of the prefix would have to rediscover */
+#define LAZY_ROOT_FORK_SUFFIX 12
 
 #define TOWER(x) ((x)->F->T)
 
@@ -337,7 +411,14 @@ _gr_tower_lazy_ref(gr_tower_flat_struct * F);
 void
 _gr_tower_lazy_unref(gr_tower_lazy_ctx_struct * L, gr_tower_flat_struct * F);
 void
+_gr_tower_lazy_ref_adjust(gr_tower_flat_struct * F, slong delta);
+void
 _gr_tower_lazy_new_def(gr_tower_gen_struct * g, gr_tower_t T, gr_ctx_t ctx);
+ulong
+_gr_tower_lazy_find_def(char ** name, int kind, slong param, const gr_tower_lazy_elem_struct * args, slong n,
+    const gr_tower_struct * skip, gr_ctx_t ctx);
+void
+_gr_tower_lazy_set_def(gr_tower_gen_struct * g, gr_tower_t T, ulong def_id, const char * name, gr_ctx_t ctx);
 void
 _gr_tower_lazy_init(gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 void
@@ -434,6 +515,21 @@ void
 _gr_tower_lazy_install(gr_tower_lazy_elem_t res, gr_tower_flat_struct * U, fmpz_mpoly_q_t r, gr_ctx_t ctx);
 void
 _gr_tower_lazy_prefix_copy(gr_tower_lazy_elem_t res, gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+
+/* rebasing (lazy_merge.c): records that the generator of definition
+   def_id equals value (a rational function of generators defined later),
+   to be applied in the towers containing it and the generator trigger
+   or trigger2 (0: none), when elements of a tower involving the
+   definition and a trigger meet (_gr_tower_lazy_rebase_check) */
+void _gr_tower_lazy_rebase_add(ulong def_id, ulong trigger, ulong trigger2, const gr_tower_lazy_elem_t value, gr_ctx_t ctx);
+/* (the same with the value computed by fn(res, data, ctx) when first
+   needed: a tower contains the definition and a trigger; data is
+   cleared by data_clear(data, L), and the record ignored if fn fails) */
+void _gr_tower_lazy_rebase_add_lazy(ulong def_id, ulong trigger, int (*fn)(gr_ptr, void *, gr_ctx_t), void * data, void (*data_clear)(void *, struct gr_tower_lazy_ctx_struct_tag *), void (*data_refs)(void *, slong), gr_ctx_t ctx);
+void _gr_tower_lazy_rebase_clear(gr_tower_lazy_rebase_struct * r, gr_ctx_t ctx);
+void _gr_tower_lazy_rebase_tower(gr_tower_flat_struct * F, gr_ctx_t ctx);
+int _gr_tower_lazy_rebase_check(gr_tower_flat_struct * F, const fmpz_mpoly_q_struct * x, slong n, gr_ctx_t ctx);
+ulong _gr_tower_lazy_gen_def_of(const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int
 _gr_tower_lazy_mul(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, const gr_tower_lazy_elem_t y, gr_ctx_t ctx);
 int
@@ -498,6 +594,8 @@ _gr_tower_lazy_sqrt(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
 /* lazy_roots.c */
 int
 _gr_tower_lazy_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
+int
+_gr_tower_lazy_poly_root_near(gr_tower_lazy_elem_t res, const gr_poly_t f, const acb_t ref, int pm, gr_ctx_t ctx);
 
 /* lazy_dense.c */
 int

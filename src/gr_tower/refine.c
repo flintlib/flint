@@ -14,6 +14,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /*
     Given a monic factor g of the minimal polynomial m_k, decides
     numerically which of g and m_k / g vanishes at the enclosure of a_k,
@@ -391,3 +394,5 @@ gr_tower_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_tower_t T)
 {
     return gr_tower_div_at(res, x, y, T->length, T);
 }
+
+POP_OPTIONS

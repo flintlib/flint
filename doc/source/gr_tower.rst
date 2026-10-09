@@ -108,6 +108,35 @@ of the primitive argument `u^* = u_j / (c_g / \gcd(c_g, c_j))` is
 adjoined as a new generator, inserted before both, of which both become
 powers (linear moduli), so that the degree of the tower does not grow.
 
+*Torsion.* Arguments with rational parts in `\pi i`, `u_j = y_j + r_j \pi
+i` (`r_j` the constant term of the coefficient of `\pi` divided by `i`),
+lead to relations `\sum c_j u_j + c_k 2 \pi i = 0` which are resolved
+modulo the roots of unity: when `\sum c_j r_j + 2 c_k = 0`, the
+exponentials become `\exp(y_j) \exp(r_j \pi i)` with a root of unity of
+order `\operatorname{lcm}(2 \operatorname{den}(r_j))` (first in the tower,
+the root of unity generators already present becoming its powers): for
+two exponentials directly through the primitive argument `y^*` as above,
+for several by new exponentials `\exp(y_j)`, related by the next search
+without roots of unity. Thus `\exp((16 + 30 \pi i)/225)` and `\exp((5 + 42
+\pi i)/60)` are expressed through `\exp(1/900)` and `\zeta_{60}` (degree
+16), not through a radical of degree 375 over a root of unity of order
+125. This is done when the root of unity is present, or when its degree
+is smaller than that of the radical it replaces. When the rational part
+is hidden (`\pi` in a denominator of the argument, as in the
+transformation factors of the theta functions), a relation
+`c_g u_g + \sum c_j u_j + k \cdot 2\pi i = 0` in which `c_g` divides the
+`c_j` still gives a modulus of degree one when `\exp(-2\pi i k/c_g)` is
+`\pm 1` or `\pm i` with `i` present: `\exp(u + \pi i/2) = i \exp(u)`
+rather than a root of the reducible `X^2 + \exp(u)^2`.
+
+A generator for a definition (a function and its arguments) which is not
+in the tower of the arguments is first looked for in the other towers of
+the context (by enclosures, then exact comparison of the arguments), and
+takes over the definition id of one found there, so that merges identify
+the two (a value cached with an element of an older tower, or adjoined to
+a copy of a prefix, would otherwise give a second, unrelated generator
+for the same value).
+
 The trigonometric generators enter through their *angles*: `A = 2u`
 for `\tan(u)` and `A = 2 \arctan(u)`, whose points on the unit circle
 `(\cos A, \sin A) = ((1 - q^2)/(1 + q^2), 2q/(1 + q^2))` (with
@@ -221,7 +250,9 @@ identify:
   the latest generator involved, which becomes algebraic of degree one
   over the others, `\pi`, roots of integers (of prime power orders, as
   in the lazy layer, or Gauss sums for square roots) and of `\pi`, and
-  roots of products of sines (written through `e^{\pi i/N}`).
+  roots of products of sines (written through `e^{\pi i/N}`). The
+  relation is made an integral combination of the distribution relations
+  through a Hermite normal form at the level, cached per thread.
 * `\psi^{(m)}(p/q)` (`m \ge 1`) and `\zeta(s, p/q) = (-1)^s \psi^{(s-1)}(p/q) / (s-1)!`
   at rationals with denominator `q \le 240`: the additive analogue of
   the gamma normal form. The values `x_k = \zeta(s, k/q)`,
@@ -257,6 +288,17 @@ identify:
   `i (Y + 1)(1 + Y + \cdots + Y^{r-1}) / (Y^r - 1)` with
   `Y = e^{2\pi i (a w + c)}`, so that
   `\psi'(\sqrt 2) + \psi'(\sqrt 2 + 1/2) = 4 \psi'(2 \sqrt 2)` is decided.
+  The digamma function takes part with `s = 1` (`-\psi` in place of
+  `\zeta(1, z)`, `P_0(x) = x`), its multiplication theorem
+  `\sum_{j<n} \psi(z + j/n) = n \psi(nz) - n \log n` contributing the
+  logarithms of the primes: `\psi(2\sqrt 2) = (\psi(\sqrt 2) +
+  \psi(\sqrt 2 + 1/2))/2 + \log 2`.
+* `\log \Gamma(z)` (``lgamma``, the analytic continuation from the
+  positive reals with the cut on the negative reals, as
+  :func:`acb_lgamma`) is `\log(\Gamma(z)) + 2\pi i k`, the integer `k`
+  determined numerically: the relations of `\log \Gamma` follow from
+  those of `\Gamma` and the structure of the logarithms
+  (`\log\Gamma(\pi + 1) = \log\Gamma(\pi) + \log \pi`).
 * `\Gamma` at irrational arguments on a common rational line
   `a w + b` (`a, b` rational: `\Gamma(\sqrt 2)`, `\Gamma(\sqrt 2 + 1/2)`,
   `\Gamma(2 \sqrt 2)`): the zero test finds the line (an integer relation
@@ -265,12 +307,59 @@ identify:
   of the others, `\pi`, `\exp(\pi i w)`, `\exp(w \log p)` (from
   `n^{n z}`), roots and linear factors `a w + c`. The result is checked
   numerically, since the logarithmic relations hold modulo `2 \pi i`.
+  Since `\Gamma(a w + b)` is, by these relations, a constant times the
+  product of the `\Gamma(w + r)` for `r` in `\{(b + i)/a \bmod 1\}`
+  (likewise for the Hurwitz zeta function, with a sum), values each of
+  whose sets of residues has an element of its own (as two values from
+  unrelated computations which happen to lie on a line) have no
+  relation, and the linear algebra is skipped.
 * `\operatorname{erf}`: odd, so the argument has `\operatorname{Re}(z) > 0`;
   on the imaginary axis `\operatorname{erf}(iy) = i \operatorname{erfi}(y)`
   with a real generator; `\operatorname{erfc}(z) = 1 - \operatorname{erf}(z)`
   and `\operatorname{erfi}(z) = -i \operatorname{erf}(iz)`.
 * `\zeta(n)` at integers: Bernoulli numbers (rational multiples of
   `\pi^n` for even `n`); `\zeta(3), \zeta(5), \ldots` are generators.
+  At other `s`, the functional equation
+  `\zeta(s) = \pi^{s - 1/2} \Gamma((1-s)/2) / \Gamma(s/2)\, \zeta(1-s)`
+  gives the canonical half `\operatorname{Re}(s) > 1/2` (or
+  `\operatorname{Re}(s) = 1/2`, `\operatorname{Im}(s) \ge 0`): `\zeta(1/3)`
+  is expressed through `\zeta(2/3)`.
+* Dirichlet `L`-functions (:func:`gr_dirichlet_l`): `L(s, \chi) =
+  L(s, \chi^*) \prod_{p \mid q} (1 - \chi^*(p) p^{-s})` for the primitive
+  character `\chi^*` of conductor `f` inducing `\chi` mod `q`. At
+  integers, `L(s, \chi^*) = f^{-s} \sum_{a \le f} \chi^*(a) \zeta(s, a/f)` in
+  the Hurwitz normal form (`-(1/f) \sum \chi^*(a) \psi(a/f)` at `s = 1`,
+  Bernoulli polynomials at `s \le 0`), so that `L(1, \chi_{-4}) = \pi/4`
+  and `L(2, \chi_{-4}) = G`. Otherwise the functional equation
+  `L(s, \chi) = \varepsilon(\chi) (f/\pi)^{1/2 - s}
+  \frac{\Gamma((1 - s + a)/2)}{\Gamma((s + a)/2)} L(1 - s, \bar\chi)`
+  (`\varepsilon(\chi) = \tau(\chi)/(i^a \sqrt f)` with the Gauss sum
+  `\tau(\chi)` written through roots of unity, `a` the parity; conductors
+  `f \le 240`, otherwise ``GR_UNABLE`` at the other half) gives the
+  canonical half as for `\zeta` (at `s = 1/2`, the smaller Conrey label
+  of `\chi`, `\bar\chi`), where `L(s, \chi^*)` is a generator of kind
+  ``GR_TOWER_DIRICHLET_L`` (printed as ``dirichlet_l(chi(f, k), s)``);
+  its conjugate is `L(\bar s, \bar\chi)`.
+* `\zeta(s, a)` for `s` not an integer `\ge 2` (those are polygamma
+  values): `-B_{1-s}(a)/(1-s)` at integers `s \le 0` (the continuation
+  in `a`, also at the nonpositive integers `a`, as
+  :func:`acb_hurwitz_zeta` at `a = 0`; ``GR_DOMAIN`` there for the other
+  `s`, a term `(a + k)^{-s}` being infinite); at rational `a`
+  (shifted into `(0, 1]`, denominators `q \le 240`) the character sum
+  `\zeta(s, p/q) = \frac{q^s}{\varphi(q)} \sum_{\chi \bmod q} \bar\chi(p) L(s, \chi)`,
+  so that the distribution relations
+  `\sum_{j<m} \zeta(s, (a + j)/m) = m^s \zeta(s, a)` and the relations
+  with `L`-functions and `\zeta(s)` hold by construction; at irrational
+  `a` a generator of kind ``GR_TOWER_HURWITZ_ZETA`` (two arguments) at
+  the shift with `0 < \operatorname{Re}(a) \le 1` (with the terms
+  `(a + k)^{-s}`, principal powers). The multiplication relations on
+  rational lines `a w + b` are not used at non-integer `s`.
+* The Lerch transcendent `\Phi(z, s, a) = \sum_n z^n (n + a)^{-s}`
+  (:func:`gr_lerch_phi`): `\zeta(s, a)` at `z = 1`,
+  `v^{-s} \sum_{k<v} z^k \zeta(s, (a + k)/v)` at the roots of unity `z`
+  of order `v \le 240`, `\operatorname{Li}_s(z)/z` at `a = 1` with an
+  integer `s`; and `\operatorname{Li}_s(z) = z \Phi(z, s, 1)` at the roots
+  of unity for non-integer `s`.
 * `\operatorname{Li}_s(z)`: rational functions for `s \le 0`,
   `-\log(1 - z)` for `s = 1`, zeta values at `z = \pm 1`,
   `\operatorname{Li}_2(1/2) = \pi^2/12 - \log^2(2)/2`; at a root of unity
@@ -296,16 +385,39 @@ identify:
   linearly in the relation after the eliminated ones are substituted. A
   rational value without a generator is adjoined at its canonical point
   when its height is smaller than that of the generator to eliminate
-  (which bounds the process).
-* `K(m)`, `E(m)`: `K(0) = E(0) = \pi/2`, `E(1) = 1`,
-  `K(1/2) = \Gamma(1/4)^2 / (4 \sqrt{\pi})` (and `E(1/2)` by Legendre's
-  relation); the singular values `m = k_r^2` for `r = 2, 3, 4` and their
-  complements (Chowla-Selberg: `K` through `\Gamma` at rationals and
-  `\pi`, `E` through the elliptic alpha function); and the
-  imaginary-modulus transformation
-  `K(m) = K(m/(m-1))/\sqrt{1-m}`, `E(m) = \sqrt{1-m}\, E(m/(m-1))` to a
-  canonical argument with `|m - 1| \le 1` (`\operatorname{Im}(m) \ge 0`
-  on its boundary). The zero test finds Legendre's relation
+  (which bounds the process). Abel's five-term relation
+  `\operatorname{Li}_2(x) + \operatorname{Li}_2(y) - \operatorname{Li}_2(xy)
+  - \operatorname{Li}_2(\frac{x(1-y)}{1-xy}) - \operatorname{Li}_2(\frac{y(1-x)}{1-xy})
+  = \log\frac{1-x}{1-xy} \log\frac{1-y}{1-xy}` is used likewise for
+  real `x, y \in (0, 1)` among the orbit points of the generators'
+  arguments, when the five values are found in the orbits.
+  `\operatorname{Li}_s` for `s \ge 3` (other than at roots of unity) is
+  reduced by the inversion formula
+  `\operatorname{Li}_s(z) + (-1)^s \operatorname{Li}_s(1/z) =
+  -\frac{(2\pi i)^s}{s!} B_s(\frac12 + \frac{\log(-z)}{2\pi i})`
+  (with `\log(-z) = \log z + \pi i` on the cut `z > 1`) to `|z| < 1`,
+  or `|z| = 1` with `\operatorname{Im}(z) > 0`; `\operatorname{Li}_3(1/2)
+  = 7\zeta(3)/8 - \pi^2\log(2)/12 + \log^3(2)/6`. The zero test finds
+  the distribution relations
+  `\operatorname{Li}_s(y^n) = n^{s-1} \sum_{k<n} \operatorname{Li}_s(\zeta_n^k y)`
+  between the generators (`n = 2, 3, 4`), which are linear with no
+  elementary part at these arguments. Landen's relations for
+  `\operatorname{Li}_3` (and the other functional equations of the
+  higher polylogarithms) are not used.
+* `K(m) = (\pi/2)\, {}_2F_1(1/2, 1/2; 1; m)`,
+  `E(m) = (\pi/2)\, {}_2F_1(-1/2, 1/2; 1; m)` are evaluated through the
+  hypergeometric normal form below: `K(0) = E(0) = \pi/2`, `E(1) = 1`
+  (Gauss's sum), `K(1/2) = \Gamma(1/4)^2 / (4 \sqrt{\pi})` and `E(1/2)`
+  (Gauss's second summation theorem, with contiguity), and the
+  imaginary-modulus transformation `K(m) = K(m/(m-1))/\sqrt{1-m}`,
+  `E(m) = \sqrt{1-m}\, E(m/(m-1))` to a canonical argument with
+  `|m - 1| \le 1` (`\operatorname{Im}(m) \ge 0` on its boundary), which is
+  Pfaff's transformation. The generators `K(m)`, `E(m)` are the closed
+  forms of the basis values of the coset `(1/2, 1/2; 1) + \mathbb{Z}^3`;
+  the singular values `m = k_r^2` for `r = 2, 3, 4` and their complements
+  (Chowla-Selberg: `K` through `\Gamma` at rationals and `\pi`, `E`
+  through the elliptic alpha function) are applied when such a generator
+  would be created. The zero test finds Legendre's relation
   `E(m) K(1-m) + E(1-m) K(m) - K(m) K(1-m) = \pi/2` and Landen's
   transformation `K(m) = (1 + k_1) K(k_1^2)`,
   `E(m) = (1 + s) E(k_1^2) - s K(m)` (`s = \sqrt{1-m}`,
@@ -313,14 +425,456 @@ identify:
   transformation (the partner of a generator at `a` may sit at `1 - a`,
   `(a-1)/a`, `1/(1-a)` or `1/a`), and eliminates the latest generator
   involved (degree one, with square roots as root generators).
+* `{}_pF_q(a_1, \ldots, a_p; b_1, \ldots, b_q; z)` (the generators, of
+  kind ``GR_TOWER_HYPGEOM``, are not regularized; see *Hypergeometric
+  functions* below).
 * Lambert W: `W_0(0) = 0`, `W_{0,-1}(-1/e) = -1`; the other relations are
   found by Richardson's algorithm (above).
+
+Hypergeometric functions
+-------------------------------------------------------------------------------
+
+The values `F(P; z) = {}_pF_q(a; b; z)`, `P = (a_1, \ldots, a_p; b_1,
+\ldots, b_q)`, are brought to a normal form in three layers
+(``lazy_hypgeom.c``):
+
+1. Degenerate parameters: `z = 0`, cancellation of `a_i = b_j`,
+   terminating series (`a_i` a nonpositive integer), poles (`b_j` a
+   nonpositive integer: ``GR_DOMAIN``; the regularized function is
+   finite there, `\tilde F = \prod_i (a_i)_{n+1} z^{n+1} \tilde F(a + n
+   + 1; n + 2, b' + n + 1; z)` for `b_1 = -n`), divergence (`p > q +
+   1`), Gauss's sum at `z = 1`, `{}_0F_0 = e^z`, `{}_1F_0 = (1-z)^{-a}`,
+   and the reduction of the order when `a_i - b_j = m` is a positive
+   integer: `F = (\theta + b_j)_m F_{\mathrm{red}} / (b_j)_m`,
+   `\theta = z\, d/dz`, with `F_{\mathrm{red}}` the function without
+   `a_i`, `b_j` (expanded exactly through `\theta^k = \sum_l S(k, l) z^l
+   D^l` and `D^l F = (a)_l / (b)_l\, F(P + l e)`, `e = (1, \ldots, 1)`).
+
+2. Transformations of one term, choosing a canonical member of the orbit
+   of `(P, z)`: for `{}_2F_1`, Pfaff's transformation `F(a, b; c; z) =
+   (1-z)^{-a} F(a, c-b; c; z/(z-1))` when `|z - 1| > 1` (or `|z - 1| = 1`
+   and `\operatorname{Im}(z) < 0`), then the smaller (in a fixed order of
+   the cells) of `P` and its Euler transform `(c-a, c-b; c)` (factor
+   `(1-z)^{c-a-b}`), off the cut `z \ge 1`; for `{}_1F_1`, Kummer's
+   transformation `F(a; b; z) = e^z F(b-a; b; -z)` to
+   `\operatorname{Re}(z) \le 0`. Powers with an irrational exponent are
+   written `x^{e_0} x^n`, `e = e_0 + n`, `0 < \operatorname{Re}(e_0) \le
+   1`, so that contiguous parameters share one generator.
+
+3. The contiguity module of the coset `P + \mathbb{Z}^{p+q}`. With `r =
+   \max(p, q+1)` and `v(P) = (F, \theta F, \ldots, \theta^{r-1} F)`, a
+   unit shift of a parameter acts as `v(P') = M v(P)` with `M = I +
+   C/a_i` (raising `a_i`) or `I + C/(b_j - 1)` (lowering `b_j`), where
+   `C` is the companion matrix of `\theta` modulo the hypergeometric
+   operator `\theta \prod_j (\theta + b_j - 1) - z \prod_i (\theta +
+   a_i)`; `\det(I + C/a_i)` is a multiple of `\prod_j (b_j - 1 - a_i)`, so
+   the shifts are invertible unless the operator is reducible. Every
+   value in the coset is thus a rational combination of the `r` basis
+   values `G_k = F(P_0 + k e)` at the canonical cell `P_0` (parameters
+   shifted to `0 < \operatorname{Re} \le 1`). A reducible pair (`b_j -
+   a_i` a positive integer) keeps `b_j - a_i = 1` in the cell, and the
+   paths stay in the chamber `b_j - a_i \ge 1`; it gives the relation
+   `(\theta + a_i) F(P_0) = a_i F_{\mathrm{red}}(P_0)` between the basis
+   values. A numerator `a_i = 1` (a positive integer, in its cell) gives
+   another: the operator factors as `\theta L_1` with `L_1 = \prod_j
+   (\theta + b_j - 1) - z \prod_{k \ne i} (\theta + a_k)`, so that `L_1 F
+   = \prod_j (b_j - 1)`.
+
+Known values give further linear relations between the basis values:
+the entries of a declarative table, each a pattern (parameters affine
+in symbols, the argument free or a rational constant) with a value in a
+small expression language and optional conditions, for example::
+
+    "3 2 | a, b, c | 1+a-b, 1+a-c | 1 | gamma(1+a/2)*gamma(1+a-b)*... | re: 1+a/2-b-c"
+    "0 1 | | 1/2 | z | cosh(2*sqrt(z))"
+    "2 1 | 1/2, 1/2 | 1 | z | 2*elliptic_k_gen(z)/pi"
+
+Every entry is matched against every point of the coset (in a box of
+shifts of its symbols) and of the images of the coset under the
+transformations of layer 2; the relations are reduced in order
+(reducibility relations, then entries with a constant argument, then by
+distance from the cell), each value being computed only when its
+relation is independent of the previous ones, until `F(P)` is
+determined or the relations are exhausted. The basis values which
+remain undetermined become generators. Thus the two entries for
+`{}_0F_1(; 1/2; z)` and `{}_0F_1(; 3/2; z)` give every `{}_0F_1(; n +
+1/2; z)` in terms of `\cosh(2\sqrt z)` and `\sinh(2 \sqrt z)`, the
+entries for `K` and `E` give every `{}_2F_1` with parameters in `(1/2,
+1/2, 1) + \mathbb{Z}^3`, the error function entry gives every
+`{}_1F_1(n + 1/2; m + 3/2; z)` (`m \ge n`, with the reducibility
+relation `(\theta + 1/2) F = e^z/2`), and the summation theorems at `z =
+\pm 1, 1/2` apply to every contiguous function of a summable one (the
+"contiguous" variants of Kummer's, Gauss's and Bailey's theorems). The
+current table contains the elementary cases of `{}_0F_1`, `{}_1F_1`
+and `{}_2F_1`, the error function, Kummer's second formula `{}_1F_1(a;
+2a; z) = e^{z/2} {}_0F_1(; a + 1/2; z^2/16)`, `K` and `E`, the sums of
+Gauss (`z = 1`), Kummer (`z = -1`), Gauss and Bailey (`z = 1/2`), and
+the sums of Dixon, Watson and Whipple for `{}_3F_2` at `z = 1` (the
+latter only at the point itself: the contiguity module at `z = 1`,
+where the rank drops to `p - 1`, is not implemented). Each entry is checked
+numerically by the tests.
+
+*Links.* Some entries relate the coset to the values of another
+hypergeometric function at another argument; they are used only when a
+generator of the context is at that argument (an ``anchor:`` condition,
+tested numerically up to Pfaff's transformation, before the exact
+evaluation), and one at a time (not inside the evaluation of another
+link), so that the generators of the context are reused rather than
+duplicated, and no chain of transformations is explored. These are the
+quadratic transformations of `{}_2F_1`,
+
+.. math ::
+
+    F(a, b; 2b; z) = (1 - z/2)^{-a} F(\tfrac{a}{2}, \tfrac{a+1}{2}; b + \tfrac12; \tfrac{z^2}{(2-z)^2}) \quad (z \notin [1, \infty)),
+
+    F(a, b; 1 + a - b; z) = (1 + z)^{-a} F(\tfrac{a}{2}, \tfrac{a+1}{2}; 1 + a - b; \tfrac{4z}{(1+z)^2}) \quad (|z| < 1),
+
+    F(a, b; \tfrac{a+b+1}{2}; z) = F(\tfrac{a}{2}, \tfrac{b}{2}; \tfrac{a+b+1}{2}; 4z(1-z)) \quad (\operatorname{Re}(z) < 1/2),
+
+and their inverses (with the principal roots `\sqrt{z}`, `\sqrt{1 - z}`,
+valid off the cut); for instance `F(1/4, 3/4; 1; 4z/(1+z)^2) = \sqrt{1 +
+z}\, F(1/2, 1/2; 1; z) = 2\sqrt{1 + z} K(z)/\pi` once `K(z)` is a
+generator. The complete elliptic integrals are linked by Landen's
+transformation in the same way (the zero test also finds it between two
+generators already present, see *Special functions*): with `k' = \sqrt{1
+- m}` and `k_1 = (1 - k')/(1 + k')`,
+
+.. math ::
+
+    K(m) = (1 + k_1) K(k_1^2), \quad E(m) = (1 + k') E(k_1^2) - k' K(m)
+    \quad (m \notin [1, \infty)),
+
+and a new `K(m)` or `E(m)` is expressed through a generator `K`, `E` at a
+point of the Landen chain of `m`, down (`m \to k_1^2`) or up (`m \to
+4s/(1+s)^2`, `s = \pm \sqrt{m}`, `|s| < 1`), within three steps, rather
+than becoming a generator.
+
+The generators of kind ``GR_TOWER_HYPGEOM`` have the argument `z` and
+the additional arguments `a_1, \ldots, a_p, b_1, \ldots, b_q` (see
+:func:`gr_tower_adjoin_special_multi_flat`), and print as
+``hypgeom_2f1(a, b, c, z)`` (``hypgeom_0f1(b, z)``,
+``hypgeom_1f1(a, b, z)``, ``hypgeom_pfq([a...], [b...], z)``).
+
+Modular forms and theta functions
+-------------------------------------------------------------------------------
+
+The modular functions and forms of a point `\tau` of the upper half-plane
+(``lazy_modular.c``) are reduced exactly to the fundamental domain
+
+.. math ::
+
+    \mathcal{F} = \{ -1/2 < \operatorname{Re}(\tau) \le 1/2, |\tau| > 1 \}
+        \cup \{ |\tau| = 1, 0 \le \operatorname{Re}(\tau) \le 1/2 \},
+
+`\tau_0 = g \tau` with `g \in PSL_2(\mathbb{Z})` found numerically
+(:func:`acb_modular_fundamental_domain_approx`) and then verified and
+corrected by exact comparisons, and the values at `\tau` follow from the
+transformation laws with exact multipliers (the eighth roots of unity of
+:func:`acb_modular_theta_transform`, the 24th roots of unity of
+:func:`acb_modular_epsilon_arg`, powers of `c\tau + d`, and `E_2(g\tau) =
+(c\tau+d)^2 E_2(\tau) + 6c(c\tau+d)/(\pi i)`). At `\tau_0`, every value is
+expressed through `\Lambda = \lambda(\tau_0)` and the complete elliptic
+integrals at `\Lambda` (canonical arguments: for `\tau_0 \in \mathcal{F}`,
+`|\Lambda - 1| \le 1`, with `\operatorname{Im}(\Lambda) > 0` on the
+boundary `\operatorname{Re}(\tau_0) = 1/2`):
+
+.. math ::
+
+    \theta_3^2 = 2K(\Lambda)/\pi, \quad
+    \theta_2 = \theta_3 \Lambda^{1/4}, \quad
+    \theta_4 = \theta_3 (1 - \Lambda)^{1/4}, \quad
+    \eta = (\theta_2 \theta_3 \theta_4 / 2)^{1/3},
+
+    j = 256 \frac{(1 - \Lambda + \Lambda^2)^3}{\Lambda^2 (1 - \Lambda)^2}, \quad
+    E_4 = \theta_3^8 (1 - \Lambda + \Lambda^2), \quad
+    E_6 = \theta_3^{12} \frac{(1 + \Lambda)(2 - \Lambda)(1 - 2\Lambda)}{2}, \quad
+    E_2 = \theta_3^4 \left(\frac{3 E(\Lambda)}{K(\Lambda)} - 2 + \Lambda\right),
+
+with principal roots (the right branches on `\mathcal{F}`), and `E_{2k}`,
+`k \ge 4`, by the recurrence of the Weierstrass coefficients. The
+relations between these values (Jacobi's identity, `j = E_4^3/\Delta`,
+`E_4^3 - E_6^2 = 1728 \Delta`, `E_8 = E_4^2`, ...) thus hold by
+construction, and the relations of `K` and `E` known to the zero test
+(Legendre's relation, which is the transformation `\tau \to -1/\tau`,
+and Landen's transformation, `\tau \to 2\tau`) apply to the modular
+values as well. The generator `\lambda(\tau_0)` has the kind
+``GR_TOWER_MODULAR_LAMBDA`` and prints as ``modular_lambda(tau0)``.
+
+At a CM point (`\operatorname{Re}(\tau_0)` and `|\tau_0|^2` rational,
+`\tau_0` a root of `A\tau^2 + B\tau + C` of discriminant `D`, class
+number `h \le 16`, `|D| \le 100000`), `\Lambda` is the algebraic number
+selected numerically among the roots of the factor of `\sum_k H_k N^k
+M^{h-k}` (`H` the Hilbert class polynomial, `N = 256(1 - x + x^2)^3`, `M
+= x^2 (1 - x)^2`) which vanishes at it, so that `j(\tau)` and
+`\lambda(\tau)` are algebraic (`j(\sqrt{-5}) = 632000 + 282880 \sqrt 5`,
+`j((1 + \sqrt{-163})/2) = -640320^3`). For the fundamental
+discriminants of class number one with `|D|` at most the option
+``GR_TOWER_OPT_GAMMA_LATTICE_LIMIT`` (36 by default), the formula of
+Chowla and Selberg gives the periods,
+
+.. math ::
+
+    |\eta(\tau_0)|^2 = \frac{1}{\sqrt{2\pi |D|}} \prod_{j=1}^{|D|-1}
+        \Gamma(j/|D|)^{w \chi_D(j)/4},
+
+with `\eta(\tau_0)^2 = e^{\pi i \operatorname{Re}(\tau_0)/6} |\eta(\tau_0)|^2`
+and `\theta_3^2 = 2^{2/3} \eta^2 (\Lambda(1 - \Lambda))^{-1/6}` (times
+the sixth root of unity selected numerically), so that `\eta(i) =
+\Gamma(1/4)/(2\pi^{3/4})`, `E_2(i) = 3/\pi`, and the elliptic integrals
+at the singular moduli of these discriminants are expressed through
+gamma values (generalizing `K(1/2)`). Elsewhere `K(\Lambda)` and
+`E(\Lambda)` are generators.
+
+*Weierstrass functions.* For the lattice `\mathbb{Z} + \tau \mathbb{Z}`
+(the conventions of :func:`acb_elliptic_p`), with `\theta_k =
+\theta_k(0, \tau)`,
+
+.. math ::
+
+    e_1 = \tfrac{\pi^2}{3} (\theta_3^4 + \theta_4^4), \quad
+    e_2 = \tfrac{\pi^2}{3} (\theta_2^4 - \theta_4^4), \quad
+    e_3 = -\tfrac{\pi^2}{3} (\theta_2^4 + \theta_3^4), \quad
+    g_2 = \tfrac{4 \pi^4}{3} E_4, \quad g_3 = \tfrac{8 \pi^6}{27} E_6,
+
+    \wp(z) = e_1 + \left(\frac{\pi \theta_3 \theta_4 \theta_2(z)}{\theta_1(z)}\right)^2, \quad
+    \wp'(z) = -2\pi^3 (\theta_2 \theta_3 \theta_4)^2 \frac{\theta_2(z) \theta_3(z) \theta_4(z)}{\theta_1(z)^3}, \quad
+    \sigma(z) = \frac{\theta_1(z)}{\pi \theta_2 \theta_3 \theta_4} e^{\pi^2 E_2 z^2 / 6},
+
+so that the differential equation `\wp'^2 = 4\wp^3 - g_2 \wp - g_3 =
+4(\wp - e_1)(\wp - e_2)(\wp - e_3)`, the periodicity and the values at
+the half periods hold by construction, and the addition and
+multiplication theorems through those of the theta functions (below).
+The Weierstrass zeta function (which needs `\theta_1'(z)/\theta_1(z)`)
+and the inverse of `\wp` are not implemented.
+
+The theta functions of a variable `z` (``jacobi_theta(z, tau)``) are
+reduced in both arguments: `\tau` to `\tau_0` as above (`z \to
+-z/(c\tau + d)` with the factor `\sqrt{i/(c\tau+d)}\, e^{-\pi i c
+z^2/(c\tau + d)}`), and then `z` modulo the half-lattice, `z = z_1 + (p +
+q\tau_0)/2` with `z_1 = x + y\tau_0`, `x, y \in [-1/4, 1/4)` (exact
+floors; `p`, `q` adjusted on the boundary of that box, see below), with
+the characteristics: in terms of `\theta[a, b](z) = \sum_n
+\exp(\pi i (n + a/2)^2 \tau + 2\pi i (n + a/2)(z + b/2))` (`\theta_1 =
+-\theta[1,1]`, `\theta_2 = \theta[1,0]`, `\theta_3 = \theta[0,0]`,
+`\theta_4 = \theta[0,1]`),
+
+.. math ::
+
+    \theta[a,b](z_1 + (p + q\tau)/2) = e^{-\pi i q^2 \tau/4 - \pi i q (z_1
+        + (b+p)/2)} \theta[a + q, b + p](z_1),
+
+`\theta[a + 2, b] = \theta[a, b]`, `\theta[a, b + 2] = (-1)^a \theta[a, b]`,
+and the parity `\theta[a, b](-z) = (-1)^{ab} \theta[a, b](z)`, to the
+reduced point `z_0 = \pm z_1` in the fundamental domain of `z \to \pm z +
+(\mathbb{Z} + \tau_0\mathbb{Z})/2` given by `0 < y < 1/4`, `-1/4 \le x <
+1/4`, or `y \in \{0, 1/4\}`, `0 \le x \le 1/4` (so that `z` and `-z`, or a
+point and its reduced point, have the same reduced point). At `\tau_0 = i` and `\tau_0 = e^{\pi i/3}`, the
+stabilizer of `\tau_0` acts on `z` (by `z \to iz`, respectively
+`e^{\pm \pi i/3} z`), and the least reduced point of the orbit is taken.
+At the reduced point `z_0 \ne 0`, `\theta_1(z_0, \tau_0)` and
+`\theta_4(z_0, \tau_0)` are generators of the kind
+``GR_TOWER_JACOBI_THETA`` (two arguments, printed as
+``jacobi_theta_1(z0, tau0)``, ``jacobi_theta_4(z0, tau0)``), and
+`\theta_2(z_0, \tau_0)`, `\theta_3(z_0, \tau_0)` are algebraic
+generators over them, with the same definition kind and Jacobi's
+relations
+
+.. math ::
+
+    \theta_2(z)^2 \sqrt{1 - \Lambda} = \theta_4(z)^2 \sqrt{\Lambda} - \theta_1(z)^2, \quad
+    \theta_3(z)^2 \sqrt{1 - \Lambda} = \theta_4(z)^2 - \theta_1(z)^2 \sqrt{\Lambda}
+
+as moduli (adjoined once per point: later evaluations at an equal point
+find them by their definition, whatever the representation of the
+point). The quasi-periodicity, the transformation laws and the quartic
+relations between the theta functions of `z` thus hold by construction.
+
+*Related points.* Every reduced point `z_0` met at `\tau_0` is recorded
+in the context with the method of its evaluation, chosen when it is
+first met from the points recorded before (relations modulo the
+half-lattice, found numerically and verified exactly), so that the
+values at related points are not independent generators:
+
+* a torsion point `z_0 = (a + b\tau_0)/N` with `3 \le N \le 6` (the
+  reduced point: `z = 1/3` has `z_0 = 1/6`, while `(1 + 2\tau)/5` with
+  `z_0 = -1/5 + \tau/10` is not used): the values are algebraic over the theta constants,
+  through the root `X = \tilde\wp(z_0)` of the division polynomial
+  `\psi_N` (in the units `\tilde\wp = \wp/(\pi^2\theta_3^4)`), the
+  ratios `\theta_k(z_0)/\theta_1(z_0)` (square roots of `X - e_j` up to
+  constants) and a root of `\theta_1(z_0)^{N^2}` given by the
+  multiplication formula at the lattice point `N z_0`;
+* `d z_0 = \pm n u` with `u` recorded, `n \le 6`, `d \le 3`: the
+  multiplication formulas `\theta_k(nu) = \theta_3 (\theta_1(u)/\theta_3)^{n^2}
+  S_k(n)` with `S_k(n)` rational in the ratios at `u` (the recursion of
+  the division polynomials), then for `d > 1` the division as for torsion
+  points (with `\tilde\wp(nu) = \tilde\wp(u) - \psi_{n-1}\psi_{n+1}/\psi_n^2`);
+* `z_0 = \pm(u + v)` with `u`, `v` and `u - v` recorded: rational, by
+  the addition formulas `\theta_k(u+v)\theta_k(u-v)\theta_4^2 =
+  \theta_k(u)^2\theta_4(v)^2 - \theta_{5-k}(u)^2\theta_1(v)^2`;
+* `u`, `u + z_0`, `u - z_0` recorded: `\theta_1(z_0)^2` and
+  `\theta_4(z_0)^2` from two of these addition formulas (linear
+  equations), the other values from Jacobi's relations;
+* `z_0 = \pm(nu \pm v)` otherwise (`n \le 3`): the ratios at `z_0`
+  rational in the values at `u` and `v` (Jacobi's addition formulas for
+  `\mathrm{sn}, \mathrm{cn}, \mathrm{dn}` from the multiple `nu`), and
+  `\theta_1(z_0)` a generator;
+* `2 z_0 = \pm(u \pm v)` otherwise: with `P = z + w`, `Q = z - w` and
+  `S_{ab} = \theta_a(P)\theta_b(Q) + \theta_b(P)\theta_a(Q)`, Jacobi's
+  formulas for `\theta_a(z+w)\theta_b(z-w)` give `\theta_1\theta_4(z) /
+  \theta_2\theta_3(z) = S_{14}/S_{23}` and its images under the
+  permutations of 2, 3, 4, so that the ratios `r_k = \theta_k/\theta_1`
+  at `z = (P + Q)/2` are monomials in the square roots of the `S_{ab}`
+  (`r_2 = \sqrt{S_{23} S_{24} / (S_{14} S_{13})}`, and so on, with
+  `r_2 r_3 r_4` rational; the signs of the square roots chosen
+  numerically, unique by the enclosures, and checked for consistency);
+  `\theta_1(z_0)` is a generator. The point `w = (P - Q)/2` then has
+  `r_k(w)/r_k(z)` rational in the `S_{ab}` and the differences `D_{ab}`
+  (`r_4(w)/r_4(z) = \theta_3 S_{12} / (\theta_2 D_{13})`, say), and
+  `\theta_1(z)\theta_1(w)` a monomial in the same square roots and
+  `\sqrt{D_{12} D_{13}}`;
+* otherwise the generators above.
+
+*Rebasing.* Where the methods above would make the values at a new
+point algebraic over those at points recorded with generators of their
+own (roots of polynomials, square roots), the roles are exchanged: the
+new point (or a related one) gets the generators, the earlier points
+become rational over it, and the context records the value of each
+earlier generator as a rational function of the new ones. When
+elements involving such a generator and elements involving one of the
+new ones meet in an operation, the generator becomes algebraic in
+their tower with the linear modulus `X - \text{value}` (the generators
+of the values are moved before it: one rebuild of the tower for all the
+records that apply), so that the elements built on it, before or after,
+meet those built on the new generators. (Not when a tower merely
+contains both: the towers of a long session hold generators of
+unrelated computations.) The cases:
+
+* `d z_0 = \pm n u` with `d > 1` and `u` of generators: with `an + cd
+  = 1`, the point `b = a z_0 \pm c u` (so that `n b = z_0`, `d b = \pm
+  u`) gets the generators, `u` and `z_0` are its multiples (the division
+  by 3 of `\theta(3z)` would be a root of degree 9 with large
+  coefficients: `\theta(3z)`, `\theta(2z)`, `\theta(z)` cost the same
+  in any order);
+* `u`, `P = u + x`, `Q = u - x` with `P`, `Q` of generators (`z = (P + Q)/2`
+  with `P = z + w`, `Q = z - w` first, and `x = w`; or `x = z_0` in the
+  case of the linear equations above): `x` gets the generators, `P`
+  the ratios of Jacobi's formulas from `u`, `x` (its `\theta_1` stays a
+  generator) and `Q` the addition formulas;
+* `z_0 = \pm(2u \pm v)` with `v` of generators: as the previous case with
+  `x = -(u \pm v)`, `P = v`, `Q = z_0`.
+
+The values at the points are then those of the order in which the
+points with generators came first, whatever the actual order (the
+addition formulas with the values at `z`, `w`, `z \pm w` take 0.06 to
+0.25 seconds in all 24 orders, against up to seven seconds without the
+rebasing). Elements built on the earlier
+generators other than the values themselves (`\wp(z + w)` as a rational
+function of `\theta_1(z + w)` and `\theta_4(z + w)`, say) become
+rational functions of the new generators, which may be large.
+
+The values are cached with the record (those of the 32 most recently
+used points; the ratios `\theta_k/\theta_3` at the 8 most recent points
+`\tau_0` and the theta constants themselves at the last one, together
+with the anchor chosen for each `\tau_0`, so that values computed later
+come from the same anchor), so that repeated evaluations at a point cost
+a lookup; the bound keeps the cache from holding the towers of a long
+session alive. At the CM points where `\lambda` has degree more than 2
+(from a class polynomial: `\lambda(1/2 + i)` is a root of a quartic
+with coefficients of five digits), the torsion points and the divisions
+are not used (the roots of the division polynomials over that field are
+costly: tens of seconds for `\psi_3`), nor the other relations except
+the doubling `z_0 = \pm 2u` (the inverses of the denominators of their
+formulas in that field take minutes, hours for `n = 6`): the values
+there are generators, and identities between the values at related
+points are not decided.
+Thus the duplication formula `\theta_1(2z)\theta_2\theta_3\theta_4 =
+2\theta_1(z)\theta_2(z)\theta_3(z)\theta_4(z)`, the addition formulas and
+the addition theorem of `\wp` are decided whatever the order of
+evaluation of `\theta(z)`, `\theta(w)`, `\theta(z \pm w)`, as rational
+identities in the values at the points with generators (the forms
+`S_{ab}`, `D_{ab}` above remain for the cases the rebasing leaves out).
+Relations among more than three points (`z_0 = u + v + w`, say) are not
+used.
+
+*Commensurable points.* A point `\tau_0 \in \mathcal{F}` which is not a
+CM point is compared with the points `\tau_1` whose `\lambda(\tau_1)` is
+already a generator of the context (the *anchors*): when `\tau_0 =
+\gamma \tau_1` with `\gamma \in GL_2^+(\mathbb{Q})` of determinant
+`2^k 3^l` (an integer relation between `1, \tau_1, \tau_0, \tau_0 \tau_1`
+found by LLL and verified exactly; `k \le 4` when `l = 0`, otherwise
+`l \le 2` and `k \le 1`), the values at `\tau_0` are computed from those
+at `\tau_1` rather than from a new generator. Two points commensurable
+beyond these limits have generators of their own, and the points
+commensurable with both (within the limits) could come from either: of
+the anchors found, those whose values come from the most recently used
+generator `\lambda` are preferred (the *root*: the values of an
+evaluation in progress, `j(\tau)`, `\eta(\tau)` and `\eta(3\tau)` say,
+then come from one root, rather than `\eta(3\tau)` from the root of an
+earlier evaluation at `(3\tau + 1)/4`, with a cheaper chain to `3\tau`,
+which would leave the identity between them undecided), and of these the
+one with the shortest chain of steps. A chain with a tripling and a
+further step (a halving, another tripling) gives values in towers of
+large degree, where everything at `\tau_0` is costly (the theta
+functions of `z` at `4i/\pi` through two thirdings from `1/3 + \pi i/4`:
+3.5 seconds, against 0.01 at a generator of its own; `j(\tau)`,
+`\eta(3\tau)` after `\lambda((2\tau + 1)/3)`: minutes). There
+`\lambda(\tau_0)` is a new generator *linked* to the anchor: the values
+at `\tau_0` are those of a new generator (the fourth roots of
+`\lambda` and `1 - \lambda`, `K(\lambda)`, `\theta_3 = \sqrt{2K/\pi}`,
+`E(\lambda)`), and the context records their values through the chain,
+computed when first needed, as rebase records (see the theta functions
+of `z` above): where values from the two meet, those at `\tau_0` are the
+values of the chain, and the identities between them hold as with the
+chain (Jacobi's modular equation of degree 3 between `\lambda(\tau)`
+and `\lambda(3\tau)` with `3\tau` from a linked `(3\tau + 1)/2`);
+elsewhere they cost what they cost in a new field. With `\gamma = g M`, `g
+\in SL_2(\mathbb{Z})`, `M = \begin{pmatrix} a & b \\ 0 & d
+\end{pmatrix}`, the steps are the duplication formulas
+
+.. math ::
+
+    \theta_3(2w)^2 = \frac{\theta_3^2 + \theta_4^2}{2}, \quad
+    \theta_4(2w)^2 = \theta_3 \theta_4, \quad
+    \theta_2(2w)^2 = \frac{\theta_3^2 - \theta_4^2}{2}, \quad
+    2 E_2(2w) - E_2(w) = \theta_3(2w)^4 + \theta_2(2w)^4
+
+(and their inverses for `w \to w/2`; the square roots are chosen
+numerically), Jacobi's modular equation of degree 3 for `w \to 3w` and
+`w \to w/3`: with `u = (\theta_2(w)/\theta_3(w))^{1/2}` and `v` the
+same at `3w`,
+
+.. math ::
+
+    u^4 - v^4 - 2uv(1 - u^2 v^2) = 0, \quad
+    \frac{\theta_3(w)^2}{\theta_3(3w)^2} = 1 + \frac{2v^3}{u}, \quad
+    3 E_2(3w) - E_2(w) = \sum_{k=2}^4 \theta_k(w)^2 \theta_k(3w)^2
+
+(the root of the quartic equals `\pm v` numerically and is adjoined as an
+algebraic generator), the translations and the transformation laws of
+`g`. The modular equations of these levels thus hold by construction:
+Landen's `\lambda(2\tau) = ((1 - k')/(1 + k'))^2`, the modular polynomial
+`\Phi_2(j(\tau), j(2\tau)) = 0`, eta quotients such as `\theta_4(2\tau) =
+\eta(\tau)^2/\eta(2\tau)`, the Hauptmodul `t = (\eta(\tau)/\eta(3\tau))^{12}`
+of `\Gamma_0(3)` with `j(\tau) = (t + 27)(t + 243)^3/t^3` and `j(3\tau) =
+(t + 27)(t + 3)^3/t`, and so on. When only `\lambda` is needed, the
+computation uses the ratios `\theta_k/\theta_3` and no elliptic integral.
+Matrices `M` with `3 \mid a` and `3 \mid d` (`\tau_1 + 1/3`, say), other
+levels (primes `\ge 5`), and levels with a factor 3 inside a conjugation
+are not used: values at points related by such transformations are
+independent generators, and the corresponding identities are not
+decided (``T_UNKNOWN``).
+
+The factors `\exp(\pi i \alpha)` of the transformation laws are written
+`\exp(\pi i \operatorname{Re}(\alpha)) \exp(-\pi \operatorname{Im}(\alpha))`
+when `\operatorname{Re}(\alpha)` is rational (a root of unity times a real
+exponential), which keeps the multiplicative relations between them of
+small degree.
 
 Conjugation maps `F(u)` to `F(\bar u)` (`W_k(u)` to `W_{-k}(\bar u)`) off
 the branch cuts, and the values at real points are real generators,
 which the real fields accept.
 
-Further relations -- the five-term relation of the dilogarithm,
+Further relations -- Landen's relations of the trilogarithm,
 polylogarithms at other algebraic arguments, isogenies of elliptic
 integrals beyond Landen's -- are not applied yet; see the design notes.
 
@@ -628,7 +1182,8 @@ Adjoining generators
     `m = u`), or ``GR_TOWER_CONSTANT`` (no argument; *param* =
     ``GR_TOWER_CONST_EULER`` or ``GR_TOWER_CONST_CATALAN``). The status is
     ``GR_TOWER_STATUS_CONJECTURAL`` (``GR_TOWER_STATUS_SCHANUEL`` for
-    Lambert W). The caller is responsible for canonical arguments (see
+    Lambert W). ``GR_TOWER_HYPGEOM`` (`{}_pF_q`) has several arguments
+    and is adjoined with :func:`gr_tower_adjoin_special_multi_flat`. The caller is responsible for canonical arguments (see
     above): a value which is algebraic or expressible through other
     generators must not be adjoined. Returns ``GR_DOMAIN`` for `u = 0`
     where the value is trivial or a pole (`\operatorname{erf}`, `W`,
@@ -636,6 +1191,21 @@ Adjoining generators
     the value cannot be evaluated numerically. The generators are
     identified across towers (merges, maps) by their kind, parameter and
     argument.
+
+.. function:: int gr_tower_adjoin_special_multi_flat(gr_tower_t T, int kind, slong param, const fmpz_mpoly_q_struct * u, slong nargs, const fmpz_mpoly_ctx_t mctx, const char * name)
+              slong _gr_tower_special_num_args(int kind, slong param)
+
+    Adjoins the value of a special function of several arguments: *u*
+    is a vector of *nargs* flat elements, of which ``u[0]`` becomes the
+    argument of the generator and the others its additional arguments.
+    For ``GR_TOWER_HYPGEOM``, *param* is ``GR_TOWER_HYPGEOM_PARAM(p, q)``
+    and `u = (z, a_1, \ldots, a_p, b_1, \ldots, b_q)` for the value
+    `{}_pF_q(a; b; z)` (not regularized; numerically through
+    :func:`acb_hypgeom_2f1` and friends, and for `p = q + 1 \ge 3` only
+    inside the unit disk). *nargs* must be
+    ``_gr_tower_special_num_args(kind, param)``. Generators are
+    identified across towers by their kind, parameter and all their
+    arguments.
 
 Numerical evaluation
 -------------------------------------------------------------------------------
@@ -712,6 +1282,20 @@ principal `n`-th roots of the lazy field) in almost all cases where
 they are irreducible. The proofs are relative to the moduli of the
 lower steps, as the status of a step is.
 
+With transcendental generators, the place also gives them values in
+`\mathbb{F}_{\ell}`. A modulus then has a root at the place only for
+some of the values: a radical `X^n - a(t)` for about one value of `t`
+in `n`, so that over the radicals of `t` and `1 - t` of orders 4 (the
+theta constants `\lambda^{1/4}`, `(1-\lambda)^{1/4}`, say) one random
+choice gives a place of degree one about once in sixteen. When a
+modulus has no simple root, the values of the generators which first
+occur from the earliest step sharing a generator with it are drawn
+again (the chain of roots being taken back to that step), up to 48
+times per place. In the merges of the towers of the modular functions,
+whose lattice searches for roots of radicals not in the target tower
+otherwise took a third of the time, the absence of a root is then
+usually shown at a place.
+
 .. function:: int gr_tower_prove_step_modular(gr_tower_t T, slong k, slong tries)
 
     Tries to prove that `m_k` is irreducible over `F_{k-1}` at places of
@@ -770,6 +1354,10 @@ lower steps, as the status of a step is.
     criterion above, for the element *a* in the flat representation
     (in the context *actx* of the tower's flat machinery). Returns 1 on
     success; the steps of the tower must be proven.
+
+    (Internally, the same test reports a prime `p \mid n` for which `a`
+    was a `p`-th power at many informative places, the evidence used
+    by :macro:`GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT`.)
 
 .. function:: int gr_tower_poly_no_roots_modular(const gr_poly_t g, gr_tower_t T, slong tries)
 
@@ -1246,6 +1834,7 @@ the computations that follow; the elements created before remain valid.
            GR_TOWER_OPT_SPLIT_DEGREE_LIMIT
            GR_TOWER_OPT_MINPOLY_DEGREE_LIMIT
            GR_TOWER_OPT_INV_DENSE_ALG
+           GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT
 
 The options (default values in parentheses; precisions are in bits):
 
@@ -1408,6 +1997,28 @@ The options (default values in parentheses; precisions are in bits):
   polynomial `P` of `f` (or the other way round; the smaller tower, of
   degree up to the second limit), a zero test in the tower of `-g`
   alone, and the numerical isolation of the roots of `P`. With 0, never.
+* :macro:`GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT` (64): in lazy fields,
+  a root `\sqrt[n]{x}` which none of the cheaper rules finds in the
+  field is looked for there when `x` is likely a `p`-th power for a
+  prime `p \mid n` and `p` times the degree of the tower is at most
+  this (with transcendental generators, 3/8 of it, halved for each
+  generator beyond the first: the norms of the factorization are
+  multivariate): the steps of the tower are proven first if needed (the
+  modular proofs, and Trager's method within its limit), and the
+  places of the modular proof of irreducibility of `X^n - x` at which
+  `x` is a unit and `p \mid q - 1` must all have shown `x` to be a
+  `p`-th power, at least eight of them (more places are tried in that
+  case only; an element which is not a `p`-th power is one at about
+  one such place in `p`). The roots of `X^p - x` are then found by
+  factoring over the tower, the principal one is identified by its
+  enclosure, and `\sqrt[n]{x} = \sqrt[n/p]{\sqrt[p]{x}}` (principal
+  roots). Otherwise, as with 0, a new generator is adjoined whose
+  modulus may be reducible, which the zero tests reduce when they meet
+  it (`\sqrt{1/(\pi^{1/6} + 2\pi + 1)^2}` is the inverse of `\pi^{1/6}
+  + 2\pi + 1` at once, rather than a generator of degree 2 over
+  `\mathbb{Q}(\pi^{1/6})`). Over the profile catalog, the check costs
+  about 0.2 seconds in all (most of it the modular test, which the
+  adjunction makes anyway).
 
 Lazy field (gr_tower_lazy.h)
 -------------------------------------------------------------------------------
@@ -1493,8 +2104,20 @@ Lazy field (gr_tower_lazy.h)
     adjoined to the tower of their argument, since the expressions and
     factorizations found for them there are too costly to rediscover
     (polynomial roots are sought over the generators their coefficients
-    involve, see below). Relations between generators of different
-    copies are found when the copies meet: a merge which adds
+    involve, see below), unless the tower continues with at least
+    twelve generators beyond the prefix (Watson's sum after Dixon's in
+    one context took four minutes, the roots of its sines appended
+    after the gamma values of Dixon's sum, which the relation searches
+    of its merges then visited; a second). For the same reason the tower of
+    one operand of an operation, containing the definitions of the
+    other, is used for the result only if no generators of other
+    computations lie between them (`i \pi` with `i` in a tower of its own grown in
+    place by an earlier computation, say: the result would carry that
+    computation's generators in its prefix), and the cached generators
+    (the roots of integers and of unity, algebraic numbers) whose
+    tower is collected move to a tower where they come first.
+    Relations between generators of different copies are found when
+    the copies meet: a merge which adds
     transcendental generators to a tower which already has some is
     followed by a relation search at the default precision. Likewise,
     `\exp(r \pi i + y)` with rational `r` is split as `\exp(r \pi i)
@@ -1727,8 +2350,10 @@ Lazy field (gr_tower_lazy.h)
     squares (or minus squares) as polynomials are read off
     (`\sqrt{(1-\pi)^2} = \pi - 1`, `\sqrt{-(\pi+1)^2} = i (\pi + 1)`);
     otherwise square roots are found exactly through quadratic steps
-    (:func:`gr_tower_sqrt`) before any lattice search, and repeated roots
-    of the same element are identified. A positive rational content is
+    (:func:`gr_tower_sqrt`) before any lattice search, repeated roots
+    of the same element are identified, and roots of likely powers are
+    found by factoring (see
+    :macro:`GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT`). A positive rational content is
     taken out of an `n`-th root (`\sqrt{4 \pi} = 2 \sqrt{\pi}`), and the
     root of a monomial in roots of unity and roots of integers is a
     monomial in such roots of higher orders (`\sqrt{4 \sqrt 2} = 2 \cdot
@@ -2246,6 +2871,7 @@ follows from :func:`fexpr_get_str_latex`.
 
 .. function:: int gr_tower_lazy_gamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_rgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
+              int gr_tower_lazy_lgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_beta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, const gr_tower_lazy_elem_t y, gr_ctx_t ctx)
               int gr_tower_lazy_digamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_polygamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
@@ -2257,17 +2883,27 @@ follows from :func:`fexpr_get_str_latex`.
               int gr_tower_lazy_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_hurwitz_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t a, gr_ctx_t ctx)
               int gr_tower_lazy_polylog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
+              int gr_tower_lazy_lerch_phi(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t a, gr_ctx_t ctx)
+              int gr_tower_lazy_dirichlet_l(gr_tower_lazy_elem_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_tower_lazy_elem_t s, gr_ctx_t ctx)
               int gr_tower_lazy_dilog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_elliptic_k(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_elliptic_e(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx)
               int gr_tower_lazy_euler(gr_tower_lazy_elem_t res, gr_ctx_t ctx)
               int gr_tower_lazy_catalan(gr_tower_lazy_elem_t res, gr_ctx_t ctx)
+              int gr_tower_lazy_hypgeom_0f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx)
+              int gr_tower_lazy_hypgeom_1f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t a, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx)
+              int gr_tower_lazy_hypgeom_2f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t a, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t c, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx)
+              int gr_tower_lazy_hypgeom_pfq(gr_tower_lazy_elem_t res, const gr_vec_t a, const gr_vec_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx)
+              int gr_tower_lazy_hypgeom_pfq_vec(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_struct * a, slong p, const gr_tower_lazy_elem_struct * b, slong q, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx)
 
     The special functions of the lazy field, as installed in its method
     table, with canonical arguments (see *Special functions* above).
-    Poles give ``GR_DOMAIN``. The order of ``polygamma`` and ``polylog``
-    and the first argument of ``hurwitz_zeta`` (an integer `\ge 2`) must
-    be integers (``GR_UNABLE`` otherwise). In the real fields, a value
+    Poles give ``GR_DOMAIN``. The order of ``polygamma`` must be an
+    integer; ``polylog`` with a non-integer order is evaluated at the
+    roots of unity (through the Lerch transcendent), and ``lerch_phi`` at
+    `z = 1`, at the roots of unity, and at `a = 1` with an integer `s`
+    (``GR_UNABLE`` otherwise). :func:`gr_dirichlet_l` dispatches to
+    ``gr_tower_lazy_dirichlet_l`` for the lazy fields. In the real fields, a value
     which is not real gives ``GR_DOMAIN``; in the algebraic fields, only
     algebraic values (such as `\Gamma(n)` and `\zeta(-n)`) are returned,
     and ``GR_UNABLE`` otherwise, since the transcendence of special
@@ -2275,7 +2911,48 @@ follows from :func:`fexpr_get_str_latex`.
     (``gamma(...)``, ``erf(...)``, ``erfi(...)``, ``lambertw(x, k)``,
     ``digamma(...)``, ``polygamma(m, x)``, ``polylog(s, x)``,
     ``zeta(...)``, ``elliptic_k(...)``, ``elliptic_e(...)``, ``euler``,
-    ``catalan``) are read back by the parser.
+    ``catalan``) are read back by the parser (the hypergeometric
+    functions, of several arguments, are not). The hypergeometric
+    functions take the flag 1 for the regularized functions (as
+    :func:`gr_hypgeom_pfq`); their normal form is described in
+    *Hypergeometric functions* above.
+
+.. function:: int gr_tower_lazy_modular_lambda(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_modular_j(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_modular_delta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_dedekind_eta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_eisenstein_e(gr_tower_lazy_elem_t res, ulong k, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_eisenstein_g(gr_tower_lazy_elem_t res, ulong k, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_jacobi_theta(gr_tower_lazy_elem_t res1, gr_tower_lazy_elem_t res2, gr_tower_lazy_elem_t res3, gr_tower_lazy_elem_t res4, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_jacobi_theta_1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_jacobi_theta_2(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_jacobi_theta_3(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_jacobi_theta_4(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_weierstrass_p(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_weierstrass_p_prime(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_weierstrass_sigma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_elliptic_roots(gr_tower_lazy_elem_t e1, gr_tower_lazy_elem_t e2, gr_tower_lazy_elem_t e3, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+              int gr_tower_lazy_elliptic_invariants(gr_tower_lazy_elem_t g2, gr_tower_lazy_elem_t g3, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx)
+
+    The modular lambda function, the `j`-invariant, the discriminant
+    `\Delta = \eta^{24}`, the Dedekind eta function, the Eisenstein series
+    `E_k` (normalized to constant term 1) and `G_k = 2\zeta(k) E_k` for even
+    `k \ge 2` (``GR_DOMAIN`` for other `k`, as for the complex numbers;
+    ``GR_UNABLE`` for `k > 1000`), the Jacobi theta functions (with the conventions of
+    :func:`acb_modular_theta`, `q = e^{\pi i \tau}`), and the Weierstrass
+    functions `\wp`, `\wp'`, `\sigma`, the roots `e_1, e_2, e_3` and the
+    invariants `g_2, g_3` of the lattice `\mathbb{Z} + \tau \mathbb{Z}`
+    (as :func:`acb_elliptic_p`; `\wp` at a lattice point gives
+    ``GR_DOMAIN``), in the normal form
+    described in *Modular forms and theta functions* above. They are
+    installed in the method table of the lazy field (``gr_modular_j`` and
+    so on). A point with `\operatorname{Im}(\tau) \le 0` gives
+    ``GR_DOMAIN``; ``GR_UNABLE`` is returned when `\tau` cannot be reduced
+    exactly (for instance when the sign of `\operatorname{Im}(\tau)` is
+    undecided). In the algebraic fields, only algebraic values (`j` and
+    `\lambda` at CM points) are returned. ``modular_lambda``,
+    ``modular_j``, ``modular_delta`` and ``dedekind_eta`` are read back by
+    the parser.
 
 The Python binding in ``src/python/flint_ctypes.py`` offers the four
 lazy fields as ``ComplexField_tower`` (``CC_tower``), ``RealField_tower``

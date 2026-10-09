@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /*
     The tangent normal form of the real trigonometric constants. The
     values at angles in (pi/D) Z (sines, cosines, tangents, and the real
@@ -704,3 +707,5 @@ _gr_tower_lazy_realify_locked(gr_tower_lazy_elem_t x, gr_ctx_t ctx)
     _gr_tower_lazy_unlock(ctx);
     return status;
 }
+
+POP_OPTIONS

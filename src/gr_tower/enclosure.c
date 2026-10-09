@@ -17,6 +17,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* Numerical evaluation of an element x of F_k. */
 int
 gr_tower_get_acb_at(acb_t res, gr_srcptr x, slong k, slong prec, gr_tower_t T)
@@ -684,6 +687,37 @@ gr_tower_trans_get_acb(acb_t res, gr_tower_t T, slong j, slong prec)
                 break;
         }
     }
+    else if (t->num_xargs > 0)
+    {
+        /* a function of several arguments */
+        slong wp, n = _gr_tower_gen_num_args(t);
+        acb_ptr u = _acb_vec_init(n);
+        int flags = (t->kind == GR_TOWER_HYPGEOM) ? _gr_tower_gen_hypgeom_flags(t, &T->flat) : 0;
+
+        for (wp = prec + 20; ; wp *= 2)
+        {
+            status = _gr_tower_gen_args_get_acb(u, t, wp, &T->flat);
+            if (status != GR_SUCCESS)
+                break;
+            status = _gr_tower_special_eval_multi_flags(res, t->kind, t->def_param, u, n, flags, wp);
+            if (status != GR_SUCCESS)
+            {
+                status = GR_SUCCESS;
+                acb_indeterminate(res);
+            }
+            else if (_gr_tower_special_real_at_multi(t->kind, t->def_param, u, n, wp))
+                arb_zero(acb_imagref(res));
+            if (acb_is_finite(res) && (acb_is_exact(res) || acb_rel_accuracy_bits(res) >= prec))
+                break;
+            if (wp > 16 * prec + 4096)
+            {
+                status = GR_UNABLE;
+                break;
+            }
+        }
+
+        _acb_vec_clear(u, n);
+    }
     else if (GR_TOWER_KIND_HAS_ARG(t->kind))
     {
         acb_t u;
@@ -766,3 +800,5 @@ gr_tower_trans_get_acb(acb_t res, gr_tower_t T, slong j, slong prec)
 
     return status;
 }
+
+POP_OPTIONS

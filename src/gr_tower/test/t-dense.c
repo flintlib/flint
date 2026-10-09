@@ -250,7 +250,9 @@ TEST_FUNCTION_START(gr_tower_dense, state)
         {
             gr_mat_t A, B, X, AX;
             gr_ptr d1, d2;
-            slong n = 1 + n_randint(state, 7), k;
+            /* (smaller with three generators: the elimination in a field
+               of degree up to several hundred is slow) */
+            slong n = 1 + n_randint(state, (ngens == 3) ? 3 : 6), k;
             gr_mat_init(A, n, n, K);
             gr_mat_init(B, n, 1 + n_randint(state, 2), K);
             gr_mat_init(X, n, gr_mat_ncols(B, K), K);

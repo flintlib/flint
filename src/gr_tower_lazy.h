@@ -21,6 +21,7 @@
 */
 
 #include "fmpq_poly.h"
+#include "dirichlet.h"
 #include "gr_tower.h"
 
 #ifdef __cplusplus
@@ -220,6 +221,9 @@ int gr_tower_lazy_get_acb(acb_t res, const gr_tower_lazy_elem_t x, slong prec, g
    special values being applied first. */
 int gr_tower_lazy_gamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int gr_tower_lazy_rgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+int gr_tower_lazy_lgamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+int gr_tower_lazy_dirichlet_l(gr_tower_lazy_elem_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_tower_lazy_elem_t s, gr_ctx_t ctx);
+int gr_tower_lazy_lerch_phi(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t a, gr_ctx_t ctx);
 int gr_tower_lazy_beta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, const gr_tower_lazy_elem_t y, gr_ctx_t ctx);
 int gr_tower_lazy_digamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int gr_tower_lazy_polygamma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
@@ -233,6 +237,33 @@ int gr_tower_lazy_hurwitz_zeta(gr_tower_lazy_elem_t res, const gr_tower_lazy_ele
 int gr_tower_lazy_polylog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t s, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int gr_tower_lazy_dilog(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int gr_tower_lazy_elliptic_k(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+int gr_tower_lazy_modular_lambda(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_modular_j(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_modular_delta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_dedekind_eta(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_eisenstein_e(gr_tower_lazy_elem_t res, ulong k, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_eisenstein_g(gr_tower_lazy_elem_t res, ulong k, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_jacobi_theta(gr_tower_lazy_elem_t res1, gr_tower_lazy_elem_t res2, gr_tower_lazy_elem_t res3, gr_tower_lazy_elem_t res4, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_jacobi_theta_1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_jacobi_theta_2(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_jacobi_theta_3(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_jacobi_theta_4(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_weierstrass_p(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_weierstrass_p_prime(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_weierstrass_sigma(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t z, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_elliptic_roots(gr_tower_lazy_elem_t e1, gr_tower_lazy_elem_t e2, gr_tower_lazy_elem_t e3, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+int gr_tower_lazy_elliptic_invariants(gr_tower_lazy_elem_t g2, gr_tower_lazy_elem_t g3, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+
+/* the table of hypergeometric identities (for the tests) */
+slong _gr_tower_hypgeom_table_length(void);
+const char * _gr_tower_hypgeom_table_entry(slong i);
+int _gr_tower_hypgeom_table_shape(slong * p, slong * q, int * used, int * zfree, fmpq_t z0, slong i);
+int _gr_tower_hypgeom_table_eval(gr_ptr params, int * cond, gr_ptr value, slong i, gr_srcptr * vals, gr_ctx_t ctx);
+int gr_tower_lazy_hypgeom_pfq_vec(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_struct * a, slong p, const gr_tower_lazy_elem_struct * b, slong q, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx);
+int gr_tower_lazy_hypgeom_pfq(gr_tower_lazy_elem_t res, const gr_vec_t a, const gr_vec_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx);
+int gr_tower_lazy_hypgeom_0f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx);
+int gr_tower_lazy_hypgeom_1f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t a, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx);
+int gr_tower_lazy_hypgeom_2f1(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t a, const gr_tower_lazy_elem_t b, const gr_tower_lazy_elem_t c, const gr_tower_lazy_elem_t z, int flags, gr_ctx_t ctx);
 int gr_tower_lazy_elliptic_e(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int gr_tower_lazy_euler(gr_tower_lazy_elem_t res, gr_ctx_t ctx);
 int gr_tower_lazy_catalan(gr_tower_lazy_elem_t res, gr_ctx_t ctx);

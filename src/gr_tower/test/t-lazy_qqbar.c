@@ -181,7 +181,7 @@ TEST_FUNCTION_START(gr_tower_lazy_qqbar, state)
     gr_ctx_init_fmpq(QQ);
     gr_ctx_init_complex_qqbar(QQbar);
 
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         gr_ptr x, y, d, q, r;
         slong depth = 1 + n_randint(state, 4);

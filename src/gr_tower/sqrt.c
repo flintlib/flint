@@ -25,6 +25,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* Square root in the base field: a rational number, or a rational
    function of the transcendental generators with square numerator and
    denominator. */
@@ -281,3 +284,5 @@ gr_tower_sqrt(gr_ptr res, gr_srcptr x, gr_tower_t T)
 {
     return gr_tower_sqrt_at(res, x, T->length, T);
 }
+
+POP_OPTIONS

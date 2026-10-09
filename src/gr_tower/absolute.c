@@ -25,6 +25,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* [F_k : F_0] */
 #define _degree_at(T, k) gr_tower_degree_at(T, k)
 
@@ -540,3 +543,5 @@ gr_tower_get_qqbar(qqbar_t res, gr_srcptr x, gr_tower_t T)
 
     return status;
 }
+
+POP_OPTIONS

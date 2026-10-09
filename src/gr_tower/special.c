@@ -17,8 +17,11 @@
 */
 
 #include "acb.h"
+#include "acb_dirichlet.h"
+#include "dirichlet.h"
 #include "acb_hypgeom.h"
 #include "acb_elliptic.h"
+#include "acb_modular.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 #include "ulong_extras.h"
@@ -26,6 +29,9 @@
 #include "gr_tower/impl.h"
 #include "bernoulli.h"
 #include "fmpz_poly.h"
+
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 /* P_j with (d/dx)^j cot(x) = P_j(cot(x)): P_0 = c, P_{j+1} = -(1 + c^2) P_j' */
 void
@@ -100,11 +106,31 @@ _gr_tower_special_eval(acb_t res, int kind, slong param, const acb_t u, slong pr
         case GR_TOWER_ZETA:
             acb_zeta(res, u, prec);
             break;
+        case GR_TOWER_DIRICHLET_L:
+            {
+                dirichlet_group_t G;
+                dirichlet_char_t chi;
+                ulong q = GR_TOWER_DIRICHLET_Q(param), k = GR_TOWER_DIRICHLET_K(param);
+                if (q < 3 || k >= q || n_gcd(k, q) != 1)
+                    return GR_UNABLE;
+                dirichlet_group_init(G, q);
+                dirichlet_char_init(chi, G);
+                dirichlet_char_log(chi, G, k);
+                acb_dirichlet_l(res, u, G, chi, prec);
+                dirichlet_char_clear(chi);
+                dirichlet_group_clear(G);
+            }
+            break;
         case GR_TOWER_ELLIPTIC_K:
             acb_elliptic_k(res, u, prec);
             break;
         case GR_TOWER_ELLIPTIC_E:
             acb_elliptic_e(res, u, prec);
+            break;
+        case GR_TOWER_MODULAR_LAMBDA:
+            if (!arb_is_positive(acb_imagref(u)))
+                return GR_UNABLE;
+            acb_modular_lambda(res, u, prec);
             break;
         case GR_TOWER_CONSTANT:
             if (param == GR_TOWER_CONST_EULER)
@@ -122,6 +148,178 @@ _gr_tower_special_eval(acb_t res, int kind, slong param, const acb_t u, slong pr
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
+/* The number of arguments (arg and the additional arguments xargs) of a
+   special function generator of the given kind. */
+slong
+_gr_tower_special_num_args(int kind, slong param)
+{
+    if (kind == GR_TOWER_CONSTANT)
+        return 0;
+    if (kind == GR_TOWER_HYPGEOM)
+        return 1 + GR_TOWER_HYPGEOM_P(param) + GR_TOWER_HYPGEOM_Q(param);
+    if (kind == GR_TOWER_JACOBI_THETA || kind == GR_TOWER_HURWITZ_ZETA)
+        return 2;
+    return 1;
+}
+
+/*
+    The flags of acb_hypgeom_2f1 for the exact parameters a, b, c (flat
+    elements in the context mctx): the differences a - b, a - c, b - c,
+    a + b - c which are (recognizably) integers, so that the limits are
+    evaluated when the parameters are inexact balls (1/3, sqrt(2)).
+*/
+int
+_gr_tower_hypgeom_2f1_flags(const fmpz_mpoly_q_t a, const fmpz_mpoly_q_t b, const fmpz_mpoly_q_t c, const fmpz_mpoly_ctx_t mctx)
+{
+    fmpz_mpoly_q_t d;
+    int flags = 0, k;
+
+    fmpz_mpoly_q_init(d, mctx);
+    for (k = 0; k < 4; k++)
+    {
+        if (k == 0)
+            fmpz_mpoly_q_sub(d, a, b, mctx);
+        else if (k == 1)
+            fmpz_mpoly_q_sub(d, a, c, mctx);
+        else if (k == 2)
+            fmpz_mpoly_q_sub(d, b, c, mctx);
+        else
+        {
+            fmpz_mpoly_q_add(d, a, b, mctx);
+            fmpz_mpoly_q_sub(d, d, c, mctx);
+        }
+        if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_numref(d), mctx) && fmpz_mpoly_is_one(fmpz_mpoly_q_denref(d), mctx))
+            flags |= (k == 0) ? ACB_HYPGEOM_2F1_AB : (k == 1) ? ACB_HYPGEOM_2F1_AC :
+                     (k == 2) ? ACB_HYPGEOM_2F1_BC : ACB_HYPGEOM_2F1_ABC;
+    }
+    fmpz_mpoly_q_clear(d, mctx);
+    return flags;
+}
+
+/* pFq(a; b; z) (not regularized) with u = (z, a_1, ..., a_p, b_1, ..., b_q);
+   flags: those of acb_hypgeom_2f1 for the integer differences (2F1) */
+static int
+_gr_tower_hypgeom_eval(acb_t res, slong param, acb_srcptr u, int flags, slong prec)
+{
+    slong p = GR_TOWER_HYPGEOM_P(param), q = GR_TOWER_HYPGEOM_Q(param);
+    acb_srcptr z = u, a = u + 1, b = u + 1 + p;
+
+    if (p == 0 && q == 1)
+        acb_hypgeom_0f1(res, b, z, 0, prec);
+    else if (p == 1 && q == 1)
+        acb_hypgeom_m(res, a, b, z, 0, prec);
+    else if (p == 2 && q == 1)
+        acb_hypgeom_2f1(res, a, a + 1, b, z, flags & ~ACB_HYPGEOM_2F1_REGULARIZED, prec);
+    else if (p == 2 && q == 0)
+    {
+        /* (an asymptotic series: only terminating cases are meaningful) */
+        acb_hypgeom_pfq(res, a, p, b, q, z, 0, prec);
+    }
+    else if (p <= q + 1)
+    {
+        /* the series converges for |z| < 1 when p = q + 1 */
+        if (p == q + 1)
+        {
+            mag_t t;
+            mag_init(t);
+            acb_get_mag(t, z);
+            if (mag_cmp_2exp_si(t, 0) >= 0)
+            {
+                mag_clear(t);
+                acb_indeterminate(res);
+                return GR_UNABLE;
+            }
+            mag_clear(t);
+        }
+        acb_hypgeom_pfq(res, a, p, b, q, z, 0, prec);
+    }
+    else
+        return GR_UNABLE;
+
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_tower_special_eval_multi(acb_t res, int kind, slong param, acb_srcptr u, slong nargs, slong prec)
+{
+    return _gr_tower_special_eval_multi_flags(res, kind, param, u, nargs, 0, prec);
+}
+
+int
+_gr_tower_special_eval_multi_flags(acb_t res, int kind, slong param, acb_srcptr u, slong nargs, int flags, slong prec)
+{
+    if (kind == GR_TOWER_HYPGEOM)
+    {
+        if (nargs != _gr_tower_special_num_args(kind, param))
+            return GR_UNABLE;
+        return _gr_tower_hypgeom_eval(res, param, u, flags, prec);
+    }
+
+    if (kind == GR_TOWER_CONSTANT)
+        return _gr_tower_special_eval(res, kind, param, NULL, prec);
+
+    if (kind == GR_TOWER_JACOBI_THETA)
+    {
+        acb_t t1, t2, t3, t4;
+        if (nargs != 2 || !arb_is_positive(acb_imagref(u + 1)))
+            return GR_UNABLE;
+        acb_init(t1); acb_init(t2); acb_init(t3); acb_init(t4);
+        acb_modular_theta(t1, t2, t3, t4, u, u + 1, prec);
+        acb_set(res, (param == 1) ? t1 : (param == 2) ? t2 : (param == 3) ? t3 : t4);
+        acb_clear(t1); acb_clear(t2); acb_clear(t3); acb_clear(t4);
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+
+    if (kind == GR_TOWER_HURWITZ_ZETA)
+    {
+        if (nargs != 2)
+            return GR_UNABLE;
+        acb_hurwitz_zeta(res, u, u + 1, prec);
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+
+    if (nargs != 1)
+        return GR_UNABLE;
+
+    return _gr_tower_special_eval(res, kind, param, u, prec);
+}
+
+/* whether the value is real at the given (real) arguments */
+int
+_gr_tower_special_real_at_multi(int kind, slong param, acb_srcptr u, slong nargs, slong prec)
+{
+    slong i;
+
+    /* theta_j(z, tau) is real for real z and purely imaginary tau */
+    if (kind == GR_TOWER_JACOBI_THETA)
+        return nargs == 2 && arb_is_zero(acb_imagref(u)) && arb_is_zero(acb_realref(u + 1));
+
+    /* zeta(s, a) for real s and a > 0 */
+    if (kind == GR_TOWER_HURWITZ_ZETA)
+        return nargs == 2 && arb_is_zero(acb_imagref(u)) && arb_is_zero(acb_imagref(u + 1)) && arb_is_positive(acb_realref(u + 1));
+
+    if (kind != GR_TOWER_HYPGEOM)
+        return (nargs <= 1) ? _gr_tower_special_real_at(kind, param, (nargs == 0) ? NULL : u, prec) : 0;
+
+    for (i = 0; i < nargs; i++)
+        if (!arb_is_zero(acb_imagref(u + i)))
+            return 0;
+
+    /* real for real arguments, except on the branch cut z > 1 when p = q + 1 */
+    if (GR_TOWER_HYPGEOM_P(param) == GR_TOWER_HYPGEOM_Q(param) + 1)
+    {
+        arb_t t;
+        int res;
+        arb_init(t);
+        arb_sub_ui(t, acb_realref(u), 1, prec);
+        res = arb_is_negative(t);
+        arb_clear(t);
+        return res;
+    }
+
+    return 1;
+}
+
 int
 _gr_tower_special_real_at(int kind, slong param, const acb_t u, slong prec)
 {
@@ -131,7 +329,11 @@ _gr_tower_special_real_at(int kind, slong param, const acb_t u, slong prec)
     if (kind == GR_TOWER_CONSTANT)
         return 1;
 
-    if (!arb_is_zero(acb_imagref(u)))
+    /* lambda is real on the imaginary axis */
+    if (kind == GR_TOWER_MODULAR_LAMBDA)
+        return u != NULL && arb_is_zero(acb_realref(u)) && arb_is_positive(acb_imagref(u));
+
+    if (u == NULL || !arb_is_zero(acb_imagref(u)))
         return 0;
 
     arb_init(t);
@@ -144,12 +346,23 @@ _gr_tower_special_real_at(int kind, slong param, const acb_t u, slong prec)
         case GR_TOWER_ZETA:
             res = 1;
             break;
+        case GR_TOWER_DIRICHLET_L:
+            /* real characters (k^2 = 1 mod q) */
+            {
+                ulong q = GR_TOWER_DIRICHLET_Q(param), k = GR_TOWER_DIRICHLET_K(param);
+                res = (q >= 1) && (n_mulmod2(k, k, q) == 1 % q);
+            }
+            break;
         case GR_TOWER_POLYLOG:
         case GR_TOWER_ELLIPTIC_K:
         case GR_TOWER_ELLIPTIC_E:
             /* real on (-inf, 1) */
             arb_sub_ui(t, acb_realref(u), 1, prec);
             res = arb_is_negative(t);
+            break;
+        case GR_TOWER_MODULAR_LAMBDA:
+            /* (not reached: tau is not real) */
+            res = 0;
             break;
         case GR_TOWER_LAMBERTW:
             /* W_0 is real on (-1/e, inf), W_{-1} on (-1/e, 0) */
@@ -186,8 +399,22 @@ _gr_tower_special_write(gr_stream_t out, int kind, slong param, const char * arg
         case GR_TOWER_GAMMA: status |= gr_stream_write(out, "gamma("); break;
         case GR_TOWER_ERF: status |= gr_stream_write(out, (param == 0) ? "erf(" : "erfi("); break;
         case GR_TOWER_ZETA: status |= gr_stream_write(out, "zeta("); break;
+        case GR_TOWER_HURWITZ_ZETA: status |= gr_stream_write(out, "hurwitz_zeta("); break;
+        case GR_TOWER_DIRICHLET_L:
+            status |= gr_stream_write(out, "dirichlet_l(chi(");
+            status |= gr_stream_write_ui(out, GR_TOWER_DIRICHLET_Q(param));
+            status |= gr_stream_write(out, ", ");
+            status |= gr_stream_write_ui(out, GR_TOWER_DIRICHLET_K(param));
+            status |= gr_stream_write(out, "), ");
+            break;
         case GR_TOWER_ELLIPTIC_K: status |= gr_stream_write(out, "elliptic_k("); break;
         case GR_TOWER_ELLIPTIC_E: status |= gr_stream_write(out, "elliptic_e("); break;
+        case GR_TOWER_MODULAR_LAMBDA: status |= gr_stream_write(out, "modular_lambda("); break;
+        case GR_TOWER_JACOBI_THETA:
+            status |= gr_stream_write(out, "jacobi_theta_");
+            status |= gr_stream_write_si(out, param);
+            status |= gr_stream_write(out, "(");
+            break;
         case GR_TOWER_LAMBERTW: status |= gr_stream_write(out, "lambertw("); break;
         case GR_TOWER_POLYGAMMA:
             if (param == 0)
@@ -203,6 +430,15 @@ _gr_tower_special_write(gr_stream_t out, int kind, slong param, const char * arg
             status |= gr_stream_write(out, "polylog(");
             status |= gr_stream_write_si(out, param);
             status |= gr_stream_write(out, ", ");
+            break;
+        case GR_TOWER_HYPGEOM:
+            {
+                slong p = GR_TOWER_HYPGEOM_P(param), q = GR_TOWER_HYPGEOM_Q(param);
+                if (p <= 2 && q == 1)
+                    status |= gr_stream_write(out, (p == 0) ? "hypgeom_0f1(" : (p == 1) ? "hypgeom_1f1(" : "hypgeom_2f1(");
+                else
+                    status |= gr_stream_write(out, "hypgeom_pfq(");
+            }
             break;
         default:
             return gr_stream_write(out, "?");
@@ -391,3 +627,5 @@ _gr_tower_hurwitz_relations(fmpq_mat_t A, const slong * col_of_k, slong s, slong
     fmpz_clear(ms);
     return nrows;
 }
+
+POP_OPTIONS

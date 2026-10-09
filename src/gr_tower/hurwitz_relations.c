@@ -57,6 +57,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* the generator as a Hurwitz value: sets *s (weight), *p, *q (the value
    is zeta(s, p/q), p/q in (0, 1]; for zeta(s): p = q = 1) and the
    factors alpha, beta with x = alpha g + beta pi^s; returns 1, or 0 if
@@ -664,3 +667,5 @@ _gr_tower_hurwitz_round(gr_tower_flat_t F, slong limit, slong depth)
 
     return changed;
 }
+
+POP_OPTIONS

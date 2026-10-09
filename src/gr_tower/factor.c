@@ -21,6 +21,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /*
     Factorization of polynomials over the fields of a tower by Trager's
     method. The norm N(M) of a polynomial M over F_k is the iterated
@@ -663,3 +666,5 @@ gr_tower_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t f, slong k,
     gr_ctx_clear(pctx);
     return status;
 }
+
+POP_OPTIONS

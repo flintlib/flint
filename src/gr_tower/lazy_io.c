@@ -16,6 +16,9 @@
 
 #include "gr_tower/lazy_impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 /* the number of decimal digits that separate the generator g from the
    other roots of its origin polynomial (0 if there is none, or if the
    roots cannot be isolated at a moderate precision) */
@@ -102,7 +105,7 @@ _write_gen_def(gr_stream_t out, const gr_tower_gen_struct * g, gr_tower_t T, slo
 
     if (GR_TOWER_KIND_IS_SPECIAL(g->def_kind))
     {
-        char * s = (g->arg.mctx != NULL) ? _gr_tower_flat_get_str(&g->arg.data, g->arg.mctx, T) : NULL;
+        char * s = _gr_tower_gen_args_str(g, T);
         status |= _gr_tower_special_write(out, g->def_kind, g->def_param, (s != NULL) ? s : "");
         flint_free(s);
         return status;
@@ -388,6 +391,58 @@ _gen_def_get_fexpr(fexpr_t res, const gr_tower_gen_struct * g, gr_tower_t T, slo
     {
         fexpr_set_symbol_builtin(res, (g->def_param == GR_TOWER_CONST_CATALAN) ? FEXPR_CatalanConstant : FEXPR_Euler);
     }
+    else if (g->def_kind == GR_TOWER_HYPGEOM && g->arg.mctx != NULL)
+    {
+        /* Hypergeometric0F1(b, z), ..., Hypergeometric3F2(a1, a2, a3, b1, b2, z) */
+        slong p = GR_TOWER_HYPGEOM_P(g->def_param), q = GR_TOWER_HYPGEOM_Q(g->def_param), i, n = 1 + p + q;
+        fexpr_ptr args;
+        fexpr_vec_t v;
+        ulong head;
+
+        fexpr_vec_init(v, n);
+        args = v->entries;
+        for (i = 0; i < p + q; i++)
+            _flat_get_fexpr(args + i, &g->xargs[i].data, g->xargs[i].mctx, T);
+        _flat_get_fexpr(args + p + q, &g->arg.data, g->arg.mctx, T);
+
+        head = (p == 0 && q == 1) ? FEXPR_Hypergeometric0F1 : (p == 1 && q == 1) ? FEXPR_Hypergeometric1F1 :
+               (p == 1 && q == 2) ? FEXPR_Hypergeometric1F2 : (p == 2 && q == 0) ? FEXPR_Hypergeometric2F0 :
+               (p == 2 && q == 1) ? FEXPR_Hypergeometric2F1 : (p == 2 && q == 2) ? FEXPR_Hypergeometric2F2 :
+               (p == 3 && q == 2) ? FEXPR_Hypergeometric3F2 : FEXPR_Unknown;
+
+        if (head != FEXPR_Unknown)
+        {
+            fexpr_t f;
+            fexpr_init(f);
+            fexpr_set_symbol_builtin(f, head);
+            fexpr_call_vec(res, f, args, n);
+            fexpr_clear(f);
+        }
+        else
+            fexpr_set_symbol_builtin(res, FEXPR_Unknown);
+
+        fexpr_vec_clear(v);
+    }
+    else if (g->def_kind == GR_TOWER_HURWITZ_ZETA && g->arg.mctx != NULL && g->num_xargs == 1)
+    {
+        _flat_get_fexpr(t, &g->arg.data, g->arg.mctx, T);
+        _flat_get_fexpr(u, &g->xargs[0].data, g->xargs[0].mctx, T);
+        fexpr_call_builtin2(res, FEXPR_HurwitzZeta, t, u);
+    }
+    else if (g->def_kind == GR_TOWER_JACOBI_THETA && g->arg.mctx != NULL && g->num_xargs == 1)
+    {
+        /* JacobiTheta(j, z, tau) */
+        fexpr_t f, jj;
+        fexpr_init(f);
+        fexpr_init(jj);
+        _flat_get_fexpr(t, &g->arg.data, g->arg.mctx, T);
+        _flat_get_fexpr(u, &g->xargs[0].data, g->xargs[0].mctx, T);
+        fexpr_set_si(jj, g->def_param);
+        fexpr_set_symbol_builtin(f, FEXPR_JacobiTheta);
+        fexpr_call3(res, f, jj, t, u);
+        fexpr_clear(f);
+        fexpr_clear(jj);
+    }
     else if (GR_TOWER_KIND_IS_SPECIAL(g->def_kind) && g->arg.mctx != NULL)
     {
         _flat_get_fexpr(t, &g->arg.data, g->arg.mctx, T);
@@ -399,6 +454,7 @@ _gen_def_get_fexpr(fexpr_t res, const gr_tower_gen_struct * g, gr_tower_t T, slo
             case GR_TOWER_ZETA: fexpr_call_builtin1(res, FEXPR_RiemannZeta, t); break;
             case GR_TOWER_ELLIPTIC_K: fexpr_call_builtin1(res, FEXPR_EllipticK, t); break;
             case GR_TOWER_ELLIPTIC_E: fexpr_call_builtin1(res, FEXPR_EllipticE, t); break;
+            case GR_TOWER_MODULAR_LAMBDA: fexpr_call_builtin1(res, FEXPR_ModularLambda, t); break;
             case GR_TOWER_LAMBERTW:
                 if (g->def_param == 0)
                     fexpr_call_builtin1(res, FEXPR_LambertW, t);
@@ -412,6 +468,21 @@ _gen_def_get_fexpr(fexpr_t res, const gr_tower_gen_struct * g, gr_tower_t T, slo
                     fexpr_call_builtin2(res, FEXPR_DigammaFunction, t, u);
                 break;
             case GR_TOWER_POLYLOG: fexpr_call_builtin2(res, FEXPR_PolyLog, u, t); break;
+            case GR_TOWER_DIRICHLET_L:
+                {
+                    fexpr_t qq, kk, ch;
+                    fexpr_init(qq);
+                    fexpr_init(kk);
+                    fexpr_init(ch);
+                    fexpr_set_ui(qq, GR_TOWER_DIRICHLET_Q(g->def_param));
+                    fexpr_set_ui(kk, GR_TOWER_DIRICHLET_K(g->def_param));
+                    fexpr_call_builtin2(ch, FEXPR_DirichletCharacter, qq, kk);
+                    fexpr_call_builtin2(res, FEXPR_DirichletL, t, ch);
+                    fexpr_clear(qq);
+                    fexpr_clear(kk);
+                    fexpr_clear(ch);
+                }
+                break;
             default: fexpr_set_symbol_builtin(res, FEXPR_Unknown);
         }
     }
@@ -567,34 +638,75 @@ _gr_tower_lazy_get_fexpr(fexpr_t res, const gr_tower_lazy_elem_t x, gr_ctx_t ctx
 /* generators of the context                                             */
 /* -------------------------------------------------------------------- */
 
+/*
+    The generators of the context: one element per definition (the
+    generator in the latest tower containing it, or the alias). Distinct
+    definitions with the same name (pi and i, created independently in
+    towers which were never merged) are listed once, by the generator in
+    the smallest tower, so that the parser, which must tell equal names
+    apart by their values, does not need to compare elements of large
+    towers.
+*/
 int
 _gr_tower_lazy_gens(gr_vec_t vec, gr_ctx_t ctx)
 {
     gr_tower_lazy_ctx_struct * L = LAZY(ctx);
     ulong id;
-    slong n = 0, i;
+    slong n = 0, i, j;
+    const char ** names;
+    slong * sizes;
 
     /* (generators created inside the towers, unnamed so far) */
     for (i = 0; i < L->num_towers; i++)
         _gr_tower_lazy_assign_def_ids(L->towers[i], ctx);
 
     gr_vec_set_length(vec, L->next_def_id, ctx);
+    names = flint_malloc(sizeof(const char *) * (L->next_def_id + 1));
+    sizes = flint_malloc(sizeof(slong) * (L->next_def_id + 1));
 
     for (id = 1; id <= L->next_def_id; id++)
     {
         gr_tower_lazy_elem_struct * res = (gr_tower_lazy_elem_struct *) gr_vec_entry_ptr(vec, n, ctx);
         int found = 0;
 
+        names[n] = NULL;
+        sizes[n] = 0;
         for (i = L->num_towers - 1; i >= 0 && !found; i--)
         {
             gr_tower_flat_struct * F = L->towers[i];
             slong d = gr_tower_find_def_order(F->T, id);
             if (d >= 0)
             {
+                names[n] = GR_TOWER_GEN(F->T, d)->name;
+                sizes[n] = F->T->num_gens;
+                /* a definition of the same name already listed: the one
+                   in the smaller tower */
+                for (j = 0; j < n && names[n] != NULL; j++)
+                {
+                    if (names[j] != NULL && strcmp(names[j], names[n]) == 0)
+                    {
+                        if (sizes[n] < sizes[j])
+                        {
+                            gr_tower_lazy_elem_struct * prev = (gr_tower_lazy_elem_struct *) gr_vec_entry_ptr(vec, j, ctx);
+                            _gr_tower_lazy_set_gen_d(prev, F, d, ctx);
+                            names[j] = names[n];
+                            sizes[j] = sizes[n];
+                        }
+                        break;
+                    }
+                }
+                if (j < n && names[n] != NULL)
+                {
+                    /* (listed already) */
+                    found = 0;
+                    break;
+                }
                 _gr_tower_lazy_set_gen_d(res, F, d, ctx);
                 found = 1;
             }
         }
+        if (!found && names[n] != NULL)
+            continue;
 
         for (i = 0; i < L->num_aliases && !found; i++)
         {
@@ -619,6 +731,8 @@ _gr_tower_lazy_gens(gr_vec_t vec, gr_ctx_t ctx)
             n++;
     }
 
+    flint_free(names);
+    flint_free(sizes);
     gr_vec_set_length(vec, n, ctx);
     return GR_SUCCESS;
 }
@@ -1001,3 +1115,5 @@ int gr_tower_lazy_get_fmpq_poly(fmpq_poly_t res, fmpz_poly_t modulus, const gr_t
 /* (the representation tag is published with a release store: no lock) */
 int gr_tower_lazy_repr(const gr_tower_lazy_elem_t x, gr_ctx_t ctx) { return (int) LAZY_REPR((const gr_tower_lazy_elem_struct *) x); }
 void gr_tower_lazy_ctx_stats(gr_ctx_t ctx) { LOCKED_V(_gr_tower_lazy_ctx_stats_impl(ctx)) }
+
+POP_OPTIONS

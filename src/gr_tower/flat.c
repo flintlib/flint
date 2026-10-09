@@ -38,6 +38,9 @@
 #include "gr_tower.h"
 #include "gr_tower/impl.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 typedef struct
 {
     gr_tower_flat_struct F;
@@ -479,3 +482,5 @@ gr_ctx_init_tower_field_flat(gr_ctx_t ctx, gr_tower_t T)
         _gr_tower_flat_methods_initialized = 1;
     }
 }
+
+POP_OPTIONS

@@ -23,6 +23,17 @@
 
 void _gr_tower_fit_length(gr_tower_t T, slong len);
 void _gr_tower_gen_set_status(gr_tower_gen_struct * g, int status);
+int _gr_tower_adjoin_special_multi_flat_nocheck(gr_tower_t T, int kind, slong param, const fmpz_mpoly_q_struct * u, slong nargs, const fmpz_mpoly_ctx_t mctx, const char * name);
+
+/* Arguments of generators (gen_args.c): arg (index 0, if present) and
+   the additional arguments xargs (indices 1, 2, ...) */
+slong _gr_tower_gen_num_args(const gr_tower_gen_struct * g);
+gr_tower_flat_elem_struct * _gr_tower_gen_arg_ptr(const gr_tower_gen_struct * g, slong i);
+void _gr_tower_gen_xargs_clear(gr_tower_gen_struct * g);
+char * _gr_tower_gen_args_str(const gr_tower_gen_struct * g, gr_tower_t T);
+int _gr_tower_gen_args_get_acb(acb_ptr res, const gr_tower_gen_struct * g, slong prec, gr_tower_flat_struct * F);
+int _gr_tower_gen_copy_def_map(gr_tower_gen_struct * ng, const gr_tower_gen_struct * g, gr_tower_map_t map);
+
 int _gr_tower_adjoin_special_flat_nocheck(gr_tower_t T, int kind, slong param, const fmpz_mpoly_q_t u, const fmpz_mpoly_ctx_t mctx, const char * name);
 gr_tower_gen_struct * _gr_tower_push_step(gr_tower_t T, const gr_poly_t m, const acb_t z, slong prec, int status, const char * name);
 
@@ -36,6 +47,27 @@ int _gr_tower_lazy_real_cyclotomic_eval(gr_tower_lazy_elem_t res, const fmpq_pol
 int _gr_tower_lazy_trig_pi_real_locked(gr_tower_lazy_elem_t res, const fmpq_t r, int which, gr_ctx_t ctx);
 int _gr_tower_lazy_special_gen_locked(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, int kind, slong param, gr_ctx_t ctx);
 int _gr_tower_lazy_special(gr_tower_lazy_elem_t res, int kind, slong param, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+int _gr_tower_lazy_dirichlet_l_prim(gr_ptr res, gr_srcptr s, ulong q, ulong k, gr_ctx_t ctx);
+int _gr_tower_lazy_hurwitz_rational(gr_ptr res, gr_srcptr s, slong p, slong q, gr_ctx_t ctx);
+int _gr_tower_lazy_hurwitz_general(gr_ptr res, gr_srcptr s, gr_srcptr a, gr_ctx_t ctx);
+/* functions of several arguments (lazy_multi.c, lazy_hypgeom.c): args[0] is
+   the argument arg of the generator, as in gr_tower_adjoin_special_multi_flat */
+int _gr_tower_lazy_special_multi(gr_tower_lazy_elem_t res, int kind, slong param, const gr_tower_lazy_elem_struct * args, slong nargs, gr_ctx_t ctx);
+int _gr_tower_lazy_special_gen_multi_locked(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_struct * args, slong nargs, int kind, slong param, gr_ctx_t ctx);
+int _gr_tower_lazy_special_alg_gen_multi_locked(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_struct * args, slong n, int kind, slong param, const gr_tower_lazy_elem_t W, ulong r, gr_ctx_t ctx);
+int _gr_tower_lazy_elliptic_gen(gr_ptr res, gr_srcptr m, int kind, gr_ctx_t ctx);
+/* the linking steps (Landen, quadratic transformations): nesting, and
+   whether a generator K, E (or 2F1) is at the argument t numerically */
+int _gr_tower_lazy_hyp_anchored(gr_ctx_t ctx, int delta);
+int _gr_tower_lazy_hyp_anchor_present(const acb_t t, int elliptic_only, gr_ctx_t ctx);
+int _gr_tower_lazy_elliptic_hypgeom(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t m, int kind, gr_ctx_t ctx);
+int _gr_tower_lazy_modular_lambda(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t tau, gr_ctx_t ctx);
+/* whether x is a rational number, exactly (a rational of small height
+   close to x, verified): 1, 0 (not known to be), -1 (unknown) */
+int _gr_tower_lazy_rational_recognize(fmpq_t c, gr_srcptr x, gr_ctx_t ctx);
+int _gr_tower_lazy_elliptic_cm(gr_ptr res, int * done, gr_srcptr m, int kind, gr_ctx_t ctx);
+int _gr_tower_lazy_jacobi_theta_j(gr_ptr res, slong j, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx);
+int _gr_tower_lazy_hypgeom_args(gr_tower_lazy_elem_t res, slong param, const gr_tower_lazy_elem_struct * args, slong nargs, gr_ctx_t ctx);
 truth_t _gr_tower_lazy_is_algebraic_repr_locked(const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 int _gr_tower_poly_norm(gr_poly_t res, const gr_poly_t M, slong j, gr_tower_t T);
 int _gr_tower_base_poly_factor(gr_vec_t fac, fmpz_vec_t mult, const gr_poly_t N, gr_tower_t T);
@@ -47,6 +79,7 @@ int _gr_tower_annihilating_poly(gr_poly_t res, gr_srcptr x, gr_tower_t T);
 int _gr_tower_flat_grow(gr_tower_flat_t F);
 void _gr_tower_move_to_front(gr_tower_t T, slong d);
 void _gr_tower_move_gen(gr_tower_t T, slong d, slong p);
+int _gr_tower_set_linear_gens(gr_tower_t T, slong n, const slong * d, const fmpz_mpoly_q_struct * v, const fmpz_mpoly_ctx_t mctx);
 fmpz_mpoly_q_struct * _gr_tower_flat_stale_alloc(gr_tower_flat_t F);
 
 /* Number fields of one generator in which elements of lazy fields have
@@ -90,7 +123,8 @@ void _gr_tower_flat_involved(int * mark, const fmpz_mpoly_q_t x, gr_tower_flat_t
 int _gr_tower_flat_involves_conjectural(const fmpz_mpoly_q_t x, gr_tower_flat_t F);
 
 /* gr_tower_adjoin_root_ui with an enclosure zx of x (or NULL) */
-int _gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb_t zx, const char * name);
+int _gr_tower_adjoin_root_ui_enclosure(gr_tower_t T, gr_srcptr x, ulong n, const acb_t zx, int known, const char * name);
+int _gr_tower_binomial_modular_evidence(gr_tower_t T, const fmpz_mpoly_q_t a, const fmpz_mpoly_ctx_t actx, ulong n, slong tries, ulong * power_prime);
 slong _gr_tower_nested_num_coeffs(gr_srcptr x, gr_ctx_t ctx, slong limit);
 char * _gr_tower_flat_get_str(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t mctx, gr_tower_t T);
 
@@ -110,6 +144,7 @@ int _gr_tower_has_conjectural_below(const gr_tower_t T, slong limit);
 #define GR_TOWER_FIELD_NONZERO 3
 
 int _gr_tower_field_is_zero_at(gr_srcptr x, slong k, gr_tower_t T);
+int _gr_tower_flat_nested_zero_code(const fmpz_mpoly_q_t x, gr_tower_flat_t F);
 
 /* Certification that a nonzero element x of F_k (a nonzero rational
    function of the transcendental generators over the algebraic part)
@@ -134,6 +169,14 @@ int _gr_tower_structural_proven(const gr_tower_gen_struct * g, const gr_tower_t 
 int _gr_tower_unramified_radical(const gr_tower_gen_struct * g, const gr_tower_t U, slong limit, int require_proven);
 void _gr_tower_express_downgraded(gr_tower_t T, slong from, slong to);
 int _gr_tower_lazy_real_sign_locked(int * sign, const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
+int _gr_tower_lazy_real_sign_fast(int * sgn, gr_srcptr x, gr_ctx_t ctx);
+int _gr_tower_lazy_re_cmp(int * sgn, gr_srcptr x, const fmpq_t c, gr_ctx_t ctx);
+int _gr_tower_lazy_im_sign(int * sgn, gr_srcptr x, gr_ctx_t ctx);
+int _gr_tower_lazy_view_finish(int status, gr_ptr res, int real, int alg, gr_ctx_t ctx);
+int _gr_tower_lazy_hurwitz_zeta_int(gr_ptr res, slong m, gr_srcptr a, gr_ctx_t ctx);
+int _gr_tower_hypgeom_2f1_flags(const fmpz_mpoly_q_t a, const fmpz_mpoly_q_t b, const fmpz_mpoly_q_t c, const fmpz_mpoly_ctx_t mctx);
+int _gr_tower_special_eval_multi_flags(acb_t res, int kind, slong param, acb_srcptr u, slong nargs, int flags, slong prec);
+int _gr_tower_gen_hypgeom_flags(const gr_tower_gen_struct * g, gr_tower_flat_struct * F);
 truth_t _gr_tower_lazy_is_real_exact(const gr_tower_lazy_elem_t x, gr_ctx_t ctx);
 void _gr_tower_lazy_lock(gr_ctx_t ctx);
 void _gr_tower_lazy_unlock(gr_ctx_t ctx);
@@ -213,5 +256,6 @@ int _gr_tower_special_root_gen(slong * d, slong * mult, gr_tower_flat_t F, const
 int _gr_tower_elliptic_round(gr_tower_flat_t F, slong limit, slong depth);
 int _gr_tower_special_trans_gen(slong * d, gr_tower_flat_t F, int kind, const fmpz_mpoly_q_t u, slong before);
 int _gr_tower_dilog_round(gr_tower_flat_t F, slong limit, slong depth);
+int _gr_tower_polylog_round(gr_tower_flat_t F, slong limit, slong depth);
 
 #endif
