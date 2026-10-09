@@ -543,6 +543,14 @@ _hyp_ev_args(gr_ptr args, slong n, hyp_expr_struct * E)
     return status;
 }
 
+/* whether b is a nonpositive integer */
+static int
+_hyp_ev_lower_pole(gr_srcptr b, gr_ctx_t ctx)
+{
+    slong n;
+    return gr_get_si(&n, b, ctx) == GR_SUCCESS && n <= 0;
+}
+
 static int
 _hyp_ev_atom(gr_ptr res, hyp_expr_struct * E)
 {
@@ -613,6 +621,16 @@ _hyp_ev_atom(gr_ptr res, hyp_expr_struct * E)
                 else if (strcmp(name, "erf") == 0) status = gr_erf(res, args, ctx);
                 else if (strcmp(name, "elliptic_k_gen") == 0) status = _gr_tower_lazy_elliptic_gen(res, args, GR_TOWER_ELLIPTIC_K, ctx);
                 else if (strcmp(name, "elliptic_e_gen") == 0) status = _gr_tower_lazy_elliptic_gen(res, args, GR_TOWER_ELLIPTIC_E, ctx);
+                else if (n >= 2 && _hyp_ev_lower_pole(ENTRY(args, n - 2, sz), ctx))
+                {
+                    /* the identities hold by continuation in the
+                       parameters: at a nonpositive integer lower
+                       parameter the function on the right is the limit,
+                       not the terminating series of the convention
+                       (2F1(1/4, 3/4; -1/2; z) through 2F1(1/2, -1; -2; w),
+                       with c = -1/2 in entry "a, a+1/2 | c") */
+                    status = GR_UNABLE;
+                }
                 else if (n >= 2)
                 {
                     /* a hypergeometric function of another family */

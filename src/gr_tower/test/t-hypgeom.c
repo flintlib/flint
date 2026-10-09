@@ -103,6 +103,92 @@ _hyp_check_overlap(gr_srcptr x, const acb_t y, gr_ctx_t K)
     return ok;
 }
 
+/*
+    Table entry i at the symbol values sym (those used) and z = c, against
+    the numerical value of its left-hand side: returns 1 if checked, 0 if
+    the entry does not apply (or the reference is not available there);
+    aborts on a mismatch.
+*/
+static int
+_hyp_table_check(slong i, slong p, slong q, const int * used, const fmpq * sym, const fmpq_t c, gr_ctx_t K)
+{
+    gr_srcptr vals[26];
+    gr_ptr symv, params, value;
+    acb_ptr av;
+    fmpq * pq;
+    acb_t zv, ref;
+    int status, cond, ok = 1, checked = 0;
+    slong k;
+
+    symv = gr_heap_init_vec(26, K);
+    params = gr_heap_init_vec(FLINT_MAX(p + q, 1), K);
+    value = gr_heap_init(K);
+    av = _acb_vec_init(FLINT_MAX(p + q, 1));
+    pq = _fmpq_vec_init(FLINT_MAX(p + q, 3));
+    acb_init(zv);
+    acb_init(ref);
+
+    for (k = 0; k < 26; k++)
+        vals[k] = NULL;
+    for (k = 0; k < 25; k++)
+    {
+        if (!used[k])
+            continue;
+        GR_MUST_SUCCEED(gr_set_fmpq(GR_ENTRY(symv, k, K->sizeof_elem), sym + k, K));
+        vals[k] = GR_ENTRY(symv, k, K->sizeof_elem);
+    }
+    GR_MUST_SUCCEED(gr_set_fmpq(GR_ENTRY(symv, 25, K->sizeof_elem), c, K));
+    vals[25] = GR_ENTRY(symv, 25, K->sizeof_elem);
+    arb_set_fmpq(acb_realref(zv), c, 256);
+
+    status = _gr_tower_hypgeom_table_eval(params, &cond, value, i, vals, K);
+    if (status != GR_SUCCESS || cond != 1)
+        ok = 0;
+
+    /* rational parameters, not nonpositive integers; for the sums
+       at z = 1, sum b - sum a >= 2 */
+    for (k = 0; k < p + q && ok; k++)
+    {
+        if (gr_get_fmpq(pq + k, GR_ENTRY(params, k, K->sizeof_elem), K) != GR_SUCCESS ||
+            (fmpz_is_one(fmpq_denref(pq + k)) && fmpz_sgn(fmpq_numref(pq + k)) <= 0))
+            ok = 0;
+        else
+            arb_set_fmpq(acb_realref(av + k), pq + k, 256);
+    }
+    if (ok && p == q + 1 && fmpq_is_one(c))
+    {
+        double sd = 0.0;
+        for (k = 0; k < p + q; k++)
+            sd += ((k < p) ? -1 : 1) * arf_get_d(arb_midref(acb_realref(av + k)), ARF_RND_NEAR);
+        if (sd < 2.0)
+            ok = 0;
+    }
+
+    if (ok && _hyp_reference(ref, av, p, av + p, q, zv,
+            (p == 2 && q == 1) ? _hyp_2f1_flags(pq + 0, pq + 1, pq + 2) : 0, 256))
+    {
+        if (!_hyp_check_overlap(value, ref, K))
+        {
+            flint_printf("FAIL: table entry %wd: %s\n", i, _gr_tower_hypgeom_table_entry(i));
+            flint_printf("params = "); _gr_vec_print(params, p + q, K); flint_printf("\n");
+            flint_printf("z = "); fmpq_print(c); flint_printf("\n");
+            flint_printf("value = "); gr_println(value, K);
+            flint_printf("reference = "); acb_printn(ref, 30, 0); flint_printf("\n");
+            flint_abort();
+        }
+        checked = 1;
+    }
+
+    acb_clear(zv);
+    acb_clear(ref);
+    _acb_vec_clear(av, FLINT_MAX(p + q, 1));
+    _fmpq_vec_clear(pq, FLINT_MAX(p + q, 3));
+    gr_heap_clear(value, K);
+    gr_heap_clear_vec(params, FLINT_MAX(p + q, 1), K);
+    gr_heap_clear_vec(symv, 26, K);
+    return checked;
+}
+
 TEST_FUNCTION_START(gr_tower_hypgeom, state)
 {
     gr_ctx_t QQ, K;
@@ -117,7 +203,7 @@ TEST_FUNCTION_START(gr_tower_hypgeom, state)
     for (i = 0; i < n; i++)
     {
         slong p, q, k, tries, checked = 0;
-        int used[25], zfree, cond;
+        int used[25], zfree;
         fmpq_t z0;
 
         fmpq_init(z0);
@@ -129,32 +215,15 @@ TEST_FUNCTION_START(gr_tower_hypgeom, state)
 
         for (tries = 0; tries < 40 && checked < 2; tries++)
         {
-            gr_srcptr vals[26];
-            gr_ptr symv, params, value;
+            fmpq sym[25];
             fmpq_t c;
-            acb_ptr av;
-            fmpq * pq;
-            acb_t zv, ref;
-            int status, ok = 1;
 
-            symv = gr_heap_init_vec(26, K);
-            params = gr_heap_init_vec(FLINT_MAX(p + q, 1), K);
-            value = gr_heap_init(K);
-            av = _acb_vec_init(FLINT_MAX(p + q, 1));
-            pq = _fmpq_vec_init(FLINT_MAX(p + q, 3));
-            acb_init(zv);
-            acb_init(ref);
             fmpq_init(c);
-
-            for (k = 0; k < 26; k++)
-                vals[k] = NULL;
             for (k = 0; k < 25; k++)
             {
-                if (!used[k])
-                    continue;
-                _rand_fmpq(c, state, 7, 4);
-                GR_MUST_SUCCEED(gr_set_fmpq(GR_ENTRY(symv, k, K->sizeof_elem), c, K));
-                vals[k] = GR_ENTRY(symv, k, K->sizeof_elem);
+                fmpq_init(sym + k);
+                if (used[k])
+                    _rand_fmpq(sym + k, state, 7, 4);
             }
             if (zfree)
             {
@@ -163,55 +232,52 @@ TEST_FUNCTION_START(gr_tower_hypgeom, state)
             }
             else
                 fmpq_set(c, z0);
-            GR_MUST_SUCCEED(gr_set_fmpq(GR_ENTRY(symv, 25, K->sizeof_elem), c, K));
-            vals[25] = GR_ENTRY(symv, 25, K->sizeof_elem);
-            arb_set_fmpq(acb_realref(zv), c, 256);
 
-            status = _gr_tower_hypgeom_table_eval(params, &cond, value, i, vals, K);
-            if (status != GR_SUCCESS || cond != 1)
-                ok = 0;
+            checked += _hyp_table_check(i, p, q, used, sym, c, K);
 
-            /* rational parameters, not nonpositive integers; for the sums
-               at z = 1, sum b - sum a >= 2 */
-            for (k = 0; k < p + q && ok; k++)
-            {
-                if (gr_get_fmpq(pq + k, GR_ENTRY(params, k, K->sizeof_elem), K) != GR_SUCCESS ||
-                    (fmpz_is_one(fmpq_denref(pq + k)) && fmpz_sgn(fmpq_numref(pq + k)) <= 0))
-                    ok = 0;
-                else
-                    arb_set_fmpq(acb_realref(av + k), pq + k, 256);
-            }
-            if (ok && p == q + 1 && fmpq_is_one(c))
-            {
-                double sd = 0.0;
-                for (k = 0; k < p + q; k++)
-                    sd += ((k < p) ? -1 : 1) * arf_get_d(arb_midref(acb_realref(av + k)), ARF_RND_NEAR);
-                if (sd < 2.0)
-                    ok = 0;
-            }
-
-            if (ok && _hyp_reference(ref, av, p, av + p, q, zv,
-                    (p == 2 && q == 1) ? _hyp_2f1_flags(pq + 0, pq + 1, pq + 2) : 0, 256))
-            {
-                if (!_hyp_check_overlap(value, ref, K))
-                {
-                    flint_printf("FAIL: table entry %wd: %s\n", i, _gr_tower_hypgeom_table_entry(i));
-                    flint_printf("params = "); _gr_vec_print(params, p + q, K); flint_printf("\n");
-                    flint_printf("value = "); gr_println(value, K);
-                    flint_printf("reference = "); acb_printn(ref, 30, 0); flint_printf("\n");
-                    flint_abort();
-                }
-                checked++;
-            }
-
+            for (k = 0; k < 25; k++)
+                fmpq_clear(sym + k);
             fmpq_clear(c);
-            acb_clear(zv);
-            acb_clear(ref);
-            _acb_vec_clear(av, FLINT_MAX(p + q, 1));
-            _fmpq_vec_clear(pq, FLINT_MAX(p + q, 3));
-            gr_heap_clear(value, K);
-            gr_heap_clear_vec(params, FLINT_MAX(p + q, 1), K);
-            gr_heap_clear_vec(symv, 26, K);
+        }
+
+        /* symbols at half-integers, quarters and negative values, where
+           parameters of the functions on the right become nonpositive
+           integers (2F1(1/4, 3/4; -1/2; 3/8) by entry "a, a+1/2 | c":
+           2F1(1/2, -1; -2; w) on the right, whose value there is the
+           limit in c, not the terminating series) */
+        for (tries = 0; tries < 12; tries++)
+        {
+            static const slong vn[] = { -5, -3, -1, -1, 1, 1, 3, 3, 1, -3 };
+            static const slong vd[] = { 2, 2, 2, 4, 4, 2, 4, 2, 3, 4 };
+            static const slong zn[] = { 3, -1, 1, -3 };
+            static const slong zd[] = { 8, 3, 5, 4 };
+            fmpq sym[25];
+            fmpq_t c;
+            slong j;
+
+            fmpq_init(c);
+            for (k = 0; k < 25; k++)
+            {
+                fmpq_init(sym + k);
+                if (used[k])
+                {
+                    j = n_randint(state, 10);
+                    fmpq_set_si(sym + k, vn[j], vd[j]);
+                }
+            }
+            if (zfree)
+            {
+                j = n_randint(state, 4);
+                fmpq_set_si(c, zn[j], zd[j]);
+            }
+            else
+                fmpq_set(c, z0);
+
+            (void) _hyp_table_check(i, p, q, used, sym, c, K);
+
+            for (k = 0; k < 25; k++)
+                fmpq_clear(sym + k);
+            fmpq_clear(c);
         }
 
         if (checked == 0)
