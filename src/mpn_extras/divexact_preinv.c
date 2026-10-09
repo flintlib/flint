@@ -23,7 +23,7 @@
 */
 
 void
-flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn)
+flint_mpn_divexact_preinv_init_prec(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn, mp_size_t qn)
 {
     mp_size_t k = 0;
 
@@ -55,8 +55,18 @@ flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_
     pre->bn = bn;
 
     /* one limb beyond bn, so that quotients of bn + 1 limbs (the generic
-       balanced case) are still a single low product */
-    flint_mpn_binv(pre->binv, pre->b, bn, bn + 1);
+       balanced case) are still a single low product; but a quotient of
+       n limbs only needs binv mod B^n, which depends only on the low
+       n limbs of b', so if all quotients are known to be short, the
+       inverse is only computed to that precision */
+    pre->binvn = FLINT_MAX(FLINT_MIN(qn, bn + 1), 1);
+    flint_mpn_binv(pre->binv, pre->b, FLINT_MIN(bn, pre->binvn), pre->binvn);
+}
+
+void
+flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn)
+{
+    flint_mpn_divexact_preinv_init_prec(pre, b, bn, WORD_MAX);
 }
 
 void
@@ -100,12 +110,15 @@ flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_d
     a += k;
     an -= k;
 
-    if (bn >= 2 && bn <= FLINT_MPN_DIVEXACT_SMALL_BN && n > bn + 1)
+    if (bn >= 2 && ((bn <= FLINT_MPN_DIVEXACT_SMALL_BN && n > bn + 1)
+                    || n > pre->binvn))
     {
         /* long quotients by short divisors: the register-based Hensel
            division of _flint_mpn_divexact beats the block algorithm here;
            it is given the exactly divisible (fully shifted) operands and
-           writes an - bn + 1 >= n limbs, the extra ones being zero */
+           writes an - bn + 1 >= n limbs, the extra ones being zero.
+           This is also the fallback for quotients longer than the
+           precision of a truncated inverse (init_prec). */
         mp_ptr qq;
         /* _flint_mpn_divexact wants a nonzero top limb */
         mp_size_t bn2 = bn - (pre->b[bn - 1] == 0);

@@ -88,5 +88,38 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         fmpz_clear(n);
     }
 
+    /* Regression test: in-place division of a long vector with large
+       entries (temporary space must not accumulate on the stack) */
+    {
+        fmpz *a;
+        fmpz_t n, q;
+        slong j, len = 3000;
+
+        fmpz_init(n);
+        fmpz_init(q);
+        fmpz_ui_pow_ui(n, 3, 100);
+        fmpz_ui_pow_ui(q, 7, 22000);   /* about 970 limbs */
+
+        a = _fmpz_vec_init(len);
+        for (j = 0; j < len; j++)
+            fmpz_mul(a + j, q, n);
+
+        _fmpz_vec_scalar_divexact_fmpz(a, a, len, n);
+
+        for (j = 0; j < len; j++)
+        {
+            if (!fmpz_equal(a + j, q))
+            {
+                flint_printf("FAIL (long vector, entry %wd)\n", j);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        _fmpz_vec_clear(a, len);
+        fmpz_clear(n);
+        fmpz_clear(q);
+    }
+
     TEST_FUNCTION_END(state);
 }
