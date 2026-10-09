@@ -136,6 +136,20 @@ _reference(arb_t res, int power, const fmpz_t cP, const fmpz_t cQ,
     mag_clear(e);
 }
 
+/* fmpz_set_si truncates to 32 bits on 32-bit platforms */
+static void
+_fmpz_set_int64(fmpz_t x, int64_t v)
+{
+    uint64_t u = (v < 0) ? -(uint64_t) v : (uint64_t) v;
+#if FLINT_BITS == 64
+    fmpz_set_ui(x, u);
+#else
+    fmpz_set_uiui(x, (ulong) (u >> 32), (ulong) u);
+#endif
+    if (v < 0)
+        fmpz_neg(x, x);
+}
+
 static void
 _randbig(fmpz_t x, flint_rand_t state, slong bits)
 {
@@ -663,14 +677,15 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
         Qz = _fmpz_vec_init(Qlen);
         Rz = _fmpz_vec_init(Rlen);
         for (i = 0; i < Plen; i++)
-            fmpz_set_si(Pz + i, P[i]);
+            _fmpz_set_int64(Pz + i, P[i]);
         for (i = 0; i < Qlen; i++)
-            fmpz_set_si(Qz + i, Q[i]);
+            _fmpz_set_int64(Qz + i, Q[i]);
         for (i = 0; i < Rlen; i++)
-            fmpz_set_si(Rz + i, R[i]);
-        fmpz_init_set_si(zP, cP);
-        fmpz_init_set_si(zQ, cQ);
-        fmpz_init_set_si(zD, cD);
+            _fmpz_set_int64(Rz + i, R[i]);
+        fmpz_init(zP); fmpz_init(zQ); fmpz_init(zD);
+        _fmpz_set_int64(zP, cP);
+        _fmpz_set_int64(zQ, cQ);
+        _fmpz_set_int64(zD, cD);
         mp_real_init(x); mp_real_init(y);
         arb_init(a); arb_init(b);
 

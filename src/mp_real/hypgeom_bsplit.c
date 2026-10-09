@@ -1756,7 +1756,8 @@ sieve_info_init(hyp_sieve_info * I, const fmpz * Q, slong Qlen,
             && (ulong) (-I->v[i]) / I->u[i] <= (ulong) N)
             goto cleanup;
     }
-    if (M > 0x1p60)
+    /* the values u k + v are computed and sieved in single words */
+    if (M >= ldexp(1.0, FLINT_BITS - 2))
         goto cleanup;
 
     /* the matching bound and the pruning thresholds */
@@ -3678,7 +3679,10 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     if (s->power != 1 && s->power != -1)
         flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: power must be 1 or -1\n");
 
-    wp = FLINT_MAX(n, 2);
+    /* at least 128 bits: with two 32-bit limbs, a small top limb of Q
+       leaves too few bits for its rounding errors (the final division
+       requires a relative radius below 2^-30) */
+    wp = FLINT_MAX(n, 128 / FLINT_BITS);
 
     P = _fmpz_vec_init(Plen + Qlen + Rlen + 3 + Qlen + Rlen + 2);
     Q = P + Plen + 1;
