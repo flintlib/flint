@@ -258,6 +258,22 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
 #endif
 
 /* Multiplication */
+#if !defined(umul_ppmm) && defined(__GNUC__) && defined(__SIZEOF_INT128__) && FLINT_BITS == 64
+# define umul_ppmm(w1, w0, u, v) \
+  do { \
+    __uint128_t __rx = (__uint128_t) (ulong) (u) * (ulong) (v); \
+    (w0) = (ulong) __rx; \
+    (w1) = (ulong) (__rx >> FLINT_BITS); \
+  } while (0)
+
+# define smul_ppmm(w1, w0, u, v) \
+  do { \
+    __int128_t __rx = (__int128_t) (slong) (u) * (slong) (v); \
+    (w0) = (ulong) __rx; \
+    (w1) = (ulong) (__rx >> FLINT_BITS); \
+  } while (0)
+#endif
+
 #if !defined(umul_ppmm)
 # define umul_ppmm(w1, w0, u, v) \
   do { \
