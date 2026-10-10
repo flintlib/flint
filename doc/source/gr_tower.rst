@@ -1796,6 +1796,7 @@ the computations that follow; the elements created before remain valid.
            GR_TOWER_OPT_SMOOTH_LIMIT
            GR_TOWER_OPT_EXPRESS_DEGREE_LIMIT
            GR_TOWER_OPT_EXPRESS_PREC
+           GR_TOWER_OPT_EXPRESS_ROUNDS
            GR_TOWER_OPT_TRAGER_DEGREE_LIMIT
            GR_TOWER_OPT_FACTOR_DEGREE_LIMIT
            GR_TOWER_OPT_ROOTS_FACTOR_DEGREE_LIMIT
@@ -1866,6 +1867,18 @@ The options (default values in parentheses; precisions are in bits):
   searches in fields up to this degree, at a precision of this many
   bits plus four per degree of the field
   (:macro:`GR_TOWER_MERGE_EXPRESS_PREC`).
+* :macro:`GR_TOWER_OPT_EXPRESS_ROUNDS` (2): the lattice-based
+  expression searches try at most this many precisions, doubling from
+  about twice the degree of the field (0: up to the precision limit).
+  A relation is nearly always found at the first or second precision,
+  while a search which finds none runs up to the limit, its last
+  rounds being the costliest: in the test suite, of 309 searches which
+  succeeded, 277 did at the first precision, 31 at the second and 1 at
+  the third, and the 319 which failed (92% of the time of the searches)
+  never met a spurious relation. With 2, the test suite is about 12%
+  faster than with 0 and the profile catalog 7%; with 1, 35% and 12%
+  (all results unchanged), an expression missed being left to the zero
+  tests, as in the fields where the search does not apply.
 * :macro:`GR_TOWER_OPT_TRAGER_DEGREE_LIMIT` (48),
   :macro:`GR_TOWER_OPT_MODULAR_TRIES` (6),
   :macro:`GR_TOWER_OPT_MODULAR_TERMS_LIMIT` (50000),
@@ -2040,7 +2053,9 @@ Lazy field (gr_tower_lazy.h)
     with ``GR_DOMAIN`` (`i`, roots and logarithms of negative numbers,
     inverse trigonometric functions outside their real domains,
     conversions of non-real numbers, non-real polynomial roots are
-    dropped by :func:`gr_poly_roots`, and :func:`gr_factor` gives
+    dropped by :func:`gr_poly_roots` (for rational polynomials, only
+    the real roots are isolated: 0.1 s rather than 1.4 s for
+    `x^{100} - 2 (101 x - 1)^2`, which has 4), and :func:`gr_factor` gives
     quadratic factors for the pairs of nonreal roots); since all
     elements are real, the tests are sign tests. The real and algebraic
     fields can also be created as views of a complex field sharing its

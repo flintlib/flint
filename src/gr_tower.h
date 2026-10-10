@@ -316,6 +316,7 @@ enum
     GR_TOWER_OPT_MINPOLY_DEGREE_LIMIT,      /* lazy fields: equality of split parts by the minimal polynomial of one of degree up to this */
     GR_TOWER_OPT_INV_DENSE_ALG,             /* dense inverses in fields of several generators: 0 automatic, 1 modular only, 2 linear algebra only (testing) */
     GR_TOWER_OPT_POWER_CHECK_DEGREE_LIMIT,  /* lazy fields: roots found in the field when the radicand is likely a power, up to this degree (0: never) */
+    GR_TOWER_OPT_EXPRESS_ROUNDS,            /* precisions tried by the lattice-based expression searches (0: up to the precision limit) */
     GR_TOWER_OPT_NUM_OPTIONS
 };
 

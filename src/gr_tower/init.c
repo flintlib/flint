@@ -85,6 +85,7 @@ static const option_info_struct option_info[GR_TOWER_OPT_NUM_OPTIONS] =
     {"minpoly_degree_limit", 512, 0, OPT_ANY},
     {"inv_dense_alg", 0, 0, 2},
     {"power_check_degree_limit", 64, 0, OPT_ANY},
+    {"express_rounds", 2, 0, OPT_ANY},
 };
 
 const slong gr_tower_default_options[GR_TOWER_OPT_NUM_OPTIONS] =
@@ -92,7 +93,7 @@ const slong gr_tower_default_options[GR_TOWER_OPT_NUM_OPTIONS] =
     0, GR_TOWER_PRINT_SYMBOLIC | GR_TOWER_PRINT_DEFS, GR_TOWER_PRINT_DIGITS_DEFAULT,
     256, 4096, 65536, 3512, 64, 256, 48, 128, 64, 6, 50000, 24, 2000, 200000, 2000, 10000,
     100000, 512, 64, 12, 6, 360, 100000, 480, 240, 1000, GR_TOWER_TRIG_EXPONENTIAL, 0, 0, 0,
-    120, 1024, 36, 12, 240, 64, 240, 30, 1048576, 8, 0, 4096, 512, 0, 64,
+    120, 1024, 36, 12, 240, 64, 240, 30, 1048576, 8, 0, 4096, 512, 0, 64, 2,
 };
 
 const char *

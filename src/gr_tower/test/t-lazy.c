@@ -762,6 +762,113 @@ TEST_FUNCTION_START(gr_tower_lazy, state)
         }
     }
 
+    /* Roots of rational polynomials in the real field: only the real
+       roots are isolated (as many as the real roots found in the complex
+       field, with the same multiplicities and values) */
+    {
+        static const char * polys[] = {
+            "(x^2 + 1)*(x^2 - 2)*(x^3 - x - 1)*(x^4 + 1)*(x - 3)^2",
+            "x^2 + x + 1",
+            "x^20 - 2*(101*x - 1)^2",
+            "(x^5 - x - 1)^3*(x^2 - 5)",
+        };
+        static const slong nreal[] = { 4, 0, 4, 3 };
+        slong k;
+        gr_ctx_t KR, KC;
+
+        gr_ctx_init_tower_lazy(KC, QQ, 0);
+        gr_ctx_init_tower_lazy(KR, QQ, GR_TOWER_LAZY_REAL);
+
+        for (k = 0; k < (slong) (sizeof(nreal) / sizeof(slong)); k++)
+        {
+            gr_ctx_t PR, PC;
+            gr_ptr fr, fc;
+            gr_vec_t rr, rc;
+            fmpz_vec_t mr, mc;
+            slong i, j, nrc = 0;
+
+            gr_ctx_init_gr_poly(PR, KR);
+            gr_ctx_init_gr_poly(PC, KC);
+            fr = gr_heap_init(PR);
+            fc = gr_heap_init(PC);
+            gr_vec_init(rr, 0, KR);
+            gr_vec_init(rc, 0, KC);
+            fmpz_vec_init(mr, 0);
+            fmpz_vec_init(mc, 0);
+            GR_MUST_SUCCEED(gr_ctx_set_gen_name(PR, "x"));
+            GR_MUST_SUCCEED(gr_ctx_set_gen_name(PC, "x"));
+            GR_MUST_SUCCEED(gr_set_str(fr, polys[k], PR));
+            GR_MUST_SUCCEED(gr_set_str(fc, polys[k], PC));
+
+            GR_MUST_SUCCEED(gr_poly_roots(rr, mr, fr, 0, KR));
+            GR_MUST_SUCCEED(gr_poly_roots(rc, mc, fc, 0, KC));
+
+            if (rr->length != nreal[k])
+            {
+                flint_printf("FAIL: real roots of %s: %wd, expected %wd\n", polys[k], rr->length, nreal[k]);
+                flint_abort();
+            }
+
+            /* each real root of the complex field, with its multiplicity,
+               among the roots of the real field */
+            for (i = 0; i < rc->length; i++)
+            {
+                gr_srcptr z = gr_vec_entry_srcptr(rc, i, KC);
+                int found = 0;
+
+                if (gr_tower_lazy_is_real(z, KC) != T_TRUE)
+                    continue;
+                nrc++;
+                for (j = 0; j < rr->length && !found; j++)
+                {
+                    acb_t a, b;
+                    acb_init(a); acb_init(b);
+                    GR_MUST_SUCCEED(gr_tower_lazy_get_acb(a, z, 128, KC));
+                    GR_MUST_SUCCEED(gr_tower_lazy_get_acb(b, gr_vec_entry_srcptr(rr, j, KR), 128, KR));
+                    if (acb_overlaps(a, b) && fmpz_equal(mc->entries + i, mr->entries + j))
+                        found = 1;
+                    acb_clear(a); acb_clear(b);
+                }
+                if (!found)
+                {
+                    flint_printf("FAIL: real root %wd of %s missing in the real field\n", i, polys[k]);
+                    flint_abort();
+                }
+            }
+            if (nrc != rr->length)
+            {
+                flint_printf("FAIL: real roots of %s: %wd in the real field, %wd in the complex field\n", polys[k], rr->length, nrc);
+                flint_abort();
+            }
+
+            /* the roots are roots */
+            for (j = 0; j < rr->length; j++)
+            {
+                gr_ptr v;
+                GR_TMP_INIT(v, KR);
+                GR_MUST_SUCCEED(gr_poly_evaluate(v, fr, gr_vec_entry_srcptr(rr, j, KR), KR));
+                if (gr_is_zero(v, KR) != T_TRUE)
+                {
+                    flint_printf("FAIL: not a root of %s\n", polys[k]);
+                    flint_abort();
+                }
+                GR_TMP_CLEAR(v, KR);
+            }
+
+            gr_vec_clear(rr, KR);
+            gr_vec_clear(rc, KC);
+            fmpz_vec_clear(mr);
+            fmpz_vec_clear(mc);
+            gr_heap_clear(fr, PR);
+            gr_heap_clear(fc, PC);
+            gr_ctx_clear(PR);
+            gr_ctx_clear(PC);
+        }
+
+        gr_ctx_clear(KR);
+        gr_ctx_clear(KC);
+    }
+
     /* Transfer between two lazy contexts and string round trips must be
        exact even for roots that are closer than their printed approximations
        would suggest: x^20 - 2 (101 x - 1)^2 has two real roots about

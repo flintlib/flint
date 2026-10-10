@@ -122,6 +122,7 @@ gr_tower_express_limit(gr_ptr res, const gr_poly_t q, const acb_t z, slong prec_
     gr_ptr coeffs, val;
     fmpq_t c;
     int status = GR_UNABLE;
+    slong rnd, max_rounds;
 
     /* the search is for a Q-linear combination of the monomial basis;
        over a transcendental base only such combinations are found */
@@ -130,12 +131,6 @@ gr_tower_express_limit(gr_ptr res, const gr_poly_t q, const acb_t z, slong prec_
 
     if (q->length < 2)
         return GR_DOMAIN;
-
-    vec = _acb_vec_init(D + 1);
-    rel = _fmpz_vec_init(D + 1);
-    coeffs = gr_heap_init_vec(D, F);
-    fmpq_init(c);
-    GR_TMP_INIT(val, top);
 
     /* default precision limit: the coordinates can have about
        deg(q) * height(q) bits, times D for the common denominator */
@@ -146,7 +141,19 @@ gr_tower_express_limit(gr_ptr res, const gr_poly_t q, const acb_t z, slong prec_
     if (prec_limit > 100000)
         prec_limit = 100000;
 
-    for (prec = FLINT_MAX(GR_TOWER_DEFAULT_PREC, 2 * (D + 1)); prec <= prec_limit; prec *= 2)
+    vec = _acb_vec_init(D + 1);
+    rel = _fmpz_vec_init(D + 1);
+    coeffs = gr_heap_init_vec(D, F);
+    fmpq_init(c);
+    GR_TMP_INIT(val, top);
+
+    /* (at most max_rounds precisions, GR_TOWER_OPT_EXPRESS_ROUNDS: a
+       relation is nearly always found at the first or second, and a
+       search which finds none runs up to the limit, the last rounds
+       being the costliest) */
+    max_rounds = GR_TOWER_OPTION(T, GR_TOWER_OPT_EXPRESS_ROUNDS);
+    for (prec = FLINT_MAX(GR_TOWER_DEFAULT_PREC, 2 * (D + 1)), rnd = 0;
+         prec <= prec_limit && (max_rounds <= 0 || rnd < max_rounds); prec *= 2, rnd++)
     {
         acb_t zz;
         int st;

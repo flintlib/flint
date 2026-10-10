@@ -937,7 +937,7 @@ _gr_tower_lazy_poly_root_near(gr_tower_lazy_elem_t res, const gr_poly_t f, const
     algebraic numbers.
 */
 static int
-_gr_tower_lazy_roots_irreducible(gr_vec_t roots, const fmpz_poly_t p, gr_ctx_t ctx)
+_gr_tower_lazy_roots_irreducible(gr_vec_t roots, const fmpz_poly_t p, int real_only, gr_ctx_t ctx)
 {
     slong d = fmpz_poly_degree(p), i;
     gr_tower_lazy_elem_struct e, t;
@@ -968,8 +968,10 @@ _gr_tower_lazy_roots_irreducible(gr_vec_t roots, const fmpz_poly_t p, gr_ctx_t c
         fmpz_submul(fmpq_numref(disc), p->coeffs + 2, p->coeffs + 0);
         fmpz_submul(fmpq_numref(disc), p->coeffs + 2, p->coeffs + 0);
         fmpz_submul(fmpq_numref(disc), p->coeffs + 2, p->coeffs + 0);
-        status = _gr_tower_lazy_root_fmpq(&t, disc, 2, ctx);
-        for (i = 0; i < 2 && status == GR_SUCCESS; i++)
+        /* (no real roots for a negative discriminant) */
+        if (!(real_only && fmpz_sgn(fmpq_numref(disc)) < 0))
+            status = _gr_tower_lazy_root_fmpq(&t, disc, 2, ctx);
+        for (i = 0; i < 2 && status == GR_SUCCESS && !(real_only && fmpz_sgn(fmpq_numref(disc)) < 0); i++)
         {
             fmpz_neg(fmpq_numref(q), p->coeffs + 1);
             fmpz_mul_ui(fmpq_denref(q), p->coeffs + 2, 2);
@@ -995,12 +997,19 @@ _gr_tower_lazy_roots_irreducible(gr_vec_t roots, const fmpz_poly_t p, gr_ctx_t c
            polynomial (see _divide_out_conjugates in map.c), so that the
            tower of all the roots has the Cauchy moduli and symmetric
            functions of the roots reduce to the coefficients */
+        /* (real roots only: isolated on the real line, about ten times
+           faster than all the roots for x^100 - 2 (101 x - 1)^2, with
+           its 4 real roots; in the same order as among all the roots) */
         qqbar_ptr rts = _qqbar_vec_init(d);
-        qqbar_roots_fmpz_poly(rts, p, QQBAR_ROOTS_IRREDUCIBLE);
+        slong n = d;
         int binomial = 1;
+        if (real_only)
+            n = qqbar_real_roots_fmpz_poly(rts, p, QQBAR_ROOTS_IRREDUCIBLE);
+        else
+            qqbar_roots_fmpz_poly(rts, p, QQBAR_ROOTS_IRREDUCIBLE);
         for (i = 1; i < d && binomial; i++)
             binomial = fmpz_is_zero(p->coeffs + i);
-        for (i = 0; i < d && status == GR_SUCCESS; i++)
+        for (i = 0; i < n && status == GR_SUCCESS; i++)
         {
             /* (binomials: principal radicals times roots of unity) */
             status = binomial ? _gr_tower_lazy_set_qqbar_structured(&e, rts + i, ctx) : _gr_tower_lazy_set_qqbar(&e, rts + i, ctx);
@@ -1281,7 +1290,7 @@ _gr_tower_lazy_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly,
                 for (i = 0; i < fac->num && status == GR_SUCCESS; i++)
                 {
                     slong before = roots->length, j;
-                    status = _gr_tower_lazy_roots_irreducible(roots, fac->p + i, ctx);
+                    status = _gr_tower_lazy_roots_irreducible(roots, fac->p + i, (flags & LAZY_ROOTS_REAL_ONLY) != 0, ctx);
                     for (j = before; j < roots->length; j++)
                     {
                         fmpz_t e;

@@ -594,6 +594,9 @@ _gr_tower_lazy_sqrt(gr_tower_lazy_elem_t res, const gr_tower_lazy_elem_t x, gr_c
 /* lazy_roots.c */
 int
 _gr_tower_lazy_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
+/* (flag of _gr_tower_lazy_poly_roots: the real roots suffice, as for the
+   real fields; other roots may still be returned, the caller filters) */
+#define LAZY_ROOTS_REAL_ONLY (1 << 30)
 int
 _gr_tower_lazy_poly_root_near(gr_tower_lazy_elem_t res, const gr_poly_t f, const acb_t ref, int pm, gr_ctx_t ctx);
 

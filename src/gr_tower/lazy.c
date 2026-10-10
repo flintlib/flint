@@ -2374,7 +2374,7 @@ gr_tower_lazy_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, 
 {
     int status;
     _gr_tower_lazy_lock(ctx);
-    status = _gr_tower_lazy_poly_roots(roots, mult, poly, flags, ctx);
+    status = _gr_tower_lazy_poly_roots(roots, mult, poly, IS_REAL_CTX(ctx) ? (flags | LAZY_ROOTS_REAL_ONLY) : flags, ctx);
     if (status == GR_SUCCESS && IS_REAL_CTX(ctx))
     {
         slong i, j = 0, n = roots->length;
