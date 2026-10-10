@@ -147,7 +147,6 @@ slong ecpp_disc_table(ecpp_disc_struct ** table, const ulong * primes,
 
 /* number theory helpers */
 
-int ecpp_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD);
 
 int ecpp_root_radicals(fmpz_t x, const fmpz_mod_poly_t f, flint_rand_t state,
                                                         const fmpz_mod_ctx_t ctx);

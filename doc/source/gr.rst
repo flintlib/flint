@@ -988,6 +988,26 @@ Enclosure and interval methods
     represented using balls, the radii are handled independently for
     the generators, as in the setter. In exact representations,
     *m* is set to *x* and *r* to zero (the generic implementation).
+    
+Cardinality
+........................................................................
+
+.. function:: int gr_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+
+    Sets *res* to the number of elements of *ctx*.
+
+    This is deliberately not tied to any one kind of structure: it is the
+    order of a finite group, the cardinality of a finite ring, the size of
+    a finite field. Returns ``GR_DOMAIN`` when the structure is infinite,
+    since there is then no such integer, and ``GR_UNABLE`` when the size is
+    not known.
+
+    The modular rings `\mathbb{Z}/n\mathbb{Z}` (*nmod*, *fmpz_mod*,
+    *mpn_mod*) answer `n` whether or not `n` is prime, needing no primality
+    test; note that this is unlike :func:`gr_ctx_fq_order`, which is only
+    defined when the ring is known to be a field. Finite fields answer
+    `q = p^d`. For the group of points of an elliptic curve, this counts the
+    points; see :func:`gr_ec_ctx_cardinality`.
 
 Finite field methods
 ........................................................................
