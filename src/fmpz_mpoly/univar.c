@@ -594,6 +594,50 @@ static void mpoly_univar_swap_fmpz_mpoly_univar(
     FLINT_SWAP(slong, A->length, B->length);
 }
 
+void fmpz_mpoly_univar_pseudo_rem(
+    fmpz_mpoly_univar_t rx,
+    const fmpz_mpoly_univar_t ax,
+    const fmpz_mpoly_univar_t bx,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    mpoly_void_ring_t R;
+    mpoly_univar_t Ax, Bx, Cx;
+
+    if (bx->length < 1)
+        flint_throw(FLINT_DIVZERO, "fmpz_mpoly_univar_pseudo_rem: division by zero");
+
+    mpoly_void_ring_init_fmpz_mpoly_ctx(R, ctx);
+    mpoly_univar_init(Ax, R);
+    mpoly_univar_init(Bx, R);
+    mpoly_univar_init(Cx, R);
+    mpoly_univar_set_fmpz_mpoly_univar(Ax, R, ax, ctx);
+
+    if (ax->length >= 1 && fmpz_cmp(ax->exps + 0, bx->exps + 0) >= 0)
+    {
+        slong i;
+        fmpz_t delta;
+
+        fmpz_init(delta);
+        fmpz_sub(delta, ax->exps + 0, bx->exps + 0);
+        fmpz_add_ui(delta, delta, 1);
+
+        mpoly_univar_set_fmpz_mpoly_univar(Bx, R, bx, ctx);
+        /* prem(A, B) = (-1)^(deg A - deg B + 1) prem(A, -B) */
+        mpoly_univar_prem(Ax, Bx, Cx, R);
+        if (fmpz_is_odd(delta))
+            for (i = 0; i < Ax->length; i++)
+                fmpz_mpoly_neg(COEFF(Ax, i), COEFF(Ax, i), ctx);
+
+        fmpz_clear(delta);
+    }
+
+    mpoly_univar_swap_fmpz_mpoly_univar(Ax, R, rx, ctx);
+
+    mpoly_univar_clear(Ax, R);
+    mpoly_univar_clear(Bx, R);
+    mpoly_univar_clear(Cx, R);
+}
+
 int fmpz_mpoly_univar_pseudo_gcd(
     fmpz_mpoly_univar_t gx,
     const fmpz_mpoly_univar_t ax,

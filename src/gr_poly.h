@@ -374,6 +374,9 @@ WARN_UNUSED_RESULT int gr_poly_divexact_scalar(gr_poly_t res, const gr_poly_t po
 
 WARN_UNUSED_RESULT int gr_poly_inv(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_div_root(gr_ptr Q, gr_ptr R, gr_srcptr A, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_div_root(gr_poly_t Q, gr_ptr R, const gr_poly_t A, gr_srcptr c, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_poly_divrem_basecase_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_divrem_basecase_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_divrem_basecase(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);

@@ -66,6 +66,7 @@
 #include "t-root_ui.c"
 #include "t-sec_pi.c"
 #include "t-set_d.c"
+#include "t-set_fmpz_poly_root.c"
 #include "t-set_re_im_d.c"
 #include "t-sgn.c"
 #include "t-sgn_re.c"
@@ -130,6 +131,7 @@ test_struct tests[] =
     TEST_FUNCTION(qqbar_root_ui),
     TEST_FUNCTION(qqbar_sec_pi),
     TEST_FUNCTION(qqbar_set_d),
+    TEST_FUNCTION(qqbar_set_fmpz_poly_root),
     TEST_FUNCTION(qqbar_set_re_im_d),
     TEST_FUNCTION(qqbar_sgn),
     TEST_FUNCTION(qqbar_sgn_re),

@@ -726,6 +726,7 @@ typedef enum
     GR_METHOD_MAT_CHARPOLY,
     GR_METHOD_MAT_REDUCE_ROW,
     GR_METHOD_MAT_PERMANENT,
+    GR_METHOD_MAT_NONSINGULAR_SOLVE,
 
     GR_METHOD_TAB_SIZE
 }
@@ -766,7 +767,7 @@ typedef enum
     GR_CTX_DFLOAT, GR_CTX_DFLOAT_BALL,
     GR_CTX_DFLOAT_COMPLEX, GR_CTX_DFLOAT_COMPLEX_BALL,
     GR_CTX_MPF,
-    GR_CTX_GR_POLY_QUOTIENT,
+    GR_CTX_GR_POLY_QUOTIENT, GR_CTX_GR_TOWER_FIELD, GR_CTX_GR_TOWER_FIELD_FLAT, GR_CTX_GR_TOWER_LAZY,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_GR_TRANSFORMED_POLY,
     GR_CTX_GR_TRANSFORMED_MPN,
@@ -1704,6 +1705,8 @@ const gr_poly_struct * gr_poly_quotient_ctx_zero_divisor(gr_ctx_t ctx, slong i);
 void gr_poly_quotient_ctx_clear_zero_divisors(gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_quotient_get_poly(gr_poly_t res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_quotient_set_poly(gr_ptr res, const gr_poly_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_quotient_norm_poly(gr_poly_t res, const gr_poly_t M, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_quotient_norm(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 
 /* Multivariate */
 
@@ -1715,6 +1718,7 @@ void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const o
 
 #ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
+fmpz_mpoly_ctx_struct * gr_ctx_fmpz_mpoly_q_mctx(gr_ctx_t ctx);
 #endif
 
 #ifdef FMPZ_MOD_MPOLY_Q_H

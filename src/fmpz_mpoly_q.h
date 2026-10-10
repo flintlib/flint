@@ -83,6 +83,16 @@ fmpz_mpoly_q_is_fmpq(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
            fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(x), ctx);
 }
 
+FMPZ_MPOLY_Q_INLINE int
+fmpz_mpoly_q_get_fmpq(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    if (!fmpz_mpoly_q_is_fmpq(x, ctx))
+        return 0;
+    fmpz_mpoly_get_fmpz(fmpq_numref(res), fmpz_mpoly_q_numref(x), ctx);
+    fmpz_mpoly_get_fmpz(fmpq_denref(res), fmpz_mpoly_q_denref(x), ctx);
+    return 1;
+}
+
 void fmpz_mpoly_q_used_vars(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_q_used_vars_num(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_q_used_vars_den(int * used, const fmpz_mpoly_q_t f, const fmpz_mpoly_ctx_t ctx);

@@ -103,6 +103,18 @@ Assignment
     and the return flag is 1. If *x* or *y* is non-finite (infinity or NaN),
     the conversion fails and the return flag is 0.
 
+.. function:: int qqbar_set_fmpz_poly_root(qqbar_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec)
+
+    Sets *res* to the root of *poly* isolated by the complex interval *z*,
+    returning 1 on success. The polynomial must be the minimal polynomial
+    of the root (irreducible and primitive, with positive leading
+    coefficient), which is not checked. The enclosure is certified to
+    contain a unique root of *poly* with
+    :func:`_qqbar_validate_existence_uniqueness` at a working precision
+    limited by *max_prec* bits (for a linear polynomial, the root is
+    rational and *z* is only checked to contain it); if the
+    certification fails, 0 is returned and *res* is left unchanged.
+
 Properties
 -------------------------------------------------------------------------------
 

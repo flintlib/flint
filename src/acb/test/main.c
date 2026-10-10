@@ -52,6 +52,7 @@
 #include "t-inv.c"
 #include "t-lambertw.c"
 #include "t-lgamma.c"
+#include "t-lindep.c"
 #include "t-log1p.c"
 #include "t-log.c"
 #include "t-log_sin_pi.c"
@@ -131,6 +132,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_inv),
     TEST_FUNCTION(acb_lambertw),
     TEST_FUNCTION(acb_lgamma),
+    TEST_FUNCTION(acb_lindep),
     TEST_FUNCTION(acb_log1p),
     TEST_FUNCTION(acb_log),
     TEST_FUNCTION(acb_log_sin_pi),

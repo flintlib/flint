@@ -103,10 +103,11 @@ void mpoly_univar_init2(mpoly_univar_t A, slong len, mpoly_void_ring_t R)
 }
 
 /*
-    A = prem(A, -B)
+    A = prem(A, -B), i.e. the pseudo-remainder with multiplier
+    (-lc(B))^(deg A - deg B + 1), for deg A >= deg B.
     C is used for working space
 */
-static void mpoly_univar_prem(
+void mpoly_univar_prem(
     mpoly_univar_t A,
     const mpoly_univar_t B,
     mpoly_univar_t C,

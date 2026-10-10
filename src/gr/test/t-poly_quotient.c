@@ -353,6 +353,112 @@ TEST_FUNCTION_START(gr_poly_quotient, state)
         gr_ctx_clear(R);
     }
 
+    /* Norms: N(M1 M2) = N(M1) N(M2) over random quotient rings, and
+       known values in Q(sqrt(2)) */
+    for (iter = 0; iter < 30; iter++)
+    {
+        gr_ctx_struct * base = QQ;
+        slong deg = 1 + n_randint(state, 4);
+        gr_poly_t M1, M2, M3, N1, N2, N3;
+        gr_ptr x, y, nx, ny, nxy;
+        int status = GR_SUCCESS;
+
+        gr_poly_init(m, base);
+        GR_MUST_SUCCEED(gr_poly_randtest(m, state, deg, base));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(m, deg, 1, base));
+        gr_ctx_init_gr_poly_quotient(R, base, m);
+
+        gr_poly_init(M1, R); gr_poly_init(M2, R); gr_poly_init(M3, R);
+        gr_poly_init(N1, base); gr_poly_init(N2, base); gr_poly_init(N3, base);
+        GR_TMP_INIT2(x, y, R);
+        GR_TMP_INIT3(nx, ny, nxy, base);
+
+        status |= gr_poly_randtest(M1, state, 1 + n_randint(state, 4), R);
+        status |= gr_poly_randtest(M2, state, 1 + n_randint(state, 4), R);
+        status |= gr_poly_mul(M3, M1, M2, R);
+        status |= gr_poly_quotient_norm_poly(N1, M1, R);
+        status |= gr_poly_quotient_norm_poly(N2, M2, R);
+        status |= gr_poly_quotient_norm_poly(N3, M3, R);
+        status |= gr_poly_mul(N1, N1, N2, base);
+
+        if (status == GR_SUCCESS && gr_poly_equal(N1, N3, base) == T_FALSE)
+        {
+            flint_printf("FAIL: norm_poly not multiplicative\n");
+            flint_printf("m = "); gr_poly_print(m, base); flint_printf("\n");
+            flint_printf("M1 = "); gr_poly_print(M1, R); flint_printf("\n");
+            flint_printf("M2 = "); gr_poly_print(M2, R); flint_printf("\n");
+            flint_abort();
+        }
+
+        status |= gr_randtest(x, state, R);
+        status |= gr_randtest(y, state, R);
+        status |= gr_poly_quotient_norm(nx, x, R);
+        status |= gr_poly_quotient_norm(ny, y, R);
+        status |= gr_mul(x, x, y, R);
+        status |= gr_poly_quotient_norm(nxy, x, R);
+        status |= gr_mul(nx, nx, ny, base);
+
+        if (status == GR_SUCCESS && gr_equal(nx, nxy, base) == T_FALSE)
+        {
+            flint_printf("FAIL: norm not multiplicative\n");
+            flint_printf("m = "); gr_poly_print(m, base); flint_printf("\n");
+            flint_abort();
+        }
+
+        gr_poly_clear(M1, R); gr_poly_clear(M2, R); gr_poly_clear(M3, R);
+        gr_poly_clear(N1, base); gr_poly_clear(N2, base); gr_poly_clear(N3, base);
+        GR_TMP_CLEAR2(x, y, R);
+        GR_TMP_CLEAR3(nx, ny, nxy, base);
+        gr_ctx_clear(R);
+        gr_poly_clear(m, base);
+    }
+
+    /* the norm of 1 + sqrt(2) is -1, that of x - sqrt(2) is x^2 - 2 */
+    {
+        gr_poly_t M, N;
+        gr_ptr x, n;
+        int status = GR_SUCCESS;
+
+        gr_poly_init(m, QQ);
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(m, 2, 1, QQ));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(m, 0, -2, QQ));
+        gr_ctx_init_gr_poly_quotient(R, QQ, m);
+        gr_poly_init(M, R);
+        gr_poly_init(N, QQ);
+        GR_TMP_INIT(x, R);
+        GR_TMP_INIT(n, QQ);
+
+        status |= gr_gen(x, R);
+        status |= gr_add_si(x, x, 1, R);
+        status |= gr_poly_quotient_norm(n, x, R);
+        if (status != GR_SUCCESS || gr_is_neg_one(n, QQ) != T_TRUE)
+        {
+            flint_printf("FAIL: N(1 + sqrt(2)) != -1\n");
+            gr_println(n, QQ);
+            flint_abort();
+        }
+
+        status |= gr_gen(x, R);
+        status |= gr_poly_set_coeff_si(M, 1, 1, R);
+        status |= gr_neg(x, x, R);
+        status |= gr_poly_set_coeff_scalar(M, 0, x, R);
+        status |= gr_poly_quotient_norm_poly(N, M, R);
+        status |= gr_poly_set(m, N, QQ);
+        if (status != GR_SUCCESS || gr_poly_equal(N, m, QQ) != T_TRUE || N->length != 3)
+        {
+            flint_printf("FAIL: N(x - sqrt(2)) != x^2 - 2\n");
+            gr_poly_print(N, QQ); flint_printf("\n");
+            flint_abort();
+        }
+
+        gr_poly_clear(M, R);
+        gr_poly_clear(N, QQ);
+        GR_TMP_CLEAR(x, R);
+        GR_TMP_CLEAR(n, QQ);
+        gr_ctx_clear(R);
+        gr_poly_clear(m, QQ);
+    }
+
     gr_ctx_clear(QQ);
     gr_ctx_clear(ZZ);
 

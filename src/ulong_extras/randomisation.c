@@ -130,6 +130,46 @@ ulong n_randprime(flint_rand_t state, ulong bits, int proved)
     return rand;
 }
 
+ulong n_randprime_mod(flint_rand_t state, ulong bits, ulong r, ulong m, int proved)
+{
+    ulong lo, hi, kmin, kmax, num, k, n, i;
+
+    if (bits < 2 || bits > FLINT_BITS || m == 0 || r >= m || n_gcd(r, m) != 1)
+        flint_throw(FLINT_ERROR, "Exception in n_randprime_mod: invalid arguments!\n");
+
+    /* the integers r + k m with the given number of bits: k in [kmin, kmax] */
+    lo = UWORD(1) << (bits - 1);
+    hi = (bits == FLINT_BITS) ? UWORD_MAX : (UWORD(1) << bits) - 1;
+    kmin = (lo > r) ? (lo - r + m - 1) / m : 0;
+    kmax = (hi >= r) ? (hi - r) / m : 0;
+
+    if (hi < r || kmin > kmax)
+        flint_throw(FLINT_ERROR, "Exception in n_randprime_mod: no candidates!\n");
+
+    num = kmax - kmin + 1;
+
+    if (num <= (UWORD(1) << 16))
+    {
+        /* few candidates: all of them from a random starting point */
+        k = n_randint(state, num);
+        for (i = 0; i < num; i++)
+        {
+            n = r + (kmin + (k + i) % num) * m;
+            if (n >= 2 && (proved ? n_is_prime(n) : n_is_probabprime(n)))
+                return n;
+        }
+        flint_throw(FLINT_ERROR, "Exception in n_randprime_mod: no prime in the progression!\n");
+    }
+
+    /* (the density of primes in the progression is about 1/bits) */
+    for (;;)
+    {
+        n = r + (kmin + n_randint(state, num)) * m;
+        if (proved ? n_is_prime(n) : n_is_probabprime(n))
+            return n;
+    }
+}
+
 ulong n_randtest_prime(flint_rand_t state, int proved)
 {
     return n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), proved);
