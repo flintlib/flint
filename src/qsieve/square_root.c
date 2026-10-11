@@ -34,7 +34,7 @@ void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    {
       if (get_null_entry(nullrows, i, l))
       {
-         position = qs_inf->matrix[i].orig*2*qs_inf->max_factors;
+         position = qs_inf->rel_offset[qs_inf->matrix[i].orig];
 
          for (j = 0; j < relation[position]; j++)
          {

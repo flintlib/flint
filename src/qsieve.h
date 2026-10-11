@@ -31,7 +31,28 @@ extern "C" {
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
-#define BLOCK_SIZE (4*65536) /* size of sieving cache block */
+/*
+   The sieve interval is processed in blocks of BLOCK_SIZE bytes, which fit
+   in L2 cache.  Within a block, the primes below QS_SMALL_BOUND, which hit it
+   many times, are sieved over sub-blocks of QS_L1_SIZE bytes, which fit in
+   L1 cache, and the primes up to BLOCK_SIZE directly over the whole block.
+
+   The primes above BLOCK_SIZE hit a block at most a couple of times, if at
+   all.  Instead of visiting each of them for every block, they are processed
+   once per polynomial (a "bucket sieve"): every hit is appended to a bucket
+   for the sub-block it falls in, and the buckets are applied to the
+   sub-blocks in turn.  The buckets are scanned again when a candidate is
+   checked for smoothness, to read off its large factor base primes rather
+   than trial dividing by them.
+*/
+#define BLOCK_SIZE (8*65536)
+#define QS_L1_BITS 15
+#define QS_L1_SIZE (WORD(1) << QS_L1_BITS)
+#define QS_SMALL_BOUND 4096
+
+#define QS_LP_MULT 60 /* large primes are less than this times the largest
+                         factor base prime */
+#define QS_TRIAL_CHUNK 64   /* primes trial divided at once by candidates */
 
 /*
    The large prime hash table is chained, so it only has to be big enough to
@@ -75,11 +96,13 @@ typedef struct          /* entry in hash table */
    ulong prime;    /* value of prime */
    ulong next;     /* next prime which have same hash value as 'prime' */
    ulong count;    /* number of occurrence of 'prime' */
+   ulong parent;   /* parent in the union-find forest of the large prime graph */
 } hash_t;
 
 typedef struct             /* format for relation */
 {
    ulong lp;          /* large prime, is 1, if relation is full */
+   ulong lp2;         /* second large prime, is 1 unless a double partial */
    slong num_factors;     /* number of factors, excluding small factor */
    slong small_primes;   /* number of small factors */
    slong * small;         /* exponent of small factors */
@@ -90,6 +113,7 @@ typedef struct             /* format for relation */
 typedef struct          /* a relation as held in the relation store */
 {
    ulong lp;           /* large prime, is 1, if relation is full */
+   ulong lp2;          /* second large prime, is 1 unless a double partial */
    slong num_factors;  /* number of factors, excluding small factors */
    slong factor_offset; /* offset of the factors in qs_inf->rel_factor */
    fmpz Y;             /* square root of sieve value for relation */
@@ -98,6 +122,10 @@ typedef struct          /* a relation as held in the relation store */
 typedef struct
 {
    fmpz_t B;          /* current B coeff of poly */
+   fmpz_t C;          /* C = (B^2 - kn)/A, computed when first needed */
+   int C_valid;       /* whether C has been computed for the current B */
+   ulong * A_root;    /* sieve position mod q of the root of the polynomial
+                         for each prime q dividing A, computed with C */
    int * soln1;       /* first start position in sieve per prime */
    int * soln2;       /* second start position in sieve per prime */
    int * posn1;       /* temp space for sieving */
@@ -105,6 +133,13 @@ typedef struct
    slong * small;     /* exponents of small prime factors in relations */
    fac_t * factor;    /* factors for a relation */
    slong num_factors; /* number of factors found in a relation */
+
+   /* bucket sieve data, one bucket per sieve block */
+   uint32_t ** bucket;      /* entries (index in slice << 16) + offset in block */
+   uint32_t ** bucket_ptr;  /* current end of each bucket */
+   slong * bucket_alloc;    /* allocated length of each bucket */
+   slong * slice_end;       /* slice_end[k*num_blocks + b] = end of slice k
+                               in bucket b */
 } qs_poly_s;
 
 typedef qs_poly_s qs_poly_t[1];
@@ -137,6 +172,22 @@ typedef struct
 
    slong small_primes;     /* number of primes to not sieve with */
    slong second_prime;     /* index of first prime bigger than block size */
+
+   /* bucket sieve parameters, set up by qsieve_poly_init */
+   int use_buckets;        /* whether to use the bucket sieve */
+   slong l1_prime;         /* index of first prime not sieved per L1 block */
+   slong bucket_prime;     /* index of first prime sieved using buckets */
+   slong huge_prime;       /* index of first prime at least the sieve size */
+   slong num_blocks;       /* number of QS_L1_SIZE blocks in the sieve */
+   slong num_slices;       /* number of slices of bucket primes */
+   slong * slice_start;    /* index of first prime of each slice, with
+                              slice_start[num_slices] = num_primes */
+   unsigned char * slice_size; /* common size (bits) of primes in slice */
+
+   /* factor base data for trial division by word size multiplications */
+   uint32_t * fb_p32;      /* p */
+   uint32_t * fb_inv32;    /* p^(-1) mod 2^32 */
+   uint32_t * fb_lim32;    /* floor((2^32 - 1) / p) */
    slong sieve_size;       /* size of sieve to use */
 
    unsigned char sieve_bits;  /* sieve threshold */
@@ -160,7 +211,7 @@ typedef struct
    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i]*B0_terms[i] (multprec) */
 
    ulong * A_inv;       /* A_inv[k] = A^(-1) mod p_k, for FB prime p_k */
-   ulong ** A_inv2B;    /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
+   uint32_t ** A_inv2B; /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
                                for FB prime p_k */
 
    int * soln1;             /* soln1[k] = first poly root mod FB prime p_k */
@@ -189,6 +240,12 @@ typedef struct
    ulong * first_subset; /* first tuple, in case of restart */
    ulong j; /* index of s-th factor of first A, if s > 3 */
 
+   fmpz * A_used;      /* the A coefficients used so far (if s > 3) */
+   slong A_used_num;
+   slong A_used_alloc;
+   ulong A_rand;       /* state of random generator for choosing A */
+   slong A_window;     /* number of candidates for the first factors of A */
+
 #if QS_DEBUG
    slong poly_count;         /* keep track of the number of polynomials used */
 #endif
@@ -208,14 +265,21 @@ typedef struct
    slong rel_num;          /* number of relations found so far */
    slong rel_alloc;        /* number of relations we have space for */
 
-   slong * rel_small;      /* small prime exponents, small_primes per relation */
+   unsigned char * rel_small; /* small prime exponents, small_primes per
+                                 relation (they are below 256, as the
+                                 polynomial values have fewer bits) */
 
-   fac_t * rel_factor;     /* factors of all relations, concatenated */
+   uint32_t * rel_factor;  /* factors of all relations, concatenated, each
+                              packed as (index << 8) + exponent */
    slong rel_factor_num;   /* entries of rel_factor in use */
    slong rel_factor_alloc; /* entries of rel_factor allocated */
 
    slong full_relation;   /* number of full relations */
-   slong num_cycles;      /* number of possible full relations from partials */
+   slong num_cycles;      /* number of possible full relations from partials,
+                             i.e. the number of independent cycles in the
+                             graph whose vertices are the large primes and 1,
+                             with an edge for every partial relation */
+   ulong lp_bound;        /* bound on large primes */
 
    slong vertices;        /* number of different primes in partials */
    slong components;      /* equal to 1 */
@@ -233,6 +297,8 @@ typedef struct
    fmpz * Y_arr;          /* array of Y's corresponding to relations */
    slong * curr_rel;      /* current relation in array of relations */
    slong * relation;      /* relation array */
+   slong * rel_offset;    /* offset of each relation in the relation array */
+   slong relation_alloc;  /* allocated length of the relation array */
 
    slong buffer_size;     /* size of buffer of relations */
    slong num_relations;   /* number of relations so far */
@@ -293,22 +359,22 @@ static const ulong qsieve_tune[][6] =
     {145, 47,    610,  9,   16000,  56},  /* 43 digits, 46.47 ms/semiprime */
     {150, 45,    610,  8,   17000,  59},  /* 45 digits, 59.05 ms/semiprime */
     {155, 43,    860, 10,   21000,  59},  /* 46 digits, 92.20 ms/semiprime */
-    {160, 150,  2000, 11,   65536, 67}, /* 49 digit */
-    {170, 150,  2000, 12,   65536, 69}, /* 52 digits */
-    {180, 150,  3000, 12,   65536, 70}, /* 55 digits */
-    {190, 150,  3000, 13,   65536, 72}, /* 58 digit */
-    {200, 200,  4500, 14,   65536, 75}, /* 61 digits */
-    /* Legacy tuning values that may need improvement */
-    {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
-    {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
-    {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
-    {240, 450, 20000, 19,   20 *  65536, 93}, /* 73 digis */
-    {250, 500, 22000, 22,   24 *  65536, 97}, /* 76 digits */
-    {260, 600, 25000, 25,   24 *  65536, 100}, /* 79 digits */
-    {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
-    {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
-    {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
-    {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */
+    /* Retuned for the bucket sieve */
+    {160, 150,   1700, 11,   73728,  64}, /* 49 digits */
+    {170, 150,   2000, 12,   81920,  66}, /* 52 digits */
+    {180, 150,   2500, 12,   81920,  67}, /* 55 digits */
+    {190, 150,   3600, 13,   65536,  72}, /* 58 digits */
+    {200, 200,   4500, 14,  131072,  72}, /* 61 digits */
+    {210, 250,   8000, 14,  327680,  80}, /* 64 digits */
+    {220, 300,  13000, 15,  786432,  88}, /* 67 digits */
+    {230, 400,  21000, 17,  917504,  90}, /* 70 digits */
+    {240, 450,  35000, 19, 1015808,  93}, /* 73 digits */
+    {250, 500,  45000, 22, 1245184,  98}, /* 76 digits */
+    {260, 600,  60000, 25, 1540096, 102}, /* 79 digits */
+    {270, 800,  78000, 26, 1703936, 105}, /* 82 digits */
+    {280, 900, 100000, 27, 1835008, 107}, /* 85 digits */
+    {290, 1000, 120000, 29, 1966080, 110}, /* 88 digits */
+    {300, 1100, 140000, 30, 2097152, 112}  /* 91 digits */
 };
 
 /* number of entries in the tuning table */
@@ -348,6 +414,8 @@ void qsieve_reinit_A(qs_t qs_inf);
 
 int qsieve_next_A(qs_t qs_inf);
 
+void qsieve_A_used_clear(qs_t qs_inf);
+
 void qsieve_init_poly_first(qs_t qs_inf);
 
 void qsieve_init_poly_next(qs_t qs_inf, slong i);
@@ -361,6 +429,8 @@ void qsieve_poly_clear(qs_t qs_inf);
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
+
+void qsieve_do_sieving3(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
 slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
 
@@ -384,8 +454,10 @@ void qsieve_relations_clear(qs_t qs_inf);
 
 void qsieve_relations_reset(qs_t qs_inf);
 
-void qsieve_add_relation(qs_t qs_inf, ulong prime,
+void qsieve_add_relation(qs_t qs_inf, ulong prime, ulong prime2,
                                                      const fmpz_t Y, const qs_poly_t poly);
+
+void qsieve_add_partial_edge(qs_t qs_inf, ulong prime, ulong prime2);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime);
 
