@@ -59,6 +59,8 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits, int proved);
 
+int _fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits, int proved, int adaptive);
+
 int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B1, ulong B2_sqrt, ulong c);
 
 void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f);
