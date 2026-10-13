@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -18,15 +19,27 @@
 #include "gr_ec.h"
 #include "gr_ec/impl.h"
 
-/* A base ring over which elliptic curves make sense. Includes rings that
-   are not fields, and rings of characteristic 2 and 3, so that the
-   rejection and GR_UNABLE paths get exercised too. */
+/* FLINT_TEST, also printing the curve on failure */
+#define GR_EC_TEST(cond, E)                                         \
+    do {                                                            \
+        if (!(cond))                                                \
+        {                                                           \
+            flint_printf("FAIL: %s\n%s:%d\n", #cond, __FILE__, __LINE__); \
+            GR_IGNORE(gr_ctx_println(E));                           \
+            fflush(stdout);                                         \
+            flint_abort();                                          \
+        }                                                           \
+    } while (0)
+
+/* A base ring over which elliptic curves make sense, mostly finite so that
+   random points can be found. Rings that are not fields and rings of
+   characteristic 2 and 3 are included so that every code path is used. */
 static inline void
 gr_ec_test_ring(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t p;
 
-    switch (n_randint(state, 7))
+    switch (n_randint(state, 10))
     {
         case 0:
             gr_ctx_init_fmpq(ctx);
@@ -38,20 +51,27 @@ gr_ec_test_ring(gr_ctx_t ctx, flint_rand_t state)
 
         case 2:
         case 3:
+        case 4:
             while (gr_ctx_init_nmod(ctx,
                         n_randprime(state, 4 + n_randint(state, 20), 1))
                     != GR_SUCCESS)
                 ;
             break;
 
-        case 4:
+        case 5:
+        case 6:
             fmpz_init(p);
             fmpz_set_ui(p, n_randprime(state, 4 + n_randint(state, 40), 1));
             gr_ctx_init_fmpz_mod(ctx, p);
             fmpz_clear(p);
+
+            /* square roots, hence random points, need a known prime;
+               leave it unknown half the time */
+            if (n_randint(state, 2))
+                GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
             break;
 
-        case 5:
+        case 7:
             gr_ctx_init_fq_nmod(ctx, n_randprime(state, 3 + n_randint(state, 4), 1),
                     1 + n_randint(state, 3), "a");
             break;

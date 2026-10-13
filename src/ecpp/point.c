@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Fredrik Johansson
+    Copyright (C) 2026 Maël Hostettler
     Developed using Claude Fable 5.1
 
     This file is part of FLINT.
@@ -53,24 +54,12 @@ ecpp_point_is_zero(const ecpp_point_t P)
 }
 
 /*
-    Point arithmetic on y^2 = x^3 + a x + b over Z/n, in Jacobian
-    coordinates with Z = 0 for the point at infinity.
+    Point arithmetic on y^2 = x^3 + a x + b over Z/n, using gr_ec.
 
-    The arithmetic itself is gr_ec's. What this module needs beyond the
-    ordinary group law is the guarantee that the law was entitled to the
-    branches it took: the formulas are polynomial and always compute
-    something, but the choice between adding, doubling and the point at
-    infinity is made by testing whether a quantity vanishes, and modulo a
-    composite n a quantity can vanish for one prime factor and not
-    another. The branch is then right for one factor and wrong for the
-    other, and the result is quietly meaningless -- which for a primality
-    proof is the one thing that must not happen.
-
-    gr_ec_jac_point_mul_fmpz_witness collects those quantities into acc,
-    so that gcd(acc, n) != 1 says the run is not to be trusted; see the
-    notes there. That guarantee is the whole of what this file adds.
-
-    Only a4 is handed over because the Jacobian formulas never read a6.
+    Modulo a composite n, the group law may take a wrong branch (a value
+    can be zero modulo one prime factor of n but not another), so the
+    result is only trusted if every value treated as nonzero is a unit;
+    gr_ec_jac_point_mul_fmpz_witness collects these values in acc.
 */
 
 #define PX(P) (P)

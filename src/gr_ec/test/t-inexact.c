@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -38,7 +39,7 @@ TEST_GR_FUNCTION_START(gr_ec_inexact, state, count_success, count_domain, count_
             continue;
         }
 
-        FLINT_TEST(gr_ec_ctx_is_smooth(E) != T_FALSE);
+        GR_EC_TEST(gr_ec_ctx_is_smooth(E) != T_FALSE, E);
 
         gr_ec_jac_point_init(P, E);
         gr_ec_jac_point_init(Q, E);
@@ -47,9 +48,9 @@ TEST_GR_FUNCTION_START(gr_ec_inexact, state, count_success, count_domain, count_
         gr_ec_aff_point_init(Pa, E);
 
         /* exact special values stay decidable */
-        FLINT_TEST(gr_ec_jac_point_is_inf(P, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(P, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_equal(P, P, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_is_inf(P, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(P, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(P, P, E) == T_TRUE, E);
 
         status = gr_ec_jac_point_randtest(P, state, E);
         status |= gr_ec_jac_point_randtest(Q, state, E);
@@ -67,52 +68,52 @@ TEST_GR_FUNCTION_START(gr_ec_inexact, state, count_success, count_domain, count_
         count_success++;
 
         /* nothing below may ever come back as a definite negative */
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(P, E) != T_FALSE);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(P, E) != T_FALSE, E);
 
         if (gr_ec_jac_point_neg(A, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE, E);
 
             if (gr_ec_jac_point_add(B, P, A, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_jac_point_is_inf(B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_is_inf(B, E) != T_FALSE, E);
         }
 
         if (gr_ec_jac_point_add(A, P, P, E) == GR_SUCCESS
                 && gr_ec_jac_point_dbl(B, P, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
 
         if (gr_ec_jac_point_add(A, P, Q, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE, E);
 
             if (gr_ec_jac_point_add(B, Q, P, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
         }
 
         /* conversions must not silently produce a valid but wrong point */
         if (gr_ec_aff_point_set_jac_point(Pa, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(Pa, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(Pa, E) != T_FALSE, E);
 
             if (gr_ec_jac_point_set_aff_point(A, Pa, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE, E);
         }
         else
         {
-            FLINT_TEST(gr_ec_aff_point_is_inf(Pa, E) == T_UNKNOWN);
+            GR_EC_TEST(gr_ec_aff_point_is_inf(Pa, E) == T_UNKNOWN, E);
         }
 
         /* scalar multiplication */
         if (gr_ec_jac_point_mul_ui(A, P, 5, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE, E);
 
             {
                 fmpz_t n;
                 fmpz_init_set_ui(n, 5);
 
                 if (_gr_ec_jac_point_mul_fmpz_binary(B, P, n, E) == GR_SUCCESS)
-                    FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+                    GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
 
                 fmpz_clear(n);
             }

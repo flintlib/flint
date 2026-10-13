@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -25,30 +26,30 @@ check_known_curves(void)
 
     /* y^2 = x^3 - x : disc = 64, j = 1728 */
     FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, -1, 0) == GR_SUCCESS);
-    FLINT_TEST(gr_ec_ctx_model(E) == GR_EC_SHORT_WEIERSTRASS);
-    FLINT_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS);
-    FLINT_TEST(gr_set_si(u, 64, R) == GR_SUCCESS);
-    FLINT_TEST(gr_equal(t, u, R) == T_TRUE);
-    FLINT_TEST(gr_ec_ctx_j_invariant(t, E) == GR_SUCCESS);
-    FLINT_TEST(gr_set_si(u, 1728, R) == GR_SUCCESS);
-    FLINT_TEST(gr_equal(t, u, R) == T_TRUE);
+    GR_EC_TEST(gr_ec_ctx_model(E) == GR_EC_SHORT_WEIERSTRASS, E);
+    GR_EC_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_set_si(u, 64, R) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_equal(t, u, R) == T_TRUE, E);
+    GR_EC_TEST(gr_ec_ctx_j_invariant(t, E) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_set_si(u, 1728, R) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_equal(t, u, R) == T_TRUE, E);
     gr_ec_ctx_clear(E);
 
     /* y^2 = x^3 + 1 : disc = -432, j = 0 */
     FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, 0, 1) == GR_SUCCESS);
-    FLINT_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS);
-    FLINT_TEST(gr_set_si(u, -432, R) == GR_SUCCESS);
-    FLINT_TEST(gr_equal(t, u, R) == T_TRUE);
-    FLINT_TEST(gr_ec_ctx_j_invariant(t, E) == GR_SUCCESS);
-    FLINT_TEST(gr_is_zero(t, R) == T_TRUE);
+    GR_EC_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_set_si(u, -432, R) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_equal(t, u, R) == T_TRUE, E);
+    GR_EC_TEST(gr_ec_ctx_j_invariant(t, E) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_is_zero(t, R) == T_TRUE, E);
     gr_ec_ctx_clear(E);
 
     /* y^2 + y = x^3 - x^2 - 10x - 20 (the curve 11a1): disc = -161051, j = -122023936/161051 */
     FLINT_TEST(gr_ec_ctx_init_si(E, R, 0, -1, 1, -10, -20) == GR_SUCCESS);
-    FLINT_TEST(gr_ec_ctx_model(E) == GR_EC_LONG_WEIERSTRASS);
-    FLINT_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS);
-    FLINT_TEST(gr_set_si(u, -161051, R) == GR_SUCCESS);
-    FLINT_TEST(gr_equal(t, u, R) == T_TRUE);
+    GR_EC_TEST(gr_ec_ctx_model(E) == GR_EC_LONG_WEIERSTRASS, E);
+    GR_EC_TEST(gr_ec_ctx_discriminant(t, E) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_set_si(u, -161051, R) == GR_SUCCESS, E);
+    GR_EC_TEST(gr_equal(t, u, R) == T_TRUE, E);
     gr_ec_ctx_clear(E);
 
     /* singular curves are rejected */
@@ -81,14 +82,14 @@ TEST_FUNCTION_START(gr_ec_ctx, state)
         }
 
         /* a context is never created with a provably zero discriminant */
-        FLINT_TEST(gr_ec_ctx_is_smooth(E) != T_FALSE);
+        GR_EC_TEST(gr_ec_ctx_is_smooth(E) != T_FALSE, E);
 
         /* the model must match the stored a-invariants */
         if (gr_ec_ctx_model(E) == GR_EC_SHORT_WEIERSTRASS)
         {
-            FLINT_TEST(gr_is_zero(GR_EC_A1(E), R) == T_TRUE);
-            FLINT_TEST(gr_is_zero(GR_EC_A2(E), R) == T_TRUE);
-            FLINT_TEST(gr_is_zero(GR_EC_A3(E), R) == T_TRUE);
+            GR_EC_TEST(gr_is_zero(GR_EC_A1(E), R) == T_TRUE, E);
+            GR_EC_TEST(gr_is_zero(GR_EC_A2(E), R) == T_TRUE, E);
+            GR_EC_TEST(gr_is_zero(GR_EC_A3(E), R) == T_TRUE, E);
         }
 
         GR_TMP_INIT5(b2, b4, b6, b8, c4, R);
@@ -106,7 +107,7 @@ TEST_FUNCTION_START(gr_ec_ctx, state)
             status |= gr_sub(t, t, u, R);
 
             if (status == GR_SUCCESS)
-                FLINT_TEST(gr_is_zero(t, R) != T_FALSE);
+                GR_EC_TEST(gr_is_zero(t, R) != T_FALSE, E);
         }
 
         /* c4^3 - c6^2 = 1728 disc */
@@ -118,7 +119,7 @@ TEST_FUNCTION_START(gr_ec_ctx, state)
         status |= gr_sub(t, t, u, R);
 
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_is_zero(t, R) != T_FALSE);
+            GR_EC_TEST(gr_is_zero(t, R) != T_FALSE, E);
 
         /* j disc = c4^3 whenever j exists */
         if (gr_ec_ctx_j_invariant(t, E) == GR_SUCCESS)
@@ -130,7 +131,7 @@ TEST_FUNCTION_START(gr_ec_ctx, state)
             status |= gr_sub(t, t, u, R);
 
             if (status == GR_SUCCESS)
-                FLINT_TEST(gr_is_zero(t, R) != T_FALSE);
+                GR_EC_TEST(gr_is_zero(t, R) != T_FALSE, E);
         }
 
         GR_TMP_CLEAR3(c6, t, u, R);

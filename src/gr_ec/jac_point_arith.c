@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -830,29 +831,9 @@ _gr_ec_jac_point_mul_fmpz_binary(gr_ec_jac_point_t res,
 */
 
 /*
-    Scalar multiplication that also answers whether the group law was
-    entitled to the branches it took.
-
-    Over a ring that is not an integral domain the addition formulas are
-    still computed correctly, but the case distinction -- add, double, or
-    the point at infinity -- is made by testing whether a quantity is
-    zero, and over Z/n a quantity can be zero modulo one prime factor and
-    not another. The branch is then right for one factor and wrong for the
-    other, and the answer is silently meaningless.
-
-    The witness w, which the caller sets to one beforehand, collects every
-    quantity a branch treated as nonzero. If all of them are units the run
-    was sound; over Z/n that is gcd(w, n) = 1, and a gcd greater than one
-    is both a proof that n is composite and a factor of it. This is what
-    elliptic curve primality proving and elliptic curve factorization both
-    need, from opposite directions: the first wants the run to be sound,
-    the second wants it not to be.
-
-    The ladder is the same width-w NAF as the plain version. Its fallback
-    is a binary ladder over the mixed addition rather than the general
-    one, because the mixed addition is both cheaper and already keeps the
-    witness; the one inversion that costs is free on the affine input
-    these callers have.
+    Binary ladder with a witness (see impl.h), used when the NAF table
+    cannot be normalized. It works with mixed additions, which keep the
+    witness, after making the input affine.
 */
 static int
 _gr_ec_jac_point_mul_fmpz_binary_witness(gr_ec_jac_point_t res,

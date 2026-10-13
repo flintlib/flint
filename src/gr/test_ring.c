@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2026 Maël Hostettler
 
     This file is part of FLINT.
 

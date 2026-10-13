@@ -94,19 +94,9 @@ Computing with forms
 
     Given `D < 0`, `n` odd with `\gcd(n, D) = 1` and a square root *sqrtD*
     of `D` modulo `n`, sets `t, v \ge 0` with `t^2 + |D| v^2 = 4n` and
-    returns 1, or returns 0 if there is no solution. That is, it represents
-    `4n` by the principal form of discriminant `D`, by Cornacchia's
-    algorithm in the form given by Cohen, Algorithm 1.5.3.
-
-    A return value of 0 is only conclusive for prime `n`; for composite `n`
-    the algorithm may fail to find a representation that exists.
-
-    This is the step that turns a discriminant with `\left(\frac{D}{p}\right) = 1`
-    into the trace of Frobenius of a curve with complex multiplication by
-    the order of discriminant `D`, since `4p = t^2 + |D| v^2` gives
-    `\#E(\mathbb{F}_p) = p + 1 \mp t`. It is used that way both by elliptic
-    curve primality proving (see :ref:`ecpp`) and by point counting (see
-    :func:`gr_ec_ctx_cardinality`).
+    returns 1, or returns 0 if there is no solution. This uses
+    Cornacchia's algorithm ([Coh1996]_, Algorithm 1.5.3). For composite `n`,
+    a return value of 0 does not prove that there is no solution.
 
 .. function:: void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -103,21 +104,21 @@ check_sound_over_a_prime(flint_rand_t state)
             gr_ec_jac_point_init(Q, E);
             w = gr_heap_init(R);
 
-            FLINT_TEST(gr_one(w, R) == GR_SUCCESS);
+            GR_EC_TEST(gr_one(w, R) == GR_SUCCESS, E);
 
             if (gr_ec_jac_point_mul_fmpz_witness(Q, P, k, w, E) == GR_SUCCESS)
             {
                 gr_ec_jac_point_t Q2;
 
-                FLINT_TEST(gr_get_fmpz(wf, w, R) == GR_SUCCESS);
+                GR_EC_TEST(gr_get_fmpz(wf, w, R) == GR_SUCCESS, E);
                 fmpz_gcd(g, wf, p);
-                FLINT_TEST(fmpz_is_one(g));
+                GR_EC_TEST(fmpz_is_one(g), E);
 
                 /* and the point is the same one the plain ladder gives */
                 gr_ec_jac_point_init(Q2, E);
 
                 if (gr_ec_jac_point_mul_fmpz(Q2, P, k, E) == GR_SUCCESS)
-                    FLINT_TEST(gr_ec_jac_point_equal(Q, Q2, E) != T_FALSE);
+                    GR_EC_TEST(gr_ec_jac_point_equal(Q, Q2, E) != T_FALSE, E);
 
                 gr_ec_jac_point_clear(Q2, E);
             }
@@ -182,7 +183,7 @@ check_detects_over_a_composite(flint_rand_t state)
 
         gr_ec_jac_point_init(T, E);
         w = gr_heap_init(R);
-        FLINT_TEST(gr_one(w, R) == GR_SUCCESS);
+        GR_EC_TEST(gr_one(w, R) == GR_SUCCESS, E);
 
         for (pr = 2; pr < 2000 && !stop; pr = n_nextprime(pr, 1))
         {
@@ -196,19 +197,19 @@ check_detects_over_a_composite(flint_rand_t state)
             if (gr_ec_jac_point_mul_fmpz_witness(T, P, k, w, E) != GR_SUCCESS)
                 stop = 1;
             else
-                FLINT_TEST(gr_ec_jac_point_set(P, T, E) == GR_SUCCESS);
+                GR_EC_TEST(gr_ec_jac_point_set(P, T, E) == GR_SUCCESS, E);
 
-            FLINT_TEST(gr_get_fmpz(wf, w, R) == GR_SUCCESS);
+            GR_EC_TEST(gr_get_fmpz(wf, w, R) == GR_SUCCESS, E);
             fmpz_gcd(g, wf, n);
 
             if (!fmpz_is_one(g))
             {
                 /* whatever it says has to be true */
-                FLINT_TEST(fmpz_divisible(n, g));
+                GR_EC_TEST(fmpz_divisible(n, g), E);
 
                 if (!fmpz_equal(g, n))
                 {
-                    FLINT_TEST(fmpz_equal(g, p) || fmpz_equal(g, q));
+                    GR_EC_TEST(fmpz_equal(g, p) || fmpz_equal(g, q), E);
                     found++;
                 }
 

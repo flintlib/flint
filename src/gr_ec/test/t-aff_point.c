@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -39,12 +40,12 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
         gr_ec_aff_point_init(B, E);
         GR_TMP_INIT2(x, y, R);
 
-        FLINT_TEST(gr_ec_aff_point_is_inf(P, E) == T_TRUE);
-        FLINT_TEST(gr_ec_aff_point_is_on_curve(P, E) == T_TRUE);
-        FLINT_TEST(gr_ec_aff_point_equal(P, P, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_aff_point_is_inf(P, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_aff_point_is_on_curve(P, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_aff_point_equal(P, P, E) == T_TRUE, E);
 
         /* the identity has no affine coordinates */
-        FLINT_TEST(gr_ec_aff_point_get_affine(x, y, P, E) == GR_DOMAIN);
+        GR_EC_TEST(gr_ec_aff_point_get_affine(x, y, P, E) == GR_DOMAIN, E);
 
         status = gr_ec_aff_point_randtest(P, state, E);
         status |= gr_ec_aff_point_randtest(Q, state, E);
@@ -61,22 +62,22 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
 
         count_success++;
 
-        FLINT_TEST(gr_ec_aff_point_is_on_curve(P, E) != T_FALSE);
-        FLINT_TEST(gr_ec_aff_point_is_on_curve(Q, E) != T_FALSE);
+        GR_EC_TEST(gr_ec_aff_point_is_on_curve(P, E) != T_FALSE, E);
+        GR_EC_TEST(gr_ec_aff_point_is_on_curve(Q, E) != T_FALSE, E);
 
-        FLINT_TEST(gr_ec_aff_point_set(A, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_aff_point_equal(A, P, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_aff_point_set(A, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_aff_point_equal(A, P, E) == T_TRUE, E);
 
-        FLINT_TEST(gr_ec_aff_point_set(B, Q, E) == GR_SUCCESS);
+        GR_EC_TEST(gr_ec_aff_point_set(B, Q, E) == GR_SUCCESS, E);
         gr_ec_aff_point_swap(A, B, E);
-        FLINT_TEST(gr_ec_aff_point_equal(A, Q, E) == T_TRUE);
-        FLINT_TEST(gr_ec_aff_point_equal(B, P, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_aff_point_equal(A, Q, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_aff_point_equal(B, P, E) == T_TRUE, E);
 
         /* coordinates round trip */
         if (gr_ec_aff_point_get_affine(x, y, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_set_affine(A, x, y, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_equal(A, P, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_set_affine(A, x, y, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, P, E) == T_TRUE, E);
         }
 
         /* a point off the curve is rejected */
@@ -84,44 +85,44 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
                 && gr_add_ui(y, y, 1, R) == GR_SUCCESS)
         {
             int s2 = gr_ec_aff_point_set_affine(A, x, y, E);
-            FLINT_TEST(s2 == GR_DOMAIN || s2 == GR_UNABLE || s2 == GR_SUCCESS);
+            GR_EC_TEST(s2 == GR_DOMAIN || s2 == GR_UNABLE || s2 == GR_SUCCESS, E);
 
             if (s2 == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE, E);
         }
 
         /* P + O = P */
-        FLINT_TEST(gr_ec_aff_point_zero(A, E) == GR_SUCCESS);
+        GR_EC_TEST(gr_ec_aff_point_zero(A, E) == GR_SUCCESS, E);
 
         if (gr_ec_aff_point_add(B, P, A, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_aff_point_equal(B, P, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_equal(B, P, E) != T_FALSE, E);
 
         /* P - P = O, -(-P) = P */
         if (gr_ec_aff_point_neg(A, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE, E);
 
             if (gr_ec_aff_point_add(B, P, A, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_is_inf(B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_aff_point_is_inf(B, E) != T_FALSE, E);
 
             if (gr_ec_aff_point_neg(B, A, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_equal(B, P, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_aff_point_equal(B, P, E) != T_FALSE, E);
         }
 
         /* P + P = 2P */
         if (gr_ec_aff_point_add(A, P, P, E) == GR_SUCCESS
                 && gr_ec_aff_point_dbl(B, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE);
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE, E);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(B, E) != T_FALSE, E);
         }
 
         /* commutativity */
         if (gr_ec_aff_point_add(A, P, Q, E) == GR_SUCCESS
                 && gr_ec_aff_point_add(B, Q, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(A, E) != T_FALSE, E);
         }
 
         /* associativity */
@@ -129,36 +130,36 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
                 && gr_ec_aff_point_add(A, S, Q, E) == GR_SUCCESS
                 && gr_ec_aff_point_dbl(S, Q, E) == GR_SUCCESS
                 && gr_ec_aff_point_add(B, P, S, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
 
         /* P - Q = P + (-Q) */
         if (gr_ec_aff_point_sub(A, P, Q, E) == GR_SUCCESS
                 && gr_ec_aff_point_neg(S, Q, E) == GR_SUCCESS
                 && gr_ec_aff_point_add(B, P, S, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
 
         /* aliasing */
         if (gr_ec_aff_point_add(A, P, Q, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_set(B, P, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_add(B, B, Q, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_set(B, P, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_add(B, B, Q, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
 
-            FLINT_TEST(gr_ec_aff_point_set(B, Q, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_add(B, P, B, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_set(B, Q, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_add(B, P, B, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
         }
 
         if (gr_ec_aff_point_dbl(A, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_set(B, P, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_dbl(B, B, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_set(B, P, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_dbl(B, B, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) == T_TRUE, E);
         }
 
         /* the group law needs a field */
         if (gr_ctx_is_field(gr_ec_ctx_base_ring(E)) == T_FALSE)
-            FLINT_TEST(gr_ec_aff_point_dbl(A, P, E) == GR_DOMAIN);
+            GR_EC_TEST(gr_ec_aff_point_dbl(A, P, E) == GR_DOMAIN, E);
 
         /* on a short curve the general formulas must give the same
            result as the specialized ones */
@@ -168,11 +169,11 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
         {
             if (_gr_ec_aff_point_add_short_weierstrass(A, P, Q, E) == GR_SUCCESS
                     && _gr_ec_aff_point_add_long_weierstrass(B, P, Q, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE, E);
 
             if (_gr_ec_aff_point_dbl_short_weierstrass(A, P, E) == GR_SUCCESS
                     && _gr_ec_aff_point_dbl_long_weierstrass(B, P, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_aff_point_equal(A, B, E) != T_FALSE, E);
         }
 
 cleanup:

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -10,31 +11,14 @@
 */
 
 /*
-    Curves over Z/NZ.
+    Curves over Z/NZ. When the discriminant is a unit modulo N, the group
+    of points splits by the Chinese remainder theorem, and reduction from
+    Z/p^k Z to F_p is onto with a kernel of p^(k-1) points, so
 
-    When the discriminant is a unit modulo N, E is an elliptic curve over
-    the ring Z/NZ, and its points (in the projective plane over Z/NZ) form
-    a group that splits along the factorisation of N,
+        #E(Z/NZ) = prod over p^k || N of p^(k-1) #E(F_p).
 
-        E(Z/NZ) = prod over p^k || N of E(Z/p^k Z)
-
-    by the Chinese remainder theorem. Over Z/p^k Z, reduction modulo p maps
-    onto E(F_p) -- every point there is smooth and lifts by Hensel's lemma
-    -- and its kernel, the points congruent to the identity, has p^(k-1)
-    elements (it is the formal group evaluated at pZ/p^kZ). So
-
-        #E(Z/NZ) = prod over p^k || N of p^(k-1) #E(F_p),
-
-    and each #E(F_p) is an ordinary point count over a prime field, done by
-    gr_ec_ctx_cardinality with everything it knows.
-
-    When the discriminant is not a unit, E has bad reduction at some p | N
-    and is not an elliptic curve over Z/NZ at all; that is GR_DOMAIN.
-
-    What this costs is factoring N. A prime power is always recognised (a
-    perfect power test and a primality proof); anything else is factored
-    in full up to GR_EC_CRT_FACTOR_BITS bits, and above that only when
-    splitting off the small primes leaves a prime power.
+    N is factored completely up to GR_EC_CRT_FACTOR_BITS bits; above that,
+    only if removing its small prime factors leaves a prime power.
 */
 
 #include "fmpz.h"

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -48,28 +49,28 @@ check_ring_operations_are_out_of_domain(gr_ec_ctx_t E)
     fmpz_init(n);
     fmpq_init(q);
 
-    FLINT_TEST(gr_one(P, E) == GR_DOMAIN);
-    FLINT_TEST(gr_neg_one(P, E) == GR_DOMAIN);
-    FLINT_TEST(gr_set_ui(P, 1, E) == GR_DOMAIN);
-    FLINT_TEST(gr_set_si(P, 1, E) == GR_DOMAIN);
-    FLINT_TEST(gr_set_fmpz(P, n, E) == GR_DOMAIN);
-    FLINT_TEST(gr_set_fmpq(P, q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_mul(P, P, Q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_sqr(P, Q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_div(P, P, Q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_inv(P, Q, E) == GR_DOMAIN);
-    FLINT_TEST(gr_pow_ui(P, Q, 2, E) == GR_DOMAIN);
-    FLINT_TEST(gr_pow_si(P, Q, 2, E) == GR_DOMAIN);
-    FLINT_TEST(gr_pow_fmpz(P, Q, n, E) == GR_DOMAIN);
+    GR_EC_TEST(gr_one(P, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_neg_one(P, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_set_ui(P, 1, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_set_si(P, 1, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_set_fmpz(P, n, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_set_fmpq(P, q, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_mul(P, P, Q, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_sqr(P, Q, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_div(P, P, Q, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_inv(P, Q, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_pow_ui(P, Q, 2, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_pow_si(P, Q, 2, E) == GR_DOMAIN, E);
+    GR_EC_TEST(gr_pow_fmpz(P, Q, n, E) == GR_DOMAIN, E);
 
     /* is_one has no answer rather than a wrong one */
-    FLINT_TEST(gr_is_one(P, E) != T_TRUE);
+    GR_EC_TEST(gr_is_one(P, E) != T_TRUE, E);
 
     /* and the domain does not claim to be something it is not */
-    FLINT_TEST(gr_ctx_is_ring(E) == T_FALSE);
-    FLINT_TEST(gr_ctx_is_field(E) == T_FALSE);
-    FLINT_TEST(gr_ctx_is_multiplicative_group(E) == T_FALSE);
-    FLINT_TEST(gr_ctx_base(E) == (gr_ptr) GR_EC_ELEM_CTX(E));
+    GR_EC_TEST(gr_ctx_is_ring(E) == T_FALSE, E);
+    GR_EC_TEST(gr_ctx_is_field(E) == T_FALSE, E);
+    GR_EC_TEST(gr_ctx_is_multiplicative_group(E) == T_FALSE, E);
+    GR_EC_TEST(gr_ctx_base(E) == (gr_ptr) GR_EC_ELEM_CTX(E), E);
 
     fmpq_clear(q);
     fmpz_clear(n);
@@ -100,26 +101,26 @@ check_generic_matches_module(gr_ec_ctx_t E, flint_rand_t state)
         status = gr_add(res1, P, Q, E);
         status |= gr_ec_jac_point_add(res2, P, Q, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE, E);
 
         status = gr_sub(res1, P, Q, E);
         status |= gr_ec_jac_point_sub(res2, P, Q, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE, E);
 
         status = gr_neg(res1, P, E);
         status |= gr_ec_jac_point_neg(res2, P, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE, E);
 
         status = gr_mul_fmpz(res1, P, n, E);
         status |= gr_ec_jac_point_mul_fmpz(res2, P, n, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE, E);
 
-        FLINT_TEST(gr_zero(res1, E) == GR_SUCCESS);
-        FLINT_TEST(gr_is_zero(res1, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_inf(res1, E) == T_TRUE);
+        GR_EC_TEST(gr_zero(res1, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_is_zero(res1, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_inf(res1, E) == T_TRUE, E);
     }
 
     fmpz_clear(n);

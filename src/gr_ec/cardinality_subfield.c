@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -10,31 +11,13 @@
 */
 
 /*
-    Counting a curve over F_{p^n} that is really a curve over F_p.
+    A curve over F_{p^n} with coefficients in F_p has the same Frobenius as
+    the curve over F_p: if alpha, beta are the roots of X^2 - t X + p, the
+    trace over F_{p^n} is alpha^n + beta^n, given by the recurrence
+    t_0 = 2, t_1 = t, t_k = t t_{k-1} - p t_{k-2}.
 
-    A curve whose a-invariants all lie in the prime field is the base
-    change of a curve over F_p, and the two have the same Frobenius: if
-    alpha and beta are the roots of X^2 - t X + p for the curve over F_p,
-    then over F_{p^n} the trace is alpha^n + beta^n. Those satisfy the
-    linear recurrence
-
-        t_0 = 2,  t_1 = t,  t_k = t t_{k-1} - p t_{k-2},
-
-    so the whole computation over the extension is a point count over F_p
-    and n - 1 multiplications of integers the size of p.
-
-    The saving is not small. Counting over F_{p^n} directly costs
-    baby-step giant-step at O(q^(1/4)) group operations in F_q, or Schoof
-    at a polynomial in log q; counting over F_p costs the same thing in a
-    field n times smaller, and then the lift is free. Measured against
-    PARI, which does this too, the difference between having it and not
-    having it is three to four orders of magnitude by n = 5.
-
-    Only descent to the prime field is attempted. A curve defined over an
-    intermediate F_{p^d} with 1 < d < n would want the same treatment, but
-    mapping its coefficients down needs an embedding of F_{p^d} in F_{p^n}
-    that gr does not currently hand out, whereas the prime field needs
-    nothing but gr_get_fmpz.
+    Curves defined over an intermediate field are not handled, as gr does
+    not provide the embeddings needed to map their coefficients down.
 */
 
 #include "fmpz.h"

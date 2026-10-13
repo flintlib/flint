@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -47,51 +48,51 @@ TEST_FUNCTION_START(gr_ec_ctx_set_cardinality, state)
         gr_ec_jac_point_init(A, E);
         gr_ec_jac_point_init(B, E);
 
-        FLINT_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS
-            || gr_ec_ctx_cardinality_naive(N, E) == GR_SUCCESS);
+        GR_EC_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS
+            || gr_ec_ctx_cardinality_naive(N, E) == GR_SUCCESS, E);
 
         /* the generic cardinality agrees, and does not cache */
-        FLINT_TEST(gr_ctx_cardinality_fmpz(M, E) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal(M, N));
-        FLINT_TEST(fmpz_is_zero(CACHED(E)));
+        GR_EC_TEST(gr_ctx_cardinality_fmpz(M, E) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal(M, N), E);
+        GR_EC_TEST(fmpz_is_zero(CACHED(E)), E);
 
         /* a value outside the Hasse interval is refused */
         fmpz_mul_ui(M, N, 100);
         fmpz_add_ui(M, M, 1);
-        FLINT_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN);
-        FLINT_TEST(fmpz_is_zero(CACHED(E)));
+        GR_EC_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN, E);
+        GR_EC_TEST(fmpz_is_zero(CACHED(E)), E);
 
         fmpz_zero(M);
-        FLINT_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN);
+        GR_EC_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN, E);
 
         /* the truth is accepted and cached */
-        FLINT_TEST(gr_ec_ctx_set_cardinality(E, N) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal(CACHED(E), N));
-        FLINT_TEST(gr_ec_ctx_cardinality(M, E) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal(M, N));
+        GR_EC_TEST(gr_ec_ctx_set_cardinality(E, N) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal(CACHED(E), N), E);
+        GR_EC_TEST(gr_ec_ctx_cardinality(M, E) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal(M, N), E);
 
         /* once known, anything else is refused */
         fmpz_add_ui(M, N, 1);
-        FLINT_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN);
-        FLINT_TEST(fmpz_equal(CACHED(E), N));
+        GR_EC_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN, E);
+        GR_EC_TEST(fmpz_equal(CACHED(E), N), E);
 
         /* reducing scalars modulo the cached value changes nothing */
         if (gr_ec_jac_point_randtest(P, state, E) == GR_SUCCESS)
         {
             fmpz_randbits(k, state, 1 + n_randint(state, 200));
-            FLINT_TEST(gr_ec_jac_point_mul_fmpz(A, P, k, E) == GR_SUCCESS);
+            GR_EC_TEST(gr_ec_jac_point_mul_fmpz(A, P, k, E) == GR_SUCCESS, E);
 
             /* the same multiplication without the cache */
             fmpz_zero(CACHED(E));
-            FLINT_TEST(gr_ec_jac_point_mul_fmpz(B, P, k, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_jac_point_mul_fmpz(B, P, k, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE, E);
         }
 
         /* gr_ec_ctx_cardinality counts and caches */
         fmpz_zero(CACHED(E));
-        FLINT_TEST(gr_ec_ctx_cardinality(M, E) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal(M, N));
-        FLINT_TEST(fmpz_equal(CACHED(E), N));
+        GR_EC_TEST(gr_ec_ctx_cardinality(M, E) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal(M, N), E);
+        GR_EC_TEST(fmpz_equal(CACHED(E), N), E);
 
         /* a wrong value within the Hasse interval is caught by a point
            it does not kill, whenever there is one */
@@ -102,8 +103,8 @@ TEST_FUNCTION_START(gr_ec_ctx_set_cardinality, state)
                 && gr_ec_jac_point_mul_fmpz(A, P, M, E) == GR_SUCCESS
                 && gr_ec_jac_point_is_inf(A, E) == T_FALSE)
         {
-            FLINT_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN);
-            FLINT_TEST(fmpz_is_zero(CACHED(E)));
+            GR_EC_TEST(gr_ec_ctx_set_cardinality(E, M) == GR_DOMAIN, E);
+            GR_EC_TEST(fmpz_is_zero(CACHED(E)), E);
         }
 
         gr_ec_jac_point_clear(P, E);
@@ -124,13 +125,13 @@ TEST_FUNCTION_START(gr_ec_ctx_set_cardinality, state)
 
         gr_ctx_init_fmpq(R);
         FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, -1, 0) == GR_SUCCESS);
-        FLINT_TEST(gr_ctx_is_finite(E) == T_UNKNOWN);
+        GR_EC_TEST(gr_ctx_is_finite(E) == T_UNKNOWN, E);
         gr_ec_ctx_clear(E);
         gr_ctx_clear(R);
 
         FLINT_TEST(gr_ctx_init_nmod(R, 101) == GR_SUCCESS);
         FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, 1, 1) == GR_SUCCESS);
-        FLINT_TEST(gr_ctx_is_finite(E) == T_TRUE);
+        GR_EC_TEST(gr_ctx_is_finite(E) == T_TRUE, E);
         gr_ec_ctx_clear(E);
         gr_ctx_clear(R);
     }

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -40,7 +41,7 @@ TEST_GR_FUNCTION_START(gr_ec_char23, state, count_success, count_domain, count_u
             continue;
         }
 
-        FLINT_TEST(gr_ec_ctx_is_smooth(E) == T_TRUE);
+        GR_EC_TEST(gr_ec_ctx_is_smooth(E) == T_TRUE, E);
 
         /* In characteristic 2 a short Weierstrass equation is always
            singular, so the context can only have picked the long model.
@@ -48,7 +49,7 @@ TEST_GR_FUNCTION_START(gr_ec_char23, state, count_success, count_domain, count_u
            and both models occur. */
         if (gr_ctx_is_finite_characteristic(R) == T_TRUE
                 && gr_ec_ctx_model(E) == GR_EC_SHORT_WEIERSTRASS)
-            FLINT_TEST(gr_is_zero(GR_EC_A4(E), R) == T_FALSE);
+            GR_EC_TEST(gr_is_zero(GR_EC_A4(E), R) == T_FALSE, E);
 
         gr_ec_jac_point_init(P, E);
         gr_ec_jac_point_init(Q, E);
@@ -72,64 +73,64 @@ TEST_GR_FUNCTION_START(gr_ec_char23, state, count_success, count_domain, count_u
 
         count_success++;
 
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(P, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(Q, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(P, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(Q, E) == T_TRUE, E);
 
         /* P - P = O */
-        FLINT_TEST(gr_ec_jac_point_neg(A, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_add(B, P, A, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_is_inf(B, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_neg(A, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_add(B, P, A, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_is_inf(B, E) == T_TRUE, E);
 
         /* P + P = 2P */
-        FLINT_TEST(gr_ec_jac_point_add(A, P, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_dbl(B, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(B, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_add(A, P, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_dbl(B, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(B, E) == T_TRUE, E);
 
         /* commutativity and associativity */
-        FLINT_TEST(gr_ec_jac_point_add(A, P, Q, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_add(B, Q, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_add(A, P, Q, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_add(B, Q, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE, E);
 
-        FLINT_TEST(gr_ec_jac_point_add(S, P, Q, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_add(A, S, Q, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_dbl(S, Q, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_add(B, P, S, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_add(S, P, Q, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_add(A, S, Q, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_dbl(S, Q, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_add(B, P, S, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE, E);
 
         /* affine and mixed addition agree */
-        FLINT_TEST(gr_ec_jac_point_add(S, P, Q, E) == GR_SUCCESS);
+        GR_EC_TEST(gr_ec_jac_point_add(S, P, Q, E) == GR_SUCCESS, E);
 
         if (gr_ec_aff_point_set_jac_point(Pa, P, E) == GR_SUCCESS
                 && gr_ec_aff_point_set_jac_point(Qa, Q, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(Pa, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(Pa, E) == T_TRUE, E);
 
-            FLINT_TEST(gr_ec_aff_point_add(Sa, Pa, Qa, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_aff_point_add(Sa, Pa, Qa, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE, E);
 
-            FLINT_TEST(gr_ec_jac_point_add_aff_point(A, P, Qa, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE);
+            GR_EC_TEST(gr_ec_jac_point_add_aff_point(A, P, Qa, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE, E);
         }
 
         /* scalar multiplication, which runs the NAF ladder */
         fmpz_randtest(m, state, 40);
         fmpz_randtest(n, state, 40);
 
-        FLINT_TEST(gr_ec_jac_point_mul_fmpz(A, P, m, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_mul_fmpz(B, P, n, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_add(S, A, B, E) == GR_SUCCESS);
+        GR_EC_TEST(gr_ec_jac_point_mul_fmpz(A, P, m, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_mul_fmpz(B, P, n, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_add(S, A, B, E) == GR_SUCCESS, E);
         fmpz_add(m, m, n);
-        FLINT_TEST(gr_ec_jac_point_mul_fmpz(A, P, m, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_mul_fmpz(A, P, m, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) == T_TRUE, E);
 
         /* and agrees with the plain ladder */
-        FLINT_TEST(_gr_ec_jac_point_mul_fmpz_binary(B, P, m, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE);
+        GR_EC_TEST(_gr_ec_jac_point_mul_fmpz_binary(B, P, m, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) == T_TRUE, E);
 
 cleanup:
         fmpz_clear(m);

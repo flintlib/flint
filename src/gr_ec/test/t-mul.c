@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -64,11 +65,11 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         fmpz_add(mn, m, n);
 
         /* 0 P = O and 1 P = P */
-        FLINT_TEST(gr_ec_jac_point_mul_ui(A, P, 0, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_is_inf(A, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_mul_ui(A, P, 0, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_is_inf(A, E) == T_TRUE, E);
 
         if (gr_ec_jac_point_mul_ui(A, P, 1, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE, E);
 
         /* a small multiple against repeated addition; the accumulator is
            never normalized, so its coordinates grow with every step and
@@ -86,8 +87,8 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
             if (status == GR_SUCCESS
                     && gr_ec_jac_point_mul_si(A, P, nsmall, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
-                FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
+                GR_EC_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE, E);
             }
         }
 
@@ -96,7 +97,7 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
                 && gr_ec_jac_point_mul_fmpz(B, P, n, E) == GR_SUCCESS
                 && gr_ec_jac_point_add(B, A, B, E) == GR_SUCCESS
                 && gr_ec_jac_point_mul_fmpz(C, P, mn, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(B, C, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(B, C, E) != T_FALSE, E);
 
         /* m (n P) = (m n) P */
         fmpz_mul(mn, m, n);
@@ -104,7 +105,7 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         if (gr_ec_jac_point_mul_fmpz(A, P, n, E) == GR_SUCCESS
                 && gr_ec_jac_point_mul_fmpz(A, A, m, E) == GR_SUCCESS
                 && gr_ec_jac_point_mul_fmpz(B, P, mn, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
 
         /* (-n) P = -(n P) */
         fmpz_neg(mn, n);
@@ -112,19 +113,19 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         if (gr_ec_jac_point_mul_fmpz(A, P, mn, E) == GR_SUCCESS
                 && gr_ec_jac_point_mul_fmpz(B, P, n, E) == GR_SUCCESS
                 && gr_ec_jac_point_neg(B, B, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
 
         /* the plain ladder agrees with the dispatched implementation */
         if (gr_ec_jac_point_mul_fmpz(A, P, n, E) == GR_SUCCESS
                 && _gr_ec_jac_point_mul_fmpz_binary(B, P, n, E) == GR_SUCCESS)
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
 
         /* aliasing */
         if (gr_ec_jac_point_mul_fmpz(A, P, n, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_jac_point_set(B, P, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_mul_fmpz(B, B, n, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_jac_point_set(B, P, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_mul_fmpz(B, B, n, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
         }
 
         /* the affine functions agree */
@@ -133,8 +134,8 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
         {
             if (gr_ec_aff_point_mul_fmpz(Aa, Pa, n, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_set_aff_point(B, Aa, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_set_aff_point(B, Aa, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
             }
 
             /* the affine ladder does an inversion per bit; only run it
@@ -142,8 +143,8 @@ TEST_GR_FUNCTION_START(gr_ec_mul, state, count_success, count_domain, count_unab
             if (gr_ctx_is_finite(R) == T_TRUE
                     && _gr_ec_aff_point_mul_fmpz_binary(Aa, Pa, n, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_set_aff_point(B, Aa, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_set_aff_point(B, Aa, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, B, E) != T_FALSE, E);
             }
         }
 

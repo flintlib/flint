@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -114,7 +115,7 @@ check_against_brute_force(flint_rand_t state)
 
         /* the enumeration and the point count must be the same number */
         if (gr_ec_ctx_cardinality(N, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal_si(N, npts));
+            GR_EC_TEST(fmpz_equal_si(N, npts), E);
 
         if (gr_ec_jac_point_randtest(P, state, E) != GR_SUCCESS)
             goto next;
@@ -132,44 +133,44 @@ check_against_brute_force(flint_rand_t state)
 
         if (sols == 1)
         {
-            FLINT_TEST(st == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE);
+            GR_EC_TEST(st == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE, E);
         }
         else
-            FLINT_TEST(st == GR_DOMAIN || st == GR_UNABLE);
+            GR_EC_TEST(st == GR_DOMAIN || st == GR_UNABLE, E);
 
         /* div_nonunique wants at least one */
         st = gr_ec_jac_point_div_fmpz_nonunique(Q, P, n, E);
 
         if (sols >= 1)
         {
-            FLINT_TEST(st == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE);
+            GR_EC_TEST(st == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE, E);
         }
         else
-            FLINT_TEST(st == GR_DOMAIN || st == GR_UNABLE);
+            GR_EC_TEST(st == GR_DOMAIN || st == GR_UNABLE, E);
 
         /* the ui and si spellings agree with the fmpz one */
         {
             gr_ec_jac_point_t U;
             gr_ec_jac_point_init(U, E);
 
-            FLINT_TEST(gr_ec_jac_point_div_ui(U, P, nn, E)
-                    == gr_ec_jac_point_div_fmpz(Q, P, n, E));
+            GR_EC_TEST(gr_ec_jac_point_div_ui(U, P, nn, E)
+                    == gr_ec_jac_point_div_fmpz(Q, P, n, E), E);
 
             if (gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_jac_point_equal(U, Q, E) == T_TRUE);
+                GR_EC_TEST(gr_ec_jac_point_equal(U, Q, E) == T_TRUE, E);
 
             /* dividing by -n is negating the answer */
             fmpz_neg(n, n);
 
             if (gr_ec_jac_point_div_fmpz(U, P, n, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_neg(T, U, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_div_ui(U, P, nn, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(T, U, E) == T_TRUE);
+                GR_EC_TEST(gr_ec_jac_point_neg(T, U, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_div_ui(U, P, nn, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(T, U, E) == T_TRUE, E);
             }
 
             fmpz_neg(n, n);
@@ -189,9 +190,9 @@ check_against_brute_force(flint_rand_t state)
 
             if (gr_ec_jac_point_mul_fmpq_nonunique(Q, P, c, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_mul_fmpz(T, Q, fmpq_denref(c), E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_mul_fmpz(U, P, fmpq_numref(c), E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(T, U, E) == T_TRUE);
+                GR_EC_TEST(gr_ec_jac_point_mul_fmpz(T, Q, fmpq_denref(c), E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_mul_fmpz(U, P, fmpq_numref(c), E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(T, U, E) == T_TRUE, E);
             }
 
             gr_ec_jac_point_clear(U, E);
@@ -200,7 +201,7 @@ check_against_brute_force(flint_rand_t state)
 
         /* dividing by zero is never a single answer */
         fmpz_zero(n);
-        FLINT_TEST(gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_DOMAIN);
+        GR_EC_TEST(gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_DOMAIN, E);
 
 next:
         for (i = 0; i < npts; i++)
@@ -262,9 +263,9 @@ check_coprime_path(flint_rand_t state)
             goto next;
 
         /* coprime to the order, so there is exactly one answer */
-        FLINT_TEST(gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_mul_ui(T, Q, nn, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_equal(T, P, E) == T_TRUE, E);
 
 next:
         gr_ec_jac_point_clear(T, E);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -133,7 +134,7 @@ check_algorithms_agree(flint_rand_t state)
         if (gr_ec_ctx_init_randtest(E, state, R) != GR_SUCCESS)
             goto next;
 
-        FLINT_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS);
+        GR_EC_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS, E);
 
         /* naive is the reference: it never touches the group law */
         if (gr_ec_ctx_cardinality_naive(nn, E) != GR_SUCCESS)
@@ -143,24 +144,24 @@ check_algorithms_agree(flint_rand_t state)
 
         /* BSGS may legitimately fail to disambiguate over a tiny field */
         if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal(nn, nb));
+            GR_EC_TEST(fmpz_equal(nn, nb), E);
 
         /* Schoof only claims the short model away from 2 and 3 */
         if (gr_ec_ctx_cardinality_schoof(ns, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal(nn, ns));
+            GR_EC_TEST(fmpz_equal(nn, ns), E);
 
         /* the CM path declines unless the j-invariant proves it applies */
         {
             fmpz_t nc;
             fmpz_init(nc);
             if (gr_ec_ctx_cardinality_cm(nc, E) == GR_SUCCESS)
-                FLINT_TEST(fmpz_equal(nn, nc));
+                GR_EC_TEST(fmpz_equal(nn, nc), E);
             fmpz_clear(nc);
         }
 
         /* and the same number must come out of the generic interface */
-        FLINT_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal(nn, ng));
+        GR_EC_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal(nn, ng), E);
 
         /* N annihilates the group */
         for (t = 0; t < 6; t++)
@@ -171,7 +172,7 @@ check_algorithms_agree(flint_rand_t state)
 
             if (gr_ec_jac_point_randtest(P, state, E) == GR_SUCCESS
                     && gr_ec_jac_point_mul_fmpz(Q, P, nn, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_jac_point_is_inf(Q, E) == T_TRUE);
+                GR_EC_TEST(gr_ec_jac_point_is_inf(Q, E) == T_TRUE, E);
 
             gr_ec_jac_point_clear(Q, E);
             gr_ec_jac_point_clear(P, E);
@@ -229,17 +230,17 @@ check_supersingular(flint_rand_t state)
             goto next;
 
         if (gr_ec_ctx_cardinality_naive(n, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+            GR_EC_TEST(fmpz_equal_ui(n, pp + 1), E);
 
         if (gr_ec_ctx_cardinality_bsgs(n, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+            GR_EC_TEST(fmpz_equal_ui(n, pp + 1), E);
 
         if (gr_ec_ctx_cardinality_schoof(n, E) == GR_SUCCESS)
-            FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+            GR_EC_TEST(fmpz_equal_ui(n, pp + 1), E);
 
         /* these are exactly the curves the CM path is meant to recognise */
-        FLINT_TEST(gr_ec_ctx_cardinality_cm(n, E) == GR_SUCCESS);
-        FLINT_TEST(fmpz_equal_ui(n, pp + 1));
+        GR_EC_TEST(gr_ec_ctx_cardinality_cm(n, E) == GR_SUCCESS, E);
+        GR_EC_TEST(fmpz_equal_ui(n, pp + 1), E);
 
         gr_ec_ctx_clear(E);
 next:
@@ -349,10 +350,10 @@ check_cm_discriminants(flint_rand_t state)
 
             /* the j-invariant proves the complex multiplication, so this
                one is not allowed to decline */
-            FLINT_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_SUCCESS);
+            GR_EC_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_SUCCESS, E);
 
             if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
-                FLINT_TEST(fmpz_equal(nc, nb));
+                GR_EC_TEST(fmpz_equal(nc, nb), E);
 
             fmpz_clear(nc);
             fmpz_clear(nb);
@@ -415,7 +416,7 @@ check_extension_fields(flint_rand_t state)
             fmpz_init(q); fmpz_init(nn); fmpz_init(nb);
             fmpz_init(ns); fmpz_init(nc); fmpz_init(ng);
 
-            FLINT_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS);
+            GR_EC_TEST(gr_ctx_cardinality_fmpz(q, R) == GR_SUCCESS, E);
 
             /* the walk is O(q), and q is in the millions here, so only
                ask for it where it is genuinely cheap */
@@ -426,23 +427,23 @@ check_extension_fields(flint_rand_t state)
 
             /* over an extension at least one of the two general
                algorithms has to deliver */
-            FLINT_TEST(have_b || have_s);
+            GR_EC_TEST(have_b || have_s, E);
 
             if (have_n) check_hasse(nn, q);
             if (have_b) check_hasse(nb, q);
             if (have_s) check_hasse(ns, q);
 
-            if (have_n && have_b) FLINT_TEST(fmpz_equal(nn, nb));
-            if (have_n && have_s) FLINT_TEST(fmpz_equal(nn, ns));
-            if (have_b && have_s) FLINT_TEST(fmpz_equal(nb, ns));
+            if (have_n && have_b) GR_EC_TEST(fmpz_equal(nn, nb), E);
+            if (have_n && have_s) GR_EC_TEST(fmpz_equal(nn, ns), E);
+            if (have_b && have_s) GR_EC_TEST(fmpz_equal(nb, ns), E);
 
             /* the CM path is for prime fields and must say so */
-            FLINT_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_UNABLE);
+            GR_EC_TEST(gr_ec_ctx_cardinality_cm(nc, E) == GR_UNABLE, E);
 
             /* and the generic entry point agrees with whichever ran */
-            FLINT_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS);
-            if (have_b) FLINT_TEST(fmpz_equal(ng, nb));
-            if (have_s) FLINT_TEST(fmpz_equal(ng, ns));
+            GR_EC_TEST(gr_ctx_cardinality_fmpz(ng, E) == GR_SUCCESS, E);
+            if (have_b) GR_EC_TEST(fmpz_equal(ng, nb), E);
+            if (have_s) GR_EC_TEST(fmpz_equal(ng, ns), E);
 
             fmpz_clear(q); fmpz_clear(nn); fmpz_clear(nb);
             fmpz_clear(ns); fmpz_clear(nc); fmpz_clear(ng);
@@ -495,14 +496,14 @@ check_subfield(flint_rand_t state)
             fmpz_init(ns);
             fmpz_init(nb);
 
-            FLINT_TEST(gr_ec_ctx_cardinality_subfield(ns, E) == GR_SUCCESS);
+            GR_EC_TEST(gr_ec_ctx_cardinality_subfield(ns, E) == GR_SUCCESS, E);
 
             if (gr_ec_ctx_cardinality_bsgs(nb, E) == GR_SUCCESS)
-                FLINT_TEST(fmpz_equal(ns, nb));
+                GR_EC_TEST(fmpz_equal(ns, nb), E);
 
             /* and it must be what the dispatcher reports */
-            FLINT_TEST(gr_ctx_cardinality_fmpz(nb, E) == GR_SUCCESS);
-            FLINT_TEST(fmpz_equal(ns, nb));
+            GR_EC_TEST(gr_ctx_cardinality_fmpz(nb, E) == GR_SUCCESS, E);
+            GR_EC_TEST(fmpz_equal(ns, nb), E);
 
             fmpz_clear(ns);
             fmpz_clear(nb);
@@ -516,7 +517,7 @@ check_subfield(flint_rand_t state)
             {
                 if (gr_ec_ctx_init_randtest(E, state, R) == GR_SUCCESS)
                 {
-                    FLINT_TEST(gr_ec_ctx_cardinality_subfield(dummy, E) == GR_UNABLE);
+                    GR_EC_TEST(gr_ec_ctx_cardinality_subfield(dummy, E) == GR_UNABLE, E);
                     gr_ec_ctx_clear(E);
                 }
 
@@ -587,11 +588,11 @@ check_zn(flint_rand_t state)
         st = gr_ec_ctx_cardinality(c, E);
 
         if (n_gcd(g, N) != 1)
-            FLINT_TEST(st == GR_DOMAIN);
+            GR_EC_TEST(st == GR_DOMAIN, E);
         else
         {
-            FLINT_TEST(st == GR_SUCCESS);
-            FLINT_TEST(fmpz_equal_ui(c, _brute_zn(N, a)));
+            GR_EC_TEST(st == GR_SUCCESS, E);
+            GR_EC_TEST(fmpz_equal_ui(c, _brute_zn(N, a)), E);
         }
 
         fmpz_clear(c);
@@ -630,15 +631,15 @@ check_zn(flint_rand_t state)
             {
                 GR_MUST_SUCCEED(gr_ec_ctx_init_short_weierstrass_si(E1, R1, a4, a6));
                 GR_MUST_SUCCEED(gr_ec_ctx_init_short_weierstrass_si(E2, R2, a4, a6));
-                FLINT_TEST(gr_ec_ctx_cardinality(c1, E1) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_ctx_cardinality(c2, E2) == GR_SUCCESS);
+                GR_EC_TEST(gr_ec_ctx_cardinality(c1, E1) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_ctx_cardinality(c2, E2) == GR_SUCCESS, E);
                 fmpz_mul(c1, c1, c2);
-                FLINT_TEST(fmpz_equal(c, c1));
+                GR_EC_TEST(fmpz_equal(c, c1), E);
                 gr_ec_ctx_clear(E1);
                 gr_ec_ctx_clear(E2);
             }
             else
-                FLINT_TEST(st == GR_DOMAIN);
+                GR_EC_TEST(st == GR_DOMAIN, E);
 
             gr_ec_ctx_clear(E);
         }

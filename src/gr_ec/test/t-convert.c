@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -41,11 +42,11 @@ TEST_GR_FUNCTION_START(gr_ec_convert, state, count_success, count_domain, count_
         gr_ec_aff_point_init(Sa, E);
 
         /* the identity converts to the identity */
-        FLINT_TEST(gr_ec_jac_point_zero(P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_aff_point_set_jac_point(Pa, P, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_aff_point_is_inf(Pa, E) == T_TRUE);
-        FLINT_TEST(gr_ec_jac_point_set_aff_point(A, Pa, E) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_jac_point_is_inf(A, E) == T_TRUE);
+        GR_EC_TEST(gr_ec_jac_point_zero(P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_aff_point_set_jac_point(Pa, P, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_aff_point_is_inf(Pa, E) == T_TRUE, E);
+        GR_EC_TEST(gr_ec_jac_point_set_aff_point(A, Pa, E) == GR_SUCCESS, E);
+        GR_EC_TEST(gr_ec_jac_point_is_inf(A, E) == T_TRUE, E);
 
         status = gr_ec_jac_point_randtest(P, state, E);
         status |= gr_ec_jac_point_randtest(Q, state, E);
@@ -65,13 +66,13 @@ TEST_GR_FUNCTION_START(gr_ec_convert, state, count_success, count_domain, count_
         /* Jacobian -> affine -> Jacobian */
         if (gr_ec_aff_point_set_jac_point(Pa, P, E) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_ec_aff_point_is_on_curve(Pa, E) != T_FALSE);
-            FLINT_TEST(gr_ec_jac_point_set_aff_point(A, Pa, E) == GR_SUCCESS);
-            FLINT_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE);
+            GR_EC_TEST(gr_ec_aff_point_is_on_curve(Pa, E) != T_FALSE, E);
+            GR_EC_TEST(gr_ec_jac_point_set_aff_point(A, Pa, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_ec_jac_point_equal(A, P, E) != T_FALSE, E);
 
             /* and back to affine */
             if (gr_ec_aff_point_set_jac_point(Qa, A, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_aff_point_equal(Qa, Pa, E) == T_TRUE);
+                GR_EC_TEST(gr_ec_aff_point_equal(Qa, Pa, E) == T_TRUE, E);
         }
 
         /* the conversions commute with addition, mixed addition and doubling */
@@ -81,18 +82,18 @@ TEST_GR_FUNCTION_START(gr_ec_convert, state, count_success, count_domain, count_
             if (gr_ec_jac_point_add(S, P, Q, E) == GR_SUCCESS
                     && gr_ec_aff_point_add(Sa, Pa, Qa, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE, E);
 
                 if (gr_ec_jac_point_add_aff_point(A, P, Qa, E) == GR_SUCCESS)
-                    FLINT_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE);
+                    GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE, E);
             }
 
             if (gr_ec_jac_point_dbl(S, P, E) == GR_SUCCESS
                     && gr_ec_aff_point_dbl(Sa, Pa, E) == GR_SUCCESS)
             {
-                FLINT_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS);
-                FLINT_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE);
+                GR_EC_TEST(gr_ec_jac_point_set_aff_point(A, Sa, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_ec_jac_point_equal(A, S, E) != T_FALSE, E);
             }
         }
 

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -61,7 +62,7 @@ check_short_model_base_cases(flint_rand_t state)
         status |= gr_poly_set_coeff_scalar(want, 0, t, R);
 
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_poly_equal(got, want, R) != T_FALSE);
+            GR_EC_TEST(gr_poly_equal(got, want, R) != T_FALSE, E);
 
         /* Psi_3 */
         status |= gr_ec_ctx_division_poly(got, 3, E);
@@ -76,7 +77,7 @@ check_short_model_base_cases(flint_rand_t state)
         status |= gr_poly_set_coeff_scalar(want, 0, t, R);
 
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_poly_equal(got, want, R) != T_FALSE);
+            GR_EC_TEST(gr_poly_equal(got, want, R) != T_FALSE, E);
 
         /* Psi_4 */
         status |= gr_ec_ctx_division_poly(got, 4, E);
@@ -105,7 +106,7 @@ check_short_model_base_cases(flint_rand_t state)
         status |= gr_poly_set_coeff_scalar(want, 0, t, R);
 
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_poly_equal(got, want, R) != T_FALSE);
+            GR_EC_TEST(gr_poly_equal(got, want, R) != T_FALSE, E);
 
         gr_poly_clear(got, R);
         gr_poly_clear(want, R);
@@ -150,12 +151,12 @@ check_degree_and_leading(flint_rand_t state)
                                     : (slong) (n * n - 4) / 2;
             gr_poly_init(p, R);
 
-            FLINT_TEST(gr_ec_ctx_division_poly(p, n, E) == GR_SUCCESS);
-            FLINT_TEST(gr_poly_length(p, R) == want_deg + 1);
+            GR_EC_TEST(gr_ec_ctx_division_poly(p, n, E) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_poly_length(p, R) == want_deg + 1, E);
 
-            FLINT_TEST(gr_set_ui(t, (n % 2) ? n : n / 2, R) == GR_SUCCESS);
-            FLINT_TEST(gr_equal(GR_ENTRY(p->coeffs, want_deg, R->sizeof_elem),
-                        t, R) == T_TRUE);
+            GR_EC_TEST(gr_set_ui(t, (n % 2) ? n : n / 2, R) == GR_SUCCESS, E);
+            GR_EC_TEST(gr_equal(GR_ENTRY(p->coeffs, want_deg, R->sizeof_elem),
+                        t, R) == T_TRUE, E);
 
             gr_poly_clear(p, R);
         }
@@ -204,7 +205,7 @@ check_divisibility(flint_rand_t state)
                 && gr_poly_length(pm, R) > 0
                 && gr_poly_divrem(q, r, pn, pm, R) == GR_SUCCESS)
         {
-            FLINT_TEST(gr_poly_is_zero(r, R) == T_TRUE);
+            GR_EC_TEST(gr_poly_is_zero(r, R) == T_TRUE, E);
         }
 
         gr_poly_clear(pm, R);
@@ -289,10 +290,10 @@ check_torsion(flint_rand_t state)
                 twoP_inf = gr_ec_jac_point_is_inf(D, E);
 
                 if (psi_zero == T_TRUE)
-                    FLINT_TEST(nP_inf != T_FALSE);
+                    GR_EC_TEST(nP_inf != T_FALSE, E);
 
                 if (nP_inf == T_TRUE && !(n % 2 == 0 && twoP_inf != T_FALSE))
-                    FLINT_TEST(psi_zero != T_FALSE);
+                    GR_EC_TEST(psi_zero != T_FALSE, E);
             }
         }
 
@@ -345,8 +346,8 @@ check_vec(flint_rand_t state)
         {
             for (k = 0; k < len; k++)
             {
-                FLINT_TEST(gr_ec_ctx_division_poly(p, (ulong) k, E) == GR_SUCCESS);
-                FLINT_TEST(gr_poly_equal(p, tab + k, R) != T_FALSE);
+                GR_EC_TEST(gr_ec_ctx_division_poly(p, (ulong) k, E) == GR_SUCCESS, E);
+                GR_EC_TEST(gr_poly_equal(p, tab + k, R) != T_FALSE, E);
             }
         }
 

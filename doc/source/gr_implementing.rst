@@ -192,18 +192,14 @@ Testing rings
 
 .. function:: void gr_test_additive_group(gr_ctx_t R, slong iters, int test_flags)
 
-    Test correctness of the abelian group *R* written additively, for a
-    domain that provides ``add``, ``sub``, ``neg`` and ``zero`` but not the
-    ring operations. Also checks that ``mul_ui``, ``mul_si``, ``mul_fmpz``,
-    ``mul_two`` and ``mul_2exp_si`` / ``mul_2exp_fmpz`` act as the
-    `\mathbb{Z}`-module scalar multiplication, agreeing with each other and
-    with repeated addition.
+    Test correctness of the abelian group *R*, written additively. Besides
+    the group operations, this checks that multiplication by integers
+    (``mul_ui``, ``mul_si``, ``mul_fmpz``, ``mul_two``, ``mul_2exp_si``,
+    ``mul_2exp_fmpz``) agrees with repeated addition.
 
 .. function:: void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
 
-    Test correctness of the group *R* written multiplicatively, for a
-    domain that provides ``mul``, ``div``, ``inv`` and ``one`` but not the
-    additive operations.
+    Test correctness of the group *R*, written multiplicatively.
 
 
 

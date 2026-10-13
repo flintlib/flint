@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -256,7 +257,7 @@ check_elkies_atkin(flint_rand_t state)
 
         if (_random_curve(E, R, state))
         {
-            FLINT_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS);
+            GR_EC_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS, E);
             fmpz_add_ui(t, p, 1);
             fmpz_sub(t, t, N);
 
@@ -270,7 +271,7 @@ check_elkies_atkin(flint_rand_t state)
                     continue;
 
                 if (el)
-                    FLINT_TEST(tl == truth);
+                    GR_EC_TEST(tl == truth, E);
                 else if (r != 0)
                 {
                     n = _gr_ec_atkin_candidates(T, l, r, fmpz_fdiv_ui(p, l));
@@ -278,7 +279,7 @@ check_elkies_atkin(flint_rand_t state)
                     for (k = 0; k < n; k++)
                         in |= (T[k] == truth);
 
-                    FLINT_TEST(in);
+                    GR_EC_TEST(in, E);
                 }
             }
 
@@ -316,7 +317,7 @@ check_match_sort(flint_rand_t state)
 
         if (_random_curve(E, R, state))
         {
-            FLINT_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS);
+            GR_EC_TEST(gr_ec_ctx_cardinality_bsgs(N, E) == GR_SUCCESS, E);
             fmpz_add_ui(t, p, 1);
             fmpz_sub(t, t, N);
 
@@ -336,8 +337,8 @@ check_match_sort(flint_rand_t state)
                     A[i].T[k] = (truth + k) % l;
             }
 
-            FLINT_TEST(_gr_ec_cardinality_match_sort(N2, t3, m3, A, 4, E) == GR_SUCCESS);
-            FLINT_TEST(fmpz_equal(N, N2));
+            GR_EC_TEST(_gr_ec_cardinality_match_sort(N2, t3, m3, A, 4, E) == GR_SUCCESS, E);
+            GR_EC_TEST(fmpz_equal(N, N2), E);
 
             for (i = 0; i < 4; i++)
                 flint_free(A[i].T);
@@ -388,12 +389,12 @@ check_sea(flint_rand_t state)
             if (gr_ec_ctx_cardinality_sea(N1, E) == GR_SUCCESS)
             {
                 if (gr_ec_ctx_cardinality_bsgs(N2, E) == GR_SUCCESS)
-                    FLINT_TEST(fmpz_equal(N1, N2));
+                    GR_EC_TEST(fmpz_equal(N1, N2), E);
 
                 if (gr_ctx_cardinality_fmpz(p, R) == GR_SUCCESS
                         && fmpz_cmp_ui(p, 70000) < 0
                         && gr_ec_ctx_cardinality_naive(N3, E) == GR_SUCCESS)
-                    FLINT_TEST(fmpz_equal(N1, N3));
+                    GR_EC_TEST(fmpz_equal(N1, N3), E);
             }
 
             gr_ec_ctx_clear(E);

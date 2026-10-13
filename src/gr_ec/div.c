@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Maël Hostettler
+    Developed using Claude Opus 5 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -10,32 +11,12 @@
 */
 
 /*
-    Dividing a point by an integer: given P and n, the Q with n Q = P.
-
-    The solutions of n Q = P, when there are any, form a coset of E[n](F_q),
-    so there are either none of them or exactly #E[n](F_q). That is what
-    makes this two operations rather than one:
-
-      div            insists on a single answer, and reports GR_DOMAIN when
-                     there is none or when there is more than one
-      div_nonunique  returns one of them, and reports GR_DOMAIN only when
-                     there is none
-
-    Two routes get there. Whenever the context knows an annihilator m -- and
-    here, unlike everywhere else in the module, it is worth counting the
-    points to learn one, since the alternative is polynomial root finding --
-    write n = n1 n2 with gcd(n1, m) = 1. Dividing by n1 is multiplying by
-    its inverse modulo m, which is one scalar multiplication and always
-    unique, because gcd(n1, m) = 1 forces E[n1](F_q) to be trivial. If n2
-    comes out as 1, which is the overwhelmingly common case, that is the
-    whole computation.
-
-    What is left is dividing by n2, every prime of which divides m. There is
-    no shortcut for that: the x-coordinates of the solutions are roots of a
-    polynomial of degree n2^2 built from division polynomials, and they have
-    to be found and then checked. That is affordable only for small n2, so
-    above GR_EC_DIV_MAX_DEGREE this reports GR_UNABLE rather than building a
-    polynomial nobody wants to wait for.
+    Solving n Q = P. With m the number of points, write n = n1 n2 with
+    gcd(n1, m) = 1 and every prime factor of n2 dividing m. Dividing by n1
+    is multiplying by its inverse modulo m, and has a unique answer. For
+    n2 > 1, the x-coordinates of the solutions are roots of a polynomial of
+    degree n2^2 built from division polynomials; this is only attempted up
+    to degree GR_EC_DIV_MAX_DEGREE.
 */
 
 #include "fmpz.h"
