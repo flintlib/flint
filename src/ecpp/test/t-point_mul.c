@@ -50,8 +50,12 @@ TEST_FUNCTION_START(ecpp_point_mul, state)
         fmpz_mod_ctx_init(ctx, n);
         ecpp_point_init(P); ecpp_point_init(R1); ecpp_point_init(R2); ecpp_point_init(R3);
 
-        /* random curve through a random point: b = y^2 - x^3 - a x */
-        fmpz_randm(a, state, n);
+        /* random curve through a random point: b = y^2 - x^3 - a x,
+           with j = 0 (a = 0) often, since D = -3 is tried first */
+        if (n_randint(state, 4) == 0)
+            fmpz_zero(a);
+        else
+            fmpz_randm(a, state, n);
         fmpz_randm(x, state, n);
         fmpz_randm(y, state, n);
         fmpz_mod_mul(b, y, y, ctx);
@@ -67,9 +71,18 @@ TEST_FUNCTION_START(ecpp_point_mul, state)
 
         /* (k + l) P == k P + l P, checked in affine coordinates */
         fmpz_one(acc);
-        ecpp_point_mul(R1, P, k, a, acc, ctx);
-        ecpp_point_mul(R2, P, l, a, acc, ctx);
-        ecpp_point_mul(R3, P, kl, a, acc, ctx);
+        ok = ecpp_point_mul(R1, P, k, a, acc, ctx);
+        ok = ok && ecpp_point_mul(R2, P, l, a, acc, ctx);
+        ok = ok && ecpp_point_mul(R3, P, kl, a, acc, ctx);
+        if (!ok)
+        {
+            flint_printf("FAIL: ecpp_point_mul failed for prime n\n");
+            flint_printf("n = "); fmpz_print(n);
+            flint_printf("\na = "); fmpz_print(a); flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         fmpz_gcd(g, acc, n);
         if (!fmpz_is_one(g))
         {

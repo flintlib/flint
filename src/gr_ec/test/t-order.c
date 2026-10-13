@@ -360,6 +360,106 @@ next:
     }
 }
 
+/*
+    Only the explicit setters modify the context, and T_TRUE from
+    gr_ec_ctx_annihilates is a proof: points that m happens to kill are
+    not enough.
+*/
+static void
+check_read_only(flint_rand_t state)
+{
+    slong iter;
+
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_t R, S;
+        gr_ec_ctx_t E;
+        gr_ec_point_t P, Q;
+        fmpz_t N, M;
+        gr_ptr s;
+        ulong p = n_randprime(state, 8 + n_randint(state, 8), 1);
+
+        if (gr_ctx_init_nmod(R, p) != GR_SUCCESS)
+            continue;
+
+        if (gr_ec_ctx_init_randtest(E, state, R) != GR_SUCCESS)
+        {
+            gr_ctx_clear(R);
+            continue;
+        }
+
+        fmpz_init(N);
+        fmpz_init(M);
+        gr_ec_point_init(P, E);
+        gr_ec_point_init(Q, E);
+
+        if (gr_ec_ctx_cardinality(N, E) != GR_SUCCESS
+                || gr_ec_point_randtest(P, state, E) != GR_SUCCESS)
+            goto next;
+
+        /* the generic cardinality agrees, and is not cached */
+        FLINT_TEST(gr_ctx_cardinality_fmpz(M, E) == GR_SUCCESS);
+        FLINT_TEST(fmpz_equal(M, N));
+        FLINT_TEST(gr_ec_ctx_order_kind(E) == GR_EC_ORDER_UNKNOWN);
+
+        /* N kills every point, but nothing in the context proves it */
+        FLINT_TEST(gr_ec_ctx_annihilates(E, N) == T_UNKNOWN);
+        FLINT_TEST(gr_ec_ctx_order_kind(E) == GR_EC_ORDER_UNKNOWN);
+
+        /* division counts the points but does not cache them */
+        GR_IGNORE(gr_div_ui(Q, P, 3, E));
+        FLINT_TEST(gr_ec_ctx_order_kind(E) == GR_EC_ORDER_UNKNOWN);
+
+        /* Z/N acts only once N is known to annihilate the group */
+        if (fmpz_abs_fits_ui(N)
+                && gr_ctx_init_nmod(S, fmpz_get_ui(N)) == GR_SUCCESS)
+        {
+            GR_TMP_INIT(s, S);
+
+            FLINT_TEST(gr_one(s, S) == GR_SUCCESS);
+            FLINT_TEST(gr_mul_other(Q, P, s, S, E) == GR_UNABLE);
+            FLINT_TEST(gr_ec_ctx_order_kind(E) == GR_EC_ORDER_UNKNOWN);
+
+            FLINT_TEST(gr_ec_ctx_order(M, E) == GR_SUCCESS);
+            FLINT_TEST(gr_ec_ctx_annihilates(E, N) == T_TRUE);
+            FLINT_TEST(gr_mul_other(Q, P, s, S, E) == GR_SUCCESS);
+            FLINT_TEST(gr_ec_point_equal(Q, P, E) == T_TRUE);
+
+            GR_TMP_CLEAR(s, S);
+            gr_ctx_clear(S);
+        }
+
+next:
+        gr_ec_point_clear(Q, E);
+        gr_ec_point_clear(P, E);
+        fmpz_clear(N);
+        fmpz_clear(M);
+        gr_ec_ctx_clear(E);
+        gr_ctx_clear(R);
+    }
+}
+
+/* E(R) is finite over a finite R, and not provably infinite otherwise */
+static void
+check_finite(void)
+{
+    gr_ctx_t R;
+    gr_ec_ctx_t E;
+
+    /* y^2 = x^3 - x has four points over Q */
+    gr_ctx_init_fmpq(R);
+    FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, -1, 0) == GR_SUCCESS);
+    FLINT_TEST(gr_ctx_is_finite(E) == T_UNKNOWN);
+    gr_ec_ctx_clear(E);
+    gr_ctx_clear(R);
+
+    FLINT_TEST(gr_ctx_init_nmod(R, 101) == GR_SUCCESS);
+    FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, 1, 1) == GR_SUCCESS);
+    FLINT_TEST(gr_ctx_is_finite(E) == T_TRUE);
+    gr_ec_ctx_clear(E);
+    gr_ctx_clear(R);
+}
+
 TEST_FUNCTION_START(gr_ec_order, state)
 {
     check_cache(state);
@@ -367,6 +467,8 @@ TEST_FUNCTION_START(gr_ec_order, state)
     check_hint_probe(state);
     check_scalar_ring(state);
     check_reduction(state);
+    check_read_only(state);
+    check_finite();
 
     TEST_FUNCTION_END(state);
 }

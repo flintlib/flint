@@ -96,16 +96,25 @@ ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a,
     slong sz = ctx->sizeof_elem;
     gr_ec_ctx_t E;
     gr_ec_jac_point_t gP, gR;
-    gr_ptr zero;
+    gr_ptr a6;
+    int status;
     int ok;
 
-    zero = gr_heap_init(ctx);
+    a6 = gr_heap_init(ctx);
 
-    /* a6 plays no part in the group law, so any value will do */
-    ok = (gr_zero(zero, ctx) == GR_SUCCESS)
-        && (gr_ec_ctx_init_short_weierstrass(E, ctx, a, zero) == GR_SUCCESS);
+    /*
+        a6 plays no part in the Jacobian group law, but gr_ec rejects a
+        singular curve: a6 = 0 is singular when a = 0, and then a6 = 1
+        gives discriminant -432.
+    */
+    status = gr_zero(a6, ctx);
+    if (status == GR_SUCCESS)
+        status = gr_ec_ctx_init_short_weierstrass(E, ctx, a, a6);
+    if (status == GR_DOMAIN && gr_one(a6, ctx) == GR_SUCCESS)
+        status = gr_ec_ctx_init_short_weierstrass(E, ctx, a, a6);
+    ok = (status == GR_SUCCESS);
 
-    gr_heap_clear(zero, ctx);
+    gr_heap_clear(a6, ctx);
 
     if (!ok)
         return 0;

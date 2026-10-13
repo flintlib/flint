@@ -80,14 +80,12 @@ ecpp_verify_step(const ecpp_step_struct * s)
     ecpp_point_set_affine(P, s->x, s->y);
     fmpz_one(acc);
 
-    /* m P = O */
-    ecpp_point_mul(R, P, s->m, s->a, acc, ctx);
-    if (!ecpp_point_is_zero(R))
+    /* m P = O; a failed multiplication proves nothing */
+    if (!ecpp_point_mul(R, P, s->m, s->a, acc, ctx) || !ecpp_point_is_zero(R))
         goto cleanup;
 
     /* (m / q) P != O */
-    ecpp_point_mul(R, P, k, s->a, acc, ctx);
-    if (ecpp_point_is_zero(R))
+    if (!ecpp_point_mul(R, P, k, s->a, acc, ctx) || ecpp_point_is_zero(R))
         goto cleanup;
 
     /* all case distinctions were legitimate */

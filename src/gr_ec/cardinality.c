@@ -129,11 +129,11 @@ gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
         bits -- so the curve is copied over to nmod or mpn_mod when p fits
         one of them, and counted there.
     */
-    if (R->which_ring == GR_CTX_FMPZ_MOD && fmpz_size(q) <= MPN_MOD_MAX_LIMBS)
+    if (R->which_ring == GR_CTX_FMPZ_MOD && fmpz_size(q) <= MPN_MOD_MAX_LIMBS
+            && _gr_ec_cardinality_mod_p(res, q, ctx) == GR_SUCCESS)
     {
-        status = _gr_ec_cardinality_mod_p(res, q, ctx);
         fmpz_clear(q);
-        return status;
+        return GR_SUCCESS;
     }
 
     status = gr_ec_ctx_cardinality_sea(res, ctx);

@@ -309,10 +309,11 @@ _gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
 
     fmpz_abs(k, n);
 
-    /* here it is worth counting: the alternative is root finding */
+    /* here it is worth counting, since the alternative is root finding;
+       the count is not cached, as this must not modify ctx */
     kind = gr_ec_ctx_get_cached_order(m, ctx);
 
-    if (kind == GR_EC_ORDER_UNKNOWN && gr_ec_ctx_order(m, ctx) == GR_SUCCESS)
+    if (kind == GR_EC_ORDER_UNKNOWN && gr_ec_ctx_cardinality(m, ctx) == GR_SUCCESS)
         kind = GR_EC_ORDER_EXACT;
 
     if (kind == GR_EC_ORDER_UNKNOWN)

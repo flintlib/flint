@@ -18,11 +18,10 @@
     m, so Z/m acts on the curve, and Z/m is exactly the ring a caller
     reaches for when the scalars are known modulo the order of the group.
 
-    The condition is that m annihilate the group, which the context is
-    asked about through gr_ec_ctx_annihilates. Notably this does not count
-    the points: if the order is already known the answer is a divisibility
-    test, and if it is not, the modulus is tested against random points.
-    Handing over a ring of scalars should not cost a point count.
+    The condition is that m annihilate the group, decided by
+    gr_ec_ctx_annihilates. This never counts the points: m must be a
+    multiple of an order or annihilator the context already knows, and
+    otherwise the answer is GR_UNABLE (or GR_DOMAIN if a point refutes m).
 
     Reading the scalar out needs gr_get_fmpz in the scalar ring, which
     nmod, fmpz_mod and mpn_mod all provide.

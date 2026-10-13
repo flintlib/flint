@@ -1199,7 +1199,7 @@ _ecpp_find_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
     ecpp_point_t P, R;
     fmpz_t acc, g, zi;
     slong tries;
-    int result = 0;
+    int ok, result = 0;
 
     ecpp_point_init(P);
     ecpp_point_init(R);
@@ -1237,7 +1237,7 @@ _ecpp_find_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
         fmpz_mod_mul(R->Y, R->Y, g, ctx);
         fmpz_one(R->Z);
 
-        ecpp_point_mul(P, R, q, a, acc, ctx);
+        ok = ecpp_point_mul(P, R, q, a, acc, ctx);
 
         fmpz_gcd(g, acc, n);
         if (!fmpz_is_one(g))
@@ -1246,7 +1246,8 @@ _ecpp_find_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
             break;
         }
 
-        if (!ecpp_point_is_zero(P))
+        /* a failed multiplication says nothing about q R */
+        if (!ok || !ecpp_point_is_zero(P))
         {
             result = 0;     /* m is not the order of this twist */
             break;

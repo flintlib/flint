@@ -158,11 +158,14 @@ cleanup:
     return result;
 }
 
+/*
+    T_TRUE only when m is a multiple of what the context knows; a point
+    that m does not kill proves T_FALSE. Points that m does kill prove
+    nothing, so they give T_UNKNOWN, and nothing is cached.
+*/
 truth_t
 gr_ec_ctx_annihilates(gr_ec_ctx_t ctx, const fmpz_t m)
 {
-    int probe;
-
     if (fmpz_sgn(m) <= 0)
         return T_FALSE;
 
@@ -171,30 +174,16 @@ gr_ec_ctx_annihilates(gr_ec_ctx_t ctx, const fmpz_t m)
             && fmpz_divisible(m, &GR_EC_CTX(ctx)->order))
         return T_TRUE;
 
-    probe = _gr_ec_probe_annihilator(m, ctx);
-
-    if (probe < 0)
-        return T_UNKNOWN;
-
-    if (probe == 0)
-        return T_FALSE;
-
-    /* evidence about m, not a point count, so it goes in as the weaker
-       kind and never displaces a count */
-    _gr_ec_ctx_store(ctx, m, GR_EC_ORDER_ANNIHILATOR);
-
-    return T_TRUE;
+    return (_gr_ec_probe_annihilator(m, ctx) == 0) ? T_FALSE : T_UNKNOWN;
 }
 
 int
 gr_ec_ctx_set_annihilator(gr_ec_ctx_t ctx, const fmpz_t m)
 {
-    truth_t ok = gr_ec_ctx_annihilates(ctx, m);
-
-    if (ok == T_FALSE)
+    if (gr_ec_ctx_annihilates(ctx, m) == T_FALSE)
         return GR_DOMAIN;
 
-    /* unverifiable is still usable: the caller asserted it */
+    /* not refuted, so trusted: the caller asserted it */
     _gr_ec_ctx_store(ctx, m, GR_EC_ORDER_ANNIHILATOR);
 
     return GR_SUCCESS;

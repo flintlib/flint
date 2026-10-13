@@ -35,10 +35,12 @@
 
 /* Context predicates */
 
+/* E(R) is finite over a finite R, but may also be finite over an infinite
+   one (y^2 = x^3 - x has four points over Q) */
 static truth_t
 _gr_ec_ctx_is_finite(gr_ec_ctx_t ctx)
 {
-    return gr_ctx_is_finite(GR_EC_ELEM_CTX(ctx));
+    return (gr_ctx_is_finite(GR_EC_ELEM_CTX(ctx)) == T_TRUE) ? T_TRUE : T_UNKNOWN;
 }
 
 static truth_t
@@ -57,6 +59,16 @@ static gr_ctx_ptr
 _gr_ec_ctx_base(gr_ec_ctx_t ctx)
 {
     return GR_EC_ELEM_CTX(ctx);
+}
+
+/* reads the cached order but never writes it: no gr method modifies ctx */
+static int
+_gr_ec_ctx_cardinality_fmpz(fmpz_t res, gr_ec_ctx_t ctx)
+{
+    if (gr_ec_ctx_get_cached_order(res, ctx) == GR_EC_ORDER_EXACT)
+        return GR_SUCCESS;
+
+    return gr_ec_ctx_cardinality(res, ctx);
 }
 
 /*
@@ -105,7 +117,7 @@ GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
     {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact}, \
     {GR_METHOD_CTX_IS_THREADSAFE,   (gr_funcptr) _gr_ec_ctx_is_threadsafe}, \
     {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base}, \
-    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) gr_ec_ctx_order},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_ec_ctx_cardinality_fmpz},
 
 #define GR_EC_NOT_IN_DOMAIN_METHODS \
     {GR_METHOD_ONE,         (gr_funcptr) gr_not_in_domain}, \

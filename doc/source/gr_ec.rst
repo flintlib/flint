@@ -199,11 +199,9 @@ the ``_nonunique`` variants that accept an ambiguous answer.
 
 An element of another ring may act as a scalar when it makes sense for it
 to: :func:`gr_mul_other` and :func:`gr_other_mul` accept an element of
-`\mathbb{Z}/n\mathbb{Z}` -- an *nmod*, *fmpz_mod* or *mpn_mod* -- exactly
-when `n` annihilates `E(R)`, which is the case a caller runs into when the
-scalars are being kept modulo the order of the group. Deciding this never
-counts the points: if the order is already known it is a divisibility test,
-and otherwise the modulus is tested against random points. See
+`\mathbb{Z}/n\mathbb{Z}` -- an *nmod*, *fmpz_mod* or *mpn_mod* -- when `n`
+is a multiple of an order or annihilator already known to the context, and
+return ``GR_UNABLE`` when nothing is known. See
 :func:`gr_ec_ctx_annihilates`.
 
 The ring operations have no meaning on a curve and return ``GR_DOMAIN``
@@ -771,9 +769,14 @@ remembers it. Two strengths are distinguished by :type:`gr_ec_order_kind_t`:
 
     The stored value is `\#E(\mathbb{F}_q)`.
 
-The counting functions above never read or write this cache, so timing one
-of them always measures the algorithm. :func:`gr_ec_ctx_order` is the cached
-entry point, and is what :func:`gr_ctx_cardinality_fmpz` calls on a curve.
+The counting functions above never read or write this cache.
+:func:`gr_ec_ctx_order` is the cached entry point;
+:func:`gr_ctx_cardinality_fmpz` returns a cached count if there is one and
+otherwise counts without caching.
+
+Only :func:`gr_ec_ctx_order`, :func:`gr_ec_ctx_set_order`,
+:func:`gr_ec_ctx_set_annihilator` and :func:`gr_ec_ctx_clear_order` modify
+the context; they must not be called while other threads use it.
 
 .. function:: int gr_ec_ctx_order(fmpz_t res, gr_ec_ctx_t ctx)
 
@@ -828,10 +831,11 @@ entry point, and is what :func:`gr_ctx_cardinality_fmpz` calls on a curve.
 
 .. function:: truth_t gr_ec_ctx_annihilates(gr_ec_ctx_t ctx, const fmpz_t m)
 
-    Whether `m P = \mathcal{O}` for every point. ``T_TRUE`` when *m* is a
-    multiple of what the context already knows, or when it passes the probe
-    above; ``T_FALSE`` when some point survives it; ``T_UNKNOWN`` when no
-    point could be produced. This never counts the points.
+    Whether `m P = \mathcal{O}` for every point. Returns ``T_TRUE`` when *m*
+    is a multiple of the order or annihilator stored in the context,
+    ``T_FALSE`` when some random point is not killed by *m*, and
+    ``T_UNKNOWN`` otherwise. This never counts the points and does not
+    modify the context.
 
 .. function:: void gr_ec_ctx_clear_order(gr_ec_ctx_t ctx)
 
