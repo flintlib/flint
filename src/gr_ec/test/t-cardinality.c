@@ -165,16 +165,16 @@ check_algorithms_agree(flint_rand_t state)
         /* N annihilates the group */
         for (t = 0; t < 6; t++)
         {
-            gr_ec_point_t P, Q;
-            gr_ec_point_init(P, E);
-            gr_ec_point_init(Q, E);
+            gr_ec_jac_point_t P, Q;
+            gr_ec_jac_point_init(P, E);
+            gr_ec_jac_point_init(Q, E);
 
-            if (gr_ec_point_randtest(P, state, E) == GR_SUCCESS
-                    && gr_ec_point_mul_fmpz(Q, P, nn, E) == GR_SUCCESS)
-                FLINT_TEST(gr_ec_point_is_inf(Q, E) == T_TRUE);
+            if (gr_ec_jac_point_randtest(P, state, E) == GR_SUCCESS
+                    && gr_ec_jac_point_mul_fmpz(Q, P, nn, E) == GR_SUCCESS)
+                FLINT_TEST(gr_ec_jac_point_is_inf(Q, E) == T_TRUE);
 
-            gr_ec_point_clear(Q, E);
-            gr_ec_point_clear(P, E);
+            gr_ec_jac_point_clear(Q, E);
+            gr_ec_jac_point_clear(P, E);
         }
 
 next_curve:

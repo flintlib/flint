@@ -105,7 +105,7 @@ check_sound_over_a_prime(flint_rand_t state)
 
             FLINT_TEST(gr_one(w, R) == GR_SUCCESS);
 
-            if (gr_ec_jac_point_mul_fmpz_witness(Q, w, P, k, E) == GR_SUCCESS)
+            if (gr_ec_jac_point_mul_fmpz_witness(Q, P, k, w, E) == GR_SUCCESS)
             {
                 gr_ec_jac_point_t Q2;
 
@@ -193,7 +193,7 @@ check_detects_over_a_composite(flint_rand_t state)
 
             fmpz_set_ui(k, e / pr);
 
-            if (gr_ec_jac_point_mul_fmpz_witness(T, w, P, k, E) != GR_SUCCESS)
+            if (gr_ec_jac_point_mul_fmpz_witness(T, P, k, w, E) != GR_SUCCESS)
                 stop = 1;
             else
                 FLINT_TEST(gr_ec_jac_point_set(P, T, E) == GR_SUCCESS);

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "ulong_extras.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_ec.h"
@@ -115,22 +116,58 @@ gr_ec_aff_point_get_affine(gr_ptr x, gr_ptr y, const gr_ec_aff_point_t P,
 int
 gr_ec_aff_point_lift_x(gr_ec_aff_point_t res, gr_srcptr x, gr_ec_ctx_t ctx)
 {
-    gr_ec_point_t P;
-    int status;
+    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
+    gr_ptr t, u, y;
+    int status = GR_SUCCESS;
 
-    gr_ec_point_init(P, ctx);
+    GR_TMP_INIT3(t, u, y, R);
 
-    /* gr_ec_point_lift_x always returns a point with Z = 1 */
-    status = gr_ec_point_lift_x(P, x, ctx);
+    if (gr_ec_ctx_model(ctx) == GR_EC_SHORT_WEIERSTRASS)
+    {
+        /* y^2 = x^3 + a4 x + a6 */
+        status |= gr_sqr(t, x, R);
+        status |= gr_mul(t, t, x, R);
+        status |= gr_mul(u, GR_EC_A4(ctx), x, R);
+        status |= gr_add(t, t, u, R);
+        status |= gr_add(t, t, GR_EC_A6(ctx), R);
+
+        if (status == GR_SUCCESS)
+            status = gr_sqrt(y, t, R);
+    }
+    else
+    {
+        /* (2y + a1 x + a3)^2 = 4 x^3 + b2 x^2 + 2 b4 x + b6 */
+        status |= gr_sqr(t, x, R);
+        status |= gr_mul(u, t, x, R);
+        status |= gr_mul_ui(u, u, 4, R);
+        status |= gr_mul(t, t, GR_EC_B2(ctx), R);
+        status |= gr_add(u, u, t, R);
+        status |= gr_mul(t, GR_EC_B4(ctx), x, R);
+        status |= gr_mul_two(t, t, R);
+        status |= gr_add(u, u, t, R);
+        status |= gr_add(u, u, GR_EC_B6(ctx), R);
+
+        if (status == GR_SUCCESS)
+            status = gr_sqrt(y, u, R);
+
+        /* y = (w - a1 x - a3) / 2 */
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_mul(t, GR_EC_A1(ctx), x, R);
+            status |= gr_sub(y, y, t, R);
+            status |= gr_sub(y, y, GR_EC_A3(ctx), R);
+            status |= gr_set_si(t, 2, R);
+            if (status == GR_SUCCESS)
+                status = gr_div(y, y, t, R);
+        }
+    }
 
     if (status == GR_SUCCESS)
-        status = _gr_ec_aff_point_set_affine(res,
-                    gr_ec_point_x_srcptr(P, ctx),
-                    gr_ec_point_y_srcptr(P, ctx), ctx);
+        status = _gr_ec_aff_point_set_affine(res, x, y, ctx);
     else
         res->is_infinity = T_UNKNOWN;
 
-    gr_ec_point_clear(P, ctx);
+    GR_TMP_CLEAR3(t, u, y, R);
 
     return status;
 }
@@ -209,18 +246,6 @@ gr_ec_aff_point_write(gr_stream_t out, const gr_ec_aff_point_t P,
 }
 
 int
-gr_ec_aff_point_get_str(char ** res, const gr_ec_aff_point_t P,
-        gr_ec_ctx_t ctx)
-{
-    gr_stream_t out;
-    int status;
-    gr_stream_init_str(out);
-    status = gr_ec_aff_point_write(out, P, ctx);
-    *res = out->s;
-    return status;
-}
-
-int
 gr_ec_aff_point_print(const gr_ec_aff_point_t P, gr_ec_ctx_t ctx)
 {
     gr_stream_t out;
@@ -232,20 +257,56 @@ int
 gr_ec_aff_point_randtest(gr_ec_aff_point_t res, flint_rand_t state,
         gr_ec_ctx_t ctx)
 {
-    gr_ec_point_t P;
-    int status;
+    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
+    gr_ptr x, y;
+    int status = GR_UNABLE;
+    slong iter;
 
-    gr_ec_point_init(P, ctx);
+    if (n_randint(state, 8) == 0)
+        return gr_ec_aff_point_zero(res, ctx);
 
-    status = gr_ec_point_randtest(P, state, ctx);
+    GR_TMP_INIT2(x, y, R);
 
-    if (status == GR_SUCCESS)
-        status = gr_ec_aff_point_set_point(res, P, ctx);
+    for (iter = 0; iter < 20; iter++)
+    {
+        status = gr_randtest(x, state, R);
+
+        if (status == GR_SUCCESS)
+            status = gr_ec_aff_point_lift_x(res, x, ctx);
+
+        if (status != GR_DOMAIN)
+            break;
+    }
+
+    /* lifting divides by 2 in residue characteristic 2, so over a finite
+       ring fall back to trying random pairs */
+    if (status != GR_SUCCESS && gr_ctx_is_finite(R) == T_TRUE)
+    {
+        for (iter = 0; iter < 100; iter++)
+        {
+            if (gr_randtest(x, state, R) != GR_SUCCESS
+                    || gr_randtest(y, state, R) != GR_SUCCESS)
+                break;
+
+            if (_gr_ec_aff_point_set_affine(res, x, y, ctx) == GR_SUCCESS
+                    && gr_ec_aff_point_is_on_curve(res, ctx) == T_TRUE)
+            {
+                status = GR_SUCCESS;
+                break;
+            }
+        }
+    }
 
     if (status != GR_SUCCESS)
-        res->is_infinity = T_UNKNOWN;
+    {
+        /* failing to find a point does not mean there is none */
+        if (status == GR_DOMAIN)
+            status = GR_UNABLE;
 
-    gr_ec_point_clear(P, ctx);
+        res->is_infinity = T_UNKNOWN;
+    }
+
+    GR_TMP_CLEAR2(x, y, R);
 
     return status;
 }

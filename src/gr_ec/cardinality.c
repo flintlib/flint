@@ -65,7 +65,7 @@
 */
 
 int
-gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
+_gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     fmpz_t q;
@@ -147,6 +147,25 @@ gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
         status = gr_ec_ctx_cardinality_naive(res, ctx);
 
     fmpz_clear(q);
+
+    return status;
+}
+
+int
+gr_ec_ctx_cardinality(fmpz_t res, gr_ec_ctx_t ctx)
+{
+    int status;
+
+    if (!fmpz_is_zero(&GR_EC_CTX(ctx)->cardinality))
+    {
+        fmpz_set(res, &GR_EC_CTX(ctx)->cardinality);
+        return GR_SUCCESS;
+    }
+
+    status = _gr_ec_ctx_cardinality(res, ctx);
+
+    if (status == GR_SUCCESS)
+        fmpz_set(&GR_EC_CTX(ctx)->cardinality, res);
 
     return status;
 }

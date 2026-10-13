@@ -15,25 +15,10 @@
 #include "impl.h"
 
 /*
-    The generic gr interface for the group of points of a curve.
-
-    A curve is not a ring: there is no multiplication of points, and no
-    integer can be cast to a point. Those operations are mapped to
-    gr_not_in_domain (GR_DOMAIN, "no such thing here") rather than left at
-    the default gr_not_implemented (GR_UNABLE, "cannot compute it"), so
-    that callers can tell the two apart.
-
-    What the interface does provide is the abelian group structure, with
-    gr_mul_ui, gr_mul_si, gr_mul_fmpz, gr_mul_two and gr_mul_2exp_si /
-    gr_mul_2exp_fmpz acting as the Z-module scalar multiplication. That
-    agrees with the documented meaning of those methods, since x*(n*1) is
-    n copies of x added in any ring.
-
-    The 2exp methods reject a negative exponent with GR_DOMAIN, since
-    halving a point is not single valued.
+    The generic interface to the group of points, whose elements are
+    Jacobian points. The ring operations do not exist on a curve and return
+    GR_DOMAIN; the integer scalar multiplications are the Z-module action.
 */
-
-/* Context predicates */
 
 /* E(R) is finite over a finite R, but may also be finite over an infinite
    one (y^2 = x^3 - x has four points over Q) */
@@ -61,198 +46,104 @@ _gr_ec_ctx_base(gr_ec_ctx_t ctx)
     return GR_EC_ELEM_CTX(ctx);
 }
 
-/* reads the cached order but never writes it: no gr method modifies ctx */
+/* reads the cached count but never writes it: no gr method modifies ctx */
 static int
 _gr_ec_ctx_cardinality_fmpz(fmpz_t res, gr_ec_ctx_t ctx)
 {
-    if (gr_ec_ctx_get_cached_order(res, ctx) == GR_EC_ORDER_EXACT)
-        return GR_SUCCESS;
-
-    return gr_ec_ctx_cardinality(res, ctx);
-}
-
-/*
-    gr_randtest is required to succeed, but finding a point on a curve can
-    fail: over characteristic 2 there is no x-coordinate lift, and over an
-    infinite ring the search may simply run out of attempts. Fall back to
-    the point at infinity, which is always available.
-*/
-
-#define GR_EC_RANDTEST_WRAPPER(name, kind) \
-static int \
-name(kind ## _t res, flint_rand_t state, gr_ec_ctx_t ctx) \
-{ \
-    int status = kind ## _randtest(res, state, ctx); \
-    if (status != GR_SUCCESS) \
-        status = kind ## _zero(res, ctx); \
-    return status; \
-}
-
-GR_EC_RANDTEST_WRAPPER(_gr_ec_point_randtest, gr_ec_point)
-GR_EC_RANDTEST_WRAPPER(_gr_ec_aff_point_randtest, gr_ec_aff_point)
-GR_EC_RANDTEST_WRAPPER(_gr_ec_jac_point_randtest, gr_ec_jac_point)
-
-/*
-    Entries shared by all three representations. Nothing here is canonical:
-    the point at infinity has arbitrary coordinates, and (X : Y : Z) names a
-    class rather than a single triple.
-*/
-
-#define GR_EC_CTX_METHODS \
-    {GR_METHOD_CTX_WRITE,           (gr_funcptr) gr_ec_ctx_write}, \
-    {GR_METHOD_CTX_CLEAR,           (gr_funcptr) gr_ec_ctx_clear}, \
-    {GR_METHOD_CTX_IS_RING,         (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_FIELD,        (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_ORDERED_RING, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_CANONICAL,    (gr_funcptr) gr_generic_ctx_predicate_false}, \
-    {GR_METHOD_CTX_IS_FINITE,       (gr_funcptr) _gr_ec_ctx_is_finite}, \
-    {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact}, \
-    {GR_METHOD_CTX_IS_THREADSAFE,   (gr_funcptr) _gr_ec_ctx_is_threadsafe}, \
-    {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base}, \
-    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_ec_ctx_cardinality_fmpz},
-
-#define GR_EC_NOT_IN_DOMAIN_METHODS \
-    {GR_METHOD_ONE,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_NEG_ONE,     (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SET_UI,      (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SET_SI,      (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SET_FMPZ,    (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SET_FMPQ,    (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SET_STR,     (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_MUL,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_SQR,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_DIV,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_INV,         (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_POW_UI,      (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_POW_SI,      (gr_funcptr) gr_not_in_domain}, \
-    {GR_METHOD_POW_FMPZ,    (gr_funcptr) gr_not_in_domain},
-
-/* The group operations, one block per representation. */
-
-#define GR_EC_GROUP_METHODS(kind, randtest) \
-    {GR_METHOD_INIT,        (gr_funcptr) kind ## _init}, \
-    {GR_METHOD_CLEAR,       (gr_funcptr) kind ## _clear}, \
-    {GR_METHOD_SWAP,        (gr_funcptr) kind ## _swap}, \
-    {GR_METHOD_RANDTEST,    (gr_funcptr) randtest}, \
-    {GR_METHOD_WRITE,       (gr_funcptr) kind ## _write}, \
-    {GR_METHOD_ZERO,        (gr_funcptr) kind ## _zero}, \
-    {GR_METHOD_IS_ZERO,     (gr_funcptr) kind ## _is_inf}, \
-    {GR_METHOD_EQUAL,       (gr_funcptr) kind ## _equal}, \
-    {GR_METHOD_SET,         (gr_funcptr) kind ## _set}, \
-    {GR_METHOD_NEG,         (gr_funcptr) kind ## _neg}, \
-    {GR_METHOD_ADD,         (gr_funcptr) kind ## _add}, \
-    {GR_METHOD_SUB,         (gr_funcptr) kind ## _sub}, \
-    {GR_METHOD_MUL_TWO,     (gr_funcptr) kind ## _dbl}, \
-    {GR_METHOD_MUL_UI,      (gr_funcptr) kind ## _mul_ui}, \
-    {GR_METHOD_MUL_SI,      (gr_funcptr) kind ## _mul_si}, \
-    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) kind ## _mul_fmpz}, \
-    {GR_METHOD_MUL_2EXP_SI,   (gr_funcptr) kind ## _mul_2exp_si}, \
-    {GR_METHOD_MUL_2EXP_FMPZ, (gr_funcptr) kind ## _mul_2exp_fmpz}, \
-    {GR_METHOD_MUL_OTHER,   (gr_funcptr) _ ## kind ## _mul_other}, \
-    {GR_METHOD_OTHER_MUL,   (gr_funcptr) _ ## kind ## _other_mul}, \
-    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) kind ## _mul_fmpq}, \
-    {GR_METHOD_DIV_UI,      (gr_funcptr) kind ## _div_ui}, \
-    {GR_METHOD_DIV_SI,      (gr_funcptr) kind ## _div_si}, \
-    {GR_METHOD_DIV_FMPZ,    (gr_funcptr) kind ## _div_fmpz}, \
-    {GR_METHOD_DIV_FMPQ,    (gr_funcptr) kind ## _div_fmpq},
-
-static int _gr_ec_methods_initialized[GR_EC_NUM_REPRS] = { 0, 0, 0 };
-
-static gr_static_method_table _gr_ec_methods[GR_EC_NUM_REPRS];
-
-static gr_method_tab_input _gr_ec_projective_methods_input[] =
-{
-    GR_EC_CTX_METHODS
-    GR_EC_GROUP_METHODS(gr_ec_point, _gr_ec_point_randtest)
-    GR_EC_NOT_IN_DOMAIN_METHODS
-    {0,                     (gr_funcptr) NULL},
-};
-
-static gr_method_tab_input _gr_ec_affine_methods_input[] =
-{
-    GR_EC_CTX_METHODS
-    GR_EC_GROUP_METHODS(gr_ec_aff_point, _gr_ec_aff_point_randtest)
-    GR_EC_NOT_IN_DOMAIN_METHODS
-    {0,                     (gr_funcptr) NULL},
-};
-
-static gr_method_tab_input _gr_ec_jacobian_methods_input[] =
-{
-    GR_EC_CTX_METHODS
-    GR_EC_GROUP_METHODS(gr_ec_jac_point, _gr_ec_jac_point_randtest)
-    GR_EC_NOT_IN_DOMAIN_METHODS
-    {0,                     (gr_funcptr) NULL},
-};
-
-static gr_method_tab_input * _gr_ec_methods_input[GR_EC_NUM_REPRS] =
-{
-    _gr_ec_projective_methods_input,
-    _gr_ec_affine_methods_input,
-    _gr_ec_jacobian_methods_input,
-};
-
-static const slong _gr_ec_sizeof_elem[GR_EC_NUM_REPRS] =
-{
-    sizeof(gr_ec_point_struct),
-    sizeof(gr_ec_aff_point_struct),
-    sizeof(gr_ec_jac_point_struct),
-};
-
-void
-_gr_ec_ctx_init_methods(gr_ec_ctx_t ctx, gr_ec_repr_t repr)
-{
-    GR_EC_CTX(ctx)->repr = repr;
-
-    ctx->sizeof_elem = _gr_ec_sizeof_elem[repr];
-    ctx->methods = _gr_ec_methods[repr];
-
-    if (!_gr_ec_methods_initialized[repr])
+    if (!fmpz_is_zero(&GR_EC_CTX(ctx)->cardinality))
     {
-        gr_method_tab_init(_gr_ec_methods[repr], _gr_ec_methods_input[repr]);
-        _gr_ec_methods_initialized[repr] = 1;
+        fmpz_set(res, &GR_EC_CTX(ctx)->cardinality);
+        return GR_SUCCESS;
     }
+
+    return _gr_ec_ctx_cardinality(res, ctx);
 }
 
-int
-gr_ec_ctx_set_repr(gr_ec_ctx_t ctx, gr_ec_repr_t repr)
+/* gr_randtest must succeed, but finding a point can fail (for instance in
+   characteristic 2 over an infinite ring), so fall back to the identity */
+static int
+_gr_ec_jac_point_randtest(gr_ec_jac_point_t res, flint_rand_t state,
+        gr_ec_ctx_t ctx)
 {
-    if (repr < 0 || repr >= GR_EC_NUM_REPRS)
-        return GR_DOMAIN;
-
-    /* Affine arithmetic inverts coordinates. */
-    if (repr == GR_EC_REPR_AFFINE
-            && gr_ctx_is_field(GR_EC_ELEM_CTX(ctx)) == T_FALSE)
-        return GR_DOMAIN;
-
-    _gr_ec_ctx_init_methods(ctx, repr);
+    if (gr_ec_jac_point_randtest(res, state, ctx) != GR_SUCCESS)
+        return gr_ec_jac_point_zero(res, ctx);
 
     return GR_SUCCESS;
 }
 
-int
-gr_ctx_init_gr_ec(gr_ctx_t ctx, gr_ctx_t base_ring, gr_srcptr a1, gr_srcptr a2,
-        gr_srcptr a3, gr_srcptr a4, gr_srcptr a6, gr_ec_repr_t repr)
+static int _gr_ec_methods_initialized = 0;
+
+static gr_static_method_table _gr_ec_methods;
+
+static gr_method_tab_input _gr_ec_methods_input[] =
 {
-    int status;
+    {GR_METHOD_CTX_WRITE,           (gr_funcptr) _gr_ec_ctx_write},
+    {GR_METHOD_CTX_CLEAR,           (gr_funcptr) gr_ec_ctx_clear},
+    {GR_METHOD_CTX_IS_RING,         (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FIELD,        (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_ORDERED_RING, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_CANONICAL,    (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE,       (gr_funcptr) _gr_ec_ctx_is_finite},
+    {GR_METHOD_CTX_IS_EXACT,        (gr_funcptr) _gr_ec_ctx_is_exact},
+    {GR_METHOD_CTX_IS_THREADSAFE,   (gr_funcptr) _gr_ec_ctx_is_threadsafe},
+    {GR_METHOD_CTX_BASE,            (gr_funcptr) _gr_ec_ctx_base},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_ec_ctx_cardinality_fmpz},
 
-    if (repr < 0 || repr >= GR_EC_NUM_REPRS)
-        return GR_DOMAIN;
+    {GR_METHOD_INIT,                (gr_funcptr) gr_ec_jac_point_init},
+    {GR_METHOD_CLEAR,               (gr_funcptr) gr_ec_jac_point_clear},
+    {GR_METHOD_SWAP,                (gr_funcptr) gr_ec_jac_point_swap},
+    {GR_METHOD_RANDTEST,            (gr_funcptr) _gr_ec_jac_point_randtest},
+    {GR_METHOD_WRITE,               (gr_funcptr) gr_ec_jac_point_write},
+    {GR_METHOD_ZERO,                (gr_funcptr) gr_ec_jac_point_zero},
+    {GR_METHOD_IS_ZERO,             (gr_funcptr) gr_ec_jac_point_is_inf},
+    {GR_METHOD_EQUAL,               (gr_funcptr) gr_ec_jac_point_equal},
+    {GR_METHOD_SET,                 (gr_funcptr) gr_ec_jac_point_set},
+    {GR_METHOD_NEG,                 (gr_funcptr) gr_ec_jac_point_neg},
+    {GR_METHOD_ADD,                 (gr_funcptr) gr_ec_jac_point_add},
+    {GR_METHOD_SUB,                 (gr_funcptr) gr_ec_jac_point_sub},
+    {GR_METHOD_MUL_TWO,             (gr_funcptr) gr_ec_jac_point_dbl},
+    {GR_METHOD_MUL_UI,              (gr_funcptr) gr_ec_jac_point_mul_ui},
+    {GR_METHOD_MUL_SI,              (gr_funcptr) gr_ec_jac_point_mul_si},
+    {GR_METHOD_MUL_FMPZ,            (gr_funcptr) gr_ec_jac_point_mul_fmpz},
+    {GR_METHOD_MUL_2EXP_SI,         (gr_funcptr) gr_ec_jac_point_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,       (gr_funcptr) gr_ec_jac_point_mul_2exp_fmpz},
 
-    if (repr == GR_EC_REPR_AFFINE && gr_ctx_is_field(base_ring) == T_FALSE)
-        return GR_DOMAIN;
+    {GR_METHOD_ONE,                 (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_NEG_ONE,             (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SET_UI,              (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SET_SI,              (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SET_FMPZ,            (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SET_FMPQ,            (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SET_STR,             (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_MUL,                 (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_SQR,                 (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_DIV,                 (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_INV,                 (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_POW_UI,              (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_POW_SI,              (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_POW_FMPZ,            (gr_funcptr) gr_not_in_domain},
+    {0,                             (gr_funcptr) NULL},
+};
 
-    status = gr_ec_ctx_init(ctx, base_ring, a1, a2, a3, a4, a6);
+void
+_gr_ec_ctx_init_methods(gr_ec_ctx_t ctx)
+{
+    ctx->which_ring = GR_CTX_GR_EC;
+    ctx->sizeof_elem = sizeof(gr_ec_jac_point_struct);
+    ctx->size_limit = WORD_MAX;
+    ctx->methods = _gr_ec_methods;
 
-    if (status == GR_SUCCESS)
-        _gr_ec_ctx_init_methods(ctx, repr);
-
-    return status;
+    if (!_gr_ec_methods_initialized)
+    {
+        gr_method_tab_init(_gr_ec_methods, _gr_ec_methods_input);
+        _gr_ec_methods_initialized = 1;
+    }
 }

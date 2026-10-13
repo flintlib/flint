@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_ec.h"
@@ -22,20 +21,13 @@ typedef char _gr_ec_ctx_data_fits
 static void
 _gr_ec_ctx_alloc(gr_ec_ctx_t ctx, gr_ctx_t base_ring)
 {
-    ctx->which_ring = GR_CTX_GR_EC;
-    ctx->size_limit = WORD_MAX;
-
     GR_EC_CTX(ctx)->base_ring = base_ring;
     GR_EC_CTX(ctx)->coeffs = flint_malloc(GR_EC_CTX_NUM_COEFFS * base_ring->sizeof_elem);
     _gr_vec_init(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, base_ring);
     GR_EC_CTX(ctx)->model = GR_EC_LONG_WEIERSTRASS;
+    fmpz_init(&GR_EC_CTX(ctx)->cardinality);
 
-    fmpz_init(&GR_EC_CTX(ctx)->order);
-    GR_EC_CTX(ctx)->order_kind = GR_EC_ORDER_UNKNOWN;
-
-    /* Projective points are the representation that works over any
-       commutative ring; gr_ctx_init_gr_ec overrides this. */
-    _gr_ec_ctx_init_methods(ctx, GR_EC_REPR_PROJECTIVE);
+    _gr_ec_ctx_init_methods(ctx);
 }
 
 void
@@ -43,10 +35,7 @@ gr_ec_ctx_clear(gr_ec_ctx_t ctx)
 {
     _gr_vec_clear(GR_EC_CTX(ctx)->coeffs, GR_EC_CTX_NUM_COEFFS, GR_EC_ELEM_CTX(ctx));
     flint_free(GR_EC_CTX(ctx)->coeffs);
-    GR_EC_CTX(ctx)->coeffs = NULL;
-
-    fmpz_clear(&GR_EC_CTX(ctx)->order);
-    GR_EC_CTX(ctx)->order_kind = GR_EC_ORDER_UNKNOWN;
+    fmpz_clear(&GR_EC_CTX(ctx)->cardinality);
 }
 
 /* b-invariants, discriminant and model, from the a-invariants */
@@ -261,7 +250,7 @@ gr_ec_ctx_init_randtest(gr_ec_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring)
 }
 
 int
-gr_ec_ctx_write(gr_stream_t out, gr_ec_ctx_t ctx)
+_gr_ec_ctx_write(gr_stream_t out, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     int status = GR_SUCCESS;
@@ -280,25 +269,6 @@ gr_ec_ctx_write(gr_stream_t out, gr_ec_ctx_t ctx)
     status |= gr_ctx_write(out, R);
 
     return status;
-}
-
-int
-gr_ec_ctx_get_str(char ** res, gr_ec_ctx_t ctx)
-{
-    gr_stream_t out;
-    int status;
-    gr_stream_init_str(out);
-    status = gr_ec_ctx_write(out, ctx);
-    *res = out->s;
-    return status;
-}
-
-int
-gr_ec_ctx_print(gr_ec_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    return gr_ec_ctx_write(out, ctx);
 }
 
 int

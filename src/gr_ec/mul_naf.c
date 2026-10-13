@@ -60,7 +60,7 @@ _gr_ec_jac_point_vec_get_aff_point_vec_witness(gr_ec_aff_point_struct * res,
     }
 
     /* every Z in the product has just been assumed invertible */
-    GR_EC_WITNESS(w, GR_ENTRY(c, len - 1, sz));
+    status |= _gr_ec_witness(w, GR_ENTRY(c, len - 1, sz), R);
 
     if (status == GR_SUCCESS)
         status = gr_inv(inv, GR_ENTRY(c, len - 1, sz), R);
@@ -281,10 +281,10 @@ _gr_ec_jac_point_mul_fmpz_naf_witness(gr_ec_jac_point_t res, const gr_ec_jac_poi
         GR_TMP_CLEAR_VEC(t, GR_EC_JAC_SCRATCH, R);
     }
 
+    /* res is left alone on failure: it may alias P, which the caller
+       still needs for its fallback */
     if (status == GR_SUCCESS)
         status = gr_ec_jac_point_set(res, acc, ctx);
-    else
-        res->is_infinity = T_UNKNOWN;
 
     gr_heap_clear_vec(jac_coords, 3 * (ntab + 2), R);
     gr_heap_clear_vec(aff_coords, 2 * (2 * ntab), R);

@@ -235,7 +235,7 @@ check_torsion(flint_rand_t state)
     {
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_point_t P, Q, D;
+        gr_ec_jac_point_t P, Q, D;
         gr_poly_t psi;
         gr_ptr x, y, v;
         ulong n;
@@ -265,9 +265,9 @@ check_torsion(flint_rand_t state)
         n = 2 + n_randint(state, 11);
 
         gr_poly_init(psi, R);
-        gr_ec_point_init(P, E);
-        gr_ec_point_init(Q, E);
-        gr_ec_point_init(D, E);
+        gr_ec_jac_point_init(P, E);
+        gr_ec_jac_point_init(Q, E);
+        gr_ec_jac_point_init(D, E);
         GR_TMP_INIT3(x, y, v, R);
 
         if (gr_ec_ctx_division_poly(psi, n, E) == GR_SUCCESS)
@@ -276,17 +276,17 @@ check_torsion(flint_rand_t state)
             {
                 truth_t nP_inf, twoP_inf, psi_zero;
 
-                if (gr_ec_point_randtest(P, state, E) != GR_SUCCESS
-                        || gr_ec_point_is_inf(P, E) != T_FALSE
-                        || gr_ec_point_get_affine(x, y, P, E) != GR_SUCCESS
+                if (gr_ec_jac_point_randtest(P, state, E) != GR_SUCCESS
+                        || gr_ec_jac_point_is_inf(P, E) != T_FALSE
+                        || gr_ec_jac_point_get_affine(x, y, P, E) != GR_SUCCESS
                         || gr_poly_evaluate(v, psi, x, R) != GR_SUCCESS
-                        || gr_ec_point_mul_ui(Q, P, n, E) != GR_SUCCESS
-                        || gr_ec_point_dbl(D, P, E) != GR_SUCCESS)
+                        || gr_ec_jac_point_mul_ui(Q, P, n, E) != GR_SUCCESS
+                        || gr_ec_jac_point_dbl(D, P, E) != GR_SUCCESS)
                     continue;
 
                 psi_zero = gr_is_zero(v, R);
-                nP_inf = gr_ec_point_is_inf(Q, E);
-                twoP_inf = gr_ec_point_is_inf(D, E);
+                nP_inf = gr_ec_jac_point_is_inf(Q, E);
+                twoP_inf = gr_ec_jac_point_is_inf(D, E);
 
                 if (psi_zero == T_TRUE)
                     FLINT_TEST(nP_inf != T_FALSE);
@@ -297,9 +297,9 @@ check_torsion(flint_rand_t state)
         }
 
         GR_TMP_CLEAR3(x, y, v, R);
-        gr_ec_point_clear(D, E);
-        gr_ec_point_clear(Q, E);
-        gr_ec_point_clear(P, E);
+        gr_ec_jac_point_clear(D, E);
+        gr_ec_jac_point_clear(Q, E);
+        gr_ec_jac_point_clear(P, E);
         gr_poly_clear(psi, R);
         gr_ec_ctx_clear(E);
         gr_ctx_clear(R);

@@ -806,6 +806,14 @@ _gr_fmpz_mod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* Z/nZ has n elements, whether or not n is prime */
+static int
+_gr_fmpz_mod_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set(res, FMPZ_MOD_CTX(ctx)->n);
+    return GR_SUCCESS;
+}
+
 
 /* todo: len 1 */
 static int
@@ -1190,7 +1198,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_fmpz_mod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
-    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_fmpz_mod_ctx_cardinality_fmpz},
     {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
     {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_fmpz_mod_vec_init},

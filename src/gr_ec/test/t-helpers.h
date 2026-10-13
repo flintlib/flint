@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_ec.h"
+#include "gr_ec/impl.h"
 
 /* A base ring over which elliptic curves make sense. Includes rings that
    are not fields, and rings of characteristic 2 and 3, so that the

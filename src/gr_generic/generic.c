@@ -156,12 +156,9 @@ gr_ptr gr_generic_ctx_base(gr_ctx_t ctx)
 }
 
 /*
-    An infinite structure has no cardinality as an integer, which is a
-    GR_DOMAIN answer rather than a GR_UNABLE one. Otherwise, every finite
-    ring in the library already knows its own size through fq_order, which
-    for Z/n is n and for a finite field is q; so that is the answer unless
-    the structure overrides this with something of its own, as the group of
-    points of an elliptic curve does.
+    GR_DOMAIN for an infinite structure. A finite one is assumed to be a
+    finite field, of order fq_order; other structures (Z/nZ, the group of
+    points of an elliptic curve) override this method.
 */
 int
 gr_generic_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)

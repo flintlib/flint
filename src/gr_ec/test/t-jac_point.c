@@ -79,7 +79,7 @@ TEST_GR_FUNCTION_START(gr_ec_jac_point, state, count_success, count_domain, coun
             FLINT_TEST(gr_ec_jac_point_is_on_curve(A, E) != T_FALSE);
 
             if (gr_ec_jac_point_is_inf(A, E) == T_FALSE)
-                FLINT_TEST(gr_is_one(gr_ec_jac_point_z_srcptr(A, E), R) != T_FALSE);
+                FLINT_TEST(gr_is_one(GR_EC_JAC_POINT_Z(A, E), R) != T_FALSE);
         }
 
         /* coordinates round trip */
@@ -93,9 +93,9 @@ TEST_GR_FUNCTION_START(gr_ec_jac_point, state, count_success, count_domain, coun
         if (gr_ec_jac_point_is_inf(P, E) == T_FALSE)
         {
             status = gr_ec_jac_point_set_jacobian(A,
-                        gr_ec_jac_point_x_srcptr(P, E),
-                        gr_ec_jac_point_y_srcptr(P, E),
-                        gr_ec_jac_point_z_srcptr(P, E), E);
+                        GR_EC_JAC_POINT_X(P, E),
+                        GR_EC_JAC_POINT_Y(P, E),
+                        GR_EC_JAC_POINT_Z(P, E), E);
 
             if (status == GR_SUCCESS)
                 FLINT_TEST(gr_ec_jac_point_equal(A, P, E) == T_TRUE);

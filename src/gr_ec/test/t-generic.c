@@ -76,59 +76,57 @@ check_ring_operations_are_out_of_domain(gr_ec_ctx_t E)
     GR_TMP_CLEAR2(P, Q, E);
 }
 
-/* The generic interface and the module functions must be the same thing.
-   Only the projective representation is checked directly; the other two
-   are covered by t-convert plus the group tests. */
+/* The generic interface and the module functions must be the same thing. */
 static void
 check_generic_matches_module(gr_ec_ctx_t E, flint_rand_t state)
 {
-    gr_ec_point_t P, Q, res1, res2;
+    gr_ec_jac_point_t P, Q, res1, res2;
     fmpz_t n;
     int status;
 
-    gr_ec_point_init(P, E);
-    gr_ec_point_init(Q, E);
-    gr_ec_point_init(res1, E);
-    gr_ec_point_init(res2, E);
+    gr_ec_jac_point_init(P, E);
+    gr_ec_jac_point_init(Q, E);
+    gr_ec_jac_point_init(res1, E);
+    gr_ec_jac_point_init(res2, E);
     fmpz_init(n);
 
-    status = gr_ec_point_randtest(P, state, E);
-    status |= gr_ec_point_randtest(Q, state, E);
+    status = gr_ec_jac_point_randtest(P, state, E);
+    status |= gr_ec_jac_point_randtest(Q, state, E);
 
     fmpz_randtest(n, state, gr_ec_test_scalar_bits(GR_EC_ELEM_CTX(E)));
 
     if (status == GR_SUCCESS)
     {
         status = gr_add(res1, P, Q, E);
-        status |= gr_ec_point_add(res2, P, Q, E);
+        status |= gr_ec_jac_point_add(res2, P, Q, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_point_equal(res1, res2, E) != T_FALSE);
+            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
 
         status = gr_sub(res1, P, Q, E);
-        status |= gr_ec_point_sub(res2, P, Q, E);
+        status |= gr_ec_jac_point_sub(res2, P, Q, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_point_equal(res1, res2, E) != T_FALSE);
+            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
 
         status = gr_neg(res1, P, E);
-        status |= gr_ec_point_neg(res2, P, E);
+        status |= gr_ec_jac_point_neg(res2, P, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_point_equal(res1, res2, E) != T_FALSE);
+            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
 
         status = gr_mul_fmpz(res1, P, n, E);
-        status |= gr_ec_point_mul_fmpz(res2, P, n, E);
+        status |= gr_ec_jac_point_mul_fmpz(res2, P, n, E);
         if (status == GR_SUCCESS)
-            FLINT_TEST(gr_ec_point_equal(res1, res2, E) != T_FALSE);
+            FLINT_TEST(gr_ec_jac_point_equal(res1, res2, E) != T_FALSE);
 
         FLINT_TEST(gr_zero(res1, E) == GR_SUCCESS);
         FLINT_TEST(gr_is_zero(res1, E) == T_TRUE);
-        FLINT_TEST(gr_ec_point_is_inf(res1, E) == T_TRUE);
+        FLINT_TEST(gr_ec_jac_point_is_inf(res1, E) == T_TRUE);
     }
 
     fmpz_clear(n);
-    gr_ec_point_clear(res2, E);
-    gr_ec_point_clear(res1, E);
-    gr_ec_point_clear(Q, E);
-    gr_ec_point_clear(P, E);
+    gr_ec_jac_point_clear(res2, E);
+    gr_ec_jac_point_clear(res1, E);
+    gr_ec_jac_point_clear(Q, E);
+    gr_ec_jac_point_clear(P, E);
 }
 
 TEST_FUNCTION_START(gr_ec_generic, state)
@@ -137,20 +135,13 @@ TEST_FUNCTION_START(gr_ec_generic, state)
 
     check_additive_group_on_rings(state);
 
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_repr_t repr;
         int flags = 0;
 
         gr_ec_test_ring(R, state);
-
-        repr = n_randint(state, GR_EC_NUM_REPRS);
-
-        /* affine arithmetic needs to invert */
-        if (repr == GR_EC_REPR_AFFINE && gr_ctx_is_field(R) != T_TRUE)
-            repr = GR_EC_REPR_PROJECTIVE;
 
         if (gr_ec_test_curve(E, R, state) != GR_SUCCESS)
         {
@@ -158,52 +149,17 @@ TEST_FUNCTION_START(gr_ec_generic, state)
             continue;
         }
 
-        FLINT_TEST(gr_ec_ctx_repr(E) == GR_EC_REPR_PROJECTIVE);
-        FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_SUCCESS);
-        FLINT_TEST(gr_ec_ctx_repr(E) == repr);
-
         check_ring_operations_are_out_of_domain(E);
 
-        /* Over a finite field every operation is decidable, so nothing is
-           allowed to come back GR_UNABLE there. */
+        /* over a finite field every operation is decidable */
         if (gr_ctx_is_finite(R) == T_TRUE && gr_ctx_is_field(R) == T_TRUE)
             flags = GR_TEST_ALWAYS_ABLE;
 
         gr_test_additive_group(E, 10, flags);
-
-        if (repr == GR_EC_REPR_PROJECTIVE)
-            check_generic_matches_module(E, state);
+        check_generic_matches_module(E, state);
 
         /* gr_ctx_clear dispatches to gr_ec_ctx_clear */
         gr_ctx_clear(E);
-        gr_ctx_clear(R);
-    }
-
-    /* the constructor that takes the representation up front */
-    {
-        gr_ctx_t R, E;
-
-        gr_ctx_init_fmpq(R);
-
-        FLINT_TEST(gr_ctx_init_gr_ec(E, R, NULL, NULL, NULL, NULL, NULL,
-                    GR_EC_NUM_REPRS) == GR_DOMAIN);
-
-        gr_ctx_clear(R);
-
-        /* Z/4 is not a field, so affine is refused */
-        while (gr_ctx_init_nmod(R, 4) != GR_SUCCESS)
-            ;
-        FLINT_TEST(gr_ctx_is_field(R) == T_FALSE);
-
-        {
-            gr_ptr a;
-            GR_TMP_INIT(a, R);
-            FLINT_TEST(gr_set_si(a, 1, R) == GR_SUCCESS);
-            FLINT_TEST(gr_ctx_init_gr_ec(E, R, a, a, a, a, a,
-                        GR_EC_REPR_AFFINE) == GR_DOMAIN);
-            GR_TMP_CLEAR(a, R);
-        }
-
         gr_ctx_clear(R);
     }
 

@@ -144,14 +144,14 @@ cleanup:
     "more than one" apart. res receives the first one found.
 */
 static int
-_gr_ec_div_by_roots(gr_ec_point_t res, int * found, const gr_ec_point_t P,
+_gr_ec_div_by_roots(gr_ec_jac_point_t res, int * found, const gr_ec_jac_point_t P,
         ulong n, int stop_at_first, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     gr_poly_t F;
     gr_vec_t roots;
     fmpz_vec_t mult;
-    gr_ec_point_t Q, T, first;
+    gr_ec_jac_point_t Q, T, first;
     gr_ptr xP;
     slong i, sz = R->sizeof_elem;
     int P_is_inf, status = GR_SUCCESS;
@@ -161,20 +161,20 @@ _gr_ec_div_by_roots(gr_ec_point_t res, int * found, const gr_ec_point_t P,
     if (gr_ec_ctx_model(ctx) != GR_EC_SHORT_WEIERSTRASS)
         return GR_UNABLE;
 
-    P_is_inf = (gr_ec_point_is_inf(P, ctx) == T_TRUE);
+    P_is_inf = (gr_ec_jac_point_is_inf(P, ctx) == T_TRUE);
 
     gr_poly_init(F, R);
     gr_vec_init(roots, 0, R);
     fmpz_vec_init(mult, 0);
-    gr_ec_point_init(Q, ctx);
-    gr_ec_point_init(T, ctx);
-    gr_ec_point_init(first, ctx);
+    gr_ec_jac_point_init(Q, ctx);
+    gr_ec_jac_point_init(T, ctx);
+    gr_ec_jac_point_init(first, ctx);
     GR_TMP_INIT(xP, R);
 
     /* the point at infinity is always divisible by anything */
     if (P_is_inf)
     {
-        status |= gr_ec_point_zero(first, ctx);
+        status |= gr_ec_jac_point_zero(first, ctx);
         *found = 1;
 
         if (stop_at_first)
@@ -184,7 +184,7 @@ _gr_ec_div_by_roots(gr_ec_point_t res, int * found, const gr_ec_point_t P,
     {
         gr_ptr x, y;
         GR_TMP_INIT2(x, y, R);
-        status |= gr_ec_point_get_affine(x, y, P, ctx);
+        status |= gr_ec_jac_point_get_affine(x, y, P, ctx);
         status |= gr_set(xP, x, R);
         GR_TMP_CLEAR2(x, y, R);
     }
@@ -206,28 +206,28 @@ _gr_ec_div_by_roots(gr_ec_point_t res, int * found, const gr_ec_point_t P,
     {
         int sign;
 
-        if (gr_ec_point_lift_x(Q, GR_ENTRY(roots->entries, i, sz), ctx)
+        if (gr_ec_jac_point_lift_x(Q, GR_ENTRY(roots->entries, i, sz), ctx)
                 != GR_SUCCESS)
             continue;
 
         /* both points over this x, which are Q and -Q */
         for (sign = 0; sign < 2; sign++)
         {
-            if (sign == 1 && gr_ec_point_neg(Q, Q, ctx) != GR_SUCCESS)
+            if (sign == 1 && gr_ec_jac_point_neg(Q, Q, ctx) != GR_SUCCESS)
                 break;
 
-            if (gr_ec_point_mul_ui(T, Q, n, ctx) != GR_SUCCESS)
+            if (gr_ec_jac_point_mul_ui(T, Q, n, ctx) != GR_SUCCESS)
                 continue;
 
-            if (gr_ec_point_equal(T, P, ctx) != T_TRUE)
+            if (gr_ec_jac_point_equal(T, P, ctx) != T_TRUE)
                 continue;
 
             if (*found == 0)
             {
-                status |= gr_ec_point_set(first, Q, ctx);
+                status |= gr_ec_jac_point_set(first, Q, ctx);
                 *found = 1;
             }
-            else if (gr_ec_point_equal(Q, first, ctx) != T_TRUE)
+            else if (gr_ec_jac_point_equal(Q, first, ctx) != T_TRUE)
             {
                 *found = 2;
                 goto done;
@@ -240,12 +240,12 @@ _gr_ec_div_by_roots(gr_ec_point_t res, int * found, const gr_ec_point_t P,
 
 done:
     if (status == GR_SUCCESS && *found > 0)
-        status = gr_ec_point_set(res, first, ctx);
+        status = gr_ec_jac_point_set(res, first, ctx);
 
     GR_TMP_CLEAR(xP, R);
-    gr_ec_point_clear(first, ctx);
-    gr_ec_point_clear(T, ctx);
-    gr_ec_point_clear(Q, ctx);
+    gr_ec_jac_point_clear(first, ctx);
+    gr_ec_jac_point_clear(T, ctx);
+    gr_ec_jac_point_clear(Q, ctx);
     fmpz_vec_clear(mult);
     gr_vec_clear(roots, R);
     gr_poly_clear(F, R);
@@ -283,40 +283,35 @@ _split_off_smooth_part(fmpz_t n1, fmpz_t n2, const fmpz_t n, const fmpz_t m)
 
 /* the common body; unique says whether more than one answer is a failure */
 static int
-_gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
+_gr_ec_jac_point_div_fmpz_impl(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         const fmpz_t n, int unique, gr_ec_ctx_t ctx)
 {
     fmpz_t k, m, n1, n2;
-    gr_ec_point_t T;
-    gr_ec_order_kind_t kind;
-    int found, status = GR_SUCCESS;
+    gr_ec_jac_point_t T;
+    int known, found, status = GR_SUCCESS;
 
     if (fmpz_is_zero(n))
     {
         /* 0 Q = P has every Q as a solution when P is the identity, and
            none otherwise; either way it is not a single answer */
-        if (unique || gr_ec_point_is_inf(P, ctx) != T_TRUE)
+        if (unique || gr_ec_jac_point_is_inf(P, ctx) != T_TRUE)
             return GR_DOMAIN;
 
-        return gr_ec_point_zero(res, ctx);
+        return gr_ec_jac_point_zero(res, ctx);
     }
 
     fmpz_init(k);
     fmpz_init(m);
     fmpz_init(n1);
     fmpz_init(n2);
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(T, ctx);
 
     fmpz_abs(k, n);
 
-    /* here it is worth counting, since the alternative is root finding;
-       the count is not cached, as this must not modify ctx */
-    kind = gr_ec_ctx_get_cached_order(m, ctx);
+    /* here it is worth counting, since the alternative is root finding */
+    known = (gr_ec_ctx_cardinality(m, ctx) == GR_SUCCESS);
 
-    if (kind == GR_EC_ORDER_UNKNOWN && gr_ec_ctx_cardinality(m, ctx) == GR_SUCCESS)
-        kind = GR_EC_ORDER_EXACT;
-
-    if (kind == GR_EC_ORDER_UNKNOWN)
+    if (!known)
     {
         /* nothing is known to be invertible, so all of n is the hard part */
         fmpz_one(n1);
@@ -325,13 +320,13 @@ _gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
     else if (fmpz_is_one(m))
     {
         /* the group is trivial: P is the identity and so is the answer */
-        status = gr_ec_point_zero(res, ctx);
+        status = gr_ec_jac_point_zero(res, ctx);
         goto cleanup;
     }
     else
         _split_off_smooth_part(n1, n2, k, m);
 
-    status = gr_ec_point_set(T, P, ctx);
+    status = gr_ec_jac_point_set(T, P, ctx);
 
     /* the easy factor: multiply by the inverse of n1 modulo m */
     if (status == GR_SUCCESS && !fmpz_is_one(n1))
@@ -340,7 +335,7 @@ _gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
         fmpz_init(inv);
 
         if (fmpz_invmod(inv, n1, m))
-            status = gr_ec_point_mul_fmpz(T, T, inv, ctx);
+            status = gr_ec_jac_point_mul_fmpz(T, T, inv, ctx);
         else
             status = GR_UNABLE;
 
@@ -353,7 +348,7 @@ _gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
     if (fmpz_is_one(n2))
     {
         /* gcd(n, m) = 1 makes E[n](F_q) trivial, so this is the only answer */
-        status = gr_ec_point_set(res, T, ctx);
+        status = gr_ec_jac_point_set(res, T, ctx);
         goto cleanup;
     }
 
@@ -385,9 +380,9 @@ _gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
 
 cleanup:
     if (status == GR_SUCCESS && fmpz_sgn(n) < 0)
-        status = gr_ec_point_neg(res, res, ctx);
+        status = gr_ec_jac_point_neg(res, res, ctx);
 
-    gr_ec_point_clear(T, ctx);
+    gr_ec_jac_point_clear(T, ctx);
     fmpz_clear(k);
     fmpz_clear(m);
     fmpz_clear(n1);
@@ -397,43 +392,28 @@ cleanup:
 }
 
 int
-gr_ec_point_div_fmpz(gr_ec_point_t res, const gr_ec_point_t P,
+gr_ec_jac_point_div_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         const fmpz_t n, gr_ec_ctx_t ctx)
 {
-    return _gr_ec_point_div_fmpz(res, P, n, 1, ctx);
+    return _gr_ec_jac_point_div_fmpz_impl(res, P, n, 1, ctx);
 }
 
 int
-gr_ec_point_div_fmpz_nonunique(gr_ec_point_t res, const gr_ec_point_t P,
+gr_ec_jac_point_div_fmpz_nonunique(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         const fmpz_t n, gr_ec_ctx_t ctx)
 {
-    return _gr_ec_point_div_fmpz(res, P, n, 0, ctx);
+    return _gr_ec_jac_point_div_fmpz_impl(res, P, n, 0, ctx);
 }
 
 int
-gr_ec_point_div_ui(gr_ec_point_t res, const gr_ec_point_t P, ulong n,
+gr_ec_jac_point_div_ui(gr_ec_jac_point_t res, const gr_ec_jac_point_t P, ulong n,
         gr_ec_ctx_t ctx)
 {
     fmpz_t t;
     int status;
 
     fmpz_init_set_ui(t, n);
-    status = gr_ec_point_div_fmpz(res, P, t, ctx);
-    fmpz_clear(t);
-
-    return status;
-}
-
-int
-gr_ec_point_div_si(gr_ec_point_t res, const gr_ec_point_t P, slong n,
-        gr_ec_ctx_t ctx)
-{
-    fmpz_t t;
-    int status;
-
-    fmpz_init(t);
-    fmpz_set_si(t, n);
-    status = gr_ec_point_div_fmpz(res, P, t, ctx);
+    status = gr_ec_jac_point_div_fmpz(res, P, t, ctx);
     fmpz_clear(t);
 
     return status;
@@ -445,92 +425,35 @@ gr_ec_point_div_si(gr_ec_point_t res, const gr_ec_point_t P, slong n,
     makes multiplication by a a bijection of E[b].
 */
 static int
-_gr_ec_point_mul_fmpq(gr_ec_point_t res, const gr_ec_point_t P,
+_gr_ec_jac_point_mul_fmpq_impl(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         const fmpq_t c, int unique, gr_ec_ctx_t ctx)
 {
-    gr_ec_point_t T;
+    gr_ec_jac_point_t T;
     int status;
 
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(T, ctx);
 
-    status = gr_ec_point_mul_fmpz(T, P, fmpq_numref(c), ctx);
+    status = gr_ec_jac_point_mul_fmpz(T, P, fmpq_numref(c), ctx);
 
     if (status == GR_SUCCESS)
-        status = _gr_ec_point_div_fmpz(res, T, fmpq_denref(c), unique, ctx);
+        status = _gr_ec_jac_point_div_fmpz_impl(res, T, fmpq_denref(c), unique, ctx);
 
-    gr_ec_point_clear(T, ctx);
-
-    return status;
-}
-
-int
-gr_ec_point_mul_fmpq(gr_ec_point_t res, const gr_ec_point_t P,
-        const fmpq_t c, gr_ec_ctx_t ctx)
-{
-    return _gr_ec_point_mul_fmpq(res, P, c, 1, ctx);
-}
-
-int
-gr_ec_point_mul_fmpq_nonunique(gr_ec_point_t res, const gr_ec_point_t P,
-        const fmpq_t c, gr_ec_ctx_t ctx)
-{
-    return _gr_ec_point_mul_fmpq(res, P, c, 0, ctx);
-}
-
-int
-gr_ec_point_div_fmpq(gr_ec_point_t res, const gr_ec_point_t P,
-        const fmpq_t c, gr_ec_ctx_t ctx)
-{
-    fmpq_t d;
-    int status;
-
-    if (fmpq_is_zero(c))
-        return GR_DOMAIN;
-
-    fmpq_init(d);
-    fmpq_inv(d, c);
-    status = gr_ec_point_mul_fmpq(res, P, d, ctx);
-    fmpq_clear(d);
+    gr_ec_jac_point_clear(T, ctx);
 
     return status;
 }
 
-/*
-    The other two representations, through the projective one. Division is
-    root finding, not a ladder, so there is nothing to gain from doing it
-    natively in either of them.
-*/
-
-#define GR_EC_DIV_VIA_PROJECTIVE(kind, short, op, argtype) \
-int \
-kind ## _ ## op(kind ## _t res, const kind ## _t P, argtype n, \
-        gr_ec_ctx_t ctx) \
-{ \
-    gr_ec_point_t A; \
-    int status; \
- \
-    gr_ec_point_init(A, ctx); \
-    status = gr_ec_point_set_ ## short(A, P, ctx); \
- \
-    if (status == GR_SUCCESS) \
-        status = gr_ec_point_ ## op(A, A, n, ctx); \
- \
-    if (status == GR_SUCCESS) \
-        status = kind ## _set_point(res, A, ctx); \
- \
-    gr_ec_point_clear(A, ctx); \
- \
-    return status; \
+int
+gr_ec_jac_point_mul_fmpq(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
+        const fmpq_t c, gr_ec_ctx_t ctx)
+{
+    return _gr_ec_jac_point_mul_fmpq_impl(res, P, c, 1, ctx);
 }
 
-#define GR_EC_DIV_FAMILY(kind, short) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, div_fmpz, const fmpz_t) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, div_fmpz_nonunique, const fmpz_t) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, div_ui, ulong) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, div_si, slong) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, mul_fmpq, const fmpq_t) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, mul_fmpq_nonunique, const fmpq_t) \
-    GR_EC_DIV_VIA_PROJECTIVE(kind, short, div_fmpq, const fmpq_t)
+int
+gr_ec_jac_point_mul_fmpq_nonunique(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
+        const fmpq_t c, gr_ec_ctx_t ctx)
+{
+    return _gr_ec_jac_point_mul_fmpq_impl(res, P, c, 0, ctx);
+}
 
-GR_EC_DIV_FAMILY(gr_ec_aff_point, aff_point)
-GR_EC_DIV_FAMILY(gr_ec_jac_point, jac_point)

@@ -52,6 +52,7 @@
 #include "fmpz_mod.h"
 #include "gr.h"
 #include "gr_ec.h"
+#include "gr_ec/impl.h"
 #include "mpn_mod.h"
 
 #define TIME_US(dest, stmt) \
@@ -75,8 +76,8 @@ int main(void)
 
     flint_printf("gr_ec: scalar multiplication k P over F_p, k of the size of p\n");
     flint_printf("microseconds per k P (lower is better)\n\n");
-    flint_printf("%9s %10s %10s %10s %10s %12s\n",
-            "bits(p)", "proj", "affine", "jacobian", "jac-binary", "jac-witness");
+    flint_printf("%9s %10s %10s %10s %12s\n",
+            "bits(p)", "affine", "jacobian", "jac-binary", "jac-witness");
 
     for (bi = 0; bi < num_sizes; bi++)
     {
@@ -85,12 +86,12 @@ int main(void)
         fmpz_mod_ctx_t mod;
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_point_t P, A;
+        gr_ec_jac_point_t P, A;
         gr_ec_aff_point_t Pa, Aa;
         gr_ec_jac_point_t Pj, Aj;
         gr_ptr a4, a6, x, y, t;
         gr_ptr gacc;
-        double t_proj, t_aff, t_jac, t_jacbin, t_wit;
+        double t_aff, t_jac, t_jacbin, t_wit;
         int status;
 
         fmpz_init(p);
@@ -129,14 +130,14 @@ int main(void)
             continue;
         }
 
-        gr_ec_point_init(P, E);
-        gr_ec_point_init(A, E);
+        gr_ec_jac_point_init(P, E);
+        gr_ec_jac_point_init(A, E);
         gr_ec_aff_point_init(Pa, E);
         gr_ec_aff_point_init(Aa, E);
         gr_ec_jac_point_init(Pj, E);
         gr_ec_jac_point_init(Aj, E);
 
-        GR_MUST_SUCCEED(gr_ec_point_set_affine(P, x, y, E));
+        GR_MUST_SUCCEED(gr_ec_jac_point_set_affine(P, x, y, E));
         GR_MUST_SUCCEED(gr_ec_aff_point_set_affine(Pa, x, y, E));
         GR_MUST_SUCCEED(gr_ec_jac_point_set_affine(Pj, x, y, E));
 
@@ -146,41 +147,41 @@ int main(void)
         /* the ecpp reference works on a raw (X, Y, Z) triple with Z = 1 */
         gacc = gr_heap_init(R);
 
-        /* check that all five compute the same point before timing them */
-        GR_MUST_SUCCEED(gr_ec_point_mul_fmpz(A, P, k, E));
+        /* check that all four compute the same point before timing them */
+        GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz(A, P, k, E));
         GR_MUST_SUCCEED(gr_ec_aff_point_mul_fmpz(Aa, Pa, k, E));
         GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz(Aj, Pj, k, E));
 
         {
-            gr_ec_point_t B;
+            gr_ec_jac_point_t B;
             gr_ec_jac_point_t Bj;
 
-            gr_ec_point_init(B, E);
+            gr_ec_jac_point_init(B, E);
             gr_ec_jac_point_init(Bj, E);
 
-            GR_MUST_SUCCEED(gr_ec_point_set_aff_point(B, Aa, E));
+            GR_MUST_SUCCEED(gr_ec_jac_point_set_aff_point(B, Aa, E));
 
-            if (gr_ec_point_equal(A, B, E) != T_TRUE)
+            if (gr_ec_jac_point_equal(A, B, E) != T_TRUE)
                 flint_throw(FLINT_ERROR, "affine result differs at %wd bits\n", bits);
 
-            GR_MUST_SUCCEED(gr_ec_point_set_jac_point(B, Aj, E));
+            GR_MUST_SUCCEED(gr_ec_jac_point_set(B, Aj, E));
 
-            if (gr_ec_point_equal(A, B, E) != T_TRUE)
+            if (gr_ec_jac_point_equal(A, B, E) != T_TRUE)
                 flint_throw(FLINT_ERROR, "jacobian result differs at %wd bits\n", bits);
 
             GR_MUST_SUCCEED(_gr_ec_jac_point_mul_fmpz_binary(Bj, Pj, k, E));
-            GR_MUST_SUCCEED(gr_ec_point_set_jac_point(B, Bj, E));
+            GR_MUST_SUCCEED(gr_ec_jac_point_set(B, Bj, E));
 
-            if (gr_ec_point_equal(A, B, E) != T_TRUE)
+            if (gr_ec_jac_point_equal(A, B, E) != T_TRUE)
                 flint_throw(FLINT_ERROR, "jacobian ladder differs at %wd bits\n", bits);
 
             /* the witness ladder has its own fallback, so it is worth
                checking that it lands on the same point */
             GR_MUST_SUCCEED(gr_one(gacc, R));
-            GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Bj, gacc, Pj, k, E));
-            GR_MUST_SUCCEED(gr_ec_point_set_jac_point(B, Bj, E));
+            GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Bj, Pj, k, gacc, E));
+            GR_MUST_SUCCEED(gr_ec_jac_point_set(B, Bj, E));
 
-            if (gr_ec_point_equal(A, B, E) != T_TRUE)
+            if (gr_ec_jac_point_equal(A, B, E) != T_TRUE)
                 flint_throw(FLINT_ERROR, "witness result differs at %wd bits\n", bits);
 
             /* over a prime modulus no branch can have been ambiguous */
@@ -188,18 +189,17 @@ int main(void)
                 flint_throw(FLINT_ERROR, "witness vanished at %wd bits\n", bits);
 
             gr_ec_jac_point_clear(Bj, E);
-            gr_ec_point_clear(B, E);
+            gr_ec_jac_point_clear(B, E);
         }
 
-        TIME_US(t_proj, GR_MUST_SUCCEED(gr_ec_point_mul_fmpz(A, P, k, E)));
         TIME_US(t_aff, GR_MUST_SUCCEED(gr_ec_aff_point_mul_fmpz(Aa, Pa, k, E)));
         TIME_US(t_jac, GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz(Aj, Pj, k, E)));
         TIME_US(t_jacbin, GR_MUST_SUCCEED(_gr_ec_jac_point_mul_fmpz_binary(Aj, Pj, k, E)));
         TIME_US(t_wit, { GR_MUST_SUCCEED(gr_one(gacc, R));
-                GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Aj, gacc, Pj, k, E)); });
+                GR_MUST_SUCCEED(gr_ec_jac_point_mul_fmpz_witness(Aj, Pj, k, gacc, E)); });
 
-        flint_printf("%9wd %10.2f %10.2f %10.2f %10.2f %12.2f\n",
-                bits, t_proj, t_aff, t_jac, t_jacbin, t_wit);
+        flint_printf("%9wd %10.2f %10.2f %10.2f %12.2f\n",
+                bits, t_aff, t_jac, t_jacbin, t_wit);
         fflush(stdout);
 
         gr_heap_clear(gacc, R);
@@ -207,8 +207,8 @@ int main(void)
         gr_ec_jac_point_clear(Aj, E);
         gr_ec_aff_point_clear(Pa, E);
         gr_ec_aff_point_clear(Aa, E);
-        gr_ec_point_clear(P, E);
-        gr_ec_point_clear(A, E);
+        gr_ec_jac_point_clear(P, E);
+        gr_ec_jac_point_clear(A, E);
         gr_ec_ctx_clear(E);
         GR_TMP_CLEAR5(a4, a6, x, y, t, R);
         gr_ctx_clear(R);

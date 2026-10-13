@@ -69,7 +69,6 @@ check_group_order_annihilates(flint_rand_t state)
     {
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_repr_t repr;
 
         GR_MUST_SUCCEED(gr_ctx_init_nmod(R, p));
 
@@ -81,36 +80,28 @@ check_group_order_annihilates(flint_rand_t state)
 
         {
             ulong N = curve_order(E, R, p);
+            gr_ptr P, res;
             fmpz_t n;
+            slong iter;
 
             fmpz_init_set_ui(n, N);
+            GR_TMP_INIT2(P, res, E);
 
-            for (repr = 0; repr < GR_EC_NUM_REPRS; repr++)
+            for (iter = 0; iter < 20; iter++)
             {
-                gr_ptr P, res;
-                slong iter;
+                FLINT_TEST(gr_randtest(P, state, E) == GR_SUCCESS);
 
-                FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_SUCCESS);
+                FLINT_TEST(gr_mul_ui(res, P, N, E) == GR_SUCCESS);
+                FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
 
-                GR_TMP_INIT2(P, res, E);
+                FLINT_TEST(gr_mul_fmpz(res, P, n, E) == GR_SUCCESS);
+                FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
 
-                for (iter = 0; iter < 20; iter++)
-                {
-                    FLINT_TEST(gr_randtest(P, state, E) == GR_SUCCESS);
-
-                    FLINT_TEST(gr_mul_ui(res, P, N, E) == GR_SUCCESS);
-                    FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-                    FLINT_TEST(gr_mul_fmpz(res, P, n, E) == GR_SUCCESS);
-                    FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-                    FLINT_TEST(gr_mul_si(res, P, -(slong) N, E) == GR_SUCCESS);
-                    FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-                }
-
-                GR_TMP_CLEAR2(P, res, E);
+                FLINT_TEST(gr_mul_si(res, P, -(slong) N, E) == GR_SUCCESS);
+                FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
             }
 
+            GR_TMP_CLEAR2(P, res, E);
             fmpz_clear(n);
         }
 
@@ -129,93 +120,76 @@ check_two_torsion_over_q(void)
 {
     gr_ctx_t R;
     gr_ec_ctx_t E;
-    gr_ec_repr_t repr;
     slong which;
 
     gr_ctx_init_fmpq(R);
     FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, -1, 0) == GR_SUCCESS);
 
-    for (repr = 0; repr < GR_EC_NUM_REPRS; repr++)
+    for (which = -1; which <= 1; which++)
     {
-        FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_SUCCESS);
+        gr_ptr P, res;
+        gr_ptr x, y;
+        fmpz_t e;
+        slong k;
 
-        for (which = -1; which <= 1; which++)
+        GR_TMP_INIT2(P, res, E);
+        GR_TMP_INIT2(x, y, R);
+        fmpz_init(e);
+
+        GR_MUST_SUCCEED(gr_set_si(x, which, R));
+        GR_MUST_SUCCEED(gr_zero(y, R));
+
+        /* building a point needs the module: no integer is a point */
+        FLINT_TEST(gr_ec_jac_point_set_affine(P, x, y, E) == GR_SUCCESS);
+
+        FLINT_TEST(gr_is_zero(P, E) == T_FALSE);
+
+        /* 2 P = O, however it is spelled */
+        FLINT_TEST(gr_mul_two(res, P, E) == GR_SUCCESS);
+        FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
+
+        FLINT_TEST(gr_mul_ui(res, P, 2, E) == GR_SUCCESS);
+        FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
+
+        FLINT_TEST(gr_mul_si(res, P, -2, E) == GR_SUCCESS);
+        FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
+
+        /* 2^k P = O for every k >= 1, and 2^0 P = P */
+        FLINT_TEST(gr_mul_2exp_si(res, P, 0, E) == GR_SUCCESS);
+        FLINT_TEST(gr_equal(res, P, E) == T_TRUE);
+
+        for (k = 1; k <= 8; k++)
         {
-            gr_ptr P, res;
-            gr_ptr x, y;
-            fmpz_t e;
-            slong k;
-
-            GR_TMP_INIT2(P, res, E);
-            GR_TMP_INIT2(x, y, R);
-            fmpz_init(e);
-
-            GR_MUST_SUCCEED(gr_set_si(x, which, R));
-            GR_MUST_SUCCEED(gr_zero(y, R));
-
-            /* building a point needs the module: no integer is a point */
-            switch (repr)
-            {
-                case GR_EC_REPR_PROJECTIVE:
-                    FLINT_TEST(gr_ec_point_set_affine(P, x, y, E) == GR_SUCCESS);
-                    break;
-                case GR_EC_REPR_AFFINE:
-                    FLINT_TEST(gr_ec_aff_point_set_affine(P, x, y, E) == GR_SUCCESS);
-                    break;
-                default:
-                    FLINT_TEST(gr_ec_jac_point_set_affine(P, x, y, E) == GR_SUCCESS);
-                    break;
-            }
-
-            FLINT_TEST(gr_is_zero(P, E) == T_FALSE);
-
-            /* 2 P = O, however it is spelled */
-            FLINT_TEST(gr_mul_two(res, P, E) == GR_SUCCESS);
+            FLINT_TEST(gr_mul_2exp_si(res, P, k, E) == GR_SUCCESS);
             FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
 
-            FLINT_TEST(gr_mul_ui(res, P, 2, E) == GR_SUCCESS);
+            fmpz_set_si(e, k);
+            FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_SUCCESS);
             FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-            FLINT_TEST(gr_mul_si(res, P, -2, E) == GR_SUCCESS);
-            FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-            /* 2^k P = O for every k >= 1, and 2^0 P = P */
-            FLINT_TEST(gr_mul_2exp_si(res, P, 0, E) == GR_SUCCESS);
-            FLINT_TEST(gr_equal(res, P, E) == T_TRUE);
-
-            for (k = 1; k <= 8; k++)
-            {
-                FLINT_TEST(gr_mul_2exp_si(res, P, k, E) == GR_SUCCESS);
-                FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-                fmpz_set_si(e, k);
-                FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_SUCCESS);
-                FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-            }
-
-            /* odd multiples of a 2-torsion point are the point itself */
-            FLINT_TEST(gr_mul_ui(res, P, 7, E) == GR_SUCCESS);
-            FLINT_TEST(gr_equal(res, P, E) == T_TRUE);
-
-            /* an exponent too large to iterate over is not an answer,
-               but it is one for the identity */
-            fmpz_one(e);
-            fmpz_mul_2exp(e, e, 200);
-            FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_UNABLE);
-
-            FLINT_TEST(gr_zero(res, E) == GR_SUCCESS);
-            FLINT_TEST(gr_mul_2exp_fmpz(res, res, e, E) == GR_SUCCESS);
-            FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
-
-            /* halving a point is not a single valued operation */
-            FLINT_TEST(gr_mul_2exp_si(res, P, -1, E) == GR_DOMAIN);
-            fmpz_set_si(e, -1);
-            FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_DOMAIN);
-
-            fmpz_clear(e);
-            GR_TMP_CLEAR2(x, y, R);
-            GR_TMP_CLEAR2(P, res, E);
         }
+
+        /* odd multiples of a 2-torsion point are the point itself */
+        FLINT_TEST(gr_mul_ui(res, P, 7, E) == GR_SUCCESS);
+        FLINT_TEST(gr_equal(res, P, E) == T_TRUE);
+
+        /* an exponent too large to iterate over is not an answer,
+           but it is one for the identity */
+        fmpz_one(e);
+        fmpz_mul_2exp(e, e, 200);
+        FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_UNABLE);
+
+        FLINT_TEST(gr_zero(res, E) == GR_SUCCESS);
+        FLINT_TEST(gr_mul_2exp_fmpz(res, res, e, E) == GR_SUCCESS);
+        FLINT_TEST(gr_is_zero(res, E) == T_TRUE);
+
+        /* halving a point is not a single valued operation */
+        FLINT_TEST(gr_mul_2exp_si(res, P, -1, E) == GR_DOMAIN);
+        fmpz_set_si(e, -1);
+        FLINT_TEST(gr_mul_2exp_fmpz(res, P, e, E) == GR_DOMAIN);
+
+        fmpz_clear(e);
+        GR_TMP_CLEAR2(x, y, R);
+        GR_TMP_CLEAR2(P, res, E);
     }
 
     gr_ctx_clear(E);
@@ -232,7 +206,6 @@ check_additive_group(flint_rand_t state)
     {
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_repr_t repr;
         fmpz_t p;
         int exact_field = 1;
 
@@ -264,8 +237,8 @@ check_additive_group(flint_rand_t state)
                 break;
 
             default:
-                /* an integral domain that is not a field: affine is
-                   refused, and being infinite the scalars stay small */
+                /* an integral domain that is not a field; being infinite,
+                   the scalars stay small */
                 gr_ctx_init_fmpz(R);
                 exact_field = 0;
                 break;
@@ -297,8 +270,7 @@ check_additive_group(flint_rand_t state)
             else
                 GR_MUST_SUCCEED(gr_one(a4, R));
 
-            FLINT_TEST(gr_ctx_init_gr_ec(E, R, a1, a2, a3, a4, a6,
-                        GR_EC_REPR_PROJECTIVE) == GR_SUCCESS);
+            FLINT_TEST(gr_ec_ctx_init(E, R, a1, a2, a3, a4, a6) == GR_SUCCESS);
 
             GR_TMP_CLEAR5(a1, a2, a3, a4, a6, R);
         }
@@ -308,25 +280,9 @@ check_additive_group(flint_rand_t state)
                     ? GR_EC_LONG_WEIERSTRASS : GR_EC_SHORT_WEIERSTRASS));
 
         FLINT_TEST(gr_ctx_is_ring(E) == T_FALSE);
-        FLINT_TEST(gr_ec_ctx_repr(E) == GR_EC_REPR_PROJECTIVE);
 
-        for (repr = 0; repr < GR_EC_NUM_REPRS; repr++)
-        {
-            int flags = 0;
-
-            if (repr == GR_EC_REPR_AFFINE && !exact_field)
-            {
-                FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_DOMAIN);
-                continue;
-            }
-
-            FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_SUCCESS);
-
-            if (exact_field)
-                flags = GR_TEST_ALWAYS_ABLE;
-
-            gr_test_additive_group(E, exact_field ? 30 : 10, flags);
-        }
+        gr_test_additive_group(E, exact_field ? 30 : 10,
+                exact_field ? GR_TEST_ALWAYS_ABLE : 0);
 
         gr_ctx_clear(E);
         gr_ctx_clear(R);
@@ -343,7 +299,7 @@ check_additive_group(flint_rand_t state)
     available and only their meaning is restricted.
 
     What is checked here is that the domain is still usable: nothing
-    crashes, and a representation needing inversion is refused up front.
+    crashes.
 */
 static void
 check_ring_with_zero_divisors(flint_rand_t state)
@@ -356,10 +312,6 @@ check_ring_with_zero_divisors(flint_rand_t state)
     GR_MUST_SUCCEED(gr_ctx_init_nmod(R, 35));
     FLINT_TEST(gr_ctx_is_field(R) == T_FALSE);
     FLINT_TEST(gr_ec_ctx_init_short_weierstrass_si(E, R, 1, 1) == GR_SUCCESS);
-
-    /* affine arithmetic would have to invert */
-    FLINT_TEST(gr_ec_ctx_set_repr(E, GR_EC_REPR_AFFINE) == GR_DOMAIN);
-    FLINT_TEST(gr_ec_ctx_repr(E) == GR_EC_REPR_PROJECTIVE);
 
     GR_TMP_INIT3(P, Q, res, E);
 
@@ -392,16 +344,10 @@ check_additive_group_over_q(void)
 {
     gr_ctx_t R;
     gr_ec_ctx_t E;
-    gr_ec_repr_t repr;
 
     gr_ctx_init_fmpq(R);
     FLINT_TEST(gr_ec_ctx_init_si(E, R, 0, -1, 1, -10, -20) == GR_SUCCESS);
-
-    for (repr = 0; repr < GR_EC_NUM_REPRS; repr++)
-    {
-        FLINT_TEST(gr_ec_ctx_set_repr(E, repr) == GR_SUCCESS);
-        gr_test_additive_group(E, 10, 0);
-    }
+    gr_test_additive_group(E, 10, 0);
 
     gr_ctx_clear(E);
     gr_ctx_clear(R);

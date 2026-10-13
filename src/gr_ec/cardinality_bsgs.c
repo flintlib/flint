@@ -412,66 +412,6 @@ _aff_add_batch(gr_ec_aff_point_struct * P, slong n, const gr_ec_aff_point_t D,
     return status;
 }
 
-/* affine copies of projective points, with one inversion */
-static int
-_aff_set_batch(gr_ec_aff_point_struct * A, const gr_ec_point_struct * P,
-        slong n, gr_ptr t, gr_ec_ctx_t ctx)
-{
-    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
-    slong sz = R->sizeof_elem, i;
-    gr_ptr u = t, w = GR_ENTRY(t, n, sz);
-    gr_ptr inv, zi;
-    int status = GR_SUCCESS;
-
-    if (n == 0)
-        return GR_SUCCESS;
-
-    GR_TMP_INIT2(inv, zi, R);
-
-    for (i = 0; i < n; i++)
-    {
-        truth_t inf = gr_ec_point_is_inf(P + i, ctx);
-
-        if (inf == T_UNKNOWN)
-            status |= GR_UNABLE;
-
-        A[i].is_infinity = (inf == T_TRUE) ? T_TRUE : T_FALSE;
-
-        if (inf == T_FALSE)
-            status |= gr_set(GR_ENTRY(u, i, sz), GR_EC_POINT_Z(P + i, ctx), R);
-        else
-            status |= gr_one(GR_ENTRY(u, i, sz), R);
-
-        if (i == 0)
-            status |= gr_set(w, u, R);
-        else
-            status |= gr_mul(GR_ENTRY(w, i, sz), GR_ENTRY(w, i - 1, sz),
-                    GR_ENTRY(u, i, sz), R);
-    }
-
-    status |= gr_inv(inv, GR_ENTRY(w, n - 1, sz), R);
-
-    for (i = n - 1; i >= 0 && status == GR_SUCCESS; i--)
-    {
-        if (i > 0)
-            status |= gr_mul(zi, inv, GR_ENTRY(w, i - 1, sz), R);
-        else
-            status |= gr_set(zi, inv, R);
-
-        status |= gr_mul(inv, inv, GR_ENTRY(u, i, sz), R);
-
-        if (A[i].is_infinity == T_FALSE)
-        {
-            status |= gr_mul(GR_EC_AFF_POINT_X(A + i, ctx), GR_EC_POINT_X(P + i, ctx), zi, R);
-            status |= gr_mul(GR_EC_AFF_POINT_Y(A + i, ctx), GR_EC_POINT_Y(P + i, ctx), zi, R);
-        }
-    }
-
-    GR_TMP_CLEAR2(inv, zi, R);
-
-    return status;
-}
-
 /* called on every point of a walk; returning nonzero stops the walk */
 typedef int (*_walk_visit_t)(void * data, slong k, slong z, ulong h,
         const gr_ec_aff_point_struct * pt, int * status);
@@ -490,16 +430,16 @@ typedef int (*_walk_visit_t)(void * data, slong k, slong z, ulong h,
     multiplications, the U being sorted.
 */
 static int
-_walk(const gr_ec_point_t P0, const fmpz * U, slong nu, int sgn,
-        const gr_ec_point_t Bu, const gr_ec_point_t Dz, slong ztot,
+_walk(const gr_ec_jac_point_t P0, const fmpz * U, slong nu, int sgn,
+        const gr_ec_jac_point_t Bu, const gr_ec_jac_point_t Dz, slong ztot,
         _walk_visit_t visit, void * data, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
     slong K = GR_EC_WALK_LANES, S, zc, nl, c0, i, z, kcur = -1;
-    gr_ec_point_struct * E, * start;
+    gr_ec_jac_point_struct * E, * start;
     gr_ec_aff_point_struct * lane;
     gr_ec_aff_point_t Da;
-    gr_ec_point_t Acur, T;
+    gr_ec_jac_point_t Acur, T;
     gr_ptr t;
     fmpz_t d;
     int status = GR_SUCCESS, stop = 0;
@@ -515,33 +455,33 @@ _walk(const gr_ec_point_t P0, const fmpz * U, slong nu, int sgn,
     zc = (ztot + S - 1) / S;
     nl = nu * S;
 
-    E = flint_malloc(S * sizeof(gr_ec_point_struct));
+    E = flint_malloc(S * sizeof(gr_ec_jac_point_struct));
     for (i = 0; i < S; i++)
-        gr_ec_point_init(E + i, ctx);
+        gr_ec_jac_point_init(E + i, ctx);
 
-    start = flint_malloc(K * sizeof(gr_ec_point_struct));
+    start = flint_malloc(K * sizeof(gr_ec_jac_point_struct));
     lane = flint_malloc(K * sizeof(gr_ec_aff_point_struct));
     for (i = 0; i < K; i++)
     {
-        gr_ec_point_init(start + i, ctx);
+        gr_ec_jac_point_init(start + i, ctx);
         gr_ec_aff_point_init(lane + i, ctx);
     }
 
     gr_ec_aff_point_init(Da, ctx);
-    gr_ec_point_init(Acur, ctx);
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(Acur, ctx);
+    gr_ec_jac_point_init(T, ctx);
     t = gr_heap_init_vec(2 * K, R);
     fmpz_init(d);
 
     /* E[s] = s zc Dz */
-    status |= gr_ec_point_zero(E + 0, ctx);
+    status |= gr_ec_jac_point_zero(E + 0, ctx);
     if (S > 1)
-        status |= gr_ec_point_mul_si(E + 1, Dz, zc, ctx);
+        status |= gr_ec_jac_point_mul_si(E + 1, Dz, zc, ctx);
     for (i = 2; i < S; i++)
-        status |= gr_ec_point_add(E + i, E + i - 1, E + 1, ctx);
+        status |= gr_ec_jac_point_add(E + i, E + i - 1, E + 1, ctx);
 
-    status |= gr_ec_aff_point_set_point(Da, Dz, ctx);
-    status |= gr_ec_point_set(Acur, P0, ctx);
+    status |= gr_ec_aff_point_set_jac_point(Da, Dz, ctx);
+    status |= gr_ec_jac_point_set(Acur, P0, ctx);
 
     for (c0 = 0; c0 < nl && status == GR_SUCCESS && !stop; c0 += K)
     {
@@ -564,17 +504,17 @@ _walk(const gr_ec_point_t P0, const fmpz * U, slong nu, int sgn,
                     if (sgn < 0)
                         fmpz_neg(d, d);
 
-                    status |= gr_ec_point_mul_fmpz(T, Bu, d, ctx);
-                    status |= gr_ec_point_add(Acur, Acur, T, ctx);
+                    status |= gr_ec_jac_point_mul_fmpz(T, Bu, d, ctx);
+                    status |= gr_ec_jac_point_add(Acur, Acur, T, ctx);
                 }
 
                 kcur = k;
             }
 
-            status |= gr_ec_point_add(start + i, Acur, E + s, ctx);
+            status |= gr_ec_jac_point_add(start + i, Acur, E + s, ctx);
         }
 
-        status |= _aff_set_batch(lane, start, n, t, ctx);
+        status |= _gr_ec_jac_point_vec_get_aff_point_vec(lane, start, n, ctx);
 
         for (z = 0; z < zc && status == GR_SUCCESS && !stop; z++)
         {
@@ -601,20 +541,20 @@ _walk(const gr_ec_point_t P0, const fmpz * U, slong nu, int sgn,
 
     fmpz_clear(d);
     gr_heap_clear_vec(t, 2 * K, R);
-    gr_ec_point_clear(T, ctx);
-    gr_ec_point_clear(Acur, ctx);
+    gr_ec_jac_point_clear(T, ctx);
+    gr_ec_jac_point_clear(Acur, ctx);
     gr_ec_aff_point_clear(Da, ctx);
 
     for (i = 0; i < K; i++)
     {
-        gr_ec_point_clear(start + i, ctx);
+        gr_ec_jac_point_clear(start + i, ctx);
         gr_ec_aff_point_clear(lane + i, ctx);
     }
     flint_free(lane);
     flint_free(start);
 
     for (i = 0; i < S; i++)
-        gr_ec_point_clear(E + i, ctx);
+        gr_ec_jac_point_clear(E + i, ctx);
     flint_free(E);
 
     return status;
@@ -625,10 +565,10 @@ _walk(const gr_ec_point_t P0, const fmpz * U, slong nu, int sgn,
     time for as long as the result still kills P.
 */
 static int
-_point_order(fmpz_t ord, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+_point_order(fmpz_t ord, const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
 {
     fmpz_factor_t fac;
-    gr_ec_point_t T;
+    gr_ec_jac_point_t T;
     fmpz_t red;
     slong i;
     int status = GR_SUCCESS;
@@ -636,7 +576,7 @@ _point_order(fmpz_t ord, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
     fmpz_factor_init(fac);
     fmpz_factor(fac, n);
     fmpz_init(red);
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(T, ctx);
 
     fmpz_set(ord, n);
 
@@ -648,19 +588,19 @@ _point_order(fmpz_t ord, const gr_ec_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
         {
             fmpz_divexact(red, ord, fac->p + i);
 
-            status |= gr_ec_point_mul_fmpz(T, P, red, ctx);
+            status |= gr_ec_jac_point_mul_fmpz(T, P, red, ctx);
 
             if (status != GR_SUCCESS)
                 break;
 
-            if (gr_ec_point_is_inf(T, ctx) == T_TRUE)
+            if (gr_ec_jac_point_is_inf(T, ctx) == T_TRUE)
                 fmpz_set(ord, red);
             else
                 break;
         }
     }
 
-    gr_ec_point_clear(T, ctx);
+    gr_ec_jac_point_clear(T, ctx);
     fmpz_clear(red);
     fmpz_factor_clear(fac);
 
@@ -736,8 +676,8 @@ typedef struct
 {
     _htab_struct * tab;
     int found;
-    gr_ec_point_struct * P;
-    gr_ec_point_struct * T;
+    gr_ec_jac_point_struct * P;
+    gr_ec_jac_point_struct * T;
     const fmpz * c;
     const fmpz * M;
     fmpz * n;
@@ -791,9 +731,9 @@ _prog_try(_prog_struct * D, slong im, slong jv, int * status)
         if (fmpz_sgn(D->cand) <= 0)
             continue;
 
-        *status |= gr_ec_point_mul_fmpz(D->T, D->P, D->cand, ctx);
+        *status |= gr_ec_jac_point_mul_fmpz(D->T, D->P, D->cand, ctx);
 
-        if (*status == GR_SUCCESS && gr_ec_point_is_inf(D->T, ctx) == T_TRUE)
+        if (*status == GR_SUCCESS && gr_ec_jac_point_is_inf(D->T, ctx) == T_TRUE)
         {
             fmpz_set(D->n, D->cand);
             D->found = 1;
@@ -866,7 +806,7 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
         const fmpz_t M, slong max_baby, gr_ec_ctx_t ctx)
 {
     gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
-    gr_ec_point_t P, Q, B, mB, S, Sp, Sm, T;
+    gr_ec_jac_point_t P, Q, B, mB, S, Sp, Sm, T;
     gr_ptr xc, yc;
     _htab_struct tab;
     flint_rand_t state;
@@ -948,14 +888,14 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     flint_rand_init(state);
     flint_rand_set_seed(state, UWORD(0x9e3779b97f4a7c15), UWORD(0xbf58476d1ce4e5b9));
 
-    gr_ec_point_init(P, ctx);
-    gr_ec_point_init(Q, ctx);
-    gr_ec_point_init(B, ctx);
-    gr_ec_point_init(mB, ctx);
-    gr_ec_point_init(S, ctx);
-    gr_ec_point_init(Sp, ctx);
-    gr_ec_point_init(Sm, ctx);
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(P, ctx);
+    gr_ec_jac_point_init(Q, ctx);
+    gr_ec_jac_point_init(B, ctx);
+    gr_ec_jac_point_init(mB, ctx);
+    gr_ec_jac_point_init(S, ctx);
+    gr_ec_jac_point_init(Sp, ctx);
+    gr_ec_jac_point_init(Sm, ctx);
+    gr_ec_jac_point_init(T, ctx);
     GR_TMP_INIT2(xc, yc, R);
 
     _htab_init(&tab, m);
@@ -977,13 +917,13 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     {
         int found = 0;
 
-        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS)
+        if (gr_ec_jac_point_randtest(P, state, ctx) != GR_SUCCESS)
             continue;
 
-        if (gr_ec_point_is_inf(P, ctx) != T_FALSE)
+        if (gr_ec_jac_point_is_inf(P, ctx) != T_FALSE)
             continue;
 
-        status |= gr_ec_point_mul_fmpz(B, P, M, ctx);
+        status |= gr_ec_jac_point_mul_fmpz(B, P, M, ctx);
 
         if (status != GR_SUCCESS)
             break;
@@ -1000,16 +940,16 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
         if (!prog.found)
         {
             fmpz_set_si(t, m);
-            status |= gr_ec_point_mul_fmpz(Q, P, c, ctx);
-            status |= gr_ec_point_mul_fmpz(mB, B, t, ctx);
+            status |= gr_ec_jac_point_mul_fmpz(Q, P, c, ctx);
+            status |= gr_ec_jac_point_mul_fmpz(mB, B, t, ctx);
 
             /* giant steps Q - i (m B), i >= 0, and Q + i (m B), i >= 1 */
-            status |= gr_ec_point_neg(Sm, mB, ctx);
+            status |= gr_ec_jac_point_neg(Sm, mB, ctx);
             status |= _walk(Q, NULL, 1, 1, mB, Sm, ngiant + 1, _prog_giant_minus, &prog, ctx);
 
             if (!prog.found && status == GR_SUCCESS)
             {
-                status |= gr_ec_point_add(Sp, Q, mB, ctx);
+                status |= gr_ec_jac_point_add(Sp, Q, mB, ctx);
                 status |= _walk(Sp, NULL, 1, 1, mB, mB, ngiant, _prog_giant_plus, &prog, ctx);
             }
         }
@@ -1038,14 +978,14 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
 
     _htab_clear(&tab);
     GR_TMP_CLEAR2(xc, yc, R);
-    gr_ec_point_clear(T, ctx);
-    gr_ec_point_clear(Sm, ctx);
-    gr_ec_point_clear(Sp, ctx);
-    gr_ec_point_clear(S, ctx);
-    gr_ec_point_clear(mB, ctx);
-    gr_ec_point_clear(B, ctx);
-    gr_ec_point_clear(Q, ctx);
-    gr_ec_point_clear(P, ctx);
+    gr_ec_jac_point_clear(T, ctx);
+    gr_ec_jac_point_clear(Sm, ctx);
+    gr_ec_jac_point_clear(Sp, ctx);
+    gr_ec_jac_point_clear(S, ctx);
+    gr_ec_jac_point_clear(mB, ctx);
+    gr_ec_jac_point_clear(B, ctx);
+    gr_ec_jac_point_clear(Q, ctx);
+    gr_ec_jac_point_clear(P, ctx);
     flint_rand_clear(state);
 
 cleanup_ints:
@@ -1290,8 +1230,8 @@ typedef struct
     const fmpz * U1;
     const fmpz * U2;
     const fmpz * q;
-    gr_ec_point_struct * P;
-    gr_ec_point_struct * T;
+    gr_ec_jac_point_struct * P;
+    gr_ec_jac_point_struct * T;
     fmpz ** cand;
     slong * ncand;
     slong * alloc;
@@ -1346,9 +1286,9 @@ _ms_giant(void * data, slong k, slong z, ulong h,
 
         fmpz_add_ui(e, D->q, 1);
         fmpz_sub(e, e, t);
-        *status |= gr_ec_point_mul_fmpz(D->T, D->P, e, ctx);
+        *status |= gr_ec_jac_point_mul_fmpz(D->T, D->P, e, ctx);
 
-        if (*status == GR_SUCCESS && gr_ec_point_is_inf(D->T, ctx) == T_TRUE)
+        if (*status == GR_SUCCESS && gr_ec_jac_point_is_inf(D->T, ctx) == T_TRUE)
         {
             slong i;
             int dup = 0;
@@ -1390,7 +1330,7 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     fmpz * U1 = NULL, * U2 = NULL;
     fmpz * cand = NULL;
     fmpz_t q, W, tc, m1, m2, M, c, zmin, zmax, e, t, N, c1, c2;
-    gr_ec_point_t P, Q, B1, B2, Cz, D, Ab, S, T;
+    gr_ec_jac_point_t P, Q, B1, B2, Cz, D, Ab, S, T;
     _ms_struct ms;
     gr_ptr xc, yc;
     _htab_struct tab;
@@ -1468,15 +1408,15 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     flint_rand_init(state);
     flint_rand_set_seed(state, UWORD(0x2545f4914f6cdd1d), UWORD(0x9e3779b97f4a7c15));
 
-    gr_ec_point_init(P, ctx);
-    gr_ec_point_init(Q, ctx);
-    gr_ec_point_init(B1, ctx);
-    gr_ec_point_init(B2, ctx);
-    gr_ec_point_init(Cz, ctx);
-    gr_ec_point_init(D, ctx);
-    gr_ec_point_init(Ab, ctx);
-    gr_ec_point_init(S, ctx);
-    gr_ec_point_init(T, ctx);
+    gr_ec_jac_point_init(P, ctx);
+    gr_ec_jac_point_init(Q, ctx);
+    gr_ec_jac_point_init(B1, ctx);
+    gr_ec_jac_point_init(B2, ctx);
+    gr_ec_jac_point_init(Cz, ctx);
+    gr_ec_jac_point_init(D, ctx);
+    gr_ec_jac_point_init(Ab, ctx);
+    gr_ec_jac_point_init(S, ctx);
+    gr_ec_jac_point_init(T, ctx);
     GR_TMP_INIT2(xc, yc, R);
 
     _htab_init(&tab, n1 * Z1);
@@ -1502,8 +1442,8 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     for (attempt = 0; attempt < GR_EC_BSGS_MAX_POINTS && ncand == 0 && status == GR_SUCCESS; attempt++)
     {
 
-        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS
-                || gr_ec_point_is_inf(P, ctx) != T_FALSE)
+        if (gr_ec_jac_point_randtest(P, state, ctx) != GR_SUCCESS
+                || gr_ec_jac_point_is_inf(P, ctx) != T_FALSE)
             continue;
 
         /* Q = (q + 1 - tc - M zmin) P, B1 = m3 m2 P, Cz = M P,
@@ -1511,13 +1451,13 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
         fmpz_add_ui(e, q, 1);
         fmpz_sub(e, e, tc);
         fmpz_submul(e, M, zmin);
-        status |= gr_ec_point_mul_fmpz(Q, P, e, ctx);
+        status |= gr_ec_jac_point_mul_fmpz(Q, P, e, ctx);
         fmpz_mul(e, m3, m2);
-        status |= gr_ec_point_mul_fmpz(B1, P, e, ctx);
-        status |= gr_ec_point_mul_fmpz(Cz, P, M, ctx);
+        status |= gr_ec_jac_point_mul_fmpz(B1, P, e, ctx);
+        status |= gr_ec_jac_point_mul_fmpz(Cz, P, M, ctx);
         fmpz_mul(e, m3, m1);
-        status |= gr_ec_point_mul_fmpz(B2, P, e, ctx);
-        status |= gr_ec_point_mul_si(D, Cz, Z1, ctx);
+        status |= gr_ec_jac_point_mul_fmpz(B2, P, e, ctx);
+        status |= gr_ec_jac_point_mul_si(D, Cz, Z1, ctx);
 
         _htab_reset(&tab);
         ms.tab = &tab;
@@ -1525,7 +1465,7 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
         ms.T = T;
 
         /* baby side: Q - u1 B1 - z1 Cz */
-        status |= gr_ec_point_neg(S, Cz, ctx);
+        status |= gr_ec_jac_point_neg(S, Cz, ctx);
         status |= _walk(Q, U1, n1, -1, B1, S, Z1, _ms_baby, &ms, ctx);
 
         if (status != GR_SUCCESS)
@@ -1533,7 +1473,7 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
 
 
         /* giant side: u2 B2 + z2 D, every match confirmed by N P = O */
-        status |= gr_ec_point_zero(Ab, ctx);
+        status |= gr_ec_jac_point_zero(Ab, ctx);
         status |= _walk(Ab, U2, n2, 1, B2, D, nz2, _ms_giant, &ms, ctx);
     }
 
@@ -1542,14 +1482,14 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     {
         slong keep = 0;
 
-        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS)
+        if (gr_ec_jac_point_randtest(P, state, ctx) != GR_SUCCESS)
             continue;
 
         for (i = 0; i < ncand && status == GR_SUCCESS; i++)
         {
-            status |= gr_ec_point_mul_fmpz(T, P, cand + i, ctx);
+            status |= gr_ec_jac_point_mul_fmpz(T, P, cand + i, ctx);
 
-            if (status == GR_SUCCESS && gr_ec_point_is_inf(T, ctx) == T_TRUE)
+            if (status == GR_SUCCESS && gr_ec_jac_point_is_inf(T, ctx) == T_TRUE)
                 fmpz_swap(cand + keep++, cand + i);
         }
 
@@ -1568,15 +1508,15 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     if (have_tab)
         _htab_clear(&tab);
     GR_TMP_CLEAR2(xc, yc, R);
-    gr_ec_point_clear(T, ctx);
-    gr_ec_point_clear(S, ctx);
-    gr_ec_point_clear(Ab, ctx);
-    gr_ec_point_clear(D, ctx);
-    gr_ec_point_clear(Cz, ctx);
-    gr_ec_point_clear(B2, ctx);
-    gr_ec_point_clear(B1, ctx);
-    gr_ec_point_clear(Q, ctx);
-    gr_ec_point_clear(P, ctx);
+    gr_ec_jac_point_clear(T, ctx);
+    gr_ec_jac_point_clear(S, ctx);
+    gr_ec_jac_point_clear(Ab, ctx);
+    gr_ec_jac_point_clear(D, ctx);
+    gr_ec_jac_point_clear(Cz, ctx);
+    gr_ec_jac_point_clear(B2, ctx);
+    gr_ec_jac_point_clear(B1, ctx);
+    gr_ec_jac_point_clear(Q, ctx);
+    gr_ec_jac_point_clear(P, ctx);
     flint_rand_clear(state);
 
     if (status == GR_SUCCESS && !resolved)

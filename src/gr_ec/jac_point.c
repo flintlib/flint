@@ -307,18 +307,6 @@ gr_ec_jac_point_write(gr_stream_t out, const gr_ec_jac_point_t P,
 }
 
 int
-gr_ec_jac_point_get_str(char ** res, const gr_ec_jac_point_t P,
-        gr_ec_ctx_t ctx)
-{
-    gr_stream_t out;
-    int status;
-    gr_stream_init_str(out);
-    status = gr_ec_jac_point_write(out, P, ctx);
-    *res = out->s;
-    return status;
-}
-
-int
 gr_ec_jac_point_print(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
 {
     gr_stream_t out;
@@ -327,23 +315,63 @@ gr_ec_jac_point_print(const gr_ec_jac_point_t P, gr_ec_ctx_t ctx)
 }
 
 int
+gr_ec_jac_point_lift_x(gr_ec_jac_point_t res, gr_srcptr x, gr_ec_ctx_t ctx)
+{
+    gr_ec_aff_point_t A;
+    int status;
+
+    gr_ec_aff_point_init(A, ctx);
+
+    status = gr_ec_aff_point_lift_x(A, x, ctx);
+
+    if (status == GR_SUCCESS)
+        status = gr_ec_jac_point_set_aff_point(res, A, ctx);
+    else
+        res->is_infinity = T_UNKNOWN;
+
+    gr_ec_aff_point_clear(A, ctx);
+
+    return status;
+}
+
+int
 gr_ec_jac_point_randtest(gr_ec_jac_point_t res, flint_rand_t state,
         gr_ec_ctx_t ctx)
 {
-    gr_ec_point_t P;
+    gr_ctx_struct * R = GR_EC_ELEM_CTX(ctx);
+    gr_ec_aff_point_t A;
+    gr_ptr u, t;
     int status;
 
-    gr_ec_point_init(P, ctx);
+    gr_ec_aff_point_init(A, ctx);
 
-    status = gr_ec_point_randtest(P, state, ctx);
+    status = gr_ec_aff_point_randtest(A, state, ctx);
 
     if (status == GR_SUCCESS)
-        status = gr_ec_jac_point_set_point(res, P, ctx);
+        status = gr_ec_jac_point_set_aff_point(res, A, ctx);
+
+    /* randomize the representative: (u^2 X, u^3 Y, u Z) */
+    if (status == GR_SUCCESS && res->is_infinity == T_FALSE)
+    {
+        GR_TMP_INIT2(u, t, R);
+
+        if (gr_randtest(u, state, R) == GR_SUCCESS
+                && gr_is_invertible(u, R) == T_TRUE)
+        {
+            status |= gr_mul(JZ(res), JZ(res), u, R);
+            status |= gr_sqr(t, u, R);
+            status |= gr_mul(JX(res), JX(res), t, R);
+            status |= gr_mul(t, t, u, R);
+            status |= gr_mul(JY(res), JY(res), t, R);
+        }
+
+        GR_TMP_CLEAR2(u, t, R);
+    }
 
     if (status != GR_SUCCESS)
         res->is_infinity = T_UNKNOWN;
 
-    gr_ec_point_clear(P, ctx);
+    gr_ec_aff_point_clear(A, ctx);
 
     return status;
 }

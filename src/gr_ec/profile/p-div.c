@@ -17,7 +17,7 @@
 
       count      gr_ec_ctx_cardinality on a context that knows nothing:
                  the price of learning the order the hard way
-      hint       gr_ec_ctx_set_order with the right answer, on a context
+      hint       gr_ec_ctx_set_cardinality with the right answer, on a context
                  that knows nothing: the price of being told instead. Over
                  a field too large to walk this is twenty scalar
                  multiplications against random points, so it should track
@@ -34,7 +34,7 @@
 
     The two div columns are the point of the file. They are the same
     operation and differ by orders of magnitude, which is why
-    gr_ec_point_div_fmpz works as hard as it does to stay in the first one.
+    gr_ec_jac_point_div_fmpz works as hard as it does to stay in the first one.
 */
 
 #include <stdio.h>
@@ -101,7 +101,7 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
     {
         gr_ctx_t R;
         gr_ec_ctx_t E;
-        gr_ec_point_t P, Q;
+        gr_ec_jac_point_t P, Q;
         gr_ptr a4, a6;
         fmpz_t N, big, n;
         slong tries;
@@ -139,8 +139,8 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
         fmpz_init(N);
         fmpz_init(big);
         fmpz_init(n);
-        gr_ec_point_init(P, E);
-        gr_ec_point_init(Q, E);
+        gr_ec_jac_point_init(P, E);
+        gr_ec_jac_point_init(Q, E);
 
         if (gr_ec_ctx_cardinality(N, E) != GR_SUCCESS)
             goto next;
@@ -148,23 +148,23 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
         /* the identity divides by anything at no cost, which would make
            the division columns meaningless */
         for (tries = 0; tries < 50; tries++)
-            if (gr_ec_point_randtest(P, state, E) == GR_SUCCESS
-                    && gr_ec_point_is_inf(P, E) == T_FALSE)
+            if (gr_ec_jac_point_randtest(P, state, E) == GR_SUCCESS
+                    && gr_ec_jac_point_is_inf(P, E) == T_FALSE)
                 break;
 
         if (tries == 50)
             goto next;
 
         /* counting, on a context that has been told nothing */
-        gr_ec_ctx_clear_order(E);
+        fmpz_zero(&GR_EC_CTX(E)->cardinality);
         TIME_US(tc[nc], { fmpz_t t; fmpz_init(t);
                 GR_IGNORE(gr_ec_ctx_cardinality(t, E)); fmpz_clear(t); });
         nc++;
 
         /* being told, on a context that has been told nothing */
-        gr_ec_ctx_clear_order(E);
-        TIME_US(th[nh], { gr_ec_ctx_clear_order(E);
-                GR_IGNORE(gr_ec_ctx_set_order(E, N)); });
+        fmpz_zero(&GR_EC_CTX(E)->cardinality);
+        TIME_US(th[nh], { fmpz_zero(&GR_EC_CTX(E)->cardinality);
+                GR_IGNORE(gr_ec_ctx_set_cardinality(E, N)); });
         nh++;
 
         /* a random scalar four times as long as the order, so that
@@ -174,13 +174,13 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
         fmpz_randbits(big, state, 4 * bits);
         fmpz_abs(big, big);
 
-        gr_ec_ctx_clear_order(E);
-        TIME_US(mr[nmr], { gr_ec_ctx_clear_order(E);
-                GR_IGNORE(gr_ec_point_mul_fmpz(Q, P, big, E)); });
+        fmpz_zero(&GR_EC_CTX(E)->cardinality);
+        TIME_US(mr[nmr], { fmpz_zero(&GR_EC_CTX(E)->cardinality);
+                GR_IGNORE(gr_ec_jac_point_mul_fmpz(Q, P, big, E)); });
         nmr++;
 
-        GR_IGNORE(gr_ec_ctx_set_order(E, N));
-        TIME_US(mc[nmc], { GR_IGNORE(gr_ec_point_mul_fmpz(Q, P, big, E)); });
+        GR_IGNORE(gr_ec_ctx_set_cardinality(E, N));
+        TIME_US(mc[nmc], { GR_IGNORE(gr_ec_jac_point_mul_fmpz(Q, P, big, E)); });
         nmc++;
 
         /* dividing by something coprime to the order */
@@ -200,9 +200,9 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
 
             fmpz_clear(g);
 
-            if (d < 200 && gr_ec_point_div_fmpz(Q, P, n, E) == GR_SUCCESS)
+            if (d < 200 && gr_ec_jac_point_div_fmpz(Q, P, n, E) == GR_SUCCESS)
             {
-                TIME_US(dc[ndc], { GR_IGNORE(gr_ec_point_div_fmpz(Q, P, n, E)); });
+                TIME_US(dc[ndc], { GR_IGNORE(gr_ec_jac_point_div_fmpz(Q, P, n, E)); });
                 ndc++;
             }
         }
@@ -215,18 +215,18 @@ run_size(flint_rand_t state, slong bits, slong ncurves)
             {
                 fmpz_set_ui(n, d);
 
-                if (gr_ec_point_div_fmpz_nonunique(Q, P, n, E) == GR_SUCCESS)
+                if (gr_ec_jac_point_div_fmpz_nonunique(Q, P, n, E) == GR_SUCCESS)
                 {
                     TIME_US(dt[ndt], {
-                        GR_IGNORE(gr_ec_point_div_fmpz_nonunique(Q, P, n, E)); });
+                        GR_IGNORE(gr_ec_jac_point_div_fmpz_nonunique(Q, P, n, E)); });
                     ndt++;
                 }
             }
         }
 
 next:
-        gr_ec_point_clear(Q, E);
-        gr_ec_point_clear(P, E);
+        gr_ec_jac_point_clear(Q, E);
+        gr_ec_jac_point_clear(P, E);
         fmpz_clear(N);
         fmpz_clear(big);
         fmpz_clear(n);
@@ -269,7 +269,7 @@ int main(void)
     run_size(state, 64, 3);
 
     flint_printf("\n");
-    flint_printf("hint against count is what gr_ec_ctx_set_order saves a caller who\n");
+    flint_printf("hint against count is what gr_ec_ctx_set_cardinality saves a caller who\n");
     flint_printf("already knows the answer; mul cached against mul raw is what the\n");
     flint_printf("context saves itself once it does.\n");
 

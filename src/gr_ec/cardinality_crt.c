@@ -185,7 +185,7 @@ _gr_ec_cardinality_mod_p(fmpz_t res, const fmpz_t p, gr_ec_ctx_t ctx)
         /* the discriminant is a unit modulo p, so the reduction is smooth */
         if (status == GR_SUCCESS)
         {
-            status = gr_ec_ctx_cardinality(res, Ep);
+            status = _gr_ec_ctx_cardinality(res, Ep);
             gr_ec_ctx_clear(Ep);
         }
         else

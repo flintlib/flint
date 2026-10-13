@@ -390,7 +390,7 @@ static int
 _cm_select_order(fmpz_t res, const fmpz * t, slong n, const fmpz_t p,
         gr_ec_ctx_t ctx)
 {
-    gr_ec_point_t P, Q;
+    gr_ec_jac_point_t P, Q;
     flint_rand_t state;
     fmpz * N;
     char * alive;
@@ -407,14 +407,14 @@ _cm_select_order(fmpz_t res, const fmpz * t, slong n, const fmpz_t p,
         alive[i] = 1;
     }
 
-    gr_ec_point_init(P, ctx);
-    gr_ec_point_init(Q, ctx);
+    gr_ec_jac_point_init(P, ctx);
+    gr_ec_jac_point_init(Q, ctx);
     flint_rand_init(state);
 
     for (round = 0; round < GR_EC_CM_SELECT_POINTS && nalive > 1; round++)
     {
-        if (gr_ec_point_randtest(P, state, ctx) != GR_SUCCESS
-                || gr_ec_point_is_inf(P, ctx) != T_FALSE)
+        if (gr_ec_jac_point_randtest(P, state, ctx) != GR_SUCCESS
+                || gr_ec_jac_point_is_inf(P, ctx) != T_FALSE)
             continue;
 
         for (i = 0; i < n; i++)
@@ -422,8 +422,8 @@ _cm_select_order(fmpz_t res, const fmpz * t, slong n, const fmpz_t p,
             if (!alive[i])
                 continue;
 
-            if (gr_ec_point_mul_fmpz(Q, P, N + i, ctx) != GR_SUCCESS
-                    || gr_ec_point_is_inf(Q, ctx) != T_TRUE)
+            if (gr_ec_jac_point_mul_fmpz(Q, P, N + i, ctx) != GR_SUCCESS
+                    || gr_ec_jac_point_is_inf(Q, ctx) != T_TRUE)
             {
                 alive[i] = 0;
                 nalive--;
@@ -440,8 +440,8 @@ _cm_select_order(fmpz_t res, const fmpz * t, slong n, const fmpz_t p,
             }
 
     flint_rand_clear(state);
-    gr_ec_point_clear(Q, ctx);
-    gr_ec_point_clear(P, ctx);
+    gr_ec_jac_point_clear(Q, ctx);
+    gr_ec_jac_point_clear(P, ctx);
     flint_free(alive);
     _fmpz_vec_clear(N, n);
 

@@ -116,7 +116,7 @@ _gr_ec_jac_point_dbl_long_weierstrass_ws(gr_ec_jac_point_t res,
 
     /* the point was taken to be of order greater than two on the strength
        of this being nonzero */
-    GR_EC_WITNESS(w, T(2));
+    status |= _gr_ec_witness(w, T(2), R);
 
     /* T3 = M = 3 X^2 + 2 a2 X ZZ + a4 ZZ^2 - a1 Y Z */
     status |= gr_sqr(T(4), JX(P), R);
@@ -240,7 +240,7 @@ _gr_ec_jac_point_dbl_short_weierstrass_ws(gr_ec_jac_point_t res,
 
     /* the point was taken to be of order greater than two on the strength
        of 2 Y Z being nonzero */
-    GR_EC_WITNESS(w, JZ(res));
+    status |= _gr_ec_witness(w, JZ(res), R);
 
     /* X3 = M^2 - 2 S */
     status |= gr_sqr(JX(res), T(1), R);
@@ -572,7 +572,7 @@ _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res,
         {
             /* the points were taken to be inverse on the strength of r
                being nonzero */
-            GR_EC_WITNESS(w, T(2));
+            status |= _gr_ec_witness(w, T(2), R);
             return (status == GR_SUCCESS) ? gr_ec_jac_point_zero(res, ctx)
                                           : status;
         }
@@ -583,7 +583,7 @@ _gr_ec_jac_point_add_aff_point_long_weierstrass_ws(gr_ec_jac_point_t res,
 
     /* the points were taken to be distinct on the strength of H being
        nonzero */
-    GR_EC_WITNESS(w, T(3));
+    status |= _gr_ec_witness(w, T(3), R);
 
     /* T4 = v = H Z1 = Z3, T5 = HH */
     status |= gr_mul(T(4), T(3), JZ(P), R);
@@ -685,7 +685,7 @@ _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res,
         {
             /* the points were taken to be inverse on the strength of r
                being nonzero */
-            GR_EC_WITNESS(w, T(2));
+            status |= _gr_ec_witness(w, T(2), R);
             return (status == GR_SUCCESS) ? gr_ec_jac_point_zero(res, ctx)
                                           : status;
         }
@@ -696,7 +696,7 @@ _gr_ec_jac_point_add_aff_point_short_weierstrass_ws(gr_ec_jac_point_t res,
 
     /* the points were taken to be distinct on the strength of H being
        nonzero */
-    GR_EC_WITNESS(w, T(1));
+    status |= _gr_ec_witness(w, T(1), R);
 
     /* T4 = HH, T5 = HHH, T6 = HHH Y1, T4 = V = X1 HH */
     status |= gr_sqr(T(4), T(1), R);
@@ -915,8 +915,8 @@ _gr_ec_jac_point_mul_fmpz_binary_witness(gr_ec_jac_point_t res,
 }
 
 int
-gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res, gr_ptr w,
-        const gr_ec_jac_point_t P, const fmpz_t n, gr_ec_ctx_t ctx)
+gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res,
+        const gr_ec_jac_point_t P, const fmpz_t n, gr_ptr w, gr_ec_ctx_t ctx)
 {
     int status;
 
@@ -970,20 +970,15 @@ gr_ec_jac_point_mul_fmpz(gr_ec_jac_point_t res, const gr_ec_jac_point_t P,
         return GR_UNABLE;
     }
 
-    /*
-        An annihilator the context already knows shortens the ladder, since
-        m P = 0 makes n P = (n mod m) P. Nothing is computed to find one:
-        if the context does not know one, the scalar is used as it stands,
-        because counting the points to save a few doublings would be a
-        thoroughly bad trade.
-    */
-    if (GR_EC_CTX(ctx)->order_kind != GR_EC_ORDER_UNKNOWN
-            && fmpz_cmpabs(n, &GR_EC_CTX(ctx)->order) >= 0)
+    /* reduce the scalar modulo the cardinality if it is known; it is never
+       computed for this */
+    if (!fmpz_is_zero(&GR_EC_CTX(ctx)->cardinality)
+            && fmpz_cmpabs(n, &GR_EC_CTX(ctx)->cardinality) >= 0)
     {
         fmpz_t k;
 
         fmpz_init(k);
-        fmpz_mod(k, n, &GR_EC_CTX(ctx)->order);
+        fmpz_mod(k, n, &GR_EC_CTX(ctx)->cardinality);
 
         if (fmpz_is_zero(k))
             status = gr_ec_jac_point_zero(res, ctx);

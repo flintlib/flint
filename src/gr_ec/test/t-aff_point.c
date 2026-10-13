@@ -157,7 +157,7 @@ TEST_GR_FUNCTION_START(gr_ec_aff_point, state, count_success, count_domain, coun
         }
 
         /* the group law needs a field */
-        if (gr_ec_ctx_is_over_field(E) == T_FALSE)
+        if (gr_ctx_is_field(gr_ec_ctx_base_ring(E)) == T_FALSE)
             FLINT_TEST(gr_ec_aff_point_dbl(A, P, E) == GR_DOMAIN);
 
         /* on a short curve the general formulas must give the same

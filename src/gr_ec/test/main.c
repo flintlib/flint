@@ -12,15 +12,13 @@
 /* Include functions *********************************************************/
 
 #include "t-ctx.c"
-#include "t-point.c"
 #include "t-aff_point.c"
 #include "t-jac_point.c"
-#include "t-xz_point.c"
 #include "t-witness.c"
 #include "t-convert.c"
 #include "t-cardinality.c"
 #include "t-sea.c"
-#include "t-order.c"
+#include "t-set_cardinality.c"
 #include "t-div.c"
 #include "t-division_poly.c"
 #include "t-mul.c"
@@ -33,15 +31,13 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_ec_ctx),
-    TEST_FUNCTION(gr_ec_point),
     TEST_FUNCTION(gr_ec_aff_point),
     TEST_FUNCTION(gr_ec_jac_point),
-    TEST_FUNCTION(gr_ec_xz_point),
     TEST_FUNCTION(gr_ec_witness),
     TEST_FUNCTION(gr_ec_convert),
     TEST_FUNCTION(gr_ec_cardinality),
     TEST_FUNCTION(gr_ec_sea),
-    TEST_FUNCTION(gr_ec_order),
+    TEST_FUNCTION(gr_ec_ctx_set_cardinality),
     TEST_FUNCTION(gr_ec_div),
     TEST_FUNCTION(gr_ec_division_poly),
     TEST_FUNCTION(gr_ec_mul),

@@ -133,7 +133,7 @@ ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a,
     }
 
     if (ok)
-        ok = (gr_ec_jac_point_mul_fmpz_witness(gR, acc, gP, k, E) == GR_SUCCESS);
+        ok = (gr_ec_jac_point_mul_fmpz_witness(gR, gP, k, acc, E) == GR_SUCCESS);
 
     if (ok)
     {

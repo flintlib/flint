@@ -170,7 +170,7 @@ gr_ec_ctx_cardinality_subfield(fmpz_t res, gr_ec_ctx_t ctx)
         The count over F_p goes through the ordinary dispatch, so the
         complex multiplication shortcut and everything else applies there.
     */
-    status = gr_ec_ctx_cardinality(N1, E1);
+    status = _gr_ec_ctx_cardinality(N1, E1);
 
     if (status != GR_SUCCESS)
         goto cleanup;
