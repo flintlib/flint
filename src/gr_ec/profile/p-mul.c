@@ -11,40 +11,9 @@
 */
 
 /*
-    Scalar multiplication k P on y^2 = x^3 + a x + b over F_p, for a scalar
-    of the same size as p. Compares the three point representations of
-    gr_ec against each other, against the plain binary Jacobian ladder,
-    and against the witness-taking ladder, whose extra cost is what it buys
-    a caller who needs to know the group law was entitled to its branches.
-
-    There is no longer an ecpp column: ecpp_point_mul_gr now calls
-    gr_ec_jac_point_mul_fmpz_witness, so timing it here would be timing
-    this file's own witness column plus a context setup.
-
-    The unit is microseconds per k P, so the numbers can be compared
-    directly with what other libraries report at the same modulus size.
-    For reference, PARI 2.15 ellmul over the same kind of curve, measured
-    with
-
-        S = [32,64,128,192,256,384,512,1024,2048];
-        for(idx=1, length(S), bb = S[idx]; pp = randomprime([2^(bb-1), 2^bb]);
-            aa = random(pp); xx = random(pp); yy = random(pp);
-            cc = lift(Mod(yy^2 - xx^3 - aa*xx, pp)); EE = ellinit([aa, cc], pp);
-            PP = [Mod(xx,pp), Mod(yy,pp)]; kk = random(2^bb); nn = 1;
-            while(1, gettime(); for(j = 1, nn, ellmul(EE, PP, kk)); tt = gettime();
-                  if(tt >= 200, break); nn = nn * 4);
-            printf("%5d %10.2f\n", bb, tt*1000.0/nn));
-
-    gave, on the machine this was written on (in microseconds, median of
-    three runs, next to the numbers this profile reports there):
-
-        bits      32     64    128    192    256    384    512   1024    2048
-        PARI   21.18  40.41 133.54 252.93 372.07 718.75 1296.9 6125.0 36562.5
-        ecpp    7.35  25.40  24.70  91.20 137.00 332.00  591.0 3700.0 26800.0
-        gr_ec   6.89  26.10  22.10  84.30 132.00 299.00  540.0 3280.0 24000.0
-
-    The jump between 64 and 128 bits is the modulus crossing into mpn_mod,
-    which handles 2 to 16 limbs; outside that range the ring is fmpz_mod.
+    Scalar multiplication k P on y^2 = x^3 + a x + b over F_p, with k of
+    the size of p: affine, Jacobian, the plain binary Jacobian ladder and
+    the witness ladder used by ECPP. Prints microseconds per k P.
 */
 
 #include <stdio.h>

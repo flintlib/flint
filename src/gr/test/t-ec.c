@@ -292,12 +292,9 @@ check_additive_group(flint_rand_t state)
 
 /*
     Over a base ring with zero divisors, E is not a group and the group
-    axioms must not be asserted. Adding two honest points can produce a
-    projective triple whose Z is a zero divisor, which is neither an affine
-    point nor the point at infinity; from there the chord and tangent
-    formulas have nothing to say. That is not a defect to be fixed -- it is
-    what elliptic curve factorization exploits -- so the operations stay
-    available and only their meaning is restricted.
+    axioms must not be asserted: adding two points can produce a Z which
+    is a zero divisor. The operations stay available, as elliptic curve
+    factorization relies on this.
 
     What is checked here is that the domain is still usable: nothing
     crashes.

@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2026 Fredrik Johansson
     Copyright (C) 2026 Maël Hostettler
-    Developed using Claude Fable 5.1
+    Developed using Claude Fable 5.1 and Opus 5.5
 
     This file is part of FLINT.
 
@@ -18,54 +18,6 @@
 #include "mpn_mod.h"
 #include "ecpp.h"
 
-/*
-    Points in Jacobian coordinates (X : Y : Z), Z = 0 for the point at
-    infinity.
-*/
-
-void
-ecpp_point_init(ecpp_point_t P)
-{
-    fmpz_init(P->X);
-    fmpz_init(P->Y);
-    fmpz_init(P->Z);
-}
-
-void
-ecpp_point_clear(ecpp_point_t P)
-{
-    fmpz_clear(P->X);
-    fmpz_clear(P->Y);
-    fmpz_clear(P->Z);
-}
-
-void
-ecpp_point_set_affine(ecpp_point_t P, const fmpz_t x, const fmpz_t y)
-{
-    fmpz_set(P->X, x);
-    fmpz_set(P->Y, y);
-    fmpz_one(P->Z);
-}
-
-int
-ecpp_point_is_zero(const ecpp_point_t P)
-{
-    return fmpz_is_zero(P->Z);
-}
-
-/*
-    Point arithmetic on y^2 = x^3 + a x + b over Z/n, using gr_ec.
-
-    Modulo a composite n, the group law may take a wrong branch (a value
-    can be zero modulo one prime factor of n but not another), so the
-    result is only trusted if every value treated as nonzero is a unit;
-    gr_ec_jac_point_mul_fmpz_witness collects these values in acc.
-*/
-
-#define PX(P) (P)
-#define PY(P) GR_ENTRY(P, 1, sz)
-#define PZ(P) GR_ENTRY(P, 2, sz)
-
 void
 ecpp_gr_ctx_init(gr_ctx_t gctx, const fmpz_mod_ctx_t ctx)
 {
@@ -78,112 +30,97 @@ ecpp_gr_ctx_init(gr_ctx_t gctx, const fmpz_mod_ctx_t ctx)
     gr_ctx_init_fmpz_mod(gctx, n);
 }
 
-int
-ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a,
-        gr_ptr acc, gr_ctx_t ctx)
+/* 1 if gcd(x, n) = 1 */
+static int
+_is_unit(gr_srcptr x, const fmpz_t n, gr_ctx_t R)
 {
-    slong sz = ctx->sizeof_elem;
-    gr_ec_ctx_t E;
-    gr_ec_jac_point_t gP, gR;
-    gr_ptr a6;
-    int status;
-    int ok;
+    fmpz_t g;
+    int res;
 
-    a6 = gr_heap_init(ctx);
+    fmpz_init(g);
+    GR_MUST_SUCCEED(gr_get_fmpz(g, x, R));
+    fmpz_gcd(g, g, n);
+    res = fmpz_is_one(g);
+    fmpz_clear(g);
 
-    /*
-        a6 plays no part in the Jacobian group law, but gr_ec rejects a
-        singular curve: a6 = 0 is singular when a = 0, and then a6 = 1
-        gives discriminant -432.
-    */
-    status = gr_zero(a6, ctx);
-    if (status == GR_SUCCESS)
-        status = gr_ec_ctx_init_short_weierstrass(E, ctx, a, a6);
-    if (status == GR_DOMAIN && gr_one(a6, ctx) == GR_SUCCESS)
-        status = gr_ec_ctx_init_short_weierstrass(E, ctx, a, a6);
-    ok = (status == GR_SUCCESS);
-
-    gr_heap_clear(a6, ctx);
-
-    if (!ok)
-        return 0;
-
-    gr_ec_jac_point_init(gP, E);
-    gr_ec_jac_point_init(gR, E);
-
-    ok = (gr_set(GR_EC_JAC_POINT_X(gP, E), PX(P), ctx) == GR_SUCCESS)
-        && (gr_set(GR_EC_JAC_POINT_Y(gP, E), PY(P), ctx) == GR_SUCCESS)
-        && (gr_set(GR_EC_JAC_POINT_Z(gP, E), PZ(P), ctx) == GR_SUCCESS);
-
-    if (ok)
-    {
-        gP->is_infinity = gr_is_zero(PZ(P), ctx);
-        ok = (gP->is_infinity != T_UNKNOWN);
-    }
-
-    if (ok)
-        ok = (gr_ec_jac_point_mul_fmpz_witness(gR, gP, k, acc, E) == GR_SUCCESS);
-
-    if (ok)
-    {
-        if (gr_ec_jac_point_is_inf(gR, E) == T_TRUE)
-            ok = (gr_zero(PZ(R), ctx) == GR_SUCCESS);
-        else
-            ok = (gr_set(PX(R), GR_EC_JAC_POINT_X(gR, E), ctx) == GR_SUCCESS)
-                && (gr_set(PY(R), GR_EC_JAC_POINT_Y(gR, E), ctx) == GR_SUCCESS)
-                && (gr_set(PZ(R), GR_EC_JAC_POINT_Z(gR, E), ctx) == GR_SUCCESS);
-    }
-
-    gr_ec_jac_point_clear(gR, E);
-    gr_ec_jac_point_clear(gP, E);
-    gr_ec_ctx_clear(E);
-
-    return ok && gr_is_zero(acc, ctx) != T_TRUE;
+    return res;
 }
 
-/* the fmpz_mod interface of point.c, through gr */
+/*
+    Modulo a composite n, the group law may take a wrong branch (a value
+    can vanish modulo one prime factor of n but not another). The witness
+    w collects every value treated as nonzero; the result is only trusted
+    if w is a unit.
+*/
 int
-ecpp_point_mul(ecpp_point_t R, const ecpp_point_t P, const fmpz_t k,
-                        const fmpz_t a, fmpz_t acc, const fmpz_mod_ctx_t ctx)
+ecpp_point_check(const fmpz_t x, const fmpz_t y, const fmpz_t a,
+        const fmpz_t b, const fmpz_t k, const fmpz_t q,
+        const fmpz_mod_ctx_t ctx)
 {
-    gr_ctx_t gctx;
-    gr_ptr gP, gR, ga, gacc;
-    slong sz;
-    int ok;
+    const fmpz * n = fmpz_mod_ctx_modulus(ctx);
+    gr_ctx_t R;
+    gr_ec_ctx_t E;
+    gr_ec_jac_point_t P, Q;
+    gr_ptr u, v, w;
+    int result;
 
-    ecpp_gr_ctx_init(gctx, ctx);
-    sz = gctx->sizeof_elem;
-    gP = gr_heap_init_vec(3, gctx);
-    gR = gr_heap_init_vec(3, gctx);
-    ga = gr_heap_init(gctx);
-    gacc = gr_heap_init(gctx);
+    ecpp_gr_ctx_init(R, ctx);
+    u = gr_heap_init(R);
+    v = gr_heap_init(R);
+    w = gr_heap_init(R);
 
-    ok = (gr_set_fmpz(PX(gP), P->X, gctx) == GR_SUCCESS)
-      && (gr_set_fmpz(PY(gP), P->Y, gctx) == GR_SUCCESS)
-      && (gr_set_fmpz(PZ(gP), P->Z, gctx) == GR_SUCCESS)
-      && (gr_set_fmpz(ga, a, gctx) == GR_SUCCESS)
-      && (gr_set_fmpz(gacc, acc, gctx) == GR_SUCCESS);
+    GR_MUST_SUCCEED(gr_set_fmpz(u, a, R));
+    GR_MUST_SUCCEED(gr_set_fmpz(v, b, R));
 
-    if (ok)
-        ok = ecpp_point_mul_gr(gR, gP, k, ga, gacc, gctx);
-
-    /* acc and R are read back even on failure (acc may be zero) */
-    GR_MUST_SUCCEED(gr_get_fmpz(acc, gacc, gctx));
-
-    if (ok)
+    /* a singular curve proves nothing */
+    if (gr_ec_ctx_init_short_weierstrass(E, R, u, v) != GR_SUCCESS)
     {
-        GR_MUST_SUCCEED(gr_get_fmpz(R->X, PX(gR), gctx));
-        GR_MUST_SUCCEED(gr_get_fmpz(R->Y, PY(gR), gctx));
-        GR_MUST_SUCCEED(gr_get_fmpz(R->Z, PZ(gR), gctx));
+        result = ECPP_POINT_WRONG_ORDER;
+        goto cleanup_ring;
     }
+
+    gr_ec_jac_point_init(P, E);
+    gr_ec_jac_point_init(Q, E);
+
+    GR_MUST_SUCCEED(gr_set_fmpz(u, x, R));
+    GR_MUST_SUCCEED(gr_set_fmpz(v, y, R));
+    GR_MUST_SUCCEED(_gr_ec_jac_point_set_affine(P, u, v, E));
+    GR_MUST_SUCCEED(gr_one(w, R));
+
+    /* Q = k P */
+    if (gr_ec_jac_point_mul_fmpz_witness(Q, P, k, w, E) != GR_SUCCESS
+            || gr_ec_jac_point_is_inf(Q, E) != T_FALSE)
+    {
+        result = ECPP_POINT_ZERO;
+        goto cleanup;
+    }
+
+    if (!_is_unit(GR_EC_JAC_POINT_Z(Q, E), n, R))
+    {
+        result = ECPP_POINT_COMPOSITE;
+        goto cleanup;
+    }
+
+    /* P = q Q */
+    if (gr_ec_jac_point_mul_fmpz_witness(P, Q, q, w, E) != GR_SUCCESS)
+        result = ECPP_POINT_WRONG_ORDER;
+    else if (!_is_unit(w, n, R))
+        result = ECPP_POINT_COMPOSITE;
+    else if (gr_ec_jac_point_is_inf(P, E) != T_TRUE)
+        result = ECPP_POINT_WRONG_ORDER;
     else
-        fmpz_zero(R->Z);
+        result = ECPP_POINT_OK;
 
-    gr_heap_clear_vec(gP, 3, gctx);
-    gr_heap_clear_vec(gR, 3, gctx);
-    gr_heap_clear(ga, gctx);
-    gr_heap_clear(gacc, gctx);
-    gr_ctx_clear(gctx);
+cleanup:
+    gr_ec_jac_point_clear(P, E);
+    gr_ec_jac_point_clear(Q, E);
+    gr_ec_ctx_clear(E);
 
-    return ok;
+cleanup_ring:
+    gr_heap_clear(u, R);
+    gr_heap_clear(v, R);
+    gr_heap_clear(w, R);
+    gr_ctx_clear(R);
+
+    return result;
 }

@@ -23,9 +23,8 @@ int
 ecpp_verify_step(const ecpp_step_struct * s)
 {
     int result = 0;
-    fmpz_t t, u, k, acc;
+    fmpz_t t, u, k;
     fmpz_mod_ctx_t ctx;
-    ecpp_point_t P, R;
 
     if (fmpz_cmp_ui(s->n, 3) <= 0 || fmpz_is_even(s->n))
         return 0;
@@ -33,10 +32,7 @@ ecpp_verify_step(const ecpp_step_struct * s)
     fmpz_init(t);
     fmpz_init(u);
     fmpz_init(k);
-    fmpz_init(acc);
     fmpz_mod_ctx_init(ctx, s->n);
-    ecpp_point_init(P);
-    ecpp_point_init(R);
 
     /* q | m, m = k q with k > 1 */
     if (fmpz_cmp_ui(s->q, 1) <= 0 || !fmpz_divisible(s->m, s->q))
@@ -77,32 +73,17 @@ ecpp_verify_step(const ecpp_step_struct * s)
     if (!fmpz_equal(t, u))
         goto cleanup;
 
-    ecpp_point_set_affine(P, s->x, s->y);
-    fmpz_one(acc);
-
-    /* m P = O; a failed multiplication proves nothing */
-    if (!ecpp_point_mul(R, P, s->m, s->a, acc, ctx) || !ecpp_point_is_zero(R))
-        goto cleanup;
-
-    /* (m / q) P != O */
-    if (!ecpp_point_mul(R, P, k, s->a, acc, ctx) || ecpp_point_is_zero(R))
-        goto cleanup;
-
-    /* all case distinctions were legitimate */
-    fmpz_gcd(t, acc, s->n);
-    if (!fmpz_is_one(t))
+    /* (m / q) P != O and m P = O, with every case distinction valid */
+    if (ecpp_point_check(s->x, s->y, s->a, s->b, k, s->q, ctx) != ECPP_POINT_OK)
         goto cleanup;
 
     result = 1;
 
 cleanup:
-    ecpp_point_clear(P);
-    ecpp_point_clear(R);
     fmpz_mod_ctx_clear(ctx);
     fmpz_clear(t);
     fmpz_clear(u);
     fmpz_clear(k);
-    fmpz_clear(acc);
 
     return result;
 }

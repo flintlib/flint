@@ -910,11 +910,8 @@ gr_ec_jac_point_mul_fmpz_witness(gr_ec_jac_point_t res,
         return GR_UNABLE;
     }
 
-    /*
-        No reduction against a cached order here, deliberately: this path
-        exists for rings where the points may not form a group at all, and
-        there an annihilator would mean nothing.
-    */
+    /* no reduction modulo a cached cardinality: over a ring that is not
+       a field, the points need not form a group */
     status = _gr_ec_jac_point_mul_fmpz_naf_witness(res, P, n, w, ctx);
 
     if (status != GR_SUCCESS)
