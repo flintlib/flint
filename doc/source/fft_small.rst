@@ -232,14 +232,98 @@ Transform plans and operands
     of the exact one even when those slots hold garbage, such as the
     aliased coefficients of a cyclic transform.
 
+.. function:: int fft_small_plan_init_mpn_window(fft_small_plan_t P, mpn_ctx_t R, ulong an_max, ulong bn_max, ulong len_bound, int is_signed, ulong lo, ulong hi)
+              ulong fft_small_plan_mpn_nslots(const fft_small_plan_t P, ulong an_max, ulong bn_max)
+              int fft_small_plan_is_cyclic(const fft_small_plan_t P)
+
+    :func:`fft_small_plan_init_mpn` for products of which only the limbs
+    `[lo, hi)` are needed. Only the chunk coefficients that can reach
+    those limbs are reconstructed, and when a power of two `2^d` at least
+    the operand lengths and the highest such coefficient exists with the
+    coefficients past `2^d` aliasing onto ones below the lowest, the
+    transforms are cyclic of length `2^d`; exports must then read windows
+    inside `[lo, hi)` (:func:`fft_small_export_mpn_signed_window`), which
+    stay within one unit of the exact window. ``lo = 0`` with *hi* at
+    least the product length gives the ordinary plan. *nslots* is the
+    number of slots the inverse transform computes for operands of at
+    most *an_max* and *bn_max* limbs; *is_cyclic* tells whether slots
+    alias. Shared by the complex products and the gr transformed ring.
+
+.. function:: ulong fft_small_export_mpn_signed_limbs(const fft_small_plan_t P, ulong nslots)
+              ulong fft_small_export_mpn_limbs(const fft_small_plan_t P, ulong len_bound, ulong nslots)
+
+    The number of limbs the signed, respectively unsigned (with up to
+    *len_bound* accumulated products per slot), reconstruction of
+    *nslots* slots writes.
+
+.. function:: void fft_small_ifft_trunc(fft_small_op_t X, ulong itrunc, ulong clear_to, const ulong * scale, const fft_small_plan_t P)
+
+    Inverse transform of the first *itrunc* slots in place, threaded
+    over the primes. When *scale* is not ``NULL`` it holds per-prime
+    normalizers deferred past the pointwise stage, applied after the
+    inverse transform (the gr ring defers them). The slots
+    `[\mathrm{itrunc}, \mathrm{clear\_to})` are zeroed, for unsigned
+    exports reading whole chunks past the transformed range.
+
+.. function:: void fft_small_op_pool_init(fft_small_op_pool_t pool)
+              int fft_small_op_pool_fit(fft_small_op_pool_t pool, mpn_ctx_t R, ulong slab_size, slong count, ulong stage_bytes, int flags)
+              void fft_small_op_pool_clear(fft_small_op_pool_t pool)
+              double * fft_small_op_pool_take(fft_small_op_pool_t pool)
+              void fft_small_op_pool_give(fft_small_op_pool_t pool, double * d)
+              int fft_small_op_pool_owns(const fft_small_op_pool_t pool, const void * d)
+              ulong * fft_small_op_pool_scratch_take(fft_small_op_pool_t pool, ulong limbs, int use_slabs)
+              void fft_small_op_pool_scratch_give(fft_small_op_pool_t pool, ulong * t)
+
+    Operand storage pools: *count* slabs of *slab_size* bytes (a
+    multiple of :macro:`FLINT_FFT_SMALL_ALIGNMENT`, normally
+    :func:`fft_small_op_sizeof_data`) for :func:`fft_small_op_init_borrowed`,
+    plus a staging region of *stage_bytes* for conversions. With
+    ``FFT_SMALL_OP_POOL_RESERVE`` in *flags* the block is a reservation
+    in *R*'s buffer (:func:`mpn_ctx_fit_buffer_reserve`), warm memory;
+    with ``FFT_SMALL_OP_POOL_ALLOC`` it is allocated when no reservation
+    is possible. *fit* returns 0 if neither applies, leaving an empty
+    pool. *take* returns ``NULL`` when no slab is free. Take and give
+    are thread safe; a reserved pool must be cleared on the thread
+    owning *R*, after every slab has been given back. Scratch comes from
+    the staging region when free and large enough, else from a free
+    slab if *use_slabs*, else from a plain allocation, so concurrent
+    conversions never share it. Used by the complex products and the
+    gr transformed ring.
+
+.. function:: ulong * fft_small_stage_begin(ulong * z, ulong zn, ulong need, fft_small_op_pool_struct * pool, int use_slabs)
+              int fft_small_stage_end(ulong * z, ulong zn, ulong * buf, ulong len, fft_small_op_pool_struct * pool)
+
+    Staged conversion out of a value whose reconstruction needs *need*
+    limbs into a window of *zn* limbs: *begin* returns *z* when it is
+    wide enough and pool scratch otherwise (*pool* may be ``NULL``:
+    plain allocation). After exporting there, and possibly adjusting
+    the value, *end* with its normalized length *len* copies it out,
+    zero pads the window and returns 0 if it does not fit.
+
 .. function:: int _fft_small_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn, nn_srcptr br, slong brn, int br_sgn, nn_srcptr bi, slong bin, int bi_sgn)
               int _fft_small_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn)
+              int _fft_small_mpn_mul_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn, nn_srcptr br, slong brn, int br_sgn, nn_srcptr bi, slong bin, int bi_sgn)
+              int _fft_small_mpn_sqr_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn)
 
-    The transformed windowed complex products behind
-    :func:`flint_mpn_mulmid_complex_fft_small`: an mpn plan for signed
-    two-term accumulations, rewindowed to the chunk coefficients that can
-    reach the limb window, with a cyclic transform when the window allows
-    it, on operands stored in a reservation of the context's buffer.
+    The transformed complex products behind all the
+    ``flint_mpn_*_complex`` functions (full, low, high and windowed
+    products and squares), one engine. *mulmid* and *sqrmid* write the
+    limbs `[lo, hi)` of the real and imaginary parts as two's-complement
+    windows, within one unit of `\lfloor x / B^{lo} \rfloor` and exact
+    for `lo = 0` (the residues mod `B^{hi}`); the window plan is used,
+    cyclic when the window allows. *mul* and *sqr* write magnitudes and
+    signed lengths of the limbs `[lo, hi)` (which must hold the parts
+    shifted right by *lo* limbs), exact for `lo = 0` and otherwise within
+    `(-1.5, +0.5)` units of the lowest limb, through the staged signed
+    exports. Parts may be zero: only the nonzero parts are transformed,
+    so a real or imaginary operand is transformed once for both output
+    parts. The signs are applied in transform space for signed exports;
+    an output part that is a single product with `lo = 0` takes the
+    cheaper unsigned reconstruction with its known sign attached, and
+    when every part does, the plan is unsigned, packing more bits per
+    chunk. Each output is formed over an operand dead after its first
+    product (five transforms' storage for a product, three for a
+    square), from a pool whose freed operand slabs serve the staging.
     Return 0 if no plan exists.
 
 .. function:: void fft_small_export_nmod_range(ulong * z, const fft_small_op_t X, ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P)

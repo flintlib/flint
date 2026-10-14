@@ -1540,10 +1540,10 @@ between output and input arrays.
     The algorithms are those of the full products, with low products in
     place of full ones: four or three (Karatsuba) real low products from
     :func:`flint_mpn_mulmid` with a zero window start, combined modulo
-    `B^n`, or above the cutoffs the transformed path of the full product
-    on the inputs truncated to `n` limbs, whose conversions out
-    reconstruct only the CRT slots below limb `n` (see
-    :func:`gr_transformed_mpn_get_low`). The transforms keep the length
+    `B^n`, or above the cutoffs the transformed windowed product
+    :func:`_fft_small_mpn_mulmid_complex` with the window `[0, n)` on
+    the inputs truncated to `n` limbs, whose conversions out reconstruct
+    only the CRT slots below limb `n`. The transforms keep the length
     of the product of the truncated inputs, since a cyclic wrap would
     land in the low limbs; the saving of the transformed path is in the
     reconstruction.
