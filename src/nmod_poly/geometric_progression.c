@@ -338,20 +338,25 @@ _fft_clear(mul_precomp_struct * F)
    form of the coefficients [zl - s, zh - s) of a * (b + s) with b + s
    truncated to length bn >= an: through _nmod_poly_mullow if zl = s = 0, or
    _nmod_poly_mulmid if zl - s = an - 1. These are also the coefficients
-   [zl, zh) of a * b. If M, the stored transform of b, contains b + s
-   (s + bn <= M->bn), was made for operands of length an, and is cheaper
-   than the transforms that the alternative would make (it saves one of
-   three, but may be longer and need more primes), this computes them with
-   M, which is only read, and returns 1. Otherwise it returns 0. */
-int
-_nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
-        nn_srcptr a, slong an, const mul_precomp_struct * M,
-        slong s, slong bn, nmod_t mod)
+   [zl, zh) of a * b. Whether M, the stored transform of b, should be used:
+   if it contains b + s (s + bn <= M->bn), was made for operands of length
+   an, and is cheaper than the transforms that the alternative would make
+   (it saves one of three, but may be longer and need more primes). */
+static int
+_fft_use(const mul_precomp_struct * M, slong zl, slong zh, slong an,
+         slong s, slong bn, nmod_t mod)
 {
-    mpn_ctx_struct * R = get_default_mpn_ctx();
     fft_small_plan_t P, D;
+    ulong e;
 
     if (zl >= zh || (ulong) (s + bn) > M->bn || (ulong) an > M->P->bound_c)
+        return 0;
+
+    /* cheap necessary condition for the cost test below: with M, a
+       transform has length at least M->bn and the depth of M; the
+       alternative has depth at most e and at most as many primes */
+    e = FLINT_MAX(4, n_clog2(an + bn + 3));
+    if (2 * M->bn * M->P->depth > 3 * e * n_pow2(e))
         return 0;
 
     /* only where the alternative would use fft_small */
@@ -365,16 +370,41 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
     if (!_fft_small_plan_fit_window(P, zl, zh, an + M->bn - 1, an, 4))
         return 0;
 
-    D->R = R;
+    D->R = get_default_mpn_ctx();
     _fft_small_plan_set_window(D, zl - s, zh - s, an + bn - 1, FLINT_MAX(an, bn), 4);
     if (P->np == 1 || !_fft_small_plan_set_bound(D, FLINT_MIN(an, bn),
                                          2 * NMOD_BITS(mod), MPN_CTX_NCRTS))
         D->np = P->np;
 
-    if (2 * P->np * P->ztrunc * P->depth > 3 * D->np * D->ztrunc * D->depth)
+    return 2 * P->np * P->ztrunc * P->depth <= 3 * D->np * D->ztrunc * D->depth;
+}
+
+/* M, if the largest call, which is the most favourable one, would use it
+   (see _fft_use); otherwise M is cleared and NULL is returned */
+static mul_precomp_struct *
+_fft_if_used(mul_precomp_struct * M, slong zl, slong zh, slong an,
+             slong s, slong bn, nmod_t mod)
+{
+    if (M != NULL && !_fft_use(M, zl, zh, an, s, bn, mod))
+    {
+        _fft_clear(M);
+        return NULL;
+    }
+
+    return M;
+}
+
+/* the product above, computed with M (which is only read) if _fft_use
+   says so, returning 1; otherwise returns 0 */
+int
+_nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
+        nn_srcptr a, slong an, const mul_precomp_struct * M,
+        slong s, slong bn, nmod_t mod)
+{
+    if (!_fft_use(M, zl, zh, an, s, bn, mod))
         return 0;
 
-    return _nmod_poly_mul_mid_precomp(z, zl, zh, a, an, M, mod, R);
+    return _nmod_poly_mul_mid_precomp(z, zl, zh, a, an, M, mod, get_default_mpn_ctx());
 }
 
 #else
@@ -391,6 +421,14 @@ _fft_clear(struct mul_precomp_struct * FLINT_UNUSED(F))
 {
 }
 
+static struct mul_precomp_struct *
+_fft_if_used(struct mul_precomp_struct * M, slong FLINT_UNUSED(zl), slong FLINT_UNUSED(zh),
+             slong FLINT_UNUSED(an), slong FLINT_UNUSED(s), slong FLINT_UNUSED(bn),
+             nmod_t FLINT_UNUSED(mod))
+{
+    return M;
+}
+
 int
 _nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zl),
         slong FLINT_UNUSED(zh), nn_srcptr FLINT_UNUSED(a), slong FLINT_UNUSED(an),
@@ -403,9 +441,9 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSE
 #endif
 
 /* Stores the transforms of the polynomials which the three functionalities
-   multiply by, for those whose largest product would use fft_small (the
-   products using a stored transform are a subset of these, see
-   _nmod_geometric_progression_mulmid_fft). The transform lengths allow any
+   multiply by, for those whose largest product would use fft_small and
+   would use the stored transform (the products using a stored transform
+   are a subset of these, see _fft_use). The transform lengths allow any
    call with lengths at most len, with no wraparound reaching the
    coefficients sought:
    - evaluate: coefficients [ilen - 1, ilen - 1 + olen) of a * ev_f, where
@@ -421,16 +459,23 @@ _nmod_geometric_progression_fft_init(nmod_geometric_progression_t G)
     slong len = G->len;
     nmod_t mod = G->mod;
 
+    slong h = len / 2;
+
     if ((G->function & UWORD(1)) && _nmod_poly_mulmid_want_fft_small(len, len, mod))
-        G->ev_f_fft = _fft_init(G->ev_f->coeffs, 2*len - 1, 2*len - 1, len, mod);
+        G->ev_f_fft = _fft_if_used(_fft_init(G->ev_f->coeffs, 2*len - 1, 2*len - 1, len, mod),
+                                   len - 1, 2*len - 1, len, 0, 2*len - 1, mod);
 
     if ((G->function & UWORD(2)) && _nmod_poly_mullow_want_fft_small(len, len, len, 0, mod))
-        G->int_f_fft = _fft_init(G->int_f->coeffs, len, 2*len - 1, len, mod);
+        G->int_f_fft = _fft_if_used(_fft_init(G->int_f->coeffs, len, 2*len - 1, len, mod),
+                                    0, len, len, 0, len, mod);
 
-    if ((G->function & UWORD(4)) && _nmod_poly_mulmid_want_fft_small(len / 2, len / 2, mod))
+    /* the largest forward and backward products have the same shape */
+    if ((G->function & UWORD(4)) && _nmod_poly_mulmid_want_fft_small(h, h, mod))
     {
-        G->ext_ff_fft = _fft_init(G->ext_ff->coeffs, len - 1, len - 1, len - 1, mod);
-        G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, len - 1, mod);
+        G->ext_ff_fft = _fft_if_used(_fft_init(G->ext_ff->coeffs, len - 1, len - 1, len - 1, mod),
+                                     h - 1, 2*h - 1, h, 0, 2*h - 1, mod);
+        if (G->ext_ff_fft != NULL)
+            G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, len - 1, mod);
     }
 }
 
