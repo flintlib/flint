@@ -91,5 +91,43 @@ TEST_FUNCTION_START(arb_poly_mulmid_block, state)
         arb_poly_clear(d);
     }
 
+    /* trailing zero coefficients ending the product below the window */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        slong len1 = 2 + n_randint(state, 20), len2 = 2 + n_randint(state, 20);
+        slong z1 = 1 + n_randint(state, len1 - 1), z2 = 1 + n_randint(state, len2 - 1);
+        slong nlo, nhi, i;
+        arb_ptr x, y, z;
+
+        x = _arb_vec_init(len1);
+        y = _arb_vec_init(len2);
+        for (i = 0; i < len1 - z1; i++)
+            arb_randtest(x + i, state, 100, 10);
+        for (i = 0; i < len2 - z2; i++)
+            arb_randtest(y + i, state, 100, 10);
+
+        nlo = (len1 - z1) + (len2 - z2) - 1 + n_randint(state, z1 + z2);
+        nhi = nlo + 1 + n_randint(state, len1 + len2 - 1 - nlo);
+        z = _arb_vec_init(nhi - nlo);
+        for (i = 0; i < nhi - nlo; i++)
+            arb_one(z + i);
+
+        _arb_poly_mulmid_block(z, x, len1, y, len2, nlo, nhi, 100);
+
+        for (i = 0; i < nhi - nlo; i++)
+        {
+            if (!arb_is_zero(z + i))
+            {
+                flint_printf("FAIL: arb_poly_mulmid_block, zero window\n");
+                flint_printf("len1 = %wd, len2 = %wd, nlo = %wd, nhi = %wd\n", len1, len2, nlo, nhi);
+                flint_abort();
+            }
+        }
+
+        _arb_vec_clear(x, len1);
+        _arb_vec_clear(y, len2);
+        _arb_vec_clear(z, nhi - nlo);
+    }
+
     TEST_FUNCTION_END(state);
 }

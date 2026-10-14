@@ -314,7 +314,8 @@ Arithmetic
     in magnitude.
 
     The default function :func:`_acb_poly_mullow` automatically switches
-    been *classical* and *transpose* multiplication.
+    between *classical* multiplication, :func:`_acb_poly_mulmid_fmpzi`
+    (for well-scaled input) and *transpose* multiplication.
 
     If the input pointers are identical (and the lengths are the same),
     they are assumed to represent the same polynomial, and its
@@ -358,6 +359,40 @@ Arithmetic
 
     Analogous to *mullow* functions, but compute the product truncated
     at length *nhi* and right-shifted by *nlo*.
+
+.. function:: int _acb_poly_mulmid_fmpzi(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+
+    Sets *{z, nhi - nlo}* to the coefficients `[nlo, nhi)` of the product
+    of *{x, xlen}* and *{y, ylen}* (the square if the pointers and lengths
+    are the same) and returns 1, if the inputs are well-scaled; otherwise
+    returns 0 and leaves *z* undefined. The window may extend beyond the
+    product, and *z* may alias an input.
+
+    After a substitution `x \to 2^c x` chosen from the first and last
+    nonzero midpoints (as for :func:`_arb_poly_mulmid_block`), the real
+    and imaginary midpoints of each input are written exactly as Gaussian
+    integers times one common power of two; the input is well-scaled if
+    this takes at most `3 \mathrm{prec} + 512` bits for each input (the
+    height :func:`_arb_poly_mulmid_block` allows a block of a real
+    polynomial). The midpoints of the result are then computed by a
+    single :func:`_fmpzi_poly_mulmid` and rounded to *prec* bits. The radii
+    are bounded separately for the real and imaginary parts: for
+    `(a_r + a_i i)(b_r + b_i i)` with radii `r_{a_r}, \ldots`, the real part
+    gets `|a_r| r_{b_r} + r_{a_r} (|b_r| + r_{b_r}) + |a_i| r_{b_i} + r_{a_i} (|b_i| + r_{b_i})`
+    and the imaginary part
+    `|a_r| r_{b_i} + r_{a_r} (|b_i| + r_{b_i}) + |a_i| r_{b_r} + r_{a_i} (|b_r| + r_{b_r})`,
+    summed over the convolution, using up to eight products of
+    nonnegative polynomials (four for a square) by
+    :func:`_arb_poly_addmulmid_mag`.
+
+.. function:: int _acb_poly_mulmid_use_fmpzi(slong len1, slong len2, slong nlo, slong nhi, slong prec, int squaring)
+
+    Returns whether :func:`_acb_poly_mulmid` and :func:`_acb_poly_mullow`
+    should try :func:`_acb_poly_mulmid_fmpzi` before the classical and
+    transposed algorithms. This is the case when the number `q` of
+    coefficient products in the window per input coefficient satisfies
+    `q \, \mathrm{prec}^{0.57} \ge 240` (330 for squares), and `q \ge 1`,
+    a fit to timings on x86-64.
 
 .. function:: void _acb_poly_inv_series(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong len, slong prec)
 

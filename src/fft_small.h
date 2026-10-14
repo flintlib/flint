@@ -729,6 +729,34 @@ void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
 void fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
                     const fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
+/* the two's-complement residue of the signed reconstruction mod
+   2^(FLINT_BITS * zn), reading only the slots below limb zn; the value
+   need not fit */
+void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
+                    const fft_small_op_t X, ulong nslots,
+                    const fft_small_plan_t P);
+/* limbs [lo_limbs, lo_limbs + zn) of the two's-complement sum of the
+   slots that can reach them, reading only the slots below limb
+   lo_limbs + zn; the value need not fit. Exact for lo_limbs = 0;
+   otherwise the dropped low slots perturb the lowest limb as in the
+   truncated export */
+void fft_small_export_mpn_signed_window(ulong* z, ulong zn,
+                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    const fft_small_plan_t P);
+
+/* limbs [lo, hi) of the real and imaginary parts of (ar + i ai)(br + i bi)
+   (respectively of the square of ar + i ai) as two's-complement windows,
+   within one unit of floor(x / B^lo) and exact for lo = 0, using a
+   cyclic transform when the window allows it; see
+   flint_mpn_mulmid_complex. Return 0 if no plan exists. */
+int _fft_small_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn,
+    nn_srcptr br, slong brn, int br_sgn,
+    nn_srcptr bi, slong bin, int bi_sgn);
+int _fft_small_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn);
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P);
 

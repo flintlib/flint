@@ -26,6 +26,7 @@
 #include "t-op_nmod.c"
 #include "t-sd_fft.c"
 #include "t-transformed_mpn.c"
+#include "t-transformed_mpn_get_low.c"
 
 /* Array of test functions ***************************************************/
 
@@ -45,7 +46,8 @@ test_struct tests[] =
     TEST_FUNCTION(fft_small_op_mpn),
     TEST_FUNCTION(fft_small_op_nmod),
     TEST_FUNCTION(sd_fft),
-    TEST_FUNCTION(gr_transformed_mpn)
+    TEST_FUNCTION(gr_transformed_mpn),
+    TEST_FUNCTION(gr_transformed_mpn_get_low)
 };
 
 /* main function *************************************************************/

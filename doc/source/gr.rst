@@ -1161,6 +1161,16 @@ middle products) run substantially faster in such a representation.
     1 ulp) plus the wholly dropped slots' total mass, under half an ulp
     either way.
 
+.. function:: int gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x, gr_ctx_t ctx)
+
+    Residue conversion out: *z* receives the value modulo
+    `2^{\mathtt{zn} \cdot \mathtt{FLINT\_BITS}}` as a two's-complement
+    residue of exactly *zn* limbs, with no sign, whatever the size of
+    the value. Only the CRT slots starting below limb *zn* are
+    reconstructed, so this costs a fraction of a full conversion when
+    *zn* is a fraction of the value's length.
+
 .. function:: int gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs, gr_ptr x, gr_ctx_t ctx)
 
     Converts *x* out into *f*, consuming it. The width the

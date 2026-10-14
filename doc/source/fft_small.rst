@@ -209,6 +209,39 @@ Transform plans and operands
     slots, under half an ulp either way. With ``lo_limbs = 0`` the
     export is exact.
 
+.. function:: void fft_small_export_mpn_signed_low(ulong * z, ulong zn, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
+
+    The two's-complement residue of the signed reconstruction modulo
+    `2^{\mathtt{zn} \cdot \mathtt{FLINT\_BITS}}`, written to *z* with no sign
+    resolution. Only the slots starting below limb *zn* are read: carries
+    and borrows propagate upward only, so the slots above cannot affect
+    the residue, and unlike the other signed exports the window need not
+    hold the value.
+
+.. function:: void fft_small_export_mpn_signed_window(ulong * z, ulong zn, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
+
+    The limbs `[\mathtt{lo\_limbs}, \mathtt{lo\_limbs} + \mathtt{zn})` of the
+    two's-complement sum of the slots that can reach them, with no sign
+    resolution, reading only the slots starting below limb
+    ``lo_limbs + zn``; the value need not fit. With ``lo_limbs = 0`` this
+    is :func:`fft_small_export_mpn_signed_low`; otherwise the slots below
+    the first one that can reach limb ``lo_limbs`` are dropped as in the
+    truncated export, and since every such slot lies below limb
+    ``lo_limbs`` whatever value it holds (values are lifted to the
+    centered range of the prime product), the window is within one unit
+    of the exact one even when those slots hold garbage, such as the
+    aliased coefficients of a cyclic transform.
+
+.. function:: int _fft_small_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn, nn_srcptr br, slong brn, int br_sgn, nn_srcptr bi, slong bin, int bi_sgn)
+              int _fft_small_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi, nn_srcptr ar, slong arn, int ar_sgn, nn_srcptr ai, slong ain, int ai_sgn)
+
+    The transformed windowed complex products behind
+    :func:`flint_mpn_mulmid_complex_fft_small`: an mpn plan for signed
+    two-term accumulations, rewindowed to the chunk coefficients that can
+    reach the limb window, with a cyclic transform when the window allows
+    it, on operands stored in a reservation of the context's buffer.
+    Return 0 if no plan exists.
+
 .. function:: void fft_small_export_nmod_range(ulong * z, const fft_small_op_t X, ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P)
 
     Chinese remaindering restricted to the coefficient window

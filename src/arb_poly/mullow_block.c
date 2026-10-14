@@ -497,6 +497,72 @@ _arb_poly_addmulmid_block(arb_ptr z, fmpz * zz,
     fmpz_clear(zexp);
 }
 
+/* z[k - nlo] += an upper bound for the coefficient k of the product of
+   the nonnegative polynomials (x, xlen) and (y, ylen), nlo <= k < nhi;
+   the factors are blocked after the substitution x -> 2^(-scale) x, as
+   the radii in _arb_poly_mulmid_block */
+void
+_arb_poly_addmulmid_mag(mag_ptr z, mag_srcptr x, slong xlen,
+    mag_srcptr y, slong ylen, slong nlo, slong nhi, const fmpz_t scale)
+{
+    fmpz *xz, *yz, *zz, *xe, *ye;
+    double *xdbl, *ydbl;
+    slong *xblocks, *yblocks;
+    arb_ptr t;
+    fmpz_t e;
+    slong i;
+
+    xlen = FLINT_MIN(xlen, nhi);
+    ylen = FLINT_MIN(ylen, nhi);
+    while (xlen > 0 && mag_is_zero(x + xlen - 1)) xlen--;
+    while (ylen > 0 && mag_is_zero(y + ylen - 1)) ylen--;
+
+    if (xlen == 0 || ylen == 0)
+        return;
+
+    nhi = FLINT_MIN(nhi, xlen + ylen - 1);
+    if (nlo >= nhi)
+        return;
+
+    xz = _fmpz_vec_init(xlen);
+    yz = _fmpz_vec_init(ylen);
+    xe = _fmpz_vec_init(xlen);
+    ye = _fmpz_vec_init(ylen);
+    zz = _fmpz_vec_init(nhi - nlo);
+    xdbl = flint_malloc(sizeof(double) * xlen);
+    ydbl = flint_malloc(sizeof(double) * ylen);
+    xblocks = flint_malloc(sizeof(slong) * (xlen + 1));
+    yblocks = flint_malloc(sizeof(slong) * (ylen + 1));
+    t = _arb_vec_init(nhi - nlo);
+    fmpz_init(e);
+
+    _mag_vec_get_fmpz_2exp_blocks(xz, xdbl, xe, xblocks, scale, NULL, x, xlen);
+    _mag_vec_get_fmpz_2exp_blocks(yz, ydbl, ye, yblocks, scale, NULL, y, ylen);
+    _arb_poly_addmulmid_rad(t, zz, xz, xdbl, xe, xblocks, xlen,
+                            yz, ydbl, ye, yblocks, ylen, nlo, nhi);
+
+    /* unscale */
+    fmpz_mul_ui(e, scale, nlo);
+    for (i = nlo; i < nhi; i++)
+    {
+        mag_mul_2exp_fmpz(arb_radref(t + i - nlo), arb_radref(t + i - nlo), e);
+        mag_add(z + i - nlo, z + i - nlo, arb_radref(t + i - nlo));
+        fmpz_add(e, e, scale);
+    }
+
+    _fmpz_vec_clear(xz, xlen);
+    _fmpz_vec_clear(yz, ylen);
+    _fmpz_vec_clear(xe, xlen);
+    _fmpz_vec_clear(ye, ylen);
+    _fmpz_vec_clear(zz, nhi - nlo);
+    flint_free(xdbl);
+    flint_free(ydbl);
+    flint_free(xblocks);
+    flint_free(yblocks);
+    _arb_vec_clear(t, nhi - nlo);
+    fmpz_clear(e);
+}
+
 void
 _arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen,
                                 arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
@@ -569,7 +635,10 @@ _arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen,
     if (xlen == 0 || ylen == 0)
         return;
 
+    /* the trailing zeros may end the product below the window */
     nhi = FLINT_MIN(nhi, xlen + ylen - 1);
+    if (nlo >= nhi)
+        return;
 
     fmpz_init(scale);
     fmpz_init(t);

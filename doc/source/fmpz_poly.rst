@@ -683,6 +683,14 @@ Multiplication
     Assumes that ``len1`` and ``len2`` are positive and that
     `0 \le nlo < nhi \le len1 + len2 - 1`.
 
+    The Schoenhage-Strassen version computes a truncated transform of
+    the full product, or, when it is shorter, a cyclic convolution of
+    power-of-two length `M \ge \max(nhi, len1 + len2 - 1 - nlo)` whose
+    wrapped-around terms all land below `nlo` (see
+    :func:`fft_convolution_choose_mid`). For the classical middle
+    product `(2m) \times m \to m` this processes `2m` instead of `3m`
+    points when `2m` is a power of two.
+
     :func:`_fmpz_poly_mulmid` is the single dispatcher behind
     :func:`_fmpz_poly_mul`, :func:`_fmpz_poly_mullow`,
     :func:`_fmpz_poly_mulhigh`, :func:`_fmpz_poly_sqr` and
@@ -700,8 +708,11 @@ Multiplication
     large coefficients; the fft_small-based classical multiplication for
     low and high windows with large coefficients; and otherwise the
     ``fft_small`` based multiplication, Kronecker substitution or
-    Schoenhage-Strassen. The boundaries were tuned for uniformly sized
-    random coefficients.
+    Schoenhage-Strassen, the latter in particular for middle products
+    whose cyclic transform (see :func:`fft_convolution_choose_mid`) is
+    at most three quarters of the truncated length, with coefficients of
+    about 1000-2000 bits or of 65536 bits and more. The boundaries were
+    tuned for uniformly sized random coefficients.
 
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
               void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)

@@ -849,6 +849,91 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
     return GR_SUCCESS;
 }
 
+/* Residue conversion: z receives the value mod 2^(FLINT_BITS zn) in
+   two's complement, exactly, whatever the size of the value. Only the
+   chunks below limb zn are reconstructed: the unsigned export reduces
+   mod 2^(FLINT_BITS zn) by construction, and the signed one reads only
+   the slots starting below limb zn. */
+static int
+_tmpn_get_low(nn_ptr z, slong zn, gr_srcptr x, int destroy, gr_ctx_t ctx)
+{
+    tmpn_ctx_struct * T = TMPN_CTX(ctx);
+    const fft_small_plan_struct * P = T->P;
+    slong m = TMPN(x)->nchunks;
+    slong sv = TMPN(x)->small;
+    fft_small_op_struct tmp;
+    double * sdata;
+    ulong itr;
+    slong i;
+
+    if (zn <= 0)
+        return GR_SUCCESS;
+
+    if (m == 0)
+    {
+        flint_mpn_zero(z, zn);
+    }
+    else
+    {
+        if (destroy)
+        {
+            sdata = NULL;
+            tmp = TMPN(x)->op;
+        }
+        else
+        {
+            sdata = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+                    n_round_up(P->np * P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
+            tmp = TMPN(x)->op;
+            tmp.data = sdata;
+            memcpy(sdata, TMPN(x)->op.data,
+                   P->np * P->stride * sizeof(double));
+        }
+
+        itr = _op_trunc((ulong) m, P);
+
+        for (i = 0; i < (slong) P->np; i++)
+        {
+            sd_fft_ctx_struct * Q = P->ffts + P->offset + i;
+            double * d = tmp.data + P->stride * i;
+
+            sd_ifft_trunc(Q, d, P->depth, itr);
+            _tmpn_scale(Q, d, T->m_orig[i], itr);
+
+            /* as in _tmpn_get: the unsigned export reads whole chunks up
+               to the requested limb count, and the slots beyond the
+               inverse transform's range stand for zero chunks */
+            if (!TMPN(x)->negs)
+            {
+                ulong chi = n_min(n_pow2(P->depth),
+                                  n_cdiv((ulong) zn * FLINT_BITS, P->bits));
+                if (chi > itr)
+                    memset(d + itr, 0, (chi - itr) * sizeof(double));
+            }
+        }
+        tmp.domain = FFT_SMALL_OP_PRODUCT;
+
+        if (TMPN(x)->negs)
+            fft_small_export_mpn_signed_low(z, (ulong) zn, &tmp, (ulong) m, P);
+        else
+            fft_small_export_mpn(z, (ulong) zn, &tmp, P);
+
+        if (sdata != NULL)
+            flint_aligned_free(sdata);
+
+        if (TMPN(x)->sign)
+            mpn_neg(z, z, zn);
+    }
+
+    /* the element is (-1)^sign T + small */
+    if (sv > 0)
+        mpn_add_1(z, z, zn, (ulong) sv);
+    else if (sv < 0)
+        mpn_sub_1(z, z, zn, -(ulong) sv);
+
+    return GR_SUCCESS;
+}
+
 static int
 tmpn_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
 
@@ -1455,6 +1540,19 @@ gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
     return _tmpn_get_trunc(z, zn, zn_out, sign, lo, x, 1, ctx);
 }
 
+int
+gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x, gr_ctx_t ctx)
+{
+    return _tmpn_get_low(z, zn, x, 0, ctx);
+}
+
+int
+gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x,
+                                       gr_ctx_t ctx)
+{
+    return _tmpn_get_low(z, zn, x, 1, ctx);
+}
+
 #else /* FLINT_HAVE_FFT_SMALL */
 
 /* Without fft_small the transformed representation does not exist: the
@@ -1502,6 +1600,18 @@ int
 gr_transformed_mpn_get_trunc_destructive(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), slong * FLINT_UNUSED(zn_out),
                                          int * FLINT_UNUSED(sign), slong FLINT_UNUSED(lo), gr_ptr FLINT_UNUSED(x),
                                          gr_ctx_t FLINT_UNUSED(ctx))
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get_low(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), gr_srcptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get_low_destructive(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), gr_ptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }

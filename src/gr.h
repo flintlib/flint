@@ -1623,6 +1623,13 @@ slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x,
                     slong lo);
 int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out,
                     int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx);
+/* the value mod 2^(FLINT_BITS zn) as a two's-complement residue, exact
+   whatever the size of the value; only the chunks below limb zn are
+   reconstructed */
+int gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x,
+                    gr_ctx_t ctx);
+int gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x,
+                    gr_ctx_t ctx);
 
 int gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
