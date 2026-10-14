@@ -995,17 +995,18 @@ void _nmod_poly_mul_mid(
     const ulong* b, slong bn,
     nmod_t mod);
 
-typedef struct {
+/* tagged -> modules can point to it without fft_small.h */
+typedef struct mul_precomp_struct {
     fft_small_plan_struct P[1];
     fft_small_op_struct bfft[1];
     ulong bn;
     ulong btrunc;
 } mul_precomp_struct;
 
-void _mul_precomp_init(
+int _mul_precomp_init(
     mul_precomp_struct* M,
     const ulong * b, ulong bn, ulong btrunc,
-    ulong depth,
+    ulong depth, ulong len_bound, ulong direct_len,
     nmod_t mod,
     mpn_ctx_t R);
 
@@ -1018,7 +1019,7 @@ FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 int _nmod_poly_mul_mid_precomp(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
-    mul_precomp_struct* M,
+    const mul_precomp_struct* M,
     nmod_t mod,
     mpn_ctx_t R);
 

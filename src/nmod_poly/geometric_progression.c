@@ -13,6 +13,10 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
+#if FLINT_HAVE_FFT_SMALL
+#include "fft_small.h"
+#endif
 
 /* specialized for moduli that support n_mulmod_shoup */
 static
@@ -298,10 +302,143 @@ void _nmod_geometric_progression_interpolate_extrapolate_init(nmod_geometric_pro
     }
 }
 
+/* Stored transforms (bit 3 of function) ***********************************/
+
+#if FLINT_HAVE_FFT_SMALL
+
+/* transform of (b, bn) for cyclic convolutions of length a power of two
+   >= n >= bn, by operands of length at most an_max; NULL if no plan
+   exists */
+static mul_precomp_struct *
+_fft_init(nn_srcptr b, slong bn, slong n, slong an_max, nmod_t mod)
+{
+    mul_precomp_struct * M = flint_malloc(sizeof(mul_precomp_struct));
+
+    if (!_mul_precomp_init(M, b, bn, bn, FLINT_MAX(4, n_clog2(n)),
+                           FLINT_MIN(an_max, bn), bn, mod, get_default_mpn_ctx()))
+    {
+        flint_free(M);
+        return NULL;
+    }
+
+    return M;
+}
+
+static void
+_fft_clear(mul_precomp_struct * F)
+{
+    if (F != NULL)
+    {
+        _mul_precomp_clear(F);
+        flint_free(F);
+    }
+}
+
+/* The operations below compute products with a fixed polynomial b, in the
+   form of the coefficients [zl - s, zh - s) of a * (b + s) with b + s
+   truncated to length bn >= an: through _nmod_poly_mullow if zl = s = 0, or
+   _nmod_poly_mulmid if zl - s = an - 1. These are also the coefficients
+   [zl, zh) of a * b. If M, the stored transform of b, contains b + s
+   (s + bn <= M->bn), was made for operands of length an, and is cheaper
+   than the transforms that the alternative would make (it saves one of
+   three, but may be longer and need more primes), this computes them with
+   M, which is only read, and returns 1. Otherwise it returns 0. */
+int
+_nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
+        nn_srcptr a, slong an, const mul_precomp_struct * M,
+        slong s, slong bn, nmod_t mod)
+{
+    mpn_ctx_struct * R = get_default_mpn_ctx();
+    fft_small_plan_t P, D;
+
+    if (zl >= zh || (ulong) (s + bn) > M->bn || (ulong) an > M->P->bound_c)
+        return 0;
+
+    /* only where the alternative would use fft_small */
+    if (zl == s ? !_nmod_poly_mullow_want_fft_small(bn, an, zh - zl, 0, mod)
+                : !_nmod_poly_mulmid_want_fft_small(an, zh - zl, mod))
+        return 0;
+
+    /* the transform length of F for this window, and the plan of the
+       alternative; a transform costs about np * ztrunc * depth */
+    *P = *M->P;
+    if (!_fft_small_plan_fit_window(P, zl, zh, an + M->bn - 1, an, 4))
+        return 0;
+
+    D->R = R;
+    _fft_small_plan_set_window(D, zl - s, zh - s, an + bn - 1, FLINT_MAX(an, bn), 4);
+    if (P->np == 1 || !_fft_small_plan_set_bound(D, FLINT_MIN(an, bn),
+                                         2 * NMOD_BITS(mod), MPN_CTX_NCRTS))
+        D->np = P->np;
+
+    if (2 * P->np * P->ztrunc * P->depth > 3 * D->np * D->ztrunc * D->depth)
+        return 0;
+
+    return _nmod_poly_mul_mid_precomp(z, zl, zh, a, an, M, mod, R);
+}
+
+#else
+
+static struct mul_precomp_struct *
+_fft_init(nn_srcptr FLINT_UNUSED(b), slong FLINT_UNUSED(bn), slong FLINT_UNUSED(n),
+          slong FLINT_UNUSED(an_max), nmod_t FLINT_UNUSED(mod))
+{
+    return NULL;
+}
+
+static void
+_fft_clear(struct mul_precomp_struct * FLINT_UNUSED(F))
+{
+}
+
+int
+_nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zl),
+        slong FLINT_UNUSED(zh), nn_srcptr FLINT_UNUSED(a), slong FLINT_UNUSED(an),
+        const struct mul_precomp_struct * FLINT_UNUSED(M), slong FLINT_UNUSED(s), slong FLINT_UNUSED(bn),
+        nmod_t FLINT_UNUSED(mod))
+{
+    return 0;
+}
+
+#endif
+
+/* Stores the transforms of the polynomials which the three functionalities
+   multiply by, for those whose largest product would use fft_small (the
+   products using a stored transform are a subset of these, see
+   _nmod_geometric_progression_mulmid_fft). The transform lengths allow any
+   call with lengths at most len, with no wraparound reaching the
+   coefficients sought:
+   - evaluate: coefficients [ilen - 1, ilen - 1 + olen) of a * ev_f, where
+     a has length at most ilen; cyclic of length >= 2*len - 1 = len(ev_f);
+   - interpolate: coefficients [0, m) of f * int_f, f of length at most m
+     <= len; length >= 2*len - 1;
+   - extrapolate: coefficients of tmp * ext_ff (or ext_fb) of index at least
+     ilen - 1, tmp of length ilen; cyclic of length >= len - 1. Since
+     ilen + olen <= len, the largest product has ilen = olen = len / 2. */
+static void
+_nmod_geometric_progression_fft_init(nmod_geometric_progression_t G)
+{
+    slong len = G->len;
+    nmod_t mod = G->mod;
+
+    if ((G->function & UWORD(1)) && _nmod_poly_mulmid_want_fft_small(len, len, mod))
+        G->ev_f_fft = _fft_init(G->ev_f->coeffs, 2*len - 1, 2*len - 1, len, mod);
+
+    if ((G->function & UWORD(2)) && _nmod_poly_mullow_want_fft_small(len, len, len, 0, mod))
+        G->int_f_fft = _fft_init(G->int_f->coeffs, len, 2*len - 1, len, mod);
+
+    if ((G->function & UWORD(4)) && _nmod_poly_mulmid_want_fft_small(len / 2, len / 2, mod))
+    {
+        G->ext_ff_fft = _fft_init(G->ext_ff->coeffs, len - 1, len - 1, len - 1, mod);
+        G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, len - 1, mod);
+    }
+}
+
 /* initialize for selection of functionalities:                        */
 /*    the lowest 3 bits of `function` act as a mask for the            */
 /*    three functionalities, in this order:                            */
 /*    evaluate(bit0)+interpolate(bit1)+extrapolate(bit2)               */
+/*    and bit3 asks for stored transforms of the polynomials involved  */
 /*                                                                     */
 /* TODO possible improvements, if precomputation efficiency matters:   */
 /*   - extrapolate may benefit from n_mulmod_shoup                     */
@@ -314,6 +451,10 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
     G->len = len;
     G->mod = mod;
     G->function = function;
+    G->ev_f_fft = NULL;
+    G->int_f_fft = NULL;
+    G->ext_ff_fft = NULL;
+    G->ext_fb_fft = NULL;
 
     if (NMOD_CAN_USE_SHOUP(mod))
     {
@@ -354,6 +495,9 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
         else if ((function & UWORD(4)) == UWORD(4))  /* extrapolate */
                 _nmod_geometric_progression_extrapolate_init(G, len, mod, q, inv_q);
     }
+
+    if (function & UWORD(8))
+        _nmod_geometric_progression_fft_init(G);
 }
 
 /* clear for selection of functionalities (see init)  */
@@ -392,6 +536,11 @@ void _nmod_geometric_progression_clear_function(nmod_geometric_progression_t G, 
         nmod_poly_clear(G->ext_ff);
         nmod_poly_clear(G->ext_fb);
     }
+
+    _fft_clear(G->ev_f_fft);
+    _fft_clear(G->int_f_fft);
+    _fft_clear(G->ext_ff_fft);
+    _fft_clear(G->ext_fb_fft);
 }
 
 /* initialize for all: evaluate+interpolate+extrapolate */
