@@ -41,42 +41,112 @@
 #define EX_DIOPHANTINE_MAX 65536
 
 /* the series of _mp_real_exp_reduced from z leading zero bits on, for
-   m > 0 (measured end to end, kernel / series time ratios: 1.3-2 at
-   2-10 limbs from z = 32, 1.1-1.6 at 12-40 limbs from z = 40-64,
-   1.05-1.2 at 48-128 limbs from z = 96-192; below 32 zero bits the
-   series never wins against the bitwise kernel) */
+   m > 0 (measured kernel / series time ratios with the dense-table
+   kernels: 1.05-1.35 at 4-9 limbs from z = 32, but at 3 and 10-21
+   limbs only from z = 64 (1.25-2.9; between, 0.55-1.0), 1.0-1.05 at
+   22-32 limbs from z = 64; with _mp_real_exp_bitwise_vec beyond:
+   1.0-1.2 at 36-48 limbs from z = 56-72, at 64-128 limbs from z =
+   128-192, 1.1 at 160-256 limbs from z = 320-384; below 32 zero bits
+   the series never wins; at two limbs the table-driven kernel always
+   wins, which _ex_kernel takes first; on 32-bit machines, end to end
+   with the bitwise kernels: 1.1-1.6 at 22-40 limbs from z = 64,
+   1.05-1.2 at 48-128 limbs from z = 96-192, and without the dense
+   kernels from z = 32 up to 10 limbs and 40 at 11-12) */
 static slong
 _ex_series_min_z(slong n)
 {
+#if FLINT_BITS == 64
+    if (n <= 1)
+        return 32;
+    if (n <= 3)
+        return 64;
+    if (n <= 9)
+        return 32;
+#else
+    /* (no dense kernels) */
     if (n <= 10)
         return 32;
     if (n <= 12)
         return 40;
+#endif
     if (n <= 40)
         return 64;
+#if FLINT_BITS == 64
+    /* (_mp_real_exp_bitwise_vec) */
+    if (n <= 48)
+        return 72;
+    if (n <= 64)
+        return 128;
+    if (n <= 80)
+        return 160;
+    if (n <= 128)
+        return 192;
+    if (n <= 256)
+        return 384;
+#else
     if (n <= 48)
         return 96;
     if (n <= 64)
         return 128;
     if (n <= 128)
         return 192;
+#endif
     return WORD_MAX;
 }
 
 /* for m < 0, the alternating series of exp(-|m|) (series_rs.c; the
    hardcoded cosh - sinh at z >= 32 up to 8 limbs) from z on (measured
-   end to end: 1.8-2.5 at 1-6 limbs from z = 32, 1.1-1.5 at 7-24 limbs
-   from z = 22-28, 1.1-1.5 at 32-128 limbs from z = 40-96, 1.15-1.35 at
-   192-256 limbs from z = 192) */
+   kernel / series time ratios with the dense-table kernels: 1.15-1.5
+   at 4-8 limbs from z = 32, 1.0-2.5 at 2-3 and 9-21 limbs from z =
+   64-72 (the reduction around the kernel tips 9-21 limbs to 64),
+   1.0-1.3 at 22-32 limbs from z = 56; with _mp_real_exp_bitwise_vec
+   beyond: 1.0-1.15 at 36-64 limbs from z = 48-96, at 80-256 limbs from
+   z = 96-256 (about z = n); end to end with the limb bitwise kernels:
+   1.8-2.5 at one limb from z = 32, and on 32-bit machines 1.1-1.5 at
+   22-24 limbs from z = 28, at 33-128 limbs from z = 40-96, 1.15-1.35
+   at 192-256 limbs from z = 192) */
 static slong
 _ex_neg_series_min_z(slong n)
 {
+#if FLINT_BITS == 64
+    if (n <= 1)
+        return 32;
+    if (n <= 3)
+        return 64;
+    if (n <= 8)
+        return 32;
+    if (n <= 21)
+        return 64;
+    if (n <= MP_REAL_DENSE_RT_MAX)
+        return 56;
+#else
+    /* (no dense kernels) */
     if (n <= 6)
         return 32;
     if (n <= 8)
         return 22;
+#endif
     if (n <= 24)
         return 28;
+#if FLINT_BITS == 64
+    /* (_mp_real_exp_bitwise_vec) */
+    if (n <= 40)
+        return 48;
+    if (n <= 48)
+        return 64;
+    if (n <= 80)
+        return 96;
+    if (n <= 96)
+        return 128;
+    if (n <= 128)
+        return 160;
+    if (n <= 160)
+        return 192;
+    if (n <= 192)
+        return 224;
+    if (n <= 256)
+        return 256;
+#else
     if (n <= 40)
         return 40;
     if (n <= 48)
@@ -85,6 +155,7 @@ _ex_neg_series_min_z(slong n)
         return 96;
     if (n <= 256)
         return 192;
+#endif
     return WORD_MAX;
 }
 
@@ -102,6 +173,13 @@ _ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n, int notab)
     }
     else if (notab)
         _mp_real_exp_notab(y, err, v, n);
+#if FLINT_BITS == 64
+    /* the table-driven kernel (small.h, through _mp_real_exp_opt) beats
+       the reduced series at two limbs (measured: 41 against 47 cycles;
+       at three limbs 97 against 99, and 66 from z = 64) */
+    else if (n == 2)
+        _mp_real_small_exp_2_mpn(y, err, v);
+#endif
     else if (z >= _ex_series_min_z(n))
         _mp_real_exp_reduced(y, err, v, n, (flint_bitcnt_t) z, 0);
     else if (n <= EX_BITWISE_MAX)
@@ -134,17 +212,6 @@ _ex_limbs(slong p)
     return n;
 }
 
-/* R = floor((1/log 2 - 1) B^2), two limbs: 1/log 2 = 1.4426950408889634... */
-#if FLINT_BITS == 64
-#define EX_ILOG2_1 UWORD(0x71547652b82fe177)
-#define EX_ILOG2_0 UWORD(0x7d0ffda0d23a7d11)
-#else
-#define EX_ILOG2_1 UWORD(0x71547652)
-#define EX_ILOG2_0 UWORD(0xb82fe177)
-#endif
-
-/* X -= q L resp. X += q L over N limbs, returning the borrow resp.
-   carry limb; unrolled in registers for constant N */
 /* the limb of |m| at position i of the frame with the mantissa's limb 0
    at position sh */
 FLINT_FORCE_INLINE ulong
@@ -168,7 +235,7 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
     slong N = n + 1, sh, q, k, j;
     nn_ptr X;
     nn_srcptr L;
-    ulong x1, x0, h, l, c, u, cy, err;
+    ulong x1, x0, err;
     int neg = m->negative;
     TMP_INIT;
 
@@ -179,36 +246,15 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
     L = _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, N);
     sh = m->exp - m->size + N;
 
-    /* q <= |m| / log 2: with X = x1 + x0/B and 1/log 2 = 1 + R/B^2,
-       R = (R1, R0), the product is x1 + h1 + (x0 + l1 + hi(x1 R0))/B
-       plus positive terms below 2/B (h1 B + l1 = x1 R1); dropping them
-       and flooring gives the exact quotient or one less */
+    /* q <= |m| / log 2, exact or one less (impl.h) */
     x1 = _ex_frame_limb(m, sh, N);
     x0 = _ex_frame_limb(m, sh, N - 1);
-    umul_ppmm(h, l, x1, EX_ILOG2_1);
-    umul_ppmm(c, u, x1, EX_ILOG2_0);
-    (void) u;
-    {
-        ulong s1, s0;
-        add_ssaaaa(s1, s0, UWORD(0), x0, UWORD(0), l);
-        add_ssaaaa(s1, s0, s1, s0, UWORD(0), c);
-        (void) s0;
-        q = (slong) (x1 + h + s1);
-    }
+    q = (slong) _mp_real_exp_quotient(x1, x0);
 
     if (!neg)
     {
         /* X = |m| (truncated), t = X - q L */
         _mp_real_elem_copy(X, N + 1, N, m);
-        MP_REAL_SUBMUL_1(cy, X, L, N, (ulong) q);
-        X[N] -= cy;
-        if (X[N] != 0 || mpn_cmp(X, L, N) >= 0)
-        {
-            /* q was one low */
-            X[N] -= mpn_sub_n(X, X, L, N);
-            q++;
-        }
-        k = q;
     }
     else
     {
@@ -220,17 +266,9 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
         mpn_neg(X + lo, m->d + drop, len);      /* nonzero: borrows */
         for (j = lo + len; j <= N; j++)
             X[j] = ~UWORD(0);
-        q++;
-        MP_REAL_ADDMUL_1(cy, X, L, N, (ulong) q);
-        X[N] += cy;
-        if (X[N] != 0)
-        {
-            /* negative (q was one low): one more L */
-            X[N] += mpn_add_n(X, X, L, N);
-            q++;
-        }
-        k = -q;
     }
+
+    k = _mp_real_exp_reduce_step(X, L, N, (ulong) q, neg);
     FLINT_ASSERT(X[N] == 0);
 
     /* the kernel on the top n fraction limbs, straight into res; the
@@ -242,6 +280,28 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
     mp_real_mul_2exp_si(res, res, k);
 
     TMP_END;
+}
+
+/* (y, n + 1) = exp(-v) for v in [0, 1) at n fraction limbs with z >=
+   _ex_neg_series_min_z(n) leading zero bits: the hardcoded cosh - sinh
+   at z >= 32 up to 8 limbs, else the alternating series; err <= 10 */
+FLINT_FORCE_INLINE void
+_ex_neg_series(nn_ptr y, ulong * err, nn_srcptr v, slong n, slong z)
+{
+    if (z >= 32 && n <= 8)
+    {
+        /* exp(-v) = cosh v - sinh v by the hardcoded series */
+        ulong sh[9], ch[9];
+        _mp_real_sinh_cosh_rs(sh, ch, err, v, n);
+        mpn_sub_n(y, ch, sh, n + 1);
+        *err *= 2;
+    }
+    else
+    {
+        /* the alternating series of exp(-v) */
+        _mp_real_series_rs(y, v, n, (flint_bitcnt_t) z, MP_REAL_SERIES_EXP_NEG);
+        *err = 5;
+    }
 }
 
 /* exp(m), m exact, nonzero, |m| < 2^(FLINT_BITS - 5), to about prec
@@ -257,7 +317,7 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec, int notab)
     if (z >= prec + FLINT_BITS)
     {
         /* |exp(m) - 1| <= |m| + m^2 < 2^(emid + 1) */
-        _mp_real_elem_set_error(res, 1, emid + 1);
+        _mp_real_elem_set_error(res, 1, _mp_real_err_exp_clamp(emid + 1, 1, prec));
         return;
     }
 
@@ -333,31 +393,16 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec, int notab)
 
     if (m->exp <= 0 && z >= _ex_neg_series_min_z(n))
     {
-        nn_ptr v, sh, ch;
+        nn_ptr v;
         ulong err;
         int trunc;
         TMP_INIT;
 
         TMP_START;
-        v = TMP_ALLOC((3 * n + 2) * sizeof(ulong));
-        sh = v + n;
-        ch = sh + n + 1;
+        v = TMP_ALLOC(n * sizeof(ulong));
         trunc = _mp_real_elem_copy(v, n, n, m);
         mp_real_fit_length(res, n + 1);
-        if (z >= 32 && n <= 8)
-        {
-            /* m in (-2^-32, 0), small n: exp(m) = cosh |m| - sinh |m|
-               by the hardcoded series */
-            _mp_real_sinh_cosh_rs(sh, ch, &err, v, n);
-            mpn_sub_n(res->d, ch, sh, n + 1);
-            err *= 2;
-        }
-        else
-        {
-            /* the alternating series of exp(-|m|) */
-            _mp_real_series_rs(res->d, v, n, (flint_bitcnt_t) z, MP_REAL_SERIES_EXP_NEG);
-            err = 5;
-        }
+        _ex_neg_series(res->d, &err, v, n, z);
         _mp_real_elem_finish(res, n, err + 2 * trunc, 0);
         TMP_END;
         return;
@@ -595,7 +640,7 @@ _ex_ball(mp_real_t res, const mp_real_t x, slong prec, int method)
     if (x->size == 0)
     {
         if (e <= -2)
-            _mp_real_elem_set_error(res, 1, e + 1);
+            _mp_real_elem_set_error(res, 1, _mp_real_err_exp_clamp(e + 1, 1, prec));
         else
         {
             mp_real_t t, u;
@@ -632,9 +677,16 @@ _ex_ball(mp_real_t res, const mp_real_t x, slong prec, int method)
             mp_real_init(u);
             _mp_real_set_mpn_2exp(r, &xerr, 1, FLINT_BITS * xanc);
             mp_real_add(hi, &mid, r, x->size + 2);
-            hi->err = 0;        /* an upper bound is enough: round up */
-            mp_real_add(hi, hi, r, x->size + 2);
-            hi->err = 0;
+            if (hi->err != 0)
+            {
+                /* an upper bound is enough: round up, adding the
+                   rounding error at the bottom limb (exactly) */
+                ulong he = hi->err;
+                hi->err = 0;
+                _mp_real_set_mpn_2exp(r, &he, 1, FLINT_BITS * (hi->exp - hi->size));
+                mp_real_add(hi, hi, r, hi->size + 2);
+                hi->err = 0;
+            }
             mp_real_exp_bits(u, hi, 30);
             mp_real_zero(res);
             _mp_real_elem_add_mag(res, u);
@@ -688,4 +740,24 @@ void
 mp_real_exp_agm(mp_real_t res, const mp_real_t x, slong n)
 {
     _ex_ball(res, x, FLINT_BITS * FLINT_MAX(n, 1), EX_METHOD_AGM);
+}
+
+/* the wrappers for the other files (see impl.h) */
+
+void
+_mp_real_exp_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
+{
+    _ex_kernel(y, err, v, n, 0);
+}
+
+int
+_mp_real_exp_neg_series(nn_ptr y, ulong * err, nn_srcptr v, slong n)
+{
+    slong z = _mp_real_elem_lzb(v, n);
+
+    if (z == WORD_MAX || z < _ex_neg_series_min_z(n))
+        return 0;
+
+    _ex_neg_series(y, err, v, n, z);
+    return 1;
 }

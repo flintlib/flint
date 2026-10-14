@@ -776,6 +776,28 @@ FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
     return _mm256_and_si256(a, b);
 }
 
+FLINT_FORCE_INLINE vec4n vec4n_bit_or(vec4n a, vec4n b) {
+    return _mm256_or_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) {
+    return _mm256_slli_epi64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return _mm256_load_si256((const __m256i*) a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    _mm256_store_si256((__m256i*) z, a);
+}
+
+/* return {b[3], a[0], a[1], a[2]}: the lanes of a moved up by one, the
+   top lane of b entering at the bottom */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    return _mm256_alignr_epi8(a, _mm256_permute2x128_si256(b, a, 0x21), 8);
+}
+
 FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
     __m256d t = _mm256_set1_pd(0x1.0p52);
     return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
@@ -2380,9 +2402,50 @@ FLINT_FORCE_INLINE vec4n vec4n_permute2_1_3(vec4n a, vec4n b) {
     z3 = vec4n_permute2_1_3(_t1, _t3); \
 }
 
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong b) {
+    return vshlq_u64(a, vdupq_n_s64(-(int64_t) b));
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_left(vec2n a, ulong b) {
+    return vshlq_u64(a, vdupq_n_s64((int64_t) b));
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_or(vec2n a, vec2n b) {
+    return vorrq_u64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_zero(void) {
+    return vec4n_set_n(0);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return vec4n_load_unaligned(a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
+    vec4n z = {vec2n_bit_shift_right(a.e1, b), vec2n_bit_shift_right(a.e2, b)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) {
+    vec4n z = {vec2n_bit_shift_left(a.e1, b), vec2n_bit_shift_left(a.e2, b)};
+    return z;
+}
+
+/* return {b[3], a[0], a[1], a[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    vec4n z = {vextq_u64(b.e2, a.e1, 1), vextq_u64(a.e1, a.e2, 1)};
+    return z;
+}
+
 EXTEND_VEC_DEF2(vec2n, vec4n, _unpacklo)
 EXTEND_VEC_DEF2(vec2n, vec4n, _unpackhi)
 EXTEND_VEC_DEF1(vec2n, vec4n, _bit_shift_right_32)
+EXTEND_VEC_DEF2(vec2n, vec4n, _bit_or)
 EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
 EXTEND_VEC_DEF2(vec2n, vec4n, _add)
 EXTEND_VEC_DEF2(vec2n, vec4n, _sub)
@@ -3041,6 +3104,78 @@ FLINT_FORCE_INLINE vec4di vec4d_to_index(vec4d a) {
 FLINT_FORCE_INLINE vec4d vec4d_gather(const double * t, vec4di i) {
     return vec4d_set_d4(t[i.v[0]], t[i.v[1]], t[i.v[2]], t[i.v[3]]);
 }
+
+/*
+    vec4n: four ulong lanes, with the operations used by the radix-2^52
+    shift-and-add loops of mp_real (load/store, add, sub, bitwise and/or,
+    shifts by a common count, lane shift).
+*/
+# if defined(FLINT_MACHINE_VECTORS_GNU_VECTOR_EXTENSIONS)
+typedef ulong vec4n __attribute__((vector_size(4 * sizeof(ulong))));
+#  define VEC4N_LANE(a, i) ((a)[i])
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    vec4n z = {a0, a1, a2, a3}; return z;
+}
+FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b) { return a + b; }
+FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b) { return a - b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) { return a & b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_or(vec4n a, vec4n b) { return a | b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) { return a >> b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) { return a << b; }
+# else
+typedef struct {ulong v[4];} vec4n;
+#  define VEC4N_LANE(a, i) ((a).v[i])
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    vec4n z; z.v[0] = a0; z.v[1] = a1; z.v[2] = a2; z.v[3] = a3; return z;
+}
+#  define VEC4N_GEN2(NAME, OP) \
+FLINT_FORCE_INLINE vec4n vec4n_##NAME(vec4n a, vec4n b) { \
+    vec4n z; \
+    z.v[0] = a.v[0] OP b.v[0]; z.v[1] = a.v[1] OP b.v[1]; \
+    z.v[2] = a.v[2] OP b.v[2]; z.v[3] = a.v[3] OP b.v[3]; \
+    return z; \
+}
+#  define VEC4N_GENS(NAME, OP) \
+FLINT_FORCE_INLINE vec4n vec4n_##NAME(vec4n a, ulong b) { \
+    vec4n z; \
+    z.v[0] = a.v[0] OP b; z.v[1] = a.v[1] OP b; \
+    z.v[2] = a.v[2] OP b; z.v[3] = a.v[3] OP b; \
+    return z; \
+}
+VEC4N_GEN2(add, +)
+VEC4N_GEN2(sub, -)
+VEC4N_GEN2(bit_and, &)
+VEC4N_GEN2(bit_or, |)
+VEC4N_GENS(bit_shift_right, >>)
+VEC4N_GENS(bit_shift_left, <<)
+#  undef VEC4N_GEN2
+#  undef VEC4N_GENS
+# endif
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    vec4n z; memcpy(&z, a, sizeof(z)); return z;
+}
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return vec4n_load_unaligned(a);
+}
+FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
+    memcpy(z, &a, sizeof(a));
+}
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+    return vec4n_set_n4(a, a, a, a);
+}
+FLINT_FORCE_INLINE vec4n vec4n_zero(void) {
+    return vec4n_set_n(0);
+}
+/* return {b[3], a[0], a[1], a[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    return vec4n_set_n4(VEC4N_LANE(b, 3), VEC4N_LANE(a, 0),
+                        VEC4N_LANE(a, 1), VEC4N_LANE(a, 2));
+}
+# undef VEC4N_LANE
 
 # undef VEC4D_GEN1
 # undef VEC4D_GEN2

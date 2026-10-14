@@ -12,6 +12,7 @@
 #include "flint.h"
 #include "mpn_extras.h"
 #include "mp_real.h"
+#include "thread_support.h"
 #include "impl.h"
 
 /* The constants of the module, as balls and as limb arrays.
@@ -24,14 +25,16 @@
    radius determines it uniquely, so it is exact and *err = 1 bounds
    c - floor(c B^n) B^-n in ulps.
 
-   With cache = 1 the floors come from a per-thread cache, one entry per
-   constant.  Floors nest: the top limbs of floor(c B^N) are
-   floor(c B^n) for n <= N, so any request up to the cached precision
-   is a copy.  A longer request recomputes the entry at
-   N = max(n + 5, 1.5 N_old) limbs, so that a sequence of slowly
-   growing requests costs a constant factor over the last one.  The
-   ball version with cache = 1 reads the same entry and encloses the
-   floor with a radius of one ulp. */
+   With cache = 1 the floors come from a shared cache
+   (thread_support.h), one per constant, read by every thread.  Floors
+   nest: the top limbs of floor(c B^N) are floor(c B^n) for n <= N, so
+   any request up to the cached precision is a copy.  A longer request
+   recomputes the entry at N = max(n + 5, 1.5 N_old) limbs, so that a
+   sequence of slowly growing requests costs a constant factor over the
+   last one (and the superseded entries, which stay allocated until
+   flint_cleanup_master, a bounded multiple of it).  The ball version
+   with cache = 1 reads the same entry and encloses the floor with a
+   radius of one ulp. */
 
 typedef void (* _const_compute_func)(mp_real_t, slong);
 
@@ -46,7 +49,8 @@ enum
 {
     C_PI4 = MP_REAL_CONST_ID_PI4, C_LOG2 = MP_REAL_CONST_ID_LOG2, C_EULER,
     C_E, C_LOG10, C_CATALAN, C_ZETA3, C_ZETA5, C_GAMMA_1_3, C_GAMMA_1_4,
-    C_2_DIV_PI = MP_REAL_CONST_ID_2_DIV_PI, C_NUM
+    C_2_DIV_PI = MP_REAL_CONST_ID_2_DIV_PI,
+    C_INV_LOG2_FRAC = MP_REAL_CONST_ID_INV_LOG2_FRAC, C_NUM
 };
 
 static const _const_info_t _const_info[C_NUM] = {
@@ -61,31 +65,32 @@ static const _const_info_t _const_info[C_NUM] = {
     { _mp_real_const_gamma_1_3_compute, 1 },
     { _mp_real_const_gamma_1_4_compute, 1 },
     { _mp_real_const_2_div_pi_compute, 0 },
+    { _mp_real_const_inv_log2_frac_compute, 0 },
 };
 
-/* entry i holds floor(c B^_const_n[i]) in _const_n[i] + units limbs */
-static FLINT_TLS_PREFIX nn_ptr _const_d[C_NUM];
-static FLINT_TLS_PREFIX slong _const_n[C_NUM];
-static FLINT_TLS_PREFIX int _const_cleanup_registered = 0;
+/* a version of the entry of a constant: floor(c B^n) in n + units limbs */
+typedef struct
+{
+    slong n;
+    ulong d[];
+}
+_const_entry_struct;
 
+#define CONST_CACHE_INIT FLINT_SHARED_CACHE_INIT(flint_free)
+static flint_shared_cache_struct _const_cache[C_NUM] = {
+    CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT,
+    CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT,
+    CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT, CONST_CACHE_INIT
+};
+
+/* free the caches: not while another thread may be using them */
 void
 _mp_real_const_clear_cache(void)
 {
     slong i;
 
     for (i = 0; i < C_NUM; i++)
-    {
-        flint_free(_const_d[i]);
-        _const_d[i] = NULL;
-        _const_n[i] = 0;
-    }
-}
-
-static void
-_const_cleanup(void)
-{
-    _mp_real_const_clear_cache();
-    _const_cleanup_registered = 0;
+        flint_shared_cache_clear(_const_cache + i);
 }
 
 /* floor(c B^n) into (e, n + units) */
@@ -110,28 +115,51 @@ _const_floor(nn_ptr e, int id, slong n)
     mp_real_clear(v);
 }
 
-/* the cache entry of id covers at least n limbs */
-static void
+/* the shared cache protocol: a request is (id, n) */
+typedef struct
+{
+    int id;
+    slong n;
+}
+_const_req_struct;
+
+static int
+_const_sufficient(const void * version, void * args)
+{
+    return ((const _const_entry_struct *) version)->n
+        >= ((const _const_req_struct *) args)->n;
+}
+
+static void *
+_const_build(const void * old, void * args)
+{
+    const _const_req_struct * R = args;
+    int units = _const_info[R->id].units;
+    slong N = R->n + 5;
+    _const_entry_struct * e;
+
+    if (old != NULL)
+    {
+        slong N_old = ((const _const_entry_struct *) old)->n;
+        N = FLINT_MAX(N, N_old + N_old / 2);
+    }
+
+    e = flint_malloc(sizeof(_const_entry_struct) + (N + units) * sizeof(ulong));
+    e->n = N;
+    _const_floor(e->d, R->id, N);
+    return e;
+}
+
+/* the cache entry of id covering at least n limbs */
+static const _const_entry_struct *
 _const_ensure(int id, slong n)
 {
-    int units = _const_info[id].units;
+    _const_req_struct R;
 
-    if (n > _const_n[id])
-    {
-        slong N = FLINT_MAX(n + 5, _const_n[id] + _const_n[id] / 2);
-        nn_ptr e = flint_malloc((N + units) * sizeof(ulong));
-
-        _const_floor(e, id, N);
-        flint_free(_const_d[id]);
-        _const_d[id] = e;
-        _const_n[id] = N;
-
-        if (!_const_cleanup_registered)
-        {
-            flint_register_cleanup_function(_const_cleanup);
-            _const_cleanup_registered = 1;
-        }
-    }
+    R.id = id;
+    R.n = n;
+    return flint_shared_cache_ensure(_const_cache + id, _const_sufficient,
+        _const_build, &R);
 }
 
 static void
@@ -145,10 +173,18 @@ _const_limbs(nn_ptr res, ulong * err, int id, slong n, int cache)
     {
         _const_floor(res, id, n);
     }
+    else if (n <= MP_REAL_CONST_STATIC_N && (id == MP_REAL_CONST_ID_PI4
+        || id == MP_REAL_CONST_ID_LOG2 || id == MP_REAL_CONST_ID_2_DIV_PI
+        || id == MP_REAL_CONST_ID_INV_LOG2_FRAC))
+    {
+        /* the static tables (impl.h), so that the few-limb regimes
+           touch no shared cache */
+        flint_mpn_copyi(res, _mp_real_const_ptr(id, n), n);
+    }
     else
     {
-        _const_ensure(id, n);
-        flint_mpn_copyi(res, _const_d[id] + (_const_n[id] - n), n + units);
+        const _const_entry_struct * e = _const_ensure(id, n);
+        flint_mpn_copyi(res, e->d + (e->n - n), n + units);
     }
 
     if (err != NULL)
@@ -160,18 +196,19 @@ _const_limbs(nn_ptr res, ulong * err, int id, slong n, int cache)
 nn_srcptr
 _mp_real_const_cached_ptr(int id, slong n)
 {
-    _const_ensure(id, n);
-    return _const_d[id] + (_const_n[id] - n);
+    const _const_entry_struct * e = _const_ensure(id, n);
+    return e->d + (e->n - n);
 }
 
-/* the number of limbs the per-thread cache holds for id (0 if none;
-   the static tables cover MP_REAL_CONST_STATIC_N limbs of pi/4, log 2
-   and 2/pi regardless): lets a caller choose an algorithm that avoids
-   a constant not yet computed */
+/* the number of limbs the shared cache holds for id (0 if none; the
+   static tables cover MP_REAL_CONST_STATIC_N limbs of pi/4, log 2,
+   2/pi and 1/log 2 - 1 regardless): lets a caller choose an algorithm
+   that avoids a constant not yet computed */
 slong
 _mp_real_const_cached_limbs(int id)
 {
-    return _const_n[id];
+    const _const_entry_struct * e = flint_shared_cache_get(_const_cache + id);
+    return (e == NULL) ? 0 : e->n;
 }
 
 static void
@@ -220,3 +257,4 @@ DEF_CONST(zeta5, C_ZETA5)
 DEF_CONST(gamma_1_3, C_GAMMA_1_3)
 DEF_CONST(gamma_1_4, C_GAMMA_1_4)
 DEF_CONST(2_div_pi, C_2_DIV_PI)
+DEF_CONST(inv_log2_frac, C_INV_LOG2_FRAC)

@@ -84,7 +84,7 @@
    and a correction whose sign it knows. */
 
 /* extra bits of margin between the starting value's error and 2^-p0
-   in the truncation bound: the bitwise functions are within 2^11.1
+   in the truncation bound: the log1p and atan kernels are within 2^11.1
    ulps of their precision, x differs from its top p0n limbs by 2 ulps
    at most, the recursive start is within 2 ulps */
 #define NEWTON_SLACK_BITS 16
@@ -276,9 +276,10 @@ _mp_real_neglog_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     if (p0n <= MP_REAL_NEWTON_CUTOFF)
     {
         nn_ptr l2 = E, arg = E + p0n;
+        ulong e;
         _mp_real_const_log2(l2, NULL, p0n, 1);
         mpn_lshift(arg, xtop, p0n, 1);   /* 2 x_top - 1 */
-        _mp_real_log1p_bitwise_rs(t + (wn - p0n), NULL, arg, p0n, 0);
+        _mp_real_log1p_kernel(t + (wn - p0n), &e, arg, p0n);
         if (mpn_sub_n(t + (wn - p0n), l2, t + (wn - p0n), p0n))
             flint_mpn_zero(t + (wn - p0n), p0n);
     }
@@ -361,7 +362,10 @@ _mp_real_atan_newton_ball(mp_real_t res, nn_srcptr x, slong n, int forward,
     /* the starting value t = atan(x_top) at p0n limbs */
     flint_mpn_zero(t, wn - p0n);
     if (p0n <= MP_REAL_NEWTON_CUTOFF)
-        _mp_real_atan_bitwise_rs(t + (wn - p0n), NULL, xtop, p0n, 0);
+    {
+        ulong e;
+        _mp_real_atan_kernel(t + (wn - p0n), &e, xtop, p0n);
+    }
     else
     {
         _mp_real_atan_newton_ball(corr, xtop, p0n, forward, 0);

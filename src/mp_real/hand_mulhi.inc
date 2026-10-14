@@ -1,9 +1,9 @@
 #ifndef MP_REAL_HAND_MULHI_INC
 #define MP_REAL_HAND_MULHI_INC
 
-/* Inline high-multiply helpers shared by the hand-written fixed-point
-   series (dev/exp_series_hand.inc, dev/log1p_hand.inc,
-   dev/trig_hand.inc, carried into the *_opt_k.c kernels).
+/* Inline high-multiply helpers shared by the fixed-point series of the
+   dense-table kernels (*_opt_<n>.c) and the table-driven kernels of
+   small.h.
 
    All operands are fractions with the binary point above the top limb.
    The products keep only the top limbs: the low partials fall below the
@@ -11,22 +11,7 @@
    (thousands of ulp against outputs of hundreds of bits) absorb this
    many times over. */
 
-/* n_mulhi is newer than FLINT 3.3; define it when building against an
-   older release so that this file stands alone.  (This block can go
-   once the module only targets releases that ship it.) */
-#if __FLINT_RELEASE < __FLINT_RELEASE_NUM(3, 4, 0)
-static inline ulong
-n_mulhi(ulong a, ulong b)
-{
-#if FLINT_BITS == 64 && defined(__GNUC__)
-    return ((__uint128_t) a * (__uint128_t) b) >> 64;
-#else
-    ulong hi, lo;
-    umul_ppmm(hi, lo, a, b);
-    return hi;
-#endif
-}
-#endif
+#include "ulong_extras.h"
 
 /* Top 2 limbs of (a1:a0) * (b1:b0), discarding the low words of both
    cross products and the a0*b0 partial entirely: three multiplies and
@@ -87,22 +72,17 @@ FLINT_FORCE_INLINE void
 _mp_real_mulhi_3x2(ulong * r2, ulong * r1, ulong * r0,
     ulong a2, ulong a1, ulong a0, ulong b1, ulong b0)
 {
-    ulong t2, t1, t0, ph, pl;
+    ulong t2, t1, x2, x1, x0, h1, h0, ph, pl, qh, ql;
 
-    umul_ppmm(t2, t1, a2, b1);          /* weight 4 */
-    t0 = 0;
-    umul_ppmm(ph, pl, a1, b1);          /* weight 3 */
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), ph, pl);
-    umul_ppmm(ph, pl, a2, b0);          /* weight 3 */
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), ph, pl);
-    ph = n_mulhi(a0, b1);               /* weight 2: high word only */
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), UWORD(0), ph);
-    ph = n_mulhi(a1, b0);               /* weight 2: high word only */
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), UWORD(0), ph);
-
-    *r0 = t0;
-    *r1 = t1;
-    *r2 = t2;
+    h0 = n_mulhi(a0, b1);
+    add_ssaaaa(h1, h0, UWORD(0), h0, UWORD(0), n_mulhi(a1, b0));
+    umul_ppmm(ph, pl, a1, b1);
+    umul_ppmm(qh, ql, a2, b0);
+    add_sssaaaaaa(x2, x1, x0, UWORD(0), ph, pl, UWORD(0), qh, ql);
+    add_sssaaaaaa(x2, x1, x0, x2, x1, x0, UWORD(0), h1, h0);
+    umul_ppmm(t2, t1, a2, b1);
+    add_ssaaaa(*r2, *r1, t2, t1, x2, x1);
+    *r0 = x0;
 }
 
 #endif /* MP_REAL_HAND_MULHI_INC */

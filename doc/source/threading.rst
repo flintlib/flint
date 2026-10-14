@@ -133,3 +133,85 @@ the interfaces might change in a future version.
     The functions ``init(res, args)`` and ``clear(res, args)``
     initialize and clear intermediate result objects.
 
+Shared caches
+-------------------------------------------------------------------------------
+
+A shared cache, declared in ``thread_support.h``, holds one process-wide,
+read-only *version* of some lazily computed data -- a table of
+constants, say -- that any thread reads without locking: an acquire load
+of the current version, a plain load on x86-64.  The cache grows by
+replacement: a thread that finds the current version insufficient takes
+the cache's lock, checks again (another thread may have grown the cache
+meanwhile), builds a larger version, usually from the current one, and
+publishes it with a release store, so that a reader seeing the new
+version also sees its contents.  Superseded versions are retired, not
+freed, since other threads may still be reading them; everything is
+freed by :func:`flint_cleanup_master` (not by the per-thread
+:func:`flint_cleanup`, which a worker thread may call while others are
+still computing).  Versions should therefore grow geometrically, so
+that the retired ones hold a bounded multiple of the current one's
+memory.  The ``mp_real`` module keeps its reduction tables in such
+caches.
+
+.. type:: flint_shared_cache_struct
+
+    A cache: the lock, the current version, the retired versions, the
+    destructor of a version and the link into the cleanup registry.
+    Caches are static objects initialized with
+    ``FLINT_SHARED_CACHE_INIT``; the version objects are whatever the
+    module chooses, handled as ``void *``.
+
+.. macro:: FLINT_SHARED_CACHE_INIT(free_version)
+
+    The static initializer of a cache whose versions are freed by
+    ``void free_version(void * version)``, for example
+    ``static flint_shared_cache_struct my_cache = FLINT_SHARED_CACHE_INIT(my_free);``.
+
+.. type:: flint_shared_cache_free_t
+
+    ``void (* f)(void * version)``: frees one version.
+
+.. function:: void * flint_shared_cache_get(flint_shared_cache_struct * cache)
+
+    Returns the current version, or ``NULL`` if none has been published.
+    The version stays valid until :func:`flint_cleanup_master` (or
+    :func:`flint_shared_cache_clear`), whatever other threads publish
+    meanwhile.
+
+.. type:: flint_shared_cache_sufficient_t
+
+    ``int (* f)(const void * version, void * args)``: whether a version
+    satisfies the request described by *args*.
+
+.. type:: flint_shared_cache_build_t
+
+    ``void * (* f)(const void * version, void * args)``: a new version
+    satisfying the request, built from the current one (``NULL`` if
+    none) -- which must not be modified -- and typically covering it, so
+    that the new version satisfies every request the old one did.
+
+.. function:: void * flint_shared_cache_ensure(flint_shared_cache_struct * cache, flint_shared_cache_sufficient_t sufficient, flint_shared_cache_build_t build, void * args)
+
+    Returns a version satisfying the request *args*: the current one if
+    ``sufficient(version, args)`` holds, else the version
+    ``build(current, args)``, built and published under the cache's lock
+    after a second check of the current version.  This is the whole
+    protocol; the following primitives let a module run it by hand.
+
+.. function:: void flint_shared_cache_lock(flint_shared_cache_struct * cache)
+              void flint_shared_cache_unlock(flint_shared_cache_struct * cache)
+
+    Takes and releases the cache's lock, which serializes the growth of
+    the cache.  Readers do not take it.
+
+.. function:: void flint_shared_cache_publish(flint_shared_cache_struct * cache, void * version)
+
+    Under the lock: makes *version* the current version, retiring the
+    previous one, and registers the cache for :func:`flint_cleanup_master`.
+
+.. function:: void flint_shared_cache_clear(flint_shared_cache_struct * cache)
+
+    Frees every version of the cache, leaving it empty.  No other
+    thread may be reading the cache; this is for tuning and testing
+    programs measuring cold builds.  (:func:`flint_cleanup_master` does
+    this for every cache that has published a version.)

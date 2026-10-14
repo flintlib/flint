@@ -58,8 +58,10 @@ mp_real_set_verbose(int level)
     mp_real_verbose_level = level;
 }
 
-int
-mp_real_get_verbose(void)
+/* the level from the environment unless mp_real_set_verbose came first
+   (once, so that concurrent first callers do not race on the store) */
+static void
+_mp_real_verbose_init(void)
 {
     if (mp_real_verbose_level < 0)
     {
@@ -68,6 +70,17 @@ mp_real_get_verbose(void)
         if (mp_real_verbose_level < 0)
             mp_real_verbose_level = 0;
     }
+}
+
+int
+mp_real_get_verbose(void)
+{
+#if FLINT_USES_PTHREAD
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once(&once, _mp_real_verbose_init);
+#else
+    _mp_real_verbose_init();
+#endif
     return mp_real_verbose_level;
 }
 

@@ -41,24 +41,52 @@
 /* the series from z leading zero bits on: sin and 1 - cos by the
    reduced series of series_tapered.c / series_rs.c below 32 zero bits
    (and below 48 at 11-16 limbs), _mp_real_sin_cos_reduced beyond
-   (measured end to end, kernel / series time ratios: 1.1-1.4 at 2-8
-   limbs from z = 18, 1.1-1.3 at 10-20 limbs from z = 24-28, 1.1-1.6 at
-   24-128 limbs from z = 32, 1.1 at 192-384 limbs from z = 40-64) */
+   (measured kernel / series time ratios with the dense-table kernels:
+   1.0-1.15 at 4-6 limbs from z = 24-28, 1.0-2.9 at 3 and 7-12 limbs
+   from z = 32, 1.0-1.25 at 13-21 limbs from z = 48, 1.1-1.35 at 22-32
+   limbs from z = 32, at two limbs only from z = 64; end to end with the
+   bitwise kernels beyond: 1.1-1.6 at 33-128 limbs from z = 32, 1.1 at
+   192-384 limbs from z = 40-64) */
 static slong
 _sc_series_min_z(slong n)
 {
     if (n <= 1)
         return WORD_MAX;
+#if FLINT_BITS == 64
+    if (n <= 2)
+        return 64;
+    if (n <= 3)
+        return 32;
+    if (n <= 4)
+        return 24;
+    if (n <= 6)
+        return 28;
+    if (n <= 12)
+        return 32;
+    if (n <= 21)
+        return 48;
+#else
+    /* (no dense kernels) */
     if (n <= 8)
         return 18;
     if (n <= 12)
         return 24;
     if (n <= 20)
         return 28;
+#endif
+#if FLINT_BITS == 64
+    /* the vector kernel (two interleaved runs: 1.05-1.2 at 128 limbs
+       from z = 48) */
+    if (n <= 96)
+        return 32;
+    if (n <= 192)
+        return 48;
+#else
     if (n <= 128)
         return 32;
     if (n <= 192)
         return 40;
+#endif
     if (n <= 256)
         return 48;
     if (n <= 384)
@@ -138,7 +166,7 @@ _sc_guard(slong p)
     slong n = (p + 12 + FLINT_BITS - 1) / FLINT_BITS;
 
     if (n <= SC_BITWISE_MAX)
-        return FLINT_BIT_COUNT(6 * (ulong) _mp_real_trig_default_r_inline(n) + 131) + 3;
+        return FLINT_BIT_COUNT(6 * (ulong) _mp_real_sin_cos_default_r_inline(n) + 131) + 3;
     return 10;
 }
 
@@ -214,18 +242,18 @@ _sc_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n, ulong eps,
 /* sin, cos of a small exact x, |x| < 2^e: sin x = x, cos x = 1 up to
    x^3/6 < 2^(3e-2) and x^2/2 = 2^(2e-1) */
 static void
-_sc_small1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong e)
+_sc_small1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong e, slong prec)
 {
     if (rs != NULL)
     {
         mp_real_set(rs, x);
         rs->err = 0;
-        mp_real_add_error_2exp_si(rs, 3 * e - 2);
+        mp_real_add_error_2exp_si(rs, _mp_real_err_exp_clamp(3 * e - 2, e, prec));
     }
     if (rc != NULL)
     {
         mp_real_set_ui(rc, 1);
-        mp_real_add_error_2exp_si(rc, 2 * e - 1);
+        mp_real_add_error_2exp_si(rc, _mp_real_err_exp_clamp(2 * e - 1, 1, prec));
     }
 }
 
@@ -554,7 +582,7 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
         if (rc != NULL)
         {
             mp_real_set_ui(rc, 1);
-            mp_real_add_error_2exp_si(rc, FLINT_MIN(2 * e - 1, 1));
+            mp_real_add_error_2exp_si(rc, FLINT_MIN(_mp_real_err_exp_clamp(2 * e - 1, 1, prec), 1));
         }
         return;
     }
@@ -619,7 +647,7 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
         slong z = -emid;
 
         if (2 * z >= prec + 3)
-            _sc_small1(rs, rc, &mid, emid);
+            _sc_small1(rs, rc, &mid, emid, prec);
         else if (4 * z >= prec + 3)
             _sc_small2(rs, rc, &mid, emid,
                 (prec + z + 6 + FLINT_BITS - 1) / FLINT_BITS,

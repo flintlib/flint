@@ -15,6 +15,7 @@
 #include "mp_real.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
+#include "bitwise_boundary.h"
 
 TEST_FUNCTION_START(mp_real_tan_bitwise_rs, state)
 {
@@ -84,33 +85,74 @@ x = flint_malloc((n + 2) * sizeof(ulong));
         flint_free(res);
     }
 
-#if FLINT_BITS == 64
-    /* the public per-size wrappers _mp_real_tan_opt_<n> route to the
-       same specialized bodies as the r = 0 dispatch, so the two
-       must agree bit for bit */
+    /* r = 0 at the per-size sizes (on 64-bit machines the sine and
+       cosine kernels and a division) */
     {
-        static void (* const tab[])(nn_ptr, nn_srcptr) = {
-            NULL,
-            _mp_real_tan_opt_1, _mp_real_tan_opt_2, _mp_real_tan_opt_3,
-            _mp_real_tan_opt_4, _mp_real_tan_opt_5, _mp_real_tan_opt_6,
-            _mp_real_tan_opt_7, _mp_real_tan_opt_8, _mp_real_tan_opt_9,
-            _mp_real_tan_opt_10, _mp_real_tan_opt_11, _mp_real_tan_opt_12
-        };
-        slong n;
+        slong n, k;
 
-        for (n = 1; n <= 12; n++)
+        /* (n = 1 is unsupported on 32-bit limbs) */
+        for (n = (FLINT_BITS == 64) ? 1 : 2; n <= 12; n++)
         {
-            ulong x[12], t1[13], t2[13];
+            for (k = 0; k < 16; k++)
+            {
+                ulong x[12], t1[13];
+                arb_t xa, e;
+                double u;
 
-            flint_mpn_rrandom(x, state, n);
-            tab[n](t1, x);
-            _mp_real_tan_bitwise_rs(t2, &test_err_out, x, n, 0);
-            if (mpn_cmp(t1, t2, n + 1) != 0)
-                TEST_FUNCTION_FAIL("opt wrapper mismatch: "
-                    "n = %wd\n", n);
+                flint_mpn_rrandom(x, state, n);
+                if (k == 0)
+                    flint_mpn_zero(x, n);
+                if (k == 1)
+                    flint_mpn_store(x, n, ~UWORD(0));
+
+                _mp_real_tan_bitwise_rs(t1, &test_err_out, x, n, 0);
+
+                arb_init(xa);
+                arb_init(e);
+                _test_bitwise_arb(xa, x, n);
+                arb_tan(e, xa, FLINT_BITS * n + 128);
+                u = _test_bitwise_ulps(t1, n + 1, n, e);
+                arb_clear(xa);
+                arb_clear(e);
+
+                if (u > TEST_ERR(DOC_TAN_BITWISE_RS_MAX_ERR(n, 0)))
+                    TEST_FUNCTION_FAIL("r = 0: n = %wd, ulp = %f\n", n, u);
+            }
         }
     }
-#endif
+
+    /* arguments at the decision boundaries (greedy and signed digits) */
+    for (iter = 0; iter < 60 * flint_test_multiplier(); iter++)
+    {
+        slong n;
+        int r;
+        nn_ptr x, res;
+        arb_t xa, e;
+        double u;
+
+        _test_bitwise_boundary_nr(&n, &r, iter, state);
+        x = flint_malloc(n * sizeof(ulong));
+        res = flint_malloc((n + 1) * sizeof(ulong));
+        _test_bitwise_boundary_arg(x, n,
+            r ? r : _mp_real_trig_bitwise_rs_default_r(n), BOUNDARY_TRIG,
+            state);
+
+        _mp_real_tan_bitwise_rs(res, &test_err_out, x, n, r);
+
+        arb_init(xa);
+        arb_init(e);
+        _test_bitwise_arb(xa, x, n);
+        arb_tan(e, xa, FLINT_BITS * n + 128);
+        u = _test_bitwise_ulps(res, n + 1, n, e);
+        arb_clear(xa);
+        arb_clear(e);
+
+        if (u > TEST_ERR(DOC_TAN_BITWISE_RS_MAX_ERR(n, r)))
+            TEST_FUNCTION_FAIL("boundary: n = %wd, r = %d, ulp = %f\n", n, r, u);
+
+        flint_free(x);
+        flint_free(res);
+    }
 
     TEST_FUNCTION_END(state);
 }

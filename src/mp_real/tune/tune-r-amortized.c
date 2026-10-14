@@ -47,9 +47,6 @@
 #include "mp_real.h"
 #include "mp_real/impl.h"
 
-void _mp_real_exp_logs_ensure(slong nv, slong rc);
-void _mp_real_atans_ensure(slong nv, slong rc);
-
 typedef enum { F_EXP, F_LOG1P, F_ATAN, F_SINCOS, F_TAN } which_t;
 
 static void

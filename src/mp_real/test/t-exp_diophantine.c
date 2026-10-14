@@ -60,7 +60,7 @@ TEST_FUNCTION_START(mp_real_exp_diophantine, state)
         if (iter % 7 == 0)
             _mp_real_log_primes_clear();
 
-        _mp_real_log_primes_ensure(num, nv);
+        const _mp_real_tab_struct * LP = _mp_real_log_primes_ensure(num, nv);
 
         arb_init(l); fmpz_init(f); fmpz_init(g);
         arb_log_ui(l, n_nth_prime(j + 1), FLINT_BITS * nv + 200);
@@ -69,7 +69,7 @@ TEST_FUNCTION_START(mp_real_exp_diophantine, state)
         if (!arb_get_unique_fmpz(f, l))
             TEST_FUNCTION_FAIL("floor not determined: j = %wd, nv = %wd\n",
                 j, nv);
-        fmpz_set_ui_array(g, _mp_real_log_primes_entry(j, nv), nv + 1);
+        fmpz_set_ui_array(g, _mp_real_machin_entry(LP, j, nv), nv + 1);
         if (!fmpz_equal(f, g))
             TEST_FUNCTION_FAIL("cache: j = %wd, nv = %wd\n%{fmpz}\n%{fmpz}\n",
                 j, nv, f, g);

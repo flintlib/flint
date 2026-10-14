@@ -308,12 +308,12 @@ mp_real_sin_cos_pi_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong pre
             {
                 _pi_v_ball(ov, NULL, NULL, NULL, NULL, T, tl, te,
                     mp_real_prec_bits(prec), (a & 1) ? negc : negs);
-                mp_real_add_error_2exp_si(ov, 3 * e - 2);
+                mp_real_add_error_2exp_si(ov, _mp_real_err_exp_clamp(3 * e - 2, e, prec));
             }
             if (oc != NULL)
             {
                 mp_real_set_ui(oc, 1);
-                mp_real_add_error_2exp_si(oc, 2 * e - 1);
+                mp_real_add_error_2exp_si(oc, _mp_real_err_exp_clamp(2 * e - 1, 1, prec));
                 if ((a & 1) ? negs : negc)
                     mp_real_neg(oc, oc);
             }
@@ -401,7 +401,7 @@ mp_real_tan_pi_bits(mp_real_t res, const mp_real_t x, slong prec)
             if (!(a & 1))
             {
                 _pi_v_ball(res, NULL, NULL, NULL, NULL, T, tl, te, wn, neg);
-                mp_real_add_error_2exp_si(res, 3 * e - 1);
+                mp_real_add_error_2exp_si(res, _mp_real_err_exp_clamp(3 * e - 1, e, prec));
             }
             else
             {
@@ -453,4 +453,18 @@ mp_real_tan_pi_bits(mp_real_t res, const mp_real_t x, slong prec)
         mp_real_zero(res);
 
     return ok;
+}
+
+/* the wrappers for the other files (see impl.h) */
+
+int
+_mp_real_trig_pi_reduce(nn_ptr T, slong * tl, slong * te, const mp_real_t x)
+{
+    return _pi_reduce(T, tl, te, x);
+}
+
+void
+_mp_real_trig_pi_v_fixed(nn_ptr V, nn_srcptr T, slong tl, slong te, slong N)
+{
+    _pi_v_fixed(V, T, tl, te, N);
 }

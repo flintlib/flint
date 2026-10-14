@@ -146,6 +146,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
             ysin = flint_malloc((wn + 2) * sizeof(ulong));
             yg = flint_malloc((wn + 2) * sizeof(ulong));
 
+            flint_set_num_threads(1 + n_randint(state, 4));
             if (cases[c].fill == 2)
                 flint_mpn_zero(t, wn);
             else if (cases[c].fill == 1)
@@ -158,7 +159,6 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
                 t[wn - 1] = n_randtest(state);
             }
             else
-                flint_set_num_threads(1 + n_randint(state, 4));
                 flint_mpn_urandomb(t, state, FLINT_BITS * wn);
             for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
                 t[wn - 1 - i] = 0;

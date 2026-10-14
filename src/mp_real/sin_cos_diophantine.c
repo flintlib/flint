@@ -494,6 +494,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
     ulong relsum;
     double eps_min;
     nn_ptr base, t, tmp, s, g, cr, Ar, Ai, X, Y, N, Zr, Zi, C, S;
+    const _mp_real_tab_struct * AG;
     int neg, rot;
     TMP_INIT;
 
@@ -523,7 +524,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
         wr = 768 / FLINT_BITS;
     wr = FLINT_MAX(wr, (slong) ((-log2(tab->epsilon_min) + 80) / FLINT_BITS) + 1);
 
-    _mp_real_atan_gauss_ensure(num, FLINT_MAX(wr, n + 1));
+    AG = _mp_real_atan_gauss_ensure(num, FLINT_MAX(wr, n + 1));
 
     TMP_START;
     rel = TMP_ALLOC(num * sizeof(slong));
@@ -540,7 +541,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
     eps_min = FLINT_MAX(eps_min, _mp_real_d_2exp_neg_or_zero(FLINT_BITS * wr - 48));
 
     _mp_real_log_reduce(rel, tab, base, wr, max_weight, eps_min,
-        _mp_real_atan_gauss_entry(0, wr), _mp_real_atan_gauss_n);
+        _mp_real_machin_entry(AG, 0, wr), AG->nc);
 
     relsum = 0;
     for (j = 0; j < num; j++)
@@ -549,7 +550,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
         / FLINT_BITS;
     wn = n + G;
 
-    _mp_real_atan_gauss_ensure(num, wn);
+    AG = _mp_real_atan_gauss_ensure(num, wn);
 
     /* t = x B^G - sum c_j theta_j, two's complement; |t| < 1 and its
        sign only flips the sine of the residual */
@@ -559,7 +560,7 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
     flint_mpn_copyi(tmp + G, x, n);
     tmp[wn] = 0;
     _mp_real_log_dot(t, tmp, wn + 1, rel, num,
-        _mp_real_atan_gauss_entry(0, wn), _mp_real_atan_gauss_n);
+        _mp_real_machin_entry(AG, 0, wn), AG->nc);
     neg = (t[wn] >> (FLINT_BITS - 1)) != 0;
     if (neg)
         mpn_neg(t, t, wn + 1);

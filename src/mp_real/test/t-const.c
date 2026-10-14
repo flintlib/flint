@@ -31,6 +31,7 @@ static const mp_real_const_func const_ball[] = {
     mp_real_const_e, mp_real_const_log10, mp_real_const_catalan,
     mp_real_const_zeta3, mp_real_const_zeta5, mp_real_const_gamma_1_3,
     mp_real_const_gamma_1_4, mp_real_const_2_div_pi,
+    mp_real_const_inv_log2_frac,
 };
 
 static const const_limb_func const_limb[] = {
@@ -38,14 +39,15 @@ static const const_limb_func const_limb[] = {
     _mp_real_const_e, _mp_real_const_log10, _mp_real_const_catalan,
     _mp_real_const_zeta3, _mp_real_const_zeta5, _mp_real_const_gamma_1_3,
     _mp_real_const_gamma_1_4, _mp_real_const_2_div_pi,
+    _mp_real_const_inv_log2_frac,
 };
 
 /* a units limb for the constants in [1, B) */
-static const int const_units[] = { 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0 };
+static const int const_units[] = { 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0 };
 
 static const char * const_name[] = { "pi/4", "log(2)", "euler", "e",
     "log(10)", "catalan", "zeta(3)", "zeta(5)", "gamma(1/3)",
-    "gamma(1/4)", "2/pi" };
+    "gamma(1/4)", "2/pi", "1/log(2) - 1" };
 
 static const char * const_ref[] = {
     "0.7853981633974483096156608458198757210492923498437764552437361480769541015715522496570087063355292669955370216283205766617734611523876455579313398520321202793626",
@@ -59,9 +61,10 @@ static const char * const_ref[] = {
     "2.678938534707747633655692940974677644128689377957301100950428327590417610167743819540982889041188789419159049200072263335719084569504472259977713367708469768167",
     "3.625609908221908311930685155867672002995167682880065467433377999569919243538729121618360136723384300361471751392420719965891524094022559977426458890361450606414",
     "0.6366197723675813430755350534900574481378385829618257949906693762355871905369061403604552110650123438242913709070318321475716473844583146115118696429267993569169",
+    "0.4426950408889634073599246810018921374266459541529859341354494069311092191811850798855266228935063444969975183096525442555931016871683596427206621582234793362745",
 };
 
-#define NUM_CONST 11
+#define NUM_CONST 12
 
 TEST_FUNCTION_START(mp_real_const, state)
 {
@@ -134,6 +137,14 @@ TEST_FUNCTION_START(mp_real_const, state)
             TEST_FUNCTION_FAIL("%s: reference mismatch, n = %wd\n", const_name[c], n);
         if (!arb_overlaps(a0, a1))
             TEST_FUNCTION_FAIL("%s: the balls differ, n = %wd\n", const_name[c], n);
+
+        /* the static tables (read in place by _mp_real_const_ptr) hold
+           the same floors */
+        if ((c == MP_REAL_CONST_ID_PI4 || c == MP_REAL_CONST_ID_LOG2 ||
+             c == MP_REAL_CONST_ID_2_DIV_PI || c == MP_REAL_CONST_ID_INV_LOG2_FRAC)
+            && n <= MP_REAL_CONST_STATIC_N
+            && mpn_cmp(y0, _mp_real_const_ptr(c, n), n) != 0)
+            TEST_FUNCTION_FAIL("%s: static table differs, n = %wd\n", const_name[c], n);
 
         /* the cached ball is the floor with one ulp of radius */
         if (arb_rel_accuracy_bits(a1) < FLINT_BITS * n - 8)

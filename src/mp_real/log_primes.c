@@ -13,19 +13,20 @@
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "mp_real.h"
+#include "thread_support.h"
 #include "impl.h"
 
-/* Thread-local cache of fixed-point logarithms of the first
-   _mp_real_log_primes_num primes 2, 3, 5, ..., for the diophantine (multi-prime)
+/* Shared cache (thread_support.h) of fixed-point logarithms of the
+   first num primes 2, 3, 5, ..., for the diophantine (multi-prime)
    argument reductions (exp_diophantine.c).
 
-   Each entry occupies _mp_real_log_primes_n limbs: a unit limb on top
-   (log 41 < 4, so it holds two bits), then _mp_real_log_primes_n - 1
-   fraction limbs, the lowest of which is a guard.  The stored value
-   is the EXACT floor of log(p) 2^(FLINT_BITS (n - 1)), so the top
-   nv + 1 limbs of an entry are exactly the floor at nv fraction
-   limbs: floors nest, and consumers read the prefix they need
-   (_mp_real_log_primes_entry).  The reductions rely on the entries
+   Each entry occupies nc limbs: a unit limb on top (log 41 < 4, so it
+   holds two bits), then nc - 1 fraction limbs, the lowest of which is
+   a guard.  The stored value is the EXACT floor of
+   log(p) 2^(FLINT_BITS (nc - 1)), so the top nv + 1 limbs of an entry
+   are exactly the floor at nv fraction limbs: floors nest, and
+   consumers read the prefix they need (_mp_real_machin_entry, impl.h),
+   so one version serves every smaller precision.  The reductions rely on the entries
    being one-sided (at most the true value, short by less than one
    ulp of the limbs read).
 
@@ -36,20 +37,9 @@
    or arb's static 4608-bit table of the first 13 logarithms at small
    precisions), floored through the balls. */
 
-FLINT_TLS_PREFIX nn_ptr _mp_real_log_primes = NULL;
-FLINT_TLS_PREFIX slong _mp_real_log_primes_n = 0;
-FLINT_TLS_PREFIX slong _mp_real_log_primes_num = 0;
-static FLINT_TLS_PREFIX int _mp_real_log_primes_cleanup_registered = 0;
-
-static void
-_mp_real_log_primes_cleanup(void)
-{
-    flint_free(_mp_real_log_primes);
-    _mp_real_log_primes = NULL;
-    _mp_real_log_primes_n = 0;
-    _mp_real_log_primes_num = 0;
-    _mp_real_log_primes_cleanup_registered = 0;
-}
+/* the shared cache of the table (thread_support.h, impl.h) */
+static flint_shared_cache_struct _mp_real_log_primes_cache =
+    FLINT_SHARED_CACHE_INIT(_mp_real_tab_free);
 
 /* e_j = floor(v_j B^(nc - 1)) into nc limbs for j < num, if the balls
    determine these floors; returns 0 otherwise */
@@ -68,36 +58,32 @@ _mp_real_store_floors(nn_ptr e, slong nc, mp_real_struct * v, slong num)
     return 1;
 }
 
-void
-_mp_real_log_primes_ensure(slong num, slong nv)
+/* the shared cache protocol: a version grown from the current one,
+   recomputed as a whole (the Machin-type sets evaluate all entries
+   together) */
+static void *
+_mp_real_log_primes_build(const void * old, void * args)
 {
-    slong nc, j, guard;
+    _mp_real_tab_struct * T;
+    slong nc, num, j, guard, i_from;
     mp_real_struct * v;
 
-    FLINT_ASSERT(num >= 1 && num <= MP_REAL_LOG_PRIMES_MAX);
-
-    /* nv value fraction limbs, one guard limb, one unit limb */
-    if (nv + 2 <= _mp_real_log_primes_n && num <= _mp_real_log_primes_num)
-        return;
-
-    nc = FLINT_MAX(nv + 2, _mp_real_log_primes_n);
-    num = FLINT_MAX(num, _mp_real_log_primes_num);
-
-    flint_free(_mp_real_log_primes);
-    _mp_real_log_primes = flint_malloc(num * nc * sizeof(ulong));
-    _mp_real_log_primes_n = nc;
-    _mp_real_log_primes_num = num;
+    T = _mp_real_tab_new(old, args, &i_from);
+    nc = T->nc;
+    num = T->num;
+    if (i_from >= num)
+        return T;
 
     v = flint_malloc(num * sizeof(mp_real_struct));
     for (j = 0; j < num; j++)
         mp_real_init(v + j);
 
-    /* an undetermined floor (a value within the radius of a grid
-       point: astronomically rare) is retried at higher precision */
+    /* undetermined floors (a value within the radius of a grid point:
+       astronomically rare) are retried at higher precision */
     for (guard = 2; ; guard *= 2)
     {
         _mp_real_log_primes_vec(v, num, nc + guard);
-        if (_mp_real_store_floors(_mp_real_log_primes, nc, v, num))
+        if (_mp_real_store_floors(T->tab, nc, v, num))
             break;
     }
 
@@ -105,31 +91,30 @@ _mp_real_log_primes_ensure(slong num, slong nv)
         mp_real_clear(v + j);
     flint_free(v);
 
-    if (!_mp_real_log_primes_cleanup_registered)
-    {
-        flint_register_cleanup_function(_mp_real_log_primes_cleanup);
-        _mp_real_log_primes_cleanup_registered = 1;
-    }
+    return T;
 }
 
-/* the top nv + 1 limbs of entry j: nv fraction limbs with the unit
-   limb at index nv; valid until the next ensure call on this thread */
-nn_srcptr
-_mp_real_log_primes_entry(slong j, slong nv)
+/* the version covering num entries at nv value fraction limbs (one
+   guard limb below, one unit limb above) */
+const _mp_real_tab_struct *
+_mp_real_log_primes_ensure(slong num, slong nv)
 {
-    FLINT_ASSERT(j >= 0 && j < _mp_real_log_primes_num);
-    FLINT_ASSERT(nv >= 1 && nv + 2 <= _mp_real_log_primes_n);
-    return _mp_real_log_primes + j * _mp_real_log_primes_n
-        + (_mp_real_log_primes_n - (nv + 1));
+    _mp_real_tab_req_struct R;
+
+    FLINT_ASSERT(num >= 1 && num <= MP_REAL_LOG_PRIMES_MAX);
+
+    R.nc = nv + 2;
+    R.num = num;
+    return flint_shared_cache_ensure(&_mp_real_log_primes_cache,
+        _mp_real_tab_sufficient, _mp_real_log_primes_build, &R);
 }
 
+
+/* free the cache (no other thread may be using it: tuning programs) */
 void
 _mp_real_log_primes_clear(void)
 {
-    flint_free(_mp_real_log_primes);
-    _mp_real_log_primes = NULL;
-    _mp_real_log_primes_n = 0;
-    _mp_real_log_primes_num = 0;
+    flint_shared_cache_clear(&_mp_real_log_primes_cache);
 }
 
 /* the number of value fraction limbs the cached entries currently
@@ -137,5 +122,8 @@ _mp_real_log_primes_clear(void)
 slong
 _mp_real_log_primes_max_limbs(void)
 {
-    return FLINT_MAX(_mp_real_log_primes_n - 2, 0);
+    const _mp_real_tab_struct * T =
+        flint_shared_cache_get(&_mp_real_log_primes_cache);
+
+    return (T == NULL) ? 0 : T->nc - 2;
 }

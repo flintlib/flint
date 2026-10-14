@@ -119,7 +119,7 @@ residual_bits(nn_srcptr x, slong n, slong num, double w)
     else if (FLINT_BITS * n <= 100000) wr = 512 / FLINT_BITS;
     else wr = 768 / FLINT_BITS;
     wr = FLINT_MAX(wr, (slong) ((-log2(tab->epsilon_min) + 80) / FLINT_BITS) + 1);
-    _mp_real_log_primes_ensure(num, FLINT_MAX(wr, n + 1));
+    const _mp_real_tab_struct * LP = _mp_real_log_primes_ensure(num, FLINT_MAX(wr, n + 1));
 
     rel = flint_malloc(num * sizeof(slong));
     base = flint_malloc(wr * sizeof(ulong));
@@ -133,7 +133,7 @@ residual_bits(nn_srcptr x, slong n, slong num, double w)
     eps_min = ldexp(1.0, -(int) FLINT_MIN(FLINT_BITS * n + 32, 2000));
     eps_min = FLINT_MAX(eps_min, ldexp(1.0, -(int) (FLINT_BITS * wr - 48)));
     _mp_real_log_reduce(rel, tab, base, wr, w, eps_min,
-        _mp_real_log_primes_entry(0, wr), _mp_real_log_primes_n);
+        _mp_real_machin_entry(LP, 0, wr), LP->nc);
 
     /* t = x B - sum rel_j log p_j at n + 1 fraction limbs */
     tmp[0] = 0;
@@ -143,9 +143,9 @@ residual_bits(nn_srcptr x, slong n, slong num, double w)
     for (j = 0; j < num; j++)
     {
         if (rel[j] > 0)
-            mpn_submul_1(t, _mp_real_log_primes_entry(j, n + 1), n + 2, rel[j]);
+            mpn_submul_1(t, _mp_real_machin_entry(LP, j, n + 1), n + 2, rel[j]);
         else if (rel[j] < 0)
-            mpn_addmul_1(t, _mp_real_log_primes_entry(j, n + 1), n + 2, -rel[j]);
+            mpn_addmul_1(t, _mp_real_machin_entry(LP, j, n + 1), n + 2, -rel[j]);
     }
     if (t[n + 1] >> (FLINT_BITS - 1))
         r = -1.0;   /* negative: should not happen */

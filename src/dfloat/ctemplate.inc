@@ -147,13 +147,313 @@ int DC(is_finite)(DC(srcptr) x) { return DF(_is_finite_inline)(&x->re) && DF(_is
 int DC(equal)(DC(srcptr) x, DC(srcptr) y) { return DF(_equal_inline)(&x->re, &y->re) && DF(_equal_inline)(&x->im, &y->im); }
 
 
+/* ---- division, square roots, absolute value ----
+
+   Fast paths, with the real arithmetic of the format called directly:
+   a real or imaginary divisor (two real divisions), and operands whose
+   nonzero parts have leading components of magnitude in [2^-250, 2^250]
+   (DC_MODERATE), for which no square, product of up to three parts or
+   reciprocal of these (nor their trailing components) can overflow or
+   underflow, so that no rescaling is needed. Everything else (zero,
+   nonfinite or extreme operands) goes through the general functions of
+   complex.c, which also give the same results up to rounding.
+
+   * x / y = x conj(y) / |y|^2 and 1 / y = conj(y) / |y|^2: for N = 1 by
+     two divisions by |y|^2, for N > 1 by one reciprocal and two
+     products (cheaper than two divisions at these precisions).
+
+   * sqrt(x) for x = a + bi from m = |x| and w = m + |a| (no
+     cancellation): q = sqrt(w / 2) and b / (2q), except for N = 2, where
+     v = 1 / sqrt(2w), q = w v and b v (one reciprocal square root and two
+     products, cheaper than a square root and a division; for N >= 3 the
+     reciprocal square root of the format is neither faster nor as
+     accurate). The parts are (q, b / (2q)) for a >= 0 and
+     (|b| / (2q), sgn(b) q) for a < 0.
+
+   * 1 / sqrt(x) = conj(sqrt(x)) / m: for N <= 2, v = 1 / sqrt(m (w^2 +
+     b^2)) (= 1 / sqrt(2 m^2 w)) with the parts w v and b v; for N >= 3,
+     g = 1 / (sqrt(w / 2) m) with the parts (w / 2) g and (b / 2) g. */
+
+/* the real arithmetic in the fast paths: for N = 2 the kernels inlined
+   (the results are finite there, so that the treatment of nonfinite
+   values in the real functions is not needed), otherwise the functions */
+#if N == 2
+#define DC_FMUL(r, x, y) DF(_mul_kernel)((r)->d, NULL, (x)->d, (y)->d, 0)
+#define DC_FSQR(r, x) DF(_sqr_kernel)((r)->d, NULL, (x)->d, 0)
+#define DC_FADD(r, x, y) DF(_add_kernel)((r)->d, NULL, (x)->d, (y)->d, 0)
+#define DC_FSUB(r, x, y) DF(_sub_kernel)((r)->d, NULL, (x)->d, (y)->d, 0)
+#else
+#define DC_FMUL(r, x, y) DF(_mul_impl)(r, x, y)
+#define DC_FSQR(r, x) DF(_sqr_impl)(r, x)
+#define DC_FADD(r, x, y) DF(_add_impl)(r, x, y)
+#define DC_FSUB(r, x, y) DF(_sub_impl)(r, x, y)
+#endif
+
+#define DC_MODERATE(v) (fabs(v) >= 0x1p-250 && fabs(v) <= 0x1p250)
+#define DC_MODERATE_OR_ZERO(v) ((v) == 0.0 || DC_MODERATE(v))
+
+/* returns 0 if not handled */
+FLINT_FORCE_INLINE int
+DC(_div_fast)(DC(t) res, DC(srcptr) x, DC(srcptr) y)
+{
+    DF(t) s, t, p, q;
+    double c0 = y->re.d[0], d0 = y->im.d[0];
+
+    if (d0 == 0.0 && c0 != 0.0)
+    {
+        /* (a + bi) / c */
+        DF(_div_inline)(p, &x->re, &y->re);
+        DF(_div_inline)(&res->im, &x->im, &y->re);
+        res->re = *p;
+        return 1;
+    }
+
+    if (c0 == 0.0 && d0 != 0.0)
+    {
+        /* (a + bi) / (di) = b / d - (a / d) i */
+        DF(_div_inline)(p, &x->im, &y->im);
+        DF(_div_inline)(q, &x->re, &y->im);
+        res->re = *p;
+        DF(_neg_inline)(&res->im, q);
+        return 1;
+    }
+
+    if (!DC_MODERATE(c0) || !DC_MODERATE(d0) ||
+        !DC_MODERATE_OR_ZERO(x->re.d[0]) || !DC_MODERATE_OR_ZERO(x->im.d[0]))
+        return 0;
+
+    /* (a c + b d) + (b c - a d) i over c^2 + d^2 */
+    DC_FSQR(s, &y->re);
+    DC_FSQR(t, &y->im);
+    DC_FADD(s, s, t);
+    DC_FMUL(p, &x->re, &y->re);
+    DC_FMUL(t, &x->im, &y->im);
+    DC_FADD(p, p, t);
+    DC_FMUL(q, &x->im, &y->re);
+    DC_FMUL(t, &x->re, &y->im);
+    DC_FSUB(q, q, t);
+    if (N == 1)
+    {
+        res->re.d[0] = p->d[0] / s->d[0];
+        res->im.d[0] = q->d[0] / s->d[0];
+    }
+    else
+    {
+        DF(_inv_inline)(t, s);
+        DC_FMUL(&res->re, p, t);
+        DC_FMUL(&res->im, q, t);
+    }
+    return 1;
+}
+
+FLINT_FORCE_INLINE int
+DC(_inv_fast)(DC(t) res, DC(srcptr) x)
+{
+    DF(t) s, t, p;
+    double c0 = x->re.d[0], d0 = x->im.d[0];
+
+    if (d0 == 0.0 && c0 != 0.0)
+    {
+        DF(_inv_inline)(&res->re, &x->re);
+        DF(_zero_inline)(&res->im);
+        return 1;
+    }
+
+    if (c0 == 0.0 && d0 != 0.0)
+    {
+        /* 1 / (di) = -i / d */
+        DF(_inv_inline)(p, &x->im);
+        DF(_zero_inline)(&res->re);
+        DF(_neg_inline)(&res->im, p);
+        return 1;
+    }
+
+    if (!DC_MODERATE(c0) || !DC_MODERATE(d0))
+        return 0;
+
+    DC_FSQR(s, &x->re);
+    DC_FSQR(t, &x->im);
+    DC_FADD(s, s, t);
+    if (N == 1)
+    {
+        res->re.d[0] = c0 / s->d[0];
+        res->im.d[0] = -d0 / s->d[0];
+    }
+    else
+    {
+        DF(_inv_inline)(t, s);
+        DC_FMUL(p, &x->im, t);
+        DC_FMUL(&res->re, &x->re, t);
+        DF(_neg_inline)(&res->im, p);
+    }
+    return 1;
+}
+
+/* m = |x| and w = m + |a| for x with moderate parts; u = b^2 */
+FLINT_FORCE_INLINE void
+DC(_abs_w)(DF(t) m, DF(t) w, DF(t) u, DC(srcptr) x)
+{
+    DF(t) s;
+    DC_FSQR(u, &x->im);
+    DC_FSQR(s, &x->re);
+    DC_FADD(s, s, u);
+    DF(_sqrt_inline)(m, s);
+    if (x->re.d[0] >= 0.0)
+        DC_FADD(w, m, &x->re);
+    else
+        DC_FSUB(w, m, &x->re);
+}
+
+FLINT_FORCE_INLINE int
+DC(_sqrt_fast)(DC(t) res, DC(srcptr) x)
+{
+    DF(t) m, w, u, v, q, r;
+    double a0 = x->re.d[0], b0 = x->im.d[0];
+
+    if (!DC_MODERATE(a0) || !DC_MODERATE(b0))
+        return 0;
+
+    DC(_abs_w)(m, w, u, x);
+
+    if (N == 1)
+    {
+        q->d[0] = sqrt(0.5 * w->d[0]);
+        r->d[0] = b0 / (2.0 * q->d[0]);
+    }
+    else if (N == 2)
+    {
+        DF(_mul_2exp_si_impl)(v, w, 1);
+        DF(_rsqrt_inline)(v, v);
+        DC_FMUL(q, w, v);
+        DC_FMUL(r, &x->im, v);
+    }
+    else
+    {
+        DF(_mul_2exp_si_impl)(v, w, -1);
+        DF(_sqrt_inline)(q, v);
+        DF(_mul_2exp_si_impl)(v, q, 1);
+        DF(_div_inline)(r, &x->im, v);
+    }
+
+    if (a0 >= 0.0)
+    {
+        res->re = *q;
+        res->im = *r;
+    }
+    else
+    {
+        DF(_abs_inline)(&res->re, r);
+        if (b0 < 0.0)
+            DF(_neg_inline)(&res->im, q);
+        else
+            res->im = *q;
+    }
+    return 1;
+}
+
+FLINT_FORCE_INLINE int
+DC(_rsqrt_fast)(DC(t) res, DC(srcptr) x)
+{
+    DF(t) m, w, u, v, q, r;
+    double a0 = x->re.d[0], b0 = x->im.d[0];
+
+    if (!DC_MODERATE(a0) || !DC_MODERATE(b0))
+        return 0;
+
+    DC(_abs_w)(m, w, u, x);
+    if (N <= 2)
+    {
+        DC_FSQR(v, w);
+        DC_FADD(v, v, u);
+        DC_FMUL(v, v, m);
+        DF(_rsqrt_inline)(v, v);
+        DC_FMUL(q, w, v);
+        DC_FMUL(r, &x->im, v);
+    }
+    else
+    {
+        /* with h = w / 2 and g = 1 / (sqrt(h) m): q = h g, r = (b / 2) g */
+        DF(_mul_2exp_si_impl)(w, w, -1);
+        DF(_sqrt_inline)(v, w);
+        DC_FMUL(v, v, m);
+        DF(_inv_inline)(v, v);
+        DC_FMUL(q, w, v);
+        DF(_mul_2exp_si_impl)(u, &x->im, -1);
+        DC_FMUL(r, u, v);
+    }
+
+    /* (q, -b v) for a >= 0, (|b| v, -sgn(b) q) for a < 0 */
+    if (a0 >= 0.0)
+    {
+        res->re = *q;
+        DF(_neg_inline)(&res->im, r);
+    }
+    else
+    {
+        DF(_abs_inline)(&res->re, r);
+        if (b0 < 0.0)
+            res->im = *q;
+        else
+            DF(_neg_inline)(&res->im, q);
+    }
+    return 1;
+}
+
+FLINT_FORCE_INLINE int
+DC(_abs_fast)(DF(t) res, DC(srcptr) x)
+{
+    DF(t) m, w, u;
+    double a0 = x->re.d[0], b0 = x->im.d[0];
+
+    if (b0 == 0.0)
+    {
+        DF(_abs_inline)(res, &x->re);
+        return 1;
+    }
+    if (a0 == 0.0)
+    {
+        DF(_abs_inline)(res, &x->im);
+        return 1;
+    }
+    if (!DC_MODERATE(a0) || !DC_MODERATE(b0))
+        return 0;
+
+    DC_FSQR(u, &x->im);
+    DC_FSQR(w, &x->re);
+    DC_FADD(w, w, u);
+    DF(_sqrt_inline)(m, w);
+    *res = *m;
+    return 1;
+}
+
+void DC(div)(DC(t) res, DC(srcptr) x, DC(srcptr) y)
+{
+    if (!DC(_div_fast)(res, x, y))
+        GR_IGNORE(_dfloat_complex_div(&DFV(ops), res->re.d, x->re.d, y->re.d, DFLOAT_MODE_AUTO));
+}
+void DC(inv)(DC(t) res, DC(srcptr) x)
+{
+    if (!DC(_inv_fast)(res, x))
+        GR_IGNORE(_dfloat_complex_inv(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO));
+}
+void DC(sqrt)(DC(t) res, DC(srcptr) x)
+{
+    if (!DC(_sqrt_fast)(res, x))
+        _dfloat_complex_sqrt(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO);
+}
+void DC(rsqrt)(DC(t) res, DC(srcptr) x)
+{
+    if (!DC(_rsqrt_fast)(res, x))
+        GR_IGNORE(_dfloat_complex_rsqrt(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO));
+}
+void DC(abs)(DF(t) res, DC(srcptr) x)
+{
+    if (!DC(_abs_fast)(res, x))
+        _dfloat_complex_abs(&DFV(ops), res->d, x->re.d);
+}
+
 /* ---- through complex.c ---- */
 
-void DC(div)(DC(t) res, DC(srcptr) x, DC(srcptr) y) { GR_IGNORE(_dfloat_complex_div(&DFV(ops), res->re.d, x->re.d, y->re.d, DFLOAT_MODE_AUTO)); }
-void DC(inv)(DC(t) res, DC(srcptr) x) { GR_IGNORE(_dfloat_complex_inv(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO)); }
-void DC(sqrt)(DC(t) res, DC(srcptr) x) { _dfloat_complex_sqrt(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO); }
-void DC(rsqrt)(DC(t) res, DC(srcptr) x) { GR_IGNORE(_dfloat_complex_rsqrt(&DFV(ops), res->re.d, x->re.d, DFLOAT_MODE_AUTO)); }
-void DC(abs)(DF(t) res, DC(srcptr) x) { _dfloat_complex_abs(&DFV(ops), res->d, x->re.d); }
 void DC(arg)(DF(t) res, DC(srcptr) x) { _dfloat_complex_arg(&DFV(ops), res->d, x->re.d); }
 void DC(exp)(DC(t) res, DC(srcptr) x) { _dfloat_complex_exp(&DFV(ops), res->re.d, x->re.d); }
 void DC(log)(DC(t) res, DC(srcptr) x) { GR_IGNORE(_dfloat_complex_log(&DFV(ops), res->re.d, x->re.d)); }
@@ -820,6 +1120,43 @@ static int GRC(mul_two)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_mul_2exp_
 static int GRC(mul_2exp_si)(DC(ptr) res, DC(srcptr) x, slong e, gr_ctx_t ctx) { DC(_mul_2exp_si_inline)(res, x, e); return GR_SUCCESS; }
 static int GRC(conj)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_conj_inline)(res, x); return GR_SUCCESS; }
 static int GRC(re)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->re; DF(_zero_inline)(&res->im); return GR_SUCCESS; }
+
+/* (GR_DOMAIN at the exact singularities, as in complex.c, whose plain
+   functions return no other status) */
+static int GRC(div)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx)
+{
+    if (DC_EXACT_ZERO(&y->re) && DC_EXACT_ZERO(&y->im))
+        return GR_DOMAIN;
+    DC(div)(res, x, y);
+    return GR_SUCCESS;
+}
+static int GRC(inv)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{
+    if (DC_EXACT_ZERO(&x->re) && DC_EXACT_ZERO(&x->im))
+        return GR_DOMAIN;
+    DC(inv)(res, x);
+    return GR_SUCCESS;
+}
+static int GRC(sqrt)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{
+    DC(sqrt)(res, x);
+    return GR_SUCCESS;
+}
+static int GRC(rsqrt)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{
+    if (DC_EXACT_ZERO(&x->re) && DC_EXACT_ZERO(&x->im))
+        return GR_DOMAIN;
+    DC(rsqrt)(res, x);
+    return GR_SUCCESS;
+}
+static int GRC(abs)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{
+    DF(t) t;
+    DC(abs)(t, x);
+    res->re = *t;
+    DF(_zero_inline)(&res->im);
+    return GR_SUCCESS;
+}
 static int GRC(im)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->im; DF(_zero_inline)(&res->im); return GR_SUCCESS; }
 
 static void GRC(vec_init)(DC(ptr) vec, slong len, gr_ctx_t ctx)
@@ -892,6 +1229,16 @@ GRC_STRONG_DOT(vec_dot, 0)
 GRC_STRONG_DOT(vec_dot_rev, 1)
 static DC_COLD int GRC(vec_exp_strong)(DC(ptr) res, DC(srcptr) x, slong len, gr_ctx_t ctx)
 { slong i; DCV(vec_exp)(res, x, len); for (i = 0; i < len; i++) DC(_canon)(res + i); return GR_SUCCESS; }
+static DC_COLD int GRC(div_strong)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx)
+{ int status = GRC(div)(res, x, y, ctx); DC(_canon)(res); return status; }
+static DC_COLD int GRC(inv_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{ int status = GRC(inv)(res, x, ctx); DC(_canon)(res); return status; }
+static DC_COLD int GRC(sqrt_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{ int status = GRC(sqrt)(res, x, ctx); DC(_canon)(res); return status; }
+static DC_COLD int GRC(rsqrt_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{ int status = GRC(rsqrt)(res, x, ctx); DC(_canon)(res); return status; }
+static DC_COLD int GRC(abs_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{ int status = GRC(abs)(res, x, ctx); DC(_canon)(res); return status; }
 
 gr_method_tab_input DCV(gr_strong_methods_input)[] =
 {
@@ -908,6 +1255,11 @@ gr_method_tab_input DCV(gr_strong_methods_input)[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) GRC(vec_dot_strong)},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) GRC(vec_dot_rev_strong)},
     {GR_METHOD_VEC_EXP,         (gr_funcptr) GRC(vec_exp_strong)},
+    {GR_METHOD_DIV,             (gr_funcptr) GRC(div_strong)},
+    {GR_METHOD_INV,             (gr_funcptr) GRC(inv_strong)},
+    {GR_METHOD_SQRT,            (gr_funcptr) GRC(sqrt_strong)},
+    {GR_METHOD_RSQRT,           (gr_funcptr) GRC(rsqrt_strong)},
+    {GR_METHOD_ABS,             (gr_funcptr) GRC(abs_strong)},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -952,6 +1304,11 @@ gr_method_tab_input DCV(gr_methods_input)[] =
     {GR_METHOD_RE,              (gr_funcptr) GRC(re)},
     {GR_METHOD_IM,              (gr_funcptr) GRC(im)},
     {GR_METHOD_I,               (gr_funcptr) GRC(i)},
+    {GR_METHOD_DIV,             (gr_funcptr) GRC(div)},
+    {GR_METHOD_INV,             (gr_funcptr) GRC(inv)},
+    {GR_METHOD_SQRT,            (gr_funcptr) GRC(sqrt)},
+    {GR_METHOD_RSQRT,           (gr_funcptr) GRC(rsqrt)},
+    {GR_METHOD_ABS,             (gr_funcptr) GRC(abs)},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) GRC(vec_init)},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) GRC(vec_clear)},
     {GR_METHOD_VEC_SET,         (gr_funcptr) GRC(vec_set)},

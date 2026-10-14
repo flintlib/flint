@@ -11,8 +11,8 @@
 
 /* Tune the LARGE-n default reduction parameters of the bitwise
    functions (used when they are called with r = 0 beyond the sizes
-   the fully specialized *_opt_<n>.c files cover; those small-n r are
-   tuned per size, at arbitrary r, by dev/tune_mp_real.py -- this
+   of the per-size kernels, small.h and the dense-table *_opt_<n>.c,
+   whose r are fixed resp. tuned per size by dev/tune_mp_real.py -- this
    program picks from the ladder where the general series evaluation
    is available in the library).
 
@@ -234,17 +234,21 @@ main(int argc, char * argv[])
     flint_printf("/* tuning the bitwise default r"
         "\n   (nmax = %wd, rmax = %wd) */\n\n", nmax, rmax);
 
-    tune_func("_mp_real_exp_bitwise_rs", _mp_real_exp_bitwise_rs,
-        nmax, rmax);
-    tune_func("_mp_real_log1p_bitwise_rs", _mp_real_log1p_bitwise_rs,
-        nmax, rmax);
-    tune_func("_mp_real_atan_bitwise_rs", _mp_real_atan_bitwise_rs,
-        nmax, rmax);
+    /* on 64-bit machines explicit r reaches the vector paths
+       (bitwise_vec.c) from their MP_REAL_*_BITWISE_VEC_MIN limbs, whose
+       tables these are (log1p's below 48 limbs are the limb path's) */
+#if FLINT_BITS == 64
+#define TAB_NAME(f) "_mp_real_" f "_bitwise_vec"
+#else
+#define TAB_NAME(f) "_mp_real_" f "_bitwise_rs"
+#endif
+    tune_func(TAB_NAME("exp"), _mp_real_exp_bitwise_rs, nmax, rmax);
+    tune_func(TAB_NAME("log1p"), _mp_real_log1p_bitwise_rs, nmax, rmax);
+    tune_func(TAB_NAME("atan"), _mp_real_atan_bitwise_rs, nmax, rmax);
     /* sin_cos and tan share the half-angle path: the sin_cos run
-       below yields _mp_real_trig_bitwise_rs_{r,n}_tab, and the tangent
-       run is a cross-check whose crossovers should agree */
-    tune_func("_mp_real_trig_bitwise_rs", sin_cos_wrapper,
-        nmax, rmax);
+       below yields _mp_real_trig_bitwise_{rs,vec}_{r,n}_tab, and the
+       tangent run is a cross-check whose crossovers should agree */
+    tune_func(TAB_NAME("trig"), sin_cos_wrapper, nmax, rmax);
     tune_func("mp_real_tan_bitwise_rs_CROSSCHECK", _mp_real_tan_bitwise_rs,
         nmax, rmax);
 

@@ -20,6 +20,33 @@ _mp_real_elem_half_ratio(nn_ptr w, nn_srcptr s, slong n, int minus)
     nn_ptr D;
     TMP_INIT;
 
+    if (n <= 2)
+    {
+        /* the exact floor, in registers */
+        ulong s1 = (n == 2) ? s[1] : s[0], s0 = (n == 2) ? s[0] : 0;
+        ulong d2, d1, d0, q[2];
+
+        if (minus)
+        {
+            sub_dddmmmsss(d2, d1, d0, UWORD(2), UWORD(0), UWORD(0), UWORD(0), s1, s0);
+        }
+        else
+        {
+            d2 = 2; d1 = s1; d0 = s0;
+        }
+
+        _mp_real_divq_4_3z(q, s1, s0, d2, d1, d0);
+
+        if (n == 2)
+        {
+            w[0] = q[0];
+            w[1] = q[1];
+        }
+        else
+            w[0] = q[1];
+        return;
+    }
+
     TMP_START;
     D = TMP_ALLOC((n + 1) * sizeof(ulong));
     if (minus)
