@@ -15,6 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fft.h"
 
 #if FLINT_HAVE_FFT_SMALL
 #include "fft_small.h"
@@ -283,6 +284,35 @@ _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1,
     bits1 = FLINT_ABS(sbits1);
     bits2 = FLINT_ABS(sbits2);
 
+    /* Middle products whose cyclic Schoenhage-Strassen transform is at
+       most 3/4 of the truncated length (see fft_convolution_choose_mid),
+       in the two bands where that measured faster than the fft_small
+       based methods: coefficients of about 1000-2000 bits (0.8-0.95 of
+       the time from length 16-32 to 512) and of 65536 bits and more
+       (0.85-0.95 from length 64; with several threads only up to length
+       128, beyond which the threaded fft_small methods win). */
+    if (nlo > 0 && nhi < len1 + len2 - 1 && len2 >= 16)
+    {
+        slong bsum = bits1 + bits2;
+
+        if ((bsum >= 1900 && bsum <= 4400 && len2 <= 512 &&
+                len2 >= (bsum >= 3000 ? 16 : 32)) ||
+            (bsum >= 120000 && len2 >= 64 &&
+                (len2 <= 128 || flint_get_num_threads() == 1)))
+        {
+            slong len_out = len1 + len2 - 1, trunc, depth;
+
+            depth = fft_convolution_choose_mid(&trunc, len_out, nlo, nhi);
+
+            if (trunc == (WORD(4) << depth) && trunc != len_out &&
+                4 * trunc <= 3 * len_out)
+            {
+                _fmpz_poly_mulmid_SS(res, poly1, len1, poly2, len2, nlo, nhi);
+                return;
+            }
+        }
+    }
+
 #if FLINT_HAVE_FFT_SMALL
     if (((nlo == 0 && nhi < len1 + len2 - 1) ?
             (len2 >= 100 && (bits1 + bits2 <= 40 || bits1 + bits2 >= 128 || len2 >= 130)) :
@@ -534,7 +564,7 @@ _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1,
            huge products when using many threads. */
         if ((squaring && len2 >= 8 && len2 <= 75 && bsum >= 800 && bsum <= 4000) ||
             (len1 + len2 >= 5000 && bsum >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4) ||
-            (!squaring && bsum >= 80000 && (double) (len1 + len2) * bsum > 4e9))
+            (bsum >= 80000 && (double) (len1 + len2) * bsum > 4e9))
             _fmpz_poly_mulmid_SS(res, poly1, len1, poly2, len2, nlo, nhi);
         else
             _fmpz_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi);

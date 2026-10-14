@@ -702,6 +702,110 @@ void fft_small_op_neg(fft_small_op_t Z, const fft_small_op_t A,
    pointwise stage) */
 void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P);
 
+/*
+    Shared machinery of the mpn drivers on transformed operands (the
+    complex products below and the gr transformed-mpn ring).
+
+    Window plans. fft_small_plan_init_mpn_window is fft_small_plan_init_mpn
+    for products of which only the limbs [lo, hi) are needed: only the
+    chunk coefficients that can reach those limbs are reconstructed, and
+    when a power of two 2^d at least the operand lengths and the highest
+    such coefficient exists with the coefficients past 2^d aliasing onto
+    ones below the lowest, the transforms are cyclic of length 2^d. The
+    slots below the lowest needed coefficient are then not exact values;
+    exports must read windows inside [lo, hi). lo = 0 and hi at least
+    the product length give the ordinary plan.
+    fft_small_plan_mpn_nslots is the number of slots the inverse
+    transform computes for operands of at most an_max and bn_max limbs.
+*/
+int fft_small_plan_init_mpn_window(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed, ulong lo, ulong hi);
+ulong fft_small_plan_mpn_nslots(const fft_small_plan_t P, ulong an_max,
+                    ulong bn_max);
+/* whether the plan's transforms are cyclic (slots alias) */
+int fft_small_plan_is_cyclic(const fft_small_plan_t P);
+
+/* limbs the reconstruction of nslots slots writes: signed (centered
+   lifts) and unsigned with up to len_bound accumulated products per
+   slot; exports into shorter windows stage through scratch */
+ulong fft_small_export_mpn_signed_limbs(const fft_small_plan_t P,
+                    ulong nslots);
+ulong fft_small_export_mpn_limbs(const fft_small_plan_t P,
+                    ulong len_bound, ulong nslots);
+
+/* inverse transform of the first itrunc slots in place, threaded over
+   the primes; scale (if not NULL) holds per-prime normalizers deferred
+   past the pointwise stage, applied after the inverse transform; the
+   slots [itrunc, clear_to) are zeroed for exports reading whole chunks
+   past the transformed range */
+void fft_small_ifft_trunc(fft_small_op_t X, ulong itrunc, ulong clear_to,
+                    const ulong * scale, const fft_small_plan_t P);
+
+/*
+    Operand storage pools: a block of equal slabs for operand data
+    (fft_small_op_init_borrowed) plus an optional staging region for
+    conversions, taken from the calling thread's mpn_ctx buffer by a
+    reservation (FFT_SMALL_OP_POOL_RESERVE) and/or allocated
+    (FFT_SMALL_OP_POOL_ALLOC). Take and give are thread safe, so a pool
+    may serve several threads; a reserved pool must be cleared on the
+    thread that created it, after every slab has been given back. Take
+    returns NULL when no slab is free; callers then allocate.
+
+    Scratch for conversions comes from the staging region when it is
+    free and large enough, else from a free slab when use_slabs is set,
+    else from a plain allocation; every request is independent, so
+    concurrent conversions are safe.
+*/
+#define FFT_SMALL_OP_POOL_RESERVE 1
+#define FFT_SMALL_OP_POOL_ALLOC 2
+
+typedef struct
+{
+    mpn_ctx_struct * R;         /* holder of the reservation, or NULL */
+    char * base;                /* the slabs, then the staging region */
+    ulong slab_size;
+    slong count;
+    slong * free_slots;
+    slong navail;
+    char * stage;
+    ulong stage_size;
+    int stage_busy;
+    int allocated;              /* base was allocated, not reserved */
+#if FLINT_USES_PTHREAD
+    pthread_mutex_t mutex;
+#endif
+} fft_small_op_pool_struct;
+
+typedef fft_small_op_pool_struct fft_small_op_pool_t[1];
+
+void fft_small_op_pool_init(fft_small_op_pool_t pool);
+int fft_small_op_pool_fit(fft_small_op_pool_t pool, mpn_ctx_t R,
+                    ulong slab_size, slong count, ulong stage_bytes,
+                    int flags);
+void fft_small_op_pool_clear(fft_small_op_pool_t pool);
+double * fft_small_op_pool_take(fft_small_op_pool_t pool);
+void fft_small_op_pool_give(fft_small_op_pool_t pool, double * d);
+int fft_small_op_pool_owns(const fft_small_op_pool_t pool, const void * d);
+ulong * fft_small_op_pool_scratch_take(fft_small_op_pool_t pool,
+                    ulong limbs, int use_slabs);
+void fft_small_op_pool_scratch_give(fft_small_op_pool_t pool, ulong * t);
+
+/*
+    Staged conversion out. A value whose reconstruction needs 'need'
+    limbs is exported into a caller window of zn limbs directly when the
+    window is wide enough, and otherwise into pool scratch (pool may be
+    NULL: plain allocation) and copied out. _begin returns where to
+    export; after the export the caller may adjust the value there, and
+    _end(len) with its normalized length copies it out, zero pads the
+    window and returns 0 when it does not fit (the window is then
+    undefined).
+*/
+ulong * fft_small_stage_begin(ulong * z, ulong zn, ulong need,
+                    fft_small_op_pool_struct * pool, int use_slabs);
+int fft_small_stage_end(ulong * z, ulong zn, ulong * buf, ulong len,
+                    fft_small_op_pool_struct * pool);
+
 /* forward transform of (a, an) reading it zero-padded to length itrunc,
    with fft truncation P->ztrunc */
 void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
@@ -729,6 +833,59 @@ void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
 void fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
                     const fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
+/* the two's-complement residue of the signed reconstruction mod
+   2^(FLINT_BITS * zn), reading only the slots below limb zn; the value
+   need not fit */
+void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
+                    const fft_small_op_t X, ulong nslots,
+                    const fft_small_plan_t P);
+/* limbs [lo_limbs, lo_limbs + zn) of the two's-complement sum of the
+   slots that can reach them, reading only the slots below limb
+   lo_limbs + zn; the value need not fit. Exact for lo_limbs = 0;
+   otherwise the dropped low slots perturb the lowest limb as in the
+   truncated export */
+void fft_small_export_mpn_signed_window(ulong* z, ulong zn,
+                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    const fft_small_plan_t P);
+
+/*
+    Complex products of signed integers: (ar + i ai)(br + i bi), each part
+    a magnitude of the given length (zero parts allowed) and a sign bit.
+
+    mulmid/sqrmid write the limbs [lo, hi) of the real and imaginary parts
+    as two's-complement windows of hi - lo limbs, within one unit of
+    floor(x / B^lo) for each exact part x and exact for lo = 0 (the
+    residues mod B^hi); the value need not fit.
+
+    mul/sqr write magnitudes and signed lengths of the limbs [lo, hi):
+    zr and zi must have hi - lo limbs, which must hold the parts shifted
+    right by lo limbs; exact for lo = 0, and otherwise within (-1.5, +0.5)
+    units of the lowest limb of the exact value (the truncated export).
+
+    All share one engine: a window plan (cyclic when the window allows),
+    the transforms of the nonzero parts only (an operand with one nonzero
+    part is transformed once for both outputs), the bilinear combinations
+    with their signs formed in transform space, and one export per output
+    part. Return 0 if no plan exists.
+*/
+int _fft_small_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn,
+    nn_srcptr br, slong brn, int br_sgn,
+    nn_srcptr bi, slong bin, int bi_sgn);
+int _fft_small_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn);
+int _fft_small_mpn_mul_complex(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn,
+    nn_srcptr br, slong brn, int br_sgn,
+    nn_srcptr bi, slong bin, int bi_sgn);
+int _fft_small_mpn_sqr_complex(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len, slong lo, slong hi,
+    nn_srcptr ar, slong arn, int ar_sgn,
+    nn_srcptr ai, slong ain, int ai_sgn);
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P);
 

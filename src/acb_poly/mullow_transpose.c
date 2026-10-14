@@ -73,8 +73,18 @@ _acb_poly_mulmid_transpose(acb_ptr res,
         f[i] = *acb_imagref(res + i);
     }
 
-    _arb_poly_mulmid(e, a, len1, c, len2, nlo, nhi, prec);
-    _arb_poly_mulmid(t, b, len1, d, len2, nlo, nhi, prec);
+    /* squaring: a and c (b and d) are separate copies of the same
+       parts, so pass the same pointers for the real squares */
+    if (poly1 == poly2 && len1 == len2)
+    {
+        _arb_poly_mulmid(e, a, len1, a, len1, nlo, nhi, prec);
+        _arb_poly_mulmid(t, b, len1, b, len1, nlo, nhi, prec);
+    }
+    else
+    {
+        _arb_poly_mulmid(e, a, len1, c, len2, nlo, nhi, prec);
+        _arb_poly_mulmid(t, b, len1, d, len2, nlo, nhi, prec);
+    }
     _arb_vec_sub(e, e, t, nhi - nlo, prec);
 
     _arb_poly_mulmid(f, a, len1, d, len2, nlo, nhi, prec);

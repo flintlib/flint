@@ -21,12 +21,12 @@
 void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
                const fmpz * poly2, slong len2, slong nlo, slong nhi)
 {
-    slong negm;
+    slong negm, conv_len;
     slong len_out, loglen, loglen2, n;
     slong res_bits, limbs, size, i;
     ulong * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
     slong bits1, bits2;
-    int sign = 0;
+    int sign = 0, squaring;
     int N;
     TMP_INIT;
     TMP_START;
@@ -91,14 +91,22 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
     len1 = FLINT_MIN(len1, trunc);
     len2 = FLINT_MIN(len2, trunc);
 
+    /* the same array at different lengths is a product, not a square:
+       it needs its own transform vector */
+    squaring = (poly1 == poly2 && len1 == len2);
+
     len_out = len1 + len2 - 1;
-    loglen  = FLINT_CLOG2(len_out);
+
+    /* truncated transform of the full product, or a cyclic transform
+       of length 4n >= max(nhi, len_out - nlo) when that is shorter:
+       the wrapped terms then land below nlo (middle products) */
+    loglen  = fft_convolution_choose_mid(&conv_len, len_out, nlo, trunc) + 2;
     loglen2 = FLINT_CLOG2(len2);
     n = (WORD(1) << (loglen - 2));
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
 
-    if (poly1 == poly2 && len1 == len2)
+    if (squaring)
         bits2 = bits1;
     else
         bits2 = _fmpz_vec_max_bits(poly2, len2);
@@ -146,7 +154,7 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
       tt[i] = tt[i - 1] + 2*size;
    }
 
-    if (poly1 != poly2)
+    if (!squaring)
     {
         jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
         for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size)
@@ -158,7 +166,7 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
     for (i = len1; i < 4*n; i++)
         flint_mpn_zero(ii[i], limbs + 1);
 
-    if (poly1 != poly2 || len1 != len2)
+    if (!squaring)
     {
         _fmpz_vec_get_fft(jj, poly2, limbs, len2);
         for (i = len2; i < 4*n; i++)
@@ -173,19 +181,19 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
             sd_fft_mpn_mulmod_2expp1_ctx_init(sdctx, get_default_mpn_ctx(),
                                 FLINT_BITS*limbs, negm);
             fft_convolution_sd_fft(sdctx, ii, jj, loglen - 2, limbs,
-                                   len_out, t1, t2, s1, tt);
+                                   conv_len, t1, t2, s1, tt);
             sd_fft_mpn_mulmod_2expp1_ctx_clear(sdctx);
         }
         else
 #endif
-            fft_convolution(ii, jj, loglen - 2, limbs, len_out,
+            fft_convolution(ii, jj, loglen - 2, limbs, conv_len,
                             t1, t2, s1, tt);
     }
 
     _fmpz_vec_set_fft(res, trunc - nlo, ii + nlo, limbs, sign); /* write res */
 
     flint_free(ii);
-    if (poly1 != poly2 || len1 != len2)
+    if (!squaring)
         flint_free(jj);
 
     TMP_END;

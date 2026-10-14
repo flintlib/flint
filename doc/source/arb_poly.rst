@@ -355,6 +355,14 @@ Arithmetic
     Analogous to *mullow* functions, but compute the product truncated
     at length *nhi* and right-shifted by *nlo*.
 
+.. function:: void _arb_poly_addmulmid_mag(mag_ptr z, mag_srcptr x, slong xlen, mag_srcptr y, slong ylen, slong nlo, slong nhi, const fmpz_t scale)
+
+    Adds to *{z, nhi - nlo}* upper bounds for the coefficients `[nlo, nhi)`
+    of the product of the polynomials *{x, xlen}* and *{y, ylen}* with
+    nonnegative coefficients. The coefficients are split into blocks
+    after the substitution `x \to 2^{-\mathrm{scale}} x`, as the radii in
+    :func:`_arb_poly_mulmid_block`.
+
 .. function:: void _arb_poly_inv_series(arb_ptr Q, arb_srcptr A, slong Alen, slong len, slong prec)
 
     Sets *{Q, len}* to the power series inverse of *{A, Alen}*. Uses Newton iteration.
