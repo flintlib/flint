@@ -7,6 +7,16 @@ FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+FLINT 3.7.0 (in development)
+-------------------------------------------------------------------------------
+
+Bug fixes
+
+* Fix ``arb_pow`` losing containment when the output aliases an inexact
+  exponent and the base interval has a zero endpoint
+  [`#2879 <https://github.com/flintlib/flint/issues/2879>`_].
+
+
 2026-06-29 -- FLINT 3.6.0
 -------------------------------------------------------------------------------
 
