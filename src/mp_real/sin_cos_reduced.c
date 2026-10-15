@@ -134,7 +134,12 @@
    in for), so the cascade is always used; the constant remains for
    experiments */
 #ifndef MP_REAL_TRIG_FULLBURST_TERMS
+#if FLINT_BITS == 64
 #define MP_REAL_TRIG_FULLBURST_TERMS (WORD(1) << 40)
+#else
+/* (out of reach as well; a shift by 40 would be undefined) */
+#define MP_REAL_TRIG_FULLBURST_TERMS (WORD(1) << 26)
+#endif
 #endif
 /* Per-slice choice inside the burst: from this many series terms
    the slice's 1 - cos track (two of the four heavy tree

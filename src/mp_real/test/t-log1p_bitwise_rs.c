@@ -15,6 +15,7 @@
 #include "mp_real.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
+#include "bitwise_boundary.h"
 
 TEST_FUNCTION_START(mp_real_log1p_bitwise_rs, state)
 {
@@ -141,6 +142,39 @@ TEST_FUNCTION_START(mp_real_log1p_bitwise_rs, state)
         }
     }
 #endif
+
+    /* arguments at the decision boundaries (greedy and signed digits) */
+    for (iter = 0; iter < 60 * flint_test_multiplier(); iter++)
+    {
+        slong n;
+        int r;
+        nn_ptr x, res;
+        arb_t xa, e;
+        double u;
+
+        _test_bitwise_boundary_nr(&n, &r, iter, state);
+        x = flint_malloc(n * sizeof(ulong));
+        res = flint_malloc(n * sizeof(ulong));
+        _test_bitwise_boundary_arg(x, n,
+            r ? r : _mp_real_log1p_bitwise_rs_default_r(n), BOUNDARY_LOG1P,
+            state);
+
+        _mp_real_log1p_bitwise_rs(res, &test_err_out, x, n, r);
+
+        arb_init(xa);
+        arb_init(e);
+        _test_bitwise_arb(xa, x, n);
+        arb_log1p(e, xa, FLINT_BITS * n + 128);
+        u = _test_bitwise_ulps(res, n, n, e);
+        arb_clear(xa);
+        arb_clear(e);
+
+        if (u > TEST_ERR(DOC_LOG1P_BITWISE_RS_MAX_ERR(n, r)))
+            TEST_FUNCTION_FAIL("boundary: n = %wd, r = %d, ulp = %f\n", n, r, u);
+
+        flint_free(x);
+        flint_free(res);
+    }
 
     TEST_FUNCTION_END(state);
 }

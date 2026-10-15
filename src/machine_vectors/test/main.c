@@ -13,13 +13,15 @@
 
 #include "t-gemm.c"
 #include "t-vec4d.c"
+#include "t-vec4n.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
     TEST_FUNCTION(machine_vectors_gemm),
-    TEST_FUNCTION(machine_vectors_vec4d)
+    TEST_FUNCTION(machine_vectors_vec4d),
+    TEST_FUNCTION(machine_vectors_vec4n)
 };
 
 /* main function *************************************************************/

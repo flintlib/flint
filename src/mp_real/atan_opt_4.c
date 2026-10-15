@@ -74,176 +74,125 @@ _mp_real_atan_series_4(nn_ptr res, nn_srcptr x)
     NN_SUB_4(res, x, V);
 }
 
+/* atan, n = 4: dense tables, 3 levels of 7 bits (the remaining
+   angle below 2^-20) */
 void
-_mp_real_atan_opt_4(nn_ptr res, nn_srcptr x)
+_mp_real_atan_opt_4(nn_ptr res, nn_srcptr v)
 {
-    const int r = 20;
     ulong x0, x1, x2, x3;
     ulong y0, y1, y2, y3;
     ulong a0, a1, a2, a3;
-    ulong e0, e1, e2, e3;
-    ulong v0, v1, v2, v3;
-    ulong w0, w1, w2, w3;
-    ulong bw, m, h, lt;
-    ulong S[5], nd[8], t[4], q[4];
-    slong i, nc;
-    int nz;
+    ulong hx0, hx1, hx2, hx3;
+    ulong hy0, hy1, hy2, hy3;
+    ulong lx1, lx2, lx3;
+    ulong ly1, ly2, ly3;
+    ulong j1, j2, j3, c, R, rr, q;
+    ulong S[5], nd[8], t[4], ys[4];
+    const ulong * T;
 
+    /* level 1: c = j_1/2^7 <= v, X = 1 + c v, Y = v - c */
+    j1 = v[3] >> (FLINT_BITS - 7);
+    c = j1 << (FLINT_BITS - 7);
+    y0 = v[0];
+    y1 = v[1];
+    y2 = v[2];
+    y3 = v[3] & ((UWORD(1) << (FLINT_BITS - 7)) - 1);
+    hx0 = n_mulhi(v[0], c);
+    umul_ppmm(hx1, lx1, v[1], c);
+    umul_ppmm(hx2, lx2, v[2], c);
+    umul_ppmm(hx3, lx3, v[3], c);
+    add_ssssaaaaaaaa(x3, x2, x1, x0,
+        hx3, hx2, hx1, hx0,
+        UWORD(0), lx3, lx2, lx1);
+    T = _mp_real_dense_rt_atan_a1 + j1 * MP_REAL_DENSE_RT_W + (MP_REAL_DENSE_RT_W - 4);
+    a0 = T[0];
+    a1 = T[1];
+    a2 = T[2];
+    a3 = T[3];
 
-    nn_srcptr tab;
-    tab = _mp_real_atans_tab(4, r, &nc);
+    /* R ~ 2^64 / X (rounded so that R / 2^64 >= 1/X up to 2^-62) */
+    udiv_qrnnd(R, rr, (UWORD(1) << (FLINT_BITS - 1)) - 1, ~UWORD(0),
+        (UWORD(1) << (FLINT_BITS - 1)) | (x3 >> 1));
+    (void) rr;
 
-    x0 = 0;
-    x1 = 0;
-    x2 = 0;
-    x3 = 0;
-    y0 = x[0];
-    y1 = x[1];
-    y2 = x[2];
-    y3 = x[3];
-    a0 = 0;
-    a1 = 0;
-    a2 = 0;
-    a3 = 0;
+    /* level 2: j = floor(2^14 Y/X) from the estimate (lowered by 2^-12), then
+       X <- X + c Y, Y <- Y - c X on the old values, c = j 2^-14 */
+    q = n_mulhi((y3 << 5) | (y2 >> 59), R);
+    q -= q >> 12;
+    j2 = q >> 55;
+    c = j2 << (FLINT_BITS - 14);
+    hx0 = n_mulhi(x0, c);
+    hy0 = n_mulhi(y0, c);
+    umul_ppmm(hx1, lx1, x1, c);
+    umul_ppmm(hy1, ly1, y1, c);
+    umul_ppmm(hx2, lx2, x2, c);
+    umul_ppmm(hy2, ly2, y2, c);
+    umul_ppmm(hx3, lx3, x3, c);
+    umul_ppmm(hy3, ly3, y3, c);
+    add_ssssaaaaaaaa(x3, x2, x1, x0,
+        x3, x2, x1, x0,
+        hy3, hy2, hy1, hy0);
+    add_ssssaaaaaaaa(x3, x2, x1, x0,
+        x3, x2, x1, x0,
+        UWORD(0), ly3, ly2, ly1);
+    sub_ddddmmmmssss(y3, y2, y1, y0,
+        y3, y2, y1, y0,
+        hx3, hx2, hx1, hx0);
+    sub_ddddmmmmssss(y3, y2, y1, y0,
+        y3, y2, y1, y0,
+        c, lx3, lx2, lx1);
+    T = _mp_real_dense_rt_atan_a2 + j2 * MP_REAL_DENSE_RT_W + (MP_REAL_DENSE_RT_W - 4);
+    add_ssssaaaaaaaa(a3, a2, a1, a0,
+        a3, a2, a1, a0,
+        T[3], T[2], T[1], T[0]);
 
-#define AP(ii) (tab + (ii) * nc + (nc - 4))
+    /* level 3: j = floor(2^21 Y/X) from the estimate (lowered by 2^-12), then
+       X <- X + c Y, Y <- Y - c X on the old values, c = j 2^-21 */
+    q = n_mulhi((y3 << 12) | (y2 >> 52), R);
+    q -= q >> 12;
+    j3 = q >> 55;
+    c = j3 << (FLINT_BITS - 21);
+    hx0 = n_mulhi(x0, c);
+    hy0 = n_mulhi(y0, c);
+    umul_ppmm(hx1, lx1, x1, c);
+    umul_ppmm(hy1, ly1, y1, c);
+    umul_ppmm(hx2, lx2, x2, c);
+    umul_ppmm(hy2, ly2, y2, c);
+    umul_ppmm(hx3, lx3, x3, c);
+    umul_ppmm(hy3, ly3, y3, c);
+    add_ssssaaaaaaaa(x3, x2, x1, x0,
+        x3, x2, x1, x0,
+        hy3, hy2, hy1, hy0);
+    add_ssssaaaaaaaa(x3, x2, x1, x0,
+        x3, x2, x1, x0,
+        UWORD(0), ly3, ly2, ly1);
+    sub_ddddmmmmssss(y3, y2, y1, y0,
+        y3, y2, y1, y0,
+        hx3, hx2, hx1, hx0);
+    sub_ddddmmmmssss(y3, y2, y1, y0,
+        y3, y2, y1, y0,
+        c, lx3, lx2, lx1);
+    T = _mp_real_dense_atan_a + MP_REAL_DENSE_ATAN_A3 + j3 * MP_REAL_DENSE_W + (MP_REAL_DENSE_W - 4);
+    add_ssssaaaaaaaa(a3, a2, a1, a0,
+        a3, a2, a1, a0,
+        T[3], T[2], T[1], T[0]);
 
-    /* window 0 */
-    {
-        nn_srcptr Ap;
-
-        /* boundary step i = 1 */
-        Ap = AP(1);
-        v0 = MPN_RIGHT_SHIFT_LOW(x1, x0, 1);
-        v1 = MPN_RIGHT_SHIFT_LOW(x2, x1, 1);
-        v2 = MPN_RIGHT_SHIFT_LOW(x3, x2, 1);
-        v3 = MPN_RIGHT_SHIFT_LOW(UWORD(1), x3, 1);
-        w0 = MPN_RIGHT_SHIFT_LOW(y1, y0, 1);
-        w1 = MPN_RIGHT_SHIFT_LOW(y2, y1, 1);
-        w2 = MPN_RIGHT_SHIFT_LOW(y3, y2, 1);
-        w3 = MPN_RIGHT_SHIFT_LOW(UWORD(0), y3, 1);
-        sub_dddddmmmmmsssss(bw, e3, e2, e1, e0,
-            UWORD(0), y3, y2, y1, y0,
-            UWORD(0), v3, v2, v1, v0);
-        m = ~bw;                /* accept iff no borrow */
-        add_ssssaaaaaaaa(x3, x2, x1, x0,
-            x3, x2, x1, x0,
-            (w3) & m, (w2) & m, (w1) & m, (w0) & m);
-        add_ssssaaaaaaaa(a3, a2, a1, a0,
-            a3, a2, a1, a0,
-            Ap[3] & m, Ap[2] & m, Ap[1] & m, Ap[0] & m);
-        y0 = (y0 & bw) | (e0 & m);
-        y1 = (y1 & bw) | (e1 & m);
-        y2 = (y2 & bw) | (e2 & m);
-        y3 = (y3 & bw) | (e3 & m);
-
-        h = y3;
-
-        for (i = 2; i <= 20; i++)
-        {
-            int b = (int) (i - 0);
-
-            lt = MPN_RIGHT_SHIFT_LOW(UWORD(1), x3, b);
-            if (h < lt)
-                continue;    /* certain reject */
-
-            Ap = AP(i);
-            v0 = MPN_RIGHT_SHIFT_LOW(x1, x0, b);
-            v1 = MPN_RIGHT_SHIFT_LOW(x2, x1, b);
-            v2 = MPN_RIGHT_SHIFT_LOW(x3, x2, b);
-            v3 = lt;
-            w0 = MPN_RIGHT_SHIFT_LOW(y1, y0, b);
-            w1 = MPN_RIGHT_SHIFT_LOW(y2, y1, b);
-            w2 = MPN_RIGHT_SHIFT_LOW(y3, y2, b);
-            w3 = MPN_RIGHT_SHIFT_LOW(UWORD(0), y3, b);
-            sub_dddddmmmmmsssss(bw, e3, e2, e1, e0,
-                UWORD(0), y3, y2, y1, y0,
-                UWORD(0), v3, v2, v1, v0);
-            m = ~bw;                /* accept iff no borrow */
-            add_ssssaaaaaaaa(x3, x2, x1, x0,
-                x3, x2, x1, x0,
-                (w3) & m, (w2) & m, (w1) & m, (w0) & m);
-            add_ssssaaaaaaaa(a3, a2, a1, a0,
-                a3, a2, a1, a0,
-                Ap[3] & m, Ap[2] & m, Ap[1] & m, Ap[0] & m);
-            y0 = (y0 & bw) | (e0 & m);
-            y1 = (y1 & bw) | (e1 & m);
-            y2 = (y2 & bw) | (e2 & m);
-            y3 = (y3 & bw) | (e3 & m);
-            h = y3;
-        }
-    }
-
-    /* the step at i = r restores Y < trunc(X >> r) <= X 2^-r;
-       entering it Y < X 2^-(r-1), so two passes suffice */
-    for (nz = 0; nz < 2; nz++)
-    {
-        nn_srcptr Ap = AP((slong) r);
-        const int b = 20;
-
-        lt = MPN_RIGHT_SHIFT_LOW(UWORD(1), x3, b);
-        v0 = MPN_RIGHT_SHIFT_LOW(x1, x0, b);
-        v1 = MPN_RIGHT_SHIFT_LOW(x2, x1, b);
-        v2 = MPN_RIGHT_SHIFT_LOW(x3, x2, b);
-        v3 = lt;
-        w0 = MPN_RIGHT_SHIFT_LOW(y1, y0, b);
-        w1 = MPN_RIGHT_SHIFT_LOW(y2, y1, b);
-        w2 = MPN_RIGHT_SHIFT_LOW(y3, y2, b);
-        w3 = MPN_RIGHT_SHIFT_LOW(UWORD(0), y3, b);
-        sub_dddddmmmmmsssss(bw, e3, e2, e1, e0,
-            UWORD(0), y3, y2, y1, y0,
-            UWORD(0), v3, v2, v1, v0);
-        m = ~bw;                /* accept iff no borrow */
-        add_ssssaaaaaaaa(x3, x2, x1, x0,
-            x3, x2, x1, x0,
-            (w3) & m, (w2) & m, (w1) & m, (w0) & m);
-        add_ssssaaaaaaaa(a3, a2, a1, a0,
-            a3, a2, a1, a0,
-            Ap[3] & m, Ap[2] & m, Ap[1] & m, Ap[0] & m);
-        y0 = (y0 & bw) | (e0 & m);
-        y1 = (y1 & bw) | (e1 & m);
-        y2 = (y2 & bw) | (e2 & m);
-        y3 = (y3 & bw) | (e3 & m);
-    }
-
-#undef AP
-
-    /* t = Y 2^(FLINT_BITS 4) / X */
+    /* t = Y/X < 2^-20, + atan(t) */
+    /* 1/X to the precision t needs (t < 2^-20), then t = Y (1/X) */
     S[0] = x0;
     S[1] = x1;
     S[2] = x2;
     S[3] = x3;
-    S[4] = 1;
-    nz = (y0 != 0) | (y1 != 0) | (y2 != 0) | (y3 != 0);
-    if (nz)
-    {
-        nd[0] = 0;
-        nd[1] = 0;
-        nd[2] = 0;
-        nd[3] = 0;
-        nd[4] = y0;
-        nd[5] = y1;
-        nd[6] = y2;
-        nd[7] = y3;
-        flint_mpn_tdiv_qr(t, nd, nd, 8, S, 5);
-    }
-    else
-    {
-        t[0] = 0;
-        t[1] = 0;
-        t[2] = 0;
-        t[3] = 0;
-    }
-
-    _mp_real_atan_series_4(q, t);
-
-    add_ssssaaaaaaaa(a3, a2, a1, a0,
+    _flint_mpn_recip_small(nd, S, 4, 240);
+    S[0] = y0;
+    S[1] = y1;
+    S[2] = y2;
+    S[3] = y3;
+    flint_mpn_mulhigh_n(t, S, nd, 4);
+    _mp_real_atan_series_4(ys, t);
+    add_ssssaaaaaaaa(res[3], res[2], res[1], res[0],
         a3, a2, a1, a0,
-        q[3], q[2], q[1], q[0]);
-    res[0] = a0;
-    res[1] = a1;
-    res[2] = a2;
-    res[3] = a3;
+        ys[3], ys[2], ys[1], ys[0]);
 }
 
 

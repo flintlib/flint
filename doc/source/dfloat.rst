@@ -1483,9 +1483,29 @@ compiled per format only where speed matters:
   than a loop of complex products and sums. (For ``d1c`` a direct
   loop over the doubles is used instead, since the copies would cost
   more than the products.)
-* Everything else (division, square roots, the elementary functions,
-  the conversions, strings, random elements and the corresponding gr
-  methods) is implemented once for all formats in
+* The plain division, inverse, square root, reciprocal square root and
+  absolute value have fast paths per format: real divisions (or a real
+  inverse) for a real or imaginary divisor of ``div`` or argument of
+  ``inv``, and otherwise, when the
+  nonzero parts have leading components of magnitude in `[2^{-250},
+  2^{250}]` (so that no square, product of up to three parts or
+  reciprocal of these can overflow or underflow, and no rescaling is
+  needed), the formulas below evaluated directly with the real
+  arithmetic of the format, inlined for `N \le 2`: `x \bar y / |y|^2`
+  with two divisions by `|y|^2` (`N = 1`) or one reciprocal and two
+  products (`N > 1`); the square root from `m = |z|` and `w = m + |a|`
+  as `q = \sqrt{w/2}` and `b/(2q)`, for `N = 2` as `w v` and `b v` with
+  `v = 1/\sqrt{2w}` (cheaper there; for `N \ge 3` the reciprocal square
+  root of the format is neither faster nor as accurate); the reciprocal
+  square root `\bar z^{1/2}/m` with `1/\sqrt{m (w^2 + b^2)}` (`N \le 2`)
+  or `1/(\sqrt{w/2}\, m)` (`N \ge 3`). Other operands (zero, nonfinite or
+  extreme parts) and the balls go to ``complex.c``. This makes these
+  functions for ``d1c`` about as fast as the real ones (a few ns) and
+  1.3-2x faster than through ``complex.c`` for `N \ge 2`.
+* Everything else (division and square roots for the balls and outside
+  the fast paths, the elementary functions, the conversions, strings,
+  random elements and the corresponding gr methods) is implemented once
+  for all formats in
   ``src/dfloat/complex.c``, through a table of the real operations of
   the format (``_dfloat_ops_struct``: pointers to the real functions,
   including the ball products with a run-time error mode and the
@@ -1568,10 +1588,11 @@ complex ``gr_mul`` and ``gr_add``):
     ====== ======= ======== ======== ======= ======== =========
 
 **Code size.** The per-format complex code (the arithmetic, the
-vectors, the dot products, their gr methods and the thin wrappers of
-the functions of ``complex.c``, and the table of real operations)
-adds about 27 KB of text per `N`, and ``complex.c`` 22 KB, together
-about 13% of the real code.
+vectors, the dot products, their gr methods, the fast paths of the
+plain division and square roots, the thin wrappers of the functions of
+``complex.c``, and the table of real operations) adds about 34 KB of
+text per `N` (of which 3-10 KB for the fast paths), and ``complex.c``
+22 KB, together about 16% of the real code.
 
 Types and functions
 ...............................................................................

@@ -50,6 +50,9 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
             fmpz_one(f);
             fmpz_mul_2exp(f, f, FLINT_BITS * n - r);
             fmpz_sub_ui(f, f, 1 + n_randint(state, 5));
+            /* (2^(64 n - r) may be as small as 2) */
+            if (fmpz_sgn(f) < 0)
+                fmpz_zero(f);
         }
         flint_mpn_zero(x, n);
         fmpz_get_ui_array(x, n, f);
@@ -153,6 +156,9 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
             fmpz_one(f);
             fmpz_mul_2exp(f, f, FLINT_BITS * n - r);
             fmpz_sub_ui(f, f, 1 + n_randint(state, 5));
+            /* (2^(64 n - r) may be as small as 2) */
+            if (fmpz_sgn(f) < 0)
+                fmpz_zero(f);
         }
         flint_mpn_zero(x, n);
         fmpz_get_ui_array(x, n, f);

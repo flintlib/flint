@@ -5,8 +5,14 @@ libflint):
 
     python3 dev/tune_mp_real.py FUNC N [options]
 
-FUNC is one of exp, log1p, atan, trig (trig covers sin_cos and tan,
-which share the half-angle reconstruction).  The script
+FUNC is one of exp, log1p, atan and sin_cos, and N in 4 .. 10: the
+dense-table kernels of dev/gen_mp_real_dense_bodies.py, whose candidates
+are r = 7 L - 1 for L reduction levels with the hand series, and (exp,
+atan, sin_cos) r = 32 resp. (exp) r = 63 for the hardcoded series of the
+2^-32 resp. 2^-64 tier after five levels resp. nine and a top level
+(tables: dev/gen_mp_real_dense_tables.py).  (The smaller sizes have the
+table-driven kernels of src/mp_real/small.h, and tan takes the sine and
+cosine kernels and a division.)  The script
 
   1. generates an out-of-tree source file containing one fully
      specialized candidate per reduction parameter r in [--rmin,
@@ -21,13 +27,13 @@ which share the half-angle reconstruction).  The script
      at half the budget have later blown it at scale (see the r table
      comment in tan_bitwise_rs.c);
   4. with --emit, writes src/mp_real/FUNC_opt_N.c containing the chosen
-     specialization under its public name (_mp_real_exp_opt_3 and so on).
+     specialization under its public name (_mp_real_exp_opt_4 and so on).
      --pin R skips the sweep and emits at exactly r = R: running with
      --pin at the shipped r must reproduce the shipped file byte for
      byte, which is the reproducibility check.
 
-Example:  python3 dev/tune_mp_real.py exp 4 --pin 16 --emit
-          python3 dev/tune_mp_real.py trig 9 --rmin 14 --rmax 26 --emit
+Example:  python3 dev/tune_mp_real.py exp 4 --pin 34 --emit
+          python3 dev/tune_mp_real.py sin_cos 9 --rmin 27 --rmax 41 --emit
 """
 
 import argparse
@@ -82,152 +88,105 @@ class ExpFunc(Func):
     name = "exp"
     outputs = 1
     def __init__(self):
-        self.g = load(os.path.join(HERE, "gen_mp_real_exp_bitwise_small.py"),
-                      "g_exp_body")
         self.hs = load(os.path.join(HERE, "gen_mp_real_exp_hand_mixed.py"),
                        "g_exp_series")
-    HAND_R = {1: 12, 2: 16}    # hand-written series, not regenerable
+        self.d = load(os.path.join(HERE, "gen_mp_real_dense_bodies.py"),
+                      "g_dense_body")
+    # the sizes of the dense-table bodies (gen_mp_real_dense_bodies.py):
+    # r = 7 L - 1 for L reduction levels of seven bits
+    DENSE = range(4, 11)
     def budget(self, r):
         return 9 * r + 100
     def series(self, o, n, r, name):
-        if n in self.HAND_R:
-            if r != self.HAND_R[n]:
-                raise ValueError("exp n <= 2 series are hand-written "
-                                 "for r = %d only" % self.HAND_R[n])
-            src = open(os.path.join(HERE,
-                                    "exp_series_hand.inc")).read()
-            fn = "_mp_real_exp_rs_opt_%d" % n
-            i = src.rindex("/*", 0, src.index("%s(nn_ptr res" % fn))
-            j = src.index("\n}\n", i) + 3
-            body = src[i:j].replace(fn, name).replace(
-                "void\n", "static void\n", 1)
-            o("#ifndef MP_REAL_EXP_E2")
-            for line in src.splitlines():
-                if line.startswith("#define MP_REAL_EXP_"):
-                    o(line)
-            o("#endif")
-            for line in body.rstrip("\n").split("\n"):
-                o(line)
+        L, top, rs = self.d.dense_levels(r)
+        if rs:
+            self.d.emit_rs_series(o, "exp", n, name)
             return
         self.hs.emit(o, n, r, name)
     def body(self, o, n, r, fn_name, series_name, static):
-        body = self.g.gen(n, opt=True, fn_name=fn_name,
-                series_name=series_name, r_const=r, static=static)
-        if isinstance(body, str):
-            body = body.split("\n")
-        for line in body:
+        L, top, rs = self.d.dense_levels(r)
+        for line in self.d.gen_exp(n, L, fn_name, series_name, static,
+                                   top=top):
             o(line)
 
 
-class GenOneFunc(Func):
-    """atan and log1p: bodies from gen_one(o, n, opt=...), series from
-    gen_mp_real_trig_hand_mixed."""
-    def __init__(self, body_gen, series_func):
-        self.g = load(os.path.join(HERE, body_gen), "g_" + self.name)
-        self.hs = load(os.path.join(HERE, "gen_mp_real_trig_hand_mixed.py"),
-                       "g_trig_series")
-        self.series_func = series_func
-    def series(self, o, n, r, name):
-        self.hs.emit(o, self.series_func, n, r, name)
-    def body(self, o, n, r, fn_name, series_name, static):
-        for line in self.g.gen_one_named(n, r, fn_name, series_name,
-                static):
-            o(line)
-
-
-class AtanFunc(GenOneFunc):
+class AtanFunc(Func):
     name = "atan"
     outputs = 1
+    # the sizes of the dense-table bodies, r = 7 L - 1
+    DENSE = range(4, 11)
     def __init__(self):
-        GenOneFunc.__init__(self, "gen_mp_real_atan_bitwise_small.py", "atan")
+        self.hs = load(os.path.join(HERE, "gen_mp_real_trig_hand_mixed.py"),
+                       "g_trig_series")
+        self.d = load(os.path.join(HERE, "gen_mp_real_dense_bodies.py"),
+                      "g_dense_body")
+    def series(self, o, n, r, name):
+        L, top, rs = self.d.dense_levels(r)
+        if top:
+            raise ValueError("no top level for atan")
+        if rs:
+            self.d.emit_rs_series(o, "atan", n, name)
+            return
+        self.hs.emit(o, "atan", n, r, name)
+    def body(self, o, n, r, fn_name, series_name, static):
+        L, top, rs = self.d.dense_levels(r)
+        for line in self.d.gen_atan(n, L, fn_name, series_name, static):
+            o(line)
     def budget(self, r):
         return 4 * r + 64
 
 
-class Log1pFunc(GenOneFunc):
+class Log1pFunc(Func):
     name = "log1p"
     outputs = 1
+    # the sizes of the dense-table bodies, r = 7 L - 1
+    DENSE = range(4, 11)
     def __init__(self):
-        GenOneFunc.__init__(self, "gen_mp_real_log1p_bitwise_small.py",
-                            "atanh")
+        self.d = load(os.path.join(HERE, "gen_mp_real_dense_bodies.py"),
+                      "g_dense_body")
     def budget(self, r):
         return 3 * r + 64
     def body(self, o, n, r, fn_name, series_name, static):
-        if n > 2:
-            GenOneFunc.body(self, o, n, r, fn_name, series_name,
-                            static)
-            return
-
-        # n <= 2 predate the body generator: the hand-written register
-        # bodies live in dev/log1p_hand.inc and are carried verbatim
-        if r != 16:
-            raise SystemExit("log1p n <= 2 exists only at r = 16 "
-                             "(hand-written; see dev/log1p_hand.inc)")
-
-        src = open(os.path.join(HERE, "log1p_hand.inc")).read()
-        i = src.index("/* n = %d:" % n)
-        j = src.index("/* n = %d:" % (n + 1)) if n == 1 else len(src)
-        body = src[i:j].rstrip("\n")
-        body = body.replace("@FN@", fn_name)
-        body = body.replace("@SERIES@", series_name)
-        if static:
-            body = body.replace("void\n" + fn_name,
-                                "static void\n" + fn_name)
-        for line in body.split("\n"):
+        for line in self.d.gen_log1p(n, (r + 1) // 7, fn_name,
+                                     series_name, static):
             o(line)
-
     def series(self, o, n, r, name):
-        # the n = 2 hand body carries its own inline atanh series
-        if n == 2:
-            self.hs.emit(o, "atanh", 2, 16, name)
-        elif n >= 3:
-            GenOneFunc.series(self, o, n, r, name)
+        if (r + 1) % 7 != 0:
+            raise ValueError("dense log1p kernels take r = 7 L - 1")
+        self.d.emit_log1p_series(o, n, r, name)
 
 
-class TrigFunc(Func):
-    """sin_cos and tan through the shared half-angle reconstruction:
-    n <= 4 fully in registers, larger n through the exported
-    _mp_real_tan_halfangle_mid helper."""
-    name = "trig"
-    outputs = 3
+class SinCosFunc(Func):
+    """sin and cos: the dense-table kernels (gen_mp_real_dense_bodies.py),
+    emitted as sin_cos_opt_<n>.c"""
+    name = "sin_cos"
+    outputs = 2
+    DENSE = range(4, 11)
     def __init__(self):
-        self.g = load(os.path.join(HERE,
-            "gen_mp_real_tan_halfangle_small.py"), "g_trig_body")
         self.hs = load(os.path.join(HERE, "gen_mp_real_trig_hand_mixed.py"),
                        "g_trig_series")
+        self.d = load(os.path.join(HERE, "gen_mp_real_dense_bodies.py"),
+                      "g_dense_body")
     def budget(self, r):
-        return 6 * r + 128        # sin/cos; tan's 8r + 256 is looser
-    def budget_tan(self, r):
-        return 8 * r + 256
+        return 6 * r + 128
     def series(self, o, n, r, name):
-        self.hs.emit(o, "tan", n, r, name)
+        if n not in self.DENSE:
+            raise ValueError("sin_cos kernels: n in 4..10")
+        L, top, rs = self.d.dense_levels(r)
+        if top:
+            raise ValueError("no top level for sin_cos")
+        if rs:
+            self.d.emit_rs_series(o, "sin_cos", n, name)
+            return
+        self.hs.emit_sincos(o, n, r, name)
     def body(self, o, n, r, fn_name, series_name, static):
-        if n == 1:
-            src = open(os.path.join(HERE, "trig_hand.inc")).read()
-            body = src[src.index("/* n = 1"):]
-            body = body.replace("@FN@", fn_name).replace("@R@", str(r))
-            body = body.replace("@SERIES@", series_name)
-            if static:
-                body = body.replace("void\n" + fn_name,
-                                    "static void\n" + fn_name)
-            for line in body.rstrip("\n").split("\n"):
-                o(line)
-        elif n <= 4:
-            for line in self.g.emit_named(n, r, fn_name, series_name,
-                    static):
-                o(line)
-        else:
-            o("static void" if static else "void")
-            o("%s(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan," % fn_name)
-            o("    nn_srcptr x)")
-            o("{")
-            o("    _mp_real_tan_halfangle_mid(ysin, ycos, ytan, x, %d, %d,"
-              % (n, r))
-            o("        %s);" % series_name)
-            o("}")
+        L, top, rs = self.d.dense_levels(r)
+        for line in self.d.gen_sin_cos(n, L, fn_name, series_name, static):
+            o(line)
+
 
 FUNCS = {"exp": ExpFunc, "log1p": Log1pFunc, "atan": AtanFunc,
-         "trig": TrigFunc}
+         "sin_cos": SinCosFunc}
 
 
 # ---------------------------------------------------------------------
@@ -246,15 +205,13 @@ def harness_source(F, n, rs, points):
     o('#include <time.h>')
     o('#include <mpfr.h>')
     o('#include "hand_mulhi.inc"')
-    if F.name == "trig" and n <= 4:
-        o('#include "tan_rotate.inc"')
     o("")
     for r in rs:
         F.series(o, n, r, "ts_%d" % r)
         F.body(o, n, r, "cand_%d" % r, "ts_%d" % r, static=True)
     o("")
-    if F.outputs == 3:
-        o("typedef void (*cand_fn)(nn_ptr, nn_ptr, nn_ptr, nn_srcptr);")
+    if F.outputs == 2:
+        o("typedef void (*cand_fn)(nn_ptr, nn_ptr, nn_srcptr);")
     else:
         o("typedef void (*cand_fn)(nn_ptr, nn_srcptr);")
     o("static const struct { cand_fn f; int r; } cands[] = {")
@@ -291,8 +248,8 @@ int main(void)
     o("                x[j] = ~UWORD(0); }")
     o("            if (i %% 13 == 5) { for (j = 0; j < %d; j++)" % n)
     o("                x[j] = 0; x[0] = i; }")
-    if F.outputs == 3:
-        o("            cands[k].f(y, yc, yt, x);")
+    if F.outputs == 2:
+        o("            cands[k].f(y, yc, x);")
     else:
         o("            cands[k].f(y, x);")
     o("            mpz_import(z, %d, -1, sizeof(ulong), 0, 0, x);" % n)
@@ -308,7 +265,6 @@ int main(void)
         vn = n
     else:
         o("            mpfr_sin_cos(fm, f2, xm, MPFR_RNDN);")
-        o("            mpfr_tan(f3, xm, MPFR_RNDN);")
         vn = n + 1
     def check(dst, ref, acc):
         o("            mpz_import(z, %d, -1, sizeof(ulong), 0, 0, %s);"
@@ -320,9 +276,8 @@ int main(void)
         o("            { double u = mpfr_get_d(dm, MPFR_RNDU);")
         o("              %s = FLINT_MAX(%s, u); }" % (acc, acc))
     check("y", "fm", "e")
-    if F.outputs == 3:
+    if F.outputs == 2:
         check("yc", "f2", "ec")
-        check("yt", "f3", "et")
     o("        }")
     o("        mpfr_clears(xm, fm, f2, f3, vm, dm, (mpfr_ptr) 0);")
     o("        mpz_clear(z);")
@@ -332,9 +287,9 @@ int main(void)
     o("        for (j = 0; j < 5; j++)")
     o("        {")
     o("            t0 = now();")
-    if F.outputs == 3:
+    if F.outputs == 2:
         o("            for (i = 0; i < 120000; i++)")
-        o("                cands[k].f(y, yc, NULL, xs[i & 63]);")
+        o("                cands[k].f(y, yc, xs[i & 63]);")
     else:
         o("            for (i = 0; i < 120000; i++)")
         o("                cands[k].f(y, xs[i & 63]);")
@@ -363,27 +318,13 @@ def emit_production(F, n, r, path):
     for inc in F.includes():
         o(inc)
     o('#include "hand_mulhi.inc"')
-    if F.name == "trig" and n <= 4:
-        o('#include "tan_rotate.inc"')
     o("")
     o("#if FLINT_BITS == 64")
     o("")
-    if F.name == "trig":
-        F.series(o, n, r, "_mp_real_tan_series_%d" % n)
-        F.body(o, n, r, "_mp_real_trig_opt_%d" % n,
-               "_mp_real_tan_series_%d" % n, static=False)
-        o("")
-        o("void")
-        o("_mp_real_sin_cos_opt_%d(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)" % n)
-        o("{")
-        o("    _mp_real_trig_opt_%d(ysin, ycos, NULL, x);" % n)
-        o("}")
-        o("")
-        o("void")
-        o("_mp_real_tan_opt_%d(nn_ptr res, nn_srcptr x)" % n)
-        o("{")
-        o("    _mp_real_trig_opt_%d(NULL, NULL, res, x);" % n)
-        o("}")
+    if F.name == "sin_cos":
+        F.series(o, n, r, "_mp_real_sin_cos_series_%d" % n)
+        F.body(o, n, r, "_mp_real_sin_cos_opt_%d" % n,
+               "_mp_real_sin_cos_series_%d" % n, static=False)
     else:
         F.series(o, n, r, "_mp_real_%s_series_%d" % (F.name, n))
         F.body(o, n, r, "_mp_real_%s_opt_%d" % (F.name, n),
@@ -412,6 +353,9 @@ def main():
 
     F = FUNCS[a.func]()
     n = a.n
+    if n not in F.DENSE:
+        sys.exit("the per-size kernels take n in 4 .. 10 (smaller sizes: "
+                 "src/mp_real/small.h)")
 
     if a.pin is not None:
         rs = [a.pin]
@@ -460,8 +404,6 @@ def main():
         errs = [float(x) for x in w[5:8]]
         bud = F.budget(r)
         lim = [a.margin * bud] * 3
-        if a.func == "trig":
-            lim[2] = a.margin * F.budget_tan(r)
         if any(e > l for e, l in zip(errs, lim)):
             continue
         accepted.append((r, ns, max(e / l for e, l in zip(errs, lim)

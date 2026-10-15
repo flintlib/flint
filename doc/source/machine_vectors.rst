@@ -13,11 +13,13 @@ vector extensions where the compiler supports them and plain ISO C
 structs elsewhere. The AVX2 and NEON backends require a 64-bit word
 size, since their integer vectors have :type:`ulong` lanes; a 32-bit
 build uses the generic backends, which provide only the floating-point
-types. The generic backends implement only the subset of the
-interface required by ``flint_sgemm``/``flint_dgemm`` and, for
-:type:`vec4d`, the operations used by ``dfloat`` (see
-:ref:`machine-vectors-vec4d-extra`); the full interface, as used by
-``fft_small``, still requires AVX2 or NEON.
+types and the :type:`vec4n` subset below (with lanes of the 32-bit
+:type:`ulong`). The generic backends implement only the subset of the
+interface required by ``flint_sgemm``/``flint_dgemm``, for
+:type:`vec4d` the operations used by ``dfloat`` (see
+:ref:`machine-vectors-vec4d-extra`), and for :type:`vec4n` those used
+by ``mp_real`` (see :ref:`machine-vectors-vec4n-extra`); the full
+interface, as used by ``fft_small``, still requires AVX2 or NEON.
 
 For the vector operations to use the target's instructions, FLINT must
 be built with appropriate compiler flags. ``configure`` chooses these
@@ -263,11 +265,9 @@ Arithmetic and basic operations
               vec4d vec4d_blendv(vec4d a, vec4d b, vec4d c)
               vec8d vec8d_blendv(vec8d a, vec8d b, vec8d c)
 
-.. function:: vec4n vec4n_bit_shift_right(vec4n a, ulong b)
-              vec8n vec8n_bit_shift_right(vec8n a, ulong b)
+.. function:: vec8n vec8n_bit_shift_right(vec8n a, ulong b)
 
-.. function:: vec4n vec4n_bit_and(vec4n a, vec4n b)
-              vec8n vec8n_bit_and(vec8n a, vec8n b)
+.. function:: vec8n vec8n_bit_and(vec8n a, vec8n b)
 
 .. _machine-vectors-vec4d-extra:
 
@@ -346,6 +346,44 @@ In the generic backends, ``vec4d_min`` and ``vec4d_max`` return *b*
 where a lane is unordered, as the AVX2 instructions do; NEON returns a
 NaN.
 
+
+.. _machine-vectors-vec4n-extra:
+
+Integer lanes for vec4n
+-------------------------------------------------------------------------------
+
+These, together with :func:`vec4n_load_unaligned`,
+:func:`vec4n_store_unaligned`, :func:`vec4n_set_n`, :func:`vec4n_add`
+and :func:`vec4n_sub` above (lanewise modulo
+`2^{\mathrm{FLINT\_BITS}}`), are provided by every backend (AVX2, NEON
+and both generic tiers) with the same results, and are tested lane by
+lane against scalar code in ``machine_vectors/test/t-vec4n.c``.
+``mp_real`` uses them for its arithmetic in radix `2^{56}` (see the
+bitwise exponential).
+
+.. function:: vec4n vec4n_load_aligned(const ulong * a)
+              void vec4n_store_aligned(ulong * z, vec4n a)
+
+    The aligned forms of the loads and stores above, requiring a
+    32-byte aligned address on the AVX2 backend.
+
+.. function:: vec4n vec4n_zero(void)
+              vec4n vec4n_bit_and(vec4n a, vec4n b)
+              vec4n vec4n_bit_or(vec4n a, vec4n b)
+
+    Lanewise.
+
+.. function:: vec4n vec4n_bit_shift_right(vec4n a, ulong b)
+              vec4n vec4n_bit_shift_left(vec4n a, ulong b)
+
+    Logical shifts of every lane by the same count
+    `0 \le b < \mathrm{FLINT\_BITS}`.
+
+.. function:: vec4n vec4n_shift_lanes_up(vec4n a, vec4n b)
+
+    Returns `\{b_3, a_0, a_1, a_2\}`: the lanes of *a* moved up by one,
+    the top lane of *b* entering at the bottom (a carry passed from one
+    vector to the next).
 
 Modular arithmetic
 -------------------------------------------------------------------------------

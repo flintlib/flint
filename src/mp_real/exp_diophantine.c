@@ -511,6 +511,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
     ulong relsum;
     double eps_min;
     nn_ptr base, t, E, p, q, tmp, N, Q;
+    const _mp_real_tab_struct * LP;
     TMP_INIT;
 
     FLINT_ASSERT(num >= 2 && num <= MP_REAL_REL_MAX);
@@ -542,7 +543,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
         wr = 768 / FLINT_BITS;
     wr = FLINT_MAX(wr, (slong) ((-log2(tab->epsilon_min) + 80) / FLINT_BITS) + 1);
 
-    _mp_real_log_primes_ensure(num, FLINT_MAX(wr, n + 1));
+    LP = _mp_real_log_primes_ensure(num, FLINT_MAX(wr, n + 1));
 
     TMP_START;
     rel = TMP_ALLOC(2 * num * sizeof(slong));
@@ -566,7 +567,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
     eps_min = FLINT_MAX(eps_min, _mp_real_d_2exp_neg_or_zero(FLINT_BITS * wr - 48));
 
     jfix = _mp_real_log_reduce(rel, tab, base, wr, max_weight, eps_min,
-        _mp_real_log_primes_entry(0, wr), _mp_real_log_primes_n);
+        _mp_real_machin_entry(LP, 0, wr), LP->nc);
 
     /* guard limbs: the residual is short of the truth by at most
        sum |rel_j| + 1 working ulps of the cached floors (plus the
@@ -579,7 +580,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
         / FLINT_BITS;
     wn = n + G;
 
-    _mp_real_log_primes_ensure(num, wn);   /* a no-op unless G > 1 */
+    LP = _mp_real_log_primes_ensure(num, wn);   /* a no-op unless G > 1 */
 
     /* t = x B^G - sum_j rel_j log(p_j), two's complement in wn + 1
        limbs.  The reduction returns a nonnegative residual at its
@@ -594,7 +595,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
     tmp[wn] = 0;
 
     _mp_real_log_dot(t, tmp, wn + 1, rel, num,
-        _mp_real_log_primes_entry(0, wn), _mp_real_log_primes_n);
+        _mp_real_machin_entry(LP, 0, wn), LP->nc);
 
     for (i = 0; (t[wn] >> (FLINT_BITS - 1)) != 0; i++)
     {
@@ -611,7 +612,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
         for (j = 0; j < num; j++)
             rel[j] -= d_row[j];   /* t += epsilon_jfix */
         _mp_real_log_dot(t, tmp, wn + 1, rel, num,
-            _mp_real_log_primes_entry(0, wn), _mp_real_log_primes_n);
+            _mp_real_machin_entry(LP, 0, wn), LP->nc);
     }
     FLINT_ASSERT(t[wn] == 0);   /* 0 <= t < 1 */
 

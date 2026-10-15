@@ -35,3 +35,21 @@ _mp_real_const_log2_compute(mp_real_t res, slong n)
     mp_real_hypgeom_series_int64(res, 1, 1, 1497, 2160,
         log2_P, 4, log2_Q, 3, log2_R, 3, n + 1);
 }
+
+/* 1/log 2 - 1 (the fraction limbs of 1/log 2 = log2(e), which turn
+   natural logarithms into binary ones and give the quotients x / log 2
+   of the exponential's reduction) */
+void
+_mp_real_const_inv_log2_frac_compute(mp_real_t res, slong n)
+{
+    mp_real_t p, one;
+
+    mp_real_init(p);
+    mp_real_init(one);
+    _mp_real_const_log2_compute(p, n + 1);
+    mp_real_set_ui(one, 1);
+    mp_real_div(res, one, p, n + 1);
+    mp_real_sub(res, res, one, n);
+    mp_real_clear(p);
+    mp_real_clear(one);
+}

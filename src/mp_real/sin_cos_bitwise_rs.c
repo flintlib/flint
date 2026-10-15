@@ -13,128 +13,37 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "thread_support.h"
 #include "impl.h"
 
-/* sin and cos on [0, 1) by the rotation analog of the bitwise exp
-   algorithm, following the identity of [Joh2022]: with
-   alpha = 2 atan(b/a),
-   exp(i x) = exp(i (x - k alpha)) ((a + b i)/(a - b i))^k, whose
-   rotation unit is a ratio of conjugates and hence EXACTLY
-   unimodular -- no normalizing square root arises.  With a = 2^i,
-   b = 1 the rotation angles are 2 atan(2^-i).
+/* The cached table of the angles A_i = atan(2^-i) (thread-local like the
+   logarithms of exp_bitwise_rs.c; the reductions of atan, sin, cos and
+   tan read it), and sin and cos on [0, 1) by bitwise reduction.
 
-   The TABLE, however, stores the UNDOUBLED angles
-   A_i = atan(2^-i) (thread-locally cached like the exp
-   logarithms), and phase 1 reduces x/2 rather than x.  This is not
-   merely an economy of one table shared with
-   _mp_real_atan_bitwise_rs: the windowed single-limb decision model of
-   _mp_real_bitwise_reduce requires tab_i < 2^-i, which A_i satisfies
-   (as log(1 + 2^-i) does) but 2 atan(2^-i) ~ 2^(1-i) does NOT --
-   with doubled entries the residual can keep one bit above the
-   window limb after a boundary step, desynchronizing the model.
-   Concavity of atan gives A_{i-1} < 2 A_i, so each index is used at
-   most once, and sum_{i>=1} A_i ~ 0.8980 > 1/2 covers x/2.
+   The latter is the tangent half-angle reconstruction of
+   tan_bitwise_rs.c (_mp_real_tan_halfangle): x/2 is reduced with the
+   angles A_i, which satisfy the windowed reductions' requirement
+   A_i < 2^-i (the doubled angles 2 atan(2^-i) of the rotation identity
+   would not), the used factors build the rotation W, and the outputs
+   come from the half-angle formulas, one reciprocal for both.  On 64-bit
+   machines r = 0 at n <= 10 selects the per-size kernels instead (small.h
+   at one to three limbs, the dense tables from four), and the reduction
+   runs with signed digits on vectors (bitwise_vec.c) from
+   MP_REAL_TRIG_BITWISE_VEC_MIN limbs.
 
-   Writing x/2 = sum_{used} A_i + t', the used factors account for
-   the rotation by sum 2 A_i and the residual angle is 2 t'.  The
-   reduction therefore runs to index r + 1, so that
-   2 t' < 2 A_{r+1} < 2^-r meets the series contract.
-
-   Phase 2 evaluates sin and cos of the residual t < 2^-r: for short
-   series both at once by _mp_real_sin_cos_rs (shared powers of t^2);
-   once the series gets long, only the odd sine series, with
-   cos t = sqrt(1 - sin^2 t) by one squaring and one integer square
-   root -- the same tradeoff and threshold shape as exp's sinh path
-   (for small n the square root costs more than the extra terms).
-
-   Phase 3 reconstructs: with W = prod (1 + i 2^-i) over the used
-   factors (the real 2^i denominators cancel between W and its
-   conjugate), each factor is two shifts and two add/subtracts on
-   the old components, and
-
-       (cos x, sin x) = components of (c + i s) W^2 / |W|^2.
-
-   Two squarings give Re W^2 = wx^2 - wy^2 and |W|^2 = wx^2 + wy^2
-   from the same pair, one product gives Im W^2 = 2 wx wy, a complex
-   multiplication by (c + i s) and two divisions by the real |W|^2
-   finish.  The self-normalization is structural: the ratio of the
-   SAME truncated W against its own conjugate is exactly unimodular
-   up to the final roundings, so the reconstruction truncations
-   perturb only the angle of the correction (O(r) ulp), never its
-   modulus.  |W| < prod sqrt(1 + 4^-i) = 1.16444, so wx in
-   (0.72, 1.17) and wy in [0, 0.92) fit n + 1 limbs, and
-   |W|^2 in [1, 1.3559).
-
-   Error accounting (output ulp 2^(-FLINT_BITS n)): reduction table
-   and creep < 2 (r + 2) ulp on the angle; series <= 15 ulp per
-   component (plus squaring and square root floors on the sqrt
-   path); reconstruction truncations < 2 ulp of angle per used
-   factor; the final squarings, products and division floors are
-   constants.  Total below
+   Error accounting (output ulp 2^(-FLINT_BITS n)): reduction table and
+   creep < 2 (r + 2) ulp on the angle; the residual's series <= 15 ulp;
+   rotation truncations < 2 ulp of angle per used factor; the products
+   and the reciprocal of the reconstruction are constants.  Total below
    the returned bound *err = 6 r + 128. */
 
-FLINT_TLS_PREFIX nn_ptr _mp_real_atans = NULL;
-FLINT_TLS_PREFIX slong _mp_real_atans_n = 0;
-FLINT_TLS_PREFIX slong _mp_real_atans_r = 0;
+/* the shared cache of the table (thread_support.h; see the logarithm
+   table of exp_bitwise_rs.c) */
+static flint_shared_cache_struct _mp_real_atans_cache =
+    FLINT_SHARED_CACHE_INIT(_mp_real_tab_free);
 
-/* free the cached table; see _mp_real_exp_logs_clear */
-void
-_mp_real_atans_clear(void)
-{
-    flint_free(_mp_real_atans);
-    _mp_real_atans = NULL;
-    _mp_real_atans_n = 0;
-    _mp_real_atans_r = 0;
-}
-static FLINT_TLS_PREFIX int _mp_real_atans_cleanup_registered = 0;
+#define ATANS_A(i) (tab + (i) * nc)
 
-static void
-_mp_real_atans_cleanup(void)
-{
-    flint_free(_mp_real_atans);
-    _mp_real_atans = NULL;
-    _mp_real_atans_n = 0;
-    _mp_real_atans_r = 0;
-    _mp_real_atans_cleanup_registered = 0;
-}
-
-#define ATANS_A(i) (_mp_real_atans + (i) * _mp_real_atans_n)
-
-
-/* acc (nc limbs) += or -= t >> s; the bits shifted below position 0
-   fall below the guard limb and are dropped.  scratch: nc limbs. */
-static void
-_mp_real_tab_addshift(nn_ptr acc, nn_srcptr t, slong nc, slong s,
-    int sub, nn_ptr scratch)
-{
-    slong q = s / FLINT_BITS, m = nc - q;
-    int b = (int) (s % FLINT_BITS);
-    nn_srcptr v;
-
-    if (m <= 0)
-        return;
-
-    if (b == 0)
-        v = t + q;
-    else
-    {
-        mpn_rshift(scratch, t + q, m, b);
-        v = scratch;
-    }
-
-    if (sub)
-    {
-        /* subtracted terms round UP (one extra guard ulp stands in
-           for the dropped bits): together with the blanket bias
-           applied to the leading term this keeps every entry AT OR
-           BELOW the exact value, preserving the strict tab_i < 2^-i
-           invariant of the reductions */
-        mpn_sub(acc, acc, nc, v, m);
-        mpn_sub_1(acc, acc, nc, 1);
-    }
-    else
-        mpn_add(acc, acc, nc, v, m);
-}
 
 /* The table entries A_i = atan(2^-i), each nc limbs (the value
    scaled by 2^(FLINT_BITS nc), whose bottom limb is a guard), built
@@ -166,23 +75,14 @@ _mp_real_tab_addshift(nn_ptr acc, nn_srcptr t, slong nc, slong s,
    the value limbs equal to the exact truncation of A_i except when
    A_i lies within about 2^-50 of a limb boundary, and then by one
    ulp at most, which the reduction's accounting absorbs on either
-   side. */
-void
-_mp_real_atans_ensure(slong nv, slong rc)
+   side.
+
+   The entries i_from..rc of (tab, entries of nc limbs), rc < 64 nc. */
+static void
+_mp_real_atans_fill(nn_ptr tab, slong nc, slong i_from, slong rc)
 {
-    slong nc, i, k, prec, iter_start;
+    slong i, k, prec, iter_start, i_lo;
     nn_ptr t, scratch, num;
-
-    if (nv + 1 <= _mp_real_atans_n && rc <= _mp_real_atans_r)
-        return;
-
-    nc = FLINT_MAX(nv + 1, _mp_real_atans_n);
-    rc = FLINT_MAX(rc, _mp_real_atans_r);
-
-    flint_free(_mp_real_atans);
-    _mp_real_atans = flint_malloc((rc + 1) * nc * sizeof(ulong));
-    _mp_real_atans_n = nc;
-    _mp_real_atans_r = rc;
 
     prec = FLINT_BITS * (nc - 1);
 
@@ -193,6 +93,7 @@ _mp_real_atans_ensure(slong nv, slong rc)
 
     /* tier 1: binary splitting; entry 0 = atan(1) = pi/4 is unused
        by the reductions (they start at i = 1) but tabulated anyway */
+    if (i_from < iter_start)
     {
         arb_ptr th;
         arb_t x;
@@ -204,9 +105,10 @@ _mp_real_atans_ensure(slong nv, slong rc)
         fmpz_init(q);
         th = _arb_vec_init(4);
 
-        arb_atan_gauss_primes_vec_bsplit(th, 4, wp);
+        if (i_from <= 3)
+            arb_atan_gauss_primes_vec_bsplit(th, 4, wp);
 
-        for (i = 0; i < iter_start && i <= rc; i++)
+        for (i = i_from; i < iter_start && i <= rc; i++)
         {
             switch (i)
             {
@@ -243,7 +145,8 @@ _mp_real_atans_ensure(slong nv, slong rc)
 
     /* tier 2: fixed-point multi-summation, directly in the target
        storage */
-    if (iter_start <= rc)
+    i_lo = FLINT_MAX(iter_start, i_from);
+    if (i_lo <= rc)
     {
         slong wp = FLINT_BITS * nc;
 
@@ -252,7 +155,7 @@ _mp_real_atans_ensure(slong nv, slong rc)
         num = flint_malloc((nc + 1) * sizeof(ulong));
 
         /* the k = 1 term is the single bit 2^-i */
-        for (i = iter_start; i <= rc; i++)
+        for (i = i_lo; i <= rc; i++)
         {
             nn_ptr acc = ATANS_A(i);
 
@@ -265,14 +168,14 @@ _mp_real_atans_ensure(slong nv, slong rc)
             mpn_sub_1(acc, acc, nc, 2);
         }
 
-        for (k = 3; k * iter_start < wp; k += 2)
+        for (k = 3; k * i_lo < wp; k += 2)
         {
             flint_mpn_zero(num, nc);
             num[nc] = 1;                    /* 2^wp */
             mpn_divrem_1(t, 0, num, nc + 1, (ulong) k);
             FLINT_ASSERT(t[nc] == 0);
 
-            for (i = iter_start; i <= rc && i * k < wp; i++)
+            for (i = i_lo; i <= rc && i * k < wp; i++)
                 _mp_real_tab_addshift(ATANS_A(i), t, nc, i * k,
                     (k & 3) == 3, scratch);
         }
@@ -282,11 +185,6 @@ _mp_real_atans_ensure(slong nv, slong rc)
         flint_free(num);
     }
 
-    if (!_mp_real_atans_cleanup_registered)
-    {
-        flint_register_cleanup_function(_mp_real_atans_cleanup);
-        _mp_real_atans_cleanup_registered = 1;
-    }
     /* Direct tail band: for 3i >= 64 nc every term of
        atan(2^-i) = 2^-i - 2^(-3i)/3 + ... beyond the first falls
        below the entry, and the omitted mass r satisfies
@@ -298,11 +196,10 @@ _mp_real_atans_ensure(slong nv, slong rc)
     {
         slong wp = FLINT_BITS * nc, band = (wp + 2) / 3;
 
-        for (i = FLINT_MAX(band, 4); i <= rc; i++)
+        for (i = FLINT_MAX(FLINT_MAX(band, 4), i_from); i <= rc; i++)
         {
             nn_ptr acc = ATANS_A(i);
-            slong b = wp - i;   /* rc < 64 nv by the r convention,
-                                   so b >= 1 */
+            slong b = wp - i;   /* rc < 64 nc, so b >= 1 */
             flint_mpn_zero(acc, nc);
             flint_mpn_store(acc, b / FLINT_BITS, ~UWORD(0));
             if (b % FLINT_BITS)
@@ -312,33 +209,69 @@ _mp_real_atans_ensure(slong nv, slong rc)
 
         /* exactness rescan of the fast tiers below the band; see
            the log table's twin loop for the reasoning */
-        for (i = 4; i < FLINT_MIN(band, rc + 1); i++)
+        for (i = FLINT_MAX(4, i_from); i < FLINT_MIN(band, rc + 1); i++)
         {
-            ulong g = _mp_real_atans[i * nc];
+            ulong g = tab[i * nc];
             if (g + MP_REAL_TAB_GUARD_SLACK < g)
                 _mp_real_tab_entry_exact(ATANS_A(i), 1, (ulong) i, nc);
         }
     }
-
 }
 
-/* Read-only view of the table for code outside the library (the
-   thread-local storage itself is not exported; see mp_real.h):
-   the top n limbs of entry i, valid until the next ensure call on
-   this thread. */
+/* the shared cache protocol (see exp_bitwise_rs.c) */
+static void *
+_mp_real_atans_build(const void * old, void * args)
+{
+    _mp_real_tab_struct * T;
+    slong i_from;
+
+    T = _mp_real_tab_new(old, args, &i_from);
+    _mp_real_atans_fill(T->tab, T->nc, i_from, T->num - 1);
+    return T;
+}
+
+/* the version covering nv value limbs and the indices 0..rc */
+const _mp_real_tab_struct *
+_mp_real_atans_ensure(slong nv, slong rc)
+{
+    _mp_real_tab_req_struct R;
+
+    R.nc = FLINT_MAX(nv + 1, rc / FLINT_BITS + 2);
+    R.num = rc + 1;
+    return flint_shared_cache_ensure(&_mp_real_atans_cache,
+        _mp_real_tab_sufficient, _mp_real_atans_build, &R);
+}
+
+/* Read-only view of the table for code outside the library: the top
+   n limbs of entry i of the current version (valid until
+   flint_cleanup_master). */
 nn_srcptr
 _mp_real_atans_entry(slong i, slong n)
 {
-    FLINT_ASSERT(i >= 0 && i <= _mp_real_atans_r);
-    FLINT_ASSERT(n >= 1 && n <= _mp_real_atans_n - 1);
-    return _mp_real_atans + i * _mp_real_atans_n + (_mp_real_atans_n - n);
+    const _mp_real_tab_struct * T =
+        flint_shared_cache_get(&_mp_real_atans_cache);
+
+    FLINT_ASSERT(T != NULL && i >= 0 && i < T->num);
+    FLINT_ASSERT(n >= 1 && n <= T->nc - 1);
+    return T->tab + i * T->nc + (T->nc - n);
 }
 
-/* the largest index the cached table currently covers */
+/* free the cached table (tuning programs): not while another thread
+   may be using it */
+void
+_mp_real_atans_clear(void)
+{
+    flint_shared_cache_clear(&_mp_real_atans_cache);
+}
+
+/* the largest index the current version covers (0 if none) */
 slong
 _mp_real_atans_max_index(void)
 {
-    return _mp_real_atans_r;
+    const _mp_real_tab_struct * T =
+        flint_shared_cache_get(&_mp_real_atans_cache);
+
+    return (T == NULL) ? 0 : T->num - 1;
 }
 
 FLINT_FORCE_INLINE void
@@ -352,12 +285,6 @@ _mp_real_sin_cos_bitwise_rs_noerr(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
        residual series */
     FLINT_ASSERT(FLINT_BITS == 64 || n >= 2);
 
-    /* Everything is done by the tangent half-angle reconstruction (see
-       tan_bitwise_rs.c), which measured faster at every size tried,
-       from n = 1 to 192.  The conjugate-ratio reconstruction that used
-       to live here -- with its |W|^2, its two squarings and its two
-       wide divisions -- is gone, and with it the doubled-angle
-       reduction it needed. */
     _mp_real_tan_halfangle(ysin, ycos, NULL, x, n, r);
 }
 
@@ -365,6 +292,24 @@ void
 _mp_real_sin_cos_bitwise_rs(nn_ptr ysin, nn_ptr ycos, ulong * err, nn_srcptr x,
     slong n, int r)
 {
+#if FLINT_BITS == 64
+    /* r = 0 at the sizes of the per-size kernels (small.h, the dense
+       tables): those serve the call (any size they decline takes the
+       bitwise path below) */
+    if (r == 0 && n <= MP_REAL_TRIG_OPT_R_MAX)
+    {
+        ulong e, ts[MP_REAL_TRIG_OPT_R_MAX + 1], tc[MP_REAL_TRIG_OPT_R_MAX + 1];
+
+        if (_mp_real_sin_cos_opt((ysin != NULL) ? ysin : ts,
+                (ycos != NULL) ? ycos : tc, &e, x, n))
+        {
+            if (err != NULL)
+                *err = e;
+            return;
+        }
+    }
+#endif
+
     _mp_real_sin_cos_bitwise_rs_noerr(ysin, ycos, x, n, r);
     if (err != NULL)
         *err = 6 * (r ? (ulong) r : (ulong) _mp_real_trig_bitwise_rs_default_r(n)) + 128;

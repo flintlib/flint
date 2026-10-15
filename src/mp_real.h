@@ -219,12 +219,14 @@ int _mp_real_get_fixed_floor(nn_ptr y, slong n, const mp_real_t x);
 /* constants ****************************************************************/
 
 /* c = pi/4, log 2, Euler's constant, e, log 10, Catalan's constant,
-   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi.  The ball versions
-   evaluate c to about n limbs; the limb versions write floor(c B^n) -- n
-   limbs for c < 1 (pi/4, log 2, Euler, Catalan, 2/pi), n + 1 with a units limb for
+   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi, 1/log 2 - 1.  The
+   ball versions evaluate c to about n limbs; the limb versions write
+   floor(c B^n) -- n limbs for c < 1 (pi/4, log 2, Euler, Catalan, 2/pi,
+   1/log 2 - 1), n + 1 with a units limb for
    the others -- and set *err = 1.  cache = 0 computes from scratch;
-   cache = 1 reads a per-thread cache of floors, extending it to at
-   least max(n + 5, 1.5 times the cached precision) when it is short
+   cache = 1 reads a shared cache of floors (one per constant, read by
+   every thread; thread_support.h), extending it to at least
+   max(n + 5, 1.5 times the cached precision) when it is short
    (the ball version then encloses the floor with a radius of one
    ulp). */
 void mp_real_const_pi4(mp_real_t res, slong n, int cache);
@@ -238,6 +240,7 @@ void mp_real_const_zeta5(mp_real_t res, slong n, int cache);
 void mp_real_const_gamma_1_3(mp_real_t res, slong n, int cache);
 void mp_real_const_gamma_1_4(mp_real_t res, slong n, int cache);
 void mp_real_const_2_div_pi(mp_real_t res, slong n, int cache);
+void mp_real_const_inv_log2_frac(mp_real_t res, slong n, int cache);
 
 void _mp_real_const_pi4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_log2(nn_ptr res, ulong * err, slong n, int cache);
@@ -250,8 +253,10 @@ void _mp_real_const_zeta5(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_gamma_1_3(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_gamma_1_4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_2_div_pi(nn_ptr res, ulong * err, slong n, int cache);
+void _mp_real_const_inv_log2_frac(nn_ptr res, ulong * err, slong n, int cache);
 
-/* frees this thread's cache of constants */
+/* frees the shared caches of the constants (no other thread may be
+   using them; flint_cleanup_master does the same) */
 void _mp_real_const_clear_cache(void);
 
 /* verbose progress reports on stderr for huge computations: 0 silent
@@ -351,6 +356,27 @@ void mp_real_exp_notab_squaring(mp_real_t res, const mp_real_t x, slong n);
 void mp_real_exp_agm(mp_real_t res, const mp_real_t x, slong n);
 int mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec);
 void mp_real_atan_bits(mp_real_t res, const mp_real_t x, slong prec);
+
+/* log1p x, expm1 x, sinh x and cosh x (either output may be NULL),
+   tanh x, asin x, acos x, asinh x, acosh x and atanh x to a relative
+   accuracy of about 2^-prec, or less as the radius of x allows (the
+   outputs may alias x), as compositions of exp, log and atan without
+   cancellation: the results keep their relative accuracy near their
+   zeros, and small and large arguments are handled without squaring
+   them.  log1p returns 0 (with res = 0) unless 1 + x is strictly
+   positive; asin and acos unless x lies in [-1, 1] (an inexact ball
+   strictly inside), acosh unless x >= 1 (strictly above for an inexact
+   ball) and atanh unless |x| < 1; else 1.  expm1, sinh and cosh throw
+   like exp for x >= 2^(FLINT_BITS - 5) resp. |x| >= 2^(FLINT_BITS - 5). */
+int mp_real_log1p_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_expm1_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_sinh_cosh_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec);
+void mp_real_tanh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_asin_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_acos_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_asinh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_acosh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_atanh_bits(mp_real_t res, const mp_real_t x, slong prec);
 
 /* elementary functions on fixed-point numbers ******************************/
 

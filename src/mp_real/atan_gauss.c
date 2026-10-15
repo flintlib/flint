@@ -13,13 +13,14 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "thread_support.h"
 #include "impl.h"
 
-/* Thread-local cache of the angles theta_0 = pi/2, theta_j =
-   2 arg(pi_j) of the first _mp_real_atan_gauss_num nonreal Gaussian
-   primes, for the diophantine (multi-prime) trigonometric reduction
+/* Shared cache (thread_support.h) of the angles theta_0 = pi/2,
+   theta_j = 2 arg(pi_j) of the first num nonreal Gaussian primes, for
+   the diophantine (multi-prime) trigonometric reduction
    (sin_cos_diophantine.c), laid out exactly like the logarithm cache
-   of log_primes.c: _mp_real_atan_gauss_n limbs per entry, a unit limb
+   of log_primes.c: nc limbs per entry, a unit limb
    on top (theta < pi < 4), the lowest fraction limb a guard, each
    entry the exact floor of theta B^(n-1) so that shorter reads are
    exact floors too.  The values come from _mp_real_atan_gauss_vec
@@ -38,20 +39,9 @@ const signed char _mp_real_gaussian_primes[2 * MP_REAL_ATAN_GAUSS_MAX] = {
     5, 26, 15, 22, 2, 27, 9, 26
 };
 
-FLINT_TLS_PREFIX nn_ptr _mp_real_atan_gauss = NULL;
-FLINT_TLS_PREFIX slong _mp_real_atan_gauss_n = 0;
-FLINT_TLS_PREFIX slong _mp_real_atan_gauss_num = 0;
-static FLINT_TLS_PREFIX int _mp_real_atan_gauss_cleanup_registered = 0;
-
-static void
-_mp_real_atan_gauss_cleanup(void)
-{
-    flint_free(_mp_real_atan_gauss);
-    _mp_real_atan_gauss = NULL;
-    _mp_real_atan_gauss_n = 0;
-    _mp_real_atan_gauss_num = 0;
-    _mp_real_atan_gauss_cleanup_registered = 0;
-}
+/* the shared cache of the table (thread_support.h, impl.h) */
+static flint_shared_cache_struct _mp_real_atan_gauss_cache =
+    FLINT_SHARED_CACHE_INIT(_mp_real_tab_free);
 
 /* res_j = theta_j = 2 arg(pi_j), j < num, as arb balls at prec bits */
 void
@@ -75,35 +65,32 @@ _mp_real_atan_gauss_vec_arb(arb_ptr res, slong num, slong prec)
     flint_free(v);
 }
 
-void
-_mp_real_atan_gauss_ensure(slong num, slong nv)
+/* the shared cache protocol: a version grown from the current one,
+   recomputed as a whole (the Machin-type sets evaluate all entries
+   together) */
+static void *
+_mp_real_atan_gauss_build(const void * old, void * args)
 {
-    slong nc, j, guard;
+    _mp_real_tab_struct * T;
+    slong nc, num, j, guard, i_from;
     mp_real_struct * v;
 
-    FLINT_ASSERT(num >= 1 && num <= MP_REAL_ATAN_GAUSS_MAX);
-
-    if (nv + 2 <= _mp_real_atan_gauss_n && num <= _mp_real_atan_gauss_num)
-        return;
-
-    nc = FLINT_MAX(nv + 2, _mp_real_atan_gauss_n);
-    num = FLINT_MAX(num, _mp_real_atan_gauss_num);
-
-    flint_free(_mp_real_atan_gauss);
-    _mp_real_atan_gauss = flint_malloc(num * nc * sizeof(ulong));
-    _mp_real_atan_gauss_n = nc;
-    _mp_real_atan_gauss_num = num;
+    T = _mp_real_tab_new(old, args, &i_from);
+    nc = T->nc;
+    num = T->num;
+    if (i_from >= num)
+        return T;
 
     v = flint_malloc(num * sizeof(mp_real_struct));
     for (j = 0; j < num; j++)
         mp_real_init(v + j);
 
-    /* undetermined floors (astronomically rare) are retried at higher
-       precision */
+    /* undetermined floors (a value within the radius of a grid point:
+       astronomically rare) are retried at higher precision */
     for (guard = 2; ; guard *= 2)
     {
         _mp_real_atan_gauss_vec(v, num, nc + guard);
-        if (_mp_real_store_floors(_mp_real_atan_gauss, nc, v, num))
+        if (_mp_real_store_floors(T->tab, nc, v, num))
             break;
     }
 
@@ -111,27 +98,28 @@ _mp_real_atan_gauss_ensure(slong num, slong nv)
         mp_real_clear(v + j);
     flint_free(v);
 
-    if (!_mp_real_atan_gauss_cleanup_registered)
-    {
-        flint_register_cleanup_function(_mp_real_atan_gauss_cleanup);
-        _mp_real_atan_gauss_cleanup_registered = 1;
-    }
+    return T;
 }
 
-nn_srcptr
-_mp_real_atan_gauss_entry(slong j, slong nv)
+/* the version covering num entries at nv value fraction limbs (one
+   guard limb below, one unit limb above) */
+const _mp_real_tab_struct *
+_mp_real_atan_gauss_ensure(slong num, slong nv)
 {
-    FLINT_ASSERT(j >= 0 && j < _mp_real_atan_gauss_num);
-    FLINT_ASSERT(nv >= 1 && nv + 2 <= _mp_real_atan_gauss_n);
-    return _mp_real_atan_gauss + j * _mp_real_atan_gauss_n
-        + (_mp_real_atan_gauss_n - (nv + 1));
+    _mp_real_tab_req_struct R;
+
+    FLINT_ASSERT(num >= 1 && num <= MP_REAL_ATAN_GAUSS_MAX);
+
+    R.nc = nv + 2;
+    R.num = num;
+    return flint_shared_cache_ensure(&_mp_real_atan_gauss_cache,
+        _mp_real_tab_sufficient, _mp_real_atan_gauss_build, &R);
 }
 
+
+/* free the cache (no other thread may be using it: tuning programs) */
 void
 _mp_real_atan_gauss_clear(void)
 {
-    flint_free(_mp_real_atan_gauss);
-    _mp_real_atan_gauss = NULL;
-    _mp_real_atan_gauss_n = 0;
-    _mp_real_atan_gauss_num = 0;
+    flint_shared_cache_clear(&_mp_real_atan_gauss_cache);
 }

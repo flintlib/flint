@@ -24,7 +24,11 @@
 
    (exp, alternating for exp(-x); sin t / t and sinh t / t; (1 - cos t)/t^2 and (cosh t - 1)/t^2;
    atan t / t and atanh t / t, alternating for the circular functions),
-   and the result is P, x P or v P.
+   and the result is P, x P or v P.  As x < 2^-r resp. v < 2^-2r damps
+   the error of P, P is wanted only to 64 n - h bits with h = r - 8 for
+   x P and h = 2 r - 8 for v P (h = 0 for exp), keeping 8 bits of the
+   damping: N is the least number of terms with a_N 2^(-sN) below
+   2^(-(64 n - h) - 3), and the windows below shrink by h bits.
 
    Rectangular splitting in blocks of m (even) terms,
 
@@ -43,17 +47,29 @@
    TAPERING.  Block b enters P multiplied by v^(mb) < 2^(-smb), so it
    runs in a window of the top
 
-       L_b = min(n, ceil((64 n + g - s m b) / 64))
+       L_b = min(n, ceil((64 n - h + g - s m b) / 64))
 
-   fraction limbs (plus the units limb), g = bits(N) + 3 guard bits;
-   within the block, v^i has floor(s i / 64) leading zero limbs, which
+   fraction limbs (plus the units limb), g = bits(N) + 3 guard bits,
+   less log2 a_(N-1) when the factorial chain never divides ((N - 1)!,
+   resp. (2N - 1)! and (2N)!/2, fit a limb: every error is then damped
+   by the final division, below); within the block, v^i has floor(s i / 64) leading zero limbs, which
    its addmul_1 skips; the multiplication of S_(b+1) by v^m reads only
    the significant limbs of both and writes the (wider) window of
    block b.  The cost: m full products for the powers, N/m boundary
    products at widths falling linearly to zero (about N/(3m) full
    products), and scalar passes over the shrinking windows -- against
    N/3 full products for the tapered Horner scheme of
-   series_tapered.c, which wins only below about a dozen limbs.
+   series_tapered.c, which wins only below about a dozen limbs.  The
+   block size is m ~ sqrt(N / 1.5) (sqrt(2 N / 1.5) for sin and cos
+   together, whose two sums share the powers).
+
+   The sum runs specialized for the family and the signs: per block,
+   per term the coefficient (with the division or rescale that may
+   precede it) and one mpn_addmul_1 or mpn_submul_1 over the window of
+   v^p, the carry stored into a limb known to be zero where it is
+   (non-alternating factorials), else added up; the boundary product
+   goes to a second accumulator (no copy), the limbs below the window
+   that it reads cleared first.
 
    Signs.  In the alternating families U is kept in two's complement
    across the units limb; with m even, every block starts with a
@@ -62,13 +78,17 @@
    decrease), U + d is divided and 1 subtracted after (for a rescale,
    U + D and D' subtracted after), keeping every division unsigned.
 
-   Error, in ulps 2^(-64n) of P (then of the result).  An error of delta
+   Error, in ulps 2^(-(64n - h)) of P (then 2^(-64n) of the result).
+   An error of delta
    window units committed while the running divisor is d at term k
    reaches P as at most delta a_k / d <= delta window units, multiplied
    by the pending v^(mb) <= 2^(-smb): for b >= 1 each event (at most 3
    units: a window-truncated term, a power's error times a_k <= 1, a
    floor, a boundary product) is below 2^(-min(g, sm)) ulps, and there
-   are at most 5 N of them, below 5/8 ulp in all.  In block 0: the
+   are at most 5 N of them, below 5/8 ulp in all (with a single run,
+   every error in U reaches P divided by the final d = 1/a_(N-1),
+   which pays for the guard bits left out); with h > 0 the
+   window of block 0 truncates too, at the same cost.  In block 0: the
    powers err by at most 1 (v = x^2 by sqrhigh; 0 for v = x) resp. 3
    ulps (the truncated products), weighted by a_i: at most
    3 (e - 2) < 2.2 for exp, 1/6 + 3 (1/5! + ..) < 0.2 for sin and sinh,
@@ -82,10 +102,12 @@
    one more ulp at most; the last boundary product at most 2 a_m; the
    omitted tail at most 1/8.  So |P - P~| < 4.6 for exp and below
    7.5 for the others.  The final product x P (resp. v P, v with its
-   own ulp) damps that by x < 2^-r <= 2^-8 and adds at most 1 ulp for
+   own ulp) damps that by x < 2^-r = 2^-(h + 8) (resp. v < 2^-(h + 8))
+   to below 1/32 ulp of the result and adds at most 1 ulp for
    the mulhigh (and 1/2 for v's error times P <= 1/2 in the cosines),
    so every result is within 5 ulps for exp and 2 ulps otherwise.
-   Outputs may alias x. */
+   (For exp the term v, a_1 = 1, is left out of the sum and added
+   exactly after the final division.)  Outputs may alias x. */
 
 /* a lower bound for 4 log2(F), F >= 1 */
 static inline slong
@@ -111,31 +133,100 @@ _rs_window(slong n, slong g, slong sm, slong b)
 #define RS_EVEN 2       /* 1/(2k+2)!               */
 #define RS_RECIP 3      /* 1/(2k+1)                */
 
-/* the number of terms: a_N 2^(-sN) < 2^(-64n-3) */
-static slong
-_rs_terms(int fam, slong n, slong s)
-{
-    slong N, lg4 = 0, T4 = 4 * (FLINT_BITS * n + 3);
+#if FLINT_BITS == 64
+/* cumulative lower bounds for 4 log2(1/a_N): sum_(i <= N) of _lg4_lower of
+   i, (2i+1)(2i) resp. (2i+2)(2i+1), N <= RS_LG4_TAB (64-bit) */
+#define RS_LG4_TAB 64
+static const unsigned short _rs_lg4_exp[RS_LG4_TAB + 1] = {
+    0, 0, 4, 10, 18, 27, 37, 47, 59, 71,
+    84, 97, 111, 125, 139, 154, 170, 186, 202, 218,
+    235, 252, 269, 286, 304, 322, 340, 358, 376, 394,
+    413, 432, 452, 472, 492, 512, 532, 552, 572, 592,
+    613, 634, 655, 676, 697, 718, 739, 760, 782, 804,
+    826, 848, 870, 892, 914, 936, 958, 980, 1002, 1024,
+    1047, 1070, 1093, 1116, 1140,
+};
+static const unsigned short _rs_lg4_odd[RS_LG4_TAB + 1] = {
+    0, 10, 27, 48, 72, 98, 126, 156, 188, 221,
+    255, 290, 326, 363, 401, 439, 479, 519, 560, 601,
+    643, 685, 728, 772, 816, 860, 905, 950, 996, 1042,
+    1088, 1135, 1183, 1231, 1279, 1327, 1376, 1425, 1474, 1524,
+    1574, 1624, 1674, 1724, 1775, 1826, 1878, 1930, 1982, 2034,
+    2086, 2139, 2192, 2245, 2298, 2351, 2405, 2459, 2513, 2567,
+    2621, 2675, 2730, 2785, 2841,
+};
+static const unsigned short _rs_lg4_even[RS_LG4_TAB + 1] = {
+    0, 14, 33, 55, 80, 108, 137, 168, 200, 233,
+    267, 303, 340, 377, 415, 454, 494, 534, 575, 617,
+    659, 701, 745, 789, 833, 878, 923, 969, 1015, 1061,
+    1107, 1154, 1202, 1250, 1298, 1346, 1395, 1444, 1493, 1543,
+    1593, 1643, 1693, 1743, 1794, 1846, 1898, 1950, 2002, 2054,
+    2107, 2160, 2213, 2266, 2319, 2373, 2427, 2481, 2535, 2589,
+    2643, 2697, 2752, 2807, 2863,
+};
+#endif
 
-    for (N = 1; ; N++)
+/* the number of terms: the least N with a_N 2^(-sN) < 2^(-p-3) by the
+   lower bounds of _lg4_lower (cumulative for the factorials, from the
+   tables up to RS_LG4_TAB terms) */
+static slong
+_rs_terms(int fam, slong p, slong s)
+{
+    slong N, lg4 = 0, T4 = 4 * (p + 3);
+
+    if (fam == RS_RECIP)
+    {
+        /* lg4 < 4 FLINT_BITS: no N <= N0 qualifies */
+        N = FLINT_MAX(0, (T4 - 4 * FLINT_BITS) / (4 * s));
+        for (N++; ; N++)
+            if (_lg4_lower((ulong) (2 * N + 1)) + 4 * s * N > T4)
+                return N;
+    }
+
+#if FLINT_BITS == 64
+    {
+        const unsigned short * tab = (fam == RS_EXP) ? _rs_lg4_exp
+            : (fam == RS_ODD) ? _rs_lg4_odd : _rs_lg4_even;
+
+        if (tab[RS_LG4_TAB] + 4 * s * RS_LG4_TAB > T4)
+        {
+            slong lo = 0, hi = RS_LG4_TAB, mid;
+
+            /* the predicate fails at lo (or lo = 0), holds at hi */
+            while (hi - lo > 1)
+            {
+                mid = (lo + hi) / 2;
+                if (tab[mid] + 4 * s * mid > T4)
+                    hi = mid;
+                else
+                    lo = mid;
+            }
+            return hi;
+        }
+        N = RS_LG4_TAB;
+        lg4 = tab[N];
+    }
+#else
+    N = 0;
+#endif
+
+    for (N++; ; N++)
     {
         if (fam == RS_EXP)
             lg4 += _lg4_lower((ulong) N);
 #if FLINT_BITS == 64
         else if (fam == RS_ODD)
             lg4 += _lg4_lower((ulong) (2 * N + 1) * (ulong) (2 * N));
-        else if (fam == RS_EVEN)
+        else
             lg4 += _lg4_lower((ulong) (2 * N + 2) * (ulong) (2 * N + 1));
 #else
         /* the factors separately (lower bounds add), the product
            possibly beyond a word */
         else if (fam == RS_ODD)
             lg4 += _lg4_lower((ulong) (2 * N + 1)) + _lg4_lower((ulong) (2 * N));
-        else if (fam == RS_EVEN)
+        else
             lg4 += _lg4_lower((ulong) (2 * N + 2)) + _lg4_lower((ulong) (2 * N + 1));
 #endif
-        else
-            lg4 = _lg4_lower((ulong) (2 * N + 1));
         if (lg4 + 4 * s * N > T4)
             return N;
     }
@@ -155,173 +246,254 @@ _rs_blocksize(slong N)
 
 #define PAD 3
 
+#define RS_MMAX 32
+
+/* the scratch of _rs_sum: two accumulators of n + 2 limbs, each with
+   PAD limbs below */
+#define RS_WORK(n) (2 * ((n) + 2 + PAD))
+
 /* P (n + 1 limbs, units limb on top) for the family fam from the powers
-   pw(1..m) (pw(i) + j the grid limb j of v^i, PAD zero limbs below) */
-static void
-_rs_sum(nn_ptr s, nn_srcptr pw, slong pslot, slong n, slong s_bits,
-    slong m, int fam, int alt, nn_ptr tmp)
+   pw(1..m) (pw(i) + j the grid limb j of v^i, PAD zero limbs below).
+
+   Descending over the blocks, and within a block over its terms
+   k = m b + p, p = m - 1 .. 0: the term's coefficient (with the
+   division or rescale that may precede it), then one mpn_addmul_1 or
+   mpn_submul_1 of the window's L_b - zi[p] limbs of v^p (zi[p] its
+   leading zero limbs), the carry into the limb above; the units term
+   p = 0 into s[n]; then the boundary product with v^m into the next
+   window. */
+FLINT_FORCE_INLINE void
+_rs_sum_tmpl(nn_ptr res, nn_srcptr pw, slong pslot, slong n, slong s_bits,
+    slong m, const int fam, const int alt, nn_ptr work, slong N, slong h)
 {
-    slong N, g, k, b, lo, i, zm, sm;
-    ulong d = 1, D = 1, c;
+    slong g, k, b, lo, p, q, zm, sm, len, i;
+    slong zi[RS_MMAX + 1];
+    char fresh[RS_MMAX + 1];
+    ulong d = 1, D = 1, c, cy, t;
     slong grp_lo = 0;
-    int fact = (fam != RS_RECIP);
+    int fact = (fam != RS_RECIP), neg;
+    nn_ptr s = work + PAD, oth = work + (n + 2 + PAD) + PAD, tt;
 
 #define SL(j) (pw + ((j) - 1) * pslot + PAD)
 
-    N = _rs_terms(fam, n, s_bits);
+    FLINT_ASSERT(N == _rs_terms(fam, FLINT_BITS * n - h, s_bits));
+    FLINT_ASSERT(m >= 2 && m <= RS_MMAX);
+    FLINT_ASSERT(h >= 0);
+
+    /* the windows carry g guard bits beyond the 64 n - h that P needs,
+       less the damping a_k / d = a_(N - 1) of every error when the
+       factorial chain never divides ((N - 1)! resp. (2N - 1)! and
+       (2N)!/2 fit a limb) */
     g = FLINT_BIT_COUNT(N) + 3;
+#if FLINT_BITS == 64
+    if (fam == RS_EXP && N <= 21)
+        g = FLINT_MAX(g - _rs_lg4_exp[N - 1] / 4, 0);
+    else if (fam == RS_ODD && N <= 10)
+        g = FLINT_MAX(g - _rs_lg4_odd[N - 1] / 4, 0);
+    else if (fam == RS_EVEN && N <= 10)
+        g = FLINT_MAX(g - _rs_lg4_even[N - 1] / 4 - 1, 0);
+#endif
+    g -= h;
     sm = s_bits * m;
     zm = sm / FLINT_BITS;
+    for (p = 0; p <= m; p++)
+        zi[p] = (s_bits * p) / FLINT_BITS;
+    /* the carry limb of term p is still zero (non-alternating
+       factorial families: nothing above the previous term's carry, as
+       divisions only lower the accumulator) */
+    for (p = 1; p < m; p++)
+        fresh[p] = fact && !alt && zi[p] >= 1
+            && zi[p] < ((p == m - 1) ? zm : zi[p + 1]);
 
     flint_mpn_zero(s, n + 2);
-    b = (N - 1) / m;
+    k = N - 1;
+    b = k / m;
     lo = n - _rs_window(n, g, sm, b);
 
-    for (k = N - 1; k >= 0; k--)
+    for (;;)
     {
-        int neg = alt && (k & 1);
-        int pneg = alt && !(k & 1);     /* the previous term, k + 1 */
-
-        i = k - m * b;
-
-        if (fact)
+        for (p = k - m * b; ; p--, k--)
         {
-            if (k < N - 1)
+            neg = alt && (k & 1);
+
+            /* the coefficient c of term k */
+            if (fact)
             {
-                ulong F, hi, lw;
-
-                /* F fits a word: 2k + 4 < 2^(FLINT_BITS/2), which the
-                   term counts keep far from (k ~ 64n/s, s >= 8) */
-                FLINT_ASSERT(FLINT_BITS == 64 || 2 * k + 4 < (WORD(1) << 16));
-                if (fam == RS_EXP)
-                    F = (ulong) (k + 1);
-                else if (fam == RS_ODD)
-                    F = (ulong) (2 * k + 3) * (ulong) (2 * k + 2);
-                else
-                    F = (ulong) (2 * k + 4) * (ulong) (2 * k + 3);
-
-                umul_ppmm(hi, lw, d, F);
-                if (hi != 0)
-                {
-                    if (pneg)
-                        s[n] += d;
-                    mpn_divrem_1(s + lo, 0, s + lo, n - lo + 1, d);
-                    if (pneg)
-                        s[n] -= 1;
-                    d = F;
-                }
-                else
-                    d = lw;
-            }
-            c = d;
-        }
-        else
-        {
-            if (k == N - 1 || k < grp_lo)
-            {
-                ulong ND = 1, hi, lw;
-                slong j = k;
-
-                while (j >= 0)
-                {
-                    umul_ppmm(hi, lw, ND, (ulong) (2 * j + 1));
-                    if (hi != 0)
-                        break;
-                    ND = lw;
-                    j--;
-                }
-                grp_lo = j + 1;
-
                 if (k < N - 1)
                 {
-                    if (pneg)
-                        s[n] += D;
-                    s[n + 1] = mpn_mul_1(s + lo, s + lo, n - lo + 1, ND);
-                    mpn_divrem_1(s + lo, 0, s + lo, n - lo + 2, D);
-                    if (pneg)
-                        s[n] -= ND;
+                    ulong F, hi, lw;
+
+                    /* F fits a word: 2k + 4 < 2^(FLINT_BITS/2), which the
+                       term counts keep far from (k ~ 64n/s, s >= 8) */
+                    FLINT_ASSERT(FLINT_BITS == 64 || 2 * k + 4 < (WORD(1) << 16));
+                    if (fam == RS_EXP)
+                        F = (ulong) (k + 1);
+                    else if (fam == RS_ODD)
+                        F = (ulong) (2 * k + 3) * (ulong) (2 * k + 2);
+                    else
+                        F = (ulong) (2 * k + 4) * (ulong) (2 * k + 3);
+
+                    umul_ppmm(hi, lw, d, F);
+                    if (hi != 0)
+                    {
+                        /* the previous term, k + 1, was negative */
+                        int pneg = alt && !neg;
+
+                        if (pneg)
+                            s[n] += d;
+                        mpn_divrem_1(s + lo, 0, s + lo, n - lo + 1, d);
+                        if (pneg)
+                            s[n] -= 1;
+                        d = F;
+                    }
+                    else
+                        d = lw;
                 }
-                D = ND;
+                c = d;
             }
-            c = D / (ulong) (2 * k + 1);
-        }
-
-        if (i == 0)
-        {
-            if (neg)
-                s[n] -= c;
             else
-                s[n] += c;
-        }
-        else
-        {
-            slong zi = (s_bits * i) / FLINT_BITS;
-            slong len = n - zi - lo;
+            {
+                if (k == N - 1 || k < grp_lo)
+                {
+                    ulong ND = 1, hi, lw;
+                    slong j = k;
 
+                    while (j >= 0)
+                    {
+                        umul_ppmm(hi, lw, ND, (ulong) (2 * j + 1));
+                        if (hi != 0)
+                            break;
+                        ND = lw;
+                        j--;
+                    }
+                    grp_lo = j + 1;
+
+                    if (k < N - 1)
+                    {
+                        int pneg = alt && !neg;
+
+                        if (pneg)
+                            s[n] += D;
+                        s[n + 1] = mpn_mul_1(s + lo, s + lo, n - lo + 1, ND);
+                        mpn_divrem_1(s + lo, 0, s + lo, n - lo + 2, D);
+                        if (pneg)
+                            s[n] -= ND;
+                    }
+                    D = ND;
+                }
+                c = D / (ulong) (2 * k + 1);
+            }
+
+            if (p == 0)
+                break;
+
+            /* exp: the term v (a_1 = 1) is added after the division */
+            if (fam == RS_EXP && !alt && k == 1)
+                continue;
+
+            /* c v^p over the window, the carry from limb n - zi[p] up */
+            len = n - zi[p] - lo;
             if (len > 0)
             {
-                ulong cy;
-                slong p = n - zi;
-
+                q = n - zi[p];
                 if (neg)
                 {
-                    cy = mpn_submul_1(s + lo, SL(i) + lo, len, c);
-                    while (cy != 0 && p <= n)
+                    cy = mpn_submul_1(s + lo, SL(p) + lo, len, c);
+                    for ( ; cy != 0 && q <= n; q++)
                     {
-                        ulong t = s[p];
-                        s[p] = t - cy;
+                        t = s[q];
+                        s[q] = t - cy;
                         cy = (t < cy);
-                        p++;
                     }
                 }
                 else
                 {
-                    cy = mpn_addmul_1(s + lo, SL(i) + lo, len, c);
-                    while (cy != 0 && p <= n)
-                    {
-                        ulong t = s[p] + cy;
-                        cy = (t < cy);
-                        s[p] = t;
-                        p++;
-                    }
+                    cy = mpn_addmul_1(s + lo, SL(p) + lo, len, c);
+                    if (fresh[p])
+                        s[q] = cy;
+                    else
+                        for ( ; cy != 0 && q <= n; q++)
+                        {
+                            t = s[q] + cy;
+                            cy = (t < cy);
+                            s[q] = t;
+                        }
                 }
             }
         }
 
-        if (i == 0 && k > 0)
+        /* the units term k = m b */
+        if (neg)
+            s[n] -= c;
+        else
+            s[n] += c;
+
+        if (k == 0)
+            break;
+        k--;
+
+        /* S_b = s v^m on the window of block b - 1: the product of the
+           top W limbs of s (zero below its window) and of v^m's
+           significant part lands at grid position n - (W - 1) - zm, at
+           or below the new window's bottom; it goes to the other
+           accumulator, the limbs above it zero, and below the window
+           anything */
         {
-            /* S_b = s v^m on the window of block b - 1: the product of
-               the top W limbs of s (zero below its window) and of v^m's
-               significant part lands at grid position n - (W - 1) - zm,
-               at or below the new window's bottom */
             slong Lo = n - lo, Ln, W, base;
 
             b--;
             Ln = _rs_window(n, g, sm, b);
-            lo = n - Ln;
             if (zm > Ln)
             {
                 /* v^m vanishes on the window */
+                lo = n - Ln;
                 flint_mpn_zero(s + lo, Ln + 1);
             }
             else
             {
                 /* Lo + zm <= n + 2 as b + 1 >= 1, so the read of v^m
-                   stays within its PAD zero limbs */
+                   stays within its PAD zero limbs, and the product
+                   starts at most PAD limbs below the accumulator */
                 W = FLINT_MAX(Lo, Ln - zm) + 1;
-                flint_mpn_mulhigh_n(tmp, s + n - W + 1, SL(m) + n - zm - W, W);
+                for (i = n - W + 1; i < lo; i++)
+                    s[i] = 0;
                 base = n - (W - 1) - zm;
-                flint_mpn_copyi(s + lo, tmp + (lo - base), n - zm - lo + 1);
-                flint_mpn_zero(s + n - zm + 1, zm);
+                FLINT_ASSERT(base >= -PAD);
+                flint_mpn_mulhigh_n(oth + base, s + n - W + 1, SL(m) + n - zm - W, W);
+                flint_mpn_zero(oth + n - zm + 1, zm + 1);
+                tt = s;
+                s = oth;
+                oth = tt;
+                lo = n - Ln;
             }
         }
     }
 
-    mpn_divrem_1(s, 0, s, n + 1, fact ? d : D);
+    /* below the window of block 0 nothing is needed (zero in res) */
+    mpn_divrem_1(res + lo, 0, s + lo, n - lo + 1, fact ? d : D);
+    flint_mpn_zero(res, lo);
     if (fam == RS_EVEN)
-        mpn_rshift(s, s, n + 1, 1);     /* a_0 = 1/2 */
+        mpn_rshift(res, res, n + 1, 1);     /* a_0 = 1/2 */
 
 #undef SL
+}
+
+/* the sum specialized for the family and the signs */
+static void
+_rs_sum(nn_ptr res, nn_srcptr pw, slong pslot, slong n, slong s_bits,
+    slong m, int fam, int alt, nn_ptr work, slong N, slong h)
+{
+#define RS_CASE(F, A) \
+    case 2 * (F) + (A): \
+        _rs_sum_tmpl(res, pw, pslot, n, s_bits, m, F, A, work, N, h); break;
+    switch (2 * fam + (alt != 0))
+    {
+        RS_CASE(RS_EXP, 0) RS_CASE(RS_EXP, 1)
+        RS_CASE(RS_ODD, 0) RS_CASE(RS_ODD, 1)
+        RS_CASE(RS_EVEN, 0) RS_CASE(RS_EVEN, 1)
+        RS_CASE(RS_RECIP, 0) RS_CASE(RS_RECIP, 1)
+    }
+#undef RS_CASE
 }
 
 /* the powers v^2 .. v^m of v = pw(1) (grid limbs, pw(1) already set) */
@@ -361,21 +533,25 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     flint_bitcnt_t r, int hyperbolic)
 {
     slong s_bits = 2 * (slong) r, N, m, pslot;
-    nn_ptr pw, s, tmp, z;
+    nn_ptr pw, s, tmp, z, work;
     int alt = !hyperbolic;
     TMP_INIT;
 
     FLINT_ASSERT(n >= 1);
     FLINT_ASSERT(r >= 8);
 
-    N = _rs_terms(RS_ODD, n, s_bits);
-    m = _rs_blocksize(N);
+    /* P is wanted to 64 n - h bits: sin by x P (x < 2^-r), 1 - cos by
+       z P (z < 2^-2r), keeping 8 bits of the damping */
+    N = _rs_terms(RS_ODD, FLINT_BITS * n - ((slong) r - 8), s_bits);
+    /* the block size for the two sums that share the powers */
+    m = _rs_blocksize(2 * N);
 
     TMP_START;
     pslot = n + PAD;
-    pw = TMP_ALLOC((m * pslot + 3 * (n + 3)) * sizeof(ulong));
+    pw = TMP_ALLOC((m * pslot + 3 * (n + 3) + RS_WORK(n)) * sizeof(ulong));
     s = pw + m * pslot;
     tmp = s + 2 * (n + 3);
+    work = tmp + (n + 3);
     z = pw + PAD;
 
     flint_mpn_sqrhigh(z, x, n);
@@ -384,7 +560,9 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     /* the products go through tmp: ysin and yg may alias x */
     if (yg != NULL)
     {
-        _rs_sum(s, pw, pslot, n, s_bits, m, RS_EVEN, alt, tmp);
+        _rs_sum(s, pw, pslot, n, s_bits, m, RS_EVEN, alt, work,
+            _rs_terms(RS_EVEN, FLINT_BITS * n - (2 * (slong) r - 8), s_bits),
+            2 * (slong) r - 8);
         flint_mpn_mulhigh_n(tmp, z, s, n);  /* s < 1 */
         if (ysin == NULL)
         {
@@ -397,7 +575,8 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
 
     if (ysin != NULL)
     {
-        _rs_sum(s, pw, pslot, n, s_bits, m, RS_ODD, alt, tmp);
+        _rs_sum(s, pw, pslot, n, s_bits, m, RS_ODD, alt, work, N,
+            (slong) r - 8);
         flint_mpn_mulhigh_n(tmp, x, s, n);
         if (s[n] != 0)
             mpn_addmul_1(tmp, x, n, s[n]);
@@ -413,9 +592,9 @@ void
 _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
     int func)
 {
-    slong s_bits, N, m, pslot;
+    slong s_bits, N, m, pslot, h;
     int fam, alt;
-    nn_ptr pw, s, tmp;
+    nn_ptr pw, s, tmp, work;
     TMP_INIT;
 
     FLINT_ASSERT(n >= 1);
@@ -449,7 +628,10 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
         s_bits = 2 * (slong) r;
     }
 
-    N = _rs_terms(fam, n, s_bits);
+    /* P is wanted to 64 n - h bits: exp is P, atan(h) x P (x < 2^-r,
+       keeping 8 bits of the damping) */
+    h = (fam == RS_EXP) ? 0 : (slong) r - 8;
+    N = _rs_terms(fam, FLINT_BITS * n - h, s_bits);
 
     /* exp x = 1 + x resp. atan(h) x = x to the working precision */
     if (N <= (fam == RS_EXP ? 2 : 1))
@@ -471,9 +653,10 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
 
     TMP_START;
     pslot = n + PAD;
-    pw = TMP_ALLOC((m * pslot + 2 * (n + 3)) * sizeof(ulong));
+    pw = TMP_ALLOC((m * pslot + 2 * (n + 3) + RS_WORK(n)) * sizeof(ulong));
     s = pw + m * pslot;
     tmp = s + (n + 3);
+    work = tmp + (n + 3);
 
     if (fam == RS_EXP)
         flint_mpn_copyi(pw + PAD, x, n);
@@ -481,10 +664,15 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
         flint_mpn_sqrhigh(pw + PAD, x, n);
     _rs_powers(pw, pslot, n, s_bits, m, PAD);
 
-    _rs_sum(s, pw, pslot, n, s_bits, m, fam, alt, tmp);
+    _rs_sum(s, pw, pslot, n, s_bits, m, fam, alt, work, N, h);
 
     if (fam == RS_EXP)
+    {
+        /* + v, left out of the sum (s is P - v, below 2) */
+        if (!alt)
+            s[n] += mpn_add_n(s, s, x, n);
         flint_mpn_copyi(res, s, n + 1);
+    }
     else
     {
         /* through tmp: res may alias x */

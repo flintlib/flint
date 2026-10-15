@@ -121,12 +121,12 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             arb_init(ta); arb_init(ref); arb_init(got);
             arb_init(bnd); fmpz_init(f);
 
+            flint_set_num_threads(1 + n_randint(state, 4));
             if (cases[c].fill == 2)
                 flint_mpn_zero(t, wn);
             else if (cases[c].fill == 1)
                 flint_mpn_store(t, wn, ~UWORD(0));
             else
-                flint_set_num_threads(1 + n_randint(state, 4));
                 flint_mpn_urandomb(t, state, FLINT_BITS * wn);
             for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
                 t[wn - 1 - i] = 0;

@@ -207,7 +207,8 @@ def main():
         h("#define MP_REAL_CONST_STATIC_N %d" % N)
         mp.prec = bits * N + 256
         fmt = "UWORD(0x%016x)" if bits == 64 else "UWORD(0x%08x)"
-        for name, val in (("pi4", pi / 4), ("log2", log(2)), ("2_div_pi", 2 / pi)):
+        for name, val in (("pi4", pi / 4), ("log2", log(2)), ("2_div_pi", 2 / pi),
+                          ("inv_log2_frac", 1 / log(2) - 1)):
             L = const_limbs(val, bits, N)
             h("FLINT_DLL extern const ulong _mp_real_const_%s_static[%d];" % (name, N))
             o("/* floor(%s B^%d), low limb first */" % (name, N))

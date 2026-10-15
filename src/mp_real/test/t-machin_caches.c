@@ -40,16 +40,17 @@ TEST_FUNCTION_START(mp_real_machin_caches, state)
 
         arb_init(v); arb_init(y); fmpq_init(q); fmpz_init(f);
         ref = flint_malloc((nv + 1) * sizeof(ulong));
+        const _mp_real_tab_struct * T;
 
         if (gaussian)
         {
             _mp_real_atan_gauss_clear();
-            _mp_real_atan_gauss_ensure(num, nv);
+            T = _mp_real_atan_gauss_ensure(num, nv);
         }
         else
         {
             _mp_real_log_primes_clear();
-            _mp_real_log_primes_ensure(num, nv);
+            T = _mp_real_log_primes_ensure(num, nv);
         }
 
         n_primes_init(iter_p);
@@ -59,7 +60,7 @@ TEST_FUNCTION_START(mp_real_machin_caches, state)
 
             if (gaussian)
             {
-                e = _mp_real_atan_gauss_entry(j, nr);
+                e = _mp_real_machin_entry(T, j, nr);
                 fmpq_set_si(q, _mp_real_gaussian_primes[2 * j + 1],
                     _mp_real_gaussian_primes[2 * j]);
                 arb_set_fmpq(y, q, prec);
@@ -68,7 +69,7 @@ TEST_FUNCTION_START(mp_real_machin_caches, state)
             }
             else
             {
-                e = _mp_real_log_primes_entry(j, nr);
+                e = _mp_real_machin_entry(T, j, nr);
                 arb_log_ui(v, n_primes_next(iter_p), prec);
             }
 

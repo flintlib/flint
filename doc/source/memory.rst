@@ -28,8 +28,10 @@ Global caches and cleanup
 
 FLINT may cache some data (such as allocated integers
 and tables of prime numbers) to speed up various computations.
-If FLINT is built in threadsafe mode, most caches are thread-local
-(some are always global and shared among the threads).
+If FLINT is built in threadsafe mode, most caches are thread-local;
+some are global and shared among the threads, in particular the
+shared caches of ``thread_support.h`` (see :ref:`threading`) holding
+the tables of the ``mp_real`` elementary functions.
 
 Data cached by the current thread can be freed by calling the
 ``flint_cleanup()`` function. The user can register additional cleanup
@@ -39,7 +41,9 @@ to a function with signature ``void cleanup_function(void)``
 to ``flint_register_cleanup_function()``.
 
 The user should call ``flint_cleanup_master()`` exactly once
-right before exiting a program. This cleans up all caches in all threads
+right before exiting a program. This cleans up all caches in all threads,
+including the shared caches (which ``flint_cleanup()`` leaves alone,
+since other threads may be using them),
 and should result in a clean output with tools like ``valgrind``
 if there are no memory leaks.
 

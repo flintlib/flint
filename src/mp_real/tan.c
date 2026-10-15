@@ -47,7 +47,9 @@
    by a factor below sqrt(2), where the output would have almost no
    accuracy anyway). */
 
-/* kernel choice by working precision (limbs), as for sin and cos */
+/* kernel choice by working precision (limbs), as for sin and cos (and
+   up to TAN_SC_MAX through their kernels) */
+#define TAN_SC_MAX 22
 #define TAN_BITWISE_MAX 600
 #define TAN_DIOPHANTINE_MAX 65536
 
@@ -174,6 +176,16 @@ _tan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
         e = _tan_div(y, s, es, c, es, n);
         TMP_END;
     }
+#if FLINT_BITS == 64
+    else if (n <= TAN_SC_MAX)
+    {
+        /* the sine and cosine kernels (small.h, the dense tables) and one
+           division: 1.05-1.95 times faster than the half-angle
+           reconstruction up to 22 limbs, 0.85 beyond, where the dense
+           kernels' wide tier begins */
+        _mp_real_tan_sc(y, &e, v, n);
+    }
+#endif
     else if (n <= TAN_BITWISE_MAX)
         _mp_real_tan_bitwise_rs(y, &e, v, n, 0);
     else if (n <= TAN_DIOPHANTINE_MAX)
@@ -205,13 +217,18 @@ _mp_real_tan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
 
 /* guard bits for a kernel result accurate to about 2^-p (absolute):
    the kernel's bound (8r + 256 for the bitwise functions, r the tuned
-   parameter; small for the others), a reduction error of a few ulps
+   parameter; 4.75 times that of the sine and cosine kernels, plus 2, for
+   _mp_real_tan_sc; small for the others), a reduction error of a few ulps
    amplified by sec^2 <= 2, and two bits of slack */
 static slong
 _tan_guard(slong p)
 {
     slong n = (p + 14 + FLINT_BITS - 1) / FLINT_BITS;
 
+#if FLINT_BITS == 64
+    if (n <= TAN_SC_MAX)
+        return FLINT_BIT_COUNT((19 * (6 * (ulong) _mp_real_sin_cos_default_r_inline(n) + 128)) / 4 + 10) + 3;
+#endif
     if (n <= TAN_BITWISE_MAX)
         return FLINT_BIT_COUNT(8 * (ulong) _mp_real_trig_default_r_inline(n) + 264) + 3;
     if (n <= TAN_DIOPHANTINE_MAX)
@@ -447,7 +464,7 @@ _tan_small(mp_real_t res, const mp_real_t x, slong prec)
 
     if (res != x)
         mp_real_set(res, x);
-    mp_real_add_error_2exp_si(res, 3 * e - 1);
+    mp_real_add_error_2exp_si(res, _mp_real_err_exp_clamp(3 * e - 1, e, prec));
     return 1;
 }
 

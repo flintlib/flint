@@ -59,9 +59,16 @@ def emit(o, n, r, name):
     o("    ulong v, w1, w0, h, l, cy;")
     if maxarr >= 3:
         o("    ulong A[%d], B[%d], T[%d], x2[%d];" % (n, n, n, n))
+    else:
+        # the tail x^2 V_2 still widens V_2 to n limbs (large r)
+        o("    ulong B[%d], T[%d], x2[%d];" % (n, n, n))
     o("    ulong X2 = x[%d], X1 = x[%d];" % (n - 1, n - 2))
     o("")
     o("    (void) v; (void) w1; (void) w0; (void) h; (void) l;")
+    if not any(L[k] <= 2 for k in range(2, N - 1)):
+        # every level below the innermost (a constant) wide (large n):
+        # the register forms never read x
+        o("    (void) X2; (void) X1;")
     o("")
 
     # innermost level: V_{N-1} = C_{N-1}

@@ -14,17 +14,12 @@
 #include "mp_real.h"
 #include "impl.h"
 
-/* quotient length from which the argument-reduction division runs
-   through _mp_real_div_newton instead of mpn_tdiv_qr; set from
-   in-context measurements (tight-loop benchmarks favor Newton much
-   earlier, but embedded in the evaluation it loses until the FFT
-   range, see dev/notes) */
-#ifndef MP_REAL_RED_DIV_NEWTON_CUTOFF
-#define MP_REAL_RED_DIV_NEWTON_CUTOFF 60
-#endif
-
-/* log(1 + x) by the dual of the bitwise exp reduction (the L-mode
-   BKM recurrence): greedily multiply P (starting from 1) by factors
+/* log(1 + x) by the dual of the bitwise exp reduction with limb
+   arithmetic: the path of 32-bit machines and, on 64-bit ones, of
+   11 to MP_REAL_LOG1P_BITWISE_VEC_MIN - 1 limbs (r = 0 takes the
+   per-size kernels below, the signed-digit vector reduction of
+   bitwise_vec.c beyond).  The L-mode BKM recurrence: greedily
+   multiply P (starting from 1) by factors
    1 + 2^-i, i = 1..r, while P (1 + 2^-i) <= X = 1 + x.  This greedy
    is exactly the exp reduction applied to log(X/P), so each factor
    is used at most once (L_{i-1} < 2 L_i), one extra conditional step
@@ -63,16 +58,11 @@
    sources): at most r + 2 table entries are added, each short of the
    true logarithm by < 2 ulp; each accepted factor truncates P by
    < 1 ulp, entering the result as log(Pi/P) < (r + 2) ulp in total;
-   the division floors once; the doubled atanh error contributes
+   the division is within one ulp; the doubled atanh error contributes
    <= 30 ulp.  Total < 3 (r + 2) + 40, bounded by
    the returned bound *err = 3 r + 64. */
 
 #define LOGS_L(i) (tab + (i) * nc)
-
-#if FLINT_BITS == 64
-
-
-#endif /* FLINT_BITS == 64 */
 
 /* smallest n at which each reduction parameter becomes optimal:
    interleaved timings of every ladder value at 26 sizes from 10 to
@@ -87,18 +77,38 @@ static const int _mp_real_log1p_bitwise_rs_r_tab[] =
 static const short _mp_real_log1p_bitwise_rs_n_tab[] =
     {1, 19, 58, 120, 300, 520, 950};
 
+#if FLINT_BITS == 64
+/* the same for _mp_real_log1p_bitwise_vec, from
+   MP_REAL_LOG1P_BITWISE_VEC_MIN limbs (its own sweep, x86-64 AVX2:
+   every ladder value at 27 sizes from 4 to 600 limbs, the minimum of
+   three interleaved runs, the optimum flat to a few percent over one or
+   two steps) */
+static const int _mp_real_log1p_bitwise_vec_r_tab[] =
+    {96, 128, 256, 320, 448, 512};
+static const short _mp_real_log1p_bitwise_vec_n_tab[] =
+    {1, 90, 120, 240, 280, 380};
+#endif
+
 int
 _mp_real_log1p_bitwise_rs_default_r(slong n)
 {
     slong j;
 
 #if FLINT_BITS == 64
-    /* the compile-time constants of the specialized per-size files:
-       keep in sync with the dev/tune_mp_real.py --pin values that
-       emitted them */
+    /* the reduction parameters of the per-size kernels that r = 0
+       selects at these sizes (see impl.h) */
     static const int opt_r[] = MP_REAL_LOG1P_OPT_R;
     if (n <= MP_REAL_LOG1P_OPT_R_MAX)
         return opt_r[n];
+
+    if (n >= MP_REAL_LOG1P_BITWISE_VEC_MIN)
+    {
+        for (j = 0; j + 1 < (slong) (sizeof(_mp_real_log1p_bitwise_vec_n_tab)
+                / sizeof(short))
+                && n >= _mp_real_log1p_bitwise_vec_n_tab[j + 1]; j++)
+            ;
+        return _mp_real_log1p_bitwise_vec_r_tab[j];
+    }
 #endif
 
     for (j = 0; j + 1 < (slong) (sizeof(_mp_real_log1p_bitwise_rs_n_tab) / sizeof(short))
@@ -110,11 +120,8 @@ _mp_real_log1p_bitwise_rs_default_r(slong n)
 FLINT_FORCE_INLINE void
 _mp_real_log1p_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 {
-#if FLINT_BITS == 64
-    int r0;
-#endif
-    slong i, c, wn, nc, pl, lsb_bits, qr, ds;
-    nn_ptr P, D, acc, sh, t, nd;
+    slong i, c, wn, nc, pl, lsb_bits;
+    nn_ptr P, D, acc, sh, t;
     TMP_INIT;
 
     FLINT_ASSERT(n >= 1);
@@ -123,35 +130,20 @@ _mp_real_log1p_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
        drop r under the r >= 32 contract of the residual series */
     FLINT_ASSERT(FLINT_BITS == 64 || n >= 2);
 
-#if FLINT_BITS == 64
-    r0 = r;
-#endif
-
     if (r == 0)
         r = _mp_real_log1p_bitwise_rs_default_r(n);
 
-    /* r < 32 (a shorter reduction with a slightly longer series) is
-       available in the register implementations below, whose inline
-       atanh evaluations only need t < 2^-16; the general path uses
-       _mp_real_atanh_rs and hence at least r = 32 */
-#if FLINT_BITS == 64
-    /* fully specialized per-size implementations (log1p_opt_<n>.c,
-       emitted and tuned by dev/tune_mp_real.py; n = 1 and 2 are the
-       hand-written register paths, carried over by the tuner) */
-    if (r0 == 0 && n <= 7)
-    {
-        static void (* const tab[])(nn_ptr, nn_srcptr) = {
-            NULL, _mp_real_log1p_opt_1, _mp_real_log1p_opt_2,
-            _mp_real_log1p_opt_3, _mp_real_log1p_opt_4, _mp_real_log1p_opt_5,
-            _mp_real_log1p_opt_6, _mp_real_log1p_opt_7
-        };
-        tab[n](res, x);
-        return;
-    }
-#endif /* FLINT_BITS == 64 */
-
+    /* the residual series, _mp_real_atanh_rs, needs r >= 32 */
     r = FLINT_MAX(r, 32);
     r = FLINT_MIN((slong) r, FLINT_BITS * n - 16);
+
+#if FLINT_BITS == 64
+    if (n >= MP_REAL_LOG1P_BITWISE_VEC_MIN)
+    {
+        _mp_real_log1p_bitwise_vec(res, x, n, r);
+        return;
+    }
+#endif
 
     wn = n + 1;
 
@@ -159,12 +151,11 @@ _mp_real_log1p_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
     tab = _mp_real_exp_logs_tab(n, r, &nc);
 
     TMP_START;
-    P = TMP_ALLOC((wn + wn + n + n + n + 2 * n + 2) * sizeof(ulong));
+    P = TMP_ALLOC((wn + wn + n + n + n) * sizeof(ulong));
     sh = P + wn;
     D = sh + wn;
     acc = D + n;
     t = acc + n;
-    nd = t + n;
 
     /* P = 1, deficit D = X - P = x, accumulator = 0 */
     flint_mpn_zero(P, n);
@@ -303,43 +294,11 @@ _mp_real_log1p_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 #undef EXACT_STEP
 
     /* t = D / (X + P) < 2^-r: the single division fuses the
-       normalization by P with the atanh transformation */
-    {
-        flint_mpn_copyi(sh, P, wn);
-        sh[n] += 1 + mpn_add_n(sh, sh, x, n);   /* S = X + P in [2, 4) */
-
-        qr = 0;
-        while (qr < n && D[n - 1 - qr] == 0)
-            qr++;
-        ds = 2 * n - qr;
-
-        flint_mpn_zero(t, n);
-        if (ds >= wn && qr < n)
-        {
-            flint_mpn_zero(nd, n);
-            flint_mpn_copyi(nd + n, D, n - qr);
-            /* quotient has ds - wn + 1 = n - qr limbs */
-            if (ds - wn + 1 < MP_REAL_RED_DIV_NEWTON_CUTOFF)
-        {
-            flint_mpn_tdiv_qr(t, nd, nd, ds, sh, wn);
-        }
-        else
-        {
-            /* Same quotient by Karp-Markstein division: numerator
-               and divisor read as fractions (the numerator's n low
-               limbs are zero, so pass only its significant top
-               part), quotient computed with k + 1 fraction limbs, k
-               the quotient length.  Truncating the two guard limbs
-               leaves t within 1 + eps ulps of the floored quotient
-               (eps = 4 B^(-1) / a' < 2^-62), which the series
-               argument budget absorbs like the tdiv floor. */
-            slong k = ds - wn + 1;
-            nn_ptr q = TMP_ALLOC((k + 4) * sizeof(ulong));
-            _mp_real_div_newton(q, nd + n, ds - n, sh, wn, k + 1);
-            flint_mpn_copyi(t, q + 2, k);
-        }
-        }
-    }
+       normalization by P with the atanh transformation (the quotient
+       within one ulp of the floor either way) */
+    flint_mpn_copyi(sh, P, wn);
+    sh[n] += 1 + mpn_add_n(sh, sh, x, n);   /* S = X + P in [2, 4) */
+    _mp_real_div_fraction(t, D, sh, n);
 
     /* log X = acc + 2 atanh(t); on 32-bit limbs n = 1 clamps r to
        16 above, where the wider-range atanh applies */
@@ -353,6 +312,22 @@ _mp_real_log1p_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 void
 _mp_real_log1p_bitwise_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n, int r)
 {
+#if FLINT_BITS == 64
+    /* r = 0 leaves the reduction to us: at the sizes of the per-size
+       kernels (small.h, the dense tables) those serve the call (any size
+       they decline takes the bitwise path below) */
+    if (r == 0 && n <= MP_REAL_LOG1P_OPT_R_MAX)
+    {
+        ulong e;
+        if (_mp_real_log1p_opt(res, &e, x, n))
+        {
+            if (err != NULL)
+                *err = e;
+            return;
+        }
+    }
+#endif
+
     _mp_real_log1p_bitwise_rs_noerr(res, x, n, r);
     if (err != NULL)
         *err = 3 * (r ? (ulong) r : (ulong) _mp_real_log1p_bitwise_rs_default_r(n)) + 64;
