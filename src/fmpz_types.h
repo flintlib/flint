@@ -149,6 +149,15 @@ typedef fmpz_mpoly_q_struct fmpz_mpoly_q_t[1];
 
 typedef struct
 {
+    fmpz_mpoly_struct num;
+    fmpz_mpoly_factor_struct den;
+}
+fmpz_mpoly_q_factored_struct;
+
+typedef fmpz_mpoly_q_factored_struct fmpz_mpoly_q_factored_t[1];
+
+typedef struct
+{
     fmpz a;
     fmpz b;
 }

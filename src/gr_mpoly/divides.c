@@ -61,13 +61,7 @@ _gr_mpoly_divides_monomial(gr_mpoly_t Q,
     }
 
     /* mask with the high bit of each exponent field set (single-word fields) */
-    mask = 0;
-    if (exp_bits <= FLINT_BITS)
-    {
-        flint_bitcnt_t j;
-        for (j = 0; j < FLINT_BITS/exp_bits; j++)
-            mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
-    }
+    mask = (exp_bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(exp_bits) : 0;
 
     gr_mpoly_init3(T, Alen, exp_bits, ctx);
 

@@ -157,6 +157,18 @@ class fmpz_mpoly_q_struct(ctypes.Structure):
     _fields_ = [('num', fmpz_mpoly_struct),
                 ('den', fmpz_mpoly_struct)]
 
+class fmpz_mpoly_factor_struct(ctypes.Structure):
+    _fields_ = [('constant', c_slong),
+                ('constant_den', c_slong),
+                ('poly', ctypes.c_void_p),
+                ('exp', ctypes.c_void_p),
+                ('num', c_slong),
+                ('alloc', c_slong)]
+
+class fmpz_mpoly_q_factored_struct(ctypes.Structure):
+    _fields_ = [('num', fmpz_mpoly_struct),
+                ('den', fmpz_mpoly_factor_struct)]
+
 
 class padic_radix_struct(ctypes.Structure):
     _fields_ = [('u', radix_integer_struct),
@@ -8512,6 +8524,39 @@ class FractionField_fmpz_mpoly_q(gr_ctx):
 
 
 
+class fmpz_mpoly_q_factored(gr_elem):
+    _struct_type = fmpz_mpoly_q_factored_struct
+
+class FractionField_fmpz_mpoly_q_factored(gr_ctx):
+    """
+    Multivariate rational functions with denominators kept in
+    factored form.
+
+        >>> R = FractionField_fmpz_mpoly_q_factored(2, ["x", "y"])
+        >>> x, y = R.gens()
+        >>> (x**2-1) / (6*(x+1)*(2*y-2)**2) + 1/(3*(y-1))
+        (x+8*y-9)/(24*(y-1)^2)
+        >>> R("1/((x+y)*(x-y)) - 1/(x^2-y^2)")
+        0
+    """
+
+    def __init__(self, nvars, vars=None):
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_fmpz_mpoly_q_factored(self._ref, nvars, 0)
+        self._elem_type = fmpz_mpoly_q_factored
+
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
+
+    @property
+    def _coefficient_ring(self):
+        return QQ
+
+
+
 class Fraction_gr_fraction(gr_ctx):
     """
     Fractions with GCD reduction:
@@ -11476,6 +11521,13 @@ def test_fmpq_mpoly():
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
     assert str(FractionField_fmpz_mpoly_q(2, ["a", "b"]).gens()) == '[a, b]'
+    R = FractionField_fmpz_mpoly_q_factored(2, ["x", "y"])
+    x, y = R.gens()
+    S = FractionField_fmpz_mpoly_q(2, ["x", "y"])
+    f = (x+1)**3 / ((x-y)**2 * (x+y) * 6) - QQ(1)/3 + x/(x-y)
+    assert S(f) == S(str(f))
+    assert R(S(f)) == f
+    assert str(R(1)/(x-y)/(y-x)) == "(-1)/((x-y)^2)"
 
 def test_set_str():
     assert RR("1/4") == RR(1)/4

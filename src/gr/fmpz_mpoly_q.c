@@ -223,6 +223,20 @@ _gr_fmpz_mpoly_q_set_fmpq(fmpz_mpoly_q_t res, const fmpq_t v, gr_ctx_t ctx)
 }
 
 static int
+_gr_fmpz_mpoly_q_set_other(fmpz_mpoly_q_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    if (x_ctx->which_ring == GR_CTX_FMPZ_MPOLY_Q_FACTORED &&
+        MPOLYNOMIAL_MCTX(ctx)->minfo->nvars == MPOLYNOMIAL_MCTX(x_ctx)->minfo->nvars &&
+        MPOLYNOMIAL_MCTX(ctx)->minfo->ord == MPOLYNOMIAL_MCTX(x_ctx)->minfo->ord)
+    {
+        fmpz_mpoly_q_factored_get_fmpz_mpoly_q(res, x, MPOLYNOMIAL_MCTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    return gr_generic_set_other(res, x, x_ctx, ctx);
+}
+
+static int
 _gr_fmpz_mpoly_q_neg(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t mat, gr_ctx_t ctx)
 {
     fmpz_mpoly_q_neg(res, mat, MPOLYNOMIAL_MCTX(ctx));
@@ -572,6 +586,7 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_fmpz_mpoly_q_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_q_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_fmpz_mpoly_q_set_fmpq},
+    {GR_METHOD_SET_OTHER,   (gr_funcptr) _gr_fmpz_mpoly_q_set_other},
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) _gr_fmpz_mpoly_q_neg},
     {GR_METHOD_ADD,         (gr_funcptr) _gr_fmpz_mpoly_q_add},
