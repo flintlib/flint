@@ -57,7 +57,7 @@
 
       sub(fmadd(h, ninv, r), r)     with r = 3*2^(prec - 2)
 
-    However, this requires |h*innv| < 2^(prec - 2), which is not always true.
+    However, this requires |h*ninv| < 2^(prec - 2), which is not always true.
     Furthermore, round(mul(.,.)) is fast on AMD :)
 
     Illustration of the truth of 1/2 + 1/2^(B+1): suppose mul(h, ninv) rounds
@@ -91,7 +91,7 @@ Analysis for 2^(prec - 4) < n < 2^(prec - 3) (aka 50 bit primes)
     For |a*b| < 2*n^2, we can take e = 2*prec - 5.
 
     Then, |h*ninv| < 2^(prec-2) and mul(h, ninv) does rounding at least
-    two bits to the right of the dot. Then, we make take q_error = 1/2 + 2^-3:
+    two bits to the right of the dot. Then, we may take q_error = 1/2 + 2^-3:
 
       |a*b*epsilon| + 2^(e - prec - 1)*ninv + 1/2+2^-3 < 2^-2 + 2^-2 + 1/2 + 2^-3 = 1+1/8
 
@@ -105,7 +105,9 @@ Analysis for 2^(prec - 4) < n < 2^(prec - 3) (aka 50 bit primes)
      Products in the range (-4*n^2, 4*n^2) are reduced to the range (-7/4*n, 7/4*n).
 
     These pessimistic bounds are not good enough. For specific values of n, epsilon can be
-    much smaller, and it not very restrictive to assume what mulmod needs:
+    much smaller, and it is not very restrictive to assume what mulmod needs
+    (checked by fft_small_mulmod_satisfies_bounds below, and required by
+    sd_fft_ctx_init_prime):
 
 (1)  Products in the range (-2*n^2, 2*n^2) are reduced to the range (-1*n, 1*n).
 (2)  Products in the range (-4*n^2, 4*n^2) are reduced to the range (-3/2*n, 3/2*n).
@@ -161,7 +163,7 @@ provided |a*b| <= 2^51*n (implied by |a*b| < 2*n^2 for n < 2^50).
 (2) does not: 4*n^2 exceeds 2^51*n for n > 2^49, see machine_vectors.h.
 
 
-Analysis of the forward butterfiles for 50 bit primes
+Analysis of the forward butterflies for 50 bit primes
 -----------------------------------------------------
 
         b0 = 1*a0 + w^2*a2 +   w*(a1 + w^2*a3)
@@ -185,7 +187,7 @@ Analysis of the forward butterfiles for 50 bit primes
     map (-3*n, 3*n) into itself at every depth.
 
 
-Analysis of the truncated forward butterfiles for 50 bit primes
+Analysis of the truncated forward butterflies for 50 bit primes
 ---------------------------------------------------------------
 
     Trivial because some of the ai are just 0.
@@ -258,7 +260,7 @@ Analysis of the truncated reverse butterflies for 50 bit primes
     rounding errors relative to n; the conditions |a*b| < 2*n^2 and sums
     below 8*n are then sufficient for every n < 2^50. So the result
     holds for every prime that fft_small accepts. For inputs of magnitude
-    at most 2*n - 1, every truncation, depths up to 16 and both variants
+    at most 2*n - 1, every truncation, depths up to 25 and both variants
     of round_mul:
 
      - every product given to mulmod_fast is below 2*n^2 (hence below
@@ -290,7 +292,9 @@ int fft_small_prime_supports_depth(ulong n, ulong depth)
         return 0;
 
     if (!fft_small_mulmod_satisfies_bounds(n))
-        /* should be implied by the 50-bit bound, but just in case */
+        /* not implied by the 50-bit bound: on more than 100000 tests with
+           random 50-bit primes, about 1 in 900 fails, e.g. 1104645587927041
+           (however, none of 49 bits or less failed) */
         return 0;
 
     if (depth > SD_FFT_CTX_W2TAB_SIZE)
