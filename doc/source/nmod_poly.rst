@@ -2634,17 +2634,21 @@ Geometric progression
 .. function:: void _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G, slong ev_len, slong int_len, slong ext_len)
 
     Stores in ``G`` the *fft_small* transforms described above for bit 3 of
-    ``function``, for the functionalities ``G`` was built for, replacing
-    those previously stored, if any. Each functionality has its own bound,
-    between `0` and ``len``, where `0` means that no transform is stored for
-    it: the transforms are built for evaluating polynomials of length at most
-    ``ev_len``, for interpolating from the first ``int_len`` points (or fewer),
-    and for extrapolating from at most ``ext_len`` values. Bit 3 of
-    ``function`` is the case ``ev_len = int_len = ext_len = len``. Smaller
-    bounds can shorten the transforms (up to twice for evaluation, and to about
-    ``2*int_len`` for interpolation) and reduce the number of primes that
-    *fft_small* needs. Longer inputs remain possible, without the stored
-    transforms.
+    ``function``, for the functionalities ``G`` was built for. Each
+    functionality has its own bound, at most ``len``: the transforms are built
+    for evaluating polynomials of length at most ``ev_len``, for interpolating
+    from the first ``int_len`` points (or fewer), and for extrapolating from
+    at most ``ext_len`` values, replacing those previously stored for the
+    functionality, if any. A bound `0` means that no transform is stored for
+    the functionality, and a negative bound that its transforms, if any, are
+    kept unchanged; for instance, ``ev_len`` can be changed between batches of
+    evaluations of different lengths without rebuilding the transform used by
+    the interpolations. Bit 3 of ``function`` is the case ``ev_len = int_len =
+    ext_len = len``. Smaller bounds can shorten the transforms (up to twice for
+    evaluation, and to about ``2*int_len`` for interpolation) and reduce the
+    number of primes that *fft_small* needs. Longer inputs remain possible,
+    without the stored transforms. This function must not be called while
+    other threads use ``G``.
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 

@@ -444,8 +444,9 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSE
    multiply by, for those whose largest product would use fft_small and
    would use the stored transform (the products using a stored transform
    are a subset of these, see _fft_use). Each functionality has its own
-   bound (0: no transform), and the transform lengths allow any call within
-   it, with no wraparound reaching the coefficients sought:
+   bound (0: no transform; negative: the stored transforms of this
+   functionality, if any, are kept), and the transform lengths allow any
+   call within it, with no wraparound reaching the coefficients sought:
    - evaluate polynomials of length at most ev_len: coefficients
      [plen - 1, plen - 1 + olen) of a * ev_f, where a has length at most
      plen <= ev_len and olen <= len; this involves ev_f[0, ev_len + len - 1),
@@ -464,16 +465,28 @@ _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
     slong len = G->len;
     nmod_t mod = G->mod;
 
-    FLINT_ASSERT(0 <= ev_len && ev_len <= len);
-    FLINT_ASSERT(0 <= int_len && int_len <= len);
-    FLINT_ASSERT(0 <= ext_len && ext_len <= len);
+    FLINT_ASSERT(ev_len <= len && int_len <= len && ext_len <= len);
 
-    _fft_clear(G->ev_f_fft);
-    _fft_clear(G->int_f_fft);
-    _fft_clear(G->ext_ff_fft);
-    _fft_clear(G->ext_fb_fft);
-    G->ev_f_fft = G->int_f_fft = G->ext_ff_fft = G->ext_fb_fft = NULL;
     G->function |= UWORD(8);
+
+    if (ev_len >= 0)
+    {
+        _fft_clear(G->ev_f_fft);
+        G->ev_f_fft = NULL;
+    }
+
+    if (int_len >= 0)
+    {
+        _fft_clear(G->int_f_fft);
+        G->int_f_fft = NULL;
+    }
+
+    if (ext_len >= 0)
+    {
+        _fft_clear(G->ext_ff_fft);
+        _fft_clear(G->ext_fb_fft);
+        G->ext_ff_fft = G->ext_fb_fft = NULL;
+    }
 
     if ((G->function & UWORD(1)) && ev_len > 0
             && _nmod_poly_mulmid_want_fft_small(ev_len, len, mod))

@@ -85,20 +85,22 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
             case 0:  /* one of the primes of the fft_small context */
 #if FLINT_HAVE_FFT_SMALL
                 p = get_default_mpn_ctx()->ffts[n_randint(state, 4)].mod.n;
-#else
+#elif FLINT_BITS == 64
                 p = UWORD(1108307720798209);
+#else
+                p = UWORD(2013265921);
 #endif
                 break;
             case 1:  /* primes transformed directly by fft_small */
                 p = (n_randint(state, 2)) ? UWORD(998244353) : UWORD(2013265921);
                 break;
             case 2:  /* a composite modulus, for evaluation only */
-                p = 2 * len + n_randint(state, n_randint(state, 2) ? 1000 : UWORD(1) << 62);
+                p = 2 * len + n_randint(state, n_randint(state, 2) ? 1000 : UWORD(1) << (FLINT_BITS - 2));
                 prime = n_is_prime(p);
                 break;
             default:
                 do
-                    p = n_randprime(state, 12 + n_randint(state, 53), 0);
+                    p = n_randprime(state, 12 + n_randint(state, FLINT_BITS - 11), 0);
                 while (p <= (ulong) 2 * len + 1);
         }
 
@@ -143,6 +145,32 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
         if ((ev_fft == 0 && G1->ev_f_fft != NULL) || (int_fft == 0 && G1->int_f_fft != NULL)
                 || (ext_fft == 0 && (G1->ext_ff_fft != NULL || G1->ext_fb_fft != NULL)))
             TEST_FUNCTION_FAIL("transform stored with bound 0: len = %wd\n", len);
+
+        /* one time in two, new bounds for some functionalities, the
+           transforms of the others being kept (negative bound) */
+        if (n_randint(state, 2))
+        {
+            const void * ev_old = G1->ev_f_fft;
+            const void * int_old = G1->int_f_fft;
+            const void * ext_old = G1->ext_ff_fft;
+            slong ev_new = n_randint(state, 2) ? -1 - (slong) n_randint(state, 3) : (slong) n_randint(state, len + 1);
+            slong int_new = n_randint(state, 2) ? -1 : (slong) n_randint(state, len + 1);
+            slong ext_new = n_randint(state, 2) ? -1 : (slong) n_randint(state, len + 1);
+
+            _nmod_geometric_progression_init_fft(G1, ev_new, int_new, ext_new);
+
+            if ((ev_new < 0 && (const void *) G1->ev_f_fft != ev_old)
+                    || (int_new < 0 && (const void *) G1->int_f_fft != int_old)
+                    || (ext_new < 0 && (const void *) G1->ext_ff_fft != ext_old))
+                TEST_FUNCTION_FAIL("transform not kept with a negative bound: len = %wd\n", len);
+
+            if (ev_new >= 0)
+                ev_fft = ev_new;
+            if (int_new >= 0)
+                int_fft = int_new;
+            if (ext_new >= 0)
+                ext_fft = ext_new;
+        }
 
         a = _nmod_vec_init(len);
         b = _nmod_vec_init(len);

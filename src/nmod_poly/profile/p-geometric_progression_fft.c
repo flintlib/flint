@@ -176,7 +176,11 @@ static ulong
 modulus(const char * s, flint_rand_t state)
 {
     if (!strcmp(s, "fft"))
+#if FLINT_BITS == 64
         return UWORD(1108307720798209);  /* 63*2^44 + 1 */
+#else
+        return UWORD(2013265921);        /* 15*2^27 + 1 */
+#endif
     if (!strcmp(s, "ntt"))
         return UWORD(998244353);
     return n_randprime(state, atoi(s), 1);
