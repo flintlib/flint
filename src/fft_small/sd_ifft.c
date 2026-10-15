@@ -1510,6 +1510,13 @@ static void sd_ifft_trunc_internal(
 /*
 Truncated inverse Fourier transform, inverse of sd_fft_trunc, assume the entries
 past `trunc` first entries of the _output_ are zero. See [vdH2004]_.
+
+For `L > LG_BLK_SZ`, `trunc` is rounded up to a multiple of `BLK_SZ`, so the
+entries up to that multiple are read as evaluations. For `L <= LG_BLK_SZ`,
+`trunc` is ignored and the full inverse of the `2^L` entries is computed: this
+is the truncated inverse only if all `2^L` entries hold evaluations, as
+`sd_fft_trunc` writes them at such depths.
+
 The array `d` need to have size at least `n_pow2(L)`.
 The input entries must be in (-2n, 2n), with n = Q->p, which holds for the
 outputs of sd_fft_ctx_point_mul. The output entries are in (-3n, 3n), not

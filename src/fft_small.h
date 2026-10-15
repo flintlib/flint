@@ -265,6 +265,12 @@ void sd_fft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc
 /* sd_ifft.c */
 void sd_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
 
+/* sd_fft_tr.c */
+void sd_fft_trunc_tr(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc);
+
+/* sd_ifft_tr.c */
+void sd_ifft_trunc_tr(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
+
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);

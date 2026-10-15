@@ -33,6 +33,8 @@ References
 
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
 
+.. [BLS2003] \A. Bostan, G. Lecerf and É. Schost. "Tellegen's principle into practice". Proceedings of the 2003 International Symposium on Symbolic and Algebraic Computation (ISSAC 2003) 37-44. https://doi.org/10.1145/860854.860870
+
 .. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), https://arxiv.org/abs/1312.0039
 
 .. [BM1980] \R. P. Brent and E. M. McMillan, "Some new algorithms for high-precision computation of Euler's constant", Mathematics of Computation 34 (1980) 305-312.

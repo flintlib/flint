@@ -347,6 +347,81 @@ Transform plans and operands
     4 GiB on 64-bit machines.
 
 
+Low-level transforms
+-------------------------------------------------------------------------------
+
+These are the truncated transforms on which the rest of the module is built.
+They operate in place on an array of ``double`` of size at least `2^L`,
+allocated with alignment ``FLINT_FFT_SMALL_ALIGNMENT``, holding residues modulo
+the prime `n` of the context object as ``double`` values.  :func:`sd_fft_trunc`
+and :func:`sd_ifft_trunc_tr` accept and produce values in `(-3n, 3n)`;
+:func:`sd_fft_trunc_tr` accepts and produces values in `(-2n, 2n)`;
+:func:`sd_ifft_trunc` accepts values in `(-2n, 2n)` and produces values in
+`(-3n, 3n)` (see the end of ``mulmod_satisfies_bounds.c``).
+The inverse transforms need the tighter input range because their butterflies
+sum four entries before any reduction, and `8n < 2^{53}` for the primes `n <
+2^{50}` of this module. The pointwise products leave values in `(-3n/2, 3n/2)`,
+so that a forward transform, pointwise product and inverse transform can be
+chained without reductions in between.
+The context must have been grown to depth `L` beforehand, which
+:func:`sd_fft_trunc` and friends do themselves via
+:func:`sd_fft_ctx_fit_depth`.
+
+.. function:: void sd_fft_trunc(sd_fft_ctx_t Q, double * d, ulong L, ulong itrunc, ulong otrunc)
+
+    Truncated forward transform of length `2^L`. Reads the first ``itrunc``
+    entries of ``d``, treating the remaining entries as zero, and writes the
+    first ``otrunc`` entries. With
+    `w_i = \mathtt{sd\_fft\_ctx\_w}(Q, \mathtt{sd\_fft\_ctx\_trunc\_index}(L, i))`
+    the evaluation point at position `i`, the output is the evaluation
+    `\mathtt{out}[i] = \sum_{0 \le t < \mathtt{itrunc}} \mathtt{in}[t] \, w_i^t`
+    for `0 \le i < \mathtt{otrunc}`. Any
+    `1 \le \mathtt{itrunc}, \mathtt{otrunc} \le 2^L` is allowed. The
+    evaluation points do not depend on `L`: if
+    `\max(\mathtt{itrunc}, \mathtt{otrunc}) \le 2^{L-1}`, the result is that
+    of depth `L - 1`, at about the same cost, so it usually only makes sense to
+    have `max(itrunc, otrunc) >= 2^(L-1)`. Recovering the input with
+    :func:`sd_ifft_trunc` requires `\mathtt{otrunc} \ge \mathtt{itrunc}`.
+    For `L \le \mathtt{LG\_BLK\_SZ}` the entries from ``itrunc`` on are set
+    to zero and all `2^L` outputs are computed; for larger `L` both
+    truncations are rounded up to multiples of `\mathtt{BLK\_SZ}`.
+
+.. function:: void sd_ifft_trunc(sd_fft_ctx_t Q, double * d, ulong L, ulong trunc)
+
+    Truncated inverse transform, the inverse of :func:`sd_fft_trunc` with
+    ``itrunc`` `=` ``otrunc`` `=` ``trunc`` up to the factor `2^L`, which is
+    left to the caller. Both are linear maps on the first
+    `\mathtt{BLK\_SZ} \lceil \mathtt{trunc}/\mathtt{BLK\_SZ} \rceil` entries of
+    ``d`` (on the first `2^L` entries when `L \le \mathtt{LG\_BLK\_SZ}`).
+    In particular, for `L \le \mathtt{LG\_BLK\_SZ}` the parameter ``trunc``
+    is ignored and the full inverse of the `2^L` entries is computed: this is
+    the truncated inverse only if all `2^L` entries hold evaluations, as
+    :func:`sd_fft_trunc` writes them at such depths. For larger `L`, the
+    entries up to the next multiple of `\mathtt{BLK\_SZ}` after ``trunc``
+    are read as evaluations. See [vdH2004]_.
+
+.. function:: void sd_fft_trunc_tr(sd_fft_ctx_t Q, double * d, ulong L, ulong itrunc, ulong otrunc)
+              void sd_ifft_trunc_tr(sd_fft_ctx_t Q, double * d, ulong L, ulong trunc)
+
+    Transposes of the two transforms above, in the sense of the transposition
+    principle (see [BLS2003]_): with the same parameters,
+    `\langle \mathtt{sd\_fft\_trunc}(a), v \rangle = \langle a, \mathtt{sd\_fft\_trunc\_tr}(v) \rangle`
+    and
+    `\langle \mathtt{sd\_ifft\_trunc}(a), v \rangle = \langle a, \mathtt{sd\_ifft\_trunc\_tr}(v) \rangle`.
+    In particular :func:`sd_fft_trunc_tr` reads the first ``otrunc`` entries and
+    writes the first ``itrunc`` entries, the other way round from
+    :func:`sd_fft_trunc`; the parameters are named after the transform being
+    transposed so that transposing a call means adding the suffix and nothing
+    else. With `w_i` as above, its output is the power projection
+    `\mathtt{out}[t] = \sum_{0 \le i < \mathtt{otrunc}} \mathtt{in}[i] \, w_i^t`
+    for `0 \le t < \mathtt{itrunc}`, so that the input is indexed exactly as
+    the output of :func:`sd_fft_trunc`. The two functions perform the same
+    operations as the transforms they transpose, in reverse order, and so have
+    the same cost. Composed as
+    `v \mapsto \mathtt{fft\_tr}(\mathtt{fft}(b) \cdot \mathtt{ifft\_tr}(v))`,
+    they give the transpose of multiplication by a fixed `b`.
+
+
 Negacyclic pointwise multiplication
 -------------------------------------------------------------------------------
 
