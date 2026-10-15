@@ -698,6 +698,9 @@ _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * Ax, slong lenA,
        progression provides, so a single precomputation of length batch serves
        for all blocks. */
     _nmod_geometric_progression_init_function(G, r, batch, mod, UWORD(1));
+    /* all blocks evaluate polynomials of length at most maxlen with G: store
+       the transform of the polynomial this multiplies by */
+    _nmod_geometric_progression_init_fft(G, maxlen, 0, 0);
 
     /* spow[j] = s^j for the current block, starting with s = 1; multiplying
        by w[j] = (q^batch)^j advances s by one block */

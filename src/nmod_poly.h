@@ -610,6 +610,9 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
 void nmod_geometric_progression_init(nmod_geometric_progression_t G,
                                      ulong r, slong len, nmod_t mod);
 
+void _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
+                                     slong ev_len, slong int_len, slong ext_len);
+
 void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
 
 void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong ilen, ulong r, slong olen, nmod_t mod);

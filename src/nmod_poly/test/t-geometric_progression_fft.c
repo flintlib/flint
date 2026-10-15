@@ -19,9 +19,10 @@
 #include "fft_small.h"
 #endif
 
-/* Geometric progressions built with stored transforms (bit 3 of function)
-   give the same results as without, for evaluation, interpolation and
-   extrapolation with any lengths up to len, and can be shared by threads. */
+/* Geometric progressions built with stored transforms (bit 3 of function,
+   or _nmod_geometric_progression_init_fft with any bounds) give the same
+   results as without, for evaluation, interpolation and extrapolation with
+   any lengths up to len, and can be shared by threads. */
 
 /* random vector with some zeros at both ends */
 static void
@@ -70,7 +71,7 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
         nmod_geometric_progression_t G0, G1;
         nmod_t mod;
         ulong p, r, function;
-        slong len, k, i;
+        slong len, ev_fft, int_fft, ext_fft, k, i;
         int prime = 1;
         nn_ptr a, b, c;
 
@@ -117,7 +118,31 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
         }
 
         _nmod_geometric_progression_init_function(G0, r, len, mod, function);
-        _nmod_geometric_progression_init_function(G1, r, len, mod, function | 8);
+
+        /* stored transforms through bit 3, or through init_fft with bounds
+           for each functionality, 0 (no transform) included (possibly
+           replacing the transforms stored through bit 3) */
+        ev_fft = n_randint(state, 4) ? 1 + n_randint(state, len) : 0;
+        int_fft = n_randint(state, 4) ? 1 + n_randint(state, len) : 0;
+        ext_fft = n_randint(state, 4) ? 1 + n_randint(state, len) : 0;
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                _nmod_geometric_progression_init_function(G1, r, len, mod, function | 8);
+                ev_fft = int_fft = ext_fft = len;
+                break;
+            case 1:
+                _nmod_geometric_progression_init_function(G1, r, len, mod, function);
+                _nmod_geometric_progression_init_fft(G1, ev_fft, int_fft, ext_fft);
+                break;
+            default:
+                _nmod_geometric_progression_init_function(G1, r, len, mod, function | 8);
+                _nmod_geometric_progression_init_fft(G1, ev_fft, int_fft, ext_fft);
+        }
+
+        if ((ev_fft == 0 && G1->ev_f_fft != NULL) || (int_fft == 0 && G1->int_f_fft != NULL)
+                || (ext_fft == 0 && (G1->ext_ff_fft != NULL || G1->ext_fb_fft != NULL)))
+            TEST_FUNCTION_FAIL("transform stored with bound 0: len = %wd\n", len);
 
         a = _nmod_vec_init(len);
         b = _nmod_vec_init(len);
@@ -125,13 +150,16 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
 
         for (k = 0; k < 10; k++)
         {
-            /* evaluation, the full shape first */
+            /* evaluation, the full shape first, then a polynomial longer
+               than ev_fft with ev_fft nonzero coefficients */
             if (function & 1)
             {
-                slong ilen = (k == 0) ? len : (slong) n_randint(state, len + 1);
-                slong olen = (k == 0) ? len : (slong) n_randint(state, len + 1);
+                slong ilen = (k <= 1) ? len : (slong) n_randint(state, len + 1);
+                slong olen = (k <= 1) ? len : (slong) n_randint(state, len + 1);
 
                 _rand_vec(a, state, ilen, mod);
+                if (k == 1)
+                    _nmod_vec_zero(a, len - ev_fft);
                 _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(b, a, ilen, G0, olen, mod);
                 _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(c, a, ilen, G1, olen, mod);
 
@@ -140,10 +168,12 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
                                        p, r, len, ilen, olen);
             }
 
-            /* interpolation */
+            /* interpolation, from all the points, then from the int_fft
+               first ones, then from random numbers of points */
             if (function & 2)
             {
-                slong m = (k == 0) ? len : 1 + (slong) n_randint(state, len);
+                slong m = (k == 0) ? len : (k == 1 && int_fft > 0) ? int_fft
+                                         : 1 + (slong) n_randint(state, len);
 
                 _rand_vec(a, state, m, mod);
                 _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(b, a, G0, m, mod);
@@ -154,11 +184,17 @@ TEST_FUNCTION_START(nmod_geometric_progression_fft, state)
                                        p, r, len, m);
             }
 
-            /* extrapolation, forward and backward: ilen + olen <= len */
+            /* extrapolation, forward and backward: ilen + olen <= len; the
+               largest shape first, then from at most ext_fft values */
             if ((function & 4) && len >= 3)
             {
                 slong olen = (k == 0) ? len / 2 : 1 + (slong) n_randint(state, len - 2);
                 slong ilen = (k == 0) ? len - len / 2 : 2 + (slong) n_randint(state, len - olen - 1);
+                if (k == 1 && ext_fft >= 2)
+                {
+                    ilen = FLINT_MIN(ext_fft, len - 1);
+                    olen = 1 + n_randint(state, len - ilen);
+                }
                 slong offset;
 
                 if (n_randint(state, 2))

@@ -443,39 +443,67 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSE
 /* Stores the transforms of the polynomials which the three functionalities
    multiply by, for those whose largest product would use fft_small and
    would use the stored transform (the products using a stored transform
-   are a subset of these, see _fft_use). The transform lengths allow any
-   call with lengths at most len, with no wraparound reaching the
-   coefficients sought:
-   - evaluate: coefficients [ilen - 1, ilen - 1 + olen) of a * ev_f, where
-     a has length at most ilen; cyclic of length >= 2*len - 1 = len(ev_f);
-   - interpolate: coefficients [0, m) of f * int_f, f of length at most m
-     <= len; length >= 2*len - 1;
-   - extrapolate: coefficients of tmp * ext_ff (or ext_fb) of index at least
-     ilen - 1, tmp of length ilen; cyclic of length >= len - 1. Since
-     ilen + olen <= len, the largest product has ilen = olen = len / 2. */
-static void
-_nmod_geometric_progression_fft_init(nmod_geometric_progression_t G)
+   are a subset of these, see _fft_use). Each functionality has its own
+   bound (0: no transform), and the transform lengths allow any call within
+   it, with no wraparound reaching the coefficients sought:
+   - evaluate polynomials of length at most ev_len: coefficients
+     [plen - 1, plen - 1 + olen) of a * ev_f, where a has length at most
+     plen <= ev_len and olen <= len; this involves ev_f[0, ev_len + len - 1),
+     and the convolution is cyclic of length >= ev_len + len - 1;
+   - interpolate from the first m <= int_len points: coefficients [0, m) of
+     f * int_f, f of length at most m; this involves int_f[0, int_len), and
+     the convolution has length >= 2*int_len - 1;
+   - extrapolate from at most ext_len values: coefficients of tmp * ext_ff
+     (or ext_fb) of index at least ilen - 1, tmp of length
+     ilen <= min(ext_len, len - 1); cyclic of length >= len - 1. Since
+     ilen + olen <= len, the largest product has ilen = min(ext_len, len/2). */
+void
+_nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
+                                     slong ev_len, slong int_len, slong ext_len)
 {
     slong len = G->len;
     nmod_t mod = G->mod;
 
-    slong h = len / 2;
+    FLINT_ASSERT(0 <= ev_len && ev_len <= len);
+    FLINT_ASSERT(0 <= int_len && int_len <= len);
+    FLINT_ASSERT(0 <= ext_len && ext_len <= len);
 
-    if ((G->function & UWORD(1)) && _nmod_poly_mulmid_want_fft_small(len, len, mod))
-        G->ev_f_fft = _fft_if_used(_fft_init(G->ev_f->coeffs, 2*len - 1, 2*len - 1, len, mod),
-                                   len - 1, 2*len - 1, len, 0, 2*len - 1, mod);
+    _fft_clear(G->ev_f_fft);
+    _fft_clear(G->int_f_fft);
+    _fft_clear(G->ext_ff_fft);
+    _fft_clear(G->ext_fb_fft);
+    G->ev_f_fft = G->int_f_fft = G->ext_ff_fft = G->ext_fb_fft = NULL;
+    G->function |= UWORD(8);
 
-    if ((G->function & UWORD(2)) && _nmod_poly_mullow_want_fft_small(len, len, len, 0, mod))
-        G->int_f_fft = _fft_if_used(_fft_init(G->int_f->coeffs, len, 2*len - 1, len, mod),
-                                    0, len, len, 0, len, mod);
-
-    /* the largest forward and backward products have the same shape */
-    if ((G->function & UWORD(4)) && _nmod_poly_mulmid_want_fft_small(h, h, mod))
+    if ((G->function & UWORD(1)) && ev_len > 0
+            && _nmod_poly_mulmid_want_fft_small(ev_len, len, mod))
     {
-        G->ext_ff_fft = _fft_if_used(_fft_init(G->ext_ff->coeffs, len - 1, len - 1, len - 1, mod),
-                                     h - 1, 2*h - 1, h, 0, 2*h - 1, mod);
-        if (G->ext_ff_fft != NULL)
-            G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, len - 1, mod);
+        slong n = ev_len + len - 1;
+        G->ev_f_fft = _fft_if_used(_fft_init(G->ev_f->coeffs, n, n, ev_len, mod),
+                                   ev_len - 1, n, ev_len, 0, n, mod);
+    }
+
+    if ((G->function & UWORD(2)) && int_len > 0
+            && _nmod_poly_mullow_want_fft_small(int_len, int_len, int_len, 0, mod))
+    {
+        G->int_f_fft = _fft_if_used(_fft_init(G->int_f->coeffs, int_len, 2*int_len - 1, int_len, mod),
+                                    0, int_len, int_len, 0, int_len, mod);
+    }
+
+    /* the largest products, forward and backward, have the same shape:
+       elen values to the next (or previous) len - elen points */
+    if ((G->function & UWORD(4)) && ext_len > 0 && len > 1)
+    {
+        slong elen = FLINT_MIN(ext_len, len / 2);
+        slong an_max = FLINT_MIN(ext_len, len - 1);
+
+        if (elen > 0 && _nmod_poly_mulmid_want_fft_small(elen, len - elen, mod))
+        {
+            G->ext_ff_fft = _fft_if_used(_fft_init(G->ext_ff->coeffs, len - 1, len - 1, an_max, mod),
+                                         elen - 1, len - 1, elen, 0, len - 1, mod);
+            if (G->ext_ff_fft != NULL)
+                G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, an_max, mod);
+        }
     }
 }
 
@@ -541,8 +569,8 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
                 _nmod_geometric_progression_extrapolate_init(G, len, mod, q, inv_q);
     }
 
-    if (function & UWORD(8))
-        _nmod_geometric_progression_fft_init(G);
+    if ((function & UWORD(8)) && len > 0)
+        _nmod_geometric_progression_init_fft(G, len, len, len);
 }
 
 /* clear for selection of functionalities (see init)  */
