@@ -508,6 +508,12 @@ _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, 
         bits = NMOD_BITS(mod);
         cutoff_len = FLINT_MIN(len1, len2);
 
+        /* modulo a prime of the fft_small context, as above; for low
+           products, classical does about half the work of a full product */
+        if (bits == 50 && FLINT_MIN(len1, 2 * len2) >= 40 &&
+            _fft_small_mpn_ctx_prime_index(get_default_mpn_ctx(), mod.n) >= 0)
+            return 1;
+
         return cutoff_len >= fft_mullow_tab[bits - 1];
     }
 }
