@@ -1344,6 +1344,11 @@ throughout.
 
     Sets *res* to a square root of `a` modulo the odd prime `d` and returns 1.
 
+    For `d - 1 = q 2^s` with `q` odd, the root is a single exponentiation
+    when `s \le 2` (`a^{(d+1)/4}`, or Atkin's formula). For `3 \le s < 32`,
+    Tonelli-Shanks is used, and for `s \ge 32` Müller's variant of the
+    Cipolla-Lehmer algorithm, whose cost does not depend on `s`.
+
     Returns 0, having set *res* to zero, when the Jacobi symbol rules a root
     out; as above this is conclusive whether or not `d` is prime. Returns
     `-1`, again setting *res* to zero, when the algorithm itself failed, which

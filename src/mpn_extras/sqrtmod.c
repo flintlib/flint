@@ -59,10 +59,137 @@ _unscale(nn_ptr r, nn_srcptr x, mp_size_t n, flint_bitcnt_t norm)
         flint_mpn_copyi(r, x, n);
 }
 
+
+
+/*
+    Tonelli-Shanks costs two exponentiations (the second with a small base,
+    which is cheap) and a descent of O(s^2) multiplications; Mueller's
+    ladder costs two multiplications per bit and a few Jacobi symbols,
+    independently of s. Measured on 2 to 32 limbs, Tonelli-Shanks is up to
+    twice as fast for small s (on 2 to 4 limbs; about even from 8 limbs),
+    the two meet around s = 24 to 32, and Mueller is 2 to 9 times as fast
+    for s = 64 to 128.
+*/
+#define MUELLER_CUTOFF 32
+
+/*
+    Mueller's variant of Cipolla-Lehmer for d = 1 mod 4 (see nmod_sqrt):
+    with t = 2^j such that (a t^2 - 4 | d) = -1, a square root of a is
+    V_{(d-1)/4}(P) / t with P = a t^2 - 2, V the Lucas sequence V_0 = 2,
+    V_1 = P, V_{m+1} = P V_m - V_{m-1}. The candidates are a - 4 (j = 0)
+    and 4 c_j with c_1 = a - 1, c_{j+1} = 4 c_j + 3.
+
+    Returns 1 with R the root (unscaled), 0 if no t was found among a
+    few candidates. a is unscaled; ONE is the scaled 1; T, U, V, W, X, Y
+    are scratch of n limbs, e of n + 1 limbs.
+*/
+static int
+_flint_mpn_sqrtmod_mueller(nn_ptr R, nn_srcptr a, nn_srcptr d, mp_size_t n,
+        nn_srcptr dnormed, nn_srcptr dinv, flint_bitcnt_t norm, nn_srcptr ONE,
+        nn_ptr T, nn_ptr U, nn_ptr V, nn_ptr W, nn_ptr X, nn_ptr Y, nn_ptr e)
+{
+    slong j, bit, ebits;
+    nn_ptr c = T, P = U, v0 = V, v1 = W, x = X, y = Y, tmp;
+
+    /* c = a - 4, using P as the constant */
+    flint_mpn_zero(P, n);
+    P[0] = 4;
+    flint_mpn_submod_n(c, a, P, d, n);
+
+    for (j = 0; ; j++)
+    {
+        if (!flint_mpn_is_square_mod(c, d, n))
+            break;
+
+        /* each candidate fails with probability about 1/2 */
+        if (j >= 32)
+            return 0;
+
+        flint_mpn_zero(P, n);
+        if (j == 0)
+        {
+            P[0] = 1;
+            flint_mpn_submod_n(c, a, P, d, n);
+        }
+        else
+        {
+            P[0] = 3;
+            flint_mpn_addmod_n(c, c, c, d, n);
+            flint_mpn_addmod_n(c, c, c, d, n);
+            flint_mpn_addmod_n(c, c, P, d, n);
+        }
+    }
+
+    /* P = a t^2 - 2 = c + 2 (j = 0) or 4 c + 2 */
+    if (j != 0)
+    {
+        flint_mpn_addmod_n(c, c, c, d, n);
+        flint_mpn_addmod_n(c, c, c, d, n);
+    }
+    flint_mpn_zero(P, n);
+    P[0] = 2;
+    flint_mpn_addmod_n(P, c, P, d, n);
+    _scale(P, P, n, norm);
+
+    /* c = 2, scaled */
+    flint_mpn_addmod_n(c, ONE, ONE, dnormed, n);
+
+    /* Lucas ladder for k = (d - 1) / 4, maintaining (V_m, V_{m+1}) */
+    mpn_rshift(e, d, n, 2);
+    {
+        mp_size_t en = n;
+        while (e[en - 1] == 0)
+            en--;
+        ebits = (en - 1) * FLINT_BITS + (FLINT_BITS - flint_clz(e[en - 1]));
+    }
+
+    flint_mpn_copyi(v0, c, n);
+    flint_mpn_copyi(v1, P, n);
+
+    for (bit = ebits - 1; bit >= 0; bit--)
+    {
+        int b = (e[bit / FLINT_BITS] >> (bit % FLINT_BITS)) & 1;
+
+        /* x = v0 v1 - P, y = w^2 - 2 with w = v1 if b else v0 */
+        flint_mpn_mulmod_preinvn(x, v0, v1, n, dnormed, dinv, norm);
+        flint_mpn_submod_n(x, x, P, dnormed, n);
+        tmp = b ? v1 : v0;
+        flint_mpn_mulmod_preinvn(y, tmp, tmp, n, dnormed, dinv, norm);
+        flint_mpn_submod_n(y, y, c, dnormed, n);
+
+        /* (v0, v1) = (x, y) if b else (y, x) */
+        if (b)
+        {
+            tmp = v0; v0 = x; x = tmp;
+            tmp = v1; v1 = y; y = tmp;
+        }
+        else
+        {
+            tmp = v0; v0 = y; y = tmp;
+            tmp = v1; v1 = x; x = tmp;
+        }
+    }
+
+    /* divide by t = 2^j */
+    _unscale(R, v0, n, norm);
+    for ( ; j > 0; j--)
+    {
+        ulong cy = 0;
+
+        if (R[0] & 1)
+            cy = mpn_add_n(R, R, d, n);
+        mpn_rshift(R, R, n, 1);
+        R[n - 1] |= cy << (FLINT_BITS - 1);
+    }
+
+    return 1;
+}
+
 /*
     Writing d - 1 = q 2^s with q odd, s = 1 and s = 2 are closed forms and
     otherwise we walk down the 2-part of the group (Tonelli and Shanks)
-    using the least quadratic nonresidue.
+    using the least quadratic nonresidue, or for s >= MUELLER_CUTOFF use
+    Mueller's algorithm, whose result is verified by squaring.
 
     Returns 1 on success, 0 when the Jacobi symbol rules out a root, and
     -1 when the algorithm itself failed, which means d is not prime.
@@ -151,6 +278,20 @@ _flint_mpn_sqrtmod(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
         flint_mpn_submod_n(U, U, ONE, dnormed, n);
         flint_mpn_mulmod_preinvn(B, B, A, n, dnormed, dinv, norm);
         flint_mpn_mulmod_preinvn(R, B, U, n, dnormed, dinv, norm);
+    }
+    else if (s >= MUELLER_CUTOFF &&
+        _flint_mpn_sqrtmod_mueller(R, a, d, n, dnormed, dinv, norm, ONE,
+            T, U, C, B, A, q, e))
+    {
+        /* d prime makes R a root; verify it, as otherwise d is not prime */
+        _scale(T, R, n, norm);
+        flint_mpn_mulmod_preinvn(U, T, T, n, dnormed, dinv, norm);
+        _scale(T, a, n, norm);
+        if (mpn_cmp(U, T, n) != 0)
+            success = -1;
+        else
+            flint_mpn_copyi(res, R, n);
+        goto cleanup;
     }
     else
     {
