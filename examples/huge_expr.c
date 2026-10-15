@@ -13,6 +13,8 @@ This file is public domain. Author: Fredrik Johansson.
 #include <flint/calcium.h>
 #include <flint/ca.h>
 #include <flint/gr.h>
+#include <flint/gr_tower.h>
+#include <flint/gr_tower_lazy.h>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -521,6 +523,16 @@ int main(int argc, char *argv[])
         gr_ctx_ca_set_option(ctx, CA_OPT_QQBAR_DEG_LIMIT, 10000);
         doit(ctx);
         gr_ctx_clear(ctx);
+    }
+    else if (argc >= 2 && strcmp(argv[1], "-tower") == 0)
+    {
+        gr_ctx_t ctx, QQ;
+        gr_ctx_init_fmpq(QQ);
+        gr_ctx_init_tower_lazy(ctx, QQ, GR_TOWER_MERGE_EXPRESS);
+        doit(ctx);
+        gr_tower_lazy_ctx_stats(ctx);
+        gr_ctx_clear(ctx);
+        gr_ctx_clear(QQ);
     }
     else
     {

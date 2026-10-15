@@ -14,6 +14,7 @@
 #include "t-builtins.c"
 #include "t-call_vec.c"
 #include "t-replace.c"
+#include "t-set_acb_decimal.c"
 #include "t-set_fmpz.c"
 #include "t-write_latex.c"
 
@@ -24,6 +25,7 @@ test_struct tests[] =
     TEST_FUNCTION(fexpr_builtins),
     TEST_FUNCTION(fexpr_call_vec),
     TEST_FUNCTION(fexpr_replace),
+    TEST_FUNCTION(fexpr_set_acb_decimal),
     TEST_FUNCTION(fexpr_set_fmpz),
     TEST_FUNCTION(fexpr_write_latex)
 };

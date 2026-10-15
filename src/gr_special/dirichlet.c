@@ -14,6 +14,7 @@
 #include "gr_special.h"
 #include "gr_vec.h"
 #include "gr_series.h"
+#include "gr_tower_lazy.h"
 
 int gr_dirichlet_chi_fmpz(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, const fmpz_t n, gr_ctx_t ctx)
 {
@@ -78,6 +79,9 @@ int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t
 
     if (ctx->which_ring == GR_CTX_GR_SERIES)
         return gr_series_dirichlet_l(res, G, chi, s, ctx);
+
+    if (ctx->which_ring == GR_CTX_GR_TOWER_LAZY)
+        return gr_tower_lazy_dirichlet_l(res, G, chi, s, ctx);
 
     return GR_UNABLE;
 }

@@ -27,6 +27,8 @@
 #include "decimal.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_tower.h"
+#include "gr_tower_lazy.h"
 #include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -258,6 +260,15 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_CC_CA:
         case GR_CTX_COMPLEX_ALGEBRAIC_CA:
             return _gr_ca_get_acb_with_prec(res, x, x_ctx, ACB_CTX_PREC(ctx));
+
+        case GR_CTX_GR_TOWER_FIELD:
+            return gr_tower_field_get_acb(res, x, ACB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_GR_TOWER_FIELD_FLAT:
+            return gr_tower_field_flat_get_acb(res, x, ACB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_GR_TOWER_LAZY:
+            return gr_tower_lazy_get_acb(res, x, ACB_CTX_PREC(ctx), x_ctx);
 
         case GR_CTX_REAL_FLOAT_ARF:
             if (arf_is_finite(x))

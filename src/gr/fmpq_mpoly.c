@@ -72,11 +72,6 @@ _gr_fmpq_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
         for (i = 0; i < nvars; i++)
             MPOLYNOMIAL_CTX(ctx)->vars[i] = NULL;
     }
-    else
-    {
-        for (i = 0; i < nvars; i++)
-            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
-    }
 
     for (i = 0; i < nvars; i++)
     {

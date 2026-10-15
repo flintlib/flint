@@ -338,7 +338,7 @@ gr_poly_factor_squarefree(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp,
 
     if (is_field == T_TRUE && is_fin_char == T_TRUE)
         return gr_poly_factor_squarefree_finite_field(c, fac, exp, F, ctx);
-    else if (gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE && is_fin_char == T_FALSE)
+    else if ((is_field == T_TRUE || gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE) && is_fin_char == T_FALSE)
         return gr_poly_factor_squarefree_ufd_char_0(c, fac, exp, F, is_field, ctx);
     else
         return GR_UNABLE;

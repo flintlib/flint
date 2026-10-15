@@ -52,11 +52,21 @@ Generic string parsing
               int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx)
 
     Parses expression string. Generators returned by :func:`gr_gens_recursive` are handled
-    automatically, as are the constants ``pi``, ``i``, ``inf`` and ``nan``
+    automatically, as are the constants ``pi``, ``euler``, ``catalan``,
+    ``i``, ``inf`` and ``nan``
     (when the ring supports them) and the operator ``+/-`` which
     constructs a ball or interval via :func:`gr_set_interval_mid_rad`
     (via :func:`gr_set_interval_mid_inf` for the special form ``+/- inf``,
     which does not require ``inf`` to be an element of the ring).
+    Function calls ``f(x)`` are recognized for the unary functions
+    ``abs``, ``sgn``, ``arg``, ``inv``, ``sqrt``, ``rsqrt``, ``floor``,
+    ``ceil``, ``nint``, ``re``, ``im``, ``conj``, ``fac``, ``log``,
+    ``exp``, ``sin``, ``cos``, ``tan``, ``asin``, ``acos``, ``atan``,
+    ``sinpi``, ``cospi``, ``tanpi``, ``sinh``, ``cosh``, ``tanh``,
+    ``asinh``, ``acosh``, ``atanh``, ``gamma``, ``rgamma``, ``digamma``,
+    ``zeta``, ``erf``, ``erfc``, ``erfi``, ``lambertw``, ``dilog``,
+    ``elliptic_k`` and ``elliptic_e`` (each evaluated with the
+    corresponding method of the ring).
     We have the following flags:
 
     * ``GR_PARSE_RING_EXPONENTS`` - by default, only (nonnegative) integer literals are allowed
@@ -64,6 +74,16 @@ Generic string parsing
       within the same ring.
     * ``GR_PARSE_BALANCE_ADDITIONS`` - attempt to improve performance for huge sums
       by reordering additions (useful for polynomials)
+
+.. function:: int gr_generic_set_str_expr_terminals(gr_ptr res, const char * s, int flags, const char ** names, gr_srcptr values, slong num, int use_gens, gr_ctx_t ctx)
+
+    Parses the expression string with the *num* named terminals given
+    by *names* and the vector *values* of elements of *ctx*, in addition
+    to (if *use_gens* is set) or instead of the generators of the ring.
+    A generator whose printed form is one of the given names is shadowed
+    by the terminal of that name. This is used by rings whose generators
+    are only known after parsing a defining expression, and by
+    applications which want to bind names to values.
 
 Generic arithmetic
 -----------------------------------------------------------------------------------------

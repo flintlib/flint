@@ -91,6 +91,7 @@
 #include "t-term_content.c"
 #include "t-total_degree.c"
 #include "t-univar.c"
+#include "t-univar_pseudo_rem.c"
 #include "t-univar_resultant.c"
 #include "t-used_vars.c"
 #include "t-vec_autoreduction.c"
@@ -179,6 +180,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mpoly_term_content),
     TEST_FUNCTION(fmpz_mpoly_total_degree),
     TEST_FUNCTION(fmpz_mpoly_univar),
+    TEST_FUNCTION(fmpz_mpoly_univar_pseudo_rem),
     TEST_FUNCTION(fmpz_mpoly_univar_resultant),
     TEST_FUNCTION(fmpz_mpoly_used_vars),
     TEST_FUNCTION(fmpz_mpoly_vec_autoreduction)

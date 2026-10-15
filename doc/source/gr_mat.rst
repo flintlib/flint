@@ -610,10 +610,16 @@ Solving
 
 .. function:: int gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_generic(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     Solves `AX = B`. If *A* is not invertible,
     returns ``GR_DOMAIN`` even if the system has a solution.
+    The generic algorithm uses LU decomposition over fields and inexact
+    rings and fraction-free LU otherwise; :func:`gr_mat_nonsingular_solve`
+    calls the method ``GR_METHOD_MAT_NONSINGULAR_SOLVE`` of the context
+    (which defaults to the generic algorithm), so that a ring can choose
+    the algorithm by the size of its elements.
 
 .. function:: int gr_mat_nonsingular_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)

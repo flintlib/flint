@@ -506,6 +506,24 @@ Quotient rings of polynomial rings
     Conversion between elements and polynomials over the base ring;
     the output is always reduced modulo the current modulus.
 
+.. function:: int gr_poly_quotient_norm(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_poly_quotient_norm_poly(gr_poly_t res, const gr_poly_t M, gr_ctx_t ctx)
+
+    Norms down to the base ring `R`: for an element `x` of `R[a]/(m)`,
+    the resultant of `m` and the polynomial representing `x` (the
+    product of the conjugates of `x` when `m` is monic and irreducible
+    over a field); for a polynomial `M` over the quotient ring, the
+    resultant with respect to `a` of `m` and `M`, the latter viewed as
+    a polynomial in `a` with coefficients in `R[x]` (the product of the
+    conjugates of `M`), a polynomial over `R` of degree
+    `\deg(M) \deg(m)` when `M` is monic. The latter is the
+    norm used by Trager's factorization algorithm. The resultant is
+    computed with :func:`gr_poly_resultant` over the base ring
+    (respectively over `R[x]`), so the result is exact over exact base
+    rings and the functions return ``GR_UNABLE`` when the base ring
+    does not support it. ``GR_DOMAIN`` is returned when the modulus is
+    constant.
+
 Fraction fields
 -------------------------------------------------------------------------------
 
@@ -549,6 +567,12 @@ Fraction fields
     fractions in *nvars* variables over the integers (equivalently, rationals),
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
+
+.. function:: fmpz_mpoly_ctx_struct * gr_ctx_fmpz_mpoly_q_mctx(gr_ctx_t ctx)
+
+    Returns a pointer to the ``fmpz_mpoly_ctx_t`` of the ring of
+    multivariate fractions *ctx*, for use with the ``fmpz_mpoly_q``
+    functions on its elements.
 
 .. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
 

@@ -77,6 +77,7 @@ void qqbar_set_fmpq(qqbar_t res, const fmpq_t x);
 void qqbar_set_re_im(qqbar_t res, const qqbar_t x, const qqbar_t y);
 int qqbar_set_d(qqbar_t res, double x);
 int qqbar_set_re_im_d(qqbar_t res, double x, double y);
+int qqbar_set_fmpz_poly_root(qqbar_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
 
 /* Properties */
 QQBAR_INLINE slong

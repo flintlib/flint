@@ -518,6 +518,7 @@ Evaluation
     Set *A* to the evaluation of *B* where the variable of index *i* in *ctxB* is replaced by the variable of index ``c[i]`` in *ctxAC*.
     The length of the array *C* is the number of variables in *ctxB*.
     If any ``c[i]`` is negative, the corresponding variable of *B* is replaced by zero. Otherwise, it is expected that ``c[i]`` is less than the number of variables in *ctxAC*.
+    The renaming is done term by term in time linear in the number of variables.
 
 
 Multiplication
@@ -714,6 +715,14 @@ Univariate Functions
               void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c, fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
     Set (resp. swap) *c* to (resp. with) the coefficient of the term of index *i* of *A*.
+
+.. function:: void fmpz_mpoly_univar_pseudo_rem(fmpz_mpoly_univar_t R, const fmpz_mpoly_univar_t A, const fmpz_mpoly_univar_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Set *R* to the pseudo-remainder of *A* by *B*, that is the
+    polynomial `R` with `\deg R < \deg B` such that
+    `\operatorname{lc}(B)^{\deg A - \deg B + 1} A = Q B + R` for some
+    polynomial `Q`, when `\deg A \ge \deg B`, and to *A* otherwise.
+    Throws if *B* is zero.
 
 
 Internal Functions

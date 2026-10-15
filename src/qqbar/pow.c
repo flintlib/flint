@@ -231,6 +231,10 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
         /* Fast path for roots of unity. */
         if (qqbar_is_root_of_unity(&p, &q, x))
         {
+            /* x^y = exp(y log x) with the principal logarithm: the
+               argument 2 pi p / q must be taken in (-pi, pi] */
+            if (2 * p > (slong) q)
+                p -= q;
             fmpz_mul_si(fmpq_numref(t), fmpq_numref(t), p);
             fmpz_mul_ui(fmpq_denref(t), fmpq_denref(t), q);
             fmpz_mul_ui(r, fmpq_denref(t), 2);

@@ -59,7 +59,7 @@ Sample output::
     >>> 2*Log(Pi*I) - 4*Log(Sqrt(Pi)) - Pi*I
     0
 
-    >>> -I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) - Pi^2/48*Log(18)
+    >>> -I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) + Pi^2/48*Log(18)
     0
 
     >>> Sqrt(5 + 2*Sqrt(6)) - Sqrt(2) - Sqrt(3)
@@ -335,7 +335,7 @@ for use in both the DFT and the inverse DFT.
 
 Usage::
 
-    build/examples/dft [-verbose] [-input i] [-limit B] [-timing T] N
+    build/examples/dft [-verbose] [-input i] [-limit B] [-timing T] [-nogb] [-tower] N
 
 The required parameter ``N`` selects the length of the vector.
 
@@ -353,8 +353,15 @@ The optional parameter ``-input i`` selects an input sequence (default = 0).
 * 1: `x_n = \sqrt{n+2}`
 * 2: `x_n = \log(n+2)`
 * 3: `x_n = e^{2 \pi i / (n+2)}`
+* 4: `x_n = 1 / (1 + (n+2) \pi)`
+* 5: `x_n = 1 / (1 + \sqrt{n+2} \pi)`
+* 6: `x_n = (n+2)^{1000}`
+* 7: `x_n = (n+2)^{10000}`
 
 The optional parameter ``-limit B`` sets the internal degree limit for algebraic numbers.
+
+The optional flag ``-tower`` runs the computation in the lazy tower field
+(:func:`gr_ctx_init_tower_lazy`) instead of Calcium.
 
 Sample output::
 

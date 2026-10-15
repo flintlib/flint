@@ -20,6 +20,7 @@
 
 #include "mpoly_types.h"
 #include "arf_types.h"
+#include "acb_types.h"
 #include "gr_types.h"
 
 #ifdef __cplusplus
@@ -424,6 +425,8 @@ void fexpr_write_latex_residue(calcium_stream_t out, const fexpr_t expr, ulong f
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);
 void fexpr_set_re_im_d(fexpr_t res, double x, double y);
+void fexpr_set_arb_decimal(fexpr_t res, const arb_t x, slong digits);
+void fexpr_set_acb_decimal(fexpr_t res, const acb_t z, slong digits);
 
 void fexpr_neg(fexpr_t res, const fexpr_t a);
 void fexpr_add(fexpr_t res, const fexpr_t a, const fexpr_t b);

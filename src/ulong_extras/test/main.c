@@ -82,6 +82,7 @@
 #include "t-nextprime.c"
 #include "t-nonzero_sizeinbase10.c"
 #include "t-nth_prime_bounds.c"
+#include "t-randprime_mod.c"
 #include "t-urandint.c"
 #include "t-pow.c"
 #include "t-powmod2.c"
@@ -186,6 +187,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_nextprime),
     TEST_FUNCTION(n_nonzero_sizeinbase10),
     TEST_FUNCTION(n_nth_prime_bounds),
+    TEST_FUNCTION(n_randprime_mod),
     TEST_FUNCTION(n_urandint),
     TEST_FUNCTION(n_pow),
     TEST_FUNCTION(n_powmod2),

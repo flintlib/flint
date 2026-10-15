@@ -24,6 +24,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "ca.h"
+#include "gr_tower.h"
+#include "gr_tower_lazy.h"
 
 typedef struct
 {
@@ -342,6 +344,21 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
             return GR_SUCCESS;
 
+        case GR_CTX_GR_TOWER_LAZY:
+            {
+                int status = gr_tower_lazy_get_qqbar(res, x, x_ctx);
+
+                if (status != GR_SUCCESS)
+                    return status;
+
+                if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR && !qqbar_is_real(res))
+                {
+                    qqbar_zero(res);
+                    return GR_DOMAIN;
+                }
+
+                return GR_SUCCESS;
+            }
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
@@ -1084,7 +1101,30 @@ _gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx
     return GR_SUCCESS;
 }
 
-/* todo: 2 pi reduction for bignum numerators */
+/* x = p / q for the trigonometric functions of pi x, all of period 2;
+   a bignum numerator is reduced mod 2q */
+static int
+_qqbar_trig_pi_args(slong * p, slong * q, const qqbar_t x)
+{
+    const fmpz * c = QQBAR_COEFFS(x);
+
+    if (COEFF_IS_MPZ(c[1]))
+        return 0;
+
+    *q = c[1];
+
+    if (COEFF_IS_MPZ(c[0]))
+    {
+        ulong r = fmpz_fdiv_ui(c, 2 * (ulong) *q);
+        *p = (r == 0) ? 0 : (slong) (2 * (ulong) *q - r);
+    }
+    else
+    {
+        *p = -c[0];
+    }
+
+    return 1;
+}
 
 #define TRIG(fn, real_check) \
 static int \
@@ -1094,13 +1134,11 @@ _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
     { \
         return GR_DOMAIN; \
     } \
-    else if (COEFF_IS_MPZ(QQBAR_COEFFS(x)[0]) || COEFF_IS_MPZ(QQBAR_COEFFS(x)[1])) \
-    { \
-        return GR_UNABLE; \
-    } \
     else \
     { \
-        slong p = -QQBAR_COEFFS(x)[0], q = QQBAR_COEFFS(x)[1]; \
+        slong p, q; \
+        if (!_qqbar_trig_pi_args(&p, &q, x)) \
+            return GR_UNABLE; \
         if (q > QQBAR_CTX(ctx)->deg_limit) \
             return GR_UNABLE; \
         qqbar_ ## fn(res, p, q); \
@@ -1118,13 +1156,11 @@ _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
     { \
         return GR_DOMAIN; \
     } \
-    else if (COEFF_IS_MPZ(QQBAR_COEFFS(x)[0]) || COEFF_IS_MPZ(QQBAR_COEFFS(x)[1])) \
-    { \
-        return GR_UNABLE; \
-    } \
     else \
     { \
-        slong p = -QQBAR_COEFFS(x)[0], q = QQBAR_COEFFS(x)[1]; \
+        slong p, q; \
+        if (!_qqbar_trig_pi_args(&p, &q, x)) \
+            return GR_UNABLE; \
         if (q > QQBAR_CTX(ctx)->deg_limit) \
             return GR_UNABLE; \
         return qqbar_ ## fn(res, p, q) ? GR_SUCCESS : GR_DOMAIN; \

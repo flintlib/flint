@@ -517,6 +517,15 @@ Division with remainder
 
     Versions of the *divrem* functions which output only the remainder.
 
+.. function:: int _gr_poly_div_root(gr_ptr Q, gr_ptr R, gr_srcptr A, slong len, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_div_root(gr_poly_t Q, gr_ptr R, const gr_poly_t A, gr_srcptr c, gr_ctx_t ctx)
+
+    Divides *A* by the linear polynomial `x - c`, computing the quotient
+    *Q* as well as the remainder `R = A(c)` (synthetic division, which
+    works over any commutative ring). The underscore method assumes that
+    *Q* has room for ``len - 1`` coefficients; *Q* may be aliased
+    with *A*.
+
 Division with remainder with full precomputed inverse
 --------------------------------------------------------------------------------
 

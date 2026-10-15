@@ -24,6 +24,8 @@
 #include "fmpzi.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_tower.h"
+#include "gr_tower_lazy.h"
 #include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -277,6 +279,42 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_CC_CA:
         case GR_CTX_COMPLEX_ALGEBRAIC_CA:
             return _gr_ca_get_arb_with_prec(res, x, x_ctx, ARB_CTX_PREC(ctx));
+
+        case GR_CTX_GR_TOWER_FIELD:
+        case GR_CTX_GR_TOWER_FIELD_FLAT:
+        case GR_CTX_GR_TOWER_LAZY:
+            {
+                acb_t t;
+                truth_t real;
+                int status;
+
+                /* (a real view of a lazy field decides realness exactly;
+                   otherwise the enclosure must have an exact imaginary
+                   part of zero, or exclude zero) */
+                real = (x_ctx->which_ring == GR_CTX_GR_TOWER_LAZY) ? gr_tower_lazy_is_real(x, x_ctx) : T_UNKNOWN;
+                if (real == T_FALSE)
+                    return GR_DOMAIN;
+
+                acb_init(t);
+                if (x_ctx->which_ring == GR_CTX_GR_TOWER_FIELD)
+                    status = gr_tower_field_get_acb(t, x, ARB_CTX_PREC(ctx), x_ctx);
+                else if (x_ctx->which_ring == GR_CTX_GR_TOWER_FIELD_FLAT)
+                    status = gr_tower_field_flat_get_acb(t, x, ARB_CTX_PREC(ctx), x_ctx);
+                else
+                    status = gr_tower_lazy_get_acb(t, x, ARB_CTX_PREC(ctx), x_ctx);
+
+                if (status == GR_SUCCESS)
+                {
+                    if (real == T_TRUE || arb_is_zero(acb_imagref(t)))
+                        arb_swap(res, acb_realref(t));
+                    else if (!arb_contains_zero(acb_imagref(t)))
+                        status = GR_DOMAIN;
+                    else
+                        status = GR_UNABLE;
+                }
+                acb_clear(t);
+                return status;
+            }
 
         case GR_CTX_REAL_FLOAT_ARF:
             if (arf_is_finite(x))

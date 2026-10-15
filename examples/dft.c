@@ -6,6 +6,11 @@
 #include <flint/calcium.h>
 #include <flint/ca.h>
 #include <flint/ca_vec.h>
+#include <flint/gr.h>
+#include <flint/gr_vec.h>
+#include <flint/gr_special.h>
+#include <flint/gr_tower.h>
+#include <flint/gr_tower_lazy.h>
 
 void
 benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, slong gb, ca_ctx_t ctx)
@@ -69,6 +74,16 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, slong gb, ca_c
             ca_mul(x + i, x + i, w, ctx);
             ca_add_ui(x + i, x + i, 1, ctx);
             ca_inv(x + i, x + i, ctx);
+        }
+        else if (input == 6 || input == 7)
+        {
+            /* (from an fmpz: ca_pow_ui would create a symbolic power
+               beyond CA_OPT_POW_LIMIT) */
+            fmpz_t c;
+            fmpz_init(c);
+            fmpz_ui_pow_ui(c, i + 2, (input == 6) ? 1000 : 10000);
+            ca_set_fmpz(x + i, c, ctx);
+            fmpz_clear(c);
         }
 
         if (verbose)
@@ -174,9 +189,168 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, slong gb, ca_c
     ca_clear(t, ctx);
 }
 
+/* The same benchmark for a generic gr context (used with the lazy tower
+   field, gr_ctx_init_tower_lazy). */
+void
+benchmark_DFT_gr(slong N, int input, int verbose, gr_ctx_t ctx)
+{
+    gr_ptr x, X, y, w, t;
+    slong i, k, n, sz = ctx->sizeof_elem;
+    truth_t is_zero;
+
+#define E(v, i) GR_ENTRY(v, i, sz)
+
+    x = gr_heap_init_vec(N, ctx);
+    X = gr_heap_init_vec(N, ctx);
+    y = gr_heap_init_vec(N, ctx);
+    w = gr_heap_init_vec(2 * N, ctx);
+    t = gr_heap_init(ctx);
+
+    if (verbose)
+        flint_printf("[x] =\n");
+
+    for (i = 0; i < N; i++)
+    {
+        if (input == 0)
+        {
+            GR_MUST_SUCCEED(gr_set_ui(E(x, i), i + 2, ctx));
+        }
+        else if (input == 1)
+        {
+            GR_MUST_SUCCEED(gr_set_ui(E(x, i), i + 2, ctx));
+            GR_MUST_SUCCEED(gr_sqrt(E(x, i), E(x, i), ctx));
+        }
+        else if (input == 2)
+        {
+            GR_MUST_SUCCEED(gr_set_ui(E(x, i), i + 2, ctx));
+            GR_MUST_SUCCEED(gr_log(E(x, i), E(x, i), ctx));
+        }
+        else if (input == 3)
+        {
+            GR_MUST_SUCCEED(gr_pi(E(x, i), ctx));
+            GR_MUST_SUCCEED(gr_i(t, ctx));
+            GR_MUST_SUCCEED(gr_mul(E(x, i), E(x, i), t, ctx));
+            GR_MUST_SUCCEED(gr_mul_ui(E(x, i), E(x, i), 2, ctx));
+            GR_MUST_SUCCEED(gr_div_ui(E(x, i), E(x, i), i + 2, ctx));
+            GR_MUST_SUCCEED(gr_exp(E(x, i), E(x, i), ctx));
+        }
+        else if (input == 4)
+        {
+            GR_MUST_SUCCEED(gr_pi(E(x, i), ctx));
+            GR_MUST_SUCCEED(gr_mul_ui(E(x, i), E(x, i), i + 2, ctx));
+            GR_MUST_SUCCEED(gr_add_ui(E(x, i), E(x, i), 1, ctx));
+            GR_MUST_SUCCEED(gr_inv(E(x, i), E(x, i), ctx));
+        }
+        else if (input == 5)
+        {
+            GR_MUST_SUCCEED(gr_pi(E(x, i), ctx));
+            GR_MUST_SUCCEED(gr_set_ui(t, i + 2, ctx));
+            GR_MUST_SUCCEED(gr_sqrt(t, t, ctx));
+            GR_MUST_SUCCEED(gr_mul(E(x, i), E(x, i), t, ctx));
+            GR_MUST_SUCCEED(gr_add_ui(E(x, i), E(x, i), 1, ctx));
+            GR_MUST_SUCCEED(gr_inv(E(x, i), E(x, i), ctx));
+        }
+        else if (input == 6 || input == 7)
+        {
+            fmpz_t c;
+            fmpz_init(c);
+            fmpz_ui_pow_ui(c, i + 2, (input == 6) ? 1000 : 10000);
+            GR_MUST_SUCCEED(gr_set_fmpz(E(x, i), c, ctx));
+            fmpz_clear(c);
+        }
+
+        if (verbose)
+            gr_println(E(x, i), ctx);
+    }
+
+    /* roots of unity */
+    for (i = 0; i < 2 * N; i++)
+    {
+        if (i == 0)
+        {
+            GR_MUST_SUCCEED(gr_one(E(w, i), ctx));
+        }
+        else if (i == 1)
+        {
+            GR_MUST_SUCCEED(gr_pi(E(w, i), ctx));
+            GR_MUST_SUCCEED(gr_i(t, ctx));
+            GR_MUST_SUCCEED(gr_mul(E(w, i), E(w, i), t, ctx));
+            GR_MUST_SUCCEED(gr_mul_ui(E(w, i), E(w, i), 2, ctx));
+            GR_MUST_SUCCEED(gr_div_si(E(w, i), E(w, i), N, ctx));
+            GR_MUST_SUCCEED(gr_exp(E(w, i), E(w, i), ctx));
+        }
+        else
+        {
+            GR_MUST_SUCCEED(gr_mul(E(w, i), E(w, i - 1), E(w, 1), ctx));
+        }
+    }
+
+    if (verbose)
+        printf("\nDFT([x]) =\n");
+
+    for (k = 0; k < N; k++)
+    {
+        GR_MUST_SUCCEED(gr_zero(E(X, k), ctx));
+        for (n = 0; n < N; n++)
+        {
+            GR_MUST_SUCCEED(gr_mul(t, E(x, n), E(w, ((2 * N - k) * n) % (2 * N)), ctx));
+            GR_MUST_SUCCEED(gr_add(E(X, k), E(X, k), t, ctx));
+        }
+        if (verbose)
+            gr_println(E(X, k), ctx);
+    }
+
+    if (verbose)
+        printf("\nIDFT(DFT([x])) =\n");
+
+    for (k = 0; k < N; k++)
+    {
+        GR_MUST_SUCCEED(gr_zero(E(y, k), ctx));
+        for (n = 0; n < N; n++)
+        {
+            GR_MUST_SUCCEED(gr_mul(t, E(X, n), E(w, (k * n) % (2 * N)), ctx));
+            GR_MUST_SUCCEED(gr_add(E(y, k), E(y, k), t, ctx));
+        }
+        GR_MUST_SUCCEED(gr_div_ui(E(y, k), E(y, k), N, ctx));
+        if (verbose)
+            gr_println(E(y, k), ctx);
+    }
+
+    if (verbose)
+        printf("\n[x] - IDFT(DFT([x])) =\n");
+
+    for (k = 0; k < N; k++)
+    {
+        GR_MUST_SUCCEED(gr_sub(t, E(x, k), E(y, k), ctx));
+        is_zero = gr_is_zero(t, ctx);
+        if (verbose)
+        {
+            gr_print(t, ctx);
+            printf("       (= 0   ");
+            truth_print(is_zero);
+            printf(")\n");
+        }
+        if (is_zero != T_TRUE)
+        {
+            printf("Failed to prove equality!\n");
+            flint_abort();
+        }
+    }
+
+    if (verbose)
+        printf("\n");
+
+    gr_heap_clear_vec(x, N, ctx);
+    gr_heap_clear_vec(X, N, ctx);
+    gr_heap_clear_vec(y, N, ctx);
+    gr_heap_clear_vec(w, 2 * N, ctx);
+    gr_heap_clear(t, ctx);
+#undef E
+}
+
 void usage(void)
 {
-    printf("usage: dft [-verbose] [-input i] [-limit B] [-timing T] [-nogb] N\n");
+    printf("usage: dft [-verbose] [-input i] [-limit B] [-timing T] [-nogb] [-tower] [-gens F] [-cyclo D] N\n");
 }
 
 int main(int argc, char *argv[])
@@ -184,6 +358,8 @@ int main(int argc, char *argv[])
     ca_ctx_t ctx;
     int verbose, input, timing;
     slong i, Nmin, Nmax, N, qqbar_limit, gb;
+    int tower = 0, gens = 0;
+    slong cyclo = -1;
 
     Nmin = Nmax = 2;
     verbose = 0;
@@ -218,6 +394,25 @@ int main(int argc, char *argv[])
         {
             gb = 0;
         }
+        else if (!strcmp(argv[i], "-tower"))
+        {
+            tower = 1;
+        }
+        else if (!strcmp(argv[i], "-cyclo"))
+        {
+            /* the option GR_TOWER_OPT_CYCLOTOMIC_DEGREE_LIMIT (implies -tower) */
+            tower = 1;
+            cyclo = atol(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-gens"))
+        {
+            /* generator policy flags of the lazy tower field
+               (GR_TOWER_GENS_*: 2 = composite roots of unity, 4 =
+               composite square roots) */
+            gens = atol(argv[i+1]);
+            i += 1;
+        }
         else if (!strcmp(argv[i], "-timing"))
         {
             timing = atol(argv[i+1]);
@@ -249,10 +444,29 @@ int main(int argc, char *argv[])
             flint_printf("x_k = 1 / (1 + (k + 2) pi)\n");
         else if (input == 5)
             flint_printf("x_k = 1 / (1 + sqrt(k + 2) pi)\n");
+        else if (input == 6)
+            flint_printf("x_k = (k + 2)^1000\n");
+        else if (input == 7)
+            flint_printf("x_k = (k + 2)^10000\n");
 
         flint_printf("\n");
 
-        if (timing == 0)
+        if (tower)
+        {
+            gr_ctx_t QQ, K;
+            TIMEIT_ONCE_START;
+            gr_ctx_init_fmpq(QQ);
+            gr_ctx_init_tower_lazy(K, QQ, GR_TOWER_MERGE_EXPRESS);
+            gr_tower_lazy_ctx_set_gen_flags(K, gens);
+            if (cyclo >= 0)
+                gr_tower_lazy_ctx_set_option(K, GR_TOWER_OPT_CYCLOTOMIC_DEGREE_LIMIT, cyclo);
+            benchmark_DFT_gr(N, input, verbose, K);
+            gr_tower_lazy_ctx_stats(K);
+            gr_ctx_clear(K);
+            gr_ctx_clear(QQ);
+            TIMEIT_ONCE_STOP;
+        }
+        else if (timing == 0)
         {
             TIMEIT_ONCE_START;
             ca_ctx_init(ctx);

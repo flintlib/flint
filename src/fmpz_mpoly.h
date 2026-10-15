@@ -679,6 +679,10 @@ void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c,
     fmpz_mpoly_swap(c, A->coeffs + i, ctx);
 }
 
+void fmpz_mpoly_univar_pseudo_rem(fmpz_mpoly_univar_t rx,
+                const fmpz_mpoly_univar_t ax, const fmpz_mpoly_univar_t bx,
+                                                const fmpz_mpoly_ctx_t ctx);
+
 int fmpz_mpoly_univar_pseudo_gcd(fmpz_mpoly_univar_t gx,
                 const fmpz_mpoly_univar_t ax, const fmpz_mpoly_univar_t bx,
                                                    const fmpz_mpoly_ctx_t ctx);

@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     OUT
 
     /* Example 1 in [BBK2014] */
-    START("-I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) - Pi^2/48*Log(18)");
+    START("-I*Pi/8*Log(2/3-2*I/3)^2 + I*Pi/8*Log(2/3+2*I/3)^2 + Pi^2/12*Log(-1-I) + Pi^2/12*Log(-1+I) + Pi^2/12*Log(1/3-I/3) + Pi^2/12*Log(1/3+I/3) + Pi^2/48*Log(18)");
     ca_zero(x, ctx);
     ca_set_qqi_si(y, 2, 3, -2, 3, ctx);
     ca_log(y, y, ctx);

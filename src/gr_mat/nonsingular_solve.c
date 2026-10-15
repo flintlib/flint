@@ -15,10 +15,16 @@
 /* todo: solve_adjugate for n <= 4 */
 /* todo: algorithm selection */
 int
-gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+gr_mat_nonsingular_solve_generic(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     if (gr_ctx_is_pretend_field(ctx) == T_TRUE || gr_ctx_is_exact(ctx) == T_FALSE)
         return gr_mat_nonsingular_solve_lu(X, A, B, ctx);
     else
         return gr_mat_nonsingular_solve_fflu(X, A, B, ctx);
+}
+
+int
+gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    return GR_MAT_BINARY_OP(ctx, MAT_NONSINGULAR_SOLVE)(X, A, B, ctx);
 }
