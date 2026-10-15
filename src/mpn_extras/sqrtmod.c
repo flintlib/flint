@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "mpn_extras.h"
 
 /* A length-n mpn read as an mpz; GMP wants the top limb to be nonzero. */
@@ -250,19 +251,16 @@ flint_mpn_sqrtmod_preinv(nn_ptr res, nn_srcptr a, nn_srcptr d, mp_size_t n,
 {
     if (n == 1)
     {
-        ulong r;
+        nmod_t mod;
 
-        if (n_jacobi_unsigned(a[0], d[0]) == -1)
-        {
-            res[0] = 0;
-            return 0;
-        }
+        nmod_init(&mod, d[0]);
 
-        r = n_sqrtmod(a[0], d[0]);
-        res[0] = r;
+        /* a returned root is always genuine */
+        if (nmod_sqrt(res, a[0], mod))
+            return 1;
 
-        /* the symbol did not rule a root out, so only a lie about d can */
-        return (r != 0 || a[0] == 0) ? 1 : -1;
+        /* if the symbol did not rule a root out, only a lie about d can */
+        return (n_jacobi_unsigned(a[0], d[0]) == -1) ? 0 : -1;
     }
 
     return _flint_mpn_sqrtmod(res, a, d, n, dinv, norm);

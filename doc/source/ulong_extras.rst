@@ -615,14 +615,17 @@ Modular arithmetic
 .. function:: ulong n_sqrtmod(ulong a, ulong p)
 
     If `p` is prime, compute a square root of `a` modulo `p` if `a` is a
-    quadratic residue modulo `p`, otherwise return `0`.
+    quadratic residue modulo `p`, otherwise return `0`. The returned root
+    is the one in `[0, p/2]`.
 
-    If `p` is not prime the result is with high probability `0`, indicating
-    that `p` is not prime, or `a` is not a square modulo `p`. Otherwise the
-    result is meaningless. It is assumed that ``p`` is prime; this is not
+    If `p` is not prime, the result is either `0`, indicating that `p` is
+    not prime or that `a` is not a square modulo `p`, or a genuine square
+    root of `a` modulo `p`. It is assumed that ``p`` is prime; this is not
     checked.
 
-    Assumes that `a` is reduced modulo `p`.
+    Assumes that `a` is reduced modulo `p`. This is a wrapper of
+    :func:`nmod_sqrt`, which should be called directly if an
+    :type:`nmod_t` for `p` is available.
 
 .. function:: slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp)
 
