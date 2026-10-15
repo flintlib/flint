@@ -156,6 +156,10 @@ assuming satisfies_bounds(n):
 (1)  Products in the range (-2*n^2, 2*n^2) are reduced to the range (-1*n, 1*n).
 (2)  Products in the range (-4*n^2, 4*n^2) are reduced to the range (-3/2*n, 3/2*n).
 
+(1) also holds for mulmod_fast, whose quotient is at least as accurate,
+provided |a*b| <= 2^51*n (implied by |a*b| < 2*n^2 for n < 2^50).
+(2) does not: 4*n^2 exceeds 2^51*n for n > 2^49, see machine_vectors.h.
+
 
 Analysis of the forward butterfiles for 50 bit primes
 -----------------------------------------------------
@@ -172,6 +176,13 @@ Analysis of the forward butterfiles for 50 bit primes
     The following claim is trivial from (1):
 
 (*)     If the ai in (-3*n, 3*n), then the bi are also in (-3*n, 3*n).
+
+    One exception: LENGTH8_ZERO_J in sd_fft.c, which is the whole transform
+    for depth 3 (sd_fft_basecase_3_1), returns in x0 and x1 sums of four
+    outputs of reduce_to_pm1n, so in (-4*n, 4*n) by its documented range
+    [-n, n]. With the actual range of reduce_to_pm1n (|result| <= n/2 + 2,
+    see machine_vectors.h) they are below 2*n + 8, so sd_fft_trunc does
+    map (-3*n, 3*n) into itself at every depth.
 
 
 Analysis of the truncated forward butterfiles for 50 bit primes
@@ -213,9 +224,64 @@ Analysis of the reverse butterflies for 50 bit primes
 Analysis of the truncated reverse butterflies for 50 bit primes
 ---------------------------------------------------------------
 
-    *** TODO ***
-    A bit tedious because there are so many formulas, but we just need make
-    sure that output is in the range (-2*n, 2*n) if input is.
+    The analogue of the claim above, outputs in (-2*n, 2*n) if the inputs
+    are, does *not* follow from (1), (2) and the documented range [-n, n]
+    of reduce_to_pm1n. With these bounds alone, five truncated butterflies
+    of sd_ifft.c leave (-2*n, 2*n):
+
+        radix_4_moth_inv_trunc_block_3_4_1      X0 up to 5n, X3 up to 3n
+        radix_4_moth_inv_trunc_block_3_4_0      X0 up to 5n
+        radix_4_moth_inv_trunc_block_3_3_1      X0 up to 4n
+        radix_4_moth_inv_trunc_block_3_3_0      X0 up to 4n
+        radix_4_moth_inv_trunc_block_1_4_0      X0 up to 3n
+
+    (e.g. X0 = 2*c - v + u + p in 3_4_x, with c and u outputs of
+    reduce_to_pm1n, v and p outputs of mulmod_fast), and through the
+    recursion these values reach mulmod_fast with products up to 3*n^2
+    and sums up to 11*n, beyond what mulmod_fast and exact addition
+    (below 2^53, that is 8*n for n close to 2^50) allow.
+    So the documented ranges do not prove sd_ifft_trunc correct.
+
+    It is correct thanks to the actual ranges of the primitives, see
+    machine_vectors.h: reduce_to_pm1n returns at most n/2 + 2^-52*|a|, and
+    mulmod and mulmod_fast at most n/2 + 3*2^-53*|a*b| (n/2 + 2^-52*|a*b|
+    for mulmod_fast with the magic constant).
+
+    This was checked by running sd_ifft_trunc on bounds instead of values:
+    each entry holds a bound on the magnitude of the integer it stands for,
+    additions and multiplications act on the bounds, and each primitive
+    checks its precondition and returns the smaller of its documented
+    range ((1), (2), [-n, n]) and its actual range above. The check does
+    not depend on the prime: every twiddle factor other than +-1 is
+    replaced by the bound (n - 1)/2, the error |n*ninv - 1| is set to its
+    maximum 2^-53, and n is taken close to 2^50, which maximizes the
+    rounding errors relative to n; the conditions |a*b| < 2*n^2 and sums
+    below 8*n are then sufficient for every n < 2^50. So the result
+    holds for every prime that fft_small accepts. For inputs of magnitude
+    at most 2*n - 1, every truncation, depths up to 16 and both variants
+    of round_mul:
+
+     - every product given to mulmod_fast is below 2*n^2 (hence below
+       2^51*n), and every product given to mulmod below 4*n^2;
+     - every floating-point addition is below 8*n, hence below 2^53; the
+       only larger results are multiplications by 4, which are exact and
+       immediately followed by reduce_to_pm1n;
+     - the values passed between butterflies are below 3.5*n, and the
+       outputs at most 2.5*n (about 2.2*n for the default primes, whose
+       twiddle factors and error |n*ninv - 1| are smaller).
+
+    So the results are correct, but outputs outside (-2*n, 2*n) do occur:
+    for instance 2.04*n in radix_4_moth_inv_trunc_block_3_3_0 at depth 10
+    with trunc = 768, n = 0x0003f00000000001 and suitable inputs in [0, n),
+    when mulmod_fast returns slightly more than n/2 and the two reduced
+    values are close to n/2. The documented output range of sd_ifft_trunc
+    is therefore (-3*n, 3*n), which is also the input range of
+    sd_fft_trunc; the callers in FLINT multiply the outputs by a reduced
+    scaling factor or reduce them before anything else.
+
+    Reducing the five outputs listed above with reduce_to_pm1n would give
+    (-2*n, 2*n) from the documented ranges alone, at a cost of about 1%
+    of sd_ifft_trunc (median over truncations, up to 4%).
 */
 
 int fft_small_prime_supports_depth(ulong n, ulong depth)

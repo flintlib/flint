@@ -440,6 +440,13 @@
     x7 = CAT(T, sub)(Z6, Z7); \
 }
 
+/*
+    x0 and x1 are sums of four outputs of reduce_to_pm1n: in (-4n, 4n) by
+    its documented range, in fact within 2n + 8. In sd_fft_basecase_5_1 the
+    next layer accepts (-4n, 4n); in sd_fft_basecase_3_1 they are outputs,
+    within the range (-3n, 3n) of sd_fft_trunc only by the actual range of
+    reduce_to_pm1n (see the forward analysis in mulmod_satisfies_bounds.c).
+*/
 #define LENGTH8_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, e14, e18, e38) \
 { \
     T X0 = x0, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, X6 = x6, X7 = x7; \
@@ -1226,6 +1233,8 @@ The output satisfies
 for all `0 <= i < otrunc`. This invariant is tested in `test/t-sd_fft.c`.
 Usually, it only makes sense to have `otrunc >= itrunc` and `n_max(itrunc, otrunc) >= 2^(L-1)`.
 The array `d` needs to have size at least `2^L`.
+The input entries must be in (-3n, 3n), with n = Q->p, and so are the output
+entries; see mulmod_satisfies_bounds.c.
 */
 void sd_fft_trunc(
     sd_fft_ctx_t Q,

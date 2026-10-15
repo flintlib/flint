@@ -896,6 +896,14 @@ FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
     q_error = 1/2 exactly, and avoids vroundpd, which is 2 uops with 8 cycles
     latency on Intel cores since Skylake (but 1 uop, 3 cycles on Zen 2-5).
 
+    The requirement |a*b| <= 2^51 is not checked, and violating it does not
+    give a rounding error but something else: for a*b > 2^51 the result is
+    an integer that may be off by more than 1/2 (the spacing of the doubles
+    near R + a*b is 2 or more), and for a*b < -2^51 it may not be an integer
+    at all (the spacing near R + a*b is 1/2 or less). With native rounding
+    there is no such requirement, so a caller exceeding it goes unnoticed
+    on the targets that use native rounding (see mulmod_fast below).
+
     FLINT_ROUND_MUL_USE_ROUND / FLINT_ROUND_MUL_USE_MAGIC force either
     choice, for testing and profiling.
 */
@@ -928,7 +936,17 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n] */
+/*
+    reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n], for |a| < 2^53.
+
+    [-n, n] is the documented range, used in the bound analyses of the
+    transforms. The result is a - q*n with q the nearest integer to a
+    computed a*ninv, whose relative error is at most 2^-52 (ninv, and the
+    rounding of mul(a, ninv) on the native-rounding path), so in fact
+    |result| <= n/2 + 2^-52*|a| <= n/2 + 2 for |a| < 2^53. The truncated
+    inverse transform relies on this tighter range, see the end of
+    mulmod_satisfies_bounds.c.
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1n(V a, V n, V ninv) { \
     return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
@@ -937,7 +955,7 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* reduce_to_pm1n(a, n, ninv): return a mod n in (-n,n) */
+/* reduce_to_pm1no(a, n, ninv): return a mod n in (-n,n), see reduce_to_pm1n */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1no(V a, V n, V ninv) { \
     return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
@@ -973,6 +991,19 @@ DEFINE_IT(vec4d)
      Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-9/8*n, 9/8*n).
      Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-7/4*n, 7/4*n).
     floating point round mode is always assumed to be set to nearest
+
+    These are the documented ranges, proven in mulmod_satisfies_bounds.c
+    and used in the bound analyses of the transforms. The result is
+    a*b - q*n with q the nearest integer to a computed h*ninv, h = mul(a, b),
+    whose error relative to a*b/n is at most 3*2^-53 (rounding of h, error
+    of ninv, rounding of mul(h, ninv)), so independently of the above
+     |result| <= n/2 + 3*2^-53*|a*b|      for |a*b| < 2^103.
+    In particular products larger than 4*n^2 still give a correct
+    representative, only a larger one. The bound is close to n/2 when
+    |a*b| is far below 2^53*n, e.g. when one operand is a twiddle factor
+    in (-n/2, n/2) and the other is small.
+    The truncated inverse transform relies on this tighter range, see the
+    end of mulmod_satisfies_bounds.c.
 */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
@@ -993,7 +1024,28 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* same as mulmod but requires |a*b| <= 2^51*n, i.e. |a*b| < 2*n^2 for n < 2^50 */
+/*
+    mulmod_fast(a, b, n, ninv): same as mulmod, with round_mul for the quotient.
+
+    Requires |a*b| <= 2^51*n, which for n < 2^50 is implied by |a*b| < 2*n^2
+    (this is how the callers state it). Under this condition the
+    result is a*b mod n in (-n, n), as for mulmod, assuming
+    fft_small_mulmod_satisfies_bounds(n) (the quotient is computed at
+    least as accurately as in mulmod), and |result| <= n/2 + 2^-52*|a*b|
+    on the magic-constant path (n/2 + 3*2^-53*|a*b| on the native path).
+
+    Unlike for mulmod, larger products are not allowed.
+    With the magic constant (FLINT_FFT_SMALL_ROUND_USE_NATIVE 0, set for the
+    Intel targets in their flint-mparam.h) a violation is silent: for
+    a*b > 2^51*n the result is still a correct representative, possibly
+    outside (-n, n), but for a*b < -2^51*n it may not be an integer, that is,
+    it is wrong (for instance mulmod_fast(-(3n - 1), n - 1) with
+    n = 1086317488242689).
+    With native rounding (other x86-64 targets, ARM) mulmod_fast is exactly
+    mulmod, so a caller violating the requirement goes unnoticed there;
+    defining FLINT_ROUND_MUL_USE_MAGIC forces the magic constant on any
+    x86-64 target, for testing.
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \
@@ -1882,7 +1934,8 @@ FLINT_FORCE_INLINE vec2d vec2d_reduce_to_0n(vec2d a, vec2d n, vec2d ninv) {
 }
 
 
-/* mulmod(a, b, n, ninv): return a*b mod n in [-n,n] with assumptions */
+/* mulmod(a, b, n, ninv): return a*b mod n,
+   with the ranges and assumptions documented in the AVX2 section */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \
@@ -1903,7 +1956,8 @@ DEFINE_IT(vec2d)
 #undef DEFINE_IT
 
 /* mulmod_fast: see the AVX2 section. frintn is cheap on ARM cores, so here it
-   is simply mulmod. */
+   is simply mulmod (the requirement |a*b| <= 2^51*n of mulmod_fast is not
+   needed here, hence not exercised by tests run on ARM). */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
     return V##_mulmod(a, b, n, ninv); \
