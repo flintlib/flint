@@ -793,6 +793,14 @@ Multiplication
     other multiplication algorithms, given inputs of length *len1* and *len2*
     and output truncation to length *n*.
 
+.. function:: int _nmod_poly_mulmid_want_fft_small(slong len2, slong m, nmod_t mod)
+
+    Estimate whether :func:`_nmod_poly_mulmid` should use *fft_small* for
+    computing *m* coefficients of the product of polynomials of lengths
+    *len1* and *len2*, where *len1* is at least *len2* and the coefficients
+    of the operands which do not contribute to the output have been
+    discarded.
+
 .. function:: int _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 
     Internal helper function for :func:`_nmod_poly_mullow_fft_small`: if the
@@ -2591,16 +2599,56 @@ Geometric progression
     The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
 
     The value of ``r`` should be reduced modulo the modulus ``mod`` and should
-    be coprime with ``mod``. If ``function`` is `1` (evaluation only), there is
-    no other constraint. For any value of ``function`` other than `1`, this `r`
+    be coprime with ``mod``. If ``function`` selects evaluation only (it is `1`
+    or `9`), there is no other constraint. Otherwise, this `r`
     should also have sufficient multiplicative order such that none of the
     powers `r^2, r^4, \ldots, r^{2(len-1)}` is one; additionally, if ``mod`` is
     not prime then `r` should be such that the auxiliary values `r^{2k} - 1`
     are invertible modulo ``mod``.
 
-    The value of ``len`` should be both greater than or equal to the number of evaluation points to be
-    considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
-    This allocates vectors and polynomials for a total space of ``11*len`` coefficients at most (evaluation alone takes ``3*len``; interpolation takes ``3*len``; extrapolation takes ``6*len`` but with ``1*len`` shared with interpolation).
+    The value of ``len`` should be both greater than or equal to the number of
+    evaluation points to be considered, and greater than or equal to the length
+    of the polynomials to be evaluated / interpolated.  This allocates vectors
+    and polynomials for a total space of ``11*len`` coefficients at most
+    (evaluation alone takes ``3*len``; interpolation takes ``3*len``;
+    extrapolation takes ``6*len`` but with ``1*len`` shared with
+    interpolation).
+
+    If bit 3 of ``function`` is set (for example, ``function`` is `15`), the
+    precomputation additionally stores the *fft_small* transforms of the
+    polynomials that the selected functionalities multiply by, so that each
+    of these products costs two transforms instead of three. This is done for
+    the functionalities whose largest product, with lengths up to ``len``,
+    would use *fft_small*; then, in each call, a product uses the stored
+    transform if it would use *fft_small* itself and if the stored transform
+    is not too long for it. This bit is ignored if *fft_small* is not
+    available. Each stored transform takes `np \cdot 2^d` doubles, where `np`
+    is the number of primes *fft_small* needs for the modulus and
+    `2^d` is the smallest power of two at least `2 len - 1` (evaluation,
+    interpolation) or at least `len - 1` (each of the two transforms for
+    extrapolation).
+
+    The functions using ``G`` only read it, so that they can be called
+    concurrently on the same ``G``, including when transforms are stored.
+
+.. function:: void _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G, slong ev_len, slong int_len, slong ext_len)
+
+    Stores in ``G`` the *fft_small* transforms described above for bit 3 of
+    ``function``, for the functionalities ``G`` was built for. Each
+    functionality has its own bound, at most ``len``: the transforms are built
+    for evaluating polynomials of length at most ``ev_len``, for interpolating
+    from the first ``int_len`` points (or fewer), and for extrapolating from
+    at most ``ext_len`` values, replacing those previously stored for the
+    functionality, if any. A bound `0` means that no transform is stored for
+    the functionality, and a negative bound that its transforms, if any, are
+    kept unchanged; for instance, ``ev_len`` can be changed between batches of
+    evaluations of different lengths without rebuilding the transform used by
+    the interpolations. Bit 3 of ``function`` is the case ``ev_len = int_len =
+    ext_len = len``. Smaller bounds can shorten the transforms (up to twice for
+    evaluation, and to about ``2*int_len`` for interpolation) and reduce the
+    number of primes that *fft_small* needs. Longer inputs remain possible,
+    without the stored transforms. This function must not be called while
+    other threads use ``G``.
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 

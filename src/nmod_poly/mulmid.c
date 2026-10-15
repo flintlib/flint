@@ -25,14 +25,33 @@
     moduli where mul has KS variants in between; otherwise classical is
     used, or KS for small moduli and outputs much longer than len2.
 */
+int
+_nmod_poly_mulmid_want_fft_small(slong len2, slong m, nmod_t mod)
+{
+#if FLINT_HAVE_FFT_SMALL
+    slong s = FLINT_MIN(len2, m);
+    slong l = FLINT_MAX(len2, m);
+    slong bits = NMOD_BITS(mod);
+
+    /* fft_mul_tab is the crossover of mul with KS, KS2 and KS4; with
+       classical as the alternative, fft_small is better from about 100
+       for 9-15 bits and from 32 bits (22-31 bits: the table is kept) */
+    return _nmod_poly_mullow_want_fft_small(l, s, l + s - 1, 0, mod)
+            || (((bits >= 9 && bits <= 15) || bits >= 32)
+                && FLINT_MIN(l, 2 * s) >= 100);
+#else
+    (void) len2;
+    (void) m;
+    (void) mod;
+    return 0;
+#endif
+}
+
 void
 _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
     slong t, m;
-#if FLINT_HAVE_FFT_SMALL
-    slong s, l, bits;
-#endif
 
     len1 = FLINT_MIN(len1, nhi);
     len2 = FLINT_MIN(len2, nhi);
@@ -78,20 +97,13 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
     }
 
 #if FLINT_HAVE_FFT_SMALL
-    s = FLINT_MIN(len2, m);
-    l = FLINT_MAX(len2, m);
-    bits = NMOD_BITS(mod);
-
-    /* fft_mul_tab is the crossover of mul with KS, KS2 and KS4; with
-       classical as the alternative, fft_small is better from about 100
-       for 9-15 bits and from 32 bits (22-31 bits: the table is kept) */
-    if (_nmod_poly_mullow_want_fft_small(l, s, l + s - 1, 0, mod)
-            || (((bits >= 9 && bits <= 15) || bits >= 32)
-                && FLINT_MIN(l, 2 * s) >= 100))
+    if (_nmod_poly_mulmid_want_fft_small(len2, m, mod))
     {
         _nmod_poly_mulmid_fft_small(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
+
+    slong bits = NMOD_BITS(mod);
 
     /* KS computes the whole product: worth it for tiny moduli, and for
        16 bits or less when the output is much longer than len2 */

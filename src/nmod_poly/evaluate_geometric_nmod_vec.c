@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "nmod_vec.h"
 
 void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen,
@@ -48,6 +49,8 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * (the bracket notation means coefficients [plen - 1, plen - 1 + len))
      * If p has valuation val, define a = p / x**val of length alen = plen - val, and this becomes
      * [rev(a) * (G->ev_f >> x**val)]_{alen - 1}^{len}  (that is, coeffs [alen - 1, alen - 1 + len))
+     * or, without the shift of G->ev_f, [rev(a) * G->ev_f]_{plen - 1}^{len}: this is the product
+     * used when the transform of G->ev_f is stored
      */
 
     const slong alen = plen - val;
@@ -59,7 +62,11 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     for (slong i = val; i < plen; i++)
         a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
 
-    _nmod_poly_mulmid(vs, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
+    int done = (G->ev_f_fft != NULL)
+        && _nmod_geometric_progression_mulmid_fft(vs, plen - 1, plen - 1 + len, a, alen,
+                                                  G->ev_f_fft, val, alen - 1 + len, mod);
+    if (!done)
+        _nmod_poly_mulmid(vs, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
 
     for (slong i = 0; i < len; i++)
         vs[i] = nmod_mul(G->ev_s[i], vs[i], mod);

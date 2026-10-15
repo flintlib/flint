@@ -45,9 +45,11 @@ int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max
     return 1;
 }
 
-void _fft_small_plan_set_window(fft_small_plan_t P,
+/* as _fft_small_plan_set_window, taking the transform length at least
+   zn + headroom when there is no wraparound */
+static void _fft_small_plan_set_window_headroom(fft_small_plan_t P,
                     ulong zl, ulong zh, ulong zn, ulong xtrunc_max,
-                    ulong min_depth)
+                    ulong min_depth, ulong headroom)
 {
     ulong ztrunc, depth, i;
 
@@ -73,10 +75,7 @@ void _fft_small_plan_set_window(fft_small_plan_t P,
     }
     else
     {
-        /* the small headroom above zn covers the signed
-           representation's bias digits, which span a few chunks past
-           the product and were absorbed by block rounding before */
-        depth = n_max(min_depth, n_clog2(zn + 4));
+        depth = n_max(min_depth, n_clog2(zn + headroom));
         ztrunc = (depth < LG_BLK_SZ) ? n_pow2(depth)
                                      : n_round_up(zn, BLK_SZ);
     }
@@ -87,6 +86,28 @@ void _fft_small_plan_set_window(fft_small_plan_t P,
     P->ztrunc = ztrunc;
     P->depth = depth;
     P->bits = 0;
+}
+
+void _fft_small_plan_set_window(fft_small_plan_t P,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max,
+                    ulong min_depth)
+{
+    /* the small headroom above zn covers the signed
+       representation's bias digits, which span a few chunks past
+       the product and were absorbed by block rounding before */
+    _fft_small_plan_set_window_headroom(P, zl, zh, zn, xtrunc_max,
+                                        min_depth, 4);
+}
+
+/* the nmod exports read no coefficient beyond zn, so they need no
+   headroom, which would double the transform length when zn is within 4
+   below a power of two (as for products of two operands of length 2^k);
+   the nmod conversions are per-coefficient and handle short transforms,
+   and the register basecases serve depths from 4 */
+void _fft_small_plan_set_window_nmod(fft_small_plan_t P,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max)
+{
+    _fft_small_plan_set_window_headroom(P, zl, zh, zn, xtrunc_max, 4, 0);
 }
 
 int _fft_small_plan_fit_window(fft_small_plan_t P,
@@ -403,9 +424,7 @@ int fft_small_plan_init_nmod(fft_small_plan_t P, mpn_ctx_t R,
     P->R = R;
     P->sign = 0;
 
-    /* the nmod conversions are per-coefficient and handle short
-       transforms; the register basecases serve depths from 4 */
-    _fft_small_plan_set_window(P, zl, zh, zn, xtrunc_max, (ulong) 4);
+    _fft_small_plan_set_window_nmod(P, zl, zh, zn, xtrunc_max);
 
     if (!_fft_small_plan_set_bound_nmod(P, len_bound, prod_bits, mod, direct_len))
         return 0;

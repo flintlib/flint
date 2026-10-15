@@ -563,10 +563,16 @@ int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max
 /* Choose depth and ztrunc for the output window [zl, zh) of a length zn
    convolution whose operand truncation lengths are at most xtrunc_max. */
 /* min_depth: LG_BLK_SZ for plans whose conversions are block
-   structured (the chunked mpn import and export), 4 where the
-   conversions handle short transforms (the nmod paths) */
+   structured (the chunked mpn import and export), 4 where the conversions
+   handle short transforms (see also next function for nmod) */
 void _fft_small_plan_set_window(fft_small_plan_t P,
                     ulong zl, ulong zh, ulong zn, ulong xtrunc_max, ulong min_depth);
+
+/* Same as _fft_small_plan_set_window with min_depth = 4,
+   but without the headroom above zn which the signed exports
+   of the mpn plans need and the nmod exports do not. */
+void _fft_small_plan_set_window_nmod(fft_small_plan_t P,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max);
 
 /* Same, but with the depth of P fixed. Returns 0 if the window needs a
    transform longer than 2^depth. */
@@ -995,17 +1001,18 @@ void _nmod_poly_mul_mid(
     const ulong* b, slong bn,
     nmod_t mod);
 
-typedef struct {
+/* tagged -> modules can point to it without fft_small.h */
+typedef struct mul_precomp_struct {
     fft_small_plan_struct P[1];
     fft_small_op_struct bfft[1];
     ulong bn;
     ulong btrunc;
 } mul_precomp_struct;
 
-void _mul_precomp_init(
+int _mul_precomp_init(
     mul_precomp_struct* M,
     const ulong * b, ulong bn, ulong btrunc,
-    ulong depth,
+    ulong depth, ulong len_bound, ulong direct_len,
     nmod_t mod,
     mpn_ctx_t R);
 
@@ -1018,7 +1025,7 @@ FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 int _nmod_poly_mul_mid_precomp(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
-    mul_precomp_struct* M,
+    const mul_precomp_struct* M,
     nmod_t mod,
     mpn_ctx_t R);
 
