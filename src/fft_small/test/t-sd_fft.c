@@ -101,6 +101,10 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
     [0, n) almost never exercise the worst-case bounds of the butterflies, so
     this uses extreme values and compares with the transform of the same data
     reduced to [0, n); both transforms are linear mod n.
+
+    The outputs are not checked against a range: the inverse transform can
+    return entries slightly outside (-2n, 2n), see the end of
+    mulmod_satisfies_bounds.c.
 */
 static double sd_fft_test_extreme(flint_rand_t state, double lim, ulong i, int mode)
 {

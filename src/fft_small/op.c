@@ -87,15 +87,17 @@ FLINT_FORCE_INLINE int _op_compatible(const fft_small_op_struct* X,
 }
 
 /*
-    Pointwise kernels. Forward transforms leave entries in (-4n, 4n) and
-    sd_ifft_trunc accepts entries in that range; sd_fft_ctx_point_mul
-    keeps its two chained mulmods within the (-4n^2, 4n^2) input bound by
-    first multiplying by m reduced to (-n/2, n/2], producing entries in
-    (-3n/2, 3n/2) (see the range documentation of mulmod in
-    machine_vectors.h). The kernels below do the same, and after additive
-    steps reduce back into [-n, n] with reduce_to_pm1n, so that the result
-    of any sequence of pointwise operations stays a valid input both to
-    further pointwise operations and to sd_ifft_trunc.
+    Pointwise kernels. Forward transforms leave entries in (-3n, 3n) and
+    sd_ifft_trunc accepts entries in (-2n, 2n) (and returns entries in
+    (-3n, 3n)), see the end of mulmod_satisfies_bounds.c.
+    sd_fft_ctx_point_mul keeps its two chained mulmods within the
+    (-4n^2, 4n^2) input bound by first multiplying by m reduced to
+    (-n/2, n/2], producing entries in (-3n/2, 3n/2) (see the range
+    documentation of mulmod in machine_vectors.h). The kernels below do
+    the same, and after additive steps reduce back into [-n, n] with
+    reduce_to_pm1n, so that the result of any sequence of pointwise
+    operations stays a valid input both to further pointwise operations
+    and to sd_ifft_trunc.
 */
 
 /* z = a*b*m; the containment step (see the range comment above) is a
