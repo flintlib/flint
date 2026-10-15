@@ -2196,9 +2196,7 @@ static int _gr_mpoly_divides_heap_threaded_pool(
 
     mpoly_monomial_add_any_bits(texps, qexps + N*0, Bexp + N*1, N, exp_bits);
 
-    mask = 0;
-    for (i = 0; (flint_bitcnt_t) i < FLINT_BITS/exp_bits; i++)
-        mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
+    mask = (exp_bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(exp_bits) : 0;
 
     k = 1;
     while (k < A->length && mpoly_monomial_gt(Aexp + N*k, texps, N, cmpmask))

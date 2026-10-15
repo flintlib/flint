@@ -33,6 +33,7 @@
 #include "t-fmpz_mod.c"
 #include "t-fmpz_mpoly.c"
 #include "t-fmpz_mpoly_q.c"
+#include "t-fmpz_mpoly_q_factored.c"
 #include "t-fmpz_mod_mpoly_q.c"
 #include "t-fmpz_poly.c"
 #include "t-fq.c"
@@ -89,6 +90,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_fmpz_mod),
     TEST_FUNCTION(gr_fmpz_mpoly),
     TEST_FUNCTION(gr_fmpz_mpoly_q),
+    TEST_FUNCTION(gr_fmpz_mpoly_q_factored),
     TEST_FUNCTION(gr_fmpz_mod_mpoly_q),
     TEST_FUNCTION(gr_fmpz_poly),
     TEST_FUNCTION(gr_fq),

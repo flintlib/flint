@@ -21,6 +21,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mpoly.h"
+#include "fmpz_mpoly_factor.h"
 #include "acb_types.h"
 
 #ifdef __cplusplus
@@ -291,6 +292,122 @@ fmpz_mpoly_q_content(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t 
 /* Evaluation */
 
 void fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx);
+
+/* Rational functions with factored denominators *****************************/
+
+#define fmpz_mpoly_q_factored_numref(x) (&((x)->num))
+#define fmpz_mpoly_q_factored_denref(x) (&((x)->den))
+
+void fmpz_mpoly_q_factored_init(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_clear(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_factored_swap(fmpz_mpoly_q_factored_t x, fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    FLINT_SWAP(fmpz_mpoly_q_factored_struct, *x, *y);
+}
+
+void fmpz_mpoly_q_factored_set(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_zero(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_one(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_gen(fmpz_mpoly_q_factored_t res, slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_set_fmpz_mpoly(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_set_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_set_si(fmpz_mpoly_q_factored_t res, slong x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_set_fmpq(fmpz_mpoly_q_factored_t res, const fmpq_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_set_fmpz_mpoly_q(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_get_fmpz_mpoly_q(fmpz_mpoly_q_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_canonicalise(fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_q_factored_is_canonical(const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_Q_INLINE int
+fmpz_mpoly_q_factored_is_zero(const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    return fmpz_mpoly_is_zero(fmpz_mpoly_q_factored_numref(x), ctx);
+}
+
+FMPZ_MPOLY_Q_INLINE int
+fmpz_mpoly_q_factored_is_one(const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    return fmpz_mpoly_is_one(fmpz_mpoly_q_factored_numref(x), ctx) &&
+           x->den.num == 0 && fmpz_is_one(x->den.constant);
+}
+
+int fmpz_mpoly_q_factored_equal(const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_print_pretty(const fmpz_mpoly_q_factored_t x, const char ** vars, const fmpz_mpoly_ctx_t ctx);
+char * fmpz_mpoly_q_factored_get_str_pretty(const fmpz_mpoly_q_factored_t x, const char ** vars, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_q_factored_set_str_pretty(fmpz_mpoly_q_factored_t res, const char * s, const char ** vars, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_randtest(fmpz_mpoly_q_factored_t res, flint_rand_t state, slong length, ulong coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_neg(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_add(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_sub(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_mul(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_div(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_q_factored_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_inv(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_pow_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_pow_si(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, slong e, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_add_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_sub_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_mul_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_div_fmpz(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_add_fmpq(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpq_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_sub_fmpq(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpq_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_mul_fmpq(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpq_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_div_fmpq(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpq_t c, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_factored_add_fmpz_mpoly(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_sub_fmpz_mpoly(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_mul_fmpz_mpoly(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_factored_div_fmpz_mpoly(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, const fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_factored_add_si(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_factored_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_factored_sub_si(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_factored_sub_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_factored_mul_si(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_factored_mul_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_factored_div_si(fmpz_mpoly_q_factored_t res, const fmpz_mpoly_q_factored_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_factored_div_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+/* helper functions */
+
+void _fmpz_mpoly_q_factored_append(fmpz_mpoly_factor_t f, const fmpz_mpoly_t p, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_q_factored_divide_out(fmpz_mpoly_t a, fmpz_t e, const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_q_factored_sort_merge(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_q_factored_factor_num(fmpz_t s, fmpz_mpoly_factor_t f, const fmpz_mpoly_t a, const fmpz_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }
