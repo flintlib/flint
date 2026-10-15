@@ -371,7 +371,7 @@ _fft_use(const mul_precomp_struct * M, slong zl, slong zh, slong an,
         return 0;
 
     D->R = get_default_mpn_ctx();
-    _fft_small_plan_set_window(D, zl - s, zh - s, an + bn - 1, FLINT_MAX(an, bn), 4);
+    _fft_small_plan_set_window_nmod(D, zl - s, zh - s, an + bn - 1, FLINT_MAX(an, bn));
     if (P->np == 1 || !_fft_small_plan_set_bound(D, FLINT_MIN(an, bn),
                                          2 * NMOD_BITS(mod), MPN_CTX_NCRTS))
         D->np = P->np;
