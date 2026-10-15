@@ -155,14 +155,12 @@ n_rsqrtmod_bn(ulong x, const radix_t radix)
         ulong inv2, s;
         slong d;
 
-        s = n_sqrtmod(nmod_set_ui(x, radix->b), p);
-        if (s == 0)
+        /* nmod_sqrt returns the canonical root in [0, (p - 1) / 2] */
+        if (!nmod_sqrt(&s, nmod_set_ui(x, radix->b), radix->b))
             return 0;                /* x is a unit but a non-residue mod p */
 
-        /* canonical choice of residue */
-        /* todo: it would be nice if this was simply enforced in n_sqrtmod */
-        if (s > (p - 1) / 2)
-            s = p - s;
+        if (s == 0)
+            return 0;                /* x is not a unit */
 
         y = n_invmod(s, p);          /* rsqrt mod p */
         if (e == 1)

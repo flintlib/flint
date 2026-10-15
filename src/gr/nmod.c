@@ -597,19 +597,15 @@ _gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
     if (gr_ctx_is_field(ctx) != T_TRUE)
         return GR_UNABLE;
 
-    res[0] = n_sqrtmod(x[0], NMOD_CTX(ctx).n);
-
-    if (res[0] == 0)
-        return GR_DOMAIN;
-    else
+    if (nmod_sqrt(res, x[0], NMOD_CTX(ctx)))
         return GR_SUCCESS;
+    else
+        return GR_DOMAIN;
 }
 
 static truth_t
 _gr_nmod_is_square(const ulong * x, gr_ctx_t ctx)
 {
-    ulong y;
-
     if (x[0] <= 1)
         return T_TRUE;
 
@@ -617,12 +613,9 @@ _gr_nmod_is_square(const ulong * x, gr_ctx_t ctx)
     if (gr_ctx_is_field(ctx) != T_TRUE)
         return T_UNKNOWN;
 
-    y = n_sqrtmod(x[0], NMOD_CTX(ctx).n);
-
-    if (y == 0)
-        return T_FALSE;
-    else
-        return T_TRUE;
+    /* the modulus is an odd prime, and the Jacobi symbol is cheaper
+       than computing a square root */
+    return (n_jacobi_unsigned(x[0], NMOD_CTX(ctx).n) == 1) ? T_TRUE : T_FALSE;
 }
 
 static int

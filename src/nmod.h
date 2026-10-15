@@ -274,6 +274,11 @@ nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
 ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod);
 ulong nmod_2_pow_ui(ulong exp, nmod_t mod);
 
+#define NMOD_SQRT_SMALL_CUTOFF 128
+
+int _nmod_sqrt_small(ulong * res, ulong a, ulong n);
+int nmod_sqrt(ulong * res, ulong a, nmod_t mod);
+
 NMOD_INLINE
 ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
 {

@@ -195,8 +195,7 @@ static int _nmod_mpoly_sqrt_heap1(
     _nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc,
                            &Qexps, &Q->exps_alloc, 1, Qlen + 1);
 
-    Qcoeffs[0] = n_sqrtmod(Acoeffs[0], mod.n);
-    if (Qcoeffs[0] == 0)
+    if (!nmod_sqrt(Qcoeffs + 0, Acoeffs[0], mod))
         goto not_sqrt;
 
     Qlen = 1;
@@ -209,7 +208,9 @@ static int _nmod_mpoly_sqrt_heap1(
 
     /* optimisation, compute final exponent */
     {
-        if (0 == n_sqrtmod(Acoeffs[Alen - 1], mod.n))
+        ulong t;
+
+        if (!nmod_sqrt(&t, Acoeffs[Alen - 1], mod))
             goto not_sqrt;
 
         if (!mpoly_monomial_halves1(&exp3, Aexps[Alen - 1], mask))
@@ -438,8 +439,7 @@ static int _nmod_mpoly_sqrt_heap(
     _nmod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc,
                            &Qexps, &Q->exps_alloc, N, Qlen + 1);
 
-    Qcoeffs[0] = n_sqrtmod(Acoeffs[0], mod.n);
-    if (Qcoeffs[0] == 0)
+    if (!nmod_sqrt(Qcoeffs + 0, Acoeffs[0], mod))
         goto not_sqrt;
 
     Qlen = 1;
@@ -454,7 +454,9 @@ static int _nmod_mpoly_sqrt_heap(
 
     /* optimisation, compute final term */
     {
-        if (0 == n_sqrtmod(Acoeffs[Alen - 1], mod.n))
+        ulong t;
+
+        if (!nmod_sqrt(&t, Acoeffs[Alen - 1], mod))
             goto not_sqrt;
 
         halves = mpoly_monomial_halves_any_bits(exp3, Aexps + (Alen - 1)*N, N, mask, bits);
