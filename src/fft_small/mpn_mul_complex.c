@@ -41,7 +41,16 @@
 
     Windows use the window plan (cyclic transforms when the window
     allows); the sign-magnitude outputs use the ordinary plan and the
-    staged exports, exact for lo = 0 and truncated otherwise.
+    staged exports, exact for lo = 0 and truncated otherwise, each
+    output reconstructing only the slots of its own products.
+
+    A full product (lo = 0) of a real or imaginary operand by a complex
+    one -- each output part a single product, the two sharing a part --
+    is exactly the task of _fft_small_mpn_mul_shared, and goes there:
+    its fused per-product pipeline was measured 5-30% faster than this
+    engine on such shapes (the engine's separate passes over all
+    operands cost some 5%, and forming the shorter product at the
+    length of the longer up to a further 25% for unbalanced parts).
 */
 
 typedef struct
@@ -259,6 +268,82 @@ _export_signed(nn_ptr z, slong lo, slong hi, const _out_struct * o,
     return (len == 0 || !sgn) ? (slong) len : -(slong) len;
 }
 
+/* whether [p, p + pn) and [q, q + qn) overlap */
+static int
+_overlap(nn_srcptr p, slong pn, nn_srcptr q, slong qn)
+{
+    return (p < q + qn) && (q < p + pn);
+}
+
+/* One operand with a single nonzero part: each output part is a single
+   product, the two sharing that part. These are the products of
+   _fft_small_mpn_mul_shared, whose fused per-product pipeline the
+   engine below cannot match: the engine makes the transforms, the
+   pointwise products and the inverse transforms separate passes over
+   all operands (in the two-prime range this alone costs some 5% over
+   the fused pipeline) and forms both products at the plan of the
+   longer. Returns 0 (doing nothing) for other shapes, windows not
+   starting at limb 0 or too short for the products, and outputs
+   overlapping an operand they must not. */
+static int
+_complex_shared(nn_ptr * z, slong * zlen, slong lo, slong hi,
+                const _part_struct * A, const _out_struct * out)
+{
+    const _term_struct * t0 = out[0].t, * t1 = out[1].t;
+    int c, p0, p1, k, first;
+    slong n0, n1;
+
+    if (lo != 0 || out[0].nt != 1 || out[1].nt != 1
+        || out[0].twice || out[1].twice
+        || t0->a == t0->b || t1->a == t1->b)
+        return 0;
+
+    /* the common part c and the other part of each product */
+    if (t0->a == t1->a || t0->a == t1->b)
+        c = t0->a;
+    else if (t0->b == t1->a || t0->b == t1->b)
+        c = t0->b;
+    else
+        return 0;
+    p0 = (t0->a == c) ? t0->b : t0->a;
+    p1 = (t1->a == c) ? t1->b : t1->a;
+
+    n0 = A[p0].n + A[c].n;
+    n1 = A[p1].n + A[c].n;
+    if (n0 > hi || n1 > hi)
+        return 0;
+
+    /* the output written first must not overlap the other product's
+       own operand; the common operand is read before either is
+       written (see _fft_small_mpn_mul_shared) */
+    if (!_overlap(z[0], hi, A[p1].d, A[p1].n))
+        first = 0;
+    else if (!_overlap(z[1], hi, A[p0].d, A[p0].n))
+        first = 1;
+    else
+        return 0;
+    if (_overlap(z[0], hi, z[1], hi))
+        return 0;
+
+    if (first == 0)
+        _fft_small_mpn_mul_shared(z[0], A[p0].d, A[p0].n,
+                                  z[1], A[p1].d, A[p1].n, A[c].d, A[c].n);
+    else
+        _fft_small_mpn_mul_shared(z[1], A[p1].d, A[p1].n,
+                                  z[0], A[p0].d, A[p0].n, A[c].d, A[c].n);
+
+    for (k = 0; k < 2; k++)
+    {
+        slong n = k ? n1 : n0, len = n;
+        flint_mpn_zero(z[k] + n, hi - n);
+        while (len > 0 && z[k][len - 1] == 0)
+            len--;
+        zlen[k] = (len == 0 || !out[k].t[0].e) ? len : -len;
+    }
+
+    return 1;
+}
+
 static int
 _complex_core(nn_ptr * z, slong * zlen, slong lo, slong hi, int mode,
               const _part_struct * A, int squaring)
@@ -276,6 +361,10 @@ _complex_core(nn_ptr * z, slong * zlen, slong lo, slong hi, int mode,
     FLINT_ASSERT(0 <= lo && lo < hi);
 
     _complex_terms(out, A, squaring);
+
+    if (mode == MODE_SIGNED && !squaring
+        && _complex_shared(z, zlen, lo, hi, A, out))
+        return 1;
 
     if (out[0].nt == 0 && out[1].nt == 0)
     {
@@ -375,8 +464,17 @@ _complex_core(nn_ptr * z, slong * zlen, slong lo, slong hi, int mode,
             _export_window(z[k], lo, hi, out + k, X + out[k].dest, terms,
                            nslots, P);
         else
+        {
+            /* the slots of this output's own products (no aliasing:
+               the sign-magnitude modes use the linear plan) */
+            ulong ns = 0;
+            int j2;
+            for (j2 = 0; j2 < out[k].nt; j2++)
+                ns = FLINT_MAX(ns, fft_small_plan_mpn_nslots(P,
+                        A[out[k].t[j2].a].n, A[out[k].t[j2].b].n));
             zlen[k] = _export_signed(z[k], lo, hi, out + k, X + out[k].dest,
-                                     terms, nslots, P, pool);
+                                     terms, ns, P, pool);
+        }
 
         fft_small_op_pool_give(pool, X[out[k].dest].data);
     }

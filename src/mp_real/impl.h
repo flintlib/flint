@@ -881,6 +881,44 @@ void _mp_real_sin_cos_sum_bs_powtab(nn_ptr A, slong * an, slong * ae,
     nn_ptr B, slong * bn, slong * be, nn_ptr Q, slong * qn,
     slong * QE, nn_srcptr xp, slong xn, slong D, slong N, slong lmax);
 
+/* transformed power tables for these splittings (powtab_pre.c): for
+   the table entries used by at least two merges, the transform of the
+   entry computed once, for partners of up to ymax[i] limbs */
+#ifndef MP_REAL_POWTAB_PRE_CUTOFF
+#define MP_REAL_POWTAB_PRE_CUTOFF 150
+#endif
+/* entries whose products exceed this many limbs are not transformed:
+   a transform takes about 2.8 doubles per limb of its longest product
+   and a tree keeps about twice its largest, so this bounds the extra
+   memory to some 50 MB per tree (at 10^7 digits the largest products
+   are 400000 limbs, all kept) */
+#ifndef MP_REAL_POWTAB_PRE_MAX_LIMBS
+#define MP_REAL_POWTAB_PRE_MAX_LIMBS (WORD(1) << 20)
+#endif
+
+typedef struct
+{
+    void * pre;             /* the transforms, or NULL */
+    double * storage;
+    slong len;
+}
+mp_real_powtab_pre_struct;
+
+/* for N terms split at fixed midpoints (ranges of 1 or 2 terms being
+   leaves): the number of merges using each step xexp[i] and their
+   longest right child */
+void _mp_real_bs_step_uses(slong * uses, slong * rmax, const slong * xexp,
+    slong len, slong N);
+void _mp_real_powtab_pre_init(mp_real_powtab_pre_struct * T,
+    nn_srcptr * xpow, const slong * xlen, const slong * uses,
+    const slong * ymax, slong len);
+void _mp_real_powtab_pre_clear(mp_real_powtab_pre_struct * T);
+/* z = xpow[i] y (xlen[i] + yn limbs, z may overlap y) through the
+   transform of entry i; returns 0, writing nothing, when the entry has
+   none or the product is outside its range */
+int _mp_real_powtab_pre_mul(nn_ptr z, const mp_real_powtab_pre_struct * T,
+    slong i, nn_srcptr y, slong yn);
+
 /* the diophantine reductions: the relation-table descent and the
    shared caches of log p_j and 2 arg(pi_j) (nv fraction limbs and
    a units limb per entry, exact floors) */
