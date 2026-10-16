@@ -159,6 +159,26 @@ _gr_fq_zech_set_fmpz(fq_zech_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* an integer exactly when x lies in the prime field */
+static int
+_gr_fq_zech_get_fmpz(fmpz_t res, const fq_zech_t x, const gr_ctx_t ctx)
+{
+    fq_nmod_t t;
+    int status = GR_SUCCESS;
+
+    fq_nmod_init(t, FQ_CTX(ctx)->fq_nmod_ctx);
+    fq_zech_get_fq_nmod(t, x, FQ_CTX(ctx));
+
+    if (nmod_poly_length(t) > 1)
+        status = GR_DOMAIN;
+    else
+        fmpz_set_ui(res, nmod_poly_get_coeff_ui(t, 0));
+
+    fq_nmod_clear(t, FQ_CTX(ctx)->fq_nmod_ctx);
+
+    return status;
+}
+
 static truth_t
 _gr_fq_zech_is_zero(const fq_zech_t x, const gr_ctx_t ctx)
 {
@@ -1062,6 +1082,7 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fq_zech_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fq_zech_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fq_zech_set_fmpz},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fq_zech_get_fmpz},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fq_zech_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fq_zech_add},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fq_zech_sub},

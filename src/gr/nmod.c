@@ -646,6 +646,14 @@ _gr_nmod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* Z/nZ has n elements, whether or not n is prime */
+static int
+_gr_nmod_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
 {
@@ -1862,6 +1870,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_nmod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_nmod_ctx_fq_prime},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, (gr_funcptr) _gr_nmod_ctx_cardinality_fmpz},
     {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _gr_nmod_poly_set_length_normalise},
     {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
     {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},

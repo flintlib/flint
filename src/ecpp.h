@@ -56,17 +56,6 @@ ecpp_cert_struct;
 
 typedef ecpp_cert_struct ecpp_cert_t[1];
 
-/* affine or Jacobian point on y^2 = x^3 + a x + b modulo n */
-typedef struct
-{
-    fmpz_t X;
-    fmpz_t Y;
-    fmpz_t Z;   /* Z = 0 is the point at infinity */
-}
-ecpp_point_struct;
-
-typedef ecpp_point_struct ecpp_point_t[1];
-
 /* certificate */
 
 void ecpp_cert_init(ecpp_cert_t cert);
@@ -83,18 +72,15 @@ int ecpp_cert_set_str(ecpp_cert_t cert, const char * str);
 
 /* elliptic curves modulo n */
 
-void ecpp_point_init(ecpp_point_t P);
-void ecpp_point_clear(ecpp_point_t P);
-void ecpp_point_set_affine(ecpp_point_t P, const fmpz_t x, const fmpz_t y);
-int ecpp_point_is_zero(const ecpp_point_t P);
-
 void ecpp_gr_ctx_init(gr_ctx_t gctx, const fmpz_mod_ctx_t ctx);
 
-int ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a,
-                                                gr_ptr acc, gr_ctx_t ctx);
+#define ECPP_POINT_OK           1
+#define ECPP_POINT_ZERO         0
+#define ECPP_POINT_WRONG_ORDER  -1
+#define ECPP_POINT_COMPOSITE    -2
 
-int ecpp_point_mul(ecpp_point_t R, const ecpp_point_t P, const fmpz_t k,
-                        const fmpz_t a, fmpz_t acc, const fmpz_mod_ctx_t ctx);
+int ecpp_point_check(const fmpz_t x, const fmpz_t y, const fmpz_t a,
+    const fmpz_t b, const fmpz_t k, const fmpz_t q, const fmpz_mod_ctx_t ctx);
 
 /* discriminants */
 
@@ -147,7 +133,6 @@ slong ecpp_disc_table(ecpp_disc_struct ** table, const ulong * primes,
 
 /* number theory helpers */
 
-int ecpp_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD);
 
 int ecpp_root_radicals(fmpz_t x, const fmpz_mod_poly_t f, flint_rand_t state,
                                                         const fmpz_mod_ctx_t ctx);

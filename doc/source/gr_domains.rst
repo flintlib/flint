@@ -113,6 +113,9 @@ Groups
     Initializes *ctx* to the modular group `\text{PSL}(2, \mathbb{Z})`
     with elements of type :type:`psl2z_t`.
 
+The group of points of an elliptic curve is created with
+:func:`gr_ec_ctx_init`; see :ref:`gr-ec`.
+
 .. function:: int gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
 
     Initializes *ctx* to the Dirichlet group `G_q`

@@ -292,6 +292,14 @@ _gr_nmod_redc_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* Z/nZ has n elements, whether or not n is prime */
+static int
+_gr_nmod_redc_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, GR_NMOD_REDC_N(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_nmod_redc_neg(ulong * res, const ulong * x, gr_ctx_t ctx)
 {
@@ -1887,6 +1895,7 @@ gr_method_tab_input __gr_nmod_redc_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
     {GR_METHOD_CTX_FQ_PRIME,    GR_FUNCPTR_CAST _gr_nmod_redc_ctx_fq_prime},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ, GR_FUNCPTR_CAST _gr_nmod_redc_ctx_cardinality_fmpz},
     {GR_METHOD_CTX_FQ_DEGREE,   GR_FUNCPTR_CAST gr_generic_ctx_fq_degree_prime_field},
     {GR_METHOD_CTX_FQ_ORDER,    GR_FUNCPTR_CAST gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_FQ_PTH_ROOT,     GR_FUNCPTR_CAST _gr_nmod_redc_set},

@@ -15,8 +15,7 @@
 #include "t-cert_str.c"
 #include "t-class_poly_genus.c"
 #include "t-class_poly_tower.c"
-#include "t-cornacchia.c"
-#include "t-point_mul.c"
+#include "t-point_check.c"
 #include "t-prove.c"
 #include "t-root_radicals.c"
 
@@ -27,8 +26,7 @@ test_struct tests[] =
     TEST_FUNCTION(ecpp_cert_str),
     TEST_FUNCTION(ecpp_class_poly_genus),
     TEST_FUNCTION(ecpp_class_poly_tower),
-    TEST_FUNCTION(ecpp_cornacchia),
-    TEST_FUNCTION(ecpp_point_mul),
+    TEST_FUNCTION(ecpp_point_check),
     TEST_FUNCTION(ecpp_prove),
     TEST_FUNCTION(ecpp_root_radicals)
 };
