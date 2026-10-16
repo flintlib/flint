@@ -952,6 +952,8 @@ void _nmod_poly_mul_mid_mpn_ctx(
 {
     ulong modbits = FLINT_BITS - mod.norm;
     ulong zn = an + bn - 1;
+    ulong mn = n_min(an, bn);
+    ulong mx = n_max(an, bn);
     ulong atrunc, btrunc;
     int squaring, success;
     fft_small_plan_t P;
@@ -983,10 +985,12 @@ void _nmod_poly_mul_mid_mpn_ctx(
     atrunc = _fft_small_len_trunc(an);
     btrunc = _fft_small_len_trunc(bn);
 
-    /* at most min(an, bn) <= bn products, each < 2^(2*modbits), accumulate
-       onto one output coefficient */
+    /* at most min(an, bn) products, each < 2^(2*modbits), accumulate onto
+       one output coefficient */
+    /* the direct-fft branch is gated on the longer operand, as in
+       _nmod_poly_mul_tr_mpn_ctx; nothing here depends on the operand order */
     success = fft_small_plan_init_nmod(P, R, zl, zh, zn,
-                        n_max(atrunc, btrunc), bn, 2*modbits, mod, bn);
+                        n_max(atrunc, btrunc), mn, 2*modbits, mod, mx);
     FLINT_ASSERT(success);
     (void) success;
 
@@ -1001,8 +1005,8 @@ void _nmod_poly_mul_mid_mpn_ctx(
     A.bfft_stride = 0;
     A.squaring = squaring;
     A.transposed = 0;
-    A.tune_n = bn;
-    A.min_an_bn = FLINT_MIN(an, bn);
+    A.tune_n = mn;
+    A.min_an_bn = mn;
     A.mod_fn = _mod_fn;
     A.s2_finish = NULL;
     A.crt_fn = _nmod_crt_fn(P->np);

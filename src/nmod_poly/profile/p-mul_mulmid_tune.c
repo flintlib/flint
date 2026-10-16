@@ -56,7 +56,8 @@
                                       #10 fft     _nmod_poly_mullow_fft_small
 
     #0 and #5 are the dispatchers, the others the algorithms they choose
-    from. #3 repacks the coefficients of moduli up to 23 bits when it can,
+    from. #3 drops the coefficients no output uses, repacks the
+    coefficients of moduli up to 23 (FFT_SMALL_MAX_REPACK) when it can,
     and otherwise computes the window as the transpose of the product of
     lengths fn and outlen (fft_small's transposed transforms) when that is
     shorter than the product of lengths fn and gn, and as a window of the
@@ -501,7 +502,7 @@ print_plan(slong fn, slong gn, nmod_t mod)
     slong outlen = gn - fn + 1;
 
     if (!fft_small_plan_init_nmod(P, get_default_mpn_ctx(), fn - 1, gn,
-                fn + gn - 1, xt, fn, 2 * NMOD_BITS(mod), mod, fn))
+                fn + gn - 1, xt, fn, 2 * NMOD_BITS(mod), mod, gn))
     {
         flint_printf(" |  -      -      -");
         return;

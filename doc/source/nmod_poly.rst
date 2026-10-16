@@ -813,10 +813,14 @@ Multiplication
 
     Multiplication via the *fft_small* module. Throws an error
     if *fft_small* is not available. The conditions on the arguments
-    are the same as for :func:`_nmod_poly_mullow`.
+    are the same as for :func:`_nmod_poly_mullow`; for
+    :func:`_nmod_poly_mulmid_fft_small`, ``z`` receives the coefficients
+    `[znlo, zn)` of the product, with `0 \le znlo < zn \le an + bn - 1`,
+    and the operands may be given in either order.
 
-    The window `[znlo, zn)` of the product is computed as the transpose of
-    the multiplication of the reversed shorter operand by a polynomial of
+    The coefficients of the operands that no output coefficient uses are
+    ignored. The window `[znlo, zn)` of the product is computed as the
+    transpose of the multiplication of the reversed shorter operand by a polynomial of
     length `zn - znlo` (see :func:`_nmod_poly_mul_tr_mpn_ctx`) whenever that
     transform is shorter than the one of the full product, which is the
     case for the usual middle products; otherwise it is taken as a window
