@@ -156,7 +156,7 @@ check_canonical_identity(flint_rand_t state)
         fmpz_poly_t z;
         gr_ptr c;
 
-        while (gr_ctx_init_nmod(R, n_randprime(state, 30 + n_randint(state, 30), 1)) != GR_SUCCESS)
+        while (gr_ctx_init_nmod(R, n_randprime(state, 30 + n_randint(state, FLINT_BITS - 30), 1)) != GR_SUCCESS)
             ;
 
         _init_phi(&phi, l, R);

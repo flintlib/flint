@@ -708,6 +708,9 @@ cleanup:
         gr_poly_clear(Jpow + d, R);
     for (m = 0; m <= (slong) l; m++)
     {
+        /* the windows are filled in place and may end in zeros */
+        _gr_poly_normalise(P + m, R);
+        _gr_poly_normalise(e + m, R);
         gr_poly_clear(P + m, R);
         gr_poly_clear(e + m, R);
     }
