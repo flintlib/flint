@@ -10,6 +10,7 @@
 */
 
 #include "fft_small.h"
+#include "butterflies.h"
 
 /*
     N is supposed to be a good fit for the number of points to process per loop
@@ -17,6 +18,10 @@
 
     M is supposed to be <= N and is used for truncation formulas that have
     a larger register pressure.
+
+    The butterflies (MOTH macros) and register basecases (LENGTH*INV) that are
+    not truncated are defined in butterflies.h, where they are shared with
+    sd_fft_tr.c.
 */
 
 #define N 8
@@ -38,17 +43,7 @@
     V ninv = V##_set_d(Q->pinv);
 
 #define RADIX_2_REVERSE_MOTH_J_IS_Z(V, X0, X1) \
-{ \
-    V x0, x1, y0, y1; \
-    x0 = V##_load(X0); \
-    x1 = V##_load(X1); \
-    y0 = V##_add(x0, x1); \
-    y1 = V##_sub(x0, x1); \
-    y0 = V##_reduce_to_pm1n(y0, n, ninv); \
-    y1 = V##_reduce_to_pm1n(y1, n, ninv); \
-    V##_store(X0, y0); \
-    V##_store(X1, y1); \
-}
+    SD_DIF2_MOTH_J_IS_Z(V, X0, X1)
 
 #define RADIX_2_REVERSE_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
     V W = V##_set_d(Q->w2tab[j_bits][j_mr]); \
@@ -56,17 +51,7 @@
     V ninv = V##_set_d(Q->pinv);
 
 #define RADIX_2_REVERSE_MOTH_J_IS_NZ(V, X0, X1) \
-{ \
-    V x0, x1, y0, y1; \
-    x0 = V##_load(X0); \
-    x1 = V##_load(X1); \
-    y0 = V##_add(x0, x1); \
-    y1 = V##_sub(x1, x0); \
-    y0 = V##_reduce_to_pm1n(y0, n, ninv); \
-    y1 = V##_mulmod_fast(y1, W, n, ninv); \
-    V##_store(X0, y0); \
-    V##_store(X1, y1); \
-}
+    SD_DIF2_MOTH_J_IS_NZ(V, mulmod_fast, W, X0, X1)
 
 #define _RADIX_2_REVERSE_PARAM_J_IS_Z(...)  RADIX_2_REVERSE_PARAM_J_IS_Z(__VA_ARGS__)
 #define _RADIX_2_REVERSE_MOTH_J_IS_Z(...)   RADIX_2_REVERSE_MOTH_J_IS_Z(__VA_ARGS__)
@@ -238,25 +223,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     V ninv = V##_set_d(Q->pinv); \
 
 #define RADIX_4_REVERSE_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = V##_load(X0); \
-    x1 = V##_load(X1); \
-    x2 = V##_load(X2); \
-    x3 = V##_load(X3); \
-    y0 = V##_add(x0, x1); \
-    y1 = V##_add(x2, x3); \
-    y2 = V##_sub(x0, x1); \
-    y3 = V##_sub(x2, x3); \
-    y0 = V##_reduce_to_pm1n(y0, n, ninv); \
-    y1 = V##_reduce_to_pm1n(y1, n, ninv); \
-    y2 = V##_reduce_to_pm1n(y2, n, ninv); \
-    y3 = V##_mulmod_fast(y3, IW, n, ninv); \
-    V##_store(X0, V##_add(y0, y1)); \
-    V##_store(X2, V##_sub(y0, y1)); \
-    V##_store(X1, V##_sub(y2, y3)); \
-    V##_store(X3, V##_add(y2, y3)); \
-}
+    SD_DIF4_MOTH_J_IS_Z(V, mulmod_fast, IW, X0, X1, X2, X3)
 
 #define RADIX_4_REVERSE_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
     V W  = V##_set_d(Q->w2tab[1+j_bits][2*j_mr+1]); \
@@ -266,31 +233,7 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
     V ninv = V##_set_d(Q->pinv); \
 
 #define RADIX_4_REVERSE_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = V##_load(X0); \
-    x1 = V##_load(X1); \
-    x2 = V##_load(X2); \
-    x3 = V##_load(X3); \
-    y0 = V##_add(x0, x1); \
-    y1 = V##_add(x2, x3); \
-    y2 = V##_sub(x0, x1); \
-    y3 = V##_sub(x3, x2); \
-    y2 = V##_mulmod_fast(y2, W, n, ninv); \
-    y3 = V##_mulmod_fast(y3, IW, n, ninv); \
-    x0 = V##_add(y0, y1); \
-    x1 = V##_sub(y3, y2); \
-    V##_store(X1, x1); \
-    x2 = V##_sub(y1, y0); \
-    x3 = V##_add(y3, y2); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    /* |x2| < 8n: may exceed the mulmod_fast range */ \
-    x2 = V##_mulmod(x2, W2, n, ninv); \
-    x3 = V##_mulmod_fast(x3, W2, n, ninv); \
-    V##_store(X0, x0); \
-    V##_store(X2, x2); \
-    V##_store(X3, x3); \
-}
+    SD_DIF4_MOTH_J_IS_NZ(V, mulmod_fast, mulmod, W2, W, IW, X0, X1, X2, X3)
 
 #define _RADIX_4_REVERSE_PARAM_J_IS_Z(...)  RADIX_4_REVERSE_PARAM_J_IS_Z(__VA_ARGS__)
 #define _RADIX_4_REVERSE_MOTH_J_IS_Z(...)   RADIX_4_REVERSE_MOTH_J_IS_Z(__VA_ARGS__)
@@ -298,94 +241,17 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
 #define _RADIX_4_REVERSE_MOTH_J_IS_NZ(...)  RADIX_4_REVERSE_MOTH_J_IS_NZ(__VA_ARGS__)
 
 
-#define LENGTH2INV_ANY_J(T, x0, x1, n, ninv, w0) \
-{ \
-   T Z0 = x0, Z1 = x1; \
-   x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
-   x1 = CAT(T, mulmod_fast)(CAT(T, sub)(Z1, Z0), w0, n, ninv); \
-}
+#define LENGTH2INV_ANY_J(T, ...) SD_DIF_LENGTH2_ANY_J(T, mulmod_fast, __VA_ARGS__)
 
-#define LENGTH2INV_ZERO_J(T, x0, x1, n, ninv) \
-{ \
-   T Z0 = x0, Z1 = x1; \
-   x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
-   x1 = CAT(T, reduce_to_pm1n)(CAT(T, sub)(Z0, Z1), n, ninv); \
-}
+#define LENGTH2INV_ZERO_J(T, ...) SD_DIF_LENGTH2_ZERO_J(T, __VA_ARGS__)
 
-#define LENGTH4INV_ANY_J(T, x0, x1, x2, x3, n, ninv, w0, ww0, ww1) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3; \
-    Y0 = CAT(T, add)(X0, X1); \
-    Y1 = CAT(T, add)(X2, X3); \
-    Y2 = CAT(T, sub)(X0, X1); \
-    Y3 = CAT(T, sub)(X3, X2); \
-    Y2 = CAT(T, mulmod_fast)(Y2, ww0, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
-    Z0 = CAT(T, add)(Y0, Y1); \
-    Z1 = CAT(T, sub)(Y3, Y2); \
-    Z2 = CAT(T, sub)(Y1, Y0); \
-    Z3 = CAT(T, add)(Y3, Y2); \
-    x0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
-    x1 = Z1; \
-    /* |Z2| < 8n: may exceed the mulmod_fast range */ \
-    x2 = CAT(T, mulmod)(Z2, w0, n, ninv); \
-    x3 = CAT(T, mulmod_fast)(Z3, w0, n, ninv); \
-}
+#define LENGTH4INV_ANY_J(T, ...) SD_DIF_LENGTH4_ANY_J(T, mulmod_fast, mulmod, __VA_ARGS__)
 
-#define LENGTH4INV_ZERO_J(T, x0, x1, x2, x3, n, ninv, ww1) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    Y0 = CAT(T, add)(X0, X1); \
-    Y1 = CAT(T, add)(X2, X3); \
-    Y2 = CAT(T, sub)(X0, X1); \
-    Y3 = CAT(T, sub)(X2, X3); \
-    Y0 = CAT(T, reduce_to_pm1n)(Y0, n, ninv); \
-    Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
-    Y2 = CAT(T, reduce_to_pm1n)(Y2, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
-    x0 = CAT(T, add)(Y0, Y1); \
-    x2 = CAT(T, sub)(Y0, Y1); \
-    x1 = CAT(T, sub)(Y2, Y3); \
-    x3 = CAT(T, add)(Y2, Y3); \
-}
+#define LENGTH4INV_ZERO_J(T, ...) SD_DIF_LENGTH4_ZERO_J(T, mulmod_fast, __VA_ARGS__)
 
-#define LENGTH8INV_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w0, ww0, ww1, www0, www1, www2, www3) \
-{ \
-    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
-    LENGTH2INV_ANY_J(T, A0,A1, n,ninv, www0) \
-    LENGTH2INV_ANY_J(T, A2,A3, n,ninv, www1) \
-    LENGTH2INV_ANY_J(T, A4,A5, n,ninv, www2) \
-    LENGTH2INV_ANY_J(T, A6,A7, n,ninv, www3) \
-    LENGTH4INV_ANY_J(T, A0,A2,A4,A6, n,ninv, w0,ww0,ww1) \
-    LENGTH4INV_ANY_J(T, A1,A3,A5,A7, n,ninv, w0,ww0,ww1) \
-    x0 = A0; \
-    x1 = A1; \
-    x2 = A2; \
-    x3 = A3; \
-    x4 = A4; \
-    x5 = A5; \
-    x6 = A6; \
-    x7 = A7; \
-}
+#define LENGTH8INV_ANY_J(T, ...) SD_DIF_LENGTH8_ANY_J(T, mulmod_fast, mulmod, __VA_ARGS__)
 
-#define LENGTH8INV_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, ww1, www2, www3) \
-{ \
-    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
-    LENGTH2INV_ZERO_J(T, A0,A1, n,ninv) \
-    LENGTH2INV_ANY_J(T, A2,A3, n,ninv, ww1) \
-    LENGTH2INV_ANY_J(T, A4,A5, n,ninv, www2) \
-    LENGTH2INV_ANY_J(T, A6,A7, n,ninv, www3) \
-    LENGTH4INV_ZERO_J(T, A0,A2,A4,A6, n,ninv, ww1) \
-    LENGTH4INV_ZERO_J(T, A1,A3,A5,A7, n,ninv, ww1) \
-    x0 = A0; \
-    x1 = A1; \
-    x2 = A2; \
-    x3 = A3; \
-    x4 = A4; \
-    x5 = A5; \
-    x6 = A6; \
-    x7 = A7; \
-}
+#define LENGTH8INV_ZERO_J(T, ...) SD_DIF_LENGTH8_ZERO_J(T, mulmod_fast, __VA_ARGS__)
 
 /************ basecase inverse transform of size dividing BLK_SZ *****************/
 
