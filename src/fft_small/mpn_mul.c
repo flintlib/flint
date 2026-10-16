@@ -856,6 +856,7 @@ static void CAT(_mpn_from_ffts, NP)( \
                 ulong l = 0; \
  \
                 CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+                CRT_UNROLL_PRIMES \
                 for (l++; l < np; l++) \
                     CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
@@ -891,6 +892,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong l = 0; \
  \
             CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
                 CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
@@ -917,6 +919,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong l = 0; \
  \
             CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
                 CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
@@ -964,6 +967,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
  \
             CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
             { \
                 xx = (d + l*dstride)[i]; \

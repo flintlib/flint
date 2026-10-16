@@ -62,6 +62,7 @@ static void CAT(_sig_block, NP)(ulong * W, ulong wlen, ulong A, ulong bits, \
  \
         CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime( \
                 (crt_data_struct *) Cd, l, N), Xs[l * BLK_SZ + j]); \
+        CRT_UNROLL_PRIMES \
         for (l++; l < NP; l++) \
             CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime( \
                     (crt_data_struct *) Cd, l, N), Xs[l * BLK_SZ + j]); \
