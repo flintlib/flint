@@ -384,6 +384,7 @@ static void _crt_2(
     ulong t[2]; \
     ulong l = 0; \
     CAT3(_big_mul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CRT_UNROLL_PRIMES \
     for (l++; l < np; l++) \
         CAT3(_big_addmul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
     CAT(_reduce_big_sum, 2)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
@@ -584,6 +585,7 @@ static void _crt_3(
     ulong t[3]; \
     ulong l = 0; \
     CAT3(_big_mul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CRT_UNROLL_PRIMES \
     for (l++; l < np; l++) \
         CAT3(_big_addmul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
     CAT(_reduce_big_sum, 3)(r, t, crt_data_prod_primes(Rcrts + np - 1));
