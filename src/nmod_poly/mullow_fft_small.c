@@ -377,7 +377,9 @@ _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b,
     Cauchy-Schwarz, but typically be less tight.
     */
 
-    aeven = (an % 2) ? a[an - 1] : 0;
+    /* If an is odd, the last coefficient is an even-indexed one without
+       an odd partner; it must enter the sum of squares squared. */
+    aeven = (an % 2) ? (uint32_t) a[an - 1] * (uint32_t) a[an - 1] : 0;
     aodd = 0;
     for (i = 0; i + 1 < an; i += 2)
     {
@@ -395,7 +397,7 @@ _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b,
     }
     else
     {
-        beven = (bn % 2) ? b[bn - 1] : 0;
+        beven = (bn % 2) ? (uint32_t) b[bn - 1] * (uint32_t) b[bn - 1] : 0;
         bodd = 0;
         for (i = 0; i + 1 < bn; i += 2)
         {
