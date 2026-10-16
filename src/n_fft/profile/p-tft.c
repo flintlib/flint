@@ -1,3 +1,14 @@
+/*
+    Copyright (C) 2025 Vincent Neiger
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
 #include "profiler.h"
 #include "nmod_vec.h"
 #include "fft_small.h"
@@ -91,9 +102,9 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     FLINT_TEST_CLEAR(state);                                                     \
 }                                                                                \
 
-SAMPLE(tft_lazy_1_4, )
+SAMPLE(_n_fft_tft_lazy_1_4, )
 
-SAMPLE_OLEN(tft_node_lazy_4_4, )
+SAMPLE_OLEN(_n_fft_tft_node_lazy_4_4, )
 
 void sample_sd_fft(void * arg, ulong count)
 {
@@ -183,8 +194,8 @@ int main()
                 {
                     info.olen = olens[oli];
                     if (k < 5) prof_repeat(min_sd+oli, &max, sample_sd_fft, (void *) &info);
-                    prof_repeat(min+oli, &max, sample_tft_lazy_1_4, (void *) &info);
-                    prof_repeat(min_olen+oli, &max, sample_tft_node_lazy_4_4, (void *) &info);
+                    prof_repeat(min+oli, &max, sample__n_fft_tft_lazy_1_4, (void *) &info);
+                    prof_repeat(min_olen+oli, &max, sample__n_fft_tft_node_lazy_4_4, (void *) &info);
                 }
 
                 flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",

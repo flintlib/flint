@@ -24,16 +24,16 @@
  * - The main interface is n_fft_dft, it solves the problem at node 0
  *   (evaluating at all roots of unity of order 2**depth), as documented
  *   in n_fft.h.
- * - The core function is `dft_node_lazy_4_4`, which goes down the subproduct
+ * - The core function is `_n_fft_dft_node_lazy_4_4`, which goes down the subproduct
  *   tree from an arbitrary node in this tree; it takes input values in [0..4n)
  *   and return values in [0..4n), following the idea of lazy butterflies
  *   highlighted by David Harvey [Faster arithmetic for number-theoretic
  *   transforms, Journal of Symbolic Computation, Volume 60, 2014, pp 113-119].
  * - This core function costs more than a DFT at node 0, at least for small or
  *   smallish lengths. So a specific function for node 0 is given
- *   (`dft_lazy_1_4`), targeting input values in [0..n) and return values in
- *   [0..4n) (it iself uses a similar function `dft_lazy_2_4`). The main
- *   function `n_fft_dft` just calls `dft_lazy_1_4` and then reduces the output
+ *   (`_n_fft_dft_lazy_1_4`), targeting input values in [0..n) and return values in
+ *   [0..4n) (it iself uses a similar function `_n_fft_dft_lazy_2_4`). The main
+ *   function `n_fft_dft` just calls `_n_fft_dft_lazy_1_4` and then reduces the output
  *   to [0..n).
  */
 
@@ -55,15 +55,15 @@
  * - The main interface is n_fft_tft, it solves the problem at node 0
  *   (evaluating at roots of unity of order 2**depth), as documented
  *   in n_fft.h.
- * - The core function is `tft_node_lazy_4_4`, which goes down the subproduct
+ * - The core function is `_n_fft_tft_node_lazy_4_4`, which goes down the subproduct
  *   tree from an arbitrary node in this tree; it takes input values in [0..4n)
  *   and return values in [0..4n), following the idea of lazy butterflies
  *   highlighted by David Harvey [Faster arithmetic for number-theoretic
  *   transforms, Journal of Symbolic Computation, Volume 60, 2014, pp 113-119].
  * - This core function costs more than a TFT at node 0, at least for small or
  *   smallish lengths. So a specific function for node 0 is given
- *   (`tft_lazy_1_4`), targeting input values in [0..n) and return values in
- *   [0..4n). The main function `n_fft_tft` just calls `tft_lazy_1_4` and then
+ *   (`_n_fft_tft_lazy_1_4`), targeting input values in [0..n) and return values in
+ *   [0..4n). The main function `n_fft_tft` just calls `_n_fft_tft_lazy_1_4` and then
  *   reduces the output to [0..n).
  */
 
@@ -107,15 +107,17 @@
  *          [p(w_k), p(-w_k)] for k in range(len/2),
  * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
  * * By construction these evaluation points are the len roots of the
- * polynomial x**len - F->tab_w[2*node] (for example, if depth=
+ * polynomial x**len - F->tab_w[2*node]**2 (for example, if depth == 3 and
+ * node == 1, this is x**8 - I**2 == x**8 + 1, whose roots are the primitive
+ * 16-th roots of unity +-K, +-IK, +-JK, +-IJK where K**2 == J)
  * * Requirements (not checked):
- *        3 <= depth
- *        (node+1) * 2**depth < 2**F->depth (length of F->tab_w)
+ *        2 <= depth
+ *        (node+1) * 2**depth <= 2**F->depth (length of F->tab_w)
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
-void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
+void _n_fft_dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    if (depth == 2)  /* TODO added base case, check it does not impact performance */
+    if (depth == 2)  /* TODO[perf] check this added base case does not impact performance */
     {
         DFT4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
                            F->tab_w[2*node+0], F->tab_w[2*node+1],    
@@ -152,25 +154,25 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         const nn_ptr p2 = p+2*len/4;
         const nn_ptr p3 = p+3*len/4;
         const ulong w2 = F->tab_w[2*node];
-        const ulong w2pre = F->tab_w[2*node+1];
+        const ulong w2_pr = F->tab_w[2*node+1];
         const ulong w = F->tab_w[4*node];
-        const ulong wpre = F->tab_w[4*node+1];
+        const ulong w_pr = F->tab_w[4*node+1];
         const ulong Iw = F->tab_w[4*node+2];
-        const ulong Iwpre = F->tab_w[4*node+3];
+        const ulong Iw_pr = F->tab_w[4*node+3];
 
         for (ulong k = 0; k < len/4; k+=4)
         {
-            DFT4_NODE_LAZY_4_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
         }
 
         // 4 recursive calls with depth-2
-        dft_node_lazy_4_4(p0, depth-2, 4*node, F);
-        dft_node_lazy_4_4(p1, depth-2, 4*node+1, F);
-        dft_node_lazy_4_4(p2, depth-2, 4*node+2, F);
-        dft_node_lazy_4_4(p3, depth-2, 4*node+3, F);
+        _n_fft_dft_node_lazy_4_4(p0, depth-2, 4*node, F);
+        _n_fft_dft_node_lazy_4_4(p1, depth-2, 4*node+1, F);
+        _n_fft_dft_node_lazy_4_4(p2, depth-2, 4*node+2, F);
+        _n_fft_dft_node_lazy_4_4(p3, depth-2, 4*node+3, F);
     }
 }
 
@@ -181,9 +183,9 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  *             requirement (not checked): 3 <= depth <= F->depth
  */
-void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
+void _n_fft_dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 2)  /* TODO added base case, check it does not impact performance */
+    if (depth == 2)  /* TODO[perf] check this added base case does not impact performance */
     {
         DFT4_LAZY_2_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
     }
@@ -224,14 +226,14 @@ void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
         }
 
         // 4 recursive calls with depth-2
-        dft_lazy_2_4(p0, depth-2, F);
-        dft_node_lazy_4_4(p1, depth-2, 1, F);
-        dft_node_lazy_4_4(p2, depth-2, 2, F);
-        dft_node_lazy_4_4(p3, depth-2, 3, F);
+        _n_fft_dft_lazy_2_4(p0, depth-2, F);
+        _n_fft_dft_node_lazy_4_4(p1, depth-2, 1, F);
+        _n_fft_dft_node_lazy_4_4(p2, depth-2, 2, F);
+        _n_fft_dft_node_lazy_4_4(p3, depth-2, 3, F);
     }
 }
 
-void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
+void _n_fft_dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 4)
     {
@@ -266,10 +268,10 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
         }
 
         // 4 recursive calls with depth-2
-        dft_lazy_2_4(p0, depth-2, F);
-        dft_node_lazy_4_4(p1, depth-2, 1, F);
-        dft_node_lazy_4_4(p2, depth-2, 2, F);
-        dft_node_lazy_4_4(p3, depth-2, 3, F);
+        _n_fft_dft_lazy_2_4(p0, depth-2, F);
+        _n_fft_dft_node_lazy_4_4(p1, depth-2, 1, F);
+        _n_fft_dft_node_lazy_4_4(p2, depth-2, 2, F);
+        _n_fft_dft_node_lazy_4_4(p3, depth-2, 3, F);
     }
     else if (depth == 3)
     {
@@ -289,17 +291,17 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 /*  TFT: auxiliary functions  */
 /*----------------------------*/
 
-/* TODO fewer base cases in node_lazy_4_4, more base cases in lazy_1_4 */
+/* TODO[perf] fewer base cases in node_lazy_4_4, more base cases in lazy_1_4 */
 
 /** truncated Fourier transform, ilen == len, general node
- * * same as dft_node_lazy_4_4, also with its requirements on depth and node,
+ * * same as _n_fft_dft_node_lazy_4_4, also with its requirements on depth and node,
  * but only computes the first olen evaluations
  * * Input requirements:
  *        ilen is len == 2**depth, power of 2 at least 4
  *        0 < olen <= len is a multiple of 4
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
-void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
+void _n_fft_tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 2)
     {
@@ -428,7 +430,7 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
     }
     else if (olen == (UWORD(1) << depth))
     {
-        dft_node_lazy_4_4(p, depth, node, F);
+        _n_fft_dft_node_lazy_4_4(p, depth, node, F);
     }
     else if (olen <= (UWORD(1) << (depth - 1)))
     {
@@ -437,10 +439,11 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
         node = node << (depth - new_depth);
         depth = new_depth;
 
-        /* reduce p1 mod x**(len_rec) - root */
+        /* reduce p mod x**len_rec - tab_w[2*node]**2; since node is even here, */
+        /* tab_w[2*node]**2 == tab_w[node] (with precomputation tab_w[node+1]) */
         ulong len_rec = UWORD(1) << depth;
-        _nmod_poly_divrem_circulant_lazy_4_4(p, len, len_rec, F->tab_w[node], F->tab_w[node+1], F->mod, F->mod2);
-        tft_node_lazy_4_4(p, olen, depth, node, F);
+        _n_fft_divrem_circulant_lazy_4_4(p, len, len_rec, F->tab_w[node], F->tab_w[node+1], F->mod, F->mod2);
+        _n_fft_tft_node_lazy_4_4(p, olen, depth, node, F);
     }
     else
     {
@@ -453,45 +456,52 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
         const nn_ptr p0 = p;
         const nn_ptr p1 = p + len/2;
         const ulong w = F->tab_w[2*node];
-        const ulong wpre = F->tab_w[2*node+1];
+        const ulong w_pr = F->tab_w[2*node+1];
         for (ulong k = 0; k < len/2; k+=4)
         {
-            DFT2_NODE_LAZY_4_4(p0[k+0], p1[k+0], w, wpre, F->mod, F->mod2);
-            DFT2_NODE_LAZY_4_4(p0[k+1], p1[k+1], w, wpre, F->mod, F->mod2);
-            DFT2_NODE_LAZY_4_4(p0[k+2], p1[k+2], w, wpre, F->mod, F->mod2);
-            DFT2_NODE_LAZY_4_4(p0[k+3], p1[k+3], w, wpre, F->mod, F->mod2);
+            DFT2_NODE_LAZY_4_4(p0[k+0], p1[k+0], w, w_pr, F->mod, F->mod2);
+            DFT2_NODE_LAZY_4_4(p0[k+1], p1[k+1], w, w_pr, F->mod, F->mod2);
+            DFT2_NODE_LAZY_4_4(p0[k+2], p1[k+2], w, w_pr, F->mod, F->mod2);
+            DFT2_NODE_LAZY_4_4(p0[k+3], p1[k+3], w, w_pr, F->mod, F->mod2);
         }
 
-        dft_node_lazy_4_4(p0, depth-1, 2*node, F);
-        tft_node_lazy_4_4(p1, olen - len/2, depth-1, 2*node+1, F);
+        _n_fft_dft_node_lazy_4_4(p0, depth-1, 2*node, F);
+        _n_fft_tft_node_lazy_4_4(p1, olen - len/2, depth-1, 2*node+1, F);
     }
 }
 
 /** truncated Fourier transform, general ilen, node 0
- * * similar to dft_lazy_1_4, but accepts p of arbitrary length and only
+ * * similar to _n_fft_dft_lazy_1_4, but accepts p of arbitrary length and only
  * computes the first olen evaluations
- * * same requirements on depth and node as in dft_lazy_1_4, where here depth
+ * * same requirements on depth and node as in _n_fft_dft_lazy_1_4, where here depth
  * is understood as ceiling(log_2(olen))
  * * Input requirements:
- *        ilen is a multiple of 4, at least 8
+ *        ilen is a positive multiple of 4
  *        olen is a positive multiple of 4
- *           (exception: ilen==4 is accepted when olen==4)
  *        p has space for max(ilen, len) coefficients where len = 1<<depth, and
  *        if ilen < len then coefficients ilen..len-1 may be modified by the
  *        algorithm
+ *        (ilen == 4 with olen > 4 is handled by zero-padding p to length 8:
+ *        p[4..8) are overwritten, which is allowed since here len >= 8)
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  *
  * NOTE: some calls could be lazier, but the gain should be quite modest:
- *     [comment1]   dft_node_lazy_4_4 -> could benefit from lazy_2_4
+ *     [comment1]   _n_fft_dft_node_lazy_4_4 -> could benefit from lazy_2_4
  *     [comment2]  DFT2_NODE_LAZY_4_4 -> could benefit from LAZY_1_4
  */
-void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
+void _n_fft_tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
 {
-    /* some recursive calls arrive at this base case */
-    if (olen == 4 && ilen == 4)
+    if (ilen == 4)
     {
-        DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-        return;
+        /* base case, also reached by some recursive calls */
+        if (olen == 4)
+        {
+            DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+            return;
+        }
+        /* the recursion below needs ilen >= 8: zero-pad (len >= 8 here) */
+        p[4] = p[5] = p[6] = p[7] = UWORD(0);
+        ilen = 8;
     }
 
     const ulong odepth = n_clog2_ge2(olen);
@@ -501,8 +511,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
     if (idepth > odepth)
     {
         const ulong len = UWORD(1) << odepth;
-        _nmod_poly_divrem_circulant1(p, ilen, len, F->mod);
-        tft_lazy_1_4(p, len, olen, F);
+        _n_fft_divrem_circulant1(p, ilen, len, F->mod);
+        _n_fft_tft_lazy_1_4(p, len, olen, F);
     }
 
     /* ilen ~ olen: recurse into dft + tft at half length */
@@ -516,8 +526,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
             DFT2_LAZY_1_2(p0[k], p1[k], F->mod);
         for (; k < len/2; k++)
             p1[k] = p0[k];
-        dft_lazy_2_4(p0, odepth - 1, F);
-        tft_node_lazy_4_4(p1, olen - len/2, odepth - 1, 1, F);
+        _n_fft_dft_lazy_2_4(p0, odepth - 1, F);
+        _n_fft_tft_node_lazy_4_4(p1, olen - len/2, odepth - 1, 1, F);
     }
 
     /* if ilen ~ olen/2, do special butterfly and recurse */
@@ -553,9 +563,9 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
             }
 
             /* recursive calls */
-            dft_lazy_2_4(p0, idepth - 1, F);
-            dft_node_lazy_4_4(p1, idepth - 1, 1, F);
-            tft_node_lazy_4_4(p2, olen - ilen2, idepth - 1, 2, F);
+            _n_fft_dft_lazy_2_4(p0, idepth - 1, F);
+            _n_fft_dft_node_lazy_4_4(p1, idepth - 1, 1, F);
+            _n_fft_tft_node_lazy_4_4(p2, olen - ilen2, idepth - 1, 2, F);
         }
         else
         {
@@ -585,10 +595,10 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
                 p2[k] = tmp0;
                 p3[k] = tmp0;
             }
-            dft_lazy_2_4(p0, idepth - 1, F);
-            dft_node_lazy_4_4(p1, idepth - 1, 1, F);
-            dft_node_lazy_4_4(p2, idepth - 1, 2, F);
-            tft_node_lazy_4_4(p3, olen - ilen2 - len_rec, idepth - 1, 3, F);
+            _n_fft_dft_lazy_2_4(p0, idepth - 1, F);
+            _n_fft_dft_node_lazy_4_4(p1, idepth - 1, 1, F);
+            _n_fft_dft_node_lazy_4_4(p2, idepth - 1, 2, F);
+            _n_fft_tft_node_lazy_4_4(p3, olen - ilen2 - len_rec, idepth - 1, 3, F);
         }
     }
 
@@ -615,8 +625,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
             p[len_rec + k] = val;
             pp[k] = val;
         }
-        dft_lazy_2_4(p, idepth - 1, F);
-        dft_node_lazy_4_4(p+len_rec, idepth - 1, 1, F);  /* [comment1] */
+        _n_fft_dft_lazy_2_4(p, idepth - 1, F);
+        _n_fft_dft_node_lazy_4_4(p+len_rec, idepth - 1, 1, F);  /* [comment1] */
 
         /* update */
         p += ilen2;
@@ -642,8 +652,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
                 p[len_rec + k] = val;
                 pp[k] = val;
             }
-            dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
-            dft_node_lazy_4_4(p+len_rec, idepth - 1, 2*i+1, F);
+            _n_fft_dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
+            _n_fft_dft_node_lazy_4_4(p+len_rec, idepth - 1, 2*i+1, F);
 
             p += ilen2;
             pp += ilen2;
@@ -661,8 +671,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
             }
             for (; k < len_rec; k++)
                 p[len_rec + k] = p[k];
-            dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
-            tft_node_lazy_4_4(p+len_rec, olen - len_rec, idepth - 1, 2*i+1, F);
+            _n_fft_dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
+            _n_fft_tft_node_lazy_4_4(p+len_rec, olen - len_rec, idepth - 1, 2*i+1, F);
         }
         else
         {
@@ -672,7 +682,7 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
                                      F->tab_w[2*i], F->tab_w[2*i+1],
                                      F->mod, F->mod2);
             }
-            tft_node_lazy_4_4(p, olen, idepth - 1, 2*i, F);
+            _n_fft_tft_node_lazy_4_4(p, olen, idepth - 1, 2*i, F);
         }
     }
 }
@@ -688,7 +698,7 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
     {
         n_fft_args_t Fargs;
         n_fft_set_args(Fargs, F->mod, F->tab_w);
-        dft_lazy_1_4(p, depth, Fargs);
+        _n_fft_dft_lazy_1_4(p, depth, Fargs);
         for (ulong k = 0; k < (UWORD(1) << depth); k++)
         {
             if (p[k] >= Fargs->mod2)
@@ -706,7 +716,7 @@ void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
     {
         n_fft_args_t Fargs;
         n_fft_set_args(Fargs, F->mod, F->tab_iw);
-        dft_lazy_1_4(p, depth, Fargs);
+        _n_fft_dft_lazy_1_4(p, depth, Fargs);
         
         // see comments in idft concerning this loop
         const ulong inv2 = F->tab_inv2[2*depth-2];
@@ -716,15 +726,18 @@ void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
     }
 }
 
-/* olen >= 0, ilen >= 0, both multiples of 4 */
+/* olen >= 0, ilen >= 0, both multiples of 4 (see n_fft.h) */
 /* p has length max(ilen, next_power_of_two(olen)) */
 void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F)
 {
+    FLINT_ASSERT(ilen % 4 == 0 && olen % 4 == 0);
+    FLINT_ASSERT(olen <= (UWORD(1) << F->depth));
+
     if (olen > 0 && ilen > 0)
     {
         n_fft_args_t Fargs;
         n_fft_set_args(Fargs, F->mod, F->tab_w);
-        tft_lazy_1_4(p, ilen, olen, Fargs);
+        _n_fft_tft_lazy_1_4(p, ilen, olen, Fargs);
         for (ulong k = 0; k < olen; k++)
         {
             if (p[k] >= Fargs->mod2)
@@ -752,12 +765,12 @@ void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F)
 /** Lazier variants for DFT with general node:
  * - lazy_1_4 variants would be basically identical to the lazy_2_4 variants (see the macros)
  * - writing lazy_2_4 variants of the DFTxx_NODE_LAZY_4_4 macros and then of
- * dft_node_lazy_4_4 brings almost no speedup (very marginal gain up to length
+ * _n_fft_dft_node_lazy_4_4 brings almost no speedup (very marginal gain up to length
  * 32 or 64, nothing observable beyond this)
  */
 
 /** Base cases:
  * - having macros for "small" lengths (up to 16 or 32 at least) improves performance
  * - removing the base cases depth==3 in internal functions where this case is
- *   not really used (eg dft_node_lazy_4_4) does not make a difference
+ *   not really used (eg _n_fft_dft_node_lazy_4_4) does not make a difference
  */

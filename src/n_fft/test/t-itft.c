@@ -59,19 +59,13 @@ TEST_FUNCTION_START(n_fft_itft, state)
         {
             const ulong len = (UWORD(1) << depth);
             ulong iolen, iolen4;
-            iolen = 1+len/2 + n_randint(state, len/2);  /* (len/2, len] */
-            /* iolen = FLINT_MIN(len, 48); */
+            if (n_randint(state, 4) == 0)
+                iolen = 1 + n_randint(state, 12);  /* small, including <= 2 */
+            else
+                iolen = 1 + n_randint(state, len);  /* [1, len] */
             ulong plen = n_fft_itft_prepare(&iolen4, iolen, F);
-
-            /* flint_printf("---\n" */
-            /*         "prime = %wu\n" */
-            /*         "len = %wu\n" */
-            /*         "iolen = %wu\n" */
-            /*         "iolen4 = %wu\n" */
-            /*         "root of unity = %wu\n" */
-            /*         "max_depth = %wu\n" */
-            /*         "depth = %wu\n", */
-            /*         prime, len, iolen, iolen4, F->tab_w2[2*(max_depth-2)], max_depth, depth); */
+            /* p below needs len entries for the full-length DFT */
+            const ulong plen2 = FLINT_MAX(plen, len);
 
             // choose random poly of degree < iolen4
             nmod_poly_t pol;
@@ -79,17 +73,17 @@ TEST_FUNCTION_START(n_fft_itft, state)
             nmod_poly_randtest(pol, state, iolen4);
 
             // find evals via full-length DFT
-            nn_ptr p = _nmod_vec_init(plen);
+            // (the first iolen4 evaluation points at depth are the same as those
+            // at any smaller depth >= ceil(log_2(iolen4)), by the bit-reversed order)
+            nn_ptr p = _nmod_vec_init(plen2);
             _nmod_vec_set(p, pol->coeffs, pol->length);
-            _nmod_vec_zero(p + pol->length, plen - pol->length);
+            _nmod_vec_zero(p + pol->length, plen2 - pol->length);
             n_fft_dft(p, depth, F);
 
-            /* make sure high degree coefficients do not matter */
-            _nmod_vec_randtest(p+iolen4, state, plen - iolen4, mod);  /* FIXME iolen4 */
-            /* _nmod_vec_zero(p+iolen4, len - iolen4);  /1* FIXME iolen4 *1/ */
+            /* make sure entries beyond iolen4 do not matter */
+            _nmod_vec_randtest(p+iolen4, state, plen2 - iolen4, mod);
 
             /* apply itft */
-
             n_fft_itft(p, iolen4, F);
 
             int res = _nmod_vec_equal(p, pol->coeffs, pol->length) && _nmod_vec_is_zero(p + pol->length, iolen4 - pol->length);

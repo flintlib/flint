@@ -59,24 +59,20 @@ TEST_FUNCTION_START(n_fft_tft, state)
         {
             const ulong len = (UWORD(1) << depth);
             ulong plen, ilen, ilen4, olen, olen4;
-            ilen = 5 + n_randint(state, 4*len);  /* [5, 4*len] */
-            /* FIXME handle smaller ilen */
-            olen = 1+len/2 + n_randint(state, len/2);  /* (len/2, len] */
+            if (n_randint(state, 4) == 0)
+            {
+                /* small lengths, including ilen <= 4 and olen <= 8 */
+                ilen = 1 + n_randint(state, 12);
+                olen = 1 + n_randint(state, 12);
+            }
+            else
+            {
+                ilen = 1 + n_randint(state, 4*len);  /* [1, 4*len] */
+                olen = 1 + n_randint(state, len);    /* [1, len] */
+            }
             plen = n_fft_tft_prepare(&ilen4, &olen4, ilen, olen, F);
-
-            /* flint_printf("---\n" */
-            /*         "prime = %wu\n" */
-            /*         "ilen = %wu\n" */
-            /*         "olen = %wu\n" */
-            /*         "ilen4 = %wu\n" */
-            /*         "olen4 = %wu\n" */
-            /*         "plen = %wu\n" */
-            /*         "root of unity = %wu\n" */
-            /*         "max_depth = %wu\n" */
-            /*         "depth = %wu\n", */
-            /*         prime, ilen, olen, */
-            /*         ilen4, olen4, plen, */
-            /*         F->tab_w2[2*(max_depth-2)], max_depth, depth); */
+            /* evals_br below needs len entries for the full-length DFT */
+            const ulong plen2 = FLINT_MAX(plen, len);
 
             // choose random poly of degree < ilen
             nmod_poly_t pol;
@@ -84,29 +80,20 @@ TEST_FUNCTION_START(n_fft_tft, state)
             nmod_poly_randtest(pol, state, ilen);
 
             // find evals via full-length DFT
-            nn_ptr evals_br = _nmod_vec_init(plen);
+            // (the first olen evaluation points at depth are the same as those
+            // at any smaller depth >= ceil(log_2(olen)), by the bit-reversed order)
+            nn_ptr evals_br = _nmod_vec_init(plen2);
             _nmod_vec_set(evals_br, pol->coeffs, pol->length);
-            _nmod_vec_zero(evals_br + pol->length, plen - pol->length);
+            _nmod_vec_zero(evals_br + pol->length, plen2 - pol->length);
             if (pol->length > (slong)len)
-                _nmod_poly_divrem_circulant1(evals_br, plen, len, prime);
+                _n_fft_divrem_circulant1(evals_br, plen2, len, prime);
             n_fft_dft(evals_br, depth, F);
 
             // find evals by TFT
             nn_ptr p = _nmod_vec_init(plen);
             _nmod_vec_set(p, pol->coeffs, pol->length);
             _nmod_vec_zero(p + pol->length, plen - pol->length);
-            n_fft_args_t Fargs;
-            n_fft_set_args(Fargs, F->mod, F->tab_w);
             n_fft_tft(p, ilen4, olen4, F);
-
-            /* tft_lazy_1_4(p, ilen4, olen4, Fargs); */
-            /* for (ulong k = 0; k < olen; k++) */
-            /* { */
-            /*     if (p[k] >= 2*prime) */
-            /*         p[k] -= 2*prime; */
-            /*     if (p[k] >= prime) */
-            /*         p[k] -= prime; */
-            /* } */
 
             int res = _nmod_vec_equal(evals_br, p, olen);
 

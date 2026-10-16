@@ -44,7 +44,7 @@ do {                                               \
 
 /** 4-point TFT, evaluation, general node, truncated at 2
  * * same as DFT4_NODE_LAZY_4_4 but only computes first 2 evaluations in a,b;
- * the elements b,c may be modified
+ * the elements c,d are left unchanged (w3, w3_pr are not needed)
  * * note: TFT4_1 would be almost the same as TFT4_2,
  *     and TFT4_3 would be almost the same as DFT4
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
@@ -57,22 +57,22 @@ do {                                                 \
     ulong u1 = (b);                                  \
     ulong u2 = (c);                                  \
     ulong u3 = (d);                                  \
-    if (u0 >= n2)                                    \
-        u0 -= n2;                                    \
-    if (u1 >= n2)                                    \
-        u1 -= n2;                                    \
+    if (u0 >= (n2))                                  \
+        u0 -= (n2);                                  \
+    if (u1 >= (n2))                                  \
+        u1 -= (n2);                                  \
                                                      \
     N_MULMOD_PRECOMP_LAZY(u2, w1, u2, w1_pr, n);     \
     u0 = u0 + u2;                    /* [0..4n) */   \
-    if (u0 >= n2)                                    \
-        u0 -= n2;                    /* [0..2n) */   \
+    if (u0 >= (n2))                                  \
+        u0 -= (n2);                  /* [0..2n) */   \
                                                      \
     N_MULMOD_PRECOMP_LAZY(u3, w1, u3, w1_pr, n);     \
     u1 = u1 + u3;                    /* [0..4n) */   \
                                                      \
     N_MULMOD_PRECOMP_LAZY(u1, w2, u1, w2_pr, n);     \
     (a) = u0 + u1;                   /* [0..4n) */   \
-    (b) = u0 + n2 - u1;              /* [0..4n) */   \
+    (b) = u0 + (n2) - u1;            /* [0..4n) */   \
 } while(0)
 
 /*------------------------*/
@@ -81,7 +81,7 @@ do {                                                 \
 
 /** 8-point FFT, evaluation, general node, truncated at 4
  * * same as DFT8_NODE_LAZY_4_4 but only computes first 4 evaluations in
- * p0,p1,p2,p3; other 4 elements may be modified
+ * p0,p1,p2,p3; the other 4 elements are left unchanged
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
 #define TFT8_4_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,    \
@@ -101,12 +101,16 @@ do {                                                            \
                        n, n2);                                  \
 } while(0)
 
-/*-------------------*/
-/* length 16, node 0 */
-/*-------------------*/
+/*------------------*/
+/* length 4, node 0 */
+/*------------------*/
 
-
-/* TODO comment, and place where appropriate */
+/** 4-point FFT, interpolation, truncated at 3
+ * * same as IDFT4_LAZY_1_4 applied to [a b c 0]: only the first 3
+ * evaluations are considered, d is output only
+ * * used as a building block of ITFT16_12_LAZY_1_4
+ * * lazy_422_2: a in [0..4n), b,c in [0..2n) / out [0..2n) / max < 4n
+ */
 #define ITFT4_3_LAZY_422_2(a, b, c, d, I, I_pr, n, n2)            \
 do {                                                              \
     ulong v0 = (a);                                               \
@@ -205,10 +209,10 @@ do {                                                                 \
 do {                                                                \
     ulong w2, w2pre, w, wpre, Iw, Iwpre;                            \
                                                                     \
-    w2 = tab_w[2*node];                                             \
-    w2pre = tab_w[2*node+1];                                        \
-    w = tab_w[4*node];                                              \
-    wpre = tab_w[4*node+1];                                         \
+    w2 = tab_w[2*(node)];                                           \
+    w2pre = tab_w[2*(node)+1];                                      \
+    w = tab_w[4*(node)];                                            \
+    wpre = tab_w[4*(node)+1];                                       \
                                                                     \
     TFT4_2_NODE_LAZY_4_4(p0, p4, p8, p12,                           \
                          w2, w2pre, w, wpre,                        \
@@ -223,12 +227,12 @@ do {                                                                \
                          w2, w2pre, w, wpre,                        \
                          n, n2);                                    \
                                                                     \
-    w2 = tab_w[8*node];                                             \
-    w2pre = tab_w[8*node+1];                                        \
-    w = tab_w[16*node];                                             \
-    wpre = tab_w[16*node+1];                                        \
-    Iw = tab_w[16*node+2];                                          \
-    Iwpre = tab_w[16*node+3];                                       \
+    w2 = tab_w[8*(node)];                                           \
+    w2pre = tab_w[8*(node)+1];                                      \
+    w = tab_w[16*(node)];                                           \
+    wpre = tab_w[16*(node)+1];                                      \
+    Iw = tab_w[16*(node)+2];                                        \
+    Iwpre = tab_w[16*(node)+3];                                     \
     DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                              \
                        w2, w2pre, w, wpre, Iw, Iwpre,               \
                        n, n2);                                      \
@@ -240,10 +244,10 @@ do {                                                                \
 do {                                                                \
     ulong w2, w2pre, w, wpre, Iw, Iwpre;                            \
                                                                     \
-    w2 = tab_w[2*node];                                             \
-    w2pre = tab_w[2*node+1];                                        \
-    w = tab_w[4*node];                                              \
-    wpre = tab_w[4*node+1];                                         \
+    w2 = tab_w[2*(node)];                                           \
+    w2pre = tab_w[2*(node)+1];                                      \
+    w = tab_w[4*(node)];                                            \
+    wpre = tab_w[4*(node)+1];                                       \
                                                                     \
     TFT4_2_NODE_LAZY_4_4(p0, p4, p8, p12,                           \
                          w2, w2pre, w, wpre,                        \
@@ -258,22 +262,22 @@ do {                                                                \
                          w2, w2pre, w, wpre,                        \
                          n, n2);                                    \
                                                                     \
-    w2 = tab_w[8*node];                                             \
-    w2pre = tab_w[8*node+1];                                        \
-    w = tab_w[16*node];                                             \
-    wpre = tab_w[16*node+1];                                        \
-    Iw = tab_w[16*node+2];                                          \
-    Iwpre = tab_w[16*node+3];                                       \
+    w2 = tab_w[8*(node)];                                           \
+    w2pre = tab_w[8*(node)+1];                                      \
+    w = tab_w[16*(node)];                                           \
+    wpre = tab_w[16*(node)+1];                                      \
+    Iw = tab_w[16*(node)+2];                                        \
+    Iwpre = tab_w[16*(node)+3];                                     \
     DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                              \
                        w2, w2pre, w, wpre, Iw, Iwpre,               \
                        n, n2);                                      \
                                                                     \
-    w2 = tab_w[8*node+2];                                           \
-    w2pre = tab_w[8*node+3];                                        \
-    w = tab_w[16*node+4];                                           \
-    wpre = tab_w[16*node+5];                                        \
-    Iw = tab_w[16*node+6];                                          \
-    Iwpre = tab_w[16*node+7];                                       \
+    w2 = tab_w[8*(node)+2];                                         \
+    w2pre = tab_w[8*(node)+3];                                      \
+    w = tab_w[16*(node)+4];                                         \
+    wpre = tab_w[16*(node)+5];                                      \
+    Iw = tab_w[16*(node)+6];                                        \
+    Iwpre = tab_w[16*(node)+7];                                     \
     DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                              \
                        w2, w2pre, w, wpre, Iw, Iwpre,               \
                        n, n2);                                      \
@@ -285,12 +289,12 @@ do {                                                                \
 do {                                                                 \
     ulong w2, w2pre, w, wpre, Iw, Iwpre;                             \
                                                                      \
-    w2 = tab_w[2*node];                                              \
-    w2pre = tab_w[2*node+1];                                         \
-    w = tab_w[4*node];                                               \
-    wpre = tab_w[4*node+1];                                          \
-    Iw = tab_w[4*node+2];                                            \
-    Iwpre = tab_w[4*node+3];                                         \
+    w2 = tab_w[2*(node)];                                            \
+    w2pre = tab_w[2*(node)+1];                                       \
+    w = tab_w[4*(node)];                                             \
+    wpre = tab_w[4*(node)+1];                                        \
+    Iw = tab_w[4*(node)+2];                                          \
+    Iwpre = tab_w[4*(node)+3];                                       \
                                                                      \
     DFT4_NODE_LAZY_4_4(p0, p4, p8, p12,                              \
                        w2, w2pre, w, wpre, Iw, Iwpre,                \
@@ -305,32 +309,32 @@ do {                                                                 \
                        w2, w2pre, w, wpre, Iw, Iwpre,                \
                        n, n2);                                       \
                                                                      \
-    w2 = tab_w[8*node];                                              \
-    w2pre = tab_w[8*node+1];                                         \
-    w = tab_w[16*node];                                              \
-    wpre = tab_w[16*node+1];                                         \
-    Iw = tab_w[16*node+2];                                           \
-    Iwpre = tab_w[16*node+3];                                        \
+    w2 = tab_w[8*(node)];                                            \
+    w2pre = tab_w[8*(node)+1];                                       \
+    w = tab_w[16*(node)];                                            \
+    wpre = tab_w[16*(node)+1];                                       \
+    Iw = tab_w[16*(node)+2];                                         \
+    Iwpre = tab_w[16*(node)+3];                                      \
     DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                               \
                        w2, w2pre, w, wpre, Iw, Iwpre,                \
                        n, n2);                                       \
                                                                      \
-    w2 = tab_w[8*node+2];                                            \
-    w2pre = tab_w[8*node+3];                                         \
-    w = tab_w[16*node+4];                                            \
-    wpre = tab_w[16*node+5];                                         \
-    Iw = tab_w[16*node+6];                                           \
-    Iwpre = tab_w[16*node+7];                                        \
+    w2 = tab_w[8*(node)+2];                                          \
+    w2pre = tab_w[8*(node)+3];                                       \
+    w = tab_w[16*(node)+4];                                          \
+    wpre = tab_w[16*(node)+5];                                       \
+    Iw = tab_w[16*(node)+6];                                         \
+    Iwpre = tab_w[16*(node)+7];                                      \
     DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                               \
                        w2, w2pre, w, wpre, Iw, Iwpre,                \
                        n, n2);                                       \
                                                                      \
-    w2 = tab_w[8*node+4];                                            \
-    w2pre = tab_w[8*node+5];                                         \
-    w = tab_w[16*node+8];                                            \
-    wpre = tab_w[16*node+9];                                         \
-    Iw = tab_w[16*node+10];                                          \
-    Iwpre = tab_w[16*node+11];                                       \
+    w2 = tab_w[8*(node)+4];                                          \
+    w2pre = tab_w[8*(node)+5];                                       \
+    w = tab_w[16*(node)+8];                                          \
+    wpre = tab_w[16*(node)+9];                                       \
+    Iw = tab_w[16*(node)+10];                                        \
+    Iwpre = tab_w[16*(node)+11];                                     \
     DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                             \
                        w2, w2pre, w, wpre, Iw, Iwpre,                \
                        n, n2);                                       \
@@ -352,10 +356,10 @@ do {                                                                 \
                               p24, p25, p26, p27, p28, p29, p30, p31,            \
                               node, n, n2, tab_w)                                \
 do {                                                                             \
-    ulong w2 = tab_w[2*node];                                                    \
-    ulong w2pre = tab_w[2*node+1];                                               \
-    ulong w = tab_w[4*node];                                                     \
-    ulong wpre = tab_w[4*node+1];                                                \
+    ulong w2 = tab_w[2*(node)];                                                  \
+    ulong w2pre = tab_w[2*(node)+1];                                             \
+    ulong w = tab_w[4*(node)];                                                   \
+    ulong wpre = tab_w[4*(node)+1];                                              \
     TFT4_2_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, n, n2);           \
     TFT4_2_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, n, n2);           \
     TFT4_2_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, n, n2);          \
@@ -365,7 +369,7 @@ do {                                                                            
     TFT4_2_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, n, n2);          \
     TFT4_2_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, n, n2);          \
                                                                                  \
-    TFT8_4_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);  \
+    TFT8_4_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w); \
 } while(0)
 
 #define TFT32_8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                  \
@@ -374,10 +378,10 @@ do {                                                                            
                               p24, p25, p26, p27, p28, p29, p30, p31,          \
                               node, n, n2, tab_w)                              \
 do {                                                                           \
-    ulong w2 = tab_w[2*node];                                                  \
-    ulong w2pre = tab_w[2*node+1];                                             \
-    ulong w = tab_w[4*node];                                                   \
-    ulong wpre = tab_w[4*node+1];                                              \
+    ulong w2 = tab_w[2*(node)];                                                \
+    ulong w2pre = tab_w[2*(node)+1];                                           \
+    ulong w = tab_w[4*(node)];                                                 \
+    ulong wpre = tab_w[4*(node)+1];                                            \
     TFT4_2_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, n, n2);         \
     TFT4_2_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, n, n2);         \
     TFT4_2_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, n, n2);        \
@@ -387,7 +391,7 @@ do {                                                                           \
     TFT4_2_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, n, n2);        \
     TFT4_2_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, n, n2);        \
                                                                                \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w); \
 } while(0)
 
 #define TFT32_12_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                           \
@@ -396,10 +400,10 @@ do {                                                                           \
                                p24, p25, p26, p27, p28, p29, p30, p31,                   \
                                node, n, n2, tab_w)                                       \
 do {                                                                                     \
-    ulong w2 = tab_w[2*node];                                                            \
-    ulong w2pre = tab_w[2*node+1];                                                       \
-    ulong w = tab_w[4*node];                                                             \
-    ulong wpre = tab_w[4*node+1];                                                        \
+    ulong w2 = tab_w[2*(node)];                                                          \
+    ulong w2pre = tab_w[2*(node)+1];                                                     \
+    ulong w = tab_w[4*(node)];                                                           \
+    ulong wpre = tab_w[4*(node)+1];                                                      \
     TFT4_2_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, n, n2);                   \
     TFT4_2_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, n, n2);                   \
     TFT4_2_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, n, n2);                  \
@@ -409,8 +413,8 @@ do {                                                                            
     TFT4_2_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, n, n2);                  \
     TFT4_2_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, n, n2);                  \
                                                                                          \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);            \
-    TFT8_4_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w);          \
+    TFT8_4_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*(node)+1, n, n2, tab_w); \
 } while(0)
 
 #define TFT32_16_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                         \
@@ -419,10 +423,10 @@ do {                                                                            
                                p24, p25, p26, p27, p28, p29, p30, p31,                 \
                                node, n, n2, tab_w)                                     \
 do {                                                                                   \
-    ulong w2 = tab_w[2*node];                                                          \
-    ulong w2pre = tab_w[2*node+1];                                                     \
-    ulong w = tab_w[4*node];                                                           \
-    ulong wpre = tab_w[4*node+1];                                                      \
+    ulong w2 = tab_w[2*(node)];                                                        \
+    ulong w2pre = tab_w[2*(node)+1];                                                   \
+    ulong w = tab_w[4*(node)];                                                         \
+    ulong wpre = tab_w[4*(node)+1];                                                    \
     TFT4_2_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, n, n2);                 \
     TFT4_2_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, n, n2);                 \
     TFT4_2_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, n, n2);                \
@@ -432,8 +436,8 @@ do {                                                                            
     TFT4_2_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, n, n2);                \
     TFT4_2_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, n, n2);                \
                                                                                        \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);          \
-    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w);        \
+    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*(node)+1, n, n2, tab_w); \
 } while(0)
 
 #define TFT32_20_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                             \
@@ -442,12 +446,12 @@ do {                                                                            
                                p24, p25, p26, p27, p28, p29, p30, p31,                     \
                                node, n, n2, tab_w)                                         \
 do {                                                                                       \
-    ulong w2 = tab_w[2*node];                                                              \
-    ulong w2pre = tab_w[2*node+1];                                                         \
-    ulong w = tab_w[4*node];                                                               \
-    ulong wpre = tab_w[4*node+1];                                                          \
-    ulong Iw = tab_w[4*node+2];                                                            \
-    ulong Iwpre = tab_w[4*node+3];                                                         \
+    ulong w2 = tab_w[2*(node)];                                                            \
+    ulong w2pre = tab_w[2*(node)+1];                                                       \
+    ulong w = tab_w[4*(node)];                                                             \
+    ulong wpre = tab_w[4*(node)+1];                                                        \
+    ulong Iw = tab_w[4*(node)+2];                                                          \
+    ulong Iwpre = tab_w[4*(node)+3];                                                       \
     DFT4_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);            \
     DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);            \
     DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
@@ -457,9 +461,9 @@ do {                                                                            
     DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
     DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
                                                                                            \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);              \
-    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);      \
-    TFT8_4_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w);            \
+    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*(node)+1, n, n2, tab_w);    \
+    TFT8_4_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*(node)+2, n, n2, tab_w); \
 } while(0)
 
 #define TFT32_24_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                           \
@@ -468,12 +472,12 @@ do {                                                                            
                                p24, p25, p26, p27, p28, p29, p30, p31,                   \
                                node, n, n2, tab_w)                                       \
 do {                                                                                     \
-    ulong w2 = tab_w[2*node];                                                            \
-    ulong w2pre = tab_w[2*node+1];                                                       \
-    ulong w = tab_w[4*node];                                                             \
-    ulong wpre = tab_w[4*node+1];                                                        \
-    ulong Iw = tab_w[4*node+2];                                                          \
-    ulong Iwpre = tab_w[4*node+3];                                                       \
+    ulong w2 = tab_w[2*(node)];                                                          \
+    ulong w2pre = tab_w[2*(node)+1];                                                     \
+    ulong w = tab_w[4*(node)];                                                           \
+    ulong wpre = tab_w[4*(node)+1];                                                      \
+    ulong Iw = tab_w[4*(node)+2];                                                        \
+    ulong Iwpre = tab_w[4*(node)+3];                                                     \
     DFT4_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
     DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
     DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
@@ -483,9 +487,9 @@ do {                                                                            
     DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
     DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
                                                                                          \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);            \
-    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);    \
-    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w);          \
+    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*(node)+1, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*(node)+2, n, n2, tab_w); \
 } while(0)
 
 #define TFT32_28_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                             \
@@ -494,12 +498,12 @@ do {                                                                            
                                p24, p25, p26, p27, p28, p29, p30, p31,                     \
                                node, n, n2, tab_w)                                         \
 do {                                                                                       \
-    ulong w2 = tab_w[2*node];                                                              \
-    ulong w2pre = tab_w[2*node+1];                                                         \
-    ulong w = tab_w[4*node];                                                               \
-    ulong wpre = tab_w[4*node+1];                                                          \
-    ulong Iw = tab_w[4*node+2];                                                            \
-    ulong Iwpre = tab_w[4*node+3];                                                         \
+    ulong w2 = tab_w[2*(node)];                                                            \
+    ulong w2pre = tab_w[2*(node)+1];                                                       \
+    ulong w = tab_w[4*(node)];                                                             \
+    ulong wpre = tab_w[4*(node)+1];                                                        \
+    ulong Iw = tab_w[4*(node)+2];                                                          \
+    ulong Iwpre = tab_w[4*(node)+3];                                                       \
     DFT4_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);            \
     DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);            \
     DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
@@ -509,10 +513,10 @@ do {                                                                            
     DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
     DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
                                                                                            \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);              \
-    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);      \
-    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
-    TFT8_4_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*(node), n, n2, tab_w);            \
+    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*(node)+1, n, n2, tab_w);    \
+    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*(node)+2, n, n2, tab_w); \
+    TFT8_4_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*(node)+3, n, n2, tab_w); \
 } while(0)
 
 

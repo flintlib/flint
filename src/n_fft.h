@@ -127,7 +127,7 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  */
 
 /* initialize with given root and given depth */
-void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong mod);
+void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong p);
 
 /* find primitive root, initialize with given depth */
 void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p);
@@ -201,11 +201,41 @@ void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
-/*-----------------------------*/
-/* TFT / ITFT / TFT_t / ITFT_t */
-/*-----------------------------*/
+/*------------*/
+/* TFT / ITFT */
+/*------------*/
 
-/* doc TODO */
+/** truncated transforms: same evaluation points w[i] as above (bit reversed
+ * order), but the input length and the number of evaluations need not be
+ * powers of 2. Below, len denotes the smallest power of 2 which is >= olen
+ * (resp. >= iolen), and depth = log_2(len).
+ *    - requirement of both functions (not checked): depth <= F->depth
+ *    - lengths must be multiples of 4 (except iolen <= 2 for itft); the
+ *    helpers n_fft_tft_prepare / n_fft_itft_prepare in n_fft/impl.h compute
+ *    suitable parameters from arbitrary lengths, together with the required
+ *    array length
+ */
+
+/** tft: truncated Fourier transform
+ * In-place transform p = [p[j] for 0 <= j < ilen], seen as a polynomial p(x)
+ * of degree < ilen, into its first olen evaluations
+ *     q == [p(w[i])  for 0 <= i < olen]
+ * where the w[i] are as in dft (for length len).
+ *    - ilen >= 0 and olen >= 0 are multiples of 4 (ilen == 0 gives q == 0)
+ *    - p must have space for max(ilen, len) entries; the entries of p beyond
+ *    ilen may hold any value, and entries ilen..max(ilen,len)-1 may be
+ *    overwritten; in output only p[0..olen) is meaningful
+ */
+
+/** itft: inverse truncated Fourier transform
+ * In-place transform p = [p[i] for 0 <= i < iolen] into the list of
+ * coefficients q = [q[j] for 0 <= j < iolen] of the unique polynomial q(x)
+ * of degree < iolen such that p[i] == q(w[i])  for 0 <= i < iolen
+ *    - iolen >= 0 is either <= 2 or a multiple of 4
+ *    - p must have space for len entries; the entries of p beyond iolen may
+ *    hold any value and may be overwritten; in output only p[0..iolen) is
+ *    meaningful
+ */
 
 void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F);
 void n_fft_itft(nn_ptr p, ulong iolen, n_fft_ctx_t F);

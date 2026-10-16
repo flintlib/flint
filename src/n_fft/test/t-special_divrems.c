@@ -99,7 +99,6 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
             nn_ptr pp = _nmod_vec_init(ilen);
             nn_ptr pok = _nmod_vec_init(ilen);
             nn_ptr rec = _nmod_vec_init(d+1);
-            /* flint_printf("depth = %wu | %wu, %wu...\n", depth, d, ilen); */
 
             /* initialize polynomials */
             nmod_poly_init_mod(a, mod);
@@ -112,7 +111,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
             _nmod_poly_set_length(a, ilen);
             _nmod_vec_set(a->coeffs, p, ilen);
 
-            /* divrem circulant, general, v0 */
+            /* divrem circulant, general */
             {
                 ulong c = n_randint(state, prime);
                 ulong c_precomp = n_mulmod_precomp_shoup(c, prime);
@@ -125,7 +124,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 nmod_poly_divrem(qok, rok, a, b);
 
                 _nmod_vec_set(pp, p, ilen);
-                _nmod_poly_divrem_circulant_lazy_4_4_v0(pp, ilen, d, c, c_precomp, prime, 2*prime);
+                _n_fft_divrem_circulant_lazy_4_4(pp, ilen, d, c, c_precomp, prime, 2*prime);
 
                 for (ulong i = 0; i < ilen; i++)
                 {
@@ -139,7 +138,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                         && _nmod_vec_equal(pp+d, qok->coeffs, qok->length));
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant_lazy_4_4_v0):\n");
+                    flint_printf("FAIL (_n_fft_divrem_circulant_lazy_4_4):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
                     _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
@@ -150,45 +149,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 }
             }
 
-            /* divrem circulant, general, v1 */
-            {
-                ulong c = n_randint(state, prime);
-                ulong c_precomp = n_mulmod_precomp_shoup(c, prime);
-
-                /* divisor b == x**d - c */
-                nmod_poly_zero(b);
-                nmod_poly_set_coeff_ui(b, d, 1);
-                nmod_poly_set_coeff_ui(b, 0, n_negmod(c, prime));
-
-                nmod_poly_divrem(qok, rok, a, b);
-
-                _nmod_vec_set(pp, p, ilen);
-                _nmod_poly_divrem_circulant_lazy_4_4(pp, ilen, d, c, c_precomp, prime, 2*prime);
-
-                for (ulong i = 0; i < ilen; i++)
-                {
-                    if (pp[i] >= 2*prime)
-                        pp[i] -= 2*prime;
-                    if (pp[i] >= prime)
-                        pp[i] -= prime;
-                }
-
-                result = (_nmod_vec_equal(pp, rok->coeffs, rok->length) && _nmod_vec_is_zero(pp + rok->length, d - rok->length)
-                        && _nmod_vec_equal(pp+d, qok->coeffs, qok->length));
-                if (!result)
-                {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant_lazy_4_4):\n");
-                    flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
-                    flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
-                    _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
-                    _nmod_vec_print(rok->coeffs, rok->length, mod), flint_printf("\n\n");
-                    _nmod_vec_print(qok->coeffs, qok->length, mod), flint_printf("\n\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
-            }
-
-            /* divrem circulant, 1, v0 */
+            /* divrem circulant, 1 */
             {
                 ulong c = 1;
 
@@ -200,42 +161,13 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 nmod_poly_divrem(qok, rok, a, b);
 
                 _nmod_vec_set(pp, p, ilen);
-                _nmod_poly_divrem_circulant1(pp, ilen, d, prime);
+                _n_fft_divrem_circulant1(pp, ilen, d, prime);
 
                 result = (_nmod_vec_equal(pp, rok->coeffs, rok->length) && _nmod_vec_is_zero(pp + rok->length, d - rok->length)
                         && _nmod_vec_equal(pp+d, qok->coeffs, qok->length));
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant1):\n");
-                    flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
-                    flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
-                    _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
-                    _nmod_vec_print(rok->coeffs, rok->length, mod), flint_printf("\n\n");
-                    _nmod_vec_print(qok->coeffs, qok->length, mod), flint_printf("\n\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
-            }
-
-            /* divrem circulant, 1, v1 */
-            {
-                ulong c = 1;
-
-                /* divisor b == x**d - 1 */
-                nmod_poly_zero(b);
-                nmod_poly_set_coeff_ui(b, d, 1);
-                nmod_poly_set_coeff_ui(b, 0, prime - 1);
-
-                nmod_poly_rem(rok, a, b);
-
-                _nmod_vec_set(pp, p, ilen);
-                _nmod_poly_divrem_circulant1_v1(pp, ilen, d, prime);
-
-                result = (_nmod_vec_equal(pp, rok->coeffs, rok->length) && _nmod_vec_is_zero(pp + rok->length, d - rok->length)
-                        && _nmod_vec_equal(pp+d, qok->coeffs, qok->length));
-                if (!result)
-                {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant1_v1):\n");
+                    flint_printf("FAIL (_n_fft_divrem_circulant1):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
                     _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
@@ -258,7 +190,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 extend_recurrence(pok, ilen, rec, d, mod);
 
                 _nmod_vec_set(pp, p, d);
-                _nmod_poly_divrem_circulant_lazy_4_2_t(pp, ilen, d, c, c_precomp, prime);
+                _n_fft_divrem_circulant_lazy_4_2_t(pp, ilen, d, c, c_precomp, prime);
 
                 for (ulong i = d; i < ilen; i++)
                 {
@@ -269,7 +201,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 result = (_nmod_vec_equal(pp, pok, ilen));
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant_lazy_4_2_t):\n");
+                    flint_printf("FAIL (_n_fft_divrem_circulant_lazy_4_2_t):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
                     _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
@@ -291,12 +223,12 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 extend_recurrence(pok, ilen, rec, d, mod);
 
                 _nmod_vec_set(pp, p, d);
-                _nmod_poly_divrem_circulant1_t(pp, ilen, d);
+                _n_fft_divrem_circulant1_t(pp, ilen, d);
 
                 result = _nmod_vec_equal(pp, pok, ilen);
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_divrem_circulant1_t):\n");
+                    flint_printf("FAIL (_n_fft_divrem_circulant1_t):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, c = %wu, input vec :\n", d, c);
                     _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
@@ -324,7 +256,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 nmod_poly_rem(rok, a, b);
 
                 _nmod_vec_set(pp, p, ilen);
-                _nmod_poly_rem_prod_root1_lazy_4_4(pp, ilen, d, mod_depth, mod_node, Fargs);
+                _n_fft_rem_prod_root1_node_lazy_4_4(pp, ilen, d, mod_depth, mod_node, Fargs);
                 for (ulong i = 0; i < d; i++)
                 {
                     if (pp[i] >= 2*prime)
@@ -336,7 +268,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 result = (_nmod_vec_equal(pp, rok->coeffs, rok->length) && _nmod_vec_is_zero(pp+rok->length, d - rok->length));
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_rem_prod_root1_lazy_4_4):\n");
+                    flint_printf("FAIL (_n_fft_rem_prod_root1_node_lazy_4_4):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, mod_depth = %wu, mod_node = %wu, input vec :\n", d, mod_depth, mod_node);
                     _nmod_vec_print(p, ilen, mod), flint_printf("\n\n");
@@ -351,7 +283,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 extend_recurrence(pok, ilen, b->coeffs, d, mod);
 
                 _nmod_vec_set(pp, p, d);
-                _nmod_poly_rem_prod_root1_t_lazy_4_4(pp, ilen, d, mod_depth, mod_node, Fargs);
+                _n_fft_rem_prod_root1_t_node_lazy_4_4(pp, ilen, d, mod_depth, mod_node, Fargs);
 
                 for (ulong i = 0; i < ilen; i++)
                 {
@@ -364,7 +296,7 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
                 result = _nmod_vec_equal(pp, pok, ilen);
                 if (!result)
                 {
-                    flint_printf("FAIL (_nmod_poly_rem_prod_root1_t_lazy_4_4):\n");
+                    flint_printf("FAIL (_n_fft_rem_prod_root1_t_node_lazy_4_4):\n");
                     flint_printf("a->length = %wd, ilen = %wu, modulus = %wu\n", a->length, ilen, prime);
                     flint_printf("d = %wu, mod_depth = %wu, mod_node = %wu, input vec :\n", d, mod_depth, mod_node);
                     _nmod_vec_print(p, d, mod), flint_printf("\n\n");
@@ -385,6 +317,8 @@ TEST_FUNCTION_START(n_fft_special_divrems, state)
             nmod_poly_clear(rok);
         }
 
+        flint_free(roots);
+        n_fft_ctx_clear(F);
     }
 
     TEST_FUNCTION_END(state);

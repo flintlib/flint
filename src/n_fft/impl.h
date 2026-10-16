@@ -28,7 +28,8 @@
 do {                                                          \
     ulong p_hi, p_lo;                                         \
     umul_ppmm(p_hi, p_lo, (a_pr), (b));                       \
-    res = (a) * (b) - p_hi * (n);                             \
+    (void) p_lo;                                              \
+    (res) = (a) * (b) - p_hi * (n);                           \
 } while(0)
 
 /** Given the precomputed quotient a_pr for modular multiplication by a mod n,
@@ -75,43 +76,41 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 }
 
 /* special divrems */
-void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
-void _nmod_poly_divrem_circulant_lazy_2_2(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
-void _nmod_poly_divrem_circulant_lazy_4_4_v0(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
-void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
-void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n);
-void _nmod_poly_rem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
-void _nmod_poly_divrem_circulant_lazy_4_2_t(nn_ptr p, ulong len, ulong d, ulong c, ulong c_precomp, ulong n);
-void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d);
+void _n_fft_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
+void _n_fft_divrem_circulant_lazy_2_2(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
+void _n_fft_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
+void _n_fft_divrem_circulant_lazy_4_2_t(nn_ptr p, ulong len, ulong d, ulong c, ulong c_precomp, ulong n);
+void _n_fft_divrem_circulant1_t(nn_ptr p, ulong len, ulong d);
 
-void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
+void _n_fft_rem_prod_root1_node_lazy_4_4(nn_ptr p, ulong len, ulong d,
                                         ulong depth, ulong node, n_fft_args_t F);
-void _nmod_poly_rem_prod_root1_lazy_2_2(nn_ptr p, ulong len, ulong d,
+void _n_fft_rem_prod_root1_node_lazy_2_2(nn_ptr p, ulong len, ulong d,
                                         ulong depth, ulong node, n_fft_args_t F);
-void _nmod_poly_rem_prod_root1_node0_lazy_2_4(nn_ptr p, ulong len, ulong d,
+void _n_fft_rem_prod_root1_lazy_2_4(nn_ptr p, ulong len, ulong d,
                                              ulong depth, n_fft_args_t F);
 
-void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
+void _n_fft_rem_prod_root1_t_node_lazy_4_4(nn_ptr p, ulong len, ulong d,
                                           ulong depth, ulong node, n_fft_args_t F);
 
 /* dft internals */
-void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
-void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F);
-void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
+void _n_fft_dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
+void _n_fft_dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F);
+void _n_fft_dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 
 /* idft internals */
-void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
-void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
+void _n_fft_idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
+void _n_fft_idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 
 /* tft internals */
-void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F);
-void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
+void _n_fft_tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F);
+void _n_fft_tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
 
-/* itft internals */
-void itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F);
-/* FIXME see how to handle args! needs tab_w, tab_iw, tab_w2 */
+/* itft internals (take the full context: both tab_w and tab_iw are needed) */
+void _n_fft_itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F);
 
-/* some functions to get the right parameters (FIXME work in progress) */
+/*----------------------------------------*/
+/* helpers to set up parameters for (i)tft */
+/*----------------------------------------*/
 
 /* exponent of next power of 2 for x >= 2 */
 FLINT_FORCE_INLINE
@@ -123,69 +122,62 @@ ulong n_clog2_ge2(ulong x)
 FLINT_FORCE_INLINE
 ulong _next_multiple_of_4(ulong x)
 {
-    return (x + 3) & UWORD(0xFFFFFFFFFFFFFFFC);
+    return (x + 3) & ~UWORD(3);
 }
 
-
-/* FIXME doc: get parameters for tft functions and ensure F "long enough" */
-/* in: olen > 0, ilen >= 0 */
-/* out: stores actual _ilen and _olen parameters to be used in tft calls, */
-/*      and returns the required length for the input array */
+/** Parameters for n_fft_tft.
+ * Input: ilen >= 0 (length of the input polynomial) and olen > 0 (number of
+ * requested evaluations), arbitrary.
+ * Output: stores in _ilen and _olen the parameters to be passed to n_fft_tft
+ * (both are multiples of 4, or _ilen == 0 if ilen == 0), ensures F supports
+ * the required depth, and returns the length that the array passed to
+ * n_fft_tft must have. Entries ilen.._ilen-1 of that array must be zero on
+ * input, and entries _ilen..plen-1 may hold any values.
+ */
 FLINT_FORCE_INLINE
 ulong n_fft_tft_prepare(ulong * _ilen, ulong * _olen, ulong ilen, ulong olen, n_fft_ctx_t F)
 {
-    /* FIXME check: no function should do anything nontrivial when ilen==0 */
-    if (ilen == 0)
-    {
-        *_ilen = 0;
-        *_olen = olen;
-        return olen;
-    }
-
-    /* FIXME support this kind of base case or go directly to 4? */
-    if (ilen <= 2 && olen <= 2)
-    {
-        *_ilen = 2;
-        *_olen = 2;
-        return 2;
-    }
-
-    const ulong odepth = n_clog2_ge2(olen);
-    const ulong len = UWORD(1) << odepth;
-
-    *_ilen = _next_multiple_of_4(ilen);
     *_olen = _next_multiple_of_4(olen);
 
+    if (ilen == 0)
+    {
+        /* n_fft_tft only zeroes the output in this case */
+        *_ilen = 0;
+        return *_olen;
+    }
+
+    *_ilen = _next_multiple_of_4(ilen);
+
+    const ulong odepth = n_clog2_ge2(*_olen);
     n_fft_ctx_fit_depth(F, odepth);
 
-    return FLINT_MAX(*_ilen, len);
+    return FLINT_MAX(*_ilen, UWORD(1) << odepth);
 }
 
+/** Parameters for n_fft_itft.
+ * Input: iolen >= 0 (number of evaluations == length of the output
+ * polynomial), arbitrary.
+ * Output: stores in _iolen the parameter to be passed to n_fft_itft (either
+ * <= 2 or a multiple of 4), ensures F supports the required depth, and
+ * returns the length that the array passed to n_fft_itft must have. Entries
+ * 0.._iolen-1 of that array must hold the evaluations of a polynomial of
+ * length <= _iolen, and entries _iolen..len-1 may hold any values.
+ */
 FLINT_FORCE_INLINE
 ulong n_fft_itft_prepare(ulong * _iolen, ulong iolen, n_fft_ctx_t F)
 {
-    /* FIXME check: no function should do anything nontrivial when ilen==0 */
-    if (iolen == 0)
+    if (iolen <= 2)
     {
-        *_iolen = 0;
+        *_iolen = iolen;
         return iolen;
     }
 
-    /* FIXME support this kind of base case or go directly to 4? */
-    if (iolen <= 2)
-    {
-        *_iolen = 2;
-        return 2;
-    }
-
-    const ulong iodepth = n_clog2_ge2(iolen);
-    const ulong len = UWORD(1) << iodepth;
-
     *_iolen = _next_multiple_of_4(iolen);
 
+    const ulong iodepth = n_clog2_ge2(*_iolen);
     n_fft_ctx_fit_depth(F, iodepth);
 
-    return len;
+    return UWORD(1) << iodepth;
 }
 
 #endif  /* N_FFT_IMPL_H */
