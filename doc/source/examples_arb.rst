@@ -472,42 +472,37 @@ positive integers 1, 2, ..., 100::
 
     > build/examples/poly_roots -print 15 w 100
     computing squarefree factorization...
-    cpu/wall(s): 0.001 0.001
-    roots with multiplicity 1
+    cpu/wall(s): 0 0
     searching for 100 roots, 100 deflated
-    prec=32: 0 isolated roots | cpu/wall(s): 0.098 0.098
-    prec=64: 0 isolated roots | cpu/wall(s): 0.247 0.247
-    prec=128: 0 isolated roots | cpu/wall(s): 0.498 0.497
-    prec=256: 0 isolated roots | cpu/wall(s): 0.713 0.713
-    prec=512: 100 isolated roots | cpu/wall(s): 0.104 0.105
+    prec=53: 100 isolated roots (100 real) | cpu/wall(s): 0 0
     done!
-    [1.00000000000000 +/- 3e-20]
-    [2.00000000000000 +/- 3e-19]
-    [3.00000000000000 +/- 1e-19]
-    [4.00000000000000 +/- 1e-19]
-    [5.00000000000000 +/- 1e-19]
+    100 roots with multiplicity 1
+    1.00000000000000
+    2.00000000000000
+    3.00000000000000
+    4.00000000000000
+    5.00000000000000
     ...
-    [96.0000000000000 +/- 1e-17]
-    [97.0000000000000 +/- 1e-17]
-    [98.0000000000000 +/- 3e-17]
-    [99.0000000000000 +/- 3e-17]
-    [100.000000000000 +/- 3e-17]
-    cpu/wall(s): 1.664 1.664
+    96.0000000000000
+    97.0000000000000
+    98.0000000000000
+    99.0000000000000
+    100.000000000000
+    cpu/wall(s): 0.006 0.006
 
 This finds the roots of a Bernoulli polynomial which has both real
 and complex roots::
 
     > build/examples/poly_roots -refine 100 -print 20 b 16
     computing squarefree factorization...
-    cpu/wall(s): 0.001 0
-    roots with multiplicity 1
+    cpu/wall(s): 0 0
     searching for 16 roots, 16 deflated
-    prec=32: 16 isolated roots | cpu/wall(s): 0.006 0.006
-    prec=64: 16 isolated roots | cpu/wall(s): 0.001 0.001
-    prec=128: 16 isolated roots | cpu/wall(s): 0.001 0.001
-    prec=256: 16 isolated roots | cpu/wall(s): 0.001 0.002
-    prec=512: 16 isolated roots | cpu/wall(s): 0.002 0.001
+    prec=53: 16 isolated roots (8 real) | cpu/wall(s): 0 0.001
+    prec=128: 16 isolated roots (8 real) | cpu/wall(s): 0.001 0
+    prec=256: 16 isolated roots (8 real) | cpu/wall(s): 0 0
+    prec=512: 16 isolated roots (8 real) | cpu/wall(s): 0 0
     done!
+    16 roots with multiplicity 1
     [-0.94308706466055783383 +/- 2.02e-21]
     [-0.75534059252067985752 +/- 2.70e-21]
     [-0.24999757119077421009 +/- 4.27e-21]
@@ -520,11 +515,11 @@ and complex roots::
     [-0.99509334829256233279 +/- 9.42e-22] + [-0.44547958157103608805 +/- 3.59e-21]*I
     [1.9950933482925623328 +/- 1.10e-20] + [0.44547958157103608805 +/- 3.59e-21]*I
     [1.9950933482925623328 +/- 1.10e-20] + [-0.44547958157103608805 +/- 3.59e-21]*I
-    [-0.92177327714429290564 +/- 4.68e-21] + [-1.0954360955079385542 +/- 1.71e-21]*I
     [-0.92177327714429290564 +/- 4.68e-21] + [1.0954360955079385542 +/- 1.71e-21]*I
+    [-0.92177327714429290564 +/- 4.68e-21] + [-1.0954360955079385542 +/- 1.71e-21]*I
     [1.9217732771442929056 +/- 3.54e-20] + [1.0954360955079385542 +/- 1.71e-21]*I
     [1.9217732771442929056 +/- 3.54e-20] + [-1.0954360955079385542 +/- 1.71e-21]*I
-    cpu/wall(s): 0.011 0.012
+    cpu/wall(s): 0.002 0.002
 
 Roots are automatically separated by multiplicity by performing an initial
 squarefree factorization::
@@ -532,35 +527,35 @@ squarefree factorization::
     > build/examples/poly_roots -print 5 p 5 p 5 t 7 coeffs 1 5 10 10 5 1
     computing squarefree factorization...
     cpu/wall(s): 0 0
-    roots with multiplicity 1
     searching for 6 roots, 3 deflated
-    prec=32: 3 isolated roots | cpu/wall(s): 0 0.001
+    prec=53: 3 isolated roots (3 real) | cpu/wall(s): 0 0
     done!
-    [-0.97493 +/- 2.10e-6]
+    6 roots with multiplicity 1
+    [-0.97493 +/- 2.09e-6]
     [-0.78183 +/- 1.49e-6]
-    [-0.43388 +/- 3.75e-6]
-    [0.43388 +/- 3.75e-6]
+    [-0.43388 +/- 3.74e-6]
+    [0.43388 +/- 3.74e-6]
     [0.78183 +/- 1.49e-6]
-    [0.97493 +/- 2.10e-6]
-    roots with multiplicity 2
+    [0.97493 +/- 2.09e-6]
     searching for 4 roots, 2 deflated
-    prec=32: 2 isolated roots | cpu/wall(s): 0 0
+    prec=53: 2 isolated roots (2 real) | cpu/wall(s): 0 0
     done!
-    [-0.90618 +/- 1.56e-7]
+    4 roots with multiplicity 2
+    [-0.90618 +/- 1.55e-7]
     [-0.53847 +/- 6.91e-7]
     [0.53847 +/- 6.91e-7]
-    [0.90618 +/- 1.56e-7]
-    roots with multiplicity 3
+    [0.90618 +/- 1.55e-7]
     searching for 1 roots, 0 deflated
-    prec=32: 0 isolated roots | cpu/wall(s): 0 0
+    prec=53: 0 isolated roots | cpu/wall(s): 0 0
     done!
+    1 roots with multiplicity 3
     0
-    roots with multiplicity 5
     searching for 1 roots, 1 deflated
-    prec=32: 1 isolated roots | cpu/wall(s): 0 0
+    prec=53: 1 isolated roots | cpu/wall(s): 0 0
     done!
+    1 roots with multiplicity 5
     -1.0000
-    cpu/wall(s): 0 0.001
+    cpu/wall(s): 0 0
 
 zeta_zeros.c
 -------------------------------------------------------------------------------

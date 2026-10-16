@@ -117,10 +117,14 @@ void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
 
-void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, const fmpq_mat_t op, const fmpq_t x);
+void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
+void fmpq_mat_scalar_mul_si(fmpq_mat_t rop, const fmpq_mat_t op, const slong x);
+void fmpq_mat_scalar_mul_ui(fmpq_mat_t rop, const fmpq_mat_t op, const ulong x);
 
 void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
+void fmpq_mat_scalar_div_si(fmpq_mat_t rop, const fmpq_mat_t op, const slong x);
+void fmpq_mat_scalar_div_ui(fmpq_mat_t rop, const fmpq_mat_t op, const ulong x);
 
 /* Basic comparison and properties *******************************************/
 

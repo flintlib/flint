@@ -29,10 +29,33 @@ extern "C" {
 
 typedef struct
 {
+    ulong m;
+    unsigned int e;
+    unsigned int c;
+}
+n_div_precomp_struct;
+
+typedef n_div_precomp_struct n_div_precomp_t[1];
+
+typedef struct
+{
+    ulong a;
+    ulong b;
+}
+n_pair_struct;
+
+typedef struct
+{
     nmod_t b;           /* Digit radix */
     unsigned int exp;   /* B = b^exp */
     nmod_t B;           /* Limb radix */
-    /* extended data which may be used by some ring contexts */
+    ulong * bpow;       /* Precomputed powers of b */
+    n_div_precomp_struct * bpow_div;  /* Division by powers of b */
+    unsigned char bits_to_digit_size[FLINT_BITS];
+    unsigned int bval;  /* Binary valuation of b */
+    n_pair_struct * bpow_oddinv;    /* Inverses of (b>>bval)^k */
+    ulong (*val_func)(ulong, const void *);  /* Function to compute digit valuation */
+    /* Extended data which may be used by some ring contexts */
     slong trunc_limbs;
     slong trunc_digits;
 }
@@ -46,10 +69,51 @@ typedef radix_struct radix_t[1];
 void radix_init(radix_t radix, ulong b, unsigned int exp);
 void radix_clear(radix_t radix);
 void radix_init_randtest(radix_t radix, flint_rand_t state);
+void radix_init_randtest_prime(radix_t radix, flint_rand_t state);
 
 RADIX_INLINE ulong radix_digit_radix(const radix_t radix) { return radix->b.n; }
 RADIX_INLINE ulong radix_limb_radix(const radix_t radix) { return radix->B.n; }
 RADIX_INLINE ulong radix_limb_exponent(const radix_t radix) { return radix->exp; }
+
+RADIX_INLINE ulong
+_radix_size_digits_1(ulong c, const radix_t radix)
+{
+    FLINT_ASSERT(c != 0);
+    FLINT_ASSERT(c < LIMB_RADIX(radix));
+
+    unsigned int bc = FLINT_BIT_COUNT(c);
+
+    ulong n = radix->bits_to_digit_size[bc - 1];
+    n += (c >= radix->bpow[n]);
+    return n;
+}
+
+RADIX_INLINE ulong
+radix_size_digits_1(ulong c, const radix_t radix)
+{
+    return (c == 0) ? 0 : _radix_size_digits_1(c, radix);
+}
+
+RADIX_INLINE ulong _radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+{
+    return (n - 1) * radix->exp + _radix_size_digits_1(x[n - 1], radix);
+}
+
+RADIX_INLINE ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+{
+    while (n > 0 && x[n - 1] == 0)
+        n--;
+
+    return (n == 0) ? 0 : _radix_size_digits_1(x[n - 1], radix);
+}
+
+RADIX_INLINE ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
+{
+    FLINT_ASSERT(c != 0);
+    FLINT_ASSERT(c < LIMB_RADIX(radix));
+
+    return radix->val_func(c, radix);
+}
 
 void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
 void radix_rand_digits(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
@@ -77,18 +141,84 @@ radix_sub_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
 }
  */
 
+/* Shift */
+
+ulong radix_lshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radix_t radix);
+ulong radix_rshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radix_t radix);
+
+/* fused add/sub with an on-the-fly left shift by sh digits, 1 <= sh < exp */
+ulong radix_addlsh(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+ulong radix_sublsh(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+ulong radix_lshsub(nn_ptr res, nn_srcptr b, slong bn, unsigned int sh, nn_srcptr a, slong an, const radix_t radix);
+int radix_cmplsh(nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+
 /* Multiplication */
+
+ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix);
 
 void radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_classical(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_KS(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_naive(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 
+/* Number of pairs (i, j) with 0 <= i < an, 0 <= j < bn and i + j < k;
+   this counts the limb products the classical algorithm performs. It is
+   computed in floating point since it can exceed the range of an slong on
+   32-bit systems (and it is only used for tuning decisions). */
+RADIX_INLINE double
+_radix_mulmid_pairs_below(slong an, slong bn, slong k)
+{
+    double a, b, t;
+
+    if (an < bn)
+        FLINT_SWAP(slong, an, bn);
+
+    a = (double) an;
+    b = (double) bn;
+
+    if (k <= 0)
+        return 0.0;
+    if (k <= bn)
+        return (double) k * ((double) k + 1.0) * 0.5;
+    if (k <= an)
+        return b * (b + 1.0) * 0.5 + ((double) k - b) * b;
+    if (k >= an + bn)
+        return a * b;
+    t = (double) (an + bn - k);
+    return a * b - t * (t + 1.0) * 0.5;
+}
+
+/* Tuning: the classical algorithm costs about one unit per limb product
+   while the FFT (or Kronecker) algorithm costs roughly a constant number
+   of units per input limb regardless of the requested slice. The ratio
+   is chosen so that a balanced full product switches at 80 limbs; a
+   truncated product (a high product for a floating-point multiplication,
+   or a product with a short operand) needs proportionally fewer limb
+   products and stays classical for longer. */
+#if FLINT_HAVE_FFT_SMALL
+#define RADIX_MULMID_FFT_CUTOFF_RATIO 40
+#else
+/* Kronecker substitution pads each limb to two words, so the crossover
+   is much later (about 350 limbs for a balanced full product). */
+#define RADIX_MULMID_FFT_CUTOFF_RATIO 175
+#endif
+
 RADIX_INLINE void
 radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix)
 {
-    /* todo: tuning */
-    if (bn < 80 || hi - lo < 80)
+    double work;
+
+    if (FLINT_MIN(an, bn) < 80 || hi - lo < 80)
+    {
+        radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
+        return;
+    }
+
+    /* limb products needed for the slice, including the ones just
+       below lo which the classical algorithm computes for carries */
+    work = _radix_mulmid_pairs_below(an, bn, hi) - _radix_mulmid_pairs_below(an, bn, FLINT_MAX(lo - 1, 0));
+
+    if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) (an + bn))
         radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
     else
 #if FLINT_HAVE_FFT_SMALL
@@ -104,8 +234,6 @@ radix_mul(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_
     radix_mulmid(res, a, an, b, bn, 0, an + bn, radix);
 }
 
-/* Division */
-
 /* todo: squaring optimisations in all multiplication algorithms */
 RADIX_INLINE void
 radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
@@ -113,10 +241,36 @@ radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     radix_mul(res, a, an, a, an, radix);
 }
 
+RADIX_INLINE ulong
+radix_mul_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+{
+    return radix_add(res, a, an, a, an, radix);
+}
+
+void
+_radix_mulhigh_known_low(nn_ptr out, nn_srcptr x, slong xn, nn_srcptr y, slong yn,
+    nn_srcptr kl, slong kl_len, slong klo, slong khi, nn_ptr scratch,
+    const radix_t radix);
+
+/* Division */
+
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 void radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
+ulong radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix);
 
-int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_div_approx_invmul(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix);
+void radix_div_approx(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix);
+
+void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix);
+void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divrem_newton_karp_markstein(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slong Bn, const radix_t radix);
+void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+
+int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 
 /* compare (x, n) with floor(B^n / 2) */
 RADIX_INLINE int
@@ -143,6 +297,34 @@ radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     return 0;
 }
+
+/* Square roots */
+
+void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix);
+void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix);
+
+void radix_sqrtrem_via_mpn(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_rsqrt_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_rsqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+int radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix);
+
+/* Modular (Hensel) division */
+
+int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+
+int radix_divmod_bn_1(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, ulong b, slong n, const radix_t radix);
+int radix_divmod_bn_classical(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix);
+int radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix);
+int radix_divmod_bn(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix);
+
+/* Modular square roots */
+
+int radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+int radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
 
 /* Radix conversion */
 
@@ -219,9 +401,29 @@ void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix
 int radix_integer_is_normalised(const radix_integer_t x, const radix_t radix);
 
 RADIX_INLINE slong
-radix_integer_size(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
+radix_integer_size_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
 {
     return FLINT_ABS(x->size);
+}
+
+RADIX_INLINE slong
+radix_integer_ssize_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
+{
+    return x->size;
+}
+
+RADIX_INLINE slong
+radix_integer_size_digits(const radix_integer_t x, const radix_t radix)
+{
+    return (x->size == 0) ? 0 : _radix_size_digits(x->d, FLINT_ABS(x->size), radix);
+}
+
+RADIX_INLINE slong
+radix_integer_ssize_digits(const radix_integer_t x, const radix_t radix)
+{
+    if (x->size == 0) return 0;
+    if (x->size > 0) return _radix_size_digits(x->d, x->size, radix);
+    return -_radix_size_digits(x->d, -x->size, radix);
 }
 
 RADIX_INLINE ulong
@@ -233,8 +435,16 @@ radix_integer_get_limb(const radix_integer_t x, slong n, const radix_t FLINT_UNU
 
 void radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix);
 
+ulong radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radix);
+void radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix);
+
 void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+void radix_integer_addlsh(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong v, const radix_t radix);
+void radix_integer_sublsh(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong v, const radix_t radix);
 
 RADIX_INLINE slong
 radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
@@ -243,17 +453,222 @@ radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSE
     if (xn == 0)
         return 0;
     slong v = 0;
-    while (v < xn && x->d[v] == 0)
+    while (x->d[v] == 0)
         v++;
     return v;
+}
+
+RADIX_INLINE slong
+radix_integer_valuation_digits(const radix_integer_t x, const radix_t radix)
+{
+    slong xn = FLINT_ABS(x->size);
+    if (xn == 0)
+        return 0;
+    slong v = 0;
+    while (x->d[v] == 0)
+        v++;
+    return v * radix->exp + _radix_valuation_digits_1(x->d[v], radix);
 }
 
 void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
+void radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
 void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
 int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+int radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t a, const radix_integer_t b, slong n, const radix_t radix);
+int radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+int radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+
+void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_tdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_fdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_cdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+
+int radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_invertible(const radix_integer_t x, const radix_t radix);
+
+int radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix);
+void radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_square(const radix_integer_t x, const radix_t radix);
+
+/* Utilities */
+
+RADIX_INLINE void
+n_div_precomp_init(n_div_precomp_t pre, ulong d)
+{
+    pre->e = FLINT_BIT_COUNT(d) - 1;
+
+    if ((d & (d - 1)) == 0)
+    {
+        pre->m = 0;
+        pre->c = 0;
+    }
+    else
+    {
+        ulong q, r;
+        udiv_qrnnd(q, r, UWORD(1) << pre->e, 0, d);
+        if (d - r < (UWORD(1) << pre->e))
+        {
+            pre->m = q + 1;
+            pre->c = 0;
+        }
+        else
+        {
+            pre->m = q;
+            pre->c = 1;
+        }
+    }
+}
+
+RADIX_INLINE ulong
+n_div_precomp_m0(ulong x, const n_div_precomp_t pre)
+{
+    return x >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(x, pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong n_incsat(ulong x)
+{
+    ulong t = x + 1;
+    return (t > x) ? t : x;
+}
+
+/* Assumes x != UWORD_MAX */
+RADIX_INLINE ulong
+n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_m0(ulong x, ulong FLINT_UNUSED(d), const n_div_precomp_t pre)
+{
+    return x & ((UWORD(1) << pre->e) - 1);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c0(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_bounded(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1_bounded(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp(x, pre);
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_m0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_m0(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c0(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c1(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c1_bounded(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_bounded(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
 
 #ifdef __cplusplus
 }

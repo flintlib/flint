@@ -144,7 +144,7 @@ int fmpz_mpoly_factor_irred_zassenhaus(
     fmpz_bpoly_t B;
     fmpz_tpoly_t F;
 
-    FLINT_ASSERT(n > 1);
+    FLINT_ASSERT(n > 0);
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(fmpz_sgn(A->coeffs + 0) > 0);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
@@ -221,7 +221,8 @@ got_alpha:
         fmpz_mpoly_repack_bits_inplace(Aevals + i, A->bits, ctx);
     }
 
-    fmpz_mpoly_get_bpoly(B, Aevals + 1, 0, 1, ctx);
+    /* for nvars = 2 (n = 1) the bivariate image is A itself */
+    fmpz_mpoly_get_bpoly(B, n > 1 ? Aevals + 1 : A, 0, 1, ctx);
     fmpz_bpoly_factor(c, F, B);
     FLINT_ASSERT(c->length == 1 && fmpz_is_pm1(c->coeffs + 0));
 

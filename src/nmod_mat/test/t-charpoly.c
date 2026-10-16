@@ -24,10 +24,13 @@ TEST_FUNCTION_START(nmod_mat_charpoly, state)
         nmod_mat_t A, B, C, D;
         nmod_poly_t f, g;
 
-        m = n_randint(state, 10);
-        n = m;
-
         mod = n_randtest_not_zero(state);
+
+        if (n_randint(state, 10) == 0 && mod <= 255)
+            m = n_randint(state, 50);
+        else
+            m = n_randint(state, 10);
+        n = m;
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, m, n, mod);
@@ -67,10 +70,13 @@ TEST_FUNCTION_START(nmod_mat_charpoly, state)
         nmod_mat_t A;
         nmod_poly_t f, g;
 
-        m = n_randint(state, 10);
-        n = m;
-
         mod = n_randtest_not_zero(state);
+
+        if (n_randint(state, 10) == 0 && mod <= 255)
+            m = n_randint(state, 50);
+        else
+            m = n_randint(state, 10);
+        n = m;
 
         nmod_mat_init(A, m, n, mod);
         nmod_poly_init(f, mod);

@@ -150,3 +150,126 @@ Primality testing
 .. function:: int fmpzi_is_probabprime(const fmpzi_t n)
 
     Check whether `n` is a probable Gaussian prime.
+
+.. function:: int _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+
+    Computes the coefficients `[\mathtt{nlo}, \mathtt{nhi})` of the
+    product of the Gaussian integer polynomials ``(poly1, len1)`` and
+    ``(poly2, len2)``, with the coefficient arithmetic done pointwise
+    on fft_small transforms: two transforms per coefficient (real and
+    imaginary parts) and four pointwise operations per complex
+    product, the shorter operand's transforms kept and the longer
+    rolling as in :func:`_fmpz_poly_mulmid_classical_fft_small`.
+    Squaring shares transforms, pairs symmetric terms and computes
+    diagonal squares with three multiplications. The lengths may be
+    given in either order. Returns 1 on success and 0 when the
+    transformed representation is unavailable or unprofitable in which
+    case nothing is written and the caller should fall back to a
+    different routine.
+
+.. function:: void _fmpzi_poly_mulmid(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[\mathtt{nlo}, \mathtt{nhi})` of the product of the Gaussian integer
+    polynomials ``(poly1, len1)`` and ``(poly2, len2)``, choosing an
+    algorithm. Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`; the lengths may be given in
+    either order, and ``res`` must not alias the inputs. This is the
+    multiplication used by the ``fmpzi`` generic ring for polynomial
+    multiplication, low products and middle products.
+
+    The choice depends on `b`, the average over the two operands of the
+    larger part size in bits, and on `q`, the number of coefficient
+    products in the window per operand coefficient (`n/2` for an
+    `n \times n` product, `n/3` for the Newton middle product
+    `(2n - 1) \times n \to [n - 1, 2n - 1)`): the classical algorithm
+    for windows of at most 12 products; four real products when a part
+    vanishes or is much smaller than the other (they skip the vanishing
+    products); :func:`_fmpzi_poly_mulmid_classical_fft_small` from 8192
+    bits up to a bound on `q` increasing with `b`; real products, three
+    (Karatsuba) from about 256 bits, below a bound on `q` decreasing with
+    `b`; and otherwise :func:`_fmpzi_poly_mulmid_KS`, except for
+    :func:`_fmpzi_poly_mulmid_SS` on squares at 384-3072 bits, short full
+    products at 768-1536 bits and middle products whose cyclic transform
+    saves a quarter of the length at 768-3072 bits (short ones) and from
+    24576 bits, and for huge products (`m_1 + m_2 \ge 32768` and
+    `(len_1 + len_2)(m_1 + m_2) > 2.5 \cdot 10^8` for the larger part sizes
+    `m_1, m_2` of the operands), where Schoenhage-Strassen runs within
+    about 10% of the time in about a fifth of the memory. The boundaries were
+    fitted to timings on x86-64 with uniformly random coefficients.
+
+.. function:: void _fmpzi_poly_mulmid_KS(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[\mathtt{nlo}, \mathtt{nhi})` of the product of the Gaussian integer
+    polynomials ``(poly1, len1)`` and ``(poly2, len2)``, using Kronecker
+    substitution. Assumes that ``len1`` and ``len2`` are positive and
+    that `0 \le nlo < nhi \le len1 + len2 - 1`; the lengths may be given
+    in either order, and ``res`` may alias the inputs.
+
+    The real and imaginary parts of each operand are packed into
+    integers at a common field size, and a single
+    :func:`flint_mpn_mul_complex` (or :func:`flint_mpn_sqr_complex`)
+    call forms both parts of the packed product. Above the transform
+    cutoff of those functions the four packed parts are thus
+    transformed once and combined pointwise (four forward and two
+    inverse transforms, two and two for squaring), and below it their
+    Karatsuba or schoolbook schemes apply. Windows are computed as
+    two's-complement windows of the packed parts, which unpack directly
+    into signed coefficients: with :func:`flint_mpn_mullow_complex` (or
+    :func:`flint_mpn_sqrlow_complex`) when the window starts at the
+    bottom and ends below the top of the product, and with
+    :func:`flint_mpn_mulmid_complex` (or :func:`flint_mpn_sqrmid_complex`)
+    when it starts above the bottom, three guard limbs below the first
+    field absorbing the error of the windowed products. Above the
+    transform cutoff the latter reconstructs only the CRT coefficients
+    reaching the window and, when the window allows it, uses a cyclic
+    transform, which is where a middle product saves transform length. When one operand is real,
+    the products are formed separately, without sharing the transform
+    of the other operand.
+
+.. function:: void _fmpzi_poly_mulmid_SS(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpzi_poly_mulmid_SS_pair(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpzi_poly_mulmid_SS_single(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[\mathtt{nlo}, \mathtt{nhi})` of the product of the Gaussian integer
+    polynomials ``(poly1, len1)`` and ``(poly2, len2)``, using
+    Schoenhage-Strassen convolution. Assumes that ``len1`` and ``len2``
+    are positive and that `0 \le nlo < nhi \le len1 + len2 - 1`; the
+    lengths may be given in either order, and ``res`` may alias the
+    inputs.
+
+    In the coefficient ring `\mathbb{Z}/(2^N+1)` of the transform,
+    `s = 2^{N/2}` is a square root of `-1`, and
+    `\mathbb{Z}[i]/(2^N+1) \cong \mathbb{Z}/(2^N+1) \times \mathbb{Z}/(2^N+1)`
+    via `a + bi \mapsto (a + sb, a - sb)`. The *pair* method
+    (``_SS_pair``) therefore computes the Gaussian product as two
+    ordinary convolutions, of
+    `u = \operatorname{re} + s \operatorname{im}` and
+    `v = \operatorname{re} - s \operatorname{im}`, with a ring size
+    covering the components of the result, and recovered as
+    `\operatorname{re} = (U + V)/2`,
+    `\operatorname{im} = (V - U) s / 2`; all conversions are shifts and
+    additions. This uses six transforms and two pointwise products per
+    point (four transforms for squaring). The *single embedding*
+    (``_SS_single``) uses the homomorphism `a + bi \mapsto a + sb` alone:
+    one convolution in a ring of twice the size gives
+    `T = \operatorname{re} + s \operatorname{im}`, from whose two's
+    complement representation both parts are read off, the ring being
+    large enough that `|T| < 2^{N-1}`. The transform work and the memory
+    are about the same as for the pair method, but the ring is rounded
+    up to a multiple of the transform length once rather than twice,
+    which favors it for small coefficients relative to the length; it
+    also halves the number of pointwise products, which favors it for
+    small rings, while for medium rings the pointwise products of the
+    larger ring cost more than twice as much. The main function chooses
+    between them by the rounded ring sizes, as measured on x86-64. The
+    convolution
+    length is
+    chosen as by :func:`fft_convolution_choose_mid`, so middle products
+    use the cyclic (wraparound) transform when it is shorter. When an
+    operand is real or purely imaginary, its nonzero part is transformed
+    once and multiplied by both parts of the other operand (two
+    convolutions sharing that transform, five transforms in all), or by
+    the single nonzero part of the other operand (one convolution).

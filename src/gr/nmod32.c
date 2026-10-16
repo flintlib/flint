@@ -15,7 +15,10 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
+#include "flint-mparam.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
 
@@ -24,12 +27,14 @@
 
 typedef uint32_t nmod32_t[1];
 
-static void
+static int
 nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, NMOD32_CTX(ctx).n);
-    gr_stream_write(out, " (nmod32)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, NMOD32_CTX(ctx).n);
+    status |= gr_stream_write(out, " (nmod32)");
+    return status;
 }
 
 /* we don't want to call n_is_prime because this predicate should
@@ -76,8 +81,7 @@ nmod32_randtest(nmod32_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, x[0]);
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, x[0]);
 }
 
 static int
@@ -331,6 +335,13 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
     return status;
 }
 
+static int
+nmod32_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD32_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 {
@@ -343,6 +354,18 @@ _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 static void
 _nmod32_vec_clear(uint32_t * res, slong len, gr_ctx_t ctx)
 {
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_nmod32_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    uint32_t * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
 }
 
 static int
@@ -423,7 +446,6 @@ _nmod32_vec_mul(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, sl
     return GR_SUCCESS;
 }
 
-/* todo: overflow checks */
 static int
 _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
@@ -468,7 +490,6 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const uint32
     return GR_SUCCESS;
 }
 
-/* todo: overflow checks */
 static int
 _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
@@ -515,6 +536,50 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const ui
 }
 
 static int
+_nmod32_vec_dot_strided(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, slong stride1, const uint32_t * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod32_zero(res, ctx);
+        else
+            nmod32_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD32_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = n_negmod(initial[0], n);
+        else
+            s = initial[0];
+    }
+
+    {
+        ulong ss;
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD32_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i * stride1], (ulong) vec2[i * stride2], NMOD32_CTX(ctx), params);
+        s = n_addmod(s, ss, n);
+    }
+
+    nmod32_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
+static int
 _nmod32_vec_mul_scalar(uint32_t * res, const uint32_t * vec, slong len, const uint32_t * c, gr_ctx_t ctx)
 {
     ulong d = *c;
@@ -549,24 +614,50 @@ _nmod32_vec_submul_scalar(uint32_t * res, const uint32_t * vec, slong len, const
 }
 
 static int
-_nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong trunc, gr_ctx_t ctx)
+_nmod32_poly_mulmid(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     nn_ptr TR, TA, TB;
-    slong i, alloc;
+    slong i, alloc, len;
     int squaring;
 
-    Alen = FLINT_MIN(Alen, trunc);
-    Blen = FLINT_MIN(Blen, trunc);
+    Alen = FLINT_MIN(Alen, nhi);
+    Blen = FLINT_MIN(Blen, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (Alen + Blen - 1) - nlo;
+
+        if (Alen > nlo2)
+        {
+            slong trunc = Alen - nlo2;
+            A += trunc;
+            Alen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (Blen > nlo2)
+        {
+            slong trunc = Blen - nlo2;
+            B += trunc;
+            Blen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
+    len = nhi - nlo;
 
     /* todo: tune this */
-    if (Alen < 10 || Blen < 10)
-        return _gr_poly_mullow_classical(res, A, Alen, B, Blen, trunc, ctx);
+    if (Alen < 10 || Blen < 10 || len < 10)
+        return _gr_poly_mulmid_classical(res, A, Alen, B, Blen, nlo, nhi, ctx);
 
     squaring = (A == B) && (Alen == Blen);
 
-    alloc = squaring ? (Alen + trunc) : (Alen + Blen + trunc);
-    TR = GR_TMP_ALLOC(alloc * sizeof(ulong));
-    TA = TR + trunc;
+    alloc = squaring ? (Alen + len) : (Alen + Blen + len);
+    alloc *= sizeof(ulong);
+    TR = GR_TMP_ALLOC(alloc);
+    TA = TR + len;
     TB = TA + Alen;
 
     for (i = 0; i < Alen; i++)
@@ -574,34 +665,76 @@ _nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32
 
     if (squaring)
     {
-        _nmod_poly_mullow(TR, TA, Alen, TA, Alen, trunc, NMOD32_CTX(ctx));
+        _nmod_poly_mulmid(TR, TA, Alen, TA, Alen, nlo, nhi, NMOD32_CTX(ctx));
     }
     else
     {
         for (i = 0; i < Blen; i++)
             TB[i] = B[i];
 
-        if (Alen >= Blen)
-            _nmod_poly_mullow(TR, TA, Alen, TB, Blen, trunc, NMOD32_CTX(ctx));
-        else
-            _nmod_poly_mullow(TR, TB, Blen, TA, Alen, trunc, NMOD32_CTX(ctx));
+        _nmod_poly_mulmid(TR, TA, Alen, TB, Blen, nlo, nhi, NMOD32_CTX(ctx));
     }
 
-    for (i = 0; i < trunc; i++)
+    for (i = 0; i < len; i++)
         res[i] = TR[i];
 
     GR_TMP_FREE(TR, alloc);
     return GR_SUCCESS;
 }
 
-/* todo: tuning for rectangular matrices */
+static int
+_nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong len, gr_ctx_t ctx)
+{
+    return _nmod32_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
+}
+
+/*
+    The integer SIMD kernel of nmod_mat (_nmod_mat_mul_u32) reads and writes
+    uint32 entries directly; single-threaded, one Strassen level is put on
+    top of it from the same dimension as in nmod_mat_mul (the recursive
+    calls come back here). The generic methods remain for tiny matrices and
+    for 32-bit builds, where the kernel declines.
+*/
 static int
 _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
+    slong ar = gr_mat_nrows(A, ctx);
+    slong ac = gr_mat_ncols(A, ctx);
+    slong bc = gr_mat_ncols(B, ctx);
+    slong min_dim = FLINT_MIN(FLINT_MIN(ar, ac), bc);
+
+    if (min_dim >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+    {
+        if (ac != gr_mat_nrows(B, ctx) || ar != gr_mat_nrows(C, ctx)
+                || bc != gr_mat_ncols(C, ctx))
+            return GR_DOMAIN;
+
+        if (flint_get_num_threads() == 1
+                && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
+            return gr_mat_mul_strassen(C, A, B, ctx);
+
+        if (_nmod_mat_mul_u32(C->entries, C->stride, A->entries, A->stride,
+                              B->entries, B->stride, ar, ac, bc,
+                              NMOD32_CTX(ctx)))
+            return GR_SUCCESS;
+    }
+
+    if (min_dim >= 256)
         return gr_mat_mul_strassen(C, A, B, ctx);
     else
         return gr_mat_mul_classical(C, A, B, ctx);
+}
+
+static int
+_nmod32_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    /* todo: tune cutoff */
+    if (n > 8 && _gr_mat_charpoly_danilevsky(res, mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_mat_charpoly_berkowitz(res, mat, ctx);
 }
 
 
@@ -616,6 +749,8 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod32_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) nmod32_ctx_is_field},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+                                        (gr_funcptr) nmod32_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
@@ -657,9 +792,14 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod32_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod32_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod32_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
-    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _nmod32_vec_zero},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_set},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
@@ -667,11 +807,15 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod32_vec_mul},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod32_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod32_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod32_vec_dot_strided},
     {GR_METHOD_VEC_MUL_SCALAR,     (gr_funcptr) _nmod32_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod32_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod32_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -680,6 +824,7 @@ gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
 {
     if (n == 0)
         return GR_DOMAIN;
+
     if (n > UWORD(4294967295))
         return GR_UNABLE;
 

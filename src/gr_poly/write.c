@@ -68,8 +68,7 @@ _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_
 
     if (n == 0)
     {
-        gr_stream_write(out, "0");
-        return status;
+        return gr_stream_write(out, "0");
     }
 
     for (i = 0; i < n; i++)
@@ -77,21 +76,21 @@ _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_
         if (gr_is_zero(GR_ENTRY(poly, i, sz), ctx) == T_TRUE)
             continue;
 
-        gr_get_str(&s, GR_ENTRY(poly, i, sz), ctx);
+        status |= gr_get_str(&s, GR_ENTRY(poly, i, sz), ctx);
 
         if (i >= 1 && !strcmp(s, "1"))
         {
             flint_free(s);
 
             if (printed_previously)
-                gr_stream_write(out, " + ");
+                status |= gr_stream_write(out, " + ");
 
-            gr_stream_write(out, x);
+            status |= gr_stream_write(out, x);
 
             if (i >= 2)
             {
-                gr_stream_write(out, "^");
-                gr_stream_write_si(out, i);
+                status |= gr_stream_write(out, "^");
+                status |= gr_stream_write_si(out, i);
             }
         }
         else if (i >= 1 && !strcmp(s, "-1"))
@@ -99,16 +98,16 @@ _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_
             flint_free(s);
 
             if (printed_previously)
-                gr_stream_write(out, " - ");
+                status |= gr_stream_write(out, " - ");
             else
-                gr_stream_write(out, "-");
+                status |= gr_stream_write(out, "-");
 
-            gr_stream_write(out, x);
+            status |= gr_stream_write(out, x);
 
             if (i >= 2)
             {
-                gr_stream_write(out, "^");
-                gr_stream_write_si(out, i);
+                status |= gr_stream_write(out, "^");
+                status |= gr_stream_write_si(out, i);
             }
         }
 
@@ -117,62 +116,62 @@ _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_
             if (want_parens(s))
             {
                 if (printed_previously)
-                    gr_stream_write(out, " + ");
+                    status |= gr_stream_write(out, " + ");
 
-                gr_stream_write(out, "(");
-                gr_stream_write_free(out, s);
-                gr_stream_write(out, ")");
+                status |= gr_stream_write(out, "(");
+                status |= gr_stream_write_free(out, s);
+                status |= gr_stream_write(out, ")");
             }
             else
             {
                 if (printed_previously && s[0] == '-')
                 {
-                    gr_stream_write(out, " - ");
-                    gr_stream_write(out, s + 1);
+                    status |= gr_stream_write(out, " - ");
+                    status |= gr_stream_write(out, s + 1);
                     flint_free(s);
                 }
                 else
                 {
                     if (printed_previously)
-                        gr_stream_write(out, " + ");
+                        status |= gr_stream_write(out, " + ");
 
-                    gr_stream_write_free(out, s);
+                    status |= gr_stream_write_free(out, s);
                 }
             }
 
             if (i == 1)
             {
-                gr_stream_write(out, "*");
-                gr_stream_write(out, x);
+                status |= gr_stream_write(out, "*");
+                status |= gr_stream_write(out, x);
             }
             else if (i >= 2)
             {
-                gr_stream_write(out, "*");
-                gr_stream_write(out, x);
-                gr_stream_write(out, "^");
-                gr_stream_write_si(out, i);
+                status |= gr_stream_write(out, "*");
+                status |= gr_stream_write(out, x);
+                status |= gr_stream_write(out, "^");
+                status |= gr_stream_write_si(out, i);
             }
         }
 
         printed_previously = 1;
 
 /*
-        gr_stream_write(out, "(");
+        status |= gr_stream_write(out, "(");
         status |= gr_write(out, GR_ENTRY(poly, i, sz), ctx);
-        gr_stream_write(out, ")");
+        status |= gr_stream_write(out, ")");
 
         if (i == 1)
         {
-            gr_stream_write(out, "*x");
+            status |= gr_stream_write(out, "*x");
         }
         else if (i >= 2)
         {
-            gr_stream_write(out, "*x^");
-            gr_stream_write_si(out, i);
+            status |= gr_stream_write(out, "*x^");
+            status |= gr_stream_write_si(out, i);
         }
 
         if (i < n - 1)
-            gr_stream_write(out, " + ");
+            status |= gr_stream_write(out, " + ");
 */
     }
     return status;

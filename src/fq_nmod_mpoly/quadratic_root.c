@@ -485,9 +485,7 @@ int fq_nmod_mpoly_quadratic_root(
 
     Qbits = FLINT_MAX(A->bits, B->bits);
     Qbits = mpoly_fix_bits(Qbits, ctx->minfo);
-    N = mpoly_words_per_exp(Qbits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Qbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Qbits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     if (Qbits > A->bits)

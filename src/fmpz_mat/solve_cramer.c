@@ -94,6 +94,22 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
 {
     slong i, dim = fmpz_mat_nrows(A);
 
+    /* The formulas below read A while writing X, so an X aliasing A is
+       solved into a temporary (the other solvers accept such aliasing,
+       and fmpz_mat_inv relies on it) */
+    if (X == A || (X->entries == A->entries && !fmpz_mat_is_empty(A)))
+    {
+        fmpz_mat_t T;
+        int success;
+
+        fmpz_mat_init(T, X->r, X->c);
+        success = fmpz_mat_solve_cramer(T, den, A, B);
+        if (success)
+            fmpz_mat_swap(X, T);
+        fmpz_mat_clear(T);
+        return success;
+    }
+
     if (dim == 0 || fmpz_mat_ncols(B) == 0)
     {
         fmpz_one(den);

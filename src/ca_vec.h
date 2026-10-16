@@ -39,13 +39,13 @@ ca_vec_entry_ptr(ca_vec_t vec, slong i)
 ca_ptr _ca_vec_init(slong len, ca_ctx_t ctx);
 void ca_vec_init(ca_vec_t vec, slong len, ca_ctx_t ctx);
 
-void _ca_vec_clear(ca_ptr v, slong len, ca_ctx_t ctx);
+void _ca_vec_clear(ca_ptr vec, slong len, ca_ctx_t ctx);
 void ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx);
 
 void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
 
 CA_VEC_INLINE void
-ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
+ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(ca_vec_struct, *vec1, *vec2);
 }
@@ -53,13 +53,13 @@ ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 /* Length */
 
 CA_VEC_INLINE
-slong ca_vec_length(const ca_vec_t vec, ca_ctx_t ctx)
+slong ca_vec_length(const ca_vec_t vec, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return vec->length;
 }
 
 void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
-void ca_vec_set_length(ca_vec_t res, slong len, ca_ctx_t ctx);
+void ca_vec_set_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
 
 /* Assignment */
 
@@ -111,8 +111,8 @@ void _ca_vec_add(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t
 void _ca_vec_sub(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx);
 void _ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 void _ca_vec_scalar_div_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
-void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
-void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
+void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
+void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 
 /* Comparisons and predicates */
 
@@ -131,7 +131,7 @@ _ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
 }
 
 CA_VEC_INLINE int
-_ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
+_ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = 0; i < len; i++)

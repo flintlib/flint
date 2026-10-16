@@ -25,8 +25,28 @@ static char * _gr_mpoly_default_vars[8] = {
 static int
 want_parens(const char * s)
 {
-    if (s[0] == '(' || s[0] == '[' || s[0] == '{')
-        return 0;
+    /* Try to determine if the expression is already enclosed by
+       brackets or parentheses. */
+    if (s[0] == '[' || s[0] == '(' || s[0] == '}')
+    {
+        slong depth = 1;
+
+        char open = s[0];
+        char close = (open == '[') ? ']' : (open == '(' ? ')' : '}');
+
+        s++;
+        while (s[0] != '\0')
+        {
+            if (s[0] == open)
+                depth++;
+            else if (s[0] == close)
+                depth--;
+
+            s++;
+            if (depth == 0)
+                return s[0] != '\0';
+        }
+    }
 
     if (s[0] == '-')
         s++;
@@ -42,7 +62,6 @@ want_parens(const char * s)
     return 0;
 }
 
-/* todo: error handling */
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -54,13 +73,11 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
     fmpz * exponents;
     char * s;
     char ** x = GR_MPOLY_VARS(ctx);
+    int status = GR_SUCCESS;
     TMP_INIT;
 
     if (len == 0)
-    {
-        gr_stream_write(out, "0");
-        return GR_SUCCESS;
-    }
+        return gr_stream_write(out, "0");
 
     N = mpoly_words_per_exp(bits, mctx);
 
@@ -96,13 +113,13 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
     {
         int removed_coeff = 0;
 
-        gr_get_str(&s, GR_ENTRY(A->coeffs, i, cctx->sizeof_elem), cctx);
+        status |= gr_get_str(&s, GR_ENTRY(A->coeffs, i, cctx->sizeof_elem), cctx);
 
         if (!strcmp(s, "1"))
         {
             flint_free(s);
             if (i > 0)
-                gr_stream_write(out, " + ");
+                status |= gr_stream_write(out, " + ");
             removed_coeff = 1;
         }
         else if (!strcmp(s, "-1"))
@@ -110,9 +127,9 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
             flint_free(s);
 
             if (i > 0)
-                gr_stream_write(out, " - ");
+                status |= gr_stream_write(out, " - ");
             else
-                gr_stream_write(out, "-");
+                status |= gr_stream_write(out, "-");
 
             removed_coeff = -1;
         }
@@ -121,26 +138,26 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
             if (want_parens(s))
             {
                 if (i > 0)
-                    gr_stream_write(out, " + ");
+                    status |= gr_stream_write(out, " + ");
 
-                gr_stream_write(out, "(");
-                gr_stream_write_free(out, s);
-                gr_stream_write(out, ")");
+                status |= gr_stream_write(out, "(");
+                status |= gr_stream_write_free(out, s);
+                status |= gr_stream_write(out, ")");
             }
             else
             {
                 if (i > 0 && s[0] == '-')
                 {
-                    gr_stream_write(out, " - ");
-                    gr_stream_write(out, s + 1);
+                    status |= gr_stream_write(out, " - ");
+                    status |= gr_stream_write(out, s + 1);
                     flint_free(s);
                 }
                 else
                 {
                     if (i > 0)
-                        gr_stream_write(out, " + ");
+                        status |= gr_stream_write(out, " + ");
 
-                    gr_stream_write_free(out, s);
+                    status |= gr_stream_write_free(out, s);
                 }
             }
         }
@@ -150,7 +167,7 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
         if (_fmpz_vec_is_zero(exponents, mctx->nvars))
         {
             if (removed_coeff != 0)
-                gr_stream_write(out, "1");
+                status |= gr_stream_write(out, "1");
         }
         else
         {
@@ -163,17 +180,17 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
                 if (cmp > 0)
                 {
                     if (have_printed_var || !removed_coeff)
-                        gr_stream_write(out, "*");
-                    gr_stream_write(out, x[j]);
-                    gr_stream_write(out, "^");
-                    gr_stream_write_fmpz(out, exponents + j);
+                        status |= gr_stream_write(out, "*");
+                    status |= gr_stream_write(out, x[j]);
+                    status |= gr_stream_write(out, "^");
+                    status |= gr_stream_write_fmpz(out, exponents + j);
                     have_printed_var = 1;
                 }
                 else if (cmp == 0)
                 {
                     if (have_printed_var || !removed_coeff)
-                        gr_stream_write(out, "*");
-                    gr_stream_write(out, x[j]);
+                        status |= gr_stream_write(out, "*");
+                    status |= gr_stream_write(out, x[j]);
                     have_printed_var = 1;
                 }
             }
@@ -185,7 +202,7 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
 
     TMP_END;
 
-    return GR_SUCCESS;
+    return status;
 }
 
 int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)

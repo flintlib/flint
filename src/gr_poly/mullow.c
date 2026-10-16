@@ -48,8 +48,7 @@ gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1,
         status = _gr_poly_mullow(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs, poly2->length, n, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 

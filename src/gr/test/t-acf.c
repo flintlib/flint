@@ -11,6 +11,8 @@
 
 #include "test_helpers.h"
 #include "gr.h"
+#include "gr_mat.h"
+#include "gr_poly.h"
 #include "gr_special.h"
 
 TEST_FUNCTION_START(gr_acf, state)
@@ -132,6 +134,16 @@ TEST_FUNCTION_START(gr_acf, state)
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_atan, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_gamma, ctx2, tol, state, 0);
             }
+
+            GR_IGNORE(gr_one(tol1, ctx));
+            GR_IGNORE(gr_mul_2exp_si(tol1, tol1, -prec + 4, ctx));
+
+            gr_mat_test_approx_mul_pos_entrywise_accurate(
+                (gr_method_mat_binary_op) gr_mat_mul,
+                tol1, state, 10, prec <= 64 ? 150 : 100, ctx);
+
+            _gr_poly_test_approx_mulmid_pos_entrywise_accurate((gr_method_poly_binary_trunc2_op) _gr_poly_mulmid,
+                NULL, tol1, state, 10, 30, ctx);
 
             gr_heap_clear(tol1, ctx);
             gr_heap_clear(tol, ctx2);

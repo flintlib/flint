@@ -114,7 +114,7 @@ ulong dirichlet_order_char(const dirichlet_group_t G, const dirichlet_char_t x);
 void dirichlet_char_log(dirichlet_char_t x, const dirichlet_group_t G, ulong m);
 
 DIRICHLET_INLINE ulong
-dirichlet_char_exp(const dirichlet_group_t G, const dirichlet_char_t x)
+dirichlet_char_exp(const dirichlet_group_t FLINT_UNUSED(G), const dirichlet_char_t x)
 {
     return x->n;
 }
@@ -142,7 +142,7 @@ ulong dirichlet_pairing(const dirichlet_group_t G, ulong m, ulong n);
 ulong dirichlet_pairing_char(const dirichlet_group_t G, const dirichlet_char_t a, const dirichlet_char_t b);
 
 DIRICHLET_INLINE int
-dirichlet_char_is_principal(const dirichlet_group_t G, const dirichlet_char_t chi)
+dirichlet_char_is_principal(const dirichlet_group_t FLINT_UNUSED(G), const dirichlet_char_t chi)
 {
     return (chi->n == 1);
 }

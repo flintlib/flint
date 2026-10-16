@@ -97,6 +97,7 @@ TEST_FUNCTION_START(fmpz_out_inp_raw, state)
             for (i = 0; i < n; ++i)
                 fmpz_clear(a + i);
             flint_free(a);
+            flint_cleanup_master();
             exit(0);
         }
         else  /* Parent process */

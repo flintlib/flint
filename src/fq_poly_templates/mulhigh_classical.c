@@ -13,6 +13,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 /* Assumes op1 and op2 are not length 0. */
 void
@@ -22,42 +23,14 @@ _TEMPLATE(T, poly_mulhigh_classical) (
     const TEMPLATE(T, struct) * op2, slong len2,
     slong start, const TEMPLATE(T, ctx_t) ctx)
 {
-    slong m, n;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
     _TEMPLATE(T, vec_zero) (rop, start, ctx);
 
-    if (len1 == 1)              /* Special case if the length of both inputs is 1 */
-    {
-        if (start == 0)
-            TEMPLATE(T, mul) (rop, op1, op2, ctx);
-    }
-    else                        /* Ordinary case */
-    {
-        slong i;
-
-        /* Set res[i] = poly1[i]*poly2[0] */
-        if (start < len1)
-            _TEMPLATE3(T, vec_scalar_mul, T) (rop + start, op1 + start,
-                                              len1 - start, op2, ctx);
-
-        if (len2 == 1)
-            return;
-
-        /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        m = FLINT_MAX(len1 - 1, start);
-        _TEMPLATE3(T, vec_scalar_mul, T) (rop + m, op2 + m - len1 + 1,
-                                          len2 - 1 + len1 - m, op1 + len1 - 1,
-                                          ctx);
-
-        /* out[i+j] += in1[i]*in2[j] */
-        m = FLINT_MAX(start, len2 - 1);
-        for (i = m - len2 + 1; i < len1 - 1; i++)
-        {
-            n = FLINT_MAX(i + 1, start);
-            _TEMPLATE3(T, vec_scalar_addmul, T) (rop + n, op2 + n - i,
-                                                 len2 + i - n, op1 + i, ctx);
-        }
-    }
+    if (start < len1 + len2 - 1)
+        GR_MUST_SUCCEED(_gr_poly_mulmid_classical(rop + start, op1, len1,
+                            op2, len2, start, len1 + len2 - 1, gr_ctx));
 }
 
 void

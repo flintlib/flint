@@ -282,6 +282,8 @@ Arithmetic
 
 .. function:: void acb_poly_scalar_mul(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)
 
+.. function:: void acb_poly_scalar_mul_si(acb_poly_t C, const acb_poly_t A, slong c, slong prec)
+
     Sets *C* to *A* multiplied by *c*.
 
 .. function:: void acb_poly_scalar_div(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)
@@ -312,7 +314,8 @@ Arithmetic
     in magnitude.
 
     The default function :func:`_acb_poly_mullow` automatically switches
-    been *classical* and *transpose* multiplication.
+    between *classical* multiplication, :func:`_acb_poly_mulmid_fmpzi`
+    (for well-scaled input) and *transpose* multiplication.
 
     If the input pointers are identical (and the lengths are the same),
     they are assumed to represent the same polynomial, and its
@@ -346,6 +349,50 @@ Arithmetic
     Sets *C* to the product of *A* and *B*.
     If the same variable is passed for *A* and *B*, sets *C* to
     the square of *A*.
+
+.. function:: void _acb_poly_mulmid_transpose(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid_transpose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _acb_poly_mulmid_classical(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid_classical(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _acb_poly_mulmid(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+
+    Analogous to *mullow* functions, but compute the product truncated
+    at length *nhi* and right-shifted by *nlo*.
+
+.. function:: int _acb_poly_mulmid_fmpzi(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+
+    Sets *{z, nhi - nlo}* to the coefficients `[nlo, nhi)` of the product
+    of *{x, xlen}* and *{y, ylen}* (the square if the pointers and lengths
+    are the same) and returns 1, if the inputs are well-scaled; otherwise
+    returns 0 and leaves *z* undefined. The window may extend beyond the
+    product, and *z* may alias an input.
+
+    After a substitution `x \to 2^c x` chosen from the first and last
+    nonzero midpoints (as for :func:`_arb_poly_mulmid_block`), the real
+    and imaginary midpoints of each input are written exactly as Gaussian
+    integers times one common power of two; the input is well-scaled if
+    this takes at most `3 \mathrm{prec} + 512` bits for each input (the
+    height :func:`_arb_poly_mulmid_block` allows a block of a real
+    polynomial). The midpoints of the result are then computed by a
+    single :func:`_fmpzi_poly_mulmid` and rounded to *prec* bits. The radii
+    are bounded separately for the real and imaginary parts: for
+    `(a_r + a_i i)(b_r + b_i i)` with radii `r_{a_r}, \ldots`, the real part
+    gets `|a_r| r_{b_r} + r_{a_r} (|b_r| + r_{b_r}) + |a_i| r_{b_i} + r_{a_i} (|b_i| + r_{b_i})`
+    and the imaginary part
+    `|a_r| r_{b_i} + r_{a_r} (|b_i| + r_{b_i}) + |a_i| r_{b_r} + r_{a_i} (|b_r| + r_{b_r})`,
+    summed over the convolution, using up to eight products of
+    nonnegative polynomials (four for a square) by
+    :func:`_arb_poly_addmulmid_mag`.
+
+.. function:: int _acb_poly_mulmid_use_fmpzi(slong len1, slong len2, slong nlo, slong nhi, slong prec, int squaring)
+
+    Returns whether :func:`_acb_poly_mulmid` and :func:`_acb_poly_mullow`
+    should try :func:`_acb_poly_mulmid_fmpzi` before the classical and
+    transposed algorithms. This is the case when the number `q` of
+    coefficient products in the window per input coefficient satisfies
+    `q \, \mathrm{prec}^{0.57} \ge 240` (330 for squares), and `q \ge 1`,
+    a fit to timings on x86-64.
 
 .. function:: void _acb_poly_inv_series(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong len, slong prec)
 
@@ -684,8 +731,8 @@ Elementary functions
 .. function:: void acb_poly_sqrt_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
     Sets *g* to the power series square root of *h*, truncated to length *n*.
-    Uses division-free Newton iteration for the reciprocal square root,
-    followed by a multiplication.
+    Uses the division-free Newton iteration for the reciprocal square root
+    to half the length, followed by a Karp-Markstein step.
 
     The underscore method does not support aliasing of the input and output
     arrays. It requires that *hlen* and *n* are greater than zero.
@@ -695,7 +742,7 @@ Elementary functions
 .. function:: void acb_poly_rsqrt_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
     Sets *g* to the reciprocal power series square root of *h*, truncated to length *n*.
-    Uses division-free Newton iteration.
+    Uses a division-free third-order Newton iteration.
 
     The underscore method does not support aliasing of the input and output
     arrays. It requires that *hlen* and *n* are greater than zero.
@@ -733,6 +780,34 @@ Elementary functions
 
     The underscore method supports aliasing of the input and output
     arrays. It requires that *flen* and *n* are greater than zero.
+
+.. function:: void _acb_poly_asin_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asin_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acos_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acos_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_atanh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_atanh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_asinh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asinh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acosh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acosh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+    Sets *res* respectively to the power series inverse trigonometric
+    and hyperbolic functions of *f*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *flen* and *n* are greater than zero.
 
 .. function:: void _acb_poly_exp_series_basecase(acb_ptr f, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -795,6 +870,17 @@ Elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
+.. function:: void _acb_poly_cot_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_cot_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* to the power series cotangent of *h*.*
+
+    Wraps :func: `_gr_poly_cot_series`.
+
+    The underscore method supports aliasing of the input and output
+    arrays. It require that *flen* and *n* are greater than zero.
+
 .. function:: void _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
@@ -806,6 +892,10 @@ Elementary functions
 .. function:: void _acb_poly_cos_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_cos_pi_series(acb_poly_t c, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_tan_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tan_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
 .. function:: void _acb_poly_cot_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -840,6 +930,22 @@ Elementary functions
     The implementations mirror those for sine and cosine, except that
     the *exponential* version computes both functions using the exponential
     function instead of the hyperbolic tangent.
+
+.. function:: void _acb_poly_tanh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tanh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_coth_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_coth_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* respectively to the power series cotangent and hyperbolic
+    cotangent of *h*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *hlen* and *n* are greater than zero.
 
 .. function:: void _acb_poly_sinc_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -920,6 +1026,51 @@ Power sums
     evaluates the sum naively term by term.
     The *threaded* version splits the computation
     over the number of threads returned by *flint_get_num_threads()*.
+
+.. function:: void _acb_poly_powsum_series_tree(acb_ptr z, const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec)
+
+    Computes the same sum as :func:`_acb_poly_powsum_series_naive` using a
+    transposed multipoint evaluation. Writing `L_k = \log(a+k)`,
+    `w_k = q^k (a+k)^{-s}` and `b_k = c - L_k` for a suitable centre `c`,
+    we have `\sum_k w_k e^{-L_k t} = e^{-c t} \sum_j p_j t^j / j!` where
+    the weighted power sums `p_j = \sum_k w_k b_k^j` are the coefficients
+    of the rational function `\sum_k w_k / (1 - b_k t) = P(t) / Q(t)`.
+    The numerator and denominator are computed using a subproduct tree
+    (with every node truncated to length *len*), followed by a single power
+    series division. This costs `\tilde O(\max(n, len))` arithmetic
+    operations instead of `O(n \cdot len)`, i.e. `\tilde O(m^2)` instead of
+    `O(m^3)` bit operations when `n, len, prec = \Theta(m)`.
+
+    The algorithm is numerically unstable, and the working precision is
+    increased by a heuristic number of guard bits (typically some constant
+    times `\min(n, len)`, plus a term depending on the variation
+    of the weights) chosen so that the output radii are comparable to those
+    produced by the naive algorithm; see
+    :func:`_acb_poly_powsum_series_tree_guard_bits`. The computation
+    is done at the midpoints of *s*, *a* and *q*; the propagated
+    error for inexact input is bounded separately term by term.
+    We require that `\operatorname{Re}(a) > 0` and that *q* is bounded
+    away from zero; otherwise this function falls back to the naive
+    algorithm. The tree is evaluated in parallel when
+    *flint_get_num_threads()* is greater than one.
+
+.. function:: slong _acb_poly_powsum_series_tree_guard_bits(const acb_t s, const acb_t a, const acb_t q, const acb_t c, slong n, slong len)
+
+    Returns the number of guard bits used by
+    :func:`_acb_poly_powsum_series_tree` with the exact parameters
+    *s*, *a*, *q* and centre *c*. The estimate is computed in
+    double precision from a sample of the terms.
+
+.. function:: int _acb_poly_powsum_series_tree_is_faster(const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec, int naive_threaded)
+
+    Returns nonzero if :func:`_acb_poly_powsum_series_tree` is predicted
+    to be faster than :func:`_acb_poly_powsum_series_naive` (or
+    :func:`_acb_poly_powsum_series_naive_threaded` if *naive_threaded* is
+    set) for the given parameters. This uses empirical cost models
+    together with :func:`_acb_poly_powsum_series_tree_guard_bits`. It is
+    used to select the algorithm in the Euler-Maclaurin summation for
+    the Hurwitz zeta function and in the direct summation of the
+    polylogarithm series for small `|z|`.
 
 .. function:: void _acb_poly_powsum_one_series_sieved(acb_ptr z, const acb_t s, slong n, slong len, slong prec)
 

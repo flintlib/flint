@@ -145,16 +145,14 @@ gr_poly_pow_series_fmpq_recurrence(gr_poly_t res,
         {
             gr_poly_fit_length(res, len, ctx);
             status |= _gr_poly_pow_series_fmpq_recurrence(res->coeffs, poly->coeffs, flen, exp, len, 0, ctx);
-            _gr_poly_set_length(res, len, ctx);
-            _gr_poly_normalise(res, ctx);
+            _gr_poly_set_length_normalise(res, len, ctx);
         }
         else
         {
             gr_poly_t t;
             gr_poly_init2(t, len, ctx);
             status |= _gr_poly_pow_series_fmpq_recurrence(t->coeffs, poly->coeffs, flen, exp, len, 0, ctx);
-            _gr_poly_set_length(t, len, ctx);
-            _gr_poly_normalise(t, ctx);
+            _gr_poly_set_length_normalise(t, len, ctx);
             gr_poly_swap(res, t, ctx);
             gr_poly_clear(t, ctx);
         }

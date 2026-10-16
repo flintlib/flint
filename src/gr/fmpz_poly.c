@@ -12,7 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
@@ -29,14 +31,12 @@
 
 static const char * default_var = "x";
 
-#if 0
 static void
 _gr_fmpz_poly_ctx_clear(gr_ctx_t ctx)
 {
     if (FMPZ_POLY_CTX_VAR(ctx) != default_var)
         flint_free(FMPZ_POLY_CTX_VAR(ctx));
 }
-#endif
 
 static int _gr_fmpz_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
@@ -61,8 +61,7 @@ static int _gr_fmpz_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 static int
 _gr_fmpz_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Polynomials over integers (fmpz_poly)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Polynomials over integers (fmpz_poly)");
 }
 
 static void
@@ -112,8 +111,7 @@ _gr_fmpz_poly_write(gr_stream_t out, const fmpz_poly_t x, const gr_ctx_t ctx)
     if (var == NULL)
         var = "x";
 
-    gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, var));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, var));
 }
 
 static int
@@ -784,10 +782,10 @@ _gr_fmpz_poly_canonical_associate(fmpz_poly_t ux, fmpz_poly_t u, const fmpz_poly
 
 
 int
-_gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+_gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, fmpz_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_poly_factor_t fac;
-    gr_ctx_t Pol, ZZ;
+    gr_ctx_t Pol;
     slong i;
 
     fmpz_poly_factor_init(fac);
@@ -798,18 +796,16 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
     /* Avoid using ctx so that this function can be used both with ctx = ZZ and
      * with ctx = ZZ[x] */
     gr_ctx_init_fmpz_poly(Pol);
-    gr_ctx_init_fmpz(ZZ);
 
     gr_vec_set_length(factors, fac->num, Pol);
-    gr_vec_set_length(exponents, fac->num, ZZ);
+    fmpz_vec_set_length(exponents, fac->num);
 
     for (i = 0; i < fac->num; i++)
     {
         fmpz_poly_swap((fmpz_poly_struct *) (factors->entries) + i, fac->p + i);
-        fmpz_set_ui((fmpz *) (exponents->entries) + i, fac->exp[i]);
+        fmpz_set_ui(exponents->entries + i, fac->exp[i]);
     }
 
-    gr_ctx_clear(ZZ);
     gr_ctx_clear(Pol);
 
     fmpz_poly_factor_clear(fac);
@@ -828,13 +824,76 @@ _gr_fmpz_poly_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr 
         return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
 }
 
+static int
+_gr_fmpz_poly_gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || nhi < MUL_KS_CUTOFF
+        || len1 + len2 - 1 - nlo < MUL_KS_CUTOFF || 2 * (nhi - nlo) < MUL_KS_CUTOFF)
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    else
+        return _gr_poly_mulmid_bivariate_KS(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
 
 int _fmpz_poly_methods_initialized = 0;
 
 gr_static_method_table _fmpz_poly_methods;
 
+
+/* Tuning, as in the polynomial base ring: the multimodular algorithm is used
+   from the degree in y of the smaller input, or the degree in x of the
+   resultant, upwards. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
+/* res_y(A, B) for bivariate A and B, the coefficients in y being elements of
+   this ring. An array of fmpz_poly_struct is what an fmpz_bpoly holds, so the
+   inputs go to the dense bivariate algorithm as they are. */
+static int
+_gr_fmpz_poly_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
+                                gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    const fmpz_poly_struct * Ax = A;
+    const fmpz_poly_struct * Bx = B;
+    fmpz_bpoly_struct Ab, Bb;
+    slong i, blenA = 0, blenB = 0, npoints;
+
+    if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    for (i = 0; i < lenA; i++)
+        blenA = FLINT_MAX(blenA, Ax[i].length);
+    for (i = 0; i < lenB; i++)
+        blenB = FLINT_MAX(blenB, Bx[i].length);
+
+    if (blenA == 0 || blenB == 0)
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
+
+    npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
+
+    if (FLINT_MIN(lenA, lenB) < MODULAR_MIN_LENGTH &&
+            npoints - 1 < MODULAR_MIN_DEGREE)
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
+
+    /* the front door copies, the algorithm removing the contents of what it
+       is given */
+    Ab.coeffs = (fmpz_poly_struct *) Ax;
+    Ab.alloc = lenA;
+    Ab.length = lenA;
+
+    Bb.coeffs = (fmpz_poly_struct *) Bx;
+    Bb.alloc = lenB;
+    Bb.length = lenB;
+
+    if (!fmpz_bpoly_resultant((fmpz_poly_struct *) res, &Ab, &Bb, 1))
+        return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
+
+    return GR_SUCCESS;
+}
+
 gr_method_tab_input _fmpz_poly_methods_input[] =
 {
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpz_poly_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpz_poly_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -924,6 +983,8 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mullow},
+    {GR_METHOD_POLY_RESULTANT,  (gr_funcptr) _gr_fmpz_poly_gr_poly_resultant},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mulmid},
     {0,                         (gr_funcptr) NULL},
 };
 

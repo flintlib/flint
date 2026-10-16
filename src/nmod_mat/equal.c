@@ -15,7 +15,7 @@
 int
 nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
 {
-    slong i, j;
+    slong i;
 
     if (mat1->r != mat2->r || mat1->c != mat2->c)
         return 0;
@@ -25,11 +25,8 @@ nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
 
     for (i = 0; i < mat1->r; i++)
     {
-        for (j = 0; j < mat1->c; j++)
-        {
-            if (!_nmod_vec_equal(nmod_mat_entry_ptr(mat1, i, 0), nmod_mat_entry_ptr(mat2, i, 0), mat1->c))
-                return 0;
-        }
+        if (!_nmod_vec_equal(nmod_mat_entry_ptr(mat1, i, 0), nmod_mat_entry_ptr(mat2, i, 0), mat1->c))
+            return 0;
     }
 
     return 1;

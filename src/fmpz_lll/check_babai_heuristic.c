@@ -70,8 +70,8 @@ static int _gr_vec_norm2(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
 /* XXX: dubious use of DBL_MIN */
 
-int
-fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+static int
+_fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_lll_packed_struct * P, fmpz_mat_t U,
                                gr_mat_t mu, gr_mat_t r, gr_ptr s,
                                gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
                                int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
@@ -112,7 +112,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             {
                 if (_gr_cmp_d(ENTRY(A->appSP2, kappa, j), DBL_MIN, ctx) == 0)
                 {
-                    status |= _gr_vec_dot(ENTRY(A->appSP2, kappa, j), NULL, 0, ROW(appB, kappa), ROW(appB, j), n, ctx);
+                    if (P != NULL)
+                    {
+                        fmpz_lll_packed_dot(ztmp, P, kappa, j, n);
+                        status |= gr_set_fmpz(ENTRY(A->appSP2, kappa, j), ztmp, ctx);
+                    }
+                    else
+                        status |= _gr_vec_dot(ENTRY(A->appSP2, kappa, j), NULL, 0, ROW(appB, kappa), ROW(appB, j), n, ctx);
 
 #if 0
                     /* If a heuristic told us that some cancellation probably happened,
@@ -167,14 +173,20 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         if (sgn >= 0)   /* in this case, X is 1 */
                         {
                             status |= _gr_vec_sub(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
-                            _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
+                            if (P != NULL)
+                                fmpz_lll_packed_row_sub(P, kappa, j);
+                            else
+                                _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                             if (U != NULL)
                                 _fmpz_vec_sub(fmpz_mat_row(U, kappa), fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c);
                         }
                         else    /* otherwise X is -1 */
                         {
                             status |= _gr_vec_add(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
-                            _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
+                            if (P != NULL)
+                                fmpz_lll_packed_row_add(P, kappa, j);
+                            else
+                                _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                             if (U != NULL)
                                 _fmpz_vec_add(fmpz_mat_row(U, kappa), fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c);
                         }
@@ -200,7 +212,10 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         status |= _gr_vec_submul_scalar(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), tmp, ctx);
                         status |= gr_get_fmpz(ztmp, tmp, ctx);
 
-                        _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n, ztmp);
+                        if (P != NULL)
+                            fmpz_lll_packed_row_submul_fmpz(P, kappa, j, ztmp);
+                        else
+                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n, ztmp);
                         if (U != NULL)
                             _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c, ztmp);
                     }
@@ -209,7 +224,10 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             if (test)           /* Anything happened? */
             {
-                status |= _gr_vec_set_fmpz_vec(ROW(appB, kappa), fmpz_mat_row(B, kappa), n, ctx);
+                if (P != NULL)
+                    fmpz_lll_packed_tighten(P, kappa);
+                else
+                    status |= _gr_vec_set_fmpz_vec(ROW(appB, kappa), fmpz_mat_row(B, kappa), n, ctx);
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= kappa; i++)
@@ -222,7 +240,15 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
         } while (test);
 
         if (_gr_cmp_d(ENTRY(A->appSP2, kappa, kappa), DBL_MIN, ctx) == 0)
-            status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
+        {
+            if (P != NULL)
+            {
+                fmpz_lll_packed_dot(ztmp, P, kappa, kappa, n);
+                status |= gr_set_fmpz(ENTRY(A->appSP2, kappa, kappa), ztmp, ctx);
+            }
+            else
+                status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
+        }
 
         status |= gr_set(GR_ENTRY(s, zeros + 1, sz), ENTRY(A->appSP2, kappa, kappa), ctx);
 
@@ -462,3 +488,22 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 }
 
 #undef GM
+
+int
+fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s,
+                               gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
+                               int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
+                               gr_ctx_t ctx, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai_heuristic(kappa, B, NULL, U, mu, r, s, appB, A, a, zeros, kappamax, n, tmp, rtmp, ctx, fl);
+}
+
+int
+fmpz_lll_check_babai_heuristic_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U,
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s, fmpz_gram_t A, int a, int zeros,
+                               int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
+                               gr_ctx_t ctx, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai_heuristic(kappa, NULL, P, U, mu, r, s, NULL, A, a, zeros, kappamax, n, tmp, rtmp, ctx, fl);
+}

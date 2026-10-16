@@ -3,8 +3,51 @@
 **machine_vectors.h** -- SIMD-accelerated operations on fixed-length vectors
 ===============================================================================
 
-This module currently requires building FLINT with support for
-AVX2 or NEON instructions.
+Vector types and operations mapping onto the target's SIMD instructions,
+together with the ``flint_sgemm`` and ``flint_dgemm`` matrix
+multiplication kernels built on top of them.
+
+Backends are selected automatically: AVX2 (and AVX512 for the ``vec8dz``
+family) on x86, NEON on ARM, and otherwise a generic backend, using GNU
+vector extensions where the compiler supports them and plain ISO C
+structs elsewhere. The AVX2 and NEON backends require a 64-bit word
+size, since their integer vectors have :type:`ulong` lanes; a 32-bit
+build uses the generic backends, which provide only the floating-point
+types and the :type:`vec4n` subset below (with lanes of the 32-bit
+:type:`ulong`). The generic backends implement only the subset of the
+interface required by ``flint_sgemm``/``flint_dgemm``, for
+:type:`vec4d` the operations used by ``dfloat`` (see
+:ref:`machine-vectors-vec4d-extra`), and for :type:`vec4n` those used
+by ``mp_real`` (see :ref:`machine-vectors-vec4n-extra`); the full
+interface, as used by ``fft_small``, still requires AVX2 or NEON.
+
+For the vector operations to use the target's instructions, FLINT must
+be built with appropriate compiler flags. ``configure`` chooses these
+from the detected CPU; ``--enable-avx2`` and ``--enable-avx512`` force
+them on.
+
+Defining ``FLINT_MACHINE_VECTORS_FORCE_GENERIC`` before including this
+header selects the generic backend even on a target with AVX2 or NEON,
+and ``FLINT_MACHINE_VECTORS_STRICT_C`` additionally selects the ISO C
+tier over GNU vector extensions. These are intended for testing and
+profiling the portable code paths.
+
+The strict ISO C tier has no way to express a vector operation, so
+whether its operations become SIMD instructions is entirely up to the
+compiler's SLP vectorizer; its performance therefore varies between
+compilers and compiler versions, unlike the other backends. It exists
+so that the header works on compilers without GNU vector extensions,
+and is not the fallback used on GCC or clang.
+
+The generic backends express a fused multiply-add (``fmadd``, ``fnmadd``) as ``a * b + c``,
+which a compiler fuses into an FMA instruction only when floating-point
+contraction is enabled. GCC in a strict ISO mode, which is how FLINT is
+built, does not contract by default; code using these operations in a
+performance-critical loop should request contraction, as
+``machine_vectors/gemm.c`` does with ``#pragma GCC optimize
+("fp-contract=fast")``. The AVX2, AVX512 and NEON backends use fused
+intrinsics and are unaffected. The ``_fused`` variants below round once
+on every backend.
 
 Some functions may require that vectors are aligned in memory.
 
@@ -24,6 +67,27 @@ Types
           vec8d
 
     Vector with 1, 2, 4, or 8 ``double`` entries.
+
+.. type:: vec1f
+          vec4f
+          vec8f
+          vec16f
+
+    Vector with 1, 4, 8, or 16 ``float`` entries.
+
+.. type:: vec8dz
+          vec16dz
+          vec16fz
+          vec32fz
+          vec8nz
+
+    Vectors backed by AVX512 registers, available only when building
+    with AVX512F support: 8 or 16 ``double`` entries, 16 or 32 ``float``
+    entries, and 8 :type:`ulong` entries respectively. The ``z`` suffix
+    distinguishes these from the equally-named types built from pairs of
+    narrower registers; ``vec8d``, for instance, remains a pair of AVX2
+    registers, which gives more instruction level parallelism in
+    existing code.
 
 Printing
 -------------------------------------------------------------------------------
@@ -80,8 +144,20 @@ Access and conversions
 
     Create vector from distinct entries.
 
-.. function:: vec4n vec4d_convert_limited_vec4n(vec4d a)
+.. function:: vec1n vec1d_convert_limited_vec1n(vec1d a)
+              vec2n vec2d_convert_limited_vec2n(vec2d a)
+              vec4n vec4d_convert_limited_vec4n(vec4d a)
+
+    Given that each entry in the input vector is an exact integer in
+    ``[0, 2^{52})``, convert it to :type:`ulong`.
+    Note that ``vec1d`` and ``vec2d`` functions are only available on NEON.
+
+.. function:: vec2d vec2n_convert_limited_vec2d(vec2n a)
+              vec4d vec4n_convert_limited_vec4d(vec4n a)
               vec8d vec8n_convert_limited_vec8d(vec8n a)
+
+    The inverse conversion, from :type:`ulong` entries to exact
+    ``double`` entries. Requires the same assumption.
 
 Permutations
 -------------------------------------------------------------------------------
@@ -115,7 +191,7 @@ Comparisons
 .. function:: vec4d vec4d_cmp_ge(vec4d a, vec4d b)
               vec4d vec4d_cmp_gt(vec4d a, vec4d b)
 
-    Entrywise comparisons.
+    Entrywise comparisons (see below for the full set).
 
 Arithmetic and basic operations
 -------------------------------------------------------------------------------
@@ -189,12 +265,125 @@ Arithmetic and basic operations
               vec4d vec4d_blendv(vec4d a, vec4d b, vec4d c)
               vec8d vec8d_blendv(vec8d a, vec8d b, vec8d c)
 
+.. function:: vec8n vec8n_bit_shift_right(vec8n a, ulong b)
+
+.. function:: vec8n vec8n_bit_and(vec8n a, vec8n b)
+
+.. _machine-vectors-vec4d-extra:
+
+Masks, bits, fused operations and gathers for vec4d
+-------------------------------------------------------------------------------
+
+These are provided by every backend (AVX2, NEON and both generic
+tiers) with the same results, and are tested lane by lane against
+scalar code in ``machine_vectors/test/t-vec4d.c``.
+
+.. function:: vec4d vec4d_cmp_eq(vec4d a, vec4d b)
+              vec4d vec4d_cmp_ne(vec4d a, vec4d b)
+              vec4d vec4d_cmp_lt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_le(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nlt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nle(vec4d a, vec4d b)
+              vec4d vec4d_cmp_ngt(vec4d a, vec4d b)
+              vec4d vec4d_cmp_nge(vec4d a, vec4d b)
+
+    With ``vec4d_cmp_gt`` and ``vec4d_cmp_ge``: a mask with all bits
+    set in the lanes where the predicate holds and all bits clear
+    elsewhere. The predicates ``eq``, ``lt``, ``le``, ``gt``, ``ge``
+    are false when a lane of *a* or *b* is a NaN, and their negations
+    ``ne``, ``nlt``, ``nle``, ``ngt``, ``nge`` are true.
+
+.. function:: int vec4d_movemask(vec4d a)
+
+    The sign bits of the lanes, lane `i` giving bit `i`. (For
+    ``vec4d_blendv``, which selects *b* where the sign bit of *c* is
+    set, a mask from a comparison selects *b* where it holds.)
+
+.. function:: vec4d vec4d_bit_and(vec4d a, vec4d b)
+              vec4d vec4d_bit_or(vec4d a, vec4d b)
+              vec4d vec4d_bit_xor(vec4d a, vec4d b)
+              vec4d vec4d_bit_andnot(vec4d a, vec4d b)
+
+    Bitwise operations; ``andnot`` computes ``(~a) & b``.
+
+.. function:: vec4d vec4d_bits_set_u64(uint64_t a)
+              vec4d vec4d_bits_add(vec4d a, vec4d b)
+              vec4d vec4d_bits_sub(vec4d a, vec4d b)
+              vec4d vec4d_bits_shl(vec4d a, int n)
+              vec4d vec4d_bits_shr(vec4d a, int n)
+
+    Operations on the lanes viewed as ``uint64_t`` bit patterns: a
+    broadcast, addition and subtraction modulo `2^{64}`, and logical
+    shifts by `0 \le n < 64`.
+
+.. function:: vec4d vec4d_sqrt(vec4d a)
+
+    The correctly rounded square root.
+
+.. function:: vec4d vec4d_fmadd_fused(vec4d a, vec4d b, vec4d c)
+              vec4d vec4d_fmsub_fused(vec4d a, vec4d b, vec4d c)
+              vec4d vec4d_fnmadd_fused(vec4d a, vec4d b, vec4d c)
+
+    `ab + c`, `ab - c` and `-ab + c` with a single rounding, like
+    ``fma(a, b, c)``, ``fma(a, b, -c)`` and ``fma(-a, b, c)``
+    (including the sign of an exact zero).
+
+.. function:: vec4d vec4d_permute_0_1_1_0(vec4d a)
+              vec4d vec4d_permute_0_2_0_2(vec4d a)
+              vec4d vec4d_permute_1_3_1_3(vec4d a)
+
+    Further permutations, like ``vec4d_permute_0_2_1_3``.
+
+.. type:: vec4di
+
+.. function:: vec4di vec4d_to_index(vec4d a)
+              vec4d vec4d_gather(const double * t, vec4di i)
+
+    Table indices converted from lanes holding integers in `[0, 2^{31})`,
+    and the lanes ``t[i0], t[i1], t[i2], t[i3]`` at those indices.
+
+In the generic backends, ``vec4d_min`` and ``vec4d_max`` return *b*
+where a lane is unordered, as the AVX2 instructions do; NEON returns a
+NaN.
+
+
+.. _machine-vectors-vec4n-extra:
+
+Integer lanes for vec4n
+-------------------------------------------------------------------------------
+
+These, together with :func:`vec4n_load_unaligned`,
+:func:`vec4n_store_unaligned`, :func:`vec4n_set_n`, :func:`vec4n_add`
+and :func:`vec4n_sub` above (lanewise modulo
+`2^{\mathrm{FLINT\_BITS}}`), are provided by every backend (AVX2, NEON
+and both generic tiers) with the same results, and are tested lane by
+lane against scalar code in ``machine_vectors/test/t-vec4n.c``.
+``mp_real`` uses them for its arithmetic in radix `2^{56}` (see the
+bitwise exponential).
+
+.. function:: vec4n vec4n_load_aligned(const ulong * a)
+              void vec4n_store_aligned(ulong * z, vec4n a)
+
+    The aligned forms of the loads and stores above, requiring a
+    32-byte aligned address on the AVX2 backend.
+
+.. function:: vec4n vec4n_zero(void)
+              vec4n vec4n_bit_and(vec4n a, vec4n b)
+              vec4n vec4n_bit_or(vec4n a, vec4n b)
+
+    Lanewise.
+
 .. function:: vec4n vec4n_bit_shift_right(vec4n a, ulong b)
-              vec8n vec8n_bit_shift_right(vec8n a, ulong b)
+              vec4n vec4n_bit_shift_left(vec4n a, ulong b)
 
-.. function:: vec4n vec4n_bit_and(vec4n a, vec4n b)
-              vec8n vec8n_bit_and(vec8n a, vec8n b)
+    Logical shifts of every lane by the same count
+    `0 \le b < \mathrm{FLINT\_BITS}`.
 
+.. function:: vec4n vec4n_shift_lanes_up(vec4n a, vec4n b)
+
+    Returns `\{b_3, a_0, a_1, a_2\}`: the lanes of *a* moved up by one,
+    the top lane of *b* entering at the bottom (a carry passed from one
+    vector to the next).
 
 Modular arithmetic
 -------------------------------------------------------------------------------
@@ -235,13 +424,13 @@ Other assumptions are not yet documented.
               vec4d vec4d_reduce_pm1n_to_pmhn(vec4d a, vec4d n)
               vec8d vec8d_reduce_pm1n_to_pmhn(vec8d a, vec8d n)
 
-    Return `a \bmod n` reduced to `[-n/2, n/2]` given given `a \in [-n,n]`.
+    Return `a \bmod n` reduced to `[-n/2, n/2]` given `a \in [-n,n]`.
 
 .. function:: vec1d vec1d_reduce_2n_to_n(vec1d a, vec1d n)
               vec4d vec4d_reduce_2n_to_n(vec4d a, vec4d n)
               vec8d vec8d_reduce_2n_to_n(vec8d a, vec8d n)
 
-    Return `a \bmod n` reduced to `[0,n)` given given `a \in [0,2n)`.
+    Return `a \bmod n` reduced to `[0,n)` given `a \in [0,2n)`.
 
 .. function:: vec1d vec1d_reduce_to_0n(vec1d a, vec1d n, vec1d ninv)
               vec4d vec4d_reduce_to_0n(vec4d a, vec4d n, vec4d ninv)
@@ -270,3 +459,55 @@ Other assumptions are not yet documented.
               vec8n vec8n_addmod_limited(vec8n a, vec8n b, vec8n n)
 
     Return `a + b \bmod n` in `[0,n)`, assuming that `n < 2^{63}`.
+
+Matrix multiplication
+-------------------------------------------------------------------------------
+
+These functions compute a matrix product in single or double precision.
+They are always available: when FLINT is built with BLAS, the default is
+to call it, and otherwise FLINT's own kernels are used. The intended use
+is as a building block for exact linear algebra over `\mathbb{Z}` and
+`\mathbb{Z}/n\mathbb{Z}`, for example in :func:`nmod_mat_mul_blas` and
+:func:`fmpz_mat_mul_blas`.
+
+All of these functions compute `C = AB` for row-major matrices, where
+*C* is *m* by *n*, *A* is *m* by *k* and *B* is *k* by *n*, with
+*ldc*, *lda* and *ldb* the respective leading dimensions (the number of
+entries between the start of consecutive rows, which must be at least
+the number of columns). No transposition or accumulation is performed:
+the previous contents of *C* are overwritten, and `k = 0` sets *C* to
+zero. This is equivalent to ``cblas_sgemm`` or ``cblas_dgemm`` called
+with ``CblasRowMajor``, ``CblasNoTrans``, ``CblasNoTrans``, ``alpha``
+equal to 1 and ``beta`` equal to 0. Aliasing of *C* with *A* or *B* is
+not allowed.
+
+The FLINT kernels are multithreaded internally according to
+:func:`flint_get_num_threads`, using FLINT's thread pool. They handle
+arbitrary dimensions, including thin and unbalanced shapes, without
+requiring any padding or alignment of the input.
+
+.. function:: void flint_sgemm(slong m, slong k, slong n, const float * A, slong lda, const float * B, slong ldb, float * C, slong ldc)
+              void flint_dgemm(slong m, slong k, slong n, const double * A, slong lda, const double * B, slong ldb, double * C, slong ldc)
+
+    Sets `C = AB`, calling either the BLAS or the FLINT implementation
+    according to :var:`flint_gemm_use_blas`.
+
+.. function:: void flint_sgemm_blas(slong m, slong k, slong n, const float * A, slong lda, const float * B, slong ldb, float * C, slong ldc)
+              void flint_dgemm_blas(slong m, slong k, slong n, const double * A, slong lda, const double * B, slong ldb, double * C, slong ldc)
+
+    Sets `C = AB` using ``cblas_sgemm`` or ``cblas_dgemm``. These raise
+    an exception if FLINT was built without BLAS support.
+
+.. function:: void flint_sgemm_fallback(slong m, slong k, slong n, const float * A, slong lda, const float * B, slong ldb, float * C, slong ldc)
+              void flint_dgemm_fallback(slong m, slong k, slong n, const double * A, slong lda, const double * B, slong ldb, double * C, slong ldc)
+
+    Sets `C = AB` using FLINT's own kernels, which are always available.
+
+.. var:: int flint_gemm_use_blas
+
+    Selects the implementation used by :func:`flint_sgemm` and
+    :func:`flint_dgemm`. It is initialized to 1 if FLINT was built with
+    BLAS support and 0 otherwise, and may be set to either value at
+    runtime, for example to compare the two implementations. Setting it
+    to 1 in a build without BLAS support will result in an exception
+    when a gemm is attempted.

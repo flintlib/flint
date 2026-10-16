@@ -23,14 +23,7 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
 
     if (len <= 2)
     {
-        if (len == 0)
-            return gr_zero(y, ctx);
-
-        if (len == 1)
-            return gr_set(y, poly, ctx);
-
-        status |= gr_mul(y, x, GR_ENTRY(poly, 1, sz), ctx);
-        status |= gr_add(y, y, GR_ENTRY(poly, 0, sz), ctx);
+        return _gr_poly_evaluate_horner(y, poly, len, x, ctx);
     }
     else
     {

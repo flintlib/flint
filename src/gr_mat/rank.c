@@ -98,6 +98,11 @@ gr_mat_rank(slong * rank, const gr_mat_t A, gr_ctx_t ctx)
 
     dom = gr_ctx_is_field(ctx);
 
+    /* (a finite ring pretending to be a field: LU, whose pivot
+       inversions report zero divisors) */
+    if (dom != T_TRUE && gr_ctx_is_pretend_field(ctx) == T_TRUE && gr_ctx_is_finite(ctx) == T_TRUE)
+        return gr_mat_rank_lu(rank, A, ctx);
+
     /* Prefer standard LU only over finite fields */
     /* Prefer FFLU over non-finite fields as it often results in
        smaller coefficients. TODO: this choice surely wants

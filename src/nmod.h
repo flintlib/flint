@@ -274,6 +274,11 @@ nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
 ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod);
 ulong nmod_2_pow_ui(ulong exp, nmod_t mod);
 
+#define NMOD_SQRT_SMALL_CUTOFF 128
+
+int _nmod_sqrt_small(ulong * res, ulong a, ulong n);
+int nmod_sqrt(ulong * res, ulong a, nmod_t mod);
+
 NMOD_INLINE
 ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
 {
@@ -317,18 +322,6 @@ NMOD_INLINE ull_t ull_u_mul_u(ulong x, ulong y) { ull_t t; umul_ppmm(t.hi, t.lo,
 NMOD_INLINE ull_t ull(ulong hi, ulong lo) { ull_t t; t.lo = lo; t.hi = hi; return t; }
 
 #endif
-
-FLINT_FORCE_INLINE ulong n_mulhi(ulong a, ulong b)
-{
-    return ull_hi(ull_u_mul_u(a, b));
-}
-
-FLINT_FORCE_INLINE void n_mul2(ulong * hi, ulong * lo, ulong a, ulong b)
-{
-    ull_t t = ull_u_mul_u(a, b);
-    *hi = ull_hi(t);
-    *lo = ull_lo(t);
-}
 
 /* Assumes a already reduced mod n. */
 FLINT_FORCE_INLINE ulong
@@ -376,9 +369,7 @@ ulong n_redc(ulong x, ulong n, ulong nred)
 FLINT_FORCE_INLINE
 ulong n_ll_redc(ull_t x, ulong n, ulong nred)
 {
-    ulong lo, hi;
-
-    lo = n_mulhi(ull_lo(x) * (-nred), n);
+    ulong lo = n_mulhi(ull_lo(x) * (-nred), n), hi;
     hi = ull_hi(x);
 
     if (hi < lo)
@@ -626,6 +617,7 @@ typedef struct
 {
     nmod_t nmod;
     ulong a;   /* when used as finite field with defining polynomial x - a */
+    ulong pretend;  /* 0: no pretense; 1: pretending to be a field; d > 1: pretending, d a factor found */
     truth_t is_prime;
 }
 _gr_nmod_ctx_struct;
@@ -633,6 +625,7 @@ _gr_nmod_ctx_struct;
 #define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
 #define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
+#define NMOD_PRETEND(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->pretend)
 /* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
 #define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
 

@@ -20,109 +20,6 @@
 
 typedef struct
 {
-    fmpz r;
-    fmpz m;
-}
-crt_res_t;
-
-typedef struct
-{
-    nn_srcptr residues;
-    nn_srcptr primes;
-}
-crt_args_t;
-
-static void
-crt_init(crt_res_t * x, crt_args_t * args)
-{
-    fmpz_init(&x->r);
-    fmpz_init(&x->m);
-}
-
-static void
-crt_clear(crt_res_t * x, crt_args_t * args)
-{
-    fmpz_clear(&x->r);
-    fmpz_clear(&x->m);
-}
-
-static void
-_fmpz_crt_combine(fmpz_t r1r2, fmpz_t m1m2, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2)
-{
-    fmpz_invmod(m1m2, m1, m2);
-    fmpz_mul(m1m2, m1m2, m1);
-    fmpz_sub(r1r2, r2, r1);
-    fmpz_mul(r1r2, r1r2, m1m2);
-    fmpz_add(r1r2, r1r2, r1);
-    fmpz_mul(m1m2, m1, m2);
-    fmpz_mod(r1r2, r1r2, m1m2);
-}
-
-static void
-crt_combine(crt_res_t * res, crt_res_t * left, crt_res_t * right, crt_args_t * args)
-{
-    _fmpz_crt_combine(&res->r, &res->m, &left->r, &left->m, &right->r, &right->m);
-}
-
-static void
-crt_basecase(crt_res_t * res, slong a, slong b, crt_args_t * args)
-{
-    if (b - a == 0)
-    {
-        fmpz_zero(&res->r);
-        fmpz_one(&res->m);
-    }
-    else if (b - a == 1)
-    {
-        fmpz_set_ui(&res->r, args->residues[a]);
-        fmpz_set_ui(&res->m, args->primes[a]);
-    }
-    else
-    {
-        crt_res_t left, right;
-        slong m = a + (b - a) / 2;
-
-        crt_init(&left, args);
-        crt_init(&right, args);
-
-        crt_basecase(&left, a, m, args);
-        crt_basecase(&right, m, b, args);
-        crt_combine(res, &left, &right, args);
-
-        crt_clear(&left, args);
-        crt_clear(&right, args);
-    }
-}
-
-/* TODO: optimize basecase  */
-void
-_arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len)
-{
-    crt_res_t res;
-    crt_args_t args;
-
-    res.r = *r;
-    res.m = *m;
-
-    args.residues = residues;
-    args.primes = primes;
-
-    flint_parallel_binary_splitting(&res,
-        (bsplit_basecase_func_t) crt_basecase,
-        (bsplit_merge_func_t) crt_combine,
-        sizeof(crt_res_t),
-        (bsplit_init_func_t) crt_init,
-        (bsplit_clear_func_t) crt_clear,
-        &args, 0, len, 20, -1, 0);
-
-    *r = res.r;
-    *m = res.m;
-
-    return;
-}
-
-typedef struct
-{
     ulong n;
     nn_ptr primes;
     nn_ptr residues;
@@ -238,7 +135,7 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
 #endif
 
     fmpz_init(M);
-    _arb_tree_crt(num, M, residues, primes, num_primes);
+    fmpz_multi_CRT_ui_once(num, M, residues, primes, num_primes, 0);
     fmpz_mul(num, num, den);
     fmpz_mod(num, num, M);
 

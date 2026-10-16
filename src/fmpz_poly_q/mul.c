@@ -51,18 +51,9 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
         const slong len2 = fmpz_poly_length(op2->num);
 
         fmpz_poly_fit_length(rop->num, len1 + len2 - 1);
-        if (len1 >= len2)
-        {
-            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs,
-                           op1->num->coeffs, op1->den->coeffs, len1,
-                           op2->num->coeffs, op2->den->coeffs, len2);
-        }
-        else
-        {
-            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs,
-                           op2->num->coeffs, op2->den->coeffs, len2,
-                           op1->num->coeffs, op1->den->coeffs, len1);
-        }
+        _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs,
+                       op1->num->coeffs, op1->den->coeffs, len1,
+                       op2->num->coeffs, op2->den->coeffs, len2);
         _fmpz_poly_set_length(rop->num, len1 + len2 - 1);
         _fmpz_poly_set_length(rop->den, 1);
 

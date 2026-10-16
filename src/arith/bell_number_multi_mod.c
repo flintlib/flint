@@ -139,8 +139,6 @@ worker(slong k, void * _work)
 void
 arith_bell_number_multi_mod(fmpz_t res, ulong n)
 {
-    fmpz_comb_temp_t temp;
-    fmpz_comb_t comb;
     slong k, num_primes;
     flint_bitcnt_t size, prime_bits;
     work_t work;
@@ -168,11 +166,7 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
 
     flint_parallel_do((do_func_t) worker, &work, num_primes, -1, FLINT_PARALLEL_UNIFORM);
 
-    fmpz_comb_init(comb, work.primes, num_primes);
-    fmpz_comb_temp_init(temp, comb);
-    fmpz_multi_CRT_ui(res, work.residues, comb, temp, 0);
-    fmpz_comb_clear(comb);
-    fmpz_comb_temp_clear(temp);
+    fmpz_multi_CRT_ui_once(res, NULL, work.residues, work.primes, num_primes, 0);
 
     flint_free(work.primes);
     flint_free(work.residues);

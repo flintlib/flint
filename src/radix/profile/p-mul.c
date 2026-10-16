@@ -41,8 +41,8 @@ int main()
         b = flint_malloc(n2 * sizeof(ulong));
         c = flint_malloc(2 * n2 * sizeof(ulong));
 
-        flint_mpn_urandomb(a, state, n1);
-        flint_mpn_urandomb(b, state, n1);
+        flint_mpn_urandomb(a, state, n1 * FLINT_BITS);
+        flint_mpn_urandomb(b, state, n1 * FLINT_BITS);
 
         flint_mpn_mul(c, a, n1, b, n1);
         TIMEIT_START;

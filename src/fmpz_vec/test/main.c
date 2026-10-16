@@ -27,6 +27,7 @@
 #include "t-lcm.c"
 #include "t-max_bits.c"
 #include "t-max_limbs.c"
+#include "t-multi_CRT_ui.c"
 #include "t-neg.c"
 #include "t-prod.c"
 #include "t-prod_ui.c"
@@ -36,6 +37,7 @@
 #include "t-scalar_addmul_si.c"
 #include "t-scalar_addmul_ui.c"
 #include "t-scalar_divexact_fmpz.c"
+#include "t-scalar_divexact_fmpz_strided.c"
 #include "t-scalar_divexact_si.c"
 #include "t-scalar_divexact_ui.c"
 #include "t-scalar_fdiv_q_fmpz.c"
@@ -73,6 +75,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_lcm),
     TEST_FUNCTION(fmpz_vec_max_bits),
     TEST_FUNCTION(fmpz_vec_max_limbs),
+    TEST_FUNCTION(fmpz_vec_multi_CRT_ui),
     TEST_FUNCTION(fmpz_vec_neg),
     TEST_FUNCTION(fmpz_vec_prod),
     TEST_FUNCTION(fmpz_ui_vec_prod),
@@ -82,6 +85,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_scalar_addmul_si),
     TEST_FUNCTION(fmpz_vec_scalar_addmul_ui),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_fmpz),
+    TEST_FUNCTION(fmpz_vec_scalar_divexact_fmpz_strided),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_si),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_ui),
     TEST_FUNCTION(fmpz_vec_scalar_fdiv_q_fmpz),

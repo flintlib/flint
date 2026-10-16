@@ -23,8 +23,7 @@
 static int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Gaussian integer ring (fmpzi)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Gaussian integer ring (fmpzi)");
 }
 
 static int
@@ -36,7 +35,8 @@ _gr_fmpzi_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     * name = flint_malloc(2);
     if (* name == NULL)
         return GR_UNABLE;
-    strncpy(* name, "I", 2);
+    (*name)[0] = 'I';
+    (*name)[1] = '\0';
 
     return GR_SUCCESS;
 }
@@ -87,41 +87,42 @@ _gr_fmpzi_randtest(fmpzi_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpzi_write(gr_stream_t out, const fmpzi_t x, const gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     if (fmpz_is_zero(fmpzi_imagref(x)))
     {
-        gr_stream_write_fmpz(out, fmpzi_realref(x));
+        status |= gr_stream_write_fmpz(out, fmpzi_realref(x));
     }
     else if (fmpz_is_zero(fmpzi_realref(x)))
     {
         if (fmpz_is_one(fmpzi_imagref(x)))
-            gr_stream_write(out, "I");
+            status |= gr_stream_write(out, "I");
         else if (fmpz_equal_si(fmpzi_imagref(x), -1))
-            gr_stream_write(out, "-I");
+            status |= gr_stream_write(out, "-I");
         else
         {
-            gr_stream_write_fmpz(out, fmpzi_imagref(x));
-            gr_stream_write(out, "*I");
+            status |= gr_stream_write_fmpz(out, fmpzi_imagref(x));
+            status |= gr_stream_write(out, "*I");
         }
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_fmpz(out, fmpzi_realref(x));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_fmpz(out, fmpzi_realref(x));
 
         if (fmpz_is_one(fmpzi_imagref(x)))
-            gr_stream_write(out, "+I)");
+            status |= gr_stream_write(out, "+I)");
         else if (fmpz_equal_si(fmpzi_imagref(x), -1))
-            gr_stream_write(out, "-I)");
+            status |= gr_stream_write(out, "-I)");
         else
         {
             if (fmpz_sgn(fmpzi_imagref(x)) > 0)
-                gr_stream_write(out, "+");
-            gr_stream_write_fmpz(out, fmpzi_imagref(x));
-            gr_stream_write(out, "*I)");
+                status |= gr_stream_write(out, "+");
+            status |= gr_stream_write_fmpz(out, fmpzi_imagref(x));
+            status |= gr_stream_write(out, "*I)");
         }
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int
@@ -923,24 +924,39 @@ _gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_c
     }
 }
 
-#define MUL_REORDER_CUTOFF 30
-
+/* the algorithm selection lives in _fmpzi_poly_mulmid; the gr windows
+   may extend past the product, where the coefficients are zero */
 static int
 _gr_fmpzi_poly_mullow(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 < MUL_REORDER_CUTOFF || len2 < MUL_REORDER_CUTOFF || n < MUL_REORDER_CUTOFF)
-    {
-        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
-    }
-    else
-    {
-        gr_ctx_t fmpz_ctx;
-        gr_ctx_init_fmpz(fmpz_ctx);
-        /* Not currently using Karatsuba because it's often worse if the real
-           and imaginary parts are even slightly unbalanced */
-        return _gr_poly_mullow_complex_reorder(res, poly1, len1, poly2, len2, n, 0, ctx, fmpz_ctx);
-    }
+    slong i, m = FLINT_MIN(n, len1 + len2 - 1);
+
+    if (len1 == 0 || len2 == 0 || m <= 0)
+        return _gr_vec_zero(res, n, ctx);
+
+    _fmpzi_poly_mulmid(res, poly1, len1, poly2, len2, 0, m);
+    for (i = m; i < n; i++)
+        fmpzi_zero(res + i);
+    return GR_SUCCESS;
 }
+
+static int
+_gr_fmpzi_poly_mulmid(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    slong i, m = FLINT_MIN(nhi, len1 + len2 - 1);
+
+    if (nlo >= nhi)
+        return GR_SUCCESS;
+
+    if (len1 == 0 || len2 == 0 || nlo >= m)
+        return _gr_vec_zero(res, nhi - nlo, ctx);
+
+    _fmpzi_poly_mulmid(res, poly1, len1, poly2, len2, nlo, m);
+    for (i = m; i < nhi; i++)
+        fmpzi_zero(res + i - nlo);
+    return GR_SUCCESS;
+}
+
 
 /*
 int
@@ -1084,6 +1100,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpzi_vec_dot_rev},
 */
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpzi_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpzi_poly_mulmid},
 /*
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpzi_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpzi_mat_det},

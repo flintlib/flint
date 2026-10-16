@@ -25,15 +25,21 @@
 #include "t-init_clear.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-left_nullspace.c"
 #include "t-lu_classical.c"
 #include "t-lu_classical_delayed.c"
 #include "t-lu_recursive.c"
 #include "t-minpoly.c"
 #include "t-mul_blas.c"
+#include "t-mul_fp50.c"
+#include "t-mul_k52.c"
 #include "t-mul.c"
 #include "t-mul_classical_threaded.c"
 #include "t-mul_nmod_vec.c"
 #include "t-mul_strassen.c"
+#include "t-mul_u8.c"
+#include "t-mul_u32.c"
+#include "t-mul_u52.c"
 #include "t-neg.c"
 #include "t-nmod_vec_mul.c"
 #include "t-nullspace.c"
@@ -73,15 +79,21 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_init_clear),
     TEST_FUNCTION(nmod_mat_inv),
     TEST_FUNCTION(nmod_mat_invert_rows_cols),
+    TEST_FUNCTION(nmod_mat_left_nullspace),
     TEST_FUNCTION(nmod_mat_lu_classical),
     TEST_FUNCTION(nmod_mat_lu_classical_delayed),
     TEST_FUNCTION(nmod_mat_lu_recursive),
     TEST_FUNCTION(nmod_mat_minpoly),
     TEST_FUNCTION(nmod_mat_mul_blas),
+    TEST_FUNCTION(nmod_mat_mul_fp50),
+    TEST_FUNCTION(nmod_mat_mul_k52),
     TEST_FUNCTION(nmod_mat_mul),
     TEST_FUNCTION(nmod_mat_mul_classical_threaded),
     TEST_FUNCTION(nmod_mat_mul_nmod_vec),
     TEST_FUNCTION(nmod_mat_mul_strassen),
+    TEST_FUNCTION(nmod_mat_mul_u8),
+    TEST_FUNCTION(nmod_mat_mul_u32),
+    TEST_FUNCTION(nmod_mat_mul_u52),
     TEST_FUNCTION(nmod_mat_neg),
     TEST_FUNCTION(nmod_mat_nmod_vec_mul),
     TEST_FUNCTION(nmod_mat_nullspace),

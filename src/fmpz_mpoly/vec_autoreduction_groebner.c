@@ -42,6 +42,7 @@ fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t
         {
             fmpz_mpoly_swap(fmpz_mpoly_vec_entry(G, i), fmpz_mpoly_vec_entry(G, G->length - 1), ctx);
             fmpz_mpoly_vec_set_length(G, G->length - 1, ctx);
+            i--;
         }
         else
         {
@@ -51,6 +52,7 @@ fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t
                 {
                     fmpz_mpoly_swap(fmpz_mpoly_vec_entry(G, j), fmpz_mpoly_vec_entry(G, G->length - 1), ctx);
                     fmpz_mpoly_vec_set_length(G, G->length - 1, ctx);
+                    j--;
                 }
             }
         }
@@ -79,6 +81,7 @@ fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t
                 {
                     fmpz_mpoly_swap(fmpz_mpoly_vec_entry(G, i), fmpz_mpoly_vec_entry(G, G->length - 1), ctx);
                     fmpz_mpoly_vec_set_length(G, G->length - 1, ctx);
+                    i--;
                     break;
                 }
             }

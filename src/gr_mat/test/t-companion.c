@@ -26,9 +26,7 @@ TEST_FUNCTION_START(gr_mat_companion, state)
         gr_ptr den;
         slong n;
 
-        do {
-            gr_ctx_init_random(ctx, state);
-        } while (gr_ctx_is_field(ctx) != T_TRUE);
+        gr_ctx_init_random_field(ctx, state);
 
         gr_poly_init(f, ctx);
         gr_poly_init(g, ctx);
@@ -45,7 +43,7 @@ TEST_FUNCTION_START(gr_mat_companion, state)
 
         status |= gr_poly_scalar_mul(g, gr_poly_coeff_srcptr(f, n, ctx), g, ctx);
 
-        if (gr_poly_equal(g, f, ctx) == T_FALSE)
+        if (status == GR_SUCCESS && gr_poly_equal(g, f, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n");
             flint_printf("A:\n"), gr_mat_print(A, ctx), flint_printf("\n");
@@ -60,7 +58,7 @@ TEST_FUNCTION_START(gr_mat_companion, state)
         status |= gr_mat_companion_fraction(B, den, f, ctx);
         status |= gr_mat_mul_scalar(A, A, den, ctx);
 
-        if (gr_mat_equal(A, B, ctx) == T_FALSE)
+        if (status == GR_SUCCESS && gr_mat_equal(A, B, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n");
             flint_printf("A:\n"), gr_mat_print(A, ctx), flint_printf("\n");

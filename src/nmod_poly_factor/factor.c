@@ -17,172 +17,87 @@
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
-#define ZASSENHAUS 0
-#define BERLEKAMP 1
-#define KALTOFEN 2
+#include "nmod_poly_factor_gr.h"
 
-static inline void
-__nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
+ulong
+nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t input)
 {
-    if (algorithm == KALTOFEN)
-        nmod_poly_factor_kaltofen_shoup(res, f);
-    else if (algorithm == ZASSENHAUS)
-        nmod_poly_factor_cantor_zassenhaus(res, f);
-    else
-        nmod_poly_factor_berlekamp(res, f);
-}
-
-static ulong
-__nmod_poly_factor(nmod_poly_factor_t result,
-                                    const nmod_poly_t input, int algorithm)
-{
-    nmod_poly_t monic_input;
-    nmod_poly_factor_t sqfree_factors, factors;
-    ulong leading_coeff;
-    slong i, len;
-
-    len = input->length;
-
-    if (len <= 1)
-    {
-        if (len == 0)
-            return 0;
-        else
-            return input->coeffs[0];
-    }
-
-    leading_coeff = *nmod_poly_lead(input);
-
-    nmod_poly_init_mod(monic_input, input->mod);
-    nmod_poly_make_monic(monic_input, input);
-
-    if (len == 2)
-    {
-        nmod_poly_factor_insert(result, monic_input, 1);
-        nmod_poly_clear(monic_input);
-        return input->coeffs[1];
-    }
-
-    nmod_poly_factor_init(sqfree_factors);
-    nmod_poly_factor_squarefree(sqfree_factors, monic_input);
-    nmod_poly_clear(monic_input);
-
-    /* Run CZ on each of the square-free factors */
-    for (i = 0; i < sqfree_factors->num; i++)
-    {
-        nmod_poly_factor_init(factors);
-
-        __nmod_poly_factor1(factors, sqfree_factors->p + i, algorithm);
-        nmod_poly_factor_pow(factors, sqfree_factors->exp[i]);
-        nmod_poly_factor_concat(result, factors);
-
-        nmod_poly_factor_clear(factors);
-    }
-
-    nmod_poly_factor_clear(sqfree_factors);
-    return leading_coeff;
-}
-
-static ulong
-__nmod_poly_factor_deflation(nmod_poly_factor_t result,
-    const nmod_poly_t input, int algorithm)
-{
-    slong i;
-    ulong deflation;
+    gr_ctx_t ctx;
+    gr_poly_t P;
+    gr_poly_vec_t fac;
+    fmpz_vec_t exp;
+    nmod_t mod = input->mod;
+    ulong lc;
 
     if (input->length <= 1)
     {
-        if (input->length == 0)
-            return 0;
-        else
-            return input->coeffs[0];
+        res->num = 0;
+        return (input->length == 0) ? 0 : input->coeffs[0];
     }
 
-    deflation = nmod_poly_deflation(input);
-    if (deflation == 1)
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+
+    NMOD_POLY_AS_GR(P, input);
+    gr_poly_vec_init(fac, 0, ctx);
+    fmpz_vec_init(exp, 0);
+
+    GR_MUST_SUCCEED(gr_poly_factor_finite_field(&lc, fac, exp, P, ctx));
+
+    res->num = 0;
+    _nmod_poly_factor_set_gr(res, fac, exp, mod, ctx);
+
+    gr_poly_vec_clear(fac, ctx);
+    fmpz_vec_clear(exp);
+    gr_ctx_clear(ctx);
+
+    return lc;
+}
+
+ulong
+nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res, const nmod_poly_t input)
+{
+    ulong lc = nmod_poly_lead(input) == NULL ? 0 : *nmod_poly_lead(input);
+
+    if (input->length <= 1)
     {
-        return __nmod_poly_factor(result, input, algorithm);
+        res->num = 0;
+        return (input->length == 0) ? 0 : input->coeffs[0];
     }
-    else
+
+    res->num = 0;
+    _nmod_poly_factor_gr(res, input, GR_POLY_FACTOR_ALGORITHM_BERLEKAMP);
+    return lc;
+}
+
+ulong
+nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t input)
+{
+    ulong lc = nmod_poly_lead(input) == NULL ? 0 : *nmod_poly_lead(input);
+
+    if (input->length <= 1)
     {
-        nmod_poly_factor_t def_res;
-        nmod_poly_t def;
-        ulong leading_coeff;
-
-        nmod_poly_init_mod(def, input->mod);
-
-        nmod_poly_deflate(def, input, deflation);
-        nmod_poly_factor_init(def_res);
-        leading_coeff = __nmod_poly_factor(def_res, def, algorithm);
-
-        nmod_poly_clear(def);
-
-        for (i = 0; i < def_res->num; i++)
-        {
-            /* Inflate */
-            nmod_poly_t pol;
-
-            nmod_poly_init_mod(pol, input->mod);
-
-            nmod_poly_inflate(pol, def_res->p + i, deflation);
-
-            /* Factor inflation */
-            if (def_res->exp[i] == 1)
-                __nmod_poly_factor(result, pol, algorithm);
-            else
-            {
-                nmod_poly_factor_t t;
-
-                nmod_poly_factor_init(t);
-
-                __nmod_poly_factor(t, pol, algorithm);
-                nmod_poly_factor_pow(t, def_res->exp[i]);
-                nmod_poly_factor_concat(result, t);
-
-                nmod_poly_factor_clear(t);
-            }
-
-            nmod_poly_clear(pol);
-        }
-
-        nmod_poly_factor_clear(def_res);
-
-        return leading_coeff;
+        res->num = 0;
+        return (input->length == 0) ? 0 : input->coeffs[0];
     }
+
+    res->num = 0;
+    _nmod_poly_factor_gr(res, input, GR_POLY_FACTOR_ALGORITHM_CANTOR_ZASSENHAUS);
+    return lc;
 }
 
 ulong
-nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
-    const nmod_poly_t input)
+nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t res, const nmod_poly_t input)
 {
-    return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
-}
+    ulong lc = nmod_poly_lead(input) == NULL ? 0 : *nmod_poly_lead(input);
 
-ulong
-nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
-    const nmod_poly_t input)
-{
-    return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
-}
+    if (input->length <= 1)
+    {
+        res->num = 0;
+        return (input->length == 0) ? 0 : input->coeffs[0];
+    }
 
-ulong
-nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
-    const nmod_poly_t input)
-{
-    return __nmod_poly_factor_deflation(result, input, KALTOFEN);
-}
-
-ulong
-nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
-{
-    ulong p = input->mod.n;
-    unsigned int bits = FLINT_BIT_COUNT (p);
-    slong n = nmod_poly_degree(input);
-
-    result->num = 0;
-
-    if (n < 10 + 50 / bits)
-        return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
-    else
-        return __nmod_poly_factor_deflation(result, input, KALTOFEN);
+    res->num = 0;
+    _nmod_poly_factor_gr(res, input, GR_POLY_FACTOR_ALGORITHM_KALTOFEN_SHOUP);
+    return lc;
 }

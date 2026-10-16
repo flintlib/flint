@@ -12,25 +12,13 @@
 
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 fmpz_mat_is_one(const fmpz_mat_t mat)
 {
-    slong i, j;
-
-    if (mat->r == 0 || mat->c == 0)
-        return 1;
-
-    for (i = 0; i < mat->r; i++)
-    {
-        for (j = 0; j < mat->c; j++)
-        {
-            if (fmpz_cmp_ui(fmpz_mat_entry(mat, i, j), i == j) != 0)
-            {
-                return 0;
-            }
-        }
-    }
-
-    return 1;
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    return gr_mat_is_one((const gr_mat_struct *) mat, ctx) == T_TRUE;
 }

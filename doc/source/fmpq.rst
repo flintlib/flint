@@ -19,7 +19,9 @@ overhead.
 A fraction is said to be in canonical form if the numerator and denominator
 have no common factor and the denominator is positive. Except where otherwise
 noted, all functions in the :type:`fmpq` module assume that inputs are in
-canonical form, and produce outputs in canonical form. The user can manipulate
+canonical form, and produce outputs in canonical form. This is not checked;
+passing a non-canonical :type:`fmpq_t` gives undefined results. The user can
+manipulate
 the numerator and denominator of an :type:`fmpq_t` as arbitrary integers, but
 then becomes responsible for canonicalising the number (for example by calling
 ``fmpq_canonicalise``) before passing it to any library function.

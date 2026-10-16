@@ -242,7 +242,6 @@ radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, co
     }
 }
 
-
 void
 radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
 {
@@ -253,7 +252,12 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
 
     FLINT_ASSERT(an >= 1);
     FLINT_ASSERT(bn >= 1);
-    FLINT_ASSERT(an >= bn);
+
+    if (an < bn)
+    {
+        FLINT_SWAP(nn_srcptr, a, b);
+        FLINT_SWAP(slong, an, bn);
+    }
 
     if (zhi <= 2 && zlo == 0)
     {
@@ -286,12 +290,26 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
         return;
     }
 
+    FLINT_ASSERT(an >= bn);
+
     an = FLINT_MIN(an, zhi);
     bn = FLINT_MIN(bn, zhi);
 
     FLINT_ASSERT(zhi <= an + bn);
     FLINT_ASSERT(zhi > zlo);
     FLINT_ASSERT(zlo >= 0);
+
+    if (bn == 1)
+    {
+        if (zhi - zlo == 1)
+            z[0] = (zlo < an) ? nmod_mul(a[zlo], b[0], radix->B) : 0;
+        else if (zhi == an + 1)
+            z[zhi - zlo - 1] = radix_mul_1(z, a + zlo, zhi - zlo - 1, b[0], radix);
+        else
+            /* alternative: z[zhi - zlo - 1] = nmod_addmul(radix_mul_1(z, a + zlo, zhi - zlo - 1, b[0], radix), a[an - 1], b[0], radix->B); */
+            radix_mul_1(z, a + zlo, zhi - zlo, b[0], radix);
+        return;
+    }
 
     /* Each dot product is bounded by bn*(B-1)^2 */
     /* Carry-in from lower terms is bounded by bn*B */

@@ -42,9 +42,10 @@ typedef gr_fraction_ctx_struct gr_fraction_ctx_t[1];
 static int
 _gr_fraction_ctx_write(gr_stream_t out, gr_fraction_ctx_t ctx)
 {
-    gr_stream_write(out, "Fraction field over ");
-    gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Fraction field over ");
+    status |= gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
+    return status;
 }
 
 static void
@@ -82,6 +83,7 @@ static truth_t _gr_fraction_ctx_is_finite(gr_ctx_t ctx) { return gr_ctx_is_finit
 static truth_t _gr_fraction_ctx_is_finite_characteristic(gr_ctx_t ctx) { return gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx)); }
 static truth_t _gr_fraction_ctx_is_exact(gr_ctx_t ctx) { return gr_ctx_is_exact(GR_FRACTION_DOMAIN_CTX(ctx)); }
 
+static gr_ptr _gr_fraction_ctx_base(gr_ctx_t ctx) { return GR_FRACTION_DOMAIN_CTX(ctx); }
 
 static void
 _gr_fraction_init(gr_ptr x, gr_fraction_ctx_t ctx)
@@ -1146,6 +1148,7 @@ gr_method_tab_input _gr_fraction_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) _gr_fraction_ctx_is_finite_characteristic},
 
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) _gr_fraction_ctx_is_exact},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_fraction_ctx_base},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fraction_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fraction_clear},

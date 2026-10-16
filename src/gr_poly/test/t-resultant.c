@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
         int status = GR_SUCCESS;
         slong n;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);
@@ -63,9 +63,10 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
             flint_abort();
         }
 
-        if ((ctx->which_ring == GR_CTX_FMPZ || ctx->which_ring == GR_CTX_FMPQ || (ctx->which_ring == GR_CTX_NMOD8 && gr_ctx_is_field(ctx) == T_TRUE)) && status != GR_SUCCESS)
+        if ((ctx->which_ring == GR_CTX_FMPZ || ctx->which_ring == GR_CTX_FMPQ ||
+            (ctx->which_ring == GR_CTX_NMOD8 && gr_ctx_is_field(ctx) == T_TRUE)) && status != GR_SUCCESS)
         {
-            flint_printf("FAIL: did not succeed over Q or Z/pZ\n\n");
+            flint_printf("FAIL: did not succeed over Z, Q or Z/pZ\n\n");
             gr_ctx_println(ctx);
             gr_poly_print(f, ctx), flint_printf("\n\n");
             gr_poly_print(g, ctx), flint_printf("\n\n");
@@ -146,9 +147,10 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
             flint_abort();
         }
 
-        if ((ctx->which_ring == GR_CTX_FMPQ || (ctx->which_ring == GR_CTX_NMOD8 && gr_ctx_is_field(ctx) == T_TRUE)) && status != GR_SUCCESS)
+        if ((ctx->which_ring == GR_CTX_FMPZ || ctx->which_ring == GR_CTX_FMPQ ||
+            (ctx->which_ring == GR_CTX_NMOD8 && gr_ctx_is_field(ctx) == T_TRUE)) && status != GR_SUCCESS)
         {
-            flint_printf("FAIL: did not succeed over Q or Z/pZ\n\n");
+            flint_printf("FAIL: did not succeed over Z, Q or Z/pZ\n\n");
             gr_ctx_println(ctx);
             gr_poly_print(f, ctx), flint_printf("\n\n");
             gr_poly_print(g, ctx), flint_printf("\n\n");

@@ -43,39 +43,39 @@ _arf_set_inline(arf_t y, const arf_t x)
 }
 
 void
-arb_set(arb_t x, const arb_t y)
+arb_set(arb_t y, const arb_t x)
 {
-    if (x != y)
+    if (y != x)
     {
-        _arf_set_inline(arb_midref(x), arb_midref(y));
-        mag_set(arb_radref(x), arb_radref(y));
+        _arf_set_inline(arb_midref(y), arb_midref(x));
+        mag_set(arb_radref(y), arb_radref(x));
     }
 }
 
 void
-arb_set_d(arb_t x, double y)
+arb_set_d(arb_t y, double x)
 {
-    arf_set_d(arb_midref(x), y);
-    mag_zero(arb_radref(x));
+    arf_set_d(arb_midref(y), x);
+    mag_zero(arb_radref(y));
 }
 
 void
-arb_set_fmpz(arb_t x, const fmpz_t y)
+arb_set_fmpz(arb_t y, const fmpz_t x)
 {
-    arf_set_fmpz(arb_midref(x), y);
-    mag_zero(arb_radref(x));
+    arf_set_fmpz(arb_midref(y), x);
+    mag_zero(arb_radref(y));
 }
 
 void
-arb_set_si(arb_t x, slong y)
+arb_set_si(arb_t y, slong x)
 {
-    arf_set_si(arb_midref(x), y);
-    mag_zero(arb_radref(x));
+    arf_set_si(arb_midref(y), x);
+    mag_zero(arb_radref(y));
 }
 
 void
-arb_set_ui(arb_t x, ulong y)
+arb_set_ui(arb_t y, ulong x)
 {
-    arf_set_ui(arb_midref(x), y);
-    mag_zero(arb_radref(x));
+    arf_set_ui(arb_midref(y), x);
+    mag_zero(arb_radref(y));
 }

@@ -10,16 +10,14 @@
 */
 
 #include "acb_poly.h"
+#include "gr_poly.h"
 
 void
 _acb_poly_integral(acb_ptr res, acb_srcptr poly, slong len, slong prec)
 {
-    slong k = len - 1;
-
-    for (k = len - 1; k > 0; k--)
-        acb_div_ui(res + k, poly + k - 1, k, prec);
-
-    acb_zero(res);
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, prec);
+    GR_MUST_SUCCEED(_gr_poly_integral(res, poly, len, ctx));
 }
 
 void

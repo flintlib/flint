@@ -14,6 +14,82 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
+static void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac,
+                                       const fmpz_poly_t G, int deflation);
+
+static void _fmpz_poly_factor_inflation(fmpz_poly_factor_t fac,
+                                        const fmpz_poly_t T, ulong d,
+                                        slong exp);
+
+static ulong
+_smallest_prime_factor(ulong d)
+{
+    ulong t;
+    if (d % 2 == 0)
+        return 2;
+    for (t = 3; t * t <= d; t += 2)
+        if (d % t == 0)
+            return t;
+    return d;
+}
+
+/*
+    Append the factorisation of T(x^d), with outer multiplicity exp, to fac,
+    where T is irreducible over Q, primitive with positive leading
+    coefficient.  Chains over the prime factors p of d via
+    T(x^d) = U(x^(d/p)) with U = T(x^p): each prime step is either certified
+    irreducible by _fmpz_poly_factor_inflation_is_irreducible_capelli
+    (in which case no factorisation
+    is performed at all) or handled by the generic machinery at degree
+    p*deg(T), which is never larger, and usually much smaller, than the
+    single call at degree d*deg(T) it replaces.
+*/
+static void
+_fmpz_poly_factor_inflation(fmpz_poly_factor_t fac, const fmpz_poly_t T,
+                            ulong d, slong exp)
+{
+    ulong p;
+    fmpz_poly_t U;
+
+    if (d == 1)
+    {
+        fmpz_poly_factor_insert(fac, T, exp);
+        return;
+    }
+
+    /* T(0) != 0 is guaranteed: fmpz_poly_factor_deflation strips powers
+       of x before deflating, and factors of U = T(x^p) with U(0) != 0
+       again have nonzero constant term, so the invariant persists through
+       the recursion below. */
+
+    p = _smallest_prime_factor(d);
+
+    fmpz_poly_init(U);
+    fmpz_poly_inflate(U, T, p);
+
+    if (_fmpz_poly_factor_inflation_is_irreducible_capelli(T, p))
+    {
+        /* U = T(x^p) is certified irreducible */
+        _fmpz_poly_factor_inflation(fac, U, d / p, exp);
+    }
+    else
+    {
+        slong i;
+        fmpz_poly_factor_t ufac;
+
+        fmpz_poly_factor_init(ufac);
+        fmpz_poly_factor_deflation(ufac, U, 0);
+
+        for (i = 0; i < ufac->num; i++)
+            _fmpz_poly_factor_inflation(fac, ufac->p + i, d / p,
+                                        exp * ufac->exp[i]);
+
+        fmpz_poly_factor_clear(ufac);
+    }
+
+    fmpz_poly_clear(U);
+}
+
 static void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int deflation)
 {
     const slong lenG = G->length;
@@ -75,18 +151,12 @@ static void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t
             fmpz_poly_factor(gfac, g);
             fmpz_set(&fac->c, &gfac->c);
 
+            /* Each gfac->p + i is irreducible; factor its inflation by
+               chained Capelli certification instead of refactoring
+               (gfac->p + i)(x^d) from scratch. */
             for (i = 0; i < gfac->num; i++)
-            {
-                fmpz_poly_factor_t hfac;
-                fmpz_poly_factor_init(hfac);
-                fmpz_poly_inflate(gfac->p + i, gfac->p + i, d);
-                fmpz_poly_factor_deflation(hfac, gfac->p + i, 0);
-
-                for (j = 0; j < hfac->num; j++)
-                    fmpz_poly_factor_insert(fac, hfac->p + j, gfac->exp[i] * hfac->exp[j]);
-
-                fmpz_poly_factor_clear(hfac);
-            }
+                _fmpz_poly_factor_inflation(fac, gfac->p + i, (ulong) d,
+                                            gfac->exp[i]);
 
             fmpz_poly_factor_clear(gfac);
         }

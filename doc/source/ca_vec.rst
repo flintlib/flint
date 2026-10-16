@@ -111,7 +111,7 @@ Input and output
 
     Prints *vec* to standard output. The coefficients are printed on separate lines.
 
-.. function:: void ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx)
+.. function:: void ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx)
 
     Prints a decimal representation of *vec* with precision specified by *digits*.
     The coefficients are comma-separated and the whole list is enclosed in square brackets.

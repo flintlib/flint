@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpzi.h"
@@ -23,6 +24,7 @@
 #include "acb_modular.h"
 #include "acb_elliptic.h"
 #include "acf.h"
+#include "decimal.h"
 #include "qqbar.h"
 #include "gr.h"
 #include "gr/impl.h"
@@ -30,6 +32,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "nfloat.h"
+#include <float.h>
+#include "dfloat.h"
 
 typedef struct
 {
@@ -61,10 +65,11 @@ static int _gr_acb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_acb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Complex numbers (acb, prec = ");
-    gr_stream_write_si(out, ACB_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Complex numbers (acb, prec = ");
+    status |= gr_stream_write_si(out, ACB_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -105,6 +110,8 @@ _gr_acb_randtest(acb_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+
     if (arb_is_zero(acb_imagref(x)))
     {
         /* used by polynomial printing */
@@ -112,32 +119,29 @@ __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr
         {
             if (arf_is_zero(arb_midref(acb_realref(x))))
             {
-                gr_stream_write(out, "0");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "0");
             }
             else if (arf_is_one(arb_midref(acb_realref(x))))
             {
-                gr_stream_write(out, "1");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "1");
             }
             else if (arf_equal_si(arb_midref(acb_realref(x)), -1))
             {
-                gr_stream_write(out, "-1");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "-1");
             }
         }
 
-        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
+        status |= gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
     }
     else if (arb_is_zero(acb_realref(x)))
     {
-        gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
-        gr_stream_write(out, "*I");
+        status |= gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
+        status |= gr_stream_write(out, "*I");
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
 
         if ((arb_is_exact(acb_imagref(x)) || (flags & ARB_STR_NO_RADIUS))
                 && arf_sgn(arb_midref(acb_imagref(x))) < 0)
@@ -145,20 +149,20 @@ __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr
             arb_t t;
             arb_init(t);
             arb_neg(t, acb_imagref(x));
-            gr_stream_write(out, " - ");
-            gr_stream_write_free(out, arb_get_str(t, digits, flags));
+            status |= gr_stream_write(out, " - ");
+            status |= gr_stream_write_free(out, arb_get_str(t, digits, flags));
             arb_clear(t);
         }
         else
         {
-            gr_stream_write(out, " + ");
-            gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
+            status |= gr_stream_write(out, " + ");
+            status |= gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
         }
 
-        gr_stream_write(out, "*I)");
+        status |= gr_stream_write(out, "*I)");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 static int
 _gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
@@ -293,17 +297,81 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 return GR_SUCCESS;
             }
 
+        case GR_CTX_DECFLOAT:
+            arb_zero(acb_imagref(res));
+            return decfloat_get_arb(acb_realref(res), x, ACB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECBALL:
+            arb_zero(acb_imagref(res));
+            return decball_get_arb(acb_realref(res), x, ACB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            return deccfloat_get_acb(res, x, ACB_CTX_PREC(ctx), x_ctx);
+
+        case GR_CTX_DECCBALL:
+            return deccball_get_acb(res, x, ACB_CTX_PREC(ctx), x_ctx);
+
         case GR_CTX_RR_ARB:
             arb_set_round(acb_realref(res), x, ACB_CTX_PREC(ctx));
+            arb_zero(acb_imagref(res));
+            return GR_SUCCESS;
+
+        case GR_CTX_DFLOAT:
+            /* a nonfinite approximation is not a complex number */
+            if (!(_dfloat_abs_sum(x, DFLOAT_CTX_N(x_ctx)) <= DBL_MAX))
+                return GR_DOMAIN;
+            _dfloat_get_arb(acb_realref(res), x, DFLOAT_CTX_N(x_ctx), 0.0);
+            arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
+            arb_zero(acb_imagref(res));
+            return GR_SUCCESS;
+
+        case GR_CTX_DFLOAT_BALL:
+            if (_dfloat_ball_is_whole(x, DFLOAT_CTX_N(x_ctx), ((const double *) x)[DFLOAT_CTX_N(x_ctx)]))
+                arb_zero_pm_inf(acb_realref(res));
+            else
+                _dfloat_get_arb(acb_realref(res), x, DFLOAT_CTX_N(x_ctx), ((const double *) x)[DFLOAT_CTX_N(x_ctx)]);
+            arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
             arb_zero(acb_imagref(res));
             return GR_SUCCESS;
 
         case GR_CTX_CC_ACB:
             acb_set_round(res, x, ACB_CTX_PREC(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_DFLOAT_COMPLEX:
+        case GR_CTX_DFLOAT_COMPLEX_BALL:
+        {
+            int n = DFLOAT_CTX_N(x_ctx), ball = DFLOAT_CTX_BALL(x_ctx);
+            if (!_dfloat_part_get_arb(acb_realref(res), x, n, ball) ||
+                !_dfloat_part_get_arb(acb_imagref(res), (const double *) x + n + ball, n, ball))
+                return GR_DOMAIN;
+            acb_set_round(res, res, ACB_CTX_PREC(ctx));
+            return GR_SUCCESS;
+        }
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
+}
+
+/* as set_interval_mid_rad with an infinite real radius (the radius +inf
+   is real), matching the printed form "[m +/- inf]" of a real part */
+static int
+_gr_acb_set_interval_mid_inf(acb_t res, const acb_t m, const gr_ctx_t ctx)
+{
+    acb_set(res, m);
+    mag_inf(arb_radref(acb_realref(res)));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_acb_get_interval_mid_rad(acb_t m, acb_t r, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_get_mid(m, x);
+    arf_set_mag(arb_midref(acb_realref(r)), arb_radref(acb_realref(x)));
+    arf_set_mag(arb_midref(acb_imagref(r)), arb_radref(acb_imagref(x)));
+    mag_zero(arb_radref(acb_realref(r)));
+    mag_zero(arb_radref(acb_imagref(r)));
+    return GR_SUCCESS;
 }
 
 static int
@@ -1188,14 +1256,24 @@ DEF_FUNC(cos)
 DEF_FUNC(cos_pi)
 DEF_FUNC_SING(tan)
 DEF_FUNC_SING(cot)
+DEF_FUNC_SING(sec)
+DEF_FUNC_SING(csc)
+DEF_FUNC_SING(tan_pi)
+DEF_FUNC_SING(cot_pi)
+DEF_FUNC_SING(csc_pi)
 
 DEF_FUNC(sinc)
 DEF_FUNC(sinc_pi)
+
+DEF_FUNC(agm1)
+DEF_FUNC2_SING(agm)
 
 DEF_FUNC(sinh)
 DEF_FUNC(cosh)
 DEF_FUNC_SING(tanh)
 DEF_FUNC_SING(coth)
+DEF_FUNC_SING(sech)
+DEF_FUNC_SING(csch)
 
 DEF_FUNC(asin)
 DEF_FUNC(acos)
@@ -1949,6 +2027,13 @@ _gr_acb_vec_dot_rev(acb_t res, const acb_t initial, int subtract, acb_srcptr vec
 }
 
 static int
+_gr_acb_vec_dot_strided(acb_t res, const acb_t initial, int subtract, acb_srcptr vec1, slong stride1, acb_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    acb_dot(res, initial, subtract, vec1, stride1, vec2, stride2, len, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+static int
 _gr_acb_poly_mullow(acb_ptr res,
     acb_srcptr poly1, slong len1,
     acb_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -1956,6 +2041,41 @@ _gr_acb_poly_mullow(acb_ptr res,
     _acb_poly_mullow(res, poly1, len1, poly2, len2, n, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
+
+static int
+_gr_acb_poly_mulmid(acb_ptr res,
+    acb_srcptr poly1, slong len1,
+    acb_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    _acb_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+/* Division with remainder via power series division, as in
+   _acb_poly_divrem (which never calls back into gr). That function does
+   not allow R to be aliased with A, so we use a temporary in that case. */
+static int
+_gr_acb_poly_divrem(acb_ptr Q, acb_ptr R,
+    acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    if (acb_contains_zero(B + lenB - 1))
+        return GR_UNABLE;
+
+    if (R == A && lenB > 1)
+    {
+        acb_ptr T = _acb_vec_init(lenB - 1);
+        _acb_poly_divrem(Q, T, A, lenA, B, lenB, ACB_CTX_PREC(ctx));
+        _acb_vec_swap(R, T, lenB - 1);
+        _acb_vec_clear(T, lenB - 1);
+    }
+    else
+    {
+        _acb_poly_divrem(Q, R, A, lenA, B, lenB, ACB_CTX_PREC(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
 
 /* xxx */
 static int
@@ -1984,12 +2104,11 @@ roots_accurate(acb_ptr roots, slong len, slong prec)
 
 /* hidden feature: also works with arb ctx */
 int
-_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_acb_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     slong prec, initial_prec, target_prec, isolated, maxiter, maxprec, deg, i;
     acb_ptr croots;
     acb_poly_t tmp;
-    gr_ctx_t ZZ;
     int status = GR_UNABLE;
     int arb_roots;
 
@@ -2001,7 +2120,6 @@ _gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
     if (acb_contains_zero(((acb_srcptr) poly->coeffs) + deg))
         return GR_UNABLE;
 
-    gr_ctx_init_fmpz(ZZ);
     croots = _acb_vec_init(deg);
     acb_poly_init(tmp);
     acb_poly_fit_length(tmp, deg + 1);
@@ -2060,41 +2178,39 @@ _gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
         if (arb_roots)
         {
             gr_vec_set_length(roots, 0, ctx);
-            gr_vec_set_length(mult, 0, ZZ);
+            fmpz_vec_set_length(mult, 0);
 
             for (i = 0; i < deg; i++)
             {
                 if (arb_contains_zero(acb_imagref(croots + i)))
                 {
-                    fmpz one = 1;
                     arb_set_round(acb_realref(croots + i), acb_realref(croots + i), target_prec);
                     GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + i), ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &one, ZZ));
+                    fmpz_vec_append_ui(mult, 1);
                 }
             }
         }
         else
         {
             gr_vec_set_length(roots, deg, ctx);
-            gr_vec_set_length(mult, deg, ZZ);
+            fmpz_vec_set_length(mult, deg);
 
             for (i = 0; i < deg; i++)
             {
                 acb_set_round(((acb_ptr) roots->entries) + i, croots + i, target_prec);
-                fmpz_one(((fmpz *) mult->entries) + i);
+                fmpz_one(mult->entries + i);
             }
         }
     }
 
     acb_poly_clear(tmp);
     _acb_vec_clear(croots, deg);
-    gr_ctx_clear(ZZ);
 
     return status;
 }
 
 static int
-_gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_acb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
@@ -2104,17 +2220,14 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         slong i, j, deg, deg2;
         acb_ptr croots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -2131,9 +2244,8 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
                 for (j = 0; j < deg2; j++)
                 {
-                    fmpz m2 = fac->exp[i];
                     GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
                 _acb_vec_clear(croots, deg2);
@@ -2141,8 +2253,6 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }
@@ -2264,6 +2374,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acb_set_d},
     {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_acb_set_interval_mid_rad},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) _gr_acb_set_interval_mid_inf},
+    {GR_METHOD_GET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_acb_get_interval_mid_rad},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_acb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_acb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acb_get_fmpz},
@@ -2333,14 +2445,23 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_COS_PI,          (gr_funcptr) _gr_acb_cos_pi},
     {GR_METHOD_SIN_COS_PI,      (gr_funcptr) _gr_acb_sin_cos_pi},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) _gr_acb_tan_pi},
     {GR_METHOD_COT,             (gr_funcptr) _gr_acb_cot},
+    {GR_METHOD_SEC,             (gr_funcptr) _gr_acb_sec},
+    {GR_METHOD_CSC,             (gr_funcptr) _gr_acb_csc},
+    {GR_METHOD_COT_PI,          (gr_funcptr) _gr_acb_cot_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) _gr_acb_csc_pi},
     {GR_METHOD_SINC,            (gr_funcptr) _gr_acb_sinc},
     {GR_METHOD_SINC_PI,         (gr_funcptr) _gr_acb_sinc_pi},
     {GR_METHOD_SINH,            (gr_funcptr) _gr_acb_sinh},
     {GR_METHOD_COSH,            (gr_funcptr) _gr_acb_cosh},
     {GR_METHOD_SINH_COSH,       (gr_funcptr) _gr_acb_sinh_cosh},
+    {GR_METHOD_AGM1,            (gr_funcptr) _gr_acb_agm1},
+    {GR_METHOD_AGM,             (gr_funcptr) _gr_acb_agm},
     {GR_METHOD_TANH,            (gr_funcptr) _gr_acb_tanh},
     {GR_METHOD_COTH,            (gr_funcptr) _gr_acb_coth},
+    {GR_METHOD_SECH,            (gr_funcptr) _gr_acb_sech},
+    {GR_METHOD_CSCH,            (gr_funcptr) _gr_acb_csch},
     {GR_METHOD_ASIN,            (gr_funcptr) _gr_acb_asin},
     {GR_METHOD_ACOS,            (gr_funcptr) _gr_acb_acos},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_acb_atan},
@@ -2466,8 +2587,11 @@ gr_method_tab_input _acb_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_acb_vec_dot_strided},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acb_poly_mulmid},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_acb_poly_divrem},
     {GR_METHOD_POLY_TAYLOR_SHIFT,   (gr_funcptr) _gr_acb_poly_taylor_shift},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_acb_poly_roots},

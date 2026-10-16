@@ -117,6 +117,33 @@ TEST_FUNCTION_START(fmpz_mpoly_factor, state)
 {
     slong i, j, tmul = 25;
 
+    /* issue #2408: sparse bivariates with large degrees were sent to the
+       dense fmpz_bpoly_factor code and took tens of seconds each */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f;
+        const char * vars[] = {"x", "y"};
+
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(f, ctx);
+
+        fmpz_mpoly_set_str_pretty(f, "x^103+x^2*y^3+x^101*y^103+y^106", vars, ctx);
+        check_omega(2, 2, f, ctx, fmpz_mpoly_factor);
+
+        fmpz_mpoly_set_str_pretty(f, "x^162*y^127+x^156*y^13+x^6*y^114+1", vars, ctx);
+        check_omega(4, 4, f, ctx, fmpz_mpoly_factor);
+
+        fmpz_mpoly_set_str_pretty(f, "x^174+y^16+x^240*y^168+x^66*y^184", vars, ctx);
+        check_omega(3, 3, f, ctx, fmpz_mpoly_factor);
+
+        fmpz_mpoly_set_str_pretty(f, "453192*x^128*y^27-652695*x^170*y^89-61824*x^130*y^115+89040*x^172*y^177", vars, ctx);
+        check_omega(157, 157, f, ctx, fmpz_mpoly_factor);
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;

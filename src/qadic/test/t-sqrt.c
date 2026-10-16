@@ -20,7 +20,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
 TEST_FUNCTION_START(qadic_sqrt, state)
 {
-    int i, result;
+    int i, j, result;
 
 /* PRIME p = 2 ***************************************************************/
 
@@ -433,6 +433,60 @@ TEST_FUNCTION_START(qadic_sqrt, state)
         qadic_clear(b);
         qadic_clear(b2);
 
+        qadic_ctx_clear(ctx);
+    }
+
+    /* Test random squares: compare with precomputed version */
+    for (i = 0; i < 10; i++)
+    {
+        fmpz_t p = {WORD(2)};
+        slong deg, N;
+        qadic_ctx_t ctx;
+        struct qadic2_sqrt_precomp *precomp;
+
+        deg = n_randint(state, 10) + 5;
+        N = n_randint(state, 50) + 5;
+        qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), N, "X", PADIC_SERIES);
+
+        precomp = _qadic_char2_sqrt_precomp_init(ctx);
+
+        for (j = 0; j < 20 * flint_test_multiplier(); j++)
+        {
+            int ans, ans2;
+            qadic_t a, b, c, c2;
+
+            qadic_init2(a, N);
+            qadic_init2(b, N);
+            qadic_init2(c, N);
+            qadic_init2(c2, N);
+
+            qadic_randtest_val(b, state, 0, ctx);
+            qadic_mul(a, b, b, ctx);
+
+            ans = qadic_sqrt(c, a, ctx);
+            ans2 = _qadic_char2_sqrt_with_precomp(c2, a, ctx, precomp);
+
+            result = ans && ans2 && qadic_equal(c, c2);
+            if (!result)
+            {
+                flint_printf("FAIL (random squares with precomputation):\n");
+                flint_printf("a = b^2, c = sqrt(a), c = sqrt(a) with precomputed data\n\n");
+                flint_printf("a = "); qadic_print_pretty(a, ctx); flint_printf("\n");
+                flint_printf("b = "); qadic_print_pretty(b, ctx); flint_printf("\n");
+                flint_printf("c = "); qadic_print_pretty(c, ctx); flint_printf("\n");
+                flint_printf("c2 = "); qadic_print_pretty(c2, ctx); flint_printf("\n");
+                flint_printf("ans = %d, ans2 = %d\n", ans, ans2);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            qadic_clear(a);
+            qadic_clear(b);
+            qadic_clear(c);
+            qadic_clear(c2);
+        }
+
+        _qadic_char2_sqrt_precomp_clear(precomp);
         qadic_ctx_clear(ctx);
     }
 

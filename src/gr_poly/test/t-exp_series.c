@@ -23,7 +23,7 @@ test_exp_series(flint_rand_t state)
     gr_poly_t a, b, ab, fa, fb, fab, fafb;
     int status = GR_SUCCESS;
 
-    gr_ctx_init_random(ctx, state);
+    gr_ctx_init_random_commutative_ring(ctx, state);
 
     gr_poly_init(a, ctx);
     gr_poly_init(b, ctx);

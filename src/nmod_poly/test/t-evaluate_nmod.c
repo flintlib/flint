@@ -104,7 +104,7 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
 
         // variants
         nmod_poly_set(a, acopy);
-        eval1_v1 = _nmod_poly_evaluate_nmod(a->coeffs, a->length, c, a->mod);
+        eval1_v1 = _nmod_poly_evaluate_nmod_horner(a->coeffs, a->length, c, a->mod);
         eval1_v1 = n_addmod(eval1_v1, _nmod_poly_evaluate_nmod(b->coeffs, b->length, c, b->mod), n);
 
         if (a->mod.norm > 0)
@@ -145,7 +145,7 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         }
 
         nmod_poly_add(a, a, b);
-        eval2_v1 = _nmod_poly_evaluate_nmod(a->coeffs, a->length, c, a->mod);
+        eval2_v1 = _nmod_poly_evaluate_nmod_horner(a->coeffs, a->length, c, a->mod);
         if (a->mod.norm > 0)
         {
             ulong c_precomp = n_mulmod_precomp_shoup(c, n);

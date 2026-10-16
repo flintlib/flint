@@ -155,8 +155,7 @@ acb_hypgeom_dilog_taylor_sum(acb_t res, const acb_t z, slong n, slong prec)
 
             while (qk > 1)
             {
-                ulong hi, lo;
-                umul_ppmm(hi, lo, q, qk * qk);
+                ulong hi = n_mulhi(q, qk * qk);
                 if (hi != 0)
                     break;
                 q *= qk * qk;

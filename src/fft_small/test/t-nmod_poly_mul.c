@@ -23,6 +23,89 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
 
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
 
+    /* Check the direct FFT branch. */
+    {
+        ulong * a, * b, * c, * d;
+        ulong an, bn, zn, zl, zh, sz, i;
+
+        nmod_init(&mod, UWORD(7340033));  /* 7*2^20 + 1 */
+
+        for (slong reps = 0; reps < 4; reps++)
+        {
+            flint_set_num_threads(1 + reps);
+
+            an = 1800 + 37*reps;
+            bn = 1600 + 19*reps;
+            zn = an + bn - 1;
+            zl = reps == 0 ? 0 : 123 + reps;
+            zh = reps == 1 ? zn : zn - 17*reps;
+            sz = FLINT_MAX(zn, zh);
+
+            a = FLINT_ARRAY_ALLOC(an, ulong);
+            b = FLINT_ARRAY_ALLOC(bn, ulong);
+            c = FLINT_ARRAY_ALLOC(sz, ulong);
+            d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+            for (i = 0; i < an; i++)
+                a[i] = n_randint(state, mod.n);
+
+            for (i = 0; i < bn; i++)
+                b[i] = n_randint(state, mod.n);
+
+            flint_mpn_zero(c, sz);
+            _nmod_poly_mul_KS(c, a, an, b, bn, mod);
+            _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
+
+            for (i = zl; i < zh; i++)
+            {
+                if (c[i] != d[i-zl])
+                {
+                    flint_printf("(direct fft) mulmid error at index %wu\n", i);
+                    flint_printf("zl=%wu, zh=%wu, an=%wu, bn=%wu\n", zl, zh, an, bn);
+                    flint_printf("mod: %wu\n", mod.n);
+                    flint_abort();
+                }
+            }
+
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+            flint_free(d);
+        }
+
+        an = 1700;
+        zn = an + an - 1;
+        zl = 41;
+        zh = zn - 29;
+        sz = zn;
+
+        a = FLINT_ARRAY_ALLOC(an, ulong);
+        c = FLINT_ARRAY_ALLOC(sz, ulong);
+        d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+        for (i = 0; i < an; i++)
+            a[i] = n_randint(state, mod.n);
+
+        flint_mpn_zero(c, sz);
+        _nmod_poly_mul_KS(c, a, an, a, an, mod);
+        _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, a, an, mod, R);
+
+        for (i = zl; i < zh; i++)
+        {
+            if (c[i] != d[i-zl])
+            {
+                flint_printf("(direct fft squaring) mulmid error at index %wu\n", i);
+                flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
+                flint_printf("mod: %wu\n", mod.n);
+                flint_abort();
+            }
+        }
+
+        flint_free(a);
+        flint_free(c);
+        flint_free(d);
+    }
+
     /* (slow) test bug where 3 instead of 4 primes were used */
 #if 0
     {
@@ -51,7 +134,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = a[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, a, an, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -103,7 +186,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = a[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, a, an, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -158,7 +241,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, b, bn, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, b, bn, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -176,6 +259,66 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
             flint_free(b);
             flint_free(c);
             flint_free(d);
+        }
+    }
+
+    /* Windows that let the plan wrap around: _fft_small_plan_set_window
+       drops to a cyclic convolution of length 2^d <= zn when
+       max(operand truncations, zh) <= 2^d and zn - 2^d <= zl.  These
+       shapes take that branch; without it they would simply use the
+       longer non-cyclic transform, so the check is on the result. */
+    {
+        /* an, bn, zl, zh */
+        const ulong shapes[6][4] = {
+            { 1000, 1000,  980, 1024 },
+            { 1000, 1000, 1000, 1024 },
+            {  700,  700,  500, 1024 },
+            {  600,  500,  600, 1024 },
+            { 1500, 1500, 2000, 2048 },
+            { 5000, 5000, 5000, 8192 },
+        };
+        ulong nn[3] = { UWORD(2), UWORD(0x0003f00000000001),
+                        UWORD(18446744073709551557) };
+
+        for (int k = 0; k < 3; k++)
+        {
+            nmod_init(&mod, nn[k]);
+
+            for (int s = 0; s < 6; s++)
+            {
+                ulong an = shapes[s][0], bn = shapes[s][1];
+                ulong zl = shapes[s][2], zh = shapes[s][3];
+                ulong zn = an + bn - 1;
+                ulong * a = FLINT_ARRAY_ALLOC(an, ulong);
+                ulong * b = FLINT_ARRAY_ALLOC(bn, ulong);
+                ulong * c = FLINT_ARRAY_ALLOC(zn, ulong);
+                ulong * d = FLINT_ARRAY_ALLOC(zh - zl, ulong);
+                ulong i;
+
+                for (i = 0; i < an; i++)
+                    a[i] = n_randint(state, mod.n);
+                for (i = 0; i < bn; i++)
+                    b[i] = n_randint(state, mod.n);
+
+                _nmod_poly_mul_KS(c, a, an, b, bn, mod);
+                _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
+
+                for (i = zl; i < zh; i++)
+                {
+                    if (c[i] != d[i - zl])
+                    {
+                        flint_printf("(wraparound) mulmid error at index %wu\n", i);
+                        flint_printf("zl=%wu, zh=%wu, an=%wu, bn=%wu\n", zl, zh, an, bn);
+                        flint_printf("mod: %wu\n", mod.n);
+                        flint_abort();
+                    }
+                }
+
+                flint_free(a);
+                flint_free(b);
+                flint_free(c);
+                flint_free(d);
+            }
         }
     }
 

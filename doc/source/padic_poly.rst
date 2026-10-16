@@ -232,10 +232,10 @@ Getting and setting coefficients
     Sets `c` to the coefficient of `x^n` in the polynomial, 
     reduced modulo the precision of `c`.
 
-.. function:: void padic_poly_set_coeff_padic(padic_poly_t f, slong n, const padic_t c, const padic_ctx_t ctx)
+.. function:: void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t c, const padic_ctx_t ctx)
 
-    Sets the coefficient of `x^n` in the polynomial `f` to `c`, 
-    reduced to the precision of the polynomial `f`.
+    Sets the coefficient of `x^n` in the polynomial `poly` to `c`,
+    reduced to the precision of the polynomial `poly`.
 
     Note that this operation can take linear time in the length 
     of the polynomial.
@@ -528,9 +528,9 @@ Input and output
 
     In the current implementation, always returns `1`.
 
-.. function:: int _padic_poly_fprint_pretty(FILE * file, const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx)
+.. function:: int _padic_poly_fprint_pretty(FILE * file, const fmpz * poly, slong len, slong val, const char * var, const padic_ctx_t ctx)
               int padic_poly_fprint_pretty(FILE * file, const padic_poly_t poly, const char * var, const padic_ctx_t ctx)
-              int _padic_poly_print_pretty(const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx)
+              int _padic_poly_print_pretty(const fmpz * poly, slong len, slong val, const char * var, const padic_ctx_t ctx)
               int padic_poly_print_pretty(const padic_poly_t poly, const char * var, const padic_ctx_t ctx)
 
 

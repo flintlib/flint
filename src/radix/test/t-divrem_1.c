@@ -108,6 +108,19 @@ TEST_FUNCTION_START(radix_divrem_1, state)
             flint_abort();
         }
 
+        r1 = radix_divrem_two(c, a, an, radix);
+        r2 = radix_divrem_1_naive(d, a, an, 2, radix);
+
+        if (r1 != r2 || mpn_cmp(c, d, an) != 0)
+        {
+            flint_printf("FAIL: divrem_two\n");
+            flint_printf("%{ulong*}\n", a, an);
+            flint_printf("%{ulong*}\n", c, an);
+            flint_printf("%{ulong*}\n", d, an);
+            flint_printf("%wu\n%wu\n\n", r1, r2);
+            flint_abort();
+        }
+
         radix_clear(radix);
 
         flint_free(a);

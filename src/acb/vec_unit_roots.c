@@ -42,7 +42,7 @@ _acb_vec_unit_roots(acb_ptr res, slong n, slong len, slong prec)
     wp = prec + 6 + 2 * FLINT_BIT_COUNT(len1);
 
     acb_init(t);
-    acb_unit_root(t, n, prec);
+    acb_unit_root(t, n, wp);
     _acb_vec_set_powers(res, t, len1, wp);
     acb_clear(t);
     _acb_vec_set_round(res, res, len1, prec);

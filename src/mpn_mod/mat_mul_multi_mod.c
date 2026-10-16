@@ -17,6 +17,7 @@
 #include "thread_support.h"
 #include "nmod.h"
 #include "nmod_mat.h"
+#include "mpn_extras.h"
 #include "mpn_mod.h"
 #include "gr_mat.h"
 
@@ -41,47 +42,9 @@ typedef struct {
     nmod_mat_t * mod_C;
     slong num_primes;
     nn_ptr primes;
+    const flint_mpn_crt_struct * crt;
     gr_ctx_struct * ctx;
 } _worker_arg;
-
-FLINT_FORCE_INLINE ulong
-nmod_set_mpn_2(nn_srcptr ad, nmod_t mod)
-{
-    ulong r = 0;
-    NMOD_RED2(r, r, ad[1], mod);
-    NMOD_RED2(r, r, ad[0], mod);
-    return r;
-}
-
-#if 0
-FLINT_FORCE_INLINE ulong
-nmod_set_mpn_3(nn_srcptr ad, nmod_t mod)
-{
-    ulong r = 0;
-    NMOD_RED2(r, r, ad[2], mod);
-    NMOD_RED2(r, r, ad[1], mod);
-    NMOD_RED2(r, r, ad[0], mod);
-    return r;
-}
-
-FLINT_FORCE_INLINE ulong
-nmod_set_mpn_4(nn_srcptr ad, nmod_t mod)
-{
-    ulong r = 0;
-    NMOD_RED2(r, r, ad[3], mod);
-    NMOD_RED2(r, r, ad[2], mod);
-    NMOD_RED2(r, r, ad[1], mod);
-    NMOD_RED2(r, r, ad[0], mod);
-    return r;
-}
-#endif
-
-/* todo: precomputed inverse */
-FLINT_FORCE_INLINE ulong
-nmod_set_mpn(nn_srcptr ad, slong an, nmod_t mod)
-{
-    return mpn_mod_1(ad, an, mod.n);
-}
 
 static void _mod_worker(void * varg)
 {
@@ -100,49 +63,36 @@ static void _mod_worker(void * varg)
     nmod_mat_t * mod_A = arg->mod_A;
     nmod_mat_t * mod_B = arg->mod_B;
     slong num_primes = arg->num_primes;
-
+    const flint_mpn_crt_struct * crt = arg->crt;
     slong nlimbs = MPN_MOD_CTX_NLIMBS(arg->ctx);
+    nn_ptr res, tmp;
+    slong maxcols = FLINT_MAX(k, (mod_B != NULL) ? n : 0);
 
-    ulong first_prime = UWORD(1) << (FLINT_BITS - 1);
+    res = FLINT_ARRAY_ALLOC(num_primes * maxcols, ulong);
+    tmp = FLINT_ARRAY_ALLOC(crt->tmp_limbs, ulong);
 
-    if (nlimbs == 2 && arg->primes[0] == first_prime)
+    /* the entries of a row are contiguous, so use the vector function */
+    for (i = Astartrow; i < Astoprow; i++)
     {
-        for (i = Astartrow; i < Astoprow; i++)
-        {
+        flint_mpn_multi_mod_vec(res, k, Aentries + i * Astride * nlimbs, nlimbs, k, crt, tmp);
+        for (l = 0; l < num_primes; l++)
             for (j = 0; j < k; j++)
-            {
-                nmod_mat_entry(mod_A[0], i, j) = (Aentries + (i * Astride + j) * nlimbs)[0] & (first_prime - 1);
-                for (l = 1; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn_2(Aentries + (i * Astride + j) * nlimbs, mod_A[l]->mod);
-            }
-        }
+                nmod_mat_entry(mod_A[l], i, j) = res[l * k + j];
+    }
 
-        if (mod_B != NULL)
+    if (mod_B != NULL)
+    {
+        for (i = Bstartrow; i < Bstoprow; i++)
         {
-            for (i = Bstartrow; i < Bstoprow; i++)
+            flint_mpn_multi_mod_vec(res, n, Bentries + i * Bstride * nlimbs, nlimbs, n, crt, tmp);
+            for (l = 0; l < num_primes; l++)
                 for (j = 0; j < n; j++)
-                {
-                    nmod_mat_entry(mod_B[0], i, j) = (Bentries + (i * Bstride + j) * nlimbs)[0] & (first_prime - 1);
-                    for (l = 1; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn_2(Bentries + (i * Bstride + j) * nlimbs, mod_A[l]->mod);
-                }
+                    nmod_mat_entry(mod_B[l], i, j) = res[l * n + j];
         }
     }
-    else
-    {
-        for (i = Astartrow; i < Astoprow; i++)
-            for (j = 0; j < k; j++)
-                for (l = 0; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn(Aentries + (i * Astride + j) * nlimbs, nlimbs, mod_A[l]->mod);
 
-        if (mod_B != NULL)
-        {
-            for (i = Bstartrow; i < Bstoprow; i++)
-                for (j = 0; j < n; j++)
-                    for (l = 0; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn(Bentries + (i * Bstride + j) * nlimbs, nlimbs, mod_A[l]->mod);
-        }
-    }
+    flint_free(res);
+    flint_free(tmp);
 }
 
 static void _crt_worker(void * varg)
@@ -155,77 +105,32 @@ static void _crt_worker(void * varg)
     nn_ptr Centries = arg->Centries;
     slong Cstride = arg->Cstride;
     nmod_mat_t * mod_C = arg->mod_C;
-    ulong * primes = arg->primes;
     slong num_primes = arg->num_primes;
+    const flint_mpn_crt_struct * crt = arg->crt;
     gr_ctx_struct * ctx = arg->ctx;
     slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_ptr res, out, tmp;
+    slong pn = crt->prod_len;
 
-    /* todo: fmpz_mat has dedicated code for num_primes <= 2
-             which we currently don't because we do not optimize
-             for small entries */
+    res = FLINT_ARRAY_ALLOC(num_primes * n, ulong);
+    out = FLINT_ARRAY_ALLOC(n * pn, ulong);
+    tmp = FLINT_ARRAY_ALLOC(crt->tmp_limbs, ulong);
 
+    for (i = Cstartrow; i < Cstoprow; i++)
     {
-        nn_ptr M, Ns, T, U;
-        slong Msize, Nsize;
-        ulong cy, ri;
+        for (l = 0; l < num_primes; l++)
+            for (j = 0; j < n; j++)
+                res[l * n + j] = nmod_mat_entry(mod_C[l], i, j);
 
-        M = FLINT_ARRAY_ALLOC(num_primes + 1, ulong);
+        flint_mpn_multi_crt_vec(out, pn, NULL, res, n, n, crt, 0, tmp);
 
-        M[0] = primes[0];
-        Msize = 1;
-        for (i = 1; i < num_primes; i++)
-        {
-            FLINT_ASSERT(Msize > 0);
-            M[Msize] = cy = mpn_mul_1(M, M, Msize, primes[i]);
-            Msize += (cy != 0);
-        }
-
-        /* We add terms with Msize + 1 limbs, with one extra limb for the
-           carry accumulation. todo: reduce Nsize by 1 when the carries
-           do not require an extra limb. */
-        Nsize = Msize + 2;
-
-        Ns = FLINT_ARRAY_ALLOC(Nsize*num_primes, ulong);
-        T = FLINT_ARRAY_ALLOC(Nsize, ulong);
-        U = FLINT_ARRAY_ALLOC(Nsize, ulong);
-
-        for (i = 0; i < num_primes; i++)
-        {
-            Ns[i*Nsize + (Nsize - 1)] = 0;
-            Ns[i*Nsize + (Nsize - 2)] = 0;
-            mpn_divrem_1(Ns + i * Nsize, 0, M, Msize, primes[i]);
-            ri = mpn_mod_1(Ns + i * Nsize, Msize, primes[i]);
-            ri = n_invmod(ri, primes[i]);
-            FLINT_ASSERT(Msize > 0);
-            Ns[i*Nsize + Msize] = mpn_mul_1(Ns + i*Nsize, Ns + i*Nsize, Msize, ri);
-        }
-
-        for (i = Cstartrow; i < Cstoprow; i++)
         for (j = 0; j < n; j++)
-        {
-            ri = nmod_mat_entry(mod_C[0], i, j);
-            FLINT_ASSERT(Nsize > 1);
-            T[Nsize - 1] = mpn_mul_1(T, Ns, Nsize - 1, ri);
-
-            /* todo: more fixed-length code */
-            for (l = 1; l < num_primes; l++)
-            {
-                ri = nmod_mat_entry(mod_C[l], i, j);
-                T[Nsize - 1] += mpn_addmul_1(T, Ns + l*Nsize, Nsize - 1, ri);
-            }
-
-            /* todo: division with precomputed inverse? */
-            /* todo: see what fft_small does here */
-            mpn_tdiv_qr(U, T, 0, T, Nsize, M, Msize);
-
-            mpn_mod_set_mpn(Centries + (i * Cstride + j) * nlimbs, T, Msize, ctx);
-        }
-
-        flint_free(M);
-        flint_free(Ns);
-        flint_free(T);
-        flint_free(U);
+            mpn_mod_set_mpn(Centries + (i * Cstride + j) * nlimbs, out + j * pn, pn, ctx);
     }
+
+    flint_free(res);
+    flint_free(out);
+    flint_free(tmp);
 }
 
 int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
@@ -278,9 +183,11 @@ int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr
     }
     else
     {
-        /* Round up in the division */
-        mainarg.num_primes = 1 + (bits - (FLINT_BITS - 1) + primes_bits - 1)/primes_bits;
-        first_prime = UWORD(1) << (FLINT_BITS - 1);
+        /* Round up in the division. The first modulus is a power of two
+           of the same size as the primes, so that the fixed-length CRT
+           code in flint_mpn_multi_crt applies for small products. */
+        mainarg.num_primes = 1 + (bits - primes_bits + primes_bits - 1)/primes_bits;
+        first_prime = UWORD(1) << primes_bits;
     }
 
     /* Initialize */
@@ -291,6 +198,12 @@ int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr
         mainarg.primes[1] = n_nextprime(UWORD(1) << primes_bits, 0);
         for (i = 2; i < mainarg.num_primes; i++)
             mainarg.primes[i] = n_nextprime(mainarg.primes[i-1], 0);
+    }
+
+    {
+        flint_mpn_crt_struct * crt = flint_malloc(sizeof(flint_mpn_crt_struct));
+        flint_mpn_crt_init(crt, mainarg.primes, mainarg.num_primes);
+        mainarg.crt = crt;
     }
 
     mainarg.mod_A = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
@@ -416,6 +329,8 @@ crt_single:
         flint_free(mainarg.mod_B);
     flint_free(mainarg.mod_C);
     flint_free(mainarg.primes);
+    flint_mpn_crt_clear((flint_mpn_crt_struct *) mainarg.crt);
+    flint_free((flint_mpn_crt_struct *) mainarg.crt);
 
     return GR_SUCCESS;
 }

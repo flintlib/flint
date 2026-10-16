@@ -46,6 +46,8 @@ _nmod_poly_powmod_fmpz_binexp(nn_ptr res, nn_srcptr poly,
            fmpz_clear(p0);
            fmpz_clear(nf);
         }
+
+        return;
     }
 
     lenT = 2*lenf - 3;

@@ -18,7 +18,6 @@
 #include "t-factor_distinct_deg_threaded.c"
 #include "t-factor_kaltofen_shoup.c"
 #include "t-factor_squarefree.c"
-#include "t-interval_threaded.c"
 #include "t-is_irreducible.c"
 #include "t-is_irreducible_ddf.c"
 #include "t-is_irreducible_rabin.c"
@@ -37,7 +36,6 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_factor_distinct_deg_threaded),
     TEST_FUNCTION(nmod_poly_factor_kaltofen_shoup),
     TEST_FUNCTION(nmod_poly_factor_squarefree),
-    TEST_FUNCTION(nmod_poly_factor_interval_threaded),
     TEST_FUNCTION(nmod_poly_factor_is_irreducible),
     TEST_FUNCTION(nmod_poly_factor_is_irreducible_ddf),
     TEST_FUNCTION(nmod_poly_factor_is_irreducible_rabin),

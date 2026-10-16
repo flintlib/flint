@@ -25,6 +25,7 @@
 #include "t-mul.c"
 #include "t-pow_ui.c"
 #include "t-roots.c"
+#include "t-shift_reverse.c"
 #include "t-squarefree_part.c"
 
 /* Array of test functions ***************************************************/
@@ -45,6 +46,7 @@ test_struct tests[] =
     TEST_FUNCTION(ca_poly_mul),
     TEST_FUNCTION(ca_poly_pow_ui),
     TEST_FUNCTION(ca_poly_roots),
+    TEST_FUNCTION(ca_poly_shift_reverse),
     TEST_FUNCTION(ca_poly_squarefree_part)
 };
 

@@ -592,15 +592,19 @@ Bit packing
     ``bit_size``, negating the coefficients before packing
     if ``negate`` is set to `-1`.
 
-.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
+.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
 
-    Unpacks the polynomial of given length from the array as packed into
+    Unpacks the polynomial of given length `nhi` from the array as packed into
     fields of the given ``bit_size``, finally negating the coefficients
     if ``negate`` is set to `-1`. Returns borrow, which is nonzero if a
     leading term with coefficient `\pm1` should be added at
-    position ``len`` of ``poly``.
+    position ``nhi`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size)
+    If `nlo` is zero, all coefficients are unpacked; otherwise the
+    coefficients in the range `[nlo, nhi)` are unpacked and written to
+    indices `[0, nhi-nlo)` in ``poly``.
+
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into
     fields of the given ``bit_size``.  The coefficients are assumed to
@@ -669,57 +673,249 @@ Multiplication
     remainder to the corresponding coefficients of the product of ``poly1``
     and ``poly2``.
 
-.. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+.. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
 
-    Sets ``res`` to the middle ``len1 - len2 + 1`` coefficients of
-    the product of ``(poly1, len1)`` and ``(poly2, len2)``, i.e. the
-    coefficients from degree ``len2 - 1`` to ``len1 - 1`` inclusive.
-    Assumes that ``len1 >= len2 > 0``.
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices `[nlo, nhi)`
+    in the full product of ``(poly1, len1)`` and ``(poly2, len2)``.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`.
+
+    The Schoenhage-Strassen version computes a truncated transform of
+    the full product, or, when it is shorter, a cyclic convolution of
+    power-of-two length `M \ge \max(nhi, len1 + len2 - 1 - nlo)` whose
+    wrapped-around terms all land below `nlo` (see
+    :func:`fft_convolution_choose_mid`). For the classical middle
+    product `(2m) \times m \to m` this processes `2m` instead of `3m`
+    points when `2m` is a power of two.
+
+    :func:`_fmpz_poly_mulmid` is the single dispatcher behind
+    :func:`_fmpz_poly_mul`, :func:`_fmpz_poly_mullow`,
+    :func:`_fmpz_poly_mulhigh`, :func:`_fmpz_poly_sqr` and
+    :func:`_fmpz_poly_sqrlow` (squaring is detected when the operands are
+    the same array). Depending on the lengths, the window and the bit
+    sizes of the coefficients it uses: direct accumulation in words or
+    double words for small coefficients; the classical algorithm on
+    ``fmpz`` values for very short polynomials (further on partial windows
+    and on low squarings, where its cost follows the number of terms in
+    the window); the packed-limb classical, Karatsuba and Karatsuba middle
+    product multiplication (:func:`_fmpz_poly_mulmid_mpn`) for polynomials
+    up to a few dozen terms with coefficients up to about a thousand bits;
+    the Toom-Cook style evaluation/interpolation
+    (:func:`_fmpz_poly_mulmid_toom_karatsuba`) for short polynomials with
+    large coefficients; the fft_small-based classical multiplication for
+    low and high windows with large coefficients; and otherwise the
+    ``fft_small`` based multiplication, Kronecker substitution or
+    Schoenhage-Strassen, the latter in particular for middle products
+    whose cyclic transform (see :func:`fft_convolution_choose_mid`) is
+    at most three quarters of the truncated length, with coefficients of
+    about 1000-2000 bits or of 65536 bits and more. The boundaries were
+    tuned for uniformly sized random coefficients.
 
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets ``res`` to the middle ``len(poly1) - len(poly2) + 1``
-    coefficients of ``poly1 * poly2``, i.e. the coefficient from degree
-    ``len2 - 1`` to ``len1 - 1`` inclusive.  Assumes that
-    ``len1 >= len2``.
+    Sets ``res`` to the polynomial formed by the coefficients at indices `[nlo, nhi)`
+    in the product of ``poly1`` and ``poly2``. Equivalently, compute
+    `[(poly1 \cdot poly2) \bmod x^{nhi}] / x^{nlo}`.
 
-.. function:: void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+.. function:: int _fmpz_poly_mulmid_classical_fft_small(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+
+    As :func:`_fmpz_poly_mulmid_classical`, computing the coefficients
+    `[\mathtt{nlo}, \mathtt{nhi})` of the product, but with the
+    coefficient arithmetic done pointwise on fft_small transforms: the
+    shorter operand's coefficients are transformed once and kept, the
+    longer operand rolls through a window of transform slots, and each
+    output coefficient is an accumulation of pointwise products
+    reconstructed once. When both operands are the same array, the
+    square shares transforms and pairs symmetric terms. The lengths may
+    be given in either order. Returns 1 on success and 0 when the
+    transformed representation is unavailable (small coefficients, or a
+    build without fft_small support), in which case nothing is written
+    and the caller should fall back to the classical routine.
+
+.. function:: int fmpz_poly_mulmid_classical_fft_small(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+
+    Wrapper handling aliasing, zero operands and normalization, with
+    the same return convention.
+
+.. function:: void _fmpz_poly_mulmid_mpn(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mul_mpn(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+
+    As :func:`_fmpz_poly_mulmid` (respectively :func:`_fmpz_poly_mul`),
+    computing the coefficients `[\mathtt{nlo}, \mathtt{nhi})` of the product
+    with the coefficient arithmetic done on packed fixed-size limb arrays
+    rather than on ``fmpz`` values, using classical or Karatsuba-based
+    multiplication (:func:`_flint_mpn_poly_mulmid`). These routines are
+    intended for polynomials of small or medium length with small or
+    medium size coefficients (say up to a few hundred bits).
+
+    The coefficients of the inputs that cannot contribute to the requested
+    window are trimmed away first. The representation, the numbers of limbs
+    and the size of the outputs are then chosen by
+    :func:`_flint_mpn_poly_mulmid_params` from the bit bounds of the inputs and
+    the lengths: the input coefficients are packed as contiguous
+    unsigned, two's complement, sign-magnitude or biased `n`-limb integers
+    (when all coefficients are small ``fmpz`` values, the ``fmpz`` arrays
+    are used directly as 1-limb two's complement arrays), and each
+    output coefficient is computed exactly modulo `2^{64 s}` and
+    converted back, applying the bias correction when needed.
+    Squaring is detected when ``poly1`` and ``poly2`` are the same array
+    of the same length.
+
+.. function:: void _fmpz_poly_mulmid_mpn_bits(fmpz * res, const fmpz * poly1, slong len1, slong bits1, const fmpz * poly2, slong len2, slong bits2, slong nlo, slong nhi)
+
+    Version taking as extra inputs the signed bit bounds ``bits1`` and
+    ``bits2`` of the coefficients of the two polynomials as computed
+    by :func:`_fmpz_vec_max_bits`, avoiding recomputation when these
+    are already known. The bounds need not be tight.
+
+.. function:: void fmpz_poly_mulmid_mpn(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+              void fmpz_poly_mul_mpn(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Wrappers handling aliasing, zero operands and normalization.
+
+.. function:: int _fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+
+    Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)`` and
+    ``(poly2, len2)`` using one level of Toom-Cook multiplication in the
+    polynomial variable, with the pointwise products done as scalar
+    integer multiplications.
+
+.. function:: int _fmpz_poly_mul_toom_scalar_nmax(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nmax)
+              int _fmpz_poly_mulmid_toom_scalar_nmax(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi, slong nmax)
+
+    Versions of the above only handling products of length (or window
+    sizes) up to ``nmax`` (clamped to ``FMPZ_POLY_TOOM_SCALAR_N_MAX``)
+    and returning 0 otherwise. The caller chooses ``nmax``; the
+    evaluations and interpolations are only negligible against the
+    multiplications for large coefficients, so the Toom-Karatsuba
+    multiplication limits the number of points depending on the
+    coefficient size. This is what the Karatsuba layer uses.
+
+    Evaluation is at the points `0, \pm 1, \ldots, \pm p`, one further
+    point when the output length is odd, and infinity, giving exactly
+    `len1 + len2 - 1` coefficient multiplications instead of the
+    `len1 \cdot len2` of the classical algorithm. This is optimal for the
+    output length: no algorithm computes a full product of these lengths
+    with fewer nonscalar multiplications.
+
+    The interpolation is table driven and runs entirely in the output
+    array, with no temporary allocation and one exact division by a
+    single word per row. Since the saving is in the number of coefficient
+    multiplications while the linear work grows, the routine is intended
+    for short polynomials with large coefficients.
+
+    Assumes ``len1 >= len2 > 0``. Allows zero-padding of the two input
+    polynomials. No aliasing of inputs with outputs is allowed. When
+    ``poly1`` and ``poly2`` are the same array of the same length, the
+    evaluations are shared and the pointwise products are squarings.
+
+    Returns 1 on success and 0, leaving ``res`` untouched, when
+    ``len1 + len2 - 1`` exceeds the largest output length supported,
+    which is 20 on 64-bit machines and 13 on 32-bit machines. The bound
+    is where the precomputed interpolation constants cease to fit in a
+    word, not a limitation of the method.
+
+.. function:: int fmpz_poly_mul_toom_scalar(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Sets ``res`` to the product of ``poly1`` and ``poly2``, with the same
+    return convention as above. Aliasing of the output with either input
+    is permitted.
+
+.. function:: int _fmpz_poly_mulmid_toom_scalar(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[nlo, nhi)` in the full product of ``(poly1, len1)`` and
+    ``(poly2, len2)``, as :func:`_fmpz_poly_mulmid`.
+
+    Coefficients of the inputs that cannot contribute to the requested
+    window are trimmed away first. Writing `(m, n, w)` for the two
+    trimmed lengths and the window length, the routine then computes the
+    window with
+
+    .. math::
+
+        (\text{sum of the two smallest of } m, n, w) - 1
+
+    coefficient multiplications, by running either a full product of the
+    trimmed operands or, transposed, a middle product of the window
+    against the shorter operand, whichever is cheaper. The count is
+    symmetric in the three parameters, as transposition invariance
+    requires, and is optimal whenever the window touches an end of the
+    product. Windows cut away from both ends can admit lower rank
+    decompositions, which are not used here.
+
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`. The lengths may be given in
+    either order. No aliasing of inputs with outputs is allowed.
+
+    Returns 1 on success and 0, leaving ``res`` untouched, when both
+    routes exceed the length bound of :func:`_fmpz_poly_mul_toom_scalar`.
+    Note that a narrow window may be supported even when the full product
+    is not: a window of four coefficients of a `16 \times 16` product
+    needs 19 multiplications where the full product would need 31.
+
+.. function:: int fmpz_poly_mulmid_toom_scalar(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+
+    Sets ``res`` to the polynomial formed by the coefficients at indices
+    `[nlo, nhi)` in the product of ``poly1`` and ``poly2``, with the same
+    return convention as above.
+
+.. function:: void _fmpz_poly_mul_toom_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
-    zero-padding of the two input polynomials.  No aliasing of inputs with
-    outputs is allowed.
+    and ``(poly2, len2)``, by Karatsuba multiplication recursing to
+    :func:`_fmpz_poly_mul_toom_scalar` as the base case. Assumes that
+    ``len1`` and ``len2`` are positive; the lengths may be given in
+    either order, and squaring is detected when ``poly1 == poly2``.
+    Unbalanced lengths are handled by splitting the longer operand into
+    pieces of the length of the shorter one, so that the cost is
+    proportional to the length ratio. No aliasing of inputs with the
+    output is allowed.
 
-.. function:: void fmpz_poly_mul_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+    Together with the base case this performs `O(L^{1.585})` coefficient
+    multiplications for length `L`, with the Toom base case removing most
+    of the Karatsuba overhead for the lowest levels of the recursion. The
+    linear work is quadratic in the length per level, so this only pays
+    off over Karatsuba multiplication of the packed (mpn) representation
+    once the coefficient multiplications dominate, for coefficients of
+    roughly 2000 bits and more; in that regime the fmpz overhead is
+    negligible.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``.
+.. function:: void fmpz_poly_mul_toom_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-.. function:: void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, slong n)
+    Sets ``res`` to the product of ``poly1`` and ``poly2``. Aliasing of
+    the output with either input is permitted.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates to the given length.  It is assumed that ``poly1`` and
-    ``poly2`` are precisely the given length, possibly zero padded.
-    Assumes `n` is not zero.
+.. function:: void _fmpz_poly_mulmid_toom_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
 
-.. function:: void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[nlo, nhi)` in the full product of ``(poly1, len1)`` and
+    ``(poly2, len2)``, as :func:`_fmpz_poly_mulmid`, with
+    :func:`_fmpz_poly_mulmid_toom_scalar` as the base case throughout.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`; the lengths may be given
+    in either order. No aliasing of inputs with the output is allowed.
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates to the given length.
+    Coefficients of the inputs that cannot contribute to the window are
+    trimmed away first. Full windows use Karatsuba multiplication, low
+    windows Mulders' algorithm, high windows a low product of the
+    reversed operands, and windows in the middle range are covered by
+    blocks of the Karatsuba middle product of Hanrot, Quercia and
+    Zimmermann, so that a middle-product-shaped window costs about half
+    of a full product.
 
-.. function:: void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, slong len)
+.. function:: void fmpz_poly_mulmid_toom_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2`` and
-    truncates at the top to the given length.  The first ``len - 1``
-    coefficients are set to zero. It is assumed that ``poly1`` and
-    ``poly2`` are precisely the given length, possibly zero padded.
-    Assumes ``len`` is not zero.
-
-.. function:: void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong len)
-
-    Sets the first ``len - 1`` coefficients of the result to zero and the
-    remaining coefficients to the corresponding coefficients of the product of
-    ``poly1`` and ``poly2``.  Assumes ``poly1`` and ``poly2`` are
-    at most of the given length.
+    Sets ``res`` to the polynomial formed by the coefficients at indices
+    `[nlo, nhi)` in the product of ``poly1`` and ``poly2``. The window
+    is clamped to the length of the product. Aliasing of the output with
+    either input is permitted.
 
 .. function:: void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -748,10 +944,10 @@ Multiplication
     Sets ``res`` to the lowest `n` coefficients of the product of
     ``poly1`` and ``poly2``.
 
-.. function:: void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, slong length1, const fmpz * input2, slong length2)
+.. function:: void _fmpz_poly_mul_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
-    Sets ``(output, length1 + length2 - 1)`` to the product of
-    ``(input1, length1)`` and ``(input2, length2)``.
+    Sets ``(res, len1 + len2 - 1)`` to the product of
+    ``(poly1, len1)`` and ``(poly2, len2)``.
 
     We must have ``len1 > 1`` and ``len2 > 1``.  Allows zero-padding
     of the two input polynomials.  Supports aliasing of inputs and outputs.
@@ -761,7 +957,7 @@ Multiplication
     Sets ``res`` to the product of ``poly1`` and ``poly2``. Uses the
     Schönhage-Strassen algorithm.
 
-.. function:: void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong length1, const fmpz * input2, slong length2, slong n)
+.. function:: void _fmpz_poly_mullow_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong n)
 
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
@@ -779,22 +975,24 @@ Multiplication
 .. function:: void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
+    and ``(poly2, len2)``.  Assumes ``len1, len2 > 0``; the operands may
+    be given in either order.  Allows
     zero-padding of the two input polynomials. Does not support aliasing
     between the inputs and the output.
 
-
 .. function:: void fmpz_poly_mul(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``.  Chooses
-    an optimal algorithm from the choices above.
+    Sets ``res`` to the product of ``poly1`` and ``poly2``.  The algorithm
+    is chosen by :func:`_fmpz_poly_mulmid`, the single dispatcher behind
+    all the multiplication and squaring functions.
 
 .. function:: void _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong n)
 
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
 
-    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Assumes ``len1, len2 > 0`` (the operands may be given in either
+    order) and ``0 < n <= len1 + len2 - 1``.
     Allows for zero-padding in the inputs.  Does not support aliasing between
     the inputs and the output.
 
@@ -815,7 +1013,8 @@ Multiplication
     Sets all but the low `n` coefficients of `res` to the corresponding
     coefficients of the product of `poly1` of length `len1` and `poly2` of
     length `len2`, the remaining coefficients being arbitrary. It is assumed
-    that `len1 >= len2 > 0` and that `0 < n < len1 + len2 - 1`. Aliasing of
+    that `len1, len2 > 0` (the operands may be given in either order) and
+    that `0 < n < len1 + len2 - 1`. Aliasing of
     inputs is not permitted.
 
 
@@ -896,18 +1095,6 @@ Squaring
     Sets ``rop`` to the square of the polynomial ``op`` using
     Kronecker segmentation.
 
-.. function:: void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, slong len)
-
-    Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``,
-    assuming that ``len > 0``.
-
-    Supports zero-padding in ``(op, len)``.  Does not support aliasing.
-
-.. function:: void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op)
-
-    Sets ``rop`` to the square of the polynomial ``op`` using
-    the Karatsuba multiplication algorithm.
-
 .. function:: void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, slong len)
 
     Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``,
@@ -944,17 +1131,6 @@ Squaring
 
     Sets ``res`` to the lowest `n` coefficients
     of the square of ``poly``.
-
-.. function:: void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n)
-
-    Sets ``(res, n)`` to the square of ``(poly, n)`` truncated
-    to length `n`, which is assumed to be positive.  Allows for ``poly``
-    to be zero-padded.
-
-.. function:: void fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
-
-    Sets ``res`` to the square of ``poly`` and
-    truncates to the given length.
 
 .. function:: void _fmpz_poly_sqrlow_classical(fmpz * res, const fmpz * poly, slong len, slong n)
 
@@ -1254,9 +1430,15 @@ Greatest common divisor
 
     This function uses the modular GCD algorithm. The basic
     strategy is to remove the content of the polynomials, reduce them
-    modulo sufficiently many primes and do CRT reconstruction until
-    some bound is reached (or we can prove with trial division that
-    we have the GCD).
+    modulo sufficiently many primes and do CRT reconstruction.
+    Primes are processed in batches (in parallel when multiple threads
+    are available), using fast multimodular reduction and a single fast
+    CRT for reconstruction. The number of primes is chosen adaptively
+    by checking when a random linear combination of the coefficients of
+    the reconstructed gcd stabilizes. The result is certified by
+    checking that the candidate divides both inputs, which is done by
+    computing the quotients multimodularly and verifying them by
+    multiplication or by coefficient bounds.
 
 .. function:: void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -1428,6 +1610,10 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
+.. function:: void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets ``res`` to the squarefree part of ``poly``, normalised to have
+    positive leading coefficient.
 
 Discriminant
 --------------------------------------------------------------------------------
@@ -1814,7 +2000,8 @@ Euclidean division
 .. function:: void _fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `x - c`.
+    division by `x - c`. Assumes the division is exact, which is not
+    checked.
 
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
@@ -1822,17 +2009,20 @@ Euclidean division
 .. function:: void fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `x - c`.
+    division by `x - c`. Assumes the division is exact, which is not
+    checked.
 
 .. function:: void _fmpz_poly_divexact(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
               void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Like :func:`fmpz_poly_div`, but assumes that the division is exact.
+    This is not checked; the result is undefined if the division is inexact.
 
 .. function:: void _fmpz_poly_divexact_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+    division by `q x - p` where `c = p/q`. Assumes the division is exact,
+    which is not checked.
 
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
@@ -1840,7 +2030,8 @@ Euclidean division
 .. function:: void fmpz_poly_divexact_root_fmpq(fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+    division by `q x - p` where `c = p/q`. Assumes the division is exact,
+    which is not checked.
 
 Division with precomputed inverse
 --------------------------------------------------------------------------------
@@ -1961,8 +2152,8 @@ Division mod p
     division is exact modulo `p`. The computed coefficients are reduced modulo
     `p` using the symmetric remainder system. We require `f` to be at least `n`
     in length. The function can handle trailing zeroes, but the low nonzero
-    coefficient of `g` must be coprime to `p`. This is a bespoke function used
-    by factoring.
+    coefficient of `g` must be coprime to `p`, which is not checked. This is a
+    bespoke function used by factoring.
 
 .. function:: void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_t p, slong n)
 
@@ -1971,7 +2162,7 @@ Division mod p
     `p` using the symmetric remainder system. We require `f` to be as output
     by ``fmpz_poly_mulhigh_n`` given polynomials `g` and a polynomial of
     length `n` as inputs. The leading coefficient of `g` must be coprime to
-    `p`. This is a bespoke function used by factoring.
+    `p`, which is not checked. This is a bespoke function used by factoring.
 
 
 Power series division
@@ -1983,40 +2174,45 @@ Power series division
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)`` using a recurrence.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q`
     using a recurrence, assuming that `Q` has constant term `\pm 1`
-    and `n \geq 1`.
+    and `n \geq 1`; the constant term is not checked.
 
 .. function:: void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)`` using Newton iteration.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q` using
-    Newton iteration, assuming `Q` has constant term `\pm 1` and `n \geq 1`.
+    Newton iteration, assuming `Q` has constant term `\pm 1` and `n \geq 1`;
+    the constant term is not checked.
 
 .. function:: void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)``.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q`,
-    assuming `Q` has constant term `\pm 1` and `n \geq 1`.
+    assuming `Q` has constant term `\pm 1` and `n \geq 1`; the constant
+    term is not checked.
 
 .. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
@@ -2025,7 +2221,8 @@ Power series division
 .. function:: void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
     Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
-    assuming `B` has constant term `\pm 1` and `n \geq 1`.
+    assuming `B` has constant term `\pm 1` and `n \geq 1`; the constant
+    term is not checked.
     Aliasing is not supported.
 
 .. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
@@ -2037,7 +2234,7 @@ Power series division
     Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
     considers the polynomials `A` and `B` as power series of length `n`
     starting with the constant terms.  The function assumes that `B` has
-    constant term `\pm 1` and `n \geq 1`.
+    constant term `\pm 1` and `n \geq 1`; the constant term is not checked.
 
 
 Pseudo division
@@ -2621,7 +2818,7 @@ Power series reversion
     Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
     as a power series, i.e. computes `Q^{-1}` such that
     `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
+    It is required that `Q_0 = 0` and `Q_1 = \pm 1`. This is not checked.
 
     Wraps :func:`_gr_poly_revert_series` which chooses automatically
     between various algorithms.
@@ -3227,6 +3424,36 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: slong fmpz_poly_roots_fmpz(fmpz * res, slong * exp, const fmpz_poly_t poly)
+              slong fmpz_poly_roots_fmpq(fmpq * res, slong * exp, const fmpz_poly_t poly)
+
+    Computes the distinct integer (respectively rational) roots of the
+    nonzero polynomial ``poly``, writes them to ``res`` in increasing order,
+    and returns the number of roots. If ``exp`` is not ``NULL``, the
+    multiplicities of the roots are written to ``exp``. The arrays must have
+    room for at least `\deg(\operatorname{poly})` entries.
+    Throws an exception if ``poly`` is zero.
+
+    If the constant and leading coefficients (after removing roots at zero)
+    are small with few divisors, the candidate roots `a/b` with `a` dividing
+    the constant coefficient and `b` dividing the leading coefficient are
+    simply tested. Otherwise, the roots are found by computing the roots
+    modulo a suitable prime `p`, lifting them `p`-adically using
+    Newton iteration to the precision necessary to recover rational roots
+    of bounded height, and verifying the candidates.
+    This is typically much faster than factoring the polynomial.
+    Multiplicities are handled using a squarefree factorization, which is
+    only computed if the polynomial is not squarefree.
+
+.. function:: slong _fmpz_poly_roots_fmpz_squarefree(fmpz * res, const fmpz * poly, slong len)
+              slong _fmpz_poly_roots_fmpq_squarefree(fmpq * res, const fmpz * poly, slong len)
+
+    Writes the integer (respectively rational) roots of ``(poly, len)``
+    to ``res`` (in no particular order) and returns the number of roots.
+    Assumes that ``poly`` is squarefree, that ``len`` is at least 1 and that
+    the constant coefficient is nonzero.
+    The array ``res`` must have room for ``len - 1`` entries.
+
 .. function:: void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len)
               void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 
@@ -3244,6 +3471,19 @@ Roots
 
     where the coefficients of the polynomial are `a_0, \ldots, a_n`.
 
+.. function:: slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slong len)
+              slong _fmpz_poly_positive_root_upper_bound_2exp(const fmpz * pol, slong len)
+              slong fmpz_poly_positive_root_upper_bound_2exp(const fmpz_poly_t pol)
+
+    Return the bitsize `e` of an upper bound `2^e` for the largest
+    positive real root of ``pol``.
+
+.. function:: slong _fmpz_poly_descartes_bound_0_1(const fmpz * p, slong len, slong bound)
+
+    Return an upper bound on the number of real roots in the interval `(0, 1)`
+    (excluding the endpoints) of the polynomial ``(p, len)`` using Descartes' rule
+    of sign. If the result is larger than ``bound`` then ``WORD_MAX`` is returned.
+
 .. function:: void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len)
 
     Sets ``n_neg`` and ``n_pos`` to the number of negative and
@@ -3255,26 +3495,120 @@ Roots
     The polynomial is assumed to be squarefree, of degree larger than 1
     and with non-zero constant coefficient.
 
+.. function:: slong _fmpz_poly_num_real_roots_sturm_bounded(const fmpz * pol, slong len, int on_0_1, slong max_size)
+
+    Counts the real roots of the polynomial ``(pol, len)`` using a Sturm
+    sequence computed as a primitive polynomial remainder sequence
+    (removing the content after each pseudo-division).
+    If ``on_0_1`` is zero, counts all real roots; otherwise, counts
+    the roots on the same interval as :func:`fmpz_poly_num_real_roots_0_1`.
+    The polynomial is assumed to be squarefree.
+
+    If some remainder in the sequence has length times maximum coefficient
+    bit size exceeding ``max_size``, the computation is aborted and
+    `-1` is returned. Pass ``WORD_MAX`` to always complete the computation.
+
+    The primitive remainder sequence is much cheaper than the subresultant
+    sequence for polynomials with special structure (for example, classical
+    orthogonal polynomials, or sparse polynomials where the degree drops
+    quickly), but typically more expensive for generic polynomials,
+    where the coefficients grow along the sequence. The bound ``max_size``
+    allows detecting the latter case cheaply.
+
 .. function:: slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
+              slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len)
+              slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol)
+              slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+              slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
 
-    Returns the number of real roots of the squarefree polynomial ``pol``
-    using Sturm sequence.
-
+    Returns the number of real roots of the polynomial ``pol``.
     The polynomial is assumed to be squarefree.
 
-.. function:: slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+    The default version uses closed formulas for degree at most 4.
+    Otherwise, it uses the subresultant Sturm sequence for input of small
+    length and bit size, and for larger input first attempts
+    :func:`_fmpz_poly_num_real_roots_sturm_bounded`
+    with a bound that detects coefficient growth,
+    falling back on the Vincent-Collins-Akritas (VCA) algorithm.
 
-    Returns the number of real roots of the squarefree polynomial
-    ``(pol, len)``.
+.. function:: slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol)
+              slong fmpz_poly_num_real_roots_0_1_vca(const fmpz_poly_t pol)
+              slong fmpz_poly_num_real_roots_0_1(const fmpz_poly_t pol)
 
+    Returns the number of real roots of the polynomial ``pol`` on the
+    interval `(0, 1)` (excluding the endpoints).
     The polynomial is assumed to be squarefree.
 
-.. function:: slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
+    The default version first applies the Descartes rule of signs on
+    `(0, 1)`, which immediately determines the result for most
+    generic polynomials. If this fails, it attempts
+    :func:`_fmpz_poly_num_real_roots_sturm_bounded` with a bound that
+    detects coefficient growth, falling back on the
+    Vincent-Collins-Akritas (VCA) algorithm.
 
-    Returns the number of real roots of the squarefree polynomial ``pol``.
+.. function:: int _fmpz_poly_has_real_root(const fmpz * p, slong len)
+              int fmpz_poly_has_real_root(const fmpz_poly_t pol)
 
+    Returns whether the polynomial has a real root.
     The polynomial is assumed to be squarefree.
 
+.. function:: void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact_roots, fmpz * c_array, slong * k_array, slong * n_intervals, const fmpz * pol, slong len)
+
+    Isolate the real roots of ``(pol, len)`` in the interval `(0, 1)`
+    (excluding the endpoints). The array ``exact_roots`` will be set to
+    the exact dyadic roots found by the algorithm and
+    ``n_exact_roots`` updated accordingly. The arrays
+    ``c_array`` and ``k_array`` are set to be interval data
+    that enclose the remaining roots and ``n_interval`` is
+    updated accordingly. The data ``c = c_array + i`` and
+    ``k = k_array[i]`` represents the open interval
+    `(c 2^k, (c + 1) 2^k)`.
+
+.. function:: void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    Isolate the real roots of ``pol``. The array
+    ``exact_roots`` will be set to the exact dyadic roots found
+    by the algorithm and ``n_exact`` updated accordingly.
+    The arrays ``c_array`` and ``k_array`` are set to be
+    interval data that enclose the remaining roots and
+    ``n_interval`` is updated accordingly. The data
+    ``c = c_array + i`` and ``k = k_array[i]`` represents the
+    open interval `(c 2^k, (c + 1) 2^k)`.
+    The polynomial is assumed to be squarefree.
+
+    Three algorithms are used. For polynomials of large degree,
+    we first attempt bisection using a Sturm sequence (computed as
+    a primitive remainder sequence, which is evaluated at each bisection
+    point in `O(n)` operations using the pseudo-quotients).
+    This is typically much faster than VCA for polynomials with many
+    real roots whose Sturm sequence has small coefficients
+    (e.g. classical orthogonal polynomials), and for sparse polynomials
+    with clusters of close roots.
+    Otherwise, if the polynomial appears to have only real roots
+    (Newton's inequalities hold and the numbers of sign variations of
+    `p(x)` and `p(-x)` add up to the degree) which are spread
+    over many orders of magnitude (e.g. Eulerian polynomials), we locate
+    sign changes by evaluating the polynomial at dyadic points
+    using ball arithmetic; the result is certified by checking that the
+    number of sign changes equals the number of sign variations
+    (Descartes' rule of signs). This avoids the huge coefficients that
+    arise in VCA for such polynomials.
+    If these methods do not apply or fail, we use
+    the Vincent-Collins-Akritas (VCA) algorithm
+    based on Descartes' rule of signs.
+
+.. function:: void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    As :func:`fmpz_poly_isolate_real_roots`, but finds only
+    the roots which are strictly positive.
+
+Note: to compute complex roots or refine roots to high precision, see:
+
+* :func:`arb_fmpz_poly_real_roots`
+
+* :func:`arb_fmpz_poly_complex_roots`
+
+* :func:`arb_fmpz_poly_refine_root_arb`
 
 Minimal polynomials
 --------------------------------------------------------------------------------

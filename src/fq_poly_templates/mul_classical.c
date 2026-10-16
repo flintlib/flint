@@ -13,6 +13,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_mul_classical) (TEMPLATE(T, struct) * rop,
@@ -20,28 +21,9 @@ _TEMPLATE(T, poly_mul_classical) (TEMPLATE(T, struct) * rop,
                                   const TEMPLATE(T, struct) * op2, slong len2,
                                   const TEMPLATE(T, ctx_t) ctx)
 {
-    if (len1 == 1 && len2 == 1)
-    {
-        TEMPLATE(T, mul) (rop, op1, op2, ctx);
-    }
-    else
-    {
-        slong i;
-
-        /* Set res[i] = poly1[i]*poly2[0] */
-        _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop, op1, len1, op2, ctx);
-
-        /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop + len1, op2 + 1,
-                                                    len2 - 1, op1 + len1 - 1,
-                                                    ctx);
-
-        /* out[i+j] += in1[i]*in2[j] */
-        for (i = 0; i < len1 - 1; i++)
-            _TEMPLATE(T, TEMPLATE(poly_scalar_addmul, T)) (rop + i + 1,
-                                                           op2 + 1, len2 - 1,
-                                                           op1 + i, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_mullow_classical(rop, op1, len1, op2, len2, len1 + len2 - 1, gr_ctx));
 }
 
 void

@@ -30,17 +30,18 @@ _gr_fmpz_mpoly_ctx_t;
 
 static int _gr_fmpz_mpoly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of multivariate polynomials over Integer ring (fmpz)");
-    gr_stream_write(out, " in ");
-    gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
-    gr_stream_write(out, " variables");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Ring of multivariate polynomials over Integer ring (fmpz)");
+    status |= gr_stream_write(out, " in ");
+    status |= gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
+    status |= gr_stream_write(out, " variables");
     if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_LEX)
-        gr_stream_write(out, ", lex order");
+        status |= gr_stream_write(out, ", lex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGLEX)
-        gr_stream_write(out, ", deglex order");
+        status |= gr_stream_write(out, ", deglex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGREVLEX)
-        gr_stream_write(out, ", degrevlex order");
-    return GR_SUCCESS;
+        status |= gr_stream_write(out, ", degrevlex order");
+    return status;
 }
 
 void
@@ -140,21 +141,32 @@ _gr_fmpz_mpoly_set_shallow(fmpz_mpoly_t res, const fmpz_mpoly_t poly, gr_ctx_t c
 static int
 _gr_fmpz_mpoly_randtest(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    slong bits;
+    slong bits, length;
+    flint_bitcnt_t exp_bits;
 
     if (n_randint(state, 10) != 0)
         bits = 10;
     else
         bits = 100;
 
-    fmpz_mpoly_randtest_bits(res, state, n_randint(state, 5), bits, 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    /* The two n_randint calls have side effects on `state`; split them so
+       the consumption order is the same on every architecture (C does not
+       specify the order in which function arguments are evaluated). */
+    length = n_randint(state, 5);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mpoly_randtest_bits(res, state, length, bits, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 static int
 _gr_fmpz_mpoly_randtest_small(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    fmpz_mpoly_randtest_bits(res, state, n_randint(state, 3), 3, 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    slong length;
+    flint_bitcnt_t exp_bits;
+
+    length = n_randint(state, 3);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mpoly_randtest_bits(res, state, length, 3, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -167,8 +179,7 @@ _gr_fmpz_mpoly_length(const fmpz_mpoly_t x, gr_ctx_t ctx)
 static int
 _gr_fmpz_mpoly_write(gr_stream_t out, fmpz_mpoly_t poly, gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
 }
 
 static truth_t
@@ -526,7 +537,7 @@ _gr_fmpz_mpoly_gcd(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_
     if (fmpz_mpoly_gcd(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx)))
         return GR_SUCCESS;
 
-    return GR_DOMAIN;
+    return GR_UNABLE;
 }
 
 static int

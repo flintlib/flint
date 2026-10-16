@@ -20,6 +20,7 @@
 #define NMOD_MAT_INLINE static inline
 #endif
 
+#include <stdint.h>
 #include "nmod_types.h"
 
 #ifdef __cplusplus
@@ -120,7 +121,7 @@ void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  nn_srcptr diag, slong n);
-void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
+void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -156,6 +157,7 @@ int nmod_mat_is_square(const nmod_mat_t mat)
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
+void _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m, slong n);
 
 /* Addition and subtraction */
 
@@ -178,6 +180,22 @@ void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+void _nmod_mat_mul_u8(uint8_t * C, slong Cstride,
+                 const uint8_t * A, slong Astride,
+                 const uint8_t * B, slong Bstride,
+                 slong m, slong k, slong n, nmod_t mod);
+void nmod_mat_mul_u8(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int _nmod_mat_mul_u32(uint32_t * C, slong Cstride,
+                 const uint32_t * A, slong Astride,
+                 const uint32_t * B, slong Bstride,
+                 slong m, slong k, slong n, nmod_t mod);
+
+int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int nmod_mat_mul_fp50(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
@@ -319,6 +337,8 @@ slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
+slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A);
+
 /* Nonsingular solving */
 
 int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
@@ -346,6 +366,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 /* Nullspace */
 
 slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
+slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
 /* Howell form */
 
@@ -361,7 +382,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* The following prototype actually lives in nmod_poly.h
  *
- * void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ * int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
  *
  * void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 */

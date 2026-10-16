@@ -79,10 +79,6 @@ void TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res,
                                       slong * const *degs,
                                       const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, poly_factor_equal_deg_prob)(TEMPLATE(T, poly_t) factor,
-                                        flint_rand_t state,
-                                        const TEMPLATE(T, poly_t) pol, slong d,
-                                        const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_factor_equal_deg)(TEMPLATE(T, poly_factor_t) factors,
                                    const TEMPLATE(T, poly_t) pol,

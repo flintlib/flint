@@ -130,6 +130,8 @@ void arb_hypgeom_bessel_y(arb_t res, const arb_t nu, const arb_t z, slong prec);
 void arb_hypgeom_bessel_jy(arb_t res1, arb_t res2, const arb_t nu, const arb_t z, slong prec);
 void arb_hypgeom_bessel_i(arb_t res, const arb_t nu, const arb_t z, slong prec);
 void arb_hypgeom_bessel_k(arb_t res, const arb_t nu, const arb_t z, slong prec);
+void _arb_hypgeom_bessel_j_series(arb_ptr res, const arb_t nu, arb_srcptr z, slong zlen, slong len, slong prec);
+void arb_hypgeom_bessel_j_series(arb_poly_t res, const arb_t nu, const arb_poly_t z, slong len, slong prec);
 
 void arb_hypgeom_bessel_i_scaled(arb_t res, const arb_t nu, const arb_t z, slong prec);
 void arb_hypgeom_bessel_k_scaled(arb_t res, const arb_t nu, const arb_t z, slong prec);

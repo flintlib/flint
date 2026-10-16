@@ -29,7 +29,8 @@ modulus. The modulus is assumed to be a prime number in functions that
 perform some kind of division, solving, or Gaussian elimination
 (including computation of rank and determinant), but can be composite
 in functions that only perform basic manipulation and ring operations
-(e.g. transpose and matrix multiplication).
+(e.g. transpose and matrix multiplication). None of these primality
+assumptions are checked.
 
 Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
@@ -271,6 +272,14 @@ Transposition and permutations
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     Aliasing is allowed for square matrices.
 
+.. function:: void _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m, slong n)
+
+    Sets `B` to the transpose of `A`, where `A` is an `m \times n` array of
+    words with row stride ``Astride`` and `B` is an `n \times m` array with
+    row stride ``Bstride``. The entries are copied as they are (no modulus is
+    involved). The two arrays must not overlap; for an in-place
+    transposition of a square matrix, use :func:`nmod_mat_transpose`.
+
 .. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
@@ -311,7 +320,7 @@ Addition and subtraction
 
     Computes `C = A - B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B)
+.. function:: void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B = -A`. Dimensions must be identical.
 
@@ -345,7 +354,21 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between classical
-    and Strassen multiplication.
+    and Strassen multiplication. For the classical algorithms, it chooses
+    between several BLAS-like implementations: the byte kernels of
+    `nmod_mat_mul_u8` for moduli up to `255`, the SIMD kernels
+    `nmod_mat_mul_u32` (moduli below `2^{32}`), `nmod_mat_mul_u52` (up to
+    `2^{52}`, when AVX512-IFMA is available) and, without AVX512-IFMA,
+    `nmod_mat_mul_k52` or `nmod_mat_mul_fp50` (moduli up to `2^{52}`,
+    respectively below `2^{50}`), and `nmod_mat_mul_blas`. The crossovers
+    for the SIMD kernels are the ``FLINT_NMOD_MAT_MUL_SIMD_*``,
+    ``_BLAS_1PASS_*``, ``_U52_*``, ``_K52_*`` and ``_FP50_*`` parameters of
+    the architecture dependent ``flint-mparam.h``, to be tuned with the
+    profile program ``nmod_mat/profile/p-mul_tune.c``. Single-threaded,
+    Strassen is put on top of the SIMD kernels for large dimensions. The
+    SIMD kernels are also used for thin shapes with any inner dimension.
+    Single-threaded (and when `C` is not aliased with `A` or `B`), shapes
+    with few rows or few columns go to dedicated routines.
 
 .. function:: void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 
@@ -377,11 +400,105 @@ Matrix multiplication
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
-    multiplication (the Strassen-Winograd variant).
+    multiplication (the Strassen-Winograd variant), one level, the products
+    being done by :func:`nmod_mat_mul` (which may use Strassen again). Odd
+    dimensions are handled by virtual padding: the blocks are seen as padded
+    with a zero row or column, without any copy or extra pass.
 
 .. function:: int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
-    Tries to set `C = AB` using BLAS and returns `1` for success and `0` for failure. Dimensions must be compatible for matrix multiplication.
+    Tries to set `C = AB` by lifting to floating-point matrix
+    multiplication (:func:`flint_sgemm` or :func:`flint_dgemm`, which use
+    BLAS if FLINT was built with BLAS support and FLINT's own kernels
+    otherwise), with multimodular reduction and CRT when the entries do
+    not fit directly. Returns `1` for success and `0` for failure;
+    failure occurs when the dimensions or the modulus are too large, or
+    when FLINT is built with a 32-bit word size.
+    Dimensions must be compatible for matrix multiplication.
+
+.. function:: void nmod_mat_mul_u8(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Sets `C = AB` using kernels specialized to moduli up to `255`,
+    which the modulus of `C` must not exceed. Moduli `2` and `3` pack
+    the entries into bit representations directly (a
+    method-of-four-Russians leaf under a Strassen recursion,
+    parallelized over a tile grid of shared packed operands when
+    several threads are available); moduli up to `15` use an
+    in-register table-lookup kernel on a byte image of the entries;
+    larger moduli lift to single precision for :func:`flint_sgemm`.
+    Aliasing of the operands is supported. Dimensions must be compatible
+    for matrix multiplication.
+
+.. function:: void _nmod_mat_mul_u8(uint8_t * C, slong Cstride, const uint8_t * A, slong Astride, const uint8_t * B, slong Bstride, slong m, slong k, slong n, nmod_t mod)
+
+    Underlying multiplication on byte matrices with arbitrary row
+    strides: sets the `m \times n` matrix `C` to `AB` where `A` is
+    `m \times k` and `B` is `k \times n`, all entries reduced modulo
+    ``mod.n``, which must not exceed `255`. This entry point skips the
+    ``ulong``-to-byte conversions of :func:`nmod_mat_mul_u8` and is the
+    natural interface for byte-entry matrix types. Exact aliasing of
+    `C` with `A` or `B` is supported (arbitrary partial overlap is
+    not).
+
+.. function:: int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using integer SIMD kernels specialized to moduli
+    below `2^{32}`. Kernels exist for AVX-512, AVX2 and AArch64 NEON, with a
+    slower portable fallback in plain C. Several threads are used when
+    available. Returns `1` for success and `0` if the modulus is at least
+    `2^{32}` or FLINT is built with a 32-bit word size. Aliasing of the
+    operands is supported. Dimensions must be compatible for matrix
+    multiplication. Approach: the entries are lifted to signed 32-bit integers
+    of absolute value at most `n/2`, products are accumulated exactly in 64-bit
+    lanes with widening `32 \times 32 \to 64` bit multiplications, and
+    reductions modulo `n` are delayed for as long as the accumulators cannot
+    overflow. So, a single pass suffices for any modulus below `2^{32}`, making
+    this typically faster than `nmod_mat_mul_blas` for input such that the
+    latter needs to use multimodular reduction and CRT.
+
+.. function:: int _nmod_mat_mul_u32(uint32_t * C, slong Cstride, const uint32_t * A, slong Astride, const uint32_t * B, slong Bstride, slong m, slong k, slong n, nmod_t mod)
+
+    The same multiplication on matrices with 32-bit entries: `A` is
+    `m \times k`, `B` is `k \times n` and `C` is `m \times n`, each stored
+    row-major with the given row strides and with entries reduced modulo
+    ``mod.n``, which must be below `2^{32}`. The kernels read and write the
+    32-bit entries directly. Returns `1` for success and `0` in the cases
+    where `nmod_mat_mul_u32` does. `C` may be equal to `A` or `B` (same
+    pointer and strides) but must not otherwise overlap them. Several
+    threads are used when available.
+
+.. function:: int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` using the AVX512-IFMA instructions, which multiply
+    52-bit integers exactly into two 64-bit accumulators. Returns `1` for
+    success and `0` if the modulus exceeds `2^{52}`, or if FLINT was not
+    compiled for a target with AVX512-IFMA (or with a 32-bit word size).
+    Aliasing of the operands is supported. This handles any modulus up to
+    `2^{52}`; up to `2^{26}`, a variant with a single IFMA instruction per
+    product is used. Several threads are used when available.
+
+.. function:: int nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` with integer SIMD instructions (AVX-512, AVX2,
+    NEON, or plain C otherwise) for a modulus up to `2^{52}`: each entry is
+    split into two 27-bit limbs and the product is formed as a two-limb
+    Karatsuba product, three widening `32b \times 32b \to 64b` multiplications
+    accumulated in three 64-bit accumulators, which are combined modulo `n`
+    in double precision at the end of each block. Returns `1` for success
+    and `0` if the modulus exceeds `2^{52}` (or on a 32-bit word size, or
+    when compiling with MSVC without AVX2, see ``nmod_mat/mul_fp_vec.h``).
+    Aliasing of the operands is supported. Several threads are used when
+    available.
+
+.. function:: int nmod_mat_mul_fp50(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+
+    Tries to set `C = AB` in double precision for a modulus below `2^{50}`,
+    reducing each product modulo `n` as it is formed with the floating point
+    modular multiplication of ``fft_small`` (vector FMA on AVX-512, AVX2
+    or NEON, plain C otherwise). Returns `1` for success and `0` if the
+    modulus is `2^{50}` or more (or on a 32-bit word size, or when
+    compiling with MSVC without AVX2). Aliasing of the operands is
+    supported. Several threads are used when available.
 
 .. function:: void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
@@ -407,6 +524,12 @@ Matrix multiplication
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
     The number entries written to ``c`` is always equal to the number of columns of ``B``.
+    The rows of ``B`` are accumulated with delayed reductions, in the manner
+    of :func:`nmod_mat_mul_u52` (AVX512-IFMA, moduli up to `2^{52}`), of
+    :func:`nmod_mat_mul_u32` (AVX2 or AVX-512 without IFMA, moduli up to
+    `2^{32}`) or of :func:`nmod_mat_mul_fp50` (AVX2, AVX-512 or NEON, moduli
+    below `2^{50}`) where available, and with one modular multiplication per
+    entry otherwise.
 
 
 Matrix Exponentiation
@@ -446,7 +569,8 @@ Determinant and rank
 
 .. function:: slong nmod_mat_rank(const nmod_mat_t A)
 
-    Returns the rank of `A`. The modulus of `A` must be a prime number.
+    Returns the rank of `A`. The modulus of `A` must be a prime number;
+    this is not checked.
 
 
 
@@ -461,7 +585,7 @@ Inverse
     `B` to undefined values.
 
     `A` and `B` must be square matrices with the same dimensions
-    and modulus. The modulus must be prime.
+    and modulus. The modulus must be prime; this is not checked.
 
 
 
@@ -478,6 +602,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular square
@@ -485,6 +612,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
@@ -505,6 +635,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -514,6 +647,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -521,6 +657,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
@@ -541,6 +680,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 
 
 Nonsingular square solving
@@ -550,8 +692,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
@@ -572,8 +714,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if a solution exists; otherwise returns `0` and sets the
     elements of `X` to zero. If more than one solution exists, one of the
@@ -584,11 +726,11 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `A` which must be a prime number.
+    is the modulus of `A` which must be a prime number; this is not
+    checked.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `x` to undefined values.
-
 
 
 LU decomposition
@@ -622,7 +764,11 @@ LU decomposition
     The *recursive* version uses block recursive decomposition.
     The default function chooses an algorithm automatically.
 
+.. function:: slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A)
 
+    Like :func:`nmod_mat_lu` with ``rank_check`` 0, but additionally
+    writes to ``pivots_nonpivots`` the indices of the pivot columns in order,
+    followed by the indices of the nonpivot columns in order.
 
 Reduced row echelon form
 --------------------------------------------------------------------------------
@@ -669,6 +815,27 @@ Nullspace
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
 
+.. function:: slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A)
+
+    Computes the left nullspace of `A` and returns the nullity.
+
+    More precisely, this function sets the first ``nullity`` rows of
+    `X` to a basis of the left nullspace of `A`, so that each such
+    row `v` satisfies `v A = 0`. Remaining rows of `X` are set to
+    zero. The return value is the nullity.
+
+    `X` must have sufficient space to store all basis vectors in the
+    left nullspace, i.e. it must have at least ``nullity`` rows and
+    `m` columns where `m` is the number of rows of `A`. In particular
+    an `m \times m` allocation is always sufficient.
+
+    This function is implemented via :func:`nmod_mat_nullspace` applied
+    to the transpose of `A`, transposing the resulting basis columns to
+    rows.  The returned rows inherit the structure produced by
+    :func:`nmod_mat_nullspace`: each row has a `1` at a unique
+    free-variable column and `0` at every other row's free-variable
+    column.
+
 
 Transforms
 --------------------------------------------------------------------------------
@@ -693,13 +860,14 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 .. function:: void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M)
-              void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+              int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
               void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
-    The *danilevsky* algorithm assumes that the modulus is prime.
-
+    The *danilevsky* algorithm returns 1 on success and 0 indicating failure
+    if it encounters an impossible inverse; it is guaranteed to succeed if
+    the modulus is prime.
 
 Minimal polynomial
 --------------------------------------------------------------------------------

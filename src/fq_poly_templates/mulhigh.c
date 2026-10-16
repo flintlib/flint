@@ -20,6 +20,20 @@ _TEMPLATE(T, poly_mulhigh) (TEMPLATE(T, struct) * rop,
                             const TEMPLATE(T, struct) * op2, slong len2,
                             slong n, TEMPLATE(T, ctx_t) ctx)
 {
+#if defined(FQ_ZECH_POLY_H)
+    if (FLINT_MIN(len1, len2) >= FQ_ZECH_POLY_MUL_UNIVARIATE_MIN_LEN(ctx) &&
+        _fq_zech_poly_mulmid_want_univariate(len1, len2, n,
+                                             len1 + len2 - 1, ctx))
+    {
+        _fq_zech_vec_zero(rop, n, ctx);
+        _fq_zech_poly_mulmid_univariate(rop + n, op1, len1, op2, len2,
+                                        n, len1 + len2 - 1, ctx);
+    }
+    else
+    {
+        _fq_zech_poly_mulhigh_classical(rop, op1, len1, op2, len2, n, ctx);
+    }
+#else
     if (FLINT_MAX(len1, len2) < 6)
     {
         _TEMPLATE(T, poly_mulhigh_classical) (rop, op1, len1, op2, len2, n,
@@ -29,6 +43,7 @@ _TEMPLATE(T, poly_mulhigh) (TEMPLATE(T, struct) * rop,
     {
         _TEMPLATE(T, poly_mul_KS) (rop, op1, len1, op2, len2, ctx);
     }
+#endif
 }
 
 void

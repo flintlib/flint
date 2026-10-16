@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
     int verbose = 0;
     int platt = 0;
     int noplatt = 0;
+    int automatic;
+    slong wp = 0;
     slong i, buffersize, prec, digits;
     fmpz_t requested, count, nstart, n;
     arb_ptr p;
@@ -156,38 +158,36 @@ int main(int argc, char *argv[])
         flint_abort();
     }
 
-    /* Above n~1e15 the large height method is better.
-     * Above n~1e11 the large height method is better for more than 100 zeros.
-     * Don't worry about crossing the threshold, just use the method
-     * that is better at the beginning of the run.
+    /* By default, the library chooses the method (and with the large
+     * height method, its working precision) from the height, the count
+     * and the target precision: see _acb_dirichlet_hardy_z_zeros_use_platt.
+     * An open-ended run counts as many zeros. Don't worry about crossing
+     * a threshold, just use the method that is better at the beginning
+     * of the run. With -platt, the large height method is used with
+     * prec as its working precision (the zeros come out with about
+     * prec - log2(t) - 35 bits after the binary point, and at most a
+     * height-dependent accuracy: about 187 bits at 1e15); with -noplatt,
+     * the Riemann-Siegel method with prec as the target precision.
      */
-    if (!noplatt && !platt)
-    {
-        fmpz_t threshold;
-        fmpz_init(threshold);
-        fmpz_set_si(threshold, 10);
-        fmpz_pow_ui(threshold, threshold, 15);
-        if (fmpz_sgn(requested) < 0 || fmpz_cmp_si(requested, 100) > 0)
-        {
-            fmpz_set_si(threshold, 10);
-            fmpz_pow_ui(threshold, threshold, 11);
-        }
-        if (fmpz_cmp(nstart, threshold) < 0)
-        {
-            noplatt = 1;
-        }
-        else
-        {
-            platt = 1;
-        }
-        fmpz_clear(threshold);
-    }
+    automatic = !noplatt && !platt;
 
     if (prec == -1)
     {
         prec = 64 + fmpz_clog_ui(nstart, 2);
-        if (platt) prec *= 2;
         digits = prec / 3.32192809488736 + 1;
+        /* (40 extra bits give the same accuracy as the target precision
+           of the other modes) */
+        if (platt) prec += 40;
+    }
+
+    if (automatic)
+    {
+        slong len;
+        if (fmpz_sgn(requested) < 0 || !fmpz_fits_si(requested))
+            len = WORD_MAX;
+        else
+            len = fmpz_get_si(requested);
+        wp = _acb_dirichlet_hardy_z_zeros_use_platt(nstart, len, prec);
     }
 
     if (verbose)
@@ -202,11 +202,23 @@ int main(int argc, char *argv[])
                          "many consecutive zeros, and lower precision; "
                          "interprets prec as a working precision)\n");
         }
-        else
+        else if (noplatt)
         {
             flint_printf("method: noplatt (good for small heights, "
                          "few consecutive zeros, and greater precision; "
                          "interprets prec as a goal precision)\n");
+        }
+        else if (wp != 0)
+        {
+            flint_printf("method: automatic, large height method at the "
+                         "working precision %wd, then Riemann-Siegel "
+                         "refinement where needed (prec is the goal "
+                         "precision)\n", wp);
+        }
+        else
+        {
+            flint_printf("method: automatic, Riemann-Siegel "
+                         "(prec is the goal precision)\n");
         }
     }
 
@@ -216,8 +228,8 @@ int main(int argc, char *argv[])
 
     TIMEIT_ONCE_START;
 
-    /* This is the low height method. */
-    if (noplatt)
+    /* The Riemann-Siegel method or the automatic choice. */
+    if (!platt)
     {
         fmpz_t iter;
         fmpz_init(iter);
@@ -235,11 +247,16 @@ int main(int argc, char *argv[])
                 }
                 fmpz_clear(remaining);
             }
-            if (fmpz_cmp_si(iter, 30) < 0)
+            /* (the first zeros early with Riemann-Siegel; with the
+               large height method, as many as possible at once) */
+            if (wp == 0 && fmpz_cmp_si(iter, 30) < 0)
             {
                 num = FLINT_MIN(1 << fmpz_get_si(iter), num);
             }
-            acb_dirichlet_hardy_z_zeros(p, n, num, prec);
+            if (noplatt)
+                _acb_dirichlet_hardy_z_zeros_rs(p, n, num, prec);
+            else
+                acb_dirichlet_hardy_z_zeros(p, n, num, prec);
             print_zeros(p, n, num, digits);
             fmpz_add_si(n, n, num);
             fmpz_add_si(count, count, num);
@@ -248,7 +265,7 @@ int main(int argc, char *argv[])
         fmpz_clear(iter);
     }
 
-    /* This is the large height method. */
+    /* The large height method at the working precision prec. */
     if (platt)
     {
         while (fmpz_sgn(requested) < 0 || fmpz_cmp(count, requested) < 0)

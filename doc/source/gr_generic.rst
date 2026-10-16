@@ -52,7 +52,12 @@ Generic string parsing
               int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx)
 
     Parses expression string. Generators returned by :func:`gr_gens_recursive` are handled
-    automatically. We have the following flags:
+    automatically, as are the constants ``pi``, ``i``, ``inf`` and ``nan``
+    (when the ring supports them) and the operator ``+/-`` which
+    constructs a ball or interval via :func:`gr_set_interval_mid_rad`
+    (via :func:`gr_set_interval_mid_inf` for the special form ``+/- inf``,
+    which does not require ``inf`` to be an element of the ring).
+    We have the following flags:
 
     * ``GR_PARSE_RING_EXPONENTS`` - by default, only (nonnegative) integer literals are allowed
       for exponents. If this flag is set, exponents are parsed as arbitrary subexpressions
@@ -224,6 +229,8 @@ To do: move to ``gr_vec``
 
 .. function:: int gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
+.. function:: int gr_generic_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+
 .. function:: int gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_generic_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx)
@@ -304,7 +311,7 @@ To do: move to ``gr_vec``
 Generic polynomial methods
 -----------------------------------------------------------------------------------------
 
-.. function:: int gr_generic_poly_factor_roots( gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx)
+.. function:: int gr_generic_poly_factor_roots( gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx)
 
     Calls :func:`gr_poly_roots` to factor a polynomial that splits into linear factors.
 

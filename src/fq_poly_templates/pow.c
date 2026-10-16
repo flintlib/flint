@@ -13,88 +13,16 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_pow) (TEMPLATE(T, struct) * rop,
                         const TEMPLATE(T, struct) * op, slong len, ulong e,
                         const TEMPLATE(T, ctx_t) ctx)
 {
-    ulong bit = ~((~UWORD(0)) >> 1);
-    slong rlen;
-    slong alloc = (slong) e * (len - 1) + 1;
-    TEMPLATE(T, struct) * v = _TEMPLATE(T, vec_init) (alloc, ctx);
-    TEMPLATE(T, struct) * R, *S, *T;
-
-    /*
-       Set bits to the bitmask with a 1 one place lower than the msb of e
-     */
-
-    while ((bit & e) == UWORD(0))
-        bit >>= 1;
-
-    bit >>= 1;
-
-    /*
-       Trial run without any polynomial arithmetic to determine the parity
-       of the number of swaps;  then set R and S accordingly
-     */
-
-    {
-        unsigned int swaps = 0U;
-        ulong bit2 = bit;
-        if ((bit2 & e))
-            swaps = ~swaps;
-        while (bit2 >>= 1)
-            if ((bit2 & e) == UWORD(0))
-                swaps = ~swaps;
-
-        if (swaps == 0U)
-        {
-            R = rop;
-            S = v;
-        }
-        else
-        {
-            R = v;
-            S = rop;
-        }
-    }
-
-    /*
-       We unroll the first step of the loop, referring to {poly, len}
-     */
-
-    _TEMPLATE(T, poly_sqr) (R, op, len, ctx);
-    rlen = 2 * len - 1;
-    if ((bit & e))
-    {
-        _TEMPLATE(T, poly_mul) (S, R, rlen, op, len, ctx);
-        rlen += len - 1;
-        T = R;
-        R = S;
-        S = T;
-    }
-
-    while ((bit >>= 1))
-    {
-        if ((bit & e))
-        {
-            _TEMPLATE(T, poly_sqr) (S, R, rlen, ctx);
-            rlen += rlen - 1;
-            _TEMPLATE(T, poly_mul) (R, S, rlen, op, len, ctx);
-            rlen += len - 1;
-        }
-        else
-        {
-            _TEMPLATE(T, poly_sqr) (S, R, rlen, ctx);
-            rlen += rlen - 1;
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-
-    _TEMPLATE(T, vec_clear) (v, alloc, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_pow_ui_binexp(rop, op, len, e, gr_ctx));
 }
 
 void

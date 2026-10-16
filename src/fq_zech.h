@@ -278,12 +278,12 @@ void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
 
 /* Deprecated functions ******************************************************/
 
-void fq_zech_ctx_init(fq_zech_ctx_t, fmpz_t, slong, const char *);
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
-void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
-void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var);
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var);
+void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var);
+void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var);
 
-void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
+void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
 
 #ifdef T
 #undef T

@@ -17,12 +17,19 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
+_nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bitcnt_t bits,
                       nmod_t mod)
 {
     slong i;
     ulong current_bit = 0, current_limb = 0;
     ulong temp_lower, temp_upper, temp_upper2;
+
+    if (nlo != 0)
+    {
+        current_limb = (nlo * bits) / FLINT_BITS;
+        current_bit = (nlo * bits) % FLINT_BITS;
+        res -= nlo;
+    }
 
     if (bits < FLINT_BITS)
     {
@@ -30,7 +37,7 @@ _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
 
         ulong mask = (UWORD(1) << bits) - UWORD(1);
 
-        for (i = 0; i < len; i++)
+        for (i = nlo; i < nhi; i++)
         {
             if (current_bit > boundary_limit_bit)
             {
@@ -63,12 +70,12 @@ _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
     }
     else if (bits == FLINT_BITS)
     {
-        for (i = 0; i < len; i++)
+        for (i = nlo; i < nhi; i++)
             NMOD_RED(res[i], mpn[i], mod);
     }
     else if (bits == 2 * FLINT_BITS)
     {
-        for (i = 0; i < len; i++)
+        for (i = nlo; i < nhi; i++)
         {
             NMOD2_RED2(res[i], mpn[current_limb + 1], mpn[current_limb], mod);
             current_limb += 2;
@@ -80,7 +87,7 @@ _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
 
         ulong mask = (UWORD(1) << (bits - FLINT_BITS)) - UWORD(1);
 
-        for (i = 0; i < len; i++)
+        for (i = nlo; i < nhi; i++)
         {
             if (current_bit == 0)
             {
@@ -136,7 +143,7 @@ _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
 
         ulong mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
 
-        for (i = 0; i < len; i++)
+        for (i = nlo; i < nhi; i++)
         {
             if (current_bit == 0)
             {
@@ -221,7 +228,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     nmod_poly_fit_length(poly, len);
 
-    _nmod_poly_bit_unpack(poly->coeffs, len, tmp->_mp_d, bit_size, poly->mod);
+    _nmod_poly_bit_unpack(poly->coeffs, 0, len, tmp->_mp_d, bit_size, poly->mod);
     poly->length = len;
     _nmod_poly_normalise(poly);
 

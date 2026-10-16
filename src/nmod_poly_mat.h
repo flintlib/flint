@@ -141,6 +141,7 @@ void nmod_poly_mat_one(nmod_poly_mat_t mat);
 
 /* Random matrices ***********************************************************/
 
+void nmod_poly_mat_rand(nmod_poly_mat_t A, flint_rand_t state, slong len);
 void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
                                 slong len);
 
@@ -195,6 +196,12 @@ void nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
 void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
+
+/* Window [zl, zh) of each entry of A*B through the small-prime FFT with
+   transform reuse; returns 0 if the accumulation bound admits no plan. */
+int nmod_poly_mat_mulmid_fft_small(nmod_poly_mat_t C,
+                    const nmod_poly_mat_t A, const nmod_poly_mat_t B,
+                    slong zl, slong zh);
 
 void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B);

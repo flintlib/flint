@@ -64,10 +64,7 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
     E = D + lenD;
     M = E + lenE;
 
-    if (lenG >= lenH)
-        _fmpz_poly_mul(C, g,lenG, h, lenH);
-    else
-        _fmpz_poly_mul(C, h, lenH, g, lenG);
+    _fmpz_poly_mul(C, g, lenG, h, lenH);
     _fmpz_vec_sub(C, f, C, lenF);
     _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
 

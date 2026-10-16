@@ -30,6 +30,10 @@ use the ``n_blah2_preinv`` variants.
 Some functions with the ``n_ll_`` or ``n_lll_`` prefix accept
 parameters of two or three limbs respectively.
 
+Throughout, a precomputed inverse is assumed to correspond to the
+stated modulus, and operands passed to the modular routines are
+assumed to be already reduced modulo `n`; none of this is checked.
+
 Simple example
 --------------
 
@@ -138,6 +142,11 @@ Random functions
 Basic arithmetic
 --------------------------------------------------------------------------------
 
+
+.. function:: ulong n_mulhi(ulong a, ulong b)
+
+    Returns the high word of the product of ``a`` and ``b``, i.e.
+    returns `\lfloor ab / 2^{\mathtt{FLINT\_BITS}} \rfloor`.
 
 .. function:: ulong n_pow(ulong n, ulong exp)
 
@@ -410,6 +419,31 @@ Basic arithmetic with precomputed inverses
 
     The algorithm used is that of Granlund and Möller [GraMol2010]_.
 
+.. function:: ulong n_barrett_precomp(ulong n)
+
+    Given `n \ge 2`, return a precomputed inverse for Barrett division.
+
+.. function:: ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
+              ulong n_mod_barrett(ulong x, ulong n, ulong npre)
+
+    Returns `x \bmod n` given the precomputed inverse ``npre`` returned
+    by :func:`n_barrett_precomp`. The ``lazy`` function returns a
+    noncanonical residue in the interval `[0, 2n)`; the other version
+    returns the canonical residue in `[0, n)`. There are no restrictions
+    on `x`.
+
+    Note: these functions support `n = 1` if one sets ``npre`` to ``UWORD_MAX``.
+
+.. function:: ulong n_lemire_precomp(ulong n)
+
+    Given `n \ge 1`, returns a precomputed inverse for Lemire, Kaser & Kurz
+    remainder.
+
+.. function:: ulong n_mod_lemire(ulong x, ulong n, ulong npre)
+
+    Returns `x \bmod n` given the precomputed inverse ``npre`` returned
+    by :func:`n_lemire_precomp`. This function is only guaranteed to be
+    correct if `n, x < 2^{\mathtt{FLINT\_BITS} / 2}`.
 
 
 Greatest common divisor
@@ -471,10 +505,12 @@ Jacobi and Kronecker symbols
 .. function:: int n_jacobi(slong x, ulong y)
 
     Computes the Jacobi symbol `\left(\frac{x}{y}\right)` for any `x` and odd `y`.
+    It is assumed that ``y`` is odd; this is not checked.
 
 .. function:: int n_jacobi_unsigned(ulong x, ulong y)
 
     Computes the Jacobi symbol, allowing `x` to go up to a full limb.
+    It is assumed that ``y`` is odd; this is not checked.
 
 
 Modular arithmetic
@@ -501,7 +537,9 @@ Modular arithmetic
 
     Assuming that `n` is odd, returns the multiplicative inverse modulo
     `2^{\mathtt{FLINT\_BITS}}`. If `n` is even, some arbitrary
-    value is returned.
+    value is returned. This is an inline function using Hurchalla's
+    variant of Newton iteration (arXiv:2204.04342), started from an 8-bit
+    inverse read from a table of 128 bytes.
 
 .. function:: ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 
@@ -577,13 +615,17 @@ Modular arithmetic
 .. function:: ulong n_sqrtmod(ulong a, ulong p)
 
     If `p` is prime, compute a square root of `a` modulo `p` if `a` is a
-    quadratic residue modulo `p`, otherwise return `0`.
+    quadratic residue modulo `p`, otherwise return `0`. The returned root
+    is the one in `[0, p/2]`.
 
-    If `p` is not prime the result is with high probability `0`, indicating
-    that `p` is not prime, or `a` is not a square modulo `p`. Otherwise the
-    result is meaningless.
+    If `p` is not prime, the result is either `0`, indicating that `p` is
+    not prime or that `a` is not a square modulo `p`, or a genuine square
+    root of `a` modulo `p`. It is assumed that ``p`` is prime; this is not
+    checked.
 
-    Assumes that `a` is reduced modulo `p`.
+    Assumes that `a` is reduced modulo `p`. This is a wrapper of
+    :func:`nmod_sqrt`, which should be called directly if an
+    :type:`nmod_t` for `p` is available.
 
 .. function:: slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp)
 
@@ -605,7 +647,7 @@ Modular arithmetic
     ``flint_free``. The number of roots is returned by the function. If
     ``a`` is not a quadratic residue modulo ``p^exp`` then 0 is
     returned by the function and the location ``sqrt`` points to is set to
-    NULL.
+    NULL. The supplied prime ``p`` is assumed correct; this is not checked.
 
 .. function:: slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
 
@@ -616,7 +658,8 @@ Modular arithmetic
     cleaned up by the user by calling :func:`flint_free`. The number of roots
     is returned by the function. If ``a`` is not a quadratic residue modulo
     ``m`` then 0 is returned by the function and the location ``sqrt``
-    points to is set to NULL.
+    points to is set to NULL. The supplied factorisation ``fac`` is assumed
+    correct; this is not checked.
 
 
 Modular arithmetic with fixed operand
@@ -776,6 +819,33 @@ precomputed quotient for `b`:
 5. compute `h = b \check{a} - q n` (two single-word multiplications)
 6. if `h \ge n` then `q \gets q+1`
 
+Double-limb modular arithmetic
+--------------------------------------------------------------------------------
+
+..  function:: void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+               void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1, ulong b2, ulong b3, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+
+    Computes `b^e \bmod m` where `b` is a small single-limb integer,
+    `e` is a double-limb integer stored in the array ``exp`` and
+    `m` is a double-limb integer accompanied by the two-limb
+    precomputed inverse `\lfloor 2^{3 \cdot \mathtt{FLINT\_BITS}} / \rfloor`
+    stored in ``minv``. The function :func:`n_ll_small_2_powmod` is
+    specialized for base `b = 2`, writing the double-limb result to
+    ``res``, while :func:`n_ll_small_powmod_triple`
+    performs three simultaneous exponentations, writing the results
+    for bases `b_1 \le b_2 \le b_3` to ``res1``, ``res2`` and ``res3``
+    respectively.
+
+    We require `m > 2^{\mathtt{FLINT\_BITS}}`. In addition, both `m` and
+    `b` must be "small" for correctness, i.e. the whole double-limb
+    operand range is not supported.
+    A sufficient criterion for correctness is that
+    `(12 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the base-2 test
+    and `(6 b_3 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the general
+    test.
+
+    These are helper functions used by :func:`n_ll_is_prime`.
+
 Divisibility testing
 --------------------------------------------------------------------------------
 
@@ -929,18 +999,22 @@ Primality testing
     `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
 
     The 2314 pseudoprimes up to 32 bits are simply looked up in a hash table.
-
-    For the pseudoprimes up to 64 bits, we follow the idea of Forisek and
-    Jancina [ForJan2015]_. We precompute a function `T` such
-    that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
-    certifies compositeness of `n`. Our `T` is represented as a hash table
-    with 98304 entries stored in an array of 24-bit integers. A small number
-    of bases (around 5%) are larger than 24 bits, triggering a secondary
-    lookup in an array of 4903 32-bit integers. In total
-    the tables for 64-bit pseudoprimes require 307 KB, which is just 60% the
-    size of the 512 KB Forisek-Jancina table of 262144 16-bit bases, while
-    the test is as efficient.
-
+    
+    For the pseudoprimes up to 64 bits we modify the approach of Forisek and
+    Jancina [ForJan2015]_. We first eliminate a class of pseudoprimes that
+    are difficult to find reliable witnesses to. These are of the form pq where 
+    p and q are primes and q = k*p(-1)+1 where k is in the interval [2,9] and 12. 
+    A semiprime check algorithm using a single floating-point sqrt, and the 
+    multiplicative inverses of the sqrt of k eliminates this class in 
+    approximately 1/20 of the runtime of a fermat test. The remaining pseudoprimes
+    are parittioned into 32768 sets using a fast multiplicative hash, and then tested 
+    against a precomputed witness smaller than 16-bit that is reliable to each set. 
+    
+    The total witness table requires 64KiB or 1/8 of the Forisek-Jancina table
+    of 262144 16-bit bases. Due to the semiprime check this test is slightly 
+    less efficient in the case of primes, and equivalent in the average case 
+    but it's low memory usage means it performs better in memory intensive computations. 
+    
     To check this implementation against Feitsma's table, one can run the
     ``examples/check_n_is_prime`` program.
 
@@ -1086,6 +1160,26 @@ Primality testing
 
     This function is obsolete and currently just wraps :func:`n_is_prime`.
 
+.. function:: int n_ll_is_prime(ulong nhi, ulong nlo)
+
+    Primality test for a double-limb integer `n` represented by
+    low part ``nlo`` and high part ``nhi``. The high part must be nonzero.
+    Returns 1 if `n` is certainly prime, 0 if `n` is certainly composite,
+    and -1 if unknown.
+
+    For `n` up to about 81 bits on a 64-bit machine, this function first does
+    trial division and then performs a strong probable prime test (Miller-Rabin
+    test) with the first 13 primes as witnesses. This has been shown to prove
+    primality for integers in this range [SorWeb2016]_, so the return
+    value in this range is always 0 or 1.
+
+    For larger `n` on a 64-bit machine, this function does trial division
+    and a base-2 test, returning either 0 or -1.
+    A return value of -1 thus indicates that `n` is at least a base
+    strong probable prime. Users may fall back on
+    :func:`fmpz_is_prime` for a proved result in this case.
+
+    On 32-bit machines, this function currently always returns -1.
 
 Chinese remaindering
 --------------------------------------------------------------------------------
@@ -1098,6 +1192,7 @@ Chinese remaindering
 
     It is assumed that `m_1` and `m_2` are positive integers greater
     than `1` and coprime. It is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
+    None of this is checked.
 
 
 Square root and perfect power testing
@@ -1242,7 +1337,8 @@ Factorisation
 
     Removes the highest possible power of `p` from `n`, replacing
     `n` with the quotient. The return value is the highest
-    power of `p` that divided `n`. Assumes `n` is not `0`.
+    power of `p` that divided `n`. Assumes `n` is not `0`. It is
+    assumed that ``p`` is greater than `1`; this is not checked.
 
     For `p = 2` trailing zeroes are counted. For other primes
     `p` is repeatedly squared and stored in a table of powers
@@ -1257,7 +1353,8 @@ Factorisation
     `n` with the quotient. The return value is the highest
     power of `p` that divided `n`. Assumes `n` is not `0`. We require
     ``ppre`` to be set to a precomputed inverse of `p` computed
-    with :func:`n_precompute_inverse`.
+    with :func:`n_precompute_inverse`. It is assumed that ``p`` is
+    greater than `1`; this is not checked.
 
     For `p = 2` trailing zeroes are counted. For other primes
     `p` we make repeated use of :func:`n_divrem2_precomp` until division
@@ -1486,6 +1583,44 @@ Factorisation
     is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
     discovered is not necessarily prime.
 
+.. function:: int n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries, ulong max_iters)
+
+    Pollard rho with Brent's cycle detection for a double-limb integer `n`
+    represented by low part ``nlo`` and high part ``nhi``. The high part must be
+    nonzero and `n` must be odd; 0 is returned otherwise.
+
+    If a nontrivial factor of `n` is found it is written to ``factor`` as two
+    limbs and 1 is returned, otherwise 0 is returned. The factor found is not
+    necessarily prime.
+
+    ``max_iters`` bounds Brent's outer doubling parameter, so about
+    `2 \cdot \mathrm{max\_iters}` iterations of the map are performed per
+    attempt, placing factors up to roughly
+    `(2 \cdot \mathrm{max\_iters})^2` within reach. If an attempt fails,
+    another is made with a different constant, up to ``max_tries`` times.
+
+    The inner loop uses Montgomery arithmetic on two limbs, which is several
+    times faster than :func:`fmpz_factor_pollard_brent` for `n` of this size.
+
+.. function:: int n_ll_factor_ecm(nn_ptr factor, ulong nhi, ulong nlo, ulong curves, ulong B1, ulong B2, flint_rand_t state)
+
+    The elliptic curve method for a double-limb integer `n` represented by low
+    part ``nlo`` and high part ``nhi``. The high part must be nonzero and `n`
+    must be odd; 0 is returned otherwise.
+
+    Up to ``curves`` curves are tried, using Suyama's parametrisation with stage
+    one bound ``B1`` and stage two bound ``B2``. If ``B2`` is smaller than
+    ``B1`` it is replaced by `100 \cdot B1`.
+
+    If a nontrivial factor of `n` is found it is written to ``factor`` as two
+    limbs and 1 is returned, otherwise 0 is returned. The factor found is not
+    necessarily prime.
+
+    Curve selection is done with ``mpn`` arithmetic, whose cost is negligible
+    beside the two stages; both stages run in Montgomery arithmetic on two
+    limbs, which is roughly twice as fast as :func:`fmpz_factor_ecm` at equal
+    parameters for `n` of this size.
+
 
 Arithmetic functions
 --------------------------------------------------------------------------------
@@ -1551,10 +1686,22 @@ Primitive roots and discrete logarithms
 --------------------------------------------------------------------------------
 
 
+.. function:: ulong n_quadratic_nonresidue(ulong n)
+
+    Given an odd non-square `n`, returns an `a` with Jacobi symbol
+    `\left(\frac{a}{n}\right) = -1`. In particular, if `n` is prime, `a`
+    is a quadratic nonresidue modulo `n`.
+
+
 .. function:: ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 
-    Returns a primitive root for the multiplicative subgroup of `\mathbb{Z}/p\mathbb{Z}`
-    where `p` is prime given the factorisation (``factors``) of `p - 1`.
+    Given a prime `p` and a list of prime divisors of `p - 1` in
+    ``factors``, returns an element `a` of `(\mathbb{Z}/p\mathbb{Z})^*`
+    such that `a^{(p-1)/q} \ne 1` for every prime `q` in ``factors``.
+    The exponents in ``factors`` are ignored.
+
+    In particular, if ``factors`` contains all prime divisors of `p - 1`,
+    this returns a primitive root modulo `p`.
 
 
 .. function:: ulong n_primitive_root_prime(ulong p)

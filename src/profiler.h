@@ -27,7 +27,7 @@
 #if defined(_MSC_VER) || defined(__x86_64__) || defined(__aarch64__)
 # define FLINT_HAVE_get_cycle_counter  1
 #endif
-#if (defined(__unix__) && !defined(__CYGWIN__)) || defined(__APPLE__)
+#if (defined(__unix__) && !defined(__CYGWIN__) && !defined(__EMSCRIPTEN__)) || defined(__APPLE__)
 # define FLINT_HAVE_getrusage   1
 #endif
 
@@ -49,7 +49,7 @@ int gettimeofday(struct timeval * p, void * tz);
 
 #if FLINT_HAVE_getrusage
 #if FLINT_HAVE_FILE
-void fprint_memory_usage(FILE *);
+void fprint_memory_usage(FILE * fs);
 #endif
 void print_memory_usage(void);
 #endif
@@ -63,7 +63,7 @@ static inline void timeit_start(timeit_t t)
     struct timeval tv;
     gettimeofday(&tv, 0);
     t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
-    t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
+    t->cpu = - (slong)(clock() * 1000 / CLOCKS_PER_SEC);
 }
 
 static inline slong timeit_query_wall(timeit_t t)

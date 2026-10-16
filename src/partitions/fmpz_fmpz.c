@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2014 Fredrik Johansson
+    Copyright (C) 2013-2014, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "arb.h"
+#include <limits.h>
+#include "mpn_extras.h"
+#include "fmpz.h"
+#include "mp_real.h"
 #include "partitions.h"
 #include "partitions/impl.h"
 
@@ -39,35 +41,9 @@ partitions_lookup[NUMBER_OF_SMALL_PARTITIONS] =
     UWORD(2552338241),UWORD(2841940500),UWORD(3163127352),UWORD(3519222692),UWORD(3913864295)
 };
 
-static void
-partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
-{
-    arb_t x;
-    arf_t bound;
-    slong N;
-
-    arb_init(x);
-    arf_init(bound);
-
-    N = partitions_hrr_needed_terms(fmpz_get_d(n));
-
-    partitions_hrr_sum_arb(x, n, 1, N, use_doubles);
-
-    partitions_rademacher_bound(bound, n, N);
-    arb_add_error_arf(x, bound);
-
-    if (!arb_get_unique_fmpz(p, x))
-    {
-        flint_throw(FLINT_ERROR, "not unique!\n%s\n", arb_get_str(x, 50, 0));
-    }
-
-    arb_clear(x);
-    arf_clear(bound);
-}
-
 /* To compute p(n) mod 2^64. */
-static void
-partitions_vec(nn_ptr v, slong len)
+void
+_partitions_vec_ui(nn_ptr v, slong len)
 {
     slong i, j, n;
     ulong p;
@@ -90,75 +66,82 @@ partitions_vec(nn_ptr v, slong len)
     }
 }
 
-/* The floor+vec method *requires* n <= 1498 for floor(p(n)/2^64)
-   to be equal to floor(T/2^64). It is faster up to n ~= 1200.
-   With doubles, it is faster up to n ~= 500. */
+/* x (an exact integer) as an fmpz */
 static void
-_partitions_fmpz_ui(fmpz_t res, ulong n, int use_doubles)
+_fmpz_set_mp_real_int(fmpz_t res, const mp_real_t x)
+{
+    slong sh;
+    mpz_ptr z;
+
+    if (x->size == 0)
+    {
+        fmpz_zero(res);
+        return;
+    }
+
+    sh = x->exp - x->size;     /* the low zero limbs */
+    FLINT_ASSERT(sh >= 0 && x->err == 0);
+    if (x->exp > INT_MAX)
+        flint_throw(FLINT_ERROR, "partitions: p(n) too large for an fmpz\n");
+    z = _fmpz_promote(res);
+    if (z->_mp_alloc < x->exp)
+        mpz_realloc(z, x->exp);
+    flint_mpn_zero(z->_mp_d, sh);
+    flint_mpn_copyi(z->_mp_d + sh, x->d, x->size);
+    z->_mp_size = x->negative ? -x->exp : x->exp;
+    _fmpz_demote_val(res);
+}
+
+/* The table, the recurrence while p(n) fits a word (n < 417 on 64-bit),
+   then the formula (mp_real_partitions_hrr, which repeats the first two
+   steps for its own small arguments). */
+void
+partitions_fmpz_ui(fmpz_t res, ulong n)
 {
     if (n < NUMBER_OF_SMALL_PARTITIONS)
     {
         fmpz_set_ui(res, partitions_lookup[n]);
     }
-    else if (FLINT_BITS == 64 && (n < 500 || (!use_doubles && n < 1200)))
+    else if (FLINT_BITS == 64 && n < 417)
     {
         nn_ptr tmp = flint_malloc((n + 1) * sizeof(ulong));
-
-        if (n < 417)  /* p(n) < 2^64 */
-        {
-            partitions_vec(tmp, n + 1);
-            fmpz_set_ui(res, tmp[n]);
-        }
-        else
-        {
-            arb_t x;
-            arb_init(x);
-            fmpz_set_ui(res, n);
-            partitions_leading_fmpz(x, res, 4 * sqrt(n) - 50);
-            arb_mul_2exp_si(x, x, -64);
-            arb_floor(x, x, 4 * sqrt(n) - 50);
-
-            if (arb_get_unique_fmpz(res, x))
-            {
-                fmpz_mul_2exp(res, res, 64);
-                partitions_vec(tmp, n + 1);
-                fmpz_add_ui(res, res, tmp[n]);
-            }
-            else
-            {
-                flint_printf("warning: failed at %wu\n", n);
-                fmpz_set_ui(res, n);
-                partitions_fmpz_fmpz_hrr(res, res, use_doubles);
-            }
-            arb_clear(x);
-        }
+        _partitions_vec_ui(tmp, n + 1);
+        fmpz_set_ui(res, tmp[n]);
         flint_free(tmp);
     }
     else
     {
-        fmpz_set_ui(res, n);
-        partitions_fmpz_fmpz_hrr(res, res, use_doubles);
+        mp_real_t x;
+        mp_real_init(x);
+        mp_real_partitions_hrr(x, 0, n);
+        _fmpz_set_mp_real_int(res, x);
+        mp_real_clear(x);
     }
 }
 
 void
-partitions_fmpz_fmpz(fmpz_t res, const fmpz_t n, int use_doubles)
+partitions_fmpz_fmpz(fmpz_t res, const fmpz_t n, int FLINT_UNUSED(use_doubles))
 {
-    if (fmpz_cmp_ui(n, 2000) < 0)
+    if (fmpz_sgn(n) < 0)
     {
-        if (fmpz_sgn(n) < 0)
-            fmpz_zero(res);
-        else
-            _partitions_fmpz_ui(res, *n, use_doubles);
+        fmpz_zero(res);
+    }
+    else if (fmpz_abs_fits_ui(n))
+    {
+        partitions_fmpz_ui(res, fmpz_get_ui(n));
+    }
+    else if (fmpz_bits(n) <= 2 * FLINT_BITS)
+    {
+        mp_real_t x;
+        ulong hi, lo;
+        mp_real_init(x);
+        fmpz_get_uiui(&hi, &lo, n);
+        mp_real_partitions_hrr(x, hi, lo);
+        _fmpz_set_mp_real_int(res, x);
+        mp_real_clear(x);
     }
     else
     {
-        partitions_fmpz_fmpz_hrr(res, n, use_doubles);
+        flint_throw(FLINT_ERROR, "partitions_fmpz_fmpz: n too large\n");
     }
-}
-
-void
-partitions_fmpz_ui(fmpz_t res, ulong n)
-{
-    _partitions_fmpz_ui(res, n, 0);
 }

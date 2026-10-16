@@ -10,26 +10,28 @@
 */
 
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 truth_t
 ca_mat_nonsingular_lu(slong * P, ca_mat_t LU, const ca_mat_t A, ca_ctx_t ctx)
 {
+    gr_ctx_t gr_ctx;
+    slong rank;
+    int status;
+
     if (ca_mat_is_empty(A))
-    {
         return T_TRUE;
-    }
-    else
-    {
-        int success;
-        slong rank;
-        success = ca_mat_lu(&rank, P, LU, A, 1, ctx);
 
-        if (success == 0)
-            return T_UNKNOWN;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    status = gr_mat_lu_generic(&rank, P, (gr_mat_struct *) LU,
+        (const gr_mat_struct *) A, 1, gr_ctx);
 
-        if (rank == 0)
-            return T_FALSE;
+    if (status != GR_SUCCESS)
+        return T_UNKNOWN;
 
-        return T_TRUE;
-    }
+    if (rank == 0)
+        return T_FALSE;
+
+    return T_TRUE;
 }

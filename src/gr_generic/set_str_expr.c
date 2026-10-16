@@ -722,10 +722,26 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
             }
             else
             {
-                if (++s >= send || !('0' <= *s && *s <= '9'))
+                /* Try to parse exponent as an fmpz. TODO: this only supports
+                   literals for now. Implement parsing expressions,
+                   and allow fmpq. */
+
+                int neg = 0;
+
+                s++;
+
+                if (s < send && *s == '-')
+                {
+                    neg = 1;
+                    s++;
+                }
+
+                if (s >= send || !('0' <= *s && *s <= '9'))
                     goto failed;
 
                 s = _parse_int(c, s, send);
+                if (neg)
+                    fmpz_neg(c, c);
 
                 if (_gr_parse_pop_prec(E, PREC_POWER))
                     goto failed;
@@ -752,6 +768,37 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
         {
             if (s + 2 < send && s[1] == '/' && s[2] == '-')
             {
+                const char * p = s + 3;
+
+                while (p < send && *p == ' ')
+                    p++;
+
+                /* "m +/- inf" or "+/- inf": an infinite radius, split off
+                   syntactically (like O(x^n)) and handed to
+                   gr_set_interval_mid_inf, since infinity need not be an
+                   element of the ring */
+                if (p + 3 <= send && (0 == strncmp(p, "inf", 3) || 0 == strncmp(p, "Inf", 3)) && (p + 3 == send || !isalpha(p[3])))
+                {
+                    if (!gr_parse_top_is_expr(E))
+                    {
+                        if (GR_SUCCESS != gr_zero(E->tmp, E->R))
+                            goto failed;
+                        if (_gr_parse_push_expr(E))
+                            goto failed;
+                    }
+                    else
+                    {
+                        if (_gr_parse_pop_prec(E, PREC_PLUSMINUS))
+                            goto failed;
+                    }
+
+                    if (GR_SUCCESS != gr_set_interval_mid_inf(gr_parse_top_expr(E), gr_parse_top_expr(E), E->R))
+                        goto failed;
+
+                    s = p + 3;
+                    goto continue_outer;
+                }
+
                 if (!gr_parse_top_is_expr(E))
                 {
                     _gr_parse_push_op(E, _op_make(OP_PLUSMINUS, FIX_PREFIX, PREC_UPLUSMINUS));
@@ -838,6 +885,7 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
         else
         {
             slong k;
+
             for (k = 0; k < E->terminals_len; k++)
             {
                 slong l = E->terminal_strings[k].str_len;
@@ -850,6 +898,123 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
                     s += l;
                     goto continue_outer;
                 }
+            }
+
+            /* Big-O error term: O(base) or O(base^n). The base is either one of
+               the registered generators (possibly inherited from a coefficient
+               ring) or an integer literal, e.g. a prime for p-adics. It is
+               split off syntactically and handed to gr_big_o_base_fmpz. */
+            if (s[0] == 'O' && s + 1 < send && s[1] == '(')
+            {
+                const char * p = s + 2;
+                slong bk = -1, blen = 0;
+                int base_is_int = 0;
+                fmpz_t bexp, bbase;
+
+                while (p < send && *p == ' ')
+                    p++;
+
+                if (p < send && is_digit(*p))
+                {
+                    /* integer literal base, e.g. O(2^5) */
+                    fmpz_init(bbase);
+                    p = _parse_int(bbase, p, send);
+                    base_is_int = 1;
+                }
+                else
+                {
+                    /* generator base; terminals are sorted longest-first, so
+                       the first prefix match is the intended one */
+                    for (k = 0; k < E->terminals_len; k++)
+                    {
+                        slong l = E->terminal_strings[k].str_len;
+                        if (p + l <= send && 0 == strncmp(p, E->terminal_strings[k].str, l))
+                        {
+                            bk = k;
+                            blen = l;
+                            break;
+                        }
+                    }
+
+                    if (bk < 0)
+                        goto failed;
+
+                    p += blen;
+                }
+
+                while (p < send && *p == ' ')
+                    p++;
+
+                fmpz_init(bexp);
+                fmpz_one(bexp);
+
+                if (p < send && *p == '^')
+                {
+                    p++;
+                    while (p < send && *p == ' ')
+                        p++;
+
+                    int neg = 0;
+
+                    if (p < send && *p == '-')
+                    {
+                        neg = 1;
+                        p++;
+                    }
+
+                    if (p >= send || !is_digit(*p))
+                    {
+                        fmpz_clear(bexp);
+                        if (base_is_int)
+                            fmpz_clear(bbase);
+                        goto failed;
+                    }
+
+                    p = _parse_int(bexp, p, send);
+                    if (neg)
+                        fmpz_neg(bexp, bexp);
+
+                    while (p < send && *p == ' ')
+                        p++;
+                }
+
+                if (p >= send || *p != ')')
+                {
+                    fmpz_clear(bexp);
+                    if (base_is_int)
+                        fmpz_clear(bbase);
+                    goto failed;
+                }
+                p++;
+
+                if (base_is_int)
+                {
+                    int ok = (gr_set_fmpz(E->tmp, bbase, E->R) == GR_SUCCESS) &&
+                             (gr_big_o_base_fmpz(E->tmp, E->tmp, bexp, E->R) == GR_SUCCESS);
+                    fmpz_clear(bbase);
+                    if (!ok)
+                    {
+                        fmpz_clear(bexp);
+                        goto failed;
+                    }
+                }
+                else
+                {
+                    if (GR_SUCCESS != gr_big_o_base_fmpz(E->tmp,
+                            GR_ENTRY(E->terminal_values, bk, E->R->sizeof_elem), bexp, E->R))
+                    {
+                        fmpz_clear(bexp);
+                        goto failed;
+                    }
+                }
+
+                fmpz_clear(bexp);
+
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+
+                s = p;
+                goto continue_outer;
             }
 
             /* some builtin constants (for R and C) */
@@ -871,6 +1036,26 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
                 if (_gr_parse_push_expr(E))
                     goto failed;
                 s += 1;
+                goto continue_outer;
+            }
+
+            if ((0 == strncmp(s, "inf", 3) || 0 == strncmp(s, "Inf", 3)) && !isalpha(s[3]))
+            {
+                if (GR_SUCCESS != gr_pos_inf(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 3;
+                goto continue_outer;
+            }
+
+            if ((0 == strncmp(s, "nan", 3) || 0 == strncmp(s, "NaN", 3)) && !isalpha(s[3]))
+            {
+                if (GR_SUCCESS != gr_undefined(E->tmp, E->R))
+                    goto failed;
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+                s += 3;
                 goto continue_outer;
             }
 

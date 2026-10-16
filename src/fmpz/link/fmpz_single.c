@@ -174,7 +174,12 @@ void _fmpz_clear_mpz(fmpz f)
     } else
     {
         if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-            mpz_realloc(ptr, MPZ_MIN_ALLOC);
+        {
+            /* Don't use mpz_realloc2 here; a plain realloc may hang on
+               to an oversized chunk. */
+            mpz_clear(ptr);
+            mpz_init2(ptr, MPZ_MIN_ALLOC * FLINT_BITS);
+        }
 
         if (mpz_free_num == mpz_free_alloc)
         {

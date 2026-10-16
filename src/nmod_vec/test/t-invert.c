@@ -37,7 +37,7 @@ void _nmod_vec_randtest_not_zero(nn_ptr vec, flint_rand_t state, slong len, nmod
 
 int check_nmod_vec_invert(slong len, ulong p, flint_rand_t state)
 {
-    nn_ptr vec, res1, res2, res3;
+    nn_ptr vec, res1, res2, res3 = NULL;
     nmod_t mod;
 
     ulong res = 0;

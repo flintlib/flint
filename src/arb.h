@@ -123,7 +123,7 @@ void arb_indeterminate(arb_t x);
 
 int arb_is_finite(const arb_t x);
 
-void arb_set(arb_t x, const arb_t y);
+void arb_set(arb_t y, const arb_t x);
 
 ARB_INLINE void
 arb_swap(arb_t x, arb_t y)
@@ -137,7 +137,7 @@ void arb_trim(arb_t y, const arb_t x);
 
 void arb_neg(arb_t y, const arb_t x);
 
-void arb_neg_round(arb_t x, const arb_t y, slong prec);
+void arb_neg_round(arb_t y, const arb_t x, slong prec);
 
 void arb_abs(arb_t y, const arb_t x);
 void arb_nonnegative_abs(arb_t y, const arb_t x);
@@ -163,13 +163,13 @@ arb_set_arf(arb_t x, const arf_t y)
     mag_zero(arb_radref(x));
 }
 
-void arb_set_si(arb_t x, slong y);
+void arb_set_si(arb_t y, slong x);
 
-void arb_set_ui(arb_t x, ulong y);
+void arb_set_ui(arb_t y, ulong x);
 
-void arb_set_d(arb_t x, double y);
+void arb_set_d(arb_t y, double x);
 
-void arb_set_fmpz(arb_t x, const fmpz_t y);
+void arb_set_fmpz(arb_t y, const fmpz_t x);
 
 ARB_INLINE void
 arb_set_fmpz_2exp(arb_t x, const fmpz_t y, const fmpz_t exp)
@@ -338,6 +338,7 @@ int arb_contains_int(const arb_t x);
 
 void arb_get_interval_fmpz_2exp(fmpz_t a, fmpz_t b, fmpz_t exp, const arb_t x);
 int arb_get_unique_fmpz(fmpz_t z, const arb_t x);
+int arb_get_simplest_fmpq(fmpq_t res, const arb_t x);
 
 void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n);
 
@@ -438,9 +439,6 @@ void arb_div_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec);
 void arb_fmpz_div_fmpz(arb_t z, const fmpz_t x, const fmpz_t y, slong prec);
 void arb_ui_div(arb_t z, ulong x, const arb_t y, slong prec);
 
-void arb_div_arf_newton(arb_t res, const arb_t x, const arf_t y, slong prec);
-void arb_div_newton(arb_t res, const arb_t x, const arb_t y, slong prec);
-void arb_fmpz_divapprox(fmpz_t res, const fmpz_t x, const fmpz_t y);
 
 ARB_INLINE void
 arb_inv(arb_t y, const arb_t x, slong prec)
@@ -466,9 +464,6 @@ void arb_rsqrt(arb_t z, const arb_t x, slong prec);
 void arb_rsqrt_ui(arb_t z, ulong x, slong prec);
 void arb_sqrt1pm1(arb_t r, const arb_t z, slong prec);
 
-void arb_rsqrt_arf_newton(arb_t res, const arf_t x, slong prec);
-void arb_sqrt_arf_newton(arb_t res, const arf_t x, slong prec);
-void arb_sqrt_newton(arb_t z, const arb_t x, slong prec);
 
 void arb_pow_fmpz_binexp(arb_t y, const arb_t b, const fmpz_t e, slong prec);
 void arb_pow_fmpz(arb_t y, const arb_t b, const fmpz_t e, slong prec);
@@ -565,6 +560,7 @@ void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec);
 void arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec);
 
 void arb_const_apery(arb_t s, slong prec);
+void arb_const_zeta5(arb_t s, slong prec);
 
 void arb_zeta_ui_asymp(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_borwein_bsplit(arb_t x, ulong s, slong prec);
@@ -662,6 +658,9 @@ void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 
 void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_mul_arf(arb_ptr res, arb_srcptr vec, slong len, const arf_t c, slong prec);
+void _arb_vec_scalar_mul_ui(arb_ptr res, arb_srcptr vec, slong len, ulong c, slong prec);
+void _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec);
 void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec);
 void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c);
 void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);

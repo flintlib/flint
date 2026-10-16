@@ -32,8 +32,7 @@ gr_poly_pow_fmpz(gr_poly_t res,
         int status;
         gr_poly_fit_length(res, 1, ctx);
         status = gr_pow_fmpz(res->coeffs, poly->coeffs, exp, ctx);
-        _gr_poly_set_length(res, 1, ctx);
-        _gr_poly_normalise(res, ctx);
+        _gr_poly_set_length_normalise(res, 1, ctx);
         return status;
     }
     else

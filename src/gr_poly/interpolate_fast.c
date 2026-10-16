@@ -12,9 +12,7 @@
 #include "longlong.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-
-/* todo */
-#define _gr_poly_mul_monic _gr_poly_mul
+#include "gr_poly/impl.h"
 
 int
 _gr_poly_interpolation_weights(gr_ptr w,
@@ -131,8 +129,7 @@ gr_poly_interpolate_fast(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, g
 
     gr_poly_fit_length(poly, n, ctx);
     status = _gr_poly_interpolate_fast(poly->coeffs, xs->entries, ys->entries, n, ctx);
-    _gr_poly_set_length(poly, n, ctx);
-    _gr_poly_normalise(poly, ctx);
+    _gr_poly_set_length_normalise(poly, n, ctx);
     return status;
 }
 

@@ -11,50 +11,14 @@
 */
 
 #include "acb_poly.h"
+#include "gr_poly.h"
 
 void
 _acb_poly_product_roots(acb_ptr poly, acb_srcptr xs, slong n, slong prec)
 {
-    if (n == 0)
-    {
-        acb_one(poly);
-    }
-    else if (n == 1)
-    {
-        acb_neg(poly, xs);
-        acb_one(poly + 1);
-    }
-    else if (n == 2)
-    {
-        acb_mul(poly, xs + 0, xs + 1, prec);
-        acb_add(poly + 1, xs + 0, xs + 1, prec);
-        acb_neg(poly + 1, poly + 1);
-        acb_one(poly + 2);
-    }
-    else if (n == 3)
-    {
-        acb_mul(poly + 1, xs, xs + 1, prec);
-        acb_mul(poly, poly + 1, xs + 2, prec);
-        acb_neg(poly, poly);
-        acb_add(poly + 2, xs, xs + 1, prec);
-        acb_addmul(poly + 1, poly + 2, xs + 2, prec);
-        acb_add(poly + 2, poly + 2, xs + 2, prec);
-        acb_neg(poly + 2, poly + 2);
-        acb_one(poly + 3);
-    }
-    else
-    {
-        const slong m = (n + 1) / 2;
-        acb_ptr tmp;
-
-        tmp = _acb_vec_init(n + 2);
-
-        _acb_poly_product_roots(tmp, xs, m, prec);
-        _acb_poly_product_roots(tmp + m + 1, xs + m, n - m, prec);
-        _acb_poly_mul_monic(poly, tmp, m + 1, tmp + m + 1, n - m + 1, prec);
-
-        _acb_vec_clear(tmp, n + 2);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, prec);
+    GR_MUST_SUCCEED(_gr_poly_product_roots(poly, xs, n, ctx));
 }
 
 void

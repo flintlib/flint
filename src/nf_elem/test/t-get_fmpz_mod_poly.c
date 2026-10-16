@@ -62,6 +62,7 @@ TEST_FUNCTION_START(nf_elem_get_fmpz_mod_poly, state)
         fmpz_mod_poly_clear(reduced_elem, ctx);
         fmpz_mod_ctx_clear(ctx);
         fmpz_clear(coeff);
+        fmpz_clear(reduced_coeff);
         fmpz_clear(mod);
         nf_clear(nf);
     }

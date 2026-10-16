@@ -449,6 +449,13 @@ void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
+struct qadic2_sqrt_precomp;
+
+struct qadic2_sqrt_precomp *_qadic_char2_sqrt_precomp_init(const qadic_ctx_t ctx);
+int _qadic_char2_sqrt_with_precomp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx,
+                                   const struct qadic2_sqrt_precomp *data);
+void _qadic_char2_sqrt_precomp_clear(struct qadic2_sqrt_precomp *data);
+
 /* Output ********************************************************************/
 
 #ifdef FLINT_HAVE_FILE

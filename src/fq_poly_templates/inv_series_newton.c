@@ -13,8 +13,17 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
-#define FQ_POLY_INV_NEWTON_CUTOFF  64
+/* Below this length, the basecase algorithm (using the precomputed
+   inverse of the constant term) is faster than Newton iteration. */
+#if defined(FQ_ZECH_POLY_H)
+#define FQ_POLY_INV_NEWTON_CUTOFF 64
+#elif defined(FQ_NMOD_POLY_H)
+#define FQ_POLY_INV_NEWTON_CUTOFF 16
+#else
+#define FQ_POLY_INV_NEWTON_CUTOFF 32
+#endif
 
 void
 _TEMPLATE(T, poly_inv_series_newton) (TEMPLATE(T, struct) * Qinv,
@@ -22,51 +31,13 @@ _TEMPLATE(T, poly_inv_series_newton) (TEMPLATE(T, struct) * Qinv,
                                       const TEMPLATE(T, t) cinv,
                                       const TEMPLATE(T, ctx_t) ctx)
 {
-    if (n == 1)                 /* {Q,1} x* cinv == 1 mod (x) */
-    {
-        TEMPLATE(T, set) (Qinv, cinv, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+
+    if (n < FQ_POLY_INV_NEWTON_CUTOFF)
+        GR_MUST_SUCCEED(_gr_poly_inv_series_basecase_preinv1(Qinv, Q, n, cinv, n, gr_ctx));
     else
-    {
-        const slong alloc = FLINT_MAX(n, 3 * FQ_POLY_INV_NEWTON_CUTOFF);
-        slong *a, i, m;
-        TEMPLATE(T, struct) * W;
-
-        W = _TEMPLATE(T, vec_init) (alloc, ctx);
-
-        for (i = 1; (WORD(1) << i) < n; i++) ;
-
-        a = (slong *) flint_malloc(i * sizeof(slong));
-        a[i = 0] = n;
-        while (n >= FQ_POLY_INV_NEWTON_CUTOFF)
-            a[++i] = (n = (n + 1) / 2);
-
-        /* Base case */
-        {
-            TEMPLATE(T, struct) * Qrev = W + 2 * FQ_POLY_INV_NEWTON_CUTOFF;
-
-            _TEMPLATE(T, poly_reverse) (Qrev, Q, n, n, ctx);
-            _TEMPLATE(T, vec_zero) (W, 2 * n - 2, ctx);
-            TEMPLATE(T, one) (W + (2 * n - 2), ctx);
-            _TEMPLATE(T, poly_div) (Qinv, W, 2 * n - 1, Qrev, n,
-                                             cinv, ctx);
-            _TEMPLATE(T, poly_reverse) (Qinv, Qinv, n, n, ctx);
-        }
-
-        for (i--; i >= 0; i--)
-        {
-            m = n;
-            n = a[i];
-
-            _TEMPLATE(T, poly_mullow) (W, Q, n, Qinv, m, n, ctx);
-            _TEMPLATE(T, poly_mullow) (Qinv + m, Qinv, m, W + m, n - m, n - m,
-                                       ctx);
-            _TEMPLATE(T, poly_neg) (Qinv + m, Qinv + m, n - m, ctx);
-        }
-
-        _TEMPLATE(T, vec_clear) (W, alloc, ctx);
-        flint_free(a);
-    }
+        GR_MUST_SUCCEED(_gr_poly_inv_series_newton(Qinv, Q, n, n, FQ_POLY_INV_NEWTON_CUTOFF, gr_ctx));
 }
 
 void

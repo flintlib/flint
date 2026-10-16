@@ -19,5 +19,5 @@ fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den,
     if (fmpz_mat_nrows(A) <= 15)
         return fmpz_mat_can_solve_fflu(X, den, A, B);
     else
-        return fmpz_mat_can_solve_multi_mod_den(X, den, A, B);
+        return _fmpz_mat_can_solve_auto_den(X, den, A, B);
 }

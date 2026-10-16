@@ -11,6 +11,7 @@
 */
 
 #include "fq.h"
+#include "fq_vec.h"
 #include "fq_poly.h"
 
 #ifdef T

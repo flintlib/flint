@@ -22,21 +22,26 @@
 #include "t-arb.c"
 #include "t-arf.c"
 #include "t-ca.c"
+#include "t-complex.c"
 #include "t-debug.c"
 #include "t-dirichlet.c"
 #include "t-fmpq.c"
+#include "t-fmpq_mpoly.c"
 #include "t-fmpq_poly.c"
 #include "t-fmpz.c"
 #include "t-fmpzi.c"
 #include "t-fmpz_mod.c"
 #include "t-fmpz_mpoly.c"
 #include "t-fmpz_mpoly_q.c"
+#include "t-fmpz_mpoly_q_factored.c"
 #include "t-fmpz_mod_mpoly_q.c"
 #include "t-fmpz_poly.c"
 #include "t-fq.c"
 #include "t-fq_nmod.c"
+#include "t-fq_special.c"
 #include "t-fq_zech.c"
 #include "t-fraction.c"
+#include "t-poly_quotient.c"
 #include "t-matrix_acb.c"
 #include "t-matrix_arb.c"
 #include "t-matrix_fmpq.c"
@@ -49,6 +54,7 @@
 #include "t-nmod.c"
 #include "t-perm.c"
 #include "t-poly.c"
+#include "t-pretend_field.c"
 #include "t-polynomial_acb.c"
 #include "t-polynomial_arb.c"
 #include "t-polynomial_fmpq.c"
@@ -73,21 +79,26 @@ test_struct tests[] =
     TEST_FUNCTION(gr_arb),
     TEST_FUNCTION(gr_arf),
     TEST_FUNCTION(gr_ca),
+    TEST_FUNCTION(gr_complex),
     TEST_FUNCTION(gr_debug),
     TEST_FUNCTION(gr_dirichlet),
     TEST_FUNCTION(gr_fmpq),
+    TEST_FUNCTION(gr_fmpq_mpoly),
     TEST_FUNCTION(gr_fmpq_poly),
     TEST_FUNCTION(gr_fmpz),
     TEST_FUNCTION(gr_fmpzi),
     TEST_FUNCTION(gr_fmpz_mod),
     TEST_FUNCTION(gr_fmpz_mpoly),
     TEST_FUNCTION(gr_fmpz_mpoly_q),
+    TEST_FUNCTION(gr_fmpz_mpoly_q_factored),
     TEST_FUNCTION(gr_fmpz_mod_mpoly_q),
     TEST_FUNCTION(gr_fmpz_poly),
     TEST_FUNCTION(gr_fq),
     TEST_FUNCTION(gr_fq_nmod),
+    TEST_FUNCTION(gr_fq_special),
     TEST_FUNCTION(gr_fq_zech),
     TEST_FUNCTION(gr_fraction),
+    TEST_FUNCTION(gr_poly_quotient),
     TEST_FUNCTION(gr_matrix_acb),
     TEST_FUNCTION(gr_matrix_arb),
     TEST_FUNCTION(gr_matrix_fmpq),
@@ -100,6 +111,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_nmod),
     TEST_FUNCTION(gr_perm),
     TEST_FUNCTION(gr_poly),
+    TEST_FUNCTION(gr_pretend_field),
     TEST_FUNCTION(gr_polynomial_acb),
     TEST_FUNCTION(gr_polynomial_arb),
     TEST_FUNCTION(gr_polynomial_fmpq),

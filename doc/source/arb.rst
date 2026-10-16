@@ -225,6 +225,22 @@ Assignment and rounding
     brackets indicating the number of digits omitted
     (useful when computing values to extremely high precision).
 
+    The conversion is done exactly (through the :ref:`decimal <decimal>`
+    module): the midpoint is correctly rounded to the printed number of
+    digits (to nearest, with ties away from zero), the number of digits
+    is the largest for which the printed radius is at most 1 ulp, and the
+    printed radius is the true radius plus the exact rounding error,
+    rounded up to three significant digits. In particular, an exact
+    midpoint which is exactly representable with *n* digits is printed
+    without a radius (``arb_get_str`` of the exact integer `10^{100}`
+    with `n = 31` gives ``1.000000000000000000000000000000e+100``), and
+    a tiny radius is never inflated (`[1 \pm 2^{-1000}]` prints as
+    ``[1.00000000000000000000000000000 +/- 9.34e-302]`` with `n = 30`).
+    Arguments with huge exponents are handled by scaling with a power of
+    ten computed in ball arithmetic, which cannot decide whether the
+    value is an exact decimal number; an exact midpoint with a huge
+    exponent is therefore tested for exact representability directly.
+
 Assignment of special values
 -------------------------------------------------------------------------------
 
@@ -557,6 +573,22 @@ Radius and interval operations
     larger than the physical memory available on the machine, resulting
     in swapping. It is recommended to check that the midpoint of *x* is
     within a reasonable range before calling this method.
+
+.. function:: int arb_get_simplest_fmpq(fmpq_t res, const arb_t x)
+
+    Sets *res* to the rational `p/q` in lowest terms, with smallest
+    positive denominator `q`, that lies in the closed real interval
+    represented by *x*, and returns 1. Among rationals with the smallest
+    denominator, returns the one with smallest absolute numerator (i.e.
+    closest to 0); if 0 lies in *x*, returns 0/1.
+
+    Returns 0 and leaves *res* unchanged if *x* is not finite.
+
+    Warning: like :func:`arb_get_unique_fmpz`, this method may allocate
+    a large amount of memory when the midpoint or dyadic endpoints of
+    *x* have very large or very small magnitude. It is recommended to
+    check that the midpoint of *x* is within a reasonable range before
+    calling this method.
 
 .. function:: void arb_floor(arb_t y, const arb_t x, slong prec)
               void arb_ceil(arb_t y, const arb_t x, slong prec)
@@ -1321,6 +1353,10 @@ For further implementation details, see :ref:`algorithms_constants`.
 
     Computes Apery's constant `\zeta(3)`.
 
+.. function:: void arb_const_zeta5(arb_t z, slong prec)
+
+    Computes `\zeta(5)`.
+
 .. function:: void arb_const_reciprocal_fibonacci(arb_t z, slong prec)
 
     Computes the reciprocal Fibonacci constant `\sum_{n=1}^{\infty} 1/F_n`.
@@ -1959,11 +1995,17 @@ Vector functions
 
 .. function:: void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
 
-.. function:: void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
+.. function:: void _arb_vec_scalar_mul_arf(arb_ptr res, arb_srcptr vec, slong len, const arf_t c, slong prec)
+
+.. function:: void _arb_vec_scalar_mul_ui(arb_ptr res, arb_srcptr vec, slong len, ulong c, slong prec)
+
+.. function:: void _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec)
 
 .. function:: void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec)
 
 .. function:: void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c)
+
+.. function:: void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
 
 .. function:: void _arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
 

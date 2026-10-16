@@ -13,75 +13,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
                                                       const fmpz_mod_ctx_t ctx)
 {
-    int res = 1;
+    gr_ctx_t gr_ctx;
+    truth_t res;
 
-    if (fmpz_mod_poly_length(f, ctx) > 2)
-    {
-        const slong n = fmpz_mod_poly_degree(f, ctx);
-        fmpz_mod_poly_t a, x, x_p, finv;
-        fmpz_mod_poly_frobenius_powers_2exp_t pow;
+    /* as special cases, zero and constants are considered irreducible */
+    if (f->length <= 2)
+        return 1;
 
-        fmpz_mod_poly_init(a, ctx);
-        fmpz_mod_poly_init(x, ctx);
-        fmpz_mod_poly_init(x_p, ctx);
-        fmpz_mod_poly_init(finv, ctx);
+    /* the context borrows ctx and must not be cleared */
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(gr_ctx, T_TRUE));
 
-        fmpz_mod_poly_set_coeff_ui(x, 1, 1, ctx);
+    res = gr_poly_is_irreducible_rabin((const gr_poly_struct *) f, gr_ctx);
 
-        /* Compute x^q mod f */
-        fmpz_mod_poly_reverse(finv, f, f->length, ctx);
+    if (res == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "fmpz_mod_poly_is_irreducible_rabin: "
+                                 "unable to decide\n");
 
-        fmpz_mod_poly_inv_series(finv, finv, f->length, ctx);
-
-        fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, n, ctx);
-
-        fmpz_mod_poly_frobenius_power(x_p, pow, f, n, ctx);
-
-        if (!fmpz_mod_poly_is_zero(x_p, ctx))
-           fmpz_mod_poly_make_monic(x_p, x_p, ctx);
-
-        /* Now do the irreducibility test */
-        if (!fmpz_mod_poly_equal(x_p, x, ctx))
-        {
-            res = 0;
-        }
-        else
-        {
-            n_factor_t factors;
-            slong i;
-
-            n_factor_init(&factors);
-            n_factor(&factors, n, 1);
-
-            for (i = 0; i < factors.num; i++)
-            {
-                fmpz_mod_poly_frobenius_power(a, pow, f, n / factors.p[i], ctx);
-
-                fmpz_mod_poly_sub(a, a, x, ctx);
-
-                if (!fmpz_mod_poly_is_zero(a, ctx))
-                    fmpz_mod_poly_make_monic(a, a, ctx);
-
-                fmpz_mod_poly_gcd(a, a, f, ctx);
-
-                if (a->length != 1)
-                   res = 0;
-            }
-        }
-
-        fmpz_mod_poly_frobenius_powers_2exp_clear(pow, ctx);
-        fmpz_mod_poly_clear(finv, ctx);
-        fmpz_mod_poly_clear(a, ctx);
-        fmpz_mod_poly_clear(x, ctx);
-        fmpz_mod_poly_clear(x_p, ctx);
-    }
-
-    return res;
+    return res == T_TRUE;
 }

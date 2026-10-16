@@ -8,6 +8,9 @@ An :type:`fmpz_mod_mpoly_q_t` represents an element of
 multivariate polynomials (:type:`fmpz_mod_mpoly_t`).
 Instances are always kept in canonical form by ensuring that the GCD
 of numerator and denominator is 1 and then normalizing denominator to a monic polynomial.
+All functions assume their inputs are in canonical form and produce
+canonical output; this is not checked. Use
+:func:`fmpz_mod_mpoly_q_canonicalise` on any directly constructed value.
 
 The user must create a multivariate polynomial context
 (:type:`fmpz_mod_mpoly_ctx_t`) specifying the prime number *m* for the field `\mathbb{F}_m` 

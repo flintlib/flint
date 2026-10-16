@@ -101,7 +101,7 @@ ulong nmod_pow_cache_mulpow_ui(
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
-    n_poly_t neg,
+    n_poly_t FLINT_UNUSED(neg),
     nmod_t ctx)
 {
     slong i;

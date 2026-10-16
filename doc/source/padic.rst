@@ -470,8 +470,7 @@ Logarithm
 
     where `v \geq 1`.
 
-    Assumes that `1 \leq v < N` or `2 \leq v < N` when `p` is 
-    odd or `p = 2`, respectively, and also that `N < 2^{f-2}` 
+    Assumes that `1 \leq v < N`, and also that `N < 2^{f-2}`
     where `f` is ``FLINT_BITS``.
 
 .. function:: void _padic_log(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
@@ -496,8 +495,7 @@ Logarithm
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
 
     Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
-    is at least `1` when `p` is odd and at least `2` when `p = 2` 
-    so that the series converges.
+    is at least `1` so that the series converges.
 
     Assumes that `v < N`, and hence in particular `N \geq 2`.
 
@@ -515,8 +513,7 @@ Logarithm
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
-    but this only converges when `\operatorname{ord}_p(x - 1)` is at least `2`
-    or `1` when `p = 2` or `p > 2`, respectively.
+    but this only converges when `\operatorname{ord}_p(x - 1)` is at least `1`.
 
 .. function:: int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 

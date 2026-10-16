@@ -37,9 +37,10 @@ static const char * default_var = "a";
 static int
 _gr_nf_ctx_write(gr_stream_t out, const gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Number field ");
-    gr_stream_write_free(out, fmpq_poly_get_str_pretty(NF_CTX(ctx)->pol, NF_VAR(ctx)));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Number field ");
+    status |= gr_stream_write_free(out, fmpq_poly_get_str_pretty(NF_CTX(ctx)->pol, NF_VAR(ctx)));
+    return status;
 }
 
 static int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -130,8 +131,7 @@ _gr_nf_randtest(nf_elem_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_nf_write(gr_stream_t out, const nf_elem_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, nf_elem_get_str_pretty(x, NF_VAR(ctx), NF_CTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, nf_elem_get_str_pretty(x, NF_VAR(ctx), NF_CTX(ctx)));
 }
 
 static int

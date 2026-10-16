@@ -42,11 +42,31 @@ _arb_poly_sqrt_series(arb_ptr g,
     }
     else
     {
-        arb_ptr t;
-        t = _arb_vec_init(len);
-        _arb_poly_rsqrt_series(t, h, hlen, len, prec);
-        _arb_poly_mullow(g, t, len, h, hlen, len, prec);
-        _arb_vec_clear(t, len);
+        /* Karp-Markstein: with g = h^(-1/2) + O(x^m) and v = h g mod x^m,
+           sqrt(h) = v + g (h - v^2) / 2 + O(x^(2m)). */
+        arb_ptr t, u;
+        slong m, tlen, r1, r2, rlen;
+
+        m = (len + 1) / 2;
+        t = _arb_vec_init(m + len);
+        u = t + m;
+
+        _arb_poly_rsqrt_series(t, h, hlen, m, prec);
+        _arb_poly_mullow(g, t, m, h, FLINT_MIN(hlen, m), m, prec);
+
+        tlen = FLINT_MIN(2 * m - 1, len);
+        r1 = FLINT_MAX(0, FLINT_MIN(hlen - m, len - m));
+        r2 = FLINT_MAX(0, tlen - m);
+        rlen = FLINT_MAX(r1, r2);
+
+        if (r2 > 0)
+            _arb_poly_mulmid(u + m, g, m, g, m, m, tlen, prec);
+        _arb_poly_sub(u, h + m, r1, u + m, r2, prec);
+
+        _arb_poly_mullow(g + m, t, len - m, u, rlen, len - m, prec);
+        _arb_vec_scalar_mul_2exp_si(g + m, g + m, len - m, -1);
+
+        _arb_vec_clear(t, m + len);
     }
 }
 

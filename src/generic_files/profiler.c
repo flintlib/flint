@@ -190,8 +190,8 @@ void fprint_memory_usage(FILE * fs)
     virt = kp.p_vm_msize * getpagesize();
     rss = kp.p_vm_rssize * getpagesize();
 #  elif defined(__OpenBSD__)
-    virt = kp.p_vmspace.vm_map.size;
-    rss = kp.p_vmspace.vm_rssize * getpagesize();
+    virt = kp.p_vm_map_size;
+    rss = kp.p_vm_rssize * getpagesize();
 #  endif
 # endif /* non-Linux OS */
 

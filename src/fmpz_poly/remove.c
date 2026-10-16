@@ -60,7 +60,18 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
         } else
             i = (poly1->length - 1)/(poly2->length - 1);
     } else if (fmpz_is_zero(p1sum) || fmpz_is_one(p2sum))
-        i = (poly1->length - 1)/(poly2->length - 1);
+    {
+        if (poly2->length == 1)
+        {
+            fmpz_t cont;
+            fmpz_init(cont);
+            _fmpz_poly_content(cont, poly1->coeffs, poly1->length);
+            i = fmpz_remove(qsum, cont, p2sum);
+            fmpz_clear(cont);
+        }
+        else
+            i = (poly1->length - 1)/(poly2->length - 1);
+    }
     else
         i = fmpz_remove(qsum, p1sum, p2sum);
 

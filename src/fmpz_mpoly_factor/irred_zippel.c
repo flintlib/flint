@@ -691,7 +691,7 @@ int fmpz_mpoly_factor_irred_zippel(
     ulong * alphap;
     slong r, L;
 
-    FLINT_ASSERT(n > 1);
+    FLINT_ASSERT(n > 0);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(fmpz_mpoly_factor_matches(lcA, lcAfac, ctx));

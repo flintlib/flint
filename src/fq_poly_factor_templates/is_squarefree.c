@@ -14,34 +14,32 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 int
 _TEMPLATE(T, poly_is_squarefree) (const TEMPLATE(T, struct) * f, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) * fd, *g;
-    slong dlen;
-    int res;
+    gr_ctx_t gr_ctx;
+    gr_poly_struct t;
+    truth_t res;
 
     if (len <= 2)
         return len != 0;
 
-    fd = _TEMPLATE(T, vec_init) (2 * (len - 1), ctx);
-    g = fd + len - 1;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-    _TEMPLATE(T, poly_derivative) (fd, f, len, ctx);
-    dlen = len - 1;
-    TEMPLATE(CAP_T, VEC_NORM) (fd, dlen, ctx);
+    t.coeffs = (TEMPLATE(T, struct) *) f;
+    t.length = len;
+    t.alloc = len;
 
-    if (dlen)
-    {
-        res = (_TEMPLATE(T, poly_gcd) (g, f, len, fd, dlen, ctx) == 1);
-    }
-    else
-        res = 0;                /* gcd(f, 0) = f, and len(f) > 2 */
+    res = gr_poly_is_squarefree(&t, gr_ctx);
 
-    _TEMPLATE(T, vec_clear) (fd, 2 * (len - 1), ctx);
-    return res;
+    if (res == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "Exception in poly_is_squarefree: "
+                                 "unable to decide\n");
+
+    return res == T_TRUE;
 }
 
 int

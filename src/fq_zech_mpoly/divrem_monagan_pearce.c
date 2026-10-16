@@ -93,18 +93,9 @@ static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow2;
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow2;
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto exp_overflow2;
+        lt_divides = mpoly_monomial_divides_any_bits(q_exp + q_len*N, exp, exp3, N, mask, bits);
 
         fq_zech_zero(q_coeff + q_len, fqctx);
         do {
@@ -271,9 +262,7 @@ void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     if (exp_bits > poly2->bits)
@@ -341,14 +330,10 @@ void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
         ulong * old_exp2 = exp2, * old_exp3 = exp3;
         slong old_exp_bits = exp_bits;
 
-        exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
-
-        N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
-        mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
-
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
+        exp2 = mpoly_monomials_repack_wider_cmpmask(&exp_bits,
+                                                    &N, &cmpmask, old_exp2,
+                                                    old_exp_bits,
+                                                    poly2->length,
                                                     poly2->length, ctx->minfo);
 
         exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));

@@ -58,6 +58,36 @@ Types and basic operations
               int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx)
               int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx)
 
+.. function:: int gr_vec_set_str(gr_vec_t vec, const char * s, int resize, gr_ctx_t ctx)
+
+    Sets *vec* to the vector described by the string *s*, which must have the
+    form ``[expr1, expr2, ..., exprn]`` (or ``[]`` for the empty vector). Each
+    entry expression is parsed with :func:`gr_set_str` over *ctx*. Whitespace
+    around the brackets and separators is ignored, and commas appearing inside
+    parentheses, brackets or braces of an entry are treated as part of that
+    entry rather than as separators. If *resize* is 1, *vec* is resized to the
+    number of entries found. If *resize* is 0, returns ``GR_DOMAIN`` when that
+    number differs from the current length of *vec*. Returns ``GR_UNABLE`` if
+    *s* is not a well-formed list, and propagates any failure from parsing an
+    individual entry.
+
+.. function:: int gr_vec_str_count_entries(slong * count, const char * s, gr_ctx_t ctx)
+
+    Sets *count* to the number of top-level entries of the bracketed list at the
+    start of *s*, without evaluating them. Nesting depth of parentheses,
+    brackets and braces is tracked so that only separators at the outermost
+    level are counted. Any characters following the matching closing bracket are
+    ignored. Returns ``GR_UNABLE`` if the list is not well-formed.
+
+.. function:: int _gr_vec_set_str(gr_ptr res, const char * s, slong len, gr_ctx_t ctx)
+
+    Evaluates the bracketed list at the start of *s* into the preallocated array
+    *res*, which must hold *len* initialized elements, parsing each entry with
+    :func:`gr_set_str`. Returns ``GR_DOMAIN`` if the number of entries found
+    differs from *len*. Any characters following the matching closing bracket
+    are ignored, which allows this function to be applied to a row lying within
+    a larger matrix string.
+
 .. macro:: GR_ENTRY(vec, i, size)
 
     Macro to access the *i*-th entry of a ``gr_ptr`` or ``gr_srcptr``
@@ -185,6 +215,45 @@ Arithmetic
 
 .. function:: int _gr_vec_mul_scalar_2exp_si(gr_ptr res, gr_srcptr vec, slong len, slong c, gr_ctx_t ctx)
 
+Elementary functions
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_vec_sqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_rsqrt(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_exp(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_log(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_sin(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_cos(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+              int _gr_vec_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, slong len, gr_ctx_t ctx)
+
+    Elementwise square roots and elementary functions (methods
+    ``GR_METHOD_VEC_SQRT``, ``GR_METHOD_VEC_EXP`` etc.). The generic
+    implementations loop over the scalar methods; rings with
+    vectorized kernels (``dfloat``) override them.
+
+Conversions and data movement
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_vec_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, slong len, gr_ctx_t ctx)
+
+    Sets ``res[i]`` to ``x[i]`` converted from the ring *x_ctx*, as
+    :func:`gr_set_other` elementwise (method ``GR_METHOD_VEC_SET_OTHER``).
+
+.. function:: int _gr_vec_gather(gr_ptr res, gr_srcptr vec, const slong * idx, slong len, gr_ctx_t ctx)
+              int _gr_vec_scatter(gr_ptr vec, const slong * idx, gr_srcptr src, slong len, gr_ctx_t ctx)
+
+    Indexed copies: ``res[i] = vec[idx[i]]``, respectively
+    ``vec[idx[i]] = src[i]``, for `0 \le i < len` (methods
+    ``GR_METHOD_VEC_GATHER``, ``GR_METHOD_VEC_SCATTER``). The indices
+    need not be distinct; when they repeat in a scatter, the last
+    write wins. The generic implementations loop over :func:`gr_set`;
+    rings whose elements are plain data override them with copies.
+
+.. function:: int _gr_vec_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, slong len, gr_ctx_t ctx)
+
+    :func:`gr_get_interval_mid_rad` elementwise (method
+    ``GR_METHOD_VEC_GET_INTERVAL_MID_RAD``).
+
 Sums and products
 --------------------------------------------------------------------------------
 
@@ -202,6 +271,11 @@ Dot products
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_i`.
 
+.. function:: int _gr_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+
+    Sets *res* to `c \pm \sum_{i=0}^{n-1} a_{i \cdot stride1} b_{i \cdot stride2}`.
+    The strides may be negative.
+
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_{n-1-i}`.
@@ -210,7 +284,7 @@ Sorting and searching
 --------------------------------------------------------------------------------
 
 .. function:: truth_t _gr_vec_contains(gr_srcptr vec, slong len, gr_srcptr x, gr_ctx_t ctx)
-              truth_t gr_vec_contains(const gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx);
+              truth_t gr_vec_contains(const gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_sort(gr_ptr vec, slong len, gr_ctx_t ctx)
               int gr_vec_sort(gr_vec_t dest, const gr_vec_t src, gr_ctx_t ctx)
@@ -223,8 +297,14 @@ Sorting and searching
 .. function:: void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
               int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
 
-    Applies a permutation to a vector. The underscore version works in-place and
-    overwrites `perm`.
+    Applies a permutation to a vector, i.e. ``dest[perm[i]] = src[i]``.
+    The underscore version works in-place and overwrites `perm`.
+
+.. function:: void _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
+              int gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
+
+    Applies the inverse of a permutation to a vector, i.e. ``dest[i] = src[perm[i]]``.
+    The underscore version works in-place and overwrites `perm`.
 
 .. function:: void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx)
 

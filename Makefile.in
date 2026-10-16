@@ -102,6 +102,8 @@ ASM_PIC_FLAG:=$(filter-out -D%,$(PIC_FLAG))
 endif
 
 UNROLL_LOOPS:=@UNROLL_LOOPS@
+dfloat_CFLAGS:=@DFLOAT_CFLAGS@
+
 ifeq ($(UNROLL_LOOPS), 1)
 ulong_extras_CFLAGS:=-funroll-loops
 nmod_CFLAGS:=-funroll-loops
@@ -168,11 +170,13 @@ HEADLESS_DIRS := generic_files
 
 HEADER_DIRS	:=	\
 		thread_pool			thread_support					\
+		machine_vectors									\
 															\
 		ulong_extras		long_extras			perm		\
 		double_extras		d_vec				d_mat		\
 															\
 		mpn_extras	radix   	mpn_mod		nfloat			\
+		mp_real		dfloat									\
 															\
 		nmod		nmod_vec	nmod_mat	nmod_poly		\
 		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\
@@ -184,12 +188,14 @@ HEADER_DIRS	:=	\
 		fq			fq_vec		fq_mat		fq_poly			\
 		padic					padic_mat	padic_poly		\
 		qadic												\
+		padic_radix											\
+		decimal												\
 															\
 		fmpz_extras	fmpz_factor	fmpzi						\
 		fft			n_fft		@FFT_SMALL@								\
 		fmpz_lll											\
 		arith												\
-		qsieve		aprcl									\
+		qsieve		aprcl		ecpp							\
 															\
 		fq_default		fq_default_mat	fq_default_poly		\
 		fq_nmod_embed	fq_zech_embed	fq_embed			\
@@ -218,11 +224,12 @@ HEADER_DIRS	:=	\
 		arb_fmpz_poly	arb_fpwrap							\
 		acb_dft			acb_elliptic	acb_modular			\
 		acb_dirichlet	acb_theta							\
-		dirichlet		bernoulli		hypgeom				\
+		dirichlet		bernoulli							\
 		bool_mat		partitions							\
 															\
 		gr			gr_generic	gr_vec		gr_mat			\
-		gr_poly		gr_mpoly	gr_series	gr_special		\
+		gr_poly		gr_mpoly	gr_ore_poly					\
+		gr_series	gr_special	gr_dft						\
 															\
 		calcium												\
 															\
@@ -987,13 +994,13 @@ endif
 ###############################################################################
 
 ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
-ifneq ($(shell command -v autoconf 2> /dev/null),)
+ifneq ($(shell command -v autoreconf 2> /dev/null),)
 $(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac $(ABS_FLINT_DIR)/bootstrap.sh
 	@echo "Running bootstrap.sh!"
 	@cd $(ABS_FLINT_DIR) && ./bootstrap.sh && cd - >/dev/null
 else
 $(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
-	$(warning autoconf not available, proceeding with stale configure)
+	$(warning autoreconf not available, proceeding with stale configure)
 endif
 endif
 

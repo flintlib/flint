@@ -56,7 +56,7 @@ arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong pre
     {
         arb_ptr tpow;
         slong j, k, m, M, tp, xmag;
-        ulong c, d, chi, clo;
+        ulong c, d, chi;
 
         xmag = arf_abs_bound_lt_2exp_si(arb_midref(x));
 
@@ -96,7 +96,7 @@ arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong pre
 
             if (k != 0)
             {
-                umul_ppmm(chi, clo, c, d);
+                chi = n_mulhi(c, d);
 
                 if (chi != 0)
                 {

@@ -22,9 +22,9 @@ to understand, except for three important things.
 
 Firstly, :type:`fmpz_t`'s will be more efficient than :type:`mpz_t`'s
 for single limb operations, or more precisely for signed quantities
-whose absolute value does not exceed ``FLINT_BITS - 2``` bits.
+whose absolute value does not exceed ``FLINT_BITS - 2`` bits.
 
-Secondly, for small integers that fit into ```FLINT_BITS - 2``` bits
+Secondly, for small integers that fit into ``FLINT_BITS - 2`` bits
 much less memory will be used than for an :type:`mpz_t`. When very
 many :type:`fmpz_t`'s are used, there can be important cache benefits
 on account of this.
@@ -92,11 +92,11 @@ Types, macros and constants
    64-bit machines) or `2^{30}-1` (on 32-bit machines). It switches
    automatically to a GMP integer for larger values.
 
-   An ``fmpz`` is implemented as an ``slong``. When its second most significant
-   bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
-   absolute value is at most ``FLINT_BITS - 2`` bits.
+   An ``fmpz`` is implemented as an ``slong``. When its two most significant
+   bits are either ``00`` or ``11`` the ``fmpz`` represents an ordinary ``slong``
+   integer whose absolute value is at most ``FLINT_BITS - 2`` bits.
 
-   When the second most significant bit is `1` then the value represents a
+   When the two most significant bits are ``01`` then the value represents a
    pointer (the pointer is shifted right `2` bits and the second most
    significant bit is set to `1`. This relies on the fact that ``malloc`` always
    allocates memory blocks on a `4` or `8` byte boundary).
@@ -265,6 +265,11 @@ should call :func:`flint_rand_clear` to clean up.
 .. function:: void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
     Generates a random integer in the range `0` to `m - 1` inclusive.
+
+.. function:: void fmpz_randm_not_zero(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range `1` to `m - 1` inclusive. Requires
+    `m \geq 2`, otherwise an exception is thrown.
 
 .. function:: void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
@@ -474,7 +479,7 @@ Conversion
 
     Sets `f` to the signed remainder `y \equiv x \bmod m` satisfying
     `-m/2 < y \leq m/2`, given `x` which is assumed to satisfy
-    `0 \leq x < m`.
+    `0 \leq x < m` (this is not checked).
 
 .. function:: void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
@@ -868,7 +873,8 @@ Basic arithmetic
     * ``cdiv`` rounds the quotient via ceil rounding.
     * ``tdiv`` rounds the quotient via truncation, i.e. rounding towards zero.
     * ``ndiv`` rounds the quotient such that the remainder has the smallest
-      absolute value. In case of ties, it rounds the quotient towards zero.
+      absolute value. In case of ties, it rounds the quotient to the even
+      integer (round half to even).
 
 .. function:: ulong fmpz_cdiv_ui(const fmpz_t g, ulong h)
 
@@ -887,13 +893,15 @@ Basic arithmetic
 
     Sets `f` to the quotient of `g` and `h`, assuming that the
     division is exact, i.e. `g` is a multiple of `h`.  If `h`
-    is `0` an exception is raised.
+    is `0` an exception is raised. The exactness of the division is
+    not checked; if it is not exact the result is undefined.
 
 .. function:: void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
     Sets `f` to the quotient of `g` and `h = x \times y`, assuming that
     the division is exact, i.e. `g` is a multiple of `h`.
-    If `x` or `y` is `0` an exception is raised.
+    If `x` or `y` is `0` an exception is raised. The exactness of the
+    division is not checked; if it is not exact the result is undefined.
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
@@ -902,11 +910,19 @@ Basic arithmetic
     Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
     none.
 
-.. function:: int fmpz_divides(fmpz_t q, const fmpz_t f, const fmpz_t g)
+.. function:: int fmpz_div(fmpz_t q, const fmpz_t g, const fmpz_t h)
+              int fmpz_div_ui(fmpz_t q, const fmpz_t g, ulong h)
+              int fmpz_div_si(fmpz_t q, const fmpz_t g, slong h)
 
-    Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
-    quotient. Otherwise returns `0` and sets `q` to `0`.
+    Checked exact division: if `h` divides `g`, sets `q = g / h` and returns
+    1; otherwise returns 0 and sets `q` to zero. Division by zero counts as
+    exact iff `g` is zero. Large operands go through :func:`flint_mpn_div`.
+    These are the natural implementations of the checked division methods
+    of the ``fmpz`` ring in the generic rings module.
 
+.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+
+    Older name for :func:`fmpz_div`.
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
@@ -988,7 +1004,36 @@ Basic arithmetic
     If `p` is not prime the return value is with high probability `0`,
     indicating that `p` is not prime, or `a` is not a square modulo `p`.
     If `p` is not prime and the return value is `1`, the value of `b` is
-    meaningless.
+    meaningless. Primality of ``p`` is assumed and not checked. On a return
+    value of `0`, `b` is set to zero.
+
+    This wraps :func:`flint_mpn_sqrtmod`; see there for the algorithm.
+
+.. function:: void fmpz_invmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    Sets ``rop`` to the inverse of ``op`` modulo `2^N`, reduced to
+    `[0, 2^N)`. Requires ``op`` to be odd. Uses the 2-adic Newton iteration
+    :func:`flint_mpn_binv` on the limb array.
+
+.. function:: int fmpz_sqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    If ``op`` is an odd square modulo `2^N` (for `N \ge 3` this means
+    `\mathrm{op} \equiv 1 \pmod 8`), sets ``rop`` to a square root modulo
+    `2^N`, reduced to `[0, 2^N)`, and returns 1; otherwise returns 0. The root
+    is the one congruent to 1 modulo 4 computed by :func:`flint_mpn_bsqrt`
+    (reduced modulo `2^N`). Even ``op`` is not supported (0 is returned).
+
+.. function:: int fmpz_rsqrtmod_2exp(fmpz_t rop, const fmpz_t op, flint_bitcnt_t N)
+
+    As :func:`fmpz_sqrtmod_2exp`, but computes a 2-adic reciprocal square
+    root `y` with `\mathrm{op} \, y^2 \equiv 1 \pmod{2^N}`, via
+    :func:`flint_mpn_brsqrt`.
+
+.. function:: void fmpz_divmod_2exp(fmpz_t rop, const fmpz_t a, const fmpz_t b, flint_bitcnt_t N)
+
+    Hensel division: sets ``rop`` to the unique `q \in [0, 2^N)` with
+    `q b \equiv a \pmod{2^N}`. Requires ``b`` to be odd. Uses
+    :func:`flint_mpn_bdiv_q`.
 
 .. function:: void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
@@ -1006,6 +1051,16 @@ Basic arithmetic
 .. function:: int fmpz_is_square(const fmpz_t f)
 
     Returns nonzero if `f` is a perfect square and zero otherwise.
+
+.. function:: int fmpz_perfect_sqrt(fmpz_t s, const fmpz_t a)
+
+    Checked exact square root: if `a` is a perfect square, sets `s` to its
+    nonnegative square root and returns 1; otherwise returns 0 and leaves
+    `s` undefined. Unlike :func:`fmpz_sqrt` (which computes the truncated
+    square root), no root is computed for nonsquares, which are usually
+    rejected by cheap quadratic residue tests (see :func:`flint_mpn_sqrt`),
+    and for squares this is about twice as fast as :func:`fmpz_is_square`
+    followed by :func:`fmpz_sqrt` for large inputs.
 
 .. function:: int fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
@@ -1188,11 +1243,13 @@ Modular arithmetic
 
 .. function:: void fmpz_negmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`.
+    Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`
+    (this is not checked).
 
 .. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t n)
 
     Computes the Jacobi symbol `\left(\frac{a}{n}\right)` for any `a` and odd positive `n`.
+    The parity and sign of ``n`` are not checked.
 
 .. function:: int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
 
@@ -1314,6 +1371,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
+    These assumptions are not checked.
 
 .. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)
 
@@ -1348,14 +1406,34 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
 
+.. function:: void fmpz_multi_mod_ui_once(ulong * out, const fmpz_t in, nn_srcptr primes, slong num_primes)
+              void fmpz_multi_CRT_ui_once(fmpz_t output, fmpz_t prod, nn_srcptr residues, nn_srcptr primes, slong num_primes, int sign)
+
+    One-shot versions of :func:`fmpz_multi_mod_ui` and
+    :func:`fmpz_multi_CRT_ui` which do not require a ``comb``; these
+    are appropriate when a single conversion is needed. In the CRT
+    version, the product of the primes is written to *prod* if it is
+    not *NULL*.
+
 .. function:: void fmpz_comb_init(fmpz_comb_t comb, nn_srcptr primes, slong num_primes)
+              void fmpz_comb_init2(fmpz_comb_t comb, nn_srcptr primes, slong num_primes, int flags)
 
     Initialises a ``comb`` structure for multimodular reduction and
-    recombination.  The array ``primes`` is assumed to contain
-    ``num_primes`` primes each of ``FLINT_BITS - 1`` bits. Modular
-    reductions and recombinations will be done modulo this list of primes.
-    The ``primes`` array must not be ``free``'d until the ``comb``
-    structure is no longer required and must be cleared by the user.
+    recombination.  The array ``primes`` must contain ``num_primes``
+    nonzero, pairwise coprime moduli of at most ``FLINT_BITS`` bits
+    (they need not be prime, and moduli of any size are batched
+    efficiently). Modular reductions and recombinations will be done
+    modulo this list of moduli. The ``primes`` array is copied and may
+    be freed after this call.
+
+    The version with *flags* (a bitwise or of ``FMPZ_COMB_MOD`` and
+    ``FMPZ_COMB_CRT``) only precomputes data for the selected operations,
+    which is cheaper when only :func:`fmpz_multi_mod_ui` or only
+    :func:`fmpz_multi_CRT_ui` will be used.
+
+    The ``comb`` structure is a thin wrapper around :type:`flint_mpn_crt_t`
+    (see :func:`flint_mpn_crt_init`), which does all the work using mpn
+    arithmetic.
 
 .. function:: void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 

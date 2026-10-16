@@ -365,6 +365,20 @@ void fmpz_bpoly_swap(fmpz_bpoly_t A, fmpz_bpoly_t B)
 
 void fmpz_bpoly_clear(fmpz_bpoly_t A);
 
+/* res_y(A, B) for dense bivariate A, B over Z, by reduction modulo several
+   word-size primes, the resultant of each image and CRT. With proved set,
+   enough primes are used for their product to exceed twice a Hadamard-type
+   bound on the coefficients, which makes the reconstruction exact; otherwise
+   the reconstruction is stopped once it has been left unchanged by primes
+   whose product carries more than 100 bits, which is a heuristic. Returns 0
+   when no image could be computed. The underscore version works in place on
+   its inputs, whose contents it removes, and needs lenA >= lenB >= 2. */
+int _fmpz_bpoly_resultant(fmpz_poly_t res, fmpz_poly_struct * A, slong lenA,
+                        fmpz_poly_struct * B, slong lenB, int proved);
+
+int fmpz_bpoly_resultant(fmpz_poly_t res, const fmpz_bpoly_t A,
+                        const fmpz_bpoly_t B, int proved);
+
 void fmpz_bpoly_realloc(fmpz_bpoly_t A, slong len);
 
 FMPZ_MPOLY_FACTOR_INLINE

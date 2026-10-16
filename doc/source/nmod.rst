@@ -49,6 +49,10 @@ Generic rings
 Modular reduction and arithmetic
 --------------------------------------------------------------------------------
 
+Many of the functions below assume that their operands are already
+reduced modulo ``mod.n``. These reduced-operand assumptions are not
+checked.
+
 .. function:: void nmod_init(nmod_t * mod, ulong n)
 
     Initialises the given ``nmod_t`` structure for reduction modulo `n`
@@ -195,6 +199,42 @@ Modular reduction and arithmetic
 .. function:: ulong nmod_2_pow_ui(ulong e, nmod_t mod)
 
     Returns `2^e` modulo ``mod.n``.
+
+.. function:: int _nmod_sqrt_small(ulong * res, ulong a, ulong n)
+
+    For odd `n` and `a` reduced modulo `n`, finds the least `r` with
+    `r^2 = a \bmod n` by exhaustive search; returns 1 and sets *res* to `r`
+    if one exists, and otherwise sets *res* to 0 and returns 0. Every
+    square root `r` satisfies `r \le n/2` or `n - r \le n/2`, so the
+    result is exact whether or not `n` is prime. This takes `O(n)` steps
+    and is intended for tiny `n`.
+
+.. function:: int nmod_sqrt(ulong * res, ulong a, nmod_t mod)
+
+    Assuming that `n` = ``mod.n`` is prime, computes a square root of `a`
+    modulo `n`. If `a` is a square, sets *res* to the square root in
+    `[0, n/2]` (the other root being `n - \textit{res}`) and returns 1.
+    Otherwise sets *res* to 0 and returns 0. It is assumed that `a` is
+    already reduced modulo `n`.
+
+    The primality of `n` is not checked. If `n` is not prime, a return
+    value of 1 still guarantees that *res* squared is `a` modulo `n`,
+    while a return value of 0 is meaningless.
+
+    For `n` below ``NMOD_SQRT_SMALL_CUTOFF`` (128), this is an exhaustive
+    search, see :func:`_nmod_sqrt_small`. Otherwise the arithmetic is
+    done in Montgomery form. When `n \equiv 3 \pmod 4`
+    the root is `a^{(n+1)/4}`, and when `n \equiv 5 \pmod 8` Atkin's
+    formula is used, which also requires a single exponentiation.
+    When `n \equiv 1 \pmod 8`, writing `n - 1 = q 2^s` with `q` odd, the
+    Tonelli-Shanks algorithm is used, with the exponentiations of `a`
+    and of the nonresidue interleaved. For large `s`, a variant of the
+    Tonelli-Shanks descent is used whose `O(s^2)` multiplications are
+    independent of each other, and for very large `s` (relative to the
+    bit size of `n`) Müller's variant of the Cipolla-Lehmer algorithm,
+    whose cost does not depend on `s`. The result is
+    verified by squaring rather than by testing `a` for being a square
+    up front; for prime `n`, this is a complete test.
 
 Montgomery arithmetic
 --------------------------------------------------------------------------------

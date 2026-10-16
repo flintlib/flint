@@ -41,6 +41,18 @@ ulong n_randtest(flint_rand_t state);
 ulong n_randtest_not_zero(flint_rand_t state);
 ulong n_randtest_prime(flint_rand_t state, int proved);
 
+ULONG_EXTRAS_INLINE ulong n_mulhi(ulong a, ulong b)
+{
+/* Experimental: see if the compiler generates better code than inline assembly */
+#if FLINT_BITS == 64 && defined(__GNUC__)
+    return ((__uint128_t) a * (__uint128_t) b) >> 64;
+#else
+    ulong hi, lo;
+    umul_ppmm(hi, lo, a, b);
+    return hi;
+#endif
+}
+
 #if FLINT64
 ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
 {
@@ -62,15 +74,9 @@ ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
 ULONG_EXTRAS_INLINE ulong _n_randint(flint_rand_t state, ulong limit)
 {
     if ((limit & (limit - 1)) == 0)
-    {
         return _n_randlimb(state) & (limit - 1);
-    }
     else
-    {
-        ulong hi, lo;
-        umul_ppmm(hi, lo, _n_randlimb(state), limit);
-        return hi;
-    }
+        return n_mulhi(_n_randlimb(state), limit);
 }
 
 /* Basic arithmetic **********************************************************/
@@ -174,11 +180,13 @@ int n_is_perfect_power235(ulong n);
 int n_is_perfect_power(ulong * root, ulong n);
 
 int n_sizeinbase(ulong n, int base);
+slong n_nonzero_sizeinbase10(ulong n);
 
 ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
 ulong n_clog_2exp(ulong n, ulong b);
 
+#ifndef __GMP_H__
 #ifdef _MSC_VER
 # define DECLSPEC_IMPORT __declspec(dllimport)
 #else
@@ -187,6 +195,7 @@ ulong n_clog_2exp(ulong n, ulong b);
 DECLSPEC_IMPORT ulong __gmpn_gcd_11(ulong, ulong);
 DECLSPEC_IMPORT ulong __gmpn_gcd_1(nn_srcptr, long int, ulong);
 #undef DECLSPEC_IMPORT
+#endif
 
 ULONG_EXTRAS_INLINE
 ulong n_gcd(ulong x, ulong y)
@@ -367,7 +376,71 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
-ulong n_binvert(ulong a);
+/* a^(-1) mod B for odd a by Hurchalla's method (arXiv:2204.04342),
+   starting from an 8-bit inverse read from a table: one Newton step less
+   than the table-free start (3 a) ^ 2, which costs about one cycle of
+   latency (the load) but saves two multiplications */
+FLINT_DLL extern const unsigned char flint_binvert_limb_tab[128];
+
+ULONG_EXTRAS_INLINE
+ulong n_binvert(ulong a)
+{
+    ulong r, y;
+
+    r = flint_binvert_limb_tab[(a / 2) & 0x7F];     /* 8 bits */
+    y = 1 - a * r;
+    r = r * (1 + y);                                /* 16 bits */
+    y *= y;
+    r = r * (1 + y);                                /* 32 bits */
+#if FLINT_BITS == 64
+    y *= y;
+    r = r * (1 + y);                                /* 64 bits */
+#endif
+    return r;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_barrett_precomp(ulong n)
+{
+    ulong q, r;
+    FLINT_ASSERT(n >= 2);
+    udiv_qrnnd(q, r, UWORD(1), UWORD(0), n);
+    return q;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
+{
+    return x - n_mulhi(x, npre) * n;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett(ulong x, ulong n, ulong npre)
+{
+    ulong y = n_mod_barrett_lazy(x, n, npre);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_lemire_precomp(ulong n)
+{
+    return UWORD_MAX / n + 1;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_lemire(ulong x, ulong n, ulong npre)
+{
+    return n_mulhi(n, x * npre);
+}
+
+/* Double-limb arithmetic. */
+
+void n_ll_small_preinv(nn_ptr minv, nn_srcptr m);
+void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1,
+    ulong b2, ulong b3, nn_srcptr exp, nn_srcptr m, nn_srcptr minv);
+void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv);
 
 /* Modular multiplication with fixed operand **********************************/
 
@@ -382,9 +455,8 @@ ulong n_mulmod_precomp_shoup(ulong a, ulong n)
 ULONG_EXTRAS_INLINE
 ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 {
-    ulong res, p_hi, p_lo;
+    ulong res, p_hi = n_mulhi(a_precomp, b);
 
-    umul_ppmm(p_hi, p_lo, a_precomp, b);
     res = a * b - p_hi * n;
 
     if (res >= n)
@@ -428,6 +500,7 @@ void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
 
 /* Primitive roots and discrete logarithms ***********************************/
 
+ulong n_quadratic_nonresidue(ulong n);
 ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors);
 ulong n_primitive_root_prime(ulong p);
 
@@ -502,6 +575,8 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
 ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
+int n_ll_is_prime(ulong nhi, ulong nlo);
+
 /* Factorisation *************************************************************/
 
 #define FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST 64
@@ -541,6 +616,8 @@ ulong n_factor_one_line(ulong n, ulong iters);
 ulong n_factor_lehman(ulong n);
 
 ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters);
+int n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries, ulong max_iters);
+int n_ll_factor_ecm(nn_ptr factor, ulong nhi, ulong nlo, ulong curves, ulong B1, ulong B2, flint_rand_t state);
 ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);

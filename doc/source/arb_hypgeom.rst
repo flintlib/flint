@@ -479,6 +479,12 @@ Bessel functions
 
     Computes the Bessel function of the first kind `J_{\nu}(z)`.
 
+.. function:: void _arb_hypgeom_bessel_j_series(arb_ptr res, const arb_t nu, arb_srcptr z, slong zlen, slong len, slong prec)
+              void arb_hypgeom_bessel_j_series(arb_poly_t res, const arb_t nu, const arb_poly_t z, slong len, slong prec)
+
+    Computes the Bessel function of the first kind `J_{\nu}(z)` evaluated
+    at the power series *z*, truncated to length *len*.
+
 .. function:: void arb_hypgeom_bessel_y(arb_t res, const arb_t nu, const arb_t z, slong prec)
 
     Computes the Bessel function of the second kind `Y_{\nu}(z)`.

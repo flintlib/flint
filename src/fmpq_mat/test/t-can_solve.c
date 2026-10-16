@@ -22,6 +22,7 @@ TEST_FUNCTION_START(fmpq_mat_can_solve, state)
     /* Solve random systems */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         fmpq_mat_t A, B, X, AX;
         fmpz_mat_t M;
         fmpz_t den;
@@ -82,6 +83,7 @@ TEST_FUNCTION_START(fmpq_mat_can_solve, state)
     /* Solve random soluble systems */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         fmpq_mat_t A, B, X, AX;
         fmpz_mat_t M;
         fmpz_t den;
@@ -140,6 +142,8 @@ TEST_FUNCTION_START(fmpq_mat_can_solve, state)
         fmpq_mat_clear(X);
         fmpq_mat_clear(AX);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

@@ -97,6 +97,8 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
         if (!fmpq_mpoly_is_zero(A, ctxAC))
             TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
+        flint_free(c);
+        fmpq_mpoly_clear(B1, ctxB);
         fmpq_mpoly_clear(B, ctxB);
         fmpq_mpoly_clear(A, ctxAC);
         for (i = 0; i < 3; i++)

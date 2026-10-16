@@ -27,7 +27,7 @@ gr_poly_canonical_associate(gr_poly_t ux, gr_poly_t u,
         if (u != NULL)
             status |= gr_poly_one(u, ctx);
     }
-    else if (gr_ctx_is_field(ctx) == T_TRUE && u == NULL)
+    else if (gr_ctx_is_pretend_field(ctx) == T_TRUE && u == NULL)
     {
         return gr_poly_make_monic(ux, poly, ctx);
     }

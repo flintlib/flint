@@ -15,6 +15,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_mulmod_preinv) (
@@ -25,35 +26,10 @@ _TEMPLATE(T, poly_mulmod_preinv) (
     const TEMPLATE(T, struct) * finv, slong lenfinv,
     const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) * T, *Q;
-    slong lenT, lenQ;
-
-    lenT = len1 + len2 - 1;
-    lenQ = lenT - lenf + 1;
-
-    if (len1 + len2 > lenf) /* reduction necessary */
-    {
-        T = _TEMPLATE(T, vec_init) (lenT + lenQ, ctx);
-        Q = T + lenT;
-
-        if (len1 >= len2)
-            _TEMPLATE(T, poly_mul) (T, poly1, len1, poly2, len2, ctx);
-        else
-            _TEMPLATE(T, poly_mul) (T, poly2, len2, poly1, len1, ctx);
-
-        _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, res, T, lenT, f, lenf,
-                                               finv, lenfinv, ctx);
-        _TEMPLATE(T, vec_clear) (T, lenT + lenQ, ctx);
-    } else /* just use mul */
-    {
-        if (len1 >= len2)
-            _TEMPLATE(T, poly_mul) (res, poly1, len1, poly2, len2, ctx);
-	else
-	    _TEMPLATE(T, poly_mul) (res, poly2, len2, poly1, len1, ctx);
-
-	if (lenT < lenf - 1)
-            _TEMPLATE(T, vec_zero) (res + lenT, lenf - lenT - 1, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_mulmod_preinv(res, poly1, len1, poly2, len2,
+                                    f, lenf, finv, lenfinv, gr_ctx));
 }
 
 void

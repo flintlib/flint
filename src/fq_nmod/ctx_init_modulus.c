@@ -49,12 +49,14 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const cha
     {
         if (modulus->coeffs[i] != 0)
         {
-            ctx->a[j] = n_mulmod2_preinv(inv, modulus->coeffs[i],
-                                         ctx->mod.n, ctx->mod.ninv);
+            ctx->a[j] = modulus->coeffs[i];
             ctx->j[j] = i;
             j++;
         }
     }
+
+    if (inv != 1)
+        _nmod_vec_scalar_mul_nmod(ctx->a, ctx->a, ctx->len, inv, ctx->mod);
 
     if (ctx->len < 6)
         ctx->sparse_modulus = 1;

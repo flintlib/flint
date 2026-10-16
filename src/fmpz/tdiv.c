@@ -13,7 +13,9 @@
 */
 
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
+#include "div_small.h"
 
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {
@@ -60,6 +62,8 @@ fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            if (_fmpz_div_qr_small_divisor(f, NULL, g, c2, 0))
+                return;
             mf = _fmpz_promote(f);
 
             if (c2 > 0)         /* h > 0 */
@@ -76,16 +80,9 @@ fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both are large */
         {
-            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
-            {
-                _fmpz_tdiv_q_newton(f, g, h);
-            }
-            else
-            {
-                mf = _fmpz_promote(f);
-                mpz_tdiv_q(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-                _fmpz_demote_val(f);    /* division by h may result in small value */
-            }
+            mf = _fmpz_promote(f);
+            flint_mpz_tdiv_q(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            _fmpz_demote_val(f);    /* division by h may result in small value */
         }
     }
 }
@@ -123,6 +120,8 @@ fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            if (_fmpz_div_qr_small_divisor(f, s, g, c2, 0))
+                return;
             _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
             ms = _fmpz_promote(s);
             mf  = COEFF_TO_PTR(*f);
@@ -142,21 +141,14 @@ fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both are large */
         {
-            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
-            {
-                _fmpz_tdiv_qr_newton(f, s, g, h);
-            }
-            else
-            {
-                _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
-                ms = _fmpz_promote(s);
-                mf  = COEFF_TO_PTR(*f);
+            _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
+            ms = _fmpz_promote(s);
+            mf  = COEFF_TO_PTR(*f);
 
-                mpz_tdiv_qr(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            flint_mpz_tdiv_qr(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 
-                _fmpz_demote_val(f);    /* division by h may result in small value */
-                _fmpz_demote_val(s);    /* division by h may result in small value */
-            }
+            _fmpz_demote_val(f);    /* division by h may result in small value */
+            _fmpz_demote_val(s);    /* division by h may result in small value */
         }
     }
 }
@@ -178,6 +170,8 @@ fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
     }
     else                        /* g is large */
     {
+        if (_fmpz_div_qr_small_divisor(f, NULL, g, h, 0))
+            return;
         mpz_ptr mf = _fmpz_promote(f);
 
         if (c2 > 0)
@@ -219,6 +213,8 @@ fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     }
     else                        /* g is large */
     {
+        if (_fmpz_div_qr_small_divisor_ui(f, NULL, NULL, g, h, 0, 0))
+            return;
         mpz_ptr mf = _fmpz_promote(f);
 
         flint_mpz_tdiv_q_ui(mf, COEFF_TO_PTR(c1), c2);
@@ -271,6 +267,9 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
     }
     else                        /* g is large */
     {
+        ulong rem;
+        if (_fmpz_div_qr_small_divisor_ui(NULL, NULL, &rem, g, h, 0, 0))
+            return rem;
         return flint_mpz_tdiv_ui(COEFF_TO_PTR(c1), h);
     }
 }

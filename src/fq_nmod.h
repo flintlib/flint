@@ -203,9 +203,9 @@ void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
 
 /* Deprecated functions ******************************************************/
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t, fmpz_t, slong, const char *);
-int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
-void fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
+void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, fmpz_t p, slong d, const char * var);
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, fmpz_t p, slong d, const char * var);
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, fmpz_t p, slong d, const char * var);
 
 #ifdef T
 #undef T

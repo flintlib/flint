@@ -25,10 +25,20 @@ TEST_FUNCTION_START(fmpz_mat_multi_CRT_ui_unsigned, state)
         slong bits, prime_bits, rows, cols, num_primes, j;
         fmpz_t mod;
         fmpz_mat_t A, B, C;
-        nmod_mat_t Amod[1000];
-        ulong primes[1000];
+        nmod_mat_t * Amod;
+        nn_ptr primes;
 
-        bits = n_randint(state, 500) + 1;
+        flint_set_num_threads(1 + n_randint(state, 4));
+
+        if (n_randint(state, 100) == 0)
+            bits = n_randint(state, 10000) + 1;
+        else
+            bits = n_randint(state, 500) + 1;
+
+        /* the number of primes can slightly exceed bits for tiny primes */
+        primes = flint_malloc((bits + 4) * sizeof(ulong));
+        Amod = flint_malloc((bits + 4) * sizeof(nmod_mat_struct));
+
         rows = n_randint(state, 10);
         cols = n_randint(state, 10);
         prime_bits = 1 + n_randint(state, FLINT_BITS - 1);
@@ -38,6 +48,17 @@ TEST_FUNCTION_START(fmpz_mat_multi_CRT_ui_unsigned, state)
         fmpz_mat_init(C, rows, cols);
 
         fmpz_mat_randtest_unsigned(A, state, bits);
+
+        /* dense entries of full size */
+        if (n_randint(state, 2))
+        {
+            slong ii;
+            for (ii = 0; ii < rows * cols; ii++)
+            {
+                fmpz_randbits(A->entries + ii, state, bits);
+                fmpz_abs(A->entries + ii, A->entries + ii);
+            }
+        }
 
         fmpz_init(mod);
         num_primes = 0;
@@ -80,6 +101,9 @@ TEST_FUNCTION_START(fmpz_mat_multi_CRT_ui_unsigned, state)
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
         fmpz_clear(mod);
+
+        flint_free(Amod);
+        flint_free(primes);
     }
 
     TEST_FUNCTION_END(state);

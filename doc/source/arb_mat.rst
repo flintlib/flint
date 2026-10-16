@@ -451,6 +451,9 @@ Gaussian elimination and solving
     `UX = B`, respectively. If *unit* is set, the main diagonal of *L* or *U*
     is taken to consist of all ones, and in that case the actual entries on
     the diagonal are not read at all and can contain other data.
+    *L* (respectively *U*) is assumed to be lower (respectively upper)
+    triangular with nonzero diagonal entries; this is not checked, and
+    entries in the unused triangle are ignored.
 
     The *classical* versions perform the computations iteratively while the
     *recursive* versions perform the computations in a block recursive
@@ -460,6 +463,8 @@ Gaussian elimination and solving
 .. function:: void arb_mat_solve_lu_precomp(arb_mat_t X, const slong * perm, const arb_mat_t LU, const arb_mat_t B, slong prec)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
+    The factorization (*perm* and *LU*) is assumed valid, as produced by the
+    corresponding routine, and is not re-checked.
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 
@@ -565,6 +570,11 @@ Gaussian elimination and solving
     output matrices are set to the approximate floating-point results with
     zeroed error bounds.
 
+    The triangular solves assume the relevant operand is triangular with
+    nonzero diagonal; this is not checked. For *approx_solve_lu_precomp*,
+    *perm* and the factored matrix are assumed to come from the corresponding
+    *approx_lu*; this is not checked.
+
     Approximate solutions are useful for computing preconditioning matrices
     for certified solutions. Some users may also find these methods useful
     for doing ordinary numerical linear algebra in applications where
@@ -594,6 +604,8 @@ Cholesky decomposition and solving
 .. function:: void arb_mat_solve_cho_precomp(arb_mat_t X, const arb_mat_t L, const arb_mat_t B, slong prec)
 
     Solves `AX = B` given the precomputed Cholesky decomposition `A = L L^T`.
+    The factor *L* is assumed to be a valid Cholesky factor, as produced by
+    :func:`arb_mat_cho`, and is not re-checked.
     The matrices *X* and *B* are allowed to be aliased with each other,
     but *X* is not allowed to be aliased with *L*.
 
@@ -614,7 +626,7 @@ Cholesky decomposition and solving
 
     Sets `X = A^{-1}` where `A` is a symmetric positive definite matrix
     whose Cholesky decomposition *L* has been computed with
-    :func:`arb_mat_cho`.
+    :func:`arb_mat_cho`, which is assumed and not re-checked.
     The inverse is calculated using the method of [Kri2013]_ which is more
     efficient than solving `AX = I` with :func:`arb_mat_solve_cho_precomp`.
 
@@ -659,14 +671,16 @@ Cholesky decomposition and solving
 .. function:: void arb_mat_solve_ldl_precomp(arb_mat_t X, const arb_mat_t L, const arb_mat_t B, slong prec)
 
     Solves `AX = B` given the precomputed `A = LDL^T` decomposition
-    encoded by *L*.  The matrices *X* and *B* are allowed to be aliased
+    encoded by *L*.  The factor *L* is assumed to be a valid LDL factor,
+    as produced by :func:`arb_mat_ldl`, and is not re-checked.
+    The matrices *X* and *B* are allowed to be aliased
     with each other, but *X* is not allowed to be aliased with *L*.
 
 .. function:: void arb_mat_inv_ldl_precomp(arb_mat_t X, const arb_mat_t L, slong prec)
 
     Sets `X = A^{-1}` where `A` is a symmetric positive definite matrix
     whose `LDL^T` decomposition encoded by *L* has been computed with
-    :func:`arb_mat_ldl`.
+    :func:`arb_mat_ldl`, which is assumed and not re-checked.
     The inverse is calculated using the method of [Kri2013]_ which is more
     efficient than solving `AX = I` with :func:`arb_mat_solve_ldl_precomp`.
 
@@ -792,8 +806,10 @@ LLL reduction
 
 .. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, double delta, double eta, slong prec)
 
-    Given a symmetric positive definite matrix *A*, returns nonzero iff *A* is
-    certainly LLL-reduced for the given LLL parameters `\eta, \delta`, meaning
+    Given a symmetric positive definite matrix *A* (only the lower triangular
+    part is read and these properties are not checked), returns nonzero iff
+    *A* is certainly LLL-reduced for the given LLL parameters `\eta, \delta`,
+    meaning
     that it satisfies the inequalities `|\mu_{j,k}|\leq \eta` and `\delta
     \lVert b_{k-1}^*\rVert^2 \leq \lVert b_k^*\rVert^2 + \mu_{k,k-1}^2 \lVert
     b_{k-1}^*\rVert^2` (with the usual notation).

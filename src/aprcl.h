@@ -15,12 +15,34 @@
 #include "limb_types.h"
 #include "fmpz_types.h"
 #include "fmpz_mod_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define SQUARING_SPACE 70
+
+/* temporary space for _unity_zp_mul_reduce, on the stack if small */
+#define UNITY_ZP_MUL_BEGIN(t, glen, hlen) \
+    fmpz stack_t[SQUARING_SPACE]; \
+    fmpz * t; \
+    slong tlen = (glen) + (hlen) - 1; \
+    if (tlen <= SQUARING_SPACE) \
+    { \
+        t = stack_t; \
+        for (i = 0; i < tlen; i++) fmpz_init(t + i); \
+    } \
+    else \
+        t = _fmpz_vec_init(tlen);
+
+#define UNITY_ZP_MUL_END(t) \
+    if (tlen <= SQUARING_SPACE) \
+    { \
+        for (i = 0; i < tlen; i++) fmpz_clear(t + i); \
+    } \
+    else \
+        _fmpz_vec_clear(t, tlen);
 
 /* Configuration struct */
 typedef struct
@@ -56,6 +78,28 @@ typedef struct
 
 typedef _unity_zp unity_zp[1];
 
+/*
+    Z[unity_root]/(n) with mpn_mod arithmetic, for moduli in range for the
+    mpn_mod module. Elements are dense coefficient vectors of length
+    d = (p - 1) * p^(exp - 1), always reduced modulo the cyclotomic
+    polynomial Phi_{p^exp}, with each coefficient a reduced mpn_mod
+    residue. The context pointer is borrowed, not owned.
+*/
+typedef struct
+{
+    nn_ptr coeffs;
+    ulong p;
+    ulong exp;
+    ulong pk;               /* p^exp */
+    ulong pk1;              /* p^(exp - 1) */
+    ulong d;                /* (p - 1) * p^(exp - 1) */
+    gr_ctx_struct * ctx;    /* mpn_mod context (borrowed) */
+    slong slimbs;           /* limbs of the unreduced product coefficients */
+    int use_karatsuba;      /* whether _flint_mpn_poly_mulmid uses Karatsuba for d x d */
+} _unity_zp_mpn;
+
+typedef _unity_zp_mpn unity_zp_mpn[1];
+
 /* Primality test status */
 typedef enum
 {
@@ -85,6 +129,7 @@ void aprcl_config_gauss_clear(aprcl_config conf);
 /* Jacobi test configuration */
 ulong aprcl_R_value(const fmpz_t n);
 void aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n);
+void aprcl_config_jacobi_init_R(aprcl_config conf, const fmpz_t n, ulong R);
 void aprcl_config_jacobi_clear(aprcl_config conf);
 
 /*  Gauss sums primality test */
@@ -109,6 +154,35 @@ slong _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v,
 slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v);
 
 int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
+
+/* mpn_mod based versions of the Jacobi sum checks; return 1 and set *h if
+   the modulus is in range for mpn_mod, otherwise return 0 */
+int _aprcl_is_prime_jacobi_check_pk_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v);
+int _aprcl_is_prime_jacobi_check_22_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v, ulong q);
+int _aprcl_is_prime_jacobi_check_2k_mpn(slong * h, const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v);
+
+/* Z[unity_root]/(n) mpn_mod operations **************************************/
+
+void unity_zp_mpn_init(unity_zp_mpn f, ulong p, ulong exp, gr_ctx_t ctx);
+void unity_zp_mpn_clear(unity_zp_mpn f);
+
+void unity_zp_mpn_set_zero(unity_zp_mpn f);
+void unity_zp_mpn_swap(unity_zp_mpn f, unity_zp_mpn g);
+void unity_zp_mpn_copy(unity_zp_mpn f, const unity_zp_mpn g);
+
+void unity_zp_mpn_coeff_set_ui(unity_zp_mpn f, ulong ind, ulong x);
+void unity_zp_mpn_set_unity_zp(unity_zp_mpn f, const unity_zp g);
+
+void unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h);
+void unity_zp_mpn_sqr(unity_zp_mpn f, const unity_zp_mpn g);
+void unity_zp_mpn_mul_scalar_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong s);
+
+void unity_zp_mpn_pow_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong pow);
+void unity_zp_mpn_pow_sliding_fmpz(unity_zp_mpn f, const unity_zp_mpn g, const fmpz_t pow);
+
+void unity_zp_mpn_aut_inv(unity_zp_mpn f, const unity_zp_mpn g, ulong x);
+
+slong unity_zp_mpn_is_unity(const unity_zp_mpn f);
 
 /* Final division function */
 int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
@@ -151,32 +225,15 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_sqr(unity_zp f, const unity_zp g);
 
 /* Special multiplication and squaring */
+void _unity_zp_mul_reduce(unity_zp f, const unity_zp g, const unity_zp h, fmpz * t);
+int _unity_zp_mul_special(unity_zp f, const unity_zp g, const unity_zp h, fmpz * t);
+int _unity_zp_sqr_special(unity_zp f, const unity_zp g, fmpz * t);
 void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
 
 void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
 
-void unity_zp_ar1(fmpz_t * t);
-void unity_zp_ar2(fmpz_t * t);
-void unity_zp_ar3(fmpz_t * t);
-void unity_zp_ar4(fmpz_t * t);
 
-void unity_zp_mul3(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul4(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul5(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul7(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul8(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
-void unity_zp_mul16(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t);
 
-void unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t);
 
 /* Powering functions */
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);

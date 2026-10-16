@@ -20,6 +20,7 @@ TEST_FUNCTION_START(fmpq_mat_inv, state)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         fmpq_mat_t A, B, C;
         fmpq_t d;
 
@@ -76,6 +77,7 @@ TEST_FUNCTION_START(fmpq_mat_inv, state)
     /* Test aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         fmpq_mat_t A, B;
         fmpq_t d;
 
@@ -119,6 +121,7 @@ TEST_FUNCTION_START(fmpq_mat_inv, state)
     /* Test singular matrices */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         slong n, r, b, d;
         fmpq_mat_t A, B;
         fmpz_mat_t M;
@@ -164,6 +167,8 @@ TEST_FUNCTION_START(fmpq_mat_inv, state)
 
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

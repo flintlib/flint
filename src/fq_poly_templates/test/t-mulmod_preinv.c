@@ -315,6 +315,76 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
+    /* Unreduced inputs at the underscore level: len1 or len2 may be
+       >= lenf as long as len1 + len2 - 1 <= 2 * lenf - 2 */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, poly_t) a, b, f, finv, res1, res2, t;
+        TEMPLATE(T, ctx_t) ctx;
+        slong lenf, len1, len2;
+
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (f, ctx);
+        TEMPLATE(T, poly_init) (finv, ctx);
+        TEMPLATE(T, poly_init) (res1, ctx);
+        TEMPLATE(T, poly_init) (res2, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+
+        lenf = 2 + n_randint(state, 30);
+        TEMPLATE(T, poly_randtest_monic) (f, state, lenf, ctx);
+
+        len1 = 1 + n_randint(state, 2 * lenf - 2);
+        len2 = 1 + n_randint(state, 2 * lenf - 1 - len1);
+
+        TEMPLATE(T, poly_randtest_not_zero) (a, state, len1, ctx);
+        TEMPLATE(T, poly_randtest_not_zero) (b, state, len2, ctx);
+        len1 = a->length;
+        len2 = b->length;
+
+        TEMPLATE(T, poly_reverse) (finv, f, lenf, ctx);
+        TEMPLATE(T, poly_inv_series_newton) (finv, finv, lenf, ctx);
+
+        TEMPLATE(T, poly_fit_length) (res1, FLINT_MAX(lenf - 1, len1 + len2 - 1), ctx);
+        _TEMPLATE(T, poly_mulmod_preinv) (res1->coeffs, a->coeffs, len1,
+                        b->coeffs, len2, f->coeffs, lenf, finv->coeffs,
+                        finv->length, ctx);
+        _TEMPLATE(T, poly_set_length) (res1, lenf - 1, ctx);
+        _TEMPLATE(T, poly_normalise) (res1, ctx);
+
+        TEMPLATE(T, poly_mul) (res2, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (t, res2, res2, f, ctx);
+
+        result = (TEMPLATE(T, poly_equal) (res1, res2, ctx));
+        if (!result)
+        {
+            flint_printf("FAIL (unreduced inputs):\n");
+            flint_printf("a:\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n");
+            TEMPLATE(T, poly_print) (f, ctx), flint_printf("\n\n");
+            flint_printf("res1:\n");
+            TEMPLATE(T, poly_print) (res1, ctx), flint_printf("\n\n");
+            flint_printf("res2:\n");
+            TEMPLATE(T, poly_print) (res2, ctx), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (f, ctx);
+        TEMPLATE(T, poly_clear) (finv, ctx);
+        TEMPLATE(T, poly_clear) (res1, ctx);
+        TEMPLATE(T, poly_clear) (res2, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }
 #endif

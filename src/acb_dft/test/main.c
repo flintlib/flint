@@ -11,14 +11,14 @@
 
 /* Include functions *********************************************************/
 
-#include "t-convol.c"
+#include "t-accuracy.c"
 #include "t-dft.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(acb_dft_convol),
+    TEST_FUNCTION(acb_dft_accuracy),
     TEST_FUNCTION(acb_dft)
 };
 

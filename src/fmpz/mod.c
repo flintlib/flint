@@ -10,7 +10,9 @@
 */
 
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
+#include "div_small.h"
 
 void
 fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
@@ -51,6 +53,8 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            if (_fmpz_div_qr_small_divisor(NULL, f, g, c2, (c2 > 0) ? -1 : 1))
+                return;
             if (c2 < WORD(0))
                 fmpz_set_si(f, flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), -c2));
             else
@@ -58,16 +62,9 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both are large */
         {
-            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
-            {
-                _fmpz_mod_newton(f, g, h);
-            }
-            else
-            {
-                mpz_ptr mf = _fmpz_promote(f);
-                mpz_mod(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-                _fmpz_demote_val(f);    /* reduction mod h may result in small value */
-            }
+            mpz_ptr mf = _fmpz_promote(f);
+            flint_mpz_mod(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            _fmpz_demote_val(f);    /* reduction mod h may result in small value */
         }
     }
 }

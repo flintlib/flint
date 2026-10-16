@@ -28,7 +28,7 @@ TEST_FUNCTION_START(gr_poly_evaluate_vec_fast, state)
         gr_vec_t x, y, z;
         slong n, m;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         if (ctx->methods == _ca_methods)
         {

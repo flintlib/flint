@@ -14,32 +14,23 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
                            const TEMPLATE(T, poly_t) input, ulong deflation,
                            const TEMPLATE(T, ctx_t) ctx)
 {
-    slong res_length, i;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
     if (deflation == 0)
     {
         flint_throw(FLINT_DIVZERO, "(%s): Division by zero\n", __func__);
     }
 
-    if (input->length <= 1 || deflation == 1)
-    {
-        TEMPLATE(T, poly_set) (result, input, ctx);
-        return;
-    }
-
-    res_length = (input->length - 1) / deflation + 1;
-    TEMPLATE(T, poly_fit_length) (result, res_length, ctx);
-    for (i = 0; i < res_length; i++)
-        TEMPLATE(T, set) (result->coeffs + i, input->coeffs + (i * deflation),
-                          ctx);
-
-    result->length = res_length;
+    GR_MUST_SUCCEED(gr_poly_deflate((gr_poly_struct *) result,
+                        (const gr_poly_struct *) input, deflation, gr_ctx));
 }
 
 

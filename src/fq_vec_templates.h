@@ -84,21 +84,36 @@ void _TEMPLATE(T, vec_sub)(TEMPLATE(T, struct) * res,
                            slong len2,
                            const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T))(TEMPLATE(T, struct) * poly1,
-                                             const TEMPLATE(T, struct) * poly2,
+void _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T))(TEMPLATE(T, struct) * vec1,
+                                             const TEMPLATE(T, struct) * vec2,
                                              slong len2,
                                              const TEMPLATE(T, t) x,
                                              const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T))(TEMPLATE(T, struct) * poly1,
-                                             const TEMPLATE(T, struct) * poly2,
+void _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T))(TEMPLATE(T, struct) * vec1,
+                                             const TEMPLATE(T, struct) * vec2,
                                              slong len2,
                                              const TEMPLATE(T, t) x,
                                              const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * poly1,
-                                  const TEMPLATE(T, struct) * poly2,
+void _TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
                                   slong len2, const TEMPLATE(T, t) x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+void _TEMPLATE(T, vec_scalar_mul_fmpz) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const fmpz_t x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+void _TEMPLATE(T, vec_scalar_mul_si) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const slong x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+void _TEMPLATE(T, vec_scalar_mul_ui) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const ulong x,
                                   const TEMPLATE(T, ctx_t) ctx);
 
 /* ****************************************************************************/

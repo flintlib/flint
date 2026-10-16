@@ -35,6 +35,23 @@ Domain properties
     mathematical property.
     The result can be ``T_UNKNOWN``.
 
+.. function:: truth_t gr_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+
+    Returns whether the structure `\tilde R` implemented by ``ctx`` is assumed
+    to represent an approximate version of a structure `R` with the
+    respective mathematical property.
+    The usual axioms need not hold exactly as long as they hold
+    within a small perturbation, i.e. an axiom of the type `a = b` in `R` is
+    replaced by an axiom of the type
+    `|\tilde a - \tilde b| < \varepsilon` in `\tilde R`.
+    For example, polynomials with floating-point coefficients are
+    considered an approximate commutative ring, but two by two matrices
+    with floating-point coefficients are not.
+
+    The exact structure is trivially considered an approximate version of
+    itself; for example, every commutative ring is considered to be an
+    approximate commutative ring.
+
 .. function:: truth_t gr_ctx_is_exact(gr_ctx_t ctx)
 
     Returns whether the representation of elements is always exact.
@@ -109,6 +126,9 @@ Basic rings and fields
 -------------------------------------------------------------------------------
 
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
     only generate base rings and composite rings over certain
@@ -139,6 +159,36 @@ Residue rings and finite fields
     the modulus is prime. This can speed up some computations and
     enable some functions to complete that otherwise would
     return ``GR_UNABLE``.
+
+.. function:: truth_t gr_ctx_is_pretend_field(gr_ctx_t ctx)
+              int gr_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+              int gr_ctx_recover_zero_divisor(gr_ptr res, gr_ctx_t ctx)
+
+    A ring may *pretend* to be a field without being known to be one,
+    in the style of dynamic evaluation: computations proceed as if
+    it were a field, and an operation which encounters a nonzero
+    element that is not invertible fails with ``GR_UNABLE`` (not
+    ``GR_DOMAIN``, which keeps its meaning in a field: for example,
+    division by zero) after recording a zero divisor in the context.
+    The zero divisor can then be retrieved with
+    :func:`gr_ctx_recover_zero_divisor`, which returns ``GR_UNABLE``
+    if none has been recorded. For `\mathbb{Z}/n\mathbb{Z}`, the zero
+    divisor is a nontrivial factor of `n` (the first one found). A
+    typical use is to attempt a computation as if `n` were prime and to
+    split `n` when this fails.
+
+    :func:`gr_ctx_is_pretend_field` returns ``T_TRUE`` if the ring is
+    a field or pretends to be one; :func:`gr_ctx_is_field` is not
+    affected by the pretense. Algorithms for fields which
+    propagate the failure of an inversion (the Euclidean and half-gcd
+    algorithms for polynomial gcds, LU decomposition, ...) check
+    :func:`gr_ctx_is_pretend_field`; algorithms whose correctness
+    depends on the ring being a field (root finding and factorization,
+    for example) check :func:`gr_ctx_is_field`. Setting the pretense
+    to ``T_FALSE`` forgets any recorded zero divisor.
+
+    Supported by :func:`gr_ctx_init_nmod`, :func:`gr_ctx_init_fmpz_mod`
+    and :func:`gr_ctx_init_mpn_mod`. The recording is thread-safe.
 
 See:
 
@@ -228,6 +278,21 @@ Real and complex numbers
 
     Sets or retrieves options of a Calcium context object.
 
+.. function:: void gr_ctx_init_gr_complex(gr_ctx_t ctx, gr_ctx_t real_ctx)
+
+    Initializes *ctx* to a generic implementation of the complex algebra `R[i]`
+    where `R` is represented by *real_ctx*.
+    Elements `a + bi` are represented as pairs `(a, b)` of elements of `R`
+    stored contiguously in memory.
+
+    Typically `R` will be an implementation of the real numbers or a subring
+    of the real numbers in which case this creates the complex numbers or
+    a subring of the complex numbers. This construction
+    also makes sense e.g. over real vector spaces and even general rings
+    (where `i` will just be a formal element satisfying `i^2 = -1`),
+    but in that case operations beyond basic arithmetic (e.g. absolute value)
+    may not make sense.
+
 Extended number sets
 -------------------------------------------------------------------------------
 
@@ -316,12 +381,23 @@ Polynomial rings
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
+.. function:: void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random univariate polynomial ring.
+
 .. function:: void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
     polynomials in *nvars* variables over the integers,
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_struct`.
+
+.. function:: void gr_ctx_init_fmpq_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    polynomials in *nvars* variables over the rationals,
+    with monomial ordering *ord*.
+    Elements have type :type:`fmpq_mpoly_struct`.
 
 .. function:: void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 
@@ -330,11 +406,105 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
 
+.. function:: void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random multivariate polynomial ring.
+
+Ore polynomials
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_ore_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
+
+    Initializes *ctx* to a ring of densely represented Ore polynomials over the
+    given *base_ring*, with the choice of Ore algebra structure given by
+    *which_algebra*. The Ore algebra structure may refer to a distinguished
+    generator of *base_ring*; this will be the generator of index *base_var*.
+    Elements have type :type:`gr_ore_poly_struct`.
+
 Power series
 -------------------------------------------------------------------------------
 
 See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
 in :ref:`gr-series`.
+
+.. function:: void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random power series ring.
+
+Quotient rings of polynomial rings
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_poly_quotient(gr_ctx_t ctx, gr_ctx_t base, const gr_poly_t modulus)
+
+    Initializes *ctx* to the quotient ring `F[x] / (m)` where *F* is
+    the commutative ring *base* and *m* is the monic polynomial *modulus*.
+    Elements are represented as polynomials over *base*
+    (type :type:`gr_poly_struct`) reduced modulo *m*.
+    The context stores precomputed data for reduction modulo *m*
+    (a :type:`gr_poly_preinv_t`, whose representation is selected by the
+    method ``GR_METHOD_POLY_PREINV_SET`` of the base ring), which is used
+    for multiplication and for powers (modular exponentiation).
+
+    If *F* is a field and *m* is irreducible, the quotient ring is a field,
+    but this is not assumed by default: :func:`gr_ctx_is_field` returns
+    ``T_UNKNOWN`` unless the user declares *m* irreducible with
+    :func:`gr_ctx_set_is_field` (it then returns ``T_TRUE`` if *F*
+    is known to be a field).
+
+    The ring can also be told to pretend to be a field with
+    :func:`gr_ctx_set_is_pretend_field` even if *m* is only
+    conjecturally irreducible (*dynamic evaluation*), provided that
+    *F* is a field or pretends to be one.
+    All operations remain correct as ring operations, and an inversion
+    of a zero divisor fails with ``GR_UNABLE`` while recording a
+    nontrivial monic factor of *m* in a table in the context.
+    The first recorded factor can be retrieved as an element with
+    :func:`gr_ctx_recover_zero_divisor`, and the whole table with
+    the functions below, from which the user can recover a refined
+    modulus. A failure in a base ring that pretends to be a field
+    propagates as ``GR_UNABLE`` as well; the zero divisor is then
+    recorded in that ring.
+    A modulus which is known to be reducible can also be used without
+    the pretense, in which case the context represents a genuine
+    (non-integral) quotient ring in which zero divisors are simply
+    not invertible (``GR_DOMAIN``).
+
+.. function:: const gr_poly_struct * gr_poly_quotient_ctx_modulus(gr_ctx_t ctx)
+              gr_ctx_struct * gr_poly_quotient_ctx_base(gr_ctx_t ctx)
+              slong gr_poly_quotient_ctx_degree(gr_ctx_t ctx)
+
+    Accessors for the modulus, the base ring and the degree of the modulus.
+
+.. function:: int gr_poly_quotient_ctx_refine(gr_ctx_t ctx, const gr_poly_t new_modulus)
+
+    Replaces the modulus by *new_modulus*, which must be a monic polynomial
+    of positive degree. If it divides the current modulus (for instance,
+    a factor recovered from a zero divisor), existing elements remain valid
+    representatives of their images in the new quotient ring: they are
+    reduced on the fly by subsequent operations, so no conversion is needed.
+    The previous modulus is kept alive until the context is cleared, so
+    that a pointer obtained from :func:`gr_poly_quotient_ctx_modulus`
+    remains valid. Returns ``GR_DOMAIN`` if *new_modulus* is not monic
+    or has degree less than one.
+
+.. function:: ulong gr_poly_quotient_ctx_version(gr_ctx_t ctx)
+
+    Returns a counter which is incremented on each refinement.
+
+.. function:: slong gr_poly_quotient_ctx_num_zero_divisors(gr_ctx_t ctx)
+              const gr_poly_struct * gr_poly_quotient_ctx_zero_divisor(gr_ctx_t ctx, slong i)
+              void gr_poly_quotient_ctx_clear_zero_divisors(gr_ctx_t ctx)
+
+    Access to the table of nontrivial monic factors of the modulus
+    discovered by failed inversions while the ring pretends to be a field.
+    Recording is thread-safe, but these accessors must not be used
+    concurrently with operations that may record a new factor.
+
+.. function:: int gr_poly_quotient_get_poly(gr_poly_t res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_poly_quotient_set_poly(gr_ptr res, const gr_poly_t x, gr_ctx_t ctx)
+
+    Conversion between elements and polynomials over the base ring;
+    the output is always reduced modulo the current modulus.
 
 Fraction fields
 -------------------------------------------------------------------------------
@@ -379,6 +549,19 @@ Fraction fields
     fractions in *nvars* variables over the integers (equivalently, rationals),
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
+
+.. function:: void gr_ctx_init_fmpz_mpoly_q_factored(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    fractions in *nvars* variables over the integers (equivalently, rationals),
+    with monomial ordering *ord*, in which denominators are kept
+    fully factored. This is the same field as with
+    :func:`gr_ctx_init_fmpz_mpoly_q`, but addition and multiplication
+    avoid polynomial GCDs while division requires polynomial factorization.
+    Elements have type :type:`fmpz_mpoly_q_factored_struct`.
+    Elements can be converted to and from :func:`gr_ctx_init_fmpz_mpoly_q`
+    and :func:`gr_ctx_init_fmpz_mpoly` rings with the same number of
+    variables and monomial ordering using :func:`gr_set_other`.
 
 .. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
 

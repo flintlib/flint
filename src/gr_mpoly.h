@@ -46,6 +46,16 @@ typedef gr_mpoly_struct gr_mpoly_t[1];
 
 typedef struct
 {
+    gr_mpoly_struct * entries;
+    slong alloc;
+    slong length;
+}
+gr_mpoly_vec_struct;
+
+typedef gr_mpoly_vec_struct gr_mpoly_vec_t[1];
+
+typedef struct
+{
     gr_ctx_struct * cctx;
     mpoly_ctx_struct * mctx;
     char ** vars;
@@ -85,7 +95,7 @@ truth_t gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx);
 /* Memory management */
 
 GR_MPOLY_INLINE
-void gr_mpoly_init(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
+void gr_mpoly_init(gr_mpoly_t A, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -135,7 +145,7 @@ void gr_mpoly_fit_length_reset_bits(
 
 /* todo: when to zero out coefficients? */
 GR_MPOLY_INLINE
-void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t ctx)
+void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
     FLINT_ASSERT(mpoly_words_per_exp(A->bits, GR_MPOLY_MCTX(ctx))*newlen <= A->exps_alloc);
@@ -144,7 +154,7 @@ void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t ctx)
 }
 
 GR_MPOLY_INLINE slong
-gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
+gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return x->length;
 }
@@ -154,15 +164,43 @@ gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
 void _gr_mpoly_normalise(gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 GR_MPOLY_INLINE
-void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_mpoly_struct, *A, *B);
 }
 
 GR_MPOLY_INLINE void
-gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *poly;
+}
+
+/* Vector of gr_mpoly objects (gr_mpoly_vec_t).
+   The ctx argument refers to the multivariate polynomial ring. */
+
+void gr_mpoly_vec_init(gr_mpoly_vec_t vec, slong len, gr_mpoly_ctx_t ctx);
+void gr_mpoly_vec_clear(gr_mpoly_vec_t vec, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_vec_set(gr_mpoly_vec_t res, const gr_mpoly_vec_t src, gr_mpoly_ctx_t ctx);
+void gr_mpoly_vec_fit_length(gr_mpoly_vec_t vec, slong len, gr_mpoly_ctx_t ctx);
+void gr_mpoly_vec_set_length(gr_mpoly_vec_t vec, slong len, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_vec_append(gr_mpoly_vec_t vec, const gr_mpoly_t f, gr_mpoly_ctx_t ctx);
+
+GR_MPOLY_INLINE slong
+gr_mpoly_vec_length(const gr_mpoly_vec_t vec, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->length;
+}
+
+GR_MPOLY_INLINE gr_mpoly_struct *
+gr_mpoly_vec_entry_ptr(gr_mpoly_vec_t vec, slong i, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->entries + i;
+}
+
+GR_MPOLY_INLINE const gr_mpoly_struct *
+gr_mpoly_vec_entry_srcptr(const gr_mpoly_vec_t vec, slong i, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->entries + i;
 }
 
 WARN_UNUSED_RESULT int gr_mpoly_set(gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
@@ -256,7 +294,8 @@ WARN_UNUSED_RESULT int gr_mpoly_add(gr_mpoly_t A, const gr_mpoly_t B, const gr_m
 WARN_UNUSED_RESULT int gr_mpoly_sub(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_mul(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, gr_mpoly_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mpoly_mul_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_mul_heap(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_mul_heap_threaded(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, gr_mpoly_ctx_t ctx);
@@ -264,6 +303,41 @@ WARN_UNUSED_RESULT int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c
 WARN_UNUSED_RESULT int gr_mpoly_mul_ui(gr_mpoly_t A, const gr_mpoly_t B, ulong c, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const fmpz_t c, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_sqr(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_sqr_monomial(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_sqr_commutative_heap(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_sqr_commutative_heap_threaded(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_divides(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divides_heap(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divides_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_divexact(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divexact_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_div(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_div_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_div_weak_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal_heap_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal_weak_heap_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_quasidiv(gr_ptr scale, gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_quasidivrem(gr_ptr scale, gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_quasidivrem_heap(gr_ptr scale, gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_quasidivrem_ideal(gr_ptr scale, gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_canonical_associate(gr_mpoly_t res, gr_mpoly_t u, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx);

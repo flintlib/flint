@@ -42,13 +42,13 @@ _gr_poly_reduce_matrix_mod_poly(gr_mat_t A,
 }
 
 int
-_gr_poly_precompute_matrix(
+_gr_poly_preinv_precompute_matrix(
     gr_mat_t A,
     gr_srcptr poly1,
-    gr_srcptr poly2, slong len2,
-    gr_srcptr poly2inv, slong len2inv,
+    const gr_poly_preinv_t P,
     gr_ctx_t ctx)
 {
+    slong len2 = P->lenf;
     /* Set rows of A to powers of poly1 */
     slong i, n, m;
     int status = GR_SUCCESS;
@@ -61,10 +61,60 @@ _gr_poly_precompute_matrix(
     status |= gr_one(gr_mat_entry_ptr(A, 0, 0, ctx), ctx);
     status |= _gr_vec_set(gr_mat_entry_ptr(A, 1, 0, ctx), poly1, n, ctx);
     for (i = 2; i < m; i++)
-        status |= _gr_poly_mulmod_preinv(gr_mat_entry_ptr(A, i, 0, ctx),
+        status |= _gr_poly_preinv_mulmod(gr_mat_entry_ptr(A, i, 0, ctx),
                 gr_mat_entry_srcptr(A, (i + 1) / 2, 0, ctx), n,
-                gr_mat_entry_srcptr(A, i / 2, 0, ctx), n, poly2, len2,
-                                          poly2inv, len2inv, ctx);
+                gr_mat_entry_srcptr(A, i / 2, 0, ctx), n, P, ctx);
+
+    return status;
+}
+
+int
+_gr_poly_precompute_matrix(
+    gr_mat_t A,
+    gr_srcptr poly1,
+    gr_srcptr poly2, slong len2,
+    gr_srcptr poly2inv, slong len2inv,
+    gr_ctx_t ctx)
+{
+    gr_poly_preinv_t P;
+    _gr_poly_preinv_init_newton_shallow(P, poly2, len2, poly2inv, len2inv, ctx);
+    return _gr_poly_preinv_precompute_matrix(A, poly1, P, ctx);
+}
+
+int
+gr_poly_preinv_precompute_matrix(gr_mat_t A, const gr_poly_t poly1, const gr_poly_preinv_t P, gr_ctx_t ctx)
+{
+    slong len1 = poly1->length;
+    slong len2 = P->lenf;
+    slong len = len2 - 1;
+    slong m = n_sqrt(len) + 1;
+    gr_ptr ptr1;
+    int status = GR_SUCCESS;
+
+    if (len2 == 0)
+        return GR_DOMAIN;
+
+    if (A->r != m || A->c != len)
+        return GR_DOMAIN;
+
+    if (len2 == 1)
+        return gr_mat_zero(A, ctx);
+
+    if (len1 >= len2)
+    {
+        gr_poly_t t;
+        gr_poly_init(t, ctx);
+        status |= gr_poly_preinv_rem(t, poly1, P, ctx);
+        if (status == GR_SUCCESS)
+            status |= gr_poly_preinv_precompute_matrix(A, t, P, ctx);
+        gr_poly_clear(t, ctx);
+        return status;
+    }
+
+    GR_TMP_INIT_VEC(ptr1, len, ctx);
+    status |= _gr_vec_set(ptr1, poly1->coeffs, len1, ctx);
+    status |= _gr_poly_preinv_precompute_matrix(A, ptr1, P, ctx);
+    GR_TMP_CLEAR_VEC(ptr1, len, ctx);
 
     return status;
 }
@@ -117,16 +167,16 @@ gr_poly_precompute_matrix(gr_mat_t A,
 }
 
 int
-_gr_poly_compose_mod_brent_kung_precomp_preinv(
+_gr_poly_preinv_compose_mod_brent_kung_precomp(
     gr_ptr res,
     gr_srcptr poly1, slong len1,
     const gr_mat_t A,
-    gr_srcptr poly3, slong len3,
-    gr_srcptr poly3inv, slong len3inv,
+    const gr_poly_preinv_t P,
     gr_ctx_t ctx)
 {
+    slong len3 = P->lenf;
     gr_mat_t B, C;
-    gr_ptr t, h;
+    gr_ptr h;
     slong i, n, m;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
@@ -153,8 +203,7 @@ _gr_poly_compose_mod_brent_kung_precomp_preinv(
     gr_mat_init(B, m, m, ctx);
     gr_mat_init(C, m, n, ctx);
 
-    GR_TMP_INIT_VEC(h, 2 * n, ctx);
-    t = GR_ENTRY(h, n, sz);
+    GR_TMP_INIT_VEC(h, n, ctx);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
@@ -164,23 +213,74 @@ _gr_poly_compose_mod_brent_kung_precomp_preinv(
 
     status |= gr_mat_mul(C, B, A, ctx);
 
-    /* Evaluate block composition using the Horner scheme */
-    status |= _gr_vec_set(res, gr_mat_entry_srcptr(C, m - 1, 0, ctx), n, ctx);
-    status |= _gr_poly_mulmod_preinv(h, gr_mat_entry_srcptr(A, m - 1, 0, ctx), n,
-                                        gr_mat_entry_srcptr(A, 1, 0, ctx), n,
-                                      poly3, len3, poly3inv, len3inv, ctx);
+    /* Evaluate block composition */
+    status |= _gr_poly_preinv_mulmod(h, gr_mat_entry_srcptr(A, m / 2, 0, ctx), n,
+                                        gr_mat_entry_srcptr(A, m - (m / 2), 0, ctx), n, P, ctx);
+    status |= _gr_poly_preinv_mod_matrix_rows_evaluate(res, C, h, n, P, ctx);
 
-    for (i = m - 2; i >= 0; i--)
-    {
-        status |= _gr_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
-                                          poly3inv, len3inv, ctx);
-        status |= _gr_poly_add(res, t, n, gr_mat_entry_srcptr(C, i, 0, ctx), n, ctx);
-    }
-
-    GR_TMP_CLEAR_VEC(h, 2 * n, ctx);
+    GR_TMP_CLEAR_VEC(h, n, ctx);
 
     gr_mat_clear(B, ctx);
     gr_mat_clear(C, ctx);
+
+    return status;
+}
+
+int
+_gr_poly_compose_mod_brent_kung_precomp_preinv(
+    gr_ptr res,
+    gr_srcptr poly1, slong len1,
+    const gr_mat_t A,
+    gr_srcptr poly3, slong len3,
+    gr_srcptr poly3inv, slong len3inv,
+    gr_ctx_t ctx)
+{
+    gr_poly_preinv_t P;
+    _gr_poly_preinv_init_newton_shallow(P, poly3, len3, poly3inv, len3inv, ctx);
+    return _gr_poly_preinv_compose_mod_brent_kung_precomp(res, poly1, len1, A, P, ctx);
+}
+
+int
+gr_poly_preinv_compose_mod_brent_kung_precomp(gr_poly_t res, const gr_poly_t poly1, const gr_mat_t A, const gr_poly_preinv_t P, gr_ctx_t ctx)
+{
+    slong len1 = poly1->length;
+    slong len3 = P->lenf;
+    slong len = len3 - 1;
+    int status = GR_SUCCESS;
+
+    if (len3 == 0)
+        return GR_DOMAIN;
+
+    if (len1 >= len3)
+    {
+        gr_poly_t t;
+        gr_poly_init(t, ctx);
+        status |= gr_poly_preinv_rem(t, poly1, P, ctx);
+        if (status == GR_SUCCESS)
+            status |= gr_poly_preinv_compose_mod_brent_kung_precomp(res, t, A, P, ctx);
+        gr_poly_clear(t, ctx);
+        return status;
+    }
+
+    if (len1 == 0 || len3 == 1)
+        return gr_poly_zero(res, ctx);
+
+    if (len1 == 1)
+        return gr_poly_set(res, poly1, ctx);
+
+    if (res == poly1)
+    {
+        gr_poly_t t;
+        gr_poly_init(t, ctx);
+        status |= gr_poly_preinv_compose_mod_brent_kung_precomp(t, poly1, A, P, ctx);
+        gr_poly_swap(res, t, ctx);
+        gr_poly_clear(t, ctx);
+        return status;
+    }
+
+    gr_poly_fit_length(res, len, ctx);
+    status |= _gr_poly_preinv_compose_mod_brent_kung_precomp(res->coeffs, poly1->coeffs, len1, A, P, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
 
     return status;
 }
@@ -228,7 +328,6 @@ gr_poly_compose_mod_brent_kung_precomp_preinv(
                                                               poly3inv->coeffs,
                                                               poly3inv->length,
                                                               ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }

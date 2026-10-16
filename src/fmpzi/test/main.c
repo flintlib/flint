@@ -12,6 +12,8 @@
 /* Include functions *********************************************************/
 
 #include "t-add_sub.c"
+#include "t-poly_mulmid_classical_fft_small.c"
+#include "t-poly_mulmid.c"
 #include "t-divexact.c"
 #include "t-divrem_approx.c"
 #include "t-divrem.c"
@@ -31,6 +33,8 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(fmpzi_add_sub),
+    TEST_FUNCTION(fmpzi_poly_mulmid_classical_fft_small),
+    TEST_FUNCTION(fmpzi_poly_mulmid),
     TEST_FUNCTION(fmpzi_divexact),
     TEST_FUNCTION(fmpzi_divrem_approx),
     TEST_FUNCTION(fmpzi_divrem),

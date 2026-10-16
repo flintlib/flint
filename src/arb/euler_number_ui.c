@@ -470,7 +470,7 @@ arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
 #endif
 
     fmpz_init(M);
-    _arb_tree_crt(num, M, residues, primes, num_primes);
+    fmpz_multi_CRT_ui_once(num, M, residues, primes, num_primes, 0);
     fmpz_mod(num, num, M);
 
     if (n % 4 == 2)

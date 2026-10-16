@@ -14,47 +14,98 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
+/* Todo: merge code with _nmod_poly_divrem_try_sparse */
+
 void _fq_nmod_sparse_reduce(ulong *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     slong i, k;
+    ulong c, cbound;
     const slong d = ctx->j[ctx->len - 1];
+    nmod_t mod = ctx->mod;
+
+    cbound = 0;
+    for (i = 0; i < ctx->len - 1; i++)
+        cbound |= ctx->a[i];
 
     NMOD_VEC_NORM(R, lenR);
 
-    for (i = lenR - 1; i >= d; i--)
+    if (ctx->mod.n == 2)
     {
-        for (k = ctx->len - 2; k >= 0; k--)
+        for (i = lenR - 1; i >= d; i--)
         {
-            /* TODO clean this mess up */
-            R[ctx->j[k] + i - d] = n_submod(R[ctx->j[k] + i - d],
-                                            n_mulmod2_preinv(R[i], ctx->a[k], ctx->mod.n, ctx->mod.ninv),
-                                            ctx->mod.n);
+            c = R[i];
+
+            for (k = ctx->len - 2; k >= 0; k--)
+            {
+                R[ctx->j[k] + i - d] ^= c;
+            }
+            R[i] = 0;
         }
-        R[i] = UWORD(0);
+    }
+    else if (cbound == 1)
+    {
+        for (i = lenR - 1; i >= d; i--)
+        {
+            c = R[i];
+
+            for (k = ctx->len - 2; k >= 0; k--)
+            {
+                R[ctx->j[k] + i - d] = nmod_sub(R[ctx->j[k] + i - d], c, mod);
+            }
+            R[i] = 0;
+        }
+    }
+    else if (lenR > d + 2 && NMOD_BITS(mod) < FLINT_BITS / 2)
+    {
+        ulong ninv = n_barrett_precomp(mod.n);
+
+        for (i = lenR - 1; i >= d; i--)
+        {
+            for (k = ctx->len - 2; k >= 0; k--)
+            {
+                R[ctx->j[k] + i - d] = n_mod_barrett(R[ctx->j[k] + i - d]
+                    + R[i] * (mod.n - ctx->a[k]), mod.n, ninv);
+            }
+            R[i] = 0;
+        }
+    }
+    else
+    {
+        for (i = lenR - 1; i >= d; i--)
+        {
+            for (k = ctx->len - 2; k >= 0; k--)
+            {
+                R[ctx->j[k] + i - d] = nmod_addmul(R[ctx->j[k] + i - d], R[i], mod.n - ctx->a[k], ctx->mod);
+            }
+            R[i] = 0;
+        }
     }
 }
 
 void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     ulong  *q, *r;
+    slong lenq, lenr;
 
     if (lenR < ctx->modulus->length)
-    {
-        _nmod_vec_reduce(R, R, lenR, ctx->mod);
         return;
-    }
 
-    q = _nmod_vec_init(lenR - ctx->modulus->length + 1);
-    r = _nmod_vec_init(ctx->modulus->length - 1);
+    TMP_INIT;
+    TMP_START;
+
+    lenq = (lenR - ctx->modulus->length + 1);
+    lenr = ctx->modulus->length - 1;
+    q = TMP_ALLOC((lenq + lenr) * sizeof(ulong));
+    r = q + lenq;
 
     _nmod_poly_divrem_newton_n_preinv(q, r, R, lenR,
                                       ctx->modulus->coeffs, ctx->modulus->length,
                                       ctx->inv->coeffs, ctx->inv->length,
                                       ctx->mod);
 
-    _nmod_vec_set(R, r, ctx->modulus->length - 1);
-    _nmod_vec_clear(q);
-    _nmod_vec_clear(r);
+    _nmod_vec_set(R, r, lenr);
+
+    TMP_END;
 
 }
 
@@ -73,3 +124,4 @@ void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
     rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
     _nmod_poly_normalise(rop);
 }
+

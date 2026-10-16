@@ -16,6 +16,11 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
+#include "thread_pool.h"
+#include "thread_support.h"
+#if FLINT_USES_PTHREAD
+#include <pthread.h>
+#endif
 
 static
 ulong n_ecm_primorial[] =
@@ -43,6 +48,103 @@ ulong n_ecm_primorial[] =
 #define num_n_ecm_primorials 9
 #endif
 
+/*
+   One worker tries a strided subset of the curves: curve indices
+   start, start + stride, start + 2*stride, ....  All curves are
+   independent, so this parallelises with near-linear speedup until a
+   factor is found.  Shared state (n, prime_array, GCD_table, prime_table,
+   the precomputed sigmas) is read-only; each worker has its own scratch
+   (its own ecm_s buffers and gcd output buffer `fac`).  The first worker
+   to find a factor sets `found`; the others stop after their current curve.
+*/
+typedef struct
+{
+    /* shared, read-only */
+    nn_srcptr n;
+    const ulong * prime_array;
+    nn_srcptr mpsig_all;        /* curves * n_size precomputed sigmas */
+    ulong num, B1, B2, P;
+    ulong curves, n_size;
+    ulong start, stride;
+
+    /* private scratch */
+    ecm_s * ecm;                /* own buffers; tables/ninv/one aliased/copied */
+    nn_ptr fac;                 /* own gcd output buffer (n_size limbs) */
+
+    /* shared result + synchronisation */
+#if FLINT_USES_PTHREAD
+    pthread_mutex_t * mutex;
+#endif
+    volatile int * found;
+    volatile ulong * found_curve;
+    nn_ptr result;              /* winning gcd (n_size limbs, normalised) */
+    slong * result_size;
+    int * result_ret;
+}
+_ecm_worker_arg;
+
+static void
+_ecm_worker(void * varg)
+{
+    _ecm_worker_arg * a = (_ecm_worker_arg *) varg;
+    ulong j;
+
+    for (j = a->start; j < a->curves; j += a->stride)
+    {
+        int gcdlimbs, stage_code = 0;
+        nn_srcptr sig;
+
+        if (*a->found)              /* another curve already succeeded */
+            break;
+
+        sig = a->mpsig_all + j * a->n_size;
+
+        gcdlimbs = fmpz_factor_ecm_select_curve(a->fac, (nn_ptr) sig,
+                                                (nn_ptr) a->n, a->ecm);
+
+        if (gcdlimbs == -1)         /* degenerate curve: skip (cf. serial guard) */
+            continue;
+        else if (gcdlimbs > 0)
+            stage_code = -1;        /* factor found while selecting curve */
+        else
+        {
+            gcdlimbs = fmpz_factor_ecm_stage_I(a->fac, a->prime_array,
+                                       a->num, a->B1, (nn_ptr) a->n, a->ecm);
+            if (gcdlimbs > 0)
+                stage_code = 1;     /* factor found in stage I */
+            else
+            {
+                gcdlimbs = fmpz_factor_ecm_stage_II(a->fac, a->B1, a->B2,
+                                       a->P, (nn_ptr) a->n, a->ecm);
+                if (gcdlimbs > 0)
+                    stage_code = 2; /* factor found in stage II */
+            }
+        }
+
+        if (stage_code != 0)
+        {
+#if FLINT_USES_PTHREAD
+            if (a->mutex != NULL)
+                pthread_mutex_lock(a->mutex);
+#endif
+            /* keep the lowest-index winning curve for reproducibility */
+            if (!*a->found || j < *a->found_curve)
+            {
+                flint_mpn_copyi(a->result, a->fac, gcdlimbs);
+                *a->result_size = gcdlimbs;
+                *a->result_ret = stage_code;
+                *a->found_curve = j;
+                *a->found = 1;
+            }
+#if FLINT_USES_PTHREAD
+            if (a->mutex != NULL)
+                pthread_mutex_unlock(a->mutex);
+#endif
+            break;
+        }
+    }
+}
+
 int
 fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
                 flint_rand_t state, const fmpz_t n_in)
@@ -53,7 +155,7 @@ fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
     int ret;
     ecm_t ecm_inf;
     mpz_ptr fac, mptr;
-    nn_ptr n, mpsig;
+    nn_ptr n;
 
     TMP_INIT;
 
@@ -72,7 +174,6 @@ fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
     TMP_START;
 
     n      = TMP_ALLOC(n_size * sizeof(ulong));
-    mpsig  = TMP_ALLOC(n_size * sizeof(ulong));
 
     if ((!COEFF_IS_MPZ(* n_in)))
     {
@@ -178,96 +279,151 @@ fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
 
     /****************************** TRY "CURVES" *****************************/
 
-    for (j = 0; j < curves; j++)
+    /* All curves are independent, so distribute them across the thread pool. */
     {
-        fmpz_randm(sig, state, nm8);
-        fmpz_add_ui(sig, sig, 7);
+        thread_pool_handle * handles;
+        slong num_handles, nworkers, w;
+        ulong jj;
+        nn_ptr mpsig_all, result;
+        ecm_s * worker_ecm;
+        nn_ptr * worker_fac;
+        _ecm_worker_arg * args;
+        volatile int found = 0;
+        volatile ulong found_curve = 0;
+        slong result_size = 0;
+        int result_ret = 0;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_t mutex;
+#endif
 
-        mpn_zero(mpsig, ecm_inf->n_size);
+        mpsig_all = flint_calloc(FLINT_MAX(curves, 1) * (ulong) ecm_inf->n_size,
+                                 sizeof(ulong));
 
-        if ((!COEFF_IS_MPZ(*sig)))
+        for (jj = 0; jj < curves; jj++)
         {
-            mpsig[0] = fmpz_get_ui(sig);
-            if (ecm_inf->normbits)
+            nn_ptr mpsig = mpsig_all + jj * (ulong) ecm_inf->n_size;
+
+            fmpz_randm(sig, state, nm8);
+            fmpz_add_ui(sig, sig, 7);
+
+            if ((!COEFF_IS_MPZ(*sig)))
             {
-                cy = mpn_lshift(mpsig, mpsig, 1, ecm_inf->normbits);
-                if (cy)
-                   mpsig[1] = cy;
+                mpsig[0] = fmpz_get_ui(sig);
+                if (ecm_inf->normbits)
+                {
+                    cy = mpn_lshift(mpsig, mpsig, 1, ecm_inf->normbits);
+                    if (cy)
+                        mpsig[1] = cy;
+                }
             }
+            else
+            {
+                mptr = COEFF_TO_PTR(*sig);
+
+                if (ecm_inf->normbits)
+                {
+                    cy = mpn_lshift(mpsig, mptr->_mp_d, mptr->_mp_size, ecm_inf->normbits);
+                    if (cy)
+                        mpsig[mptr->_mp_size] = cy;
+                }
+                else
+                {
+                    flint_mpn_copyi(mpsig, mptr->_mp_d, mptr->_mp_size);
+                }
+            }
+        }
+
+        /* request threads and decide how many workers to use */
+        num_handles = flint_request_threads(&handles, flint_get_num_threads());
+        nworkers = num_handles + 1;
+        if ((ulong) nworkers > curves)
+            nworkers = (slong) curves;
+        if (nworkers < 1)
+            nworkers = 1;
+
+        result      = flint_calloc(ecm_inf->n_size, sizeof(ulong));
+        worker_ecm  = flint_malloc(nworkers * sizeof(ecm_s));
+        worker_fac  = flint_malloc(nworkers * sizeof(nn_ptr));
+        args        = flint_malloc(nworkers * sizeof(_ecm_worker_arg));
+
+#if FLINT_USES_PTHREAD
+        pthread_mutex_init(&mutex, NULL);
+#endif
+
+        for (w = 0; w < nworkers; w++)
+        {
+            /* private scratch; ninv/one copied, big tables aliased read-only */
+            fmpz_factor_ecm_init(&worker_ecm[w], ecm_inf->n_size);
+            flint_mpn_copyi(worker_ecm[w].ninv, ecm_inf->ninv, ecm_inf->n_size);
+            worker_ecm[w].one[0]      = ecm_inf->one[0];
+            worker_ecm[w].normbits    = ecm_inf->normbits;
+            worker_ecm[w].n_size      = ecm_inf->n_size;
+            worker_ecm[w].GCD_table   = ecm_inf->GCD_table;
+            worker_ecm[w].prime_table = ecm_inf->prime_table;
+
+            worker_fac[w] = flint_calloc(ecm_inf->n_size, sizeof(ulong));
+
+            args[w].n           = n;
+            args[w].prime_array = prime_array;
+            args[w].mpsig_all   = mpsig_all;
+            args[w].num         = num;
+            args[w].B1          = B1;
+            args[w].B2          = B2;
+            args[w].P           = P;
+            args[w].curves      = curves;
+            args[w].n_size      = ecm_inf->n_size;
+            args[w].start       = (ulong) w;
+            args[w].stride      = (ulong) nworkers;
+            args[w].ecm         = &worker_ecm[w];
+            args[w].fac         = worker_fac[w];
+#if FLINT_USES_PTHREAD
+            args[w].mutex       = (nworkers > 1) ? &mutex : NULL;
+#endif
+            args[w].found       = &found;
+            args[w].found_curve = &found_curve;
+            args[w].result      = result;
+            args[w].result_size = &result_size;
+            args[w].result_ret  = &result_ret;
+        }
+
+        for (w = 0; w < nworkers - 1; w++)
+            thread_pool_wake(global_thread_pool, handles[w], 0,
+                             _ecm_worker, &args[w]);
+
+        _ecm_worker(&args[nworkers - 1]);
+
+        for (w = 0; w < nworkers - 1; w++)
+            thread_pool_wait(global_thread_pool, handles[w]);
+
+        /* combine: write the winning factor into f, denormalising */
+        if (found)
+        {
+            flint_mpn_copyi(fac->_mp_d, result, result_size);
+            if (ecm_inf->normbits)
+                mpn_rshift(fac->_mp_d, fac->_mp_d, result_size, ecm_inf->normbits);
+            MPN_NORM(fac->_mp_d, result_size);
+            fac->_mp_size = result_size;
+            _fmpz_demote_val(f);
+            ret = result_ret;
         }
         else
+            ret = 0;
+
+        for (w = 0; w < nworkers; w++)
         {
-            mptr = COEFF_TO_PTR(*sig);
-
-            if (ecm_inf->normbits)
-            {
-                cy = mpn_lshift(mpsig, mptr->_mp_d, mptr->_mp_size, ecm_inf->normbits);
-                if (cy)
-                    mpsig[mptr->_mp_size] = cy;
-            } else
-            {
-                flint_mpn_copyi(mpsig, mptr->_mp_d, mptr->_mp_size);
-            }
+            fmpz_factor_ecm_clear(&worker_ecm[w]);
+            flint_free(worker_fac[w]);
         }
-
-        /************************ SELECT CURVE ************************/
-
-        ret = fmpz_factor_ecm_select_curve(fac->_mp_d, mpsig, n, ecm_inf);
-
-        if (ret)
-        {
-            /* Found factor while selecting curve,
-               very very lucky :) */
-
-            if (ecm_inf->normbits)
-               mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
-            MPN_NORM(fac->_mp_d, ret);
-
-            fac->_mp_size = ret;
-            _fmpz_demote_val(f);
-            ret = -1;
-            goto cleanup;
-        }
-
-        if (ret != -1)
-        {
-
-            /************************** STAGE I ***************************/
-
-            ret = fmpz_factor_ecm_stage_I(fac->_mp_d, prime_array, num, B1, n, ecm_inf);
-
-            if (ret)
-            {
-                /* Found factor after stage I */
-                if (ecm_inf->normbits)
-                   mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
-                MPN_NORM(fac->_mp_d, ret);
-
-                fac->_mp_size = ret;
-                _fmpz_demote_val(f);
-                ret = 1;
-                goto cleanup;
-            }
-            /************************** STAGE II ***************************/
-
-            ret = fmpz_factor_ecm_stage_II(fac->_mp_d, B1, B2, P, n, ecm_inf);
-
-            if (ret)
-            {
-                /* Found factor after stage II */
-                if (ecm_inf->normbits)
-                   mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
-                MPN_NORM(fac->_mp_d, ret);
-                fac->_mp_size = ret;
-                _fmpz_demote_val(f);
-                ret = 2;
-                goto cleanup;
-            }
-        }
+        flint_free(worker_ecm);
+        flint_free(worker_fac);
+        flint_free(args);
+        flint_free(result);
+        flint_free(mpsig_all);
+#if FLINT_USES_PTHREAD
+        pthread_mutex_destroy(&mutex);
+#endif
+        flint_give_back_threads(handles, num_handles);
     }
-
-    cleanup:
-
 
     flint_free(ecm_inf->GCD_table);
     for (i = 0; i < mdiff; i++)

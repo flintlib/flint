@@ -27,13 +27,13 @@ TEST_FUNCTION_START(gr_poly_compose_horner, state)
         gr_poly_t x, Fx, Gx, FxGx, FGx;
 
         /* Test F(x) + G(x) = (F + G)(x) */
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         gr_poly_init(F, ctx);

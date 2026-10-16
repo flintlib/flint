@@ -30,6 +30,17 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
 
         TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
+        /* not supported in characteristic 2 */
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
+        if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
+        {
+            TEMPLATE(T, ctx_clear)(ctx);
+            continue;
+        }
+
         TEMPLATE(T, init)(c, ctx);
 
         TEMPLATE(T, poly_init)(h, ctx);
@@ -50,11 +61,6 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, poly_truncate)(h, m, ctx);
 
         result = TEMPLATE(T, poly_equal)(r, h, ctx);
-#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
-        result = result || TEMPLATE(T, ctx_prime)(ctx) == 2;
-#else
-        result = result || fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0;
-#endif
 
         if (!result)
         {
@@ -92,6 +98,17 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
 
         TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
+        /* not supported in characteristic 2 */
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
+        if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
+        {
+            TEMPLATE(T, ctx_clear)(ctx);
+            continue;
+        }
+
         TEMPLATE(T, init)(c, ctx);
 
         TEMPLATE(T, poly_init)(h, ctx);
@@ -109,11 +126,6 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, poly_invsqrt_series)(h, h, m, ctx);
 
         result = TEMPLATE(T, poly_equal)(g, h, ctx);
-#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
-        result = result || TEMPLATE(T, ctx_prime)(ctx) == 2;
-#else
-        result = result || fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0;
-#endif
         if (!result)
         {
             flint_printf("FAIL:\n");

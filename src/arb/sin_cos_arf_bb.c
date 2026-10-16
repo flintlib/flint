@@ -89,13 +89,13 @@ cos_bsplit_struct;
 
 typedef cos_bsplit_struct cos_bsplit_t[1];
 
-static void cos_bsplit_init(cos_bsplit_t x, void * args)
+static void cos_bsplit_init(cos_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void cos_bsplit_clear(cos_bsplit_t x, void * args)
+static void cos_bsplit_clear(cos_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);
@@ -298,7 +298,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     else
         fmpz_mul_2exp(T, T, prec - Qexp[0]);
 
-    arb_fmpz_divapprox(T, T, Q);
+    fmpz_tdiv_q(T, T, Q);
 
     fmpz_mul_2exp(Q, x, prec - r);
     fmpz_add(T, T, Q);
@@ -389,13 +389,13 @@ pmerge(acb_t res, acb_t a, acb_t b, pwork_t * work)
 }
 
 static void
-pinit(acb_t x, void * args)
+pinit(acb_t x, void * FLINT_UNUSED(args))
 {
     acb_init(x);
 }
 
 static void
-pclear(acb_t x, void * args)
+pclear(acb_t x, void * FLINT_UNUSED(args))
 {
     acb_clear(x);
 }

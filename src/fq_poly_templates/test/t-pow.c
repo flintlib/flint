@@ -119,6 +119,60 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
+    /* Underscore version, including e = 1 */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        slong len, rlen;
+        TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, poly_t) a, b, c;
+        ulong exp;
+
+        len = n_randint(state, 15) + 1;
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (c, ctx);
+
+        TEMPLATE(T, poly_randtest_not_zero) (b, state, len, ctx);
+        len = b->length;
+        exp = (i % 4 == 0) ? 1 : 1 + n_randint(state, 10);
+        rlen = (slong) exp * (len - 1) + 1;
+
+        TEMPLATE(T, poly_fit_length) (a, rlen, ctx);
+        _TEMPLATE(T, poly_pow) (a->coeffs, b->coeffs, len, exp, ctx);
+        _TEMPLATE(T, poly_set_length) (a, rlen, ctx);
+        _TEMPLATE(T, poly_normalise) (a, ctx);
+
+        {
+            slong j;
+
+            TEMPLATE(T, poly_set) (c, b, ctx);
+            for (j = 1; j < exp; j++)
+                TEMPLATE(T, poly_mul) (c, c, b, ctx);
+        }
+
+        result = (TEMPLATE(T, poly_equal) (a, c, ctx));
+        if (!result)
+        {
+            flint_printf("FAIL (underscore version):\n\n");
+            flint_printf("a = "), TEMPLATE(T, poly_print_pretty) (a, "X", ctx),
+                flint_printf("\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
+                flint_printf("\n");
+            flint_printf("c = "), TEMPLATE(T, poly_print_pretty) (c, "X", ctx),
+                flint_printf("\n");
+            flint_printf("exp = %wu\n", exp);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (c, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }
 #endif

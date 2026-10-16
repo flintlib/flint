@@ -10,32 +10,14 @@
 */
 
 #include "ca_mat.h"
-#include "ca_poly.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 ca_mat_adjugate_charpoly(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
 {
-    ca_poly_t pol;
-    slong n;
-
-    n = ca_mat_nrows(A);
-
-    if (n == 0)
-    {
-        ca_one(det, ctx);
-        return;
-    }
-
-    ca_poly_init(pol, ctx);
-    ca_mat_charpoly(pol, A, ctx);
-    ca_swap(det, ca_poly_coeff_ptr(pol, 0), ctx);
-    ca_poly_shift_right(pol, pol, 1, ctx);
-    ca_mat_ca_poly_evaluate(adj, pol, A, ctx);
-
-    if (n % 2)
-        ca_neg(det, det, ctx);
-    else
-        ca_mat_neg(adj, adj, ctx);
-
-    ca_poly_clear(pol, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_adjugate_charpoly((gr_mat_struct *) adj, det,
+        (const gr_mat_struct *) A, gr_ctx));
 }

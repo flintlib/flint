@@ -11,46 +11,33 @@
 
 #include "fmpz.h"
 
-/* b aliases neither q nor r */
+/* b aliases neither q nor r; rounds to nearest, ties to even */
 static void _fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 {
     int c, rbsgn;
 
     fmpz_tdiv_qr(q, r, a, b);
 
-    c = fmpz_cmp2abs(b, r);
+    c = fmpz_cmp2abs(b, r);    /* compare |b| with 2 |r| */
 
     if (c > 0)
         return;
 
-    rbsgn = fmpz_sgn(r)*fmpz_sgn(b);
+    /* |2r| >= |b|: round away from zero unless it is a tie with q even */
+    if (c == 0 && fmpz_is_even(q))
+        return;
 
-    if (c < 0)
+    rbsgn = fmpz_sgn(r) * fmpz_sgn(b);   /* sign of a / b */
+
+    if (rbsgn < 0)
     {
-        if (rbsgn < 0)
-        {
-            fmpz_sub_ui(q, q, 1);
-            fmpz_add(r, r, b);
-        }
-        else
-        {
-            fmpz_add_ui(q, q, 1);
-            fmpz_sub(r, r, b);
-        }
+        fmpz_sub_ui(q, q, 1);
+        fmpz_add(r, r, b);
     }
     else
     {
-        int qsgn = fmpz_sgn(q);
-        if (rbsgn < 0 && qsgn > 0)
-        {
-            fmpz_sub_ui(q, q, 1);
-            fmpz_add(r, r, b);
-        }
-        else if (rbsgn > 0 && qsgn < 0)
-        {
-            fmpz_add_ui(q, q, 1);
-            fmpz_sub(r, r, b);
-        }
+        fmpz_add_ui(q, q, 1);
+        fmpz_sub(r, r, b);
     }
 }
 
@@ -84,7 +71,10 @@ fmpz_ndiv_qr(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
         lquo = *q + FLINT_SGN(A) * FLINT_SGN(B);
         lrem = A - B * lquo;
 
-        if (FLINT_ABS(lrem) < FLINT_ABS(*r))
+        /* round away from zero if that gives a smaller remainder, or on a
+           tie if the truncated quotient is odd (ties to even) */
+        if (FLINT_ABS(lrem) < FLINT_ABS(*r)
+            || (FLINT_ABS(lrem) == FLINT_ABS(*r) && (*q & 1)))
         {
             *q = lquo;
             *r = lrem;

@@ -15,6 +15,11 @@ int
 _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA,
                                          const fmpz * B, slong lenB, int exact)
 {
+    slong lenQ = lenA - lenB + 1;
+
+    if (!exact && lenQ > lenB && lenB * lenQ <= 2048)
+        return _fmpz_poly_div_basecase(Q, NULL, A, lenA, B, lenB, exact);
+
     return _fmpz_poly_div_divconquer(Q, A, lenA, B, lenB, exact);
 }
 

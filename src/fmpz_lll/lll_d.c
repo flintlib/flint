@@ -59,6 +59,8 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
         double ctt;
         int *alpha;
         ulong max_exp, iter, max_iter, newvec, newvec_max;
+        fmpz_lll_packed_t P;
+        int use_packed;
 
         n = B->c;
         d = B->r;
@@ -66,6 +68,17 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
         ctt = (fl->delta + 1) / 2;
 
         shift = fmpz_lll_shift(B);
+
+        /* pack B into a homogeneous limb representation if the entries are small */
+        {
+            slong m = fmpz_lll_packed_limbs(B);
+            use_packed = (m <= FMPZ_LLL_PACKED_MAX_LIMBS && d * n * m <= FMPZ_LLL_PACKED_MAX_SIZE);
+            if (use_packed)
+            {
+                fmpz_lll_packed_init(P, d, n, m);
+                fmpz_lll_packed_set_fmpz_mat(P, B);
+            }
+        }
 
         alpha = (int *) flint_malloc(d * sizeof(int));
         expo = (int *) flint_malloc(d * sizeof(int));
@@ -101,7 +114,10 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
         max_exp = 0;
         for (i = 0; i < d; i++)
         {
-            expo[i] = _fmpz_vec_get_d_vec_2exp(appB->rows[i], fmpz_mat_row(B, i), n);
+            if (use_packed)
+                expo[i] = fmpz_lll_packed_get_d_vec_2exp(appB->rows[i], P, i);
+            else
+                expo[i] = _fmpz_vec_get_d_vec_2exp(appB->rows[i], fmpz_mat_row(B, i), n);
             max_exp = FLINT_MAX(max_exp, expo[i]);
         }
         max_iter =
@@ -168,6 +184,14 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
 
             if (num_failed_fast < nff_cutoff)
             {
+                if (use_packed)
+                {
+                    fmpz_lll_packed_maybe_shrink(P);
+                    babai_ok = fmpz_lll_check_babai_packed(
+                        kappa, P, U, mu, r, s, appB, expo, A, alpha[kappa],
+                        zeros, kappamax, FLINT_MIN(kappamax + 1 + shift, n), fl, heuristic);
+                }
+                else
                 babai_ok = (heuristic ? fmpz_lll_check_babai_heuristic_d : fmpz_lll_check_babai)(
                         kappa, B, U, mu, r, s, appB, expo, A, alpha[kappa],
                         zeros, kappamax, FLINT_MIN(kappamax + 1 + shift, n), fl);
@@ -179,6 +203,11 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
             if (babai_ok == -1)
             {
                 num_failed_fast++;
+                if (use_packed)
+                    heuristic_fail = fmpz_lll_check_babai_packed(kappa, P, U, mu,
+                        r, s, appB, expo, A, alpha[kappa], zeros, kappamax,
+                        FLINT_MIN(kappamax + 1 + shift, n), fl, 1);
+                else
                 heuristic_fail = fmpz_lll_check_babai_heuristic_d(kappa, B, U, mu,
                         r, s, appB, expo, A, alpha[kappa], zeros, kappamax,
                         FLINT_MIN(kappamax + 1 + shift, n), fl);
@@ -186,6 +215,11 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
 
             if (heuristic_fail == -1)
             {
+                if (use_packed)
+                {
+                    fmpz_lll_packed_get_fmpz_mat(B, P);
+                    fmpz_lll_packed_clear(P);
+                }
                 flint_free(alpha);
                 flint_free(expo);
                 d_mat_clear(mu);
@@ -206,6 +240,13 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
                     /* running ahead to kappa = d, without upsetting LLL... */
                     for (kappa2 = d - 1; kappa2 > kappa; kappa2--)
                     {
+                        if (use_packed)
+                            babai_ok =
+                                fmpz_lll_advance_check_babai_packed(kappa, kappa2, P, U,
+                                                         mu, r, s, appB, expo,
+                                                         A, alpha[kappa2],
+                                                         zeros, kappa + 1, n, fl, 0);
+                        else
                         babai_ok =
                             fmpz_lll_advance_check_babai(kappa, kappa2, B, U,
                                                          mu, r, s, appB, expo,
@@ -213,6 +254,13 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
                                                          zeros, kappa + 1, n, fl);
                         if (babai_ok == -1)
                         {
+                            if (use_packed)
+                                heuristic_fail =
+                                    fmpz_lll_advance_check_babai_packed(kappa, kappa2, P, U,
+                                                         mu, r, s, appB, expo,
+                                                         A, alpha[kappa2],
+                                                         zeros, kappa + 1, n, fl, 1);
+                            else
                             heuristic_fail =
                                 fmpz_lll_advance_check_babai_heuristic_d(kappa,
                                                                          kappa2,
@@ -325,7 +373,10 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
                 /* Step7: Update B and appB */
                 /* ************************ */
 
-                fmpz_mat_move_row(B, kappa2, kappa);
+                if (use_packed)
+                    fmpz_lll_packed_move_row(P, kappa2, kappa);
+                else
+                    fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
                     fmpz_mat_move_row(U, kappa2, kappa);
@@ -404,6 +455,12 @@ static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz
                 }
                 fmpz_clear(rii);
             }
+        }
+
+        if (use_packed)
+        {
+            fmpz_lll_packed_get_fmpz_mat(B, P);
+            fmpz_lll_packed_clear(P);
         }
 
         flint_free(alpha);

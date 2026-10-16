@@ -16,7 +16,7 @@
 void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
            const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx)
 {
-    slong Abits;
+    flint_bitcnt_t Abits;
 
     if (B->length == 0)
     {

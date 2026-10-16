@@ -110,10 +110,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 
                 if (lenV3 != 0)
 				{
-				    if (lenU2 >= lenQ)
-                        _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, ctx);
-                    else
-                        _fmpz_mod_poly_mul(W, Q, lenQ, U2, lenU2, ctx);
+				    _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, ctx);
                     lenW = lenQ + lenU2 - 1;
 
                     _fmpz_mod_poly_sub(U1, U1, lenU1, W, lenW, ctx);

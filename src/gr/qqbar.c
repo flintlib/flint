@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
@@ -45,24 +46,26 @@ _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
 static int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+
     if (QQBAR_CTX(ctx)->real_only)
-        gr_stream_write(out, "Real algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Real algebraic numbers (qqbar)");
     else
-        gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Complex algebraic numbers (qqbar)");
 
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", deg_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
+        status |= gr_stream_write(out, ", deg_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
     }
 
     if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", bits_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
+        status |= gr_stream_write(out, ", bits_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static void
@@ -132,17 +135,18 @@ static int
 _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 {
     char *re_s, *im_s;
+    int status = GR_SUCCESS;
 
     if (qqbar_is_rational(x))
     {
         fmpq_t t;
         fmpq_init(t);
         qqbar_get_fmpq(t, x);
-        gr_stream_write_fmpz(out, fmpq_numref(t));
+        status |= gr_stream_write_fmpz(out, fmpq_numref(t));
         if (!fmpz_is_one(fmpq_denref(t)))
         {
-            gr_stream_write(out, "/");
-            gr_stream_write_fmpz(out, fmpq_denref(t));
+            status |= gr_stream_write(out, "/");
+            status |= gr_stream_write_fmpz(out, fmpq_denref(t));
         }
         fmpq_clear(t);
     }
@@ -150,11 +154,11 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
     {
         qqbar_get_decimal_root_nearest(&re_s, &im_s, x, 6);
 
-        gr_stream_write(out, "Root a = ");
+        status |= gr_stream_write(out, "Root a = ");
 
         if (re_s != NULL)
         {
-            gr_stream_write_free(out, re_s);
+            status |= gr_stream_write_free(out, re_s);
         }
 
         if (im_s != NULL)
@@ -163,28 +167,28 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
             {
                 if (im_s[0] == '-')
                 {
-                    gr_stream_write(out, " - ");
-                    gr_stream_write(out, im_s + 1);
+                    status |= gr_stream_write(out, " - ");
+                    status |= gr_stream_write(out, im_s + 1);
                     flint_free(im_s);
                 }
                 else
                 {
-                    gr_stream_write(out, " + ");
-                    gr_stream_write_free(out, im_s);
+                    status |= gr_stream_write(out, " + ");
+                    status |= gr_stream_write_free(out, im_s);
                 }
             }
             else
             {
-                gr_stream_write_free(out, im_s);
+                status |= gr_stream_write_free(out, im_s);
             }
 
-            gr_stream_write(out, "*I");
+            status |= gr_stream_write(out, "*I");
         }
-        gr_stream_write(out, " of ");
-        gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
+        status |= gr_stream_write(out, " of ");
+        status |= gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int
@@ -1163,7 +1167,7 @@ TRIG3(acsc_pi)
 
 
 static int
-_gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
+_gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt,
                       int flags, gr_ctx_t ctx)
 {
     if (gr_ctx_is_algebraically_closed(ctx) == T_TRUE)
@@ -1171,30 +1175,68 @@ _gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
     return GR_UNABLE;
 }
 
-/* todo: quickly skip nonreal roots over the real algebraic numbers */
 static int
-_gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx);
+
+/* todo: quickly skip nonreal roots over the real algebraic numbers
+   also when the coefficients are irrational */
+static int
+_gr_qqbar_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status;
-    gr_ctx_t ZZ, Rx;
-    gr_vec_t fac, exp;
+    gr_poly_vec_t fac;
+    fmpz_vec_t exp;
     gr_ptr c;
     slong i;
 
     if (poly->length == 0)
         return GR_DOMAIN;
 
+    /* Over the real algebraic numbers with rational coefficients, use the
+       integer version, which only isolates real roots. */
+    if (QQBAR_CTX(ctx)->real_only)
+    {
+        qqbar_srcptr coeffs = poly->coeffs;
+        int rational = 1;
+
+        for (i = 0; i < poly->length && rational; i++)
+            rational = qqbar_is_rational(coeffs + i);
+
+        if (rational)
+        {
+            fmpz_poly_t f;
+            fmpq * q;
+            fmpz_t den;
+            gr_ctx_t ZZ;
+
+            q = _fmpq_vec_init(poly->length);
+            for (i = 0; i < poly->length; i++)
+                qqbar_get_fmpq(q + i, coeffs + i);
+
+            fmpz_init(den);
+            fmpz_poly_init2(f, poly->length);
+            _fmpz_poly_set_length(f, poly->length);
+            _fmpq_vec_get_fmpz_vec_fmpz(f->coeffs, den, q, poly->length);
+
+            gr_ctx_init_fmpz(ZZ);
+            status = _gr_qqbar_poly_roots_other(roots, mult, (gr_poly_struct *) f, ZZ, flags, ctx);
+            gr_ctx_clear(ZZ);
+
+            fmpz_poly_clear(f);
+            fmpz_clear(den);
+            _fmpq_vec_clear(q, poly->length);
+            return status;
+        }
+    }
+
     /* todo: fast numerical check to avoid an exact squarefree factorization */
 
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Rx, ctx);
-
     gr_vec_set_length(roots, 0, ctx);
-    gr_vec_set_length(mult, 0, ZZ);
+    fmpz_vec_set_length(mult, 0);
 
     c = gr_heap_init(ctx);
-    gr_vec_init(fac, 0, Rx);
-    gr_vec_init(exp, 0, ZZ);
+    gr_poly_vec_init(fac, 0, ctx);
+    fmpz_vec_init(exp, 0);
 
     status = gr_poly_factor_squarefree(c, fac, exp, poly, ctx);
 
@@ -1207,8 +1249,7 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
 
         for (i = 0; i < fac->length; i++)
         {
-            gr_poly_struct * fac_i = gr_vec_entry_ptr(fac, i, Rx);
-            fmpz * exp_i = gr_vec_entry_ptr(exp, i, ZZ);
+            gr_poly_struct * fac_i = gr_poly_vec_entry_ptr(fac, i, ctx);
 
             deg2 = fac_i->length - 1;
 
@@ -1227,7 +1268,7 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
                     continue;
 
                 GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                GR_MUST_SUCCEED(gr_vec_append(mult, exp_i, ZZ));
+                fmpz_vec_append(mult, exp->entries + i);
             }
 
             _qqbar_vec_clear(croots, deg2);
@@ -1236,36 +1277,29 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
 
     /* todo: qqbar_cmp_root_order, but must sort exponents as well */
 
-    gr_vec_clear(fac, Rx);
-    gr_vec_clear(exp, ZZ);
+    gr_poly_vec_clear(fac, ctx);
+    fmpz_vec_clear(exp);
     gr_heap_clear(c, ctx);
-
-    gr_ctx_clear(ZZ);
-    gr_ctx_clear(Rx);
 
     return status;
 }
 
-/* todo: quickly skip nonreal roots over the real algebraic numbers */
 static int
-_gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
-        slong i, j, deg, deg2;
+        slong i, j, deg, deg2, num;
         qqbar_struct * croots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -1278,17 +1312,22 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
                 deg2 = fmpz_poly_degree(fac->p + i);
 
                 croots = _qqbar_vec_init(deg2);
-                qqbar_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
 
-                for (j = 0; j < deg2; j++)
+                if (QQBAR_CTX(ctx)->real_only)
                 {
-                    fmpz m2 = fac->exp[i];
+                    /* only isolate the real roots */
+                    num = qqbar_real_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                }
+                else
+                {
+                    qqbar_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+                    num = deg2;
+                }
 
-                    if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(croots + j))
-                        continue;
-
+                for (j = 0; j < num; j++)
+                {
                     GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
                 _qqbar_vec_clear(croots, deg2);
@@ -1298,8 +1337,6 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
         }
 
         /* todo: qqbar_cmp_root_order, but must sort exponents as well */
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }

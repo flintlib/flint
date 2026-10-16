@@ -1,0 +1,31 @@
+/*
+    Copyright (C) 2023 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
+#include "mpoly.h"
+#include "gr.h"
+
+TEST_FUNCTION_START(gr_fmpq_mpoly, state)
+{
+    gr_ctx_t QQxy;
+    slong iter;
+    int flags = 0;
+
+    for (iter = 0; iter < 10; iter++)
+    {
+        gr_ctx_init_fmpq_mpoly(QQxy, n_randint(state, 3), mpoly_ordering_randtest(state));
+        QQxy->size_limit = 50;
+        gr_test_ring(QQxy, 100, flags);
+        gr_ctx_clear(QQxy);
+    }
+
+    TEST_FUNCTION_END(state);
+}

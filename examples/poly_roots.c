@@ -17,14 +17,15 @@ int main(int argc, char *argv[])
     fmpz_poly_factor_t fac;
     fmpz_t t;
     acb_ptr roots;
-    slong compd, printd, i, j, deg;
+    slong compd, printd, i, j, deg, num;
     int flags;
+    int realonly;
 
     if (argc < 2)
     {
-        flint_printf("poly_roots [-refine d] [-print d] <poly>\n\n");
+        flint_printf("poly_roots [-refine d] [-print d] [-real] <poly>\n\n");
 
-        flint_printf("Isolates all the complex roots of a polynomial with integer coefficients.\n\n");
+        flint_printf("Isolates all the real or complex roots of a polynomial with integer coefficients.\n\n");
 
         flint_printf("If -refine d is passed, the roots are refined to a relative tolerance\n");
         flint_printf("better than 10^(-d). By default, the roots are only computed to sufficient\n");
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
 
     compd = 0;
     printd = 0;
+    realonly = 0;
     flags = ARB_FMPZ_POLY_ROOTS_VERBOSE;
 
     fmpz_poly_init(f);
@@ -68,6 +70,10 @@ int main(int argc, char *argv[])
         {
             compd = atol(argv[i+1]);
             i++;
+        }
+        else if (!strcmp(argv[i], "-real"))
+        {
+            realonly = 1;
         }
         else if (!strcmp(argv[i], "-print"))
         {
@@ -193,14 +199,25 @@ int main(int argc, char *argv[])
     {
         deg = fmpz_poly_degree(fac->p + i);
 
-        flint_printf("%wd roots with multiplicity %wd\n", deg, fac->exp[i]);
         roots = _acb_vec_init(deg);
 
-        arb_fmpz_poly_complex_roots(roots, fac->p + i, flags, compd * 3.32193 + 2);
+        if (realonly)
+        {
+            num = arb_fmpz_poly_real_roots((arb_ptr) roots, fac->p + i, flags, compd * 3.32193 + 2);
+            for (j = num - 1; j > 0; j--)
+                arb_swap((arb_ptr) roots + j, (arb_ptr) roots + 2 * j);
+        }
+        else
+        {
+            arb_fmpz_poly_complex_roots(roots, fac->p + i, flags, compd * 3.32193 + 2);
+            num = deg;
+        }
+
+        flint_printf("%wd roots with multiplicity %wd\n", num, fac->exp[i]);
 
         if (printd)
         {
-            for (j = 0; j < deg; j++)
+            for (j = 0; j < num; j++)
             {
                 acb_printn(roots + j, printd, 0);
                 flint_printf("\n");

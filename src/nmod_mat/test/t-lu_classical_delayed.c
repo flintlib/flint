@@ -95,7 +95,10 @@ TEST_FUNCTION_START(nmod_mat_lu_classical_delayed, state)
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        mod = n_randtest_prime(state, 0);
+        if (n_randint(state, 10) == 0)
+            mod = n_nextprime(UWORD(1) << (FLINT_BITS - 1), 0);
+        else
+            mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {

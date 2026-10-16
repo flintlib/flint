@@ -10,14 +10,14 @@
 */
 
 #include "acb_poly.h"
+#include "gr_poly.h"
 
 void
 _acb_poly_derivative(acb_ptr res, acb_srcptr poly, slong len, slong prec)
 {
-    slong i;
-
-    for (i = 1; i < len; i++)
-        acb_mul_ui(res + i - 1, poly + i, i, prec);
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, prec);
+    GR_MUST_SUCCEED(_gr_poly_derivative(res, poly, len, ctx));
 }
 
 void

@@ -9,13 +9,137 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly.h"
+#include "nmod_mpoly_factor.h"
+
+/* The dense bivariate representation holds the whole bounding box of the
+   inputs, so these bound what converting to it can cost. They are also what
+   keeps the size arithmetic below from overflowing, which is why the
+   comparisons are made in double: a box of this many entries is already that
+   many words of input before the resultant is even called.
+
+   There is deliberately no density condition. Measured against the sparse
+   algorithm, how full the box is barely matters: the subresultant PRS over
+   the univariate form pays for the degrees whether or not the coefficients
+   are there, so at degree 16 and above the dense algorithm is ahead even at
+   a few terms per input. What decides is the degree, which
+   n_bpoly_mod_resultant_cutoff already tests. */
+#define BIVARIATE_MAX_AREA 4294967296.0     /* 2^32 */
+#define BIVARIATE_MAX_POINTS 4294967296.0
+
+/* A sparse input expands into a box far larger than itself. Below
+   BIVARIATE_FREE_AREA entries that does not matter, the box being small
+   whatever the input; above it the box may exceed the input by at most
+   BIVARIATE_MAX_EXPANSION, so that a few terms of high degree are left to the
+   sparse algorithm rather than materialised. */
+#define BIVARIATE_FREE_AREA 67108864.0      /* 2^26, a 512 MB box */
+#define BIVARIATE_MAX_EXPANSION 64.0
+
+/* Two polynomials of only a few terms each have a resultant the subresultant
+   PRS finds almost at once, and at low degree the dense algorithm cannot make
+   back the cost of the whole box. Measured over Z at degree 8, four terms
+   each: three to a hundred times slower, at every coefficient size from 32 to
+   10000 bits. From BIVARIATE_MIN_AREA in the degrees up it wins again, the
+   PRS by then paying for the degrees whether or not the coefficients are
+   there. */
+#define BIVARIATE_MIN_TERMS 5
+#define BIVARIATE_MIN_AREA 256
+
+/* res_var(A, B) through the dense bivariate algorithm, when the inputs are
+   bivariate and dense enough for it to pay. Returns 0 when they are not, or
+   when the algorithm declines. */
+static int
+_nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
+            const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
+{
+    slong other = 1 - var;
+    slong degAy, degAx, degBy, degBx, lenA, lenB, npoints;
+    double areaA, areaB;
+    n_bpoly_t Ab, Bb, Rb;
+    n_poly_t res;
+    int success;
+
+    if (ctx->minfo->nvars != 2 || A->length == 0 || B->length == 0)
+        return 0;
+
+    degAy = nmod_mpoly_degree_si(A, var, ctx);
+    degAx = nmod_mpoly_degree_si(A, other, ctx);
+    degBy = nmod_mpoly_degree_si(B, var, ctx);
+    degBx = nmod_mpoly_degree_si(B, other, ctx);
+
+    if (degAy < 1 || degBy < 1)
+        return 0;
+
+    lenA = degAy + 1;
+    lenB = degBy + 1;
+
+    areaA = (double) lenA * (degAx + 1);
+    areaB = (double) lenB * (degBx + 1);
+
+    if (areaA > BIVARIATE_MAX_AREA || areaB > BIVARIATE_MAX_AREA)
+        return 0;
+
+    if ((double) degBy * degAx + (double) degAy * degBx + 1.0
+            > BIVARIATE_MAX_POINTS)
+        return 0;
+
+    if (areaA > BIVARIATE_FREE_AREA &&
+            areaA > BIVARIATE_MAX_EXPANSION * A->length)
+        return 0;
+
+    if (areaB > BIVARIATE_FREE_AREA &&
+            areaB > BIVARIATE_MAX_EXPANSION * B->length)
+        return 0;
+
+    if (FLINT_MIN(A->length, B->length) < BIVARIATE_MIN_TERMS &&
+            lenA * lenB < BIVARIATE_MIN_AREA)
+        return 0;
+
+    npoints = degBy * degAx + degAy * degBx + 1;
+
+    if (!n_bpoly_mod_resultant_cutoff(FLINT_MAX(lenA, lenB),
+                                      FLINT_MIN(lenA, lenB), npoints))
+        return 0;
+
+    n_bpoly_init(Ab);
+    n_bpoly_init(Bb);
+    n_bpoly_init(Rb);
+    n_poly_init(res);
+
+    /* var becomes the outer variable, the one the resultant eliminates */
+    nmod_mpoly_get_bpoly(Ab, A, var, other, ctx);
+    nmod_mpoly_get_bpoly(Bb, B, var, other, ctx);
+
+    success = n_bpoly_mod_resultant(res, Ab, Bb, ctx->mod);
+
+    if (success)
+    {
+        /* the resultant is a polynomial in the other variable alone */
+        n_bpoly_fit_length(Rb, 1);
+        n_poly_swap(Rb->coeffs + 0, res);
+        Rb->length = 1;
+        n_bpoly_normalise(Rb);
+
+        nmod_mpoly_set_bpoly(R, A->bits, Rb, var, other, ctx);
+    }
+
+    n_poly_clear(res);
+    n_bpoly_clear(Ab);
+    n_bpoly_clear(Bb);
+    n_bpoly_clear(Rb);
+
+    return success;
+}
 
 int nmod_mpoly_resultant(nmod_mpoly_t R, const nmod_mpoly_t A,
            const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
 {
     int success;
     nmod_mpoly_univar_t Ax, Bx;
+
+    if (_nmod_mpoly_resultant_bivariate(R, A, B, var, ctx))
+        return 1;
 
     nmod_mpoly_univar_init(Ax, ctx);
     nmod_mpoly_univar_init(Bx, ctx);

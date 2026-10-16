@@ -11,6 +11,8 @@ References
 
 .. [Ari2012] \J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
 
+.. [Ari2020] \J. Arias de Reyna, "Computation of the secondary zeta function", https://arxiv.org/abs/2006.04869
+
 .. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
 
 .. [Arn2012] \J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
@@ -69,11 +71,17 @@ References
 
 .. [BuhlerCrandallSompolski1992] \Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
 
+.. [BW1993] \T. Becker and V. Weispfenning, *Gröbner Bases: A Computational Approach to Commutative Algebra*, Graduate Texts in Mathematics 141, Springer-Verlag (1993). https://doi.org/10.1007/978-1-4612-0913-3
+
+.. [Cab1971] \S. Cabay, "Exact solution of linear equations", Proceedings of the Second ACM Symposium on Symbolic and Algebraic Manipulation (1971) 392-398
+
 .. [CFG2017] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and vector-valued Siegel modular forms of genus two", Math. Ann. 369 (2017), 1649--1669. https://doi.org/10.1007/s00208-016-1510-2
 
 .. [CFG2019] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and modular forms of degree 2 with character", Math. Comp. 88 (2019), 2423--2441. https://doi.org/10.1090/mcom/3412
 
 .. [CGHJK1996] \R. M. Corless, G. H. Gonnet, D. E. Hare, D. J. Jeffrey and D. E. Knuth, "On the Lambert W function", Advances in Computational Mathematics, 5(1) (1996), 329-359
+
+.. [CheSto2005] \Z. Chen and A. Storjohann, "A BLAS based C library for exact linear algebra on integer matrices", Proceedings of the 2005 International Symposium on Symbolic and Algebraic Computation (ISSAC) (2005) 92-99
 
 .. [CP2005] \R. Crandall and C. Pomerance, *Prime Numbers: A Computational Perspective*, second edition, Springer (2005).
 
@@ -95,6 +103,8 @@ References
 
 .. [DHBHS2004] \B. Deconinck, M. Heil, A. Bobenko, M.  van Hoeij, and M. Schmies, "Computing Riemann theta functions", Math. Comp. 73:247 (2004), 1417--1442. https://arxiv.org/abs/nlin/0206009
 
+.. [Dix1982] \J. D. Dixon, "Exact solution of linear equations using p-adic expansions", Numerische Mathematik 40 (1982) 137-141
+
 .. [DYF1999] \A. Dzieciol, S. Yngve and P. O. Fröman, "Coulomb wave functions with complex values of the variable and the parameters", J. Math. Phys. 40, 6145 (1999), https://doi.org/10.1063/1.533083
 
 .. [DelegliseNicolasZimmermann2009] \Deleglise, Marc and Niclas, Jean-Louis and Zimmermann, Paul : Landau's function for one million billions, J. Théor. Nombres Bordeaux 20:3 (2009) 625--671
@@ -106,6 +116,22 @@ References
 .. [Dus1999] \P. Dusart, "The `k^{th}` prime is greater than `k(\ln k+\ln \ln k-1)` for `k \ge 2`," Math. Comp., 68:225 (January 1999) 411--415.
 
 .. [EHJ2016] \A. Enge, W. Hart and F. Johansson, "Short addition sequences for theta functions", preprint (2016), https://arxiv.org/abs/1608.06810
+
+.. [Enge2024] \A. Enge, "FastECPP over MPI", Mathematical Software - ICMS 2024: 8th International Conference, Durham, UK, July 22-25, 2024, Proceedings, Springer-Verlag, Berlin, Heidelberg, 36-45. https://doi.org/10.1007/978-3-031-64529-7_4
+
+.. [EngeCM] \A. Enge, CM - a library for the computation of class polynomials and elliptic curve primality proving, https://www.multiprecision.org/cm/
+
+.. [EngeMorain2003] \A. Enge and F. Morain, "Fast decomposition of polynomials with known Galois group", Applied Algebra, Algebraic Algorithms and Error-Correcting Codes (AAECC-15), LNCS 2643, Springer (2003), 254-264
+
+.. [FKMW2004] \J. Franke, T. Kleinjung, F. Morain and T. Wirth, "Proving the primality of very large numbers with fastECPP", Algorithmic Number Theory (ANTS-VI), LNCS 3076, Springer (2004), 194-207
+
+.. [Morain2007] \F. Morain, "Implementing the asymptotically fast version of the elliptic curve primality proving algorithm", Mathematics of Computation 76 (2007), 493-505
+
+.. [PARI] \The PARI Group, PARI/GP, https://pari.math.u-bordeaux.fr/ ; the ``primecert`` implementation of FastECPP is by Jared Asuncion
+
+.. [Schertz2002] \R. Schertz, "Weber's class invariants revisited", Journal de Theorie des Nombres de Bordeaux 14 (2002), 325-343
+
+.. [YuiZagier1997] \N. Yui and D. Zagier, "On the singular values of Weber modular functions", Mathematics of Computation 66 (1997), 1645-1662
 
 .. [EM2004] \O. Espinosa and V. Moll, "A generalized polygamma function", Integral Transforms and Special Functions (2004), 101-115.
 
@@ -125,9 +151,13 @@ References
 
 .. [GG2003] \J. von zur Gathen and J. Gerhard, *Modern Computer Algebra*, second edition, Cambridge University Press (2003)
 
+.. [GieLobSau1998] \M. Giesbrecht, A. Lobo and B. D. Saunders, "Certifying inconsistency of sparse linear systems", Proceedings of the 1998 International Symposium on Symbolic and Algebraic Computation (ISSAC) (1998) 113-119
+
 .. [GS2003] \X. Gourdon and P. Sebah, "Numerical evaluation of the Riemann Zeta-function" (2003), http://numbers.computation.free.fr/Constants/Miscellaneous/zetaevaluations.pdf
 
 .. [GVL1996] \G. H. Golub and C. F. Van Loan, *Matrix Computations*, third edition, Johns Hopkins University Press (1996).
+
+.. [GatSho1992] \J. von zur Gathen and V. Shoup, "Computing Frobenius maps and factoring polynomials", Computational Complexity 2 (1992), 187-224. https://doi.org/10.1007/BF01272074
 
 .. [Gas2018] \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
 
@@ -142,6 +172,12 @@ References
 .. [GraMol2010] \Torbjörn Granlund and Niels Möller : Improved Division by Invariant Integers, https://gmplib.org/~tege/division-paper.pdf
 
 .. [GraMon1994] \Törbjorn Granlund and Peter L. Montgomery : Division by Invariant Integers using Multiplication https://gmplib.org/~tege/divcnst-pldi94.pdf
+
+.. [HJ2024] \J. van der Hoeven and F. Johansson, "Fast multiple precision exp(x) with precomputations", 2024 IEEE 31st Symposium on Computer Arithmetic (ARITH) (2024), https://hal.science/hal-04454093
+
+.. [Zun2025] \J. Zuniga, "Fast Ramanujan-type Series for Logarithms. Part I", 2025, https://arxiv.org/abs/2506.08245
+
+.. [Zun2025b] \J. Zuniga, "Fast Ramanujan-type Series for Logarithms. Part II", 2025, https://arxiv.org/abs/2506.10321
 
 .. [HM2017] \J. van der Hoeven and B. Mourrain. "Efficient certification of numeric solutions to eigenproblems", MACIS 2017, 81-94, (2017), https://hal.archives-ouvertes.fr/hal-01579079
 
@@ -191,7 +227,7 @@ References
 
 .. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. https://doi.org/10.1145/2608628.2608629
 
-.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", https://arxiv.org/abs/1410.7176
+.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", 22nd IEEE Symposium on Computer Arithmetic (ARITH 22), 83-89 (2015), https://arxiv.org/abs/1410.7176
 
 .. [Joh2015] \F. Johansson, "Computing Bell numbers", https://fredrikj.net/blog/2015/08/computing-bell-numbers/
 
@@ -217,7 +253,11 @@ References
 
 .. [Kar1998] \E. A. Karatsuba, "Fast evaluation of the Hurwitz zeta function and Dirichlet L-series", Problems of Information Transmission 34:4 (1998), 342-353, http://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=ppi&paperid=425&option_lang=eng
 
+.. [KL2024] \Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
+
 .. [Knu1997] \Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
+
+.. [KalSho1998] \E. Kaltofen and V. Shoup, "Subquadratic-time factoring of polynomials over finite fields", Mathematics of Computation 67 (1998), 1179-1197. https://doi.org/10.1090/S0025-5718-98-00944-2
 
 .. [Kob2010] \A. Kobel, "Certified Complex Numerical Root Finding", Seminar on Computational Geometry and Geometric Computing (2010), http://www.mpi-inf.mpg.de/departments/d1/teaching/ss10/Seminar_CGGC/Slides/02_Kobel_NRS.pdf
 
@@ -248,6 +288,8 @@ References
 .. [Mos1971] \J. Moses. "Algebraic simplification - a guide for the perplexed". Proceedings of the second ACM symposium on Symbolic and algebraic manipulation (1971), 282-304. https://doi.org/10.1145/362637.362648
 
 .. [Mul2000] \Thom Mulders : On Short Multiplications and Divisions, AAECC vol. 11 (2000) 69--88
+
+.. [MulSto2004] \T. Mulders and A. Storjohann, "Certified dense linear system solving", Journal of Symbolic Computation 37:4 (2004) 485-510
 
 .. [Mum1983] \D. Mumford, *Tata Lectures on Theta I*, Birkhäuser, 1983. https://doi.org/10.1007/978-1-4899-2843-6
 
@@ -309,6 +351,8 @@ References
 
 .. [Ste2010] \A. Steel. "Computing with algebraically closed fields". Journal of Symbolic Computation 45 (2010) 342-372. https://doi.org/10.1016/j.jsc.2009.09.005
 
+.. [Stef2010] \D. E. Steffy, "Exact solutions to linear systems of equations using output sensitive lifting", ACM Communications in Computer Algebra 44:3/4 (2010) 160-182
+
 .. [Stehle2010] \Stehlé, Damien : Floating-Point LLL: Theoretical and Practical Aspects, in Nguyen, Phong Q. and Vallée, Brigitte : The LLL Algorithm: Survey and Applications (2010) 179--213
 
 .. [Stein2007] \Stein, William A.: Modular forms, a computational approach. American Mathematical Society. 2007
@@ -355,6 +399,8 @@ References
 
 .. [vdH1995] \J. van der Hoeven, "Automatic numerical expansions". Proc. of the conference Real numbers and computers (1995), 261-274. https://www.texmacs.org/joris/ane/ane-abs.html
 
+.. [vdH2004] \J. van der Hoeven, "Truncated FFTs", ISSAC 2004 notes, https://www.texmacs.org/joris/issac04/issac04.html
+
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
 All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_,
@@ -363,10 +409,10 @@ All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_,
 [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
 [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,
 [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_,
-[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
+[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GatSho1992]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
 [HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
 [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_,
-[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
+[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [KalSho1998]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
 [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_,
 [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_,
 [NakTurWil1997]_, [NW1978]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_,

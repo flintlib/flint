@@ -10,11 +10,14 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 
 int
 gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
 {
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
     slong c, i, j, k;
     slong m = mat->r;
     slong n = mat->c;
@@ -31,11 +34,9 @@ gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
             if ((i = n_randint(state, m)) == (j = n_randint(state, m)))
                 continue;
             if (n_randint(state, 2))
-                for (k = 0; k < n; k++)
-                    status |= gr_add(GR_MAT_ENTRY(mat, j, k, sz), GR_MAT_ENTRY(mat, j, k, sz), GR_MAT_ENTRY(mat, i, k, sz), ctx);
+                status |= _gr_vec_add(GR_MAT_ENTRY(mat, j, 0, sz), GR_MAT_ENTRY(mat, j, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), n, ctx);
             else
-                for (k = 0; k < n; k++)
-                    status |= gr_sub(GR_MAT_ENTRY(mat, j, k, sz), GR_MAT_ENTRY(mat, j, k, sz), GR_MAT_ENTRY(mat, i, k, sz), ctx);
+                status |= _gr_vec_sub(GR_MAT_ENTRY(mat, j, 0, sz), GR_MAT_ENTRY(mat, j, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), n, ctx);
         }
         else
         {
@@ -43,10 +44,10 @@ gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    status |= gr_add(GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, i, sz), ctx);
+                    status |= add(GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, i, sz), ctx);
             else
                 for (k = 0; k < m; k++)
-                    status |= gr_sub(GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, i, sz), ctx);
+                    status |= sub(GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, j, sz), GR_MAT_ENTRY(mat, k, i, sz), ctx);
         }
     }
 

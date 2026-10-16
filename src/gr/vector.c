@@ -46,20 +46,21 @@ vector_gr_vec_init(gr_vec_t res, gr_ctx_t ctx)
 static int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = ENTRY_CTX(ctx);
+    int status = GR_SUCCESS;
 
     if (VECTOR_CTX(ctx)->all_sizes)
     {
-        gr_stream_write(out, "Vectors (any length) over ");
+        status |= gr_stream_write(out, "Vectors (any length) over ");
     }
     else
     {
-        gr_stream_write(out, "Space of length ");
-        gr_stream_write_si(out, VECTOR_CTX(ctx)->n);
-        gr_stream_write(out, " vectors over ");
+        status |= gr_stream_write(out, "Space of length ");
+        status |= gr_stream_write_si(out, VECTOR_CTX(ctx)->n);
+        status |= gr_stream_write(out, " vectors over ");
     }
 
-    gr_ctx_write(out, elem_ctx);
-    return GR_SUCCESS;
+    status |= gr_ctx_write(out, elem_ctx);
+    return status;
 }
 
 static truth_t vector_ctx_is_ring(gr_ctx_t ctx)
@@ -109,6 +110,16 @@ static truth_t vector_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(ENTRY_CTX(ctx));
 }
 
+static truth_t vector_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return T_FALSE;
+    if (VECTOR_CTX(ctx)->n == 0)
+        return T_TRUE;
+    return gr_ctx_is_approx_commutative_ring(ENTRY_CTX(ctx));
+}
+
+
 #if 0
 /* todo: public */
 static truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
@@ -122,6 +133,9 @@ vector_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(ENTRY_CTX(ctx));
 }
+
+static gr_ptr vector_ctx_base(gr_ctx_t ctx) { return ENTRY_CTX(ctx); }
+
 
 static void
 vector_gr_vec_clear(gr_vec_t res, gr_ctx_t ctx)
@@ -139,6 +153,15 @@ static int
 vector_gr_vec_write(gr_stream_t out, gr_vec_t vec, gr_ctx_t ctx)
 {
     return gr_vec_write(out, vec, ENTRY_CTX(ctx));
+}
+
+static int
+vector_gr_vec_set_str(gr_vec_t res, const char * s, gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return gr_vec_set_str(res, s, 1, ENTRY_CTX(ctx));
+    else
+        return gr_vec_set_str(res, s, 0, ENTRY_CTX(ctx));
 }
 
 static int
@@ -726,7 +749,9 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) vector_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) vector_ctx_base},
 
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},
     {GR_METHOD_INIT,        (gr_funcptr) vector_gr_vec_init},
@@ -734,6 +759,7 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_SWAP,        (gr_funcptr) vector_gr_vec_swap},
     {GR_METHOD_RANDTEST,    (gr_funcptr) vector_gr_vec_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) vector_gr_vec_write},
+    {GR_METHOD_SET_STR,     (gr_funcptr) vector_gr_vec_set_str},
     {GR_METHOD_EQUAL,       (gr_funcptr) vector_gr_vec_equal},
     {GR_METHOD_SET,         (gr_funcptr) vector_gr_vec_set},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) vector_gr_vec_set_other},

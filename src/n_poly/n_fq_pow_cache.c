@@ -136,7 +136,7 @@ void n_fq_pow_cache_mulpow_ui(
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
-    n_poly_t neg,
+    n_poly_t FLINT_UNUSED(neg),
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);

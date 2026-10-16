@@ -34,6 +34,11 @@ be normalised and all coefficients to be reduced modulo `n`, and
 unless otherwise specified they produce output that is normalised with
 coefficients reduced modulo `n`.
 
+Many functions in this module (greatest common divisors and extended
+gcds, modular inverses, minimal polynomials, division as if over a
+field, square roots, factorisation and irreducibility testing) require
+the modulus to be prime. This is assumed and not checked.
+
 Simple example
 --------------
 
@@ -213,6 +218,18 @@ Randomisation
     set to a random monic irreducible polynomial.
 
 
+.. function:: void fmpz_mod_poly_rand(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random polynomial with length up to `len`, with uniformly chosen coefficients.
+
+.. function:: void fmpz_mod_poly_rand_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random monic polynomial with length `len`, with uniformly chosen coefficients.
+
+.. function:: void fmpz_mod_poly_rand_irreducible(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random irreducible polynomial with up to the given length and where the coefficients
+    are generated uniformly.
 
 Attributes
 --------------------------------------------------------------------------------
@@ -474,7 +491,8 @@ Multiplication
 .. function:: void _fmpz_mod_poly_mul(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz_mod_ctx_t ctx)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
-    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
+    and ``(poly2, len2)``.  Assumes ``len1, len2 > 0``; the operands may
+    be given in either order.  Allows
     zero-padding of the two input polynomials.
 
 .. function:: void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
@@ -486,7 +504,8 @@ Multiplication
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
 
-    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Assumes ``len1, len2 > 0`` (the operands may be given in either
+    order) and ``0 < n <= len1 + len2 - 1``.
     Allows for zero-padding in the inputs.  Does not support aliasing between
     the inputs and the output.
 
@@ -494,6 +513,20 @@ Multiplication
 
     Sets ``res`` to the lowest `n` coefficients of the product of
     ``poly1`` and ``poly2``.
+
+.. function:: void _fmpz_mod_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi, const fmpz_mod_ctx_t ctx)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices `[nlo, nhi)`
+    in the full product of ``(poly1, len1)`` and ``(poly2, len2)``.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`.
+    Does not support aliasing between the inputs and the output.
+
+.. function:: void fmpz_mod_poly_mulmid(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong nlo, slong nhi, const fmpz_mod_ctx_t ctx)
+
+    Sets ``res`` to the polynomial formed by the coefficients at indices `[nlo, nhi)`
+    in the product of ``poly1`` and ``poly2``. Equivalently, compute
+    `[(poly1 \cdot poly2) \bmod x^{nhi}] / x^{nlo}`.
 
 .. function:: void _fmpz_mod_poly_sqr(fmpz * res, const fmpz * poly, slong len, const fmpz_mod_ctx_t ctx)
 
@@ -792,7 +825,7 @@ Division
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
-    modulo `p`.
+    modulo `p`, which is not checked.
 
 .. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz * Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
 
@@ -978,7 +1011,8 @@ Power series inversion
 
     Sets ``Qinv`` to the inverse of ``Q`` modulo `x^n`,
     where `n \geq 1`, assuming that the bottom coefficient of
-    `Q` is a unit.
+    `Q` is a unit. A non-unit bottom coefficient (a zero or, over a
+    composite modulus, a nonzero non-invertible value) raises an exception.
 
 .. function:: void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
 
@@ -1001,7 +1035,8 @@ Power series division
 
     Set `Q` to the quotient of the series `A` by `B`, thinking of the series as
     though they were of length `n`. We assume that the bottom coefficient of
-    `B` is a unit.
+    `B` is a unit. A non-unit bottom coefficient (a zero or, over a
+    composite modulus, a nonzero non-invertible value) raises an exception.
 
 
 Greatest common divisor
@@ -1011,8 +1046,10 @@ Greatest common divisor
 .. function:: void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 
     If ``poly`` is non-zero, sets ``res`` to ``poly`` divided
-    by its leading coefficient.  This assumes that the leading coefficient
-    of ``poly`` is invertible modulo `p`.
+    by its leading coefficient.  If the leading coefficient
+    of ``poly`` is not invertible modulo `p`, an exception
+    (``FLINT_IMPINV``) is raised; use :func:`fmpz_mod_poly_make_monic_f`
+    to obtain a factor of `p` instead.
 
     Otherwise, if ``poly`` is zero, sets ``res`` to zero.
 
@@ -1039,7 +1076,8 @@ Greatest common divisor
 
     In general, the greatest common divisor is defined in the polynomial
     ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
-    number.  Thus, this function assumes that `p` is prime.
+    number.  Thus, this function assumes that `p` is prime, which is not
+    checked.
 
 .. function:: slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz * G, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
 
@@ -1226,7 +1264,7 @@ Greatest common divisor
 
     Attempts to set `A` to the inverse of `B` modulo `P` in the polynomial
     ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
-    number.
+    number, which is not checked.
 
     If `\deg(P) < 2`, raises an exception.
 
@@ -1252,16 +1290,16 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version uses the Berlekamp-Massey algorithm, whose running time
     is proportional to ``len`` times the size of the minimal generator.
@@ -1273,16 +1311,16 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version uses the HGCD algorithm, whose running time is
     `O(n \log^2 n)` field operations, regardless of the actual size of
@@ -1295,9 +1333,9 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
@@ -1311,7 +1349,7 @@ Minpoly
 
     `seq_i = -\sum_{j=0}^{d-1} seq_{i+j}*f_j.`
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version automatically chooses the fastest underlying
     implementation based on ``len`` and the size of the modulus.
@@ -1565,11 +1603,6 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
-
-    Worker function version of ``_fmpz_mod_poly_precompute_matrix``.
-    Input/output is stored in ``fmpz_mod_poly_matrix_precompute_arg_t``.
-
 .. function:: void _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f, const fmpz * g, slong leng, const fmpz * ginv, slong lenginv, const fmpz_mod_ctx_t ctx)
 
     Sets the ith row of ``A`` to `f^i` modulo `g` for
@@ -1585,13 +1618,6 @@ Modular composition
     `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
-
-    Worker function version of
-    :func:`_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv`.
-    Input/output is stored in
-    ``fmpz_mod_poly_compose_mod_precomp_preinv_arg_t``.
 
 .. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res, const fmpz * f, slong lenf, const fmpz_mat_t A, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_mod_ctx_t ctx)
 
@@ -1632,51 +1658,6 @@ Modular composition
     `h` is nonzero and that `f` has smaller degree than `h`. Furthermore,
     we require ``hinv`` to be the inverse of the reverse of ``h``.
     The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz * g, slong glen, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
-    where `f_i` are the ``l`` elements of ``polys``. We require that `h` is
-    nonzero and that the length of `g` is less than the length of `h`. We
-    also require that the length of `f_i` is less than the length of `h`. We
-    require ``res`` to have enough memory allocated to hold ``l``
-    ``fmpz_mod_poly_struct``'s. The entries of ``res`` need to be initialised
-    and ``l`` needs to be less than ``len1`` Furthermore, we require ``hinv``
-    to be the inverse of the reverse of ``h``. The output is not allowed to be
-    aliased with any of the inputs.
-
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
-    where `f_i` are the ``n`` elements of ``polys``. We require ``res`` to
-    have enough memory allocated to hold ``n`` ``fmpz_mod_poly_struct``'s.
-    The entries of ``res`` need to be initialised and ``n`` needs to be less
-    than ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
-    smaller degree than `h`. Furthermore, we require ``hinv`` to be the
-    inverse of the reverse of ``h``. No aliasing of ``res`` and
-    ``polys`` is allowed.
-    The algorithm used is the Brent-Kung matrix algorithm.
-
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
-
-    Multithreaded version of
-    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx)
-
-    Multithreaded version of
-    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
-    Horner evaluations across :func:`flint_get_num_threads` threads.
-
 
 Subproduct trees
 --------------------------------------------------------------------------------

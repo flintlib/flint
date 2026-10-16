@@ -13,16 +13,16 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_derivative) (TEMPLATE(T, struct) * rop,
                                const TEMPLATE(T, struct) * op, slong len,
                                const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i;
-
-    for (i = 1; i < len; i++)
-        TEMPLATE(T, mul_ui) (rop + (i - 1), op + i, i, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_derivative(rop, op, len, gr_ctx));
 }
 
 void

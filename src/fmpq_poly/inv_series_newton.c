@@ -67,11 +67,6 @@ _fmpq_poly_inv_series_basecase_rev(fmpz * Qinv, fmpz_t Qinvden,
 }
 
 
-#define MULLOW(z, x, xn, y, yn, nn) \
-    if ((xn) >= (yn)) \
-        _fmpz_poly_mullow(z, x, xn, y, yn, nn); \
-    else \
-        _fmpz_poly_mullow(z, y, yn, x, xn, nn); \
 
 void
 _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
@@ -115,10 +110,10 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
         Wlen = FLINT_MIN(Qnlen + m - 1, n);
         W2len = Wlen - m;
 
-        MULLOW(W, Q, Qnlen, Qinv, m, Wlen);
+        _fmpz_poly_mulmid(W, Q, Qnlen, Qinv, m, m, Wlen);
         fmpz_mul(Wden, Qden, Qinvden);
 
-        MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m);
+        _fmpz_poly_mullow(Qinv + m, Qinv, m, W, W2len, n - m);
         fmpz_mul(Qinvden, Qinvden, Wden);
 
         _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);

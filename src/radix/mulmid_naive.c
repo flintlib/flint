@@ -24,7 +24,6 @@ void radix_mulmid_naive(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, 
 
     FLINT_ASSERT(an >= 1);
     FLINT_ASSERT(bn >= 1);
-    FLINT_ASSERT(an >= bn);
 
     an = FLINT_MIN(an, zhi);
     bn = FLINT_MIN(bn, zhi);

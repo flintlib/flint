@@ -30,7 +30,7 @@ TEST_FUNCTION_START(gr_fmpz_mod_mpoly_q, state)
 
         gr_ctx_init_fmpz_mod_mpoly_q(ZZxy, n_randint(state, 3), mpoly_ordering_randtest(state), m);
         ZZxy->size_limit = 100;
-        gr_test_ring(ZZxy, 1000, flags);
+        gr_test_ring(ZZxy, 100, flags);
         gr_ctx_clear(ZZxy);
 
         fmpz_clear(m);

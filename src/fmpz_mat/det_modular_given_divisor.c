@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,12 +10,13 @@
 */
 
 #include "ulong_extras.h"
+#include "perm.h"
+#include "nmod.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
 /* Enable to exercise corner cases */
-#define DEBUG_USE_SMALL_PRIMES 0
 
 
 static ulong
@@ -31,7 +32,6 @@ next_good_prime(const fmpz_t d, ulong p)
 
     return p;
 }
-
 
 void
 fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
@@ -69,11 +69,14 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_zero(x);
     fmpz_one(prod);
 
-#if DEBUG_USE_SMALL_PRIMES
-    p = UWORD(1);
-#else
-    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
-#endif
+    p = (flint_fmpz_mat_force_small_primes ? UWORD(1) : (UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS));
+
+    slong * P;
+    slong * pivs;
+    slong rank;
+
+    P = flint_malloc(n * sizeof(slong));
+    pivs = flint_malloc(n * sizeof(slong));
 
     /* Compute x = det(A) / d */
     while (fmpz_cmp(prod, bound) <= 0)
@@ -83,7 +86,22 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
         fmpz_mat_get_nmod_mat(Amod, A);
 
         /* Compute x = det(A) / d mod p */
-        xmod = _nmod_mat_det(Amod);
+        rank = nmod_mat_lu_with_pivots(P, pivs, Amod);
+
+        /* Attempt to certify zero determinant. May want to skip this
+           check if proved == 0. */
+        if (rank != n && _fmpz_mat_certify_singular_lu_mod_p(A, rank, P, pivs, p))
+        {
+            fmpz_zero(x);
+            break;
+        }
+
+        xmod = 1;
+        for (slong i = 0; i < n; i++)
+            xmod = nmod_mul(xmod, nmod_mat_entry(Amod, i, i), Amod->mod);
+        if (_perm_parity(P, n) != 0)
+            xmod = nmod_neg(xmod, Amod->mod);
+
         xmod = n_mulmod2_preinv(xmod,
             n_invmod(fmpz_fdiv_ui(d, p), p), Amod->mod.n, Amod->mod.ninv);
 
@@ -103,6 +121,9 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
         fmpz_mul_ui(prod, prod, p);
         fmpz_set(x, xnew);
     }
+
+    flint_free(P);
+    flint_free(pivs);
 
     /* det(A) = x * d */
     fmpz_mul(det, x, d);

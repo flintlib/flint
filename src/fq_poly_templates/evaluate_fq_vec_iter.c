@@ -14,6 +14,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
@@ -21,9 +22,9 @@ _TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
                                           const TEMPLATE(T, struct) * xs, slong n,
                                           const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i;
-    for (i = 0; i < n; i++)
-        _TEMPLATE3(T, poly_evaluate, T)(ys + i, coeffs, len, xs + i, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate_vec_iter(ys, coeffs, len, xs, n, gr_ctx));
 }
 
 void

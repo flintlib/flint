@@ -100,6 +100,17 @@ when the user knows the type.
 Users may wish to define their own union types when only some
 particular types will appear in an application.
 
+.. function:: void gr_ctx_uninitialized(gr_ctx_t ctx)
+
+    Create an uninitialized context. This context object does not support
+    any operations and attempting to initialize an element will throw an
+    exception, but the context object itself can be printed with
+    :func:`gr_ctx_print` and cleared with :func:`gr_ctx_clear`.
+
+    This method is intended for use in wrapper code to allow creating
+    a dummy context that can be safely deinitialized even if an
+    initialization method (for example :func:`gr_ctx_init_mpn_mod`) failed.
+
 Error handling
 ...............................................................................
 
@@ -286,6 +297,13 @@ Context operations
 
     Get the name of the generator of index *i*.
     The returned buffer must be freed with :func:`flint_free`.
+
+.. function:: gr_ptr gr_ctx_base(gr_ctx_t ctx)
+
+    Assuming that ``ctx`` is an extension of a base structure ``base_ctx``,
+    returns the pointer to ``base_ctx``.
+    Otherwise, returns ``NULL``.
+
 
 Element operations
 --------------------------------------------------------------------------------
@@ -797,7 +815,7 @@ Factorization
     `u x` with respect to multiplication by units, also writing the normalizing
     unit *u* as a second output. If `x = 0`, sets *res* to 0 and *u* to 1.
 
-.. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+.. function:: int gr_factor(gr_ptr c, gr_vec_t factors, fmpz_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 
     Given `x \in R`, computes a factorization
 
@@ -910,6 +928,43 @@ Ordering methods
 Enclosure and interval methods
 ........................................................................
 
+.. function:: int gr_big_o_base_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t n, gr_ctx_t ctx)
+
+    Construct the error term `O(x^n)` as a ring element, where *x* typically
+    will be either a generator of a finite-precision power series ring or the
+    base `p` of a finite-precision `p`-adic ring. Returns ``GR_UNABLE`` for ring
+    implementations that cannot represent such an error term,
+    e.g. when *x* is the generator of an exact polynomial ring.
+
+    If the element *x* is not a top-level generator, the ring implementation
+    should search recursively for a generator of a base ring. For example, in
+    `(R[[x]])[[y]]`, the term `O(x^2)` is understood as `O(x^2) y^0`,
+    and one can build objects with nested error terms like
+    `(x + O(x^5)) + (3 + x + O(x^4)) y^2 + O(y^5)`.
+
+    In ring implementations that provide this method, :func:`gr_set_str`
+    allows parsing strings containing subexpressions of the form ``O(x^n)``.
+    Such expressions are parsed specially and the components *x* and *n*
+    are passed to this function without eagerly evaluating the power `x^n`.
+
+.. function:: int gr_set_interval_mid_inf(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+
+    In ball representations of the real numbers, sets *res* to the
+    interval `m \pm \infty`, i.e. the whole real line. In vector spaces
+    over the real numbers, this is `m \pm \infty` with the infinity
+    regarded as a real (or constant) element, so that only the real part
+    of a complex number, respectively the constant coefficient of a
+    polynomial, gets an infinite radius, consistently with
+    :func:`gr_set_interval_mid_rad`.
+
+    :func:`gr_set_str` parses subexpressions of the form ``m +/- inf``
+    (and ``+/- inf`` with `m = 0`) by passing *m* to this function
+    without evaluating ``inf``, so that intervals with an infinite radius
+    can be read back in rings where infinity is not an element.
+    The generic implementation uses :func:`gr_pos_inf` and
+    :func:`gr_set_interval_mid_rad`, returning ``GR_UNABLE`` when
+    the ring has no infinity.
+
 .. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
 
     In ball representations of the real numbers, sets *res* to
@@ -920,6 +975,20 @@ Enclosure and interval methods
     for example, in the complex numbers, `a + b i \pm (0.1 + 0.2 i)`
     is equivalent to `(a \pm 0.1) + (b \pm 0.2) i`.
 
+    In ring implementations that provide this method, :func:`gr_set_str`
+    allows parsing strings containing subexpressions with the syntax ``a +/- b``.
+
+.. function:: int gr_get_interval_mid_rad(gr_ptr m, gr_ptr r, gr_srcptr x, gr_ctx_t ctx)
+
+    The inverse of :func:`gr_set_interval_mid_rad`: in ball
+    representations, sets *m* to the midpoint of *x* and *r* to its
+    radius, as exact elements of the ring (both are then balls of
+    radius zero), so that ``gr_set_interval_mid_rad(y, m, r)``
+    reproduces *x*. In a vector space over the real numbers
+    represented using balls, the radii are handled independently for
+    the generators, as in the setter. In exact representations,
+    *m* is set to *x* and *r* to zero (the generic implementation).
+
 Finite field methods
 ........................................................................
 
@@ -928,6 +997,11 @@ Finite field methods
 .. function:: int gr_ctx_fq_degree(slong * deg, gr_ctx_t ctx)
 
 .. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
+
+    Rings `\mathbb{Z}/n\mathbb{Z}` (*nmod*, *fmpz_mod*, *mpn_mod*) implement
+    these methods when `n` is known to be prime (see :func:`gr_ctx_set_is_field`),
+    with :func:`gr_ctx_fq_degree` returning 1 and :func:`gr_ctx_fq_order`
+    returning `n`.
 
 .. function:: int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 
@@ -946,3 +1020,225 @@ Finite field methods
 .. raw:: latex
 
     \newpage
+
+
+Transformed representations
+--------------------------------------------------------------------------------
+
+A *transformed representation* holds ring elements in a form in which
+multiplications are cheap pointwise operations, at the price of
+conversions in and out -- e.g. polynomials as pointwise evaluations
+under a number-theoretic transform. Algorithms performing many
+multiplications between few conversions (matrix products, half-gcd,
+middle products) run substantially faster in such a representation.
+
+.. type:: gr_transformed_poly_workload_struct
+          gr_transformed_poly_workload_t
+
+    An advisory estimate of the intended workload: how many operands
+    will be converted in (*num_inputs*), how many pointwise
+    multiplications performed (*num_muls*), how many results converted
+    out (*num_outputs*), and a memory bound in bytes (*mem_limit*, 0 for
+    the implementation default). Implementations use it to judge whether
+    switching representation is profitable and to size their tables.
+
+.. function:: int gr_ctx_init_gr_poly_transformed_repr(gr_ctx_t ctx, gr_ctx_t base, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+
+    Constructs a ring of transformed polynomials over *base* admitting
+    lengths up to *len_bound* and up to *terms_bound* accumulated
+    elementary products per element, for the estimated workload. Returns
+    ``GR_UNABLE`` if the base ring provides no transformed
+    representation or judges the switch unprofitable. Conversions are
+    performed by the ``SET_GR_POLY`` / ``GET_GR_POLY`` /
+    ``GET_GR_POLY_WINDOW`` methods of the constructed context; the
+    window variant writes the coefficients `[zl, zh)` of the represented
+    polynomial, with zeros beyond its length.
+    ``_gr_get_gr_poly_destructive`` converts out through the
+    ``GET_GR_POLY_DESTRUCTIVE`` method where the representation provides
+    it: the inverse transforms run on the element's own storage, skipping
+    the transform-sized copy, and the element may only be cleared or
+    fully overwritten afterwards; representations without the method fall
+    back to the copying conversion.
+
+.. function:: int gr_ctx_init_gr_poly_transformed_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+
+    Constructs a ring of transformed polynomials modulo `x^{L} - 1`
+    over *base*, where products wrap around: the implementation may round
+    the requested cyclic length ``*len`` up (for example to a power of
+    two) and writes the actual `L` back. Conversions in require length at
+    most `L`; conversions out give the coefficients of the reduced
+    representative. This is the ``CTX_INIT_TRANSFORMED_POLY_CYCLIC_REPR``
+    method of the base ring (returning ``GR_UNABLE`` by default); it is
+    used for middle products and for products whose high part is known,
+    such as the remainder step of division by a precomputed modulus.
+
+.. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy)
+
+    Constructs the ring of transformed big integers: bilinear
+    expressions over `\mathbb{Z}` with results below ``2^bits_bound``
+    in absolute value, at most *terms_bound* accumulated elementary
+    products and multiplicative depth two. Elements carry a sign bit;
+    mixed-sign accumulations switch the pointwise additions and
+    subtractions, and the sign of a mixed result is resolved at
+    conversion out.
+
+    *alloc_strategy* selects how element storage is obtained.
+    ``GR_TRANSFORMED_MPN_ALLOC_MALLOC`` allocates each element
+    separately. ``GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER`` reserves a
+    stable region of the thread's fft_small scratch buffer holding
+    *num_live* element slabs, from which ``gr_init`` draws and to
+    which ``gr_clear`` returns; initializations beyond *num_live*
+    simultaneously live elements fall back to separate allocation.
+    The reservation makes repeated context creation cheap, since the
+    region persists in the thread's scratch buffer across contexts. It
+    is designed for a context that is the only user of fft_small on its
+    thread while it lives -- construct, perform ring operations,
+    destroy -- and every use in the library follows that pattern. It is
+    an assumption rather than a requirement: while a reservation is
+    live the thread's scratch buffer can neither grow nor move, and an
+    interleaved fft_small operation, such as an integer multiplication
+    large enough to reach it, is served from a secondary buffer instead
+    (see :func:`mpn_ctx_fit_buffer`). A context held across unrelated
+    work, or test code that checks ring results against ``fmpz``
+    arithmetic, therefore stays correct; the secondary buffer is a
+    guarantee, not a fast path. One reservation exists per thread, so a
+    context constructed while another holds it degrades to separate
+    allocation. Elements should be initialized with ``gr_init`` or
+    ``GR_TMP_INIT_VEC`` in every strategy.
+
+    Conversions out whose destination window is too short to hold the
+    reconstruction are staged inside the ring, and that staging is
+    provisioned with the reservation: a region of well under one
+    element's storage, reserved past the slabs. A caller that will
+    always have an element dead by the time it converts may add the bit
+    flag ``GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB`` to *alloc_strategy*,
+    and the ring then takes a free slab for the staging rather than
+    reserving anything. The flag declares a footprint; it is not a correctness
+    contract, and if no slab happens to be free the ring falls back to
+    a plain allocation for that conversion.
+
+    A context may be shared by any number of threads, each working on
+    its own elements: the element storage and the staging are managed
+    by an operand pool (shared with the fft_small complex products, see
+    :func:`fft_small_op_pool_fit`) whose bookkeeping is locked, and
+    every conversion takes independent scratch. A context holding a
+    reservation pins the creating thread's scratch buffer and must be
+    cleared on that thread, after all its elements.
+
+.. function:: int gr_ctx_init_transformed_mpn_window(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy, slong lo, slong hi)
+
+    As :func:`gr_ctx_init_transformed_mpn`, for products of which only
+    the limbs `[lo, hi)` are wanted. The plan is the window plan of
+    :func:`fft_small_plan_init_mpn_window`: when the window allows it,
+    the transforms are cyclic of a length shorter than the products, and
+    a product whose slots then alias converts only through
+    :func:`gr_transformed_mpn_get_window` with a window inside
+    `[lo, hi)`; the other conversions of such a product return
+    ``GR_UNABLE``. Elements that do not alias (operands, and products
+    short enough) convert as usual.
+
+.. function:: int gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live)
+
+    Switches a context created with
+    ``GR_TRANSFORMED_MPN_ALLOC_MALLOC`` to the reserved-slab
+    strategy for *num_live* simultaneously live elements, as if it
+    had been created that way. This is for callers whose live count
+    depends on quantities derived from the constructed context, such
+    as a blocking decision based on the element size. Returns
+    ``GR_UNABLE``, leaving separate allocation in place, if the
+    reservation cannot be made.
+
+.. function:: int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign, gr_ctx_t ctx)
+              int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out, int * sign, gr_ptr x, gr_ctx_t ctx)
+              slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
+
+    Conversions by limb arrays with an explicit sign. The *destructive*
+    get may consume the element, skipping a copy of the transform;
+    *get_limbs* returns the number of limbs the reconstruction needs,
+    which exceeds the length of the value itself by the top CRT
+    coefficient's length.
+
+    A window of *get_limbs* limbs or more takes the reconstruction
+    directly, with no staging and no copy. A shorter window is also
+    accepted: the ring stages the conversion in its own scratch and
+    copies the result out, succeeding whenever the value fits in *zn*
+    limbs and returning ``GR_DOMAIN`` otherwise. For the destructive
+    forms that refusal arrives with the element already consumed, so it
+    cannot be retried. Limbs of *z* above ``*zn_out`` are zeroed.
+
+.. function:: int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_ptr x, gr_ctx_t ctx)
+              slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x, slong lo)
+
+    Truncated conversion out: the limbs of the value starting at limb
+    *lo*, with an error against the exact value within `(-1.5, +0.5)`
+    ulp of the lowest returned limb -- equivalently, at most 1 from the
+    floor-truncated value. The export includes every CRT slot whose
+    coefficient span can reach the first returned limb, with carries
+    propagated, so the error is the truncation itself (one-sided, below
+    1 ulp) plus the wholly dropped slots' total mass, under half an ulp
+    either way.
+
+.. function:: int gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x, gr_ctx_t ctx)
+
+    Residue conversion out: *z* receives the value modulo
+    `2^{\mathtt{zn} \cdot \mathtt{FLINT\_BITS}}` as a two's-complement
+    residue of exactly *zn* limbs, with no sign, whatever the size of
+    the value. Only the CRT slots starting below limb *zn* are
+    reconstructed, so this costs a fraction of a full conversion when
+    *zn* is a fraction of the value's length.
+
+.. function:: int gr_transformed_mpn_get_window(nn_ptr z, slong zn, slong lo, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_window_destructive(nn_ptr z, slong zn, slong lo, gr_ptr x, gr_ctx_t ctx)
+
+    Window conversion out, for signed contexts: *z* receives the limbs
+    `[lo, lo + zn)` of the value as a two's-complement window, within
+    one unit of `\lfloor x / B^{lo} \rfloor` (two when the element
+    carries a small side value, which is folded exactly only for
+    `lo = 0`) and exact for `lo = 0`; the value need not fit. The sign
+    is applied in transform space, so the window is that of the signed
+    value. This is the conversion of windowed contexts with cyclic
+    plans. Returns ``GR_UNABLE`` for unsigned contexts.
+
+.. function:: int gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs, gr_ptr x, gr_ctx_t ctx)
+
+    Converts *x* out into *f*, consuming it. The width the
+    reconstruction needs is taken from the element and *f* is grown to
+    match, so the conversion writes straight into *f*'s own limbs:
+    neither staging nor a copy of the result. A nonzero *lo_limbs*
+    selects the truncated conversion, with the error described above.
+    This is the conversion to use whenever the destination is an
+    ``fmpz``; the caller needs neither *get_limbs* nor a scratch buffer
+    of its own.
+
+.. function:: ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
+
+    Size in bytes of one element's transform storage in this
+    context. A reserved-slab context occupies *num_live* times this,
+    plus the conversion staging region described above when it is not
+    taken from a slab.
+
+    The transformed-mpn context constructor takes a *num_live*
+    declaration of the elements expected alive simultaneously, and
+    declines when their combined transform storage would exceed
+    ``flint_fft_small_max_transformed_ring_size``; the transformed
+    polynomial workload structure carries the same declaration in its
+    ``num_live`` field (zero derives a conservative count). Its ``force``
+    field skips the profitability model and the storage budget entirely,
+    declining only on implementation bounds: for tests, where small
+    unprofitable sizes catch bugs most easily.
+
+    For the transformed-mpn context, *bits_bound* bounds the magnitude
+    of any single represented product; the representation provisions the
+    accumulation capacity from *terms_bound* and the sign headroom from
+    *is_signed* itself, so callers must not add either to the bound.
+    ``gr_transformed_mpn_get_limbs_bound(ctx)`` returns an upper bound,
+    over every element of the context, on what
+    ``gr_transformed_mpn_get_limbs`` can return. The ring sizes its own
+    conversion staging from it, so callers converting into an ``fmpz``
+    or into a window of *get_limbs* limbs need not consult it; a caller
+    that does want a buffer of its own should size it from this bound
+    rather than from a reconstruction of the representation's limb
+    requirements.

@@ -30,7 +30,7 @@ TEST_FUNCTION_START(gr_poly_resultant_euclidean, state)
         int status = GR_SUCCESS;
         slong n;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         gr_poly_init(f, ctx);
         gr_poly_init(g, ctx);

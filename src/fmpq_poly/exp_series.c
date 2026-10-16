@@ -98,110 +98,25 @@ _fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
     fmpz_clear(Aden2);
 }
 
-/* c_k x^k -> c_k x^k / (m+k) */
-static void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
-                           const fmpz * poly, const fmpz_t den, slong len, slong m)
-{
-    slong k;
-    ulong v, c, d;
-    nn_ptr divisors;
-    fmpz_t t, u;
-    TMP_INIT;
-
-    TMP_START;
-    divisors = TMP_ALLOC(sizeof(ulong) * len);
-
-    fmpz_init(t);
-    fmpz_one(t);
-
-    for (k = len - 1; k >= 0; k--)
-    {
-        if (fmpz_is_zero(poly + k))
-        {
-            fmpz_zero(rpoly + k);
-        }
-        else
-        {
-            c = _fmpz_gcd_small(poly + k, k + m);
-
-            if (c == (ulong) (k + m))
-            {
-                fmpz_divexact_ui(rpoly + k, poly + k, k + m);
-                divisors[k] = 1;
-            }
-            else
-            {
-                if (c == 1)
-                {
-                    fmpz_set(rpoly + k, poly + k);
-                    divisors[k] = k + m;
-                }
-                else
-                {
-                    fmpz_divexact_ui(rpoly + k, poly + k, c);
-                    divisors[k] = (k + m) / c;
-                }
-
-                c = divisors[k];
-                d = _fmpz_gcd_small(t, c);
-                if (d != c)
-                    fmpz_mul_ui(t, t, c / d);
-            }
-        }
-    }
-
-    fmpz_mul(rden, den, t);
-
-    if (!fmpz_is_one(t))
-    {
-        if (!COEFF_IS_MPZ(*t))
-        {
-            v = *t;
-            for (k = len - 1; k >= 0; k--)
-            {
-                if (!fmpz_is_zero(rpoly + k) && v != divisors[k])
-                    fmpz_mul_ui(rpoly + k, rpoly + k, divisors[k] == 1 ? v : v / divisors[k]);
-            }
-        }
-        else
-        {
-            fmpz_init(u);
-
-            for (k = len - 1; k >= 0; k--)
-            {
-                if (!fmpz_is_zero(rpoly + k))
-                {
-                    if (divisors[k] == 1)
-                    {
-                        fmpz_mul(rpoly + k, rpoly + k, t);
-                    }
-                    else
-                    {
-                        fmpz_divexact_ui(u, t, divisors[k]);
-                        fmpz_mul(rpoly + k, rpoly + k, u);
-                    }
-                }
-            }
-
-            fmpz_clear(u);
-        }
-    }
-
-    fmpz_clear(t);
-    TMP_END;
-}
-
 static void
 MULLOW(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong n)
 {
-    if (xn + yn - 1 < n)
-        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+    FLINT_ASSERT(xn + yn - 1 >= n);
 
     if (xn >= yn)
         _fmpz_poly_mullow(z, x, xn, y, yn, n);
     else
         _fmpz_poly_mullow(z, y, yn, x, xn, n);
 
+    fmpz_mul(zden, xden, yden);
+}
+
+static void
+MULMID(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong nlo, slong nhi)
+{
+    FLINT_ASSERT(xn + yn - 1 >= nhi);
+
+    _fmpz_poly_mulmid(z, x, xn, y, yn, nlo, nhi);
     fmpz_mul(zden, xden, yden);
 }
 
@@ -309,9 +224,9 @@ _fmpq_poly_exp_series_newton(fmpz * f, fmpz_t fden,
             CONCATENATE(hprime, hprimeden, uden, m - 1, l);
         }
 
-        MULLOW(t, tden, hprime, hprimeden, l, f, fden, m, r);
-        _fmpq_poly_canonicalise(t + m - 1, tden, r + 1 - m);
-        MULLOW(g + m, uden, g, gden, n - m, t + m - 1, tden, r + 1 - m, n - m);
+        MULMID(t, tden, hprime, hprimeden, l, f, fden, m, m - 1, r);
+        _fmpq_poly_canonicalise(t, tden, r + 1 - m);
+        MULLOW(g + m, uden, g, gden, n - m, t, tden, r + 1 - m, n - m);
         _fmpq_poly_canonicalise(g + m, uden, n - m);
         _fmpq_poly_integral_offset(g + m, uden, g + m, uden, n - m, m);
         MULLOW(f + m, uden, f, fden, n - m, g + m, uden, n - m, n - m);
@@ -323,9 +238,9 @@ _fmpq_poly_exp_series_newton(fmpz * f, fmpz_t fden,
         /* g := exp(-h) + O(x^n); not needed if we only want exp(x) */
         if (i != 0 || inverse)
         {
-            MULLOW(t, tden, f, fden, n, g, gden, m, n);
-            _fmpq_poly_canonicalise(t + m, tden, n - m);
-            MULLOW(g + m, uden, g, gden, m, t + m, tden, n - m, n - m);
+            MULMID(t, tden, f, fden, n, g, gden, m, m, n);
+            _fmpq_poly_canonicalise(t, tden, n - m);
+            MULLOW(g + m, uden, g, gden, m, t, tden, n - m, n - m);
             /* Assuming that the low part is canonicalised on input,
                we just need to canonicalise the high part. */
             _fmpq_poly_canonicalise(g + m, uden, n - m);

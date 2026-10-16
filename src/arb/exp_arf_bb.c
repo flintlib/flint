@@ -75,7 +75,7 @@ worker(slong iter, work_t * work)
     else
         fmpz_mul_2exp(T, T, wp - *Qexp);
 
-    arb_fmpz_divapprox(T, T, Q);
+    fmpz_tdiv_q(T, T, Q);
 
     /* T = 1 + T */
     fmpz_one(Q);
@@ -132,13 +132,13 @@ pmerge(arb_t res, const arb_t a, const arb_t b, pwork_t * work)
 }
 
 static void
-pinit(arb_t x, void * args)
+pinit(arb_t x, void * FLINT_UNUSED(args))
 {
     arb_init(x);
 }
 
 static void
-pclear(arb_t x, void * args)
+pclear(arb_t x, void * FLINT_UNUSED(args))
 {
     arb_clear(x);
 }
@@ -254,12 +254,12 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
             if (*Qexp >= wp)
             {
                 fmpz_tdiv_q_2exp(T, T, *Qexp - wp);
-                arb_fmpz_divapprox(T, T, Q);
+                fmpz_tdiv_q(T, T, Q);
             }
             else
             {
                 fmpz_mul_2exp(T, T, wp - *Qexp);
-                arb_fmpz_divapprox(T, T, Q);
+                fmpz_tdiv_q(T, T, Q);
             }
 
             /* T = 1 + T */

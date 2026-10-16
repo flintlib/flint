@@ -161,11 +161,8 @@ _nmod_poly_mullow_classical_check(nn_srcptr p, nn_srcptr poly1, slong len1,
         }
     } else
     {
-        dot_params_t params = {_DOT2, 0};
-        if (bits <= 2 * FLINT_BITS)
-            params.method = _DOT2;
-        else
-            params.method = _DOT3;
+        /* every dot product below has length at most len1 */
+        const dot_params_t params = _nmod_vec_dot_params(len1, mod);
 
         for (i = 0; i < n; i++)
         {

@@ -52,7 +52,8 @@ Manipulating factors
 
     Adds the primitive polynomial `p^e` to the factorisation ``fac``.
 
-    Assumes that `\deg(p) \geq 2` and `e \neq 0`.
+    Assumes that `\deg(p) \geq 2` and `e \neq 0`. These conditions are not
+    checked.
 
 .. function:: void fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 
@@ -119,7 +120,8 @@ Factoring algorithms
 
     Assumes that the constant coefficient of `f` is non-zero.  Note that
     this can be easily achieved by taking out factors of the form `x^k`
-    before calling this routine.
+    before calling this routine.  Neither the primitivity of `f` nor the
+    non-zero constant coefficient is checked.
 
     If the final flag is set, the function will use the van Hoeij factorisation
     algorithm with gradual feeding and mod `2^k` data truncation to find
@@ -138,7 +140,8 @@ Factoring algorithms
 
     Inserts the factorisation of the quadratic (resp. cubic) polynomial *f* into *fac* with
     multiplicity *exp*. This function requires that the content of *f* has
-    been removed, and does not update the content of *fac*.
+    been removed (this is not checked), and does not update the content of
+    *fac*.
     The factorization is calculated over `\mathbb{R}` or `\mathbb{Q}_2` and then tested over `\mathbb{Z}`.
 
 .. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, const fmpz_poly_t F)
@@ -146,3 +149,41 @@ Factoring algorithms
     A wrapper of the Zassenhaus and van Hoeij factoring algorithms, which takes
     as input any polynomial `F`, and stores a factorization in
     ``final_fac``.
+
+.. function:: int _fmpz_poly_factor_inflation_is_irreducible_capelli(const fmpz_poly_t T, ulong p)
+
+    Given `T` irreducible over `\mathbb{Q}` of degree at least 1 and a prime
+    `p`, attempts to certify that the inflation `T(x^p)` is irreducible over
+    `\mathbb{Q}`.  Returns 1 if a certificate was found, in which case
+    `T(x^p)` is provably irreducible, and 0 if the search was inconclusive,
+    in which case nothing is claimed (in particular, `T(x^p)` may still be
+    irreducible).  The behaviour is undefined if `T` is reducible.  `T` need
+    not be primitive and may have negative leading coefficient.
+
+    By Capelli's theorem, for prime `p` the polynomial `T(x^p)` is
+    irreducible over `\mathbb{Q}` if and only if `\theta`, the image of `x`
+    in `K = \mathbb{Q}[x]/(T)`, is not a `p`-th power in `K`.  For
+    `\deg T = 1`, and for `\deg T = 2` with `p = 2`, this condition is
+    decided exactly (so the return value is 1 precisely when `T(x^p)` is
+    irreducible).  Otherwise the function searches for a rational prime `q`,
+    with `T` squarefree modulo `q` and `q` dividing neither the leading nor
+    the constant coefficient of `T`, such that `\theta` reduces to a
+    non-`p`-th power in some residue field of `K` above `q`; any such
+    witness proves `\theta \notin K^p`.  The search is heuristically tuned:
+    its budget is linear in `\deg T` (for inputs with abelian splitting
+    fields of exponent `p`, such as the deflations of Swinnerton-Dyer
+    polynomials, witnesses have density only `1/(p \deg T)` among rational
+    primes and occur only in degree-1 residue fields), and it terminates
+    early when accumulated local evidence makes irreducibility unlikely.
+
+.. function:: int fmpz_poly_factor_inflation_is_irreducible_capelli(const fmpz_poly_t T, ulong d)
+
+    Given `T` irreducible over `\mathbb{Q}` of degree at least 1 and
+    `d \geq 1`, returns 1 if the inflation `T(x^d)` is certified irreducible
+    over `\mathbb{Q}`, and 0 if the certification was inconclusive, in which
+    case nothing is claimed.  Chains the prime-step certificate over the
+    prime factorisation of `d`, via `T(x^d) = U(x^{d/p})` with
+    `U = T(x^p)`.  The behaviour is undefined if `T` is reducible.
+    This certificate is used by :func:`fmpz_poly_factor` to avoid
+    refactoring inflations of irreducible deflation factors.
+

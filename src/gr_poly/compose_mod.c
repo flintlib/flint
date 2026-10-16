@@ -84,8 +84,7 @@ gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t re
 
     gr_poly_fit_length(res, len, ctx);
     status |= _compose_mod(res->coeffs, poly1->coeffs, len1, ptr2, poly3->coeffs, len3, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
 
     GR_TMP_CLEAR_VEC(ptr2, vec_len, ctx);
     return status;

@@ -32,25 +32,25 @@ int _nmod_vec_fprint_pretty(FILE * file, nn_srcptr vec, slong len, nmod_t mod)
     if (z <= 0)
         return z;
 
-    z = flint_printf("[");
+    z = flint_fprintf(file, "[");
     if (z <= 0)
         return z;
 
     for (j = 0; j < len; j++)
     {
-        z = flint_printf(fmt, vec[j]);
+        z = flint_fprintf(file, fmt, vec[j]);
         if (z <= 0)
             return z;
 
         if (j + 1 < len)
         {
-            z = flint_printf(" ");
+            z = flint_fprintf(file, " ");
             if (z <= 0)
                 return z;
         }
     }
 
-    z = flint_printf("]\n");
+    z = flint_fprintf(file, "]\n");
 
     return z;
 }

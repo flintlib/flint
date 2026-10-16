@@ -48,6 +48,17 @@ TEST_FUNCTION_START(fmpz_poly_hermite_h, state)
             flint_abort();
         }
 
+        /* check that the output is correct when overwriting a
+           polynomial with arbitrary coefficients */
+        fmpz_poly_randtest(t2, state, n + 5, 20);
+        fmpz_poly_hermite_h(t2, n);
+        if (!fmpz_poly_equal(t2, T1))
+        {
+            flint_printf("FAIL (reusing output): n = %wd\n", n);
+            fflush(stdout);
+            flint_abort();
+        }
+
         fmpz_poly_swap(T0, T1);
     }
 

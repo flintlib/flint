@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -20,39 +21,34 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        gr_ctx_t ctx, poly_ctx, fmpz_ctx;
+        gr_ctx_t ctx;
         gr_poly_t A, B, C;
         gr_ptr c;
-        gr_vec_t F, exp;
+        gr_poly_vec_t F;
+        fmpz_vec_t exp;
         slong i;
         int status = GR_SUCCESS;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
-        while (gr_ctx_is_field(ctx) != T_TRUE)
+        while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
-
-        gr_ctx_init_gr_poly(poly_ctx, ctx);
-        gr_ctx_init_fmpz(fmpz_ctx);
 
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);
         gr_poly_init(C, ctx);
 
-        gr_vec_init(F, 0, poly_ctx);
-        gr_vec_init(exp, 0, fmpz_ctx);
+        gr_poly_vec_init(F, 0, ctx);
+        fmpz_vec_init(exp, 0);
 
         c = gr_heap_init(ctx);
 
-        if (ctx->methods == _ca_methods)
-            status |= gr_poly_randtest(A, state, 3, ctx);
-        else
-            status |= gr_poly_randtest(A, state, 10, ctx);
+        status |= gr_poly_randtest(A, state, 8, ctx);
 
         status |= gr_poly_factor_squarefree(c, F, exp, A, ctx);
 
@@ -64,15 +60,16 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
             {
                 status |= gr_poly_one(C, ctx);
                 for (i = 0; i < F->length; i++)
-                    status |= gr_poly_mul(C, C, gr_vec_entry_ptr(F, i, poly_ctx), ctx);
+                    status |= gr_poly_mul(C, C, F->entries + i, ctx);
+                status |= gr_poly_canonical_associate(C, NULL, C, ctx);
 
                 if (status == GR_SUCCESS && gr_poly_equal(B, C, ctx) == T_FALSE)
                 {
                     flint_printf("FAIL (product)\n\n");
+                    gr_ctx_println(ctx);
                     flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                     flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
                     flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n");
-
                     flint_abort();
                 }
             }
@@ -82,13 +79,10 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
         gr_poly_clear(B, ctx);
         gr_poly_clear(C, ctx);
 
-        gr_vec_clear(F, poly_ctx);
-        gr_vec_clear(exp, fmpz_ctx);
-
+        gr_poly_vec_clear(F, ctx);
+        fmpz_vec_clear(exp);
         gr_heap_clear(c, ctx);
 
-        gr_ctx_clear(poly_ctx);
-        gr_ctx_clear(fmpz_ctx);
         gr_ctx_clear(ctx);
     }
 

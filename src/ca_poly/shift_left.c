@@ -10,26 +10,14 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_shift_left(ca_ptr res, ca_srcptr poly, slong len, slong n, ca_ctx_t ctx)
 {
-    slong i;
-
-    /* Copy in reverse to avoid writing over unshifted coefficients */
-    if (res != poly)
-    {
-        for (i = len; i--; )
-            ca_set(res + n + i, poly + i, ctx);
-    }
-    else
-    {
-        for (i = len; i--; )
-            ca_swap(res + n + i, res + i, ctx);
-    }
-
-    for (i = 0; i < n; i++)
-        ca_zero(res + i, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_shift_left(res, poly, len, n, gr_ctx));
 }
 
 void

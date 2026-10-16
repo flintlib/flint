@@ -203,6 +203,8 @@ Radix 2 transforms
     space, but their value is irrelevant. The value of ``trunc`` must be
     divisible by 2.
 
+    This is a truncated FFT variant in the sense of [vdH2004]_.
+
 .. function:: void fft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
     As for ``fft_radix2`` except that only the first ``trunc``
@@ -266,6 +268,8 @@ Radix 2 transforms
     Finally a single layer of the IFFT is completed on all the coefficients
     up to ``trunc`` being careful to note that this involves doubling the
     coefficients from ``trunc - n`` up to ``n``.
+
+    This inverse truncated transform follows the approach of [vdH2004]_.
 
 .. function:: void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
@@ -560,6 +564,24 @@ Convolution
     limbs of space and ``tt`` must have ``2*(limbs + 1)`` of free 
     space.
 
+.. function:: slong fft_convolution_choose_mid(slong * trunc, slong len_out, slong nlo, slong nhi)
+
+    Plans a convolution of which only the output coefficients at indices
+    `[nlo, nhi)` of a product of length ``len_out`` are needed, where
+    `0 \le nlo < nhi \le len\_out`. Returns the ``depth`` and sets
+    ``trunc`` for :func:`fft_convolution`. This is either the truncated
+    transform of depth `\lceil \log_2 len\_out \rceil - 2` with
+    ``trunc = len_out``, or a full transform of length
+    `M = 4 \cdot 2^{depth}`, the smallest power of two with
+    `M \ge nhi` and `M \ge len\_out - nlo`. The full transform computes
+    the product modulo `x^M - 1`, in which coefficient `k` receives
+    `c_k + c_{k+M}`; the conditions ensure that all wrapped terms land
+    below `nlo`. The cyclic option is chosen when `M` is smaller than
+    the number of points the truncated transform processes (``trunc``
+    rounded up as in :func:`fft_convolution`). The bit bound used to
+    select the coefficient ring only needs to hold for the coefficients
+    in the window. The depth is at least 0.
+
 FFT Precaching
 -------------------------------------------------------------------------------
 
@@ -574,3 +596,33 @@ FFT Precaching
     As per ``fft_convolution`` except that it is assumed ``fft_precache`` has
     been called on ``jj`` with the same parameters. This will then run faster
     than if ``fft_convolution`` had been run with the original ``jj``.
+.. function:: void fft_convolution_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx, mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+
+    As ``fft_convolution_basic``, except that when ``sdctx`` is not
+    ``NULL`` the pointwise multiplications modulo `2^N + 1` are
+    performed by ``sd_fft_mpn_mulmod_2expp1`` with the given context instead of
+    ``fft_mulmod_2expp1``. Passing ``NULL`` reproduces the classic
+    behavior exactly. The context must have been initialized for
+    `N` equal to ``limbs * FLINT_BITS``.
+
+.. function:: void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx, mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+
+    As ``fft_convolution_precache`` with the same optional negacyclic
+    pointwise context as ``fft_convolution_sd_fft``.
+
+.. function:: slong fft_adjust_limbs_sd_fft(slong tight, slong n_outer, slong * m_out)
+
+    Negacyclic-aware ring selection for Schoenhage-Strassen
+    convolutions. The instantiated digit sizes of the negacyclic
+    pointwise engine form a lattice of rings `N' = mb` with `m` a
+    power of two; among candidates whose growth over
+    ``fft_adjust_limbs(tight)`` stays within a per-prime-count cap,
+    the one minimizing an estimated cost is selected. On success
+    ``*m_out`` receives the digit count and the returned limb count
+    defines `N'`; otherwise ``*m_out`` is zero and the standard
+    Nussbaumer rounding is returned, so the caller keeps
+    ``fft_mulmod_2expp1``. The caps and cost weights are tuning
+    parameters, calibrated conservatively; on targets with tuned
+    assembly the measured advantage of the engine is larger and
+    admits looser caps.
+

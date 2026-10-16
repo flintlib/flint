@@ -12,7 +12,7 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
-/* todo: algorithm selection */
+/* todo: algorithm selection, especially for finite fields */
 int
 _gr_mat_charpoly_generic(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
 {

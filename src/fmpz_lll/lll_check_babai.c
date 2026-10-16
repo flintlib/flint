@@ -31,7 +31,10 @@
     do { \
         if (heuristic) \
         { \
-            d_mat_entry(G, I, J) = fmpz_lll_heuristic_dot(appB->rows[I], appB->rows[J], C, B, I, J, expo[I] + expo[J]); \
+            if (P != NULL) \
+                d_mat_entry(G, I, J) = fmpz_lll_packed_heuristic_dot(appB->rows[I], appB->rows[J], C, P, I, J, expo[I] + expo[J]); \
+            else \
+                d_mat_entry(G, I, J) = fmpz_lll_heuristic_dot(appB->rows[I], appB->rows[J], C, B, I, J, expo[I] + expo[J]); \
         } \
         else if (advance) \
         { \
@@ -47,7 +50,7 @@
     } while (0)
 
 static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
-    fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
+    fmpz_mat_t B, fmpz_lll_packed_struct * P, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
     d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros,
     int kappamax, int n, const fmpz_lll_t fl, int advance, int heuristic)
 {
@@ -158,7 +161,10 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - tmp;
                             }
-                            _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
+                            if (P != NULL)
+                                fmpz_lll_packed_row_sub(P, kappa, j);
+                            else
+                                _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
                                           fmpz_mat_row(B, j), n);
                             if (U != NULL)
                             {
@@ -175,7 +181,10 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) + tmp;
                             }
-                            _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
+                            if (P != NULL)
+                                fmpz_lll_packed_row_add(P, kappa, j);
+                            else
+                                _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
                                           fmpz_mat_row(B, j), n);
                             if (U != NULL)
                             {
@@ -205,7 +214,10 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
                             }
 
                             xx = (slong) tmp;
-                            _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
+                            if (P != NULL)
+                                fmpz_lll_packed_row_submul_si(P, kappa, j, xx);
+                            else
+                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
                                                        fmpz_mat_row(B, j), n, xx);
                             if (U != NULL)
                             {
@@ -230,7 +242,10 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
                                 xx = xx << -exponent;
                                 exponent = 0;
 
-                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
+                                if (P != NULL)
+                                    fmpz_lll_packed_row_submul_si(P, kappa, j, xx);
+                                else
+                                    _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
                                                            fmpz_mat_row(B, j), n, xx);
                                 if (U != NULL)
                                 {
@@ -250,7 +265,10 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
                             }
                             else
                             {
-                                _fmpz_vec_scalar_submul_si_2exp(fmpz_mat_row(B, kappa),
+                                if (P != NULL)
+                                    fmpz_lll_packed_row_submul_si_2exp(P, kappa, j, xx, exponent);
+                                else
+                                    _fmpz_vec_scalar_submul_si_2exp(fmpz_mat_row(B, kappa),
                                                                 fmpz_mat_row(B, j),
                                                                 n, xx,
                                                                 exponent);
@@ -282,8 +300,11 @@ static int _fmpz_lll_check_babai(int cur_kappa, int kappa,
 
             if (test)           /* Anything happened? */
             {
-                expo[kappa] =
-                    _fmpz_vec_get_d_vec_2exp(appB->rows[kappa],
+                if (P != NULL)
+                    expo[kappa] = fmpz_lll_packed_get_d_vec_2exp(appB->rows[kappa], P, kappa);
+                else
+                    expo[kappa] =
+                        _fmpz_vec_get_d_vec_2exp(appB->rows[kappa],
                                              fmpz_mat_row(B, kappa), n);
                 aa = zeros + 1;
 
@@ -662,27 +683,41 @@ int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_ma
     d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
     int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    return _fmpz_lll_check_babai(cur_kappa, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 0);
+    return _fmpz_lll_check_babai(cur_kappa, kappa, B, NULL, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 0);
 }
 
 int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U,
     d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
     int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    return _fmpz_lll_check_babai(cur_kappa, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 1);
+    return _fmpz_lll_check_babai(cur_kappa, kappa, B, NULL, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 1);
 }
 
 int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U,
     d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
     int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    return _fmpz_lll_check_babai(INT_MIN, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 0);
+    return _fmpz_lll_check_babai(INT_MIN, kappa, B, NULL, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 0);
 }
 
 int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U,
     d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
     int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    return _fmpz_lll_check_babai(INT_MIN, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 1);
+    return _fmpz_lll_check_babai(INT_MIN, kappa, B, NULL, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 1);
 }
 
+
+int fmpz_lll_advance_check_babai_packed(int cur_kappa, int kappa, fmpz_lll_packed_t P, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic)
+{
+    return _fmpz_lll_check_babai(cur_kappa, kappa, NULL, P, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, heuristic);
+}
+
+int fmpz_lll_check_babai_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic)
+{
+    return _fmpz_lll_check_babai(INT_MIN, kappa, NULL, P, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, heuristic);
+}

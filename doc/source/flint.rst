@@ -228,11 +228,16 @@ Input/Output
 
 .. function:: int flint_printf(const char * format, ...)
               int flint_fprintf(FILE * fs, const char * format, ...)
+              int flint_snprintf(char * s, size_t n, const char * str, ...)
+              int flint_sprintf(char * s, const char * str, ...)
               int flint_vprintf(const char * format, va_list vlist)
               int flint_vfprintf(FILE * fs, const char * format, va_list vlist)
+              int flint_vsnprintf(char * s, size_t n, const char * str, va_list vlist)
+              int flint_vsprintf(char * s, const char * str, va_list vlist)
 
     These functions are extensions of the C standard library functions
-    ``printf``, ``fprintf``, ``vprintf``, and ``vfprintf``.
+    ``printf``, ``fprintf``, ``snprintf``, ``sprintf``, ``vprintf``, ``vfprintf``, 
+    ``vsnprintf``, and ``vsprintf``.
 
     The first extension is the addition of the length modifier ``w``, used for
     printing the types :type:`ulong`, :type:`slong` and :type:`ulong`. As
@@ -428,12 +433,6 @@ Input/Output
     Invalid formats using variable minimum field width and/or precision such as
     ``"%* p"`` may be wrongly parsed, and may result in a different result
     compared to the C standard library functions.
-
-.. function:: int flint_sprintf(char * s, const char * str, ...)
-
-    This functions is an extensions of the C standard library functions
-    ``sprintf``. It is currently advised to not use this function as it is
-    currently not coherent with :func:`flint_printf`.
 
 .. function:: int flint_scanf(const char * str, ...)
               int flint_fscanf(FILE * f, const char * str, ...)

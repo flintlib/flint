@@ -33,8 +33,8 @@ TEST_FUNCTION_START(nmod_poly_mullow_KS, state)
         if (b->length > 0 && c->length > 0)
             trunc = n_randint(state, b->length + c->length);
 
-        nmod_poly_mullow_KS(a, b, c, 0, trunc);
-        nmod_poly_mullow_KS(b, b, c, 0, trunc);
+        nmod_poly_mullow_KS(a, b, c, trunc);
+        nmod_poly_mullow_KS(b, b, c, trunc);
 
         result = (nmod_poly_equal(a, b));
         if (!result)
@@ -67,8 +67,8 @@ TEST_FUNCTION_START(nmod_poly_mullow_KS, state)
         if (b->length > 0 && c->length > 0)
             trunc = n_randint(state, b->length + c->length);
 
-        nmod_poly_mullow_KS(a, b, c, 0, trunc);
-        nmod_poly_mullow_KS(c, b, c, 0, trunc);
+        nmod_poly_mullow_KS(a, b, c, trunc);
+        nmod_poly_mullow_KS(c, b, c, trunc);
 
         result = (nmod_poly_equal(a, c));
         if (!result)
@@ -103,7 +103,7 @@ TEST_FUNCTION_START(nmod_poly_mullow_KS, state)
             trunc = n_randint(state, b->length + c->length);
 
         nmod_poly_mullow_classical(a1, b, c, trunc);
-        nmod_poly_mullow_KS(a2, b, c, 0, trunc);
+        nmod_poly_mullow_KS(a2, b, c, trunc);
 
         result = (nmod_poly_equal(a1, a2));
         if (!result)

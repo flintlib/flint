@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -82,13 +83,31 @@ _gr_poly_compose_series(gr_ptr res, gr_srcptr poly1, slong len1,
     {
         status |= _gr_poly_compose_series_horner(res, poly1, len1, poly2, len2, n, ctx);
     }
-    else if (len1 * len1 < n || (len1 - 1) * (len2 - 1) + 1 < 4 * n)  /* todo: tune these cutoffs */
+    else if (len1 * len1 < n || (len1 - 1) * (len2 - 1) + 1 < 4 * n)  /* todo: tune this */
     {
         status |= _gr_poly_compose_series_divconquer(res, poly1, len1, poly2, len2, n, ctx);
     }
     else
     {
-        status |= _gr_poly_compose_series_brent_kung(res, poly1, len1, poly2, len2, n, ctx);
+        /* Try to figure out a reasonable cutoff for Kinoshita-Li.
+           The following fallback is OK for fmpz and
+           nmod with 64-bit coefficients.
+           See also _gr_poly_revert_series. */
+        slong cutoff = 500;
+
+        /* Tuned for arb and acb. */
+        if (n >= 100 && gr_ctx_has_real_prec(ctx) == T_TRUE)
+        {
+            GR_MUST_SUCCEED(gr_ctx_get_real_prec(&cutoff, ctx));
+
+            cutoff = 15000 / sqrt(FLINT_MAX(64, cutoff));
+            cutoff = FLINT_MAX(cutoff, 100);
+        }
+
+        if (n < cutoff)
+            status |= _gr_poly_compose_series_brent_kung(res, poly1, len1, poly2, len2, n, ctx);
+        else
+            status |= _gr_poly_compose_series_kinoshita_li(res, poly1, len1, poly2, len2, n, ctx);
     }
 
     return status;
@@ -129,8 +148,7 @@ gr_poly_compose_series(gr_poly_t res,
         gr_poly_fit_length(res, lenr, ctx);
         status = _gr_poly_compose_series(res->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, ctx);
-        _gr_poly_set_length(res, lenr, ctx);
-        _gr_poly_normalise(res, ctx);
+        _gr_poly_set_length_normalise(res, lenr, ctx);
     }
     else
     {
@@ -138,8 +156,7 @@ gr_poly_compose_series(gr_poly_t res,
         gr_poly_init2(t, lenr, ctx);
         status = _gr_poly_compose_series(t->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, ctx);
-        _gr_poly_set_length(t, lenr, ctx);
-        _gr_poly_normalise(t, ctx);
+        _gr_poly_set_length_normalise(t, lenr, ctx);
         gr_poly_swap(res, t, ctx);
         gr_poly_clear(t, ctx);
     }

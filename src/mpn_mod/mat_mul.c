@@ -105,11 +105,12 @@ mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     if (ar < cutoff_multi_mod || ac < cutoff_multi_mod || bc < cutoff_multi_mod)
         return mpn_mod_mat_mul_waksman(C, A, B, ctx);
 
-    /* special case: near the two-limb boundary, strassen beats multi_mod on a single thread */
-#ifndef FLINT_USES_BLAS
-    if (bits >= 113 && bits <= 128 && flint_get_num_available_threads() == 1)
-        return gr_mat_mul_strassen(C, A, B, ctx);
-#endif
+    /*
+        This special case (near the two-limb boundary, strassen beat
+        multi_mod on a single thread) applied only to builds without
+        BLAS; multi_mod now always has a gemm-backed path, so it is
+        gone. Worth re-checking against the fallback kernels.
+    */
 
     return mpn_mod_mat_mul_multi_mod(C, A, B, ctx);
 }

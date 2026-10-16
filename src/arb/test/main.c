@@ -80,7 +80,6 @@
 #include "t-div_arf.c"
 #include "t-div.c"
 #include "t-div_fmpz.c"
-#include "t-div_newton.c"
 #include "t-div_si.c"
 #include "t-div_ui.c"
 #include "t-dot.c"
@@ -120,6 +119,7 @@
 #include "t-get_mpn_fixed_mod_log2.c"
 #include "t-get_mpn_fixed_mod_pi4.c"
 #include "t-get_rand_fmpq.c"
+#include "t-get_simplest_fmpq.c"
 #include "t-get_str.c"
 #include "t-get_unique_fmpz.c"
 #include "t-hurwitz_zeta.c"
@@ -188,7 +188,6 @@
 #include "t-special.c"
 #include "t-sqrt1pm1.c"
 #include "t-sqrt.c"
-#include "t-sqrt_newton.c"
 #include "t-sqrtpos.c"
 #include "t-sub_arf.c"
 #include "t-sub.c"
@@ -288,7 +287,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_div_arf),
     TEST_FUNCTION(arb_div),
     TEST_FUNCTION(arb_div_fmpz),
-    TEST_FUNCTION(arb_div_newton),
     TEST_FUNCTION(arb_div_si),
     TEST_FUNCTION(arb_div_ui),
     TEST_FUNCTION(arb_dot),
@@ -328,6 +326,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_get_mpn_fixed_mod_log2),
     TEST_FUNCTION(arb_get_mpn_fixed_mod_pi4),
     TEST_FUNCTION(arb_get_rand_fmpq),
+    TEST_FUNCTION(arb_get_simplest_fmpq),
     TEST_FUNCTION(arb_get_str),
     TEST_FUNCTION(arb_get_unique_fmpz),
     TEST_FUNCTION(arb_hurwitz_zeta),
@@ -396,7 +395,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_special),
     TEST_FUNCTION(arb_sqrt1pm1),
     TEST_FUNCTION(arb_sqrt),
-    TEST_FUNCTION(arb_sqrt_newton),
     TEST_FUNCTION(arb_sqrtpos),
     TEST_FUNCTION(arb_sub_arf),
     TEST_FUNCTION(arb_sub),

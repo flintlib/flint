@@ -12,6 +12,9 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#if FLINT_HAVE_FFT_SMALL
+# include "fft_small.h"
+#endif
 
 TEST_FUNCTION_START(nmod_poly_mul, state)
 {
@@ -118,6 +121,45 @@ TEST_FUNCTION_START(nmod_poly_mul, state)
         nmod_poly_clear(c);
         nmod_poly_clear(d);
     }
+
+#if FLINT_HAVE_FFT_SMALL
+    /* Check against the classical algorithm modulo the primes of the
+       fft_small context, for which the dispatcher has its own cutoff,
+       with lengths on both sides of it, squarings included */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+
+        ulong n = get_default_mpn_ctx()->ffts[n_randint(state, MPN_CTX_NCRTS)].mod.n;
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, n_randint(state, 2) ? 60 : 1000));
+        nmod_poly_randtest(c, state, 1 + n_randint(state, n_randint(state, 2) ? 60 : 1000));
+
+        if (n_randint(state, 5) == 0)
+            nmod_poly_set(c, b);
+
+        nmod_poly_mul(a, b, c);
+        nmod_poly_mul_classical(d, b, c);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (fft_small prime):\n");
+            flint_printf("n = %wu, lengths %wd, %wd\n", n, b->length, c->length);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+#endif
 
     TEST_FUNCTION_END(state);
 }

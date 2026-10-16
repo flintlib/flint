@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_poly.h"
 #include "arb_poly.h"
 
 void
@@ -23,16 +24,10 @@ _arb_poly_cot_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong len, slong pr
     }
     else
     {
-        arb_ptr t, u;
-
-        t = _arb_vec_init(len);
-        u = _arb_vec_init(len);
-
-        _arb_poly_sin_cos_pi_series(t, u, h, hlen, len, prec);
-        _arb_poly_div_series(g, u, len, t, len, len, prec);
-
-        _arb_vec_clear(t, len);
-        _arb_vec_clear(u, len);
+        gr_ctx_t ctx;
+        gr_ctx_init_real_arb(ctx, prec);
+        if (_gr_poly_cot_pi_series(g, h, hlen, len, ctx) != GR_SUCCESS)
+            _arb_vec_indeterminate(g, len);
     }
 }
 

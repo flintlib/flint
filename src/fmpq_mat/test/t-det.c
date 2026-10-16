@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
+#include "fmpz_mat.h"
 
 TEST_FUNCTION_START(fmpq_mat_det, state)
 {
@@ -19,6 +20,7 @@ TEST_FUNCTION_START(fmpq_mat_det, state)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         fmpq_mat_t A, B, C;
         fmpq_t a, b, ab, c;
 
@@ -74,6 +76,8 @@ TEST_FUNCTION_START(fmpq_mat_det, state)
         fmpq_mat_clear(B);
         fmpq_mat_clear(C);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

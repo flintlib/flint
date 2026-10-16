@@ -29,7 +29,7 @@ test_fib_fmpz_rec1(flint_rand_t state)
     fmpz_init(x1);
     fmpz_init(x2);
 
-    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite(ctx) == T_TRUE)
         fmpz_randtest(x, state, 100);
     else
         fmpz_randtest(x, state, 10);
@@ -75,7 +75,7 @@ test_fib_ui_rec1(flint_rand_t state)
 
     GR_TMP_INIT4(fx, fx1, fx2, fxfx1, ctx);
 
-    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+    if (gr_ctx_has_real_prec(ctx) == T_TRUE || gr_ctx_is_finite(ctx) == T_TRUE)
     {
         x = n_randtest(state);
         x = FLINT_MIN(x, UWORD_MAX - 2);

@@ -52,7 +52,7 @@ _fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_mod_ct
 
 #else
 
-void
+static void
 _fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_mod_ctx_t ctx)
 {
     fmpz_powm(res, x, e, ctx->n);
@@ -127,7 +127,7 @@ _fmpz_mod_pow_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_mod_ctx_t ctx)
 
 #else
 
-void
+static void
 _fmpz_mod_pow_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_mod_ctx_t ctx)
 {
     fmpz_powm_ui(res, x, e, ctx->n);

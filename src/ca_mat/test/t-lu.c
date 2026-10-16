@@ -157,6 +157,59 @@ TEST_FUNCTION_START(ca_mat_lu, state)
                 check(P, LU, A, rank, ctx);
             }
 
+            /* With rank_check, a provably rank-deficient square matrix
+               must give success with rank 0 (integer entries: all zero
+               tests are decidable, so this cannot fail). */
+            if (m == n)
+            {
+                success = ca_mat_lu(&rank, P, LU, A, 1, ctx);
+
+                if (!success || (r < n && rank != 0) || (r == n && rank != n))
+                {
+                    flint_printf("FAIL (rank_check):\n");
+                    flint_printf("success = %d, r = %wd, rank = %wd\n", success, r, rank);
+                    flint_printf("A:");
+                    ca_mat_print(A, ctx);
+                    flint_abort();
+                }
+
+                if (r == n)
+                    check(P, LU, A, rank, ctx);
+
+                {
+                    truth_t nonsingular;
+                    ca_t det;
+                    int det_success;
+
+                    nonsingular = ca_mat_nonsingular_lu(P, LU, A, ctx);
+
+                    if (nonsingular != ((r == n) ? T_TRUE : T_FALSE))
+                    {
+                        flint_printf("FAIL (nonsingular_lu):\n");
+                        flint_printf("r = %wd, nonsingular = %d\n", r, (int) nonsingular);
+                        flint_printf("A:");
+                        ca_mat_print(A, ctx);
+                        flint_abort();
+                    }
+
+                    ca_init(det, ctx);
+                    det_success = ca_mat_det_lu(det, A, ctx);
+
+                    if (!det_success || (r < n && ca_check_is_zero(det, ctx) != T_TRUE)
+                                     || (r == n && ca_check_is_zero(det, ctx) != T_FALSE))
+                    {
+                        flint_printf("FAIL (det_lu):\n");
+                        flint_printf("r = %wd, success = %d\n", r, det_success);
+                        flint_printf("A:");
+                        ca_mat_print(A, ctx);
+                        flint_printf("det = "); ca_print(det, ctx); flint_printf("\n");
+                        flint_abort();
+                    }
+
+                    ca_clear(det, ctx);
+                }
+            }
+
             ca_mat_clear(A, ctx);
             ca_mat_clear(LU, ctx);
             flint_free(P);

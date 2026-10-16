@@ -12,7 +12,7 @@
 #include "arb.h"
 
 static int
-use_algebraic(const fmpz_t v, const fmpz_t w, slong prec)
+use_algebraic(const fmpz_t FLINT_UNUSED(v), const fmpz_t w, slong prec)
 {
     fmpz q = *w;
     int r;

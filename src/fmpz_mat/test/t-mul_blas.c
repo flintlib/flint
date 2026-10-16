@@ -54,10 +54,10 @@ TEST_FUNCTION_START(fmpz_mat_mul_blas, state)
                 flint_abort();
             }
         }
-#if FLINT_USES_BLAS && FLINT_BITS == 64
+#if FLINT_BITS == 64
         else
         {
-            flint_printf("FAIL: blas should have worked\n");
+            flint_printf("FAIL: mul_blas should have worked\n");
             fflush(stdout);
             flint_abort();
         }
@@ -102,10 +102,10 @@ TEST_FUNCTION_START(fmpz_mat_mul_blas, state)
                 flint_abort();
             }
         }
-#if FLINT_USES_BLAS && FLINT_BITS == 64
+#if FLINT_BITS == 64
         else
         {
-            flint_printf("FAIL: blas should have worked\n");
+            flint_printf("FAIL: mul_blas should have worked\n");
             fflush(stdout);
             flint_abort();
         }

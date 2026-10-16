@@ -261,6 +261,12 @@ Bessel, Airy and Coulomb functions
               int gr_bessel_i_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_bessel_k_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
+.. function:: int gr_bessel_j_jet(gr_ptr res, gr_srcptr nu, gr_srcptr z, slong len, gr_ctx_t ctx)
+
+    Computes the jet of `J_\nu(z)`, truncated to length *len*. The
+    coefficients are computed using the recurrence relation
+    https://fungrim.org/entry/9b2f38/.
+
 .. function:: int gr_airy(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_ctx_t ctx)
               int gr_airy_ai(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_airy_bi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)

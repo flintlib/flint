@@ -88,6 +88,9 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
         int kappa, kappa2, d, n, i, j, zeros, kappamax;
+        fmpz_lll_packed_t P;
+        int use_packed = 0;
+        fmpz_t zt;
         gr_mat_t mu, r, appB;
         fmpz_gram_t A;
         gr_ptr s, appSPtmp;
@@ -107,6 +110,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         gr_mat_init(r, d, d, ctx);
         gr_mat_init(appB, d, n, ctx);
         gr_mat_init(A->appSP2, d, d, ctx);
+        fmpz_init(zt);
 
         if (U != NULL)
         {
@@ -127,7 +131,19 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         /* Step1: Initialization Step */
         /* ************************** */
 
-        status |= gr_mat_set_fmpz_mat(appB, B, ctx);
+        /* pack B into a homogeneous limb representation; the Gram matrix
+           entries are then computed exactly from the packed rows */
+        {
+            slong m = fmpz_lll_packed_limbs(B);
+            use_packed = (m <= FMPZ_LLL_PACKED_MAX_LIMBS_MPF && d * n * m <= FMPZ_LLL_PACKED_MAX_SIZE);
+            if (use_packed)
+            {
+                fmpz_lll_packed_init(P, d, n, m);
+                fmpz_lll_packed_set_fmpz_mat(P, B);
+            }
+            else
+                status |= gr_mat_set_fmpz_mat(appB, B, ctx);
+        }
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
@@ -138,7 +154,13 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
         do
         {
-            status |= _gr_vec_norm2(ENTRY(A->appSP2, i, i), ROW(appB, i), n, ctx);
+            if (use_packed)
+            {
+                fmpz_lll_packed_dot(zt, P, i, i, n);
+                status |= gr_set_fmpz(ENTRY(A->appSP2, i, i), zt, ctx);
+            }
+            else
+                status |= _gr_vec_norm2(ENTRY(A->appSP2, i, i), ROW(appB, i), n, ctx);
         } while ((_gr_sgn(ENTRY(A->appSP2, i, i), ctx) == 0)
                  && (++i < d));
 
@@ -164,6 +186,14 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
             /* ********************************** */
             /* Step3: Call to the Babai algorithm */
             /* ********************************** */
+            if (use_packed)
+            {
+                fmpz_lll_packed_maybe_shrink(P);
+                babai_ok = fmpz_lll_check_babai_heuristic_packed(kappa, P, U, mu, r, s,
+                                               A, alpha[kappa], zeros, kappamax, n,
+                                               tmp, rtmp, ctx, fl);
+            }
+            else
             babai_ok =
                 fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
                                                A, alpha[kappa], zeros,
@@ -176,6 +206,12 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
                 gr_mat_clear(mu, ctx);
                 gr_mat_clear(r, ctx);
+                if (use_packed)
+                {
+                    fmpz_lll_packed_get_fmpz_mat(B, P);
+                    fmpz_lll_packed_clear(P);
+                }
+                fmpz_clear(zt);
                 gr_mat_clear(appB, ctx);
                 gr_mat_clear(A->appSP2, ctx);
                 GR_TMP_CLEAR_VEC(s, d, ctx);
@@ -264,7 +300,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step7: Update B and appB */
                 /* ************************ */
 
-                fmpz_mat_move_row(B, kappa2, kappa);
+                if (use_packed)
+                    fmpz_lll_packed_move_row(P, kappa2, kappa);
+                else
+                    fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
                     fmpz_mat_move_row(U, kappa2, kappa);
@@ -306,7 +345,13 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 {
                     zeros++;
                     kappa++;
-                    status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
+                    if (use_packed)
+                    {
+                        fmpz_lll_packed_dot(zt, P, kappa, kappa, n);
+                        status |= gr_set_fmpz(ENTRY(A->appSP2, kappa, kappa), zt, ctx);
+                    }
+                    else
+                        status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
                     status |= gr_set(ENTRY(r, kappa, kappa), ENTRY(A->appSP2, kappa, kappa), ctx);
                 }
 
@@ -340,6 +385,12 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
         gr_mat_clear(mu, ctx);
         gr_mat_clear(r, ctx);
+        if (use_packed)
+        {
+            fmpz_lll_packed_get_fmpz_mat(B, P);
+            fmpz_lll_packed_clear(P);
+        }
+        fmpz_clear(zt);
         gr_mat_clear(appB, ctx);
         gr_mat_clear(A->appSP2, ctx);
         GR_TMP_CLEAR_VEC(s, d, ctx);

@@ -32,6 +32,8 @@ TEST_FUNCTION_START(fmpz_sqrt, state)
         mpz_init(mg);
 
         fmpz_randtest(g, state, 200);
+        if (n_randint(state, 200) == 0)   /* large: Newton square root */
+            fmpz_randtest(g, state, 64 * (2800 + n_randint(state, 2000)));
         fmpz_abs(g, g);
         fmpz_get_mpz(mg, g);
 

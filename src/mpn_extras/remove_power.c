@@ -40,7 +40,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     /* Remove ascending powers */
     for (i = 0; i < FLINT_BITS && xsize >= square_size[i]; i++)
     {
-        mpn_tdiv_qr(div, rem, 0, x, xsize, square[i], square_size[i]);
+        flint_mpn_tdiv_qr(div, rem, x, xsize, square[i], square_size[i]);
         if (!flint_mpn_zero_p(rem, square_size[i]))
         {
             i -= 1;
@@ -70,7 +70,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     {
         if (xsize >= square_size[i])
         {
-            mpn_tdiv_qr(div, rem, 0, x, xsize, square[i], square_size[i]);
+            flint_mpn_tdiv_qr(div, rem, x, xsize, square[i], square_size[i]);
             if (flint_mpn_zero_p(rem, square_size[i]))
             {
                 *exp += (1 << i);

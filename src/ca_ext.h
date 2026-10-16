@@ -50,7 +50,7 @@ ca_ext_init_set(ca_ext_t res, const ca_ext_t x, ca_ctx_t ctx)
 
 void ca_ext_clear(ca_ext_t res, ca_ctx_t ctx);
 
-CA_EXT_INLINE slong ca_ext_nargs(const ca_ext_t x, ca_ctx_t ctx)
+CA_EXT_INLINE slong ca_ext_nargs(const ca_ext_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     if (CA_EXT_HEAD(x) == CA_QQBar)
         return 0;
@@ -70,7 +70,7 @@ CA_EXT_INLINE void ca_ext_get_arg(ca_t res, const ca_ext_t x, slong i, ca_ctx_t 
     }
 }
 
-CA_EXT_INLINE ulong ca_ext_hash(const ca_ext_t x, ca_ctx_t ctx)
+CA_EXT_INLINE ulong ca_ext_hash(const ca_ext_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return CA_EXT_HASH(x);
 }

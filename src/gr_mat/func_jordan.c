@@ -31,6 +31,9 @@ _gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func1, 
     if (n == 0)
         return GR_SUCCESS;
 
+    if (gr_ctx_is_field(ctx) != T_TRUE && gr_ctx_has_real_prec(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     gr_mat_init(P, n, n, ctx);
     gr_mat_init(Q, n, n, ctx);
     gr_mat_init(J, n, n, ctx);

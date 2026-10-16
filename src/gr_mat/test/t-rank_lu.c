@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "gr_mat.h"
 
-TEST_GR_FUNCTION_START(gr_mat_rank_lu, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_rank_lu, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -24,7 +24,15 @@ TEST_GR_FUNCTION_START(gr_mat_rank_lu, state, count_success, count_unable, count
         slong rank1, rank2, r, c;
         int status = GR_SUCCESS;
 
-        gr_ctx_init_random(ctx, state);
+        /* The rank is only well-defined over integral domains,
+           which gr_mat_rank_lu/fflu assume without checking. */
+        while (1)
+        {
+            gr_ctx_init_random(ctx, state);
+            if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
+                break;
+            gr_ctx_clear(ctx);
+        }
 
         r = n_randint(state, 5);
         c = n_randint(state, 5);
@@ -66,5 +74,5 @@ TEST_GR_FUNCTION_START(gr_mat_rank_lu, state, count_success, count_unable, count
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }

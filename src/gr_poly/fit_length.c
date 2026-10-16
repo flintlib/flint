@@ -12,7 +12,7 @@
 #include "gr_poly.h"
 
 void
-gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
+_gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 {
     slong alloc = poly->alloc;
 

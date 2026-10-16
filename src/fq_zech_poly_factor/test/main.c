@@ -15,7 +15,6 @@
 #include "t-factor.c"
 #include "t-factor_cantor_zassenhaus.c"
 #include "t-factor_distinct_deg.c"
-#include "t-factor_equal_deg_prob.c"
 #include "t-factor_kaltofen_shoup.c"
 #include "t-factor_split_single.c"
 #include "t-factor_squarefree.c"
@@ -34,7 +33,6 @@ test_struct tests[] =
     TEST_FUNCTION(fq_zech_poly_factor),
     TEST_FUNCTION(fq_zech_poly_factor_cantor_zassenhaus),
     TEST_FUNCTION(fq_zech_poly_factor_distinct_deg),
-    TEST_FUNCTION(fq_zech_poly_factor_equal_deg_prob),
     TEST_FUNCTION(fq_zech_poly_factor_kaltofen_shoup),
     TEST_FUNCTION(fq_zech_poly_factor_split_single),
     TEST_FUNCTION(fq_zech_poly_factor_squarefree),

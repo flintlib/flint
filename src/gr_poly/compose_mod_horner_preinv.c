@@ -15,14 +15,14 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_compose_mod_horner_preinv(gr_ptr res,
+_gr_poly_preinv_compose_mod_horner(gr_ptr res,
     gr_srcptr f, slong lenf,
     gr_srcptr g,
-    gr_srcptr h, slong lenh,
-    gr_srcptr hinv, slong lenhinv,
+    const gr_poly_preinv_t P,
     gr_ctx_t ctx)
 {
     slong i, len;
+    slong lenh = P->lenf;
     gr_ptr t;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
@@ -48,13 +48,26 @@ _gr_poly_compose_mod_horner_preinv(gr_ptr res,
     while (i > 0)
     {
         i--;
-        status |= _gr_poly_mulmod_preinv(t, res, len, g, len, h, lenh, hinv, lenhinv, ctx);
+        status |= _gr_poly_preinv_mulmod(t, res, len, g, len, P, ctx);
         status |= _gr_poly_add(res, t, len, GR_ENTRY(f, i, sz), 1, ctx);
     }
 
     GR_TMP_CLEAR_VEC(t, len, ctx);
 
     return status;
+}
+
+int
+_gr_poly_compose_mod_horner_preinv(gr_ptr res,
+    gr_srcptr f, slong lenf,
+    gr_srcptr g,
+    gr_srcptr h, slong lenh,
+    gr_srcptr hinv, slong lenhinv,
+    gr_ctx_t ctx)
+{
+    gr_poly_preinv_t P;
+    _gr_poly_preinv_init_newton_shallow(P, h, lenh, hinv, lenhinv, ctx);
+    return _gr_poly_preinv_compose_mod_horner(res, f, lenf, g, P, ctx);
 }
 
 int

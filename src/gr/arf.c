@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_poly.h"
@@ -20,6 +21,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "nfloat.h"
+#include "decimal.h"
 
 typedef struct
 {
@@ -49,10 +51,11 @@ static int _gr_arf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_arf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Floating-point numbers (arf, prec = ");
-    gr_stream_write_si(out, ARF_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Floating-point numbers (arf, prec = ");
+    status |= gr_stream_write_si(out, ARF_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -94,8 +97,7 @@ _gr_arf_randtest(arf_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_arf_write(gr_stream_t out, const arf_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
 }
 
 static int
@@ -199,6 +201,22 @@ _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             nfloat_get_arf(res, x, x_ctx);
             arf_set_round(res, res, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_arf(res, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decfloat_get_arf(res, DECBALL_MIDREF((decball_srcptr) x), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            if (!_deccfloat_is_real((deccfloat_srcptr) x))
+                return GR_DOMAIN;
+            return decfloat_get_arf(res, DECCFLOAT_REALREF((deccfloat_srcptr) x), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
+
+        case GR_CTX_DECCBALL:
+            if (!_deccball_is_real((deccball_srcptr) x, x_ctx))
+                return GR_DOMAIN;
+            return decfloat_get_arf(res, DECBALL_MIDREF(DECCBALL_REALREF((deccball_srcptr) x)), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx), x_ctx);
 
         default:
             {
@@ -1096,27 +1114,56 @@ _gr_arf_vec_dot_rev(arf_t res, const arf_t initial, int subtract, arf_srcptr vec
     return GR_SUCCESS;
 }
 
+static int
+_gr_arf_vec_dot_strided(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, slong stride1, arf_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    arf_approx_dot(res, initial, subtract, vec1, stride1, vec2, stride2, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
 #include "gr_poly.h"
 #include "acb_poly.h"
 
-/* todo: test */
 static int
-_gr_arf_poly_mullow(arf_ptr res,
+_gr_arf_poly_mulmid(arf_ptr res,
     arf_srcptr poly1, slong len1,
-    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+    arf_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     /* todo: tuning */
-    if (len1 <= 10 || len2 <= 10)
+    if (len1 <= 10 || len2 <= 10 || 2 * (nhi - nlo) <= 10)
     {
-        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
     }
     else
     {
         arb_ptr tmp, t1, t2, t3;
-        slong i;
+        slong i, n = nhi - nlo;
         int squaring = (poly1 == poly2 && len1 == len2);
 
         if (!squaring)
@@ -1155,7 +1202,7 @@ _gr_arf_poly_mullow(arf_ptr res,
             mag_init(arb_radref(t3 + i));
         }
 
-        _arb_poly_mullow(t3, t1, len1, t2, len2, n, ARF_CTX_PREC(ctx));
+        _arb_poly_mulmid(t3, t1, len1, t2, len2, nlo, nhi, ARF_CTX_PREC(ctx));
 
         for (i = 0; i < n; i++)
         {
@@ -1169,26 +1216,32 @@ _gr_arf_poly_mullow(arf_ptr res,
     }
 }
 
+static int
+_gr_arf_poly_mullow(arf_ptr res,
+    arf_srcptr poly1, slong len1,
+    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_arf_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+
 /* todo: real-only roots in arb */
 static int
-_gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_arf_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
-        slong i, j, deg, deg2;
-        acb_ptr croots;
+        slong i, j, deg, deg2, num;
+        arb_ptr rroots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -1200,26 +1253,20 @@ _gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
             {
                 deg2 = fmpz_poly_degree(fac->p + i);
 
-                croots = _acb_vec_init(deg2);
-                arb_fmpz_poly_complex_roots(croots, fac->p + i, 0, ARF_CTX_PREC(ctx));
+                rroots = _arb_vec_init(deg2);
+                num = arb_fmpz_poly_real_roots(rroots, fac->p + i, 0, ARF_CTX_PREC(ctx));
 
-                for (j = 0; j < deg2; j++)
+                for (j = 0; j < num; j++)
                 {
-                    if (acb_is_real(croots + j))
-                    {
-                        fmpz m2 = fac->exp[i];
-                        GR_MUST_SUCCEED(gr_vec_append(roots, arb_midref(acb_realref(croots + j)), ctx));
-                        GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
-                    }
+                    GR_MUST_SUCCEED(gr_vec_append(roots, arb_midref(rroots + j), ctx));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
-                _acb_vec_clear(croots, deg2);
+                _arb_vec_clear(rroots, deg2);
             }
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }
@@ -1318,6 +1365,7 @@ gr_method_tab_input _arf_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
@@ -1439,7 +1487,9 @@ gr_method_tab_input _arf_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_arf_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arf_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_arf_poly_mulmid},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arf_poly_roots_other},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},

@@ -81,6 +81,17 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     ``n_factor`` internally if `n` or the remainder after trial division
     is smaller than one word, guaranteeing a complete factorisation.
 
+.. function:: int _fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits, int proved, int adaptive)
+
+    As :func:`fmpz_factor_smooth`, which calls this with *adaptive* set to 0.
+    If *adaptive* is nonzero, the bound ``bits`` is lowered, whenever the
+    unfactored part of `n` gets smaller (after trial division and after each
+    factor found by the elliptic curve method), to the bound
+    :func:`fmpz_factor_no_trial` would choose for a number of that size, so
+    that the search stops once finishing the cofactor with the quadratic
+    sieve is expected to be faster. This is used by
+    :func:`fmpz_factor_no_trial`.
+
 .. function:: void fmpz_factor_si(fmpz_factor_t factor, slong n)
 
     Like ``fmpz_factor``, but takes a machine integer `n` as input.

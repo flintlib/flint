@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "gmpcompat.h"
+#include "ulong_extras.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
@@ -20,6 +21,7 @@
 #include "fmpq_mat.h"
 #include "fexpr.h"
 #include "qqbar.h"
+#include "decimal.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -28,8 +30,7 @@
 static int
 _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Rational field (fmpq)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Rational field (fmpq)");
 }
 
 static void
@@ -78,15 +79,16 @@ _gr_fmpq_randtest(fmpq_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpq_write(gr_stream_t out, const fmpq_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_fmpz(out, fmpq_numref(x));
+    int status = GR_SUCCESS;
+    status |= gr_stream_write_fmpz(out, fmpq_numref(x));
 
     if (!fmpz_is_one(fmpq_denref(x)))
     {
-        gr_stream_write(out, "/");
-        gr_stream_write_fmpz(out, fmpq_denref(x));
+        status |= gr_stream_write(out, "/");
+        status |= gr_stream_write_fmpz(out, fmpq_denref(x));
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int
@@ -158,6 +160,18 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_FMPQ:
             fmpq_set(res, x);
             return GR_SUCCESS;
+
+        case GR_CTX_DECFLOAT:
+            return decfloat_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECBALL:
+            return decball_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECCFLOAT:
+            return deccfloat_get_fmpq(res, x, x_ctx);
+
+        case GR_CTX_DECCBALL:
+            return deccball_get_fmpq(res, x, x_ctx);
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
@@ -327,6 +341,50 @@ _gr_fmpq_div(fmpq_t res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
     else
     {
         fmpq_div(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+static int
+_gr_fmpq_div_ui(fmpq_t res, const fmpq_t x, ulong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz f = *fmpq_numref(x);
+        ulong g;
+
+        if (f == 0)
+        {
+            fmpq_zero(res);
+            return GR_SUCCESS;
+        }
+
+        if (!COEFF_IS_MPZ(f))
+            g = n_gcd(FLINT_ABS(f), y);
+        else
+        {
+            fmpz_t t;
+            fmpz_init(t);
+            fmpz_gcd_ui(t, fmpq_numref(x), y);
+            g = fmpz_get_ui(t);
+            fmpz_clear(t);
+        }
+
+        if (g == 1)
+        {
+            fmpz_set(fmpq_numref(res), fmpq_numref(x));
+            fmpz_mul_ui(fmpq_denref(res), fmpq_denref(x), y);
+        }
+        else
+        {
+            fmpz_divexact_ui(fmpq_numref(res), fmpq_numref(x), g);
+            fmpz_mul_ui(fmpq_denref(res), fmpq_denref(x), y / g);
+        }
+
         return GR_SUCCESS;
     }
 }
@@ -723,6 +781,42 @@ _gr_fmpq_vec_equal(const fmpq * vec1, const fmpq * vec2, slong len, gr_ctx_t ctx
 }
 
 static int
+_gr_fmpq_vec_set(fmpq * res, const fmpq * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (res == vec)
+        return GR_SUCCESS;
+
+    /* avoid function calls for small values */
+    for (i = 0; i < len; i++)
+    {
+        if (!COEFF_IS_MPZ(vec[i].num) && !COEFF_IS_MPZ(res[i].num))
+            res[i].num = vec[i].num;
+        else
+            fmpz_set(fmpq_numref(res + i), fmpq_numref(vec + i));
+
+        if (!COEFF_IS_MPZ(vec[i].den) && !COEFF_IS_MPZ(res[i].den))
+            res[i].den = vec[i].den;
+        else
+            fmpz_set(fmpq_denref(res + i), fmpq_denref(vec + i));
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpq_vec_zero(fmpq * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpq_zero(res + i);
+
+    return GR_SUCCESS;
+}
+
+static int
 _fmpq_vec_is_fmpz_vec(const fmpq * vec, slong len)
 {
     slong i;
@@ -860,12 +954,38 @@ _fmpq_vec_set_fmpz_vec_div_fmpz(fmpq * res, const fmpz * v, const fmpz_t den, sl
 }
 
 static int
-_gr_fmpq_poly_mullow(fmpq * res,
+_gr_fmpq_poly_mulmid(fmpq * res,
     const fmpq * poly1, slong len1,
-    const fmpq * poly2, slong len2, slong n, gr_ctx_t ctx)
+    const fmpq * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     fmpz *z1, *z2, *z3;
     fmpz_t den1, den2;
+
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     /* Todo: handle mixed cases */
     if (_fmpq_vec_is_fmpz_vec(poly1, len1) &&
@@ -873,7 +993,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
     {
         slong i;
 
-        z1 = flint_malloc((len1 + len2 + n) * sizeof(fmpz));
+        z1 = flint_malloc((len1 + len2 + nhi - nlo) * sizeof(fmpz));
         z2 = z1 + len1;
         z3 = z2 + len2;
 
@@ -881,15 +1001,12 @@ _gr_fmpq_poly_mullow(fmpq * res,
             z1[i] = *fmpq_numref(poly1 + i);
         for (i = 0; i < len2; i++)
             z2[i] = *fmpq_numref(poly2 + i);
-        for (i = 0; i < n; i++)
+        for (i = 0; i < nhi - nlo; i++)
             z3[i] = *fmpq_numref(res + i);
 
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mulmid(z3, z1, len1, z2, len2, nlo, nhi);
 
-        for (i = 0; i < n; i++)
+        for (i = 0; i < nhi - nlo; i++)
         {
             *fmpq_numref(res + i) = z3[i];
             fmpz_one(fmpq_denref(res + i));
@@ -901,7 +1018,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
     {
         fmpz_init(den1);
         fmpz_init(den2);
-        z1 = _fmpz_vec_init(len1 + len2 + n);
+        z1 = _fmpz_vec_init(len1 + len2 + nhi - nlo);
         z2 = z1 + len1;
         z3 = z2 + len2;
 
@@ -909,14 +1026,10 @@ _gr_fmpq_poly_mullow(fmpq * res,
         _fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2);
 
         fmpz_mul(den1, den1, den2);
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mulmid(z3, z1, len1, z2, len2, nlo, nhi);
+        _fmpq_vec_set_fmpz_vec_div_fmpz(res, z3, den1, nhi - nlo);
 
-        _fmpq_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n);
-
-        _fmpz_vec_clear(z1, len1 + len2 + n);
+        _fmpz_vec_clear(z1, len1 + len2 + nhi - nlo);
         fmpz_clear(den1);
         fmpz_clear(den2);
     }
@@ -925,7 +1038,15 @@ _gr_fmpq_poly_mullow(fmpq * res,
 }
 
 static int
-_gr_fmpq_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_fmpq_poly_mullow(fmpq * res,
+    const fmpq * poly1, slong len1,
+    const fmpq * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_fmpq_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+static int
+_gr_fmpq_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     gr_ctx_t ZZ;
     gr_poly_t f;
@@ -954,7 +1075,7 @@ _gr_fmpq_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fla
 }
 
 static int
-_gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_fmpq_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
@@ -964,60 +1085,34 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         int status = GR_SUCCESS;
         slong deg;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         if (deg == 0)
         {
             gr_vec_set_length(roots, 0, ctx);
-            gr_vec_set_length(mult, 0, ZZ);
+            fmpz_vec_set_length(mult, 0);
         }
-        else /* todo: special cases */
+        else
         {
-            /* todo: better algorithm */
-            fmpz_poly_factor_t fac;
-            slong i, j, num;
-            fmpq * res_entries;
-            fmpz * mult_entries;
+            slong i, num;
+            slong * exp;
 
-            fmpz_poly_factor_init(fac);
-            fmpz_poly_factor(fac, (const fmpz_poly_struct *) poly);
+            gr_vec_set_length(roots, deg, ctx);
+            exp = flint_malloc(sizeof(slong) * deg);
 
-            num = 0;
-            for (i = 0; i < fac->num; i++)
-                if (fac->p[i].length == 2)
-                    num++;
+            num = fmpz_poly_roots_fmpq(roots->entries, exp,
+                (const fmpz_poly_struct *) poly);
 
             gr_vec_set_length(roots, num, ctx);
-            gr_vec_set_length(mult, num, ZZ);
+            fmpz_vec_set_length(mult, num);
+            for (i = 0; i < num; i++)
+                fmpz_set_si(mult->entries + i, exp[i]);
 
-            res_entries = roots->entries;
-            mult_entries = mult->entries;
-
-            for (i = j = 0; i < fac->num; i++)
-            {
-                if (fac->p[i].length == 2)
-                {
-                    fmpz_neg(fmpq_numref(res_entries + j), fac->p[i].coeffs);
-                    fmpz_swap(fmpq_denref(res_entries + j), fac->p[i].coeffs + 1);
-
-                    if (fmpz_sgn(fmpq_denref(res_entries + j)) <= 0)
-                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-                    fmpz_set_ui(mult_entries + j, fac->exp[i]);
-                    j++;
-                }
-            }
-
-            fmpz_poly_factor_clear(fac);
+            flint_free(exp);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }
@@ -1140,6 +1235,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpq_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpq_mul_si},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpq_div},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_fmpq_div_ui},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
@@ -1171,8 +1267,11 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpq_vec_is_zero},
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpq_vec_equal},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fmpq_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fmpq_vec_zero},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpq_vec_sum},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpq_poly_mulmid},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},

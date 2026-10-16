@@ -13,7 +13,7 @@
 #include "fmpz_extras.h"
 
 void
-fmpz_lshift_mpn(fmpz_t z, nn_srcptr d, slong dn, int sgnbit, flint_bitcnt_t shift)
+fmpz_lshift_mpn(fmpz_t z, nn_srcptr src, slong n, int negative, flint_bitcnt_t shift)
 {
     mpz_ptr zmpz;
     nn_ptr zp;
@@ -24,22 +24,22 @@ fmpz_lshift_mpn(fmpz_t z, nn_srcptr d, slong dn, int sgnbit, flint_bitcnt_t shif
 
     shift_limbs = shift / FLINT_BITS;
     shift_bits = shift % FLINT_BITS;
-    zn = dn + shift_limbs + (shift_bits != 0);
+    zn = n + shift_limbs + (shift_bits != 0);
 
     zp = FLINT_MPZ_REALLOC(zmpz, zn);
     flint_mpn_zero(zp, shift_limbs);
 
     if (shift_bits == 0)
     {
-        flint_mpn_copyi(zp + shift_limbs, d, dn);
+        flint_mpn_copyi(zp + shift_limbs, src, n);
     }
     else
     {
-        zp[zn - 1] = mpn_lshift(zp + shift_limbs, d, dn, shift_bits);
+        zp[zn - 1] = mpn_lshift(zp + shift_limbs, src, n, shift_bits);
         while (zp[zn - 1] == 0)
             zn--;
     }
 
-    zmpz->_mp_size = sgnbit ? -(slong) zn : zn;
+    zmpz->_mp_size = negative ? -(slong) zn : zn;
     _fmpz_demote_val(z);
 }

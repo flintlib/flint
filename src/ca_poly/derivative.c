@@ -10,14 +10,14 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_derivative(ca_ptr res, ca_srcptr poly, slong len, ca_ctx_t ctx)
 {
-    slong i;
-
-    for (i = 1; i < len; i++)
-        ca_mul_ui(res + (i - 1), poly + i, i, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_derivative(res, poly, len, gr_ctx));
 }
 
 void

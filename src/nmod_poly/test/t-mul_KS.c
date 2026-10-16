@@ -29,8 +29,8 @@ TEST_FUNCTION_START(nmod_poly_mul_KS, state)
         nmod_poly_randtest(b, state, n_randint(state, 50));
         nmod_poly_randtest(c, state, n_randint(state, 50));
 
-        nmod_poly_mul_KS(a, b, c, 0);
-        nmod_poly_mul_KS(b, b, c, 0);
+        nmod_poly_mul_KS(a, b, c);
+        nmod_poly_mul_KS(b, b, c);
 
         result = (nmod_poly_equal(a, b));
         if (!result)
@@ -59,8 +59,8 @@ TEST_FUNCTION_START(nmod_poly_mul_KS, state)
         nmod_poly_randtest(b, state, n_randint(state, 50));
         nmod_poly_randtest(c, state, n_randint(state, 50));
 
-        nmod_poly_mul_KS(a, b, c, 0);
-        nmod_poly_mul_KS(c, b, c, 0);
+        nmod_poly_mul_KS(a, b, c);
+        nmod_poly_mul_KS(c, b, c);
 
         result = (nmod_poly_equal(a, c));
         if (!result)
@@ -91,7 +91,7 @@ TEST_FUNCTION_START(nmod_poly_mul_KS, state)
         nmod_poly_randtest(c, state, n_randint(state, 50));
 
         nmod_poly_mul_classical(a1, b, c);
-        nmod_poly_mul_KS(a2, b, c, 0);
+        nmod_poly_mul_KS(a2, b, c);
 
         result = (nmod_poly_equal(a1, a2));
         if (!result)

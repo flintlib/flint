@@ -25,66 +25,42 @@ TEST_FUNCTION_START(fq_default_poly_factor_init, state)
         fmpz_t p;
 
         fmpz_init(p);
-
         fmpz_set_ui(p, 3);
-
         fq_default_ctx_init(ctx, p, 3, "x");
-
         fq_default_poly_factor_init(fq_poly_fac, ctx);
-
         fq_default_poly_init(poly, ctx);
-
         fq_default_init(c, ctx);
-
         while (fq_default_poly_is_zero(poly, ctx))
             fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
-
         fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
-
+        fq_default_poly_clear(poly, ctx);
         fq_default_clear(c, ctx);
-
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
-
         fq_default_ctx_clear(ctx);
 
         fq_default_ctx_init(ctx, p, 16, "x");
-
         fq_default_poly_factor_init(fq_poly_fac, ctx);
-
         fq_default_poly_init(poly, ctx);
-
         fq_default_init(c, ctx);
-
         while (fq_default_poly_is_zero(poly, ctx))
             fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
-
         fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
-
+        fq_default_poly_clear(poly, ctx);
         fq_default_clear(c, ctx);
-
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
-
         fq_default_ctx_clear(ctx);
 
         fmpz_set_str(p, "73786976294838206473", 10);
-
         fq_default_ctx_init(ctx, p, 1, "x");
-
         fq_default_poly_factor_init(fq_poly_fac, ctx);
-
         fq_default_poly_init(poly, ctx);
-
         fq_default_init(c, ctx);
-
         while (fq_default_poly_is_zero(poly, ctx))
             fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
-
         fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
-
+        fq_default_poly_clear(poly, ctx);
         fq_default_clear(c, ctx);
-
         fq_default_poly_factor_clear(fq_poly_fac, ctx);
-
         fq_default_ctx_clear(ctx);
 
         fmpz_clear(p);

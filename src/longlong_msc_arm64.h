@@ -14,7 +14,9 @@
 
 #include <stdlib.h>
 #include <intrin.h>
+#if !defined(_MSC_VER) || defined(USE_SOFT_INTRINSICS)
 #include <immintrin.h>
+#endif
 
 /* Trailing and leading zeros */
 # define flint_clz _CountLeadingZeros64

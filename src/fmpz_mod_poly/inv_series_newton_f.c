@@ -61,7 +61,7 @@ void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv,
 
         /* _fmpz_mod_poly_inv_series(t, Qcopy, n, cinv, ctx); */
 
-        _fmpz_mod_poly_inv_series(Qinv->coeffs, Qcopy, n, n, ctx);
+        _fmpz_mod_poly_inv_series(t, Qcopy, n, n, ctx);
         _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
         Qinv->coeffs = t;
         Qinv->alloc  = n;

@@ -90,10 +90,7 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
                 lenD = lenV3 - 1;
                 FMPZ_VEC_NORM(D, lenD);
 
-                if (lenV1 >= lenQ)
-                    _fmpz_mod_poly_mul(W, V1, lenV1, Q, lenQ, ctx);
-                else
-                    _fmpz_mod_poly_mul(W, Q, lenQ, V1, lenV1, ctx);
+                _fmpz_mod_poly_mul(W, V1, lenV1, Q, lenQ, ctx);
                 lenW = lenQ + lenV1 - 1;
 
                 _fmpz_mod_poly_sub(U, U, lenU, W, lenW, ctx);

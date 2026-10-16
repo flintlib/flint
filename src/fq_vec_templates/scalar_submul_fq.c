@@ -14,8 +14,8 @@
 #include "templates.h"
 
 void
-_TEMPLATE3(T, vec_scalar_submul, T) (TEMPLATE(T, struct) * poly1,
-                                     const TEMPLATE(T, struct) * poly2,
+_TEMPLATE3(T, vec_scalar_submul, T) (TEMPLATE(T, struct) * vec1,
+                                     const TEMPLATE(T, struct) * vec2,
                                      slong len2, const TEMPLATE(T, t) x,
                                      const TEMPLATE(T, ctx_t) ctx)
 {
@@ -26,8 +26,8 @@ _TEMPLATE3(T, vec_scalar_submul, T) (TEMPLATE(T, struct) * poly1,
 
     for (i = 0; i < len2; i++)
     {
-        TEMPLATE(T, mul) (y, poly2 + i, x, ctx);
-        TEMPLATE(T, sub) (poly1 + i, poly1 + i, y, ctx);
+        TEMPLATE(T, mul) (y, vec2 + i, x, ctx);
+        TEMPLATE(T, sub) (vec1 + i, vec1 + i, y, ctx);
     }
 
     TEMPLATE(T, clear) (y, ctx);

@@ -891,8 +891,20 @@ more:
 
     old_nrows = nmod_mat_nrows(N);
     _lattice(N, lift_fac, r, curr_alpha_pow, starts, B, ctx);
-    if (nmod_mat_nrows(N) < old_nrows && nmod_mat_is_reduced(N))
+    if (nmod_mat_is_reduced(N))
+    {
+        if (nmod_mat_nrows(N) < old_nrows)
+            goto try_zas;
+        /* lattice converged, run zassenhaus to completion */
+        zas_limit = nmod_mat_nrows(N);
         goto try_zas;
+    }
+
+    /* Congratulations! You've reached the unreachable code!
+       Please report this input to FLINT's issue tracker. */
+    flint_printf("Congratulations! You've reached the unreachable code in "
+                 "n_fq_bpoly_factor_lgprime! Please report this input to "
+                 "https://github.com/flintlib/flint/issues\n");
 
     next_lift_pow = curr_lift_pow + r;
     next_lift_pow = FLINT_MIN(next_lift_pow, 2*curr_lift_pow);
@@ -902,10 +914,10 @@ more:
 
     n_fq_poly_pow(p1, alpha, next_lift_pow - curr_lift_pow, ctx);
 
-    n_fq_poly_mul(next_alpha_pow, next_alpha_pow, p1, ctx);
+    n_fq_poly_mul(next_alpha_pow, curr_alpha_pow, p1, ctx);
     n_fq_bpoly_make_monic_mod_poly(monicB, B, next_alpha_pow, ctx);
 
-    _hensel_lift_tree(0, link, v, w, monicB, 2*r-4, curr_alpha_pow, p1, ctx);
+    _hensel_lift_tree(1, link, v, w, monicB, 2*r-4, curr_alpha_pow, p1, ctx);
 
     prev_lift_pow = curr_lift_pow;
     curr_lift_pow = next_lift_pow;

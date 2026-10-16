@@ -9,40 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 ca_mat_det_lu(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 {
-    truth_t invertible;
-    slong * P;
-    ca_mat_t T;
-    slong i, n;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
 
-    n = ca_mat_nrows(A);
-    P = _perm_init(n);
-    ca_mat_init(T, n, n, ctx);
-    invertible = ca_mat_nonsingular_lu(P, T, A, ctx);
-
-    if (invertible == T_FALSE)
-    {
-        ca_zero(res, ctx);
-    }
-    else if (invertible == T_TRUE)
-    {
-        ca_one(res, ctx);
-        for (i = 0; i < n; i++)
-            ca_mul(res, res, ca_mat_entry(T, i, i), ctx);
-        if (_perm_parity(P, n))
-            ca_neg(res, res, ctx);
-    }
-    else
+    if (gr_mat_det_lu(res, (const gr_mat_struct *) A, gr_ctx) != GR_SUCCESS)
     {
         ca_unknown(res, ctx);
+        return 0;
     }
 
-    ca_mat_clear(T, ctx);
-    _perm_clear(P);
-    return invertible != T_UNKNOWN;
+    return 1;
 }

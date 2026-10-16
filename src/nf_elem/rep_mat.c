@@ -53,14 +53,14 @@ void nf_elem_rep_mat(fmpq_mat_t res, const nf_elem_t a, const nf_t nf)
         slong i, j;
         slong d = fmpq_poly_degree(nf->pol);
 
-        nf_elem_init(t, nf);
-        nf_elem_set(t, a, nf);
-
         if (NF_ELEM(a)->length == 0)
         {
             fmpq_mat_zero(res);
             return;
         }
+
+        nf_elem_init(t, nf);
+        nf_elem_set(t, a, nf);
 
         for (i = 0; i <= NF_ELEM(a)->length - 1; i ++)
         {

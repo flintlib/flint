@@ -116,6 +116,24 @@ TEST_FUNCTION_START(fmpz_mpoly_factor_zassenhaus, state)
 {
     slong i, j, tmul = 20;
 
+    /* issue #2408: with sparse bivariates routed to the generic code,
+       irred_zassenhaus used to read out of bounds for nvars = 2 */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a;
+        const char * vars[] = {"x", "y"};
+
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "(x^30+y+1)*(x+y^30+1)", vars, ctx);
+        check_omega(2, 2, a, ctx, fmpz_mpoly_factor_zassenhaus);
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a;

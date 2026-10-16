@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #define ARB_FMPZ_POLY_ROOTS_VERBOSE 1
+#define ARB_FMPZ_POLY_ROOTS_RATIONAL 2
 
 void _arb_fmpz_poly_evaluate_acb_horner(acb_t res, const fmpz * f, slong len, const acb_t x, slong prec);
 void arb_fmpz_poly_evaluate_acb_horner(acb_t res, const fmpz_poly_t f, const acb_t a, slong prec);
@@ -38,6 +39,8 @@ void arb_fmpz_poly_evaluate_arb(arb_t res, const fmpz_poly_t f, const arb_t a, s
 void arb_fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation);
 ulong arb_fmpz_poly_deflation(const fmpz_poly_t input);
 
+void arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t initial, slong prec);
+slong arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec);
 void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec);
 
 void arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n);

@@ -134,6 +134,8 @@ void _padic_log_rectangular(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, s
     _padic_log_rectangular_series(z, y, n, p, N, pN);
 
     fmpz_sub(z, pN, z);
+    if (fmpz_equal(z, pN))
+        fmpz_zero(z);
     fmpz_clear(pN);
 }
 
@@ -171,7 +173,7 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
+            if (v >= 1)
             {
                 if (v >= N)
                 {

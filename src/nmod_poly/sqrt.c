@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
@@ -57,8 +58,7 @@ _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong len, nmod_t mod)
     c = d = p[0];
     if (c != 1)
     {
-        c = n_sqrtmod(c, mod.n);
-        if (c == 0)
+        if (!nmod_sqrt(&c, c, mod))
             return 0;
     }
 

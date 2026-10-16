@@ -136,9 +136,9 @@ void
 _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len,
     const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-    for (i = 0; i < n; i++)
-        _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate_vec_iter(ys, coeffs, len, xs, n, gr_ctx));
 }
 
 void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly,

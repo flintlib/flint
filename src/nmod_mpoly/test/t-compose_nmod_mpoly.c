@@ -111,6 +111,8 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
             !nmod_mpoly_is_zero(A2, ctxAC))
             TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
+        flint_free(c);
+        nmod_mpoly_clear(B1, ctxB);
         nmod_mpoly_clear(B, ctxB);
         nmod_mpoly_clear(A, ctxAC);
         nmod_mpoly_clear(A1, ctxAC);

@@ -35,9 +35,10 @@ gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, cons
         if (m != 0)
             status |= gr_mat_nonsingular_solve_fflu_precomp(X, perm, LU, B, ctx);
     }
-    else
+    else if (status == GR_SUCCESS)
     {
-        status |= GR_DOMAIN;
+        /* (singular; a failure of the decomposition is propagated as such) */
+        status = GR_DOMAIN;
     }
 
     gr_mat_clear(LU, ctx);

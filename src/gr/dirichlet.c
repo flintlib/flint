@@ -17,10 +17,11 @@
 
 static int _gr_dirichlet_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Dirichlet group modulo ");
-    gr_stream_write_ui(out, DIRICHLET_CTX(ctx)->q);
-    gr_stream_write(out, " (dirichlet_char)");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Dirichlet group modulo ");
+    status |= gr_stream_write_ui(out, DIRICHLET_CTX(ctx)->q);
+    status |= gr_stream_write(out, " (dirichlet_char)");
+    return status;
 }
 
 static void
@@ -55,34 +56,35 @@ _gr_dirichlet_swap(dirichlet_char_t x, dirichlet_char_t y, gr_ctx_t ctx)
     *y = t;
 }
 
-static void
+static int
 _dirichlet_char_print(gr_stream_t out, const dirichlet_group_t G, const dirichlet_char_t x)
 {
-    gr_stream_write(out, "chi_");
-    gr_stream_write_ui(out, G->q);
-    gr_stream_write(out, "(");
-    gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
-    gr_stream_write(out, ", .)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "chi_");
+    status |= gr_stream_write_ui(out, G->q);
+    status |= gr_stream_write(out, "(");
+    status |= gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
+    status |= gr_stream_write(out, ", .)");
 /*
     slong k;
-    gr_stream_write(out, "Character ");
-    gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
-    gr_stream_write(out, " [");
+    status |= gr_stream_write(out, "Character ");
+    status |= gr_stream_write_ui(out, G->q == 1 ? 1 : x->n);
+    status |= gr_stream_write(out, " [");
     for (k = 0; k < G->num; k++)
     {
-        gr_stream_write_ui(out, x->log[k]);
+        status |= gr_stream_write_ui(out, x->log[k]);
         if (k + 1 < G->num)
-            gr_stream_write(out, ", ");
+            status |= gr_stream_write(out, ", ");
     }
-    gr_stream_write(out, "]");
+    status |= gr_stream_write(out, "]");
 */
+    return status;
 }
 
 static int
 _gr_dirichlet_write(gr_stream_t out, dirichlet_char_t x, gr_ctx_t ctx)
 {
-    _dirichlet_char_print(out, DIRICHLET_CTX(ctx), x);
-    return GR_SUCCESS;
+    return _dirichlet_char_print(out, DIRICHLET_CTX(ctx), x);
 }
 
 static int

@@ -24,14 +24,16 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         fmpz *a, *b;
         fmpz_t n;
         slong len = n_randint(state, 100);
+        slong nbits = n_randint(state, 10) == 0 ? 2000 : 100;
+        slong abits = n_randint(state, 10) == 0 ? 20000 : 200;
         fmpz_init(n);
-        fmpz_randtest_not_zero(n, state, 100);
+        fmpz_randtest_not_zero(n, state, nbits);
         if (n_randint(state, 2))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(a, state, len, abits);
 
         _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
         _fmpz_vec_scalar_divexact_fmpz(b, a, len, n);
@@ -84,6 +86,39 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
         fmpz_clear(n);
+    }
+
+    /* Regression test: in-place division of a long vector with large
+       entries (temporary space must not accumulate on the stack) */
+    {
+        fmpz *a;
+        fmpz_t n, q;
+        slong j, len = 3000;
+
+        fmpz_init(n);
+        fmpz_init(q);
+        fmpz_ui_pow_ui(n, 3, 100);
+        fmpz_ui_pow_ui(q, 7, 22000);   /* about 970 limbs */
+
+        a = _fmpz_vec_init(len);
+        for (j = 0; j < len; j++)
+            fmpz_mul(a + j, q, n);
+
+        _fmpz_vec_scalar_divexact_fmpz(a, a, len, n);
+
+        for (j = 0; j < len; j++)
+        {
+            if (!fmpz_equal(a + j, q))
+            {
+                flint_printf("FAIL (long vector, entry %wd)\n", j);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        _fmpz_vec_clear(a, len);
+        fmpz_clear(n);
+        fmpz_clear(q);
     }
 
     TEST_FUNCTION_END(state);

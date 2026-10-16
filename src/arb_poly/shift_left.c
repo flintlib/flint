@@ -12,26 +12,14 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_shift_left(arb_ptr res, arb_srcptr poly, slong len, slong n)
 {
-    slong i;
-
-    /* Copy in reverse to avoid writing over unshifted coefficients */
-    if (res != poly)
-    {
-        for (i = len; i--; )
-            arb_set(res + n + i, poly + i);
-    }
-    else
-    {
-        for (i = len; i--; )
-            arb_swap(res + n + i, res + i);
-    }
-
-    for (i = 0; i < n; i++)
-        arb_zero(res + i);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, 53);
+    GR_MUST_SUCCEED(_gr_poly_shift_left(res, poly, len, n, ctx));
 }
 
 void

@@ -131,7 +131,7 @@ _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error,
 
         _arf_get_integer_mpn(np, xp, xn, exp + dn * FLINT_BITS);
 
-        mpn_tdiv_qr(qp, rp, 0, np, nn, dp, dn);
+        flint_mpn_tdiv_qr(qp, rp, np, nn, dp, dn);
 
         if (!negative)
         {

@@ -194,8 +194,8 @@ Martin Lee
 
 Marc Mezzarobba
 
-  Fast evaluation of Legendre polynomials, work on the Arb interface
-  in Sage, functionality for generic polynomials; shift equivalence,
+  Ore polynomials, fast evaluation of Legendre polynomials, work on the Arb
+  interface in Sage, functionality for generic polynomials; shift equivalence,
   dispersion, and shiftless decomposition for polynomials; bug reports,
   feedback.
 
@@ -371,8 +371,9 @@ Alex Griffing
 
 Vincent Delecroix
 
-  Power sums, various polynomial improvements, speedups,
-  root counting and some patches. Work on Sage interface.
+  Real root isolation and root counting for integer polynomials, power sums,
+  various polynomial improvements, speedups, and some patches.
+  Work on Sage interface.
 
   web      https://www.labri.fr/perso/vdelecro/
 
@@ -433,7 +434,7 @@ D.H.J. Polymath
 Joel Dahne
 
   Feedback and improvements for Legendre functions, nth derivatives for Arb
-  polynomials, minmax function.
+  polynomials, power series functions, minmax function.
 
 Vincent Neiger
 
@@ -483,7 +484,8 @@ Andrii Yanovets
 Ricardo Buring
 
   Functionality for generic polynomials and matrices, series solutions of
-  linear systems of ODEs with rational function coefficients.
+  linear systems of ODEs with rational function coefficients,
+  Ore polynomials, functionality for permutations.
 
   github   rburing
 
@@ -509,6 +511,68 @@ Hartmut Monien
 
   Double exponential integration example program, bug reports and feedback.
 
+Alexey Orlov
+
+  Optimizations to qadic numbers.
+
+  github   https://github.com/alexey-orlov-math
+
+Guillaume Moroz
+
+  Machine-precision polynomial root-finding; improved initial value selection
+  for root-finding.
+
+  github   https://github.com/guyomes
+
+Edgar Costa
+
+  Smith normal form using iterated Hermite form; many bug fixes
+  and documentation improvements.
+
+  github   https://github.com/edgarcosta
+
+Lars Göttgens
+
+  Unified printing functions, many helper functions for linear algebra,
+  many bug fixes.
+
+  github   https://github.com/lgoettgens
+
+Maria Neagoie
+
+  Multiplication and division of Ore polynomials.
+
+  github   https://github.com/vioneers
+
+Mate Soos
+
+  Emscripten support.
+
+  github   https://github.com/msoos
+
+user202729
+
+  Many optimizations and bugfixes.
+
+  github   https://github.com/user202729
+
+Viorel Wegner
+
+  Optimized hash table and algorithm for detecting 64-bit pseudoprimes.
+
+  github   https://github.com/JASory
+
+Chenxin Zhong
+
+  Tuning of linear algebra over the integers and rationals.
+
+  github   https://github.com/cxzhong
+
+Elias Tsigaridas
+
+  Real root isolation for integer polynomials.
+
+
 
 Other contributors
 -------------------------------------------------------------------------------
@@ -527,15 +591,16 @@ Francesco Biscani
 Francois Bissey
 Guillem Blanco
 Janko Boehm
+Valentin Boettcher
 Andrew Booker
 Robert Bradshaw
 Volker Braun
 Eric Bray
+Nicolas Brisebarre
 Ondřej Čertík
 Frédéric Chapoton
 Frédéric Chyzak
 Craig Citro
-Edgar Costa
 Gianfranco Costamagna
 Håvard Damm-Johnsen
 Jeroen Demeyer
@@ -546,16 +611,17 @@ David Lowry-Duda
 Andreas Enge
 Jan Englehardt
 Daniel Fabian
+Sergey Fedorov
 Raphael Fourquet
 Peter Frentrep
 Srajan Garg
 Max Goldfar
-Lars Göttgens
 Dan Grayson
 Qingwen Guan
 Fabian Gundlach
 Tobias Hansen
 Clemens Heuberger
+Mikhail Hogrefe
 Pavel Holoborodko
 Max Horn
 Matthew House
@@ -566,8 +632,10 @@ Jan Jancar
 Marek Kaluba
 Lars Kastner
 Kiran Kedlaya
+Kerem Kelleboz
 Alexander Kobel
 Matthias Koeppe
+Oliver Krüger
 Denis Kryskov
 Dejan Latinovic
 Andrea Lesavourey
@@ -576,9 +644,11 @@ Leif Lionhardy
 Ben Lorenz
 Peter Luschny
 Yuri Matiyasevich
+Massoud Mazar
 Anton Mellit
 Kate Minola
 Apoorv Mishra
+Thierry Monteil
 Jake Moss
 Oleksandr Motsak
 Michael Orlitzky
@@ -586,20 +656,26 @@ Michele Orru
 Julien Ospald
 John Palmieri
 Dima Pasechnik
+Dave Platt
 Giacomo Pope
 Julien Puydt
+Tal Regev
 Josh Rickmar
 Erico Rolim Noguerira
 Julian Ruth
+Bruno Salvy
 Mahrud Sayrafi
 Hans Schoenemann
+Julien Schueller
 Frithjof Schulze
 Marcello Seri
+Vlad Shcherbina
 Victor Shoup
 Tomás Oliveira e Silva
 Alexander Smirnov
 Bob Smith
 Ahmed Soliman
+David Sparks
 Jaap Spies
 William Stein
 Mike Stillman
@@ -612,15 +688,17 @@ Debian User
 Gregory Vanuxem
 Antony Vennard
 David Walker
+Mark Watkins
 Carl Witty
 Michiel de Wilde
+Hanhong Xue
 yuri@FreeBSD
 kac3pro
 Mgkurtz
 Vinklein
 Sourcekris
 Lzmths
-user202729
+p15-git-acc
 
 Other credits
 -------------------------------------------------------------------------------

@@ -55,6 +55,10 @@ jobs:
         run: |
           ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
           $MAKE && sudo make install && sudo ldconfig
+      - name: "Test FLINT for msolve"
+        run: |
+          $MAKE tests
+          $MAKE check
       - name: "Test msolve"
         run: |
           git clone --depth=1 https://github.com/algebraic-solving/msolve
@@ -70,6 +74,16 @@ jobs:
       - name: "Test Nemo.jl"
         run: |
           git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
+          # Temporary workaround: fmpz_ndiv_qr now rounds ties to even, which
+          # changes the expected results of Nemo's ndivrem/ntdivrem tests at
+          # ties. Patch these tests until Nemo is updated; remove this once it is.
+          sed -i \
+            -e 's/ndivrem(ZZRingElem(6), ZZRingElem(-4)) == (ZZRingElem(-1), ZZRingElem(2))/ndivrem(ZZRingElem(6), ZZRingElem(-4)) == (ZZRingElem(-2), ZZRingElem(-2))/' \
+            -e 's/ntdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)/ntdivrem(ZZ(-6), ZZ(+4)) == (-2, +2)/' \
+            -e 's/ntdivrem(ZZ(+6), ZZ(+4)) == (+1, +2)/ntdivrem(ZZ(+6), ZZ(+4)) == (+2, -2)/' \
+            -e 's/ntdivrem(ZZ(+6), ZZ(-4)) == (-1, +2)/ntdivrem(ZZ(+6), ZZ(-4)) == (-2, -2)/' \
+            -e 's/ntdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)/ntdivrem(ZZ(-6), ZZ(-4)) == (+2, +2)/' \
+            Nemo.jl/test/flint/fmpz-test.jl
           mkdir -p ~/.julia/artifacts
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)\"" > ~/.julia/artifacts/Overrides.toml
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
@@ -119,8 +133,7 @@ jobs:
     env:
       CC: "gcc"
       CFLAGS: "-march=native -std=c11 -Wall -Wextra -Werror"
-      MODULES: "build/thread_pool_merged.lo build/thread_support_merged.lo build/ulong_extras_merged.lo build/long_extras_merged.lo build/perm_merged.lo build/double_extras_merged.lo build/d_vec_merged.lo build/d_mat_merged.lo build/mpn_extras_merged.lo build/nmod_merged.lo build/nmod_vec_merged.lo build/nmod_mat_merged.lo build/nmod_poly_merged.lo build/mpn_mod_merged.lo build/fmpz_merged.lo build/fmpz_vec_merged.lo build/fmpz_mat_merged.lo build/fmpz_poly_merged.lo build/fmpz_mod_merged.lo build/fmpz_mod_vec_merged.lo build/fmpz_mod_mat_merged.lo build/fmpz_mod_poly_merged.lo build/fmpq_merged.lo build/fmpq_vec_merged.lo build/fmpq_mat_merged.lo build/fmpq_poly_merged.lo build/fq_merged.lo build/fq_vec_merged.lo build/fq_mat_merged.lo build/fq_poly_merged.lo build/fq_nmod_merged.lo build/fq_nmod_vec_merged.lo build/fq_nmod_mat_merged.lo build/fq_nmod_poly_merged.lo build/fq_zech_merged.lo build/fq_zech_mat_merged.lo build/fq_zech_poly_merged.lo build/fq_default_merged.lo build/fq_default_mat_merged.lo build/fq_default_poly_merged.lo build/fq_embed_merged.lo build/fq_nmod_embed_merged.lo build/fq_zech_embed_merged.lo build/padic_merged.lo build/padic_mat_merged.lo build/padic_poly_merged.lo build/qadic_merged.lo build/nmod_poly_factor_merged.lo build/fmpz_factor_merged.lo build/fmpz_poly_factor_merged.lo build/fmpz_mod_poly_factor_merged.lo build/fq_poly_factor_merged.lo build/fq_nmod_poly_factor_merged.lo build/fq_zech_poly_factor_merged.lo build/fq_default_poly_factor_merged.lo build/nmod_poly_mat_merged.lo build/fmpz_poly_mat_merged.lo build/mpoly_merged.lo build/nmod_mpoly_merged.lo build/fmpz_mpoly_merged.lo build/fmpz_mod_mpoly_merged.lo build/fmpq_mpoly_merged.lo build/fq_nmod_mpoly_merged.lo build/fq_zech_mpoly_merged.lo build/nmod_mpoly_factor_merged.lo build/fmpz_mpoly_factor_merged.lo build/fmpz_mod_mpoly_factor_merged.lo build/fmpq_mpoly_factor_merged.lo build/fq_nmod_mpoly_factor_merged.lo build/fq_zech_mpoly_factor_merged.lo build/fft_merged.lo build/fft_small_merged.lo"
-      # Everything until fmpz_poly_q
+      MODULES: "build/thread_pool_merged.lo build/thread_support_merged.lo build/ulong_extras_merged.lo build/long_extras_merged.lo build/perm_merged.lo build/double_extras_merged.lo build/d_vec_merged.lo build/d_mat_merged.lo build/mpn_extras_merged.lo build/nmod_merged.lo build/nmod_vec_merged.lo build/nmod_mat_merged.lo build/nmod_poly_merged.lo build/mpn_mod_merged.lo build/fmpz_merged.lo build/fmpz_vec_merged.lo build/fmpz_mat_merged.lo build/fmpz_poly_merged.lo build/fmpz_mod_merged.lo build/fmpz_mod_vec_merged.lo build/fmpz_mod_mat_merged.lo build/fmpz_mod_poly_merged.lo build/fmpq_merged.lo build/fmpq_vec_merged.lo build/fmpq_mat_merged.lo build/fmpq_poly_merged.lo build/fq_merged.lo build/fq_vec_merged.lo build/fq_mat_merged.lo build/fq_poly_merged.lo build/fq_nmod_merged.lo build/fq_nmod_vec_merged.lo build/fq_nmod_mat_merged.lo build/fq_nmod_poly_merged.lo build/fq_zech_merged.lo build/fq_zech_mat_merged.lo build/fq_zech_poly_merged.lo build/fq_default_merged.lo build/fq_default_mat_merged.lo build/fq_default_poly_merged.lo build/fq_embed_merged.lo build/fq_nmod_embed_merged.lo build/fq_zech_embed_merged.lo build/padic_merged.lo build/padic_mat_merged.lo build/padic_poly_merged.lo build/qadic_merged.lo build/nmod_poly_factor_merged.lo build/fmpz_factor_merged.lo build/fmpz_poly_factor_merged.lo build/fmpz_mod_poly_factor_merged.lo build/fq_poly_factor_merged.lo build/fq_nmod_poly_factor_merged.lo build/fq_zech_poly_factor_merged.lo build/fq_default_poly_factor_merged.lo build/nmod_poly_mat_merged.lo build/fmpz_poly_mat_merged.lo build/mpoly_merged.lo build/nmod_mpoly_merged.lo build/fmpz_mpoly_merged.lo build/fmpz_mod_mpoly_merged.lo build/fmpq_mpoly_merged.lo build/fq_nmod_mpoly_merged.lo build/fq_zech_mpoly_merged.lo build/nmod_mpoly_factor_merged.lo build/fmpz_mpoly_factor_merged.lo build/fmpz_mod_mpoly_factor_merged.lo build/fmpq_mpoly_factor_merged.lo build/fq_nmod_mpoly_factor_merged.lo build/fq_zech_mpoly_factor_merged.lo build/fft_merged.lo build/fft_small_merged.lo build/bool_mat_merged.lo build/calcium_merged.lo build/double_interval_merged.lo build/fmpz_extras_merged.lo build/fmpz_mod_mpoly_q_merged.lo build/fmpz_mpoly_q_merged.lo build/fmpz_poly_q_merged.lo build/fmpzi_merged.lo build/generic_files_merged.lo build/gr_mat_merged.lo build/gr_vec_merged.lo build/mag_merged.lo build/nf_elem_merged.lo build/nf_merged.lo build/partitions_merged.lo"
     steps:
       - uses: actions/checkout@v5
       - name: "Setup"
@@ -191,7 +204,7 @@ jobs:
         run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
   ubuntu-clang:
-    name: BLAS, examples (x1)
+    name: ASan, BLAS, examples (x1)
     runs-on: ubuntu-24.04
     env:
       CC: "clang"
@@ -209,7 +222,7 @@ jobs:
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug
+        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug --enable-asan
       - name: "Compile library"
         run: $MAKE && ldd libflint.so
       - name: "Compile tests"

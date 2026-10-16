@@ -94,6 +94,11 @@ Context objects
 Basic operations and arithmetic
 -------------------------------------------------------------------------------
 
+
+.. function:: int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
+
+   Generates a coefficient uniformly between `0` and `MPN_MOD_CTX_MODULUS(ctx)` exclusive.
+
 .. function:: int mpn_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
               void mpn_mod_ctx_clear(gr_ctx_t ctx)
               truth_t mpn_mod_ctx_is_field(gr_ctx_t ctx)
@@ -141,6 +146,8 @@ Basic operations and arithmetic
               int mpn_mod_sqr(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
+              truth_t mpn_mod_is_square(nn_srcptr x, gr_ctx_t ctx)
+              int mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 
     Basic functionality for the ``gr`` method table.
     These methods are interchangeable with their ``gr`` counterparts.
@@ -148,6 +155,19 @@ Basic operations and arithmetic
     ``gr_add(res, x, y, ctx)``.
     The former can be slightly faster as it avoids the indirection of the
     method table lookup.
+
+    :func:`mpn_mod_sqrt` wraps :func:`flint_mpn_sqrtmod_preinv`, 
+    passing the modulus and the precomputed inverse that the context already holds.
+
+    :func:`mpn_mod_is_square` is therefore the Jacobi symbol
+    `\left(\frac{x}{n}\right)`. For an odd modulus, a symbol of `-1` gives
+    ``T_FALSE`` whether or not the modulus is prime; a symbol of `+1` gives
+    ``T_TRUE`` for a modulus known to be prime and ``T_UNKNOWN`` otherwise. Likewise :func:`mpn_mod_sqrt` returns
+    ``GR_DOMAIN`` when the Jacobi symbol rules out a root, and ``GR_UNABLE``
+    when a root is not ruled out but the modulus is not known to be prime.
+    Primality is not something the context establishes by itself; use
+    :func:`gr_ctx_set_is_field` to say so. As exceptions, 0 and 1 are squares
+    for any modulus and are recognized as such.
 
 Vector functions
 -------------------------------------------------------------------------------
@@ -163,9 +183,10 @@ Vector functions
               int _mpn_mod_vec_mul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
               int _mpn_mod_scalar_mul_vec(nn_ptr res, nn_srcptr y, nn_srcptr x, slong len, gr_ctx_t ctx)
               int _mpn_mod_vec_addmul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
-              int _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx);
+              int _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
               int _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
               int _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
 
     Overrides for generic ``gr`` vector operations with inlined or partially inlined
     code for reduced overhead.
@@ -227,31 +248,41 @@ Multiplication
 All multiplication algorithms optimize for squaring.
 
 .. function:: int _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using the schoolbook algorithm.
 
 .. function:: int _mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using Kronecker substitution (bit packing).
 
 .. function:: int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx)
 
-    Polynomial multiplication using the Karatsuba algorithm,
-    implemented without intermediate modular reductions.
-    This algorithm calls itself recursively, switching to
-    basecase multiplication (also without intermediate reductions)
-    when either *len1* or *len2* is smaller than *cutoff*.
+    Polynomial multiplication using the Karatsuba algorithm
+    (:func:`_flint_mpn_poly_mulmid_karatsuba`), implemented without
+    intermediate modular reductions. This algorithm calls itself
+    recursively, switching to basecase multiplication (also without
+    intermediate reductions) when either *len1* or *len2* is smaller
+    than *cutoff*; a *cutoff* of -1 selects the tuned value.
 
-    Currently a full product is computed internally regardless of *len*;
-    truncation only skips the modular reductions.
+.. function:: int _mpn_mod_poly_mulmid_mpn(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+
+    Polynomial multiplication without intermediate modular reductions,
+    choosing between the classical algorithm and Karatsuba via
+    :func:`_flint_mpn_poly_mulmid`, with the size of the unreduced coefficients
+    given by :func:`_flint_mpn_poly_mulmid_params`.
 
 .. function:: int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using the small-prime FFT.
     Returns ``GR_UNABLE`` if the small-prime FFT is not available
     or if the coefficients are too large to use this implementation.
 
 .. function:: int _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication with automatic algorithm selection.
 
@@ -270,10 +301,10 @@ Division
     Polynomial division with remainder implemented using the basecase
     algorithm with delayed reductions.
 
-.. function:: int _mpn_mod_poly_divrem_q1_preinv1_fmma(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx);
-              int _mpn_mod_poly_divrem_q1_preinv1_fmma_precond(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx);
-              int _mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx);
-              int _mpn_mod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx);
+.. function:: int _mpn_mod_poly_divrem_q1_preinv1_fmma(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx)
+              int _mpn_mod_poly_divrem_q1_preinv1_fmma_precond(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx)
+              int _mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx)
+              int _mpn_mod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx)
 
     Algorithms for polynomial division in the special case where
     `lenA = lenB + 1`. Require `lenB \ge 2`.
@@ -292,7 +323,8 @@ GCD
     Polynomial GCD with automatic selection between basecase
     and HGCD algorithms.
 
-.. function:: int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
+.. function:: int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 
     Polynomial extended GCD with automatic selection between basecase
     and HGCD algorithms.
+

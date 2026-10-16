@@ -14,11 +14,32 @@
 
 #include "templates.h"
 
+#if defined(FQ_ZECH_POLY_H)
+/* Kept out of line so that the fast path for small squares
+   in _fq_zech_poly_sqr does not need a stack frame. */
+FLINT_STATIC_NOINLINE void
+_fq_zech_poly_sqr_large(fq_zech_struct * rop,
+                        const fq_zech_struct * op, slong len,
+                        const fq_zech_ctx_t ctx)
+{
+    if (_fq_zech_poly_sqr_want_univariate(len, ctx))
+        _fq_zech_poly_mul_univariate(rop, op, len, op, len, ctx);
+    else
+        _fq_zech_poly_sqr_classical(rop, op, len, ctx);
+}
+#endif
+
 void
 _TEMPLATE(T, poly_sqr) (TEMPLATE(T, struct) * rop,
                         const TEMPLATE(T, struct) * op, slong len,
                         const TEMPLATE(T, ctx_t) ctx)
 {
+#if defined(FQ_ZECH_POLY_H)
+    if (len < 2 * FQ_ZECH_POLY_MUL_UNIVARIATE_MIN_LEN(ctx))
+        _fq_zech_poly_sqr_classical(rop, op, len, ctx);
+    else
+        _fq_zech_poly_sqr_large(rop, op, len, ctx);
+#else
     if (len < TEMPLATE(CAP_T, SQR_CLASSICAL_CUTOFF))
     {
         _TEMPLATE(T, poly_sqr_classical) (rop, op, len, ctx);
@@ -33,6 +54,7 @@ _TEMPLATE(T, poly_sqr) (TEMPLATE(T, struct) * rop,
     {
         _TEMPLATE(T, poly_sqr_KS) (rop, op, len, ctx);
     }
+#endif
 }
 
 void

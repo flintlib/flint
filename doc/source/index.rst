@@ -60,7 +60,9 @@ Generic rings
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
+   gr_ore_poly.rst
    gr_series.rst
+   gr_dft.rst
 
 .. only:: not latex
 
@@ -89,7 +91,9 @@ Integers
    long_extras.rst
    longlong.rst
    mpn_extras.rst
+   mp_real.rst
    aprcl.rst
+   ecpp.rst
    arith.rst
    fft.rst
    fft_small.rst
@@ -192,6 +196,8 @@ Real and complex numbers
    examples_arb.rst
    mag.rst
    nfloat.rst
+   decimal.rst
+   dfloat.rst
    arf.rst
    acf.rst
    arb.rst
@@ -209,7 +215,6 @@ Real and complex numbers
    acb_theta.rst
    acb_dirichlet.rst
    bernoulli.rst
-   hypgeom.rst
    partitions.rst
    arb_calc.rst
    acb_calc.rst
@@ -297,6 +302,7 @@ p-adic numbers
    padic_poly.rst
    padic_mat.rst
    qadic.rst
+   padic_radix.rst
 
 Floating-point support code
 -----------------------------------

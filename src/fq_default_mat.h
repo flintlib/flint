@@ -1067,6 +1067,31 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
 
 /* Scalar operations */
 
+FQ_DEFAULT_MAT_INLINE void fq_default_mat_scalar_mul(fq_default_mat_t B,
+                          const fq_default_mat_t A, const fq_default_t c, const fq_default_ctx_t ctx)
+{
+    GR_IGNORE(gr_mat_mul_scalar((gr_mat_struct *) B, (const gr_mat_struct *) A, c, FQ_DEFAULT_GR_CTX(ctx)));
+}
+
+FQ_DEFAULT_MAT_INLINE void fq_default_mat_scalar_mul_fmpz(fq_default_mat_t B,
+                          const fq_default_mat_t A, const fmpz_t c, const fq_default_ctx_t ctx)
+{
+    GR_IGNORE(gr_mat_mul_fmpz((gr_mat_struct *) B, (const gr_mat_struct *) A, c, FQ_DEFAULT_GR_CTX(ctx)));
+}
+
+FQ_DEFAULT_MAT_INLINE void fq_default_mat_scalar_mul_si(fq_default_mat_t B,
+                          const fq_default_mat_t A, const slong c, const fq_default_ctx_t ctx)
+{
+    GR_IGNORE(gr_mat_mul_si((gr_mat_struct *) B, (const gr_mat_struct *) A, c, FQ_DEFAULT_GR_CTX(ctx)));
+}
+
+FQ_DEFAULT_MAT_INLINE void fq_default_mat_scalar_mul_ui(fq_default_mat_t B,
+                          const fq_default_mat_t A, const ulong c, const fq_default_ctx_t ctx)
+{
+    GR_IGNORE(gr_mat_mul_ui((gr_mat_struct *) B, (const gr_mat_struct *) A, c, FQ_DEFAULT_GR_CTX(ctx)));
+}
+
+
 /* Multiplication */
 
 FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,

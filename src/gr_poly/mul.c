@@ -47,7 +47,6 @@ gr_poly_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_
         status = _gr_poly_mul(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs, poly2->length, ctx);
     }
 
-    _gr_poly_set_length(res, len_out, ctx);
-    _gr_poly_normalise(res, ctx);  /* needed for non-integral domains */
+    _gr_poly_set_length_normalise(res, len_out, ctx);  /* needed for non-integral domains */
     return status;
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "ulong_extras.h"
@@ -189,6 +190,26 @@ _gr_poly_revert_series(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ct
 {
     int status;
 
+    /* Estimate composition cutoff for Kinoshita-Li; see _gr_poly_compose_series. */
+    if (n >= 100)
+    {
+        slong cutoff = 500;
+
+        if (n >= 100 && gr_ctx_has_real_prec(ctx) == T_TRUE)
+        {
+            GR_MUST_SUCCEED(gr_ctx_get_real_prec(&cutoff, ctx));
+            cutoff = 15000 / sqrt(FLINT_MAX(64, cutoff));
+            cutoff = FLINT_MAX(cutoff, 100);
+        }
+
+        /* Guess that the optimal cutoff for reversion is quite a bit higher
+           than that for composition. */
+        cutoff *= 5;
+
+        if (n >= cutoff)
+            return _gr_poly_revert_series_newton(res, f, flen, n, ctx);
+    }
+
     status = _gr_poly_revert_series_lagrange_fast(res, f, flen, n, ctx);
 
     /* Newton may succeed where Lagrange fails in finite characteristic */
@@ -218,8 +239,7 @@ gr_poly_revert_series_lagrange(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -243,8 +263,7 @@ gr_poly_revert_series_lagrange_fast(gr_poly_t res, const gr_poly_t f, slong n, g
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -268,8 +287,7 @@ gr_poly_revert_series_newton(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -293,7 +311,6 @@ gr_poly_revert_series(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }

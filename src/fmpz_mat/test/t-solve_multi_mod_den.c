@@ -22,6 +22,7 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
@@ -56,6 +57,38 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
             flint_abort();
         }
 
+
+        /* the denominator must be positive, minimal (no common factor
+           with the entries of X) and a divisor of det(A) */
+        if (success && m > 0)
+        {
+            fmpz_t g, det, rem;
+            slong ii, jj;
+            fmpz_init(g);
+            fmpz_init(det);
+            fmpz_init(rem);
+            fmpz_set(g, den);
+            for (ii = 0; ii < m; ii++)
+                for (jj = 0; jj < n; jj++)
+                    fmpz_gcd(g, g, fmpz_mat_entry(X, ii, jj));
+            fmpz_mat_det(det, A);
+            fmpz_mod(rem, det, den);
+            if (fmpz_sgn(den) <= 0 || !fmpz_is_one(g) || !fmpz_is_zero(rem))
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("denominator not positive, minimal or a divisor of det\n");
+                flint_printf("A:\n"),      fmpz_mat_print_pretty(A), flint_printf("\n");
+                flint_printf("X:\n"),      fmpz_mat_print_pretty(X), flint_printf("\n");
+                flint_printf("den(X) = "), fmpz_print(den),          flint_printf("\n");
+                flint_printf("gcd = "),    fmpz_print(g),            flint_printf("\n");
+                flint_printf("det(A) = "), fmpz_print(det),          flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+            fmpz_clear(g);
+            fmpz_clear(det);
+            fmpz_clear(rem);
+        }
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(X);
@@ -66,6 +99,7 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
     /* Test singular systems */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = 1 + n_randint(state, 10);
         n = 1 + n_randint(state, 10);
         r = n_randint(state, m);
@@ -99,6 +133,8 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

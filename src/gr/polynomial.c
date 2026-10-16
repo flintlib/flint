@@ -31,9 +31,10 @@ polynomial_init(gr_poly_t res, gr_ctx_t ctx)
 
 static int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of polynomials over ");
-    gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Ring of polynomials over ");
+    status |= gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
 }
 
 static int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -62,12 +63,18 @@ _gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
 
     char * var = POLYNOMIAL_CTX(ctx)->var;
     size_t len = strlen(var);
+
     * name = flint_malloc(len + 1);
     if (* name == NULL)
         return GR_UNABLE;
     strncpy(* name, var, len + 1);
 
     return GR_SUCCESS;
+}
+
+static gr_ptr _gr_gr_poly_ctx_base(gr_ctx_t ctx)
+{
+    return POLYNOMIAL_ELEM_CTX(ctx);
 }
 
 static void
@@ -104,6 +111,12 @@ polynomial_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
 }
 
 static truth_t
+polynomial_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
 polynomial_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_rational_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
@@ -119,6 +132,12 @@ static truth_t
 polynomial_ctx_is_complex_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_complex_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+static truth_t
+polynomial_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_approx_commutative_ring(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 static truth_t
@@ -149,13 +168,6 @@ polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t ctx)
 static int
 polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 {
-    /* todo */
-    if (poly->length == 0)
-    {
-        gr_stream_write(out, "0");
-        return GR_SUCCESS;
-    }
-
     return gr_poly_write(out, poly, POLYNOMIAL_CTX(ctx)->var, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
@@ -249,6 +261,30 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             _gr_poly_set_length(res, 0, POLYNOMIAL_ELEM_CTX(ctx));
         return status;
     }
+}
+
+/* m +/- inf where inf is the constant polynomial: the constant coefficient
+   gets an infinite radius */
+static int
+polynomial_set_interval_mid_inf(gr_poly_t res, const gr_poly_t m, gr_ctx_t ctx)
+{
+    gr_ctx_ptr cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    int status;
+
+    status = gr_poly_set(res, m, cctx);
+    if (status != GR_SUCCESS)
+        return status;
+
+    if (res->length == 0)
+    {
+        gr_poly_fit_length(res, 1, cctx);
+        _gr_poly_set_length(res, 1, cctx);
+        status = gr_zero(gr_poly_coeff_ptr(res, 0, cctx), cctx);
+    }
+
+    status |= gr_set_interval_mid_inf(gr_poly_coeff_ptr(res, 0, cctx), gr_poly_coeff_ptr(res, 0, cctx), cctx);
+    _gr_poly_normalise(res, cctx);
+    return status;
 }
 
 static int
@@ -385,6 +421,32 @@ polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     gr_vec_clear(vec1, POLYNOMIAL_ELEM_CTX(ctx));
 
     return status;
+}
+
+static int
+polynomial_big_o_base_fmpz(gr_poly_t res, const gr_poly_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    int status;
+
+    /* base is a constant: build O(base^exp) in the coefficient ring and place
+       it as the constant term. Never truncate in y. */
+    if (gr_poly_length(base, cctx) == 1)
+    {
+        gr_ptr t;
+
+        GR_TMP_INIT(t, cctx);
+
+        status = gr_big_o_base_fmpz(t, base->coeffs, exp, cctx);
+        if (status == GR_SUCCESS)
+            status = gr_poly_set_scalar(res, t, cctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    /* we don't support inexact elements with respect to the generator */
+    return GR_UNABLE;
 }
 
 static truth_t
@@ -690,7 +752,7 @@ polynomial_canonical_associate(gr_poly_t ux, gr_poly_t u, const gr_poly_t x, gr_
 
 
 static int
-polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
+polynomial_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
 {
     gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
     return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);
@@ -737,10 +799,77 @@ _polynomial_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr po
     return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
 }
 
+static int
+_polynomial_gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || nhi < MUL_KS_CUTOFF
+        || len1 + len2 - 1 - nlo < MUL_KS_CUTOFF || 2 * (nhi - nlo) < MUL_KS_CUTOFF)
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+
+    if (!want_KS(cctx, 0))
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+
+    return _gr_poly_mulmid_bivariate_KS(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
 
 int _gr_poly_methods_initialized = 0;
 
 gr_static_method_table _gr_poly_methods;
+
+
+/* Tuning for the multimodular algorithm over bivariate polynomial rings over
+   Z and Q: it is used when the degree in y of the smaller input, or the degree
+   in x of the resultant, reaches these values. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
+/* res_y(A, B) where the coefficients are themselves polynomials, that is for
+   bivariate A and B. Over a word-size prime field the coefficients are
+   evaluated, univariate resultants taken at the points and the result
+   interpolated; over Z and Q that same algorithm is run modulo several primes
+   and the result reconstructed by CRT. At sizes or over rings where neither
+   applies, the generic algorithms take over. */
+static int
+_polynomial_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
+                              gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    const gr_poly_struct * Ax = A;
+    const gr_poly_struct * Bx = B;
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    slong i, blenA = 0, blenB = 0, npoints;
+
+    if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    for (i = 0; i < lenA; i++)
+        blenA = FLINT_MAX(blenA, Ax[i].length);
+    for (i = 0; i < lenB; i++)
+        blenB = FLINT_MAX(blenB, Bx[i].length);
+
+    if (blenA != 0 && blenB != 0)
+    {
+        npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
+
+        if (cctx->which_ring == GR_CTX_NMOD)
+        {
+            if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB, npoints) &&
+                _gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+                return GR_SUCCESS;
+        }
+        else if (cctx->which_ring == GR_CTX_FMPZ || cctx->which_ring == GR_CTX_FMPQ)
+        {
+            if ((FLINT_MIN(lenA, lenB) >= MODULAR_MIN_LENGTH ||
+                    npoints - 1 >= MODULAR_MIN_DEGREE) &&
+                _gr_poly_resultant_modular(res, A, lenA, B, lenB, 1, ctx) == GR_SUCCESS)
+                return GR_SUCCESS;
+        }
+    }
+
+    return _gr_poly_resultant_generic(res, A, lenA, B, lenB, ctx);
+}
 
 gr_method_tab_input _gr_poly_methods_input[] =
 {
@@ -752,14 +881,17 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,  (gr_funcptr) polynomial_ctx_is_unique_factorization_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) polynomial_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
     {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_gr_poly_ctx_gen_name},
+    {GR_METHOD_CTX_BASE,                (gr_funcptr) _gr_gr_poly_ctx_base},
 
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
@@ -774,6 +906,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE, (gr_funcptr) polynomial_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ,   (gr_funcptr) polynomial_big_o_base_fmpz},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},
 /*
@@ -787,6 +920,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) polynomial_set_other},
     {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) polynomial_set_interval_mid_rad},
+    {GR_METHOD_SET_INTERVAL_MID_INF,    (gr_funcptr) polynomial_set_interval_mid_inf},
     /* todo: we actually want parse using sparse polynomials
              before converting to the dense representation, to avoid O(n^2) behavior */
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
@@ -829,6 +963,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
 
     {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
     {GR_METHOD_POLY_MULLOW, (gr_funcptr) _polynomial_gr_poly_mullow},
+    {GR_METHOD_POLY_MULMID, (gr_funcptr) _polynomial_gr_poly_mulmid},
+    {GR_METHOD_POLY_RESULTANT, (gr_funcptr) _polynomial_gr_poly_resultant},
 
     {0,                     (gr_funcptr) NULL},
 };

@@ -22,7 +22,7 @@ test_compose_mod_preinv(flint_rand_t state, int which)
 
     while (1)
     {
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE)
             break;
         gr_ctx_clear(ctx);
@@ -35,9 +35,13 @@ test_compose_mod_preinv(flint_rand_t state, int which)
     gr_poly_init(E, ctx);
     gr_poly_init(Cinv, ctx);
 
-    GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, 15), ctx));
-    GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, 15), ctx));
-    GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, 15), ctx));
+    {
+        /* occasionally use long polynomials to exercise rectangular splitting */
+        slong maxlen = (n_randint(state, 10) == 0 && gr_ctx_is_finite(ctx) == T_TRUE) ? 200 : 15;
+        GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, maxlen), ctx));
+        GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, maxlen), ctx));
+        GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, maxlen), ctx));
+    }
     GR_MUST_SUCCEED(gr_poly_randtest(D, state, 1 + n_randint(state, 15), ctx));
     GR_MUST_SUCCEED(gr_poly_randtest(Cinv, state, 1 + n_randint(state, 15), ctx));
 

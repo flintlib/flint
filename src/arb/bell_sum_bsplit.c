@@ -76,7 +76,7 @@ bsplit(arb_t P, arb_t Q, const fmpz_t n, const fmpz_t a, const fmpz_t b, slong p
 
 void
 arb_bell_sum_bsplit(arb_t res, const fmpz_t n,
-    const fmpz_t a, const fmpz_t b, const fmpz_t mmag, slong prec)
+    const fmpz_t a, const fmpz_t b, const fmpz_t FLINT_UNUSED(mmag), slong prec)
 {
     if (fmpz_cmp(a, b) >= 0)
     {

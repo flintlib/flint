@@ -15,80 +15,16 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
                                 ulong e, slong trunc, const fmpz_mod_ctx_t ctx)
 {
-    ulong bit = ~((~UWORD(0)) >> 1);
-    fmpz * v = _fmpz_vec_init(trunc);
-    fmpz * R, * S, * T;
-
-    /*
-       Set bits to the bitmask with a 1 one place lower than the msb of e
-     */
-
-    while ((bit & e) == UWORD(0))
-        bit >>= 1;
-
-    bit >>= 1;
-
-    /*
-       Trial run without any polynomial arithmetic to determine the parity
-       of the number of swaps;  then set R and S accordingly
-     */
-
-    {
-        unsigned int swaps = 0U;
-        ulong bit2 = bit;
-        if ((bit2 & e))
-            swaps = ~swaps;
-        while (bit2 >>= 1)
-            if ((bit2 & e) == UWORD(0))
-                swaps = ~swaps;
-
-        if (swaps == 0U)
-        {
-            R = res;
-            S = v;
-        }
-        else
-        {
-            R = v;
-            S = res;
-        }
-    }
-
-    /*
-       We unroll the first step of the loop, referring to {poly, len}
-     */
-
-    _fmpz_mod_poly_mullow(R, poly, trunc, poly, trunc, trunc, ctx);
-    if ((bit & e))
-    {
-        _fmpz_mod_poly_mullow(S, R, trunc, poly, trunc, trunc, ctx);
-        T = R;
-        R = S;
-        S = T;
-    }
-
-    while ((bit >>= 1))
-    {
-        if ((bit & e))
-        {
-            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, trunc, ctx);
-            _fmpz_mod_poly_mullow(R, S, trunc, poly, trunc, trunc, ctx);
-        }
-        else
-        {
-            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, trunc, ctx);
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-
-    _fmpz_vec_clear(v, trunc);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, poly, trunc, e, trunc, gr_ctx));
 }
 
 void

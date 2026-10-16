@@ -56,6 +56,10 @@ Radix objects
 
     Initializes to a randomly chosen radix.
 
+.. function:: void radix_init_randtest_prime(radix_t radix, flint_rand_t state)
+
+    Initializes to a randomly chosen radix with `b` a prime number.
+
 .. function:: ulong radix_digit_radix(const radix_t radix)
               ulong radix_limb_radix(const radix_t radix)
               ulong radix_limb_exponent(const radix_t radix)
@@ -75,6 +79,25 @@ Except where otherwise noted, the following rules apply:
 * Input limbs must be normalised to the range `[0, B - 1]`, and output limbs
   will also be normalised to this range.
 * Aliasing is permitted as long as aliased operands start at the same address.
+
+.. function:: ulong _radix_size_digits_1(ulong c, const radix_t radix)
+              ulong radix_size_digits_1(ulong c, const radix_t radix)
+
+    Return the size of the limb `c` in digits. The underscore method
+    requires `c > 0`.
+
+.. function:: ulong _radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+              ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+
+    Return the size of *(x, n)* in digits. The underscore requires `n > 0`
+    and `x_{n-1} \ne 0`. The version without an underscore allows `n = 0`
+    and `x_{n-1} = 0`.
+
+.. function:: ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
+
+    Return the digit valuation of the limb `c`, i.e. the number of trailing
+    zeros in base `b`, or the largest exponent `k` such that `b^k` divides `c`.
+    Requires `c > 0`.
 
 .. function:: void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix)
 
@@ -107,10 +130,40 @@ Except where otherwise noted, the following rules apply:
     Sets *(res, xn)* to the sum or difference of *(x, xn)* and *(y, yn)*, returning
     carry or borrow. Requires `xn \ge yn \ge 1`.
 
+.. function:: ulong radix_lshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int k, const radix_t radix)
+
+    Sets *(res, n)* to *(a, n)* shifted left by `k` digits, i.e.
+    multiplied by `b^k`, with the carry out returned in the `k` least
+    significant digits of the return limb.
+    This is equivalent to :func:`radix_mul_1` with scalar `b^k`,
+    but more efficient. Requires `n > 1` and `1 \le k < e`. Note that
+    this operation only makes sense in a limb radix with `e \ge 2` digits
+    per limb.
+
+.. function:: ulong radix_rshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int k, const radix_t radix)
+
+    Sets *(res, n)* to *(a, n)* shifted right by `k` digits, i.e.
+    divided by `b^k`, with the fractional part
+    returned in the `k` most significant digits of the return limb.
+    This is equivalent to :func:`radix_divrem_1` with scalar `b^k` followed
+    by multiplying the remainder by `b^{e-k}`,
+    but more efficient. Requires `n > 1` and `1 \le k < e`. Note that
+    this operation only makes sense in a limb radix with `e \ge 2` digits
+    per limb.
+
+.. function:: ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
+
+    Sets *(res, xn)* to *(x, xn)* multiplied by *c*, returning
+    carry out. Requires `1 \le d \le c`.
+
+.. function:: ulong radix_mul_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets *(res, xn)* to *(x, xn)* multiplied by 2, returning carry out.
+
 .. function:: void radix_mul(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, const radix_t radix)
 
     Sets *(res, xn + yn)* to the product of *(x, xn)* and *(y, yn)*.
-    Requires `xn \ge yn \ge 1`. Does not allow *res* to be aliased with
+    Requires `xn, yn \ge 1`. Does not allow *res* to be aliased with
     either *x* or *y*.
 
     This function is currently a wrapper of :func:`radix_mulmid`.
@@ -127,7 +180,7 @@ Except where otherwise noted, the following rules apply:
               void radix_mulmid_naive(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong lo, slong hi, const radix_t radix)
 
     Short, truncated or middle product.
-    Requires `xn \ge yn \ge 1` and `0 \le lo < hi \le xn + yn`.
+    Requires `xn, yn \ge 1` and `0 \le lo < hi \le xn + yn`.
     Does not allow *res* to be aliased with either *x* or *y*.
 
     Viewing as `x` and `y` as polynomials `X, Y \in \mathbb{Z}[T]` evaluated
@@ -158,10 +211,25 @@ Except where otherwise noted, the following rules apply:
     * *naive* is an unoptimized reference implementation which does a polynomial
       multiplication using ``fmpz_poly``.
 
+    The dispatching function :func:`radix_mulmid` uses the classical
+    algorithm when either operand or the requested slice is shorter than
+    80 limbs, and otherwise when the number of limb products in the
+    requested slice is smaller than
+    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot (xn + yn)`, since
+    the cost of the FFT algorithm depends essentially on the input lengths
+    only while the classical algorithm benefits from short slices (for
+    example, a truncated high product needs about half as many limb
+    products as the full product).
+
 .. function:: ulong radix_divrem_1(nn_ptr res, nn_srcptr x, slong xn, ulong d, const radix_t radix)
 
     Sets *(res, xn)* to the quotient of *(x, xn)* divided by *d*, returning the
     remainder. Requires `1 \le d \le B - 1`.
+
+.. function:: ulong radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets *(res, xn)* to the quotient of *(x, xn)* divided by 2, returning the
+    remainder.
 
 .. function:: void radix_divexact_1(nn_ptr res, nn_srcptr x, slong xn, ulong d, const radix_t radix)
 
@@ -169,15 +237,140 @@ Except where otherwise noted, the following rules apply:
     *(x, xn)* is an exact multiple of *d*, with undefined behavior otherwise.
     Requires `1 \le d \le B - 1`.
 
+.. function:: void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` with `a_{an-1} \ne 0` representing a fixed-point number
+    `a \in [1/B, 1)` with `an` fraction limbs,
+    sets `(q, n+2)` to an approximation of `1/a \in (1, B]` with `n` fraction limbs
+    and two integral limbs (the highest limb may be zero).
+    The relative error is bounded by `4 B^{-n}`, i.e. the absolute error is bounded
+    by `4 B^{-n} / a`.
+
+.. function:: void radix_div_approx_invmul(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              void radix_div_approx(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+
+    Given `(b, bn)` with `b_{bn-1} \ne 0` representing a fixed-point number
+    `b \in [1/B, 1)` with `bn \ge 1` fraction limbs, and `(a, an)` with `an \ge 1`
+    fraction limbs representing a fixed-point number `a \in [0, 1)`,
+    sets `(q, n+2)` to an approximation of `a/b` with `n` fraction limbs
+    and two integral limbs (the highest limbs may be zero).
+    The absolute error is bounded by `4 B^{-n} / b`.
+
+.. function:: void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem_newton_karp_markstein(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slong Bn, const radix_t radix)
+              void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient and `(r,bn)` to the remainder of
+    `(a,an)` divided by `(b,bn)`. Requires `an \ge bn \ge 1` and
+    `b_{bn-1} \ne 0`. The user can pass ``NULL`` for `r` to compute
+    only the quotient.
+
+.. function:: void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix)
+
+    Similar to :func:`radix_divrem`, but accepts a precomputed inverse
+    of `b` given as `(b, binvn+2)` with `binvn` fraction limbs and two
+    integral limbs, as computed by :func:`radix_inv_approx`.
+    Currently requires that `binvn \ge an-bn+1`. Passing an inverse with
+    several extra limbs can improve performance. The user can pass ``NULL``
+    for `r` to compute only the quotient.
+
+.. function:: int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact. If the division is not exact, returns 0
+    leaving the data in `q` undefined.
+
+.. function:: int radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` assuming that
+    the division is exact. The result is undefined if the division is
+    inexact.
+
 .. function:: int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
 
     If *(x, xn)* is invertible modulo `B^n`, sets *(res, n)* to the inverse
     and returns 1. If *(x, xn)* is not invertible, returns 0.
 
+.. function:: int radix_divmod_bn_1(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, ulong b, slong n, const radix_t radix)
+              int radix_divmod_bn_classical(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              int radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              int radix_divmod_bn(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+
+    Given *(a, an)* and *(b, bn)* with *b* invertible modulo the limb
+    radix B, develop *n* limbs of the B-adic (Hensel) quotient *q* with
+    `qb = a \bmod B^n`.
+    If *rem* is not NULL, the remainder `r = (a - qb)/B^n \bmod B^{bn}` is
+    written to *(rem, bn)*. This gives `a = qb + B^n rem \bmod B^{n+bn}`.
+
+.. function:: int radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
+
+    The digit radix is assumed to be a prime number `p`, with limb
+    radix exponent `e \ge 3` if `p = 2`.
+    If *(x, xn)* is a unit and a perfect square modulo `p` (modulo 8 if `p = 2`),
+    sets *(res, n)* to a square root modulo `B^n` and returns 1. Otherwise
+    returns 0. We choose the square root with the smallest nonnegative
+    residue mod `p`.
+
+.. function:: int radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
+
+    Computes the reciprocal of the square root computed by
+    :func:`radix_sqrtmod_bn`, with the same meaning of the return flag.
+
 .. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
     or greater than `\lfloor B^n / 2 \rfloor`. We require *n* to be positive.
+
+.. function:: void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix)
+              void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix)
+
+    Sets `(res,n)` to the fractional limbs of an approximation of `1 / \sqrt{a}`.
+    Assumes that `2 \le a < B`. The error is bounded by `2 B^{-n}`, i.e. by
+    2 fixed-point ulps.
+
+.. function:: void radix_rsqrt_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_rsqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` representing a fixed-point number `a \in [B^{-2}, 1)`
+    with `an` fraction limbs (at least one of the two highest limbs must
+    be nonzero), sets `(q, n+2)` to an approximation of
+    `1/\sqrt{a} \in (1, B]` with `n` fraction limbs and two integral limbs
+    (the highest limb is nonzero only when `a` is close to `B^{-2}`).
+    The absolute error is bounded by `4 B^{-n} / \sqrt{a}`.
+    The input normalization is wider than that of :func:`radix_inv_approx`
+    (which requires `a \in [1/B, 1)`) so that :func:`radix_sqrtrem` can
+    handle inputs with an odd number of limbs, the square root scale
+    factor `B^{1/2}` not being a limb shift.
+
+.. function:: void radix_sqrt_approx_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_sqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` representing a fixed-point number `a \in [B^{-2}, 1)`
+    as in :func:`radix_rsqrt_approx`, sets `(q, n+2)` to an approximation
+    of `\sqrt{a} \in [1/B, 1)` with `n` fraction limbs and two integral
+    limbs (normally zero, though the computed value can round up to 1).
+    The absolute error is bounded by `4 B^{-n} / \sqrt{a}`. Note that the
+    error is proportional to `1/\sqrt{a}` rather than to the output
+    `\sqrt{a}`: the corrections of the final iteration are multiplied by
+    an approximation of `1/\sqrt{a} \le B`, which amplifies their
+    `B^{-n}`-size rounding errors accordingly.
+
+.. function:: void radix_sqrtrem_via_mpn(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+              void radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+              void radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets `(s, \lceil an/2 \rceil)` to the truncated square root of
+    `(a, an)` and `(r, \lceil an/2 \rceil + 1)` to the remainder
+    `a - s^2 \le 2s`. Requires `an \ge 1` and `a_{an-1} \ne 0`. The user
+    can pass ``NULL`` for `r` to compute only the square root.
+
+.. function:: int radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets `(s, \lceil an/2 \rceil)` to the truncated square root of
+    `(a, an)`, returning 1 if `a` is a perfect square and 0 otherwise.
+    Requires `an \ge 1` and `a_{an-1} \ne 0`.
 
 Radix conversion
 --------------------------------------------------------------------------------
@@ -200,7 +393,10 @@ Radix conversion
     to *res* and returning the exact size of the result in the target radix.
     Leading zero limbs are omitted from the output size and may or may not be written.
     Requires that *res* has space for at least ``radix_set_mpn_need_alloc(an, radix)``
-    limbs.
+    limbs. The divide and conquer version caches (per thread) the table
+    of powers used most recently, so that repeated conversions of inputs
+    of the same size (for example when printing many numbers) do not
+    recompute it.
 
 .. function:: slong radix_set_mpn_need_alloc(slong n, const radix_t radix)
 
@@ -224,7 +420,7 @@ String conversion
     If the given pointer *res* is *NULL*, a new string will be allocated
     with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
     and is assumed to have sufficient space to store the result including
-    ter.
+    null terminator.
 
 .. function:: char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix)
 
@@ -293,45 +489,60 @@ Memory-managed integers
     and the most significant limb is nonzero. If the result is 0,
     operations on *x* have undefined behavior.
 
-.. function:: slong radix_integer_size(const radix_integer_t x, const radix_t radix)
+.. function:: slong radix_integer_size_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_size_digits(const radix_integer_t x, const radix_t radix)
 
-    Number of limbs in *x*, ignoring the sign.
+    Number of limbs (respectively digits) in *x*, ignoring the sign.
+
+.. function:: slong radix_integer_ssize_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_ssize_digits(const radix_integer_t x, const radix_t radix)
+
+    Number of limbs (respectively digits) in *x*, negated if *x* is negative.
 
 .. function:: ulong radix_integer_get_limb(const radix_integer_t x, slong index, const radix_t radix)
+              ulong radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radix)
 
-    Returns the limb at position *index* in *x*.
+    Returns the limb (respectively digit) at position *index* in *x*.
     The index must be nonnegative. The sign of *x* is ignored.
 
 .. function:: void radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
+              void radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
 
-    Sets *res* to *x* with the limb at position *index* replaced by the given
-    limb value *c*. The index must be nonnegative and *c* must be smaller
-    than the limb radix.
-    The sign of *x* is preserved. If *x* is zero and *c* is nonzero,
+    Sets *res* to *x* with the limb (respectively digit) at position *index*
+    replaced by the given limb (respectively digit) *c*. The index must be
+    nonnegative and *c* must be smaller than the limb radix (respectively
+    digit radix). The sign of *x* is preserved. If *x* is zero and *c* is nonzero,
     the sign of the result will be positive.
 
 .. function:: void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* multiplied by `B^n`.
+    Sets *res* to *x* multiplied by `B^n` (respectively `b^n`).
 
 .. function:: void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* divided by `B^n`, truncating the result (rounding to zero).
+    Sets *res* to *x* divided by `B^n` (respectively `b^n`),
+    truncating the result (rounding to zero).
 
 .. function:: slong radix_integer_valuation_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_valuation_digits(const radix_integer_t x, const radix_t radix)
 
-    Returns the largest *n* such that `B^n` divides *x* exactly.
+    Returns the largest *n* such that `B^n` (respectively `b^n`) divides *x* exactly,
+    i.e. the number of least significant zero limbs (respectively digits).
     In the special case `x = 0`, returns zero.
 
 .. function:: void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* with the absolute value reduced modulo `B^n`, preserving
-    the sign of *x*.
+    Sets *res* to *x* with the absolute value reduced modulo `B^n` (respectively `b^n`),
+    preserving the sign of *x*.
 
 .. function:: void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* reduced modulo `B^n`, returning the unique
-    unsigned representative in `[0, B^n-1]`.
+    Sets *res* to *x* reduced modulo `B^n` (respectively `b^n`), returning the unique
+    unsigned representative in `[0, B^n-1]` (respectively `[0, b^n-1]`).
 
 .. function:: void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
@@ -344,9 +555,69 @@ Memory-managed integers
     Sets *res* to the product of *x* and *y* with the absolute value
     reduced modulo `B^n`.
 
+.. function:: int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact, otherwise sets `q` to zero and returns 0.
+
+.. function:: int radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` assuming that the
+    division is exact. The behavior is undefined if the division is inexact.
+
+.. function:: void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_tdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Division with remainder: compute `a = qb + r` where `q` is the truncation,
+    floor, and ceiling quotient respectively.
+
+.. function:: int radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix)
+
+    Sets `s` to the truncated square root of `x` and returns 1 if `x` is
+    a perfect square, otherwise returns 0. If `x` is negative, returns 0
+    without modifying `s`.
+
+.. function:: void radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix)
+
+    Sets `s` to the truncated square root of `x` and `r` to the remainder
+    `x - s^2 \le 2s`. Raises an error if `x` is negative.
+
+.. function:: int radix_integer_is_square(const radix_integer_t x, const radix_t radix)
+
+    Returns 1 if `x` is a perfect square and 0 otherwise (in particular,
+    if `x` is negative).
+
+.. function:: int radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+
+    If `x` is invertible, sets *res* to the inverse of `x` and returns 1,
+    otherwise returns 0 without modifying *res*.
+
+.. function:: int radix_integer_is_invertible(const radix_integer_t x, const radix_t radix)
+
+    Returns 1 if `x` is invertible, i.e. if `x = \pm 1`, and 0 otherwise.
+
 .. function:: int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
     If *x* is invertible modulo `B^n`, sets *res* to the inverse
     and returns 1. The sign of the input is preserved.
     If *x* is not invertible, returns 0.
+
+.. function:: int radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer y, slong n, const radix_t radix)
+
+    If *y* is invertible modulo `B^n`, sets *res* to the quotient
+    `x / y` modulo `B^n` and returns 1. The sign of the inputs is preserved.
+    If *y* is not invertible, returns 0.
+
+.. function:: int radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              int radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Square root modulo `B^n`: see :func:`radix_sqrtmod_bn` and
+    :func:`radix_rsqrtmod_bn`.
 

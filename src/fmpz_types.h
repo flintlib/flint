@@ -52,6 +52,16 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 typedef struct
 {
+    fmpz * entries;
+    slong alloc;
+    slong length;
+}
+fmpz_vec_struct;
+ 
+typedef fmpz_vec_struct fmpz_vec_t[1];
+
+typedef struct
+{
     fmpz * coeffs;
     slong alloc;
     slong length;
@@ -136,6 +146,15 @@ typedef struct
 fmpz_mpoly_q_struct;
 
 typedef fmpz_mpoly_q_struct fmpz_mpoly_q_t[1];
+
+typedef struct
+{
+    fmpz_mpoly_struct num;
+    fmpz_mpoly_factor_struct den;
+}
+fmpz_mpoly_q_factored_struct;
+
+typedef fmpz_mpoly_q_factored_struct fmpz_mpoly_q_factored_t[1];
 
 typedef struct
 {

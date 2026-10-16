@@ -24,7 +24,7 @@ _TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, struct) * res,
 {
     gr_ctx_t gr_ctx;
     TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
-    GR_MUST_SUCCEED(_gr_poly_powmod_ui_binexp(res, poly, e, f, lenf, gr_ctx));
+    GR_MUST_SUCCEED(_gr_poly_powmod_ui_binexp(res, poly, lenf - 1, e, f, lenf, gr_ctx));
 }
 
 void

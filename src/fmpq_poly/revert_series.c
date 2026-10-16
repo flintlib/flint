@@ -25,7 +25,10 @@ _fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
         return;
     }
 
-    _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, Qlen, n);
+    if (n < 20)
+        _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, Qlen, n);
+    else
+        _fmpq_poly_revert_series_newton(Qinv, den, Q, Qden, Qlen, n);
 }
 
 void

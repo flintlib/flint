@@ -54,6 +54,8 @@ _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulon
         acb_dirichlet_powsum_sieved(sum, s, N, d, prec);
     else if (acb_is_one(a) && d <= 4) /* todo: also better for slightly larger d, if N and prec large enough */
         acb_dirichlet_powsum_smooth(sum, s, N, d, prec);
+    else if (_acb_poly_powsum_series_tree_is_faster(s, a, one, N, d, prec, flint_get_num_threads() > 1 && N > 50))
+        _acb_poly_powsum_series_tree(sum, s, a, one, N, d, prec);
     else if (N > 50 && flint_get_num_threads() > 1)
         _acb_poly_powsum_series_naive_threaded(sum, s, a, one, N, d, prec);
     else

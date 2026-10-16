@@ -11,22 +11,14 @@
 
 #include "arb.h"
 #include "arb_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 arb_mat_hilbert(arb_mat_t mat, slong prec)
 {
-    slong R, C, i, j;
-
-    R = arb_mat_nrows(mat);
-    C = arb_mat_ncols(mat);
-
-    for (i = 0; i < R; i++)
-    {
-        for (j = 0; j < C; j++)
-        {
-            arb_one(arb_mat_entry(mat, i, j));
-            arb_div_ui(arb_mat_entry(mat, i, j),
-                arb_mat_entry(mat, i, j), i + j + 1, prec);
-        }
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    GR_MUST_SUCCEED(gr_mat_hilbert((gr_mat_struct *) mat, ctx));
+    gr_ctx_clear(ctx);
 }

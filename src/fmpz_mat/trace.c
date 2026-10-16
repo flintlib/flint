@@ -17,6 +17,9 @@ fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat)
 {
     slong i, n = fmpz_mat_nrows(mat);
 
+    if (n != fmpz_mat_ncols(mat))
+        flint_throw(FLINT_ERROR, "fmpz_mat_trace: a square matrix is required!\n");
+
     if (n == 0)
         fmpz_zero(trace);
     else

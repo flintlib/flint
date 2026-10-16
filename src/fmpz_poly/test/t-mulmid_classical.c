@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -16,103 +16,69 @@
 
 TEST_FUNCTION_START(fmpz_poly_mulmid_classical, state)
 {
-    int i, result;
+    slong iter;
 
-    /* Check aliasing of a and b */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t a, b, c;
-
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
-        if (b->length == 0)
-            fmpz_poly_zero(c);
-        else
-            fmpz_poly_randtest(c, state, n_randint(state, b->length), 200);
-
-        fmpz_poly_mulmid_classical(a, b, c);
-        fmpz_poly_mulmid_classical(b, b, c);
-
-        result = (fmpz_poly_equal(a, b));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_poly_print(a), flint_printf("\n\n");
-            fmpz_poly_print(b), flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
-    }
-
-    /* Check aliasing of a and c */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t a, b, c;
-
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
-        if (b->length == 0)
-            fmpz_poly_zero(c);
-        else
-            fmpz_poly_randtest(c, state, n_randint(state, b->length), 200);
-
-        fmpz_poly_mulmid_classical(a, b, c);
-        fmpz_poly_mulmid_classical(c, b, c);
-
-        result = (fmpz_poly_equal(a, c));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_poly_print(a), flint_printf("\n\n");
-            fmpz_poly_print(c), flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
-    }
-
-    /* Compare with mul_basecase */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         fmpz_poly_t a, b, c, d;
+        slong nlo, nhi, bits;
+        int aliasing, result;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
-        fmpz_poly_randtest(c, state, n_randint(state, b->length + 1), 200);
 
-        fmpz_poly_mulmid_classical(d, b, c);
-        if (b->length == 0 || c->length == 0)
+        bits = 1 + n_randint(state, 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 10), bits);
+        fmpz_poly_randtest(b, state, n_randint(state, 10), bits);
+        fmpz_poly_randtest(c, state, n_randint(state, 10), bits);
+        fmpz_poly_randtest(d, state, n_randint(state, 10), bits);
+
+        nlo = n_randint(state, 10);
+        nhi = n_randint(state, 10);
+        aliasing = n_randint(state, 5);
+
+        if (aliasing == 3 || aliasing == 4)
+            fmpz_poly_set(b, a);
+
+        fmpz_poly_mul_classical(c, a, b);
+        fmpz_poly_shift_right(c, c, nlo);
+        fmpz_poly_truncate(c, FLINT_MAX(0, nhi - nlo));
+
+        if (aliasing == 0)
         {
-            result = (d->length == 0);
+            fmpz_poly_mulmid_classical(d, a, b, nlo, nhi);
         }
-        else
+        else if (aliasing == 1)
         {
-            fmpz_poly_mul_classical(a, b, c);
-            fmpz_poly_truncate(a, b->length);
-            fmpz_poly_shift_right(a, a, c->length - 1);
-            result = (fmpz_poly_equal(a, d));
+            fmpz_poly_set(d, a);
+            fmpz_poly_mulmid_classical(d, d, b, nlo, nhi);
         }
+        else if (aliasing == 2)
+        {
+            fmpz_poly_set(d, b);
+            fmpz_poly_mulmid_classical(d, a, d, nlo, nhi);
+        }
+        else if (aliasing == 3)
+        {
+            fmpz_poly_mulmid_classical(d, a, a, nlo, nhi);
+        }
+        else if (aliasing == 4)
+        {
+            fmpz_poly_set(d, a);
+            fmpz_poly_mulmid_classical(d, d, d, nlo, nhi);
+        }
+
+        result = (fmpz_poly_equal(c, d));
         if (!result)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
-            flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
-            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
-            flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n\n");
+            flint_printf("FAIL: fmpz_poly_mulmid_classical\n");
+            flint_printf("aliasing = %d, nlo = %wd, nhi = %wd\n", aliasing, nlo, nhi);
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
+            fmpz_poly_print(d), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
