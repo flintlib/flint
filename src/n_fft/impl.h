@@ -181,4 +181,3 @@ ulong n_fft_itft_prepare(ulong * _iolen, ulong iolen, n_fft_ctx_t F)
 }
 
 #endif  /* N_FFT_IMPL_H */
-

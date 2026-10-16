@@ -106,7 +106,7 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  *       -- for 0 <= k < max_depth, tab_inv2[2*k] = the inverse of 2**(k+1)
  *       modulo mod, and tab_inv2[2*k+1] = floor(tab_inv2[2*k] * 2**FLINT_BITS / mod)
  *       -- for 2*max_depth <= k < 2*FLINT_BITS, tab_inv2[k] is undefined
- * 
+ *
  * Recall F->mod == 1 + cofactor * 2**max_depth, so
  *          1 == F->mod - cofactor * 2**(max_depth - k) * 2**k
  * --> the inverse of 2**k in (0, F->mod) is

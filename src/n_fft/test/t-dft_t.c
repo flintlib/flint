@@ -37,7 +37,7 @@ static void t_dft_t_weighted_power_sums(nn_ptr q, nn_srcptr p, nn_ptr roots, ulo
         q[j] = 0;
         for (ulong i = 0; i < len; i++)
         {
-            q[j] = nmod_add(q[j], 
+            q[j] = nmod_add(q[j],
                             nmod_mul(p[i], w_pow_j[i], mod),
                             mod);
             w_pow_j[i] = nmod_mul(w_pow_j[i], roots[i], mod);

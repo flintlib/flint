@@ -129,10 +129,10 @@ do {                                              \
  *                              [1 -1  I -I]
  * [a  b  c  d] <- [a  b  c  d] [1  1 -1 -1]
  *                              [1 -1 -I  I]
- *                              [1  0  1  0] [1  1  0  0] 
- *              == [a  b  c  d] [0  1  0  I] [1 -1  0  0] 
- *                              [1  0 -1  0] [0  0  1  1] 
- *                              [0  1  0 -I] [0  0  1 -1] 
+ *                              [1  0  1  0] [1  1  0  0]
+ *              == [a  b  c  d] [0  1  0  I] [1 -1  0  0]
+ *                              [1  0 -1  0] [0  0  1  1]
+ *                              [0  1  0 -I] [0  0  1 -1]
  * * Corresponds to reducing down the tree with nodes
  *                       x^4 - 1
  *                     /         \
@@ -447,7 +447,7 @@ do {                                                   \
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as the evaluations
  *       [p(1), p(-1), p(I), p(-I), p(J), p(-J), p(I*J), p(-I*J)]
  * at all 8-th roots of unity J**k for 0 <= k < 8 in bit-reversed order
- * of a polynomial p(x) of degree < 8, into the coefficients of this polynomial 
+ * of a polynomial p(x) of degree < 8, into the coefficients of this polynomial
  * * Recall: [F->tab_w[2*k] for k in range(4)] == [1, I, J, IJ])
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  */
@@ -509,7 +509,7 @@ do {                                                          \
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as the evaluations
  *       [p(w0), p(-w0), p(w1), p(-w1), p(w2), p(-w2), p(w3), p(-w3)]
  * where w_k = F->tab_w[8*node + 2*k] for 0 <= k < 4 of a polynomial p(x) of
- * degree < 8, into the coefficients of this polynomial 
+ * degree < 8, into the coefficients of this polynomial
  * * By construction these 8 evaluation points are the 8 roots of the
  * polynomial x**8 - F->tab_w[2*node]**2
  * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
@@ -626,7 +626,7 @@ do {                                                             \
 /** 16-point FFT, interpolation
  * * In-place transform p of length 16, seen as the evaluations at all 16-th
  * roots of unity  1, -1, I, -I... (bit-reversed order) of a polynomial p(x) of
- * degree < 16, into the coefficients of this polynomial 
+ * degree < 16, into the coefficients of this polynomial
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  */
 #define IDFT16_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,              \
@@ -662,7 +662,7 @@ do {                                                                 \
 
 /** 16-point FFT, evaluation, general node
  * * In-place transform p of length 16, seen as a polynomial
- * p(x) = p0 + p1*x + ... + p15*x**15, into its evaluations at 
+ * p(x) = p0 + p1*x + ... + p15*x**15, into its evaluations at
  *       p(w0), p(-w0), p(w1), p(-w1), ..., p(w7), p(-w7)
  * where w_k = F->tab_w[16*node + 2*k] for 0 <= k < 8
  * * By construction these 16 evaluation points are the 16 roots of the
@@ -737,7 +737,7 @@ do {                                                              \
 } while(0)
 
 /** 16-point FFT, interpolation, general node
- * * In-place transform p of length 16, seen as the evaluations at 
+ * * In-place transform p of length 16, seen as the evaluations at
  *       w0, -w0, w1, -w1, ..., w7, -w7
  * where w_k = F->tab_w[16*node + 2*k] for 0 <= k < 8
  * of a polynomial of degree < 16, into the coefficients of this polynomial
@@ -901,7 +901,7 @@ do {                                                                            
 /** 32-point FFT, interpolation
  * * In-place transform p of length 32, seen as the evaluations at all 32-th
  * roots of unity  1, -1, I, -I... (bit-reversed order) of a polynomial p(x) of
- * degree < 32, into the coefficients of this polynomial 
+ * degree < 32, into the coefficients of this polynomial
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  */
 #define IDFT32_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,                           \
@@ -931,7 +931,7 @@ do {                                                                            
 
 /** 32-point FFT, evaluation, general node
  * * In-place transform p of length 32, seen as a polynomial
- * p(x) = p0 + p1*x + ... + p31*x**31, into its evaluations at 
+ * p(x) = p0 + p1*x + ... + p31*x**31, into its evaluations at
  *       p(w0), p(-w0), p(w1), p(-w1), ..., p(w15), p(-w15)
  * where w_k = F->tab_w[32*node + 2*k] for 0 <= k < 16
  * * By construction these 32 evaluation points are the 32 roots of the
@@ -966,7 +966,7 @@ do {                                                                            
 } while(0)
 
 /** 32-point FFT, interpolation, general node
- * * In-place transform p of length 32, seen as the evaluations at 
+ * * In-place transform p of length 32, seen as the evaluations at
  *       w0, -w0, w1, -w1, ..., w15, -w15
  * where w_k = F->tab_w[32*node + 2*k] for 0 <= k < 16 of a polynomial of
  * degree < 32, into the coefficients of this polynomial

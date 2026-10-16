@@ -16,7 +16,7 @@
 #include "ulong_extras.h"  /* provides n_mulmod_shoup */
 
 /** Structure for DFT.
- * 
+ *
  * The DFT functions take as input an array p of length ``len == 2**depth``,
  * and in-place modify it into the corresponding ``len`` DFT evaluations (see
  * functions documentations below for more details).
@@ -69,7 +69,7 @@
 
 /** Example for nodes/depth:
  *   if F->depth is 3, the tree of roots of unity in F->tab_w is
- *                    1                               d3n0                <-- depth 3 
+ *                    1                               d3n0                <-- depth 3
  *               /        \                        /        \
  *             1            -1                 d2n0          d2n1         <-- depth 2
  *           /   \        /     \     =        /   \        /     \
@@ -120,8 +120,8 @@ void _n_fft_dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     if (depth == 2)  /* TODO[perf] check this added base case does not impact performance */
     {
         DFT4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
-                           F->tab_w[2*node+0], F->tab_w[2*node+1],    
-                           F->tab_w[4*node+0], F->tab_w[4*node+1],   
+                           F->tab_w[2*node+0], F->tab_w[2*node+1],
+                           F->tab_w[4*node+0], F->tab_w[4*node+1],
                            F->tab_w[4*node+2], F->tab_w[4*node+3],
                            F->mod, F->mod2);
     }
@@ -717,7 +717,7 @@ void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
         n_fft_args_t Fargs;
         n_fft_set_args(Fargs, F->mod, F->tab_iw);
         _n_fft_dft_lazy_1_4(p, depth, Fargs);
-        
+
         // see comments in idft concerning this loop
         const ulong inv2 = F->tab_inv2[2*depth-2];
         const ulong inv2_pr = F->tab_inv2[2*depth-1];
@@ -759,7 +759,7 @@ void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F)
 
 /** In n_fft_idft_t, there is apparently no gain from using the lazy
  * mulmod_shoup variant whose output is in [0..2n) (so one may as well use the
- * non-lazy one which ensures output < n)              
+ * non-lazy one which ensures output < n)
  */
 
 /** Lazier variants for DFT with general node:

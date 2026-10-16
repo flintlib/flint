@@ -144,7 +144,7 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         // init
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, depth, p);
-        
+
         int res = test_one(F, max_depth, depth, p, state);
 
         if (res)

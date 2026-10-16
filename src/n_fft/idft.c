@@ -104,8 +104,8 @@ void _n_fft_idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F
     else if (depth == 2)
     {
         IDFT4_NODE_LAZY_1_2(p[0], p[1], p[2], p[3],
-                            F->tab_w[2*node+0], F->tab_w[2*node+1],    
-                            F->tab_w[4*node+0], F->tab_w[4*node+1],   
+                            F->tab_w[2*node+0], F->tab_w[2*node+1],
+                            F->tab_w[4*node+0], F->tab_w[4*node+1],
                             F->tab_w[4*node+2], F->tab_w[4*node+3],
                             F->mod, F->mod2);
     }
@@ -408,5 +408,5 @@ void n_fft_itft(nn_ptr p, ulong iolen, n_fft_ctx_t F)
 
 /** In n_fft_idft, there is apparently no gain from using the lazy mulmod_shoup
  * variant whose output is in [0..2n) (so one may as well use the non-lazy one
- * which ensures output < n)              
+ * which ensures output < n)
  */
