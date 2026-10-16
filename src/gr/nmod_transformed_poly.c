@@ -23,17 +23,6 @@
 #include "machine_vectors.h"
 #include "fft_small.h"
 
-/* truncation granularity follows the plan's depth: whole blocks at
-   block depths, the full (short) transform length below one block */
-
-/* the anticipated granularity for a length before any plan exists */
-#define _len_trunc(x) \
-    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
-                              : n_round_up((x), BLK_SZ))
-#define _op_trunc(x, Pln) \
-    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
-                                : n_round_up((x), BLK_SZ))
-
 /*
     Ring of nmod polynomials of bounded length in fft_small transformed
     representation (prototype).
@@ -274,7 +263,7 @@ tpoly_set_gr_poly(gr_ptr res, gr_srcptr a, slong len,
         return tpoly_zero(res, ctx);
 
     fft_small_fft_nmod(&TPOLY(res)->op, ac, len,
-                       _op_trunc(len, T->P), T->mod, T->P);
+                       _fft_small_op_trunc(len, T->P), T->mod, T->P);
     TPOLY(res)->len = len;
     TPOLY(res)->terms = 1;
     TPOLY(res)->depth = 1;
@@ -292,7 +281,7 @@ _tpoly_export(tpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
     const fft_small_plan_struct * P = T->P;
     slong xlen = TPOLY(x)->len;
     fft_small_op_struct tmp;
-    ulong itr = _op_trunc((ulong) xlen, P);
+    ulong itr = _fft_small_op_trunc((ulong) xlen, P);
     slong i;
 
     tmp = TPOLY(x)->op;
@@ -332,7 +321,7 @@ static void
 _tpoly_invert_in_place(tpoly_ctx_struct * T, gr_ptr x)
 {
     const fft_small_plan_struct * P = T->P;
-    ulong itr = _op_trunc((ulong) TPOLY(x)->len, P);
+    ulong itr = _fft_small_op_trunc((ulong) TPOLY(x)->len, P);
     slong i;
 
     for (i = 0; i < (slong) P->np; i++)
@@ -501,7 +490,7 @@ tpoly_one(gr_ptr x, gr_ctx_t ctx)
     tpoly_ctx_struct * T = TPOLY_CTX(ctx);
     ulong c = 1;
 
-    fft_small_fft_nmod(&TPOLY(x)->op, &c, 1, _op_trunc(1, T->P), T->mod, T->P);
+    fft_small_fft_nmod(&TPOLY(x)->op, &c, 1, _fft_small_op_trunc(1, T->P), T->mod, T->P);
     TPOLY(x)->len = 1;
     TPOLY(x)->terms = 1;
     TPOLY(x)->depth = 1;
@@ -833,7 +822,7 @@ _tpoly_ctx_init(gr_ctx_t ctx, gr_ctx_t base, slong N, slong terms_bound,
             n_clog2(N), N, 2 * (ulong) terms_bound, 2 * modbits, mod);
     else
         ok = fft_small_plan_init_nmod(T->P, get_default_mpn_ctx(),
-            0, N, N, _len_trunc(N), 2 * (ulong) terms_bound,
+            0, N, N, _fft_small_len_trunc(N), 2 * (ulong) terms_bound,
             2 * modbits, mod, N);
 
     if (!ok)
@@ -869,7 +858,7 @@ _tpoly_ctx_init(gr_ctx_t ctx, gr_ctx_t base, slong N, slong terms_bound,
        storage budget are policy and are skipped */
     if (!wl->force)
     {
-            double L = (double) _len_trunc(N);
+            double L = (double) _fft_small_len_trunc(N);
             double lg = (double) FLINT_BIT_COUNT((ulong) L);
             double np = (double) T->P->np;
             double ni = (double) wl->num_inputs;

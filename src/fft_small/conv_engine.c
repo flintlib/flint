@@ -24,6 +24,14 @@
     transform in place. Stage 2 chinese remainders BLK_SZ-aligned ranges of
     output coefficients into the destination.
 
+    With A->transposed set, stage 1 computes instead the transpose with
+    respect to a of the multiplication by b: convert a at the full product
+    length, apply the transpose of the inverse transform, multiply
+    pointwise as before, and apply the transpose of the forward transform
+    with output truncation A->atrunc. By the transposition principle this
+    performs the same operations as the multiplication, in reverse order;
+    see _nmod_poly_mul_tr_mpn_ctx in nmod_poly_mul.c.
+
     Both stages parallelize as the original per-type drivers did: stage 1
     over the primes (with each worker optionally requesting one extra
     thread to transform b concurrently with a), stage 2 over output
@@ -108,8 +116,18 @@ static void s1worker_func(void* varg)
             bfft = bbuf;
         }
 
-        A->mod_fn(abuf, A->atrunc, A->a, A->an, A->aaux, Q, A->params);
-        sd_fft_trunc(Q, abuf, P->depth, A->atrunc, P->ztrunc);
+        if (A->transposed)
+        {
+            /* the transpose of the inverse transform reads the whole
+               product length, which the conversion zero-fills */
+            A->mod_fn(abuf, P->ztrunc, A->a, A->an, A->aaux, Q, A->params);
+            sd_ifft_trunc_tr(Q, abuf, P->depth, P->ztrunc);
+        }
+        else
+        {
+            A->mod_fn(abuf, A->atrunc, A->a, A->an, A->aaux, Q, A->params);
+            sd_fft_trunc(Q, abuf, P->depth, A->atrunc, P->ztrunc);
+        }
 
         if (A->bfft == NULL && !A->squaring && nworkers > 0)
             thread_pool_wait(global_thread_pool, handles[0]);
@@ -119,7 +137,10 @@ static void s1worker_func(void* varg)
         else
             sd_fft_ctx_point_mul(Q, abuf, bfft, P->m[i], P->depth);
 
-        sd_ifft_trunc(Q, abuf, P->depth, P->ztrunc);
+        if (A->transposed)
+            sd_fft_trunc_tr(Q, abuf, P->depth, A->atrunc, P->ztrunc);
+        else
+            sd_ifft_trunc(Q, abuf, P->depth, P->ztrunc);
     }
 
     flint_give_back_threads(handles, nworkers);
@@ -163,6 +184,8 @@ void _fft_small_conv(void* z, const fft_small_plan_t P,
     FLINT_ASSERT(P->zh <= P->zn);
     FLINT_ASSERT(A->atrunc <= P->ztrunc);
     FLINT_ASSERT(A->bfft != NULL || A->btrunc <= P->ztrunc);
+    FLINT_ASSERT(A->transposed == 0 || A->transposed == 1);
+    FLINT_ASSERT(!A->transposed || (!A->squaring && A->an <= P->ztrunc));
 
     want_threads = A->tuning->s1_threads(np, A->tune_n);
 

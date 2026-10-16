@@ -344,6 +344,7 @@ static int _mpn_mod_poly_mulmid_fft_small_internal(nn_ptr z, ulong zl, ulong zh,
     A.bfft = NULL;
     A.bfft_stride = 0;
     A.squaring = squaring;
+    A.transposed = 0;
     A.tune_n = bn;
     A.min_an_bn = FLINT_MIN(an, bn);
     A.mod_fn = _mod_fn;

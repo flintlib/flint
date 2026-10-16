@@ -385,6 +385,7 @@ int _fmpz_poly_mul_mid_mpn_ctx(
     A.bfft = NULL;
     A.bfft_stride = 0;
     A.squaring = squaring;
+    A.transposed = 0;
     A.tune_n = bn;
     A.min_an_bn = FLINT_MIN(an, bn);
     A.mod_fn = _mod_fn;
