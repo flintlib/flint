@@ -42,6 +42,7 @@
 #include "t-mod_preinvn.c"
 #include "t-mul.c"
 #include "t-mul_n.c"
+#include "t-mul_shared.c"
 #include "t-mul_complex.c"
 #include "t-mullow_complex.c"
 #include "t-mulmid_complex.c"
@@ -99,6 +100,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_gcd_full),
     TEST_FUNCTION(flint_mpn_mod_preinvn),
     TEST_FUNCTION(flint_mpn_mul),
+    TEST_FUNCTION(flint_mpn_mul_shared),
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_complex),
     TEST_FUNCTION(flint_mpn_mullow_complex),

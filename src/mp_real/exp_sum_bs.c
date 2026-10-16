@@ -327,8 +327,25 @@ typedef struct
                                (base-B kernel); NULL otherwise */
     flint_bitcnt_t r;
     slong xn;               /* limbs of x, for size bounds */
+    const mp_real_powtab_pre_struct * pre;  /* transformed entries */
 }
 bs_args;
+
+/* z = x^(xexp[i]) y, through the transformed table entry when there is
+   one; returns the normalized length */
+static slong
+nnn_mul_pow(nn_ptr z, const bs_args * args, slong i, nn_srcptr y,
+    slong yn)
+{
+    if (yn > 0 && _mp_real_powtab_pre_mul(z, args->pre, i, y, yn))
+    {
+        slong zn = args->xlen[i] + yn;
+        while (zn > 0 && z[zn - 1] == 0)
+            zn--;
+        return zn;
+    }
+    return nnn_mul(z, args->xpow[i], args->xlen[i], y, yn);
+}
 
 static slong
 qbound(const bs_args * args, slong a, slong b)
@@ -426,10 +443,11 @@ _exp_bs_job(void * arg)
 
 typedef struct
 {
-    nn_srcptr T, Q, T2, Q2, P;
-    slong tn, qn, t2n, q2n, Pl;
+    nn_srcptr T, Q, T2, Q2;
+    slong tn, qn, t2n, q2n, i;
     nn_ptr sc, qsc, sc2;
     slong l1, lq, l2;
+    const bs_args * args;
 }
 exp_merge_struct;
 
@@ -445,7 +463,7 @@ static void
 _exp_merge_y(void * arg)
 {
     exp_merge_struct * M = (exp_merge_struct *) arg;
-    M->l2 = nnn_mul(M->sc2, M->P, M->Pl, M->T2, M->t2n);
+    M->l2 = nnn_mul_pow(M->sc2, M->args, M->i, M->T2, M->t2n);
 }
 
 static void
@@ -518,7 +536,7 @@ bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
         i = get_exp_pos(args->xexp, step);
         M.T = T; M.tn = *tn; M.Q = Q; M.qn = *qn;
         M.T2 = T2; M.t2n = t2n; M.Q2 = Q2; M.q2n = q2n;
-        M.P = args->xpow[i]; M.Pl = args->xlen[i];
+        M.i = i; M.args = args;
         M.sc = sc; M.qsc = qsc; M.sc2 = sc2;
         _mp_real_parallel_pair(_exp_merge_x, &M, _exp_merge_y, &M);
 
@@ -559,8 +577,8 @@ bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
         l = nnn_mul(sc, T, *tn, Q2, q2n);
         i = get_exp_pos(args->xexp, step);
         flint_mpn_zero(T, args->xoff[i]);
-        *tn = args->xoff[i] + nnn_mul(T + args->xoff[i],
-            args->xpow[i], args->xlen[i], T2, t2n);
+        *tn = args->xoff[i] + nnn_mul_pow(T + args->xoff[i], args, i,
+            T2, t2n);
         *tn = nnn_add_shifted(T, *tn, sc, l, Q2E);
 
         /* Q = Q Q2, trailing zero limbs stripped into QE */
@@ -607,7 +625,26 @@ _mp_real_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
     args.r = 0;
     args.xn = xn;
 
-    bsplit(T, tn, Q, qn, QE, &args, D, 0, N);
+    /* the transforms of the table entries used by two merges or more,
+       for partners T2 over right children of up to rmax[i] terms:
+       T2 / (Q2 B^Q2E) < e - 1 bounds T2 by the limbs of Q2 B^Q2E,
+       r D plus the factorial content */
+    {
+        slong uses[2 * FLINT_BITS], rmax[2 * FLINT_BITS];
+        slong ymax[2 * FLINT_BITS];
+        mp_real_powtab_pre_struct pre;
+
+        _mp_real_bs_step_uses(uses, rmax, xexp, length, N);
+        for (i = 0; i < length; i++)
+            ymax[i] = rmax[i] * D
+                + (rmax[i] * FLINT_BIT_COUNT((ulong) N + 1)) / FLINT_BITS + 4;
+        _mp_real_powtab_pre_init(&pre, xpow, xlen, uses, ymax, length);
+        args.pre = &pre;
+
+        bsplit(T, tn, Q, qn, QE, &args, D, 0, N);
+
+        _mp_real_powtab_pre_clear(&pre);
+    }
 
     flint_free(storage);
 }

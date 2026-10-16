@@ -846,6 +846,11 @@ void fft_small_fft_tr(fft_small_op_t X, ulong itrunc, const fft_small_plan_t P);
 /* forward transform of the integer (a, an), with fft truncation P->ztrunc */
 void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
                     const fft_small_plan_t P);
+/* the same with the transforms truncated to the first otrunc points
+   (otrunc <= P->ztrunc, a multiple of the block size or P->ztrunc),
+   for products of at most otrunc slots */
+void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong otrunc, const fft_small_plan_t P);
 /* chinese remaindering restricted to the window [zl, zh), which must lie
    inside [P->zl, P->zh); z receives zh - zl coefficients */
 void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
@@ -919,6 +924,47 @@ int _fft_small_mpn_sqr_complex(nn_ptr zr, slong * zr_len,
     nn_srcptr ai, slong ain, int ai_sgn);
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P);
+
+/* z1 = a x (an + xn limbs) and z2 = b x (bn + xn limbs), the transform
+   of x shared (three forward and two inverse transforms), in the
+   two-prime geometry up to FLINT_MPN_MUL_NP2_MAX_AN limbs and the wide
+   geometry above; all lengths positive. z1 may overlap a and x but not
+   b; z2 may overlap any input but not z1. See also flint_mpn_mul_shared,
+   which chooses between this and two products. */
+void _fft_small_mpn_mul_shared(nn_ptr z1, nn_srcptr a, ulong an,
+                    nn_ptr z2, nn_srcptr b, ulong bn,
+                    nn_srcptr x, ulong xn);
+
+/* Products z = x y (xn + yn limbs) by a fixed operand x whose transform
+   is computed once at init, for partners y of 1 to yn_max limbs: in
+   the two-prime geometry up to FLINT_MPN_MUL_NP2_MAX_AN limbs, in the
+   wide geometry above (as the multiplication driver chooses). _size
+   gives the doubles of storage the transform needs; init uses the
+   storage given, or allocates when it is NULL. z may overlap y. The
+   transform is read only: products may run on several threads. */
+typedef struct
+{
+    double * d;         /* the transform of x, per prime the first
+                           xstride points (those any product reads) */
+    ulong xstride;
+    ulong xn;
+    ulong yn_max;
+    ulong bits;
+    ulong depth;
+    int owns;
+    int wide;
+    fft_small_plan_struct P[1];     /* wide: the plan */
+}
+fft_small_mpn_mul_precomp_struct;
+
+typedef fft_small_mpn_mul_precomp_struct fft_small_mpn_mul_precomp_t[1];
+
+ulong _fft_small_mpn_mul_precomp_size(ulong xn, ulong yn_max);
+void _fft_small_mpn_mul_precomp_init(fft_small_mpn_mul_precomp_t P,
+                    nn_srcptr x, ulong xn, ulong yn_max, double * storage);
+void _fft_small_mpn_mul_precomp_clear(fft_small_mpn_mul_precomp_t P);
+void _fft_small_mpn_mul_precomp(nn_ptr z, const fft_small_mpn_mul_precomp_t P,
+                    nn_srcptr y, ulong yn);
 
 /* chinese remaindering of an inverse-transformed operand into the output
    window [P->zl, P->zh) */

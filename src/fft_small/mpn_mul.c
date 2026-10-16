@@ -2004,6 +2004,7 @@ typedef struct {
     ulong stop_hard;
     ulong start_pi;      /* prime range for the fft (or fused slow) stage */
     ulong stop_pi;
+    ulong otrunc;        /* output truncation of the transforms */
 } _op_mpn_fft_worker_struct;
 
 static void _op_mpn_pack_worker_func(void* varg)
@@ -2024,7 +2025,7 @@ static void _op_mpn_fft_worker_func(void* varg)
 
     for (ulong l = W->start_pi; l < W->stop_pi; l++)
         sd_fft_trunc(P->R->ffts + l, W->X->data + l*P->stride, P->depth,
-                     n_min(W->atrunc, P->ztrunc), P->ztrunc);
+                     n_min(W->atrunc, W->otrunc), W->otrunc);
 }
 
 static void _op_mpn_slow_worker_func(void* varg)
@@ -2038,12 +2039,21 @@ static void _op_mpn_slow_worker_func(void* varg)
         slow_mpn_to_fft(R->ffts + l, W->X->data + l*P->stride, W->atrunc,
                         W->a, W->an, P->bits, R->slow_two_pow_tab[l]);
         sd_fft_trunc(R->ffts + l, W->X->data + l*P->stride, P->depth,
-                     n_min(W->atrunc, P->ztrunc), P->ztrunc);
+                     n_min(W->atrunc, W->otrunc), W->otrunc);
     }
 }
 
 void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
                     const fft_small_plan_t P)
+{
+    _fft_small_fft_mpn_trunc(X, a, an, P->ztrunc, P);
+}
+
+/* the forward transforms truncated to the first otrunc <= P->ztrunc
+   points (a multiple of the block size, or P->ztrunc): enough for the
+   products of output length up to otrunc slots */
+void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong otrunc, const fft_small_plan_t P)
 {
     mpn_ctx_struct* R = P->R;
     ulong bits = P->bits;
@@ -2068,9 +2078,10 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
         FLINT_ASSERT(atrunc <= P->stride);
         _fft_small_np2_pack(X->data, X->data + P->stride, a, an,
                             alen, atrunc, bits);
-        sd_fft_trunc(R->ffts + 0, X->data, P->depth, atrunc, P->ztrunc);
+        sd_fft_trunc(R->ffts + 0, X->data, P->depth,
+                     n_min(atrunc, otrunc), otrunc);
         sd_fft_trunc(R->ffts + 1, X->data + P->stride, P->depth,
-                     atrunc, P->ztrunc);
+                     n_min(atrunc, otrunc), otrunc);
         X->itrunc = atrunc;
         X->domain = FFT_SMALL_OP_PRIMAL;
         return;
@@ -2126,6 +2137,7 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
             W->stop_easy  = n_round_up((i+1)*a_stop_easy/nthreads, rounding);
             W->start_hard = (i + 1 == nthreads) ? a_stop_easy : atrunc;
             W->stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
+            W->otrunc = otrunc;
         }
 
         for (i = nthreads - 1; i > 0; i--)
@@ -2162,6 +2174,7 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
             W->atrunc = atrunc;
             W->start_pi = (i+0)*np/nthreads;
             W->stop_pi  = (i+1)*np/nthreads;
+            W->otrunc = otrunc;
         }
 
         for (i = nthreads - 1; i > 0; i--)

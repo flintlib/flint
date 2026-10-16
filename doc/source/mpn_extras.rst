@@ -110,6 +110,30 @@ Multiplication
     and that ``z`` is not aliased with the input operand.
     The algorithm selection is similar to :func:`flint_mpn_sqr`.
 
+.. function:: void flint_mpn_mul_shared(mp_ptr z1, mp_srcptr a, mp_size_t an, mp_ptr z2, mp_srcptr b, mp_size_t bn, mp_srcptr x, mp_size_t xn)
+
+    Sets ``(z1, an+xn)`` to the product of ``(a, an)`` and ``(x, xn)``
+    and ``(z2, bn+xn)`` to the product of ``(b, bn)`` and ``(x, xn)``.
+    We require all lengths to be at least 1 (in any order) and that
+    ``z1`` and ``z2`` overlap neither each other nor any input.
+    With ``fft_small``, when both products are long enough, the
+    transform of ``x`` is computed once for both
+    (:func:`_fft_small_mpn_mul_shared`, about 10% faster than two
+    products); otherwise two calls to :func:`flint_mpn_mul` are made.
+
+.. function:: int _flint_mpn_mul_shared_use_fft(mp_size_t an, mp_size_t bn, mp_size_t xn)
+
+    The choice made by :func:`flint_mpn_mul_shared`: nonzero when the
+    transform is shared, that is when ``fft_small`` is available, the
+    longer product (by `\max(an, bn)`) is in the FFT range of
+    :func:`flint_mpn_mul` with the threshold `T` =
+    ``FLINT_MPN_MUL_SHARED_THRESHOLD`` and the shorter with the
+    threshold `T/2`. The threshold defaults to
+    ``FLINT_FFT_SMALL_MUL_THRESHOLD`` and is set per architecture in
+    ``flint-mparam.h`` where measured otherwise. Callers that need the
+    looser aliasing of :func:`_fft_small_mpn_mul_shared` can call it
+    directly when this returns nonzero.
+
 .. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n)
 
     Given not-necessarily-normalized `x_1` and `x_2` of length `n > 0` and output `y` of length `n`, try to compute `y = a_1\cdot x_1 - a_2\cdot x_2`.
