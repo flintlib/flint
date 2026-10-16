@@ -22,6 +22,7 @@ Introduction
 
 .. toctree::
    :maxdepth: 1
+   :caption: Introduction
 
    introduction.rst
    building.rst
@@ -38,6 +39,7 @@ General utilities
 
 .. toctree::
    :maxdepth: 1
+   :caption: General utilities
 
    flint.rst
    profiler.rst
@@ -50,6 +52,7 @@ Generic rings
 
 .. toctree::
    :maxdepth: 1
+   :caption: Generic rings
 
    gr.rst
    gr_implementing.rst
@@ -76,6 +79,7 @@ Integers
 
 .. toctree::
    :maxdepth: 1
+   :caption: Integers
 
    ulong_extras.rst
    fmpz.rst
@@ -113,6 +117,7 @@ Rational numbers
 
 .. toctree::
    :maxdepth: 1
+   :caption: Rational numbers
 
    fmpq.rst
    fmpq_vec.rst
@@ -135,6 +140,7 @@ Integers mod n
 
 .. toctree::
    :maxdepth: 1
+   :caption: Integers mod n
 
    nmod.rst
    nmod_vec.rst
@@ -166,6 +172,7 @@ Groups and other structures
 
 .. toctree::
    :maxdepth: 1
+   :caption: Groups and other structures
 
    perm.rst
    qfb.rst
@@ -178,6 +185,7 @@ Number fields and algebraic numbers
 
 .. toctree::
    :maxdepth: 1
+   :caption: Number fields and algebraic numbers
 
    nf.rst
    nf_elem.rst
@@ -189,6 +197,7 @@ Real and complex numbers
 
 .. toctree::
    :maxdepth: 1
+   :caption: Real and complex numbers
 
    overview.rst
    using.rst
@@ -240,6 +249,7 @@ Exact real and complex numbers
 
 .. toctree::
    :maxdepth: 1
+   :caption: Exact real and complex numbers
 
    introduction_calcium.rst
    examples_calcium.rst
@@ -258,6 +268,7 @@ Finite fields
 
 .. toctree::
    :maxdepth: 1
+   :caption: Finite fields
 
    fq.rst
    fq_default.rst
@@ -297,6 +308,7 @@ p-adic numbers
 
 .. toctree::
    :maxdepth: 1
+   :caption: p-adic numbers
 
    padic.rst
    padic_poly.rst
@@ -309,6 +321,7 @@ Floating-point support code
 
 .. toctree::
    :maxdepth: 1
+   :caption: Floating-point support code
 
    double_extras.rst
    double_interval.rst
@@ -320,6 +333,7 @@ Interfaces
 
 .. toctree::
    :maxdepth: 1
+   :caption: Interfaces
 
    python_flint.rst
 
@@ -328,6 +342,7 @@ References
 
 .. toctree::
    :maxdepth: 1
+   :caption: References
 
    references.rst
 
@@ -336,5 +351,6 @@ Version history
 
 .. toctree::
    :maxdepth: 1
+   :caption: Version history
 
    history.rst
