@@ -52,6 +52,12 @@ TEST_FUNCTION_START(gr_mpoly_divexact, state)
 
         gr_mpoly_ctx_init_rand(ctx, state, cctx, 12);
 
+        /* Over inexact rings, remainder terms that are zero but not provably
+           zero turn into spurious quotient terms (balls containing zero),
+           and the "quotient" can have millions of terms for big inputs. */
+        if (big && gr_ctx_is_exact(cctx) != T_TRUE)
+            big = 0;
+
         gr_mpoly_init(f, ctx);
         gr_mpoly_init(g, ctx);
         gr_mpoly_init(h, ctx);

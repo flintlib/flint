@@ -773,6 +773,7 @@ typedef enum
     GR_CTX_GR_TRANSFORMED_MPN,
     GR_CTX_FMPZ_MPOLY, GR_CTX_FMPQ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
+    GR_CTX_FMPZ_MPOLY_Q_FACTORED,
     GR_CTX_FMPZ_MOD_MPOLY_Q,
     GR_CTX_GR_ORE_POLY,
     GR_CTX_GR_FRACTION, GR_CTX_GR_COMPLEX,
@@ -1626,6 +1627,25 @@ slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x,
                     slong lo);
 int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out,
                     int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx);
+/* the value mod 2^(FLINT_BITS zn) as a two's-complement residue, exact
+   whatever the size of the value; only the chunks below limb zn are
+   reconstructed */
+int gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x,
+                    gr_ctx_t ctx);
+int gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x,
+                    gr_ctx_t ctx);
+/* windowed contexts: products of which only the limbs [lo, hi) are
+   wanted, with cyclic transforms when the window allows (products whose
+   slots then alias convert only through get_window inside [lo, hi)) */
+int gr_ctx_init_transformed_mpn_window(gr_ctx_t ctx, slong bits_bound,
+                    slong terms_bound, int is_signed, slong num_live,
+                    int alloc_strategy, slong lo, slong hi);
+/* limbs [lo, lo + zn) of the value as a two's-complement window, within
+   one unit of floor(value / B^lo) and exact for lo = 0; signed contexts */
+int gr_transformed_mpn_get_window(nn_ptr z, slong zn, slong lo,
+                    gr_srcptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_window_destructive(nn_ptr z, slong zn, slong lo,
+                    gr_ptr x, gr_ctx_t ctx);
 
 int gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
@@ -1718,6 +1738,7 @@ void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const o
 
 #ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
+void gr_ctx_init_fmpz_mpoly_q_factored(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 
 #ifdef FMPZ_MOD_MPOLY_Q_H

@@ -57,7 +57,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_diophantine, state)
         if (iter % 7 == 0)
             _mp_real_atan_gauss_clear();
 
-        _mp_real_atan_gauss_ensure(num, nv);
+        const _mp_real_tab_struct * AG = _mp_real_atan_gauss_ensure(num, nv);
 
         arb_init(l); fmpz_init(f); fmpz_init(g); fmpq_init(q);
         fmpq_set_si(q, _mp_real_gaussian_primes[2 * j + 1],
@@ -70,7 +70,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_diophantine, state)
         if (!arb_get_unique_fmpz(f, l))
             TEST_FUNCTION_FAIL("floor not determined: j = %wd, nv = %wd\n",
                 j, nv);
-        fmpz_set_ui_array(g, _mp_real_atan_gauss_entry(j, nv), nv + 1);
+        fmpz_set_ui_array(g, _mp_real_machin_entry(AG, j, nv), nv + 1);
         if (!fmpz_equal(f, g))
             TEST_FUNCTION_FAIL("cache: j = %wd, nv = %wd\n%{fmpz}\n%{fmpz}\n",
                 j, nv, f, g);

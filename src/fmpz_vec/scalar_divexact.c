@@ -356,6 +356,140 @@ _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2,
     _fmpz_vec_divexact_ui(vec1, vec2, len2, c, 0);
 }
 
+#define DIVEXACT_TSTACK_LIMBS 64
+
+/* B = A / x for an r x c array of entries with row strides Bstride and
+   Astride (B = A allowed); x has more than one limb */
+static void
+_fmpz_strided_divexact_mpz(fmpz * B, slong Bstride, const fmpz * A,
+    slong Astride, slong r, slong c, const fmpz_t x)
+{
+    /* multi-limb divisor: precompute its 2-adic inverse once and do
+       each division as a Hensel division with that inverse */
+    mpz_srcptr mx = COEFF_TO_PTR(*x);
+    mp_size_t bn = FLINT_ABS(mx->_mp_size);
+    int xneg = mx->_mp_size < 0;
+    flint_mpn_divexact_preinv_t pre;
+    /* scratch for in-place division: a small fixed buffer, replaced
+       by a heap buffer if a larger quotient occurs */
+    mp_limb_t tstack[DIVEXACT_TSTACK_LIMBS];
+    mp_ptr t = tstack;
+    slong i, j, talloc = DIVEXACT_TSTACK_LIMBS;
+
+    /* the inverse costs about as much as one division, so it only
+       pays off with at least two entries at least as large as x;
+       it is only needed to the precision of the longest quotient
+       (much less than that of x if the quotients are small) */
+    {
+        slong count = 0, an, max_an = 0;
+
+        for (i = 0; i < r; i++)
+        {
+            const fmpz * Ai = A + i * Astride;
+
+            for (j = 0; j < c; j++)
+            {
+                if (COEFF_IS_MPZ(Ai[j]))
+                {
+                    an = FLINT_ABS(COEFF_TO_PTR(Ai[j])->_mp_size);
+                    if (an >= bn)
+                    {
+                        count++;
+                        max_an = FLINT_MAX(max_an, an);
+
+                        /* the full precision bn + 1 is needed anyway */
+                        if (count >= 2 && max_an >= 2 * bn)
+                            goto scan_done;
+                    }
+                }
+            }
+        }
+
+scan_done:
+
+        if (count < 2)
+        {
+            for (i = 0; i < r; i++)
+                for (j = 0; j < c; j++)
+                    fmpz_divexact(B + i * Bstride + j, A + i * Astride + j, x);
+            return;
+        }
+
+        flint_mpn_divexact_preinv_init_prec(pre, mx->_mp_d, bn, max_an - bn + 1);
+    }
+
+    for (i = 0; i < r; i++)
+    {
+        for (j = 0; j < c; j++)
+        {
+            fmpz * b = B + i * Bstride + j;
+            const fmpz * a = A + i * Astride + j;
+
+            if (!COEFF_IS_MPZ(*a))
+            {
+                /* |a| < |x| and x | a forces a = 0 */
+                fmpz_zero(b);
+            }
+            else
+            {
+                mpz_srcptr ma = COEFF_TO_PTR(*a);
+                mp_size_t an = FLINT_ABS(ma->_mp_size), qn;
+                int qneg = (ma->_mp_size < 0) ^ xneg;
+                mpz_ptr mq;
+                mp_ptr qd;
+
+                if (an < bn)
+                {
+                    fmpz_zero(b);
+                    continue;
+                }
+
+                qn = an - bn + 1;
+
+                if (b == a)
+                {
+                    /* in place: divide into a temporary limb buffer, then
+                       copy (the pooled mpz keeps its own allocation).
+                       The buffer is reused across iterations. (TMP_ALLOC
+                       must not be used in this loop: small TMP allocations
+                       live on the stack until the function returns, which
+                       overflows the stack for long vectors.) */
+                    if (qn > talloc)
+                    {
+                        /* the contents need not be preserved */
+                        if (t != tstack)
+                            flint_free(t);
+                        talloc = FLINT_MAX(qn, 2 * talloc);
+                        t = flint_malloc(talloc * sizeof(mp_limb_t));
+                    }
+                    flint_mpn_divexact_preinv(t, ma->_mp_d, an, pre);
+                    while (qn > 0 && t[qn - 1] == 0)
+                        qn--;
+                    mq = _fmpz_promote(b);
+                    qd = FLINT_MPZ_REALLOC(mq, FLINT_MAX(qn, 1));
+                    flint_mpn_copyi(qd, t, qn);
+                    mq->_mp_size = qneg ? -qn : qn;
+                }
+                else
+                {
+                    mq = _fmpz_promote(b);
+                    qd = FLINT_MPZ_REALLOC(mq, qn);
+                    flint_mpn_divexact_preinv(qd, ma->_mp_d, an, pre);
+                    while (qn > 0 && qd[qn - 1] == 0)
+                        qn--;
+                    mq->_mp_size = qneg ? -qn : qn;
+                }
+
+                _fmpz_demote_val(b);
+            }
+        }
+    }
+
+    if (t != tstack)
+        flint_free(t);
+    flint_mpn_divexact_preinv_clear(pre);
+}
+
 void
 _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
                                slong len2, const fmpz_t x)
@@ -373,89 +507,28 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
     }
     else
     {
-        /* multi-limb divisor: precompute its 2-adic inverse once and do
-           each division as a Hensel division with that inverse */
-        mpz_srcptr mx = COEFF_TO_PTR(c);
-        mp_size_t bn = FLINT_ABS(mx->_mp_size);
-        int xneg = mx->_mp_size < 0;
-        flint_mpn_divexact_preinv_t pre;
-        slong i;
-
-        /* the inverse costs about as much as one division, so it only
-           pays off with at least two entries at least as large as x */
-        {
-            slong count = 0;
-            for (i = 0; i < len2 && count < 2; i++)
-                if (COEFF_IS_MPZ(vec2[i]) && FLINT_ABS(COEFF_TO_PTR(vec2[i])->_mp_size) >= bn)
-                    count++;
-
-            if (count < 2)
-            {
-                for (i = 0; i < len2; i++)
-                    fmpz_divexact(vec1 + i, vec2 + i, x);
-                return;
-            }
-        }
-
-        flint_mpn_divexact_preinv_init(pre, mx->_mp_d, bn);
-
-        for (i = 0; i < len2; i++)
-        {
-            fmpz a = vec2[i];
-
-            if (!COEFF_IS_MPZ(a))
-            {
-                /* |a| < |x| and x | a forces a = 0 */
-                fmpz_zero(vec1 + i);
-            }
-            else
-            {
-                mpz_srcptr ma = COEFF_TO_PTR(a);
-                mp_size_t an = FLINT_ABS(ma->_mp_size), qn;
-                int qneg = (ma->_mp_size < 0) ^ xneg;
-                mpz_ptr mq;
-                mp_ptr qd;
-
-                if (an < bn)
-                {
-                    fmpz_zero(vec1 + i);
-                    continue;
-                }
-
-                qn = an - bn + 1;
-
-                if (vec1 + i == vec2 + i)
-                {
-                    /* in place: divide into a temporary limb buffer, then
-                       copy (the pooled mpz keeps its own allocation) */
-                    mp_ptr t;
-                    TMP_INIT;
-                    TMP_START;
-                    t = TMP_ALLOC(qn * sizeof(mp_limb_t));
-                    flint_mpn_divexact_preinv(t, ma->_mp_d, an, pre);
-                    while (qn > 0 && t[qn - 1] == 0)
-                        qn--;
-                    mq = _fmpz_promote(vec1 + i);
-                    qd = FLINT_MPZ_REALLOC(mq, FLINT_MAX(qn, 1));
-                    flint_mpn_copyi(qd, t, qn);
-                    mq->_mp_size = qneg ? -qn : qn;
-                    TMP_END;
-                }
-                else
-                {
-                    mq = _fmpz_promote(vec1 + i);
-                    qd = FLINT_MPZ_REALLOC(mq, qn);
-                    flint_mpn_divexact_preinv(qd, ma->_mp_d, an, pre);
-                    while (qn > 0 && qd[qn - 1] == 0)
-                        qn--;
-                    mq->_mp_size = qneg ? -qn : qn;
-                }
-
-                _fmpz_demote_val(vec1 + i);
-            }
-        }
-
-        flint_mpn_divexact_preinv_clear(pre);
+        _fmpz_strided_divexact_mpz(vec1, 0, vec2, 0, 1, len2, x);
     }
 }
 
+void
+_fmpz_vec_scalar_divexact_fmpz_strided(fmpz * B, slong Bstride,
+    const fmpz * A, slong Astride, slong r, slong c, const fmpz_t x)
+{
+    slong i;
+
+    if (r == 0 || c == 0)
+        return;
+
+    if (!COEFF_IS_MPZ(*x))
+    {
+        for (i = 0; i < r; i++)
+            _fmpz_vec_scalar_divexact_fmpz(B + i * Bstride, A + i * Astride, c, x);
+    }
+    else
+    {
+        /* one inverse (to the precision of the longest quotient in the
+           whole matrix) and one scratch buffer for all rows */
+        _fmpz_strided_divexact_mpz(B, Bstride, A, Astride, r, c, x);
+    }
+}

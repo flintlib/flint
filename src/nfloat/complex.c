@@ -17,6 +17,8 @@
 #include "acb.h"
 #include "mag.h"
 #include "nfloat.h"
+#include "impl.h"
+#include "elem.h"
 
 static int
 _flint_mpn_signed_add_n(nn_ptr res, nn_srcptr x, int xsgnbit, nn_srcptr y, int ysgnbit, mp_size_t n)
@@ -1327,12 +1329,300 @@ nfloat_complex_mul(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
         return _nfloat_complex_mul_karatsuba(r, s, a, b, c, d, ctx);
 }
 
+/*
+    Division, inverse, square root and reciprocal square root.
+
+    These share one reciprocal (or reciprocal square root) between the two
+    parts of the result. The errors are a few ulp relative to the magnitude
+    of the result; the rounding mode is not respected.
+
+    At one limb, the regular cases (no zero or special part, and parts whose
+    exponents differ by at most FLINT_BITS / 2 + 2 where |y|^2 or |z| is
+    needed) are computed in registers:
+
+    * |y|^2 is the top limb t of S = c^2 + d^2 (both squares at two limbs,
+      the smaller one shifted to the scale of the larger), truncated, with
+      relative error below 2^(1 - FLINT_BITS); both parts of the
+      numerator are then divided by t, the quotients exactly truncated
+      (one inverse of t shared, or hardware division where it is fast).
+
+    * |z| = sqrt(S) is the exact floor of the square root of the top two
+      limbs of S (_nfloat_isqrt_2); then T = |z| + |a| (no cancellation)
+      at one limb, w = 1 / sqrt(2T) (square root) or 1 / sqrt(2 T |z|^2)
+      (reciprocal square root) from the one-limb kernel, and the parts are
+      T w and |b| w with the signs of the formulas below.
+*/
+
+/* (h, l) >>= k for 0 <= k < 2 FLINT_BITS */
+#define NFLOAT_RSHIFT_2(h, l, k) \
+    do { \
+        if ((k) >= FLINT_BITS) \
+        { \
+            (l) = (h) >> ((k) - FLINT_BITS); \
+            (h) = 0; \
+        } \
+        else if ((k) != 0) \
+        { \
+            (l) = ((l) >> (k)) | ((h) << (FLINT_BITS - (k))); \
+            (h) = (h) >> (k); \
+        } \
+    } while (0)
+
+/* (m, e) = the truncated product of one-limb mantissas u 2^eu and v 2^ev */
+#define NFLOAT_MUL_1(m, e, u, eu, v, ev) \
+    do { \
+        ulong __h, __l; \
+        umul_ppmm(__h, __l, (u), (v)); \
+        if (__h >> (FLINT_BITS - 1)) \
+        { \
+            (e) = (eu) + (ev); \
+            (m) = __h; \
+        } \
+        else \
+        { \
+            (e) = (eu) + (ev) - 1; \
+            (m) = (__h << 1) | (__l >> (FLINT_BITS - 1)); \
+        } \
+    } while (0)
+
+FLINT_FORCE_INLINE int
+_nfloat_set_1_mant(nfloat_ptr res, ulong m, slong exp, int sgnbit, gr_ctx_t ctx)
+{
+    NFLOAT_CHECK_EXP_RANGE(res, exp, sgnbit, ctx);
+    NFLOAT_D(res)[0] = m;
+    NFLOAT_EXP(res) = exp;
+    NFLOAT_SGNBIT(res) = sgnbit;
+    return GR_SUCCESS;
+}
+
+/* S = c^2 + d^2 2^-k (or c^2 2^-k + d^2) for nonzero normal c, d at one
+   limb, as (s2, s1, s0) with the smaller square shifted by k = 2 |EXP(c) -
+   EXP(d)| < 2 FLINT_BITS and truncated; returns e = max(EXP(c), EXP(d)),
+   so that c^2 + d^2 = S 2^(2e - 2 FLINT_BITS) (up to the truncation) */
+FLINT_FORCE_INLINE slong
+_nfloat_complex_sum_sqr_1(ulong * s2, ulong * s1, ulong * s0, nfloat_srcptr c, nfloat_srcptr d)
+{
+    slong ec = NFLOAT_EXP(c), ed = NFLOAT_EXP(d), e = FLINT_MAX(ec, ed);
+    ulong h1, l1, h2, l2;
+    slong k;
+
+    umul_ppmm(h1, l1, NFLOAT_D(c)[0], NFLOAT_D(c)[0]);
+    umul_ppmm(h2, l2, NFLOAT_D(d)[0], NFLOAT_D(d)[0]);
+    k = 2 * (e - ec);
+    NFLOAT_RSHIFT_2(h1, l1, k);
+    k = 2 * (e - ed);
+    NFLOAT_RSHIFT_2(h2, l2, k);
+    add_sssaaaaaa(*s2, *s1, *s0, UWORD(0), h1, l1, UWORD(0), h2, l2);
+    return e;
+}
+
+/* (re, im) = (p (-1)^psgn, q (-1)^qsgn) / |y|^2 with |y|^2 = c^2 + d^2 as
+   above, at one limb; p and q are normal or zero, and may alias re, im, c
+   or d */
+static int
+_nfloat_complex_div_sum_sqr_1(nfloat_ptr re, nfloat_ptr im, nfloat_srcptr p, int psgn,
+    nfloat_srcptr q, int qsgn, nfloat_srcptr c, nfloat_srcptr d, gr_ctx_t ctx)
+{
+    ulong s2, s1, s0, t, qp, qq, rp, rq, sp, sq;
+    slong e, L, texp, ep, eq;
+    int pzero, qzero, status;
+
+    e = _nfloat_complex_sum_sqr_1(&s2, &s1, &s0, c, d);
+
+    /* t = the top limb of S (S >= 2^(2 FLINT_BITS - 2): the larger square
+       is not shifted), L = the bit length of S */
+    if (s2 != 0)
+    {
+        t = (UWORD(1) << (FLINT_BITS - 1)) | (s1 >> 1);
+        L = 2 * FLINT_BITS + 1;
+    }
+    else if (s1 >> (FLINT_BITS - 1))
+    {
+        t = s1;
+        L = 2 * FLINT_BITS;
+    }
+    else
+    {
+        t = (s1 << 1) | (s0 >> (FLINT_BITS - 1));
+        L = 2 * FLINT_BITS - 1;
+    }
+
+    /* |y|^2 = (t / B) 2^texp */
+    texp = L + 2 * e - 2 * FLINT_BITS;
+
+    pzero = NFLOAT_IS_ZERO(p);
+    qzero = NFLOAT_IS_ZERO(q);
+    qp = qq = sp = sq = 0;
+
+#if FLINT_PREINVERT_LIMB_USE_NATIVE
+    if (!pzero)
+        qp = _nfloat_div_1_kernel(&rp, &sp, NFLOAT_D(p)[0], t);
+    if (!qzero)
+        qq = _nfloat_div_1_kernel(&rq, &sq, NFLOAT_D(q)[0], t);
+#else
+    {
+        ulong tinv;
+        NFLOAT_INVERT_LIMB(tinv, t);
+        if (!pzero)
+            qp = _nfloat_div_1_kernel_preinv(&rp, &sp, NFLOAT_D(p)[0], t, tinv);
+        if (!qzero)
+            qq = _nfloat_div_1_kernel_preinv(&rq, &sq, NFLOAT_D(q)[0], t, tinv);
+    }
+#endif
+    (void) rp;
+    (void) rq;
+
+    ep = pzero ? 0 : NFLOAT_EXP(p) - texp + (slong) sp;
+    eq = qzero ? 0 : NFLOAT_EXP(q) - texp + (slong) sq;
+
+    status = pzero ? nfloat_zero(re, ctx) : _nfloat_set_1_mant(re, qp, ep, psgn, ctx);
+    status |= qzero ? nfloat_zero(im, ctx) : _nfloat_set_1_mant(im, qq, eq, qsgn, ctx);
+    return status;
+}
+
+#if FLINT_BITS == 64
+
+/* sqrt(a + bi) (rsqrt = 0) or 1 / sqrt(a + bi) (rsqrt = 1) at one limb, for
+   nonzero normal a, b with |EXP(a) - EXP(b)| <= FLINT_BITS / 2 + 2 */
+static int
+_nfloat_complex_sqrt_rsqrt_1(nfloat_ptr re, nfloat_ptr im, nfloat_srcptr a, nfloat_srcptr b, int rsqrt, gr_ctx_t ctx)
+{
+    ulong A = NFLOAT_D(a)[0], Bm = NFLOAT_D(b)[0];
+    slong ea = NFLOAT_EXP(a), eb = NFLOAT_EXP(b), e, er, eT, eQ, ew, ebig, esmall;
+    int asgn = NFLOAT_SGNBIT(a), bsgn = NFLOAT_SGNBIT(b), status;
+    ulong s2, s1, s0, n1, n0, rm, a1, a0, c, t1, t0, T, Q, w, big, small, tq;
+    unsigned int sh;
+
+    /* |z| = (rm / B) 2^er: the floor of the square root of S, taken
+       as (n1, n0) 2^(2j) with n1 >= B/4 */
+    e = _nfloat_complex_sum_sqr_1(&s2, &s1, &s0, a, b);
+    if (s2 != 0)
+    {
+        n1 = (s2 << (FLINT_BITS - 2)) | (s1 >> 2);
+        n0 = (s1 << (FLINT_BITS - 2)) | (s0 >> 2);
+        er = e + 1;
+    }
+    else
+    {
+        n1 = s1;
+        n0 = s0;
+        er = e;
+    }
+    _nfloat_isqrt_2(&rm, n1, n0);
+
+    /* T = |z| + |a| = (T / B) 2^eT, truncated; |z| >= |a|, with the shift
+       er - ea <= FLINT_BITS / 2 + 3 */
+    sh = er - ea;
+    a1 = A >> sh;
+    a0 = (sh == 0) ? 0 : (A << (FLINT_BITS - sh));
+    add_sssaaaaaa(c, t1, t0, UWORD(0), rm, UWORD(0), UWORD(0), a1, a0);
+    (void) t0;
+    if (c)
+    {
+        T = (UWORD(1) << (FLINT_BITS - 1)) | (t1 >> 1);
+        eT = er + 1;
+    }
+    else
+    {
+        T = t1;
+        eT = er;
+    }
+
+    /* w = 1 / sqrt(Q 2^eQ), Q 2^eQ = 2 T resp. 2 T |z|^2 */
+    if (!rsqrt)
+    {
+        Q = T;
+        eQ = eT + 1;
+    }
+    else
+    {
+        NFLOAT_MUL_1(Q, eQ, T, eT, rm, er);
+        NFLOAT_MUL_1(Q, eQ, Q, eQ, rm, er);
+        eQ += 1;
+    }
+    tq = eQ & 1;
+    _nfloat_rsqrt_1_approx(&w, Q, tq, 0);
+    ew = (1 - (slong) tq) - (eQ - (slong) tq) / 2;
+
+    NFLOAT_MUL_1(big, ebig, T, eT, w, ew);
+    NFLOAT_MUL_1(small, esmall, Bm, eb, w, ew);
+
+    /* sqrt: (T w, b w) for a >= 0, (|b| w, sgn(b) T w) for a < 0;
+       rsqrt: the conjugates divided by |z| */
+    if (!asgn)
+    {
+        status = _nfloat_set_1_mant(re, big, ebig, 0, ctx);
+        status |= _nfloat_set_1_mant(im, small, esmall, bsgn ^ rsqrt, ctx);
+    }
+    else
+    {
+        status = _nfloat_set_1_mant(re, small, esmall, 0, ctx);
+        status |= _nfloat_set_1_mant(im, big, ebig, bsgn ^ rsqrt, ctx);
+    }
+
+    return status;
+}
+
+#endif
+
+/* exponents for which squares, products of two and their reciprocals
+   cannot overflow or underflow, so that no scaling is needed */
+#define NFLOAT_COMPLEX_EXP_MODERATE(e) (FLINT_ABS(e) < NFLOAT_MAX_EXP / 8)
+
+/* x *= 2^e in place, directly on the exponent where that is safe */
+FLINT_FORCE_INLINE int
+_nfloat_mul_2exp_si_ip(nfloat_ptr x, slong e, gr_ctx_t ctx)
+{
+    if (!NFLOAT_IS_SPECIAL(x) && NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(x)))
+    {
+        NFLOAT_EXP(x) += e;
+        return GR_SUCCESS;
+    }
+    return nfloat_mul_2exp_si(x, x, e, ctx);
+}
+
+/* r = |a + bi| within about one ulp (not correctly rounded): the
+   correctly rounded hypot at one and two limbs, where it is fastest, and
+   for extreme exponents; otherwise the square root of a^2 + b^2 */
+static int
+_nfloat_complex_abs_approx(nfloat_ptr r, nfloat_srcptr a, nfloat_srcptr b, gr_ctx_t ctx)
+{
+    if (NFLOAT_CTX_NLIMBS(ctx) >= 3 &&
+        NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(a)) && NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(b)))
+    {
+        ulong t[NFLOAT_MAX_ALLOC];
+        int status;
+
+        status = nfloat_sqr(r, a, ctx);
+        status |= nfloat_sqr(t, b, ctx);
+        status |= nfloat_add(r, r, t, ctx);
+        status |= nfloat_sqrt(r, r, ctx);
+        return status;
+    }
+
+    return nfloat_hypot(r, a, b, ctx);
+}
+
+/* scales x by 2^-e in place (exactly, barring underflow of a part) */
+static int
+_nfloat_complex_scale_parts(nfloat_ptr r, nfloat_ptr s, slong e, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    if (e != 0)
+    {
+        status |= nfloat_mul_2exp_si(r, r, -e, ctx);
+        status |= nfloat_mul_2exp_si(s, s, -e, ctx);
+    }
+    return status;
+}
+
 int
 nfloat_complex_inv(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
     nfloat_ptr r, s;
     int status;
+    slong n = NFLOAT_CTX_NLIMBS(ctx);
 
     r = NFLOAT_COMPLEX_RE(res, ctx);
     s = NFLOAT_COMPLEX_IM(res, ctx);
@@ -1355,18 +1645,69 @@ nfloat_complex_inv(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx
         return status;
     }
 
-    ulong a2[NFLOAT_MAX_ALLOC];
-    ulong b2[NFLOAT_MAX_ALLOC];
-    ulong t[NFLOAT_MAX_ALLOC];
+    {
+        ulong a2[NFLOAT_MAX_ALLOC];
+        ulong b2[NFLOAT_MAX_ALLOC];
+        ulong t[NFLOAT_MAX_ALLOC];
+        slong ea = NFLOAT_EXP(a), eb = NFLOAT_EXP(b), e, lim;
 
-    /* todo: improve */
-    status = nfloat_sqr(a2, a, ctx);
-    status |= nfloat_sqr(b2, b, ctx);
-    status |= nfloat_add(t, a2, b2, ctx);
-    status |= nfloat_div(r, a, t, ctx);
-    status |= nfloat_div(s, b, t, ctx);
-    status |= nfloat_neg(s, s, ctx);
-    return status;
+        /* (a - bi) / (a^2 + b^2), avoiding spurious over- and underflow */
+        lim = FLINT_BITS / 2 * n + 2;
+
+        if (ea - eb > lim)
+        {
+            /* 1/a - (b/a)/a i, the relative error below one ulp */
+            status = nfloat_div(t, b, a, ctx);
+            status |= nfloat_div(s, t, a, ctx);
+            status |= nfloat_inv(r, a, ctx);
+            status |= nfloat_neg(s, s, ctx);
+            return status;
+        }
+
+        if (eb - ea > lim)
+        {
+            /* (a/b)/b - 1/b i */
+            status = nfloat_div(t, a, b, ctx);
+            status |= nfloat_div(r, t, b, ctx);
+            status |= nfloat_inv(s, b, ctx);
+            status |= nfloat_neg(s, s, ctx);
+            return status;
+        }
+
+        if (n == 1 && !NFLOAT_IS_SPECIAL(a) && !NFLOAT_IS_SPECIAL(b))
+            return _nfloat_complex_div_sum_sqr_1(r, s, a, NFLOAT_SGNBIT(a), b, !NFLOAT_SGNBIT(b), a, b, ctx);
+
+        if (NFLOAT_COMPLEX_EXP_MODERATE(ea) && NFLOAT_COMPLEX_EXP_MODERATE(eb))
+        {
+            /* (a - bi) / (a^2 + b^2) with one reciprocal (r, s may alias
+               a, b: each product reads its own part) */
+            status = nfloat_sqr(t, a, ctx);
+            status |= nfloat_sqr(b2, b, ctx);
+            status |= nfloat_add(t, t, b2, ctx);
+            status |= nfloat_inv(t, t, ctx);
+            status |= nfloat_mul(r, a, t, ctx);
+            status |= nfloat_mul(s, b, t, ctx);
+            status |= nfloat_neg(s, s, ctx);
+            return status;
+        }
+
+        /* scale by 2^-e (exact), one reciprocal of a^2 + b^2 */
+        e = FLINT_MAX(ea, eb);
+        nfloat_set(a2, a, ctx);
+        nfloat_set(b2, b, ctx);
+        NFLOAT_EXP(a2) -= e;
+        NFLOAT_EXP(b2) -= e;
+
+        status = nfloat_sqr(t, a2, ctx);
+        status |= nfloat_sqr(s, b2, ctx);
+        status |= nfloat_add(t, t, s, ctx);
+        status |= nfloat_inv(t, t, ctx);
+        status |= nfloat_mul(r, a2, t, ctx);
+        status |= nfloat_mul(s, b2, t, ctx);
+        status |= nfloat_neg(s, s, ctx);
+        status |= _nfloat_complex_scale_parts(r, s, e, ctx);
+        return status;
+    }
 }
 
 int
@@ -1375,6 +1716,7 @@ nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     nfloat_srcptr a, b, c, d;
     nfloat_ptr r, s;
     int status = GR_SUCCESS;
+    slong n = NFLOAT_CTX_NLIMBS(ctx);
 
     r = NFLOAT_COMPLEX_RE(res, ctx);
     s = NFLOAT_COMPLEX_IM(res, ctx);
@@ -1427,26 +1769,90 @@ nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     }
     else
     {
-        ulong c2[NFLOAT_MAX_ALLOC];
-        ulong d2[NFLOAT_MAX_ALLOC];
-        ulong t[NFLOAT_MAX_ALLOC];
         ulong u[2 * NFLOAT_MAX_ALLOC];
+        ulong t[NFLOAT_MAX_ALLOC];
+        slong ec = NFLOAT_EXP(c), ed = NFLOAT_EXP(d), e;
+        slong lim = FLINT_BITS / 2 * n + 2;
+        nfloat_ptr ur = NFLOAT_COMPLEX_RE(u, ctx), ui = NFLOAT_COMPLEX_IM(u, ctx);
 
-        /* todo: improve */
-        status = nfloat_sqr(c2, c, ctx);
-        status |= nfloat_sqr(d2, d, ctx);
-        status |= nfloat_add(t, c2, d2, ctx);
-        status |= nfloat_set(NFLOAT_COMPLEX_RE(u, ctx), c, ctx);
-        status |= nfloat_neg(NFLOAT_COMPLEX_IM(u, ctx), d, ctx);
-        status |= nfloat_complex_mul(res, x, u, ctx);
-        status |= nfloat_div(r, r, t, ctx);
-        status |= nfloat_div(s, s, t, ctx);
+        if (FLINT_ABS(ec - ed) > lim)
+        {
+            /* x / y = x (1 / y), with 1 / y as above */
+            status = nfloat_complex_inv(u, y, ctx);
+            status |= nfloat_complex_mul(res, x, u, ctx);
+            return status;
+        }
+
+        if (n == 1 && !NFLOAT_IS_SPECIAL(c) && !NFLOAT_IS_SPECIAL(d))
+        {
+            /* x conj(y) / |y|^2 in registers, x conj(y) unscaled unless it
+               overflows */
+            int st;
+
+            _nfloat_copy_limbs(ur, c, NFLOAT_CTX_DATA_NLIMBS(ctx));
+            _nfloat_copy_limbs(ui, d, NFLOAT_CTX_DATA_NLIMBS(ctx));
+            NFLOAT_SGNBIT(ui) ^= 1;
+
+            st = nfloat_complex_mul(u, x, u, ctx);
+
+            if (st == GR_SUCCESS &&
+                (!NFLOAT_IS_SPECIAL(ur) || NFLOAT_IS_ZERO(ur)) &&
+                (!NFLOAT_IS_SPECIAL(ui) || NFLOAT_IS_ZERO(ui)))
+                return _nfloat_complex_div_sum_sqr_1(r, s, ur, NFLOAT_SGNBIT(ur), ui, NFLOAT_SGNBIT(ui), c, d, ctx);
+        }
+
+        if (NFLOAT_COMPLEX_EXP_MODERATE(ec) && NFLOAT_COMPLEX_EXP_MODERATE(ed) &&
+            NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(a)) && NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(b)))
+        {
+            /* x conj(y) / |y|^2 with one reciprocal of |y|^2 */
+            _nfloat_copy_limbs(ur, c, NFLOAT_CTX_DATA_NLIMBS(ctx));
+            _nfloat_copy_limbs(ui, d, NFLOAT_CTX_DATA_NLIMBS(ctx));
+            NFLOAT_SGNBIT(ui) ^= 1;
+            status = nfloat_sqr(t, c, ctx);
+            status |= nfloat_complex_mul(u, x, u, ctx);
+            {
+                ulong d2[NFLOAT_MAX_ALLOC];
+                status |= nfloat_sqr(d2, d, ctx);
+                status |= nfloat_add(t, t, d2, ctx);
+            }
+            status |= nfloat_inv(t, t, ctx);
+            status |= nfloat_mul(r, ur, t, ctx);
+            status |= nfloat_mul(s, ui, t, ctx);
+            return status;
+        }
+
+        /* x conj(y) / |y|^2, with y scaled by 2^-e (exact) and one
+           reciprocal of |y|^2 */
+        e = FLINT_MAX(ec, ed);
+        nfloat_set(ur, c, ctx);
+        nfloat_neg(ui, d, ctx);
+        NFLOAT_EXP(ur) -= e;
+        NFLOAT_EXP(ui) -= e;
+
+        status = nfloat_complex_mul(u, x, u, ctx);
+
+        {
+            ulong c2[NFLOAT_MAX_ALLOC];
+            ulong d2[NFLOAT_MAX_ALLOC];
+
+            nfloat_set(c2, c, ctx);
+            nfloat_set(d2, d, ctx);
+            NFLOAT_EXP(c2) -= e;
+            NFLOAT_EXP(d2) -= e;
+            status |= nfloat_sqr(t, c2, ctx);
+            status |= nfloat_sqr(c2, d2, ctx);
+            status |= nfloat_add(t, t, c2, ctx);
+            status |= nfloat_inv(t, t, ctx);
+            status |= nfloat_mul(r, ur, t, ctx);
+            status |= nfloat_mul(s, ui, t, ctx);
+            status |= _nfloat_complex_scale_parts(r, s, e, ctx);
+        }
     }
 
     return status;
 }
 
-static int
+int
 nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
@@ -1499,41 +1905,48 @@ nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ct
         return status;
     }
 
-    /* r = |a+bi| */
-    status |= nfloat_sqr(r, a, ctx);
-    status |= nfloat_sqr(t, b, ctx);
-    status |= nfloat_add(r, r, t, ctx);
-    status |= nfloat_sqrt(r, r, ctx);
+#if FLINT_BITS == 64
+    if (NFLOAT_CTX_NLIMBS(ctx) == 1 && !NFLOAT_IS_SPECIAL(a) && !NFLOAT_IS_SPECIAL(b) &&
+        FLINT_ABS(NFLOAT_EXP(a) - NFLOAT_EXP(b)) <= FLINT_BITS / 2 + 2)
+        return _nfloat_complex_sqrt_rsqrt_1(c, d, a, b, 0, ctx);
+#endif
 
-    if (!NFLOAT_SGNBIT(a))
+    /* r = |z|, q = sqrt((r + |a|) / 2), sqrt(z) = (q, b / (2q)) for a >= 0,
+       (|b| / (2q), sgn(b) q) for a < 0 (a single square root and division
+       beat a reciprocal square root and two products at all precisions) */
     {
-        /* sqrt(a+bi) = sqrt((r+a)/2) + b/sqrt(2*(r+a))*i */
+        int asgnbit = NFLOAT_SGNBIT(a), bsgnbit = NFLOAT_SGNBIT(b);
 
-        status |= nfloat_add(t, r, a, ctx);
-        status |= nfloat_mul_2exp_si(t, t, 1, ctx);
-        status |= nfloat_sqrt(t, t, ctx);
-        status |= nfloat_div(d, b, t, ctx);
-        status |= nfloat_mul_2exp_si(c, t, -1, ctx);
-    }
-    else
-    {
-        /* sqrt(a+bi) = |b|/sqrt(2*(r-a)) + sgn(b)*sqrt((r-a)/2)*i */
-        int bsgnbit = NFLOAT_SGNBIT(b);
+        status |= _nfloat_complex_abs_approx(r, a, b, ctx);
+        if (asgnbit)
+            status |= nfloat_sub(t, r, a, ctx);
+        else
+            status |= nfloat_add(t, r, a, ctx);
+        status |= _nfloat_mul_2exp_si_ip(t, -1, ctx);
 
-        status |= nfloat_sub(t, r, a, ctx);
-        status |= nfloat_mul_2exp_si(t, t, 1, ctx);
-        status |= nfloat_sqrt(t, t, ctx);
-        status |= nfloat_div(c, b, t, ctx);
-        status |= nfloat_abs(c, c, ctx);
-        status |= nfloat_mul_2exp_si(d, t, -1, ctx);
-        if (bsgnbit)
-            status |= nfloat_neg(d, d, ctx);
+        if (!asgnbit)
+        {
+            /* c may alias a, which is no longer needed */
+            status |= nfloat_sqrt(c, t, ctx);
+            status |= nfloat_div(d, b, c, ctx);
+            status |= _nfloat_mul_2exp_si_ip(d, -1, ctx);
+        }
+        else
+        {
+            status |= nfloat_sqrt(t, t, ctx);
+            status |= nfloat_div(c, b, t, ctx);
+            NFLOAT_SGNBIT(c) = 0;
+            status |= _nfloat_mul_2exp_si_ip(c, -1, ctx);
+            status |= nfloat_set(d, t, ctx);
+            if (bsgnbit)
+                status |= nfloat_neg(d, d, ctx);
+        }
     }
 
     return status;
 }
 
-static int
+int
 nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
@@ -1541,7 +1954,6 @@ nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t c
 
     ulong r[NFLOAT_MAX_ALLOC];
     ulong t[NFLOAT_MAX_ALLOC];
-    ulong u[NFLOAT_MAX_ALLOC];
     ulong v[NFLOAT_MAX_ALLOC];
 
     int status = GR_SUCCESS;
@@ -1589,43 +2001,64 @@ nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t c
         return status;
     }
 
-    /* u = b^2, r = |a+bi| */
-    status |= nfloat_sqr(r, a, ctx);
-    status |= nfloat_sqr(u, b, ctx);
-    status |= nfloat_add(r, r, u, ctx);
-    status |= nfloat_sqrt(r, r, ctx);
+#if FLINT_BITS == 64
+    if (NFLOAT_CTX_NLIMBS(ctx) == 1 && !NFLOAT_IS_SPECIAL(a) && !NFLOAT_IS_SPECIAL(b) &&
+        FLINT_ABS(NFLOAT_EXP(a) - NFLOAT_EXP(b)) <= FLINT_BITS / 2 + 2)
+        return _nfloat_complex_sqrt_rsqrt_1(c, d, a, b, 1, ctx);
+#endif
 
-    if (!NFLOAT_SGNBIT(a))
+    /* T = |z| + |a|, v = 1 / sqrt(2 T |z|^2): 1 / sqrt(z) = (T v, -b v) for
+       a >= 0, (|b| v, -sgn(b) T v) for a < 0 */
     {
-        /* t = r+a, v = r*(b^2+(r+a)^2) */
-        status |= nfloat_add(t, r, a, ctx);
-        status |= nfloat_sqr(v, t, ctx);
-        status |= nfloat_add(v, v, u, ctx);
-        status |= nfloat_mul(v, v, r, ctx);
+        int asgnbit = NFLOAT_SGNBIT(a), bsgnbit = NFLOAT_SGNBIT(b);
 
-        status |= nfloat_rsqrt(v, v, ctx);
-        status |= nfloat_mul(c, t, v, ctx);
-        status |= nfloat_mul(d, b, v, ctx);
-        status |= nfloat_neg(d, d, ctx);
-    }
-    else
-    {
-        int bsgnbit = NFLOAT_SGNBIT(b);
+        if (NFLOAT_CTX_NLIMBS(ctx) >= 3 &&
+            NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(a)) && NFLOAT_COMPLEX_EXP_MODERATE(NFLOAT_EXP(b)))
+        {
+            /* as in _nfloat_complex_abs_approx, keeping u = b^2 for
+               2 r^2 T = r (b^2 + T^2) (squarings are cheaper than
+               products at high precision) */
+            ulong u[NFLOAT_MAX_ALLOC];
 
-        /* t = r-a, v = r*(b^2+(r-a)^2) */
-        status |= nfloat_sub(t, r, a, ctx);
-        status |= nfloat_sqr(v, t, ctx);
-        status |= nfloat_add(v, v, u, ctx);
-        status |= nfloat_mul(v, v, r, ctx);
-
-        status |= nfloat_rsqrt(v, v, ctx);
-        status |= nfloat_mul(c, b, v, ctx);
-        status |= nfloat_mul(d, t, v, ctx);
-
-        if (!bsgnbit)
-            status |= nfloat_neg(d, d, ctx);
+            status |= nfloat_sqr(u, b, ctx);
+            status |= nfloat_sqr(r, a, ctx);
+            status |= nfloat_add(r, r, u, ctx);
+            status |= nfloat_sqrt(r, r, ctx);
+            if (asgnbit)
+                status |= nfloat_sub(t, r, a, ctx);
+            else
+                status |= nfloat_add(t, r, a, ctx);
+            status |= nfloat_sqr(v, t, ctx);
+            status |= nfloat_add(v, v, u, ctx);
+            status |= nfloat_mul(v, v, r, ctx);
+        }
         else
-            status |= nfloat_neg(c, c, ctx);
+        {
+            status |= nfloat_hypot(r, a, b, ctx);
+            if (asgnbit)
+                status |= nfloat_sub(t, r, a, ctx);
+            else
+                status |= nfloat_add(t, r, a, ctx);
+            status |= nfloat_mul(v, t, r, ctx);
+            status |= nfloat_mul(v, v, r, ctx);
+            status |= _nfloat_mul_2exp_si_ip(v, 1, ctx);
+        }
+        status |= nfloat_rsqrt(v, v, ctx);
+
+        if (!asgnbit)
+        {
+            status |= nfloat_mul(d, b, v, ctx);
+            status |= nfloat_mul(c, t, v, ctx);
+            status |= nfloat_neg(d, d, ctx);
+        }
+        else
+        {
+            status |= nfloat_mul(c, b, v, ctx);
+            status |= nfloat_mul(d, t, v, ctx);
+            NFLOAT_SGNBIT(c) = 0;
+            if (!bsgnbit)
+                status |= nfloat_neg(d, d, ctx);
+        }
     }
 
     return status;
@@ -1793,29 +2226,13 @@ nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr 
 int
 nfloat_complex_abs(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
-    ulong t[NFLOAT_MAX_ALLOC];
-    ulong u[NFLOAT_MAX_ALLOC];
-    int status = GR_SUCCESS;
+    int status;
 
     if (NFLOAT_CTX_HAS_INF_NAN(ctx))
         return GR_UNABLE;
 
-    if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(x, ctx)))
-    {
-        status = nfloat_abs(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), ctx);
-    }
-    else if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_RE(x, ctx)))
-    {
-        status = nfloat_abs(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_IM(x, ctx), ctx);
-    }
-    else
-    {
-        status |= nfloat_sqr(t, NFLOAT_COMPLEX_RE(x, ctx), ctx);
-        status |= nfloat_sqr(u, NFLOAT_COMPLEX_IM(x, ctx), ctx);
-        status |= nfloat_add(NFLOAT_COMPLEX_RE(res, ctx), t, u, ctx);
-        status |= nfloat_sqrt(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(res, ctx), ctx);
-    }
-
+    /* (correctly rounded, also with directed rounding) */
+    status = nfloat_hypot(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), NFLOAT_COMPLEX_IM(x, ctx), ctx);
     status |= nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
     return status;
 }
@@ -1957,9 +2374,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) nfloat_complex_get_fmpz_2exp_fmpz},
 */
 
-/*
     {GR_METHOD_POW,             (gr_funcptr) nfloat_complex_pow},
-*/
 /*
     {GR_METHOD_POW_UI,          (gr_funcptr) nfloat_complex_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) nfloat_complex_pow_si},
@@ -1994,18 +2409,58 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
 
     {GR_METHOD_I,               (gr_funcptr) nfloat_complex_i},
     {GR_METHOD_PI,              (gr_funcptr) nfloat_complex_pi},
-/*
     {GR_METHOD_EXP,             (gr_funcptr) nfloat_complex_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) nfloat_complex_expm1},
+    {GR_METHOD_EXP_PI_I,        (gr_funcptr) nfloat_complex_exp_pi_i},
+    {GR_METHOD_EXP2,            (gr_funcptr) nfloat_complex_exp2},
+    {GR_METHOD_EXP10,           (gr_funcptr) nfloat_complex_exp10},
     {GR_METHOD_LOG,             (gr_funcptr) nfloat_complex_log},
     {GR_METHOD_LOG1P,           (gr_funcptr) nfloat_complex_log1p},
+    {GR_METHOD_LOG_PI_I,        (gr_funcptr) nfloat_complex_log_pi_i},
+    {GR_METHOD_LOG2,            (gr_funcptr) nfloat_complex_log2},
+    {GR_METHOD_LOG10,           (gr_funcptr) nfloat_complex_log10},
     {GR_METHOD_SIN,             (gr_funcptr) nfloat_complex_sin},
     {GR_METHOD_COS,             (gr_funcptr) nfloat_complex_cos},
     {GR_METHOD_TAN,             (gr_funcptr) nfloat_complex_tan},
+    {GR_METHOD_COT,             (gr_funcptr) nfloat_complex_cot},
+    {GR_METHOD_SEC,             (gr_funcptr) nfloat_complex_sec},
+    {GR_METHOD_CSC,             (gr_funcptr) nfloat_complex_csc},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) nfloat_complex_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) nfloat_complex_cos_pi},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) nfloat_complex_tan_pi},
+    {GR_METHOD_COT_PI,          (gr_funcptr) nfloat_complex_cot_pi},
+    {GR_METHOD_SEC_PI,          (gr_funcptr) nfloat_complex_sec_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) nfloat_complex_csc_pi},
+    {GR_METHOD_SINC,            (gr_funcptr) nfloat_complex_sinc},
+    {GR_METHOD_SINC_PI,         (gr_funcptr) nfloat_complex_sinc_pi},
     {GR_METHOD_SINH,            (gr_funcptr) nfloat_complex_sinh},
     {GR_METHOD_COSH,            (gr_funcptr) nfloat_complex_cosh},
     {GR_METHOD_TANH,            (gr_funcptr) nfloat_complex_tanh},
+    {GR_METHOD_COTH,            (gr_funcptr) nfloat_complex_coth},
+    {GR_METHOD_SECH,            (gr_funcptr) nfloat_complex_sech},
+    {GR_METHOD_CSCH,            (gr_funcptr) nfloat_complex_csch},
+    {GR_METHOD_ASIN,            (gr_funcptr) nfloat_complex_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) nfloat_complex_acos},
     {GR_METHOD_ATAN,            (gr_funcptr) nfloat_complex_atan},
+    {GR_METHOD_ACOT,            (gr_funcptr) nfloat_complex_acot},
+    {GR_METHOD_ASEC,            (gr_funcptr) nfloat_complex_asec},
+    {GR_METHOD_ACSC,            (gr_funcptr) nfloat_complex_acsc},
+    {GR_METHOD_ASINH,           (gr_funcptr) nfloat_complex_asinh},
+    {GR_METHOD_ACOSH,           (gr_funcptr) nfloat_complex_acosh},
+    {GR_METHOD_ATANH,           (gr_funcptr) nfloat_complex_atanh},
+    {GR_METHOD_ACOTH,           (gr_funcptr) nfloat_complex_acoth},
+    {GR_METHOD_ASECH,           (gr_funcptr) nfloat_complex_asech},
+    {GR_METHOD_ACSCH,           (gr_funcptr) nfloat_complex_acsch},
+    {GR_METHOD_ASIN_PI,         (gr_funcptr) nfloat_complex_asin_pi},
+    {GR_METHOD_ACOS_PI,         (gr_funcptr) nfloat_complex_acos_pi},
+    {GR_METHOD_ATAN_PI,         (gr_funcptr) nfloat_complex_atan_pi},
+    {GR_METHOD_ACOT_PI,         (gr_funcptr) nfloat_complex_acot_pi},
+    {GR_METHOD_ASEC_PI,         (gr_funcptr) nfloat_complex_asec_pi},
+    {GR_METHOD_ACSC_PI,         (gr_funcptr) nfloat_complex_acsc_pi},
+    {GR_METHOD_SIN_COS,         (gr_funcptr) nfloat_complex_sin_cos},
+    {GR_METHOD_SIN_COS_PI,      (gr_funcptr) nfloat_complex_sin_cos_pi},
+    {GR_METHOD_SINH_COSH,       (gr_funcptr) nfloat_complex_sinh_cosh},
+/*
     {GR_METHOD_GAMMA,            (gr_funcptr) nfloat_complex_gamma},
     {GR_METHOD_ZETA,             (gr_funcptr) nfloat_complex_zeta},
 */
@@ -2055,6 +2510,7 @@ nfloat_complex_ctx_init(gr_ctx_t ctx, slong prec, int flags)
     NFLOAT_CTX_NLIMBS(ctx) = nlimbs;
     NFLOAT_CTX_FLAGS(ctx) = flags;
     NFLOAT_CTX_RND(ctx) = 0;
+    NFLOAT_CTX_FUNC_PREC(ctx) = nlimbs * FLINT_BITS;
 
     ctx->methods = _nfloat_complex_methods;
 

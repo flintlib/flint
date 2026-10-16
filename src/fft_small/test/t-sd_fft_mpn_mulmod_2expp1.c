@@ -167,6 +167,18 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
             TEST_FUNCTION_FAIL("aliased: b = %wd, m = %wd\n",
                                b, m);
 
+        /* squares through the same pointer (the one-transform path),
+           also fully in place as the convolution's pointwise pass does
+           for squares */
+        negmul_ref(r, x, x, n);
+        sd_fft_mpn_mulmod_2expp1(C, z, x, x, S);
+        if (z[n] != r[n] || mpn_cmp(z, r, n) != 0)
+            TEST_FUNCTION_FAIL("square: b = %wd, m = %wd\n", b, m);
+        memcpy(z, x, (n + 1) * sizeof(ulong));
+        sd_fft_mpn_mulmod_2expp1(C, z, z, z, S);
+        if (z[n] != r[n] || mpn_cmp(z, r, n) != 0)
+            TEST_FUNCTION_FAIL("square in place: b = %wd, m = %wd\n", b, m);
+
         flint_free(x);
         flint_free(y);
         flint_free(z);

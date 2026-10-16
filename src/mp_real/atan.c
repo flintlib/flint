@@ -38,21 +38,51 @@
 
 /* the series from z leading zero bits on: the reduced series of
    series_tapered.c / series_rs.c below 32 zero bits, _mp_real_atan_rs
-   from 32 (measured end to end, kernel / series time ratios: 1.1-2 at
-   1-8 limbs from z = 10, 1.1-1.5 at 10-24 limbs from z = 14-16,
-   1.1-1.3 at 32-64 limbs from z = 20-32, 1.05-1.35 at 96-512 limbs from
-   z = 40-128) */
+   from 32 (measured kernel / series time ratios with the dense-table
+   kernels from 2 to 32 limbs: 1.0-1.2 at 4-7 limbs from z = 24,
+   1.05-1.35 at 3 and 8-10 limbs from z = 28, 1.0-2.5 at 2 and 11-32
+   limbs from z = 32; end to end with the bitwise kernels: 1.1-2 at one
+   limb from z = 10, 1.1-1.5 at 22-24 limbs from z = 16 (the dense
+   kernels lowered to 21 limbs), 1.1-1.3 at 33-64 limbs from z =
+   20-32, 1.05-1.35 at 96-512 limbs from z = 40-128) */
 static slong
 _at_series_min_z(slong n)
 {
+#if FLINT_BITS == 64
+    if (n <= 1)
+        return 10;
+    if (n <= 2)
+        return 32;
+    if (n <= 3)
+        return 28;
+    if (n <= 7)
+        return 24;
+    if (n <= 10)
+        return 28;
+    if (n <= MP_REAL_DENSE_RT_MAX)
+        return 32;
+#else
+    /* (no dense kernels) */
     if (n <= 8)
         return 10;
     if (n <= 14)
         return 14;
+#endif
     if (n <= 24)
         return 16;
     if (n <= 40)
         return 20;
+#if FLINT_BITS == 64
+    /* the vector kernel, faster by 1.3-1.47 (two interleaved runs:
+       1.1-1.5 at 48-96 limbs from z = 28-48, 1.0-1.15 at 128-192 limbs
+       from z = 96, 1.1 at 256 from z = 128) */
+    if (n <= 48)
+        return 28;
+    if (n <= 96)
+        return 48;
+    if (n <= 192)
+        return 96;
+#else
     if (n <= 48)
         return 24;
     if (n <= 64)
@@ -61,6 +91,7 @@ _at_series_min_z(slong n)
         return 40;
     if (n <= 256)
         return 96;
+#endif
     if (n <= 512)
         return 128;
     return 192;
@@ -158,7 +189,7 @@ _at_mid(mp_real_t res, const mp_real_t m, slong prec)
         {
             /* |atan m - m| <= |m|^3/3 */
             _mp_real_elem_set_trunc(res, m, wp);
-            mp_real_add_error_2exp_si(res, 3 * emid - 1);
+            mp_real_add_error_2exp_si(res, _mp_real_err_exp_clamp(3 * emid - 1, emid, prec));
             return;
         }
 
@@ -353,4 +384,12 @@ mp_real_atan_bits(mp_real_t res, const mp_real_t x, slong prec)
         else
             _mp_real_elem_add_rad(res, xerr, xanc);
     }
+}
+
+/* the wrapper for the other files (see impl.h) */
+
+void
+_mp_real_atan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
+{
+    _at_kernel(y, err, v, n);
 }

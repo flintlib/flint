@@ -650,7 +650,16 @@ static void sd_ifft_base_9_1(const sd_fft_ctx_t Q, double* x, ulong j)
 
 /***************** inverse butterfy with truncation **************************/
 
-/* the legal function are opt-in, and illegal/unimplemented are NULL */
+/*
+    the legal function are opt-in, and illegal/unimplemented are NULL
+
+    Ranges: unlike the untruncated butterflies, these do not all map
+    (-2n, 2n) into itself by the documented ranges of mulmod_fast and
+    reduce_to_pm1n. The X0 outputs of 3_4_1, 3_4_0, 3_3_1, 3_3_0 and
+    1_4_0, and X3 of 3_4_1, can leave it; the transform is still correct
+    by the actual ranges of these primitives, and its outputs are in
+    (-3n, 3n). See the end of mulmod_satisfies_bounds.c.
+*/
 
 #define radix_4_moth_inv_trunc_block_0_1_0 NULL
 #define radix_4_moth_inv_trunc_block_0_1_1 NULL
@@ -1502,6 +1511,9 @@ static void sd_ifft_trunc_internal(
 Truncated inverse Fourier transform, inverse of sd_fft_trunc, assume the entries
 past `trunc` first entries of the _output_ are zero. See [vdH2004]_.
 The array `d` need to have size at least `n_pow2(L)`.
+The input entries must be in (-2n, 2n), with n = Q->p, which holds for the
+outputs of sd_fft_ctx_point_mul. The output entries are in (-3n, 3n), not
+(-2n, 2n): see the end of mulmod_satisfies_bounds.c.
 */
 void sd_ifft_trunc(
     sd_fft_ctx_t Q,

@@ -82,6 +82,38 @@ test_agm(flint_rand_t state, slong iters)
             flint_abort();
         }
 
+        /* res aliasing either input (taken over inside) or both */
+        {
+            mp_real_t s;
+            int which = n_randint(state, 3);
+            mp_real_init(s);
+            if (which == 0)
+            {
+                mp_real_set(s, x);
+                _mp_real_agm_order(s, s, y, n, m);
+            }
+            else if (which == 1)
+            {
+                mp_real_set(s, y);
+                _mp_real_agm_order(s, x, s, n, m);
+            }
+            else
+            {
+                mp_real_set(s, x);
+                _mp_real_agm_order(r, x, x, n, m);
+                _mp_real_agm_order(s, s, s, n, m);
+            }
+            mp_real_get_arb(ya, s);
+            mp_real_get_arb(rr, r);
+            if (!arb_equal(ya, rr))
+            {
+                flint_printf("FAIL: agm aliasing %d (iter %wd, n = %wd, m = %d)\n", which, iter, n, m);
+                mp_real_print(s); mp_real_print(r);
+                flint_abort();
+            }
+            mp_real_clear(s);
+        }
+
         mp_real_clear(x); mp_real_clear(y); mp_real_clear(r);
         arb_clear(xa); arb_clear(ya); arb_clear(ra); arb_clear(rr);
     }

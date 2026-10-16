@@ -283,8 +283,6 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
         {
             qsieve_collect_relations(qs_inf, sieve);
 
-            qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
-
 #if QS_DEBUG
             flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
                          "extra rels = %wd, poly_count = %wd, num_primes = %wd\n", qs_inf->full_relation,
@@ -292,8 +290,17 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                           qs_inf->extra_rels, qs_inf->poly_count, qs_inf->num_primes);
 #endif
 
+            /*
+               We need extra_rels more relations than primes we sieve with.
+               qs_inf->num_cycles, kept up to date as partial relations are
+               found, is the number of full relations they combine to, except
+               that it counts duplicates.  The relations used to be processed
+               only once 10% more than needed had been found, which wasted
+               sieving; when there are too few, qsieve_process_relation lowers
+               num_cycles by the shortfall instead.
+            */
             if (qs_inf->full_relation + qs_inf->num_cycles >=
-                ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+                qs_inf->num_primes + qs_inf->extra_rels)
             {
                 int ok = qsieve_process_relation(qs_inf);
 
@@ -317,8 +324,8 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                     num_primes = qs_inf->num_primes;
                     qs_inf->num_primes += qs_inf->ks_primes;
 
-                    ncols = qs_inf->num_primes + qs_inf->extra_rels;
-                    nrows = qs_inf->num_primes;
+                    ncols = num_primes + qs_inf->extra_rels;
+                    nrows = num_primes;
 
                     reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
@@ -462,6 +469,20 @@ found_small_factor:
         }
 
         qsieve_linalg_realloc(qs_inf);
+
+        /*
+           The factor base was extended by appending primes, so the relations
+           found so far are still valid: count them again (the counts were
+           reset above), rather than effectively starting over.
+        */
+        for (j = 0; j < qs_inf->rel_num; j++)
+        {
+            if (qs_inf->relations[j].lp == 1)
+                qs_inf->full_relation++;
+            else
+                qsieve_add_partial_edge(qs_inf, qs_inf->relations[j].lp,
+                                                qs_inf->relations[j].lp2);
+        }
     }
 
     /**************************************************************************

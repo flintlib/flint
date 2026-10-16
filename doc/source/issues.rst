@@ -125,8 +125,10 @@ multithreaded code is therefore recommended.
 
 Arb may cache some data (such as the value of `\pi` and
 Bernoulli numbers) to speed up various computations. In threadsafe mode,
-caches use thread-local storage. There is currently no way to save memory
-and avoid recomputation by having several threads share the same cache.
+most of these caches use thread-local storage, so that each thread
+computes its own copy; the tables of the ``mp_real`` elementary
+functions (which also serve ``nfloat``) are shared among the threads
+instead (see :ref:`threading`).
 Caches can be freed by calling the ``flint_cleanup()`` function. To avoid
 memory leaks, the user should call ``flint_cleanup()`` when exiting a thread.
 It is also recommended to call ``flint_cleanup()`` when exiting the main

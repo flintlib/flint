@@ -14,17 +14,12 @@
 #include "mp_real.h"
 #include "impl.h"
 
-/* quotient length from which the argument-reduction division runs
-   through _mp_real_div_newton instead of mpn_tdiv_qr; set from
-   in-context measurements (tight-loop benchmarks favor Newton much
-   earlier, but embedded in the evaluation it loses until the FFT
-   range, see dev/notes) */
-#ifndef MP_REAL_RED_DIV_NEWTON_CUTOFF
-#define MP_REAL_RED_DIV_NEWTON_CUTOFF 60
-#endif
-
-/* atan(t) for t in [0, 1) by greedy vectoring (the trigonometric
-   analog of the _mp_real_log1p_bitwise_rs reduction): the vector
+/* atan(t) for t in [0, 1) by greedy vectoring with limb arithmetic:
+   the path of 32-bit machines, and of explicit r below
+   MP_REAL_ATAN_BITWISE_VEC_MIN limbs on 64-bit ones, where r = 0 takes
+   the per-size kernels and larger sizes the signed-digit vector
+   reduction of bitwise_vec.c.  (The trigonometric analog of the
+   _mp_real_log1p_bitwise_rs reduction): the vector
    (X, Y) = (1, t) is rotated towards the real axis by the factors
    (1 - i 2^-i), i = 1..r, applying a factor -- i.e.
    (X, Y) <- (X + Y 2^-i, Y - X 2^-i), two shifts and two
@@ -58,8 +53,8 @@
    Error accounting (output ulp 2^(-FLINT_BITS n)): at most r + 1
    table entries, each short by < 1 ulp; each accepted
    factor truncates X and Y by < 1 ulp each, perturbing the residual
-   angle by < 2 ulp per accept; the halving, the division floor and
-   the series error (<= 15 ulp two-sided) are constants.  Total
+   angle by < 2 ulp per accept; the halving, the division (within one
+   ulp) and the series error (<= 15 ulp two-sided) are constants.  Total
    below the returned bound *err = 4 r + 64. */
 
 #define ATANS_A(i) (tab + (i) * nc)
@@ -77,18 +72,37 @@ static const int _mp_real_atan_bitwise_rs_r_tab[] =
 static const short _mp_real_atan_bitwise_rs_n_tab[] =
     {1, 18, 100, 270, 450, 620};
 
+#if FLINT_BITS == 64
+/* the same for _mp_real_atan_bitwise_vec (its own sweep, x86-64 AVX2:
+   every ladder value at 27 sizes from 4 to 600 limbs, the minimum of
+   three interleaved runs, the optimum flat to a few percent over one or
+   two steps) */
+static const int _mp_real_atan_bitwise_vec_r_tab[] =
+    {32, 48, 64, 96, 192, 320, 384, 512};
+static const short _mp_real_atan_bitwise_vec_n_tab[] =
+    {1, 18, 30, 44, 88, 200, 240, 380};
+#endif
+
 int
 _mp_real_atan_bitwise_rs_default_r(slong n)
 {
     slong j;
 
 #if FLINT_BITS == 64
-    /* the compile-time constants of the specialized per-size files:
-       keep in sync with the dev/tune_mp_real.py --pin values that
-       emitted them */
+    /* the reduction parameters of the per-size kernels that r = 0
+       selects at these sizes (see impl.h) */
     static const int opt_r[] = MP_REAL_ATAN_OPT_R;
     if (n <= MP_REAL_ATAN_OPT_R_MAX)
         return opt_r[n];
+
+    if (n >= MP_REAL_ATAN_BITWISE_VEC_MIN)
+    {
+        for (j = 0; j + 1 < (slong) (sizeof(_mp_real_atan_bitwise_vec_n_tab)
+                / sizeof(short))
+                && n >= _mp_real_atan_bitwise_vec_n_tab[j + 1]; j++)
+            ;
+        return _mp_real_atan_bitwise_vec_r_tab[j];
+    }
 #endif
 
     for (j = 0; j + 1 < (slong) (sizeof(_mp_real_atan_bitwise_rs_n_tab) / sizeof(short))
@@ -97,17 +111,11 @@ _mp_real_atan_bitwise_rs_default_r(slong n)
     return _mp_real_atan_bitwise_rs_r_tab[j];
 }
 
-#if FLINT_BITS == 64
-#endif
-
 FLINT_FORCE_INLINE void
 _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 {
-#if FLINT_BITS == 64
-    int r0;
-#endif
-    slong i, c, wn, nc, num, j, qr, ds;
-    nn_ptr X, Y, vx, vy, acc, t, y, nd;
+    slong i, c, wn, nc, num, j;
+    nn_ptr X, Y, vx, vy, acc, t, y;
     slong * used;
     TMP_INIT;
 
@@ -117,10 +125,6 @@ _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
        drop r under the r >= 32 contract of the residual series */
     FLINT_ASSERT(FLINT_BITS == 64 || n >= 2);
 
-#if FLINT_BITS == 64
-    r0 = r;
-#endif
-
     if (r == 0)
         r = _mp_real_atan_bitwise_rs_default_r(n);
 
@@ -129,19 +133,9 @@ _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
     r = FLINT_MIN((slong) r, FLINT_BITS * n - 16);
 
 #if FLINT_BITS == 64
-    /* fully specialized per-size implementations (atan_opt_<n>.c,
-       emitted and tuned by dev/tune_mp_real.py): with r = 0 the caller
-       has left the reduction parameter to us, and the whole call
-       collapses to straight-line code with a compile-time r and the
-       series built for it */
-    if (r0 == 0 && n <= 7)
+    if (n >= MP_REAL_ATAN_BITWISE_VEC_MIN)
     {
-        static void (* const tab[])(nn_ptr, nn_srcptr) = {
-            NULL, _mp_real_atan_opt_1, _mp_real_atan_opt_2, _mp_real_atan_opt_3,
-            _mp_real_atan_opt_4, _mp_real_atan_opt_5, _mp_real_atan_opt_6,
-            _mp_real_atan_opt_7
-        };
-        tab[n](res, x);
+        _mp_real_atan_bitwise_vec(res, x, n, r);
         return;
     }
 #endif
@@ -152,14 +146,12 @@ _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
     tab = _mp_real_atans_tab(n, r, &nc);
 
     TMP_START;
-    X = TMP_ALLOC((wn + n + wn + wn + wn + n + n + 2 * n + 2)
-        * sizeof(ulong));
+    X = TMP_ALLOC((wn + n + wn + wn + wn + n + n) * sizeof(ulong));
     Y = X + wn;
     vx = Y + n;
     vy = vx + wn;
     acc = vy + wn;
     t = acc + wn;
-    nd = t + n + n;
     used = TMP_ALLOC(MP_REAL_BITWISE_REDUCE_USED_ALLOC(r) * sizeof(slong));
 
     /* X = 1, Y = t */
@@ -275,35 +267,7 @@ _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 
     /* t' = Y / X < 2^-r: one division, X in [1, 2) with the top
        limb X[n] = 1 */
-    qr = 0;
-    while (qr < n && Y[n - 1 - qr] == 0)
-        qr++;
-    ds = 2 * n - qr;
-    flint_mpn_zero(t, n);
-    if (ds >= wn && qr < n)
-    {
-        flint_mpn_zero(nd, n);
-        flint_mpn_copyi(nd + n, Y, n - qr);
-        if (ds - wn + 1 < MP_REAL_RED_DIV_NEWTON_CUTOFF)
-        {
-            flint_mpn_tdiv_qr(t, nd, nd, ds, X, wn);
-        }
-        else
-        {
-            /* Same quotient by Karp-Markstein division: numerator
-               and divisor read as fractions (the numerator's n low
-               limbs are zero, so pass only its significant top
-               part), quotient computed with k + 1 fraction limbs, k
-               the quotient length.  Truncating the two guard limbs
-               leaves t within 1 + eps ulps of the floored quotient
-               (eps = 4 B^(-1) / a' < 2^-62), which the series
-               argument budget absorbs like the tdiv floor. */
-            slong k = ds - wn + 1;
-            nn_ptr q = TMP_ALLOC((k + 4) * sizeof(ulong));
-            _mp_real_div_newton(q, nd + n, ds - n, X, wn, k + 1);
-            flint_mpn_copyi(t, q + 2, k);
-        }
-    }
+    _mp_real_div_fraction(t, Y, X, n);
 
     /* res = acc + atan(t') (the series does not support aliased
        output) */
@@ -317,6 +281,22 @@ _mp_real_atan_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 void
 _mp_real_atan_bitwise_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n, int r)
 {
+#if FLINT_BITS == 64
+    /* r = 0 leaves the reduction to us: at the sizes of the per-size
+       kernels (small.h, the dense tables) those serve the call (any size
+       they decline takes the bitwise path below) */
+    if (r == 0 && n <= MP_REAL_ATAN_OPT_R_MAX)
+    {
+        ulong e;
+        if (_mp_real_atan_opt(res, &e, x, n))
+        {
+            if (err != NULL)
+                *err = e;
+            return;
+        }
+    }
+#endif
+
     _mp_real_atan_bitwise_rs_noerr(res, x, n, r);
     if (err != NULL)
         *err = 4 * (r ? (ulong) r : (ulong) _mp_real_atan_bitwise_rs_default_r(n)) + 64;

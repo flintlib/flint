@@ -127,6 +127,8 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
                                      across the two shapes) */
             { 5100, 16, 3, 0 },   /* N > 10000: the high-2-adic
                                      re-padding of the term count */
+            { 4542, 16, 0, 0 },   /* a two-level cascade (the guard
+                                     limb of the series remainder) */
             { 60, 3820, 3, 0 },   /* r within a limb of 64 wn: the
                                      degenerate single-slice
                                      ladder */
@@ -144,6 +146,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
             ysin = flint_malloc((wn + 2) * sizeof(ulong));
             yg = flint_malloc((wn + 2) * sizeof(ulong));
 
+            flint_set_num_threads(1 + n_randint(state, 4));
             if (cases[c].fill == 2)
                 flint_mpn_zero(t, wn);
             else if (cases[c].fill == 1)
@@ -156,7 +159,6 @@ TEST_FUNCTION_START(mp_real_sin_cos_reduced, state)
                 t[wn - 1] = n_randtest(state);
             }
             else
-                flint_set_num_threads(1 + n_randint(state, 4));
                 flint_mpn_urandomb(t, state, FLINT_BITS * wn);
             for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
                 t[wn - 1 - i] = 0;

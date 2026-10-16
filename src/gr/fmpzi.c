@@ -924,43 +924,37 @@ _gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_c
     }
 }
 
-#define MUL_REORDER_CUTOFF 30
-
+/* the algorithm selection lives in _fmpzi_poly_mulmid; the gr windows
+   may extend past the product, where the coefficients are zero */
 static int
 _gr_fmpzi_poly_mullow(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 < MUL_REORDER_CUTOFF || len2 < MUL_REORDER_CUTOFF || n < MUL_REORDER_CUTOFF)
-    {
-        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
-    }
-    else
-    {
-        gr_ctx_t fmpz_ctx;
-        gr_ctx_init_fmpz(fmpz_ctx);
-        /* Not currently using Karatsuba because it's often worse if the real
-           and imaginary parts are even slightly unbalanced */
-        return _gr_poly_mullow_complex_reorder(res, poly1, len1, poly2, len2, n, 0, ctx, fmpz_ctx);
-    }
+    slong i, m = FLINT_MIN(n, len1 + len2 - 1);
+
+    if (len1 == 0 || len2 == 0 || m <= 0)
+        return _gr_vec_zero(res, n, ctx);
+
+    _fmpzi_poly_mulmid(res, poly1, len1, poly2, len2, 0, m);
+    for (i = m; i < n; i++)
+        fmpzi_zero(res + i);
+    return GR_SUCCESS;
 }
 
 static int
 _gr_fmpzi_poly_mulmid(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    if (len1 < MUL_REORDER_CUTOFF ||
-        len2 < MUL_REORDER_CUTOFF ||
-        FLINT_MIN(nhi, len1 + len2 - 1 - nlo) < MUL_REORDER_CUTOFF ||
-        2 * (nhi - nlo) < MUL_REORDER_CUTOFF)
-    {
-        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
-    }
-    else
-    {
-        gr_ctx_t fmpz_ctx;
-        gr_ctx_init_fmpz(fmpz_ctx);
-        /* Not currently using Karatsuba because it's often worse if the real
-           and imaginary parts are even slightly unbalanced */
-        return _gr_poly_mulmid_complex_reorder(res, poly1, len1, poly2, len2, nlo, nhi, 0, ctx, fmpz_ctx);
-    }
+    slong i, m = FLINT_MIN(nhi, len1 + len2 - 1);
+
+    if (nlo >= nhi)
+        return GR_SUCCESS;
+
+    if (len1 == 0 || len2 == 0 || nlo >= m)
+        return _gr_vec_zero(res, nhi - nlo, ctx);
+
+    _fmpzi_poly_mulmid(res, poly1, len1, poly2, len2, nlo, m);
+    for (i = m; i < nhi; i++)
+        fmpzi_zero(res + i - nlo);
+    return GR_SUCCESS;
 }
 
 

@@ -49,6 +49,9 @@ typedef struct
 nmod_poly_matrix_precompute_arg_t;
 
 
+/* stored transform, defined in fft_small.h */
+struct mul_precomp_struct;
+
 typedef struct
 {
     nn_ptr ev_s;            /* evaluate: scaling constants */
@@ -60,6 +63,10 @@ typedef struct
     nn_ptr ext_s1f;         /* extrapolate: forward scaling constant  */
     nn_ptr ext_s1b;         /* extrapolate: backward scaling constant */
     nn_ptr ext_s2, ext_s3;  /* extrapolate: shared scaling constants */
+    struct mul_precomp_struct * ev_f_fft;    /* stored FFT of ev_f, or NULL */
+    struct mul_precomp_struct * int_f_fft;   /* stored FFT of int_f, or NULL */
+    struct mul_precomp_struct * ext_ff_fft;  /* stored FFT of ext_ff, or NULL */
+    struct mul_precomp_struct * ext_fb_fft;  /* stored FFT of ext_fb, or NULL */
     nmod_t mod;             /* modulus */
     slong len;              /* number of points */
     ulong function;         /* choice of precomputations */
@@ -365,6 +372,7 @@ void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t p
 
 int _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod);
 int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod);
+int _nmod_poly_mulmid_want_fft_small(slong len2, slong m, nmod_t mod);
 
 void _nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod);
 void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod);
@@ -601,6 +609,9 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
                                                ulong function);
 void nmod_geometric_progression_init(nmod_geometric_progression_t G,
                                      ulong r, slong len, nmod_t mod);
+
+void _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
+                                     slong ev_len, slong int_len, slong ext_len);
 
 void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
 

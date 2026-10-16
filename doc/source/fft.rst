@@ -564,6 +564,24 @@ Convolution
     limbs of space and ``tt`` must have ``2*(limbs + 1)`` of free 
     space.
 
+.. function:: slong fft_convolution_choose_mid(slong * trunc, slong len_out, slong nlo, slong nhi)
+
+    Plans a convolution of which only the output coefficients at indices
+    `[nlo, nhi)` of a product of length ``len_out`` are needed, where
+    `0 \le nlo < nhi \le len\_out`. Returns the ``depth`` and sets
+    ``trunc`` for :func:`fft_convolution`. This is either the truncated
+    transform of depth `\lceil \log_2 len\_out \rceil - 2` with
+    ``trunc = len_out``, or a full transform of length
+    `M = 4 \cdot 2^{depth}`, the smallest power of two with
+    `M \ge nhi` and `M \ge len\_out - nlo`. The full transform computes
+    the product modulo `x^M - 1`, in which coefficient `k` receives
+    `c_k + c_{k+M}`; the conditions ensure that all wrapped terms land
+    below `nlo`. The cyclic option is chosen when `M` is smaller than
+    the number of points the truncated transform processes (``trunc``
+    rounded up as in :func:`fft_convolution`). The bit bound used to
+    select the coefficient ring only needs to hold for the coefficients
+    in the window. The depth is at least 0.
+
 FFT Precaching
 -------------------------------------------------------------------------------
 

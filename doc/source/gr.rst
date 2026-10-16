@@ -1124,8 +1124,27 @@ middle products) run substantially faster in such a representation.
     and the ring then takes a free slab for the staging rather than
     reserving anything. The flag declares a footprint; it is not a correctness
     contract, and if no slab happens to be free the ring falls back to
-    an allocation cached for the context's lifetime. One conversion may
-    be in flight at a time.
+    a plain allocation for that conversion.
+
+    A context may be shared by any number of threads, each working on
+    its own elements: the element storage and the staging are managed
+    by an operand pool (shared with the fft_small complex products, see
+    :func:`fft_small_op_pool_fit`) whose bookkeeping is locked, and
+    every conversion takes independent scratch. A context holding a
+    reservation pins the creating thread's scratch buffer and must be
+    cleared on that thread, after all its elements.
+
+.. function:: int gr_ctx_init_transformed_mpn_window(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy, slong lo, slong hi)
+
+    As :func:`gr_ctx_init_transformed_mpn`, for products of which only
+    the limbs `[lo, hi)` are wanted. The plan is the window plan of
+    :func:`fft_small_plan_init_mpn_window`: when the window allows it,
+    the transforms are cyclic of a length shorter than the products, and
+    a product whose slots then alias converts only through
+    :func:`gr_transformed_mpn_get_window` with a window inside
+    `[lo, hi)`; the other conversions of such a product return
+    ``GR_UNABLE``. Elements that do not alias (operands, and products
+    short enough) convert as usual.
 
 .. function:: int gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live)
 
@@ -1169,6 +1188,28 @@ middle products) run substantially faster in such a representation.
     propagated, so the error is the truncation itself (one-sided, below
     1 ulp) plus the wholly dropped slots' total mass, under half an ulp
     either way.
+
+.. function:: int gr_transformed_mpn_get_low(nn_ptr z, slong zn, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_low_destructive(nn_ptr z, slong zn, gr_ptr x, gr_ctx_t ctx)
+
+    Residue conversion out: *z* receives the value modulo
+    `2^{\mathtt{zn} \cdot \mathtt{FLINT\_BITS}}` as a two's-complement
+    residue of exactly *zn* limbs, with no sign, whatever the size of
+    the value. Only the CRT slots starting below limb *zn* are
+    reconstructed, so this costs a fraction of a full conversion when
+    *zn* is a fraction of the value's length.
+
+.. function:: int gr_transformed_mpn_get_window(nn_ptr z, slong zn, slong lo, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_window_destructive(nn_ptr z, slong zn, slong lo, gr_ptr x, gr_ctx_t ctx)
+
+    Window conversion out, for signed contexts: *z* receives the limbs
+    `[lo, lo + zn)` of the value as a two's-complement window, within
+    one unit of `\lfloor x / B^{lo} \rfloor` (two when the element
+    carries a small side value, which is folded exactly only for
+    `lo = 0`) and exact for `lo = 0`; the value need not fit. The sign
+    is applied in transform space, so the window is that of the signed
+    value. This is the conversion of windowed contexts with cyclic
+    plans. Returns ``GR_UNABLE`` for unsigned contexts.
 
 .. function:: int gr_transformed_mpn_get_fmpz_destructive(fmpz_t f, slong lo_limbs, gr_ptr x, gr_ctx_t ctx)
 

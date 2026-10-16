@@ -82,6 +82,7 @@ typedef struct
     slong nlimbs;
     int flags;
     int rnd;    /* Allow rounding modes? Currently unused. */
+    slong func_prec;    /* bit precision targeted by transcendental functions */
 }
 _nfloat_ctx_struct;
 
@@ -93,6 +94,7 @@ typedef const void * nfloat_srcptr;
 #define NFLOAT_CTX_PREC(ctx) ((NFLOAT_CTX(ctx)->nlimbs) * FLINT_BITS)
 #define NFLOAT_CTX_FLAGS(ctx) (NFLOAT_CTX(ctx)->flags)
 #define NFLOAT_CTX_RND(ctx) (NFLOAT_CTX(ctx)->rnd)
+#define NFLOAT_CTX_FUNC_PREC(ctx) (NFLOAT_CTX(ctx)->func_prec)
 #define NFLOAT_CTX_DATA_NLIMBS(ctx) (NFLOAT_CTX_NLIMBS(ctx) + NFLOAT_HEADER_LIMBS)
 #define NFLOAT_CTX_HAS_INF_NAN(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)) != 0)
 #define NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_RND_FLOOR | NFLOAT_RND_CEIL)) != 0)
@@ -121,6 +123,8 @@ typedef nfloat4096_struct nfloat4096_t[1];
 
 int nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags);
 int nfloat_ctx_write(gr_stream_t out, gr_ctx_t ctx);
+int nfloat_ctx_set_func_prec(gr_ctx_t ctx, slong prec);
+slong nfloat_ctx_get_func_prec(gr_ctx_t ctx);
 
 NFLOAT_INLINE void
 nfloat_init(nfloat_ptr res, gr_ctx_t FLINT_UNUSED(ctx))
@@ -176,8 +180,8 @@ int _nfloat_overflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx);
 
 #define NFLOAT_HANDLE_OVERFLOW(res, ctx) \
     do { \
-        if (FLINT_UNLIKELY(NFLOAT_EXP(res) < NFLOAT_MIN_EXP)) \
-            return _nfloat_underflow(res, NFLOAT_SGNBIT(res), ctx); \
+        if (FLINT_UNLIKELY(NFLOAT_EXP(res) > NFLOAT_MAX_EXP)) \
+            return _nfloat_overflow(res, NFLOAT_SGNBIT(res), ctx); \
     } while (0)
 
 #define NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx) \
@@ -386,15 +390,56 @@ int nfloat_pi(nfloat_ptr res, gr_ctx_t ctx);
 int nfloat_pow(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_exp(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_expm1(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_exp2(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_log(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_log1p(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_log2(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_sin(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_cos(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_tan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sin_cos(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sin_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_cos_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sin_cos_pi(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_tan_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_sinh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_cosh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_tanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sinh_cosh(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_atan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_atan2(nfloat_ptr res, nfloat_srcptr y, nfloat_srcptr x, gr_ctx_t ctx);
+
+int nfloat_exp10(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_log10(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_cot(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sec(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_csc(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sinc(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_cot_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sec_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_csc_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sinc_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_coth(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_sech(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_csch(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asin(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acos(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asin_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acos_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_atan_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acot(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asec(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acsc(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acot_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asec_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acsc_pi(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asinh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acosh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_atanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acoth(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_asech(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_acsch(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_hypot(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_gamma(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_zeta(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 
@@ -409,6 +454,10 @@ int _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len,
 int _nfloat_vec_mul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx);
 int _nfloat_vec_addmul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx);
 int _nfloat_vec_submul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx);
+int _nfloat_vec_div(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
+int _nfloat_vec_div_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr c, gr_ctx_t ctx);
+int _nfloat_vec_div_scalar_ui(nfloat_ptr res, nfloat_srcptr x, slong len, ulong c, gr_ctx_t ctx);
+int _nfloat_vec_div_scalar_si(nfloat_ptr res, nfloat_srcptr x, slong len, slong c, gr_ctx_t ctx);
 
 int _nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
 int _nfloat_vec_dot_rev(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
@@ -516,6 +565,61 @@ int nfloat_complex_mul_2exp_si(nfloat_complex_ptr res, nfloat_complex_srcptr x, 
 int nfloat_complex_cmp(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
 int nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
 int nfloat_complex_abs(nfloat_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+
+int nfloat_complex_exp(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_expm1(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_exp_pi_i(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_exp2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_exp10(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_log(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_log1p(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_log_pi_i(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_log2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_log10(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sin(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_cos(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_tan(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_cot(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sec(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_csc(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sin_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_cos_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_tan_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_cot_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sec_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_csc_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sinc(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sinc_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sinh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_cosh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_tanh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_coth(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sech(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_csch(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asin(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acos(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_atan(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acot(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asec(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acsc(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asinh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acosh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_atanh(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acoth(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asech(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acsch(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asin_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acos_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_atan_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acot_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_asec_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_acsc_pi(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sin_cos(nfloat_complex_ptr res1, nfloat_complex_ptr res2, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sin_cos_pi(nfloat_complex_ptr res1, nfloat_complex_ptr res2, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_sinh_cosh(nfloat_complex_ptr res1, nfloat_complex_ptr res2, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_pow(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
 
 void _nfloat_complex_vec_init(nfloat_complex_ptr res, slong len, gr_ctx_t ctx);
 void _nfloat_complex_vec_clear(nfloat_complex_ptr res, slong len, gr_ctx_t ctx);

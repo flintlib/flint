@@ -1051,50 +1051,74 @@ static void _nmod_poly_mul_mod_xpnm1(
 }
 
 
-void _mul_precomp_init(
+/*
+    Stores the transform of (b, bn), reduced modulo x^N - 1, for cyclic
+    convolutions of length N = 2^depth, where depth >= 4, in which at most
+    len_bound products accumulate onto one output coefficient: N covers any
+    use, and a smaller bound, such as min(an, bn) when bn <= N and the other
+    operand has length at most an <= N, may save a prime. btrunc is the
+    truncation of the transforms the precomputation will be used with (rounded
+    up as the operand truncations). direct_len gates the direct transform
+    modulo a prime as in fft_small_plan_init_nmod (0 disables it). Returns 0 if
+    no plan is available.
+*/
+int _mul_precomp_init(
     mul_precomp_struct* M,
     const ulong * b, ulong bn, ulong btrunc,
-    ulong depth,
+    ulong depth, ulong len_bound, ulong direct_len,
     nmod_t mod,
     mpn_ctx_t R)
 {
     ulong modbits = FLINT_BITS - mod.norm;
     ulong N = n_pow2(depth);
-    int success;
 
-    btrunc = _len_trunc(btrunc);
+    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(bn > 0);
 
-    /* the transform may be used for cyclic convolutions, which accumulate
-       up to N products onto one output coefficient */
-    success = fft_small_plan_init_nmod_cyclic(M->P, R, depth, N, N,
-                                              2*modbits, mod);
-    FLINT_ASSERT(success);
-    (void) success;
+    /* the window [0, N) of a length N convolution: a cyclic plan */
+    if (!fft_small_plan_init_nmod(M->P, R, 0, N, N, N, len_bound,
+                                  2*modbits, mod, direct_len))
+        return 0;
 
     M->bn = bn;
-    M->btrunc = btrunc;
+    M->btrunc = _len_trunc(btrunc);
 
+    /* the forward transform reads b zero-padded (or folded) to this
+       truncation, which does not change the transform */
     fft_small_op_init(M->bfft, M->P);
-    fft_small_fft_nmod(M->bfft, b, bn, N, mod, M->P);
+    fft_small_fft_nmod(M->bfft, b, bn, n_min(_len_trunc(bn), N), mod, M->P);
+
+    return 1;
 }
 
 
+/*
+    Coefficients [zl, zh) of a * b, with b given by M; returns 0 if the
+    window needs a transform longer than the one of M.
+
+    M is only read: the window is fitted on a copy of the plan, which takes
+    its scratch and its primes from R, so that concurrent calls with the
+    same M are fine if each uses its own R, for instance the default context
+    of its thread. R must have the primes of the context M was made with,
+    as all default contexts do; a plan transforming directly modulo mod.n
+    keeps its own tables.
+*/
 int _nmod_poly_mul_mid_precomp(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
-    mul_precomp_struct* M,
+    const mul_precomp_struct* M,
     nmod_t mod,
-    mpn_ctx_t FLINT_UNUSED(R))
+    mpn_ctx_t R)
 {
     ulong bn = M->bn;
     ulong zn = an + bn - 1;
     ulong atrunc;
+    fft_small_plan_t P;
     fft_small_conv_arg_struct A;
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
     FLINT_ASSERT(M->btrunc <= n_pow2(M->P->depth));
-    FLINT_ASSERT(R == M->P->R);
 
     if (zl >= zh)
         return 1;
@@ -1116,15 +1140,19 @@ int _nmod_poly_mul_mid_precomp(
 
     atrunc = n_min(_len_trunc(an), n_pow2(M->P->depth));
 
-    /* note: adjusting the window in M means concurrent calls on the same M
-       race, but they already race on the scratch buffer in R */
-    if (!_fft_small_plan_fit_window(M->P, zl, zh, zn, atrunc, (ulong) 4))
+    *P = *M->P;
+    P->R = R;
+    P->crts = R->crts;
+    if (!P->use_direct_fft)
+        P->ffts = R->ffts;
+
+    if (!_fft_small_plan_fit_window(P, zl, zh, zn, atrunc, (ulong) 4))
         return 0;
 
     /* cap AFTER the window is fitted: fitting recomputes ztrunc, which
        can shrink on a reused plan, and coefficients past it cannot
        reach a linear window */
-    atrunc = n_min(atrunc, M->P->ztrunc);
+    atrunc = n_min(atrunc, P->ztrunc);
 
     A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
     A.b = NULL; A.bn = bn; A.baux = 0; A.btrunc = 0;
@@ -1135,11 +1163,11 @@ int _nmod_poly_mul_mid_precomp(
     A.min_an_bn = FLINT_MIN(an, bn);
     A.mod_fn = _mod_fn;
     A.s2_finish = NULL;
-    A.crt_fn = _nmod_crt_fn(M->P->np);
+    A.crt_fn = _nmod_crt_fn(P->np);
     A.params = &mod;
     A.tuning = &_nmod_conv_tuning_no_rethread;
 
-    _fft_small_conv(z, M->P, &A);
+    _fft_small_conv(z, P, &A);
 
     return 1;
 }
@@ -1285,11 +1313,23 @@ void _nmod_poly_divrem_precomp_init(
     _nmod_poly_reverse(B, B, Bn, Bn);
 
 
-    _mul_precomp_init(M->quo_maker, B, Bn, Bn, n_max(LG_BLK_SZ, n_clog2(2*Bn-1)), mod, R);
+    /* TODO: both precomputations keep the bound 2^depth on the number of
+       accumulated products and do not allow the direct transform modulo a
+       prime (direct_len = 0), as before _mul_precomp_init had these
+       parameters. Passing a nonzero direct_len (and a tighter bound where
+       the operand lengths allow) would let a prime modulus that fft_small
+       transforms directly use a single prime instead of two or three;
+       to be measured. */
+    ulong lgQ = n_max(LG_BLK_SZ, n_clog2(2*Bn-1));
+    int success = _mul_precomp_init(M->quo_maker, B, Bn, Bn, lgQ,
+                                     n_pow2(lgQ), 0, mod, R);
 
     ulong lgN = n_max(LG_BLK_SZ, n_clog2(bn-1));
     ulong N = n_pow2(lgN);
-    _mul_precomp_init(M->rem_maker, b, bn, N, lgN, mod, R);
+    success = success && _mul_precomp_init(M->rem_maker, b, bn, N, lgN,
+                                           N, 0, mod, R);
+    FLINT_ASSERT(success);
+    (void) success;
 
     flint_free(B);
     flint_free(t);

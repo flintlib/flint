@@ -17,14 +17,16 @@
 
 /* exp of a fraction 0 <= x < 2^-32, (res, n + 1) with a units limb.
 
-   Dispatch: hardcoded straight-line rectangular splitting on 64-bit
-   machines ("Fast multiple precision exp(x) with precomputations", van
-   der Hoeven and Johansson; "Efficient implementation of elementary
-   functions in the medium-precision range", Johansson) for
-   2^-64 <= x < 2^-32 with n <= 11 (the table is indexed by the number
-   of Taylor terms N, n = ceil(N/2); N = 21 serves n = 11 since
-   21! > 2^33 damps the half-limb overhang) and for
-   2^-128 <= x < 2^-64 with n <= 21; otherwise the tapered rectangular
+   Dispatch: hardcoded rectangular splitting on 64-bit machines ("Fast
+   multiple precision exp(x) with precomputations", van der Hoeven and
+   Johansson; "Efficient implementation of elementary functions in the
+   medium-precision range", Johansson) for 2^-64 <= x < 2^-32 with
+   n <= 11 (indexed by the number of Taylor terms N, n = ceil(N/2);
+   N = 21 serves n = 11 since 21! > 2^33 damps the half-limb overhang)
+   and for 2^-128 <= x < 2^-64 with n <= 21: straight-line routines
+   (exp_rs_hard.inc) at the sizes on the hot paths of the elementary
+   functions, the generic engine of series_hard.c (same calls,
+   identical results) at the others.  Otherwise the tapered rectangular
    splitting of series_rs.c at the argument's actual leading zero bits
    (1.3 to 1.8 times faster than the untapered generic routine it
    replaced from 14 limbs up).
@@ -54,14 +56,22 @@ _mp_real_exp_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n)
         /* 2^-64 <= x < 2^-32 */
         if (n <= 11)
         {
-            _mp_real_exp_rs32_tab[FLINT_MIN(2 * n, 21)](res, x);
+            slong N = FLINT_MIN(2 * n, 21);
+
+            if (_mp_real_exp_rs32_tab[N] != NULL)
+                _mp_real_exp_rs32_tab[N](res, x);
+            else
+                _mp_real_exp_series_hard(res, x, N, 32);
             return;
         }
     }
     else if (n <= 21 && !(n >= 2 && x[n - 2] == 0))
     {
         /* 2^-128 <= x < 2^-64 */
-        _mp_real_exp_rs_tab[n](res, x);
+        if (_mp_real_exp_rs_tab[n] != NULL)
+            _mp_real_exp_rs_tab[n](res, x);
+        else
+            _mp_real_exp_series_hard(res, x, n, 64);
         return;
     }
 #endif

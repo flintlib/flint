@@ -1567,7 +1567,8 @@ flint_mpn_divexact(mp_ptr q, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t b
 typedef struct
 {
     mp_ptr b;           /* odd part b' of the divisor, bn limbs */
-    mp_ptr binv;        /* b'^(-1) mod B^(bn+1) */
+    mp_ptr binv;        /* b'^(-1) mod B^binvn */
+    mp_size_t binvn;    /* limbs of binv: bn + 1, or fewer with init_prec */
     mp_size_t bn;
     mp_size_t bn_orig;  /* limbs of the original divisor */
     mp_size_t k;        /* zero low limbs stripped */
@@ -1578,6 +1579,7 @@ flint_mpn_divexact_preinv_struct;
 typedef flint_mpn_divexact_preinv_struct flint_mpn_divexact_preinv_t[1];
 
 void flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn);
+void flint_mpn_divexact_preinv_init_prec(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn, mp_size_t qn);
 void flint_mpn_divexact_preinv_clear(flint_mpn_divexact_preinv_t pre);
 void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_divexact_preinv_t pre);
 
@@ -1840,6 +1842,15 @@ t##quotient_found:                                                          \
 FLINT_DLL extern slong flint_mpn_mul_complex_fft_cutoff;
 FLINT_DLL extern slong flint_mpn_sqr_complex_fft_cutoff;
 
+/* Size in limbs (of the shorter operand) from which the full, low and
+   windowed products of a real or imaginary operand -- some part zero --
+   use the transformed path, which transforms only the nonzero parts:
+   an operand with a single nonzero part is transformed once for both
+   output parts. The first serves the full and low products, the
+   second the windows with lo > 0. */
+FLINT_DLL extern slong flint_mpn_mul_complex_sparse_fft_cutoff;
+FLINT_DLL extern slong flint_mpn_mulmid_complex_sparse_fft_cutoff;
+
 /* Complex multiplication with separate sign bits (0 = nonnegative):
    zr + i zi = (ar + i ai) (br + i bi), outputs being exact magnitudes
    and signs.
@@ -1911,6 +1922,89 @@ int flint_mpn_sqr_complex_fft_small(nn_ptr zr, slong * zr_len,
     nn_ptr zi, slong * zi_len,
     nn_srcptr ar, mp_size_t arn, int ar_sgn,
     nn_srcptr ai, mp_size_t ain, int ai_sgn);
+/* Low products: zr and zi receive the real and imaginary parts of the
+   product mod B^n, as n-limb two's-complement residues (no sign). The
+   inputs are as for the full products (magnitudes of any lengths >= 1
+   limb with sign bits); only their low n limbs are read. zr and zi must
+   not overlap each other or the inputs. */
+FLINT_DLL extern slong flint_mpn_mullow_complex_fft_cutoff;
+FLINT_DLL extern slong flint_mpn_sqrlow_complex_fft_cutoff;
+
+void flint_mpn_mullow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqrlow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_mullow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_mullow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+int flint_mpn_mullow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqrlow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_sqrlow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+int flint_mpn_sqrlow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+
+/* Windowed products: limbs [lo, hi) of the real and imaginary parts as
+   two's-complement windows (hi - lo limbs each), equal to
+   floor(x / B^lo) + e mod B^(hi - lo) for each exact part x with e = 0
+   for lo = 0, |e| <= 1 on the transformed path and
+   |e| < 4 (m + 1) 2^FLINT_BITS otherwise, m = min(max(arn, ain),
+   max(brn, bin)). Inputs as for the low products. */
+FLINT_DLL extern slong flint_mpn_mulmid_complex_fft_cutoff;
+FLINT_DLL extern slong flint_mpn_sqrmid_complex_fft_cutoff;
+
+void flint_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_mulmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_mulmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+int flint_mpn_mulmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqrmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_sqrmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+int flint_mpn_sqrmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+
 void flint_mpn_mulhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi,
     int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn,
     nn_srcptr br, int br_sgn, nn_srcptr bi, int bi_sgn, mp_size_t n);

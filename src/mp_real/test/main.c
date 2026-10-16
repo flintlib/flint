@@ -27,13 +27,24 @@
 #include "t-machin_caches.c"
 #include "t-sin_cos_bitwise_rs.c"
 #include "t-sin_cos_bits.c"
+#include "t-sin_cos_pi.c"
+#include "t-tan_bits.c"
+#include "t-trig_pi.c"
+#include "t-tiny_arg.c"
+#include "t-small_kernels.c"
 #include "t-exp_log_atan_bits.c"
 #include "t-rel_tab.c"
 #include "t-sin_cos_diophantine.c"
 #include "t-sin_cos_reduced.c"
 #include "t-sin_cos_sum_bs.c"
+#include "t-dense_kernels.c"
+#include "t-dfloat_conv.c"
 #include "t-div_newton.c"
+#include "t-elem_composed.c"
 #include "t-sqrt_newton.c"
+#include "t-set_fmpz_trunc.c"
+#include "t-unique_integer.c"
+#include "t-partitions_hrr.c"
 #include "t-tab_bsplit.c"
 #include "t-arith.c"
 #include "t-api.c"
@@ -44,11 +55,15 @@
 #include "t-hypgeom_series.c"
 #include "t-newton.c"
 #include "t-exp_diophantine.c"
+#include "t-exp_huge.c"
 #include "t-exp_notab.c"
 #include "t-exp_reduced.c"
 #include "t-exp_sum_bs.c"
 #include "t-tab_floor.c"
 #include "t-tab_static.c"
+#include "t-shared_tables.c"
+#include "t-static_regime.c"
+#include "t-dense_rt_tables.c"
 #include "t-tan_bitwise_rs.c"
 #include "t-series_rs.c"
 #include "t-series_tapered.c"
@@ -74,15 +89,26 @@ test_struct tests[] =
     TEST_FUNCTION(mp_real_machin_caches),
     TEST_FUNCTION(mp_real_sin_cos_bitwise_rs),
     TEST_FUNCTION(mp_real_sin_cos_bits),
+    TEST_FUNCTION(mp_real_sin_cos_pi),
+    TEST_FUNCTION(mp_real_tan_bits),
+    TEST_FUNCTION(mp_real_trig_pi),
+    TEST_FUNCTION(mp_real_tiny_arg),
+    TEST_FUNCTION(mp_real_small_kernels),
     TEST_FUNCTION(mp_real_exp_log_atan_bits),
     TEST_FUNCTION(mp_real_rel_tab),
     TEST_FUNCTION(mp_real_sin_cos_diophantine),
     TEST_FUNCTION(mp_real_sin_cos_reduced),
     TEST_FUNCTION(mp_real_sin_cos_sum_bs),
+    TEST_FUNCTION(mp_real_dense_kernels),
+    TEST_FUNCTION(mp_real_dfloat_conv),
     TEST_FUNCTION(mp_real_div_newton),
+    TEST_FUNCTION(mp_real_elem_composed),
     TEST_FUNCTION(mp_real_sqrt_newton),
     TEST_FUNCTION(mp_real_tab_bsplit),
     TEST_FUNCTION(mp_real_arith),
+    TEST_FUNCTION(mp_real_set_fmpz_trunc),
+    TEST_FUNCTION(mp_real_unique_integer),
+    TEST_FUNCTION(mp_real_partitions_hrr),
     TEST_FUNCTION(mp_real_api),
     TEST_FUNCTION(mp_real_submul_bounded),
     TEST_FUNCTION(mp_real_mul_complex),
@@ -91,11 +117,15 @@ test_struct tests[] =
     TEST_FUNCTION(mp_real_hypgeom_series),
     TEST_FUNCTION(mp_real_newton),
     TEST_FUNCTION(mp_real_exp_diophantine),
+    TEST_FUNCTION(mp_real_exp_huge),
     TEST_FUNCTION(mp_real_exp_notab),
     TEST_FUNCTION(mp_real_exp_reduced),
     TEST_FUNCTION(mp_real_exp_sum_bs),
     TEST_FUNCTION(mp_real_tab_floor),
     TEST_FUNCTION(mp_real_tab_static),
+    TEST_FUNCTION(mp_real_shared_tables),
+    TEST_FUNCTION(mp_real_static_regime),
+    TEST_FUNCTION(mp_real_dense_rt_tables),
     TEST_FUNCTION(mp_real_tan_bitwise_rs),
     TEST_FUNCTION(mp_real_series_rs),
     TEST_FUNCTION(mp_real_series_tapered),

@@ -37,6 +37,7 @@
 #include "t-scalar_addmul_si.c"
 #include "t-scalar_addmul_ui.c"
 #include "t-scalar_divexact_fmpz.c"
+#include "t-scalar_divexact_fmpz_strided.c"
 #include "t-scalar_divexact_si.c"
 #include "t-scalar_divexact_ui.c"
 #include "t-scalar_fdiv_q_fmpz.c"
@@ -84,6 +85,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_scalar_addmul_si),
     TEST_FUNCTION(fmpz_vec_scalar_addmul_ui),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_fmpz),
+    TEST_FUNCTION(fmpz_vec_scalar_divexact_fmpz_strided),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_si),
     TEST_FUNCTION(fmpz_vec_scalar_divexact_ui),
     TEST_FUNCTION(fmpz_vec_scalar_fdiv_q_fmpz),

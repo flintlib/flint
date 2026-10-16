@@ -62,8 +62,24 @@ static void remove_found_factors(fmpz_factor_t factor, fmpz_t n, fmpz_t f)
     fmpz_factor_clear(fac);
 }
 
+/*
+   The smoothness bound which fmpz_factor_no_trial uses for a cofactor of
+   the given number of bits before switching to the quadratic sieve.
+*/
+static slong
+_fmpz_factor_qsieve_bound(slong bits)
+{
+    return FLINT_MAX(bits/3 - 17, 2);
+}
+
 int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 		                                        slong bits, int proved)
+{
+    return _fmpz_factor_smooth(factor, n, bits, proved, 0);
+}
+
+int _fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
+		                             slong bits, int proved, int adaptive)
 {
     ulong exp;
     ulong p;
@@ -187,6 +203,10 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         flint_mpn_copyi(data->_mp_d, xd, xsize);
         data->_mp_size = xsize;
 
+        /* trial division may have made the number much smaller */
+        if (adaptive)
+            bits = FLINT_MIN(bits, _fmpz_factor_qsieve_bound(fmpz_bits(n2)));
+
         if (proved != -1 && _is_prime(n2, proved))
         {
             _fmpz_factor_append(factor, n2, 1);
@@ -206,7 +226,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
                 fmpz_factor_init(fac);
 
-                ret = fmpz_factor_smooth(fac, root, bits, proved);
+                ret = _fmpz_factor_smooth(fac, root, bits, proved, adaptive);
                 fmpz_set_ui(n2, 1);
 
                 _fmpz_factor_concat(factor, fac, exp);
@@ -262,6 +282,18 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                             ret = 1;
 
                             break;
+                        }
+
+                        /*
+                           In adaptive mode, only look for factors as long as
+                           that is expected to be cheaper than finishing the
+                           remaining cofactor with the quadratic sieve.
+                        */
+                        if (adaptive)
+                        {
+                            bits = FLINT_MIN(bits,
+                                     _fmpz_factor_qsieve_bound(fmpz_bits(n2)));
+                            bits2 = (bits + 1)/2;
                         }
 
                         i -= istride; /* redo with the same parameters if factor found */

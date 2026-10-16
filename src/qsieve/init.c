@@ -28,23 +28,27 @@ void qsieve_init_with_tune(qs_t qs_inf, const fmpz_t n, ulong ks_primes,
     qs_inf->small_primes = small_primes; /* number of primes to not sieve with */
     qs_inf->sieve_size   = sieve_size;   /* size of sieve to use */
 
-    /* split sieve_bits into threshold and fill (sieve values are biased so
-       that the threshold is at least 64) */
-    if (sieve_bits >= 64)
+    /*
+       split sieve_bits into threshold and fill: sieve values are biased so
+       that an entry is over the threshold exactly when its top bit is set,
+       which lets qsieve_evaluate_sieve skip a word at a time
+    */
+    if (sieve_bits >= 127)
     {
         qs_inf->sieve_bits = sieve_bits;
         qs_inf->sieve_fill = 0;
     }
     else
     {
-        qs_inf->sieve_bits = 64;
-        qs_inf->sieve_fill = 64 - sieve_bits;
+        qs_inf->sieve_bits = 127;
+        qs_inf->sieve_fill = 127 - sieve_bits;
     }
 
     qs_inf->num_primes  = 0;
     qs_inf->num_relations = 0;
     qs_inf->full_relation = 0;
     qs_inf->num_cycles = 0;
+    qs_inf->lp_bound = 0;
     qs_inf->columns = 0;
     qs_inf->vertices = 0;
     qs_inf->components = 0;
@@ -57,6 +61,19 @@ void qsieve_init_with_tune(qs_t qs_inf, const fmpz_t n, ulong ks_primes,
 
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
+
+    qs_inf->poly = NULL;
+
+    qs_inf->A_used = NULL;
+    qs_inf->A_used_num = 0;
+    qs_inf->A_used_alloc = 0;
+    qs_inf->A_rand = UWORD(0x9e3779b97f4a7c15);
+    qs_inf->A_window = 0;
+    qs_inf->use_buckets = 0;
+    qs_inf->num_slices = 0;
+    qs_inf->slice_start = NULL;
+    qs_inf->slice_size = NULL;
+    qs_inf->fb_p32 = qs_inf->fb_inv32 = qs_inf->fb_lim32 = NULL;
 
     qs_inf->s = 0;
     qs_inf->low = 0;

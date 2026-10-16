@@ -1304,7 +1304,11 @@ DF(_sqrt_ool)(DF(t) res, DF(srcptr) x)
     }
     else
     {
-        DF(_sqrt_kernel)(res->d, x->d);
+        /* the kernel writes the output before it has read all of the
+           input: a copy for res == x */
+        double xc[N];
+        memcpy(xc, x->d, sizeof(xc));
+        DF(_sqrt_kernel)(res->d, xc);
         DF(_fix_nonfinite)(res->d);
     }
 }
@@ -1396,7 +1400,11 @@ DF(_rsqrt_ool)(DF(t) res, DF(srcptr) x)
     }
     else
     {
-        DF(_rsqrt_kernel)(res->d, x->d);
+        /* the kernel writes the output before it has read all of the
+           input: a copy for res == x */
+        double xc[N];
+        memcpy(xc, x->d, sizeof(xc));
+        DF(_rsqrt_kernel)(res->d, xc);
         DF(_fix_nonfinite)(res->d);
     }
 }
@@ -3056,6 +3064,7 @@ void DFV(vec_div)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4], ys[4];
         vec4d mx[N], my[N], mq[N], bad, chk;
         int mask, l;
         DF(_vload4)(mx, x[i].d, N);
@@ -3066,12 +3075,19 @@ void DFV(vec_div)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
         DF(_v_div_level)(mq, mx, my, N, N);
         chk = DF(_vabs_sum)(mq);
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)));
-        DF(_vstore4)(res[i].d, mq, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+            memcpy(ys, y + i, 4 * sizeof(ys[0]));
+        }
+        DF(_vstore4)(res[i].d, mq, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(_div_inline)(res + i + l, x + i + l, y + i + l);
+                    DF(_div_inline)(res + i + l, xs + l, ys + l);
     }
 #endif
     for (; i < len; i++)
@@ -3085,6 +3101,7 @@ DBV(_vec_div_m)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, slong len, int mode)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4], ys[4];
         vec4d mx[N], my[N], mq[N], P[N], D[N], rx, ry, bad, ylo, E, aq, rad, err, ax, ay, rr;
         int mask, l, exact, k;
         DF(_vload4)(mx, x[i].d, N + 1);
@@ -3134,12 +3151,19 @@ DBV(_vec_div_m)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, slong len, int mode)
            not bump) and nonfinite results: scalar */
         bad = vec4d_bit_or(bad, DB(_v_rad_underflow)(rad, vec4d_bit_or(vec4d_bit_or(V_NONZERO(E), V_NONZERO(rx)), V_NONZERO(ry))));
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(vec4d_add(aq, rad), vec4d_set_d(DBL_MAX)));
-        DB(_vstore4)(res + i, mq, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+            memcpy(ys, y + i, 4 * sizeof(ys[0]));
+        }
+        DB(_vstore4)(res + i, mq, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    GR_IGNORE(DB(_div_ool)(res + i + l, x + i + l, y + i + l, mode));
+                    GR_IGNORE(DB(_div_ool)(res + i + l, xs + l, ys + l, mode));
     }
 #endif
     for (; i < len; i++)
@@ -3303,6 +3327,7 @@ void DFV(vec_sqrt)(DF(ptr) res, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d mx[N], ms[N], bad, chk;
         int mask, l;
         DF(_vload4)(mx, x[i].d, N);
@@ -3312,12 +3337,18 @@ void DFV(vec_sqrt)(DF(ptr) res, DF(srcptr) x, slong len)
         bad = vec4d_bit_or(bad, DF(_v_sqrt_kernel)(ms, mx));
         chk = DF(_vabs_sum)(ms);
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)));
-        DF(_vstore4)(res[i].d, ms, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, ms, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(_sqrt_inline)(res + i + l, x + i + l);
+                    DF(_sqrt_inline)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -3330,6 +3361,7 @@ void DFV(vec_rsqrt)(DF(ptr) res, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d mx[N], mr[N], bad, chk;
         int mask, l;
         DF(_vload4)(mx, x[i].d, N);
@@ -3340,12 +3372,18 @@ void DFV(vec_rsqrt)(DF(ptr) res, DF(srcptr) x, slong len)
             bad = vec4d_bit_or(bad, DF(_v_canonicalise)(mr));
         chk = DF(_vabs_sum)(mr);
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)));
-        DF(_vstore4)(res[i].d, mr, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, mr, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(_rsqrt_inline)(res + i + l, x + i + l);
+                    DF(_rsqrt_inline)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -3364,6 +3402,7 @@ DBV(_vec_sqrt_m)(DB(ptr) res, DB(srcptr) x, slong len, int mode)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d mx[N], ms[N], P[N], D[N], rx, bad, xlo, slo, E, rad, err, rr, ubad;
         int mask, l, exact, k;
         DF(_vload4)(mx, x[i].d, N + 1);
@@ -3407,12 +3446,18 @@ DBV(_vec_sqrt_m)(DB(ptr) res, DB(srcptr) x, slong len, int mode)
         ubad = DB(_v_rad_underflow)(rad, vec4d_bit_or(V_NONZERO(E), V_NONZERO(rx)));
         bad = vec4d_bit_or(bad, ubad);
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(vec4d_add(DF(_vabs_sum)(ms), rad), vec4d_set_d(DBL_MAX)));
-        DB(_vstore4)(res + i, ms, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, ms, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    status |= DB(_sqrt_m)(res + i + l, x + i + l, mode);
+                    status |= DB(_sqrt_m)(res + i + l, xs + l, mode);
     }
 #endif
     for (; i < len; i++)
@@ -3435,6 +3480,7 @@ DBV(_vec_rsqrt_m)(DB(ptr) res, DB(srcptr) x, slong len, int mode)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d mx[N], mr[N], P[N], Q[N], D[N], one[N], rx, bad, xlo, xhi, rhi, E, rad, perr, qerr, derr, rr, ubad, zero = vec4d_zero();
         int mask, l, exact, k;
         DF(_vload4)(mx, x[i].d, N + 1);
@@ -3489,12 +3535,18 @@ DBV(_vec_rsqrt_m)(DB(ptr) res, DB(srcptr) x, slong len, int mode)
         ubad = DB(_v_rad_underflow)(rad, vec4d_bit_or(V_NONZERO(E), V_NONZERO(rx)));
         bad = vec4d_bit_or(bad, ubad);
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(vec4d_add(DF(_vabs_sum)(mr), rad), vec4d_set_d(DBL_MAX)));
-        DB(_vstore4)(res + i, mr, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, mr, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    status |= DB(_rsqrt_ool)(res + i + l, x + i + l, mode);
+                    status |= DB(_rsqrt_ool)(res + i + l, xs + l, mode);
     }
 #endif
     for (; i < len; i++)
@@ -4747,17 +4799,24 @@ void DFV(vec_sin)(DF(ptr) res, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
         bad = DF(_v_trig_bad)(xc);
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
-        DF(_vstore4)(res[i].d, sn, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, sn, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(sin)(res + i + l, x + i + l);
+                    DF(sin)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -4770,17 +4829,24 @@ void DFV(vec_cos)(DF(ptr) res, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
         bad = DF(_v_trig_bad)(xc);
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
-        DF(_vstore4)(res[i].d, cs, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, cs, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(cos)(res + i + l, x + i + l);
+                    DF(cos)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -4793,6 +4859,7 @@ void DBV(vec_sin)(DB(ptr) res, DB(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad, rx, am, rad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -4802,12 +4869,18 @@ void DBV(vec_sin)(DB(ptr) res, DB(srcptr) x, slong len)
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
         am = DF(_vabs_sum)(xc);
         DB(_v_trig_finish)(sn, &rad, am, rx, 1);
-        DB(_vstore4)(res + i, sn, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, sn, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DB(sin)(res + i + l, x + i + l);
+                    DB(sin)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -4821,18 +4894,25 @@ void DFV(vec_sin_cos)(DF(ptr) sres, DF(ptr) cres, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
         bad = DF(_v_trig_bad)(xc);
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
+        mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
         DF(_vstore4)(sres[i].d, sn, N);
         DF(_vstore4)(cres[i].d, cs, N);
-        mask = vec4d_movemask(bad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(sin_cos)(sres + i + l, cres + i + l, x + i + l);
+                    DF(sin_cos)(sres + i + l, cres + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -4845,6 +4925,7 @@ void DBV(vec_sin_cos)(DB(ptr) sres, DB(ptr) cres, DB(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad, rx, am, rad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -4854,14 +4935,20 @@ void DBV(vec_sin_cos)(DB(ptr) sres, DB(ptr) cres, DB(srcptr) x, slong len)
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
         am = DF(_vabs_sum)(xc);
         DB(_v_trig_finish)(sn, &rad, am, rx, 1);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
+        mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
         DB(_vstore4)(sres + i, sn, rad);
         DB(_v_trig_finish)(cs, &rad, am, rx, 0);
         DB(_vstore4)(cres + i, cs, rad);
-        mask = vec4d_movemask(bad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DB(sin_cos)(sres + i + l, cres + i + l, x + i + l);
+                    DB(sin_cos)(sres + i + l, cres + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -4874,6 +4961,7 @@ void DBV(vec_cos)(DB(ptr) res, DB(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], sn[N], cs[N], bad, rx, am, rad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -4883,12 +4971,18 @@ void DBV(vec_cos)(DB(ptr) res, DB(srcptr) x, slong len)
         bad = vec4d_bit_or(bad, DF(_v_trig_core)(sn, cs, xc));
         am = DF(_vabs_sum)(xc);
         DB(_v_trig_finish)(cs, &rad, am, rx, 0);
-        DB(_vstore4)(res + i, cs, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, cs, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DB(cos)(res + i + l, x + i + l);
+                    DB(cos)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -5866,17 +5960,24 @@ void DFV(vec_log)(DF(ptr) res, DF(srcptr) x, slong len)
 #if defined(DFLOAT_HAVE_SIMD) && N >= 2
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], y[N], bad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
         bad = DF(_v_log_bad)(xc);
         bad = vec4d_bit_or(bad, DF(_v_log_core)(y, xc));
-        DF(_vstore4)(res[i].d, y, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, y, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(log)(res + i + l, x + i + l);
+                    DF(log)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -5889,17 +5990,24 @@ void DFV(vec_atan)(DF(ptr) res, DF(srcptr) x, slong len)
 #if defined(DFLOAT_HAVE_SIMD) && N >= 2
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], y[N], bad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
         bad = DF(_v_atan_bad)(xc);
         bad = vec4d_bit_or(bad, DF(_v_atan_core)(y, xc));
-        DF(_vstore4)(res[i].d, y, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, y, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(atan)(res + i + l, x + i + l);
+                    DF(atan)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -5913,6 +6021,7 @@ int DBV(vec_log)(DB(ptr) res, DB(srcptr) x, slong len)
 #if defined(DFLOAT_HAVE_SIMD) && N >= 2
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], y[N], bad, rx, mlow, rad, ay;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -5931,12 +6040,18 @@ int DBV(vec_log)(DB(ptr) res, DB(srcptr) x, slong len)
         rad = vec4d_blendv(rad, vec4d_add(rad, vec4d_set_d(0x1p-1069)),
             vec4d_cmp_lt(rad, vec4d_set_d(DFLOAT_RAD_UNDERFLOW_THRESHOLD)));
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(rad, vec4d_set_d(DBL_MAX)));
-        DB(_vstore4)(res + i, y, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, y, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    status |= DB(log)(res + i + l, x + i + l);
+                    status |= DB(log)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -5950,6 +6065,7 @@ void DBV(vec_atan)(DB(ptr) res, DB(srcptr) x, slong len)
 #if defined(DFLOAT_HAVE_SIMD) && N >= 2
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], y[N], bad, rx, rad, ay;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -5962,12 +6078,18 @@ void DBV(vec_atan)(DB(ptr) res, DB(srcptr) x, slong len)
         rad = vec4d_mul(rad, vec4d_set_d(DFLOAT_RAD_SLACK));
         rad = vec4d_blendv(rad, vec4d_add(rad, vec4d_set_d(0x1p-1069)),
             vec4d_cmp_lt(rad, vec4d_set_d(DFLOAT_RAD_UNDERFLOW_THRESHOLD)));
-        DB(_vstore4)(res + i, y, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, y, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DB(atan)(res + i + l, x + i + l);
+                    DB(atan)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -6628,6 +6750,7 @@ void DFV(vec_exp)(DF(ptr) res, DF(srcptr) x, slong len)
 #ifdef DFLOAT_HAVE_SIMD
     for (; i + 4 <= len; i += 4)
     {
+        DF(struct) xs[4];
         vec4d xc[N], y[N], bad, x0;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N);
@@ -6636,12 +6759,18 @@ void DFV(vec_exp)(DF(ptr) res, DF(srcptr) x, slong len)
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(x0, vec4d_set_d(709.9)));
         bad = vec4d_bit_or(bad, vec4d_cmp_nge(x0, vec4d_set_d(-746.0)));
         bad = vec4d_bit_or(bad, DF(_v_exp_core)(y, xc));
-        DF(_vstore4)(res[i].d, y, N);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DF(_vstore4)(res[i].d, y, N);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DF(exp)(res + i + l, x + i + l);
+                    DF(exp)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)
@@ -6655,6 +6784,7 @@ void DBV(vec_exp)(DB(ptr) res, DB(srcptr) x, slong len)
     const double eps = DFLOAT_EXP_EPS(N);
     for (; i + 4 <= len; i += 4)
     {
+        DB(struct) xs[4];
         vec4d xc[N], y[N], bad, x0, rx, E, ay, rad;
         int mask, l;
         DF(_vload4)(xc, x[i].d, N + 1);
@@ -6676,12 +6806,18 @@ void DBV(vec_exp)(DB(ptr) res, DB(srcptr) x, slong len)
         rad = vec4d_blendv(rad, vec4d_add(rad, vec4d_set_d(0x1p-1069)),
             vec4d_cmp_lt(rad, vec4d_set_d(DFLOAT_RAD_UNDERFLOW_THRESHOLD)));
         bad = vec4d_bit_or(bad, vec4d_cmp_nle(vec4d_add(ay, rad), vec4d_set_d(DBL_MAX)));
-        DB(_vstore4)(res + i, y, rad);
+        /* the inputs of the lanes redone in scalar, saved before the
+           store (the output may alias them) */
         mask = vec4d_movemask(bad);
+        if (FLINT_UNLIKELY(mask))
+        {
+            memcpy(xs, x + i, 4 * sizeof(xs[0]));
+        }
+        DB(_vstore4)(res + i, y, rad);
         if (FLINT_UNLIKELY(mask))
             for (l = 0; l < 4; l++)
                 if (mask & (1 << l))
-                    DB(exp)(res + i + l, x + i + l);
+                    DB(exp)(res + i + l, xs + l);
     }
 #endif
     for (; i < len; i++)

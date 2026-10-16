@@ -321,6 +321,24 @@ Scalar multiplication and division
     division is assumed to be exact for every entry in ``vec2``
     (this is not checked).
 
+    For a multi-limb `x` and at least two entries as large as `x`, a
+    2-adic inverse of `x` is precomputed once, only to the precision
+    of the largest quotient, and shared by all entries.
+
+.. function:: void _fmpz_vec_scalar_divexact_fmpz_strided(fmpz * B, slong Bstride, const fmpz * A, slong Astride, slong r, slong c, const fmpz_t x)
+
+    Sets the `r \times c` array ``B`` to ``A`` divided by `x`, where row
+    `i` of ``B`` (respectively ``A``) consists of the `c` entries starting
+    at ``B + i * Bstride`` (respectively ``A + i * Astride``), and the
+    division is assumed to be exact for every entry of ``A``
+    (this is not checked). Aliasing is allowed if ``B = A`` and
+    ``Bstride = Astride``.
+
+    This is equivalent to calling :func:`_fmpz_vec_scalar_divexact_fmpz`
+    on each row, but for a multi-limb `x` a single inverse (to the
+    precision of the largest quotient in the whole array) is shared by all
+    rows. Used by :func:`fmpz_mat_scalar_divexact_fmpz`.
+
 .. function:: void _fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the

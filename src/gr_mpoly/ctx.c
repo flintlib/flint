@@ -128,6 +128,12 @@ gr_mpoly_ctx_is_field(gr_mpoly_ctx_t ctx)
 }
 
 static truth_t
+gr_mpoly_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_MPOLY_CCTX(ctx));
+}
+
+static truth_t
 gr_mpoly_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_rational_vector_space(GR_MPOLY_CCTX(ctx));
@@ -334,6 +340,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_mpoly_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_mpoly_ctx_is_field},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_mpoly_ctx_is_threadsafe},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,     (gr_funcptr) gr_mpoly_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_complex_vector_space},

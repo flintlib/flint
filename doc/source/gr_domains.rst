@@ -553,6 +553,19 @@ Fraction fields
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
 
+.. function:: void gr_ctx_init_fmpz_mpoly_q_factored(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    fractions in *nvars* variables over the integers (equivalently, rationals),
+    with monomial ordering *ord*, in which denominators are kept
+    fully factored. This is the same field as with
+    :func:`gr_ctx_init_fmpz_mpoly_q`, but addition and multiplication
+    avoid polynomial GCDs while division requires polynomial factorization.
+    Elements have type :type:`fmpz_mpoly_q_factored_struct`.
+    Elements can be converted to and from :func:`gr_ctx_init_fmpz_mpoly_q`
+    and :func:`gr_ctx_init_fmpz_mpoly` rings with the same number of
+    variables and monomial ordering using :func:`gr_set_other`.
+
 .. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
 
     Initializes *ctx* to a ring of sparsely represented multivariate

@@ -3,21 +3,17 @@
 **partitions.h** -- computation of the partition function
 ===============================================================================
 
-This module implements the asymptotically fast algorithm
-for evaluating the integer partition function `p(n)`
-described in [Joh2012]_.
-The idea is to evaluate a truncation of the Hardy-Ramanujan-Rademacher series
-using tight precision estimates, and symbolically factoring the
-occurring exponential sums.
-
-An implementation based on floating-point arithmetic can
-also be found in FLINT. That version relies on some numerical subroutines
-that have not been proved correct.
-
-The implementation provided here uses ball arithmetic throughout to guarantee
-a correct error bound for the numerical approximation of `p(n)`.
-Optionally, hardware double arithmetic can be used for low-precision
-terms. This gives a significant speedup for small (e.g. `n < 10^6`).
+This module computes the integer partition function `p(n)`: by a lookup
+table and the pentagonal recurrence for small `n`, and otherwise by the
+asymptotically fast algorithm described in [Joh2012]_, which evaluates a
+truncation of the Hardy-Ramanujan-Rademacher series using tight precision
+estimates and symbolically factoring the occurring exponential sums.  The
+evaluation is done by :func:`mp_real_partitions_hrr`, in ball arithmetic
+throughout, so the result is proved correct; it uses hardware
+double-based ball arithmetic (dfloat) for the low-precision terms and
+several threads when they are available.  The previous implementation
+based on arb balls (``partitions_hrr_sum_arb``) is kept as an example in
+``examples/partitions.c``.
 
 .. function:: void partitions_rademacher_bound(arf_t b, const fmpz_t n, ulong N)
 
@@ -33,45 +29,23 @@ terms. This gives a significant speedup for small (e.g. `n < 10^6`).
     Hardy-Ramanujan-Rademacher formula when the series is taken up
     to the term `t(n,N)` inclusive.
 
-.. function:: void partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubles)
-
-    Evaluates the partial sum `\sum_{k=N_0}^N t(n,k)` of the
-    Hardy-Ramanujan-Rademacher series.
-
-    If *use_doubles* is nonzero, doubles and the system's standard library math
-    functions are used to evaluate the smallest terms. This significantly
-    speeds up evaluation for small `n` (e.g. `n < 10^6`), and gives a small speed
-    improvement for larger `n`, but the result is not guaranteed to be correct.
-    In practice, the error is estimated very conservatively, and unless
-    the system's standard library is broken, use of doubles can be considered
-    safe. Setting *use_doubles* to zero gives a fully guaranteed
-    bound.
-
 .. function:: void partitions_fmpz_fmpz(fmpz_t p, const fmpz_t n, int use_doubles)
+              void partitions_fmpz_ui(fmpz_t p, ulong n)
 
-    Computes the partition function `p(n)` using the Hardy-Ramanujan-Rademacher
-    formula. This function computes a numerical ball containing `p(n)`
-    and verifies that the ball contains a unique integer.
-
-    If *n* is sufficiently large and a number of threads greater than 1
-    has been selected with :func:`flint_set_num_threads()`, the computation
-    time will be reduced by using two threads.
-
-    See :func:`partitions_hrr_sum_arb` for an explanation of the
-    *use_doubles* option.
-
-.. function:: void partitions_fmpz_ui(fmpz_t p, ulong n)
-
-    Computes the partition function `p(n)` using the Hardy-Ramanujan-Rademacher
-    formula. This function computes a numerical ball containing `p(n)`
-    and verifies that the ball contains a unique integer.
+    Computes the partition function `p(n)` (zero for negative `n`): from
+    a table for `n < 128`, by the pentagonal recurrence while `p(n)` fits
+    a word (`n < 417` on 64-bit machines), and otherwise by
+    :func:`mp_real_partitions_hrr`, which computes a ball containing
+    `p(n)` and verifies that it contains a unique integer.  The number of
+    threads selected with :func:`flint_set_num_threads` is used for large
+    `n` (from about `10^8`).  The *use_doubles* argument is ignored (the
+    hardware doubles are always used, with proved error bounds).  The
+    result must fit an :type:`fmpz_t` (`n` up to about `1.4 \cdot
+    10^{21}`); use :func:`mp_real_partitions_hrr` beyond.
 
 .. function:: void partitions_fmpz_ui_using_doubles(fmpz_t p, ulong n)
 
-    Computes the partition function `p(n)`, enabling the use of doubles
-    internally. This significantly speeds up evaluation for small `n`
-    (e.g. `n < 10^6`), but the error bounds are not certified
-    (see remarks for :func:`partitions_hrr_sum_arb`).
+    Deprecated: the same as :func:`partitions_fmpz_ui`.
 
 .. function:: void partitions_leading_fmpz(arb_t res, const fmpz_t n, slong prec)
 

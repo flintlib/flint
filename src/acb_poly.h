@@ -343,6 +343,8 @@ void acb_poly_mul(acb_poly_t res, const acb_poly_t poly1,
               const acb_poly_t poly2, slong prec);
 
 void _acb_poly_mulmid_transpose(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+int _acb_poly_mulmid_fmpzi(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+int _acb_poly_mulmid_use_fmpzi(slong len1, slong len2, slong nlo, slong nhi, slong prec, int squaring);
 void acb_poly_mulmid_transpose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec);
 void _acb_poly_mulmid_classical(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
 void acb_poly_mulmid_classical(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec);
@@ -689,6 +691,9 @@ void _acb_poly_mullow_cpx(acb_ptr res, acb_srcptr src, slong len, const acb_t c,
 void _acb_poly_powsum_series_naive(acb_ptr z, const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec);
 void _acb_poly_powsum_series_naive_threaded(acb_ptr z, const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec);
 void _acb_poly_powsum_one_series_sieved(acb_ptr z, const acb_t s, slong n, slong len, slong prec);
+void _acb_poly_powsum_series_tree(acb_ptr z, const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec);
+slong _acb_poly_powsum_series_tree_guard_bits(const acb_t s, const acb_t a, const acb_t q, const acb_t c, slong n, slong len);
+int _acb_poly_powsum_series_tree_is_faster(const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec, int naive_threaded);
 
 void _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulong N, ulong M, slong d, slong prec);
 void _acb_poly_zeta_em_choose_param(mag_t bound, ulong * N, ulong * M, const acb_t s, const acb_t a, slong d, slong target, slong prec);

@@ -80,6 +80,7 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
        covering the square pointwise ops and the signed exports */
     slong save_mul_cutoff = flint_mpn_mul_complex_fft_cutoff;
     slong save_sqr_cutoff = flint_mpn_sqr_complex_fft_cutoff;
+    slong save_sparse_cutoff = flint_mpn_mul_complex_sparse_fft_cutoff;
 
     for (slong iter = 0; iter < 40 * flint_test_multiplier(); iter++)
     {
@@ -136,6 +137,7 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
 
         flint_mpn_mul_complex_fft_cutoff = fftpath ? 1 : WORD_MAX;
         flint_mpn_sqr_complex_fft_cutoff = fftpath ? 1 : WORD_MAX;
+        flint_mpn_mul_complex_sparse_fft_cutoff = n_randint(state, 2) ? 1 : WORD_MAX;
 
         /* the transformed conversions thread from a size threshold */
         flint_set_num_threads(1 + n_randint(state, 4));
@@ -193,11 +195,16 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
         if (cancel_b)
             flint_mpn_copyi(bi, br, n);
 
-        /* zero components must not disturb the signs */
+        /* zero components must not disturb the signs; they also select
+           the transformed path of the real and imaginary operands */
+        if (n_randint(state, 6) == 0)
+            flint_mpn_zero(ar, n);
         if (n_randint(state, 6) == 0)
             flint_mpn_zero(ai, n);
         if (n_randint(state, 6) == 0)
             flint_mpn_zero(br, n);
+        if (n_randint(state, 6) == 0)
+            flint_mpn_zero(bi, n);
 
         sar = n_randint(state, 2);
         sai = n_randint(state, 2);
@@ -341,5 +348,6 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
 
     flint_mpn_mul_complex_fft_cutoff = save_mul_cutoff;
     flint_mpn_sqr_complex_fft_cutoff = save_sqr_cutoff;
+    flint_mpn_mul_complex_sparse_fft_cutoff = save_sparse_cutoff;
     TEST_FUNCTION_END(state);
 }

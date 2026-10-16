@@ -182,6 +182,49 @@ TEST_FUNCTION_START(mp_real_const_misc, state)
         arb_clear(c);
     }
 
+    /* the roots for k >= 4 of inexact operands whose top limb holds one
+       to three bits (the seed then needs the third limb on 32-bit
+       machines: from two, it was accurate to only about 33 bits, and the
+       steps planned for 49 lost up to a few hundred bits) */
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        /* (sizes where the loss was most frequent: about 1% of the
+           operands with a one-bit top limb at 40 - 51 limbs) */
+        ulong k = 4 + n_randint(state, 300);
+        slong n = (iter % 2) ? 40 + n_randint(state, 12) : 2 + n_randint(state, 80), j;
+        mp_real_t x, y;
+        arb_t a, b;
+
+        mp_real_init(x);
+        mp_real_init(y);
+        arb_init(a);
+        arb_init(b);
+
+        mp_real_fit_length(x, n + 2);
+        for (j = 0; j < n + 2; j++)
+            x->d[j] = n_randtest(state);
+        x->d[n + 1] = (iter % 2) ? 1 : 1 + n_randint(state, 7);
+        x->size = n + 2;
+        x->exp = (slong) n_randint(state, 200) - 100;
+        x->negative = 0;
+        x->err = 1 + n_randint(state, 3);
+
+        mp_real_root_ui(y, x, k, n);
+        mp_real_get_arb(a, x);
+        mp_real_get_arb(b, y);
+        if (arb_rel_accuracy_bits(b) < FLINT_MIN(arb_rel_accuracy_bits(a), FLINT_BITS * n) - 40)
+        {
+            flint_printf("FAIL: mp_real_root_ui accuracy (small top limb), k = %wu, n = %wd\n", k, n);
+            flint_printf("in  %wd, out %wd\n", arb_rel_accuracy_bits(a), arb_rel_accuracy_bits(b));
+            flint_abort();
+        }
+
+        mp_real_clear(x);
+        mp_real_clear(y);
+        arb_clear(a);
+        arb_clear(b);
+    }
+
     for (i = 0; i < NCONST; i++)
         arb_clear(ref[i]);
 

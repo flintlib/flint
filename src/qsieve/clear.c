@@ -25,4 +25,5 @@ void qsieve_clear(qs_t qs_inf)
     qs_inf->sqrts       = NULL;
 
     qsieve_relations_clear(qs_inf);
+    qsieve_A_used_clear(qs_inf);
 }

@@ -270,7 +270,7 @@ static void
 gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
 {
 
-    switch (n_randint(state, 4))
+    switch (n_randint(state, 5))
     {
         case 0:
             gr_ctx_init_fmpz_poly(ctx);
@@ -291,6 +291,13 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
                 slong nvars = n_randint(state, 2);
                 ordering_t ord = mpoly_ordering_randtest(state);
                 gr_ctx_init_fmpz_mpoly_q(ctx, nvars, ord);
+            }
+            break;
+        case 4:
+            {
+                slong nvars = n_randint(state, 2);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly_q_factored(ctx, nvars, ord);
             }
             break;
     }

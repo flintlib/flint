@@ -360,16 +360,16 @@ sd_fft_mpn_mulmod_2expp1_transform(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
     _mulmod_2expp1_transform_op(C, F, y, S);
 }
 
-void
-sd_fft_mpn_mulmod_2expp1_mul_cached(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
-            nn_ptr z, nn_srcptr x, const double * F,
+/* z = x*y mod 2^N+1 given the transform of x in S->buf and that of y
+   in F; F may be S->buf itself (squaring) */
+static void
+_mulmod_2expp1_finish(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            nn_ptr z, const double * F,
             sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
 {
     slong m = C->m, n = C->N / 64, np = C->np;
     slong dsz = C->dsz;
     double * abuf = S->buf;
-
-    _mulmod_2expp1_transform_op(C, abuf, x, S);
 
     for (slong k = 0; k < np; k++)
     {
@@ -488,13 +488,32 @@ sd_fft_mpn_mulmod_2expp1_mul_cached(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
 }
 
 void
+sd_fft_mpn_mulmod_2expp1_mul_cached(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            nn_ptr z, nn_srcptr x, const double * F,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
+{
+    _mulmod_2expp1_transform_op(C, S->buf, x, S);
+    _mulmod_2expp1_finish(C, z, F, S);
+}
+
+void
 sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_srcptr x,
             nn_srcptr y, sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
 {
-    double * bbuf = S->buf + C->np * C->dsz;
+    if (x == y)
+    {
+        /* squaring: one forward transform, multiplied by itself (the
+           pointwise pass reads each entry once before writing it) */
+        _mulmod_2expp1_transform_op(C, S->buf, x, S);
+        _mulmod_2expp1_finish(C, z, S->buf, S);
+    }
+    else
+    {
+        double * bbuf = S->buf + C->np * C->dsz;
 
-    _mulmod_2expp1_transform_op(C, bbuf, y, S);
-    sd_fft_mpn_mulmod_2expp1_mul_cached(C, z, x, bbuf, S);
+        _mulmod_2expp1_transform_op(C, bbuf, y, S);
+        sd_fft_mpn_mulmod_2expp1_mul_cached(C, z, x, bbuf, S);
+    }
 }
 
 /* per-thread mutable state for sd_fft_mpn_mulmod_2expp1; the context itself is

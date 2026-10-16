@@ -227,6 +227,21 @@ TEST_FUNCTION_START(mp_real_sin_cos_bits, state)
         if (!mp_real_is_zero(s) || !arb_is_one(a))
             TEST_FUNCTION_FAIL("zero\n");
 
+        /* an inexact argument >= 1: the accuracy is that of its absolute
+           radius (not of the radius relative to B^exp) */
+        {
+            slong e;
+            for (e = 20; e <= 200; e += 60)
+            {
+                mp_real_set_ui(x, 3);
+                mp_real_add_error_2exp_si(x, -e);
+                mp_real_sin_cos_bits(s, c, x, e + 64);
+                mp_real_get_arb(a, s);
+                if (sc_abs_acc(a) < e - 4)
+                    TEST_FUNCTION_FAIL("inexact accuracy, e = %wd: %wd\n", e, (slong) sc_abs_acc(a));
+            }
+        }
+
         mp_real_clear(x);
         mp_real_clear(s);
         mp_real_clear(c);

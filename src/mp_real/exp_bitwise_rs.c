@@ -13,9 +13,14 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "thread_support.h"
 #include "impl.h"
 
-/* exp via bitwise argument reduction: subtract in turn each
+/* exp via bitwise argument reduction (on 64-bit machines from
+   MP_REAL_EXP_BITWISE_VEC_MIN limbs by _mp_real_exp_bitwise_vec, with
+   signed digits and vector arithmetic in radix 2^56; see
+   bitwise_vec.c; what follows describes the remaining cases):
+   subtract in turn each
    L_i = log(1 + 2^-i), i = 0, 1, ..., r, for which L_i <= x, evaluate
    the Taylor series on the reduced argument below 2^-r, and multiply
    back the used (1 + 2^-i) factors, each of which is a single
@@ -51,37 +56,24 @@
    splitting through arb for small i, where few series terms are
    shared between entries, and a fixed-point mpn multi-summation for
    large i, where one reciprocal per odd k serves EVERY entry (see
-   _mp_real_exp_logs_ensure below) -- and cached per thread at the
-   largest precision and index range requested so far.  Each cached
-   entry carries one guard limb below the value limbs; smaller
-   requests read the top limbs of the cached entries, which equal
-   the truncations at the smaller precision exactly. */
+   _mp_real_exp_logs_fill below) -- and cached in a shared cache
+   (thread_support.h, impl.h) at the largest precision and index range
+   requested so far by any thread.  Each cached entry carries one guard
+   limb below the value limbs; smaller requests read the top limbs of
+   the cached entries, which equal the truncations at the smaller
+   precision exactly. */
 
-FLINT_TLS_PREFIX nn_ptr _mp_real_exp_logs = NULL;
-FLINT_TLS_PREFIX slong _mp_real_exp_logs_n = 0;   /* limbs per entry,
-                                                   INCLUDING one guard
-                                                   limb at the bottom */
-FLINT_TLS_PREFIX slong _mp_real_exp_logs_r = 0;   /* entries 0..r */
-static FLINT_TLS_PREFIX int _mp_real_exp_logs_cleanup_registered = 0;
+static flint_shared_cache_struct _mp_real_exp_logs_cache =
+    FLINT_SHARED_CACHE_INIT(_mp_real_tab_free);
 
-static void
-_mp_real_exp_logs_cleanup(void)
-{
-    flint_free(_mp_real_exp_logs);
-    _mp_real_exp_logs = NULL;
-    _mp_real_exp_logs_n = 0;
-    _mp_real_exp_logs_r = 0;
-    _mp_real_exp_logs_cleanup_registered = 0;
-}
-
-#define LOGS_L(i) (_mp_real_exp_logs + (i) * _mp_real_exp_logs_n)
+#define LOGS_L(i) (tab + (i) * nc)
 #define TAB_E(i) (tab + (i) * nc)
-
 
 /* acc (nc limbs) += or -= t >> s, where t has nc limbs and the bits
    shifted below position 0 are dropped (they fall below the guard
-   limb).  scratch holds nc limbs. */
-static void
+   limb).  scratch holds nc limbs.  Shared by the table builders of
+   sin_cos_bitwise_rs.c and bitwise_vec.c. */
+void
 _mp_real_tab_addshift(nn_ptr acc, nn_srcptr t, slong nc, slong s,
     int sub, nn_ptr scratch)
 {
@@ -149,23 +141,15 @@ _mp_real_tab_subbit(nn_ptr acc, slong nc, slong e)
    the value limbs equal to the exact truncation of L_i except when
    L_i lies within about 2^-50 of a limb boundary, and then by one
    ulp at most, which the reduction's accounting absorbs on either
-   side. */
-void
-_mp_real_exp_logs_ensure(slong nv, slong rc)
+   side.
+
+   The entries i_from..rc of (tab, entries of nc limbs), with rc < 64 nc
+   so that every entry has a leading bit to set. */
+static void
+_mp_real_exp_logs_fill(nn_ptr tab, slong nc, slong i_from, slong rc)
 {
-    slong nc, i, k, l, prec, iter_start;
+    slong i, k, l, prec, iter_start, i_lo;
     nn_ptr t, scratch, num;
-
-    if (nv + 1 <= _mp_real_exp_logs_n && rc <= _mp_real_exp_logs_r)
-        return;
-
-    nc = FLINT_MAX(nv + 1, _mp_real_exp_logs_n);
-    rc = FLINT_MAX(rc, _mp_real_exp_logs_r);
-
-    flint_free(_mp_real_exp_logs);
-    _mp_real_exp_logs = flint_malloc((rc + 1) * nc * sizeof(ulong));
-    _mp_real_exp_logs_n = nc;
-    _mp_real_exp_logs_r = rc;
 
     prec = FLINT_BITS * (nc - 1);
 
@@ -175,6 +159,7 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
         iter_start = rc + 1;
 
     /* tier 1: binary splitting */
+    if (i_from < iter_start)
     {
         arb_ptr lp;
         arb_t x;
@@ -186,9 +171,10 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
         fmpz_init(q);
         lp = _arb_vec_init(7);
 
-        arb_log_primes_vec_bsplit(lp, 7, wp);
+        if (i_from <= 6)
+            arb_log_primes_vec_bsplit(lp, 7, wp);
 
-        for (i = 0; i < iter_start && i <= rc; i++)
+        for (i = i_from; i < iter_start && i <= rc; i++)
         {
             switch (i)
             {
@@ -240,7 +226,8 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
 
     /* tier 2: fixed-point multi-summation, directly in the target
        storage */
-    if (iter_start <= rc)
+    i_lo = FLINT_MAX(iter_start, i_from);
+    if (i_lo <= rc)
     {
         slong wp = FLINT_BITS * nc;
 
@@ -250,7 +237,7 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
 
         /* the k = 1 group is pure bits: the leading term 2^-i and
            the corrections -2^(-(i 2^l + l)) for its even multiples */
-        for (i = iter_start; i <= rc; i++)
+        for (i = i_lo; i <= rc; i++)
         {
             nn_ptr acc = LOGS_L(i);
 
@@ -267,14 +254,14 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
         }
 
         /* odd k >= 3: one reciprocal per k serves every i */
-        for (k = 3; k * iter_start < wp; k += 2)
+        for (k = 3; k * i_lo < wp; k += 2)
         {
             flint_mpn_zero(num, nc);
             num[nc] = 1;                    /* 2^wp */
             mpn_divrem_1(t, 0, num, nc + 1, (ulong) k);
             FLINT_ASSERT(t[nc] == 0);
 
-            for (i = iter_start; i <= rc && i * k < wp; i++)
+            for (i = i_lo; i <= rc && i * k < wp; i++)
             {
                 nn_ptr acc = LOGS_L(i);
 
@@ -291,11 +278,6 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
         flint_free(num);
     }
 
-    if (!_mp_real_exp_logs_cleanup_registered)
-    {
-        flint_register_cleanup_function(_mp_real_exp_logs_cleanup);
-        _mp_real_exp_logs_cleanup_registered = 1;
-    }
     /* Direct tail band: for 3i >= 64 nc every term of
        log(1 + 2^-i) = 2^-i - 2^(-2i-1) + 2^(-3i)/3 - ... from the
        third on falls below the entry, with the omitted alternating
@@ -317,7 +299,7 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
     {
         slong wp = FLINT_BITS * nc, band = (wp + 2) / 3;
 
-        for (i = FLINT_MAX(band, 7); i <= rc; i++)
+        for (i = FLINT_MAX(FLINT_MAX(band, 7), i_from); i <= rc; i++)
         {
             nn_ptr acc = LOGS_L(i);
             slong b = wp - i;
@@ -340,49 +322,73 @@ _mp_real_exp_logs_ensure(slong nv, slong rc)
             }
         }
 
-        for (i = 7; i < FLINT_MIN(band, rc + 1); i++)
+        for (i = FLINT_MAX(7, i_from); i < FLINT_MIN(band, rc + 1); i++)
         {
-            ulong g = _mp_real_exp_logs[i * nc];
+            ulong g = tab[i * nc];
             if (g + MP_REAL_TAB_GUARD_SLACK < g)
                 _mp_real_tab_entry_exact(LOGS_L(i), 0, (ulong) i, nc);
         }
     }
-
 }
 
+/* the shared cache protocol: a version grown from the current one,
+   its new entries filled */
+static void *
+_mp_real_exp_logs_build(const void * old, void * args)
+{
+    _mp_real_tab_struct * T;
+    slong i_from;
 
-/* Read-only view of the table for code outside the library (the
-   thread-local storage itself is not exported; see mp_real.h):
-   the top n limbs of entry i, valid until the next ensure call on
-   this thread. */
+    T = _mp_real_tab_new(old, args, &i_from);
+    _mp_real_exp_logs_fill(T->tab, T->nc, i_from, T->num - 1);
+    return T;
+}
+
+/* the version covering nv value limbs and the indices 0..rc */
+const _mp_real_tab_struct *
+_mp_real_exp_logs_ensure(slong nv, slong rc)
+{
+    _mp_real_tab_req_struct R;
+
+    /* every entry needs a leading bit: rc < 64 nc (always the case for
+       the library's requests, r <= 64 n - 16 with nv >= n) */
+    R.nc = FLINT_MAX(nv + 1, rc / FLINT_BITS + 2);
+    R.num = rc + 1;
+    return flint_shared_cache_ensure(&_mp_real_exp_logs_cache,
+        _mp_real_tab_sufficient, _mp_real_exp_logs_build, &R);
+}
+
+/* Read-only view of the table for code outside the library: the top
+   n limbs of entry i of the current version (valid until
+   flint_cleanup_master). */
 nn_srcptr
 _mp_real_exp_logs_entry(slong i, slong n)
 {
-    FLINT_ASSERT(i >= 0 && i <= _mp_real_exp_logs_r);
-    FLINT_ASSERT(n >= 1 && n <= _mp_real_exp_logs_n - 1);
-    return _mp_real_exp_logs + i * _mp_real_exp_logs_n
-        + (_mp_real_exp_logs_n - n);
+    const _mp_real_tab_struct * T =
+        flint_shared_cache_get(&_mp_real_exp_logs_cache);
+
+    FLINT_ASSERT(T != NULL && i >= 0 && i < T->num);
+    FLINT_ASSERT(n >= 1 && n <= T->nc - 1);
+    return T->tab + i * T->nc + (T->nc - n);
 }
 
-/* free the cached table (tuning programs measure cold rebuilds;
-   exported so that code outside the library never touches the
-   thread-local data directly) */
+/* free the cached table (tuning programs measure cold rebuilds): not
+   while another thread may be using it */
 void
 _mp_real_exp_logs_clear(void)
 {
-    flint_free(_mp_real_exp_logs);
-    _mp_real_exp_logs = NULL;
-    _mp_real_exp_logs_n = 0;
-    _mp_real_exp_logs_r = 0;
+    flint_shared_cache_clear(&_mp_real_exp_logs_cache);
 }
 
-/* the largest index the cached table currently covers */
+/* the largest index the current version covers (0 if none) */
 slong
 _mp_real_exp_logs_max_index(void)
 {
-    return _mp_real_exp_logs_r;
-}
+    const _mp_real_tab_struct * T =
+        flint_shared_cache_get(&_mp_real_exp_logs_cache);
 
+    return (T == NULL) ? 0 : T->num - 1;
+}
 
 
 
@@ -557,7 +563,6 @@ _mp_real_exp_recon(nn_ptr y, nn_ptr sh, slong ylen, const slong * used,
     }
 }
 
-
 /* Greedy bitwise reduction of t (wn limbs) by L_0, ..., L_r,
    recording the used indices; returns their number.  The subtractions
    are decided one FLINT_BITS window at a time on a single-limb model
@@ -672,9 +677,6 @@ _mp_real_bitwise_reduce(nn_ptr t, slong wn, int r, slong istart,
     return num;
 }
 
-#if FLINT_BITS == 64
-#endif
-
 /* smallest n at which each reduction parameter becomes optimal:
    interleaved timings of every ladder value at 26 sizes from 10 to
    640 limbs and at 800, 1000, 1300 and 1700 limbs (x86-64), the
@@ -688,17 +690,37 @@ static const int _mp_real_exp_bitwise_rs_r_tab[] =
 static const short _mp_real_exp_bitwise_rs_n_tab[] =
     {1, 12, 48, 125, 170, 450, 540, 700, 800};
 
+#if FLINT_BITS == 64
+/* the same for _mp_real_exp_bitwise_vec (its own sweep, x86-64 AVX2:
+   every ladder value at 25 sizes from 11 to 600 limbs, the optimum
+   flat to a few percent over one or two steps; up to r = 768, whose
+   radix tables take 8.5 MB at 600 limbs) */
+static const int _mp_real_exp_bitwise_vec_r_tab[] =
+    {64, 96, 128, 192, 256, 320, 448, 512, 640, 768};
+static const short _mp_real_exp_bitwise_vec_n_tab[] =
+    {1, 24, 40, 56, 80, 128, 160, 224, 256, 448};
+#endif
+
 int
 _mp_real_exp_bitwise_rs_default_r(slong n)
 {
     slong j;
 
 #if FLINT_BITS == 64
-    /* the compile-time constants of exp_opt_<n>.c: keep in sync with
-       the dev/tune_mp_real.py --pin values that emitted those files */
+    /* the reduction parameters of the per-size kernels that r = 0
+       selects at these sizes (see impl.h) */
     static const int opt_r[] = MP_REAL_EXP_OPT_R;
     if (n <= MP_REAL_EXP_OPT_R_MAX)
         return opt_r[n];
+
+    if (n >= MP_REAL_EXP_BITWISE_VEC_MIN)
+    {
+        for (j = 0; j + 1 < (slong) (sizeof(_mp_real_exp_bitwise_vec_n_tab)
+                / sizeof(short))
+                && n >= _mp_real_exp_bitwise_vec_n_tab[j + 1]; j++)
+            ;
+        return _mp_real_exp_bitwise_vec_r_tab[j];
+    }
 #endif
 
     for (j = 0; j + 1 < (slong) (sizeof(_mp_real_exp_bitwise_rs_n_tab)
@@ -711,11 +733,9 @@ _mp_real_exp_bitwise_rs_default_r(slong n)
 FLINT_FORCE_INLINE void
 _mp_real_exp_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 {
-#if FLINT_BITS == 64
-    int r0;
-#endif
-    slong num, wn;
+    slong num, wn, nc;
     nn_ptr t, y, sh;
+    nn_srcptr tab;
     slong * used;
     TMP_INIT;
 
@@ -725,37 +745,24 @@ _mp_real_exp_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
        the 2^-32 contract of the series functions */
     FLINT_ASSERT(FLINT_BITS == 64 || n >= 2);
 
-#if FLINT_BITS == 64
-    r0 = r;         /* the specialized sizes trigger on r = 0 only */
-#endif
-
     if (r == 0)
         r = _mp_real_exp_bitwise_rs_default_r(n);
-
-#if FLINT_BITS == 64
-    /* the fully specialized per-size implementations (exp_opt_<n>.c,
-       emitted and tuned by dev/tune_mp_real.py) serve the default
-       dispatch: with r = 0 the caller has left the reduction
-       parameter to us, and the whole call collapses to straight-line
-       code with a compile-time r and the series built for it */
-    if (r0 == 0 && n <= 7)
-    {
-        static void (* const tab[])(nn_ptr, nn_srcptr) = {
-            NULL, _mp_real_exp_opt_1, _mp_real_exp_opt_2, _mp_real_exp_opt_3,
-            _mp_real_exp_opt_4, _mp_real_exp_opt_5, _mp_real_exp_opt_6,
-            _mp_real_exp_opt_7
-        };
-        tab[n](res, x);
-        return;
-    }
-#endif
 
     r = FLINT_MAX(r, 32);
     r = FLINT_MIN((slong) r, FLINT_BITS * n - 16);
 
+#if FLINT_BITS == 64
+    if (n >= MP_REAL_EXP_BITWISE_VEC_MIN)
+    {
+        _mp_real_exp_bitwise_vec(res, x, n, r);
+        return;
+    }
+#endif
+
     wn = n;
 
-    _mp_real_exp_logs_ensure(wn, r);
+    /* the static prefix of the table where it reaches (impl.h) */
+    tab = _mp_real_exp_logs_tab(wn, r, &nc);
 
     TMP_START;
     t = TMP_ALLOC((wn + 2 * (n + 1)) * sizeof(ulong));
@@ -765,8 +772,7 @@ _mp_real_exp_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 
     flint_mpn_copyi(t, x, n);
 
-    num = _mp_real_bitwise_reduce(t, wn, r, 0, _mp_real_exp_logs,
-        _mp_real_exp_logs_n, used);
+    num = _mp_real_bitwise_reduce(t, wn, r, 0, tab, nc, used);
 
     /* exp of the reduced argument */
     _mp_real_exp_reduced(y, NULL, t, wn, (flint_bitcnt_t) r, 0);
@@ -781,6 +787,22 @@ _mp_real_exp_bitwise_rs_noerr(nn_ptr res, nn_srcptr x, slong n, int r)
 void
 _mp_real_exp_bitwise_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n, int r)
 {
+#if FLINT_BITS == 64
+    /* r = 0 leaves the reduction to us: at the sizes of the per-size
+       kernels (small.h, the dense tables) those serve the call (any size
+       they decline takes the bitwise path below) */
+    if (r == 0 && n <= MP_REAL_EXP_OPT_R_MAX)
+    {
+        ulong e;
+        if (_mp_real_exp_opt(res, &e, x, n))
+        {
+            if (err != NULL)
+                *err = e;
+            return;
+        }
+    }
+#endif
+
     _mp_real_exp_bitwise_rs_noerr(res, x, n, r);
     if (err != NULL)
         *err = 9 * (r ? (ulong) r : (ulong) _mp_real_exp_bitwise_rs_default_r(n)) + 100;

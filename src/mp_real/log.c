@@ -38,12 +38,17 @@
 /* the ratio and the atanh series (series_tapered.c / series_rs.c below
    32 zero bits, _mp_real_atanh_rs from 32) from z leading zero bits of
    D on, for m above 1 (E = 1) resp. below (E = 0), where the kernel
-   (log1p of 2u - 1 close to 1) costs more (measured end to end, kernel
-   / series time ratios: above 1, 1.2-1.4 at 5-6 limbs and 1.1-1.45 at
-   10-24 limbs from z = 32, 1.1-1.2 at 7-8 limbs from z = 20, 1.15-1.25
-   at 32-48 limbs from z = 64, 1.05-1.2 at 64-256 limbs from z = 96-256;
-   below 1, 1.05-1.4 at 1-24 limbs from z = 14-28, 1.1-1.2 at 32-128
-   limbs from z = 40-96, 1.05-1.25 at 192-512 limbs from z = 192-256) */
+   (log1p of 2u - 1 close to 1) costs more (measured kernel / series
+   time ratios with the dense-table kernels: above 1, 1.0-1.15 at 5-32
+   limbs from z = 64, never better at 2-4 limbs; below 1, 1.1-1.4 at
+   11-17 limbs from z = 32, 1.15-2 at 2 and 4-10 and 18-32 limbs from
+   z = 64, never better at 3 limbs; end to end with the bitwise kernels
+   beyond: above 1, 1.1-1.45 at 22-24 limbs from z = 32 (the dense
+   kernels lowered to 21 limbs), 1.15-1.25 at 33-48 limbs from z = 64,
+   1.05-1.2 at 64-256 limbs from z = 96-256; below 1, 1.05-1.4 at one
+   limb (and at 22-24 limbs, as above) from z = 16-28, 1.1-1.2 at
+   33-128 limbs from z = 40-96, 1.05-1.25 at 192-512 limbs from z =
+   192-256) */
 static slong
 _lg_series_min_z(slong n, int E)
 {
@@ -51,10 +56,16 @@ _lg_series_min_z(slong n, int E)
     {
         if (n <= 4)
             return WORD_MAX;
+#if FLINT_BITS == 64
+        if (n <= MP_REAL_DENSE_RT_MAX)
+            return 64;
+#else
+        /* (no dense kernels) */
         if (n <= 6)
             return 32;
         if (n <= 8)
             return 20;
+#endif
         if (n <= 24)
             return 32;
         if (n <= 48)
@@ -69,6 +80,19 @@ _lg_series_min_z(slong n, int E)
     }
     if (n <= 1)
         return 16;
+#if FLINT_BITS == 64
+    if (n <= 2)
+        return 64;
+    if (n <= 3)
+        return WORD_MAX;
+    if (n <= 10)
+        return 64;
+    if (n <= 17)
+        return 32;
+    if (n <= MP_REAL_DENSE_RT_MAX)
+        return 64;
+#else
+    /* (no dense kernels) */
     if (n <= 2)
         return 28;
     if (n <= 6)
@@ -77,6 +101,7 @@ _lg_series_min_z(slong n, int E)
         return 16;
     if (n <= 12)
         return 24;
+#endif
     if (n <= 24)
         return 28;
     if (n <= 40)
@@ -500,4 +525,21 @@ mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec)
         }
         return 1;
     }
+}
+
+/* the wrappers for the other files (see impl.h) */
+
+void
+_mp_real_log1p_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
+{
+    FLINT_ASSERT(n <= LG_BITWISE_MAX);
+
+    if (!_mp_real_log1p_opt(y, err, v, n))
+        _mp_real_log1p_bitwise_rs(y, err, v, n, 0);
+}
+
+slong
+_mp_real_log_series_min_z(slong n, int above)
+{
+    return _lg_series_min_z(n, above ? 1 : 0);
 }

@@ -69,7 +69,19 @@ TEST_FUNCTION_START(flint_mpn_divexact, state)
         else if (alg == 3)
         {
             flint_mpn_divexact_preinv_t pre;
-            flint_mpn_divexact_preinv_init(pre, b, bn);
+            if (n_randint(state, 2))
+                flint_mpn_divexact_preinv_init(pre, b, bn);
+            else
+            {
+                /* inverse truncated to the quotient length (or
+                   deliberately too short, exercising the fallback) */
+                mp_size_t qn = an - bn + 1;
+                if (n_randint(state, 4) == 0)
+                    qn = 1 + n_randint(state, qn);
+                else
+                    qn += n_randint(state, 3);
+                flint_mpn_divexact_preinv_init_prec(pre, b, bn, qn);
+            }
             flint_mpn_divexact_preinv(q, a, an, pre);
             flint_mpn_divexact_preinv_clear(pre);
         }

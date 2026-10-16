@@ -435,12 +435,19 @@ _mp_real_root_ui_order(mp_real_t res, const mp_real_t x, ulong k, slong n,
     mp_real_init(v);
     mp_real_init(z);
 
-    /* x = md 2^E with md in [1/2, 1); v = x 2^(-k q) with q = floor(E/k)
-       lies in [1/2, 2^k) and the root scales back by 2^q */
+    /* x = md 2^E with md in [B^-1, 1) to the precision of a double (the
+       seed's accuracy of 2^-49 needs it: the top limb may hold a single
+       bit, so three limbs on 32-bit machines); v = x 2^(-k q) with
+       q = floor(E/k) lies in [B^-1, 2^k) and the root scales back by
+       2^q */
     E = FLINT_BITS * x->exp;
     md = (double) x->d[x->size - 1];
     if (x->size >= 2)
         md += (double) x->d[x->size - 2] * MP_REAL_D_BINV;
+#if FLINT_BITS == 32
+    if (x->size >= 3)
+        md += (double) x->d[x->size - 3] * (MP_REAL_D_BINV * MP_REAL_D_BINV);
+#endif
     md = md * MP_REAL_D_BINV;
     q = (E >= 0) ? E / (slong) k : -(((slong) k - 1 - E) / (slong) k);
 

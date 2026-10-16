@@ -19,6 +19,7 @@
 FLINT_DLL extern const ulong _mp_real_const_pi4_static[64];
 FLINT_DLL extern const ulong _mp_real_const_log2_static[64];
 FLINT_DLL extern const ulong _mp_real_const_2_div_pi_static[64];
+FLINT_DLL extern const ulong _mp_real_const_inv_log2_frac_static[64];
 #define MP_REAL_SERIES_TAN_NMAX 80
 #define MP_REAL_SERIES_TAN_RMIN 32
 #define MP_REAL_SERIES_TAN_K 77
@@ -60,6 +61,7 @@ FLINT_DLL extern const short _mp_real_series_tan_rs_num_off[77];
 FLINT_DLL extern const ulong _mp_real_const_pi4_static[128];
 FLINT_DLL extern const ulong _mp_real_const_log2_static[128];
 FLINT_DLL extern const ulong _mp_real_const_2_div_pi_static[128];
+FLINT_DLL extern const ulong _mp_real_const_inv_log2_frac_static[128];
 #define MP_REAL_SERIES_TAN_NMAX 80
 #define MP_REAL_SERIES_TAN_RMIN 32
 #define MP_REAL_SERIES_TAN_K 38

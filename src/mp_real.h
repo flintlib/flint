@@ -123,6 +123,8 @@ void mp_real_zero(mp_real_t x);
 void mp_real_set(mp_real_t res, const mp_real_t x);
 void mp_real_set_ui(mp_real_t x, ulong c);
 void mp_real_set_si(mp_real_t x, slong c);
+void mp_real_set_fmpz(mp_real_t x, const fmpz_t f);
+void mp_real_set_trunc(mp_real_t res, const mp_real_t x, slong n);
 /* x = (p, len) 2^e exactly (p unsigned; len may include zero top
    limbs) */
 void _mp_real_set_mpn_2exp(mp_real_t x, nn_srcptr p, slong len, slong e);
@@ -186,6 +188,26 @@ void _mp_real_agm_order(mp_real_t res, const mp_real_t x, const mp_real_t y, slo
 
 /* conversions */
 void mp_real_get_arb(arb_t res, const mp_real_t x);
+/* the unique integer in the ball x (exactly, as an mp_real, without the
+   size limits of fmpz) and 1, or 0 (res unchanged) if there is none or
+   more than one; res may alias x (in place, no reallocation) */
+int mp_real_unique_integer(mp_real_t res, const mp_real_t x);
+
+/* p(n) exactly, n = nhi B + nlo (the partition function: lookup table,
+   pentagonal recurrence, then the Hardy-Ramanujan-Rademacher formula);
+   _mp_real_partitions_hrr by the formula for n >= 2 (p(n) for any fmpz n), with flags
+   MP_REAL_PARTITIONS_NO_DFLOAT (no dfloat batches) and
+   MP_REAL_PARTITIONS_TEST (the rarely taken paths at any n, for tests) */
+#define MP_REAL_PARTITIONS_NO_DFLOAT 1
+#define MP_REAL_PARTITIONS_TEST 2
+void mp_real_partitions_hrr(mp_real_t res, ulong nhi, ulong nlo);
+void _mp_real_partitions_hrr(mp_real_t res, const fmpz_t n, int flags);
+/* dfloat expansions as double arrays: res = sum x[i] +- rad (exact up to
+   the radius's rounding; throws for nonfinite input); and the greedy
+   rounding of x to n <= 8 doubles with a radius (rad may be NULL), the
+   whole line [0 +- inf] beyond the double range */
+void mp_real_set_dfloat(mp_real_t res, const double * x, slong n, double rad);
+void mp_real_get_dfloat(double * res, double * rad, slong n, const mp_real_t x);
 void mp_real_print(const mp_real_t x);
 /* a ball in [0, 1) as an n-limb fraction (truncating); *err is a bound
    in output ulps, UWORD_MAX meaning none below 2^FLINT_BITS - 1 */
@@ -197,12 +219,14 @@ int _mp_real_get_fixed_floor(nn_ptr y, slong n, const mp_real_t x);
 /* constants ****************************************************************/
 
 /* c = pi/4, log 2, Euler's constant, e, log 10, Catalan's constant,
-   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi.  The ball versions
-   evaluate c to about n limbs; the limb versions write floor(c B^n) -- n
-   limbs for c < 1 (pi/4, log 2, Euler, Catalan, 2/pi), n + 1 with a units limb for
+   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi, 1/log 2 - 1.  The
+   ball versions evaluate c to about n limbs; the limb versions write
+   floor(c B^n) -- n limbs for c < 1 (pi/4, log 2, Euler, Catalan, 2/pi,
+   1/log 2 - 1), n + 1 with a units limb for
    the others -- and set *err = 1.  cache = 0 computes from scratch;
-   cache = 1 reads a per-thread cache of floors, extending it to at
-   least max(n + 5, 1.5 times the cached precision) when it is short
+   cache = 1 reads a shared cache of floors (one per constant, read by
+   every thread; thread_support.h), extending it to at least
+   max(n + 5, 1.5 times the cached precision) when it is short
    (the ball version then encloses the floor with a radius of one
    ulp). */
 void mp_real_const_pi4(mp_real_t res, slong n, int cache);
@@ -216,6 +240,7 @@ void mp_real_const_zeta5(mp_real_t res, slong n, int cache);
 void mp_real_const_gamma_1_3(mp_real_t res, slong n, int cache);
 void mp_real_const_gamma_1_4(mp_real_t res, slong n, int cache);
 void mp_real_const_2_div_pi(mp_real_t res, slong n, int cache);
+void mp_real_const_inv_log2_frac(mp_real_t res, slong n, int cache);
 
 void _mp_real_const_pi4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_log2(nn_ptr res, ulong * err, slong n, int cache);
@@ -228,8 +253,10 @@ void _mp_real_const_zeta5(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_gamma_1_3(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_gamma_1_4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_2_div_pi(nn_ptr res, ulong * err, slong n, int cache);
+void _mp_real_const_inv_log2_frac(nn_ptr res, ulong * err, slong n, int cache);
 
-/* frees this thread's cache of constants */
+/* frees the shared caches of the constants (no other thread may be
+   using them; flint_cleanup_master does the same) */
 void _mp_real_const_clear_cache(void);
 
 /* verbose progress reports on stderr for huge computations: 0 silent
@@ -293,6 +320,29 @@ void mp_real_hypgeom_series_int64(mp_real_t res, int power, int64_t coefP,
    Arguments beyond 2^max(65536, 4 prec) give [0 +- 1]. */
 void mp_real_sin_cos_bits(mp_real_t res1, mp_real_t res2, const mp_real_t x, slong prec);
 
+/* tan x to a relative accuracy of about 2^-prec, or less as the radius
+   of x allows (the output may alias x); keeps its relative accuracy
+   near the zeros and poles of the tangent.  Returns 1, or 0 with res
+   set to zero when the ball may contain a pole (or its argument is
+   beyond 2^max(65536, 4 prec)). */
+int mp_real_tan_bits(mp_real_t res, const mp_real_t x, slong prec);
+
+/* sin(pi x), cos(pi x) and tan(pi x) as the functions above, with an
+   exact argument reduction: the outputs keep their relative accuracy
+   near every zero (and tan near every pole), at any magnitude of x,
+   and the values at exact multiples of 1/2 are exact (0, +-1), as is
+   tan at the odd multiples of 1/4 (+-1). */
+void mp_real_sin_cos_pi_bits(mp_real_t res1, mp_real_t res2, const mp_real_t x, slong prec);
+int mp_real_tan_pi_bits(mp_real_t res, const mp_real_t x, slong prec);
+
+/* sin(pi p/q) and cos(pi p/q) for words p, q >= 1 (either output may be
+   NULL; they must be distinct) to a relative accuracy of about B^-n;
+   the rational values 0, +-1, +-1/2 are exact.  tan(pi p/q) likewise,
+   returning 0 (with res set to zero) at a pole, else 1; 0, +-1 are
+   exact. */
+void mp_real_sin_cos_pi_ui_div_ui(mp_real_t res1, mp_real_t res2, ulong p, ulong q, slong n);
+int mp_real_tan_pi_ui_div_ui(mp_real_t res, ulong p, ulong q, slong n);
+
 /* exp x, log x and atan x to a relative accuracy of about 2^-prec, or
    less as the radius of x allows (the output may alias x); the working
    precision is chosen internally, and the results keep their relative
@@ -301,8 +351,32 @@ void mp_real_sin_cos_bits(mp_real_t res1, mp_real_t res2, const mp_real_t x, slo
    leave the safe range; log returns 0 (with res = 0) unless the ball
    is strictly positive, else 1. */
 void mp_real_exp_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_exp_notab_log2(mp_real_t res, const mp_real_t x, slong n);
+void mp_real_exp_notab_squaring(mp_real_t res, const mp_real_t x, slong n);
+void mp_real_exp_agm(mp_real_t res, const mp_real_t x, slong n);
 int mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec);
 void mp_real_atan_bits(mp_real_t res, const mp_real_t x, slong prec);
+
+/* log1p x, expm1 x, sinh x and cosh x (either output may be NULL),
+   tanh x, asin x, acos x, asinh x, acosh x and atanh x to a relative
+   accuracy of about 2^-prec, or less as the radius of x allows (the
+   outputs may alias x), as compositions of exp, log and atan without
+   cancellation: the results keep their relative accuracy near their
+   zeros, and small and large arguments are handled without squaring
+   them.  log1p returns 0 (with res = 0) unless 1 + x is strictly
+   positive; asin and acos unless x lies in [-1, 1] (an inexact ball
+   strictly inside), acosh unless x >= 1 (strictly above for an inexact
+   ball) and atanh unless |x| < 1; else 1.  expm1, sinh and cosh throw
+   like exp for x >= 2^(FLINT_BITS - 5) resp. |x| >= 2^(FLINT_BITS - 5). */
+int mp_real_log1p_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_expm1_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_sinh_cosh_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec);
+void mp_real_tanh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_asin_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_acos_bits(mp_real_t res, const mp_real_t x, slong prec);
+void mp_real_asinh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_acosh_bits(mp_real_t res, const mp_real_t x, slong prec);
+int mp_real_atanh_bits(mp_real_t res, const mp_real_t x, slong prec);
 
 /* elementary functions on fixed-point numbers ******************************/
 
@@ -319,6 +393,15 @@ void _mp_real_cosh_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n);
 void _mp_real_sinh_cosh_rs(nn_ptr ysinh, nn_ptr ycosh, ulong * err, nn_srcptr x, slong n);
 void _mp_real_atan_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n);
 void _mp_real_atanh_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n);
+
+/* sin(pi p/q) and cos(pi p/q) for 0 <= p <= q/2: outputs (ys, n + 1),
+   (yc, n + 1), either may be NULL.  err <= 6r + 130, r <= 768 the
+   bitwise parameter, when the sin/cos kernel is used, else at most 4
+   (computed at run time).  alg: 0 = tuned, 1 = the kernel on pi p/q,
+   2 = the Chebyshev (U_(q-1) root) iteration of order r (0 =
+   default), 3 = square roots for q = 5, 8, 10, 12. */
+void _mp_real_sin_cos_pi_ui_div_ui(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n);
+void _mp_real_sin_cos_pi_ui_div_ui_tune(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n, int alg, int r);
 
 /* Bitwise argument reduction with tabulated log(1 + 2^-i) resp.
    atan(2^-i), for any x in [0, 1); r = 0 selects a tuned reduction

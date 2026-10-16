@@ -531,10 +531,15 @@ Matrix-scalar arithmetic
               void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
               void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 
-    Set ``A = B / c``, where ``B`` is an ``fmpz_mat_t`` and ``c``
+    Set ``B = A / c``, where ``A`` is an ``fmpz_mat_t`` and ``c``
     is a scalar respectively of type ``slong``, ``ulong``,
     or ``fmpz_t``, which is assumed to divide all elements of
-    ``B`` exactly.
+    ``A`` exactly.
+
+    For a multi-limb ``c``, the *fmpz* version precomputes a single
+    2-adic inverse of ``c`` for the whole matrix (see
+    :func:`flint_mpn_divexact_preinv_init_prec`), only to the
+    precision of the largest quotient.
 
 .. function:: void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
 

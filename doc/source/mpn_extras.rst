@@ -869,9 +869,11 @@ Division
 
     Precomputed data for repeated exact division by a fixed divisor: its
     odd part `b'` (with `b = 2^v B^k b'`) and the 2-adic inverse
-    `b'^{-1} \bmod B^{bn'+1}`.
+    `b'^{-1} \bmod B^{m}`, where `m = bn' + 1` unless a smaller precision
+    was requested with :func:`flint_mpn_divexact_preinv_init_prec`.
 
 .. function:: void flint_mpn_divexact_preinv_init(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn)
+              void flint_mpn_divexact_preinv_init_prec(flint_mpn_divexact_preinv_t pre, mp_srcptr b, mp_size_t bn, mp_size_t qn)
               void flint_mpn_divexact_preinv_clear(flint_mpn_divexact_preinv_t pre)
               void flint_mpn_divexact_preinv(mp_ptr q, mp_srcptr a, mp_size_t an, const flint_mpn_divexact_preinv_t pre)
 
@@ -885,10 +887,19 @@ Division
     limbs of `a` that can influence the quotient are read (and shifted when
     `b` is even). Compared with a fresh ``mpn_divexact`` for every division,
     which recomputes an inverse each time, this is 1.5-2.5 times faster for
-    balanced operands and 10-25% faster for long quotients. Used by
+    balanced operands and 10-25% faster for long quotients.
+
+    A quotient of `n` limbs only needs the inverse modulo `B^n`, which
+    depends only on the low `n` limbs of `b'`. The *init_prec* version
+    computes the inverse only to `\min(bn' + 1, qn)` limbs, which is much
+    cheaper when all quotients are known to have at most `qn \ll bn'`
+    limbs (the cost of the inverse is then that of about one division
+    rather than several `bn'`-limb products). Longer quotients remain
+    correct but are not accelerated by the inverse. Used by
     :func:`_fmpz_vec_scalar_divexact_fmpz` and
     :func:`fmpz_mat_scalar_divexact_fmpz` when at least two entries are as
-    large as the divisor.
+    large as the divisor, with the inverse computed to the precision of
+    the longest quotient.
 
 .. function:: int flint_mpn_divisible(mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
 
@@ -1333,6 +1344,11 @@ throughout.
 
     Sets *res* to a square root of `a` modulo the odd prime `d` and returns 1.
 
+    For `d - 1 = q 2^s` with `q` odd, the root is a single exponentiation
+    when `s \le 2` (`a^{(d+1)/4}`, or Atkin's formula). For `3 \le s < 32`,
+    Tonelli-Shanks is used, and for `s \ge 32` Müller's variant of the
+    Cipolla-Lehmer algorithm, whose cost does not depend on `s`.
+
     Returns 0, having set *res* to zero, when the Jacobi symbol rules a root
     out; as above this is conclusive whether or not `d` is prime. Returns
     `-1`, again setting *res* to zero, when the algorithm itself failed, which
@@ -1508,11 +1524,125 @@ between output and input arrays.
     three -- so below 3 ulp for any practical `n`. The transformed path
     stays within `(-1.5, +0.5)` ulp.
 
+.. function:: void flint_mpn_mullow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqrlow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    Low products: ``zr`` and ``zi`` receive exactly `n \ge 1` limbs, the
+    real and imaginary parts of `(ar + ai i)(br + bi i)` (respectively of
+    the square of `ar + ai i`) modulo `2^{n \cdot \mathtt{FLINT\_BITS}}`, as
+    two's-complement residues: no sign is returned, and a negative part
+    `x` is represented by `2^{n \cdot \mathtt{FLINT\_BITS}} + x` when
+    `|x| < 2^{n \cdot \mathtt{FLINT\_BITS}}`. These are the low limbs of the
+    exact parts in two's complement, from which a Kronecker unpacking of
+    signed fields lying below limb `n` reads the exact coefficients. The
+    inputs are as for :func:`flint_mpn_mul_complex` -- magnitudes of any
+    lengths of at least 1 limb, with sign bits -- and only their low `n`
+    limbs are read, since `(-1)^s |x| \equiv (-1)^s (|x| \bmod B^n)`.
+    The outputs must not overlap each other or the inputs; `n` may exceed
+    the length of the product, the residues then being the sign-extended
+    exact parts.
+
+    The algorithms are those of the full products, with low products in
+    place of full ones: four or three (Karatsuba) real low products from
+    :func:`flint_mpn_mulmid` with a zero window start, combined modulo
+    `B^n`, or above the cutoffs the transformed windowed product
+    :func:`_fft_small_mpn_mulmid_complex` with the window `[0, n)` on
+    the inputs truncated to `n` limbs, whose conversions out reconstruct
+    only the CRT slots below limb `n`. The transforms keep the length
+    of the product of the truncated inputs, since a cyclic wrap would
+    land in the low limbs; the saving of the transformed path is in the
+    reconstruction.
+
+.. function:: void flint_mpn_mullow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_mullow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              int flint_mpn_mullow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqrlow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              void flint_mpn_sqrlow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              int flint_mpn_sqrlow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    The individual algorithms behind the low products, exposed for
+    comparison and tuning, with the same conventions as for the full
+    products.
+
+.. function:: void flint_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    Windowed products: ``zr`` and ``zi`` receive `hi - lo` limbs each,
+    `0 \le lo < hi`, the limbs `[lo, hi)` of the real and imaginary
+    parts of the product (respectively the square) in two's complement:
+    for each exact part `x`, the window is
+    `\lfloor x / B^{lo} \rfloor + e \bmod B^{hi - lo}` with
+    `B = 2^{\mathtt{FLINT\_BITS}}` and a small error `e`. For `lo = 0`
+    these are the low products, with `e = 0`; on the transformed path
+    `|e| \le 1`; otherwise `|e| < 4 (m + 1) B` with
+    `m = \min(\max(arn, ain), \max(brn, bin))`. No sign is returned: as
+    for the low products, the window is a two's-complement window of the
+    signed part, which is linear (so the real windows of the schoolbook
+    and Karatsuba schemes combine modulo `B^{hi - lo}`) and is what a
+    Kronecker unpacking of signed fields reads. The inputs are as for the
+    low products (only their low `hi` limbs are read), and the outputs
+    must not overlap each other or the inputs.
+
+    Translating a polynomial window of Kronecker fields `[nlo, nhi)` of
+    `b` bits: take `hi = \lceil nhi \cdot b / \mathtt{FLINT\_BITS} \rceil`
+    and `lo` some guard limbs below the bit `nlo \cdot b - 1` that the
+    signed unpacking reads first; the unpacked fields are exact provided
+    `|e| B^{lo}` is below the distance from the low part
+    `\sum_{k < nlo} r_k 2^{k b}` to `\pm 2^{nlo \cdot b - 1}`, which a
+    bound `|r_k| \le 2^{b - 1} - 2^{b - s}` puts at `2^{nlo \cdot b - s}`
+    or more (see :func:`_fmpzi_poly_mulmid_KS`, where three guard limbs
+    are used).
+
+    The schoolbook and Karatsuba variants combine real windows from
+    :func:`flint_mpn_mulmid`. The transformed variant splits the integers
+    into chunks and multiplies them as chunk sequences on fft_small
+    transforms (four forward and two inverse; two and two for the
+    square), with the window taken at the level of the chunk
+    coefficients as in the real multiplication: only the coefficients
+    that can reach limbs `[lo, hi)` are reconstructed, and when a power
+    of two `2^d` admits it -- operands and the coefficients below the top
+    of the window fitting in `2^d`, and the coefficients beyond `2^d`
+    aliasing below the first one reaching the window -- the transforms
+    are cyclic of length `2^d`. For the integer shape of the Newton
+    middle product (`2n` by `n` limbs, window `[n, 2n)`) this is a
+    transform of length about `2n` chunks instead of `3n` when `2n`
+    chunks lie a little below a power of two. Every slot below the first
+    coefficient reaching the window lies below limb `lo` whatever it
+    holds (its value is lifted to the centered range of the prime
+    product), which bounds the error by one unit.
+
+.. function:: void flint_mpn_mulmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_mulmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              int flint_mpn_mulmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqrmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              void flint_mpn_sqrmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              int flint_mpn_sqrmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    The individual algorithms behind the windowed products, exposed for
+    comparison and tuning, with the error bounds stated above.
+
 .. var:: slong flint_mpn_mul_complex_fft_cutoff
          slong flint_mpn_sqr_complex_fft_cutoff
+         slong flint_mpn_mullow_complex_fft_cutoff
+         slong flint_mpn_sqrlow_complex_fft_cutoff
+         slong flint_mpn_mulmid_complex_fft_cutoff
+         slong flint_mpn_sqrmid_complex_fft_cutoff
 
     Sizes in limbs from which the general functions use the transformed
     path. Machine dependent; writable for tuning.
+
+.. var:: slong flint_mpn_mul_complex_sparse_fft_cutoff
+         slong flint_mpn_mulmid_complex_sparse_fft_cutoff
+
+    Sizes in limbs (of the shorter operand) from which the full and low
+    products, respectively the windows with `lo > 0`, of operands with a
+    zero part (a real or purely imaginary operand) use the transformed
+    path. The transformed functions handle a zero part by transforming
+    only the nonzero parts, so that an operand with a single nonzero part
+    is transformed once for both output parts (three forward and two
+    inverse transforms for a real times a complex operand, against four
+    and two for two separate real products), and by forming every output
+    part as a single product.
 
 Multimodular reduction and Chinese remaindering
 --------------------------------------------------------------------------------

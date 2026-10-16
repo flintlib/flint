@@ -18,13 +18,16 @@
 /* sin, cos, sinh, cosh, atan and atanh of a fraction 0 <= x < 2^-32,
    (res, n + 1) with a units limb (res, n for atan and atanh).
 
-   Dispatch: hardcoded straight-line rectangular splitting on 64-bit
-   machines for 2^-64 <= x < 2^-32 (n <= 10 for the sin/cos families,
-   n <= 17 for atan/atanh) and for 2^-128 <= x < 2^-64 (n <= 22 resp.
-   n <= 35), where they are fastest; otherwise the tapered rectangular
-   splitting of series_rs.c at the argument's actual leading zero bits
-   (1.3 to 1.7 times faster than the untapered generic routines it
-   replaced, which tapered only by whole zero limbs).
+   Dispatch: hardcoded rectangular splitting on 64-bit machines for
+   2^-64 <= x < 2^-32 (n <= 10 for the sin/cos families, n <= 17 for
+   atan/atanh) and for 2^-128 <= x < 2^-64 (n <= 22 resp. n <= 35),
+   where it is fastest: straight-line routines (trig_rs_hard.inc) at
+   the sizes on the hot paths of the elementary functions, the generic
+   engine of series_hard.c (same calls, identical results) at the
+   others; otherwise the tapered rectangular splitting of series_rs.c
+   at the argument's actual leading zero bits (1.3 to 1.7 times faster
+   than the untapered generic routines it replaced, which tapered only
+   by whole zero limbs).
 
    Error bounds (15 ulps returned): hardcoded routines <= 12 ulps;
    series_rs.c within 2 ulps, plus 1 for forming cos = 1 - (1 - cos).
@@ -33,7 +36,6 @@
 
 #if FLINT_BITS == 64
 #include "trig_rs_hard.inc"
-#include "hand_mulhi.inc"
 #endif
 
 /* ysin = sin x (resp. sinh x), ycos = cos x (resp. cosh x), each n + 1
@@ -103,8 +105,12 @@ _mp_real_sc_rs(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n,
         /* 2^-64 <= x < 2^-32 */
         if (n <= 10)
         {
-            (alternating ? _mp_real_sin_cos_rs32_tab
-                         : _mp_real_sinh_cosh_rs32_tab)[n](ysin, ycos, x);
+            odd_even_series_fn f = (alternating ? _mp_real_sin_cos_rs32_tab
+                                        : _mp_real_sinh_cosh_rs32_tab)[n];
+            if (f != NULL)
+                f(ysin, ycos, x);
+            else
+                _mp_real_sin_cos_series_hard(ysin, ycos, x, n, 32, alternating);
             return;
         }
     }
@@ -113,8 +119,12 @@ _mp_real_sc_rs(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n,
         if (n <= 22 && !(n >= 2 && x[n - 2] == 0))
         {
             /* 2^-128 <= x < 2^-64 */
-            (alternating ? _mp_real_sin_cos_rs_tab
-                         : _mp_real_sinh_cosh_rs_tab)[n](ysin, ycos, x);
+            odd_even_series_fn f = (alternating ? _mp_real_sin_cos_rs_tab
+                                        : _mp_real_sinh_cosh_rs_tab)[n];
+            if (f != NULL)
+                f(ysin, ycos, x);
+            else
+                _mp_real_sin_cos_series_hard(ysin, ycos, x, n, 64, alternating);
             return;
         }
     }
@@ -134,8 +144,12 @@ _mp_real_at_rs(nn_ptr res, nn_srcptr x, slong n, int alternating)
         /* 2^-64 <= x < 2^-32 */
         if (n <= 17)
         {
-            (alternating ? _mp_real_atan_rs32_tab
-                         : _mp_real_atanh_rs32_tab)[n](res, x);
+            odd_series_fn f = (alternating ? _mp_real_atan_rs32_tab
+                                   : _mp_real_atanh_rs32_tab)[n];
+            if (f != NULL)
+                f(res, x);
+            else
+                _mp_real_atan_series_hard(res, x, n, 32, alternating);
             return;
         }
     }
@@ -144,8 +158,12 @@ _mp_real_at_rs(nn_ptr res, nn_srcptr x, slong n, int alternating)
         if (n <= 35 && !(n >= 2 && x[n - 2] == 0))
         {
             /* 2^-128 <= x < 2^-64 */
-            (alternating ? _mp_real_atan_rs_tab
-                         : _mp_real_atanh_rs_tab)[n](res, x);
+            odd_series_fn f = (alternating ? _mp_real_atan_rs_tab
+                                   : _mp_real_atanh_rs_tab)[n];
+            if (f != NULL)
+                f(res, x);
+            else
+                _mp_real_atan_series_hard(res, x, n, 64, alternating);
             return;
         }
     }

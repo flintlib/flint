@@ -117,7 +117,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(nn_ptr D, slong Dstride, nn_srcptr C
                                thread_pool_handle * threads, slong num_threads)
 {
     nn_ptr tmp;
-    slong i, j, block;
+    slong i, block;
     slong shared_i = 0, shared_j = 0;
     nmod_mat_transpose_arg_t * args;
 #if FLINT_USES_PTHREAD
@@ -127,9 +127,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(nn_ptr D, slong Dstride, nn_srcptr C
     tmp = flint_malloc(sizeof(ulong) * k * n);
 
     /* transpose B */
-    for (i = 0; i < k; i++)
-        for (j = 0; j < n; j++)
-            tmp[j*k + i] = B[i * Bstride + j];
+    _nmod_mat_transpose(tmp, k, B, Bstride, k, n);
 
     /* compute optimal block width */
     block = FLINT_MAX(FLINT_MIN(m/(num_threads + 1), n/(num_threads + 1)), 1);

@@ -244,6 +244,8 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
                                     slong limbs, slong trunc, mp_limb_t ** t1,
                             mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
+slong fft_convolution_choose_mid(slong * trunc, slong len_out, slong nlo, slong nhi);
+
 /***** FFT Precaching *****/
 
 void fft_precache(mp_limb_t ** jj, slong depth, slong limbs,

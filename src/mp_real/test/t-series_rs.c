@@ -50,6 +50,9 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
             fmpz_one(f);
             fmpz_mul_2exp(f, f, FLINT_BITS * n - r);
             fmpz_sub_ui(f, f, 1 + n_randint(state, 5));
+            /* (2^(64 n - r) may be as small as 2) */
+            if (fmpz_sgn(f) < 0)
+                fmpz_zero(f);
         }
         flint_mpn_zero(x, n);
         fmpz_get_ui_array(x, n, f);
@@ -131,6 +134,15 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
         slong r = 32 + n_randint(state, (iter % 2) ? 40 : 300);
         slong prec = FLINT_BITS * n + 128;
         ulong x[170], y1[170];
+
+        /* also arguments so small that one term remains (beyond the tables
+           of the Horner tail: the direct t + t^3/3) */
+        if (iter % 8 == 7)
+        {
+            n = 81 + n_randint(state, 80);
+            r = 32 + n_randint(state, FLINT_BITS * n);
+            prec = FLINT_BITS * n + 128;
+        }
         double err;
 
         if (r > FLINT_BITS * n - 1 || !_mp_real_series_rs_tan_ok(n, r))
@@ -144,6 +156,9 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
             fmpz_one(f);
             fmpz_mul_2exp(f, f, FLINT_BITS * n - r);
             fmpz_sub_ui(f, f, 1 + n_randint(state, 5));
+            /* (2^(64 n - r) may be as small as 2) */
+            if (fmpz_sgn(f) < 0)
+                fmpz_zero(f);
         }
         flint_mpn_zero(x, n);
         fmpz_get_ui_array(x, n, f);

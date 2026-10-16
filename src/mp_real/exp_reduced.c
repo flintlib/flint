@@ -47,8 +47,16 @@
    around the series kernels and the exact binary splitting is
    mp_real ball arithmetic (see _mp_real_exp_reduced_ball), whose rigorous
    bound is checked against EXP_REDUCED_MAX_ERR on export (it
-   comes to about 27 ulps for the one-step cascade, 1 for the full
-   burst).  An earlier driver in hand-written mpn arithmetic
+   comes to 1 ulp for the one-step cascade and the full burst, and
+   the series kernel's own, about 17 ulps, for the sinh path).  The
+   series remainder of the cascade runs one guard limb deeper than
+   the output: multiplied into the product of the slice factors,
+   whose top limb can hold anything from 1 to 64 bits, its radius is
+   requantized at a coarser limb anchor, which can triple it per
+   cascade level (at most seven levels), and without the guard limb
+   that compounded past 96 ulps at four levels (127 ulps at 6292
+   limbs, r = 185); with it the remainder's radius stays below one
+   ulp of the output at every depth.  An earlier driver in hand-written mpn arithmetic
    (windowed middle products, limb-aligned frames and an informal
    error accounting) measured the same speed at every size and was
    dropped. */
@@ -217,10 +225,13 @@ _exp_burst_task(slong i, void * arg)
         f = S->f + k;
         fq = S->fq + k;
         MP_REAL_PHASE_START(ph, "exp burst: series remainder", wn);
-        xres = TMP_ALLOC(wn * sizeof(ulong));
-        flint_mpn_copyi(xres, t, wn);
-        flint_mpn_zero(xres + wn - L[k], L[k]);
-        _mp_real_exp_reduced_ball(f, xres, wn,
+        /* one guard limb deeper than the output (a zero limb below
+           t): see the notes at the top */
+        xres = TMP_ALLOC((wn + 1) * sizeof(ulong));
+        xres[0] = 0;
+        flint_mpn_copyi(xres + 1, t, wn);
+        flint_mpn_zero(xres + 1 + wn - L[k], L[k]);
+        _mp_real_exp_reduced_ball(f, xres, wn + 1,
             (flint_bitcnt_t) (FLINT_BITS * L[k]), S->series_alg);
         mp_real_zero(fq);
         MP_REAL_PHASE_END(ph);

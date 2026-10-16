@@ -37,10 +37,19 @@ mp_real_clear(mp_real_t x)
     flint_free(x->d);
 }
 
+/* geometric growth (by half) for short numbers; from MP_REAL_GROW_TIGHT
+   limbs by a sixteenth: the long numbers of a huge-precision computation
+   mostly grow by a few limbs at a time (a product or a square root a
+   limb or two longer than the previous value of the variable), where
+   half the length again would be dead memory in every such variable,
+   while a reallocation costs no more than reading the number once */
+#define MP_REAL_GROW_TIGHT 4096
+
 void
 _mp_real_grow(mp_real_t x, slong k)
 {
-    slong newalloc = FLINT_MAX(k, x->alloc + x->alloc / 2);
+    slong newalloc = FLINT_MAX(k, x->alloc + ((x->alloc < MP_REAL_GROW_TIGHT)
+        ? x->alloc / 2 : x->alloc / 16));
     x->d = flint_realloc(x->d, newalloc * sizeof(ulong));
     x->alloc = newalloc;
 }

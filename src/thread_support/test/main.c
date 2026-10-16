@@ -13,13 +13,15 @@
 
 #include "t-parallel_binary_splitting.c"
 #include "t-parallel_do.c"
+#include "t-shared_cache.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
     TEST_FUNCTION(thread_support_parallel_binary_splitting),
-    TEST_FUNCTION(thread_support_parallel_do)
+    TEST_FUNCTION(thread_support_parallel_do),
+    TEST_FUNCTION(thread_support_shared_cache)
 };
 
 /* main function *************************************************************/

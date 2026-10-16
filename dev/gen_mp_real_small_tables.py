@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Emit src/mp_real/small_tables.c and src/mp_real/small_tables.h: the
+tables of the table-driven kernels for two and three fraction limbs
+(small.h), 64-bit limbs only.
+
+Each entry is stored as consecutive limbs, least significant first:
+fraction limbs floor(c B^3) mod B^3 (three limbs), preceded in the
+table by nothing and followed, for tables with an integral part, by the
+integral limb.  All values are floors (an error below one ulp of
+B^-3); the kernels for two limbs read the top two fraction limbs.
+
+  exp:  E1[j] = exp(j/2^7)          j < 128   (fraction and integral limb)
+        E2[j] = exp(j/2^14) - 1     j < 128
+        E3[j] = exp(j/2^21) - 1     j < 128
+        N1[j] = exp(-j/2^7)         j < 128   (fraction and integral limb)
+        N2[j] = 1 - exp(-j/2^14)    j < 128
+        N3[j] = 1 - exp(-j/2^21)    j < 128
+
+  log1p: for levels k = 1 .. 4 (s = 7k, m = s + 16 bits), j <= 128
+        (j < 128 for k = 1):
+        D_k[j] = floor(2^m j / (2^s + j)) / 2^m   (one limb, exact)
+        L_k[j] = -log(1 - D_k[j])
+        so that 1 - D_k[j] >= 1 / (1 + j 2^-s) (the reduction keeps
+        u >= 0) and (1 + u)(1 - D_k[j]) < 1 + 2^-s (1 + 2^-16) for
+        u < (j + 1) 2^-s.
+
+  sin, cos: S1[j] = (sin(j/2^7), 1 - cos(j/2^7))       j < 128
+            S2[j] = (sin(j/2^14), 1 - cos(j/2^14))     j < 128
+        (the two values of an entry consecutive, 6 limbs)
+
+  atan: A[j] = atan(j/2^9)                         j <= 512
+
+Run from the top-level FLINT directory:
+
+    python3 dev/gen_mp_real_small_tables.py
+"""
+import mpmath
+from mpmath import mp, mpf
+
+mp.prec = 400
+
+B = 2 ** 64
+
+LICENSE = """/*
+    Copyright (C) 2026 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/"""
+
+
+def limbs_of(x, nfrac, integral):
+    """floor(x B^nfrac) as nfrac fraction limbs (+ an integral limb)"""
+    v = int(mpmath.floor(x * mpf(B) ** nfrac))
+    assert v >= 0
+    out = []
+    for _ in range(nfrac):
+        out.append(v % B)
+        v //= B
+    if integral:
+        assert v < B
+        out.append(v)
+    else:
+        assert v == 0, x
+    return out
+
+
+TABLES = []
+
+
+def table(name, comment, values, integral):
+    width = 3 + (1 if integral else 0)
+    data = []
+    for x in values:
+        data.extend(limbs_of(x, 3, integral))
+    TABLES.append((name, comment, width, len(values), data))
+
+
+def build():
+    table("_mp_real_small_exp_e1", "exp(j/2^7), j < 128 (3 fraction limbs, integral limb)",
+          [mpmath.exp(mpf(j) / 2 ** 7) for j in range(128)], True)
+    table("_mp_real_small_exp_e2", "exp(j/2^14) - 1, j < 128",
+          [mpmath.exp(mpf(j) / 2 ** 14) - 1 for j in range(128)], False)
+    table("_mp_real_small_exp_e3", "exp(j/2^21) - 1, j < 128",
+          [mpmath.exp(mpf(j) / 2 ** 21) - 1 for j in range(128)], False)
+    table("_mp_real_small_exp_n1", "exp(-j/2^7), j < 128 (3 fraction limbs, integral limb)",
+          [mpmath.exp(-mpf(j) / 2 ** 7) for j in range(128)], True)
+    table("_mp_real_small_exp_n2", "1 - exp(-j/2^14), j < 128",
+          [1 - mpmath.exp(-mpf(j) / 2 ** 14) for j in range(128)], False)
+    table("_mp_real_small_exp_n3", "1 - exp(-j/2^21), j < 128",
+          [1 - mpmath.exp(-mpf(j) / 2 ** 21) for j in range(128)], False)
+
+
+def build_log():
+    for k in range(1, 5):
+        sh = 7 * k
+        m = sh + 16
+        count = 128 if k == 1 else 129
+        D = []
+        L = []
+        for j in range(count):
+            d = (2 ** m * j) // (2 ** sh + j)          # floor
+            dv = mpf(d) / 2 ** m
+            D.append(d << (64 - m))
+            L.append(-mpmath.log(1 - dv))
+        TABLES.append(("_mp_real_small_log_d%d" % k,
+            "log1p level %d: D[j] = floor(2^%d j / (2^%d + j)) / 2^%d, j < %d (one limb)" % (k, m, sh, m, count),
+            1, count, D))
+        table("_mp_real_small_log_l%d" % k, "log1p level %d: -log(1 - D[j]), j < %d" % (k, count), L, False)
+
+
+def build_sin_cos():
+    for k, sh in ((1, 7), (2, 14)):
+        data = []
+        for j in range(128):
+            a = mpf(j) / 2 ** sh
+            data.extend(limbs_of(mpmath.sin(a), 3, False))
+            data.extend(limbs_of(1 - mpmath.cos(a), 3, False))
+        TABLES.append(("_mp_real_small_sin_cos_s%d" % k,
+            "sin(j/2^%d), 1 - cos(j/2^%d), j < 128 (3 + 3 fraction limbs)" % (sh, sh), 6, 128, data))
+
+
+def build_atan():
+    table("_mp_real_small_atan_a", "atan(j/2^9), j <= 512",
+          [mpmath.atan(mpf(j) / 2 ** 9) for j in range(513)], False)
+
+
+def emit():
+    c = open("src/mp_real/small_tables.c", "w")
+    h = open("src/mp_real/small_tables.h", "w")
+    hdr = "/* GENERATED by dev/gen_mp_real_small_tables.py -- do not edit */\n"
+    c.write(LICENSE + "\n\n" + hdr + "\n")
+    c.write('#include "flint.h"\n#include "small_tables.h"\n\n#if FLINT_BITS == 64\n\n')
+    h.write(LICENSE + "\n\n" + hdr + "\n")
+    h.write("#ifndef MP_REAL_SMALL_TABLES_H\n#define MP_REAL_SMALL_TABLES_H\n\n")
+    h.write('#include "flint.h"\n\n#if FLINT_BITS == 64\n\n')
+    for name, comment, width, count, data in TABLES:
+        h.write("/* %s; %d limbs per entry */\n" % (comment, width))
+        h.write("FLINT_DLL extern const ulong %s[%d];\n" % (name, len(data)))
+        c.write("/* %s; %d limbs per entry */\n" % (comment, width))
+        c.write("const ulong %s[%d] = {\n" % (name, len(data)))
+        for i in range(0, len(data), width):
+            c.write("    " + ", ".join("UWORD(0x%016x)" % d for d in data[i:i + width]) + ",\n")
+        c.write("};\n\n")
+    c.write("#endif\n")
+    h.write("\n#endif\n\n#endif\n")
+
+
+if __name__ == "__main__":
+    build()
+    build_log()
+    build_sin_cos()
+    build_atan()
+    emit()

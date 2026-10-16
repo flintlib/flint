@@ -725,9 +725,7 @@ int gr_mpoly_divides_heap(
     mask = 0;
     if (exp_bits <= FLINT_BITS)
     {
-        flint_bitcnt_t jj;
-        for (jj = 0; jj < FLINT_BITS/exp_bits; jj++)
-            mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
+        mask = mpoly_overflow_mask_sp(exp_bits);
 
         if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))
             easy_exit = 1;

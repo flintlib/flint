@@ -654,6 +654,45 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     _mm256_storeu_si256((__m256i*) z, a);
 }
 
+/* same, as two 16-byte stores (see nmod_mat/transpose.c) */
+FLINT_FORCE_INLINE void vec4n_store_unaligned_halves(ulong* z, vec4n a) {
+    _mm_storeu_si128((__m128i*) z, _mm256_castsi256_si128(a));
+    _mm_storeu_si128((__m128i*) (z + 2), _mm256_extracti128_si256(a, 1));
+}
+
+/* return {a[0], b[0], a[2], b[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_unpacklo(vec4n a, vec4n b) {
+    return _mm256_unpacklo_epi64(a, b);
+}
+
+/* return {a[1], b[1], a[3], b[3]} */
+FLINT_FORCE_INLINE vec4n vec4n_unpackhi(vec4n a, vec4n b) {
+    return _mm256_unpackhi_epi64(a, b);
+}
+
+/* permute2_i0_i1(a, b): return {v[i0], v[i1]}, as for vec4d */
+#define DEFINE_IT(i0, i1) \
+FLINT_FORCE_INLINE vec4n CAT4(vec4n, permute2, i0, i1)(vec4n a, vec4n b) { \
+    return _mm256_permute2x128_si256(a, b, i0 + 16*i1); \
+}
+DEFINE_IT(0,2)
+DEFINE_IT(1,3)
+#undef DEFINE_IT
+
+/* view the 4 vectors as the rows of a 4x4 matrix, as VEC4D_TRANSPOSE */
+#define VEC4N_TRANSPOSE(z0, z1, z2, z3, a0, a1, a2, a3) \
+{ \
+    vec4n _t0, _t1, _t2, _t3; \
+    _t0 = vec4n_unpacklo(a0, a1); \
+    _t1 = vec4n_unpackhi(a0, a1); \
+    _t2 = vec4n_unpacklo(a2, a3); \
+    _t3 = vec4n_unpackhi(a2, a3); \
+    z0 = vec4n_permute2_0_2(_t0, _t2); \
+    z1 = vec4n_permute2_0_2(_t1, _t3); \
+    z2 = vec4n_permute2_1_3(_t0, _t2); \
+    z3 = vec4n_permute2_1_3(_t1, _t3); \
+}
+
 /* permute_i0_i1_i2_i3(a): return {a[i0], a[i1], a[i2], a[i3]} */
 #ifndef AVOID_AVX2
 #define DEFINE_IT(i0, i1, i2, i3)                                        \
@@ -735,6 +774,28 @@ FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
 
 FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
     return _mm256_and_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_or(vec4n a, vec4n b) {
+    return _mm256_or_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) {
+    return _mm256_slli_epi64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return _mm256_load_si256((const __m256i*) a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    _mm256_store_si256((__m256i*) z, a);
+}
+
+/* return {b[3], a[0], a[1], a[2]}: the lanes of a moved up by one, the
+   top lane of b entering at the bottom */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    return _mm256_alignr_epi8(a, _mm256_permute2x128_si256(b, a, 0x21), 8);
 }
 
 FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
@@ -835,6 +896,14 @@ FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
     q_error = 1/2 exactly, and avoids vroundpd, which is 2 uops with 8 cycles
     latency on Intel cores since Skylake (but 1 uop, 3 cycles on Zen 2-5).
 
+    The requirement |a*b| <= 2^51 is not checked, and violating it does not
+    give a rounding error but something else: for a*b > 2^51 the result is
+    an integer that may be off by more than 1/2 (the spacing of the doubles
+    near R + a*b is 2 or more), and for a*b < -2^51 it may not be an integer
+    at all (the spacing near R + a*b is 1/2 or less). With native rounding
+    there is no such requirement, so a caller exceeding it goes unnoticed
+    on the targets that use native rounding (see mulmod_fast below).
+
     FLINT_ROUND_MUL_USE_ROUND / FLINT_ROUND_MUL_USE_MAGIC force either
     choice, for testing and profiling.
 */
@@ -867,7 +936,17 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n] */
+/*
+    reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n], for |a| < 2^53.
+
+    [-n, n] is the documented range, used in the bound analyses of the
+    transforms. The result is a - q*n with q the nearest integer to a
+    computed a*ninv, whose relative error is at most 2^-52 (ninv, and the
+    rounding of mul(a, ninv) on the native-rounding path), so in fact
+    |result| <= n/2 + 2^-52*|a| <= n/2 + 2 for |a| < 2^53. The truncated
+    inverse transform relies on this tighter range, see the end of
+    mulmod_satisfies_bounds.c.
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1n(V a, V n, V ninv) { \
     return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
@@ -876,7 +955,7 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* reduce_to_pm1n(a, n, ninv): return a mod n in (-n,n) */
+/* reduce_to_pm1no(a, n, ninv): return a mod n in (-n,n), see reduce_to_pm1n */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_pm1no(V a, V n, V ninv) { \
     return V##_fnmadd(V##_round_mul(a, ninv), n, a); \
@@ -912,6 +991,19 @@ DEFINE_IT(vec4d)
      Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-9/8*n, 9/8*n).
      Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-7/4*n, 7/4*n).
     floating point round mode is always assumed to be set to nearest
+
+    These are the documented ranges, proven in mulmod_satisfies_bounds.c
+    and used in the bound analyses of the transforms. The result is
+    a*b - q*n with q the nearest integer to a computed h*ninv, h = mul(a, b),
+    whose error relative to a*b/n is at most 3*2^-53 (rounding of h, error
+    of ninv, rounding of mul(h, ninv)), so independently of the above
+     |result| <= n/2 + 3*2^-53*|a*b|      for |a*b| < 2^103.
+    In particular products larger than 4*n^2 still give a correct
+    representative, only a larger one. The bound is close to n/2 when
+    |a*b| is far below 2^53*n, e.g. when one operand is a twiddle factor
+    in (-n/2, n/2) and the other is small.
+    The truncated inverse transform relies on this tighter range, see the
+    end of mulmod_satisfies_bounds.c.
 */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
@@ -932,7 +1024,28 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* same as mulmod but requires |a*b| <= 2^51*n, i.e. |a*b| < 2*n^2 for n < 2^50 */
+/*
+    mulmod_fast(a, b, n, ninv): same as mulmod, with round_mul for the quotient.
+
+    Requires |a*b| <= 2^51*n, which for n < 2^50 is implied by |a*b| < 2*n^2
+    (this is how the callers state it). Under this condition the
+    result is a*b mod n in (-n, n), as for mulmod, assuming
+    fft_small_mulmod_satisfies_bounds(n) (the quotient is computed at
+    least as accurately as in mulmod), and |result| <= n/2 + 2^-52*|a*b|
+    on the magic-constant path (n/2 + 3*2^-53*|a*b| on the native path).
+
+    Unlike for mulmod, larger products are not allowed.
+    With the magic constant (FLINT_FFT_SMALL_ROUND_USE_NATIVE 0, set for the
+    Intel targets in their flint-mparam.h) a violation is silent: for
+    a*b > 2^51*n the result is still a correct representative, possibly
+    outside (-n, n), but for a*b < -2^51*n it may not be an integer, that is,
+    it is wrong (for instance mulmod_fast(-(3n - 1), n - 1) with
+    n = 1086317488242689).
+    With native rounding (other x86-64 targets, ARM) mulmod_fast is exactly
+    mulmod, so a caller violating the requirement goes unnoticed there;
+    defining FLINT_ROUND_MUL_USE_MAGIC forces the magic constant on any
+    x86-64 target, for testing.
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \
@@ -1821,7 +1934,8 @@ FLINT_FORCE_INLINE vec2d vec2d_reduce_to_0n(vec2d a, vec2d n, vec2d ninv) {
 }
 
 
-/* mulmod(a, b, n, ninv): return a*b mod n in [-n,n] with assumptions */
+/* mulmod(a, b, n, ninv): return a*b mod n,
+   with the ranges and assumptions documented in the AVX2 section */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \
@@ -1842,7 +1956,8 @@ DEFINE_IT(vec2d)
 #undef DEFINE_IT
 
 /* mulmod_fast: see the AVX2 section. frintn is cheap on ARM cores, so here it
-   is simply mulmod. */
+   is simply mulmod (the requirement |a*b| <= 2^51*n of mulmod_fast is not
+   needed here, hence not exercised by tests run on ARM). */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod_fast(V a, V b, V n, V ninv) { \
     return V##_mulmod(a, b, n, ninv); \
@@ -2238,6 +2353,14 @@ FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a) {
     return vld1q_u64((const uint64_t *) a);
 }
 
+FLINT_FORCE_INLINE vec2n vec2n_unpacklo(vec2n a, vec2n b) {
+    return vtrn1q_u64(a, b);
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_unpackhi(vec2n a, vec2n b) {
+    return vtrn2q_u64(a, b);
+}
+
 // Right shift 32bits
 FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right_32(vec2n a) {
     return vshrq_n_u64(a, 32);
@@ -2290,6 +2413,10 @@ FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
     vec2n_store_unaligned(z+2, a.e2);
 }
 
+FLINT_FORCE_INLINE void vec4n_store_unaligned_halves(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
     vec2n z1 = vec2d_convert_limited_vec2n(a.e1);
     vec2n z2 = vec2d_convert_limited_vec2n(a.e2);
@@ -2308,7 +2435,71 @@ FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
     vec4n z = {z1, z2}; return z;
 }
 
+FLINT_FORCE_INLINE vec4n vec4n_permute2_0_2(vec4n a, vec4n b) {
+    vec4n z = {a.e1, b.e1}; return z;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_permute2_1_3(vec4n a, vec4n b) {
+    vec4n z = {a.e2, b.e2}; return z;
+}
+
+#define VEC4N_TRANSPOSE(z0, z1, z2, z3, a0, a1, a2, a3) \
+{ \
+    vec4n _t0, _t1, _t2, _t3; \
+    _t0 = vec4n_unpacklo(a0, a1); \
+    _t1 = vec4n_unpackhi(a0, a1); \
+    _t2 = vec4n_unpacklo(a2, a3); \
+    _t3 = vec4n_unpackhi(a2, a3); \
+    z0 = vec4n_permute2_0_2(_t0, _t2); \
+    z1 = vec4n_permute2_0_2(_t1, _t3); \
+    z2 = vec4n_permute2_1_3(_t0, _t2); \
+    z3 = vec4n_permute2_1_3(_t1, _t3); \
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong b) {
+    return vshlq_u64(a, vdupq_n_s64(-(int64_t) b));
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_left(vec2n a, ulong b) {
+    return vshlq_u64(a, vdupq_n_s64((int64_t) b));
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_or(vec2n a, vec2n b) {
+    return vorrq_u64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_zero(void) {
+    return vec4n_set_n(0);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return vec4n_load_unaligned(a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
+    vec4n z = {vec2n_bit_shift_right(a.e1, b), vec2n_bit_shift_right(a.e2, b)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) {
+    vec4n z = {vec2n_bit_shift_left(a.e1, b), vec2n_bit_shift_left(a.e2, b)};
+    return z;
+}
+
+/* return {b[3], a[0], a[1], a[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    vec4n z = {vextq_u64(b.e2, a.e1, 1), vextq_u64(a.e1, a.e2, 1)};
+    return z;
+}
+
+EXTEND_VEC_DEF2(vec2n, vec4n, _unpacklo)
+EXTEND_VEC_DEF2(vec2n, vec4n, _unpackhi)
 EXTEND_VEC_DEF1(vec2n, vec4n, _bit_shift_right_32)
+EXTEND_VEC_DEF2(vec2n, vec4n, _bit_or)
 EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
 EXTEND_VEC_DEF2(vec2n, vec4n, _add)
 EXTEND_VEC_DEF2(vec2n, vec4n, _sub)
@@ -2967,6 +3158,78 @@ FLINT_FORCE_INLINE vec4di vec4d_to_index(vec4d a) {
 FLINT_FORCE_INLINE vec4d vec4d_gather(const double * t, vec4di i) {
     return vec4d_set_d4(t[i.v[0]], t[i.v[1]], t[i.v[2]], t[i.v[3]]);
 }
+
+/*
+    vec4n: four ulong lanes, with the operations used by the radix-2^52
+    shift-and-add loops of mp_real (load/store, add, sub, bitwise and/or,
+    shifts by a common count, lane shift).
+*/
+# if defined(FLINT_MACHINE_VECTORS_GNU_VECTOR_EXTENSIONS)
+typedef ulong vec4n __attribute__((vector_size(4 * sizeof(ulong))));
+#  define VEC4N_LANE(a, i) ((a)[i])
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    vec4n z = {a0, a1, a2, a3}; return z;
+}
+FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b) { return a + b; }
+FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b) { return a - b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) { return a & b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_or(vec4n a, vec4n b) { return a | b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) { return a >> b; }
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_left(vec4n a, ulong b) { return a << b; }
+# else
+typedef struct {ulong v[4];} vec4n;
+#  define VEC4N_LANE(a, i) ((a).v[i])
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    vec4n z; z.v[0] = a0; z.v[1] = a1; z.v[2] = a2; z.v[3] = a3; return z;
+}
+#  define VEC4N_GEN2(NAME, OP) \
+FLINT_FORCE_INLINE vec4n vec4n_##NAME(vec4n a, vec4n b) { \
+    vec4n z; \
+    z.v[0] = a.v[0] OP b.v[0]; z.v[1] = a.v[1] OP b.v[1]; \
+    z.v[2] = a.v[2] OP b.v[2]; z.v[3] = a.v[3] OP b.v[3]; \
+    return z; \
+}
+#  define VEC4N_GENS(NAME, OP) \
+FLINT_FORCE_INLINE vec4n vec4n_##NAME(vec4n a, ulong b) { \
+    vec4n z; \
+    z.v[0] = a.v[0] OP b; z.v[1] = a.v[1] OP b; \
+    z.v[2] = a.v[2] OP b; z.v[3] = a.v[3] OP b; \
+    return z; \
+}
+VEC4N_GEN2(add, +)
+VEC4N_GEN2(sub, -)
+VEC4N_GEN2(bit_and, &)
+VEC4N_GEN2(bit_or, |)
+VEC4N_GENS(bit_shift_right, >>)
+VEC4N_GENS(bit_shift_left, <<)
+#  undef VEC4N_GEN2
+#  undef VEC4N_GENS
+# endif
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    vec4n z; memcpy(&z, a, sizeof(z)); return z;
+}
+FLINT_FORCE_INLINE vec4n vec4n_load_aligned(const ulong* a) {
+    return vec4n_load_unaligned(a);
+}
+FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
+    memcpy(z, &a, sizeof(a));
+}
+FLINT_FORCE_INLINE void vec4n_store_aligned(ulong* z, vec4n a) {
+    vec4n_store_unaligned(z, a);
+}
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+    return vec4n_set_n4(a, a, a, a);
+}
+FLINT_FORCE_INLINE vec4n vec4n_zero(void) {
+    return vec4n_set_n(0);
+}
+/* return {b[3], a[0], a[1], a[2]} */
+FLINT_FORCE_INLINE vec4n vec4n_shift_lanes_up(vec4n a, vec4n b) {
+    return vec4n_set_n4(VEC4N_LANE(b, 3), VEC4N_LANE(a, 0),
+                        VEC4N_LANE(a, 1), VEC4N_LANE(a, 2));
+}
+# undef VEC4N_LANE
 
 # undef VEC4D_GEN1
 # undef VEC4D_GEN2

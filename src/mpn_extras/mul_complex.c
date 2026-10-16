@@ -11,7 +11,6 @@
 
 #include <string.h>
 #include "mpn_extras.h"
-#include "gr.h"
 #if FLINT_HAVE_FFT_SMALL
 # include "fft_small.h"
 #endif
@@ -30,11 +29,12 @@
     multiplications for a product, via t3 = (ar + ai)(br + bi), and two
     for a square, via zr = (ar + ai)(ar - ai) -- with the terms
     accumulated in a two's-complement accumulator so that the mixed signs
-    need no case analysis. Above the threshold the operands are converted
-    once into a transformed-integer context and reused across the
-    pointwise products: 4 forward + 2 inverse transforms replace the
-    8 + 4 of four fused multiplications (2 + 2 replace 6 + 3 for
-    squaring).
+    need no case analysis. Above the threshold every variant (full, low,
+    high and windowed products and squares) goes through one fft_small
+    engine (_fft_small_mpn_mul_complex and relatives), which transforms
+    each operand once and reuses it across the pointwise products:
+    4 forward + 2 inverse transforms replace the 8 + 4 of four fused
+    multiplications (2 + 2 replace 6 + 3 for squaring).
 
     The high variants receive n + 1 limbs, the limbs [n, 2n] of the exact
     result. They are approximate, as usual for high products: each real
@@ -74,172 +74,6 @@ ulong flint_fft_small_max_transformed_ring_size = UWORD(1) << 30;
 #define SQRHIGH_COMPLEX_KARATSUBA_CUTOFF 20
 
 #if FLINT_HAVE_FFT_SMALL
-
-/* convert an accumulated element out into (z, zlimbs) starting at limb
-   offset 'shift' of the magnitude; returns 0 on any refusal. shift > 0
-   uses the truncated conversion (at most one unit of error in the
-   lowest returned limb, the mulhigh contract); shift = 0 is exact. */
-static int
-_tmpn_out(nn_ptr z, mp_size_t zlimbs, slong * zlen, gr_ptr acc,
-          mp_size_t shift, gr_ctx_t tctx)
-{
-    slong tn;
-    int sg, status;
-
-    /* The accumulators are dead after this, so the conversion consumes
-       them and skips copying the transform. The window is the caller's
-       result window, which is short of the reconstruction by the top
-       CRT coefficient's length; the ring stages that itself, out of a
-       slab freed by the clears above, and refuses if the value does
-       not fit. */
-    if (shift > 0)
-        status = gr_transformed_mpn_get_trunc_destructive(z, zlimbs, &tn,
-                                                          &sg, shift, acc,
-                                                          tctx);
-    else
-        status = gr_transformed_mpn_get_destructive(z, zlimbs, &tn, &sg,
-                                                    acc, tctx);
-
-    if (status != GR_SUCCESS)
-        return 0;
-    *zlen = (tn == 0 || !sg) ? tn : -(slong) tn;
-    return 1;
-}
-
-/* fft path shared by mul and mulhigh: shift = 0 writes 2n+1 limbs,
-   shift = n writes n+1 limbs */
-static int
-_mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
-    nn_srcptr ar, mp_size_t arn, int ar_sgn,
-    nn_srcptr ai, mp_size_t ain, int ai_sgn,
-    nn_srcptr br, mp_size_t brn, int br_sgn,
-    nn_srcptr bi, mp_size_t bin, int bi_sgn,
-    mp_size_t shift, mp_size_t zlimbs)
-{
-    gr_ctx_t tctx;
-    gr_ptr E;
-    int ok = 1;
-#define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
-
-    /* the bound is one product's magnitude; the two-term accumulation
-       and the sign are the context's own provisioning. Five elements
-       suffice (see the schedule below), and the conversions take their
-       staging from a slab the clears release rather than from a
-       reservation of their own */
-    if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin)),
-            2, 1, 5, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER
-                     | GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB)
-            != GR_SUCCESS)
-        return 0;
-
-    GR_TMP_INIT_VEC(E, 5, tctx);
-
-    ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, ar_sgn, tctx) == GR_SUCCESS;
-    ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, ai_sgn, tctx) == GR_SUCCESS;
-    ok = ok && gr_transformed_mpn_set(E_(2), br, brn, br_sgn, tctx) == GR_SUCCESS;
-    ok = ok && gr_transformed_mpn_set(E_(3), bi, bin, bi_sgn, tctx) == GR_SUCCESS;
-
-    /*
-        zr = ar br - ai bi, zi = ar bi + ai br. Every input enters both
-        outputs, so nothing is dead until the second is formed and the
-        first output needs a slot of its own -- but only the first: the
-        second is accumulated over ar in place, which dies at its own
-        last use. Hence five elements, and the same two product pairs
-        as a six-element schedule, so the depth agreement the
-        accumulations require is unchanged.
-    */
-    ok = ok && gr_mul(E_(4), E_(0), E_(2), tctx) == GR_SUCCESS;
-    ok = ok && gr_submul(E_(4), E_(1), E_(3), tctx) == GR_SUCCESS;   /* zr */
-    ok = ok && gr_mul(E_(0), E_(0), E_(3), tctx) == GR_SUCCESS;
-    ok = ok && gr_addmul(E_(0), E_(1), E_(2), tctx) == GR_SUCCESS;   /* zi */
-
-    /* ai, br and bi are dead; releasing them now returns their slabs,
-       and the conversions below take their staging from one. A repeat
-       clear is inert, so the vector clear at the end stays correct. */
-    gr_clear(E_(1), tctx);
-    gr_clear(E_(2), tctx);
-    gr_clear(E_(3), tctx);
-
-    ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(4), shift, tctx);
-    ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(0), shift, tctx);
-
-    GR_TMP_CLEAR_VEC(E, 5, tctx);
-    gr_ctx_clear(tctx);
-#undef E_
-    return ok;
-}
-
-static int
-_sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
-    nn_srcptr ar, mp_size_t arn, int ar_sgn,
-    nn_srcptr ai, mp_size_t ain, int ai_sgn,
-    mp_size_t shift, mp_size_t zlimbs)
-{
-    gr_ctx_t tctx;
-    gr_ptr E;
-    int ok = 1;
-#define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
-
-    /*
-        terms_bound is 2, not 4: an earlier version formed
-        (ar + ai)(ar - ai) on sums of transforms, whose slot values need
-        four products' capacity -- the profile then packs fewer bits per
-        slot, and since the conversions dominate (their cost is
-        proportional to the slot count), both directions inflated by more
-        than the two forward transforms the method saves over the
-        two-multiplication Karatsuba square. The identity buys nothing
-        where multiplications are pointwise; the direct
-        ar * ar - ai * ai keeps the same geometry as the complex product.
-    */
-    if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 3,
-            GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER
-            | GR_TRANSFORMED_MPN_SCRATCH_FROM_SLAB)
-            != GR_SUCCESS)
-        return 0;
-
-    GR_TMP_INIT_VEC(E, 3, tctx);
-
-    /* the operands enter as magnitudes: the squares are sign free and
-       2 ar ai has the known sign ar_sgn ^ ai_sgn, applied below -- so
-       the imaginary part keeps a nonnegative element and takes the
-       cheaper unsigned reconstruction, which lacks the bias and
-       two's-complement sign-resolution passes of the signed one; only
-       the real part, whose sign genuinely depends on the values, pays
-       for the signed export */
-    ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, 0, tctx) == GR_SUCCESS;
-    ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, 0, tctx) == GR_SUCCESS;
-
-    /*
-        zr = ar ar - ai ai; zi = ar ai doubled by a pointwise addition,
-        which costs a pass over the evaluations against a full pointwise
-        multiplication. Three elements, by the same argument as the
-        product: zr takes the one slot the inputs cannot supply, and zi
-        is accumulated over ar in place at its last use. The two
-        squarings go through the pointwise square, reading one operand
-        stream where a multiply would read two.
-    */
-    ok = ok && gr_sqr(E_(2), E_(0), tctx) == GR_SUCCESS;
-    ok = ok && gr_submul(E_(2), E_(1), E_(1), tctx) == GR_SUCCESS;    /* zr */
-    ok = ok && gr_mul(E_(0), E_(0), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_add(E_(0), E_(0), E_(0), tctx) == GR_SUCCESS;       /* zi */
-
-    /* ai is dead; its slab is the conversions' staging */
-    gr_clear(E_(1), tctx);
-
-    ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(2), shift, tctx);
-    ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(0), shift, tctx);
-
-    /* attach the known sign of 2 ar ai */
-    if (ok && (ar_sgn ^ ai_sgn))
-        *zi_len = -*zi_len;
-
-    GR_TMP_CLEAR_VEC(E, 3, tctx);
-    gr_ctx_clear(tctx);
-#undef E_
-    return ok;
-}
 
 /* the high variants promise exactly zlimbs limbs, zero padded, plus a
    sign; the shared fft path hands back a signed length */
@@ -615,6 +449,28 @@ flint_mpn_mul_complex_karatsuba(nn_ptr zr, slong * zr_len,
     TMP_END;
 }
 
+/*
+    Products with a zero part (a real or purely imaginary operand, or
+    both): the transformed engine transforms only the nonzero parts and
+    forms only the surviving part products, so the operand with one
+    nonzero part is transformed once for both outputs (three forward and
+    two inverse transforms for a real times a complex operand, against
+    four and two for two independent real products). The cutoffs below
+    send such shapes to it earlier than the general ones.
+*/
+
+slong flint_mpn_mul_complex_sparse_fft_cutoff = 300;
+slong flint_mpn_mulmid_complex_sparse_fft_cutoff = 150;
+
+/* whether some part is zero (the others nonzero or not) */
+static int
+_has_zero_part(nn_srcptr ar, mp_size_t arn, nn_srcptr ai, mp_size_t ain,
+               nn_srcptr br, mp_size_t brn, nn_srcptr bi, mp_size_t bin)
+{
+    return _norm(ar, arn) == 0 || _norm(ai, ain) == 0 ||
+           _norm(br, brn) == 0 || _norm(bi, bin) == 0;
+}
+
 /* the transformed path; returns 0 (leaving the outputs untouched) if
    fft_small is not built in or the plan is inadmissible */
 int
@@ -628,9 +484,9 @@ flint_mpn_mul_complex_fft_small(nn_ptr zr, slong * zr_len,
 #if FLINT_HAVE_FFT_SMALL
     mp_size_t maxa = FLINT_MAX(arn, ain), maxb = FLINT_MAX(brn, bin);
 
-    return _mul_complex_fft(zr, zr_len, zi, zi_len, ar, arn, ar_sgn,
-                            ai, ain, ai_sgn, br, brn, br_sgn, bi, bin,
-                            bi_sgn, 0, maxa + maxb + 1);
+    return _fft_small_mpn_mul_complex(zr, zr_len, zi, zi_len, 0,
+                maxa + maxb + 1, ar, arn, ar_sgn, ai, ain, ai_sgn,
+                br, brn, br_sgn, bi, bin, bi_sgn);
 #else
     return 0;
 #endif
@@ -645,8 +501,8 @@ flint_mpn_sqr_complex_fft_small(nn_ptr zr, slong * zr_len,
 #if FLINT_HAVE_FFT_SMALL
     mp_size_t maxa = FLINT_MAX(arn, ain);
 
-    return _sqr_complex_fft(zr, zr_len, zi, zi_len, ar, arn, ar_sgn,
-                            ai, ain, ai_sgn, 0, 2 * maxa + 1);
+    return _fft_small_mpn_sqr_complex(zr, zr_len, zi, zi_len, 0,
+                2 * maxa + 1, ar, arn, ar_sgn, ai, ain, ai_sgn);
 #else
     return 0;
 #endif
@@ -660,6 +516,15 @@ _mul_complex_general(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     nn_srcptr bi, mp_size_t bin, int bi_sgn)
 {
     mp_size_t maxa = FLINT_MAX(arn, ain), maxb = FLINT_MAX(brn, bin);
+
+    /* a real or imaginary operand: the transformed path shares its
+       transform between both output parts */
+    if (FLINT_MIN(maxa, maxb) >= flint_mpn_mul_complex_sparse_fft_cutoff &&
+        _has_zero_part(ar, arn, ai, ain, br, brn, bi, bin) &&
+        flint_mpn_mul_complex_fft_small(zr, zr_len, zi, zi_len,
+                ar, arn, ar_sgn, ai, ain, ai_sgn,
+                br, brn, br_sgn, bi, bin, bi_sgn))
+        return;
 
     if (_kara_worth_it(arn, ain, brn, bin, MUL_COMPLEX_KARATSUBA_CUTOFF))
     {
@@ -970,8 +835,8 @@ flint_mpn_mulhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
         slong lr, li;
 
         if (n >= flint_mpn_mul_complex_fft_cutoff &&
-            _mul_complex_fft(zr, &lr, zi, &li, ar, n, ar_sgn, ai, n, ai_sgn,
-                             br, n, br_sgn, bi, n, bi_sgn, n, n + 1))
+            _fft_small_mpn_mul_complex(zr, &lr, zi, &li, n, 2 * n + 1,
+                ar, n, ar_sgn, ai, n, ai_sgn, br, n, br_sgn, bi, n, bi_sgn))
         {
             _high_pad(zr, zr_sgn, lr, n + 1);
             _high_pad(zi, zi_sgn, li, n + 1);
@@ -992,8 +857,8 @@ flint_mpn_sqrhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
         slong lr, li;
 
         if (n >= flint_mpn_sqr_complex_fft_cutoff &&
-            _sqr_complex_fft(zr, &lr, zi, &li, ar, n, ar_sgn, ai, n, ai_sgn,
-                             n, n + 1))
+            _fft_small_mpn_sqr_complex(zr, &lr, zi, &li, n, 2 * n + 1,
+                ar, n, ar_sgn, ai, n, ai_sgn))
         {
             _high_pad(zr, zr_sgn, lr, n + 1);
             _high_pad(zi, zi_sgn, li, n + 1);
@@ -1002,4 +867,604 @@ flint_mpn_sqrhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
     }
 #endif
     _sqr_complex_high(zr, zr_sgn, zi, zi_sgn, ar, ar_sgn, ai, ai_sgn, n);
+}
+
+/*
+    Low products: zr and zi receive the real and imaginary parts of the
+    product mod B^n as n-limb two's-complement residues. The inputs are
+    magnitudes with sign bits as for the full products, of any lengths
+    (>= 1 limb, possibly beyond n); only their low n limbs matter, since
+    (-1)^s |x| = (-1)^s (|x| mod B^n) mod B^n. The residues need no sign:
+    they are the low limbs of the exact parts in two's complement, which
+    is what a Kronecker unpacking of signed fields reads.
+*/
+
+slong flint_mpn_mullow_complex_fft_cutoff = 230;
+slong flint_mpn_sqrlow_complex_fft_cutoff = 270;
+
+/* t (n limbs) = |a| |b| mod B^n; zero lengths allowed */
+static void
+_mullow_any(nn_ptr t, mp_size_t n, nn_srcptr a, mp_size_t an,
+            nn_srcptr b, mp_size_t bn)
+{
+    mp_size_t zh;
+
+    an = _norm(a, FLINT_MIN(an, n));
+    bn = _norm(b, FLINT_MIN(bn, n));
+
+    if (an == 0 || bn == 0)
+    {
+        flint_mpn_zero(t, n);
+        return;
+    }
+
+    zh = FLINT_MIN(n, an + bn);
+
+    if (an >= bn)
+        flint_mpn_mulmid(t, a, an, b, bn, 0, zh);
+    else
+        flint_mpn_mulmid(t, b, bn, a, an, 0, zh);
+
+    if (zh < n)
+        flint_mpn_zero(t + zh, n - zh);
+}
+
+/* z = (-1)^xs x + (-1)^ys y mod B^n; z may alias x or y */
+static void
+_addsub_mod(nn_ptr z, nn_srcptr x, int xs, nn_srcptr y, int ys, mp_size_t n)
+{
+    if (xs == ys)
+    {
+        mpn_add_n(z, x, y, n);
+        if (xs)
+            mpn_neg(z, z, n);
+    }
+    else if (xs)
+        mpn_sub_n(z, y, x, n);
+    else
+        mpn_sub_n(z, x, y, n);
+}
+
+/* z = 2 x mod B^n, negated if s */
+static void
+_double_mod(nn_ptr z, nn_srcptr x, int s, mp_size_t n)
+{
+    mpn_lshift(z, x, n, 1);
+    if (s)
+        mpn_neg(z, z, n);
+}
+
+void
+flint_mpn_mullow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    nn_ptr t;
+    TMP_INIT;
+
+    TMP_START;
+    t = TMP_ALLOC(n * sizeof(ulong));
+
+    _mullow_any(zr, n, ar, arn, br, brn);
+    _mullow_any(t, n, ai, ain, bi, bin);
+    _addsub_mod(zr, zr, ar_sgn ^ br_sgn, t, ai_sgn ^ bi_sgn ^ 1, n);
+
+    _mullow_any(zi, n, ar, arn, bi, bin);
+    _mullow_any(t, n, ai, ain, br, brn);
+    _addsub_mod(zi, zi, ar_sgn ^ bi_sgn, t, ai_sgn ^ br_sgn, n);
+
+    TMP_END;
+}
+
+void
+flint_mpn_mullow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    mp_size_t maxa, maxb;
+    nn_ptr t2, u, v;
+    slong ul, vl;
+    int s1, s2, s3;
+    TMP_INIT;
+
+    arn = _norm(ar, FLINT_MIN(arn, n));
+    ain = _norm(ai, FLINT_MIN(ain, n));
+    brn = _norm(br, FLINT_MIN(brn, n));
+    bin = _norm(bi, FLINT_MIN(bin, n));
+    maxa = FLINT_MAX(arn, ain);
+    maxb = FLINT_MAX(brn, bin);
+
+    TMP_START;
+    t2 = TMP_ALLOC((n + maxa + 1 + maxb + 1) * sizeof(ulong));
+    u = t2 + n;
+    v = u + maxa + 1;
+
+    s1 = ar_sgn ^ br_sgn;
+    s2 = ai_sgn ^ bi_sgn;
+
+    /* the sums of the truncated parts are congruent to the sums of the
+       parts, and so is their truncated product */
+    ul = _signed_add_normalise(u, ar, arn, ar_sgn, ai, ain, ai_sgn);
+    vl = _signed_add_normalise(v, br, brn, br_sgn, bi, bin, bi_sgn);
+    s3 = (ul < 0) ^ (vl < 0);
+
+    _mullow_any(zi, n, u, FLINT_ABS(ul), v, FLINT_ABS(vl));    /* t3 */
+    _mullow_any(t2, n, ai, ain, bi, bin);
+    _mullow_any(zr, n, ar, arn, br, brn);                      /* t1 */
+
+    /* zi = t3 - t1 - t2, zr = t1 - t2 */
+    _addsub_mod(zi, zi, s3, zr, s1 ^ 1, n);
+    _addsub_mod(zi, zi, 0, t2, s2 ^ 1, n);
+    _addsub_mod(zr, zr, s1, t2, s2 ^ 1, n);
+
+    TMP_END;
+}
+
+void
+flint_mpn_sqrlow_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    nn_ptr t;
+    TMP_INIT;
+
+    TMP_START;
+    t = TMP_ALLOC(n * sizeof(ulong));
+
+    _mullow_any(zr, n, ar, arn, ar, arn);
+    _mullow_any(t, n, ai, ain, ai, ain);
+    mpn_sub_n(zr, zr, t, n);
+
+    _mullow_any(t, n, ar, arn, ai, ain);
+    _double_mod(zi, t, ar_sgn ^ ai_sgn, n);
+
+    TMP_END;
+}
+
+void
+flint_mpn_sqrlow_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    mp_size_t maxa;
+    nn_ptr u, v;
+    slong ul, vl;
+    TMP_INIT;
+
+    arn = _norm(ar, FLINT_MIN(arn, n));
+    ain = _norm(ai, FLINT_MIN(ain, n));
+    maxa = FLINT_MAX(arn, ain);
+
+    TMP_START;
+    u = TMP_ALLOC(2 * (maxa + 1) * sizeof(ulong));
+    v = u + maxa + 1;
+
+    /* zr = (ar + ai)(ar - ai) */
+    ul = _signed_add_normalise(u, ar, arn, ar_sgn, ai, ain, ai_sgn);
+    vl = _signed_add_normalise(v, ar, arn, ar_sgn, ai, ain, ai_sgn ^ 1);
+    _mullow_any(zr, n, u, FLINT_ABS(ul), v, FLINT_ABS(vl));
+    if ((ul < 0) ^ (vl < 0))
+        mpn_neg(zr, zr, n);
+
+    _mullow_any(zi, n, ar, arn, ai, ain);
+    _double_mod(zi, zi, ar_sgn ^ ai_sgn, n);
+
+    TMP_END;
+}
+
+int
+flint_mpn_mullow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+#if FLINT_HAVE_FFT_SMALL
+    /* the residues mod B^n are the windows [0, n) */
+    return _fft_small_mpn_mulmid_complex(zr, zi, 0, n, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+#else
+    return 0;
+#endif
+}
+
+int
+flint_mpn_sqrlow_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+#if FLINT_HAVE_FFT_SMALL
+    return _fft_small_mpn_sqrmid_complex(zr, zi, 0, n, ar, arn, ar_sgn,
+                                         ai, ain, ai_sgn);
+#else
+    return 0;
+#endif
+}
+
+void
+flint_mpn_mullow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    mp_size_t maxa, maxb;
+
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(arn >= 1 && ain >= 1 && brn >= 1 && bin >= 1);
+
+    /* only the low n limbs of each part matter */
+    arn = FLINT_MIN(arn, n);
+    ain = FLINT_MIN(ain, n);
+    brn = FLINT_MIN(brn, n);
+    bin = FLINT_MIN(bin, n);
+    maxa = FLINT_MAX(arn, ain);
+    maxb = FLINT_MAX(brn, bin);
+
+    if (FLINT_MIN(maxa, maxb) >= flint_mpn_mul_complex_sparse_fft_cutoff &&
+        _has_zero_part(ar, arn, ai, ain, br, brn, bi, bin) &&
+        flint_mpn_mullow_complex_fft_small(zr, zi, n,
+                ar, arn, ar_sgn, ai, ain, ai_sgn,
+                br, brn, br_sgn, bi, bin, bi_sgn))
+        return;
+
+    if (_kara_worth_it(arn, ain, brn, bin, MUL_COMPLEX_KARATSUBA_CUTOFF))
+    {
+        if (FLINT_MIN(maxa, maxb) >= flint_mpn_mullow_complex_fft_cutoff &&
+            flint_mpn_mullow_complex_fft_small(zr, zi, n,
+                    ar, arn, ar_sgn, ai, ain, ai_sgn,
+                    br, brn, br_sgn, bi, bin, bi_sgn))
+            return;
+
+        flint_mpn_mullow_complex_karatsuba(zr, zi, n, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+    }
+    else
+        flint_mpn_mullow_complex_classical(zr, zi, n, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+}
+
+void
+flint_mpn_sqrlow_complex(nn_ptr zr, nn_ptr zi, mp_size_t n,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    mp_size_t maxa;
+
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(arn >= 1 && ain >= 1);
+
+    arn = FLINT_MIN(arn, n);
+    ain = FLINT_MIN(ain, n);
+    maxa = FLINT_MAX(arn, ain);
+
+    if (_kara_worth_it(arn, ain, arn, ain, SQR_COMPLEX_KARATSUBA_CUTOFF))
+    {
+        if (maxa >= flint_mpn_sqrlow_complex_fft_cutoff &&
+            flint_mpn_sqrlow_complex_fft_small(zr, zi, n,
+                    ar, arn, ar_sgn, ai, ain, ai_sgn))
+            return;
+
+        flint_mpn_sqrlow_complex_karatsuba(zr, zi, n,
+                ar, arn, ar_sgn, ai, ain, ai_sgn);
+    }
+    else
+        flint_mpn_sqrlow_complex_classical(zr, zi, n,
+                ar, arn, ar_sgn, ai, ain, ai_sgn);
+}
+
+/*
+    Windowed products: zr and zi receive the limbs [lo, hi) of the real
+    and imaginary parts in two's complement, i.e. floor(x / B^lo) + e
+    mod B^(hi - lo) for each exact part x, with a small error e in the
+    lowest limb (none for lo = 0, where these are the low products).
+    The schoolbook and Karatsuba variants combine real windows from
+    flint_mpn_mulmid, each a lower approximation short by less than
+    min(an, bn) B units; the transformed variant has |e| <= 1.
+*/
+
+slong flint_mpn_mulmid_complex_fft_cutoff = 120;
+slong flint_mpn_sqrmid_complex_fft_cutoff = 160;
+
+/* t (hi - lo limbs) = limbs [lo, hi) of |a| |b|, as flint_mpn_mulmid
+   computes them (a lower approximation); any lengths */
+static void
+_mulmid_any(nn_ptr t, mp_size_t lo, mp_size_t hi, nn_srcptr a, mp_size_t an,
+            nn_srcptr b, mp_size_t bn)
+{
+    mp_size_t zh;
+
+    an = _norm(a, FLINT_MIN(an, hi));
+    bn = _norm(b, FLINT_MIN(bn, hi));
+
+    if (an == 0 || bn == 0 || lo >= an + bn)
+    {
+        flint_mpn_zero(t, hi - lo);
+        return;
+    }
+
+    zh = FLINT_MIN(hi, an + bn);
+
+    if (an >= bn)
+        flint_mpn_mulmid(t, a, an, b, bn, lo, zh);
+    else
+        flint_mpn_mulmid(t, b, bn, a, an, lo, zh);
+
+    if (zh < hi)
+        flint_mpn_zero(t + zh - lo, hi - zh);
+}
+
+void
+flint_mpn_mulmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    mp_size_t w = hi - lo;
+    nn_ptr t;
+    TMP_INIT;
+
+    if (lo == 0)
+    {
+        flint_mpn_mullow_complex_classical(zr, zi, hi, ar, arn, ar_sgn,
+            ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+        return;
+    }
+
+    TMP_START;
+    t = TMP_ALLOC(w * sizeof(ulong));
+
+    _mulmid_any(zr, lo, hi, ar, arn, br, brn);
+    _mulmid_any(t, lo, hi, ai, ain, bi, bin);
+    _addsub_mod(zr, zr, ar_sgn ^ br_sgn, t, ai_sgn ^ bi_sgn ^ 1, w);
+
+    _mulmid_any(zi, lo, hi, ar, arn, bi, bin);
+    _mulmid_any(t, lo, hi, ai, ain, br, brn);
+    _addsub_mod(zi, zi, ar_sgn ^ bi_sgn, t, ai_sgn ^ br_sgn, w);
+
+    TMP_END;
+}
+
+void
+flint_mpn_mulmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    mp_size_t w = hi - lo, maxa, maxb;
+    nn_ptr t2, u, v;
+    slong ul, vl;
+    int s1, s2, s3;
+    TMP_INIT;
+
+    if (lo == 0)
+    {
+        flint_mpn_mullow_complex_karatsuba(zr, zi, hi, ar, arn, ar_sgn,
+            ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+        return;
+    }
+
+    arn = _norm(ar, FLINT_MIN(arn, hi));
+    ain = _norm(ai, FLINT_MIN(ain, hi));
+    brn = _norm(br, FLINT_MIN(brn, hi));
+    bin = _norm(bi, FLINT_MIN(bin, hi));
+    maxa = FLINT_MAX(arn, ain);
+    maxb = FLINT_MAX(brn, bin);
+
+    TMP_START;
+    t2 = TMP_ALLOC((w + maxa + 1 + maxb + 1) * sizeof(ulong));
+    u = t2 + w;
+    v = u + maxa + 1;
+
+    s1 = ar_sgn ^ br_sgn;
+    s2 = ai_sgn ^ bi_sgn;
+
+    ul = _signed_add_normalise(u, ar, arn, ar_sgn, ai, ain, ai_sgn);
+    vl = _signed_add_normalise(v, br, brn, br_sgn, bi, bin, bi_sgn);
+    s3 = (ul < 0) ^ (vl < 0);
+
+    _mulmid_any(zi, lo, hi, u, FLINT_ABS(ul), v, FLINT_ABS(vl));    /* t3 */
+    _mulmid_any(t2, lo, hi, ai, ain, bi, bin);
+    _mulmid_any(zr, lo, hi, ar, arn, br, brn);                      /* t1 */
+
+    _addsub_mod(zi, zi, s3, zr, s1 ^ 1, w);
+    _addsub_mod(zi, zi, 0, t2, s2 ^ 1, w);
+    _addsub_mod(zr, zr, s1, t2, s2 ^ 1, w);
+
+    TMP_END;
+}
+
+void
+flint_mpn_sqrmid_complex_classical(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    mp_size_t w = hi - lo;
+    nn_ptr t;
+    TMP_INIT;
+
+    if (lo == 0)
+    {
+        flint_mpn_sqrlow_complex_classical(zr, zi, hi, ar, arn, ar_sgn, ai, ain, ai_sgn);
+        return;
+    }
+
+    TMP_START;
+    t = TMP_ALLOC(w * sizeof(ulong));
+
+    _mulmid_any(zr, lo, hi, ar, arn, ar, arn);
+    _mulmid_any(t, lo, hi, ai, ain, ai, ain);
+    mpn_sub_n(zr, zr, t, w);
+
+    /* 2 ar ai from the window one limb lower, so that the doubling
+       shifts in the true bit below lo rather than a zero */
+    {
+        nn_ptr t2 = TMP_ALLOC((w + 1) * sizeof(ulong));
+        _mulmid_any(t2, lo - 1, hi, ar, arn, ai, ain);
+        mpn_lshift(t2, t2, w + 1, 1);
+        flint_mpn_copyi(zi, t2 + 1, w);
+        if (ar_sgn ^ ai_sgn)
+            mpn_neg(zi, zi, w);
+    }
+
+    TMP_END;
+}
+
+void
+flint_mpn_sqrmid_complex_karatsuba(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    mp_size_t w = hi - lo, maxa;
+    nn_ptr u, v, t2;
+    slong ul, vl;
+    TMP_INIT;
+
+    if (lo == 0)
+    {
+        flint_mpn_sqrlow_complex_karatsuba(zr, zi, hi, ar, arn, ar_sgn, ai, ain, ai_sgn);
+        return;
+    }
+
+    arn = _norm(ar, FLINT_MIN(arn, hi));
+    ain = _norm(ai, FLINT_MIN(ain, hi));
+    maxa = FLINT_MAX(arn, ain);
+
+    TMP_START;
+    u = TMP_ALLOC((2 * (maxa + 1) + w + 1) * sizeof(ulong));
+    v = u + maxa + 1;
+    t2 = v + maxa + 1;
+
+    /* zr = (ar + ai)(ar - ai) */
+    ul = _signed_add_normalise(u, ar, arn, ar_sgn, ai, ain, ai_sgn);
+    vl = _signed_add_normalise(v, ar, arn, ar_sgn, ai, ain, ai_sgn ^ 1);
+    _mulmid_any(zr, lo, hi, u, FLINT_ABS(ul), v, FLINT_ABS(vl));
+    if ((ul < 0) ^ (vl < 0))
+        mpn_neg(zr, zr, w);
+
+    _mulmid_any(t2, lo - 1, hi, ar, arn, ai, ain);
+    mpn_lshift(t2, t2, w + 1, 1);
+    flint_mpn_copyi(zi, t2 + 1, w);
+    if (ar_sgn ^ ai_sgn)
+        mpn_neg(zi, zi, w);
+
+    TMP_END;
+}
+
+int
+flint_mpn_mulmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+#if FLINT_HAVE_FFT_SMALL
+    return _fft_small_mpn_mulmid_complex(zr, zi, lo, hi, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+#else
+    return 0;
+#endif
+}
+
+int
+flint_mpn_sqrmid_complex_fft_small(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+#if FLINT_HAVE_FFT_SMALL
+    return _fft_small_mpn_sqrmid_complex(zr, zi, lo, hi, ar, arn, ar_sgn,
+                                         ai, ain, ai_sgn);
+#else
+    return 0;
+#endif
+}
+
+void
+flint_mpn_mulmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn)
+{
+    mp_size_t maxa, maxb;
+
+    FLINT_ASSERT(0 <= lo && lo < hi);
+    FLINT_ASSERT(arn >= 1 && ain >= 1 && brn >= 1 && bin >= 1);
+
+    if (lo == 0)
+    {
+        flint_mpn_mullow_complex(zr, zi, hi, ar, arn, ar_sgn, ai, ain, ai_sgn,
+                                 br, brn, br_sgn, bi, bin, bi_sgn);
+        return;
+    }
+
+    arn = FLINT_MIN(arn, hi);
+    ain = FLINT_MIN(ain, hi);
+    brn = FLINT_MIN(brn, hi);
+    bin = FLINT_MIN(bin, hi);
+    maxa = FLINT_MAX(arn, ain);
+    maxb = FLINT_MAX(brn, bin);
+
+    if (FLINT_MIN(maxa, maxb) >= flint_mpn_mulmid_complex_sparse_fft_cutoff &&
+        _has_zero_part(ar, arn, ai, ain, br, brn, bi, bin) &&
+        flint_mpn_mulmid_complex_fft_small(zr, zi, lo, hi,
+                ar, arn, ar_sgn, ai, ain, ai_sgn,
+                br, brn, br_sgn, bi, bin, bi_sgn))
+        return;
+
+    if (_kara_worth_it(arn, ain, brn, bin, MUL_COMPLEX_KARATSUBA_CUTOFF))
+    {
+        if (FLINT_MIN(maxa, maxb) >= flint_mpn_mulmid_complex_fft_cutoff &&
+            flint_mpn_mulmid_complex_fft_small(zr, zi, lo, hi,
+                    ar, arn, ar_sgn, ai, ain, ai_sgn,
+                    br, brn, br_sgn, bi, bin, bi_sgn))
+            return;
+
+        flint_mpn_mulmid_complex_karatsuba(zr, zi, lo, hi, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+    }
+    else
+        flint_mpn_mulmid_complex_classical(zr, zi, lo, hi, ar, arn, ar_sgn,
+                ai, ain, ai_sgn, br, brn, br_sgn, bi, bin, bi_sgn);
+}
+
+void
+flint_mpn_sqrmid_complex(nn_ptr zr, nn_ptr zi, mp_size_t lo, mp_size_t hi,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn)
+{
+    mp_size_t maxa;
+
+    FLINT_ASSERT(0 <= lo && lo < hi);
+    FLINT_ASSERT(arn >= 1 && ain >= 1);
+
+    if (lo == 0)
+    {
+        flint_mpn_sqrlow_complex(zr, zi, hi, ar, arn, ar_sgn, ai, ain, ai_sgn);
+        return;
+    }
+
+    arn = FLINT_MIN(arn, hi);
+    ain = FLINT_MIN(ain, hi);
+    maxa = FLINT_MAX(arn, ain);
+
+    if (_kara_worth_it(arn, ain, arn, ain, SQR_COMPLEX_KARATSUBA_CUTOFF))
+    {
+        if (maxa >= flint_mpn_sqrmid_complex_fft_cutoff &&
+            flint_mpn_sqrmid_complex_fft_small(zr, zi, lo, hi,
+                    ar, arn, ar_sgn, ai, ain, ai_sgn))
+            return;
+
+        flint_mpn_sqrmid_complex_karatsuba(zr, zi, lo, hi,
+                ar, arn, ar_sgn, ai, ain, ai_sgn);
+    }
+    else
+        flint_mpn_sqrmid_complex_classical(zr, zi, lo, hi,
+                ar, arn, ar_sgn, ai, ain, ai_sgn);
 }

@@ -239,6 +239,65 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
   } while (0)
 #endif
 
+/* (wider chains, for the dense-table kernels of mp_real: composed from
+   the eight-limb chains and a carry; inline assembly with nine or more
+   early-clobber outputs exceeds what the register allocator can satisfy
+   at low optimization levels, "asm operand has impossible constraints"
+   with gcc 13 at -O1 -march=native) */
+#if !defined(add_sssssssssaaaaaaaaaaaaaaaaaa)
+# define add_sssssssssaaaaaaaaaaaaaaaaaa(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t29 = 0; \
+    add_ssssssssaaaaaaaaaaaaaaaa(__t29, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b6, b5, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s8, s7, a8, a7, b8, b7); \
+    add_ssaaaa(s8, s7, s8, s7, (ulong) 0, __t29); \
+  } while (0)
+
+# define sub_dddddddddmmmmmmmmmsssssssss(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t39, __t49; \
+    sub_ddddddddmmmmmmmmssssssss(__t39, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b6, b5, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__t49, s7, (ulong) 0, a7, (ulong) 0, b7); \
+    sub_ddmmss(s8, s7, (a8) - (b8), s7, -__t49, -__t39); \
+  } while (0)
+#endif
+
+#if !defined(add_ssssssssssaaaaaaaaaaaaaaaaaaaa)
+# define add_ssssssssssaaaaaaaaaaaaaaaaaaaa(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t30 = 0; \
+    add_sssssssssaaaaaaaaaaaaaaaaaa(__t30, s7, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a7, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b7, b6, b5, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s9, s8, a9, a8, b9, b8); \
+    add_ssaaaa(s9, s8, s9, s8, (ulong) 0, __t30); \
+  } while (0)
+
+# define sub_ddddddddddmmmmmmmmmmssssssssss(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t40, __t50; \
+    sub_dddddddddmmmmmmmmmsssssssss(__t40, s7, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a7, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b7, b6, b5, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__t50, s8, (ulong) 0, a8, (ulong) 0, b8); \
+    sub_ddmmss(s9, s8, (a9) - (b9), s8, -__t50, -__t40); \
+  } while (0)
+#endif
+
+#if !defined(add_sssssssssssaaaaaaaaaaaaaaaaaaaaaa)
+# define add_sssssssssssaaaaaaaaaaaaaaaaaaaaaa(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t31 = 0; \
+    add_ssssssssssaaaaaaaaaaaaaaaaaaaa(__t31, s8, s7, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a8, a7, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b8, b7, b6, b5, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s10, s9, a10, a9, b10, b9); \
+    add_ssaaaa(s10, s9, s10, s9, (ulong) 0, __t31); \
+  } while (0)
+
+# define sub_dddddddddddmmmmmmmmmmmsssssssssss(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t41, __t51; \
+    sub_ddddddddddmmmmmmmmmmssssssssss(__t41, s8, s7, s6, s5, s4, s3, s2, s1, s0, (ulong) 0, a8, a7, a6, a5, a4, a3, a2, a1, a0, (ulong) 0, b8, b7, b6, b5, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__t51, s9, (ulong) 0, a9, (ulong) 0, b9); \
+    sub_ddmmss(s10, s9, (a10) - (b10), s9, -__t51, -__t41); \
+  } while (0)
+#endif
+
 #if !defined(MPN_INCR_U)
 # if FLINT_WANT_ASSERT
 #  define MPN_INCR_U(ptr, size, incr) \

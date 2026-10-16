@@ -266,9 +266,12 @@ _acb_poly_polylog_cpx_small(acb_ptr w, const acb_t s, const acb_t z, slong len, 
 
     N = polylog_choose_terms(err, sigma, zmag, len - 1, prec);
 
-    /* TODO: allow threading */
+    /* TODO: allow threading in the naive case */
     acb_one(a);
-    _acb_poly_powsum_series_naive(w, s, a, z, N - 1, len, prec);
+    if (_acb_poly_powsum_series_tree_is_faster(s, a, z, N - 1, len, prec, 0))
+        _acb_poly_powsum_series_tree(w, s, a, z, N - 1, len, prec);
+    else
+        _acb_poly_powsum_series_naive(w, s, a, z, N - 1, len, prec);
     _acb_vec_scalar_mul(w, w, len, z, prec);
 
     for (k = 0; k < len; k++)
