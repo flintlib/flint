@@ -23,17 +23,6 @@
 #include "machine_vectors.h"
 #include "fft_small.h"
 
-/* truncation granularity follows the plan's depth: whole blocks at
-   block depths, the full (short) transform length below one block */
-
-/* the anticipated granularity for a length before any plan exists */
-#define _len_trunc(x) \
-    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
-                              : n_round_up((x), BLK_SZ))
-#define _op_trunc(x, Pln) \
-    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
-                                : n_round_up((x), BLK_SZ))
-
 /*
     Ring of mpn_mod polynomials of bounded length in fft_small transformed
     representation, following gr/nmod_transformed_poly.c: elements are
@@ -242,7 +231,7 @@ mtpoly_set_gr_poly(gr_ptr res, gr_srcptr a, slong len,
         return mtpoly_zero(res, ctx);
 
     fft_small_fft_mpn_mod(&MTPOLY(res)->op, ac, len,
-                          _op_trunc(len, T->P), T->base, T->P);
+                          _fft_small_op_trunc(len, T->P), T->base, T->P);
     MTPOLY(res)->len = len;
     MTPOLY(res)->terms = 1;
     MTPOLY(res)->depth = 1;
@@ -260,7 +249,7 @@ _mtpoly_export(mtpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
     const fft_small_plan_struct * P = T->P;
     slong xlen = MTPOLY(x)->len;
     fft_small_op_struct tmp;
-    ulong itr = _op_trunc((ulong) xlen, P);
+    ulong itr = _fft_small_op_trunc((ulong) xlen, P);
     slong i;
 
     tmp = MTPOLY(x)->op;
@@ -304,7 +293,7 @@ mtpoly_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x,
     const fft_small_plan_struct * P = T->P;
     nn_ptr cc = (nn_ptr) c;
     slong xlen = MTPOLY(x)->len;
-    ulong itr = _op_trunc((ulong) xlen, P);
+    ulong itr = _fft_small_op_trunc((ulong) xlen, P);
     slong i;
 
     if (!_mtpoly_base_ok(base_ctx, T))
@@ -403,7 +392,7 @@ mtpoly_one(gr_ptr x, gr_ctx_t ctx)
     nn_ptr c = flint_calloc(T->nlimbs, sizeof(ulong));
     c[0] = 1;
 
-    fft_small_fft_mpn_mod(&MTPOLY(x)->op, c, 1, _op_trunc(1, T->P), T->base, T->P);
+    fft_small_fft_mpn_mod(&MTPOLY(x)->op, c, 1, _fft_small_op_trunc(1, T->P), T->base, T->P);
     flint_free(c);
     MTPOLY(x)->len = 1;
     MTPOLY(x)->terms = 1;
@@ -768,7 +757,7 @@ _mtpoly_ctx_init(gr_ctx_t ctx, gr_ctx_t base,
        storage budget are policy and are skipped */
     if (!wl->force)
     {
-            double L = (double) _len_trunc((ulong) N);
+            double L = (double) _fft_small_len_trunc((ulong) N);
             double lg = (double) FLINT_BIT_COUNT((ulong) L);
             double np = (double) T->P->np;
             double ni = (double) wl->num_inputs;

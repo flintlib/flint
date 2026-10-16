@@ -423,11 +423,100 @@ _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b,
     return 0;
 }
 
+/*
+    Whether the transposed product of lengths sn and m behind the window
+    [znlo, zn) of the product of lengths an and bn has a strictly shorter
+    transform than the window of the full product, with the arguments the
+    plans of _nmod_poly_mul_tr_mpn_ctx and _nmod_poly_mul_mid_mpn_ctx use.
+    Only the transform lengths are computed, not the plans.
+*/
+static int
+_nmod_poly_mulmid_fft_small_transposed_shorter(slong an, slong bn,
+                        slong znlo, slong zn, slong sn, slong m)
+{
+    fft_small_plan_t Pw, Pt;
+    ulong full = an + bn - 1;
+
+    _fft_small_plan_set_window_nmod(Pw, znlo, FLINT_MIN((ulong) zn, full), full,
+            n_max(_fft_small_len_trunc((ulong) an), _fft_small_len_trunc((ulong) bn)));
+    _fft_small_plan_set_window_nmod(Pt, 0, m, sn + m - 1,
+            n_max(_fft_small_len_trunc((ulong) sn), _fft_small_len_trunc((ulong) m)));
+
+    return Pt->ztrunc < Pw->ztrunc;
+}
+
 void
 _nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
-    if (!_nmod_poly_mulmid_fft_small_repack(z, a, an, b, bn, znlo, zn, mod))
-        _nmod_poly_mul_mid_default_mpn_ctx(z, znlo, zn, a, an, b, bn, mod);
+    nn_srcptr s, l;
+    slong sn, ln, m;
+
+    if (_nmod_poly_mulmid_fft_small_repack(z, a, an, b, bn, znlo, zn, mod))
+        return;
+
+    if (an >= bn)
+        s = b, sn = bn, l = a, ln = an;
+    else
+        s = a, sn = an, l = b, ln = bn;
+
+    m = zn - znlo;
+
+    /*
+        The window [znlo, zn) of the product is the transpose of the
+        multiplication by s reversed of a polynomial of length m: with
+        g = x^(sn - 1 - znlo) * l (shifted, the negative powers dropped), it
+        is the range [sn - 1, sn - 1 + m) of s*g, which
+        _nmod_poly_mul_tr_mpn_ctx computes from rev(s) and g at the cost of
+        a product of lengths sn and m, against a product of lengths sn and ln
+        for the window of the full product.
+        However, the full product's wraparound can bring the latter down to the
+        same transform length (for instance for the window [255, 319) of a
+        product of lengths 256 and 319, both are 512), and then the window
+        product is a few percent faster.
+        So the transposed driver is used only when its transform is strictly
+        shorter, as computed by the window selection of the plans of both
+        drivers. It is not used when the window is padded on both sides (it
+        starts before the full sums and ends after them).
+    */
+    if (m < ln && (znlo >= sn - 1 || zn <= ln)
+        && _nmod_poly_mulmid_fft_small_transposed_shorter(an, bn, znlo, zn, sn, m))
+    {
+        slong lead = sn - 1 - znlo;     /* zeros in front of g, if > 0 */
+        slong gn = m + sn - 1;          /* length of g, zeros included */
+        nn_ptr t;
+        TMP_INIT;
+
+        TMP_START;
+
+        if (lead <= 0)
+        {
+            /* g = l[-lead .. ), with gn - (ln + lead) zeros at the end
+               that the driver supplies itself; ln + lead > 0 since the
+               window starts before the end of the product */
+            FLINT_ASSERT(ln + lead > 0);
+            t = TMP_ARRAY_ALLOC(sn, ulong);
+            _nmod_poly_reverse(t, s, sn, sn);
+            _nmod_poly_mul_tr_default_mpn_ctx(z, m, t, sn, l - lead,
+                                              FLINT_MIN(ln + lead, gn), mod);
+        }
+        else
+        {
+            slong glen = FLINT_MIN(ln, gn - lead);
+
+            t = TMP_ARRAY_ALLOC(sn + lead + glen, ulong);
+            _nmod_poly_reverse(t, s, sn, sn);
+            _nmod_vec_zero(t + sn, lead);
+            _nmod_vec_set(t + sn + lead, l, glen);
+            _nmod_poly_mul_tr_default_mpn_ctx(z, m, t, sn, t + sn,
+                                              lead + glen, mod);
+        }
+
+        TMP_END;
+
+        return;
+    }
+
+    _nmod_poly_mul_mid_default_mpn_ctx(z, znlo, zn, a, an, b, bn, mod);
 }
 
 void

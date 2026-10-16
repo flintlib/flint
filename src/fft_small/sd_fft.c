@@ -1231,7 +1231,15 @@ are zero.
 The output satisfies
     eval_poly(in_data, sd_fft_ctx_w(Q, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
 for all `0 <= i < otrunc`. This invariant is tested in `test/t-sd_fft.c`.
-Usually, it only makes sense to have `otrunc >= itrunc` and `n_max(itrunc, otrunc) >= 2^(L-1)`.
+
+Any `1 <= itrunc, otrunc <= 2^L` is allowed. The evaluation points do not
+depend on `L`: if `n_max(itrunc, otrunc) <= 2^(L-1)`, the result is that of
+depth `L - 1`, at about the same cost, so it usually only makes sense to have
+`max(itrunc, otrunc) >= 2^(L-1)`. Recovering the input with `sd_ifft_trunc`
+requires `otrunc >= itrunc`. For `L <= LG_BLK_SZ` the entries from `itrunc` on
+are set to zero and all `2^L` outputs are computed; for larger `L` both
+truncations are rounded up to multiples of `BLK_SZ`.
+
 The array `d` needs to have size at least `2^L`.
 The input entries must be in (-3n, 3n), with n = Q->p, and so are the output
 entries; see mulmod_satisfies_bounds.c.

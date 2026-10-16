@@ -515,6 +515,8 @@ void fft_small_op_neg(fft_small_op_t Z, const fft_small_op_t A,
 typedef struct {
     fft_small_op_struct* X;
     const fft_small_plan_struct* P;
+    ulong itrunc;       /* output truncation of the transposed forward transform */
+    int transposed;
     ulong start_pi;
     ulong stop_pi;
 } _ifft_worker_struct;
@@ -525,11 +527,21 @@ static void _ifft_worker_func(void* varg)
     const fft_small_plan_struct* P = W->P;
 
     for (ulong i = W->start_pi; i < W->stop_pi; i++)
-        sd_ifft_trunc(P->ffts + P->offset + i, W->X->data + P->stride*i,
-                P->depth, P->ztrunc);
+    {
+        if (W->transposed)
+            sd_fft_trunc_tr(P->ffts + P->offset + i, W->X->data + P->stride*i,
+                    P->depth, W->itrunc, P->ztrunc);
+        else
+            sd_ifft_trunc(P->ffts + P->offset + i, W->X->data + P->stride*i,
+                    P->depth, P->ztrunc);
+    }
 }
 
-void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
+/* the inverse transform of a product, or, transposed, the transpose of the
+   forward transform of an operand of truncation itrunc; both consume the
+   normalization the pointwise stage applied */
+static void _op_ifft(fft_small_op_t X, ulong itrunc, int transposed,
+                    const fft_small_plan_t P)
 {
     ulong i;
     thread_pool_handle* handles = NULL;
@@ -539,6 +551,7 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
 
     FLINT_ASSERT(_op_compatible(X, P));
     FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+    FLINT_ASSERT(itrunc <= P->ztrunc);
 
     /* thread over the primes; ztrunc ~ an + bn, so this corresponds to
        the fused drivers threading from operand length ~1500 up */
@@ -550,6 +563,8 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
     {
         args[i].X = X;
         args[i].P = P;
+        args[i].itrunc = itrunc;
+        args[i].transposed = transposed;
         args[i].start_pi = (i+0)*P->np/nthreads;
         args[i].stop_pi  = (i+1)*P->np/nthreads;
     }
@@ -562,4 +577,15 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
         thread_pool_wait(global_thread_pool, handles[i - 1]);
 
     flint_give_back_threads(handles, nworkers);
+}
+
+void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
+{
+    _op_ifft(X, P->ztrunc, 0, P);
+}
+
+void fft_small_fft_tr(fft_small_op_t X, ulong itrunc, const fft_small_plan_t P)
+{
+    _op_ifft(X, itrunc, 1, P);
+    X->itrunc = itrunc;
 }

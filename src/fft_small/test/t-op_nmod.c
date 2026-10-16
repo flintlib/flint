@@ -15,11 +15,6 @@
 #include "nmod_poly.h"
 #include "fft_small.h"
 
-/* truncation granularity follows the plan's depth */
-#define _op_trunc(x, Pln) \
-    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
-                                : n_round_up((x), BLK_SZ))
-
 /* Accumulate K products in transform space (as a bilinear application
    like matrix multiplication would) and compare the exported window
    against classical multiplications. Inflating prod_bits beyond the
@@ -78,8 +73,8 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
             continue;   /* bound needs more than MPN_CTX_NCRTS primes */
         }
 
-        atrunc = _op_trunc(an, P);
-        btrunc = _op_trunc(bn, P);
+        atrunc = _fft_small_op_trunc(an, P);
+        btrunc = _fft_small_op_trunc(bn, P);
 
         a = FLINT_ARRAY_ALLOC(K*an, ulong);
         b = FLINT_ARRAY_ALLOC(K*bn, ulong);
@@ -218,6 +213,82 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
         flint_free(ref);
         flint_free(t);
         flint_free(ta);
+    }
+
+    /* the transposed product, as documented with fft_small_ifft_tr_nmod:
+       z[j] = sum_i b[i] v[i + j] for 0 <= j < an, which is the range
+       [bn - 1, bn - 1 + an) of rev(b)*v */
+    for (slong iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        nmod_t mod;
+        int large = n_randint(state, 8) == 0;
+        ulong an = 1 + n_randint(state, large ? 5000 : 700);
+        ulong bn = 1 + n_randint(state, large ? 5000 : 700);
+        ulong pn = an + bn - 1;
+        ulong vn = 1 + n_randint(state, pn);
+        ulong atrunc, btrunc, i;
+        fft_small_plan_t P;
+        fft_small_op_t X, B;
+        ulong *b, *br, *v, *z, *ref;
+
+        flint_set_num_threads(1 + n_randint(state, 8));
+
+        nmod_init(&mod, n_randbits(state, 2 + n_randint(state, 49)));
+
+        if (!fft_small_plan_init_nmod(P, R, 0, an, pn,
+                        FLINT_MAX(_fft_small_len_trunc(an), _fft_small_len_trunc(bn)),
+                        bn, 2 * NMOD_BITS(mod), mod, 0))
+        {
+            continue;
+        }
+
+        atrunc = FLINT_MIN(_fft_small_op_trunc(an, P), P->ztrunc);
+        btrunc = FLINT_MIN(_fft_small_op_trunc(bn, P), P->ztrunc);
+
+        b = FLINT_ARRAY_ALLOC(bn, ulong);
+        br = FLINT_ARRAY_ALLOC(bn, ulong);
+        v = FLINT_ARRAY_ALLOC(pn, ulong);
+        z = FLINT_ARRAY_ALLOC(an, ulong);
+        ref = FLINT_ARRAY_ALLOC(pn + bn - 1, ulong);
+
+        _nmod_vec_randtest(b, state, bn, mod);
+        _nmod_vec_randtest(v, state, vn, mod);
+        _nmod_vec_zero(v + vn, pn - vn);
+
+        fft_small_op_init(X, P);
+        fft_small_op_init(B, P);
+
+        fft_small_fft_nmod(B, b, bn, btrunc, mod, P);
+        fft_small_ifft_tr_nmod(X, v, vn, mod, P);
+        fft_small_op_mul(X, X, B, P);
+        fft_small_fft_tr(X, atrunc, P);
+        fft_small_export_nmod_range(z, X, 0, an, mod, P);
+
+        _nmod_poly_reverse(br, b, bn, bn);
+        _nmod_poly_mul(ref, v, pn, br, bn, mod);
+
+        for (i = 0; i < an; i++)
+        {
+            if (z[i] != ref[bn - 1 + i])
+            {
+                TEST_FUNCTION_FAIL(
+                        "transposed: i = %wu, an = %wu, bn = %wu, vn = %wu\n"
+                        "np = %wu, depth = %wu, ztrunc = %wu, modulus = %wu\n"
+                        "got %wu, expected %wu\n",
+                        i, an, bn, vn, P->np, P->depth, P->ztrunc, mod.n,
+                        z[i], ref[bn - 1 + i]);
+            }
+        }
+
+        fft_small_op_clear(X);
+        fft_small_op_clear(B);
+        fft_small_plan_clear(P);
+
+        flint_free(b);
+        flint_free(br);
+        flint_free(v);
+        flint_free(z);
+        flint_free(ref);
     }
 
     mpn_ctx_clear(R);

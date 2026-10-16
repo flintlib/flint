@@ -815,6 +815,13 @@ Multiplication
     if *fft_small* is not available. The conditions on the arguments
     are the same as for :func:`_nmod_poly_mullow`.
 
+    The window `[znlo, zn)` of the product is computed as the transpose of
+    the multiplication of the reversed shorter operand by a polynomial of
+    length `zn - znlo` (see :func:`_nmod_poly_mul_tr_mpn_ctx`) whenever that
+    transform is shorter than the one of the full product, which is the
+    case for the usual middle products; otherwise it is taken as a window
+    of the full product (see :func:`_nmod_poly_mul_mid_mpn_ctx`).
+
 .. function:: void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nn_srcptr f, slong lenf, nmod_t mod)
 
     Sets ``res`` to the remainder of the product of ``poly1`` and
