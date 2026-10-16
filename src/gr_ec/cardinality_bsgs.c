@@ -48,7 +48,7 @@ baby_struct;
 static ulong
 _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
 {
-    ulong h = UWORD(14695981039346656037);
+    ulong h = ((ulong) 14695981039346656037ULL);
     char * s;
     slong i;
     fmpz_t z;
@@ -56,7 +56,7 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
     /* the common types, read directly */
     if (R->which_ring == GR_CTX_NMOD)
     {
-        h = *(const ulong *) x * UWORD(0x9e3779b97f4a7c15);
+        h = *(const ulong *) x * ((ulong) 0x9e3779b97f4a7c15ULL);
         return h ^ (h >> 29);
     }
 
@@ -71,16 +71,16 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
             const __mpz_struct * m = COEFF_TO_PTR(*f);
 
             for (i = 0; i < FLINT_ABS(m->_mp_size); i++)
-                h = (h ^ m->_mp_d[i]) * UWORD(0x100000001b3);
+                h = (h ^ m->_mp_d[i]) * ((ulong) 0x100000001b3ULL);
         }
 
-        h *= UWORD(0x9e3779b97f4a7c15);
+        h *= ((ulong) 0x9e3779b97f4a7c15ULL);
         return h ^ (h >> 29);
     }
 
     if (R->which_ring == GR_CTX_FQ_ZECH)
     {
-        h = ((const fq_zech_struct *) x)->value * UWORD(0x9e3779b97f4a7c15);
+        h = ((const fq_zech_struct *) x)->value * ((ulong) 0x9e3779b97f4a7c15ULL);
         return h ^ (h >> 29);
     }
 
@@ -89,7 +89,7 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
         const nmod_poly_struct * f = x;
 
         for (i = 0; i < f->length; i++)
-            h = (h ^ f->coeffs[i]) * UWORD(0x100000001b3);
+            h = (h ^ f->coeffs[i]) * ((ulong) 0x100000001b3ULL);
 
         return h ^ (h >> 29);
     }
@@ -99,7 +99,7 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
         const fmpz_poly_struct * f = x;
 
         for (i = 0; i < f->length; i++)
-            h = (h ^ fmpz_fdiv_ui(f->coeffs + i, UWORD_MAX)) * UWORD(0x100000001b3);
+            h = (h ^ fmpz_fdiv_ui(f->coeffs + i, UWORD_MAX)) * ((ulong) 0x100000001b3ULL);
 
         return h ^ (h >> 29);
     }
@@ -109,7 +109,7 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
 
     if (gr_get_fmpz(z, x, R) == GR_SUCCESS)
     {
-        h = fmpz_fdiv_ui(z, UWORD_MAX) * UWORD(0x9e3779b97f4a7c15);
+        h = fmpz_fdiv_ui(z, UWORD_MAX) * ((ulong) 0x9e3779b97f4a7c15ULL);
         fmpz_clear(z);
         return h ^ (h >> 29);
     }
@@ -125,7 +125,7 @@ _hash_elem(gr_srcptr x, gr_ctx_t R, int * status)
     for (i = 0; s[i] != '\0'; i++)
     {
         h ^= (ulong) (unsigned char) s[i];
-        h *= UWORD(1099511628211);
+        h *= ((ulong) 1099511628211ULL);
     }
 
     flint_free(s);
@@ -528,7 +528,7 @@ _walk(const gr_ec_jac_point_t P0, const fmpz * U, slong nu, int sgn,
                     continue;
 
                 if (lane[i].is_infinity == T_TRUE)
-                    h = UWORD(0x5bd1e9955bd1e995);
+                    h = ((ulong) 0x5bd1e9955bd1e995ULL);
                 else
                     h = _hash_elem(GR_EC_AFF_POINT_X(lane + i, ctx), R, &status);
 
@@ -887,7 +887,7 @@ _gr_ec_cardinality_bsgs_progression(fmpz_t res, const fmpz_t t0,
     }
 
     flint_rand_init(state);
-    flint_rand_set_seed(state, UWORD(0x9e3779b97f4a7c15), UWORD(0xbf58476d1ce4e5b9));
+    flint_rand_set_seed(state, ((ulong) 0x9e3779b97f4a7c15ULL), ((ulong) 0xbf58476d1ce4e5b9ULL));
 
     gr_ec_jac_point_init(P, ctx);
     gr_ec_jac_point_init(Q, ctx);
@@ -1162,7 +1162,7 @@ _gr_ec_atkin_plan(int * side, slong * Z1, int * use_atkin,
         cost says so and the caller does not search then, but Z1 must not
         overflow on the way.
     */
-    *Z1 = (z1 < 1e15) ? (slong) z1 : WORD(1000000000000000);
+    *Z1 = (z1 < (double) (WORD_MAX / 4)) ? (slong) z1 : WORD_MAX / 4;
 
     flint_free(S);
 
@@ -1396,7 +1396,7 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
 
     fmpz_sub(e, zmax, zmin);
 
-    if (!fmpz_fits_si(e) || fmpz_get_si(e) > WORD(1) << 40)
+    if (!fmpz_fits_si(e) || fmpz_get_si(e) > WORD(1) << (FLINT_BITS / 2 + 8))
     {
         status = GR_UNABLE;
         goto cleanup_ints;
@@ -1407,7 +1407,7 @@ _gr_ec_cardinality_match_sort(fmpz_t res, const fmpz_t t3, const fmpz_t m3,
     nz2 = (nz + Z1 - 1) / Z1;
 
     flint_rand_init(state);
-    flint_rand_set_seed(state, UWORD(0x2545f4914f6cdd1d), UWORD(0x9e3779b97f4a7c15));
+    flint_rand_set_seed(state, ((ulong) 0x2545f4914f6cdd1dULL), ((ulong) 0x9e3779b97f4a7c15ULL));
 
     gr_ec_jac_point_init(P, ctx);
     gr_ec_jac_point_init(Q, ctx);

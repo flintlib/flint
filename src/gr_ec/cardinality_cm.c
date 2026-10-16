@@ -194,7 +194,7 @@ _cm_trace_j1728(fmpz_t t, const fmpz_t a4, const fmpz_t p)
 typedef struct
 {
     slong D;
-    slong j;
+    const char * j;          /* decimal, as it need not fit a word */
     slong Dc;
     slong m;
     slong c;
@@ -204,17 +204,17 @@ typedef struct
 cm_disc_struct;
 
 static const cm_disc_struct cm_discs[] = {
-    {  -7, WORD(-3375),                  -7,   7, WORD(-2),      1, CM_SIGN_JACOBI },
-    {  -8, WORD(8000),                   -8,   1, WORD(21),      1, CM_SIGN_D8     },
-    { -11, WORD(-32768),                -11,  11, WORD(21),     -1, CM_SIGN_JACOBI },
-    { -12, WORD(54000),                 -12,   3, WORD(22),     -1, CM_SIGN_JACOBI },
-    { -16, WORD(287496),                 -4,   1, WORD(7),       1, CM_SIGN_D16    },
-    { -19, WORD(-884736),               -19,  19, WORD(1),      -1, CM_SIGN_JACOBI },
-    { -27, WORD(-12288000),             -27,   3, WORD(253),    -1, CM_SIGN_JACOBI },
-    { -28, WORD(16581375),               -7,   7, WORD(-114),    1, CM_SIGN_JACOBI },
-    { -43, WORD(-884736000),            -43,  43, WORD(21),     -1, CM_SIGN_JACOBI },
-    { -67, WORD(-147197952000),         -67,  67, WORD(217),    -1, CM_SIGN_JACOBI },
-    {-163, WORD(-262537412640768000),  -163, 163, WORD(185801), -1, CM_SIGN_JACOBI },
+    {  -7, "-3375",                  -7,   7, WORD(-2),      1, CM_SIGN_JACOBI },
+    {  -8, "8000",                   -8,   1, WORD(21),      1, CM_SIGN_D8     },
+    { -11, "-32768",                -11,  11, WORD(21),     -1, CM_SIGN_JACOBI },
+    { -12, "54000",                 -12,   3, WORD(22),     -1, CM_SIGN_JACOBI },
+    { -16, "287496",                 -4,   1, WORD(7),       1, CM_SIGN_D16    },
+    { -19, "-884736",               -19,  19, WORD(1),      -1, CM_SIGN_JACOBI },
+    { -27, "-12288000",             -27,   3, WORD(253),    -1, CM_SIGN_JACOBI },
+    { -28, "16581375",               -7,   7, WORD(-114),    1, CM_SIGN_JACOBI },
+    { -43, "-884736000",            -43,  43, WORD(21),     -1, CM_SIGN_JACOBI },
+    { -67, "-147197952000",         -67,  67, WORD(217),    -1, CM_SIGN_JACOBI },
+    {-163, "-262537412640768000",  -163, 163, WORD(185801), -1, CM_SIGN_JACOBI },
 };
 
 #define CM_NUM_DISCS (sizeof(cm_discs) / sizeof(cm_disc_struct))
@@ -310,19 +310,22 @@ cleanup:
     same for every J in the table, so the caller passes it reduced.
 */
 static int
-_j_equals(slong J, const fmpz_t num, const fmpz_t den, const fmpz_t p)
+_j_equals(const char * J, const fmpz_t num, const fmpz_t den, const fmpz_t p)
 {
-    fmpz_t v;
+    fmpz_t v, j;
     int eq;
 
     fmpz_init(v);
+    fmpz_init(j);
 
-    fmpz_mul_si(v, den, J);
+    fmpz_set_str(j, J, 10);
+    fmpz_mul(v, den, j);
     fmpz_mod(v, v, p);
 
     eq = fmpz_equal(num, v);
 
     fmpz_clear(v);
+    fmpz_clear(j);
 
     return eq;
 }
