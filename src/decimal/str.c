@@ -78,7 +78,8 @@ _decimal_write_number_bound(slong L, const fmpz_t t)
    unless E = 0; mode 2 (radii): positional notation when -3 <= E <= 5;
    mode 3 (the arb_get_str format): positional notation when
    -4 <= E < L - 1, i.e. with at least one digit after the point, and
-   otherwise scientific with a sign on the exponent ("e+5"),
+   otherwise scientific with a sign on the exponent ("e+5"); mode 4
+   (arb_get_str radii): as mode 3 but positional only when -2 <= E < L - 1,
    where E = t + L - 1 is the scientific exponent. */
 slong
 _decimal_write_number(char * out, int negative, const char * digits, slong L, const fmpz_t t, int mode)
@@ -96,6 +97,8 @@ _decimal_write_number(char * out, int negative, const char * digits, slong L, co
         plain = fmpz_cmp_si(Ez, -3) >= 0 && fmpz_cmp_si(Ez, 5) <= 0;
     else if (mode == 3)
         plain = fmpz_cmp_si(Ez, -4) >= 0 && fmpz_cmp_si(Ez, L - 1) < 0;
+    else if (mode == 4)
+        plain = fmpz_cmp_si(Ez, -2) >= 0 && fmpz_cmp_si(Ez, L - 1) < 0;
     else
         plain = fmpz_is_zero(Ez);
 
@@ -139,7 +142,7 @@ _decimal_write_number(char * out, int negative, const char * digits, slong L, co
             out[pos++] = '.';
             memcpy(out + pos, digits + 1, L - 1); pos += L - 1;
         }
-        pos += _write_exponent(out + pos, Ez, mode == 3);
+        pos += _write_exponent(out + pos, Ez, mode >= 3);
     }
 
     fmpz_clear(Ez);
