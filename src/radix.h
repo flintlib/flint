@@ -194,7 +194,9 @@ _radix_mulmid_pairs_below(slong an, slong bn, slong k)
    is chosen so that a balanced full product switches at 80 limbs; a
    truncated product (a high product for a floating-point multiplication,
    or a product with a short operand) needs proportionally fewer limb
-   products and stays classical for longer. */
+   products and stays classical for longer. With fft_small, the input
+   limbs are counted as radix_mulmid_fft_small uses them, see
+   _radix_mulmid_fft_length. */
 #if FLINT_HAVE_FFT_SMALL
 #define RADIX_MULMID_FFT_CUTOFF_RATIO 40
 #else
@@ -202,6 +204,45 @@ _radix_mulmid_pairs_below(slong an, slong bn, slong k)
    is much later (about 350 limbs for a balanced full product). */
 #define RADIX_MULMID_FFT_CUTOFF_RATIO 175
 #endif
+
+/* The length of the convolution radix_mulmid_fft_small computes for the
+   slice [lo, hi): the operands lose their limbs above hi and the low limbs
+   which only meet the other operand below lo, and a slice shorter than
+   the longer operand is computed as a transposed product, at the cost of
+   a product of the shorter operand and the slice. */
+RADIX_INLINE slong
+_radix_mulmid_fft_length(slong an, slong bn, slong lo, slong hi)
+{
+    slong t;
+
+    an = FLINT_MIN(an, hi);
+    bn = FLINT_MIN(bn, hi);
+    hi = FLINT_MIN(hi, an + bn - 1);
+
+    if (lo >= hi)
+        return 0;
+
+    t = lo - (bn - 1);
+    if (t > 0)
+    {
+        an -= t;
+        lo -= t;
+        hi -= t;
+    }
+
+    t = lo - (an - 1);
+    if (t > 0)
+    {
+        bn -= t;
+        lo -= t;
+        hi -= t;
+    }
+
+    if (hi - lo < FLINT_MAX(an, bn))
+        return FLINT_MIN(an, bn) + (hi - lo);
+    else
+        return an + bn;
+}
 
 RADIX_INLINE void
 radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix)
@@ -218,12 +259,15 @@ radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo,
        below lo which the classical algorithm computes for carries */
     work = _radix_mulmid_pairs_below(an, bn, hi) - _radix_mulmid_pairs_below(an, bn, FLINT_MAX(lo - 1, 0));
 
+#if FLINT_HAVE_FFT_SMALL
+    if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) _radix_mulmid_fft_length(an, bn, lo, hi))
+        radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
+    else
+        radix_mulmid_fft_small(res, a, an, b, bn, lo, hi, radix);
+#else
     if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) (an + bn))
         radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
     else
-#if FLINT_HAVE_FFT_SMALL
-        radix_mulmid_fft_small(res, a, an, b, bn, lo, hi, radix);
-#else
         radix_mulmid_KS(res, a, an, b, bn, lo, hi, radix);
 #endif
 }

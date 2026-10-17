@@ -205,7 +205,10 @@ Except where otherwise noted, the following rules apply:
     * *classical* is an efficient implementation of the schoolbook algorithm,
       good when either *yn* or `hi - lo` is small.
     * *fft_small* multiplies using FFT. This is only available if FLINT is
-      built with support for the *fft_small* module.
+      built with support for the *fft_small* module. It only transforms the
+      limbs of each operand that reach the slice, and computes a slice
+      shorter than the longer operand as a transposed product when that is
+      cheaper, at the cost of a product of the shorter operand and the slice.
     * *KS* denotes Kronecker substitution, converting to a larger integer
       multiplication in the machine word radix.
     * *naive* is an unoptimized reference implementation which does a polynomial
@@ -215,11 +218,14 @@ Except where otherwise noted, the following rules apply:
     algorithm when either operand or the requested slice is shorter than
     80 limbs, and otherwise when the number of limb products in the
     requested slice is smaller than
-    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot (xn + yn)`, since
-    the cost of the FFT algorithm depends essentially on the input lengths
-    only while the classical algorithm benefits from short slices (for
-    example, a truncated high product needs about half as many limb
-    products as the full product).
+    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot L`, since
+    the cost of the FFT algorithm depends essentially on the length `L` of
+    the convolution it computes while the classical algorithm benefits
+    from short slices (for example, a truncated high product needs about
+    half as many limb products as the full product). With *fft_small*,
+    `L` is the sum of the lengths of the parts of the operands that reach
+    the slice, or the length of the shorter of them plus `hi - lo` when the
+    slice is shorter than the longer one; without it, `L = xn + yn`.
 
 .. function:: ulong radix_divrem_1(nn_ptr res, nn_srcptr x, slong xn, ulong d, const radix_t radix)
 
