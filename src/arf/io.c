@@ -85,105 +85,6 @@ char * arf_get_str(const arf_t x, slong d)
     }
 }
 
-/* writes a decimal exponent with a sign for nonnegative values ("e+5",
-   "e-5"); returns the number of characters */
-static slong
-_write_exponent(char * out, const fmpz_t E)
-{
-    slong len;
-
-    out[0] = 'e';
-    if (fmpz_sgn(E) >= 0)
-    {
-        out[1] = '+';
-        len = 2;
-    }
-    else
-        len = 1;
-
-    if (!COEFF_IS_MPZ(*E))
-    {
-        /* small: write digits directly */
-        slong v = *E;
-        ulong u = FLINT_ABS(v);
-        char tmp[24];
-        slong i = 0, j;
-
-        if (v < 0)
-            out[len++] = '-';
-        do { tmp[i++] = '0' + (u % 10); u /= 10; } while (u != 0);
-        for (j = 0; j < i; j++)
-            out[len + j] = tmp[i - 1 - j];
-        len += i;
-    }
-    else
-    {
-        fmpz_get_str(out + len, 10, E);
-        len += strlen(out + len);
-    }
-
-    return len;
-}
-
-/* Writes the number digits * 10^t (digits a string of L significant
-   digits, the first nonzero) in fixed-point notation if the scientific
-   exponent E = t + L - 1 satisfies minfix <= E <= maxfix and E < L - 1,
-   and otherwise as d.ddde+E. Returns the number of characters written
-   (no null terminator). */
-static slong
-_write_float(char * out, const char * digits, slong L, const fmpz_t t, slong minfix, slong maxfix)
-{
-    slong E, pos = 0, i;
-    fmpz_t Ez;
-
-    fmpz_init(Ez);
-    fmpz_add_ui(Ez, t, L - 1);
-
-    if (fmpz_cmp_si(Ez, minfix) >= 0 && fmpz_cmp_si(Ez, maxfix) <= 0 && fmpz_cmp_si(Ez, L - 1) < 0)
-    {
-        E = fmpz_get_si(Ez);
-
-        if (E < 0)
-        {
-            out[pos++] = '0';
-            out[pos++] = '.';
-            for (i = 0; i < -1 - E; i++)
-                out[pos++] = '0';
-            memcpy(out + pos, digits, L);
-            pos += L;
-        }
-        else
-        {
-            memcpy(out + pos, digits, E + 1);
-            pos += E + 1;
-            out[pos++] = '.';
-            memcpy(out + pos, digits + E + 1, L - E - 1);
-            pos += L - E - 1;
-        }
-    }
-    else
-    {
-        out[pos++] = digits[0];
-        if (L > 1)
-        {
-            out[pos++] = '.';
-            memcpy(out + pos, digits + 1, L - 1);
-            pos += L - 1;
-        }
-        pos += _write_exponent(out + pos, Ez);
-    }
-
-    fmpz_clear(Ez);
-    return pos;
-}
-
-/* upper bound for the number of characters written by _write_float */
-static slong
-_write_float_bound(slong L, const fmpz_t t)
-{
-    return L + 8 + fmpz_sizeinbase(t, 10) + 20;
-}
-
 char *
 arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd)
 {
@@ -215,11 +116,8 @@ arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd)
     fmpz_sub_ui(t, t, d - L);
     L = d;
 
-    res = flint_malloc(_write_float_bound(L, t) + 2);
-    pos = 0;
-    if (DECFLOAT_SGNBIT(y))
-        res[pos++] = '-';
-    pos += _write_float(res + pos, digits, L, t, -4, FLINT_MAX(6, d - 1));
+    res = flint_malloc(_decimal_write_number_bound(L, t) + 1);
+    pos = _decimal_write_number(res, DECFLOAT_SGNBIT(y), digits, L, t, 3);
     res[pos] = '\0';
 
     flint_free(digits);
