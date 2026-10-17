@@ -51,7 +51,14 @@ check_window(mpn_ctx_t R, const ulong* a, ulong an, const ulong* b, ulong bn,
     }
 }
 
-void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
+/*
+    With newton set, the shapes are those of the middle products of Newton
+    iterations: the middle n limbs of a product of lengths about 2n and n,
+    with a few guard limbs on each side, which the two-prime driver
+    computes as transposed products.
+*/
+void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state,
+                 int newton)
 {
     ulong *a, *b, *c, *full, *scratch;
     fmpz_t fa, fb, fv, fvlo, fd, fdef, fbound;
@@ -59,8 +66,10 @@ void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
     a       = FLINT_ARRAY_ALLOC(maxsize, ulong);
     b       = FLINT_ARRAY_ALLOC(maxsize, ulong);
     c       = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    full    = FLINT_ARRAY_ALLOC(maxsize + 2, ulong);
-    scratch = FLINT_ARRAY_ALLOC(maxsize + 2, ulong);
+    /* windows reach up to 3 limbs past the top of products of up to
+       maxsize limbs */
+    full    = FLINT_ARRAY_ALLOC(maxsize + 3, ulong);
+    scratch = FLINT_ARRAY_ALLOC(maxsize + 3, ulong);
 
     fmpz_init(fa);
     fmpz_init(fb);
@@ -74,8 +83,16 @@ void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
     {
         ulong an = 2 + n_randint(state, maxsize - 4);
         ulong bn = 1 + n_randint(state, n_min(an, maxsize - an));
-        ulong zn = an + bn;
-        ulong lo, hi;
+        ulong zn, lo, hi;
+
+        if (newton)
+        {
+            bn = 1 + n_randint(state, (maxsize - 4) / 3);
+            an = 2 * bn + n_randint(state, 5);
+            an = n_max(an - n_min(an, 2), bn);
+        }
+
+        zn = an + bn;
 
         for (ulong i = 0; i < maxsize; i++)
         {
@@ -90,6 +107,12 @@ void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
             case 1:  lo = n_randint(state, zn); break;
             case 2:  lo = (zn > 4) ? zn - 1 - n_randint(state, 4) : 0; break;
             default: lo = n_randint(state, n_max(1, zn/2)); break;
+        }
+
+        if (newton)
+        {
+            lo = bn - 1 + n_randint(state, 3);
+            lo -= n_min(lo, n_randint(state, 4));
         }
 
         /* exact product and exact integers */
@@ -122,8 +145,11 @@ void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
         /* --- high-truncation consistency against the maximal-top run --- */
         for (int t = 0; t < 3; t++)
         {
-            switch (n_randint(state, 4))
+            switch (n_randint(state, newton ? 5 : 4))
             {
+                case 4:  hi = n_min(an + 1 + n_randint(state, 6), zn);
+                         hi = n_max(hi, lo + 1);                   /* Newton */
+                         break;
                 case 0:  hi = lo + 1; break;                       /* tiny window */
                 case 1:  hi = lo + 1 + n_randint(state, zn - lo);  /* random      */
                          break;
@@ -155,13 +181,17 @@ TEST_FUNCTION_START(_mpn_ctx_mpn_mul_range, state)
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
-        test_mulmid(R, 1000, 200 * flint_test_multiplier(), state);
-        test_mulmid(R, 10000, 40 * flint_test_multiplier(), state);
-        test_mulmid(R, 50000, 4 * flint_test_multiplier(), state);
+        test_mulmid(R, 1000, 200 * flint_test_multiplier(), state, 0);
+        test_mulmid(R, 10000, 40 * flint_test_multiplier(), state, 0);
+        test_mulmid(R, 50000, 4 * flint_test_multiplier(), state, 0);
+        test_mulmid(R, 3000, 100 * flint_test_multiplier(), state, 1);
+        test_mulmid(R, 30000, 10 * flint_test_multiplier(), state, 1);
+        test_mulmid(R, 150000, 2 * flint_test_multiplier(), state, 1);
 
         /* exercise the threading paths */
         flint_set_num_threads(1 + n_randint(state, 8));
-        test_mulmid(R, 20000, 10 * flint_test_multiplier(), state);
+        test_mulmid(R, 20000, 10 * flint_test_multiplier(), state, 0);
+        test_mulmid(R, 150000, 2 * flint_test_multiplier(), state, 1);
 
         mpn_ctx_clear(R);
     }

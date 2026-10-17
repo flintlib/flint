@@ -284,6 +284,11 @@ deficit (a single carry from below `\mathrm{zlo}`) is bounded by
     for arbitrary input by padding internally, but is only economical in its own
     regime; :func:`flint_mpn_mulmid` chooses between them.
 
+    The small-prime FFT computes a window shorter than the longer operand as a
+    transposed product, whose cost is that of a product of the shorter operand
+    and the window, when this is cheaper than the window of the full product;
+    the result is the same.
+
 .. function:: void flint_mpn_mulmid_n(mp_ptr rp, mp_srcptr ap, mp_srcptr bp, mp_size_t n)
 
     Exact balanced middle product of `\{ap, 2n-1\}` and `\{bp, n\}`, writing
