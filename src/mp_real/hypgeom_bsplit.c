@@ -24,6 +24,9 @@
 #include "fmpz_poly_factor.h"
 #include "mp_real.h"
 #include "impl.h"
+#if FLINT_HAVE_FFT_SMALL
+# include "fft_small.h"
+#endif
 
 /* Generic binary splitting for hypergeometric series in the format of
    y-cruncher's SeriesHypergeometric (its CommonP2B3 framework):
@@ -2375,6 +2378,181 @@ leaf(mp_real_t T, mp_real_t Qo, mp_real_t Ro, slong a, slong b, int need_r,
     }
 }
 
+/* TRANSFORM REUSE.  Of the four products of a merge, T1 Q2 and Q1 Q2
+   share the operand Q2, and R1 T2 and R1 R2 share R1, so each pair is
+   formed with the transform of its common operand computed once
+   (_fft_small_mpn_mul_shared: three forward and two inverse transforms
+   instead of four and two) when all operands are exact, both products
+   are kept whole, and flint_mpn_mul_shared would choose the shared
+   transform for them (_flint_mpn_mul_shared_use_fft); the pairs are
+   those of the two-thread merge.  The fft_small function is called
+   directly for its aliasing: the second product is written over its
+   operand Q1 (resp. R1).  The near-root merges, whose products are
+   truncated to the working precision (middle products), use separate
+   products.  The shared products take no more memory than one product
+   (the transforms of the common operand and of one partner), so no
+   further policy is needed here.  Measured on Emerald Rapids for pi
+   (FLINT at -O3, GMP 6.3 built for ADX), the whole computation: 6-10%
+   faster at 10^5 and 10^6 digits, 4-5% at 10^7 and 3% at 10^8
+   single-threaded, 3-7% on two threads.
+
+   Summing T1 Q2 + R1 T2 in transform space as well (one inverse
+   transform fewer) is not done: the two products are aligned
+   differently (Q2 lacks the low zero limbs of the 2-adic content of Q,
+   stripped from its mantissa, for pi a third of its length), and
+   padding them to a common bottom lengthens all the transforms by more
+   than the inverse transform saves. */
+
+/* U = A X and V = B X, kept whole, with the transform of X shared; V
+   may alias A, B or X, U none of them.  Returns 0, changing nothing,
+   unless A, B, X are exact and nonzero and both products have at most
+   n limbs and are in FFT range. */
+static int
+_hyp_mul_shared(mp_real_t U, const mp_real_t A, mp_real_t V,
+    const mp_real_t B, const mp_real_t X, slong n)
+{
+#if FLINT_HAVE_FFT_SMALL
+    slong an = A->size, bn = B->size, xn = X->size;
+    slong uexp, vexp;
+    int uneg, vneg;
+
+    if (A->err != 0 || B->err != 0 || X->err != 0
+        || an == 0 || bn == 0 || xn == 0
+        || an + xn > n || bn + xn > n
+        || !_flint_mpn_mul_shared_use_fft(an, bn, xn))
+        return 0;
+
+    FLINT_ASSERT(U != A && U != B && U != X && U != V);
+
+    uexp = A->exp + X->exp;
+    vexp = B->exp + X->exp;
+    uneg = A->negative ^ X->negative;
+    vneg = B->negative ^ X->negative;
+
+    /* the growth of V preserves an input it aliases */
+    mp_real_fit_length(U, an + xn);
+    mp_real_fit_length(V, bn + xn);
+
+    _fft_small_mpn_mul_shared(U->d, A->d, an, V->d, B->d, bn, X->d, xn);
+
+    U->size = an + xn;
+    U->exp = uexp;
+    U->negative = uneg;
+    U->err = 0;
+    _mp_real_norm(U);
+
+    V->size = bn + xn;
+    V->exp = vexp;
+    V->negative = vneg;
+    V->err = 0;
+    _mp_real_norm(V);
+
+    return 1;
+#else
+    return 0;
+#endif
+}
+
+/* U = T1 Q2 and Q = Q1 Q2 (T, Q holding T1, Q1 on entry), U then
+   times pq when non-NULL.  V is scratch, or NULL for a half with none
+   of its own (on two threads; nothing is allocated): T1, dead once
+   T1 Q2 is formed and read by no other half, then receives Q1 Q2,
+   which is copied into the storage of Q (swapping it in, or forming
+   Q1 Q2 in U first, left longer buffers held up the tree: 4% more peak
+   memory for Catalan's constant at 10^7 digits on two threads), and
+   Q2, dead once both products are formed, receives the product by pq
+   (T is overwritten by the sum after the merge) */
+static void
+_hyp_merge_q(mp_real_t U, mp_real_t Q, mp_real_t T, mp_real_t Q2,
+    mp_real_t V, const mp_real_struct * pq, slong wp)
+{
+    if (!_hyp_mul_shared(U, T, Q, Q, Q2, wp))
+    {
+        mp_real_mul(U, T, Q2, wp);
+        if (V != NULL)
+        {
+            mp_real_mul(V, Q, Q2, wp);
+            mp_real_swap(Q, V);
+        }
+        else
+        {
+            mp_real_mul(T, Q, Q2, wp);
+            mp_real_set(Q, T);
+        }
+    }
+
+    if (pq != NULL)
+    {
+        if (V == NULL)
+            V = Q2;
+        mp_real_mul(V, U, pq, wp);
+        mp_real_swap(U, V);
+    }
+}
+
+/* V = R1 T2 to vp limbs, then times pr when non-NULL, and R = R1 R2 if
+   need_r (R holding R1 on entry).  W is scratch, or NULL for a half
+   with none of its own (on two threads; nothing is allocated): T2,
+   dead once R1 T2 is formed and read by no other half, then serves,
+   and R1 R2 is copied into the storage of R rather than swapped in,
+   which would leave R holding the longer buffer of T2 up the tree (5%
+   more peak memory for zeta(3) at 10^7 digits) */
+static void
+_hyp_merge_r(mp_real_t V, mp_real_t R, mp_real_t T2, const mp_real_t R2,
+    mp_real_t W, const mp_real_struct * pr, int need_r, slong wp, slong vp)
+{
+    if (!need_r || !_hyp_mul_shared(V, T2, R, R2, R, wp))
+    {
+        mp_real_mul(V, R, T2, vp);
+        if (need_r)
+        {
+            if (W != NULL)
+            {
+                mp_real_mul(W, R, R2, wp);
+                mp_real_swap(R, W);
+            }
+            else
+            {
+                mp_real_mul(T2, R, R2, wp);
+                mp_real_set(R, T2);
+            }
+        }
+    }
+
+    if (pr != NULL)
+    {
+        if (W == NULL)
+            W = T2;
+        mp_real_mul(W, V, pr, wp);
+        mp_real_swap(V, W);
+    }
+}
+
+/* The precision of R1 T2.  R1 T2 / (Q1 Q2) is the right partial sum
+   times R1 / Q1, so R1 T2 lies below T1 Q2 by the convergence of the
+   left half, gap limbs (half the working precision at the root).  Once
+   T1 Q2 is truncated to wp limbs (near the root), only the top
+   wp - gap limbs of R1 T2 reach the kept part of the sum, and the
+   product is formed at that precision plus a guard limb (for a zero
+   top limb of T1 Q2): at 10^7 digits of pi this cuts R1 T2 at the root
+   by a third, the whole computation by about 1% single-threaded.
+   Before T1 Q2 is truncated, wp: T must stay exact for the content
+   removal. */
+static slong
+_hyp_vprec(const mp_real_t T1, const mp_real_t Q2, const mp_real_t R1,
+    const mp_real_t T2, const mp_real_struct * pq, const mp_real_struct * pr,
+    slong wp)
+{
+    slong gap;
+
+    if (pq != NULL || pr != NULL || T1->size == 0 || Q2->size == 0
+        || R1->size == 0 || T2->size == 0 || T1->size + Q2->size <= wp)
+        return wp;
+
+    gap = (T1->exp + Q2->exp) - (R1->exp + T2->exp);
+    return (gap <= 1) ? wp : FLINT_MAX(wp - gap + 1, 1);
+}
+
 /* T = T1 Q2 + R1 T2 (with the content powers pq, pr when non-NULL),
    Q = Q1 Q2, R = R1 R2; (T, Q, R) hold the left values on entry;
    (T2, Q2, R2, U, V) is scratch */
@@ -2383,30 +2561,12 @@ merge(mp_real_t T, mp_real_t Q, mp_real_t R, mp_real_t T2, mp_real_t Q2, mp_real
     mp_real_t U, mp_real_t V, const mp_real_struct * pq, const mp_real_struct * pr,
     int need_r, slong wp)
 {
-    mp_real_mul(U, T, Q2, wp);
-    if (pq != NULL)
-    {
-        mp_real_mul(V, U, pq, wp);
-        mp_real_swap(U, V);
-    }
-
-    mp_real_mul(V, R, T2, wp);
-    if (pr != NULL)
-    {
-        mp_real_mul(T2, V, pr, wp);
-        mp_real_swap(T2, V);
-    }
-
+    /* Q2 is dead after the first pair: its storage is the scratch of
+       the second (whose inputs are R1, T2, R2) */
+    slong vp = _hyp_vprec(T, Q2, R, T2, pq, pr, wp);
+    _hyp_merge_q(U, Q, T, Q2, V, pq, wp);
+    _hyp_merge_r(V, R, T2, R2, Q2, pr, need_r, wp, vp);
     mp_real_add(T, U, V, wp);
-
-    mp_real_mul(U, Q, Q2, wp);
-    mp_real_swap(Q, U);
-
-    if (need_r)
-    {
-        mp_real_mul(U, R, R2, wp);
-        mp_real_swap(R, U);
-    }
 }
 
 /* the content removal at a node: g = gcd(R1, Q2) read off the lists,
@@ -2716,29 +2876,25 @@ typedef struct
     mp_real_struct * T, * Q, * R, * T2, * Q2, * R2, * U, * V;
     const mp_real_struct * pq, * pr;
     int need_r;
-    slong wp;
+    slong wp, vp;           /* vp: the precision of V */
 }
 hyp_merge_struct;
 
+/* the halves have no scratch of their own: V and Q2, which the serial
+   merge borrows, are written or read by the other half */
 static void
 _hyp_merge_x(void * arg)
 {
     hyp_merge_struct * M = (hyp_merge_struct *) arg;
-    mp_real_mul(M->U, M->T, M->Q2, M->wp);
-    if (M->pq != NULL)
-        mp_real_mul(M->U, M->U, M->pq, M->wp);
-    mp_real_mul(M->Q, M->Q, M->Q2, M->wp);
+    _hyp_merge_q(M->U, M->Q, M->T, M->Q2, NULL, M->pq, M->wp);
 }
 
 static void
 _hyp_merge_y(void * arg)
 {
     hyp_merge_struct * M = (hyp_merge_struct *) arg;
-    mp_real_mul(M->V, M->R, M->T2, M->wp);
-    if (M->pr != NULL)
-        mp_real_mul(M->V, M->V, M->pr, M->wp);
-    if (M->need_r)
-        mp_real_mul(M->R, M->R, M->R2, M->wp);
+    _hyp_merge_r(M->V, M->R, M->T2, M->R2, NULL, M->pr, M->need_r, M->wp,
+        M->vp);
 }
 
 static void
@@ -2747,6 +2903,7 @@ merge_par(mp_real_t T, mp_real_t Q, mp_real_t R, mp_real_t T2, mp_real_t Q2,
     const mp_real_struct * pr, int need_r, slong wp)
 {
     hyp_merge_struct M;
+    M.vp = _hyp_vprec(T, Q2, R, T2, pq, pr, wp);
     M.T = T; M.Q = Q; M.R = R; M.T2 = T2; M.Q2 = Q2; M.R2 = R2;
     M.U = U; M.V = V; M.pq = pq; M.pr = pr; M.need_r = need_r; M.wp = wp;
     _mp_real_parallel_pair(_hyp_merge_x, &M, _hyp_merge_y, &M);

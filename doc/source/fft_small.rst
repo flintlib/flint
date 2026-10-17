@@ -206,6 +206,18 @@ Transform plans and operands
     bytes, 4096-aligned, which must outlive the operand and is not freed
     by *clear*.
 
+.. function:: void fft_small_fft_mpn(fft_small_op_t X, const ulong * a, ulong an, const fft_small_plan_t P)
+              void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong * a, ulong an, ulong otrunc, const fft_small_plan_t P)
+
+    Sets *X* to the forward transforms of the nonnegative integer
+    ``(a, an)``, split into chunks of the plan's bit size, modulo each of
+    the plan's primes. The first computes the evaluations up to the
+    plan's output truncation, for products of any length the plan
+    admits; the second only the first *otrunc* evaluations (at most the
+    plan's truncation, a multiple of the block size), enough for
+    products of at most *otrunc* coefficients: a partner shorter than
+    the plan's longest product then costs only its own length.
+
 .. function:: int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R, ulong an_max, ulong bn_max, ulong len_bound, int is_signed)
 
     Plan for products of operands of at most *an_max* and *bn_max*
@@ -404,6 +416,10 @@ Transform plans and operands
     chunk. Each output is formed over an operand dead after its first
     product (five transforms' storage for a product, three for a
     square), from a pool whose freed operand slabs serve the staging.
+    A full product (`lo = 0`) whose output parts are single products
+    sharing a part -- a real or imaginary operand times a complex one
+    -- is computed by :func:`_fft_small_mpn_mul_shared`, whose fused
+    per-product pipeline is faster on that task than the engine.
     Return 0 if no plan exists.
 
 .. function:: void fft_small_export_nmod_range(ulong * z, const fft_small_op_t X, ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P)
@@ -500,6 +516,63 @@ The four transforms below grow the context to depth `L` themselves, with
     the same cost. Composed as
     `v \mapsto \mathtt{fft\_tr}(\mathtt{fft}(b) \cdot \mathtt{ifft\_tr}(v))`,
     they give the transpose of multiplication by a fixed `b`.
+
+
+Products with a shared or precomputed transform
+--------------------------------------------------------------------------------
+
+The functions in this section multiply nonnegative integers given as
+limb arrays, reusing the transform of one operand across several
+products: two products with a common operand, or any number of
+products by an operand fixed in advance (the power tables of binary
+splitting). Like :func:`mpn_ctx_mpn_mul` they have a plan for all
+lengths: the two-prime geometry up to ``FLINT_MPN_MUL_NP2_MAX_AN`` limbs,
+where each product runs fused (pack, forward transforms, pointwise
+product, inverse transforms and reconstruction while its data is hot),
+and the wide geometry above, threaded over the primes, with each
+partner's transforms truncated to its own product. They use the
+calling thread's default context (:func:`get_default_mpn_ctx`) for
+scratch. The program ``profile/p-mpn_mul_shared`` compares them with
+independent products.
+
+.. function:: void _fft_small_mpn_mul_shared(nn_ptr z1, nn_srcptr a, ulong an, nn_ptr z2, nn_srcptr b, ulong bn, nn_srcptr x, ulong xn)
+
+    Sets ``(z1, an + xn)`` to `a x` and ``(z2, bn + xn)`` to `b x`, with
+    the transform of `x` computed once: three forward and two inverse
+    transforms against four and two for two independent products. All
+    lengths must be positive; the operands may have any relative
+    lengths. The output *z1* may overlap *a* and *x* but not *b*; *z2*
+    may overlap any input but not *z1*. Above the FFT threshold of
+    :func:`flint_mpn_mul` this is faster than two independent products
+    (by about 10% for products of similar lengths); see
+    :func:`flint_mpn_mul_shared`, which chooses between the two.
+
+.. type:: fft_small_mpn_mul_precomp_struct
+          fft_small_mpn_mul_precomp_t
+
+    The transform of a fixed operand `x`, for products by partners of
+    up to a planned length.
+
+.. function:: ulong _fft_small_mpn_mul_precomp_size(ulong xn, ulong yn_max)
+              void _fft_small_mpn_mul_precomp_init(fft_small_mpn_mul_precomp_t P, nn_srcptr x, ulong xn, ulong yn_max, double * storage)
+              void _fft_small_mpn_mul_precomp_clear(fft_small_mpn_mul_precomp_t P)
+
+    Prepares *P* for products of ``(x, xn)`` by partners of 1 to
+    *yn_max* limbs, computing the transform of *x* once. The transform
+    is stored in *storage*, which must hold the number of doubles given
+    by *_size* (64-byte aligned), or in an allocation of *init*'s own
+    when *storage* is ``NULL``; only the evaluations the products read
+    are kept, up to half of a full transform. The array *x* is not
+    referenced after *init*. Lengths must be positive.
+
+.. function:: void _fft_small_mpn_mul_precomp(nn_ptr z, const fft_small_mpn_mul_precomp_t P, nn_srcptr y, ulong yn)
+
+    Sets ``(z, xn + yn)`` to `x y`, with `x` the operand of *P* and
+    `1 \le yn \le` *yn_max*; *z* may overlap *y*. Each product costs
+    one conversion and forward transform less than an independent
+    product (26-31% faster in the two-prime range, 16-22% in the wide
+    range, for partners of about twice the length of `x`). *P* is read
+    only, so products may run concurrently on several threads.
 
 
 Negacyclic pointwise multiplication
