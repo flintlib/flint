@@ -54,8 +54,8 @@ check_window(mpn_ctx_t R, const ulong* a, ulong an, const ulong* b, ulong bn,
 /*
     With newton set, the shapes are those of the middle products of Newton
     iterations: the middle n limbs of a product of lengths about 2n and n,
-    with a few guard limbs on each side, which the two-prime driver
-    computes as transposed products.
+    with a few guard limbs on each side, which the two-prime and wide
+    drivers compute as transposed products.
 */
 void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state,
                  int newton)

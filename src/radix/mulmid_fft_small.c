@@ -110,7 +110,7 @@ static void _mod(
             for (j = 0; j < BLK_SZ; j += 8)
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
-FLINT_ASSERT(i+j < atrunc);
+                FLINT_ASSERT(i+j < atrunc);
                 vec8d_store_aligned(aI + j, vec8n_convert_limited_vec8d(t));
             }
         }
@@ -211,7 +211,7 @@ static void _crt_1(
     {
         _convert_block(Xs, Rffts, d, dstride, 1, i/BLK_SZ);
 
-        jstart = (i < zi_start) ? zi_start - i : 0; \
+        jstart = (i < zi_start) ? zi_start - i : 0;
         jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
 
         FLINT_ASSERT(mod.norm != 0);
@@ -646,7 +646,10 @@ radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn,
 #else
 
 void
-radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
+radix_mulmid_fft_small(nn_ptr FLINT_UNUSED(res), nn_srcptr FLINT_UNUSED(a),
+    slong FLINT_UNUSED(an), nn_srcptr FLINT_UNUSED(b), slong FLINT_UNUSED(bn),
+    slong FLINT_UNUSED(zlo), slong FLINT_UNUSED(zhi),
+    const radix_t FLINT_UNUSED(radix))
 {
     flint_throw(FLINT_ERROR, "radix_mulmid_fft_small: fft_small not available");
 }
