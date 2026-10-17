@@ -44,6 +44,7 @@
 #include "t-get_fmpz.c"
 #include "t-get_mpfr.c"
 #include "t-get_str.c"
+#include "t-get_str_rnd.c"
 #include "t-is_int_2exp_si.c"
 #include "t-mul.c"
 #include "t-mul_fmpz.c"
@@ -110,6 +111,7 @@ test_struct tests[] =
     TEST_FUNCTION(arf_get_fmpz),
     TEST_FUNCTION(arf_get_mpfr),
     TEST_FUNCTION(arf_get_str),
+    TEST_FUNCTION(arf_get_str_rnd),
     TEST_FUNCTION(arf_is_int_2exp_si),
     TEST_FUNCTION(arf_mul),
     TEST_FUNCTION(arf_mul_fmpz),
