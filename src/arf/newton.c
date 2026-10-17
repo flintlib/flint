@@ -53,14 +53,14 @@ static int
 _arf_set_fixed(arf_t res, mp_ptr Q, slong n, const fmpz_t exp, int sgnbit, slong prec)
 {
     slong qn = n + 2, fix;
-    int inexact;
 
     while (Q[qn - 1] == 0)
         qn--;
 
-    inexact = _arf_set_round_mpn(res, &fix, Q, qn, sgnbit, prec, ARF_RND_NEAR);
+    _arf_set_round_mpn(res, &fix, Q, qn, sgnbit, prec, ARF_RND_NEAR);
     _fmpz_add_fast(ARF_EXPREF(res), exp, fix + (qn - n) * FLINT_BITS);
-    return inexact;
+    /* The Newton approximation may be inexact even if rounding Q was exact. */
+    return 1;
 }
 
 /* Space for the n + 2 limb fixed-point result: when res does not alias an

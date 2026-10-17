@@ -12,6 +12,8 @@ FLINT 3.7.0 (in development)
 
 Bug fixes
 
+* Fix zero radii for inexact division and square root results computed
+  using Newton iteration.
 * Fix ``arb_pow`` losing containment when the output aliases an inexact
   exponent and the base interval has a zero endpoint
   [`#2879 <https://github.com/flintlib/flint/issues/2879>`_].

@@ -39,6 +39,37 @@ TEST_FUNCTION_START(arf_approx, state)
 {
     slong iter;
 
+    /* Rounding a Newton approximation exactly does not certify exactness. */
+    for (iter = 0; iter < 2; iter++)
+    {
+        arf_t x, y, res;
+        slong prec;
+        int r1, r2, r3, r4;
+        arf_rnd_t rnd = iter ? ARF_RND_ACCURATE : ARF_RND_FAST;
+
+        prec = FLINT_MAX(ARF_INV_NEWTON_CUTOFF, ARF_DIV_NEWTON_CUTOFF);
+        prec = FLINT_MAX(prec, ARF_SQRT_NEWTON_CUTOFF);
+        prec = FLINT_MAX(prec, ARF_RSQRT_NEWTON_CUTOFF);
+
+        arf_init(x); arf_init(y); arf_init(res);
+        arf_one(x);
+        arf_set_ui_2exp_si(y, 1, -(prec + 1000));
+        arf_add(x, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+        arf_set_ui(y, 3);
+
+        r1 = arf_ui_div(res, 1, x, prec, rnd);
+        r2 = arf_div(res, y, x, prec, rnd);
+        r3 = arf_sqrt(res, x, prec, rnd);
+        r4 = arf_rsqrt(res, x, prec, rnd);
+
+        if (r1 != 1 || r2 != 1 || r3 != 1 || r4 != 1)
+            TEST_FUNCTION_FAIL("Newton return flags: rnd = %d, "
+                "inv = %d, div = %d, sqrt = %d, rsqrt = %d\n",
+                rnd, r1, r2, r3, r4);
+
+        arf_clear(x); arf_clear(y); arf_clear(res);
+    }
+
     for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
         arf_t x, y, res, ref;
