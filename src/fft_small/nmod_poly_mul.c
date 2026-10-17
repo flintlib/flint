@@ -1278,6 +1278,7 @@ int _mul_precomp_init(
 
     M->bn = bn;
     M->btrunc = _fft_small_len_trunc(btrunc);
+    M->transposed = 0;
 
     /* the forward transform reads b zero-padded (or folded) to this
        truncation, which does not change the transform */
@@ -1314,6 +1315,7 @@ int _nmod_poly_mul_mid_precomp(
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
+    FLINT_ASSERT(!M->transposed);
     FLINT_ASSERT(M->btrunc <= n_pow2(M->P->depth));
 
     if (zl >= zh)
@@ -1358,6 +1360,106 @@ int _nmod_poly_mul_mid_precomp(
     A.transposed = 0;
     A.tune_n = bn;
     A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning_no_rethread;
+
+    _fft_small_conv(z, P, &A);
+
+    return 1;
+}
+
+/*
+    The precomputation of the transposed products with a fixed (v, vn):
+    the transposed products z[j] = sum_i r[i] v[i + j], 0 <= j < zn, for
+    any (r, rn) with rn + zn - 1 <= vn (see _nmod_poly_mul_tr_mpn_ctx),
+    are the transposes of products of length at most vn, which one plan
+    for the window [0, vn) of a convolution of length vn serves, and they
+    share the images of v through the transpose of the inverse transform,
+    which are stored. With r the reversal of a, zero padded in front, this
+    is a window of a * v: the middle products of evaluations and
+    extrapolations at geometric progressions with a fixed polynomial v.
+    Against the window of the full product with a stored transform of v
+    (_mul_precomp_init), the transform has length about vn instead of a
+    power of two, or of the length of the full product.
+
+    len_bound bounds the number of nonzero coefficients of r (the number of
+    products accumulating onto one output coefficient), and direct_len
+    gates the direct transform modulo a prime as in
+    fft_small_plan_init_nmod. Returns 0 if no plan is available.
+*/
+int _mul_precomp_init_tr(
+    mul_precomp_struct* M,
+    const ulong * v, ulong vn,
+    ulong len_bound, ulong direct_len,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    ulong modbits = FLINT_BITS - mod.norm;
+
+    FLINT_ASSERT(vn > 0);
+
+    if (!fft_small_plan_init_nmod(M->P, R, 0, vn, vn, _fft_small_len_trunc(vn),
+                                  len_bound, 2*modbits, mod, direct_len))
+        return 0;
+
+    M->bn = vn;
+    M->btrunc = 0;
+    M->transposed = 1;
+
+    fft_small_op_init(M->bfft, M->P);
+    fft_small_ifft_tr_nmod(M->bfft, v, vn, mod, M->P);
+
+    return 1;
+}
+
+/*
+    The transposed product z[j] = sum_i r[i] v[i + j], 0 <= j < zn, with v
+    given by M (_mul_precomp_init_tr); returns 0 if rn + zn - 1 exceeds
+    the length of v. r must have at most len_bound nonzero coefficients
+    (the len_bound of M), which leaves room for zeros in front of a
+    reversed operand. The precomputed images of v are multiplied by the
+    transform of r and the transpose of the forward transform gives the zn
+    coefficients: two transforms, of the length of M. M is only read, as
+    for _nmod_poly_mul_mid_precomp.
+*/
+int _nmod_poly_mul_tr_precomp(
+    ulong* z, ulong zn,
+    const ulong* r, ulong rn,
+    const mul_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+
+    FLINT_ASSERT(M->transposed);
+    FLINT_ASSERT(rn > 0 && zn > 0);
+
+    if (rn + zn - 1 > M->bn)
+        return 0;
+
+    *P = *M->P;
+    P->R = R;
+    P->crts = R->crts;
+    if (!P->use_direct_fft)
+        P->ffts = R->ffts;
+
+    P->zl = 0;
+    P->zh = zn;
+
+    A.a = NULL; A.an = 0; A.aaux = 0;
+    A.atrunc = n_min(_fft_small_op_trunc(zn, P), P->ztrunc);
+    A.b = r; A.bn = rn; A.baux = 0;
+    A.btrunc = n_min(_fft_small_op_trunc(rn, P), P->ztrunc);
+    A.bfft = M->bfft->data;
+    A.bfft_stride = M->bfft->stride;
+    A.squaring = 0;
+    A.transposed = 2;
+    A.tune_n = n_min(rn, zn);
+    A.min_an_bn = n_min(rn, M->P->bound_c);
     A.mod_fn = _mod_fn;
     A.s2_finish = NULL;
     A.crt_fn = _nmod_crt_fn(P->np);

@@ -30,7 +30,11 @@
     pointwise as before, and apply the transpose of the forward transform
     with output truncation A->atrunc. By the transposition principle this
     performs the same operations as the multiplication, in reverse order;
-    see _nmod_poly_mul_tr_mpn_ctx in nmod_poly_mul.c.
+    see _nmod_poly_mul_tr_mpn_ctx in nmod_poly_mul.c. With
+    A->transposed == 2, the images of a through the transpose of the
+    inverse transform are given in A->bfft, and b is converted and
+    transformed in the working buffer instead (see
+    _nmod_poly_mul_tr_precomp).
 
     Both stages parallelize as the original per-type drivers did: stage 1
     over the primes (with each worker optionally requesting one extra
@@ -95,6 +99,16 @@ static void s1worker_func(void* varg)
         double* bbuf = X->bbuf;
         const double* bfft = NULL;
         sd_fft_ctx_struct* Q = P->ffts + ioff;
+
+        if (A->transposed == 2)
+        {
+            A->mod_fn(abuf, A->btrunc, A->b, A->bn, A->baux, Q, A->params);
+            sd_fft_trunc(Q, abuf, P->depth, A->btrunc, P->ztrunc);
+            sd_fft_ctx_point_mul(Q, abuf, A->bfft + A->bfft_stride*i,
+                                 P->m[i], P->depth);
+            sd_fft_trunc_tr(Q, abuf, P->depth, A->atrunc, P->ztrunc);
+            continue;
+        }
 
         if (A->bfft != NULL)
         {
@@ -184,8 +198,10 @@ void _fft_small_conv(void* z, const fft_small_plan_t P,
     FLINT_ASSERT(P->zh <= P->zn);
     FLINT_ASSERT(A->atrunc <= P->ztrunc);
     FLINT_ASSERT(A->bfft != NULL || A->btrunc <= P->ztrunc);
-    FLINT_ASSERT(A->transposed == 0 || A->transposed == 1);
-    FLINT_ASSERT(!A->transposed || (!A->squaring && A->an <= P->ztrunc));
+    FLINT_ASSERT(A->transposed >= 0 && A->transposed <= 2);
+    FLINT_ASSERT(A->transposed != 1 || (!A->squaring && A->an <= P->ztrunc));
+    FLINT_ASSERT(A->transposed != 2 || (A->bfft != NULL && !A->squaring
+                                        && A->btrunc <= P->ztrunc));
 
     want_threads = A->tuning->s1_threads(np, A->tune_n);
 

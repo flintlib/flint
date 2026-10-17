@@ -2626,9 +2626,15 @@ Geometric progression
     interpolation).
 
     If bit 3 of ``function`` is set (for example, ``function`` is `15`), the
-    precomputation additionally stores the *fft_small* transforms of the
+    precomputation additionally stores *fft_small* transforms of the
     polynomials that the selected functionalities multiply by, so that each
-    of these products costs two transforms instead of three. This is done for
+    of these products costs two transforms instead of three. The products of
+    evaluation and extrapolation are `mulmid` or transposed products: for them,
+    the stored data are the images of the fixed polynomial through the
+    transpose of the inverse transform, and the transforms have length
+    `2 len - 1` (evaluation) or `len - 1` (extrapolation) rounded up to a
+    multiple of `256`, instead of a power of two or the length of the full
+    product. This is done for
     the functionalities whose largest product, with lengths up to ``len``,
     would use *fft_small*; then, in each call, a product uses the stored
     transform if it would use *fft_small* itself and if the stored transform

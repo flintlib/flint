@@ -324,6 +324,24 @@ _fft_init(nn_srcptr b, slong bn, slong n, slong an_max, nmod_t mod)
     return M;
 }
 
+/* the precomputation of transposed products with (v, vn), multipliers
+   with at most an_max nonzero coefficients (see _mul_precomp_init_tr);
+   NULL if no plan exists */
+static mul_precomp_struct *
+_fft_init_tr(nn_srcptr v, slong vn, slong an_max, nmod_t mod)
+{
+    mul_precomp_struct * M = flint_malloc(sizeof(mul_precomp_struct));
+
+    if (!_mul_precomp_init_tr(M, v, vn, FLINT_MIN(an_max, vn), vn, mod,
+                              get_default_mpn_ctx()))
+    {
+        flint_free(M);
+        return NULL;
+    }
+
+    return M;
+}
+
 static void
 _fft_clear(mul_precomp_struct * F)
 {
@@ -341,13 +359,75 @@ _fft_clear(mul_precomp_struct * F)
    [zl, zh) of a * b. Whether M, the stored transform of b, should be used:
    if it contains b + s (s + bn <= M->bn), was made for operands of length
    an, and is cheaper than the transforms that the alternative would make
-   (it saves one of three, but may be longer and need more primes). */
+   (it saves one of three, but may be longer and need more primes). For a
+   stored transposed transform, see _fft_use_tr. */
+
+/*
+    With a stored transposed transform of b (M->transposed: evaluation and
+    extrapolation, where zl >= an - 1), the coefficients [zl, zh) of a * b
+    are the transposed product of r, a reversed with zl - (an - 1) zeros in
+    front, of length rn = zl + 1, and of b: two transforms of the length of
+    M, if zh <= M->bn. The alternative, the middle product of (b + s, bn)
+    and a, takes three transforms, of the length of the transposed product
+    of a and the window or of the window of the full product, whichever is
+    shorter, as _nmod_poly_mulmid_fft_small chooses, and converts both
+    operands. With np * ztrunc * depth for the cost of a transform, the
+    stored transform pays while its two transforms cost at most 3.5 times
+    one of the alternative
+    TODO only measured on a Xeon for 30- and 60-bit moduli and for a prime of
+    the fft_small context; about 4 for a prime transformed directly, hence the
+    ratio 3.4 = 17/5 below (this is not expected to change much on other machines,
+    but some check might be in order).
+*/
+static int
+_fft_use_tr(const mul_precomp_struct * M, slong zl, slong zh, slong an,
+            slong s, slong bn, nmod_t mod)
+{
+    fft_small_plan_t Dw, Dt;
+    fft_small_plan_struct * D;
+    slong m = zh - zl;
+    ulong e, np;
+
+    if (zl >= zh || zl < an - 1 || (ulong) zh > M->bn
+            || (ulong) an > M->P->bound_c)
+        return 0;
+
+    /* cheap necessary condition for the cost test below: the alternative
+       has depth at most e and at most as many primes */
+    e = FLINT_MAX(4, n_clog2(an + bn + 3));
+    if (10 * M->P->ztrunc * M->P->depth > 17 * e * n_pow2(e))
+        return 0;
+
+    /* only where the alternative would use fft_small */
+    if (!_nmod_poly_mulmid_want_fft_small(an, m, mod))
+        return 0;
+
+    _fft_small_plan_set_window_nmod(Dw, zl - s, zh - s, an + bn - 1,
+        FLINT_MAX(_fft_small_len_trunc(an), _fft_small_len_trunc(bn)));
+    _fft_small_plan_set_window_nmod(Dt, 0, m, an + m - 1,
+        FLINT_MAX(_fft_small_len_trunc(an), _fft_small_len_trunc(m)));
+    D = (m < FLINT_MAX(an, bn) && Dt->ztrunc < Dw->ztrunc) ? Dt : Dw;
+
+    D->R = get_default_mpn_ctx();
+    if (M->P->np == 1 || !_fft_small_plan_set_bound(D, FLINT_MIN(an, bn),
+                                         2 * NMOD_BITS(mod), MPN_CTX_NCRTS))
+        np = M->P->np;
+    else
+        np = D->np;
+
+    return 10 * M->P->np * M->P->ztrunc * M->P->depth
+                <= 17 * np * D->ztrunc * D->depth;
+}
+
 static int
 _fft_use(const mul_precomp_struct * M, slong zl, slong zh, slong an,
          slong s, slong bn, nmod_t mod)
 {
     fft_small_plan_t P, D;
     ulong e;
+
+    if (M->transposed)
+        return _fft_use_tr(M, zl, zh, an, s, bn, mod);
 
     if (zl >= zh || (ulong) (s + bn) > M->bn || (ulong) an > M->P->bound_c)
         return 0;
@@ -404,6 +484,25 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
     if (!_fft_use(M, zl, zh, an, s, bn, mod))
         return 0;
 
+    if (M->transposed)
+    {
+        slong rn = zl + 1, t = rn - an, i;
+        nn_ptr r;
+        int done;
+        TMP_INIT;
+
+        TMP_START;
+        r = TMP_ARRAY_ALLOC(rn, ulong);
+        _nmod_vec_zero(r, t);
+        for (i = 0; i < an; i++)
+            r[t + i] = a[an - 1 - i];
+        done = _nmod_poly_mul_tr_precomp(z, zh - zl, r, rn, M, mod,
+                                         get_default_mpn_ctx());
+        TMP_END;
+
+        return done;
+    }
+
     return _nmod_poly_mul_mid_precomp(z, zl, zh, a, an, M, mod, get_default_mpn_ctx());
 }
 
@@ -412,6 +511,13 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
 static struct mul_precomp_struct *
 _fft_init(nn_srcptr FLINT_UNUSED(b), slong FLINT_UNUSED(bn), slong FLINT_UNUSED(n),
           slong FLINT_UNUSED(an_max), nmod_t FLINT_UNUSED(mod))
+{
+    return NULL;
+}
+
+static struct mul_precomp_struct *
+_fft_init_tr(nn_srcptr FLINT_UNUSED(v), slong FLINT_UNUSED(vn),
+             slong FLINT_UNUSED(an_max), nmod_t FLINT_UNUSED(mod))
 {
     return NULL;
 }
@@ -450,14 +556,17 @@ _nmod_geometric_progression_mulmid_fft(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSE
    - evaluate polynomials of length at most ev_len: coefficients
      [plen - 1, plen - 1 + olen) of a * ev_f, where a has length at most
      plen <= ev_len and olen <= len; this involves ev_f[0, ev_len + len - 1),
-     and the convolution is cyclic of length >= ev_len + len - 1;
+     whose images through the transpose of the inverse transform are stored
+     for transposed products of length ev_len + len - 1 (see
+     _mul_precomp_init_tr);
    - interpolate from the first m <= int_len points: coefficients [0, m) of
      f * int_f, f of length at most m; this involves int_f[0, int_len), and
      the convolution has length >= 2*int_len - 1;
    - extrapolate from at most ext_len values: coefficients of tmp * ext_ff
      (or ext_fb) of index at least ilen - 1, tmp of length
-     ilen <= min(ext_len, len - 1); cyclic of length >= len - 1. Since
-     ilen + olen <= len, the largest product has ilen = min(ext_len, len/2). */
+     ilen <= min(ext_len, len - 1), transposed products of length len - 1.
+     Since ilen + olen <= len, the largest product has
+     ilen = min(ext_len, len/2). */
 void
 _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
                                      slong ev_len, slong int_len, slong ext_len)
@@ -492,7 +601,7 @@ _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
             && _nmod_poly_mulmid_want_fft_small(ev_len, len, mod))
     {
         slong n = ev_len + len - 1;
-        G->ev_f_fft = _fft_if_used(_fft_init(G->ev_f->coeffs, n, n, ev_len, mod),
+        G->ev_f_fft = _fft_if_used(_fft_init_tr(G->ev_f->coeffs, n, ev_len, mod),
                                    ev_len - 1, n, ev_len, 0, n, mod);
     }
 
@@ -512,10 +621,10 @@ _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
 
         if (elen > 0 && _nmod_poly_mulmid_want_fft_small(elen, len - elen, mod))
         {
-            G->ext_ff_fft = _fft_if_used(_fft_init(G->ext_ff->coeffs, len - 1, len - 1, an_max, mod),
+            G->ext_ff_fft = _fft_if_used(_fft_init_tr(G->ext_ff->coeffs, len - 1, an_max, mod),
                                          elen - 1, len - 1, elen, 0, len - 1, mod);
             if (G->ext_ff_fft != NULL)
-                G->ext_fb_fft = _fft_init(G->ext_fb->coeffs, len - 1, len - 1, an_max, mod);
+                G->ext_fb_fft = _fft_init_tr(G->ext_fb->coeffs, len - 1, an_max, mod);
         }
     }
 }
