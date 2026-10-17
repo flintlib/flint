@@ -192,14 +192,24 @@ _radix_mulmid_pairs_below(slong an, slong bn, slong k)
    while the FFT (or Kronecker) algorithm costs roughly a constant number
    of units per input limb regardless of the requested slice. The ratio
    is chosen so that a balanced full product switches at about 100 limbs
-   (measured crossover: ratio 48-52 on a recent x86-64); a
+   [*]; a
    truncated product (a high product for a floating-point multiplication,
    or a product with a short operand) needs proportionally fewer limb
    products and stays classical for longer. With fft_small, the input
    limbs are counted as radix_mulmid_fft_small uses them, see
-   _radix_mulmid_fft_length. */
+   _radix_mulmid_fft_length.
+
+  [*] measured crossover: ratio 48-52 on a recent x86-64; flint-mparam.h can
+  override it with FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO (85 on arm64,
+  measured on Apple M4)
+  TODO see if ratios differ between several x86-64 machines / arm64 machines
+   */
 #if FLINT_HAVE_FFT_SMALL
+#ifdef FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO
+#define RADIX_MULMID_FFT_CUTOFF_RATIO FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO
+#else
 #define RADIX_MULMID_FFT_CUTOFF_RATIO 50
+#endif
 #else
 /* Kronecker substitution pads each limb to two words, so the crossover
    is much later (about 350 limbs for a balanced full product). */

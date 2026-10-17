@@ -174,4 +174,9 @@
 */
 #define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
 
+/* radix_mulmid: classical below this many limb products per limb of
+   the fft_small convolution (see radix.h); measured on Apple M4, where
+   the scalar multiplications are fast relative to the 128-bit vectors */
+#define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO 85
+
 #endif
