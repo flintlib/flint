@@ -456,8 +456,12 @@ _gr_dft_realize(gr_dft_pre_t P, gr_srcptr w, int canonical,
     {
         /* fixed-point contexts: table built by binary-splitting
            products from a high-precision primitive root, with a
-           computed ulp error bound; w is ignored (and may be NULL) */
-        status = _gr_dft_nfixed_roots(P->roots, n, &P->nfixed_root_err, ctx);
+           computed ulp error bound; w (which may be NULL) only selects
+           this root and must approximate e^(-2 pi i/n) */
+        if (!canonical && w != NULL)
+            status = _gr_dft_nfixed_check_root(w, n, ctx);
+        if (status == GR_SUCCESS)
+            status = _gr_dft_nfixed_roots(P->roots, n, &P->nfixed_root_err, ctx);
     }
     else if (canonical && n > 2)
     {
@@ -487,13 +491,18 @@ _gr_dft_realize(gr_dft_pre_t P, gr_srcptr w, int canonical,
        inconclusive (T_UNKNOWN) over inexact rings, in which case we
        proceed. Canonical tables are correct by construction and are
        not checked (over approximate rings such as the fixed-point
-       contexts, the checks could not certify anything anyway). */
-    if (status == GR_SUCCESS && !canonical && n % 2 == 0)
+       contexts, the checks could not certify anything anyway).
+       The tables over the complex fixed-point contexts are always the
+       default ones (w was checked above), and gr_is_neg_one is never
+       T_TRUE there, so they are not checked either. */
+    if (status == GR_SUCCESS && !canonical && n % 2 == 0
+            && !_gr_dft_ctx_is_nfixed_complex(ctx))
     {
         if (gr_is_neg_one(GR_ENTRY(P->roots, n / 2, sz), ctx) == T_FALSE)
             status = GR_DOMAIN;
     }
-    if (status == GR_SUCCESS && !canonical && n >= 2)
+    if (status == GR_SUCCESS && !canonical && n >= 2
+            && !_gr_dft_ctx_is_nfixed_complex(ctx))
     {
         n_factor_t fac;
         n_factor_init(&fac);

@@ -26,6 +26,11 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
    slong w = (limbs*FLINT_BITS)/n;
    slong sqrt = (WORD(1)<<(depth/2));
 
+   /* the transforms need more than 2n output points, except for the
+      radix 2 transforms with an even w (see fft.h) */
+   FLINT_ASSERT(0 < trunc && trunc <= 4*n);
+   FLINT_ASSERT(2*n < trunc || (depth <= 6 && w % 2 == 0));
+
    if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);
@@ -73,6 +78,11 @@ void fft_convolution_basic(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
    slong n = (WORD(1)<<depth), j, s, t, u, trunc2;
    slong w = (limbs*FLINT_BITS)/n;
    slong sqrt = (WORD(1)<<(depth/2));
+
+   /* the transforms need more than 2n output points, except for the
+      radix 2 transforms with an even w (see fft.h) */
+   FLINT_ASSERT(0 < trunc && trunc <= 4*n);
+   FLINT_ASSERT(2*n < trunc || (depth <= 6 && w % 2 == 0));
 
    if (depth <= 6)
    {
@@ -341,6 +351,11 @@ void fft_convolution_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
    slong n = (WORD(1)<<depth), j;
    slong w = (limbs*FLINT_BITS)/n;
    slong sqrt = (WORD(1)<<(depth/2));
+
+   /* the transforms need more than 2n output points, except for the
+      radix 2 transforms with an even w (see fft.h) */
+   FLINT_ASSERT(0 < trunc && trunc <= 4*n);
+   FLINT_ASSERT(2*n < trunc || (depth <= 6 && w % 2 == 0));
 
    if (depth <= 6)
    {

@@ -927,7 +927,15 @@ FLINT_FORCE_INLINE vec4d vec4d_round_mul(vec4d a, vec4d b) {
 }
 #endif
 
-/* reduce_pm1no_to_0n(a, n): return a mod n in [0,n) assuming a in (-n,n) */
+/*
+    reduce_pm1no_to_0n(a, n): return a mod n in [0,n) assuming a in (-n,n).
+
+    vec4d_blendv tests the sign bit, so a = -0.0 gives n rather than 0 for
+    vec4d (and vec8d); vec1d, which compares with 0, returns -0.0. This is
+    a known property, kept to save an instruction (a comparison a < 0
+    would fix it). reduce_to_0n inherits it, but only for a = -0.0: in
+    round-to-nearest mode, reduce_to_pm1no returns -0.0 only for a = -0.0.
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_pm1no_to_0n(V a, V n) { \
     return V##_blendv(a, V##_add(a, n), a); \
@@ -937,7 +945,12 @@ DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
 /*
-    reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n], for |a| < 2^53.
+    reduce_to_pm1n(a, n, ninv): return a mod n in [-n,n], for |a| < 2^53
+    and, when round_mul uses the magic constant, |a*ninv| <= 2^51 (about
+    |a| <= 2^51*n). The second condition follows from the first for n >= 4;
+    for n <= 3 and |a| close to 2^53 the result can be wrong (for negative
+    a not even an integer). The same applies to reduce_to_pm1no and
+    reduce_to_0n.
 
     [-n, n] is the documented range, used in the bound analyses of the
     transforms. The result is a - q*n with q the nearest integer to a
@@ -965,7 +978,8 @@ DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
 
-/* reduce_to_0n(a, n, ninv): return a mod n in [0,n) */
+/* reduce_to_0n(a, n, ninv): return a mod n in [0,n), with the assumptions
+   of reduce_to_pm1n and the -0.0 caveat of reduce_pm1no_to_0n */
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_reduce_to_0n(V a, V n, V ninv) { \
     return V##_reduce_pm1no_to_0n(V##_reduce_to_pm1no(a, n, ninv), n); \

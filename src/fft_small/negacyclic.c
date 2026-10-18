@@ -67,6 +67,11 @@ sd_fft_mpn_mulmod_2expp1_ctx_init(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, mpn_c
 {
     slong np;
 
+    /* the operands are N/FLINT_BITS limbs */
+    if (N <= 0 || N % FLINT_BITS != 0)
+        flint_throw(FLINT_ERROR, "sd_fft_mpn_mulmod_2expp1_ctx_init: N = %wd "
+                    "is not a positive multiple of FLINT_BITS\n", N);
+
     if (m == 0)
     {
         m = _mulmod_2expp1_choose_m(R, N);

@@ -1041,7 +1041,11 @@ Primality testing
     `n - 1` the algorithm can still proceed.
 
     One can also specify a number of iterations if less time
-    should be taken. Simply set this to ``WORD(0)`` if this is irrelevant.
+    should be taken: for each prime factor of the factored part of `n - 1`,
+    the bases `2, \ldots, \mathit{iterations} - 1` are tried, and `-1` is
+    returned if none of them is suitable. If ``iterations`` is `0` or `1`,
+    there is no limit on the number of bases, and `-1` is never returned
+    for this reason.
     In most cases a greater number of iterations will not
     significantly affect timings as most of the time is spent
     factoring.

@@ -91,21 +91,17 @@ int _padic_poly_fprint_pretty(FILE *file,
             flint_fprintf(file, "*%s", var);
         }
 
-        fmpz_abs(padic_unit(x), poly);
-        padic_val(x) = val;
-        _padic_canonicalise(x, ctx);
+        if (!fmpz_is_zero(poly))
+        {
+            fmpz_abs(padic_unit(x), poly);
+            padic_val(x) = val;
+            _padic_canonicalise(x, ctx);
 
-        if (fmpz_sgn(poly) > 0)
-        {
-            fputc('+', file);
+            fputc(fmpz_sgn(poly) > 0 ? '+' : '-', file);
+            fputc('(', file);
+            padic_fprint(file, x, ctx);
+            fputc(')', file);
         }
-        else if (fmpz_sgn(poly) < 0)
-        {
-            fputc('-', file);
-        }
-        fputc('(', file);
-        padic_fprint(file, x, ctx);
-        fputc(')', file);
     }
     else  /* len >= 3 */
     {

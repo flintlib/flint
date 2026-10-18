@@ -31,11 +31,11 @@ flint_mpn_sqr_and_add_a(nn_ptr y, nn_ptr a, nn_ptr n, ulong n_size, nn_ptr ninv,
 
     /* Since carry cannot be greater than 1, if carry
        then simply subtract for modulo (a < n, y < n, a + y < 2n).
-       If no carry, then check if y > n before subtracting. */
+       If no carry, then check if y >= n before subtracting. */
 
     if (cy)
         mpn_sub_n(y, y, n, n_size);
-    else if (mpn_cmp(y, n, n_size) > 0)
+    else if (mpn_cmp(y, n, n_size) >= 0)
             mpn_sub_n(y, y, n, n_size);
 }
 

@@ -31,9 +31,15 @@ check(const arf_t res, const arf_t ref, slong prec, arf_rnd_t rnd)
     return ok;
 }
 
+/* also check the inexact flag: 0 only for an exact result, and exact
+   results of at most prec bits must be found (ref is computed with a
+   strict rounding mode, so inexact_ref is reliable) */
 #define CHECK(name) \
     if (!check(res, ref, prec, rnd)) \
-        TEST_FUNCTION_FAIL("%s: prec = %wd\nx = %{arf}\ny = %{arf}\nres = %{arf}\nref = %{arf}\n", name, prec, x, y, res, ref);
+        TEST_FUNCTION_FAIL("%s: prec = %wd\nx = %{arf}\ny = %{arf}\nres = %{arf}\nref = %{arf}\n", name, prec, x, y, res, ref); \
+    if ((!inexact && (inexact_ref || !arf_equal(res, ref))) || \
+        (inexact && !inexact_ref && arf_bits(ref) <= prec)) \
+        TEST_FUNCTION_FAIL("%s: inexact flag: prec = %wd\ninexact = %d, inexact_ref = %d\nx = %{arf}\ny = %{arf}\nres = %{arf}\nref = %{arf}\n", name, prec, inexact, inexact_ref, x, y, res, ref);
 
 TEST_FUNCTION_START(arf_approx, state)
 {
@@ -44,6 +50,7 @@ TEST_FUNCTION_START(arf_approx, state)
         arf_t x, y, res, ref;
         slong prec, xbits, ybits;
         arf_rnd_t rnd = n_randint(state, 2) ? ARF_RND_FAST : ARF_RND_ACCURATE;
+        int inexact, inexact_ref;
 
         arf_init(x); arf_init(y); arf_init(res); arf_init(ref);
 
@@ -58,21 +65,34 @@ TEST_FUNCTION_START(arf_approx, state)
         if (n_randint(state, 4) == 0)
             arf_set_ui_2exp_si(y, 1 + n_randint(state, 100), n_randint(state, 200) - 100);
 
-        arf_div(res, x, y, prec, rnd);
-        arf_div(ref, x, y, prec + 64, ARF_RND_DOWN);
+        /* exact quotients and square roots */
+        if (n_randint(state, 4) == 0)
+        {
+            arf_t z;
+            arf_init(z);
+            arf_randtest_not_zero(z, state, 1 + n_randint(state, prec), 100);
+            if (n_randint(state, 2))
+                arf_mul(x, y, z, ARF_PREC_EXACT, ARF_RND_DOWN);
+            else
+                arf_mul(x, z, z, ARF_PREC_EXACT, ARF_RND_DOWN);
+            arf_clear(z);
+        }
+
+        inexact = arf_div(res, x, y, prec, rnd);
+        inexact_ref = arf_div(ref, x, y, prec + 64, ARF_RND_DOWN);
         CHECK("div")
 
-        arf_ui_div(res, 1, y, prec, rnd);
-        arf_ui_div(ref, 1, y, prec + 64, ARF_RND_DOWN);
+        inexact = arf_ui_div(res, 1, y, prec, rnd);
+        inexact_ref = arf_ui_div(ref, 1, y, prec + 64, ARF_RND_DOWN);
         CHECK("inv")
 
         arf_abs(x, x);
-        arf_sqrt(res, x, prec, rnd);
-        arf_sqrt(ref, x, prec + 64, ARF_RND_DOWN);
+        inexact = arf_sqrt(res, x, prec, rnd);
+        inexact_ref = arf_sqrt(ref, x, prec + 64, ARF_RND_DOWN);
         CHECK("sqrt")
 
-        arf_rsqrt(res, x, prec, rnd);
-        arf_rsqrt(ref, x, prec + 64, ARF_RND_DOWN);
+        inexact = arf_rsqrt(res, x, prec, rnd);
+        inexact_ref = arf_rsqrt(ref, x, prec + 64, ARF_RND_DOWN);
         CHECK("rsqrt")
 
         /* aliased versions must agree with the unaliased ones */

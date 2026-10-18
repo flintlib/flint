@@ -535,8 +535,11 @@ ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slon
 // in short: with current DOT_SPLIT_BITS value 56,
 // -> modulus n up to about 2**30.5
 //       (more precisely, n <= 1515531528)
-// -> length of dot product up to at least 380368697
-//       (more precisely, len * (n-1)**3 < 2**120 + 2**56 - 2**112)
+// -> length of dot product up to at least 47546087, and up to at least
+//    380368697 for n <= 1178828563
+//       (more precisely, len * (n-1)**3 + 7 * (n-1)**2 * 2**56
+//                                      < 2**120 + 2**56 - 2**112,
+//        see (C2); this is checked in _nmod_vec_dot_params)
 
 // APPROACH:
 //
@@ -575,9 +578,14 @@ ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slon
 //
 // -> constraint (C2):
 // for dp_lo + pow2_precomp * dp_hi to fit in a single word, we require
-//      2**s - 1 + (n-1) dp_hi < 2**64.
+//      dp_lo + (n-1) dp_hi < 2**64.
+// After the last fold, up to t more products are added to dp_lo (t = 7 for
+// the scalar code, t = 3 for the AVX2 code), so dp_lo <= 2**s - 1 + t (n-1)**2.
 // Since dp_hi <= len * (n-1)**2 / 2**s, it suffices to ensure
-//     len * (n-1)**3 < 2**s * (2**64 + 1 - 2**s)
+//     len * (n-1)**3 + t * (n-1)**2 * 2**s < 2**s * (2**64 + 1 - 2**s)
+// The table below omits the term t * (n-1)**2 * 2**s and its length bounds
+// are therefore too large for n close to nmax8: _nmod_vec_dot_params checks
+// (C2) with t = 7 instead. At n = 1515531528 it gives len <= 47546087.
 //
 // sage: for s in range(40,64):
 // ....:     nmax8 = 1 + floor(sqrt(2**61 - 2**(s-3)))             # (C0-8)

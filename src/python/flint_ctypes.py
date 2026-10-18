@@ -2991,6 +2991,21 @@ class gr_ctx:
         """
         return ctx._unary_op(s, libgr.gr_zeta, "zeta($s)")
 
+    def zeta_ui(ctx, n):
+        """
+        Riemann zeta function at a nonnegative integer `n \\ne 1`.
+
+            >>> RR.zeta_ui(2)
+            [1.644934066848226 +/- 4.57e-16]
+            >>> CC.zeta_ui(0)
+            -0.5000000000000000
+            >>> RR.zeta_ui(1)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: zeta_ui(n) is not an element of {Real numbers (arb, prec = 53)} for {n = 1}
+        """
+        return ctx._op_ui(n, libgr.gr_zeta_ui, "zeta_ui($n)")
+
     def hurwitz_zeta(ctx, s, a):
         """
         Hurwitz zeta function.
@@ -3069,6 +3084,18 @@ class gr_ctx:
             [0.822467033424113 +/- 2.36e-16]
         """
         return ctx._unary_op(x, libgr.gr_dirichlet_eta, "dirichlet_eta($x)")
+
+    def dirichlet_beta(ctx, x):
+        """
+        Dirichlet beta function.
+
+            >>> RR.dirichlet_beta(2)
+            [0.915965594177219 +/- 2.68e-16]
+            >>> CC.dirichlet_beta(1); RR.pi() / 4
+            [0.785398163397448 +/- 3.69e-16]
+            [0.7853981633974483 +/- 7.66e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_dirichlet_beta, "dirichlet_beta($x)")
 
     def riemann_xi(ctx, x):
         """
@@ -3183,6 +3210,45 @@ class gr_ctx:
             -7.234656556133921e+134
         """
         return ctx._op_vec_len(length, libgr.gr_eulernum_vec, "eulernum_vec($length)")
+
+    def bernpoly(ctx, n, x):
+        """
+        Bernoulli polynomial `B_n(x)`.
+
+            >>> RR.bernpoly(2, 0.5)
+            [-0.0833333333333333 +/- 7.04e-17]
+            >>> CC.bernpoly(3, 1j)
+            (1.500000000000000 - 0.5000000000000000*I)
+        """
+        n = ctx._as_ui(n)
+        x = ctx._as_elem(x)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_bernpoly_ui.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_void_p, ctypes.c_void_p)
+        status = libgr.gr_bernpoly_ui(res._ref, n, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "bernpoly($n, $x)", n, x)
+        return res
+
+    def eulerpoly(ctx, n, x):
+        """
+        Euler polynomial `E_n(x)`.
+
+            >>> RR.eulerpoly(2, 0.5)
+            -0.2500000000000000
+            >>> RR.eulerpoly(10, 0.5) * 2**10; RR.eulernum(10)
+            [-50521.0000000000 +/- 1.46e-11]
+            -50521.00000000000
+            >>> CC.eulerpoly(3, 1j)
+            ([1.750000000000000 +/- 4.45e-16] - 1.000000000000000*I)
+        """
+        n = ctx._as_ui(n)
+        x = ctx._as_elem(x)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_eulerpoly_ui.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_void_p, ctypes.c_void_p)
+        status = libgr.gr_eulerpoly_ui(res._ref, n, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "eulerpoly($n, $x)", n, x)
+        return res
 
     def fib(ctx, n):
         """
@@ -3585,6 +3651,20 @@ class gr_ctx:
         """
         return ctx._unary_op(tau, libgr.gr_dedekind_eta, "dedekind_eta($tau)")
 
+    def dedekind_eta_q(ctx, q):
+        """
+        Dedekind eta function as a function of the nome q = exp(2 pi i tau),
+        without the leading factor q^(1/24), i.e. the product
+        (1-q)(1-q^2)(1-q^3)... for |q| < 1.
+
+            >>> RR.dedekind_eta_q(0.5)
+            [0.2887880950866024 +/- 6.99e-17]
+            >>> CC.dedekind_eta_q(CC.exp(-2*CC.pi())) * CC.exp(-CC.pi()/12); CC.dedekind_eta(1j)
+            [0.768225422326057 +/- 8.61e-16]
+            [0.768225422326057 +/- 9.03e-16]
+        """
+        return ctx._unary_op(q, libgr.gr_dedekind_eta_q, "dedekind_eta_q($q)")
+
     def hilbert_class_poly(ctx, D, x):
         """
         Hilbert class polynomial H_D(x) evaluated at x.
@@ -3683,6 +3763,10 @@ class gr_ctx:
         return ctx._binary_op_with_flag(phi, m, pi, libgr.gr_elliptic_e_inc, "elliptic_e_inc($phi, $m, $pi)")
 
     def elliptic_pi_inc(ctx, n, phi, m, pi=0):
+        """
+            >>> CC.elliptic_pi_inc(0.25, 0.5, 0.75)
+            [0.527039554837693 +/- 6.29e-16]
+        """
         return ctx._ternary_op_with_flag(n, phi, m, pi, libgr.gr_elliptic_pi_inc, "elliptic_pi_inc($n, $phi, $m, $pi)")
 
     def carlson_rc(ctx, x, y, flags=0):
@@ -7714,6 +7798,8 @@ class gr_mat(gr_elem):
             4
             >>> A*X == B*d
             True
+            >>> MatZZ(0, 0).nonsingular_solve_den(MatZZ(0, 1))[1]
+            1
         """
         r = self.nrows()
         c = self.ncols()
@@ -10172,6 +10258,15 @@ def test_ca():
     assert raises(lambda: R(X.unknown()), FlintUnableError)
     assert X(R(1)) == 1
     assert R(X(1)) == 1
+    # special values of gamma, tan, cot
+    assert str(X.gamma(X.inf())) == "+Infinity"
+    assert str(X.gamma(X.neg_inf())) == "Undefined"
+    assert str(X.gamma(X.unknown())) == "Unknown"
+    assert str(X.tan(X.unknown())) == "Unknown"
+    assert str(X.cot(X.unknown())) == "Unknown"
+    # an indeterminate numerical enclosure is printed as [+/- inf], not nan
+    s = str(1 / ((R(163).sqrt() * R.pi()).exp() - 640320**3 - 744))
+    assert s.startswith("[+/- inf] + [+/- inf]*I {") and "nan" not in s
 
 def test_ca_more():
     sqrt = CC_ca.sqrt
@@ -11844,6 +11939,18 @@ def test_integers_mod():
     assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**50)(17)), NotImplementedError)
     assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20 + 1)(17)), NotImplementedError)
     assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**50)(17)), NotImplementedError)
+    # the characteristic polynomial exists for a composite modulus
+    R = IntegersMod_mpn_mod(3 * (2**127 - 1))
+    A = Mat(R)([[3 * ((i * 7 + j * 3) % 5) + (i == j) for j in range(12)] for i in range(12)])
+    assert A.charpoly() == A.charpoly(algorithm="berkowitz")
+    # determinants over Z/nZ (elimination, with a fallback for composite n)
+    for n in [1000003, 1000004, 2**64 - 59, 2**64 - 1]:
+        R = IntegersMod_nmod(n)
+        A = Mat(R)([[(i * 7 + j * j * 3 + i * j) % 13 + 5 * (i == j) for j in range(12)] for i in range(12)])
+        assert A.det() == A.det(algorithm="berkowitz")
+    # gcd over ZZ
+    x = PolynomialRing_gr_poly(ZZ).gen()
+    assert ((x**2 - 1) * (x**5 + 3 * x + 7)).gcd((x**2 - 1) * (2 * x**3 + 1)) == x**2 - 1
 
 def test_nfloat():
     R = RealFloat_nfloat(128)

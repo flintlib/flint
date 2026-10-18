@@ -78,6 +78,8 @@ Input and output
     Writes the Arb number *z* to *out*, showing *digits*
     digits and with the display style specified by *flags*
     (``ARB_STR_NO_RADIUS``, etc.).
+    A part with a NaN midpoint (an indeterminate enclosure) is
+    written as ``[+/- inf]``.
 
 
 

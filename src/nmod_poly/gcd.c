@@ -254,7 +254,9 @@ slong _nmod_poly_gcd_hgcd(nn_ptr G, nn_srcptr A, slong lenA,
     slong lenG = 0;
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_gcd_hgcd(G, &lenG, A, lenA, B, lenB, inner_cutoff, outer_cutoff, ctx));
+    if (_gr_poly_gcd_hgcd(G, &lenG, A, lenA, B, lenB, inner_cutoff, outer_cutoff, ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception (nmod_poly_gcd_hgcd). Impossible inverse: "
+            "a leading coefficient is not invertible (the modulus must be prime).\n");
     return lenG;
 }
 
@@ -344,7 +346,9 @@ slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA,
     {
         gr_ctx_t ctx;
         GR_MUST_SUCCEED(gr_ctx_init_nmod_redc_fast(ctx, mod.n));
-        GR_MUST_SUCCEED(_gr_poly_gcd_euclidean(G, &lenG, B, lenB, R, lenR, ctx));
+        if (_gr_poly_gcd_euclidean(G, &lenG, B, lenB, R, lenR, ctx) != GR_SUCCESS)
+            flint_throw(FLINT_IMPINV, "Exception (nmod_poly_gcd_euclidean_redc_fast). Impossible inverse: "
+                "a leading coefficient is not invertible (the modulus must be prime).\n");
         /* The redc scaling factor does not matter for the GCD, but we need to
            convert back to normalised residues.  */
         for (i = 0; i < lenG; i++)

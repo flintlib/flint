@@ -28,6 +28,8 @@ TEST_FUNCTION_START(fmpq_poly_get_slice, state)
         fmpq_poly_init(c);
         fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
         fmpq_poly_set(b, a);
+        /* the old value of c must not matter */
+        fmpq_poly_randtest(c, state, n_randint(state, 100), 200);
 
         j1 = n_randint(state, 100);
         j2 = n_randint(state, 100);

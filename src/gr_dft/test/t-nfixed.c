@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "arf.h"
@@ -472,6 +473,52 @@ TEST_FUNCTION_START(gr_dft_nfixed, state)
             gr_dft_precomp_clear(P);
         }
 
+        gr_ctx_clear(rctx);
+        gr_ctx_clear(cctx);
+    }
+
+    /* gr_dft_precomp_init_root: w only selects the default root */
+    {
+        ulong n_tab[] = { 1, 2, 8, 9, 12 };
+        slong bi;
+        gr_ctx_t rctx, cctx;
+        gr_ptr w;
+        arf_t x;
+
+        GR_MUST_SUCCEED(gr_dft_ctx_init_nfixed(rctx, 2));
+        GR_MUST_SUCCEED(gr_dft_ctx_init_nfixed_complex(cctx, 2));
+        w = gr_heap_init(cctx);
+        arf_init(x);
+
+        for (bi = 0; bi < 5; bi++)
+        {
+            ulong n = n_tab[bi];
+            gr_dft_pre_t P;
+            int status, conj;
+
+            /* e^(-2 pi i/n) and its conjugate, to double precision */
+            for (conj = 0; conj < 2; conj++)
+            {
+                arf_set_d(x, cos(2 * 3.14159265358979323846 / n));
+                GR_MUST_SUCCEED(gr_dft_nfixed_set_arf(w, x, rctx));
+                arf_set_d(x, (conj ? 1 : -1) * sin(2 * 3.14159265358979323846 / n));
+                GR_MUST_SUCCEED(gr_dft_nfixed_set_arf(GR_ENTRY(w, 1, rctx->sizeof_elem), x, rctx));
+                status = gr_dft_precomp_init_root(P, w, n, GR_DFT_ALG_AUTO, 0, cctx);
+                gr_dft_precomp_clear(P);
+                if (status != ((conj && n > 2) ? GR_UNABLE : GR_SUCCESS))
+                    TEST_FUNCTION_FAIL("init_root, n = %wu, conj = %d, status = %d\n", n, conj, status);
+            }
+
+            /* 0 is not a root of unity */
+            GR_MUST_SUCCEED(gr_zero(w, cctx));
+            status = gr_dft_precomp_init_root(P, w, n, GR_DFT_ALG_AUTO, 0, cctx);
+            gr_dft_precomp_clear(P);
+            if (status != GR_DOMAIN)
+                TEST_FUNCTION_FAIL("init_root, n = %wu, w = 0, status = %d\n", n, status);
+        }
+
+        arf_clear(x);
+        gr_heap_clear(w, cctx);
         gr_ctx_clear(rctx);
         gr_ctx_clear(cctx);
     }

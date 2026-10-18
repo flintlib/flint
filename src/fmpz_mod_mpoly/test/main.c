@@ -59,6 +59,7 @@
 #include "t-to_from_fmpz_mpoly.c"
 #include "t-total_degree.c"
 #include "t-univar_resultant.c"
+#include "t-univar_set_coeff_ui.c"
 #include "t-used_vars.c"
 
 /* Array of test functions ***************************************************/
@@ -113,6 +114,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mpoly_sqrt),
     TEST_FUNCTION(fmpz_mod_mpoly_total_degree),
     TEST_FUNCTION(fmpz_mod_mpoly_univar_resultant),
+    TEST_FUNCTION(fmpz_mod_mpoly_univar_set_coeff_ui),
     TEST_FUNCTION(fmpz_mod_mpoly_used_vars)
 };
 

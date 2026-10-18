@@ -599,7 +599,7 @@ void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
     {
         nmod_mat_set(mat1->nmod, mat2);
     }
-    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_mat_set_nmod_mat(mat1->fmpz_mod, mat2, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }

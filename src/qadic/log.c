@@ -15,7 +15,7 @@ void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N, const fmpz_t pN)
 {
-    if (N < (WORD(1) < 10) / (slong) fmpz_bits(p))
+    if (N < (WORD(1) << 10) / (slong) fmpz_bits(p))
     {
         _qadic_log_rectangular(z, y, v, len, a, j, lena, p, N, pN);
     }
@@ -32,7 +32,7 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     const slong N   = qadic_prec(rop);
     const slong len = op->length;
 
-    if (op->val < 0)
+    if (qadic_is_zero(op) || op->val < 0)
     {
         return 0;
     }
@@ -61,7 +61,7 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         {
             const slong v = _fmpz_vec_ord_p(x, len, p);
 
-            if (v >= 2 || (*p != WORD(2) && v >= 1))
+            if (v >= 1)
             {
                 if (v >= N)
                 {

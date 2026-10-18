@@ -32,6 +32,9 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     pre->len2 = poly2->length;
     pre->bits2 = _fmpz_vec_max_bits(poly2->coeffs, pre->len2);
     pre->bits2 = FLINT_ABS(pre->bits2);
+    /* bits1 may be negative (as returned by fmpz_poly_max_bits); the
+       output bound below always includes a sign bit */
+    bits1 = FLINT_ABS(bits1);
 
     len_out = len1 + pre->len2 - 1;
     pre->loglen  = FLINT_CLOG2(len_out);

@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "gr.h"
 #include "gr_mat.h"
 
 int
@@ -23,7 +24,7 @@ gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, cons
     m = gr_mat_ncols(X, ctx);
 
     if (n == 0)
-        return GR_SUCCESS;
+        return gr_one(den, ctx);
 
     perm = _perm_init(n);
     gr_mat_init(LU, n, n, ctx);

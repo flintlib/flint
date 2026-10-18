@@ -12,6 +12,7 @@
 
 #include "test_helpers.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "fft_small.h"
 
@@ -62,10 +63,30 @@ TEST_FUNCTION_START(_nmod_poly_divrem_mpn_ctx, state)
 
             _nmod_poly_divrem_mpn_ctx(q2, r2, a, an, b, bn, mod, R);
 
-            ulong prec = qn + n_randint(state, 200);
+            /* sometimes an inverse too short for the quotient: then
+               the precomputed division must return 0 */
+            ulong prec;
+            int status;
+            if (qn > 1 && n_randint(state, 4) == 0)
+                prec = 1 + n_randint(state, qn - 1);
+            else
+                prec = qn + n_randint(state, 200);
             _nmod_poly_divrem_precomp_init(M, b, bn, prec, mod, R);
-            _nmod_poly_divrem_precomp(q3, r3, a, an, M, mod, R);
+            status = _nmod_poly_divrem_precomp(q3, r3, a, an, M, mod, R);
             _nmod_poly_divrem_precomp_clear(M);
+
+            if (status != (prec >= qn))
+            {
+                flint_printf("precomp status %d, qn=%wu, prec=%wu, bn=%wu\n",
+                             status, qn, prec, bn);
+                flint_abort();
+            }
+
+            if (status == 0)
+            {
+                _nmod_vec_set(q3, q1, qn);
+                _nmod_vec_set(r3, r1, bn - 1);
+            }
 
             for (i = qn; i > 0; i--)
             {

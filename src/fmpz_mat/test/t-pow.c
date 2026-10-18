@@ -48,6 +48,22 @@ TEST_FUNCTION_START(fmpz_mat_pow, state)
             flint_abort();
         }
 
+        /* the output may be a window */
+        {
+            fmpz_mat_t W, X;
+            fmpz_mat_init(W, n + 1, n + 2);
+            fmpz_mat_window_init(X, W, 1, 1, n + 1, n + 1);
+            fmpz_mat_pow(X, A, e);
+            if (!fmpz_mat_equal(X, B))
+            {
+                flint_printf("FAIL: window output\n");
+                fflush(stdout);
+                flint_abort();
+            }
+            fmpz_mat_window_clear(X);
+            fmpz_mat_clear(W);
+        }
+
         fmpz_mat_pow(A, A, e);
 
         if (!fmpz_mat_equal(A, B))

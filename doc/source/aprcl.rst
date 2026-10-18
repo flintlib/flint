@@ -67,7 +67,8 @@ Primality test functions
 
     Jacobi sum test for `n`. Possible return values:
     ``PRIME``, ``COMPOSITE`` and ``UNKNOWN`` (if we cannot
-    prove primality).
+    prove primality, for example when ``config`` does not satisfy
+    `s^2 > n`).
 
 .. function:: primality_test_status _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
@@ -113,13 +114,17 @@ Configuration functions
 
     Returns a precomputed `R` value for APRCL, such that the
     corresponding `s` value is greater than `\sqrt{n}`. The maximum
-    stored value `6983776800` allows to test numbers up to `6000` digits.
+    stored value `6983776800` allows to test numbers up to `6000` digits
+    (`20004` bits); it is returned for all larger `n` (on 64-bit systems),
+    for which :func:`aprcl_config_jacobi_init` extends it.
 
 .. function:: void aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
     Computes the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `a^R \equiv 1 \mod{s}` for all `a` coprime to `s`.
-    Also stores factors of `R` and `s`.
+    Also stores factors of `R` and `s`. If the value of
+    :func:`aprcl_R_value` does not give `s^2 > n`, `R` is multiplied by
+    further primes until it does.
 
 .. function:: void aprcl_config_jacobi_clear(aprcl_config conf)
 

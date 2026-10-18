@@ -1735,6 +1735,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     nmod_mat_t R, X, Y;
     nmod_mat_struct *XX, *YY;
 
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     R->entries = res->entries;
     R->r = res->r;
     R->c = res->c;
@@ -1788,6 +1791,26 @@ _gr_nmod_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
         return GR_SUCCESS;
 
     return _gr_mat_charpoly_berkowitz(res, mat, ctx);
+}
+
+/* nmod_mat_det uses elimination: LU decomposition for a prime modulus,
+   the Howell form otherwise */
+static int
+_gr_nmod_mat_det(ulong * res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    nmod_mat_t A;
+
+    if (mat->r != mat->c)
+        return GR_DOMAIN;
+
+    A->entries = mat->entries;
+    A->r = mat->r;
+    A->c = mat->c;
+    A->stride = mat->stride;
+    A->mod = NMOD_CTX(ctx);
+
+    res[0] = nmod_mat_det(A);
+    return GR_SUCCESS;
 }
 
 int __gr_nmod_methods_initialized = 0;
@@ -1915,6 +1938,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_nmod_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,     (gr_funcptr) _gr_nmod_mat_charpoly},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_nmod_mat_det},
 
     {0,                         (gr_funcptr) NULL},
 };

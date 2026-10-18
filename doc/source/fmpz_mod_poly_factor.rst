@@ -41,7 +41,9 @@ module assume that the modulus is prime. This is not checked.
 .. function:: void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, slong alloc, const fmpz_mod_ctx_t ctx)
 
     Reallocates the factor structure to provide space for
-    precisely ``alloc`` factors.
+    precisely ``alloc`` factors. If ``alloc`` is smaller than the
+    number of factors, the factors beyond the first ``alloc`` are
+    discarded.
 
 .. function:: void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len, const fmpz_mod_ctx_t ctx)
 
@@ -112,7 +114,7 @@ module assume that the modulus is prime. This is not checked.
 .. function:: int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 
     If `fac` returns with the value `1` then the function operates as per
-    :func:`_fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
+    :func:`_fmpz_mod_poly_is_squarefree`, otherwise `fac` is set to a nontrivial
     factor of `p`.
 
 .. function:: int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
@@ -123,7 +125,7 @@ module assume that the modulus is prime. This is not checked.
 .. function:: int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 
     If `fac` returns with the value `1` then the function operates as per
-    :func:`fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
+    :func:`fmpz_mod_poly_is_squarefree`, otherwise `fac` is set to a nontrivial
     factor of `p`.
 
 Root Finding

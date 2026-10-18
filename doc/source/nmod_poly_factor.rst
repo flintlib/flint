@@ -37,7 +37,9 @@ that the modulus is prime. This is not checked.
 .. function:: void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
 
     Reallocates the factor structure to provide space for
-    precisely ``alloc`` factors.
+    precisely ``alloc`` factors. If ``alloc`` is smaller than the
+    number of factors, the factors beyond the first ``alloc`` are
+    discarded.
 
 .. function:: void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len)
 

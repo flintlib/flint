@@ -84,11 +84,11 @@ int _fmpz_mpoly_factor_squarefree(
                 continue;
 
             fmpz_mul(ke, k, e);
-            _fmpz_mpoly_factor_mul_mpoly_fmpz(f, S, k, ctx);
+            _fmpz_mpoly_factor_mul_mpoly_fmpz(f, S, ke, ctx);
         }
 
         fmpz_mul(ke, k, e);
-        _fmpz_mpoly_factor_mul_mpoly_fmpz(f, Ss, k, ctx);
+        _fmpz_mpoly_factor_mul_mpoly_fmpz(f, Ss, ke, ctx);
 
         success = 1;
         goto cleanup;
@@ -99,6 +99,7 @@ int _fmpz_mpoly_factor_squarefree(
 cleanup:
 
     fmpz_clear(k);
+    fmpz_clear(ke);
     fmpz_mpoly_clear(S, ctx);
     fmpz_mpoly_clear(Sp, ctx);
     fmpz_mpoly_clear(Sm, ctx);

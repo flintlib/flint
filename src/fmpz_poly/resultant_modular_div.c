@@ -113,7 +113,9 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
     nbits = FLINT_MAX((slong)0, nbits);
 
-    num_primes = (nbits+pbits-1)/pbits;
+    /* the primes exceed 2^pbits and the signed reconstruction of a
+       value of nbits bits needs a modulus of at least nbits + 1 bits */
+    num_primes = (nbits + 1 + pbits - 1) / pbits;
     if (num_primes <= 0) num_primes = 1;
 
     parr = _nmod_vec_init(num_primes);

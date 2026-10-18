@@ -1323,6 +1323,10 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       return 1;
    }
 
+   /* array division expects exponents that fit in one word */
+   if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
+      return -1;
+
    TMP_START;
 
     /* compute maximum fields */

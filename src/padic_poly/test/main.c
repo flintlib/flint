@@ -16,6 +16,7 @@
 #include "t-compose_pow.c"
 #include "t-derivative.c"
 #include "t-evaluate_padic.c"
+#include "t-get_set_coeff_padic.c"
 #include "t-get_set_fmpq_poly.c"
 #include "t-init_realloc_clear.c"
 #include "t-inv_series.c"
@@ -37,6 +38,7 @@ test_struct tests[] =
     TEST_FUNCTION(padic_poly_compose_pow),
     TEST_FUNCTION(padic_poly_derivative),
     TEST_FUNCTION(padic_poly_evaluate_padic),
+    TEST_FUNCTION(padic_poly_get_set_coeff_padic),
     TEST_FUNCTION(padic_poly_get_set_fmpq_poly),
     TEST_FUNCTION(padic_poly_init_realloc_clear),
     TEST_FUNCTION(padic_poly_inv_series),

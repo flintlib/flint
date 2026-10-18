@@ -295,7 +295,9 @@ Roots and the AGM
               void mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
 
     Sets *res* to `\sqrt{x}` resp. `1/\sqrt{x}` for `x > 0` of relative
-    radius below `2^{-30}` (checked).  The exponent is aligned, the
+    radius below `2^{-30}` (checked).  A ball with a negative midpoint or
+    a zero midpoint throws, except that :func:`mp_real_sqrt` of an exact
+    zero gives zero.  The exponent is aligned, the
     root computed by :func:`_mp_real_sqrt_newton` resp.
     :func:`_mp_real_rsqrt_newton` (or ``flint_mpn_sqrtrem`` below a
     cutoff) and the radius bounded through the derivative.  *res* may

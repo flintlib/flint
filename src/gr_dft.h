@@ -170,6 +170,7 @@ int gr_dft_nfixed_set_arf(gr_ptr res, const arf_t x, gr_ctx_t ctx);
 void gr_dft_nfixed_get_arf(arf_t res, gr_srcptr x, gr_ctx_t ctx);
 
 int _gr_dft_nfixed_roots(gr_ptr roots, ulong n, double * err_ulps, gr_ctx_t ctx);
+int _gr_dft_nfixed_check_root(gr_srcptr w, ulong n, gr_ctx_t ctx);
 double _gr_dft_nfixed_cmul_err_ulps(gr_ctx_t ctx);
 double _gr_dft_nfixed_root_err_bound(ulong n, double kmul);
 /* forced complex-multiplication paths, for machine tuning of
@@ -212,7 +213,8 @@ typedef struct
     int which;
     slong nl;               /* fixed point: number of limbs */
     slong p1e;              /* fixed point: peak(1) < 2^p1e */
-    double in_mag;          /* fixed point: scaled input bound */
+    double in_mag;          /* fixed point: bound on the modulus of the
+                               scaled input */
     double errulps;         /* fixed point: output roundoff, in ulp */
     gr_ctx_struct rctx[1];
     gr_ctx_struct cctx[1];

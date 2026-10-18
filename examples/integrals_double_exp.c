@@ -176,11 +176,11 @@ quad(arb_t result,
             {
                 arb_log_base_ui(w, d + j - 1, 10, prec);
                 double d_0 = arf_get_d(arb_midref(w), ARF_RND_NEAR);
-                flint_printf("\t%8.2f %8d %10.4f\n", d_1, n_eval, d_1 / d_0);
+                flint_printf("\t%8.2f %8wd %10.4f\n", d_1, n_eval, d_1 / d_0);
             }
             else
             {
-                flint_printf("\t%8.2f %8d\n", d_1, n_eval);
+                flint_printf("\t%8.2f %8wd\n", d_1, n_eval);
             }
         }
 
@@ -400,8 +400,8 @@ example ex[] = {
 void
 show_desc(int argc, char *argv[])
 {
-    flint_printf("Examples for double exponential integration.\n\n", argv[0]);
-    flint_printf("usage: %s [-v] [-p precision] [-h]\n");
+    flint_printf("Examples for double exponential integration.\n\n");
+    flint_printf("usage: %s [-v] [-p precision] [-h]\n", argv[0]);
     flint_printf("\n\tcalculates a numerical approximation to:\n\n");
     for (slong j = 0; j < sizeof(ex) / sizeof(ex[0]); j++)
     {

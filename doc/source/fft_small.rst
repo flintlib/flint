@@ -175,8 +175,11 @@ Preconditioned polynomial arithmetic
 
 .. function:: int _nmod_poly_divrem_precomp(ulong * q, ulong * r, const ulong * a, ulong an, nmod_poly_divrem_precomp_struct * M, nmod_t mod, mpn_ctx_t R)
 
-    Polynomial multiplication given a precomputed transform ``M``.
-    Returns 1 if successful, 0 if the precomputed transform is too short.
+    Division with remainder of ``(a, an)`` by ``(b, bn)`` given the
+    precomputation ``M``, setting ``(q, an - bn + 1)`` and ``(r, bn - 1)``.
+    Returns 1 if successful, 0 if the quotient length ``an - bn + 1``
+    exceeds the precision ``Bn`` of the stored inverse or the precomputed
+    transform is too short.
 
 
 Transform plans and operands
@@ -262,8 +265,8 @@ Transform plans and operands
     caller-side fold. The geometry selection was tuned with
     ``profile/p-mpn_cyclic_tuning``.
 
-.. function:: void fft_small_export_mpn_signed(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
-              void fft_small_export_mpn_signed_trunc(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
+.. function:: void fft_small_export_mpn_signed(ulong * z, ulong zn, int * sign, fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
+              void fft_small_export_mpn_signed_trunc(ulong * z, ulong zn, int * sign, fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
 
     Chinese-remainder reconstruction of a signed integer result: the
     value is assembled in two's complement and the sign resolved from
@@ -277,7 +280,7 @@ Transform plans and operands
     slots, under half an ulp either way. With ``lo_limbs = 0`` the
     export is exact.
 
-.. function:: void fft_small_export_mpn_signed_low(ulong * z, ulong zn, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
+.. function:: void fft_small_export_mpn_signed_low(ulong * z, ulong zn, fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
 
     The two's-complement residue of the signed reconstruction modulo
     `2^{\mathtt{zn} \cdot \mathtt{FLINT\_BITS}}`, written to *z* with no sign
@@ -286,7 +289,7 @@ Transform plans and operands
     the residue, and unlike the other signed exports the window need not
     hold the value.
 
-.. function:: void fft_small_export_mpn_signed_window(ulong * z, ulong zn, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
+.. function:: void fft_small_export_mpn_signed_window(ulong * z, ulong zn, fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
 
     The limbs `[\mathtt{lo\_limbs}, \mathtt{lo\_limbs} + \mathtt{zn})` of the
     two's-complement sum of the slots that can reach them, with no sign
@@ -609,7 +612,8 @@ zero.
     and transform contexts are taken from *R*, normally
     ``get_default_mpn_ctx()``.
 
-    An exception is raised when no supported configuration exists.
+    An exception is raised when *N* is not a positive multiple of
+    ``FLINT_BITS`` or no supported configuration exists.
     With `m = 0` and the default context, initialization succeeds
     precisely when `N = 2^k b` for some `k \geq 4` and an
     instantiated digit size

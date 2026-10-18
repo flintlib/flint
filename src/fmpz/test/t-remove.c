@@ -147,5 +147,42 @@ TEST_FUNCTION_START(fmpz_remove, state)
         mpz_clear(g);
     }
 
+    /* op = 0: rop = 0 and the return value is 0 */
+    {
+        fmpz_t a, b, c;
+        slong x;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init_set_ui(c, 5);
+
+        for (i = 0; i < 4; i++)
+        {
+            if (i == 0)
+                fmpz_set_ui(b, 2);
+            else if (i == 1)
+                fmpz_set_ui(b, 3);
+            else if (i == 2)
+                fmpz_set_ui(b, 1024);
+            else
+                fmpz_ui_pow_ui(b, 2, 100);
+
+            x = fmpz_remove(c, a, b);
+
+            if (x != 0 || !fmpz_is_zero(c))
+            {
+                flint_printf("FAIL (op = 0):\n");
+                flint_printf("b = "); fmpz_print(b);
+                flint_printf(", x = %wd\n", x);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+    }
+
     TEST_FUNCTION_END(state);
 }

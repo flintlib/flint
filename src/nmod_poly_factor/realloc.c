@@ -25,12 +25,14 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
         {
             slong i;
 
-            for (i = alloc; i < fac->num; i++)
+            /* all entries up to fac->alloc are initialised */
+            for (i = alloc; i < fac->alloc; i++)
                 nmod_poly_clear(fac->p + i);
 
             fac->p     = flint_realloc(fac->p, alloc * sizeof(nmod_poly_struct));
             fac->exp   = flint_realloc(fac->exp, alloc * sizeof(slong));
             fac->alloc = alloc;
+            fac->num   = FLINT_MIN(fac->num, alloc);
         }
         else if (fac->alloc < alloc)
         {

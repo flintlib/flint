@@ -93,5 +93,47 @@ TEST_FUNCTION_START(fmpz_poly_mul_SS_precache, state)
         fmpz_poly_clear(d);
     }
 
+    /* Check bits1 = fmpz_poly_max_bits(b), possibly negative */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, b, c, d;
+        fmpz_poly_mul_precache_t pre;
+        slong len1;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        len1 = n_randint(state, 100) + 10;
+        fmpz_poly_randtest(b, state, len1, 200);
+        fmpz_poly_randtest_not_zero(c, state, n_randint(state, 100) + 1, 200);
+        if (n_randint(state, 2))
+            fmpz_poly_set_coeff_si(b, 0, -1);
+
+        fmpz_poly_mul_SS_precache_init(pre, len1, fmpz_poly_max_bits(b), c);
+
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_mul_SS_precache(d, b, pre);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (negative bits1):\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(d), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_poly_mul_precache_clear(pre);
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

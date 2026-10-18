@@ -349,7 +349,7 @@ Arithmetic
 
     Sets ``B`` to the square of ``A``, which must be a square matrix.
     Aliasing is allowed. This function automatically chooses between
-    classical and KS squaring.
+    classical, KS and evaluation-interpolation squaring.
 
 .. function:: void nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 

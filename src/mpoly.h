@@ -1023,9 +1023,6 @@ void mpoly_compose_mat_fill_column(fmpz_mat_t M, const ulong * Cexp,
 void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
                                                        const mpoly_ctx_t mctx);
 
-void mpoly_get_ovfmask(ulong * ovfmask, slong N, flint_bitcnt_t bits,
-                                                       const mpoly_ctx_t mctx);
-
 int mpoly_monomials_cmp(const ulong * Aexps, flint_bitcnt_t Abits,
                                   const ulong * Bexps, flint_bitcnt_t Bbits,
                                          slong length, const mpoly_ctx_t mctx);

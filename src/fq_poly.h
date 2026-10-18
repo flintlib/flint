@@ -45,4 +45,22 @@
 #undef CAP_T
 #undef T
 
+/* not available for fq_nmod and fq_zech */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void _fq_poly_mul_reorder(fq_struct * rop, const fq_struct * op1, slong len1,
+                          const fq_struct * op2, slong len2, const fq_ctx_t ctx);
+void fq_poly_mul_reorder(fq_poly_t rop, const fq_poly_t op1,
+                         const fq_poly_t op2, const fq_ctx_t ctx);
+
+void _fq_poly_sqr_reorder(fq_struct * rop, const fq_struct * op, slong len,
+                          const fq_ctx_t ctx);
+void fq_poly_sqr_reorder(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

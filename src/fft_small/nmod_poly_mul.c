@@ -1546,6 +1546,10 @@ int _nmod_poly_divrem_precomp(
     FLINT_ASSERT(bn > 1);
     FLINT_ASSERT(qn > 0);
 
+    /* the stored inverse has precision Bn */
+    if (qn > Bn)
+        return 0;
+
     if (!_nmod_poly_mul_mid_precomp(q, Bn-1, Bn-1+qn, a+an-qn, qn, M->quo_maker, mod, R))
         return 0;
     _nmod_poly_mul_mod_xpnm1_precomp(r, bn-1, q, qn, M->rem_maker, mod, R);

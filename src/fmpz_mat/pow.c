@@ -56,7 +56,7 @@ fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
                 fmpz_mat_swap(T, U);
         }
 
-        fmpz_mat_swap(B, T);
+        fmpz_mat_swap_entrywise(B, T);
         fmpz_mat_clear(T);
         fmpz_mat_clear(U);
     }

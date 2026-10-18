@@ -41,7 +41,17 @@ dirichlet_chi_vec_loop_order(ulong * v, const dirichlet_group_t G, const dirichl
     for (k = 0; k < nv; k++)
         v[k] = DIRICHLET_CHI_NULL;
 
-    t = v[1] = 0;
+    /* chi(1) = 1, i.e. log 0; modulo q = 1 the index of 1 is 0 */
+    t = 0;
+    if (G->q == 1)
+    {
+        if (nv > 0)
+            v[0] = 0;
+    }
+    else if (nv > 1)
+    {
+        v[1] = 0;
+    }
 
     while ( (j = dirichlet_char_next(x, G)) >= 0 )
     {

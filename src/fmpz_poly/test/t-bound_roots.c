@@ -82,5 +82,47 @@ TEST_FUNCTION_START(fmpz_poly_bound_roots, state)
         fmpz_poly_clear(g);
     }
 
+    /* x^k - c has roots of absolute value |c|^(1/k); first x^2 - 6 */
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        fmpz_poly_t f;
+        fmpz_t c, bound;
+        slong k;
+
+        fmpz_init(c);
+        fmpz_init(bound);
+        fmpz_poly_init(f);
+
+        if (iter == 0)
+        {
+            k = 2;
+            fmpz_set_si(c, -6);
+        }
+        else
+        {
+            k = 2 + n_randint(state, 6);
+            fmpz_randtest_not_zero(c, state, 1 + n_randint(state, 100));
+        }
+
+        fmpz_poly_set_coeff_ui(f, k, 1);
+        fmpz_poly_set_coeff_fmpz(f, 0, c);
+        fmpz_poly_bound_roots(bound, f);
+
+        fmpz_abs(c, c);
+        fmpz_pow_ui(bound, bound, k);
+
+        if (fmpz_cmp(bound, c) < 0)
+        {
+            flint_printf("FAIL (x^k - c)\n");
+            flint_printf("f = "); fmpz_poly_print(f); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_clear(c);
+        fmpz_clear(bound);
+        fmpz_poly_clear(f);
+    }
+
     TEST_FUNCTION_END(state);
 }

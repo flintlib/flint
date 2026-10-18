@@ -173,6 +173,12 @@ vector *res*.
 
     Euler numbers `E_n`.
 
+.. function:: int gr_bernpoly_ui(gr_ptr res, ulong n, gr_srcptr x, gr_ctx_t ctx)
+              int gr_eulerpoly_ui(gr_ptr res, ulong n, gr_srcptr x, gr_ctx_t ctx)
+
+    Bernoulli polynomials `B_n(x)` and Euler polynomials `E_n(x)`.
+    These are currently implemented for real and complex balls.
+
 .. function:: int gr_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
               int gr_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
               int gr_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx)
@@ -304,7 +310,11 @@ Riemann zeta, polylogarithms and Dirichlet L-functions
               int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
               int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx)
 
+    The *ui* version of the zeta function takes an integer `x \ne 1`;
+    ``GR_DOMAIN`` is returned for the pole `x = 1`.
+
 .. function:: int gr_dirichlet_eta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_dirichlet_beta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_riemann_xi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_zeta_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
               int gr_zeta_zero_vec(gr_ptr res, const fmpz_t n, slong len, gr_ctx_t ctx)
@@ -313,7 +323,6 @@ Riemann zeta, polylogarithms and Dirichlet L-functions
 .. function:: int gr_dirichlet_chi_fmpz(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, const fmpz_t n, gr_ctx_t ctx)
               int gr_dirichlet_chi_vec(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, gr_ctx_t ctx)
               int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr s, gr_ctx_t ctx)
-              int gr_dirichlet_l_all(gr_vec_t res, const dirichlet_group_t G, gr_srcptr s, gr_ctx_t ctx)
               int gr_dirichlet_hardy_theta(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx)
               int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx)
 
@@ -346,7 +355,15 @@ Elliptic, modular and theta functions
               int gr_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
 
 .. function:: int gr_dedekind_eta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
-              int gr_dedekind_eta_q(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_dedekind_eta_q(gr_ptr res, gr_srcptr q, gr_ctx_t ctx)
+
+    Dedekind eta function. The *q* version takes the nome
+    `q = \exp(2 \pi i \tau)` and computes the function
+    without the leading factor `q^{1/24}`, i.e.
+    `q^{-1/24} \eta(\tau) = \prod_{k=1}^{\infty} (1 - q^k)`,
+    which is a single-valued function of `q` for `|q| < 1`
+    (``GR_DOMAIN`` is returned for `|q| \ge 1`).
+    The *q* version is currently implemented for real and complex balls.
 
 .. function:: int gr_modular_j(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
               int gr_modular_lambda(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)

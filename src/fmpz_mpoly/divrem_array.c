@@ -1021,8 +1021,11 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
       return 1;
    }
 
-   TMP_START;
+   /* array division expects exponents that fit in one word */
+   if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
+      return 0;
 
+   TMP_START;
 
    /* compute maximum exponents for each variable */
    max_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));

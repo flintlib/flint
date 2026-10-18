@@ -41,7 +41,10 @@ Many functions in this module (greatest common divisors, modular
 inverses, division as if over a field, resultants and discriminants,
 factorisation, irreducibility testing, root finding, square roots, and
 the transcendental series) require the modulus to be prime. This is
-assumed and not checked.
+assumed and not checked. With a composite modulus, the greatest common
+divisor and resultant functions raise an exception (of type
+``FLINT_IMPINV``) when they meet a leading coefficient that is not
+invertible.
 
 Functions in ``nmod_poly`` do all the memory management for the user.
 One does not need to specify the maximum length in advance before

@@ -21,7 +21,8 @@ nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)
-            nmod_mat_entry(mat, i, j) = FLINT_MAX(1, n_randint(state, mat->mod.n));
+            nmod_mat_entry(mat, i, j) = (mat->mod.n == 1) ? 0 :
+                                    FLINT_MAX(1, n_randint(state, mat->mod.n));
 }
 
 void

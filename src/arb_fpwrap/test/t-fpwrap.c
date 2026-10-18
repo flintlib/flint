@@ -165,6 +165,32 @@ TEST_FUNCTION_START(arb_fpwrap, state)
     }
 
     {
+        double y;
+        complex_double cy, n, a, b, x;
+
+        /* P_2^(1/2, 1/4)(3/4) = 0.84228515625 (all four arguments used) */
+        arb_fpwrap_double_jacobi_p(&y, 2, 0.5, 0.25, 0.75, FPWRAP_CORRECT_ROUNDING);
+
+        if (y != 0.84228515625)
+        {
+            flint_printf("FAIL: value 7 (jacobi_p)\n\n");
+            flint_abort();
+        }
+
+        n.real = 2; n.imag = 0;
+        a.real = 0.5; a.imag = 0;
+        b.real = 0.25; b.imag = 0;
+        x.real = 0.75; x.imag = 0;
+        arb_fpwrap_cdouble_jacobi_p(&cy, n, a, b, x, FPWRAP_CORRECT_ROUNDING);
+
+        if (cy.real != 0.84228515625 || cy.imag != 0.0)
+        {
+            flint_printf("FAIL: value 7 (cdouble jacobi_p)\n\n");
+            flint_abort();
+        }
+    }
+
+    {
         double x, y, z;
         complex_double cx, cy, cz, ctau;
         double res, res2;

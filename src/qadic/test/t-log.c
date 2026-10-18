@@ -17,7 +17,137 @@ TEST_FUNCTION_START(qadic_log, state)
 {
     int i, result;
 
+/** Special values ***********************************************************/
+
+    /* log(0) does not converge; qadic_gen is reduced for d = 1 */
+    {
+        fmpz_t p;
+        qadic_ctx_t ctx;
+        qadic_t a, b;
+        slong d;
+
+        fmpz_init_set_ui(p, 7);
+
+        for (d = 1; d <= 3; d++)
+        {
+            qadic_ctx_init_conway(ctx, p, d, 0, 30, "a", PADIC_TERSE);
+            qadic_init2(a, 10);
+            qadic_init2(b, 10);
+
+            if (qadic_log(b, a, ctx) || qadic_log_balanced(b, a, ctx)
+                || qadic_log_rectangular(b, a, ctx))
+            {
+                flint_printf("FAIL (log(0)):\n\n");
+                flint_printf("d = %wd\n", d);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            qadic_gen(a, ctx);
+            if (qadic_is_zero(a) || !padic_poly_is_reduced(a, &ctx->pctx))
+            {
+                flint_printf("FAIL (qadic_gen):\n\n");
+                flint_printf("d = %wd\n", d);
+                flint_printf("a = "), padic_poly_debug(a), flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            qadic_clear(a);
+            qadic_clear(b);
+            qadic_ctx_clear(ctx);
+        }
+
+        fmpz_clear(p);
+    }
+
 /** p == 2 *******************************************************************/
+
+    /* Check that log converges when ord_2(a - 1) >= 1, that the
+       algorithms agree and that log(a) + log(b) == log(a * b) */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        fmpz_t p;
+        slong deg, N;
+        int ans1, ans2, ans3;
+        qadic_ctx_t ctx;
+
+        qadic_t a, b, c, d, e, f, g;
+
+        fmpz_init_set_ui(p, 2);
+        deg = n_randint(state, 6) + 1;
+        N = n_randint(state, 50) + 1;
+        qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "a", PADIC_SERIES);
+
+        qadic_init2(a, N);
+        qadic_init2(b, N);
+        qadic_init2(c, N);
+        qadic_init2(d, N);
+        qadic_init2(e, N);
+        qadic_init2(f, N);
+        qadic_init2(g, N);
+
+        qadic_randtest_val(a, state, 1, ctx);
+        qadic_one(c);
+        qadic_add(a, a, c, ctx);
+
+        qadic_randtest_not_zero(b, state, ctx);
+        if (b->val < 1)
+            b->val = 1;
+        padic_poly_reduce(b, &ctx->pctx);
+        qadic_one(c);
+        qadic_add(b, b, c, ctx);
+
+        qadic_mul(c, a, b, ctx);
+
+        ans1 = qadic_log(d, a, ctx);
+        ans2 = qadic_log_balanced(f, a, ctx);
+        ans3 = qadic_log_rectangular(g, a, ctx);
+
+        result = ans1 && ans2 && ans3 && qadic_equal(d, f) && qadic_equal(d, g);
+        if (!result)
+        {
+            flint_printf("FAIL (p = 2, algorithms):\n\n");
+            flint_printf("ans = %d %d %d\n", ans1, ans2, ans3);
+            flint_printf("a                  = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("log(a)             = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+            flint_printf("log_balanced(a)    = "), qadic_print_pretty(f, ctx), flint_printf("\n");
+            flint_printf("log_rectangular(a) = "), qadic_print_pretty(g, ctx), flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        qadic_log(e, b, ctx);
+        qadic_add(f, d, e, ctx);
+
+        qadic_log(g, c, ctx);
+
+        result = (qadic_equal(f, g));
+        if (!result)
+        {
+            flint_printf("FAIL (p = 2, functional equation):\n\n");
+            flint_printf("a                   = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b                   = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = a * b           = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("d = log(a)          = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+            flint_printf("e = log(b)          = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+            flint_printf("f = log(a) + log(b) = "), qadic_print_pretty(f, ctx), flint_printf("\n");
+            flint_printf("g = log(a * b)      = "), qadic_print_pretty(g, ctx), flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        qadic_clear(a);
+        qadic_clear(b);
+        qadic_clear(c);
+        qadic_clear(d);
+        qadic_clear(e);
+        qadic_clear(f);
+        qadic_clear(g);
+
+        fmpz_clear(p);
+        qadic_ctx_clear(ctx);
+    }
 
 /** p > 2 ********************************************************************/
 

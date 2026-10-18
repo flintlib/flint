@@ -209,5 +209,45 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         mpz_clear(z);
     }
 
+    /* nmod_2_pow_ui, including even moduli and exponents >= 2^20 */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        nmod_t mod;
+        ulong m, c;
+        mpz_t y, z;
+        ulong exp;
+
+        m = n_randtest_not_zero(state);
+        if (n_randint(state, 2))
+            exp = n_randtest(state);
+        else
+            exp = (UWORD(1) << 20) + n_randint(state, UWORD(1) << 20);
+
+        nmod_init(&mod, m);
+
+        c = nmod_2_pow_ui(exp, mod);
+
+        mpz_init(y);
+        mpz_init(z);
+
+        flint_mpz_set_ui(y, 2);
+        flint_mpz_set_ui(z, m);
+        flint_mpz_powm_ui(z, y, exp, z);
+
+        if (flint_mpz_cmp_ui(z, c) != 0)
+            TEST_FUNCTION_FAIL("(2_pow) m = %wu, exp = %wu, got %wu\n", m, exp, c);
+
+        mpz_clear(y);
+        mpz_clear(z);
+    }
+
+    /* 2^(2^20) mod 10 = 6 */
+    {
+        nmod_t mod;
+        nmod_init(&mod, 10);
+        if (nmod_2_pow_ui(UWORD(1) << 20, mod) != 6)
+            TEST_FUNCTION_FAIL("(2_pow) 2^(2^20) mod 10\n");
+    }
+
     TEST_FUNCTION_END(state);
 }

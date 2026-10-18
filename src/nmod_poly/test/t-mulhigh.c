@@ -59,5 +59,76 @@ TEST_FUNCTION_START(nmod_poly_mulhigh, state)
         nmod_poly_clear(c);
     }
 
+    /* Independent lengths and start, longer inputs, aliasing */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+        slong j, len1, len2, n;
+
+        ulong m = n_randtest_not_zero(state);
+
+        nmod_poly_init(a, m);
+        nmod_poly_init(b, m);
+        nmod_poly_init(c, m);
+        nmod_poly_init(d, m);
+
+        if (n_randint(state, 10) == 0)
+        {
+            len1 = n_randint(state, 2000);
+            len2 = n_randint(state, 2000);
+        }
+        else
+        {
+            len1 = n_randint(state, 100);
+            len2 = n_randint(state, 100);
+        }
+
+        nmod_poly_randtest(b, state, len1);
+        nmod_poly_randtest(c, state, len2);
+        n = n_randint(state, len1 + len2 + 1);
+
+        nmod_poly_mul(d, b, c);
+
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                nmod_poly_mulhigh(a, b, c, n);
+                break;
+            case 1:
+                nmod_poly_set(a, b);
+                nmod_poly_mulhigh(a, a, c, n);
+                break;
+            default:
+                nmod_poly_set(a, c);
+                nmod_poly_mulhigh(a, b, a, n);
+                break;
+        }
+
+        for (j = 0; j < n; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < d->length)
+                d->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(d);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (lengths %wd, %wd, n = %wd):\n", len1, len2, n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(d), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

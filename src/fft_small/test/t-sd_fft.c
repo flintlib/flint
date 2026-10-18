@@ -488,6 +488,15 @@ void test_sd_fft_tr_extreme(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong reps, 
 
 TEST_FUNCTION_START(sd_fft, state)
 {
+    /* sd_fft_ctx_init_prime needs 2^4 | p - 1, whatever the depth */
+    if (fft_small_prime_supports_depth(13, 2) ||
+        !fft_small_prime_supports_depth(17, 2) ||
+        !fft_small_prime_supports_depth(UWORD(0x0003f00000000001), 20))
+    {
+        flint_printf("FAIL: fft_small_prime_supports_depth\n");
+        flint_abort();
+    }
+
     {
         sd_fft_ctx_t Q;
         sd_fft_ctx_init_prime(Q, UWORD(0x0003f00000000001));

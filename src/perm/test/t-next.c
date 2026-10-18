@@ -75,6 +75,20 @@ TEST_FUNCTION_START(perm_next, state)
         }
     }
 
+    /* n = 0 and n = 1: there is no next permutation, and nothing beyond
+       the first n entries is touched */
+    for (n = 0; n < 2; n++)
+    {
+        slong p[3] = { 0, 7, 8 }, s[3] = { 0, 0, 0 };
+
+        if (_perm_next_heap(p, n, s) != 0 || _perm_next_lex(p, n) != 0 ||
+            p[0] != 0 || p[1] != 7 || p[2] != 8 ||
+            s[0] != 0 || s[1] != 0 || s[2] != 0)
+        {
+            TEST_FUNCTION_FAIL("n = %wd: next permutation exists\n", n);
+        }
+    }
+
     fmpz_clear(fact);
     fmpz_clear(half_fact);
 

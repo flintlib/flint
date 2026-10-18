@@ -269,9 +269,6 @@ int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
 slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
 
-slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L,
-                                         slong m, const TEMPLATE(T, ctx_t) ctx);
-
 slong TEMPLATE(T, mat_nullspace)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
                            const TEMPLATE(T, ctx_t) ctx);
 

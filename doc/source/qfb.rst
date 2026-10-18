@@ -51,13 +51,14 @@ Hash table
     Also store the second binary quadratic form ``q2`` (if not 
     ``NULL``) in the similarly named field and ``iter`` in the 
     similarly named field of the hash structure. 
+    An exception is thrown if the table is full.
 
 .. function:: slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth)
 
     Search for the given binary quadratic form or its inverse in the 
     given hash table of size `2^{depth}`. If it is found, return
     the index in the table (which is an array of ``qfb_hash_t`` 
-    structs), otherwise return ``-1``.
+    structs), otherwise return ``-1`` (also when the table is full).
 
 Basic manipulation
 ----------------------------------------------------------------------------------------
@@ -145,7 +146,9 @@ Computing with forms
 
 .. function:: void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp)
 
-    As per ``qfb_pow_ui``.
+    As per ``qfb_pow_ui``. The exponent may be negative, in which case
+    the result is the power `-\mathrm{exp}` of the inverse of `f`
+    (see :func:`qfb_inverse`).
 
 .. function:: void qfb_inverse(qfb_t r, qfb_t f)
     

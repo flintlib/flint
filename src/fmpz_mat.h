@@ -360,11 +360,6 @@ void _fmpz_mat_solve_dixon(
         const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
         ulong p, const fmpz_t N, const fmpz_t D);
 
-void _fmpz_mat_solve_dixon_den(
-        fmpz_mat_t X, fmpz_t den,
-        const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
-        ulong p, const fmpz_t N, const fmpz_t D);
-
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_mat_t A, const fmpz_mat_t B);
 
 int _fmpz_mat_reconstruct_matwise(fmpz_mat_t Z, fmpz_t den, const fmpz_mat_t x, const fmpz_t m, const fmpz_t N, const fmpz_t D, const fmpz_t den_init);

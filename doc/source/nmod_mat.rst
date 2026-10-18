@@ -504,12 +504,14 @@ Matrix multiplication
 
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
     not with `A` or `B`. Automatically selects between classical
-    and Strassen multiplication.
+    multiplication fused with the addition and :func:`nmod_mat_mul`
+    followed by an addition.
 
 .. function:: void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
-    Sets `D = C + AB`. `C` and `D` may be aliased with each other but
-    not with `A` or `B`.
+    Sets `D = C - AB`. `C` and `D` may be aliased with each other but
+    not with `A` or `B`. The algorithm is selected as for
+    :func:`nmod_mat_addmul`.
 
 .. function:: void nmod_mat_mul_nmod_vec(ulong * c, const nmod_mat_t A, const ulong * b, slong blen)
               void nmod_mat_mul_nmod_vec_ptr(ulong * const * c, const nmod_mat_t A, const ulong * const * b, slong blen)
