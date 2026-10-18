@@ -18,4 +18,5 @@
        gr_mpoly.rst
        gr_ore_poly.rst
        gr_series.rst
+       gr_ec.rst
 

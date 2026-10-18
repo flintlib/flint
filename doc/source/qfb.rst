@@ -91,6 +91,14 @@ Computing with forms
     Set `D` to the discriminant of the binary quadratic form `f`, i.e. to
     `b^2 - 4ac`, where `f = (a, b, c)`.
 
+.. function:: int qfb_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
+
+    Given `D < 0`, `n` odd with `\gcd(n, D) = 1` and a square root *sqrtD*
+    of `D` modulo `n`, sets `t, v \ge 0` with `t^2 + |D| v^2 = 4n` and
+    returns 1, or returns 0 if there is no solution. This uses
+    Cornacchia's algorithm ([Coh1996]_, Algorithm 1.5.3). For composite `n`,
+    a return value of 0 does not prove that there is no solution.
+
 .. function:: void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 
     Set `r` to a reduced form equivalent to the binary quadratic form `f`

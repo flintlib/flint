@@ -21,6 +21,7 @@
 #include "thread_support.h"
 #include "thread_pool.h"
 #include "acb_modular.h"
+#include "qfb.h"
 #include "ecpp.h"
 
 /*
@@ -608,7 +609,7 @@ _corn_worker(slong w, void * varg)
 
     fmpz_init(sqrtD); fmpz_init(t); fmpz_init(v); fmpz_init(u);
 
-    if (_scan_sqrt_disc(sqrtD, s, d) && ecpp_cornacchia(t, v, s->n, d->D, sqrtD))
+    if (_scan_sqrt_disc(sqrtD, s, d) && qfb_cornacchia(t, v, s->n, d->D, sqrtD))
     {
         fmpz_add((ms + 0), s->np1, t);
         fmpz_sub((ms + 1), s->np1, t);
@@ -1185,83 +1186,34 @@ _ecpp_random_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
     Given a curve (a, b) and m = k q, look for a point P with m P = O and
     k P != O. Returns 1 and sets (x, y) on success, 0 if m is not the
     order of the curve (or the point was unlucky), -1 if n was found to be
-    composite. m P is computed as q (k P), with k P normalised to affine
-    coordinates first, so that the cost is that of a multiplication by q
-    plus one by k.
+    composite.
 */
 static int
 _ecpp_find_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
         const fmpz_t q, const fmpz_t k, flint_rand_t state,
         const fmpz_mod_ctx_t ctx)
 {
-    const fmpz * n = fmpz_mod_ctx_modulus(ctx);
-    ecpp_point_t P, R;
-    fmpz_t acc, g, zi;
     slong tries;
-    int result = 0;
-
-    ecpp_point_init(P);
-    ecpp_point_init(R);
-    fmpz_init(acc);
-    fmpz_init(g);
-    fmpz_init(zi);
 
     for (tries = 0; tries < 4; tries++)
     {
         if (!_ecpp_random_point(x, y, a, b, state, ctx))
+            return 0;
+
+        switch (ecpp_point_check(x, y, a, b, k, q, ctx))
         {
-            result = 0;
-            break;
+            case ECPP_POINT_OK:
+                return 1;
+            case ECPP_POINT_ZERO:
+                break;      /* unlucky point; try another */
+            case ECPP_POINT_COMPOSITE:
+                return -1;
+            default:
+                return 0;   /* m is not the order of this twist */
         }
-
-        ecpp_point_set_affine(P, x, y);
-        fmpz_one(acc);
-
-        /* R = k P; then q R should be O and R != O */
-        ecpp_point_mul(R, P, k, a, acc, ctx);
-        if (ecpp_point_is_zero(R))
-            continue;   /* unlucky point (or wrong order); try another */
-
-        /* affine R = (X / Z^2, Y / Z^3) */
-        fmpz_gcd(g, R->Z, n);
-        if (!fmpz_is_one(g))
-        {
-            result = -1;
-            break;
-        }
-        fmpz_mod_inv(zi, R->Z, ctx);
-        fmpz_mod_mul(g, zi, zi, ctx);
-        fmpz_mod_mul(R->X, R->X, g, ctx);
-        fmpz_mod_mul(g, g, zi, ctx);
-        fmpz_mod_mul(R->Y, R->Y, g, ctx);
-        fmpz_one(R->Z);
-
-        ecpp_point_mul(P, R, q, a, acc, ctx);
-
-        fmpz_gcd(g, acc, n);
-        if (!fmpz_is_one(g))
-        {
-            result = -1;
-            break;
-        }
-
-        if (!ecpp_point_is_zero(P))
-        {
-            result = 0;     /* m is not the order of this twist */
-            break;
-        }
-
-        result = 1;
-        break;
     }
 
-    ecpp_point_clear(P);
-    ecpp_point_clear(R);
-    fmpz_clear(acc);
-    fmpz_clear(g);
-    fmpz_clear(zi);
-
-    return result;
+    return 0;
 }
 
 /*

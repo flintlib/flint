@@ -155,6 +155,25 @@ gr_ptr gr_generic_ctx_base(gr_ctx_t ctx)
     return NULL;
 }
 
+/*
+    GR_DOMAIN for an infinite structure. A finite one is assumed to be a
+    finite field, of order fq_order; other structures (Z/nZ, the group of
+    points of an elliptic curve) override this method.
+*/
+int
+gr_generic_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+{
+    truth_t finite = gr_ctx_is_finite(ctx);
+
+    if (finite == T_FALSE)
+        return GR_DOMAIN;
+
+    if (finite == T_UNKNOWN)
+        return GR_UNABLE;
+
+    return gr_ctx_fq_order(res, ctx);
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -2985,6 +3004,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_0},
     {GR_METHOD_CTX_BASE,                (gr_funcptr) gr_generic_ctx_base},
+    {GR_METHOD_CTX_CARDINALITY_FMPZ,    (gr_funcptr) gr_generic_ctx_cardinality_fmpz},
 
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},

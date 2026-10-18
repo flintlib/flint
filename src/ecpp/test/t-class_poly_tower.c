@@ -17,6 +17,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "acb_modular.h"
+#include "qfb.h"
 #include "ecpp.h"
 
 /* a prime of the given size with n = residue mod modulus that splits
@@ -39,7 +40,7 @@ _split_prime(fmpz_t n, fmpz_t v, slong D, slong bits, ulong modulus, ulong resid
         if (fmpz_jacobi(sq, n) != 1)
             continue;
         fmpz_sqrtmod(sq, sq, n);
-        if (!ecpp_cornacchia(t, v, n, D, sq))
+        if (!qfb_cornacchia(t, v, n, D, sq))
             continue;
         if (vpar < 0 || (int) fmpz_is_even(v) == vpar)
             break;

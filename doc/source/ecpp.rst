@@ -125,13 +125,6 @@ Types, macros and constants
 
     A certificate: an array of steps.
 
-.. type:: ecpp_point_struct
-
-.. type:: ecpp_point_t
-
-    A point `(X : Y : Z)` in Jacobian coordinates; `Z = 0` is the point at
-    infinity.
-
 Certificates
 -------------------------------------------------------------------------------
 
@@ -199,34 +192,24 @@ Proving and verifying
 Curve arithmetic
 -------------------------------------------------------------------------------
 
-.. function:: void ecpp_point_init(ecpp_point_t P)
-              void ecpp_point_clear(ecpp_point_t P)
-              void ecpp_point_set_affine(ecpp_point_t P, const fmpz_t x, const fmpz_t y)
-              int ecpp_point_is_zero(const ecpp_point_t P)
-
 .. function:: void ecpp_gr_ctx_init(gr_ctx_t gctx, const fmpz_mod_ctx_t ctx)
 
     Initialises ``gctx`` as the ring of integers modulo the modulus of
     ``ctx``: ``mpn_mod`` for moduli of 2 to ``MPN_MOD_MAX_LIMBS`` limbs,
     ``fmpz_mod`` otherwise.
 
-.. function:: int ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a, gr_ptr acc, gr_ctx_t ctx)
+.. function:: int ecpp_point_check(const fmpz_t x, const fmpz_t y, const fmpz_t a, const fmpz_t b, const fmpz_t k, const fmpz_t q, const fmpz_mod_ctx_t ctx)
 
-    The scalar multiplication over a generic ring (a point is three
-    consecutive elements X, Y, Z), the implementation behind
-    ``ecpp_point_mul``, which converts to the ring given by
-    ``ecpp_gr_ctx_init``; about 1.7 times faster than the ``fmpz_mod``
-    arithmetic at 200 bits and 1.6 at 400.
+    Given a point `P = (x, y)` on `y^2 = x^3 + a x + b` modulo the modulus
+    `n` of ``ctx``, computes `Q = k P` and `q Q` with
+    :func:`gr_ec_jac_point_mul_fmpz_witness`. Returns
+    ``ECPP_POINT_OK`` if `Q \ne \mathcal{O}` and `q Q = \mathcal{O}`,
+    ``ECPP_POINT_ZERO`` if `Q = \mathcal{O}`, ``ECPP_POINT_WRONG_ORDER``
+    if `q Q \ne \mathcal{O}`, and ``ECPP_POINT_COMPOSITE`` if the
+    computation showed that `n` is composite. Only ``ECPP_POINT_OK``
+    certifies anything.
 
-.. function:: int ecpp_point_mul(ecpp_point_t R, const ecpp_point_t P, const fmpz_t k, const fmpz_t a, fmpz_t acc, const fmpz_mod_ctx_t ctx)
-
-    Sets `R = k P` on `y^2 = x^3 + a x + b` modulo the modulus of ``ctx``,
-    for an affine point `P` (`Z = 1`) and `k \ge 0`. Every quantity whose
-    invertibility the formulas assume is multiplied into ``acc``; the
-    result is only meaningful if `\gcd(\mathrm{acc}, n) = 1` at the end,
-    otherwise `n` is composite. Returns 0 if ``acc`` became zero.
-
-Discriminants and Cornacchia
+Discriminants
 -------------------------------------------------------------------------------
 
 .. function:: slong ecpp_disc_table(ecpp_disc_struct ** table, const ulong * primes, slong nprimes, slong Dmax, slong hmax, slong omax, double costmax)
@@ -303,8 +286,3 @@ Discriminants and Cornacchia
     of a root of `H_D`. Returns 1 on success, 0 if `g < 2` or the
     coefficients could not be identified. Requires `D` fundamental.
 
-.. function:: int ecpp_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD)
-
-    Given `D < 0`, `n` odd with `\gcd(n, D) = 1` and a square root of `D`
-    modulo `n`, finds `t, v \ge 0` with `t^2 + |D| v^2 = 4n` and returns 1,
-    or returns 0 if there is no solution.

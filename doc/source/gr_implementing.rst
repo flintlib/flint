@@ -190,6 +190,17 @@ Testing rings
     Test correctness of the ring *R*. This calls test functions for
     various methods, each being repeated up to *iters* times.
 
+.. function:: void gr_test_additive_group(gr_ctx_t R, slong iters, int test_flags)
+
+    Test correctness of the abelian group *R*, written additively. Besides
+    the group operations, this checks that multiplication by integers
+    (``mul_ui``, ``mul_si``, ``mul_fmpz``, ``mul_two``, ``mul_2exp_si``,
+    ``mul_2exp_fmpz``) agrees with repeated addition.
+
+.. function:: void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
+
+    Test correctness of the group *R*, written multiplicatively.
+
 
 
 .. raw:: latex

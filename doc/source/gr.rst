@@ -989,6 +989,15 @@ Enclosure and interval methods
     the generators, as in the setter. In exact representations,
     *m* is set to *x* and *r* to zero (the generic implementation).
 
+Cardinality
+........................................................................
+
+.. function:: int gr_ctx_cardinality_fmpz(fmpz_t res, gr_ctx_t ctx)
+
+    Sets *res* to the number of elements of *ctx*. Returns ``GR_DOMAIN``
+    if *ctx* is infinite and ``GR_UNABLE`` if the number is not known.
+    For `\mathbb{Z}/n\mathbb{Z}` this is `n`, also when `n` is composite.
+
 Finite field methods
 ........................................................................
 

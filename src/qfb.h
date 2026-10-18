@@ -111,6 +111,13 @@ void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q,
 
 slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth);
 
+/*
+    Cornacchia: solve t^2 + |D| v^2 = 4n for t, v >= 0, given a square root
+    of D modulo n. Returns 1 on success and 0 if there is no solution (or n
+    is composite and the algorithm fails).
+*/
+int qfb_cornacchia(fmpz_t t, fmpz_t v, const fmpz_t n, slong D, const fmpz_t sqrtD);
+
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
 
 int qfb_is_reduced(qfb_t r);
