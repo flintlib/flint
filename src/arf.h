@@ -705,6 +705,7 @@ void arf_nint(arf_t z, const arf_t x);
 void arf_debug(const arf_t x);
 
 char * arf_get_str(const arf_t x, slong d);
+char * arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd);
 
 #ifdef FLINT_HAVE_FILE
 void arf_fprint(FILE * file, const arf_t x);

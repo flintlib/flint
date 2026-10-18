@@ -509,6 +509,11 @@ Input and output
     Returns *x* as a decimal floating-point number, rounding to *d* digits.
     Rounding is faithful (at most 1 ulp error).
 
+.. function:: char * arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd)
+
+    Returns *x* as a decimal floating-point number, correctly rounded to
+    *d* significant digits in the direction specified by *rnd*.
+
 .. function:: void arf_fprint(FILE * file, const arf_t x)
 
     Prints *x* as an integer mantissa and exponent to the stream *file*.
