@@ -31,7 +31,7 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
             {
                 return n_remove2_precomp((ulong *) x, q, finv);
             }
-            else
+            else if (y < 0)
             {
                 ulong z = - (ulong) y;
                 slong e  = n_remove2_precomp(&z, q, finv);
@@ -41,6 +41,10 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
                     *x = - (slong) z;
                 }
                 return e;
+            }
+            else  /* x is zero */
+            {
+                return 0;
             }
         }
         else  /* f is large */

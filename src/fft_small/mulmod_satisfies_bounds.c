@@ -301,5 +301,6 @@ int fft_small_prime_supports_depth(ulong n, ulong depth)
         /* unlikely, the transform length would have to be massive */
         return 0;
 
-    return n_trailing_zeros(n - 1) >= depth;
+    /* sd_fft_ctx_init_prime also requires 2^4 | n - 1 */
+    return n_trailing_zeros(n - 1) >= FLINT_MAX(depth, 4);
 }

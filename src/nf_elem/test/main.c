@@ -21,6 +21,7 @@
 #include "t-get_set_fmpz_mat_row.c"
 #include "t-init_clear.c"
 #include "t-inv.c"
+#include "t-is_gen.c"
 #include "t-is_rational_integer.c"
 #include "t-mod_fmpz.c"
 #include "t-mul.c"
@@ -50,6 +51,7 @@ test_struct tests[] =
     TEST_FUNCTION(nf_elem_get_set_fmpz_mat_row),
     TEST_FUNCTION(nf_elem_init_clear),
     TEST_FUNCTION(nf_elem_inv),
+    TEST_FUNCTION(nf_elem_is_gen),
     TEST_FUNCTION(nf_elem_is_rational_integer),
     TEST_FUNCTION(nf_elem_mod_fmpz),
     TEST_FUNCTION(nf_elem_mul),

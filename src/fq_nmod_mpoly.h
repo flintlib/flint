@@ -1032,10 +1032,6 @@ void fq_nmod_mpolyu_scalar_mul_fq_nmod(fq_nmod_mpolyu_t A,
 void fq_nmod_mpolyu_set(fq_nmod_mpolyu_t A, const fq_nmod_mpolyu_t B,
                                                const fq_nmod_mpoly_ctx_t uctx);
 
-void fq_nmod_mpolyu_evaluate_one_fq_nmod(fq_nmod_mpolyu_t E,
-                        fq_nmod_mpolyu_t A, slong var, const fq_nmod_t alpha,
-                                                const fq_nmod_mpoly_ctx_t ctx);
-
 void fq_nmod_mpolyu_setform(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 

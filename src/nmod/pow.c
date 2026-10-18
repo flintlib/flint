@@ -232,7 +232,8 @@ ulong nmod_2_pow_ui(ulong exp, nmod_t mod)
     ulong x;
     nmod_redc_ctx_t ctx;
 
-    if (exp < (UWORD(1) << 20))
+    /* Montgomery arithmetic requires an odd modulus */
+    if (exp < (UWORD(1) << 20) || mod.n % 2 == 0)
     {
         return _nmod_2_pow_ui_binexp(exp, mod);
     }

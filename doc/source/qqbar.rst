@@ -560,9 +560,7 @@ Polynomial evaluation
     to that of the minimal polynomial of *x*. In the generic case, evaluation
     is done by computing minimal polynomials of representation matrices.
 
-.. function:: int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
-              int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
-              int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
+.. function:: int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
 
     Sets *res* to the value of *poly* evaluated at the algebraic numbers
     given in the vector *x*. The number of variables is defined by

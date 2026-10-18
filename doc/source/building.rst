@@ -167,6 +167,8 @@ AVX2 instructions
 On x86-64 machines with AVX2 support, compiling FLINT with the ``--enable-avx2``
 option can improve performance substantially, notably by enabling
 the small-prime FFT. Currently this option is not enabled by default.
+Similarly, ``--enable-avx512`` adds the flags for AVX-512 (AVX512F and,
+if the compiler supports it, AVX512DQ); it implies ``--enable-avx2``.
 
 TLS, reentrancy and single mode
 -------------------------------------------------------------------------------

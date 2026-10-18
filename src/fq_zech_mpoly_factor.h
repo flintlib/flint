@@ -121,19 +121,10 @@ slong fq_zech_bpoly_degree0(const fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_U
 
 slong fq_zech_bpoly_degree1(const fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx));
 
-void fq_zech_bpoly_set_poly_var1(fq_zech_bpoly_t A, const fq_zech_poly_t B, const fq_zech_ctx_t ctx);
-
-void fq_zech_bpoly_set_poly_var0(fq_zech_bpoly_t A, const fq_zech_poly_t B, const fq_zech_ctx_t ctx);
-
 void fq_zech_bpoly_print_pretty(const fq_zech_bpoly_t A,
                 const char * var0, const char * var1, const fq_zech_ctx_t ctx);
 
 int fq_zech_bpoly_is_canonical(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx);
-
-int fq_zech_bpoly_fq_equal(
-    const fq_zech_bpoly_t A,
-    const fq_zech_bpoly_t B,
-    const fq_zech_ctx_t ctx);
 
 void fq_zech_bpoly_set_coeff_fq_zech(
     fq_zech_bpoly_t A,
@@ -150,11 +141,6 @@ void fq_zech_bpoly_set_fq_zech_poly_var0(
 void fq_zech_bpoly_set_fq_zech_poly_var1(
     fq_zech_bpoly_t A,
     const fq_zech_poly_t B,
-    const fq_zech_ctx_t ctx);
-
-void fq_zech_bpoly_make_monic(
-    fq_zech_bpoly_t A,
-    slong order,
     const fq_zech_ctx_t ctx);
 
 void fq_zech_bpoly_mul(
@@ -248,13 +234,6 @@ int fq_zech_bpoly_factor_smprime(
     fq_zech_bpoly_t B,
     int allow_shift,
     const fq_zech_ctx_t ctx);
-
-int fq_zech_bpoly_factor_lgprime(
-    fq_zech_poly_t c,
-    fq_zech_tpoly_t F,
-    fq_zech_bpoly_t B,
-    const fq_zech_ctx_t ctx,
-    flint_rand_t state);
 
 /*****************************************************************************/
 
@@ -427,20 +406,8 @@ void fq_zech_mpoly_factor_fit_length(fq_zech_mpoly_factor_t f,
 void fq_zech_mpoly_factor_clear(fq_zech_mpoly_factor_t f,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-void fq_zech_mpoly_factor_set(fq_zech_mpoly_factor_t a,
-                const fq_zech_mpoly_factor_t b, const fq_zech_mpoly_ctx_t ctx);
-
 void fq_zech_mpoly_factor_print_pretty(const fq_zech_mpoly_factor_t f,
                             const char ** vars, const fq_zech_mpoly_ctx_t ctx);
-
-void fq_zech_mpoly_factor_append_ui(fq_zech_mpoly_factor_t f,
-              const fq_zech_mpoly_t A, ulong e, const fq_zech_mpoly_ctx_t ctx);
-
-void fq_zech_mpoly_factor_append_fmpz(fq_zech_mpoly_factor_t f,
-       const fq_zech_mpoly_t A, const fmpz_t e, const fq_zech_mpoly_ctx_t ctx);
-
-int fq_zech_mpoly_factor_squarefree(fq_zech_mpoly_factor_t f,
-                       const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
 int fq_zech_mpoly_factor(fq_zech_mpoly_factor_t f,
                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
@@ -455,22 +422,6 @@ void fq_zech_mpoly_factor_swap(fq_zech_mpoly_factor_t A,
 }
 
 void fq_zech_mpoly_factor_one(fq_zech_mpoly_factor_t a, const fq_zech_mpoly_ctx_t ctx);
-
-int fq_zech_mpoly_factor_expand(fq_zech_mpoly_t A,
-                const fq_zech_mpoly_factor_t f, const fq_zech_mpoly_ctx_t ctx);
-
-
-FQ_ZECH_MPOLY_FACTOR_INLINE
-int fq_zech_mpoly_factor_matches(const fq_zech_mpoly_t a, const fq_zech_mpoly_factor_t f, const fq_zech_mpoly_ctx_t ctx)
-{
-    int matches;
-    fq_zech_mpoly_t t;
-    fq_zech_mpoly_init(t, ctx);
-    fq_zech_mpoly_factor_expand(t, f, ctx);
-    matches = fq_zech_mpoly_equal(t, a, ctx);
-    fq_zech_mpoly_clear(t, ctx);
-    return matches;
-}
 
 void _fq_zech_mpoly_get_lead0(
     fq_zech_mpoly_t c,
@@ -545,11 +496,6 @@ int fq_zech_mpoly_univar_content_mpoly(
     const fq_zech_mpoly_univar_t A,
     const fq_zech_mpoly_ctx_t ctx);
 
-void fq_zech_mpoly_univar_divexact_mpoly(
-    fq_zech_mpoly_univar_t A,
-    const fq_zech_mpoly_t b,
-    const fq_zech_mpoly_ctx_t ctx);
-
 /*****************************************************************************/
 
 int fq_zech_mpoly_factor_lcc_wang(
@@ -567,12 +513,6 @@ int fq_zech_mpoly_factor_irred_smprime_zassenhaus(
     const fq_zech_mpoly_ctx_t ctx,
     flint_rand_t state);
 
-int fq_zech_mpoly_factor_irred_lgprime_zassenhaus(
-    fq_zech_mpolyv_t fac,
-    const fq_zech_mpoly_t A,
-    const fq_zech_mpoly_ctx_t ctx,
-    flint_rand_t state);
-
 int fq_zech_mpoly_factor_irred_smprime_wang(
     fq_zech_mpolyv_t fac,
     const fq_zech_mpoly_t A,
@@ -581,24 +521,8 @@ int fq_zech_mpoly_factor_irred_smprime_wang(
     const fq_zech_mpoly_ctx_t ctx,
     flint_rand_t state);
 
-int fq_zech_mpoly_factor_irred_lgprime_wang(
-    fq_zech_mpolyv_t Af,
-    const fq_zech_mpoly_t A,
-    const fq_zech_mpoly_factor_t lcAfac,
-    const fq_zech_mpoly_t lcA,
-    const fq_zech_mpoly_ctx_t ctx,
-    flint_rand_t state);
-
 int fq_zech_mpoly_factor_irred_smprime_zippel(
     fq_zech_mpolyv_t fac,
-    const fq_zech_mpoly_t A,
-    const fq_zech_mpoly_factor_t lcAfac,
-    const fq_zech_mpoly_t lcA,
-    const fq_zech_mpoly_ctx_t ctx,
-    flint_rand_t state);
-
-int fq_zech_mpoly_factor_irred_lgprime_zippel(
-    fq_zech_mpolyv_t Af,
     const fq_zech_mpoly_t A,
     const fq_zech_mpoly_factor_t lcAfac,
     const fq_zech_mpoly_t lcA,
@@ -696,12 +620,6 @@ int fq_zech_mpoly_factor_wang(fq_zech_mpoly_factor_t f,
 
 int fq_zech_mpoly_factor_zippel(fq_zech_mpoly_factor_t f,
                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
-
-void fq_zech_poly_product_roots_fq_zech(
-    fq_zech_poly_t master,
-    const fq_zech_struct * monomials,
-    slong mlength,
-    const fq_zech_ctx_t ctx);
 
 void _fq_zech_mpoly_monomial_evals(
     fq_zech_struct * E,

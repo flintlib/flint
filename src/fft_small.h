@@ -862,18 +862,21 @@ void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
    (-P/2, P/2] for the product P of the plan's primes: callers must
    keep true slot values inside that range, one spare factor of two
    against the unsigned exactness bound, e.g. by doubling len_bound
-   at plan creation. */
+   at plan creation.
+   The mpn exports (signed and unsigned) may overwrite the transform data
+   of X (they do for two-prime plans), so X is not const; copy X first if
+   the transform is needed afterwards. */
 void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
-                    const fft_small_op_t X, ulong nslots,
+                    fft_small_op_t X, ulong nslots,
                     const fft_small_plan_t P);
 void fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
-                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
 /* the two's-complement residue of the signed reconstruction mod
    2^(FLINT_BITS * zn), reading only the slots below limb zn; the value
    need not fit */
 void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
-                    const fft_small_op_t X, ulong nslots,
+                    fft_small_op_t X, ulong nslots,
                     const fft_small_plan_t P);
 /* limbs [lo_limbs, lo_limbs + zn) of the two's-complement sum of the
    slots that can reach them, reading only the slots below limb
@@ -881,7 +884,7 @@ void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
    otherwise the dropped low slots perturb the lowest limb as in the
    truncated export */
 void fft_small_export_mpn_signed_window(ulong* z, ulong zn,
-                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
 
 /*
@@ -922,7 +925,8 @@ int _fft_small_mpn_sqr_complex(nn_ptr zr, slong * zr_len,
     nn_ptr zi, slong * zi_len, slong lo, slong hi,
     nn_srcptr ar, slong arn, int ar_sgn,
     nn_srcptr ai, slong ain, int ai_sgn);
-void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
+/* destroys the transform data of X for two-prime plans (see above) */
+void fft_small_export_mpn(ulong* z, ulong zn, fft_small_op_t X,
                     const fft_small_plan_t P);
 
 /* z1 = a x (an + xn limbs) and z2 = b x (bn + xn limbs), the transform

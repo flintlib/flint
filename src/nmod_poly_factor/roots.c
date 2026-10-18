@@ -47,6 +47,7 @@ void nmod_poly_roots(nmod_poly_factor_t r, const nmod_poly_t f,
     {
         /* the linear factor x - root */
         nmod_poly_struct * p = r->p + i;
+        nmod_poly_set_mod(p, mod);
         nmod_poly_fit_length(p, 2);
         p->coeffs[0] = nmod_neg(((nn_srcptr) roots->entries)[i], mod);
         p->coeffs[1] = 1;

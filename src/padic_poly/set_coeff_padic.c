@@ -22,6 +22,7 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t c,
         if (n < poly->length)
         {
             fmpz_zero(poly->coeffs + n);
+            _padic_poly_normalise(poly);
             padic_poly_canonicalise(poly, ctx->p);
         }
         return;

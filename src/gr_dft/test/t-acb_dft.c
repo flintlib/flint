@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "acb.h"
@@ -267,6 +268,24 @@ TEST_FUNCTION_START(gr_dft_acb, state)
         _acb_vec_clear(v, n);
         _acb_vec_clear(w1, n);
         _acb_vec_clear(w2, n);
+    }
+
+    /* invalid lengths: the objects can be cleared after the failure */
+    {
+        gr_dft_acb_pre_t Q;
+        gr_dft_acb_prod_pre_t Qp;
+        ulong cyc[2] = { 4, 0 };
+
+        memset(Q, 0x5a, sizeof(gr_dft_acb_pre_t));
+        if (gr_dft_acb_precomp_init(Q, 0, 64) != GR_DOMAIN || Q->which != 0)
+            TEST_FUNCTION_FAIL("precomp_init with n = 0\n");
+        gr_dft_acb_precomp_clear(Q);
+
+        memset(Qp, 0x5a, sizeof(gr_dft_acb_prod_pre_t));
+        if (gr_dft_acb_prod_precomp_init(Qp, cyc, 2, 64) != GR_DOMAIN
+                || Qp->which != 0 || Qp->cyc != NULL)
+            TEST_FUNCTION_FAIL("prod_precomp_init with a zero component\n");
+        gr_dft_acb_prod_precomp_clear(Qp);
     }
 
     TEST_FUNCTION_END(state);

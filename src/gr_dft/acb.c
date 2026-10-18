@@ -123,12 +123,20 @@ _gr_dft_acb_select_core(slong * nl_out, slong * p1e_out, double * in_mag_out,
        overflows */
     in_mag = ldexp(1.0, -p1e - 1);
 
+    /* The input is scaled so that every real and imaginary part is
+       below in_mag (see _gr_dft_acb_nfixed_run), but the bound expects
+       a bound on the modulus of the inputs, which can be sqrt(2) times
+       larger. The double constant is the nearest one to sqrt(2), which
+       lies above it, and the product (an exact power of two times it)
+       is exact. */
+    in_mag = in_mag * 1.4142135623730951;
+
     bound(&peak, &errulps, in_mag, 1.0, plan);
     if (!(peak < 1.0) || !(errulps >= 1.0 && errulps <= DBL_MAX))
         return GR_UNABLE;
 
     /* guard bits: absolute roundoff errulps 2^(-64 nl) should stay
-       below 2^-(prec+2) in_mag */
+       below 2^-(prec+2) in_mag (here the modulus bound) */
     nl = (prec + FLINT_BITS - 1) / FLINT_BITS;
     {
         double need = prec + 2.0 + log2(errulps) - log2(in_mag);
@@ -700,6 +708,9 @@ gr_dft_acb_precomp_init(gr_dft_acb_pre_t Q, slong n, slong prec)
     int status = GR_SUCCESS;
     int use_nfixed = 1;
 
+    /* clearing Q must be safe after a failure */
+    Q->which = 0;
+
     if (n <= 0)
         return GR_DOMAIN;
 
@@ -933,6 +944,10 @@ gr_dft_acb_prod_precomp_init(gr_dft_acb_prod_pre_t Q, const ulong * cyc,
 {
     int status = GR_SUCCESS;
     slong a, n = 1;
+
+    /* clearing Q must be safe after a failure */
+    Q->which = 0;
+    Q->cyc = NULL;
 
     for (a = 0; a < num; a++)
     {

@@ -1101,17 +1101,6 @@ doubling `k` while profitable.
     Aliasing between input and output matrices is allowed.
 
 
-.. function:: void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, ulong p, const fmpz_t N, const fmpz_t D)
-
-    Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a
-    ``p``-adic algorithm for the supplied prime ``p``. The values ``N`` and
-    ``D`` are absolute value bounds for the numerator and denominator of the
-    solution.
-
-    Uses the Dixon lifting algorithm with early termination once the lifting
-    stabilises.
-
 .. function:: int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes

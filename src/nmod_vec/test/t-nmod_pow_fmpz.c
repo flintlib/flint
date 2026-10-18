@@ -77,5 +77,51 @@ TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
         fmpz_clear(exp1);
     }
 
+    /* check negative exponents: b^(-e) * b^e = 1 for invertible b */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        nmod_t mod;
+        ulong b, c1, c2;
+        fmpz_t exp1, exp2;
+
+        nmod_init(&mod, n_randtest_not_zero(state));
+
+        fmpz_init(exp1);
+        fmpz_init(exp2);
+
+        fmpz_randtest_unsigned(exp1, state, 200);
+        fmpz_neg(exp2, exp1);
+
+        do {
+            b = n_randlimb(state) % mod.n;
+        } while (n_gcd(b, mod.n) != 1);
+
+        c1 = nmod_pow_fmpz(b, exp1, mod);
+        c2 = nmod_pow_fmpz(b, exp2, mod);
+
+        if (nmod_mul(c1, c2, mod) != nmod_set_ui(1, mod))
+            TEST_FUNCTION_FAIL(
+                    "check b^(-e) * b^e = 1\n"
+                    "i = %wd\n",
+                    i);
+
+        fmpz_clear(exp2);
+        fmpz_clear(exp1);
+    }
+
+    /* 3^-1 = 34 mod 101 */
+    {
+        nmod_t mod;
+        fmpz_t e;
+
+        nmod_init(&mod, 101);
+        fmpz_init_set_si(e, -1);
+
+        if (nmod_pow_fmpz(3, e, mod) != 34)
+            TEST_FUNCTION_FAIL("3^-1 mod 101\n");
+
+        fmpz_clear(e);
+    }
+
     TEST_FUNCTION_END(state);
 }

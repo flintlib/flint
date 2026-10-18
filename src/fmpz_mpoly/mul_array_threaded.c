@@ -888,7 +888,7 @@ int fmpz_mpoly_mul_array_threaded(
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
+    slong thread_limit = FLINT_MIN(B->length, C->length)/16;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)

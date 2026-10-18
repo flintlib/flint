@@ -15,7 +15,13 @@
 void
 calcium_write_arb(calcium_stream_t out, const arb_t x, slong digits, ulong flags)
 {
-    calcium_write_free(out, arb_get_str(x, digits, flags));
+    /* An indeterminate enclosure (NaN midpoint) carries no information
+       about the value; show it as a ball of unknown magnitude rather
+       than as nan. */
+    if (arf_is_nan(arb_midref(x)))
+        calcium_write(out, "[+/- inf]");
+    else
+        calcium_write_free(out, arb_get_str(x, digits, flags));
 }
 
 void

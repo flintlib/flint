@@ -14,7 +14,7 @@
 
 void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, qfb_t q2, slong iter, slong depth)
 {
-   slong size = (1L<<depth), i;
+   slong size = (WORD(1)<<depth), i, probes = 0;
    fmpz_t r;
 
    fmpz_init(r);
@@ -27,6 +27,13 @@ void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, qfb_t q2, slong iter, slong de
       i++;
       if (i == size)
          i = 0;
+
+      probes++;
+      if (probes == size)
+      {
+         fmpz_clear(r);
+         flint_throw(FLINT_ERROR, "Exception (qfb_hash_insert). Hash table is full.\n");
+      }
    }
 
    qfb_set(qhash[i].q, q);

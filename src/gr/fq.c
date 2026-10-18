@@ -971,6 +971,9 @@ _gr_fq_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_poly_t poly, int fl
 static int
 _gr_fq_mat_mul(fq_mat_t res, const fq_mat_t x, const fq_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fq_mat_mul(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
@@ -1200,6 +1203,7 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,      (gr_funcptr) _gr_fq_mat_nonsingular_solve_tril},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,      (gr_funcptr) _gr_fq_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_mat_charpoly},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fq_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };

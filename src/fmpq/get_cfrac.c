@@ -25,7 +25,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
     int input_is_canonical;
 #endif
 
-    num_sign = fmpz_sgn(fmpq_denref(f));
+    num_sign = fmpz_sgn(fmpq_numref(f));
     den_sign = fmpz_sgn(fmpq_denref(f));
 
     if (limit <= 0 || den_sign == 0)

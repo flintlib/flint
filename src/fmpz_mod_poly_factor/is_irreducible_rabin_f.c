@@ -25,6 +25,8 @@ fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, const fmpz_mod_poly_t f,
 {
     int res = 1;
 
+    fmpz_one(fac);
+
     if (fmpz_mod_poly_length(f, ctx) > 2)
     {
         const slong n = fmpz_mod_poly_degree(f, ctx);

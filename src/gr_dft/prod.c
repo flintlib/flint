@@ -318,9 +318,8 @@ _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse,
     ulong n = P->n;
     slong a;
     ulong inner;
-    thread_pool_handle * handles = NULL;
-    slong num_workers = 0;
     slong blk, max_chunks;
+    int threaded;
 
     if (res != vec)
         status |= _gr_vec_set(res, vec, n, ctx);
@@ -332,9 +331,8 @@ _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse,
                                 : GR_DFT_SERIAL_BLOCK_DEFAULT;
     max_chunks = (slong) (n / (ulong) blk);
 
-    if (max_chunks >= 2 && flint_get_num_threads() > 1 &&
-        gr_ctx_is_threadsafe(ctx) == T_TRUE)
-        num_workers = flint_request_threads(&handles, max_chunks);
+    threaded = (max_chunks >= 2 && flint_get_num_threads() > 1 &&
+        gr_ctx_is_threadsafe(ctx) == T_TRUE);
 
     /* suffix products give the line strides */
     inner = n;
@@ -343,6 +341,8 @@ _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse,
         ulong m = P->cyc[a];
         ulong nlines;
         const gr_dft_pre_struct * plan = P->plans + P->plan_of[a];
+        thread_pool_handle * handles = NULL;
+        slong num_workers = 0;
 
         inner /= m;
 
@@ -351,7 +351,15 @@ _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse,
 
         nlines = n / m;
 
-        if (num_workers < 1 || nlines < 2)
+        /* Workers are requested per axis, and only for axes with at
+           least two lines: an axis with a single line (a product with
+           one long axis) is transformed by its plan, which can then use
+           the threads of the pool itself. */
+        if (threaded && nlines >= 2)
+            num_workers = flint_request_threads(&handles,
+                    FLINT_MIN(max_chunks, (slong) nlines));
+
+        if (num_workers < 1)
         {
             gr_ptr tmp = NULL;
 
@@ -396,10 +404,9 @@ _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse,
 
             flint_free(args);
         }
-    }
 
-    if (handles != NULL)
         flint_give_back_threads(handles, num_workers);
+    }
 
     return status;
 }

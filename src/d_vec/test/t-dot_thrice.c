@@ -56,5 +56,9 @@ TEST_FUNCTION_START(d_vec_dot_thrice, state)
         _d_vec_clear(b);
     }
 
+    /* err may be NULL, also for length 0 */
+    if (_d_vec_dot_thrice(NULL, NULL, 0, NULL) != 0.0)
+        TEST_FUNCTION_FAIL("length 0 with err = NULL\n");
+
     TEST_FUNCTION_END(state);
 }

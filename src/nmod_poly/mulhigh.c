@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "longlong.h"
 
@@ -27,9 +28,16 @@ void _nmod_poly_mulhigh(nn_ptr res, nn_srcptr poly1, slong len1,
     bits2 = FLINT_BIT_COUNT(len1);
 
     if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
+    {
         _nmod_poly_mulhigh_classical(res, poly1, len1, poly2, len2, n, mod);
+    }
     else
-        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, mod);
+    {
+        /* only the high coefficients are computed; the low ones are
+           zeroed as in the classical version */
+        _nmod_poly_mulmid(res + n, poly1, len1, poly2, len2, n, len1 + len2 - 1, mod);
+        _nmod_vec_zero(res, n);
+    }
 }
 
 void nmod_poly_mulhigh(nmod_poly_t res,

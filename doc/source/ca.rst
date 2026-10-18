@@ -302,6 +302,14 @@ printed in various styles::
 
     Prints *x* to standard output.
 
+    The numerical values shown are enclosures computed at a fixed
+    precision, without adaptive refinement. If such an enclosure
+    is indeterminate (for example when a denominator cannot be
+    separated from zero at that precision), its real and imaginary
+    parts are shown as ``[+/- inf]`` even though *x* is a
+    well-defined number; use :func:`ca_get_decimal_str` for an
+    adaptively computed numerical value.
+
 .. function:: void ca_fprint(FILE * fp, const ca_t x, ca_ctx_t ctx)
 
     Prints *x* to the file *fp*.
@@ -831,7 +839,6 @@ Arithmetic
     Sets *res* to the polynomial *poly* evaluated at *x*.
 
 .. function:: void ca_fmpz_mpoly_evaluate_horner(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
-              void ca_fmpz_mpoly_evaluate_iter(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
               void ca_fmpz_mpoly_evaluate(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
 
     Sets *res* to the multivariate polynomial *f* evaluated at the vector of arguments *x*.

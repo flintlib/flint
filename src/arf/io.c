@@ -243,9 +243,7 @@ arf_dump_file(FILE * stream, const arf_t x)
     int nwrite;
     char* data = arf_dump_str(x);
     nwrite = fputs(data, stream);
-    if (nwrite == EOF)
-        return nwrite;
-
     flint_free(data);
-    return 0;
+
+    return (nwrite == EOF) ? nwrite : 0;
 }

@@ -110,5 +110,69 @@ TEST_FUNCTION_START(padic_poly_evaluate_padic, state)
         fmpz_clear(p);
     }
 
+    /* Output precision lower than that of the polynomial: the result
+       must be reduced */
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    {
+        padic_poly_t f;
+        padic_t a, y, z;
+        slong N2;
+        fmpz_t pow;
+
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
+            + PADIC_TEST_PREC_MIN;
+        N2 = N - n_randint(state, 10);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_poly_init2(f, 0, N);
+        padic_init2(a, N);
+        padic_init2(y, N);
+        padic_init2(z, N2);
+        fmpz_init(pow);
+
+        padic_poly_randtest(f, state, n_randint(state, 10), ctx);
+        if (n_randint(state, 2))
+            padic_zero(a);
+        else
+            padic_randtest_int(a, state, ctx);
+
+        padic_poly_evaluate_padic(y, f, a, ctx);
+        padic_poly_evaluate_padic(z, f, a, ctx);
+
+        if (!padic_is_zero(z))
+            fmpz_pow_ui(pow, p, N2 - padic_val(z));
+
+        result = (padic_is_zero(z) || (padic_val(z) < N2
+                    && fmpz_sgn(padic_unit(z)) > 0
+                    && fmpz_cmp(padic_unit(z), pow) < 0
+                    && !fmpz_divisible(padic_unit(z), p)));
+
+        padic_prec(y) = N2;
+        padic_reduce(y, ctx);
+        result = result && padic_equal(y, z);
+
+        if (!result)
+        {
+            flint_printf("FAIL (lower output precision):\n");
+            flint_printf("N = %wd, N2 = %wd\n", N, N2);
+            flint_printf("f = "), padic_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n\n");
+            flint_printf("y = "), padic_print(y, ctx), flint_printf("\n\n");
+            flint_printf("z = "), padic_print(z, ctx), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        padic_poly_clear(f);
+        padic_clear(a);
+        padic_clear(y);
+        padic_clear(z);
+        fmpz_clear(pow);
+
+        padic_ctx_clear(ctx);
+        fmpz_clear(p);
+    }
+
     TEST_FUNCTION_END(state);
 }

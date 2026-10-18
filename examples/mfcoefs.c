@@ -606,6 +606,7 @@ int main(int argc, char * argv[])
         else break;
     }
 
+    j = count;    /* invalid unless set below */
     if (opt_bench) opt_time = 1, j = 0;
     if (opt_time) timer = &timer_struct;
 

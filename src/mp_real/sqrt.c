@@ -86,6 +86,9 @@ mp_real_rsqrt_ui(mp_real_t res, ulong c, slong n)
 void
 mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
 {
+    if (x->size == 0 || x->negative)
+        flint_throw(FLINT_ERROR, "mp_real_rsqrt: need x > 0\n");
+
     MP_REAL_SQRT_ALIAS(mp_real_rsqrt)
     MP_REAL_SQRT_ALIGN
 
@@ -135,10 +138,19 @@ mp_real_rsqrt(mp_real_t res, const mp_real_t x, slong n)
    faster below, crossover at m ~ 1300-2000 on x86-64) */
 #define MP_REAL_BALL_SQRT_NEWTON_CUTOFF (FLINT_MPN_SQRTREM_NEWTON_CUTOFF / 4)
 
-/* res = sqrt(x); x > 0, n-limb target */
+/* res = sqrt(x); x > 0 or x = 0 exactly, n-limb target */
 void
 mp_real_sqrt(mp_real_t res, const mp_real_t x, slong n)
 {
+    if (x->size == 0 && x->err == 0)
+    {
+        mp_real_zero(res);
+        return;
+    }
+
+    if (x->size == 0 || x->negative)
+        flint_throw(FLINT_ERROR, "mp_real_sqrt: need x > 0 or x = 0 exactly\n");
+
     MP_REAL_SQRT_ALIAS(mp_real_sqrt)
     MP_REAL_SQRT_ALIGN
 

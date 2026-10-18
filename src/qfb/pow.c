@@ -23,6 +23,19 @@ void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e)
       return;
    }
 
+   if (fmpz_sgn(e) < 0)
+   {
+      /* f^e = (f^{-1})^{-e} */
+      qfb_init(pow);
+      fmpz_init(exp);
+      qfb_inverse(pow, f);
+      fmpz_neg(exp, e);
+      qfb_pow(r, pow, D, exp);
+      qfb_clear(pow);
+      fmpz_clear(exp);
+      return;
+   }
+
    if (fmpz_is_one(e))
    {
       qfb_set(r, f);
@@ -75,6 +88,19 @@ void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L)
    if (fmpz_is_zero(e))
    {
       qfb_principal_form(r, D);
+      return;
+   }
+
+   if (fmpz_sgn(e) < 0)
+   {
+      /* f^e = (f^{-1})^{-e} */
+      qfb_init(pow);
+      fmpz_init(exp);
+      qfb_inverse(pow, f);
+      fmpz_neg(exp, e);
+      qfb_pow_with_root(r, pow, D, exp, L);
+      qfb_clear(pow);
+      fmpz_clear(exp);
       return;
    }
 

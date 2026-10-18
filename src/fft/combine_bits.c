@@ -10,11 +10,15 @@
 */
 
 #include "fft.h"
+#include "mpn_extras.h"
 
 void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    mp_size_t skip, i;
+
+   /* carries out of the windows are not propagated: see fft.h */
+   FLINT_ASSERT(flint_mpn_zero_p(res, total_limbs));
 
    for (skip = 0, i = 0; i < length && skip + output_limbs + 1 <= total_limbs; i++, skip += coeff_limbs)
       mpn_add(res + skip, res + skip, output_limbs + 1, poly[i], output_limbs);
@@ -35,6 +39,9 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length,
    flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
    mp_size_t coeff_limbs, i;
    mp_limb_t * temp, * limb_ptr, * end;
+
+   /* carries out of the windows are not propagated: see fft.h */
+   FLINT_ASSERT(flint_mpn_zero_p(res, total_limbs));
 
    if (top_bits == 0)
    {

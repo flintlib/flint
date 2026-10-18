@@ -12,8 +12,10 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 #include "longlong.h"
 #include "mpn_extras.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpq.h"
 #include "arf.h"
@@ -885,6 +887,53 @@ gr_dft_nfixed_get_arf(arf_t res, gr_srcptr x, gr_ctx_t ctx)
     arf_set_fmpz(res, t);
     arf_mul_2exp_si(res, res, -n * FLINT_BITS);
     fmpz_clear(t);
+}
+
+/* Check a root w supplied to gr_dft_precomp_init_root over a complex
+   fixed-point context. The root table is always that of the default root
+   e^(-2 pi i/n), computed to the full precision of the context, so w
+   only selects this root: it is accepted if it lies within 1/n of
+   e^(-2 pi i/n) (distinct n-th roots of unity are more than 2/n apart).
+   Returns GR_UNABLE if w is close to another primitive n-th root of
+   unity (a valid root which these contexts do not support), and
+   GR_DOMAIN otherwise. */
+int
+_gr_dft_nfixed_check_root(gr_srcptr w, ulong n, gr_ctx_t ctx)
+{
+    slong nl = NFIXED_CTX_NLIMBS(ctx);
+    double re, im, t, d;
+    ulong k;
+    arf_t x;
+
+    arf_init(x);
+    gr_dft_nfixed_get_arf(x, w, ctx);
+    re = arf_get_d(x, ARF_RND_NEAR);
+    gr_dft_nfixed_get_arf(x, ((nn_srcptr) w) + nl + 1, ctx);
+    im = arf_get_d(x, ARF_RND_NEAR);
+    arf_clear(x);
+
+    if (n == 0)
+        return GR_DOMAIN;
+
+    /* the nearest n-th root of unity e^(-2 pi i k/n) */
+    t = -atan2(im, re) * (double) n / (2 * 3.14159265358979323846);
+    t = floor(t + 0.5);
+    if (t < 0)
+        t += (double) n;
+    k = (ulong) t;
+    if (k >= n)
+        k -= n;
+
+    t = -2 * 3.14159265358979323846 * (double) k / (double) n;
+    d = (re - cos(t)) * (re - cos(t)) + (im - sin(t)) * (im - sin(t));
+
+    if (!(d < 1.0 / ((double) n * (double) n)))
+        return GR_DOMAIN;
+
+    if (k == 1 % n)
+        return GR_SUCCESS;
+
+    return (n_gcd(k, n) == 1) ? GR_UNABLE : GR_DOMAIN;
 }
 
 int

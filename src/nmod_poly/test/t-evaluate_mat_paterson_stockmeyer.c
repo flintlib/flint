@@ -105,5 +105,59 @@ TEST_FUNCTION_START(nmod_poly_evaluate_mat_paterson_stockmeyer, state)
         nmod_mat_clear(C);
     }
 
+    /* compare with Horner, and check aliasing of dest and c */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a;
+        nmod_mat_t A, B, C;
+        ulong n = n_randtest_not_zero(state);
+        slong m;
+
+        nmod_poly_init(a, n);
+        nmod_poly_randtest(a, state, n_randint(state, 60));
+
+        m = n_randint(state, 20);
+
+        nmod_mat_init(A, m, m, n);
+        nmod_mat_init(B, m, m, n);
+        nmod_mat_init(C, m, m, n);
+        nmod_mat_randtest(A, state);
+
+        nmod_poly_evaluate_mat_horner(B, a, A);
+
+        nmod_mat_set(C, A);
+        nmod_poly_evaluate_mat_paterson_stockmeyer(C, a, C);
+
+        if (!nmod_mat_equal(B, C))
+        {
+            flint_printf("FAIL (aliasing):\n");
+            nmod_mat_print_pretty(A);
+            nmod_mat_print_pretty(B);
+            nmod_mat_print_pretty(C);
+            nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_mat_set(C, A);
+        nmod_poly_evaluate_mat(C, a, C);
+
+        if (!nmod_mat_equal(B, C))
+        {
+            flint_printf("FAIL (evaluate_mat, aliasing):\n");
+            nmod_mat_print_pretty(A);
+            nmod_mat_print_pretty(B);
+            nmod_mat_print_pretty(C);
+            nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+    }
+
     TEST_FUNCTION_END(state);
 }

@@ -85,6 +85,9 @@ mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong ar = A->r;
 
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+        return GR_DOMAIN;
+
     if (ar <= 3)
         return gr_mat_mul_classical(C, A, B, ctx);
 

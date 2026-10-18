@@ -50,5 +50,50 @@ TEST_FUNCTION_START(radix_digit_size, state)
         radix_clear(radix);
     }
 
+    /* multi-limb numbers, possibly with zero top limbs */
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        ulong x[6];
+        ulong c1, c2;
+        slong n, m, i;
+
+        radix_init_randtest(radix, state);
+        n = n_randint(state, 7);
+        radix_randtest_limbs(x, state, n, radix);
+        m = n_randint(state, n + 1);
+        for (i = m; i < n; i++)
+            x[i] = 0;
+
+        c1 = radix_size_digits(x, n, radix);
+
+        /* strip zero limbs and count the digits of the top limb */
+        while (n > 0 && x[n - 1] == 0)
+            n--;
+
+        c2 = 0;
+        if (n > 0)
+        {
+            for (c2 = 1; c2 <= radix->exp; c2++)
+            {
+                if (n_pow(DIGIT_RADIX(radix), c2) > x[n - 1])
+                    break;
+            }
+            c2 += (n - 1) * radix->exp;
+        }
+
+        if (c1 != c2)
+        {
+            flint_printf("FAIL: size_digits\n");
+            flint_printf("radix %wu^%wd\n", DIGIT_RADIX(radix), radix->exp);
+            flint_printf("n = %wd\n", n);
+            flint_printf("c1 = %wu\n", c1);
+            flint_printf("c2 = %wu\n", c2);
+            flint_abort();
+        }
+
+        radix_clear(radix);
+    }
+
     TEST_FUNCTION_END(state);
 }

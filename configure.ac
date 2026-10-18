@@ -250,7 +250,7 @@ esac],
 enable_avx2="no")
 
 AC_ARG_ENABLE(avx512,
-[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
+[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions, implies --enable-avx2 [default=no]])],
 [case $enableval in
 yes|no) ;;
 *) AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
@@ -961,6 +961,15 @@ then
                           [AC_MSG_ERROR([$CC does not support -m$ABI])])
 fi
 
+# AVX512 (AVX512F and AVX512DQ) implies AVX2 and FMA, which -mavx512f
+# alone does not enable (with GCC, -mavx512f defines __AVX2__ but not
+# __FMA__, and the AVX2 code then fails to compile): add the flags of
+# --enable-avx2 too
+if test "$enable_avx512" = "yes";
+then
+    enable_avx2="yes"
+fi
+
 if test "$enable_avx2" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx2],[save_CFLAGS="-mavx2 $save_CFLAGS"],
@@ -972,6 +981,7 @@ if test "$enable_avx512" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx512f],[save_CFLAGS="-mavx512f $save_CFLAGS"],
                           [AC_MSG_ERROR([$CC does not support -mavx512f])])
+    AX_CHECK_COMPILE_FLAG([-mavx512dq],[save_CFLAGS="-mavx512dq $save_CFLAGS"])
 fi
 
 if test "$enable_asan" = "yes";

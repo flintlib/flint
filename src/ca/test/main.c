@@ -20,6 +20,7 @@
 #include "t-div.c"
 #include "t-erf.c"
 #include "t-exp.c"
+#include "t-factor_insert.c"
 #include "t-field_init_clear.c"
 #include "t-fmpz_mpoly_evaluate.c"
 #include "t-gamma.c"
@@ -54,6 +55,7 @@ test_struct tests[] =
     TEST_FUNCTION(ca_div),
     TEST_FUNCTION(ca_erf),
     TEST_FUNCTION(ca_exp),
+    TEST_FUNCTION(ca_factor_insert),
     TEST_FUNCTION(ca_field_init_clear),
     TEST_FUNCTION(ca_fmpz_mpoly_evaluate),
     TEST_FUNCTION(ca_gamma),

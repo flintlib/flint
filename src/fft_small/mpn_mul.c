@@ -2191,7 +2191,7 @@ void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong* a, ulong an,
     X->domain = FFT_SMALL_OP_PRIMAL;
 }
 
-void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
+void fft_small_export_mpn(ulong* z, ulong zn, fft_small_op_t X,
                     const fft_small_plan_t P)
 {
     if (P->np == 2 && P->bits <= 57)

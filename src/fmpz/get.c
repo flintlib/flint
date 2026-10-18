@@ -120,7 +120,7 @@ fmpz_get_mpn(nn_ptr *n, fmpz_t n_in)
     nn_ptr temp;
 
     n_size = fmpz_size(n_in);
-    *n = flint_malloc(n_size * sizeof(ulong));
+    *n = flint_malloc(FLINT_MAX(n_size, 1) * sizeof(ulong));
 
     if (n_size <= 1)
     {

@@ -81,6 +81,13 @@ n_is_prime_pocklington(ulong n, ulong iterations)
         if (n_is_square(det))               /* BSL's test for (n^1/3 <= F < n^1/2) */
             return 0;
     }
+    /* no limit on the number of bases: for each prime factor p of F, the
+       loop below ends at the latest at the least base which is either not
+       a p-th power residue modulo n (if n is prime) or a multiple of the
+       least prime factor of n (if n is composite), so before j = n */
+    if (iterations <= 1)
+        iterations = UWORD_MAX;
+
     ninv = n_preinvert_limb(n);
     c = 1;
     for (i = factors.num - 1; i >= 0; i--)

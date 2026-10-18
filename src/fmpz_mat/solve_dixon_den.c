@@ -1181,7 +1181,7 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
                 found = 0;
                 goto dixon_done;
             }
-            fmpz_mat_swap(Z, Zt);
+            fmpz_mat_swap_entrywise(Z, Zt);
             goto dixon_done;
         }
 
@@ -1250,7 +1250,7 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
             if (_fmpz_mat_solve_reconstruct_attempt(Zt, den, x, ppow, N, D,
                     blind ? t : sden_prev, Amax, Bmax, A, B, fmpz_bits(q) - 1, 1, blind ? 0 : den_margin))
             {
-                fmpz_mat_swap(Z, Zt);
+                fmpz_mat_swap_entrywise(Z, Zt);
                 DIXON_VERB("  success: den %wd bits, X %wd bits\n", fmpz_bits(den), FLINT_ABS(fmpz_mat_max_bits(Z)));
                 goto dixon_done;
             }

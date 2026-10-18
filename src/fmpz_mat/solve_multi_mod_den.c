@@ -227,7 +227,7 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t Z, fmpz_t den,
                 found = 0;
                 goto done;
             }
-            fmpz_mat_swap(Z, Zt);
+            fmpz_mat_swap_entrywise(Z, Zt);
             goto done;
         }
 
@@ -276,7 +276,7 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t Z, fmpz_t den,
                     blind ? t : sden_prev, Amax, Bmax, A, B, NMOD_MAT_OPTIMAL_MODULUS_BITS - 1,
                     (2.0 * (double) (n / 3 + cols) * 64.0 / ((double) cols * (1 + fmpz_bits(Amax))) + 1.0 / cols), blind ? 0 : den_margin))
             {
-                fmpz_mat_swap(Z, Zt);
+                fmpz_mat_swap_entrywise(Z, Zt);
                 goto done;
             }
             if (probe_stable && den_margin < (slong) fmpz_bits(D))

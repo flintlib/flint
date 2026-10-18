@@ -106,6 +106,8 @@ void nmod_mat_charpoly_berkowitz(nmod_poly_t cp, const nmod_mat_t mat)
     nmod_poly_fit_length(cp, mat->r + 1);
     _nmod_poly_set_length(cp, mat->r + 1);
     _nmod_mat_charpoly_berkowitz(cp->coeffs, mat, mat->mod);
+    /* the result is zero modulo 1 */
+    _nmod_poly_normalise(cp);
 }
 
 static
@@ -262,6 +264,12 @@ int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t mat)
         flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
     }
 
+    if (mat->mod.n == 1)
+    {
+        nmod_poly_zero(p);
+        return 1;
+    }
+
     nmod_poly_fit_length(p, mat->r + 1);
     _nmod_poly_set_length(p, mat->r + 1);
     return _nmod_mat_charpoly_danilevsky(p->coeffs, mat, mat->mod);
@@ -274,6 +282,11 @@ int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t mat)
 void
 nmod_mat_charpoly(nmod_poly_t cp, const nmod_mat_t mat)
 {
+    if (mat->r != mat->c)
+    {
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly).  Non-square matrix.\n");
+    }
+
     if (mat->r >= 32 && mat->mod.n <= 255 && n_is_prime(mat->mod.n))
     {
         slong n = mat->r;

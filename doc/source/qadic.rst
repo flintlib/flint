@@ -222,7 +222,8 @@ Assignments and conversions
 
     Sets ``rop`` to the generator `X` for the extension 
     when `N > 0`, and zero otherwise.  If the extension degree 
-    is one, raises an abort signal.
+    is one, so that the defining polynomial is `X + a_0`, sets
+    ``rop`` to `-a_0`, reduced in the context.
 
 .. function:: void qadic_set_ui(qadic_t rop, ulong op, const qadic_ctx_t ctx)
 
@@ -415,8 +416,7 @@ Special functions
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
 
     Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
-    is at least `1` when `p` is odd and at least `2` when `p = 2` 
-    so that the series converges.
+    is at least `1` so that the series converges.
 
     Assumes that `y` is reduced modulo `p^N`.
 
@@ -440,8 +440,8 @@ Special functions
 
 
 
-    Assumes that `v = \operatorname{ord}_p(y)` is at least `1` when `p` is odd and 
-    at least `2` when `p = 2` so that the series converges.
+    Assumes that `y` is non-zero and that `v = \operatorname{ord}_p(y)` is
+    at least `1` so that the series converges.
 
     Supports aliasing between `z` and `y`.
 
@@ -468,8 +468,7 @@ Special functions
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
 
     Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
-    is at least `1` when `p` is odd and at least `2` when `p = 2` 
-    so that the series converges.
+    is at least `1` so that the series converges.
 
     Assumes that `(y, d)` is reduced modulo `p^N`.
 
@@ -490,8 +489,7 @@ Special functions
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
 
-    but this only converges when `\operatorname{ord}_p(x)` is at least `2` or `1` 
-    when `p = 2` or `p > 2`, respectively.
+    but this only converges when `\operatorname{ord}_p(x - 1)` is at least `1`.
 
 .. function:: void _qadic_frobenius_a(fmpz * rop, slong e, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 

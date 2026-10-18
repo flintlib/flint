@@ -30,25 +30,30 @@ Split/combine FFT coefficients
 
 .. function:: void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 
-    Evaluate the polynomial ``poly`` of the given ``length`` at 
-    ``B^coeff_limbs``, where ``B = 2^FLINT_BITS``, and add the 
-    result to the integer ``(res, total_limbs)`` throwing away any bits 
-    that exceed the given number of limbs. The polynomial coefficients are 
-    assumed to have at least ``output_limbs`` limbs each, however any 
-    additional limbs are ignored.
+    Evaluate the polynomial ``poly`` of the given ``length`` at
+    ``B^coeff_limbs``, where ``B = 2^FLINT_BITS``, and set the integer
+    ``(res, total_limbs)`` to the result, throwing away any bits
+    that exceed the given number of limbs. The polynomial coefficients are
+    assumed to have at least ``output_limbs`` limbs each, however any
+    additional limbs are ignored. The coefficients must be less than
+    ``B^output_limbs``.
 
-    If the integer is initially zero the result will just be the evaluation 
-    of the polynomial.
+    The integer ``(res, total_limbs)`` must be zero on entry. The
+    coefficients are added into it, but the carry out of the
+    ``output_limbs + 1`` limbs that each coefficient is added to is
+    discarded, so for a nonzero ``res`` the result is not the sum of
+    ``res`` and the evaluation in general.
 
 .. function:: void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 
     Evaluate the polynomial ``poly`` of the given ``length`` at
-    ``2^bits`` and add the result to the integer
-    ``(res, total_limbs)`` throwing away any bits that exceed the given
-    number of limbs. The polynomial coefficients are assumed to have at least
-    ``output_limbs`` limbs each, however any additional limbs are ignored.
-    If the integer is initially zero the result will just be the evaluation
-    of the polynomial.
+    ``2^bits`` and set the integer ``(res, total_limbs)`` to the result,
+    throwing away any bits that exceed the given number of limbs. The
+    coefficients must be less than ``B^output_limbs`` and have
+    ``output_limbs + 1`` readable limbs (the top limb is read when ``bits``
+    is not a multiple of ``FLINT_BITS``).
+    As for :func:`fft_combine_limbs`, ``(res, total_limbs)`` must be zero
+    on entry, since carries out of the window of each coefficient are lost.
 
 
 Test helper functions
@@ -511,10 +516,12 @@ Negacyclic multiplication
 
     As per ``_fft_mulmod_2expp1`` but with a tuned cutoff below which more 
     classical methods are used for the convolution. The temporary space is 
-    required to fit ``n*w + FLINT_BITS`` bits. There are no restrictions 
-    on `n`, but if ``limbs = n*w/FLINT_BITS`` then if ``limbs`` exceeds 
+    required to fit ``n*w + FLINT_BITS`` bits. There are no restrictions
+    on `n`, but if ``limbs = n*w/FLINT_BITS`` then if ``limbs`` exceeds
     ``FFT_MULMOD_2EXPP1_CUTOFF`` the function ``fft_adjust_limbs`` must
     be called to increase the number of limbs to an appropriate value.
+    This is not checked (except by an assertion in debug builds), and
+    other sizes above the cutoff give wrong results.
 
 
 Integer multiplication
@@ -534,7 +541,11 @@ Integer multiplication
     ``j1`` coefficients and breaking the second integer results in 
     ``j2`` chunks then ``j1 + j2 - 1 <= 2^(depth + 2)``.
 
-    If ``n = 2^depth`` then we require `nw` to be at least 64.
+    If ``n = 2^depth`` then we require `nw` to be at least 64. The
+    pointwise products are computed with :func:`fft_mulmod_2expp1`, so
+    ``limbs = nw/FLINT_BITS`` must be a size accepted by it: if
+    ``limbs`` exceeds ``FFT_MULMOD_2EXPP1_CUTOFF`` it must be a value
+    returned by :func:`fft_adjust_limbs`.
 
 .. function:: void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 
@@ -542,7 +553,10 @@ Integer multiplication
     Fourier algorithm is used.
 
     If ``n = 2^depth`` then we require `nw` to be at least 64. Here we
-    also require `w` to be `2^i` for some `i \geq 0`. 
+    also require `w` to be `2^i` for some `i \geq 0`. As for
+    :func:`mul_truncate_sqrt2`, ``limbs = nw/FLINT_BITS`` must be a size
+    accepted by :func:`fft_mulmod_2expp1`; for example depth 8 and
+    `w = 33` (132 limbs) gives wrong products.
 
 .. function:: void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2)
 
@@ -559,10 +573,17 @@ Convolution
     Perform an FFT convolution of ``ii`` with ``jj``, both of length 
     ``4*n`` where ``n = 2^depth``. Assume that all but the first 
     ``trunc`` coefficients of the output (placed in ``ii``) are zero.
-    Each coefficient is taken modulo ``B^limbs + 1``. The temporary 
-    spaces ``t1``, ``t2`` and ``s1`` must have ``limbs + 1`` 
-    limbs of space and ``tt`` must have ``2*(limbs + 1)`` of free 
+    Each coefficient is taken modulo ``B^limbs + 1``. The temporary
+    spaces ``t1``, ``t2`` and ``s1`` must have ``limbs + 1``
+    limbs of space and ``tt`` must have ``2*(limbs + 1)`` of free
     space.
+
+    We require `0 < trunc \le 4n`, and `trunc > 2n` unless
+    ``depth <= 6`` and ``w = limbs*FLINT_BITS/n`` is even; smaller values
+    of ``trunc`` can crash or hang. The pointwise products are computed with
+    :func:`fft_mulmod_2expp1`, so ``limbs`` must be a size accepted by it
+    (see :func:`fft_adjust_limbs`). The same requirements apply to
+    :func:`fft_precache` and the other convolution functions below.
 
 .. function:: slong fft_convolution_choose_mid(slong * trunc, slong len_out, slong nlo, slong nhi)
 

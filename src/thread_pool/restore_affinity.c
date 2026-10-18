@@ -37,7 +37,13 @@ int thread_pool_restore_affinity(thread_pool_t T)
             return errorno;
     }
 
-    /* restore affinity for main thread */
+    /* Restore the affinity of the calling thread. Only one affinity is
+       recorded, that of the thread which called thread_pool_init, and it
+       is applied here to the calling thread. This assumes that the caller
+       is the thread which created the pool (for the global pool, the
+       master thread, which creates it in flint_set_num_threads). If
+       another thread calls this function, it receives the creator's
+       affinity rather than its own original one. */
     errorno = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t),
                                         (cpu_set_t *)T->original_affinity);
     if (errorno != 0)

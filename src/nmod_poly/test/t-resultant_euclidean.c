@@ -100,5 +100,41 @@ TEST_FUNCTION_START(nmod_poly_resultant_euclidean, state)
         nmod_poly_clear(h);
     }
 
+    /* Check aliasing: res(f, f) == res(f, copy of f), in particular 1 for
+       a nonzero constant f */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t f, g;
+        ulong x, y;
+        ulong n;
+
+        do n = n_randtest_not_zero(state);
+        while (!n_is_probabprime(n));
+
+        nmod_poly_init(f, n);
+        nmod_poly_init(g, n);
+
+        nmod_poly_randtest(f, state, n_randint(state, 5));
+        nmod_poly_set(g, f);
+
+        x = nmod_poly_resultant_euclidean(f, f);
+        y = nmod_poly_resultant_euclidean(f, g);
+
+        result = (x == y && (nmod_poly_length(f) != 1 || x == 1));
+        if (!result)
+        {
+            flint_printf("FAIL (aliasing):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("x = %wu\n", x);
+            flint_printf("y = %wu\n", y);
+            flint_printf("n = %wu\n", n);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(f);
+        nmod_poly_clear(g);
+    }
+
     TEST_FUNCTION_END(state);
 }

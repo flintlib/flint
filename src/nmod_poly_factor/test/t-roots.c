@@ -46,6 +46,13 @@ void test_poly(
             flint_abort();
         }
 
+        if (roots->p[i].mod.n != f->mod.n)
+        {
+            flint_printf("FAIL:\ncheck modulus of the factor\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         multiplicity = 0;
         while (nmod_poly_divrem(qt, r, q, roots->p + i), nmod_poly_is_zero(r))
         {

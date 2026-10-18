@@ -523,20 +523,6 @@ ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly, const fmpz * exp, co
 ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
-void _nmod_mpoly_max_degrees(ulong * max_degs, const ulong * exps, slong len, slong bits, slong n, int deg, int rev, slong N);
-void nmod_mpoly_max_degrees(ulong * max_degs, const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpoly_set_nmod(nmod_mpoly_t poly, const nmod_t c, const nmod_mpoly_ctx_t ctx);
-
-
-ulong nmod_mpoly_get_coeff_ui(nmod_t x, const nmod_mpoly_t poly, slong n, const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpoly_set_coeff_ui(nmod_mpoly_t poly, slong n, ulong x, const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly, slong n, const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpoly_set_monomial(nmod_mpoly_t poly, slong n, const ulong * exps, const nmod_mpoly_ctx_t ctx);
-
 /* Addition/Subtraction ******************************************************/
 
 void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx);
@@ -978,8 +964,6 @@ void nmod_mpolyd_zero(nmod_mpolyd_t poly);
 
 void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars);
 
-void nmod_mpolyd_set(nmod_mpolyd_t A, const nmod_mpolyd_t B);
-
 void nmod_mpolyd_clear(nmod_mpolyd_t poly);
 
 void nmod_mpolyd_print(nmod_mpolyd_t poly);
@@ -1116,9 +1100,6 @@ int nmod_mpolyn_is_canonical(const nmod_mpolyn_t A,
 void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 void nmod_mpoly_cvtfrom_mpolyn(nmod_mpoly_t A, const nmod_mpolyn_t B,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
@@ -1184,8 +1165,6 @@ void nmod_mpolyn_one(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
 
-ulong nmod_mpolyun_leadcoeff_last(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
-
 void nmod_mpolyn_set_mod(nmod_mpolyn_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod));
 
 void nmod_mpolyun_set_mod(nmod_mpolyun_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod));
@@ -1247,12 +1226,6 @@ int nmod_mpolyn_divides_threaded_pool(nmod_mpolyn_t Q,
 
 int nmod_mpolyun_divides(nmod_mpolyun_t Q, const nmod_mpolyun_t A,
         const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
-
-void nmod_mpoly_to_mpolyun_perm_deflate_threaded_pool(
-        nmod_mpolyun_t A, const nmod_mpoly_ctx_t uctx,
-        const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-        const slong * perm, const ulong * shift, const ulong * stride,
-        const thread_pool_handle * handles, slong num_handles);
 
 void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(nmod_mpolyn_t A,
         const nmod_mpoly_ctx_t nctx, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,

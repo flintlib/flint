@@ -273,10 +273,14 @@ QADIC_INLINE void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     }
     else
     {
-        padic_poly_fit_length(x, 1);
-	fmpz_neg(x->coeffs + 0, ctx->a + 0);
-	_padic_poly_set_length(x, 1);
-	x->val = 0;
+        /* The generator is the root -a_0 of X + a_0, reduced mod p^N */
+        fmpz_t t;
+
+        fmpz_init(t);
+        if (ctx->j[0] == 0)
+            fmpz_neg(t, ctx->a + 0);
+        padic_poly_set_fmpz(x, t, &ctx->pctx);
+        fmpz_clear(t);
     }
 }
 

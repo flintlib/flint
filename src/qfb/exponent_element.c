@@ -178,6 +178,8 @@ do_restart1:
 
    n_prime_pi_bounds(&lo, &hi, B1);
    restart_inc = (((hi/1024 + 127)/128))*1024;
+   /* hi < 1024, i.e. B1 < 8161 (all primes come in one chunk) */
+   restart_inc = FLINT_MAX(restart_inc, 1024);
    quot = (double) B2_sqrt/(double) lo;
 
    pr = 2;

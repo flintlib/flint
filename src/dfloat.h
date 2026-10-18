@@ -239,7 +239,7 @@ void X##_inv(T res, TS x); \
 void X##_sqrt(T res, TS x); \
 void X##_rsqrt(T res, TS x); \
 void X##_mul_2exp_si(T res, TS x, slong e); \
-void X##_renorm(T res, const double * t, slong len); \
+void X##_renorm(T res, double * t, slong len); \
 int X##_is_zero(TS x); \
 int X##_is_one(TS x); \
 int X##_is_finite(TS x); \

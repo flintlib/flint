@@ -369,10 +369,6 @@ Container operations
     Combine adjacent like terms in the internal ``A->zpoly`` and then factor out content via a call to :func:`fmpq_mpoly_reduce`.
     If the terms of *A* were sorted to begin with, the result will be in canonical form.
 
-.. function:: void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
-
-    Set *A* to the reversal of *B*.
-
 
 Random generation
 --------------------------------------------------------------------------------

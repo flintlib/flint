@@ -124,14 +124,16 @@ int _fft_small_plan_fit_window(fft_small_plan_t P,
     if (P->depth < min_depth)
         return 0;
 
-    ztrunc = (P->depth < LG_BLK_SZ) ? N : n_round_up(zn, BLK_SZ);
-
     if (xtrunc_max <= N && zh <= N && N <= zn && zn <= zl + N)
     {
+        /* cyclic: the wrapped coefficients land below zl */
         ztrunc = N;
     }
-    else if (ztrunc <= N)
+    else if (zn <= N)
     {
+        /* the whole product fits; below LG_BLK_SZ the transform is not
+           truncated (and N is not a multiple of BLK_SZ) */
+        ztrunc = (P->depth < LG_BLK_SZ) ? N : n_round_up(zn, BLK_SZ);
     }
     else
     {

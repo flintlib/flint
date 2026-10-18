@@ -104,7 +104,7 @@ RADIX_INLINE ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
     while (n > 0 && x[n - 1] == 0)
         n--;
 
-    return (n == 0) ? 0 : _radix_size_digits_1(x[n - 1], radix);
+    return (n == 0) ? 0 : _radix_size_digits(x, n, radix);
 }
 
 RADIX_INLINE ulong _radix_valuation_digits_1(ulong c, const radix_t radix)

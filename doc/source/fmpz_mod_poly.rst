@@ -878,7 +878,8 @@ Division
 .. function:: ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
 
     Removes the highest possible power of ``g`` from ``f`` and
-    returns the exponent.
+    returns the exponent. The divisor ``g`` must not be zero or
+    constant, otherwise an exception is raised.
 
 .. function:: void _fmpz_mod_poly_rem_basecase(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 
@@ -939,7 +940,7 @@ Division
     computed correctly, and `f` is set to `1`.  Otherwise, `f` is set to
     a non-trivial factor of `p` and `Q` and `R` are not touched.
 
-    Assumes that `B` is non-zero.
+    Raises a division by zero exception if `B` is zero.
 
 .. function:: void _fmpz_mod_poly_rem(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 

@@ -905,10 +905,12 @@ Basic arithmetic
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
+.. function:: int fmpz_divisible_ui(const fmpz_t f, ulong g)
+
 .. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
 
     Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
-    none.
+    none. In particular, `f` is divisible by `g = 0` if and only if `f = 0`.
 
 .. function:: int fmpz_div(fmpz_t q, const fmpz_t g, const fmpz_t h)
               int fmpz_div_ui(fmpz_t q, const fmpz_t g, ulong h)
