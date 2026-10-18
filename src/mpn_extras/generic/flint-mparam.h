@@ -183,4 +183,11 @@
 */
 #define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
 
+/*
+    radix_mulmid: with fft_small, the classical algorithm is used below this
+    many limb products per limb of the convolution that fft_small computes;
+    see src/radix.h (not measured on this target: default)
+*/
+#define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO 60
+
 #endif

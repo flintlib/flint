@@ -218,7 +218,9 @@ Except where otherwise noted, the following rules apply:
     algorithm when either operand or the requested slice is shorter than
     80 limbs, and otherwise when the number of limb products in the
     requested slice is smaller than
-    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot L`, since
+    `\mathrm{RADIX\_MULMID\_FFT\_CUTOFF\_RATIO} \cdot L` (with *fft_small*,
+    a parameter of ``flint-mparam.h`` from 50 to 85 depending on the
+    machine), since
     the cost of the FFT algorithm depends essentially on the length `L` of
     the convolution it computes while the classical algorithm benefits
     from short slices (for example, a truncated high product needs about
