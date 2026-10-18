@@ -39,6 +39,9 @@ int fmpz_mod_mpoly_get_fmpz_mod_poly(
     if (B->length < 1)
         return 1;
 
+    if (!fmpz_mod_mpoly_is_fmpz_mod_poly(B, var, ctx))
+        return 0;
+
     if (Bbits <= FLINT_BITS)
     {
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - Bbits);

@@ -49,6 +49,9 @@ int nmod_mpoly_get_n_poly(
     if (B->length < 1)
         return 1;
 
+    if (!nmod_mpoly_is_nmod_poly(B, var, ctx))
+        return 0;
+
     if (Bbits <= FLINT_BITS)
     {
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - Bbits);
