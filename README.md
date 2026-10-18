@@ -47,7 +47,8 @@ To download, bootstrap, configure and build everything, write
     make check                         # optional
     make install                       # optional
     make examples                      # optional
-    cd doc && make html && cd ..       # optional: documentation
+    make doc                           # optional: documentation (HTML)
+    make docpdf                        # optional: documentation (PDF)
 
 See FLINT's documentation for further instructions on how to build FLINT.
 

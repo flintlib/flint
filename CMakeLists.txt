@@ -639,13 +639,13 @@ endif()
 
 
 if(BUILD_DOCS)
-    find_package(Sphinx REQUIRED)
-    file(GLOB DOC_SOURCES doc/source/*.rst)
+    # the documentation is built by doc/fdoc (Python 3; Node.js optional;
+    # pdflatex for the PDF)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
     add_custom_target(html
-        COMMAND ${SPHINX_EXECUTABLE} -b html "${CMAKE_CURRENT_SOURCE_DIR}/doc/source" "${CMAKE_CURRENT_BINARY_DIR}/html"
-        SOURCES ${DOC_SOURCES})  
-    add_custom_target(latex
-        COMMAND ${SPHINX_EXECUTABLE} -b latex "${CMAKE_CURRENT_SOURCE_DIR}/doc/source" "${CMAKE_CURRENT_BINARY_DIR}/latex"
-        SOURCES ${DOC_SOURCES})  
-    add_custom_target(pdf DEPENDS latex COMMAND make WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex") 
+        COMMAND ${Python3_EXECUTABLE} -m fdoc --flint "${CMAKE_CURRENT_SOURCE_DIR}" build --out "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+    add_custom_target(pdf
+        COMMAND ${Python3_EXECUTABLE} -m fdoc --flint "${CMAKE_CURRENT_SOURCE_DIR}" latex --pdf --out "${CMAKE_CURRENT_BINARY_DIR}/doc/latex"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 endif()

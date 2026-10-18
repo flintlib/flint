@@ -1,0 +1,60 @@
+---
+title: FLINT documentation
+module-categories:
+  - Foundations
+  - Word-size integers
+  - Integers
+  - Rational numbers
+  - Integers mod n
+  - Number theory
+  - Univariate polynomials
+  - Multivariate polynomials
+  - Matrices
+  - Finite fields
+  - p-adic numbers
+  - Algebraic numbers and number fields
+  - Real and complex numbers
+  - Special functions
+  - Floating-point arithmetic
+  - Exact real and complex numbers
+  - Generic rings
+  - Fast Fourier transforms
+---
+
+# FLINT: Fast Library for Number Theory
+
+FLINT is a C library for number theory and computer algebra: arithmetic with
+integers, rationals, polynomials, matrices, finite fields, $p$-adic numbers,
+and real and complex numbers with rigorous error bounds.
+
+The documentation has four parts:
+
+- The **[User guide](guide)** explains how to build and use FLINT and the
+  conventions shared by all modules: types, memory management, aliasing,
+  threads, ball arithmetic and exact numbers.
+- The **modules** below document every public function, module by
+  module, grouped by subject. Each module page lists all functions with
+  their full prototypes and a short description; function pages and guides
+  give the details, usually with a short complete program.
+- **[Algorithms](algorithms)** describes the methods behind the functions,
+  with proofs, complexity and references, starting from the generic
+  algorithms and leading to the specialised implementations.
+- **[Examples and tutorials](tutorials)** develop complete programs step
+  by step.
+
+Every example program in the documentation is compiled and run by `make
+check`, and its output is compared with the output shown.
+
+## Start here {#start}
+
+::: summary tutorials/getting-started/first-program :::
+
+::: summary gr/getting-started :::
+
+::: summary algorithms/generic/overview :::
+
+::: summary algorithms/fft/choosing :::
+
+## Modules {#modules}
+
+::: modules :::

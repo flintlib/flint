@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'doc/**'
+      - 'src/*.h'
       - '.github/workflows/docs.yml'
   push:
     paths:
       - 'doc/**'
+      - 'src/*.h'
       - '.github/workflows/docs.yml'
 
 concurrency:
@@ -31,25 +33,32 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-sphinx
-          sphinx-build --version
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin nodejs
+          python3 --version
+          node --version
 
       - name: "Build documentation"
         run: |
           cd doc
-          make html SPHINXOPTS="-W -j auto"
+          python3 -m fdoc --strict build --redirects --out build/html
+
+      - name: "Check the example programs of the documentation"
+        run: |
+          ./bootstrap.sh
+          ./configure --disable-debug
+          make -j$(expr $(nproc) + 1) library
+          make checkdoc
 
       - name: "Setup LaTeX"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
-          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk lmodern
+          sudo apt-get install -y texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra lmodern
 
       - name: "Build PDF documentation"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd doc
-          make latexpdf SPHINXOPTS="-W -j auto"
+          python3 -m fdoc latex --pdf --out build/latex
 
       - name: "Create a tarball of the documentation"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
