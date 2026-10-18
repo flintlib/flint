@@ -243,6 +243,134 @@ _fft_small_np2_pack(double * d, double * d2, nn_srcptr x, ulong xn, ulong len,
    excluded, so the deficit is the carry of a sum of values each
    below 2^(64 zl) - under two ulps of limb zl, within the range
    driver's documented min(an, bn, lo) bound. */
+
+/*
+    The window of _mpn_ctx_mpn_mul_window_np2 as a transposed product
+    (see _nmod_poly_mul_tr_mpn_ctx), when that is shorter. The
+    recomposition reads the chunks [j0, jtop) of the product, with j0 the
+    first chunk that can reach bit 64 zl (the straddlers) and jtop the
+    first one above limb zh, and nothing else; these coefficients are
+    computed exactly as
+
+        c[c0 + j] = sum_i r[i] v[i + j],    0 <= j < m = jtop - c0,
+
+    with r the sl chunks of b reversed (b's zero chunks above blen
+    included) and v the chunks of a from s0 = c0 - (sl - 1) on, at the
+    cost of a product of lengths sl and m instead of alen and blen. With
+    c0 * bits and (sl - 1) * bits multiples of 64 (and c0 one of 8, for
+    the vectorized Garner step), v starts at limb s0 * bits / 64 of a (or
+    at zero chunks in front of it), and the recomposition runs on the
+    shifted chunks as on the full product: same chunks, same chunk
+    positions relative to the limbs, so the result is the same, bit for
+    bit, as that of the window of the full product.
+
+    Returns 0, doing nothing, if the transposed product is not shorter.
+*/
+static int
+_mpn_ctx_mpn_mul_window_np2_tr(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
+                        nn_srcptr a, ulong an, nn_srcptr b, ulong bn,
+                        ulong bits, ulong alen, ulong blen, ulong zlen)
+{
+    ulong g, q, jstr, jtop, c0, sl, m, pn, ztr, btr, otr, depth, dsz, j;
+    slong s0;
+    sd_fft_ctx_struct * Q0 = R->ffts + 0, * Q1 = R->ffts + 1;
+    double * d0, * d1, * e0, * e1;
+
+    /* g * bits is the smallest multiple of bits divisible by 64 */
+    g = 64;
+    while (g > 1 && (g / 2) * bits % 64 == 0)
+        g /= 2;
+    q = FLINT_MAX(g, 8);
+
+    jstr = (64 * zl > 99) ? (64 * zl - 99) / bits : 0;
+    jtop = FLINT_MIN(zlen, 64 * zh / bits + 1);
+    c0 = jstr - jstr % q;
+    m = jtop - c0;
+    sl = blen + (g - (blen - 1) % g) % g;
+    pn = sl + m - 1;
+
+    FLINT_ASSERT(jstr < jtop);
+
+    if (m >= alen || n_round_up(pn, BLK_SZ) >= n_round_up(zlen, BLK_SZ))
+        return 0;
+
+    ztr = n_round_up(pn, BLK_SZ);
+    btr = n_round_up(sl, BLK_SZ);
+    otr = n_round_up(m, BLK_SZ);
+    depth = FLINT_MAX(LG_BLK_SZ, n_clog2(ztr));
+    dsz = sd_fft_ctx_data_size(depth);
+    s0 = (slong) c0 - (slong) (sl - 1);
+
+    FLINT_ASSERT(c0 * bits % 64 == 0 && (sl - 1) * bits % 64 == 0);
+    FLINT_ASSERT(s0 < (slong) alen);
+
+    d0 = mpn_ctx_fit_buffer(R, 4 * dsz * sizeof(double));
+    d1 = d0 + dsz;
+    e0 = d1 + dsz;
+    e1 = e0 + dsz;
+
+    /* v: zero chunks in front of a if s0 < 0, otherwise a from limb
+       s0 * bits / 64; zeros up to ztr (the chunks beyond pn meet only
+       zero rows of the transposed product) */
+    if (s0 < 0)
+    {
+        ulong k = -s0;
+
+        for (j = 0; j < k; j++)
+        {
+            d0[j] = 0.0;
+            d1[j] = 0.0;
+        }
+
+        _fft_small_np2_pack(d0 + k, d1 + k, a, an,
+                            FLINT_MIN(alen, pn - k), ztr - k, bits);
+    }
+    else
+    {
+        ulong off = (ulong) s0 * bits / 64;
+        ulong xn = an - off;
+
+        _fft_small_np2_pack(d0, d1, a + off, xn,
+                            FLINT_MIN(pn, (64 * xn + bits - 1) / bits), ztr, bits);
+    }
+
+    sd_ifft_trunc_tr(Q0, d0, depth, ztr);
+    sd_ifft_trunc_tr(Q1, d1, depth, ztr);
+
+    /* r: the chunks of b, zero padded to sl, reversed */
+    _fft_small_np2_pack(e0, e1, b, bn, blen, btr, bits);
+    for (j = 0; j < sl / 2; j++)
+    {
+        FLINT_SWAP(double, e0[j], e0[sl - 1 - j]);
+        FLINT_SWAP(double, e1[j], e1[sl - 1 - j]);
+    }
+
+    sd_fft_trunc(Q0, e0, depth, btr, ztr);
+    sd_fft_trunc(Q1, e1, depth, btr, ztr);
+
+    for (int k = 0; k < 2; k++)
+    {
+        sd_fft_ctx_struct * Q = k ? Q1 : Q0;
+        vec8d n8 = vec8d_set_d(Q->p), ninv8 = vec8d_set_d(Q->pinv);
+        double * X = k ? d1 : d0, * Y = k ? e1 : e0;
+        for (j = 0; j < ztr; j += 8)
+            vec8d_store(X + j, vec8d_mulmod(vec8d_load(X + j),
+                                            vec8d_load(Y + j), n8, ninv8));
+    }
+
+    /* the transposes of the transforms are unnormalized like the
+       transforms, so the recomposition normalizes by 2^-depth as for
+       the window of the full product */
+    sd_fft_trunc_tr(Q0, d0, depth, otr, ztr);
+    sd_fft_trunc_tr(Q1, d1, depth, otr, ztr);
+
+    _fft_small_np2_crt_recompose(R, z, zl - c0 * bits / 64,
+                                 zh - c0 * bits / 64, d0, d1, m, otr,
+                                 bits, depth);
+
+    return 1;
+}
+
 void
 _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
                         nn_srcptr a, ulong an, nn_srcptr b, ulong bn)
@@ -270,6 +398,10 @@ _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
     ulong j;
 
     FLINT_ASSERT(an >= bn && bn >= 1);
+
+    if (!sqr && _mpn_ctx_mpn_mul_window_np2_tr(R, z, zl, zh, a, an, b, bn,
+                                              bits, alen, blen, zlen))
+        return;
 
     d0 = mpn_ctx_fit_buffer(R, (sqr ? 2 : 4) * dsz * sizeof(double));
     d1 = d0 + dsz;

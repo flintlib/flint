@@ -89,6 +89,89 @@ TEST_FUNCTION_START(radix_mulmid_fft_small, state)
         flint_free(d);
     }
 
+    /* windows which are short compared to the longer operand, as in the
+       middle products of Newton iterations: the transposed product */
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        nn_ptr a, b, c, d;
+        slong an, bn, sn, ln, m, lo, hi;
+
+        radix_mulmid_force_threading = n_randint(state, 2);
+        flint_set_num_threads(1 + n_randint(state, 8));
+
+        radix_init_randtest(radix, state);
+
+        sn = 1 + n_randint(state, n_randint(state, 10) == 0 ? 10000 : 1000);
+        ln = sn + n_randint(state, 3 * sn + 100);
+        m = 1 + n_randint(state, ln);
+
+        switch (n_randint(state, 5))
+        {
+            case 0:     /* full sums: the middle product */
+                lo = sn - 1;
+                break;
+            case 4:     /* the middle product with a few guard limbs on
+                           each side, as in the Newton iterations */
+                lo = sn - 1 - (slong) n_randint(state, 5);
+                lo = FLINT_MAX(lo, 0);
+                m = ln - sn + 1 + n_randint(state, 8) + (sn - 1 - lo);
+                break;
+            case 1:     /* starting at or after the full sums */
+                lo = sn - 1 + n_randint(state, ln + 1);
+                break;
+            case 2:     /* ending before the end of the longer operand */
+                lo = n_randint(state, FLINT_MIN(sn, ln - m + 1));
+                break;
+            default:    /* anywhere */
+                lo = n_randint(state, ln + sn);
+        }
+
+        lo = FLINT_MIN(lo, ln + sn - 1);
+        hi = FLINT_MIN(lo + m, ln + sn);
+
+        if (n_randint(state, 2))
+            an = ln, bn = sn;
+        else
+            an = sn, bn = ln;
+
+        a = flint_malloc(an * sizeof(ulong));
+        b = flint_malloc(bn * sizeof(ulong));
+        c = flint_malloc((hi - lo) * sizeof(ulong));
+        d = flint_malloc((hi - lo) * sizeof(ulong));
+
+        if (n_randint(state, 2))
+        {
+            radix_rand_limbs(a, state, an, radix);
+            radix_rand_limbs(b, state, bn, radix);
+        }
+        else
+        {
+            radix_randtest_limbs(a, state, an, radix);
+            radix_randtest_limbs(b, state, bn, radix);
+        }
+
+        radix_randtest_limbs(c, state, hi - lo, radix);
+        radix_randtest_limbs(d, state, hi - lo, radix);
+
+        radix_mulmid_fft_small(c, a, an, b, bn, lo, hi, radix);
+        radix_mulmid_naive(d, a, an, b, bn, lo, hi, radix);
+
+        if (mpn_cmp(c, d, hi - lo) != 0)
+        {
+            flint_printf("FAIL: short window\n");
+            flint_printf("an = %wd, bn = %wd, lo = %wd, hi = %wd\n", an, bn, lo, hi);
+            flint_abort();
+        }
+
+        radix_clear(radix);
+
+        flint_free(a);
+        flint_free(b);
+        flint_free(c);
+        flint_free(d);
+    }
+
 #endif
 
     TEST_FUNCTION_END(state);

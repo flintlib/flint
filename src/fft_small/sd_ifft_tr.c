@@ -10,6 +10,7 @@
 */
 
 #include "fft_small.h"
+#include "butterflies.h"
 
 /*
     This module contains the function `sd_ifft_trunc_tr`, the transpose of the
@@ -38,8 +39,9 @@
       decimation-in-time butterfly `(a0, a1) -> (a0 + w^-1*a1, a0 - w^-1*a1)`,
       i.e. the shape used by `sd_fft.c`, with the inverse twiddles of
       `sd_ifft.c`. So the twiddle lookups here are those of `sd_ifft.c`
-      (`SET_J_BITS_AND_J_MR`) while the reduction placement follows
-      `sd_fft.c`;
+      (`SET_J_BITS_AND_J_MR`), and the butterflies are those of `sd_fft.c`
+      (see butterflies.h), with `w = -W` given by multiplying with
+      `nmulmod_fast`, hence with the same reduction placement and bounds;
 
     - the truncated inverse butterflies of `sd_ifft.c` are not restrictions of
       one formula, they are 13 + 6 separately derived maps, each documented by
@@ -65,10 +67,6 @@
     reduced residues in `[0, n)`.
 */
 
-/* TODO given the proximity with computations done in sd_fft, several macros
- * below could be replaced by macros already in sd_fft_trunc.c
- * -> this should be refactored */
-
 #define N 8
 #define VECND vec8d
 #define VECNOP(op) vec8d_##op
@@ -84,22 +82,15 @@
     is
         b0 = a0 + w^-1*a1
         b1 = a0 - w^-1*a1
-    with, as in sd_ifft.c, W := -w^-1.
+    with, as in sd_ifft.c, W := -w^-1: the DIT butterfly of sd_fft.c with
+    twiddle -W, see butterflies.h.
 */
 #define RADIX_2_REVERSE_TR_PARAM_J_IS_Z(V, Q) \
     V n    = CAT(V, set_d)(Q->p); \
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_REVERSE_TR_MOTH_J_IS_Z(V, X0, X1) \
-{ \
-    V x0, x1; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, reduce_to_pm1n)(x1, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
-    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
-}
+    SD_DIT2_MOTH_J_IS_Z(V, X0, X1)
 
 #define RADIX_2_REVERSE_TR_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
     V W = CAT(V, set_d)(Q->w2tab[j_bits][j_mr]); \
@@ -107,15 +98,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_REVERSE_TR_MOTH_J_IS_NZ(V, X0, X1) \
-{ \
-    V x0, x1; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, nmulmod_fast)(x1, W, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
-    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
-}
+    SD_DIT2_MOTH_J_IS_NZ(V, nmulmod_fast, W, X0, X1)
 
 /***************** transposed inverse butterfly *******************************
     The transpose of
@@ -128,7 +111,8 @@
         b1 = (a0 - W2*a2) + W *(a1 - W2*a3)
         b2 = (a0 + W2*a2) - IW*(a1 + W2*a3)
         b3 = (a0 + W2*a2) + IW*(a1 + W2*a3)
-    with, as in sd_ifft.c, W := -w^-1, W2 := -w^-2, IW := i*w^-1.
+    with, as in sd_ifft.c, W := -w^-1, W2 := -w^-2, IW := i*w^-1: the radix-4
+    butterfly of sd_fft.c with twiddles (-W2, -W, -IW).
 */
 #define RADIX_4_REVERSE_TR_PARAM_J_IS_Z(V, Q) \
     V IW = CAT(V, set_d)(Q->w2tab[0][1]); \
@@ -136,26 +120,7 @@
     V ninv = CAT(V, set_d)(Q->pinv); \
 
 #define RADIX_4_REVERSE_TR_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    x2 = CAT(V, reduce_to_pm1n)(x2, n, ninv); \
-    x3 = CAT(V, reduce_to_pm1n)(x3, n, ninv); \
-    y0 = CAT(V, add)(x0, x2); \
-    y1 = CAT(V, add)(x1, x3); \
-    y2 = CAT(V, sub)(x0, x2); \
-    y3 = CAT(V, sub)(x1, x3); \
-    y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
-    y3 = CAT(V, mulmod_fast)(y3, IW, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(y0, y1)); \
-    CAT(V, store)(X1, CAT(V, sub)(y0, y1)); \
-    CAT(V, store)(X2, CAT(V, sub)(y2, y3)); \
-    CAT(V, store)(X3, CAT(V, add)(y2, y3)); \
-}
+    SD_DIT4_MOTH_J_IS_Z(V, nmulmod_fast, IW, X0, X1, X2, X3)
 
 #define RADIX_4_REVERSE_TR_PARAM_J_IS_NZ(V, Q, j_mr, j_bits) \
     V W  = CAT(V, set_d)(Q->w2tab[1+j_bits][2*j_mr+1]); \
@@ -165,104 +130,28 @@
     V ninv = CAT(V, set_d)(Q->pinv); \
 
 #define RADIX_4_REVERSE_TR_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    x2 = CAT(V, mulmod_fast)(x2, W2, n, ninv); \
-    x3 = CAT(V, mulmod_fast)(x3, W2, n, ninv); \
-    y0 = CAT(V, sub)(x0, x2); \
-    y1 = CAT(V, sub)(x1, x3); \
-    y2 = CAT(V, add)(x0, x2); \
-    y3 = CAT(V, add)(x1, x3); \
-    y1 = CAT(V, mulmod_fast)(y1, W, n, ninv); \
-    y3 = CAT(V, mulmod_fast)(y3, IW, n, ninv); \
-    CAT(V, store)(X0, CAT(V, sub)(y0, y1)); \
-    CAT(V, store)(X1, CAT(V, add)(y0, y1)); \
-    CAT(V, store)(X2, CAT(V, sub)(y2, y3)); \
-    CAT(V, store)(X3, CAT(V, add)(y2, y3)); \
-}
+    SD_DIT4_MOTH_J_IS_NZ(V, nmulmod_fast, W2, W, IW, X0, X1, X2, X3)
 
 #define _RADIX_4_REVERSE_TR_PARAM_J_IS_Z(...)  RADIX_4_REVERSE_TR_PARAM_J_IS_Z(__VA_ARGS__)
 #define _RADIX_4_REVERSE_TR_MOTH_J_IS_Z(...)   RADIX_4_REVERSE_TR_MOTH_J_IS_Z(__VA_ARGS__)
 #define _RADIX_4_REVERSE_TR_PARAM_J_IS_NZ(...) RADIX_4_REVERSE_TR_PARAM_J_IS_NZ(__VA_ARGS__)
 #define _RADIX_4_REVERSE_TR_MOTH_J_IS_NZ(...)  RADIX_4_REVERSE_TR_MOTH_J_IS_NZ(__VA_ARGS__)
 
-/* transposes of the LENGTH{2,4,8}INV macros of sd_ifft.c */
+/* transposes of the LENGTH{2,4,8}INV macros of sd_ifft.c: the DIT register
+   basecases of sd_fft.c with negated twiddles. For j != 0 the 3-layer one is
+   the LENGTH8_ANY_J of sd_fft.c, which performs the same operations as
+   composing LENGTH4INVTR_ANY_J and LENGTH2INVTR_ANY_J (as done below for
+   j == 0), in another order. */
 
-#define LENGTH2INVTR_ANY_J(T, x0, x1, n, ninv, w0) \
-{ \
-   T Z0 = CAT(T, reduce_to_pm1n)(x0, n, ninv); \
-   T Z1 = CAT(T, nmulmod_fast)(x1, w0, n, ninv); \
-   x0 = CAT(T, add)(Z0, Z1); \
-   x1 = CAT(T, sub)(Z0, Z1); \
-}
+#define LENGTH2INVTR_ANY_J(T, ...) SD_DIT_LENGTH2_ANY_J(T, nmulmod_fast, __VA_ARGS__)
 
-#define LENGTH2INVTR_ZERO_J(T, x0, x1, n, ninv) \
-{ \
-   T Z0 = CAT(T, reduce_to_pm1n)(x0, n, ninv); \
-   T Z1 = CAT(T, reduce_to_pm1n)(x1, n, ninv); \
-   x0 = CAT(T, add)(Z0, Z1); \
-   x1 = CAT(T, sub)(Z0, Z1); \
-}
+#define LENGTH2INVTR_ZERO_J(T, ...) SD_DIT_LENGTH2_ZERO_J(T, __VA_ARGS__)
 
-#define LENGTH4INVTR_ANY_J(T, x0, x1, x2, x3, n, ninv, w0, ww0, ww1) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X2 = CAT(T, mulmod_fast)(X2, w0, n, ninv); \
-    X3 = CAT(T, mulmod_fast)(X3, w0, n, ninv); \
-    Y0 = CAT(T, sub)(X0, X2); \
-    Y1 = CAT(T, sub)(X1, X3); \
-    Y2 = CAT(T, add)(X0, X2); \
-    Y3 = CAT(T, add)(X1, X3); \
-    Y1 = CAT(T, mulmod_fast)(Y1, ww0, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
-    x0 = CAT(T, sub)(Y0, Y1); \
-    x1 = CAT(T, add)(Y0, Y1); \
-    x2 = CAT(T, sub)(Y2, Y3); \
-    x3 = CAT(T, add)(Y2, Y3); \
-}
+#define LENGTH4INVTR_ANY_J(T, ...) SD_DIT_LENGTH4_ANY_J(T, nmulmod_fast, __VA_ARGS__)
 
-#define LENGTH4INVTR_ZERO_J(T, x0, x1, x2, x3, n, ninv, ww1) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X2 = CAT(T, reduce_to_pm1n)(X2, n, ninv); \
-    X3 = CAT(T, reduce_to_pm1n)(X3, n, ninv); \
-    Y0 = CAT(T, add)(X0, X2); \
-    Y1 = CAT(T, add)(X1, X3); \
-    Y2 = CAT(T, sub)(X0, X2); \
-    Y3 = CAT(T, sub)(X1, X3); \
-    Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, ww1, n, ninv); \
-    x0 = CAT(T, add)(Y0, Y1); \
-    x1 = CAT(T, sub)(Y0, Y1); \
-    x2 = CAT(T, sub)(Y2, Y3); \
-    x3 = CAT(T, add)(Y2, Y3); \
-}
+#define LENGTH4INVTR_ZERO_J(T, ...) SD_DIT_LENGTH4_ZERO_J(T, nmulmod_fast, __VA_ARGS__)
 
-#define LENGTH8INVTR_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w0, ww0, ww1, www0, www1, www2, www3) \
-{ \
-    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
-    LENGTH4INVTR_ANY_J(T, A0,A2,A4,A6, n,ninv, w0,ww0,ww1) \
-    LENGTH4INVTR_ANY_J(T, A1,A3,A5,A7, n,ninv, w0,ww0,ww1) \
-    LENGTH2INVTR_ANY_J(T, A0,A1, n,ninv, www0) \
-    LENGTH2INVTR_ANY_J(T, A2,A3, n,ninv, www1) \
-    LENGTH2INVTR_ANY_J(T, A4,A5, n,ninv, www2) \
-    LENGTH2INVTR_ANY_J(T, A6,A7, n,ninv, www3) \
-    x0 = A0; \
-    x1 = A1; \
-    x2 = A2; \
-    x3 = A3; \
-    x4 = A4; \
-    x5 = A5; \
-    x6 = A6; \
-    x7 = A7; \
-}
+#define LENGTH8INVTR_ANY_J(T, ...) SD_DIT_LENGTH8_ANY_J(T, nmulmod_fast, __VA_ARGS__)
 
 #define LENGTH8INVTR_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, ww1, www2, www3) \
 { \

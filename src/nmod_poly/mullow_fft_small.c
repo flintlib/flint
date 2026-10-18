@@ -451,7 +451,34 @@ void
 _nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
     nn_srcptr s, l;
-    slong sn, ln, m;
+    slong sn, ln, m, t;
+
+    /* drop the coefficients that no output coefficient uses, as
+       _nmod_poly_mulmid does: the high ones, and the low ones of each
+       operand that only meet the other below znlo */
+    an = FLINT_MIN(an, zn);
+    bn = FLINT_MIN(bn, zn);
+
+    t = znlo - (bn - 1);
+    if (t > 0)
+    {
+        a += t;
+        an -= t;
+        znlo -= t;
+        zn -= t;
+    }
+
+    t = znlo - (an - 1);
+    if (t > 0)
+    {
+        b += t;
+        bn -= t;
+        znlo -= t;
+        zn -= t;
+    }
+
+    FLINT_ASSERT(an > 0 && bn > 0);
+    FLINT_ASSERT(znlo < zn && zn <= an + bn - 1);
 
     if (_nmod_poly_mulmid_fft_small_repack(z, a, an, b, bn, znlo, zn, mod))
         return;

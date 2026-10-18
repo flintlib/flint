@@ -10,6 +10,7 @@
 */
 
 #include "fft_small.h"
+#include "butterflies.h"
 
 /*
     This module contains the function `sd_fft_trunc_tr`, the transpose of the
@@ -61,9 +62,10 @@
       i.e. the shape used by `sd_ifft.c`, but with the *forward* twiddle `w`
       instead of `w^-1`. All the twiddle lookups here are therefore identical
       to the ones in `sd_fft.c` (`SET_J_BITS_AND_J_R`, never
-      `SET_J_BITS_AND_J_MR`), while the placement of the reductions follows
-      `sd_ifft.c`, whose butterflies have the same shape and hence the same
-      bounds;
+      `SET_J_BITS_AND_J_MR`). The butterflies themselves are those of
+      `sd_ifft.c` (see butterflies.h): with `W = -w` in place of
+      `W = -w^-1`, which they get by multiplying with `nmulmod_fast` and
+      `nmulmod`, so that they also have the same bounds;
 
     - in every sequence of steps, the order is reversed. In the recursion this
       means the row transforms are done before the column transforms, and in
@@ -100,10 +102,6 @@
     `(-3n/2, 3n/2)`.
 */
 
-/* TODO given the above-mentioned proximity with computations done in sd_ifft,
- * several macros below could be replaced by macros already in sd_ifft_trunc.c
- * -> this should be refactored */
-
 #define N 8
 #define VECND vec8d
 #define VECNOP(op) TEMPLATE(VECND, op)
@@ -115,6 +113,7 @@
     is
         b0 =   (a0 + a1)
         b1 = w*(a0 - a1)
+    the DIF butterfly of sd_ifft.c with W = -w, see butterflies.h.
 */
 
 #define RADIX_2_TRANSPOSED_PARAM_J_IS_Z(V, Q) \
@@ -122,17 +121,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_TRANSPOSED_MOTH_J_IS_Z(V, X0, X1) \
-{ \
-    V x0, x1, y0, y1; \
-    x0 = CAT(V, load)(X0); \
-    x1 = CAT(V, load)(X1); \
-    y0 = CAT(V, add)(x0, x1); \
-    y1 = CAT(V, sub)(x0, x1); \
-    y0 = CAT(V, reduce_to_pm1n)(y0, n, ninv); \
-    y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
-    CAT(V, store)(X0, y0); \
-    CAT(V, store)(X1, y1); \
-}
+    SD_DIF2_MOTH_J_IS_Z(V, X0, X1)
 
 #define RADIX_2_TRANSPOSED_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
     V w = CAT(V, set_d)(Q->w2tab[j_bits][j_r]); \
@@ -140,17 +129,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_TRANSPOSED_MOTH_J_IS_NZ(V, X0, X1) \
-{ \
-    V x0, x1, y0, y1; \
-    x0 = CAT(V, load)(X0); \
-    x1 = CAT(V, load)(X1); \
-    y0 = CAT(V, add)(x0, x1); \
-    y1 = CAT(V, sub)(x0, x1); \
-    y0 = CAT(V, reduce_to_pm1n)(y0, n, ninv); \
-    y1 = CAT(V, mulmod_fast)(y1, w, n, ninv); \
-    CAT(V, store)(X0, y0); \
-    CAT(V, store)(X1, y1); \
-}
+    SD_DIF2_MOTH_J_IS_NZ(V, nmulmod_fast, w, X0, X1)
 
 /*********** transposed forward butterfly with truncation *********************
     The transpose of the (itrunc, otrunc) = (2, 1) butterfly
@@ -185,6 +164,7 @@
         b1 =       w*(a0 - a1) +      i*w*(a2 - a3)
         b2 = w^2*(   (a0 + a1) -          (a2 + a3))
         b3 = w^2*( w*(a0 - a1) -      i*w*(a2 - a3))
+    the radix-4 butterfly of sd_ifft.c with (W2, W, IW) = (-w^2, -w, -i*w).
 */
 
 #define RADIX_4_TRANSPOSED_PARAM_J_IS_Z(V, Q) \
@@ -193,25 +173,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_TRANSPOSED_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    y0 = CAT(V, add)(x0, x1); \
-    y1 = CAT(V, add)(x2, x3); \
-    y2 = CAT(V, sub)(x0, x1); \
-    y3 = CAT(V, sub)(x2, x3); \
-    y0 = CAT(V, reduce_to_pm1n)(y0, n, ninv); \
-    y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
-    y2 = CAT(V, reduce_to_pm1n)(y2, n, ninv); \
-    y3 = CAT(V, mulmod_fast)(y3, iw, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(y0, y1)); \
-    CAT(V, store)(X1, CAT(V, add)(y2, y3)); \
-    CAT(V, store)(X2, CAT(V, sub)(y0, y1)); \
-    CAT(V, store)(X3, CAT(V, sub)(y2, y3)); \
-}
+    SD_DIF4_MOTH_J_IS_Z(V, nmulmod_fast, iw, X0, X1, X2, X3)
 
 #define RADIX_4_TRANSPOSED_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
     FLINT_ASSERT(j_bits > 0); \
@@ -222,133 +184,35 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_TRANSPOSED_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    y0 = CAT(V, add)(x0, x1); \
-    y1 = CAT(V, add)(x2, x3); \
-    y2 = CAT(V, sub)(x0, x1); \
-    y3 = CAT(V, sub)(x2, x3); \
-    y2 = CAT(V, mulmod_fast)(y2, w, n, ninv); \
-    y3 = CAT(V, mulmod_fast)(y3, iw, n, ninv); \
-    x1 = CAT(V, add)(y2, y3); \
-    CAT(V, store)(X1, x1); \
-    x0 = CAT(V, add)(y0, y1); \
-    x2 = CAT(V, sub)(y0, y1); \
-    x3 = CAT(V, sub)(y2, y3); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    /* |x2| < 8n: may exceed the mulmod_fast range */ \
-    x2 = CAT(V, mulmod)(x2, w2, n, ninv); \
-    x3 = CAT(V, mulmod_fast)(x3, w2, n, ninv); \
-    CAT(V, store)(X0, x0); \
-    CAT(V, store)(X2, x2); \
-    CAT(V, store)(X3, x3); \
-}
+    SD_DIF4_MOTH_J_IS_NZ(V, nmulmod_fast, nmulmod, w2, w, iw, X0, X1, X2, X3)
 
 #define _RADIX_4_TRANSPOSED_PARAM_J_IS_Z(...)  RADIX_4_TRANSPOSED_PARAM_J_IS_Z(__VA_ARGS__)
 #define _RADIX_4_TRANSPOSED_MOTH_J_IS_Z(...)   RADIX_4_TRANSPOSED_MOTH_J_IS_Z(__VA_ARGS__)
 #define _RADIX_4_TRANSPOSED_PARAM_J_IS_NZ(...) RADIX_4_TRANSPOSED_PARAM_J_IS_NZ(__VA_ARGS__)
 #define _RADIX_4_TRANSPOSED_MOTH_J_IS_NZ(...)  RADIX_4_TRANSPOSED_MOTH_J_IS_NZ(__VA_ARGS__)
 
+/* transposes of the register basecases of sd_fft.c: those of sd_ifft.c with
+   negated twiddles, see butterflies.h */
+
 /* transpose of a 1-layer transform */
 
-#define LENGTH2TR_ANY_J(T, x0, x1, n, ninv, w0) \
-{ \
-    T Z0 = x0, Z1 = x1; \
-    x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
-    x1 = CAT(T, mulmod_fast)(CAT(T, sub)(Z0, Z1), w0, n, ninv); \
-}
+#define LENGTH2TR_ANY_J(T, ...) SD_DIF_LENGTH2_ANY_J(T, nmulmod_fast, __VA_ARGS__)
 
-#define LENGTH2TR_ZERO_J(T, x0, x1, n, ninv) \
-{ \
-    T Z0 = x0, Z1 = x1; \
-    x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
-    x1 = CAT(T, reduce_to_pm1n)(CAT(T, sub)(Z0, Z1), n, ninv); \
-}
+#define LENGTH2TR_ZERO_J(T, ...) SD_DIF_LENGTH2_ZERO_J(T, __VA_ARGS__)
 
 /* transpose of a 2-layer transform */
 
-#define LENGTH4TR_ANY_J(T, x0, x1, x2, x3, n, ninv, w2, w, iw) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3; \
-    Y0 = CAT(T, add)(X0, X1); \
-    Y1 = CAT(T, add)(X2, X3); \
-    Y2 = CAT(T, sub)(X0, X1); \
-    Y3 = CAT(T, sub)(X2, X3); \
-    Y2 = CAT(T, mulmod_fast)(Y2, w, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, iw, n, ninv); \
-    Z0 = CAT(T, add)(Y0, Y1); \
-    Z1 = CAT(T, add)(Y2, Y3); \
-    Z2 = CAT(T, sub)(Y0, Y1); \
-    Z3 = CAT(T, sub)(Y2, Y3); \
-    x0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
-    x1 = Z1; \
-    /* |Z2| < 8n: may exceed the mulmod_fast range */ \
-    x2 = CAT(T, mulmod)(Z2, w2, n, ninv); \
-    x3 = CAT(T, mulmod_fast)(Z3, w2, n, ninv); \
-}
+#define LENGTH4TR_ANY_J(T, ...) SD_DIF_LENGTH4_ANY_J(T, nmulmod_fast, nmulmod, __VA_ARGS__)
 
-#define LENGTH4TR_ZERO_J(T, x0, x1, x2, x3, n, ninv, e14) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    Y0 = CAT(T, add)(X0, X1); \
-    Y1 = CAT(T, add)(X2, X3); \
-    Y2 = CAT(T, sub)(X0, X1); \
-    Y3 = CAT(T, sub)(X2, X3); \
-    Y0 = CAT(T, reduce_to_pm1n)(Y0, n, ninv); \
-    Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
-    Y2 = CAT(T, reduce_to_pm1n)(Y2, n, ninv); \
-    Y3 = CAT(T, mulmod_fast)(Y3, e14, n, ninv); \
-    x0 = CAT(T, add)(Y0, Y1); \
-    x1 = CAT(T, add)(Y2, Y3); \
-    x2 = CAT(T, sub)(Y0, Y1); \
-    x3 = CAT(T, sub)(Y2, Y3); \
-}
+#define LENGTH4TR_ZERO_J(T, ...) SD_DIF_LENGTH4_ZERO_J(T, nmulmod_fast, __VA_ARGS__)
 
 /* transpose of a 3-layer transform: the last layer of the forward transform
    comes first, so this is four length 2 transposes followed by two length 4
    transposes. */
 
-#define LENGTH8TR_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w2, w, iw, ww0, ww1, ww2, ww3) \
-{ \
-    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
-    LENGTH2TR_ANY_J(T, A0,A1, n,ninv, ww0) \
-    LENGTH2TR_ANY_J(T, A2,A3, n,ninv, ww1) \
-    LENGTH2TR_ANY_J(T, A4,A5, n,ninv, ww2) \
-    LENGTH2TR_ANY_J(T, A6,A7, n,ninv, ww3) \
-    LENGTH4TR_ANY_J(T, A0,A2,A4,A6, n,ninv, w2, w, iw) \
-    LENGTH4TR_ANY_J(T, A1,A3,A5,A7, n,ninv, w2, w, iw) \
-    x0 = A0; \
-    x1 = A1; \
-    x2 = A2; \
-    x3 = A3; \
-    x4 = A4; \
-    x5 = A5; \
-    x6 = A6; \
-    x7 = A7; \
-}
+#define LENGTH8TR_ANY_J(T, ...) SD_DIF_LENGTH8_ANY_J(T, nmulmod_fast, nmulmod, __VA_ARGS__)
 
-#define LENGTH8TR_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, e14, e18, e38) \
-{ \
-    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
-    LENGTH2TR_ZERO_J(T, A0,A1, n,ninv) \
-    LENGTH2TR_ANY_J(T, A2,A3, n,ninv, e14) \
-    LENGTH2TR_ANY_J(T, A4,A5, n,ninv, e18) \
-    LENGTH2TR_ANY_J(T, A6,A7, n,ninv, e38) \
-    LENGTH4TR_ZERO_J(T, A0,A2,A4,A6, n,ninv, e14) \
-    LENGTH4TR_ZERO_J(T, A1,A3,A5,A7, n,ninv, e14) \
-    x0 = A0; \
-    x1 = A1; \
-    x2 = A2; \
-    x3 = A3; \
-    x4 = A4; \
-    x5 = A5; \
-    x6 = A6; \
-    x7 = A7; \
-}
+#define LENGTH8TR_ZERO_J(T, ...) SD_DIF_LENGTH8_ZERO_J(T, nmulmod_fast, __VA_ARGS__)
 
 /************ transposed basecase transform of size 2^m ***********************/
 /* template<int m, bool j_is_zero> sd_fft_tr_basecase(Q, X, j_r, j_bits)

@@ -1035,14 +1035,20 @@ typedef struct
                                    b/bn/baux/btrunc are ignored */
     ulong bfft_stride;
     int squaring;
-    int transposed;             /* if set, compute the transpose, with
+    int transposed;             /* if 1, compute the transpose, with
                                    respect to a, of the multiplication by
                                    b: a is converted at full length ztrunc
                                    and sent through sd_ifft_trunc_tr, the
                                    pointwise product is unchanged, and
                                    sd_fft_trunc_tr with output truncation
                                    atrunc replaces sd_ifft_trunc. See
-                                   _nmod_poly_mul_tr_mpn_ctx */
+                                   _nmod_poly_mul_tr_mpn_ctx.
+                                   If 2, the same with a precomputed:
+                                   bfft holds the images of a through
+                                   sd_ifft_trunc_tr (a/an/aaux are
+                                   ignored) and b is converted and
+                                   transformed in the working buffer.
+                                   See _nmod_poly_mul_tr_precomp */
     ulong tune_n;               /* size fed to the tuning predicates */
     ulong min_an_bn;            /* bound on the number of products
                                    accumulating on one output coefficient */
@@ -1107,12 +1113,20 @@ typedef struct mul_precomp_struct {
     fft_small_op_struct bfft[1];
     ulong bn;
     ulong btrunc;
+    int transposed;     /* made by _mul_precomp_init_tr */
 } mul_precomp_struct;
 
 int _mul_precomp_init(
     mul_precomp_struct* M,
     const ulong * b, ulong bn, ulong btrunc,
     ulong depth, ulong len_bound, ulong direct_len,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+int _mul_precomp_init_tr(
+    mul_precomp_struct* M,
+    const ulong * v, ulong vn,
+    ulong len_bound, ulong direct_len,
     nmod_t mod,
     mpn_ctx_t R);
 
@@ -1125,6 +1139,13 @@ FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 int _nmod_poly_mul_mid_precomp(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
+    const mul_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+int _nmod_poly_mul_tr_precomp(
+    ulong* z, ulong zn,
+    const ulong* r, ulong rn,
     const mul_precomp_struct* M,
     nmod_t mod,
     mpn_ctx_t R);

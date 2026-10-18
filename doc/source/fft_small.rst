@@ -82,7 +82,7 @@ Polynomial arithmetic
     Writes to ``z`` the middle product containing coefficients in the
     range `[zl, zh)` of the product of the polynomials  ``(a, an)`` and ``(b, bn)``,
     respectively using a given context object ``R`` or the default thread-local object.
-    Assumes that `an \ge bn \ge 1`. Coefficients of index at least
+    Assumes that `an, bn \ge 1`. Coefficients of index at least
     `an + bn - 1` are set to zero.
 
     This uses a cyclic convolution with wraparound. The product `c = ab` of
@@ -102,9 +102,9 @@ Polynomial arithmetic
     `j - L` in `[0, \ell - L)`, which are below the window and not output.
     Since `\ell < 2 \max(an, bn) \le 2L`, there is at most one such power of 2.
     The cost therefore depends on where the window lies and not only on its
-    length. For instance the middle product `[bn - 1, an)` wraps around
-    whenever there is a power of 2 in `[\mathtt{atrunc}, \ell]`: for `an = 319`
-    and `bn = 256` it uses `L = 512` instead of 1024.
+    length. For instance, for `an \ge bn`, the middle product `[bn - 1, an)`
+    wraps around whenever there is a power of 2 in `[\mathtt{atrunc}, \ell]`:
+    for `an = 319` and `bn = 256` it uses `L = 512` instead of 1024.
 
 .. function:: void _nmod_poly_mul_tr_mpn_ctx(ulong * z, ulong zn, const ulong * a, ulong an, const ulong * v, ulong vn, nmod_t mod, mpn_ctx_t R)
               void _nmod_poly_mul_tr_default_mpn_ctx(nn_ptr z, slong zn, nn_srcptr a, slong an, nn_srcptr v, slong vn, nmod_t mod)

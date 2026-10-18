@@ -63,10 +63,10 @@ typedef struct
     nn_ptr ext_s1f;         /* extrapolate: forward scaling constant  */
     nn_ptr ext_s1b;         /* extrapolate: backward scaling constant */
     nn_ptr ext_s2, ext_s3;  /* extrapolate: shared scaling constants */
-    struct mul_precomp_struct * ev_f_fft;    /* stored FFT of ev_f, or NULL */
-    struct mul_precomp_struct * int_f_fft;   /* stored FFT of int_f, or NULL */
-    struct mul_precomp_struct * ext_ff_fft;  /* stored FFT of ext_ff, or NULL */
-    struct mul_precomp_struct * ext_fb_fft;  /* stored FFT of ext_fb, or NULL */
+    struct mul_precomp_struct * ev_f_fft;    /* stored ifft_tr of ev_f, or NULL */
+    struct mul_precomp_struct * int_f_fft;   /* stored fft of int_f, or NULL */
+    struct mul_precomp_struct * ext_ff_fft;  /* stored ifft_tr of ext_ff, or NULL */
+    struct mul_precomp_struct * ext_fb_fft;  /* stored ifft_tr of ext_fb, or NULL */
     nmod_t mod;             /* modulus */
     slong len;              /* number of points */
     ulong function;         /* choice of precomputations */

@@ -92,6 +92,7 @@
 #include "t-mullow_KS.c"
 #include "t-mulmid.c"
 #include "t-mulmid_classical.c"
+#include "t-mulmid_fft_small.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmod.c"
 #include "t-mulmod_precond.c"
@@ -227,6 +228,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mullow_KS),
     TEST_FUNCTION(nmod_poly_mulmid),
     TEST_FUNCTION(nmod_poly_mulmid_classical),
+    TEST_FUNCTION(nmod_poly_mulmid_fft_small),
     TEST_FUNCTION(nmod_poly_mulmid_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
     TEST_FUNCTION(nmod_poly_mulmod_precond),
