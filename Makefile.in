@@ -793,10 +793,12 @@ checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 #
 # DOCFLAGS is passed to the HTML build, e.g. DOCFLAGS=--redirects to also
 # write pages that redirect the URLs of the old (Sphinx) documentation.
+# DOC_PYTHON selects the Python interpreter (not PYTHON, which selects the
+# Python tests in make check).
 
-PYTHON ?= python3
+DOC_PYTHON ?= python3
 DOC_OUT := $(abspath $(BUILD_DIR))/doc
-FDOC := cd $(ABS_FLINT_DIR)/doc && $(PYTHON) -m fdoc --flint $(ABS_FLINT_DIR)
+FDOC := cd $(ABS_FLINT_DIR)/doc && $(DOC_PYTHON) -m fdoc --flint $(ABS_FLINT_DIR)
 
 doc: dochtml
 

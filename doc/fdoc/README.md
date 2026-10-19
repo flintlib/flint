@@ -35,12 +35,19 @@ python3 -m fdoc examples --only fmpz_poly,algorithms/polynomials -v
 ```
 
 Global options: `--strict` (warnings make the command fail), `-q` (no
-progress output; also `FDOC_QUIET=1`), `--flint DIR` (the FLINT source
-tree, default the parent of `doc/`), `--src DIR` (the documentation
-sources). `examples` takes `-j N` (parallel jobs, default the number of
-CPUs), `--cc`, `--cflags` and `--libs` (default: the in-tree headers and
-library). Progress is shown on standard error, as a counter on a terminal
-and as one line per stage otherwise.
+progress output; also `FDOC_QUIET=1`), `-j N` (parallel jobs, default the
+number of CPUs), `--flint DIR` (the FLINT source tree, default the parent
+of `doc/`), `--src DIR` (the documentation sources). `examples` takes
+`--cc`, `--cflags` and `--libs` (default: the in-tree headers and library)
+and `-v` (also list the examples that pass). Progress is shown on standard
+error, as a counter on a terminal and as one line per stage otherwise.
+
+Parsing the sources, scanning FLINT's C sources and headers, rendering and
+writing the pages, and compiling and running the examples are done in
+parallel (in forked processes; serially where fork is not available). The
+output does not depend on the number of jobs. `./configure` is not needed:
+when the headers it generates are missing, `fdoc` uses stand-ins made from
+the `.in` templates, for a 64-bit x86-64 build with `fft_small`.
 
 The HTML pages carry a "Cite this page" box with a citation and a BibTeX
 entry. They give the URL under https://flintlib.org/doc/ (the `baseurl`

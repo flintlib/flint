@@ -36,10 +36,10 @@ class Progress:
 
     def _show(self):
         if self.total:
-            text = "%-24s %*d/%d  %3d%%" % (self.label, len(str(self.total)), self.count, self.total,
+            text = "%-30s %*d/%d  %3d%%" % (self.label, len(str(self.total)), self.count, self.total,
                                           100 * self.count // max(self.total, 1))
         else:
-            text = "%-24s ..." % self.label
+            text = "%-30s ..." % self.label
         sys.stderr.write("\r\x1b[K" + text)
         sys.stderr.flush()
 
@@ -48,7 +48,7 @@ class Progress:
             return
         dt = time.time() - self.t0
         what = ("%d " % self.count if self.total else "")
-        line = "%-24s %sdone in %.1f s%s" % (self.label, what, dt, (" (%s)" % note) if note else "")
+        line = "%-30s %sdone in %.1f s%s" % (self.label, what, dt, (" (%s)" % note) if note else "")
         if self.tty:
             sys.stderr.write("\r\x1b[K" + line + "\n")
         else:

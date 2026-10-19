@@ -139,10 +139,20 @@ class Site:
             for fn in sorted(filenames):
                 if fn.endswith(".md") and not (dirpath == self.srcroot and fn.startswith("references")):
                     paths.append(os.path.join(dirpath, fn))
+        from .parallel import pmap
         pr = Progress("reading sources", len(paths))
-        for path in paths:
-            self._load_page(path)
-            pr.step()
+        parsed = pmap(_parse_file, paths, pr)
+        pr.done()
+        self._scan_queue = []
+        for path, res in zip(paths, parsed):
+            self._load_page(path, res)
+        # scan the C sources of the documented modules (in parallel), then
+        # merge the results in the order of the pages
+        mods = list(dict.fromkeys(self._scan_queue))
+        pr = Progress("scanning C sources", len(mods))
+        data = pmap(_collect_module, mods, pr, state=self.sources)
+        for mod, d in zip(mods, data):
+            self.sources.merge(mod, d)
         pr.done()
         pr = Progress("cross-referencing")
         self._assign_blocks()
@@ -193,16 +203,15 @@ class Site:
         self.pages[page.id] = page
         self.order.append(page)
 
-    def _load_page(self, path):
+    def _load_page(self, path, parsed=None):
         rel = os.path.relpath(path, self.srcroot)[:-3].replace(os.sep, "/")
-        with open(path, encoding="utf-8") as f:
-            text = f.read()
-        try:
-            meta, body, off = split_front_matter(text)
-            blocks = BlockParser(path).parse(body, off)
-        except MarkupError as e:
-            self.warn(e.msg, e.path or path, e.line)
+        if parsed is None:
+            parsed = _parse_file(path)
+        if parsed[0] == "error":
+            _, msg, epath, line = parsed
+            self.warn(msg, epath or path, line)
             return
+        _, meta, blocks = parsed
         parts = rel.split("/")
         title = meta.get("title")
         if title is None and blocks and blocks[0].kind == "heading" and blocks[0]["level"] == 1:
@@ -246,9 +255,9 @@ class Site:
             if meta.get("preprocess"):
                 self.sources.preprocess_flags[meta.get("source", module)] = (
                     meta["preprocess"] if isinstance(meta["preprocess"], list) else [meta["preprocess"]])
-            self.sources.scan_module(meta.get("source", module))
+            self._scan_queue.append(meta.get("source", module))
             for extra in meta_list(meta.get("extra-headers")):
-                self.sources.scan_module(extra)
+                self._scan_queue.append(extra)
             self._extract_blocks(page)
         self._add_page(page)
 
@@ -607,8 +616,26 @@ class Site:
                                   % (p.name, decl[0], decl[1], p.text, decl[2].text), b.path, b.line)
             hdr = "src/%s.h" % page.meta.get("source", mod)
             missing = sorted(n for n, d in self.sources.declarations.items()
-                             if d[0] == hdr and n not in documented and not n.startswith("_"))
+                             if d[0] in (hdr, hdr + ".in") and n not in documented and not n.startswith("_"))
             self.undocumented[mod] = missing
+
+
+def _parse_file(path):
+    """Read and parse one source file: ("ok", meta, blocks), or
+    ("error", message, path, line). Runs in a worker process."""
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    try:
+        meta, body, off = split_front_matter(text)
+        return ("ok", meta, BlockParser(path).parse(body, off))
+    except MarkupError as e:
+        return ("error", e.msg, e.path, e.line)
+
+
+def _collect_module(module):
+    """SourceIndex.collect in a worker process."""
+    from .parallel import state
+    return state().collect(module)
 
 
 def slugify(s):

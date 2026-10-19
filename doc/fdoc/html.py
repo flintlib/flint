@@ -73,6 +73,14 @@ class Katex:
             tex = new
         return tex
 
+    def register(self, key, where=""):
+        """The index of a formula given by its key (as made by placeholder)."""
+        if key not in self.items:
+            self.items[key] = len(self.items)
+            if where:
+                self.where.setdefault(key, where)
+        return self.items[key]
+
     def placeholder(self, tex, display, where=""):
         tex = self.expand(tex)
         key = ("D" if display else "I") + tex
@@ -484,29 +492,29 @@ class HtmlBuilder:
                 if fn.endswith(".html"):
                     os.remove(os.path.join(dirpath, fn))
         from .progress import Progress
+        from .parallel import pmap
+        ids = [page.id for page in self.site.order]
+        # render the pages in parallel; each worker numbers the formulas of
+        # its pages itself, and the numbers are made global here
+        pr = Progress("rendering pages", len(ids))
+        results = pmap(_render_page_worker, ids, pr, state=self)
         rendered = {}
-        pr = Progress("rendering pages", len(self.site.order))
-        for page in self.site.order:
-            r = HtmlRenderer(self.site, page, self.katex)
-            rendered[page.id] = self.render_page(page, r)
-            pr.step()
+        for pid, (text, keys) in zip(ids, results):
+            index = [self.katex.register(k, w) for k, w in keys]
+            rendered[pid] = re.sub("\x00K(\\d+)\x00", lambda m: "\x00K%d\x00" % index[int(m.group(1))], text)
         pr.done()
         pr = Progress("typesetting math")
         self.katex.render_all()
         pr.done("KaTeX with Node.js" if self.katex.prerendered else "in the browser: Node.js not found")
+        self._rendered = rendered
+        pr = Progress("writing pages", len(ids))
+        written = pmap(_write_page_worker, ids, pr, state=self)
+        self._rendered = None
         bundles = {}
-        pr = Progress("writing pages", len(rendered))
-        for pid, text in rendered.items():
-            pr.step()
-            page = self.site.pages[pid]
-            if "#" in page.url:
-                bundles.setdefault(page.url.split("#")[0].rsplit("/", 1)[0], []).append(
-                    (page, self.katex_js(self.katex.substitute(text))))
-                continue
-            path = os.path.join(self.outdir, page.url)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(self.katex_js(self.katex.substitute(text)))
+        for pid, text in zip(ids, written):
+            if text is not None:
+                page = self.site.pages[pid]
+                bundles.setdefault(page.url.split("#")[0].rsplit("/", 1)[0], []).append((page, text))
         for module, pages in bundles.items():
             self.write_bundle(module, pages)
         self.copystatic()
@@ -937,6 +945,48 @@ def bibtex_title(s):
         else:
             out.append(ch)
     return "{" + "".join(out) + "}"
+
+
+class _MathCollector:
+    """Stands in for Katex while a page is rendered in a worker process:
+    records the formulas in the order of their placeholders."""
+
+    def __init__(self, katex):
+        self.katex = katex
+        self.items = {}
+        self.keys = []
+
+    def placeholder(self, tex, display, where=""):
+        tex = self.katex.expand(tex)
+        key = ("D" if display else "I") + tex
+        if key not in self.items:
+            self.items[key] = len(self.keys)
+            self.keys.append((key, where))
+        return "\x00K%d\x00" % self.items[key]
+
+
+def _render_page_worker(pid):
+    from .parallel import state
+    builder = state()
+    page = builder.site.pages[pid]
+    math = _MathCollector(builder.katex)
+    text = builder.render_page(page, HtmlRenderer(builder.site, page, math))
+    return text, math.keys
+
+
+def _write_page_worker(pid):
+    """Write one page; for a bundled page, return its text instead."""
+    from .parallel import state
+    builder = state()
+    page = builder.site.pages[pid]
+    text = builder.katex_js(builder.katex.substitute(builder._rendered[pid]))
+    if "#" in page.url:
+        return text
+    path = os.path.join(builder.outdir, page.url)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    return None
 
 
 def first_sentence(s):

@@ -169,14 +169,17 @@ def cmd_examples(args):
         if res.returncode != 0:
             return "fail", name, where, "exit status %d" % res.returncode
         want = ex.get("output")
-        if want is not None and got != want.rstrip():
+        if want is None:
+            return "ran", name, where, "no expected output"
+        if got != want.rstrip():
             return "fail", name, where, "output\n--- expected\n%s\n--- got\n%s" % (want.rstrip(), got)
         return "ok", name, where, ""
 
     from concurrent.futures import ThreadPoolExecutor
     from .progress import Progress
-    njobs = args.jobs or os.cpu_count() or 1
-    pr = Progress("compiling examples", len(jobs))
+    from .parallel import jobs as _jobs
+    njobs = _jobs()
+    pr = Progress("compiling and running examples", len(jobs))
     results = []
     with ThreadPoolExecutor(max_workers=njobs) as pool:
         for r in pool.map(run, jobs):
@@ -190,7 +193,11 @@ def cmd_examples(args):
             print("FAIL %s (%s): %s" % (name, where, msg))
         elif args.verbose:
             print("%-4s %-28s %s%s" % (status, name, where, " (%s)" % msg if msg else ""))
-    print("%d examples, %d failures, %d skipped" % (len(results), failures, skipped))
+    ok = sum(1 for r in results if r[0] == "ok")
+    ran = sum(1 for r in results if r[0] == "ran")
+    print("%d examples: %d compiled, ran and printed the expected output, %d compiled and ran "
+          "(no expected output given), %d failed, %d skipped"
+          % (len(results), ok, ran, failures, skipped))
     return 1 if failures else 0
 
 
@@ -222,6 +229,8 @@ def main(argv=None):
     ap.add_argument("--flint", default=os.path.dirname(os.path.dirname(HERE)))
     ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
     ap.add_argument("-q", "--quiet", action="store_true", help="no progress output")
+    ap.add_argument("-j", "--jobs", type=int, default=0,
+                    help="parallel jobs (default: the number of CPUs)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("build")
     p.add_argument("--out", default="build/html")
@@ -240,7 +249,6 @@ def main(argv=None):
     p.add_argument("--libs", default=None,
                    help="default: the in-tree libflint of --flint")
     p.add_argument("--timeout", type=float, default=20)
-    p.add_argument("-j", "--jobs", type=int, default=0, help="parallel jobs (default: number of CPUs)")
     p.add_argument("-v", "--verbose", action="store_true", help="also list the examples that pass")
     p.add_argument("--only", help="comma-separated paths under src/ (e.g. fmpz_poly,algorithms/polynomials)")
     p = sub.add_parser("check")
@@ -249,6 +257,8 @@ def main(argv=None):
     if args.quiet:
         from . import progress
         progress.QUIET = True
+    from . import parallel
+    parallel.JOBS = args.jobs
     return {"build": cmd_build, "latex": cmd_latex, "examples": cmd_examples,
             "check": cmd_check}[args.cmd](args)
 
