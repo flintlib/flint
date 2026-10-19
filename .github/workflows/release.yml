@@ -226,9 +226,11 @@ jobs:
         name: "Build PDF documentation"
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra lmodern
+          sudo apt-get install -y libgmp-dev libmpfr-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra lmodern
           tar -xf flint-${FLINT_VERSION}.tar.gz
-          cd flint-${FLINT_VERSION}/doc/
+          cd flint-${FLINT_VERSION}
+          ./configure --disable-debug
+          cd doc
           python3 -m fdoc latex --pdf --out build/latex
 
       - if: env.TAG_NAME != 'nightly'

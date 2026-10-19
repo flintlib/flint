@@ -20,10 +20,18 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+# headers that ./configure generates and that the header checks need
+CONFIGURED_HEADERS = ("flint.h", "flint-config.h", "flint-mparam.h", "gmpcompat.h")
+
+
 def load_site(args):
     from .model import Site
     src = os.path.abspath(args.src)
     flint = os.path.abspath(args.flint)
+    missing = [h for h in CONFIGURED_HEADERS if not os.path.exists(os.path.join(flint, "src", h))]
+    if missing:
+        sys.exit("fdoc: %s not found in %s: run ./configure first"
+                 % (", ".join(missing), os.path.join(flint, "src")))
     try:
         with open(os.path.join(flint, "VERSION")) as f:
             version = f.read().strip()

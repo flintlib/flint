@@ -230,68 +230,6 @@ class SourceIndex:
                 self.declarations[name] = (rel, 0, proto)
                 self.generated.add(name)
 
-    # configuration assumed when the tree has not been configured (a 64-bit
-    # x86-64 build with fft_small), so that the documentation does not
-    # depend on ./configure
-    FALLBACK_CONFIG = {
-        "FLINT_BITS": "64", "FLINT_HAVE_FFT_SMALL": "1", "FLINT_KNOW_STRONG_ORDER": "1",
-        "FLINT_USES_PTHREAD": "1", "FLINT_USES_TLS": "1", "FLINT_WANT_ASSEMBLY": "1",
-        "FLINT_HAVE_ASSEMBLY_x86_64_adx": "1", "FLINT_WANT_GMP_INTERNALS": "1",
-    }
-    FALLBACK_CONFIG.update({"FLINT_HAVE_NATIVE_mpn_" + f: "1" for f in (
-        "add_n_sub_n", "add_nc", "addlsh1_n", "addmul_2", "modexact_1_odd", "divexact",
-        "mod_34lsub1", "mulmid_n", "rsh1add_n", "rsh1sub_n", "sub_nc")})
-
-    def fallback_include_dir(self):
-        """A directory with stand-ins for the headers that ./configure
-        generates (flint.h, flint-config.h, flint-mparam.h, gmpcompat*.h),
-        for the ones that are missing from the source tree; None if the tree
-        is configured."""
-        if getattr(self, "_fallback_dir", False) is not False:
-            return self._fallback_dir
-        import tempfile
-        missing = [h for h in ("flint.h", "flint-config.h", "flint-mparam.h", "gmpcompat.h",
-                               "gmpcompat-longlong.h")
-                   if not os.path.exists(os.path.join(self.srcdir, h))]
-        self._fallback_dir = None
-        if not missing:
-            return None
-        d = tempfile.mkdtemp(prefix="fdoc-config-")
-        root = os.path.dirname(self.srcdir)
-        try:
-            with open(os.path.join(root, "VERSION")) as f:
-                version = f.read().strip()
-        except OSError:
-            version = "0.0.0"
-        nums = (re.findall(r"\d+", version) + ["0", "0", "0"])[:3]
-        subst = {"FLINT_MAJOR": nums[0], "FLINT_MINOR": nums[1], "FLINT_PATCH": nums[2],
-                 "FLINT_VERSION_FULL": version}
-        for h in missing:
-            out = os.path.join(d, h)
-            if h == "flint-mparam.h":
-                src = os.path.join(self.srcdir, "mpn_extras", "generic", "flint-mparam.h")
-                with open(src) as f:
-                    text = f.read()
-            else:
-                try:
-                    with open(os.path.join(self.srcdir, h + ".in")) as f:
-                        text = f.read()
-                except OSError:
-                    continue
-                text = re.sub(r"@(\w+)@", lambda m: subst.get(m.group(1), ""), text)
-                if h == "flint-config.h":
-                    text = re.sub(r"^#undef (\w+)\s*$",
-                                  lambda m: ("#define %s %s" % (m.group(1), self.FALLBACK_CONFIG[m.group(1)])
-                                             if m.group(1) in self.FALLBACK_CONFIG else m.group(0)),
-                                  text, flags=re.M)
-            with open(out, "w") as f:
-                f.write(text)
-        import atexit
-        import shutil
-        atexit.register(shutil.rmtree, d, True)
-        self._fallback_dir = d
-        return d
-
     def collect_preprocessed(self, module, flag_sets=None):
         """Run the C preprocessor over the module header and record
         declarations that only exist after macro expansion (functions
@@ -308,9 +246,7 @@ class SourceIndex:
             try:
                 stubs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stubs")
                 flags = flags.replace("{stubs}", stubs)
-                fallback = self.fallback_include_dir()
-                inc = ["-I" + self.srcdir] + (["-I" + fallback] if fallback else [])
-                res = subprocess.run(cc.split() + flags.split() + ["-E"] + inc + [header],
+                res = subprocess.run(cc.split() + flags.split() + ["-E", "-I" + self.srcdir, header],
                                      capture_output=True, timeout=60)
             except Exception:
                 continue

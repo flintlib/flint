@@ -37,15 +37,18 @@ jobs:
           python3 --version
           node --version
 
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure --disable-debug
+
       - name: "Build documentation"
         run: |
           cd doc
           python3 -m fdoc --strict build --redirects --out build/html
 
-      - name: "Check the example programs of the documentation"
+      - name: "Check the documentation and its example programs"
         run: |
-          ./bootstrap.sh
-          ./configure --disable-debug
           make -j$(expr $(nproc) + 1) library
           make checkdoc
 
