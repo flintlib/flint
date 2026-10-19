@@ -89,6 +89,10 @@ int main(void)
         nmod_poly_evaluate_nmod_vec(s, c, pts, 2 * T);
         flint_printf("c(a^i) = 0 for i = 1..2T: %d\n", _nmod_vec_is_zero(s, 2 * T));
     }
+
+    nmod_poly_clear(g);
+    nmod_poly_clear(m);
+    nmod_poly_clear(c);
     return 0;
 }
 ```
@@ -286,6 +290,10 @@ int main(void)
         i = rs_decode(r, mod, nerr == 3);
         flint_printf("  decoder returns %wd, codeword restored: %d\n", i, nmod_poly_equal(r, c));
     }
+
+    nmod_poly_clear(g);
+    nmod_poly_clear(c);
+    nmod_poly_clear(r);
     return 0;
 }
 ```

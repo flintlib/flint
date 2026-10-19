@@ -15,6 +15,7 @@ make docpdf                   # PDF  -> build/doc/latex/flint.pdf
 make checkdoc                 # check the documentation against the headers,
                               # then compile and run every example program
 make doc DOCFLAGS=--redirects # also write redirects for the old (Sphinx) URLs
+make doc DOCFLAGS=--strict    # treat warnings as errors (as CI does)
 ```
 
 Or directly, from `doc/` (after `./configure`):

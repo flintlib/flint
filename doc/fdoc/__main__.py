@@ -259,11 +259,23 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="fdoc")
     ap.add_argument("--src", default=os.path.join(os.path.dirname(HERE), "src"))
     ap.add_argument("--flint", default=os.path.dirname(os.path.dirname(HERE)))
-    ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
-    ap.add_argument("-q", "--quiet", action="store_true", help="no progress output")
-    ap.add_argument("-j", "--jobs", type=int, default=0,
-                    help="parallel jobs (default: the number of CPUs)")
+    # the general options are accepted before and after the command, so that
+    # e.g. 'make doc DOCFLAGS=--strict' works (the defaults are set here; the
+    # subcommands' copies only override them when given)
+    def general(parser, suppress):
+        d = (lambda v: argparse.SUPPRESS) if suppress else (lambda v: v)
+        parser.add_argument("--strict", action="store_true", default=d(False),
+                            help="treat warnings as errors")
+        parser.add_argument("-q", "--quiet", action="store_true", default=d(False),
+                            help="no progress output")
+        parser.add_argument("-j", "--jobs", type=int, default=d(0),
+                            help="parallel jobs (default: the number of CPUs)")
+    general(ap, False)
+    common = argparse.ArgumentParser(add_help=False)
+    general(common, True)
     sub = ap.add_subparsers(dest="cmd", required=True)
+    _add_parser = sub.add_parser
+    sub.add_parser = lambda name, **kw: _add_parser(name, parents=[common], **kw)
     p = sub.add_parser("build")
     p.add_argument("--out", default="build/html")
     p.add_argument("--redirects", action="store_true",

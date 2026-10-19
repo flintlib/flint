@@ -146,5 +146,6 @@ MOD=...`), also with `--enable-assert`, and that the documentation check
 reports no problems. Then open a pull request on GitHub, describing the
 change and, for performance work, giving timings before and after.
 Changes are reviewed before they are merged; the continuous integration
-runs the test suite on several platforms. Notable changes are recorded in
+runs the test suite on several platforms, and also builds the
+documentation and runs its checks and example programs. Notable changes are recorded in
 the release notes ([](history)) when a release is made.

@@ -792,7 +792,8 @@ checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 #                             compile and run its example programs
 #
 # DOCFLAGS is passed to the HTML build, e.g. DOCFLAGS=--redirects to also
-# write pages that redirect the URLs of the old (Sphinx) documentation.
+# write pages that redirect the URLs of the old (Sphinx) documentation, or
+# DOCFLAGS=--strict to treat warnings as errors.
 # DOC_PYTHON selects the Python interpreter (not PYTHON, which selects the
 # Python tests in make check).
 

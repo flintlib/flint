@@ -1,15 +1,21 @@
 name: Documentation
 
+# Pull requests that change the library but not the documentation are
+# checked against the documentation by the "ASan, BLAS, examples" job of
+# CI.yml. Pushes also rebuild the documentation for changes of the library,
+# so that the published documentation follows main.
 on:
   pull_request:
     paths:
       - 'doc/**'
-      - 'src/*.h'
+      - 'Makefile.in'
       - '.github/workflows/docs.yml'
   push:
     paths:
       - 'doc/**'
-      - 'src/*.h'
+      - 'src/**'
+      - 'configure.ac'
+      - 'Makefile.in'
       - '.github/workflows/docs.yml'
 
 concurrency:
@@ -81,8 +87,21 @@ jobs:
 
       - name: "Push documentation to server"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          # a directory of its own for each run, so that an earlier failed or
+          # concurrent run does not get in the way
+          STAGE: tmp/flint-doc-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           cd doc/build
-          ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'
-          scp doc.tar.gz wbhart@opal6.opalstack.com:~/tmp
-          ssh -t wbhart@opal6.opalstack.com 'cd ~/tmp && tar -xf doc.tar.gz && rm -rf ~/apps/flintlib_org/doc && mv doc ~/apps/flintlib_org && cd ~ && rm -rf ~/tmp'
+          ssh wbhart@opal6.opalstack.com "rm -rf ~/$STAGE && mkdir -p ~/$STAGE"
+          scp doc.tar.gz wbhart@opal6.opalstack.com:$STAGE/
+          # unpack next to the live copy, then replace it with two renames, so
+          # that the site is never without documentation
+          ssh wbhart@opal6.opalstack.com "set -e
+            cd ~/$STAGE && tar -xzf doc.tar.gz
+            cd ~/apps/flintlib_org
+            rm -rf doc.new doc.old
+            mv ~/$STAGE/doc doc.new
+            if [ -d doc ]; then mv doc doc.old; fi
+            mv doc.new doc
+            rm -rf doc.old ~/$STAGE"

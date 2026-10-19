@@ -658,7 +658,9 @@ class HtmlBuilder:
             nav.append('<a href="%s%s"%s>%s</a>' % (up, url, cur, label))
         katex_js = "\x00KATEXJS%s\x00" % up
         cite = self.citation(page)
-        return TEMPLATE.format(cite=cite,
+        # the PDF is published next to the HTML (flint.pdf in the base URL)
+        pdf = cfg.get("baseurl", "") + "flint.pdf"
+        return TEMPLATE.format(cite=cite, pdf=esc(pdf),
             title=esc(full_title), up=up, nav="".join(nav), sidebar=sidebar, main=main,
             project=esc(cfg["project"]), version=esc(cfg["version"]), edit=edit,
             commit=esc(site.commit[:10]), katex_js=katex_js,
@@ -1058,7 +1060,7 @@ TEMPLATE = """<!doctype html>
   <main class="main" id="main">
 {main}
     {cite}
-    <footer class="foot">{edit}Built with fdoc from <code>{commit}</code></footer>
+    <footer class="foot">{edit}<a href="{pdf}">PDF version</a> · Built with fdoc from <code>{commit}</code></footer>
   </main>
 </div>
 <script>window.FDOC_ROOT="{up}";</script>
