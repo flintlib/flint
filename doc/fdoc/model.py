@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 
+from .outputs import check_flags as check_output_flags
 from .markup import (BlockParser, MarkupError, Node, meta_list, parse_inline,
                      plain_text, split_front_matter)
 from .csyntax import Prototype, SourceIndex
@@ -459,6 +460,8 @@ class Site:
                     name = node["flags"].get("name") or "%s_%d" % (page.id.split("/")[-1], ex)
                     node.attrs["example_name"] = name
                     page.examples.append(node)
+                    for problem in check_output_flags(node.get("output_flags") or {}):
+                        self.warn("example %s: %s" % (name, problem), page.path, node.get("line"))
             # backlinks from function documentation to other pages (algorithms)
             if page.kind == "module":
                 for node in page.body:

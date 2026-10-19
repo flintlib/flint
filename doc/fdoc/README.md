@@ -182,6 +182,24 @@ Longer text, only on the function's own page.
 ```
 ````
 
+Output that legitimately differs between platforms can be marked on the
+`output` fence (like SageMath's `# random`, `# abs tol`, `# rel tol`):
+
+| flag | meaning |
+|---|---|
+| `radius-tol`, `radius-tol=F` | radii of printed balls (the number after `+/-`) may differ by a factor up to `F` (default 10); everything else exactly |
+| `rel-tol=X`, `abs-tol=X` | every number may differ by this relative or absolute amount |
+| `random` | not compared; the program must still compile and run |
+
+The text between the numbers, the number of lines and the number of numbers
+must still match. Ball radii are rigorous but not reproducible bit for bit:
+they can depend on the compiler (e.g. on whether it contracts expressions
+into fused multiply-adds) and on the algorithms selected for the machine.
+Prefer an output that is reproducible (print fewer digits, test a property
+instead of printing a radius) and use these flags only where the varying
+numbers are what the example is about. The pages show a short note next to
+such an output.
+
 ## Library defects found while documenting
 
 Do not fix library code as part of documentation work: report the defect

@@ -13,6 +13,7 @@ import subprocess
 
 from .markup import Node, plain_text
 from .csyntax import C_KEYWORDS, C_TYPES, tokenize
+from .outputs import describe as describe_output
 from .model import THEOREM_KINDS, COLLECTIONS, PROSE_KINDS, anchor_url
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -297,8 +298,9 @@ class HtmlRenderer:
         if nd.get("example_name"):
             out = ""
             if nd.get("output") is not None:
-                out = ('<div class="ex-out"><div class="ex-label">Output</div><pre>%s</pre></div>'
-                       % esc(nd["output"]))
+                note = describe_output(nd.get("output_flags"))
+                out = ('<div class="ex-out"><div class="ex-label">Output%s</div><pre>%s</pre></div>'
+                       % ('<span class="ex-note">%s</span>' % esc(note) if note else "", esc(nd["output"])))
             req = nd["flags"].get("requires")
             reqs = ('<span class="ex-req">%s</span>' % esc(", ".join(
                         ("%s-bit only" % r) if r.isdigit() else ("needs %s" % r)

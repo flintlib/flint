@@ -293,6 +293,7 @@ a.c-fn { color: var(--accent); } a.c-ty { color: var(--hl-ty); text-decoration: 
 .example pre.code { margin: 0; border-radius: 0; background: transparent; }
 .ex-out { border-top: 1px dashed var(--line-2); background: var(--surface); }
 .ex-label { font: 600 0.68rem var(--font-ui); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0.5rem 1rem 0; }
+.ex-note { margin-left: 0.6rem; font-weight: 400; text-transform: none; letter-spacing: 0; }
 .ex-out pre { margin: 0; padding: 0.3rem 1rem 0.8rem; font-size: 0.84rem; overflow-x: auto; }
 
 /* cards, function lists, tables */

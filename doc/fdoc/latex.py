@@ -12,6 +12,7 @@ import os
 import re
 
 from .markup import Node, plain_text
+from .outputs import describe as describe_output
 from .model import THEOREM_KINDS
 
 PREAMBLE = r"""\documentclass[11pt,a4paper]{report}
@@ -283,9 +284,10 @@ class LatexRenderer:
                    "\\begin{Verbatim}[fontsize=\\small,frame=single,framesep=2mm]\n%s\n\\end{Verbatim}\n"
                    % (tex_escape(nd["example_name"]), text))
             if nd.get("output") is not None:
-                out += ("\n\\noindent{\\small\\textbf{Output}}\n"
+                note = describe_output(nd.get("output_flags"))
+                out += ("\n\\noindent{\\small\\textbf{Output}%s}\n"
                         "\\begin{Verbatim}[fontsize=\\small,frame=leftline,framesep=2mm]\n%s\n\\end{Verbatim}\n"
-                        % nd["output"])
+                        % (" {\\color{fdocmuted}(%s)}" % tex_escape(note) if note else "", nd["output"]))
             return out
         return "\\begin{Verbatim}[fontsize=\\small]\n%s\n\\end{Verbatim}\n" % text
 

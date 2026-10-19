@@ -206,7 +206,7 @@ int main(void)
     return 0;
 }
 ```
-```output
+```output radius-tol
 prec 32: 0 isolated
 prec 64: 20 isolated
 [1.000000000 +/- 7.32e-16] + [+/- 7.24e-16]*I
@@ -219,3 +219,11 @@ root 1 has radius $10^{-15}$: a relative perturbation $\varepsilon$ of
 the coefficients can move the root 20 by about $3 \cdot 10^{12} \varepsilon$
 (and the root 1 by about $420 \varepsilon$), and
 the validation sees the corresponding rounding errors in $f(m)$.
+
+The radii, and the last digits of the midpoints, can differ slightly
+between platforms. At 32 bits the starting values come from the
+double-precision iteration (step 2 above), whose rounding depends on the
+compiler: for example, whether it contracts expressions into fused
+multiply-adds. The 64-bit iteration then starts from slightly different
+points and stops at slightly different approximations. Every
+enclosure is still rigorous.

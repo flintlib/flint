@@ -122,6 +122,7 @@ def cmd_latex(args):
 def cmd_examples(args):
     """Extract every '```c example' block, compile it against FLINT, run it,
     and compare stdout with the '```output' block that follows it."""
+    from . import outputs
     site = load_site(args)
     outdir = os.path.abspath(args.out)
     os.makedirs(outdir, exist_ok=True)
@@ -194,7 +195,7 @@ def cmd_examples(args):
         want = ex.get("output")
         if want is None:
             return "ran", name, where, "no expected output"
-        if got != want.rstrip():
+        if not outputs.compare(want, got, ex.get("output_flags")):
             return "fail", name, where, "output\n--- expected\n%s\n--- got\n%s" % (want.rstrip(), got)
         return "ok", name, where, ""
 
@@ -256,6 +257,12 @@ def cmd_check(args):
 
 
 def main(argv=None):
+    # progress goes to stderr: keep stdout line-buffered so that reports
+    # and progress lines appear in order when both go to the same log
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, ValueError):
+        pass
     ap = argparse.ArgumentParser(prog="fdoc")
     ap.add_argument("--src", default=os.path.join(os.path.dirname(HERE), "src"))
     ap.add_argument("--flint", default=os.path.dirname(os.path.dirname(HERE)))

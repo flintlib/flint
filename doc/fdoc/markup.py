@@ -5,7 +5,9 @@ Block syntax
     # Heading {#optional-id}
     paragraphs, - bullet / 1. numbered lists, | pipe | tables |
     ```c [example] [name=foo]      fenced code (``example`` = compiled by make checkdoc)
-    ```output                      expected output of the preceding example
+    ```output [flags]              expected output of the preceding example
+                                   (flags: radius-tol[=F], rel-tol=X, abs-tol=X,
+                                   random; see outputs.py)
     $$ ... $$                      display math
     ::: kind [args] [{#id}]        fenced div (function, details, theorem, proof, ...)
     :::                            closes the innermost div
@@ -255,6 +257,7 @@ class BlockParser:
                     line=line0 + i + 1)
         if lang == "output" and out and out[-1].kind == "code" and out[-1]["flags"].get("example"):
             out[-1].attrs["output"] = node["text"]
+            out[-1].attrs["output_flags"] = flags
         else:
             out.append(node)
         return k + 1
