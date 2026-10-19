@@ -75,7 +75,7 @@ prime count, which favours two primes slightly and penalises eight.
 
 ## Example {#example}
 
-```c example name=fft_small_mulmod_2expp1
+```c example name=fft_small_mulmod_2expp1 requires=fft_small
 #include <flint/flint.h>
 #include <flint/fmpz.h>
 #include <flint/fft_small.h>

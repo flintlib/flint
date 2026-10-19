@@ -10,6 +10,7 @@ preprocess:
   - -D__ARM_NEON -D__aarch64__ -I{stubs}
 category: Foundations
 order: 5
+requires: 64
 ---
 
 This header defines short vectors of `double`, `float` and `ulong` values

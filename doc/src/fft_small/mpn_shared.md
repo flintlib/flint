@@ -88,7 +88,7 @@ Two products with a common factor of 3000 limbs, compared with
 `flint_mpn_mul`, and products by a fixed factor with a precomputed
 transform:
 
-```c example name=fft_small_mpn_shared
+```c example name=fft_small_mpn_shared requires=fft_small
 #include <flint/flint.h>
 #include <flint/mpn_extras.h>
 #include <flint/fft_small.h>

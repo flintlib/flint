@@ -109,7 +109,7 @@ ranges of coefficients for the reconstruction.
 Multiplying $3^{300000}$ by $7^{100000}$, and computing the top four limbs
 of the product alone:
 
-```c example name=fft_small_mpn_mul
+```c example name=fft_small_mpn_mul requires=fft_small
 #include <gmp.h>
 #include <flint/flint.h>
 #include <flint/mpn_extras.h>

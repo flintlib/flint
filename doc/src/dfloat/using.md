@@ -93,6 +93,7 @@ elimination on a matrix with condition number $1.5 \cdot 10^7$.
 
 ```c example name=dfloat_gr_hilbert
 #include <flint/flint.h>
+#include <flint/arb.h>
 #include <flint/gr.h>
 #include <flint/gr_mat.h>
 #include <flint/gr_special.h>
@@ -100,9 +101,10 @@ elimination on a matrix with condition number $1.5 \cdot 10^7$.
 
 int main(void)
 {
-    gr_ctx_t ctx;
+    gr_ctx_t ctx, RR;
     gr_mat_t H, X, B;
     gr_ptr x;
+    arb_t y;
     slong i, j, n = 6, sz;
     int status = GR_SUCCESS;
 
@@ -112,10 +114,16 @@ int main(void)
 
     gr_ctx_println(ctx);
 
+    /* e^pi; its radius depends on whether the processor has fused
+       multiply-add, so print the midpoint and a bound for the radius */
     x = gr_heap_init(ctx);
     status |= gr_pi(x, ctx);
     status |= gr_exp(x, x, ctx);
-    status |= gr_println(x, ctx);
+    gr_ctx_init_real_arb(RR, 200);
+    arb_init(y);
+    status |= gr_set_other(y, x, ctx, RR);
+    arb_printn(y, 40, ARB_STR_NO_RADIUS);
+    flint_printf(", radius < 10^-43: %d\n", mag_cmp_2exp_si(arb_radref(y), -143) < 0);
     flint_printf("gamma unsupported: %d\n", gr_gamma(x, x, ctx) == GR_UNABLE);
 
     gr_mat_init(H, n, n, ctx);
@@ -138,13 +146,15 @@ int main(void)
     gr_mat_clear(X, ctx);
     gr_mat_clear(B, ctx);
     gr_heap_clear(x, ctx);
+    arb_clear(y);
+    gr_ctx_clear(RR);
     gr_ctx_clear(ctx);
     return 0;
 }
 ```
 ```output
 Real numbers as balls with 3-term double expansion midpoints (d3b)
-[23.1406926327792690057290863679485473802661062 +/- 5.86e-44]
+23.14069263277926900572908636794854738027, radius < 10^-43: 1
 gamma unsupported: 1
 [[[-6.000000000000000000000000000000000 +/- 1.01e-34]],
 [[210.000000000000000000000000000000000 +/- 1.25e-34]],

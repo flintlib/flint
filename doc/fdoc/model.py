@@ -597,9 +597,35 @@ class Site:
 
     # -- checks ----------------------------------------------------------------
 
+    def configured_features(self):
+        """Features of the configured build, from src/flint-config.h: the
+        number of bits of a limb ("64" or "32") and "fft_small"."""
+        feats = set()
+        try:
+            with open(os.path.join(self.flintroot, "src", "flint-config.h")) as f:
+                text = f.read()
+        except OSError:
+            return feats
+        m = re.search(r"^#define FLINT_BITS (\d+)", text, re.M)
+        if m:
+            feats.add(m.group(1))
+        if re.search(r"^#define FLINT_HAVE_FFT_SMALL 1", text, re.M):
+            feats.add("fft_small")
+        return feats
+
     def _check_sources(self):
         self.undocumented = {}
+        # a module can only be checked against a configuration that has it:
+        # front matter 'requires: 64' (or fft_small, ...) in its overview
+        feats = self.configured_features()
+        self.unchecked = {}
         for mod, page in self.modules.items():
+            req = [r.strip() for r in str(page.meta.get("requires", "")).split(",") if r.strip()]
+            unmet = [r for r in req if r not in feats]
+            if unmet:
+                self.unchecked[mod] = unmet
+                self.undocumented[mod] = []
+                continue
             documented = set(b_name for b in self.blocks if b.module == mod for b_name in b.names)
             for b in self.blocks:
                 if b.module != mod or b.kind != "function":

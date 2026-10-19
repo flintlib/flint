@@ -280,7 +280,9 @@ class HtmlRenderer:
                 out = ('<div class="ex-out"><div class="ex-label">Output</div><pre>%s</pre></div>'
                        % esc(nd["output"]))
             req = nd["flags"].get("requires")
-            reqs = '<span class="ex-req">%s-bit only</span>' % esc(req) if req else ""
+            reqs = ('<span class="ex-req">%s</span>' % esc(", ".join(
+                        ("%s-bit only" % r) if r.isdigit() else ("needs %s" % r)
+                        for r in (x.strip() for x in str(req).split(",")) if r)) if req else "")
             return ('<figure class="example" id="example-%s"><figcaption><span class="ex-title">Example</span>'
                     '<span class="ex-file">%s.c</span>%s<span class="ex-check" title="This program is '
                     'compiled and run by make check; its output must match exactly.">checked by make check</span>'

@@ -88,7 +88,7 @@ the number of primes times the transform length.
 The plan constructors make the same choices as the multiplication
 drivers (for one thread) and can be used to inspect them:
 
-```c example name=fft_small_choices
+```c example name=fft_small_choices requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/fft_small.h>

@@ -121,7 +121,7 @@ see [](algorithms/fft/small-prime-fft#transposed).
 The positions of the first values of a transform of length 16, and the
 inverse transform:
 
-```c example name=fft_small_sd_fft_order
+```c example name=fft_small_sd_fft_order requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/fft_small.h>
@@ -180,7 +180,7 @@ A product of polynomials of lengths 300 and 200 modulo the prime with
 truncated transforms of length $2^{10}$, of which only the first 512
 values are computed:
 
-```c example name=fft_small_sd_fft_mul
+```c example name=fft_small_sd_fft_mul requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>
@@ -246,7 +246,7 @@ The transposed product $z_j = \sum_i a_i v_{i+j}$, $j < 400$, of $a$ of
 length 300 and $v$ of length 699 modulo the prime, with transforms of
 length $2^{10}$ truncated to 768 points:
 
-```c example name=fft_small_sd_fft_transposed
+```c example name=fft_small_sd_fft_transposed requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>

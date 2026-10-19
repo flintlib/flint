@@ -85,7 +85,7 @@ prime costs four forward transforms, two pointwise products and one
 inverse transform per prime, against four, two and two for two separate
 products, and one reconstruction instead of two.
 
-```c example name=fft_small_op_nmod
+```c example name=fft_small_op_nmod requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>
@@ -171,7 +171,7 @@ The difference $ab - cd$ of products of integers of about 2000 limbs,
 with a signed plan and a signed export. For sums of at most two products
 of operands of up to 40000 limbs the plan uses the two-prime geometry.
 
-```c example name=fft_small_op_mpn_signed
+```c example name=fft_small_op_mpn_signed requires=fft_small
 #include <gmp.h>
 #include <flint/flint.h>
 #include <flint/mpn_extras.h>
@@ -269,7 +269,7 @@ transposed products of the same plan can be added in transform space
 before `fft_small_fft_tr`, since the transposed transform is linear.
 `_nmod_poly_mul_tr_mpn_ctx` performs the same steps for a single product.
 
-```c example name=fft_small_op_transposed
+```c example name=fft_small_op_transposed requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>

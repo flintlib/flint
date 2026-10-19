@@ -119,7 +119,7 @@ computes each transposed product with two transforms
 A middle product modulo a 62-bit prime, and a product of integer
 polynomials with large coefficients:
 
-```c example name=fft_small_poly_mul
+```c example name=fft_small_poly_mul requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>
@@ -204,7 +204,7 @@ bits) are too few.
 The middle product of the example above as a transposed product, by the
 reversal of $b$, and the same coefficients from `nmod_poly_mulmid`:
 
-```c example name=fft_small_poly_mul_tr
+```c example name=fft_small_poly_mul_tr requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>

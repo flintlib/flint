@@ -80,7 +80,7 @@ operand. As for `_nmod_poly_mul_mid_precomp`, `M` is only read.
 A polynomial $v$ of length 3000 prepared once, and the window
 $[999, 2999)$ of its products with three polynomials of length 1000:
 
-```c example name=fft_small_mul_tr_precomp
+```c example name=fft_small_mul_tr_precomp requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>
@@ -175,7 +175,7 @@ A polynomial of length 1000 transformed once for length $2^{12}$ and
 multiplied by three others, with full products of length 3999 and with a
 middle product that uses the wrap-around:
 
-```c example name=fft_small_mul_precomp
+```c example name=fft_small_mul_precomp requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>
@@ -240,7 +240,7 @@ k = 3: full product agrees, full product of length 4999 returns 0, middle produc
 Division by a fixed divisor of length 500, prepared for quotients of
 length up to 1500:
 
-```c example name=fft_small_divrem_precomp
+```c example name=fft_small_divrem_precomp requires=fft_small
 #include <flint/flint.h>
 #include <flint/nmod.h>
 #include <flint/nmod_vec.h>

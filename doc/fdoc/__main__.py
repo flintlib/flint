@@ -140,12 +140,24 @@ def cmd_examples(args):
         args.libs = "-L%s -lflint -lmpfr -lgmp -lm -Wl,-rpath,%s" % (flint, flint)
     cflags = args.cflags.split()
     libs = args.libs.split()
-    # word size of the target, for examples marked requires=64 or requires=32
-    probe = os.path.join(outdir, "_bits_probe.c")
+    # features of the configured build, for examples marked requires=...
+    # (64, 32, fft_small; several separated by commas)
+    probe = os.path.join(outdir, "_features_probe.c")
     with open(probe, "w") as f:
-        f.write('#include <stdio.h>\n#include <flint/flint.h>\nint main(void) { printf("%d\\n", FLINT_BITS); return 0; }\n')
+        f.write('#include <stdio.h>\n#include <flint/flint.h>\n'
+                'int main(void)\n{\n    printf("%d", FLINT_BITS);\n'
+                '#if FLINT_HAVE_FFT_SMALL\n    printf(" fft_small");\n#endif\n'
+                '    printf("\\n");\n    return 0;\n}\n')
     res = subprocess.run(cc + cflags + ["-o", probe[:-2], probe] + libs, capture_output=True)
-    bits = subprocess.run([probe[:-2]], capture_output=True).stdout.decode().strip() if res.returncode == 0 else ""
+    if res.returncode != 0:
+        print("fdoc: cannot compile a test program against FLINT:\n" + res.stderr.decode())
+        return 1
+    features = set(subprocess.run([probe[:-2]], capture_output=True).stdout.decode().split())
+    # requirements of every example, set by the documentation in the front
+    # matter of the home page ('example-requires'): the expected outputs are
+    # those of a build with these features
+    home = site.pages.get("index")
+    default_req = str(home.meta.get("example-requires", "")) if home else ""
     prefixes = only_filter(args)
     jobs = []
     for page in site.order:
@@ -159,9 +171,12 @@ def cmd_examples(args):
         page, ex = job
         name = ex["example_name"]
         where = "%s:%d" % (os.path.relpath(page.path, site.srcroot), ex["line"])
-        req = ex["flags"].get("requires")
-        if req and bits and req != bits:
-            return "skip", name, where, "requires %s-bit" % req
+        req = list(dict.fromkeys(r.strip() for r in (default_req + "," + str(ex["flags"].get("requires", "")))
+                                 .split(",") if r.strip()))
+        unmet = [r for r in req if r not in features]
+        if unmet:
+            return "skip", name, where, "needs a build with " + ", ".join(
+                ("%s-bit limbs" % r) if r.isdigit() else r for r in unmet)
         src = os.path.join(outdir, name + ".c")
         exe = os.path.join(outdir, name)
         with open(src, "w") as f:
@@ -196,6 +211,12 @@ def cmd_examples(args):
     failures = sum(1 for r in results if r[0] == "fail")
     skipped = sum(1 for r in results if r[0] == "skip")
     pr.done("%d failed" % failures if failures else "")
+    reasons = {}
+    for status, name, where, msg in results:
+        if status == "skip":
+            reasons[msg] = reasons.get(msg, 0) + 1
+    for msg, n in sorted(reasons.items()):
+        print("skipped %d example%s: %s" % (n, "s" if n > 1 else "", msg))
     for status, name, where, msg in results:
         if status == "fail":
             print("FAIL %s (%s): %s" % (name, where, msg))
@@ -222,6 +243,9 @@ def cmd_check(args):
             print("%s: %d public functions declared in the header are not documented:" % (mod, len(missing)))
             for name in missing:
                 print("    " + name)
+    for mod, unmet in sorted(getattr(site, "unchecked", {}).items()):
+        print("%s: not checked against the headers: needs a build with %s"
+              % (mod, ", ".join(("%s-bit limbs" % r) if r.isdigit() else r for r in unmet)))
     nblocks = len(site.blocks)
     ndetail = sum(1 for p in site.order if p.kind == "detail")
     nex = sum(len(p.examples) for p in site.order)

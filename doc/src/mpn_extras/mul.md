@@ -79,7 +79,7 @@ multiplied by two cofactors.
 The product of two 2000-limb numbers (in the `fft_small` range) agrees
 with GMP's, and a shared product agrees with two separate ones:
 
-```c example name=mpn_mul_basic
+```c example name=mpn_mul_basic requires=fft_small
 #include <gmp.h>
 #include <flint/flint.h>
 #include <flint/mpn_extras.h>

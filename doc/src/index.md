@@ -1,5 +1,6 @@
 ---
 title: FLINT documentation
+example-requires: 64
 module-categories:
   - Foundations
   - Word-size integers
