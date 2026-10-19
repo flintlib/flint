@@ -204,7 +204,7 @@ $f$ is ill-conditioned, $I$ may need to be extremely narrow for the
 bound to be finite.
 
 ::: note
-Until commit `5603850` (PR #2898, during the development of FLINT 3.7)
+In FLINT 3.6 and earlier
 the function returned only $C/2$, and `arb_calc_newton_step` and
 `arb_calc_refine_root_newton` given this factor could return a ball
 that excludes the root. Doubling the result is a safe workaround for

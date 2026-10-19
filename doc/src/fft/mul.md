@@ -6,7 +6,7 @@ functions: flint_mpn_mul_fft_main mul_truncate_sqrt2 mul_mfa_truncate_sqrt2
 `flint_mpn_mul_fft_main` multiplies two natural numbers given as limb
 arrays with the Schönhage–Strassen algorithm. It chooses a transform
 length and a coefficient ring from tuning tables and then calls one of
-the two lower-level functions on this page, which take these parameters
+the two lower-level functions documented below, which take these parameters
 explicitly. For general use, call `flint_mpn_mul` (or `fmpz_mul`)
 instead: it uses FLINT's basecase and Karatsuba code (where FLINT has
 assembly) and GMP's `mpn_mul` for small and medium operands, and for

@@ -7,9 +7,9 @@ category: Finite fields
 order: 20
 ---
 
-This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_zech` in place of `fq`; this page lists them with short descriptions, and each function page links to the `fq_poly` version, whose documentation has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
+This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_zech` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_poly` version, whose documentation has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
 
-The differences are in multiplication: the classical algorithm works directly with discrete logarithms and the Zech table, and for long polynomials `fq_zech_poly_mul`, `fq_zech_poly_mullow`, `fq_zech_poly_sqr` and `_fq_zech_poly_mulhigh` convert the coefficients to their polynomial representation, multiply in $(\Z/p\Z)[x]$ after the substitution $y = x^{2d-1}$, and convert back ([](fq_poly/mul)); the functions that decide between the two are listed at the end of this page. The GCD functions switch from the Euclidean algorithm to the half-GCD algorithm at length 96 (`FQ_ZECH_POLY_GCD_CUTOFF`), with the half-GCD basecase below 35 (`FQ_ZECH_POLY_HGCD_CUTOFF`).
+The differences are in multiplication: the classical algorithm works directly with discrete logarithms and the Zech table, and for long polynomials `fq_zech_poly_mul`, `fq_zech_poly_mullow`, `fq_zech_poly_sqr` and `_fq_zech_poly_mulhigh` convert the coefficients to their polynomial representation, multiply in $(\Z/p\Z)[x]$ after the substitution $y = x^{2d-1}$, and convert back ([](fq_poly/mul)); the functions that decide between the two are documented at the end. The GCD functions switch from the Euclidean algorithm to the half-GCD algorithm at length 96 (`FQ_ZECH_POLY_GCD_CUTOFF`), with the half-GCD basecase below 35 (`FQ_ZECH_POLY_HGCD_CUTOFF`).
 
 ::: summary algorithms/polynomials/multiplication :::
 
@@ -504,7 +504,7 @@ The underscore version writes `len1 + len2 - 1` coefficients, requires
 `len1`, `len2` $\ge 1$ and does not allow aliasing.
 
 ::: details
-Generated from the same template as `_fq_poly_mul`, whose documentation has the details. The algorithm selection of each representation is described on [](fq_poly/mul).
+Generated from the same template as `_fq_poly_mul`, whose documentation has the details. The algorithm selection of each representation is described in [](fq_poly/mul).
 :::
 :::
 

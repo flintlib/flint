@@ -11,7 +11,7 @@ two polynomials with integer coefficients exactly. This is how `fmpz_poly`
 implements Schönhage–Strassen multiplication, and with integer
 coefficients obtained by cutting integers into chunks, it is also the
 core of `mul_mfa_truncate_sqrt2`. The guide [](fft/using) explains the
-whole procedure; this page gives the precise contract.
+whole procedure; the precise contract is given below.
 
 ## Parameters and layout {#layout}
 

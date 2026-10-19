@@ -14,8 +14,8 @@ $$
 $$
 
 but the series converge only on small discs, and the denominators
-$i!$ and $i$ are divisible by $p$ for large $i$. This page gives the
-truncation bounds that FLINT uses, proves them, and describes the three
+$i!$ and $i$ are divisible by $p$ for large $i$. The sections below give
+the truncation bounds that FLINT uses, prove them, and describe the three
 evaluation methods: rectangular splitting, the balanced method based on
 binary splitting, and, for the logarithm, the reduction of Satoh,
 Skjernaa and Taguchi [@SST2003]. The same algorithms are used in

@@ -12,8 +12,8 @@ dimension $d = \min(m, k, n)$ and the entry size. For small entries the
 cost is dominated by memory traffic and by the overhead of the `fmpz`
 representation; for large matrices of moderate entries, by the $mkn$
 multiply-adds; for large entries, by the cost of each integer
-multiplication. This page describes the methods and the regions where
-each wins. `fmpz_mat_mul` implements the choice; the exact tests are in
+multiplication. The methods and the regions where each wins are
+described below. `fmpz_mat_mul` implements the choice; the exact tests are in
 [](fmpz_mat/mul#dispatch).
 
 The generic `gr_mat_mul` over the integers (`gr_ctx_init_fmpz`) calls

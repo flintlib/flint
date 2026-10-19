@@ -5,8 +5,8 @@ complexity: One product and one to three word additions per term, plus one reduc
 order: 10
 ---
 
-Throughout, $n \ge 2$ is the modulus, $a_i, b_i \in [0, n)$ are reduced
-entries, $\ell$ is the length, $\beta = \bits$ and
+Consider a dot product modulo a word-size integer: $n \ge 2$ is the
+modulus, $a_i, b_i \in [0, n)$ are reduced entries, $\ell$ is the length, $\beta = \bits$ and
 
 $$
 S = \sum_{i=0}^{\ell - 1} a_i b_i

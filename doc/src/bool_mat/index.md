@@ -13,7 +13,7 @@ the arithmetic functions use bitwise operations and give wrong results
 for other values. A square Boolean matrix is the adjacency matrix of a
 directed graph, with $A_{ij} = 1$ when there is an edge from vertex $i$
 to vertex $j$; then $A^k$ records which vertices are joined by a walk of
-length exactly $k$. The graph functions at the end of this page answer
+length exactly $k$. The graph functions documented at the end answer
 questions about walks, cycles and strongly connected components.
 
 The module comes from Arb, where it is used to bound the sparsity

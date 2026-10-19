@@ -81,8 +81,7 @@ working precision: the implementation aims at a relative error of a few
 units in the last place for well-conditioned input and may use more
 precision internally, but the radius of the result is only guaranteed to
 be a bound, not to be small. If the input is exact or computed with
-increasing accuracy, the output converges as `prec` grows. The page
-[](arb/arithmetic) and the user guide [](guide/ball-arithmetic/precision)
+increasing accuracy, the output converges as `prec` grows. [](arb/arithmetic) and the user guide [](guide/ball-arithmetic/precision)
 discuss how to choose the precision.
 
 *Special values.* The following balls with infinite or NaN parts may be
@@ -616,7 +615,7 @@ mode.
 
 All predicates return 1 when the property certainly holds for every
 number in the ball(s) and 0 otherwise, which includes the case where it
-cannot be decided. The page [](arb/predicates) explains how to test the
+cannot be decided. [](arb/predicates) explains how to test the
 negation of a property correctly.
 
 ::: function
@@ -737,7 +736,7 @@ contained in `x` without touching either endpoint.
 The basic operations compute the midpoint with one `arf` operation and
 bound the propagated error with a few `mag` operations, so they are
 nearly as fast as floating-point arithmetic of the same precision. The
-error bounds are proved on [](algorithms/ball-arithmetic/error-propagation).
+error bounds are proved in [](algorithms/ball-arithmetic/error-propagation).
 
 ::: function
 void arb_neg(arb_t y, const arb_t x)
@@ -903,10 +902,7 @@ The inexact flag of the relaxed division is reliable also on the Newton
 path (from 12000 bits, or 5000 bits for $1/y$, when the divisor has
 more than `prec`/2 bits), so one ulp is added to the radius whenever
 the midpoint differs from the exact quotient, and an exact quotient of
-exact input gets radius 0. Until commit `5603850` (during the
-development of FLINT 3.7) the flag could be wrong on that path, and
-about one result in 500 was an exact-looking ball missing the true
-value by up to one ulp.
+exact input gets radius 0.
 :::
 :::
 
@@ -942,7 +938,7 @@ not computed to more bits than the radii justify.
 `arb_dot_simple` is that loop, kept for testing and used as a fallback
 for exponents outside the range of the fast code. `arb_dot_precise`
 computes the exact dot product of the midpoints before rounding, which
-can be very slow; it is meant for testing. The algorithm is on
+can be very slow; it is meant for testing. The algorithm is described in
 [](algorithms/ball-arithmetic/dot-products).
 :::
 :::
@@ -1083,7 +1079,7 @@ $y$ is an exact integer.
 ## Exponentials and logarithms {#exp-log}
 
 The guide [](arb/elementary) explains the accuracy and the
-special cases of the elementary functions; the algorithms are on
+special cases of the elementary functions; the algorithms are described in
 [](algorithms/special-functions/elementary).
 
 ::: function
@@ -1340,7 +1336,7 @@ are read from static tables below about 4600 bits and $\gamma$ below
 about 3400 bits), so
 repeated calls at the same or a lower precision cost a rounding;
 `flint_cleanup` frees the caches. The formulas and their cost are
-described on [](algorithms/special-functions/constants).
+described in [](algorithms/special-functions/constants).
 
 ::: function
 void arb_const_pi(arb_t z, slong prec)
@@ -1480,7 +1476,7 @@ Set `z` to the binomial coefficient $\binom{n}{k} = (n-k+1)_k / k!$.
 
 ## Zeta function {#zeta}
 
-The algorithms for $\zeta(s)$ at integers and in general are described on
+The algorithms for $\zeta(s)$ at integers and in general are described in
 [](algorithms/special-functions/zeta).
 
 ::: function
@@ -1862,7 +1858,7 @@ Print the entries with `arb_printn`, respectively `arb_printd`.
 ## Internals of the elementary functions {#internals}
 
 These functions and tables implement the elementary functions and are
-described on [](algorithms/special-functions/elementary). They use
+described in [](algorithms/special-functions/elementary). They use
 fixed-point numbers: arrays of $n$ limbs representing a number in $[0,
 1)$ (or with an extra integer limb where stated) with an error measured in
 units of $2^{-64n}$ (ulps).

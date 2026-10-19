@@ -24,7 +24,7 @@ moves up with the number of threads. Use `ecpp_prove` directly when a
 certificate is wanted.
 
 For example, proving $10^{100} + 267$ took 17 ms with ECPP and 29 ms with
-APRCL on one core of the machine used to write this page, and
+APRCL on one core of the machine used for these timings, and
 $2^{521} - 1$ (157 digits) 84 ms and 149 ms.
 
 ## How the proof proceeds {#steps}

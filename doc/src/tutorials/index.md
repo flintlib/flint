@@ -9,8 +9,8 @@ solves a small but realistic problem, explains the mathematics behind it
 and the choices made in the code, and points to the reference
 documentation and the algorithm pages for details. The programs are
 complete: they can be copied into a file, compiled and linked as shown in
-[](tutorials/getting-started/first-program), and run. Every program on
-these pages is compiled and run by the documentation checks, and its
+[](tutorials/getting-started/first-program), and run. Every program in
+the tutorials is compiled and run by the documentation checks, and its
 output is compared with the output shown, so the code and the results
 stay in sync with the library.
 

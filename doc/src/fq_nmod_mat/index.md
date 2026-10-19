@@ -7,7 +7,7 @@ category: Finite fields
 order: 13
 ---
 
-This module implements dense matrices over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_mat) and has the same functions, with `fq_nmod` in place of `fq`; this page lists them with short descriptions, and each function page links to the `fq_mat` version, whose documentation has the details. As there, the linear algebra functions are wrappers of the generic `gr_mat` algorithms, and multiplication uses Kronecker substitution for all but small matrices.
+This module implements dense matrices over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_mat) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_mat` version, whose documentation has the details. As there, the linear algebra functions are wrappers of the generic `gr_mat` algorithms, and multiplication uses Kronecker substitution for all but small matrices.
 
 ::: summary algorithms/linear-algebra/gaussian-elimination :::
 

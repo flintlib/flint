@@ -16,7 +16,7 @@ integers of up to about 90 digits, or larger ones whose second largest
 prime factor has at most about 40 digits. `fmpz_factor_smooth` finds the
 small factors only.
 
-The page [](fmpz_factor/factor) explains the strategy of `fmpz_factor`
+[](fmpz_factor/factor) explains the strategy of `fmpz_factor`
 with its cutoffs; the topic page
 [](algorithms/number-theory/integer-factoring) compares the methods.
 The basic operations used along the way are in [](fmpz): exact division

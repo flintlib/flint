@@ -10,8 +10,8 @@ $Q$ and isolating balls (see [](algorithms/exact/qqbar-representation)),
 the number $w = x \circ y$ for $\circ \in \{+, -, \times, /\}$ is again
 algebraic, and [](qqbar) computes its minimal polynomial and an
 isolating ball. Operations with a rational operand are affine
-substitutions $P((t - b)/a)$ and cost little (`qqbar_scalar_op`). This
-page is about two irrational operands, which are handled by
+substitutions $P((t - b)/a)$ and cost little (`qqbar_scalar_op`). What
+follows is about two irrational operands, which are handled by
 `qqbar_binary_op`. Its default strategy, classical since Loos
 [@Loo1983], computes a polynomial of degree $\deg x \deg y$ that
 annihilates $w$, factors it and selects the right factor; the other

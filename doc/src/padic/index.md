@@ -391,7 +391,7 @@ power of the stored value exactly and does not account for this.
 
 ## Exponential and logarithm {#exp-log}
 
-The page [](padic/exp-log) describes the functions of this section and
+[](padic/exp-log) describes the functions of this section and
 the choice of algorithm in more detail.
 
 ::: function

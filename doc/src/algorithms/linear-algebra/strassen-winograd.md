@@ -10,8 +10,8 @@ multiplied with 7 multiplications instead of 8 [@Str1969]. Since the
 entries can themselves be matrices, applying the scheme recursively
 multiplies $d \times d$ matrices in $O(d^{\log_2 7})$ ring operations.
 Winograd's variant [@Win1971] needs 15 block additions instead of 18.
-This page describes the version in `nmod_mat_mul_strassen`, which is
-also used, in byte or bit-packed form, by `nmod_mat_mul_u8`.
+The version described below is that of `nmod_mat_mul_strassen`, which
+is also used, in byte or bit-packed form, by `nmod_mat_mul_u8`.
 
 ## Generic version {#generic}
 

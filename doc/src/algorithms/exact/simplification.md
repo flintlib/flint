@@ -10,7 +10,7 @@ numbers: a "simplest" form is not defined in general, and finding one
 would require at least deciding equality. FLINT therefore aims at a
 weaker goal: keep representations small and recognise equal numbers as
 often as possible, so that zero tests succeed and results are readable.
-This page lists the mechanisms.
+The mechanisms are listed below.
 
 ## Canonical forms where available {#canonical}
 

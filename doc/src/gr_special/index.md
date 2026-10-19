@@ -33,8 +33,8 @@ Which rings implement which functions:
 * Power series rings (`gr_series`) implement the functions of power
   series, via `gr_poly` (for example `_gr_poly_exp_series`).
 * $\Z$, $\mathbb{Q}$, $\Z/n\Z$ and finite fields implement the combinatorial
-  numbers, many through the generic implementations at the end of this
-  page, which work in any ring.
+  numbers, many through the generic implementations documented at the
+  end, which work in any ring.
 
 A function that is not implemented for a ring returns `GR_UNABLE`. The
 defaults of the elementary functions handle only trivial arguments
@@ -659,7 +659,7 @@ int gr_dedekind_eta_q(gr_ptr res, gr_srcptr q, gr_ctx_t ctx)
 Set `res` to the Dedekind eta function $\eta(\tau)$. `gr_dedekind_eta_q` takes the nome $q = e^{2 \pi i \tau}$ instead and computes $\eta$ without the leading factor $q^{1/24}$, that is, $q^{-1/24} \eta(\tau) = \prod_{k \ge 1} (1 - q^k)$ (as `acb_modular_eta_sum` does), which is a single-valued function of $q$ for $|q| < 1$. It returns `GR_DOMAIN` if $|q| \ge 1$, and is implemented for real and complex balls.
 
 ::: details
-For $|q| \le 1/2$ (or a ball $q$ containing 0) the ball versions sum the series with `acb_modular_eta_sum`; otherwise they compute $\tau = \log(q) / (2 \pi i)$ and use `acb_modular_eta`, which moves $\tau$ to the fundamental domain, and multiply by $q^{-1/24} = e^{-\log(q)/24}$. A ball $q$ that contains points of modulus both below and at least 1 gives `GR_UNABLE`. Until commit `5603850` (during the development of FLINT 3.7) no ring implemented this method, and its parameter was named `tau`.
+For $|q| \le 1/2$ (or a ball $q$ containing 0) the ball versions sum the series with `acb_modular_eta_sum`; otherwise they compute $\tau = \log(q) / (2 \pi i)$ and use `acb_modular_eta`, which moves $\tau$ to the fundamental domain, and multiply by $q^{-1/24} = e^{-\log(q)/24}$. A ball $q$ that contains points of modulus both below and at least 1 gives `GR_UNABLE`.
 :::
 :::
 

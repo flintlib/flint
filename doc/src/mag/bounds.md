@@ -100,4 +100,4 @@ balls at a low precision such as 30 bits and convert it with
 directions automatically.
 
 The representation of `mag_t` and the proofs that its operations round in
-the right direction are on [](algorithms/ball-arithmetic/representation).
+the right direction are described in [](algorithms/ball-arithmetic/representation).

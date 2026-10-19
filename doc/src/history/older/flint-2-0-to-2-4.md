@@ -4,6 +4,10 @@ summary: Releases from 2011 to 2014: the rewrite of FLINT 1 as FLINT 2, with fmp
 order: 2
 ---
 
+FLINT 2.0, released in January 2011, was a complete rewrite of FLINT 1
+from scratch. The release notes below cover the FLINT 2 series up to
+FLINT 2.4 (November 2012) and its bug-fix releases 2.4.2 to 2.4.5.
+
 ## FLINT 2.4.5 {#flint-2-4-5}
 
 * fixed a severe bug in flint's fmpz_poly_gcd_heuristic, reported by

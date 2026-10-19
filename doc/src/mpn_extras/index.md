@@ -229,7 +229,7 @@ so that the sum cannot overflow two limbs.
 
 ## Multiplication {#multiplication}
 
-The page [](mpn_extras/mul) explains the algorithm selection.
+[](mpn_extras/mul) explains the algorithm selection.
 
 ::: summary algorithms/integers/basecase-multiplication :::
 
@@ -354,7 +354,7 @@ Given two $n$-limb integers, the *low product* is the product modulo
 $B^n$, and a *high product* is an approximation of the top $n$ limbs
 $\lfloor uv / B^n \rfloor$ of the full product. The low product is
 uniquely defined; the high product is not, since the carry from the low
-part is not computed. The page [](mpn_extras/mulhigh) states the
+part is not computed. [](mpn_extras/mulhigh) states the
 precise contracts.
 
 ::: summary algorithms/integers/short-products :::
@@ -1125,7 +1125,7 @@ Euclidean division and its relatives. Unless stated otherwise the dividend
 $(a, \mathit{an})$ and the divisor $(b, \mathit{bn})$ satisfy
 $\mathit{an} \ge \mathit{bn} \ge 1$ and $b_{bn-1} \ne 0$ (the top limb of
 $a$ may be zero), and the quotient has $\mathit{an} - \mathit{bn} + 1$
-limbs. The page [](mpn_extras/tdiv_qr) describes the algorithm
+limbs. [](mpn_extras/tdiv_qr) describes the algorithm
 selection.
 
 ::: summary algorithms/integers/division :::
@@ -1904,7 +1904,7 @@ single-limb moduli (*multi-mod*) and the inverse reconstruction
 (*multi-CRT*), with precomputed data stored in a `flint_mpn_crt_t`. The
 moduli must be nonzero and, for Chinese remaindering, pairwise coprime;
 they need not be prime. The `fmpz_comb_t` of the `fmpz` module is a thin
-wrapper around this structure, and the page [](mpn_extras/multi_crt)
+wrapper around this structure, and [](mpn_extras/multi_crt)
 shows how to use it.
 
 ::: summary algorithms/integers/multimodular-reduction :::

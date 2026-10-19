@@ -11,9 +11,11 @@ elliptic curve method) depends mainly on the size of the factor $p$ they
 find, while that of the *general purpose* methods (SQUFOF, the quadratic
 sieve) depends only on the size of the number $N$ itself. A factoring
 routine therefore removes small factors first and calls the general
-methods only on what remains. This page compares the methods and
-describes how `fmpz_factor` and `n_factor` use them; the elliptic curve
-method and the quadratic sieve have their own pages.
+methods only on what remains. The sections below compare the methods
+and describe how `fmpz_factor` and `n_factor` use them; the elliptic
+curve method and the quadratic sieve are described in
+[](algorithms/number-theory/ecm) and
+[](algorithms/number-theory/quadratic-sieve).
 
 ## The methods {#methods}
 

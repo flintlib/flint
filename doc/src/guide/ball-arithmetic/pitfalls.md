@@ -8,8 +8,8 @@ The ball arithmetic modules follow the conventions of all FLINT modules
 for types, naming, aliasing and memory management
 ([](guide/conventions)), and the general remarks on correctness, input
 validation and size limits apply to them as well
-([](guide/correctness)). This page describes the additional conventions
-that are specific to ball arithmetic and easy to overlook.
+([](guide/correctness)). The sections below describe the additional
+conventions that are specific to ball arithmetic and easy to overlook.
 
 ## Precision limits {#limits}
 

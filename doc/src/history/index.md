@@ -3,9 +3,9 @@ title: History
 summary: The release notes of FLINT, release by release, and the version histories of the Arb, Calcium and Antic libraries that were merged into FLINT 3.0.
 ---
 
-These pages collect the release notes of FLINT from version 1.0 (2007)
-to the present, with one page for each release series of FLINT 3 and
-grouped pages for the earlier releases. FLINT 3.0 merged the separate
+This part of the documentation collects the release notes of FLINT
+from version 1.0 (2007) to the present: those of each release series of
+FLINT 3 separately, and those of the earlier releases in groups. FLINT 3.0 merged the separate
 libraries Arb (ball arithmetic), Calcium (exact real and complex
 numbers) and Antic (number fields and binary quadratic forms); their
 version histories up to the merge are kept in the last group. The

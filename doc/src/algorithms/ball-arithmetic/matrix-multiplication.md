@@ -127,7 +127,7 @@ ball arithmetic, which adds the rounding errors to the radius. The
 radius part adds an upper bound for $A_r(|B_m| + B_r) + |A_m| B_r$ by
 [](#lem-double) and the upward rounding of the conversions between
 `mag_t` and `double`, which bounds $|\tilde A \tilde B - A_m B_m|$ by the
-identity at the top of this page.
+identity at the beginning of this section.
 :::
 
 ## Algorithm selection {#selection}

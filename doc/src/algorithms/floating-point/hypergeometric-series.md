@@ -11,7 +11,7 @@ so that the products at each level have similar sizes
 ([](algorithms/integers/binary-splitting)) [@Bre1976] [@HP1998]. It is
 the method of choice for constants such as $\pi$, $e$, $\log 2$ and
 $\zeta(3)$, and for the Taylor series of elementary functions at a
-rational point (the bit-burst algorithm). This page describes the
+rational point (the bit-burst algorithm). This section describes the
 engine of `mp_real_hypgeom_series` and the two splittings with power
 tables used by the elementary functions, with emphasis on how they save
 FFT work by reusing transforms.

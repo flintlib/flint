@@ -7,8 +7,8 @@ order: 3
 Every ball function that can round takes a precision `prec` in bits. The
 precision controls the *working precision*, not the accuracy of the
 result: how many bits of the output are correct depends on the function,
-on the input and on the conditioning of the problem. This page explains
-the relation between the two and how to choose the precision.
+on the input and on the conditioning of the problem. The sections below
+explain the relation between the two and how to choose the precision.
 
 ## Measuring accuracy {#accuracy}
 

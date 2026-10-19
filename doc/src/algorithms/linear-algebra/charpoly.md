@@ -10,12 +10,14 @@ polynomial $\chi_M(x) = \det(xI - M)$ can be computed with
 $O(r^\omega)$ operations over a field by the algorithms of Keller-Gehrig
 [@KG1985] and Pernet and Storjohann [@PS2007], which reduce the problem
 to matrix multiplication; see [@DPW2005] for a practical comparison. FLINT
-uses two simpler cubic and quartic algorithms instead, chosen so that
-the result is correct for every modulus $N$, prime or not.
+uses two simpler algorithms instead, Danilevsky's cubic reduction to
+companion form and Berkowitz's quartic division-free algorithm, chosen so
+that the result is correct for every modulus $N$, prime or not. The
+minimal polynomial is computed with a Krylov method ([](#minpoly)).
 
 ## Generic version {#generic}
 
-Both algorithms on this page are implemented once in `gr_mat`
+Both characteristic polynomial algorithms are implemented once in `gr_mat`
 (`_gr_mat_charpoly_berkowitz`, `_gr_mat_charpoly_danilevsky`), together
 with the Faddeev-LeVerrier algorithm and its baby-step giant-step
 variant (which divide by $1, \ldots, r$ and need characteristic zero or

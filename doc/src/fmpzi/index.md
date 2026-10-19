@@ -18,8 +18,7 @@ is built on these functions and gives polynomials and matrices over
 $\mathbb{Z}[i]$. Factorisation is not implemented.
 
 The reference lists the types and basic operations, then arithmetic,
-division and GCDs, primality, and finally polynomial multiplication. The
-page [](fmpzi/gcd) describes the GCD functions in more detail. All
+division and GCDs, primality, and finally polynomial multiplication. [](fmpzi/gcd) describes the GCD functions in more detail. All
 functions allow aliasing between inputs and outputs.
 
 ::: summary algorithms/number-theory/gaussian-integers :::

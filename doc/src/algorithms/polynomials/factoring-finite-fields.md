@@ -99,7 +99,7 @@ generic code uses composition when $q$ has more than $\tfrac{3}{4}(\lfloor
 
 Squarefree factorisation needs only gcds, divisions, derivatives and, in
 characteristic $p$, $p$-th roots of coefficients; it costs $O(M(n) \log
-n)$ operations per gcd and is described on
+n)$ operations per gcd and is described in
 [](algorithms/polynomials/squarefree). It reduces the problem to monic
 squarefree polynomials, and all steps below assume this.
 
@@ -460,7 +460,7 @@ is described in [](algorithms/finite-fields/overview). The modular factorisation
 over $\Z$ ([](algorithms/polynomials/factoring-integers)) and by the
 multivariate factorisation code
 ([](algorithms/multivariate/modp-factoring)) call `nmod_poly_factor` and
-`fmpz_mod_poly_factor`. Irreducibility tests are on
+`fmpz_mod_poly_factor`. Irreducibility tests are described in
 [](algorithms/polynomials/irreducibility), and root finding, which is
 the case $d = 1$ with a cheaper first split, on
 [](algorithms/polynomials/root-finding).

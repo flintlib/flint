@@ -5,8 +5,9 @@ complexity: $mkn$ vector multiply-adds (u32, u52 in single mode), two (u52), thr
 order: 20
 ---
 
-This page describes the kernels behind `nmod_mat_mul` for moduli
-$1 \le N \le 2^{52}$ and the floating-point method for larger moduli.
+The blocked kernels described below are those behind `nmod_mat_mul`
+for moduli $1 \le N \le 2^{52}$; the floating-point method for larger
+moduli is described after them.
 Throughout, $A$ is $m \times k$, $B$ is $k \times n$, and the entries are
 residues in $[0, N)$. The kernels have the same structure as
 floating-point `gemm` kernels ([](algorithms/linear-algebra/gemm)); what

@@ -5,8 +5,8 @@ functions: flint_mpn_crt_init flint_mpn_multi_mod flint_mpn_multi_crt flint_mpn_
 
 Multimodular algorithms map a large integer to its residues modulo many
 word-size primes, do their work modulo each prime, and recover the integer
-result by Chinese remaindering. The two conversions are the subject of this
-page. A `flint_mpn_crt_t` holds the precomputed data for a fixed list of
+result by Chinese remaindering. The two conversions are described below.
+A `flint_mpn_crt_t` holds the precomputed data for a fixed list of
 moduli $m_0, \ldots, m_{k-1}$ (pairwise coprime for Chinese remaindering,
 not necessarily prime), with product $P$; `flint_mpn_multi_mod` and
 `flint_mpn_multi_crt` then convert in quasi-linear time

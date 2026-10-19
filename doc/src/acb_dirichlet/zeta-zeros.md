@@ -12,7 +12,7 @@ isolated in an interval that contains exactly one sign change of $Z(t)$,
 and the zeros between are counted by Turing's method, so that the $n$-th
 zero found is the $n$-th zero of $\zeta(s)$ in the critical strip. In
 particular, the computation verifies that the zeros in the Gram blocks it
-examines are simple and lie on the critical line. The mathematics is on
+examines are simple and lie on the critical line. The mathematics is described in
 [](algorithms/special-functions/zeta-zeros); the general techniques for
 isolating and refining real roots in ball arithmetic are described in
 [](algorithms/ball-arithmetic/real-root-isolation).

@@ -6,7 +6,7 @@ order: 2.5
 ---
 
 FLINT is used to obtain mathematical results, and a user needs to know
-how far these results can be trusted. The pages below explain what FLINT
+how far these results can be trusted. The sections below explain what FLINT
 promises and what it does not:
 
 - the algorithms are provably correct, except where a function

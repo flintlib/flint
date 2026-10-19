@@ -22,7 +22,7 @@ These back `acb_dft` and `acb_dirichlet_dft`.
 
 Start with the guide [](gr_dft/getting-started), which also explains the
 conventions of `gr` (contexts, status codes, element pointers) used
-throughout this page. The guide [](gr_dft/performance) explains how a
+throughout this module. The guide [](gr_dft/performance) explains how a
 plan chooses its algorithm and how to tune plans and threads. The
 algorithms and their conditions on the ring are described in
 [](algorithms/fft/dft-algorithms), and the error analysis of the
@@ -62,7 +62,7 @@ $$
 A plan holds everything that depends only on the length, the ring and the
 root: the algorithm and its decomposition into sub-plans, the table of
 roots of unity, and the auxiliary tables of the composite algorithms.
-The page [](gr_dft/plans) explains how to construct plans and what can
+[](gr_dft/plans) explains how to construct plans and what can
 go wrong.
 
 ::: type
@@ -273,7 +273,7 @@ X_{k_0, \ldots, k_{r-1}} = \sum_{j_0, \ldots, j_{r-1}} x_{j_0, \ldots, j_{r-1}}
 $$
 
 where $w_a$ is a principal $c_a$-th root of unity. It is computed as one
-cyclic transform along each axis. The page [](gr_dft/prod) has an
+cyclic transform along each axis. [](gr_dft/prod) has an
 example.
 
 ::: type
@@ -361,8 +361,7 @@ root $e^{-2\pi i/n}$. They use the fixed-point contexts internally with a
 rigorous error bound, and ball arithmetic when the fixed-point path does
 not apply. The outputs contain the exact transform of every vector of
 complex numbers contained in the input balls. `acb_dft` and
-`acb_dirichlet_dft` are thin wrappers around them. The page
-[](gr_dft/acb) explains how the method works and when it falls back.
+`acb_dirichlet_dft` are thin wrappers around them. [](gr_dft/acb) explains how the method works and when it falls back.
 
 ::: type
 gr_dft_acb_pre_struct
@@ -460,7 +459,7 @@ holding an absolute value in $[0, 1)$ with unit $2^{-k \bits}$ (one
 *ulp*); an element of the complex context is a real and an imaginary
 part. Additions are exact, and multiplications truncate toward zero.
 Every value must stay below 1 in absolute value: an operation that
-overflows returns `GR_UNABLE`. The page [](gr_dft/nfixed) shows how to
+overflows returns `GR_UNABLE`. [](gr_dft/nfixed) shows how to
 scale the input with the help of `gr_dft_precomp_nfixed_bound`.
 
 ::: function

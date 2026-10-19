@@ -9,7 +9,7 @@ word-size modulus $n$, using the `ulong` inverse from `n_preinvert_limb`
 `slong` for `n_powmod2_preinv` and `n_powmod2`, where a negative $e$
 computes a power of $a^{-1} \bmod n$; `ulong` for the full unsigned range;
 and `fmpz_t` for nonnegative exponents of any size. The functions with a
-`double` inverse (`n_powmod_precomp` and its relatives) have their own page.
+`double` inverse (`n_powmod_precomp` and its relatives) are documented separately.
 
 By convention $a^0 = 1$ (also for $a = 0$), reduced modulo $n$, so the
 result is 0 when $n = 1$.

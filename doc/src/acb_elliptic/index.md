@@ -240,7 +240,7 @@ integrals: they are symmetric in their arguments, homogeneous, and can be
 computed by a duplication algorithm [@Car1995]. Every elliptic integral
 can be expressed in terms of $R_F$, $R_G$ and $R_J$, of which
 $R_C(x, y) = R_F(x, y, y)$ and $R_D(x, y, z) = R_J(x, y, z, z)$ are
-special cases. The page [](acb_elliptic/carlson) explains the domains of
+special cases. [](acb_elliptic/carlson) explains the domains of
 validity and the choice of method.
 
 ::: function

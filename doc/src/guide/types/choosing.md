@@ -10,8 +10,8 @@ The integers modulo $n$ alone can be `ulong` residues with an `nmod_t`,
 `mpn_mod` context, or elements of any of these through the generic
 interface [`gr`](gr). The types differ in the range of parameters they
 accept, in speed (often by large factors for small inputs), in the
-functionality that exists for them, and in how they are called. This
-page gives the general principles, a table of the types by area with
+functionality that exists for them, and in how they are called. The
+sections below give the general principles, a table of the types by area with
 their limits, and a short decision guide. The conventions shared by all
 types (the `foo_t` objects, contexts, naming and aliasing) are described
 in [](guide/conventions/types-and-naming).

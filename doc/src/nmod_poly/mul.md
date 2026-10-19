@@ -182,9 +182,8 @@ aliasing:  1
 
 For $n \le 23$ the FFT product packs two coefficients into one and checks
 with a Cauchy–Schwarz bound that the packed digits cannot overflow
-([](algorithms/polynomials/multiplication#repack)). Until commit
-`c54fd98` (PR #2892, during the development of FLINT 3.7) the last
-even-indexed coefficient of an operand of odd length entered that bound
+([](algorithms/polynomials/multiplication#repack)). In FLINT 3.6
+and earlier the last even-indexed coefficient of an operand of odd length entered that bound
 unsquared, and `nmod_poly_mul` could return a wrong product for inputs
 whose even coefficients are nearly all $n - 1$. The following program
 prints `BUG` on affected versions and `ok` on fixed ones:

@@ -20,8 +20,8 @@ $\theta_{0,0} = \theta_3$, $\theta_{0,1} = \theta_4$, $\theta_{1,0} = \theta_2$
 and $\theta_{1,1} = -\theta_1$. FLINT evaluates them in two steps: an
 action of the modular group moves $(z, \tau)$ to a *reduced* point, where
 the series converges quickly and uniformly, and the theta values at the
-reduced point are computed either by summing the series (this page) or
-by the quasi-linear algorithm based on duplication formulas
+reduced point are computed either by summing the series (described
+below) or by the quasi-linear algorithm based on duplication formulas
 ([](algorithms/special-functions/theta-quasi-linear)). The general
 references are [@Mum1983] and [@Igu1972]; the algorithms of
 [`acb_theta`](acb_theta) are those of Elkies and Kieffer [@EK2025].

@@ -5,7 +5,8 @@ complexity: $O(M(n) \log^2 n)$ for the hypergeometric constants by binary splitt
 order: 20
 ---
 
-Most constants are sums of *hypergeometric series*, series whose term
+Most of the mathematical constants provided by `arb` are sums of
+*hypergeometric series*, series whose term
 ratio is a rational function of the index, and are evaluated by binary
 splitting. The series for $\pi$, $e$, $\log 2$, $\log 10$, $\gamma$,
 Catalan's constant, $\zeta(3)$ and $\zeta(5)$ are summed by the `mp_real`
@@ -13,7 +14,7 @@ module, and the `arb_const_` functions call it through
 `_mp_real_const_arb`; the formulas were chosen as the fastest among
 those collected by y-cruncher [@Yee2025]. The implementation side
 (splitting trees, threads, the shared cache of exact floors) is described
-on [](algorithms/floating-point/constants); this page gives the
+in [](algorithms/floating-point/constants); the sections below give the
 mathematics and the remaining constants.
 
 ## Binary splitting {#binary-splitting}

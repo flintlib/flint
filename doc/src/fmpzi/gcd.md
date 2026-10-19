@@ -33,7 +33,7 @@ compared directly. They differ only in the algorithm.
   `fmpzi_gcd_shortest`, preceded by one division if the sizes are very
   different.
 
-The proofs and the cost analysis are on
+The proofs and the cost analysis are described in
 [](algorithms/number-theory/gaussian-integers).
 
 ## Example {#example}

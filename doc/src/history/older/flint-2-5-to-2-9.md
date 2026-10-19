@@ -4,6 +4,11 @@ summary: Releases from 2015 to 2022: multivariate polynomials and their factoris
 order: 1
 ---
 
+The FLINT 2 series continued from version 2.5.0 (August 2015) to 2.9.0
+(June 2022), its last release before FLINT 3.0. FLINT 2.6.0 (June 2020)
+added multivariate polynomials over most standard rings, APR-CL
+primality proving and elliptic curve factoring.
+
 ## FLINT 2.9.0 (2022-06-24) {#flint-2-9-0}
 
 * Add fmpz_mod_poly_div function

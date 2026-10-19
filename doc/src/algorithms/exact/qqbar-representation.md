@@ -24,7 +24,7 @@ given by [](arb) balls, that contains $x$ and no other root of $P$ (an
 *isolating* ball). This representation, used for example by Loos
 [@Loo1983] and Strzebonski [@Str1997], is canonical: equal numbers have
 the same $P$, and different balls for the same number are recognised by
-refining them. This page explains how the isolation property is
+refining them. This section explains how the isolation property is
 certified and maintained and how all predicates are decided. Arithmetic
 is described in [](algorithms/exact/qqbar-arithmetic).
 

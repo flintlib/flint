@@ -9,8 +9,8 @@ correct result for every valid input, using algorithms with a proof of
 correctness. Heuristics are used everywhere, but only to choose between
 algorithms or parameters: tuning cutoffs, `double` estimates of the
 number of terms of a series or of the number of primes needed, random
-evaluation points. They affect the running time, not the result. This
-page describes the exceptions to the rule, which are always stated in
+evaluation points. They affect the running time, not the result. The
+sections below describe the exceptions to the rule, which are always stated in
 the documentation of the function concerned, and the cases where a
 function is allowed to answer "unknown" instead.
 

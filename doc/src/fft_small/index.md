@@ -1164,7 +1164,7 @@ there is none.
 
 The number-theoretic transforms themselves. Data is an array of doubles
 holding integers, transformed in place; the algorithm and the bounds are
-on [](algorithms/fft/small-prime-fft). These functions are internal, but
+described in [](algorithms/fft/small-prime-fft). These functions are internal, but
 stable enough to be used directly; see [](fft_small/sd_fft).
 
 ::: macro

@@ -21,9 +21,9 @@ coefficients are then lifted or combined over several primes.
 
 All methods need strict degree bounds $\deg_{x_j} f < r_j$. The number of
 values of $f$ (*probes*) they use, for $f$ with $t$ terms in $m$
-variables, compares as follows; the presentation of this page, in
-particular of the Berlekamp–Massey algorithm as a half-gcd computation,
-follows Schultz's notes [@Sch-mpoly].
+variables, compares as follows; the presentation below, in particular
+of the Berlekamp–Massey algorithm as a half-gcd computation, follows
+Schultz's notes [@Sch-mpoly].
 
 | Method | Probes | Main difficulties |
 |---|---|---|

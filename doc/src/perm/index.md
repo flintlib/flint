@@ -121,8 +121,7 @@ parity.
 
 ## Enumeration {#enumeration}
 
-The two functions below step through all $n!$ permutations. The page
-[](perm/enumeration) compares them and has an example.
+The two functions below step through all $n!$ permutations. [](perm/enumeration) compares them and has an example.
 
 ::: function
 int _perm_next_lex(slong * res, slong n)

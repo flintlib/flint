@@ -19,7 +19,7 @@ There is no negative zero, no unsigned infinity and no NaN payload.
 
 The guide [](arf/rounding) explains the rounding modes, the inexact flag
 and the precision argument with examples. The representation is described
-on [](algorithms/ball-arithmetic/representation).
+in [](algorithms/ball-arithmetic/representation).
 
 ## Representation and conventions {#conventions}
 
@@ -91,9 +91,7 @@ $1/\sqrt{x}$ are dyadic only for powers of two (resp. powers of four),
 which are handled without Newton iteration, and an exact quotient or
 square root that fits in `prec` bits is found exactly by the iteration,
 so it is verified by one exact multiplication, made only when the bit
-lengths and the low bits of the mantissas allow an exact result. (Until
-commit `5603850`, during the development of FLINT 3.7, the flag of the
-final rounding was returned, which could be 0 for an inexact result.)
+lengths and the low bits of the mantissas allow an exact result.
 :::
 :::
 

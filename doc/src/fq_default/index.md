@@ -451,7 +451,7 @@ the trace of $a \in \mathbb{F}_q$ are
 $N(a) = \prod_{i=0}^{d-1} \sigma^i(a)$ and
 $\operatorname{Tr}(a) = \sum_{i=0}^{d-1} \sigma^i(a)$, which are the
 determinant and the trace of the $\mathbb{F}_p$-linear map
-$x \mapsto ax$. The algorithms are described on
+$x \mapsto ax$. The algorithms are described in
 [](algorithms/finite-fields/frobenius-norm-trace).
 
 ::: function

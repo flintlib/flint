@@ -5,7 +5,9 @@ complexity: One modular exponentiation with an exponent below $n$, about $\log_2
 order: 40
 ---
 
-The test goes back to Miller [@Mil1976], who showed that it proves
+The strong probable prime test, also called the Miller–Rabin test,
+checks with one modular exponentiation a condition that every odd prime
+satisfies. It goes back to Miller [@Mil1976], who showed that it proves
 primality under the generalised Riemann hypothesis when enough bases are
 tried, and Rabin [@Rab1980], who turned it into a randomised test.
 

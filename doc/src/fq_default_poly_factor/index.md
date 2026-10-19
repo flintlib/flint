@@ -13,7 +13,7 @@ function of the representation of the context: those of
 [](fq_poly_factor) (and its `fq_nmod` and `fq_zech` versions), which wrap
 the generic algorithms of `gr_poly`, for extension fields, and those of
 `nmod_poly_factor` and `fmpz_mod_poly_factor` for prime fields. The
-algorithms are described on
+algorithms are described in
 [](algorithms/polynomials/factoring-finite-fields); the guide
 [](fq_default/getting-started) has an example.
 

@@ -15,8 +15,8 @@ transforms over two `gr` contexts of fixed-point numbers, computes a
 bound for every intermediate value and for the output error from the
 structure of the plan alone, and uses these bounds to produce enclosures
 for transforms of `acb` vectors (`gr_dft_acb`, which also implements
-`acb_dft`). This page describes the arithmetic, the error model and how
-the bounds are derived. For floating-point FFTs, error bounds of a
+`acb_dft`). The arithmetic, the error model and the derivation of the
+bounds are described below. For floating-point FFTs, error bounds of a
 similar kind are classical [@Hig2002, ch. 24; @Per2003].
 
 ## Arithmetic {#arithmetic}

@@ -4,6 +4,13 @@ summary: Releases of Arb from 2012 to 2015: from the first ball arithmetic code 
 order: 2
 ---
 
+Arb, the library for arbitrary-precision ball arithmetic built on
+FLINT 2 and merged into FLINT 3.0 in 2023, started with version 0.1 in
+September 2012. The release notes below cover the versions up to 2.8.1
+(December 2015), among them Arb 2.0 (May 2014), which introduced the
+modules `mag`, `arf`, `arb` and `acb`; the later versions are in
+[](history/merged/arb-2-9-to-2-23).
+
 ## Arb 2.8.1 (2015-12-31) {#arb-2-8-1}
 
 * Fixed 32-bit test failure for the Laguerre function.

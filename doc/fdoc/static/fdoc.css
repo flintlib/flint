@@ -24,6 +24,13 @@
   --ok-soft: #e6f3eb;
   --warn: #9a5b0b;
   --warn-soft: #fbf1e3;
+  /* cards: one shade of gray per kind of page */
+  --tone-module: #ffffff;
+  --tone-overview: #f6f7f9;
+  --tone-algorithm: #eef0f3;
+  --tone-guide: #f7f6f3;
+  --tone-tutorial: #f1f3f0;
+  --tone-manual: #f3f4f6;
   --font-text: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
   --font-ui: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -34,6 +41,7 @@
   --step-3: 2.1rem;
   --rail-w: 17rem;
   --measure: 46rem;
+  --wide: 84rem;         /* card listings on overview pages */
   --top-h: 3.25rem;
 }
 @media (prefers-color-scheme: dark) {
@@ -43,6 +51,8 @@
     --code-bg: #1a2029; --hl-ty: #b5a4f0; --hl-kw: #e48cc4; --hl-num: #e5b567; --hl-str: #8fd0a6;
     --hl-com: #7a8696; --hl-pre: #d4b77a; --ok: #78c897; --ok-soft: #17291f; --warn: #e5a75a;
     --warn-soft: #2a2116; color-scheme: dark;
+    --tone-module: #171c24; --tone-overview: #1b212a; --tone-algorithm: #212731;
+    --tone-guide: #201f1f; --tone-tutorial: #1d2221; --tone-manual: #1e222a;
   }
 }
 :root[data-theme="dark"] {
@@ -51,6 +61,8 @@
   --code-bg: #1a2029; --hl-ty: #b5a4f0; --hl-kw: #e48cc4; --hl-num: #e5b567; --hl-str: #8fd0a6;
   --hl-com: #7a8696; --hl-pre: #d4b77a; --ok: #78c897; --ok-soft: #17291f; --warn: #e5a75a;
   --warn-soft: #2a2116; color-scheme: dark;
+  --tone-module: #171c24; --tone-overview: #1b212a; --tone-algorithm: #212731;
+  --tone-guide: #201f1f; --tone-tutorial: #1d2221; --tone-manual: #1e222a;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -158,7 +170,6 @@ h1, h2, h3, h4 { font-family: var(--font-ui); font-weight: 600; line-height: 1.2
 h1 { font-size: var(--step-3); margin: 0 0 0.6rem; letter-spacing: -0.01em; }
 .page-head h1 code { font-size: 0.82em; font-weight: 600; background: none; padding: 0; }
 h1.fn-title code { font-size: 0.72em; overflow-wrap: anywhere; }
-.lead { font-size: 1.16rem; line-height: 1.55; color: var(--ink-2); margin: 0.4rem 0 1rem; }
 pre.include { margin: 0.8rem 0 0; padding: 0; background: none; }
 pre.include code { font-size: 0.85rem; }
 
@@ -357,18 +368,28 @@ pre.cite-body { font: 0.76rem/1.5 var(--font-mono); white-space: pre-wrap; backg
 }
 
 /* collections and listings */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 0.75rem; margin: 0.6rem 0 1.4rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 0.75rem; margin: 0.6rem 0 1.4rem; }
 .cards .card { margin: 0; }
 .group h2 { font-size: var(--step-1); margin: 2.2rem 0 0.3rem; padding-top: 1rem; border-top: 1px solid var(--line); }
 .group h2 a { color: var(--ink); }
 .group h2 a:hover { color: var(--accent); }
 .group-summary { margin: 0 0 0.4rem; color: var(--ink-2); font-size: 0.98rem; }
 .modcat h3 { font: 600 0.78rem var(--font-ui); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 1.4rem 0 0.5rem; }
-.modcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 0.6rem; }
+.modcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 0.6rem; }
 .modcard { display: grid; align-content: start; gap: 0.2rem; padding: 0.7rem 0.9rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink-2); font-size: 0.93rem; }
 .modcard:hover { border-color: var(--accent); text-decoration: none; }
 .modcard code { font-size: 0.92rem; font-weight: 600; color: var(--accent); background: none; padding: 0; }
-.main > .cards, .main > .group { max-width: var(--measure); }
+.main > .cards, .main > .group { max-width: var(--wide); }
+/* listings use the full width (up to four columns); their text stays at reading width */
+.group > h2, .group-summary, .prose.home > :not(.modcat):not(.cards) { max-width: var(--measure); }
+.main > .prose.home { max-width: var(--wide); }
+.prose.intro .cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); }
+.card.k-module, .modcard.k-module { background: var(--tone-module); }
+.card.k-overview { background: var(--tone-overview); }
+.card.k-algorithm { background: var(--tone-algorithm); }
+.card.k-guide { background: var(--tone-guide); }
+.card.k-tutorial { background: var(--tone-tutorial); }
+.card.k-manual, .card.k-history { background: var(--tone-manual); }
 .ex-req { font-size: 0.72rem; color: var(--warn); background: var(--warn-soft); padding: 0.1rem 0.5rem; border-radius: 999px; }
 
 /* module sidebar: guides above the reference sections */

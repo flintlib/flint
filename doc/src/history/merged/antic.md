@@ -4,6 +4,11 @@ summary: Releases of Antic 0.1 to 0.2.5 (2013–2021), the library for number fi
 order: 4
 ---
 
+Antic, a library for number fields (`nf_elem`) and binary quadratic
+forms (`qfb`) built on FLINT 2, was released from version 0.1 (May 2013)
+to 0.2.5 (June 2021), and merged into FLINT 3.0 in 2023 at that last
+version. Most of its releases had no release notes.
+
 ## Antic 0.2.5 (2021-06-24) {#antic-0-2-5}
 
 * No release notes were written for this release.

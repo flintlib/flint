@@ -17,7 +17,7 @@ and the asymptotically fast bit-burst algorithm beyond. The design is
 described in [@Joh2014c] (medium precision) and [@HJ2024] (high
 precision); [@Bre1976b], [@Smi1989], [@BZ2011] and [@Mul2016] are
 general references. The `mp_real` module implements its own versions of
-the same functions with further refinements, described on
+the same functions with further refinements, described in
 [](algorithms/floating-point/elementary-functions).
 
 ## The ball layer {#ball}

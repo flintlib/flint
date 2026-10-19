@@ -507,7 +507,7 @@ inexact rings they would otherwise only be approximately zero).
 The non-underscore functions return `GR_DOMAIN` if $V = 0$; the
 underscore version requires $\mathit{lenU} \ge \mathit{lenV} \ge 1$ and
 writes $\mathit{lenU} - \mathit{lenV} + 1$ coefficients of $Q$ and
-$\mathit{lenU}$ of $R$. (Until commit `5603850`, during the development
-of FLINT 3.7, the last step, $k = 0$, was skipped, so that for example
+$\mathit{lenU}$ of $R$. (In FLINT 3.6 and
+earlier the last step, $k = 0$, was skipped, so that for example
 $D^2 + D + 1$ divided by $D$ gave $Q = D$ and $R = 1 + D$.)
 :::

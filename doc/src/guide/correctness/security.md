@@ -68,9 +68,9 @@ previous pages:
   their input. `fmpz_poly_set_str` and `nmod_poly_set_str` allocate the
   number of coefficients announced at the start of the string before
   reading any of them, so `"1000000000000  1"` requests 8 TB of memory.
-  While this page was written, `fmpz_poly_set_str` was found to read
-  past the end of a string announcing more coefficients than it
-  contains, and `nmod_poly_set_str` to crash on a negative length.
+  `fmpz_poly_set_str` reads past the end of a string announcing more
+  coefficients than it contains, and `nmod_poly_set_str` crashes on a
+  negative length.
   `nmod_poly_set_str` also accepts coefficients that are not reduced
   modulo $n$, which produces an invalid polynomial.
 

@@ -15,9 +15,10 @@ B_{2m} = (-1)^{m+1} \frac{2\, (2m)!}{(2\pi)^{2m}} \zeta(2m), \qquad
 $$
 
 The numerator of $B_n$ thus has about $n \log_2 n$ bits; that of $B_{10^6}$
-has about 15.8 million. This page describes how FLINT computes $B_n$ exactly
-for one $n$, for a range of $n$, and modulo a prime. Euler numbers, which
-are handled by the same ideas, are discussed at the end. For the
+has about 15.8 million. The sections below describe how FLINT computes
+$B_n$ exactly for one $n$, for a range of $n$, and modulo a prime. Euler
+numbers, which are handled by the same ideas, are discussed at the end.
+For the
 classical theory see [@IR1990, Chapter 15] and [@Coh2007b, Chapter 9].
 
 ## The denominator {#denominator}

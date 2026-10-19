@@ -115,7 +115,9 @@ for reproducible builds).
 * Algorithm pages automatically get a "Referenced from" list of every function
   block or page that links to them.
 * Module front matter: `title`, `header`, `category` (groups modules on the
-  home page), `order` (position within the category), `description`, and
+  home page), `order` (position within the category), `description` (the
+  text of the module's card on the home page; like `summary`, it is not
+  repeated on the page itself or in the PDF), and
   optionally `extra-headers` (other modules whose headers declare functions
   documented here, e.g. `flint`), `source` (the header/source directory when
   it differs from the page directory, e.g. `gr_domains` documents `gr.h`),
@@ -140,7 +142,8 @@ identifiers and math never need escaping.
 ---
 title: Modular multiplication          front matter: key: value
 functions: n_mulmod2_preinv n_mulmod2  (function pages)
-summary: One sentence.                 (algorithm pages; shown on cards)
+summary: One sentence.                 (shown only on the cards linking to the page:
+                                        the page's own introduction must not rely on it)
 ---
 
 ## Section {#optional-id}
@@ -167,6 +170,7 @@ Longer text, only on the function's own page.
 :::                                    definition, remark, proof, algorithm,
                                        note, warning
 ::: summary algorithms/shoup :::       card linking to a page, with its summary
+                                       (in the PDF, a reference to the section)
 ::: functions n_gcd n_xgcd :::         compact list of linked prototypes
 
 ```c example name=gcd_basic           compiled and run by `fdoc examples`

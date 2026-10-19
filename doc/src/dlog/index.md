@@ -22,8 +22,7 @@ integers $1, \ldots, N-1$ at once, by enumeration or by sieving.
 Little effort has been made for a single logarithm in a large group of
 prime order. For one-off logarithms modulo a prime with smooth $p - 1$,
 see also `nmod_discrete_log_pohlig_hellman`
-([](algorithms/number-theory/discrete-log)). The page
-[](dlog/precomp) explains how to set up a precomputation, and the
+([](algorithms/number-theory/discrete-log)). [](dlog/precomp) explains how to set up a precomputation, and the
 algorithms are described in
 [](algorithms/number-theory/discrete-log-tables).
 

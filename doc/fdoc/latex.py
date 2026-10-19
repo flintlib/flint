@@ -219,7 +219,32 @@ class LatexRenderer:
 
     # -- blocks -----------------------------------------------------------
     def blocks(self, nodes):
-        return "\n\n".join(x for x in (self.block(nd) for nd in nodes) if x)
+        out = []
+        run = []        # consecutive '::: summary' pointers share one quote
+        for nd in nodes:
+            if nd.kind == "div" and nd.get("kind") == "summary":
+                x = self.summary_pointer(nd)
+                if x:
+                    run.append(x)
+                continue
+            if run:
+                out.append("\\begin{quote}\\small %s\\end{quote}" % "\\\\\n".join(run))
+                run = []
+            x = self.block(nd)
+            if x:
+                out.append(x)
+        if run:
+            out.append("\\begin{quote}\\small %s\\end{quote}" % "\\\\\n".join(run))
+        return "\n\n".join(out)
+
+    def summary_pointer(self, nd):
+        """A '::: summary' card in print: a reference to the section, without
+        the card's abstract."""
+        tp = self.site.resolve_page(nd["args"].split()[0]) if nd["args"] else None
+        if tp is None:
+            return ""
+        return ("$\\rightarrow$ \\hyperref[pg:%s]{\\textbf{%s}} (p.~\\pageref{pg:%s})"
+                % (label(tp.id), self.inline(tp.title), label(tp.id)))
 
     def heading_cmd(self, level):
         cmds = ["chapter", "section", "subsection", "subsubsection", "paragraph", "subparagraph"]
@@ -254,7 +279,7 @@ class LatexRenderer:
         text = nd["text"]
         if nd.get("example_name"):
             out = ("\\par\\noindent{\\small\\textbf{Example} \\texttt{%s.c} "
-                   "{\\color{fdocmuted}(compiled and run by \\texttt{make check})}}\n"
+                   "{\\color{fdocmuted}(compiled and run by \\texttt{make checkdoc})}}\n"
                    "\\begin{Verbatim}[fontsize=\\small,frame=single,framesep=2mm]\n%s\n\\end{Verbatim}\n"
                    % (tex_escape(nd["example_name"]), text))
             if nd.get("output") is not None:
@@ -265,8 +290,7 @@ class LatexRenderer:
         return "\\begin{Verbatim}[fontsize=\\small]\n%s\n\\end{Verbatim}\n" % text
 
     def table(self, nd):
-        n = len(nd["head"])
-        spec = "@{}" + "Y" * n + "@{}"
+        spec = "@{}" + "".join(r">{\hsize=%.3f\hsize}Y" % w for w in self.column_widths(nd)) + "@{}"
         head = " & ".join(r"\textbf{%s}" % self.inline(c) for c in nd["head"]) + r" \\"
         rows = [" & ".join(self.inline(c) for c in r) + r" \\" for r in nd["rows"]]
         if self.nest == 0:
@@ -275,6 +299,23 @@ class LatexRenderer:
                     "%s\\midrule\\endhead\n\\bottomrule\\endlastfoot\n%s\n\\end{xltabular}}" % (spec, head, "\n".join(rows)))
         return ("{\\small\\renewcommand{\\arraystretch}{1.25}\\begin{tabularx}{\\linewidth}{%s}\\toprule\n%s\\midrule\n%s\n"
                 "\\bottomrule\\end{tabularx}}" % (spec, head, "\n".join(rows)))
+
+    @staticmethod
+    def column_widths(nd):
+        """Relative widths of the columns (summing to the number of columns,
+        as tabularx requires): proportional to the longest cell of each
+        column, but wide enough for its longest word, so that a column of
+        short numbers does not take as much room as one of sentences."""
+        rows = [nd["head"]] + list(nd["rows"])
+        n = len(nd["head"])
+        weights = []
+        for j in range(n):
+            texts = [plain_text(r[j]) if j < len(r) else "" for r in rows]
+            longest = max((len(s) for s in texts), default=1)
+            word = max((len(w) for s in texts for w in s.split()), default=1)
+            weights.append(max(min(longest, 60), 1.3 * word, 3))
+        total = sum(weights)
+        return [n * w / total for w in weights]
 
     def proto(self, p, anchor):
         parts = []
@@ -313,12 +354,8 @@ class LatexRenderer:
             return "\\begin{quote}\\textbf{%s.} %s\\end{quote}" % (tex_escape(nd["args"] or kind.capitalize()),
                                                                   self.blocks(nd.children))
         if kind == "summary":
-            tp = self.site.resolve_page(nd["args"].split()[0]) if nd["args"] else None
-            if tp is None:
-                return ""
-            summ = tp.summary()
-            return ("\\begin{quote}\\small $\\rightarrow$ \\hyperref[pg:%s]{\\textbf{%s}} (p.~\\pageref{pg:%s}). %s\\end{quote}"
-                    % (label(tp.id), self.inline(tp.title), label(tp.id), self.inline(summ) if summ else ""))
+            x = self.summary_pointer(nd)
+            return "\\begin{quote}\\small %s\\end{quote}" % x if x else ""
         if kind == "functions":
             out = []
             for name in nd["args"].split():
@@ -365,16 +402,12 @@ class LatexBuilder:
                 level = 3
                 if g is not None:
                     r = LatexRenderer(self, g, 3)
-                    summ = g.summary()
-                    sec.append("\\section{%s}%s\n%s%s" % (r.inline(g.title), self.page_label(g),
-                               "\\emph{%s}\n\n" % r.inline(summ) if summ else "", r.blocks(g.body)))
+                    sec.append("\\section{%s}%s\n%s" % (r.inline(g.title), self.page_label(g), r.blocks(g.body)))
                     level = 4
                 for p in pages:
                     r = LatexRenderer(self, p, level)
-                    summ = p.summary()
                     cmd = "subsection" if level == 4 else "section"
-                    sec.append("\\%s{%s}%s\n%s%s" % (cmd, r.inline(p.title), self.page_label(p),
-                               "\\emph{%s}\n\n" % r.inline(summ) if summ else "", r.blocks(p.body)))
+                    sec.append("\\%s{%s}%s\n%s" % (cmd, r.inline(p.title), self.page_label(p), r.blocks(p.body)))
             parts.append("\n\n".join(sec))
         return parts
 
@@ -396,16 +429,12 @@ class LatexBuilder:
                 "pages that have extended content."]
         for name, mpage in site.modules_in_order():
             r = LatexRenderer(self, mpage, 2)
-            mods.append("\\section{%s}%s\n%s\n\n%s" % (tt(mpage.meta.get("header", name + ".h")),
-                                                       self.page_label(mpage),
-                                                       r.inline(_parse(mpage.meta.get("description", ""))),
-                                                       r.blocks(mpage.body)))
+            mods.append("\\section{%s}%s\n%s" % (tt(mpage.meta.get("header", name + ".h")),
+                                                 self.page_label(mpage), r.blocks(mpage.body)))
             # guides: narrative pages, direct children of the module
             for g in site.module_guides(name):
                 r = LatexRenderer(self, g, 3)
-                summ = g.summary()
-                mods.append("\\subsection{%s}%s\n%s%s" % (r.inline(g.title), self.page_label(g),
-                            "\\emph{%s}\n\n" % r.inline(summ) if summ else "", r.blocks(g.body)))
+                mods.append("\\subsection{%s}%s\n%s" % (r.inline(g.title), self.page_label(g), r.blocks(g.body)))
             # function pages with extended content
             details = []
             for p in site.module_pages(name):

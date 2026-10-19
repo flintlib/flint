@@ -12,8 +12,8 @@ precision per variable. The newer `padic_radix` works for word-size $p$,
 stores the unit in a radix $p^e$ representation, tracks an error term
 for every element, and implements the generic ring interface, so that
 polynomials, matrices and power series over it are available through
-`gr_poly`, `gr_mat` and `gr_series`. This page compares them and lists
-the algorithms; the details are on the pages of this group.
+`gr_poly`, `gr_mat` and `gr_series`. The sections below compare them
+and list the algorithms, with references to their detailed descriptions.
 
 ## Modules and representations {#modules}
 

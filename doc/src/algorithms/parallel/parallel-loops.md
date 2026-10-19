@@ -4,6 +4,12 @@ summary: How flint_parallel_do schedules independent calls over threads, why str
 order: 2
 ---
 
+Two generic helpers distribute work over the threads of the pool
+([](algorithms/parallel/thread-pool)): `flint_parallel_do` runs
+independent calls $f(0), \ldots, f(n-1)$, and
+`flint_parallel_binary_splitting` runs the two halves of a binary
+splitting recursion in parallel.
+
 ## Static scheduling of a loop {#static}
 
 `flint_parallel_do` evaluates $f(0), \ldots, f(n-1)$ with $T$ threads,

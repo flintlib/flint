@@ -4,7 +4,7 @@ functions: gr_mat_mul gr_mat_mul_classical gr_mat_mul_strassen gr_mat_mul_waksma
 ---
 
 `gr_mat_mul` multiplies two matrices over any ring by calling the ring's
-matrix multiplication method. The other functions on this page
+matrix multiplication method. The other functions below
 implement one algorithm each: the classical algorithm with dot
 products, one level of Strassen-Winograd, and the commutative
 algorithms of Waksman and Rosowski, which trade multiplications for
@@ -75,9 +75,9 @@ All these functions return `GR_DOMAIN` when the shapes do not match.
 `gr_mat_mul` passes its arguments to the ring method without checking
 them, so the check is part of the contract of every `GR_METHOD_MAT_MUL`
 implementation; the ring-specific methods in FLINT make it before
-calling the type's own multiplication. (Until commit `5603850`, during
-the development of FLINT 3.7, most of them did not, and incompatible
-shapes gave wrong results or corrupted memory.)
+calling the type's own multiplication. (In FLINT 3.6 and
+earlier most of them did not, and incompatible shapes gave wrong results
+or corrupted memory.)
 
 ## Example {#example}
 

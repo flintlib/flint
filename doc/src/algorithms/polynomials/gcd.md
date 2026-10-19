@@ -13,8 +13,8 @@ avoids divisions. These algorithms are implemented once in
 depends on the ring: the Euclidean algorithm and its asymptotically
 fast form, the half-gcd algorithm, are the methods of choice over finite
 fields; over $\mathbb{Q}$ and $\Z$ their intermediate coefficients grow, and the
-best algorithms reduce the problem modulo primes instead. This page
-describes the generic algorithms, the selection made by the generic
+best algorithms reduce the problem modulo primes instead. The sections
+below describe the generic algorithms, the selection made by the generic
 code, and the specialised algorithms that replace it for particular
 rings. The resultant, which is computed from the same remainder
 sequences, is treated alongside.

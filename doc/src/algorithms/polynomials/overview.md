@@ -16,10 +16,11 @@ modules (`nmod_poly`, `fmpz_poly`, `fmpq_poly`, `fmpz_mod_poly`,
 `fq_poly` and its variants, `arb_poly`, `acb_poly`, `ca_poly`) keep
 hand-optimised kernels for the operations whose speed depends on the
 coefficient representation, above all multiplication, and use the
-generic implementations for much of the rest. This page describes how
-the two layers fit together, which algorithm the generic code uses for
-each task, and where a specialised algorithm takes over; the pages
-summarised at the end of each section give the algorithms in detail.
+generic implementations for much of the rest. The sections below
+describe how the two layers fit together, which algorithm the generic
+code uses for each task, and where a specialised algorithm takes over;
+the pages summarised at the end of each section give the algorithms in
+detail.
 
 ## Ring methods {#methods}
 

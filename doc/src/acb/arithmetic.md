@@ -9,8 +9,8 @@ separately and are as tight as the real operations. Multiplication and
 division mix the parts, and since a rectangle is not closed under these
 operations (the product of two rectangles is not a rectangle), the result
 is a rectangle enclosing the true set, with some unavoidable
-overestimation. This page describes how the bounds are computed and the
-special cases that make them tighter.
+overestimation. The sections below describe how the bounds are computed
+and the special cases that make them tighter.
 
 ## Multiplication {#mul}
 

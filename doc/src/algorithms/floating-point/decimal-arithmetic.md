@@ -10,8 +10,8 @@ arbitrary precision whose operations are correctly rounded to a given
 number of significant digits, as specified for decimal arithmetic by
 IEEE 754-2008 [@IEEE754] and the General Decimal Arithmetic
 specification [@Cow2009], but with unbounded precision and exponents.
-This page describes the representation and the algorithms that make
-correct rounding cheap. The binary floating-point types of FLINT are
+The representation and the algorithms that make correct rounding cheap
+are described below. The binary floating-point types of FLINT are
 compared in [](algorithms/floating-point/overview).
 
 ## Representation {#representation}

@@ -6,10 +6,10 @@ order: 72
 ---
 
 The continued fraction of a rational number is the sequence of quotients
-of the Euclidean algorithm. This page explains how FLINT computes it in
-quasi-linear time by the half-GCD method [@Sch1971], how the result is
-evaluated, and the related functions of `fmpq` that use the same
-machinery. For the basic theory see [@HarWri2008, Chapter X] and
+of the Euclidean algorithm. The sections below explain how FLINT
+computes it in quasi-linear time by the half-GCD method [@Sch1971], how
+the result is evaluated, and the related functions of `fmpq` that use
+the same machinery. For the basic theory see [@HarWri2008, Chapter X] and
 [@GKP1994, §6.7].
 
 ## Continued fractions and matrices {#matrices}

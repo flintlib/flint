@@ -56,7 +56,7 @@ and about $N/v$ for the logarithm.
   never selected automatically, and for $N < 16$ it falls back to
   rectangular splitting.
 
-The page [](algorithms/p-adic/exp-log) states the bounds with proofs and
+[](algorithms/p-adic/exp-log) states the bounds with proofs and
 analyses the methods.
 
 ## Example {#example}

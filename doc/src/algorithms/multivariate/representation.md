@@ -236,7 +236,7 @@ common strides $t$ is $x^{\min(s, s')} \iota(\gcd(A', B'))$, since
 $\iota(A')$ and $\iota(B')$ are not divisible by any variable. The GCD
 code uses this to reduce degrees. The factoring code goes further and
 applies an invertible integer affine map to the exponents
-(*compression*, `mpoly_compression_set`), described on
+(*compression*, `mpoly_compression_set`), described in
 [](algorithms/multivariate/factorisation#compression).
 
 When exponents need more than one word per field, most algorithms first

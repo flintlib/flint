@@ -57,8 +57,8 @@ complete dispatch. In outline:
 
 When FLINT is built with BLAS, `flint_sgemm` and `flint_dgemm` call it
 (unless `flint_gemm_use_blas` is set to 0). Otherwise they use FLINT's
-own kernels in `src/machine_vectors/gemm.c`, which the rest of this page
-describes. Their organisation follows Goto and van de Geijn
+own kernels in `src/machine_vectors/gemm.c`, which are described
+below. Their organisation follows Goto and van de Geijn
 [@GvdG2008] in the loop ordering of BLIS [@VZvdG2015].
 
 ## Exactness {#exactness}

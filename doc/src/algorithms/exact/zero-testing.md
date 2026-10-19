@@ -8,8 +8,8 @@ order: 40
 The zero test is the core of exact real and complex arithmetic. Every
 decision in [](ca), from comparisons and divisions to degrees of
 polynomials and ranks of matrices, reduces to deciding whether some
-number $x$ equals zero. This page explains the theoretical limits of
-the problem and the strategy that `ca_check_is_zero` follows; the
+number $x$ equals zero. The theoretical limits of the problem and the
+strategy that `ca_check_is_zero` follows are explained below; the
 function page [](ca/check-is-zero) gives a user-level summary and
 examples.
 
@@ -170,8 +170,7 @@ $\sqrt{5 + 2\sqrt{6}} = \sqrt{2} + \sqrt{3}$,
 $\log(\sqrt 2 + 1) + \log(\sqrt 2 - 1) = 0$ or Machin's formula
 $16 \operatorname{atan}(1/5) - 4 \operatorname{atan}(1/239) = \pi$, and
 fails for identities that need deeper knowledge, such as
-$\Gamma(1/3) \Gamma(2/3) = 2\pi/\sqrt{3}$. The page
-[](ca/check-is-zero) shows these cases in a program and explains what
+$\Gamma(1/3) \Gamma(2/3) = 2\pi/\sqrt{3}$. [](ca/check-is-zero) shows these cases in a program and explains what
 to do when the answer is `T_UNKNOWN`.
 
 ## Consequences for the API {#api}

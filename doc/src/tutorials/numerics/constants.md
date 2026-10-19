@@ -125,11 +125,11 @@ quasi-linear in the precision:
 - Euler's constant $\gamma$ (`arb_const_euler`): the Brent–McMillan
   algorithm [@BM1980] with the error bound of [@BJ2013].
 
-The details are on [](algorithms/special-functions/constants). Each
+The details are in [](algorithms/special-functions/constants). Each
 constant is cached: the first call at a given precision computes it, and
 later calls at the same or lower precision only round the cached value.
 The cache is local to the thread and is freed by `flint_cleanup`, which
-is why the programs on these pages call it before returning (this keeps
+is why the programs in these tutorials call it before returning (this keeps
 memory checkers quiet; it is not required for correctness).
 
 ## Our own π: the AGM iteration {#agm}

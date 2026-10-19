@@ -4,8 +4,8 @@ summary: Timings of the dfloat arithmetic, vector operations, elementary functio
 order: 3
 ---
 
-This page collects timings of the `dfloat` operations, to help choose
-between the formats and between `dfloat`, `nfloat` and `arb_t`. All
+The timings below measure the speed of the `dfloat` operations, to help
+choose between the formats and between `dfloat`, `nfloat` and `arb_t`. All
 numbers are nanoseconds per operation on one core of an Intel Xeon
 (Skylake-AVX512 class, 2.8 GHz, a virtual machine), measured with the
 programs in `src/dfloat/profile`. The absolute numbers vary by up to

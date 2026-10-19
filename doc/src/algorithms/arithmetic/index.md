@@ -9,12 +9,12 @@ Almost every computation over $\Z/n\Z$, in `nmod`, `fmpz_mod`, `mpn_mod`,
 the vector, polynomial and matrix modules built on them and the `gr`
 contexts for them, spends its time multiplying and reducing modulo $n$.
 A hardware division is too slow to do this directly, so FLINT replaces
-it with multiplications by precomputed data. Most pages of this group
-treat a word-size modulus; the pages on multiword moduli describe the
+it with multiplications by precomputed data. Most of the sections below
+treat a word-size modulus; those on multiword moduli describe the
 analogous methods for moduli of several limbs: a precomputed inverse of
 the modulus, and sums of products accumulated exactly and reduced once.
-The two overview pages below compare the methods and say which to use;
-the other pages state each method and prove it correct.
+The two overviews compare the methods and say which to use; the other
+sections state each method and prove it correct.
 
 ::: summary algorithms/arithmetic/choosing :::
 

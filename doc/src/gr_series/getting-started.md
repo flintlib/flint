@@ -4,10 +4,12 @@ summary: A short program that computes in Q[[x]] with error terms and in Q[[x]]/
 order: 1
 ---
 
-Both kinds of power series rings are generic rings, so their elements
-are created with `gr_heap_init` (or `GR_TMP_INIT`) and manipulated with
-the functions of `gr.h` and `gr_special.h`. The program below works in
-$\mathbb{Q}[[x]]$ with default precision 6 and in $\mathbb{Q}[[x]]/(x^6)$.
+The two power series rings of `gr_series`, $R[[x]]$ with error terms
+and the truncated ring $R[[x]]/(x^n)$, are generic rings, so their
+elements are created with `gr_heap_init` (or `GR_TMP_INIT`) and
+manipulated with the functions of `gr.h` and `gr_special.h`. The
+program below works in $\mathbb{Q}[[x]]$ with default precision 6 and
+in $\mathbb{Q}[[x]]/(x^6)$.
 
 ```c example name=gr_series_basics
 #include <flint/flint.h>

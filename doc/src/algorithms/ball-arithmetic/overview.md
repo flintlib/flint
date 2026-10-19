@@ -9,8 +9,8 @@ Ball arithmetic represents a real number by a ball $[m \pm r]$ and
 replaces each operation $f$ by a function that returns a ball containing
 $f(t)$ for every $t$ in the input ball. FLINT implements it in the
 modules [mag](mag), [arf](arf), [arb](arb) and [acb](acb), following the
-design of Arb [@Joh2017]; the general theory is in [@Hoe2009]. This page
-explains the main ideas and points to the pages with the details.
+design of Arb [@Joh2017]; the general theory is in [@Hoe2009]. The main
+ideas are summarised below, with links to the detailed descriptions.
 
 ## Midpoint and radius {#representation}
 
@@ -49,7 +49,7 @@ and returns $[\tilde y \pm (\varepsilon + \rho)]$. For the arithmetic
 operations $\tilde y$ is a single `arf` operation, and $\varepsilon$ is
 one unit in the last place, added only if the operation was inexact, so
 exact input with an exact result gives an exact ball. The propagated
-error bounds for arithmetic and elementary functions, with proofs, are on
+error bounds for arithmetic and elementary functions, with proofs, are described in
 [](algorithms/ball-arithmetic/error-propagation).
 
 Two refinements make this efficient. First, the midpoint is not computed
@@ -80,7 +80,7 @@ coefficients to a common exponent, multiplying the midpoints exactly as
 integer polynomials and bounding the radius contribution with a separate
 product of upper bounds. Infinite series of special functions are
 truncated where a tail bound, computed with `mag_t` arithmetic, falls
-below the target accuracy; common tail bounds are on
+below the target accuracy; common tail bounds are described in
 [](algorithms/ball-arithmetic/error-propagation).
 
 ## Precision and the inclusion principle {#precision}

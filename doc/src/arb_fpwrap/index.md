@@ -83,12 +83,11 @@ precisions $64, 128, \ldots, 64 \cdot 2^{n}$ bits (at most $64 \cdot
 2^{24}$). The default $n = 0$ tries $64, 128, \ldots, 8192$ bits.
 
 ::: details
-The implementation (FLINT 3.7-dev) stops after the precision $64
-\cdot 2^n$, that is, after $n + 1$ precision levels for $n \ge 1$, while
-the default uses 8 levels, the same as $n = 7$. The documentation of
-earlier versions stated $n$ levels ("with `2 * FPWRAP_WORK_LIMIT` we
-only try 64 and 128 bits"); with that setting the wrappers actually
-also try 256 bits.
+The implementation stops after the precision $64 \cdot 2^n$, that
+is, after $n + 1$ precision levels for $n \ge 1$, while the default uses
+8 levels, the same as $n = 7$. With `2 * FPWRAP_WORK_LIMIT` the wrappers
+thus try 64, 128 and 256 bits (the documentation of FLINT 3.6 and
+earlier stated $n$ levels).
 :::
 :::
 
@@ -691,7 +690,7 @@ int arb_fpwrap_double_jacobi_p(double * res, double n, double a, double b, doubl
 int arb_fpwrap_cdouble_jacobi_p(complex_double * res, complex_double n, complex_double a, complex_double b, complex_double x, int flags)
 
 Compute the Jacobi function $P_n^{(a,b)}(x)$ (`arb_hypgeom_jacobi_p`, `acb_hypgeom_jacobi_p`).
-Until commit `5603850` (during the development of FLINT 3.7) the real
+In FLINT 3.6 and earlier the real
 version computed $P_n^{(a,x)}(0)$ instead; the complex version was
 correct.
 :::

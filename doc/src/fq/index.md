@@ -21,7 +21,7 @@ fields.
 The interface is generated, like that of `fq_nmod` (word-size $p$) and
 `fq_zech` (Zech logarithms), from the template header `fq_templates.h`;
 the three modules have the same functions apart from the conversions and
-a few context functions. This page documents the common interface in
+a few context functions. The common interface is documented here in
 detail. Most users should use `fq_default` (see
 [](fq_default/getting-started)), which chooses the best of the three
 representations, and use this module directly only for fields with a
@@ -440,7 +440,7 @@ the trace of $a \in \mathbb{F}_q$ are
 $N(a) = \prod_{i=0}^{d-1} \sigma^i(a)$ and
 $\operatorname{Tr}(a) = \sum_{i=0}^{d-1} \sigma^i(a)$; they are the
 determinant and the trace of the $\mathbb{F}_p$-linear map
-$x \mapsto ax$ and lie in $\mathbb{F}_p$. The algorithms are on
+$x \mapsto ax$ and lie in $\mathbb{F}_p$. The algorithms are described in
 [](algorithms/finite-fields/frobenius-norm-trace).
 
 ::: summary algorithms/finite-fields/frobenius-norm-trace :::

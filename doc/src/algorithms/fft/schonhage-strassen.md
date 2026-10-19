@@ -17,7 +17,7 @@ $n$-bit integers. Fürer [@Fur2009] and Harvey and van der Hoeven
 Schönhage–Strassen algorithm remains the standard exact integer FFT, as
 in GMP [@GKZ2007] and in FLINT's `fft` module, written by William Hart.
 
-This page describes the algorithm as implemented in `fft.h`: the ring and
+The following describes the algorithm as implemented in `fft.h`: the ring and
 its roots of unity, the $\sqrt 2$ trick that doubles the transform
 length, the reduction of integer multiplication to a convolution, the
 pointwise multiplication modulo $2^N + 1$ by a negacyclic convolution,

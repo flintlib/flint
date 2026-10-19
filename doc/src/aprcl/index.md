@@ -26,7 +26,7 @@ older Gauss sum version of the test, which is slower and is kept for
 reference. The module was written by Vladimir Glazachev (Google Summer of
 Code 2015).
 
-The test is described on [](algorithms/number-theory/primality-proving).
+The test is described in [](algorithms/number-theory/primality-proving).
 
 ::: summary algorithms/number-theory/primality-proving :::
 

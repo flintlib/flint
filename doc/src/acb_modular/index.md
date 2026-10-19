@@ -193,7 +193,7 @@ authors write $q^{1/4}$ for $q_{1/4}$, but the principal fourth root
 $(q)^{1/4}$ differs from $q_{1/4}$ in general, so this module writes
 $q^k$ only for integer $k$. In the notation of [`acb_theta`](acb_theta),
 $(\theta_{0,0}, \theta_{0,1}, \theta_{1,0}, \theta_{1,1}) = (\theta_3, \theta_4, \theta_2, -\theta_1)$.
-The page [](acb_modular/theta) explains how the functions below are
+[](acb_modular/theta) explains how the functions below are
 evaluated and gives an example.
 
 ::: function

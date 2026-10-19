@@ -121,7 +121,7 @@ The following rules apply to all functions of the module.
   quotient and a remainder, the outputs must be distinct objects.
 - *Canonical form.* A value that fits inline is always stored inline. Every
   function expects its inputs in this form and produces its outputs in
-  it; only the internal functions at the end of this page may leave a
+  it; only the internal functions documented at the end may leave a
   small value in an `mpz`. See [](fmpz/representation#canonical).
 - *Errors.* Division by zero and other invalid arguments raise an
   exception through `flint_throw` (by default, a message and `abort`),

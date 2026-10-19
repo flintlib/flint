@@ -9,7 +9,7 @@ nonzero $y$ is invertible and $x / y$ is unique. In an integral domain
 such as $\Z$ the quotient is unique when it exists, but it may not exist.
 In a ring with zero divisors such as $\Z/10\Z$ the equation $q y = x$
 may have several solutions. And in a Euclidean ring there is also
-division with remainder. The functions on this page cover these cases:
+division with remainder. The functions below cover these cases:
 
 | Function | Computes | Fails with `GR_DOMAIN` when |
 |---|---|---|

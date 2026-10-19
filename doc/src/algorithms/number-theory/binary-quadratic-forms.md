@@ -10,8 +10,8 @@ cy^2$ with integer coefficients; its discriminant is $D = b^2 - 4ac$,
 which is congruent to 0 or 1 modulo 4. The group
 $\mathrm{SL}_2(\Z)$ acts on forms by linear substitution of the
 variables, preserving the discriminant, and two forms in the same orbit
-are *equivalent*. This page treats positive definite forms ($D < 0$, $a >
-0$), the only ones supported by `qfb`. The standard references are
+are *equivalent*. Only positive definite forms ($D < 0$, $a > 0$) are
+supported by `qfb` and treated here. The standard references are
 [@Buell1989], [@Coh1996, Chapter 5] and [@Cox2013].
 
 ## Reduction {#reduction}

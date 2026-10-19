@@ -516,7 +516,7 @@ $$
 ::: details
 This is the tail bound used when summing polylogarithms and their
 derivatives. When $s$ is real or complex, any integer $s' \le
-\operatorname{Re}(s)$ can be substituted. The derivation is on
+\operatorname{Re}(s)$ can be substituted. The derivation is described in
 [](algorithms/special-functions/zeta).
 :::
 :::

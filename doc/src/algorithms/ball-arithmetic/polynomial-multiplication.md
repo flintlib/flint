@@ -17,8 +17,8 @@ they rely on cancellations that ball arithmetic does not see, so the
 radii of the output grow like the sum of the absolute values of all
 intermediate quantities, which for polynomials with coefficients of very
 different magnitudes destroys the accuracy entirely
-([@vdH2008], [@Hig2002]). This page describes the algorithm that FLINT
-uses instead: the midpoints are multiplied *exactly* with fast integer
+([@vdH2008], [@Hig2002]). FLINT uses the following algorithm
+instead: the midpoints are multiplied *exactly* with fast integer
 polynomial arithmetic, after a scaling and a splitting into blocks that
 keep the integers small, and the radii are bounded by a separate product
 of nonnegative polynomials of low precision, following van der Hoeven
@@ -28,8 +28,8 @@ The generic code in [](gr_poly) does not implement this itself: over the
 real and complex ball contexts, `_gr_poly_mullow` and `_gr_poly_mulmid`
 dispatch to `_arb_poly_mullow`, `_acb_poly_mullow` and their middle
 product versions, so all generic polynomial algorithms over balls
-(division, composition, power series functions) use the algorithms of
-this page.
+(division, composition, power series functions) use the algorithms
+described below.
 
 ## Error bound for the product {#bound}
 

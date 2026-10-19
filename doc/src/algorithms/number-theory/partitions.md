@@ -14,8 +14,9 @@ $$
 $$
 
 The values grow subexponentially: $\log p(n) \sim \pi \sqrt{2n/3}$, so
-$p(n)$ has about $3.7 \sqrt{n}$ bits. This page describes the methods
-FLINT uses for all values up to $n$ and for an isolated value, following
+$p(n)$ has about $3.7 \sqrt{n}$ bits. The sections below describe the
+methods FLINT uses for all values up to $n$ and for an isolated value,
+following
 [@Joh2012]; for the theory see [@Andrews1976, Chapter 5] and
 [@Apostol1997, Chapter 5].
 

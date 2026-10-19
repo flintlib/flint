@@ -30,8 +30,7 @@ $\beta$ in quasi-linear time, which `flint_mpn_get_str` uses for decimal
 output, and a memory-managed signed integer type `radix_integer_t` with a
 generic ring (`gr`) context. The functions are not optimised for $b$ a
 power of two, where binary arithmetic should be used. The guide
-[](radix/getting-started) shows how to use the module; the page
-[](radix/conversion) describes the conversions to and from binary.
+[](radix/getting-started) shows how to use the module; [](radix/conversion) describes the conversions to and from binary.
 
 ## Radix objects {#radix}
 

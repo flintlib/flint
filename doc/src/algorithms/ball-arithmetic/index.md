@@ -5,7 +5,7 @@ summary: Rigorous real and complex arithmetic with midpoint-radius balls: repres
 order: 11
 ---
 
-These pages describe the algorithms behind FLINT's ball arithmetic: the
+This section describes the algorithms behind FLINT's ball arithmetic: the
 modules [`mag`](mag), [`arf`](arf), [`arb`](arb) and [`acb`](acb), and
 the polynomial, matrix and calculus modules built on them (`arb_poly`,
 `acb_poly`, `arb_mat`, `acb_mat`, `arb_calc`, `acb_calc` and

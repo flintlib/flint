@@ -28,7 +28,7 @@ output length $n$ cost about $M(n)$ each
 
 ## Generic version {#generic}
 
-The iterations on this page are implemented once in `gr_poly` and are
+The iterations described here are implemented once in `gr_poly` and are
 valid over any commutative ring, not only $\Z/p\Z$: each step uses ring
 operations and one inversion of the constant coefficient (the leading
 coefficient of the divisor for division with remainder), and the

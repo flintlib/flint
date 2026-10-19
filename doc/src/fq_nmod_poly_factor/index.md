@@ -7,7 +7,7 @@ category: Finite fields
 order: 15
 ---
 
-This module factors polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`), tests irreducibility and squarefreeness, and finds roots. It is generated from the same template as [](fq_poly_factor) and has the same functions, with `fq_nmod` in place of `fq`; this page lists them with short descriptions, and each function page links to the `fq_poly_factor` version, whose documentation has the details. All algorithms are those of the generic module [](gr_poly), see [](algorithms/polynomials/factoring-finite-fields).
+This module factors polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`), tests irreducibility and squarefreeness, and finds roots. It is generated from the same template as [](fq_poly_factor) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_poly_factor` version, whose documentation has the details. All algorithms are those of the generic module [](gr_poly), see [](algorithms/polynomials/factoring-finite-fields).
 
 ::: summary algorithms/polynomials/factoring-finite-fields :::
 

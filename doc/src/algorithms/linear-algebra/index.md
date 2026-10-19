@@ -5,7 +5,7 @@ summary: Dot products and matrix multiplication modulo word-size integers, over 
 order: 5
 ---
 
-These pages describe the algorithms behind the matrix modules: the
+This section describes the algorithms behind the matrix modules: the
 generic [`gr_mat`](gr_mat) and the type-specific modules such as
 `nmod_mat`, `fmpz_mod_mat`, `fmpz_mat`, `fmpq_mat` and the modules of
 polynomial matrices. Over $\Z/n\Z$ for word-size $n$, most of the time

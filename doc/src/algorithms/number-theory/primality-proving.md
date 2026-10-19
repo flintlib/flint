@@ -15,8 +15,8 @@ it decides small inputs directly, tries the classical $n \pm 1$ tests,
 which succeed when $n - 1$ or $n + 1$ is sufficiently factored, and
 otherwise runs one of two general-purpose algorithms: the APRCL test,
 based on Jacobi sums in cyclotomic rings, or elliptic curve primality
-proving (ECPP), which also produces a certificate. This page describes
-the three approaches and how FLINT chooses between them.
+proving (ECPP), which also produces a certificate. The sections below
+describe the three approaches and how FLINT chooses between them.
 
 ## Tests based on $n \pm 1$ {#n-pm-1}
 
@@ -162,7 +162,7 @@ FLINT also uses the class field tower of Enge and Morain
 root of $H_D$ in steps of prime degree, and factors of $H_D$ over the
 genus field. The heuristic running time of fastECPP is
 $\tilde O(\log^4 n)$, against $\tilde O(\log^5 n)$ for the original
-Atkin–Morain algorithm. The details are on [](ecpp/prove) and
+Atkin–Morain algorithm. The details are in [](ecpp/prove) and
 [](ecpp).
 
 ## Choice of the method {#choice}

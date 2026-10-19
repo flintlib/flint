@@ -4,7 +4,7 @@ functions: flint_mpn_tdiv_qr flint_mpn_cdiv_qr flint_mpn_ndiv_qr flint_mpn_divap
 ---
 
 `flint_mpn_tdiv_qr` replaces GMP's `mpn_tdiv_qr`, with the same interface
-and aliasing rules, and the other functions on this page are built on the
+and aliasing rules, and the other functions below are built on the
 same machinery. The division is done entirely by FLINT (except for GMP's
 assembly `mpn_divrem_1` and, where it helps, `mpn_divrem_2`), which makes
 it faster than GMP's for all shapes: up to twice as fast for small

@@ -18,7 +18,7 @@ rational order, and the incomplete gamma function. The functions
 `arb_hypgeom_sum_fmpq_arb` and `arb_hypgeom_sum_fmpq_imag_arb` of
 [`arb_hypgeom`](arb_hypgeom) compute such sums exactly as written (no
 truncation error), with $w = z$ or $w = 1/z$. Their usage is described
-on [](arb_hypgeom/sums); this page describes the algorithms. In each
+in [](arb_hypgeom/sums); the algorithms are described below. In each
 term ratio
 $$
 \frac{T(n+1)}{T(n)} = w \prod_i \frac{p_i + n q_i}{q_i}

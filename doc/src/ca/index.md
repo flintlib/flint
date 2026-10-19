@@ -174,7 +174,7 @@ ideals of relations.
 The member `options` of a `ca_ctx_t` is an array of `slong` values that
 control evaluation limits, simplification and printing. They are read
 and written with `ca_ctx_get_option` and `ca_ctx_set_option`, or
-directly as `ctx->options[i]`. The page [](ca/options) explains the
+directly as `ctx->options[i]`. [](ca/options) explains the
 options and their effect in detail.
 
 Options that control evaluation should be set right after
@@ -541,8 +541,8 @@ imaginary parts are printed as `[+/- inf]`, even for a well-defined
 real number; there is no recomputation at a higher precision. For
 example, the reciprocal of Ramanujan's constant prints as
 `[+/- inf] + [+/- inf]*I {(1)/(a-262537412640768744) where ...}`, while
-`ca_get_decimal_str` gives `-1.333462408e+12`. (Before commit `5603850`,
-during the development of FLINT 3.7, such parts were printed as `nan`.)
+`ca_get_decimal_str` gives `-1.333462408e+12`. (FLINT 3.6 and earlier
+printed such parts as `nan`.)
 
 ::: details
 For example, $-7$, $2/3$, $(\sqrt{3}+5)/2$ and $\sqrt{2} (\log(\pi) +
@@ -737,7 +737,7 @@ in a field with a single algebraic generator.
 
 The following functions check mathematical properties, which need not be
 decidable. They return a `truth_t`; `T_TRUE` and `T_FALSE` are proved
-answers. The page [](ca/check-is-zero) describes how zero tests and
+answers. [](ca/check-is-zero) describes how zero tests and
 equality tests work and what to expect from them.
 
 ::: function

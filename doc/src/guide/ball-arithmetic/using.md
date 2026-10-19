@@ -4,8 +4,7 @@ summary: The inclusion principle, a first program, binary and decimal conversion
 order: 2
 ---
 
-This page introduces computing with real balls (`arb_t`) through
-examples. The same principles apply to complex balls (`acb_t`) and to
+The examples below introduce computing with real balls (`arb_t`). The same principles apply to complex balls (`acb_t`) and to
 polynomials and matrices of balls. The full interface is documented on
 the module page [arb](arb); [](arb/getting-started) is a shorter
 practical introduction.

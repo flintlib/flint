@@ -15,10 +15,10 @@ $R[x]/(x^n)$. With ball coefficients, every algorithm that is correct in
 exact arithmetic therefore becomes an algorithm that returns
 enclosures, simply by performing each ring operation in ball
 arithmetic. Rigor is automatic; what the choice of algorithm decides is
-the speed and the *width* of the enclosures. This page describes these
-choices in FLINT. The generic algorithms (Newton iteration, middle
+the speed and the *width* of the enclosures. The choices FLINT makes are
+described below. The generic algorithms (Newton iteration, middle
 products, the formulas for the elementary functions) are described in
-[](algorithms/polynomials/newton); this page focuses on what changes
+[](algorithms/polynomials/newton); the focus here is on what changes
 with balls.
 
 ## Rigorous Taylor expansions {#taylor}

@@ -15,10 +15,10 @@ Hensel lifting of a factorisation $A = G\bar{A}$, $B = G\bar{B}$ of an
 image. These algorithms, common to all coefficient rings, are described
 in [](algorithms/multivariate/gcd),
 [](algorithms/multivariate/sparse-interpolation) and
-[](algorithms/multivariate/hensel-lifting). This page treats what is
-specific to finite fields $K = \mathbb{F}_q$, $q = p^d$, with a word-size
-characteristic: the field may be too small to provide the evaluation
-points these algorithms need. FLINT then computes the images over larger
+[](algorithms/multivariate/hensel-lifting). What is specific to finite
+fields $K = \mathbb{F}_q$, $q = p^d$, with a word-size characteristic is
+that the field may be too small to provide the evaluation points these
+algorithms need. FLINT then computes the images over larger
 fields, in two ways:
 
 - *medium extensions*: the inputs are mapped into an extension

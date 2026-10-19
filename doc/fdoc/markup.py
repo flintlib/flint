@@ -4,7 +4,7 @@ The fdoc markup language: a small, strict Markdown dialect.
 Block syntax
     # Heading {#optional-id}
     paragraphs, - bullet / 1. numbered lists, | pipe | tables |
-    ```c [example] [name=foo]      fenced code (``example`` = compiled by make check)
+    ```c [example] [name=foo]      fenced code (``example`` = compiled by make checkdoc)
     ```output                      expected output of the preceding example
     $$ ... $$                      display math
     ::: kind [args] [{#id}]        fenced div (function, details, theorem, proof, ...)

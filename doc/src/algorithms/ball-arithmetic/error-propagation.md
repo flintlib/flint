@@ -283,7 +283,7 @@ tail bound is then [](#thm-geometric) applied to $c_k R^k \cdot (z/R)^k$.
 :::
 
 The Euler-Maclaurin formula and its remainder bounds, used for the zeta
-function, are discussed on [](algorithms/special-functions/zeta).
+function, are discussed in [](algorithms/special-functions/zeta).
 
 ## Use in FLINT {#use}
 

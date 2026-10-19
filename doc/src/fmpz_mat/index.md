@@ -1024,9 +1024,6 @@ $\mathit{den} = \det(A)$; `fmpz_mat_solve_dixon_den` and
 denominator of the solution. $X$ may be $A$ or $B$. On a return value
 of 0, $X$ is unspecified and `den` is 0 for the fraction-free solvers.
 $X$ may be a window matrix: the solvers copy the result entry by entry.
-(Until commit `5603850`, during the development of FLINT 3.7, the
-modular solvers and `fmpz_mat_solve_cramer` swapped the struct of $X$
-with a temporary, which aborted the program when $X$ was a window.)
 :::
 :::
 

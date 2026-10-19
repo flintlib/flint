@@ -14,8 +14,8 @@ is $\mathbf{Z}_q / p\mathbf{Z}_q \cong \mathbf{F}_p[X]/(\bar f) =
 \mathbf{F}_q$. In particular $p$ is still a uniformiser: every nonzero
 element is $p^v u$ with $u \in \mathbf{Z}_q^\times$, and
 $u \in \mathbf{Z}_q$ is a unit if and only if its reduction in
-$\mathbf{F}_q$ is nonzero [@Rob2000, Ch. 3]. This page describes how
-`qadic` computes in $\mathbf{Q}_q$; the Frobenius automorphism and
+$\mathbf{F}_q$ is nonzero [@Rob2000, Ch. 3]. The sections below describe
+how `qadic` computes in $\mathbf{Q}_q$; the Frobenius automorphism and
 Teichmüller lifts are treated in [](algorithms/p-adic/frobenius).
 
 ## Representation {#representation}

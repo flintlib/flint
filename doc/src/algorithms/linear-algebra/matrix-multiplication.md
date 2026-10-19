@@ -6,8 +6,8 @@ order: 5
 ---
 
 Let $A$ be an $m \times k$ and $B$ a $k \times n$ matrix over $\Z/N\Z$
-with $1 \le N < 2^{\bits}$, stored with entries in $[0, N)$. (On this
-page $N$ is the modulus and $n$ a dimension.) The product $C = AB$ needs
+with $1 \le N < 2^{\bits}$, stored with entries in $[0, N)$. (Throughout
+this section $N$ is the modulus and $n$ a dimension.) The product $C = AB$ needs
 $mkn$ multiplications and additions of residues with the classical
 algorithm, and every fast algorithm in `nmod_mat`, from LU decomposition
 to the characteristic polynomial, spends most of its time in such
@@ -24,7 +24,7 @@ the FFLAS-FFPACK library [@DGP2002; @DGP2008].
 `GR_METHOD_MAT_MUL`. The `gr` context for $\Z/n\Z$ installs
 `nmod_mat_mul`, so generic matrix code over this ring, such as the
 recursive LU decomposition of `gr_mat` or modular composition in
-`gr_poly`, uses the methods described on this page; the contexts
+`gr_poly`, uses the methods described here; the contexts
 `nmod8` and `nmod32`, whose entries are stored in bytes and 32-bit
 words, call the byte and 32-bit kernels of `nmod_mat` directly. Other rings install their own products
 ([](gr_mat/mul)), and the generic default is the classical algorithm

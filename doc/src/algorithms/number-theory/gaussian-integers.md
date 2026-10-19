@@ -8,10 +8,10 @@ order: 60
 The ring $\Z[i]$ of Gaussian integers is a Euclidean domain with respect
 to the norm $N(a + bi) = a^2 + b^2$, and hence a unique factorisation
 domain. Its units are $\pm 1, \pm i$, and $1 + i$ is the unique prime
-above 2, with $2 = -i(1 + i)^2$. This page describes the algorithms of
-`fmpzi`: division with remainder, the choice of a canonical associate,
-the greatest common divisor, the removal of the prime $1 + i$ and
-primality testing. Standard references are [@Coh1996, §1.2] for
+above 2, with $2 = -i(1 + i)^2$. The sections below describe the
+algorithms of `fmpzi`: division with remainder, the choice of a
+canonical associate, the greatest common divisor, the removal of the
+prime $1 + i$ and primality testing. Standard references are [@Coh1996, §1.2] for
 Euclidean rings and [@Wei2000] for the binary algorithm.
 
 ## Division with remainder {#division}

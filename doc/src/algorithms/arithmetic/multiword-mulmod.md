@@ -5,14 +5,14 @@ complexity: One $\ell \times \ell$-limb product, one high product and one low pr
 order: 51
 ---
 
-This page describes how FLINT computes $ab \bmod n$ for residues
-$0 \le a, b < n$ when $n$ has $\ell \ge 2$ limbs: in `mpn_mod`
+FLINT computes $ab \bmod n$ for residues $0 \le a, b < n$ when $n$ has
+$\ell \ge 2$ limbs in three places: in `mpn_mod`
 (`mpn_mod_mul`), in `mpn_extras` (`flint_mpn_mulmod_preinvn` and its
 relatives, which `mpn_mod`, `fmpz` and the primality tests use) and in
 `fmpz_mod` for two-limb moduli. All methods follow Barrett's idea
 [@Bar1987] of replacing the division by $n$ with multiplications by a
 precomputed approximation of $1/n$; for a single limb, the analogous
-methods are on the pages [](algorithms/arithmetic/moller-granlund),
+methods are described in [](algorithms/arithmetic/moller-granlund),
 [](algorithms/arithmetic/barrett) and [](algorithms/arithmetic/shoup).
 A textbook treatment of multiword Barrett and Montgomery reduction is
 [@BZ2011, §2.4].

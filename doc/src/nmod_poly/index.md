@@ -528,8 +528,8 @@ name choose the algorithm from the lengths and the number of bits of $n$:
   x86-64 and ARM64). Moduli $n \le 23$ use a repacked product of half the
   length.
 
-The crossover points, tabulated for each bit size of $n$, are explained on
-the page [](nmod_poly/mul). Truncated products (`mullow`), high products
+The crossover points, tabulated for each bit size of $n$, are explained in
+[](nmod_poly/mul). Truncated products (`mullow`), high products
 (`mulhigh`) and middle products (`mulmid`) compute part of the product
 for about the cost of the part; middle products are the transposes of
 ordinary products and are what Newton iteration needs
@@ -827,7 +827,7 @@ $\min(\mathit{an}, \mathit{bn}) (n-1)^2$ or, if that fails, with the
 Cauchy–Schwarz inequality applied to the even and odd parts.
 
 ::: note
-Until commit `c54fd98` (PR #2892, during the development of FLINT 3.7),
+In FLINT 3.6 and earlier,
 the trailing coefficient of an operand of odd length entered the
 Cauchy–Schwarz bound unsquared, so the check could accept a packing
 that overflows: for $n = 23$ and
@@ -888,7 +888,7 @@ the zero polynomial throws `FLINT_DIVZERO`, except modulo $n = 1$, where
 $Q = A$ and $R = 0$. Short quotients are computed by schoolbook division;
 long ones by [Newton iteration](algorithms/polynomials/newton) on the
 reversed polynomials, which costs a constant number of multiplications.
-The page [](nmod_poly/divrem) compares the functions and gives examples.
+[](nmod_poly/divrem) compares the functions and gives examples.
 
 ::: summary algorithms/polynomials/newton :::
 
@@ -2645,7 +2645,7 @@ changed, 0 otherwise.
 The new points are absorbed into $R$ and the remainder sequence is
 continued with Euclidean steps, or with `nmod_poly_hgcd` when at least 10
 more degrees have to be removed, until $\deg R < m/2$; the algorithm and
-its correctness are on
+its correctness are described in
 [](algorithms/multivariate/sparse-interpolation#bm-hgcd). For example, after
 adding $1, 1, 2, 3$ the function returns 1 with $V = x^2 - x - 1$ (up to
 a constant factor) and $\deg R < \deg V$; adding $5, 8$ and reducing

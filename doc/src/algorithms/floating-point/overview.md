@@ -105,6 +105,6 @@ see [](algorithms/floating-point/double-intervals).
 | Exact decimal rounding | `decimal` |
 | Writing new limb-level numerical kernels | `mp_real` |
 
-Speed comparisons are on [](dfloat/performance) (which also includes
+Speed comparisons are described in [](dfloat/performance) (which also includes
 `nfloat` and `arb_t`); the `nfloat` speedups over `arf_t` are discussed
 in [@Joh2025gr].

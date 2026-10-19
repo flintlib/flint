@@ -98,9 +98,9 @@ The factor $C$ is computed by evaluating $f'(J)$ and $f''(J)$ on the
 whole interval $J$ (`arb_calc_newton_conv_factor`,
 `_arb_poly_newton_convergence_factor`). It is finite only if $f'$ is
 bounded away from zero on $J$, which requires $J$ to be a narrow
-interval around a simple root. (Until commit `5603850`, during the
-development of FLINT 3.7, `arb_calc_newton_conv_factor` returned only
-$C/2$, for which [](#thm-newton) does not apply.)
+interval around a simple root. (In FLINT 3.6 and
+earlier `arb_calc_newton_conv_factor` returned only $C/2$, for which
+[](#thm-newton) does not apply.)
 
 ## The interval Newton operator {#interval-newton}
 

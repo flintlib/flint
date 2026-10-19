@@ -269,7 +269,7 @@ $n$ it requires $s \ge 31$.
 
 ## Use in FLINT {#use}
 
-- `nmod_sqrt` implements everything on this page. `n_sqrtmod` is a wrapper
+- `nmod_sqrt` implements all the methods above. `n_sqrtmod` is a wrapper
   that skips `nmod_init` for $n < 128$.
 - Other callers include `nmod_poly_sqrt` (for the constant term), the
   square root method of `gr_ctx_init_nmod` contexts, and

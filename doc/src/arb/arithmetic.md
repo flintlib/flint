@@ -6,8 +6,8 @@ functions: arb_add arb_sub arb_mul arb_div arb_inv arb_addmul arb_fma
 The arithmetic functions are the building blocks of every computation
 with balls. Each computes the result of the operation on the midpoints
 with one `arf` operation rounded to `prec` bits, and sets the radius to a
-bound for the propagated error plus the rounding error. This page
-explains exactly what they compute, how the precision and exactness
+bound for the propagated error plus the rounding error. The sections
+below explain exactly what they compute, how the precision and exactness
 interact, and what happens for special input.
 
 ## What is computed {#formulas}
@@ -24,7 +24,7 @@ For $x = [m_x \pm r_x]$ and $y = [m_y \pm r_y]$:
 The midpoint is rounded to `prec` bits towards zero (`ARB_RND`), and if
 the rounding changed it, one unit in the last place of the rounded
 midpoint is added to the radius. All radius computations round upward.
-The bounds are proved on
+The bounds are proved in
 [](algorithms/ball-arithmetic/error-propagation); for addition and
 multiplication of real balls they are the best possible up to the
 rounding of the radius.
@@ -133,10 +133,7 @@ square root) uses Newton iteration with an error below one unit in the
 last place. The inexact flag of that mode is reliable, so for exact
 input the radius is zero exactly when the result is exact: an exact
 quotient or the square root of a perfect square still gets radius 0,
-and every other result gets a radius of one ulp. (Until commit `5603850`,
-during the development of FLINT 3.7, the flag could be 0 for an inexact
-Newton result, and about one result in a few hundred above the cutoffs
-had radius 0 although it differed from the true value by up to one ulp.)
+and every other result gets a radius of one ulp.
 
 ## Aliasing and fused operations {#aliasing}
 

@@ -13,7 +13,7 @@ exponents. `fmpz_mpoly_factor_content` splits off the content and the
 powers of variables, `fmpz_mpoly_factor_squarefree` computes a squarefree
 factorisation, and `fmpz_mpoly_factor` the factorisation into irreducible
 polynomials. The factoring strategy and an example are on the function page
-[](fmpz_mpoly_factor/factor), and the algorithms are explained on
+[](fmpz_mpoly_factor/factor), and the algorithms are explained in
 [](algorithms/multivariate/factorisation) and
 [](algorithms/multivariate/hensel-lifting).
 
@@ -434,7 +434,7 @@ negative.
 
 ## Partial fractions and Hensel lifting {#hensel}
 
-These functions implement the multivariate Hensel lifting described on
+These functions implement the multivariate Hensel lifting described in
 [](algorithms/multivariate/hensel-lifting). Given $A \equiv \prod_i f_i
 \bmod (x_m - \alpha)$ with the correct leading coefficients, the factors
 are lifted one power of $x_m - \alpha$ at a time, each step solving a

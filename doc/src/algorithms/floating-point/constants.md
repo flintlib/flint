@@ -11,7 +11,7 @@ code by binary splitting of hypergeometric series
 taken from the collection of y-cruncher [@Yee2025], and for each
 constant the formula measured fastest in this implementation was
 chosen; the mathematical background of most of them is described in
-[](algorithms/special-functions/constants). This page lists the
+[](algorithms/special-functions/constants). This section lists the
 formulas, describes the one constant that is not a single series,
 Euler's constant, and explains the cache.
 

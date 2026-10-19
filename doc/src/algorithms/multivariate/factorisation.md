@@ -15,9 +15,9 @@ density. Most of these stages are cheap and settle many inputs alone;
 the expensive last stage is the classical reduction to a univariate (or
 bivariate) problem by evaluation, followed by Hensel lifting
 [@Mus1975; @WanRot1975; @Wan1978; @Kal1985]. The function-level
-description and examples are on [](fmpz_mpoly_factor/factor), the lifting
-algorithms on [](algorithms/multivariate/hensel-lifting), and the
-specific problems of finite fields on
+description and examples are in [](fmpz_mpoly_factor/factor), the lifting
+algorithms in [](algorithms/multivariate/hensel-lifting), and the
+specific problems of finite fields in
 [](algorithms/multivariate/modp-factoring). The code is by Schultz, whose
 notes [@Sch-mpoly] contain further details.
 
@@ -345,6 +345,6 @@ condition on the evaluation point.
 - `fmpq_mpoly_factor` reduces to `fmpz_mpoly_factor`; the factorisation
   over finite fields (`nmod_mpoly_factor`, `fq_nmod_mpoly_factor`,
   `fmpz_mod_mpoly_factor`) follows the same pipeline with the changes
-  described on [](algorithms/multivariate/modp-factoring).
+  described in [](algorithms/multivariate/modp-factoring).
 
 ::: functions fmpz_mpoly_factor fmpz_mpoly_factor_squarefree fmpz_mpoly_factor_content fmpz_mpoly_factor_wang fmpz_mpoly_factor_zippel fmpz_mpoly_factor_zassenhaus fmpz_bpoly_factor mpoly_compression_set :::

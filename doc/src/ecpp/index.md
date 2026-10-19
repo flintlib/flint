@@ -17,10 +17,10 @@ chain. Its running time also grows more slowly with the size of $n$
 for APRCL). `fmpz_is_prime` uses ECPP for its final proof from about 250
 bits (more with several threads, see below).
 
-The page [](ecpp/prove) shows how to prove, verify, print and read
+[](ecpp/prove) shows how to prove, verify, print and read
 certificates. The mathematics (the theorem behind a step, the construction
 of curves by complex multiplication and the choice of discriminants) is
-on [](algorithms/number-theory/primality-proving).
+described in [](algorithms/number-theory/primality-proving).
 
 ::: summary algorithms/number-theory/primality-proving :::
 

@@ -11,9 +11,9 @@ exact value of the function at every point of the input. Every
 algorithm therefore comes with an error bound: for a truncated series,
 for the propagation of the input radius, and for the rounding errors,
 which ball arithmetic tracks automatically. Most of the code goes back
-to Arb [@Joh2017; @Joh2014a]. This page explains the principles shared
-by all implementations and maps the function families to the methods
-and pages that describe them.
+to Arb [@Joh2017; @Joh2014a]. The sections below explain the principles
+shared by all implementations and map the function families to the
+methods and to the descriptions of these methods.
 
 ## Principles {#principles}
 
@@ -146,7 +146,7 @@ The functions are available at three levels.
 
 ## Use in FLINT {#use}
 
-The algorithm pages of this group give, for each family, the
+The descriptions of the individual algorithms give, for each family, the
 mathematics, the error bounds and the list of functions that implement
 them. The module pages give the conventions (precision, branch cuts,
 regularization, optional outputs); the guide [](acb_hypgeom/using)

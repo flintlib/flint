@@ -56,9 +56,7 @@ can install them as their method. The rings with their own method are:
 
 Other rings use the generic Berkowitz algorithm for $n \ge 5$, which
 takes $O(n^4)$ operations; over a field, `gr_mat_det_lu` is much faster
-for large $n$. (Until commit `5603850`, during the development of FLINT
-3.7, `nmod`, `nmod8`, `nmod32` and the finite fields had no method of
-their own and used Berkowitz's algorithm.)
+for large $n$.
 
 ## Permanents {#permanent}
 

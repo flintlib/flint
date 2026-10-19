@@ -93,8 +93,8 @@ Appends the null-terminated string `s` to `out`.
 When writing to a string, the buffer at least doubles in size whenever
 it has to grow, so that appending $n$ characters in total costs $O(n)$
 time. A file stream is written with `fputs`, so `s` is written
-literally (until commit `5603850`, during the development of FLINT 3.7,
-it was passed as a format string, and `%` in `s` was misprinted).
+literally (in FLINT 3.6 and earlier it was passed as a format string,
+and `%` in `s` was misprinted).
 :::
 :::
 

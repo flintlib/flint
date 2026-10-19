@@ -180,7 +180,7 @@ Sets the entries to uniformly random nonzero residues in $[1, n)$ (to
 zero if $n = 1$).
 
 ::: details
-Until commit `5603850` (during the development of FLINT 3.7), both
+In FLINT 3.6 and earlier both
 functions used the number of rows for both dimensions, which wrote past
 the matrix when it had more rows than columns, and `fmpz_mod_mat_randfull`
 produced matrices of zeros and ones.

@@ -6,6 +6,6 @@ order: 8
 ---
 
 FLINT has three FFT implementations, each suited to different coefficient
-rings and sizes. The pages here describe the transforms, their truncated
+rings and sizes. The sections below describe the transforms, their truncated
 and cache-friendly variants, and how they are combined with the Chinese
 remainder theorem to multiply large integers and polynomials.

@@ -10,7 +10,7 @@ $\Z/n\Z$ for a word-size or a multiprecision $n$, over every finite
 field and over real balls. C has no templates or generics, so FLINT has
 used several techniques to avoid writing each algorithm once per type.
 They were introduced at different times, and all of them are still
-present in the source. This page describes them, in roughly
+present in the source. They are described below in roughly
 chronological order, because they explain the shape of the library: why
 some modules have nearly identical function lists, why some functions
 are documented once for three types, and why a classic function may

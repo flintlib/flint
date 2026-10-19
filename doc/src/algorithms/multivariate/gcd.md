@@ -19,13 +19,13 @@ bivariate over a finite field, and reconstruct $G$ from these images
 know the shape of $G$ in advance or to detect the images that do not
 reflect it.
 
-This page covers the algorithms used for `fmpz_mpoly` (and through it
+The algorithms below are those used for `fmpz_mpoly` (and through it
 `fmpq_mpoly`); the function-level description, with an example, is
 [](fmpz_mpoly/gcd). The algorithms over finite fields are the same
 inside, with the additional problem that a small field may not have
-enough evaluation points, which is treated on
+enough evaluation points, which is treated in
 [](algorithms/multivariate/modp-gcd). The reconstruction of sparse
-polynomials from values is on [](algorithms/multivariate/sparse-interpolation)
+polynomials from values is described in [](algorithms/multivariate/sparse-interpolation)
 and the lifting of factorisations on
 [](algorithms/multivariate/hensel-lifting). There is no generic
 multivariate GCD in `gr_mpoly`; the `gr` contexts of these modules call
@@ -88,7 +88,7 @@ interpolation.
 ## Easy cases {#easy}
 
 Before any modular computation, `fmpz_mpoly_gcd` removes as much
-structure as possible; the list of steps is on [](fmpz_mpoly/gcd#easy).
+structure as possible; the list of steps is described in [](fmpz_mpoly/gcd#easy).
 They rest on three facts.
 
 - *Monomials*: the GCD of the monomial contents (term-wise minima of the
@@ -146,7 +146,7 @@ theorem. Modulo $p$ it recurses on the variables: the last variable is
 evaluated at points of $\F_p$, the GCDs of the images in one variable
 fewer are computed recursively, normalised to the image of the leading
 coefficient $\gamma$, and interpolated
-(`nmod_mpolyn_gcd_brown_smprime`, described on
+(`nmod_mpolyn_gcd_brown_smprime`, described in
 [](algorithms/multivariate/modp-gcd)). Over $\Z$:
 
 ::: algorithm Brown's algorithm over the integers {#alg-brown}
@@ -403,6 +403,6 @@ returning a wrong result, and the next one is used.
   `fmpz_mpoly_hlift`.
 - Subresultants: `fmpz_mpoly_gcd_subresultant`.
 - `fmpq_mpoly_gcd` and friends apply these to the integer parts; the
-  finite field versions are on [](algorithms/multivariate/modp-gcd).
+  finite field versions are described in [](algorithms/multivariate/modp-gcd).
 
 ::: functions fmpz_mpoly_gcd fmpz_mpoly_gcd_cofactors fmpz_mpoly_gcd_brown fmpz_mpoly_gcd_zippel fmpz_mpoly_gcd_zippel2 fmpz_mpoly_gcd_hensel fmpz_mpoly_gcd_subresultant fmpz_mpolyl_gcd_brown fmpz_mpolyl_gcd_zippel fmpz_mpolyl_gcd_zippel2 fmpz_mpolyl_gcd_hensel :::

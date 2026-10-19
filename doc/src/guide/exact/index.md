@@ -48,8 +48,7 @@ version 3.0.
   [](gr_domains#algebraic) and [](gr_domains#real-complex)).
 
 For numbers known to lie in $\mathbb{Q}$ or in one fixed number field,
-[](fmpq) and [](nf_elem) are much faster. The page
-[](algorithms/exact/overview) compares the four representations in
+[](fmpq) and [](nf_elem) are much faster. [](algorithms/exact/overview) compares the four representations in
 detail.
 
 ## When to use exact numbers {#when}

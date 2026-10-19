@@ -26,7 +26,7 @@ method).
 
 ## Generic version {#generic}
 
-All the composition algorithms on this page are implemented once in
+All the composition algorithms described here are implemented once in
 `gr_poly` for any commutative ring, and `nmod_poly`, `fmpz_poly`,
 `fmpz_mod_poly`, `fq_poly`, `arb_poly` and `acb_poly` call them with
 their contexts. The generic dispatchers choose by size only:

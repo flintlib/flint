@@ -405,7 +405,7 @@ otherwise returns zero.
 
 ## Arithmetic {#arithmetic}
 
-The page [](acb/arithmetic) describes the error bounds and special
+[](acb/arithmetic) describes the error bounds and special
 cases of these functions.
 
 ::: function
@@ -1012,7 +1012,7 @@ on $(1, +\infty)$.
 
 ## Arithmetic-geometric mean {#agm}
 
-The algorithms are described on
+The algorithms are described in
 [](algorithms/special-functions/elliptic-modular).
 
 ::: function

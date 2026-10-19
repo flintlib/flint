@@ -10,7 +10,7 @@ the product and the sum of the $d$ conjugates $\sigma^i(a)$, which are
 elements of the prime field, returned as integers in $[0, p)$. The same
 functions exist for `fq_nmod`, `fq_zech` and `fq_default`; the
 algorithms, Newton's identities for the trace and a resultant for the
-norm, are on [](algorithms/finite-fields/frobenius-norm-trace).
+norm, are described in [](algorithms/finite-fields/frobenius-norm-trace).
 
 ::: summary algorithms/finite-fields/frobenius-norm-trace :::
 

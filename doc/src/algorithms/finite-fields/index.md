@@ -5,7 +5,7 @@ summary: Arithmetic in finite fields of non-prime order: the polynomial and Zech
 order: 9
 ---
 
-These pages describe how the modules `fq_default`, `fq`, `fq_nmod` and
+This section describes how the modules `fq_default`, `fq`, `fq_nmod` and
 `fq_zech` and their vector, matrix, polynomial and embedding modules
 compute in finite fields $\mathbb{F}_{p^d}$. The overview compares the
 representations and lists the methods used for each task; the other
@@ -13,5 +13,5 @@ pages state the algorithms and prove them correct. Polynomials and
 matrices over finite fields mostly use the generic algorithms of the
 [polynomial](algorithms/polynomials/overview) and
 [linear algebra](algorithms/linear-algebra/overview) groups, and their
-factorisation is described on
+factorisation is described in
 [](algorithms/polynomials/factoring-finite-fields).

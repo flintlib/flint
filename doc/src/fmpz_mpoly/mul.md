@@ -10,8 +10,8 @@ and the output; a dense array method, which accumulates the products in a
 dense array one slice at a time and is several times faster when the
 product is reasonably dense; or a Kronecker substitution into a
 univariate product, which is fastest for dense inputs of moderate degree.
-Large products are computed with several threads. The other functions on
-this page run one of these algorithms directly, which is useful for
+Large products are computed with several threads. The other functions
+documented below run one of these algorithms directly, which is useful for
 benchmarking and for code that knows its inputs.
 
 ::: summary algorithms/multivariate/multiplication :::

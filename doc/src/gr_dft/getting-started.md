@@ -69,8 +69,7 @@ compared with `T_TRUE` rather than used as a C boolean.
 Over rings without default roots, the one-shot functions `gr_dft`,
 `gr_dft_inverse` and the product and Dirichlet transforms return
 `GR_UNABLE` or `GR_DOMAIN`, and a plan must be made with
-`gr_dft_precomp_init_root` (or `gr_dft_prod_precomp_init_root`). The
-page [](gr_dft/plans) explains how to choose the root and what the
+`gr_dft_precomp_init_root` (or `gr_dft_prod_precomp_init_root`). [](gr_dft/plans) explains how to choose the root and what the
 constructors check.
 
 ## A first transform {#example}

@@ -12,10 +12,10 @@ coefficient) times distinct irreducible polynomials with positive leading
 coefficients, each with its multiplicity. Two coarser factorisations are
 available as well, and are the first two stages of the full one.
 
-The algorithms are described on [](algorithms/multivariate/factorisation)
+The algorithms are described in [](algorithms/multivariate/factorisation)
 and [](algorithms/multivariate/hensel-lifting); the factorisation over
 $\Q$ (`fmpq_mpoly_factor`) is a thin layer over this one, and the
-factorisation over finite fields is described on
+factorisation over finite fields is described in
 [](algorithms/multivariate/modp-factoring).
 
 ## The three levels

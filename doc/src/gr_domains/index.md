@@ -7,8 +7,8 @@ category: Generic rings
 order: 2
 ---
 
-This page lists the constructors of the structures that come with FLINT
-for use with the generic interface [`gr`](gr): integers and rationals,
+The constructors of the structures that come with FLINT for use with the
+generic interface [`gr`](gr) are listed below: integers and rationals,
 residue rings and finite fields, number fields and algebraic numbers,
 real and complex numbers in ball, exact and floating-point
 representations, and the rings built from other rings (polynomials,

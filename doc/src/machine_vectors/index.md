@@ -1048,7 +1048,7 @@ All of them set $C = AB$ for row-major matrices, where $C$ is
 $m \times n$, $A$ is $m \times k$ and $B$ is $k \times n$, and
 `lda`, `ldb` and `ldc` are the distances between the starts of
 consecutive rows. $C$ is overwritten and must not overlap $A$ or $B$.
-The page [](machine_vectors/gemm) compares this interface with
+[](machine_vectors/gemm) compares this interface with
 `cblas_dgemm` and discusses threading and exactness.
 
 ::: function

@@ -6,7 +6,7 @@ functions: bool_mat_transitive_closure bool_mat_get_strongly_connected_component
 A square Boolean matrix $A$ of order $n$ is the adjacency matrix of a
 directed graph on the vertices $0, \ldots, n - 1$, and the Boolean
 product of matrices composes walks: $(A^k)_{ij} = 1$ exactly when there
-is a walk of length $k$ from $i$ to $j$. The four functions on this page
+is a walk of length $k$ from $i$ to $j$. The four functions described here
 compute properties of all powers of $A$ at once from the structure of the
 graph, without forming the powers.
 

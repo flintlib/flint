@@ -5,7 +5,7 @@ summary: Fixed-precision multiprecision floating-point and decimal arithmetic, d
 order: 13
 ---
 
-These pages describe how FLINT implements floating-point arithmetic
+This section describes how FLINT implements floating-point arithmetic
 outside the `arb` ball arithmetic (which has its own group,
 [](algorithms/ball-arithmetic/overview)): the fixed-precision `nfloat`
 type and its kernels, the limb-level `mp_real` balls and their

@@ -15,8 +15,8 @@ objects. FLINT's framework [`gr`](gr), introduced in FLINT 3 and
 described in [@Joh2025gr], works in plain C with run-time dispatch: a
 ring is an object, operations are looked up in a table of function
 pointers, and the critical kernels are specialised by hand rather than
-by a compiler. This page summarises the design and links to the pages
-that explain each part.
+by a compiler. The design is summarised below, with links to the
+detailed descriptions of each part.
 
 ## Rings as objects {#objects}
 

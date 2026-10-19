@@ -4,7 +4,7 @@ summary: The fixed-point layer of mp_real: number formats, the ulp error contrac
 order: 2
 ---
 
-Below the balls, `mp_real` works with fixed-point numbers in limb
+Below the ball level, `mp_real` works with fixed-point numbers in limb
 arrays. These carry no exponent, sign or radius: the caller knows the
 range of the value and receives a bound for the error in units of the
 last place. The elementary function kernels, the Newton inverses and

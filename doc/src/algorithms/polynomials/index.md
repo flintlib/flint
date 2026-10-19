@@ -5,13 +5,13 @@ summary: Dense univariate polynomials over generic rings, $\Z/n\Z$, $\Z$ and fin
 order: 6
 ---
 
-These pages describe the algorithms behind the dense univariate
+The sections below describe the algorithms behind the dense univariate
 polynomial modules: the generic [`gr_poly`](gr_poly) and the
 type-specific modules such as `nmod_poly`, `fmpz_mod_poly`, `fmpz_poly`,
 `fmpq_poly` and `fq_poly`, with their factorisation modules.
 Multiplication comes first: division, power series, GCDs, evaluation,
 interpolation and composition are reduced to it so that they inherit its
-quasi-linear complexity. The later pages cover Hensel lifting,
+quasi-linear complexity. The later sections cover Hensel lifting,
 factorisation over finite fields and over $\Z$, roots over finite fields
 and the real roots of integer polynomials. Over $\Z/n\Z$ the basic
 operations rest on the vector arithmetic of
@@ -19,9 +19,9 @@ operations rest on the vector arithmetic of
 [](algorithms/arithmetic).
 
 Start with the overview, which describes how the generic algorithms are
-organised and where the type-specific modules take over. The topic pages
+organised and where the type-specific modules take over. The sections
 on multiplication say which method is used for which lengths and
-coefficient sizes, and the page on GCDs does the same for GCDs and
+coefficient sizes, and the section on GCDs does the same for GCDs and
 resultants.
 
 ::: summary algorithms/polynomials/overview :::

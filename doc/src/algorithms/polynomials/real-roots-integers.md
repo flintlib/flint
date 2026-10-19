@@ -5,8 +5,8 @@ complexity: The Descartes bisection algorithm visits a number of nodes polynomia
 order: 85
 ---
 
-This page describes the exact algorithms that `fmpz_poly` uses to
-count the real roots of a squarefree $f \in \Z[x]$ of degree $n$ and to
+The sections below describe the exact algorithms that `fmpz_poly` uses
+to count the real roots of a squarefree $f \in \Z[x]$ of degree $n$ and to
 isolate them, that is, to find disjoint intervals with rational (here
 dyadic) endpoints that each contain exactly one root. Numerical
 refinement of isolated roots and complex root isolation with ball

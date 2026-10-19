@@ -8,13 +8,13 @@ order: 4
 FLINT's generic rings framework [`gr`](gr) lets one implementation of an
 algorithm run over every ring, from $\Z/n\Z$ to power series over
 complex balls, while the type-specific modules keep their speed by
-overriding the critical operations. The pages here describe the design
+overriding the critical operations. The sections below describe the design
 decisions behind the framework and the guarantees that generic
 algorithms rely on: how rings are represented and dispatched, how
 operations are layered so that specialisation pays off, how inexact
 elements are handled rigorously, what the two kinds of failure mean,
 and how implementations are tested. The design is described in detail
-by Johansson [@Joh2025gr]; these pages follow the current source.
+by Johansson [@Joh2025gr]; the sections below follow the current source.
 
 The algorithms themselves (polynomial multiplication, GCDs, linear
 algebra, series) are described in their own groups, which start from

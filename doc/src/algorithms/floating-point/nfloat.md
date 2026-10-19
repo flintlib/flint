@@ -153,7 +153,7 @@ on this matrix multiplication.
 
 ## Use in FLINT {#use}
 
-The algorithms of this page are implemented in `src/nfloat`: the
+The algorithms described above are implemented in `src/nfloat`: the
 arithmetic kernels in `nfloat.c` and `div.c`, the dot products in
 `dot.c` (`_nfloat_vec_dot`, `_nfloat_complex_vec_dot`), the fixed-point
 arithmetic in `nfixed.c` and the matrix multiplication in `mat_mul.c`.

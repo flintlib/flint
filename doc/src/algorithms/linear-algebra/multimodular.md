@@ -13,10 +13,9 @@ as the final result in each of its $O(n^3)$ operations. Modular methods
 avoid this. They solve the problem modulo word-size primes, where
 `nmod_mat` runs at the speed of floating-point arithmetic
 ([](algorithms/linear-algebra/matrix-multiplication)), and recover the
-integer or rational result from its residues. This page describes how
-FLINT does this for determinants, linear systems, ranks and echelon
-forms, characteristic polynomials and products, and how every answer is
-made rigorous.
+integer or rational result from its residues. FLINT does this for
+determinants, linear systems, ranks and echelon forms, characteristic
+polynomials and products, and makes every answer rigorous.
 
 The methods are specific to $\Z$ and $\Q$. There is no generic
 multimodular framework in `gr_mat`; instead, the generic functions

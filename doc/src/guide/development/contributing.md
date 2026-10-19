@@ -10,7 +10,7 @@ best discussed first in an issue or on the `flint-devel` mailing list
 (https://groups.google.com/g/flint-devel). The conventions that users of
 FLINT see (types, naming, aliasing, memory management) are described in
 [](guide/conventions/types-and-naming) and [](guide/conventions/memory);
-this page adds what contributors need to know. The file
+the sections below add what contributors need to know. The file
 `code_conventions.md` in the source tree has further details.
 
 ## Adding a function {#adding}
@@ -25,8 +25,8 @@ module:
    entry `TEST_FUNCTION(module_foo)` in the list of tests, both in
    alphabetical order.
 3. Declare the function in `src/module.h`.
-4. Document it in `doc/src/module/index.md`, as described at the end of
-   this page.
+4. Document it in `doc/src/module/index.md`, as described in
+   [](#documentation) below.
 
 The build system finds new source and test files automatically. Helper
 functions used only by `module_foo` are declared `static` in `foo.c`.

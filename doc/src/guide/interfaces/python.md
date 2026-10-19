@@ -18,8 +18,8 @@ There are two ways to use FLINT from Python.
   covers a large part of FLINT through the generic rings interface. It is
   not officially supported and should not be used in production, but it
   is convenient for experimenting with FLINT, including functionality
-  that python-flint does not wrap yet. The rest of this page describes
-  it.
+  that python-flint does not wrap yet. It is described in the rest of
+  this section.
 
 Other languages have their own interfaces: for example Nemo and
 Oscar.jl use FLINT from Julia, and SageMath uses it from Python.

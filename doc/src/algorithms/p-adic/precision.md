@@ -6,9 +6,9 @@ order: 10
 ---
 
 A $p$-adic number can only be stored approximately, as a residue class
-modulo a power of $p$. This page fixes the notation, states how much
-information each arithmetic operation preserves, and describes the two
-models FLINT uses: the fixed-precision model of `padic`, `qadic`,
+modulo a power of $p$. The sections below fix the notation, state how
+much information each arithmetic operation preserves, and describe the
+two models FLINT uses: the fixed-precision model of `padic`, `qadic`,
 `padic_poly` and `padic_mat`, where every variable has a precision and
 inputs are treated as exact, and the ball model of `padic_radix`, where
 every element carries its own error term. [@Car2017] compares these and
@@ -157,4 +157,4 @@ element that may be zero returns `GR_UNABLE`.
   [](#prop-ring) for negative valuations but do not apply it.
 - `padic_radix_add`, `padic_radix_mul`, `padic_radix_div`,
   `padic_radix_inv`, `padic_radix_sqrt`, `padic_radix_exp` and
-  `padic_radix_log` apply the rules of this page to their error terms.
+  `padic_radix_log` apply the rules above to their error terms.

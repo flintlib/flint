@@ -6,9 +6,9 @@ order: 2
 
 FLINT is built with a `configure` script and GNU Make on Linux, macOS,
 the BSDs and other Unix-like systems (including MSYS2 and Cygwin on
-Windows), and with CMake on Windows. This page describes both, the
-options that change how the library is built, the targets for testing,
-and how to compile programs against the installed library.
+Windows), and with CMake on Windows. Both are described below, together
+with the options that change how the library is built, the targets for
+testing, and how to compile programs against the installed library.
 
 ## Quick start {#quick-start}
 

@@ -13,8 +13,8 @@ Pohlig and Hellman [@PohHel1978] reduces the problem to logarithms in
 groups of prime order, which are solved by Shanks' baby-step giant-step
 method [@Sha1971]. See also [@CraPom2005].
 
-This page describes the implementation behind the
-`nmod_discrete_log_pohlig_hellman` functions.
+FLINT implements this method in the `nmod_discrete_log_pohlig_hellman`
+functions, as described below.
 
 ## Reduction to prime-power order {#crt}
 

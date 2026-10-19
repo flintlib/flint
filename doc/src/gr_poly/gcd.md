@@ -68,9 +68,7 @@ Several rings override the methods with tuned algorithms:
 
 There is no override for $\mathbb{Q}$: over `fmpq` the generic Euclidean
 algorithm is used, whose intermediate coefficients can grow large; for
-large inputs `fmpq_poly_gcd` is much faster. (Until commit `5603850`,
-during the development of FLINT 3.7, there was no override for $\Z$
-either, and the generic subresultant algorithm was used.)
+large inputs `fmpq_poly_gcd` is much faster.
 
 The underscore functions `_gr_poly_gcd_euclidean`, `_gr_poly_gcd_hgcd`
 and `_gr_poly_gcd_subresultant`, and the corresponding *xgcd*

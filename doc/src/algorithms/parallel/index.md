@@ -6,6 +6,6 @@ order: 16
 ---
 
 FLINT uses a single process-wide pool of threads, created on demand. The
-pages here describe how the pool hands out threads, how the generic
+sections below describe how the pool hands out threads, how the generic
 parallel helpers divide work among them, and how read-only data is shared
 between threads without locks.

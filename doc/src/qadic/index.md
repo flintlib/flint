@@ -20,7 +20,7 @@ and the name of the generator.
 Besides the field operations, the module provides the functions that
 make unramified extensions useful in $p$-adic point counting: the
 Frobenius automorphism, Teichmüller lifts, the norm and the trace, all
-described on [](qadic/galois), and the exponential and logarithm. The
+described in [](qadic/galois), and the exponential and logarithm. The
 reference below lists the context, memory management, conversions and
 arithmetic, then square roots, the transcendental functions, the Galois
 structure, and output.

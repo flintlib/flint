@@ -4,6 +4,11 @@ summary: Releases of Calcium 0.1 to 0.4 (2020–2021), the library for exact rea
 order: 3
 ---
 
+Calcium, the library for exact real and complex numbers (`ca`) and
+algebraic numbers (`qqbar`) built on FLINT 2, was released from
+version 0.1 (September 2020) to 0.4 (May 2021), and merged into
+FLINT 3.0 in 2023 at version 0.4.
+
 ## Calcium 0.4 (2021-05-28) {#calcium-0-4}
 
 * Algebraic numbers

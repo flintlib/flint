@@ -5,8 +5,8 @@ complexity: An isolated S(n,k) or B_n costs about $O(n^2 \log^{O(1)} n)$ bit ope
 order: 80
 ---
 
-This page describes the algorithms of `arith` for the Stirling numbers
-$s(n,k)$ and $S(n,k)$ and the Bell numbers $B_n$, defined on
+The sections below describe the algorithms of `arith` for the Stirling
+numbers $s(n,k)$ and $S(n,k)$ and the Bell numbers $B_n$, defined on
 [](arith/stirling) and [](arith/bell). All of these numbers have
 $\Theta(n \log n)$ bits for typical $k$, so the best possible cost of an
 isolated value is quasi-linear in $n \log n$; the methods below are

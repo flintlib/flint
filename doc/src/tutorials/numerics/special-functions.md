@@ -137,7 +137,7 @@ a given accuracy should check `arb_rel_accuracy_bits` of the result and
 retry at a higher precision if needed, as in the loop above. Near
 singularities or for huge parameters, the result may be a wide or
 infinite ball; it is still correct, just not informative. The details of
-the algorithms are on [](algorithms/special-functions/overview).
+the algorithms are described in [](algorithms/special-functions/overview).
 
 ## Accurate floating-point values with arb_fpwrap {#fpwrap}
 

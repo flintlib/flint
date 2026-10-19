@@ -19,7 +19,7 @@ the operands and the bit length $\beta$ of $n$ (`NMOD_BITS`):
 
 Here $\ell_1 \ge \ell_2$ are the operand lengths. The algorithms are
 standard; see [@GG2003, Ch. 8] and [@Ber2008] for surveys. The point
-of this page is what FLINT uses where.
+here is what FLINT uses where.
 
 Products come in four shapes, each with its own selection among these
 methods:
@@ -40,7 +40,7 @@ by calling the ring methods `GR_METHOD_POLY_MULLOW` and
 (`gr_ctx_init_nmod`) installs `_nmod_poly_mullow` and
 `_nmod_poly_mulmid` as these methods, so generic code over this ring
 (Newton iteration, subproduct trees, half-gcd, composition) makes
-exactly the choices described on this page. Other rings have their own
+exactly the choices described here. Other rings have their own
 methods: `fmpz_poly` products for $\Z$ and $\mathbb{Q}$, Kronecker substitution
 for finite fields $\mathbb{F}_q$, block multiplication for real and
 complex balls, multi-word kernels and the small-prime FFT for
@@ -164,7 +164,7 @@ $\|A_e\|_2 \|B_e\|_2 < M$ and so on, which are much smaller for random
 inputs. If neither works it returns 0 and the ordinary FFT is used.
 
 ::: note
-Until commit `c54fd98` (PR #2892, during the development of FLINT 3.7),
+In FLINT 3.6 and earlier,
 the Cauchy–Schwarz test added the last coefficient of an operand of odd
 length to $\|A_e\|_2^2$ (respectively $\|B_e\|_2^2$) without squaring
 it, so the norm could be underestimated and $M = 2^{17}$ accepted

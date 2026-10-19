@@ -10,8 +10,8 @@ that converge quickly: the arithmetic-geometric mean, which gives the
 complete elliptic integrals; Carlson's duplication algorithm, which gives
 the incomplete integrals; and theta functions, which give the
 Weierstrass elliptic functions and the modular forms after a modular
-transformation has moved $\tau$ to the fundamental domain. This page
-describes these methods as implemented in [`acb`](acb) (the AGM),
+transformation has moved $\tau$ to the fundamental domain. The sections
+below describe these methods as implemented in [`acb`](acb) (the AGM),
 [`acb_elliptic`](acb_elliptic) and [`acb_modular`](acb_modular), following
 [@Joh2019]; the summation of theta series is described in
 [](algorithms/special-functions/theta-functions).

@@ -12,7 +12,7 @@ over the new ring. This guide builds a complete example, the ring
 $\Z/2^{64}\Z$ with elements stored as `ulong` and wrapping machine
 arithmetic, tests it with `gr_test_ring`, computes a determinant with
 `gr_mat_det`, and then adds an inverse. The design behind the method
-tables is explained on [](algorithms/generic/method-tables).
+tables is explained in [](algorithms/generic/method-tables).
 
 ## The context object {#context}
 

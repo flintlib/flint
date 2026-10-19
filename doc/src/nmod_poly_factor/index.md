@@ -23,9 +23,9 @@ factorisation followed, for each squarefree part, by either the
 Cantor–Zassenhaus algorithm with classical distinct-degree factorisation
 (small degrees and small $p$) or the Kaltofen–Shoup algorithm with
 baby-step giant-step distinct-degree factorisation and modular
-composition; Berlekamp's algorithm is available on request. The page
+composition; Berlekamp's algorithm is available on request. The guide
 [](nmod_poly_factor/factor) explains the choices and their costs with
-examples, and the algorithms are described in detail on the pages below.
+examples, and the algorithms are described in detail in:
 
 ::: summary algorithms/polynomials/factoring-finite-fields :::
 

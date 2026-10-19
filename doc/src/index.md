@@ -44,7 +44,7 @@ The documentation has four parts:
   by step.
 
 Every example program in the documentation is compiled and run by `make
-check`, and its output is compared with the output shown.
+checkdoc`, and its output is compared with the output shown.
 
 ## Start here {#start}
 

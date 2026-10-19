@@ -320,7 +320,7 @@ of some of the variables, use `fmpz_mpoly_get_coeff_vars_ui`.
 Exponents are not limited to a machine word. Internally, the exponents of
 a monomial are packed into bit fields of a common width, the field `bits`
 of the polynomial, which every function enlarges as needed; the details
-are on the page [](algorithms/multivariate/representation). Exponent
+are described in [](algorithms/multivariate/representation). Exponent
 vectors of type `fmpz` give access to exponents of any size, and the
 `_ui` and `_si` access functions throw an exception if an exponent does
 not fit.

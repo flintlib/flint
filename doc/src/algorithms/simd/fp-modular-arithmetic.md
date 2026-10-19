@@ -11,9 +11,9 @@ while it performs four double-precision fused multiply-adds per
 instruction. FLINT therefore does the modular arithmetic of its
 small-prime FFT (`fft_small`) on integers stored exactly in doubles. The
 functions are `vec4d_mulmod`, `vec4d_reduce_to_pm1n` and their
-relatives in [`machine_vectors.h`](machine_vectors), and this page proves
-the ranges stated there. The approach is of the kind studied by van der
-Hoeven, Lecerf and Quintin [@HLQ2016]; exact linear algebra libraries
+relatives in [`machine_vectors.h`](machine_vectors), and the ranges
+stated there are proved below. The approach is of the kind studied by
+van der Hoeven, Lecerf and Quintin [@HLQ2016]; exact linear algebra libraries
 such as FFLAS have long relied on integer computations in floating point
 [@DGP2008].
 

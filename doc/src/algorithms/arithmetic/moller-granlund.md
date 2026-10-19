@@ -5,9 +5,11 @@ complexity: One $1 \times 1 \to 2$ word product, one low product, a two-word add
 order: 10
 ---
 
-This is the algorithm of Möller and Granlund [@GraMol2010] (Algorithm 4 in
-their paper). FLINT uses it for every `_preinv` function in `ulong_extras`
-that reduces or divides by a single word.
+To divide a two-word number by a fixed single word without a hardware
+division, FLINT uses the algorithm of Möller and Granlund [@GraMol2010]
+(Algorithm 4 in their paper), which multiplies by a precomputed
+reciprocal of the divisor. Every `_preinv` function in `ulong_extras`
+that reduces or divides by a single word uses it.
 
 ## The reciprocal {#reciprocal}
 

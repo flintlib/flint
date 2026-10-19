@@ -16,7 +16,7 @@ $$
 
 which lie in $\mathbb{F}_p$; equivalently they are the trace and the
 determinant of the $\mathbb{F}_p$-linear map $x \mapsto ax$ on
-$\mathbb{F}_q$. This page describes how the polynomial representations
+$\mathbb{F}_q$. This section describes how the polynomial representations
 `fq` and `fq_nmod` compute them, with $\mathbb{F}_q = \mathbb{F}_p[x]/(f)$
 for an irreducible $f$ of degree $d$ with roots $\alpha_1, \ldots,
 \alpha_d$ (the conjugates of the generator); for the Zech representation

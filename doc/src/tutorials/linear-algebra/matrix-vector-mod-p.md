@@ -158,7 +158,7 @@ The program needs a 64-bit build because of its 41- and 63-bit moduli.
 
 ## How much faster? {#timing}
 
-On the machine that built this page (x86-64, FLINT compiled for
+On the machine used for these timings (x86-64, FLINT compiled for
 AVX-512), with $N = 2000$ and one thread, the dot-product version was
 about 5.5 times faster than the naive loop for the 21-bit prime, 4.3 times
 for the 29-bit prime and 3 times for the 41- and 63-bit primes. The gain

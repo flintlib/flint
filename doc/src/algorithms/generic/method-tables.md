@@ -4,10 +4,10 @@ summary: How rings and elements are represented, how a generic call is dispatche
 order: 10
 ---
 
-This page describes the representation behind [`gr`](gr): the context
-object, the method table and the element layout, and the way generic
-defaults and specialised methods are layered so that generic code runs
-at the speed of type-specific code where it matters
+The generic rings framework [`gr`](gr) rests on three data structures,
+the context object, the method table and the element layout, and on a
+layering of generic defaults and specialised methods that lets generic
+code run at the speed of type-specific code where it matters
 [@Joh2025gr, §3, §5–7].
 
 ## Contexts and method tables {#tables}

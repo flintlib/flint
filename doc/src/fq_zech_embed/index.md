@@ -7,7 +7,7 @@ category: Finite fields
 order: 22
 ---
 
-This module computes embeddings $\mathbb{F}_{p^m} \to \mathbb{F}_{p^n}$, $m \mid n$, between fields in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$), as matrices over $\mathbb{F}_p$ (`nmod_mat_t`), and the change-of-basis matrices they rest on. It is generated from the same template as [](fq_embed) and has the same functions, with `fq_zech` in place of `fq` and `nmod_poly` and `nmod_mat` in place of `fmpz_mod_poly` and `fmpz_mod_mat`; this page lists them with short descriptions, and each function page links to the `fq_embed` version, whose documentation has the details. The algorithms are described on [](algorithms/finite-fields/embeddings).
+This module computes embeddings $\mathbb{F}_{p^m} \to \mathbb{F}_{p^n}$, $m \mid n$, between fields in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$), as matrices over $\mathbb{F}_p$ (`nmod_mat_t`), and the change-of-basis matrices they rest on. It is generated from the same template as [](fq_embed) and has the same functions, with `fq_zech` in place of `fq` and `nmod_poly` and `nmod_mat` in place of `fmpz_mod_poly` and `fmpz_mod_mat`; they are listed below with short descriptions, and each function page links to the `fq_embed` version, whose documentation has the details. The algorithms are described in [](algorithms/finite-fields/embeddings).
 
 The matrix functions of this module convert the elements to the `fq_nmod` representation of the underlying context and call the `fq_nmod_embed` functions.
 

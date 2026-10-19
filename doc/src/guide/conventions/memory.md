@@ -8,7 +8,7 @@ FLINT objects manage their own memory: every object is initialised
 before use and cleared afterwards, and functions grow their outputs as
 needed. Raw memory is allocated with FLINT's own versions of `malloc`
 and `free`. FLINT also keeps some caches between calls, which can be
-freed explicitly. This page describes these mechanisms; the functions
+freed explicitly. These mechanisms are described below; the functions
 are documented in [](flint).
 
 ## Initialising and clearing objects {#init-clear}

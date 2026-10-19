@@ -8,8 +8,8 @@ Every `arf_t` function that can produce a result not representable with
 `prec` bits takes a precision `prec` and a rounding mode `rnd`, and
 returns an `int`. The result is the exact mathematical result rounded
 once to a mantissa of at most `prec` bits, and the return value says
-whether that rounding changed anything. This page explains these
-conventions and the few exceptions.
+whether that rounding changed anything. These conventions and the few
+exceptions are explained below.
 
 ## Rounding modes {#modes}
 

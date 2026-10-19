@@ -14,7 +14,7 @@ the functions computed with it. (They were developed as the separate
 library Arb, which was merged into FLINT in version 3.0, and keep its
 module names and interfaces.)
 
-The pages below explain what ball arithmetic is, how to write programs
+The sections below explain what ball arithmetic is, how to write programs
 with it, how the precision relates to the accuracy of the results, and
 the conventions specific to ball arithmetic. The general rules of
 [](guide/conventions) and [](guide/correctness) apply as well. The module pages

@@ -54,7 +54,7 @@ internally and converted back.
 | | repeated multiplication | finite fields | `nmod_mpoly_pow_rmul` |
 
 `fmpz_mpoly_mul` and `nmod_mpoly_mul` choose automatically; the rules are
-on [](fmpz_mpoly/mul).
+described in [](fmpz_mpoly/mul).
 
 ::: summary algorithms/multivariate/division :::
 

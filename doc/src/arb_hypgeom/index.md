@@ -22,7 +22,7 @@ rational parameters. Several functions also have variants based on
 rigorous numerical integration, which work for large parameters where
 series expansions fail.
 
-The page [](algorithms/special-functions/overview) explains how FLINT
+[](algorithms/special-functions/overview) explains how FLINT
 evaluates special functions and which methods each function uses;
 [](algorithms/special-functions/gamma) and
 [](algorithms/special-functions/hypergeometric) describe the two main
@@ -174,7 +174,7 @@ factorial for moderate integers, reduces arguments with denominator 2,
 3, 4 or 6 to the constants $\sqrt\pi$, $\Gamma(1/3)$ and $\Gamma(1/4)$,
 uses a hypergeometric series summed by binary splitting at very high
 precision for other denominators, and otherwise the Taylor or Stirling
-series. The selection is described on [](arb_hypgeom/gamma).
+series. The selection is described in [](arb_hypgeom/gamma).
 `arb_gamma`, `arb_gamma_fmpq` and `arb_gamma_fmpz` of [`arb`](arb) call
 these functions.
 :::

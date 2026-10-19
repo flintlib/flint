@@ -7,8 +7,8 @@ Balls are stored in binary, but are usually read and written in decimal.
 Converting between the two is inexact in general, and FLINT provides
 conversions that take the conversion error into account, so that a
 decimal string obtained from a ball, or a ball obtained from a decimal
-string, is still a rigorous enclosure. This page explains the formats
-and the flags.
+string, is still a rigorous enclosure. The formats and the flags are
+explained below.
 
 ## The decimal ball format {#format}
 

@@ -15,7 +15,7 @@ one row at a time) it costs $O(\ell_B^2 \ell_C)$ monomial comparisons in
 the worst case. FLINT's algorithms avoid this in different ways: a heap
 (sparse inputs), a dense array (moderately dense inputs) or a reduction to
 univariate multiplication (dense inputs). `fmpz_mpoly_mul` chooses among
-them as described on [](fmpz_mpoly/mul).
+them as described in [](fmpz_mpoly/mul).
 
 ## The heap method {#heap}
 
@@ -290,7 +290,7 @@ own operations. The specialised modules add:
 | `fmpz_mod_mpoly` | `fmpz_mod_mpoly_mul_johnson` | | | `fmpz_mod_mpoly_mul_dense` | repeated multiplication |
 | `fq_nmod_mpoly` | `fq_nmod_mpoly_mul_johnson` | | | | repeated multiplication |
 
-The choice of method in `fmpz_mpoly_mul`, with its thresholds, is on
+The choice of method in `fmpz_mpoly_mul`, with its thresholds, is described in
 [](fmpz_mpoly/mul); `nmod_mpoly_mul` follows the same pattern.
 
 - Heap: [](#alg-heap) in `_fmpz_mpoly_mul_johnson` (one-word exponents:

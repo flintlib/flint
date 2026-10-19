@@ -10,9 +10,9 @@ multiplication needs the top limbs of the product of two mantissas; Hensel
 division and 2-adic arithmetic need the bottom half. A *short product*
 computes such a part in less time than the full product: about half the
 time for quadratic multiplication, and a fraction between $1/2$ and 1 for
-Karatsuba and Toom–Cook multiplication. This page states precisely what
-the functions compute; the algorithms and the proofs of the error bounds
-are on the algorithm page.
+Karatsuba and Toom–Cook multiplication. The descriptions below state
+precisely what the functions compute; the algorithms and the proofs of
+the error bounds are on the algorithm page.
 
 ::: summary algorithms/integers/short-products :::
 

@@ -34,7 +34,7 @@ expansions, transformation formulas, analytic continuation and, for
 real arguments, numerical integration, and sets its working precision
 from an estimate of the cancellation; the algorithms and error bounds
 are described in [](algorithms/special-functions/hypergeometric), and
-the page [](algorithms/special-functions/overview) maps each function
+[](algorithms/special-functions/overview) maps each function
 to its methods. The guide [](acb_hypgeom/using) explains the
 conventions with examples. The reference starts with the top-level
 functions and ends with the series summation routines on which they are

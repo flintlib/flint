@@ -10,7 +10,7 @@ The [](ca) module represents a number as an element of a field $K =
 many *extension numbers* $a_k$: algebraic numbers, constants such as
 $\pi$, and values $f(z)$ of functions such as $\exp$, $\log$ or
 $\sqrt{\cdot}$ at numbers $z$ that are themselves elements of such
-fields [@Joh2021calcium]. This page describes how such fields are
+fields [@Joh2021calcium]. This section describes how such fields are
 represented and how the algebraic relations between the generators are
 found.
 

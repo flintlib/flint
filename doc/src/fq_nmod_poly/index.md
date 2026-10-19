@@ -7,7 +7,7 @@ category: Finite fields
 order: 14
 ---
 
-This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_nmod` in place of `fq`; this page lists them with short descriptions, and each function page links to the `fq_poly` version, whose documentation has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
+This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_poly` version, whose documentation has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
 
 The differences are in multiplication: `fq_nmod_poly_mul` uses the substitution $y = x^{2d-1}$ of the generator, which turns the product into one product in $(\Z/p\Z)[x]$ computed by `nmod_poly_mul` (with `fft_small` for long products), except for very short products (see [](fq_poly/mul)). The GCD functions switch from the Euclidean algorithm to the half-GCD algorithm at length 110 for $p < 2^8$ (`FQ_NMOD_POLY_SMALL_GCD_CUTOFF`) and 120 otherwise (`FQ_NMOD_POLY_GCD_CUTOFF`), with the half-GCD basecase below 25 (`FQ_NMOD_POLY_HGCD_CUTOFF`).
 
@@ -504,7 +504,7 @@ The underscore version writes `len1 + len2 - 1` coefficients, requires
 `len1`, `len2` $\ge 1$ and does not allow aliasing.
 
 ::: details
-Generated from the same template as `_fq_poly_mul`, whose documentation has the details. The algorithm selection of each representation is described on [](fq_poly/mul).
+Generated from the same template as `_fq_poly_mul`, whose documentation has the details. The algorithm selection of each representation is described in [](fq_poly/mul).
 :::
 :::
 

@@ -10,7 +10,7 @@ an enclosure of the range of the function on the ball. For exact or
 accurate input, the result is accurate to within a few units in the last
 place at the given precision, so they behave like correctly rounded
 floating-point functions with an attached error bound. This guide
-describes their behaviour; the algorithms are on
+describes their behaviour; the algorithms are described in
 [](algorithms/special-functions/elementary).
 
 ## Accuracy {#accuracy}

@@ -10,7 +10,7 @@ lifting and 2-adic Newton iteration need the low half, floating-point
 multiplication and Newton division need the high half, and Newton
 iteration for the reciprocal needs a middle part of a $2n \times n$
 product whose low part is known to cancel. Computing only the required
-part saves up to half of the work. This page states what FLINT computes
+part saves up to half of the work. This section states what FLINT computes
 and proves the error bounds; the interfaces are described in
 [](mpn_extras/mulhigh). FLINT's high products, their error analysis and
 their kernels for small sizes are due to Ahlbäck and Johansson

@@ -230,7 +230,27 @@ class HtmlRenderer:
     # -- blocks ------------------------------------------------------------------
 
     def blocks(self, nodes):
-        return "\n".join(self.block(nd) for nd in nodes)
+        out = []
+        run = []        # consecutive '::: summary' cards, laid out as one grid
+        for nd in nodes:
+            if nd.kind == "div" and nd.get("kind") == "summary":
+                card = self.block(nd)
+                if card:
+                    run.append(card)
+                continue
+            if run:
+                out.append(self.card_grid(run))
+                run = []
+            out.append(self.block(nd))
+        if run:
+            out.append(self.card_grid(run))
+        return "\n".join(out)
+
+    @staticmethod
+    def card_grid(cards):
+        if len(cards) == 1:
+            return cards[0]
+        return '<div class="cards">%s</div>' % "".join(cards)
 
     def block(self, nd):
         k = nd.kind
@@ -285,7 +305,7 @@ class HtmlRenderer:
                         for r in (x.strip() for x in str(req).split(",")) if r)) if req else "")
             return ('<figure class="example" id="example-%s"><figcaption><span class="ex-title">Example</span>'
                     '<span class="ex-file">%s.c</span>%s<span class="ex-check" title="This program is '
-                    'compiled and run by make check; its output must match exactly.">checked by make check</span>'
+                    'compiled and run by make checkdoc; its output must match exactly.">checked by make checkdoc</span>'
                     '</figcaption><pre class="code"><code>%s</code></pre>%s</figure>'
                     % (esc(nd["example_name"]), esc(nd["example_name"]), reqs, code, out))
         return '<pre class="code"><code>%s</code></pre>' % code
@@ -408,7 +428,7 @@ class HtmlRenderer:
             if c not in by_cat:
                 continue
             items = "".join(
-                '<a class="modcard" href="%s"><code>%s</code><span>%s</span></a>'
+                '<a class="modcard k-module" href="%s"><code>%s</code><span>%s</span></a>'
                 % (self.rel(mp.url), esc(mp.meta.get("header", mp.module + ".h")),
                    self.plain_inline(_parse(mp.meta.get("description", ""))))
                 for mp in by_cat[c])
@@ -428,12 +448,16 @@ class HtmlRenderer:
         if tp is None:
             self.site.warn("unknown page in ::: summary %s" % target, self.where(nd))
             return ""
+        return self.page_card(tp)
+
+    def page_card(self, tp):
+        """A card linking to a page: its kind, title and abstract. The kind
+        also selects the card's background tone (class k-<kind>)."""
         summ = tp.summary()
-        kind = {"algorithm": "Algorithm", "topic": "Overview", "group": "Overview",
-                "tutorial": "Tutorial", "module": "Module", "guide": "Guide", "manual": "User guide"}.get(tp.kind, "") if tp.kind != "manual" else COLLECTIONS.get(tp.collection, "")
-        return ('<a class="card" href="%s"><span class="card-kind">%s</span><span class="card-title">%s</span>'
+        tone, kind = card_kind(tp)
+        return ('<a class="card k-%s" href="%s"><span class="card-kind">%s</span><span class="card-title">%s</span>'
                 '<span class="card-text">%s</span></a>'
-                % (self.rel(tp.url), kind, self.plain_inline(tp.title), self.plain_inline(summ) if summ else ""))
+                % (tone, self.rel(tp.url), kind, self.plain_inline(tp.title), self.plain_inline(summ) if summ else ""))
 
     def overview_block(self, nd):
         b = nd["block"]
@@ -749,12 +773,7 @@ class HtmlBuilder:
         return "".join(out)
 
     def card(self, r, tp):
-        summ = tp.summary()
-        kind = {"algorithm": "Algorithm", "topic": "Overview", "group": "Overview",
-                "tutorial": "Tutorial", "module": "Module", "guide": "Guide", "manual": "User guide"}.get(tp.kind, "") if tp.kind != "manual" else COLLECTIONS.get(tp.collection, "")
-        return ('<a class="card" href="%s"><span class="card-kind">%s</span><span class="card-title">%s</span>'
-                '<span class="card-text">%s</span></a>'
-                % (r.rel(tp.url), kind, r.plain_inline(tp.title), r.plain_inline(summ) if summ else ""))
+        return r.page_card(tp)
 
     def crumbs(self, r, items):
         parts = ['<a href="%s">%s</a>' % (r.rel(u), t) if u else '<span>%s</span>' % t for t, u in items]
@@ -776,13 +795,13 @@ class HtmlBuilder:
             intro += ('<section class="group"><h2 id="guides">Guides<a class="hl" href="#guides">#</a></h2>'
                       '<div class="cards">%s</div></section>' % "".join(self.card(r, g) for g in guides))
         return ('%s<header class="page-head"><div class="eyebrow">Module · %s</div>'
-                '<h1><code>%s</code></h1><p class="lead">%s</p>'
+                '<h1><code>%s</code></h1>'
                 '<pre class="include"><code><span class="c-pre">#include &lt;flint/%s&gt;</span></code></pre></header>'
                 '<div class="prose intro">%s</div>'
                 '<nav class="toc" aria-label="Sections"><div class="toc-label">Sections</div><ol>%s</ol></nav>'
                 '<div class="prose overview">%s</div>%s'
                 % (self.crumbs(r, [("FLINT", "index.html"), (esc(page.module), None)]), stats,
-                   esc(hdr), r.inline(_parse(page.meta.get("description", ""))), esc(hdr), intro, toc, body,
+                   esc(hdr), esc(hdr), intro, toc, body,
                    r.references()))
 
     def function_page(self, page, r):
@@ -849,17 +868,13 @@ class HtmlBuilder:
         crumbs = self.crumbs(r, [("FLINT", "index.html"),
                                  ("<code>%s</code>" % esc(page.module), mpage.url),
                                  ("Guides", anchor_url(mpage.url, "guides"))])
-        summ = page.summary()
         hdr = mpage.meta.get("header", page.module + ".h")
-        return ('%s<header class="page-head"><div class="eyebrow">Guide · <code>%s</code></div><h1>%s</h1>%s</header>'
+        return ('%s<header class="page-head"><div class="eyebrow">Guide · <code>%s</code></div><h1>%s</h1></header>'
                 '<div class="prose">%s</div>%s'
-                % (crumbs, esc(hdr), r.inline(page.title),
-                   '<p class="lead">%s</p>' % r.inline(summ) if summ else "",
-                   r.blocks(page.body), r.references()))
+                % (crumbs, esc(hdr), r.inline(page.title), r.blocks(page.body), r.references()))
 
     def prose_page(self, page, r):
         site = self.site
-        summ = page.summary()
         body = r.blocks(page.body)
         used = ""
         links = site.backlinks.get(page.id, [])
@@ -917,10 +932,9 @@ class HtmlBuilder:
                 listing = ('<section class="group"><h2 id="pages">In this section<a class="hl" href="#pages">#</a></h2>'
                            '<div class="cards">%s</div></section>' % "".join(self.card(r, p) for p in pages))
         eb = '<div class="eyebrow">%s</div>' % eyebrow if eyebrow else ""
-        return ('%s<header class="page-head">%s<h1>%s</h1>%s%s</header>'
+        return ('%s<header class="page-head">%s<h1>%s</h1>%s</header>'
                 '<div class="prose">%s</div>%s%s%s'
-                % (crumbs, eb, r.inline(page.title),
-                   '<p class="lead">%s</p>' % r.inline(summ) if summ else "", meta, body, listing, used,
+                % (crumbs, eb, r.inline(page.title), meta, body, listing, used,
                    r.references()))
 
     def refs_page(self, page, r):
@@ -989,6 +1003,18 @@ def _write_page_worker(pid):
     with open(path, "w", encoding="utf-8") as f:
         f.write(text)
     return None
+
+
+def card_kind(page):
+    """(tone, label) of a page's card: the label names the kind of page,
+    the tone (a CSS class suffix) gives each kind its own shade of gray."""
+    if page.kind == "manual":
+        if page.collection == "guide":
+            return "manual", "User guide"
+        return page.collection or "manual", COLLECTIONS.get(page.collection, "")
+    return {"algorithm": ("algorithm", "Algorithm"), "topic": ("overview", "Overview"),
+            "group": ("overview", "Overview"), "tutorial": ("tutorial", "Tutorial"),
+            "module": ("module", "Module"), "guide": ("guide", "Guide")}.get(page.kind, ("other", ""))
 
 
 def first_sentence(s):

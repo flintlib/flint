@@ -50,7 +50,7 @@ logarithms, and Brown's and Zippel's algorithms modulo irreducible
 polynomials of increasing degree in one variable, combined by the Chinese
 remainder theorem. This is transparent: the result is the GCD over
 $\mathbb{F}_p$ in all cases. The details, including the exact selection
-rules, are on [](algorithms/multivariate/modp-gcd).
+rules, are described in [](algorithms/multivariate/modp-gcd).
 
 The individual algorithms are exported mainly for testing and
 benchmarking. They treat zero inputs and the trivial cases like

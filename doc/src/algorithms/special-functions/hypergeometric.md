@@ -22,7 +22,7 @@ first two. The implementation in [`acb_hypgeom`](acb_hypgeom) is
 described in Johansson [@Joh2016], from which the error bounds below
 are taken; the summation algorithms are surveyed in [@Joh2014a].
 
-Throughout this page,
+Throughout this section,
 $$
 T(k) = \frac{\prod_{i=0}^{p-1} (a_i)_k}{\prod_{i=0}^{q-1} (b_i)_k} z^k,
 \qquad {}_pf_q(z) = \sum_{k=0}^\infty T(k) = {}_{p+1}F_q(a_0, \ldots,

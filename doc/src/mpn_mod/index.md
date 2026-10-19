@@ -640,7 +640,7 @@ $\mathit{nhi} - \mathit{nlo}$ coefficients to *res*; it requires
 $0 \le \mathit{nlo} < \mathit{nhi} \le \mathit{len1} + \mathit{len2} - 1$.
 A low product (`mullow`) is the middle product with $\mathit{nlo} = 0$
 and $\mathit{nhi} = \mathit{len}$. All variants detect squaring
-(`poly1 == poly2` and equal lengths). The page [](mpn_mod/poly-mul)
+(`poly1 == poly2` and equal lengths). [](mpn_mod/poly-mul)
 describes the algorithms and how they are chosen.
 
 ::: function

@@ -7,7 +7,7 @@ Evaluating a polynomial of length $m$ at $m$ points with Horner's rule
 costs $m^2$ multiplications, and so does Lagrange interpolation through
 $m$ points. With a *subproduct tree*, both cost $O(M(m) \log m)$
 operations [@GG2003, §10]. For points in geometric progression,
-$O(M(m))$ is possible. This page explains how the functions of the
+$O(M(m))$ is possible. The text below explains how the functions of the
 section [Multipoint evaluation and interpolation](nmod_poly#multipoint)
 choose their algorithm, how to reuse a tree for many polynomials, and how
 the geometric variants are used.

@@ -7,8 +7,8 @@ order: 20
 
 Given integers $a \ge 0$ of $m$ limbs and $b > 0$ of $n$ limbs, Euclidean
 division computes the quotient $q = \lfloor a/b \rfloor$ of $m - n + 1$
-limbs and the remainder $r = a - qb \in [0, b)$. This page describes the
-algorithms FLINT uses for it, from the schoolbook method to Newton
+limbs and the remainder $r = a - qb \in [0, b)$. This section describes
+the algorithms FLINT uses for it, from the schoolbook method to Newton
 iteration, and the related problems of exact division, division by a
 fixed divisor and integer square roots. Most of the code is in
 `mpn_extras`; it replaces GMP's `mpn_tdiv_qr` throughout FLINT, and the

@@ -4,7 +4,7 @@ functions: nmod_mat_mul nmod_mat_addmul
 ---
 
 `nmod_mat_mul` computes $C = AB$ for an $m \times k$ matrix $A$ and a
-$k \times n$ matrix $B$ over $\Z/N\Z$ (on this page $N$ is the modulus,
+$k \times n$ matrix $B$ over $\Z/N\Z$ (here $N$ is the modulus,
 since $n$ is a dimension). It is the function to call: it picks one of
 about ten methods from the dimensions, the size of $N$, the number of
 threads and the instruction set, and it accepts any modulus, prime or

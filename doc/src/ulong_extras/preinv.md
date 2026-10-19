@@ -5,8 +5,8 @@ functions: n_preinvert_limb n_mod2_preinv n_divrem2_preinv n_div2_preinv n_ll_mo
 
 Division by a word $n$ costs tens of cycles in hardware. When $n$ is used
 more than a few times, it is faster to compute a reciprocal of $n$ once
-with `n_preinvert_limb` and divide with multiplications. The functions on
-this page accept any nonzero $n$ and any dividend, with two exceptions:
+with `n_preinvert_limb` and divide with multiplications. The functions
+below accept any nonzero $n$ and any dividend, with two exceptions:
 `n_lll_mod_preinv` requires its top word to be reduced, and
 `n_divrem_preinv_unnorm` requires $n$ not to be normalised.
 

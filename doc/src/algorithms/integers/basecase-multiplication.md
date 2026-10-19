@@ -27,7 +27,7 @@ assembly on x86-64 processors with the BMI2 and ADX extensions and on
 ARM64. Other builds have portable C routines for at most 7 limbs (and
 for a one-limb operand times up to 14 limbs), and call GMP's
 `mpn_mul_basecase` directly when the longer operand has at most 16
-limbs ([](#hardcoded)). This page describes the kernels and the
+limbs ([](#hardcoded)). This section describes the kernels and the
 strategy; the selection is given in [](mpn_extras/mul), and the high and
 low products built with the same techniques in
 [](algorithms/integers/short-products).

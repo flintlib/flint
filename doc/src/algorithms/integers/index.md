@@ -5,7 +5,7 @@ summary: Multiplication, division, GCDs, roots and radix conversion of multiprec
 order: 2
 ---
 
-These pages describe how FLINT computes with multiprecision integers:
+This section describes how FLINT computes with multiprecision integers:
 the algorithms behind the `fmpz` functions and the limb-level routines of
 `mpn_extras` on which they are built, from schoolbook methods to fast
 Fourier transforms and Newton iteration. Multiplication comes first,

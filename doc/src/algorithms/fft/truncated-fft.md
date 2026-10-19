@@ -23,8 +23,8 @@ implements van der Hoeven's recursion in `fft_truncate` and
 `fft_small` implements Harvey's version with separate input and output
 truncation in `sd_fft_trunc` and `sd_ifft_trunc`, and their transposes
 in `sd_fft_trunc_tr` and `sd_ifft_trunc_tr`
-([](algorithms/fft/small-prime-fft#transposed)). This page states the
-algorithms in the form used by `fft.h` and proves them.
+([](algorithms/fft/small-prime-fft#transposed)). The algorithms are
+stated below in the form used by `fft.h`, with proofs.
 
 ## Notation {#notation}
 

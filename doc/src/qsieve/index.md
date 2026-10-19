@@ -15,10 +15,10 @@ threads made available with `flint_set_num_threads`.
 
 The only function meant for general use is `qsieve_factor`; normally one
 calls `fmpz_factor`, which also handles primes, perfect powers and small
-factors, and finishes the factorisation. The rest of this page documents
-the stages of the sieve for those who want to experiment with it. The
-algorithm, its parameters and its complexity are described on
-[](algorithms/number-theory/quadratic-sieve).
+factors, and finishes the factorisation. The remaining sections
+document the stages of the sieve for those who want to experiment
+with it. The algorithm, its parameters and its complexity are
+described in [](algorithms/number-theory/quadratic-sieve).
 
 ::: summary algorithms/number-theory/quadratic-sieve :::
 

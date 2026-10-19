@@ -30,25 +30,15 @@ configurations, including builds with assertions enabled.
 Random testing finds most bugs, but not all of them. A defect may only
 show for inputs that random generation is unlikely to produce: a
 particular combination of lengths, a modulus in a narrow range, or a
-coincidence that occurs once in thousands of cases. Two examples, both
-fixed during the development of FLINT 3.7:
-
-- `nmod_poly_mul` could return wrong products modulo $n \le 23$ for
-  some lengths above about 370. The FFT-based multiplication packs two
-  coefficients into one to save work, and the bound that decided
-  whether packing was safe underestimated a sum of squares when an
-  operand had odd length, so a packed coefficient could overflow (fixed
-  in PR #2892, which also added a test with worst-case inputs).
-- `arb_div`, `arb_inv`, `arb_sqrt` and `arb_rsqrt` could return a ball
-  of radius zero that did not contain the exact result, for about one
-  in 300 random operands at precisions above the cutoffs (thousands of
-  bits) where Newton iteration is used: the Newton code reported an
-  exact result when its approximation happened to fit in the target
-  precision (fixed in PR #2898).
-
-Both bugs were found by reading the code while writing this
-documentation, not by the test suite: each affected only inputs that the
-existing tests did not generate.
+coincidence that occurs once in thousands of cases. For example,
+`nmod_poly_mul` in FLINT 3.6 and earlier could return wrong products
+modulo $n \le 23$ for some lengths above about 370. The FFT-based
+multiplication packs two coefficients into one to save work, and the
+bound that decided whether packing was safe underestimated a sum of
+squares when an operand had odd length, so a packed coefficient could
+overflow. The bug was found by reading the code, not by the test suite,
+which did not generate such inputs; the fix added a test with worst-case
+inputs.
 
 ## Checking results {#checking}
 

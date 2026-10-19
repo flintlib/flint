@@ -5,8 +5,9 @@ complexity: Barrett: one high and one low product and one conditional subtractio
 order: 40
 ---
 
-These methods reduce a *single* word $x$ modulo $n$, rather than a
-two-word product. They are cheaper than a two-word
+The methods of Barrett and of Lemire, Kaser and Kurz reduce a *single*
+word $x$ modulo $n$, rather than a two-word product, using a precomputed
+approximation of $B/n$. They are cheaper than a two-word
 [Möller–Granlund](algorithms/arithmetic/moller-granlund) reduction when
 the value to be reduced is known to fit in one word, as in hashing,
 sieving and table lookups. Throughout, $B = 2^{\bits}$.

@@ -11,7 +11,7 @@ of series all cost a constant or logarithmic factor times a
 multiplication. FLINT multiplies $n$-limb integers with a sequence of
 algorithms of decreasing asymptotic cost and increasing overhead: the
 schoolbook method, Karatsuba's method, the Toom–Cook family, and fast
-Fourier transforms. This page states the algorithms, proves the
+Fourier transforms. This section states the algorithms, proves the
 identities they rest on, and describes how `flint_mpn_mul`, the
 multiplication behind `fmpz_mul` and almost every other product of large
 integers in FLINT, chooses among them.

@@ -9,7 +9,7 @@ A polynomial over $\Z$ has two sizes: its length $n$ and the bit size
 $b$ of its coefficients. A product of two polynomials of length $n$
 with $b$-bit coefficients has $2n - 1$ coefficients of at most $2b +
 \log_2 n$ bits, and its cost is bounded below by the cost of
-multiplying integers of about $nb$ bits. Every algorithm on this page
+multiplying integers of about $nb$ bits. Every algorithm described below
 reaches that cost in some range and is far from it in others: for $n =
 3$ and $b = 10^6$ the problem is a handful of huge integer products,
 for $n = 10^6$ and $b = 10$ it is essentially a product over a small

@@ -9,9 +9,9 @@ A ball $[m \pm r]$ in FLINT has an `arf_t` midpoint and a `mag_t`
 radius. The two types are designed for different jobs. The midpoint
 carries the value and needs arbitrary precision with correct rounding;
 the radius carries an error bound, for which a few significant bits
-suffice as long as every operation rounds upwards. This page describes
-both formats and the rounding arguments on which the error bounds of ball
-arithmetic rest. The design is discussed in [@Joh2017].
+suffice as long as every operation rounds upwards. Both formats are
+described below, together with the rounding arguments on which the error
+bounds of ball arithmetic rest. The design is discussed in [@Joh2017].
 
 ## The mag_t format {#mag}
 

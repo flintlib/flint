@@ -490,11 +490,6 @@ discarded. The terms may be in any order, but for an accurate result
 they should be roughly sorted by decreasing magnitude. The array `t` is
 used as scratch space and overwritten (by `_dfloat_renorm`); pass a copy
 if the terms are needed afterwards. `res` must not overlap `t`.
-
-::: details
-Until commit `5603850` (during the development of FLINT 3.7) the
-prototype declared `t` as `const` although it was overwritten.
-:::
 :::
 
 ::: function
@@ -1886,7 +1881,7 @@ real `vec_exp` and `vec_sin_cos` on blocks of 32 elements.
 These functions use the `dfloat` balls to accelerate the Riemann–Siegel
 and Platt methods for the Riemann zeta function on the critical line
 (`acb_dirichlet_zeta_rs_r`, `acb_dirichlet_platt_multieval`). The
-algorithms are described on [](dfloat/powsum).
+algorithms are described in [](dfloat/powsum).
 
 ::: function
 int gr_powsum_sieved(acb_t res, const acb_t s, ulong N, gr_ctx_t T, gr_ctx_t P, gr_ctx_t F, double dm, double da, ulong M)

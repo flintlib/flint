@@ -4,7 +4,7 @@ functions: fmpz_poly_inv_series fmpz_poly_inv_series_basecase fmpz_poly_div_seri
 ---
 
 A polynomial of length at most $n$ also represents a power series in
-$\Z[[x]]$ known modulo $x^n$. The functions on this page compute
+$\Z[[x]]$ known modulo $x^n$. The functions below compute
 inverses, quotients, compositions, reversions and square roots of
 such series. Over $\Z$ these operations exist only under conditions
 on the leading terms: $1/Q$ requires $Q(0) = \pm 1$, $A/B$ requires

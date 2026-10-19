@@ -13,7 +13,7 @@ and squarefreeness, and finds roots. All algorithms are those of the
 generic module [](gr_poly), which this module wraps: squarefree
 factorisation, distinct-degree factorisation, equal-degree splitting, and
 the complete algorithms of Cantor and Zassenhaus [@CanZas1981], Berlekamp
-[@Ber1970] and Kaltofen and Shoup [@KalSho1998]. They are described on
+[@Ber1970] and Kaltofen and Shoup [@KalSho1998]. They are described in
 [](algorithms/polynomials/factoring-finite-fields). The interface is
 generated from `fq_poly_factor_templates.h` and is the same for
 `fq_nmod_poly_factor` and `fq_zech_poly_factor`; `fq_default_poly_factor`

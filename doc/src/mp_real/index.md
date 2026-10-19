@@ -574,7 +574,7 @@ that the caller can retry at a higher precision.
 
 The constants are computed by binary splitting of hypergeometric
 series ([](algorithms/floating-point/constants)) and can be cached
-process-wide. The page [](mp_real/constants) describes the functions in
+process-wide. [](mp_real/constants) describes the functions in
 detail.
 
 ::: function
@@ -678,7 +678,7 @@ These functions evaluate the elementary functions on balls to a
 relative accuracy of about $2^{-\mathit{prec}}$, or less as the radius
 of the argument allows. The midpoint is evaluated exactly as given, the
 working precision is chosen internally, and the outputs may alias the
-argument. The page [](mp_real/elementary) explains the common
+argument. [](mp_real/elementary) explains the common
 behaviour, and [](algorithms/floating-point/elementary-functions) the
 algorithms.
 
@@ -966,7 +966,7 @@ Flags for `_mp_real_partitions_hrr`.
 ## Hypergeometric series {#hypgeom}
 
 The general binary splitting engine of the module, used for all the
-constants. The page [](mp_real/hypgeom) gives examples, and
+constants. [](mp_real/hypgeom) gives examples, and
 [](algorithms/floating-point/hypergeometric-series) the algorithm.
 
 ::: type

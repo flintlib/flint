@@ -10,7 +10,7 @@ There are $\varphi(q)$ characters, forming a group isomorphic to
 $(\Z/q\Z)^\times$, but the isomorphism is not canonical: naming the
 characters requires a choice. This module uses the choice of Conrey,
 adopted by the LMFDB [@LMFDB], which is reviewed here; the mathematics is
-on [](algorithms/number-theory/dirichlet-characters).
+described in [](algorithms/number-theory/dirichlet-characters).
 
 ## Numbers and logs {#numbering}
 

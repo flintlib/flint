@@ -13,7 +13,7 @@ p_{k-1}$ whose product $P$ exceeds the bound, and recovered with the
 Chinese remainder theorem. This multimodular approach goes back to
 Pollard [@Pol1971] (see also [@Knu1997, §4.3.3] and [@GG2003]); it is the
 method of FLINT's `fft_small` module, whose transforms are described in
-[](algorithms/fft/small-prime-fft). This page describes how the number of
+[](algorithms/fft/small-prime-fft). This section describes how the number of
 primes and the coefficient sizes are chosen, how the results are
 reconstructed, and the variants for windows of a product, sums of
 products, fixed and shared operands, and transposed products.

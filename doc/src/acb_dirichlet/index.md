@@ -801,7 +801,7 @@ The $n$-th zero of the Hardy Z-function is $\gamma_n$, where
 $\rho_n = 1/2 + i\gamma_n$ is the $n$-th nontrivial zero of $\zeta(s)$
 with positive imaginary part (assuming, as verified for every $n$ handled
 by these functions, that the zeros are on the critical line and simple).
-The page [](acb_dirichlet/zeta-zeros) explains the methods and gives an
+[](acb_dirichlet/zeta-zeros) explains the methods and gives an
 example.
 
 ::: function
