@@ -444,10 +444,6 @@ void qsieve_linalg_realloc(qs_t qs_inf);
 
 void qsieve_linalg_clear(qs_t qs_inf);
 
-int qsieve_relations_cmp(const void * a, const void * b);
-
-slong qsieve_merge_relations(qs_t qs_inf);
-
 void qsieve_relations_init(qs_t qs_inf);
 
 void qsieve_relations_clear(qs_t qs_inf);

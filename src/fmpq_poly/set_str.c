@@ -53,7 +53,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
     mpq_t * a;
 
     if (!len)
-        return *str == '\0';
+        return (*str == '\0') ? 0 : -1;
     if (*str == '\0')
         return -1;
 

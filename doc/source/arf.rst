@@ -683,16 +683,20 @@ Division
     respectively to nearest) and the Newton iterations of the ``mp_real``
     module (:func:`_mp_real_inv_newton`, :func:`_mp_real_div_newton`,
     :func:`_mp_real_sqrt_newton`, :func:`_mp_real_rsqrt_newton`), taking the
-    latter above tuned precision cutoffs (about 8000, 12000, 100000 and
-    30000 bits for inversion, division, square root and reciprocal square
-    root) where they are faster. The Newton results carry 8 (fast) or 11
-    (accurate) guard bits and are rounded to nearest, which gives at most
-    0.5625 respectively 0.508 ulp of error; the returned value always has
-    the exponent of `f` or equals `2^e`, so adding one ulp of the result as
-    an error bound (as ``arb`` does) is valid. The return value of the
-    functions is not a reliable inexact flag with these modes (it is 1 when
-    the Newton path was taken). Passing these modes to other arf functions
-    is not supported.
+    latter above tuned precision cutoffs (``ARF_INV_NEWTON_CUTOFF``,
+    ``ARF_DIV_NEWTON_CUTOFF``, ``ARF_SQRT_NEWTON_CUTOFF`` and
+    ``ARF_RSQRT_NEWTON_CUTOFF``: 5000, 12000, 100000 and 4000 bits for
+    inversion, division, square root and reciprocal square root) where they
+    are faster. The Newton results carry 8 (fast) or 11 (accurate) guard
+    bits and are rounded to nearest, which gives at most 0.5625 respectively
+    0.508 ulp of error; the returned value always has the exponent of `f` or
+    equals `2^e`, so adding one ulp of the result as an error bound (as
+    ``arb`` does) is valid. The return value is the inexact flag as with
+    the other rounding modes: it is 0 if and only if *res* equals the exact
+    result `f`. (When the Newton path is taken, exact results are recognised
+    by checking the bit lengths and, if these allow an exact result, by one
+    exact multiplication.) Passing these modes to other arf functions is not
+    supported.
 .. function:: int arf_div_ui(arf_t res, const arf_t x, ulong y, slong prec, arf_rnd_t rnd)
 
 .. function:: int arf_ui_div(arf_t res, ulong x, const arf_t y, slong prec, arf_rnd_t rnd)

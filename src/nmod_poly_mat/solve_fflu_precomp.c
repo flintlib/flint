@@ -23,14 +23,14 @@ nmod_poly_mat_set_perm(nmod_poly_mat_t X, const slong * perm,
 {
     if (X == B)
     {
-        flint_throw(FLINT_ERROR, "(%s): Not implemented\n");
+        flint_throw(FLINT_ERROR, "(%s): Not implemented\n", __func__);
     }
     else
     {
         slong i, j;
 
         if (perm == NULL)
-            flint_throw(FLINT_ERROR, "(%s): perm == NULL\n");
+            flint_throw(FLINT_ERROR, "(%s): perm == NULL\n", __func__);
 
         for (i = 0; i < nmod_poly_mat_nrows(B); i++)
             for (j = 0; j < nmod_poly_mat_ncols(B); j++)

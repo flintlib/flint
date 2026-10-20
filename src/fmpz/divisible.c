@@ -20,6 +20,9 @@ fmpz_divisible_ui(const fmpz_t f, ulong g)
     if (*f == WORD(0))
         return 1;
 
+    if (g == 0)
+        return 0;
+
     if (!COEFF_IS_MPZ(*f))
     {
         ulong fa = FLINT_ABS(*f);

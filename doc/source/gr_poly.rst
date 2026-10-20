@@ -529,6 +529,7 @@ Division with remainder with full precomputed inverse
     We require that `Q` have space for ``lenA - lenB + 1`` coefficients
     and assume that the leading coefficient of `B` is a unit. Furthermore, we
     assume that `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
+    Returns ``GR_UNABLE`` if ``lenBinv`` is zero (no inverse available).
 
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.

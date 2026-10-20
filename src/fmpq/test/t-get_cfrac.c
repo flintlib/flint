@@ -91,5 +91,42 @@ TEST_FUNCTION_START(fmpq_get_cfrac, state)
         fmpq_clear(r);
     }
 
+    /* No terms: the remainder is 1/x in canonical form */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fmpq_t x, r, t;
+        fmpz c[1];
+        slong n;
+
+        fmpq_init(x);
+        fmpq_init(r);
+        fmpq_init(t);
+        fmpz_init(c);
+
+        if (i == 0)
+            fmpq_set_si(x, -3, 2);
+        else
+            fmpq_randtest_not_zero(x, state, 1 + n_randint(state, 200));
+
+        n = fmpq_get_cfrac(c, r, x, -(slong) n_randint(state, 2));
+        fmpq_inv(t, x);
+
+        if (n != 0 || !fmpq_is_canonical(r) || !fmpq_equal(r, t))
+        {
+            flint_printf("FAIL: no terms\n");
+            flint_printf("x = "); fmpq_print(x);
+            flint_printf(", r = "); fmpz_print(fmpq_numref(r));
+            flint_printf("/"); fmpz_print(fmpq_denref(r));
+            flint_printf(", n = %wd\n", n);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpq_clear(x);
+        fmpq_clear(r);
+        fmpq_clear(t);
+        fmpz_clear(c);
+    }
+
     TEST_FUNCTION_END(state);
 }

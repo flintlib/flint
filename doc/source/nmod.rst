@@ -187,9 +187,10 @@ checked.
 
 .. function:: ulong nmod_pow_fmpz(ulong a, const fmpz_t e, nmod_t mod)
 
-    Returns `a^e` modulo ``mod.n``. No assumptions are made about 
+    Returns `a^e` modulo ``mod.n``. No assumptions are made about
     ``mod.n``. It is assumed that `a` is already reduced
-    modulo ``mod.n`` and that `e` is not negative.
+    modulo ``mod.n``. If `e` is negative, returns a power of the inverse
+    of `a`; an exception is raised if `a` is not invertible modulo ``mod.n``.
 
 .. function:: ulong nmod_ui_pow_ui(ulong a, ulong e, nmod_t mod)
 

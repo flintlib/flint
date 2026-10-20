@@ -153,9 +153,6 @@ int nmod_mpoly_factor_matches(const nmod_mpoly_t a, const nmod_mpoly_factor_t f,
     return matches;
 }
 
-int nmod_mpoly_factor_fix_units(nmod_mpoly_factor_t f,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
                                                     const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))

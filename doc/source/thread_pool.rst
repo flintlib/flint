@@ -22,6 +22,9 @@ Thread pool
     If `size \le 0` no threads are created and future calls to
     :func:`thread_pool_request` will return `0` (unless
     :func:`thread_pool_set_size` has been called).
+    If FLINT was built without pthread support, no threads are ever
+    created: ``size`` is treated as `0` here and in
+    :func:`thread_pool_set_size`.
 
 .. function:: slong thread_pool_get_size(thread_pool_t T)
 

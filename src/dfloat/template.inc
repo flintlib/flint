@@ -1082,9 +1082,10 @@ DF(_mul_d_impl)(DF(t) res, DF(srcptr) x, double y)
 }
 void DF(mul_d)(DF(t) res, DF(srcptr) x, double y) { DF(_mul_d_impl)(res, x, y); }
 
-void DF(renorm)(DF(t) res, const double * t, slong len)
+/* the terms t are used as scratch space (clobbered) */
+void DF(renorm)(DF(t) res, double * t, slong len)
 {
-    _dfloat_renorm(res->d, N, NULL, (double *) t, len);
+    _dfloat_renorm(res->d, N, NULL, t, len);
 }
 
 /* a compiled lower-precision function (dM_name) at level M < N on

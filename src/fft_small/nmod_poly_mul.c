@@ -19,17 +19,6 @@
 #include "crt_helpers.h"
 #include "fft_small.h"
 
-/* truncation granularity follows the plan's depth: whole blocks at
-   block depths, the full (short) transform length below one block */
-
-/* the anticipated granularity for a length before any plan exists */
-#define _len_trunc(x) \
-    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
-                              : n_round_up((x), BLK_SZ))
-#define _op_trunc(x, Pln) \
-    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
-                                : n_round_up((x), BLK_SZ))
-
 static void _mod_red(
     double* abuf, ulong atrunc,
     const ulong* a, ulong an,
@@ -395,6 +384,7 @@ static void _crt_2(
     ulong t[2]; \
     ulong l = 0; \
     CAT3(_big_mul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CRT_UNROLL_PRIMES \
     for (l++; l < np; l++) \
         CAT3(_big_addmul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
     CAT(_reduce_big_sum, 2)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
@@ -595,6 +585,7 @@ static void _crt_3(
     ulong t[3]; \
     ulong l = 0; \
     CAT3(_big_mul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CRT_UNROLL_PRIMES \
     for (l++; l < np; l++) \
         CAT3(_big_addmul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
     CAT(_reduce_big_sum, 3)(r, t, crt_data_prod_primes(Rcrts + np - 1));
@@ -728,6 +719,7 @@ typedef struct {
     const ulong* a;
     ulong an;
     ulong itrunc;
+    int transposed;
     nmod_t mod;
     const fft_small_plan_struct* P;
     ulong start_pi;
@@ -744,13 +736,26 @@ static void _op_fft_worker_func(void* varg)
         sd_fft_ctx_struct* Q = P->ffts + P->offset + i;
         double* xbuf = W->X->data + P->stride*i;
 
-        _mod(xbuf, W->itrunc, W->a, W->an, Q, W->mod);
-        sd_fft_trunc(Q, xbuf, P->depth, W->itrunc, P->ztrunc);
+        if (W->transposed)
+        {
+            /* the conversion zero-fills up to ztrunc, which
+               sd_ifft_trunc_tr reads in full */
+            _mod(xbuf, P->ztrunc, W->a, W->an, Q, W->mod);
+            sd_ifft_trunc_tr(Q, xbuf, P->depth, P->ztrunc);
+        }
+        else
+        {
+            _mod(xbuf, W->itrunc, W->a, W->an, Q, W->mod);
+            sd_fft_trunc(Q, xbuf, P->depth, W->itrunc, P->ztrunc);
+        }
     }
 }
 
-void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
-                    ulong itrunc, nmod_t mod, const fft_small_plan_t P)
+/* convert (a, an) and apply the forward transform truncated to itrunc, or,
+   transposed, the transpose of the inverse transform at full length */
+static void _op_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong itrunc, int transposed, nmod_t mod,
+                    const fft_small_plan_t P)
 {
     ulong i;
     thread_pool_handle* handles = NULL;
@@ -762,6 +767,7 @@ void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
                  X->depth == P->depth && X->stride == P->stride);
     FLINT_ASSERT(itrunc % 8 == 0);
     FLINT_ASSERT(itrunc <= P->ztrunc);
+    FLINT_ASSERT(!transposed || an <= P->ztrunc);
 
     /* thread over the primes; the threshold mirrors the fused drivers'
        stage 1 gate */
@@ -776,6 +782,7 @@ void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
         W->a = a;
         W->an = an;
         W->itrunc = itrunc;
+        W->transposed = transposed;
         W->mod = mod;
         W->P = P;
         W->start_pi = (i+0)*P->np/nthreads;
@@ -793,6 +800,38 @@ void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
 
     X->itrunc = itrunc;
     X->domain = FFT_SMALL_OP_PRIMAL;
+}
+
+void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong itrunc, nmod_t mod, const fft_small_plan_t P)
+{
+    _op_fft_nmod(X, a, an, itrunc, 0, mod, P);
+}
+
+
+/*
+    Transposes of fft_small_fft_nmod and fft_small_ifft, for the transposed
+    convolutions (see sd_fft_tr.c and sd_ifft_tr.c): fft_small_ifft_tr_nmod
+    (here) converts (a, an) and applies the transpose of the inverse
+    transform, leaving a PRIMAL operand ready for the pointwise stage;
+    fft_small_fft_tr (in op.c) applies the transpose of the forward transform
+    of an operand of truncation itrunc, consuming the normalization the
+    pointwise stage applied. A transposed product is therefore
+
+        fft_small_fft_nmod(B, b, bn, btrunc, mod, P);
+        fft_small_ifft_tr_nmod(X, v, vn, mod, P);
+        fft_small_op_mul(X, X, B, P);
+        fft_small_fft_tr(X, atrunc, P);
+        fft_small_export_nmod_range(z, X, 0, an, mod, P);
+
+    which is the transpose, with respect to a, of the multiplication by b
+    performed by fft_small_fft_nmod / fft_small_op_mul / fft_small_ifft /
+    fft_small_export_nmod.
+*/
+void fft_small_ifft_tr_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    nmod_t mod, const fft_small_plan_t P)
+{
+    _op_fft_nmod(X, a, an, P->ztrunc, 1, mod, P);
 }
 
 typedef struct {
@@ -900,7 +939,12 @@ void fft_small_export_nmod(ulong* z, const fft_small_op_t X, nmod_t mod,
     flint_give_back_threads(handles, nworkers);
 }
 
-
+/*
+    The coefficients [zl, zh) of the product of (a, an) and (b, bn), from a
+    convolution of length L = 2^depth chosen by _fft_small_plan_set_window:
+    usually L >= an + bn - 1, but L may be shorter when the wrapped
+    coefficients of the product modulo x^L - 1 all fall below zl.
+*/
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
@@ -910,6 +954,8 @@ void _nmod_poly_mul_mid_mpn_ctx(
 {
     ulong modbits = FLINT_BITS - mod.norm;
     ulong zn = an + bn - 1;
+    ulong mn = n_min(an, bn);
+    ulong mx = n_max(an, bn);
     ulong atrunc, btrunc;
     int squaring, success;
     fft_small_plan_t P;
@@ -938,13 +984,15 @@ void _nmod_poly_mul_mid_mpn_ctx(
 
     squaring = (a == b) && (an == bn);
 
-    atrunc = _len_trunc(an);
-    btrunc = _len_trunc(bn);
+    atrunc = _fft_small_len_trunc(an);
+    btrunc = _fft_small_len_trunc(bn);
 
-    /* at most min(an, bn) <= bn products, each < 2^(2*modbits), accumulate
-       onto one output coefficient */
+    /* at most min(an, bn) products, each < 2^(2*modbits), accumulate onto
+       one output coefficient */
+    /* the direct-fft branch is gated on the longer operand, as in
+       _nmod_poly_mul_tr_mpn_ctx; nothing here depends on the operand order */
     success = fft_small_plan_init_nmod(P, R, zl, zh, zn,
-                        n_max(atrunc, btrunc), bn, 2*modbits, mod, bn);
+                        n_max(atrunc, btrunc), mn, 2*modbits, mod, mx);
     FLINT_ASSERT(success);
     (void) success;
 
@@ -958,8 +1006,9 @@ void _nmod_poly_mul_mid_mpn_ctx(
     A.bfft = NULL;
     A.bfft_stride = 0;
     A.squaring = squaring;
-    A.tune_n = bn;
-    A.min_an_bn = FLINT_MIN(an, bn);
+    A.transposed = 0;
+    A.tune_n = mn;
+    A.min_an_bn = mn;
     A.mod_fn = _mod_fn;
     A.s2_finish = NULL;
     A.crt_fn = _nmod_crt_fn(P->np);
@@ -971,6 +1020,152 @@ void _nmod_poly_mul_mid_mpn_ctx(
     fft_small_plan_clear(P);
 }
 
+
+/*
+    The transposed product.
+
+    Summary: writes to z the zn coefficients
+       z[j] = sum_i a[i] * v[i + j], 0 <= j < zn,
+    with v read as padded with zeros to length an + zn - 1 (so vn <= an + zn - 1
+    is required). This is the transpose of the multiplication by (a, an) of
+    polynomials of length zn, and costs the same; with a = rev(f) it is the
+    range [fn - 1, fn - 1 + zn) of f*v, at a lower cost than the fn by vn
+    product _nmod_poly_mul_mid_mpn_ctx would transform for the same range.
+
+    ********************************************************************************
+
+    Let `M` be the matrix of the multiplication by `(a, an)`,
+
+        M : b  |-->  a * b,     R^zn -> R^(an + zn - 1).
+
+    Then `M[r][j]` is the coefficient of `x^r` in `a*x^j`, that is
+    `a[r - j]`, so its transpose maps `v` of length `an + zn - 1` to
+
+        (M^T v)[j] = sum_r a[r - j] v[r] = sum_i a[i] v[i + j],
+                                                       0 <= j < zn.
+
+    This is what the function below computes, with `v` read as padded with
+    zeros to length `an + zn - 1`. With `a` the reversal of `(f, fn)`,
+    `a[i] = f[fn - 1 - i]`, it is
+
+        sum_i f[fn - 1 - i] v[i + j] = (f*v)[fn - 1 + j],
+
+    i.e. the range `[fn - 1, fn - 1 + zn)` of `f*v`: the middle product of
+    `f` and `v` is the transpose of a multiplication by `f` reversed. This
+    is Tellegen's principle applied to polynomial multiplication; see
+    [BLS2003]_. The window `[zl, zh)` of any product is of this form once
+    the operand it slides over is shifted and padded (see
+    _nmod_poly_mulmid_fft_small in nmod_poly/mullow_fft_small.c).
+
+    ********************************************************************************
+
+    Transposing the multiplication pipeline
+
+        b  |-->  export o ifft o (fft(a) *) o fft
+
+    step by step gives
+
+        v  |-->  export o fft_tr o (fft(a) *) o ifft_tr
+
+    where the pointwise stage is unchanged (it is its own transpose, and it
+    still applies the normalization exactly once) and only the two
+    transforms are replaced by the transposed ones of sd_fft_tr.c and
+    sd_ifft_tr.c. In particular `a` is transformed exactly as in a
+    multiplication by `a`. Both ends of the pipeline are in the natural
+    coefficient order: `ifft_tr` consumes `v` indexed by increasing powers
+    of `x`, as `ifft` produces its output, and `fft_tr` produces the result
+    indexed the same way as `fft` consumes its input. The
+    bit-reversed-and-shuffled order only appears on the evaluation side,
+    where all three of `fft(a)`, the output of `ifft_tr` and the input of
+    `fft_tr` agree.
+
+    This is what the convolution engine of conv_engine.c does in its
+    transposed mode, so the transposed product is threaded, buffered and
+    tuned exactly as the multiplication it transposes; the fused driver
+    below follows _nmod_poly_mul_mid_mpn_ctx.
+
+    ********************************************************************************
+
+    The point for middle products is the transform length. The transposed
+    pipeline transforms `a` of length `an` and produces `zn` coefficients
+    from a convolution of length `an + zn - 1`, so it costs exactly one
+    product of lengths `an` and `zn`. Computing the same range as a window
+    of the full product, which is what
+
+        _nmod_poly_mul_mid_mpn_ctx(z, fn - 1, fn - 1 + zn, v, vn, f, fn, mod, R)
+
+    does, transforms `v` of length `vn` and needs a convolution of length
+    `fn + vn - 1`. In the balanced case `fn = zn`, the usual one for Newton
+    iteration and power series division, that is a transform of length
+    `3*fn` against `2*fn`, so up to a factor of about 1.5 in the transform
+    work and 2 in the pointwise and conversion work; the wraparound of
+    _fft_small_plan_set_window closes part of that gap when a power of two
+    sits in the right place. See nmod_poly/profile/p-mul_mulmid_tune.c.
+
+    No wraparound is used here: the plan is built for the window `[0, zn)`
+    of a convolution of length `an + zn - 1`, so _fft_small_plan_set_window
+    chooses `2^depth` at least that length. The cyclic trick would fold `v`
+    into fewer slots, and the transpose of a cyclic convolution is a cyclic
+    correlation, which is not the transposed product.
+*/
+void _nmod_poly_mul_tr_mpn_ctx(
+    ulong* z, ulong zn,
+    const ulong* a, ulong an,
+    const ulong* v, ulong vn,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    ulong modbits = FLINT_BITS - mod.norm;
+    ulong pn = an + zn - 1;          /* length of the transposed product */
+    ulong atrunc, ztrunc;
+    int success;
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+
+    FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(vn > 0);
+    FLINT_ASSERT(zn > 0);
+    FLINT_ASSERT(vn <= pn);
+
+    atrunc = _fft_small_len_trunc(an);
+    ztrunc = _fft_small_len_trunc(zn);
+
+    /* the plan of the multiplication of lengths an and zn, exported on
+       [0, zn): every output coefficient is a sum of at most an products,
+       each < 2^(2*modbits). The direct-fft branch is gated on the longer
+       length: its setup cost is paid against the whole transform, and
+       one-sided shapes (zn or an < 100) are where it pays most */
+    success = fft_small_plan_init_nmod(P, R, 0, zn, pn,
+                        n_max(atrunc, ztrunc), an, 2*modbits, mod,
+                        n_max(an, zn));
+    FLINT_ASSERT(success);
+    (void) success;
+
+    /* the plan's depth fixes the granularity of the operand truncations */
+    atrunc = n_min(_fft_small_op_trunc(an, P), P->ztrunc);
+    ztrunc = n_min(_fft_small_op_trunc(zn, P), P->ztrunc);
+
+    /* transposed: the engine's a = v goes through ifft_tr at full length
+       and comes back through fft_tr truncated to ztrunc; its b = a is
+       transformed as in a multiplication */
+    A.a = v; A.an = vn; A.aaux = 0; A.atrunc = ztrunc;
+    A.b = a; A.bn = an; A.baux = 0; A.btrunc = atrunc;
+    A.bfft = NULL;
+    A.bfft_stride = 0;
+    A.squaring = 0;
+    A.transposed = 1;
+    A.tune_n = n_min(an, zn);
+    A.min_an_bn = an;       /* every output is a sum of at most an products */
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning;
+
+    _fft_small_conv(z, P, &A);
+
+    fft_small_plan_clear(P);
+}
 
 #if 0
 static void _nmod_poly_mul_mod_xpnm1_naive(
@@ -1037,6 +1232,7 @@ static void _nmod_poly_mul_mod_xpnm1(
     A.bfft = NULL;
     A.bfft_stride = 0;
     A.squaring = 0;
+    A.transposed = 0;
     A.tune_n = bn;
     A.min_an_bn = FLINT_MIN(an, bn);
     A.mod_fn = _mod_fn;
@@ -1081,12 +1277,13 @@ int _mul_precomp_init(
         return 0;
 
     M->bn = bn;
-    M->btrunc = _len_trunc(btrunc);
+    M->btrunc = _fft_small_len_trunc(btrunc);
+    M->transposed = 0;
 
     /* the forward transform reads b zero-padded (or folded) to this
        truncation, which does not change the transform */
     fft_small_op_init(M->bfft, M->P);
-    fft_small_fft_nmod(M->bfft, b, bn, n_min(_len_trunc(bn), N), mod, M->P);
+    fft_small_fft_nmod(M->bfft, b, bn, n_min(_fft_small_len_trunc(bn), N), mod, M->P);
 
     return 1;
 }
@@ -1118,6 +1315,7 @@ int _nmod_poly_mul_mid_precomp(
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
+    FLINT_ASSERT(!M->transposed);
     FLINT_ASSERT(M->btrunc <= n_pow2(M->P->depth));
 
     if (zl >= zh)
@@ -1138,7 +1336,7 @@ int _nmod_poly_mul_mid_precomp(
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    atrunc = n_min(_len_trunc(an), n_pow2(M->P->depth));
+    atrunc = n_min(_fft_small_len_trunc(an), n_pow2(M->P->depth));
 
     *P = *M->P;
     P->R = R;
@@ -1159,8 +1357,109 @@ int _nmod_poly_mul_mid_precomp(
     A.bfft = M->bfft->data;
     A.bfft_stride = M->bfft->stride;
     A.squaring = 0;
+    A.transposed = 0;
     A.tune_n = bn;
     A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning_no_rethread;
+
+    _fft_small_conv(z, P, &A);
+
+    return 1;
+}
+
+/*
+    The precomputation of the transposed products with a fixed (v, vn):
+    the transposed products z[j] = sum_i r[i] v[i + j], 0 <= j < zn, for
+    any (r, rn) with rn + zn - 1 <= vn (see _nmod_poly_mul_tr_mpn_ctx),
+    are the transposes of products of length at most vn, which one plan
+    for the window [0, vn) of a convolution of length vn serves, and they
+    share the images of v through the transpose of the inverse transform,
+    which are stored. With r the reversal of a, zero padded in front, this
+    is a window of a * v: the middle products of evaluations and
+    extrapolations at geometric progressions with a fixed polynomial v.
+    Against the window of the full product with a stored transform of v
+    (_mul_precomp_init), the transform has length about vn instead of a
+    power of two, or of the length of the full product.
+
+    len_bound bounds the number of nonzero coefficients of r (the number of
+    products accumulating onto one output coefficient), and direct_len
+    gates the direct transform modulo a prime as in
+    fft_small_plan_init_nmod. Returns 0 if no plan is available.
+*/
+int _mul_precomp_init_tr(
+    mul_precomp_struct* M,
+    const ulong * v, ulong vn,
+    ulong len_bound, ulong direct_len,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    ulong modbits = FLINT_BITS - mod.norm;
+
+    FLINT_ASSERT(vn > 0);
+
+    if (!fft_small_plan_init_nmod(M->P, R, 0, vn, vn, _fft_small_len_trunc(vn),
+                                  len_bound, 2*modbits, mod, direct_len))
+        return 0;
+
+    M->bn = vn;
+    M->btrunc = 0;
+    M->transposed = 1;
+
+    fft_small_op_init(M->bfft, M->P);
+    fft_small_ifft_tr_nmod(M->bfft, v, vn, mod, M->P);
+
+    return 1;
+}
+
+/*
+    The transposed product z[j] = sum_i r[i] v[i + j], 0 <= j < zn, with v
+    given by M (_mul_precomp_init_tr); returns 0 if rn + zn - 1 exceeds
+    the length of v. r must have at most len_bound nonzero coefficients
+    (the len_bound of M), which leaves room for zeros in front of a
+    reversed operand. The precomputed images of v are multiplied by the
+    transform of r and the transpose of the forward transform gives the zn
+    coefficients: two transforms, of the length of M. M is only read, as
+    for _nmod_poly_mul_mid_precomp.
+*/
+int _nmod_poly_mul_tr_precomp(
+    ulong* z, ulong zn,
+    const ulong* r, ulong rn,
+    const mul_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+
+    FLINT_ASSERT(M->transposed);
+    FLINT_ASSERT(rn > 0 && zn > 0);
+
+    if (rn + zn - 1 > M->bn)
+        return 0;
+
+    *P = *M->P;
+    P->R = R;
+    P->crts = R->crts;
+    if (!P->use_direct_fft)
+        P->ffts = R->ffts;
+
+    P->zl = 0;
+    P->zh = zn;
+
+    A.a = NULL; A.an = 0; A.aaux = 0;
+    A.atrunc = n_min(_fft_small_op_trunc(zn, P), P->ztrunc);
+    A.b = r; A.bn = rn; A.baux = 0;
+    A.btrunc = n_min(_fft_small_op_trunc(rn, P), P->ztrunc);
+    A.bfft = M->bfft->data;
+    A.bfft_stride = M->bfft->stride;
+    A.squaring = 0;
+    A.transposed = 2;
+    A.tune_n = n_min(rn, zn);
+    A.min_an_bn = n_min(rn, M->P->bound_c);
     A.mod_fn = _mod_fn;
     A.s2_finish = NULL;
     A.crt_fn = _nmod_crt_fn(P->np);
@@ -1198,6 +1497,7 @@ static void _nmod_poly_mul_mod_xpnm1_precomp(
     A.bfft = M->bfft->data;
     A.bfft_stride = M->bfft->stride;
     A.squaring = 0;
+    A.transposed = 0;
     A.tune_n = an;
     A.min_an_bn = an;  /* Todo: we might want to store bn and min by this here,
                           in case this is much smaller than an. */
@@ -1351,6 +1651,10 @@ int _nmod_poly_divrem_precomp(
     FLINT_ASSERT(an >= bn);
     FLINT_ASSERT(bn > 1);
     FLINT_ASSERT(qn > 0);
+
+    /* the stored inverse has precision Bn */
+    if (qn > Bn)
+        return 0;
 
     if (!_nmod_poly_mul_mid_precomp(q, Bn-1, Bn-1+qn, a+an-qn, qn, M->quo_maker, mod, R))
         return 0;

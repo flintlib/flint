@@ -334,10 +334,6 @@ Container operations
     If the terms of *A* were sorted to begin with, the result will be in canonical form.
     This function runs in linear time in the size of *A*.
 
-.. function:: void fmpz_mod_mpoly_reverse(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
-
-    Set *A* to the reversal of *B*.
-
 
 Random generation
 --------------------------------------------------------------------------------
@@ -404,6 +400,11 @@ Scalar operations
 .. function:: void fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
 
     Set *A* to *B* divided by the leading coefficient of *B*. This throws if *B* is zero or the leading coefficient is not invertible.
+
+.. function:: void fmpz_mod_mpoly_monic_part(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Set *res* to *f* divided by the leading coefficient of *f*, or to zero
+    if *f* is zero. This throws if the leading coefficient is not invertible.
 
 
 Differentiation

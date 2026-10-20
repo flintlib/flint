@@ -42,6 +42,18 @@ TEST_FUNCTION_START(arb_mat_transpose, state)
             flint_abort();
         }
 
+        /* eq and ne for exact matrices of any shape */
+        arb_mat_get_mid(c, a);
+        arb_mat_transpose(b, c);
+        arb_mat_transpose(a, b);
+
+        if (!arb_mat_eq(a, c) || arb_mat_ne(a, c))
+        {
+            flint_printf("FAIL (eq, ne)\n\n");
+            flint_printf("m = %wd, n = %wd\n", m, n);
+            flint_abort();
+        }
+
         if (arb_mat_nrows(a) == arb_mat_ncols(a))
         {
             arb_mat_transpose(c, a);

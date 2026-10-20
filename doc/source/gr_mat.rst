@@ -436,6 +436,8 @@ Matrix multiplication
     Compute `AB` using the default algorithm chosen by the element ring.
     If the element ring does not overload matrix multiplication, this will
     fall back to :func:`gr_mat_mul_generic` by default.
+    Returns ``GR_DOMAIN`` if the shapes are incompatible; rings that
+    overload matrix multiplication must also perform this check.
 
 .. function:: int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 

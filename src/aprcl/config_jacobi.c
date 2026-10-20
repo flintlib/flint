@@ -89,10 +89,13 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
     ulong i, j, q;
     double * w;
     n_factor_t q_factors;
-    fmpz_t new_s, p;
+    fmpz_t new_s, p, t, r;
+    int n_pos = (fmpz_sgn(n) > 0);
 
     fmpz_init(new_s);
     fmpz_init(p);
+    fmpz_init(t);
+    fmpz_init(r);
     w = (double *) flint_malloc(sizeof(double) * conf->qs->num);
 
     for (i = 0; i < conf->qs->num; i++)
@@ -135,16 +138,38 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
         w_max = -1;
         ind = -1;
 
+        /*
+            Removing p = q^k from s keeps s^2 > n iff s^2 > n p^2. With
+            s^2 = t n + r, 0 <= r < n, this holds iff t > p^2, or t = p^2
+            and r > 0, which only needs a comparison of t with p^2.
+        */
+        if (n_pos)
+        {
+            fmpz_mul(t, conf->s, conf->s);
+            fmpz_fdiv_qr(t, r, t, n);
+        }
+
         for (i = 0; i < conf->qs->num; i++)
         {
+            int keeps;
+
             if (conf->qs_used[i] == 0)
                 continue;
 
-            fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
-            fmpz_fdiv_q(new_s, conf->s, p);
-            fmpz_mul(new_s, new_s, new_s);
+            if (n_pos)
+            {
+                int c;
 
-            if (fmpz_cmp(new_s, n) > 0)
+                fmpz_pow_ui(p, conf->qs->p + i, 2 * conf->qs->exp[i]);
+                c = fmpz_cmp(t, p);
+                keeps = (c > 0 || (c == 0 && !fmpz_is_zero(r)));
+            }
+            else
+            {
+                keeps = 1;
+            }
+
+            if (keeps)
                 if (w_max <= w[i])
                 {
                     w_max = w[i];
@@ -163,6 +188,8 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
     fmpz_clear(new_s);
     fmpz_clear(p);
+    fmpz_clear(t);
+    fmpz_clear(r);
     flint_free(w);
 }
 
@@ -231,6 +258,21 @@ _aprcl_config_jacobi_update(aprcl_config conf)
     flint_free(divisors);
 }
 
+/* is s^2 > n? */
+static int
+_aprcl_config_s_squared_gt(const aprcl_config conf, const fmpz_t n)
+{
+    int result;
+    fmpz_t s2;
+
+    fmpz_init(s2);
+    fmpz_mul(s2, conf->s, conf->s);
+    result = (fmpz_cmp(s2, n) > 0);
+    fmpz_clear(s2);
+
+    return result;
+}
+
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 /* configuration with a given R; s^2 > n is not checked */
 void
@@ -251,7 +293,29 @@ aprcl_config_jacobi_init_R(aprcl_config conf, const fmpz_t n, ulong R)
 void
 aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 {
-    aprcl_config_jacobi_init_R(conf, n, aprcl_R_value(n));
+    ulong R = aprcl_R_value(n);
+
+    aprcl_config_jacobi_init_R(conf, n, R);
+
+    /*
+        The final trial division only proves primality if s^2 > n. The
+        tabulated values of R give this for n up to about 20000 bits; for
+        larger n, multiply R by further primes (each prime q with q - 1 | R
+        contributes to s) until s^2 > n. Since the reduction of s keeps
+        s^2 > n whenever the full s satisfies it, checking the reduced s
+        is enough.
+    */
+    while (!_aprcl_config_s_squared_gt(conf, n))
+    {
+        ulong p = n_nextprime(conf->rs.p[conf->rs.num - 1], 1);
+
+        if (R > UWORD_MAX / p)
+            flint_throw(FLINT_ERROR, "aprcl_config_jacobi_init: n is too large\n");
+
+        R *= p;
+        aprcl_config_jacobi_clear(conf);
+        aprcl_config_jacobi_init_R(conf, n, R);
+    }
 }
 
 void

@@ -110,7 +110,7 @@ static void _mod(
             for (j = 0; j < BLK_SZ; j += 8)
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
-FLINT_ASSERT(i+j < atrunc);
+                FLINT_ASSERT(i+j < atrunc);
                 vec8d_store_aligned(aI + j, vec8n_convert_limited_vec8d(t));
             }
         }
@@ -211,7 +211,7 @@ static void _crt_1(
     {
         _convert_block(Xs, Rffts, d, dstride, 1, i/BLK_SZ);
 
-        jstart = (i < zi_start) ? zi_start - i : 0; \
+        jstart = (i < zi_start) ? zi_start - i : 0;
         jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
 
         FLINT_ASSERT(mod.norm != 0);
@@ -343,10 +343,14 @@ static void _radix_s2_finish(void* zv, ulong zl, ulong FLINT_UNUSED(zh),
     }
 }
 
-static void _radix_mul_mpn_ctx(
+/* the window [zl, zh) of the convolution of (a, an) and (b, bn), with
+   zh <= an + bn - 1, as a window of the full product (wrapped around when
+   a power of two allows) */
+static void _radix_mul_mid_mpn_ctx(
     ulong * z, ulong zl, ulong zh,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
+    int write_carry_out,
     nmod_t mod,
     mpn_ctx_t R)
 {
@@ -354,39 +358,16 @@ static void _radix_mul_mpn_ctx(
     ulong zn = an + bn - 1;
     ulong atrunc, btrunc;
     int squaring, success;
-    int write_carry_out = 0;
     fft_small_plan_t P;
     fft_small_conv_arg_struct A;
     _conv_params_struct par;
 
-    an = FLINT_MIN(an, zh);
-    bn = FLINT_MIN(bn, zh);
-
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
-
-    if (zl >= zh)
-        return;
-
-    if (zh == an + bn)
-        write_carry_out = 1;
-
-    if (zh > zn)
-    {
-        if (zl >= zn)
-        {
-            flint_mpn_zero(z, zh - zl);
-            return;
-        }
-
-        flint_mpn_zero(z + zn - zl, zh - zn);
-        zh = zn;
-    }
-
-    squaring = (a == b) && (an == bn);
-
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
+
+    squaring = (a == b) && (an == bn);
 
     atrunc = n_round_up(an, BLK_SZ);
     btrunc = n_round_up(bn, BLK_SZ);
@@ -397,9 +378,9 @@ static void _radix_mul_mpn_ctx(
     _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc),
                                (ulong) 4);
 
-    /* need prod_of_primes >= bn * 4^modbits; the radix chinese
+    /* need prod_of_primes >= min(an, bn) * 4^modbits; the radix chinese
        remaindering handles at most 4 primes */
-    success = _fft_small_plan_set_bound(P, bn, 2*modbits, 4);
+    success = _fft_small_plan_set_bound(P, FLINT_MIN(an, bn), 2*modbits, 4);
     FLINT_ASSERT(success);
     (void) success;
 
@@ -419,7 +400,8 @@ static void _radix_mul_mpn_ctx(
     A.bfft = NULL;
     A.bfft_stride = 0;
     A.squaring = squaring;
-    A.tune_n = bn;
+    A.transposed = 0;
+    A.tune_n = FLINT_MIN(an, bn);
     A.min_an_bn = FLINT_MIN(an, bn);
     A.mod_fn = _mod_fn;
     A.s2_finish = _radix_s2_finish;
@@ -430,6 +412,222 @@ static void _radix_mul_mpn_ctx(
     _fft_small_conv(z, P, &A);
 
     fft_small_plan_clear(P);
+}
+
+/*
+    The transposed product (see _nmod_poly_mul_tr_mpn_ctx): the m
+    coefficients z[j] = sum_i r[i] v[i + j], 0 <= j < m, with v read as
+    padded with zeros to length rn + m - 1, followed by the radix carry
+    chain and, if write_carry_out, its final carry in z[m]. With r the
+    reversal of an operand s, this is a window of the convolution of s and
+    v at the cost of a product of lengths rn and m.
+*/
+static void _radix_mul_tr_mpn_ctx(
+    ulong * z, ulong m,
+    const ulong* r, ulong rn,
+    const ulong* v, ulong vn,
+    int write_carry_out,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    ulong modbits = FLINT_BITS - mod.norm;
+    ulong pn = rn + m - 1;
+    ulong rtrunc, mtrunc;
+    int success;
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+    _conv_params_struct par;
+
+    FLINT_ASSERT(rn > 0);
+    FLINT_ASSERT(vn > 0);
+    FLINT_ASSERT(m > 0);
+    FLINT_ASSERT(vn <= pn);
+
+    P->R = R;
+    P->sign = 0;
+
+    _fft_small_plan_set_window(P, 0, m, pn,
+        n_max(_fft_small_len_trunc(rn), _fft_small_len_trunc(m)), (ulong) 4);
+
+    /* every output coefficient is a sum of at most rn products < B^2 */
+    success = _fft_small_plan_set_bound(P, rn, 2*modbits, 4);
+    FLINT_ASSERT(success);
+    (void) success;
+
+    _fft_small_plan_set_normalizers(P);
+
+    rtrunc = n_min(_fft_small_op_trunc(rn, P), P->ztrunc);
+    mtrunc = n_min(_fft_small_op_trunc(m, P), P->ztrunc);
+
+    par.mod = mod;
+    par.write_carry_out = write_carry_out;
+
+    /* transposed: the engine's a = v goes through ifft_tr at full length
+       and comes back through fft_tr truncated to mtrunc; its b = r is
+       transformed as in a multiplication */
+    A.a = v; A.an = vn; A.aaux = 0; A.atrunc = mtrunc;
+    A.b = r; A.bn = rn; A.baux = 0; A.btrunc = rtrunc;
+    A.bfft = NULL;
+    A.bfft_stride = 0;
+    A.squaring = 0;
+    A.transposed = 1;
+    A.tune_n = FLINT_MIN(rn, m);
+    A.min_an_bn = rn;
+    A.mod_fn = _mod_fn;
+    A.s2_finish = _radix_s2_finish;
+    A.crt_fn = _radix_crt_fn(P->np);
+    A.params = &par;
+    A.tuning = &_radix_conv_tuning;
+
+    _fft_small_conv(z, P, &A);
+
+    fft_small_plan_clear(P);
+}
+
+/*
+    Whether the transposed product of lengths sn and m behind the window
+    [zl, zh) of the convolution of lengths an and bn has a strictly shorter
+    transform than the window of the full product, the transform lengths
+    being computed as in _radix_mul_tr_mpn_ctx and _radix_mul_mid_mpn_ctx
+    respectively (same window selection, same arguments).
+*/
+static int
+_radix_mul_transposed_shorter(ulong an, ulong bn, ulong zl, ulong zh,
+                              ulong sn, ulong m)
+{
+    fft_small_plan_t Pw, Pt;
+
+    _fft_small_plan_set_window(Pw, zl, zh, an + bn - 1,
+        n_max(n_round_up(an, BLK_SZ), n_round_up(bn, BLK_SZ)), (ulong) 4);
+    _fft_small_plan_set_window(Pt, 0, m, sn + m - 1,
+        n_max(_fft_small_len_trunc(sn), _fft_small_len_trunc(m)), (ulong) 4);
+
+    return Pt->ztrunc < Pw->ztrunc;
+}
+
+static void _radix_mul_mpn_ctx(
+    ulong * z, ulong zl, ulong zh,
+    const ulong* a, ulong an,
+    const ulong* b, ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    ulong zn, t, m, sn, ln;
+    const ulong * s, * l;
+    int write_carry_out;
+
+    an = FLINT_MIN(an, zh);
+    bn = FLINT_MIN(bn, zh);
+
+    FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(bn > 0);
+
+    if (zl >= zh)
+        return;
+
+    /* the convolution of the (truncated) operands has zn coefficients;
+       limb zn only receives the final carry */
+    zn = an + bn - 1;
+    write_carry_out = (zh == an + bn);
+
+    if (zh > zn)
+    {
+        if (zl >= zn)
+        {
+            flint_mpn_zero(z, zh - zl);
+            return;
+        }
+
+        flint_mpn_zero(z + zn - zl, zh - zn);
+        zh = zn;
+    }
+
+    /* drop the low limbs of each operand that only meet the other below
+       zl: they only contribute to the carries from below the window,
+       which are omitted. The window shifts with the operands, z does not. */
+    if (zl > bn - 1)
+    {
+        t = zl - (bn - 1);
+        a += t;
+        an -= t;
+        zl -= t;
+        zh -= t;
+    }
+
+    if (zl > an - 1)
+    {
+        t = zl - (an - 1);
+        b += t;
+        bn -= t;
+        zl -= t;
+        zh -= t;
+    }
+
+    FLINT_ASSERT(an > 0 && bn > 0);
+    FLINT_ASSERT(zl < zh && zh <= an + bn - 1);
+
+    if (an >= bn)
+        s = b, sn = bn, l = a, ln = an;
+    else
+        s = a, sn = an, l = b, ln = bn;
+
+    m = zh - zl;
+
+    /*
+        As for _nmod_poly_mulmid_fft_small: the window [zl, zh) is the
+        transpose of the multiplication by s reversed of a polynomial of
+        length m, applied to l shifted by sn - 1 - zl, at the cost of a
+        product of lengths sn and m instead of sn and ln. The middle
+        products of Newton iterations (an operand of length about 2n, a
+        window of n limbs starting at n) are the typical case. The carry
+        chain starts at zl in both drivers, so the result is the same.
+        The window may start before the full sums and end after them, as
+        the windows of the Newton iterations of radix_inv_approx and the
+        divisions do (a few guard limbs on each side): the operand l is
+        then padded with zeros in front (a copy) and at the end (by the
+        driver). Not for squarings (two transforms for the window product).
+    */
+    if (!(a == b && an == bn) && m < ln
+        && _radix_mul_transposed_shorter(an, bn, zl, zh, sn, m))
+    {
+        slong lead = (slong) sn - 1 - (slong) zl;   /* zeros in front of v */
+        ulong vn = m + sn - 1;                     /* length of v, zeros included */
+        ulong i, * u;
+        TMP_INIT;
+
+        TMP_START;
+
+        if (lead <= 0)
+        {
+            /* v = l[-lead, ..), with the zeros at the end supplied by
+               the driver */
+            FLINT_ASSERT((slong) ln + lead > 0);
+            u = TMP_ARRAY_ALLOC(sn, ulong);
+            for (i = 0; i < sn; i++)
+                u[i] = s[sn - 1 - i];
+            _radix_mul_tr_mpn_ctx(z, m, u, sn, l - lead,
+                FLINT_MIN((ulong) ((slong) ln + lead), vn),
+                write_carry_out, mod, R);
+        }
+        else
+        {
+            ulong glen = FLINT_MIN(ln, vn - (ulong) lead);
+
+            u = TMP_ARRAY_ALLOC(sn + lead + glen, ulong);
+            for (i = 0; i < sn; i++)
+                u[i] = s[sn - 1 - i];
+            flint_mpn_zero(u + sn, lead);
+            flint_mpn_copyi(u + sn + lead, l, glen);
+            _radix_mul_tr_mpn_ctx(z, m, u, sn, u + sn, lead + glen,
+                write_carry_out, mod, R);
+        }
+
+        TMP_END;
+
+        return;
+    }
+
+    _radix_mul_mid_mpn_ctx(z, zl, zh, a, an, b, bn, write_carry_out, mod, R);
 }
 
 
@@ -448,7 +646,10 @@ radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn,
 #else
 
 void
-radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
+radix_mulmid_fft_small(nn_ptr FLINT_UNUSED(res), nn_srcptr FLINT_UNUSED(a),
+    slong FLINT_UNUSED(an), nn_srcptr FLINT_UNUSED(b), slong FLINT_UNUSED(bn),
+    slong FLINT_UNUSED(zlo), slong FLINT_UNUSED(zhi),
+    const radix_t FLINT_UNUSED(radix))
 {
     flint_throw(FLINT_ERROR, "radix_mulmid_fft_small: fft_small not available");
 }

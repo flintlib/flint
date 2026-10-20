@@ -47,37 +47,47 @@
 
       middle product                  product of lengths fn and outlen
 
-      #0 mulmid   _nmod_poly_mulmid   #4 mul      _nmod_poly_mul
-      #1 cl       .._mulmid_classical #5 cl       _nmod_poly_mul_classical
-      #2 KS       .._mulmid_KS        #6 KS       _nmod_poly_mul_KS
-      #3 fft      .._mulmid_fft_small #7 KS2      _nmod_poly_mul_KS2
-                                      #8 KS4      _nmod_poly_mul_KS4
-                                      #9 fft      _nmod_poly_mullow_fft_small
+      #0 mulmid   _nmod_poly_mulmid   #5 mul      _nmod_poly_mul
+      #1 cl       .._mulmid_classical #6 cl       _nmod_poly_mul_classical
+      #2 KS       .._mulmid_KS        #7 KS       _nmod_poly_mul_KS
+      #3 fft      .._mulmid_fft_small #8 KS2      _nmod_poly_mul_KS2
+      #4 win      .._mul_mid_default_mpn_ctx
+                                      #9 KS4      _nmod_poly_mul_KS4
+                                      #10 fft     _nmod_poly_mullow_fft_small
 
-    #0 and #4 are the dispatchers, the others the algorithms they choose
-    from (#3 and #9 repack the coefficients of moduli up to 23 when they
-    can, and otherwise call fft_small's window product; #3 and #9 are
-    absent without fft_small). All are called with the longer operand
-    first.
+    #0 and #5 are the dispatchers, the others the algorithms they choose
+    from. #3 drops the coefficients no output uses, repacks the
+    coefficients of moduli up to 23 (FFT_SMALL_MAX_REPACK) when it can,
+    and otherwise computes the window as the transpose of the product of
+    lengths fn and outlen (fft_small's transposed transforms) when that is
+    shorter than the product of lengths fn and gn, and as a window of the
+    latter otherwise; #4 is that window product alone, which is what #3
+    did before the transposed transforms. #10 repacks or calls the window
+    product. #3, #4 and #10 are absent without fft_small. All are called
+    with the longer operand first.
 
     Ratio columns:
 
       mid best    which of #1, #2, #3 is fastest;
       #0/best     what the choice of the mulmid dispatcher costs (1.00: the
                   right choice);
-      mul best    which of #5..#9 is fastest;
-      #4/best     the same for the mul dispatcher;
-      #0/#4       middle product against product: ideally about 1;
-      #3/#9       the same for fft_small alone;
+      mul best    which of #6..#10 is fastest;
+      #5/best     the same for the mul dispatcher;
+      #0/#5       middle product against product: ideally about 1;
+      #3/#10      the same for fft_small alone;
+      #4/#3       what the transposed transforms buy over the window
+                  product;
 
-    and, where fft_small is available, the plan fft_small uses for #3:
-    `np` the number of primes (`1d` when it transforms directly modulo
-    mod.n) and `ztrunc` the transform length. The cost of fft_small is
-    mostly a function of these two, and ztrunc is a staircase in fn and
-    outlen (a power of two below 512, a multiple of 256 above).
+    and, where fft_small is available, the plans: `np` the number of
+    primes of the window product #4 (`1d` when it transforms directly
+    modulo mod.n), `ztrunc` its transform length, and `ztr.t` that of the
+    transposed product #3 (followed by `d` when that one transforms
+    directly). The cost of fft_small is mostly a function of these, and
+    ztrunc is a staircase in fn and outlen (a power of two below 512, a
+    multiple of 256 above).
 
-    Before timing, every middle product is checked against #3 (#2 without
-    fft_small) and every product against #9 (#6). Classical algorithms are
+    Before timing, every middle product is checked against #4 (#2 without
+    fft_small) and every product against #10 (#7). Classical algorithms are
     not timed above 2e7 coefficient products, and unless -a is given, the
     classical and KS algorithms of each family drop out of the rest of the
     run once they are hopeless (25x slower than the reference and above
@@ -125,9 +135,9 @@
         p-mul_mulmid_tune nbits fn outlen
             the shape (fn, outlen) above, all functions;
         p-mul_mulmid_tune nbits fn gn nlo nhi
-            the middle products #0..#3 on a general window: coefficients
+            the middle products #0..#4 on a general window: coefficients
             [nlo, nhi) of the product of f of length fn and g of length
-            gn, 0 <= nlo < nhi <= fn + gn - 1; the products #4..#9 on the
+            gn, 0 <= nlo < nhi <= fn + gn - 1; the products #5..#10 on the
             full product of f and g (nlo and nhi do not apply to them).
             Results are checked first.
 */
@@ -171,6 +181,7 @@ PRODUCT(mul_KS2, _nmod_poly_mul_KS2(z, a, an, b, bn, mod))
 PRODUCT(mul_KS4, _nmod_poly_mul_KS4(z, a, an, b, bn, mod))
 #if FLINT_HAVE_FFT_SMALL
 PRODUCT(mul_fft_small, _nmod_poly_mullow_fft_small(z, a, an, b, bn, an + bn - 1, mod))
+PRODUCT(mulmid_window, _nmod_poly_mul_mid_default_mpn_ctx(z, nlo, nhi, a, an, b, bn, mod))
 #endif
 
 typedef struct
@@ -188,16 +199,16 @@ fun_info;
 # define IF_FFT(f) NULL
 #endif
 
-#define NFUNS 10
-#define NMID 4                  /* #0..#3 are middle products */
+#define NFUNS 11
+#define NMID 5                  /* #0..#4 are middle products */
 #define IFUN_MID 0
-#define IFUN_MUL 4
+#define IFUN_MUL 5
 #if FLINT_HAVE_FFT_SMALL
-# define IFUN_MID_REF 3         /* the references for the checks */
-# define IFUN_MUL_REF 9
+# define IFUN_MID_REF 4         /* the references for the checks */
+# define IFUN_MUL_REF 10
 #else
 # define IFUN_MID_REF 2
-# define IFUN_MUL_REF 6
+# define IFUN_MUL_REF 7
 #endif
 
 static const fun_info funs[NFUNS] = {
@@ -205,6 +216,7 @@ static const fun_info funs[NFUNS] = {
     { _nmod_poly_mulmid_classical,         "mulmid_classical", "cl",  1 },
     { _nmod_poly_mulmid_KS,                "mulmid_KS",        "KS",  2 },
     { IF_FFT(_nmod_poly_mulmid_fft_small), "mulmid_fft_small", "fft", 0 },
+    { IF_FFT(mulmid_window),               "mul_mid_default_mpn_ctx", "win", 0 },
     { mul,                                 "mul",              "-",   0 },
     { mul_classical,                       "mul_classical",    "cl",  1 },
     { mul_KS,                              "mul_KS",           "KS",  2 },
@@ -477,28 +489,39 @@ select_modulus(nmod_t * mod, ulong x, int is_n)
 
 #if FLINT_HAVE_FFT_SMALL
 
-/* as in fft_small/nmod_poly_mul.c */
-#define _len_trunc(x) \
-    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
-                              : n_round_up((x), BLK_SZ))
 
-/* prints the plan of the window product behind #3, with the arguments of
+/* prints the plan of the window product #4 and the transform length of
+   the transposed product behind #3, with the arguments of
    _nmod_poly_mul_mid_mpn_ctx for the middle product of (f, fn), (g, gn) */
 static void
 print_plan(slong fn, slong gn, nmod_t mod)
 {
     fft_small_plan_t P;
-    ulong xt = n_max(_len_trunc((ulong) gn), _len_trunc((ulong) fn));
+    ulong xt = n_max(_fft_small_len_trunc((ulong) gn), _fft_small_len_trunc((ulong) fn));
+
+    slong outlen = gn - fn + 1;
 
     if (!fft_small_plan_init_nmod(P, get_default_mpn_ctx(), fn - 1, gn,
-                fn + gn - 1, xt, fn, 2 * NMOD_BITS(mod), mod, fn))
+                fn + gn - 1, xt, fn, 2 * NMOD_BITS(mod), mod, gn))
     {
-        flint_printf(" |  -      -");
+        flint_printf(" |  -      -      -");
         return;
     }
 
     flint_printf(" | %2wu%s %6wu", P->np, P->use_direct_fft ? "d" : " ",
                  P->ztrunc);
+    fft_small_plan_clear(P);
+
+    /* the plan of _nmod_poly_mul_tr_mpn_ctx: the product of lengths fn
+       and outlen, exported on [0, outlen) */
+    xt = n_max(_fft_small_len_trunc((ulong) fn), _fft_small_len_trunc((ulong) outlen));
+    if (!fft_small_plan_init_nmod(P, get_default_mpn_ctx(), 0, outlen,
+                gn, xt, fn, 2 * NMOD_BITS(mod), mod, FLINT_MAX(fn, outlen)))
+    {
+        flint_printf("      -");
+        return;
+    }
+    flint_printf(" %6wu%s", P->ztrunc, P->use_direct_fft ? "d" : " ");
     fft_small_plan_clear(P);
 }
 
@@ -574,9 +597,10 @@ print_header(nmod_t mod, const options_struct * O)
             flint_printf("# #%d --> _nmod_poly_%s%s\n", j, funs[j].name,
                          (j == IFUN_MID || j == IFUN_MUL) ? "  (dispatcher)" : "");
 
-    flint_printf("# mid, mul: fastest of #1..#3, of #5..#9"
+    flint_printf("# mid, mul: fastest of #1..#3, of #6..#10"
 #if FLINT_HAVE_FFT_SMALL
-                 "; np, ztrunc: fft_small plan of #3 (d = direct)"
+                 "; np, ztrunc: fft_small plan of #4 (d = direct); "
+                 "ztr.t: transform length of #3 (d = direct)"
 #endif
                  "\n%6s %6s |", "fn", "outlen");
 
@@ -589,9 +613,9 @@ print_header(nmod_t mod, const options_struct * O)
     }
 
     flint_printf(" | %4s %7s | %4s %7s | %6s", "mid", "#0/best", "mul",
-                 "#4/best", "#0/#4");
+                 "#5/best", "#0/#5");
 #if FLINT_HAVE_FFT_SMALL
-    flint_printf(" %6s | %3s %6s", "#3/#9", "np", "ztrunc");
+    flint_printf(" %6s %6s | %3s %6s %7s", "#3/#10", "#4/#3", "np", "ztrunc", "ztr.t ");
 #endif
     flint_printf("\n");
 }
@@ -666,7 +690,8 @@ run_shape(slong fn, slong outlen, nmod_t mod, flint_rand_t state,
     print_ratio(t[IFUN_MID], t[IFUN_MUL], 6);
 
 #if FLINT_HAVE_FFT_SMALL
-    print_ratio(t[3], t[9], 6);
+    print_ratio(t[3], t[10], 6);
+    print_ratio(t[4], t[3], 6);
     print_plan(fn, gn, mod);
 #endif
 
@@ -804,15 +829,15 @@ single(int argc, char ** argv, const options_struct * O, flint_rand_t state)
     if (window)
     {
         flint_printf("# %wu bits, mod.n = %wu: len(f) = %wd, len(g) = %wd; "
-                     "#0..#3: coefficients [%wd, %wd) of f*g; #4..#9: f*g\n",
+                     "#0..#4: coefficients [%wd, %wd) of f*g; #5..#10: f*g\n",
                      FLINT_BIT_COUNT(mod.n), mod.n, fn, gn, nlo, nhi);
         measure(t, run, a, an, b, bn, nlo, nhi, a, an, b, bn, z, zref, mod, O);
     }
     else
     {
         flint_printf("# %wu bits, mod.n = %wu: fn = %wd, outlen = %wd; "
-                     "#0..#3: middle product of lengths fn, gn = %wd; "
-                     "#4..#9: product of lengths fn, outlen\n",
+                     "#0..#4: middle product of lengths fn, gn = %wd; "
+                     "#5..#10: product of lengths fn, outlen\n",
                      FLINT_BIT_COUNT(mod.n), mod.n, fn, outlen, gn);
         if (fn >= outlen)
             measure(t, run, g, gn, f, fn, nlo, nhi, f, fn, g, outlen, z, zref, mod, O);
@@ -859,15 +884,15 @@ usage(const char * name)
 "        (factor R) | a:b:+S (step S)\n"
 "\n"
 "  Each shape (fn, outlen) is timed as the middle product of lengths fn and\n"
-"  gn = fn + outlen - 1 (#0..#3) and as the product of lengths fn and outlen\n"
-"  (#4..#9), its transpose.\n"
+"  gn = fn + outlen - 1 (#0..#4) and as the product of lengths fn and outlen\n"
+"  (#5..#10), its transpose.\n"
 "\n"
 "  e.g. %s -q -n 3 -b 0,20,30,50,60,64 -f 16:1024:x1.25 -r 0.1,1,10\n"
 "\n"
 "  single timings, all functions, one line each:\n"
 "       %s nbits fn outlen\n"
-"       %s nbits fn gn nlo nhi   (#0..#3: coefficients [nlo, nhi) of f*g,\n"
-"                                  len(f) = fn, len(g) = gn; #4..#9: f*g)\n"
+"       %s nbits fn gn nlo nhi   (#0..#4: coefficients [nlo, nhi) of f*g,\n"
+"                                  len(f) = fn, len(g) = gn; #5..#10: f*g)\n"
 "\nFunctions:\n", name, name, name, name);
 
     for (j = 0; j < NFUNS; j++)
@@ -875,13 +900,15 @@ usage(const char * name)
             flint_printf("   #%d  _nmod_poly_%s\n", j, funs[j].name);
 
     flint_printf("\n"
-"  Ratio columns: mid, mul = fastest of #1..#3, of #5..#9 (what each\n"
-"  dispatcher chooses from; #3 and #9 call the fft_small window product when\n"
-"  they do not repack); #0/best, #4/best; #0/#4 (middle product against\n"
-"  the product it is the transpose of); #3/#9.\n");
+"  Ratio columns: mid, mul = fastest of #1..#3, of #6..#10 (what each\n"
+"  dispatcher chooses from; #3 computes the window as a transposed product\n"
+"  when it does not repack, #4 is the window product it replaced, #10\n"
+"  repacks or calls the window product); #0/best, #5/best; #0/#5 (middle\n"
+"  product against the product it is the transpose of); #3/#10; #4/#3\n"
+"  (window product against transposed product).\n");
 
 #if !FLINT_HAVE_FFT_SMALL
-    flint_printf("\n  (built without fft_small: #3 and #9 are absent)\n");
+    flint_printf("\n  (built without fft_small: #3, #4 and #10 are absent)\n");
 #endif
 }
 

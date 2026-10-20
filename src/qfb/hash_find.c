@@ -14,7 +14,7 @@
 
 slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth)
 {
-   slong size = (1L<<depth), i;
+   slong size = (WORD(1)<<depth), i, probes;
    fmpz_t r;
 
    fmpz_init(r);
@@ -22,7 +22,8 @@ slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth)
    fmpz_fdiv_r_2exp(r, q->a, depth);
    i = fmpz_get_ui(r);
 
-   while (!fmpz_is_zero(qhash[i].q->a))
+   /* stop at an empty slot, or after probing a full table once */
+   for (probes = 0; probes < size && !fmpz_is_zero(qhash[i].q->a); probes++)
    {
       if (fmpz_cmp(qhash[i].q->a, q->a) == 0)
       {

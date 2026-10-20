@@ -126,7 +126,20 @@ fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, con
 
     fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
     primitive = fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx);
-    ctx->owns_fq_nmod_ctx = 1;
+
+    if (primitive)
+    {
+        ctx->owns_fq_nmod_ctx = 1;
+    }
+    else
+    {
+        /* everything has been freed; clearing ctx is allowed but not
+           required */
+        fq_nmod_ctx_clear(fq_nmod_ctx);
+        flint_free(fq_nmod_ctx);
+        ctx->fq_nmod_ctx = NULL;
+        ctx->owns_fq_nmod_ctx = 0;
+    }
 
     return primitive;
 }
@@ -134,7 +147,9 @@ fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, con
 void
 fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
-   fq_zech_ctx_init_modulus_check(ctx, modulus, var);
+    if (!fq_zech_ctx_init_modulus_check(ctx, modulus, var))
+        flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_modulus): "
+                "Polynomial is not primitive.\n");
 }
 
 int
@@ -209,7 +224,13 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctx2)
             fq_nmod_clear(r, ctx2);
             fq_nmod_clear(gen, ctx2);
             flint_free(n_reverse_table);
-            fq_zech_ctx_clear(ctx);
+            /* free the tables and leave a context that may be cleared
+               (which then does nothing) */
+            flint_free(ctx->zech_log_table);
+            ctx->zech_log_table = NULL;
+            ctx->prime_field_table = NULL;
+            ctx->eval_table = NULL;
+            ctx->owns_fq_nmod_ctx = 0;
             return 0; /* failure: modulus not primitive */
         }
 

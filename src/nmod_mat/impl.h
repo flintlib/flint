@@ -169,4 +169,36 @@ int _nmod_mat_mul_rows_simd(ulong * const * c, const ulong * const * a,
 int _nmod_mat_mul_cols_simd(nmod_mat_t C, const nmod_mat_t A,
                             const nmod_mat_t B);
 
+/*
+    Whether nmod_mat_addmul and nmod_mat_submul (single-threaded, below
+    the Strassen cutoff) should compute A * B with nmod_mat_mul and add
+    it, rather than with the fused classical _nmod_mat_mul_classical_op:
+    when nmod_mat_mul has a faster kernel than the classical code for the
+    modulus (mul_u8; with 64-bit words mul_u32, mul_u52,
+    mul_fp50, mul_k52 and the row and column engines), except for tiny
+    products and for B with fewer than 4 columns, where the temporary
+    matrix and the extra pass cost as much as they save.
+*/
+static inline int
+_nmod_mat_addmul_want_mul(slong m, slong k, slong n, nmod_t mod)
+{
+    if (n < 4 || m * k * FLINT_MIN(n, 128) < 128)
+        return 0;
+
+    /* nmod_mat_mul_u8, which does not pay for its conversions below
+       dimension 16 */
+    if (mod.n <= 255 && FLINT_MIN(m, k) >= 8 && n >= 8)
+        return FLINT_MIN(m, k) >= 16 && n >= 16;
+
+#if FLINT_BITS == 64
+    if (mod.n <= (UWORD(1) << 32))
+        return 1;
+
+    if (mod.n <= (UWORD(1) << 52) && (NMOD_MAT_HAVE_MUL_U52 || NMOD_MAT_HAVE_FPV))
+        return 1;
+#endif
+
+    return 0;
+}
+
 #endif

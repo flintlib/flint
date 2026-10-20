@@ -265,6 +265,12 @@ void sd_fft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc
 /* sd_ifft.c */
 void sd_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
 
+/* sd_fft_tr.c */
+void sd_fft_trunc_tr(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc);
+
+/* sd_ifft_tr.c */
+void sd_ifft_trunc_tr(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
+
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
@@ -556,6 +562,20 @@ typedef struct
 
 typedef fft_small_plan_struct fft_small_plan_t[1];
 
+/*
+    Truncation granularity follows the plan's depth: whole blocks at block
+    depths, the full (short) transform length below one block, where
+    sd_fft_trunc dispatches to the register basecases.
+    _fft_small_len_trunc is the anticipated granularity for a length before
+    any plan exists, _fft_small_op_trunc the one a given plan imposes.
+*/
+#define _fft_small_len_trunc(x) \
+    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
+                              : n_round_up((x), BLK_SZ))
+#define _fft_small_op_trunc(x, Pln) \
+    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
+                                : n_round_up((x), BLK_SZ))
+
 /* Select np and offset such that prod_primes(np) >= c * 2^e, considering
    only the primes ffts[i] for i < np_max. Returns 0 on failure. */
 int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max);
@@ -817,10 +837,20 @@ int fft_small_stage_end(ulong * z, ulong zn, ulong * buf, ulong len,
 void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
                     ulong itrunc, nmod_t mod, const fft_small_plan_t P);
 
-/* chinese remaindering of an inverse-transformed operand into the output
-   window [P->zl, P->zh) */
+/* Transposes of fft_small_fft_nmod and fft_small_ifft, for the transposed
+    convolutions (see sd_fft_tr.c and sd_ifft_tr.c) */
+void fft_small_ifft_tr_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    nmod_t mod, const fft_small_plan_t P);
+void fft_small_fft_tr(fft_small_op_t X, ulong itrunc, const fft_small_plan_t P);
+
+/* forward transform of the integer (a, an), with fft truncation P->ztrunc */
 void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
                     const fft_small_plan_t P);
+/* the same with the transforms truncated to the first otrunc points
+   (otrunc <= P->ztrunc, a multiple of the block size or P->ztrunc),
+   for products of at most otrunc slots */
+void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong otrunc, const fft_small_plan_t P);
 /* chinese remaindering restricted to the window [zl, zh), which must lie
    inside [P->zl, P->zh); z receives zh - zl coefficients */
 void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
@@ -832,18 +862,21 @@ void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
    (-P/2, P/2] for the product P of the plan's primes: callers must
    keep true slot values inside that range, one spare factor of two
    against the unsigned exactness bound, e.g. by doubling len_bound
-   at plan creation. */
+   at plan creation.
+   The mpn exports (signed and unsigned) may overwrite the transform data
+   of X (they do for two-prime plans), so X is not const; copy X first if
+   the transform is needed afterwards. */
 void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
-                    const fft_small_op_t X, ulong nslots,
+                    fft_small_op_t X, ulong nslots,
                     const fft_small_plan_t P);
 void fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
-                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
 /* the two's-complement residue of the signed reconstruction mod
    2^(FLINT_BITS * zn), reading only the slots below limb zn; the value
    need not fit */
 void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
-                    const fft_small_op_t X, ulong nslots,
+                    fft_small_op_t X, ulong nslots,
                     const fft_small_plan_t P);
 /* limbs [lo_limbs, lo_limbs + zn) of the two's-complement sum of the
    slots that can reach them, reading only the slots below limb
@@ -851,7 +884,7 @@ void fft_small_export_mpn_signed_low(ulong* z, ulong zn,
    otherwise the dropped low slots perturb the lowest limb as in the
    truncated export */
 void fft_small_export_mpn_signed_window(ulong* z, ulong zn,
-                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    fft_small_op_t X, ulong nslots, ulong lo_limbs,
                     const fft_small_plan_t P);
 
 /*
@@ -892,9 +925,53 @@ int _fft_small_mpn_sqr_complex(nn_ptr zr, slong * zr_len,
     nn_ptr zi, slong * zi_len, slong lo, slong hi,
     nn_srcptr ar, slong arn, int ar_sgn,
     nn_srcptr ai, slong ain, int ai_sgn);
-void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
+/* destroys the transform data of X for two-prime plans (see above) */
+void fft_small_export_mpn(ulong* z, ulong zn, fft_small_op_t X,
                     const fft_small_plan_t P);
 
+/* z1 = a x (an + xn limbs) and z2 = b x (bn + xn limbs), the transform
+   of x shared (three forward and two inverse transforms), in the
+   two-prime geometry up to FLINT_MPN_MUL_NP2_MAX_AN limbs and the wide
+   geometry above; all lengths positive. z1 may overlap a and x but not
+   b; z2 may overlap any input but not z1. See also flint_mpn_mul_shared,
+   which chooses between this and two products. */
+void _fft_small_mpn_mul_shared(nn_ptr z1, nn_srcptr a, ulong an,
+                    nn_ptr z2, nn_srcptr b, ulong bn,
+                    nn_srcptr x, ulong xn);
+
+/* Products z = x y (xn + yn limbs) by a fixed operand x whose transform
+   is computed once at init, for partners y of 1 to yn_max limbs: in
+   the two-prime geometry up to FLINT_MPN_MUL_NP2_MAX_AN limbs, in the
+   wide geometry above (as the multiplication driver chooses). _size
+   gives the doubles of storage the transform needs; init uses the
+   storage given, or allocates when it is NULL. z may overlap y. The
+   transform is read only: products may run on several threads. */
+typedef struct
+{
+    double * d;         /* the transform of x, per prime the first
+                           xstride points (those any product reads) */
+    ulong xstride;
+    ulong xn;
+    ulong yn_max;
+    ulong bits;
+    ulong depth;
+    int owns;
+    int wide;
+    fft_small_plan_struct P[1];     /* wide: the plan */
+}
+fft_small_mpn_mul_precomp_struct;
+
+typedef fft_small_mpn_mul_precomp_struct fft_small_mpn_mul_precomp_t[1];
+
+ulong _fft_small_mpn_mul_precomp_size(ulong xn, ulong yn_max);
+void _fft_small_mpn_mul_precomp_init(fft_small_mpn_mul_precomp_t P,
+                    nn_srcptr x, ulong xn, ulong yn_max, double * storage);
+void _fft_small_mpn_mul_precomp_clear(fft_small_mpn_mul_precomp_t P);
+void _fft_small_mpn_mul_precomp(nn_ptr z, const fft_small_mpn_mul_precomp_t P,
+                    nn_srcptr y, ulong yn);
+
+/* chinese remaindering of an inverse-transformed operand into the output
+   window [P->zl, P->zh) */
 void fft_small_export_nmod(ulong* z, const fft_small_op_t X, nmod_t mod,
                     const fft_small_plan_t P);
 
@@ -958,6 +1035,20 @@ typedef struct
                                    b/bn/baux/btrunc are ignored */
     ulong bfft_stride;
     int squaring;
+    int transposed;             /* if 1, compute the transpose, with
+                                   respect to a, of the multiplication by
+                                   b: a is converted at full length ztrunc
+                                   and sent through sd_ifft_trunc_tr, the
+                                   pointwise product is unchanged, and
+                                   sd_fft_trunc_tr with output truncation
+                                   atrunc replaces sd_ifft_trunc. See
+                                   _nmod_poly_mul_tr_mpn_ctx.
+                                   If 2, the same with a precomputed:
+                                   bfft holds the images of a through
+                                   sd_ifft_trunc_tr (a/an/aaux are
+                                   ignored) and b is converted and
+                                   transformed in the working buffer.
+                                   See _nmod_poly_mul_tr_precomp */
     ulong tune_n;               /* size fed to the tuning predicates */
     ulong min_an_bn;            /* bound on the number of products
                                    accumulating on one output coefficient */
@@ -974,12 +1065,27 @@ typedef struct
 void _fft_small_conv(void* z, const fft_small_plan_t P,
                     const fft_small_conv_arg_struct* A);
 
+/* coefficients [zl, zh) of the product of (a, an) and (b, bn) */
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
     nmod_t mod,
     mpn_ctx_t R);
+
+/* transposed product: z[j] = sum_i a[i] * v[i + j], 0 <= j < zn */
+void _nmod_poly_mul_tr_mpn_ctx(
+    ulong* z, ulong zn,
+    const ulong* a, ulong an,
+    const ulong* v, ulong vn,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+void _nmod_poly_mul_tr_default_mpn_ctx(
+    nn_ptr z, slong zn,
+    nn_srcptr a, slong an,
+    nn_srcptr v, slong vn,
+    nmod_t mod);
 
 void _nmod_poly_divrem_mpn_ctx(
     ulong* q,
@@ -1007,12 +1113,20 @@ typedef struct mul_precomp_struct {
     fft_small_op_struct bfft[1];
     ulong bn;
     ulong btrunc;
+    int transposed;     /* made by _mul_precomp_init_tr */
 } mul_precomp_struct;
 
 int _mul_precomp_init(
     mul_precomp_struct* M,
     const ulong * b, ulong bn, ulong btrunc,
     ulong depth, ulong len_bound, ulong direct_len,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+int _mul_precomp_init_tr(
+    mul_precomp_struct* M,
+    const ulong * v, ulong vn,
+    ulong len_bound, ulong direct_len,
     nmod_t mod,
     mpn_ctx_t R);
 
@@ -1025,6 +1139,13 @@ FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 int _nmod_poly_mul_mid_precomp(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
+    const mul_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R);
+
+int _nmod_poly_mul_tr_precomp(
+    ulong* z, ulong zn,
+    const ulong* r, ulong rn,
     const mul_precomp_struct* M,
     nmod_t mod,
     mpn_ctx_t R);

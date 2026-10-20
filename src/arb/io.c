@@ -154,11 +154,9 @@ arb_dump_file(FILE* stream, const arb_t x)
     char* data = arb_dump_str(x);
 
     nwrite = fputs(data, stream);
-    if (nwrite == EOF)
-        return nwrite;
-
     flint_free(data);
-    return 0;
+
+    return (nwrite == EOF) ? nwrite : 0;
 }
 
 int

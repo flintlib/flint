@@ -15,7 +15,8 @@
 
 TEST_FUNCTION_START(fmpz_mat_solve, state)
 {
-    fmpz_mat_t A, X, B, AX;
+    fmpz_mat_t A, X, B, AX, W;
+    int use_window;
     fmpz_t den;
     slong i, m, n, r;
     int success;
@@ -28,7 +29,15 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, n);
-        fmpz_mat_init(X, m, n);
+        /* the output may be a window */
+        use_window = n_randint(state, 2);
+        if (use_window)
+        {
+            fmpz_mat_init(W, m + 1, n + 2);
+            fmpz_mat_window_init(X, W, 1, 1, m + 1, n + 1);
+        }
+        else
+            fmpz_mat_init(X, m, n);
         fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
@@ -104,7 +113,13 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
-        fmpz_mat_clear(X);
+        if (use_window)
+        {
+            fmpz_mat_window_clear(X);
+            fmpz_mat_clear(W);
+        }
+        else
+            fmpz_mat_clear(X);
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }

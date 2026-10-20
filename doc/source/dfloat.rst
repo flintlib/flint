@@ -453,6 +453,17 @@ return nothing. Aliasing of inputs and outputs is allowed everywhere.
     Sets *res* to `x_0 + x_1`, renormalized (the ball version records
     anything that does not fit in the radius).
 
+.. function:: void d1_renorm(d1_t res, double * t, slong len)
+              void d2_renorm(d2_t res, double * t, slong len)
+              void d3_renorm(d3_t res, double * t, slong len)
+              void d4_renorm(d4_t res, double * t, slong len)
+
+    Sets *res* to the sum of the *len* doubles *t* (which should be
+    roughly sorted by decreasing magnitude for good results), renormalized
+    to `N` components; the part of the sum that does not fit in `N`
+    components is discarded. The array *t* is used as scratch space: its
+    contents are overwritten. *res* must not overlap *t*.
+
 .. function:: void d1b_set_d_rad(d1b_t res, double x, double rad)
               void d2b_set_d_rad(d2b_t res, double x, double rad)
               void d3b_set_d_rad(d3b_t res, double x, double rad)

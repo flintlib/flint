@@ -99,7 +99,9 @@ Context Management
 
     As per the previous function, but returns `0` if the modulus was not
     primitive and `1` if the context was successfully initialised with the
-    given modulus. No exception is raised.
+    given modulus. No exception is raised. If `0` is returned, all memory
+    has already been freed: ``ctx`` need not be cleared (clearing it is
+    allowed and has no effect).
 
 .. function:: void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn)
 
@@ -109,8 +111,10 @@ Context Management
 .. function:: int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn)
 
     As per the previous function but returns `0` if a non-primitive modulus is
-    detected. Returns `0` if the Zech representation was successfully
-    initialised.
+    detected. Returns `1` if the Zech representation was successfully
+    initialised. If `0` is returned, the memory allocated for ``ctx`` has
+    already been freed: ``ctx`` need not be cleared (clearing it is allowed
+    and has no effect), and ``ctxn`` remains owned by the caller.
 
 .. function:: void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
 
@@ -264,19 +268,6 @@ Basic arithmetic
      Sets ``inv`` to be the inverse of ``op`` modulo the modulus
      of ``ctx`` and sets ``f`` to one.  Since the modulus for
      ``ctx`` is always irreducible, ``op`` is always invertible.
-
-.. function:: void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e, const fmpz * a, const slong * j, slong lena, const fmpz_t p)
-
-    Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
-    reduced modulo `f(X)`, the modulus of ``ctx``.
-
-    Assumes that `e \geq 0` and that ``len`` is positive and at most `d`.
-
-    Although we require that ``rop`` provides space for
-    `2d - 1` coefficients, the output will be reduced modulo
-    `f(X)`, which is a polynomial of degree `d`.
-
-    Does not support aliasing.
 
 .. function:: void fq_zech_pow(fq_zech_t rop, const fq_zech_t op, const fmpz_t e, const fq_zech_ctx_t ctx)
 

@@ -76,6 +76,12 @@ void thread_pool_init(thread_pool_t T, slong size)
     thread_pool_entry_struct * D;
     size = FLINT_MAX(size, WORD(0));
 
+#if !FLINT_USES_PTHREAD
+    /* Without pthreads no thread could run the work handed to a worker,
+       so the pool has no workers and thread_pool_request returns 0. */
+    size = 0;
+#endif
+
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&T->mutex, NULL);
 #endif

@@ -92,15 +92,15 @@ nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t po
     slong lim = n_sqrt(poly->length), i, j, rem, quo, curr;
     nmod_mat_t tmat, *temp;
 
-    nmod_mat_zero(dest);
-
     if (poly->length == 0)
     {
+        nmod_mat_zero(dest);
         return;
     }
 
     if (poly->length == 1 || nmod_mat_is_zero(c))
     {
+        nmod_mat_zero(dest);
         nmod_mat_one_addmul(dest, dest, poly->coeffs[0]);
         return;
     }
@@ -117,6 +117,9 @@ nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t po
         nmod_mat_init(temp[i], c->r, c->c, c->mod.n);
         nmod_mat_mul(temp[i], temp[i - 1], c);
     }
+
+    /* only now, since dest may be aliased with c */
+    nmod_mat_zero(dest);
 
     rem = (poly->length % lim);
     quo = poly->length / lim;

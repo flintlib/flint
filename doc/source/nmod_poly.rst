@@ -41,7 +41,10 @@ Many functions in this module (greatest common divisors, modular
 inverses, division as if over a field, resultants and discriminants,
 factorisation, irreducibility testing, root finding, square roots, and
 the transcendental series) require the modulus to be prime. This is
-assumed and not checked.
+assumed and not checked. With a composite modulus, the greatest common
+divisor and resultant functions raise an exception (of type
+``FLINT_IMPINV``) when they meet a leading coefficient that is not
+invertible.
 
 Functions in ``nmod_poly`` do all the memory management for the user.
 One does not need to specify the maximum length in advance before
@@ -813,7 +816,18 @@ Multiplication
 
     Multiplication via the *fft_small* module. Throws an error
     if *fft_small* is not available. The conditions on the arguments
-    are the same as for :func:`_nmod_poly_mullow`.
+    are the same as for :func:`_nmod_poly_mullow`; for
+    :func:`_nmod_poly_mulmid_fft_small`, ``z`` receives the coefficients
+    `[znlo, zn)` of the product, with `0 \le znlo < zn \le an + bn - 1`,
+    and the operands may be given in either order.
+
+    The coefficients of the operands that no output coefficient uses are
+    ignored. The window `[znlo, zn)` of the product is computed as the
+    transpose of the multiplication of the reversed shorter operand by a polynomial of
+    length `zn - znlo` (see :func:`_nmod_poly_mul_tr_mpn_ctx`) whenever that
+    transform is shorter than the one of the full product, which is the
+    case for the usual middle products; otherwise it is taken as a window
+    of the full product (see :func:`_nmod_poly_mul_mid_mpn_ctx`).
 
 .. function:: void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nn_srcptr f, slong lenf, nmod_t mod)
 
@@ -2615,9 +2629,15 @@ Geometric progression
     interpolation).
 
     If bit 3 of ``function`` is set (for example, ``function`` is `15`), the
-    precomputation additionally stores the *fft_small* transforms of the
+    precomputation additionally stores *fft_small* transforms of the
     polynomials that the selected functionalities multiply by, so that each
-    of these products costs two transforms instead of three. This is done for
+    of these products costs two transforms instead of three. The products of
+    evaluation and extrapolation are `mulmid` or transposed products: for them,
+    the stored data are the images of the fixed polynomial through the
+    transpose of the inverse transform, and the transforms have length
+    `2 len - 1` (evaluation) or `len - 1` (extrapolation) rounded up to a
+    multiple of `256`, instead of a power of two or the length of the full
+    product. This is done for
     the functionalities whose largest product, with lengths up to ``len``,
     would use *fft_small*; then, in each call, a product uses the stored
     transform if it would use *fft_small* itself and if the stored transform

@@ -12,12 +12,14 @@
 /* Include functions *********************************************************/
 
 #include "t-isolate_roots.c"
+#include "t-newton_conv_factor.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(arb_calc_isolate_roots)
+    TEST_FUNCTION(arb_calc_isolate_roots),
+    TEST_FUNCTION(arb_calc_newton_conv_factor)
 };
 
 /* main function *************************************************************/

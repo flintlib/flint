@@ -1125,6 +1125,9 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly,
 static int
 _gr_fmpq_mat_mul(fmpq_mat_t res, const fmpq_mat_t x, const fmpq_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fmpq_mat_mul(res, x, y);
     return GR_SUCCESS;
 }

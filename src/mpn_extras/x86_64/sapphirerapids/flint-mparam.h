@@ -30,6 +30,13 @@
 #define FLINT_FFT_SQR_THRESHOLD                32000
 /* <---- these were taken directly from skylake flint-mparam.h  */
 
+/* two products with a common operand (flint_mpn_mul_shared) share the
+   transform of it from this threshold (measured on Emerald Rapids:
+   from 1e5 digits of the hypergeometric constants, 500 = the threshold
+   above was 3-11% slower, 150 and 240 even; the pairs of p-mpn_mul_shared
+   gain from about 240 limbs) */
+#define FLINT_MPN_MUL_SHARED_THRESHOLD         240
+
 #define FFT_TAB \
    { { 4, 4 }, { 4, 3 }, { 3, 2 }, { 2, 2 }, { 2, 1 } }
 
@@ -178,5 +185,12 @@
     AVX512-IFMA, u64 takes over above)
 */
 #define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 60
+
+/*
+    radix_mulmid: with fft_small, the classical algorithm is used below this
+    many limb products per limb of the convolution that fft_small computes;
+    see src/radix.h (measured on virtual machine Sapphire Rapids)
+*/
+#define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO 60
 
 #endif

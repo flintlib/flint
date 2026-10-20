@@ -16,6 +16,48 @@
 TEST_GR_FUNCTION_START(gr_ore_poly_divrem, state, count_success, count_domain, count_unable)
 {
     slong iter;
+
+    /* regression test: the remainder must be fully reduced */
+    {
+        int status = GR_SUCCESS;
+        gr_ctx_t QQ;
+        gr_ore_poly_ctx_t ore_ctx;
+        gr_ore_poly_t U, V, Q, R, Q2, R2;
+
+        gr_ctx_init_fmpq(QQ);
+        gr_ore_poly_ctx_init(ore_ctx, QQ, 0, ORE_ALGEBRA_COMMUTATIVE);
+        gr_ore_poly_init(U, ore_ctx);
+        gr_ore_poly_init(V, ore_ctx);
+        gr_ore_poly_init(Q, ore_ctx);
+        gr_ore_poly_init(R, ore_ctx);
+        gr_ore_poly_init(Q2, ore_ctx);
+        gr_ore_poly_init(R2, ore_ctx);
+
+        status |= gr_ore_poly_set_str(U, "D^2 + D + 1", ore_ctx);
+        status |= gr_ore_poly_set_str(V, "D", ore_ctx);
+        status |= gr_ore_poly_set_str(Q2, "D + 1", ore_ctx);
+        status |= gr_ore_poly_one(R2, ore_ctx);
+        status |= gr_ore_poly_divrem(Q, R, U, V, ore_ctx);
+
+        if (status != GR_SUCCESS || gr_ore_poly_equal(Q, Q2, ore_ctx) != T_TRUE ||
+                gr_ore_poly_equal(R, R2, ore_ctx) != T_TRUE)
+        {
+            flint_printf("FAIL (D^2 + D + 1) / D\n\n");
+            flint_printf("Q = "); gr_ore_poly_print(Q, ore_ctx); flint_printf("\n");
+            flint_printf("R = "); gr_ore_poly_print(R, ore_ctx); flint_printf("\n");
+            flint_abort();
+        }
+
+        gr_ore_poly_clear(U, ore_ctx);
+        gr_ore_poly_clear(V, ore_ctx);
+        gr_ore_poly_clear(Q, ore_ctx);
+        gr_ore_poly_clear(R, ore_ctx);
+        gr_ore_poly_clear(Q2, ore_ctx);
+        gr_ore_poly_clear(R2, ore_ctx);
+        gr_ore_poly_ctx_clear(ore_ctx);
+        gr_ctx_clear(QQ);
+    }
+
     for (iter = 0; iter < 3000 * flint_test_multiplier(); iter++)
     {
         int status = GR_SUCCESS;
@@ -73,7 +115,8 @@ TEST_GR_FUNCTION_START(gr_ore_poly_divrem, state, count_success, count_domain, c
                 status |= gr_ore_poly_mul(QBR, Q, B, ore_ctx);
                 status |= gr_ore_poly_add(QBR, QBR, R, ore_ctx);
 
-                if (status == GR_SUCCESS && gr_ore_poly_equal(QBR, A, ore_ctx) == T_FALSE)
+                if (status == GR_SUCCESS && (gr_ore_poly_equal(QBR, A, ore_ctx) == T_FALSE ||
+                        gr_ore_poly_length(R, ore_ctx) >= FLINT_MAX(gr_ore_poly_length(B, ore_ctx), 1)))
                 {
                     flint_printf("FAIL\n\n");
                     flint_printf("A = "); gr_ore_poly_print(A, ore_ctx); flint_printf("\n");

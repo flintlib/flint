@@ -356,10 +356,6 @@ int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A,
 
 slong nmod_mat_rref(nmod_mat_t A);
 slong _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P);
-slong nmod_mat_rref_classical(nmod_mat_t A);
-slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots);
-slong nmod_mat_rref_storjohann(nmod_mat_t A);
-slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
 slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 

@@ -1070,6 +1070,9 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
 static int
 _gr_fmpz_mod_mat_mul(fmpz_mod_mat_t res, const fmpz_mod_mat_t x, const fmpz_mod_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fmpz_mat_mul(res, x, y);
     _fmpz_mod_mat_reduce(res, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;

@@ -164,7 +164,19 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
 {
     if (poly1->length < poly2->length)
     {
+        /* the lengths are read first, as s or t may alias an input */
+        const int negate = (poly1->length % 2 == 0)
+                        && (poly2->length % 2 == 0) && poly1->length > 0;
+
         fmpz_poly_xgcd_modular(r, t, s, poly2, poly1);
+
+        /* res(f, g) = (-1)^(deg(f) deg(g)) res(g, f) */
+        if (negate)
+        {
+            fmpz_neg(r, r);
+            fmpz_poly_neg(s, s);
+            fmpz_poly_neg(t, t);
+        }
     } else /* len1 >= len2 >= 0 */
     {
         const slong len1 = poly1->length;

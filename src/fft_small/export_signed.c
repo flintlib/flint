@@ -62,6 +62,7 @@ static void CAT(_sig_block, NP)(ulong * W, ulong wlen, ulong A, ulong bits, \
  \
         CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime( \
                 (crt_data_struct *) Cd, l, N), Xs[l * BLK_SZ + j]); \
+        CRT_UNROLL_PRIMES \
         for (l++; l < NP; l++) \
             CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime( \
                     (crt_data_struct *) Cd, l, N), Xs[l * BLK_SZ + j]); \
@@ -362,8 +363,6 @@ _sig_worker(void * varg)
     _sig_segment(((sig_worker_arg *) varg)->S);
 }
 
-ulong _sig_max_threads_used = 0;   /* TEMPORARY */
-
 /*
     low != 0 selects the two's-complement window export: z receives the
     limbs [lo_limbs, lo_limbs + zn) of the two's-complement sum of the
@@ -377,7 +376,7 @@ ulong _sig_max_threads_used = 0;   /* TEMPORARY */
 */
 static void
 _fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
-        const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+        fft_small_op_t X, ulong nslots, ulong lo_limbs,
         const fft_small_plan_t P, int low)
 {
     ulong bits = P->bits;
@@ -564,7 +563,6 @@ _fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
             (nslots - j0) * bits >= 2048 * FLINT_BITS)
         nworkers = flint_request_threads(&handles, 8);
     nthreads = nworkers + 1;
-    if (nthreads > _sig_max_threads_used) _sig_max_threads_used = nthreads;
 
     {
         sig_seg_struct * segs = FLINT_ARRAY_ALLOC(nthreads, sig_seg_struct);
@@ -636,7 +634,7 @@ _fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
 
 void
 fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
-        const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+        fft_small_op_t X, ulong nslots, ulong lo_limbs,
         const fft_small_plan_t P)
 {
     _fft_small_export_mpn_signed(z, zn, sign, X, nslots, lo_limbs, P, 0);
@@ -644,13 +642,13 @@ fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
 
 void
 fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
-        const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
+        fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
 {
     _fft_small_export_mpn_signed(z, zn, sign, X, nslots, 0, P, 0);
 }
 
 void
-fft_small_export_mpn_signed_low(ulong* z, ulong zn, const fft_small_op_t X,
+fft_small_export_mpn_signed_low(ulong* z, ulong zn, fft_small_op_t X,
         ulong nslots, const fft_small_plan_t P)
 {
     int sign;
@@ -659,7 +657,7 @@ fft_small_export_mpn_signed_low(ulong* z, ulong zn, const fft_small_op_t X,
 
 void
 fft_small_export_mpn_signed_window(ulong* z, ulong zn,
-        const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+        fft_small_op_t X, ulong nslots, ulong lo_limbs,
         const fft_small_plan_t P)
 {
     int sign;

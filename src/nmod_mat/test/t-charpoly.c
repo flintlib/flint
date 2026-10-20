@@ -104,5 +104,56 @@ TEST_FUNCTION_START(nmod_mat_charpoly, state)
         nmod_poly_clear(g);
     }
 
+    /* modulus 1: the characteristic polynomial is the zero polynomial */
+    for (rep = 0; rep < 10 * flint_test_multiplier(); rep++)
+    {
+        nmod_mat_t A;
+        nmod_poly_t f;
+
+        m = n_randint(state, 40);
+
+        nmod_mat_init(A, m, m, 1);
+        nmod_poly_init(f, 1);
+
+        nmod_mat_randfull(A, state);
+        for (i = 0; i < m * m; i++)
+        {
+            if (nmod_mat_entry(A, i / m, i % m) != 0)
+            {
+                flint_printf("FAIL: randfull modulo 1\n");
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        nmod_mat_one(A);
+        if (!nmod_mat_is_one(A))
+        {
+            flint_printf("FAIL: is_one modulo 1\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        for (i = 0; i < 3; i++)
+        {
+            if (i == 0)
+                nmod_mat_charpoly(f, A);
+            else if (i == 1)
+                nmod_mat_charpoly_berkowitz(f, A);
+            else
+                nmod_mat_charpoly_danilevsky(f, A);
+
+            if (!nmod_poly_is_zero(f))
+            {
+                flint_printf("FAIL: charpoly modulo 1, m = %wd, algorithm %wd\n", m, i);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        nmod_mat_clear(A);
+        nmod_poly_clear(f);
+    }
+
     TEST_FUNCTION_END(state);
 }

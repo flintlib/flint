@@ -105,7 +105,7 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
         fmpz_mat_init(T, X->r, X->c);
         success = fmpz_mat_solve_cramer(T, den, A, B);
         if (success)
-            fmpz_mat_swap(X, T);
+            fmpz_mat_swap_entrywise(X, T);
         fmpz_mat_clear(T);
         return success;
     }

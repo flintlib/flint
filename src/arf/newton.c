@@ -48,19 +48,18 @@
 
 /* set res from the n + 2 limb fixed-point value Q (n fraction limbs),
    times 2^exp, rounded to nearest at prec bits; Q may lie inside the
-   buffer of res (_arf_set_round_mpn rounds in place) */
-static int
+   buffer of res (_arf_set_round_mpn rounds in place); the inexact flag of
+   this rounding says nothing about the exact result and is not returned */
+static void
 _arf_set_fixed(arf_t res, mp_ptr Q, slong n, const fmpz_t exp, int sgnbit, slong prec)
 {
     slong qn = n + 2, fix;
-    int inexact;
 
     while (Q[qn - 1] == 0)
         qn--;
 
-    inexact = _arf_set_round_mpn(res, &fix, Q, qn, sgnbit, prec, ARF_RND_NEAR);
+    _arf_set_round_mpn(res, &fix, Q, qn, sgnbit, prec, ARF_RND_NEAR);
     _fmpz_add_fast(ARF_EXPREF(res), exp, fix + (qn - n) * FLINT_BITS);
-    return inexact;
 }
 
 /* Space for the n + 2 limb fixed-point result: when res does not alias an
@@ -98,6 +97,81 @@ _arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec)
         && !arf_is_special(y) && arf_bits(y) > prec / 2;
 }
 
+/*
+    Inexact flag of the Newton results. The value returned by _arf_set_fixed
+    only says whether the approximation Q fitted in prec bits, which says
+    nothing about the exact result, so the flag is determined separately:
+    1/y and 1/sqrt(x) are dyadic only for powers of two (handled exactly
+    without Newton iteration), and a quotient or square root that is dyadic
+    with at most prec bits is found exactly by the iteration (its error is
+    below 0.5625 ulp), so it can be verified by one multiplication. The
+    multiplication is only done when the bit lengths and the lowest limbs of
+    the odd parts of the mantissas are compatible with an exact result.
+*/
+
+/* lowest limb of the odd part of the mantissa of x (finite, nonzero) */
+static ulong
+_arf_odd_low_limb(const arf_t x)
+{
+    nn_srcptr xp;
+    slong xn;
+    unsigned int c;
+
+    ARF_GET_MPN_READONLY(xp, xn, x);
+    c = flint_ctz(xp[0]);
+    if (c == 0)
+        return xp[0];
+    return (xp[0] >> c) | (xn > 1 ? (xp[1] << (FLINT_BITS - c)) : 0);
+}
+
+/* whether q != x / y, for nonzero finite q, x, y */
+static int
+_arf_div_newton_inexact(const arf_t q, const arf_t x, const arf_t y)
+{
+    slong bq, bx, by;
+    arf_t t;
+    int inexact;
+
+    /* X = Y Q for the odd parts implies bits(X) = bits(Y) + bits(Q) - {0, 1} */
+    bq = arf_bits(q);
+    bx = arf_bits(x);
+    by = arf_bits(y);
+    if (bx < bq + by - 1 || bx > bq + by)
+        return 1;
+    if (_arf_odd_low_limb(x) != _arf_odd_low_limb(y) * _arf_odd_low_limb(q))
+        return 1;
+
+    arf_init(t);
+    arf_mul(t, q, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+    inexact = !arf_equal(t, x);
+    arf_clear(t);
+    return inexact;
+}
+
+/* whether q != sqrt(x), for positive finite q, x */
+static int
+_arf_sqrt_newton_inexact(const arf_t q, const arf_t x)
+{
+    slong bq, bx;
+    ulong ql;
+    arf_t t;
+    int inexact;
+
+    bq = arf_bits(q);
+    bx = arf_bits(x);
+    if (bx < 2 * bq - 1 || bx > 2 * bq)
+        return 1;
+    ql = _arf_odd_low_limb(q);
+    if (_arf_odd_low_limb(x) != ql * ql)
+        return 1;
+
+    arf_init(t);
+    arf_mul(t, q, q, ARF_PREC_EXACT, ARF_RND_DOWN);
+    inexact = !arf_equal(t, x);
+    arf_clear(t);
+    return inexact;
+}
+
 int
 _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
 {
@@ -105,7 +179,10 @@ _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
     nn_srcptr xptr;
     mp_ptr Q;
     fmpz_t e;
-    int inexact;
+
+    /* the only exact case (division by a power of two is a shift) */
+    if (ARF_IS_POW2(x))
+        return arf_ui_div(res, 1, x, prec, ARF_RND_DOWN);
 
     ARF_GET_MPN_READONLY(xptr, xn, x);
     n = NEWTON_LIMBS(prec, rnd);
@@ -114,11 +191,11 @@ _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
     fmpz_neg(e, ARF_EXPREF(x));
     Q = _arf_approx_scratch(res, n + 2, res == x);
     _mp_real_inv_newton(Q, xptr, xn, n);
-    inexact = _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x), prec);
+    _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x), prec);
     if (res == x)
         flint_free(Q);
     fmpz_clear(e);
-    return inexact;
+    return 1;
 }
 
 int
@@ -128,10 +205,21 @@ _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t r
     nn_srcptr xptr, yptr;
     mp_ptr Q;
     fmpz_t e;
-    int inexact;
 
     if (arf_is_one(x))
         return _arf_inv_newton(res, y, prec, rnd);
+
+    /* the inputs are needed to determine the inexact flag */
+    if (res == x || res == y)
+    {
+        arf_t t;
+        int inexact;
+        arf_init(t);
+        inexact = _arf_div_newton(t, x, y, prec, rnd);
+        arf_swap(res, t);
+        arf_clear(t);
+        return inexact;
+    }
 
     ARF_GET_MPN_READONLY(xptr, xn, x);
     ARF_GET_MPN_READONLY(yptr, yn, y);
@@ -139,13 +227,11 @@ _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t r
 
     fmpz_init(e);
     fmpz_sub(e, ARF_EXPREF(x), ARF_EXPREF(y));
-    Q = _arf_approx_scratch(res, n + 2, res == x || res == y);
+    Q = _arf_approx_scratch(res, n + 2, 0);
     _mp_real_div_newton(Q, xptr, xn, yptr, yn, n);
-    inexact = _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x) ^ ARF_SGNBIT(y), prec);
-    if (res == x || res == y)
-        flint_free(Q);
+    _arf_set_fixed(res, Q, n, e, ARF_SGNBIT(x) ^ ARF_SGNBIT(y), prec);
     fmpz_clear(e);
-    return inexact;
+    return _arf_div_newton_inexact(res, x, y);
 }
 
 /*
@@ -188,7 +274,6 @@ _arf_sqrt_operand(mp_srcptr * Aptr, mp_ptr A, fmpz_t e, const arf_t x, slong n)
     mp_ptr A, Q; \
     mp_srcptr Aptr; \
     fmpz_t e; \
-    int inexact; \
     TMP_INIT; \
     n = NEWTON_LIMBS(prec, rnd); \
     TMP_START; \
@@ -200,21 +285,44 @@ _arf_sqrt_operand(mp_srcptr * Aptr, mp_ptr A, fmpz_t e, const arf_t x, slong n)
         fmpz_neg(e, e); \
     Q = _arf_approx_scratch(res, n + 2, res == x); \
     newton(Q, Aptr, An, n); \
-    inexact = _arf_set_fixed(res, Q, n, e, 0, prec); \
+    _arf_set_fixed(res, Q, n, e, 0, prec); \
     if (res == x) \
         flint_free(Q); \
     fmpz_clear(e); \
-    TMP_END; \
-    return inexact;
+    TMP_END;
 
 int
 _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    SQRT_NEWTON_BODY(_mp_real_sqrt_newton, 0)
+    /* the input is needed to determine the inexact flag */
+    if (res == x)
+    {
+        arf_t t;
+        int inexact;
+        arf_init(t);
+        inexact = _arf_sqrt_newton(t, x, prec, rnd);
+        arf_swap(res, t);
+        arf_clear(t);
+        return inexact;
+    }
+
+    {
+        SQRT_NEWTON_BODY(_mp_real_sqrt_newton, 0)
+    }
+
+    return _arf_sqrt_newton_inexact(res, x);
 }
 
 int
 _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    SQRT_NEWTON_BODY(_mp_real_rsqrt_newton, 1)
+    /* the only exact case: x = 4^k */
+    if (ARF_IS_POW2(x) && fmpz_is_odd(ARF_EXPREF(x)))
+        return arf_rsqrt(res, x, prec, ARF_RND_DOWN);
+
+    {
+        SQRT_NEWTON_BODY(_mp_real_rsqrt_newton, 1)
+    }
+
+    return 1;
 }

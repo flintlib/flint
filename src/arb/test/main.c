@@ -78,6 +78,7 @@
 #include "t-digits_round_inplace.c"
 #include "t-div_2expm1_ui.c"
 #include "t-div_arf.c"
+#include "t-div_newton.c"
 #include "t-div.c"
 #include "t-div_fmpz.c"
 #include "t-div_si.c"
@@ -285,6 +286,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_digits_round_inplace),
     TEST_FUNCTION(arb_div_2expm1_ui),
     TEST_FUNCTION(arb_div_arf),
+    TEST_FUNCTION(arb_div_newton),
     TEST_FUNCTION(arb_div),
     TEST_FUNCTION(arb_div_fmpz),
     TEST_FUNCTION(arb_div_si),

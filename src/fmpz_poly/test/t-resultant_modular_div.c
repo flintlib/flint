@@ -61,6 +61,48 @@ TEST_FUNCTION_START(fmpz_poly_resultant_modular_div, state)
         fmpz_clear(div);
     }
 
+    /* nbits exactly the size of the result: res(x^2 + c, x) = c with
+       c = +-(2^k - 1), k near FLINT_BITS */
+    for (i = 0; i < 8; i++)
+    {
+        fmpz_poly_t f, g;
+        fmpz_t c, r, div;
+        slong k = FLINT_BITS - 3 + (i % 4);
+
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_init(c);
+        fmpz_init(r);
+        fmpz_init(div);
+
+        fmpz_one(c);
+        fmpz_mul_2exp(c, c, k);
+        fmpz_sub_ui(c, c, 1);
+        if (i >= 4)
+            fmpz_neg(c, c);
+        fmpz_poly_set_coeff_ui(f, 2, 1);
+        fmpz_poly_set_coeff_fmpz(f, 0, c);
+        fmpz_poly_set_coeff_ui(g, 1, 1);
+        fmpz_one(div);
+
+        fmpz_poly_resultant_modular_div(r, f, g, div, fmpz_bits(c));
+
+        if (!fmpz_equal(r, c))
+        {
+            flint_printf("FAIL (exact nbits):\n");
+            flint_printf("c = "), fmpz_print(c), flint_printf("\n\n");
+            flint_printf("r = "), fmpz_print(r), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_clear(c);
+        fmpz_clear(r);
+        fmpz_clear(div);
+    }
+
     /* Check that R(fg, h) = R(f, h) R(g, h) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

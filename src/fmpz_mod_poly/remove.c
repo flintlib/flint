@@ -20,6 +20,12 @@ ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g,
     fmpz_mod_poly_t q, r;
     ulong i = 0;
 
+    if (g->length == 0)
+        flint_throw(FLINT_DIVZERO, "(fmpz_mod_poly_remove): Division by zero.\n");
+
+    if (g->length == 1)
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_remove): Divisor must not be constant.\n");
+
     fmpz_mod_poly_init(q, ctx);
     fmpz_mod_poly_init(r, ctx);
 

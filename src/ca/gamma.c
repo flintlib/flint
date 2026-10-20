@@ -62,15 +62,15 @@ ca_gamma(ca_t res, const ca_t x, ca_ctx_t ctx)
     if (CA_IS_SPECIAL(x))
     {
         /* todo: other signs */
-        if (ca_check_is_pos_inf(x, ctx))
+        if (ca_check_is_pos_inf(x, ctx) == T_TRUE)
         {
             ca_pos_inf(res, ctx);
         }
-        else if (ca_check_is_neg_inf(x, ctx) || ca_check_is_undefined(x, ctx) || ca_check_is_uinf(x, ctx))
+        else if (ca_check_is_neg_inf(x, ctx) == T_TRUE || ca_check_is_undefined(x, ctx) == T_TRUE || ca_check_is_uinf(x, ctx) == T_TRUE)
         {
             ca_undefined(res, ctx);
         }
-        else if (ca_check_is_pos_i_inf(x, ctx) || ca_check_is_neg_i_inf(x, ctx))
+        else if (ca_check_is_pos_i_inf(x, ctx) == T_TRUE || ca_check_is_neg_i_inf(x, ctx) == T_TRUE)
         {
             ca_zero(res, ctx);
         }

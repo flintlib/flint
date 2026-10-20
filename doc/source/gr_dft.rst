@@ -415,7 +415,8 @@ multiplication, accounting for the intermediate sums inside the
     back to a one-shot ball transform. Since the plan construction is
     amortized, the automatic backend selection routes large prime
     factors to the ball path at a lower threshold than the one-shot
-    interface.
+    interface. The initialization returns ``GR_DOMAIN`` for `n \le 0`;
+    the object may be cleared after any return status.
 
 Two-phase plan construction
 -------------------------------------------------------------------------------
@@ -583,6 +584,15 @@ Plan construction
     `w^{n/p} \ne 1` for odd primes `p \mid n`, when these conditions
     are decidable in the ring), returning ``GR_DOMAIN`` on a definite
     failure.
+
+    Over the complex fixed-point contexts
+    (:func:`gr_dft_ctx_init_nfixed_complex`), the root table is always
+    that of `e^{-2\pi i/n}`, computed to the full precision of the
+    context, and *w* only selects this root: it is accepted if it lies
+    within `1/n` of `e^{-2\pi i/n}` (so a value rounded to a lower
+    precision is fine). ``GR_UNABLE`` is returned if *w* approximates
+    another primitive *n*-th root of unity, and ``GR_DOMAIN`` if it
+    approximates no primitive *n*-th root of unity.
 
     If the return status is
     not ``GR_SUCCESS``, the plan is left in a cleared state and must
@@ -765,7 +775,10 @@ and the ring is marked thread-safe.
     arithmetic internally with rigorous error bounds (the same
     scaling and error analysis as :func:`gr_dft_acb`, with the
     composed product bound), falling back to ball arithmetic when
-    fixed point does not apply.
+    fixed point does not apply. The initialization returns
+    ``GR_DOMAIN`` for a zero component length or a product of the
+    component lengths that is too large; the object may be cleared
+    after any return status.
 
 DFT on Dirichlet groups
 -------------------------------------------------------------------------------

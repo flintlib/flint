@@ -106,7 +106,7 @@ FLINT_FORCE_INLINE int _op_compatible(const fft_small_op_struct* X,
    optimization level emits branch-free loops -- GCC only unswitches
    such loops at -O3, and only for some of these kernels. */
 FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, const double* b, ulong m_, ulong depth,
+    double* z, const double* a, const double* b, ulong m_, ulong npts,
     int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
@@ -114,12 +114,11 @@ FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
     vec8d ninv = vec8d_set_d(Q->pinv);
     /* flat over the whole transform: below one block the
        data is simply shorter, the addressing is unchanged */
-    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(npts >= 16 && npts % 16 == 0);
     {
     double* zx = z;
     const double* ax = a;
     const double* bx = b;
-    ulong npts = n_pow2(depth);
     ulong j = 0; do {
             vec8d x0, x1, b0, b1;
             x0 = vec8d_load(ax+j+0);
@@ -145,30 +144,29 @@ FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
 }
 
 static void _point_mul(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, const double* b, ulong m_, ulong depth)
+    double* z, const double* a, const double* b, ulong m_, ulong npts)
 {
     if (m_ == 1)
-        _point_mul_impl(Q, z, a, b, m_, depth, 1);
+        _point_mul_impl(Q, z, a, b, m_, npts, 1);
     else
-        _point_mul_impl(Q, z, a, b, m_, depth, 0);
+        _point_mul_impl(Q, z, a, b, m_, npts, 0);
 }
 
 /* z = a*a*m; by-m-first (or reduce-first with the normalizer deferred)
    exactly as _point_mul, for the same range containment; constant
    specialization for the same branch-free loops. */
 FLINT_FORCE_INLINE void _point_sqr_impl(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, ulong m_, ulong depth, int m_is_one)
+    double* z, const double* a, ulong m_, ulong npts, int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     /* flat over the whole transform: below one block the
        data is simply shorter, the addressing is unchanged */
-    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(npts >= 16 && npts % 16 == 0);
     {
     double* zx = z;
     const double* ax = a;
-    ulong npts = n_pow2(depth);
     ulong j = 0; do {
             vec8d x0, x1, t0, t1;
             x0 = vec8d_load(ax+j+0);
@@ -192,30 +190,29 @@ FLINT_FORCE_INLINE void _point_sqr_impl(const sd_fft_ctx_struct* Q,
 }
 
 static void _point_sqr(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, ulong m_, ulong depth)
+    double* z, const double* a, ulong m_, ulong npts)
 {
     if (m_ == 1)
-        _point_sqr_impl(Q, z, a, m_, depth, 1);
+        _point_sqr_impl(Q, z, a, m_, npts, 1);
     else
-        _point_sqr_impl(Q, z, a, m_, depth, 0);
+        _point_sqr_impl(Q, z, a, m_, npts, 0);
 }
 
 /* z = z +/- a*b*m */
 FLINT_FORCE_INLINE void _point_addmul_impl(const sd_fft_ctx_struct* Q,
     double* z, const double* a, const double* b, ulong m_, int subtract,
-    ulong depth, int m_is_one)
+    ulong npts, int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     /* flat over the whole transform: below one block the
        data is simply shorter, the addressing is unchanged */
-    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(npts >= 16 && npts % 16 == 0);
     {
     double* zx = z;
     const double* ax = a;
     const double* bx = b;
-    ulong npts = n_pow2(depth);
     ulong j = 0; do {
             vec8d x0, x1, b0, b1, z0, z1;
             x0 = vec8d_load(ax+j+0);
@@ -256,30 +253,29 @@ FLINT_FORCE_INLINE void _point_addmul_impl(const sd_fft_ctx_struct* Q,
 
 static void _point_addmul(const sd_fft_ctx_struct* Q,
     double* z, const double* a, const double* b, ulong m_, int subtract,
-    ulong depth)
+    ulong npts)
 {
     if (m_ == 1)
-        _point_addmul_impl(Q, z, a, b, m_, subtract, depth, 1);
+        _point_addmul_impl(Q, z, a, b, m_, subtract, npts, 1);
     else
-        _point_addmul_impl(Q, z, a, b, m_, subtract, depth, 0);
+        _point_addmul_impl(Q, z, a, b, m_, subtract, npts, 0);
 }
 
 /* z = z +/- a*a*m: _point_addmul over a single load stream, with the
    by-m-first ordering of _point_sqr for the same range containment */
 FLINT_FORCE_INLINE void _point_addsqr_impl(const sd_fft_ctx_struct* Q,
     double* z, const double* a, ulong m_, int subtract,
-    ulong depth, int m_is_one)
+    ulong npts, int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
     /* flat over the whole transform: below one block the
        data is simply shorter, the addressing is unchanged */
-    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(npts >= 16 && npts % 16 == 0);
     {
     double* zx = z;
     const double* ax = a;
-    ulong npts = n_pow2(depth);
     ulong j = 0; do {
             vec8d x0, x1, t0, t1, z0, z1;
             x0 = vec8d_load(ax+j+0);
@@ -317,28 +313,27 @@ FLINT_FORCE_INLINE void _point_addsqr_impl(const sd_fft_ctx_struct* Q,
 }
 
 static void _point_addsqr(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, ulong m_, int subtract, ulong depth)
+    double* z, const double* a, ulong m_, int subtract, ulong npts)
 {
     if (m_ == 1)
-        _point_addsqr_impl(Q, z, a, m_, subtract, depth, 1);
+        _point_addsqr_impl(Q, z, a, m_, subtract, npts, 1);
     else
-        _point_addsqr_impl(Q, z, a, m_, subtract, depth, 0);
+        _point_addsqr_impl(Q, z, a, m_, subtract, npts, 0);
 }
 
 /* z = a +/- b, or z = -a for b == NULL */
 static void _point_add(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, const double* b, int subtract, ulong depth)
+    double* z, const double* a, const double* b, int subtract, ulong npts)
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
 /* flat over the whole transform: below one block the
        data is simply shorter, the addressing is unchanged */
-    FLINT_ASSERT(depth >= 4);
+    FLINT_ASSERT(npts >= 16 && npts % 16 == 0);
     {
     double* zx = z;
     const double* ax = a;
     const double* bx = b;
-    ulong npts = n_pow2(depth);
     ulong j = 0; do {
             vec8d x0, x1;
             x0 = vec8d_load(ax+j+0);
@@ -368,6 +363,18 @@ static void _point_add(const sd_fft_ctx_struct* Q,
     }
 }
 
+/* the points the pointwise operations cover: the plan's output
+   truncation ztrunc at the granularity of the transforms
+   (_fft_small_op_trunc), which is all the forward transforms produce
+   and the truncated inverse transforms read -- not the whole 2^depth,
+   up to twice as many; below a block that granularity is the full
+   length */
+static ulong
+_op_npts(const fft_small_plan_struct * P)
+{
+    return n_min(_fft_small_op_trunc(P->ztrunc, P), n_pow2(P->depth));
+}
+
 void fft_small_op_mul(fft_small_op_t Z, const fft_small_op_t A,
                     const fft_small_op_t B, const fft_small_plan_t P)
 {
@@ -381,7 +388,7 @@ void fft_small_op_mul(fft_small_op_t Z, const fft_small_op_t A,
     for (i = 0; i < P->np; i++)
         _point_mul(P->ffts + P->offset + i, Z->data + P->stride*i,
                 A->data + P->stride*i, B->data + P->stride*i,
-                P->m[i], P->depth);
+                P->m[i], _op_npts(P));
 
     Z->domain = FFT_SMALL_OP_PRODUCT;
 }
@@ -396,7 +403,7 @@ void fft_small_op_sqr(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_sqr(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, P->m[i], P->depth);
+                A->data + P->stride*i, P->m[i], _op_npts(P));
 
     Z->domain = FFT_SMALL_OP_PRODUCT;
 }
@@ -415,7 +422,7 @@ void fft_small_op_addmul(fft_small_op_t Z, const fft_small_op_t A,
     for (i = 0; i < P->np; i++)
         _point_addmul(P->ffts + P->offset + i, Z->data + P->stride*i,
                 A->data + P->stride*i, B->data + P->stride*i,
-                P->m[i], 0, P->depth);
+                P->m[i], 0, _op_npts(P));
 }
 
 void fft_small_op_submul(fft_small_op_t Z, const fft_small_op_t A,
@@ -432,7 +439,7 @@ void fft_small_op_submul(fft_small_op_t Z, const fft_small_op_t A,
     for (i = 0; i < P->np; i++)
         _point_addmul(P->ffts + P->offset + i, Z->data + P->stride*i,
                 A->data + P->stride*i, B->data + P->stride*i,
-                P->m[i], 1, P->depth);
+                P->m[i], 1, _op_npts(P));
 }
 
 /* Z +/-= A*A. Equivalent to fft_small_op_addmul/submul with B = A and
@@ -449,7 +456,7 @@ void fft_small_op_addsqr(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_addsqr(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, P->m[i], 0, P->depth);
+                A->data + P->stride*i, P->m[i], 0, _op_npts(P));
 }
 
 void fft_small_op_subsqr(fft_small_op_t Z, const fft_small_op_t A,
@@ -463,7 +470,7 @@ void fft_small_op_subsqr(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_addsqr(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, P->m[i], 1, P->depth);
+                A->data + P->stride*i, P->m[i], 1, _op_npts(P));
 }
 
 void fft_small_op_add(fft_small_op_t Z, const fft_small_op_t A,
@@ -477,7 +484,7 @@ void fft_small_op_add(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_add(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, B->data + P->stride*i, 0, P->depth);
+                A->data + P->stride*i, B->data + P->stride*i, 0, _op_npts(P));
 
     Z->domain = A->domain;
 }
@@ -493,7 +500,7 @@ void fft_small_op_sub(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_add(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, B->data + P->stride*i, 1, P->depth);
+                A->data + P->stride*i, B->data + P->stride*i, 1, _op_npts(P));
 
     Z->domain = A->domain;
 }
@@ -507,7 +514,7 @@ void fft_small_op_neg(fft_small_op_t Z, const fft_small_op_t A,
 
     for (i = 0; i < P->np; i++)
         _point_add(P->ffts + P->offset + i, Z->data + P->stride*i,
-                A->data + P->stride*i, NULL, 0, P->depth);
+                A->data + P->stride*i, NULL, 0, _op_npts(P));
 
     Z->domain = A->domain;
 }
@@ -515,6 +522,8 @@ void fft_small_op_neg(fft_small_op_t Z, const fft_small_op_t A,
 typedef struct {
     fft_small_op_struct* X;
     const fft_small_plan_struct* P;
+    ulong itrunc;       /* output truncation of the transposed forward transform */
+    int transposed;
     ulong start_pi;
     ulong stop_pi;
 } _ifft_worker_struct;
@@ -525,11 +534,21 @@ static void _ifft_worker_func(void* varg)
     const fft_small_plan_struct* P = W->P;
 
     for (ulong i = W->start_pi; i < W->stop_pi; i++)
-        sd_ifft_trunc(P->ffts + P->offset + i, W->X->data + P->stride*i,
-                P->depth, P->ztrunc);
+    {
+        if (W->transposed)
+            sd_fft_trunc_tr(P->ffts + P->offset + i, W->X->data + P->stride*i,
+                    P->depth, W->itrunc, P->ztrunc);
+        else
+            sd_ifft_trunc(P->ffts + P->offset + i, W->X->data + P->stride*i,
+                    P->depth, P->ztrunc);
+    }
 }
 
-void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
+/* the inverse transform of a product, or, transposed, the transpose of the
+   forward transform of an operand of truncation itrunc; both consume the
+   normalization the pointwise stage applied */
+static void _op_ifft(fft_small_op_t X, ulong itrunc, int transposed,
+                    const fft_small_plan_t P)
 {
     ulong i;
     thread_pool_handle* handles = NULL;
@@ -539,6 +558,7 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
 
     FLINT_ASSERT(_op_compatible(X, P));
     FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+    FLINT_ASSERT(itrunc <= P->ztrunc);
 
     /* thread over the primes; ztrunc ~ an + bn, so this corresponds to
        the fused drivers threading from operand length ~1500 up */
@@ -550,6 +570,8 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
     {
         args[i].X = X;
         args[i].P = P;
+        args[i].itrunc = itrunc;
+        args[i].transposed = transposed;
         args[i].start_pi = (i+0)*P->np/nthreads;
         args[i].stop_pi  = (i+1)*P->np/nthreads;
     }
@@ -562,4 +584,15 @@ void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
         thread_pool_wait(global_thread_pool, handles[i - 1]);
 
     flint_give_back_threads(handles, nworkers);
+}
+
+void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P)
+{
+    _op_ifft(X, P->ztrunc, 0, P);
+}
+
+void fft_small_fft_tr(fft_small_op_t X, ulong itrunc, const fft_small_plan_t P)
+{
+    _op_ifft(X, itrunc, 1, P);
+    X->itrunc = itrunc;
 }

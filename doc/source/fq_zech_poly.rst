@@ -379,42 +379,6 @@ Multiplication
     Sets ``rop`` to the product of ``op1`` and ``op2``
     using classical polynomial multiplication.
 
-.. function:: void _fq_zech_poly_mul_reorder(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
-
-    Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
-    and ``(op2, len2)``, assuming that ``len1`` and ``len2`` are
-    non-zero.
-
-    Permits zero padding.  Supports aliasing.
-
-.. function:: void fq_zech_poly_mul_reorder(fq_zech_poly_t rop, const fq_zech_poly_t op1, const fq_zech_poly_t op2, const fq_zech_ctx_t ctx)
-
-    Sets ``rop`` to the product of ``op1`` and ``op2``,
-    reordering the two indeterminates `X` and `Y` when viewing
-    the polynomials as elements of `\mathbf{F}_p[X,Y]`.
-
-    Suppose `\mathbf{F}_q = \mathbf{F}_p[X]/ (f(X))` and recall
-    that elements of `\mathbf{F}_q` are internally represented
-    by elements of type ``fmpz_poly``.  For small degree extensions
-    but polynomials in `\mathbf{F}_q[Y]` of large degree `n`, we
-    change the representation to
-
-
-    .. math::
-
-
-        \begin{split}
-        g(Y) & = \sum_{i=0}^{n} a_i(X) Y^i \\
-             & = \sum_{j=0}^{d} \sum_{i=0}^{n} \text{Coeff}(a_i(X), j) Y^i.
-        \end{split}
-
-
-
-    This allows us to use a poor algorithm (such as classical multiplication)
-    in the `X`-direction and leverage the existing fast integer
-    multiplication routines in the `Y`-direction where the polynomial
-    degree `n` is large.
-
 .. function:: void _fq_zech_poly_mul_KS(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``

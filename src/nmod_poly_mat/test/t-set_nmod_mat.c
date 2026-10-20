@@ -32,6 +32,7 @@ TEST_FUNCTION_START(nmod_poly_mat_set_nmod_mat, state)
 
         nmod_poly_mat_init(pmat, m, n, mod);
         nmod_mat_init(cmat, m, n, mod);
+        nmod_mat_randtest(cmat, state);
 
         nmod_poly_mat_set_nmod_mat(pmat, cmat);
         if (! nmod_poly_mat_equal_nmod_mat(pmat, cmat))

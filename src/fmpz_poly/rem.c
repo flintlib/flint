@@ -61,7 +61,7 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenB - 1;
+        R->alloc  = lenA;
     }
     _fmpz_poly_set_length(R, lenA);
     _fmpz_poly_normalise(R);

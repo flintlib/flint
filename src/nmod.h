@@ -279,11 +279,7 @@ ulong nmod_2_pow_ui(ulong exp, nmod_t mod);
 int _nmod_sqrt_small(ulong * res, ulong a, ulong n);
 int nmod_sqrt(ulong * res, ulong a, nmod_t mod);
 
-NMOD_INLINE
-ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
-{
-    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
-}
+ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod);
 
 NMOD_INLINE
 void nmod_init(nmod_t * mod, ulong n)

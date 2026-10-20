@@ -42,6 +42,11 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz *q, *r;
     fmpz_t invB;
 
+    if (lenB == 0)
+    {
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
+    }
+
     fmpz_init(invB);
     fmpz_gcdinv(f, invB, fmpz_mod_poly_lead(B, ctx), fmpz_mod_ctx_modulus(ctx));
 
@@ -49,12 +54,6 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         fmpz_clear(invB);
         return;
-    }
-
-    if (lenB == 0)
-    {
-        fmpz_clear(invB); /* flint_throw */
-        flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
     }
 
     if (lenA < lenB)

@@ -63,10 +63,10 @@ typedef struct
     nn_ptr ext_s1f;         /* extrapolate: forward scaling constant  */
     nn_ptr ext_s1b;         /* extrapolate: backward scaling constant */
     nn_ptr ext_s2, ext_s3;  /* extrapolate: shared scaling constants */
-    struct mul_precomp_struct * ev_f_fft;    /* stored FFT of ev_f, or NULL */
-    struct mul_precomp_struct * int_f_fft;   /* stored FFT of int_f, or NULL */
-    struct mul_precomp_struct * ext_ff_fft;  /* stored FFT of ext_ff, or NULL */
-    struct mul_precomp_struct * ext_fb_fft;  /* stored FFT of ext_fb, or NULL */
+    struct mul_precomp_struct * ev_f_fft;    /* stored ifft_tr of ev_f, or NULL */
+    struct mul_precomp_struct * int_f_fft;   /* stored fft of int_f, or NULL */
+    struct mul_precomp_struct * ext_ff_fft;  /* stored ifft_tr of ext_ff, or NULL */
+    struct mul_precomp_struct * ext_fb_fft;  /* stored ifft_tr of ext_fb, or NULL */
     nmod_t mod;             /* modulus */
     slong len;              /* number of points */
     ulong function;         /* choice of precomputations */
@@ -746,16 +746,14 @@ slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod);
 /* XGCD:  Euclidean -> HGCD */
 slong nmod_poly_xgcd_hgcd_cutoff(nmod_t mod);
 
-/* Euclidean GCD: normal -> redc_fast */
-#define NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod) (lenB >= 32 && NMOD_BITS(mod) >= FLINT_BITS / 2 && NMOD_BITS(mod) <= FLINT_BITS - 2)
+/* Euclidean GCD: normal -> redc_fast (Montgomery arithmetic needs an odd modulus) */
+#define NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod) ((lenB) >= 32 && ((mod).n & 1) && NMOD_BITS(mod) >= FLINT_BITS / 2 && NMOD_BITS(mod) <= FLINT_BITS - 2)
 
 slong _nmod_poly_gcd_euclidean(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
 
 slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean_redc_fast(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
-
-slong _nmod_poly_hgcd_recursive(nn_ptr *M, slong *lenM, nn_ptr A, slong *lenA, nn_ptr B, slong *lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nn_ptr P, nmod_t mod, int flag, nmod_poly_res_t res);
 
 slong nmod_poly_hgcd_ref(nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22, nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
 

@@ -337,7 +337,7 @@ ca_tan_special(ca_t res, const ca_t x, ca_ctx_t ctx)
         return;
     }
 
-    if (ca_is_unknown(res, ctx))
+    if (ca_is_unknown(x, ctx))
         ca_unknown(res, ctx);
     else
         ca_undefined(res, ctx);

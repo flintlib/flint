@@ -17,15 +17,15 @@ dirichlet_vec_set_null(ulong *v, const dirichlet_group_t G, slong nv)
     slong k, l;
     if (G->q_even > 1)
     {
-        for (k = 2; k < nv; k += 2)
-            v[k] = -1;
+        for (k = 0; k < nv; k += 2)
+            v[k] = DIRICHLET_CHI_NULL;
     }
 
     for (l = G->neven; l < G->num; l++)
     {
         ulong p = G->P[l].p;
 
-        for (k = p; k < nv; k += p)
+        for (k = 0; k < nv; k += p)
             v[k] = DIRICHLET_CHI_NULL;
     }
 }

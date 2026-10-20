@@ -84,6 +84,36 @@ TEST_FUNCTION_START(fmpz_mpoly_factor_squarefree, state)
 {
     slong i, j, tmul = 30;
 
+    /* _fmpz_mpoly_factor_squarefree(f, A, e) multiplies f by sqf(A)^e
+       (regression test: the exponent e used to be ignored) */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b;
+        fmpz_mpoly_factor_t f;
+        fmpz_t e;
+        const char * vars[] = {"x", "y"};
+
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_factor_init(f, ctx);
+        fmpz_init_set_ui(e, 3);
+
+        fmpz_mpoly_set_str_pretty(a, "(x + y + 1)^2*(x - y)", vars, ctx);
+        fmpz_mpoly_pow_ui(b, a, 3, ctx);
+        if (!_fmpz_mpoly_factor_squarefree(f, a, e, ctx) ||
+            !fmpz_mpoly_factor_matches(b, f, ctx))
+        {
+            TEST_FUNCTION_FAIL("_fmpz_mpoly_factor_squarefree with e = 3\n");
+        }
+
+        fmpz_clear(e);
+        fmpz_mpoly_factor_clear(f, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;

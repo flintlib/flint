@@ -572,6 +572,16 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
     }
 }
 
+/* z1 = a x (an + xn limbs) and z2 = b x (bn + xn limbs), the
+   operands in any order of lengths (all >= 1); with fft_small the
+   transform of x is shared when both products are long enough
+   (_flint_mpn_mul_shared_use_fft), else two products are formed. The
+   outputs must not overlap each other or the inputs. */
+void flint_mpn_mul_shared(mp_ptr z1, mp_srcptr a, mp_size_t an,
+    mp_ptr z2, mp_srcptr b, mp_size_t bn, mp_srcptr x, mp_size_t xn);
+int _flint_mpn_mul_shared_use_fft(mp_size_t an, mp_size_t bn,
+    mp_size_t xn);
+
 /* Like flint_mpn_mul but allow operands in either order, completely
    inline some small products, and also check for squaring. */
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \

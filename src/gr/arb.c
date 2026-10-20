@@ -1499,6 +1499,95 @@ _gr_arb_lerch_phi(arb_t res, const arb_t z, const arb_t s, const arb_t a, const 
 }
 
 static int
+_gr_arb_zeta_ui(arb_t res, ulong n, const gr_ctx_t ctx)
+{
+    if (n == 1)
+        return GR_DOMAIN;
+
+    arb_zeta_ui(res, n, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_arb_bernpoly_ui(arb_t res, ulong n, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_bernoulli_poly_ui(res, n, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+/* E_n(x) = 2 (B_{n+1}(x) - 2^(n+1) B_{n+1}(x/2)) / (n+1) */
+static int
+_gr_arb_eulerpoly_ui(arb_t res, ulong n, const arb_t x, const gr_ctx_t ctx)
+{
+    slong prec = ARB_CTX_PREC(ctx), wp;
+    arb_t t, u;
+    fmpz_t e;
+    mag_t m;
+
+    if (n == UWORD_MAX)
+        return GR_UNABLE;
+
+    /* the leading terms cancel when |x| is large */
+    mag_init(m);
+    arb_get_mag(m, x);
+    wp = prec + 2 * FLINT_BIT_COUNT(n) + 10;
+    if (mag_cmp_2exp_si(m, 0) > 0)
+        wp += (slong) FLINT_MIN(mag_get_d_log2_approx(m), 4.0 * prec + 100.0);
+    mag_clear(m);
+
+    arb_init(t);
+    arb_init(u);
+    fmpz_init_set_ui(e, n);
+    fmpz_add_ui(e, e, 1);
+    arb_bernoulli_poly_ui(t, n + 1, x, wp);
+    arb_mul_2exp_si(u, x, -1);
+    arb_bernoulli_poly_ui(u, n + 1, u, wp);
+    arb_mul_2exp_fmpz(u, u, e);
+    arb_sub(t, t, u, wp);
+    arb_div_ui(t, t, n + 1, wp);
+    arb_mul_2exp_si(res, t, 1);
+    arb_set_round(res, res, prec);
+    arb_clear(t);
+    arb_clear(u);
+    fmpz_clear(e);
+
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+static int
+_gr_arb_dirichlet_beta(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    acb_t t;
+    int status;
+
+    acb_init(t);
+    acb_set_arb(t, x);
+    status = _gr_acb_dirichlet_beta_prec(t, t, ARB_CTX_PREC(ctx));
+    /* the character is real, so the value is real for real x */
+    if (status == GR_SUCCESS)
+        arb_swap(res, acb_realref(t));
+    acb_clear(t);
+    return status;
+}
+
+/* prod_{k >= 1} (1 - q^k), see _gr_acb_dedekind_eta_q_prec */
+static int
+_gr_arb_dedekind_eta_q(arb_t res, const arb_t q, const gr_ctx_t ctx)
+{
+    acb_t t;
+    int status;
+
+    acb_init(t);
+    acb_set_arb(t, q);
+    status = _gr_acb_dedekind_eta_q_prec(t, t, ARB_CTX_PREC(ctx));
+    /* the value is real for real q */
+    if (status == GR_SUCCESS)
+        arb_swap(res, acb_realref(t));
+    acb_clear(t);
+    return status;
+}
+
+static int
 _gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1852,6 +1941,9 @@ _gr_arb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, 
 static int
 _gr_arb_mat_mul(arb_mat_t res, const arb_mat_t x, const arb_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     arb_mat_mul(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
@@ -2036,6 +2128,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_arb_barnes_g},
     {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_arb_log_barnes_g},
     {GR_METHOD_DIRICHLET_ETA,   (gr_funcptr) _gr_arb_dirichlet_eta},
+    {GR_METHOD_DIRICHLET_BETA,  (gr_funcptr) _gr_arb_dirichlet_beta},
+    {GR_METHOD_DEDEKIND_ETA_Q,  (gr_funcptr) _gr_arb_dedekind_eta_q},
     {GR_METHOD_RIEMANN_XI,      (gr_funcptr) _gr_arb_riemann_xi},
     {GR_METHOD_POLYGAMMA,       (gr_funcptr) _gr_arb_polygamma},
     {GR_METHOD_LERCH_PHI,       (gr_funcptr) _gr_arb_lerch_phi},
@@ -2107,6 +2201,9 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_HYPGEOM_2F1,          (gr_funcptr) _gr_arb_hypgeom_2f1},
     {GR_METHOD_HYPGEOM_PFQ,          (gr_funcptr) _gr_arb_hypgeom_pfq},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
+    {GR_METHOD_ZETA_UI,         (gr_funcptr) _gr_arb_zeta_ui},
+    {GR_METHOD_BERNPOLY_UI,     (gr_funcptr) _gr_arb_bernpoly_ui},
+    {GR_METHOD_EULERPOLY_UI,    (gr_funcptr) _gr_arb_eulerpoly_ui},
     {GR_METHOD_POLYLOG,         (gr_funcptr) _gr_arb_polylog},
     {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) _gr_arb_hurwitz_zeta},
     {GR_METHOD_AGM,             (gr_funcptr) _gr_arb_agm},

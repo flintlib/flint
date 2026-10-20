@@ -35,6 +35,20 @@ TEST_FUNCTION_START(fq_zech_get_set_nmod_poly, state)
 
             fq_zech_randtest(a, state, ctx);
             fq_zech_get_nmod_poly(c, a, ctx);
+
+            /* the old value of the output is overwritten */
+            nmod_poly_randtest(t, state, 20);
+            fq_zech_get_nmod_poly(t, a, ctx);
+            if (!nmod_poly_equal(t, c) || nmod_poly_degree(t) >= fq_zech_ctx_degree(ctx))
+            {
+                flint_printf("FAIL: old coefficients kept\n");
+                fq_zech_ctx_print(ctx);
+                flint_printf("\n");
+                flint_printf("c = "), nmod_poly_print_pretty(c, "x"), flint_printf("\n");
+                flint_printf("t = "), nmod_poly_print_pretty(t, "x"), flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
             nmod_poly_randtest(t, state, 20);
             nmod_poly_mul(t, t, ctx->fq_nmod_ctx->modulus);
             nmod_poly_add(c, c, t);

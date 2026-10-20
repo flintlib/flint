@@ -933,9 +933,17 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     */
     if (result == PROBABPRIME)
     {
-        /* if we don't find divisors of n then n is composite */
+        /* if we find a divisor of n then n is composite */
         if (aprcl_is_prime_final_division(n, config->s, config->R) == 1)
-            result = PRIME;
+        {
+            /*
+                If we don't find a divisor, n is prime provided that
+                s^2 > n (the configurations from aprcl_config_jacobi_init
+                satisfy this); otherwise primality is not proved.
+            */
+            fmpz_mul(temp, config->s, config->s);
+            result = (fmpz_cmp(temp, n) > 0) ? PRIME : UNKNOWN;
+        }
         else
             result = COMPOSITE;
     }

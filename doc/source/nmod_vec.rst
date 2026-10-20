@@ -248,7 +248,14 @@ performed at the very end of the computation.
     Internals, subject to change: its field ``method`` indicates the method that
     will be used to compute a dot product of this length ``len`` when working
     with the given ``mod``. Its field ``pow2_precomp`` is set to ``2**DOT_SPLIT_BITS
-    % mod.n`` if ``method == _DOT2_SPLIT``, and to `0` otherwise.
+    % mod.n`` if ``method == _DOT2_SPLIT``, or if ``method == _DOT2_HALF`` and
+    FLINT was built with AVX2, and to `0` otherwise. The methods
+    ``_DOT2_SPLIT`` and ``_DOT2_HALF`` (the latter with AVX2) are only
+    selected for lengths at which their accumulators cannot overflow.
+
+    This is a function of the library (not an inline function), so that the
+    method matches the kernels FLINT was compiled with, independently of the
+    compiler flags of the calling code.
 
 .. function:: ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 

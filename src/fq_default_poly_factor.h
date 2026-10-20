@@ -60,7 +60,7 @@ void fq_default_poly_factor_init(fq_default_poly_factor_t fac,
     {
         nmod_poly_factor_init(fac->nmod);
     }
-    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_factor_init(fac->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }

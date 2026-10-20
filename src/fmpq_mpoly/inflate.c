@@ -14,7 +14,7 @@
 void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
            const fmpz * shift, const fmpz * stride, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_inflate(A->zpoly, A->zpoly, shift, stride, ctx->zctx);
+    fmpz_mpoly_inflate(A->zpoly, B->zpoly, shift, stride, ctx->zctx);
     fmpq_set(A->content, B->content);
     fmpq_mpoly_reduce(A, ctx);
 }

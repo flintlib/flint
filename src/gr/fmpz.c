@@ -1130,6 +1130,33 @@ _gr_fmpz_poly_taylor_shift(fmpz * res, const fmpz * poly, slong len, const fmpz_
     return GR_SUCCESS;
 }
 
+/* assumes lenA >= lenB >= 1 with nonzero leading coefficients;
+   (_fmpz_poly_gcd does not call back into gr_poly) */
+static int
+_gr_fmpz_poly_gcd(fmpz * G, slong * lenG, const fmpz * A, slong lenA, const fmpz * B, slong lenB, gr_ctx_t ctx)
+{
+    slong len;
+
+    if (G == A || G == B)
+    {
+        fmpz * T = _fmpz_vec_init(lenB);
+        _fmpz_poly_gcd(T, A, lenA, B, lenB);
+        _fmpz_vec_swap(G, T, lenB);
+        _fmpz_vec_clear(T, lenB);
+    }
+    else
+    {
+        _fmpz_poly_gcd(G, A, lenA, B, lenB);
+    }
+
+    len = lenB;
+    while (len > 0 && fmpz_is_zero(G + len - 1))
+        len--;
+
+    *lenG = len;
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fmpz_poly_inv_series_basecase(fmpz * res,
     const fmpz * f, slong flen, slong n, gr_ctx_t ctx)
@@ -1223,6 +1250,9 @@ _gr_fmpz_roots_gr_poly_other(gr_vec_t roots, gr_vec_t mult, /* const gr_poly_t *
 static int
 _gr_fmpz_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fmpz_mat_mul(res, x, y);
     return GR_SUCCESS;
 }
@@ -1395,6 +1425,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_poly_mulmid},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_fmpz_poly_divexact2},
     {GR_METHOD_POLY_TAYLOR_SHIFT, (gr_funcptr) _gr_fmpz_poly_taylor_shift},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fmpz_poly_gcd},
     {GR_METHOD_POLY_INV_SERIES_BASECASE, (gr_funcptr) _gr_fmpz_poly_inv_series_basecase},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_roots_gr_poly},

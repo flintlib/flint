@@ -114,5 +114,58 @@ TEST_FUNCTION_START(fmpz_poly_rem_basecase, state)
         fmpz_poly_clear(r);
     }
 
+    /* Check fmpz_poly_rem against rem_basecase, with aliasing; the
+       remainder may be as long as a (regression test: wrong alloc) */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, b, r;
+        int alias_b = n_randint(state, 2);
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(r);
+
+        if (i == 0)
+        {
+            fmpz_poly_set_str(a, "3  1 1 1");
+            fmpz_poly_set_str(b, "2  1 2");
+            alias_b = 0;
+        }
+        else
+        {
+            fmpz_poly_randtest(a, state, n_randint(state, 50), 100);
+            fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
+        }
+
+        fmpz_poly_rem_basecase(r, a, b);
+        if (alias_b)
+        {
+            fmpz_poly_rem(b, a, b);
+            fmpz_poly_swap(a, b);
+        }
+        else
+            fmpz_poly_rem(a, a, b);
+
+        result = (fmpz_poly_equal(a, r) && a->length <= a->alloc);
+
+        /* growing the result must keep its coefficients */
+        fmpz_poly_set_coeff_ui(a, a->length + 1, 1);
+        fmpz_poly_set_coeff_ui(r, r->length + 1, 1);
+        result = result && fmpz_poly_equal(a, r);
+
+        if (!result)
+        {
+            flint_printf("FAIL (fmpz_poly_rem, aliasing):\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(r), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(r);
+    }
+
     TEST_FUNCTION_END(state);
 }
