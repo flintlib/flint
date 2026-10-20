@@ -147,11 +147,10 @@ return. The main caches are:
 - the pool of GMP integers that `fmpz` reuses (in the default build);
 - tables of primes and of their inverses (`n_primes_arr_readonly`), and
   the product tree used for trial division;
-- constants of ball arithmetic such as $\pi$, $\log 2$ and Euler's
-  constant at precisions beyond the built-in tables, the logarithms of
+- constants of ball arithmetic such as $\pi$, $\log 2$ at precisions
+  beyond the built-in tables, the logarithms of
   small primes used by the elementary functions, Bernoulli numbers and
-  Gauss–Legendre quadrature nodes (see
-  [](guide/ball-arithmetic/pitfalls#caches));
+  quadrature nodes (see [](guide/ball-arithmetic/pitfalls#caches));
 - precomputed tables of [](fft_small), of radix conversion, and of some
   matrix multiplication kernels;
 - the constants and tables of [](mp_real), which are shared by all
@@ -159,11 +158,7 @@ return. The main caches are:
 - the threads of the global thread pool.
 
 This memory is not leaked, since it remains reachable and is reused,
-but tools such as Valgrind report it as "still reachable". MPFR keeps
-caches of its own (of constants such as $\pi$ and $\log 2$), which are
-filled only when MPFR functions that need them are called; FLINT calls
-such functions only in a few places, such as `n_clog_2exp` and
-`qfb_exponent_grh`, but the program itself may call MPFR.
+but tools such as Valgrind report it as "still reachable".
 
 Most caches belong to the thread that created them (when FLINT is built
 with thread-local storage, the default). `flint_cleanup()` frees the

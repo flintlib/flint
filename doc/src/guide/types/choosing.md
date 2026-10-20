@@ -24,10 +24,8 @@ allocation, no branches on the size of the operands and no pointer
 chasing, and can be packed into vectors and matrices on which
 vectorised kernels operate. If the modulus is below $2^{64}$, `nmod`
 types are several times faster than `fmpz_mod` types for the same
-computation (for a 60-bit prime, `nmod_poly_mul` is 2 to 6 times and
-`nmod_poly_gcd` 9 to 20 times faster than their `fmpz_mod_poly`
-counterparts at lengths 20 to 1000 on an x86-64 machine); if a finite field has fewer than about $2^{16}$ elements,
-Zech logarithms make multiplication an integer addition. The price is a
+computation; for small non-prime finite fields, Zech logarithms
+are much faster than polynomial representations. The price is a
 limit on the parameters, which the tables below give for each type.
 
 *Use the type of the module that does what you need.* The classic
@@ -35,15 +33,14 @@ modules (`fmpz_poly`, `nmod_mat`, `fmpz_mpoly`, ...) contain algorithms
 that exist for one ring only: factorisation of integer polynomials, LLL
 reduction, Hermite normal forms, multivariate GCDs. Before choosing a
 representation for speed, check that the module of that type has the
-operations your program needs; converting between types costs time and
-code.
+operations your program needs.
 
 *Decide between exact and approximate arithmetic.* Exact types (`fmpz`,
 `fmpq`, residues, finite fields, number fields, `qqbar`, `ca`) give
 exact results whose size may grow. Ball types (`arb`, `acb` and the
 `dfloat` and `decimal` balls) give rigorous error bounds at a fixed
 working precision. Floating-point types (`arf`, `nfloat`, the `dfloat`
-numbers, `double`) give approximations without any bound. See
+numbers, `double`) give approximations without automatic error tracking. See
 [](guide/ball-arithmetic) and [](guide/exact).
 
 *Use the generic interface for rings that have no module of their own
@@ -58,10 +55,9 @@ described in [](guide/types/generic-programming).
 
 *Mind the context.* Types whose parameters are not stored in the
 object (`fmpz_mod`, `fq`, `padic`, the multivariate types, `gr`) take a
-context argument, which must outlive the objects; types such as
-`nmod_poly` and `nmod_mat` store their modulus in each object, which is
-simpler to call but makes objects larger. This rarely decides the
-choice, but it determines the shape of the code.
+context argument, which must outlive the objects. For historical reasons,
+the `nmod_poly` and `nmod_mat` types store their modulus in each object,
+which is simpler to call but makes objects larger.
 
 ## Integers {#integers}
 
@@ -73,13 +69,6 @@ choice, but it determines the shape of the code.
 | `radix_integer_t` in [`radix`](radix) | integers in a radix such as $10^{19}$ | | decimal or base-$p$ digit manipulation and conversion in linear time |
 | `fmpzi_t` in [`fmpzi`](fmpzi) | Gaussian integers $\Z[i]$ | memory | Euclidean division, GCD and primality in $\Z[i]$ |
 | `fmpq_t` in [`fmpq`](fmpq) | a rational number in lowest terms | memory | exact rational arithmetic; vectors and matrices in [`fmpq_vec`](fmpq_vec) and [`fmpq_mat`](fmpq_mat) |
-
-Word arithmetic does not check for overflow; `z_add_checked` and
-`z_mul_checked` report it. `fmpz` is the right choice whenever values
-are not provably bounded: small values cost a branch but no memory
-allocation. The number theory of `fmpz` integers
-(factoring, primality, CRT) is in [`fmpz`](fmpz),
-[`fmpz_factor`](fmpz_factor), [`aprcl`](aprcl) and [`qsieve`](qsieve).
 
 ## Integers modulo n {#mod-n}
 
@@ -94,12 +83,8 @@ Operations that divide (polynomial division and GCD, matrix inversion
 and solving) generally require a prime modulus, or at least invertible
 pivots and leading coefficients. With the classic types the requirement
 is a documented precondition, and violating it raises an exception or
-gives undefined results; the generic interface instead returns
-`GR_DOMAIN` or `GR_UNABLE`. Some `nmod` functions with a leading
-underscore need $n \le 2^{\bits - 1}$ (see the module page).
-`fmpz_mod` itself switches to `nmod` arithmetic for one-word moduli and
-to a two-limb Barrett reduction below $2^{2\bits}$
-([](fmpz_mod/usage)).
+gives undefined results; the generic `gr` interface instead returns
+`GR_DOMAIN` or `GR_UNABLE`.
 
 ## Finite fields {#finite-fields}
 
@@ -139,9 +124,7 @@ vectors, matrices, polynomials, polynomial factorisation and embeddings
 Lengths and degrees are `slong`; the practical limit is memory. Most
 classic polynomial modules have `_series` functions (inverse, square
 root, exponential, logarithm, composition and reversion of power series
-truncated to a length), and for `nmod_poly`, `fmpz_mod_poly`,
-`arb_poly` and `acb_poly` many of them are now computed by the generic
-`gr_poly` implementation ([](guide/types/generic-programming#gr)).
+truncated to a length).
 
 ## Multivariate polynomials {#multivariate}
 
@@ -159,9 +142,9 @@ the context, with exponent vectors packed into fields of `bits` bits
 fields share a word (at least `MPOLY_MIN_BITS` = 8 bits per field), and
 larger exponents take several words per field; the packing is enlarged
 automatically when a result needs it. `fmpq_mpoly` stores a rational
-content times a primitive `fmpz_mpoly`. For univariate problems, use the
-univariate types, which store polynomials densely and have
-asymptotically fast algorithms.
+content times a primitive `fmpz_mpoly`. For univariate problems,
+it is generally better to use the univariate types which store polynomials
+densely.
 
 ## Matrices {#matrices}
 
@@ -179,8 +162,7 @@ asymptotically fast algorithms.
 
 For approximate (non-rigorous) linear algebra at or above double
 precision, `gr_mat` over an `nfloat` or `dfloat` context is the fastest
-choice; for certified results, use `arb_mat` or `acb_mat`, or compute
-approximately and verify afterwards.
+choice; for certified results, use `arb_mat` or `acb_mat`.
 
 ## p-adic and algebraic numbers {#padic-algebraic}
 
@@ -201,7 +183,7 @@ approximately and verify afterwards.
 | [`nfloat`](nfloat) | floating-point numbers of a fixed number of words, real or complex | 1 to 66 words (64 to 4224 bits on 64-bit machines); exponents below about $2^{61}$ in magnitude | fast approximate linear algebra and root finding through `gr_mat` and `gr_poly` ([](nfloat/getting-started)) |
 | [`dfloat`](dfloat) | sums of $N = 1, \ldots, 4$ doubles, and balls of them, real or complex | about $53N$ bits; the exponent range of `double` | fast approximate or rigorous arithmetic up to about 200 bits; requires correctly rounded `fma` (`dfloat_is_supported`) |
 | [`decimal`](decimal) | decimal floating-point numbers and balls | any number of decimal digits, seven rounding modes | results specified in decimal digits; cheap conversion to and from decimal strings |
-| [`mp_real`](mp_real) | balls and fixed-point numbers in the radix $2^{\bits}$ | limb granularity | a low-level backend for constants, elementary functions and Newton iterations at high precision |
+| [`mp_real`](mp_real) | balls and fixed-point numbers in the radix $2^{\bits}$ | limb granularity | a low-level backend for ball arithmetic at high precision |
 | `double` with [`double_extras`](double_extras), [`d_vec`](d_vec), [`d_mat`](d_mat), and `di_t` in [`double_interval`](double_interval) | IEEE doubles; intervals with double endpoints | 53 bits | cheap estimates and cheap rigorous bounds |
 | [`arb_fpwrap`](arb_fpwrap) | special functions of `double` arguments | results accurate to double precision | calling FLINT's special functions from floating-point code |
 
@@ -216,8 +198,8 @@ verification, and are not rings in the sense of `gr`
 
 | Type | Represents | Use it for |
 |---|---|---|
+| [`qqbar`](qqbar) | algebraic numbers | algebraic numbers where the canonical form is useful |
 | [`ca`](ca) | exact real and complex numbers in automatically constructed fields ($\mathbb{Q}(\sqrt 2, \pi)$, ...) | exact computation with algebraic and elementary transcendental numbers; some equalities can be undecidable ([](guide/exact)) |
-| [`qqbar`](qqbar) | algebraic numbers | usually faster than `ca` for purely algebraic computations |
 | [`fexpr`](fexpr) | symbolic expressions | input, output and conversion between representations |
 
 ## Generic rings {#generic}
@@ -230,26 +212,3 @@ of their own, for the types that exist only as generic rings (`mpn_mod`,
 work over several rings. [](gr/getting-started) is the tutorial, and
 [](guide/types/generic-programming) discusses what generic code costs.
 
-## Decision guide {#guide}
-
-- Integers that may grow: `fmpz`. Integers provably below $2^{62}$ in
-  loops where speed matters: `slong` or `ulong`, with checks.
-- Arithmetic modulo $n < 2^{64}$: `nmod` and its polynomial and matrix
-  modules. Modulo larger $n$: `fmpz_mod` modules, or `gr_poly` and
-  `gr_mat` over `mpn_mod` for $n < 2^{1024}$ when the operations you
-  need exist generically.
-- A finite field you know in advance: `fq_zech` for $q < 2^{16}$,
-  `fq_nmod` for word-size $p$, `fq` otherwise; if not known in advance:
-  `fq_default`.
-- Polynomials over $\Z$ or $\mathbb{Q}$: `fmpz_poly`, `fmpq_poly`; many
-  variables or sparse: `fmpz_mpoly`, `fmpq_mpoly`.
-- Linear algebra over $\Z$ or $\mathbb{Q}$: `fmpz_mat`, `fmpq_mat`;
-  modulo a word-size prime: `nmod_mat`.
-- Real or complex numbers with guaranteed accuracy: `arb`, `acb`;
-  their polynomials and power series: `arb_poly`, `acb_poly`.
-- Fast approximate numerics: `nfloat` or `dfloat` with `gr_poly` and
-  `gr_mat`; a quick double-precision value of a special function:
-  `arb_fpwrap`.
-- Exact algebraic numbers: `qqbar` (or `nf_elem` within one number
-  field); expressions involving $\pi$, $e$, logarithms: `ca`.
-- Anything else, or a function that should work for many rings: `gr`.

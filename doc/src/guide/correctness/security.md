@@ -1,5 +1,5 @@
 ---
-title: Intended use and security
+title: Security
 summary: FLINT is a library for mathematical research, education and experimentation; why it must not be used to implement cryptographic protocols, and why untrusted input should only be processed in a sandbox.
 order: 5
 ---
@@ -7,12 +7,7 @@ order: 5
 FLINT is written for mathematical research, education and
 experimentation, where the user controls the input and wants correct
 results as fast as possible. It is not designed to be safe in an
-adversarial setting, and two uses in particular are outside its scope:
-deployments of cryptographic protocols, and processing data from
-untrusted sources outside a sandbox. Experimenting with cryptographic
-algorithms (factoring, discrete logarithms, lattice reduction,
-prototypes of schemes) is of course a legitimate use; deploying them is
-not.
+adversarial setting.
 
 ## Cryptography {#cryptography}
 
@@ -38,6 +33,9 @@ influence the computation. FLINT makes no attempt to:
   randomised algorithms reproducible.
 
 Use a dedicated cryptographic library for cryptographic protocols.
+Experimenting with cryptographic algorithms (factoring, discrete logarithms,
+lattice reduction, prototypes of schemes) is of course a legitimate use
+of FLINT; deploying them is not.
 
 ## Untrusted input {#untrusted}
 
@@ -61,7 +59,7 @@ previous pages:
   for: the factorisation of a 500-digit integer, or a zero test of a
   complicated exact expression.
 - *Errors terminate the process.* By default, an exception raised with
-  `flint_throw`, and a failed allocation inside GMP, abort the process.
+  `flint_throw`, and a failed allocation, abort the process.
   A server that calls FLINT directly can be stopped by a single bad
   request.
 - *Parsers are not hardened.* The string functions trust the sizes in

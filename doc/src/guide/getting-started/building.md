@@ -110,8 +110,8 @@ Thread-local storage holds per-thread caches, notably the pool of freed
 integers that `fmpz` reuses. It should only be disabled
 (`--disable-thread-safe`) on systems that lack it; FLINT is then not
 safe to use from several threads unless it is also built with
-`--enable-reentrant`, which replaces the cached `fmpz` memory manager by
-plain GMP allocations and protects the global state with mutexes. The
+`--enable-reentrant` which disables the `fmpz` cache
+and protects the global state with mutexes. The
 reentrant mode is slower, but it is convenient when tracing every
 allocation with a debugging tool. The garbage collector (`--with-gc`)
 cannot be combined with thread-local storage. See

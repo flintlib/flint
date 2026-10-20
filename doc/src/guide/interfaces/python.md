@@ -102,5 +102,4 @@ parent:
 
 The docstrings of `flint_ctypes.py` contain many more examples, for
 polynomials, matrices, power series, finite fields, number fields,
-$p$-adic numbers, exact real and complex numbers (`ca`) and symbolic
-expressions (`fexpr`).
+$p$-adic numbers, and other types.

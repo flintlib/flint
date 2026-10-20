@@ -5,17 +5,17 @@ order: 1
 ---
 
 FLINT (Fast Library for Number Theory) is a C library for computations in
-number theory and computer algebra. It provides arithmetic in the basic
-rings and fields of exact computation, among them the integers, the
-rationals, the integers modulo $n$, finite fields, $p$-adic numbers and
+number theory and computer algebra. It provides arithmetic in basic
+rings and fields, among them integers,
+rationals, integers modulo $n$, finite fields, $p$-adic numbers and
 number fields, together with univariate and multivariate polynomials,
-power series and matrices over most of them, with factorisation, linear
+power series and matrices, with factorisation, linear
 algebra and number theoretic functions. It also provides arbitrary
 precision real and complex arithmetic with rigorous error bounds (ball
 arithmetic), special functions, exact real and complex numbers, and a
 generic interface to all of these rings. FLINT is highly optimised, and
 it is portable: it is written in C11, with assembly and SIMD code for
-x86-64 and ARM64 where it pays off.
+x86-64 and ARM64.
 
 FLINT is also a research project in the algorithms of computer algebra.
 The algorithm pages of this documentation describe the methods that are
@@ -62,10 +62,10 @@ against the single library `libflint`.
 This documentation has four parts: the User guide (this part), the
 reference documentation of each module (every public function with its
 prototype; the module pages also contain guides to using the module),
-the algorithm pages, and the examples and tutorials. The conventions
+the algorithm pages, and the examples and tutorials. Conventions
 shared by all modules (types, naming, memory management, aliasing) are
 described in [](guide/conventions/types-and-naming) and the following
-pages; the module documentation assumes them.
+pages.
 
 ## Requirements {#requirements}
 
@@ -79,8 +79,8 @@ FLINT requires
   checkout), or CMake on Windows.
 
 MPIR, a fork of GMP that FLINT supported before version 3.0, is no longer
-supported. Optional dependencies are a BLAS library (used for some
-floating-point matrix products, over $\Z$ and modulo word-size primes), the Boehm–Demers–Weiser garbage collector, and
+supported. Optional dependencies are a BLAS library,
+the Boehm–Demers–Weiser garbage collector, and
 NTL (only for testing the conversion functions of the C++ header
 `NTL-interface.h`). FLINT is optimised in
 particular for x86-64 and ARM64 processors, and also runs on other 64-bit
