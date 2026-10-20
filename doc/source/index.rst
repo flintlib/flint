@@ -97,6 +97,7 @@ Integers
    arith.rst
    fft.rst
    fft_small.rst
+   n_fft.rst
    qsieve.rst
    radix.rst
 
