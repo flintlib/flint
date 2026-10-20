@@ -128,8 +128,7 @@ series gives $f$ and $f'$ at a nearby point. The corner case starts
 with the direct series at $z_1 = 0.375 \pm 0.625i$ (where $|z_1| \approx
 0.73$; $f'(z_1) = \frac{ab}{c}\,{}_2F_1(a+1,b+1;c+1;z_1)$ is also a
 direct series), continues to $z_2 = 0.5 \pm 0.8125i$ and from there to
-$z$, with the sign of the imaginary parts taken from $z$. Experiments
-showed that these two continuation steps give good performance.
+$z$, with the sign of the imaginary parts taken from $z$.
 
 ::: theorem Majorant bound {#thm-majorant}
 Let $\nu \ge \max(1/|z_0|, 1/|z_0 - 1|)$, $M_0 = 2\nu|ab|$, $M_1 =

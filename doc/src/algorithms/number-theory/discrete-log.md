@@ -14,7 +14,7 @@ groups of prime order, which are solved by Shanks' baby-step giant-step
 method [@Sha1971]. See also [@CraPom2005].
 
 FLINT implements this method in the `nmod_discrete_log_pohlig_hellman`
-functions, as described below.
+functions.
 
 ## Reduction to prime-power order {#crt}
 
@@ -174,7 +174,7 @@ $y^{c_i}$ for each $i$. When all $q_i$ are small, this is $O(\log^2 p)$.
 ## Use in FLINT {#use}
 
 - The sparse interpolation in the multivariate gcd code of
-  `fmpz_mpoly_factor` (file `gcd_zippel2.c`) evaluates at powers of a
+  `fmpz_mpoly_factor` evaluates at powers of a
   primitive root and recovers exponents with
   `nmod_discrete_log_pohlig_hellman_run`. It chooses primes $p$ with
   `fmpz_next_smooth_prime`, for which $p - 1$ currently has no prime factor

@@ -75,8 +75,8 @@ subexponential (index calculus), are not implemented.
 ## Composition {#composition}
 
 Gauss composition of two primitive forms $f_1 = (a_1, b_1, c_1)$ and $f_2
-= (a_2, b_2, c_2)$ of discriminant $D$ can be described as follows
-(Dirichlet's composition, see [@Cox2013, §3]). Let $g = \gcd(a_1, a_2,
+= (a_2, b_2, c_2)$ of discriminant $D$ is as follows (Dirichlet's
+composition, see [@Cox2013, §3]). Let $g = \gcd(a_1, a_2,
 (b_1 + b_2)/2)$ and find $B$ with
 $$
 B \equiv b_1 \pmod{2a_1/g}, \qquad B \equiv b_2 \pmod{2a_2/g}, \qquad

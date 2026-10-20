@@ -45,9 +45,7 @@ make the sum overflow without any warning.
   the coefficients of a polynomial product.
 - `_nmod_vec_dot_ptr` multiplies `vec1[i]` by `vec2[i][offset]`, a column
   of a matrix stored as an array of row pointers. It never uses the
-  vectorised kernels for moduli above $2^{32}$, because loading `vec2`
-  needs gather instructions, which were found to be slower than the scalar
-  code.
+  vectorised kernels for moduli above $2^{32}$.
 - `_nmod_vec_dot_strided` reads `vec1[i * stride1]` and
   `vec2[i * stride2]`. The strides may be negative or zero. It is an inline
   function built on `NMOD_VEC_DOT`.

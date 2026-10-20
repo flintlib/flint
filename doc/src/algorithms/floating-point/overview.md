@@ -68,9 +68,8 @@ on its fixed-point kernels. See
 The `decimal` module provides floating-point numbers and balls in radix
 10, with precision measured in decimal digits and mantissas stored in
 words of radix $10^{19}$, so that decimal input and output and decimal
-rounding are exact. It is the right choice when results must be
-rounded to decimal digits exactly, for example when decimal inputs must
-be represented without conversion error or results must be correctly
+rounding are exact. It is the right choice when decimal inputs must be
+represented without conversion error or results must be correctly
 rounded to a number of decimal digits; binary types are faster
 otherwise. See [](algorithms/floating-point/decimal-arithmetic).
 
@@ -81,8 +80,7 @@ plain formats (approximate, like `double`) and ball formats with a
 double radius (rigorous). All operations are built from double
 arithmetic and fused multiply-adds, with SIMD for vectors, so that at
 53 to 106 bits they are several times faster than `nfloat` and
-`arb_t`; the elementary functions are 20 to 40 times faster than those
-of `arb_t` at 53 bits and about 3 times at 106 bits. The balls track every rounding error exactly, so exact
+`arb_t`. The balls track every rounding error exactly, so exact
 operations stay exact. They are used for the main sums of the
 Riemann–Siegel and Platt methods for the zeta function. See
 [](algorithms/floating-point/double-word) and

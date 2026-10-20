@@ -47,8 +47,7 @@ Let $m = \min(\mathit{len1}, \mathit{len2})$ after the truncation.
    is computed without intermediate reductions by
    `_mpn_mod_poly_mulmid_mpn`, which leaves the choice between the
    schoolbook algorithm and Karatsuba to `_flint_mpn_poly_mulmid` of
-   `mpn_extras`, with its own tuned cutoff (the Karatsuba cutoffs in the
-   tables are no longer used).
+   `mpn_extras`, with its own tuned cutoff.
 4. Otherwise the small-prime FFT (`_mpn_mod_poly_mulmid_fft_small`) is
    tried, and if it declines (`fft_small` unavailable, or $n$ larger than
    about 190 bits), Kronecker substitution

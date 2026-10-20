@@ -9,8 +9,7 @@ Ball arithmetic represents a real number by a ball $[m \pm r]$ and
 replaces each operation $f$ by a function that returns a ball containing
 $f(t)$ for every $t$ in the input ball. FLINT implements it in the
 modules [mag](mag), [arf](arf), [arb](arb) and [acb](acb), following the
-design of Arb [@Joh2017]; the general theory is in [@Hoe2009]. The main
-ideas are summarised below, with links to the detailed descriptions.
+design of Arb [@Joh2017]; the general theory is in [@Hoe2009].
 
 ## Midpoint and radius {#representation}
 
@@ -91,8 +90,8 @@ the last place of the best possible ball, so the accuracy of a computation
 can be predicted from the precision and the conditioning of the problem.
 For higher functions the radius can be larger, and convergence as the
 precision grows is the practical goal. The user guide
-[](guide/ball-arithmetic/precision) explains how to choose the precision,
-and [](guide/ball-arithmetic/pitfalls) lists technical conventions such as
+[](guide/types/ball-arithmetic#precision) explains how to choose the precision,
+and [](guide/types/ball-arithmetic#conventions) lists technical conventions such as
 the treatment of aliased arguments.
 
 ## Overview of the algorithm pages {#pages}

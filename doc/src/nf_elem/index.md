@@ -19,10 +19,8 @@ precomputed power sums. Every function takes the `nf_t` as its last
 argument, and all elements passed to a function must belong to the same
 field.
 
-The guide [](nf_elem/getting-started) shows the basic operations. The
-reference lists the types, memory management and conversions, then
-comparison, arithmetic, norms and traces, and finally reduction modulo
-integers. How a fixed number field compares with the other exact
+The guide [](nf_elem/getting-started) shows the basic operations. How a
+fixed number field compares with the other exact
 representations (`qqbar`, `ca`) is discussed in
 [](algorithms/exact/overview).
 

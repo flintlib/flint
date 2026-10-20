@@ -15,7 +15,7 @@ computations that are certified afterwards, and as the element type of the
 generic ring of complex floating-point numbers
 (`gr_ctx_init_complex_float_acf`).
 
-The interface is small. Addition, subtraction and multiplication are
+Addition, subtraction and multiplication are
 correctly rounded in each part, like the `arf` operations; division,
 square root and dot products are only approximate. All functions allow
 aliasing of inputs and outputs.
@@ -150,8 +150,7 @@ $ad + bc$ rounded once.
 
 The following functions are not correctly rounded: `rnd` is the direction
 of the final rounding, but the intermediate roundings are not specified
-and no error bound is given. They are meant for floating-point stages of
-algorithms whose results are verified separately.
+and no error bound is given.
 
 ::: function
 void acf_approx_inv(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)

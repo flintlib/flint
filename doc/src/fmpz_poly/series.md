@@ -40,8 +40,8 @@ outer polynomials of length at most 10, the baby-step giant-step
 algorithm of Brent and Kung [@BrentKung1978] for $n < 500$, and the
 algorithm of Kinoshita and Li [@KL2024], which reduces composition to
 bivariate products and costs $O(M(n) \log n)$, for larger $n$.
-*Reversion* is computed by `_gr_poly_revert_series`: fast Lagrange
-inversion (baby-step giant-step) for $n < 2500$, and Newton iteration,
+*Reversion* uses fast Lagrange inversion (baby-step giant-step) for
+$n < 2500$, and Newton iteration,
 whose compositions use the method of [@KL2024], above.
 
 The *square root* of a series with even valuation $2v$ is computed

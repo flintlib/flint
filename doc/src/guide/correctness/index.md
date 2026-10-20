@@ -26,4 +26,4 @@ The conventions that define valid input (aliasing, normalisation, the
 meaning of a leading underscore) are described in
 [](guide/conventions/types-and-naming), and the semantics of ball
 arithmetic, in which every result is a rigorous enclosure, in
-[](guide/ball-arithmetic).
+[](guide/types/ball-arithmetic).

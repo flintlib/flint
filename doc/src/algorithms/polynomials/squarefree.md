@@ -156,8 +156,7 @@ The squarefree part $\prod_i g_i$ is $f / \gcd(f, f')$ (up to a unit) in
 characteristic 0, while in characteristic $p$ it is computed from the
 squarefree factorisation. To test whether $f$ is squarefree it suffices,
 over a perfect field, to test $\gcd(f, f') = 1$: if $f' = 0$ and $\deg f
-\ge 1$ then $f$ is a $p$-th power, hence not squarefree unless it is
-constant.
+\ge 1$ then $f$ is a $p$-th power, hence not squarefree.
 
 ## Use in FLINT {#use}
 

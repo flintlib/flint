@@ -93,8 +93,7 @@ $y + 1$, $z + 1$ and $xz + y^2 + 1$ all have multiplicity 1).
 
 ## Strategy for irreducible factors
 
-Each squarefree primitive base $A$ is factored as follows; the steps are
-in `src/fmpz_mpoly_factor/factor.c`.
+Each squarefree primitive base $A$ is factored as follows.
 
 1. Exponents are repacked into one word if possible (otherwise the
    function fails). The exponent vectors are then *compressed*:
@@ -207,8 +206,8 @@ zassenhaus 1: 1*(x^3*y+x*z^2+5)^1*(2*x^2*y*z+x+y^3-3*z)^1*(x^2*z-y*z^2+1)^2
 - The algorithms are randomised (evaluation points and primes), but the
   result is deterministic: the factors are always verified, by exact
   division or by the bounds of the lifting.
-- The integer content is returned unfactored; use `fmpz_factor` on the
-  constant to split it into primes.
+- Use `fmpz_factor` on the constant to split the integer content into
+  primes.
 - `fmpz_mpoly_factor_squarefree` is much cheaper than `fmpz_mpoly_factor`,
   and suffices for many uses, such as computing the radical or simplifying
   exponents.

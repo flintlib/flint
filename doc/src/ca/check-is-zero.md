@@ -254,6 +254,4 @@ exact algebraic evaluation limits bit sizes to ten times
 The options are described in [](ca/options); the limits apply to the
 whole context, so they can be set once before a computation. Since a
 context caches fields and enclosures, repeating a test in the same
-context is cheap. Zero tests on algebraic numbers can be expensive
-when the degrees are large; `CA_OPT_QQBAR_DEG_LIMIT` bounds the work, at
-the price of more `T_UNKNOWN` answers.
+context is cheap.

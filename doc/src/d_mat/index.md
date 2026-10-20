@@ -121,8 +121,7 @@ void d_mat_transpose(d_mat_t B, const d_mat_t A)
 
 Sets $B$ to the transpose $A^T$. Throws an exception unless the
 dimensions of $B$ are those of $A^T$. Aliasing is allowed (for square
-matrices, by the dimension condition). The copy works on blocks of
-$8 \times 8$ entries to make better use of the cache.
+matrices, by the dimension condition).
 :::
 
 ::: function

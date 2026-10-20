@@ -40,9 +40,9 @@ which has about $n \log_2 n$ bits: $\log_2 |B_n| \approx n \log_2(n /
   practice.
 
 `bernoulli_fmpq_ui` first looks in the cache, then uses the zeta method
-for $n < 18000$ and the combined method above. For $n = 10^5$ it takes
-on the order of a second, and for $n = 10^6$ minutes, with most of the
-time in the residues, which run in parallel with `flint_set_num_threads`.
+for $n < 18000$ and the combined method above, where most of the time
+is spent on the residues, which run in parallel with
+`flint_set_num_threads`.
 
 ## Residues modulo primes {#mod-p}
 
@@ -54,7 +54,7 @@ binary expansion of $1/p$. When $p - 1$ divides $n$, $p$ divides the
 denominator of $B_n$ and the function returns `UWORD_MAX`. A result of 0
 means that $p$ divides the numerator, as for $p = 691$ and $B_{12} =
 -691/2730$; primes with this property for some $n < p - 1$ are the
-*irregular primes* of Kummer's work on Fermat's last theorem.
+*irregular primes*.
 
 ## Example {#example}
 

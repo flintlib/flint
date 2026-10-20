@@ -9,9 +9,7 @@ truncated product, of two polynomials over $\mathbb{F}_q =
 one turn the problem into a single product of polynomials over $\Z$ or
 over $\Z/p\Z$, so that they inherit the quasi-linear multiplication of
 `fmpz_poly` and `nmod_poly` ([](algorithms/polynomials/multiplication)),
-and reduce modulo $f$ only once per output coefficient. The algorithms
-and the choices made by `fq_poly`, `fq_nmod_poly` and `fq_zech_poly`
-are described below.
+and reduce modulo $f$ only once per output coefficient.
 
 ::: summary algorithms/polynomials/kronecker :::
 
@@ -99,10 +97,6 @@ fields, where the tables no longer fit in the cache and lookups become
 expensive. `fq_poly_mulhigh` always uses the classical algorithm, while
 `_fq_poly_mulhigh` computes a full product by Kronecker substitution for
 inputs of length at least 6.
-
-The functions without a leading underscore accept outputs aliased with
-inputs, and a truncated product is always the truncation of the full
-product.
 
 ## Example {#example}
 

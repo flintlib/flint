@@ -1,7 +1,7 @@
 ---
 title: Antic
 summary: Releases of Antic 0.1 to 0.2.5 (2013–2021), the library for number fields and binary quadratic forms that was merged into FLINT 3.0.
-order: 4
+order: 3
 ---
 
 Antic, a library for number fields (`nf_elem`) and binary quadratic

@@ -12,11 +12,7 @@ with precomputed inverses, primality testing, factoring, integer roots and
 elementary number-theoretic functions. Most higher-level modules
 (`nmod`, `fmpz`, the polynomial and matrix modules) rely on it.
 
-The sections below start with plain word arithmetic, continue with
-division and modular arithmetic, then cover primes, primality testing,
-factoring and other number-theoretic functions, and end with random
-numbers and low-level helpers. For background,
-[](algorithms/arithmetic/choosing) compares the ways of computing modulo a
+For background, [](algorithms/arithmetic/choosing) compares the ways of computing modulo a
 word-size integer, and [](algorithms/number-theory/primality-word) and
 [](algorithms/number-theory/factoring-word) describe the algorithms behind
 `n_is_prime` and `n_factor`.
@@ -154,7 +150,7 @@ and a Chebyshev approximation (requires $n \ne 0$).
 ::: details
 `n_cbrt_chebyshev_approx` writes $n = x \cdot 2^e$ with
 $x \in [1/2, 1]$, evaluates a Chebyshev approximation of $x^{1/3}$
-(coefficients computed with mpmath's `chebyfit`) and multiplies by
+and multiplies by
 $2^{\lfloor e/3 \rfloor}$ and the cube root of $2^{e \bmod 3}$.
 :::
 :::
@@ -1102,7 +1098,7 @@ is set), or 0 if `bits` is 0.
 ulong n_randtest_bits(flint_rand_t state, int bits)
 
 Like `n_randbits`, but values with sparse binary representations are more
-likely. Intended for test code.
+likely.
 :::
 
 ::: function
@@ -1121,7 +1117,6 @@ ulong n_randtest(flint_rand_t state)
 Returns a random integer of random bit length between 0 and `FLINT_BITS`,
 with 0, 1, `COEFF_MAX`, `WORD_MAX`, `UWORD_MAX` and sparse values made
 more likely.
-Intended for test code.
 :::
 
 ::: function
@@ -1142,7 +1137,7 @@ the flag `proved` has no effect.
 ulong n_randtest_prime(flint_rand_t state, int proved)
 
 Returns a random prime whose bit length is chosen at random between 2 and
-`FLINT_BITS`. Intended for test code.
+`FLINT_BITS`.
 :::
 
 ## Double-limb modular exponentiation {#double-limb}

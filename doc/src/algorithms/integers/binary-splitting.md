@@ -15,8 +15,7 @@ and cost $\Theta(N^2)$ for an $N$-bit result. Organising the work as a
 balanced binary tree, so that operands of similar size are multiplied
 at each level, reduces the cost to $O(M(N) \log N)$ or $O(M(N) \log^2
 N)$, where $M(N)$ is the cost of an $N$-bit multiplication; with FFT
-multiplication this is quasi-linear. The three forms of the idea, and
-where FLINT uses them, are described below.
+multiplication this is quasi-linear.
 
 ## Product trees {#product-trees}
 

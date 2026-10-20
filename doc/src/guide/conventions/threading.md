@@ -5,8 +5,8 @@ order: 3
 ---
 
 FLINT can use several threads for large computations, and it can be
-called from several threads of a multithreaded program. Both uses are
-described below. The functions that control threads are documented
+called from several threads of a multithreaded program. The functions
+that control threads are documented
 in [](thread_support), the thread pool behind them in [](thread_pool),
 and their design in [](algorithms/parallel).
 
@@ -39,9 +39,8 @@ are parallelised are:
   elementary functions by binary splitting, and the generic DFTs of
   [](gr_dft).
 
-Each FLINT release parallelises more functions. Threads only pay off for
-large inputs; small operations run on one thread regardless of the
-limit.
+Threads only pay off for large inputs; small operations run on one
+thread regardless of the limit.
 
 ## Calling FLINT from several threads {#thread-safety}
 

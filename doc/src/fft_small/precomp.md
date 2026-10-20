@@ -37,9 +37,6 @@ the wrap-around trick for middle products [@BZ2011]: a middle product of
 lengths $2m$ and $m$ fits in any transform length $2^d \ge 2m$, where the
 full product would need $2^d \ge 3m - 1$.
 
-`_nmod_poly_mul_mid_precomp` checks this condition for every depth and
-returns 0 without writing anything when the window does not fit.
-
 `_nmod_poly_mul_mid_precomp` only reads `M`: it works on a copy of the
 plan whose primes, Chinese remaindering data and scratch memory come from
 the context `R`. Several threads can use one `M` at the same time, each
@@ -70,12 +67,7 @@ With $r$ the reversal of $a$, preceded by $k$ zeros, the output is the
 window $[a_n + k - 1, a_n + k - 1 + z_n)$ of $av$. Storing the forward
 transform of $v$ with `_mul_precomp_init` instead would need a cyclic
 length $2^d$ into which that window fits; the transposed version needs
-transforms of length about $v_n$ only. The evaluation and
-extrapolation at geometric progressions (bit 3 of `function` in
-`_nmod_geometric_progression_init_function`) use it, with $v$ the chirp
-sequence of length $2\ell - 1$ and the two extrapolation series of
-length $\ell - 1$, and `len_bound` the largest length of the short
-operand. As for `_nmod_poly_mul_mid_precomp`, `M` is only read.
+transforms of length about $v_n$ only. As for `_nmod_poly_mul_mid_precomp`, `M` is only read.
 
 A polynomial $v$ of length 3000 prepared once, and the window
 $[999, 2999)$ of its products with three polynomials of length 1000:

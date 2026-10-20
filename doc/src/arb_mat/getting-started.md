@@ -7,10 +7,9 @@ order: 1
 An `arb_mat_t` is a dense matrix of real balls with dimensions fixed at
 initialisation. Each entry is an ordinary `arb_t` accessed by the macro
 `arb_mat_entry(A, i, j)`, so all functions of [](arb) can be used on
-entries; note that `arb_mat.h` declares the matrix functions only, and
-programs that work with the entries must also include `arb.h`. This
-guide shows a first program and explains the conventions that differ
-from exact matrix modules such as [](fmpz_mat).
+entries; programs that work with the entries must also include
+`arb.h`. This guide explains the conventions that differ from exact
+matrix modules such as [](fmpz_mat).
 
 ## A first program {#first}
 
@@ -85,7 +84,7 @@ exp(A) =
 need to be set. The entry $\pi$ is a ball of radius about $2^{-64}$, and
 every result encloses the corresponding quantity for all matrices
 within that ball. The product $A A^{-1}$ is not exactly the identity,
-but it contains it, as it must.
+but it contains it.
 
 ## Return values and failure {#failure}
 

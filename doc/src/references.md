@@ -42,7 +42,6 @@ title: References
 [CFG2019]: F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and modular forms of degree 2 with character", Math. Comp. 88 (2019), 2423--2441. https://doi.org/10.1090/mcom/3412
 [CGHJK1996]: R. M. Corless, G. H. Gonnet, D. E. Hare, D. J. Jeffrey and D. E. Knuth, "On the Lambert W function", Advances in Computational Mathematics, 5(1) (1996), 329-359
 [CheSto2005]: Z. Chen and A. Storjohann, "A BLAS based C library for exact linear algebra on integer matrices", Proceedings of the 2005 International Symposium on Symbolic and Algebraic Computation (ISSAC) (2005) 92-99
-[CP2005]: R. Crandall and C. Pomerance, *Prime Numbers: A Computational Perspective*, second edition, Springer (2005).
 [Car1995]: B. C. Carlson, "Numerical computation of real or complex elliptic integrals". Numerical Algorithms, 10(1):13-26 (1995).
 [Car2004]: J. Carette. "Understanding expression simplification." ISSAC '04: Proceedings of the 2004 international symposium on Symbolic and algebraic computation, pp. 72-79. 2004. https://doi.org/10.1145/1005285.1005298
 [Chen2003]: Zhuo Chen and John Greene : Some Comments on Baillie--PSW Pseudoprimes, The Fibonacci Quarterly 41:4 (2003) 334--344
@@ -50,7 +49,7 @@ title: References
 [Coh1996]: Cohen, Henri : A course in computational algebraic number theory, Springer, 1996
 [Coh2000]: H. Cohen. *Advanced topics in computational number theory*. Springer, 2000. https://doi.org/10.1007/978-1-4419-8489-0
 [Col1971]: Collins, George E. : The Calculation of Multivariate Polynomial Resultants, SYMSAC '71, ACM 1971 212--222
-[CraPom2005]: Richard Crandall and Carl Pomerance: Prime numbers: a computational perspective. 2005.
+[CraPom2005]: R. Crandall and C. Pomerance, *Prime Numbers: A Computational Perspective*, second edition, Springer (2005).
 [DHBHS2004]: B. Deconinck, M. Heil, A. Bobenko, M. van Hoeij, and M. Schmies, "Computing Riemann theta functions", Math. Comp. 73:247 (2004), 1417--1442. https://arxiv.org/abs/nlin/0206009
 [Dix1982]: J. D. Dixon, "Exact solution of linear equations using p-adic expansions", Numerische Mathematik 40 (1982) 137-141
 [DYF1999]: A. Dzieciol, S. Yngve and P. O. Fröman, "Coulomb wave functions with complex values of the variable and the parameters", J. Math. Phys. 40, 6145 (1999), https://doi.org/10.1063/1.533083

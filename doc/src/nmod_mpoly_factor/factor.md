@@ -124,5 +124,4 @@ The squarefree decomposition keeps the two factors of multiplicity 1
 together as one base; the irreducible factorisation separates them. The
 program switches to $\mathbb{F}_2$ with `nmod_mpoly_ctx_set_modulus`,
 which is allowed because both `a` and `f` are completely overwritten
-before they are used again. Note that `nmod_mpoly_factor_get_exp_si`
-takes a non-`const` factorisation.
+before they are used again. `nmod_mpoly_factor_get_exp_si` takes a non-`const` factorisation.

@@ -23,9 +23,8 @@ Bernoulli numbers come from `bernoulli`, the partition function from
 `gr_mat`. The algorithms are described in
 [](algorithms/number-theory/bernoulli),
 [](algorithms/number-theory/partitions) and
-[](algorithms/number-theory/stirling-bell); the hand-written pages
-[](arith/stirling) and [](arith/bell) give the details for the
-combinatorial numbers. Functions for primorials, divisor sums, the Möbius
+[](algorithms/number-theory/stirling-bell), and for the combinatorial
+numbers in [](arith/stirling) and [](arith/bell). Functions for primorials, divisor sums, the Möbius
 and Euler functions and the classical orthogonal and cyclotomic
 polynomials, formerly in this module, are now in `fmpz`, `fmpz_poly` and
 `fmpq_poly`; the old names remain as macros (see

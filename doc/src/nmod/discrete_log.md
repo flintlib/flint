@@ -35,7 +35,7 @@ whether a prime is suitable.
 
 The base is chosen internally and returned by
 `nmod_discrete_log_pohlig_hellman_primitive_root`. To take logarithms to
-another base $h$, note that $h^x = y$ if and only if
+another base $h$, use that $h^x = y$ if and only if
 $x \log_g h \equiv \log_g y \pmod{p - 1}$, a linear congruence that
 `nmod_divides` solves (see the second example).
 

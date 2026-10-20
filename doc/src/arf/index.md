@@ -183,7 +183,7 @@ int arf_is_finite(const arf_t x)
 
 Return whether `x` is a finite nonzero number, whether it is one of the
 special values $0$, $\pm\infty$, NaN, and whether it is finite (zero
-included). Note that `arf_is_finite` is not the negation of `arf_is_inf`,
+included). `arf_is_finite` is not the negation of `arf_is_inf`,
 because of NaN.
 :::
 

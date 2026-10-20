@@ -12,10 +12,7 @@ over $\Z/p\Z$ and transforms of the entries with the small-prime FFT.
 All methods compute the exact product, so the result never depends on the
 choice. The functions with a suffix force one method; they are useful for
 testing and for callers that know their inputs better than the
-heuristics do. Ball matrices are multiplied through `fmpz_mat_mul` as
-well: the block algorithm of `arb_mat_mul_block` scales the midpoints to
-integer matrices and multiplies them exactly
-([](algorithms/ball-arithmetic/matrix-multiplication)).
+heuristics do.
 
 ::: summary algorithms/linear-algebra/integer-matrix-multiplication :::
 
@@ -73,14 +70,6 @@ algorithm is chosen for $d = 2$ when $\min(a, b) \ge 5000$ and
 $\max(a, b) \le 1.1 \min(a, b)$, and for $3 \le d < 20$ when
 $\max(a, b) \le 1.6 \min(a, b)$ and $\min(a, b)$ is at least 3000
 ($d = 3$), 1000 ($4 \le d < 12$) or 500 ($d \ge 12$).
-
-The general picture: for small entries the product is computed with
-machine-word dot products; for moderately large matrices with entries up
-to a few hundred bits, by floating-point `gemm` modulo primes; for large
-matrices with larger entries, by multimodular multiplication; for small
-matrices with entries of thousands of bits, by Waksman's or Strassen's
-algorithm on `fmpz` arithmetic; and for entries of many thousands of bits,
-by transforming each entry once.
 
 ## Methods {#methods}
 

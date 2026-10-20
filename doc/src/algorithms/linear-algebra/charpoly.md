@@ -29,10 +29,8 @@ for `fmpz_mod`, with Berkowitz's algorithm as the fallback when a pivot
 is not invertible, and 12 for the `fq` family; `fmpz` and `fmpq` use
 `fmpz_mat_charpoly`, which reduces modulo primes for large matrices
 ([](algorithms/linear-algebra/multimodular#charpoly)). `nmod_mat_charpoly`
-uses its own implementations of the two algorithms, except for prime
-moduli below 256 and dimension at least 32, where it converts the
-matrix to the byte representation of `nmod8` and calls the generic
-code, whose row operations then use byte arithmetic. The minimal
+uses its own implementations of the two algorithms, except in the case
+described in [](#danilevsky). The minimal
 polynomial is computed by the same Krylov method
 over any field (`gr_mat_minpoly_field`), with the row reductions done
 by the ring method `GR_METHOD_MAT_REDUCE_ROW`, which `fmpz_mod`,
@@ -130,7 +128,7 @@ computed with a single reduction.
 Over a field the algorithm cannot fail. Over $\Z/N\Z$ with composite $N$,
 step 3 needs the inverse of $h$; if $h$ is a nonzero zero divisor, the
 function returns 0 and `nmod_mat_charpoly` falls back to Berkowitz's
-algorithm. Note that a zero divisor can appear even when the result is
+algorithm. A zero divisor can appear even when the result is
 well defined: the method depends on the arithmetic of a field, not just
 on the ring.
 

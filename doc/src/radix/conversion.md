@@ -21,8 +21,7 @@ $c < B$ (cutting it into $s$-bit chunks, which is free), and the same
 recursion is run in reverse: the halves are converted recursively and
 combined with radix-$B$ arithmetic (`radix_mul`, which uses `fft_small`)
 and a precomputed radix-$B$ power $c^k$. No division by a large power is
-needed, unlike in the classical subquadratic conversion. The details and
-the cost are on the algorithm page.
+needed, unlike in the classical subquadratic conversion.
 
 ::: summary algorithms/integers/radix-conversion :::
 

@@ -33,9 +33,6 @@ compared directly. They differ only in the algorithm.
   `fmpzi_gcd_shortest`, preceded by one division if the sizes are very
   different.
 
-The proofs and the cost analysis are described in
-[](algorithms/number-theory/gaussian-integers).
-
 ## Example {#example}
 
 With $x = 3(1 + i)(2 + i)^3$ and $y = 3(2 + i)(2 - i)^2$, the GCD is

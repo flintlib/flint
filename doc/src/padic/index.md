@@ -17,11 +17,8 @@ then reduces it modulo $p^N$ for the precision $N$ of the output, much as
 MPFR rounds to the precision of the output variable; the precision of the
 inputs is not used, and no error bound is propagated.
 
-The guide [](padic/precision) explains this model with an example. The
-reference below lists the types and the context first, then memory
-management, conversions and arithmetic, then the transcendental functions
-and Teichmüller lifts, and finally the low-level functions on bare
-integers. Polynomials and matrices over $\mathbf{Q}_p$ are in
+The guide [](padic/precision) explains this model with an example.
+Polynomials and matrices over $\mathbf{Q}_p$ are in
 `padic_poly.h` and `padic_mat.h`, unramified extensions in `qadic.h`.
 The newer module `padic_radix.h` implements $\mathbf{Q}_p$ for word-size
 $p$ with tracked error bounds and the generic ring interface.

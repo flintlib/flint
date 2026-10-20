@@ -31,10 +31,8 @@ $\mathbb{F}_p$ along their orbits under the Frobenius automorphism; see
 
 ::: summary algorithms/multivariate/modp-factoring :::
 
-The reference starts with the factorisation type and its basic
-operations, then the factorisation functions, which are described in
-detail on [](nmod_mpoly_factor/factor), and ends with the internal
-functions used by the factoring algorithms.
+The factorisation functions are described in detail in
+[](nmod_mpoly_factor/factor).
 
 ## Types and memory management {#types}
 

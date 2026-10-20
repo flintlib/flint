@@ -9,8 +9,7 @@ $D < 0$, up to $\mathrm{SL}_2(\Z)$-equivalence, form the *form class
 group* $\mathrm{Cl}(D)$, a finite abelian group whose order is the class
 number $h(D)$. For a fundamental discriminant it is isomorphic to the
 ideal class group of the imaginary quadratic field $\Q(\sqrt D)$
-[@Coh1996, §5.2], [@Buell1989]. This guide shows how to compute in it
-with `qfb`.
+[@Coh1996, §5.2], [@Buell1989].
 
 ## Representing classes {#classes}
 

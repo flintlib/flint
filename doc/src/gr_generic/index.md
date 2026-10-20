@@ -57,8 +57,8 @@ exception naming the missing method.
 ::: macro
 GR_GENERIC_DEBUG_RINGS
 
-Set to 0. Changing it to 1 makes the placeholders above throw instead of
-returning `GR_UNABLE`, which helps when developing a new ring.
+Set to 0. The value 1, which makes the placeholders above throw, helps
+when developing a new ring.
 :::
 
 ## Context methods {#context}

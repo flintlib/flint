@@ -59,8 +59,8 @@ repeatedly, which finds the largest exponent. For larger values it
 follows the algorithm of GMP's `mpz_perfect_power_p`: the multiplicities
 of 2 and of small primes in $f$ restrict the possible exponents to the
 divisors of their GCD, and the remaining candidates are tested with
-`mpz_root`. The exponent found is then not necessarily the largest: $2^{120}$ is reported as the square of
-$2^{60}$. Apply the function again to the root to obtain a larger
+`mpz_root`. The exponent found is then not necessarily the largest:
+$2^{120}$ is reported as the square of $2^{60}$. Apply the function again to the root to obtain a larger
 exponent.
 
 ## Example {#example}

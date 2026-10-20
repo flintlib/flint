@@ -42,8 +42,8 @@ the term $r\,m$ (if $r \ne 0$) to the remainder. The result satisfies $A =
 QB + R$, and a term of $R$ whose monomial is divisible by
 $\operatorname{lm}(B)$ has a coefficient of the same sign as
 $\operatorname{lc}(B)$ and absolute value less than
-$|\operatorname{lc}(B)|$. If $\operatorname{lc}(B) = \pm 1$, which is the
-main use case, this is ordinary division with remainder. If $B$ divides
+$|\operatorname{lc}(B)|$. If $\operatorname{lc}(B) = \pm 1$, this is
+ordinary division with remainder. If $B$ divides
 $A$ exactly, $R = 0$ and $Q = A/B$ whatever $\operatorname{lc}(B)$ is,
 and `fmpz_mpoly_div`, which does not form the remainder, is then the
 fastest way to compute the quotient.

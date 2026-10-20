@@ -13,8 +13,7 @@ and it is exact when the entries are small enough ([](#exactness)).
 Larger entries are first reduced modulo several small numbers, each
 product is computed by `gemm`, and the result is reconstructed by
 Chinese remaindering. This route is used only in some ranges of
-moduli, entry sizes and dimensions; FLINT has many other methods, and
-the topic pages [](algorithms/linear-algebra/matrix-multiplication) and
+moduli, entry sizes and dimensions; the topic pages [](algorithms/linear-algebra/matrix-multiplication) and
 [](algorithms/linear-algebra/integer-matrix-multiplication) give the
 complete dispatch. In outline:
 

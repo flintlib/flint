@@ -15,8 +15,7 @@ $y \mapsto x^{2d-1}$ for the generator of $\mathbb{F}_q$, so that it
 benefits from FLINT's fast multiplication in $\Z[x]$. Most other
 algorithms (division, GCD, composition, power series, evaluation) are thin
 wrappers around the generic implementations of [](gr_poly), which call the
-multiplication of this module; [](fq_poly/mul) describes the
-multiplication algorithms. Factorisation is in `fq_poly_factor.h`.
+multiplication of this module. Factorisation is in `fq_poly_factor.h`.
 
 The interface is generated from `fq_poly_templates.h` and is the same for
 `fq_nmod_poly` and `fq_zech_poly`, apart from the multiplication

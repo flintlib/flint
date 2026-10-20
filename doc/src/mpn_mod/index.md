@@ -27,14 +27,9 @@ directly, which saves the method table lookup. Compared with the
 the basecase algorithms faster (Euclid's algorithm and Gaussian
 elimination with delayed reduction), avoid temporary allocations in the
 divide-and-conquer algorithms, and make additions cheap enough to favour
-Karatsuba and Waksman multiplication; the reported speedups for polynomial
-gcds and linear solving are between 1x and 3x for moduli of 128 to 1024
-bits [@Joh2025gr].
+Karatsuba and Waksman multiplication [@Joh2025gr].
 
-The guide [](mpn_mod/usage) shows how to set up and use the ring. The
-reference below lists every function, from the context and the scalar
-operations to the vector, matrix and polynomial methods and the internal
-helpers at the end.
+The guide [](mpn_mod/usage) shows how to set up and use the ring.
 
 ::: summary algorithms/arithmetic/multiword-overview :::
 
@@ -118,9 +113,7 @@ cleared with `gr_ctx_clear`. Initialisation costs one precomputed inverse
 of $n$ (`flint_mpn_preinvn`). The primality flag starts as `T_UNKNOWN`.
 
 A caller that handles all sizes typically uses `gr_ctx_init_nmod` for one
-limb, this function for 2 to 16 limbs and `gr_ctx_init_fmpz_mod` beyond,
-as FLINT's APRCL and ECPP primality tests, Lucas chains and Hensel lifting
-do.
+limb, this function for 2 to 16 limbs and `gr_ctx_init_fmpz_mod` beyond.
 
 :::
 :::
@@ -384,8 +377,7 @@ int mpn_mod_fmma(nn_ptr res, nn_srcptr x1, nn_srcptr y1, nn_srcptr x2, nn_srcptr
 
 Sets *res* to $x_1 y_1 + x_2 y_2 \bmod n$ with a single reduction of the
 unreduced sum (`flint_mpn_fmmamod_preinvn`), which costs little more
-than one modular multiplication. Dot products of length 2 and the
-two-term quotients of Euclid's algorithm use it.
+than one modular multiplication.
 :::
 
 ## Inverses, division and powers {#inverse}
@@ -423,9 +415,8 @@ $x$ to be invertible and otherwise gives the status of `mpn_mod_inv`.
 ::: details
 Exponents $e \le 64$ (`pow_ui`) or of at most 6 bits (`pow_fmpz`) use
 binary exponentiation with `mpn_mod_mul` (`gr_generic_pow_ui`,
-`gr_generic_pow_fmpz`); larger exponents call GMP's `mpz_powm`, which
-works in Montgomery representation with sliding windows and is two to
-three times faster. Negative exponents go through the generic code.
+`gr_generic_pow_fmpz`); larger exponents call GMP's `mpz_powm`.
+Negative exponents go through the generic code.
 
 :::
 :::
@@ -609,8 +600,7 @@ of the $m \times m$ matrix *mat*, with the Berkowitz algorithm for
 $m \le 11$ and Danilevsky's algorithm (`_gr_mat_charpoly_danilevsky`)
 for larger $m$. Danilevsky's algorithm divides by pivots, so for a
 composite modulus it can fail; the function then falls back to the
-division-free Berkowitz algorithm, as the `nmod` and `fmpz_mod` rings
-do, and always succeeds. This is the method behind `gr_mat_charpoly`.
+division-free Berkowitz algorithm, and always succeeds. This is the method behind `gr_mat_charpoly`.
 :::
 
 ::: function
@@ -808,8 +798,7 @@ and `gr_ctx_init_gr_poly_transformed_cyclic_repr`: polynomials of bounded
 length are kept as their transforms modulo the `fft_small` primes, so
 that sums of products can be accumulated pointwise and converted back
 once. `gr_poly_preinv_set` uses it for dense polynomial moduli of length
-at least 160, the measured crossover with Newton division for 100- to
-192-bit moduli. Like the `fft_small` multiplication, it is only available
+at least 160. Like the `fft_small` multiplication, it is only available
 for moduli of up to about 190 bits.
 
 ::: function
@@ -842,10 +831,7 @@ several threads.
 The truncation granularity of the transforms (whole blocks of 256 points
 for long transforms, the full transform length below one block) is given
 by the macros `_fft_small_len_trunc` and `_fft_small_op_trunc` of
-`fft_small.h`. They replaced private copies in this file and in the
-`nmod` transformed ring when transposed transforms were added to
-`fft_small`, so that all users of the plans agree on it; the behaviour
-of this ring did not change.
+`fft_small.h`.
 
 :::
 :::

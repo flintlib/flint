@@ -147,10 +147,9 @@ requires AVX2 or NEON.
 - Lanes are numbered from 0. A load puts the element at the lowest
   address in lane 0, and `vec4d_set_d4(a0, a1, a2, a3)` puts `a0` in
   lane 0. In the descriptions, $a_i$ denotes lane $i$ of `a`.
-- Vectors are passed and returned by value. The header notes that some
-  platforms pass vector types by value incorrectly, and its functions are
-  all forced inline for this reason. Helper functions that take vectors
-  should be declared `FLINT_FORCE_INLINE` too.
+- Vectors are passed and returned by value. Since some platforms pass
+  vector types by value incorrectly, helper functions that take vectors
+  should be declared `FLINT_FORCE_INLINE`, like those of the header.
 - In the names of modular functions, `0n` stands for $[0, n)$, `2n` for
   $[0, 2n)$, `pm1n` for $[-n, n]$, `pm1no` for the open interval
   $(-n, n)$ and `pmhn` for $[-n/2, n/2]$. For example
@@ -210,9 +209,8 @@ vec8nz
 AVX-512F only: 8 doubles (`__m512d`), 16 doubles (two `vec8dz`), 16
 floats (`__m512`), 32 floats (two `vec16fz`) and 8 `ulong` values
 (`__m512i`). The `z` suffix distinguishes them from `vec8d` and friends,
-which remain pairs of AVX2 registers because a single zmm register was
-found to give less instruction-level parallelism in existing code. Only
-`vec8dz` and `vec16fz` have operations.
+which remain pairs of AVX2 registers. Only `vec8dz` and `vec16fz` have
+operations.
 :::
 
 ::: type
@@ -333,9 +331,7 @@ Loads and stores of four words. All backends.
 void vec4n_store_unaligned_halves(ulong * z, vec4n a)
 
 Same as `vec4n_store_unaligned`, but done as two 16-byte stores on AVX2.
-`nmod_mat_transpose` uses it on Intel cores, where 32-byte stores to rows
-of a transposed matrix were measured to be up to twice as slow. AVX2 and
-NEON.
+AVX2 and NEON.
 :::
 
 ::: function
@@ -622,8 +618,7 @@ lane by lane. All backends.
 
 A mask has all bits set in the lanes where a condition holds and all
 bits clear elsewhere. The `vec4d` operations in this section behave
-identically on all backends, which `machine_vectors/test/t-vec4d.c`
-checks lane by lane.
+identically on all backends.
 
 ::: function
 vec4d vec4d_cmp_eq(vec4d a, vec4d b)
@@ -776,9 +771,7 @@ The `vec4n` version of `VEC4D_TRANSPOSE`. AVX2 and NEON.
 
 ## Integer vectors {#integer}
 
-Arithmetic on `vec4n` lanes is modulo $2^{\bits}$. The operations
-available on all backends, which `mp_real` uses for arithmetic in radix
-$2^{56}$, are tested lane by lane in `machine_vectors/test/t-vec4n.c`.
+Arithmetic on `vec4n` lanes is modulo $2^{\bits}$.
 
 ::: function
 vec4n vec4n_set_n(ulong a)
@@ -944,9 +937,7 @@ The magic-constant path computes `fmadd(a, b, R) - R` with
 $R = 1.5 \cdot 2^{52}$. When $|ab| \le 2^{51}$, the exact sum $ab + R$
 lies in $[2^{52}, 2^{53}]$, where consecutive doubles are 1 apart, so the
 single rounding of the FMA rounds $ab$ to the nearest integer. This
-avoids `vroundpd`, which the header records as 2 µops with 8 cycles
-latency on Intel cores since Skylake, against 1 µop and 3 cycles on Zen 2
-to Zen 5.
+avoids `vroundpd`, which is slow on Intel cores.
 :::
 :::
 

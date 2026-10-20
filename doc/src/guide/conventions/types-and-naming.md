@@ -5,8 +5,8 @@ order: 1
 ---
 
 All FLINT modules follow the same conventions for types, function names,
-argument order and aliasing. They are described once here; the module
-documentation only mentions deviations. The code conventions for
+argument order and aliasing. The module documentation only mentions
+deviations. The code conventions for
 contributors are in [](guide/development/contributing), and which type
 to use for a given task is discussed in [](guide/types/choosing).
 

@@ -10,9 +10,7 @@ The [](ca) module represents a number as an element of a field $K =
 many *extension numbers* $a_k$: algebraic numbers, constants such as
 $\pi$, and values $f(z)$ of functions such as $\exp$, $\log$ or
 $\sqrt{\cdot}$ at numbers $z$ that are themselves elements of such
-fields [@Joh2021calcium]. This section describes how such fields are
-represented and how the algebraic relations between the generators are
-found.
+fields [@Joh2021calcium].
 
 ## Formal fields {#formal}
 
@@ -54,7 +52,7 @@ $p$ with respect to $G$ is zero [@CLO2015, §2.6].
 The denominator of every element must be a polynomial that does not
 vanish at the generators; this is guaranteed because a division is only
 performed after the divisor has been proved nonzero (see
-[](algorithms/exact/zero-testing)). Note that even with $J = I$ the
+[](algorithms/exact/zero-testing)). Even with $J = I$ the
 fraction $p/q$ is not unique: $1/\sqrt{2}$ and $\sqrt{2}/2$ are different
 fractions in $\mathbb{Q}(X)/(X^2 - 2)$. Fields with a single algebraic
 generator avoid this, since FLINT stores their elements as polynomials

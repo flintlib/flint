@@ -374,7 +374,7 @@ counterparts.
 All the Newton iterations live in `gr_poly` and are called by
 `nmod_poly` through the `gr` context for $\Z/n\Z$, which supplies the
 `nmod_poly` multiplication and middle product and the tuned cutoffs
-quoted above (tables indexed by $\beta$, in `src/gr/nmod.c`).
+quoted above (tables indexed by $\beta$).
 
 | Operation | `nmod_poly` function | Iteration |
 |---|---|---|

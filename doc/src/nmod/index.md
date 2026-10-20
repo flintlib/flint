@@ -17,9 +17,7 @@ also provides square roots modulo primes, discrete logarithms, Montgomery
 arithmetic, and the generic ring (`gr`) contexts for $\Z/n\Z$.
 
 The guides below explain how to use the module; start with
-[](nmod/arithmetic). The reference that follows them lists every
-function, from the basic operations to the low-level reduction macros at
-the end. The conventions common to all FLINT modules, including the
+[](nmod/arithmetic). The conventions common to all FLINT modules, including the
 naming of functions and the use of `nmod_t` as a context, are described
 in [](guide/conventions/types-and-naming).
 
@@ -608,8 +606,7 @@ These macros are the building blocks of the arithmetic functions above
 and of the vector, polynomial and matrix modules. Most reduce one, two or
 three words modulo $n$ with one or two steps of
 [Möller–Granlund division](algorithms/arithmetic/moller-granlund).
-`NMOD_MUL_PRENORM` and `NMOD_MUL_FULLWORD` multiply without the operand
-shift done by `nmod_mul`. Unless stated otherwise, the first argument
+Unless stated otherwise, the first argument
 receives the result and `mod` is an `nmod_t`. A pair `a_hi, a_lo` stands
 for the two-word integer $a_{hi} B + a_{lo}$.
 

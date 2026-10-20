@@ -144,12 +144,12 @@ $p + 12$ bits while the iterates carry $p + \log_2 t + 8$ bits.
   is used, which converges superlinearly while always keeping a
   bracket. When an iterate falls so close to the zero that the sign of
   $Z$ cannot be determined, the zero is bracketed by evaluating at a
-  quarter of the tolerance on either side.
-- From $\log_2 t + 96$ bits, the zero is first refined to about half the
-  precision, where $Z$ is much cheaper, and then finished by one secant
-  step and sign checks at the target precision, four evaluations in
-  total.
-- Above $4 \log_2 t + 40$ bits, Newton's method with
+  quarter of the tolerance on either side. Within this range, from
+  $\log_2 t + 96$ bits on, the zero is first refined in the same way to
+  about half the precision, where $Z$ is much cheaper, and then finished
+  by one secant step and sign checks at the target precision, four
+  evaluations in total.
+- From $4 \log_2 t + 40$ bits, Newton's method with
   `acb_dirichlet_hardy_z` of length 2 is used.
 
 The zeros of a range are refined in parallel with `flint_parallel_do`.

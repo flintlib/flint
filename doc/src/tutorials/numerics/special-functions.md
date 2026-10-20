@@ -235,7 +235,7 @@ at a precision doubled from 30 bits until the value has a few accurate
 bits (pixels where this fails below 500 bits are drawn grey), so the
 colours are correct even where `double` arithmetic would fail, for
 example for $\zeta(s)$ high in the critical strip; features smaller than
-a pixel can of course be missed.
+a pixel can be missed.
 For example, the following plots the zeta function in a part of the
 critical strip:
 

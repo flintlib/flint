@@ -9,9 +9,8 @@ The elementary functions of `arb` (`arb_exp`, `arb_log`, `arb_sin`,
 an enclosure of the range of the function on the ball. For exact or
 accurate input, the result is accurate to within a few units in the last
 place at the given precision, so they behave like correctly rounded
-floating-point functions with an attached error bound. This guide
-describes their behaviour; the algorithms are described in
-[](algorithms/special-functions/elementary).
+floating-point functions with an attached error bound. The algorithms
+are described in [](algorithms/special-functions/elementary).
 
 ## Accuracy {#accuracy}
 
@@ -61,7 +60,7 @@ standard rays.
 
 The cost of evaluating a function is bounded by a polynomial in the
 precision, whatever the input (see
-[](guide/ball-arithmetic/precision#polynomial-time)). For arguments so
+[](guide/types/ball-arithmetic#polynomial-time)). For arguments so
 large that an accurate result would be too expensive, crude bounds are
 returned: $\sin$ and $\cos$ give $[\pm 1]$ above $2^{\max(65536,
 4\,\mathit{prec})}$, and $\exp$ gives $[\pm \infty]$ or a tiny ball near

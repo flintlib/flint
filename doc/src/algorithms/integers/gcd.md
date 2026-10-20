@@ -13,10 +13,8 @@ complexity but replaces almost all multiprecision steps by word
 operations; and the half-GCD algorithm of Knuth and Schönhage reduces the
 cost to $O(M(n) \log n)$. The same algorithms compute continued
 fractions, Bézout coefficients and rational reconstructions, which are
-all byproducts of the sequence of quotients. FLINT uses GMP's
-implementations for `fmpz_gcd` and the extended GCD, and its own
-implementation of the half-GCD in `fmpq` for continued fractions and
-rational reconstruction. The polynomial analogue is described in
+all byproducts of the sequence of quotients. The polynomial analogue is
+described in
 [](algorithms/polynomials/half-gcd).
 
 ## The Euclidean algorithm as a product of matrices {#matrices}
@@ -103,7 +101,7 @@ and $b$ with a few multiply-and-add passes. Each pass reduces the
 operands by about one word at a cost of $O(n)$, so the total is $O(n^2)$
 with a small constant.
 
-The test for when to stop is the important detail. Collins and Jebelean
+Collins and Jebelean
 [@Jeb1993b] showed that, with the remainders $\hat r_i$ and cofactors
 $u_i, v_i$ of the single-word computation, the quotients $q_1, \ldots,
 q_{i}$ are those of $a/b$ if

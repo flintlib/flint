@@ -15,10 +15,7 @@ SIMD modular arithmetic is that of van der Hoeven, Lecerf and Quintin
 [@HLQ2016]. The implementation, by Daniel Schultz, combines radix-4
 butterflies with lazy reduction in the spirit of Harvey [@Har2014], van
 der Hoeven's truncated transforms [@vdH2004] and a recursive matrix
-decomposition of the transform [@Bai1990]. This section describes the
-transforms `sd_fft_trunc` and `sd_ifft_trunc` and proves that all values
-stay in the ranges where the floating-point arithmetic is exact. How
-several primes are combined is described in
+decomposition of the transform [@Bai1990]. How several primes are combined is described in
 [](algorithms/fft/multimodular), and how polynomial multiplication uses
 the transforms in [](algorithms/polynomials/multiplication#fft-small).
 

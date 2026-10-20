@@ -109,8 +109,7 @@ $$
 
 ::: proof
 Step 3 computes $r = R \bmod B$, since $u - (q_1 + 1) d \equiv u_0 - (q_1 + 1) d$
-modulo $B$. Note that $B \le 2d$ because $d$ is normalised. There are three
-cases.
+modulo $B$. Since $d$ is normalised, $B \le 2d$. There are three cases.
 
 - $R < 0$. Then $r = R + B > q_0$ by [](#lem-bounds), so step 4 decrements
   the quotient and sets $r = R + d$, which lies in $[0, d)$ because

@@ -31,9 +31,8 @@ otherwise. Add `sizeof(fmpz)` for the total size of the object.
 These functions give the same results as the `fmpz` functions they
 replace, for all inputs. If the operands are inline (and the word-size
 operand lies in $[$`COEFF_MIN`, `COEFF_MAX`$]$), the result is computed
-with one machine addition and stored with `fmpz_set_si`, which cannot
-overflow since the sum of two such values fits in an `slong`; otherwise
-the out-of-line `fmpz` function is called. Inlining enlarges the code and
+with one machine addition; otherwise the out-of-line `fmpz` function is
+called. Inlining enlarges the code and
 slightly slows down the general case, so these functions should be used
 only where operands are almost always small.
 

@@ -113,8 +113,8 @@ $$
 4(k+1)(k+2)\, m(m-1)\, c_{k+2} = -(2k+1)^2 c_k - 4(k+1)^2 (2m-1) c_{k+1}.
 $$
 
-The complete integral of the third kind, $\Pi(n, m)$, has no comparably
-simple AGM formula in FLINT and is computed with Carlson's integrals,
+The complete integral of the third kind, $\Pi(n, m)$, is computed with
+Carlson's integrals,
 $\Pi(n, m) = R_F(0, 1-m, 1) + \frac{n}{3} R_J(0, 1-m, 1, 1-n)$.
 
 ## Carlson's symmetric integrals {#carlson}

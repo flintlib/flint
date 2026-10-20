@@ -7,7 +7,7 @@ category: Finite fields
 order: 13
 ---
 
-This module implements dense matrices over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_mat) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_mat` version, whose documentation has the details. As there, the linear algebra functions are wrappers of the generic `gr_mat` algorithms, and multiplication uses Kronecker substitution for all but small matrices.
+This module implements dense matrices over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_mat) and has the same functions, with `fq_nmod` in place of `fq`. As there, the linear algebra functions are wrappers of the generic `gr_mat` algorithms, and multiplication uses Kronecker substitution for all but small matrices.
 
 ::: summary algorithms/linear-algebra/gaussian-elimination :::
 
@@ -272,8 +272,7 @@ int fq_nmod_mat_randpermdiag(fq_nmod_mat_t mat, flint_rand_t state, fq_nmod_stru
 Sets `mat` to a random row and column permutation of the diagonal matrix
 whose first $n$ diagonal entries are `diag` and whose other entries are
 zero; $n$ must not exceed the number of rows or columns. Returns the
-parity of the permutation (0 for even, 1 for odd), as a wrapper of
-`gr_mat_randpermdiag`.
+parity of the permutation (0 for even, 1 for odd).
 
 ::: details
 Generated from the same template as `fq_mat_randpermdiag`, whose documentation has the details.
@@ -495,8 +494,8 @@ Generated from the same template as `fq_mat_lu`, whose documentation has the det
 slong fq_nmod_mat_rref(fq_nmod_mat_t B, const fq_nmod_mat_t A, const fq_nmod_ctx_t ctx)
 
 Sets $B$ to the reduced row echelon form of $A$ and returns the rank of
-$A$. The form is computed from an LU decomposition
-(`gr_mat_rref_lu`). $B$ may be aliased with $A$. If $A$ is zero, $B$
+$A$. The form is computed from an LU decomposition. $B$ may be aliased
+with $A$. If $A$ is zero, $B$
 is set to zero and 0 is returned.
 
 ::: details

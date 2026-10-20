@@ -1021,8 +1021,7 @@ void acb_agm1(acb_t m, const acb_t z, slong prec)
 Sets `m` to $M(z) = \operatorname{agm}(1, z)$, defined by always choosing
 the optimal branch of the square root in the AGM iteration. $M$ is
 continuous except for a branch cut on the negative real axis, where it is
-continuous from above. The algorithm is described in
-[](algorithms/special-functions/elliptic-modular#agm).
+continuous from above.
 :::
 
 ::: function

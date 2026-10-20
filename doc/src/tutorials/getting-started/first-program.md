@@ -179,7 +179,7 @@ whole polynomial is read from a string with `fmpz_poly_set_str`, whose
 format is the length, two spaces, and the coefficients from the constant
 term up: `"2  1 1"` is $1 + x$. Polynomials grow automatically as
 coefficients are set. The factorisation found by `fmpz_poly_factor`
-consists of the content and the irreducible factors `fac->p + i` with
+consists of the content and the irreducible factors with
 multiplicities `fac->exp[i]`; here they are the cyclotomic polynomials
 $\Phi_d$ for the divisors $d$ of 12, each with multiplicity 1. The
 factors are entries of an array of `fmpz_poly_struct`, so the $i$-th one

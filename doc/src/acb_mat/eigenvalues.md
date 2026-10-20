@@ -106,8 +106,7 @@ The algorithms and proofs are in
   fails to converge on a well-scaled matrix.
 - The left eigenvectors computed by `acb_mat_eig_simple` are normalised
   so that $L = R^{-1}$, which gives a certified diagonalisation $LAR =
-  D$. The generic function `gr_mat_diagonalization` uses this for
-  matrices over the complex ball context.
+  D$.
 
 ## Examples {#examples}
 

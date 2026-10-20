@@ -13,10 +13,8 @@ and stores, and above all the latency of carry propagation. GMP's
 (`mpn_mul_1`, then `mpn_addmul_1` for each further limb of the shorter
 operand), each of which pays a start-up cost and ends its carry chain at
 the row boundary. Ahlbäck and Johansson [@AJ2025] replace it by a *table
-of straight-line routines*, one for each pair of small sizes, and
-measure speedups over GMP's `mpn_mul` by factors between about 1.1 and
-2.5 on x86-64 and between 1.25 and 3 on ARM64 for operands of up to
-about a hundred limbs ([](#performance)).
+of straight-line routines*, one for each pair of small sizes
+([](#performance)).
 
 FLINT's `flint_mpn_mul`, `flint_mpn_mul_n` and `flint_mpn_sqr`
 therefore look up a routine in such a table for small sizes, and switch
@@ -27,9 +25,8 @@ assembly on x86-64 processors with the BMI2 and ADX extensions and on
 ARM64. Other builds have portable C routines for at most 7 limbs (and
 for a one-limb operand times up to 14 limbs), and call GMP's
 `mpn_mul_basecase` directly when the longer operand has at most 16
-limbs ([](#hardcoded)). This section describes the kernels and the
-strategy; the selection is given in [](mpn_extras/mul), and the high and
-low products built with the same techniques in
+limbs ([](#hardcoded)). The selection is given in [](mpn_extras/mul),
+and the high and low products built with the same techniques in
 [](algorithms/integers/short-products).
 
 ## Schoolbook multiplication {#schoolbook}

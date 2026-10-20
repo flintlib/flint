@@ -7,10 +7,7 @@ order: 20
 
 Given integers $a \ge 0$ of $m$ limbs and $b > 0$ of $n$ limbs, Euclidean
 division computes the quotient $q = \lfloor a/b \rfloor$ of $m - n + 1$
-limbs and the remainder $r = a - qb \in [0, b)$. This section describes
-the algorithms FLINT uses for it, from the schoolbook method to Newton
-iteration, and the related problems of exact division, division by a
-fixed divisor and integer square roots. Most of the code is in
+limbs and the remainder $r = a - qb \in [0, b)$. Most of the code is in
 `mpn_extras`; it replaces GMP's `mpn_tdiv_qr` throughout FLINT, and the
 `fmpz` division functions ([](fmpz/division)) reach it through an
 `mpz`-like layer (`flint_mpz_tdiv_qr` and its relatives) that applies the
@@ -237,9 +234,7 @@ limbs) with FLINT's multiplication; and for $d \ge$
 least four times the length of a divisor of 531 limbs or more,
 `flint_mpn_bdiv_q`, which computes the inverse with `flint_mpn_binv`
 (Newton iteration with middle products) and uses Karp–Markstein Hensel
-division, or block division for short divisors. A bidirectional variant,
-computing the low half of the quotient 2-adically and the high half by
-Euclidean division, was measured to be slower and is not used.
+division, or block division for short divisors.
 
 The same tools give:
 

@@ -34,7 +34,6 @@ for them are compared in [](algorithms/number-theory/integer-factoring).
   limit; `n_factor_trial` only does trial division.
 - `n_factor_evaluate` multiplies a factorisation back out, and
   `n_factor_insert` adds a prime power to one.
-- `fmpz_factor` factors multiprecision integers.
 
 ## Example {#example}
 

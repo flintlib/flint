@@ -12,9 +12,11 @@ real balls (`decball_t`), complex numbers (`deccfloat_t`) and complex
 balls (`deccball_t`), together with the radius type `decmag_t`.
 Precision is counted in decimal digits, and the floating-point
 operations are correctly rounded to that many significant digits in
-one of seven rounding modes, as in IEEE 754 decimal arithmetic and
-the General Decimal Arithmetic specification [@IEEE754] [@Cow2009], but
-with unbounded precision and exponents. Mantissas are integers in the
+one of seven rounding modes, with unbounded precision and exponents.
+Many of the operations and ideas follow the IEEE 754 standard for
+decimal arithmetic and the General Decimal Arithmetic specification
+[@IEEE754] [@Cow2009], but the module is not an implementation of
+either. Mantissas are integers in the
 radix $B = 10^e$ of the [](radix) module ($e = 19$ on 64-bit machines),
 so that rounding to a number of digits and conversion to and from
 decimal strings are cheap.
@@ -169,14 +171,12 @@ with the precision measured in `bits`: setting $p$ bits selects
 $\lceil p \log_{10} 2 \rceil$ digits, and a context with $d$ digits
 reports $\lfloor d \log_2 10 \rfloor - 1$ bits (directed rounding to
 $d$ digits has a relative error up to $10^{1-d}$, slightly more than
-that of $d \log_2 10$ bits). This is a compromise which lets the
-generic algorithms taking a precision in bits (series expansions,
-linear algebra with adaptive precision, etc.) work with decimal
-contexts; those algorithms assume radix-2 semantics such as exact
-representability of $2^{-p}$ and error bounds in powers of two, so
-their results need not be precisely what they would be for binary
-types (they remain correct, since all decimal operations return
-correctly rounded results or rigorous enclosures).
+that of $d \log_2 10$ bits). This lets generic algorithms that take a
+precision in bits (series expansions, linear algebra with adaptive
+precision) work with decimal contexts. Since they assume radix-2
+semantics, their results need not be what they would be for binary
+types, but they remain correct, since all decimal operations return
+correctly rounded results or rigorous enclosures.
 
 :::
 :::
@@ -211,9 +211,8 @@ the context represents:
   finite, and an operation whose result would be infinite or undefined
   ($\log 0$, $\Gamma(0)$, $1/0$, a midpoint overflowing the exponent
   limits) returns `GR_DOMAIN` or `GR_UNABLE`. A ball with an infinite
-  radius is the whole real line $(-\infty, \infty)$, a perfectly good
-  enclosure of a real number, and is returned whenever nothing better
-  is known (for example when an intermediate `arb` computation
+  radius is the whole real line $(-\infty, \infty)$ and is returned
+  whenever nothing better is known (for example when an intermediate `arb` computation
   overflows).
 
 Functions on radii (`decmag_t`) take a context argument but are
@@ -317,7 +316,7 @@ In the ball ring, bound the rounding error of each midpoint operation
 by one ulp (half an ulp in the nearest rounding modes) instead of
 computing a tight upper bound (the exact error rounded up to the
 radius precision), which is the default. The tight bound costs
-essentially nothing extra, so this flag mainly exists for testing.
+essentially nothing extra, so this flag is mainly for testing.
 
 :::
 
@@ -1259,9 +1258,9 @@ literals are parsed exactly (then rounded); any other string goes
 through the generic expression parser, so `"[mid +/- rad]"` (the
 output format), `"mid +/- rad"`, `"+/- rad"` and arithmetic
 expressions are accepted, and the same syntax works inside strings
-for polynomials, matrices and other objects over decimal balls. Note
-that a radius smaller than $10^{emin}$ can only be parsed when
-underflow is allowed in the context. Since `inf` is not an element
+for polynomials, matrices and other objects over decimal balls. A
+radius smaller than $10^{emin}$ can only be parsed when underflow is
+allowed in the context. Since `inf` is not an element
 of the ring, the printed forms of balls with an infinite radius
 (`"[m +/- inf]"`, `"[+/- inf]"`) are parsed through
 `set_interval_mid_inf` rather than by evaluating `inf`. Algebraic

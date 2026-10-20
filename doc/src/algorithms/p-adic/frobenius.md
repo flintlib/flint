@@ -12,9 +12,8 @@ identifies it with the Galois group of $\mathbf{F}_q/\mathbf{F}_p$
 $\sigma(x) = x^p$ of $\mathbf{F}_q$ is the *Frobenius automorphism* of
 $\mathbf{Q}_q$; it is the basic tool of $p$-adic point counting
 algorithms such as Kedlaya's [@Ked2001] and of the canonical lift
-methods of Satoh, Skjernaa and Taguchi [@SST2003]. The sections below
-describe `qadic_frobenius` and `qadic_teichmuller`; the representation of
-$\mathbf{Q}_q = \mathbf{Q}_p[X]/(f)$ is described in
+methods of Satoh, Skjernaa and Taguchi [@SST2003]. The representation
+of $\mathbf{Q}_q = \mathbf{Q}_p[X]/(f)$ is described in
 [](algorithms/p-adic/unramified-extensions).
 
 ## The Frobenius automorphism {#frobenius}

@@ -178,13 +178,6 @@ void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mo
 
 Sets the entries to uniformly random nonzero residues in $[1, n)$ (to
 zero if $n = 1$).
-
-::: details
-In FLINT 3.6 and earlier both
-functions used the number of rows for both dimensions, which wrote past
-the matrix when it had more rows than columns, and `fmpz_mod_mat_randfull`
-produced matrices of zeros and ones.
-:::
 :::
 
 ::: function
@@ -317,10 +310,7 @@ The exact integer product is computed with `fmpz_mat_mul`
 (respectively `fmpz_mat_sqr`), which chooses between classical,
 Strassen, multimodular and BLAS-based algorithms and is multithreaded,
 and each entry is then reduced modulo $n$
-([](algorithms/linear-algebra/matrix-multiplication)). This is delayed
-reduction: one reduction per entry. The generic `fmpz_mod` ring
-multiplies matrices in the same way, so the block recursive algorithms
-behind the elimination functions below benefit from it.
+([](algorithms/linear-algebra/matrix-multiplication)).
 
 :::
 :::
@@ -413,8 +403,7 @@ These functions are wrappers of the generic `gr_mat` algorithms over the
 in block recursive algorithms. Unless stated otherwise they require $n$
 to be prime, which is not checked. For a composite modulus they work as
 long as every pivot they meet is invertible; otherwise they throw an
-exception (the generic algorithm fails and the wrapper uses
-`GR_MUST_SUCCEED`) or, for the functions returning a success flag,
+exception or, for the functions returning a success flag,
 return 0 even if the result exists. See [](fmpz_mod_mat/composite).
 
 ::: function
@@ -422,10 +411,7 @@ slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check, const fmpz_mo
 
 Computes a generalised LU decomposition $PA = LU$ of $A$ in place and
 returns the rank of $A$. *P* must have room for as many entries as $A$
-has rows; it receives the row permutation. A wrapper of `gr_mat_lu`,
-which over the `fmpz_mod` ring uses classical elimination for matrices
-with fewer than 8 rows or columns and the block recursive algorithm
-otherwise.
+has rows; it receives the row permutation. A wrapper of `gr_mat_lu`.
 
 ::: details
 If $A$ is a nonsingular square matrix, it is overwritten with a unit

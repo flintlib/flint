@@ -8,8 +8,7 @@ FLINT objects manage their own memory: every object is initialised
 before use and cleared afterwards, and functions grow their outputs as
 needed. Raw memory is allocated with FLINT's own versions of `malloc`
 and `free`. FLINT also keeps some caches between calls, which can be
-freed explicitly. These mechanisms are described below; the functions
-are documented in [](flint).
+freed explicitly. The functions are documented in [](flint).
 
 ## Initialising and clearing objects {#init-clear}
 
@@ -150,7 +149,7 @@ return. The main caches are:
 - constants of ball arithmetic such as $\pi$, $\log 2$ at precisions
   beyond the built-in tables, the logarithms of
   small primes used by the elementary functions, Bernoulli numbers and
-  quadrature nodes (see [](guide/ball-arithmetic/pitfalls#caches));
+  quadrature nodes (see [](guide/types/ball-arithmetic#caches));
 - precomputed tables of [](fft_small), of radix conversion, and of some
   matrix multiplication kernels;
 - the constants and tables of [](mp_real), which are shared by all

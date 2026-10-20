@@ -307,8 +307,7 @@ By [](#lem-split), each attempt succeeds with probability at least $4/9$,
 and because each factor goes to either side independently, the expected
 depth of the recursion is $O(\log r)$. The cost of an attempt is that of
 the trace, an exponentiation, $O(M(n) \log q)$, and a gcd. FLINT computes
-the trace in one of three ways (`_gr_poly_trace` in
-`gr_poly/factor_equal_deg.c`):
+the trace in one of three ways (`_gr_poly_trace`):
 
 - for small $q$ (the same test as in [](#frobenius)), as $a + a^q + \cdots$
   with $d - 1$ exponentiations by $q$;
@@ -397,9 +396,7 @@ each squarefree factor separately.
   exponentiation, and calls the equal-degree factorisation
   (`_gr_poly_factor_equal_deg_with_frob`) on each $g_{[d]}$ with $d <
   \deg g_{[d]}$, passing $x^q \bmod g_{[d]}$ obtained from the first
-  exponentiation. It is written on coefficient arrays with a single
-  scratch block, which matters for tiny inputs where the whole
-  factorisation takes a few hundred nanoseconds.
+  exponentiation.
 - `gr_poly_factor_kaltofen_shoup` computes $x^q \bmod g$ once, runs
   [](#alg-ddf-bsgs) (`_gr_poly_factor_distinct_deg_with_frob`), and
   calls the equal-degree factorisation on each piece with $x^q$ reduced

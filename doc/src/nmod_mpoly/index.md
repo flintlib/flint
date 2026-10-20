@@ -35,10 +35,7 @@ resultants are computed by evaluation and interpolation
 `nmod_mpoly_factor.h`.
 
 The guide [](nmod_mpoly/getting-started) shows how to set up a context,
-build, print and inspect polynomials. The reference below starts with
-types and conventions, contexts and memory management, then lists the
-basic operations, arithmetic, division, GCDs and resultants, and ends with
-the internal functions used by the GCD and factorisation code.
+build, print and inspect polynomials.
 
 ::: summary algorithms/multivariate/overview :::
 
@@ -899,7 +896,7 @@ otherwise by the subresultant algorithm of Ducos on the univariate forms.
 ::: function
 int nmod_mpoly_discriminant(nmod_mpoly_t R, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
-Sets `D` to the discriminant of `A` with respect to the variable of index
+Sets `R` to the discriminant of `A` with respect to the variable of index
 `var`, and returns 1 for success. The modulus must be prime.
 :::
 

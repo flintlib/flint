@@ -49,9 +49,7 @@ integer. FLINT offers two variants, described with examples on
   remainder;
 - `fmpz_mpoly_quasidivrem` keeps a scale $s$ and, when $\operatorname{lc}(B)
   \nmid c$, multiplies $P$, $Q$, $R$ and $s$ by $u = |\operatorname{lc}(B)|
-  / \gcd(c, \operatorname{lc}(B))$ before continuing. (The implementation
-  records the scale at which each term was produced and multiplies the
-  terms out at the end, which has the same effect.)
+  / \gcd(c, \operatorname{lc}(B))$ before continuing.
 
 ::: lemma Quasi-division {#lem-quasi}
 `fmpz_mpoly_quasidivrem` returns $s > 0$, $Q$ and $R$ with $sA = QB + R$

@@ -216,10 +216,7 @@ When several products share an operand, its transform can be computed
 once. `_fft_small_mpn_mul_shared` forms two products $ax$ and $bx$, and the
 `_fft_small_mpn_mul_precomp` functions keep the transform of a fixed
 factor $x$ for any number of products. `flint_mpn_mul_shared` chooses
-between the first and two ordinary products; the binary splitting of
-`mp_real` uses both, for pairs of products in the merges of
-hypergeometric series and for the powers of the argument in the series
-of `exp`, `sin` and `cos`. See [](fft_small/mpn_shared).
+between the first and two ordinary products. See [](fft_small/mpn_shared).
 
 ::: function
 void _fft_small_mpn_mul_shared(nn_ptr z1, nn_srcptr a, ulong an, nn_ptr z2, nn_srcptr b, ulong bn, nn_srcptr x, ulong xn)
@@ -287,12 +284,9 @@ Sets $(z, x_n + y_n)$ to $xy$, where $x$ is the integer whose transform
 ::: details
 A product converts and transforms $y$ at the truncation of its own
 length, multiplies pointwise by the stored transform, transforms back and
-reconstructs, which saves the conversion and forward transform of $x$. The
-source reports products 26 to 31% faster than `flint_mpn_mul` in the
-two-prime range (300 to 28000 limbs) and 16 to 22% faster from 43000 to
-920000 limbs, for partners of 1.75 times the length of $x$. `P` is only
-read, so several threads may multiply with it at the same time, each using
-the scratch buffer of its own default context.
+reconstructs, which saves the conversion and forward transform of $x$.
+`P` is only read, so several threads may multiply with it at the same
+time, each using the scratch buffer of its own default context.
 :::
 :::
 
@@ -635,8 +629,7 @@ export `fft_small_export_mpn` returns a nonnegative value less than
 `len_bound` $\cdot 2^{\bits n_n + 2 \mathtt{bits} + d}$, which it writes
 exactly into $z_n$ limbs if $\bits z_n \ge \bits n_n + 2\,\mathtt{bits}
 + d + \lceil \log_2(\mathtt{len\_bound} + 1) \rceil$; the caller folds
-the limbs above $n_n$ back to reduce modulo $B^{n_n} - 1$. The chunk size
-and depth were tuned with `profile/p-mpn_cyclic_tuning`.
+the limbs above $n_n$ back to reduce modulo $B^{n_n} - 1$.
 :::
 :::
 

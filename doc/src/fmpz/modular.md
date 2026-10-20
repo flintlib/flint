@@ -53,8 +53,7 @@ $g$ is not invertible. The algorithm depends on the sizes:
 
 `fmpz_sqrtmod` computes a square root modulo a prime $p$. It returns 1
 and a root if $a$ is a square modulo $p$ (0 and 1 are their own roots),
-and 0 with $b = 0$ otherwise. It works on limb arrays with precomputed
-inverses (`flint_mpn_sqrtmod`) and chooses, as `nmod_sqrt` does for
+and 0 with $b = 0$ otherwise. It chooses, as `nmod_sqrt` does for
 words ([](nmod/sqrt)), between $a^{(p+1)/4}$ for $p \equiv 3 \pmod 4$,
 Atkin's formula for $p \equiv 5 \pmod 8$, Tonelli–Shanks when $2^s \|
 p - 1$ for $s < 32$, and Müller's Lucas sequence variant of the

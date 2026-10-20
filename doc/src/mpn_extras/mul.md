@@ -67,9 +67,7 @@ when the longer product (by $\max(\mathit{an}, \mathit{bn})$) satisfies
 the FFT rule of `flint_mpn_mul` above with threshold $T$ and the shorter
 product satisfies it with threshold $T/2$: once the longer product is
 transformed, the shorter one costs about its share of the transforms and
-need not reach the FFT range on its own. In this range the shared
-products are 7 to 14% faster than two separate products, for $x$ of any
-length from a quarter of the longer partner up. This is used for
+need not reach the FFT range on its own. This is used for
 instance by the Chinese remaindering trees of
 [](algorithms/integers/multimodular-reduction), where each node is
 multiplied by two cofactors.

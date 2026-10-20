@@ -6,9 +6,7 @@ order: 1
 
 `gr_dft` is written on top of `gr`, FLINT's interface to generic rings, so
 one implementation serves complex balls, exact algebraic numbers,
-$\Z/m\Z$, finite fields and fixed-point numbers. This guide explains the
-little of `gr` that is needed to use the module, which rings are suitable,
-and shows a first transform.
+$\Z/m\Z$, finite fields and fixed-point numbers.
 
 ## Generic rings in brief {#gr}
 
@@ -53,7 +51,7 @@ output values are unspecified.
 
 **Predicates.** Comparisons such as `gr_equal` and `gr_is_one` return a
 `truth_t`: `T_TRUE`, `T_FALSE` or `T_UNKNOWN`, the last when an inexact
-ring cannot decide. Note that `T_TRUE` is 0, so the result must be
+ring cannot decide. `T_TRUE` is 0, so the result must be
 compared with `T_TRUE` rather than used as a C boolean.
 
 ## Which rings can be used {#rings}

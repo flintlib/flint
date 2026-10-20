@@ -279,11 +279,8 @@ transforms the reversed short operand and applies the transposed forward
 transform (`_nmod_poly_mul_tr_precomp`). The interpolation series is
 stored as an ordinary transform (`_mul_precomp_init`). A call uses the
 stored images of $v$ only if the product would use `fft_small` anyway,
-if it fits, and if one transform of the stored length costs at most 1.7
-times one transform of what `_nmod_poly_mulmid_fft_small` would do
-instead (a transposed product or a window of the full product, with
-three transforms and both operands converted), a transform of $k$
-primes, depth $d$ and truncation $t$ being counted as $k d t$. For
+if it fits, and if this is estimated to be cheaper than what
+`_nmod_poly_mulmid_fft_small` would do without the precomputation. For
 $p < 2^{\bits - 1}$ the
 evaluation and interpolation data are computed with [Shoup multiplication](algorithms/arithmetic/shoup)
 for the many products by powers of $r$. Then

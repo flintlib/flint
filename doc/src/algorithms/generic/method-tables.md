@@ -65,15 +65,12 @@ reallocation.
 ## The cost of dispatch {#dispatch}
 
 A generic call costs a load from the method table and an indirect call
-that the compiler cannot inline: a few nanoseconds. Johansson
-[@Joh2025gr, §5] measures the loop `z_i = x_i + y_i` over integers of 20
-bits: with `fmpz_add` in a loop it takes about 2.7, 25 and 253 ns for
-$n = 1, 10, 100$, with `gr_add` in a loop 3.9, 34 and 344 ns, and with
-the vector functions `_fmpz_vec_add` and `_gr_vec_add` (overridden for
-`fmpz`) the same 3.2, 13 and 98 ns. The overhead of an elementwise
-generic call is thus about 30% for single-word integers and about 10%
-for multiword integers, and disappears completely at the vector level.
-This motivates the layering below.
+that the compiler cannot inline: a few nanoseconds. In the measurements
+of [@Joh2025gr, §5] for the loop `z_i = x_i + y_i` over `fmpz`
+integers, the overhead of an elementwise generic call is about 30% for
+single-word integers and about 10% for multiword integers, and
+disappears completely at the vector level, where `_gr_vec_add` is
+overridden by `_fmpz_vec_add`. This motivates the layering below.
 
 ## Three levels of operations {#levels}
 
@@ -128,18 +125,14 @@ size. Two families use this [@Joh2025gr, §6]:
   Compared with `fmpz_mod`, whose elements are `fmpz` values that may
   live on the heap, it avoids memory management and uses fixed-length
   multiplication and delayed reduction
-  ([](algorithms/arithmetic/multiword-overview)). Johansson reports
-  speed-ups of about 1 to 3 times for `gr_poly_gcd` and
-  `gr_mat_nonsingular_solve` at 128 to 1024 bits, from faster basecase
-  arithmetic, less temporary allocation in divide-and-conquer
+  ([](algorithms/arithmetic/multiword-overview)). It gains from faster
+  basecase arithmetic, less temporary allocation in divide-and-conquer
   algorithms, and cheaper additions that move the cutoffs of Karatsuba
   and Waksman multiplication down.
 * [`nfloat`](nfloat) represents floating-point numbers with 1 to 66 limbs
   of precision (`NFLOAT_MAX_LIMBS` on 64-bit machines, 64 to 4224 bits)
   as a fixed-length mantissa with an inline exponent and sign, and
-  `nfloat_complex` complex numbers; they are about twice as fast as
-  MPFR or `arf` for polynomial root-finding and approximate linear
-  solving.
+  `nfloat_complex` complex numbers.
 
 All sizes share one method table, and the methods dispatch on the
 number of limbs stored in the context. Templates or just-in-time

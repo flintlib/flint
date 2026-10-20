@@ -8,11 +8,8 @@ order: 60
 The ring $\Z[i]$ of Gaussian integers is a Euclidean domain with respect
 to the norm $N(a + bi) = a^2 + b^2$, and hence a unique factorisation
 domain. Its units are $\pm 1, \pm i$, and $1 + i$ is the unique prime
-above 2, with $2 = -i(1 + i)^2$. The sections below describe the
-algorithms of `fmpzi`: division with remainder, the choice of a
-canonical associate, the greatest common divisor, the removal of the
-prime $1 + i$ and primality testing. Standard references are [@Coh1996, §1.2] for
-Euclidean rings and [@Wei2000] for the binary algorithm.
+above 2, with $2 = -i(1 + i)^2$. Standard references are [@Coh1996,
+§1.2] for Euclidean rings and [@Wei2000] for the binary algorithm.
 
 ## Division with remainder {#division}
 
@@ -136,7 +133,7 @@ with $p$ prime and $p \equiv 3 \pmod 4$, or $ab \ne 0$ and $a^2 + b^2$
 is prime. `fmpzi_is_prime` applies this criterion with `fmpz_is_prime`,
 which proves primality, and `fmpzi_is_probabprime` with
 `fmpz_is_probabprime`. FLINT does not provide factorisation in
-$\Z[i]$; it reduces to factoring the norm and, for each prime
+$\Z[i]$, which reduces to factoring the norm and, for each prime
 $p \equiv 1 \pmod 4$ dividing it, finding $\pi = \gcd(p, t + i)$ with
 $t^2 \equiv -1 \pmod p$.
 

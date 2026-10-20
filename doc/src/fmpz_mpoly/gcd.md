@@ -19,10 +19,9 @@ preprocessing.
 
 ## Easy cases {#easy}
 
-The GCD code is shared with the other coefficient rings and organised
-around the exponents. With the *monomial content* of $A$ (the GCD of its
-monomials) removed, write $\operatorname{ess}(A)$ for what is left. In
-this order, `fmpz_mpoly_gcd`
+With the *monomial content* of $A$ (the GCD of its monomials) removed,
+write $\operatorname{ess}(A)$ for what is left. In this order,
+`fmpz_mpoly_gcd`
 
 1. reduces inputs with exponents of more than one word per field: it
    repacks them into one word if possible, and otherwise deflates both by

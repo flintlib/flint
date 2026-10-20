@@ -14,9 +14,7 @@ $$
 $$
 
 The values grow subexponentially: $\log p(n) \sim \pi \sqrt{2n/3}$, so
-$p(n)$ has about $3.7 \sqrt{n}$ bits. The sections below describe the
-methods FLINT uses for all values up to $n$ and for an isolated value,
-following
+$p(n)$ has about $3.7 \sqrt{n}$ bits. FLINT's methods follow
 [@Joh2012]; for the theory see [@Andrews1976, Chapter 5] and
 [@Apostol1997, Chapter 5].
 
@@ -182,8 +180,5 @@ The generic functions `gr_partitions_ui`, `gr_partitions_fmpz` and
 `gr_partitions_vec` call `partitions_fmpz_ui`, `partitions_fmpz_fmpz` and
 the vector functions over $\Z$ and $\Z/n\Z$, and `arb_partitions_fmpz`
 in real and complex rings.
-
-The previous implementation in Arb balls (`partitions_hrr_sum_arb`) is
-kept as an example program, `examples/partitions.c`.
 
 ::: functions partitions_fmpz_fmpz partitions_rademacher_bound arith_hrr_expsum_factored arith_number_of_partitions_vec :::

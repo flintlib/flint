@@ -29,9 +29,7 @@ and special functions) returns the exact result rounded once to that
 many digits in the context's rounding mode: toward zero, away from
 zero, toward $\pm\infty$, or to nearest with ties to even, away from
 zero or toward zero (`DECIMAL_RND_DOWN`, ..., `DECIMAL_RND_NEAR_ZERO`).
-This is the semantics of decimal floating-point arithmetic in IEEE 754
-and in the General Decimal Arithmetic specification [@IEEE754]
-[@Cow2009], with unbounded precision and exponents. Decimal constants
+Precision and exponents are unbounded. Decimal constants
 such as $0.1$ are represented exactly, so decimal inputs and outputs
 need no binary conversion: in the example below, $0.1 + 0.2 = 0.3$
 holds exactly. The `_round` versions of the arithmetic functions take

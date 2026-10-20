@@ -8,10 +8,7 @@ FLINT represents a finite field $\mathbb{F}_q$, $q = p^d$, by a context
 object, and its elements by values that are only meaningful together with
 the context. The module `fq_default` hides the choice between five
 representations behind one interface: it is the module to start with,
-and the only one most programs need. This guide shows a first program,
-explains how the representation is chosen and how to override it, and
-shows how to work with polynomials, matrices and the generic ring
-interface over the same field.
+and the only one most programs need.
 
 ## A first program {#first}
 

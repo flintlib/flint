@@ -6,9 +6,7 @@ order: 2
 
 A plan made with `GR_DFT_ALG_AUTO` chooses an algorithm from the
 factorisation of the length $n$, and composite algorithms recursively
-choose the algorithms of their sub-plans. This guide describes the
-choice, the cost of each algorithm in multiplications by roots of unity,
-the tuning constants, and the use of threads. The mathematics is in
+choose the algorithms of their sub-plans. The mathematics is in
 [](algorithms/fft/dft-algorithms).
 
 ## The automatic choice {#auto}
@@ -21,11 +19,7 @@ the tuning constants, and the use of threads. The mathematics is in
 | $n = p^e$, $p$ odd prime | mixed-radix, radices $p, \ldots, p$ | for $p > 19$, Bluestein of length $p$ if the ring has default roots |
 | $n$ with $r \ge 2$ distinct prime factors | prime factor algorithm, $n = n_1 n_2$ with $n_1$ the power of the smallest prime | automatic, for $n_1$ and $n_2$ |
 
-So a general length is split into its prime power factors without any
-twiddle factors, each power of two is transformed by split-radix or
-radix-2, and each odd prime power by mixed-radix with the direct
-prime kernel or, for primes above 19, Bluestein's algorithm. Bluestein's
-algorithm embeds the transform of length $p$ in a cyclic convolution of
+Bluestein's algorithm embeds the transform of length $p$ in a cyclic convolution of
 power-of-two length $N$, the least power of two with $N \ge 2p - 1$,
 computed with a scrambled radix-2 sub-plan. Over rings without default
 roots, such as $\Z/m\Z$, this sub-plan cannot be built, and primes above

@@ -11,10 +11,10 @@ FLINT runs on one thread unless told otherwise. `flint_set_num_threads(n)`
 allows FLINT functions to use up to $n$ threads, and many functions then
 parallelise themselves: large integer and polynomial multiplication,
 integer factoring, multivariate polynomial arithmetic and others. This
-module also provides the helpers that such functions are built from, which
-are available to users as well: thread limits, the requesting of worker
-threads from the global pool, parallel loops, parallel binary splitting,
-and shared caches for data computed once and read by all threads. The
+module provides the helpers that such functions are built from: thread
+limits, the requesting of worker threads from the global pool, parallel
+loops, parallel binary splitting, and shared caches for data computed
+once and read by all threads. The
 parallel helpers are experimental and their interfaces may change. The
 pool itself is described in [](thread_pool); the guide
 [](thread_pool/manual) shows how to use requested threads directly. The
@@ -27,7 +27,7 @@ A function running on the *master* thread that may use $n$ threads in
 total may start $n - 1$ *workers*. `flint_get_num_threads` returns the
 number of threads the current thread may use, including itself, so its
 value differs between threads. Library code should request at most
-`flint_get_num_threads()` threads and never more.
+`flint_get_num_threads()` threads.
 :::
 
 ::: summary algorithms/parallel :::

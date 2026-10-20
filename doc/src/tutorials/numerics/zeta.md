@@ -9,8 +9,7 @@ computational number theory, and [](acb_dirichlet) contains the tools to
 compute with it rigorously: values and derivatives of $\zeta(s)$ and of
 Dirichlet $L$-functions $L(s, \chi)$ anywhere in the complex plane, and
 the zeros on the critical line, which are isolated with a proof that none
-is missed. This tutorial shows the main functions and the example
-programs built on them. The algorithms are described in
+is missed. The algorithms are described in
 [](algorithms/special-functions/zeta).
 
 ## Zeros on the critical line {#zeros}

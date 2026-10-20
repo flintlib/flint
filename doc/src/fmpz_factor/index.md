@@ -19,9 +19,6 @@ small factors only.
 [](fmpz_factor/factor) explains the strategy of `fmpz_factor`
 with its cutoffs; the topic page
 [](algorithms/number-theory/integer-factoring) compares the methods.
-The basic operations used along the way are in [](fmpz): exact division
-and divisibility tests ([](fmpz/division)) and perfect power detection
-([](fmpz/roots)).
 
 ::: summary algorithms/number-theory/integer-factoring :::
 
@@ -64,9 +61,9 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
 Set $n$ to the integer represented by `factor`, including the sign.
 `fmpz_factor_expand` calls `fmpz_factor_expand_multiexp`, which processes
 the bits of all exponents simultaneously, from the top: at each step it
-squares the result and multiplies it by the product (computed by a
-balanced product tree, `_fmpz_vec_prod`) of the bases whose exponent has
-that bit set. This is much faster than `fmpz_factor_expand_iterative`,
+squares the result and multiplies it by the product of the bases whose
+exponent has that bit set. This is much faster than
+`fmpz_factor_expand_iterative`,
 which raises each base to its power and multiplies the powers one at a
 time.
 :::
@@ -179,8 +176,9 @@ void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
 Given a partial factorisation `f` of an integer (bases need not be prime,
 coprime or in any order, and may be 1), sets `res` to a factorisation of
 the same integer whose bases are pairwise coprime and greater than 1, by
-the factor refinement algorithm of Bach, Driscoll and Shallit [@BDS1993], which uses repeated GCDs. The
-result need not consist of primes and is not sorted.
+the factor refinement algorithm of Bach, Driscoll and Shallit
+[@BDS1993], which uses repeated GCDs. The result need not consist of
+primes and is not sorted.
 :::
 
 ## Factoring methods {#methods}

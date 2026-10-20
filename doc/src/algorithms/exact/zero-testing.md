@@ -8,10 +8,8 @@ order: 40
 The zero test is the core of exact real and complex arithmetic. Every
 decision in [](ca), from comparisons and divisions to degrees of
 polynomials and ranks of matrices, reduces to deciding whether some
-number $x$ equals zero. The theoretical limits of the problem and the
-strategy that `ca_check_is_zero` follows are explained below; the
-function page [](ca/check-is-zero) gives a user-level summary and
-examples.
+number $x$ equals zero. The function page [](ca/check-is-zero) gives a
+user-level summary and examples.
 
 ## Decidability {#decidability}
 
@@ -143,10 +141,8 @@ directly (`CA_TRIG_DIRECT`), and $16 \operatorname{atan}(1/5) - 4
 With the methods above, the following questions are always decided,
 within the limits set in the context (see [](ca/options)).
 
-- **Inequality of distinct numbers**, given enough precision. If $x \ne
-  0$, evaluating $x$ in ball arithmetic at increasing precision
-  eventually gives a ball that excludes zero. The precision is bounded
-  by the context option `CA_OPT_PREC_LIMIT` (4096 bits by default), so a
+- **Inequality of distinct numbers**, given enough precision
+  ([](#numerical)). The precision is bounded by the context option `CA_OPT_PREC_LIMIT` (4096 bits by default), so a
   nonzero number smaller than about $2^{-4096}$ in absolute value is not
   recognised as nonzero by default.
 - **Equality of algebraic numbers.** A number all of whose generators

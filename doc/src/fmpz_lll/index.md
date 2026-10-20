@@ -200,10 +200,9 @@ if the precision turns out to be insufficient.
 
 ::: details
 The arithmetic is that of `nfloat` if `nfloat_ctx_init` accepts the
-precision, and `arf` (`gr_ctx_init_real_float_arf`) otherwise; earlier
-versions used GMP's `mpf` type, hence the name. When the entries fit in a
-few limbs, the basis is packed (`fmpz_lll_packed_t`) and the Gram matrix
-entries are computed exactly and then rounded.
+precision, and `arf` (`gr_ctx_init_real_float_arf`) otherwise. When the
+entries fit in a few limbs, the basis is packed (`fmpz_lll_packed_t`) and
+the Gram matrix entries are computed exactly and then rounded.
 :::
 :::
 

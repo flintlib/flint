@@ -1,7 +1,7 @@
 ---
 title: Calcium
 summary: Releases of Calcium 0.1 to 0.4 (2020–2021), the library for exact real and complex numbers that was merged into FLINT 3.0.
-order: 3
+order: 2
 ---
 
 Calcium, the library for exact real and complex numbers (`ca`) and

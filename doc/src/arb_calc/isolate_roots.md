@@ -42,8 +42,8 @@ Correctness only depends on the enclosures computed by the evaluator,
 which must contain $f(I)$ and $f'(I)$ for the *whole* interval $I$.
 Overestimation (for example from the dependency problem when $f$ is
 evaluated naively on a wide ball) only causes more bisections. A root of
-even multiplicity, or of odd multiplicity greater than 1, is never
-isolated, because $f'$ vanishes there; nor is a root that happens to be
+multiplicity greater than 1 is never isolated, because $f'$ vanishes
+there; nor is a root that happens to be
 exactly a bisection point, since the sign of $f$ there is zero. Such
 roots end up in small subintervals with flag 2.
 

@@ -9,8 +9,7 @@ order: 1
 This module implements dense univariate polynomials over $\Z$. An
 `fmpz_poly_t` is an array of `fmpz` coefficients together with its
 length; each coefficient is an integer of arbitrary size and is managed
-separately, so polynomials whose coefficients range from single bits to
-millions of bits are handled by the same code. Multiplication chooses
+separately. Multiplication chooses
 among the classical algorithm, word-size and packed-limb kernels,
 Karatsuba and Toom–Cook interpolation in the polynomial variable,
 [Kronecker substitution](algorithms/polynomials/kronecker) on top of
@@ -24,11 +23,8 @@ algorithms, and power series by Newton iteration. Factorisation is in
 rigorous numerical root finding in `arb_fmpz_poly.h` ([](arb_fmpz_poly/roots),
 [](algorithms/ball-arithmetic/polynomial-roots)).
 
-Start with the guide [](fmpz_poly/getting-started). The reference
-lists every function: first types, memory management, coefficients and
-basic operations, then multiplication, division, GCDs and resultants,
-then evaluation, composition and power series, then roots, modular
-methods and special polynomials, and finally the low-level functions.
+Start with the guide [](fmpz_poly/getting-started), which explains the
+conventions below with examples.
 
 ::: summary algorithms/polynomials/multiplication-integers :::
 
@@ -70,9 +66,6 @@ by reference. The coefficient of $x^i$ is `coeffs[i]`.
   either assume that the division is exact, or define the quotient by
   rounding each coefficient (see [](fmpz_poly/divrem)), or work with
   pseudo-division.
-
-The guide [](fmpz_poly/getting-started) explains these rules with
-examples.
 
 ## Memory management {#memory}
 
@@ -182,14 +175,14 @@ fmpz * fmpz_poly_get_coeff_ptr(const fmpz_poly_t poly, slong n)
 Returns a pointer to the coefficient of $x^n$, or `NULL` if $n$ is at
 least the length. The coefficient can be read or changed with the
 functions of [](fmpz); changing the leading coefficient to zero
-requires a call to `_fmpz_poly_normalise`. Implemented as a macro.
+requires a call to `_fmpz_poly_normalise`.
 :::
 
 ::: macro
 fmpz * fmpz_poly_lead(const fmpz_poly_t poly)
 
 Returns a pointer to the leading coefficient of `poly`, or `NULL` if
-`poly` is zero. Implemented as a macro.
+`poly` is zero.
 :::
 
 ## Assignment and basic manipulation {#assignment}
@@ -270,7 +263,7 @@ polynomial if $c = 0$).
 ::: macro
 int fmpz_poly_is_zero(const fmpz_poly_t poly)
 
-Returns whether `poly` is zero. Implemented as a macro.
+Returns whether `poly` is zero.
 :::
 
 ::: function
@@ -1056,8 +1049,8 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
 void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
 Set `res` to `poly` raised to the power $e$ by left-to-right binary
-exponentiation [@Knu1997, §4.6.3]. The underscore version is a wrapper
-of `_gr_poly_pow_ui_binexp`; it requires $\mathit{len} > 0$, $e > 1$
+exponentiation [@Knu1997, §4.6.3]. The underscore version requires
+$\mathit{len} > 0$, $e > 1$
 and room for $e(\mathit{len} - 1) + 1$ coefficients, and does not
 allow aliasing.
 :::
@@ -1110,8 +1103,7 @@ void fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong
 Set `res` to `poly` raised to the power $e$ and truncated to length
 $n$, computed with truncated products throughout, which is much faster
 than powering and truncating; with $0^0 = 1$ for $n > 0$. The
-underscore version is a wrapper of `_gr_poly_pow_series_ui_binexp`; it
-reads $n$ coefficients of `poly` (so it must be zero padded to length
+underscore version reads $n$ coefficients of `poly` (so it must be zero padded to length
 $n$), requires $e, n > 0$ and does not allow aliasing.
 :::
 
@@ -1176,10 +1168,9 @@ void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
 Set $Q$ to $A / B$, assuming that $B$ divides $A$; this is not
 checked, and the result is undefined otherwise. Division by zero
-raises an exception. Short quotients and short divisors use
-`_gr_poly_divexact_basecase_bidirectional`, which computes the
-quotient from both ends at once with coefficients no larger than those
-of $Q$; long ones use `_fmpz_poly_div`. The underscore version requires
+raises an exception. Short quotients and short divisors are computed
+from both ends at once, with coefficients no larger than those of $Q$;
+long ones use `_fmpz_poly_div`. The underscore version requires
 $\mathit{lenA} \ge \mathit{lenB} > 0$ and does not allow aliasing.
 :::
 
@@ -1565,8 +1556,7 @@ proved by a size bound.
 ::: details
 If both $f$ and $g$ are nonzero, $s$ and $t$ are unique and their
 coefficients are minors of the Sylvester matrix, so they are integers.
-Unlike the old documentation stated, $f$ and $g$ need not be
-primitive.
+$f$ and $g$ need not be primitive.
 
 The underscore versions require $\mathit{len1} \ge \mathit{len2} > 0$,
 write $\mathit{len2}$ coefficients to $s$ and $\mathit{len1}$ to $t$
@@ -1820,8 +1810,8 @@ Set `poly` to the polynomial $f$ of degree less than $n$ with $f(x_i)
 $f$ has integer coefficients; otherwise return 0. The *newton* version
 computes divided differences, failing at the first inexact division,
 and converts from the Newton basis; the *multi_mod* version
-interpolates modulo word-size primes (with the fast algorithm of
-`_gr_poly_interpolate_fast` for many points) and combines the results
+interpolates modulo word-size primes (with a fast algorithm for many
+points) and combines the results
 by the Chinese remainder theorem until they stabilise and are checked.
 The default uses Newton interpolation for $n \le 25$ and chooses by
 size otherwise. The underscore versions write $n$ coefficients.
@@ -1919,9 +1909,8 @@ void fmpz_poly_compose_divconquer(fmpz_poly_t res, const fmpz_poly_t poly1, cons
 
 Composition by Horner's rule, respectively by the divide-and-conquer
 algorithm that splits $g$ into blocks evaluated at $h$ and combines
-them with the powers $h^{2^k}$. The underscore versions are wrappers
-of `_gr_poly_compose_horner` and `_gr_poly_compose_divconquer`, with
-the conventions of `_fmpz_poly_compose`.
+them with the powers $h^{2^k}$. The underscore versions have the
+conventions of `_fmpz_poly_compose`.
 :::
 
 ::: function
@@ -1987,8 +1976,8 @@ void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
 Power series inversion by the recurrence $b_k = -b_0 \sum_{j=1}^{k}
 q_j b_{k-j}$, with word-size arithmetic while the sizes allow and a
-special case for binomials, respectively by Newton iteration
-(`_gr_poly_inv_series_newton`). The conventions are those of
+special case for binomials, respectively by Newton iteration. The
+conventions are those of
 `fmpz_poly_inv_series`.
 :::
 
@@ -2041,8 +2030,7 @@ void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, const fmpz_poly_t poly
 
 Power series composition by Horner's scheme, respectively by
 Algorithm 2.1 of [@BrentKung1978], with the conventions of
-`fmpz_poly_compose_series`; the underscore versions are wrappers of
-the corresponding `gr_poly` functions.
+`fmpz_poly_compose_series`.
 :::
 
 ::: function
@@ -2051,8 +2039,7 @@ void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
 Set `Qinv` to the compositional inverse of the power series $Q$
 modulo $x^n$, so that $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
-Requires $Q(0) = 0$ and $Q'(0) = \pm 1$, which is not checked. A
-wrapper of `_gr_poly_revert_series`, which chooses the algorithm.
+Requires $Q(0) = 0$ and $Q'(0) = \pm 1$, which is not checked.
 :::
 
 ::: function
@@ -2210,9 +2197,9 @@ constant polynomials.
 Unless stated otherwise, the functions in this section assume that the
 polynomial is squarefree; the results are undefined otherwise, and
 some functions raise an exception. Roots at zero are counted where
-noted. See [](algorithms/polynomials/real-roots-integers). To compute
-the real roots to a given accuracy, use `arb_fmpz_poly_real_roots`
-([](arb_fmpz_poly/roots)).
+noted. See [](algorithms/polynomials/real-roots-integers). For
+numerical enclosures of the real or complex roots, see
+[](arb_fmpz_poly/roots).
 
 ::: function
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
@@ -2379,10 +2366,6 @@ Uses a Sturm sequence, Algorithm 4.1.11 of [@Coh1996]. The zero
 polynomial gives $(0, 0)$; for a polynomial that is not squarefree the
 result is undefined and an exception may be raised.
 :::
-
-To compute numerical enclosures of the real or complex roots, or to
-refine roots to high precision, see `arb_fmpz_poly_real_roots`,
-`arb_fmpz_poly_complex_roots` and `arb_fmpz_poly_refine_root_arb`.
 
 ## Modular reduction and reconstruction {#crt}
 

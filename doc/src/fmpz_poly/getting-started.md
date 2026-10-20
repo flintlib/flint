@@ -6,12 +6,7 @@ order: 1
 
 An `fmpz_poly_t` holds a polynomial with integer coefficients of any
 size. It owns its array of `fmpz` coefficients, grows as needed, and
-must be initialised before use and cleared afterwards. This guide walks
-through a first program, explains how coefficients are stored and
-which functions accept the same object as input and output, shows how
-to use the low-level functions with a leading underscore, points out
-the one real difference from polynomials over a field (division), and
-shows how to convert to and from other polynomial types.
+must be initialised before use and cleared afterwards.
 
 ## A first program {#first}
 
@@ -144,9 +139,7 @@ $\mathit{alen} + \mathit{blen} - 1$ coefficients to an array of
 initialised `fmpz` that the caller provides, and does not allow `res`
 to overlap the inputs. The arrays are usually managed with
 `_fmpz_vec_init` and `_fmpz_vec_clear`. The conditions vary and are
-stated with each function; typical ones are positive lengths, an order
-on the lengths, a fixed output length including leading zeros, and no
-aliasing.
+stated with each function.
 
 The example computes the product of two arrays and its middle
 coefficients 2 to 4 with `_fmpz_poly_mulmid`, and the GCD of two

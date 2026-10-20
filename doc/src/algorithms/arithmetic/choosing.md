@@ -48,9 +48,6 @@ variants work with $R = 2^{\bits/2}$ and need only single-word products.
 
 ## Many values with the same modulus {#vectors}
 
-When many operations share a modulus, more can be saved than the cost of
-a single reduction.
-
 - **Fixed multiplier.** `_nmod_vec_scalar_mul_nmod` precomputes data for
   the scalar and uses [Shoup](algorithms/arithmetic/shoup) multiplication
   when $n < 2^{\bits - 1}$, Montgomery multiplication for odd full-word
@@ -104,5 +101,4 @@ a single reduction.
   Barrett reduction is cheaper than a two-word reduction, and Lemire's
   method is cheaper still for half-word $n$ and $x$.
 - The `_precomp` (floating-point, scalar) functions of `ulong_extras`
-  predate the others. In FLINT's experience the `_preinv` functions are
-  generally faster, so prefer those.
+  predate the others; the `_preinv` functions are generally faster.

@@ -24,9 +24,7 @@ is a `gr_ctx_t`, functions return the status flags `GR_SUCCESS`,
 `GR_DOMAIN` and `GR_UNABLE`, predicates return a `truth_t`, and
 polynomials, matrices and power series over $\mathbf{Q}_p$ are available
 as `gr_poly`, `gr_mat` and `gr_series`. The guide
-[](padic_radix/getting-started) shows the precision model at work. The
-reference lists the context, the representation and the element
-functions, then dot products and the exponential and logarithm.
+[](padic_radix/getting-started) shows the precision model at work.
 
 ::: summary algorithms/p-adic/precision :::
 

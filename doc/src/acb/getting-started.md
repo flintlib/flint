@@ -6,9 +6,7 @@ order: 1
 
 An `acb_t` is a complex number $a + bi$ whose real and imaginary parts
 are real balls (`arb_t`). Everything said about precision, predicates and
-printing in [](arb/getting-started) applies to each part. This guide
-shows a first program and the points that are specific to complex
-numbers.
+printing in [](arb/getting-started) applies to each part.
 
 ## A first program {#first}
 
@@ -78,7 +76,7 @@ exp_pi_i(1) + 1 = 0
 pointers that can be passed to any `arb` function, for reading or for
 writing. Many operations that the `acb` module does not provide are easily
 written this way. The parts are independent balls: the rectangle may have
-an exact real part and an inexact imaginary part, and in particular a
+an exact real part and an inexact imaginary part, and a
 real number stored in an `acb_t` has an imaginary part that is exactly
 zero. Functions use this: `acb_mul` of a real and a complex number does two
 real multiplications, and `acb_is_real` tests whether the imaginary part

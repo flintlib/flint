@@ -34,7 +34,7 @@ influence the computation. FLINT makes no attempt to:
 
 Use a dedicated cryptographic library for cryptographic protocols.
 Experimenting with cryptographic algorithms (factoring, discrete logarithms,
-lattice reduction, prototypes of schemes) is of course a legitimate use
+lattice reduction, prototypes of schemes) is a legitimate use
 of FLINT; deploying them is not.
 
 ## Untrusted input {#untrusted}
@@ -52,7 +52,7 @@ previous pages:
 - *No overflow checks.* Sizes, shifts, exponents and precisions are not
   checked against overflow; see [](guide/correctness/limits). A small
   input can request an impossible amount of memory, or wrap around in a
-  size computation: `fmpz_pow_ui(x, 3, e)` with a 20-digit `e` aborts
+  size computation: `fmpz_ui_pow_ui(x, 3, e)` with a 19-digit `e` aborts
   the process when the allocation fails.
 - *Unbounded running time.* The cost of many operations is not bounded
   by a function of the size of the input that is reasonable to wait

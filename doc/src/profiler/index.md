@@ -8,9 +8,8 @@ order: 2
 
 This module provides simple tools for timing code and reporting memory
 usage. It is used by FLINT's own profiling programs (the `profile`
-directories, built with `make profile`) and example programs, and it is
-handy for quick measurements in user code. It is not a substitute for a
-real profiler such as `perf`.
+directories, built with `make profile`) and example programs. It is not
+a substitute for a real profiler such as `perf`.
 
 There are three groups of functions. The `timeit` timers and the
 `TIMEIT_*` macros measure processor time and wall time in milliseconds

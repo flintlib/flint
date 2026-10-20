@@ -1,13 +1,13 @@
 ---
 title: FLINT 1
 summary: Releases from 2007 to 2010: FLINT 1.0 to 1.6, the original library for polynomial and integer arithmetic.
-order: 3
+order: 2
 ---
 
 FLINT 1, the original version of the library, was released from
 version 1.0 (December 2007), which contained `fmpz_poly`, `fmpz` and the
 quadratic sieve `mpQS`, to 1.6.0 (December 2010). It was replaced by
-FLINT 2, a complete rewrite; see [](history/older/flint-2-0-to-2-4).
+FLINT 2, a complete rewrite; see [](history/older/flint-2).
 
 ## FLINT 1.6.0 (2010-12-24) {#flint-1-6-0}
 

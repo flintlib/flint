@@ -8,10 +8,8 @@ The Bessel, Airy and Coulomb wave functions are confluent
 hypergeometric functions: each of them is a combination of
 ${}_0F_1$ or ${}_1F_1$ series near the origin and of $U$ functions with
 exponential prefactors near infinity. FLINT evaluates them with the
-general methods of [](algorithms/special-functions/hypergeometric) —
-convergent series with tail bounds, the asymptotic expansion of $U^*$
-with Olver's error bound, regularization and power series limits at
-integer orders — plus a few specializations: the cancellation estimate
+general methods of [](algorithms/special-functions/hypergeometric),
+plus a few specializations: the cancellation estimate
 that decides the working precision, propagated error bounds based on
 derivative bounds, dedicated error bounds for the Airy functions, and
 interval Newton iteration for the zeros of the Airy functions.

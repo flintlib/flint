@@ -5,8 +5,7 @@ complexity: After reduction, summation needs $O(p^{g/2})$ terms at precision $p$
 order: 65
 ---
 
-Theta functions are the basic building blocks of elliptic and abelian
-functions and of modular forms. In genus $g$, for $\tau$ in the Siegel
+In genus $g$, for $\tau$ in the Siegel
 upper half-space $\mathcal{H}_g$ (symmetric complex matrices with
 positive definite imaginary part $Y$), $z \in \mathbb{C}^g$ and characteristics
 $a, b \in \{0, 1\}^g$,

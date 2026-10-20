@@ -84,7 +84,7 @@ choose by size.
 ## Shared techniques {#techniques}
 
 The implementations differ in their rings but share most of their
-structure. Each technique is described once.
+structure.
 
 **Truncation.** A radix-2 transform for a product of length $t$ needs
 length $L = 2^{\lceil \log_2 t \rceil}$, which wastes up to half of the

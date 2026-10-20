@@ -510,9 +510,7 @@ If the ball $x$ contains exactly one integer, set `res` to that integer
 
 ::: details
 This is `arb_get_unique_fmpz` with the result kept as an `mp_real_t`,
-free of the size limits of `fmpz_t` (an `mpz` holds at most $2^{31}$
-limbs, which the value of the partition function exceeds from
-$n \approx 1.4 \cdot 10^{21}$). With a fractional part of $f$ limbs and
+free of the size limits of `fmpz_t`. With a fractional part of $f$ limbs and
 a radius below one ulp, the candidates follow from the carry of the
 fraction plus the radius and the borrow of the fraction minus the
 radius, decided by scanning the fraction from its top limb until a limb
@@ -540,8 +538,7 @@ component is the double nearest to the remainder, so that
 $|x_{i+1}| \le \operatorname{ulp}(x_i)/2$; components that would be
 subnormal are not produced (their value goes to the radius), and a value
 beyond the double range gives dfloat's whole line, zero components with
-an infinite radius. Both conversions avoid `arb_t` and cost about half
-as much as going through it.
+an infinite radius. Both conversions avoid `arb_t`.
 :::
 :::
 
@@ -897,15 +894,13 @@ and the range $|y| < 2^{\bits - 5}$ are those of `mp_real_exp_bits`.
 - `mp_real_exp_notab_squaring` needs no $\log 2$:
   $\exp(|m|) = \exp(|m| 2^{-s})^{2^s}$ with $|m| 2^{-s} < 1/2$, the
   reduced value from `_mp_real_exp_notab` and $s$ ball squarings (with
-  $s + 16$ guard bits), and one reciprocal for $m < 0$. It is 1.2 to 1.7
-  times faster than the reduction when $\log 2$ must be computed.
+  $s + 16$ guard bits), and one reciprocal for $m < 0$. It is faster
+  than the reduction when $\log 2$ must be computed.
 - `mp_real_exp_agm` computes $y_0 = \exp(m)$ to a fraction of the
   precision by the squarings and corrects it by one Newton–Taylor step
   on the AGM logarithm of $y_0$ ([](algorithms/floating-point/elementary-functions)),
   in $O(M(n) \log n)$. It calls the squarings below about 30 limbs and
   overtakes them at about 15000 limbs.
-
-The partition function uses all three for $\exp(\pi\sqrt{24n - 1}/6)$.
 :::
 :::
 
@@ -1395,8 +1390,8 @@ void _mp_real_sqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
 
 For $a$ as for `_mp_real_rsqrt_newton`, set $(q, n + 2)$ to an
 approximation of $\sqrt{a} \in [1/B, 1)$ (the computed value can round
-up to 1) with absolute error at most $4 B^{-n}/\sqrt{a}$; note that the
-error is proportional to $1/\sqrt{a}$, not to the output. The first
+up to 1) with absolute error at most $4 B^{-n}/\sqrt{a}$, which is
+proportional to $1/\sqrt{a}$, not to the output. The first
 function multiplies by the reciprocal square root; the second performs a
 Karp–Markstein iteration.
 :::
@@ -1802,8 +1797,7 @@ The `_bitwise_rs` functions call these from
 `MP_REAL_EXP_BITWISE_VEC_MIN` = 4, `MP_REAL_LOG1P_BITWISE_VEC_MIN` =
 48, `MP_REAL_ATAN_BITWISE_VEC_MIN` = 4 and
 `MP_REAL_TRIG_BITWISE_VEC_MIN` = 4 limbs (beyond the per-size kernels
-for $r = 0$). Measured on x86-64 with AVX2, they are 1.05 to 1.5 times
-faster than the reductions in limb arithmetic. See
+for $r = 0$). See
 [](algorithms/floating-point/elementary-functions#signed-digits).
 :::
 :::

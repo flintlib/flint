@@ -5,9 +5,7 @@ order: 1
 ---
 
 An `fmpq_t` holds a rational number as a numerator and a denominator, two
-`fmpz` integers. This guide explains the invariant that the module
-maintains on this pair, what it costs and what it buys, and how to work
-with the components directly.
+`fmpz` integers.
 
 ## The canonical form {#canonical}
 

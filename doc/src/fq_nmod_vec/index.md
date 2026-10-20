@@ -7,7 +7,7 @@ category: Finite fields
 order: 12
 ---
 
-This module provides low-level functions on vectors over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`): plain C arrays of `fq_nmod_struct` with their length. It is generated from the same template as [](fq_vec) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_vec` version, whose documentation has the details.
+This module provides low-level functions on vectors over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`): plain C arrays of `fq_nmod_struct` with their length. It is generated from the same template as [](fq_vec) and has the same functions, with `fq_nmod` in place of `fq`; each function links to the `fq_vec` version, which has the details.
 
 `_fq_nmod_vec_dot` (a wrapper of `_gr_vec_dot`) accumulates the products of the representatives modulo $p$ and reduces modulo the defining polynomial once.
 

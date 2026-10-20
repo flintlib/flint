@@ -54,9 +54,8 @@ can install them as their method. The rings with their own method are:
 | `ca` | `ca_mat_det` |
 | `arf`, `acf`, `nfloat`, `nfloat_complex` | `gr_mat_det_generic_field` |
 
-Other rings use the generic Berkowitz algorithm for $n \ge 5$, which
-takes $O(n^4)$ operations; over a field, `gr_mat_det_lu` is much faster
-for large $n$.
+Other rings use the generic Berkowitz algorithm for $n \ge 5$; over a
+field, `gr_mat_det_lu` is much faster for large $n$.
 
 ## Permanents {#permanent}
 

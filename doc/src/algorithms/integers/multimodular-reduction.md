@@ -11,8 +11,7 @@ modulo many word-size primes $m_1, \ldots, m_k$, solving the problem
 modulo each prime, and recovering $x$ from its residues by the Chinese
 remainder theorem, which determines $x$ modulo $P = m_1 \cdots m_k$. The
 two conversions, *multi-mod* (from $x$ to its residues) and *multi-CRT*
-(back), are the subject of this section. Done naively, each costs
-$O(k^2)$ limb operations; the subproduct tree makes them quasi-linear
+(back), each cost $O(k^2)$ limb operations if done naively; the subproduct tree makes them quasi-linear
 [@BorMoe1974; @Ber2008].
 
 The generic and fixed-size Chinese remaindering used inside the

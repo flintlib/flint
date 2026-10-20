@@ -48,8 +48,7 @@ polynomials of length less than $2 \operatorname{len}(B)$.
 
 `fmpz_poly_divexact` assumes that $B$ divides $A$ and does not check
 it. For short quotients or short divisors it computes the quotient
-from both ends at once (`_gr_poly_divexact_basecase_bidirectional`):
-the low half of $Q$ from the constant coefficients upwards, as a power
+from both ends at once: the low half of $Q$ from the constant coefficients upwards, as a power
 series quotient, and the high half from the top down. Each coefficient
 is an exact integer division, and each half only involves the part of
 $B$ that it needs, which halves the work of the basecase algorithm.

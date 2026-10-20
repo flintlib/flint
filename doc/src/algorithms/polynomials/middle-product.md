@@ -315,8 +315,6 @@ tree ([](algorithms/polynomials/subproduct-tree)).
   `_gr_poly_exp_series_newton`), which `nmod_poly` calls for long series,
   use a middle product whenever the ring provides one, and a low
   product followed by discarding coefficients otherwise.
-  `_gr_poly_mulmid_generic` falls back on a low product when the ring
-  has a fast one and on the classical method otherwise.
 - `nmod_poly_evaluate_geometric_nmod_vec_fast` and
   `nmod_poly_extrapolate_geometric` are each one middle product plus
   linear work; with a precomputation made with bit 3 of `function` set

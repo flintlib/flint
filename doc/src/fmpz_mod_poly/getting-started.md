@@ -97,8 +97,7 @@ the `powmod` functions, the division functions `_newton_n_preinv` and the
 Brent–Kung modular composition. Computing $\mathit{finv}$ costs about as
 much as two multiplications ([](algorithms/polynomials/newton)), so it
 pays off as soon as more than a few reductions modulo the same $f$ are
-needed. The factorisation algorithms in `fmpz_mod_poly_factor` work this
-way.
+needed.
 
 ## Composite moduli {#composite}
 
@@ -172,10 +171,8 @@ factor of n found: 1000003
 
 For moduli $n < 2^{\bits}$, use `nmod_poly`, whose coefficients are words
 and whose multiplication uses dedicated FFTs, which makes it considerably
-faster.
-For larger moduli `fmpz_mod_poly` is the standard choice. The generic
-`gr_poly` type over an `fmpz_mod` or `mpn_mod` context provides the same
-algorithms (in fact, most `fmpz_mod_poly` functions are wrappers of them);
-the `mpn_mod` context, which stores coefficients as limb arrays of fixed
+faster. For larger moduli `fmpz_mod_poly` is the standard choice. The
+generic `gr_poly` type over an `fmpz_mod` or `mpn_mod` context provides
+the same algorithms; the `mpn_mod` context, which stores coefficients as limb arrays of fixed
 size, is designed to be faster than `fmpz` coefficients for moduli of a
 few words.

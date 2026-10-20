@@ -33,10 +33,7 @@ code.
 
 The guide [](gr_mat/exactness) explains how the functions behave over
 rings that are not fields and over inexact rings, with complete
-programs. The reference below starts with the types and conventions,
-memory management and basic operations, continues with arithmetic,
-multiplication and elimination, and ends with spectral functions,
-decompositions and the low-level and test functions.
+programs.
 
 ::: summary algorithms/linear-algebra/overview :::
 
@@ -1224,8 +1221,7 @@ The matrix is constructed by `fmpz_mat_hadamard` and converted. It
 uses Sylvester's doubling and Paley's constructions [@Pal1933], which
 succeed for all sizes $2^e$ and $2^e(q + 1)$ with $q$ an odd prime
 power. Sizes for which Hadamard matrices are known to exist but this
-construction fails start with 92, 116, 156 (OEIS A046116). Whether a
-Hadamard matrix exists for every multiple of 4 is an open problem.
+construction fails start with 92, 116, 156 (OEIS A046116).
 :::
 :::
 

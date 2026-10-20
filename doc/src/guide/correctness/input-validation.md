@@ -22,8 +22,7 @@ whether the input is valid:
 
 - *Division by zero and impossible inverses* in the basic arithmetic of
   the exact types raise an exception with `flint_throw`: for example
-  `fmpz_fdiv_q`, `fmpz_divexact`, `fmpq_div` and `qqbar_div` with a zero
-  divisor, `nmod_inv` and `fmpz_mod_inv` of a non-invertible residue,
+  `fmpz_fdiv_q`, `fmpz_divexact` and `fmpq_div` with a zero divisor, `nmod_inv` and `fmpz_mod_inv` of a non-invertible residue,
   `fmpz_poly_div` and `nmod_poly_divrem` by the zero polynomial, and
   `nmod_poly_divrem` when the leading coefficient of the divisor is not
   invertible modulo a composite modulus. Context constructors check
@@ -40,7 +39,7 @@ whether the input is valid:
 - *Ball arithmetic* never fails on numerical grounds: dividing by a
   ball that contains zero gives an indeterminate ball (`arb_div` returns
   NaN with infinite radius), and functions outside their domain give
-  indeterminate results; see [](guide/ball-arithmetic/using).
+  indeterminate results; see [](guide/types/ball-arithmetic).
 - *Exact numbers.* The `ca_t` type has special values for undefined
   and infinite results: `ca_div` by zero gives `UnsignedInfinity`, and
   $0/0$ gives `Undefined`. `qqbar_div` and `qqbar_inv` throw on

@@ -52,8 +52,7 @@ without Chinese remaindering, in two further cases:
 - $n$ is one of the eight primes of the context, which have 50 bits;
 - $n$ is a prime of at least 20 bits with $2^d \mid n - 1$, where $2^d$ is
   the transform length, and $b_n \ge 100$. The transform is then computed
-  modulo $n$ itself, with twiddle tables set up for the call; the last
-  modulus found prime is cached per thread.
+  modulo $n$ itself, with twiddle tables set up for the call.
 
 For `fmpz` polynomials the coefficients are bounded by
 $b_n 2^{\beta_a + \beta_b}$ in absolute value and are reconstructed in

@@ -21,10 +21,9 @@ as a generator of the fields $\mathbb{Q}(a_1, \ldots, a_n)$ in which
 - a builtin constant such as $\pi$, which is the case $n = 0$ of a
   function value.
 
-An extension number is not merely a node of an expression tree: it is a
-heavyweight object that caches data for repeated computations with the
-same number, namely a numerical enclosure that is refined on demand
-and, for algebraic numbers, the number field data used for arithmetic
+An extension number caches data for repeated computations with the
+same number: a numerical enclosure that is refined on demand and, for
+algebraic numbers, the number field data used for arithmetic
 in $\mathbb{Q}(a)$. Because the arguments of a function value are
 themselves elements of fields with their own extension numbers,
 extension numbers form a directed acyclic graph, and their operations

@@ -10,11 +10,8 @@ $$
 \operatorname{Li}_2(z) = -\int_0^z \frac{\log(1-t)}{t}\,dt =
 \sum_{k=1}^\infty \frac{z^k}{k^2} = z\,{}_3F_2(1,1,1;2,2;z)
 $$
-is analytic on $\mathbb{C} \setminus [1, \infty)$. It is the simplest
-polylogarithm beyond the logarithm and appears in volumes of
-hyperbolic manifolds, in perturbative quantum field theory and in
-special values of $L$-functions. `acb_hypgeom_dilog` evaluates it for
-complex balls; it is a holonomic function, and the methods below are
+is analytic on $\mathbb{C} \setminus [1, \infty)$. `acb_hypgeom_dilog`
+evaluates it for complex balls; it is a holonomic function, and the methods below are
 instances of the general ones in
 [](algorithms/special-functions/hypergeometric). General polylogarithms
 $\operatorname{Li}_s(z)$ are computed in [`acb_dirichlet`](acb_dirichlet)

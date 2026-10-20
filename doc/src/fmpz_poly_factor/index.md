@@ -11,12 +11,10 @@ A factorisation is stored as an `fmpz_poly_factor_t`: a signed
 content $c$ together with distinct primitive irreducible factors $f_i$
 of positive degree and positive leading coefficient, and multiplicities
 $e_i$, so that $f = c \prod_i f_i^{e_i}$. The main function is
-`fmpz_poly_factor`. It removes powers of $x$ and deflates
-$f(x) = g(x^d)$, computes a squarefree factorisation, factors each
-squarefree part modulo a well-chosen small prime, lifts the modular
-factors $p$-adically, and recombines them into true factors, by the
-Zassenhaus algorithm when there are few modular factors and by van
-Hoeij's lattice reduction algorithm when there are many. The guide
+`fmpz_poly_factor`, which lifts a factorisation modulo a small prime
+$p$-adically and recombines the modular factors by the Zassenhaus
+algorithm when there are few and by van Hoeij's lattice reduction
+algorithm when there are many. The guide
 [](fmpz_poly_factor/factor) shows how to use it, and
 [](algorithms/polynomials/factoring-integers) describes the
 algorithms.

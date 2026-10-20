@@ -14,8 +14,8 @@ $n$ coefficients of $h$, these operations compose: a chain of series
 operations computes the Taylor coefficients of the composite function
 with rigorous error bounds. This is forward-mode automatic
 differentiation of any order, and it is how FLINT computes derivatives
-of special functions. This guide shows the idiom and the conventions;
-[](algorithms/ball-arithmetic/power-series) describes the algorithms.
+of special functions. The algorithms are described in
+[](algorithms/ball-arithmetic/power-series).
 
 ## Derivatives of a composite function {#derivatives}
 
@@ -85,8 +85,7 @@ f^(7)(1/2) = [1154.76846929024 +/- 3.86e-12]
 
 The cost of each operation is that of a few multiplications of length
 $n$ (the elementary functions use Newton iteration, $O(M(n))$), so
-derivatives of high order are cheap: a thousand derivatives of the same
-function take a few hundredths of a second at this precision. The radii grow
+derivatives of high order are cheap. The radii grow
 roughly in proportion to the coefficients, so that the relative accuracy
 decreases only slowly with the order: the derivative of order 999 of
 this function, about $-8.63 \cdot 10^{2515}$, still has 13 correct

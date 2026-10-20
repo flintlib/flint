@@ -7,7 +7,7 @@ category: Finite fields
 order: 16
 ---
 
-This module computes embeddings $\mathbb{F}_{p^m} \to \mathbb{F}_{p^n}$, $m \mid n$, between fields in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`), as matrices over $\mathbb{F}_p$ (`nmod_mat_t`), and the change-of-basis matrices they rest on. It is generated from the same template as [](fq_embed) and has the same functions, with `fq_nmod` in place of `fq` and `nmod_poly` and `nmod_mat` in place of `fmpz_mod_poly` and `fmpz_mod_mat`; they are listed below with short descriptions, and each function page links to the `fq_embed` version, whose documentation has the details. The algorithms are described in [](algorithms/finite-fields/embeddings).
+This module computes embeddings $\mathbb{F}_{p^m} \to \mathbb{F}_{p^n}$, $m \mid n$, between fields in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`), as matrices over $\mathbb{F}_p$ (`nmod_mat_t`), and the change-of-basis matrices they rest on. It is generated from the same template as [](fq_embed) and has the same functions, with `fq_nmod` in place of `fq` and `nmod_poly` and `nmod_mat` in place of `fmpz_mod_poly` and `fmpz_mod_mat`.
 
 ::: summary algorithms/finite-fields/embeddings :::
 

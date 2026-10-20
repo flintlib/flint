@@ -8,10 +8,7 @@ Gaussian elimination needs two things from the ring: deciding whether a
 candidate pivot is zero, and inverting (or exactly dividing by) the
 pivot. The generic matrix functions work over any ring but are
 explicit about these two needs, so that they return an error instead
-of a wrong answer when the ring does not provide them. This guide
-explains the outcomes over three kinds of rings: fields with exact
-arithmetic, rings that are not fields, and inexact rings such as real
-balls.
+of a wrong answer when the ring does not provide them.
 
 ## Fields with exact arithmetic {#fields}
 

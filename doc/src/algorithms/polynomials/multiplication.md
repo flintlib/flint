@@ -18,8 +18,7 @@ the operands and the bit length $\beta$ of $n$ (`NMOD_BITS`):
 | Small-prime FFT | `_nmod_poly_mullow_fft_small`, `_nmod_poly_mulmid_fft_small` | $O(N \log N)$ for $N = \ell_1 + \ell_2$, with one to four primes | long operands |
 
 Here $\ell_1 \ge \ell_2$ are the operand lengths. The algorithms are
-standard; see [@GG2003, Ch. 8] and [@Ber2008] for surveys. The point
-here is what FLINT uses where.
+standard; see [@GG2003, Ch. 8] and [@Ber2008] for surveys.
 
 Products come in four shapes, each with its own selection among these
 methods:
@@ -73,8 +72,7 @@ only the requested dot products, so they cost proportionally less.
 
 FLINT does not use Karatsuba's method [@KO1962] for `nmod_poly`: Kronecker
 substitution reaches the Karatsuba and Toom–Cook range of integer
-multiplication with less overhead. (The generic `gr_poly` module has
-Karatsuba and Toom-3 implementations for rings without a better method.)
+multiplication with less overhead.
 
 ## Kronecker substitution {#ks}
 
@@ -236,8 +234,8 @@ FFT cutoffs for low products decrease from 1115 for $\beta = 1$ to 69 for
 $\beta = 21$, and lie between 174 and 220 for $\beta \ge 46$. Since KS
 computes the whole product and the FFT needs a transform as long as for
 the full product, a truncated product is substantially cheaper than a
-full one only with the classical method; note also that low products use
-only plain KS, not KS2 or KS4, which is one reason why the FFT cutoffs
+full one only with the classical method. Low products use only plain
+KS, not KS2 or KS4, which is one reason why the FFT cutoffs
 differ from those for full products.
 
 **Middle products.** `_nmod_poly_mulmid` first drops the operand

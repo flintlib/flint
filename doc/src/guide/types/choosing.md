@@ -11,10 +11,8 @@ The integers modulo $n$ alone can be `ulong` residues with an `nmod_t`,
 interface [`gr`](gr). The types differ in the range of parameters they
 accept, in speed (often by large factors for small inputs), in the
 functionality that exists for them, and in how they are called. The
-sections below give the general principles, a table of the types by area with
-their limits, and a short decision guide. The conventions shared by all
-types (the `foo_t` objects, contexts, naming and aliasing) are described
-in [](guide/conventions/types-and-naming).
+sections below give the general principles and tables of the types by
+domain, with their limits.
 
 ## General principles {#principles}
 
@@ -41,7 +39,7 @@ exact results whose size may grow. Ball types (`arb`, `acb` and the
 `dfloat` and `decimal` balls) give rigorous error bounds at a fixed
 working precision. Floating-point types (`arf`, `nfloat`, the `dfloat`
 numbers, `double`) give approximations without automatic error tracking. See
-[](guide/ball-arithmetic) and [](guide/exact).
+[](guide/types/ball-arithmetic) and [](#exact).
 
 *Use the generic interface for rings that have no module of their own
 and for code that must work over several rings.* Polynomials over
@@ -51,7 +49,7 @@ dedicated type, but are available as `gr_poly`, `gr_mat` and so on over
 the right context. Where a classic module exists, its functions are at
 least as fast as the generic ones (the generic contexts call them for
 the critical operations) and usually more complete. The trade-offs are
-described in [](guide/types/generic-programming).
+described in [](guide/generic).
 
 *Mind the context.* Types whose parameters are not stored in the
 object (`fmpz_mod`, `fq`, `padic`, the multivariate types, `gr`) take a
@@ -164,7 +162,7 @@ For approximate (non-rigorous) linear algebra at or above double
 precision, `gr_mat` over an `nfloat` or `dfloat` context is the fastest
 choice; for certified results, use `arb_mat` or `acb_mat`.
 
-## p-adic and algebraic numbers {#padic-algebraic}
+## p-adic numbers and number fields {#padic}
 
 | Type | Represents | Limits | Use it for |
 |---|---|---|---|
@@ -172,13 +170,12 @@ choice; for certified results, use `arb_mat` or `acb_mat`.
 | [`qadic`](qadic) | unramified extensions $\mathbb{Q}_q$ of degree $d$ | any $p$, any $d$ | Frobenius, norms and traces, Teichmüller lifts |
 | [`padic_radix`](padic_radix) | $\mathbb{Q}_p$ with propagated error terms | word-size $p$ | a `gr` type with digits in radix $p^e$, faster than `padic` at high precision ([](padic_radix/getting-started)) |
 | [`nf_elem`](nf_elem) with [`nf`](nf) | number fields $\mathbb{Q}[x]/(f)$ | $f$ irreducible of degree $\ge 1$ (not checked) | arithmetic, norms and traces; special fixed-size representations for degree 1 and 2 |
-| [`qqbar`](qqbar) | algebraic numbers: minimal polynomial and isolating ball | practical while minimal polynomials have moderate degree | exact computation with individual algebraic numbers, decided equality and comparisons |
 
 ## Real and complex numbers {#real-complex}
 
 | Type | Represents | Precision and range | Use it for |
 |---|---|---|---|
-| [`arb`](arb), [`acb`](acb) | balls $[m \pm r]$ with an `arf` midpoint and a `mag` radius | any precision in bits, unbounded exponents | rigorous numerics and special functions (the default; see [](guide/ball-arithmetic)) |
+| [`arb`](arb), [`acb`](acb) | balls $[m \pm r]$ with an `arf` midpoint and a `mag` radius | any precision in bits, unbounded exponents | rigorous numerics and special functions (the default; see [](guide/types/ball-arithmetic)) |
 | [`arf`](arf), [`mag`](mag), [`acf`](acf) | binary floating-point numbers; radii with a 30-bit mantissa | `arf`: any precision, unbounded exponents, mantissas of up to two limbs stored inline | midpoints and radii of balls; approximate computation with correctly rounded basic operations |
 | [`nfloat`](nfloat) | floating-point numbers of a fixed number of words, real or complex | 1 to 66 words (64 to 4224 bits on 64-bit machines); exponents below about $2^{61}$ in magnitude | fast approximate linear algebra and root finding through `gr_mat` and `gr_poly` ([](nfloat/getting-started)) |
 | [`dfloat`](dfloat) | sums of $N = 1, \ldots, 4$ doubles, and balls of them, real or complex | about $53N$ bits; the exponent range of `double` | fast approximate or rigorous arithmetic up to about 200 bits; requires correctly rounded `fma` (`dfloat_is_supported`) |
@@ -196,11 +193,44 @@ verification, and are not rings in the sense of `gr`
 
 ## Exact real and complex numbers {#exact}
 
+Ball arithmetic can prove that two numbers differ, by computing them
+accurately enough that their balls are disjoint, but never that they are
+equal: a ball that contains zero is compatible with a tiny nonzero
+number. Computations that need equality (is a pivot zero, does an
+expression reproduce a known constant) can use FLINT's exact real and
+complex numbers, which represent numbers symbolically, so that
+arithmetic is exact and numerical values are available to any
+precision. This part of FLINT was developed as the library Calcium
+[@Joh2021calcium].
+
 | Type | Represents | Use it for |
 |---|---|---|
-| [`qqbar`](qqbar) | algebraic numbers | algebraic numbers where the canonical form is useful |
-| [`ca`](ca) | exact real and complex numbers in automatically constructed fields ($\mathbb{Q}(\sqrt 2, \pi)$, ...) | exact computation with algebraic and elementary transcendental numbers; some equalities can be undecidable ([](guide/exact)) |
-| [`fexpr`](fexpr) | symbolic expressions | input, output and conversion between representations |
+| [`qqbar`](qqbar) | algebraic numbers, stored canonically by a minimal polynomial and an isolating ball | individual algebraic numbers of moderate degree; every predicate is decided ([](qqbar/using)) |
+| [`ca`](ca) | elements of fields $\mathbb{Q}(a_1, \ldots, a_n)$ generated by algebraic and transcendental numbers ($\mathbb{Q}(\sqrt 2, \pi)$, ...), constructed automatically; also infinities and *Undefined* | exact computation with algebraic and elementary transcendental numbers, with vectors, polynomials and matrices in [`ca_vec`](ca_vec), [`ca_poly`](ca_poly), [`ca_mat`](ca_mat) ([](ca/using)) |
+| [`fexpr`](fexpr) | symbolic expressions such as `Add(Sqrt(2), Pi)` | constructing numbers from formulas, printing them as text or LaTeX; not a number type ([](fexpr/using)) |
+
+The predicates of `ca` return `T_TRUE`, `T_FALSE` or `T_UNKNOWN`
+([](calcium#truth)): equality of algebraic numbers is decided within
+configurable limits, and equality involving transcendental numbers in
+many but not all cases, since it is not known to be decidable in
+general. A program must handle `T_UNKNOWN`
+([](ca/check-is-zero#unknown), [](algorithms/exact/zero-testing#in-practice)).
+`qqbar` decides every predicate, but its minimal polynomials can grow
+quickly; computations whose degrees explode, such as sums of many square
+roots, can be cheaper with `ca`, which keeps them in a field with
+several generators. For numbers in $\mathbb{Q}$ or in one fixed number
+field, [`fmpq`](fmpq) and [`nf_elem`](nf_elem) are much faster.
+
+Exact numbers are far too slow to replace floating-point or ball
+arithmetic in numerical computations. A mostly numerical computation
+should use balls, and fall back on exact numbers only where an exact
+comparison is needed; exact numbers are also useful for testing
+numerical code. The contexts `gr_ctx_init_real_qqbar`,
+`gr_ctx_init_complex_qqbar`, `gr_ctx_init_real_ca`,
+`gr_ctx_init_complex_ca` and related ones make these numbers available
+to the generic polynomial and matrix algorithms ([](gr_domains#algebraic),
+[](gr_domains#real-complex)). [](algorithms/exact/overview) compares the
+representations in detail, and [](tutorials/exact) has worked examples.
 
 ## Generic rings {#generic}
 
@@ -210,5 +240,5 @@ context `gr_ctx_t` ([](gr_domains)). Use it for rings without a module
 of their own, for the types that exist only as generic rings (`mpn_mod`,
 `nfloat`, `dfloat`, `decimal`, `padic_radix`), and for code that must
 work over several rings. [](gr/getting-started) is the tutorial, and
-[](guide/types/generic-programming) discusses what generic code costs.
+[](guide/generic) discusses what generic code costs.
 

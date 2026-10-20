@@ -11,11 +11,7 @@ elliptic curve method) depends mainly on the size of the factor $p$ they
 find, while that of the *general purpose* methods (SQUFOF, the quadratic
 sieve) depends only on the size of the number $N$ itself. A factoring
 routine therefore removes small factors first and calls the general
-methods only on what remains. The sections below compare the methods
-and describe how `fmpz_factor` and `n_factor` use them; the elliptic
-curve method and the quadratic sieve are described in
-[](algorithms/number-theory/ecm) and
-[](algorithms/number-theory/quadratic-sieve).
+methods only on what remains.
 
 ## The methods {#methods}
 
@@ -23,7 +19,7 @@ We write $L_x[\alpha, c] = \exp\bigl((c + o(1)) (\log x)^\alpha
 (\log \log x)^{1 - \alpha}\bigr)$. The running times below are in
 arithmetic operations modulo $N$ (or, for the sieve, in operations on
 small numbers), and those of the randomised methods are heuristic expected
-values [@CP2005, Chapters 5–6].
+values [@CraPom2005, Chapters 5–6].
 
 | Method | Finds | Time | In FLINT |
 |---|---|---|---|

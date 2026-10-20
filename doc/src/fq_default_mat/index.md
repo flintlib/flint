@@ -214,7 +214,7 @@ void fq_default_mat_scalar_mul_fmpz(fq_default_mat_t B, const fq_default_mat_t A
 void fq_default_mat_scalar_mul_si(fq_default_mat_t B, const fq_default_mat_t A, const slong c, const fq_default_ctx_t ctx)
 void fq_default_mat_scalar_mul_ui(fq_default_mat_t B, const fq_default_mat_t A, const ulong c, const fq_default_ctx_t ctx)
 
-Set $B$ to $cA$, through the generic `gr_mat` functions.
+Set $B$ to $cA$.
 :::
 
 ::: function

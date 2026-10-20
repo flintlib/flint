@@ -21,10 +21,7 @@ complexity. Factorisation and irreducibility testing are in
 `nmod_poly_factor.h`, and polynomial matrices in `nmod_poly_mat.h`.
 
 The guides below explain how to use the module; start with
-[](nmod_poly/getting-started). The reference that follows lists every
-function: first the types, memory management and basic operations, then
-arithmetic, division and GCDs, then evaluation, composition and power
-series, and finally the low-level helpers.
+[](nmod_poly/getting-started).
 
 ::: summary algorithms/polynomials/multiplication :::
 
@@ -68,9 +65,8 @@ is `coeffs[i]`.
   resultant functions always throw `FLINT_IMPINV` when they meet a
   leading coefficient that is not invertible.
 
-The guide [](nmod_poly/getting-started) explains these rules with
-examples, and [](nmod_poly/modular-arithmetic) the conventions for
-arithmetic modulo a fixed polynomial.
+The conventions for arithmetic modulo a fixed polynomial are explained in
+[](nmod_poly/modular-arithmetic).
 
 ## Memory management {#memory}
 
@@ -444,7 +440,7 @@ void _nmod_poly_shift_right(nn_ptr res, nn_srcptr poly, slong len, slong k)
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, slong k)
 
 Set `res` to `poly` divided by $x^k$, discarding the remainder, for
-$k \ge 0$. Note that in the underscore version `len` is the length of the
+$k \ge 0$. In the underscore version `len` is the length of the
 *output*: it sets `res[i] = poly[i + k]` for $0 \le i < \mathit{len}$, so
 `poly` must have at least $\mathit{len} + k$ coefficients. It allows
 `res == poly`.
@@ -1591,8 +1587,8 @@ void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
 
 Set `x_int` to the integral of `x` with constant term 0. The integers
 $1, \ldots, \deg x + 1$ must be invertible modulo $n$, for example $n$
-prime and $n > \deg x + 1$; otherwise `FLINT_IMPINV` is thrown. Note
-that `len` is the length of the *output*: the underscore version reads
+prime and $n > \deg x + 1$; otherwise `FLINT_IMPINV` is thrown. Here
+`len` is the length of the *output*: the underscore version reads
 $\mathit{len} - 1$ coefficients, writes `len` coefficients, requires
 $\mathit{len} \ge 1$ and allows `x_int == x`. It needs only one modular
 inversion.

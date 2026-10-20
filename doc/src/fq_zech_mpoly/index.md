@@ -68,7 +68,7 @@ void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars, const orde
 
 Initialises `ctx` for polynomials in `nvars` variables with the ordering
 `ord` over $\mathbb{F}_{p^{\mathit{deg}}}$, defined by a Conway polynomial
-if the database has one and a random irreducible polynomial otherwise
+if the database has one and a random primitive polynomial otherwise
 (see `fq_zech_ctx_init_ui`); the generator is printed as `#`. This is the
 only way to create a context.
 :::

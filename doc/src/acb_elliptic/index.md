@@ -96,7 +96,7 @@ $$
 4(k+1)(k+2) \, m(m-1) \, c_{k+2} = -(2k+1)^2 c_k - 4(k+1)^2 (2m-1) c_{k+1},
 $$
 
-which is what the implementation evaluates. At $m = 0$ it uses
+At $m = 0$ it uses
 $c_k = \frac{\pi}{2} \left(\frac{(1/2)_k}{k!}\right)^2$ directly.
 :::
 :::

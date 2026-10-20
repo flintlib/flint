@@ -8,9 +8,7 @@ A `gr_poly_t` is a dense polynomial whose coefficients are elements of a
 ring described by a context `gr_ctx_t` ([](gr)). The same functions work
 over the integers, the rationals, $\Z/n\Z$, finite fields, real and
 complex balls, floating-point numbers and any other ring with a
-context. This guide shows a first program, a function written once for
-all rings, the meaning of the status codes, and what changes when the
-coefficients are inexact.
+context.
 
 ## A first program {#first}
 
@@ -141,7 +139,7 @@ Integers mod 5 (_gr_nmod): 2 + 2*x + x^2
 Integers mod 6 (_gr_nmod): failed (status 2)
 ```
 
-The answers differ as they should. Over $\Z$ the GCD keeps the common
+Over $\Z$ the GCD keeps the common
 content 2 and is normalised to a positive leading coefficient; over the
 fields $\mathbb{Q}$ and $\Z/5\Z$ it is monic. $(\Z/6\Z)[x]$ is not a GCD domain,
 and the function reports that it cannot compute an answer instead of
@@ -254,8 +252,6 @@ functions do. Temporary arrays of elements are created with
 The context of a polynomial ring $R[x]$, created by
 `gr_ctx_init_gr_poly(Rx, R)`, has `gr_poly_struct` elements. It is
 needed to build structures over $R[x]$: matrices of polynomials
-(`gr_mat`), polynomials over polynomials (bivariate polynomials, whose
-products `gr_poly` computes by Kronecker substitution and whose
-resultants have dedicated algorithms), or power series over
-polynomials. For arithmetic on single polynomials, the functions of
+(`gr_mat`), polynomials over polynomials (bivariate polynomials), or
+power series over polynomials. For arithmetic on single polynomials, the functions of
 this module with the context of $R$ are simpler and faster.

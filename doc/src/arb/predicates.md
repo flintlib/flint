@@ -6,8 +6,7 @@ functions: arb_is_positive arb_contains_zero arb_lt arb_equal arb_overlaps arb_c
 A ball represents an unknown real number in an interval, so a question
 such as "is $x < y$?" can have three answers: certainly true, certainly
 false, or unknown. FLINT's predicates return an `int` that is 1 when the
-answer is certainly true and 0 otherwise. The sections below explain how
-to use them correctly and what each family means.
+answer is certainly true and 0 otherwise.
 
 ## Three-valued logic with two values {#logic}
 
@@ -138,5 +137,5 @@ usual remedy is to recompute at a higher precision. This terminates if
 the answer is determined by a nonzero quantity, but loops forever when
 the quantity is exactly zero, since ball arithmetic cannot prove that a
 number is zero unless the computation is exact (see
-[](guide/ball-arithmetic/using#guess-and-verify)). Programs should limit
+[](guide/types/ball-arithmetic#guess-and-verify)). Programs should limit
 the precision, and treat the remaining case explicitly.

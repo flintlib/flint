@@ -152,17 +152,56 @@ entries, and accept the solution only when a norm bound proves it.
 ## Rigorous numerics {#balls}
 
 Real and complex numbers are computed with ball arithmetic
-([](guide/ball-arithmetic)): every result is a ball that is guaranteed
+([](guide/types/ball-arithmetic)): every result is a ball that is guaranteed
 to contain the exact value. This guarantee is the same kind of guarantee
 as for exact computations, but the information content of the answer
 varies: a ball may be too wide to be useful, or even contain all real
 numbers. Predicates on balls return 1 only when the property is certain
 and 0 when it is false *or* cannot be decided at the current precision;
-see [](guide/ball-arithmetic/using#predicates). The `double` functions
+see [](guide/types/ball-arithmetic#predicates). The `double` functions
 of [](arb_fpwrap) build on this: a result they return is accurate to
 within one unit in the last place (or correctly rounded on request),
 and when that accuracy cannot be reached they return NaN with the
 status `FPWRAP_UNABLE` instead of an inaccurate value.
+
+## Hardware floating point {#floating-point}
+
+Many parts of FLINT use `double` arithmetic, under different
+assumptions.
+
+- *Heuristics.* `double` arithmetic and `libm` functions choose
+  parameters, such as the number of terms of a series, or compute
+  approximations that are verified afterwards, such as the starting
+  values of the root finder `acb_poly_find_roots` or the
+  floating-point stage of `fmpz_lll`. A flawed floating-point
+  implementation can then only make the computation slower or make it
+  fail. Results computed this way may differ slightly between
+  platforms, for example with and without fused multiply-adds; a
+  rigorous enclosure may have a different radius, but it is still an
+  enclosure.
+- *Rigorous bounds in the ball modules.* `mag_t` arithmetic and some
+  error bounds of `arb` (such as `arb_sin_cos_wide`) are computed with
+  doubles under weak assumptions: `double` is IEEE 754 binary64; the
+  compiler does not reorder floating-point operations; basic operations
+  have an error of at most 1.1 units in the last place in any rounding
+  mode (so x87 arithmetic and a changed rounding mode are allowed); only
+  normal numbers and explicit infinities are used; and `libm`
+  transcendental functions are never used for bounds (logarithms are
+  bounded with `mag_d_log_upper_bound` and `mag_d_log_lower_bound`).
+- *Exact or correctly rounded arithmetic.* Other code relies on IEEE
+  arithmetic exactly: the floating-point FFTs of [](fft_small), the
+  `_precomp` functions of [](ulong_extras), the floating-point matrix
+  kernels, and the [`dfloat`](dfloat) numbers and balls (`d1b_t` to
+  `d4b_t`), which also require round-to-nearest, a correctly rounded
+  `fma`, evaluation of doubles in double precision and no contraction
+  of expressions into fused multiply-adds. `dfloat_is_supported`
+  checks these conditions where possible, and the `dfloat` functions
+  must not be used where it returns 0.
+
+FLINT must therefore not be compiled with unsafe floating-point
+optimisations such as `-ffast-math`. These are off by default in GCC
+and Clang, but some other compilers, such as the classic Intel
+compiler, enable them by default and must be told not to.
 
 ## Unknown answers {#unknown}
 

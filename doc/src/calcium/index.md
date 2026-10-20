@@ -16,7 +16,7 @@ helper for the triple-valued logic type `truth_t`, and a hash function
 for integers. Most programs do not need to include it; it is needed for
 `truth_print`, which `ca.h` does not declare.
 
-The user guide page [](guide/exact) gives an overview of the exact
+The user guide page [](guide/types/choosing#exact) gives an overview of the exact
 number types; [](ca/using) and [](qqbar/using) introduce the two main
 modules.
 
@@ -93,8 +93,7 @@ Appends the null-terminated string `s` to `out`.
 When writing to a string, the buffer at least doubles in size whenever
 it has to grow, so that appending $n$ characters in total costs $O(n)$
 time. A file stream is written with `fputs`, so `s` is written
-literally (in FLINT 3.6 and earlier it was passed as a format string,
-and `%` in `s` was misprinted).
+literally.
 :::
 :::
 

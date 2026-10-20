@@ -69,10 +69,8 @@ block algorithm converts the operand only once and uses the bound
 $a_r(2|a_m| + a_r)$ for the radius. Passing two different copies of the
 same polynomial is correct but slower and gives slightly larger radii.
 
-The functions without underscore truncate the operands to length $n$,
-handle zero lengths and aliasing, and use a few special cases for $n
-\le 2$ to avoid temporary allocations when computing first derivatives
-in automatic differentiation.
+The functions without underscore truncate the operands to length $n$
+and handle zero lengths and aliasing.
 
 ## Middle products {#mulmid}
 

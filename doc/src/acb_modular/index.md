@@ -17,8 +17,9 @@ $\mathrm{PSL}_2(\Z)$, reduction to the fundamental domain, and Hilbert
 class polynomials.
 
 Every evaluation first moves $\tau$ to (or close to) the fundamental
-domain with a modular transformation, so that $|q| \le e^{-\pi\sqrt3}$
-with $q = e^{\pi i \tau}$, and then sums a $q$-series with an addition
+domain with a modular transformation, so that $\operatorname{Im}(\tau) \ge
+\sqrt3/2$ and $|q| \le e^{-\pi\sqrt3/2} \approx 0.066$ with
+$q = e^{\pi i \tau}$, and then sums a $q$-series with an addition
 sequence or rectangular splitting [@EHJ2016]. At precision $p$ this needs
 $O(\sqrt{p})$ terms, and the cost does not depend on how close $\tau$
 was to the real line. The algorithms are described in

@@ -7,9 +7,7 @@ order: 1
 This guide introduces the `gr` interface through small complete
 programs: one generic function evaluated over six rings, the ways of
 allocating elements, the meaning of status codes and truth values,
-vectors, printing and parsing, and conversions between rings. The guide
-[](gr_dft/getting-started) gives a shorter summary of the same
-conventions in the setting of discrete Fourier transforms. All
+vectors, printing and parsing, and conversions between rings. All
 functions mentioned here are documented on the module page [`gr`](gr)
 and in [`gr_vec`](gr_vec); the constructors of the rings are listed in
 [`gr_domains`](gr_domains).
@@ -341,9 +339,7 @@ so it is not known to equal 1, while $1/3$ and $1/2$ are separated and
 known to be different. The algorithm page [](algorithms/generic/errors)
 explains how algorithms use the distinction between the two failure
 codes, and [](algorithms/generic/inexact) how generic algorithms work
-with inexact elements, including the weak normalisation of polynomials
-whose leading coefficient is not known to be nonzero
-([](algorithms/generic/inexact#weak-normalisation)).
+with inexact elements.
 
 ## Vectors {#vectors}
 

@@ -307,9 +307,7 @@ the size second.
 
 FLINT keeps some data between calls to save time: freed `fmpz` integers
 for reuse, tables of primes, precomputed constants, and the tables of
-the shared caches of [](thread_support); `flint_cleanup` also frees
-MPFR's own caches. Most
-of these are per thread (when FLINT is built with thread-local storage);
+the shared caches of [](thread_support). Most of these are per thread (when FLINT is built with thread-local storage);
 the shared caches are global.
 
 ::: type

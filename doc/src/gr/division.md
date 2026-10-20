@@ -33,8 +33,8 @@ ring, since every $q$ solves $q \cdot 0 = 0$; in the zero ring $0/0 = 0$
 is the unique quotient. In $\Z/10\Z$, both $3$ and $8$ solve
 $2 q = 6$, so `gr_div` fails there too, while `gr_div_nonunique` returns
 one of the solutions. `gr_divides(y, x)` answers the question that
-`gr_div_nonunique` answers: whether some $q$ exists. In particular
-$0 \mid 0$ is true in every ring. (Note the order of the arguments:
+`gr_div_nonunique` answers: whether some $q$ exists, so $0 \mid 0$ is
+true in every ring. (Note the order of the arguments:
 `gr_divides(d, x, ctx)` tests whether $d$ divides $x$.)
 
 For ball arithmetic, a quotient by a ball that contains zero but is not

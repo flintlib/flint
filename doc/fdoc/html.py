@@ -660,9 +660,15 @@ class HtmlBuilder:
             nav.append('<a href="%s%s"%s>%s</a>' % (up, url, cur, label))
         katex_js = "\x00KATEXJS%s\x00" % up
         cite = self.citation(page)
+        # a site-wide notice ('notice:' in the front matter of the home
+        # page), shown in a box at the top of every page
+        home = site.pages.get("index")
+        notice = home.meta.get("notice") if home else None
+        notice = ('<aside class="notice" role="note">%s</aside>\n' % r.inline(_parse(notice))
+                  if notice else "")
         # the PDF is published next to the HTML (flint.pdf in the base URL)
         pdf = cfg.get("baseurl", "") + "flint.pdf"
-        return TEMPLATE.format(cite=cite, pdf=esc(pdf),
+        return TEMPLATE.format(cite=cite, pdf=esc(pdf), notice=notice,
             title=esc(full_title), up=up, nav="".join(nav), sidebar=sidebar, main=main,
             project=esc(cfg["project"]), version=esc(cfg["version"]), edit=edit,
             commit=esc(site.commit[:10]), katex_js=katex_js,
@@ -771,8 +777,9 @@ class HtmlBuilder:
             else:
                 cur = ' aria-current="page"' if g is page else ""
                 label = esc(g.meta["short"]) if g.meta.get("short") else r.inline(g.title)
-                out.append('<li class="sb-sec open"><a href="%s"%s>%s</a><ul>%s</ul></li>'
-                           % (r.rel(g.url), cur, label, "".join(items)))
+                sub = "<ul>%s</ul>" % "".join(items) if items else ""
+                out.append('<li class="sb-sec open"><a href="%s"%s>%s</a>%s</li>'
+                           % (r.rel(g.url), cur, label, sub))
         out.append("</ul>")
         return "".join(out)
 
@@ -1060,7 +1067,7 @@ TEMPLATE = """<!doctype html>
 <div class="shell">
   <aside class="sidebar" id="sidebar">{sidebar}</aside>
   <main class="main" id="main">
-{main}
+{notice}{main}
     {cite}
     <footer class="foot">{edit}<a href="{pdf}">PDF version</a> · Built with fdoc from <code>{commit}</code></footer>
   </main>

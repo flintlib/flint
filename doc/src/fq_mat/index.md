@@ -210,8 +210,7 @@ int fq_mat_randpermdiag(fq_mat_t mat, flint_rand_t state, fq_struct * diag, slon
 Sets `mat` to a random row and column permutation of the diagonal matrix
 whose first $n$ diagonal entries are `diag` and whose other entries are
 zero; $n$ must not exceed the number of rows or columns. Returns the
-parity of the permutation (0 for even, 1 for odd), as a wrapper of
-`gr_mat_randpermdiag`.
+parity of the permutation (0 for even, 1 for odd).
 :::
 
 ::: function
@@ -368,11 +367,10 @@ alias $a$.
 
 ## Gaussian elimination {#elimination}
 
-These functions are wrappers of the generic `gr_mat` implementations
-([](algorithms/linear-algebra/gaussian-elimination)), which use
-recursive (block) LU decomposition and triangular solving for large
-matrices, so that their cost is dominated by matrix multiplications
-with `fq_mat_mul`.
+These functions use recursive (block) LU decomposition and triangular
+solving for large matrices
+([](algorithms/linear-algebra/gaussian-elimination)), so that their cost
+is dominated by matrix multiplications with `fq_mat_mul`.
 
 ::: function
 slong fq_mat_lu(slong * P, fq_mat_t A, int rank_check, const fq_ctx_t ctx)
@@ -388,7 +386,7 @@ $U$. If $A$ has rank $r$, then $U$ is in row echelon form with $r$
 nonzero rows, and $L$ is lower triangular with $r$ columns and implicit
 ones on its diagonal. If `rank_check` is nonzero and $A$ is found to be
 rank-deficient, the function stops early and returns 0, leaving $A$ in an
-undefined state. This is a wrapper of `gr_mat_lu`.
+undefined state.
 :::
 :::
 
@@ -396,8 +394,8 @@ undefined state. This is a wrapper of `gr_mat_lu`.
 slong fq_mat_rref(fq_mat_t B, const fq_mat_t A, const fq_ctx_t ctx)
 
 Sets $B$ to the reduced row echelon form of $A$ and returns the rank of
-$A$. The form is computed from an LU decomposition
-(`gr_mat_rref_lu`). $B$ may be aliased with $A$. If $A$ is zero, $B$
+$A$. The form is computed from an LU decomposition. $B$ may be aliased
+with $A$. If $A$ is zero, $B$
 is set to zero and 0 is returned.
 :::
 

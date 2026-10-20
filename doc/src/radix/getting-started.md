@@ -4,8 +4,8 @@ summary: Choosing the radix, working with radix_integer_t, and cheap operations 
 order: 1
 ---
 
-This guide shows how to use the `radix` module for exact integer
-arithmetic in a radix other than a power of two. A radix is described by
+The `radix` module does exact integer arithmetic in a radix other than a
+power of two. A radix is described by
 a `radix_t`, created with `radix_init(radix, b, e)` for the digit radix
 $b$ and $e$ digits per limb. Passing $e = 0$ chooses the largest $e$ with
 $b^e < 2^{\bits}$, which is almost always the best choice: $10^{19}$ for

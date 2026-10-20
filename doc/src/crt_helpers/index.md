@@ -133,9 +133,7 @@ than it, leaving the reduced value in `r`.
 The kernels are written as straight-line code guarded by compile-time
 conditions instead of loops: the accumulators stay in registers only if
 every loop indexing them is completely unrolled, which compilers do not
-do reliably (GCC 12 to 14 and clang 18 leave some of the natural loops
-rolled, which made the reconstruction up to 1.9 times slower). For the
-same reason, a loop over a compile-time number of primes that calls
+do reliably. For the same reason, a loop over a compile-time number of primes that calls
 `_big_addmul_n_m` should be preceded by the macro `CRT_UNROLL_PRIMES`.
 
 A Chinese remaindering for $k$ primes $p_1, \ldots, p_k$ with product

@@ -27,10 +27,6 @@ bits.
   returns 0 for negative $c$, which has infinitely many (GMP's
   `mpz_popcount` returns the largest `mp_bitcnt_t` instead).
 
-Inline operands are handled with word operations, which give the same
-results since inline values are stored in two's complement; large
-operands use GMP's `mpz` functions.
-
 ## Example {#example}
 
 The program shows the low eight bits of the results; the dots stand for

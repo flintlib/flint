@@ -488,7 +488,7 @@ Sets `res` to the sum of the `len` doubles $t_0, \ldots, t_{len-1}$,
 rounded to $N$ nonoverlapping components; the dropped part is
 discarded. The terms may be in any order, but for an accurate result
 they should be roughly sorted by decreasing magnitude. The array `t` is
-used as scratch space and overwritten (by `_dfloat_renorm`); pass a copy
+used as scratch space and overwritten; pass a copy
 if the terms are needed afterwards. `res` must not overlap `t`.
 :::
 
@@ -505,10 +505,8 @@ Adds $|\mathit{err}|$ to the radius of `res`, rounding up; a nonfinite
 ## Elementary functions {#elementary}
 
 The elementary functions of the plain formats are floating-point kernels
-with static error bounds, proved once for all arguments in a range (the
-bounds are derived with a model of every kernel operation in
-`dev/dfloat_exp_bound.py`); the observed errors on random arguments are
-4 to 100 times smaller. The ball versions apply the kernel to the
+with static error bounds, proved once for all arguments in a range; the
+observed errors on random arguments are 4 to 100 times smaller. The ball versions apply the kernel to the
 midpoint, add the static bound, and propagate the input radius with a
 bound on the derivative. The algorithms (table-based argument
 reduction, polynomials evaluated in several chains with tapered

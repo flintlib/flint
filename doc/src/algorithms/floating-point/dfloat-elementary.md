@@ -157,8 +157,8 @@ A reduction by division, $z = (m - c)/(m + c)$ with
 $\log m = \log c + 2\operatorname{atanh} z$, would halve the number of
 coefficients by using only odd powers; but the even and odd parts of the
 polynomial already run in parallel lanes, so nothing would be gained for
-the price of a division (46 ns at $N = 4$, against a few ns for a
-reduction level by multiplication).
+the price of a division, which costs much more than a reduction level by
+multiplication.
 
 ## Arctangent {#atan}
 
@@ -173,8 +173,7 @@ kernel; for $x \le 1/128$ no division is done. With $w = z^2$,
 $\operatorname{atan} z = z + zwE(w)$, $E(w) = -1/3 + w/5 - \cdots$ with
 3, 7, 11 and 14 coefficients, evaluated as four chains in $w^4$. One
 division is unavoidable here; a second reduction level would save only
-two tapered steps (about 4 ns at $N = 4$) at the cost of a second
-division. The relative error bound `DFLOAT_ATAN_EPS_N` holds for all
+two tapered steps at the cost of a second division. The relative error bound `DFLOAT_ATAN_EPS_N` holds for all
 finite $x$.
 
 ## Balls {#balls}

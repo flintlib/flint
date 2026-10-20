@@ -22,8 +22,7 @@ for integer polynomials $P$, $Q$, $R$ and integers $c_P$, $c_Q$, $c_D$.
 It is the format of y-cruncher's `SeriesHypergeometric` formula files
 [@Yee2025], whose fields `CoefficientP`, `CoefficientQ`,
 `CoefficientD`, `PolynomialP`, `PolynomialQ`, `PolynomialR` and
-`Power` translate directly; a formula file can therefore be used as it
-stands. Prefactors that y-cruncher applies outside the series, such as
+`Power` translate directly. Prefactors that y-cruncher applies outside the series, such as
 the $1/\sqrt{10005}$ of the Chudnovsky formula, are left to the caller.
 The term and the ratio share the denominator $Q(k)$ and the product
 stops at $k - 1$, so most formulas need only polynomials of small degree.
@@ -56,7 +55,7 @@ terms, removal of common factors at the nodes, truncation of the values
 to the working precision near the root, and a single division at the
 end; the cost is $O(M(N)\log^2 N)$ for $N$ bits. The merges share the
 `fft_small` transform of their common operand between two products
-([](fft_small/mpn_shared)), which saves 3 to 10% of the total for $\pi$. The function uses the
+([](fft_small/mpn_shared)). The function uses the
 threads of `flint_set_num_threads`, and its result does not depend on
 their number. Below about 30 limbs the setup, 1 to 2 microseconds,
 dominates.

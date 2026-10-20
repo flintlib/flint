@@ -49,7 +49,7 @@ library:
 | $m \le 16$ | FLINT's assembly basecase for each pair $(m, n)$ |
 | $n = 1$ | `mpn_mul_1` |
 | $n \le 230$ and $5n \ge 4m$ | Karatsuba (`flint_mpn_mul_toom22`) on FLINT's basecase |
-| $n < 500$, unless $m + n > 1000$ and $3n > 500$ | GMP's `mpn_mul`: its basecase, Karatsuba and Toom–Cook 3, 4, 6.5 and 8.5, with unbalanced variants (its own FFT starts only at thousands of limbs, beyond this range) |
+| $n < 500$, unless $m + n > 1000$ and $3n > 500$ | GMP's `mpn_mul`: its basecase, Karatsuba and Toom–Cook 3, 4, 6.5 and 8.5, with unbalanced variants |
 | otherwise | small-prime FFT of `fft_small` (`mpn_mul_default_mpn_ctx`) |
 
 The threshold 500 is `FLINT_FFT_SMALL_MUL_THRESHOLD`, which depends on
@@ -126,8 +126,7 @@ F_101^2 + F_100^2 - 3 F_99 = 453973694165307953196640200709906953726748
 COEFF_MAX^2 = 21267647932558653957237540927630737409
 ```
 
-The algorithms of the table above give the same results as GMP. The
-program compares `fmpz_mul` with `mpz_mul` for random operands of $n$
+The program compares `fmpz_mul` with `mpz_mul` for random operands of $n$
 and $2n$ limbs, from the basecase up to `fft_small`, and checks that the
 squaring path agrees with `fmpz_pow_ui`:
 

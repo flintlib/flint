@@ -331,8 +331,7 @@ Set $v[k]$ to the exponent of $\chi(k)$ for $0 \le k < \mathit{nv}$,
 modulo `G->expo` or modulo `order`, which must be a multiple of the order
 of $\chi$; entries with $\gcd(k, q) > 1$ are set to `DIRICHLET_CHI_NULL`.
 The functions call the `loop` versions if $2\,\mathit{nv} >
-\varphi(q)$ and the `primeloop` versions otherwise. In particular
-$v[0]$ is `DIRICHLET_CHI_NULL` for $q > 1$, and for $q = 1$, where the
+\varphi(q)$ and the `primeloop` versions otherwise. $v[0]$ is `DIRICHLET_CHI_NULL` for $q > 1$, and for $q = 1$, where the
 trivial character is 1 everywhere, every entry is 0.
 :::
 

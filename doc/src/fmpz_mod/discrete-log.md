@@ -10,8 +10,9 @@ $q^e$ dividing $p - 1$, one base-$q$ digit at a time with Shanks'
 baby-step giant-step search in the subgroup of order $q$, and the
 results are combined by the Chinese remainder theorem. This is fast when
 every prime factor $q$ of $p - 1$ is small; the cost grows like
-$\sqrt{q}$ for the largest $q$. The method and its analysis are described in [](algorithms/number-theory/discrete-log); the word-size version is
-`nmod_discrete_log_pohlig_hellman_run`.
+$\sqrt{q}$ for the largest $q$. The method and its analysis are
+described in [](algorithms/number-theory/discrete-log); the word-size
+version is `nmod_discrete_log_pohlig_hellman_run`.
 
 ## Usage {#usage}
 

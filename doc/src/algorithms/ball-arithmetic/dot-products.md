@@ -95,9 +95,7 @@ contribution, without any normalisation of intermediate `mag_t` values.
 
 Lowering the precision in step 2 is what makes `arb_dot` fast for inexact
 input: if the entries of a matrix are only known to 50 bits, the products
-are computed to about 80 bits, whatever `prec` is. This is consistent with
-the general rule of FLINT's ball arithmetic that the midpoint need not be
-more precise than about 30 bits below the radius.
+are computed to about 80 bits, whatever `prec` is.
 
 ## Variants {#variants}
 

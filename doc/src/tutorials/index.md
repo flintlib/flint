@@ -8,11 +8,10 @@ function at work. The tutorials in this chapter are longer. Each one
 solves a small but realistic problem, explains the mathematics behind it
 and the choices made in the code, and points to the reference
 documentation and the algorithm pages for details. The programs are
-complete: they can be copied into a file, compiled and linked as shown in
-[](tutorials/getting-started/first-program), and run. Every program in
-the tutorials is compiled and run by the documentation checks, and its
-output is compared with the output shown, so the code and the results
-stay in sync with the library.
+complete: they can be compiled and linked as shown in
+[](tutorials/getting-started/first-program). The documentation checks
+compile and run every program and compare its output with the output
+shown.
 
 FLINT's source tree also contains a directory `examples` of larger
 programs: command-line tools, demonstrations and benchmarks, some of
@@ -34,7 +33,7 @@ The tutorials are grouped by topic:
 - [](tutorials/numerics): rigorous numerical computation with ball
   arithmetic: constants to many digits, special functions, roots of
   functions and polynomials, integrals and the zeros of the Riemann zeta
-  function, with guaranteed error bounds.
+  function.
 - [](tutorials/exact): exact computation with algebraic numbers and exact
   real and complex numbers.
 
@@ -42,4 +41,4 @@ The tutorials assume some familiarity with C and with the mathematics of
 their topic, but not with FLINT. For the conventions that all modules
 share (types, memory management, aliasing, threading) see
 [](guide/conventions); for the meaning of the results of ball arithmetic
-see [](guide/ball-arithmetic).
+see [](guide/types/ball-arithmetic).

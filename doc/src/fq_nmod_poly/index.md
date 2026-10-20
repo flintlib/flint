@@ -7,7 +7,7 @@ category: Finite fields
 order: 14
 ---
 
-This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_nmod` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_poly` version, whose documentation has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
+This module implements dense univariate polynomials over a finite field $\mathbb{F}_q$ in the representation of [](fq_nmod) (a prime $p < 2^{\bits}$, elements stored as `nmod_poly`). It is generated from the same template as [](fq_poly) and has the same functions, with `fq_nmod` in place of `fq`; each function links to the `fq_poly` version, which has the details. As there, division, GCD, composition and power series functions are wrappers of the generic `gr_poly` algorithms.
 
 The differences are in multiplication: `fq_nmod_poly_mul` uses the substitution $y = x^{2d-1}$ of the generator, which turns the product into one product in $(\Z/p\Z)[x]$ computed by `nmod_poly_mul` (with `fft_small` for long products), except for very short products (see [](fq_poly/mul)). The GCD functions switch from the Euclidean algorithm to the half-GCD algorithm at length 110 for $p < 2^8$ (`FQ_NMOD_POLY_SMALL_GCD_CUTOFF`) and 120 otherwise (`FQ_NMOD_POLY_GCD_CUTOFF`), with the half-GCD basecase below 25 (`FQ_NMOD_POLY_HGCD_CUTOFF`).
 
@@ -1322,7 +1322,7 @@ void fq_nmod_mat_charpoly(fq_nmod_poly_t p, const fq_nmod_mat_t M, const fq_nmod
 Sets $p$ to the characteristic polynomial $\det(xI - M)$ of the square
 matrix $M$; throws `FLINT_ERROR` if $M$ is not square. This is a wrapper
 of `gr_mat_charpoly`, which uses the Berkowitz algorithm for
-$n \le 12$ and Danilevsky's algorithm otherwise (for `fq_nmod_zech`, from
+$n \le 12$ and Danilevsky's algorithm otherwise (for `fq_zech`, from
 $n = 5$); see [](algorithms/linear-algebra/charpoly).
 
 ::: details

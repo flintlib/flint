@@ -8,11 +8,8 @@ arrays with the Schönhage–Strassen algorithm. It chooses a transform
 length and a coefficient ring from tuning tables and then calls one of
 the two lower-level functions documented below, which take these parameters
 explicitly. For general use, call `flint_mpn_mul` (or `fmpz_mul`)
-instead: it uses FLINT's basecase and Karatsuba code (where FLINT has
-assembly) and GMP's `mpn_mul` for small and medium operands, and for
-large ones the faster `mpn_mul_default_mpn_ctx` in builds with
-`fft_small`, or otherwise this function from `FLINT_FFT_MUL_THRESHOLD`
-limbs ([](mpn_extras/mul)).
+instead, which uses this function only in builds without `fft_small`,
+from `FLINT_FFT_MUL_THRESHOLD` limbs ([](mpn_extras/mul)).
 
 ## How the product is computed {#method}
 

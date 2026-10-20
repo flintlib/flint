@@ -47,9 +47,7 @@ of a curve are tried at once, and the realisation of a step (class
 polynomial, root, curve and point) runs on a pool thread while the search
 for the next step proceeds.
 
-`ecpp_set_verbose(1)` reports the steps as they are found; compiling
-`src/ecpp/prove.c` with `-DECPP_PROFILE` prints a breakdown of the time,
-and `src/ecpp/profile/p-prove.c` compares ECPP with APRCL. The example
+`ecpp_set_verbose(1)` reports the steps as they are found. The example
 program `factor_integer` (in `examples/`) proves the prime factors it
 finds with ECPP when given `-certify`, and prints the certificates in the
 PARI/GP format with `-pari`.
@@ -72,8 +70,6 @@ function as a class invariant [@Schertz2002; @YuiZagier1997]. The class
 field tower is the decomposition of Enge and Morain [@EngeMorain2003];
 the factor of $H_D$ over the genus field and the descent by radicals and
 by Kummer theory through the tower are original to this implementation.
-The timings of PARI/GP and CM on the same inputs were used to tune the
-parameters.
 
 ## Example {#example}
 

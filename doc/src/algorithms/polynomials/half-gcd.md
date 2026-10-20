@@ -35,10 +35,9 @@ finite fields from length 200, with inner cutoff 100, and the
 Euclidean algorithm over other fields, where the half-gcd algorithm
 suffers from coefficient growth (exact infinite fields such as $\mathbb{Q}$) or
 numerical instability (floating-point and ball arithmetic).
-`nmod_poly`, `fmpz_mod_poly` (cutoffs 256 and 128), `mpn_mod` (240 and
-80) and the `fq` variants (90 to 120 and 25 to 35) call the same
-functions with their own cutoffs; the cutoffs for `nmod_poly` are
-listed in [](#use). The $2 \times 2$ matrix products are the ring method
+The type-specific modules call the same functions with their own
+cutoffs ([](algorithms/polynomials/gcd#specialisations)); those of
+`nmod_poly` are listed in [](#use). The $2 \times 2$ matrix products are the ring method
 `_gr_poly_hgcd_mat_mul`, so a ring can replace the products described
 below. [](algorithms/polynomials/gcd) compares the half-gcd algorithm
 with the Euclidean and subresultant algorithms over all rings.

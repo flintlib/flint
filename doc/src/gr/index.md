@@ -22,12 +22,10 @@ mathematically undefined (`GR_DOMAIN`) or could not be computed
 (`GR_UNABLE`), and predicates return a three-valued `truth_t`, so that
 inexact and partially decidable rings are handled rigorously.
 
-The reference below documents the functions declared in `gr.h` that
-act on elements and contexts of any ring. The constructors of the
-built-in rings are listed in [`gr_domains`](gr_domains), the default
-implementations of methods in [`gr_generic`](gr_generic), special
-functions in [`gr_special`](gr_special) and vector operations in
-[`gr_vec`](gr_vec). Start with the guide [](gr/getting-started); the
+The constructors of the built-in rings are listed in
+[`gr_domains`](gr_domains), the default implementations of methods in
+[`gr_generic`](gr_generic), special functions in
+[`gr_special`](gr_special) and vector operations in [`gr_vec`](gr_vec). Start with the guide [](gr/getting-started); the
 guide [](gr/implementing) explains how to define a new ring. The design
 of the framework (method tables, inexact elements, error handling and
 testing) is described in [](algorithms/generic/overview) and in
@@ -242,9 +240,6 @@ Converts a truth value into a status: `T_TRUE` to `GR_SUCCESS`,
 :::
 
 ## Contexts {#contexts}
-
-The constructors `gr_ctx_init_*` of the built-in rings are listed in
-[`gr_domains`](gr_domains).
 
 ::: function
 void gr_ctx_clear(gr_ctx_t ctx)

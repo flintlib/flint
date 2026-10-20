@@ -7,12 +7,12 @@ order: 80
 
 The `decimal` module implements decimal floating-point numbers of
 arbitrary precision whose operations are correctly rounded to a given
-number of significant digits, as specified for decimal arithmetic by
-IEEE 754-2008 [@IEEE754] and the General Decimal Arithmetic
-specification [@Cow2009], but with unbounded precision and exponents.
-The representation and the algorithms that make correct rounding cheap
-are described below. The binary floating-point types of FLINT are
-compared in [](algorithms/floating-point/overview).
+number of significant digits, with unbounded precision and exponents.
+Many of its operations and ideas come from IEEE 754-2008 decimal
+arithmetic [@IEEE754] and the General Decimal Arithmetic specification
+[@Cow2009], but it is not an implementation of either.
+The binary floating-point types of FLINT are compared in
+[](algorithms/floating-point/overview).
 
 ## Representation {#representation}
 

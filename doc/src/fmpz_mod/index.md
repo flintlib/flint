@@ -25,9 +25,7 @@ The generic ring with `fmpz` residues is `gr_ctx_init_fmpz_mod`. For a
 single operation modulo $n$ without a context, the functions of `fmpz`
 described in [](fmpz/modular) suffice.
 
-The guide [](fmpz_mod/usage) shows the typical use. The reference below
-lists every function, from the context to the internal arithmetic
-functions at the end.
+The guide [](fmpz_mod/usage) shows the typical use.
 
 ::: summary algorithms/arithmetic/multiword-overview :::
 
@@ -170,8 +168,7 @@ void fmpz_mod_sub(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t
 void fmpz_mod_neg(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
 Set $a$ to $b + c$, $b - c$ and $-b$ modulo $n$, for canonical $b$ and
-$c$. `fmpz_mod_add` and `fmpz_mod_sub` call the function selected by
-the context; the results need one conditional correction.
+$c$.
 :::
 
 ::: function

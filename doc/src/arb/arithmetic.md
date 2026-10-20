@@ -6,9 +6,7 @@ functions: arb_add arb_sub arb_mul arb_div arb_inv arb_addmul arb_fma
 The arithmetic functions are the building blocks of every computation
 with balls. Each computes the result of the operation on the midpoints
 with one `arf` operation rounded to `prec` bits, and sets the radius to a
-bound for the propagated error plus the rounding error. The sections
-below explain exactly what they compute, how the precision and exactness
-interact, and what happens for special input.
+bound for the propagated error plus the rounding error.
 
 ## What is computed {#formulas}
 
@@ -142,7 +140,7 @@ prec)` computes $z + xy$ with a single rounding of the midpoint, which is
 both faster and more accurate than a multiplication followed by an
 addition; `arb_fma` is the same with a separate output. For sums of many
 products, `arb_dot` is better still: it rounds only once in total and
-lowers the working precision to what the input justifies. Note that
+lowers the working precision to what the input justifies.
 `arb_sub(z, x, x, prec)` and `arb_mul(z, x, x, prec)` treat the two
 arguments as independent balls: $x - x$ is $[0 \pm 2r]$, not 0 (see
-[](guide/ball-arithmetic/pitfalls)).
+[](guide/types/ball-arithmetic#conventions)).

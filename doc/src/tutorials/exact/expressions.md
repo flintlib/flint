@@ -8,9 +8,7 @@ Symbolic computation sometimes produces algebraic numbers as large
 expressions with nested radicals, and deciding whether two of them are
 equal is a common and difficult task for computer algebra systems. FLINT
 can evaluate such expressions either as canonical algebraic numbers
-([](qqbar)) or as elements of formal fields ([](ca)). This tutorial
-shows both on small examples, and then discusses the example program
-`huge_expr`.
+([](qqbar)) or as elements of formal fields ([](ca)).
 
 ## Parsing and comparing {#parsing}
 

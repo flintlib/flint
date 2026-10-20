@@ -17,9 +17,7 @@ variants, `arb_mat`, `acb_mat`, `ca_mat`) provide kernels whose speed
 depends on the entry representation, above all matrix multiplication,
 and algorithms that exploit the structure of their ring, such as
 multimodular and $p$-adic methods over $\Z$ and preconditioned
-elimination for balls. The sections below describe the generic
-algorithms, how they choose among themselves from the properties of the
-ring, and where the specialised algorithms take over.
+elimination for balls.
 
 ## Ring methods and the role of multiplication {#methods}
 

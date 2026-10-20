@@ -7,9 +7,7 @@ order: 75
 
 A Dirichlet character modulo $q$ is a group homomorphism $\chi :
 (\Z/q\Z)^\times \to \C^\times$, extended to $\Z$ by periodicity and by
-$\chi(n) = 0$ for $\gcd(n, q) > 1$. The sections below describe the
-representation used by the `dirichlet` module and the algorithms for the
-basic operations. For the theory see [@Apo1976, Chapter 6] and
+$\chi(n) = 0$ for $\gcd(n, q) > 1$. For the theory see [@Apo1976, Chapter 6] and
 [@IR1990, Chapter 4]; the numbering is that of Conrey, used by the LMFDB
 [@LMFDB].
 

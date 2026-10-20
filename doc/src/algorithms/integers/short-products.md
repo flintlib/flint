@@ -10,8 +10,7 @@ lifting and 2-adic Newton iteration need the low half, floating-point
 multiplication and Newton division need the high half, and Newton
 iteration for the reciprocal needs a middle part of a $2n \times n$
 product whose low part is known to cancel. Computing only the required
-part saves up to half of the work. This section states what FLINT computes
-and proves the error bounds; the interfaces are described in
+part saves up to half of the work. The interfaces are described in
 [](mpn_extras/mulhigh). FLINT's high products, their error analysis and
 their kernels for small sizes are due to Ahlbäck and Johansson
 [@AJ2025].
@@ -70,7 +69,7 @@ the carries, so it cannot be computed exactly faster than the full
 product in the worst case. A high product computes the diagonals
 $d \ge n - 1$ (or $d \ge n - 2$), which determine the top $n$ limbs up to
 a small error, and drops the others. Following Ahlbäck and Johansson
-[@AJ2025], who designed FLINT's high products, write
+[@AJ2025], write
 
 $$
 H'_n(u, v) = \sum_{i + j \ge n - 1} u_i v_j B^{i+j}, \qquad
@@ -140,9 +139,7 @@ $\lfloor uv/B^{n-1} \rfloor - h = \lfloor E / B^{n-1} \rfloor \le 2n - 4$.
 :::
 
 All algorithms used by `flint_mpn_mulhigh_n` and `flint_mpn_sqrhigh`
-return an $h$ with the same bounds ([](#thm-recursive-high) below); the
-tests of these functions check the slightly weaker bound
-$\lfloor uv/B^{n-1} \rfloor - 2n < h$.
+return an $h$ with the same bounds ([](#thm-recursive-high) below).
 
 ::: corollary {#cor-exact}
 Write $h = H B + r$ with $0 \le r < B$, so that $H$ is the computed

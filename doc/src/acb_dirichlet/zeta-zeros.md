@@ -10,11 +10,11 @@ imaginary part from $\rho_1 = 1/2 + 14.1347\ldots i$, and
 zeros of the Hardy Z-function. The results are proven: each zero is
 isolated in an interval that contains exactly one sign change of $Z(t)$,
 and the zeros between are counted by Turing's method, so that the $n$-th
-zero found is the $n$-th zero of $\zeta(s)$ in the critical strip. In
-particular, the computation verifies that the zeros in the Gram blocks it
-examines are simple and lie on the critical line. The mathematics is described in
-[](algorithms/special-functions/zeta-zeros); the general techniques for
-isolating and refining real roots in ball arithmetic are described in
+zero found is the $n$-th zero of $\zeta(s)$ in the critical strip. The
+computation thereby verifies that the zeros in the Gram blocks it
+examines are simple and lie on the critical line. The mathematics is
+described in [](algorithms/special-functions/zeta-zeros), and real root
+isolation in ball arithmetic in
 [](algorithms/ball-arithmetic/real-root-isolation).
 
 ## Two methods {#methods}

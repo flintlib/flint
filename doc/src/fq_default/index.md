@@ -14,18 +14,14 @@ logarithms (`fq_zech`) for small fields, polynomials over a word-size
 prime field (`fq_nmod`), polynomials over a multiprecision prime field
 (`fq`), and, for prime fields ($d = 1$), plain residues modulo $p$
 (`nmod` or `fmpz_mod`). Every function dispatches on the representation,
-either by comparing the type code or through the method table of the
-generic ring interface, so the same code works for all fields at the cost
-of a few comparisons or an indirect call per operation. Polynomials, matrices and factorisation over the same
-fields are provided by `fq_default_poly.h`, `fq_default_mat.h` and
+at the cost of a few comparisons or an indirect call per operation.
+Polynomials, matrices and factorisation over the same fields are provided
+by `fq_default_poly.h`, `fq_default_mat.h` and
 `fq_default_poly_factor.h`.
 
 The guide [](fq_default/getting-started) shows how to create fields and
 compute with their elements. The representations and the algorithms
-they use are compared on [](algorithms/finite-fields/overview). The
-reference below starts with the context, then lists memory management,
-conversions, arithmetic, roots, the Frobenius map, norm and trace,
-random elements and input and output, and ends with the internal macros.
+they use are compared on [](algorithms/finite-fields/overview).
 
 ::: summary algorithms/finite-fields/overview :::
 

@@ -9,8 +9,7 @@ Converting an integer from binary to decimal and back is needed for
 input and output, and for arithmetic in a decimal (or $p$-adic) radix.
 The schoolbook methods (repeated division by the radix, or Horner's rule)
 take quadratic time, which is far too slow for numbers of millions of
-digits. This section describes the quasi-linear algorithms, and in
-particular the variant used by the [`radix`](radix) module, which
+digits. The [`radix`](radix) module uses a quasi-linear variant that
 avoids divisions entirely by doing the arithmetic in the target radix.
 
 Throughout, $\beta = 2^{\bits}$ is the binary limb radix and $B = b^e < \beta$

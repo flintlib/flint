@@ -30,8 +30,7 @@ as follows.
   available, which includes all common 64-bit desktop and server
   processors, it has replaced this module for integer multiplication:
   `mpn_mul_default_mpn_ctx` is used from a few hundred to 1000 limbs on,
-  depending on the target, and is about 1.5 to 2 times faster than
-  `flint_mpn_mul_fft_main` at sizes where both apply.
+  depending on the target.
 - `fmpz_poly` multiplication (`_fmpz_poly_mulmid` and everything that
   dispatches through it: products, low, high and middle products,
   squaring) uses Schönhage–Strassen convolutions (`fft_convolution`) for
@@ -53,9 +52,6 @@ as follows.
 
 The guide [](fft/using) shows how to multiply integers and polynomials
 with the module, including the memory layout that the transforms expect.
-The reference below starts with the high-level functions; the arithmetic
-modulo $2^N + 1$, the butterflies and the transforms they are built from
-follow.
 
 ::: summary algorithms/fft/schonhage-strassen :::
 

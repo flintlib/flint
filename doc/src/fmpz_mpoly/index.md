@@ -23,9 +23,6 @@ Factorisation is in `fmpz_mpoly_factor`, rational functions in
 
 Start with the guide [](fmpz_mpoly/getting-started), which covers
 contexts, orderings, building, parsing, printing and iterating over terms.
-The reference below lists every function: first types, memory management
-and basic access, then arithmetic, division and GCDs, then special
-operations, and finally the internal functions.
 
 ::: summary algorithms/multivariate/overview :::
 
@@ -1120,9 +1117,7 @@ int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx, slong nwork
 Chooses the monomial boundaries at which the dividend is split among
 `nworkers` threads in the threaded exact division, storing them as the
 monomials of `S`. Returns nonzero if it detects on the way that the
-division cannot be exact. It lives here because it uses an
-`fmpz_mpoly_t` to sort the monomials, but it is also used by
-`nmod_mpoly`.
+division cannot be exact. It is also used by `nmod_mpoly`.
 :::
 
 ## Square roots {#sqrt}

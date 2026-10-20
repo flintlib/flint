@@ -11,18 +11,17 @@ polynomial $f \in \mathbb{Q}[x]$ is stored as an integer polynomial (the
 *numerator*, an `fmpz` coefficient array) together with a single positive
 integer *denominator*, $f = (a_0 + a_1 x + \cdots + a_{n-1} x^{n-1}) / d$.
 A common denominator is usually much more efficient than a vector of
-rational coefficients: products and most other operations reduce to
-`fmpz_poly` arithmetic on the numerators, with a few gcds of integers to
-keep the representation in lowest terms.
+rational coefficients: most operations reduce to `fmpz_poly` arithmetic
+on the numerators, with a few integer gcds to keep the representation
+in lowest terms.
 
-The algorithms are those of `fmpz_poly`, applied to the numerators:
-multiplication by Kronecker substitution and FFTs over $\Z$, division by
-[pseudo-division](fmpz_poly/divrem#pseudo), GCDs by the modular and
+Multiplication uses Kronecker substitution and FFTs over $\Z$, division
+[pseudo-division](fmpz_poly/divrem#pseudo), GCDs the modular and
 heuristic algorithms of `fmpz_poly`
-([](algorithms/polynomials/gcd-integers)), power series by Newton iteration with fraction-free
-basecases. The guide [](fmpq_poly/getting-started) explains the
-representation, canonical forms and the rules for the underscore
-functions.
+([](algorithms/polynomials/gcd-integers)), and power series Newton
+iteration with fraction-free basecases. The guide
+[](fmpq_poly/getting-started) explains the representation, canonical
+forms and the rules for the underscore functions.
 
 ## Types and conventions {#conventions}
 
@@ -90,11 +89,8 @@ void fmpq_poly_fit_length(fmpq_poly_t poly, slong len)
 
 If `len` is greater than the number of coefficients currently
 allocated, then the polynomial is reallocated to have space for at
-least `len` coefficients. No data is lost when calling this
-function. The function efficiently deals with the case where
-`fit_length` is called many times in small increments by at
-least doubling the number of allocated coefficients when `len`
-is larger than the number of coefficients currently allocated.
+least `len` coefficients, at least doubling the allocation so that
+many calls in small increments are efficient. No data is lost.
 
 :::
 
@@ -504,8 +500,7 @@ int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 Compares the two polynomials `left` and `right`.
 
 ::: details
-Compares the two polynomials `left` and `right`, returning
-$-1$, $0$, or $1$ as `left` is less than, equal to, or greater
+Returns $-1$, $0$, or $1$ as `left` is less than, equal to, or greater
 than `right`.  The comparison is first done by the degree, and
 then, in case of a tie, by the individual coefficients from highest
 to lowest.
@@ -560,9 +555,8 @@ be aliased.
 void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
 
 As per `_fmpq_poly_add` except that one can specify whether to
-canonicalise the output or not. This function is intended to be used with
-weak canonicalisation to prevent explosion in memory usage. It exists for
-performance reasons.
+canonicalise the output or not, for use with weak canonicalisation to
+prevent explosion in memory usage.
 
 :::
 
@@ -577,10 +571,9 @@ Henrici's algorithm.
 ::: function
 void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can)
 
-As per `mpq_poly_add` except that one can specify whether to
-canonicalise the output or not. This function is intended to be used with
-weak canonicalisation to prevent explosion in memory usage. It exists for
-performance reasons.
+As per `fmpq_poly_add` except that one can specify whether to
+canonicalise the output or not, for use with weak canonicalisation to
+prevent explosion in memory usage.
 
 :::
 
@@ -641,9 +634,8 @@ aliased.
 void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
 
 As per `_fmpq_poly_sub` except that one can specify whether to
-canonicalise the output or not. This function is intended to be used with
-weak canonicalisation to prevent explosion in memory usage. It exists for
-performance reasons.
+canonicalise the output or not, for use with weak canonicalisation to
+prevent explosion in memory usage.
 
 :::
 
@@ -659,9 +651,8 @@ using Henrici's algorithm.
 void fmpq_poly_sub_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can)
 
 As per `_fmpq_poly_sub` except that one can specify whether to
-canonicalise the output or not. This function is intended to be used with
-weak canonicalisation to prevent explosion in memory usage. It exists for
-performance reasons.
+canonicalise the output or not, for use with weak canonicalisation to
+prevent explosion in memory usage.
 
 :::
 
@@ -1390,11 +1381,11 @@ letting $x$ and $y$ denote the leading coefficients, the resultant
 is defined as
 
 $$
-x^{\deg(f)} y^{\deg(g)} \prod_{1 \leq i, j \leq n} (r_i - s_j).
+x^{n} y^{m} \prod_{i=1}^{m} \prod_{j=1}^{n} (r_i - s_j).
 $$
 
 We handle special cases as follows:  if one of the polynomials is zero,
-the resultant is zero.  Note that otherwise if one of the polynomials is
+the resultant is zero.  Otherwise, if one of the polynomials is
 constant, the last term in the above expression is the empty product.
 
 :::
@@ -1486,8 +1477,7 @@ in canonical form.
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
 
 Sets `res` to the integral of `poly`. The constant
-term is set to zero. In particular, the integral of the zero
-polynomial is the zero polynomial.
+term is set to zero.
 
 :::
 
@@ -1618,7 +1608,7 @@ Supports aliasing between the input and output polynomials.
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t h, slong n)
 
 Sets `res` to the series expansion of the exponential function
-of `h` to order `n > 0`. Requires `f` to have
+of `h` to order `n > 0`. Requires `h` to have
 constant term 0.
 
 :::
@@ -1881,10 +1871,9 @@ void _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n)
 Sets `coeffs` to the coefficient array of the Legendre polynomial
 $P_n(x)$, defined by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$,
 for $n\ge0$. Sets `den` to the overall denominator.
-The coefficients are calculated using a hypergeometric recurrence.
-The length of the array will be `n+1`.
-To improve performance, the common denominator is computed in one step
-and the coefficients are evaluated using integer arithmetic. The
+The coefficients are calculated using a hypergeometric recurrence
+in integer arithmetic.
+The length of the array will be `n+1`. The
 denominator is given by
 $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 See `fmpz_poly` for the shifted Legendre polynomials.
@@ -1896,10 +1885,8 @@ void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
 
 Sets `poly` to the Legendre polynomial $P_n(x)$, defined
 by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$, for $n\ge0$.
-The coefficients are calculated using a hypergeometric recurrence.
-To improve performance, the common denominator is computed in one step
-and the coefficients are evaluated using integer arithmetic. The
-denominator is given by
+The coefficients are calculated using a hypergeometric recurrence
+in integer arithmetic. The denominator is given by
 $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 See `fmpz_poly` for the shifted Legendre polynomials.
 
@@ -2331,7 +2318,7 @@ variable name `x`.
 ::: function
 int fmpq_poly_fprint_pretty(FILE * file, const fmpq_poly_t poly, const char * var)
 
-Prints the pretty representation of `poly` to `stdout`, using
+Prints the pretty representation of `poly` to `file`, using
 the null-terminated string `var` not equal to `"\0"` as the
 variable name.
 

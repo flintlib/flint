@@ -21,7 +21,7 @@ Results that are rational, such as solutions of $AX = B$, inverses and
 reduced row echelon forms, are returned as an integer matrix together with
 a common denominator. The guide [](fmpz_mat/linear-algebra) explains this
 representation, how the algorithms are chosen and how to organise
-computations; the reference below lists every function.
+computations.
 
 ::: summary algorithms/linear-algebra/integer-matrix-multiplication :::
 
@@ -164,9 +164,7 @@ $0 \le r_1 \le r_2 \le$ `mat->r` and $0 \le c_1 \le c_2 \le$ `mat->c`.
 The window shares its entries with `mat`; no memory is allocated.
 
 ::: details
-The bounds are checked only with `FLINT_ASSERT`. A window can be passed to
-most functions as input or output, as long as no two arguments overlap
-partially; it must not be passed to `fmpz_mat_clear` or `fmpz_mat_swap`.
+The bounds are checked only with `FLINT_ASSERT`.
 :::
 :::
 
@@ -618,8 +616,7 @@ must not overlap $a$.
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 
 Sets `Amod` to $A$ reduced modulo the modulus of `Amod`, which must have
-the same dimensions. Symmetric square matrices are detected and only
-half of their entries reduced.
+the same dimensions.
 :::
 
 ::: function
@@ -990,9 +987,6 @@ Equivalently, $d$ times column $r$ is added to every column
 $j \notin \{r - 1, r\}$, and then $d$ times the sum of the rows
 $j \notin \{r - 1, r\}$ is subtracted from row $r$. Such transforms
 preserve the determinant and the characteristic and minimal polynomials.
-Earlier documentation stated that all off-diagonal entries of row $r$ of
-$P$ are $d$; the entry in column $r - 1$ is in fact zero, as for
-`nmod_mat_similarity`.
 :::
 :::
 
@@ -1023,7 +1017,7 @@ $\mathit{den} = \det(A)$; `fmpz_mat_solve_dixon_den` and
 `fmpz_mat_solve_multi_mod_den` return the smallest positive common
 denominator of the solution. $X$ may be $A$ or $B$. On a return value
 of 0, $X$ is unspecified and `den` is 0 for the fraction-free solvers.
-$X$ may be a window matrix: the solvers copy the result entry by entry.
+$X$ may be a window matrix.
 :::
 :::
 

@@ -14,8 +14,7 @@ sieving and table lookups. Throughout, $B = 2^{\bits}$.
 
 ## Barrett reduction {#barrett}
 
-Barrett's method [@Bar1987] estimates the quotient with a precomputed
-approximation of $B/n$.
+Barrett's method [@Bar1987] estimates the quotient as follows.
 
 ::: proposition {#prop-barrett}
 Let $2 \le n < B$, $m = \lfloor B/n \rfloor$ and $0 \le x < B$, and let

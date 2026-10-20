@@ -98,8 +98,7 @@ Bluestein's algorithm (odd $n \ge 3$).
 the prime factor algorithm when $n$ has at least two distinct prime
 factors, and mixed-radix for powers of an odd prime $p$. For $p > 19$,
 mixed-radix computes the transforms of length $p$ with a Bluestein
-sub-plan when the ring allows it. The guide [](gr_dft/performance) gives the details, and
-[](algorithms/fft/dft-algorithms) describes each algorithm.
+sub-plan when the ring allows it; see [](gr_dft/performance).
 :::
 :::
 

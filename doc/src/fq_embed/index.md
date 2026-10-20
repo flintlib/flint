@@ -17,8 +17,7 @@ back onto the subfield, by matrices over $\mathbb{F}_p$ acting on
 coordinate vectors with respect to the bases $1, x, \ldots, x^{d-1}$. It
 also provides the linear algebra on which this rests: multiplication
 and composition matrices, and the change of basis between the monomial
-basis and its dual basis for the trace form. The algorithms are described
-in [](algorithms/finite-fields/embeddings).
+basis and its dual basis for the trace form.
 
 The interface is generated from `fq_embed_templates.h` and is the same
 for `fq_nmod_embed` and `fq_zech_embed`, with matrices and polynomials

@@ -10,11 +10,9 @@ This module factors polynomials of [](fq_default_poly) into irreducible
 factors, tests irreducibility and squarefreeness, and finds roots, for
 any finite field given by an `fq_default_ctx_t`. Every function calls the
 function of the representation of the context: those of
-[](fq_poly_factor) (and its `fq_nmod` and `fq_zech` versions), which wrap
-the generic algorithms of `gr_poly`, for extension fields, and those of
-`nmod_poly_factor` and `fmpz_mod_poly_factor` for prime fields. The
-algorithms are described in
-[](algorithms/polynomials/factoring-finite-fields); the guide
+[](fq_poly_factor) (and its `fq_nmod` and `fq_zech` versions) for
+extension fields, and those of `nmod_poly_factor` and
+`fmpz_mod_poly_factor` for prime fields. The guide
 [](fq_default/getting-started) has an example.
 
 ::: summary algorithms/polynomials/factoring-finite-fields :::

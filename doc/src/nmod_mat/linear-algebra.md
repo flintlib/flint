@@ -4,12 +4,6 @@ summary: How matrices are stored, how to work on blocks with windows, which func
 order: 1
 ---
 
-This guide explains how to use `nmod_mat` for exact linear algebra over
-$\Z/n\Z$: how matrices are stored and how to address blocks of them,
-which functions are valid for which moduli, and how to arrange a
-computation so that most of the time is spent in matrix multiplication,
-which is by far the best optimised operation.
-
 ## Storage and windows {#storage}
 
 An `nmod_mat_t` holds a pointer to its first entry, its dimensions, a
@@ -90,10 +84,7 @@ much of their work they hand to it.
   vectorised kernels, and moduli above $2^{52}$ by a slower
   multimodular floating-point method or by the classical algorithm. The
   macro `NMOD_MAT_OPTIMAL_MODULUS_BITS` (`FLINT_BITS - 5`) predates the
-  vectorised kernels and is no longer a good choice for them: on an
-  x86-64 machine with AVX-512 but without IFMA, a $600 \times 600$
-  product modulo a 59-bit prime took 2.5 to 3.2 times longer per bit of
-  modulus than modulo primes of 31 to 52 bits.
+  vectorised kernels and is no longer a good choice for them.
   Very small moduli $n \le 255$, in particular $n = 2$ and $n = 3$, have
   their own byte- and bit-packed kernels.
 - *Use threads.* After `flint_set_num_threads(t)`, `nmod_mat_mul` and the

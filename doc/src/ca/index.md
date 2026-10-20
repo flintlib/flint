@@ -73,8 +73,7 @@ and the generic rings interface [](gr) offers `ca_t` contexts through
 
 ### Special values {#special-values}
 
-In order to give every operation a result and to express limiting
-cases, a `ca_t` can hold the following values besides numbers.
+A `ca_t` can hold the following values besides numbers.
 
 - *Unsigned infinity* $\tilde \infty$, the value of $1/0$ and more
   generally of meromorphic functions at their poles.
@@ -541,8 +540,7 @@ imaginary parts are printed as `[+/- inf]`, even for a well-defined
 real number; there is no recomputation at a higher precision. For
 example, the reciprocal of Ramanujan's constant prints as
 `[+/- inf] + [+/- inf]*I {(1)/(a-262537412640768744) where ...}`, while
-`ca_get_decimal_str` gives `-1.333462408e+12`. (FLINT 3.6 and earlier
-printed such parts as `nan`.)
+`ca_get_decimal_str` gives `-1.333462408e+12`.
 
 ::: details
 For example, $-7$, $2/3$, $(\sqrt{3}+5)/2$ and $\sqrt{2} (\log(\pi) +

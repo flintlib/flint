@@ -8,8 +8,7 @@ Every `arf_t` function that can produce a result not representable with
 `prec` bits takes a precision `prec` and a rounding mode `rnd`, and
 returns an `int`. The result is the exact mathematical result rounded
 once to a mantissa of at most `prec` bits, and the return value says
-whether that rounding changed anything. These conventions and the few
-exceptions are explained below.
+whether that rounding changed anything.
 
 ## Rounding modes {#modes}
 
@@ -93,9 +92,9 @@ such exact intermediate results.
 The return value is 0 exactly when the result is the exact value, and 1
 otherwise. Ball arithmetic relies on it: `arb_add` adds a rounding error
 to the radius only when `arf_add` reports one, so that exact inputs with
-an exact result give an exact ball. The value is exact information, not
-a heuristic; it is computed from the discarded bits, or, in division, by
-multiplying the quotient back when its low bits are zero.
+an exact result give an exact ball. The flag is computed from the
+discarded bits, or, in division, by multiplying the quotient back when
+its low bits are zero.
 
 The relaxed modes `ARF_RND_FAST` and `ARF_RND_ACCURATE` of division and
 square roots trade correct rounding for speed at high precision: they

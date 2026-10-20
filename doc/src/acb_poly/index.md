@@ -14,9 +14,7 @@ an enclosure of the exact result for all inputs in that set. As in
 [](arb_poly), whose interface this module follows function by function,
 the same objects serve as truncated power series, and the `_series`
 functions compute Taylor expansions of elementary and special functions
-of a power series argument; they are used throughout FLINT to compute
-derivatives of special functions, for example of the Riemann zeta
-function.
+of a power series argument.
 
 Products of well-scaled polynomials are computed with one product of
 Gaussian integer polynomials (`fmpzi`), other products by four real
@@ -61,9 +59,7 @@ The conventions are those of [](arb_poly#conventions):
 - Functions described as wrappers of a `_gr_poly` function call it with
   `gr_ctx_init_complex_acb(ctx, prec)` (see [](gr_domains)); if the
   generic code reports failure, the output is set to indeterminate
-  balls. Polynomials over the generic complex ball context in turn use
-  this module for multiplication, division, Taylor shifts, root finding
-  and factorisation into linear factors.
+  balls.
 
 ## Memory management {#memory}
 
@@ -494,8 +490,8 @@ int _acb_poly_mulmid_use_fmpzi(slong len1, slong len2, slong nlo, slong nhi, slo
 Returns whether `_acb_poly_mulmid` and `_acb_poly_mullow` should try
 `_acb_poly_mulmid_fmpzi` first: this is the case when the number $q$ of
 coefficient products in the window per input coefficient satisfies $q
-\ge 1$ and $q \cdot \mathit{prec}^{0.57} \ge 240$ (330 for squares), a
-fit to timings on x86-64. Both lengths must be at least 2.
+\ge 1$ and $q \cdot \mathit{prec}^{0.57} \ge 240$ (330 for squares).
+Both lengths must be at least 2.
 :::
 
 ::: function

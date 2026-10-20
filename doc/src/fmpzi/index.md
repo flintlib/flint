@@ -17,9 +17,7 @@ integer coefficients. The generic ring `gr_ctx_init_fmpzi` (in `gr.h`)
 is built on these functions and gives polynomials and matrices over
 $\mathbb{Z}[i]$. Factorisation is not implemented.
 
-The reference lists the types and basic operations, then arithmetic,
-division and GCDs, primality, and finally polynomial multiplication. [](fmpzi/gcd) describes the GCD functions in more detail. All
-functions allow aliasing between inputs and outputs.
+[](fmpzi/gcd) describes the GCD functions in more detail.
 
 ::: summary algorithms/number-theory/gaussian-integers :::
 
@@ -267,6 +265,9 @@ probable prime test `fmpz_is_probabprime`.
 
 ## Polynomial multiplication {#poly}
 
+These functions do not support aliasing: the output `res` must not
+overlap the input polynomials.
+
 ::: function
 int _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
 
@@ -330,7 +331,7 @@ $[\mathtt{nlo}, \mathtt{nhi})$ of the product of the Gaussian integer
 polynomials `(poly1, len1)` and `(poly2, len2)`, using Kronecker
 substitution. Assumes that `len1` and `len2` are positive and
 that $0 \le nlo < nhi \le len1 + len2 - 1$; the lengths may be given
-in either order, and `res` may alias the inputs.
+in either order, and `res` must not alias the inputs.
 
 ::: details
 The real and imaginary parts of each operand are packed into
@@ -367,7 +368,7 @@ $[\mathtt{nlo}, \mathtt{nhi})$ of the product of the Gaussian integer
 polynomials `(poly1, len1)` and `(poly2, len2)`, using
 Schoenhage-Strassen convolution. Assumes that `len1` and `len2`
 are positive and that $0 \le nlo < nhi \le len1 + len2 - 1$; the
-lengths may be given in either order, and `res` may alias the
+lengths may be given in either order, and `res` must not alias the
 inputs.
 
 ::: details
@@ -396,9 +397,8 @@ also halves the number of pointwise products, which favors it for
 small rings, while for medium rings the pointwise products of the
 larger ring cost more than twice as much. The main function chooses
 between them by the rounded ring sizes, as measured on x86-64. The
-convolution
-length is
-chosen as by `fft_convolution_choose_mid`, so middle products
+convolution length is chosen as by `fft_convolution_choose_mid`, so
+middle products
 use the cyclic (wraparound) transform when it is shorter. When an
 operand is real or purely imaginary, its nonzero part is transformed
 once and multiplied by both parts of the other operand (two

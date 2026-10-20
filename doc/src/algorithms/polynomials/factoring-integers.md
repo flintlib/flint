@@ -75,8 +75,7 @@ $f$ from scratch.
 
 ### Cubics {#cubic}
 
-A cubic is reducible over $\mathbb{Q}$ if and only if it has a rational
-root, so `_fmpz_poly_factor_cubic` looks for roots instead of factoring
+`_fmpz_poly_factor_cubic` looks for rational roots instead of factoring
 modulo a prime, by a method from Schultz's notes [@Sch-mpoly]. Let $f =
 a x^3 + b x^2 + c x + d$ with $a > 0$. With $X = 3a x + b$,
 $$

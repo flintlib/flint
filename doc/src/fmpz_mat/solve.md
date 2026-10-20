@@ -157,8 +157,9 @@ with $A$ or $B$. On a return value of 0, $X$ and `den` are unspecified.
 A $20 \times 20$ system with one right-hand side, solved by the default
 method (here $p$-adic lifting) and by fraction-free elimination. The
 $p$-adic solver returns the least common denominator, the fraction-free
-solver the determinant, which is $-4000$ times larger. Then a $3 \times 4$ system of rank 2, consistent for one
-right-hand side and inconsistent for another:
+solver the determinant, which is $-4000$ times larger. Then a $3 \times 4$
+system of rank 2, consistent for one right-hand side and inconsistent for
+another:
 
 ```c example name=fmpz_mat_solve_systems
 #include <flint/flint.h>

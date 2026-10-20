@@ -23,9 +23,7 @@ The interface is the one documented in detail for [](fq), with `fq_nmod`
 in place of `fq`, word-size integers (`ulong`, `nmod_poly`, `nmod_mat`) in
 place of multiprecision ones (`fmpz`, `fmpz_mod_poly`, `fmpz_mod_mat`) for
 the characteristic and the conversions, and a few additional context
-functions. The reference below lists every function with a short
-description; the function pages of the common functions link to the
-`fq` versions.
+functions.
 
 ::: summary algorithms/finite-fields/overview :::
 

@@ -32,12 +32,8 @@ show for inputs that random generation is unlikely to produce: a
 particular combination of lengths, a modulus in a narrow range, or a
 coincidence that occurs once in thousands of cases. For example,
 `nmod_poly_mul` in FLINT 3.6 and earlier could return wrong products
-modulo $n \le 23$ for some lengths above about 370. The FFT-based
-multiplication packs two coefficients into one to save work, and the
-bound that decided whether packing was safe underestimated a sum of
-squares when an operand had odd length, so a packed coefficient could
-overflow. The bug was found by reading the code, not by the test suite,
-which did not generate such inputs; the fix added a test with worst-case
+modulo $n \le 23$ for some lengths above about 370. The bug was found by
+reading the code, not by the test suite, which did not generate such
 inputs.
 
 ## Checking results {#checking}

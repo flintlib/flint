@@ -45,8 +45,7 @@ where $v_i$ is the entry at position `sd_fft_ctx_trunc_index(L, i)`. See
 
 ## Requirements {#requirements}
 
-- `d` must be aligned to 32 bytes and hold $2^L$ doubles. The
-  multiplication drivers allocate with 4096-byte alignment.
+- `d` must be aligned to 32 bytes and hold $2^L$ doubles.
 - Entries are integers. The forward transform accepts and returns entries
   in $(-3p, 3p)$. The inverse transform accepts entries in $(-2p, 2p)$,
   which `sd_fft_ctx_point_mul` produces from forward outputs, and returns
@@ -98,8 +97,6 @@ butterfly $(a, b) \mapsto (a + wb, a - wb)$ of the forward transform is
 $(a, b) \mapsto (a + b, w(a - b))$, the shape of the inverse butterflies
 with the forward twiddles, and conversely; truncation transposes into
 truncation, with the roles of `itrunc` and `otrunc` exchanged.
-`sd_fft_trunc_tr` and `sd_ifft_trunc_tr` were derived from
-`sd_fft_trunc` and `sd_ifft_trunc` in this way.
 
 Their use is the transposed convolution. For a fixed $a$ of length $a_n$,
 multiplication by $a$ of polynomials of length $z_n$ is, for a transform

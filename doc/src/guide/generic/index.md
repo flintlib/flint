@@ -1,22 +1,19 @@
 ---
 title: Generic programming
-summary: The techniques FLINT uses to implement one algorithm for many types (parallel modules, preprocessor templates, generated code, run-time dispatch and the generic rings of gr), how they coexist today, and what the generic interface costs compared with the type-specific modules.
-order: 2
+short: Generic programming
+summary: The techniques FLINT uses to implement one algorithm for many types (parallel modules, preprocessor templates, generated code, run-time dispatch and the generic rings of gr), and what the generic interface costs compared with the type-specific modules.
+order: 2.8
 ---
 
 Most algorithms in FLINT are needed for more than one coefficient type:
 the same half-GCD, Newton iteration or Gaussian elimination works over
 $\Z/n\Z$ for a word-size or a multiprecision $n$, over every finite
 field and over real balls. C has no templates or generics, so FLINT has
-used several techniques to avoid writing each algorithm once per type.
-They were introduced at different times, and all of them are still
-present in the source. They are described below in roughly
-chronological order, because they explain the shape of the library: why
-some modules have nearly identical function lists, why some functions
-are documented once for three types, and why a classic function may
-turn out to call a generic one. It ends with the generic rings
-framework [`gr`](gr), which supersedes most of the older techniques,
-and with a comparison of classic and generic code.
+used several techniques to avoid writing each algorithm once per type,
+all of which are still present in the source. They are described below
+in roughly chronological order, ending with the generic rings framework
+[`gr`](gr), which supersedes most of the older techniques, and with a
+comparison of classic and generic code.
 
 ## Parallel modules {#copies}
 
@@ -26,19 +23,15 @@ the next. The modules for polynomials over $\Z/n\Z$ (`nmod_poly`,
 `arb_mat` and `acb_mat`) and for multivariate polynomials over the
 various coefficient rings (`nmod_mpoly`, `fmpz_mod_mpoly`,
 `fq_nmod_mpoly`, `fq_zech_mpoly`) were written this way, and their
-function lists are largely the same. For example, 46 of the 103 source
-files that `arb_poly` and `acb_poly` have in common are identical up to
-replacing `arb` by `acb`.
+function lists are largely the same.
 
-For users this has a convenient consequence: code written for one
-module can usually be ported to its sibling by renaming. For the
-library, it means that a fix or an improvement must be made in every
+Code written for one module can usually be ported to its sibling by
+renaming. For the library, a fix or an improvement must be made in every
 copy, and in practice the copies drift apart: `nmod_poly` has many
-algorithms and tuned cutoffs that `fmpz_mod_poly` lacks, because it
-received much more optimisation. The copies also allow deliberate
-specialisation, which is why the technique has not disappeared: the
-word-size modules use delayed reduction and packed representations that
-make no sense for `fmpz` coefficients.
+algorithms and tuned cutoffs that `fmpz_mod_poly` lacks. The copies also
+allow deliberate specialisation: the word-size modules use delayed
+reduction and packed representations that make no sense for `fmpz`
+coefficients.
 
 ## Preprocessor templates {#templates}
 
@@ -165,10 +158,7 @@ directions:
   `_fmpz_mod_poly_gcd` calls `_gr_poly_gcd_euclidean` or
   `_gr_poly_gcd_hgcd`; `_arb_poly_revert_series` calls
   `_gr_poly_revert_series` over a real ball context and returns
-  indeterminate balls if it fails. About 300 source files in some 30
-  classic modules call generic algorithms in this way, most of them in
-  `fq_poly_templates`, `ca_mat`, `fmpz_mod_poly`, `arb_poly`,
-  `acb_poly` and `nmod_poly`.
+  indeterminate balls if it fails.
 - Some recent types exist only as generic rings: [`mpn_mod`](mpn_mod),
   [`nfloat`](nfloat), [`dfloat`](dfloat), [`decimal`](decimal) and
   [`padic_radix`](padic_radix) have no polynomial or matrix modules of
@@ -176,12 +166,11 @@ directions:
   `fq_default` element arithmetic, too, is now implemented by calls
   such as `gr_add` on a context that is a `gr_ctx_struct`.
 
-The generic framework therefore supersedes, for new code, most of what
-the older techniques were used for: a new algorithm written for
-`gr_poly` serves every coefficient ring at once, and a new ring gains
-every generic algorithm by implementing a context
-([](gr/implementing)). It is, however, a newer addition that is not yet
-fully integrated. Many classic modules do not use it at all: the
+For new code, the generic framework supersedes most of what the older
+techniques were used for: a new algorithm written for `gr_poly` serves
+every coefficient ring at once, and a new ring gains every generic
+algorithm by implementing a context ([](gr/implementing)). It is not yet
+fully integrated, however. Many classic modules do not use it at all: the
 vector modules `nmod_vec` and `fmpz_vec`, most of `nmod_mat`, and all
 the multivariate polynomial modules (`fmpz_mpoly`, `nmod_mpoly`, ...),
 which remain far more complete than `gr_mpoly` (which has arithmetic

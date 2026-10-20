@@ -177,7 +177,6 @@ deg_x res = 128 (bound 128), equal: 1
 - `gr_poly_resultant_multipoint`, for polynomials over $\mathbb{F}_p[x]$
   in the generic rings framework, passes its arguments to
   `_n_bpoly_mod_resultant` (the memory layouts of `gr_poly` over `nmod`
-  and of `n_bpoly` coincide), so the generic function is a wrapper of this
-  implementation.
+  and of `n_bpoly` coincide).
 
 ::: functions nmod_mpoly_resultant n_bpoly_mod_resultant n_bpoly_mod_resultant_cutoff :::

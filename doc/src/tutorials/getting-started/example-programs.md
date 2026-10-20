@@ -7,10 +7,7 @@ order: 3
 The directory `examples` of the FLINT source tree contains about fifty
 complete programs. Some are short demonstrations of a module, others are
 command-line tools and benchmarks that were used for record computations.
-They are good starting points for one's own programs. They are listed
-below by topic. The programs about real and complex numbers and about
-exact computation are discussed in more depth in the tutorials of
-[](tutorials/numerics) and [](tutorials/exact).
+They are good starting points for one's own programs.
 
 ## Building and running {#building}
 

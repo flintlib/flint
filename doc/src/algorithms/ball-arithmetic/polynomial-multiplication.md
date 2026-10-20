@@ -24,13 +24,6 @@ keep the integers small, and the radii are bounded by a separate product
 of nonnegative polynomials of low precision, following van der Hoeven
 [@vdH2008] and Johansson [@Joh2017].
 
-The generic code in [](gr_poly) does not implement this itself: over the
-real and complex ball contexts, `_gr_poly_mullow` and `_gr_poly_mulmid`
-dispatch to `_arb_poly_mullow`, `_acb_poly_mullow` and their middle
-product versions, so all generic polynomial algorithms over balls
-(division, composition, power series functions) use the algorithms
-described below.
-
 ## Error bound for the product {#bound}
 
 Write $A = A_m + E$ with $A_m = \sum m_i x^i$ and $E = \sum \varepsilon_i
@@ -127,9 +120,8 @@ product of at most $L$ such factors, each at least $1 - u$, so $\tilde s
 roundings.)
 :::
 
-The implementation multiplies the double results by $1 + 10^{-9}$
-(`DOUBLE_ROUNDING_FACTOR` in `arb_poly/mullow_block.c`), which is a
-comfortable margin over [](#lem-double).
+The implementation multiplies the double results by $1 + 10^{-9}$,
+a comfortable margin over [](#lem-double).
 
 ::: algorithm Block multiplication {#alg-block}
 Input: $A$, $B$ with ball coefficients, a window $[\ell, h)$ of output

@@ -5,9 +5,8 @@ order: 1
 ---
 
 An `arb_t` is a real number represented as a ball: a midpoint and an
-error bound. This guide shows how to write, compile and read a first
-program, and what to look at next. The user guide
-[](guide/ball-arithmetic) explains the concepts in more depth.
+error bound. The user guide [](guide/types/ball-arithmetic) explains the
+concepts in more depth.
 
 ## A first program {#first}
 
@@ -136,7 +135,7 @@ as `0.1` is not the decimal number $1/10$.
 - [](arb/predicates): comparisons in ball arithmetic.
 - [](arb/elementary): the elementary functions, their domains and their
   accuracy.
-- [](guide/ball-arithmetic/using) and [](guide/ball-arithmetic/precision):
+- [](guide/types/ball-arithmetic) and [](guide/types/ball-arithmetic#precision):
   the guess-and-verify strategy and how to choose the precision.
 - [acb](acb) for complex numbers, [arb_poly](arb_poly) and
   [arb_mat](arb_mat) for polynomials and matrices, and

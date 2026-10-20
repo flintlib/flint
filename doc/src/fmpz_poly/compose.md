@@ -5,16 +5,15 @@ functions: fmpz_poly_compose fmpz_poly_compose_horner fmpz_poly_taylor_shift fmp
 
 `fmpz_poly_compose` computes $g(h(x))$, a polynomial of degree $\deg g
 \cdot \deg h$. The *Taylor shift* $f(x + c)$ is the special case $h = x
-+ c$, which occurs often enough (root isolation, change of variables,
-the transformations of the VCA algorithm) to have its own functions.
++ c$, which occurs often enough (for example in root isolation) to have
+its own functions.
 For composition of power series, see `fmpz_poly_compose_series`.
 
 ::: summary algorithms/polynomials/composition :::
 
 ## Algorithms {#algorithms}
 
-Composition is implemented by the generic `gr_poly` functions with
-$\Z$ as the coefficient ring. Horner's rule $g(h) = (\cdots(g_m h +
+Horner's rule $g(h) = (\cdots(g_m h +
 g_{m-1}) h + \cdots) h + g_0$ performs $m = \deg g$ products of
 increasingly unbalanced size. The divide-and-conquer algorithm groups
 the coefficients of $g$ in pairs, $g_{2i} + g_{2i+1} h$, then combines

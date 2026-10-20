@@ -4,8 +4,7 @@ functions: fmpz_factor fmpz_factor_no_trial fmpz_factor_smooth
 ---
 
 `fmpz_factor` is the function to use for the complete factorisation of an
-integer. It always succeeds (it has no failure mode other than taking too
-long) and returns prime factors whose primality has been *proved*. Its
+integer. It always succeeds, given enough time, and returns prime factors whose primality has been *proved*. Its
 running time is governed by the second largest prime factor: integers
 whose factors are all small are factored almost instantly whatever their
 size, while a product of two primes of 45 digits each takes minutes with
@@ -63,7 +62,7 @@ prime factors this proof can take longer than finding them.
 
 The factors are *not* sorted: those found in steps 1–2 come first in
 increasing order, and the others follow in the order in which they were
-split off. Sort them yourself if needed.
+split off.
 
 ## Expected running times {#timings}
 

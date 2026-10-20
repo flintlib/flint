@@ -6,10 +6,9 @@ order: 1
 
 The functions of [`acb_hypgeom`](acb_hypgeom) and
 [`arb_hypgeom`](arb_hypgeom) follow the conventions of ball arithmetic
-(see [](guide/ball-arithmetic)): the output is a ball that is
+(see [](guide/types/ball-arithmetic)): the output is a ball that is
 guaranteed to contain the exact function value, for every point of the
-input balls. This guide shows the consequences on a short program, and
-explains how to get good enclosures. The algorithms are described in
+input balls. The algorithms are described in
 [](algorithms/special-functions/overview).
 
 ## A first program {#first}
@@ -168,7 +167,5 @@ t$, the coefficients of the result are the Taylor coefficients
 $f^{(k)}(x_0)/k!$; above, $\operatorname{erf}'(1) = 2e^{-1}/\sqrt\pi
 \approx 0.4151$ and $\operatorname{erf}''(1)/2 = -2e^{-1}/\sqrt\pi$.
 The functions with the suffix `_jet` take a point and return the
-Taylor coefficients directly. Power series arguments are also the way
-to propagate derivatives through compositions, and the basis of the
-power series methods of [`arb_poly`](arb_poly) and
-[`acb_poly`](acb_poly) such as Newton iteration.
+Taylor coefficients directly. Power series arguments also propagate
+derivatives through compositions.

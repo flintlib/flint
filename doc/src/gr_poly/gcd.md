@@ -7,9 +7,7 @@ functions: gr_poly_gcd gr_poly_xgcd
 two polynomials, and with it the Bézout cofactors, over any ring whose
 context says that the GCD makes sense: a field (or a ring that pretends
 to be one, see `gr_ctx_set_is_pretend_field`) or a unique factorisation
-domain. The algorithm is chosen from the properties of the ring and, for
-the common rings, from that ring's own implementation. The algorithms
-are compared in [](algorithms/polynomials/gcd).
+domain. The algorithms are compared in [](algorithms/polynomials/gcd).
 
 ::: summary algorithms/polynomials/gcd :::
 

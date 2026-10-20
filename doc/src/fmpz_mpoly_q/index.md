@@ -213,8 +213,7 @@ int fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char *
 Sets `res` to the rational function given by the null-terminated string
 `s`, which may use integers, the variable names, parentheses, `+`, `-`,
 `*`, `/` and `^` followed by an integer exponent. Returns 0 on success and $-1$ if parsing fails or a division by
-zero occurs, in which case `res` is unspecified. Parsing is done by the
-generic expression parser of `gr_set_str`.
+zero occurs, in which case `res` is unspecified.
 :::
 
 ## Random generation {#random}
@@ -316,8 +315,7 @@ a denominator $D = c \, p_1^{e_1} \cdots p_k^{e_k}$ stored in factored
 form as an `fmpz_mpoly_factor_t` (see [](fmpz_mpoly_factor)).
 
 This representation pays off when denominators are products of a modest
-number of factors that occur repeatedly, as in many computations with
-partial fractions, Feynman integrals or symbolic sums. Since the
+number of factors that occur repeatedly. Since the
 irreducible factors of the denominators are known, addition, subtraction
 and multiplication only need trial divisions by these factors instead of
 GCDs, and denominators are never expanded. In exchange, division and

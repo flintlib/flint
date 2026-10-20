@@ -45,7 +45,7 @@ known factor can be removed, `fmpz_poly_resultant_modular_div`
 computes $\operatorname{res}(f, g)/d$ for a given exact divisor $d$
 with only as many primes as a given bit bound for the quotient
 requires; the bound should be one bit more than the size of the
-quotient (see the warning on `fmpz_poly_resultant_modular_div`). The discriminant is computed as a resultant with the
+quotient. The discriminant is computed as a resultant with the
 derivative.
 
 ## Examples {#examples}

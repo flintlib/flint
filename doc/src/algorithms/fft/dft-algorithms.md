@@ -16,9 +16,7 @@ element $w \in R$ with $w^n = 1$. Unlike the transforms of `fft_small` and
 `fft`, which are specialised to particular rings and lengths, it works with
 any length and only uses the ring operations of `gr`, so the same code
 serves complex balls, exact algebraic numbers, $\Z/m\Z$, finite fields and
-fixed-point numbers. Its algorithms are described below, with the precise
-conditions on $w$ under which each one is correct and their costs. The
-classical references are the survey of Duhamel and Vetterli [@DV1990]
+fixed-point numbers. The classical references are the survey of Duhamel and Vetterli [@DV1990]
 and the book of Nussbaumer [@Nus1982]; transforms over general rings are
 treated by von zur Gathen and Gerhard [@GG2003, §8.2], Pollard [@Pol1971]
 and Bernstein [@Ber2001].

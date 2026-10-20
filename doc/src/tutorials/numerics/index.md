@@ -41,7 +41,7 @@ built with `make examples` (see
 was produced with `build/examples/<name>`, and the timing and memory
 lines it contains vary between machines.
 
-For background, see the user guide chapter [](guide/ball-arithmetic) for
+For background, see the user guide chapter [](guide/types/ball-arithmetic) for
 the semantics of balls and the conventions of the ball arithmetic
 modules, and the overviews of the algorithms for
 [ball arithmetic](algorithms/ball-arithmetic/overview) and for

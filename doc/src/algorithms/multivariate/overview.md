@@ -114,8 +114,8 @@ described in:
 
 ## Practical advice {#advice}
 
-- Use `fmpz_mpoly` rather than `gr_mpoly` over $\Z$, $\Q$ and finite
-  fields: the specialised modules accumulate coefficients without
+- Use the specialised modules rather than `gr_mpoly` over $\Z$, $\Q$ and
+  finite fields: they accumulate coefficients without
   intermediate reductions, use dense methods when they pay, and provide
   GCDs and factorisation.
 - The ordering only matters for the leading terms (and hence for division

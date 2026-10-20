@@ -9,8 +9,7 @@ separately and are as tight as the real operations. Multiplication and
 division mix the parts, and since a rectangle is not closed under these
 operations (the product of two rectangles is not a rectangle), the result
 is a rectangle enclosing the true set, with some unavoidable
-overestimation. The sections below describe how the bounds are computed
-and the special cases that make them tighter.
+overestimation.
 
 ## Multiplication {#mul}
 
@@ -33,7 +32,7 @@ Several cases are recognised first:
   for a real `arb_t` factor);
 - if `x` and `y` are the same object, the squaring formula $(a^2 - b^2) +
   2abi$ is used, which is allowed because identical pointers mean the same
-  number (see [](guide/ball-arithmetic/pitfalls#simplification)); `acb_sqr`
+  number (see [](guide/types/ball-arithmetic#aliasing)); `acb_sqr`
   calls it;
 - `acb_cube` uses two real squarings and two real multiplications.
 

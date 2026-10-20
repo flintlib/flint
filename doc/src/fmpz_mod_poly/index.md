@@ -22,8 +22,8 @@ Most of the arithmetic is delegated: products are computed over $\Z$ by
 FFTs, depending on the sizes) and reduced afterwards, while division,
 power series, GCDs, resultants, powering modulo a polynomial,
 composition and modular composition are thin wrappers around the generic
-algorithms of [`gr_poly`](gr_poly) over the `fmpz_mod` context, which view the
-coefficient arrays without copying. These algorithms are quasi-linear:
+algorithms of [`gr_poly`](gr_poly) over the `fmpz_mod` context. These
+algorithms are quasi-linear:
 Newton iteration for division and series ([](algorithms/polynomials/newton)),
 the half-GCD algorithm for GCDs and resultants
 ([](algorithms/polynomials/half-gcd)) and the Brent–Kung algorithm for
@@ -66,8 +66,7 @@ of $x^i$ is `coeffs[i]`.
   take an `fmpz_t f` as first argument and either set $f = 1$ and
   compute the result, or, if they meet a non-invertible leading
   coefficient, set $f$ to a nontrivial factor of $n$ (and leave the other
-  outputs undefined). This is how algorithms such as ECM or primality
-  proofs over $\Z/n\Z$ with unfactored $n$ detect a factor of $n$.
+  outputs undefined).
 
 ## Memory management {#memory}
 
@@ -613,8 +612,7 @@ void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e, con
 
 Set `res` to $x^e \bmod f$ for $e \ge 0$ by sliding-window
 exponentiation, given `finv` as above. Multiplications by $x$ are shifts,
-which makes this cheaper than powering a general polynomial; it is the
-first step of every factorisation algorithm ($x^p \bmod f$). The
+which makes this cheaper than powering a general polynomial. The
 underscore version requires $e > 0$ and $\mathit{lenf} > 2$ and writes
 $\mathit{lenf} - 1$ coefficients.
 :::

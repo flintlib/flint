@@ -24,7 +24,7 @@ W, partitions). Complex balls are in `acb`, polynomials and power series
 in `arb_poly` (see [](arb_poly/power-series) for Taylor expansions of
 functions), matrices in `arb_mat`, and most other special functions
 in `arb_hypgeom`. New users should start with [](arb/getting-started)
-and the user guide [](guide/ball-arithmetic). The pages
+and the user guide [](guide/types/ball-arithmetic). The pages
 [](arb/arithmetic), [](arb/predicates), [](arb/printing) and
 [](arb/elementary) explain precision, comparisons, decimal conversion and
 the elementary functions in detail. The tutorials
@@ -81,7 +81,7 @@ working precision: the implementation aims at a relative error of a few
 units in the last place for well-conditioned input and may use more
 precision internally, but the radius of the result is only guaranteed to
 be a bound, not to be small. If the input is exact or computed with
-increasing accuracy, the output converges as `prec` grows. [](arb/arithmetic) and the user guide [](guide/ball-arithmetic/precision)
+increasing accuracy, the output converges as `prec` grows. [](arb/arithmetic) and the user guide [](guide/types/ball-arithmetic#precision)
 discuss how to choose the precision.
 
 *Special values.* The following balls with infinite or NaN parts may be
@@ -102,7 +102,7 @@ any input of the same type, unless stated otherwise. Identical input
 pointers allow, but do not require, algebraic simplification: the
 implementation may treat `x` and `x` as the same number rather than two
 independent numbers in the same ball. See
-[](guide/ball-arithmetic/pitfalls) for the consequences.
+[](guide/types/ball-arithmetic#conventions) for the consequences.
 
 ## Memory management {#memory}
 
@@ -980,9 +980,10 @@ spurious.
 ::: details
 For $x = [m \pm r]$ with $0 \le r \le m$ the propagated error is bounded
 by $\sqrt{m} - \sqrt{m - r} \le \frac{\sqrt{m}}{2}(r/m + (r/m)^2)$. The
-midpoint is computed with `arf_sqrt` in the relaxed mode `ARF_RND_FAST`;
-for exact input at 100000 bits or more the result can wrongly have
-radius 0, as explained for `arb_div`.
+midpoint is computed with `arf_sqrt` in the relaxed mode `ARF_RND_FAST`
+(Newton iteration from 100000 bits); as for `arb_div`, its inexact flag
+is reliable, so exact input gives radius 0 exactly when the square root
+is exact.
 :::
 :::
 

@@ -57,8 +57,7 @@ $$
 k \cdot \max_{i,l} |A_{il}| \cdot \max_{l,j} |B_{lj}| \le 2^{53}
 $$
 
-for `flint_dgemm`, and with $2^{24}$ for `flint_sgemm`. FLINT's exact
-matrix multiplications are designed around this condition.
+for `flint_dgemm`, and with $2^{24}$ for `flint_sgemm`.
 
 ::: summary algorithms/linear-algebra/gemm :::
 

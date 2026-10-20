@@ -7,7 +7,7 @@ category: Finite fields
 order: 18
 ---
 
-This module provides low-level functions on vectors over a finite field $\mathbb{F}_q$ in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$): plain C arrays of `fq_zech_struct` with their length. It is generated from the same template as [](fq_vec) and has the same functions, with `fq_zech` in place of `fq`; they are listed below with short descriptions, and each function page links to the `fq_vec` version, whose documentation has the details.
+This module provides low-level functions on vectors over a finite field $\mathbb{F}_q$ in the representation of [](fq_zech) (elements stored as discrete logarithms with respect to a primitive element, $q < 2^{\bits}$): plain C arrays of `fq_zech_struct` with their length. It is generated from the same template as [](fq_vec) and has the same functions, with `fq_zech` in place of `fq`; each function links to the `fq_vec` version, which has the details.
 
 `_fq_zech_vec_dot` is the plain loop of the template: it multiplies and adds the elements one by one with the Zech tables, and `res` must not be an element of the input vectors. The generic `_gr_vec_dot` of the `fq_zech` ring has a faster dedicated implementation working with discrete logarithms.
 

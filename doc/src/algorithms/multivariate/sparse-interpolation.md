@@ -68,8 +68,7 @@ division in $O(t)$ operations, and the numerator and denominator are
 accumulated during that division.
 :::
 
-`_nmod_zip_vand_solve` implements this (accumulating the numerator in
-three words before one reduction). With more than $t$ values it also
+`_nmod_zip_vand_solve` implements this. With more than $t$ values it also
 checks the remaining equations, which detects a wrong support: it
 returns $-1$ if two $\mu_i$ coincide (choose another point) and $0$ if
 the system is inconsistent (the assumed support was wrong).

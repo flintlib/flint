@@ -229,8 +229,8 @@ happen when $f < c B^{\ell - 1}$ for a small constant $c$ (the error of
 the approximation, a few units of the limb below the high half). Then the
 computed remainder is
 $r + n < n (1 + c/B + b/B^{\ell}) < n (3/2 + c/B) < 2n$ when
-$b < n < B^{\ell}/2$, so for $\nu > 0$ one subtraction still suffices,
-as the source notes. If the top bit of $n$ is set, $r$ may exceed
+$b < n < B^{\ell}/2$, so for $\nu > 0$ one subtraction still suffices.
+If the top bit of $n$ is set, $r$ may exceed
 $B^{\ell}$; the code then computes modulo $B^{\ell + 1}$ and subtracts $n$
 up to twice (for $\ell = 2$ it uses an exact high product and one
 subtraction).
@@ -267,9 +267,8 @@ Euclidean algorithm (`mpn_gcdext` in `mpn_mod_inv`, `fmpz_gcdinv` in
 large exponents use GMP's `mpz_powm` (in `mpn_mod_pow_fmpz`, and through
 `fmpz_powm` in `fmpz_mod_pow_fmpz` for moduli below 70000 bits). It uses
 Montgomery's representation [@Mon1985], in which no quotient estimate is
-needed, with sliding windows; for long products it is two to three times
-faster than repeated `mpn_mod_mul`, so `mpn_mod` uses it for exponents
-with more than 6 bits. For moduli of 70000 bits and more (and when
+needed, with sliding windows; `mpn_mod` uses it for exponents with more
+than 6 bits. For moduli of 70000 bits and more (and when
 `fft_small` is available), `fmpz_mod_pow_fmpz` switches to generic
 sliding-window exponentiation with `fmpz_mod_mul`, whose products use
 the FFT.

@@ -11,7 +11,7 @@ two polynomials with integer coefficients exactly. This is how `fmpz_poly`
 implements Schönhage–Strassen multiplication, and with integer
 coefficients obtained by cutting integers into chunks, it is also the
 core of `mul_mfa_truncate_sqrt2`. The guide [](fft/using) explains the
-whole procedure; the precise contract is given below.
+whole procedure.
 
 ## Parameters and layout {#layout}
 
@@ -107,8 +107,7 @@ truncated transform of length $\ell$ would process; otherwise it returns
 $\mathit{depth} = \lceil \log_2 \ell \rceil - 2$ (at least 0) with
 $\mathit{trunc} = \ell$. For the middle product of $2m$ by $m$
 coefficients, where the wanted window has length $m$, this gives $M = 2m$
-points instead of about $3m$ when $2m$ is a power of two. Both
-`fmpz_poly` and `fmpzi` use it for middle products.
+points instead of about $3m$ when $2m$ is a power of two.
 
 ## Examples {#examples}
 

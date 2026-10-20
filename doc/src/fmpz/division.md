@@ -57,11 +57,9 @@ which reports it as an inexact division unless $g = 0$.
 `fmpz_divexact` divides $g$ by a divisor $h$ that is known to divide it.
 The quotient is then determined by the low limbs of $g$ and $h$ alone, and
 FLINT computes it by 2-adic (Hensel) division from the least significant
-limb upwards. This avoids the correction steps of Euclidean division; we
-measured it at 1.4 to 2.5 times the speed of `fmpz_tdiv_q` for a
-quotient and divisor of 10 to 4000 limbs each. If $h$ does not divide
-$g$ the result is meaningless; nothing is checked. Typical uses are dividing
-out a known content or GCD, the last step of an LCM, binomial
+limb upwards, avoiding the correction steps of Euclidean division. If
+$h$ does not divide $g$ the result is meaningless; nothing is checked.
+Typical uses are dividing out a known content or GCD, the last step of an LCM, binomial
 coefficients, and fraction-free elimination.
 
 `fmpz_div` (also available under its older name `fmpz_divides`) is the
@@ -79,9 +77,7 @@ hardware divisions if it has at most two limbs, and otherwise by GMP's
 (division by a single limb with a precomputed inverse,
 [](algorithms/arithmetic/moller-granlund)). Two large operands
 are divided by `_flint_mpn_tdiv_qr`, FLINT's replacement of GMP's
-division, through an `mpz`-like layer (`flint_mpz_tdiv_qr` and its
-relatives) that applies the rounding at the limb level. Depending on the
-sizes it uses schoolbook division with a 3-by-2 inverse, the
+division. Depending on the sizes it uses schoolbook division with a 3-by-2 inverse, the
 divide-and-conquer division of Burnikel and Ziegler, block division with
 a shared approximate inverse for long quotients, or Newton iteration
 (Karp–Markstein division) once divisor and quotient have about 950 limbs.

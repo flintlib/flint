@@ -12,9 +12,7 @@ infinities and NaN, the module fixes how such values are interpreted and
 what happens when an input ball meets the boundary of the domain of a
 function. These rules are the same for the `dNb` functions and for the
 generic rings created with `gr_ctx_init_dfloat`, and they follow those of
-`arb_t` and the `gr` interface [@Joh2025gr]. They have been checked by
-fuzzing every function and ring method against `arb_t`, for all $N$ and
-flags, on random and special balls.
+`arb_t` and the `gr` interface [@Joh2025gr].
 
 ## The whole real line {#whole-line}
 
@@ -164,10 +162,9 @@ cut gets an enclosure of the values on both sides. For example:
 
 With the crude enclosures used where the precise formulas fail (wide
 rectangles, parts equal to $W$), a complex ball function returns
-`GR_UNABLE` for an input inside its domain only rarely (0.2 to 0.5% of
-the inputs of the fuzzer: balls whose lower bound on $|z|$ is below
-$2^{-1000}$, or tangents at the edge of what the double range can
-decide).
+`GR_UNABLE` for an input inside its domain only rarely: for balls whose
+lower bound on $|z|$ is below $2^{-1000}$, or tangents at the edge of
+what the double range can decide.
 
 Conversions of the complex rings: from the real types (`arb_t`, `fmpz`,
 `fmpq`, the real `dfloat` rings) through the real ring of the parts,

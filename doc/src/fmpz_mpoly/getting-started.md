@@ -8,12 +8,8 @@ An `fmpz_mpoly_t` is a sparse polynomial in several variables with
 integer coefficients. Unlike the univariate types, it does not know its
 ring: the number of variables and the monomial ordering are kept in a
 context object, an `fmpz_mpoly_ctx_t`, which is passed to every function.
-This guide shows how to create a context and polynomials, how the
-ordering determines the order of the terms, how to build polynomials from
-strings, coefficients and terms, how to read them back term by term, and
-how exponents of any size are handled. Everything here applies with small
-changes to `fmpq_mpoly`, `nmod_mpoly`, `fmpz_mod_mpoly` and the other
-`mpoly` types.
+Everything here applies with small changes to `fmpq_mpoly`, `nmod_mpoly`,
+`fmpz_mod_mpoly` and the other `mpoly` types.
 
 ## A first program {#first}
 
@@ -73,9 +69,8 @@ f*g/g == f: 1
 coefficient of x^2*y in f: 1
 ```
 
-The pattern is the same as for the other FLINT types: initialise, compute,
-clear. Polynomials must be cleared before their context. The context
-only stores the number of variables and the ordering; the names of the
+Polynomials must be cleared before their context. The context only
+stores the number of variables and the ordering; the names of the
 variables are not part of it and are passed to the input and output
 functions when needed.
 
@@ -309,8 +304,7 @@ read
 - the term or its monomial as a polynomial: `fmpz_mpoly_get_term` and
   `fmpz_mpoly_get_term_monomial`.
 
-Reading a term does not change the polynomial, and each access costs time
-proportional to the number of variables. To see a polynomial as a
+Each access costs time proportional to the number of variables. To see a polynomial as a
 polynomial in one variable with multivariate coefficients, convert it
 with `fmpz_mpoly_to_univar`; to read the coefficient of a power product
 of some of the variables, use `fmpz_mpoly_get_coeff_vars_ui`.

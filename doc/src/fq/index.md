@@ -348,7 +348,7 @@ Set `rop` to `op` times the image of the integer $x$ in $\mathbb{F}_p$.
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
 Sets `rop` to $\mathit{op1}^{-1}$, computed with the extended Euclidean
-algorithm in $\mathbb{F}_p[x]$ (`_fmpz_mod_poly_invmod`). Throws
+algorithm in $\mathbb{F}_p[x]$. Throws
 `FLINT_ERROR` if `op1` is zero.
 :::
 
@@ -440,8 +440,7 @@ the trace of $a \in \mathbb{F}_q$ are
 $N(a) = \prod_{i=0}^{d-1} \sigma^i(a)$ and
 $\operatorname{Tr}(a) = \sum_{i=0}^{d-1} \sigma^i(a)$; they are the
 determinant and the trace of the $\mathbb{F}_p$-linear map
-$x \mapsto ax$ and lie in $\mathbb{F}_p$. The algorithms are described in
-[](algorithms/finite-fields/frobenius-norm-trace).
+$x \mapsto ax$ and lie in $\mathbb{F}_p$.
 
 ::: summary algorithms/finite-fields/frobenius-norm-trace :::
 

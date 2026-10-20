@@ -396,8 +396,7 @@ otherwise.
 ::: details
 The main sum is computed with `dfloat_powsum_sieved` when it can deliver
 about $\text{prec} + 10 - \log_2 |t|$ bits after the binary point and
-has at least 16 terms (below that, the fixed cost of the double-word
-version exceeds the whole ball computation), and with
+has at least 16 terms, and with
 `acb_dirichlet_powsum_sieved` otherwise, or always if
 `acb_dirichlet_zeta_rs_use_dfloat` is 0. The double-word power sums are
 described in [](dfloat/powsum).
@@ -861,9 +860,7 @@ The model compares three options.
 At the default precision, the large height method is used from 158 zeros
 at $n = 10^{11}$, 51 at $10^{12}$, 14 at $10^{13}$, 10 at $10^{14}$, 3 at
 $10^{15}$, 2 from $10^{16}$, and (extrapolated) for a single zero from
-$10^{20}$. For 100 zeros at $10^{15}$ to 180 bits, the ball arithmetic
-version takes 31 s (2 threads), against about 1200 s for the
-Riemann–Siegel method. Without double-word arithmetic (x87 builds), the
+$10^{20}$. Without double-word arithmetic (x87 builds), the
 large height method is used from $10^{15}$, or from $10^{11}$ for more
 than 100 zeros. It is only used for $10^{11} \le n < 10^{23}$.
 :::
@@ -909,8 +906,7 @@ $p_1 = (\text{prec} + \log_2 t)/2 + 16$ bits, where $Z$ is much cheaper,
 and finished by one secant step through the endpoints of that bracket and
 the signs of $Z$ at a quarter of the tolerance on either side of the
 result: four evaluations at the target precision rather than a dozen for
-the Illinois method alone (for the $10^{15}$-th zero to 192 bits, 12 s
-against 31 s). Above $4 \log_2 t + 40$ bits, Newton's method is used.
+the Illinois method alone. Above $4 \log_2 t + 40$ bits, Newton's method is used.
 :::
 :::
 

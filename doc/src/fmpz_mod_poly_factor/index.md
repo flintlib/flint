@@ -14,9 +14,8 @@ factorisation. It mirrors `nmod_poly_factor`, and as there, the
 factorisation, irreducibility and root-finding functions are wrappers
 around the generic finite-field code of `gr_poly`
 (`gr_poly_factor_finite_field`, `gr_poly_is_irreducible`,
-`gr_poly_roots_finite_field`), which views an `fmpz_mod_poly_t` as a
-`gr_poly_t` over the `fmpz_mod` context without copying. For moduli
-below $2^{\bits}$, `nmod_poly_factor` is faster.
+`gr_poly_roots_finite_field`). For moduli below $2^{\bits}$,
+`nmod_poly_factor` is faster.
 
 A complete factorisation consists of a squarefree factorisation and, for
 each squarefree part, the Kaltofen–Shoup algorithm (baby-step giant-step

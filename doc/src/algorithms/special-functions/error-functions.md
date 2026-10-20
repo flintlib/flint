@@ -20,8 +20,7 @@ Their evaluation therefore follows
 [](algorithms/special-functions/hypergeometric): a convergent series
 near the origin, the asymptotic expansion of $U$ with Olver's error
 bound for large $|z|$, and a working precision chosen from the
-cancellation of the series. The sections below list the representations
-that are used and the specializations that make them fast.
+cancellation of the series.
 
 ## Error functions {#erf}
 

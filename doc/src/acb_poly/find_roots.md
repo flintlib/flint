@@ -221,9 +221,6 @@ the coefficients can move the root 20 by about $3 \cdot 10^{12} \varepsilon$
 the validation sees the corresponding rounding errors in $f(m)$.
 
 The radii, and the last digits of the midpoints, can differ slightly
-between platforms. At 32 bits the starting values come from the
-double-precision iteration (step 2 above), whose rounding depends on the
-compiler: for example, whether it contracts expressions into fused
-multiply-adds. The 64-bit iteration then starts from slightly different
-points and stops at slightly different approximations. Every
-enclosure is still rigorous.
+between platforms, since the starting values come from the
+double-precision iteration at 32 bits (step 2 above), whose rounding
+depends on the compiler. Every enclosure is still rigorous.

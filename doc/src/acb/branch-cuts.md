@@ -8,8 +8,7 @@ The complex logarithm, square root, powers, inverse trigonometric and
 inverse hyperbolic functions, the polylogarithm, the log-gamma function
 and others are multivalued. The functions of `acb` return their principal
 values, defined by branch cuts that follow the conventions of the DLMF
-[@NIST2012] and of most computer algebra systems. They are listed below,
-followed by an explanation of how ball arithmetic interacts with them.
+[@NIST2012] and of most computer algebra systems.
 
 ## The principal branches {#conventions}
 

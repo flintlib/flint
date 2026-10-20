@@ -293,7 +293,7 @@ condition, and `fmpz_mpoly_factor_irred_wang` falls back to it when the
 condition fails (`fmpz_mpoly_factor_lcc_kaltofen`,
 `fmpz_mpoly_factor_lcc_kaltofen_step`).
 
-In more detail, since only coprime factors can be lifted, the step for
+Since only coprime factors can be lifted, the step for
 $x_v$ works with squarefree parts. The leading coefficients of the
 bivariate factors (polynomials in $x_v$, primitive) are replaced by their
 squarefree decompositions, which are then refined by GCDs into a single

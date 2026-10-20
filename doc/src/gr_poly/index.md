@@ -23,20 +23,11 @@ can replace the generic implementation of multiplication, division,
 GCD, power series inversion and a few others by its own (for example
 `nmod_poly` multiplication for $\Z/n\Z$, `arb_poly` multiplication for
 real balls, [](algorithms/ball-arithmetic/polynomial-multiplication)), and every algorithm in this module that multiplies calls
-that method. Conversely, many functions of `nmod_poly`, `fmpz_mod_poly`,
-`fq_poly`, `fmpz_poly` and `arb_poly` are now thin wrappers of the
-generic algorithms here. The overview
-[](algorithms/polynomials/overview) says which ring uses which
-algorithm.
+that method. The overview [](algorithms/polynomials/overview) says which
+ring uses which algorithm.
 
 The guide [](gr_poly/getting-started) explains contexts, status codes and
-the handling of inexact coefficients with complete programs. The
-reference below lists every function: first the types and conventions,
-memory management and basic operations, then arithmetic, division and
-power series, evaluation and composition, GCDs, resultants and
-factorisation, the special functions of power series, arithmetic modulo
-a fixed polynomial, and finally the generic method implementations and
-test functions.
+the handling of inexact coefficients with complete programs.
 
 ::: summary algorithms/polynomials/overview :::
 
@@ -757,8 +748,8 @@ int gr_poly_div_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, sl
 int _gr_poly_div_newton(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 int gr_poly_div_newton(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
-The same as the *divrem* functions, but compute only the quotient,
-which saves work. `gr_poly_div` calls the ring method
+The same as the *divrem* functions, but compute only the quotient.
+`gr_poly_div` calls the ring method
 `GR_METHOD_POLY_DIV`; its default `_gr_poly_div_generic` uses long
 division when the divisor or the quotient has at most 10 coefficients
 and Newton division otherwise (falling back to divide-and-conquer
@@ -886,9 +877,7 @@ hard to predict in general. The *bidirectional* algorithms compute the
 upper and the lower half of the quotient from the two ends, which halves
 the work in the basecase at the cost of possibly one more coefficient
 inversion. The *noinv* versions use `gr_divexact` on the coefficients
-instead of inverting the leading (or trailing) coefficient; there are
-no *divexact_preinv1* versions since they would be the *div_preinv1*
-functions.
+instead of inverting the leading (or trailing) coefficient.
 
 ::: function
 int _gr_poly_divexact(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -995,10 +984,7 @@ int gr_poly_evaluate(gr_ptr res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx
 Sets `res` to $f(x)$ for $x \in R$. This calls the ring method
 `GR_METHOD_POLY_EVALUATE`, whose default `gr_generic_poly_evaluate`
 uses Horner's rule; `nmod`, `fq`, `fq_nmod` and `fq_zech` override it
-with the evaluation of their polynomial modules. Fast evaluation
-matters for instance for trial division by linear factors in
-`gr_poly_is_irreducible`, which evaluates at every element of a small
-prime field.
+with the evaluation of their polynomial modules.
 :::
 
 ::: function
@@ -1683,8 +1669,7 @@ The default version first looks for roots by evaluation when the field
 is a small prime field; for degree below 600 it then calls the *ddf*
 version, and from 600 on it checks squarefreeness, removes inputs with
 factors of degree at most 4 with a few gcds, and calls the *rabin*
-version (measured 1.2 to 1.8 times faster than the distinct-degree
-test on irreducible inputs of degree 1000 to 3000 over `nmod`).
+version.
 :::
 :::
 
@@ -2245,9 +2230,8 @@ account. The default `gr_generic_poly_preinv_set` chooses ordinary
 division for moduli of length at most 8, the sparse representation for
 at most 8 nonzero terms below the leading term, and the Newton
 representation otherwise. Rings with cheap elements use larger cutoffs
-for ordinary division: 32 for `nmod`, where long division was measured
-to beat Newton division up to that length (with a sparse cutoff of 5
-terms, matching its inner loops). `nmod`, `fmpz_mod`, `mpn_mod` and the
+for ordinary division (32 for `nmod`, with a sparse cutoff of 5
+terms). `nmod`, `fmpz_mod`, `mpn_mod` and the
 contexts of `gr_ctx_init_gr_poly_quotient` override the method.
 :::
 :::
@@ -2549,8 +2533,8 @@ The functions in this section are the default implementations of the
 ring methods for polynomials, installed in the method table of every
 context that does not provide its own (see [](gr_generic)). A ring that
 overrides a method can call the default for the cases it does not
-handle. The table lists the methods with their defaults; the choices
-are described with the corresponding functions above.
+handle. The choices are described with the corresponding functions
+above.
 
 | Method | Called by | Default |
 |---|---|---|
@@ -2585,8 +2569,7 @@ int _gr_poly_mulmid_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr p
 The default multiplication methods. `_gr_poly_mullow_generic` is
 classical multiplication. `_gr_poly_mulmid_generic` calls the ring's
 `_gr_poly_mullow` for the product up to $\mathit{nhi}$ and discards the
-low part when that method is not the default (borrowing the output
-elements for the high part to avoid allocations), and uses classical
+low part when that method is not the default, and uses classical
 multiplication otherwise. Generic algorithms compare the method table
 entries with these functions to decide whether fast multiplication or
 a native middle product is available.

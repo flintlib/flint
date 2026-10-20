@@ -8,8 +8,8 @@ Exact real and complex numbers ([](ca)) recognise many identities
 between elementary constants. Some simplify automatically during
 arithmetic, because the field in which the result is represented knows
 a relation between its generators; others are recognised only by an
-explicit zero test. This tutorial shows both, following the example
-programs `elementary` and `machin` in the `examples` directory (see
+explicit zero test. This tutorial follows the example programs
+`elementary` and `machin` (see
 [](tutorials/getting-started/example-programs)).
 
 ## Elementary expressions {#elementary}

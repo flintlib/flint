@@ -17,14 +17,12 @@ modulo $q - 1$, and addition uses a table of Zech logarithms
 $Z(k)$, defined by $1 + g^k = g^{Z(k)}$, with $q$ entries. The context
 therefore holds tables of $2q + p$ words, built in $O(q)$ operations when
 it is created, which limits the representation to small fields; `fq_default`
-uses it for $q < 2^{16}$. The algorithms are described in
-[](algorithms/finite-fields/zech-logarithms).
+uses it for $q < 2^{16}$.
 
 The interface is the one documented in detail for [](fq), with `fq_zech`
 in place of `fq` and word-size integers (`ulong`, `nmod_poly`, `nmod_mat`)
 in place of multiprecision ones, plus conversions to and from the
-`fq_nmod` representation, on which a Zech context is built. The
-reference below lists every function with a short description. Multivariate polynomials
+`fq_nmod` representation, on which a Zech context is built. Multivariate polynomials
 with coefficients in this representation are in [](fq_zech_mpoly).
 
 ::: summary algorithms/finite-fields/zech-logarithms :::

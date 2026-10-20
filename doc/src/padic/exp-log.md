@@ -56,9 +56,6 @@ and about $N/v$ for the logarithm.
   never selected automatically, and for $N < 16$ it falls back to
   rectangular splitting.
 
-[](algorithms/p-adic/exp-log) states the bounds with proofs and
-analyses the methods.
-
 ## Example {#example}
 
 With $p = 5$ and precision 20, the logarithm inverts the exponential at

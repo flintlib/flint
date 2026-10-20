@@ -10,9 +10,7 @@ an unknown real number in an interval, and a power series
 $a_0 + a_1 x + O(x^n)$ for any series with those first terms. The
 framework makes such rings usable by generic code without losing rigour
 by fixing a semantics for inexact elements and a three-valued logic for
-predicates [@Joh2025gr, §8]. This section states the semantics, proves that
-it is preserved by generic algorithms, and explains the consequences
-for normalisation, pivoting and failure.
+predicates [@Joh2025gr, §8].
 
 ## Enclosure semantics {#enclosures}
 

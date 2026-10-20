@@ -14,11 +14,7 @@ $$
 $$
 
 but the series converge only on small discs, and the denominators
-$i!$ and $i$ are divisible by $p$ for large $i$. The sections below give
-the truncation bounds that FLINT uses, prove them, and describe the three
-evaluation methods: rectangular splitting, the balanced method based on
-binary splitting, and, for the logarithm, the reduction of Satoh,
-Skjernaa and Taguchi [@SST2003]. The same algorithms are used in
+$i!$ and $i$ are divisible by $p$ for large $i$. The same algorithms are used in
 $\mathbf{Q}_p$ (`padic`, `padic_radix`) and in the unramified
 extensions $\mathbf{Q}_q$ (`qadic`), where the arguments are polynomials
 reduced modulo the defining polynomial but the coefficients of the

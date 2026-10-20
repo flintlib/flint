@@ -9,9 +9,8 @@ Contributions are submitted as pull requests there; larger changes are
 best discussed first in an issue or on the `flint-devel` mailing list
 (https://groups.google.com/g/flint-devel). The conventions that users of
 FLINT see (types, naming, aliasing, memory management) are described in
-[](guide/conventions/types-and-naming) and [](guide/conventions/memory);
-the sections below add what contributors need to know. The file
-`code_conventions.md` in the source tree has further details.
+[](guide/conventions/types-and-naming) and [](guide/conventions/memory).
+The file `code_conventions.md` in the source tree has further details.
 
 ## Adding a function {#adding}
 

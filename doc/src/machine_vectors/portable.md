@@ -8,10 +8,7 @@ order: 1
 backend: AVX2, AVX-512, NEON, GNU vector extensions and strict ISO C.
 Code written with these operations compiles everywhere and, with the
 exceptions listed under [Pitfalls](#pitfalls), gives the same results on
-every backend.
-`machine_vectors/test/t-vec4d.c` checks most of them lane by lane
-against scalar code, with inputs that include signed zeros, infinities
-and NaNs. FLINT's `dfloat` module is written this way.
+every backend. FLINT's `dfloat` module is written this way.
 
 ## What is portable {#portable}
 

@@ -109,9 +109,9 @@ entries need no lifting.
 For $N \le 2^{26}$ the products are below $2^{52}$, the high halves are
 zero, and `nmod_mat_mul_u52` uses a second micro-kernel with only the low
 accumulator: one instruction per product and twice as many rows per
-tile. In this mode it was measured 1.1 to 1.35 times faster than
-`nmod_mat_mul_u32`, which needs a multiplication and an addition per
-product; in the two-accumulator mode it is slower than
+tile. In this mode it is faster than `nmod_mat_mul_u32`, which needs a
+multiplication and an addition per product; in the two-accumulator mode
+it is slower than
 `nmod_mat_mul_u32` up to about 30 bits, which is why `nmod_mat_mul` uses
 it only from 31 bits on (`FLINT_NMOD_MAT_MUL_U52_MIN_BITS`).
 

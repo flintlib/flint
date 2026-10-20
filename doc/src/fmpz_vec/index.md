@@ -8,11 +8,9 @@ order: 2
 
 This module implements operations on vectors of integers. A vector is a
 plain array of `fmpz` together with a length, written `(vec, len)`. It is
-the coefficient array of `fmpz_poly`, the row storage of `fmpz_mat` and
-the representation used throughout FLINT wherever integers are stored in
-bulk. The functions, all with a leading underscore, leave memory
-management to the caller, like the low-level polynomial functions they
-serve. The module also has a small resizable vector type, `fmpz_vec_t`.
+the coefficient array of `fmpz_poly` and the row storage of `fmpz_mat`.
+The functions, all with a leading underscore, leave memory management to
+the caller. The module also has a small resizable vector type, `fmpz_vec_t`.
 See [](fmpz/getting-started#arrays) for how to work with arrays of
 integers, and [](fmpz_vec/dot) for dot products.
 
@@ -227,8 +225,7 @@ $n$ of `mod`.
 void _fmpz_vec_set_nmod_vec(fmpz * res, nn_srcptr poly, slong len, nmod_t mod)
 
 Sets `res[i]` to the symmetric representative in $(-n/2, n/2]$ of the
-reduced residue `poly[i]` modulo $n$. (The old documentation gave the
-range as $[-n/2, n/2)$, which differs for even $n$.)
+reduced residue `poly[i]` modulo $n$.
 :::
 
 ::: function

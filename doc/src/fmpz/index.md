@@ -15,16 +15,11 @@ stored directly in one machine word; larger values are stored in a GMP
 is automatic, so `fmpz_t` behaves like GMP's `mpz_t`, but small values
 cost no memory allocation and most operations on them run without a
 function call into GMP. Large values use FLINT's own multiplication,
-division and square root code where it is faster than GMP's, including FFT
-multiplication from a few hundred limbs on.
+division and square root code where it is faster than GMP's.
 
-The guides below explain how to use the module: start with
-[](fmpz/getting-started), and read [](fmpz/representation) before writing
-code that accesses the representation or creates large arrays of
-integers. The reference that follows lists every function, from types and
-memory management through arithmetic, division, GCDs and modular
-arithmetic to primality testing and the internal functions at the end.
-The naming, memory and aliasing conventions common to all FLINT modules
+Start with [](fmpz/getting-started), and read [](fmpz/representation)
+before writing code that accesses the representation or creates large
+arrays of integers. The naming, memory and aliasing conventions common to all FLINT modules
 are described in [](guide/conventions/types-and-naming).
 
 ::: summary algorithms/integers/multiplication :::
@@ -191,8 +186,7 @@ void fmpz_set_si(fmpz_t f, slong val)
 void fmpz_set_ui(fmpz_t f, ulong val)
 void fmpz_neg_ui(fmpz_t f, ulong val)
 
-Set $f$ to `val`, and `fmpz_neg_ui` to $-$`val`. Inline; values outside
-$[$`COEFF_MIN`, `COEFF_MAX`$]$ call a promoting helper.
+Set $f$ to `val`, and `fmpz_neg_ui` to $-$`val`.
 :::
 
 ::: function
@@ -297,9 +291,8 @@ $f = 0$ it returns 0 and sets `*exp` to 0.
 ::: function
 void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
 
-Sets $f$ to $d 2^{\mathit{exp}}$ rounded towards zero. (Older documentation
-claimed rounding to the nearest integer; the result is truncated, so
-$0.75 \cdot 2^0$ gives 0.)
+Sets $f$ to $d 2^{\mathit{exp}}$ rounded towards zero, so that
+$0.75 \cdot 2^0$ gives 0.
 :::
 
 ::: function
@@ -489,8 +482,7 @@ int fmpz_is_zero(const fmpz_t f)
 int fmpz_is_one(const fmpz_t f)
 int fmpz_is_pm1(const fmpz_t f)
 
-Return whether $f = 0$, $f = 1$ and $f = \pm 1$. Inline: a single
-comparison of the word.
+Return whether $f = 0$, $f = 1$ and $f = \pm 1$.
 :::
 
 ::: function
@@ -816,8 +808,7 @@ int fmpz_div_si(fmpz_t q, const fmpz_t g, slong h)
 
 Checked exact division: if $h$ divides $g$, set $q = g/h$ and return 1;
 otherwise set $q = 0$ and return 0. Division by zero counts as exact only
-for $g = 0$ (with $q = 0$). These implement the checked division of the
-`fmpz` ring in the generic rings module (`gr_div` and `gr_divexact`).
+for $g = 0$ (with $q = 0$).
 :::
 
 ::: function
@@ -864,11 +855,7 @@ void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, co
 void fmpz_fdiv_r_preinvn(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t inv)
 
 As `fmpz_fdiv_qr` and `fmpz_fdiv_r`, using the precomputed inverse `inv`
-of $h$, for many divisions by the same multi-limb $h$. The quotient is
-formed $n$ limbs at a time by multiplications with the inverse
-(`flint_mpn_divrem_preinvn`); for shapes where this does not pay off
-(a divisor of at most three limbs, or a very short quotient) ordinary
-division is used.
+of $h$, for many divisions by the same multi-limb $h$.
 :::
 
 ## Modular arithmetic {#modular}
@@ -1057,8 +1044,7 @@ Runs the extended Euclidean algorithm on $r_2 > r_1 > 0$ until the
 remainder drops to at most $L$, with Lehmer's acceleration. On return
 $r_2$ and $r_1$ are the last two remainders and `co2`, `co1` the
 corresponding cofactors, with `co2`$\cdot r_1 -$ `co1`$\cdot r_2 = \pm
-r_{2,\mathrm{orig}}$. Used for the reduction of binary quadratic forms
-(NUCOMP) in `qfb`. No aliasing is allowed.
+r_{2,\mathrm{orig}}$. No aliasing is allowed.
 :::
 
 ## Chinese remaindering {#crt}
@@ -1391,9 +1377,8 @@ After the tests of `fmpz_is_probabprime` (which settle every $n$ up to
 about 81 bits on 64-bit machines), the function trial factors $n - 1$ and $n + 1$ and tries the
 Pocklington, Morrison and Brillhart–Lehmer–Selfridge tests [@BLS1975]. If
 these do not succeed, the proof is done by ECPP (`ecpp_is_prime`) from 250
-bits when one thread is available (the crossover rises with the number
-of threads: 550 bits for two, 2000 for four) and by APRCL
-(`aprcl_is_prime`) otherwise. If neither can decide, an exception is
+bits with one thread (the crossover rises with the number of threads)
+and by APRCL (`aprcl_is_prime`) otherwise. If neither can decide, an exception is
 raised; this is not expected to happen.
 :::
 :::

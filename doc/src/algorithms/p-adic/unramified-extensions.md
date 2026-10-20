@@ -14,9 +14,8 @@ is $\mathbf{Z}_q / p\mathbf{Z}_q \cong \mathbf{F}_p[X]/(\bar f) =
 \mathbf{F}_q$. In particular $p$ is still a uniformiser: every nonzero
 element is $p^v u$ with $u \in \mathbf{Z}_q^\times$, and
 $u \in \mathbf{Z}_q$ is a unit if and only if its reduction in
-$\mathbf{F}_q$ is nonzero [@Rob2000, Ch. 3]. The sections below describe
-how `qadic` computes in $\mathbf{Q}_q$; the Frobenius automorphism and
-Teichmüller lifts are treated in [](algorithms/p-adic/frobenius).
+$\mathbf{F}_q$ is nonzero [@Rob2000, Ch. 3]. The Frobenius automorphism
+and Teichmüller lifts are treated in [](algorithms/p-adic/frobenius).
 
 ## Representation {#representation}
 
@@ -69,8 +68,7 @@ evaluation routines of `qadic`. The finite field modules use the same
 sparse elimination ([](algorithms/finite-fields/reduction)).
 
 `qadic_pow` uses left-to-right binary exponentiation with this
-reduction, determining in advance the parity of the number of buffer
-swaps so that the result ends in the output array without a copy.
+reduction.
 
 ## Inversion {#inverse}
 

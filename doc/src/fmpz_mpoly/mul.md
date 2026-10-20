@@ -86,7 +86,7 @@ The *dense method* is Kronecker substitution: with $r_i = \deg_{x_i} B +
 \deg_{x_i} C + 1$, the substitution $x_0 \mapsto x$, $x_1 \mapsto
 x^{r_0}$, $x_2 \mapsto x^{r_0 r_1}$, ... maps $B$ and $C$ to univariate
 polynomials whose product determines $BC$ uniquely; it is computed with
-`fmpz_poly_mul`, which uses its own fast algorithms.
+`fmpz_poly_mul`.
 
 ## Examples {#examples}
 

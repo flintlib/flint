@@ -66,9 +66,10 @@ for `fmpz_mat_rref_fflu`, and 1 or a divisor of such a minor for
 results. Divide by the gcd of `den` and the entries for a canonical form,
 or use `fmpq_mat_rref`.
 
-`fmpz_mat_rref` calls `fmpz_mat_rref_fflu` if $m \le 3$, $n \le 2$,
-$m \le 20$ and $n > m$, or $20 < m \le 100$ and
-$n > m + \frac{m - 20}{80} m$; otherwise `fmpz_mat_rref_mul`. Wide
+For an $m \times n$ matrix, `fmpz_mat_rref` calls `fmpz_mat_rref_fflu`
+if $m \le 3$, if $n \le 2$, if $m \le 20$ and $n > m$, or if
+$20 < m \le 100$ and $n > m + \frac{m - 20}{80} m$; otherwise it calls
+`fmpz_mat_rref_mul`. Wide
 matrices thus go to fraction-free elimination, whose cost is dominated
 by the elimination of the first $m$ columns, and tall or square ones to
 the multimodular method.

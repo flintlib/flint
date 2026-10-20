@@ -6,8 +6,8 @@ order: 1
 
 This guide introduces the programming interface of [](ca), FLINT's
 exact real and complex numbers (formerly the library Calcium
-[@Joh2021calcium]). The module page lists all functions; what can and
-cannot be decided about these numbers is explained in
+[@Joh2021calcium]). What can and cannot be decided about these numbers
+is explained in
 [](algorithms/exact/zero-testing#in-practice), and the choice between
 `ca_t` and the other exact representations in
 [](algorithms/exact/overview).

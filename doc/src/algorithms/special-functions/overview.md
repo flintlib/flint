@@ -11,9 +11,7 @@ exact value of the function at every point of the input. Every
 algorithm therefore comes with an error bound: for a truncated series,
 for the propagation of the input radius, and for the rounding errors,
 which ball arithmetic tracks automatically. Most of the code goes back
-to Arb [@Joh2017; @Joh2014a]. The sections below explain the principles
-shared by all implementations and map the function families to the
-methods and to the descriptions of these methods.
+to Arb [@Joh2017; @Joh2014a].
 
 ## Principles {#principles}
 
@@ -26,7 +24,7 @@ given — a pole in the input, an input that straddles a branch cut, a
 missing algorithm, or too low a precision for the size of the
 arguments — the result is indeterminate (infinite radius). The
 semantics and the cost model of ball arithmetic are explained in
-[](guide/ball-arithmetic) and [](algorithms/ball-arithmetic/overview).
+[](guide/types/ball-arithmetic) and [](algorithms/ball-arithmetic/overview).
 
 **Truncation bounds.** Every series is truncated with an explicit bound
 for the remainder: tail bounds by geometric series for convergent
@@ -86,8 +84,7 @@ holonomic functions ([](algorithms/special-functions/hypergeometric#summation)).
 **Caching.** Constants ($\pi$, $\log 2$, Euler's $\gamma$,
 $\Gamma(1/3)$, ...) and Bernoulli numbers are computed once at the
 highest precision requested so far and cached per thread or globally
-([](algorithms/special-functions/constants)). Repeated evaluation at the
-same precision therefore does not pay for them again.
+([](algorithms/special-functions/constants)).
 
 **Power series.** Functions of power series arguments (`_series`) and
 Taylor expansions at a point (`_jet`) give derivatives with rigorous
@@ -146,8 +143,6 @@ The functions are available at three levels.
 
 ## Use in FLINT {#use}
 
-The descriptions of the individual algorithms give, for each family, the
-mathematics, the error bounds and the list of functions that implement
-them. The module pages give the conventions (precision, branch cuts,
+The module pages give the conventions (precision, branch cuts,
 regularization, optional outputs); the guide [](acb_hypgeom/using)
 explains them for the hypergeometric functions with examples.

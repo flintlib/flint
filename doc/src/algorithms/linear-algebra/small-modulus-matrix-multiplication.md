@@ -54,8 +54,7 @@ $\lfloor (65535 - (N - 1))/(N - 1)^2 \rfloor$ steps, which is still 291
 steps at $N = 16$.
 
 Above $N = 16$ the residues no longer fit a single 16-byte table, and
-the lookups would have to be combined; measurements put the crossover
-with a floating-point product between 13 and 17.
+the lookups would have to be combined.
 
 ## Larger moduli {#sgemm}
 

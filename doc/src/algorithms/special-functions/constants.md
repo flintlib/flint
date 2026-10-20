@@ -48,10 +48,9 @@ is superadditive, so each level costs $O(M(n \log n))$. The final
 division costs $O(M(n))$.
 :::
 
-The series below add between 2 and 47 bits per term. The proposition
-explains why constants can be computed to millions of digits; the
-constant factor is what distinguishes the formulas, and it is governed by
-the number of bits per term and the size of the coefficients
+The series below add between 2 and 47 bits per term. The constant
+factor is what distinguishes the formulas, and it is governed by the
+number of bits per term and the size of the coefficients
 [@HP1998] [@BZ2011].
 
 ## Caching {#cache}
@@ -150,8 +149,7 @@ G = \frac{1}{64} \sum_{k=1}^{\infty} \frac{256^k (580 k^2 - 184 k + 15)
 $$
 
 which adds about 5.4 bits per term and was measured to be the fastest
-available formula. Earlier versions used a series of Zuniga [@Zun2023],
-which is about 10% slower.
+available formula.
 
 ## $\zeta(3)$ and $\zeta(5)$ {#zeta}
 
@@ -164,10 +162,8 @@ P(k)}{k^5 (2k-1)^3 (3k-1)(3k-2)(4k-1)(4k-3)(6k-1)(6k-5)
 \binom{5k}{k}\binom{5k}{2k}\binom{9k}{4k}\binom{10k}{5k}\binom{12k}{6k}},
 $$
 
-with $P(k)$ a polynomial of degree 11 given in the source and in the
-earlier documentation; it was measured to be 20% faster than the
-Amdeberhan-Zeilberger series used before. $\zeta(5)$ is computed from Z.-W.
-Sun's identity
+with $P(k)$ a polynomial of degree 11 given in the source. $\zeta(5)$ is
+computed from Z.-W. Sun's identity
 
 $$
 \zeta(5) = \frac{3 S + 56 \pi^2 \zeta(3)}{540}, \quad
@@ -191,8 +187,7 @@ $$
 
 where $N \ge 2$ is a free parameter (`arb_const_khinchin` uses $N \approx
 p^{0.35}$). The finite sum has a minus sign: each product of logarithms
-is negative. (The formula in earlier versions of the documentation had a
-plus sign; the implementation has always been correct.)
+is negative.
 
 ::: proposition Truncation error {#prop-khinchin}
 If the series over $n$ is truncated after $n = M$, the error inside the

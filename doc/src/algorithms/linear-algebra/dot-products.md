@@ -29,7 +29,7 @@ $0 \le S \le \ell (n - 1)^2$, and the upper bound is attained when all
 entries equal $n - 1$.
 :::
 
-The proof is immediate. The bound decides everything that follows.
+The proof is immediate.
 
 ::: theorem Limb count {#thm-limbs}
 Let $k \ge 1$. Every dot product of length $\ell$ of reduced entries fits
@@ -260,8 +260,8 @@ depend on the compiler flags of the calling program.
 ## SIMD kernels for moduli above $2^{32}$ {#simd}
 
 For $n > 2^{32}$ the products have more than 64 bits and the vector
-multiply instructions of x86-64 cannot form them directly. Following the
-FLINT splits the entries into smaller
+multiply instructions of x86-64 cannot form them directly. FLINT splits
+the entries into smaller
 pieces whose products fit in vector lanes, accumulates the pieces in
 separate lanes, and recombines them into a two- or three-word integer
 before the final reduction. All three kernels compute $S$ exactly, so they
@@ -336,9 +336,7 @@ Each is subject to these parameters:
 | `NMOD_VEC_DOT3_U64_MIN_LEN` | `nmod_vec.h` | least length for `_DOT3_U64` (48) |
 | `NMOD_VEC_DOT2_SPLIT_MAX_LEN` | `nmod_vec.h` | AArch64 only: `_DOT2` instead of `_DOT2_SPLIT` from this length (160) |
 
-The values come from measurements on several processors, recorded in
-comments in `nmod_vec.h` and in the parameter files under
-`src/mpn_extras`. The `_ptr` forms of the kernels exist but are not
+The `_ptr` forms of the kernels exist but are not
 selected, since loading `vec2[i][offset]` needs gathers, which measured
 slower than the scalar code.
 

@@ -221,7 +221,7 @@ q^j \ge q^e - q^{e/2+1}/(q-1) \ge q^e - 2q^{e/2}$.
 
 So whatever the size of $q$, moduli of degree $e \approx \log_q D$
 suffice: a random irreducible polynomial of degree $e$ divides $\Delta$
-with probability at most $D/(q^e - 2q^{e/2})$. FLINT does not even pick
+with probability at most $D/(q^e - 2q^{e/2})$. FLINT does not pick
 the moduli at random: it uses the irreducible polynomial chosen by
 `fq_nmod_ctx_init_ui` for $\mathbb{F}_{p^e}$ (a Conway polynomial or a
 fixed polynomial of minimal weight) for $e = e_0, e_0 + 1, e_0 + 2,

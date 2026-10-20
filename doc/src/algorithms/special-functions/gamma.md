@@ -5,11 +5,7 @@ complexity: Stirling series at p bits — O(p) terms and an argument shift by O(
 order: 30
 ---
 
-The gamma function is the most frequently used special function after
-the elementary functions: it appears in the prefactors of almost every
-hypergeometric formula, in binomial coefficients, in functional
-equations of $L$-functions and in normalisations throughout
-mathematical physics. FLINT computes $\Gamma(z)$, $1/\Gamma(z)$ and
+FLINT computes $\Gamma(z)$, $1/\Gamma(z)$ and
 $\log\Gamma(z)$ for real and complex balls with a combination of four
 methods:
 
@@ -152,9 +148,7 @@ omitted parts are below $2^{-p}$. The splitting parameter $K$ (at most
 
 ## Rising factorials {#rising}
 
-The rising factorial $(x)_n$ appears in the argument reduction above,
-in the recurrences of hypergeometric series and as a function in its
-own right. FLINT has three algorithms.
+FLINT has three algorithms for the rising factorial $(x)_n$.
 
 - **Forward recurrence.** $n-1$ multiplications at a precision of $p +
   \log_2 n$ bits, enough to absorb the rounding errors. The increments
@@ -269,11 +263,9 @@ million bits, from
 $$
 \Gamma(\tfrac14) = \sqrt{\frac{(2\pi)^{3/2}}{\operatorname{agm}(1, \sqrt 2)}},
 $$
-whose arithmetic-geometric mean costs $O(M(p) \log p)$. Older versions
-of the library computed $\Gamma(1/3)$ with a series of Ramanujan type
-for $\pi/\Gamma(1/3)^3$, which is about four times slower; formulas
-for other small fractions through elliptic integrals are given by
-Borwein and Zucker [@BZ1992].
+whose arithmetic-geometric mean costs $O(M(p) \log p)$. Formulas for
+other small fractions through elliptic integrals are given by Borwein
+and Zucker [@BZ1992].
 
 **General rational numbers at high precision.** For other denominators,
 above about $7000 + 300\log_2 q$ bits and for $|x|$ not too large,

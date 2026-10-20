@@ -33,11 +33,10 @@ polynomial multiplication and division, LU decomposition, row reduction
 and matrix multiplication; the higher-level generic algorithms (Newton
 iteration, half-gcd, block recursive LU, triangular solving, nullspaces,
 ...) are unchanged and inherit the speed of the kernels. This is the
-design described in [@Joh2025gr]: the measured speedups of `mpn_mod`
-over the `fmpz`-based `fmpz_mod` ring, between 1x and 3x for polynomial
-gcd and linear solving at 128 to 1024 bits, come from these basecases,
-from fewer temporary allocations, and from cheap additions, which make
-Karatsuba and Waksman multiplication worthwhile.
+design described in [@Joh2025gr]. The speedups of `mpn_mod` over the
+`fmpz`-based `fmpz_mod` ring come from these basecases, from fewer
+temporary allocations, and from cheap additions, which make Karatsuba
+and Waksman multiplication worthwhile.
 
 The ring `fmpz_mod` uses a simpler form of the same idea: its dot
 products (`_fmpz_mod_vec_dot`) and matrix products (`fmpz_mod_mat_mul`)

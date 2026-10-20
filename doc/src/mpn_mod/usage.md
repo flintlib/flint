@@ -9,7 +9,7 @@ up to $2^{1024}$ on 64-bit machines) as a generic ring. There is no
 `mpn_mod_poly` or `mpn_mod_mat` type: polynomials and matrices are the
 generic `gr_poly_t` and `gr_mat_t` over an `mpn_mod` context, and the
 generic functions dispatch to the specialised code of this module through
-the ring's method table. This guide shows the typical use.
+the ring's method table.
 
 ## Creating the ring {#ring}
 

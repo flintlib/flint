@@ -14,8 +14,7 @@ and sorts or merges them. Done naively (adding $b_i C$ to an accumulator
 one row at a time) it costs $O(\ell_B^2 \ell_C)$ monomial comparisons in
 the worst case. FLINT's algorithms avoid this in different ways: a heap
 (sparse inputs), a dense array (moderately dense inputs) or a reduction to
-univariate multiplication (dense inputs). `fmpz_mpoly_mul` chooses among
-them as described in [](fmpz_mpoly/mul).
+univariate multiplication (dense inputs).
 
 ## The heap method {#heap}
 

@@ -171,8 +171,8 @@ The context data, the base ring, and the algebra-specific data of an
 Ore polynomial context.
 :::
 
-As in `gr_poly`, the context argument of the functions is the context
-of the Ore polynomial ring (not the base ring as in `gr_poly`), Ore
+The context argument of the functions is the context of the Ore
+polynomial ring (not the base ring as in `gr_poly`). As in `gr_poly`, Ore
 polynomials are weakly normalised (a leading coefficient is removed
 only if it is provably zero, so the length bounds the order plus one
 over inexact rings), functions returning `int` return status codes, and

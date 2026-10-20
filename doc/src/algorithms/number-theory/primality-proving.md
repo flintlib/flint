@@ -15,8 +15,7 @@ it decides small inputs directly, tries the classical $n \pm 1$ tests,
 which succeed when $n - 1$ or $n + 1$ is sufficiently factored, and
 otherwise runs one of two general-purpose algorithms: the APRCL test,
 based on Jacobi sums in cyclotomic rings, or elliptic curve primality
-proving (ECPP), which also produces a certificate. The sections below
-describe the three approaches and how FLINT chooses between them.
+proving (ECPP), which also produces a certificate.
 
 ## Tests based on $n \pm 1$ {#n-pm-1}
 

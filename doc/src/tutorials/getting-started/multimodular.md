@@ -9,11 +9,9 @@ problem modulo several primes, where all numbers fit in a machine word,
 and reconstruct the integer answer with the Chinese remainder theorem.
 This tutorial writes such an algorithm for the determinant of an integer
 matrix, to show how the modules [](fmpz_mat), [](nmod_mat),
-[](ulong_extras) and [](fmpz) work together. For matrices of
-dimension 25 and more, FLINT's own `fmpz_mat_det` does the same, with
-refinements, as described in [](algorithms/linear-algebra/multimodular);
-smaller matrices are handled by cofactor expansion and fraction-free
-elimination.
+[](ulong_extras) and [](fmpz) work together. For large matrices,
+FLINT's own `fmpz_mat_det` does the same, with refinements, as described
+in [](algorithms/linear-algebra/multimodular).
 
 ## The method {#method}
 

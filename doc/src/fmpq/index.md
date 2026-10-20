@@ -19,9 +19,7 @@ $\Q$ in `fmpq_poly` and `fmpq_mat`.
 
 Start with the guide [](fmpq/canonical-form), which explains the
 canonical form that almost every function relies on and the low-level
-interface on pairs of `fmpz`. The reference below lists every function,
-from the types and basic operations to the internal helpers of the
-continued fraction code. The conventions common to all FLINT modules
+interface on pairs of `fmpz`. The conventions common to all FLINT modules
 (naming, underscore functions, aliasing, canonical forms) are described
 in [](guide/conventions/types-and-naming).
 

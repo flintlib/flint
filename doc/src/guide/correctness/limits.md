@@ -20,8 +20,7 @@ precision) or from untrusted input.
 Lengths, degrees, dimensions and precisions are `slong` values, shift
 counts and exponents usually `ulong` or `flint_bitcnt_t`, and the
 number of bytes to allocate is computed from them in word arithmetic,
-which wraps around silently. Two examples on a 64-bit machine, both
-verified with the current library:
+which wraps around silently. Two examples on a 64-bit machine:
 
 - `nmod_poly_init2(f, n, WORD(1) << 61)` asks for $2^{61}$
   coefficients of 8 bytes. The byte count $2^{64}$ wraps around to 0,
@@ -67,7 +66,7 @@ occur:
   exponents as `fmpz` integers, so a ball such as $[2^{2^{100}} \pm 1]$
   is cheap to represent. Conversions whose output size depends on the
   exponent, such as `arf_get_fmpz`, are not protected; see
-  [](guide/ball-arithmetic/pitfalls#limits).
+  [](guide/types/ball-arithmetic#limits).
 - The multivariate polynomial types (`fmpz_mpoly` and the others) pack
   exponents into fields of a variable number of bits and repack
   automatically when an operation needs larger fields, up to

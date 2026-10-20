@@ -7,11 +7,9 @@ functions: flint_mpn_tdiv_qr flint_mpn_cdiv_qr flint_mpn_ndiv_qr flint_mpn_divap
 and aliasing rules, and the other functions below are built on the
 same machinery. The division is done entirely by FLINT (except for GMP's
 assembly `mpn_divrem_1` and, where it helps, `mpn_divrem_2`), which makes
-it faster than GMP's for all shapes: up to twice as fast for small
-divisors on machines with fast hardware division, 5 to 15% faster for
-balanced operands in the divide and conquer range, and asymptotically
-faster for huge operands, where it uses Newton iteration on top of the
-`fft_small` multiplication.
+it faster than GMP's for all shapes, and asymptotically faster for huge
+operands, where it uses Newton iteration on top of the `fft_small`
+multiplication.
 
 ::: summary algorithms/integers/division :::
 

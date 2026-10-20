@@ -157,9 +157,8 @@ dyadic roots, refines the isolating intervals with
 `arb_fmpz_poly_refine_root_arb` and takes $d$-th roots. With
 `ARB_FMPZ_POLY_ROOTS_RATIONAL`, the rational roots are first found
 exactly with `fmpz_poly_roots_fmpq` and divided out; this is much faster
-for polynomials with many rational roots (about 150 times for
-$\prod_{i=1}^{512} (b_i x - a_i)$ with small $a_i, b_i$) and adds some
-overhead otherwise. Rational roots that are dyadic are returned as
+for polynomials with many rational roots and adds some overhead
+otherwise. Rational roots that are dyadic are returned as
 exact balls.
 
 `arb_fmpz_poly_complex_roots` deflates the polynomial, isolates the
@@ -167,8 +166,7 @@ real roots, and then runs `acb_poly_find_roots` with doubling precision,
 starting at 53 bits, until all roots are isolated and accurate to `prec`
 bits. If the real roots are numerous (a quarter of the roots or more)
 or clustered, they are divided out in ball arithmetic first and only
-the nonreal roots are computed numerically; this is much faster for
-polynomials with many or clustered real roots. Otherwise the reality of
+the nonreal roots are computed numerically. Otherwise the reality of
 the real roots is proved with `acb_poly_validate_real_roots`. See
 [](arb_fmpz_poly/roots).
 :::
@@ -193,7 +191,7 @@ integer coefficients are recovered with `arb_poly_get_unique_fmpz_poly`,
 doubling the precision until this succeeds. If additionally $(q-1)/f$
 is coprime to $n$, where $f$ is the multiplicative order of a prime $p$
 modulo $q$, the polynomial is irreducible over $\mathbb{F}_p$
-[@CP2005], which gives a fast way to construct finite field extensions
+[@CraPom2005], which gives a fast way to construct finite field extensions
 of a given degree (see [](algorithms/finite-fields/defining-polynomials)).
 :::
 :::

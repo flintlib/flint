@@ -20,9 +20,7 @@ base $b$ take time $O(n)$ instead of $O(M(n))$ or $O(M(n) \log n)$. The two
 principal applications are decimal arithmetic ($b = 10$, see the
 [`decimal`](decimal) module) and $p$-adic arithmetic ($b = p$ a small
 prime, with Hensel division and $p$-adic square roots; see the
-[`padic_radix`](padic_radix) module). The module is
-also a convenient test bed for multi-limb algorithms, whose corner cases
-are easier to find and to debug in a small radix such as 10.
+[`padic_radix`](padic_radix) module).
 
 The module provides low-level functions on limb arrays (in the style of
 `mpn_extras`), conversion between radix $B$ and the binary radix

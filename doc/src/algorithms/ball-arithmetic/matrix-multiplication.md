@@ -66,14 +66,10 @@ than the precision, so that ordinary dynamic range within a row does not
 split blocks; the constant 192 accommodates low-precision inputs.
 
 The integer matrix multiplication `fmpz_mat_mul` chooses its algorithm
-from the dimension and the entry size ([](fmpz_mat)): special kernels for
-entries of one or two words, Strassen's algorithm, multimodular
-reduction to word-size primes (with products of reduced matrices in
-`double` arithmetic for large dimensions) and FFT-based multiplication
-for huge entries. At precisions of a few hundred bits, the multimodular
-method, which replaces the $p$-bit products by matrix products modulo
-word-size primes, gives most of the speedup over the classical
-algorithm.
+from the dimension and the entry size ([](fmpz_mat)). At precisions of a
+few hundred bits, its multimodular method, which replaces the $p$-bit
+products by matrix products modulo word-size primes, gives most of the
+speedup over the classical algorithm.
 
 ## Radii: products in double precision {#radii}
 

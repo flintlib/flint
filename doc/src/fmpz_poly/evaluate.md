@@ -85,8 +85,7 @@ f(10^6) mod 1000003 = 999978
 ```
 
 The divide-and-conquer algorithm and Horner's rule give the same
-value; the first is faster for long polynomials evaluated at large
-integers. The value of a polynomial of degree 999 with 10-bit
+value. The value of a polynomial of degree 999 with 10-bit
 coefficients at $3^{100}$ has about 160000 bits:
 
 ```c example name=fmpz_poly_evaluate_large

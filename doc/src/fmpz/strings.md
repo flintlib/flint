@@ -7,8 +7,7 @@ functions: fmpz_get_str fmpz_set_str fmpz_fprint fmpz_fread fmpz_out_raw
 any base from 2 to 62, `fmpz_print` and `fmpz_fprint` print in decimal,
 and `fmpz_read` and `fmpz_fread` parse decimal input from a stream.
 `fmpz_out_raw` and `fmpz_inp_raw` store integers in GMP's portable binary
-format. For numbers of many thousands of digits the decimal conversions
-use FLINT's subquadratic radix conversion.
+format.
 
 ## Formats {#formats}
 
@@ -25,10 +24,8 @@ must be freed with `flint_free`. The function returns the string.
 
 `fmpz_set_str` accepts white space before the number, between the minus
 sign and the digits, and after the number; white space between digits is
-ignored as well (such strings are passed to GMP's parser, in base 10
-too). It returns 0 on success and $-1$
-if the string is not a valid integer, in which case the value of the
-output is undefined.
+ignored as well. It returns 0 on success and $-1$ if the string is not a
+valid integer, in which case the value of the output is undefined.
 
 `fmpz_fprint` writes the decimal representation without a newline and
 returns the number of characters written. `fmpz_fread` skips leading

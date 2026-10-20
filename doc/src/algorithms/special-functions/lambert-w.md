@@ -18,8 +18,8 @@ rotates the cut on $(-\infty, 0)$ to $(0, +\infty)$, and
 in the lower half-plane through $(-1/e, 0)$, which extends the real
 function $W_{-1}(x)$ analytically. FLINT implements the function in
 [`arb`](arb) (`arb_lambertw`, branches 0 and $-1$ for real arguments)
-and [`acb`](acb) (`acb_lambertw`, any branch $k$ given as an `fmpz`,
-with flags for alternative branch cut conventions), following
+and [`acb`](acb) (`acb_lambertw`, any branch $k$ given as an `fmpz`),
+following
 Johansson [@Joh2017b]. Unlike the functions of the rest of this group,
 $W$ is not given by a convenient series; it is computed by solving the
 equation.

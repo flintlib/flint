@@ -8,9 +8,8 @@ order: 70
 A number field $K = \mathbf{Q}(\theta)$ of degree $d$ is represented as
 $\mathbf{Q}[x]/(f)$ for the minimal polynomial $f \in \mathbf{Q}[x]$ of
 $\theta$, and its elements as polynomials of degree less than $d$. The
-sections below describe how `nf` and `nf_elem`, which originate in the ANTIC
-library [@Har2015], implement this representation; the standard
-reference for the mathematics and the general algorithms is
+modules `nf` and `nf_elem` originate in the ANTIC library [@Har2015]; the
+standard reference for the mathematics and the general algorithms is
 [@Coh1996, Ch. 4].
 
 ## Representation {#representation}

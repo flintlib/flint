@@ -9,11 +9,7 @@ The real elementary functions of `arb` are built on four core functions:
 the exponential, the logarithm, sine and cosine (computed together) and
 the arctangent. All other real and complex elementary functions are
 derived from these by algebraic identities. Each core function has
-several algorithms, and the choice depends on the precision: a fixed-point
-implementation with precomputed tables up to a few thousand bits, a
-reduction by logarithms of small primes (or arguments of Gaussian primes)
-or Newton iteration in the range of a few thousand to a few million bits,
-and the asymptotically fast bit-burst algorithm beyond. The design is
+several algorithms, chosen by precision ([](#choice)). The design is
 described in [@Joh2014c] (medium precision) and [@HJ2024] (high
 precision); [@Bre1976b], [@Smi1989], [@BZ2011] and [@Mul2016] are
 general references. The `mp_real` module implements its own versions of
@@ -40,7 +36,7 @@ follows.
    ([](algorithms/ball-arithmetic/error-propagation)) is added.
 
 Huge arguments are capped to keep the cost polynomial in the precision
-(see [](guide/ball-arithmetic/precision)): `arb_exp` returns $[0 \pm
+(see [](guide/types/ball-arithmetic#precision)): `arb_exp` returns $[0 \pm
 \infty]$ or a tiny ball when $|m| > 2^{\max(128, 2p)}$, and `arb_sin_cos`
 returns $[\pm 1]$ when $|m| > 2^{\max(65536, 4p)}$. Arguments close to 0
 are handled by Taylor polynomials of degree one or two with an explicit
@@ -150,9 +146,7 @@ one word, with numerators that also fit in one word (the tables
 and one division by a single word; and because the arithmetic is
 fixed-point, there are no normalisations or roundings in between. Each
 operation adds at most one ulp of error, and the total is returned as an
-explicit bound. (The tables and the error bounds were generated and
-checked by a script, `verify_taylor.py`, which the source refers to but
-which is not part of the distribution.)
+explicit bound.
 
 Two further tricks halve the work. When many terms are needed, the
 exponential is computed as $e^v = \sinh v + \sqrt{1 + \sinh^2 v}$ from the

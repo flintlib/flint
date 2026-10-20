@@ -12,9 +12,7 @@ FLINT implements the *self-initialising multiple polynomial* variant
 `qsieve` module; `fmpz_factor` uses it for the cofactors left by trial
 division and the [elliptic curve method](algorithms/number-theory/ecm).
 The implementation is due to William Hart and Nitin Kumar (2015–2016),
-with the block Lanczos code of Jason Papadopoulos (from msieve), and was
-later extended with the bucket sieve, the in-memory relation store and
-the cycle counting.
+with the block Lanczos code of Jason Papadopoulos (from msieve).
 
 ## Congruences of squares {#squares}
 
@@ -182,7 +180,7 @@ that a value of size $N^{1/2 + o(1)}$ is $b$-smooth is $L_N[1/2, -1/2]$,
 so $L_N[1/2, 1/2]$ relations are found by sieving $L_N[1/2, 1]$
 positions. The linear algebra takes $L_N[1/2, 1]$ with a sparse method
 such as block Lanczos (and $L_N[1/2, 3/2]$ with Gaussian elimination),
-so the total is $L_N[1/2, 1]$ [@CP2005, §6.1]; in practice the sieve
+so the total is $L_N[1/2, 1]$ [@CraPom2005, §6.1]; in practice the sieve
 dominates.
 
 The parameters (number of primes considered for the multiplier, size of

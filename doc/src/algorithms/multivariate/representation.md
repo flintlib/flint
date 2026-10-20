@@ -112,12 +112,7 @@ So comparing monomials costs at most $N$ word comparisons
 The layout relies only on four properties: multiplying monomials adds
 fields, comparing them compares the packed words after an exclusive or
 with a mask, every exponent is one of the fields, and all fields are
-nonnegative. Other orderings with these properties fit the same scheme,
-although FLINT implements none. For example, a block ordering that is
-deglex in $x, y$ and degrevlex in $z, w$, with $x > y > z > w$, would store
-$x^a y^b z^c w^d$ in the six fields $c, d, c + d, b, a, a + b$, from the least
-to the most significant, with the mask set on the fields of $c$ and $d$
-[@Sch-mpoly].
+nonnegative.
 
 ### Multiplication and overflow {#arithmetic}
 
@@ -261,8 +256,5 @@ or fail otherwise.
 - Deflation ([](#lem-inflate)): `mpoly_gcd_info_stride`,
   `mpoly_to_mpolyl_perm_deflate`, `mpoly_from_mpolyl_perm_inflate`,
   `fmpz_mpoly_deflation`, `fmpz_mpoly_deflate`, `fmpz_mpoly_inflate`.
-- The same packed representation is used with all coefficient types,
-  including `gr_mpoly`, whose algorithms are generic in the coefficients
-  but share the monomial code.
 
 ::: functions mpoly_monomial_cmp mpoly_monomial_divides mpoly_fix_bits mpoly_get_cmpmask fmpz_mpoly_repack_bits fmpz_mpoly_deflate :::

@@ -41,7 +41,7 @@ are exact.
 
 `gr_dft_precomp_init_root` requires a principal $n$-th root of unity:
 $w^n = 1$, and $w^{n/p} - 1$ is not a zero divisor for every prime
-$p \mid n$. Over a field this just means that $w$ has order $n$. Over
+$p \mid n$. Over a field this means that $w$ has order $n$. Over
 $\Z/m\Z$ with composite $m$ it means that $w$ has order $n$ modulo every
 prime factor of $m$. [](algorithms/fft/dft-algorithms#principal) explains
 why the fast algorithms need this. The constructor checks two necessary

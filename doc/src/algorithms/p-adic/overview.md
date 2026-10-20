@@ -12,8 +12,7 @@ precision per variable. The newer `padic_radix` works for word-size $p$,
 stores the unit in a radix $p^e$ representation, tracks an error term
 for every element, and implements the generic ring interface, so that
 polynomials, matrices and power series over it are available through
-`gr_poly`, `gr_mat` and `gr_series`. The sections below compare them
-and list the algorithms, with references to their detailed descriptions.
+`gr_poly`, `gr_mat` and `gr_series`.
 
 ## Modules and representations {#modules}
 
@@ -42,9 +41,7 @@ digits, with $p^e$ chosen as large as possible (for example $7^{22}$
 on a 64-bit machine), so
 reduction modulo a power of $p^e$ is a truncation, valuations are found
 by inspecting the lowest digit, and no conversion from binary is
-needed for printing; the history notes report `padic_radix`
-multiplication about 5 times and division about 7 times faster than
-`padic` at high precision.
+needed for printing.
 
 ## Algorithms {#algorithms}
 

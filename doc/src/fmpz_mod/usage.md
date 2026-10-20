@@ -124,16 +124,11 @@ moduli of a few limbs.
 
 For polynomials and matrices modulo $n$ with 2 to 16 limbs, the
 generic ring `mpn_mod` (residues as fixed-length limb arrays, delayed
-reduction in all basecase algorithms) is typically faster, by factors of
-up to about 3 for polynomial gcds and linear solving; see
+reduction in all basecase algorithms) is typically faster; see
 [](mpn_mod/usage) and [](algorithms/arithmetic/multiword-overview).
 
 ## Generic rings {#generic}
 
 `gr_ctx_init_fmpz_mod` creates the generic ring $\Z/n\Z$ with `fmpz`
 residues; its elements are interchangeable with `fmpz_mod` residues, and
-its arithmetic calls this module. Internally, `fmpz_mod_mat` and
-`fmpz_mod_poly` implement many algorithms as wrappers around the
-generic `gr_mat` and `gr_poly` algorithms over this ring, constructed
-without copying from an existing `fmpz_mod_ctx_t` by
-`_gr_ctx_init_fmpz_mod_from_ref`.
+its arithmetic calls this module.

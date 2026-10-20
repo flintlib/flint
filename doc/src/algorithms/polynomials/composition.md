@@ -29,16 +29,12 @@ method).
 All the composition algorithms described here are implemented once in
 `gr_poly` for any commutative ring, and `nmod_poly`, `fmpz_poly`,
 `fmpz_mod_poly`, `fq_poly`, `arb_poly` and `acb_poly` call them with
-their contexts. The generic dispatchers choose by size only:
-`_gr_poly_compose` uses Horner's rule when $f$ has at most 7
-coefficients and the divide-and-conquer algorithm otherwise;
-`_gr_poly_compose_series` uses Horner's rule for short inputs, the
-divide-and-conquer algorithm when $f$ is short relative to $n$, and
-otherwise the Brent-Kung algorithm below a cutoff (500 terms over
-exact rings, a precision-dependent value for balls) and the algorithm
-of Kinoshita and Li above it; the Taylor shift, a ring method, uses
-Horner's scheme up to length 20 and divide and conquer above, with
-`fmpz` and the ball rings supplying their own versions. Modular
+their contexts. The generic dispatchers choose by size only, as
+described below for `nmod_poly` (over balls, the cutoff between
+Brent–Kung and Kinoshita–Li depends on the precision). The Taylor
+shift, a ring method, uses Horner's scheme up to length 20 and divide
+and conquer above, with `fmpz` and the ball rings supplying their own
+versions. Modular
 composition with the Brent-Kung algorithm multiplies matrices with
 `gr_mat_mul`, so it uses the fastest matrix multiplication of the ring
 ([](algorithms/linear-algebra/overview)). Series reversion by Lagrange

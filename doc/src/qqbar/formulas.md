@@ -4,7 +4,7 @@ functions: qqbar_get_fexpr_formula qqbar_set_fexpr qqbar_get_fexpr_repr qqbar_ge
 ---
 
 A `qqbar_t` can be converted to a symbolic expression (see [](fexpr)) in
-three ways, which serve different purposes, and converted back with
+three ways, and converted back with
 `qqbar_set_fexpr`.
 
 - `qqbar_get_fexpr_repr` writes the internal representation exactly,

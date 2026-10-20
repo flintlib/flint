@@ -159,8 +159,7 @@ vector, which is evaluated recursively by the same algorithm for many
 vectors at once. `acb_theta_ql_nb_steps` decides, from the diagonal of
 the Cholesky factor and the precision, how many duplication steps to
 apply before lowering the dimension at each level (a vector called the
-*pattern*); its rules were tuned with timings.
-`acb_theta_ql_lower_dim` and `acb_theta_ql_recombine` perform the split
+*pattern*). `acb_theta_ql_lower_dim` and `acb_theta_ql_recombine` perform the split
 and the recombination, and `acb_theta_ql_exact` runs the whole recursion.
 The effect is that every summation and every duplication step works at
 precision $O(p)$ on ellipsoids with $O(1)$ points, which keeps the

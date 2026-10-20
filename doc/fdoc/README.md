@@ -71,6 +71,10 @@ entry. They give the URL under https://flintlib.org/doc/ (the `baseurl`
 in `__main__.py`) and the date of the build (`SOURCE_DATE_EPOCH` if set,
 for reproducible builds).
 
+A `notice:` in the front matter of the home page (inline markup, may
+continue on indented lines) is shown in a box at the top of every HTML
+page; it is not included in the PDF. Remove the line to remove the box.
+
 ## Files
 
 | Path | Role |

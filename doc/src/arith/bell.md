@@ -15,8 +15,7 @@ The module computes an isolated $B_n$ (`arith_bell_number`), the vector
 $B_0, \ldots, B_{n-1}$ (`arith_bell_number_vec`), and the same modulo a
 word-size integer (`arith_bell_number_nmod`,
 `arith_bell_number_nmod_vec`), which is much cheaper when only the
-residue is needed. Each default function chooses among the variants
-documented with it.
+residue is needed.
 
 ::: summary algorithms/number-theory/stirling-bell :::
 

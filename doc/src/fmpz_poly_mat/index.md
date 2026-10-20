@@ -196,7 +196,6 @@ Copies `mat2` to `mat1`, which must have the same dimensions.
 void fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 
 Sets $B$ to the transpose of $A$; $B$ may be $A$ if it is square.
-Wrapper of `gr_mat_transpose`.
 :::
 
 ::: function
@@ -232,7 +231,7 @@ allowed.
 void fmpz_poly_mat_trace(fmpz_poly_t trace, const fmpz_poly_mat_t mat)
 
 Sets `trace` to the sum of the diagonal entries of the square matrix
-`mat`. Wrapper of `gr_mat_trace`; throws if `mat` is not square.
+`mat`. Throws if `mat` is not square.
 :::
 
 ## Multiplication {#mul}

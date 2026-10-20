@@ -263,8 +263,7 @@ by a square root, in characteristic 2 by [](#alg-quad2) with the static
 heap function `_fq_nmod_mpoly_quadratic_root_heap` and the trace formula
 of [](#lem-trace). Over $\mathbb{F}_2$ itself case 2 never applies, since
 $\mathrm{Tr}(1) = 1$. The factoring code uses them for squarefree
-factors of degree 2 in the main variable (`_apply_quadratic` in
-`src/nmod_mpoly_factor/factor.c` and `src/fq_nmod_mpoly_factor/factor.c`).
+factors of degree 2 in the main variable (`_apply_quadratic`).
 
 ## Evaluation points and extension fields {#irreducible}
 

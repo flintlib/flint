@@ -495,9 +495,9 @@ int _padic_poly_print_pretty(const fmpz * poly, slong len, slong val, const char
 int padic_poly_print_pretty(const padic_poly_t poly, const char * var, const padic_ctx_t ctx)
 
 Print the polynomial as a sum of terms in the variable `var`, highest
-degree first, each nonconstant coefficient in parentheses. Note the
-argument order `len, val` of the underscore versions, which differs
-from `_padic_poly_fprint`. Return 1.
+degree first, each nonconstant coefficient in parentheses. The
+underscore versions take `len, val` in the opposite order to
+`_padic_poly_fprint`. Return 1.
 :::
 
 ::: function

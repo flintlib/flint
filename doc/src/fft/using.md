@@ -8,18 +8,14 @@ The module offers three levels of functionality: integer multiplication
 with automatically chosen parameters (`flint_mpn_mul_fft_main`),
 convolutions of vectors of large integers with parameters chosen by the
 caller (`fft_convolution` and its variants), and the transforms
-themselves. This guide explains when each is the right tool and walks
-through a complete convolution, from cutting the integers into
-coefficients to putting the product together.
+themselves.
 
 ## Choosing a function {#choosing}
 
-- To multiply integers, call `flint_mpn_mul` or `fmpz_mul`. They use
-  FLINT's basecase and Karatsuba code and GMP's `mpn_mul` for small and
-  medium operands, and for large ones, in builds with `fft_small` (on
-  x86-64 with AVX2 and on ARM64), the faster `mpn_mul_default_mpn_ctx`
-  from a few hundred limbs, otherwise `flint_mpn_mul_fft_main` from
-  `FLINT_FFT_MUL_THRESHOLD` limbs. Call `flint_mpn_mul_fft_main` directly only
+- To multiply integers, call `flint_mpn_mul` or `fmpz_mul`. For large
+  operands they use `mpn_mul_default_mpn_ctx` in builds with `fft_small`
+  (on x86-64 with AVX2 and on ARM64), and otherwise
+  `flint_mpn_mul_fft_main`. Call `flint_mpn_mul_fft_main` directly only
   to get this algorithm regardless of the build, for example for
   comparisons; see [](fft/mul).
 - To multiply polynomials with integer coefficients, call `fmpz_poly_mul`
@@ -51,9 +47,7 @@ needs:
 The transforms swap pointers between the operand arrays and the scratch
 arrays, so all blocks should come from a single allocation, freed as a
 whole at the end, and the coefficients must always be accessed through
-the pointer array. This is what `mul_truncate_sqrt2` and
-`_fmpz_poly_mulmid_SS` do: one `flint_malloc` holds the pointer array
-followed by the blocks.
+the pointer array.
 
 ## Choosing the parameters {#parameters}
 
@@ -179,8 +173,6 @@ signed coefficients this way and compares the result with
 `fft_convolution` with $\mathit{depth} > 6$, `fft_convolution_sd_fft`,
 `mul_mfa_truncate_sqrt2` (and so `flint_mpn_mul_fft_main` for large
 operands) and the splitting functions run in parallel on the threads of
-FLINT's global thread pool, as set by `flint_set_num_threads`. Columns
-and rows of the [matrix Fourier algorithm](algorithms/fft/matrix-fourier)
-are handed out in blocks of 16 to whichever thread is free. The precached
-convolutions without the `fft_small` engine and, apart from the
-splitting, `mul_truncate_sqrt2` run in the calling thread.
+FLINT's global thread pool, as set by `flint_set_num_threads`. The
+precached convolutions without the `fft_small` engine and, apart from
+the splitting, `mul_truncate_sqrt2` run in the calling thread.

@@ -26,8 +26,7 @@ follow [](algorithms/ball-arithmetic/linear-systems), and the
 eigenvalue algorithms [](algorithms/ball-arithmetic/eigenvalues). The
 characteristic polynomial, the companion matrix and powers are computed
 by the generic implementations in [](gr_mat) with the complex ball
-context, and a matrix over that context uses this module for
-multiplication, determinants, the exponential and diagonalisation.
+context.
 
 ::: summary algorithms/ball-arithmetic/eigenvalues :::
 

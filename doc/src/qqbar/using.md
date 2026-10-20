@@ -4,8 +4,8 @@ summary: How to compute with algebraic numbers in canonical form: creating them 
 order: 1
 ---
 
-This guide introduces the programming interface of [](qqbar). The
-module represents an algebraic number by its minimal polynomial over
+The module [](qqbar) represents an algebraic number by its minimal
+polynomial over
 $\Z$ and a ball that isolates it from the other roots (see
 [](algorithms/exact/qqbar-representation)). Unlike [](ca), it needs
 no context, its representation is canonical, and every predicate is

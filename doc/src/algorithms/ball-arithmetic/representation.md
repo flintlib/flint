@@ -9,9 +9,8 @@ A ball $[m \pm r]$ in FLINT has an `arf_t` midpoint and a `mag_t`
 radius. The two types are designed for different jobs. The midpoint
 carries the value and needs arbitrary precision with correct rounding;
 the radius carries an error bound, for which a few significant bits
-suffice as long as every operation rounds upwards. Both formats are
-described below, together with the rounding arguments on which the error
-bounds of ball arithmetic rest. The design is discussed in [@Joh2017].
+suffice as long as every operation rounds upwards. The design is
+discussed in [@Joh2017].
 
 ## The mag_t format {#mag}
 
@@ -82,7 +81,7 @@ word division. Square roots, logarithms and exponentials are computed with
 `double` arithmetic on the mantissa and multiplied by a correction factor
 such as $1 \pm 10^{-13}$ before conversion back with an extra unit in the
 last place; this is valid under the weak assumptions on floating-point
-arithmetic listed on [](guide/ball-arithmetic/pitfalls), because the
+arithmetic listed on [](guide/types/ball-arithmetic#conventions), because the
 relative error of each `double` operation is far below the correction
 factor. The logarithm is the only transcendental function needed for
 `mag_t` bounds, and since the C standard says nothing about the accuracy

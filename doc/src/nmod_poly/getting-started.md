@@ -6,11 +6,7 @@ order: 1
 
 An `nmod_poly_t` holds a polynomial over $\Z/n\Z$ for a modulus $1 \le n
 < 2^{\bits}$. It owns its coefficient array and its modulus, grows as
-needed, and must be initialised before use and cleared afterwards. This
-guide walks through a first program, explains how the coefficients are
-stored, which functions accept the same object as input and output, how
-the low-level functions with a leading underscore are used, and which
-functions need a prime modulus.
+needed, and must be initialised before use and cleared afterwards.
 
 ## A first program {#first}
 

@@ -10,9 +10,7 @@ irreducible $f$ of degree $d$, distinct-degree factorisation, primality
 tests for polynomials, and the computation of $x^{p^i} \bmod f$ in
 general. An element of the quotient ring is represented by its remainder
 modulo $f$, a polynomial of degree less than $d = \deg f$, and the basic
-operation is a product followed by a reduction modulo $f$. This guide
-explains the conventions shared by the functions that do this and how to
-choose among them. The leading coefficient of $f$ must be invertible; for
+operation is a product followed by a reduction modulo $f$. The leading coefficient of $f$ must be invertible; for
 a field, $n$ must be prime and $f$ irreducible.
 
 ## Reduction with a precomputed inverse {#preinv}

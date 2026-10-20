@@ -70,8 +70,8 @@ error of a nearest-rounded sum of two doubles, which is itself a double
 of the ulp of the operand with the smaller exponent), so it is also
 computed exactly.
 TwoSum reconstructs the same quantities without knowing which operand is
-larger; see [@MBD2018, §4.3] for the complete proof. Note that sums are
-exact in the subnormal range, so no underflow condition is needed.
+larger; see [@MBD2018, §4.3] for the complete proof. Sums are exact in
+the subnormal range, so no underflow condition is needed.
 :::
 
 ::: algorithm TwoProd {#alg-twoprod}

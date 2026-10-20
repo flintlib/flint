@@ -5,10 +5,8 @@ functions: fmpz_poly_mat_det fmpz_poly_mat_rank
 
 `fmpz_poly_mat_det` computes the determinant of a square matrix with
 entries in $\Z[x]$, a polynomial of degree at most $n(\ell - 1)$ for an
-$n \times n$ matrix whose entries have length at most $\ell$. Small
-matrices are handled by fraction-free elimination over $\Z[x]$, larger
-ones by evaluating the matrix at integers, computing integer
-determinants and interpolating. `fmpz_poly_mat_rank` computes the rank
+$n \times n$ matrix whose entries have length at most $\ell$.
+`fmpz_poly_mat_rank` computes the rank
 over $\Q(x)$ by fraction-free elimination.
 
 ::: summary algorithms/linear-algebra/polynomial-matrices :::

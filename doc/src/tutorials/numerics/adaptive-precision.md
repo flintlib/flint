@@ -251,13 +251,9 @@ $|\det H_{40}| \le 1.53 \cdot 10^{-128}$. A ball that contains zero
 cannot determine the sign, though, and for many applications (is the
 matrix singular? is a quadratic form definite?) the first precision at
 which the ball excludes zero is what matters; `examples/hilbert_matrix.c`
-stops there. The determinant is computed by `arb_mat_det`, which for
-large matrices at
-moderate precision uses a preconditioned method: an approximate LU
-factorisation computed in floating point, and a rigorous enclosure of
-the determinant of the preconditioned matrix, which is close to the
-identity; otherwise it uses Gaussian elimination in ball arithmetic.
-See [](arb_mat) for the available methods and their trade-offs.
+stops there. For large matrices at moderate precision, `arb_mat_det`
+uses a preconditioned method rather than Gaussian elimination in ball
+arithmetic; see [](arb_mat) for the available methods.
 
 ## The example programs {#programs}
 

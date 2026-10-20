@@ -36,9 +36,7 @@ from an estimate of the cancellation; the algorithms and error bounds
 are described in [](algorithms/special-functions/hypergeometric), and
 [](algorithms/special-functions/overview) maps each function
 to its methods. The guide [](acb_hypgeom/using) explains the
-conventions with examples. The reference starts with the top-level
-functions and ends with the series summation routines on which they are
-built.
+conventions with examples.
 
 ::: summary algorithms/special-functions/hypergeometric :::
 
@@ -639,8 +637,6 @@ length $n$.
 :::
 
 ## Exponential and trigonometric integrals {#expint}
-
-The branch cut conventions of these functions match *Mathematica*.
 
 ::: function
 void acb_hypgeom_expint(acb_t res, const acb_t s, const acb_t z, slong prec)

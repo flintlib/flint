@@ -157,13 +157,7 @@ without any factorisation.
 
 FLINT does not compute absolute factorisations (over an algebraic
 closure of the coefficient field); the polytope test is only used as a
-certificate of irreducibility. Schultz's notes [@Sch-mpoly] sketch how
-absolute factorisation could be done, and note the restriction the
-polytope imposes on it: if an irreducible $f$ is the product of the $m$
-conjugates of an absolutely irreducible $g$ over an extension of degree
-$m$, then all conjugates have the same polytope, so
-$\operatorname{Newt}(f) = m \operatorname{Newt}(g)$ and $m$ divides the
-coordinates of every vertex of $\operatorname{Newt}(f)$.
+certificate of irreducibility.
 
 ## Small cases {#small}
 

@@ -98,8 +98,7 @@ sigma^-1(a) == pth_root(a): 1
 ## Costs {#costs}
 
 `fq_frobenius` computes $a^{p^e}$ by binary exponentiation, about
-$e \log_2 p$ squarings, so it is fast for small $p$ and $e$ but costs as
-much as $e$ exponentiations by $p$; for repeated applications of the same
+$e \log_2 p$ squarings; for repeated applications of the same
 power to many elements, the matrix of $\sigma^e$ (an $\mathbb{F}_p$-linear
 map, see `fq_embed_composition_matrix` applied to $x^{p^e}$) can be
 cheaper. The trace costs $O(dt)$ operations in $\mathbb{F}_p$ for a

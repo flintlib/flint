@@ -8,8 +8,8 @@ C has no portable integer type of twice the word size, but number
 theoretic code constantly needs one: the product of two residues modulo
 a 64-bit modulus has up to 128 bits. The macros of `longlong.h` give
 access to the processor's full-width multiplication, add-with-carry and
-double-word division instructions, with portable fallbacks. This guide
-shows the common patterns. Higher-level functions are usually preferable:
+double-word division instructions, with portable fallbacks.
+Higher-level functions are usually preferable:
 `n_mulmod2_preinv` and the [](nmod) functions for modular products, and
 the [](mpn_extras) functions for arrays of limbs.
 

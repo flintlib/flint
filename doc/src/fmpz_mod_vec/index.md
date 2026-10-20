@@ -28,9 +28,7 @@ $(B, \mathit{len})$ reduced modulo $n$; $B$ may contain any integers and
 may alias $A$.
 
 ::: details
-This is used to reduce the output of exact integer computations (for
-example in `fmpz_mod_poly_mul` and `fmpz_mod_mat_mul`). Long vectors, or
-vectors with large entries or a large modulus, are reduced in parallel
+Long vectors, or vectors with large entries or a large modulus, are reduced in parallel
 when FLINT uses several threads.
 
 :::
@@ -83,7 +81,7 @@ void _fmpz_mod_vec_scalar_addmul_fmpz_mod(fmpz * A, const fmpz * B, slong len, c
 
 Sets $(A, \mathit{len})$ to $(A, \mathit{len}) + c \cdot (B, \mathit{len})$,
 for canonical $c$. Each entry is updated with one exact `fmpz_addmul`
-and one reduction; $c = 0$ and $c = 1$ are special-cased.
+and one reduction.
 :::
 
 ::: function
@@ -105,9 +103,7 @@ $\sum_i a_i b_{\mathit{len} - 1 - i}$, modulo $n$.
 ::: details
 The sum is computed exactly with `_fmpz_vec_dot` (respectively
 `_fmpz_vec_dot_general`) and reduced once, so the entries may in fact be
-any integers. This is delayed reduction with multiprecision accumulation;
-the generic ring `mpn_mod` does the same with fixed-size accumulators
-([](algorithms/arithmetic/multiword-delayed-reduction)).
+any integers.
 
 :::
 :::

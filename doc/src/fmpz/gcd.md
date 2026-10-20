@@ -48,9 +48,7 @@ is also the normalisation of GMP's `mpz_gcdext` [@GMP]):
 
 In the last two cases the minimal solution is not unique, since
 $|g|/(2d)$ or $|f|/(2d)$ is then an integer or a half-integer that one
-cofactor attains. (The old documentation had $|g|$ in place of $|f|$ in
-the last row.) The function calls `mpn_gcdext_1` for two inline
-operands and GMP's `mpz_gcdext` otherwise.
+cofactor attains.
 
 **`fmpz_xgcd`** normalises the cofactor of the operand of smaller
 absolute value instead: if $|f| < |g|$, then $a \operatorname{sgn} f \in

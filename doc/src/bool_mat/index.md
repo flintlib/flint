@@ -16,10 +16,9 @@ to vertex $j$; then $A^k$ records which vertices are joined by a walk of
 length exactly $k$. The graph functions documented at the end answer
 questions about walks, cycles and strongly connected components.
 
-The module comes from Arb, where it is used to bound the sparsity
-pattern of matrix power series: `arb_mat_exp` and `acb_mat_exp` use
-`bool_mat_nilpotency_degree` and `bool_mat_all_pairs_longest_walk` on
-the pattern of nonzero entries of the input: when the pattern is
+`arb_mat_exp` and `acb_mat_exp` use `bool_mat_nilpotency_degree` and
+`bool_mat_all_pairs_longest_walk` on the pattern of nonzero entries of
+the input: when the pattern is
 nilpotent, the Taylor series of the exponential is a finite sum, and its
 error bound can be set to zero entry by entry.
 

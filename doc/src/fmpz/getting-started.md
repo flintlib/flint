@@ -9,9 +9,7 @@ initialised before use and cleared afterwards, every function writes its
 result to its first argument, and outputs may be the same objects as
 inputs. Unlike an `mpz_t`, an `fmpz_t` holding a small value is a single
 machine word with no allocated memory, which makes FLINT's integers cheap
-to create, copy and store in large arrays. This guide walks through a
-first program, the conventions shared by all functions, arrays of
-integers and conversions.
+to create, copy and store in large arrays.
 
 ## A first program {#first}
 
@@ -224,6 +222,5 @@ use `flint_mpz_init_set_readonly`, described with the representation in
 For a computation that is mostly integer arithmetic, `fmpz_t` is usually
 faster than `mpz_t`: small values need no allocation and many operations
 on them are inline, and for large values FLINT uses its own
-multiplication (with FFTs from a few hundred limbs on), division and
-square root code where it is faster than GMP's
+multiplication, division and square root code where it is faster than GMP's
 ([](algorithms/integers/multiplication)).

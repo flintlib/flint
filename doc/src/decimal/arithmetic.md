@@ -16,8 +16,9 @@ A result is rounded to `prec` significant digits, counted from its
 leading nonzero digit. Rounding never depends on how the operands were
 stored: the trailing zero digits of a mantissa's lowest limb, which are
 an artefact of the limb alignment, do not count as significant. The
-seven rounding modes are those of IEEE 754 decimal arithmetic plus
-round to nearest with ties toward zero. `decfloat_set_round_info` and
+seven rounding modes are toward zero, away from zero, toward
+$-\infty$, toward $+\infty$, and to nearest with ties to even, away
+from zero or toward zero. `decfloat_set_round_info` and
 the underscore functions report in a `decimal_rounding_info` whether the
 result is inexact, whether its magnitude was rounded up, and whether
 the exponent limits caused an underflow or overflow, and optionally

@@ -24,9 +24,8 @@ given by [](arb) balls, that contains $x$ and no other root of $P$ (an
 *isolating* ball). This representation, used for example by Loos
 [@Loo1983] and Strzebonski [@Str1997], is canonical: equal numbers have
 the same $P$, and different balls for the same number are recognised by
-refining them. This section explains how the isolation property is
-certified and maintained and how all predicates are decided. Arithmetic
-is described in [](algorithms/exact/qqbar-arithmetic).
+refining them. Arithmetic is described in
+[](algorithms/exact/qqbar-arithmetic).
 
 ## Certifying an isolating ball {#newton}
 
@@ -175,9 +174,9 @@ setting the imaginary part of the ball to zero contains a root; by
 [](#lem-real) this proves that $x$ is real. If $x$ is not real, the
 refinement eventually separates the ball from the real axis. In the same
 way `qqbar_sgn_re` decides the sign of the real part, attempting the
-certification on the imaginary axis only when $P$ is even. Note that
+certification on the imaginary axis only when $P$ is even.
 $\operatorname{Re}(x) = 0$ and $x \ne 0$ is impossible for odd degree,
-and that a real number of degree at least 2 is never zero.
+and a real number of degree at least 2 is never zero.
 
 The comparisons `qqbar_cmp_re`, `qqbar_cmp_im` and `qqbar_cmpabs`
 compare the corresponding parts of the balls, refining them while they

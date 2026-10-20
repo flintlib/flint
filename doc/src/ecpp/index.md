@@ -183,9 +183,7 @@ int ecpp_point_mul_gr(gr_ptr R, gr_srcptr P, const fmpz_t k, gr_srcptr a, gr_ptr
 
 The scalar multiplication over a generic ring (a point being three
 consecutive elements $X$, $Y$, $Z$), on which `ecpp_point_mul` is
-built after converting to the ring given by `ecpp_gr_ctx_init`. With
-`mpn_mod` arithmetic it is about 1.7 times faster than with `fmpz_mod` at
-200 bits and 1.6 times at 400 bits.
+built after converting to the ring given by `ecpp_gr_ctx_init`.
 :::
 
 ## Discriminants {#discriminants}
@@ -293,8 +291,7 @@ normalisations of Enge's CM library [@EngeCM; @Schertz2002;
 @YuiZagier1997]) are used instead of $j$, and $j$ is recovered from the
 root modulo $n$ by a closed formula. The Lagrange numerators are built by
 a subproduct tree, so that about 1.5 times the height of the class
-polynomial suffices as precision: $h = 256$ takes 0.13 s with Weber's
-function and 3.4 s with $j$. For odd $D$ the caller may pass $4D$: the
+polynomial suffices as precision. For odd $D$ the caller may pass $4D$: the
 order of conductor 2 has the same class field (for $D \equiv 1 \pmod 8$;
 three times the class number for $D \equiv 5 \pmod 8$) and admits
 Weber's function, and its curves have the right order when $v$ is even.

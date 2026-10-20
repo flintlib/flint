@@ -21,8 +21,7 @@ of which require $n$ to be prime. The multimodular algorithms for
 matrices over $\Z$ in [](fmpz_mat) are built on this module.
 
 The guide [](nmod_mat/linear-algebra) explains which functions work for
-which moduli and how they fit together. The reference below lists every
-function, from memory management to the internal helpers at the end.
+which moduli and how they fit together.
 
 ::: summary algorithms/linear-algebra/matrix-multiplication :::
 
@@ -1040,8 +1039,6 @@ Equivalently, $d$ times column $r$ is added to every column
 $j \notin \{r - 1, r\}$, and then $d$ times the sum of the rows
 $j \notin \{r - 1, r\}$ is subtracted from row $r$. Such transforms
 preserve the determinant and the characteristic and minimal polynomials.
-Earlier documentation stated that all off-diagonal entries of row $r$ of
-$P$ are $d$; the entry in column $r - 1$ is in fact zero.
 :::
 :::
 
@@ -1075,10 +1072,8 @@ A suggested bit size, `FLINT_BITS - 5`, for the primes of multimodular
 algorithms that rely on matrix multiplication, used for example by
 `fmpz_mat_mul_multi_mod` and the Dixon solver of `fmpz_mat`. It was
 chosen when classical multiplication with two-word dot products was the
-fastest method. With the SIMD kernels this is no longer the case: on an
-x86-64 machine with AVX-512 but without IFMA, multiplying $600 \times 600$
-matrices modulo a 59-bit prime took 2.5 to 3.2 times longer per bit of
-modulus than modulo a prime of 31, 50 or 52 bits.
+fastest method; with the SIMD kernels, primes of at most 52 bits can be
+cheaper per bit of modulus.
 :::
 
 ## Internal functions {#internal}

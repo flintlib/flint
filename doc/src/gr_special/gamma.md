@@ -26,7 +26,7 @@ $\Z$ and directly modulo $p$ in $\Z/p\Z$, without forming the integer.
   expansion of $\Gamma$ at the constant term of $f$, composed with $f$),
   and the result carries the error term of $f$.
 * **Floating point.** `nfloat`, `arf`, `dfloat` and `decimal` contexts
-  compute approximations without error bounds.
+  compute approximations without automatic error tracking.
 * **Exact rings.** $\Gamma(x)$ is not available in $\Z$ or $\Q$ as a
   method, but `gr_fac`, `gr_fac_ui` and `gr_fac_fmpz` work in every ring
   through the generic implementation `gr_generic_fac_ui`:

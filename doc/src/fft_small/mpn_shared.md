@@ -9,9 +9,9 @@ transform, followed by the reconstruction. When one factor $x$ occurs in
 several products, its conversion and transform can be computed once.
 `_fft_small_mpn_mul_shared` does this for two products $ax$ and $bx$, and
 the `_fft_small_mpn_mul_precomp` functions keep the transform of $x$ for
-any number of products, possibly on several threads. Both are used by the
-binary splitting of `mp_real`; `flint_mpn_mul_shared` in `mpn_extras` is
-the user-level entry point for the first.
+any number of products, possibly on several threads.
+`flint_mpn_mul_shared` in `mpn_extras` is the user-level entry point for
+the first.
 
 ## Contract {#contract}
 
@@ -52,10 +52,7 @@ data is in cache: the partner is packed, transformed modulo the first
 prime, multiplied pointwise and transformed back, then the same modulo
 the second prime, and the result is recomposed with one Garner step. The
 partner's transforms are truncated to its own product, so a short partner
-costs less than a long one. A version built on the transformed-operand
-API, with separate passes for the transforms, the pointwise products and
-the inverse transforms, was measured to be no faster than two independent
-products: the extra memory traffic cost what the shared transform saved.
+costs less than a long one.
 
 **Several primes** (longer operands). The plan of a product of $x$ by the
 longest partner with at least three primes is used. The transform of $x$
@@ -76,9 +73,7 @@ the FFT test of `flint_mpn_mul` with the threshold
 $T$ = `FLINT_MPN_MUL_SHARED_THRESHOLD` and the shorter one with $T/2$.
 $T$ is `FLINT_FFT_SMALL_MUL_THRESHOLD` (500 for the Intel targets from
 Skylake on, 240 on Zen 3 and 4) unless `flint-mparam.h` sets it; the
-`sapphirerapids` target sets 240, measured on Emerald Rapids. Above the
-rule the source reports the shared products 7 to 14% faster than two
-products.
+`sapphirerapids` target sets 240.
 
 ::: summary algorithms/fft/multimodular :::
 

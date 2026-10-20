@@ -5,10 +5,8 @@ order: 1
 ---
 
 This guide explains how to use `fmpz_mat` for exact linear algebra with
-integer matrices: how matrices and rational results are represented, how
-large intermediate and final results become, which algorithms the main
-functions choose, and how to combine the module with `nmod_mat`,
-`fmpq_mat` and `fmpz_lll`.
+integer matrices, and how to combine it with `nmod_mat`, `fmpq_mat` and
+`fmpz_lll`.
 
 ## Storage {#storage}
 
@@ -50,11 +48,10 @@ on the algorithm:
 To compare results or to get canonical output, divide `den` and the
 entries by their gcd (`fmpz_mat_content`), or convert to an
 `fmpq_mat_t` with `fmpq_mat_set_fmpz_mat_div_fmpz`, which reduces every
-entry. Note that `den` may be negative for the fraction-free functions.
+entry. `den` may be negative for the fraction-free functions.
 
-The modular solvers return the least common denominator, which is the
-denominator of the solution in lowest terms. For the inverse it is the
-largest invariant factor $s_n$ of $A$ (the last entry of the Smith form),
+For the inverse, the least common denominator returned by the modular
+solvers is the largest invariant factor $s_n$ of $A$ (the last entry of the Smith form),
 which is often much smaller than $\det(A)$.
 
 ## Sizes {#sizes}

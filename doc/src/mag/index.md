@@ -25,9 +25,7 @@ the rounding rules in detail; the guide [](mag/bounds) explains how to
 combine upper and lower bounds correctly.
 
 For floating-point arithmetic with more precision, correct rounding or
-negative numbers, use `arf_t`; for bounds involving a long alternation of
-upper and lower bounds, it is often simpler to compute with `arb_t` balls
-and convert the result with `arb_get_mag` at the end.
+negative numbers, use `arf_t`.
 
 ## Representation {#representation}
 

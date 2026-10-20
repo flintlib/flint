@@ -95,8 +95,7 @@ add_sssssssssssaaaaaaaaaaaaaaaaaaaaaa(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s
 sub_dddddddddddmmmmmmmmmmmsssssssssss(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0)
 
 Addition and subtraction of integers of 4 to 11 words, modulo $B^4$ to
-$B^{11}$. They are used for fixed-size arithmetic, for example in the
-[](mpn_extras) multiplication kernels and in [](fft_small).
+$B^{11}$.
 :::
 
 ::: macro

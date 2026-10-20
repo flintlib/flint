@@ -8,11 +8,8 @@ An `fmpz` is a single word. Most integers that occur in practice, such as
 polynomial coefficients over $\Z$, matrix entries before fraction-free
 elimination, or exponents of floating-point numbers, fit in a word, and
 FLINT stores them without any allocation; larger integers are kept in a
-GMP `mpz` structure that the word points to. This guide describes the
-encoding, the invariants that every function maintains, the memory
-manager behind the large values, and the patterns for writing new
-functions that use the representation directly. Ordinary use of the
-module needs none of this: see [](fmpz/getting-started).
+GMP `mpz` structure that the word points to. Ordinary use of the
+module needs none of this guide: see [](fmpz/getting-started).
 
 ## The encoding {#encoding}
 
@@ -105,8 +102,7 @@ allocated `mpz`s so that the collector does not reclaim them.
 In all builds, an `mpz` handed out by `_fmpz_new_mpz` has at least
 `MPZ_MIN_ALLOC` limbs, and an `mpz` handed back to `_fmpz_clear_mpz` must
 still have that many. GMP functions never shrink an allocation, with one
-known exception: `mpz_remove` in GMP 6.3 may reduce it, which is why
-FLINT's `_fmpz_remove` reallocates after calling it. Code that calls
+known exception: `mpz_remove` in GMP 6.3 may reduce it. Code that calls
 `mpz_realloc` on an `mpz` owned by an `fmpz` must not go below
 `MPZ_MIN_ALLOC`.
 

@@ -56,7 +56,7 @@ C_{21} &= P_1 - P_3 - P_5 - P_6, & C_{22} &= P_1 + P_2 - P_3 - P_5.
 $$
 
 ::: theorem {#thm-correct}
-These formulas give $C = AB$ over any commutative ring.
+These formulas give $C = AB$ over any ring, commutative or not.
 :::
 
 ::: proof
@@ -75,7 +75,9 @@ to $P_1 - P_3$ instead gives, after cancellation,
 $A_{21} B_{12} + A_{22} B_{22} = C_{22}$. Finally
 $P_3 - P_4 = S T - S B_{12} + A_{11} B_{12} = S (B_{22} - B_{21}) + A_{11} B_{12}$
 and $S (B_{22} - B_{21}) = A_{12} (B_{22} - B_{21}) + P_2$, so
-$P_3 - P_4 - P_2 + P_5 = A_{11} B_{12} + A_{12} B_{22} = C_{12}$.
+$P_3 - P_4 - P_2 + P_5 = A_{11} B_{12} + A_{12} B_{22} = C_{12}$. No
+step exchanges the two factors of a product, so commutativity is not
+used.
 :::
 
 The operands of the products need 8 additions ($U$, $V$, $A_{22} - A_{21}$,

@@ -8,9 +8,7 @@ An `nmod_mpoly_t` is a polynomial in $m$ variables over $\Z/n\Z$ for a
 word-size modulus $n$. Unlike `nmod_poly_t`, it does not store its
 modulus: the modulus, the number of variables and the monomial ordering
 belong to a context object `nmod_mpoly_ctx_t`, which is passed as the
-last argument of every function. This guide walks through a first
-program, explains the representation and its invariants, and lists the
-rules for aliasing, prime moduli and threads. The same conventions hold
+last argument of every function. The same conventions hold
 for `fmpz_mpoly`, `fmpz_mod_mpoly` and `fq_nmod_mpoly`.
 
 ## A first program {#first}
