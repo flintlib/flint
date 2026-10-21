@@ -41,6 +41,9 @@ int fq_zech_mpoly_get_fq_zech_poly(
     if (B->length < 1)
         return 1;
 
+    if (!fq_zech_mpoly_is_fq_zech_poly(B, var, ctx))
+        return 0;
+
     if (Bbits <= FLINT_BITS)
     {
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - Bbits);
