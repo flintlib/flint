@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -30,16 +31,33 @@ void fmpz_mat_mul_fmpz_vec_ptr(
     const fmpz_mat_t A,
     const fmpz * const * b, slong blen)
 {
-    slong i, j;
+    slong i;
     slong len = FLINT_MIN(A->c, blen);
+    slong nrows = A->r;
+    fmpz * bb, * cc;
+    TMP_INIT;
 
-    for (i = A->r - 1; i >= 0; i--)
+    len = FLINT_MAX(len, 0);
+
+    TMP_START;
+
+    bb = TMP_ARRAY_ALLOC(len + nrows, fmpz);
+    cc = bb + len;
+
+    /* shallow copies */
+    for (i = 0; i < len; i++)
+        bb[i] = *b[i];
+
+    for (i = 0; i < nrows; i++)
+        fmpz_init(cc + i);
+
+    fmpz_mat_mul_fmpz_vec(cc, A, bb, len);
+
+    for (i = 0; i < nrows; i++)
     {
-        fmpz * ci = c[i];
-        const fmpz * Ai = fmpz_mat_row(A, i);
-
-        fmpz_zero(ci);
-        for (j = 0; j < len; j++)
-            fmpz_addmul(ci, Ai + j, b[j]);
+        fmpz_swap(c[i], cc + i);
+        fmpz_clear(cc + i);
     }
+
+    TMP_END;
 }
