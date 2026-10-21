@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void fmpz_mat_fmpz_vec_mul(
@@ -18,15 +19,29 @@ void fmpz_mat_fmpz_vec_mul(
     const fmpz * a, slong alen,
     const fmpz_mat_t B)
 {
-    slong i, j;
     slong len = FLINT_MIN(B->r, alen);
+    fmpz_mat_struct A1, B1, C1;
 
-    for (i = B->c - 1; i >= 0; i--)
+    if (len <= 0)
     {
-        fmpz_zero(c + i);
-        for (j = 0; j < len; j++)
-            fmpz_addmul(c + i, a + j, fmpz_mat_entry(B, j, i));
+        _fmpz_vec_zero(c, B->c);
+        return;
     }
+
+    A1.entries = (fmpz *) a;
+    A1.r = 1;
+    A1.c = len;
+    A1.stride = len;
+
+    B1 = *B;
+    B1.r = len;
+
+    C1.entries = c;
+    C1.r = 1;
+    C1.c = B->c;
+    C1.stride = B->c;
+
+    fmpz_mat_mul(&C1, &A1, &B1);
 }
 
 void fmpz_mat_fmpz_vec_mul_ptr(

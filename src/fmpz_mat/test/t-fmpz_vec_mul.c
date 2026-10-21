@@ -60,7 +60,7 @@ TEST_FUNCTION_START(fmpz_mat_fmpz_vec_mul, state)
         for (j = 0; j < m && j < alen; j++)
             fmpz_set(fmpz_mat_entry(A, 0, j), a + j);
 
-        fmpz_mat_mul(C, A, B);
+        fmpz_mat_mul_classical(C, A, B);
 
         for (j = 0; j < n; j++)
         {
