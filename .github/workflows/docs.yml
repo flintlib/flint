@@ -1,13 +1,21 @@
 name: Documentation
 
+# Pull requests that change the library but not the documentation are
+# checked against the documentation by the "ASan, BLAS, examples" job of
+# CI.yml. Pushes also rebuild the documentation for changes of the library,
+# so that the published documentation follows main.
 on:
   pull_request:
     paths:
       - 'doc/**'
+      - 'Makefile.in'
       - '.github/workflows/docs.yml'
   push:
     paths:
       - 'doc/**'
+      - 'src/**'
+      - 'configure.ac'
+      - 'Makefile.in'
       - '.github/workflows/docs.yml'
 
 concurrency:
@@ -31,25 +39,35 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-sphinx
-          sphinx-build --version
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin nodejs
+          python3 --version
+          node --version
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure --disable-debug
 
       - name: "Build documentation"
         run: |
           cd doc
-          make html SPHINXOPTS="-W -j auto"
+          python3 -m fdoc --strict build --redirects --out build/html
+
+      - name: "Check the documentation and its example programs"
+        run: |
+          make -j$(expr $(nproc) + 1) library
+          make checkdoc
 
       - name: "Setup LaTeX"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
-          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk lmodern
+          sudo apt-get install -y texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra lmodern
 
       - name: "Build PDF documentation"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd doc
-          make latexpdf SPHINXOPTS="-W -j auto"
+          python3 -m fdoc latex --pdf --out build/latex
 
       - name: "Create a tarball of the documentation"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -69,8 +87,21 @@ jobs:
 
       - name: "Push documentation to server"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          # a directory of its own for each run, so that an earlier failed or
+          # concurrent run does not get in the way
+          STAGE: tmp/flint-doc-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           cd doc/build
-          ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'
-          scp doc.tar.gz wbhart@opal6.opalstack.com:~/tmp
-          ssh -t wbhart@opal6.opalstack.com 'cd ~/tmp && tar -xf doc.tar.gz && rm -rf ~/apps/flintlib_org/doc && mv doc ~/apps/flintlib_org && cd ~ && rm -rf ~/tmp'
+          ssh wbhart@opal6.opalstack.com "rm -rf ~/$STAGE && mkdir -p ~/$STAGE"
+          scp doc.tar.gz wbhart@opal6.opalstack.com:$STAGE/
+          # unpack next to the live copy, then replace it with two renames, so
+          # that the site is never without documentation
+          ssh wbhart@opal6.opalstack.com "set -e
+            cd ~/$STAGE && tar -xzf doc.tar.gz
+            cd ~/apps/flintlib_org
+            rm -rf doc.new doc.old
+            mv ~/$STAGE/doc doc.new
+            if [ -d doc ]; then mv doc doc.old; fi
+            mv doc.new doc
+            rm -rf doc.old ~/$STAGE"

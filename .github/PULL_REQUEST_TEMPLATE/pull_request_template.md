@@ -14,5 +14,6 @@ Add any other context about the pull request here.
 - [ ] If I added additional code, I have written tests for it as well as made
   sure that I have close to 100% code coverage.
 
-- [ ] I have added a corresponding entry in `doc/source/history.rst` for my
-  changes.
+- [ ] I have documented my changes in `doc/src` (`make checkdoc` passes) and
+  added an entry to the release notes of the next version in
+  `doc/src/history/flint3/`.

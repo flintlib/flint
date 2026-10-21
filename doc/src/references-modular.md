@@ -1,0 +1,4 @@
+[Joh2019]: F. Johansson. Numerical evaluation of elliptic functions, elliptic integrals and modular forms. In J. Blümlein, C. Schneider and P. Paule (eds.), Elliptic Integrals, Elliptic Functions and Modular Forms in Quantum Field Theory, Texts & Monographs in Symbolic Computation, Springer, 2019, 269–293. https://arxiv.org/abs/1806.06725
+[Enge2009]: A. Enge. The complexity of class polynomial computation via floating point approximations. Mathematics of Computation 78 (2009), 1089–1107. https://doi.org/10.1090/S0025-5718-08-02200-X
+[OS1988]: A. M. Odlyzko and A. Schönhage. Fast algorithms for multiple evaluations of the Riemann zeta function. Transactions of the American Mathematical Society 309 (1988), 797–809. https://doi.org/10.1090/S0002-9947-1988-0961614-2
+[Boo2006]: A. R. Booker. Artin's conjecture, Turing's method, and the Riemann hypothesis. Experimental Mathematics 15:4 (2006), 385–407. https://doi.org/10.1080/10586458.2006.10128976

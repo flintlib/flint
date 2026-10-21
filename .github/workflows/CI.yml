@@ -233,6 +233,10 @@ jobs:
         run: $MAKE examples
       - name: "Check examples"
         run: $MAKE checkexamples
+      - name: "Build documentation"
+        run: $MAKE doc DOCFLAGS="--strict -q"
+      - name: "Check documentation and its examples"
+        run: $MAKE checkdoc
 
   mingw64-gcc:
     name: MinGW (x0.5)
