@@ -39,8 +39,9 @@
       double precision with the mulmod of fft_small (nmod_mat_mul_fp50),
       the accumulators being brought back to (-0.51 n, 0.51 n) every four
       rows;
-    - otherwise the scalar code: one full modular multiplication per entry
-      (nmod_mat_nmod_vec_mul), or the classical product (nmod_mat_mul).
+    - otherwise one full modular multiplication per entry for short
+      vectors, the classical product (nmod_mat_mul_classical) for longer
+      ones.
 */
 
 #define VM_ROWS NMOD_MAT_MUL_ROWS_MAX
@@ -766,6 +767,7 @@ void nmod_mat_nmod_vec_mul(
     slong i;
     slong len = FLINT_MIN(B->r, alen);
     slong ncols = B->c;
+    nmod_mat_t A1, B1, C1;
 
     /* scalar_addmul wants non-empty */
     if (ncols < 1)
@@ -780,10 +782,36 @@ void nmod_mat_nmod_vec_mul(
     if (len >= 2 && _nmod_mat_mul_rows_simd(&c, &a, 1, len, B))
         return;
 
-    _nmod_vec_scalar_mul_nmod(c, nmod_mat_entry_ptr(B, 0, 0), ncols, a[0], B->mod);
+    /* below, the classical product does not pay for its overhead */
+    if (len < 12)
+    {
+        _nmod_vec_scalar_mul_nmod(c, nmod_mat_entry_ptr(B, 0, 0), ncols, a[0], B->mod);
 
-    for (i = 1; i < len; i++)
-        _nmod_vec_scalar_addmul_nmod(c, nmod_mat_entry_ptr(B, i, 0), ncols, a[i], B->mod);
+        for (i = 1; i < len; i++)
+            _nmod_vec_scalar_addmul_nmod(c, nmod_mat_entry_ptr(B, i, 0), ncols, a[i], B->mod);
+
+        return;
+    }
+
+    A1->entries = (ulong *) a;
+    A1->r = 1;
+    A1->c = len;
+    A1->stride = len;
+    A1->mod = B->mod;
+
+    B1->entries = B->entries;
+    B1->r = len;
+    B1->c = ncols;
+    B1->stride = B->stride;
+    B1->mod = B->mod;
+
+    C1->entries = c;
+    C1->r = 1;
+    C1->c = ncols;
+    C1->stride = ncols;
+    C1->mod = B->mod;
+
+    nmod_mat_mul_classical(C1, A1, B1);
 }
 
 void nmod_mat_nmod_vec_mul_ptr(
