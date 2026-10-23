@@ -105,7 +105,7 @@ radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slo
 
     FLINT_ASSERT(ban >= bbn);
 
-    mpn_tdiv_qr(bq, br, 0, ba, ban, bb, bbn);
+    flint_mpn_tdiv_qr(bq, br, ba, ban, bb, bbn);
 
     /* Need to do radix conversion in temporary space as radix conversion may
        need an extra output scratch limb. */
@@ -859,7 +859,7 @@ _radix_div_via_mpn(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const
 
     FLINT_ASSERT(ban >= bbn);
 
-    mpn_tdiv_qr(bq, br, 0, ba, ban, bb, bbn);
+    flint_mpn_tdiv_qr(bq, br, ba, ban, bb, bbn);
     exact = flint_mpn_zero_p(br, brn);
 
     /* Need to do radix conversion in temporary space as radix conversion may

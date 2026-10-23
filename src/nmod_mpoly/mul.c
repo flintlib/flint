@@ -80,7 +80,7 @@ static int _try_array_LEX(slong * Bdegs, slong * Cdegs,
 }
 
 
-static int _try_array_DEG(slong Btotaldeg, slong FLINT_UNUSED(Ctotaldeg),
+static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
                                            slong Blen, slong Clen, slong nvars)
 {
     slong i, dense_size, total_degree;
@@ -89,7 +89,7 @@ static int _try_array_DEG(slong Btotaldeg, slong FLINT_UNUSED(Ctotaldeg),
     FLINT_ASSERT(Blen > 0);
     FLINT_ASSERT(Clen > 0);
 
-    total_degree = Btotaldeg + Btotaldeg;
+    total_degree = Btotaldeg + Ctotaldeg;
     if (total_degree <= 0)
         return 0;
 

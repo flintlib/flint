@@ -98,3 +98,11 @@ gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx)
     vec->length++;
     return gr_poly_set(vec->entries + vec->length - 1, f, ctx);
 }
+
+void
+gr_poly_vec_append_swap(gr_poly_vec_t vec, gr_poly_t f, gr_ctx_t ctx)
+{
+    gr_poly_vec_fit_length(vec, vec->length + 1, ctx);
+    gr_poly_swap(vec->entries + vec->length, f, ctx);
+    vec->length++;
+}

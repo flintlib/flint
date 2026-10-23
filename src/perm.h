@@ -246,6 +246,7 @@ PERM_INLINE int _perm_next_lex(slong *perm, slong n)
 PERM_INLINE int _perm_next_heap(slong *perm, slong n, slong *stack)
 {
     slong sp = 1;
+    if (n <= 1) return 0;
     while (sp < n && stack[sp] >= sp)
         stack[sp++] = 0;
     if (sp == n) return 0;

@@ -47,7 +47,6 @@ static void _crt_worker(void * varg)
 
     FLINT_ASSERT(sign == 0 || sign == 1);
 
-    if (comb != NULL)
     {
         ulong * residues;
         fmpz_comb_temp_t comb_temp;
@@ -66,136 +65,6 @@ static void _crt_worker(void * varg)
         flint_free(residues);
         fmpz_comb_temp_clear(comb_temp);
     }
-    else if (num_primes == 1)
-    {
-        ulong r, t, p = mod_C[0]->mod.n;
-
-        if (sign)
-        {
-            for (i = Cstartrow; i < Cstoprow; i++)
-            for (j = 0; j < n; j++)
-            {
-                r = nmod_mat_entry(mod_C[0], i, j);
-                t = p - r;
-                if (t < r)
-                    fmpz_neg_ui(Centries + i * Cstride + j, t);
-                else
-                    fmpz_set_ui(Centries + i * Cstride + j, r);
-            }
-        }
-        else
-        {
-            for (i = Cstartrow; i < Cstoprow; i++)
-            for (j = 0; j < n; j++)
-            {
-                r = nmod_mat_entry(mod_C[0], i, j);
-                fmpz_set_ui(Centries + i * Cstride + j, r);
-            }
-        }
-    }
-    else if (num_primes == 2)
-    {
-        ulong r0, r1, i0, i1, m0, m1, M[2], t[2], u[2];
-        m0 = mod_C[0]->mod.n;
-        m1 = mod_C[1]->mod.n;
-        umul_ppmm(M[1], M[0], m0, m1);
-        if (FLINT_BIT_COUNT(M[1]) >= FLINT_BITS)
-            goto generic;
-
-        i0 = n_invmod(m1 % m0, m0);
-        i1 = n_invmod(m0 % m1, m1);
-
-        for (i = Cstartrow; i < Cstoprow; i++)
-        for (j = 0; j < n; j++)
-        {
-            r0 = nmod_mul(i0, nmod_mat_entry(mod_C[0], i, j), mod_C[0]->mod);
-            r1 = nmod_mul(i1, nmod_mat_entry(mod_C[1], i, j), mod_C[1]->mod);
-
-            FLINT_ASSERT(FLINT_BIT_COUNT(M[1]) < FLINT_BITS);
-            umul_ppmm(t[1], t[0], r0, m1);
-            umul_ppmm(u[1], u[0], r1, m0);
-            add_ssaaaa(t[1], t[0], t[1], t[0], u[1], u[0]);
-
-            if (t[1] > M[1] || (t[1] == M[1] && t[0] > M[0]))
-                sub_ddmmss(t[1], t[0], t[1], t[0], M[1], M[0]);
-
-            FLINT_ASSERT(t[1] < M[1] || (t[1] == M[1] && t[0] < M[0]));
-
-            if (sign)
-            {
-                sub_ddmmss(u[1], u[0], M[1], M[0], t[1], t[0]);
-                if (u[1] < t[1] || (u[1] == t[1] && u[0] < t[0]))
-                    fmpz_neg_uiui(Centries + i * Cstride + j, u[1], u[0]);
-                else
-                    fmpz_set_uiui(Centries + i * Cstride + j, t[1], t[0]);
-            }
-            else
-            {
-                fmpz_set_uiui(Centries + i * Cstride + j, t[1], t[0]);
-            }
-        }
-    }
-    else
-    {
-        nn_ptr M, Ns, T, U, primes;
-        slong Msize, Nsize;
-        ulong cy, ri;
-
-generic:
-        primes = FLINT_ARRAY_ALLOC(num_primes, ulong);
-        M = FLINT_ARRAY_ALLOC(num_primes + 1, ulong);
-        M[0] = primes[0] = mod_C[0]->mod.n;
-        Msize = 1;
-        for (i = 1; i < num_primes; i++)
-        {
-            primes[i] = mod_C[i]->mod.n;
-            M[Msize] = cy = mpn_mul_1(M, M, Msize, primes[i]);
-            Msize += (cy != 0);
-        }
-
-        Nsize = Msize + 2;
-        Ns = FLINT_ARRAY_ALLOC(Nsize * num_primes, ulong);
-        T  = FLINT_ARRAY_ALLOC(Nsize, ulong);
-        U  = FLINT_ARRAY_ALLOC(Nsize, ulong);
-
-        for (i = 0; i < num_primes; i++)
-        {
-            Ns[i*Nsize + (Nsize - 1)] = 0;
-            Ns[i*Nsize + (Nsize - 2)] = 0;
-            mpn_divexact_1(Ns + i * Nsize, M, Msize, primes[i]);
-            ri = mpn_mod_1(Ns + i * Nsize, Msize, primes[i]);
-            ri = n_invmod(ri, primes[i]);
-            Ns[i*Nsize + Msize] = mpn_mul_1(Ns + i*Nsize, Ns + i*Nsize, Msize, ri);
-        }
-
-        for (i = Cstartrow; i < Cstoprow; i++)
-        for (j = 0; j < n; j++)
-        {
-            ri = nmod_mat_entry(mod_C[0], i, j);
-            T[Nsize - 1] = mpn_mul_1(T, Ns, Nsize - 1, ri);
-            for (l = 1; l < num_primes; l++)
-            {
-                ri = nmod_mat_entry(mod_C[l], i, j);
-                T[Nsize - 1] += mpn_addmul_1(T, Ns + l*Nsize, Nsize - 1, ri);
-            }
-            mpn_tdiv_qr(U, T, 0, T, Nsize, M, Msize);
-            if (sign && (mpn_sub_n(U, M, T, Msize), mpn_cmp(U, T, Msize) < 0))
-            {
-                fmpz_set_ui_array(Centries + i * Cstride + j, U, Msize);
-                fmpz_neg(Centries + i * Cstride + j, Centries + i * Cstride + j);
-            }
-            else
-            {
-                fmpz_set_ui_array(Centries + i * Cstride + j, T, Msize);
-            }
-        }
-
-        flint_free(primes);
-        flint_free(M);
-        flint_free(Ns);
-        flint_free(T);
-        flint_free(U);
-    }
 }
 
 void fmpz_mat_multi_CRT_ui_precomp(
@@ -210,6 +79,19 @@ void fmpz_mat_multi_CRT_ui_precomp(
     slong num_workers, thread_limit;
     thread_pool_handle * handles;
     _crt_worker_arg mainarg, * args;
+    fmpz_comb_t comb_local;
+    int own_comb = 0;
+
+    if (comb == NULL)
+    {
+        nn_ptr primes = FLINT_ARRAY_ALLOC(nres, ulong);
+        for (i = 0; i < nres; i++)
+            primes[i] = residues[i]->mod.n;
+        fmpz_comb_init2(comb_local, primes, nres, FMPZ_COMB_CRT);
+        flint_free(primes);
+        comb = comb_local;
+        own_comb = 1;
+    }
 
     mainarg.n          = n;
     mainarg.Centries   = mat->entries;
@@ -227,7 +109,7 @@ single:
         mainarg.Cstartrow = 0;
         mainarg.Cstoprow  = m;
         _crt_worker(&mainarg);
-        return;
+        goto cleanup;
     }
 
     num_workers = flint_request_threads(&handles, thread_limit);
@@ -256,28 +138,13 @@ single:
 
     flint_give_back_threads(handles, num_workers);
     flint_free(args);
+
+cleanup:
+    if (own_comb)
+        fmpz_comb_clear(comb_local);
 }
 
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, int sign)
 {
-    if (nres > FMPZ_MAT_CRT_PRIMES_COMB_CUTOFF)
-    {
-        fmpz_comb_t comb;
-        slong i;
-        nn_ptr primes;
-        primes = _nmod_vec_init(nres);
-        for (i = 0; i < nres; i++)
-            primes[i] = residues[i]->mod.n;
-        fmpz_comb_init(comb, primes, nres);
-        _nmod_vec_clear(primes);
-
-        fmpz_mat_multi_CRT_ui_precomp(mat, residues, nres, comb, sign);
-
-        fmpz_comb_clear(comb);
-    }
-    else
-    {
-        fmpz_mat_multi_CRT_ui_precomp(mat, residues, nres, NULL, sign);
-    }
+    fmpz_mat_multi_CRT_ui_precomp(mat, residues, nres, NULL, sign);
 }
-

@@ -32,6 +32,16 @@ TEST_FUNCTION_START(fmpq_mat_solve_fmpz_mat_multi_mod, state)
         m = n_randint(state, 40);
         bits = 1 + n_randint(state, 100);
 
+        /* the testing hook makes the modular algorithms lift with 2-bit
+           primes, which is only affordable for small instances */
+        flint_fmpz_mat_force_small_primes = (n_randint(state, 4) == 0);
+        if (flint_fmpz_mat_force_small_primes)
+        {
+            n = FLINT_MIN(n, 5);
+            m = FLINT_MIN(m, 5);
+            bits = FLINT_MIN(bits, 10);
+        }
+
         fmpz_mat_init(A, n, n);
         fmpz_mat_init(B, n, m);
         fmpz_mat_init(AX_Z, n, m);
@@ -78,6 +88,7 @@ TEST_FUNCTION_START(fmpq_mat_solve_fmpz_mat_multi_mod, state)
     /* Check singular systems */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = (n_randint(state, 16) == 0);
         fmpq_mat_t X;
         fmpz_mat_t A, B;
         slong n, m, bits;
@@ -110,6 +121,8 @@ TEST_FUNCTION_START(fmpq_mat_solve_fmpz_mat_multi_mod, state)
         fmpz_mat_clear(B);
         fmpq_mat_clear(X);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

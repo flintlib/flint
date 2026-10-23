@@ -11,7 +11,9 @@
 
 #ifdef T
 
-#include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
+#include "templates.h"
 
 void
 TEMPLATE(T, mat_concat_vertical) (TEMPLATE(T, mat_t) res,
@@ -19,19 +21,10 @@ TEMPLATE(T, mat_concat_vertical) (TEMPLATE(T, mat_t) res,
 		                            const TEMPLATE(T, mat_t) mat2,
 		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i;
-    slong r1 = mat1->r;
-    slong c1 = mat1->c;
-    slong r2 = mat2->r;
-
-    if (c1 > 0)
-    {
-        for (i = 0; i < r1; i++)
-            _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry)(res, i, 0), TEMPLATE(T, mat_entry)(mat1, i, 0), c1, ctx);
-        for (i = 0; i < r2; i++)
-            _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry)(res, i + r1, 0), TEMPLATE(T, mat_entry)(mat2, i, 0), c1, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_concat_vertical((gr_mat_struct *) res,
+        (const gr_mat_struct *) mat1, (const gr_mat_struct *) mat2, gr_ctx));
 }
-
 
 #endif

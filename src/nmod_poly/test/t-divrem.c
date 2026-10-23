@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "nmod_poly.h"
 
 TEST_FUNCTION_START(nmod_poly_divrem, state)

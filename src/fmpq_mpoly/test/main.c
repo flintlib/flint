@@ -41,6 +41,7 @@
 #include "t-get_set_coeff_fmpq_monomial.c"
 #include "t-get_set_coeff_fmpq_ui.c"
 #include "t-get_set_is_fmpq.c"
+#include "t-get_set_is_fmpq_poly.c"
 #include "t-get_set_str_pretty.c"
 #include "t-get_set_term_coeff_fmpq.c"
 #include "t-get_set_term_exp_fmpz.c"
@@ -48,6 +49,7 @@
 #include "t-get_set_term_exp_ui.c"
 #include "t-get_term.c"
 #include "t-get_term_monomial.c"
+#include "t-inflate.c"
 #include "t-mul.c"
 #include "t-pow_fmpz.c"
 #include "t-pow_ui.c"
@@ -96,6 +98,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_mpoly_get_set_coeff_fmpq_monomial),
     TEST_FUNCTION(fmpq_mpoly_get_set_coeff_fmpq_ui),
     TEST_FUNCTION(fmpq_mpoly_get_set_is_fmpq),
+    TEST_FUNCTION(fmpq_mpoly_get_set_is_fmpq_poly),
     TEST_FUNCTION(fmpq_mpoly_get_set_str_pretty),
     TEST_FUNCTION(fmpq_mpoly_get_set_term_coeff_fmpq),
     TEST_FUNCTION(fmpq_mpoly_get_set_term_exp_fmpz),
@@ -103,6 +106,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_mpoly_get_set_term_exp_ui),
     TEST_FUNCTION(fmpq_mpoly_get_term),
     TEST_FUNCTION(fmpq_mpoly_get_term_monomial),
+    TEST_FUNCTION(fmpq_mpoly_inflate),
     TEST_FUNCTION(fmpq_mpoly_mul),
     TEST_FUNCTION(fmpq_mpoly_pow_fmpz),
     TEST_FUNCTION(fmpq_mpoly_pow_ui),

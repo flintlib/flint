@@ -14,6 +14,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_divrem_newton_n_preinv) (
@@ -24,20 +25,10 @@ _TEMPLATE(T, poly_divrem_newton_n_preinv) (
     const TEMPLATE(T, struct) * Binv, slong lenBinv,
     const TEMPLATE(T, ctx_t) ctx)
 {
-    const slong lenQ = lenA - lenB + 1;
-
-    _TEMPLATE(T, poly_div_newton_n_preinv) (Q, A, lenA, B, lenB, Binv, lenBinv,
-                                            ctx);
-
-    if (lenB > 1)
-    {
-        if (lenQ >= lenB - 1)
-            _TEMPLATE(T, poly_mullow) (R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
-        else
-            _TEMPLATE(T, poly_mullow) (R, B, lenB - 1, Q, lenQ, lenB - 1, ctx);
-
-        _TEMPLATE(T, vec_sub) (R, A, R, lenB - 1, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_divrem_newton_n_preinv(Q, R, A, lenA, B, lenB,
+                                    Binv, lenBinv, gr_ctx));
 }
 
 void

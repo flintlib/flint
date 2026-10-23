@@ -28,14 +28,14 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
         return;
     }
 
-    if (n <= 3)
+    ab = fmpz_mat_max_bits(A);
+    ab = FLINT_ABS(ab);
+
+    if ((n <= 3 || (n == 4 && ab >= 1024)) && ab <= 12000)
     {
         fmpz_mat_sqr_bodrato(B, A);
         return;
     }
-
-    ab = fmpz_mat_max_bits(A);
-    ab = FLINT_ABS(ab);
 
     if (n == 4 && ab >= 1024)
         fmpz_mat_sqr_bodrato(B, A);

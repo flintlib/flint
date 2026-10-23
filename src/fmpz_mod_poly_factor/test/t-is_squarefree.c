@@ -91,5 +91,48 @@ TEST_FUNCTION_START(fmpz_mod_poly_factor_is_squarefree, state)
 
     fmpz_mod_ctx_clear(ctx);
 
+    /* the _f variants set fac to 1 when the answer is valid, also for
+       short polynomials and when f' = 0 */
+    {
+        fmpz_mod_poly_t f;
+        fmpz_t fac;
+        slong k;
+
+        fmpz_init(fac);
+        fmpz_mod_ctx_init_ui(ctx, 5);
+        fmpz_mod_poly_init(f, ctx);
+
+        for (k = 0; k <= 5; k++)
+        {
+            int v, w;
+
+            fmpz_mod_poly_zero(f, ctx);
+            if (k > 0)
+                fmpz_mod_poly_set_coeff_ui(f, k == 5 ? 5 : k - 1, 1, ctx);
+
+            fmpz_zero(fac);
+            v = fmpz_mod_poly_is_squarefree_f(fac, f, ctx);
+            w = fmpz_mod_poly_is_squarefree(f, ctx);
+            if (!fmpz_is_one(fac) || v != w)
+                TEST_FUNCTION_FAIL("is_squarefree_f: f = %{fmpz_mod_poly}, "
+                                   "fac = %{fmpz}\n", f, fac);
+
+            if (k > 1)
+            {
+                fmpz_zero(fac);
+                v = fmpz_mod_poly_is_irreducible_rabin_f(fac, f, ctx);
+                w = fmpz_mod_poly_is_irreducible_rabin(f, ctx);
+                if (!fmpz_is_one(fac) || v != w)
+                    TEST_FUNCTION_FAIL("is_irreducible_rabin_f: "
+                                       "f = %{fmpz_mod_poly}, fac = %{fmpz}\n",
+                                       f, fac);
+            }
+        }
+
+        fmpz_mod_poly_clear(f, ctx);
+        fmpz_mod_ctx_clear(ctx);
+        fmpz_clear(fac);
+    }
+
     TEST_FUNCTION_END(state);
 }

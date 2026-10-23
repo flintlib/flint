@@ -19,32 +19,13 @@ void
 _nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
                                   nn_srcptr B, slong lenB, nmod_t mod)
 {
-    ulong invB;
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
 
-#if FLINT_BITS == 64 && defined(__AVX2__)
-    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(mod) <= 27) ? 400 : 80))
-#else
-    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(mod) <= 27) ? 200 : 80))
-#endif
-    {
-        invB = (B[lenB - 1] == 1) ? 1 : n_invmod(B[lenB - 1], mod.n);
-
-        _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, mod);
-    }
-    else
-    {
-        gr_ctx_t ctx;
-        _gr_ctx_init_nmod(ctx, &mod);
-
-#if FLINT_HAVE_FFT_SMALL
-        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx));
-#else
-        if (NMOD_BITS(mod) >= 16 && lenB >= 1024 && lenA <= 16384)
-            GR_MUST_SUCCEED(_gr_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, 16, ctx));
-        else
-            GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx));
-#endif
-    }
+    /* the nmod method (_gr_nmod_poly_divrem) does the algorithm selection */
+    if (_gr_poly_divrem(Q, R, A, lenA, B, lenB, ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception (_nmod_poly_divrem). "
+            "Leading coefficient of divisor is not invertible.\n");
 }
 
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,

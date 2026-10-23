@@ -183,6 +183,102 @@ do \
     (s7) = _FLINT_SBB(a7, b7, _carry, &_carry); \
 } while (0)
 
+#define add_sssssssssaaaaaaaaaaaaaaaaaa(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_ADC(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_ADC(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_ADC(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_ADC(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_ADC(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_ADC(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_ADC(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_ADC(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_ADC(a8, b8, _carry, &_carry); \
+} while (0)
+
+#define sub_dddddddddmmmmmmmmmsssssssss(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_SBB(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_SBB(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_SBB(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_SBB(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_SBB(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_SBB(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_SBB(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_SBB(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_SBB(a8, b8, _carry, &_carry); \
+} while (0)
+
+#define add_ssssssssssaaaaaaaaaaaaaaaaaaaa(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_ADC(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_ADC(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_ADC(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_ADC(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_ADC(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_ADC(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_ADC(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_ADC(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_ADC(a8, b8, _carry, &_carry); \
+    (s9) = _FLINT_ADC(a9, b9, _carry, &_carry); \
+} while (0)
+
+#define sub_ddddddddddmmmmmmmmmmssssssssss(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_SBB(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_SBB(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_SBB(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_SBB(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_SBB(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_SBB(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_SBB(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_SBB(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_SBB(a8, b8, _carry, &_carry); \
+    (s9) = _FLINT_SBB(a9, b9, _carry, &_carry); \
+} while (0)
+
+#define add_sssssssssssaaaaaaaaaaaaaaaaaaaaaa(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_ADC(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_ADC(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_ADC(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_ADC(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_ADC(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_ADC(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_ADC(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_ADC(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_ADC(a8, b8, _carry, &_carry); \
+    (s9) = _FLINT_ADC(a9, b9, _carry, &_carry); \
+    (s10) = _FLINT_ADC(a10, b10, _carry, &_carry); \
+} while (0)
+
+#define sub_dddddddddddmmmmmmmmmmmsssssssssss(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    ulong _carry; \
+    (s0) = _FLINT_SBB(a0, b0, 0, &_carry); \
+    (s1) = _FLINT_SBB(a1, b1, _carry, &_carry); \
+    (s2) = _FLINT_SBB(a2, b2, _carry, &_carry); \
+    (s3) = _FLINT_SBB(a3, b3, _carry, &_carry); \
+    (s4) = _FLINT_SBB(a4, b4, _carry, &_carry); \
+    (s5) = _FLINT_SBB(a5, b5, _carry, &_carry); \
+    (s6) = _FLINT_SBB(a6, b6, _carry, &_carry); \
+    (s7) = _FLINT_SBB(a7, b7, _carry, &_carry); \
+    (s8) = _FLINT_SBB(a8, b8, _carry, &_carry); \
+    (s9) = _FLINT_SBB(a9, b9, _carry, &_carry); \
+    (s10) = _FLINT_SBB(a10, b10, _carry, &_carry); \
+} while (0)
+
 #define _mul_ppmm(big_type, small_type, r1, r0, u, v) \
 do \
 { \

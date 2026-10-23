@@ -31,7 +31,6 @@ gr_poly_integral(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
     int status;
     gr_poly_fit_length(res, poly->length + 1, ctx);
     status = _gr_poly_integral(res->coeffs, poly->coeffs, poly->length + 1, ctx);
-    _gr_poly_set_length(res, poly->length + 1, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, poly->length + 1, ctx);
     return status;
 }

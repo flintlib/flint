@@ -13,6 +13,7 @@
 #include "thread_support.h"
 #include "acb.h"
 #include "acb_dirichlet.h"
+#include "acb_dirichlet/impl.h"
 #include "arb_calc.h"
 
 /*
@@ -1362,8 +1363,10 @@ refinement_worker(slong i, work_t * work)
     _acb_dirichlet_refine_hardy_z_zero(work->res + i, &(work->p[i].a), &(work->p[i].b), work->prec);
 }
 
+/* the Riemann-Siegel method (isolation and refinement), for
+   acb_dirichlet_hardy_z_zeros */
 void
-acb_dirichlet_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, slong prec)
+_acb_dirichlet_hardy_z_zeros_rs(arb_ptr res, const fmpz_t n, slong len, slong prec)
 {
     if (len <= 0)
     {

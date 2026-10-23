@@ -29,7 +29,7 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
         return;
     }
 
-    for (ulong k = n & 1; k < n; k += 2)
+    for (ulong k = !(n & 1); k < n; k += 2)
     {
         fmpz_zero(coeffs + k);
     }

@@ -12,8 +12,8 @@
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
-#define FLINT_FFT_SMALL_MUL_THRESHOLD           1540
-#define FLINT_FFT_SMALL_SQR_THRESHOLD           3080
+#define FLINT_FFT_SMALL_MUL_THRESHOLD           500
+#define FLINT_FFT_SMALL_SQR_THRESHOLD           500
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
@@ -29,7 +29,155 @@
 
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 0
 
+/* fft_small: round quotients with the magic constant instead of vroundpd,
+   which is 2 uops with 8 cycle latency on Intel cores since Skylake
+   (Haswell/Broadwell: 2 uops, 6 cycles) */
+#define FLINT_FFT_SMALL_ROUND_USE_NATIVE 0
+
 /* verified on Xeon(R) Gold 6244 (cascade lake) */
 #define FLINT_MULMOD_SHOUP_THRESHOLD 23
+
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
+
+/* Newton division, Newton Hensel (exact) division and Newton square root
+   replace the divide and conquer code from these limb counts (divisor /
+   quotient limbs for the first two, divisor limbs for the next two with
+   a quotient at least as long, respectively at least four times as long,
+   input limbs for the square root) */
+#define FLINT_MPN_TDIV_QR_NEWTON_CUTOFF 950
+#define FLINT_MPN_TDIV_QR_NEWTON_LONG_CUTOFF 608
+#define FLINT_MPN_DIVEXACT_NEWTON_CUTOFF 1187
+#define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 531
+#define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 7423
+
+/* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c (on an
+   Emerald Rapids Xeon without FLINT_PREINVERT_LIMB_USE_NATIVE, against
+   GMP 6.3.0 built with --host=skylake) */
+#define FLINT_MPN_DIV_DC_CUTOFF 18
+#define FLINT_MPN_DIVAPPR_DC_CUTOFF 32
+#define FLINT_MPN_DIVAPPROX_SHORT_CUTOFF 45
+#define FLINT_MPN_TDIV_Q_DC_CUTOFF 72
+#define FLINT_MPN_DIVAPPROX_NEWTON_CUTOFF 921
+#define FLINT_MPN_INV_NEWTON_CUTOFF 37
+#define FLINT_MPN_INV_NEWTON_LONG_CUTOFF 24
+#define FLINT_MPN_INV_NEWTON_VERYLONG_CUTOFF 171
+#define FLINT_MPN_DC_BDIV_QR_CUTOFF 40
+#define FLINT_MPN_DC_BDIV_Q_CUTOFF 80
+
+/* one-limb division by a chain of hardware divisions below these dividend
+   lengths (unnormalized / normalized divisor); only used with
+   FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3 values) */
+#define FLINT_MPN_DIVREM_1_HW_CUTOFF 24
+#define FLINT_MPN_DIVREM_1_NORM_HW_CUTOFF 14
+
+/* two-limb divisors by hardware 2/1 divisions without an inverse below this
+   dividend length; only used with FLINT_PREINVERT_LIMB_USE_NATIVE (Zen 3
+   value) */
+#define FLINT_MPN_DIV_2_HW_CUTOFF 22
+
+/* 3- to 7-limb divisors by hardware 2/1 divisions without an inverse for
+   quotients shorter than this */
+#define FLINT_MPN_DIV_SMALL_HW_QN_CUTOFF 4
+
+/* two-limb divisors by GMP's assembly mpn_divrem_2 (when available) from
+   this dividend length (1000000: never) */
+#define FLINT_MPN_DIV_2_GMP_CUTOFF 8
+
+
+/*
+    nmod_mat_mul: dispatch of the SIMD kernels nmod_mat_mul_u32 (moduli
+    below 2^32), nmod_mat_mul_u52 (AVX512-IFMA, moduli up to 2^52) and,
+    without IFMA, nmod_mat_mul_k52 / nmod_mat_mul_fp50 (moduli up to 2^52
+    / below 2^50); see src/nmod_mat/mul.c and the profile p-mul_tune.c
+    (measured on Intel Xeon Gold 6246R (Cascade Lake, AVX-512), with an
+    external BLAS; client Skylake (AVX2 only) not measured).
+      SIMD_MIN_DIM         use the SIMD kernels when B has at least this
+                           many columns and A this many rows (or half as
+                           many if B has 4x as many columns), for any inner
+                           dimension
+      SIMD_STRASSEN_CUTOFF single-threaded, Strassen is put on top of the
+                           SIMD kernels from this dimension on (0: never;
+                           values 1 to 4 also mean never)
+      BLAS_1PASS_CUTOFF    when one dgemm pass suffices (k*(n/2)^2 < 2^53),
+                           nmod_mat_mul_blas is preferred to u32 from this
+                           dimension on and, with an external BLAS, also to
+                           the single-IFMA mode of u52 (0: never)
+      BLAS_1PASS_CUTOFF_MT the same with 3 threads or more (measured with
+                           4; with 2 threads: the geometric mean)
+      U52_MIN_BITS         u52 is preferred to u32 from this modulus bit
+                           size on (through 52 bits)
+      U52_LO_MAX_BITS      u52 in its single-IFMA mode is preferred to u32
+                           up to this modulus bit size (0: never)
+      K52_MIN_BITS         without IFMA, from this modulus bit size on
+                           (through 52 bits) the two-limb integer kernel
+                           nmod_mat_mul_k52 replaces blas + CRT (0: never)
+      FP50_MAX_BITS        in that range, the floating point kernel
+                           nmod_mat_mul_fp50 is preferred to k52 up to
+                           this modulus bit size (through 50; 0: never)
+      K52_BLAS_CUTOFF      in that range and with an external BLAS,
+                           nmod_mat_mul_blas and its CRT are preferred to
+                           k52 / fp50 from this dimension on (0: never).
+                           The crossover grows with the modulus size, since
+                           blas needs more primes; the value is the one for
+                           the bottom of the range.
+*/
+#define FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM 8
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF 512
+#define FLINT_NMOD_MAT_MUL_BLAS_1PASS_CUTOFF_MT 800
+#define FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF 300
+#define FLINT_NMOD_MAT_MUL_U52_MIN_BITS 31
+#define FLINT_NMOD_MAT_MUL_U52_LO_MAX_BITS 0
+#define FLINT_NMOD_MAT_MUL_K52_MIN_BITS 33
+#define FLINT_NMOD_MAT_MUL_FP50_MAX_BITS 50
+#define FLINT_NMOD_MAT_MUL_K52_BLAS_CUTOFF 3000
+
+/*
+    nmod_mat_mul: for moduli up to 2^32, fp50 is preferred to u32 for these
+    inner dimensions (default: k = 1..3 on AVX2, k = 1 with AVX-512); see
+    src/nmod_mat/impl.h.
+    fp50 / u32 at k = 1, 2, 3: 0.82, 0.77, 0.80 on Intel Xeon Gold 6246R
+    (Cascade Lake, AVX-512); 1..3 is also the default on AVX2
+*/
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MIN_K 1
+#define FLINT_NMOD_MAT_MUL_FP50_U32_MAX_K 3
+
+/*
+    nmod_mat_mul: inner dimension from which u52 is preferred to fp50
+    (33-50 bits) and, in its single-IFMA mode, to u32 (only used with
+    AVX512-IFMA); see src/nmod_mat/mul.c (not measured on this target:
+    default)
+*/
+#define FLINT_NMOD_MAT_MUL_U52_MIN_K 12
+
+/*
+    nmod_vec_dot: the split-limbs SIMD dot product (AVX2 / AVX-512, moduli
+    above 2^32) is used from this length on (0: never); see src/nmod_vec.h
+    (measured on Intel Xeon Gold 6246R (Cascade Lake, AVX-512); client
+    Skylake (AVX2 only) not measured)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN 128
+
+/*
+    nmod_vec_dot: split limbs are used for moduli up to 2^this; see
+    src/nmod_vec.h (not measured on this target: default, no
+    limit)
+*/
+#define FLINT_NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS 64
+
+/*
+    nmod_vec_dot: with AVX512-IFMA, the u52 SIMD dot product (moduli above
+    2^32 up to 2^52) is used from this length on; see src/nmod_vec.h (not
+    measured on this target: default)
+*/
+#define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
+
+/*
+    radix_mulmid: with fft_small, the classical algorithm is used below this
+    many limb products per limb of the convolution that fft_small computes;
+    see src/radix.h (measured on Cascade Lake)
+*/
+#define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO 80
 
 #endif

@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <string.h>
 #include "test_helpers.h"
+#include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
@@ -93,6 +96,54 @@ TEST_FUNCTION_START(fq_zech_ctx_init_ui, state)
     }
 
     fmpz_clear(e);
+
+    /* a non-primitive modulus is rejected, and clearing afterwards is safe */
+    {
+        nmod_poly_t m;
+        int ok;
+
+        /* x^2 + 1 is irreducible over GF(3) but not primitive */
+        nmod_poly_init(m, 3);
+        nmod_poly_set_coeff_ui(m, 2, 1);
+        nmod_poly_set_coeff_ui(m, 0, 1);
+        ok = fq_zech_ctx_init_modulus_check(ctx, m, "a");
+        if (ok)
+            TEST_FUNCTION_FAIL("x^2 + 1 mod 3 accepted\n");
+        fq_zech_ctx_clear(ctx);
+
+        /* x^2 + 2x + 2 is primitive */
+        nmod_poly_set_coeff_ui(m, 1, 2);
+        nmod_poly_set_coeff_ui(m, 0, 2);
+        ok = fq_zech_ctx_init_modulus_check(ctx, m, "a");
+        if (!ok)
+            TEST_FUNCTION_FAIL("x^2 + 2x + 2 mod 3 rejected\n");
+        fq_zech_ctx_clear(ctx);
+
+        nmod_poly_clear(m);
+    }
+
+    /* zero is printed as 0 (assume tmpfile() is broken on windows) */
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+    {
+        FILE * tmp = tmpfile();
+        fq_zech_t a;
+        char buf[16] = { 0 };
+
+        if (tmp != NULL)
+        {
+            fq_zech_ctx_init_ui(ctx, 5, 3, "a");
+            fq_zech_init(a, ctx);
+            fq_zech_zero(a, ctx);
+            fq_zech_fprint_pretty(tmp, a, ctx);
+            rewind(tmp);
+            if (fgets(buf, sizeof(buf), tmp) == NULL || strcmp(buf, "0") != 0)
+                TEST_FUNCTION_FAIL("zero printed as \"%s\"\n", buf);
+            fclose(tmp);
+            fq_zech_clear(a, ctx);
+            fq_zech_ctx_clear(ctx);
+        }
+    }
+#endif
 
     TEST_FUNCTION_END(state);
 }

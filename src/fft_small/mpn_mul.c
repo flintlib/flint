@@ -1,6 +1,9 @@
 /*
     Copyright (C) 2022 Daniel Schultz
     Copyright (C) 2024 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -18,6 +21,28 @@
 #include "nmod.h"
 #include "crt_helpers.h"
 #include "fft_small.h"
+
+/*
+    If set, the truncated/wrap-around FFT optimization for partial products is
+    enabled: when computing only the limb window [lo, hi) of a product (a middle
+    or high product) we are free to fold the unused low coefficients [0, c_lo)
+    on top of the high ones with a cyclic (x^(2^d) - 1) transform, provided the
+    resulting aliasing never lands inside the window we actually read.  This can
+    roughly halve the transform length for balanced middle products.  Guarded by
+    an #if so its effect can be measured by toggling it to 0 (in which case the
+    full-length transform is used and only the output extraction is windowed).
+*/
+#ifndef MPN_MUL_USE_WRAPAROUND
+#define MPN_MUL_USE_WRAPAROUND 1
+#endif
+
+/*
+    Upper bound (in limbs) on the small scratch buffer used by _mpn_from_ffts to
+    reconstruct the "bottom band" of coefficients that straddle the limb 'lo'.
+    The band spans at most one BLK_SZ block plus the n+1 limb overlap of a single
+    coefficient; over all profiles this is < 800 limbs (checked with an assert).
+*/
+#define MPN_MULMID_BOUNDBUF 1024
 
 /*
 The following profiles are hardcoded.
@@ -521,6 +546,7 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
             (d + l*dstride)[i] = 0.0; \
 }
 
+DEFINE_IT(3)
 DEFINE_IT(4)
 DEFINE_IT(5)
 DEFINE_IT(6)
@@ -634,18 +660,36 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
                               start_hard, stop_hard, bits); \
 }
 
+DEFINE_IT(3, 64)
+DEFINE_IT(4, 64)
 DEFINE_IT(4, 84)
 DEFINE_IT(4, 88)
 DEFINE_IT(4, 92)
+DEFINE_IT(5, 84)
+DEFINE_IT(5, 88)
+DEFINE_IT(5, 92)
 DEFINE_IT(5,112)
 DEFINE_IT(5,116)
 DEFINE_IT(5,120)
+DEFINE_IT(6,112)
+DEFINE_IT(6,116)
+DEFINE_IT(6,120)
+DEFINE_IT(6,126)
+DEFINE_IT(6,128)
 DEFINE_IT(6,136)
 DEFINE_IT(6,140)
 DEFINE_IT(6,144)
+DEFINE_IT(7,126)
+DEFINE_IT(7,128)
+DEFINE_IT(7,136)
+DEFINE_IT(7,140)
+DEFINE_IT(7,144)
 DEFINE_IT(7,160)
 DEFINE_IT(7,164)
 DEFINE_IT(7,168)
+DEFINE_IT(8,160)
+DEFINE_IT(8,164)
+DEFINE_IT(8,168)
 DEFINE_IT(8,184)
 DEFINE_IT(8,188)
 DEFINE_IT(8,192)
@@ -700,19 +744,14 @@ FLINT_FORCE_INLINE void CAT(_add_to_answer_hard, n)(ulong z[], ulong r[], ulong 
     mpn_add_n(z + toff, z + toff, r, zn - toff); \
 }
 
+DEFINE_IT(3, 4)
 DEFINE_IT(4, 5)
 DEFINE_IT(5, 6)
 DEFINE_IT(6, 7)
 DEFINE_IT(7, 8)
 #undef DEFINE_IT
 
-typedef void (*from_ffts_func)(
-    ulong* z, ulong zn, ulong zlen,
-    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts,
-    ulong bits,
-    ulong start_easy, ulong stop_easy,
-    ulong* overhang);
+/* from_ffts_func typedef now in fft_small.h */
 
 /*
     The "n" here is the limb count Rcrts[np-1].coeff_len, which is big enough
@@ -720,47 +759,65 @@ typedef void (*from_ffts_func)(
     intermediate dot products f[0]*x[0] + ... + f[np-1]*x[np-1]. The x[i] are
     single limb and the f[i] are of length "m". The number of primes is "np".
 
-    The coefficient of X^i, 0 <= i < zlen needs to be reconstructed and added
-    to the answer mpn (z, zn). This involves the limbs
+    This is the windowed reconstruction.  The full integer answer is
 
-       z[floor(i*bits/64)] ... z[floor(i*bits/64)+n]
+        sum_{i=0}^{clen-1} coeff(X^i) * 2^(i*bits)
 
-    so is easy if floor(i*bits/64)+n < zn.
+    but only the limb window [lo, hi) of it is requested (a lower approximation:
+    carries coming from limbs below 'lo' are not recovered).  The output buffer
+    (z, hi-lo) holds limbs [lo, hi); writing the coefficient of X^i, which spans
 
-    The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
+       (z - lo)[floor(i*bits/64)] ... (z - lo)[floor(i*bits/64) + n]
 
-    if overhang = NULL
+    is "easy" when floor(i*bits/64) + n < hi.
 
-        handle output coefficients from [start_easy, zlen)
-        end_easy is still expected to be valid
+    Coefficients are partitioned into three groups by the caller:
 
+      [c_lo, start_easy)  bottom band: coefficients that reach into limb >= lo
+                          but lie below the BLK_SZ-aligned easy start.  Only the
+                          worker passing boundbuf != NULL (thread 0) handles
+                          these, reconstructing them -- including the sub-lo
+                          limbs that carry into limb lo -- into boundbuf anchored
+                          at limb L0 = floor(c_lo*bits/64).  The driver adds the
+                          in-range slice of boundbuf into z after all threads
+                          join (kept serial to avoid a carry-propagation race).
+
+      [start_easy, stop_easy)  easy interior: start_easy and stop_easy are
+                          divisible by BLK_SZ.  This is the byte-identical hot
+                          loop of the full product, just writing through the
+                          shifted base (z - lo).
+
+      [stop_easy, clen)   handled either via the overhang (parallel segments) or,
+                          for the last segment (overhang == NULL), the hard tail
+                          clamped at limb 'hi'.
+
+    The l^th fft ctx Rffts[l] is expected to have data at d + l*dstride.
+
+    if overhang == NULL
+        handle output coefficients from [start_easy, clen), clamped above at hi
     if overhang != NULL
-
-        overhang has space for n words
-
-        handle output coefficients from [start_easy, end_easy) where
-        start_easy and stop_easy are divisible by BLK_SZ
-
-        write to output words
-        [start_easy*bits/64, stop_easy*bits/64) [overhang+0, overhang+n)
+        overhang has space for n words; handle [start_easy, stop_easy) and write
+        the spill of the topmost block into [overhang+0, overhang+n)
 */
 #define DEFINE_IT(NP, N, M) \
 static void CAT(_mpn_from_ffts, NP)( \
-    ulong* z, ulong zn, ulong zlen, \
+    ulong* z, ulong lo, ulong hi, ulong c_lo, ulong clen, \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
     crt_data_struct* Rcrts, \
     ulong bits, \
     ulong start_easy, ulong stop_easy, \
-    ulong* overhang) \
+    ulong* overhang, ulong* boundbuf) \
 { \
     ulong np = NP; \
     ulong n = N; \
     ulong m = M; \
+    ulong* zbase = z - lo;  /* an absolute limb 'toff' is written at z[toff - lo] */ \
     ulong zn_start = start_easy*bits/64; \
-    ulong zn_stop  = (overhang == NULL) ? zn : stop_easy*bits/64; \
+    ulong zn_stop  = (overhang == NULL) ? hi : stop_easy*bits/64; \
  \
     FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
     FLINT_ASSERT(start_easy <= stop_easy); \
+    FLINT_ASSERT(zn_start >= lo); \
  \
     if (n == m + 1) \
     { \
@@ -773,9 +830,47 @@ static void CAT(_mpn_from_ffts, NP)( \
         FLINT_ASSERT(n == m); \
     } \
  \
-    memset(z + zn_start, 0, (zn_stop - zn_start)*sizeof(ulong)); \
- \
     ulong Xs[BLK_SZ*NP]; \
+ \
+    /* bottom band: coefficients [c_lo, start_easy) -> boundbuf (thread 0 only) */ \
+    if (boundbuf != NULL && c_lo < start_easy) \
+    { \
+        ulong L0     = (c_lo*bits)/64; \
+        ulong topabs = ((start_easy - 1)*bits)/64 + n; \
+        ulong tw     = topabs - L0 + 1; \
+        ulong* bbase = boundbuf - L0; \
+ \
+        FLINT_ASSERT(tw <= MPN_MULMID_BOUNDBUF); \
+        for (ulong k = 0; k < tw; k++) \
+            boundbuf[k] = 0; \
+ \
+        for (ulong blk = c_lo/BLK_SZ; blk < start_easy/BLK_SZ; blk++) \
+        { \
+            _convert_block(Xs, Rffts, d, dstride, np, blk); \
+            ulong j0 = (blk*BLK_SZ < c_lo) ? c_lo - blk*BLK_SZ : 0; \
+            for (ulong j = j0; j < BLK_SZ; j += 1) \
+            { \
+                ulong i = blk*BLK_SZ + j; \
+                ulong r[N + 1]; \
+                ulong t[N + 1]; \
+                ulong l = 0; \
+ \
+                CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+                CRT_UNROLL_PRIMES \
+                for (l++; l < np; l++) \
+                    CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+ \
+                CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+ \
+                ulong toff = (i*bits)/FLINT_BITS; \
+                ulong tshift = (i*bits)%FLINT_BITS; \
+ \
+                CAT(_add_to_answer_easy, N)(bbase, r, topabs + 1, toff, tshift); \
+            } \
+        } \
+    } \
+ \
+    memset(zbase + zn_start, 0, (zn_stop - zn_start)*sizeof(ulong)); \
  \
     if (overhang != NULL) \
     { \
@@ -797,6 +892,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong l = 0; \
  \
             CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
                 CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
@@ -807,7 +903,7 @@ static void CAT(_mpn_from_ffts, NP)( \
  \
             FLINT_ASSERT(zn_stop > n + toff); \
  \
-            CAT(_add_to_answer_easy, N)(z, r, zn_stop, toff, tshift); \
+            CAT(_add_to_answer_easy, N)(zbase, r, zn_stop, toff, tshift); \
         } \
     } \
  \
@@ -823,6 +919,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong l = 0; \
  \
             CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
                 CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
  \
@@ -833,7 +930,7 @@ static void CAT(_mpn_from_ffts, NP)( \
  \
             if (n + toff < zn_stop) \
             { \
-                CAT(_add_to_answer_easy, N)(z, r, zn_stop, toff, tshift); \
+                CAT(_add_to_answer_easy, N)(zbase, r, zn_stop, toff, tshift); \
             } \
             else \
             { \
@@ -853,7 +950,7 @@ static void CAT(_mpn_from_ffts, NP)( \
                 unsigned char cf = 0; \
                 ulong k = 0; \
                 for (; k < zn_stop - toff; k++) \
-                    cf = _addcarry_ulong(cf, z[toff + k], r[k], &z[toff + k]); \
+                    cf = _addcarry_ulong(cf, zbase[toff + k], r[k], &zbase[toff + k]); \
                 for (; k <= n; k++) \
                     cf = _addcarry_ulong(cf, overhang[k-(zn_stop-toff)], r[k], &overhang[k-(zn_stop-toff)]); \
             } \
@@ -861,7 +958,7 @@ static void CAT(_mpn_from_ffts, NP)( \
     } \
     else \
     { \
-        for (ulong i = stop_easy; i < zlen; i++) \
+        for (ulong i = stop_easy; i < clen; i++) \
         { \
             ulong r[N + 1]; \
             ulong t[N + 1]; \
@@ -870,6 +967,7 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
  \
             CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+            CRT_UNROLL_PRIMES \
             for (l++; l < np; l++) \
             { \
                 xx = (d + l*dstride)[i]; \
@@ -882,14 +980,15 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong toff = (i*bits)/FLINT_BITS; \
             ulong tshift = (i*bits)%FLINT_BITS; \
  \
-            if (toff >= zn) \
+            if (toff >= hi) \
                 break; \
  \
-            CAT(_add_to_answer_hard, N)(z, r, zn, toff, tshift); \
+            CAT(_add_to_answer_hard, N)(zbase, r, hi, toff, tshift); \
         } \
     } \
 }
 
+DEFINE_IT(3, 3, 2)
 DEFINE_IT(4, 4, 3)
 DEFINE_IT(5, 4, 4)
 DEFINE_IT(6, 5, 4)
@@ -980,10 +1079,14 @@ static void fill_vec_two_pow_tab(
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
 {
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
     ulong i;
 
     R->buffer = NULL;
     R->buffer_alloc = 0;
+    R->spill = NULL;
+    R->spill_alloc = 0;
 
     for (i = 0; i < MPN_CTX_NCRTS; i++)
     {
@@ -1097,6 +1200,27 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     PUSH_PROFILE(8,192, 7,6);
 
     FLINT_ASSERT(R->profiles_size <= MAX_NPROFILES);
+    /* two-prime pipeline constants */
+    {
+        ulong p1 = (ulong) R->ffts[0].p, p2 = (ulong) R->ffts[1].p;
+        ulong hi, lo, d;
+        R->np2_ip1 = n_invmod(p1 % p2, p2);
+        umul_ppmm(hi, lo, p1, p2);
+        R->np2_prodbits = 64 + FLINT_BIT_COUNT(hi) - 1;
+        (void) lo;
+
+        nmod_t mod1, mod2;
+        nmod_init(&mod1, p1);
+        nmod_init(&mod2, p2);
+        R->np2_s1[0] = 1;
+        R->np2_s2[0] = 1;
+        for (d = 1; d < 32; d++)
+        {
+            R->np2_s1[d] = nmod_mul(R->np2_s1[d - 1], (p1 + 1) / 2, mod1);
+            R->np2_s2[d] = nmod_mul(R->np2_s2[d - 1], (p2 + 1) / 2, mod2);
+        }
+    }
+
 }
 
 #define VEC_SZ 4
@@ -1115,6 +1239,7 @@ void mpn_ctx_clear(mpn_ctx_t R)
     flint_aligned_free(R->vec_two_pow_buffer);
 
     flint_aligned_free(R->buffer);
+    flint_aligned_free(R->spill);
 }
 
 
@@ -1223,6 +1348,22 @@ find_next:
 
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 {
+    /* contract in fft_small.h. Under a live reservation the main buffer
+       is pinned, so a request beyond the reserved head goes to the
+       secondary buffer: same no-free contract, same geometric growth,
+       and the same one-outstanding-request rule -- a larger request
+       here reallocates it just as one would the main buffer. */
+    if (R->reserved_tail != 0 && n > R->reserved_head)
+    {
+        if (n > R->spill_alloc)
+        {
+            flint_aligned_free(R->spill);
+            n = n_round_up(n_max(n, R->spill_alloc*17/16), 4096);
+            R->spill = flint_aligned_alloc(4096, n);
+            R->spill_alloc = n;
+        }
+        return R->spill;
+    }
     if (n > R->buffer_alloc)
     {
         flint_aligned_free(R->buffer);
@@ -1232,6 +1373,35 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
     }
     return R->buffer;
 }
+
+void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail)
+{
+    ulong total = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT)
+                  + n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+
+    /* one reservation at a time: a second requester, such as a ring
+       context constructed while another is live, receives NULL and
+       provides its own storage. The growth below invalidates any
+       fit_buffer pointer still outstanding, as any growth does. */
+    if (R->reserved_tail != 0)
+        return NULL;
+    if (total > R->buffer_alloc)
+    {
+        flint_aligned_free(R->buffer);
+        R->buffer = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, total);
+        R->buffer_alloc = total;
+    }
+    R->reserved_head = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT);
+    R->reserved_tail = n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+    return (void *) ((char *) R->buffer + R->reserved_head);
+}
+
+void mpn_ctx_fit_buffer_release(mpn_ctx_t R)
+{
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
+}
+
 
 /* pointwise mul of a with b and m */
 void sd_fft_ctx_point_mul(
@@ -1244,12 +1414,14 @@ void sd_fft_ctx_point_mul(
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    /* flat over the whole transform: below one block the data is
+       simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* ax = a + sd_fft_ctx_blk_offset(I);
-        const double* bx = b + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* ax = a;
+    const double* bx = b;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1, b0, b1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -1261,7 +1433,7 @@ void sd_fft_ctx_point_mul(
             x1 = vec8d_mulmod(x1, b1, n, ninv);
             vec8d_store(ax+j+0, x0);
             vec8d_store(ax+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -1274,12 +1446,13 @@ void sd_fft_ctx_point_sqr(
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
+    /* flat, as above */
+    FLINT_ASSERT(depth >= 4);
 
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
     {
-        double* ax = a + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* ax = a;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -1289,7 +1462,7 @@ void sd_fft_ctx_point_sqr(
             x1 = vec8d_mulmod(x1, m, n, ninv);
             vec8d_store(ax+j+0, x0);
             vec8d_store(ax+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -1342,7 +1515,36 @@ typedef struct fft_worker_struct {
     ulong btrunc;
     struct fft_worker_struct* next;
     int squaring;
+    int transposed;     /* see _mpn_ctx_mpn_mul_range */
+    ulong rlen;
+    ulong otrunc;
 } fft_worker_struct;
+
+/* reverse the first n entries of x */
+static void _fft_small_reverse(double* x, ulong n)
+{
+    for (ulong i = 0, j = n - 1; i < j; i++, j--)
+        FLINT_SWAP(double, x[i], x[j]);
+}
+
+/* with the transposed flag: the b side, reversed on its first rlen
+   coefficients, is transformed as in a multiplication, the a side goes
+   through the transpose of the inverse transform at full length, and the
+   transpose of the forward transform produces otrunc coefficients */
+static void _transposed_transforms(sd_fft_ctx_struct* Q, double* abuf,
+    double* bbuf, ulong rlen, ulong btrunc, ulong otrunc, ulong depth,
+    ulong ztrunc, ulong cop)
+{
+    ulong m;
+
+    _fft_small_reverse(bbuf, rlen);
+    sd_fft_trunc(Q, bbuf, depth, btrunc, ztrunc);
+    sd_ifft_trunc_tr(Q, abuf, depth, ztrunc);
+    NMOD_RED2(m, cop >> (FLINT_BITS - depth), cop << depth, Q->mod);
+    m = nmod_inv(m, Q->mod);
+    sd_fft_ctx_point_mul(Q, abuf, bbuf, m, depth);
+    sd_fft_trunc_tr(Q, abuf, depth, otrunc, ztrunc);
+}
 
 static void fft_worker_func(void* varg)
 {
@@ -1351,6 +1553,13 @@ static void fft_worker_func(void* varg)
 
     do {
         sd_fft_ctx_struct* Q = X->fctx;
+
+        if (X->transposed)
+        {
+            _transposed_transforms(Q, X->abuf, X->bbuf, X->rlen, X->btrunc,
+                                   X->otrunc, X->depth, X->ztrunc, X->cop);
+            continue;
+        }
 
         if (!X->squaring)
             sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
@@ -1385,6 +1594,9 @@ typedef struct mod_fft_worker_struct {
     ulong btrunc;
     struct mod_fft_worker_struct* next;
     int squaring;
+    int transposed;     /* as for fft_worker_struct */
+    ulong rlen;
+    ulong otrunc;
 } mod_fft_worker_struct;
 
 static void mod_fft_worker_func(void* varg)
@@ -1394,6 +1606,15 @@ static void mod_fft_worker_func(void* varg)
 
     do {
         sd_fft_ctx_struct* Q = X->fctx;
+
+        if (X->transposed)
+        {
+            slow_mpn_to_fft(Q, X->bbuf, X->btrunc, X->b, X->bn, X->bits, X->two_pow_tab);
+            slow_mpn_to_fft(Q, X->abuf, X->atrunc, X->a, X->an, X->bits, X->two_pow_tab);
+            _transposed_transforms(Q, X->abuf, X->bbuf, X->rlen, X->btrunc,
+                                   X->otrunc, X->depth, X->ztrunc, X->cop);
+            continue;
+        }
 
         if (!X->squaring)
         {
@@ -1419,8 +1640,10 @@ static void mod_fft_worker_func(void* varg)
 typedef struct {
     from_ffts_func from_ffts;
     ulong* z;
-    ulong zn;
-    ulong zlen;
+    ulong lo;
+    ulong hi;
+    ulong c_lo;
+    ulong clen;
     sd_fft_ctx_struct* fctxs;
     double* abuf;
     ulong stride;
@@ -1429,6 +1652,7 @@ typedef struct {
     ulong start_easy;
     ulong stop_easy;
     ulong* overhang;
+    ulong* boundbuf;
     ulong overhang_buffer[MPN_CTX_NCRTS];
 } crt_worker_struct;
 
@@ -1436,19 +1660,65 @@ static void crt_worker_func(void* varg)
 {
     crt_worker_struct* X = (crt_worker_struct*) varg;
 
-    X->from_ffts(X->z, X->zn, X->zlen, X->fctxs, X->abuf, X->stride, X->crts,
-                X->bits, X->start_easy, X->stop_easy, X->overhang);
+    X->from_ffts(X->z, X->lo, X->hi, X->c_lo, X->clen, X->fctxs, X->abuf,
+                 X->stride, X->crts, X->bits, X->start_easy, X->stop_easy,
+                 X->overhang, X->boundbuf);
 }
 
 
-void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn)
+/*
+    Compute the limb window [lo, hi) of the integer product a*b, as a lower
+    approximation: carries propagating up from limbs strictly below 'lo' are not
+    recovered, exactly as in the radix middle-product code.  The low-end deficit
+    (true - computed) of limb 'lo' is < min(an, bn, lo) coefficients' worth, i.e.
+    bounded by min(an, bn, lo)*2^64; limbs sufficiently far above 'lo' are exact
+    (until the upper truncation at 'hi').  Writes hi - lo limbs to z.
+
+    With lo == 0 and hi == an + bn this reduces to the full product computed by
+    mpn_ctx_mpn_mul (every code path below collapses to the original one).
+*/
+void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
+                            const ulong* a, ulong an, const ulong* b, ulong bn)
 {
     ulong zn, alen, blen, zlen, atrunc, btrunc, ztrunc, depth, stride;
+    ulong c_lo, c_hi, nn;
     double* abuf;
     profile_entry P;
     ulong sz;
     void* worker_struct_buffer;
     int squaring;
+    int transposed = 0;
+    ulong tr_c0 = 0, tr_rlen = 0, tr_otrunc = 0;
+    ulong* tr_v = NULL;
+
+    FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(bn > 0);
+
+    zn = an + bn;
+
+    if (lo >= hi)
+        return;
+
+    /* limbs at or above the top of the product are zero */
+    if (hi > zn)
+    {
+        if (lo >= zn)
+        {
+            flint_mpn_zero(z, hi - lo);
+            return;
+        }
+        flint_mpn_zero(z + (zn - lo), hi - zn);
+        hi = zn;
+    }
+
+    if (FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
+    {
+        if (an >= bn)
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, a, an, b, bn);
+        else
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, b, bn, a, an);
+        return;
+    }
 
     mpn_ctx_best_profile(R, &P, an, bn);
 
@@ -1459,32 +1729,131 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulon
     worker_struct_buffer = flint_malloc(sz);
 
     squaring = (a == b) && (an == bn);
-    zn = an + bn;
     alen = n_cdiv(FLINT_BITS*an, P.bits);
     blen = n_cdiv(FLINT_BITS*bn, P.bits);
     zlen = alen + blen - 1;
     atrunc = n_round_up(alen, BLK_SZ);
     btrunc = n_round_up(blen, BLK_SZ);
+
+    nn = R->crts[P.np - 1].coeff_len;
+
+    /* first coefficient whose support reaches into limb >= lo */
+    c_lo = (lo > nn) ? n_min(zlen, n_cdiv((lo - nn)*FLINT_BITS, P.bits)) : 0;
+    /* first coefficient lying entirely at limb >= hi */
+    c_hi = n_min(zlen, n_cdiv(hi*FLINT_BITS, P.bits));
+
+    if (c_lo >= c_hi)
+    {
+        /* no coefficient touches the window: it is all zero */
+        flint_mpn_zero(z, hi - lo);
+        flint_free(worker_struct_buffer);
+        flint_give_back_threads(P.handles, P.nhandles);
+        return;
+    }
+
+    /*
+        Transform-size selection.  Baseline: the full-length transform, with the
+        output extraction windowed to [c_lo, c_hi).  The wrap-around trick (guard)
+        may shrink the transform to a power of two 2^d when the unused low
+        coefficients can be aliased on top of the high ones without disturbing
+        [c_lo, c_hi): need max(atrunc, btrunc, c_hi) <= 2^d <= zlen and the
+        wrap-around of the top, zlen - 2^d, to land at or below c_lo.
+    */
     ztrunc = n_round_up(zlen, BLK_SZ);
     depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
+#if MPN_MUL_USE_WRAPAROUND
+    {
+        /* largest power of two w = 2^d with w <= zlen */
+        ulong d = n_flog2(zlen);
+        ulong w = n_pow2(d);
+        if (d >= LG_BLK_SZ &&
+            atrunc <= w && btrunc <= w && c_hi <= w && w <= zlen && zlen <= c_lo + w)
+        {
+            depth = d;
+            ztrunc = w;
+        }
+    }
+#endif
+    /*
+        The transposed product (as in _mpn_ctx_mpn_mul_window_np2_tr): the
+        reconstruction only reads the coefficients [c_lo, c_hi), which are
+
+            c[c0 + j] = sum_i r[i] v[i + j],    0 <= j < m = c_hi - c0,
+
+        with r the rlen coefficients of the shorter operand s (its zero
+        coefficients above its length included) reversed and v those of
+        the longer operand l from s0 = c0 - (rlen - 1) on: the transpose of
+        a product of lengths rlen and m, instead of the window of the full
+        product. With c0*bits and (rlen - 1)*bits multiples of 64, v is the
+        integer l from limb s0*bits/64 on (with zero limbs in front if
+        s0 < 0), and the reconstruction runs on [c_lo, c_hi) shifted by c0
+        coefficients and c0*bits/64 limbs, on the same coefficients at the
+        same bit positions as for the full product: the result is the same.
+        Used when the window is shorter than the longer operand and the
+        transform strictly shorter.
+    */
+    if (!squaring)
+    {
+        const ulong * s, * l;
+        ulong sn, ln, slen, llen, g, m, pn;
+
+        if (alen >= blen)
+            l = a, ln = an, llen = alen, s = b, sn = bn, slen = blen;
+        else
+            l = b, ln = bn, llen = blen, s = a, sn = an, slen = alen;
+
+        /* g * bits is the smallest multiple of bits divisible by 64 */
+        g = 64;
+        while (g > 1 && (g / 2) * P.bits % 64 == 0)
+            g /= 2;
+
+        tr_c0 = c_lo - c_lo % g;
+        tr_rlen = slen + (g - (slen - 1) % g) % g;
+        m = c_hi - tr_c0;
+        pn = tr_rlen + m - 1;
+
+        if (m < llen && n_round_up(pn, BLK_SZ) < ztrunc)
+        {
+            slong s0 = (slong) tr_c0 - (slong) (tr_rlen - 1);
+
+            transposed = 1;
+            ztrunc = n_round_up(pn, BLK_SZ);
+            depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
+            tr_otrunc = n_round_up(m, BLK_SZ);
+
+            if (s0 < 0)
+            {
+                /* the limbs of l that the window can reach */
+                ulong kl = (ulong) (-s0) * P.bits / 64;
+                ulong cn = n_min(ln, n_cdiv(c_hi * P.bits, FLINT_BITS) + 1);
+
+                tr_v = FLINT_ARRAY_ALLOC(kl + cn, ulong);
+                flint_mpn_zero(tr_v, kl);
+                flint_mpn_copyi(tr_v + kl, l, cn);
+                a = tr_v;
+                an = kl + cn;
+            }
+            else
+            {
+                ulong off = (ulong) s0 * P.bits / 64;
+
+                FLINT_ASSERT(off < ln);
+                a = l + off;
+                an = ln - off;
+            }
+
+            b = s;
+            bn = sn;
+            atrunc = ztrunc;
+            btrunc = n_round_up(tr_rlen, BLK_SZ);
+        }
+    }
+
     stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
 
-    FLINT_ASSERT(an > 0);
-    FLINT_ASSERT(bn > 0);
     FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
                                 crt_data_prod_primes(R->crts + P.np - 1),
                                 R->crts[P.np - 1].coeff_len, blen, 2*P.bits));
-
-#define TIME_THIS 0
-
-#if TIME_THIS
-timeit_t timer, timer_overall;
-flint_printf("------------ zn = %wu, nthreads = %wu np = %wu, bits = %wu, -------------\n", zn, nthreads, np, bits);
-#endif
-
-#if TIME_THIS
-timeit_start(timer_overall);
-#endif
 
     if (P.to_ffts != NULL)
     {
@@ -1504,10 +1873,6 @@ timeit_start(timer_overall);
 
         abuf = (double*) mpn_ctx_fit_buffer(R, 2*P.np*stride*sizeof(double));
         bbuf = abuf + P.np*stride;
-
-#if TIME_THIS
-timeit_start(timer);
-#endif
 
         /* some fixups for loop unrollings: round down the easy stops */
         FLINT_ASSERT(bits%2 == 0);
@@ -1550,31 +1915,6 @@ timeit_start(timer);
         for (slong i = P.nhandles; i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
 
-#if TIME_THIS
-timeit_stop(timer);
-if (timer->wall > 50)
-flint_printf("    mod: %wd\n", timer->wall);
-#endif
-
-#if TIME_THIS
-timeit_start(timer);
-#endif
-
-        /*
-            current scheduling:
-                np = 5, nthreads = 3:
-                thread0: p0, p3
-                thread1: p1, p4
-                thread2: p2
-
-                np = 3, nthreads = 5:
-                thread0: p0
-                thread1: p1
-                thread2: p2
-                thread3: -
-                thread4: -
-        */
-
         wf = (fft_worker_struct*) worker_struct_buffer;
 
         for (ulong l = 0; l < P.np; l++)
@@ -1590,6 +1930,9 @@ timeit_start(timer);
             X->btrunc = btrunc;
             X->next = (l + nthreads < P.np) ? X + nthreads : NULL;
             X->squaring = squaring;
+            X->transposed = transposed;
+            X->rlen = tr_rlen;
+            X->otrunc = tr_otrunc;
         }
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
@@ -1599,12 +1942,6 @@ timeit_start(timer);
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
-
-#if TIME_THIS
-timeit_stop(timer);
-if (timer->wall > 50)
-flint_printf("    fft: %wd\n", timer->wall);
-#endif
     }
     else
     {
@@ -1617,9 +1954,6 @@ flint_printf("    fft: %wd\n", timer->wall);
         abuf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
         bbuf = abuf + np*stride;
 
-#if TIME_THIS
-timeit_start(timer);
-#endif
         for (ulong l = 0; l < np; l++)
         {
             mod_fft_worker_struct* X = w + l;
@@ -1639,6 +1973,9 @@ timeit_start(timer);
             X->two_pow_tab = R->slow_two_pow_tab[l];
             X->next = (l + nthreads < np) ? X + nthreads : NULL;
             X->squaring = squaring;
+            X->transposed = transposed;
+            X->rlen = tr_rlen;
+            X->otrunc = tr_otrunc;
         }
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
@@ -1648,101 +1985,514 @@ timeit_start(timer);
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
-
-#if TIME_THIS
-timeit_stop(timer);
-if (timer->wall > 50)
-flint_printf("mod+fft: %wd\n", timer->wall);
-#endif
     }
 
-#if TIME_THIS
-timeit_start(timer);
-#endif
+    if (transposed)
+    {
+        /* the coefficients [c_lo, c_hi) are at [c_lo - c0, c_hi - c0) */
+        ulong L0 = tr_c0 * P.bits / FLINT_BITS;
+
+        lo -= L0;
+        hi -= L0;
+        c_lo -= tr_c0;
+        c_hi -= tr_c0;
+        flint_free(tr_v);
+    }
 
     {
+        ulong bits = P.bits;
         ulong n = R->crts[P.np-1].coeff_len;
         crt_worker_struct* w = (crt_worker_struct*) worker_struct_buffer;
         ulong nthreads = P.nthreads;
-        ulong end_easy = (zn >= n+1 ? zn - (n+1) : UWORD(0))*64/P.bits;
 
-        /* this is how must space was statically allocated in each struct */
+        /* BLK_SZ-aligned easy interval [E0, E1) of coefficients whose whole */
+        /* span lies inside the window [lo, hi) */
+        ulong E0 = n_round_up(n_cdiv(lo*FLINT_BITS, bits), BLK_SZ);
+        ulong E1 = ((hi >= n + 1) ? hi - (n + 1) : UWORD(0))*FLINT_BITS/bits;
+        E1 &= -BLK_SZ;
+        if (E1 < E0)
+            E1 = E0;
+
+        /* this is how much space was statically allocated in each struct */
         FLINT_ASSERT(n <= MPN_CTX_NCRTS);
-
-        end_easy &= -BLK_SZ;
-
         FLINT_ASSERT(4 <= P.np && P.np <= 8);
-        static from_ffts_func tab[8-4+1] = {_mpn_from_ffts_4,
+        static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+                                            _mpn_from_ffts_4,
                                             _mpn_from_ffts_5,
                                             _mpn_from_ffts_6,
                                             _mpn_from_ffts_7,
                                             _mpn_from_ffts_8};
 
-        for (ulong l = 0; l < nthreads; l++)
+        if (E1 <= E0)
         {
-            crt_worker_struct* X = w + l;
-            X->from_ffts = tab[P.np - 4];
-            X->z = z;
-            X->zn = zn;
-            X->zlen = zlen;
-            X->fctxs = R->ffts;
-            X->abuf = abuf;
-            X->stride = stride;
-            X->crts = R->crts;
-            X->bits = P.bits;
-            X->start_easy = n_round_up((l+0)*end_easy/nthreads, BLK_SZ);
-            X->stop_easy  = n_round_up((l+1)*end_easy/nthreads, BLK_SZ);
-            X->overhang = (l + 1 == nthreads) ? NULL : X->overhang_buffer;
+            /*
+                Window too small for a BLK_SZ-aligned interior: reconstruct the
+                whole of [c_lo, c_hi) serially into a scratch anchored at limb
+                L0 = floor(c_lo*bits/64) (so that no coefficient straddles its
+                low end), then copy out the in-range slice.
+            */
+            ulong L0 = (c_lo*bits)/64;
+            ulong tlen = hi - L0;
+            ulong* tmp = FLINT_ARRAY_ALLOC(tlen, ulong);
+
+            tab[P.np - 3](tmp, L0, hi, c_lo, c_hi, R->ffts, abuf, stride,
+                          R->crts, bits, c_lo, c_lo, NULL, NULL);
+
+            flint_mpn_copyi(z, tmp + (lo - L0), hi - lo);
+            flint_free(tmp);
+        }
+        else
+        {
+            ulong L0 = (c_lo*bits)/64;
+            ulong span = E1 - E0;
+            ulong gap = E0*bits/64;            /* absolute limb of E0 (>= lo) */
+            ulong boundbuf[MPN_MULMID_BOUNDBUF];
+
+            /* limbs [lo, gap) get only the bottom band (or stay zero) */
+            if (gap > lo)
+                flint_mpn_zero(z, gap - lo);
+
+            for (ulong l = 0; l < nthreads; l++)
+            {
+                crt_worker_struct* X = w + l;
+                X->from_ffts = tab[P.np - 3];
+                X->z = z;
+                X->lo = lo;
+                X->hi = hi;
+                X->c_lo = c_lo;
+                X->clen = c_hi;
+                X->fctxs = R->ffts;
+                X->abuf = abuf;
+                X->stride = stride;
+                X->crts = R->crts;
+                X->bits = bits;
+                X->start_easy = E0 + n_round_up((l+0)*span/nthreads, BLK_SZ);
+                X->stop_easy  = E0 + n_round_up((l+1)*span/nthreads, BLK_SZ);
+                X->overhang = (l + 1 == nthreads) ? NULL : X->overhang_buffer;
+                X->boundbuf = (l == 0 && c_lo < E0) ? boundbuf : NULL;
+            }
+
+            for (slong i = P.nhandles; i > 0; i--)
+                thread_pool_wake(global_thread_pool, P.handles[i - 1], 0,
+                                                       crt_worker_func, w + i);
+            crt_worker_func(w + 0);
+
+            for (slong i = P.nhandles; i > 0; i--)
+                thread_pool_wait(global_thread_pool, P.handles[i - 1]);
+
+            /* stitch the per-segment overhangs (carries across boundaries) */
+            {
+                unsigned char cf = 0;
+                for (slong i = 1; i <= P.nhandles; i++)
+                {
+                    ulong start = w[i].start_easy*bits/64;
+                    if (i == P.nhandles)
+                    {
+                        cf = flint_mpn_add_inplace_c(z + (start - lo), hi - start,
+                                                  w[i - 1].overhang_buffer, n, cf);
+                    }
+                    else
+                    {
+                        ulong stop = w[i].stop_easy*bits/64;
+                        if (stop > start)
+                        {
+                            cf = flint_mpn_add_inplace_c(z + (start - lo), stop - start,
+                                                  w[i - 1].overhang_buffer, n, cf);
+                        }
+                        else
+                        {
+                            for (ulong k = 0; k < n; k++)
+                            {
+                                FLINT_ASSERT(w[i].overhang_buffer[k] == 0);
+                                w[i].overhang_buffer[k] = w[i - 1].overhang_buffer[k];
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* add the bottom band (limbs >= lo of coefficients [c_lo, E0)) */
+            if (c_lo < E0)
+            {
+                ulong topabs = ((E0 - 1)*bits)/64 + n;
+                ulong tw = topabs - L0 + 1;
+                flint_mpn_add_inplace_c(z, hi - lo,
+                                        boundbuf + (lo - L0), tw - (lo - L0), 0);
+            }
+        }
+    }
+
+    flint_free(worker_struct_buffer);
+    flint_give_back_threads(P.handles, P.nhandles);
+}
+
+void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn)
+{
+    _mpn_ctx_mpn_mul_range(R, z, 0, an + bn, a, an, b, bn);
+}
+
+/* ------------------------------------------------------------------------ */
+/* transforms of mpn operands for the plan/op interface                     */
+/* ------------------------------------------------------------------------ */
+
+typedef struct {
+    const fft_small_plan_struct* P;
+    fft_small_op_struct* X;
+    const ulong* a;
+    ulong an;
+    ulong atrunc;
+    to_ffts_func to_ffts;
+    ulong start_easy;
+    ulong stop_easy;
+    ulong start_hard;
+    ulong stop_hard;
+    ulong start_pi;      /* prime range for the fft (or fused slow) stage */
+    ulong stop_pi;
+    ulong otrunc;        /* output truncation of the transforms */
+} _op_mpn_fft_worker_struct;
+
+static void _op_mpn_pack_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+    mpn_ctx_struct* R = P->R;
+
+    W->to_ffts(R->ffts, W->X->data, P->stride, W->a, W->an, W->atrunc,
+               R->vec_two_pow_tab[n_cdiv(P->np, VEC_SZ) - 1],
+               W->start_easy, W->stop_easy, W->start_hard, W->stop_hard);
+}
+
+static void _op_mpn_fft_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+
+    for (ulong l = W->start_pi; l < W->stop_pi; l++)
+        sd_fft_trunc(P->R->ffts + l, W->X->data + l*P->stride, P->depth,
+                     n_min(W->atrunc, W->otrunc), W->otrunc);
+}
+
+static void _op_mpn_slow_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+    mpn_ctx_struct* R = P->R;
+
+    for (ulong l = W->start_pi; l < W->stop_pi; l++)
+    {
+        slow_mpn_to_fft(R->ffts + l, W->X->data + l*P->stride, W->atrunc,
+                        W->a, W->an, P->bits, R->slow_two_pow_tab[l]);
+        sd_fft_trunc(R->ffts + l, W->X->data + l*P->stride, P->depth,
+                     n_min(W->atrunc, W->otrunc), W->otrunc);
+    }
+}
+
+void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
+                    const fft_small_plan_t P)
+{
+    _fft_small_fft_mpn_trunc(X, a, an, P->ztrunc, P);
+}
+
+/* the forward transforms truncated to the first otrunc <= P->ztrunc
+   points (a multiple of the block size, or P->ztrunc): enough for the
+   products of output length up to otrunc slots */
+void _fft_small_fft_mpn_trunc(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong otrunc, const fft_small_plan_t P)
+{
+    mpn_ctx_struct* R = P->R;
+    ulong bits = P->bits;
+    ulong np = P->np;
+    ulong alen = n_cdiv(FLINT_BITS*an, bits);
+    /* the packing passes work in whole blocks; for sub-block
+       transforms the excess lands in the zeroed slab padding and the
+       transform itself runs at the plan's truncation */
+    ulong atrunc = n_round_up(alen, BLK_SZ);
+    to_ffts_func to_ffts = NULL;
+    ulong i;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+    _op_mpn_fft_worker_struct args[MPN_CTX_NCRTS];
+
+    FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(P->offset == 0);
+
+    if (np == 2 && bits <= 57)
+    {
+        FLINT_ASSERT(atrunc <= P->stride);
+        _fft_small_np2_pack(X->data, X->data + P->stride, a, an,
+                            alen, atrunc, bits);
+        sd_fft_trunc(R->ffts + 0, X->data, P->depth,
+                     n_min(atrunc, otrunc), otrunc);
+        sd_fft_trunc(R->ffts + 1, X->data + P->stride, P->depth,
+                     n_min(atrunc, otrunc), otrunc);
+        X->itrunc = atrunc;
+        X->domain = FFT_SMALL_OP_PRIMAL;
+        return;
+    }
+
+    FLINT_ASSERT(bits > 64);
+    FLINT_ASSERT(X->np == np && X->offset == P->offset &&
+                 X->depth == P->depth && X->stride == P->stride);
+    /* atrunc is the packing extent: whole blocks, whose excess over a
+       sub-block transform lands in the zeroed slab padding; the
+       transforms themselves run capped at the plan's truncation */
+    FLINT_ASSERT(atrunc <= P->stride);
+
+    /* look for a vectorized packing profile matching (np, bits); the
+       profile's bn_bound concerns the multiplication drivers' product
+       bound and is irrelevant to the packing itself */
+    for (i = 0; i < R->profiles_size; i++)
+    {
+        if (R->profiles[i].np == np && R->profiles[i].bits == bits)
+        {
+            to_ffts = R->profiles[i].to_ffts;
+            break;
+        }
+    }
+
+    /* the threshold corresponds to the multiplication driver enabling
+       threads from a product of ~2048 limbs up */
+    if (an >= 1024)
+        nworkers = flint_request_threads(&handles, np);
+    nthreads = FLINT_MIN((ulong)(nworkers + 1), np);
+
+    if (to_ffts != NULL)
+    {
+        /* packing stage: split the easy coefficient range over the
+           threads, the last thread taking the hard tail, exactly as the
+           multiplication driver's mod workers do */
+        ulong a_stop_easy = n_min(atrunc, (FLINT_BITS*an - 33)/bits);
+        ulong a_stop_hard = n_min(atrunc, (FLINT_BITS*an + bits - 1)/bits);
+        ulong rounding = (bits%8 == 0) ? 4 : (bits%4 == 0) ? 8 : 16;
+
+        a_stop_easy &= -rounding;
+
+        for (i = 0; i < nthreads; i++)
+        {
+            _op_mpn_fft_worker_struct* W = args + i;
+            W->P = P;
+            W->X = X;
+            W->a = a;
+            W->an = an;
+            W->atrunc = atrunc;
+            W->to_ffts = to_ffts;
+            W->start_easy = n_round_up((i+0)*a_stop_easy/nthreads, rounding);
+            W->stop_easy  = n_round_up((i+1)*a_stop_easy/nthreads, rounding);
+            W->start_hard = (i + 1 == nthreads) ? a_stop_easy : atrunc;
+            W->stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
+            W->otrunc = otrunc;
         }
 
-        for (slong i = P.nhandles; i > 0; i--)
-            thread_pool_wake(global_thread_pool, P.handles[i - 1], 0,
-                                                   crt_worker_func, w + i);
-        crt_worker_func(w + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_pack_worker_func, args + i);
+        _op_mpn_pack_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
 
-        for (slong i = P.nhandles; i > 0; i--)
-            thread_pool_wait(global_thread_pool, P.handles[i - 1]);
-
-        unsigned char cf = 0;
-        for (slong i = 1; i <= P.nhandles; i++)
+        /* fft stage: split the primes */
+        for (i = 0; i < nthreads; i++)
         {
-            ulong start = w[i].start_easy*P.bits/64;
-            if (i == P.nhandles)
+            args[i].start_pi = (i+0)*np/nthreads;
+            args[i].stop_pi  = (i+1)*np/nthreads;
+        }
+
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_fft_worker_func, args + i);
+        _op_mpn_fft_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+    else
+    {
+        /* slow packing is per prime anyway: fuse pack + fft per prime */
+        for (i = 0; i < nthreads; i++)
+        {
+            _op_mpn_fft_worker_struct* W = args + i;
+            W->P = P;
+            W->X = X;
+            W->a = a;
+            W->an = an;
+            W->atrunc = atrunc;
+            W->start_pi = (i+0)*np/nthreads;
+            W->stop_pi  = (i+1)*np/nthreads;
+            W->otrunc = otrunc;
+        }
+
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_slow_worker_func, args + i);
+        _op_mpn_slow_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+
+    flint_give_back_threads(handles, nworkers);
+
+    X->itrunc = atrunc;
+    X->domain = FFT_SMALL_OP_PRIMAL;
+}
+
+void fft_small_export_mpn(ulong* z, ulong zn, fft_small_op_t X,
+                    const fft_small_plan_t P)
+{
+    if (P->np == 2 && P->bits <= 57)
+    {
+        mpn_ctx_struct* R2 = P->R;
+        FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+
+        /* destructive: the reconstruction consumes the lanes; a
+           caller needing the transform afterwards copies first, as
+           the non-destructive ring conversions do */
+        _fft_small_np2_crt_recompose(R2, z, 0, zn, X->data,
+                                     X->data + P->stride,
+                                     P->zn, P->ztrunc, P->bits,
+                                     P->depth);
+        return;
+    }
+
+    ulong bits = P->bits;
+    ulong c_hi = n_min(P->zn, n_cdiv(zn*FLINT_BITS, bits));
+    static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+                                        _mpn_from_ffts_4,
+                                        _mpn_from_ffts_5,
+                                        _mpn_from_ffts_6,
+                                        _mpn_from_ffts_7,
+                                        _mpn_from_ffts_8};
+
+    ulong n = P->R->crts[P->np - 1].coeff_len;
+    ulong E1;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+
+    FLINT_ASSERT(zn > 0);
+    FLINT_ASSERT(3 <= P->np && P->np <= 8);
+    FLINT_ASSERT(P->offset == 0);
+    FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+
+    /* BLK_SZ-aligned easy interval [0, E1) of coefficients whose whole
+       span lies inside [0, zn), as in the multiplication driver's crt
+       stage with lo = c_lo = 0 (so there is no bottom band) */
+    E1 = ((zn >= n + 1) ? zn - (n + 1) : UWORD(0))*FLINT_BITS/bits;
+    E1 &= -BLK_SZ;
+    /* never run the easy interval past the coefficients that were
+       actually produced: slots beyond c_hi were not computed by the
+       truncated inverse transform, and zn may be generous */
+    if (E1 > c_hi)
+        E1 = c_hi & -(ulong) BLK_SZ;
+
+    /* the threshold corresponds to the multiplication driver enabling
+       threads from a product of ~2048 limbs up */
+    if (E1 > 0 && zn >= 2048)
+        nworkers = flint_request_threads(&handles, 8);
+    nthreads = nworkers + 1;
+
+    if (nthreads == 1)
+    {
+        /* serial reconstruction of limbs [0, zn). The easy interval must
+           be passed here as well: with start_easy = stop_easy = 0 every
+           coefficient takes the hard tail, converting residues one at a
+           time with scalar reductions instead of block-converting them
+           with _convert_block -- measured about 3x slower overall. */
+        tab[P->np - 3](z, 0, zn, 0, c_hi, P->R->ffts, X->data, X->stride,
+                       P->R->crts, bits, 0, E1, NULL, NULL);
+    }
+    else
+    {
+        /* the multiplication driver's threaded crt stage: per-range
+           reconstruction with overhang buffers, then a serial stitch of
+           the carries across the range boundaries */
+        crt_worker_struct w[8];
+        ulong span = E1;
+        ulong l;
+
+        for (l = 0; l < nthreads; l++)
+        {
+            crt_worker_struct* W = w + l;
+            W->from_ffts = tab[P->np - 3];
+            W->z = z;
+            W->lo = 0;
+            W->hi = zn;
+            W->c_lo = 0;
+            W->clen = c_hi;
+            W->fctxs = P->R->ffts;
+            W->abuf = X->data;
+            W->stride = X->stride;
+            W->crts = P->R->crts;
+            W->bits = bits;
+            W->start_easy = n_round_up((l+0)*span/nthreads, BLK_SZ);
+            W->stop_easy  = n_round_up((l+1)*span/nthreads, BLK_SZ);
+            W->overhang = (l + 1 == nthreads) ? NULL : W->overhang_buffer;
+            W->boundbuf = NULL;
+        }
+
+        for (slong i = nworkers; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             crt_worker_func, w + i);
+        crt_worker_func(w + 0);
+        for (slong i = nworkers; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+        /* stitch the per-segment overhangs (carries across boundaries) */
+        {
+            unsigned char cf = 0;
+            for (slong i = 1; i <= nworkers; i++)
             {
-                cf = flint_mpn_add_inplace_c(z + start, zn - start,
-                                              w[i - 1].overhang_buffer, n, cf);
-            }
-            else
-            {
-                ulong stop = w[i].stop_easy*P.bits/64;
-                if (stop > start)
+                ulong start = w[i].start_easy*bits/FLINT_BITS;
+                if (i == nworkers)
                 {
-                    cf = flint_mpn_add_inplace_c(z + start, stop - start,
+                    cf = flint_mpn_add_inplace_c(z + start, zn - start,
                                               w[i - 1].overhang_buffer, n, cf);
                 }
                 else
                 {
-                    for (ulong k = 0; k < n; k++)
+                    ulong stop = w[i].stop_easy*bits/FLINT_BITS;
+                    if (stop > start)
                     {
-                        FLINT_ASSERT(w[i].overhang_buffer[k] == 0);
-                        w[i].overhang_buffer[k] = w[i - 1].overhang_buffer[k];
+                        cf = flint_mpn_add_inplace_c(z + start, stop - start,
+                                              w[i - 1].overhang_buffer, n, cf);
+                    }
+                    else
+                    {
+                        for (ulong k = 0; k < n; k++)
+                        {
+                            FLINT_ASSERT(w[i].overhang_buffer[k] == 0);
+                            w[i].overhang_buffer[k] = w[i - 1].overhang_buffer[k];
+                        }
                     }
                 }
             }
         }
     }
 
-#if TIME_THIS
-timeit_stop(timer);
-if (timer->wall > 50)
-flint_printf("    crt: %wd\n", timer->wall);
-timeit_stop(timer_overall);
-if (timer_overall->wall > 50)
-flint_printf("      +: %wd\n", timer_overall->wall);
-#endif
+    flint_give_back_threads(handles, nworkers);
+}
 
-#undef TIME_THIS
+/* exported dispatch for the negacyclic engine (negacyclic.c) */
+to_ffts_func _mpn_ctx_to_ffts_func(ulong np, ulong bits)
+{
+#define P(NP, B) if (np == NP && bits == B) return CAT3(mpn_to_ffts, NP, B);
+    P(3, 64) P(4, 64) P(4, 84) P(4, 88) P(4, 92)
+    P(5, 84) P(5, 88) P(5, 92)
+    P(5, 112) P(5, 116) P(5, 120)
+    P(6, 112) P(6, 116) P(6, 120)
+    P(6, 126) P(6, 128) P(6, 136) P(6, 140) P(6, 144)
+    P(7, 126) P(7, 128) P(7, 136) P(7, 140) P(7, 144)
+    P(7, 160) P(7, 164) P(7, 168)
+    P(8, 160) P(8, 164) P(8, 168)
+    P(8, 184) P(8, 188) P(8, 192)
+#undef P
+    return NULL;
+}
 
-    flint_free(worker_struct_buffer);
-    flint_give_back_threads(P.handles, P.nhandles);
+from_ffts_func _mpn_ctx_from_ffts_func(ulong np)
+{
+    static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+        _mpn_from_ffts_4, _mpn_from_ffts_5, _mpn_from_ffts_6,
+        _mpn_from_ffts_7, _mpn_from_ffts_8};
+    FLINT_ASSERT(3 <= np && np <= 8);
+    return tab[np - 3];
 }

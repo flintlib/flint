@@ -23,8 +23,6 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 {
     flint_bitcnt_t pbits;
     slong i, num_primes;
-    fmpz_comb_t comb;
-    fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus, div, la, lb;
     fmpz * A, * B, * lead_A, * lead_B;
     nn_ptr a, b, rarr, parr;
@@ -115,7 +113,9 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
     nbits = FLINT_MAX((slong)0, nbits);
 
-    num_primes = (nbits+pbits-1)/pbits;
+    /* the primes exceed 2^pbits and the signed reconstruction of a
+       value of nbits bits needs a modulus of at least nbits + 1 bits */
+    num_primes = (nbits + 1 + pbits - 1) / pbits;
     if (num_primes <= 0) num_primes = 1;
 
     parr = _nmod_vec_init(num_primes);
@@ -146,14 +146,9 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
         parr[i++] = p;
     }
 
-    fmpz_comb_init(comb, parr, num_primes);
-    fmpz_comb_temp_init(comb_temp, comb);
-
-    fmpz_multi_CRT_ui(res, rarr, comb, comb_temp, 1);
+    fmpz_multi_CRT_ui_once(res, NULL, rarr, parr, num_primes, 1);
 
     fmpz_clear(modulus);
-    fmpz_comb_temp_clear(comb_temp);
-    fmpz_comb_clear(comb);
 
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);

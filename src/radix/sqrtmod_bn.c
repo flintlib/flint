@@ -35,42 +35,36 @@
     Since x - b^2 == 0 (mod B^m), the correction y(x - b^2)/2 vanishes modulo
     B^m, so s shares its low m limbs with b and only its high n-m limbs are new.
 
+    In both cases b is written straight into the low limbs of the root, the
+    high part (b^2)[m', n') comes from a guarded middle product (its low m'
+    limbs are x mod B^m') via the shared _radix_mulhigh_known_low, and only
+    the high difference limbs are formed, so no full-width square, x copy or
+    root copy is needed.
+
     Division by 2:
       - p odd: modular half of y*(x-b^2)[m, n) (the same short division by two as
         in radix_rsqrtmod_bn); the high limbs are limb-aligned.
-      - p = 2: 1/2 does not exist, but x - b^2 == 0 (mod 2^{e m}) is even, so the
-        whole correction y(x - b^2) is shifted right by one bit exactly. The
-        single bit dropped at the top is absorbed by computing one guard limb
-        and then reducing to n limbs.
+      - p = 2: 1/2 does not exist, but x - b^2 == 0 (mod 2^{e m'}) is even
+        (with m' = m + 1, see below), so the correction y (x - b^2) / 2 is an
+        exact halving. Since only x - b^2 == 0 (mod 2^{e m'}) is guaranteed
+        -- not (mod 2^{e m' + 1}) -- the halved correction is aligned at bit
+        e m' - 1 rather than at limb m': it equals
 
-    For odd p, b is written straight into the low m limbs of the root, the high
-    part (b^2)[m, n) comes from a guarded middle product (its low m limbs are
-    x mod B^m) via the shared _radix_mulhigh_known_low, and only the n-m high
-    difference limbs are formed, so no full-width square, x copy or root copy is
-    needed. The p = 2 path still uses low products.
+            B^{m'-1} * ((y * dh) * 2^{e-1}  mod B^{n-m'+1}),
+
+        dh = (x - b^2)[m', n+1), and is added over limbs [m'-1, n) of the
+        root, straddling the limb boundary by one bit. The multiplication by
+        2^{e-1} is a left shift by e-1 p-adic digits; the bits it pushes out
+        at the top, like the original guard-limb formulation, fall above
+        limb n and are discarded.
+
+        The reciprocal root is taken one limb beyond ceil(n/2) (m' = m + 1)
+        so that the few bits lost to the 2-adic squaring still leave all n
+        limbs correct.
 
     s receives n limbs (caller provides room). Returns 1 on success, 0 if x is
     not a square modulo B (nothing written in that case). s must not alias x.
 */
-
-/* keep only the low d bits of a (limbs hold e bits each, p = 2) */
-static void
-_radix2_mask_bits(nn_ptr a, slong d, slong alimbs, slong e)
-{
-    slong full = d / e, r = d % e, i;
-
-    if (r)
-    {
-        a[full] &= (UWORD(1) << r) - 1;
-        for (i = full + 1; i < alimbs; i++)
-            a[i] = 0;
-    }
-    else
-    {
-        for (i = full; i < alimbs; i++)
-            a[i] = 0;
-    }
-}
 
 /* W[0,k) = V[0,k) / 2 mod B^k for ODD radix; overflow-safe short division by 2,
    adding the (odd) modulus once when V is odd. W may alias V. */
@@ -121,16 +115,12 @@ radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix
 
     if (DIGIT_RADIX(radix) == 2)
     {
-        /* p = 2: form the full correction y(x - b^2) and shift it right one bit.
-           One guard limb absorbs the bit dropped by that shift. The half-
-           precision root is taken one limb beyond ceil(n/2) so that the few bits
-           lost to the 2-adic squaring still leave all n limbs correct. */
+        /* p = 2: limb-aligned products, bit-straddling correction (see above) */
         slong e = radix->exp;
         slong mm = m + 1;            /* reciprocal-root precision (limbs) */
-        slong w = n + 1;             /* working limbs (1 guard limb) */
-        slong xc;
+        slong ah;
         ulong bo;
-        nn_ptr b, b2, c, yc;
+        nn_ptr b;
 
         y = TMP_ALLOC(mm * sizeof(ulong));
         if (!radix_rsqrtmod_bn(y, x, xn, mm, radix))
@@ -139,40 +129,57 @@ radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix
             return 0;
         }
 
-        b  = TMP_ALLOC(w * sizeof(ulong));
-        b2 = TMP_ALLOC(w * sizeof(ulong));
-        c  = TMP_ALLOC(w * sizeof(ulong));
-        yc = TMP_ALLOC(w * sizeof(ulong));
+        b = TMP_ALLOC(mm * sizeof(ulong));
 
         /* b = x y mod B^mm */
         radix_mulmid(b, x, FLINT_MIN(xn, mm), y, mm, 0, mm, radix);
-        flint_mpn_zero(b + mm, w - mm);
+        flint_mpn_copyi(res, b, FLINT_MIN(mm, n));
 
-        /* b2 = b^2 mod B^w */
-        radix_mulmid(b2, b, mm, b, mm, 0, w, radix);
-
-        /* c = x - b^2 mod B^w  (== 0 mod B^mm, hence even). Built without a
-           zero-padded x: subtract where x has limbs, negate the rest, fold in
-           the low borrow. */
-        xc = FLINT_MIN(xn, w);
-        bo = 0;
-        if (xc > 0)
-            bo = radix_sub(c, x, xc, b2, xc, radix);
-        if (xc < w)
+        /* nm = n - m = (n + 1) - mm is both the number of limbs of
+           (x - b^2)[mm, n+1) and the size n - (mm - 1) of the correction
+           window [mm-1, n) in the root. */
+        if (nm > 0)
         {
-            radix_neg(c + xc, b2 + xc, w - xc, radix);
-            if (bo)
-                radix_sub(c + xc, c + xc, w - xc, &bo, 1, radix);
+            slong w = n + 1;
+            nn_ptr b2h, dh, scr;
+
+            b2h = TMP_ALLOC(nm * sizeof(ulong));
+            dh  = TMP_ALLOC(nm * sizeof(ulong));
+            scr = TMP_ALLOC(w * sizeof(ulong));
+
+            /* (b^2)[mm, n+1): the low mm limbs of b^2 are x mod B^mm (known),
+               so this is a guarded middle product rather than a full square. */
+            _radix_mulhigh_known_low(b2h, b, mm, b, mm, x, FLINT_MIN(xn, mm),
+                mm, w, scr, radix);
+
+            /* dh = (x - b^2)[mm, n+1), where x is zero above limb xn. Rather
+               than materialise the zero-padded operand, subtract over the
+               limbs where x is present and negate over the zero limbs, then
+               fold in the borrow out of the low subtraction (radix_neg takes
+               no borrow-in). No incoming borrow at limb mm:
+               x - b^2 == 0 (mod B^mm). */
+            ah = (xn > mm) ? FLINT_MIN(xn - mm, nm) : 0;
+            bo = 0;
+            if (ah > 0)
+                bo = radix_sub(dh, x + mm, ah, b2h, ah, radix);
+            if (ah < nm)
+            {
+                radix_neg(dh + ah, b2h + ah, nm - ah, radix);
+                if (bo)
+                    radix_sub(dh + ah, dh + ah, nm - ah, &bo, 1, radix);
+            }
+
+            /* s[mm-1, n) += (y dh 2^{e-1})[0, nm); only the low nm <= mm
+               limbs of y enter, digits shifted past the window top fall
+               above limb n and are discarded, and the carry out of the
+               addition is the reduction mod B^n. */
+            radix_mulmid(scr, y, FLINT_MIN(mm, nm), dh, nm, 0, nm, radix);
+            radix_lshift_digits(scr, scr, nm, e - 1, radix);
+
+            if (n > mm)
+                flint_mpn_zero(res + mm, n - mm);
+            radix_add(res + (mm - 1), res + (mm - 1), nm, scr, nm, radix);
         }
-
-        /* yc = y c mod B^w, then yc /= 2 (exact bit shift) */
-        radix_mulmid(yc, y, mm, c, w, 0, w, radix);
-        radix_rshift_digits(yc, yc, w, 1, radix);
-
-        /* s = b + yc/2 mod B^w; keep the low n limbs */
-        radix_add(b, b, w, yc, w, radix);
-        _radix2_mask_bits(b, e * n, w, e);
-        flint_mpn_copyi(res, b, n);
 
         TMP_END;
         return 1;
@@ -221,8 +228,9 @@ radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix
                     radix_sub(dh + ah, dh + ah, nm - ah, &bo, 1, radix);
             }
 
-            /* s[m, n) = (y * dh / 2)[0, nm) -> straight into the high limbs. */
-            radix_mulmid(res + m, y, m, dh, nm, 0, nm, radix);
+            /* s[m, n) = (y * dh / 2)[0, nm) -> straight into the high limbs;
+               only the low nm <= m limbs of y enter. */
+            radix_mulmid(res + m, y, nm, dh, nm, 0, nm, radix);
             _radix_halve_odd(res + m, res + m, nm, radix);
         }
 

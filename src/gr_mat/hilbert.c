@@ -10,6 +10,7 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 
 int
@@ -22,15 +23,23 @@ gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx)
     R = gr_mat_nrows(mat, ctx);
     C = gr_mat_ncols(mat, ctx);
 
-    /* todo: exploit symmetry */
+    if (R == 0 || C == 0)
+        return GR_SUCCESS;
+
+    /* Entry (i, j) only depends on i + j: compute the first row and the
+       last column, and copy the remaining entries from the previous row. */
     for (i = 0; i < R; i++)
     {
-        for (j = 0; j < C; j++)
+        for (j = (i == 0) ? 0 : C - 1; j < C; j++)
         {
             status |= gr_one(GR_MAT_ENTRY(mat, i, j, sz), ctx);
             status |= gr_div_ui(GR_MAT_ENTRY(mat, i, j, sz),
                 GR_MAT_ENTRY(mat, i, j, sz), i + j + 1, ctx);
         }
+
+        if (i > 0 && C > 1)
+            status |= _gr_vec_set(GR_MAT_ENTRY(mat, i, 0, sz),
+                GR_MAT_ENTRY(mat, i - 1, 1, sz), C - 1, ctx);
     }
 
     return status;

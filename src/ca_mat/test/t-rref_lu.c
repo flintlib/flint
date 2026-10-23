@@ -40,6 +40,46 @@ ca_mat_randrowops(ca_mat_t mat, flint_rand_t state, slong count, ca_ctx_t ctx)
 }
 #endif
 
+/* On success, R must be in reduced row echelon form: in each of the first
+   rank rows, the first entry that is not provably zero is provably one and
+   is the only entry not provably zero in its column; the remaining rows are
+   zero. This catches returning success on an unfinished computation. */
+static int
+_ca_mat_check_rref_shape(const ca_mat_t R, slong rank, ca_ctx_t ctx)
+{
+    slong i, j, k, prev;
+
+    prev = -1;
+
+    for (i = 0; i < ca_mat_nrows(R); i++)
+    {
+        for (j = 0; j < ca_mat_ncols(R); j++)
+            if (ca_check_is_zero(ca_mat_entry(R, i, j), ctx) != T_TRUE)
+                break;
+
+        if (i >= rank)
+        {
+            if (j != ca_mat_ncols(R))
+                return 0;
+            continue;
+        }
+
+        if (j == ca_mat_ncols(R) || j <= prev)
+            return 0;
+
+        if (ca_check_is_one(ca_mat_entry(R, i, j), ctx) != T_TRUE)
+            return 0;
+
+        for (k = 0; k < ca_mat_nrows(R); k++)
+            if (k != i && ca_check_is_zero(ca_mat_entry(R, k, j), ctx) != T_TRUE)
+                return 0;
+
+        prev = j;
+    }
+
+    return 1;
+}
+
 TEST_FUNCTION_START(ca_mat_rref_lu, state)
 {
     slong iter;
@@ -125,6 +165,15 @@ TEST_FUNCTION_START(ca_mat_rref_lu, state)
         ca_mat_randrowops(B, state, 1 + n_randint(state, 20), ctx);
 
         success = ca_mat_rref_lu(&rank1, R, A, ctx);
+
+        if (success && !_ca_mat_check_rref_shape(R, rank1, ctx))
+        {
+            flint_printf("FAIL (not in rref form):\n");
+            flint_printf("A: "); ca_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("R: "); ca_mat_print(R, ctx); flint_printf("\n");
+            flint_printf("rank = %wd\n\n", rank1);
+            flint_abort();
+        }
 
         if (success)
         {

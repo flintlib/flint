@@ -286,6 +286,13 @@ _gr_nmod_redc_set(ulong * res, const ulong * x, gr_ctx_t FLINT_UNUSED(ctx))
 }
 
 static int
+_gr_nmod_redc_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, GR_NMOD_REDC_N(ctx));
+    return GR_SUCCESS;
+}
+
+static int
 _gr_nmod_redc_neg(ulong * res, const ulong * x, gr_ctx_t ctx)
 {
     res[0] = nmod_redc_neg(x[0], GR_NMOD_REDC_CTX(ctx));
@@ -401,6 +408,32 @@ _gr_nmod_redc_fast_pow_ui(ulong * res, const ulong * x, ulong e, gr_ctx_t ctx)
     else
         res[0] = _nmod_redc_fast_pow_ui(*x, e, GR_NMOD_REDC_CTX(ctx));
     return GR_SUCCESS;
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_gr_nmod_redc_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    ulong * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
+}
+
+/* Here zero has the two representatives 0 and n (compare
+   _gr_nmod_redc_fast_vec_normalise). */
+static void
+_gr_nmod_redc_fast_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    ulong * coeffs = poly->coeffs;
+    ulong n = GR_NMOD_REDC_N(ctx);
+
+    while (len > 0 && (coeffs[len - 1] == 0 || coeffs[len - 1] == n))
+        len--;
+
+    poly->length = len;
 }
 
 static void
@@ -1853,6 +1886,10 @@ gr_method_tab_input __gr_nmod_redc_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
+    {GR_METHOD_CTX_FQ_PRIME,    GR_FUNCPTR_CAST _gr_nmod_redc_ctx_fq_prime},
+    {GR_METHOD_CTX_FQ_DEGREE,   GR_FUNCPTR_CAST gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    GR_FUNCPTR_CAST gr_generic_ctx_fq_order_prime_field},
+    {GR_METHOD_FQ_PTH_ROOT,     GR_FUNCPTR_CAST _gr_nmod_redc_set},
     {GR_METHOD_CTX_IS_FINITE,
                                 GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
@@ -1951,6 +1988,8 @@ gr_method_tab_input __gr_nmod_redc_methods_input[] =
     {GR_METHOD_VEC_RECIPROCALS, GR_FUNCPTR_CAST _gr_nmod_redc_vec_reciprocals},
 */
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_mullow},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, GR_FUNCPTR_CAST _gr_nmod_redc_poly_set_length_normalise},
+    {GR_METHOD_POLY_FACTOR,     GR_FUNCPTR_CAST _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_mulmid},
 /*
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_divrem},
@@ -2004,6 +2043,8 @@ gr_method_tab_input __gr_nmod_redc_fast_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mullow},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_set_length_normalise},
+    {GR_METHOD_POLY_FACTOR,     GR_FUNCPTR_CAST _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_divrem},
     {0,                         GR_FUNCPTR_CAST NULL},

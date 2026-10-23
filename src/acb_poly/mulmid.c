@@ -17,6 +17,11 @@ _acb_poly_mulmid(acb_ptr res,
     acb_srcptr poly1, slong len1,
     acb_srcptr poly2, slong len2, slong nlo, slong nhi, slong prec)
 {
+    /* well-scaled input: one Gaussian integer product */
+    if (_acb_poly_mulmid_use_fmpzi(len1, len2, nlo, nhi, prec, poly1 == poly2 && len1 == len2) &&
+        _acb_poly_mulmid_fmpzi(res, poly1, len1, poly2, len2, nlo, nhi, prec))
+        return;
+
     if (len1 <= 7 || len2 <= 7 || nhi <= 7)
     {
         _acb_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, prec);

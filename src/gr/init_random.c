@@ -43,6 +43,17 @@ _gr_random_base_ring(flint_rand_t state)
     return _gr_some_base_rings + n_randint(state, sizeof(_gr_some_base_rings) / sizeof(gr_ctx_struct));
 }
 
+/* Precision for a random power series ring. Precision 0 (every element
+   is O(x^0)) makes most tests trivial, so generate it only rarely. */
+static slong
+_gr_random_series_prec(flint_rand_t state)
+{
+    if (n_randint(state, 20) == 0)
+        return 0;
+    else
+        return 1 + n_randint(state, 5);
+}
+
 static void
 gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 {
@@ -62,10 +73,10 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
             }
             break;
         case 2:
-            gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
+            gr_series_ctx_init(ctx, base_ring, _gr_random_series_prec(state));
             break;
         case 3:
-            gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
+            gr_series_mod_ctx_init(ctx, base_ring, _gr_random_series_prec(state));
             break;
         case 4:
             gr_ctx_init_vector_space_gr_vec(ctx, base_ring, n_randint(state, 4));
@@ -270,7 +281,7 @@ static void
 gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
 {
 
-    switch (n_randint(state, 4))
+    switch (n_randint(state, 5))
     {
         case 0:
             gr_ctx_init_fmpz_poly(ctx);
@@ -291,6 +302,13 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
                 slong nvars = n_randint(state, 2);
                 ordering_t ord = mpoly_ordering_randtest(state);
                 gr_ctx_init_fmpz_mpoly_q(ctx, nvars, ord);
+            }
+            break;
+        case 4:
+            {
+                slong nvars = n_randint(state, 2);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly_q_factored(ctx, nvars, ord);
             }
             break;
     }
@@ -419,10 +437,10 @@ gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
     switch (n_randint(state, 2))
     {
         case 0:
-            gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
+            gr_series_ctx_init(ctx, base_ring, _gr_random_series_prec(state));
             break;
         case 1:
-            gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
+            gr_series_mod_ctx_init(ctx, base_ring, _gr_random_series_prec(state));
             break;
     }
 }

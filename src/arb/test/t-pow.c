@@ -17,6 +17,35 @@ TEST_FUNCTION_START(arb_pow, state)
 {
     slong iter;
 
+    /* check exponent aliasing with a zero endpoint */
+    {
+        arb_t a, b, c;
+
+        arb_init(a);
+        arb_init(b);
+        arb_init(c);
+
+        arb_one(a);
+        mag_one(arb_radref(a));       /* [0,2] */
+        arb_set_ui(b, 2);
+        mag_one(arb_radref(b));       /* [1,3] */
+
+        arb_pow(c, a, b, 64);
+        arb_pow(b, a, b, 64);
+
+        if (!arb_contains_si(b, 8) || !arb_equal(b, c))
+        {
+            flint_printf("FAIL: interval from zero; exponent aliasing\n\n");
+            flint_printf("b = "); arb_print(b); flint_printf("\n\n");
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_clear(a);
+        arb_clear(b);
+        arb_clear(c);
+    }
+
     /* check large arguments */
     for (iter = 0; iter < 20000 * 0.1 * flint_test_multiplier(); iter++)
     {

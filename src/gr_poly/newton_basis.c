@@ -104,8 +104,7 @@ gr_poly_newton_basis_interpolate_exact(gr_poly_t res, const gr_vec_t basis, cons
 
     gr_poly_fit_length(res, ys->length, ctx);
     status |= _gr_poly_newton_basis_interpolate_exact(res->coeffs, basis->entries, ys->entries, ys->length, ctx);
-    _gr_poly_set_length(res, ys->length, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, ys->length, ctx);
     return status;
 }
 
@@ -150,8 +149,7 @@ gr_poly_newton_basis_interpolate(gr_poly_t res, const gr_vec_t basis, const gr_v
 
     gr_poly_fit_length(res, ys->length, ctx);
     status |= _gr_poly_newton_basis_interpolate(res->coeffs, basis->entries, ys->entries, ys->length, ctx);
-    _gr_poly_set_length(res, ys->length, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, ys->length, ctx);
     return status;
 }
 
@@ -166,7 +164,7 @@ _gr_poly_newton_basis_to_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, s
 
     for (i = len - 2; i >= 0; i--)
         for (j = i; j < len - 1; j++)
-            status |= gr_submul(GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j + 1, sz), GR_ENTRY(basis, i, sz), ctx);
+            status |= gr_submul(GR_ENTRY(res, j, sz), GR_ENTRY(res, j + 1, sz), GR_ENTRY(basis, i, sz), ctx);
 
     return status;
 }
@@ -198,7 +196,7 @@ _gr_poly_newton_basis_from_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly,
 
     for (i = 0; i < len - 1; i++)
         for (j = len - 2; j >= i; j--)
-            status |= gr_addmul(GR_ENTRY(poly, j, sz), GR_ENTRY(poly, j + 1, sz), GR_ENTRY(basis, i, sz), ctx);
+            status |= gr_addmul(GR_ENTRY(res, j, sz), GR_ENTRY(res, j + 1, sz), GR_ENTRY(basis, i, sz), ctx);
 
     return status;
 }

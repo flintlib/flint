@@ -32,6 +32,7 @@
 #include "t-hessenberg.c"
 #include "t-hessenberg_gauss.c"
 #include "t-hessenberg_householder.c"
+#include "t-hilbert.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
 #include "t-is_orthogonal.c"
@@ -40,6 +41,7 @@
 #include "t-lu_classical.c"
 #include "t-lu_recursive.c"
 #include "t-minpoly_field.c"
+#include "t-mul.c"
 #include "t-mul_rosowski.c"
 #include "t-mul_strassen.c"
 #include "t-mul_waksman.c"
@@ -99,6 +101,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
     TEST_FUNCTION(gr_mat_hessenberg_householder),
+    TEST_FUNCTION(gr_mat_hilbert),
     TEST_FUNCTION(gr_mat_inv),
     TEST_FUNCTION(gr_mat_invert_rows_cols),
     TEST_FUNCTION(gr_mat_is_orthogonal),
@@ -107,6 +110,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_lu_classical),
     TEST_FUNCTION(gr_mat_lu_recursive),
     TEST_FUNCTION(gr_mat_minpoly_field),
+    TEST_FUNCTION(gr_mat_mul),
     TEST_FUNCTION(gr_mat_mul_rosowski),
     TEST_FUNCTION(gr_mat_mul_strassen),
     TEST_FUNCTION(gr_mat_mul_waksman),

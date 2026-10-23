@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
@@ -20,6 +21,68 @@ TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
     nmod_t mod;
 
     slong i, j;
+
+    /* Worst cases for the norm bounds: odd lengths with every even-indexed
+       coefficient equal to n - 1, so that the middle coefficient of the
+       packed product is close to 2^16 or 2^17. The odd-indexed
+       coefficients are zero or one. Lengths are chosen so that the number
+       k of even-indexed coefficients satisfies k (n - 1)^2 ~ M. */
+    {
+        ulong n, M;
+        slong k, k0;
+        int odd_pattern, squaring;
+
+        for (n = 2; n <= 23; n++)
+        {
+            nmod_init(&mod, n);
+
+            for (M = UWORD(1) << 16; M <= UWORD(1) << 17; M *= 2)
+            {
+                k0 = (M + (n - 1) * (n - 1) - 1) / ((n - 1) * (n - 1));
+
+                for (k = FLINT_MAX(k0 - 2, 1); k <= k0 + 2; k++)
+                {
+                    for (odd_pattern = 0; odd_pattern <= 1; odd_pattern++)
+                    {
+                        for (squaring = 0; squaring <= 1; squaring++)
+                        {
+                            an = bn = 2 * k - 1;
+                            zn = an + bn - 1;
+
+                            a = flint_calloc(an, sizeof(ulong));
+                            b = squaring ? a : flint_calloc(bn, sizeof(ulong));
+                            z = flint_malloc(sizeof(ulong) * zn);
+                            w = flint_malloc(sizeof(ulong) * zn);
+
+                            for (j = 0; j < an; j++)
+                                a[j] = (j % 2 == 0) ? n - 1 : odd_pattern;
+                            if (!squaring)
+                                _nmod_vec_set(b, a, an);
+
+                            if (_nmod_poly_mulmid_fft_small_repack(z, a, an, b, bn, 0, zn, mod))
+                            {
+                                _nmod_poly_mul_KS(w, a, an, b, bn, mod);
+
+                                if (!_nmod_vec_equal(z, w, zn))
+                                {
+                                    flint_printf("FAIL (structured)\n");
+                                    flint_printf("n = %wu, an = bn = %wd, odd = %d, squaring = %d\n",
+                                        n, an, odd_pattern, squaring);
+                                    flint_abort();
+                                }
+                            }
+
+                            flint_free(a);
+                            if (!squaring)
+                                flint_free(b);
+                            flint_free(z);
+                            flint_free(w);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

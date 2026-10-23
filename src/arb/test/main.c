@@ -78,9 +78,9 @@
 #include "t-digits_round_inplace.c"
 #include "t-div_2expm1_ui.c"
 #include "t-div_arf.c"
+#include "t-div_newton.c"
 #include "t-div.c"
 #include "t-div_fmpz.c"
-#include "t-div_newton.c"
 #include "t-div_si.c"
 #include "t-div_ui.c"
 #include "t-dot.c"
@@ -189,7 +189,6 @@
 #include "t-special.c"
 #include "t-sqrt1pm1.c"
 #include "t-sqrt.c"
-#include "t-sqrt_newton.c"
 #include "t-sqrtpos.c"
 #include "t-sub_arf.c"
 #include "t-sub.c"
@@ -287,9 +286,9 @@ test_struct tests[] =
     TEST_FUNCTION(arb_digits_round_inplace),
     TEST_FUNCTION(arb_div_2expm1_ui),
     TEST_FUNCTION(arb_div_arf),
+    TEST_FUNCTION(arb_div_newton),
     TEST_FUNCTION(arb_div),
     TEST_FUNCTION(arb_div_fmpz),
-    TEST_FUNCTION(arb_div_newton),
     TEST_FUNCTION(arb_div_si),
     TEST_FUNCTION(arb_div_ui),
     TEST_FUNCTION(arb_dot),
@@ -398,7 +397,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_special),
     TEST_FUNCTION(arb_sqrt1pm1),
     TEST_FUNCTION(arb_sqrt),
-    TEST_FUNCTION(arb_sqrt_newton),
     TEST_FUNCTION(arb_sqrtpos),
     TEST_FUNCTION(arb_sub_arf),
     TEST_FUNCTION(arb_sub),

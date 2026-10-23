@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "thread_support.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
@@ -156,6 +157,7 @@ TEST_FUNCTION_START(aprcl_is_prime_jacobi, state)
                 fmpz_randtest_unsigned(n, state, 1000);
 
             pbprime = fmpz_is_probabprime(n);
+            flint_set_num_threads(1 + n_randint(state, 4));
             cycloprime = aprcl_is_prime_jacobi(n);
 
             if (pbprime != cycloprime)
@@ -216,6 +218,24 @@ TEST_FUNCTION_START(aprcl_is_prime_jacobi, state)
             fmpz_set_str(n, "3194984256290911228520362769161858765901", 10);
             if (aprcl_is_prime_jacobi(n) == 1)
                 result = 0;
+
+            /* moduli beyond the mpn_mod range exercise the fmpz arithmetic */
+            {
+                fmpz_t a, b;
+                fmpz_init(a);
+                fmpz_init(b);
+                flint_set_num_threads(1 + n_randint(state, 4));
+                fmpz_randprime(n, state, 1100, 0);
+                if (aprcl_is_prime_jacobi(n) == 0)
+                    result = 0;
+                fmpz_randprime(a, state, 550, 0);
+                fmpz_randprime(b, state, 560, 0);
+                fmpz_mul(n, a, b);
+                if (aprcl_is_prime_jacobi(n) == 1)
+                    result = 0;
+                fmpz_clear(a);
+                fmpz_clear(b);
+            }
 
             if (result == 0)
             {

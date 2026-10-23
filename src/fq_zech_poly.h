@@ -27,6 +27,9 @@
 #define FQ_ZECH_POLY_DIVREM_DIVCONQUER_CUTOFF  16
 #define FQ_ZECH_COMPOSE_MOD_LENH_CUTOFF 6
 #define FQ_ZECH_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
+/* No longer used: the choice between classical and univariate
+   multiplication is made by _fq_zech_poly_mulmid_want_univariate
+   and _fq_zech_poly_sqr_want_univariate. */
 #define FQ_ZECH_SQR_CLASSICAL_CUTOFF 100
 #define FQ_ZECH_MUL_CLASSICAL_CUTOFF 90
 #define FQ_ZECH_MULLOW_CLASSICAL_CUTOFF 90
@@ -44,5 +47,30 @@
 #include "fq_poly_templates.h"
 #undef CAP_T
 #undef T
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void _fq_zech_poly_mulmid_univariate(fq_zech_struct * rop,
+    const fq_zech_struct * op1, slong len1,
+    const fq_zech_struct * op2, slong len2,
+    slong nlo, slong nhi, const fq_zech_ctx_t ctx);
+
+slong _fq_zech_poly_mul_univariate_threshold(const fq_zech_ctx_t ctx);
+
+/* Lower bound for _fq_zech_poly_mul_univariate_threshold, for a quick
+   check before calling the functions below: univariate multiplication is
+   never used when either length is smaller. */
+#define FQ_ZECH_POLY_MUL_UNIVARIATE_MIN_LEN(ctx) (2 * fq_zech_ctx_degree(ctx) + 2)
+
+int _fq_zech_poly_mulmid_want_univariate(slong len1, slong len2,
+    slong nlo, slong nhi, const fq_zech_ctx_t ctx);
+
+int _fq_zech_poly_sqr_want_univariate(slong len, const fq_zech_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

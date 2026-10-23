@@ -20,7 +20,7 @@ ca_factor_insert(ca_factor_t fac, const ca_t base, const ca_t exp, ca_ctx_t ctx)
     {
         if (ca_equal_repr(fac->base + i, base, ctx))
         {
-            ca_add(fac->exp, fac->exp, exp, ctx);
+            ca_add(fac->exp + i, fac->exp + i, exp, ctx);
             return;
         }
     }

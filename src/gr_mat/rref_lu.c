@@ -27,7 +27,7 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
     if (gr_mat_is_zero(A, ctx) == T_TRUE)
     {
         *res_rank = 0;
-        return GR_SUCCESS;
+        return gr_mat_zero(R, ctx);
     }
 
     /* Todo: fast path for nrows == 1 */
@@ -44,7 +44,7 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
     if (rank == 0)
     {
         *res_rank = 0;
-        return GR_SUCCESS;
+        return gr_mat_zero(R, ctx);
     }
 
     /* Clear L */

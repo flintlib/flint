@@ -239,8 +239,7 @@ gr_poly_revert_series_lagrange(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -264,8 +263,7 @@ gr_poly_revert_series_lagrange_fast(gr_poly_t res, const gr_poly_t f, slong n, g
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -289,8 +287,7 @@ gr_poly_revert_series_newton(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }
 
@@ -314,7 +311,6 @@ gr_poly_revert_series(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
         gr_poly_clear(t, ctx);
     }
 
-    _gr_poly_set_length(res, n, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, n, ctx);
     return status;
 }

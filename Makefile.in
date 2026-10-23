@@ -102,6 +102,8 @@ ASM_PIC_FLAG:=$(filter-out -D%,$(PIC_FLAG))
 endif
 
 UNROLL_LOOPS:=@UNROLL_LOOPS@
+dfloat_CFLAGS:=@DFLOAT_CFLAGS@
+
 ifeq ($(UNROLL_LOOPS), 1)
 ulong_extras_CFLAGS:=-funroll-loops
 nmod_CFLAGS:=-funroll-loops
@@ -168,11 +170,13 @@ HEADLESS_DIRS := generic_files
 
 HEADER_DIRS	:=	\
 		thread_pool			thread_support					\
+		machine_vectors									\
 															\
 		ulong_extras		long_extras			perm		\
 		double_extras		d_vec				d_mat		\
 															\
 		mpn_extras	radix   	mpn_mod		nfloat			\
+		mp_real		dfloat									\
 															\
 		nmod		nmod_vec	nmod_mat	nmod_poly		\
 		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\
@@ -185,12 +189,13 @@ HEADER_DIRS	:=	\
 		padic					padic_mat	padic_poly		\
 		qadic												\
 		padic_radix											\
+		decimal												\
 															\
 		fmpz_extras	fmpz_factor	fmpzi						\
 		fft			@FFT_SMALL@								\
 		fmpz_lll											\
 		arith												\
-		qsieve		aprcl									\
+		qsieve		aprcl		ecpp							\
 															\
 		fq_default		fq_default_mat	fq_default_poly		\
 		fq_nmod_embed	fq_zech_embed	fq_embed			\
@@ -219,12 +224,12 @@ HEADER_DIRS	:=	\
 		arb_fmpz_poly	arb_fpwrap							\
 		acb_dft			acb_elliptic	acb_modular			\
 		acb_dirichlet	acb_theta							\
-		dirichlet		bernoulli		hypgeom				\
+		dirichlet		bernoulli							\
 		bool_mat		partitions							\
 															\
 		gr			gr_generic	gr_vec		gr_mat			\
 		gr_poly		gr_mpoly	gr_ore_poly					\
-		gr_series	gr_special								\
+		gr_series	gr_special	gr_dft						\
 															\
 		calcium												\
 															\
@@ -773,6 +778,44 @@ examples: library $(EXMPS)
 checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 
 ###############################################################################
+# documentation
+###############################################################################
+
+# The documentation is built by doc/fdoc, a Python 3 program (no Python
+# packages needed). Node.js is optional: with it, formulas are typeset with
+# KaTeX when the documentation is built, without it in the browser. The PDF
+# needs pdflatex.
+#
+#   make doc / make dochtml   HTML in build/doc/html
+#   make docpdf               PDF in build/doc/latex/flint.pdf
+#   make checkdoc             check the documentation against the headers and
+#                             compile and run its example programs
+#
+# DOCFLAGS is passed to the HTML build, e.g. DOCFLAGS=--redirects to also
+# write pages that redirect the URLs of the old (Sphinx) documentation, or
+# DOCFLAGS=--strict to treat warnings as errors.
+# DOC_PYTHON selects the Python interpreter (not PYTHON, which selects the
+# Python tests in make check).
+
+DOC_PYTHON ?= python3
+DOC_OUT := $(abspath $(BUILD_DIR))/doc
+FDOC := cd $(ABS_FLINT_DIR)/doc && $(DOC_PYTHON) -m fdoc --flint $(ABS_FLINT_DIR)
+
+doc: dochtml
+
+dochtml:
+	$(FDOC) build --out $(DOC_OUT)/html $(DOCFLAGS)
+
+docpdf:
+	$(FDOC) latex --pdf --out $(DOC_OUT)/latex
+
+checkdoc: library | $(BUILD_DIR)/include
+	$(FDOC) check
+	$(FDOC) examples --out $(DOC_OUT)/examples --cc "$(CC)" \
+	    --cflags "$(TESTCFLAGS) -I$(abspath $(BUILD_DIR))/include @CPPFLAGS@" \
+	    --libs "-L$(abspath $(FLINT_DIR)) @WL@-rpath,$(abspath $(FLINT_DIR)) $(EXE_LDFLAGS) $(LIBS2)"
+
+###############################################################################
 # profiling
 ###############################################################################
 
@@ -1029,5 +1072,5 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_TEST_RUN_% %_TEST_DGB_RUN_ARGS %_VALGRIND_RUN print-% coverage coverage_html debug
+.PHONY: all library shared static examples checkexamples doc dochtml docpdf checkdoc profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_TEST_RUN_% %_TEST_DGB_RUN_ARGS %_VALGRIND_RUN print-% coverage coverage_html debug
 .PRECIOUS: $(mpn_extras_PIC_S_SOURCES) $(mpn_extras_S_SOURCES)

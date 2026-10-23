@@ -26,7 +26,7 @@ int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_defa
     {
         return nmod_mat_fprint(file, mat->nmod);
     }
-    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_mat_fprint(file, mat->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }

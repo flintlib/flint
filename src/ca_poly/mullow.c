@@ -170,10 +170,7 @@ _ca_poly_mullow_fmpqs(ca_ptr res,
         for (i = 0; i < len2; i++)
             z2[i] = *CA_FMPQ_NUMREF(poly2 + i);
 
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
 
         for (i = 0; i < n; i++)
         {
@@ -197,10 +194,7 @@ _ca_poly_mullow_fmpqs(ca_ptr res,
         _ca_vec_fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2, ctx);
 
         fmpz_mul(den1, den1, den2);
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
 
         _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
 

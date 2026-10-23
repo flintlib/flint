@@ -70,11 +70,9 @@ fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
 void
 fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 {
-    slong i, j;
-
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            fmpz_divexact(fmpz_mat_entry(B,i,j), fmpz_mat_entry(A,i,j), c);
+    /* shares one precomputed inverse among all rows */
+    _fmpz_vec_scalar_divexact_fmpz_strided(B->entries, B->stride,
+        A->entries, A->stride, A->r, A->c, c);
 }
 
 void

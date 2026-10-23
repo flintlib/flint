@@ -1,9 +1,6 @@
 #include "gr_poly.h"
 #include "gr_ore_poly.h"
 
-/* gr_poly/compose.c */
-int _gr_poly_inflate(gr_ptr poly, slong len, slong n, gr_ctx_t ctx);
-
 int
 sigma_delta_unable(gr_ptr FLINT_UNUSED(sigma), gr_ptr FLINT_UNUSED(delta),
                    gr_srcptr FLINT_UNUSED(a),

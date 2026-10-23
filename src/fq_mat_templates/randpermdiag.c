@@ -12,9 +12,9 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
-
-#include "perm.h"
 
 int
 TEMPLATE(T, mat_randpermdiag) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
@@ -22,25 +22,10 @@ TEMPLATE(T, mat_randpermdiag) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
                                const TEMPLATE(T, ctx_t) ctx)
 {
     int parity;
-    slong i;
-    slong *rows;
-    slong *cols;
-
-    rows = _perm_init(mat->r);
-    cols = _perm_init(mat->c);
-
-    parity = _perm_randtest(rows, mat->r, state);
-    parity ^= _perm_randtest(cols, mat->c, state);
-
-    TEMPLATE(T, mat_zero) (mat, ctx);
-    for (i = 0; i < n; i++)
-        TEMPLATE(T, mat_entry_set) (mat, rows[i], cols[i], diag + i, ctx);
-
-    _perm_clear(rows);
-    _perm_clear(cols);
-
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_randpermdiag(&parity, (gr_mat_struct *) mat, state, diag, n, gr_ctx));
     return parity;
 }
-
 
 #endif

@@ -6,7 +6,7 @@ void fmpz_mod_mat_rand(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ct
     fmpz* e;
     slong i, j, r, c;
     r = fmpz_mod_mat_nrows(mat, ctx);
-    c = fmpz_mod_mat_nrows(mat, ctx);
+    c = fmpz_mod_mat_ncols(mat, ctx);
 
     for (i = 0; i < r; i++)
     {

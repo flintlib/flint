@@ -10,21 +10,15 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_add(ca_ptr res, ca_srcptr poly1, slong len1,
     ca_srcptr poly2, slong len2, ca_ctx_t ctx)
 {
-    slong i, min = FLINT_MIN(len1, len2);
-
-    for (i = 0; i < min; i++)
-        ca_add(res + i, poly1 + i, poly2 + i, ctx);
-
-    for (i = min; i < len1; i++)
-        ca_set(res + i, poly1 + i, ctx);
-
-    for (i = min; i < len2; i++)
-        ca_set(res + i, poly2 + i, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_add(res, poly1, len1, poly2, len2, gr_ctx));
 }
 
 void

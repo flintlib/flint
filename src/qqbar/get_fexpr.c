@@ -377,14 +377,23 @@ void
 qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x)
 {
     qqbar_ptr conjugates;
-    slong d, i, j;
+    slong d, i, j, n;
 
     d = qqbar_degree(x);
 
     conjugates = _qqbar_vec_init(d);
-    qqbar_conjugates(conjugates, x);
 
-    for (i = 0; i < d; i++)
+    /* The real roots come first in the canonical order, so for real x
+       we only need to isolate the real roots. */
+    if (qqbar_is_real(x))
+        n = qqbar_real_roots_fmpz_poly(conjugates, QQBAR_POLY(x), QQBAR_ROOTS_IRREDUCIBLE);
+    else
+    {
+        qqbar_conjugates(conjugates, x);
+        n = d;
+    }
+
+    for (i = 0; i < n; i++)
     {
         if (qqbar_equal(conjugates + i, x))
         {

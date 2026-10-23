@@ -43,6 +43,102 @@ do \
     (r1) = _tmp >> 32; \
 } while (0)
 
+#define add_sssssssssaaaaaaaaaaaaaaaaaa(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_ADC(0, a0, b0, &(s0)); \
+    _carry = _FLINT_ADC(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_ADC(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_ADC(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_ADC(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_ADC(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_ADC(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_ADC(_carry, a7, b7, &(s7)); \
+    _FLINT_ADC(_carry, a8, b8, &(s8)); \
+} while (0)
+
+#define sub_dddddddddmmmmmmmmmsssssssss(s8, s7, s6, s5, s4, s3, s2, s1, s0, a8, a7, a6, a5, a4, a3, a2, a1, a0, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_SBB(0, a0, b0, &(s0)); \
+    _carry = _FLINT_SBB(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_SBB(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_SBB(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_SBB(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_SBB(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_SBB(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_SBB(_carry, a7, b7, &(s7)); \
+    _FLINT_SBB(_carry, a8, b8, &(s8)); \
+} while (0)
+
+#define add_ssssssssssaaaaaaaaaaaaaaaaaaaa(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_ADC(0, a0, b0, &(s0)); \
+    _carry = _FLINT_ADC(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_ADC(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_ADC(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_ADC(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_ADC(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_ADC(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_ADC(_carry, a7, b7, &(s7)); \
+    _carry = _FLINT_ADC(_carry, a8, b8, &(s8)); \
+    _FLINT_ADC(_carry, a9, b9, &(s9)); \
+} while (0)
+
+#define sub_ddddddddddmmmmmmmmmmssssssssss(s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_SBB(0, a0, b0, &(s0)); \
+    _carry = _FLINT_SBB(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_SBB(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_SBB(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_SBB(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_SBB(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_SBB(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_SBB(_carry, a7, b7, &(s7)); \
+    _carry = _FLINT_SBB(_carry, a8, b8, &(s8)); \
+    _FLINT_SBB(_carry, a9, b9, &(s9)); \
+} while (0)
+
+#define add_sssssssssssaaaaaaaaaaaaaaaaaaaaaa(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_ADC(0, a0, b0, &(s0)); \
+    _carry = _FLINT_ADC(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_ADC(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_ADC(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_ADC(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_ADC(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_ADC(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_ADC(_carry, a7, b7, &(s7)); \
+    _carry = _FLINT_ADC(_carry, a8, b8, &(s8)); \
+    _carry = _FLINT_ADC(_carry, a9, b9, &(s9)); \
+    _FLINT_ADC(_carry, a10, b10, &(s10)); \
+} while (0)
+
+#define sub_dddddddddddmmmmmmmmmmmsssssssssss(s10, s9, s8, s7, s6, s5, s4, s3, s2, s1, s0, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0) \
+do \
+{ \
+    unsigned char _carry; \
+    _carry = _FLINT_SBB(0, a0, b0, &(s0)); \
+    _carry = _FLINT_SBB(_carry, a1, b1, &(s1)); \
+    _carry = _FLINT_SBB(_carry, a2, b2, &(s2)); \
+    _carry = _FLINT_SBB(_carry, a3, b3, &(s3)); \
+    _carry = _FLINT_SBB(_carry, a4, b4, &(s4)); \
+    _carry = _FLINT_SBB(_carry, a5, b5, &(s5)); \
+    _carry = _FLINT_SBB(_carry, a6, b6, &(s6)); \
+    _carry = _FLINT_SBB(_carry, a7, b7, &(s7)); \
+    _carry = _FLINT_SBB(_carry, a8, b8, &(s8)); \
+    _carry = _FLINT_SBB(_carry, a9, b9, &(s9)); \
+    _FLINT_SBB(_carry, a10, b10, &(s10)); \
+} while (0)
+
 /* Division */
 # define _FLINT_DIV(_n1, _n0, _dx, _rp) _udiv64((unsigned __int64) (_n1) | (unsigned __int64) (_n0), _dx, _rp)
 # define _FLINT_IDIV(_n1, _n0, _dx, _rp) _div64((__int64) (_n1) | (__int64) (_n0), _dx, _rp)

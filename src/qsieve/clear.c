@@ -24,5 +24,6 @@ void qsieve_clear(qs_t qs_inf)
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
 
-    flint_free(qs_inf->fname);
+    qsieve_relations_clear(qs_inf);
+    qsieve_A_used_clear(qs_inf);
 }

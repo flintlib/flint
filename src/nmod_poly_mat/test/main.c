@@ -22,6 +22,7 @@
 #include "t-mul.c"
 #include "t-mul_interpolate.c"
 #include "t-mul_KS.c"
+#include "t-mulmid_fft_small.c"
 #include "t-neg.c"
 #include "t-nullspace.c"
 #include "t-one.c"
@@ -56,6 +57,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mat_mul),
     TEST_FUNCTION(nmod_poly_mat_mul_interpolate),
     TEST_FUNCTION(nmod_poly_mat_mul_KS),
+    TEST_FUNCTION(nmod_poly_mat_mulmid_fft_small),
     TEST_FUNCTION(nmod_poly_mat_neg),
     TEST_FUNCTION(nmod_poly_mat_nullspace),
     TEST_FUNCTION(nmod_poly_mat_one),

@@ -3622,9 +3622,10 @@ gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
             status |= gr_mul(xu1, x, u1, R);
             status |= gr_mul(xvu2, xv, u2, R);
 
-            if (gr_equal(y1, y2, R) == T_FALSE ||
+            if (status == GR_SUCCESS &&
+                (gr_equal(y1, y2, R) == T_FALSE ||
                 gr_equal(xu1, y1, R) == T_FALSE ||
-                gr_equal(xvu2, y2, R) == T_FALSE)
+                gr_equal(xvu2, y2, R) == T_FALSE))
             {
                 status = GR_TEST_FAIL;
             }
@@ -4303,7 +4304,6 @@ gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-#if 0
 static int
 gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
@@ -4359,7 +4359,6 @@ gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
-#endif
 
 int
 gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags)
@@ -4994,7 +4993,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         gr_test_iter(R, state, "integral_domain", gr_test_integral_domain, iters, test_flags);
 
     if (gr_ctx_is_field(R) == T_TRUE)
-        gr_test_iter(R, state, "field", gr_test_integral_domain, iters, test_flags);
+        gr_test_iter(R, state, "field", gr_test_field, iters, test_flags);
 
     if (gr_ctx_is_integral_domain(R) == T_TRUE)
         gr_test_iter(R, state, "div: distributive", gr_test_div_right_distributive, iters, test_flags);
@@ -5021,7 +5020,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     if (gr_ctx_is_commutative_ring(R) == T_TRUE)
         gr_test_iter(R, state, "pow_ui: base multiplication", gr_test_pow_ui_base_multiplication, iters, test_flags);
 
-    gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_exponent_addition, iters, test_flags);
+    gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_aliasing, iters, test_flags);
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     gr_test_iter(R, state, "sqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
@@ -5133,7 +5132,7 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "inv: involution", gr_test_inv_involution, iters, test_flags);
 
     gr_test_iter(R, state, "pow_ui: exponent addition", gr_test_pow_ui_exponent_addition, iters, test_flags);
-    gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_exponent_addition, iters, test_flags);
+    gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_aliasing, iters, test_flags);
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);

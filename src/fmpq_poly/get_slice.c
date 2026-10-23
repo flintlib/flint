@@ -35,6 +35,7 @@ void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, slong i, slong j
             fmpq_poly_fit_length(rop, j);
             _fmpq_poly_set_length(rop, j);
 
+            _fmpz_vec_zero(rop->coeffs, i);
             _fmpz_vec_set(rop->coeffs + i, op->coeffs + i, j - i);
             fmpz_set(rop->den, op->den);
             fmpq_poly_canonicalise(rop);

@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
+#include "dfloat.h"
 
 TEST_FUNCTION_START(acb_dirichlet_zeta_zeros, state)
 {
@@ -81,6 +82,127 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_zeros, state)
         fmpz_clear(m);
         fmpz_clear(k);
         _acb_vec_clear(p, maxlen);
+    }
+
+    /* the choice of the large height method and its working precision */
+    {
+        fmpz_t n;
+        int ok = 1;
+        fmpz_init(n);
+        fmpz_ui_pow_ui(n, 10, 13);      /* L = log2(n) = 44 */
+        ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 200, 0) != 0;
+        ok = ok && !_acb_dirichlet_hardy_z_zeros_use_platt(n, 5, 0);
+        if (dfloat_is_supported())
+        {
+            ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 14, 108) == 148;
+            ok = ok && !_acb_dirichlet_hardy_z_zeros_use_platt(n, 13, 108);
+            /* the arb sums (up to the accuracy of the method), else
+               the dfloat sums and refinement */
+            ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 200, 180) == 228;
+            ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 200, 500) == 148;
+            ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 200, 30) == 100;
+        }
+        fmpz_sub_ui(n, n, 1);
+        ok = ok && !_acb_dirichlet_hardy_z_zeros_use_platt(n, 15, 0);
+        fmpz_ui_pow_ui(n, 10, 11);
+        fmpz_sub_ui(n, n, 1);
+        ok = ok && !_acb_dirichlet_hardy_z_zeros_use_platt(n, 1000, 0);
+        fmpz_ui_pow_ui(n, 10, 20);
+        ok = ok && _acb_dirichlet_hardy_z_zeros_use_platt(n, 1, 0) != 0;
+        fmpz_ui_pow_ui(n, 10, 23);
+        ok = ok && !_acb_dirichlet_hardy_z_zeros_use_platt(n, 1000, 0);
+        if (!ok)
+        {
+            flint_printf("FAIL: choice of the method\n");
+            flint_abort();
+        }
+        fmpz_clear(n);
+    }
+
+    /* the refinement of a zero from a ball (as for the zeros of the large
+       height method beyond its accuracy) against Riemann-Siegel */
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    {
+        fmpz_t n;
+        arb_t z, w, v;
+        slong prec0, prec;
+
+        fmpz_init(n);
+        arb_init(z);
+        arb_init(w);
+        arb_init(v);
+        fmpz_randtest_unsigned(n, state, 30);
+        fmpz_add_ui(n, n, 1);
+        /* (a ball isolating the zero: well below the spacing) */
+        prec0 = fmpz_bits(n) + 16 + n_randint(state, 100);
+        prec = prec0 + n_randint(state, 300);
+
+        acb_dirichlet_hardy_z_zero(z, n, prec0);
+        _acb_dirichlet_refine_hardy_z_zero_ball(w, z, prec);
+        acb_dirichlet_hardy_z_zero(v, n, prec);
+
+        if (!arb_overlaps(w, v) || !arb_overlaps(w, z) ||
+            arb_rel_accuracy_bits(w) < prec - 3)
+        {
+            flint_printf("FAIL: refinement from a ball\n\n");
+            flint_printf("n = "); fmpz_print(n);
+            flint_printf("  prec0 = %wd  prec = %wd\n\n", prec0, prec);
+            flint_printf("z = "); arb_printn(z, 100, 0); flint_printf("\n\n");
+            flint_printf("w = "); arb_printn(w, 100, 0); flint_printf("\n\n");
+            flint_printf("v = "); arb_printn(v, 100, 0); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        fmpz_clear(n);
+        arb_clear(z);
+        arb_clear(w);
+        arb_clear(v);
+    }
+
+    /* the large height method (one run, a few seconds; only with dfloat,
+       for which the choice is tuned) against Riemann-Siegel */
+    if (dfloat_is_supported())
+    {
+        fmpz_t n, k;
+        acb_ptr p;
+        acb_t z;
+        slong len = 15, prec, i, j;
+
+        fmpz_init(n);
+        fmpz_init(k);
+        acb_init(z);
+        p = _acb_vec_init(len);
+        fmpz_ui_pow_ui(n, 10, 13);
+        fmpz_add_ui(n, n, n_randint(state, 1000000));
+        prec = 60 + n_randint(state, 48);
+
+        if (!_acb_dirichlet_hardy_z_zeros_use_platt(n, len, prec))
+        {
+            flint_printf("FAIL: platt not chosen\n");
+            flint_abort();
+        }
+
+        acb_dirichlet_zeta_zeros(p, n, len, prec);
+
+        for (j = 0; j < 2; j++)
+        {
+            i = (j == 0) ? 0 : 1 + n_randint(state, len - 1);
+            fmpz_add_si(k, n, i);
+            acb_dirichlet_zeta_zero(z, k, prec);
+            if (!acb_overlaps(z, p + i) || acb_rel_accuracy_bits(p + i) < prec - 3)
+            {
+                flint_printf("FAIL: large height method\n\n");
+                flint_printf("n = "); fmpz_print(n); flint_printf("  i = %wd  prec = %wd\n\n", i, prec);
+                flint_printf("z = "); acb_printn(z, 50, 0); flint_printf("\n\n");
+                flint_printf("p = "); acb_printn(p + i, 50, 0); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
+        fmpz_clear(n);
+        fmpz_clear(k);
+        acb_clear(z);
+        _acb_vec_clear(p, len);
     }
 
     TEST_FUNCTION_END(state);

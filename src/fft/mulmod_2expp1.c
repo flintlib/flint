@@ -194,6 +194,13 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    w1 = bits/(UWORD(1)<<(2*depth1));
 
+   /* The size must be one that the Nussbaumer convolution supports, for
+      example a value returned by fft_adjust_limbs: bits must be split
+      exactly into 2^depth1 pieces of 2^depth1 * w1 bits, and the pieces
+      combined in _fft_mulmod_2expp1 must be whole limbs. */
+   FLINT_ASSERT(((flint_bitcnt_t) w1 << (2*depth1)) == bits);
+   FLINT_ASSERT(limbs % (WORD(2) << depth1) == 0);
+
    _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
 }
 

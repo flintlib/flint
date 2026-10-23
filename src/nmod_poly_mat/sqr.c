@@ -40,8 +40,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
             && (dim > INTERPOLATE_MIN_DIM + n_sqrt(Alen))
             && (mod >= 2 * Alen - 1) && n_is_prime(mod))
             nmod_poly_mat_sqr_interpolate(C, A);
-
-        if (Alen > KS_MAX_LENGTH)
+        else if (Alen > KS_MAX_LENGTH)
             nmod_poly_mat_sqr_classical(C, A);
         else
             nmod_poly_mat_sqr_KS(C, A);

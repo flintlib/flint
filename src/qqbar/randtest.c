@@ -61,15 +61,28 @@ _qqbar_randtest(qqbar_t res, flint_rand_t state, slong deg, slong bits, int real
     else
         i = r1 + n_randint(state, 2 * r2);
 
-    for (prec = QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
+    if (real == 1)
     {
-        arb_fmpz_poly_complex_roots(roots, pol, 0, prec);
-
-        if (_qqbar_validate_uniqueness(roots + i, pol, roots + i, 2 * prec))
+        /* Only isolate the real roots. The real roots come first in
+           the output of arb_fmpz_poly_complex_roots, so this selects the
+           same root. */
+        qqbar_ptr rroots = _qqbar_vec_init(rdeg);
+        qqbar_real_roots_fmpz_poly(rroots, pol, QQBAR_ROOTS_IRREDUCIBLE | QQBAR_ROOTS_UNSORTED);
+        qqbar_swap(res, rroots + i);
+        _qqbar_vec_clear(rroots, rdeg);
+    }
+    else
+    {
+        for (prec = QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
         {
-            fmpz_poly_set(QQBAR_POLY(res), pol);
-            acb_set(QQBAR_ENCLOSURE(res), roots + i);
-            break;
+            arb_fmpz_poly_complex_roots(roots, pol, 0, prec);
+
+            if (_qqbar_validate_uniqueness(roots + i, pol, roots + i, 2 * prec))
+            {
+                fmpz_poly_set(QQBAR_POLY(res), pol);
+                acb_set(QQBAR_ENCLOSURE(res), roots + i);
+                break;
+            }
         }
     }
 

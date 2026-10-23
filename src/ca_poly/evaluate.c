@@ -10,12 +10,15 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_evaluate(ca_t res, ca_srcptr f, slong len,
                            const ca_t x, ca_ctx_t ctx)
 {
-    _ca_poly_evaluate_horner(res, f, len, x, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate(res, f, len, x, gr_ctx));
 }
 
 void

@@ -84,9 +84,9 @@ TEST_FUNCTION_START(nmod_mat_mul_blas, state)
             if (!nmod_mat_equal(C, D))
                 TEST_FUNCTION_FAIL("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
         }
-#if FLINT_USES_BLAS && FLINT_BITS == 64
+#if FLINT_BITS == 64
         else
-            TEST_FUNCTION_FAIL("BLAS should have worked\n");
+            TEST_FUNCTION_FAIL("mul_blas should have worked\n");
 #endif
 
         nmod_mat_clear(A);

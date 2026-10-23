@@ -36,9 +36,7 @@ void _nmod_mpoly_set_coeff_ui_fmpz(
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     nmod_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, A->bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, A->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

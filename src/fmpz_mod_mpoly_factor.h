@@ -36,9 +36,6 @@ void fmpz_mod_mpoly_factor_init(fmpz_mod_mpoly_factor_t f,
     f->alloc = 0;
 }
 
-void fmpz_mod_mpoly_factor_init2(fmpz_mod_mpoly_factor_t f,
-                                  slong alloc, const fmpz_mod_mpoly_ctx_t ctx);
-
 void fmpz_mod_mpoly_factor_realloc(fmpz_mod_mpoly_factor_t f,
                                   slong alloc, const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -94,9 +91,6 @@ void fmpz_mod_mpoly_factor_swap(fmpz_mod_mpoly_factor_t f,
    *f = *g;
    *g = t;
 }
-
-void fmpz_mod_mpoly_factor_set(fmpz_mod_mpoly_factor_t f,
-              const fmpz_mod_mpoly_factor_t g, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_factor_print_pretty(const fmpz_mod_mpoly_factor_t f,
                            const char ** vars, const fmpz_mod_mpoly_ctx_t ctx);
@@ -852,16 +846,6 @@ void fmpz_mod_polyu3_print_pretty(
     const char * var2,
     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
-/* mpolyu ********************************************************************/
-
-int fmpz_mod_mpolyu_is_canonical(const fmpz_mod_mpolyu_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
-
-void fmpz_mod_mpolyu3_print_pretty(const fmpz_mod_mpolyu_t A,
-                    const char * var0, const char * var1, const char * var2,
-                           const char ** vars, const fmpz_mod_mpoly_ctx_t ctx);
-
-
 /* bpoly *********************************************************************/
 
 int fmpz_mod_bpoly_is_canonical(const fmpz_mod_bpoly_t A,
@@ -1214,10 +1198,6 @@ int fmpz_mod_mpoly_pfrac(slong r, fmpz_mod_mpoly_t t, const slong * deg,
 int fmpz_mod_mpoly_hlift(slong m, fmpz_mod_mpoly_struct * f, slong r,
             const fmpz * alpha, const fmpz_mod_mpoly_t A, const slong * degs,
                                                const fmpz_mod_mpoly_ctx_t ctx);
-
-int fmpz_mod_bpoly_pfrac(slong r, fmpz_mod_bpoly_struct * C,
-          slong * C_deg1_bound, fmpz_mod_bpoly_t A, fmpz_mod_bpoly_struct * B,
-                                                     const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_bpoly_hlift2(fmpz_mod_bpoly_t A, fmpz_mod_bpoly_t B0,
                   fmpz_mod_bpoly_t B1, const fmpz_t alpha, slong degree_inner,

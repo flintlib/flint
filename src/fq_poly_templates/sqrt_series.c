@@ -13,16 +13,32 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
+
+/* Below this length, the basecase algorithm is faster than Newton
+   iteration. */
+#if defined(FQ_ZECH_POLY_H)
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 200
+#elif defined(FQ_NMOD_POLY_H)
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 48
+#else
+#define FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF 48
+#endif
 
 void
 _TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, struct) * g, const TEMPLATE(T, struct) * h, slong n, TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) * t = _TEMPLATE(T, vec_init)(n, ctx);
+    gr_ctx_t gr_ctx;
 
-    _TEMPLATE(T, poly_invsqrt_series)(t, h, n, ctx);
-    _TEMPLATE(T, poly_mullow)(g, t, n, h, n, n, ctx);
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (n > 1 && TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
+    if (n > 1 && fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
+        flint_throw(FLINT_ERROR, "(%s): Not supported in characteristic 2.\n", __func__);
 
-    _TEMPLATE(T, vec_clear)(t, n, ctx);
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_sqrt_series_newton(g, h, n, n, FQ_POLY_SQRT_SERIES_NEWTON_CUTOFF, gr_ctx));
 }
 
 void

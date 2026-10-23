@@ -22,7 +22,11 @@
 #include "t-nfixed_mat_mul_waksman.c"
 #include "t-nfloat.c"
 #include "t-nfloat_complex.c"
+#include "t-nfloat_complex_elem.c"
 #include "t-nfloat_directed.c"
+#include "t-nfloat_div_sqrt.c"
+#include "t-nfloat_elem.c"
+#include "t-nfloat_hypot.c"
 
 /* Array of test functions ***************************************************/
 
@@ -39,7 +43,11 @@ test_struct tests[] =
     TEST_FUNCTION(nfixed_mat_mul_waksman),
     TEST_FUNCTION(nfloat),
     TEST_FUNCTION(nfloat_complex),
+    TEST_FUNCTION(nfloat_complex_elem),
     TEST_FUNCTION(nfloat_directed),
+    TEST_FUNCTION(nfloat_div_sqrt),
+    TEST_FUNCTION(nfloat_elem),
+    TEST_FUNCTION(nfloat_hypot),
 };
 
 /* main function *************************************************************/

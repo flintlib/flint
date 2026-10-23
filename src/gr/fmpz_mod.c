@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+#include <gmp.h>
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
@@ -18,6 +21,7 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
@@ -26,13 +30,17 @@ typedef struct
 {
     fmpz_mod_ctx_struct * ctx;
     truth_t is_prime;
+    int pretend;   /* pretending to be a field */
     fmpz a;    /* when used as finite field with defining polynomial x - a */
+    fmpz * factor;   /* a factor of the modulus found while pretending (NULL: none) */
 }
 _gr_fmpz_mod_ctx_struct;
 
 #define FMPZ_MOD_CTX(ring_ctx) ((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->ctx))
 #define FMPZ_MOD_IS_PRIME(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->is_prime)
 #define FMPZ_MOD_CTX_A(ring_ctx) (&((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->a)))
+#define FMPZ_MOD_PRETEND(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->pretend)
+#define FMPZ_MOD_FACTOR(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->factor)
 
 static int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -50,6 +58,100 @@ _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
     fmpz_mod_ctx_clear(FMPZ_MOD_CTX(ctx));
     flint_free(FMPZ_MOD_CTX(ctx));
     fmpz_clear(FMPZ_MOD_CTX_A(ctx));
+    if (FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_clear(FMPZ_MOD_FACTOR(ctx));
+        flint_free(FMPZ_MOD_FACTOR(ctx));
+    }
+}
+
+/*
+    Pretending to be a field: an operation which needs the inverse of a
+    nonzero non-unit x records the factor gcd(x, n) of the modulus (the
+    first one found, allocated once under the zero divisor lock) and fails
+    with GR_UNABLE instead of GR_DOMAIN.
+*/
+static truth_t _gr_fmpz_mod_ctx_is_field(gr_ctx_t ctx);
+
+static truth_t
+_gr_fmpz_mod_ctx_is_pretend_field(gr_ctx_t ctx)
+{
+    int p;
+    _gr_ctx_zero_divisor_lock();
+    p = FMPZ_MOD_PRETEND(ctx);
+    _gr_ctx_zero_divisor_unlock();
+    if (p)
+        return T_TRUE;
+    return (_gr_fmpz_mod_ctx_is_field(ctx) == T_TRUE) ? T_TRUE : T_FALSE;
+}
+
+static int
+_gr_fmpz_mod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field)
+{
+    _gr_ctx_zero_divisor_lock();
+    FMPZ_MOD_PRETEND(ctx) = (is_pretend_field == T_TRUE);
+    /* (turning the pretense off forgets the zero divisor) */
+    if (!FMPZ_MOD_PRETEND(ctx) && FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_clear(FMPZ_MOD_FACTOR(ctx));
+        flint_free(FMPZ_MOD_FACTOR(ctx));
+        FMPZ_MOD_FACTOR(ctx) = NULL;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return GR_SUCCESS;
+}
+
+/* the status for a failed inversion of x (d = gcd(x, n), or NULL to
+   compute it): GR_DOMAIN for zero (or when not pretending), otherwise
+   GR_UNABLE with a factor recorded */
+static int
+_gr_fmpz_mod_nonunit(const fmpz_t x, const fmpz_t d, const gr_ctx_t ctx)
+{
+    int status = GR_DOMAIN;
+
+    if (fmpz_is_zero(x))
+        return GR_DOMAIN;
+
+    _gr_ctx_zero_divisor_lock();
+    if (FMPZ_MOD_PRETEND(ctx))
+    {
+        if (FMPZ_MOD_FACTOR(ctx) == NULL)
+        {
+            fmpz_t g;
+            fmpz_init(g);
+            if (d != NULL)
+                fmpz_set(g, d);
+            else
+                fmpz_gcd(g, x, FMPZ_MOD_CTX(ctx)->n);
+            if (!fmpz_is_one(g) && !fmpz_equal(g, FMPZ_MOD_CTX(ctx)->n))
+            {
+                fmpz * f = flint_malloc(sizeof(fmpz));
+                fmpz_init(f);
+                fmpz_swap(f, g);
+                FMPZ_MOD_FACTOR((gr_ctx_struct *) ctx) = f;
+            }
+            fmpz_clear(g);
+        }
+        status = GR_UNABLE;
+    }
+    _gr_ctx_zero_divisor_unlock();
+    return status;
+}
+
+static int
+_gr_fmpz_mod_ctx_recover_zero_divisor(fmpz_t res, gr_ctx_t ctx)
+{
+    int status = GR_UNABLE;
+    _gr_ctx_zero_divisor_lock();
+    if (FMPZ_MOD_FACTOR(ctx) != NULL)
+    {
+        fmpz_set(res, FMPZ_MOD_FACTOR(ctx));
+        status = GR_SUCCESS;
+    }
+    else
+        fmpz_zero(res);
+    _gr_ctx_zero_divisor_unlock();
+    return status;
 }
 
 static int
@@ -95,6 +197,113 @@ static void
 _gr_fmpz_mod_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     *res = *x;
+}
+
+/* Elements are plain fmpz: vector methods avoiding per-element dispatch. */
+static void
+_gr_fmpz_mod_vec_init(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    if (len > 0)
+        memset(vec, 0, len * sizeof(fmpz));
+}
+
+static void
+_gr_fmpz_mod_vec_clear(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpz_clear(vec + i);
+}
+
+static void
+_gr_fmpz_mod_vec_swap(fmpz * vec1, fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    fmpz t;
+
+    for (i = 0; i < len; i++)
+    {
+        t = vec1[i];
+        vec1[i] = vec2[i];
+        vec2[i] = t;
+    }
+}
+
+static int
+_gr_fmpz_mod_vec_zero(fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fmpz_zero(vec + i);
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_set(fmpz * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (res != vec)
+    {
+        for (i = 0; i < len; i++)
+        {
+            if (!COEFF_IS_MPZ(vec[i]) && !COEFF_IS_MPZ(res[i]))
+                res[i] = vec[i];
+            else
+                fmpz_set(res + i, vec + i);
+        }
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_normalise(slong * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && fmpz_is_zero(vec + len - 1))
+        len--;
+
+    res[0] = len;
+    return GR_SUCCESS;
+}
+
+static void
+_gr_fmpz_mod_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t ctx)
+{
+    fmpz * coeffs = poly->coeffs;
+    slong i;
+
+    for (i = len; i < poly->length; i++)
+        fmpz_zero(coeffs + i);
+
+    while (len > 0 && fmpz_is_zero(coeffs + len - 1))
+        len--;
+
+    poly->length = len;
+}
+
+static int
+_gr_fmpz_mod_vec_neg(fmpz * res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_neg(res, vec, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_add(res, vec1, vec2, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_mod_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_sub(res, vec1, vec2, len, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
 }
 
 static int
@@ -201,6 +410,20 @@ _gr_fmpz_mod_is_neg_one(const fmpz_t x, const gr_ctx_t ctx)
 {
     truth_t res;
     fmpz_t t;
+    const fmpz * n = FMPZ_MOD_CTX(ctx)->n;
+    ulong xlo, nlo;
+
+    /* x = n - 1 implies x + 1 = n mod 2^FLINT_BITS */
+    xlo = COEFF_IS_MPZ(*x) ? COEFF_TO_PTR(*x)->_mp_d[0] : (ulong) *x;
+    nlo = COEFF_IS_MPZ(*n) ? COEFF_TO_PTR(*n)->_mp_d[0] : (ulong) *n;
+
+    if (xlo + 1 != nlo)
+        return T_FALSE;
+
+    /* for small n this is exact */
+    if (!COEFF_IS_MPZ(*n) && !COEFF_IS_MPZ(*x))
+        return T_TRUE;
+
     fmpz_init(t);
     fmpz_mod_set_si(t, -1, FMPZ_MOD_CTX(ctx));
     res = fmpz_equal(t, x) ? T_TRUE : T_FALSE;
@@ -217,7 +440,21 @@ _gr_fmpz_mod_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 static int
 _gr_fmpz_mod_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    fmpz_set(res, x);
+    if (!COEFF_IS_MPZ(*x))
+    {
+        if (!COEFF_IS_MPZ(*res))
+            *res = *x;
+        else
+            fmpz_set(res, x);
+    }
+    else if (COEFF_IS_MPZ(*res))
+    {
+        mpz_set(COEFF_TO_PTR(*res), COEFF_TO_PTR(*x));
+    }
+    else
+    {
+        fmpz_set(res, x);
+    }
     return GR_SUCCESS;
 }
 
@@ -360,7 +597,7 @@ _gr_fmpz_mod_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
         if (fmpz_is_one(d))
             status = GR_SUCCESS;
         else
-            status = GR_DOMAIN;
+            status = _gr_fmpz_mod_nonunit(x, d, ctx);
 
         fmpz_clear(d);
         return status;
@@ -390,6 +627,10 @@ _gr_fmpz_mod_div_nonunique(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_
     int status;
 
 #if 1
+    if (FMPZ_MOD_PRETEND(ctx) && !fmpz_is_zero(y) && !fmpz_mod_is_invertible(y, FMPZ_MOD_CTX(ctx)) &&
+        _gr_fmpz_mod_nonunit(y, NULL, ctx) == GR_UNABLE)
+        return GR_UNABLE;
+
     status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 #else
     if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE)
@@ -417,6 +658,11 @@ _gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     truth_t res;
     fmpz_t t;
+
+    if (FMPZ_MOD_PRETEND(ctx) && !fmpz_is_zero(x) && !fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)) &&
+        _gr_fmpz_mod_nonunit(x, NULL, ctx) == GR_UNABLE)
+        return T_UNKNOWN;
+
     fmpz_init(t);
     res = fmpz_mod_divides(t, y, x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
     fmpz_clear(t);
@@ -426,7 +672,9 @@ _gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 static truth_t
 _gr_fmpz_mod_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
 {
-    return fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
+    if (fmpz_mod_is_invertible(x, FMPZ_MOD_CTX(ctx)))
+        return T_TRUE;
+    return (_gr_fmpz_mod_nonunit(x, NULL, ctx) == GR_UNABLE) ? T_UNKNOWN : T_FALSE;
 }
 
 static int
@@ -442,50 +690,113 @@ _gr_fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx
     return fmpz_mod_pow_fmpz(res, x, exp, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
+/*
+    A Jacobi symbol, not a square root: a symbol of -1 rules out a square
+    whether or not the modulus is prime, and for a prime it decides.
+*/
+static truth_t
+_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_mod_ctx_struct * mctx = FMPZ_MOD_CTX(ctx);
+    slong n;
+    nn_ptr d, a;
+    int square;
+    TMP_INIT;
+
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+        return T_TRUE;
+
+    if (fmpz_is_even(mctx->n))
+        return T_UNKNOWN;
+
+    n = fmpz_size(mctx->n);
+
+    TMP_START;
+
+    d = TMP_ALLOC((2 * n) * sizeof(ulong));
+    a = d + n;
+
+    fmpz_get_ui_array(d, n, mctx->n);
+    fmpz_get_ui_array(a, n, x);
+
+    square = flint_mpn_is_square_mod(a, d, n);
+
+    TMP_END;
+
+    if (!square)
+        return T_FALSE;
+
+    return (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE) ? T_TRUE : T_UNKNOWN;
+}
+
 static int
 _gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
+    fmpz_mod_ctx_struct * mctx = FMPZ_MOD_CTX(ctx);
+    slong n;
+    nn_ptr d, a, r;
+    nn_srcptr dinv;
+    flint_bitcnt_t norm;
+    int success;
+    TMP_INIT;
+
     if (fmpz_is_zero(x) || fmpz_is_one(x))
     {
         fmpz_set(res, x);
         return GR_SUCCESS;
     }
-    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+
+    /* an even modulus is not prime here, whatever the context claims */
+    if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE || fmpz_is_even(mctx->n))
     {
-        int status = fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
-        /* fmpz_sqrtmod may have set res to an unreduced value on failure */
-        if (status != GR_SUCCESS)
+        /* the Jacobi symbol can still rule a root out */
+        if (_gr_fmpz_mod_is_square(x, ctx) == T_FALSE)
+        {
             fmpz_zero(res);
-        return status;
-    }
-    else
-    {
-        /* todo: implement the general case */
+            return GR_DOMAIN;
+        }
+
         return GR_UNABLE;
     }
-}
 
-static truth_t
-_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
-{
-    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    n = fmpz_size(mctx->n);
+
+    TMP_START;
+
+    d = TMP_ALLOC((3 * n) * sizeof(ulong));
+    a = d + n;
+    r = a + n;
+
+    fmpz_get_ui_array(d, n, mctx->n);
+    fmpz_get_ui_array(a, n, x);
+
+    /* the context only keeps a precomputed inverse for a huge modulus */
+    if (mctx->ninv_huge != NULL && mctx->ninv_huge->n == n)
     {
-        return T_TRUE;
-    }
-    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
-    {
-        fmpz_t t;
-        truth_t ans;
-        fmpz_init(t);
-        ans = fmpz_sqrtmod(t, x, FMPZ_MOD_CTX(ctx)->n) ? T_TRUE : T_FALSE;
-        fmpz_clear(t);
-        return ans;
+        dinv = mctx->ninv_huge->dinv;
+        norm = mctx->ninv_huge->norm;
     }
     else
     {
-        /* todo: implement the general case */
-        return T_UNKNOWN;
+        dinv = NULL;
+        norm = flint_clz(d[n - 1]);
     }
+
+    /* the symbol is computed once, inside */
+    success = flint_mpn_sqrtmod_preinv(r, a, d, n, dinv, norm);
+
+    if (success == 1)
+        fmpz_set_ui_array(res, r, n);
+    else
+        fmpz_zero(res);
+
+    TMP_END;
+
+    if (success == 1)
+        return GR_SUCCESS;
+
+    /* a failure of the algorithm means the modulus is not prime after all */
+    return (success == 0) ? GR_DOMAIN : GR_UNABLE;
 }
 
 static int
@@ -559,10 +870,7 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, n, FMPZ_MOD_CTX(ctx));
-    else
-        _fmpz_mod_poly_mullow(res, poly2, len2, poly1, len1, n, FMPZ_MOD_CTX(ctx));
+    _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, n, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -572,10 +880,7 @@ _gr_fmpz_mod_poly_mulmid(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fmpz_mod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, FMPZ_MOD_CTX(ctx));
-    else
-        _fmpz_mod_poly_mulmid(res, poly2, len2, poly1, len1, nlo, nhi, FMPZ_MOD_CTX(ctx));
+    _fmpz_mod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -640,7 +945,6 @@ _gr_fmpz_mod_poly_inv_series(fmpz * Q, const fmpz * B, slong lenB, slong len, gr
         return _gr_poly_inv_series_newton(Q, B, lenB, len, cutoff, ctx);
 }
 
-/* todo: the fmpz_mod_poly module has better basecase code */
 static int
 _gr_fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, slong len, gr_ctx_t ctx)
 {
@@ -659,6 +963,27 @@ _gr_fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong lenA, const fmpz * 
         return _gr_poly_div_series_basecase(Q, A, lenA, B, lenB, len, ctx);
     else
         return _gr_poly_div_series_newton(Q, A, lenA, B, lenB, len, cutoff, ctx);
+}
+
+/* Newton division with a precomputed inverse beats ordinary division
+   (the generic choice for short moduli) at all lengths, and the generic
+   sparse reduction only wins for very sparse, long moduli (measured) */
+static int
+_gr_fmpz_mod_poly_preinv_set(gr_poly_preinv_struct * P, const fmpz * f, slong lenf, gr_ctx_t ctx)
+{
+    slong i, nz;
+
+    if (lenf > 32)
+    {
+        nz = 0;
+        for (i = 0; i < lenf - 1 && nz <= 2; i++)
+            nz += !fmpz_is_zero(f + i);
+
+        if (nz <= 2)
+            return _gr_poly_preinv_set_sparse(P, f, lenf, ctx);
+    }
+
+    return _gr_poly_preinv_set_newton(P, f, lenf, ctx);
 }
 
 static int _gr_fmpz_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -745,6 +1070,9 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
 static int
 _gr_fmpz_mod_mat_mul(fmpz_mod_mat_t res, const fmpz_mod_mat_t x, const fmpz_mod_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fmpz_mat_mul(res, x, y);
     _fmpz_mod_mat_reduce(res, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;
@@ -819,6 +1147,9 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) _gr_fmpz_mod_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_PRETEND_FIELD,    (gr_funcptr) _gr_fmpz_mod_ctx_is_pretend_field},
+    {GR_METHOD_CTX_SET_IS_PRETEND_FIELD,(gr_funcptr) _gr_fmpz_mod_ctx_set_is_pretend_field},
+    {GR_METHOD_CTX_RECOVER_ZERO_DIVISOR,(gr_funcptr) _gr_fmpz_mod_ctx_recover_zero_divisor},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_mod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_mod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpz_mod_swap},
@@ -862,17 +1193,18 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_fmpz_mod_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
-/*
-    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_mpn_mod_vec_zero},
-    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_mpn_mod_vec_clear},
-    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_mpn_mod_vec_set},
-    {GR_METHOD_VEC_SWAP,        (gr_funcptr) _gr_mpn_mod_vec_swap},
-    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_mpn_mod_vec_zero},
-    {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_mpn_mod_vec_neg},
-    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_mpn_mod_vec_add},
-    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_mpn_mod_vec_sub},
-    {GR_METHOD_VEC_MUL,         (gr_funcptr) _gr_mpn_mod_vec_mul},
-*/
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_fmpz_mod_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_fmpz_mod_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fmpz_mod_vec_set},
+    {GR_METHOD_VEC_SWAP,        (gr_funcptr) _gr_fmpz_mod_vec_swap},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fmpz_mod_vec_zero},
+    {GR_METHOD_VEC_NORMALISE,   (gr_funcptr) _gr_fmpz_mod_vec_normalise},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _gr_fmpz_mod_poly_set_length_normalise},
+    {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_fmpz_mod_vec_neg},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_mod_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_mod_vec_sub},
     {GR_METHOD_VEC_MUL_SCALAR,  (gr_funcptr) _gr_fmpz_mod_vec_mul_scalar},
     {GR_METHOD_SCALAR_MUL_VEC,  (gr_funcptr) _gr_fmpz_mod_scalar_mul_vec},
     {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_fmpz_mod_vec_addmul_scalar},
@@ -880,11 +1212,13 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_mod_poly_mulmid},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
     {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fmpz_mod_poly_gcd},
+    {GR_METHOD_POLY_PREINV_SET, (gr_funcptr) _gr_fmpz_mod_poly_preinv_set},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
@@ -903,6 +1237,8 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
     FMPZ_MOD_CTX(ctx) = flint_malloc(sizeof(fmpz_mod_ctx_struct));
     fmpz_mod_ctx_init(FMPZ_MOD_CTX(ctx), n);
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    FMPZ_MOD_PRETEND(ctx) = 0;
+    FMPZ_MOD_FACTOR(ctx) = NULL;
     fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;
@@ -924,6 +1260,8 @@ _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fctx)
 
     FMPZ_MOD_CTX(ctx) = (fmpz_mod_ctx_struct *) fctx;
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    FMPZ_MOD_PRETEND(ctx) = 0;
+    FMPZ_MOD_FACTOR(ctx) = NULL;
     fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;

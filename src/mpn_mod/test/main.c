@@ -24,6 +24,7 @@
 #include "t-poly_mullow_classical.c"
 #include "t-poly_mullow_fft_small.c"
 #include "t-poly_mullow_karatsuba.c"
+#include "t-sqrt.c"
 
 /* Array of test functions ***************************************************/
 
@@ -42,6 +43,7 @@ test_struct tests[] =
     TEST_FUNCTION(mpn_mod_poly_mullow_classical),
     TEST_FUNCTION(mpn_mod_poly_mullow_fft_small),
     TEST_FUNCTION(mpn_mod_poly_mullow_karatsuba),
+    TEST_FUNCTION(mpn_mod_sqrt),
 };
 
 /* main function *************************************************************/

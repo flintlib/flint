@@ -135,6 +135,34 @@ _flint_mpn_mullow_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     return cy;
 }
 
+#if FLINT_HAVE_FFT_SMALL
+
+mp_limb_t
+_flint_mpn_mullow_n_fft_small(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    mp_ptr tmp;
+    mp_limb_t cy;
+    tmp = flint_malloc(sizeof(mp_limb_t) * (n + 1));
+    flint_mpn_mulmid_fft_small(tmp, u, n, v, n, 0, n + 1);
+    memcpy(res, tmp, sizeof(mp_limb_t) * n);
+    cy = tmp[n];
+    flint_free(tmp);
+    return cy;
+}
+
+mp_limb_t
+_flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    if (n <= FLINT_MPN_MULLOW_MULDERS_CUTOFF)
+        return flint_mpn_mullow_basecase(res, u, v, n);
+    else if (n <= FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF)
+        return _flint_mpn_mullow_n_mulders(res, u, v, n);
+    else
+        return _flint_mpn_mullow_n_fft_small(res, u, v, n);
+}
+
+#else
+
 mp_limb_t
 _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
@@ -145,3 +173,6 @@ _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     else
         return _flint_mpn_mullow_n_mul(res, u, v, n);
 }
+
+#endif
+

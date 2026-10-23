@@ -13,6 +13,8 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
 {
     slong iter;
@@ -24,6 +26,13 @@ TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
         gr_poly_t A, B, Binv, Q, Q2;
 
         gr_ctx_init_random_commutative_ring(ctx, state);
+
+        /* Hack: avoid because of potential blowup */
+        while (ctx->methods == _ca_methods)
+        {
+            gr_ctx_clear(ctx);
+            gr_ctx_init_random_commutative_ring(ctx, state);
+        }
 
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);
@@ -81,6 +90,32 @@ TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
         gr_poly_clear(Q, ctx);
         gr_poly_clear(Q2, ctx);
 
+        gr_ctx_clear(ctx);
+    }
+
+    /* an empty inverse (the caller failed to invert B) is not success */
+    {
+        gr_ctx_t ctx;
+        gr_poly_t A, B, Binv, Q;
+
+        gr_ctx_init_fmpq(ctx);
+        gr_poly_init(A, ctx);
+        gr_poly_init(B, ctx);
+        gr_poly_init(Binv, ctx);
+        gr_poly_init(Q, ctx);
+
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(A, 2, 1, ctx));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(A, 0, 1, ctx));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(B, 1, 1, ctx));
+        GR_MUST_SUCCEED(gr_poly_set_coeff_si(B, 0, 1, ctx));
+
+        if (gr_poly_div_newton_n_preinv(Q, A, B, Binv, ctx) != GR_UNABLE)
+            TEST_FUNCTION_FAIL("lenBinv = 0 must give GR_UNABLE\n");
+
+        gr_poly_clear(A, ctx);
+        gr_poly_clear(B, ctx);
+        gr_poly_clear(Binv, ctx);
+        gr_poly_clear(Q, ctx);
         gr_ctx_clear(ctx);
     }
 

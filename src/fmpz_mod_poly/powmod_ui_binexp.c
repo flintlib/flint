@@ -22,7 +22,7 @@ _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
 {
     gr_ctx_t gr_ctx;
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
-    GR_MUST_SUCCEED(_gr_poly_powmod_ui_binexp(res, poly, e, f, lenf, gr_ctx));
+    GR_MUST_SUCCEED(_gr_poly_powmod_ui_binexp(res, poly, lenf - 1, e, f, lenf, gr_ctx));
 }
 
 

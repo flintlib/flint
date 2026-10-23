@@ -37,6 +37,20 @@ void test_mul(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
         }
 
         mpn_ctx_mpn_mul(R, d, a, an, b, bn);
+
+        /* exact low windows through mul_range (the np2 dispatch) */
+        {
+            ulong hw = 1 + n_randint(state, an + bn);
+            nn_ptr zw = FLINT_ARRAY_ALLOC(hw, ulong);
+            _mpn_ctx_mpn_mul_range(R, zw, 0, hw, a, an, b, bn);
+            if (mpn_cmp(zw, d, hw) != 0)
+            {
+                flint_printf("FAIL: low window: an = %wu, bn = %wu, "
+                             "hw = %wu\n", an, bn, hw);
+                flint_abort();
+            }
+            flint_free(zw);
+        }
         mpn_mul(c, a, an, b, bn);
         for (ulong i = 0; i < an + bn; i++)
         {

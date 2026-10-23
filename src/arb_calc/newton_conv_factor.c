@@ -23,8 +23,9 @@ void arb_calc_newton_conv_factor(arf_t conv_factor,
 
     func(t, conv_region, param, 3, prec);
 
+    /* t + 2 is the Taylor coefficient f''(I) / 2, so no further factor
+       1/2 is needed */
     arb_div(t, t + 2, t + 1, prec);
-    arb_mul_2exp_si(t, t, -1);
 
     arb_get_abs_ubound_arf(conv_factor, t, prec);
 

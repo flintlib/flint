@@ -106,6 +106,8 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
     if (arf_cmp_si(arb_midref(x), 0) > 0
         && arf_cmpabs_mag(arb_midref(x), arb_radref(x)) == 0
         && arb_is_nonnegative(y)) {
+        arb_t t;
+
         /* x is an interval of the form <a +- a>, y is an interval of the form
            <b +- c> with b >= c.
 
@@ -115,17 +117,20 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
            above). So the lowerbound of the result is 0, and the upperbound can
            be found somewhere at (2*a)^y.
 
-           We compute this upperbound by computing z^y with z = <3*a/2 +- a/2>,
+           We compute this upperbound by computing t^y with t = <3*a/2 +- a/2>,
            which has the same upperbound (2*a) as x, then keeping the upper
            bound of this result and setting the lower bound to 0. This
            necessarily drops the precision to MAG_BITS, so we might as well do
            that from the start. */
         prec = (prec > MAG_BITS) ? MAG_BITS : prec;
-        arf_mul_ui(arb_midref(z), arb_midref(x), 3, prec, ARF_RND_UP);
-        arf_mul_2exp_si(arb_midref(z), arb_midref(z), -1);
-        mag_mul_2exp_si(arb_radref(z), arb_radref(x), -1);
+        /* Use a temporary base so that z can alias y. */
+        arb_init(t);
+        arf_mul_ui(arb_midref(t), arb_midref(x), 3, prec, ARF_RND_UP);
+        arf_mul_2exp_si(arb_midref(t), arb_midref(t), -1);
+        mag_mul_2exp_si(arb_radref(t), arb_radref(x), -1);
 
-        arb_pow(z, z, y, prec);
+        arb_pow(z, t, y, prec);
+        arb_clear(t);
 
         /* Now we keep the upper bound of z (we may need to round up) and set the lower bound to
            zero. That is, if currently, z = <zc +/- zr>, we set it to <(zc + zr)/2 +/- (zc +

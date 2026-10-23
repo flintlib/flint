@@ -18,10 +18,10 @@ int nf_elem_is_gen(const nf_elem_t a, const nf_t nf)
       fmpz_t t1, t2;
 	  int is_gen;
 
-	  /* fast path */
+	  /* fast path: the generator is -a0/a1 where pol = a1*x + a0 */
 	  if (fmpz_equal(LNF_ELEM_DENREF(a), nf->pol->coeffs + 1))
-	    return fmpz_cmpabs(LNF_ELEM_DENREF(a), nf->pol->coeffs) == 0
-            && fmpz_sgn(LNF_ELEM_DENREF(a)) == -fmpz_sgn(nf->pol->coeffs);
+	    return fmpz_cmpabs(LNF_ELEM_NUMREF(a), nf->pol->coeffs) == 0
+            && fmpz_sgn(LNF_ELEM_NUMREF(a)) == -fmpz_sgn(nf->pol->coeffs);
 
 	  /* slow path */
 	  fmpz_init(t1);

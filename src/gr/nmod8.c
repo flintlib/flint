@@ -16,6 +16,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
 
@@ -34,12 +35,25 @@ nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return status;
 }
 
-/* todo: n_is_prime is fast, but this should still be cached
-   or use a fixed table lookup */
+/* the context has the layout of _gr_nmod_ctx_struct (see nmod.h): as for
+   nmod, a primality flag set with gr_ctx_set_is_field is used if known;
+   otherwise the modulus is tested with n_is_prime on each call */
+#define NMOD8_IS_PRIME(ring_ctx) NMOD_IS_PRIME(ring_ctx)
+
 static truth_t
 nmod8_ctx_is_field(const gr_ctx_t ctx)
 {
+    if (NMOD8_IS_PRIME(ctx) != T_UNKNOWN)
+        return NMOD8_IS_PRIME(ctx);
+
     return n_is_prime(NMOD8_CTX(ctx).n) ? T_TRUE : T_FALSE;
+}
+
+static int
+nmod8_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
+{
+    NMOD8_IS_PRIME(ctx) = is_field;
+    return GR_SUCCESS;
 }
 
 static void
@@ -351,6 +365,18 @@ _nmod8_vec_init(uint8_t * res, slong len, gr_ctx_t ctx)
 static void
 _nmod8_vec_clear(uint8_t * res, slong len, gr_ctx_t ctx)
 {
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_nmod8_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    uint8_t * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
 }
 
 static int
@@ -808,12 +834,27 @@ _nmod8_poly_mullow(uint8_t * res, const uint8_t * A, slong Alen, const uint8_t *
     return _nmod8_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
 }
 
-/* todo: tuning for rectangular matrices */
+#include "nmod_mat.h"
+
 static int
 _nmod8_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
-        return gr_mat_mul_strassen(C, A, B, ctx);
+    slong ar, ac, bc;
+
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+        return GR_DOMAIN;
+
+    ar = gr_mat_nrows(A, ctx);
+    ac = gr_mat_ncols(A, ctx);
+    bc = gr_mat_ncols(B, ctx);
+
+    if (ar >= 8 && ac >= 8 && bc >= 8)
+    {
+        _nmod_mat_mul_u8(C->entries, C->stride, A->entries, A->stride, B->entries, B->stride,
+            ar, ac, bc, NMOD8_CTX(ctx));
+
+        return GR_SUCCESS;
+    }
     else
         return gr_mat_mul_classical(C, A, B, ctx);
 }
@@ -832,6 +873,20 @@ _nmod8_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     return _gr_mat_charpoly_berkowitz(res, mat, ctx);
 }
 
+static int
+_nmod8_mat_det(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (mat->r <= 4)
+        return gr_mat_det_cofactor(res, mat, ctx);
+
+    if (gr_mat_det_lu(res, mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    /* fall back on a division-free algorithm if a pivot was not
+       invertible (composite modulus) */
+    return gr_mat_det_berkowitz(res, mat, ctx);
+}
+
 int _nmod8_methods_initialized = 0;
 
 gr_static_method_table _nmod8_methods;
@@ -843,6 +898,9 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod8_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) nmod8_ctx_is_field},
+    {GR_METHOD_CTX_SET_IS_FIELD,        (gr_funcptr) nmod8_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+                                        (gr_funcptr) nmod8_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
@@ -886,6 +944,9 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod8_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod8_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod8_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},
@@ -901,9 +962,11 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod8_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod8_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod8_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod8_mat_charpoly},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _nmod8_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -921,6 +984,7 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, ulong n)
     ctx->size_limit = WORD_MAX;
 
     nmod_init(NMOD8_CTX_REF(ctx), n);
+    NMOD8_IS_PRIME(ctx) = T_UNKNOWN;
 
     ctx->methods = _nmod8_methods;
 

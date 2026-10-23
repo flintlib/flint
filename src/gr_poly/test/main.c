@@ -17,9 +17,11 @@
 #include "t-compose_divconquer.c"
 #include "t-compose_horner.c"
 #include "t-compose_mod.c"
+#include "t-compose_mod_brent_kung_vec_preinv.c"
 #include "t-compose_mod_precomp_preinv.c"
 #include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
+#include "t-deflate_inflate.c"
 #include "t-dispersion.c"
 #include "t-div_basecase.c"
 #include "t-div.c"
@@ -41,7 +43,12 @@
 #include "t-evaluate_rectangular.c"
 #include "t-evaluate_vec_fast.c"
 #include "t-exp_series.c"
+#include "t-factor_distinct_deg.c"
+#include "t-factor_finite_field.c"
+#include "t-factor_threaded.c"
 #include "t-factor_squarefree.c"
+#include "t-is_irreducible.c"
+#include "t-roots_finite_field.c"
 #include "t-gcd.c"
 #include "t-gcd_euclidean.c"
 #include "t-gcd_hgcd.c"
@@ -71,12 +78,16 @@
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
 #include "t-pow_ui.c"
+#include "t-powmod_misc.c"
+#include "t-preinv.c"
 #include "t-product_roots.c"
 #include "t-rem.c"
 #include "t-refine_roots.c"
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
+#include "t-resultant_modular.c"
+#include "t-resultant_multipoint.c"
 #include "t-resultant_subresultant.c"
 #include "t-resultant_sylvester.c"
 #include "t-revert_series.c"
@@ -110,9 +121,11 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose_divconquer),
     TEST_FUNCTION(gr_poly_compose_horner),
     TEST_FUNCTION(gr_poly_compose_mod),
+    TEST_FUNCTION(gr_poly_compose_mod_brent_kung_vec_preinv),
     TEST_FUNCTION(gr_poly_compose_mod_precomp_preinv),
     TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
+    TEST_FUNCTION(gr_poly_deflate_inflate),
     TEST_FUNCTION(gr_poly_dispersion),
     TEST_FUNCTION(gr_poly_div_basecase),
     TEST_FUNCTION(gr_poly_div),
@@ -134,7 +147,12 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_evaluate_rectangular),
     TEST_FUNCTION(gr_poly_evaluate_vec_fast),
     TEST_FUNCTION(gr_poly_exp_series),
+    TEST_FUNCTION(gr_poly_factor_distinct_deg),
+    TEST_FUNCTION(gr_poly_factor_finite_field),
+    TEST_FUNCTION(gr_poly_factor_threaded),
     TEST_FUNCTION(gr_poly_factor_squarefree),
+    TEST_FUNCTION(gr_poly_is_irreducible),
+    TEST_FUNCTION(gr_poly_roots_finite_field),
     TEST_FUNCTION(gr_poly_gcd),
     TEST_FUNCTION(gr_poly_gcd_euclidean),
     TEST_FUNCTION(gr_poly_gcd_hgcd),
@@ -164,12 +182,16 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
     TEST_FUNCTION(gr_poly_pow_ui),
+    TEST_FUNCTION(gr_poly_powmod_misc),
+    TEST_FUNCTION(gr_poly_preinv),
     TEST_FUNCTION(gr_poly_product_roots),
     TEST_FUNCTION(gr_poly_refine_roots),
     TEST_FUNCTION(gr_poly_rem),
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
+    TEST_FUNCTION(gr_poly_resultant_modular),
+    TEST_FUNCTION(gr_poly_resultant_multipoint),
     TEST_FUNCTION(gr_poly_resultant_subresultant),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
     TEST_FUNCTION(gr_poly_revert_series),

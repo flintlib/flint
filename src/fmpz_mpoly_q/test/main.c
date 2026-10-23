@@ -17,6 +17,15 @@
 #include "t-div.c"
 #include "t-div_fmpq.c"
 #include "t-div_fmpz.c"
+#include "t-factored_add.c"
+#include "t-factored_canonicalise.c"
+#include "t-factored_div.c"
+#include "t-factored_get_set_str.c"
+#include "t-factored_inv.c"
+#include "t-factored_mul.c"
+#include "t-factored_pow.c"
+#include "t-factored_scalar.c"
+#include "t-factored_sub.c"
 #include "t-get_set_str.c"
 #include "t-inv.c"
 #include "t-mul.c"
@@ -37,6 +46,15 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mpoly_q_div),
     TEST_FUNCTION(fmpz_mpoly_q_div_fmpq),
     TEST_FUNCTION(fmpz_mpoly_q_div_fmpz),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_add),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_canonicalise),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_div),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_get_set_str),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_inv),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_mul),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_pow),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_scalar),
+    TEST_FUNCTION(fmpz_mpoly_q_factored_sub),
     TEST_FUNCTION(fmpz_mpoly_q_get_set_str),
     TEST_FUNCTION(fmpz_mpoly_q_inv),
     TEST_FUNCTION(fmpz_mpoly_q_mul),

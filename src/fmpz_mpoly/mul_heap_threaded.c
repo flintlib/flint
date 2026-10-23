@@ -242,12 +242,7 @@ static slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * 
             x->j = start[i];
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], Bexp + x->i*N,
-                                                       Cexp + x->j*N, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexp + x->i*N,
-                                                          Cexp + x->j*N, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + x->i*N, Cexp + x->j*N, N, bits);
 
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -330,12 +325,7 @@ static slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * 
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + x->i*N,
-                                                           Cexp + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + x->i*N,
-                                                              Cexp + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + x->i*N, Cexp + x->j*N, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -356,12 +346,7 @@ static slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * 
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + x->i*N,
-                                                           Cexp + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + x->i*N,
-                                                              Cexp + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + x->i*N, Cexp + x->j*N, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -825,9 +810,7 @@ void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(
     exp_bits = FLINT_MAX(exp_bits, C->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     freeBexp = 0;
@@ -912,7 +895,7 @@ void fmpz_mpoly_mul_heap_threaded(
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
-    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
+    slong thread_limit = FLINT_MIN(B->length, C->length)/16;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)

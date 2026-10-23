@@ -21,6 +21,11 @@ _acb_poly_mullow(acb_ptr res,
     {
         acb_mul(res, poly1, poly2, prec);
     }
+    else if (_acb_poly_mulmid_use_fmpzi(len1, len2, 0, n, prec, poly1 == poly2 && len1 == len2) &&
+             _acb_poly_mulmid_fmpzi(res, poly1, len1, poly2, len2, 0, n, prec))
+    {
+        /* well-scaled input: one Gaussian integer product */
+    }
     else if (n <= 7 || len1 <= 7 || len2 <= 7)
     {
         _acb_poly_mullow_classical(res, poly1, len1, poly2, len2, n, prec);

@@ -10,6 +10,7 @@
 */
 
 #include "fft_small.h"
+#include "butterflies.h"
 
 /*
     This module contains the function `sd_fft_trunc` to compute a truncated FFT,
@@ -201,6 +202,8 @@
         } while (i += N, i < BLK_SZ);
 
     The `PARAM` macro defines local variables used by the corresponding `MOTH` macro.
+    Most `MOTH` macros and register basecases (`LENGTH*`) are defined in
+    butterflies.h, where they are shared with sd_ifft_tr.c.
 
     The first argument `V` is usually `VECND` = `vec8d`. This means each `MOTH`
     macro invocation transforms `N = 8` entries from each `X*` argument,
@@ -232,15 +235,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_FORWARD_MOTH_J_IS_Z(V, X0, X1) \
-{ \
-    V x0, x1; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, reduce_to_pm1n)(x1, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
-    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
-}
+    SD_DIT2_MOTH_J_IS_Z(V, X0, X1)
 
 #define RADIX_2_FORWARD_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
     V w = CAT(V, set_d)(Q->w2tab[j_bits][j_r]); \
@@ -248,15 +243,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_FORWARD_MOTH_J_IS_NZ(V, X0, X1) \
-{ \
-    V x0, x1; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
-    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
-    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
-}
+    SD_DIT2_MOTH_J_IS_NZ(V, mulmod_fast, w, X0, X1)
 
 /**************** forward butterfly with truncation **************************/
 
@@ -276,7 +263,7 @@
     x0 = CAT(V, load)(X0); \
     x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
     x1 = CAT(V, load)(X1); \
-    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
+    x1 = CAT(V, mulmod_fast)(x1, w, n, ninv); \
     CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
 }
 
@@ -295,30 +282,7 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_FORWARD_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    x2 = CAT(V, reduce_to_pm1n)(x2, n, ninv); \
-    x3 = CAT(V, reduce_to_pm1n)(x3, n, ninv); \
-    y0 = CAT(V, add)(x0, x2); \
-    y1 = CAT(V, add)(x1, x3); \
-    y2 = CAT(V, sub)(x0, x2); \
-    y3 = CAT(V, sub)(x1, x3); \
-    y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
-    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
-    x0 = CAT(V, add)(y0, y1); \
-    x1 = CAT(V, sub)(y0, y1); \
-    x2 = CAT(V, add)(y2, y3); \
-    x3 = CAT(V, sub)(y2, y3); \
-    CAT(V, store)(X0, x0); \
-    CAT(V, store)(X1, x1); \
-    CAT(V, store)(X2, x2); \
-    CAT(V, store)(X3, x3); \
-}
+    SD_DIT4_MOTH_J_IS_Z(V, mulmod_fast, iw, X0, X1, X2, X3)
 
 #define RADIX_4_FORWARD_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
     FLINT_ASSERT(j_bits > 0); \
@@ -329,117 +293,23 @@
     V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_FORWARD_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
-{ \
-    V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = CAT(V, load)(X0); \
-    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
-    x1 = CAT(V, load)(X1); \
-    x2 = CAT(V, load)(X2); \
-    x3 = CAT(V, load)(X3); \
-    x2 = CAT(V, mulmod)(x2, w2, n, ninv); \
-    x3 = CAT(V, mulmod)(x3, w2, n, ninv); \
-    y0 = CAT(V, add)(x0, x2); \
-    y1 = CAT(V, add)(x1, x3); \
-    y2 = CAT(V, sub)(x0, x2); \
-    y3 = CAT(V, sub)(x1, x3); \
-    y1 = CAT(V, mulmod)(y1, w, n, ninv); \
-    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
-    x0 = CAT(V, add)(y0, y1); \
-    x1 = CAT(V, sub)(y0, y1); \
-    x2 = CAT(V, add)(y2, y3); \
-    x3 = CAT(V, sub)(y2, y3); \
-    CAT(V, store)(X0, x0); \
-    CAT(V, store)(X1, x1); \
-    CAT(V, store)(X2, x2); \
-    CAT(V, store)(X3, x3); \
-}
+    SD_DIT4_MOTH_J_IS_NZ(V, mulmod_fast, w2, w, iw, X0, X1, X2, X3)
 
-#define LENGTH4_ANY_J(T, x0, x1, x2, x3, n, ninv, w2, w, iw) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X2 = CAT(T, mulmod)(X2, w2, n, ninv); \
-    X3 = CAT(T, mulmod)(X3, w2, n, ninv); \
-    Y0 = CAT(T, add)(X0, X2); \
-    Y1 = CAT(T, add)(X1, X3); \
-    Y2 = CAT(T, sub)(X0, X2); \
-    Y3 = CAT(T, sub)(X1, X3); \
-    Y1 = CAT(T, mulmod)(Y1, w, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, iw, n, ninv); \
-    x0 = CAT(T, add)(Y0, Y1); \
-    x1 = CAT(T, sub)(Y0, Y1); \
-    x2 = CAT(T, add)(Y2, Y3); \
-    x3 = CAT(T, sub)(Y2, Y3); \
-}
+#define LENGTH4_ANY_J(T, ...) SD_DIT_LENGTH4_ANY_J(T, mulmod_fast, __VA_ARGS__)
 
-#define LENGTH4_ZERO_J(T, x0, x1, x2, x3, n, ninv, e14) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
-    X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X2 = CAT(T, reduce_to_pm1n)(X2, n, ninv); \
-    X3 = CAT(T, reduce_to_pm1n)(X3, n, ninv); \
-    Y0 = CAT(T, add)(X0, X2); \
-    Y1 = CAT(T, add)(X1, X3); \
-    Y2 = CAT(T, sub)(X0, X2); \
-    Y3 = CAT(T, sub)(X1, X3); \
-    Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, e14, n, ninv); \
-    x0 = CAT(T, add)(Y0, Y1); \
-    x1 = CAT(T, sub)(Y0, Y1); \
-    x2 = CAT(T, add)(Y2, Y3); \
-    x3 = CAT(T, sub)(Y2, Y3); \
-}
+#define LENGTH4_ZERO_J(T, ...) SD_DIT_LENGTH4_ZERO_J(T, mulmod_fast, __VA_ARGS__)
 
 /* A 3-layer transform. */
 
-#define LENGTH8_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w2, w, iw, ww0, ww1, ww2, ww3) \
-{ \
-    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, X6 = x6, X7 = x7; \
-    T Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7, Z0, Z1, Z2, Z3, Z4, Z5, Z6, Z7; \
-    X0 = CAT(T, reduce_to_pm1n)(X0, n, ninv); \
-    X1 = CAT(T, reduce_to_pm1n)(X1, n, ninv); \
-    X4 = CAT(T, mulmod)(X4, w2, n, ninv); \
-    X5 = CAT(T, mulmod)(X5, w2, n, ninv); \
-    X6 = CAT(T, mulmod)(X6, w2, n, ninv); \
-    X7 = CAT(T, mulmod)(X7, w2, n, ninv); \
-    Y0 = CAT(T, add)(X0, X4); \
-    Y1 = CAT(T, add)(X1, X5); \
-    Y2 = CAT(T, add)(X2, X6); \
-    Y3 = CAT(T, add)(X3, X7); \
-    Y4 = CAT(T, sub)(X0, X4); \
-    Y5 = CAT(T, sub)(X1, X5); \
-    Y6 = CAT(T, sub)(X2, X6); \
-    Y7 = CAT(T, sub)(X3, X7); \
-    Y2 = CAT(T, mulmod)(Y2, w, n, ninv); \
-    Y3 = CAT(T, mulmod)(Y3, w, n, ninv); \
-    Y6 = CAT(T, mulmod)(Y6, iw, n, ninv); \
-    Y7 = CAT(T, mulmod)(Y7, iw, n, ninv); \
-    Z0 = CAT(T, add)(Y0, Y2); \
-    Z1 = CAT(T, add)(Y1, Y3); \
-    Z2 = CAT(T, sub)(Y0, Y2); \
-    Z3 = CAT(T, sub)(Y1, Y3); \
-    Z4 = CAT(T, add)(Y4, Y6); \
-    Z5 = CAT(T, add)(Y5, Y7); \
-    Z6 = CAT(T, sub)(Y4, Y6); \
-    Z7 = CAT(T, sub)(Y5, Y7); \
-    Z0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
-    Z1 = CAT(T, mulmod)(Z1, ww0, n, ninv); \
-    Z2 = CAT(T, reduce_to_pm1n)(Z2, n, ninv); \
-    Z3 = CAT(T, mulmod)(Z3, ww1, n, ninv); \
-    Z4 = CAT(T, reduce_to_pm1n)(Z4, n, ninv); \
-    Z5 = CAT(T, mulmod)(Z5, ww2, n, ninv); \
-    Z6 = CAT(T, reduce_to_pm1n)(Z6, n, ninv); \
-    Z7 = CAT(T, mulmod)(Z7, ww3, n, ninv); \
-    x0 = CAT(T, add)(Z0, Z1); \
-    x1 = CAT(T, sub)(Z0, Z1); \
-    x2 = CAT(T, add)(Z2, Z3); \
-    x3 = CAT(T, sub)(Z2, Z3); \
-    x4 = CAT(T, add)(Z4, Z5); \
-    x5 = CAT(T, sub)(Z4, Z5); \
-    x6 = CAT(T, add)(Z6, Z7); \
-    x7 = CAT(T, sub)(Z6, Z7); \
-}
+#define LENGTH8_ANY_J(T, ...) SD_DIT_LENGTH8_ANY_J(T, mulmod_fast, __VA_ARGS__)
 
+/*
+    x0 and x1 are sums of four outputs of reduce_to_pm1n: in (-4n, 4n) by
+    its documented range, in fact within 2n + 8. In sd_fft_basecase_5_1 the
+    next layer accepts (-4n, 4n); in sd_fft_basecase_3_1 they are outputs,
+    within the range (-3n, 3n) of sd_fft_trunc only by the actual range of
+    reduce_to_pm1n (see the forward analysis in mulmod_satisfies_bounds.c).
+*/
 #define LENGTH8_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, e14, e18, e38) \
 { \
     T X0 = x0, X1 = x1, X2 = x2, X3 = x3, X4 = x4, X5 = x5, X6 = x6, X7 = x7; \
@@ -456,17 +326,17 @@
     Z1 = CAT(T, add)(Y1, Y3); \
     Z2 = CAT(T, sub)(Y0, Y2); \
     Z3 = CAT(T, sub)(Y1, Y3); \
-    Y6 = CAT(T, mulmod)(e14, Y6, n, ninv); \
-    Y7 = CAT(T, mulmod)(e14, Y7, n, ninv); \
+    Y6 = CAT(T, mulmod_fast)(e14, Y6, n, ninv); \
+    Y7 = CAT(T, mulmod_fast)(e14, Y7, n, ninv); \
     Z4 = CAT(T, add)(Y4, Y6); \
     Z5 = CAT(T, add)(Y5, Y7); \
     Z6 = CAT(T, sub)(Y4, Y6); \
     Z7 = CAT(T, sub)(Y5, Y7); \
     x0 = CAT(T, add)(Z0, Z1); \
     x1 = CAT(T, sub)(Z0, Z1); \
-    Z3 = CAT(T, mulmod)(e14, Z3, n, ninv); \
-    Z5 = CAT(T, mulmod)(e18, Z5, n, ninv); \
-    Z7 = CAT(T, mulmod)(e38, Z7, n, ninv); \
+    Z3 = CAT(T, mulmod_fast)(e14, Z3, n, ninv); \
+    Z5 = CAT(T, mulmod_fast)(e18, Z5, n, ninv); \
+    Z7 = CAT(T, mulmod_fast)(e38, Z7, n, ninv); \
     x2 = CAT(T, add)(Z2, Z3); \
     x3 = CAT(T, sub)(Z2, Z3); \
     x4 = CAT(T, add)(Z4, Z5); \
@@ -800,7 +670,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
         y1 = VECNOP(reduce_to_pm1n)(y1, n, ninv); \
-        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
+        y3 = VECNOP(mulmod_fast)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \
@@ -825,15 +695,15 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
         if (0 < itrunc) x0 = VECNOP(reduce_to_pm1n)(x0, n, ninv); \
         if (1 < itrunc) x1 = VECNOP(load)(X1+i); \
         if (2 < itrunc) x2 = VECNOP(load)(X2+i); \
-        if (2 < itrunc) x2 = VECNOP(mulmod)(x2, w2, n, ninv); \
+        if (2 < itrunc) x2 = VECNOP(mulmod_fast)(x2, w2, n, ninv); \
         if (3 < itrunc) x3 = VECNOP(load)(X3+i); \
-        if (3 < itrunc) x3 = VECNOP(mulmod)(x3, w2, n, ninv); \
+        if (3 < itrunc) x3 = VECNOP(mulmod_fast)(x3, w2, n, ninv); \
         y0 = (2 < itrunc) ? VECNOP(add)(x0, x2) : x0; \
         y1 = (3 < itrunc) ? VECNOP(add)(x1, x3) : x1; \
         y2 = (2 < itrunc) ? VECNOP(sub)(x0, x2) : x0; \
         y3 = (3 < itrunc) ? VECNOP(sub)(x1, x3) : x1; \
-        y1 = VECNOP(mulmod)(y1, w, n, ninv); \
-        y3 = VECNOP(mulmod)(y3, iw, n, ninv); \
+        y1 = VECNOP(mulmod_fast)(y1, w, n, ninv); \
+        y3 = VECNOP(mulmod_fast)(y3, iw, n, ninv); \
         x0 = VECNOP(add)(y0, y1); \
         x1 = VECNOP(sub)(y0, y1); \
         x2 = VECNOP(add)(y2, y3); \
@@ -1224,8 +1094,18 @@ are zero.
 The output satisfies
     eval_poly(in_data, sd_fft_ctx_w(Q, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
 for all `0 <= i < otrunc`. This invariant is tested in `test/t-sd_fft.c`.
-Usually, it only makes sense to have `otrunc >= itrunc` and `n_max(itrunc, otrunc) >= 2^(L-1)`.
+
+Any `1 <= itrunc, otrunc <= 2^L` is allowed. The evaluation points do not
+depend on `L`: if `n_max(itrunc, otrunc) <= 2^(L-1)`, the result is that of
+depth `L - 1`, at about the same cost, so it usually only makes sense to have
+`max(itrunc, otrunc) >= 2^(L-1)`. Recovering the input with `sd_ifft_trunc`
+requires `otrunc >= itrunc`. For `L <= LG_BLK_SZ` the entries from `itrunc` on
+are set to zero and all `2^L` outputs are computed; for larger `L` both
+truncations are rounded up to multiples of `BLK_SZ`.
+
 The array `d` needs to have size at least `2^L`.
+The input entries must be in (-3n, 3n), with n = Q->p, and so are the output
+entries; see mulmod_satisfies_bounds.c.
 */
 void sd_fft_trunc(
     sd_fft_ctx_t Q,

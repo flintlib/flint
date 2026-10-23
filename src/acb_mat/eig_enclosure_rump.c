@@ -219,6 +219,22 @@ partition_X_trivial(slong * u, slong * v, const acb_mat_t X, slong prec)
         v[i] = n - k + i;
 }
 
+/* whether every entry of B lies in the interior of the corresponding
+   entry of A (Rump's theorem requires the image of the inflated
+   enclosure to lie in its interior) */
+static int
+_acb_mat_contains_interior(const acb_mat_t A, const acb_mat_t B)
+{
+    slong i, j;
+
+    for (i = 0; i < acb_mat_nrows(A); i++)
+        for (j = 0; j < acb_mat_ncols(A); j++)
+            if (!acb_contains_interior(acb_mat_entry(A, i, j), acb_mat_entry(B, i, j)))
+                return 0;
+
+    return 1;
+}
+
 void
 acb_mat_eig_enclosure_rump(acb_t lambda, acb_mat_t J, acb_mat_t X, const acb_mat_t A,
     const acb_t lambda_approx, const acb_mat_t X_approx, slong prec)
@@ -332,7 +348,7 @@ acb_mat_eig_enclosure_rump(acb_t lambda, acb_mat_t J, acb_mat_t X, const acb_mat
         acb_mat_add(Y, Y, UY, prec);
         acb_mat_add(Y, Y, Y0, prec);
 
-        if (acb_mat_contains(Yeps, Y))
+        if (_acb_mat_contains_interior(Yeps, Y))
         {
             acb_get_mid(lambda, lambda_approx);
 

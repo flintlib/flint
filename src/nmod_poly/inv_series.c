@@ -28,6 +28,46 @@ _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slo
     {
         _nmod_vec_zero(Qinv + 1, n - 1);
     }
+    else if (Qlen == 2 || _nmod_vec_is_zero(Q + 1, Qlen - 2))
+    {
+        /* Binomial Q = Q[0] + c x^step: 1/Q = q sum_k t^k x^(k step) with
+           t = -c q. The first B powers are computed serially; later blocks
+           are obtained by scalar multiplication by t^B, which avoids the
+           latency of a serial chain of multiplications. */
+        slong i, k, K, B, step = Qlen - 1;
+        ulong t, tB;
+
+        t = nmod_neg(nmod_mul(q, Q[step], mod), mod);
+        K = (n + step - 1) / step;
+        B = FLINT_MIN(K, 32);
+
+        /* Qinv[k] = q t^k for 0 <= k < K */
+        for (k = 1; k < B; k++)
+            Qinv[k] = nmod_mul(Qinv[k - 1], t, mod);
+
+        if (K > B)
+        {
+            /* t^B = Qinv[B - 1] t / q, and 1/q = Q[0] */
+            tB = nmod_mul(Qinv[B - 1], t, mod);
+            if (Q[0] != 1)
+                tB = nmod_mul(tB, Q[0], mod);
+            for (k = B; k < K; k += B)
+                _nmod_vec_scalar_mul_nmod(Qinv + k, Qinv + k - B, FLINT_MIN(B, K - k), tB, mod);
+        }
+
+        /* spread out to Qinv[k step] */
+        if (step > 1)
+        {
+            for (k = K - 1; k >= 1; k--)
+            {
+                Qinv[k * step] = Qinv[k];
+                for (i = k * step + 1; i < FLINT_MIN(n, (k + 1) * step); i++)
+                    Qinv[i] = 0;
+            }
+            for (i = 1; i < FLINT_MIN(n, step); i++)
+                Qinv[i] = 0;
+        }
+    }
     else
     {
         slong i, l;

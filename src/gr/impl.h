@@ -39,6 +39,8 @@ int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
 
 int _gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx);
 
+int _gr_acb_dirichlet_beta_prec(acb_t res, const acb_t x, slong prec);
+int _gr_acb_dedekind_eta_q_prec(acb_t res, const acb_t q, slong prec);
 int _gr_acb_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
 
 int _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);

@@ -28,10 +28,7 @@
 #include "t-compose.c"
 #include "t-compose_mod_brent_kung.c"
 #include "t-compose_mod_brent_kung_precomp_preinv.c"
-#include "t-compose_mod_brent_kung_precomp_preinv_threaded.c"
 #include "t-compose_mod_brent_kung_preinv.c"
-#include "t-compose_mod_brent_kung_vec_preinv.c"
-#include "t-compose_mod_brent_kung_vec_preinv_threaded.c"
 #include "t-compose_mod.c"
 #include "t-compose_mod_horner.c"
 #include "t-deflate_deflation_inflate.c"
@@ -105,10 +102,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_compose),
     TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung),
     TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv),
-    TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_threaded),
     TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung_preinv),
-    TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung_vec_preinv),
-    TEST_FUNCTION(fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded),
+
     TEST_FUNCTION(fmpz_mod_poly_compose_mod),
     TEST_FUNCTION(fmpz_mod_poly_compose_mod_horner),
     TEST_FUNCTION(fmpz_mod_poly_deflate_deflation_inflate),

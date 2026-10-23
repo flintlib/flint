@@ -199,9 +199,7 @@ void gr_mpoly_sort_terms(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
     TMP_INIT;
 
     TMP_START;
-    N = mpoly_words_per_exp(A->bits, mctx);
-    ptempexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(ptempexp, N, A->bits, mctx);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(ptempexp, N, A->bits, mctx);
 
     himask = 0;
     for (i = 0; i < A->length; i++)

@@ -21,6 +21,7 @@
 #include "t-exp.c"
 #include "t-exp_taylor_sum.c"
 #include "t-frobenius_norm.c"
+#include "t-hilbert.c"
 #include "t-inv.c"
 #include "t-inv_cho_precomp.c"
 #include "t-inv_ldl_precomp.c"
@@ -32,6 +33,7 @@
 #include "t-mul_entrywise.c"
 #include "t-mul_threaded.c"
 #include "t-pascal.c"
+#include "t-pow_ui.c"
 #include "t-solve.c"
 #include "t-solve_cho_precomp.c"
 #include "t-solve_ldl_precomp.c"
@@ -64,6 +66,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_mat_exp),
     TEST_FUNCTION(arb_mat_exp_taylor_sum),
     TEST_FUNCTION(arb_mat_frobenius_norm),
+    TEST_FUNCTION(arb_mat_hilbert),
     TEST_FUNCTION(arb_mat_inv),
     TEST_FUNCTION(arb_mat_inv_cho_precomp),
     TEST_FUNCTION(arb_mat_inv_ldl_precomp),
@@ -75,6 +78,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_mat_mul_entrywise),
     TEST_FUNCTION(arb_mat_mul_threaded),
     TEST_FUNCTION(arb_mat_pascal),
+    TEST_FUNCTION(arb_mat_pow_ui),
     TEST_FUNCTION(arb_mat_solve),
     TEST_FUNCTION(arb_mat_solve_cho_precomp),
     TEST_FUNCTION(arb_mat_solve_ldl_precomp),

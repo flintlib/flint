@@ -104,7 +104,7 @@ RADIX_INLINE ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
     while (n > 0 && x[n - 1] == 0)
         n--;
 
-    return (n == 0) ? 0 : _radix_size_digits_1(x[n - 1], radix);
+    return (n == 0) ? 0 : _radix_size_digits(x, n, radix);
 }
 
 RADIX_INLINE ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
@@ -161,16 +161,124 @@ void radix_mulmid_classical(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slon
 void radix_mulmid_KS(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_naive(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 
+/* Number of pairs (i, j) with 0 <= i < an, 0 <= j < bn and i + j < k;
+   this counts the limb products the classical algorithm performs. It is
+   computed in floating point since it can exceed the range of an slong on
+   32-bit systems (and it is only used for tuning decisions). */
+RADIX_INLINE double
+_radix_mulmid_pairs_below(slong an, slong bn, slong k)
+{
+    double a, b, t;
+
+    if (an < bn)
+        FLINT_SWAP(slong, an, bn);
+
+    a = (double) an;
+    b = (double) bn;
+
+    if (k <= 0)
+        return 0.0;
+    if (k <= bn)
+        return (double) k * ((double) k + 1.0) * 0.5;
+    if (k <= an)
+        return b * (b + 1.0) * 0.5 + ((double) k - b) * b;
+    if (k >= an + bn)
+        return a * b;
+    t = (double) (an + bn - k);
+    return a * b - t * (t + 1.0) * 0.5;
+}
+
+/* Tuning: the classical algorithm costs about one unit per limb product
+   while the FFT (or Kronecker) algorithm costs roughly a constant number
+   of units per input limb regardless of the requested slice. The ratio
+   is the measured crossover [*]; a
+   truncated product (a high product for a floating-point multiplication,
+   or a product with a short operand) needs proportionally fewer limb
+   products and stays classical for longer. With fft_small, the input
+   limbs are counted as radix_mulmid_fft_small uses them, see
+   _radix_mulmid_fft_length.
+
+  [*] with fft_small, it is the same for balanced full products, Newton
+  middle products and short slices of a long operand, but depends on the
+  machine (50 on Zen 4, 60 on Ice Lake and Sapphire Rapids, 80 on Cascade
+  Lake, 85 on Apple M4), hence the parameter
+  FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO, which every flint-mparam.h
+  must define
+   */
+#ifndef FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO
+# error "flint-mparam.h must define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO"
+#endif
+#if FLINT_HAVE_FFT_SMALL
+#define RADIX_MULMID_FFT_CUTOFF_RATIO FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO
+#else
+/* Kronecker substitution pads each limb to two words, so the crossover
+   is much later (about 350 limbs for a balanced full product). */
+#define RADIX_MULMID_FFT_CUTOFF_RATIO 175
+#endif
+
+/* The length of the convolution radix_mulmid_fft_small computes for the
+   slice [lo, hi): the operands lose their limbs above hi and the low limbs
+   which only meet the other operand below lo, and a slice shorter than
+   the longer operand is computed as a transposed product, at the cost of
+   a product of the shorter operand and the slice. */
+RADIX_INLINE slong
+_radix_mulmid_fft_length(slong an, slong bn, slong lo, slong hi)
+{
+    slong t;
+
+    an = FLINT_MIN(an, hi);
+    bn = FLINT_MIN(bn, hi);
+    hi = FLINT_MIN(hi, an + bn - 1);
+
+    if (lo >= hi)
+        return 0;
+
+    t = lo - (bn - 1);
+    if (t > 0)
+    {
+        an -= t;
+        lo -= t;
+        hi -= t;
+    }
+
+    t = lo - (an - 1);
+    if (t > 0)
+    {
+        bn -= t;
+        lo -= t;
+        hi -= t;
+    }
+
+    if (hi - lo < FLINT_MAX(an, bn))
+        return FLINT_MIN(an, bn) + (hi - lo);
+    else
+        return an + bn;
+}
+
 RADIX_INLINE void
 radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix)
 {
-    /* todo: tuning */
+    double work;
+
     if (FLINT_MIN(an, bn) < 80 || hi - lo < 80)
+    {
+        radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
+        return;
+    }
+
+    /* limb products needed for the slice, including the ones just
+       below lo which the classical algorithm computes for carries */
+    work = _radix_mulmid_pairs_below(an, bn, hi) - _radix_mulmid_pairs_below(an, bn, FLINT_MAX(lo - 1, 0));
+
+#if FLINT_HAVE_FFT_SMALL
+    if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) _radix_mulmid_fft_length(an, bn, lo, hi))
         radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
     else
-#if FLINT_HAVE_FFT_SMALL
         radix_mulmid_fft_small(res, a, an, b, bn, lo, hi, radix);
 #else
+    if (work < (double) RADIX_MULMID_FFT_CUTOFF_RATIO * (double) (an + bn))
+        radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
+    else
         radix_mulmid_KS(res, a, an, b, bn, lo, hi, radix);
 #endif
 }
@@ -249,6 +357,15 @@ radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
 void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix);
 void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix);
+
+void radix_sqrtrem_via_mpn(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_rsqrt_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_rsqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+int radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix);
 
 /* Modular (Hensel) division */
 
@@ -434,6 +551,12 @@ void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radi
 void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 
+int radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_invertible(const radix_integer_t x, const radix_t radix);
+
+int radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix);
+void radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_square(const radix_integer_t x, const radix_t radix);
 
 /* Utilities */
 

@@ -1,0 +1,708 @@
+/*
+    Copyright (C) 2026 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "flint.h"
+#include "mpn_extras.h"
+#include "mp_real.h"
+#include "impl.h"
+
+/* sin and cos of a ball to a relative accuracy of about 2^-prec.
+
+   The midpoint is evaluated exactly as given; the radius r of x enters
+   the outputs at the end (|sin'|, |cos'| <= 1), and prec is first
+   lowered to what r allows.  For |x| < 1 the argument goes to the
+   fixed-point kernel as it is, at enough limbs that sin keeps its
+   relative accuracy (small arguments take a short Taylor polynomial
+   instead).  For |x| >= 1 it is reduced mod pi/2: with q a lower
+   approximation of x 2/pi (from a cached 2/pi, never above the exact
+   quotient) and P <= pi/2 the cached pi/2 at m + n + 1 fraction limbs,
+   t = x - q P lies in [0, pi/2 (1 + 2/B)).  For t > pi/4 the angle is
+   folded, v = P - t (slightly negative only when q came out one low).
+   So x = a pi/2 + s v, v in [0, pi/4], and
+
+       sin x = s sin v, cos v, -s sin v, -cos v   for a = 0, 1, 2, 3,
+       cos x = cos v, -s sin v, -cos v, s sin v,
+
+   where the kernel gives sin v and cos v at n fraction limbs.  The
+   reduction errs by q (pi/2 - P) + truncation < 3 ulps of B^-n. */
+
+/* kernel choice by working precision (limbs) */
+#define SC_BITWISE_MAX 600
+#define SC_DIOPHANTINE_MAX 65536
+
+/* the series from z leading zero bits on: sin and 1 - cos by the
+   reduced series of series_tapered.c / series_rs.c below 32 zero bits
+   (and below 48 at 11-16 limbs), _mp_real_sin_cos_reduced beyond
+   (measured kernel / series time ratios with the dense-table kernels:
+   1.0-1.15 at 4-6 limbs from z = 24-28, 1.0-2.9 at 3 and 7-12 limbs
+   from z = 32, 1.0-1.25 at 13-21 limbs from z = 48, 1.1-1.35 at 22-32
+   limbs from z = 32, at two limbs only from z = 64; end to end with the
+   bitwise kernels beyond: 1.1-1.6 at 33-128 limbs from z = 32, 1.1 at
+   192-384 limbs from z = 40-64) */
+static slong
+_sc_series_min_z(slong n)
+{
+    if (n <= 1)
+        return WORD_MAX;
+#if FLINT_BITS == 64
+    if (n <= 2)
+        return 64;
+    if (n <= 3)
+        return 32;
+    if (n <= 4)
+        return 24;
+    if (n <= 6)
+        return 28;
+    if (n <= 12)
+        return 32;
+    if (n <= 21)
+        return 48;
+#else
+    /* (no dense kernels) */
+    if (n <= 8)
+        return 18;
+    if (n <= 12)
+        return 24;
+    if (n <= 20)
+        return 28;
+#endif
+#if FLINT_BITS == 64
+    /* the vector kernel (two interleaved runs: 1.05-1.2 at 128 limbs
+       from z = 48) */
+    if (n <= 96)
+        return 32;
+    if (n <= 192)
+        return 48;
+#else
+    if (n <= 128)
+        return 32;
+    if (n <= 192)
+        return 40;
+#endif
+    if (n <= 256)
+        return 48;
+    if (n <= 384)
+        return 64;
+    if (n <= SC_BITWISE_MAX)
+        return 96;
+    if (n <= 2048)
+        return 160;
+    if (n <= 8192)
+        return 256;
+    if (n <= SC_DIOPHANTINE_MAX)
+        return 4096;
+    return WORD_MAX;    /* the notab kernel adapts by itself */
+}
+
+/* (ys, n + 1), (yc, n + 1) = sin v, cos v for v in [0, 1) at n
+   fraction limbs (both outputs required).  The kernel, the evaluation
+   and the reduction are forced inline into mp_real_sin_cos_bits, as
+   they were with their single call sites there (an exported function
+   is an interposable call with -fPIC, and a static one with a second
+   caller is not inlined): measured, 25-70 instructions per call at one
+   or two limbs.  The other files reach them through the _mp_real_
+   wrappers at the end. */
+FLINT_FORCE_INLINE void
+_sc_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
+{
+    slong top = n - 1, z;
+
+    while (top >= 0 && v[top] == 0)
+        top--;
+    z = (top < 0) ? WORD_MAX : FLINT_BITS * (n - 1 - top) + flint_clz(v[top]);
+
+    if (z >= _sc_series_min_z(n)
+        && !(z < 32 || (n >= 11 && n <= 16 && z < 48)))
+    {
+        if (z == WORD_MAX)
+        {
+            flint_mpn_zero(ys, n + 1);
+            flint_mpn_zero(yc, n);
+            yc[n] = 1;
+            *err = 0;
+        }
+        else
+        {
+            /* sin v and g = 1 - cos v (below 1/2); z >= 32 */
+            _mp_real_sin_cos_reduced(ys, yc, err, v, n, (flint_bitcnt_t) z, 0);
+            ys[n] = 0;
+            yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
+        }
+    }
+    else if (z >= _sc_series_min_z(n))
+    {
+        /* sin v and g = 1 - cos v by the tapered series */
+        _mp_real_series_sin_cos(ys, yc, v, n, (flint_bitcnt_t) z);
+        ys[n] = 0;
+        yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
+        *err = 6;
+    }
+    else if (n <= SC_BITWISE_MAX)
+    {
+        if (!_mp_real_sin_cos_opt(ys, yc, err, v, n))
+            _mp_real_sin_cos_bitwise_rs(ys, yc, err, v, n, 0);
+    }
+    else if (n <= SC_DIOPHANTINE_MAX)
+        _mp_real_sin_cos_diophantine(ys, yc, err, v, n);
+    else
+        _mp_real_sin_cos_notab(ys, yc, err, v, n);
+}
+
+/* guard bits for a kernel result accurate to about 2^-p (absolute):
+   the kernel's bound (6r + 128 for the bitwise functions, r the tuned
+   parameter; at most 128 otherwise), the reduction's 3 ulps and two
+   bits of slack */
+static slong
+_sc_guard(slong p)
+{
+    slong n = (p + 12 + FLINT_BITS - 1) / FLINT_BITS;
+
+    if (n <= SC_BITWISE_MAX)
+        return FLINT_BIT_COUNT(6 * (ulong) _mp_real_sin_cos_default_r_inline(n) + 131) + 3;
+    return 10;
+}
+
+/* the kernel limbs for a target of about 2^-p (absolute) */
+static slong
+_sc_limbs(slong p)
+{
+    slong n = (p + _sc_guard(p) + FLINT_BITS - 1) / FLINT_BITS;
+#if FLINT_BITS == 32
+    n = FLINT_MAX(n, 2);
+#endif
+    return n;
+}
+
+/* sin x and cos x from v in [0, 1) at n fraction limbs, for
+   x = a pi/2 + s v (s = +-1) up to eps ulps of B^-n, with the sine
+   negated for a negative x.  v must not alias the outputs' limbs. */
+FLINT_FORCE_INLINE void
+_sc_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n, ulong eps,
+    int a, int s, int xneg)
+{
+    /* sin v goes to rs for even a, to rc for odd a */
+    mp_real_ptr os = (a & 1) ? rc : rs, oc = (a & 1) ? rs : rc;
+    int sneg = (s < 0), negs, negc;
+    nn_ptr ys, yc, tmp = NULL;
+    ulong err;
+    TMP_INIT;
+
+    TMP_START;
+    if (os == NULL || oc == NULL)
+        tmp = TMP_ALLOC((n + 1) * sizeof(ulong));
+
+    if (os != NULL)
+    {
+        mp_real_fit_length(os, n + 1);
+        ys = os->d;
+    }
+    else
+        ys = tmp;
+
+    if (oc != NULL)
+    {
+        mp_real_fit_length(oc, n + 1);
+        yc = oc->d;
+    }
+    else
+        yc = tmp;
+
+    _sc_kernel(ys, yc, &err, v, n);
+    err += eps;
+
+    /* sin x = s sin v, cos v, -s sin v, -cos v;
+       cos x = cos v, -s sin v, -cos v, s sin v   (a = 0, 1, 2, 3) */
+    if (a & 1)
+    {
+        negs = (a == 3);
+        negc = sneg ^ (a == 1);
+    }
+    else
+    {
+        negs = sneg ^ (a == 2);
+        negc = (a == 2);
+    }
+
+    if (rs != NULL)
+        _mp_real_elem_finish(rs, n, err, negs ^ xneg);
+    if (rc != NULL)
+        _mp_real_elem_finish(rc, n, err, negc);
+
+    TMP_END;
+}
+
+/* sin, cos of a small exact x, |x| < 2^e: sin x = x, cos x = 1 up to
+   x^3/6 < 2^(3e-2) and x^2/2 = 2^(2e-1) */
+static void
+_sc_small1(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong e, slong prec)
+{
+    if (rs != NULL)
+    {
+        mp_real_set(rs, x);
+        rs->err = 0;
+        mp_real_add_error_2exp_si(rs, _mp_real_err_exp_clamp(3 * e - 2, e, prec));
+    }
+    if (rc != NULL)
+    {
+        mp_real_set_ui(rc, 1);
+        mp_real_add_error_2exp_si(rc, _mp_real_err_exp_clamp(2 * e - 1, 1, prec));
+    }
+}
+
+/* sin, cos of a small exact x, |x| < 2^e <= 1/2, as x - x^3/6 and
+   1 - x^2/2 (remainders below x^5/120 < 2^(5e-6) and x^4/24 < 2^(4e-4))
+   at w fraction limbs */
+#define SC_SMALL2_FIXED_MAX 8
+
+static void
+_sc_small2(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong e, slong w,
+    slong wp)
+{
+    if (w <= SC_SMALL2_FIXED_MAX)
+    {
+        /* fixed point: v = |x| truncated (1 ulp), x2 = floor(v^2) within
+           2 ulps of x^2, x3 = floor(x2 v) within 2, x3/6 within 2, so
+           sin within 3 ulps; x2/2 within 2, so cos within 2 */
+        ulong v[SC_SMALL2_FIXED_MAX], t[2 * SC_SMALL2_FIXED_MAX];
+        ulong x2[SC_SMALL2_FIXED_MAX];
+        int xneg = x->negative;
+
+        _mp_real_elem_copy(v, w, w, x);
+        flint_mpn_sqr(t, v, w);
+        flint_mpn_copyi(x2, t + w, w);
+
+        if (rs != NULL)
+        {
+            flint_mpn_mul_n(t, x2, v, w);
+            mpn_divrem_1(t + w, 0, t + w, w, 6);
+            mp_real_fit_length(rs, w + 1);
+            mpn_sub_n(rs->d, v, t + w, w);
+            rs->d[w] = 0;
+            _mp_real_elem_finish(rs, w, 3, xneg);
+            mp_real_add_error_2exp_si(rs, 5 * e - 6);
+        }
+
+        if (rc != NULL)
+        {
+            mp_real_fit_length(rc, w + 1);
+            mpn_rshift(t, x2, w, 1);
+            rc->d[w] = 1 - mpn_neg(rc->d, t, w);
+            _mp_real_elem_finish(rc, w, 2, 0);
+            mp_real_add_error_2exp_si(rc, 4 * e - 4);
+        }
+    }
+    else
+    {
+        mp_real_t x2, t;
+
+        mp_real_init(x2);
+        mp_real_init(t);
+        mp_real_mul(x2, x, x, wp);
+
+        if (rs != NULL)
+        {
+            mp_real_mul(t, x2, x, wp);
+            mp_real_div_ui(t, t, 6, wp);
+            mp_real_sub(t, x, t, wp);
+            mp_real_add_error_2exp_si(t, 5 * e - 6);
+            mp_real_swap(rs, t);
+        }
+        if (rc != NULL)
+        {
+            mp_real_mul_2exp_si(x2, x2, -1);
+            mp_real_set_ui(t, 1);
+            mp_real_sub(rc, t, x2, wp);
+            mp_real_add_error_2exp_si(rc, 4 * e - 4);
+        }
+
+        mp_real_clear(x2);
+        mp_real_clear(t);
+    }
+}
+
+/* |x| < 1, exact, nonzero: the kernel on the fixed-point x at n
+   fraction limbs (x truncated there, one more ulp) */
+static void
+_sc_unit(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong n)
+{
+    nn_ptr buf;
+    nn_srcptr v;
+    int trunc, xneg = x->negative;
+    TMP_INIT;
+
+    /* x's limbs read in place unless an output shares them (the eval
+       may grow the outputs) */
+    TMP_START;
+    buf = TMP_ALLOC(n * sizeof(ulong));
+    v = _mp_real_elem_frame(buf, n, x, (rs != NULL) ? rs->d : NULL,
+        (rc != NULL) ? rc->d : NULL, &trunc);
+    _sc_eval(rs, rc, v, n, trunc, 0, 1, xneg);
+    TMP_END;
+}
+
+#if FLINT_BITS == 64
+
+/* the fraction limbs of pi/2 (low first), 2/pi = (R1, R0) / B^2
+   truncated, and the top fraction limb of pi/4 */
+#define SC_PI2_LIMBS 40
+static const ulong _sc_pi2_frac[SC_PI2_LIMBS] = {
+    UWORD(0xb0ec04e67d90d4c8), UWORD(0xe25ff40db31410c9), UWORD(0x9dc7a44c35a5dcd7),
+    UWORD(0x3d1929c0944ac33b), UWORD(0x57eb5d19b61267ae), UWORD(0x672e1f0b4dc3c98f),
+    UWORD(0x15d4e2aeba0c18fb), UWORD(0xd9f70a08b1b7de15), UWORD(0x50aa4357be3974c9),
+    UWORD(0x5a662e1a08a0f467), UWORD(0x2ae51cb51555885b), UWORD(0x2ba44c3131f40a20),
+    UWORD(0x732a92f9d52ad5ca), UWORD(0xbc5797ed2ab02e30), UWORD(0x6b8abbe0de98a593),
+    UWORD(0x364f0745d80f451f), UWORD(0xc73cee58301d0c07), UWORD(0x6520bc8c5c6d9c77),
+    UWORD(0xe2e8d811943042f8), UWORD(0xce186a9c95793009), UWORD(0x3daa520ee12d2cda),
+    UWORD(0x38c5e6ac410aa577), UWORD(0x06caba47b9475b2c), UWORD(0xd22c7f51fa499ebf),
+    UWORD(0x31b4906c38aba734), UWORD(0x8400f97142c77e0b), UWORD(0x9250cca3d9c8b67b),
+    UWORD(0x5d3e4822f8963fcc), UWORD(0xdc70d7f6b5133f4b), UWORD(0x17feb96de80d6fdb),
+    UWORD(0xe89885d34c6fdad6), UWORD(0xc90b6aecc4bcfd8d), UWORD(0x9fc26adadaa3848b),
+    UWORD(0x605614dbe4be286e), UWORD(0xdf2a33679a748636), UWORD(0xa29410f31c6809bb),
+    UWORD(0x04177d4c76273644), UWORD(0x52049c1114cf98e8), UWORD(0x898cc51701b839a2),
+    UWORD(0x921fb54442d18469)
+};
+#define SC_2_DIV_PI_1 UWORD(0xa2f9836e4e441529)
+#define SC_2_DIV_PI_0 UWORD(0xfc2757d1f534ddc0)
+#define SC_PI4_TOP UWORD(0xc90fdaa22168c234)
+
+/* one integral limb (x->exp == 1), exact, n + 1 <= SC_PI2_LIMBS (the
+   result as for _sc_reduce):
+   q from (x1, x0) (R1, R0) without the low products, a lower
+   approximation of x 2/pi within 5/B; P = pi/2 at N = n + 1 fraction
+   limbs, truncated, t = X - q P in [0, pi/2 (1 + 5/B)).  Errors:
+   (q + 1)(pi/2 - P) < B^-n, x truncated below B^-N, v truncated to n
+   limbs: under 3 ulps of B^-n. */
+FLINT_FORCE_INLINE int
+_sc_reduce1(nn_ptr W, const mp_real_t x, slong n)
+{
+    ulong X[SC_PI2_LIMBS + 1], V[SC_PI2_LIMBS + 1];
+    nn_srcptr P;
+    slong N = n + 1;
+    ulong q, h11, l11, h10, l10, h01, l01, c, u, top, b;
+    int a, s = 1, fold;
+
+    _mp_real_elem_copy(X, N + 1, N, x);
+    P = _sc_pi2_frac + SC_PI2_LIMBS - N;
+
+    umul_ppmm(h11, l11, X[N], SC_2_DIV_PI_1);
+    umul_ppmm(h10, l10, X[N], SC_2_DIV_PI_0);
+    umul_ppmm(h01, l01, X[N - 1], SC_2_DIV_PI_1);
+    (void) l10;
+    (void) l01;
+    add_ssaaaa(c, u, 0, l11, 0, h10);
+    add_ssaaaa(c, u, c, u, 0, h01);
+    q = h11 + c;
+    a = (int) (q & 3);
+
+    /* t = X - q (1 + P B^-N) */
+    MP_REAL_SUBMUL_1(b, X, P, N, q);
+    X[N] = X[N] - q - b;
+    FLINT_ASSERT(X[N] <= 1);
+
+    /* fold when t is above about pi/4: either way v <= pi/4 + 1/B */
+    fold = (X[N] != 0) || (X[N - 1] > SC_PI4_TOP);
+
+    if (fold)
+    {
+        /* v = (1 + P B^-N) - t: negative (and tiny) only when q was
+           one low */
+        b = mpn_sub_n(V, P, X, N);
+        top = UWORD(1) - X[N] - b;
+        V[N] = top;
+        if ((slong) top < 0)
+        {
+            mpn_neg(V, V, N + 1);
+            s = 1;
+        }
+        else
+            s = -1;
+        a = (a + 1) & 3;
+        FLINT_ASSERT(V[N] == 0);
+        flint_mpn_copyi(W, V + 1, n);
+    }
+    else
+        flint_mpn_copyi(W, X + 1, n);
+
+    return a | ((s < 0) << 2);
+}
+
+#endif
+
+/* |x| >= 1 (m = exp >= 1 integral limbs), exact: |x| = a pi/2 + s v,
+   (W, n) = v in [0, pi/4 (1 + 2/B)] within 3 ulps; returns a + 4 [s < 0] */
+FLINT_FORCE_INLINE int
+_sc_reduce(nn_ptr W, const mp_real_t x, slong n)
+{
+    slong m = x->exp, N = m + n + 1, xl;
+    nn_ptr X, P, V, q;
+    int a, s = 1;
+    TMP_INIT;
+
+    FLINT_ASSERT(x->exp >= 1 && x->err == 0);
+
+#if FLINT_BITS == 64
+    if (m == 1 && n + 1 <= SC_PI2_LIMBS)
+        return _sc_reduce1(W, x, n);
+#endif
+
+    TMP_START;
+    X = TMP_ALLOC((m + N + 1) * sizeof(ulong));
+    P = TMP_ALLOC((N + 1) * sizeof(ulong));
+    V = TMP_ALLOC((N + 1) * sizeof(ulong));
+    q = TMP_ALLOC((2 * m + 4) * sizeof(ulong));
+
+    /* X = |x| with m integral and N fraction limbs, truncated below
+       B^-N (an error below one ulp of B^-N) */
+    xl = m + N;
+    _mp_real_elem_copy(X, xl, N, x);
+
+    /* P = 2 floor(pi/4 B^N) <= pi/2 B^N, below by less than 2 */
+    P[N] = mpn_lshift(P, _mp_real_const_ptr(MP_REAL_CONST_ID_PI4, N), N, 1);
+
+    /* q = floor of a lower approximation of x 2/pi within 2/B:
+       the top m + 1 limbs of X (m integral, one fraction) times
+       floor(2/pi B^(m + 2)), limbs m + 3 up of the product */
+    {
+        slong k = m + 2;
+        nn_ptr pr = TMP_ALLOC((2 * m + 3) * sizeof(ulong));
+
+        flint_mpn_mul(pr, _mp_real_const_ptr(MP_REAL_CONST_ID_2_DIV_PI, k), k,
+            X + N - 1, m + 1);
+        flint_mpn_copyi(q, pr + m + 3, m);
+    }
+
+    /* a = q mod 4; t = X - q P, in [0, pi/2 (1 + 2/B)): the low N + 1
+       limbs of X, the rest zero */
+    a = (int) (q[0] & 3);
+    {
+        slong ql = m;
+        nn_ptr T = TMP_ALLOC((ql + N + 1) * sizeof(ulong));
+
+        while (ql > 0 && q[ql - 1] == 0)
+            ql--;
+        if (ql == 1)
+        {
+            ulong cy = mpn_submul_1(X, P, N + 1, q[0]);
+            FLINT_ASSERT(cy == 0 || xl > N + 1);
+            if (xl > N + 1)
+                mpn_sub_1(X + N + 1, X + N + 1, xl - N - 1, cy);
+        }
+        else if (ql > 0)
+        {
+            if (ql >= N + 1)
+                flint_mpn_mul(T, q, ql, P, N + 1);
+            else
+                flint_mpn_mul(T, P, N + 1, q, ql);
+            /* q P <= X, so T has at most xl significant limbs */
+            FLINT_ASSERT(ql + N + 1 <= xl || T[xl] == 0);
+            mpn_sub(X, X, xl, T, FLINT_MIN(xl, ql + N + 1));
+        }
+    }
+    FLINT_ASSERT(X[N] <= 1);
+
+    /* fold: t > pi/4 (pi/4 < t when the units limb is set, else by the
+       fraction limbs against those of pi/4 = P/2) */
+    {
+        int fold = (X[N] != 0);
+
+        if (!fold)
+        {
+            nn_ptr H = V;
+            mpn_rshift(H, P, N + 1, 1);
+            fold = (mpn_cmp(X, H, N) > 0);
+        }
+
+        if (fold)
+        {
+            /* v = P - t: negative (and tiny) only when q was one low */
+            if (mpn_sub_n(V, P, X, N + 1))
+            {
+                mpn_neg(V, V, N + 1);
+                s = 1;
+            }
+            else
+                s = -1;
+            a = (a + 1) & 3;
+        }
+        else
+            flint_mpn_copyi(V, X, N + 1);
+    }
+
+    /* v in [0, pi/4] at n fraction limbs: the reduction error
+       q (pi/2 - P) (twice for the fold) < 2 B^(m - N) = 2 B^-(n+1), the
+       truncations of x and v: 3 ulps of B^-n in all */
+    flint_mpn_copyi(W, V + (N - n), n);
+    TMP_END;
+
+    return a | ((s < 0) << 2);
+}
+
+void
+mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
+{
+    mp_real_struct mid;
+    slong e;
+    ulong xerr = x->err;
+    slong xanc = x->exp - x->size;
+
+    prec = FLINT_MAX(prec, 2);
+
+    /* x = 0 exactly */
+    if (x->size == 0 && x->err == 0)
+    {
+        if (rs != NULL)
+            mp_real_zero(rs);
+        if (rc != NULL)
+            mp_real_set_ui(rc, 1);
+        return;
+    }
+
+    /* |x| < 2^e over the whole ball */
+    e = mp_real_abs_bound_lt_2exp_si(x);
+
+    /* a ball around zero, or one too wide for a relative accuracy of
+       two bits within (-1, 1): sin in [+-min(2^e, 1)] (|sin x| <= |x|),
+       cos = 1 +- min(2^(2e-1), 2) */
+    if (x->size == 0 || (x->err != 0 && e <= 0
+            && mp_real_rel_radius_lt_2exp_si(x) > -2))
+    {
+        if (rs != NULL)
+        {
+            mp_real_zero(rs);
+            mp_real_add_error_2exp_si(rs, FLINT_MIN(e, 0));
+        }
+        if (rc != NULL)
+        {
+            mp_real_set_ui(rc, 1);
+            mp_real_add_error_2exp_si(rc, FLINT_MIN(_mp_real_err_exp_clamp(2 * e - 1, 1, prec), 1));
+        }
+        return;
+    }
+
+    /* ridiculously large arguments */
+    if (FLINT_BITS * (x->exp - 1) >= FLINT_MAX(65536, 4 * prec))
+    {
+        if (rs != NULL)
+        {
+            mp_real_zero(rs);
+            mp_real_add_error_2exp_si(rs, 0);
+        }
+        if (rc != NULL)
+        {
+            mp_real_zero(rc);
+            mp_real_add_error_2exp_si(rc, 0);
+        }
+        return;
+    }
+
+    /* the midpoint, exactly */
+    mid = *x;
+    mid.err = 0;
+
+    /* an inexact x: the absolute radius 2^-acc bounds the output error;
+       for |x| < 1 the sine's relative accuracy is that of x */
+    if (x->err != 0)
+    {
+        slong rel = mp_real_rel_radius_lt_2exp_si(x);   /* rad < 2^rel |x| */
+        slong acc;
+
+        if (x->exp <= 0)
+            acc = -rel;                                 /* relative, for sin */
+        else                                            /* absolute, |x| < 2^emid */
+            acc = -(rel + FLINT_BITS * (x->exp - 1) + FLINT_BIT_COUNT(x->d[x->size - 1]));
+
+        if (acc < 2)
+        {
+            /* no useful information */
+            if (rs != NULL)
+            {
+                mp_real_zero(rs);
+                mp_real_add_error_2exp_si(rs, 0);
+            }
+            if (rc != NULL)
+            {
+                mp_real_zero(rc);
+                mp_real_add_error_2exp_si(rc, 0);
+            }
+            return;
+        }
+
+        prec = FLINT_MIN(prec, acc + 8);
+    }
+
+    /* (the outputs may alias x: from here on, only mid, xerr and xanc
+       are read, and each path copies mid before writing an output) */
+    if (x->exp <= 0)
+    {
+        /* |x| < 2^emid, emid <= 0 */
+        slong emid = FLINT_BITS * (x->exp - 1) + FLINT_BIT_COUNT(x->d[x->size - 1]);
+        slong z = -emid;
+
+        if (2 * z >= prec + 3)
+            _sc_small1(rs, rc, &mid, emid, prec);
+        else if (4 * z >= prec + 3)
+            _sc_small2(rs, rc, &mid, emid,
+                (prec + z + 6 + FLINT_BITS - 1) / FLINT_BITS,
+                mp_real_prec_bits(prec + 4));
+        else
+            _sc_unit(rs, rc, &mid, _sc_limbs(prec + z));
+    }
+    else
+    {
+        slong n = _sc_limbs(prec);
+        nn_ptr W;
+        int code;
+        TMP_INIT;
+
+        TMP_START;
+        W = TMP_ALLOC(n * sizeof(ulong));
+        code = _sc_reduce(W, &mid, n);
+        _sc_eval(rs, rc, W, n, 3, code & 3,
+            (code & 4) ? -1 : 1, mid.negative);
+        TMP_END;
+    }
+
+    /* the radius of x */
+    if (xerr != 0)
+    {
+        if (rs != NULL)
+            _mp_real_elem_add_rad(rs, xerr, xanc);
+        if (rc != NULL)
+            _mp_real_elem_add_rad(rc, xerr, xanc);
+    }
+}
+
+/* the wrappers for the other files (see impl.h) */
+
+void
+_mp_real_sin_cos_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
+{
+    _sc_kernel(ys, yc, err, v, n);
+}
+
+slong
+_mp_real_sin_cos_limbs(slong p)
+{
+    return _sc_limbs(p);
+}
+
+void
+_mp_real_sin_cos_eval(mp_real_t rs, mp_real_t rc, nn_srcptr v, slong n,
+    ulong eps, int a, int s, int xneg)
+{
+    _sc_eval(rs, rc, v, n, eps, a, s, xneg);
+}
+
+int
+_mp_real_trig_reduce(nn_ptr W, const mp_real_t x, slong n)
+{
+    return _sc_reduce(W, x, n);
+}

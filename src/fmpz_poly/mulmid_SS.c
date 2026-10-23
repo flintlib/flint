@@ -15,16 +15,18 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
+#include "fft_small.h"
+
 
 void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
                const fmpz * poly2, slong len2, slong nlo, slong nhi)
 {
+    slong negm, conv_len;
     slong len_out, loglen, loglen2, n;
     slong res_bits, limbs, size, i;
     ulong * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
     slong bits1, bits2;
-    ulong size1, size2;
-    int sign = 0;
+    int sign = 0, squaring;
     int N;
     TMP_INIT;
     TMP_START;
@@ -89,30 +91,43 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
     len1 = FLINT_MIN(len1, trunc);
     len2 = FLINT_MIN(len2, trunc);
 
+    /* the same array at different lengths is a product, not a square:
+       it needs its own transform vector */
+    squaring = (poly1 == poly2 && len1 == len2);
+
     len_out = len1 + len2 - 1;
-    loglen  = FLINT_CLOG2(len_out);
+
+    /* truncated transform of the full product, or a cyclic transform
+       of length 4n >= max(nhi, len_out - nlo) when that is shorter:
+       the wrapped terms then land below nlo (middle products) */
+    loglen  = fft_convolution_choose_mid(&conv_len, len_out, nlo, trunc) + 2;
     loglen2 = FLINT_CLOG2(len2);
     n = (WORD(1) << (loglen - 2));
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
 
-    if (poly1 == poly2 && len1 == len2)
+    if (squaring)
         bits2 = bits1;
     else
         bits2 = _fmpz_vec_max_bits(poly2, len2);
 
-    size1 = (FLINT_ABS(bits1) + FLINT_BITS - 1) / FLINT_BITS;
-    size2 = (FLINT_ABS(bits2) + FLINT_BITS - 1) / FLINT_BITS;
 
-    /* Start with an upper bound on the number of bits needed */
-    res_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1;
+    if (bits1 < WORD(0) || bits2 < WORD(0))
+    {
+        sign = 1;
+        bits1 = FLINT_ABS(bits1);
+        bits2 = FLINT_ABS(bits2);
+    }
 
-    /* round up for sqrt2 trick */
+    /* exact bit bound, rounded up for the sqrt2 trick */
+    res_bits = bits1 + bits2 + loglen2 + sign;
     res_bits = (((res_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
 
-    limbs = (res_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
-    if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
-        limbs = (WORD(1) << FLINT_CLOG2(limbs));
+    /* final ring selection happens before any allocation; without
+       the fft_small engine the chooser degenerates to the standard
+       Nussbaumer rounding with negm = 0 */
+    limbs = (res_bits - 1) / FLINT_BITS + 1;
+    limbs = fft_adjust_limbs_sd_fft(limbs, n, &negm);
     size = limbs + 1;
 
     /* allocate space for ffts */
@@ -139,7 +154,7 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
       tt[i] = tt[i - 1] + 2*size;
    }
 
-    if (poly1 != poly2)
+    if (!squaring)
     {
         jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
         for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size)
@@ -151,35 +166,34 @@ void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1,
     for (i = len1; i < 4*n; i++)
         flint_mpn_zero(ii[i], limbs + 1);
 
-    if (poly1 != poly2 || len1 != len2)
+    if (!squaring)
     {
         _fmpz_vec_get_fft(jj, poly2, limbs, len2);
         for (i = len2; i < 4*n; i++)
             flint_mpn_zero(jj[i], limbs + 1);
     }
 
-    if (bits1 < WORD(0) || bits2 < WORD(0))
     {
-        sign = 1;
-        bits1 = FLINT_ABS(bits1);
-        bits2 = FLINT_ABS(bits2);
+#if FLINT_HAVE_FFT_SMALL
+        if (negm != 0)
+        {
+            sd_fft_mpn_mulmod_2expp1_ctx_t sdctx;
+            sd_fft_mpn_mulmod_2expp1_ctx_init(sdctx, get_default_mpn_ctx(),
+                                FLINT_BITS*limbs, negm);
+            fft_convolution_sd_fft(sdctx, ii, jj, loglen - 2, limbs,
+                                   conv_len, t1, t2, s1, tt);
+            sd_fft_mpn_mulmod_2expp1_ctx_clear(sdctx);
+        }
+        else
+#endif
+            fft_convolution(ii, jj, loglen - 2, limbs, conv_len,
+                            t1, t2, s1, tt);
     }
-
-    /* Recompute the number of bits/limbs now that we know how large everything is */
-    res_bits = bits1 + bits2 + loglen2 + sign;
-
-    /* round up res bits for sqrt2 */
-    res_bits = (((res_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
-
-    limbs = (res_bits - 1) / FLINT_BITS + 1;
-    limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
-
-    fft_convolution(ii, jj, loglen - 2, limbs, len_out, t1, t2, s1, tt);
 
     _fmpz_vec_set_fft(res, trunc - nlo, ii + nlo, limbs, sign); /* write res */
 
     flint_free(ii);
-    if (poly1 != poly2 || len1 != len2)
+    if (!squaring)
         flint_free(jj);
 
     TMP_END;

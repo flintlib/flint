@@ -13,35 +13,39 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_mulhigh_n(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
+fmpz_poly_mulhigh_n(fmpz_poly_t res, const fmpz_poly_t poly1,
+                    const fmpz_poly_t poly2, slong n)
 {
-    slong limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
-    slong limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
     slong len1 = poly1->length;
     slong len2 = poly2->length;
-    slong limbsx = FLINT_MAX(limbs1, limbs2);
+    slong lenfull, lo;
 
-    if (n == 0)
+    if (n == 0 || len1 == 0 || len2 == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (n < 4)
+    if (res == poly1 || res == poly2)
     {
-        fmpz_poly_mulhigh_classical(res, poly1, poly2, n - 1);
+        fmpz_poly_t t;
+        fmpz_poly_init2(t, 2 * n - 1);
+        fmpz_poly_mulhigh_n(t, poly1, poly2, n);
+        fmpz_poly_swap(res, t);
+        fmpz_poly_clear(t);
         return;
     }
 
-    if ((limbsx > 4) && (n < 16) && poly1->length <= n && poly2->length <= n)
-        fmpz_poly_mulhigh_karatsuba_n(res, poly1, poly2, n);
-    else if (limbs1 + limbs2 <= 8)
-        fmpz_poly_mul_KS(res, poly1, poly2);
-    else if ((limbs1+limbs2)/2048 > len1 + len2)
-        fmpz_poly_mul_KS(res, poly1, poly2);
-    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
-       fmpz_poly_mul_KS(res, poly1, poly2);
-    else
-       fmpz_poly_mul_SS(res, poly1, poly2);
+    /* the top n coefficients of the product (which has lenfull
+       coefficients; the top coefficient is nonzero); anything below is
+       left arbitrary, matching the documented interface. The operands
+       are multiplied at their full lengths even beyond n, as some
+       callers (fmpz_poly_divhigh_smodp) rely on this. */
+    lenfull = len1 + len2 - 1;
+    lo = FLINT_MAX(lenfull - n, 0);
+
+    fmpz_poly_fit_length(res, lenfull);
+    _fmpz_poly_mulmid(res->coeffs + lo, poly1->coeffs, len1,
+                      poly2->coeffs, len2, lo, lenfull);
+    _fmpz_poly_set_length(res, lenfull);
 }

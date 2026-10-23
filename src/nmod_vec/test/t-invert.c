@@ -63,7 +63,27 @@ int check_nmod_vec_invert(slong len, ulong p, flint_rand_t state)
 
         if (!_nmod_vec_equal(res3, res2, len))
             res = 2;
+
+        /* aliasing */
+        _nmod_vec_set(res3, vec, len);
+        _nmod_vec_invert_shoup(res3, res3, len, mod);
+
+        if (!_nmod_vec_equal(res3, res1, len))
+            res = 3;
     }
+
+    /* aliasing */
+    _nmod_vec_set(res2, vec, len);
+    _nmod_vec_invert_generic(res2, res2, len, mod);
+
+    if (!_nmod_vec_equal(res2, res1, len))
+        res = 4;
+
+    _nmod_vec_set(res2, vec, len);
+    _nmod_vec_invert(res2, res2, len, mod);
+
+    if (!_nmod_vec_equal(res2, res1, len))
+        res = 5;
 
     _nmod_vec_clear(vec);
     _nmod_vec_clear(res1);

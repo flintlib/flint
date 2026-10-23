@@ -146,8 +146,7 @@ _qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len,
     \end{align*}
 
     Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$
-    so that the series converges.
+    is at least $1$ so that the series converges.
 
     Assumes that $v < N$.
 
@@ -228,7 +227,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     const slong N   = qadic_prec(rop);
     const slong len = op->length;
 
-    if (op->val < 0)
+    if (qadic_is_zero(op) || op->val < 0)
     {
         return 0;
     }
@@ -257,7 +256,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         {
             const slong v = _fmpz_vec_ord_p(x, len, p);
 
-            if (v >= 2 || (*p != WORD(2) && v >= 1))
+            if (v >= 1)
             {
                 if (v >= N)
                 {

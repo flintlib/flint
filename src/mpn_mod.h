@@ -44,6 +44,8 @@ typedef struct
     ulong dnormed[MPN_MOD_MAX_LIMBS];
     flint_bitcnt_t norm;
     truth_t is_prime;
+    int pretend;        /* pretending to be a field */
+    nn_ptr factor;      /* a factor of the modulus found while pretending (nlimbs limbs; NULL: none) */
 }
 _mpn_mod_ctx_struct;
 
@@ -54,6 +56,8 @@ _mpn_mod_ctx_struct;
 #define MPN_MOD_CTX_MODULUS_PREINV(ctx) (MPN_MOD_CTX(ctx)->dinv)
 #define MPN_MOD_CTX_NORM(ctx) (MPN_MOD_CTX(ctx)->norm)
 #define MPN_MOD_CTX_IS_PRIME(ctx) (MPN_MOD_CTX(ctx)->is_prime)
+#define MPN_MOD_CTX_PRETEND(ctx) (MPN_MOD_CTX(ctx)->pretend)
+#define MPN_MOD_CTX_FACTOR(ctx) (MPN_MOD_CTX(ctx)->factor)
 #define MPN_MOD_CTX_MODULUS_BITS(ctx) ((MPN_MOD_CTX_NLIMBS(ctx) - 1) * FLINT_BITS + (FLINT_BITS - MPN_MOD_CTX_NORM(ctx)))
 
 MPN_MOD_INLINE int
@@ -64,6 +68,11 @@ mpn_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
 }
 
 /* Basic operations and arithmetic */
+
+truth_t mpn_mod_ctx_is_pretend_field(gr_ctx_t ctx);
+int mpn_mod_ctx_set_is_pretend_field(gr_ctx_t ctx, truth_t is_pretend_field);
+int mpn_mod_ctx_recover_zero_divisor(nn_ptr res, gr_ctx_t ctx);
+int _mpn_mod_nonunit(nn_srcptr x, nn_srcptr g, slong gsize, gr_ctx_t ctx);
 
 int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n);
 int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs);
@@ -126,10 +135,14 @@ int mpn_mod_neg_one(nn_ptr res, gr_ctx_t ctx);
 int mpn_mod_set_mpn(nn_ptr res, nn_srcptr x, slong xn, gr_ctx_t ctx);
 int mpn_mod_set_fmpz(nn_ptr res, const fmpz_t x, gr_ctx_t ctx);
 int mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx);
+int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx);
 int mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx);
 int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx);
 
 int mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx);
+
+int mpn_mod_pow_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t e, gr_ctx_t ctx);
+int mpn_mod_pow_ui(nn_ptr res, nn_srcptr x, ulong e, gr_ctx_t ctx);
 
 MPN_MOD_INLINE truth_t
 mpn_mod_is_zero(nn_srcptr x, gr_ctx_t ctx)
@@ -186,11 +199,15 @@ int mpn_mod_fmma(nn_ptr res, nn_srcptr x1, nn_srcptr y1, nn_srcptr x2, nn_srcptr
 int mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx);
 int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx);
 
+truth_t mpn_mod_is_square(nn_srcptr x, gr_ctx_t ctx);
+int mpn_mod_sqrt(nn_ptr res, nn_srcptr x, gr_ctx_t ctx);
+
 /* Vector functions */
 
 int _mpn_mod_vec_zero(nn_ptr res, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_clear(nn_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx));
 int _mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
+int _mpn_mod_vec_rand(nn_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx);
 void _mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_neg(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_add(nn_ptr res, nn_srcptr x, nn_srcptr y, slong len, gr_ctx_t ctx);
@@ -221,6 +238,7 @@ int mpn_mod_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slo
 /* Polynomial algorithms */
 
 int _mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid_mpn(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
 int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
@@ -247,6 +265,21 @@ int _mpn_mod_poly_div(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB
 
 int _mpn_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
 int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
+
+#if FLINT_HAVE_FFT_SMALL
+#include "fft_small.h"
+/* transformed polynomial representation support */
+void fft_small_fft_mpn_mod(fft_small_op_t X, nn_srcptr a,
+        ulong an, ulong itrunc, gr_ctx_t ctx, const fft_small_plan_t P);
+void fft_small_export_mpn_mod_range(nn_ptr z, const fft_small_op_t X,
+        ulong zl, ulong zh, gr_ctx_t ctx, const fft_small_plan_t P);
+#endif
+
+struct gr_transformed_poly_workload_struct;
+int _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+        slong len_bound, slong terms_bound,
+        const struct gr_transformed_poly_workload_struct * workload);
+int _gr_mpn_mod_ctx_init_transformed_poly_cyclic_repr(gr_ctx_t ctx, gr_ctx_t base, slong * len, slong terms_bound, const struct gr_transformed_poly_workload_struct * workload);
 
 #ifdef __cplusplus
 }

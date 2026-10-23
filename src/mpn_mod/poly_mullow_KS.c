@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Fredrik Johansson
+    Copyright (C) 2024, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,6 +10,9 @@
 */
 
 #include "mpn_mod.h"
+#include "flint-mparam.h"
+
+#define GUARD_LIMBS 3
 
 /* assumes res is initially zeroed */
 /* assumes that we can write one (zeroed) limb too much */
@@ -124,14 +127,62 @@ _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2
     if (!squaring)
         _mpn_mod_poly_bit_pack(arr2, poly2, len2, bits, nlimbs);
 
-    arr = flint_malloc((limbs1 + limbs2) * sizeof(ulong));
+    {
+        slong flimbs = limbs1 + limbs2;
+        slong f = nlo * bits;
+        slong elimb = f / FLINT_BITS;
+        slong zhi = FLINT_MIN(flimbs, (nhi * bits + FLINT_BITS - 1) / FLINT_BITS + 1);
+        slong zlo = FLINT_MAX(0, elimb - GUARD_LIMBS);
+        int windowed = (zlo > 0 || zhi < flimbs);
 
-    if (squaring)
-        flint_mpn_sqr(arr, arr1, limbs1);
-    else if (limbs1 >= limbs2)
-        flint_mpn_mul(arr, arr1, limbs1, arr2, limbs2);
-    else
-        flint_mpn_mul(arr, arr2, limbs2, arr1, limbs1);
+        /* mulmid is currently missing good sub-fft sqrlow code */
+#if FLINT_HAVE_FFT_SMALL
+        windowed = windowed && !squaring;
+#else
+        windowed = windowed && (!squaring || FLINT_MIN(limbs1, limbs2) >= FLINT_FFT_SMALL_SQR_THRESHOLD);
+#endif
+
+        arr = flint_malloc((windowed ? zhi : flimbs) * sizeof(ulong));
+
+        if (windowed)
+        {
+            /* In general, flint_mpn_mulmid computes a window which may be 1 ulp
+               too small. However, all mulmid algorithms used in practice include
+               the contribution of all limbs in the middle window without
+               introducing any artificial borrows, so the result is actually
+               guaranteed to be exact for KS integers. */
+            flint_mpn_mulmid(arr + zlo, arr1, limbs1, arr2, limbs2, zlo, zhi);
+
+            /* Do a sanity check mod 2^FLINT_BITS to verify that flint_mpn_mulmid
+               isn't doing anything weird. */
+#if FLINT_WANT_ASSERT
+            if (zlo > 0)
+            {
+                slong fl = (nlo * bits) / FLINT_BITS;
+                slong fb = (nlo * bits) % FLINT_BITS;
+                slong i;
+                ulong m = 0, Fobs;
+
+                for (i = FLINT_MAX(0, nlo - (len2 - 1)); i <= FLINT_MIN(nlo, len1 - 1); i++)
+                    m += poly1[i * nlimbs] * poly2[(nlo - i) * nlimbs];
+
+                Fobs = arr[fl] >> fb;
+                if (fb != 0)
+                    Fobs |= arr[fl + 1] << (FLINT_BITS - fb);
+                FLINT_ASSERT(Fobs == m);
+            }
+#endif
+        }
+        else
+        {
+            if (squaring)
+                flint_mpn_sqr(arr, arr1, limbs1);
+            else if (limbs1 >= limbs2)
+                flint_mpn_mul(arr, arr1, limbs1, arr2, limbs2);
+            else
+                flint_mpn_mul(arr, arr2, limbs2, arr1, limbs1);
+        }
+    }
 
     _mpn_mod_poly_bit_unpack(res, arr, nlo, nhi, bits, nlimbs, ctx);
 

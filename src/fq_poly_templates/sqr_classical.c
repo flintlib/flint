@@ -13,31 +13,39 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_sqr_classical) (TEMPLATE(T, struct) * rop,
                                   const TEMPLATE(T, struct) * op, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)
 {
-    if (len == 1)
-    {
-        TEMPLATE(T, mul) (rop, op, op, ctx);
-    }
-    else
+    gr_ctx_t gr_ctx;
+
+#if defined(FQ_ZECH_POLY_H)
+    /* For very short input, this is faster than the generic code
+       (which computes each coefficient by a dot product) because
+       Zech arithmetic is so cheap. */
+    if (len <= 8)
     {
         slong i;
         TEMPLATE(T, t) t;
 
+        if (len == 1)
+        {
+            TEMPLATE(T, mul) (rop, op, op, ctx);
+            return;
+        }
+
         TEMPLATE(T, init) (t, ctx);
 
-        _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop, op, len, op, ctx);
-
-        _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop + len, op + 1, len - 1,
-                                                    op + len - 1, ctx);
+        _TEMPLATE3(T, poly_scalar_mul, T) (rop, op, len, op, ctx);
+        _TEMPLATE3(T, poly_scalar_mul, T) (rop + len, op + 1, len - 1,
+                                           op + len - 1, ctx);
 
         for (i = 1; i < len - 1; i++)
-            _TEMPLATE(T, TEMPLATE(poly_scalar_addmul, T)) (rop + i + 1, op + 1,
-                                                           i - 1, op + i, ctx);
+            _TEMPLATE3(T, poly_scalar_addmul, T) (rop + i + 1, op + 1,
+                                                  i - 1, op + i, ctx);
 
         for (i = 1; i < 2 * len - 2; i++)
             TEMPLATE(T, add) (rop + i, rop + i, rop + i, ctx);
@@ -47,8 +55,14 @@ _TEMPLATE(T, poly_sqr_classical) (TEMPLATE(T, struct) * rop,
             TEMPLATE(T, sqr) (t, op + i, ctx);
             TEMPLATE(T, add) (rop + 2 * i, rop + 2 * i, t, ctx);
         }
+
         TEMPLATE(T, clear) (t, ctx);
+        return;
     }
+#endif
+
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_mullow_classical(rop, op, len, op, len, 2 * len - 1, gr_ctx));
 }
 
 void

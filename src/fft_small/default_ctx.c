@@ -50,6 +50,12 @@ _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcptr a, 
     _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, get_default_mpn_ctx());
 }
 
+void
+_nmod_poly_mul_tr_default_mpn_ctx(nn_ptr z, slong zn, nn_srcptr a, slong an, nn_srcptr v, slong vn, nmod_t mod)
+{
+    _nmod_poly_mul_tr_mpn_ctx(z, zn, a, an, v, vn, mod, get_default_mpn_ctx());
+}
+
 int
 _fmpz_poly_mul_mid_default_mpn_ctx(fmpz * res, slong zl, slong zh, const fmpz * a, slong an, const fmpz * b, slong bn)
 {

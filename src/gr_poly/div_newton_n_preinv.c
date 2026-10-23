@@ -26,20 +26,17 @@ _gr_poly_div_newton_n_preinv(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr FLINT_
 
     lenQ = lenA - lenB + 1;
 
-    if (lenBinv == 0)  /* fallback if the caller failed to invert B */
-    {
-        status = _gr_vec_zero(Q, lenQ, ctx);
-    }
-    else
-    {
-        Arev = GR_TMP_ALLOC(lenQ * sz);
-        _gr_vec_reverse_shallow(Arev, GR_ENTRY(A, lenA - lenQ, sz), lenQ, ctx);
+    /* the caller failed to invert B */
+    if (lenBinv == 0)
+        return GR_UNABLE;
 
-        status |= _gr_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
-        status |= _gr_poly_reverse(Q, Q, lenQ, lenQ, ctx);
+    Arev = GR_TMP_ALLOC(lenQ * sz);
+    _gr_vec_reverse_shallow(Arev, GR_ENTRY(A, lenA - lenQ, sz), lenQ, ctx);
 
-        GR_TMP_FREE(Arev, lenQ * sz);
-    }
+    status |= _gr_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
+    status |= _gr_poly_reverse(Q, Q, lenQ, lenQ, ctx);
+
+    GR_TMP_FREE(Arev, lenQ * sz);
 
     return status;
 }
@@ -83,7 +80,6 @@ gr_poly_div_newton_n_preinv(gr_poly_t Q,
         status = _gr_poly_div_newton_n_preinv(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, Binv->coeffs, lenBinv, ctx);
     }
 
-    _gr_poly_set_length(Q, Qlen, ctx);
-    _gr_poly_normalise(Q, ctx);
+    _gr_poly_set_length_normalise(Q, Qlen, ctx);
     return status;
 }

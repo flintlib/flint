@@ -27,10 +27,18 @@ gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, g
 
     if (c1 > 0)
     {
-        for (i = 0; i < r1; i++)
-            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
-        for (i = 0; i < r2; i++)
-            status |= _gr_vec_set(GR_MAT_ENTRY(res, i + r1, 0, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c1, ctx);
+        /* contiguous storage */
+        if (res->stride == c1 && mat1->stride == c1)
+            status |= _gr_vec_set(res->entries, mat1->entries, r1 * c1, ctx);
+        else
+            for (i = 0; i < r1; i++)
+                status |= _gr_vec_set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
+
+        if (res->stride == c1 && mat2->stride == c1)
+            status |= _gr_vec_set(GR_MAT_ENTRY(res, r1, 0, sz), mat2->entries, r2 * c1, ctx);
+        else
+            for (i = 0; i < r2; i++)
+                status |= _gr_vec_set(GR_MAT_ENTRY(res, i + r1, 0, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c1, ctx);
     }
 
     return status;

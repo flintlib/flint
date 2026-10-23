@@ -239,10 +239,7 @@ void _fq_nmod_mpoly_set_n_fq_bpoly_gen1_zero(
         if (_n_fq_is_zero(A->coeffs + d*Alen, d))
             continue;
 
-        if (Abits <= FLINT_BITS)
-            mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
-        else
-            mpoly_monomial_mul_ui_mp(A->exps + N*Alen, genexp, N, i);
+                    mpoly_monomial_mul_ui_any_bits(A->exps + N*Alen, genexp, N, i, Abits);
         Alen++;
     }
     A->length = Alen;

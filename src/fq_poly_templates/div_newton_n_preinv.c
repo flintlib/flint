@@ -15,28 +15,20 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
     const TEMPLATE(T, struct) *A, slong lenA,
-    const TEMPLATE(T, struct) * FLINT_UNUSED(B), slong lenB,
+    const TEMPLATE(T, struct) * B, slong lenB,
     const TEMPLATE(T, struct) * Binv, slong lenBinv,
     const TEMPLATE(T, ctx_t) ctx)
 {
-    const slong lenQ = lenA - lenB + 1;
-    TEMPLATE(T, struct) * Arev;
-
-    Arev = _TEMPLATE(T, vec_init) (lenQ, ctx);
-
-    _TEMPLATE(T, poly_reverse) (Arev, A + (lenA - lenQ), lenQ, lenQ, ctx);
-
-    _TEMPLATE(T, poly_mullow) (Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv),
-                               lenQ, ctx);
-
-    _TEMPLATE(T, poly_reverse) (Q, Q, lenQ, lenQ, ctx);
-
-    _TEMPLATE(T, vec_clear) (Arev, lenQ, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_div_newton_n_preinv(Q, A, lenA, B, lenB,
+                                    Binv, lenBinv, gr_ctx));
 }
 
 void

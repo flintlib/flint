@@ -15,7 +15,7 @@
 int flint_mpn_divides(mp_ptr q, mp_srcptr array1,
       mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
 {
-   mpn_tdiv_qr(q, temp, 0, array1, limbs1, arrayg, limbsg);
+   _flint_mpn_tdiv_qr(q, temp, array1, limbs1, arrayg, limbsg);
    while ((limbsg) && temp[limbsg - 1] == 0) limbsg--;
 
    return (limbsg == 0);

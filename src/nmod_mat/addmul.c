@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "nmod_mat/impl.h"
 
 void
 nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
@@ -26,7 +27,8 @@ nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
     else
         cutoff = 200;
 
-    if (flint_get_num_threads() == 1 && (m < cutoff || n < cutoff || k < cutoff))
+    if (flint_get_num_threads() == 1 && (m < cutoff || n < cutoff || k < cutoff)
+            && !_nmod_mat_addmul_want_mul(m, k, n, C->mod))
     {
         _nmod_mat_mul_classical_op(D, C, A, B, 1);
     }

@@ -84,6 +84,16 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
         flint_abort();
     }
 
+    /* the bases are now monic, but their content is not 1 in general */
+    fmpq_mpoly_factor_make_monic(g, ctx);
+    fmpq_mpoly_factor_expand(q, g, ctx);
+    if (!fmpq_mpoly_equal(q, p, ctx))
+    {
+        flint_printf("monic factorization (second call) does not match original polynomial\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
     fmpq_mpoly_factor_make_integral(g, ctx);
     for (i = 0; i < g->num; i++)
     {

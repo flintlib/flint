@@ -16,7 +16,8 @@
 
 TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
 {
-    fmpz_mat_t A, X, B, AX;
+    fmpz_mat_t A, X, B, AX, W;
+    int use_window;
     fmpz_t den;
     slong i, m, n, k;
     int success;
@@ -24,13 +25,22 @@ TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
     /* test random systems (likely not soluble) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 20);
         n = n_randint(state, 20);
         k = n_randint(state, 20);
 
         fmpz_mat_init(A, m, k);
         fmpz_mat_init(B, m, n);
-        fmpz_mat_init(X, k, n);
+        /* the output may be a window */
+        use_window = n_randint(state, 2);
+        if (use_window)
+        {
+            fmpz_mat_init(W, k + 1, n + 2);
+            fmpz_mat_window_init(X, W, 1, 1, k + 1, n + 1);
+        }
+        else
+            fmpz_mat_init(X, k, n);
         fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
@@ -64,7 +74,13 @@ TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
-        fmpz_mat_clear(X);
+        if (use_window)
+        {
+            fmpz_mat_window_clear(X);
+            fmpz_mat_clear(W);
+        }
+        else
+            fmpz_mat_clear(X);
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
@@ -72,6 +88,7 @@ TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
     /* test random soluble systems */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 20);
         n = n_randint(state, 20);
         k = n_randint(state, 20);
@@ -121,6 +138,8 @@ TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

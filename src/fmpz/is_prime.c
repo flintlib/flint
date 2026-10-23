@@ -14,7 +14,41 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
+#include "thread_support.h"
 #include "aprcl.h"
+#include "ecpp.h"
+
+/*
+    ECPP versus APRCL for the final proof: single-threaded, ECPP is the
+    faster from about 250 bits on (means over random primes); APRCL parallelises better (its
+    Jacobi sums are independent), ECPP's chain is largely serial, so the
+    crossover moves up with the number of threads (measured on random
+    primes: 250 bits with one thread, 550 with two, 1000 with three, 2000
+    with four).
+*/
+static slong
+_fmpz_is_prime_ecpp_bits(void)
+{
+    slong t = flint_get_num_available_threads();
+    if (t <= 1) return 250;
+    if (t == 2) return 550;
+    if (t == 3) return 1000;
+    if (t == 4) return 2000;
+    if (t <= 8) return 8000;
+    return 12000;   /* heuristic, neither APRCL nor ECPP is currently tuned for larger bit sizes */
+}
+
+static int
+_fmpz_is_prime_proof(const fmpz_t n)
+{
+    if ((slong) fmpz_bits(n) >= _fmpz_is_prime_ecpp_bits())
+    {
+        int r = ecpp_is_prime(n);
+        if (r >= 0)
+            return r;
+    }
+    return aprcl_is_prime(n);
+}
 
 static int _fmpz_is_prime(const fmpz_t n, int proved)
 {
@@ -93,6 +127,16 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
    logd = fmpz_dlog(n);
    limit = (ulong) (logd*logd*logd/100.0) + 20;
 
+   /* Below about 260 bits, a 10x larger trial factor base measurably
+      increases the fraction of inputs proven by the n +- 1 tests alone
+      (for instance from 43% to 69% of random 96-bit primes) while the
+      scan remains far cheaper than the APRCL fallback it avoids, for
+      10-15% faster average proving times at 96-128 bits. Above that
+      size the n +- 1 route essentially never completes for random
+      inputs and a larger factor base is pure overhead. */
+   if (logd < 180.0)
+      limit *= 10;
+
    fmpz_init(F1);
    fmpz_init(R);
    fmpz_init(Fsqr);
@@ -141,6 +185,73 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
          /* get next batch of primes */
          primes += num;
          pinv += num;
+      }
+
+      /* Feasibility check: with F1 | n - 1 and F2 | n + 1 the fully
+         factored parts, every proof below requires lcm(F1, F2)^3 > n
+         (Lenstra's divisors in residue classes being the weakest such
+         condition), except when a cofactor of n - 1 or n + 1 is itself
+         prime. Both the smooth parts arising from the trial factor bases
+         and the probable primality of the cofactors can be determined for
+         a fraction of the cost of the Pocklington and Morrison tests, so
+         work them out first and skip straight to APRCL when the p - 1
+         and p + 1 machinery cannot possibly complete a proof. */
+      {
+         fmpz_t Fc, Rc, t;
+         fmpz base2 = 2;
+         int feasible = 0, side;
+
+         fmpz_init(Fc);
+         fmpz_init(Rc);
+         fmpz_init(t);
+
+         fmpz_set_ui(Fc, 1);
+
+         for (side = 0; side < 2 && !feasible; side++)
+         {
+            ulong * pf = (side == 0) ? pm1 : pp1;
+            slong npf = (side == 0) ? num_pm1 : num_pp1;
+
+            if (side == 0)
+               fmpz_sub_ui(Rc, n, 1);
+            else
+               fmpz_add_ui(Rc, n, 1);
+
+            for (i = 0; i < npf; i++)
+            {
+               slong e;
+
+               fmpz_set_ui(t, pf[i]);
+               e = fmpz_remove(Rc, Rc, t);
+               fmpz_pow_ui(t, t, e);
+               fmpz_mul(Fc, Fc, t);
+            }
+
+            /* prime cofactor makes n -+ 1 fully factorable */
+            if (fmpz_is_one(Rc) || fmpz_is_strong_probabprime(Rc, &base2))
+               feasible = 1;
+         }
+
+         if (!feasible)
+         {
+            /* both 2-parts were included, so lcm(F1, F2) >= Fc / 2 */
+            fmpz_tdiv_q_2exp(Fc, Fc, 1);
+            fmpz_mul(t, Fc, Fc);
+            fmpz_mul(t, t, Fc);
+            feasible = (fmpz_cmp(t, n) > 0);
+         }
+
+         fmpz_clear(Fc);
+         fmpz_clear(Rc);
+         fmpz_clear(t);
+
+         if (!feasible)
+         {
+            res = _fmpz_is_prime_proof(n);
+            _nmod_vec_clear(pm1);
+            _nmod_vec_clear(pp1);
+            break;
+         }
       }
 
       /* p - 1 test */
@@ -277,7 +388,7 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
                               fmpz_clear(r);
                            } else /* apr-cl primality test */
                            {
-                              res = aprcl_is_prime(n);
+                              res = _fmpz_is_prime_proof(n);
                            }
 
                            fmpz_clear(d);

@@ -113,22 +113,25 @@
 #include "t-mul.c"
 #include "t-mul_classical.c"
 #include "t-mulhigh_classical.c"
-#include "t-mulhigh_karatsuba_n.c"
 #include "t-mulhigh_n.c"
-#include "t-mul_karatsuba.c"
 #include "t-mul_KS.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
-#include "t-mullow_karatsuba_n.c"
 #include "t-mullow_KS.c"
 #include "t-mullow_SS.c"
 #include "t-mullow_SS_precache.c"
 #include "t-mulmid.c"
 #include "t-mulmid_classical.c"
+#include "t-mulmid_mpn.c"
+#include "t-mulmid_classical_fft_small.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmid_SS.c"
+#include "t-mulmid_toom_karatsuba.c"
+#include "t-mulmid_toom_scalar.c"
 #include "t-mul_SS.c"
 #include "t-mul_SS_precache.c"
+#include "t-mul_toom_karatsuba.c"
+#include "t-mul_toom_scalar.c"
 #include "t-neg.c"
 #include "t-newton_to_monomial.c"
 #include "t-nth_derivative.c"
@@ -149,6 +152,7 @@
 #include "t-print_read.c"
 #include "t-print_read_pretty.c"
 #include "t-product_roots_fmpq_vec.c"
+#include "t-roots_fmpq.c"
 #include "t-product_roots_fmpz_vec.c"
 #include "t-pseudo_div.c"
 #include "t-pseudo_divrem_basecase.c"
@@ -185,11 +189,9 @@
 #include "t-signature.c"
 #include "t-sqr.c"
 #include "t-sqr_classical.c"
-#include "t-sqr_karatsuba.c"
 #include "t-sqr_KS.c"
 #include "t-sqrlow.c"
 #include "t-sqrlow_classical.c"
-#include "t-sqrlow_karatsuba_n.c"
 #include "t-sqrlow_KS.c"
 #include "t-sqrt.c"
 #include "t-sqrt_classical.c"
@@ -304,22 +306,25 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_mul),
     TEST_FUNCTION(fmpz_poly_mul_classical),
     TEST_FUNCTION(fmpz_poly_mulhigh_classical),
-    TEST_FUNCTION(fmpz_poly_mulhigh_karatsuba_n),
     TEST_FUNCTION(fmpz_poly_mulhigh_n),
-    TEST_FUNCTION(fmpz_poly_mul_karatsuba),
     TEST_FUNCTION(fmpz_poly_mul_KS),
     TEST_FUNCTION(fmpz_poly_mullow),
     TEST_FUNCTION(fmpz_poly_mullow_classical),
-    TEST_FUNCTION(fmpz_poly_mullow_karatsuba_n),
     TEST_FUNCTION(fmpz_poly_mullow_KS),
     TEST_FUNCTION(fmpz_poly_mullow_SS),
     TEST_FUNCTION(fmpz_poly_mullow_SS_precache),
     TEST_FUNCTION(fmpz_poly_mulmid),
     TEST_FUNCTION(fmpz_poly_mulmid_classical),
+    TEST_FUNCTION(fmpz_poly_mulmid_mpn),
+    TEST_FUNCTION(fmpz_poly_mulmid_classical_fft_small),
     TEST_FUNCTION(fmpz_poly_mulmid_KS),
     TEST_FUNCTION(fmpz_poly_mulmid_SS),
+    TEST_FUNCTION(fmpz_poly_mulmid_toom_karatsuba),
+    TEST_FUNCTION(fmpz_poly_mulmid_toom_scalar),
     TEST_FUNCTION(fmpz_poly_mul_SS),
     TEST_FUNCTION(fmpz_poly_mul_SS_precache),
+    TEST_FUNCTION(fmpz_poly_mul_toom_karatsuba),
+    TEST_FUNCTION(fmpz_poly_mul_toom_scalar),
     TEST_FUNCTION(fmpz_poly_neg),
     TEST_FUNCTION(fmpz_poly_newton_to_monomial),
     TEST_FUNCTION(fmpz_poly_nth_derivative),
@@ -340,6 +345,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_print_read),
     TEST_FUNCTION(fmpz_poly_print_read_pretty),
     TEST_FUNCTION(fmpz_poly_product_roots_fmpq_vec),
+    TEST_FUNCTION(fmpz_poly_roots_fmpq),
     TEST_FUNCTION(fmpz_poly_product_roots_fmpz_vec),
     TEST_FUNCTION(fmpz_poly_pseudo_div),
     TEST_FUNCTION(fmpz_poly_pseudo_divrem_basecase),
@@ -376,11 +382,9 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_signature),
     TEST_FUNCTION(fmpz_poly_sqr),
     TEST_FUNCTION(fmpz_poly_sqr_classical),
-    TEST_FUNCTION(fmpz_poly_sqr_karatsuba),
     TEST_FUNCTION(fmpz_poly_sqr_KS),
     TEST_FUNCTION(fmpz_poly_sqrlow),
     TEST_FUNCTION(fmpz_poly_sqrlow_classical),
-    TEST_FUNCTION(fmpz_poly_sqrlow_karatsuba_n),
     TEST_FUNCTION(fmpz_poly_sqrlow_KS),
     TEST_FUNCTION(fmpz_poly_sqrt),
     TEST_FUNCTION(fmpz_poly_sqrt_classical),

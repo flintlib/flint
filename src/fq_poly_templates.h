@@ -277,16 +277,6 @@ void TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, poly_t) rop,
                                 const TEMPLATE(T, poly_t) op2,
                                 const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, struct) *rop,
-                               const TEMPLATE(T, struct) *op1, slong len1,
-                               const TEMPLATE(T, struct) *op2, slong len2,
-                               const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, poly_t) rop,
-                              const TEMPLATE(T, poly_t) op1,
-                              const TEMPLATE(T, poly_t) op2,
-                              const TEMPLATE(T, ctx_t) ctx);
-
 void _TEMPLATE(T, poly_mul_univariate)(TEMPLATE(T, struct) *rop,
                           const TEMPLATE(T, struct) *op1, slong len1,
                           const TEMPLATE(T, struct) *op2, slong len2,
@@ -422,14 +412,6 @@ void _TEMPLATE(T, poly_sqr_classical)(TEMPLATE(T, struct) *rop,
 void TEMPLATE(T, poly_sqr_classical)(TEMPLATE(T, poly_t) rop,
                                 const TEMPLATE(T, poly_t) op,
                                 const TEMPLATE(T, ctx_t) ctx);
-
-void _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) *rop,
-                               const TEMPLATE(T, struct) *op, slong len,
-                               const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, poly_t) rop,
-                              const TEMPLATE(T, poly_t) op,
-                              const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) *rop,
                           const TEMPLATE(T, struct) *op, slong len,
@@ -588,17 +570,6 @@ slong TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op,
                                  const TEMPLATE(T, ctx_t) ctx);
 
 /*  Greatest common divisor  *************************************************/
-
-void TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, poly_t) rop,
-                                const TEMPLATE(T, poly_t) op1,
-                                const TEMPLATE(T, poly_t) op2,
-                                const TEMPLATE(T, ctx_t) ctx);
-
-slong _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,
-                                 const TEMPLATE(T, struct)* A, slong lenA,
-                                 const TEMPLATE(T, struct)* B, slong lenB,
-                                 const TEMPLATE(T, t) invB,
-                                 const TEMPLATE(T, ctx_t) ctx);
 
 slong _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G,
                        const TEMPLATE(T, struct)* A, slong lenA,

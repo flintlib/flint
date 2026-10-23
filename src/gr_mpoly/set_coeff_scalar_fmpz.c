@@ -44,9 +44,7 @@ int gr_mpoly_set_coeff_scalar_fmpz(
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
     gr_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
-    N = mpoly_words_per_exp(A->bits, mctx);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, A->bits, mctx);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, A->bits, mctx);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

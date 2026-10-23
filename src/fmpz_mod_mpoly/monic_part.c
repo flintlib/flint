@@ -9,34 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"
 
+/* set res to f divided by its leading coefficient, or to zero if f is zero */
 void
 fmpz_mod_mpoly_monic_part(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx)
 {
-    if (res != f)
-        fmpz_mod_mpoly_set(res, f, ctx);
-
-    if (fmpz_mod_mpoly_is_zero(res, ctx))
-        return;
-
-    if (fmpz_sgn(res->coeffs) < 0)
-        fmpz_mod_mpoly_neg(res, res, ctx);
-
-    if (!fmpz_is_one(res->coeffs))
-    {
-        fmpz_t c;
-        fmpz_init(c);
-
-        _fmpz_vec_content(c, res->coeffs, res->length);
-        if (!fmpz_is_one(c))
-        {
-            fmpz_mod_inv(c, c, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res, res, c, ctx);
-        }
-        fmpz_clear(c);
-    }
+    if (fmpz_mod_mpoly_is_zero(f, ctx))
+        fmpz_mod_mpoly_zero(res, ctx);
+    else
+        fmpz_mod_mpoly_make_monic(res, f, ctx);
 }

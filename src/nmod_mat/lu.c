@@ -13,25 +13,18 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-#if FLINT_USES_BLAS || (FLINT_BITS == 32) || !defined(__AVX2__)
-
-/* Tuned for Zen 3 with BLAS */
+/*
+    Tuned for Zen 3 with BLAS. A gemm-backed nmod_mat_mul is now always
+    available (nmod_mat_mul_blas uses flint_dgemm/flint_sgemm, which
+    fall back to FLINT's own kernels when no external BLAS is
+    configured), so the "without BLAS" table has been retired. It may be
+    worth re-tuning against the fallback kernels.
+*/
 static const slong lu_cutoff_tab[64] = { 64, 64, 244, 280, 296, 320, 332,
     792, 800, 800, 800, 400, 400, 400, 400, 404, 404, 400, 408, 416, 400,
     412, 424, 408, 484, 1352, 1032, 260, 68, 56, 56, 56, 148, 160, 148, 156,
     156, 156, 120, 168, 160, 124, 156, 124, 156, 148, 112, 156, 148, 136,
     156, 160, 116, 136, 168, 148, 156, 160, 120, 128, 68, 64, 104, 104 };
-
-#else
-
-/* Tuned for Zen 3 without BLAS */
-static const slong lu_cutoff_tab[64] = { 64, 64, 212, 260, 280, 316, 344,
-    792, 872, 904, 856, 1016, 1136, 1456, 1440, 1464, 1376, 1392, 1448, 1448,
-    1360, 1392, 1400, 1392, 1448, 1416, 1032, 260, 68, 56, 56, 60, 168, 164,
-    152, 152, 156, 148, 148, 148, 152, 164, 160, 148, 164, 148, 164, 160, 160,
-    148, 156, 156, 148, 164, 148, 164, 148, 148, 148, 128, 68, 64, 96, 96 };
-
-#endif
 
 slong
 nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)

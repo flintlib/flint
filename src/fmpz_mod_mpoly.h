@@ -108,9 +108,6 @@ void fmpz_mod_mpoly_init2(fmpz_mod_mpoly_t A, slong alloc,
 void fmpz_mod_mpoly_init3(fmpz_mod_mpoly_t A, slong alloc,
                           flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mod_mpoly_realloc(fmpz_mod_mpoly_t A,
-                                  slong alloc, const fmpz_mod_mpoly_ctx_t ctx);
-
 void fmpz_mod_mpoly_fit_length(fmpz_mod_mpoly_t A, slong length,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -438,9 +435,6 @@ void fmpz_mod_mpoly_sort_terms(fmpz_mod_mpoly_t A,
 
 void fmpz_mod_mpoly_combine_like_terms(fmpz_mod_mpoly_t A,
                                                const fmpz_mod_mpoly_ctx_t ctx);
-
-void fmpz_mod_mpoly_reverse(fmpz_mod_mpoly_t A,
-                     const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_assert_canonical(const fmpz_mod_mpoly_t A,
                                                const fmpz_mod_mpoly_ctx_t ctx);

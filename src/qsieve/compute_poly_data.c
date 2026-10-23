@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
@@ -47,6 +48,60 @@
     Return value indicates success. Should always succeed unless tuning
     parameters are really screwed up!
 */
+/* has this A been used already? if not, record it */
+static int
+qsieve_A_is_new(qs_t qs_inf, const fmpz_t A)
+{
+    slong i;
+
+    for (i = 0; i < qs_inf->A_used_num; i++)
+        if (fmpz_equal(qs_inf->A_used + i, A))
+            return 0;
+
+    if (qs_inf->A_used_num == qs_inf->A_used_alloc)
+    {
+        slong alloc = FLINT_MAX(16, 2*qs_inf->A_used_alloc);
+
+        qs_inf->A_used = flint_realloc(qs_inf->A_used, alloc*sizeof(fmpz));
+        for (i = qs_inf->A_used_alloc; i < alloc; i++)
+            fmpz_init(qs_inf->A_used + i);
+        qs_inf->A_used_alloc = alloc;
+    }
+
+    fmpz_set(qs_inf->A_used + qs_inf->A_used_num, A);
+    qs_inf->A_used_num++;
+
+    return 1;
+}
+
+/* forget the A coefficients used so far */
+void qsieve_A_used_clear(qs_t qs_inf)
+{
+    slong i;
+
+    for (i = 0; i < qs_inf->A_used_alloc; i++)
+        fmpz_clear(qs_inf->A_used + i);
+
+    flint_free(qs_inf->A_used);
+    qs_inf->A_used = NULL;
+    qs_inf->A_used_num = 0;
+    qs_inf->A_used_alloc = 0;
+}
+
+static ulong
+qsieve_A_rand(qs_t qs_inf, ulong n)
+{
+    /* xorshift64 */
+    ulong x = qs_inf->A_rand;
+
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+    qs_inf->A_rand = x;
+
+    return x % n;
+}
+
 int qsieve_init_A(qs_t qs_inf)
 {
     slong i, j;
@@ -338,6 +393,11 @@ int qsieve_init_A(qs_t qs_inf)
 
     fmpz_set(qs_inf->A, prod);
 
+    /* the A's used for this factor base, starting with this one */
+    qsieve_A_used_clear(qs_inf);
+    qs_inf->A_window = 0;
+    qsieve_A_is_new(qs_inf, prod);
+
     fmpz_set(qs_inf->low_bound, lower_bound);
 
     fmpz_set(qs_inf->upp_bound, upper_bound);
@@ -415,16 +475,27 @@ void qsieve_reinit_A(qs_t qs_inf)
     qs_inf->h = s;
 }
 
+#define QS_NEXT_A_ATTEMPTS 100000
+
 /*
-    Compute next A coefficient (differing from previous tuple in at least two
-    positions). This is called every time we run out of B coefficients
-    for a given A coefficient and need to compute a new A coefficient. If the
-    return value is 0, we have run out of possible coefficients (should not
-    ever happen unless tuning parameters are way off).
+    Compute the next A coefficient. If the return value is 0, we have failed
+    to find a new one (should not ever happen unless tuning parameters are
+    way off).
+
+    For s > 3, the first s - 1 factors of A are chosen at random from the
+    allowed factor base primes whose index (counted from low) is not
+    divisible by 4, and the last one, among those whose index is divisible
+    by 4, is chosen to bring A within a factor of two of its optimal value.
+    A's that were already used are rejected.
+
+    (The A's used to be enumerated in a lexicographic order of the first
+    s - 1 factors. That enumeration could run through enormous numbers of
+    tuples whose product was out of range before finding the next valid A,
+    taking minutes per A for some inputs around 280 bits.)
 */
 int qsieve_next_A(qs_t qs_inf)
 {
-    slong i, j, mid, diff;
+    slong i, j, k, mid, attempt, n1, n4;
     slong s = qs_inf->s;
     slong low = qs_inf->low;
     slong span = qs_inf->span;
@@ -435,7 +506,6 @@ int qsieve_next_A(qs_t qs_inf)
     ulong * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp;
-    int found_j, inc_diff;
 
     fmpz_init(prod);
     fmpz_init(temp);
@@ -462,105 +532,118 @@ int qsieve_next_A(qs_t qs_inf)
         }
         else
            ret = 0;
-    } else
+
+        qs_inf->h = h;
+        qs_inf->m = m;
+    }
+    else
     {
-        diff = qs_inf->A_ind_diff;
-        inc_diff = 0;
+        /* number of allowed positions t for the first s - 1 factors, which
+           have index low + 4t/3 + 1, and for the last, which has index
+           low + 4u */
+        for (n1 = 0; 4*n1/3 + 1 < span; n1++) ;
+        n4 = (span + 3)/4;
 
-        while (1)
+        ret = 0;
+
+        if (n1 >= s - 1 && n4 >= 1)
         {
-            if (4*(curr_subset[0] + s + diff)/3 + 1 >= span) /* have run out of A's */
+            /*
+               The first factors are drawn from the w smallest allowed
+               primes, where w is adjusted as we go so that the product
+               typically lands in range.  (The range of allowed primes is
+               chosen so that products of the smallest ones are about
+               right, so drawing from all of it gives products far too large.)
+            */
+            slong w, wmin = FLINT_MIN(n1, s + 4);
+
+            w = qs_inf->A_window;
+            if (w <= 0 || w > n1)
+                w = n1;
+
+            for (attempt = 0; attempt < QS_NEXT_A_ATTEMPTS; attempt++)
             {
-                ret = 0;
-                goto next_A_cleanup;
-            }
+                w = FLINT_MAX(w, wmin);
 
-            h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
-
-            /* h must not exceed s - 2: if it does the index s - 2 - h
-               goes negative and we have exhausted all valid (s-1)-subsets */
-            if (h > s - 2)
-            {
-                ret = 0;
-                goto next_A_cleanup;
-            }
-
-            m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
-            if (h == 2)
-               inc_diff = 1;
-            else if (h > 2)
-               diff = 1;
-
-            for (j = 0; j < h; j++)
-                curr_subset[s + j - h - 2] = m + j;
-
-            curr_subset[s - 2] = curr_subset[s - 3] + diff;
-
-            fmpz_set_ui(prod, 1);
-
-            for (j = 0; j < s - 1; j++)
-                fmpz_mul_ui(prod, prod, factor_base[4*curr_subset[j]/3 + 1 + low].p);
-
-            /* binary search for final prime */
-            i = 0;
-            j = span/4 - 1;
-
-            found_j = 0;
-
-            while (i < j)
-            {
-                mid = i + (j - i) / 2;
-
-                fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
-
-                if (fmpz_cmp(qs_inf->low_bound, temp) > 0)
+                /* random distinct positions for the first s - 1 factors */
+                for (j = 0; j < s - 1; j++)
                 {
-                    i = mid + (i == mid);
-                }
-                else if (fmpz_cmp(temp, qs_inf->upp_bound) > 0)
-                {
-                    j = mid - (j == mid);
-                }
-                else
-                {
-                    j = 4*mid + low;
-                    found_j = 1;
-                    if (inc_diff)
+                    ulong t;
+                    int fresh;
+
+                    do
                     {
-                        diff += 1;
-                        qs_inf->A_ind_diff = diff;
-                    }
-                    break;
+                        t = qsieve_A_rand(qs_inf, w);
+                        fresh = 1;
+                        for (k = 0; k < j; k++)
+                            if (curr_subset[k] == t)
+                                fresh = 0;
+                    } while (!fresh);
+
+                    curr_subset[j] = t;
                 }
-            }
 
-            if (found_j)
-            {
-                A_ind[s - 1] = j;
+                fmpz_set_ui(prod, 1);
+                for (j = 0; j < s - 1; j++)
+                    fmpz_mul_ui(prod, prod, factor_base[4*curr_subset[j]/3 + 1 + low].p);
 
-                fmpz_mul_ui(prod, prod, qs_inf->factor_base[j].p);
+                /* binary search for the final prime */
+                i = 0;
+                j = n4 - 1;
+
+                while (i <= j)
+                {
+                    mid = i + (j - i) / 2;
+
+                    fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
+
+                    if (fmpz_cmp(qs_inf->low_bound, temp) > 0)
+                        i = mid + 1;
+                    else if (fmpz_cmp(temp, qs_inf->upp_bound) > 0)
+                        j = mid - 1;
+                    else
+                        break;
+                }
+
+                if (i > j) /* no final prime brings A in range */
+                {
+                    if (i == 0) /* product too large */
+                        w = w - 1 - w/16;
+                    else /* product too small */
+                        w = FLINT_MIN(n1, w + 1 + w/16);
+
+                    continue;
+                }
+
+                if (!qsieve_A_is_new(qs_inf, temp))
+                    continue;
 
                 for (j = 0; j < s - 1; j++)
                     A_ind[j] = 4*curr_subset[j]/3 + 1 + low;
+                A_ind[s - 1] = 4*mid + low;
 
+                fmpz_set(prod, temp);
+                ret = 1;
                 break;
             }
+
+            qs_inf->A_window = w;
         }
     }
 
 #if QS_DEBUG
-    flint_printf("A_ind = (");
-    for (i = 0; i < s - 1; i++)
-        flint_printf("%ld, ", A_ind[i]);
-    flint_printf("%ld", A_ind[s - 1]);
-    flint_printf(")\n");
+    if (ret)
+    {
+        flint_printf("A_ind = (");
+        for (i = 0; i < s - 1; i++)
+            flint_printf("%ld, ", A_ind[i]);
+        flint_printf("%ld", A_ind[s - 1]);
+        flint_printf(")\n");
+    }
 #endif
 
-    qs_inf->h = h;
-    qs_inf->m = m;
-    fmpz_set(qs_inf->A, prod);
-
-next_A_cleanup:
+    if (ret)
+        fmpz_set(qs_inf->A, prod);
 
     fmpz_clear(prod);
     fmpz_clear(temp);
@@ -581,7 +664,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     ulong * A_ind = qs_inf->A_ind;
     ulong * A_inv = qs_inf->A_inv;
     ulong * B0_terms = qs_inf->B0_terms;
-    ulong ** A_inv2B = qs_inf->A_inv2B;
+    uint32_t ** A_inv2B = qs_inf->A_inv2B;
     fmpz_t * B_terms = qs_inf->B_terms;
     fmpz_t * A_divp = qs_inf->A_divp;
     prime_t * factor_base = qs_inf->factor_base;
@@ -589,6 +672,8 @@ void qsieve_init_poly_first(qs_t qs_inf)
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
     ulong p, pinv, temp, temp2;
+    ulong * B_ui = NULL;
+    int small_A, small_B;
 
 #if QS_DEBUG
     qs_inf->poly_count += 1;
@@ -628,12 +713,55 @@ void qsieve_init_poly_first(qs_t qs_inf)
         fmpz_add(qs_inf->B, qs_inf->B, B_terms[i]);
     }
 
-    /* calculate A_inv[k] = A^-1 modulo p_k for p_k in the factor base */
-    for (k = 3; k < qs_inf->num_primes; k++)
+    /*
+       A and the B_terms fit in a single word for inputs up to roughly 160
+       bits.  When they do, reduce them with the precomputed inverse rather
+       than calling fmpz_fdiv_ui: the A_inv2B loop below performs s
+       reductions for every factor base prime, and a multiprecision division
+       there dominates the cost of setting up a polynomial.
+    */
+    small_A = (fmpz_size(qs_inf->A) <= 1);
+    small_B = small_A;
+
+    if (small_B)
     {
-        p = factor_base[k].p;
-        temp = fmpz_fdiv_ui(qs_inf->A, p);
-        A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        for (i = 0; i < s; i++)
+        {
+            if (fmpz_size(B_terms[i]) > 1)
+            {
+                small_B = 0;
+                break;
+            }
+        }
+    }
+
+    if (small_B)
+    {
+        B_ui = flint_malloc(s*sizeof(ulong));
+        for (i = 0; i < s; i++)
+            B_ui[i] = fmpz_get_ui(B_terms[i]);
+    }
+
+    /* calculate A_inv[k] = A^-1 modulo p_k for p_k in the factor base */
+    if (small_A)
+    {
+        ulong A_ui = fmpz_get_ui(qs_inf->A);
+
+        for (k = 3; k < qs_inf->num_primes; k++)
+        {
+            p = factor_base[k].p;
+            temp = n_mod2_preinv(A_ui, p, factor_base[k].pinv);
+            A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        }
+    }
+    else
+    {
+        for (k = 3; k < qs_inf->num_primes; k++)
+        {
+            p = factor_base[k].p;
+            temp = fmpz_fdiv_ui(qs_inf->A, p);
+            A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        }
     }
 
     /*
@@ -647,13 +775,17 @@ void qsieve_init_poly_first(qs_t qs_inf)
 
         for (i = 0; i < s; i++)
         {
-            temp = fmpz_fdiv_ui(B_terms[i], p);
+            temp = small_B ? n_mod2_preinv(B_ui[i], p, pinv)
+                           : fmpz_fdiv_ui(B_terms[i], p);
             temp *= 2;
             if (temp >= p)
                temp -= p;
             A_inv2B[i][k] = n_mulmod2_preinv(temp, A_inv[k], p, pinv);
         }
     }
+
+    if (small_B)
+        flint_free(B_ui);
 
     /*
         compute roots of first polynomial modulo factor base primes
@@ -704,11 +836,10 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
 {
     slong j, v;
     slong s = qs_inf->s;
-    prime_t * factor_base = qs_inf->factor_base;
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
-    ulong ** A_inv2B = qs_inf->A_inv2B;
-    ulong sign, p, r1, r2;
+    uint32_t ** A_inv2B = qs_inf->A_inv2B;
+    ulong sign;
     fmpz_t temp;
 
     fmpz_init(temp);
@@ -732,34 +863,42 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
     else
        fmpz_sub(qs_inf->B, qs_inf->B, temp);
 
-    /* updating roots of poly for B_{i+1} */
-    for (j = 3; j < qs_inf->num_primes; j++)
+    /*
+       updating roots of poly for B_{i+1}; written without branches, so
+       that the compiler can vectorise the loops
+    */
     {
-        p = factor_base[j].p;
+        const uint32_t * Ainv2B = A_inv2B[v];
+        const uint32_t * p32 = qs_inf->fb_p32;
+        slong num_primes = qs_inf->num_primes;
 
         if (sign)
         {
-            r1 = soln1[j] + p - A_inv2B[v][j];
-            r2 = soln2[j] + p - A_inv2B[v][j];
-        } else
-        {
-            r1 = soln1[j] + A_inv2B[v][j];
-            r2 = soln2[j] + A_inv2B[v][j];
+            for (j = 3; j < num_primes; j++)
+            {
+                int32_t pp = p32[j], a = Ainv2B[j];
+                int32_t s1 = soln1[j] - a, s2 = soln2[j] - a;
+
+                s1 += (s1 < 0) ? pp : 0;
+                s2 += (s2 < 0) ? pp : 0;
+
+                soln1[j] = FLINT_MIN(s1, s2);
+                soln2[j] = FLINT_MAX(s1, s2);
+            }
         }
-
-        if (r1 >= p)
-            r1 -= p;
-        if (r2 >= p)
-            r2 -= p;
-
-        if (r1 < r2)
+        else
         {
-           soln1[j] = r1;
-           soln2[j] = r2;
-        } else
-        {
-            soln1[j] = r2;
-            soln2[j] = r1;
+            for (j = 3; j < num_primes; j++)
+            {
+                int32_t pp = p32[j], a = Ainv2B[j];
+                int32_t s1 = soln1[j] + a, s2 = soln2[j] + a;
+
+                s1 -= (s1 >= pp) ? pp : 0;
+                s2 -= (s2 >= pp) ? pp : 0;
+
+                soln1[j] = FLINT_MIN(s1, s2);
+                soln2[j] = FLINT_MAX(s1, s2);
+            }
         }
     }
 
@@ -798,13 +937,8 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
 */
 void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf)
 {
-   slong i;
-
    fmpz_set(poly->B, qs_inf->B);
 
-   for (i = 0; i < qs_inf->num_primes; i++)
-   {
-      poly->soln1[i] = qs_inf->soln1[i];
-      poly->soln2[i] = qs_inf->soln2[i];
-   }
+   memcpy(poly->soln1, qs_inf->soln1, qs_inf->num_primes*sizeof(int));
+   memcpy(poly->soln2, qs_inf->soln2, qs_inf->num_primes*sizeof(int));
 }

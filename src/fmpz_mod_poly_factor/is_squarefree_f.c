@@ -24,6 +24,8 @@ _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz
     slong dlen;
     int res = 0;
 
+    fmpz_one(fac);
+
     if (len <= 2)
         return len != 0;
 

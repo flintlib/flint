@@ -12,40 +12,16 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, slong len1,
                                       const fmpz * poly2, slong len2)
 {
-    if (len1 == 1)
-    {
-        fmpz_set(res, poly1);
-    }
-    else
-    {
-        const slong alloc = (len1 - 1) * (len2 - 1) + 1;
-
-        slong i = len1 - 1, lenr;
-        fmpz * t = _fmpz_vec_init(alloc);
-
-        /*
-           Perform the first two steps as one,
-             "res = a(m) * poly2 + a(m-1)".
-         */
-        {
-            lenr = len2;
-            _fmpz_vec_scalar_mul_fmpz(res, poly2, len2, poly1 + i);
-            i--;
-            fmpz_add(res, res, poly1 + i);
-        }
-        while (i--)
-        {
-            _fmpz_poly_mul(t, res, lenr, poly2, len2);
-            lenr += len2 - 1;
-            _fmpz_poly_add(res, t, lenr, poly1 + i, 1);
-        }
-        _fmpz_vec_clear(t, alloc);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(_gr_poly_compose_horner(res, poly1, len1, poly2, len2, ctx));
 }
 
 void

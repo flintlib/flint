@@ -34,7 +34,6 @@ gr_poly_addmul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t
     }
 
     status |= _gr_vec_addmul_scalar(res->coeffs, poly->coeffs, len, c, ctx);
-    _gr_poly_set_length(res, FLINT_MAX(res->length, poly->length), ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, FLINT_MAX(res->length, poly->length), ctx);
     return status;
 }

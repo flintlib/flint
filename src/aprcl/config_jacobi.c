@@ -10,10 +10,24 @@
 */
 
 #include <math.h>
+#include <stdlib.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "aprcl.h"
+
+/*
+    Exponent alpha in the cost model cost(p, q) ~ phi(p^k)^alpha used when
+    choosing which primes q to keep in s.
+*/
+#define APRCL_JACOBI_COST_EXPONENT 2.0
+
+/*
+    Primes q above this bound are only kept in s when they are needed to
+    reach s^2 > n: the Jacobi sums J(p, q) are computed with tables of q
+    words, so e.g. q = R + 1 with R ~ 10^8 needs gigabytes of memory.
+*/
+#define APRCL_MAX_Q (UWORD(1) << 22)
 
 ulong
 aprcl_R_value(const fmpz_t n)
@@ -75,10 +89,13 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
     ulong i, j, q;
     double * w;
     n_factor_t q_factors;
-    fmpz_t new_s, p;
+    fmpz_t new_s, p, t, r;
+    int n_pos = (fmpz_sgn(n) > 0);
 
     fmpz_init(new_s);
     fmpz_init(p);
+    fmpz_init(t);
+    fmpz_init(r);
     w = (double *) flint_malloc(sizeof(double) * conf->qs->num);
 
     for (i = 0; i < conf->qs->num; i++)
@@ -89,6 +106,11 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
+        /*
+            w[i] = estimated cost of the Jacobi sum tests for q per bit
+            contributed to s, with the cost of a pair (p, q) modelled as
+            phi(p^k)^APRCL_JACOBI_COST_EXPONENT.
+        */
         w[i] = 0;
 
         for (j = 0; j < q_factors.num; j++)
@@ -97,12 +119,15 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
             p = q_factors.p[j];
             euler_phi = n_pow(p, q_factors.exp[j] - 1) * (p - 1);
-            euler_phi = euler_phi * euler_phi;
 
-            w[i] += euler_phi;
+            w[i] += pow((double) euler_phi, APRCL_JACOBI_COST_EXPONENT);
         }
 
         w[i] /= log((double) n_pow(q, conf->qs->exp[i]));
+
+        /* large q are expensive (tables of q words): drop them first */
+        if (q > APRCL_MAX_Q)
+            w[i] += 1e6 * ((double) q / APRCL_MAX_Q);
     }
 
     while (1)
@@ -113,16 +138,38 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
         w_max = -1;
         ind = -1;
 
+        /*
+            Removing p = q^k from s keeps s^2 > n iff s^2 > n p^2. With
+            s^2 = t n + r, 0 <= r < n, this holds iff t > p^2, or t = p^2
+            and r > 0, which only needs a comparison of t with p^2.
+        */
+        if (n_pos)
+        {
+            fmpz_mul(t, conf->s, conf->s);
+            fmpz_fdiv_qr(t, r, t, n);
+        }
+
         for (i = 0; i < conf->qs->num; i++)
         {
+            int keeps;
+
             if (conf->qs_used[i] == 0)
                 continue;
 
-            fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
-            fmpz_fdiv_q(new_s, conf->s, p);
-            fmpz_mul(new_s, new_s, new_s);
+            if (n_pos)
+            {
+                int c;
 
-            if (fmpz_cmp(new_s, n) > 0)
+                fmpz_pow_ui(p, conf->qs->p + i, 2 * conf->qs->exp[i]);
+                c = fmpz_cmp(t, p);
+                keeps = (c > 0 || (c == 0 && !fmpz_is_zero(r)));
+            }
+            else
+            {
+                keeps = 1;
+            }
+
+            if (keeps)
                 if (w_max <= w[i])
                 {
                     w_max = w[i];
@@ -141,49 +188,99 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
     fmpz_clear(new_s);
     fmpz_clear(p);
+    fmpz_clear(t);
+    fmpz_clear(r);
     flint_free(w);
 }
 
+/* compare ulongs for qsort */
+static int
+_aprcl_ulong_cmp(const void * a, const void * b)
+{
+    ulong x = *(const ulong *) a, y = *(const ulong *) b;
+    return (x < y) ? -1 : (x > y);
+}
+
+/*
+    Sets s and the list qs of primes q with (q - 1) | R (with exponents
+    such that the powers q^k dividing s are as large as allowed), by
+    enumerating the divisors d of R and keeping those with d + 1 prime.
+*/
 static void
 _aprcl_config_jacobi_update(aprcl_config conf)
 {
-    ulong prime = 2;
+    ulong i, j, num_divisors, prime;
+    nn_ptr divisors;
+    n_factor_t factors;
 
     fmpz_set_ui(conf->s, 1);
     fmpz_factor_clear(conf->qs);
     fmpz_factor_init(conf->qs);
     conf->qs->sign = 1;
 
-    _fmpz_factor_append_ui(conf->qs, prime, aprcl_p_power_in_q(conf->R, prime) + 2);
-    fmpz_mul_ui(conf->s, conf->s, n_pow(prime, aprcl_p_power_in_q(conf->R, prime) + 2));
+    /* enumerate the divisors of R */
+    n_factor_init(&factors);
+    n_factor(&factors, conf->R, 1);
 
-    prime = 3;
-    while (2 * (prime - 1) <= conf->R)
+    num_divisors = 1;
+    for (i = 0; i < factors.num; i++)
+        num_divisors *= factors.exp[i] + 1;
+
+    divisors = flint_malloc(num_divisors * sizeof(ulong));
+    divisors[0] = 1;
+    num_divisors = 1;
+    for (i = 0; i < factors.num; i++)
     {
-        if ((conf->R % (prime - 1)) == 0)
+        ulong len = num_divisors, pk = 1;
+        for (j = 0; j < factors.exp[i]; j++)
         {
-            _fmpz_factor_append_ui(conf->qs, prime, aprcl_p_power_in_q(conf->R, prime) + 1);
-            fmpz_mul_ui(conf->s, conf->s, n_pow(prime, aprcl_p_power_in_q(conf->R, prime) + 1));
+            ulong l;
+            pk *= factors.p[i];
+            for (l = 0; l < len; l++)
+                divisors[num_divisors++] = divisors[l] * pk;
         }
-        prime++;
-        while (n_is_prime(prime) == 0)
-            prime++;
     }
 
-    if (n_is_prime(conf->R + 1))
+    qsort(divisors, num_divisors, sizeof(ulong), _aprcl_ulong_cmp);
+
+    /* q = d + 1 prime; q = 2 (from d = 1) gets one extra power of 2 */
+    for (i = 0; i < num_divisors; i++)
     {
-        _fmpz_factor_append_ui(conf->qs, conf->R + 1, 1);
-        fmpz_mul_ui(conf->s, conf->s, conf->R + 1);
+        prime = divisors[i] + 1;
+        if (n_is_prime(prime))
+        {
+            ulong k = aprcl_p_power_in_q(conf->R, prime) + 1 + (prime == 2);
+            _fmpz_factor_append_ui(conf->qs, prime, k);
+            fmpz_mul_ui(conf->s, conf->s, n_pow(prime, k));
+        }
     }
+
+    flint_free(divisors);
+}
+
+/* is s^2 > n? */
+static int
+_aprcl_config_s_squared_gt(const aprcl_config conf, const fmpz_t n)
+{
+    int result;
+    fmpz_t s2;
+
+    fmpz_init(s2);
+    fmpz_mul(s2, conf->s, conf->s);
+    result = (fmpz_cmp(s2, n) > 0);
+    fmpz_clear(s2);
+
+    return result;
 }
 
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
+/* configuration with a given R; s^2 > n is not checked */
 void
-aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
+aprcl_config_jacobi_init_R(aprcl_config conf, const fmpz_t n, ulong R)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
-    conf->R = aprcl_R_value(n);
+    conf->R = R;
     _aprcl_config_jacobi_update(conf);
 
     n_factor_init(&conf->rs);
@@ -191,6 +288,34 @@ aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
     conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
     _aprcl_config_jacobi_reduce_s2(conf, n);
+}
+
+void
+aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
+{
+    ulong R = aprcl_R_value(n);
+
+    aprcl_config_jacobi_init_R(conf, n, R);
+
+    /*
+        The final trial division only proves primality if s^2 > n. The
+        tabulated values of R give this for n up to about 20000 bits; for
+        larger n, multiply R by further primes (each prime q with q - 1 | R
+        contributes to s) until s^2 > n. Since the reduction of s keeps
+        s^2 > n whenever the full s satisfies it, checking the reduced s
+        is enough.
+    */
+    while (!_aprcl_config_s_squared_gt(conf, n))
+    {
+        ulong p = n_nextprime(conf->rs.p[conf->rs.num - 1], 1);
+
+        if (R > UWORD_MAX / p)
+            flint_throw(FLINT_ERROR, "aprcl_config_jacobi_init: n is too large\n");
+
+        R *= p;
+        aprcl_config_jacobi_clear(conf);
+        aprcl_config_jacobi_init_R(conf, n, R);
+    }
 }
 
 void

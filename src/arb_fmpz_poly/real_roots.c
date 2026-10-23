@@ -213,6 +213,83 @@ arb_fmpz_poly_real_roots_deflated(arb_ptr res, const fmpz_poly_t poly, slong def
 }
 
 
+/* Computes the rational roots exactly first, and the remaining roots
+   using the general algorithm. */
+static slong
+_arb_fmpz_poly_real_roots_rational(arb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec)
+{
+    slong deg, nr, num, i, j, prec;
+    fmpq * rat;
+    slong * exp;
+    fmpz_poly_t Q, P, lin;
+
+    deg = fmpz_poly_degree(poly);
+    flags &= ~ARB_FMPZ_POLY_ROOTS_RATIONAL;
+
+    rat = _fmpq_vec_init(deg);
+    exp = flint_malloc(sizeof(slong) * deg);
+
+    nr = fmpz_poly_roots_fmpq(rat, exp, poly);
+
+    if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
+        flint_printf("%wd rational roots\n", nr);
+
+    if (nr == 0)
+    {
+        num = arb_fmpz_poly_real_roots(roots, poly, flags, target_prec);
+    }
+    else
+    {
+        fmpz_poly_init(Q);
+        fmpz_poly_init(P);
+        fmpz_poly_init(lin);
+
+        /* Q = poly / prod (b x - a)^e */
+        fmpz_poly_one(P);
+        for (i = 0; i < nr; i++)
+        {
+            fmpz_poly_zero(lin);
+            fmpz_poly_set_coeff_fmpz(lin, 1, fmpq_denref(rat + i));
+            fmpz_neg(fmpq_numref(rat + i), fmpq_numref(rat + i));
+            fmpz_poly_set_coeff_fmpz(lin, 0, fmpq_numref(rat + i));
+            fmpz_neg(fmpq_numref(rat + i), fmpq_numref(rat + i));
+            for (j = 0; j < exp[i]; j++)
+                fmpz_poly_mul(P, P, lin);
+        }
+        fmpz_poly_divexact(Q, poly, P);
+
+        for (prec = target_prec; ; prec *= 2)
+        {
+            num = arb_fmpz_poly_real_roots(roots, Q, flags, prec);
+
+            for (i = 0; i < nr; i++)
+                arb_set_fmpq(roots + num + i, rat + i, prec + 10);
+            num += nr;
+
+            _arb_vec_sort_mid(roots, num);
+
+            for (i = 0; i + 1 < num; i++)
+                if (arb_overlaps(roots + i, roots + i + 1))
+                    break;
+
+            if (i + 1 >= num)
+                break;
+
+            if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
+                flint_printf("rational root not isolated at precision %wd; retrying\n", prec);
+        }
+
+        fmpz_poly_clear(Q);
+        fmpz_poly_clear(P);
+        fmpz_poly_clear(lin);
+    }
+
+    _fmpq_vec_clear(rat, deg);
+    flint_free(exp);
+
+    return num;
+}
+
 slong
 arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec)
 {
@@ -222,6 +299,9 @@ arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong
 
     if (fmpz_poly_degree(poly) < 1)
         return 0;
+
+    if (flags & ARB_FMPZ_POLY_ROOTS_RATIONAL)
+        return _arb_fmpz_poly_real_roots_rational(roots, poly, flags, target_prec);
 
     fmpz_poly_init(poly_deflated);
 

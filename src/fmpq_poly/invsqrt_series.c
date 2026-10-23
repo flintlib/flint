@@ -15,58 +15,119 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+/* Set (rpoly, rden) to (rpoly, rden) + x^m (w, wden), where w has
+   length L and (w, wden) is overwritten. The result is canonical if both
+   inputs are. */
 static void
-_fmpq_poly_mulmid(fmpz * rpoly, fmpz_t rden,
-                  const fmpz * poly1, const fmpz_t den1, slong len1,
-                  const fmpz * poly2, const fmpz_t den2, slong len2, slong nlo, slong nhi)
+_fmpq_poly_append_shifted(fmpz * rpoly, fmpz_t rden, slong m,
+                          fmpz * w, fmpz_t wden, slong L)
 {
-    _fmpz_poly_mulmid(rpoly, poly1, len1, poly2, len2, nlo, nhi);
-    fmpz_mul(rden, den1, den2);
+    fmpz_t d, t;
+
+    fmpz_init(d);
+    fmpz_init(t);
+
+    fmpz_gcd(d, rden, wden);
+
+    /* scale low part by wden / d, high part by rden / d */
+    fmpz_divexact(t, wden, d);
+    if (!fmpz_is_one(t))
+        _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, m, t);
+    fmpz_divexact(d, rden, d);
+    if (!fmpz_is_one(d))
+        _fmpz_vec_scalar_mul_fmpz(rpoly + m, w, L, d);
+    else
+        _fmpz_vec_set(rpoly + m, w, L);
+    fmpz_mul(rden, rden, t);
+
+    fmpz_clear(d);
+    fmpz_clear(t);
 }
 
+/*
+    Third-order Newton iteration: given g = h^(-1/2) + O(x^m), let
+    e = 1 - h g^2 = O(x^m). Then
+
+        h^(-1/2) = g (1 + e/2 + 3e^2/8) + O(x^(3m)).
+*/
 void
 _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
                       const fmpz * poly, const fmpz_t den, slong len, slong n)
 {
-    slong m;
-    fmpz * t, * u;
-    fmpz_t tden, uden;
+    slong a[FLINT_BITS];
+    slong i, m, k, L, tlen, hnlen, plen;
+    fmpz * t, * u, * v;
+    fmpz_t uden, wden;
+
+    fmpz_one(rpoly);
+    fmpz_one(rden);
 
     if (n == 1)
+        return;
+
+    len = FLINT_MIN(len, n);
+
+    if (len == 1)
     {
-        fmpz_one(rpoly);
-        fmpz_one(rden);
+        _fmpz_vec_zero(rpoly + 1, n - 1);
         return;
     }
 
-    m = (n + 1) / 2;
+    a[i = 0] = n;
+    while (n > 1)
+        a[++i] = (n = (n + 2) / 3);
 
-    _fmpq_poly_invsqrt_series(rpoly, rden, poly, den, len, m);
+    t = _fmpz_vec_init(3 * a[0]);
+    u = t + a[0];
+    v = u + a[0];
 
-    fmpz_init(tden);
     fmpz_init(uden);
-    t = _fmpz_vec_init(n);
-    u = _fmpz_vec_init(n);
+    fmpz_init(wden);
 
-    _fmpz_vec_zero(rpoly + m, n - m);
+    for (i--; i >= 0; i--)
+    {
+        m = n;
+        n = a[i];
+        k = n - 2 * m;
+        L = n - m;
 
-    _fmpq_poly_mul(t, tden, rpoly, rden, m, rpoly, rden, m);
-    if (2*m - 1 < n)
-        fmpz_zero(t + n - 1);
+        /* u / uden = (h g^2)[m, n) = -e / x^m */
+        tlen = FLINT_MIN(2 * m - 1, n);
+        hnlen = FLINT_MIN(len, n);
+        plen = FLINT_MIN(n, tlen + hnlen - 1);
+        _fmpz_poly_sqrlow(t, rpoly, m, tlen);
+        _fmpz_poly_mulmid(u, t, tlen, poly, hnlen, m, plen);
+        _fmpz_vec_zero(u + plen - m, n - plen);
+        fmpz_mul(uden, rden, rden);
+        fmpz_mul(uden, uden, den);
 
-    _fmpq_poly_mullow(u, uden, t, tden, n, rpoly, rden, n, n);
-    _fmpq_poly_mulmid(t + m, tden, u, uden, n, poly, den, len, m, n);
-    _fmpz_vec_neg(t + m, t + m, n - m);
-    _fmpz_vec_zero(t, m);
-    fmpz_mul_ui(tden, tden, UWORD(2));
-    _fmpq_poly_canonicalise(t, tden, n);
-    /* todo: concatenate instead of zero+add */
-    _fmpq_poly_add(rpoly, rden, rpoly, rden, m, t, tden, n);
+        if (k > 0)
+        {
+            /* e/2 + 3e^2/8 = -(4 uden u - 3 x^m u^2) / (8 uden^2) */
+            _fmpz_poly_sqrlow(v, u, k, k);
+            _fmpz_vec_scalar_mul_ui(v, v, k, 3);
+            _fmpz_vec_scalar_mul_fmpz(u, u, L, uden);
+            _fmpz_vec_scalar_mul_2exp(u, u, L, 2);
+            _fmpz_vec_sub(u + m, u + m, v, k);
+            fmpz_mul(wden, uden, uden);
+            fmpz_mul_2exp(wden, wden, 3);
+        }
+        else
+        {
+            /* e/2 = -u / (2 uden) */
+            fmpz_mul_2exp(wden, uden, 1);
+        }
 
-    fmpz_clear(tden);
+        _fmpz_poly_mullow(t, rpoly, FLINT_MIN(m, L), u, L, L);
+        _fmpz_vec_neg(t, t, L);
+        fmpz_mul(wden, wden, rden);
+        _fmpq_poly_canonicalise(t, wden, L);
+        _fmpq_poly_append_shifted(rpoly, rden, m, t, wden, L);
+    }
+
     fmpz_clear(uden);
-    _fmpz_vec_clear(t, n);
-    _fmpz_vec_clear(u, n);
+    fmpz_clear(wden);
+    _fmpz_vec_clear(t, 3 * a[0]);
 }
 
 void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)

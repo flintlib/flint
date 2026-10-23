@@ -42,6 +42,7 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
@@ -60,6 +61,26 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         fmpz_mat_inv(B, den, A);
+
+        /* aliased input and output must give the same result */
+        {
+            fmpz_mat_t Aalias;
+            fmpz_t denalias;
+            fmpz_mat_init_set(Aalias, A);
+            fmpz_init(denalias);
+            fmpz_mat_inv(Aalias, denalias, Aalias);
+            if (!fmpz_mat_equal(Aalias, B) || !fmpz_equal(denalias, den))
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("aliased inverse differs!\n");
+                flint_printf("A:\n"), fmpz_mat_print_pretty(A), flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+            fmpz_mat_clear(Aalias);
+            fmpz_clear(denalias);
+        }
+
         fmpz_mat_mul(C, A, B);
 
         _fmpz_vec_scalar_divexact_fmpz(C->entries, C->entries, m*m, den);
@@ -102,6 +123,7 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
     /* Test singular systems */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = 1 + n_randint(state, 10);
         r = n_randint(state, m);
 
@@ -138,6 +160,8 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
         fmpz_mat_clear(B);
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

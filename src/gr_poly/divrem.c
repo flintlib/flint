@@ -25,6 +25,19 @@ _gr_poly_divrem_generic(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B
     if (lenB == 1 || lenA - lenB == 1)
         return _gr_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ctx);
 
+    /* Over finite rings, Newton division costs several multiplications
+       of length lenB regardless of the quotient length, so use the
+       basecase algorithm when the quotient (or the divisor) is short.
+       This matters in particular for the Euclidean algorithm, where the
+       quotients occasionally have degree larger than one.
+       Todo: the same selection is probably appropriate for other rings
+       (as in _gr_poly_div_generic), but this needs to be checked with
+       respect to numerical stability over approximate rings and
+       coefficient growth over exact nonfinite rings. */
+    if (gr_ctx_is_finite(ctx) == T_TRUE &&
+        (lenB <= DIVCONQUER_CUTOFF || lenA - lenB <= DIVCONQUER_CUTOFF))
+        return _gr_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ctx);
+
     status = _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 
     /* Newton requires invertible lc(B); basecase and divide-and-conquer

@@ -10,37 +10,40 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_interpolation_weights(arb_ptr w,
     arb_ptr * tree, slong len, slong prec)
 {
-    arb_ptr tmp;
-    slong i, n, height;
+    gr_ctx_t ctx;
 
-    if (len == 0)
-        return;
+    gr_ctx_init_real_arb(ctx, prec);
 
-    if (len == 1)
+    /* Weights that are not invertible give GR_UNABLE, in which case
+       gr_inv has already written the same (non-finite) value as arb_inv.
+       Exact zeros give GR_DOMAIN and are not written; this can only
+       happen for degenerate input, where we simply redo the computation
+       with arb_inv to get the same output as arb_inv. */
+    if (_gr_poly_interpolation_weights(w, (const gr_ptr *) tree, len, ctx) & GR_DOMAIN)
     {
-        arb_one(w);
-        return;
+        arb_ptr tmp;
+        slong i, n, height;
+
+        tmp = _arb_vec_init(len + 1);
+        height = FLINT_CLOG2(len);
+        n = WORD(1) << (height - 1);
+
+        _arb_poly_mul_monic(tmp, tree[height-1], n + 1,
+                            tree[height-1] + (n + 1), (len - n + 1), prec);
+        _arb_poly_derivative(tmp, tmp, len + 1, prec);
+        _arb_poly_evaluate_vec_fast_precomp(w, tmp, len, tree, len, prec);
+
+        for (i = 0; i < len; i++)
+            arb_inv(w + i, w + i, prec);
+
+        _arb_vec_clear(tmp, len + 1);
     }
-
-    tmp = _arb_vec_init(len + 1);
-    height = FLINT_CLOG2(len);
-    n = WORD(1) << (height - 1);
-
-    _arb_poly_mul_monic(tmp, tree[height-1], n + 1,
-                        tree[height-1] + (n + 1), (len - n + 1), prec);
-
-    _arb_poly_derivative(tmp, tmp, len + 1, prec);
-    _arb_poly_evaluate_vec_fast_precomp(w, tmp, len, tree, len, prec);
-
-    for (i = 0; i < len; i++)
-        arb_inv(w + i, w + i, prec);
-
-    _arb_vec_clear(tmp, len + 1);
 }
 
 void
@@ -48,46 +51,10 @@ _arb_poly_interpolate_fast_precomp(arb_ptr poly,
     arb_srcptr ys, arb_ptr * tree, arb_srcptr weights,
     slong len, slong prec)
 {
-    arb_ptr t, u, pa, pb;
-    slong i, pow, left;
-
-    if (len == 0)
-        return;
-
-    t = _arb_vec_init(len);
-    u = _arb_vec_init(len);
-
-    for (i = 0; i < len; i++)
-        arb_mul(poly + i, weights + i, ys + i, prec);
-
-    for (i = 0; i < FLINT_CLOG2(len); i++)
-    {
-        pow = (WORD(1) << i);
-        pa = tree[i];
-        pb = poly;
-        left = len;
-
-        while (left >= 2 * pow)
-        {
-            _arb_poly_mul(t, pa, pow + 1, pb + pow, pow, prec);
-            _arb_poly_mul(u, pa + pow + 1, pow + 1, pb, pow, prec);
-            _arb_vec_add(pb, t, u, 2 * pow, prec);
-
-            left -= 2 * pow;
-            pa += 2 * pow + 2;
-            pb += 2 * pow;
-        }
-
-        if (left > pow)
-        {
-            _arb_poly_mul(t, pa, pow + 1, pb + pow, left - pow, prec);
-            _arb_poly_mul(u, pb, pow, pa + pow + 1, left - pow + 1, prec);
-            _arb_vec_add(pb, t, u, left, prec);
-        }
-    }
-
-    _arb_vec_clear(t, len);
-    _arb_vec_clear(u, len);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    GR_MUST_SUCCEED(_gr_poly_interpolate_fast_precomp(poly, ys,
+        (const gr_ptr *) tree, weights, len, ctx));
 }
 
 void

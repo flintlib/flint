@@ -274,11 +274,12 @@ nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
 ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod);
 ulong nmod_2_pow_ui(ulong exp, nmod_t mod);
 
-NMOD_INLINE
-ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
-{
-    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
-}
+#define NMOD_SQRT_SMALL_CUTOFF 128
+
+int _nmod_sqrt_small(ulong * res, ulong a, ulong n);
+int nmod_sqrt(ulong * res, ulong a, nmod_t mod);
+
+ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod);
 
 NMOD_INLINE
 void nmod_init(nmod_t * mod, ulong n)
@@ -612,6 +613,7 @@ typedef struct
 {
     nmod_t nmod;
     ulong a;   /* when used as finite field with defining polynomial x - a */
+    ulong pretend;  /* 0: no pretense; 1: pretending to be a field; d > 1: pretending, d a factor found */
     truth_t is_prime;
 }
 _gr_nmod_ctx_struct;
@@ -619,6 +621,7 @@ _gr_nmod_ctx_struct;
 #define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
 #define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
+#define NMOD_PRETEND(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->pretend)
 /* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
 #define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
 

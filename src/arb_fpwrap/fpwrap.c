@@ -291,7 +291,7 @@ static int arb_fpwrap_double_4(double * res, arb_func_4 func, double x1, double 
     arb_set_d(arb_x1, x1);
     arb_set_d(arb_x2, x2);
     arb_set_d(arb_x3, x3);
-    arb_set_d(arb_x3, x4);
+    arb_set_d(arb_x4, x4);
 
     if (!arb_is_finite(arb_x1) || !arb_is_finite(arb_x2) || !arb_is_finite(arb_x3) || !arb_is_finite(arb_x4))
     {

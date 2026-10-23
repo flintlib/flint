@@ -48,15 +48,9 @@ typedef struct
 }
 nmod_poly_matrix_precompute_arg_t;
 
-typedef struct
-{
-    nmod_mat_struct * A;
-    nmod_poly_struct * res;
-    nmod_poly_struct * poly1;
-    nmod_poly_struct * poly3;
-    nmod_poly_struct * poly3inv;
-}
-nmod_poly_compose_mod_precomp_preinv_arg_t;
+
+/* stored transform, defined in fft_small.h */
+struct mul_precomp_struct;
 
 typedef struct
 {
@@ -69,6 +63,10 @@ typedef struct
     nn_ptr ext_s1f;         /* extrapolate: forward scaling constant  */
     nn_ptr ext_s1b;         /* extrapolate: backward scaling constant */
     nn_ptr ext_s2, ext_s3;  /* extrapolate: shared scaling constants */
+    struct mul_precomp_struct * ev_f_fft;    /* stored ifft_tr of ev_f, or NULL */
+    struct mul_precomp_struct * int_f_fft;   /* stored fft of int_f, or NULL */
+    struct mul_precomp_struct * ext_ff_fft;  /* stored ifft_tr of ext_ff, or NULL */
+    struct mul_precomp_struct * ext_fb_fft;  /* stored ifft_tr of ext_fb, or NULL */
     nmod_t mod;             /* modulus */
     slong len;              /* number of points */
     ulong function;         /* choice of precomputations */
@@ -227,6 +225,10 @@ int nmod_poly_is_monic(const nmod_poly_t poly)
 
 /* Randomisation  ************************************************************/
 
+void nmod_poly_rand(nmod_poly_t poly, flint_rand_t state, slong len);
+void nmod_poly_rand_monic(nmod_poly_t poly, flint_rand_t state, slong len);
+void nmod_poly_rand_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
 void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len);
 
 NMOD_POLY_INLINE
@@ -370,6 +372,7 @@ void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t p
 
 int _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod);
 int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod);
+int _nmod_poly_mulmid_want_fft_small(slong len2, slong m, nmod_t mod);
 
 void _nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod);
 void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod);
@@ -607,6 +610,9 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
 void nmod_geometric_progression_init(nmod_geometric_progression_t G,
                                      ulong r, slong len, nmod_t mod);
 
+void _nmod_geometric_progression_init_fft(nmod_geometric_progression_t G,
+                                     slong ev_len, slong int_len, slong ext_len);
+
 void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
 
 void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong ilen, ulong r, slong olen, nmod_t mod);
@@ -678,7 +684,6 @@ void _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B, const n
 void _nmod_poly_precompute_matrix(nmod_mat_t A, nn_srcptr poly1, nn_srcptr poly2,
                slong len2, nn_srcptr poly2inv, slong len2inv, nmod_t mod);
 
-void _nmod_poly_precompute_matrix_worker(void * arg_ptr);
 
 void nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
@@ -688,7 +693,6 @@ void _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr poly
                             slong len3, nn_srcptr poly3inv, slong len3inv,
                             nmod_t mod);
 
-void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
 
 void nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_mat_t A,
@@ -701,44 +705,6 @@ void _nmod_poly_compose_mod_brent_kung_preinv(nn_ptr res, nn_srcptr poly1, slong
 void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3, const nmod_poly_t poly3inv);
-
-void
-_nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-        const nmod_poly_struct * polys, slong FLINT_UNUSED(lenpolys), slong l,
-        nn_srcptr g, slong glen, nn_srcptr poly, slong len,
-        nn_srcptr polyinv, slong leninv, nmod_t mod);
-
-void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                    const nmod_poly_struct * polys, slong len1, slong n,
-                    const nmod_poly_t g, const nmod_poly_t poly,
-                    const nmod_poly_t polyinv);
-
-void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
-
-void
-nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
-           const nmod_poly_struct * polys, slong len1, slong n,
-                          const nmod_poly_t g, const nmod_poly_t poly,
-                     const nmod_poly_t polyinv, thread_pool_handle * threads,
-                                                                slong num_threads);
-
-void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
-        nmod_poly_struct * res,
-        const nmod_poly_struct * polys,
-        slong FLINT_UNUSED(lenpolys), slong l,
-        nn_srcptr g, slong glen,
-        nn_srcptr poly, slong len,
-        nn_srcptr polyinv, slong leninv,
-        nmod_t mod,
-        thread_pool_handle * threads,
-        slong num_threads);
-
-void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(
-        nmod_poly_struct * res,
-        const nmod_poly_struct * polys,
-        slong len1, slong n,
-        const nmod_poly_t g, const nmod_poly_t poly,
-        const nmod_poly_t polyinv);
 
 void _nmod_poly_compose_mod_horner(nn_ptr res, nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod);
 void nmod_poly_compose_mod_horner(nmod_poly_t res, const nmod_poly_t f, const nmod_poly_t g, const nmod_poly_t h);
@@ -780,16 +746,14 @@ slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod);
 /* XGCD:  Euclidean -> HGCD */
 slong nmod_poly_xgcd_hgcd_cutoff(nmod_t mod);
 
-/* Euclidean GCD: normal -> redc_fast */
-#define NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod) (lenB >= 32 && NMOD_BITS(mod) >= FLINT_BITS / 2 && NMOD_BITS(mod) <= FLINT_BITS - 2)
+/* Euclidean GCD: normal -> redc_fast (Montgomery arithmetic needs an odd modulus) */
+#define NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod) ((lenB) >= 32 && ((mod).n & 1) && NMOD_BITS(mod) >= FLINT_BITS / 2 && NMOD_BITS(mod) <= FLINT_BITS - 2)
 
 slong _nmod_poly_gcd_euclidean(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
 
 slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean_redc_fast(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
-
-slong _nmod_poly_hgcd_recursive(nn_ptr *M, slong *lenM, nn_ptr A, slong *lenA, nn_ptr B, slong *lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nn_ptr P, nmod_t mod, int flag, nmod_poly_res_t res);
 
 slong nmod_poly_hgcd_ref(nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22, nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
 

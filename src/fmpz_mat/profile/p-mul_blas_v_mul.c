@@ -11,8 +11,6 @@
 
 #include "flint.h"
 
-#if FLINT_USES_BLAS
-#include <cblas.h>
 #include "longlong.h"  // for FLINT_BIT_COUNT
 #include "fmpz_mat.h"
 #include "profiler.h"
@@ -96,10 +94,3 @@ int main(void)
     FLINT_TEST_CLEAR(state);
     return 0;
 }
-
-#else
-int main(void)
-{
-    return 0;
-}
-#endif

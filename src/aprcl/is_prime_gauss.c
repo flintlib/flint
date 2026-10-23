@@ -335,9 +335,20 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
     {
         int f_division;
         f_division = aprcl_is_prime_final_division(n, config->s, config->R);
-        /* if (Lp) is true for all p | R and f_division == 1 then n - prime */
+        /*
+            if (Lp) is true for all p | R and f_division == 1 then n - prime,
+            provided that s^2 > n (the configurations from
+            aprcl_config_gauss_init satisfy this)
+        */
         if (result == PROBABPRIME && f_division == 1)
-            result = PRIME;
+        {
+            fmpz_t s2;
+            fmpz_init(s2);
+            fmpz_mul(s2, config->s, config->s);
+            if (fmpz_cmp(s2, n) > 0)
+                result = PRIME;
+            fmpz_clear(s2);
+        }
         /*
             if we not prove (Lp) for some p and f_division == 1
             then n still can be prime

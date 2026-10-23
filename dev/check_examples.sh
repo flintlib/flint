@@ -237,7 +237,21 @@ then
     echo "lvalue....SKIPPED"
 elif test "$1" = "machin";
 then
-    echo "machin....SKIPPED"
+    echo -n "machin...."
+    res=$($2/machin 5 2>/dev/null)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo $res | perl -0ne 'if (/A FORMULA IS WRONG/) { $bad=1 } END { exit !!$bad }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 elif test "$1" = "mfcoefs";
 then
     echo -n "mfcoefs...."
@@ -246,6 +260,11 @@ then
     then
         echo "FAIL"
         exit 1
+    fi
+    if test "$res" = "mfcoefs requires the fft_small module.  Failing silently.";
+    then
+        echo "SKIPPED"
+        exit 0
     fi
     echo "$res" | perl -0ne 'if (/2 2  -536 -528 -907 322/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";

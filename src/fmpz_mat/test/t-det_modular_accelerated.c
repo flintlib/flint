@@ -24,14 +24,19 @@ TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         int proved = n_randlimb(state) % 2;
+        slong bits = 1 + n_randint(state, 200);
         m = n_randint(state, 10);
+
+        /* the testing hook makes the modular algorithms lift with 2-bit
+           primes, so restrict it to small instances */
+        flint_fmpz_mat_force_small_primes = (m <= 4 && bits <= 10);
 
         fmpz_mat_init(A, m, m);
 
         fmpz_init(det1);
         fmpz_init(det2);
 
-        fmpz_mat_randtest(A, state, 1+n_randint(state,200));
+        fmpz_mat_randtest(A, state, bits);
 
         fmpz_mat_det_bareiss(det1, A);
         fmpz_mat_det_modular_accelerated(det2, A, proved);
@@ -54,6 +59,7 @@ TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated, state)
 
     for (i = 0; i < 10000; i++)
     {
+        flint_fmpz_mat_force_small_primes = (n_randint(state, 8) == 0);
         int proved = n_randlimb(state) % 2;
         m = 2 + n_randint(state, 10);
         fmpz_mat_init(A, m, m);
@@ -76,6 +82,8 @@ TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated, state)
         fmpz_mat_clear(A);
         fmpz_clear(det2);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

@@ -44,23 +44,50 @@ int fmpz_mpoly_get_fmpz_poly(
     {
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - Bbits);
         slong off, shift;
+        ulong * genexp, * texp;
+        TMP_INIT;
 
+        TMP_START;
+        genexp = (ulong *) TMP_ALLOC(2*N*sizeof(ulong));
+        texp = genexp + N;
         mpoly_gen_offset_shift_sp(&off, &shift, var, Bbits, ctx->minfo);
+        mpoly_gen_monomial_sp(genexp, var, Bbits, ctx->minfo);
+
+        /* check that every term is a power of the variable var */
+        for (i = 0; i < Blen; i++)
+        {
+            k = (Bexps[N*i + off] >> shift) & mask;
+            mpoly_monomial_mul_ui(texp, genexp, N, k);
+            if (!mpoly_monomial_equal(texp, Bexps + N*i, N))
+            {
+                TMP_END;
+                return 0;
+            }
+        }
 
         for (i = 0; i < Blen; i++)
         {
             k = (Bexps[N*i + off] >> shift) & mask;
             fmpz_poly_set_coeff_fmpz(A, k, Bcoeffs + i);
         }
+
+        TMP_END;
         return 1;
     }
     else
     {
         slong j, off, wpf = Bbits/FLINT_BITS;
         ulong check;
+        ulong * genexp, * texp;
+        TMP_INIT;
 
-        off = mpoly_gen_offset_mp(var, Bbits, ctx->minfo);
+        TMP_START;
+        genexp = (ulong *) TMP_ALLOC(2*N*sizeof(ulong));
+        texp = genexp + N;
+        off = mpoly_gen_monomial_offset_mp(genexp, var, Bbits, ctx->minfo);
 
+        /* check that every term is a power of the variable var
+           with an exponent that fits in an slong */
         for (i = 0; i < Blen; i++)
         {
             k = Bexps[N*i + off + 0];
@@ -69,10 +96,26 @@ int fmpz_mpoly_get_fmpz_poly(
                 check |= Bexps[N*i + off + j];
 
             if (check != 0 || (slong) k < 0)
+            {
+                TMP_END;
                 return 0;
+            }
 
+            mpoly_monomial_mul_ui_mp(texp, genexp, N, k);
+            if (!mpoly_monomial_equal(texp, Bexps + N*i, N))
+            {
+                TMP_END;
+                return 0;
+            }
+        }
+
+        for (i = 0; i < Blen; i++)
+        {
+            k = Bexps[N*i + off + 0];
             fmpz_poly_set_coeff_fmpz(A, k, Bcoeffs + i);
         }
+
+        TMP_END;
         return 1;
     }
 }
@@ -112,10 +155,7 @@ void _fmpz_mpoly_set_fmpz_poly(
 
         FLINT_ASSERT(Alen < A->alloc);
         fmpz_set(A->coeffs + Alen, Bcoeffs + i);
-        if (Abits <= FLINT_BITS)
-            mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
-        else
-            mpoly_monomial_mul_ui_mp(A->exps + N*Alen, genexp, N, i);
+        mpoly_monomial_mul_ui_any_bits(A->exps + N*Alen, genexp, N, i, Abits);
         Alen++;
     }
     _fmpz_mpoly_set_length(A, Alen, ctx);

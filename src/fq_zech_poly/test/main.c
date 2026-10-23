@@ -45,9 +45,12 @@
 #include "t-mulhigh.c"
 #include "t-mulhigh_classical.c"
 #include "t-mul_KS.c"
+#include "t-mulmid_univariate.c"
+#include "t-mul_univariate.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
 #include "t-mullow_KS.c"
+#include "t-mullow_univariate.c"
 #include "t-mulmod.c"
 #include "t-mulmod_preinv.c"
 #include "t-neg.c"
@@ -117,9 +120,12 @@ test_struct tests[] =
     TEST_FUNCTION(fq_zech_poly_mulhigh),
     TEST_FUNCTION(fq_zech_poly_mulhigh_classical),
     TEST_FUNCTION(fq_zech_poly_mul_KS),
+    TEST_FUNCTION(fq_zech_poly_mulmid_univariate),
+    TEST_FUNCTION(fq_zech_poly_mul_univariate),
     TEST_FUNCTION(fq_zech_poly_mullow),
     TEST_FUNCTION(fq_zech_poly_mullow_classical),
     TEST_FUNCTION(fq_zech_poly_mullow_KS),
+    TEST_FUNCTION(fq_zech_poly_mullow_univariate),
     TEST_FUNCTION(fq_zech_poly_mulmod),
     TEST_FUNCTION(fq_zech_poly_mulmod_preinv),
     TEST_FUNCTION(fq_zech_poly_neg),

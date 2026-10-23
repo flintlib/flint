@@ -168,8 +168,7 @@ gr_poly_compose_series_divconquer(gr_poly_t res,
         gr_poly_fit_length(res, lenr, ctx);
         status = _gr_poly_compose_series_divconquer(res->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, ctx);
-        _gr_poly_set_length(res, lenr, ctx);
-        _gr_poly_normalise(res, ctx);
+        _gr_poly_set_length_normalise(res, lenr, ctx);
     }
     else
     {
@@ -177,8 +176,7 @@ gr_poly_compose_series_divconquer(gr_poly_t res,
         gr_poly_init2(t, lenr, ctx);
         status = _gr_poly_compose_series_divconquer(t->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, ctx);
-        _gr_poly_set_length(t, lenr, ctx);
-        _gr_poly_normalise(t, ctx);
+        _gr_poly_set_length_normalise(t, lenr, ctx);
         gr_poly_swap(res, t, ctx);
         gr_poly_clear(t, ctx);
     }

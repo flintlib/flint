@@ -61,6 +61,29 @@ TEST_FUNCTION_START(n_is_prime_pocklington, state)
         mpz_clear(d_m);
     }
 
+    /* iterations 0 or 1 means no limit on the number of bases */
+    for (d = 1; d < 3000; d++)
+    {
+        int iter;
+
+        for (iter = 0; iter <= 1; iter++)
+        {
+            result = n_is_prime_pocklington(d, iter);
+
+            if (result != n_is_prime(d))
+                TEST_FUNCTION_FAIL("d = %wu, iterations = %d, result = %d\n", d, iter, result);
+        }
+    }
+
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        d = n_randtest_not_zero(state);
+        result = n_is_prime_pocklington(d, n_randint(state, 2));
+
+        if (result != n_is_prime(d))
+            TEST_FUNCTION_FAIL("d = %wu, result = %d\n", d, result);
+    }
+
     if (count > 200 * flint_test_multiplier())
         TEST_FUNCTION_FAIL("FAIL: Pocklington-Lehmer failed too many times (%wu times)\n", count);
 

@@ -179,8 +179,7 @@ int gr_poly_compose(gr_poly_t res,
             gr_poly_clear(t, ctx);
         }
 
-        _gr_poly_set_length(res, lenr, ctx);
-        _gr_poly_normalise(res, ctx);
+        _gr_poly_set_length_normalise(res, lenr, ctx);
         return status;
     }
 }

@@ -15,6 +15,11 @@
 void
 fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
 {
+    if (fmpz_mod_mpoly_is_zero(fmpz_mod_mpoly_q_numref(x), ctx))
+    {
+        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_inv: division by zero\n");
+    }
+
     if (res != x)
         fmpz_mod_mpoly_q_set(res, x, ctx);
 

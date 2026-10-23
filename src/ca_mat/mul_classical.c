@@ -10,56 +10,21 @@
 */
 
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 ca_mat_mul_classical(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 {
-    slong ar, ac, br, bc, i, j, k;
-    ca_t t;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
 
-    ar = ca_mat_nrows(A);
-    ac = ca_mat_ncols(A);
-    br = ca_mat_nrows(B);
-    bc = ca_mat_ncols(B);
-
-    if (ac != br || ar != ca_mat_nrows(C) || bc != ca_mat_ncols(C))
+    if (ca_mat_ncols(A) != ca_mat_nrows(B) || ca_mat_nrows(A) != ca_mat_nrows(C)
+        || ca_mat_ncols(B) != ca_mat_ncols(C))
     {
         flint_throw(FLINT_ERROR, "ca_mat_mul_classical: incompatible dimensions\n");
     }
 
-    if (br == 0)
-    {
-        ca_mat_zero(C, ctx);
-        return;
-    }
-
-    if (A == C || B == C)
-    {
-        ca_mat_t T;
-        ca_mat_init(T, ar, bc, ctx);
-        ca_mat_mul(T, A, B, ctx);
-        ca_mat_swap(T, C, ctx);
-        ca_mat_clear(T, ctx);
-        return;
-    }
-
-    ca_init(t, ctx);
-
-    for (i = 0; i < ar; i++)
-    {
-        for (j = 0; j < bc; j++)
-        {
-            ca_mul(ca_mat_entry(C, i, j),
-                      ca_mat_entry(A, i, 0),
-                      ca_mat_entry(B, 0, j), ctx);
-
-            for (k = 1; k < br; k++)
-            {
-                ca_mul(t, ca_mat_entry(A, i, k), ca_mat_entry(B, k, j), ctx);
-                ca_add(ca_mat_entry(C, i, j), ca_mat_entry(C, i, j), t, ctx);
-            }
-        }
-    }
-
-    ca_clear(t, ctx);
+    GR_MUST_SUCCEED(gr_mat_mul_classical((gr_mat_struct *) C,
+        (const gr_mat_struct *) A, (const gr_mat_struct *) B, gr_ctx));
 }

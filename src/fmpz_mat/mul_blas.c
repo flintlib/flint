@@ -14,11 +14,11 @@
 
 /* todo: squaring optimizations */
 
-#if FLINT_USES_BLAS && FLINT_BITS == 64
+#if FLINT_BITS == 64
 
 #include <stdint.h>
 #include <limits.h>
-#include <cblas.h>
+#include "machine_vectors.h"
 #include "nmod.h"
 #include "fmpz.h"
 #include "thread_pool.h"
@@ -141,8 +141,7 @@ red_single:
         flint_free(args);
     }
 
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-                                       m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
+    flint_dgemm(m, k, n, dA, k, dB, n, dC, n);
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
@@ -169,75 +168,19 @@ static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
         a[i] = (int32_t)(b[i] - (n & (-(uint32_t)((int32_t)(n/2 - b[i]) < 0))));
 }
 
-static uint32_t _reduce_uint32(ulong a, nmod_t mod)
-{
-    ulong r;
-    NMOD_RED(r, a, mod);
-    return (uint32_t)r;
-}
-
 static void fmpz_multi_mod_uint32_stride(
     uint32_t * out, slong stride,
     const fmpz_t input,
     const fmpz_comb_t C,
-    fmpz_comb_temp_t CT)
+    fmpz_comb_temp_t CT,
+    ulong * residues)
 {
-    slong i, k, l;
-    fmpz * A = CT->A;
-    mod_lut_entry * lu;
-    slong * offsets;
-    slong klen = C->mod_klen;
-    fmpz_t ttt;
+    slong l, n = C->num_primes;
 
-    /* high level split */
-    if (klen == 1)
-    {
-        *ttt = A[0];
-        A[0] = *input;
-    }
-    else
-    {
-        _fmpz_multi_mod_precomp(A, C->mod_P, input, -1, CT->T);
-    }
+    fmpz_multi_mod_ui(residues, input, C, CT);
 
-    offsets = C->mod_offsets;
-    lu = C->mod_lu;
-
-    for (k = 0, i = 0, l = 0; k < klen; k++)
-    {
-        slong j = offsets[k];
-
-        for ( ; i < j; i++)
-        {
-            /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            ulong t = fmpz_get_nmod(A + k, lu[i].mod);
-
-            /* low level split: 1, 2, or 3 small primes */
-            if (lu[i].mod2.n != 0)
-            {
-                FLINT_ASSERT(l + 3 <= C->num_primes);
-                out[l*stride] = _reduce_uint32(t, lu[i].mod0); l++;
-                out[l*stride] = _reduce_uint32(t, lu[i].mod1); l++;
-                out[l*stride] = _reduce_uint32(t, lu[i].mod2); l++;
-            }
-            else if (lu[i].mod1.n != 0)
-            {
-                FLINT_ASSERT(l + 2 <= C->num_primes);
-                out[l*stride] = _reduce_uint32(t, lu[i].mod0); l++;
-                out[l*stride] = _reduce_uint32(t, lu[i].mod1); l++;
-            }
-            else
-            {
-                FLINT_ASSERT(l + 1 <= C->num_primes);
-                out[l*stride] = (uint32_t)(t); l++;
-            }
-        }
-    }
-
-    FLINT_ASSERT(l == C->num_primes);
-
-    if (klen == 1)
-        A[0] = *ttt;
+    for (l = 0; l < n; l++)
+        out[l*stride] = (uint32_t) residues[l];
 }
 
 /* workers */
@@ -290,19 +233,22 @@ static void _mod_worker(void * arg_ptr)
     slong Bstride = arg->Bstride;
     const fmpz_comb_struct * comb = arg->comb;
     fmpz_comb_temp_t comb_temp;
+    ulong * residues;
 
     fmpz_comb_temp_init(comb_temp, comb);
+    residues = FLINT_ARRAY_ALLOC(num_primes, ulong);
 
     for (i = Astartrow; i < Astoprow; i++)
         for (j = 0; j < k; j++)
             fmpz_multi_mod_uint32_stride(bigA + i*k*num_primes + j, k,
-                                                Aentries + i * Astride + j, comb, comb_temp);
+                                                Aentries + i * Astride + j, comb, comb_temp, residues);
 
     for (i = Bstartrow; i < Bstoprow; i++)
         for (j = 0; j < n; j++)
             fmpz_multi_mod_uint32_stride(bigB + i*n*num_primes + j, n,
-                                                Bentries + i * Bstride + j, comb, comb_temp);
+                                                Bentries + i * Bstride + j, comb, comb_temp, residues);
 
+    flint_free(residues);
     fmpz_comb_temp_clear(comb_temp);
 }
 
@@ -355,7 +301,7 @@ static void _fromd_worker(void * arg_ptr)
         {
             ulong r;
             slong a = (slong) dC[i*n + j];
-            ulong b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? (ulong) a + shift : (ulong) a;
             NMOD_RED(r, b, mod);
             bigC[n*(num_primes*i + l) + j] = r;
         }
@@ -475,7 +421,7 @@ int _fmpz_mat_mul_blas(
     slong num_primes;
     fmpz_comb_t comb;
     thread_pool_handle * handles;
-    slong num_workers;
+    slong num_workers, max_workers;
     _worker_arg * args;
 
     FLINT_ASSERT(sign == 0 || sign == 1);
@@ -509,6 +455,7 @@ int _fmpz_mat_mul_blas(
     dC = (double *) flint_calloc(m*n, sizeof(double));
 
     num_workers = flint_request_threads(&handles, INT_MAX);
+    max_workers = num_workers;
 
     args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
     for (start = 0, i = 0; i <= num_workers; start = stop, i++)
@@ -567,8 +514,40 @@ int _fmpz_mat_mul_blas(
         for (i = 0; i < num_workers; i++)
             thread_pool_wait(global_thread_pool, handles[i]);
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-                                       m, n, k, 1.0, dA, k, dB, n, 0.0, dC, n);
+        /*
+            The fallback gemm threads through FLINT's pool itself, so
+            the workers held for the conversions must be returned
+            before the call or it finds the pool empty and runs on one
+            thread. (An external BLAS schedules its own threads and
+            does not care.) The re-request is capped by the first
+            grant, so the args array stays large enough; if fewer
+            workers come back, the work is redistributed below.
+        */
+        {
+            slong prev_workers = num_workers;
+
+            flint_give_back_threads(handles, num_workers);
+
+            flint_dgemm(m, k, n, dA, k, dB, n, dC, n);
+
+            num_workers = flint_request_threads(&handles, max_workers + 1);
+
+            if (num_workers != prev_workers)
+            {
+                for (start = 0, i = 0; i <= num_workers; start = stop, i++)
+                {
+                    args[i].l = l;
+                    args[i].prime = primes[l];
+                    args[i].Cstartrow = ((i + 0)*m)/(num_workers + 1);
+                    args[i].Cstoprow  = ((i + 1)*m)/(num_workers + 1);
+                    stop = _thread_pool_find_work_2(m, k, k, n,
+                                                    i + 1, num_workers + 1);
+                    _thread_pool_distribute_work_2(start, stop,
+                                  &args[i].Astartrow, &args[i].Astoprow, m,
+                                  &args[i].Bstartrow, &args[i].Bstoprow, k);
+                }
+            }
+        }
 
         for (i = 0; i < num_workers; i++)
             thread_pool_wake(global_thread_pool, handles[i], 0, _fromd_worker, &args[i]);

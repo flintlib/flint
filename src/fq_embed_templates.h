@@ -28,11 +28,6 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
                                               TEMPLATE(B, poly_t) minpoly,
                                               const TEMPLATE(T, ctx_t) sub_ctx,
                                               const TEMPLATE(T, ctx_t) sup_ctx);
-void _TEMPLATE(T, embed_gens_allombert)(TEMPLATE(T, t) gen_sub,
-                                                  TEMPLATE(T, t) gen_sup,
-                                                  TEMPLATE(B, poly_t) minpoly,
-                                                  const TEMPLATE(T, ctx_t) sub_ctx,
-                                                  const TEMPLATE(T, ctx_t) sup_ctx);
 
 /* Convert to-from column vectors */
 void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,

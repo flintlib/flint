@@ -10,44 +10,15 @@
 */
 
 #include "ca_poly.h"
+#include "gr_poly.h"
 
 void
 _ca_poly_evaluate_horner(ca_t y, ca_srcptr f, slong len,
                            const ca_t x, ca_ctx_t ctx)
 {
-    if (len == 0)
-    {
-        ca_zero(y, ctx);
-    }
-    else if (len == 1 || ca_check_is_zero(x, ctx) == T_TRUE)
-    {
-        ca_set(y, f, ctx);
-    }
-    else if (len == 2)
-    {
-        ca_mul(y, x, f + 1, ctx);
-        ca_add(y, y, f + 0, ctx);
-    }
-    else
-    {
-        slong i = len - 1;
-        ca_t t, u;
-
-        ca_init(t, ctx);
-        ca_init(u, ctx);
-        ca_set(u, f + i, ctx);
-
-        for (i = len - 2; i >= 0; i--)
-        {
-            ca_mul(t, u, x, ctx);
-            ca_add(u, f + i, t, ctx);
-        }
-
-        ca_swap(y, u, ctx);
-
-        ca_clear(t, ctx);
-        ca_clear(u, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate_horner(y, f, len, x, gr_ctx));
 }
 
 void

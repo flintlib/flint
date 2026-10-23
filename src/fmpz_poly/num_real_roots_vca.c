@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len)
 {
@@ -25,7 +26,7 @@ slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol)
     slong n_exact = 0;
     slong n_interval = 0;
 
-    fmpz_poly_isolate_real_roots(NULL, &n_exact, NULL, NULL, &n_interval, pol);
+    _fmpz_poly_isolate_real_roots_vca(NULL, &n_exact, NULL, NULL, &n_interval, pol, 0);
 
     return n_exact + n_interval;
 }

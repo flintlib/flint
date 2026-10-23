@@ -1548,6 +1548,9 @@ _gr_ca_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int fla
 static int
 _gr_ca_mat_mul(ca_mat_t res, const ca_mat_t x, const ca_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     ca_mat_mul(res, x, y, GR_CA_CTX(ctx));
     return GR_SUCCESS;
 }

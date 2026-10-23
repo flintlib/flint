@@ -718,6 +718,222 @@ static int _do_univar(
 
 
 
+/**** ess(B) depends on one variable only, ess(A) on more ********************/
+/*
+    Every term of B then has the same exponent in every variable other than v,
+    that is, B = m*b(x_v) for a monomial m and a b in Z[x_v]. Every divisor of
+    B is therefore a monomial times a divisor of b, and a d in Z[x_v] divides A
+    exactly when it divides each coefficient of A viewed as a polynomial in the
+    variables other than v. So
+
+        gcd(A, B) = xbar^Gmin_exp * gcd(b, coefficients of A),
+
+    all of which is univariate arithmetic. Without this the gcd is found by
+    _try_missing_var, which splits off one variable of A at a time and recurses
+    on the multivariate coefficients, paying for a full mpoly_gcd_info per
+    level.
+*/
+/* sort perm by the corresponding keys, using tmp as scratch */
+static void _sort_by_key(
+    slong * perm,
+    slong * tmp,
+    slong len,
+    const ulong * keys,
+    slong N)
+{
+    slong width;
+
+    for (width = 1; width < len; width *= 2)
+    {
+        slong i;
+
+        for (i = 0; i < len; i += 2*width)
+        {
+            slong a = i;
+            slong b = FLINT_MIN(i + width, len);
+            slong mid = b, right = FLINT_MIN(i + 2*width, len);
+            slong k = i;
+
+            while (a < mid && b < right)
+                tmp[k++] = mpoly_monomial_lt_nomask(keys + N*perm[b],
+                                     keys + N*perm[a], N) ? perm[b++] : perm[a++];
+
+            while (a < mid)
+                tmp[k++] = perm[a++];
+
+            while (b < right)
+                tmp[k++] = perm[b++];
+        }
+
+        for (i = 0; i < len; i++)
+            perm[i] = tmp[i];
+    }
+}
+
+/* set the coefficient of term k of A in the deflated variable x_v */
+static void _set_coeff(
+    fmpz_poly_t c,
+    const fmpz_mpoly_t A,
+    slong k,
+    slong N, slong off, slong shift, ulong mask,
+    ulong var_shift, ulong var_stride)
+{
+    ulong e = ((A->exps[N*k + off] >> shift) & mask) - var_shift;
+    fmpz_poly_set_coeff_fmpz(c, e == 0 ? 0 : e/var_stride, A->coeffs + k);
+}
+
+/*
+    The route below stores one coefficient per exponent, so it must not be
+    taken for a sparse input of high degree: gcd(x^(10^7) - 1, ...) would build
+    a polynomial of 10^7 coefficients out of two terms. Measured against the
+    general recursion on the shapes in p-gcd_univar, it wins throughout up to a
+    deflated degree of about 100 and breaks even near 128, whether or not the
+    univariate input is dense.
+*/
+#define UNIVAR_DIVISOR_MAX_DEG 100
+
+static int _univar_divisor_is_cheap(slong v, const mpoly_gcd_info_t I)
+{
+    return I->Adeflate_deg[v] <= UNIVAR_DIVISOR_MAX_DEG &&
+           I->Bdeflate_deg[v] <= UNIVAR_DIVISOR_MAX_DEG;
+}
+
+static int _try_univar_divisor(
+    fmpz_mpoly_t G,
+    fmpz_mpoly_t Abar,          /* cofactor of A, could be NULL */
+    fmpz_mpoly_t Bbar,          /* cofactor of B, could be NULL */
+    const fmpz_mpoly_t A, const ulong * Amin_exp,
+    const fmpz_mpoly_t B, const ulong * Bmin_exp,
+    slong v,
+    const mpoly_gcd_info_t I,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success = 1;
+    slong i, j;
+    slong Alen = A->length;
+    slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
+    slong off, shift;
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - A->bits);
+    ulong var_shift = Amin_exp[v];
+    ulong var_stride = I->Gstride[v];
+    ulong * oneexp;
+    ulong * keys;
+    slong * perm;
+    slong * scratch;
+    fmpz_poly_t g, c, t;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(var_stride > 0);
+
+    TMP_START;
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_monomial_sp(oneexp, v, A->bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, v, A->bits, ctx->minfo);
+
+    fmpz_poly_init(g);
+    fmpz_poly_init(c);
+    fmpz_poly_init(t);
+
+    _fmpz_mpoly_to_fmpz_poly_deflate(g, B, v, Bmin_exp, I->Gstride, ctx);
+
+    /*
+        The coefficients of A as a polynomial in the variables other than x_v
+        are the groups of terms of A sharing a monomial once x_v is divided
+        out. Sorting by that monomial brings each group together, but the
+        running gcd is usually already one after the first group, so do that
+        group by itself first and only sort when it is not.
+    */
+    keys = FLINT_ARRAY_ALLOC(N*Alen, ulong);
+    perm = FLINT_ARRAY_ALLOC(2*Alen, slong);
+    scratch = perm + Alen;
+
+    for (i = 0; i < Alen; i++)
+    {
+        ulong e = (A->exps[N*i + off] >> shift) & mask;
+        mpoly_monomial_msub(keys + N*i, A->exps + N*i, e, oneexp, N);
+        perm[i] = i;
+    }
+
+    fmpz_poly_zero(c);
+    for (i = 0; i < Alen; i++)
+    {
+        if (mpoly_monomial_equal(keys, keys + N*i, N))
+            _set_coeff(c, A, i, N, off, shift, mask, var_shift, var_stride);
+    }
+    fmpz_poly_gcd(t, g, c);
+    fmpz_poly_swap(g, t);
+
+    if (!fmpz_poly_is_one(g))
+    {
+        _sort_by_key(perm, scratch, Alen, keys, N);
+
+        for (i = 0; i < Alen && !fmpz_poly_is_one(g); i = j)
+        {
+            fmpz_poly_zero(c);
+            for (j = i; j < Alen && mpoly_monomial_equal(keys + N*perm[i],
+                                                    keys + N*perm[j], N); j++)
+            {
+                _set_coeff(c, A, perm[j], N, off, shift, mask,
+                                                       var_shift, var_stride);
+            }
+
+            fmpz_poly_gcd(t, g, c);
+            fmpz_poly_swap(g, t);
+        }
+    }
+
+    if (Abar == NULL && Bbar == NULL)
+    {
+        _fmpz_mpoly_from_fmpz_poly_inflate(G, I->Gbits, g, v, I->Gmin_exp,
+                                                             I->Gstride, ctx);
+    }
+    else
+    {
+        /* G and the cofactors may alias A or B, so finish reading both first */
+        fmpz_mpoly_t tG, tAbar, tBbar;
+
+        fmpz_mpoly_init(tG, ctx);
+        fmpz_mpoly_init(tAbar, ctx);
+        fmpz_mpoly_init(tBbar, ctx);
+
+        _fmpz_mpoly_from_fmpz_poly_inflate(tG, I->Gbits, g, v, I->Gmin_exp,
+                                                             I->Gstride, ctx);
+
+        if (Abar != NULL)
+            success = success && fmpz_mpoly_divides(tAbar, A, tG, ctx);
+
+        if (Bbar != NULL)
+            success = success && fmpz_mpoly_divides(tBbar, B, tG, ctx);
+
+        if (success)
+        {
+            if (Abar != NULL)
+                fmpz_mpoly_swap(Abar, tAbar, ctx);
+
+            if (Bbar != NULL)
+                fmpz_mpoly_swap(Bbar, tBbar, ctx);
+
+            fmpz_mpoly_swap(G, tG, ctx);
+        }
+
+        fmpz_mpoly_clear(tG, ctx);
+        fmpz_mpoly_clear(tAbar, ctx);
+        fmpz_mpoly_clear(tBbar, ctx);
+    }
+
+    flint_free(keys);
+    flint_free(perm);
+    fmpz_poly_clear(g);
+    fmpz_poly_clear(c);
+    fmpz_poly_clear(t);
+
+    TMP_END;
+
+    return success;
+}
+
+
 /********* Assume B has length one when converted to univar format ***********/
 static int _try_missing_var(
     fmpz_mpoly_t G, flint_bitcnt_t Gbits,
@@ -1437,6 +1653,8 @@ static int _fmpz_mpoly_gcd_algo_small(
     slong v_in_either;
     slong v_in_A_only;
     slong v_in_B_only;
+    slong A_ess_nvars;
+    slong B_ess_nvars;
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
@@ -1566,6 +1784,33 @@ skip_monomial_cofactors:
     {
         _do_univar(G, Abar, Bbar, A, B, v_in_both, I, ctx);
         goto successful;
+    }
+
+    /*
+        If one of ess(A), ess(B) depends on v_in_both only, then it is a
+        monomial times a univariate polynomial and the gcd follows from
+        univariate arithmetic.
+    */
+    A_ess_nvars = 0;
+    B_ess_nvars = 0;
+    for (j = 0; j < nvars; j++)
+    {
+        A_ess_nvars += (I->Amax_exp[j] > I->Amin_exp[j]);
+        B_ess_nvars += (I->Bmax_exp[j] > I->Bmin_exp[j]);
+    }
+
+    if (B_ess_nvars == 1 && _univar_divisor_is_cheap(v_in_both, I))
+    {
+        success = _try_univar_divisor(G, Abar, Bbar, A, I->Amin_exp,
+                                      B, I->Bmin_exp, v_in_both, I, ctx);
+        goto cleanup;
+    }
+
+    if (A_ess_nvars == 1 && _univar_divisor_is_cheap(v_in_both, I))
+    {
+        success = _try_univar_divisor(G, Bbar, Abar, B, I->Bmin_exp,
+                                      A, I->Amin_exp, v_in_both, I, ctx);
+        goto cleanup;
     }
 
     /* check if there is a variable in ess(A) that is not in ess(B) */

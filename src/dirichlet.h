@@ -25,7 +25,9 @@
 extern "C" {
 #endif
 
-#define MAX_FACTORS 15
+/* at most 16 components: 2 at p = 2 and 14 odd ones, as for
+   q = 8 * 3 * 5 * ... * 47 < 2^64 */
+#define MAX_FACTORS 16
 
 /* should this dlog pointer be in the prime or the global group? */
 typedef struct

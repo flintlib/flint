@@ -320,8 +320,6 @@ void _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den,
 void qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpq_poly_t poly, const qqbar_t x);
 void _qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz * poly, slong len, const qqbar_t x);
 void qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x);
-int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
-int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
 int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
 
 #define QQBAR_ROOTS_IRREDUCIBLE 1
@@ -329,6 +327,8 @@ int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x,
 
 void qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags);
 void qqbar_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags);
+slong qqbar_real_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags);
+slong qqbar_real_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags);
 int _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, slong deg_limit, slong bits_limit);
 
 void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags);
@@ -391,6 +391,7 @@ int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 /* Internal functions */
 void qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);
 void qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_poly_t B, int op);
+void qqbar_fmpz_poly_symmetric_composed_op(fmpz_poly_t res, const fmpz_poly_t A, int op);
 void qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op);
 int _qqbar_validate_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
 int _qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong prec);

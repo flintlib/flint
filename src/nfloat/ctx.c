@@ -149,15 +149,55 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) nfloat_pi},
     {GR_METHOD_EXP,             (gr_funcptr) nfloat_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) nfloat_expm1},
+    {GR_METHOD_EXP2,            (gr_funcptr) nfloat_exp2},
     {GR_METHOD_LOG,             (gr_funcptr) nfloat_log},
     {GR_METHOD_LOG1P,           (gr_funcptr) nfloat_log1p},
+    {GR_METHOD_LOG2,            (gr_funcptr) nfloat_log2},
     {GR_METHOD_SIN,             (gr_funcptr) nfloat_sin},
     {GR_METHOD_COS,             (gr_funcptr) nfloat_cos},
     {GR_METHOD_TAN,             (gr_funcptr) nfloat_tan},
+    {GR_METHOD_SIN_COS,         (gr_funcptr) nfloat_sin_cos},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) nfloat_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) nfloat_cos_pi},
+    {GR_METHOD_SIN_COS_PI,      (gr_funcptr) nfloat_sin_cos_pi},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) nfloat_tan_pi},
     {GR_METHOD_SINH,            (gr_funcptr) nfloat_sinh},
     {GR_METHOD_COSH,            (gr_funcptr) nfloat_cosh},
     {GR_METHOD_TANH,            (gr_funcptr) nfloat_tanh},
+    {GR_METHOD_SINH_COSH,       (gr_funcptr) nfloat_sinh_cosh},
     {GR_METHOD_ATAN,            (gr_funcptr) nfloat_atan},
+    {GR_METHOD_ATAN2,           (gr_funcptr) nfloat_atan2},
+    {GR_METHOD_EXP10,           (gr_funcptr) nfloat_exp10},
+    {GR_METHOD_LOG10,           (gr_funcptr) nfloat_log10},
+    {GR_METHOD_COT,             (gr_funcptr) nfloat_cot},
+    {GR_METHOD_SEC,             (gr_funcptr) nfloat_sec},
+    {GR_METHOD_CSC,             (gr_funcptr) nfloat_csc},
+    {GR_METHOD_SINC,            (gr_funcptr) nfloat_sinc},
+    {GR_METHOD_COT_PI,          (gr_funcptr) nfloat_cot_pi},
+    {GR_METHOD_SEC_PI,          (gr_funcptr) nfloat_sec_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) nfloat_csc_pi},
+    {GR_METHOD_SINC_PI,         (gr_funcptr) nfloat_sinc_pi},
+    {GR_METHOD_COTH,            (gr_funcptr) nfloat_coth},
+    {GR_METHOD_SECH,            (gr_funcptr) nfloat_sech},
+    {GR_METHOD_CSCH,            (gr_funcptr) nfloat_csch},
+    {GR_METHOD_ASIN,            (gr_funcptr) nfloat_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) nfloat_acos},
+    {GR_METHOD_ASIN_PI,         (gr_funcptr) nfloat_asin_pi},
+    {GR_METHOD_ACOS_PI,         (gr_funcptr) nfloat_acos_pi},
+    {GR_METHOD_ATAN_PI,         (gr_funcptr) nfloat_atan_pi},
+    {GR_METHOD_ACOT,            (gr_funcptr) nfloat_acot},
+    {GR_METHOD_ASEC,            (gr_funcptr) nfloat_asec},
+    {GR_METHOD_ACSC,            (gr_funcptr) nfloat_acsc},
+    {GR_METHOD_ACOT_PI,         (gr_funcptr) nfloat_acot_pi},
+    {GR_METHOD_ASEC_PI,         (gr_funcptr) nfloat_asec_pi},
+    {GR_METHOD_ACSC_PI,         (gr_funcptr) nfloat_acsc_pi},
+    {GR_METHOD_ASINH,           (gr_funcptr) nfloat_asinh},
+    {GR_METHOD_ACOSH,           (gr_funcptr) nfloat_acosh},
+    {GR_METHOD_ATANH,           (gr_funcptr) nfloat_atanh},
+    {GR_METHOD_ACOTH,           (gr_funcptr) nfloat_acoth},
+    {GR_METHOD_ASECH,           (gr_funcptr) nfloat_asech},
+    {GR_METHOD_ACSCH,           (gr_funcptr) nfloat_acsch},
+    {GR_METHOD_HYPOT,           (gr_funcptr) nfloat_hypot},
     {GR_METHOD_GAMMA,            (gr_funcptr) nfloat_gamma},
     {GR_METHOD_ZETA,             (gr_funcptr) nfloat_zeta},
 
@@ -171,6 +211,10 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR,          (gr_funcptr) _nfloat_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _nfloat_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,          (gr_funcptr) _nfloat_vec_submul_scalar},
+    {GR_METHOD_VEC_DIV,                 (gr_funcptr) _nfloat_vec_div},
+    {GR_METHOD_VEC_DIV_SCALAR,          (gr_funcptr) _nfloat_vec_div_scalar},
+    {GR_METHOD_VEC_DIV_SCALAR_UI,       (gr_funcptr) _nfloat_vec_div_scalar_ui},
+    {GR_METHOD_VEC_DIV_SCALAR_SI,       (gr_funcptr) _nfloat_vec_div_scalar_si},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nfloat_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nfloat_vec_dot_rev},
 /*
@@ -205,6 +249,7 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
     NFLOAT_CTX_NLIMBS(ctx) = nlimbs;
     NFLOAT_CTX_FLAGS(ctx) = flags;
     NFLOAT_CTX_RND(ctx) = 0;
+    NFLOAT_CTX_FUNC_PREC(ctx) = nlimbs * FLINT_BITS;
 
     ctx->methods = _nfloat_methods;
 
@@ -215,6 +260,22 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
     }
 
     return GR_SUCCESS;
+}
+
+int
+nfloat_ctx_set_func_prec(gr_ctx_t ctx, slong prec)
+{
+    if (prec < 1)
+        return GR_UNABLE;
+
+    NFLOAT_CTX_FUNC_PREC(ctx) = FLINT_MIN(prec, NFLOAT_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+slong
+nfloat_ctx_get_func_prec(gr_ctx_t ctx)
+{
+    return NFLOAT_CTX_FUNC_PREC(ctx);
 }
 
 int

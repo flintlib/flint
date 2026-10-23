@@ -13,6 +13,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE3(T, poly_evaluate, T) (TEMPLATE(T, t) rop,
@@ -20,28 +21,9 @@ _TEMPLATE3(T, poly_evaluate, T) (TEMPLATE(T, t) rop,
                                  const TEMPLATE(T, t) a,
                                  const TEMPLATE(T, ctx_t) ctx)
 {
-    if (len == 0)
-    {
-        TEMPLATE(T, zero) (rop, ctx);
-    }
-    else if (len == 1 || TEMPLATE(T, is_zero) (a, ctx))
-    {
-        TEMPLATE(T, set) (rop, op + 0, ctx);
-    }
-    else
-    {
-        slong i = len - 1;
-        TEMPLATE(T, t) t;
-
-        TEMPLATE(T, init) (t, ctx);
-        TEMPLATE(T, set) (rop, op + i, ctx);
-        for (i = len - 2; i >= 0; i--)
-        {
-            TEMPLATE(T, mul) (t, rop, a, ctx);
-            TEMPLATE(T, add) (rop, op + i, t, ctx);
-        }
-        TEMPLATE(T, clear) (t, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_evaluate(rop, op, len, a, gr_ctx));
 }
 
 void

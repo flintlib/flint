@@ -19,8 +19,10 @@ _mpn_mod_mat_charpoly(nn_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     slong n = mat->r;
 
     /* todo: depends weakly on limb count; could be fine-tuned */
-    if (n <= 11)
-        return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
-    else
-        return _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx);
+    /* Danilevsky needs inverses, so it can fail for a composite modulus;
+       Berkowitz is division-free and always succeeds */
+    if (n > 11 && _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
 }

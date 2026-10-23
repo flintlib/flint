@@ -244,6 +244,70 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
+    /* Check _poly_rem against divrem, including lenA < lenB */
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, poly_t) a, b, q, r;
+        TEMPLATE(T, struct) * R;
+        TEMPLATE(T, t) invB;
+        slong lenA, lenB, rlen;
+
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+        TEMPLATE(T, init) (invB, ctx);
+
+        TEMPLATE(T, poly_randtest_not_zero) (b, state,
+                                             n_randint(state, 20) + 1, ctx);
+        lenB = b->length;
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, lenB + 10), ctx);
+        lenA = a->length;
+
+        TEMPLATE(T, inv) (invB, b->coeffs + lenB - 1, ctx);
+
+        rlen = FLINT_MAX(lenB - 1, 1);
+        R = _TEMPLATE(T, vec_init) (rlen, ctx);
+
+        /* garbage in the output */
+        TEMPLATE(T, randtest_not_zero) (R + 0, state, ctx);
+        if (lenB >= 2)
+            TEMPLATE(T, randtest_not_zero) (R + lenB - 2, state, ctx);
+
+        _TEMPLATE(T, poly_rem) (R, a->coeffs, lenA, b->coeffs, lenB, invB, ctx);
+
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
+
+        result = (r->length <= lenB - 1)
+            && _TEMPLATE(T, vec_equal) (R, r->coeffs, r->length, ctx)
+            && _TEMPLATE(T, vec_is_zero) (R + r->length, lenB - 1 - r->length, ctx);
+
+        if (!result)
+        {
+            flint_printf("FAIL (_poly_rem):\n\n");
+            flint_printf("lenA = %wd, lenB = %wd\n", lenA, lenB);
+            flint_printf("a = "), TEMPLATE(T, poly_print_pretty) (a, "X", ctx),
+                flint_printf("\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
+                flint_printf("\n");
+            flint_printf("r = "), TEMPLATE(T, poly_print_pretty) (r, "X", ctx),
+                flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        _TEMPLATE(T, vec_clear) (R, rlen, ctx);
+        TEMPLATE(T, clear) (invB, ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }
 #endif

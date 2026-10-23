@@ -97,7 +97,7 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
     /* Init CRT comb */
     for (i = 0; i < resolution; i++)
     {
-        fmpz_comb_init(comb[i], primes, num_primes * (i + 1) / resolution);
+        fmpz_comb_init2(comb[i], primes, num_primes * (i + 1) / resolution, FMPZ_COMB_CRT);
         fmpz_comb_temp_init(temp[i], comb[i]);
     }
 

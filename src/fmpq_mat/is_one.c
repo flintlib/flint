@@ -12,25 +12,13 @@
 
 #include "fmpq.h"
 #include "fmpq_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 fmpq_mat_is_one(const fmpq_mat_t mat)
 {
-    slong i, j;
-
-    if (mat->r == 0 || mat->c == 0)
-        return 1;
-
-    for (i = 0; i < mat->r; i++)
-    {
-        for (j = 0; j < mat->c; j++)
-        {
-            if (fmpq_cmp_ui(fmpq_mat_entry(mat, i, j), i == j) != 0)
-            {
-                return 0;
-            }
-        }
-    }
-
-    return 1;
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpq(ctx);
+    return gr_mat_is_one((const gr_mat_struct *) mat, ctx) == T_TRUE;
 }

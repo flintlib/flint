@@ -262,6 +262,135 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         }
     }
 
+    /* Windows that let the plan wrap around: _fft_small_plan_set_window
+       drops to a cyclic convolution of length 2^d <= zn when
+       max(operand truncations, zh) <= 2^d and zn - 2^d <= zl.  These
+       shapes take that branch; without it they would simply use the
+       longer non-cyclic transform, so the check is on the result. */
+    {
+        /* an, bn, zl, zh */
+        const ulong shapes[6][4] = {
+            { 1000, 1000,  980, 1024 },
+            { 1000, 1000, 1000, 1024 },
+            {  700,  700,  500, 1024 },
+            {  600,  500,  600, 1024 },
+            { 1500, 1500, 2000, 2048 },
+            { 5000, 5000, 5000, 8192 },
+        };
+        ulong nn[3] = { UWORD(2), UWORD(0x0003f00000000001),
+                        UWORD(18446744073709551557) };
+
+        for (int k = 0; k < 3; k++)
+        {
+            nmod_init(&mod, nn[k]);
+
+            for (int s = 0; s < 6; s++)
+            {
+                ulong an = shapes[s][0], bn = shapes[s][1];
+                ulong zl = shapes[s][2], zh = shapes[s][3];
+                ulong zn = an + bn - 1;
+                ulong * a = FLINT_ARRAY_ALLOC(an, ulong);
+                ulong * b = FLINT_ARRAY_ALLOC(bn, ulong);
+                ulong * c = FLINT_ARRAY_ALLOC(zn, ulong);
+                ulong * d = FLINT_ARRAY_ALLOC(zh - zl, ulong);
+                ulong i;
+
+                for (i = 0; i < an; i++)
+                    a[i] = n_randint(state, mod.n);
+                for (i = 0; i < bn; i++)
+                    b[i] = n_randint(state, mod.n);
+
+                _nmod_poly_mul_KS(c, a, an, b, bn, mod);
+                _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
+
+                for (i = zl; i < zh; i++)
+                {
+                    if (c[i] != d[i - zl])
+                    {
+                        flint_printf("(wraparound) mulmid error at index %wu\n", i);
+                        flint_printf("zl=%wu, zh=%wu, an=%wu, bn=%wu\n", zl, zh, an, bn);
+                        flint_printf("mod: %wu\n", mod.n);
+                        flint_abort();
+                    }
+                }
+
+                flint_free(a);
+                flint_free(b);
+                flint_free(c);
+                flint_free(d);
+            }
+        }
+    }
+
+    /* products with a precomputed transform of small depth: the result
+       must be right whenever 1 is returned, and 1 must be returned when
+       the whole product fits in the transform */
+    {
+        slong reps;
+
+        for (reps = 0; reps < 200 * flint_test_multiplier(); reps++)
+        {
+            ulong depth = 4 + n_randint(state, 6), N = UWORD(1) << depth;
+            ulong an, bn, zn, zl, zh, i;
+            ulong * a, * b, * c, * d;
+            mul_precomp_struct M[1];
+            int status;
+
+            nmod_init(&mod, n_randtest_prime(state, 0));
+
+            bn = 1 + n_randint(state, N);
+            an = 1 + n_randint(state, 2 * N);
+            zn = an + bn - 1;
+            zl = n_randint(state, zn);
+            zh = zl + 1 + n_randint(state, zn - zl);
+
+            a = FLINT_ARRAY_ALLOC(an, ulong);
+            b = FLINT_ARRAY_ALLOC(bn, ulong);
+            c = FLINT_ARRAY_ALLOC(zn, ulong);
+            d = FLINT_ARRAY_ALLOC(zh - zl, ulong);
+
+            for (i = 0; i < an; i++)
+                a[i] = n_randint(state, mod.n);
+            for (i = 0; i < bn; i++)
+                b[i] = n_randint(state, mod.n);
+
+            if (an >= bn)
+                _nmod_poly_mul(c, a, an, b, bn, mod);
+            else
+                _nmod_poly_mul(c, b, bn, a, an, mod);
+
+            if (!_mul_precomp_init(M, b, bn, N, depth, N, 0, mod, R))
+                goto cleanup;
+
+            status = _nmod_poly_mul_mid_precomp(d, zl, zh, a, an, M, mod, R);
+
+            if (status == 0 && zn <= N)
+            {
+                flint_printf("(precomp) mul_mid returns 0 for a fitting product\n");
+                flint_printf("depth=%wu, zl=%wu, zh=%wu, an=%wu, bn=%wu\n", depth, zl, zh, an, bn);
+                flint_abort();
+            }
+
+            for (i = zl; status != 0 && i < zh; i++)
+            {
+                if (c[i] != d[i - zl])
+                {
+                    flint_printf("(precomp) mul_mid error at index %wu\n", i);
+                    flint_printf("depth=%wu, zl=%wu, zh=%wu, an=%wu, bn=%wu\n", depth, zl, zh, an, bn);
+                    flint_printf("mod: %wu\n", mod.n);
+                    flint_abort();
+                }
+            }
+
+            _mul_precomp_clear(M);
+cleanup:
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+            flint_free(d);
+        }
+    }
+
     mpn_ctx_clear(R);
 
     TEST_FUNCTION_END(state);

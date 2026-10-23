@@ -16,4 +16,11 @@
 
 slong partitions_hrr_needed_terms(double n);
 
+/* p(n) for n < 128 */
+extern const unsigned int partitions_lookup[128];
+
+/* v[n] = p(n) mod 2^FLINT_BITS for 0 <= n < len, by the pentagonal
+   recurrence (exact while p(n) < 2^FLINT_BITS) */
+void _partitions_vec_ui(nn_ptr v, slong len);
+
 #endif

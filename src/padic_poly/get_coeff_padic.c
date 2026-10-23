@@ -19,7 +19,6 @@ void padic_poly_get_coeff_padic(padic_t c, const padic_poly_t poly, slong n,
     {
         fmpz_set(padic_unit(c), poly->coeffs + n);
         padic_val(c) = poly->val;
-        padic_prec(c) = poly->N;
         padic_reduce(c, ctx);
     }
     else

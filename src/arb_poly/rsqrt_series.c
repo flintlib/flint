@@ -10,6 +10,7 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_rsqrt_series(arb_ptr g,
@@ -43,27 +44,10 @@ _arb_poly_rsqrt_series(arb_ptr g,
     }
     else
     {
-        arb_ptr t, u;
-        slong tlen;
-        t = _arb_vec_init(2 * len);
-        u = t + len;
-
-        arb_rsqrt(g, h, prec);
-
-        NEWTON_INIT(1, len)
-
-        NEWTON_LOOP(m, n)
-        tlen = FLINT_MIN(2 * m - 1, n);
-        _arb_poly_mullow(t, g, m, g, m, tlen, prec);
-        _arb_poly_mullow(u, g, m, t, tlen, n, prec);
-        _arb_poly_mulmid(g + m, u, n, h, hlen, m, n, prec);
-        _arb_vec_scalar_mul_2exp_si(g + m, g + m, n - m, -1);
-        _arb_vec_neg(g + m, g + m, n - m);
-        NEWTON_END_LOOP
-
-        NEWTON_END
-
-        _arb_vec_clear(t, 2 * len);
+        gr_ctx_t ctx;
+        gr_ctx_init_real_arb(ctx, prec);
+        if (_gr_poly_rsqrt_series_newton(g, h, hlen, len, 2, ctx) != GR_SUCCESS)
+            _arb_vec_indeterminate(g, len);
     }
 }
 

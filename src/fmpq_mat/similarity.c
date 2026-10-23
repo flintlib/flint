@@ -9,28 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
 #include "fmpq_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d)
 {
-   slong n = A->r, i, j;
-
-   for (i = 0; i < n; i++)
-   {
-      for (j = 0; j < r - 1; j++)
-         fmpq_addmul(fmpq_mat_entry(A, i, j), fmpq_mat_entry(A, i, r), d);
-
-      for (j = r + 1; j < n; j++)
-         fmpq_addmul(fmpq_mat_entry(A, i, j), fmpq_mat_entry(A, i, r), d);
-   }
-
-   for (i = 0; i < n; i++)
-   {
-      for (j = 0; j < r - 1; j++)
-         fmpq_submul(fmpq_mat_entry(A, r, i), fmpq_mat_entry(A, j, i), d);
-
-      for (j = r + 1; j < n; j++)
-         fmpq_submul(fmpq_mat_entry(A, r, i), fmpq_mat_entry(A, j, i), d);
-   }
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpq(ctx);
+    GR_MUST_SUCCEED(gr_mat_apply_row_similarity((gr_mat_struct *) A, r, d, ctx));
 }

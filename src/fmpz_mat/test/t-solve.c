@@ -15,19 +15,29 @@
 
 TEST_FUNCTION_START(fmpz_mat_solve, state)
 {
-    fmpz_mat_t A, X, B, AX;
+    fmpz_mat_t A, X, B, AX, W;
+    int use_window;
     fmpz_t den;
     slong i, m, n, r;
     int success;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 10);
         n = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, n);
-        fmpz_mat_init(X, m, n);
+        /* the output may be a window */
+        use_window = n_randint(state, 2);
+        if (use_window)
+        {
+            fmpz_mat_init(W, m + 1, n + 2);
+            fmpz_mat_window_init(X, W, 1, 1, m + 1, n + 1);
+        }
+        else
+            fmpz_mat_init(X, m, n);
         fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
@@ -39,6 +49,51 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         success = fmpz_mat_solve(X, den, A, B);
+
+        /* X is allowed to alias A or B; both must give the same result */
+        {
+            fmpz_mat_t Xa, Xb;
+            fmpz_t dena, denb;
+            int successa, successb;
+
+            fmpz_mat_init_set(Xa, A);
+            fmpz_mat_init_set(Xb, B);
+            fmpz_init(dena);
+            fmpz_init(denb);
+
+            successb = fmpz_mat_solve(Xb, denb, A, Xb);
+            if (successb != success || (success && (!fmpz_equal(denb, den)
+                    || !fmpz_mat_equal(Xb, X))))
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("aliased solve (X == B) differs\n");
+                fmpz_mat_print_pretty(A), flint_printf("\n");
+                fmpz_mat_print_pretty(B), flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            /* X aliasing A needs matching dimensions */
+            if (m == n)
+            {
+                successa = fmpz_mat_solve(Xa, dena, Xa, B);
+                if (successa != success || (success && (!fmpz_equal(dena, den)
+                        || !fmpz_mat_equal(Xa, X))))
+                {
+                    flint_printf("FAIL:\n");
+                    flint_printf("aliased solve (X == A) differs\n");
+                    fmpz_mat_print_pretty(A), flint_printf("\n");
+                    fmpz_mat_print_pretty(B), flint_printf("\n");
+                    fflush(stdout);
+                    flint_abort();
+                }
+            }
+
+            fmpz_mat_clear(Xa);
+            fmpz_mat_clear(Xb);
+            fmpz_clear(dena);
+            fmpz_clear(denb);
+        }
 
         fmpz_mat_mul(AX, A, X);
         fmpz_mat_scalar_divexact_fmpz(AX, AX, den);
@@ -58,7 +113,13 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
-        fmpz_mat_clear(X);
+        if (use_window)
+        {
+            fmpz_mat_window_clear(X);
+            fmpz_mat_clear(W);
+        }
+        else
+            fmpz_mat_clear(X);
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
@@ -66,6 +127,7 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
     /* Test singular systems */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = 1 + n_randint(state, 10);
         n = 1 + n_randint(state, 10);
         r = n_randint(state, m);
@@ -99,6 +161,8 @@ TEST_FUNCTION_START(fmpz_mat_solve, state)
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

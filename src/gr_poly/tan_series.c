@@ -136,8 +136,7 @@ gr_poly_tan_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_tan_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 
@@ -155,8 +154,7 @@ gr_poly_tanh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_tanh_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 
@@ -177,8 +175,7 @@ gr_poly_cot_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_cot_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 
@@ -199,8 +196,7 @@ gr_poly_coth_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_coth_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 
@@ -218,8 +214,7 @@ gr_poly_tan_pi_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_tan_pi_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 
@@ -240,8 +235,7 @@ gr_poly_cot_pi_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_cot_pi_series(res->coeffs, f->coeffs, flen, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 

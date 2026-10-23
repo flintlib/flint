@@ -15,6 +15,7 @@
 int
 gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
+    gr_method_vec_op set = GR_VEC_OP(ctx, VEC_SET);
     int status = GR_SUCCESS;
     slong i;
     slong r1 = mat1->r;
@@ -28,9 +29,9 @@ gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2,
     for (i = 0; i < r1; i++)
     {
         if (c1 > 0)
-            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
+            status |= set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
         if (c2 > 0)
-            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, c1, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c2, ctx);
+            status |= set(GR_MAT_ENTRY(res, i, c1, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c2, ctx);
     }
 
     return status;

@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_poly_t tmp, res;
-        fmpz_t r;
+        fmpz_t r, rr;
         int type;
 
         fmpz_poly_init(d);
@@ -36,6 +36,7 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
         fmpz_poly_init(tmp);
         fmpz_poly_init(res);
         fmpz_init(r);
+        fmpz_init(rr);
 
         do
         {
@@ -45,6 +46,8 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
             fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd(d, f, g);
         } while (fmpz_poly_length(d) != 1);
+
+        fmpz_poly_resultant(rr, f, g);
 
         type = n_randint(state, 5);
 
@@ -102,7 +105,19 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
                     "d = %{fmpz_poly}\n",
                     type, res, r, f, g, s, t, d);
 
+        /* r is the resultant of f and g (not of g and f) */
+        if (!fmpz_equal(r, rr))
+            TEST_FUNCTION_FAIL(
+                    "r != res(f, g)\n"
+                    "type = %d\n"
+                    "r = %{fmpz}\n"
+                    "res(f, g) = %{fmpz}\n"
+                    "f = %{fmpz_poly}\n"
+                    "g = %{fmpz_poly}\n",
+                    type, r, rr, f, g);
+
         fmpz_clear(r);
+        fmpz_clear(rr);
         fmpz_poly_clear(tmp);
         fmpz_poly_clear(res);
         fmpz_poly_clear(d);

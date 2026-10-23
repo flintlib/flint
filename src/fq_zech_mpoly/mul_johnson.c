@@ -69,10 +69,7 @@ slong _fq_zech_mpoly_mul_johnson(
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
 
-    if (bits <= FLINT_BITS)
-        mpoly_monomial_add(heap[1].exp, exp2, exp3, N);
-    else
-        mpoly_monomial_add_mp(heap[1].exp, exp2, exp3, N);
+    mpoly_monomial_add_any_bits(heap[1].exp, exp2, exp3, N, bits);
 
     hind[0] = 2*1 + 0;
 
@@ -128,10 +125,7 @@ slong _fq_zech_mpoly_mul_johnson(
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N, bits);
 
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
@@ -153,10 +147,7 @@ slong _fq_zech_mpoly_mul_johnson(
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N, bits);
 
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
@@ -221,9 +212,7 @@ void fq_zech_mpoly_mul_johnson(
         fmpz_clear(max_fields3 + i);
     }
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)

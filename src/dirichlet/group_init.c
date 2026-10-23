@@ -156,7 +156,7 @@ dirichlet_group_init(dirichlet_group_t G, ulong q)
 void
 dirichlet_subgroup_init(dirichlet_group_t H, const dirichlet_group_t G, ulong h)
 {
-    int s[15];    /* selected components */
+    int s[MAX_FACTORS];    /* selected components */
     slong k, j, e2;
 
     H->q = h;
@@ -177,6 +177,7 @@ dirichlet_subgroup_init(dirichlet_group_t H, const dirichlet_group_t G, ulong h)
     H->neven = j;
 
     /* odd components */
+    H->rad_q = 1;
     for (k = G->neven; k < G->num; k++)
     {
         ulong p = G->P[k].p;

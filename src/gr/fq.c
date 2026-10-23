@@ -15,8 +15,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr/impl.h"
 #include "fq.h"
 #include "fq_poly.h"
@@ -40,7 +42,13 @@ _gr_fq_ctx_clear(gr_ctx_t ctx)
 static int
 _gr_fq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    return gr_stream_write(out, "Finite field (fq)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "GF(");
+    status |= gr_stream_write_fmpz(out, fq_ctx_prime(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, fq_ctx_degree(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, ") (fq)");
+    return status;
 }
 
 static int _gr_fq_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -236,6 +244,84 @@ _gr_fq_mul_fmpz(fq_t res, const fq_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* Sets t to 2^c mod p; returns 0 if this is not possible (p = 2, c < 0). */
+static int
+_fq_two_pow_si(fmpz_t t, slong c, const fq_ctx_t ctx)
+{
+    const fmpz * p = fq_ctx_prime(ctx);
+
+    if (fmpz_equal_ui(p, 2))
+    {
+        if (c < 0)
+            return 0;
+        fmpz_set_ui(t, c == 0);
+        return 1;
+    }
+
+    if (c >= 0)
+    {
+        fmpz_set_ui(t, 2);
+        fmpz_mod_pow_ui(t, t, c, ctx->ctxp);
+    }
+    else
+    {
+        /* 1/2 = (p + 1) / 2 */
+        fmpz_add_ui(t, p, 1);
+        fmpz_fdiv_q_2exp(t, t, 1);
+        fmpz_mod_pow_ui(t, t, -(ulong) c, ctx->ctxp);
+    }
+
+    return 1;
+}
+
+static int
+_gr_fq_vec_mul_scalar_2exp_si(fq_struct * res, const fq_struct * vec, slong len, slong c, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    slong i;
+
+    if (c == 0)
+    {
+        for (i = 0; i < len; i++)
+            fq_set(res + i, vec + i, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    fmpz_init(t);
+
+    if (!_fq_two_pow_si(t, c, FQ_CTX(ctx)))
+    {
+        fmpz_clear(t);
+        return GR_DOMAIN;
+    }
+
+    /* t is a nonzero element of the prime field, or zero in
+       characteristic 2 */
+    for (i = 0; i < len; i++)
+    {
+        if (fmpz_is_zero(t))
+        {
+            fq_zero(res + i, FQ_CTX(ctx));
+        }
+        else
+        {
+            slong l = vec[i].length;
+            fmpz_poly_fit_length(res + i, l);
+            _fmpz_mod_vec_scalar_mul_fmpz_mod(res[i].coeffs, vec[i].coeffs, l, t, FQ_CTX(ctx)->ctxp);
+            _fmpz_poly_set_length(res + i, l);
+        }
+    }
+
+    fmpz_clear(t);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_mul_2exp_si(fq_t res, const fq_t x, slong c, gr_ctx_t ctx)
+{
+    return _gr_fq_vec_mul_scalar_2exp_si(res, x, 1, c, ctx);
+}
+
 #if 0
 static int
 _gr_fq_si_mul(fq_t res, slong y, const fq_t x, const gr_ctx_t ctx)
@@ -419,6 +505,78 @@ _gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+
+/* Dot product accumulating directly into the coefficients of res
+   without temporary allocations. Requires that res is not aliased
+   with any of the inputs. */
+static void
+_fq_vec_dot_inplace(fq_struct * res, const fq_struct * initial, int subtract, const fq_struct * vec1, const fq_struct * vec2, slong len, int rev, const fq_ctx_t ctx)
+{
+    slong i, j, k, len1, len2, slen, plen, oldlen;
+    const fq_struct * b;
+    fmpz * s;
+
+    plen = ctx->modulus->length;
+    oldlen = res->length;
+    k = FLINT_MAX(2 * plen - 3, 1);
+
+    fmpz_poly_fit_length(res, k);
+    s = res->coeffs;
+    _fmpz_vec_zero(s, FLINT_MAX(oldlen, k));
+    slen = 0;
+
+    for (i = 0; i < len; i++)
+    {
+        b = rev ? vec2 + len - 1 - i : vec2 + i;
+        len1 = vec1[i].length;
+        len2 = b->length;
+
+        for (j = 0; j < len1; j++)
+            for (k = 0; k < len2; k++)
+                fmpz_addmul(s + j + k, vec1[i].coeffs + j, b->coeffs + k);
+
+        if (len1 != 0 && len2 != 0)
+            slen = FLINT_MAX(slen, len1 + len2 - 1);
+    }
+
+    if (subtract)
+        _fmpz_vec_neg(s, s, slen);
+
+    if (initial != NULL)
+    {
+        len2 = initial->length;
+
+        /* s is already negated if subtract is set */
+        _fmpz_poly_add(s, s, slen, initial->coeffs, len2);
+
+        slen = FLINT_MAX(slen, len2);
+    }
+
+    k = slen;
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    _fq_reduce(s, slen, ctx);
+    slen = FLINT_MIN(slen, plen - 1);
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    /* entries beyond slen may be nonzero after reduction */
+    _fmpz_vec_zero(s + slen, k - slen);
+    res->length = slen;
+}
+
+#define FQ_DOT_ALIASES(res, initial, vec1, vec2, len) \
+    ((res) == (initial) || ((res) >= (vec1) && (res) < (vec1) + (len)) || \
+        ((res) >= (vec2) && (res) < (vec2) + (len)))
+
+/* Use the in-place (schoolbook) algorithm when the products are cheap:
+   for larger degree or larger p, _fmpz_poly_mul is faster (measured). */
+#define FQ_DOT_INPLACE(fctx) \
+    ((fctx)->modulus->length <= 4 && fmpz_bits(fq_ctx_prime(fctx)) <= 1024)
+
 static int
 _gr_fq_vec_dot(fq_struct * res, const fq_struct * initial, int subtract, const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
 {
@@ -433,6 +591,21 @@ _gr_fq_vec_dot(fq_struct * res, const fq_struct * initial, int subtract, const f
             fq_zero(res, FQ_CTX(ctx));
         else
             fq_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (FQ_DOT_INPLACE(FQ_CTX(ctx)) &&
+        !FQ_DOT_ALIASES(res, initial, vec1, vec2, len))
+    {
+        _fq_vec_dot_inplace(res, initial, subtract, vec1, vec2, len, 0, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (len == 1 && initial == NULL)
+    {
+        fq_mul(res, vec1, vec2, FQ_CTX(ctx));
+        if (subtract)
+            fq_neg(res, res, FQ_CTX(ctx));
         return GR_SUCCESS;
     }
 
@@ -505,7 +678,8 @@ _gr_fq_vec_dot(fq_struct * res, const fq_struct * initial, int subtract, const f
         slen--;
 
     fmpz_poly_fit_length(res, slen);
-    _fmpz_vec_set(res->coeffs, s, slen); /* todo: swap */
+    for (i = 0; i < slen; i++)
+        fmpz_swap(res->coeffs + i, s + i);
     _fmpz_poly_set_length(res, slen);
 
     for (i = 0; i < 4 * plen; i++)
@@ -530,6 +704,21 @@ _gr_fq_vec_dot_rev(fq_struct * res, const fq_struct * initial, int subtract, con
             fq_zero(res, FQ_CTX(ctx));
         else
             fq_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (FQ_DOT_INPLACE(FQ_CTX(ctx)) &&
+        !FQ_DOT_ALIASES(res, initial, vec1, vec2, len))
+    {
+        _fq_vec_dot_inplace(res, initial, subtract, vec1, vec2, len, 1, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (len == 1 && initial == NULL)
+    {
+        fq_mul(res, vec1, vec2, FQ_CTX(ctx));
+        if (subtract)
+            fq_neg(res, res, FQ_CTX(ctx));
         return GR_SUCCESS;
     }
 
@@ -602,7 +791,8 @@ _gr_fq_vec_dot_rev(fq_struct * res, const fq_struct * initial, int subtract, con
         slen--;
 
     fmpz_poly_fit_length(res, slen);
-    _fmpz_vec_set(res->coeffs, s, slen); /* todo: swap */
+    for (i = 0; i < slen; i++)
+        fmpz_swap(res->coeffs + i, s + i);
     _fmpz_poly_set_length(res, slen);
 
     for (i = 0; i < 4 * plen; i++)
@@ -614,6 +804,22 @@ _gr_fq_vec_dot_rev(fq_struct * res, const fq_struct * initial, int subtract, con
 }
 
 /* todo: _fq_poly_mullow should do the right thing */
+/* gcd and xgcd of the fq_poly module (Euclid or half-gcd with its
+   cutoffs) */
+static int
+_gr_fq_poly_gcd(fq_struct * G, slong * lenG, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_poly_gcd(G, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_poly_xgcd(slong * lenG, fq_struct * G, fq_struct * S, fq_struct * T, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    *lenG = _fq_poly_xgcd(G, S, T, A, lenA, B, lenB, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fq_poly_mullow(fq_struct * res,
     const fq_struct * poly1, slong len1,
@@ -634,6 +840,88 @@ _gr_fq_poly_mullow(fq_struct * res,
             _fq_poly_mullow(res, poly1, len1, poly2, len2, n, FQ_CTX(ctx));
         else
             _fq_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
+/* The middle product is computed by the classical algorithm in the range
+   where the classical full or low product would be used anyway. */
+static int
+_gr_fq_poly_mulmid(fq_struct * res,
+    const fq_struct * poly1, slong len1,
+    const fq_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (nlo != 0 && (nhi < FQ_MULLOW_CLASSICAL_CUTOFF ||
+                     FLINT_MAX(len1, len2) < FQ_MUL_CLASSICAL_CUTOFF))
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    else
+        return _gr_poly_mulmid_generic(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
+static int
+_gr_fq_poly_divrem(fq_struct * Q, fq_struct * R,
+    const fq_struct * A, slong lenA,
+    const fq_struct * B, slong lenB, gr_ctx_t ctx)
+{
+    /* The Newton division only involves products of length about lenQ and
+       lenB, which are fast (Kronecker substitution), and in this ring it
+       beats the basecase division already for tiny lengths, except for
+       a quotient of length 1. */
+    if (lenA == lenB)
+        return _gr_poly_divrem_generic(Q, R, A, lenA, B, lenB, ctx);
+    else
+        return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+}
+
+/* Horner's rule */
+static int
+_gr_fq_poly_evaluate(fq_t res, const fq_struct * f, slong len,
+    const fq_t x, gr_ctx_t ctx)
+{
+    const fq_ctx_struct * fctx = FQ_CTX(ctx);
+
+    if (len == 0)
+    {
+        fq_zero(res, fctx);
+    }
+    else if (len == 1 || fq_is_zero(x, fctx))
+    {
+        fq_set(res, f, fctx);
+    }
+    else
+    {
+        fq_t t, u;
+        fq_struct * s;
+        slong i;
+
+        fq_init(t, fctx);
+
+        if (res == x)
+        {
+            fq_init(u, fctx);
+            s = u;
+        }
+        else
+        {
+            s = res;
+        }
+
+        fq_set(s, f + len - 1, fctx);
+
+        for (i = len - 2; i >= 0; i--)
+        {
+            fq_mul(t, s, x, fctx);
+            fq_add(s, f + i, t, fctx);
+        }
+
+        if (res == x)
+        {
+            fq_swap(res, u, fctx);
+            fq_clear(u, fctx);
+        }
+
+        fq_clear(t, fctx);
     }
 
     return GR_SUCCESS;
@@ -683,6 +971,9 @@ _gr_fq_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_poly_t poly, int fl
 static int
 _gr_fq_mat_mul(fq_mat_t res, const fq_mat_t x, const fq_mat_t y, gr_ctx_t ctx)
 {
+    if (x->c != y->r || res->r != x->r || res->c != y->c)
+        return GR_DOMAIN;
+
     fq_mat_mul(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
@@ -721,6 +1012,87 @@ _gr_fq_mat_reduce_row(slong * column, fq_mat_t mat, slong * P, slong * L, slong 
 {
     *column = fq_mat_reduce_row(mat, P, L, n, FQ_CTX(ctx));
     return GR_SUCCESS;
+}
+
+/* Vector methods avoiding per-element dispatch through the method table */
+
+static int
+_gr_fq_vec_set(fq_struct * res, const fq_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_set(res + i, vec + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_vec_zero(fq_struct * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_zero(res + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_vec_add(fq_struct * res, const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_add(res + i, vec1 + i, vec2 + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_vec_sub(fq_struct * res, const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_sub(res + i, vec1 + i, vec2 + i, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fq_vec_add_scalar(fq_struct * res, const fq_struct * vec, slong len, const fq_struct * c, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_add(res + i, vec + i, c, FQ_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static truth_t
+_gr_fq_vec_is_zero(const fq_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fq_is_zero(vec + i, FQ_CTX(ctx)))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
+static truth_t
+_gr_fq_vec_equal(const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fq_equal(vec1 + i, vec2 + i, FQ_CTX(ctx)))
+            return T_FALSE;
+
+    return T_TRUE;
 }
 
 int _fq_methods_initialized = 0;
@@ -777,6 +1149,7 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_fq_mul_ui},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fq_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fq_mul_fmpz},
+    {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_fq_mul_2exp_si},
 /*
     {GR_METHOD_SI_MUL,          (gr_funcptr) _gr_fq_si_mul},
     {GR_METHOD_UI_MUL,          (gr_funcptr) _gr_fq_ui_mul},
@@ -810,12 +1183,27 @@ gr_method_tab_input _fq_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fq_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fq_vec_dot_rev},
+    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,  (gr_funcptr) _gr_fq_vec_mul_scalar_2exp_si},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_fq_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _gr_fq_vec_zero},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fq_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fq_vec_sub},
+    {GR_METHOD_VEC_ADD_SCALAR,  (gr_funcptr) _gr_fq_vec_add_scalar},
+    {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fq_vec_is_zero},
+    {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fq_vec_equal},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fq_poly_mulmid},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fq_poly_divrem},
+    {GR_METHOD_POLY_EVALUATE,   (gr_funcptr) _gr_fq_poly_evaluate},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _gr_fq_poly_gcd},
+    {GR_METHOD_POLY_XGCD,       (gr_funcptr) _gr_fq_poly_xgcd},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,      (gr_funcptr) _gr_fq_mat_nonsingular_solve_tril},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,      (gr_funcptr) _gr_fq_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_mat_charpoly},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fq_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };

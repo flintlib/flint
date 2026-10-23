@@ -15,6 +15,7 @@
 int nmod_mat_is_one(const nmod_mat_t mat)
 {
     slong i;
+    ulong one = (mat->mod.n == 1) ? 0 : 1;
 
     if (mat->mod.n == 0 || mat->r == 0 || mat->c == 0)
         return 1;
@@ -27,7 +28,7 @@ int nmod_mat_is_one(const nmod_mat_t mat)
         if (i + 1 > mat->c)
             continue;
 
-        if (nmod_mat_entry(mat, i, i) != 1)
+        if (nmod_mat_entry(mat, i, i) != one)
             return 0;
 
         if (!_nmod_vec_is_zero(nmod_mat_entry_ptr(mat, i, i + 1), mat->c - (i + 1)))

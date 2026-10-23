@@ -46,13 +46,7 @@ void _fq_embed_gens_naive(fq_t gen_sub,
     flint_rand_init(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
-    while (fq_poly_degree(modulus, sup_ctx) != 1)
-    {
-        while (!fq_poly_factor_equal_deg_prob(fact, state, modulus, 1, sup_ctx))
-        {
-        };
-        fq_poly_set(modulus, fact, sup_ctx);
-    }
+    fq_poly_factor_split_single(modulus, modulus, sup_ctx);
 
     flint_rand_clear(state);
 

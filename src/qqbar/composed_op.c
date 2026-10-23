@@ -11,9 +11,11 @@
 
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
+#include "impl.h"
 
 #define OP_ADD 0
 #define OP_SUB 1
@@ -190,68 +192,159 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     fmpq_poly_clear(P2drev);
 }
 
-#define TIMING 0
+/*
+    Symmetric composed operations. Given A with roots a_1, ..., a_d
+    (d >= 2), computes a nonzero integer multiple of
 
-#if TIMING
-#include "profiler.h"
-#endif
+        op = OP_ADD:  prod_{i<j} (z - (a_i + a_j))
+        op = OP_MUL:  prod_{i<j} (z - a_i a_j)
+        op = OP_SUB:  prod_{i<j} (z - (a_i - a_j)^2)
 
-static void
-qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
+    each of degree d(d-1)/2. If A is irreducible and x != y are two roots
+    of A, then x + y, x y and (x - y)^2 are roots of these polynomials.
+    Compared to the general composed operations (degree d^2, with the
+    square of the polynomial above as a factor), this halves the degree
+    and removes the need for squarefree factorization.
+    With power sums p_k = sum_i a_i^k:
+
+        sum_{i<j} (a_i + a_j)^k = (sum_{m} binom(k,m) p_m p_{k-m} - 2^k p_k) / 2,
+        sum_{i<j} (a_i a_j)^k = (p_k^2 - p_{2k}) / 2,
+        sum_{i<j} (a_i - a_j)^(2k) = (1/2) sum_{m} binom(2k,m) (-1)^m p_m p_{2k-m}.
+
+    The first and third are computed using exponential generating
+    functions: E(t)^2 - E(2t) and E(t) E(-t) where E(t) = sum p_k t^k / k!.
+*/
+void
+qqbar_fmpz_poly_symmetric_composed_op(fmpz_poly_t res, const fmpz_poly_t A, int op)
+{
+    slong d, m, n, len, i;
+    fmpq_poly_t P, Prev, Pdrev, E, F;
+    fmpq_t c;
+
+    d = fmpz_poly_degree(A);
+
+    if (d <= 1)
+    {
+        flint_throw(FLINT_ERROR, "symmetric_composed_op: input must have degree >= 2\n");
+    }
+
+    m = d * (d - 1) / 2;
+    n = m + 1;
+
+    /* number of power sums needed */
+    len = (op == OP_ADD) ? n : 2 * n - 1;
+
+    fmpq_poly_init(P);
+    fmpq_poly_init(Prev);
+    fmpq_poly_init(Pdrev);
+    fmpq_poly_init(E);
+    fmpq_poly_init(F);
+    fmpq_init(c);
+
+    fmpq_poly_set_fmpz_poly(P, A);
+    fmpq_poly_reverse(Prev, P, d + 1);
+    fmpq_poly_derivative(Pdrev, P);
+    fmpq_poly_reverse(Pdrev, Pdrev, d);
+
+    /* power sums p_0, ..., p_{len-1} */
+    fmpq_poly_div_series(P, Pdrev, Prev, len);
+
+    if (op == OP_MUL)
+    {
+        /* E = sum_k (p_k^2 - p_{2k}) / 2 t^k */
+        for (i = 0; i < n; i++)
+        {
+            fmpq_poly_get_coeff_fmpq(c, P, i);
+            fmpq_mul(c, c, c);
+            fmpq_poly_set_coeff_fmpq(E, i, c);
+            fmpq_poly_get_coeff_fmpq(c, P, 2 * i);
+            fmpq_poly_set_coeff_fmpq(F, i, c);
+        }
+
+        fmpq_poly_sub(E, E, F);
+        fmpq_poly_scalar_div_ui(E, E, 2);
+    }
+    else if (op == OP_ADD)
+    {
+        /* E = (B(t)^2 - B(2t)) / 2, B(t) = sum_k p_k t^k / k!,
+           gives the exponential generating function for the power sums */
+        fmpq_poly_borel_transform(P, P);
+        fmpq_poly_mullow(E, P, P, n);
+        fmpz_set_ui(fmpq_numref(c), 2);
+        fmpz_one(fmpq_denref(c));
+        fmpq_poly_rescale(F, P, c);
+        fmpq_poly_sub(E, E, F);
+        fmpq_poly_scalar_div_ui(E, E, 2);
+        /* convert to ordinary generating function */
+        fmpq_poly_inv_borel_transform(E, E);
+    }
+    else
+    {
+        /* B(t) B(-t) gives the exponential generating function for
+           sum_{i,j} (a_i - a_j)^k; we want (1/2) of the even terms */
+        fmpq_poly_borel_transform(P, P);
+        fmpz_set_si(fmpq_numref(c), -1);
+        fmpz_one(fmpq_denref(c));
+        fmpq_poly_rescale(F, P, c);
+        fmpq_poly_mullow(F, P, F, 2 * n - 1);
+        fmpq_poly_inv_borel_transform(F, F);
+
+        for (i = 0; i < n; i++)
+        {
+            fmpq_poly_get_coeff_fmpq(c, F, 2 * i);
+            fmpq_poly_set_coeff_fmpq(E, i, c);
+        }
+
+        fmpq_poly_scalar_div_ui(E, E, 2);
+    }
+
+    /* E = sum_k s_k t^k (s_k = power sums of the roots). Recover the
+       polynomial as exp(-sum_{k>=1} s_k t^k / k), reversed. */
+    fmpq_poly_shift_right(E, E, 1);
+    fmpq_poly_neg(E, E);
+    fmpq_poly_integral(E, E);
+    fmpq_poly_exp_series(E, E, n);
+    fmpq_poly_reverse(E, E, n);
+
+    fmpq_poly_get_numerator(res, E);
+
+    fmpq_poly_clear(P);
+    fmpq_poly_clear(Prev);
+    fmpq_poly_clear(Pdrev);
+    fmpq_poly_clear(E);
+    fmpq_poly_clear(F);
+    fmpq_clear(c);
+}
+
+/* Given a factorization containing the minimal polynomial of w as a
+   factor, where w is computed from x and y as follows, identifies the
+   correct factor and sets res to w.
+
+    op = 0: w = x + y
+    op = 1: w = x - y
+    op = 2: w = x * y
+    op = 3: w = x / y
+    op = 4: w = (x - y)^2
+    op = 5: w = (x - y) / (2i)
+*/
+void
+_qqbar_binary_op_select_factor(qqbar_t res, const fmpz_poly_factor_t fac, const qqbar_t x, const qqbar_t y, int op)
 {
     slong i, prec, found;
-    fmpz_poly_t H;
-    fmpz_poly_factor_t fac;
     acb_t z1, z2, w, t;
 
-    fmpz_poly_init(H);
-    fmpz_poly_factor_init(fac);
     acb_init(z1);
     acb_init(z2);
     acb_init(w);
     acb_init(t);
 
-    /* flint_printf("BEGIN COMPOSED OP %wd %wd %wd %wd\n",
-        fmpz_poly_degree(QQBAR_POLY(x)),
-        fmpz_poly_max_bits(QQBAR_POLY(x)),
-        fmpz_poly_degree(QQBAR_POLY(y)),
-        fmpz_poly_max_bits(QQBAR_POLY(y))); */
-#if TIMING
-    {
-        flint_printf("composed op: ");
-        TIMEIT_ONCE_START;
-        qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
-        TIMEIT_ONCE_STOP;
-
-        flint_printf("factoring: ");
-        TIMEIT_ONCE_START;
-        fmpz_poly_factor(fac, H);
-        TIMEIT_ONCE_STOP;
-    }
-#else
-    qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
-    fmpz_poly_factor(fac, H);
-#endif
-
     acb_set(z1, QQBAR_ENCLOSURE(x));
     acb_set(z2, QQBAR_ENCLOSURE(y));
 
-/*
-    qqbar_print(x); printf("\n");
-    qqbar_print(y); printf("\n");
-*/
-
     for (prec = QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
     {
-        /* printf("binop %ld\n", prec); */
-
         _qqbar_enclosure_raw(z1, QQBAR_POLY(x), z1, prec);
         _qqbar_enclosure_raw(z2, QQBAR_POLY(y), z2, prec);
-
-        /*
-        acb_printd(z1, 30); printf("\n");
-        acb_printd(z2, 30); printf("\n");
-        */
 
         if (op == 0)
             acb_add(w, z1, z2, prec);
@@ -259,8 +352,19 @@ qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int
             acb_sub(w, z1, z2, prec);
         else if (op == 2)
             acb_mul(w, z1, z2, prec);
-        else
+        else if (op == 3)
             acb_div(w, z1, z2, prec);
+        else if (op == 4)
+        {
+            acb_sub(w, z1, z2, prec);
+            acb_sqr(w, w, prec);
+        }
+        else
+        {
+            acb_sub(w, z1, z2, prec);
+            acb_div_onei(w, w);
+            acb_mul_2exp_si(w, w, -1);
+        }
 
         /* Look for potential roots -- we want exactly one */
         found = -1;
@@ -276,8 +380,6 @@ qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int
             }
         }
 
-        /* printf("found: %ld\n", found); */
-
         /* Check if the enclosure is good enough */
         if (found >= 0)
         {
@@ -290,21 +392,144 @@ qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int
         }
     }
 
-    fmpz_poly_clear(H);
-    fmpz_poly_factor_clear(fac);
     acb_clear(z1);
     acb_clear(z2);
     acb_clear(w);
     acb_clear(t);
 }
 
+static void
+qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
+{
+    fmpz_poly_t H;
+    fmpz_poly_factor_t fac;
+
+    fmpz_poly_init(H);
+    fmpz_poly_factor_init(fac);
+
+    qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
+    fmpz_poly_factor(fac, H);
+    _qqbar_binary_op_select_factor(res, fac, x, y, op);
+
+    fmpz_poly_clear(H);
+    fmpz_poly_factor_clear(fac);
+}
+
+/* Given T irreducible (primitive, positive leading coefficient), factor
+   T(z^2), using a Capelli certificate to avoid refactoring T when possible. */
+void
+_qqbar_factor_inflate2_irreducible(fmpz_poly_factor_t fac, const fmpz_poly_t T)
+{
+    fmpz_poly_t U;
+    fmpz_poly_init(U);
+    fmpz_poly_inflate(U, T, 2);
+
+    if (fmpz_poly_degree(T) >= 1 && !fmpz_is_zero(T->coeffs) &&
+        _fmpz_poly_factor_inflation_is_irreducible_capelli(T, 2))
+    {
+        fmpz_poly_factor_fit_length(fac, 1);
+        fmpz_one(&fac->c);
+        fmpz_poly_swap(fac->p, U);
+        fac->exp[0] = 1;
+        fac->num = 1;
+    }
+    else
+    {
+        fmpz_poly_factor(fac, U);
+    }
+
+    fmpz_poly_clear(U);
+}
+
+/* x != y are roots of the same irreducible polynomial.
+   Computes x + y (op = 0), x - y (op = 1), x * y (op = 2),
+   (x - y)^2 (op = 4), or (x - y) / (2i) (op = 5). */
+void
+_qqbar_conjugate_pair_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
+{
+    fmpz_poly_t H;
+    fmpz_poly_factor_t fac;
+
+    fmpz_poly_init(H);
+    fmpz_poly_factor_init(fac);
+
+    if (op == 0 || op == 2)
+    {
+        qqbar_fmpz_poly_symmetric_composed_op(H, QQBAR_POLY(x), op);
+        fmpz_poly_factor(fac, H);
+        _qqbar_binary_op_select_factor(res, fac, x, y, op);
+    }
+    else
+    {
+        qqbar_t v;
+        qqbar_init(v);
+
+        /* v = (x - y)^2 */
+        qqbar_fmpz_poly_symmetric_composed_op(H, QQBAR_POLY(x), OP_SUB);
+        fmpz_poly_factor(fac, H);
+        _qqbar_binary_op_select_factor(v, fac, x, y, 4);
+
+        if (op == 4)
+        {
+            qqbar_swap(res, v);
+        }
+        else
+        {
+            /* w = x - y is a root of f(z^2), (x - y) / (2i) of f(-4 z^2),
+               where f = minpoly(v) */
+            if (op == 5)
+            {
+                slong i;
+                for (i = 1; i < QQBAR_POLY(v)->length; i++)
+                    fmpz_mul_2exp(QQBAR_COEFFS(v) + i, QQBAR_COEFFS(v) + i, 2 * i);
+                for (i = 1; i < QQBAR_POLY(v)->length; i += 2)
+                    fmpz_neg(QQBAR_COEFFS(v) + i, QQBAR_COEFFS(v) + i);
+                fmpz_poly_primitive_part(QQBAR_POLY(v), QQBAR_POLY(v));
+                if (fmpz_sgn(QQBAR_COEFFS(v) + qqbar_degree(v)) < 0)
+                    fmpz_poly_neg(QQBAR_POLY(v), QQBAR_POLY(v));
+            }
+
+            _qqbar_factor_inflate2_irreducible(fac, QQBAR_POLY(v));
+            _qqbar_binary_op_select_factor(res, fac, x, y, op);
+        }
+
+        qqbar_clear(v);
+    }
+
+    fmpz_poly_clear(H);
+    fmpz_poly_factor_clear(fac);
+}
+
 void
 qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 {
     slong dx, dy;
+    int same_poly;
 
     dx = qqbar_degree(x);
     dy = qqbar_degree(y);
+
+    same_poly = (dx == dy) && fmpz_poly_equal(QQBAR_POLY(x), QQBAR_POLY(y));
+
+    if (same_poly && qqbar_equal(x, y))
+    {
+        if (op == 0)
+            qqbar_mul_2exp_si(res, x, 1);
+        else if (op == 1)
+            qqbar_zero(res);
+        else if (op == 2)
+            qqbar_sqr(res, x);
+        else
+            qqbar_one(res);
+        return;
+    }
+
+    /* Specialized algorithms when one operand is quadratic. */
+    if (dx == 2 || dy == 2)
+    {
+        _qqbar_binary_op_quadratic(res, x, y, op);
+        return;
+    }
 
     /* Guess and verify rational result; this could be generalized to
        higher degree results. */
@@ -358,6 +583,20 @@ qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 
         if (found)
             return;
+    }
+
+    /* If one operand lies in the field generated by the other, or both lie
+       in a common cyclotomic field, we can compute the result by linear
+       algebra in that field instead of factoring a composed polynomial
+       of degree dx * dy. */
+    if (_qqbar_binary_op_structured(res, x, y, op))
+        return;
+
+    /* Distinct conjugates: use a composed polynomial of half the degree. */
+    if (same_poly && op != 3)
+    {
+        _qqbar_conjugate_pair_op(res, x, y, op);
+        return;
     }
 
     qqbar_binary_op_without_guess(res, x, y, op);

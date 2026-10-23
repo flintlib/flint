@@ -12,6 +12,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "fmpq_poly.h"
 
 void check_invalid(char * s)
@@ -56,6 +57,17 @@ TEST_FUNCTION_START(fmpq_poly_get_set_str, state)
     check_invalid("0  0");
     check_invalid("2  -1 0 1");
     check_invalid("4  0 0");
+
+    /* _fmpq_poly_set_str with len = 0: 0 on success, -1 on failure */
+    {
+        fmpz_t den;
+
+        fmpz_init(den);
+        if (_fmpq_poly_set_str(NULL, den, "", 0) != 0
+                || _fmpq_poly_set_str(NULL, den, "1", 0) != -1)
+            TEST_FUNCTION_FAIL("_fmpq_poly_set_str with len = 0\n");
+        fmpz_clear(den);
+    }
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

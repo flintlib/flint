@@ -236,10 +236,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
 
-    if (bits <= FLINT_BITS)
-        mpoly_monomial_add(heap[1].exp, Bexp + N*0, Cexp + N*0, N);
-    else
-        mpoly_monomial_add_mp(heap[1].exp, Bexp + N*0, Cexp + N*0, N);
+    mpoly_monomial_add_any_bits(heap[1].exp, Bexp + N*0, Cexp + N*0, N, bits);
 
     hind[0] = 2*1 + 0;
 
@@ -317,12 +314,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -341,12 +333,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -415,9 +402,7 @@ int nmod_mpolyuu_divides(
 
     TMP_START;
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, bits, ctx->minfo);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */

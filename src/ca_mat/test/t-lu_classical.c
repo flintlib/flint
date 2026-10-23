@@ -157,6 +157,26 @@ TEST_FUNCTION_START(ca_mat_lu_classical, state)
                 check(P, LU, A, rank, ctx);
             }
 
+            /* With rank_check, a provably rank-deficient square matrix
+               must give success with rank 0 (integer entries: all zero
+               tests are decidable, so this cannot fail). */
+            if (m == n)
+            {
+                success = ca_mat_lu_classical(&rank, P, LU, A, 1, ctx);
+
+                if (!success || (r < n && rank != 0) || (r == n && rank != n))
+                {
+                    flint_printf("FAIL (rank_check):\n");
+                    flint_printf("success = %d, r = %wd, rank = %wd\n", success, r, rank);
+                    flint_printf("A:");
+                    ca_mat_print(A, ctx);
+                    flint_abort();
+                }
+
+                if (r == n)
+                    check(P, LU, A, rank, ctx);
+            }
+
             ca_mat_clear(A, ctx);
             ca_mat_clear(LU, ctx);
             flint_free(P);

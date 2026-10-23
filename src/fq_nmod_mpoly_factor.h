@@ -455,16 +455,6 @@ int n_fq_bpoly_hlift2(
     const fq_nmod_ctx_t ctx,
     n_poly_bpoly_stack_t St);
 
-int n_fq_bpoly_hlift_cubic(
-    n_fq_bpoly_t A, /* clobbered (shifted by alpha) */
-    n_fq_bpoly_t B0,
-    n_fq_bpoly_t B1,
-    const fq_nmod_t alpha_,
-    slong degree_inner, /* required degree in x */
-    const fq_nmod_ctx_t ctx,
-    nmod_eval_interp_t E,
-    n_poly_bpoly_stack_t St);
-
 int n_fq_bpoly_hlift(
     slong r,
     n_bpoly_t A, /* clobbered (shifted by alpha) */

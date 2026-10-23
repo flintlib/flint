@@ -84,5 +84,44 @@ TEST_FUNCTION_START(fmpz_divisible_si, state)
         mpz_clear(d);
     }
 
+    /* Divisor zero: divisible iff b = 0, as for fmpz_divisible */
+    {
+        fmpz_t b, z;
+        int e, f, g;
+
+        fmpz_init(b);
+        fmpz_init(z);
+
+        for (i = 0; i < 5; i++)
+        {
+            if (i == 0)
+                fmpz_zero(b);
+            else if (i == 1)
+                fmpz_set_si(b, 6);
+            else if (i == 2)
+                fmpz_set_si(b, -6);
+            else if (i == 3)
+                fmpz_ui_pow_ui(b, 3, 100);
+            else
+                fmpz_neg(b, b);
+
+            e = fmpz_divisible_si(b, 0);
+            f = fmpz_divisible_ui(b, 0);
+            g = fmpz_divisible(b, z);
+
+            if (e != fmpz_is_zero(b) || f != e || g != e)
+            {
+                flint_printf("FAIL (divisor 0):\n");
+                flint_printf("b = "), fmpz_print(b);
+                flint_printf(", %d, %d, %d\n", e, f, g);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        fmpz_clear(b);
+        fmpz_clear(z);
+    }
+
     TEST_FUNCTION_END(state);
 }

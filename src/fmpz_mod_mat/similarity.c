@@ -13,43 +13,12 @@
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d, const fmpz_mod_ctx_t ctx)
 {
-    slong n = A->r, i, j;
-    fmpz_t t;
-
-    fmpz_init(t);
-
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < r - 1; j++)
-        {
-            fmpz_mod_mul(t, fmpz_mod_mat_entry(A, i, r), d, ctx);
-            fmpz_mod_add(fmpz_mod_mat_entry(A, i, j), fmpz_mod_mat_entry(A, i, j), t, ctx);
-        }
-
-        for (j = r + 1; j < n; j++)
-        {
-            fmpz_mod_mul(t, fmpz_mod_mat_entry(A, i, r), d, ctx);
-            fmpz_mod_add(fmpz_mod_mat_entry(A, i, j), fmpz_mod_mat_entry(A, i, j), t, ctx);
-        }
-    }
-
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < r - 1; j++)
-        {
-            fmpz_mod_mul(t, fmpz_mod_mat_entry(A, j, i), d, ctx);
-            fmpz_mod_sub(fmpz_mod_mat_entry(A, r, i), fmpz_mod_mat_entry(A, r, i), t, ctx);
-        }
-
-        for (j = r + 1; j < n; j++)
-        {
-            fmpz_mod_mul(t, fmpz_mod_mat_entry(A, j, i), d, ctx);
-            fmpz_mod_sub(fmpz_mod_mat_entry(A, r, i), fmpz_mod_mat_entry(A, r, i), t, ctx);
-        }
-    }
-
-    fmpz_clear(t);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_apply_row_similarity((gr_mat_struct *) A, r, d, gr_ctx));
 }

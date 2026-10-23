@@ -70,7 +70,6 @@ static int
 _padic_radix_log_wrapper(padic_radix_t res, const padic_radix_t x, int algorithm, gr_ctx_t ctx)
 {
     radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
-    ulong p = GR_PADIC_RADIX_CTX(ctx)->p;
     slong thr = 1;    /* log converges for valuation >= 1 for every p */
     slong Nx = x->N;
     slong prec_abs = PADIC_RADIX_CTX_PREC_ABS(ctx);

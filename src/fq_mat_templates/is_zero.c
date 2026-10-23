@@ -12,25 +12,17 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 int
 TEMPLATE(T, mat_is_zero) (const TEMPLATE(T, mat_t) mat,
                           const TEMPLATE(T, ctx_t) ctx)
 {
-    slong j;
-
-    if (mat->r == 0 || mat->c == 0)
-        return 1;
-
-    for (j = 0; j < mat->r; j++)
-    {
-        if (!_TEMPLATE(T, vec_is_zero) (TEMPLATE(T, mat_entry)(mat, j, 0), mat->c, ctx))
-            return 0;
-    }
-
-    return 1;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    return gr_mat_is_zero((const gr_mat_struct *) mat, gr_ctx) == T_TRUE;
 }
-
 
 #endif

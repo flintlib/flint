@@ -10,7 +10,7 @@
 */
 
 #include <stdlib.h>
-#include <time.h>
+
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
@@ -63,11 +63,11 @@ void _fmpz_np1_trial_factors(const fmpz_t n, nn_ptr pp1, slong * num_pp1, ulong 
 
 int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pp1, slong num_pp1)
 {
-   slong i, d, bits;
+   slong i, d;
    ulong a, b;
    fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1, p;
    fmpz_factor_t fac;
-   int res = 0, fac_found;
+   int res = 0;
 
    fmpz_init(D);
    fmpz_init(Dinv);
@@ -89,8 +89,6 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pp1, slong
 
    fmpz_add_ui(R, n, 1); /* start with n + 1 */
 
-   bits = fmpz_bits(R);
-
    for (i = 0; i < num_pp1; i++)
    {
       fmpz_set_ui(p, pp1[i]);
@@ -98,26 +96,20 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pp1, slong
       _fmpz_factor_append_ui(fac, pp1[i], d);
    }
 
-   srand(time(NULL));
+   /*
+      An attempt to pull another factor out of the cofactor with p+1 used to be
+      made here for bits > 150.  It rarely succeeds, and when it does the proof
+      it enables costs more than simply calling aprcl_is_prime on n: removing it
+      makes fmpz_is_prime 1.5-1.8x faster from 152 to 300 bits and 1.1-1.2x at
+      400 to 512 bits, with the cost of the whole n+-1 chain then falling to
+      within a few percent of aprcl_is_prime alone.
 
-   if (!fmpz_is_probabprime_BPSW(R))
-   {
-      if (bits > 150 && (fac_found = fmpz_factor_pp1(p, R, bits + 1000, bits/20 + 1000, rand()%100 + 3)
-                    && fmpz_is_prime(p)))
-      {
-         d = fmpz_remove(R, R, p);
-         _fmpz_factor_append(fac, p, d);
+      It also used rand(), seeded with srand(time(NULL)) on every call, which
+      reset the caller's random state, was not thread safe, and returned the
+      same value throughout any given second.
+   */
 
-         if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
-         {
-            if (fmpz_is_prime(R) == 1)
-            {
-               _fmpz_factor_append(fac, R, 1);
-               fmpz_set_ui(R, 1);
-            }
-         }
-      }
-   } else
+   if (fmpz_is_probabprime_BPSW(R))
    {
       if (fmpz_is_prime(R) == 1)
       {

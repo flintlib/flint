@@ -18,6 +18,7 @@
 # include <intrin.h>
 #endif
 
+#include "gmpcompat.h"
 #include "longlong.h"
 #include "templates.h"
 
@@ -25,7 +26,7 @@
 extern "C" {
 #endif
 
-#if defined(__AVX2__)
+#if defined(__AVX2__) && (FLINT_BITS == 64)
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
@@ -82,22 +83,19 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 #endif
 
 
-#if 1
-
-#if defined(__GNUC__) && defined(__AVX2__)
-
-
-#elif defined(__GNUC__) && defined(__ARM_NEON)
-
-
-
-#elif defined(_MSC_VER) && (defined(__AVX2__) || defined(_M_ARM64))
-
-
-
+/*
+    Fixed-length additions and subtractions. On x86-64 and ARM64 the
+    multi-limb macros from longlong.h expand to good carry chains; elsewhere
+    (including 32-bit platforms) we use the macros up to 3 limbs and mpn
+    calls beyond.
+*/
+#if defined(__AVX2__) || defined(__ARM_NEON) || (defined(_MSC_VER) && defined(_M_ARM64))
+# define CRT_HELPERS_UNROLLED_ADD 1
 #else
-# error crt_helpers.h requires AVX2 or Neon instructions
+# define CRT_HELPERS_UNROLLED_ADD 0
 #endif
+
+#if CRT_HELPERS_UNROLLED_ADD
 
 FLINT_FORCE_INLINE void multi_add_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[]))
 {
@@ -275,47 +273,40 @@ FLINT_FORCE_INLINE void multi_rsub_8(ulong z[], const ulong a[])
 
 #else
 
+FLINT_FORCE_INLINE void multi_add_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_add_1(ulong z[], const ulong a[]) { z[0] += a[0]; }
+FLINT_FORCE_INLINE void multi_add_2(ulong z[], const ulong a[]) { add_ssaaaa(z[1],z[0], z[1],z[0], a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_add_3(ulong z[], const ulong a[]) { add_sssaaaaaa(z[2],z[1],z[0], z[2],z[1],z[0], a[2],a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_add_4(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 4); }
+FLINT_FORCE_INLINE void multi_add_5(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 5); }
+FLINT_FORCE_INLINE void multi_add_6(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 6); }
+FLINT_FORCE_INLINE void multi_add_7(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 7); }
+FLINT_FORCE_INLINE void multi_add_8(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 8); }
 
-#define DEFINE_IT(n) \
-FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
-{ \
-    unsigned char cf = 0; \
-    for (ulong i = 0; i < n; i++) \
-        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]); \
-}
+FLINT_FORCE_INLINE void multi_sub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_sub_1(ulong z[], const ulong a[]) { z[0] -= a[0]; }
+FLINT_FORCE_INLINE void multi_sub_2(ulong z[], const ulong a[]) { sub_ddmmss(z[1],z[0], z[1],z[0], a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_sub_3(ulong z[], const ulong a[]) { sub_dddmmmsss(z[2],z[1],z[0], z[2],z[1],z[0], a[2],a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_sub_4(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 4); }
+FLINT_FORCE_INLINE void multi_sub_5(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 5); }
+FLINT_FORCE_INLINE void multi_sub_6(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 6); }
+FLINT_FORCE_INLINE void multi_sub_7(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 7); }
+FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 8); }
 
-DEFINE_IT(0)
-DEFINE_IT(1)
-DEFINE_IT(2)
-DEFINE_IT(3)
-DEFINE_IT(4)
-DEFINE_IT(5)
-DEFINE_IT(6)
-DEFINE_IT(7)
-DEFINE_IT(8)
-#undef DEFINE_IT
-
-#define DEFINE_IT(n) \
-FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
-{ \
-    unsigned char cf = 0; \
-    for (ulong i = 0; i < n; i++) \
-        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
-}
-
-DEFINE_IT(0)
-DEFINE_IT(1)
-DEFINE_IT(2)
-DEFINE_IT(3)
-DEFINE_IT(4)
-DEFINE_IT(5)
-DEFINE_IT(6)
-DEFINE_IT(7)
-#undef DEFINE_IT
+/* z = a - z */
+FLINT_FORCE_INLINE void multi_rsub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_rsub_1(ulong z[], const ulong a[]) { z[0] = a[0] - z[0]; }
+FLINT_FORCE_INLINE void multi_rsub_2(ulong z[], const ulong a[]) { sub_ddmmss(z[1],z[0], a[1],a[0], z[1],z[0]); }
+FLINT_FORCE_INLINE void multi_rsub_3(ulong z[], const ulong a[]) { sub_dddmmmsss(z[2],z[1],z[0], a[2],a[1],a[0], z[2],z[1],z[0]); }
+FLINT_FORCE_INLINE void multi_rsub_4(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 4); }
+FLINT_FORCE_INLINE void multi_rsub_5(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 5); }
+FLINT_FORCE_INLINE void multi_rsub_6(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 6); }
+FLINT_FORCE_INLINE void multi_rsub_7(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 7); }
+FLINT_FORCE_INLINE void multi_rsub_8(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 8); }
 
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(__SIZEOF_INT128__) && FLINT_BITS == 64
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     __uint128_t p = ((__uint128_t) x) * ((__uint128_t) y);
@@ -357,91 +348,119 @@ FLINT_FORCE_INLINE void CAT3(_big_addmul, 1, 0)(ulong FLINT_UNUSED(r[]), ulong F
 {
 }
 
+/*
+    The value is accumulated as two interleaved partial sums r[0..n-1] and
+    t[1..n-1]: the product C[j]*y goes into r[j..j+1] for even j and into
+    t[j..j+1] for odd j, which keeps the carry chains short. The products
+    are issued for all even j first, then all odd j.
+
+    These helpers are deliberately written as straight-line code guarded by
+    compile-time constant conditions (n and m are literals and j <= 7)
+    instead of loops. The accumulators r and t can only be kept in registers
+    if every loop indexing them is completely unrolled, and compilers do not
+    do this reliably: GCC 12 and 13 leave the natural loops rolled for
+    (n, m) = (5, 4) and (7, 6) (where the last iteration is empty), GCC 14
+    for (7, 6) and partly (5, 4), and clang 18 for 7 and 8 primes and
+    partly 6 (GCC 11 unrolls all of them). The accumulators then live on the stack, which made the CRT for
+    the affected numbers of primes up to 1.9 times slower.
+*/
+#define CRT_ACC(j) (((j) % 2 == 0) ? r : t)
+
+/*
+    For the same reason, callers should put CRT_UNROLL_PRIMES in front of
+    a loop over a compile-time number of primes calling _big_addmul;
+    without it GCC and clang leave some of these loops rolled (e.g. for
+    8 primes). Loops over a runtime number of terms (as in multi_crt.c)
+    gain nothing from it.
+*/
+#if defined(__GNUC__)
+# define CRT_UNROLL_PRIMES _Pragma("GCC unroll 8")
+#else
+# define CRT_UNROLL_PRIMES
+#endif
+
+#define CRT_MUL_J(j, n, m) \
+    if ((j) < (m)) \
+    { \
+        if ((j) + 1 < (n)) \
+            _mul(&CRT_ACC(j)[(j) + 1], &CRT_ACC(j)[j], C[j], y); \
+        else \
+            CRT_ACC(j)[j] = C[j]*y; \
+    }
+
+#define CRT_MADD_J(j, n, m) \
+    if ((j) < (m)) \
+    { \
+        if ((j) + 1 < (n)) \
+            _madd(&CRT_ACC(j)[(j) + 1], &CRT_ACC(j)[j], C[j], y); \
+        else \
+            CRT_ACC(j)[j] += C[j]*y; \
+    }
+
+#define CRT_ZERO_K(k, n) \
+    if ((k) < (n)) \
+    { \
+        r[k] = 0; \
+        t[k] = 0; \
+    }
+
 #define DEFINE_IT(n, m) \
 FLINT_FORCE_INLINE void CAT3(_big_mul, n, m)(ulong r[], ulong t[], ulong C[], ulong y) \
 { \
-    for (ulong k = 0; k < n; k += 2) \
-    { \
-        if (k + 1 < n) \
-        { \
-            FLINT_ASSERT(k < m); \
-            _mul(&r[k+1],&r[k+0], C[k+0], y); \
-        } \
-        else \
-        { \
-            FLINT_ASSERT(k + 1 == n); \
-            if (k < m) \
-                r[k+0] = C[k+0]*y; \
-            else \
-                r[k+0] = 0; \
-        } \
- \
-        if (k + 2 < n) \
-        { \
-            FLINT_ASSERT(k + 1 < m); \
-            _mul(&t[k+2],&t[k+1], C[k+1], y); \
-        } \
-        else if (k + 1 < n) \
-        { \
-            if (k + 1 < m) \
-                t[k+1] = C[k+1]*y; \
-            else \
-                t[k+1] = 0; \
-        } \
-    } \
+    FLINT_ASSERT((m) <= (n) && (n) <= 8); \
+    CRT_ZERO_K(0, n) CRT_ZERO_K(1, n) CRT_ZERO_K(2, n) CRT_ZERO_K(3, n) \
+    CRT_ZERO_K(4, n) CRT_ZERO_K(5, n) CRT_ZERO_K(6, n) CRT_ZERO_K(7, n) \
+    CRT_MUL_J(0, n, m) CRT_MUL_J(2, n, m) CRT_MUL_J(4, n, m) CRT_MUL_J(6, n, m) \
+    CRT_MUL_J(1, n, m) CRT_MUL_J(3, n, m) CRT_MUL_J(5, n, m) CRT_MUL_J(7, n, m) \
 } \
 FLINT_FORCE_INLINE void CAT3(_big_addmul, n, m)(ulong r[], ulong t[], ulong C[], ulong y) \
 { \
-    for (ulong k = 0; k < n; k += 2) \
-    { \
-        if (k + 1 < n) \
-        { \
-            FLINT_ASSERT(k < m); \
-            _madd(&r[k+1],&r[k+0], C[k+0], y); \
-        } \
-        else \
-        { \
-            FLINT_ASSERT(k + 1 == n); \
-            if (k < m) \
-                r[k+0] += C[k+0]*y; \
-        } \
- \
-        if (k + 2 < n) \
-        { \
-            FLINT_ASSERT(k + 1 < m); \
-            _madd(&t[k+2],&t[k+1], C[k+1], y); \
-        } \
-        else if (k + 1 < n) \
-        { \
-            if (k + 1 < m) \
-                t[k+1] += C[k+1]*y; \
-        } \
-    } \
+    FLINT_ASSERT((m) <= (n) && (n) <= 8); \
+    CRT_MADD_J(0, n, m) CRT_MADD_J(2, n, m) CRT_MADD_J(4, n, m) CRT_MADD_J(6, n, m) \
+    CRT_MADD_J(1, n, m) CRT_MADD_J(3, n, m) CRT_MADD_J(5, n, m) CRT_MADD_J(7, n, m) \
 }
 
+DEFINE_IT(1, 1)
 DEFINE_IT(2, 1)
+DEFINE_IT(2, 2)
 DEFINE_IT(3, 2)
+DEFINE_IT(3, 3)
 DEFINE_IT(4, 3)
 DEFINE_IT(4, 4)
 DEFINE_IT(5, 4)
+DEFINE_IT(5, 5)
 DEFINE_IT(6, 5)
+DEFINE_IT(6, 6)
 DEFINE_IT(7, 6)
+DEFINE_IT(7, 7)
+DEFINE_IT(8, 7)
+DEFINE_IT(8, 8)
 #undef DEFINE_IT
+#undef CRT_ACC
+#undef CRT_MUL_J
+#undef CRT_MADD_J
+#undef CRT_ZERO_K
 
 
+
+/* compare r[k] with limit[k], most significant first; see above for why
+   this is not a loop */
+#define CRT_CMP_K(k, n) \
+    if ((k) < (n)) \
+    { \
+        if (FLINT_LIKELY(r[k] > limit[k])) \
+            goto sub; \
+        if (r[k] < limit[k]) \
+            return; \
+    }
 
 #define DEFINE_IT(n, n_minus_1) \
 FLINT_FORCE_INLINE void CAT(_reduce_big_sum, n)(ulong r[], ulong t[], const ulong* limit) \
 { \
     CAT(multi_add, n_minus_1)(r+1, t+1); \
 check: \
-    for (ulong k = n; k > 1; k--) \
-    { \
-        if (FLINT_LIKELY(r[k-1] > limit[k-1])) \
-            goto sub; \
-        if (r[k-1] < limit[k-1]) \
-            return; \
-    } \
+    CRT_CMP_K(7, n) CRT_CMP_K(6, n) CRT_CMP_K(5, n) CRT_CMP_K(4, n) \
+    CRT_CMP_K(3, n) CRT_CMP_K(2, n) CRT_CMP_K(1, n) \
     if (r[0] < limit[0]) \
         return; \
 sub: \
@@ -456,7 +475,103 @@ DEFINE_IT(4, 3)
 DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
+DEFINE_IT(8, 7)
 #undef DEFINE_IT
+#undef CRT_CMP_K
+
+/*
+    Template for the chinese remaindering stage of the fft_small
+    convolution engine. CRT_DEFINE(NP, N, M) defines a function with the
+    fft_small_crt_func signature reconstructing output coefficients from
+    NP prime images, where N is the coefficient length of the product of
+    the primes and M the length of the reduced cofactors (as in
+    crt_helpers.h).
+
+    Before instantiating, the including file defines:
+
+    CRT_FN(NP)             the function name, e.g. CAT3(_crt, NP, fn)
+    CRT_Z_TYPE             pointer type of the output
+    CRT_HEAD               declarations run once; may unpack `params` and
+                           `local` and use `min_an_bn`
+    CRT_EMIT(zi, r, NP, N, M)
+                           emit output coefficient `zi` (an index into
+                           `z`, `zl` already subtracted) from the
+                           reconstructed value `r` of N words; NP, N, M
+                           are compile-time constants usable for token
+                           pasting. The half product of the primes is
+                           available as `Mhalf` for signed emits.
+    CRT_TAIL               statements run once at the end; may write
+                           per-range outputs to `local`
+
+    and afterwards #undefs all of them and CRT_DEFINE.
+
+    The in-scope names np, n, m hold NP, N, M at runtime, and Rffts,
+    Rcrts, zl are the corresponding arguments.
+*/
+
+#define CRT_DEFINE(NP, N, M) \
+static void CRT_FN(NP)(void* zv, ulong zl, \
+    ulong zi_start, ulong zi_stop, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
+    crt_data_struct* Rcrts, ulong min_an_bn, ulong* local, \
+    const void* params) \
+{ \
+    CRT_Z_TYPE z = (CRT_Z_TYPE) zv; \
+    ulong np = NP; \
+    ulong n = N; \
+    ulong m = M; \
+ \
+    CRT_HEAD \
+ \
+    FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
+    FLINT_ASSERT(1 <= N && N <= 7); \
+ \
+    if (n == m + 1) \
+    { \
+        for (ulong l = 0; l < np; l++) { \
+            FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0); \
+        } \
+    } \
+    else \
+    { \
+        FLINT_ASSERT(n == m); \
+    } \
+ \
+    ulong Mhalf[N]; \
+    mpn_rshift(Mhalf, crt_data_prod_primes(Rcrts + np - 1), N, 1); \
+ \
+    ulong Xs[BLK_SZ*NP]; \
+ \
+    (void) min_an_bn; \
+    (void) local; \
+    (void) params; \
+    (void) Mhalf; \
+ \
+    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ) \
+    { \
+        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
+ \
+        ulong jstart = (i < zi_start) ? zi_start - i : 0; \
+        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i); \
+        for (ulong j = jstart; j < jstop; j += 1) \
+        { \
+            ulong r[N]; \
+            ulong t[N]; \
+            ulong l = 0; \
+ \
+            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            CRT_UNROLL_PRIMES \
+            for (l++; l < np; l++) \
+                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+ \
+            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+ \
+            CRT_EMIT(i + j - zl, r, NP, N, M) \
+        } \
+    } \
+ \
+    CRT_TAIL \
+}
 
 #ifdef __cplusplus
 }

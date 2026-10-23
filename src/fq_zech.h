@@ -135,9 +135,6 @@ void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void fq_zech_inv(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
-void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
-                  const fmpz * a, const slong *j, slong lena, const fmpz_t p);
-
 void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
                  const fq_zech_ctx_t ctx);
 

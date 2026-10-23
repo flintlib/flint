@@ -44,6 +44,7 @@
 #include "t-get_set_coeff.c"
 #include "t-get_set_coeff_fmpz_monomial.c"
 #include "t-get_set_is_fmpz.c"
+#include "t-get_set_is_fmpz_poly.c"
 #include "t-get_set_str_pretty.c"
 #include "t-get_set_term_coeff_fmpz.c"
 #include "t-get_set_term_exp_fmpz.c"
@@ -92,6 +93,7 @@
 #include "t-total_degree.c"
 #include "t-univar.c"
 #include "t-univar_resultant.c"
+#include "t-univar_set_coeff_ui.c"
 #include "t-used_vars.c"
 #include "t-vec_autoreduction.c"
 
@@ -132,6 +134,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mpoly_get_set_coeff),
     TEST_FUNCTION(fmpz_mpoly_get_set_coeff_fmpz_monomial),
     TEST_FUNCTION(fmpz_mpoly_get_set_is_fmpz),
+    TEST_FUNCTION(fmpz_mpoly_get_set_is_fmpz_poly),
     TEST_FUNCTION(fmpz_mpoly_get_set_str_pretty),
     TEST_FUNCTION(fmpz_mpoly_get_set_term_coeff_fmpz),
     TEST_FUNCTION(fmpz_mpoly_get_set_term_exp_fmpz),
@@ -180,6 +183,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mpoly_total_degree),
     TEST_FUNCTION(fmpz_mpoly_univar),
     TEST_FUNCTION(fmpz_mpoly_univar_resultant),
+    TEST_FUNCTION(fmpz_mpoly_univar_set_coeff_ui),
     TEST_FUNCTION(fmpz_mpoly_used_vars),
     TEST_FUNCTION(fmpz_mpoly_vec_autoreduction)
 };

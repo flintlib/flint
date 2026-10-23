@@ -17,7 +17,6 @@
 #include "fmpz_mat.h"
 
 /* Enable to exercise corner cases */
-#define DEBUG_USE_SMALL_PRIMES 0
 
 
 static ulong
@@ -70,11 +69,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_zero(x);
     fmpz_one(prod);
 
-#if DEBUG_USE_SMALL_PRIMES
-    p = UWORD(1);
-#else
-    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
-#endif
+    p = (flint_fmpz_mat_force_small_primes ? UWORD(1) : (UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS));
 
     slong * P;
     slong * pivs;
@@ -95,7 +90,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 
         /* Attempt to certify zero determinant. May want to skip this
            check if proved == 0. */
-        if (rank != n && fmpz_mat_rank_certify_lu_mod_p(A, rank, P, pivs))
+        if (rank != n && _fmpz_mat_certify_singular_lu_mod_p(A, rank, P, pivs, p))
         {
             fmpz_zero(x);
             break;

@@ -66,7 +66,6 @@ gr_poly_bessel_j_series(gr_poly_t res, gr_srcptr nu, const gr_poly_t z, slong le
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_bessel_j_series(res->coeffs, nu, z->coeffs, z->length, len, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }

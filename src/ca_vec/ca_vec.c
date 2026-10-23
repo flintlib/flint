@@ -105,10 +105,9 @@ void
 ca_vec_neg(ca_vec_t res, const ca_vec_t src, ca_ctx_t ctx)
 {
     if (res != src)
-    {
         ca_vec_set_length(res, ca_vec_length(src, ctx), ctx);
-        _ca_vec_neg(ca_vec_entry(res, 0), ca_vec_entry(src, 0), ca_vec_length(res, ctx), ctx);
-    }
+
+    _ca_vec_neg(ca_vec_entry(res, 0), ca_vec_entry(src, 0), ca_vec_length(res, ctx), ctx);
 }
 
 void

@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz_mpoly.h"
+#include "fmpz_mpoly_factor.h"
 
 TEST_FUNCTION_START(fmpz_mpoly_gcd_zippel, state)
 {
@@ -130,6 +131,52 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd_zippel, state)
             fmpz_mpoly_ctx_clear(ctx);
         }
 
+    }
+
+    /* regression test: the coefficient bound used to ignore the degree in
+       the first variable, and gcd_zippel did not terminate for this input */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, p;
+        fmpz_t bound, h;
+        slong degs[2];
+        const char * vars[] = {"x", "y"};
+
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(p, ctx);
+        fmpz_init(bound);
+        fmpz_init(h);
+
+        /* p has 72-bit coefficients and divides a, whose coefficients
+           are below 2^20 */
+        fmpz_mpoly_set_str_pretty(p, "((x^100-1)/(x-1))^12 + y", vars, ctx);
+        fmpz_mpoly_set_str_pretty(a, "(x-1)^12*(x+2)", vars, ctx);
+        fmpz_mpoly_mul(a, a, p, ctx);
+        fmpz_mpoly_set_str_pretty(b, "x^3+3", vars, ctx);
+        fmpz_mpoly_mul(b, b, p, ctx);
+
+        fmpz_mpoly_degrees_si(degs, a, ctx);
+        fmpz_mpoly_height(h, a, ctx);
+        if (!fmpz_mpoly_factor_bound_si(bound, h, degs, 2))
+            TEST_FUNCTION_FAIL("fmpz_mpoly_factor_bound_si failed\n");
+
+        fmpz_mpoly_height(h, p, ctx);
+        if (fmpz_cmp(h, bound) > 0)
+            TEST_FUNCTION_FAIL("fmpz_mpoly_factor_bound_si: bound too small\n");
+
+        if (!fmpz_mpoly_gcd_zippel(g, a, b, ctx) || !fmpz_mpoly_equal(g, p, ctx))
+            TEST_FUNCTION_FAIL("check regression example\n");
+
+        fmpz_clear(bound);
+        fmpz_clear(h);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(p, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)

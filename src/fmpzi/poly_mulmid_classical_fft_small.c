@@ -1,0 +1,281 @@
+/*
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include <gmp.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpzi.h"
+#include "gr.h"
+#include "fft_small.h"
+#include "ulong_extras.h"
+
+/* Middle products of Gaussian integer polynomials with the coefficient
+   arithmetic done pointwise on fft_small transforms: the same rolling
+   schoolbook as _fmpz_poly_mulmid_classical_fft_small, with two
+   transforms per coefficient (real and imaginary parts) and four
+   pointwise operations per complex product,
+       re += ra rb,  re -= ia ib,  im += ra ib,  im += ia rb.
+   Squaring shares transforms, pairs symmetric terms through doubled
+   accumulators, and computes diagonal squares with three
+   multiplications ((r + ii)^2 = r^2 - i^2 + 2ri i, the cross term
+   riding the doubled accumulator). Returns 1 on success, 0 when the
+   transformed representation is unavailable or unprofitable. */
+
+#if FLINT_HAVE_FFT_SMALL
+
+int
+_fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
+    const fmpzi_struct * poly1, slong len1,
+    const fmpzi_struct * poly2, slong len2,
+    slong nlo, slong nhi)
+{
+    gr_ctx_t ctx;
+    gr_ptr E, B, X, accR, accI, accR2, accI2;
+    slong i, j, k, sz, abits, bbits;
+    slong * xidx;
+    int share = (poly1 == poly2);
+    int status = GR_SUCCESS;
+    int ok;
+
+    if (len2 < 1 || len1 < 1 || nlo >= nhi)
+        return 0;
+
+    if (len1 < len2)
+    {
+        const fmpzi_struct * tp = poly1;
+        slong tl = len1;
+        poly1 = poly2;
+        len1 = len2;
+        poly2 = tp;
+        len2 = tl;
+    }
+    k = len2;
+
+    /* bounds over both components; the subtraction in the real part
+       makes the representation signed regardless of input signs */
+    {
+        slong m, t;
+        abits = 0;
+        for (i = 0; i < len1; i++)
+        {
+            t = fmpz_bits(fmpzi_realref(poly1 + i));
+            m = fmpz_bits(fmpzi_imagref(poly1 + i));
+            abits = FLINT_MAX(abits, FLINT_MAX(t, m));
+        }
+        if (share)
+            bbits = abits;
+        else
+        {
+            bbits = 0;
+            for (i = 0; i < len2; i++)
+            {
+                t = fmpz_bits(fmpzi_realref(poly2 + i));
+                m = fmpz_bits(fmpzi_imagref(poly2 + i));
+                bbits = FLINT_MAX(bbits, FLINT_MAX(t, m));
+            }
+        }
+    }
+    if (abits == 0 || bbits == 0)
+    {
+        for (i = 0; i < nhi - nlo; i++)
+            fmpzi_zero(res + i);
+        return 1;
+    }
+
+    /* Decline if too sparse; to be moved to the algorithm selection in
+       a future _fmpzi_poly_mulmid when this  function has been integrated.
+    {
+        slong wa = 0, wb = 0;
+        double density, need;
+        for (i = 0; i < len1; i++)
+            wa += fmpz_bits(fmpzi_realref(poly1 + i))
+                + fmpz_bits(fmpzi_imagref(poly1 + i));
+        if (share)
+            wb = wa;
+        else
+            for (i = 0; i < len2; i++)
+                wb += fmpz_bits(fmpzi_realref(poly2 + i))
+                    + fmpz_bits(fmpzi_imagref(poly2 + i));
+        density = (double) (wa + wb)
+                  / (2.0 * ((double) len1 * abits
+                            + (double) len2 * bbits));
+        need = (k <= 2) ? 0.90 : (k <= 4) ? 0.62
+             : (k <= 8) ? 0.50 : 0.30;
+        if (density < need)
+            return 0;
+    } */
+
+    /* each output component accumulates at most 2 k product
+       magnitudes of one product's size */
+    if (gr_ctx_init_transformed_mpn(ctx,
+            abits + bbits, 2 * k, 1, 4 * k + 4,
+            GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER) != GR_SUCCESS)
+        return 0;
+
+    sz = ctx->sizeof_elem;
+    /* 2k kept transforms (re, im interleaved), 2k rolling slots, and
+       four accumulators on borrowed slabs */
+    GR_TMP_INIT_VEC(E, 4 * k + 4, ctx);
+    B = E;
+    X = GR_ENTRY(E, 2 * k, sz);
+    accR = GR_ENTRY(E, 4 * k, sz);
+    accI = GR_ENTRY(E, 4 * k + 1, sz);
+    accR2 = GR_ENTRY(E, 4 * k + 2, sz);
+    accI2 = GR_ENTRY(E, 4 * k + 3, sz);
+    xidx = flint_malloc(k * sizeof(slong));
+    for (i = 0; i < k; i++)
+        xidx[i] = -1;
+
+    for (j = 0; j < k && status == GR_SUCCESS; j++)
+    {
+        const fmpzi_struct * c = (share ? poly1 : poly2) + j;
+        status |= gr_set_fmpz(GR_ENTRY(B, 2 * j, sz),
+                             fmpzi_realref(c), ctx);
+        status |= gr_set_fmpz(GR_ENTRY(B, 2 * j + 1, sz),
+                             fmpzi_imagref(c), ctx);
+    }
+
+#define A_PAIR(t, outr, outi) \
+    do { \
+        if (share && (t) < k) \
+        { \
+            (outr) = GR_ENTRY(B, 2 * (t), sz); \
+            (outi) = GR_ENTRY(B, 2 * (t) + 1, sz); \
+        } \
+        else \
+        { \
+            slong _s = share ? ((t) - k) % k : (t) % k; \
+            gr_ptr _er = GR_ENTRY(X, 2 * _s, sz); \
+            gr_ptr _ei = GR_ENTRY(X, 2 * _s + 1, sz); \
+            if (xidx[_s] != (t)) \
+            { \
+                status |= gr_set_fmpz(_er, \
+                    fmpzi_realref(poly1 + (t)), ctx); \
+                status |= gr_set_fmpz(_ei, \
+                    fmpzi_imagref(poly1 + (t)), ctx); \
+                xidx[_s] = (t); \
+            } \
+            (outr) = _er; \
+            (outi) = _ei; \
+        } \
+    } while (0)
+
+    /* one complex product accumulated into the (re, im) target pair */
+/* the freshly re-initialized accumulators are the ring's zero and
+   the ring's addmul handles empty accumulators itself */
+#define CPROD(tr, ti, ar, ai, br, bi) \
+    do { \
+        status |= gr_addmul(tr, ar, br, ctx); \
+        status |= gr_submul(tr, ai, bi, ctx); \
+        status |= gr_addmul(ti, ar, bi, ctx); \
+        status |= gr_addmul(ti, ai, br, ctx); \
+    } while (0)
+
+    for (i = nlo; i < nhi && status == GR_SUCCESS; i++)
+    {
+        slong jlo = FLINT_MAX(0, i - len1 + 1);
+        slong jhi = FLINT_MIN(i, k - 1);
+        gr_ptr ar, ai, br, bi;
+
+        if (!share)
+        {
+            for (j = jlo; j <= jhi; j++)
+            {
+                A_PAIR(i - j, ar, ai);
+                br = GR_ENTRY(B, 2 * j, sz);
+                bi = GR_ENTRY(B, 2 * j + 1, sz);
+                if (status != GR_SUCCESS)
+                    break;
+                CPROD(accR, accI, ar, ai, br, bi);
+            }
+        }
+        else
+        {
+            for (j = jlo; j <= jhi; j++)
+            {
+                slong jp = i - j;
+                int paired = (jp >= jlo && jp <= jhi);
+
+                if (paired && j > jp)
+                    continue;
+
+                A_PAIR(i - j, ar, ai);
+                A_PAIR(j, br, bi);
+                if (status != GR_SUCCESS)
+                    break;
+
+                if (paired && j < jp)
+                    CPROD(accR2, accI2, ar, ai, br, bi);
+                else if (paired)
+                {
+                    /* the diagonal square: r^2 - i^2 into the single
+                       accumulator, r i into the doubled one */
+                    status |= gr_addmul(accR, ar, ar, ctx);
+                    status |= gr_submul(accR, ai, ai, ctx);
+                    status |= gr_addmul(accI2, ar, ai, ctx);
+                }
+                else
+                    CPROD(accR, accI, ar, ai, br, bi);
+            }
+        }
+
+        /* fold the paired sums in twice; zero paired accumulators
+           reduce to short-circuited bookkeeping */
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_add(accR, accR, accR2, ctx);
+            status |= gr_add(accR, accR, accR2, ctx);
+            status |= gr_add(accI, accI, accI2, ctx);
+            status |= gr_add(accI, accI, accI2, ctx);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_transformed_mpn_get_fmpz_destructive(fmpzi_realref(res + i - nlo), 0, accR, ctx);
+            status |= gr_transformed_mpn_get_fmpz_destructive(fmpzi_imagref(res + i - nlo), 0, accI, ctx);
+            /* the destructive gets consumed the accumulators: bring
+               them back for the next output; under the fit_buffer
+               strategy this is a slab-pool round trip */
+            gr_clear(accR, ctx);
+            gr_init(accR, ctx);
+            gr_clear(accI, ctx);
+            gr_init(accI, ctx);
+            gr_clear(accR2, ctx);
+            gr_init(accR2, ctx);
+            gr_clear(accI2, ctx);
+            gr_init(accI2, ctx);
+        }
+    }
+
+#undef A_PAIR
+#undef CPROD
+
+    ok = (status == GR_SUCCESS);
+    GR_TMP_CLEAR_VEC(E, 4 * k + 4, ctx);
+    flint_free(xidx);
+    gr_ctx_clear(ctx);
+    return ok;
+}
+
+#else
+
+int
+_fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
+    const fmpzi_struct * poly1, slong len1,
+    const fmpzi_struct * poly2, slong len2,
+    slong nlo, slong nhi)
+{
+    return 0;
+}
+
+#endif

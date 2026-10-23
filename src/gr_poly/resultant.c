@@ -20,14 +20,20 @@
 #define HGCD_CUTOFF 200
 #define HGCD_INNER_CUTOFF 100
 
-int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+/* Tuning for the multimodular algorithm over bivariate polynomial rings over
+   Z and Q: it is used when the degree in y of the smaller input, or the degree
+   in x of the resultant, reaches these values. */
+#define MODULAR_MIN_LENGTH 7
+#define MODULAR_MIN_DEGREE 96
+
+int _gr_poly_resultant_generic(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
 
     if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
         return GR_SUCCESS;
 
-    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_is_pretend_field(ctx) == T_TRUE)
     {
         if (FLINT_MIN(lenA, lenB) >= HGCD_CUTOFF && gr_ctx_is_finite(ctx) == T_TRUE)
             status = _gr_poly_resultant_hgcd(res, A, lenA, B, lenB, HGCD_INNER_CUTOFF, HGCD_CUTOFF, ctx);
@@ -47,6 +53,11 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
         status = _gr_poly_resultant_sylvester(res, A, lenA, B, lenB, ctx);
 
     return status;
+}
+
+int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    return GR_POLY_RESULTANT_OP(ctx, POLY_RESULTANT)(res, A, lenA, B, lenB, ctx);
 }
 
 int gr_poly_resultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)

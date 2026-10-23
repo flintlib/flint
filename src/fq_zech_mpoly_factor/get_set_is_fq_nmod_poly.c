@@ -113,10 +113,7 @@ void _fq_zech_mpoly_set_fq_zech_poly(
 
         FLINT_ASSERT(Alen < A->alloc);
         fq_zech_set(A->coeffs + Alen, Bcoeffs + i, ctx->fqctx);
-        if (Abits <= FLINT_BITS)
-            mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
-        else
-            mpoly_monomial_mul_ui_mp(A->exps + N*Alen, genexp, N, i);
+        mpoly_monomial_mul_ui_any_bits(A->exps + N*Alen, genexp, N, i, Abits);
         Alen++;
     }
     A->length = Alen;

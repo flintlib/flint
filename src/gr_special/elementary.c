@@ -193,6 +193,52 @@ gr_generic_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_sec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    status |= gr_cos_pi(res, x, ctx);
+    status |= gr_inv(res, res, ctx);
+
+    return status;
+}
+
+int
+gr_generic_csc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    status |= gr_sin_pi(res, x, ctx);
+    status |= gr_inv(res, res, ctx);
+
+    return status;
+}
+
+/* f(x) / pi for an inverse trigonometric function f */
+static int
+_gr_generic_div_pi(gr_ptr res, int status, gr_ctx_t ctx)
+{
+    gr_ptr t;
+
+    if (status != GR_SUCCESS)
+        return status;
+
+    GR_TMP_INIT(t, ctx);
+    status = gr_pi(t, ctx);
+    status |= gr_div(res, res, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    return status;
+}
+
+int gr_generic_asin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_asin(res, x, ctx), ctx); }
+int gr_generic_acos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_acos(res, x, ctx), ctx); }
+int gr_generic_atan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_atan(res, x, ctx), ctx); }
+int gr_generic_acot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_acot(res, x, ctx), ctx); }
+int gr_generic_asec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_asec(res, x, ctx), ctx); }
+int gr_generic_acsc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return _gr_generic_div_pi(res, gr_acsc(res, x, ctx), ctx); }
+
+int
 gr_generic_acot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;

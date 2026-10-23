@@ -15,19 +15,29 @@
 
 TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
 {
-    fmpz_mat_t A, X, B, AX;
+    fmpz_mat_t A, X, B, AX, W;
+    int use_window;
     fmpz_t den;
     slong i, m, n, r;
     int success;
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, n);
-        fmpz_mat_init(X, m, n);
+        /* the output may be a window */
+        use_window = n_randint(state, 2);
+        if (use_window)
+        {
+            fmpz_mat_init(W, m + 1, n + 2);
+            fmpz_mat_window_init(X, W, 1, 1, m + 1, n + 1);
+        }
+        else
+            fmpz_mat_init(X, m, n);
         fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
@@ -56,9 +66,47 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
             flint_abort();
         }
 
+
+        /* the denominator must be positive, minimal (no common factor
+           with the entries of X) and a divisor of det(A) */
+        if (success && m > 0)
+        {
+            fmpz_t g, det, rem;
+            slong ii, jj;
+            fmpz_init(g);
+            fmpz_init(det);
+            fmpz_init(rem);
+            fmpz_set(g, den);
+            for (ii = 0; ii < m; ii++)
+                for (jj = 0; jj < n; jj++)
+                    fmpz_gcd(g, g, fmpz_mat_entry(X, ii, jj));
+            fmpz_mat_det(det, A);
+            fmpz_mod(rem, det, den);
+            if (fmpz_sgn(den) <= 0 || !fmpz_is_one(g) || !fmpz_is_zero(rem))
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("denominator not positive, minimal or a divisor of det\n");
+                flint_printf("A:\n"),      fmpz_mat_print_pretty(A), flint_printf("\n");
+                flint_printf("X:\n"),      fmpz_mat_print_pretty(X), flint_printf("\n");
+                flint_printf("den(X) = "), fmpz_print(den),          flint_printf("\n");
+                flint_printf("gcd = "),    fmpz_print(g),            flint_printf("\n");
+                flint_printf("det(A) = "), fmpz_print(det),          flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+            fmpz_clear(g);
+            fmpz_clear(det);
+            fmpz_clear(rem);
+        }
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
-        fmpz_mat_clear(X);
+        if (use_window)
+        {
+            fmpz_mat_window_clear(X);
+            fmpz_mat_clear(W);
+        }
+        else
+            fmpz_mat_clear(X);
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
@@ -66,6 +114,7 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
     /* Test singular systems */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         m = 1 + n_randint(state, 10);
         n = 1 + n_randint(state, 10);
         r = n_randint(state, m);
@@ -99,6 +148,8 @@ TEST_FUNCTION_START(fmpz_mat_solve_multi_mod_den, state)
         fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

@@ -434,20 +434,9 @@ static int _nmod_mpoly_divrem_monagan_pearce(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow2;
-
-            lt_divides = mpoly_monomial_divides(Qexps + Qlen*N, exp, Bexps, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow2;
-
-            lt_divides = mpoly_monomial_divides_mp(Qexps + Qlen*N, exp, Bexps, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto exp_overflow2;
+        lt_divides = mpoly_monomial_divides_any_bits(Qexps + Qlen*N, exp, Bexps, N, mask, bits);
 
         acc0 = acc1 = acc2 = 0;
         do {
@@ -634,9 +623,7 @@ void nmod_mpoly_divrem_monagan_pearce(
     QRbits = FLINT_MAX(A->bits, B->bits);
     QRbits = mpoly_fix_bits(QRbits, ctx->minfo);
 
-    N = mpoly_words_per_exp(QRbits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, QRbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, QRbits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     if (QRbits != A->bits)

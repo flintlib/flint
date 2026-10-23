@@ -15,12 +15,16 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
                          ulong e, slong trunc, const fmpz_mod_ctx_t ctx)
 {
-    _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, poly, trunc, e, trunc, gr_ctx));
 }
 
 void

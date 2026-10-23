@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 
 void nmod_poly_extrapolate_geometric_precomp(nn_ptr oval, slong olen,
                                              nn_srcptr ival, slong ilen,
@@ -54,8 +55,13 @@ void nmod_poly_extrapolate_geometric_precomp(nn_ptr oval, slong olen,
             tmp[i] = nmod_mul(G->ext_s2[i], tmp[i], G->mod);
         }
 
-        /* middle product */
-        _nmod_poly_mulmid(oval, G->ext_ff->coeffs + offset-ilen, ilen+olen-1, tmp, ilen, ilen-1, ilen+olen-1, G->mod);
+        /* middle product; with the stored transform of the whole ext_ff,  */
+        /* the coefficients are [offset-1, offset-1+olen) of tmp * ext_ff   */
+        int done = (G->ext_ff_fft != NULL)
+            && _nmod_geometric_progression_mulmid_fft(oval, offset-1, offset-1+olen, tmp, ilen,
+                                                      G->ext_ff_fft, offset-ilen, ilen+olen-1, G->mod);
+        if (!done)
+            _nmod_poly_mulmid(oval, G->ext_ff->coeffs + offset-ilen, ilen+olen-1, tmp, ilen, ilen-1, ilen+olen-1, G->mod);
 
         /* second scaling */
         for (slong j = 0; j < olen; j++)
@@ -81,8 +87,13 @@ void nmod_poly_extrapolate_geometric_precomp(nn_ptr oval, slong olen,
             tmp[i] = nmod_mul(G->ext_s3[i], tmp[i], G->mod);
         }
 
-        /* middle product */
-        _nmod_poly_mulmid(oval, G->ext_fb->coeffs - (offset+olen), ilen+olen-1, tmp, ilen, ilen-1, ilen+olen-1, G->mod);
+        /* middle product; with the stored transform of the whole ext_fb,  */
+        /* the coefficients are [ilen-1-offset-olen, ilen-1-offset) of tmp * ext_fb */
+        int done = (G->ext_fb_fft != NULL)
+            && _nmod_geometric_progression_mulmid_fft(oval, ilen-1-offset-olen, ilen-1-offset, tmp, ilen,
+                                                      G->ext_fb_fft, -(offset+olen), ilen+olen-1, G->mod);
+        if (!done)
+            _nmod_poly_mulmid(oval, G->ext_fb->coeffs - (offset+olen), ilen+olen-1, tmp, ilen, ilen-1, ilen+olen-1, G->mod);
 
         /* second scaling */
         for (slong j = 0; j < olen; j++)

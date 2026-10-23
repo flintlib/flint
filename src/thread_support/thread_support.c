@@ -299,16 +299,18 @@ flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsp
             init(right, args);
         }
 
-        if (thread_limit <= 0)
-            thread_limit = flint_get_num_threads();
+        /* The budget of this call: at most nt threads (including the
+           calling thread) run base cases of [a, b) at the same time. */
+        nt = flint_get_num_threads();
+        if (thread_limit > 0)
+            nt = FLINT_MIN(nt, thread_limit);
 
-        nt = thread_limit;
         nw = flint_request_threads(&threads, FLINT_MIN(nt, 2)); /* request one extra worker */
 
         if (nw == 0)
         {
-            flint_parallel_binary_splitting(left, basecase, merge, sizeof_res, init, clear, args, a, m, basecase_cutoff, thread_limit, flags);
-            flint_parallel_binary_splitting(right, basecase, merge, sizeof_res, init, clear, args, m, b, basecase_cutoff, thread_limit, flags);
+            flint_parallel_binary_splitting(left, basecase, merge, sizeof_res, init, clear, args, a, m, basecase_cutoff, nt, flags);
+            flint_parallel_binary_splitting(right, basecase, merge, sizeof_res, init, clear, args, m, b, basecase_cutoff, nt, flags);
         }
         else
         {
@@ -316,6 +318,12 @@ flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsp
 
             FLINT_ASSERT(nt >= 2);
 
+            /* Split the budget: the calling thread keeps nt - nt / 2
+               threads for the left half (itself and nt - nt / 2 - 1
+               workers), the woken worker gets nt / 2 threads for the
+               right half (itself and nt / 2 - 1 workers). The recursive
+               calls must receive these shares as their thread_limit,
+               not the original limit. */
             nw_save = flint_set_num_workers(nt - nt / 2 - 1);
 
             right_args.res = right;
@@ -328,12 +336,12 @@ flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsp
             right_args.a = m;
             right_args.b = b;
             right_args.basecase_cutoff = basecase_cutoff;
-            right_args.thread_limit = thread_limit;
+            right_args.thread_limit = nt / 2;
             right_args.flags = flags;
 
             thread_pool_wake(global_thread_pool, threads[0], nt / 2 - 1, _bsplit_worker, &right_args);
 
-            flint_parallel_binary_splitting(left, basecase, merge, sizeof_res, init, clear, args, a, m, basecase_cutoff, thread_limit, flags);
+            flint_parallel_binary_splitting(left, basecase, merge, sizeof_res, init, clear, args, a, m, basecase_cutoff, nt - nt / 2, flags);
 
             flint_reset_num_workers(nw_save);
             thread_pool_wait(global_thread_pool, threads[0]);

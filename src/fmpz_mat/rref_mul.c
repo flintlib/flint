@@ -134,7 +134,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
     /* use 16 bit primes to ensure it is unlikely we hit a bad one and so that
        the modular computations are not too long */
-    p = 1 << 16;
+    p = flint_fmpz_mat_force_small_primes ? UWORD(1) : (UWORD(1) << 16);
 
     while (1)
     {

@@ -13,13 +13,16 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, struct) * res,
-		      const TEMPLATE(T, struct) *  poly, ulong e,
-		                     slong trunc, const TEMPLATE(T, ctx_t) ctx)
+                              const TEMPLATE(T, struct) * poly, ulong e,
+                              slong trunc, const TEMPLATE(T, ctx_t) ctx)
 {
-    _TEMPLATE(T, poly_pow_trunc_binexp) (res, poly, e, trunc, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, poly, trunc, e, trunc, gr_ctx));
 }
 
 void

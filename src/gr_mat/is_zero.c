@@ -24,6 +24,10 @@ gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
     if (r == 0 || c == 0)
         return T_TRUE;
 
+    /* contiguous storage */
+    if (mat->stride == c || r == 1)
+        return _gr_vec_is_zero(mat->entries, r * c, ctx);
+
     eq = T_TRUE;
 
     for (i = 0; i < r; i++)

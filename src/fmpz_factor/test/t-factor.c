@@ -299,6 +299,49 @@ TEST_FUNCTION_START(fmpz_factor, state)
        fmpz_factor_clear(factors);
     }
 
+    /*
+       Regression: the parts of a split have to be pairwise coprime, because
+       _fmpz_factor_concat appends without merging equal primes.  fmpz_remove
+       does not ensure that when the factor found is composite: taking 21 out
+       of 735 leaves 35, and both contain 7.  Each of these p1*p2*p3^2 came
+       back as four factors while that was wrong.  They are sized so that the
+       cofactor reaches SQUFOF, where the same problem is reachable without
+       the rho and ECM stages.
+    */
+    {
+        const char * strs[6] = {
+            "96136956939863236169",
+            "65944518589428072257",
+            "1117737217548882611767",
+            "379342496431314884483",
+            "33748151787603397083959",
+            "232399130433533084177623"
+        };
+        slong c;
+
+        for (c = 0; c < 6; c++)
+        {
+            fmpz_set_str(n, strs[c], 10);
+
+            fmpz_factor_init(factors);
+
+            fmpz_factor(factors, n);
+
+            if (factors->num != 3)
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("Regression, coprime split\nc = %wd\n", c);
+                flint_printf("%ld factors found\n", factors->num);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            check(n);
+
+            fmpz_factor_clear(factors);
+        }
+    }
+
     for (i = 0; i < 5 + flint_test_multiplier(); i++) /* Test random p1*p2*p3^2 */
     {
        fmpz_randprime(x, state, 40, 0);

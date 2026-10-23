@@ -244,7 +244,7 @@ main(int argc, char ** argv)
         }
         else if (!strcmp(argv[i], "-delta"))
         {
-            reps = atof(argv[i+1]);
+            DELTA = atof(argv[i+1]);
             i++;
         }
     }

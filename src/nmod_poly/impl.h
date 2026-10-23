@@ -22,4 +22,10 @@ int nmod_poly_irreducible_tetranomial(nmod_poly_t res, ulong n);
 int nmod_poly_irreducible_pentanomial(nmod_poly_t res, ulong n);
 void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, nn_srcptr B, slong lenA, ulong invL, nmod_t mod);
 
+/* product with a precomputed transform, see geometric_progression.c */
+struct mul_precomp_struct;
+int _nmod_geometric_progression_mulmid_fft(nn_ptr z, slong zl, slong zh,
+        nn_srcptr a, slong an, const struct mul_precomp_struct * F,
+        slong s, slong bn, nmod_t mod);
+
 #endif

@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
@@ -69,9 +70,9 @@ int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx)
 
     fmpz_init(coeff);
 
-    poly->length = 0;
+    _fmpz_mod_poly_set_length(poly, 0);
 
-    if (flint_fscanf(f, "%wd", &length) != 1)
+    if (flint_fscanf(f, "%wd", &length) != 1 || length < 0)
         goto cleanup;
 
     if (!fmpz_fread(f, coeff))
@@ -83,6 +84,8 @@ int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx)
     fmpz_mod_ctx_set_modulus(ctx, coeff);
 
     fmpz_mod_poly_fit_length(poly, length, ctx);
+    /* set_coeff below does not write zero coefficients beyond the length */
+    _fmpz_vec_zero(poly->coeffs, length);
 
     for (i = 0; i < length; i++)
     {

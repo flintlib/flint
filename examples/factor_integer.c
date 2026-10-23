@@ -18,6 +18,7 @@
 #include <flint/fmpz_factor.h>
 #include <flint/gr.h>
 #include <flint/profiler.h>
+#include <flint/ecpp.h>
 
 int
 main(int argc, char * argv[])
@@ -26,12 +27,15 @@ main(int argc, char * argv[])
     fmpz_factor_t fac;
     slong i;
     int num_threads = 1;
-    int timing = 0;
+    int timing = 0, certify = 0, format = ECPP_CERT_FORMAT_FLINT;
 
     if (argc < 2)
     {
-        flint_printf("usage: factor_integer [-threads t] [-timing] n\n");
+        flint_printf("usage: factor_integer [-threads t] [-timing] [-certify] [-pari] [-verbose] n\n");
         flint_printf("n can be given as an expression (no spaces)\n");
+        flint_printf("-certify: prove the primality of each prime factor above 64 bits with\n");
+        flint_printf("          ECPP and print the certificate (-pari: in PARI/GP primecert\n");
+        flint_printf("          syntax); -verbose: report the steps of the proofs\n");
         return 1;
     }
 
@@ -48,6 +52,19 @@ main(int argc, char * argv[])
         else if (!strcmp(argv[i], "-timing"))
         {
             timing = 1;
+        }
+        else if (!strcmp(argv[i], "-certify"))
+        {
+            certify = 1;
+        }
+        else if (!strcmp(argv[i], "-pari"))
+        {
+            certify = 1;
+            format = ECPP_CERT_FORMAT_PARI;
+        }
+        else if (!strcmp(argv[i], "-verbose"))
+        {
+            ecpp_set_verbose(1);
         }
         else
         {
@@ -98,6 +115,30 @@ main(int argc, char * argv[])
             flint_printf(" * ");
     }
     flint_printf("\n");
+
+    if (certify)
+    {
+        for (i = 0; i < fac->num; i++)
+        {
+            if (fmpz_bits(fac->p + i) > 64)
+            {
+                ecpp_cert_t cert;
+                int r;
+                ecpp_cert_init(cert);
+                r = ecpp_prove(cert, fac->p + i);
+                flint_printf("\nECPP certificate for ");
+                fmpz_print(fac->p + i);
+                if (r == 1 && ecpp_verify(cert, fac->p + i))
+                {
+                    flint_printf(" (verified):\n");
+                    ecpp_cert_print(cert, format);
+                }
+                else
+                    flint_printf(": not found (%d)\n", r);
+                ecpp_cert_clear(cert);
+            }
+        }
+    }
 
     fmpz_factor_clear(fac);
     fmpz_clear(n);

@@ -96,7 +96,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
             /* Newton refinement seems to be converging too slowly --
                force a slow recomputation of all roots (this could be improved...) */
             acb_ptr roots;
-            slong found, i;
+            slong found, i, num;
 
 /*
             printf("recompute %ld %ld\n", d, prec);
@@ -111,11 +111,24 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
             if (!fmpz_poly_is_squarefree(poly))
                 flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-            arb_fmpz_poly_complex_roots(roots, poly, 0, 2 * prec);
+            /* If z is a real enclosure, only the real roots are relevant */
+            if (arb_is_zero(acb_imagref(z)))
+            {
+                arb_ptr rroots = _arb_vec_init(d);
+                num = arb_fmpz_poly_real_roots(rroots, poly, 0, 2 * prec);
+                for (i = 0; i < num; i++)
+                    acb_set_arb(roots + i, rroots + i);
+                _arb_vec_clear(rroots, d);
+            }
+            else
+            {
+                arb_fmpz_poly_complex_roots(roots, poly, 0, 2 * prec);
+                num = d;
+            }
 
             /* Check for unique root */
             found = -1;
-            for (i = 0; i < d && found != -2; i++)
+            for (i = 0; i < num && found != -2; i++)
             {
                 if (acb_overlaps(roots + i, z))
                 {

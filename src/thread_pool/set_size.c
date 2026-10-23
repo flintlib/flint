@@ -19,6 +19,11 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
 
     new_size = FLINT_MAX(new_size, WORD(0));
 
+#if !FLINT_USES_PTHREAD
+    /* see thread_pool_init */
+    new_size = 0;
+#endif
+
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(&T->mutex);
 #endif

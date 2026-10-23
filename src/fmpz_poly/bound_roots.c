@@ -49,6 +49,7 @@ _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len)
         fmpz_mul_2exp(t, poly + len - 1, 1);
         fmpz_cdiv_abs_q(bound, poly + 0, t);
         fmpz_root(bound, bound, len - 1);
+        fmpz_add_ui(bound, bound, 1);
 
         for (i = 1; i < len - 1; i++)
         {

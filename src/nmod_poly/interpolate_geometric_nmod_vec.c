@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "nmod_vec.h"
 
 void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
@@ -71,7 +72,12 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
     /*   == x**val (f * G->int_f  mod x**(len-val))                */
     /* note: len - val is <= G->int_f->length, since G->int_f has  */
     /* length G->len >= len (all its coefficients are nonzero)     */
-    _nmod_poly_mullow(h+val, G->int_f->coeffs, len - val, f, f_len, len - val, mod);
+    /* the low coefficients of f * G->int_f only involve the low part of   */
+    /* G->int_f, so its stored transform, if any, can be used as it is     */
+    int done = (G->int_f_fft != NULL)
+        && _nmod_geometric_progression_mulmid_fft(h+val, 0, len - val, f, f_len, G->int_f_fft, 0, len - val, mod);
+    if (!done)
+        _nmod_poly_mullow(h+val, G->int_f->coeffs, len - val, f, f_len, len - val, mod);
 
     /* for Newton interpolation, here we should compute h[i] = h[i]/q_i */
     /* yet this "/q_i" will simplify with another operation just below, */
@@ -117,7 +123,10 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         f[i] = nmod_mul(h[h_len-1-i], G->int_s2[h_len-1-i], mod);
 
     /* transposed short product */
-    _nmod_poly_mullow(h+len-h_len, G->int_f->coeffs, h_len, f, h_len-val, h_len, mod);
+    done = (G->int_f_fft != NULL)
+        && _nmod_geometric_progression_mulmid_fft(h+len-h_len, 0, h_len, f, h_len-val, G->int_f_fft, 0, h_len, mod);
+    if (!done)
+        _nmod_poly_mullow(h+len-h_len, G->int_f->coeffs, h_len, f, h_len-val, h_len, mod);
 
     /* final scaling */
     _nmod_vec_zero(poly+h_len, len-h_len);

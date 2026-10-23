@@ -221,10 +221,7 @@ static int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
         {
             int divides;
 
-            if (bits <= FLINT_BITS)
-                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
-            else
-                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+            divides = mpoly_monomial_divides_any_bits(texp, exp, exp3[w] + N*0, N, mask, bits);
 
             if (divides)
             {
@@ -338,9 +335,7 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
         QRbits = FLINT_MAX(QRbits, B[i]->bits);
     QRbits = mpoly_fix_bits(QRbits, ctx->minfo);
 
-    N = mpoly_words_per_exp(QRbits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, QRbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, QRbits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     Aexps = A->exps;

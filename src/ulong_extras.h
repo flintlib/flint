@@ -376,7 +376,28 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
-ulong n_binvert(ulong a);
+/* a^(-1) mod B for odd a by Hurchalla's method (arXiv:2204.04342),
+   starting from an 8-bit inverse read from a table: one Newton step less
+   than the table-free start (3 a) ^ 2, which costs about one cycle of
+   latency (the load) but saves two multiplications */
+FLINT_DLL extern const unsigned char flint_binvert_limb_tab[128];
+
+ULONG_EXTRAS_INLINE
+ulong n_binvert(ulong a)
+{
+    ulong r, y;
+
+    r = flint_binvert_limb_tab[(a / 2) & 0x7F];     /* 8 bits */
+    y = 1 - a * r;
+    r = r * (1 + y);                                /* 16 bits */
+    y *= y;
+    r = r * (1 + y);                                /* 32 bits */
+#if FLINT_BITS == 64
+    y *= y;
+    r = r * (1 + y);                                /* 64 bits */
+#endif
+    return r;
+}
 
 ULONG_EXTRAS_INLINE
 ulong n_barrett_precomp(ulong n)
@@ -595,6 +616,8 @@ ulong n_factor_one_line(ulong n, ulong iters);
 ulong n_factor_lehman(ulong n);
 
 ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters);
+int n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries, ulong max_iters);
+int n_ll_factor_ecm(nn_ptr factor, ulong nhi, ulong nlo, ulong curves, ulong B1, ulong B2, flint_rand_t state);
 ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);

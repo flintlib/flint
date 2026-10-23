@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "test_helpers.h"
 #include "fq_default_mat.h"
 
@@ -60,6 +61,21 @@ TEST_FUNCTION_START(fq_default_mat_inlines, state)
         fq_default_mat_mul(g, b, c, ctx);
         fq_default_mat_sub(e, f, g, ctx);
         FLINT_TEST(fq_default_mat_equal(d, e, ctx));
+
+        /* printing works for every type (assume tmpfile() is broken on
+           windows) */
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+        {
+            FILE * tmp = tmpfile();
+
+            if (tmp != NULL)
+            {
+                fq_default_mat_fprint(tmp, a, ctx);
+                fq_default_mat_fprint_pretty(tmp, a, ctx);
+                fclose(tmp);
+            }
+        }
+#endif
 
         fq_default_clear(t, ctx);
         fq_default_mat_clear(a, ctx);

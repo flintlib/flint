@@ -10,7 +10,11 @@
 */
 
 #include "perm.h"
+#include "nmod_mat.h"
 #include "fmpz_mat.h"
+
+int flint_fmpz_mat_force_small_primes = 0;
+
 
 int
 fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
@@ -20,8 +24,8 @@ fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
         return fmpz_mat_solve_cramer(X, den, A, B);
     else if (fmpz_mat_nrows(A) <= 15)
         return fmpz_mat_solve_fflu(X, den, A, B);
-    else if (fmpz_mat_ncols(B) <= 32)
-        return fmpz_mat_solve_dixon_den(X, den, A, B);
-    else
+    else if (2 * fmpz_mat_ncols(B) >= fmpz_mat_nrows(A))
         return fmpz_mat_solve_multi_mod_den(X, den, A, B);
+    else
+        return fmpz_mat_solve_dixon_den(X, den, A, B);
 }

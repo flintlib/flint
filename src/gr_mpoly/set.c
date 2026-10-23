@@ -30,7 +30,8 @@ int gr_mpoly_set(
     gr_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
 
     status = _gr_vec_set(A->coeffs, B->coeffs, B->length, cctx);
-    mpoly_copy_monomials(A->exps, B->exps, B->length, N);
+    if (B->length != 0)
+        mpoly_copy_monomials(A->exps, B->exps, B->length, N);
     _gr_mpoly_set_length(A, B->length, ctx);
 
     return status;

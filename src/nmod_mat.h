@@ -20,6 +20,7 @@
 #define NMOD_MAT_INLINE static inline
 #endif
 
+#include <stdint.h>
 #include "nmod_types.h"
 
 #ifdef __cplusplus
@@ -156,6 +157,7 @@ int nmod_mat_is_square(const nmod_mat_t mat)
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
+void _nmod_mat_transpose(nn_ptr B, slong Bstride, nn_srcptr A, slong Astride, slong m, slong n);
 
 /* Addition and subtraction */
 
@@ -178,6 +180,22 @@ void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+void _nmod_mat_mul_u8(uint8_t * C, slong Cstride,
+                 const uint8_t * A, slong Astride,
+                 const uint8_t * B, slong Bstride,
+                 slong m, slong k, slong n, nmod_t mod);
+void nmod_mat_mul_u8(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+int nmod_mat_mul_u32(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int _nmod_mat_mul_u32(uint32_t * C, slong Cstride,
+                 const uint32_t * A, slong Astride,
+                 const uint32_t * B, slong Bstride,
+                 slong m, slong k, slong n, nmod_t mod);
+
+int nmod_mat_mul_u52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int nmod_mat_mul_fp50(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+int nmod_mat_mul_k52(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
@@ -338,10 +356,6 @@ int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A,
 
 slong nmod_mat_rref(nmod_mat_t A);
 slong _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P);
-slong nmod_mat_rref_classical(nmod_mat_t A);
-slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots);
-slong nmod_mat_rref_storjohann(nmod_mat_t A);
-slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
 slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 

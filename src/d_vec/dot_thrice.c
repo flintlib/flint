@@ -25,7 +25,8 @@ _d_vec_dot_thrice(const double *vec1, const double *vec2, slong len2,
 
     if (len2 == 0)
     {
-        *err = 0;
+        if (err != NULL)
+            *err = 0;
         return 0;
     }
 

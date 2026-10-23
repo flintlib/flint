@@ -25,7 +25,9 @@ _nmod_poly_resultant_euclidean_redc_fast(nn_srcptr poly1, slong len1,
     gr_ctx_t ctx;
     ulong res, R;
     gr_ctx_init_nmod_redc_fast(ctx, mod.n);
-    GR_MUST_SUCCEED(_gr_poly_resultant_euclidean(&res, poly1, len1, poly2, len2, ctx));
+    if (_gr_poly_resultant_euclidean(&res, poly1, len1, poly2, len2, ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception (nmod_poly_resultant). Impossible inverse: "
+            "a leading coefficient is not invertible (the modulus must be prime).\n");
 
     /* Undo scaling factor from casting poly1 and poly2 to Montgomery representation */
     R = _nmod_redc_fast_2_pow_ui(FLINT_BITS * (len1 + len2 - 2), GR_NMOD_REDC_CTX(ctx));
@@ -40,7 +42,7 @@ ulong
 _nmod_poly_resultant(nn_srcptr poly1, slong len1,
                                nn_srcptr poly2, slong len2, nmod_t mod)
 {
-    if (poly1 == poly2)
+    if (poly1 == poly2 && len1 > 1)
     {
         return 0;
     }
@@ -105,7 +107,7 @@ ulong
 _nmod_poly_resultant_euclidean(nn_srcptr poly1, slong len1,
                                nn_srcptr poly2, slong len2, nmod_t mod)
 {
-    if (poly1 == poly2)
+    if (poly1 == poly2 && len1 > 1)
     {
         return 0;
     }
@@ -229,7 +231,9 @@ _nmod_poly_resultant_hgcd(nn_srcptr poly1, slong len1,
     slong outer_cutoff = nmod_poly_hgcd_outer_cutoff(mod);
     ulong res;
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, inner_cutoff, outer_cutoff, ctx));
+    if (_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, inner_cutoff, outer_cutoff, ctx) != GR_SUCCESS)
+        flint_throw(FLINT_IMPINV, "Exception (nmod_poly_resultant_hgcd). Impossible inverse: "
+            "a leading coefficient is not invertible (the modulus must be prime).\n");
     return res;
 }
 

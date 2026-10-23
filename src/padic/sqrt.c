@@ -118,61 +118,8 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, slong N)
     if (fmpz_fdiv_ui(op, 8) != 1)
         return 0;
 
-    if (N <= 3)
-    {
-        fmpz_one(rop);
-    }
-    else
-    {
-        slong *e, i, n;
-        fmpz *W, *u;
-
-        i = FLINT_CLOG2(N);
-
-        /* Compute sequence of exponents */
-        e = flint_malloc((i + 2) * sizeof(slong));
-        for (e[i = 0] = N; e[i] > 3; i++)
-            e[i + 1] = (e[i] + 3) / 2;
-        n = i + 1;
-
-        W = _fmpz_vec_init(2 + n);
-        u = W + 2;
-
-        /* Compute reduced units */
-        {
-            fmpz_fdiv_r_2exp(u, op, e[0]);
-        }
-        for (i = 1; i < n; i++)
-        {
-            fmpz_fdiv_r_2exp(u + i, u + (i - 1), e[i]);
-        }
-
-        /* Run Newton iteration */
-        fmpz_one(rop);
-        for (i = n - 2; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
-        {
-            fmpz_mul(W, rop, rop);
-            fmpz_mul(W + 1, u + i, W);
-            fmpz_sub_ui(W + 1, W + 1, 1);
-            fmpz_fdiv_q_2exp(W + 1, W + 1, 1);
-            fmpz_mul(W, W + 1, rop);
-            fmpz_sub(rop, rop, W);
-            fmpz_fdiv_r_2exp(rop, rop, e[i]);
-        }
-        {
-            fmpz_mul(W, u + 1, rop);
-            fmpz_mul(W + 1, W, W);
-            fmpz_sub(W + 1, u + 0, W + 1);
-            fmpz_fdiv_q_2exp(W + 1, W + 1, 1);
-            fmpz_mul(rop, rop, W + 1);
-            fmpz_add(rop, W, rop);
-        }
-        fmpz_fdiv_r_2exp(rop, rop, e[0]);
-
-        flint_free(e);
-        _fmpz_vec_clear(W, 2 + n);
-
-    }
+    /* 2-adic Newton iteration on the underlying limb arrays */
+    fmpz_sqrtmod_2exp(rop, op, N);
     return 1;
 }
 

@@ -13,6 +13,7 @@
 
 #include "t-add.c"
 #include "t-add_series.c"
+#include "t-add_ui.c"
 #include "t-asinh_series.c"
 #include "t-asin_series.c"
 #include "t-atanh_series.c"
@@ -23,10 +24,7 @@
 #include "t-compose_horner.c"
 #include "t-compose_mod_brent_kung.c"
 #include "t-compose_mod_brent_kung_precomp_preinv.c"
-#include "t-compose_mod_brent_kung_precomp_preinv_threaded.c"
 #include "t-compose_mod_brent_kung_preinv.c"
-#include "t-compose_mod_brent_kung_vec_preinv.c"
-#include "t-compose_mod_brent_kung_vec_preinv_threaded.c"
 #include "t-compose_mod.c"
 #include "t-compose_mod_horner.c"
 #include "t-compose_series.c"
@@ -58,6 +56,7 @@
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-fread_print.c"
 #include "t-gcd.c"
+#include "t-geometric_progression_fft.c"
 #include "t-gcd_euclidean.c"
 #include "t-gcd_euclidean_redc_fast.c"
 #include "t-gcd_hgcd.c"
@@ -93,6 +92,7 @@
 #include "t-mullow_KS.c"
 #include "t-mulmid.c"
 #include "t-mulmid_classical.c"
+#include "t-mulmid_fft_small.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmod.c"
 #include "t-mulmod_precond.c"
@@ -131,6 +131,7 @@
 #include "t-sqrt_series.c"
 #include "t-sub.c"
 #include "t-sub_series.c"
+#include "t-sub_ui.c"
 #include "t-tanh_series.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
@@ -145,6 +146,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(nmod_poly_add),
+    TEST_FUNCTION(nmod_poly_add_ui),
     TEST_FUNCTION(nmod_poly_add_series),
     TEST_FUNCTION(nmod_poly_asinh_series),
     TEST_FUNCTION(nmod_poly_asin_series),
@@ -156,10 +158,8 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_compose_horner),
     TEST_FUNCTION(nmod_poly_compose_mod_brent_kung),
     TEST_FUNCTION(nmod_poly_compose_mod_brent_kung_precomp_preinv),
-    TEST_FUNCTION(nmod_poly_compose_mod_brent_kung_precomp_preinv_threaded),
     TEST_FUNCTION(nmod_poly_compose_mod_brent_kung_preinv),
-    TEST_FUNCTION(nmod_poly_compose_mod_brent_kung_vec_preinv),
-    TEST_FUNCTION(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded),
+
     TEST_FUNCTION(nmod_poly_compose_mod),
     TEST_FUNCTION(nmod_poly_compose_mod_horner),
     TEST_FUNCTION(nmod_poly_compose_series),
@@ -192,6 +192,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(nmod_poly_fread_print),
     TEST_FUNCTION(nmod_poly_gcd),
+    TEST_FUNCTION(nmod_geometric_progression_fft),
     TEST_FUNCTION(nmod_poly_gcd_euclidean),
     TEST_FUNCTION(nmod_poly_gcd_euclidean_redc_fast),
     TEST_FUNCTION(nmod_poly_gcd_hgcd),
@@ -227,6 +228,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mullow_KS),
     TEST_FUNCTION(nmod_poly_mulmid),
     TEST_FUNCTION(nmod_poly_mulmid_classical),
+    TEST_FUNCTION(nmod_poly_mulmid_fft_small),
     TEST_FUNCTION(nmod_poly_mulmid_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
     TEST_FUNCTION(nmod_poly_mulmod_precond),
@@ -264,6 +266,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_sqrt),
     TEST_FUNCTION(nmod_poly_sqrt_series),
     TEST_FUNCTION(nmod_poly_sub),
+    TEST_FUNCTION(nmod_poly_sub_ui),
     TEST_FUNCTION(nmod_poly_sub_series),
     TEST_FUNCTION(nmod_poly_tanh_series),
     TEST_FUNCTION(nmod_poly_tan_series),

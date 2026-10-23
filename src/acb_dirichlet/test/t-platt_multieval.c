@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
+#include "acb_dirichlet/impl.h"
 
 static void
 _arb_inv_si(arb_t res, slong a, slong prec)
@@ -218,6 +219,116 @@ TEST_FUNCTION_START(acb_dirichlet_platt_multieval, state)
         fmpz_clear(T);
         _arb_vec_clear(v1, N);
         _arb_vec_clear(v2, N);
+    }
+
+    /* the Lemma A7 bounds for all k at once, against the scalar version */
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
+    {
+        slong sigma = 3 + 2 * n_randint(state, 200), K = 1 + n_randint(state, 40);
+        slong A = 1 + n_randint(state, 16), prec = 32 + n_randint(state, 100), k;
+        arb_t t0, h, x;
+        arb_ptr v;
+
+        arb_init(t0);
+        arb_init(h);
+        arb_init(x);
+        v = _arb_vec_init(K);
+        {
+            fmpz_t tz;
+            fmpz_init(tz);
+            fmpz_randtest_unsigned(tz, state, 50);
+            arb_set_fmpz(t0, tz);
+            fmpz_clear(tz);
+        }
+        arb_add_ui(t0, t0, n_randint(state, 1000), prec);
+        arb_set_si(h, 1 + n_randint(state, 20000));
+        arb_div_si(h, h, 100, prec);
+
+        _acb_dirichlet_platt_lemma_A7_vec(v, sigma, t0, h, K, A, prec);
+        for (k = 0; k < K; k++)
+        {
+            acb_dirichlet_platt_lemma_A7(x, sigma, t0, h, k, A, prec);
+            if (!arb_overlaps(x, v + k))
+            {
+                flint_printf("FAIL: lemma A7 (vec)\n");
+                flint_printf("sigma = %wd, K = %wd, A = %wd, k = %wd\n", sigma, K, A, k);
+                flint_printf("t0 = "); arb_printd(t0, 20); flint_printf("\n");
+                flint_printf("h = "); arb_printd(h, 20); flint_printf("\n");
+                flint_printf("x = "); arb_printd(x, 20); flint_printf("\n");
+                flint_printf("v = "); arb_printd(v + k, 20); flint_printf("\n");
+                flint_abort();
+            }
+        }
+
+        arb_clear(t0);
+        arb_clear(h);
+        arb_clear(x);
+        _arb_vec_clear(v, K);
+    }
+
+    /* the dfloat sums over j (used for prec <= bits(T) + 110) against
+       the arb ones and the direct evaluation */
+    for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
+    {
+        slong prec, sigma, Tbits;
+        ulong A, B, N, K;
+        fmpz_t J, T;
+        arb_t h;
+        arb_ptr v1, v2, v3;
+
+        sigma = 1 + 2*(1 + n_randint(state, 100));
+        K = 1 + n_randint(state, 30);
+        A = 1 + n_randint(state, 8);
+        B = 1 + n_randint(state, 32);
+        if (n_randint(state, 2))
+            A *= 2;
+        else
+            B *= 2;
+        N = A*B;
+
+        fmpz_init(J);
+        fmpz_init(T);
+        fmpz_set_si(J, 1 + n_randint(state, 3000));
+        Tbits = 5 + n_randint(state, 40);
+        /* (not n_randtest_bits: Tbits may exceed FLINT_BITS) */
+        fmpz_randbits_unsigned(T, state, Tbits);
+        if (fmpz_is_zero(T))
+            fmpz_one(T);
+        prec = 2 + n_randint(state, fmpz_bits(T) + 110);
+
+        arb_init(h);
+        arb_set_si(h, 1 + n_randint(state, 20000));
+        arb_div_si(h, h, 1000, prec);
+
+        v1 = _arb_vec_init(N);
+        v2 = _arb_vec_init(N);
+        v3 = _arb_vec_init(N);
+        if (N <= 64)
+            acb_dirichlet_platt_scaled_lambda_vec(v1, T, A, B, prec);
+        acb_dirichlet_platt_use_dfloat = 1;
+        acb_dirichlet_platt_multieval(v2, T, A, B, h, J, K, sigma, prec);
+        acb_dirichlet_platt_use_dfloat = 0;
+        acb_dirichlet_platt_multieval(v3, T, A, B, h, J, K, sigma, prec);
+        acb_dirichlet_platt_use_dfloat = 1;
+
+        if (!_arb_vec_overlaps(v2, v3, N) || (N <= 64 && !_arb_vec_overlaps(v1, v2, N)))
+        {
+            flint_printf("FAIL: overlap (dfloat)\n\n");
+            flint_printf("iter = %wd  prec = %wd\n\n", iter, prec);
+            flint_printf("sigma = %wd\n\n", sigma);
+            flint_printf("A = %wu  B = %wu  K = %wu\n\n", A, B, K);
+            flint_printf("J = "); fmpz_print(J); flint_printf("\n\n");
+            flint_printf("T = "); fmpz_print(T); flint_printf("\n\n");
+            flint_printf("h = "); arb_printn(h, 30, 0); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_clear(h);
+        fmpz_clear(J);
+        fmpz_clear(T);
+        _arb_vec_clear(v1, N);
+        _arb_vec_clear(v2, N);
+        _arb_vec_clear(v3, N);
     }
 
     TEST_FUNCTION_END(state);

@@ -813,17 +813,6 @@ int fmpz_pow_cache_mulpow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t k, fmpz_po
 
 /*****************************************************************************/
 
-void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
-        fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
-        const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-        const slong * perm, const ulong * shift, const ulong * stride,
-        const thread_pool_handle * handles, slong num_handles);
-
-void fmpz_mpoly_from_mpoly_perm_inflate(
-        fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
-        const fmpz_mpoly_t B,  const fmpz_mpoly_ctx_t lctx,
-        const slong * perm, const ulong * shift, const ulong * stride);
-
 void fmpz_mpoly_height(fmpz_t max, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 void fmpz_mpoly_heights(fmpz_t max, fmpz_t sum, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 

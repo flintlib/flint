@@ -10,9 +10,14 @@
 */
 
 #include "ca_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 ca_mat_lu(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
 {
-    return ca_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    return gr_mat_lu_generic(rank, P, (gr_mat_struct *) LU,
+        (const gr_mat_struct *) A, rank_check, gr_ctx) == GR_SUCCESS;
 }

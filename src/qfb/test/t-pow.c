@@ -71,6 +71,26 @@ TEST_FUNCTION_START(qfb_pow, state)
            flint_abort();
         }
 
+        /* negative exponent: f^(-exp) * f^exp is the identity */
+        fmpz_neg(fexp, fexp);
+        if (n_randint(state, 2))
+           qfb_pow(t, r, D, fexp);
+        else
+           qfb_pow_with_root(t, r, D, fexp, L);
+        qfb_reduce(t, t, D);
+        qfb_nucomp(t, t, s, D, L);
+        qfb_reduce(t, t, D);
+
+        result = (qfb_is_principal_form(t, D));
+        if (!result)
+        {
+           printf("FAIL (negative exponent):\n");
+           flint_printf("exp = -%wu\n", exp);
+           qfb_print(r); printf("\n");
+           qfb_print(t); printf("\n");
+           flint_abort();
+        }
+
         fmpz_clear(fexp);
         fmpz_clear(D);
         fmpz_clear(L);

@@ -439,9 +439,6 @@ void arb_div_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec);
 void arb_fmpz_div_fmpz(arb_t z, const fmpz_t x, const fmpz_t y, slong prec);
 void arb_ui_div(arb_t z, ulong x, const arb_t y, slong prec);
 
-void arb_div_arf_newton(arb_t res, const arb_t x, const arf_t y, slong prec);
-void arb_div_newton(arb_t res, const arb_t x, const arb_t y, slong prec);
-void arb_fmpz_divapprox(fmpz_t res, const fmpz_t x, const fmpz_t y);
 
 ARB_INLINE void
 arb_inv(arb_t y, const arb_t x, slong prec)
@@ -467,9 +464,6 @@ void arb_rsqrt(arb_t z, const arb_t x, slong prec);
 void arb_rsqrt_ui(arb_t z, ulong x, slong prec);
 void arb_sqrt1pm1(arb_t r, const arb_t z, slong prec);
 
-void arb_rsqrt_arf_newton(arb_t res, const arf_t x, slong prec);
-void arb_sqrt_arf_newton(arb_t res, const arf_t x, slong prec);
-void arb_sqrt_newton(arb_t z, const arb_t x, slong prec);
 
 void arb_pow_fmpz_binexp(arb_t y, const arb_t b, const fmpz_t e, slong prec);
 void arb_pow_fmpz(arb_t y, const arb_t b, const fmpz_t e, slong prec);
@@ -566,6 +560,7 @@ void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec);
 void arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec);
 
 void arb_const_apery(arb_t s, slong prec);
+void arb_const_zeta5(arb_t s, slong prec);
 
 void arb_zeta_ui_asymp(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_borwein_bsplit(arb_t x, ulong s, slong prec);

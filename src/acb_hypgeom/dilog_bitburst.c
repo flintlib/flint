@@ -67,7 +67,7 @@ acb_hypgeom_dilog_bitburst(acb_t res, acb_t z0, const acb_t z, slong prec)
             acb_sub(u, t, z, 30);
 
             if (arf_cmpabs_2exp_si(arb_midref(acb_realref(u)), -prec / 8) < 0 &&
-                arf_cmpabs_2exp_si(arb_midref(acb_realref(u)), -prec / 8) < 0)
+                arf_cmpabs_2exp_si(arb_midref(acb_imagref(u)), -prec / 8) < 0)
                 break;
 
             acb_hypgeom_dilog_continuation(u, tprev, t, prec);

@@ -14,6 +14,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_mulmod) (TEMPLATE(T, struct) * res,
@@ -22,28 +23,10 @@ _TEMPLATE(T, poly_mulmod) (TEMPLATE(T, struct) * res,
                            const TEMPLATE(T, struct) * f, slong lenf,
                            const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) * T, *Q;
-    TEMPLATE(T, t) invf;
-    slong lenT, lenQ;
-
-    lenT = len1 + len2 - 1;
-    lenQ = lenT - lenf + 1;
-
-    T = _TEMPLATE(T, vec_init) (lenT + lenQ, ctx);
-    Q = T + lenT;
-
-    if (len1 >= len2)
-        _TEMPLATE(T, poly_mul) (T, poly1, len1, poly2, len2, ctx);
-    else
-        _TEMPLATE(T, poly_mul) (T, poly2, len2, poly1, len1, ctx);
-
-    TEMPLATE(T, init) (invf, ctx);
-    TEMPLATE(T, inv) (invf, f + lenf - 1, ctx);
-
-    _TEMPLATE(T, poly_divrem) (Q, res, T, lenT, f, lenf, invf, ctx);
-
-    _TEMPLATE(T, vec_clear) (T, lenT + lenQ, ctx);
-    TEMPLATE(T, clear) (invf, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_mulmod(res, poly1, len1, poly2, len2,
+                                    f, lenf, gr_ctx));
 }
 
 void

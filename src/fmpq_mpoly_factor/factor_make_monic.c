@@ -29,7 +29,8 @@ int fmpq_mpoly_factor_make_monic(fmpq_mpoly_factor_t f,
             goto cleanup;
         }
 
-        fmpq_div_fmpz(t, f->poly[i].content, f->poly[i].zpoly->coeffs + 0);
+        /* t = leading coefficient of the base content*zpoly */
+        fmpq_mul_fmpz(t, f->poly[i].content, f->poly[i].zpoly->coeffs + 0);
 
         if (!fmpq_pow_fmpz(t, t, f->exp + i))
         {
@@ -37,15 +38,17 @@ int fmpq_mpoly_factor_make_monic(fmpq_mpoly_factor_t f,
             goto cleanup;
         }
 
-        fmpq_div(f->constant, f->constant, t);
+        fmpq_mul(f->constant, f->constant, t);
 
+        /* the base becomes zpoly/lc(zpoly) */
         fmpz_one(fmpq_numref(f->poly[i].content));
         fmpz_set(fmpq_denref(f->poly[i].content), f->poly[i].zpoly->coeffs + 0);
+        fmpq_canonicalise(f->poly[i].content);
     }
 
 cleanup:
 
     fmpq_clear(t);
 
-	return success;
+    return success;
 }

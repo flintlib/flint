@@ -22,7 +22,7 @@
 
 int main()
 {
-    slong n, c1, c2, c3, c4;
+    slong n, c1, c2, c3, c4, c5, c6;
 
     flint_rand_t state;
     flint_rand_init(state);
@@ -39,9 +39,9 @@ int main()
     slong n_ex = 0;
     slong n_iv = 0;
 
-    flint_printf("   polynomial  n       count real roots             count (0, 1) roots             isolate all roots\n");
-    flint_printf("                       sturm     vca     ratio         sturm     vca   ratio      acb       vca      ratio\n");
-    flint_printf("----------------------------------------------------------------------------------------------------------\n");
+    flint_printf("   polynomial  n       count real roots                         count (0, 1) roots                         isolate all roots\n");
+    flint_printf("                       sturm       vca   default  best/def       sturm       vca   default  best/def       acb       vca      ratio\n");
+    flint_printf("------------------------------------------------------------------------------------------------------------------------------------\n");
 
 
     for (n = 8; n <= MAXN; n *= 2)
@@ -105,7 +105,7 @@ int main()
                 s = "rand1000b";
             }
 
-            double t1, t2, t3, t4, t5, t6, FLINT_SET_BUT_UNUSED(tcpu);
+            double t1, t2, t3, t4, t5, t6, t7, t8, FLINT_SET_BUT_UNUSED(tcpu);
 
             TIMEIT_START;
             c1 = fmpz_poly_num_real_roots_sturm(f);
@@ -124,6 +124,14 @@ int main()
             TIMEIT_STOP_VALUES(tcpu, t4);
 
             TIMEIT_START;
+            c5 = fmpz_poly_num_real_roots(f);
+            TIMEIT_STOP_VALUES(tcpu, t7);
+
+            TIMEIT_START;
+            c6 = fmpz_poly_num_real_roots_0_1(f);
+            TIMEIT_STOP_VALUES(tcpu, t8);
+
+            TIMEIT_START;
             arb_fmpz_poly_complex_roots(R, f, 0, 32);
             TIMEIT_STOP_VALUES(tcpu, t5);
 
@@ -131,14 +139,14 @@ int main()
             fmpz_poly_isolate_real_roots(ex, &n_ex, iv, karr, &n_iv, f);
             TIMEIT_STOP_VALUES(tcpu, t6);
 
-            if (c1 != c2)
+            if (c1 != c2 || c1 != c5)
                 flint_abort();
-            if (c3 != c4)
+            if (c3 != c4 || c3 != c6)
                 flint_abort();
 
-            flint_printf("%12s %3wd   %9g %9g %7.2f   %9g %9g %7.2f   %9g %9g %7.2f\n",
-                s, n, t1, t2, FLINT_MIN(t1 / t2, 9999.0),
-                      t3, t4, FLINT_MIN(t3 / t4, 9999.0),
+            flint_printf("%12s %3wd   %9g %9g %9g %7.2f   %9g %9g %9g %7.2f   %9g %9g %7.2f\n",
+                s, n, t1, t2, t7, FLINT_MIN(t1, t2) / t7,
+                      t3, t4, t8, FLINT_MIN(t3, t4) / t8,
                       t5, t6, FLINT_MIN(t5 / t6, 9999.0));
         }
 

@@ -16,6 +16,31 @@ TEST_FUNCTION_START(fmpz_mpoly_divrem_array, state)
 {
     int i, j, result, ok1, ok2;
 
+    /* multiword exponents: the array method is not applicable and must
+       return 0 (regression test: this used to abort) */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, q, r;
+        const char * vars[] = {"x", "y"};
+
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(q, ctx);
+        fmpz_mpoly_init(r, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "x^100000000000000000000*y + x*y", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "x*y", vars, ctx);
+        if (fmpz_mpoly_divrem_array(q, r, a, b, ctx) != 0)
+            TEST_FUNCTION_FAIL("multiword exponents\n");
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(q, ctx);
+        fmpz_mpoly_clear(r, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* Check f*g/g = f */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {

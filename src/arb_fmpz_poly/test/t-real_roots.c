@@ -100,6 +100,8 @@ TEST_FUNCTION_START(arb_fmpz_poly_real_roots, state)
 
         prec = 20 + n_randint(state, 1000);
         flags = 0; /* ARB_FMPZ_POLY_ROOTS_VERBOSE; */
+        if (n_randint(state, 2))
+            flags |= ARB_FMPZ_POLY_ROOTS_RATIONAL;
 
         fmpz_poly_init(f);
         fmpz_poly_init(g);
@@ -119,8 +121,21 @@ TEST_FUNCTION_START(arb_fmpz_poly_real_roots, state)
             {
                 n = n_randint(state, 18);
 
-                switch (n_randint(state, 12))
+                switch (n_randint(state, 13))
                 {
+                    case 10:
+                        /* rational roots */
+                        fmpz_poly_one(g);
+                        for (j = 0; j < n; j++)
+                        {
+                            fmpz_poly_t lin;
+                            fmpz_poly_init(lin);
+                            fmpz_poly_set_coeff_si(lin, 1, 1 + n_randint(state, 10));
+                            fmpz_poly_set_coeff_si(lin, 0, (slong) n_randint(state, 41) - 20);
+                            fmpz_poly_mul(g, g, lin);
+                            fmpz_poly_clear(lin);
+                        }
+                        break;
                     case 0:
                         fmpz_poly_zero(g);
                         for (j = 0; j <= n; j++)
@@ -192,6 +207,47 @@ TEST_FUNCTION_START(arb_fmpz_poly_real_roots, state)
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
         fmpq_poly_clear(h);
+        fmpz_clear(t);
+    }
+
+    /* regression test: refinement used to loop (practically) forever when
+       the root is extremely close to an endpoint of the initial interval */
+    {
+        fmpz_poly_t f, g;
+        arb_t r;
+        fmpz_t t;
+
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        arb_init(r);
+        fmpz_init(t);
+
+        /* (x - (2^200 - 3)) (x^2 + 1), root in (2^199, 2^200) */
+        fmpz_one(t);
+        fmpz_mul_2exp(t, t, 200);
+        fmpz_sub_ui(t, t, 3);
+        fmpz_neg(t, t);
+        fmpz_poly_set_coeff_fmpz(f, 0, t);
+        fmpz_poly_set_coeff_si(f, 1, 1);
+        fmpz_poly_set_coeff_si(g, 0, 1);
+        fmpz_poly_set_coeff_si(g, 2, 1);
+        fmpz_poly_mul(f, f, g);
+
+        arb_set_ui(r, 3);
+        mag_one(arb_radref(r));
+        arb_mul_2exp_si(r, r, 198);
+        arb_fmpz_poly_refine_root_arb(r, f, r, 64);
+
+        fmpz_neg(t, t);
+        if (arb_rel_accuracy_bits(r) < 64 || !arb_contains_fmpz(r, t))
+        {
+            flint_printf("FAIL: refine_root_arb regression\n");
+            flint_abort();
+        }
+
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        arb_clear(r);
         fmpz_clear(t);
     }
 

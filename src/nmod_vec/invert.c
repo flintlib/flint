@@ -40,8 +40,10 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
          **/
         for (; k > 0; k--)
         {
+            /* read vec[k] before writing res[k], to allow aliasing */
+            ulong v = vec[k];
             res[k] = nmod_mul(inv, tmp[k-1], mod);
-            inv = nmod_mul(inv, vec[k], mod);
+            inv = nmod_mul(inv, v, mod);
         }
         res[0] = inv;
         _nmod_vec_clear(tmp);
@@ -86,8 +88,10 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
          **/
         for (k = len-1; k > 0; k--)
         {
+            /* read vec[k] before writing res[k], to allow aliasing */
+            ulong v = vec[k];
             res[k] = n_mulmod_shoup(tmp[3*k-2], inv, tmp[3*k-1], mod.n);
-            inv = n_mulmod_shoup(vec[k], inv, tmp[3*k], mod.n);
+            inv = n_mulmod_shoup(v, inv, tmp[3*k], mod.n);
         }
         res[0] = inv;
         _nmod_vec_clear(tmp);

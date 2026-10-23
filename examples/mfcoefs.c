@@ -606,6 +606,7 @@ int main(int argc, char * argv[])
         else break;
     }
 
+    j = count;    /* invalid unless set below */
     if (opt_bench) opt_time = 1, j = 0;
     if (opt_time) timer = &timer_struct;
 
@@ -707,14 +708,17 @@ int main(int argc, char * argv[])
         }
     }
     flint_cleanup_master();
+    return 0;
 }
 
 #else
 
 int main(int argc, char * argv[])
 {
-    flint_printf("mfcoefs requires the fft_small module.\n");
-    return EXIT_FAILURE;
+    /* Failing silently as to not upset the CI whenever fft_small is
+     * unavailable. */
+    flint_printf("mfcoefs requires the fft_small module.  Failing silently.\n");
+    return 0;
 }
 
 #endif

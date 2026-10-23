@@ -469,9 +469,6 @@ void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
     fmpq_mpoly_reduce(A, ctx);
 }
 
-void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
 void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 

@@ -146,12 +146,14 @@ _fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
 
     double bb, b1, b2;
     slong exp;
+    int big;
 
     bb = fmpz_get_d_2exp(&exp, b);
+    big = (fmpz_cmp_ui(b, n) >= 0);
 
     fmpz_clear(b);
 
-    if (fmpz_cmp_ui(b, n) >= 0)
+    if (big)
     {
         b1 = _log2e(bb, exp);
     }

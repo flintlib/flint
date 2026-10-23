@@ -18,7 +18,7 @@ calcium_write(calcium_stream_t out, const char * s)
 {
     if (out->fp != NULL)
     {
-        flint_fprintf((FILE *) out->fp, s);
+        fputs(s, (FILE *) out->fp);
     }
     else
     {

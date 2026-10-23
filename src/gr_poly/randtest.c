@@ -18,7 +18,6 @@ gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
     int status = GR_SUCCESS;
     gr_poly_fit_length(poly, len, ctx);
     status |= _gr_vec_randtest(poly->coeffs, state, len, ctx);
-    _gr_poly_set_length(poly, len, ctx);
-    _gr_poly_normalise(poly, ctx);
+    _gr_poly_set_length_normalise(poly, len, ctx);
     return status;
 }

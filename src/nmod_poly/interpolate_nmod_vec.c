@@ -12,6 +12,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
 void
 _nmod_poly_interpolate_nmod_vec(nn_ptr poly,
@@ -108,80 +109,19 @@ nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
 void
 _nmod_poly_interpolation_weights(nn_ptr w, const nn_ptr * tree, slong len, nmod_t mod)
 {
-    nn_ptr tmp;
-    slong i, n, height;
-
-    if (len == 0)
-        return;
-
-    if (len == 1)
-    {
-        w[0] = 1;
-        return;
-    }
-
-    tmp = _nmod_vec_init(len + 1);
-    height = FLINT_CLOG2(len);
-    n = WORD(1) << (height - 1);
-
-    _nmod_poly_mul(tmp, tree[height-1], n + 1,
-                        tree[height-1] + (n + 1), (len - n + 1), mod);
-
-    _nmod_poly_derivative(tmp, tmp, len + 1, mod);
-    _nmod_poly_evaluate_nmod_vec_fast_precomp(w, tmp, len, tree, len, mod);
-
-    for (i = 0; i < len; i++)
-        w[i] = n_invmod(w[i], mod.n);
-
-    _nmod_vec_clear(tmp);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_interpolation_weights(w, (const gr_ptr *) tree, len, ctx));
 }
 
 void
 _nmod_poly_interpolate_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr ys,
     const nn_ptr * tree, nn_srcptr weights, slong len, nmod_t mod)
 {
-    nn_ptr t, u, pa, pb;
-    slong i, pow, left;
-
-    if (len == 0)
-        return;
-
-    t = _nmod_vec_init(len);
-    u = _nmod_vec_init(len);
-
-    for (i = 0; i < len; i++)
-        poly[i] = nmod_mul(weights[i], ys[i], mod);
-
-    for (i = 0; i < (slong) FLINT_CLOG2(len); i++)
-    {
-        pow = (WORD(1) << i);
-        pa = tree[i];
-        pb = poly;
-        left = len;
-
-        while (left >= 2 * pow)
-        {
-            _nmod_poly_mul(t, pa, pow + 1, pb + pow, pow, mod);
-            _nmod_poly_mul(u, pa + pow + 1, pow + 1, pb, pow, mod);
-            _nmod_vec_add(pb, t, u, 2 * pow, mod);
-
-            left -= 2 * pow;
-            pa += 2 * pow + 2;
-            pb += 2 * pow;
-        }
-
-        if (left > pow)
-        {
-            _nmod_poly_mul(t, pa, pow + 1, pb + pow, left - pow, mod);
-            _nmod_poly_mul(u, pb, pow, pa + pow + 1, left - pow + 1, mod);
-            _nmod_vec_add(pb, t, u, left, mod);
-        }
-    }
-
-    _nmod_vec_clear(t);
-    _nmod_vec_clear(u);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_interpolate_fast_precomp(poly, ys, (const gr_ptr *) tree, weights, len, ctx));
 }
-
 
 void
 _nmod_poly_interpolate_nmod_vec_fast(nn_ptr poly,

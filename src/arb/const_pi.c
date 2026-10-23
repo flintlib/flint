@@ -9,37 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
 #include "arb.h"
-#include "hypgeom.h"
+#include "mp_real.h"
 
 static void
 arb_const_pi_chudnovsky_eval(arb_t s, slong prec)
 {
-    hypgeom_t series;
-    arb_t t, u;
-
-    arb_init(t);
-    arb_init(u);
-    hypgeom_init(series);
-
-    fmpz_poly_set_str(series->A, "2  13591409 545140134");
-    fmpz_poly_set_str(series->B, "1  1");
-    fmpz_poly_set_str(series->P, "4  5 -46 108 -72");
-    fmpz_poly_set_str(series->Q, "4  0 0 0 10939058860032000");
-
-    prec += FLINT_CLOG2(prec) + 5;
-    arb_hypgeom_infsum(s, t, series, prec, prec);
-
-    arb_rsqrt_ui(u, 640320, prec);
-    arb_mul(s, s, u, prec);
-
-    arb_mul_ui(t, t, 640320 / 12, prec);
-    arb_div(s, t, s, prec);
-
-    hypgeom_clear(series);
-    arb_clear(t);
-    arb_clear(u);
+    /* the Chudnovsky series (mp_real/const_pi.c) */
+    _mp_real_const_arb(s, mp_real_const_pi4, prec);
+    arb_mul_2exp_si(s, s, 2);
 }
 
 _ARB_DEF_CACHED_CONSTANT(static, arb_const_pi_chudnovsky, arb_const_pi_chudnovsky_eval)

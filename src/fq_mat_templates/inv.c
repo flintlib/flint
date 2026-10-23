@@ -10,45 +10,18 @@
 */
 
 #ifdef T
+
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 int
 TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
                                    const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, mat_t) I;
-    slong i, dim;
-    int result;
-
-    dim = A->r;
-
-    switch (dim)
-    {
-        case 0:
-            result = 1;
-            break;
-
-        case 1:
-            if (TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(A, 0, 0), ctx))
-            {
-                result = 0;
-            }
-            else
-            {
-                TEMPLATE(T, inv)(TEMPLATE(T, mat_entry(B, 0, 0)), TEMPLATE(T, mat_entry(A, 0, 0)), ctx);
-                result = 1;
-            }
-            break;
-
-        default:
-            TEMPLATE(T, mat_init)(I, dim, dim, ctx);
-            for (i = 0; i < dim; i++)
-                TEMPLATE(T, one)(TEMPLATE(T, mat_entry)(I, i, i), ctx);
-            result = TEMPLATE(T, mat_solve)(B, A, I, ctx);
-            TEMPLATE(T, mat_clear)(I, ctx);
-    }
-
-    return result;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    return gr_mat_inv((gr_mat_struct *) B, (const gr_mat_struct *) A, gr_ctx) == GR_SUCCESS;
 }
 
 #endif

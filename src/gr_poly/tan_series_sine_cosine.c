@@ -100,8 +100,7 @@ gr_poly_tan_series_sine_cosine(gr_poly_t res, const gr_poly_t h, slong len, int 
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_tan_series_sine_cosine(res->coeffs, h->coeffs, hlen, len, func, ctx);
-    _gr_poly_set_length(res, len, ctx);
-    _gr_poly_normalise(res, ctx);
+    _gr_poly_set_length_normalise(res, len, ctx);
     return status;
 }
 

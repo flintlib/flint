@@ -23,7 +23,7 @@ static void _fmpz_mod_poly_evaluate_fmpz_horner(fmpz_t res, const fmpz *poly, sl
     }
     else if (len == 1 || fmpz_is_zero(a))
     {
-        fmpz_set(res, poly);
+        fmpz_mod(res, poly, p);
     }
     else
     {
@@ -40,8 +40,8 @@ static void _fmpz_mod_poly_evaluate_fmpz_horner(fmpz_t res, const fmpz *poly, sl
         }
         fmpz_clear(t);
 
-        if (fmpz_cmpabs(res, p) >= 0)
-            fmpz_sub(res, res, p);
+        /* The coefficients need not be reduced modulo p */
+        fmpz_mod(res, res, p);
     }
 }
 

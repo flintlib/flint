@@ -409,11 +409,11 @@ _mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, s
         }
     }
 
-    if (n < cutoff_karatsuba)
-        return _mpn_mod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    /* the classical/Karatsuba choice is made by the shared mpn code */
+    (void) cutoff_karatsuba;
 
     if (n < cutoff_fft_KS && FLINT_MAX(len1, len2) < 4 * n)
-        return _mpn_mod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo, nhi, -1, ctx);
+        return _mpn_mod_poly_mulmid_mpn(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
 
     if (GR_SUCCESS == _mpn_mod_poly_mulmid_fft_small(res, poly1, len1, poly2, len2, nlo, nhi, ctx))
         return GR_SUCCESS;

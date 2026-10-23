@@ -1,8 +1,5 @@
 /*
-    Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010, 2022 William Hart
-    Copyright (C) 2008 Richard Howell-Peak
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,13 +11,17 @@
 
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
+#include "nmod_poly_factor_gr.h"
 
 void
 nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 {
-    nmod_poly_t f_d, g, g_1;
-    ulong p;
-    slong deg, i;
+    gr_ctx_t ctx;
+    gr_poly_t P;
+    gr_poly_vec_t fac;
+    fmpz_vec_t exp;
+    nmod_t mod = f->mod;
+    ulong lc;
 
     if (f->length <= 1)
     {
@@ -28,111 +29,19 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         return;
     }
 
-    if (f->length == 2)
-    {
-        nmod_poly_factor_insert(res, f, 1);
-        nmod_poly_make_monic(res->p + (res->num - 1),
-                             res->p + (res->num - 1));
-        return;
-    }
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
 
-    p = nmod_poly_modulus(f);
-    deg = nmod_poly_degree(f);
+    NMOD_POLY_AS_GR(P, f);
+    gr_poly_vec_init(fac, 0, ctx);
+    fmpz_vec_init(exp, 0);
 
+    GR_MUST_SUCCEED(gr_poly_factor_squarefree(&lc, fac, exp, P, ctx));
 
-    /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
-       for some particular h(x), clearly f(x) = sum a_k x^kp, k <= deg(f) */
+    res->num = 0;
+    _nmod_poly_factor_set_gr(res, fac, exp, mod, ctx);
 
-    nmod_poly_init_mod(g_1, f->mod);
-    nmod_poly_init_mod(f_d, f->mod);
-    nmod_poly_init_mod(g, f->mod);
-
-    nmod_poly_derivative(f_d, f);
-
-    /* Case 1 */
-    if (nmod_poly_is_zero(f_d))
-    {
-        nmod_poly_factor_t new_res;
-        nmod_poly_t h;
-
-        nmod_poly_init_mod(h, f->mod);
-
-        for (i = 0; (ulong) i <= deg / p; i++) /* this will be an integer since f'=0 */
-        {
-            nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i*p));
-        }
-
-        /* Now run square-free on h, and return it to the pth power */
-        nmod_poly_factor_init(new_res);
-
-        nmod_poly_factor_squarefree(new_res, h);
-        nmod_poly_factor_pow(new_res, p);
-
-        nmod_poly_factor_concat(res, new_res);
-        nmod_poly_clear(h);
-        nmod_poly_factor_clear(new_res);
-   } else
-   {
-        nmod_poly_t h, z;
-
-        nmod_poly_gcd(g, f, f_d);
-        nmod_poly_divexact(g_1, f, g);
-
-        i = 1;
-
-        nmod_poly_init_mod(h, f->mod);
-        nmod_poly_init_mod(z, f->mod);
-
-        /* Case 2 */
-        while (!nmod_poly_is_one(g_1))
-        {
-            nmod_poly_gcd(h, g_1, g);
-            nmod_poly_divexact(z, g_1, h);
-
-            /* out <- out.z */
-            if (z->length > 1)
-            {
-                nmod_poly_factor_insert(res, z, 1);
-                nmod_poly_make_monic(res->p + (res->num - 1),
-                                     res->p + (res->num - 1));
-                if (res->num)
-                    res->exp[res->num - 1] *= i;
-            }
-
-            i++;
-            nmod_poly_set(g_1, h);
-            nmod_poly_divexact(g, g, h);
-        }
-
-        nmod_poly_clear(h);
-        nmod_poly_clear(z);
-
-        nmod_poly_make_monic(g, g);
-
-        if (!nmod_poly_is_one(g))
-        {
-            /* so now we multiply res with square-free(g^1/p) ^ p  */
-            nmod_poly_t g_p; /* g^(1/p) */
-            nmod_poly_factor_t new_res_2;
-
-            nmod_poly_init_mod(g_p, f->mod);
-
-            for (i = 0; (ulong) i <= nmod_poly_degree(g)/p; i++)
-                nmod_poly_set_coeff_ui(g_p, i, nmod_poly_get_coeff_ui(g, i*p));
-
-            nmod_poly_factor_init(new_res_2);
-
-            /* square-free(g^(1/p)) */
-            nmod_poly_factor_squarefree(new_res_2, g_p);
-            nmod_poly_factor_pow(new_res_2, p);
-
-            nmod_poly_factor_concat(res, new_res_2);
-            nmod_poly_clear(g_p);
-            nmod_poly_factor_clear(new_res_2);
-        }
-   }
-
-    nmod_poly_clear(g_1);
-    nmod_poly_clear(f_d);
-    nmod_poly_clear(g);
+    gr_poly_vec_clear(fac, ctx);
+    fmpz_vec_clear(exp);
+    gr_ctx_clear(ctx);
 }

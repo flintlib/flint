@@ -75,7 +75,6 @@ gr_poly_div_series_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B,
 
     gr_poly_fit_length(Q, len, ctx);
     status = _gr_poly_div_series_divconquer(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, len, cutoff, ctx);
-    _gr_poly_set_length(Q, len, ctx);
-    _gr_poly_normalise(Q, ctx);
+    _gr_poly_set_length_normalise(Q, len, ctx);
     return status;
 }

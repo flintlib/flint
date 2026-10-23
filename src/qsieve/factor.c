@@ -11,39 +11,81 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define _STDC_FORMAT_MACROS
-
-/* try to get fdopen, mkstemp declared */
-#if defined(__STRICT_ANSI__)
-# undef __STRICT_ANSI__
-#endif
-
-#if defined(__CYGWIN__)
-# define ulong ulongxx
-# include <sys/param.h>
-# undef ulong
-#endif
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "qsieve.h"
 
-/* Use Windows API for temporary files under MSVC and MinGW */
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-# include <windows.h>
-#endif
+/*
+   Refine n by the factors found so far, so that every entry of the result is a
+   product of prime powers of n and their product is n.  Each factor is taken
+   against *every* entry, not just the last: a factor splitting an earlier
+   entry would otherwise be dropped and n would come back incompletely
+   factored.  Exponents are multiplied through a split so repeated factors stay
+   correct.
 
-static int compare_facs(const void * a, const void * b)
+   Both the decision to stop taking square roots and the factor list finally
+   returned come from this one routine, so the two cannot disagree.
+*/
+static void
+qsieve_refine(fmpz_factor_t factors, const fmpz_t n, fmpz * facs, slong num_facs)
 {
-   fmpz * x = (fmpz *) a;
-   fmpz * y = (fmpz *) b;
+   fmpz_t temp, temp2;
+   slong i, k;
 
-   return fmpz_cmp(x, y);
+   fmpz_init(temp);
+   fmpz_init(temp2);
+
+   _fmpz_factor_set_length(factors, 0);
+   _fmpz_factor_append(factors, n, 1);
+
+   for (i = 0; i < num_facs; i++)
+   {
+      for (k = 0; k < factors->num; k++)
+      {
+         fmpz_gcd(temp, factors->p + k, facs + i);
+
+         if (!fmpz_is_one(temp) && !fmpz_equal(temp, factors->p + k))
+         {
+            slong mult = factors->exp[k];
+            slong e = fmpz_remove(temp2, factors->p + k, temp);
+
+            fmpz_set(factors->p + k, temp);
+            factors->exp[k] = e * mult;
+
+            if (!fmpz_is_one(temp2))
+               _fmpz_factor_append(factors, temp2, mult);
+         }
+      }
+   }
+
+   fmpz_clear(temp);
+   fmpz_clear(temp2);
+}
+
+/* is every entry of the refinement prime? */
+static int
+qsieve_refine_is_complete(const fmpz_t n, fmpz * facs, slong num_facs)
+{
+   fmpz_factor_t trial;
+   slong k;
+   int complete = 1;
+
+   fmpz_factor_init(trial);
+   qsieve_refine(trial, n, facs, num_facs);
+
+   for (k = 0; k < trial->num; k++)
+   {
+      if (!fmpz_is_probabprime(trial->p + k))
+      {
+         complete = 0;
+         break;
+      }
+   }
+
+   fmpz_factor_clear(trial);
+   return complete;
 }
 
 /*
@@ -67,11 +109,6 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-    char temp_path[MAX_PATH];
-#else
-    int fd;
-#endif
 
     if (fmpz_sgn(n) < 0)
     {
@@ -220,40 +257,6 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-    if (GetTempPathA(MAX_PATH, temp_path) == 0)
-    {
-        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempPathA() failed.\n");
-    }
-    /* uUnique = 0 means the we *do* want a unique filename (obviously!). */
-    if (GetTempFileNameA(temp_path, "siq", /*uUnique*/ 0, qs_inf->fname) == 0)
-    {
-        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempFileNameA() failed.\n");
-    }
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fopen failed\n");
-#else
-    strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
-    fd = mkstemp(qs_inf->fname);
-    if (fd == -1)
-        flint_throw(FLINT_ERROR, "mkstemp failed\n");
-
-    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "wb");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fdopen failed\n");
-#endif
-    /*
-     * The code here and in large_prime_variant.c opens and closes the file
-     * qs_inf->fname in several different places. On Windows all file handles
-     * need to be closed before the file can be removed in cleanup at function
-     * exit. The invariant that needs to be preserved at each open/close is
-     * that either
-     *    qs_inf->siqs is NULL and there are no open handles to the file,
-     * or
-     *    qs_inf->siqs is not NULL and is the *only* open handle to the file.
-     */
-
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
         if (qs_inf->factor_base[j].p > BLOCK_SIZE)
@@ -280,8 +283,6 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
         {
             qsieve_collect_relations(qs_inf, sieve);
 
-            qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
-
 #if QS_DEBUG
             flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
                          "extra rels = %wd, poly_count = %wd, num_primes = %wd\n", qs_inf->full_relation,
@@ -289,16 +290,19 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                           qs_inf->extra_rels, qs_inf->poly_count, qs_inf->num_primes);
 #endif
 
+            /*
+               We need extra_rels more relations than primes we sieve with.
+               qs_inf->num_cycles, kept up to date as partial relations are
+               found, is the number of full relations they combine to, except
+               that it counts duplicates.  The relations used to be processed
+               only once 10% more than needed had been found, which wasted
+               sieving; when there are too few, qsieve_process_relation lowers
+               num_cycles by the shortfall instead.
+            */
             if (qs_inf->full_relation + qs_inf->num_cycles >=
-                ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+                qs_inf->num_primes + qs_inf->extra_rels)
             {
-                int ok;
-
-                if (fclose((FILE *) qs_inf->siqs))
-                    flint_throw(FLINT_ERROR, "fclose fail\n");
-                qs_inf->siqs = NULL;
-
-                ok = qsieve_process_relation(qs_inf);
+                int ok = qsieve_process_relation(qs_inf);
 
                 if (ok == -1)
                 {
@@ -320,8 +324,8 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                     num_primes = qs_inf->num_primes;
                     qs_inf->num_primes += qs_inf->ks_primes;
 
-                    ncols = qs_inf->num_primes + qs_inf->extra_rels;
-                    nrows = qs_inf->num_primes;
+                    ncols = num_primes + qs_inf->extra_rels;
+                    nrows = num_primes;
 
                     reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
@@ -376,7 +380,21 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                             fmpz_gcd(X, X, qs_inf->n);
 
                             if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                            {
                                 fmpz_set(facs + num_facs++, X);
+
+                                /*
+                                   Every square root costs a pass over the
+                                   relations and a modular exponentiation per
+                                   factor base prime, so this loop is
+                                   expensive; it used to run over all 64
+                                   nullspace vectors even once n was completely
+                                   split.  Stop as soon as refining n by the
+                                   factors collected so far leaves only primes.
+                                */
+                                if (qsieve_refine_is_complete(qs_inf->n, facs, num_facs))
+                                   break;
+                            }
                         }
                     }
 
@@ -384,24 +402,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
 
                     if (num_facs > 0)
                     {
-                        _fmpz_factor_append(factors, qs_inf->n, 1);
-
-                        qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
-
-                        for (i = 0; i < num_facs; i++)
-                        {
-                            fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
-                            if (!fmpz_is_one(temp))
-                            {
-                                factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
-                                fmpz_set(factors->p + factors->num - 1, temp);
-
-                                if (fmpz_is_one(temp2))
-                                   break;
-                                else
-                                   _fmpz_factor_append(factors, temp2, 1);
-                             }
-                        }
+                        qsieve_refine(factors, qs_inf->n, facs, num_facs);
 
                         _fmpz_vec_clear(facs, 100);
 
@@ -410,9 +411,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
 
                     _fmpz_vec_clear(facs, 100);
 
-                    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
-                    if (qs_inf->siqs == NULL)
-                        flint_throw(FLINT_ERROR, "fopen fail\n");
+                    qsieve_relations_reset(qs_inf); /* start the relations over */
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
                     goto more_primes; /* factoring failed, may need more primes */
                 }
@@ -470,6 +469,20 @@ found_small_factor:
         }
 
         qsieve_linalg_realloc(qs_inf);
+
+        /*
+           The factor base was extended by appending primes, so the relations
+           found so far are still valid: count them again (the counts were
+           reset above), rather than effectively starting over.
+        */
+        for (j = 0; j < qs_inf->rel_num; j++)
+        {
+            if (qs_inf->relations[j].lp == 1)
+                qs_inf->full_relation++;
+            else
+                qsieve_add_partial_edge(qs_inf, qs_inf->relations[j].lp,
+                                                qs_inf->relations[j].lp2);
+        }
     }
 
     /**************************************************************************
@@ -490,11 +503,6 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
-    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
-        flint_throw(FLINT_ERROR, "fclose fail\n");
-    if (remove(qs_inf->fname)) {
-        flint_throw(FLINT_ERROR, "remove fail\n");
-    }
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);
     qsieve_poly_clear(qs_inf);
@@ -530,4 +538,3 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         qsieve_tune[i][4],  /* sieve_size   */
         qsieve_tune[i][5]); /* sieve_bits   */
 }
-

@@ -11,10 +11,10 @@
 
 #include "nmod_mat.h"
 
-#if FLINT_USES_BLAS && FLINT_BITS == 64
+#if FLINT_BITS == 64
 
 #include <limits.h>
-#include <cblas.h>
+#include "machine_vectors.h"
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "nmod.h"
@@ -152,7 +152,7 @@ static void _reduce_sp_worker(void * arg_ptr)
         for (j = 0; j < n; j++)
         {
             slong a = (slong) dC[i*n + j];
-            ulong b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? (ulong) a + shift : (ulong) a;
             NMOD_RED(Centries[i * Cstride + j], b, ctx);
         }
     }
@@ -210,8 +210,21 @@ static int _nmod_mat_mul_blas_sp(nmod_mat_t C,
             thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
-                                                1.0, dA, k, dB, n, 0.0, dC, n);
+    /*
+        The fallback gemm threads through FLINT's pool itself, so the
+        workers held for the conversions must be returned before the
+        call or it finds the pool empty and runs on one thread. (An
+        external BLAS schedules its own threads and does not care.)
+        Re-requests are capped by the first grant so the args buffer
+        stays large enough.
+    */
+    {
+        slong max_workers = num_workers;
+
+        flint_give_back_threads(handles, num_workers);
+        flint_sgemm(m, k, n, dA, k, dB, n, dC, n);
+        num_workers = flint_request_threads(&handles, max_workers + 1);
+    }
 
     /* convert output */
 
@@ -382,7 +395,7 @@ static void _reduce_crt_worker(void * arg_ptr)
             for (pi = 0; pi < crtnum; pi++)
             {
                 slong a = (slong) dC[i*n + j + pi*m*n];
-                ulong b = (a < 0) ? a + shifts[pi] : a;
+                ulong b = (a < 0) ? (ulong) a + shifts[pi] : (ulong) a;
                 NMOD_RED(u[pi], b, crtmod[pi]);
             }
 
@@ -497,8 +510,21 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
         for (i = 0; i < num_workers; i++)
             thread_pool_wait(global_thread_pool, handles[i]);
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
-                                       1.0, dA, k, dB, n, 0.0, dC + pi*m*n, n);
+        /*
+            The fallback gemm threads through FLINT's pool itself, so the
+            workers held for the conversions must be returned before the
+            call or it finds the pool empty and runs on one thread. (An
+            external BLAS schedules its own threads and does not care.)
+            Re-requests are capped by the first grant so the args buffer
+            stays large enough.
+        */
+        {
+            slong max_workers = num_workers;
+
+            flint_give_back_threads(handles, num_workers);
+            flint_dgemm(m, k, n, dA, k, dB, n, dC + pi*m*n, n);
+            num_workers = flint_request_threads(&handles, max_workers + 1);
+        }
     }
 
     {
@@ -619,7 +645,7 @@ static void _reduce_dp_worker(void * arg_ptr)
         for (j = 0; j < n; j++)
         {
             slong a = (slong) dC[i*n + j];
-            ulong b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? (ulong) a + shift : (ulong) a;
             NMOD_RED(Centries[i * Cstride + j], b, ctx);
         }
     }
@@ -695,8 +721,21 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
-                                                1.0, dA, k, dB, n, 0.0, dC, n);
+    /*
+        The fallback gemm threads through FLINT's pool itself, so the
+        workers held for the conversions must be returned before the
+        call or it finds the pool empty and runs on one thread. (An
+        external BLAS schedules its own threads and does not care.)
+        Re-requests are capped by the first grant so the args buffer
+        stays large enough.
+    */
+    {
+        slong max_workers = num_workers;
+
+        flint_give_back_threads(handles, num_workers);
+        flint_dgemm(m, k, n, dA, k, dB, n, dC, n);
+        num_workers = flint_request_threads(&handles, max_workers + 1);
+    }
 
     /* convert output */
 
@@ -743,6 +782,7 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
 #else
 
+/* the lifting and CRT here assume 64-bit words */
 int nmod_mat_mul_blas(nmod_mat_t FLINT_UNUSED(C),
                 const nmod_mat_t FLINT_UNUSED(A),
                 const nmod_mat_t FLINT_UNUSED(B))

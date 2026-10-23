@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,10 +15,10 @@
 
 TEST_FUNCTION_START(flint_mpn_mulmod_preinv1, state)
 {
-    int i, result;
-    mpz_t a, b, d, r1, r2;
+    int i;
+    mpz_t a, b, d, r1;
     gmp_randstate_t st;
-    mp_limb_t d1, d2, dinv;
+    mp_limb_t dinv;
     mp_size_t size;
     flint_bitcnt_t norm;
 
@@ -25,64 +26,71 @@ TEST_FUNCTION_START(flint_mpn_mulmod_preinv1, state)
     mpz_init(b);
     mpz_init(d);
     mpz_init(r1);
-    /* don't init r2 */
 
     gmp_randinit_default(st);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        size = n_randint(state, 200) + 2;
+        mp_ptr A, B, D, R, R1;
+        int alias;
 
-        mpz_rrandomb(a, st, size*FLINT_BITS);
-        mpz_rrandomb(b, st, size*FLINT_BITS);
-        do {
-            mpz_rrandomb(d, st, size*FLINT_BITS);
-        } while (mpz_sgn(d) == 0);
+        size = n_randint(state, 200) + 1;
+
+        /* d of exactly size limbs, normalised or not */
+        mpz_rrandomb(d, st, size * FLINT_BITS - n_randint(state, FLINT_BITS));
+        mpz_rrandomb(a, st, n_randint(state, size * FLINT_BITS + 1));
+        mpz_rrandomb(b, st, n_randint(state, size * FLINT_BITS + 1));
 
         /* reduce a, b mod d */
         mpz_fdiv_r(a, a, d);
         mpz_fdiv_r(b, b, d);
 
+        alias = (n_randint(state, 4) == 0);
+        if (alias)
+            mpz_set(b, a);
+
         mpz_mul(r1, a, b);
         mpz_fdiv_r(r1, r1, d);
 
-        /* normalise */
+        /* normalise; the result has the same shift */
         norm = flint_clz(d->_mp_d[d->_mp_size - 1]);
         mpz_mul_2exp(a, a, norm);
         mpz_mul_2exp(b, b, norm);
         mpz_mul_2exp(d, d, norm);
+        mpz_mul_2exp(r1, r1, norm);
 
-        d1 = d->_mp_d[size - 1];
-        d2 = d->_mp_d[size - 2];
-        dinv = flint_mpn_preinv1(d1, d2);
+        /* zero-padded operands of size limbs */
+        A = flint_calloc(size, sizeof(mp_limb_t));
+        B = flint_calloc(size, sizeof(mp_limb_t));
+        D = flint_calloc(size, sizeof(mp_limb_t));
+        R = flint_calloc(size, sizeof(mp_limb_t));
+        R1 = flint_calloc(size, sizeof(mp_limb_t));
+        mpz_export(A, NULL, -1, sizeof(mp_limb_t), 0, 0, a);
+        mpz_export(B, NULL, -1, sizeof(mp_limb_t), 0, 0, b);
+        mpz_export(D, NULL, -1, sizeof(mp_limb_t), 0, 0, d);
+        mpz_export(R1, NULL, -1, sizeof(mp_limb_t), 0, 0, r1);
 
-        r2->_mp_d = flint_malloc(size*sizeof(mp_limb_t));
+        /* for one limb, the 3/2 inverse of (d, 0) */
+        dinv = flint_mpn_preinv1(D[size - 1], (size > 1) ? D[size - 2] : 0);
 
-        flint_mpn_mulmod_preinv1(r2->_mp_d, a->_mp_d, b->_mp_d, size, d->_mp_d, dinv, norm);
+        flint_mpn_mulmod_preinv1(R, A, alias ? A : B, size, D, dinv, norm);
 
-        /* normalise */
-        while (size && r2->_mp_d[size - 1] == 0) size--;
-        r2->_mp_size = size;
-        r2->_mp_alloc = size;
+        if (mpn_cmp(R, R1, size) != 0)
+            TEST_FUNCTION_FAIL("size = %wd, norm = %wu, alias = %d\n"
+                "a = %{mpz}\nb = %{mpz}\nd = %{mpz}\nr1 = %{mpz}\nr = %{ulong*}\n",
+                size, norm, alias, a, b, d, r1, R, size);
 
-        result = (mpz_cmp(r1, r2) == 0);
-        if (!result)
-            TEST_FUNCTION_FAIL(
-                    "%{mpz}\n"
-                    "%{mpz}\n"
-                    "%{mpz}\n"
-                    "%{mpz}\n"
-                    "%{mpz}\n",
-                    a, b, d, r1, r2);
-
-        flint_free(r2->_mp_d);
+        flint_free(A);
+        flint_free(B);
+        flint_free(D);
+        flint_free(R);
+        flint_free(R1);
     }
 
     mpz_clear(a);
     mpz_clear(b);
     mpz_clear(d);
     mpz_clear(r1);
-    /* don't init r2 */
 
     gmp_randclear(st);
 

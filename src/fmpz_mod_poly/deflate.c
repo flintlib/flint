@@ -9,27 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void fmpz_mod_poly_deflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input,
                                      ulong deflation, const fmpz_mod_ctx_t ctx)
 {
-    slong res_length, i;
+    gr_ctx_t gr_ctx;
 
     if (deflation == 0)
         flint_throw(FLINT_DIVZERO, "fmpz_mod_poly_deflate");
 
-    if (input->length <= 1 || deflation == 1)
-    {
-        fmpz_mod_poly_set(result, input, ctx);
-        return;
-    }
-
-    res_length = (input->length - 1) / deflation + 1;
-    fmpz_mod_poly_fit_length(result, res_length, ctx);
-    for (i = 0; i < res_length; i++)
-        fmpz_set(result->coeffs + i, input->coeffs + (i * deflation));
-
-    _fmpz_mod_poly_set_length(result, res_length);
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_poly_deflate((gr_poly_struct *) result,
+                        (const gr_poly_struct *) input, deflation, gr_ctx));
 }

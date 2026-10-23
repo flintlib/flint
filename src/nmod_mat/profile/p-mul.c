@@ -16,10 +16,6 @@
 #include "ulong_extras.h"
 #include "thread_support.h"
 
-#if FLINT_USES_BLAS
-# include <cblas.h>
-#endif
-
 typedef struct
 {
     slong dim_m;
@@ -112,10 +108,6 @@ int main(void)
             for (blas_num = flint_num; blas_num <= flint_num; blas_num *= 2)
             {
                 double min_old, min_new, min_ratio = 100;
-
-#if FLINT_USES_BLAS
-                //openblas_set_num_threads(blas_num);
-#endif
 
                 flint_printf("[flint %wd, blas %wd]: (", flint_num, blas_num);
 

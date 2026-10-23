@@ -28,13 +28,15 @@ fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, slong alloc,
         {
             slong i;
 
-            for (i = alloc; i < fac->num; i++)
+            /* all entries up to fac->alloc are initialised */
+            for (i = alloc; i < fac->alloc; i++)
                 fmpz_mod_poly_clear(fac->poly + i, ctx);
 
             fac->poly =
                 flint_realloc(fac->poly, alloc * sizeof(fmpz_mod_poly_struct));
             fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
             fac->alloc = alloc;
+            fac->num   = FLINT_MIN(fac->num, alloc);
         }
         else if (fac->alloc < alloc)
         {

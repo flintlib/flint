@@ -1743,6 +1743,9 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     slong n = A->c;
     slong p = B->c;
 
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+        return GR_DOMAIN;
+
     dim = FLINT_MIN(n, FLINT_MIN(m, p));
 
     /* To do: fast matrix mul with inf/nan or directed rounding */
@@ -1791,6 +1794,9 @@ nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t 
     slong m = A->r;
     slong n = A->c;
     slong p = B->c;
+
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+        return GR_DOMAIN;
 
     dim = FLINT_MIN(n, FLINT_MIN(m, p));
 

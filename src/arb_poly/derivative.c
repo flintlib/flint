@@ -10,14 +10,14 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_derivative(arb_ptr res, arb_srcptr poly, slong len, slong prec)
 {
-    slong i;
-
-    for (i = 1; i < len; i++)
-        arb_mul_ui(res + i - 1, poly + i, i, prec);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    GR_MUST_SUCCEED(_gr_poly_derivative(res, poly, len, ctx));
 }
 
 void

@@ -58,7 +58,7 @@ int func_name(const S am, const T bm)           \
 {                                               \
     slong ix, jx;                               \
                                                 \
-    if (mat_nrows(am) != mat_nrows(bm) || mat_ncols(am) != mat_nrows(bm)) \
+    if (mat_nrows(am) != mat_nrows(bm) || mat_ncols(am) != mat_ncols(bm)) \
         return 1;                               \
                                                 \
     for (ix = 0; ix < mat_nrows(am); ix++)      \

@@ -94,10 +94,11 @@ void fq_nmod_mpoly_univar_set_coeff_ui(
 
             fq_nmod_mpoly_univar_fit_length(A, A->length + 1, ctx);
 
+            /* shift the terms i, ..., length - 1 up by one */
             for (j = A->length; j > i; j--)
             {
-                fq_nmod_mpoly_swap(A->coeffs + j, A->coeffs + j + 1, ctx);
-                fmpz_swap(A->exps + j, A->exps + j + 1);
+                fq_nmod_mpoly_swap(A->coeffs + j - 1, A->coeffs + j, ctx);
+                fmpz_swap(A->exps + j - 1, A->exps + j);
             }
 
             A->length++;
@@ -108,18 +109,21 @@ void fq_nmod_mpoly_univar_set_coeff_ui(
         }
         else if (cmp == 0)
         {
-            fq_nmod_mpoly_set(A->coeffs + i, c, ctx);
+            /* the term with exponent e is at index i - 1 */
+            fq_nmod_mpoly_set(A->coeffs + i - 1, c, ctx);
 
-            if (!fq_nmod_mpoly_is_zero(A->coeffs + i, ctx))
+            if (!fq_nmod_mpoly_is_zero(A->coeffs + i - 1, ctx))
                 return;
 
             A->length--;
 
-            for (j = i; j < A->length; j++)
+            for (j = i - 1; j < A->length; j++)
             {
                 fq_nmod_mpoly_swap(A->coeffs + j, A->coeffs + j + 1, ctx);
                 fmpz_swap(A->exps + j, A->exps + j + 1);
             }
+
+            return;
         }
     }
 

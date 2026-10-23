@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <mpfr.h>
 #include "thread_pool.h"
+#include "thread_support.h"
 #include "fmpz.h"
 
 #if FLINT_USES_GC
@@ -406,5 +407,8 @@ void flint_cleanup_master(void)
         thread_pool_clear(global_thread_pool);
         global_thread_pool_initialized = 0;
     }
+    /* the shared caches (thread_support.h), once the pool's workers
+       are gone */
+    _flint_shared_cache_cleanup_all();
     _flint_cleanup();
 }

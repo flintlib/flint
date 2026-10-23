@@ -75,7 +75,7 @@ worker(slong iter, work_t * work)
     else
         fmpz_mul_2exp(T, T, wp - *Qexp);
 
-    arb_fmpz_divapprox(T, T, Q);
+    fmpz_tdiv_q(T, T, Q);
 
     /* T = 1 + T */
     fmpz_one(Q);
@@ -254,12 +254,12 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
             if (*Qexp >= wp)
             {
                 fmpz_tdiv_q_2exp(T, T, *Qexp - wp);
-                arb_fmpz_divapprox(T, T, Q);
+                fmpz_tdiv_q(T, T, Q);
             }
             else
             {
                 fmpz_mul_2exp(T, T, wp - *Qexp);
-                arb_fmpz_divapprox(T, T, Q);
+                fmpz_tdiv_q(T, T, Q);
             }
 
             /* T = 1 + T */

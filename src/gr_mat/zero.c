@@ -22,6 +22,10 @@ gr_mat_zero(gr_mat_t res, gr_ctx_t ctx)
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
+    /* contiguous storage */
+    if (res->stride == c || r == 1)
+        return _gr_vec_zero(res->entries, r * c, ctx);
+
     status = GR_SUCCESS;
     for (i = 0; i < r; i++)
     {

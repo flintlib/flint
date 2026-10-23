@@ -46,7 +46,7 @@ int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V
     for (slong i = 1; i < lenQ; i++)
         status |= gr_ore_poly_sigma(GR_ENTRY(sigma_pows, i, el_size), GR_ENTRY(sigma_pows, i - 1, el_size), ctx);
 
-    while (ordR > ordV)
+    while (ordR >= ordV)
     {
         slong k = ordR - ordV;
 
@@ -71,6 +71,10 @@ int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V
 
         ordR--;
     }
+
+    // The coefficients of R of index >= ordV have been eliminated; set them
+    // to exact zeros (in inexact rings they are only approximately zero)
+    status |= _gr_vec_zero(GR_ENTRY(R, ordV, el_size), lenQ, cctx);
 
     GR_TMP_CLEAR_VEC(sigma_pows, lenQ, cctx);
     GR_TMP_CLEAR(c, cctx);

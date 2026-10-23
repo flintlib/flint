@@ -122,7 +122,7 @@ TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
         {
             n = n_randint(state, 18);
 
-            switch (n_randint(state, 12))
+            switch (n_randint(state, 14))
             {
                 case 0:
                     fmpz_poly_zero(g);
@@ -170,6 +170,36 @@ TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
                     fmpz_poly_pow(g, g, n_randint(state, 5));
                     fmpz_poly_set_coeff_ui(g, n, 1);
                     break;
+                case 10:
+                    /* many real roots, possibly clustered */
+                    fmpz_poly_one(g);
+                    for (j = 0; j < n; j++)
+                    {
+                        fmpz_poly_t lin;
+                        fmpz_poly_init(lin);
+                        fmpz_poly_set_coeff_si(lin, 0, (slong) n_randint(state, 1000) - 500);
+                        fmpz_poly_set_coeff_si(lin, 1, 1 + n_randint(state, 1000));
+                        fmpz_poly_mul(g, g, lin);
+                        fmpz_poly_clear(lin);
+                    }
+                    if (n_randint(state, 2))
+                        fmpz_poly_set_coeff_si(g, 0, (slong) n_randint(state, 5) - 2);
+                    break;
+                case 11:
+                    /* Wilkinson-type */
+                    fmpz_poly_one(g);
+                    for (j = 1; j <= n; j++)
+                    {
+                        fmpz_poly_t lin;
+                        fmpz_poly_init(lin);
+                        fmpz_poly_set_coeff_si(lin, 0, -j);
+                        fmpz_poly_set_coeff_si(lin, 1, 1);
+                        fmpz_poly_mul(g, g, lin);
+                        fmpz_poly_clear(lin);
+                    }
+                    fmpz_poly_scalar_mul_ui(g, g, 1 + n_randint(state, 3));
+                    fmpz_poly_set_coeff_si(g, 0, (slong) n_randint(state, 5) - 2);
+                    break;
                 default:
                     fmpz_poly_randtest(g, state, 1 + n, 1 + n_randint(state, 300));
                     break;
@@ -189,6 +219,19 @@ TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
                 roots = _acb_vec_init(deg);
                 arb_fmpz_poly_complex_roots(roots, fac->p + i, flags, prec);
                 check_roots(fac->p + i, roots, prec);
+
+                for (j = 0; j < deg; j++)
+                {
+                    if (acb_rel_accuracy_bits(roots + j) < prec)
+                    {
+                        flint_printf("FAIL! (accuracy)\n");
+                        flint_printf("prec = %wd, root %wd = ", prec, j);
+                        acb_printn(roots + j, 30, 0);
+                        flint_printf("\n\npoly:\n");
+                        fmpz_poly_print(fac->p + i); flint_printf("\n\n");
+                        flint_abort();
+                    }
+                }
                 _acb_vec_clear(roots, deg);
             }
 

@@ -66,6 +66,15 @@ void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
    }
 }
 
+/*
+    fft_combine_limbs and fft_combine_bits set (res, total_limbs) to the
+    evaluation of poly at B^coeff_limbs resp. 2^bits, modulo B^total_limbs.
+    (res, total_limbs) must be zero on entry: each coefficient is added
+    into a window of output_limbs + 1 limbs of res and the carry out of the
+    window is discarded, which loses nothing only when res starts at zero.
+    The coefficients must be less than B^output_limbs and have
+    output_limbs + 1 readable limbs.
+*/
 void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs);
 
@@ -172,6 +181,11 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
                       flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                                 mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
 
+/*
+    mul_truncate_sqrt2 and mul_mfa_truncate_sqrt2 do their pointwise
+    products with fft_mulmod_2expp1(.., n, w, ..) with n = 2^depth, so
+    (n*w)/FLINT_BITS must be a size accepted by fft_mulmod_2expp1.
+*/
 void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w);
 
@@ -182,6 +196,12 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj,
             mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                 mp_limb_t ** FLINT_UNUSED(temp), mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt);
+
+struct sd_fft_mpn_mulmod_2expp1_ctx_struct;
+void fft_mfa_truncate_sqrt2_inner_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1,
+                                mp_size_t sqrt, mp_size_t trunc, mp_limb_t ** tt);
 
 void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
                         flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
@@ -201,19 +221,57 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
 
 slong fft_adjust_limbs(mp_size_t limbs);
 
+/*
+    If limbs = (n*w)/FLINT_BITS exceeds FFT_MULMOD_2EXPP1_CUTOFF, limbs must
+    be a size supported by the Nussbaumer convolution, such as a value
+    returned by fft_adjust_limbs; other sizes give wrong results (checked
+    with FLINT_ASSERT).
+*/
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
 
 void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2);
 
+/*
+    The convolutions (and fft_precache) require 0 < trunc <= 4n, where
+    n = 2^depth, and 2n < trunc unless depth <= 6 and
+    w = limbs*FLINT_BITS/n is even (checked with FLINT_ASSERT). Their
+    pointwise products use fft_mulmod_2expp1, so limbs must be a size
+    accepted by it.
+*/
 void fft_convolution_basic(mp_limb_t ** ii, mp_limb_t ** jj,
 		     slong depth, slong limbs, slong trunc, mp_limb_t ** t1,
                             mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
+struct sd_fft_mpn_mulmod_2expp1_ctx_struct;
+#define FLINT_FFT_SD_FFT_MIN_RING 16384  /* bits */
+slong fft_adjust_limbs_sd_fft(slong tight, slong n_outer, slong * m_out);
+void _fft_pointwise_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong j0, slong j1,
+                   slong limbs);
+
+void _fft_pointwise_rows_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                   slong srt, slong nrows, slong rvbits, slong limbs);
+
+void _fft_pointwise_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong j0, slong j1,
+                   slong limbs);
+void _fft_pointwise_rows_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                   slong srt, slong nrows, slong rvbits, slong limbs);
+
+void fft_convolution_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                          mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
+                          slong limbs, slong trunc, mp_limb_t ** t1,
+                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+
 void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
                                     slong limbs, slong trunc, mp_limb_t ** t1,
                             mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+
+slong fft_convolution_choose_mid(slong * trunc, slong len_out, slong nlo, slong nhi);
 
 /***** FFT Precaching *****/
 
@@ -223,6 +281,10 @@ void fft_precache(mp_limb_t ** jj, slong depth, slong limbs,
 void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
                slong depth, slong limbs, slong trunc, mp_limb_t ** t1,
 	                    mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                          mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
+                          slong limbs, slong trunc, mp_limb_t ** t1,
+                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
 #ifdef __cplusplus
 }

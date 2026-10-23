@@ -1054,7 +1054,6 @@ void n_polyun_init(n_polyun_t A)
 void n_polyun_clear(n_polyun_t A);
 void n_polyun_realloc(n_polyun_t A, slong len);
 
-int n_polyun_is_canonical(const n_polyun_t A);
 int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod);
 
 FLINT_FORCE_INLINE

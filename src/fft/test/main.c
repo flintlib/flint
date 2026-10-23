@@ -20,6 +20,8 @@
 #include "t-butterfly_twiddle.c"
 #include "t-convolution.c"
 #include "t-convolution_precache.c"
+#include "t-convolution_precache_sd_fft.c"
+#include "t-convolution_sd_fft.c"
 #include "t-div_2expmod_2expp1.c"
 #include "t-fft_ifft_mfa_truncate_sqrt2.c"
 #include "t-fft_ifft_negacyclic.c"
@@ -48,6 +50,8 @@ test_struct tests[] =
     TEST_FUNCTION(fft_ifft_butterfly_twiddle),
     TEST_FUNCTION(fft_convolution),
     TEST_FUNCTION(fft_convolution_precache),
+    TEST_FUNCTION(fft_convolution_precache_sd_fft),
+    TEST_FUNCTION(fft_convolution_sd_fft),
     TEST_FUNCTION(mpn_div_2expmod_2expp1),
     TEST_FUNCTION(fft_ifft_mfa_truncate_sqrt2),
     TEST_FUNCTION(fft_ifft_negacyclic),

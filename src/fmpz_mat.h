@@ -256,6 +256,9 @@ slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 int fmpz_mat_rref_upper_certify_lu_mod_p(fmpz_mat_t E, fmpz_t den, const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs);
 
 int fmpz_mat_rank_certify_lu_mod_p(const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs);
+int _fmpz_mat_certify_singular_lu_mod_p(const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs, ulong p);
+int _fmpz_mat_solve_dixon_den_given_lu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t LU, const slong * P, ulong p);
+int fmpz_mat_is_singular(const fmpz_mat_t A);
 
 int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank);
 
@@ -341,6 +344,15 @@ ulong
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
 		                   const fmpz_mat_t A, const fmpz_t det_bound);
 
+ulong _fmpz_mat_find_good_prime_and_lu(nmod_mat_t LU, slong * P, const fmpz_mat_t A, const fmpz_t det_bound);
+/* Finds a prime p (of about the given number of bits) modulo which A has
+   full rank, together with the LU factorisation. Returns 0 if A was found
+   to be singular, which is certified either by an exact kernel vector or
+   by testing primes whose product exceeds det_bound. If
+   A_is_known_nonsingular is set, no certification is attempted and
+   det_bound may be NULL. */
+ulong _fmpz_mat_find_good_prime_and_lu2(nmod_mat_t LU, slong * P, const fmpz_mat_t A, const fmpz_t det_bound, slong bits, int A_is_known_nonsingular);
+
 ulong * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, ulong p);
 
 void _fmpz_mat_solve_dixon(
@@ -348,16 +360,21 @@ void _fmpz_mat_solve_dixon(
         const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
         ulong p, const fmpz_t N, const fmpz_t D);
 
-void _fmpz_mat_solve_dixon_den(
-        fmpz_mat_t X, fmpz_t den,
-        const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
-        ulong p, const fmpz_t N, const fmpz_t D);
-
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_mat_t A, const fmpz_mat_t B);
 
+int _fmpz_mat_reconstruct_matwise(fmpz_mat_t Z, fmpz_t den, const fmpz_mat_t x, const fmpz_t m, const fmpz_t N, const fmpz_t D, const fmpz_t den_init);
+/* minimum number of word operations per thread for the parallel loops of
+   the solvers (below this the thread pool overhead dominates) */
+#define FMPZ_MAT_SOLVE_MIN_WORK_PER_THREAD 1000000
+
+int _fmpz_mat_solve_probe_reconstruct(fmpz_t num, fmpz_t den, const fmpz_t s, const fmpz_t m, const fmpz_t den_prev, int have_prev);
+int _fmpz_mat_solve_attempt_worthwhile(const fmpz_t m, const fmpz_t snum, const fmpz_t sden, const fmpz_t Amax, const fmpz_t Bmax, slong n, slong cols, slong step_bits, double step_cost);
+int _fmpz_mat_solve_reconstruct_attempt(fmpz_mat_t Z, fmpz_t den, const fmpz_mat_t x, const fmpz_t m, const fmpz_t N, const fmpz_t D, const fmpz_t sden, const fmpz_t Amax, const fmpz_t Bmax, const fmpz_mat_t A, const fmpz_mat_t B, slong step_bits, double step_cost, slong den_margin_bits);
 int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
+int _fmpz_mat_can_solve_auto_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_can_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
@@ -378,10 +395,15 @@ void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
 void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
+/* Testing hook, not part of the public API: when nonzero, the multimodular
+   and p-adic algorithms for solving, determinants, rank etc. start from
+   p = 2 instead of a word-size prime so that bad primes (singular
+   reductions, wrong ranks) are actually exercised. The test code toggles
+   this randomly. Matrix multiplication is not affected. */
+FLINT_DLL extern int flint_fmpz_mat_force_small_primes;
+
 /* fmpz_comb has poor basecase code; only use it when it's worth it.
    Fixme: improve fmpz_comb so that this isn't necessary. */
-#define FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF 200
-#define FMPZ_MAT_CRT_PRIMES_COMB_CUTOFF 8
 
 /* Minimum (entries * primes) that warrant spawning a worker for multimodular
    reduction/CRT. */
@@ -477,6 +499,16 @@ int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit);
 /* Van Hoeij helper function *************************************************/
 
 int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P, fmpz_mat_t col, slong exp, slong U_exp);
+
+/* transformed-integer matrix product (fft_small); returns 0 without
+   touching C when unavailable or unprofitable, so callers can fall back */
+int fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A,
+                           const fmpz_mat_t B);
+/* each entry receives the limbs of its magnitude above limb lo_limbs,
+   with the entry's sign; at most one unit of error in the lowest
+   returned limb of each entry (lo_limbs = 0 is exact) */
+int fmpz_mat_mul_fft_small_trunc(fmpz_mat_t C, const fmpz_mat_t A,
+                           const fmpz_mat_t B, slong lo_limbs);
 
 #ifdef __cplusplus
 }

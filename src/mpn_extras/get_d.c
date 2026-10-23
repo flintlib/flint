@@ -155,8 +155,10 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 
       if (ONE_LIMB)
 	{
-	  /* lshift to have high of m0 non-zero, and collapse nails */
-	  rshift = FLINT_BITS - lshift;
+	  /* lshift to have high of m0 non-zero, and collapse nails
+	     (a shift by FLINT_BITS being undefined, the case lshift == 0
+	     takes nothing from m1) */
+	  rshift = (lshift == 0) ? 1 : FLINT_BITS - lshift;
 	  rmask = lshift == 0 ? 0 : UWORD_MAX;
 	  m0 = (m0 << lshift) | ((m1 >> rshift) & rmask);
 
@@ -167,8 +169,9 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 	{
 	  m2 = (size >= 3 ? ptr[size-3] : 0);  /* third highest limb */
 
-	  /* lshift to have high of m0:m1 non-zero, collapse nails from m0 */
-	  rshift = FLINT_BITS - lshift;
+	  /* lshift to have high of m0:m1 non-zero, collapse nails from m0
+	     (see above for lshift == 0) */
+	  rshift = (lshift == 0) ? 1 : FLINT_BITS - lshift;
 	  rmask = (lshift == 0 ? 0 : UWORD_MAX);
 	  m0 = (m0 << lshift) | ((m1 >> rshift) & rmask);
 	  m1 = (m1 << lshift) | ((m2 >> rshift) & rmask);

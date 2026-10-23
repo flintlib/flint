@@ -41,14 +41,101 @@ _arb_fmpz_poly_evaluate_sign(arb_t res, const fmpz_poly_t poly, const arb_t x, s
     return arf_sgn(arb_midref(res));
 }
 
+/* Given lo < hi where hi - lo = N * 2^e with 0 < N < 2^30 (so that
+   [lo, hi] is exactly representable as a ball), and a, b with
+   lo <= a < b <= hi, enlarge [a, b] to an interval with endpoints
+   on the grid lo + 2^f Z for some f <= e, so that b - a = N' * 2^f with
+   0 < N' < 2^30. This maintains the invariant that the current
+   interval is exactly representable as a ball, which ensures that the
+   output is contained in the initial interval. */
+static void
+_round_to_grid(arf_t a, arf_t b, const arf_t lo, const arf_t hi)
+{
+    arf_t w;
+    fmpz_t man, exp, q;
+    slong e, f;
+
+    arf_init(w);
+    fmpz_init(man);
+    fmpz_init(exp);
+    fmpz_init(q);
+
+    arf_sub(w, hi, lo, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_get_fmpz_2exp(man, exp, w);
+    e = fmpz_get_si(exp);
+
+    arf_sub(w, b, a, ARF_PREC_EXACT, ARF_RND_DOWN);
+    f = arf_abs_bound_lt_2exp_si(w) - 29;
+    f = FLINT_MIN(f, e);
+
+    /* a = lo + floor((a - lo) / 2^f) 2^f */
+    arf_sub(w, a, lo, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul_2exp_si(w, w, -f);
+    arf_get_fmpz(q, w, ARF_RND_FLOOR);
+    fmpz_set_si(exp, f);
+    arf_set_fmpz_2exp(w, q, exp);
+    arf_add(a, lo, w, ARF_PREC_EXACT, ARF_RND_DOWN);
+
+    /* b = lo + ceil((b - lo) / 2^f) 2^f */
+    arf_sub(w, b, lo, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul_2exp_si(w, w, -f);
+    arf_get_fmpz(q, w, ARF_RND_CEIL);
+    arf_set_fmpz_2exp(w, q, exp);
+    arf_add(b, lo, w, ARF_PREC_EXACT, ARF_RND_DOWN);
+
+    arf_clear(w);
+    fmpz_clear(man);
+    fmpz_clear(exp);
+    fmpz_clear(q);
+}
+
+/* Set z to the ball [lo, hi], exactly if hi - lo has at most MAG_BITS
+   significant bits (which _round_to_grid ensures). */
+static void
+_set_ball(arb_t z, const arf_t lo, const arf_t hi)
+{
+    arf_t w;
+    fmpz_t man, exp;
+
+    arf_init(w);
+    fmpz_init(man);
+    fmpz_init(exp);
+
+    arf_sub(w, hi, lo, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_get_fmpz_2exp(man, exp, w);
+
+    if (fmpz_sgn(man) > 0 && fmpz_bits(man) <= MAG_BITS && COEFF_IS_MPZ(*exp) == 0)
+    {
+        arf_add(arb_midref(z), lo, hi, ARF_PREC_EXACT, ARF_RND_DOWN);
+        arf_mul_2exp_si(arb_midref(z), arb_midref(z), -1);
+        mag_set_ui_2exp_si(arb_radref(z), fmpz_get_ui(man), fmpz_get_si(exp) - 1);
+    }
+    else
+    {
+        arb_set_interval_arf(z, lo, hi, ARF_PREC_EXACT);
+    }
+
+    arf_clear(w);
+    fmpz_clear(man);
+    fmpz_clear(exp);
+}
+
+static int
+_refine_done(const arb_t x, slong prec)
+{
+    return arb_rel_accuracy_bits(x) >= 1.1 * prec;
+}
+
 void
 arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t initial, slong prec)
 {
     slong d, wp, step, wp_new;
     fmpz_poly_t deriv;
-    arb_t z, m, a, b, fdz, fm, fa, fb, t;
-    mag_t err;
-    int sign_a, sign_b, sign_m;
+    arb_t z, m, a, b, fdz, fm, fa, t, u;
+    arf_t lo, hi;
+    mag_t err, err2, err3, width0;
+    int attempt, progress, done;
+    int sign_a, sign_b, sign_m, sign_lo;
     slong guard = 10;
 
     slong num_interval, num_newton, num_bisect;
@@ -82,14 +169,35 @@ arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t ini
     arb_init(fdz);
     arb_init(fm);
     arb_init(fa);
-    arb_init(fb);
     arb_init(t);
+    arb_init(u);
+    arf_init(lo);
+    arf_init(hi);
     mag_init(err);
+    mag_init(err2);
+    mag_init(err3);
+    mag_init(width0);
 
-    arb_set(z, initial);
+    /* We maintain an exact interval [lo, hi] containing the root in its
+       interior (and no other root), together with the sign of poly at lo
+       when known (sign_lo = 2 means unknown). The sign at hi is then
+       -sign_lo. The ball z is an enclosure of [lo, hi]. */
+    arb_get_lbound_arf(lo, initial, ARF_PREC_EXACT);
+    arb_get_ubound_arf(hi, initial, ARF_PREC_EXACT);
+    sign_lo = 2;
+    _set_ball(z, lo, hi);
+    mag_mul_2exp_si(width0, arb_radref(z), 1);
 
     for (step = 0; ; step++)
     {
+        /* The enclosure may already be accurate enough, e.g. after
+           bisections (which are not followed by an accuracy check). */
+        if (step != 0 && _refine_done(z, prec))
+        {
+            arb_set(res, z);
+            break;
+        }
+
         guard += 1;
 
         wp_new = 2 * arb_rel_accuracy_bits(z);
@@ -104,7 +212,10 @@ arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t ini
         flint_printf("\n");
 #endif
 
-        arb_set_arf(m, arb_midref(z));
+        /* exact midpoint of [lo, hi] */
+        arf_add(arb_midref(m), lo, hi, ARF_PREC_EXACT, ARF_RND_DOWN);
+        arf_mul_2exp_si(arb_midref(m), arb_midref(m), -1);
+        mag_zero(arb_radref(m));
 
         num_interval++;
 
@@ -126,118 +237,184 @@ arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t ini
             arb_div(t, fm, fdz, wp);
             arb_sub(t, m, t, wp);
 
-            if (arb_contains_interior(z, t) && arb_rel_accuracy_bits(t) >= 1.1 * prec)
+            /* If N(z) is contained in z, then z contains a unique root,
+               and it lies in N(z). */
+            if (arb_contains_interior(z, t))
             {
-                arb_set(res, t);
-                break;
-            }
-
-            /* Accept the refined value for the next iteration. */
-            if (arb_contains_interior(z, t) && arb_rel_accuracy_bits(t) >= 1.1 * arb_rel_accuracy_bits(z))
-            {
-                arb_set(z, t);
-                continue;
-            }
-        }
-
-        /* Try standard Newton iteration, estimate error as size of correction. */
-        num_newton++;
-        _arb_fmpz_poly_evaluate_accurately(fm, poly, m, wp, 2 * wp);
-        /* The sign of m is determined; it may be used by the bisection fallback below */
-        sign_m = arf_sgn(arb_midref(fm));
-        _arb_fmpz_poly_evaluate_accurately(fdz, deriv, m, wp, 2 * wp);
-        arb_div(t, fm, fdz, wp);
-        arb_get_mag(err, t);
-        arb_sub(t, m, t, wp);
-        arb_add_error_mag(t, err);
-
-        /* The candidate enclosure maintains the isolation property. */
-        if (arb_contains_interior(z, t))
-        {
-            arb_get_lbound_arf(arb_midref(a), t, ARF_PREC_EXACT);
-            arb_get_ubound_arf(arb_midref(b), t, ARF_PREC_EXACT);
-            mag_zero(arb_radref(a));
-            mag_zero(arb_radref(b));
-
-            sign_a = _arb_fmpz_poly_evaluate_sign(fa, poly, a, wp);
-            sign_b = _arb_fmpz_poly_evaluate_sign(fb, poly, b, wp);
-
-            /* Lucky exact zero */
-            if (sign_a == 0)
-            {
-                arb_set(res, a);
-                break;
-            }
-
-            /* Lucky exact zero */
-            if (sign_b == 0)
-            {
-                arb_set(res, b);
-                break;
-            }
-
-            /* The candidate enclosure brackets a root. */
-            if (sign_a != sign_b)
-            {
-                arb_set_interval_arf(t, arb_midref(a), arb_midref(b), wp);
-
-                /* Continue if we've made progress. */
-                if (arb_contains_interior(z, t))
+                if (_refine_done(t, prec))
                 {
-                    arb_set(z, t);
+                    arb_set(res, t);
+                    break;
+                }
 
-                    if (arb_rel_accuracy_bits(t) >= 1.1 * prec)
-                    {
-                        arb_set(res, z);
-                        break;
-                    }
+                /* Accept the refined value for the next iteration. */
+                if (arb_rel_accuracy_bits(t) >= 1.1 * arb_rel_accuracy_bits(z))
+                {
+                    arb_get_lbound_arf(arb_midref(a), t, ARF_PREC_EXACT);
+                    arb_get_ubound_arf(arb_midref(b), t, ARF_PREC_EXACT);
 
+                    if (arf_cmp(arb_midref(a), lo) < 0)
+                        arf_set(arb_midref(a), lo);
+                    if (arf_cmp(arb_midref(b), hi) > 0)
+                        arf_set(arb_midref(b), hi);
+
+                    _round_to_grid(arb_midref(a), arb_midref(b), lo, hi);
+
+                    if (!arf_equal(arb_midref(a), lo))
+                        sign_lo = 2;
+
+                    arf_set(lo, arb_midref(a));
+                    arf_set(hi, arb_midref(b));
+
+                    _set_ball(z, lo, hi);
                     continue;
                 }
             }
         }
 
-        /* Fallback bisections if both Newton attempts failed. */
-        num_bisect++;
-        arb_get_lbound_arf(arb_midref(a), z, ARF_PREC_EXACT);
-        arb_get_ubound_arf(arb_midref(b), z, ARF_PREC_EXACT);
-        mag_zero(arb_radref(a));
-        mag_zero(arb_radref(b));
+        /* Try standard Newton iteration. */
+        num_newton++;
+        _arb_fmpz_poly_evaluate_accurately(fm, poly, m, wp, 2 * wp);
+        /* The sign of m is determined; it may be used by the bisection fallback below */
+        sign_m = arf_sgn(arb_midref(fm));
 
-        sign_a = _arb_fmpz_poly_evaluate_sign(fa, poly, a, wp);
-
-        if (sign_a == 0)
-            flint_throw(FLINT_ERROR, "arb_fmpz_poly_refine_root_arb: root encountered at endpoint\n");
-
-        if (sign_a == sign_m)
-            arb_set(a, m);   /* Sign change is on (m, b) */
-        else
-            arb_set(b, m);   /* Sign change is on (a, m) */
-
-        arb_set_interval_arf(t, arb_midref(a), arb_midref(b), wp);
-
-        /* Do further bisections until we've certainly made progress. */
-        while (!(arb_contains_interior(z, t)))
+        /* Lucky exact zero */
+        if (sign_m == 0)
         {
-            num_bisect++;
-
-            wp = arb_rel_accuracy_bits(t) + 10;
-            wp = FLINT_MAX(wp, 64);
-
-            arb_add(m, a, b, ARF_PREC_EXACT);
-            arb_mul_2exp_si(m, m, -1);
-
-            sign_m = _arb_fmpz_poly_evaluate_sign(fm, poly, m, wp);
-
-            if (sign_a == sign_m)
-                arb_set(a, m);   /* Sign change is on (m, b) */
-            else
-                arb_set(b, m);   /* Sign change is on (a, m) */
-
-            arb_set_interval_arf(t, arb_midref(a), arb_midref(b), wp);
+            arb_set(res, m);
+            break;
         }
 
-        arb_set(z, t);
+        _arb_fmpz_poly_evaluate_accurately(fdz, deriv, m, wp, 2 * wp);
+        arb_div(t, fm, fdz, wp);
+        arb_get_mag(err, t);
+        arb_sub(t, m, t, wp);
+
+        /* Candidate enclosures around the Newton iterate: first a tight one
+           assuming quadratic convergence, then one with the size of
+           the correction as radius. The candidate is intersected with
+           [lo, hi] and accepted if the signs at its endpoints differ. */
+        progress = 0;
+        done = 0;
+        for (attempt = 0; attempt < 2 && !progress && !done; attempt++)
+        {
+            arb_set(u, t);
+
+            if (attempt == 0)
+            {
+                /* 2^16 err^2 / max(|m|, w) + 2^-wp |m| where w is the
+                   width of the initial interval */
+                arb_get_mag_lower(err2, m);
+                mag_max(err2, err2, width0);
+                if (mag_is_zero(err2))
+                    continue;
+                mag_mul(err3, err, err);
+                mag_div(err3, err3, err2);
+                mag_mul_2exp_si(err3, err3, 16);
+                arb_get_mag(err2, m);
+                mag_mul_2exp_si(err2, err2, -wp);
+                mag_add(err3, err3, err2);
+                if (mag_cmp(err3, err) >= 0)
+                    continue;
+                arb_add_error_mag(u, err3);
+            }
+            else
+            {
+                arb_add_error_mag(u, err);
+            }
+
+            arb_get_lbound_arf(arb_midref(a), u, ARF_PREC_EXACT);
+            arb_get_ubound_arf(arb_midref(b), u, ARF_PREC_EXACT);
+            if (arf_cmp(arb_midref(a), lo) < 0)
+                arf_set(arb_midref(a), lo);
+            if (arf_cmp(arb_midref(b), hi) > 0)
+                arf_set(arb_midref(b), hi);
+            mag_zero(arb_radref(a));
+            mag_zero(arb_radref(b));
+
+            if (arf_cmp(arb_midref(a), arb_midref(b)) >= 0)
+                continue;
+
+            _round_to_grid(arb_midref(a), arb_midref(b), lo, hi);
+
+            /* no progress */
+            if (arf_equal(arb_midref(a), lo) && arf_equal(arb_midref(b), hi))
+                continue;
+
+            if (arf_equal(arb_midref(a), lo) && sign_lo != 2)
+                sign_a = sign_lo;
+            else
+                sign_a = _arb_fmpz_poly_evaluate_sign(fa, poly, a, wp);
+
+            /* Lucky exact zero */
+            if (sign_a == 0)
+            {
+                arb_set(res, a);
+                done = 1;
+                break;
+            }
+
+            if (arf_equal(arb_midref(b), hi) && sign_lo != 2)
+                sign_b = -sign_lo;
+            else
+                sign_b = _arb_fmpz_poly_evaluate_sign(fa, poly, b, wp);
+
+            /* Lucky exact zero */
+            if (sign_b == 0)
+            {
+                arb_set(res, b);
+                done = 1;
+                break;
+            }
+
+            /* The candidate interval brackets the root. */
+            if (sign_a != sign_b)
+            {
+                arf_set(lo, arb_midref(a));
+                arf_set(hi, arb_midref(b));
+                sign_lo = sign_a;
+                progress = 1;
+            }
+        }
+
+        if (done)
+            break;
+
+        if (progress)
+        {
+            _set_ball(z, lo, hi);
+
+            if (_refine_done(z, prec))
+            {
+                arb_set(res, z);
+                break;
+            }
+
+            continue;
+        }
+
+        /* Fallback bisection if both Newton attempts failed. */
+        num_bisect++;
+
+        if (sign_lo == 2)
+        {
+            arb_set_arf(a, lo);
+            sign_lo = _arb_fmpz_poly_evaluate_sign(fa, poly, a, wp);
+
+            /* The unique root in [lo, hi] is lo. */
+            if (sign_lo == 0)
+            {
+                arb_set(res, a);
+                break;
+            }
+        }
+
+        if (sign_lo == sign_m)
+            arf_set(lo, arb_midref(m));   /* Sign change is on (m, hi) */
+        else
+            arf_set(hi, arb_midref(m));   /* Sign change is on (lo, m) */
+
+        _set_ball(z, lo, hi);
     }
 
 #if VERBOSE
@@ -256,7 +433,12 @@ arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t ini
     arb_clear(fdz);
     arb_clear(fm);
     arb_clear(fa);
-    arb_clear(fb);
     arb_clear(t);
+    arb_clear(u);
+    arf_clear(lo);
+    arf_clear(hi);
     mag_clear(err);
+    mag_clear(err2);
+    mag_clear(err3);
+    mag_clear(width0);
 }

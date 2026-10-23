@@ -15,7 +15,10 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
+#include "flint-mparam.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
 
@@ -34,12 +37,25 @@ nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return status;
 }
 
-/* we don't want to call n_is_prime because this predicate should
-   be fast. allow storing a flag in the context object? */
+/* the context has the layout of _gr_nmod_ctx_struct (see nmod.h): as for
+   nmod, a primality flag set with gr_ctx_set_is_field is used if known;
+   otherwise the modulus is tested with n_is_prime on each call */
+#define NMOD32_IS_PRIME(ring_ctx) NMOD_IS_PRIME(ring_ctx)
+
 static truth_t
 nmod32_ctx_is_field(const gr_ctx_t ctx)
 {
-    return T_UNKNOWN;
+    if (NMOD32_IS_PRIME(ctx) != T_UNKNOWN)
+        return NMOD32_IS_PRIME(ctx);
+
+    return n_is_prime(NMOD32_CTX(ctx).n) ? T_TRUE : T_FALSE;
+}
+
+static int
+nmod32_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
+{
+    NMOD32_IS_PRIME(ctx) = is_field;
+    return GR_SUCCESS;
 }
 
 static void
@@ -351,6 +367,18 @@ _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 static void
 _nmod32_vec_clear(uint32_t * res, slong len, gr_ctx_t ctx)
 {
+}
+
+/* Shallow element storage: truncated coefficients need not be cleared. */
+static void
+_nmod32_poly_set_length_normalise(gr_poly_struct * poly, slong len, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    uint32_t * coeffs = poly->coeffs;
+
+    while (len > 0 && (coeffs[len - 1] == 0))
+        len--;
+
+    poly->length = len;
 }
 
 static int
@@ -673,11 +701,37 @@ _nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32
     return _nmod32_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
 }
 
-/* todo: tuning for rectangular matrices */
+/*
+    The integer SIMD kernel of nmod_mat (_nmod_mat_mul_u32) reads and writes
+    uint32 entries directly; single-threaded, one Strassen level is put on
+    top of it from the same dimension as in nmod_mat_mul (the recursive
+    calls come back here). The generic methods remain for tiny matrices and
+    for 32-bit builds, where the kernel declines.
+*/
 static int
 _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
+    slong ar = gr_mat_nrows(A, ctx);
+    slong ac = gr_mat_ncols(A, ctx);
+    slong bc = gr_mat_ncols(B, ctx);
+    slong min_dim = FLINT_MIN(FLINT_MIN(ar, ac), bc);
+
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+        return GR_DOMAIN;
+
+    if (min_dim >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+    {
+        if (flint_get_num_threads() == 1
+                && min_dim >= FLINT_NMOD_MAT_MUL_SIMD_STRASSEN_CUTOFF)
+            return gr_mat_mul_strassen(C, A, B, ctx);
+
+        if (_nmod_mat_mul_u32(C->entries, C->stride, A->entries, A->stride,
+                              B->entries, B->stride, ar, ac, bc,
+                              NMOD32_CTX(ctx)))
+            return GR_SUCCESS;
+    }
+
+    if (min_dim >= 256)
         return gr_mat_mul_strassen(C, A, B, ctx);
     else
         return gr_mat_mul_classical(C, A, B, ctx);
@@ -695,6 +749,20 @@ _nmod32_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
     return _gr_mat_charpoly_berkowitz(res, mat, ctx);
 }
 
+static int
+_nmod32_mat_det(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (mat->r <= 4)
+        return gr_mat_det_cofactor(res, mat, ctx);
+
+    if (gr_mat_det_lu(res, mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    /* fall back on a division-free algorithm if a pivot was not
+       invertible (composite modulus) */
+    return gr_mat_det_berkowitz(res, mat, ctx);
+}
+
 
 int _nmod32_methods_initialized = 0;
 
@@ -707,6 +775,9 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) nmod32_ctx_is_field},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) nmod32_ctx_is_field},
+    {GR_METHOD_CTX_SET_IS_FIELD,        (gr_funcptr) nmod32_ctx_set_is_field},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
+                                        (gr_funcptr) nmod32_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
@@ -750,9 +821,12 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
     {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
     {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
+    {GR_METHOD_POLY_SET_LENGTH_NORMALISE, (gr_funcptr) _nmod32_poly_set_length_normalise},
+    {GR_METHOD_CTX_FQ_DEGREE,   (gr_funcptr) gr_generic_ctx_fq_degree_prime_field},
+    {GR_METHOD_CTX_FQ_ORDER,    (gr_funcptr) gr_generic_ctx_fq_order_prime_field},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
-    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _nmod32_vec_zero},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_set},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
@@ -765,9 +839,11 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_poly_factor_finite_field_method},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod32_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod32_mat_charpoly},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _nmod32_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -785,6 +861,7 @@ gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
     ctx->size_limit = WORD_MAX;
 
     nmod_init(NMOD32_CTX_REF(ctx), n);
+    NMOD32_IS_PRIME(ctx) = T_UNKNOWN;
 
     ctx->methods = _nmod32_methods;
 

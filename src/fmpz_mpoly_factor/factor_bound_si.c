@@ -26,7 +26,7 @@ int fmpz_mpoly_factor_bound_si(fmpz_t B, const fmpz_t A,
     FLINT_ASSERT(nvars > 0);
 
     fmpz_init_set_ui(t, 1);
-    for (i = 1; i < nvars; i++)
+    for (i = 0; i < nvars; i++)
     {
         if (degs[i] < 0)
         {

@@ -10,9 +10,7 @@
 */
 
 #include "gr_poly.h"
-
-/* todo */
-#define _gr_poly_mul_monic _gr_poly_mul
+#include "gr_poly/impl.h"
 
 /* todo: parallel version; better temporary management */
 int
@@ -73,8 +71,7 @@ gr_poly_product_roots(gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
     gr_poly_fit_length(poly, n + 1, ctx);
     status = _gr_poly_product_roots(poly->coeffs, xs->entries, n, ctx);
-    _gr_poly_set_length(poly, n + 1, ctx);
-    _gr_poly_normalise(poly, ctx);
+    _gr_poly_set_length_normalise(poly, n + 1, ctx);
     return status;
 }
 

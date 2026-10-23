@@ -23,6 +23,7 @@ TEST_FUNCTION_START(fmpz_mat_det_modular, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         int proved = n_randlimb(state) % 2;
         m = n_randint(state, 10);
 
@@ -54,6 +55,7 @@ TEST_FUNCTION_START(fmpz_mat_det_modular, state)
 
     for (i = 0; i < 10000; i++)
     {
+        flint_fmpz_mat_force_small_primes = n_randint(state, 2);
         int proved = n_randlimb(state) % 2;
         m = 2 + n_randint(state, 10);
         fmpz_mat_init(A, m, m);
@@ -76,6 +78,8 @@ TEST_FUNCTION_START(fmpz_mat_det_modular, state)
         fmpz_mat_clear(A);
         fmpz_clear(det2);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

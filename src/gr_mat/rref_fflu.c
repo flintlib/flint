@@ -26,6 +26,7 @@ _gr_mat_rref_fflu(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, in
     if (gr_mat_is_zero(A, ctx) == T_TRUE)
     {
         *res_rank = 0;
+        status |= gr_mat_zero(R, ctx);
         status |= gr_one(den, ctx);
         return status;
     }

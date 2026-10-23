@@ -29,8 +29,10 @@ fq_zech_get_nmod_poly(nmod_poly_t rop, const fq_zech_t op,
     while (q >= ctx->p)
     {
         r = n_divrem2_precomp(&q, q, ctx->p, ctx->ppre);
-        nmod_poly_set_coeff_ui(rop, i, r);
+        rop->coeffs[i] = r;
         i ++;
     }
-    nmod_poly_set_coeff_ui(rop, i, q);
+    rop->coeffs[i] = q;
+    _nmod_poly_set_length(rop, i + 1);
+    _nmod_poly_normalise(rop);
 }

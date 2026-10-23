@@ -13,6 +13,8 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_divrem_newton, state)
 {
     slong iter;
@@ -24,6 +26,13 @@ TEST_FUNCTION_START(gr_poly_divrem_newton, state)
         gr_poly_t A, B, Q, R, QBR;
 
         gr_ctx_init_random_commutative_ring(ctx, state);
+
+        /* Hack: avoid because of potential blowup */
+        while (ctx->methods == _ca_methods)
+        {
+            gr_ctx_clear(ctx);
+            gr_ctx_init_random_commutative_ring(ctx, state);
+        }
 
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);

@@ -37,4 +37,15 @@ int FQ_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_ctx_t ctx);
 #undef CAP_T
 #undef T
 
+/* not available for fq_zech */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L, slong m, const fq_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

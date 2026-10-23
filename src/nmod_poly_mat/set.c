@@ -38,9 +38,10 @@ void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat)
                 nmod_poly_zero(nmod_poly_mat_entry(pmat, i, j));
             else
             {
-                nmod_poly_realloc(nmod_poly_mat_entry(pmat, i, j), 1);
+                nmod_poly_fit_length(nmod_poly_mat_entry(pmat, i, j), 1);
                 nmod_poly_mat_entry(pmat, i, j)->coeffs[0]
                     = nmod_mat_entry(cmat, i, j);
+                _nmod_poly_set_length(nmod_poly_mat_entry(pmat, i, j), 1);
             }
         }
     }

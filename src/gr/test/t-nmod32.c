@@ -37,5 +37,23 @@ TEST_FUNCTION_START(gr_nmod32, state)
     gr_test_ring(ZZn, 10000, flags);
     gr_ctx_clear(ZZn);
 
+    /* field flag */
+    gr_ctx_init_nmod32(ZZn, UWORD(4294967291));
+    if (gr_ctx_is_field(ZZn) != T_TRUE)
+        TEST_FUNCTION_FAIL("is_field (prime)\n");
+    gr_ctx_clear(ZZn);
+
+    gr_ctx_init_nmod32(ZZn, UWORD(4294967295));
+    if (gr_ctx_is_field(ZZn) != T_FALSE)
+        TEST_FUNCTION_FAIL("is_field (composite)\n");
+    gr_ctx_clear(ZZn);
+
+    gr_ctx_init_nmod32(ZZn, 101);
+    if (gr_ctx_set_is_field(ZZn, T_FALSE) != GR_SUCCESS || gr_ctx_is_field(ZZn) != T_FALSE)
+        TEST_FUNCTION_FAIL("set_is_field (T_FALSE)\n");
+    if (gr_ctx_set_is_field(ZZn, T_TRUE) != GR_SUCCESS || gr_ctx_is_field(ZZn) != T_TRUE)
+        TEST_FUNCTION_FAIL("set_is_field (T_TRUE)\n");
+    gr_ctx_clear(ZZn);
+
     TEST_FUNCTION_END(state);
 }

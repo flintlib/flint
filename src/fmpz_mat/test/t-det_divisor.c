@@ -27,6 +27,10 @@ TEST_FUNCTION_START(fmpz_mat_det_divisor, state)
         m = n_randint(state, 15);
         bits = 1 + n_randint(state, 50);
 
+        /* the testing hook makes the modular algorithms lift with 2-bit
+           primes, so restrict it to small instances */
+        flint_fmpz_mat_force_small_primes = (m <= 5 && bits <= 10);
+
         fmpz_init(det);
         fmpz_init(d);
         fmpz_init(q);
@@ -73,6 +77,8 @@ TEST_FUNCTION_START(fmpz_mat_det_divisor, state)
         fmpz_clear(q);
         fmpz_clear(r);
     }
+
+    flint_fmpz_mat_force_small_primes = 0;
 
     TEST_FUNCTION_END(state);
 }

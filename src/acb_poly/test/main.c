@@ -61,6 +61,7 @@
 #include "t-mullow_transpose_gauss.c"
 #include "t-mulmid.c"
 #include "t-mulmid_classical.c"
+#include "t-mulmid_fmpzi.c"
 #include "t-mulmid_transpose.c"
 #include "t-polylog_cpx.c"
 #include "t-polylog_series.c"
@@ -68,6 +69,7 @@
 #include "t-pow_series.c"
 #include "t-powsum_one_series_sieved.c"
 #include "t-powsum_series_naive_threaded.c"
+#include "t-powsum_series_tree.c"
 #include "t-pow_ui.c"
 #include "t-pow_ui_trunc_binexp.c"
 #include "t-product_roots.c"
@@ -150,6 +152,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_mullow_transpose_gauss),
     TEST_FUNCTION(acb_poly_mulmid),
     TEST_FUNCTION(acb_poly_mulmid_classical),
+    TEST_FUNCTION(acb_poly_mulmid_fmpzi),
     TEST_FUNCTION(acb_poly_mulmid_transpose),
     TEST_FUNCTION(acb_poly_polylog_cpx),
     TEST_FUNCTION(acb_poly_polylog_series),
@@ -157,6 +160,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_pow_series),
     TEST_FUNCTION(acb_poly_powsum_one_series_sieved),
     TEST_FUNCTION(acb_poly_powsum_series_naive_threaded),
+    TEST_FUNCTION(acb_poly_powsum_series_tree),
     TEST_FUNCTION(acb_poly_pow_ui),
     TEST_FUNCTION(acb_poly_pow_ui_trunc_binexp),
     TEST_FUNCTION(acb_poly_product_roots),

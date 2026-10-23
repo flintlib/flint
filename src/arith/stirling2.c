@@ -362,7 +362,7 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
     {
         local_num_primes[i] = FLINT_MAX(1, num_primes * (i + 1) / resolution);
 
-        fmpz_comb_init(comb[i], primes, local_num_primes[i]);
+        fmpz_comb_init2(comb[i], primes, local_num_primes[i], FMPZ_COMB_CRT);
         fmpz_comb_temp_init(temp[i], comb[i]);
         local_len[i] = len;
 
@@ -593,54 +593,8 @@ stirling_2_nmod(const unsigned int * divtab, ulong n, ulong k, nmod_t mod)
 }
 
 static void
-_fmpz_crt_combine(fmpz_t r1r2, fmpz_t m1m2, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2)
-{
-    fmpz_invmod(m1m2, m1, m2);
-    fmpz_mul(m1m2, m1m2, m1);
-    fmpz_sub(r1r2, r2, r1);
-    fmpz_mul(r1r2, r1r2, m1m2);
-    fmpz_add(r1r2, r1r2, r1);
-    fmpz_mul(m1m2, m1, m2);
-    fmpz_mod(r1r2, r1r2, m1m2);
-}
-
-static void
-tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len)
-{
-    if (len == 0)
-    {
-        fmpz_zero(r);
-        fmpz_one(m);
-    }
-    else if (len == 1)
-    {
-        fmpz_set_ui(r, residues[0]);
-        fmpz_set_ui(m, primes[0]);
-    }
-    else
-    {
-        fmpz_t r1, m1, r2, m2;
-
-        fmpz_init(r1);
-        fmpz_init(m1);
-        fmpz_init(r2);
-        fmpz_init(m2);
-
-        tree_crt(r1, m1, residues, primes, len / 2);
-        tree_crt(r2, m2, residues + len / 2, primes + len / 2, len - len / 2);
-        _fmpz_crt_combine(r, m, r1, m1, r2, m2);
-
-        fmpz_clear(r1);
-        fmpz_clear(m1);
-        fmpz_clear(r2);
-        fmpz_clear(m2);
-    }
-}
-
-static void
 stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
 {
-    fmpz_t tmp;
     nmod_t mod;
     nn_ptr primes, residues;
     slong i, num_primes;
@@ -651,7 +605,6 @@ stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    fmpz_init(tmp);
     primes = flint_malloc(num_primes * sizeof(ulong));
     residues = flint_malloc(num_primes * sizeof(ulong));
 
@@ -668,12 +621,11 @@ stirling_2_multi_mod(fmpz_t res, ulong n, ulong k)
         residues[i] = stirling_2_nmod(divtab, n, k, mod);
     }
 
-    tree_crt(res, tmp, residues, primes, num_primes);
+    fmpz_multi_CRT_ui_once(res, NULL, residues, primes, num_primes, 0);
 
     flint_free(primes);
     flint_free(residues);
     flint_free(divtab);
-    fmpz_clear(tmp);
 }
 
 void

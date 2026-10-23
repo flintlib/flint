@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "gr.h"
 #include "gr_mat.h"
 
 int
@@ -23,7 +24,7 @@ gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, cons
     m = gr_mat_ncols(X, ctx);
 
     if (n == 0)
-        return GR_SUCCESS;
+        return gr_one(den, ctx);
 
     perm = _perm_init(n);
     gr_mat_init(LU, n, n, ctx);
@@ -35,9 +36,10 @@ gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, cons
         if (m != 0)
             status |= gr_mat_nonsingular_solve_fflu_precomp(X, perm, LU, B, ctx);
     }
-    else
+    else if (status == GR_SUCCESS)
     {
-        status |= GR_DOMAIN;
+        /* (singular; a failure of the decomposition is propagated as such) */
+        status = GR_DOMAIN;
     }
 
     gr_mat_clear(LU, ctx);
