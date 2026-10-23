@@ -114,6 +114,27 @@ TEST_FUNCTION_START(nmod_mpoly_factor_wang, state)
 {
     slong i, j, tmul = 30;
 
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a;
+        const char * vars[] = {"a", "b", "c"};
+
+        nmod_mpoly_ctx_init(ctx, 3, ORD_LEX, 5);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_set_str_pretty(a,
+                "a^3*b^4+4*a^3*b^3*c^2+2*a^3*b^3*c+3*a^3*b^2*c^2+4*a^3*b^2*c+a^3*b^2+"
+                "4*a^3*b*c^3+3*a^3*b*c^2+a^3*b*c+2*a^3*b+a^3*c^5+2*a^3*c^3+4*a^3*c^2+"
+                "2*a^3*c+a^3+a^2*b^5*c+a^2*b^4*c^2+a^2*b^4*c+4*a^2*b^4+3*a^2*b^3*c^3+"
+                "4*a^2*b^3*c^2+3*a^2*b^3+a^2*b^2*c^4+2*a^2*b^2*c^3+4*a^2*b^2*c^2+"
+                "3*a^2*b^2*c+4*a^2*b^2+4*a^2*b*c^5+2*a^2*b*c^4+a^2*b*c^3+a^2*b*c^2+"
+                "2*a^2*b*c+4*a^2*b+4*a*b^5*c+4*a*b^5+4*a*b^4*c^2+3*a*b^4*c+2*a*b^4+"
+                "4*a*b^3*c^2+a*b^3+2*a*b^2*c^4+4*a*b^2*c^3+a*b^2*c^2+4*a*b^2*c+3*a*b^2+"
+                "b^5+b^4*c^2+4*b^4*c+4*b^4+4*b^3*c^3+b^3*c^2+4*b^3*c", vars, ctx);
+        check_omega(1, 1, a, ctx, nmod_mpoly_factor_wang);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         slong lower;
