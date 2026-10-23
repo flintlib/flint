@@ -39,8 +39,9 @@
       double precision with the mulmod of fft_small (nmod_mat_mul_fp50),
       the accumulators being brought back to (-0.51 n, 0.51 n) every four
       rows;
-    - otherwise the scalar code: one full modular multiplication per entry
-      (nmod_mat_nmod_vec_mul), or the classical product (nmod_mat_mul).
+    - otherwise one full modular multiplication per entry for short
+      vectors, the classical product (nmod_mat_mul_classical) for longer
+      ones.
 */
 
 #define VM_ROWS NMOD_MAT_MUL_ROWS_MAX
@@ -763,9 +764,12 @@ void nmod_mat_nmod_vec_mul(
     const ulong * a, slong alen,
     const nmod_mat_t B)
 {
-    slong i;
+    slong i, blk, nblk;
     slong len = FLINT_MIN(B->r, alen);
     slong ncols = B->c;
+    nmod_mat_t A1, B1, C1;
+    ulong * t;
+    TMP_INIT;
 
     /* scalar_addmul wants non-empty */
     if (ncols < 1)
@@ -780,10 +784,59 @@ void nmod_mat_nmod_vec_mul(
     if (len >= 2 && _nmod_mat_mul_rows_simd(&c, &a, 1, len, B))
         return;
 
-    _nmod_vec_scalar_mul_nmod(c, nmod_mat_entry_ptr(B, 0, 0), ncols, a[0], B->mod);
+    /* below, the classical product does not pay for its overhead */
+    if (len < 12)
+    {
+        _nmod_vec_scalar_mul_nmod(c, nmod_mat_entry_ptr(B, 0, 0), ncols, a[0], B->mod);
 
-    for (i = 1; i < len; i++)
-        _nmod_vec_scalar_addmul_nmod(c, nmod_mat_entry_ptr(B, i, 0), ncols, a[i], B->mod);
+        for (i = 1; i < len; i++)
+            _nmod_vec_scalar_addmul_nmod(c, nmod_mat_entry_ptr(B, i, 0), ncols, a[i], B->mod);
+
+        return;
+    }
+
+    /*
+        nmod_mat_mul_classical reads B by columns; for wide B a column
+        spans one page per row, so take few rows at a time to keep them
+        in the TLB, in blocks of equal size
+    */
+    blk = (ncols < 512) ? 128 : 32;
+    nblk = (len + blk - 1) / blk;
+    blk = (len + nblk - 1) / nblk;
+
+    TMP_START;
+
+    t = TMP_ARRAY_ALLOC(ncols, ulong);
+
+    A1->r = 1;
+    A1->mod = B->mod;
+
+    B1->c = ncols;
+    B1->stride = B->stride;
+    B1->mod = B->mod;
+
+    C1->r = 1;
+    C1->c = ncols;
+    C1->stride = ncols;
+    C1->mod = B->mod;
+
+    for (i = 0; i < len; i += blk)
+    {
+        A1->entries = (ulong *) a + i;
+        A1->c = A1->stride = FLINT_MIN(blk, len - i);
+
+        B1->entries = nmod_mat_entry_ptr(B, i, 0);
+        B1->r = A1->c;
+
+        C1->entries = (i == 0) ? c : t;
+
+        nmod_mat_mul_classical(C1, A1, B1);
+
+        if (i != 0)
+            _nmod_vec_add(c, c, t, ncols, B->mod);
+    }
+
+    TMP_END;
 }
 
 void nmod_mat_nmod_vec_mul_ptr(
