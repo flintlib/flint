@@ -764,10 +764,12 @@ void nmod_mat_nmod_vec_mul(
     const ulong * a, slong alen,
     const nmod_mat_t B)
 {
-    slong i;
+    slong i, blk, nblk;
     slong len = FLINT_MIN(B->r, alen);
     slong ncols = B->c;
     nmod_mat_t A1, B1, C1;
+    ulong * t;
+    TMP_INIT;
 
     /* scalar_addmul wants non-empty */
     if (ncols < 1)
@@ -793,25 +795,48 @@ void nmod_mat_nmod_vec_mul(
         return;
     }
 
-    A1->entries = (ulong *) a;
+    /*
+        nmod_mat_mul_classical reads B by columns; for wide B a column
+        spans one page per row, so take few rows at a time to keep them
+        in the TLB, in blocks of equal size
+    */
+    blk = (ncols < 512) ? 128 : 32;
+    nblk = (len + blk - 1) / blk;
+    blk = (len + nblk - 1) / nblk;
+
+    TMP_START;
+
+    t = TMP_ARRAY_ALLOC(ncols, ulong);
+
     A1->r = 1;
-    A1->c = len;
-    A1->stride = len;
     A1->mod = B->mod;
 
-    B1->entries = B->entries;
-    B1->r = len;
     B1->c = ncols;
     B1->stride = B->stride;
     B1->mod = B->mod;
 
-    C1->entries = c;
     C1->r = 1;
     C1->c = ncols;
     C1->stride = ncols;
     C1->mod = B->mod;
 
-    nmod_mat_mul_classical(C1, A1, B1);
+    for (i = 0; i < len; i += blk)
+    {
+        A1->entries = (ulong *) a + i;
+        A1->c = A1->stride = FLINT_MIN(blk, len - i);
+
+        B1->entries = nmod_mat_entry_ptr(B, i, 0);
+        B1->r = A1->c;
+
+        C1->entries = (i == 0) ? c : t;
+
+        nmod_mat_mul_classical(C1, A1, B1);
+
+        if (i != 0)
+            _nmod_vec_add(c, c, t, ncols, B->mod);
+    }
+
+    TMP_END;
 }
 
 void nmod_mat_nmod_vec_mul_ptr(
