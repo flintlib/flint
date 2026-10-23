@@ -25,9 +25,6 @@ ring is a `gr_ctx_t`, so Ore polynomials can be used with the generic
 functions (`gr_mul` composes operators) and in other generic
 structures.
 
-The module is under development: it provides memory management,
-additive arithmetic, multiplication and Euclidean division.
-
 ## Example {#example}
 
 The program below multiplies differential operators over $\mathbb{Q}[x]$,
@@ -422,6 +419,105 @@ _gr_ore_poly_default_sigma_delta
 The array of the `sigma_delta` functions of the predefined algebras,
 indexed by `ore_algebra_t` (`sigma_delta_unable` for
 `ORE_ALGEBRA_CUSTOM`).
+:::
+
+::: function
+int gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ctx_t ctx)
+int gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcptr d1, gr_ore_poly_ctx_t ctx)
+
+Set `res` to the result of applying `P` to the base ring element `f`.
+The first function uses the standard interpretation of `P` as an
+operator acting on the base ring (derivative operators differentiate,
+shift operators shift, etc.). In the second one, the generator $D$ acts
+by $g \mapsto \sigma(g) \, d_1 + \delta(g)$ where `d1` is the value
+$D(1)$; any `d1` defines a valid action.
+:::
+
+## Conversions {#conversions}
+
+The following functions convert between expressions of a linear
+differential or difference operator in different bases, represented as
+Ore polynomials in different Ore polynomial rings over the same base
+ring.
+
+::: function
+int _gr_ore_poly_euler_to_ddx(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx)
+int _gr_ore_poly_ddx_to_euler(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx)
+
+Rewrite `op`, of length `len`, from `ORE_ALGEBRA_EULER_DERIVATIVE` to
+`ORE_ALGEBRA_DERIVATIVE` (first function), or from
+`ORE_ALGEBRA_DERIVATIVE` to `ORE_ALGEBRA_EULER_DERIVATIVE` (second
+function). In the latter case the result is multiplied by a power of
+$x$: $\mathit{res} = x^{\mathit{len}-1} \cdot \mathit{op}$. Here `ctx` is
+the common base ring and `var` is the index of the generator $x$ of
+`ctx` on which the derivations act. The output vector `res` has the
+same length `len` as `op` and must not alias it.
+:::
+
+::: function
+int _gr_ore_poly_shift_convert(gr_ptr res, slong * p, gr_srcptr op, slong len, ore_algebra_t src_alg, ore_algebra_t dst_alg, slong var, gr_ctx_t ctx)
+int _gr_ore_poly_shift_convert_difference(gr_ptr res, slong * p, gr_srcptr op, slong len, int to_backward, slong var, gr_ctx_t ctx)
+
+Rewrite `op` from `src_alg` to `dst_alg`, where both are among the
+builtin shift and difference algebras (corresponding to operators
+written in terms of the forward and backward shifts $S$, $S^{-1}$ and
+the forward and backward differences $S - 1$, $1 - S^{-1}$). The
+result satisfies $S^p \cdot \mathit{res} = \mathit{op}$. Here `ctx` is the
+common base ring and `var` is the index of the generator of `ctx` on
+which $S$ acts. Conversions that cross between the forward side ($S$,
+$S - 1$) and the backward side ($S^{-1}$, $1 - S^{-1}$) currently
+require a generic univariate polynomial base ring and otherwise return
+`GR_UNABLE`. The function returns an error status when the source or
+destination algebra is not of the required type. The output vector
+`res` has the same length `len` as `op` and must not alias it.
+
+The second function is the specialisation to conversions between
+`ORE_ALGEBRA_FORWARD_DIFFERENCE` and `ORE_ALGEBRA_BACKWARD_DIFFERENCE`,
+the flag `to_backward` giving the direction.
+:::
+
+::: function
+int gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+
+Convert `op` from `op_ctx` to `res_ctx`. The meaning of the output
+parameter `p` depends on the algebra. For a conversion within the
+differential family, $x^p \cdot \mathit{res} = \mathit{op}$ where $x$ is
+the generator of the base ring specified in the source context. For a
+conversion within the shift/difference family, $S^p \cdot
+\mathit{res} = \mathit{op}$ (a power of the forward shift $S$). No
+attempt is currently made to minimise $p$ or its absolute value.
+:::
+
+For $f = \sum_n a_n x^n$, the Euler derivative $\theta = x \, d/dx$ acts on
+$(a_n)$ as multiplication by $n$ and $x$ acts as the backward shift
+$S^{-1}$. The following functions convert between differential and
+difference operators in a way compatible with this action, mapping
+$x \, d/dx \mapsto n$ and $x \mapsto S^{-1}$, and inversely.
+
+::: function
+int _gr_ore_poly_euler_to_backshift_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx)
+int _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx)
+
+The two inverse rewritings of the isomorphism between the Euler operator
+and the backward shift $S^{-1}$. The common base ring `ctx` must be a
+univariate polynomial ring. The caller allocates `res` to `reslen`, one
+more than the largest coefficient degree of `op`.
+:::
+
+::: function
+int gr_ore_poly_differential_to_shift(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+int gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+
+Given a differential operator `op` represented as an element of
+`op_ctx`, compute a shift/difference operator `res` in `res_ctx` and an
+integer `p` such that the above correspondence maps `op` to
+$S^p \cdot \mathit{res}$ (first function); or, conversely, given a
+shift/difference operator `op`, compute a differential operator `res`
+and `p` such that the correspondence maps `op` to
+$x^p \cdot \mathit{res}$ (second function). The generators of the base
+rings specified in the source and destination contexts play the role of
+$x$ and $n$ (first function), or $n$ and $x$ (second function). No
+attempt is currently made to minimise $p$ or its absolute value.
 :::
 
 ## Arithmetic {#arithmetic}
