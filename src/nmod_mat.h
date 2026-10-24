@@ -122,6 +122,8 @@ void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  nn_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank);
+void nmod_mat_randrank_profile(nmod_mat_t mat, flint_rand_t state,
+                     const slong * mrp_r, const slong * mrp_c, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -330,6 +332,14 @@ void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, i
 void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 
+void nmod_mat_solve_tril_right(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_right_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_right_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+
+void nmod_mat_solve_triu_right(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_right_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_right_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+
 /* LU decomposition */
 
 slong nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check);
@@ -338,6 +348,25 @@ slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
 slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A);
+
+/* PLE decomposition revealing the rank profile matrix */
+
+#define NMOD_MAT_PLE_RANK_CHECK 1
+
+slong nmod_mat_ple(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags);
+slong nmod_mat_ple_classical(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags);
+slong nmod_mat_ple_classical_delayed(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags);
+slong nmod_mat_ple_recursive(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags);
+slong nmod_mat_ple_crout(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags);
+
+void nmod_mat_ple_nullspace(nmod_mat_t X, const nmod_mat_t LU,
+                            const slong * pivots_nonpivots, slong rank);
+void nmod_mat_ple_left_nullspace(nmod_mat_t X, const nmod_mat_t LU,
+                                 const slong * P, slong rank);
+void nmod_mat_ple_nullspace_compact(nmod_mat_t X, const nmod_mat_t LU,
+                                    const slong * pivots_nonpivots, slong rank);
+void nmod_mat_ple_left_nullspace_compact(nmod_mat_t X, slong * rows,
+                        const nmod_mat_t LU, const slong * P, slong rank);
 
 /* Nonsingular solving */
 

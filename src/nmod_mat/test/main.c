@@ -44,7 +44,10 @@
 #include "t-nmod_vec_mul.c"
 #include "t-nullspace.c"
 #include "t-permute_rows.c"
+#include "t-ple.c"
+#include "t-ple_nullspace.c"
 #include "t-pow.c"
+#include "t-randrank_profile.c"
 #include "t-rank.c"
 #include "t-rref.c"
 #include "t-scalar_addmul_ui.c"
@@ -53,9 +56,11 @@
 #include "t-solve_tril.c"
 #include "t-solve_tril_classical.c"
 #include "t-solve_tril_recursive.c"
+#include "t-solve_tril_right.c"
 #include "t-solve_triu.c"
 #include "t-solve_triu_classical.c"
 #include "t-solve_triu_recursive.c"
+#include "t-solve_triu_right.c"
 #include "t-solve_vec.c"
 #include "t-trace.c"
 #include "t-transpose.c"
@@ -98,7 +103,10 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_nmod_vec_mul),
     TEST_FUNCTION(nmod_mat_nullspace),
     TEST_FUNCTION(nmod_mat_permute_rows),
+    TEST_FUNCTION(nmod_mat_ple),
+    TEST_FUNCTION(nmod_mat_ple_nullspace),
     TEST_FUNCTION(nmod_mat_pow),
+    TEST_FUNCTION(nmod_mat_randrank_profile),
     TEST_FUNCTION(nmod_mat_rank),
     TEST_FUNCTION(nmod_mat_rref),
     TEST_FUNCTION(nmod_mat_scalar_addmul_ui),
@@ -107,9 +115,11 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_solve_tril),
     TEST_FUNCTION(nmod_mat_solve_tril_classical),
     TEST_FUNCTION(nmod_mat_solve_tril_recursive),
+    TEST_FUNCTION(nmod_mat_solve_tril_right),
     TEST_FUNCTION(nmod_mat_solve_triu),
     TEST_FUNCTION(nmod_mat_solve_triu_classical),
     TEST_FUNCTION(nmod_mat_solve_triu_recursive),
+    TEST_FUNCTION(nmod_mat_solve_triu_right),
     TEST_FUNCTION(nmod_mat_solve_vec),
     TEST_FUNCTION(nmod_mat_trace),
     TEST_FUNCTION(nmod_mat_transpose),

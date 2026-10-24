@@ -12,6 +12,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "thread_support.h"
 
@@ -42,6 +43,174 @@ _blas_1pass_cutoff(slong num_threads)
 
 #endif
 
+/*
+    C = A * B with all dimensions at most tmax (a constant at each call
+    site, <= 8): the bound k (n - 1)^2 on the dot products tells whether
+    they fit one word, two words with the high word below n (one reduction
+    by NMOD_RED2), or three words. The bound with k = tmax decides for most
+    moduli; the bound with the actual k only for the others.
+*/
+FLINT_FORCE_INLINE void
+_nmod_mat_mul_tiny_impl(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
+                        slong tmax)
+{
+    const slong m = A->r, k = A->c, n = B->c;
+    const nmod_t mod = C->mod;
+    ulong t[64], bh, bl, kh, kl, s0, s1, s2, h, l;
+    slong i, j, q;
+    int words;
+
+    FLINT_ASSERT(m <= tmax && k <= tmax && n <= tmax && tmax <= 8);
+
+    /* (bh, bl) = (n - 1)^2 */
+    umul_ppmm(bh, bl, mod.n - 1, mod.n - 1);
+
+    if (bh == 0 && bl <= UWORD_MAX / tmax)
+        words = 1;
+    else if (bh != 0 && bh + 1 <= mod.n / tmax)
+        words = 2;
+    else
+    {
+        /* one word if bh = 0 and k bl does not overflow; otherwise two
+           words if bh = 0 (then k < n) or k (bh + 1) <= n */
+        umul_ppmm(kh, kl, (bh == 0) ? bl : bh + 1, (ulong) k);
+        words = (bh == 0) ? ((kh == 0) ? 1 : 2)
+                          : ((kh == 0 && kl <= mod.n) ? 2 : 3);
+    }
+
+    if (words == 1)
+    {
+        for (i = 0; i < m; i++)
+        {
+            const ulong * a = nmod_mat_entry_ptr(A, i, 0);
+            for (j = 0; j < n; j++)
+            {
+                s0 = 0;
+                for (q = 0; q < k; q++)
+                    s0 += a[q] * nmod_mat_entry(B, q, j);
+                NMOD_RED(t[i * n + j], s0, mod);
+            }
+        }
+    }
+    else if (words == 2)
+    {
+        for (i = 0; i < m; i++)
+        {
+            const ulong * a = nmod_mat_entry_ptr(A, i, 0);
+            for (j = 0; j < n; j++)
+            {
+                s1 = s0 = 0;
+                for (q = 0; q < k; q++)
+                {
+                    umul_ppmm(h, l, a[q], nmod_mat_entry(B, q, j));
+                    add_ssaaaa(s1, s0, s1, s0, h, l);
+                }
+                NMOD_RED2(t[i * n + j], s1, s0, mod);
+            }
+        }
+    }
+    else
+    {
+        for (i = 0; i < m; i++)
+        {
+            const ulong * a = nmod_mat_entry_ptr(A, i, 0);
+            for (j = 0; j < n; j++)
+            {
+                s2 = s1 = s0 = 0;
+                for (q = 0; q < k; q++)
+                {
+                    umul_ppmm(h, l, a[q], nmod_mat_entry(B, q, j));
+                    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, UWORD(0), h, l);
+                }
+                NMOD_RED3(t[i * n + j], s2, s1, s0, mod);
+            }
+        }
+    }
+
+    for (i = 0; i < m; i++)
+        for (j = 0; j < n; j++)
+            nmod_mat_entry(C, i, j) = t[i * n + j];
+}
+
+/* C = A * B for A of size 1 x 1 (not inlined, to keep the code of
+   nmod_mat_mul before it small) */
+FLINT_STATIC_NOINLINE void
+_nmod_mat_mul_scalar_row(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    _nmod_vec_scalar_mul_nmod(nmod_mat_entry_ptr(C, 0, 0),
+                              nmod_mat_entry_ptr(B, 0, 0), B->c,
+                              nmod_mat_entry(A, 0, 0), C->mod);
+}
+
+void
+_nmod_mat_mul_tiny(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    _nmod_mat_mul_tiny_impl(C, A, B, 8);
+}
+
+/*
+    Whether nmod_mat_mul tries the rows path for m = 2..NMOD_MAT_MUL_ROWS_MAX
+    rows, k >= 2 and n columns, when the modulus modn has one (on top of the
+    conditions in nmod_mat_mul). Measured on Zen 4 and Ice Lake SP
+    (AVX512-IFMA), Cascade Lake (AVX-512 without IFMA) and Apple M4, 20 to
+    64 bits, m = 2, 3, 4, 8, k = 2..512, n = 2..32, against what nmod_mat_mul
+    does otherwise (the few-columns path, the SIMD kernels, or the classical
+    code).
+
+    TODO check with measurements on an AVX2 (non-AVX-512) machine
+*/
+static int
+_nmod_mat_mul_rows_wanted(slong m, slong k, slong n, ulong modn,
+                          slong num_threads)
+{
+    int kernel_shape = (n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+        && (m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+            || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)));
+    int x86_no_ifma = NMOD_MAT_HAVE_VECMAT_U64 && !NMOD_MAT_HAVE_MUL_U52;
+
+    (void) kernel_shape;
+
+    if (n >= 2 && n <= NMOD_MAT_MUL_COLS_MAX && num_threads == 1
+            && NMOD_MAT_MUL_COLS_IS_SIMD(modn)
+            && ((n == 2 && k >= (x86_no_ifma ? 32 : 128))
+                || (x86_no_ifma && n <= 4 && k >= 128)))
+        return 0;
+
+    if (NMOD_MAT_NMOD_VEC_MUL_IS_U64(modn))
+    {
+#if FLINT_BITS == 64
+        if (modn <= (UWORD(1) << 61))
+            return n >= NMOD_MAT_MUL_ROWS_U64_MIN_COLS || (n >= 4 && k <= 128);
+        else
+            return n >= NMOD_MAT_MUL_ROWS_U64_MIN_COLS
+                && !(m >= 4 && k >= 256 && n < 32 && n % 8 != 0);
+#else
+        return n >= NMOD_MAT_MUL_ROWS_U64_MIN_COLS;
+#endif
+    }
+
+#if FLINT_BITS == 64
+    /* for small k, the rows path takes its fp50 tier (see
+       NMOD_MAT_VECMAT_U32_TO_FP50), which also beats the kernels */
+    if (NMOD_MAT_HAVE_VECMAT_U32 && modn <= (UWORD(1) << 32))
+        return n >= 4 && (NMOD_MAT_VECMAT_U32_TO_FP50(k, n)
+                          || !(k <= 4 && kernel_shape));
+
+    /* for k <= 2, the kernels where nmod_mat_mul reaches them (more than
+       NMOD_MAT_MUL_COLS_MAX columns, otherwise the few-columns path comes
+       first) and where they are fp50 (above 32 bits) */
+    if (NMOD_MAT_HAVE_MUL_U52 && modn <= (UWORD(1) << 52))
+    {
+        flint_bitcnt_t bits = FLINT_BIT_COUNT(modn);
+        return !(k <= 2 && kernel_shape && n > NMOD_MAT_MUL_COLS_MAX
+                 && bits > 32 && bits <= FLINT_NMOD_MAT_MUL_FP50_MAX_BITS);
+    }
+#endif
+
+    return 1;
+}
+
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -54,6 +223,22 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     FLINT_ASSERT(C->r == A->r);
     FLINT_ASSERT(C->c == B->c);
     FLINT_ASSERT(A->c == B->r);
+
+    /* tiny matrices: before the costs of the dispatch below and of the
+       setup of the routines it calls */
+    if (m <= NMOD_MAT_MUL_TINY_MAX && k <= NMOD_MAT_MUL_TINY_MAX
+            && n <= NMOD_MAT_MUL_TINY_MAX)
+    {
+        _nmod_mat_mul_tiny_impl(C, A, B, NMOD_MAT_MUL_TINY_MAX);
+        return;
+    }
+
+    /* a scalar times a row of more than NMOD_MAT_MUL_TINY_MAX entries */
+    if (m == 1 && k == 1)
+    {
+        _nmod_mat_mul_scalar_row(C, A, B);
+        return;
+    }
 
     /* Todo: optimize nmod_mat_mul_blas. For mod.n >= 17, nmod_mat_mul_blas
        should be faster up to dim about 1000-2000 as nmod_mat_mul_u8 does
@@ -88,6 +273,54 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         return;
     }
 
+#if FLINT_BITS == 64 && NMOD_MAT_HAVE_FPV && !NMOD_MAT_HAVE_VECMAT_U64 \
+        && !NMOD_MAT_HAVE_MUL_U52
+    /*
+        A has a few rows, NEON (the rows path has only its fp50 tier, two
+        lanes per vector): measured on Apple M4 for N < 2^50, m = 2..4,
+        k = 2..512, n = 2..32. For N <= 2^32 the u32 kernel where it is
+        faster (larger k and n; only from 4 rows for 32-bit N, where its
+        folds come every few products), otherwise the classical code where
+        it is faster (small n relative to k), otherwise the rows path, also
+        for the shapes the generic condition below would send to the
+        kernels (m = 4, n >= 32, small k). The few-columns path never won.
+    */
+    if (m >= 2 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2
+            && flint_num_threads == 1 && C != A && C != B
+            && C->mod.n < (UWORD(1) << 50))
+    {
+        ulong * c[NMOD_MAT_MUL_ROWS_MAX];
+        const ulong * a[NMOD_MAT_MUL_ROWS_MAX];
+
+        if (C->mod.n <= (UWORD(1) << 32)
+                && ((m >= 4 && ((k >= 16 && n >= (k >= 512 ? 6 : 4))
+                                || (k >= 8 && n >= 16)))
+                    || (C->mod.n <= (UWORD(1) << 31)
+                        && ((m == 3 && ((k >= 32 && n >= 8)
+                                        || (k >= 16 && n >= 20)))
+                            || (m == 2 && k >= 128 && n >= 24))))
+                && nmod_mat_mul_u32(C, A, B))
+            return;
+
+        if ((n <= 12 && n * (m == 2 ? 3 : 5) <= k)
+                || (m == 2 && k >= 128 && n <= 20)
+                || (k >= 512 && n <= 24))
+        {
+            nmod_mat_mul_classical(C, A, B);
+            return;
+        }
+
+        for (slong i = 0; i < m; i++)
+        {
+            c[i] = nmod_mat_entry_ptr(C, i, 0);
+            a[i] = nmod_mat_entry_ptr(A, i, 0);
+        }
+
+        if (_nmod_mat_mul_rows_simd(c, a, m, k, B))
+            return;
+    }
+#endif
+
     /*
         A has a few rows (up to NMOD_MAT_MUL_ROWS_MAX): _nmod_mat_mul_rows_simd
         streams B once for all of them with delayed reductions where it is vectorized
@@ -100,20 +333,29 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         kernel is faster whenever it takes the shape (Apple M4: 2.0-2.5x
         at 4 rows), see NMOD_MAT_MUL_ROWS_PREFER_KERNEL.
 
+        Where the few-columns path, the kernels or the classical code are
+        faster for these shapes, see _nmod_mat_mul_rows_wanted (one row:
+        nmod_mat_nmod_vec_mul, which has its own rule).
+
         NOTE It is single-threaded: with several threads it is still used
         for the shapes the threaded kernels do not take (below), which
         would otherwise go to nmod_mat_mul_classical_threaded (observed 2-7x
-        slower than it on Ice Lake, Meteor Lake, 4 threads).
+        slower than it on Ice Lake, Meteor Lake, 4 threads), and for the
+        moduli without SIMD kernel (above 2^52), for which the classical
+        code is serial with so few rows.
         TODO thread it (split the columns of B).
     */
     if (m >= 1 && m <= NMOD_MAT_MUL_ROWS_MAX && k >= 2 && n >= 1
             && ((flint_num_threads == 1
                  && !NMOD_MAT_MUL_ROWS_PREFER_KERNEL(C->mod.n))
-                || !((m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
-                      && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
-                     || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
-                         && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)))
-            && C != A && C != B && NMOD_MAT_NMOD_VEC_MUL_IS_SIMD(C->mod.n))
+                || !(NMOD_MAT_MUL_HAVE_SIMD_KERNEL(C->mod.n)
+                     && ((m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                          && n >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM)
+                         || (2 * m >= FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM
+                             && n >= 4 * FLINT_NMOD_MAT_MUL_SIMD_MIN_DIM))))
+            && C != A && C != B && NMOD_MAT_NMOD_VEC_MUL_IS_SIMD(C->mod.n)
+            && (m == 1 || _nmod_mat_mul_rows_wanted(m, k, n, C->mod.n,
+                                                    flint_num_threads)))
     {
         ulong * c[NMOD_MAT_MUL_ROWS_MAX];
         const ulong * a[NMOD_MAT_MUL_ROWS_MAX];
@@ -122,6 +364,13 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         {
             c[i] = nmod_mat_entry_ptr(C, i, 0);
             a[i] = nmod_mat_entry_ptr(A, i, 0);
+        }
+
+        /* one row: the rule of nmod_mat_nmod_vec_mul for narrow B */
+        if (m == 1)
+        {
+            nmod_mat_nmod_vec_mul(c[0], a[0], k, B);
+            return;
         }
 
         if (_nmod_mat_mul_rows_simd(c, a, m, k, B))

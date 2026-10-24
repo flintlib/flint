@@ -162,7 +162,9 @@ parameters are listed in [](nmod_mat/mul#dispatch). In summary, on a
   also `nmod_mat_mul_u32` for $N \ge 2^{30}$.
 - $N > 2^{52}$: classical multiplication with three-word dot products,
   Strassen–Winograd from dimension 200, and `nmod_mat_mul_blas` with
-  several `dgemm` calls from dimension 450.
+  several `dgemm` calls from dimension 450; on x86-64 with AVX2, when $A$
+  has at most 4 rows (8 with IFMA), $k \ge 2$ and $B$ at least 16
+  columns, the few-rows code of the next item.
 - Matrices with very few rows or columns, for which the kernels would pad
   most of a register tile with zeros, go to code that streams the other
   operand once ([](algorithms/linear-algebra/modular-matrix-kernels#thin)).

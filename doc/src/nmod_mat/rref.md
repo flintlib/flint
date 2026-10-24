@@ -8,8 +8,9 @@ matrix row equivalent to it in which each nonzero row starts with a 1
 (its pivot), the pivots move strictly to the right from row to row, the
 zero rows come last, and each pivot is the only nonzero entry in its
 column. `nmod_mat_rref` computes it in place, and `nmod_mat_nullspace`
-and `nmod_mat_left_nullspace` read bases of the nullspaces off it. The
-modulus must be prime.
+and `nmod_mat_left_nullspace` compute the bases of the nullspaces that it
+defines, for the matrix and for its transpose. The modulus must be
+prime.
 
 ::: summary algorithms/linear-algebra/gaussian-elimination :::
 
@@ -47,11 +48,18 @@ zero and returns $d$. $X$ must have $n$ rows and at least $d$ columns.
 Since $d$ is not known in advance, an $n \times n$ matrix is the usual
 choice. This basis is the unique one whose vectors have the entries
 $x_{f_j} = \delta_{ij}$ in the free positions, so it depends only on $A$.
+`nmod_mat_nullspace` computes it without forming $R$, from the PLE
+decomposition computed by `nmod_mat_ple`, with `nmod_mat_ple_nullspace`:
+one triangular solve, as for $R$ (see [](nmod_mat/ple#kernels)).
 
-`nmod_mat_left_nullspace(X, A)` applies `nmod_mat_nullspace` to the
-transpose of $A$ and writes the basis vectors of $\{v : vA = 0\}$ to the
-first $d = m - r$ rows of $X$, which must have at least $d$ rows and
-exactly $m$ columns.
+`nmod_mat_left_nullspace(X, A)` writes to the first $d = m - r$ rows of
+$X$, which must have at least $d$ rows and $m$ columns, the basis
+of $\{v : vA = 0\}$ obtained in the same way from the transpose of $A$:
+the unique one whose vectors have the entries $\delta_{ij}$ at the rows
+of $A$ that are not in its row rank profile. Since `nmod_mat_ple` reveals
+the row rank profile, this basis is computed from the PLE decomposition
+of $A$ itself, with `nmod_mat_ple_left_nullspace`, without transposing
+$A$.
 
 ## Example {#example}
 

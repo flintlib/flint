@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010, 2011 Fredrik Johansson
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -127,6 +128,64 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
     nmod_mat_randpermdiag(mat, state, diag, rank);
 
     _nmod_vec_clear(diag);
+}
+
+void
+nmod_mat_randrank_profile(nmod_mat_t mat, flint_rand_t state,
+                          const slong * mrp_r, const slong * mrp_c, slong rank)
+{
+    slong m = mat->r, n = mat->c, i, j, k;
+    char * used;
+    nmod_mat_t L, U;
+
+    if (rank < 0 || rank > m || rank > n)
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_randrank_profile). "
+                                 "Impossible rank.\n");
+
+    /* the positions must be in distinct rows and columns */
+    used = flint_calloc(m + n + 1, sizeof(char));
+    for (k = 0; k < rank; k++)
+    {
+        if (mrp_r[k] < 0 || mrp_r[k] >= m || mrp_c[k] < 0 || mrp_c[k] >= n
+                || used[mrp_r[k]] || used[m + mrp_c[k]])
+        {
+            flint_free(used);
+            flint_throw(FLINT_ERROR, "Exception (nmod_mat_randrank_profile). "
+                                     "Invalid positions.\n");
+        }
+        used[mrp_r[k]] = 1;
+        used[m + mrp_c[k]] = 1;
+    }
+    flint_free(used);
+
+    if (rank == 0 || mat->mod.n == 1)
+    {
+        nmod_mat_zero(mat);
+        return;
+    }
+
+    /* mat = L U with L (m x rank) zero above (mrp_r[k], k) and 1 there,
+       U (rank x n) zero left of (k, mrp_c[k]) and nonzero there */
+    nmod_mat_init(L, m, rank, mat->mod.n);
+    nmod_mat_init(U, rank, n, mat->mod.n);
+    nmod_mat_randtest(L, state);
+    nmod_mat_randtest(U, state);
+
+    for (k = 0; k < rank; k++)
+    {
+        for (i = 0; i < mrp_r[k]; i++)
+            nmod_mat_entry(L, i, k) = 0;
+        nmod_mat_entry(L, mrp_r[k], k) = 1;
+
+        for (j = 0; j < mrp_c[k]; j++)
+            nmod_mat_entry(U, k, j) = 0;
+        nmod_mat_entry(U, k, mrp_c[k]) = 1 + n_randint(state, mat->mod.n - 1);
+    }
+
+    nmod_mat_mul(mat, L, U);
+
+    nmod_mat_clear(L);
+    nmod_mat_clear(U);
 }
 
 void

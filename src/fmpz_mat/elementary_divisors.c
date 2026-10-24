@@ -86,12 +86,14 @@ _fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
             - Replace some row of R (assigned to j) with that vector
 
             We must assign each basis vector to a distinct row of R.
-            Each basis vector produced by nmod_mat_nullspace (via RREF,
-            see src/nmod_mat/nullspace.c) has a 1 at its own
-            free-variable column and 0 at every other free-variable
-            column, so a distinct row index per j can be recovered by
-            scanning.  If that invariant ever breaks, we throw an
-            explicit error below rather than write at index -1.
+            Each basis vector produced by nmod_mat_left_nullspace has a 1
+            at its own free-variable column and 0 at every other
+            free-variable column (the basis has an identity matrix in
+            the columns of the rows of Rp outside its row rank profile,
+            see the documentation of nmod_mat_left_nullspace), so a
+            distinct row index per j can be recovered by scanning.  If
+            that invariant ever breaks, we throw an explicit error below
+            rather than write at index -1.
 
             We compute ALL combinations BEFORE replacing any rows,
             since the nullspace was computed for the original R.
@@ -132,9 +134,8 @@ _fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
                 if (piv_rows[j] == -1)
                     flint_throw(FLINT_ERROR,
                         "(fmpz_mat_elementary_divisors): "
-                        "nmod_mat_nullspace basis does not have the "
-                        "expected free-variable structure "
-                        "(see src/nmod_mat/nullspace.c).\n");
+                        "nmod_mat_left_nullspace basis does not have the "
+                        "expected free-variable structure.\n");
             }
 
             /* Compute all linear combinations using the original R */
