@@ -22,9 +22,12 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
     if (len > 1)
     {
         ulong k;
+        nn_ptr tmp;
+        TMP_INIT;
 
         /* fill tmp with tmp[k] = vec[0] * ... * vec[k] */
-        nn_ptr tmp = _nmod_vec_init(len);
+        TMP_START;
+        tmp = TMP_ALLOC(len * sizeof(ulong));
         tmp[0] = vec[0];
         for (k = 1; k < len; k++)
             tmp[k] = nmod_mul(vec[k], tmp[k-1], mod);
@@ -46,7 +49,7 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
             inv = nmod_mul(inv, v, mod);
         }
         res[0] = inv;
-        _nmod_vec_clear(tmp);
+        TMP_END;
     }
     else if (len == 1)
     {
@@ -67,7 +70,11 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
          * temporary rem = precomp rem for mul by vec[k]
          */
         ulong rem;
-        nn_ptr tmp = _nmod_vec_init(3*len);
+        nn_ptr tmp;
+        TMP_INIT;
+
+        TMP_START;
+        tmp = TMP_ALLOC(3 * len * sizeof(ulong));
 
         tmp[0] = n_mulmod_precomp_shoup(vec[0], mod.n);
         tmp[1] = vec[0];
@@ -94,7 +101,7 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
             inv = n_mulmod_shoup(v, inv, tmp[3*k], mod.n);
         }
         res[0] = inv;
-        _nmod_vec_clear(tmp);
+        TMP_END;
     }
     else if (len == 1)
     {
