@@ -21,7 +21,7 @@ TEST_FUNCTION_START(fmpz_mpoly_set_gen_fmpz_poly, state)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t F, G, x, t;
-        fmpz_poly_t f;
+        fmpz_poly_t f, f_out;
         slong nvars, i, j;
 
         fmpz_poly_init(f);
@@ -58,6 +58,14 @@ TEST_FUNCTION_START(fmpz_mpoly_set_gen_fmpz_poly, state)
                 flint_abort();
             }
 
+            fmpz_poly_init(f_out);
+            if (!fmpz_mpoly_get_fmpz_poly(f_out, F, i, ctx) || !fmpz_poly_equal(f_out, f))
+            {
+                flint_printf("FAIL: roundtrip get_fmpz_poly failed\n");
+                flint_abort();
+            }
+            fmpz_poly_clear(f_out);
+
             fmpz_mpoly_clear(F, ctx);
             fmpz_mpoly_clear(G, ctx);
             fmpz_mpoly_clear(x, ctx);
@@ -66,6 +74,40 @@ TEST_FUNCTION_START(fmpz_mpoly_set_gen_fmpz_poly, state)
 
         fmpz_poly_clear(f);
         fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        const char * vars[] = {"x", "y"};
+        fmpz_mpoly_ctx_t ctx2;
+        fmpz_mpoly_t B;
+        fmpz_poly_t A;
+        fmpz_mpoly_ctx_init(ctx2, 2, ORD_LEX);
+        fmpz_mpoly_init(B, ctx2);
+        fmpz_poly_init(A);
+
+        fmpz_mpoly_set_str_pretty(B, "x*y", vars, ctx2);
+        if (fmpz_mpoly_get_fmpz_poly(A, B, 0, ctx2) != 0 ||
+            fmpz_mpoly_get_fmpz_poly(A, B, 1, ctx2) != 0)
+        {
+            flint_printf("FAIL: fmpz_mpoly_get_fmpz_poly returned 1 on non-univariate x*y\n");
+            flint_abort();
+        }
+
+        fmpz_mpoly_set_str_pretty(B, "x^2 + 3*x + 1", vars, ctx2);
+        if (fmpz_mpoly_get_fmpz_poly(A, B, 0, ctx2) != 1)
+        {
+            flint_printf("FAIL: fmpz_mpoly_get_fmpz_poly returned 0 on univariate x^2 + 3*x + 1\n");
+            flint_abort();
+        }
+        if (fmpz_mpoly_get_fmpz_poly(A, B, 1, ctx2) != 0)
+        {
+            flint_printf("FAIL: fmpz_mpoly_get_fmpz_poly returned 1 for var y on x^2 + 3*x + 1\n");
+            flint_abort();
+        }
+
+        fmpz_poly_clear(A);
+        fmpz_mpoly_clear(B, ctx2);
+        fmpz_mpoly_ctx_clear(ctx2);
     }
 
     TEST_FUNCTION_END(state);
