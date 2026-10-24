@@ -182,12 +182,15 @@ next_alphabetas:
             nmod_mpoly_one(lc_divs->coeffs + i, ctx);
     }
 
+    /* Unlucky evaluations can give incompatible leading coefficient divisors. */
     success = nmod_mpoly_divides(m, lcA, lc_divs->coeffs + 0, ctx);
-    FLINT_ASSERT(success);
+    if (!success)
+        goto next_alphabetas;
     for (i = 1; i < r; i++)
     {
         success = nmod_mpoly_divides(m, m, lc_divs->coeffs + i, ctx);
-        FLINT_ASSERT(success);
+        if (!success)
+            goto next_alphabetas;
     }
 
     nmod_mpoly_pow_ui(mpow, m, r - 1, ctx);
