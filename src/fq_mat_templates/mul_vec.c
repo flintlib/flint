@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -18,23 +19,11 @@ void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) * c,
                                     const TEMPLATE(T, struct) * b, slong blen,
                                     const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, j;
-    slong len = FLINT_MIN(A->c, blen);
-    TEMPLATE(T, t) t;
+    slong i;
+    slong len = FLINT_MAX(FLINT_MIN(A->c, blen), 0);
 
-    TEMPLATE(T, init)(t, ctx);
-
-    for (i = A->r - 1; i >= 0; i--)
-    {
-        TEMPLATE(T, zero)(c + i, ctx);
-        for (j = 0; j < len; j++)
-        {
-            TEMPLATE(T, mul)(t, TEMPLATE(T, mat_entry)(A, i, j), b + j, ctx);
-            TEMPLATE(T, add)(c + i, c + i, t, ctx);
-        }
-    }
-
-    TEMPLATE(T, clear)(t, ctx);
+    for (i = 0; i < A->r; i++)
+        _TEMPLATE(T, vec_dot)(c + i, TEMPLATE(T, mat_entry)(A, i, 0), b, len, ctx);
 }
 
 void TEMPLATE(T, mat_mul_vec_ptr)(TEMPLATE(T, struct) * const * c,
@@ -42,23 +31,23 @@ void TEMPLATE(T, mat_mul_vec_ptr)(TEMPLATE(T, struct) * const * c,
                             const TEMPLATE(T, struct) * const * b, slong blen,
                             const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, j;
-    slong len = FLINT_MIN(A->c, blen);
-    TEMPLATE(T, t) t;
+    slong i;
+    slong len = FLINT_MAX(FLINT_MIN(A->c, blen), 0);
+    TEMPLATE(T, struct) * bb;
+    TMP_INIT;
 
-    TEMPLATE(T, init)(t, ctx);
+    TMP_START;
 
-    for (i = A->r - 1; i >= 0; i--)
-    {
-        TEMPLATE(T, zero)(c[i], ctx);
-        for (j = 0; j < len; j++)
-        {
-            TEMPLATE(T, mul)(t, TEMPLATE(T, mat_entry)(A, i, j), b[j], ctx);
-            TEMPLATE(T, add)(c[i], c[i], t, ctx);
-        }
-    }
+    bb = TMP_ARRAY_ALLOC(len, TEMPLATE(T, struct));
 
-    TEMPLATE(T, clear)(t, ctx);
+    /* shallow copies */
+    for (i = 0; i < len; i++)
+        bb[i] = *b[i];
+
+    for (i = 0; i < A->r; i++)
+        _TEMPLATE(T, vec_dot)(c[i], TEMPLATE(T, mat_entry)(A, i, 0), bb, len, ctx);
+
+    TMP_END;
 }
 
 #endif
