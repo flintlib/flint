@@ -15,6 +15,7 @@
 #include "arf.h"
 #include "gr_vec.h"
 #include "gr_special.h"
+#include "mpn_extras.h"
 #include "nfloat.h"
 
 TEST_FUNCTION_START(nfixed_mat_mul, state)
@@ -23,15 +24,21 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
     nn_ptr A, B, C, D, t;
     nn_ptr a;
 
-    slong MAXN = 20;
+    slong MAXN;
     slong MINLIMBS = 2;
     slong MAXLIMBS = 12;
+    int worst;
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
+        /* occasionally large enough for Strassen */
+        MAXN = (n_randint(state, 10) == 0) ? 64 : 20;
         m = 1 + n_randint(state, MAXN);
         n = 1 + n_randint(state, MAXN);
         p = 1 + n_randint(state, MAXN);
+
+        /* worst case: maximal entries with equal signs */
+        worst = n_randint(state, 4) == 0;
 
         nlimbs = MINLIMBS + n_randint(state, MAXLIMBS - MINLIMBS + 1);
 
@@ -61,16 +68,20 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         for (i = 0; i < m * n; i++)
         {
             a = A + i * (nlimbs + 1);
-            a[0] = n_randint(state, 2);
+            a[0] = worst ? 0 : n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
+            if (worst)
+                flint_mpn_store(a + 1, nlimbs, ~UWORD(0));
             a[nlimbs] >>= top;
         }
 
         for (i = 0; i < n * p; i++)
         {
             a = B + i * (nlimbs + 1);
-            a[0] = n_randint(state, 2);
+            a[0] = worst ? 0 : n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
+            if (worst)
+                flint_mpn_store(a + 1, nlimbs, ~UWORD(0));
             a[nlimbs] >>= top;
         }
 
@@ -90,9 +101,14 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
 
         for (i = 0; i < m * p; i++)
         {
+            /* The difference is computed modulo 1, so also check that the
+               signs agree unless both values are tiny (a result off by
+               exactly 1 would otherwise go unnoticed). */
             nfixed_sub(t, C + i * (nlimbs + 1), D + i * (nlimbs + 1), nlimbs);
 
-            if (!flint_mpn_zero_p(t + 2, nlimbs - 1) || t[1] > maxerr)
+            if (!flint_mpn_zero_p(t + 2, nlimbs - 1) || t[1] > maxerr ||
+                ((C + i * (nlimbs + 1))[0] != (D + i * (nlimbs + 1))[0] &&
+                    ((C + i * (nlimbs + 1))[nlimbs] != 0 || (D + i * (nlimbs + 1))[nlimbs] != 0)))
             {
                 TEST_FUNCTION_FAIL("nlimbs = %wd, m = %wd, n = %wd, p = %wd\n\nt = %{ulong*}, maxerr = %wu\n\nA = %{ulong*}\n\nB = %{ulong*}\n\nC = %{ulong*}\n\nD = %{ulong*}\n\n",
                     nlimbs, m, n, p,

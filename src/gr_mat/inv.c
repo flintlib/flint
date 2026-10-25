@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 int
-gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_inv_generic(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     gr_mat_t T;
     int status = GR_SUCCESS;
@@ -36,4 +36,10 @@ gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     gr_mat_clear(T, ctx);
 
     return status;
+}
+
+int
+gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return GR_MAT_UNARY_OP(ctx, MAT_INV)(res, mat, ctx);
 }

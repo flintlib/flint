@@ -266,20 +266,27 @@ void nfixed_div2(nn_ptr res, nn_srcptr a, slong nlimbs)
     mpn_rshift(res + 1, a + 1, nlimbs, 1);
 }
 
+/*
+    The dot products _nfixed_dot_2, _nfixed_dot_3 and _nfixed_dot_4
+    accumulate in two's complement, with one spare limb above the top
+    accumulator, so that any result in (-1, 1) (the full range of nfixed
+    numbers) is decoded correctly. In particular, a result in [1/2, 1)
+    must not be mistaken for a negative number.
+*/
+
 void _nfixed_dot_2(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len)
 {
     slong j;
 
-    ulong as, bs, a0, a1, b0, b1, s0, s1, t0, t1, u0, u1, hi, lo;
+    ulong as, bs, a0, a1, b0, b1, s0, s1, s2, t0, t1, hi, lo;
 
-    s0 = s1 = t0 = t1 = u0 = u1 = 0;
+    s0 = s1 = s2 = t0 = t1 = 0;
 
         /*
-                    s0    s1
+                    s0    s1    (s2 = spare limb)
                   |a1 b1----|
-                    u0    u1
-            |a1 b0----|
                     t0    t1
+            |a1 b0----|
             |a0 b1----|
         */
 
@@ -295,28 +302,29 @@ void _nfixed_dot_2(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         if (as == bs)
         {
             umul_ppmm(hi, lo, a1, b1);
-            add_ssaaaa(s1, s0, s1, s0, hi, lo);
+            add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, hi, lo);
             umul_ppmm(hi, lo, a0, b1);
             add_ssaaaa(t1, t0, t1, t0, 0, hi);
             umul_ppmm(hi, lo, a1, b0);
-            add_ssaaaa(u1, u0, u1, u0, 0, hi);
+            add_ssaaaa(t1, t0, t1, t0, 0, hi);
         }
         else
         {
             umul_ppmm(hi, lo, a1, b1);
-            sub_ddmmss(s1, s0, s1, s0, hi, lo);
+            sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, hi, lo);
             umul_ppmm(hi, lo, a0, b1);
             sub_ddmmss(t1, t0, t1, t0, 0, hi);
             umul_ppmm(hi, lo, a1, b0);
-            sub_ddmmss(u1, u0, u1, u0, 0, hi);
+            sub_ddmmss(t1, t0, t1, t0, 0, hi);
         }
     }
 
-    add_ssaaaa(s1, s0, s1, s0, t1, t0);
-    add_ssaaaa(s1, s0, s1, s0, u1, u0);
+    /* t is signed */
+    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, FLINT_SIGN_EXT(t1), t1, t0);
 
-    if ((slong) s1 < WORD(0))
+    if ((slong) s2 < WORD(0))
     {
+        /* the magnitude is less than 1, so it fits in s1, s0 */
         sub_ddmmss(s1, s0, 0, 0, s1, s0);
         res[0] = 1;
     }
@@ -333,11 +341,11 @@ void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
 {
     slong j;
 
-    ulong as, bs, a0, a1, a2, b0, b1, b2, s0, s1, s2, hi, lo;
-    ulong u0, u1, v0, v1;
+    ulong as, bs, a0, a1, a2, b0, b1, b2, s0, s1, s2, s3, hi, lo;
+    ulong u0, u1;
 
-    s0 = s1 = s2 = 0;
-    u0 = u1 = v0 = v1 = 0;
+    s0 = s1 = s2 = s3 = 0;
+    u0 = u1 = 0;
 
     for (j = 0; j < len; j++)
     {
@@ -351,12 +359,12 @@ void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         b2 = y[j * ystride + 3];
 
         /*
-                      |a2 b2----|
+                      |a2 b2----|        s, at limbs 0, 1, 2 (s3 = spare limb)
 
                 |a1 b2----|
                 |a2 b1----|
 
-           |a0 b2----|
+           |a0 b2----|                   u, at limb 0
            |a1 b1----|
            |a2 b0----|
         */
@@ -371,12 +379,12 @@ void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
             add_ssaaaa(u1, u0, u1, u0, 0, hi);
 
             umul_ppmm(hi, lo, a2, b2);
-            add_ssaaaa(s2, s1, s2, s1, hi, lo);
+            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, 0, hi, lo);
 
             umul_ppmm(hi, lo, a1, b2);
-            add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, hi, lo);
+            add_ssssaaaaaaaa(s3, s2, s1, s0, s3, s2, s1, s0, 0, 0, hi, lo);
             umul_ppmm(hi, lo, a2, b1);
-            add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, hi, lo);
+            add_ssssaaaaaaaa(s3, s2, s1, s0, s3, s2, s1, s0, 0, 0, hi, lo);
         }
         else
         {
@@ -388,27 +396,21 @@ void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
             sub_ddmmss(u1, u0, u1, u0, 0, hi);
 
             umul_ppmm(hi, lo, a2, b2);
-            sub_ddmmss(s2, s1, s2, s1, hi, lo);
+            sub_dddmmmsss(s3, s2, s1, s3, s2, s1, 0, hi, lo);
 
             umul_ppmm(hi, lo, a1, b2);
-            sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, hi, lo);
+            sub_ddddmmmmssss(s3, s2, s1, s0, s3, s2, s1, s0, 0, 0, hi, lo);
             umul_ppmm(hi, lo, a2, b1);
-            sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, hi, lo);
+            sub_ddddmmmmssss(s3, s2, s1, s0, s3, s2, s1, s0, 0, 0, hi, lo);
         }
     }
 
-    if ((slong) u1 < WORD(0))
-    {
-        sub_ddmmss(u1, u0, 0, 0, u1, u0);
-        sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, u1, u0);
-    }
-    else
-    {
-        add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, u1, u0);
-    }
+    /* u is signed */
+    add_ssssaaaaaaaa(s3, s2, s1, s0, s3, s2, s1, s0, FLINT_SIGN_EXT(u1), FLINT_SIGN_EXT(u1), u1, u0);
 
-    if ((slong) s2 < WORD(0))
+    if ((slong) s3 < WORD(0))
     {
+        /* the magnitude is less than 1, so it fits in s2, s1, s0 */
         sub_dddmmmsss(s2, s1, s0, 0, 0, 0, s2, s1, s0);
         res[0] = 1;
     }
@@ -416,7 +418,6 @@ void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
     {
         res[0] = 0;
     }
-
 
     res[1] = s0;
     res[2] = s1;
@@ -428,7 +429,7 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
     slong j;
 
     /*
-                 s1     s2    s3
+                 s1     s2    s3    (s4 = spare limb)
                       |a3 b3----|
 
                 |a2 b3----|
@@ -451,10 +452,10 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
 
     ulong as, a0, a1, a2, a3;
     ulong bs, b0, b1, b2, b3;
-    ulong s0, s1, s2, s3, t0, t1, t2, u0, u1;
+    ulong s0, s1, s2, s3, s4, t0, t1, t2, u0, u1;
     ulong hi, lo;
 
-    s0 = s1 = s2 = s3 = t0 = t1 = t2 = u0 = u1 = 0;
+    s0 = s1 = s2 = s3 = s4 = t0 = t1 = t2 = u0 = u1 = 0;
 
     for (j = 0; j < len; j++)
     {
@@ -473,12 +474,12 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         if (as == bs)
         {
             umul_ppmm(hi, lo, a3, b3);
-            add_ssaaaa(s3, s2, s3, s2, hi, lo);
+            add_sssaaaaaa(s4, s3, s2, s4, s3, s2, 0, hi, lo);
 
             umul_ppmm(hi, lo, a2, b3);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, 0, hi, lo);
+            add_ssssaaaaaaaa(s4, s3, s2, s1, s4, s3, s2, s1, 0, 0, hi, lo);
             umul_ppmm(hi, lo, a3, b2);
-            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, 0, hi, lo);
+            add_ssssaaaaaaaa(s4, s3, s2, s1, s4, s3, s2, s1, 0, 0, hi, lo);
 
             umul_ppmm(hi, lo, a1, b3);
             add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, hi, lo);
@@ -499,12 +500,12 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         else
         {
             umul_ppmm(hi, lo, a3, b3);
-            sub_ddmmss(s3, s2, s3, s2, hi, lo);
+            sub_dddmmmsss(s4, s3, s2, s4, s3, s2, 0, hi, lo);
 
             umul_ppmm(hi, lo, a2, b3);
-            sub_dddmmmsss(s3, s2, s1, s3, s2, s1, 0, hi, lo);
+            sub_ddddmmmmssss(s4, s3, s2, s1, s4, s3, s2, s1, 0, 0, hi, lo);
             umul_ppmm(hi, lo, a3, b2);
-            sub_dddmmmsss(s3, s2, s1, s3, s2, s1, 0, hi, lo);
+            sub_ddddmmmmssss(s4, s3, s2, s1, s4, s3, s2, s1, 0, 0, hi, lo);
 
             umul_ppmm(hi, lo, a1, b3);
             sub_dddmmmsss(t2, t1, t0, t2, t1, t0, 0, hi, lo);
@@ -524,28 +525,13 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         }
     }
 
-    if ((slong) u1 < WORD(0))
-    {
-        sub_ddmmss(u1, u0, 0, 0, u1, u0);
-        sub_dddmmmsss(t2, t1, s0, t2, t1, s0, 0, u1, u0);
-    }
-    else
-    {
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, u1, u0);
-    }
+    /* t and u are signed */
+    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, FLINT_SIGN_EXT(u1), u1, u0);
+    add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, s4, s3, s2, s1, s0, FLINT_SIGN_EXT(t2), FLINT_SIGN_EXT(t2), t2, t1, t0);
 
-    if ((slong) t2 < WORD(0))
+    if ((slong) s4 < WORD(0))
     {
-        sub_dddmmmsss(t2, t1, t0, 0, 0, 0, t2, t1, t0);
-        sub_ddddmmmmssss(s3, s2, s1, s0, s3, s2, s1, s0, 0, t2, t1, t0);
-    }
-    else
-    {
-        add_ssssaaaaaaaa(s3, s2, s1, s0, s3, s2, s1, s0, 0, t2, t1, t0);
-    }
-
-    if ((slong) s3 < WORD(0))
-    {
+        /* the magnitude is less than 1, so it fits in s3, ..., s0 */
         sub_ddddmmmmssss(s3, s2, s1, s0, 0, 0, 0, 0, s3, s2, s1, s0);
         res[0] = 1;
     }
@@ -1511,7 +1497,7 @@ _nfixed_mat_mul_bound_strassen(double * bound, double * error, slong m, slong n,
     d = FLINT_MIN(d, p);
 
     if (cutoff < 0)
-        cutoff = nfixed_mat_mul_strassen_cutoff(d, n, nlimbs);
+        cutoff = nfixed_mat_mul_strassen_cutoff(d, n & 1, nlimbs);
     else
         cutoff = FLINT_MAX(cutoff, 2);
 

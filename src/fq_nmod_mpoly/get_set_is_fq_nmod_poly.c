@@ -50,6 +50,12 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
         goto cleanup;
     }
 
+    if (!fq_nmod_mpoly_is_fq_nmod_poly(B, var, ctx))
+    {
+        success = 0;
+        goto cleanup;
+    }
+
     if (Bbits <= FLINT_BITS)
     {
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - Bbits);

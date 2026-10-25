@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "fq_zech.h"
 #include "fq_zech_vec.h"
+#include "gr_vec.h"
 
 #ifdef T
 #undef T
@@ -22,7 +23,6 @@
 
 #include "fq_vec_templates/add.c"
 #include "fq_vec_templates/clear.c"
-#include "fq_vec_templates/dot.c"
 #include "fq_vec_templates/equal.c"
 #include "fq_vec_templates/init.c"
 #include "fq_vec_templates/io.c"
@@ -42,3 +42,11 @@
 
 #undef CAP_T
 #undef T
+
+void _fq_zech_vec_dot(fq_zech_t res, const fq_zech_struct * vec1,
+         const fq_zech_struct * vec2, slong len2, const fq_zech_ctx_t ctx)
+{
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fq_zech_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_vec_dot(res, NULL, 0, vec1, vec2, len2, gr_ctx));
+}

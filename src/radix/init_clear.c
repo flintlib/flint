@@ -227,6 +227,22 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
     for (i = 0; i <= exp; i++)
         n_div_precomp_init(radix->bpow_div + i, radix->bpow[i]);
 
+    /* division by exp (see radix_div_exp) */
+    n_div_precomp_init(&radix->exp_div, exp);
+    if (exp > 2)
+    {
+        unsigned int l = FLINT_BIT_COUNT(exp - 1);     /* ceil(log2(exp)) */
+        ulong q, r;
+        udiv_qrnnd(q, r, UWORD(1) << (l - 2), 0, (ulong) exp);   /* 2^(62 + l) / exp */
+        radix->exp_inv = q + (r != 0);
+        radix->exp_shift = l - 2;
+    }
+    else
+    {
+        radix->exp_inv = 0;
+        radix->exp_shift = 0;
+    }
+
     {
         int prevbc = 0;
         for (i = 0; i <= exp; i++)

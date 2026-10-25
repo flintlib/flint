@@ -64,6 +64,47 @@ TEST_FUNCTION_START(arb_hypgeom_bessel_k_integration, state)
             }
         }
 
+        if (iter == 0)
+        {
+            prec1 = 96;
+
+            arb_zero(a);
+            arb_set_str(z, "37.5", prec1);
+            arb_set_str(r2, "1.05577742607775512948222738569e-17 +/- 1e-46", prec1);
+
+            arb_hypgeom_bessel_k_integration(r1, a, z, 0, prec1);
+
+            if (!arb_overlaps(r1, r2) || arb_rel_accuracy_bits(r1) < prec1 - 20)
+            {
+                flint_printf("FAIL: K_0 (1)\n\n");
+                flint_printf("r1 = "); arb_printd(r1, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            arb_hypgeom_bessel_k(r1, a, z, prec1);
+
+            if (!arb_overlaps(r1, r2) || arb_rel_accuracy_bits(r1) < prec1 - 20)
+            {
+                flint_printf("FAIL: K_0 (2)\n\n");
+                flint_printf("r1 = "); arb_printd(r1, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            arb_set_d(a, -0.25);
+            arb_set_ui(z, 20);
+
+            arb_hypgeom_bessel_k_integration(r1, a, z, 1, prec1);
+            arb_hypgeom_bessel_k_scaled(r2, a, z, 4 * prec1);
+
+            if (!arb_overlaps(r1, r2) || arb_rel_accuracy_bits(r1) < prec1 - 20)
+            {
+                flint_printf("FAIL: K_{-1/4} scaled\n\n");
+                flint_printf("r1 = "); arb_printd(r1, 30); flint_printf("\n\n");
+                flint_printf("r2 = "); arb_printd(r2, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
         arb_clear(a);
         arb_clear(z);
         arb_clear(r1);

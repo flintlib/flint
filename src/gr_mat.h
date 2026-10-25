@@ -265,6 +265,7 @@ WARN_UNUSED_RESULT int gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_
 
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_generic(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_fflu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
@@ -284,6 +285,7 @@ WARN_UNUSED_RESULT int gr_mat_det_generic_integral_domain(gr_ptr res, const gr_m
 WARN_UNUSED_RESULT int gr_mat_det_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_det(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_inv_generic(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_adjugate_charpoly(gr_mat_t adj, gr_ptr det, const gr_mat_t A, gr_ctx_t ctx);

@@ -140,6 +140,13 @@ truncation is recorded in the error term. An exact result that fits
 within this precision is kept exact, so that, with both precisions
 infinite, the arithmetic is exact arithmetic in $\Z[1/p]$.
 
+Applying these rules operation by operation always gives valid error
+terms, but not always the smallest ones: the guaranteed precision of a
+result depends on the algorithm. For sums of products and block
+products, see [](algorithms/p-adic/block-products); for linear algebra,
+where full pivoting on valuations and the differential of the function
+give the optimal precision, see [](algorithms/p-adic/linear-algebra).
+
 Predicates follow the conventions of the generic rings: `padic_radix_equal`
 returns `T_FALSE` if the balls are disjoint, `T_TRUE` only if both
 elements are exact and equal, and `T_UNKNOWN` otherwise; division by an
@@ -155,4 +162,6 @@ element that may be zero returns `GR_UNABLE`.
   [](#prop-ring) for negative valuations but do not apply it.
 - `padic_radix_add`, `padic_radix_mul`, `padic_radix_div`,
   `padic_radix_inv`, `padic_radix_sqrt`, `padic_radix_exp` and
-  `padic_radix_log` apply the rules above to their error terms.
+  `padic_radix_log` apply the rules above to their error terms;
+  `padic_radix_dot` applies them to whole sums of products
+  ([](algorithms/p-adic/block-products#dot)).

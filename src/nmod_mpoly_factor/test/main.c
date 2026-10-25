@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-factor.c"
+#include "t-irred_smprime.c"
 #include "t-factor_content.c"
 #include "t-factor_squarefree.c"
 #include "t-factor_wang.c"
@@ -24,6 +25,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(nmod_mpoly_factor_irred_smprime),
     TEST_FUNCTION(nmod_mpoly_factor),
     TEST_FUNCTION(nmod_mpoly_factor_content),
     TEST_FUNCTION(nmod_mpoly_factor_squarefree),

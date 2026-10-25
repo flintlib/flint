@@ -13,6 +13,7 @@
 
 #include "t-add.c"
 #include "t-digit_size.c"
+#include "t-div_exp.c"
 #include "t-div_approx.c"
 #include "t-divmod_bn.c"
 #include "t-divmod_bn_1.c"
@@ -48,6 +49,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(radix_add),
     TEST_FUNCTION(radix_digit_size),
+    TEST_FUNCTION(radix_div_exp),
     TEST_FUNCTION(radix_div_approx),
     TEST_FUNCTION(radix_divrem),
     TEST_FUNCTION(radix_divrem_1),

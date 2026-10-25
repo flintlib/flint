@@ -113,7 +113,7 @@ define(X86_PATTERN,
 [[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
 
 define(X86_64_PATTERN,
-[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar-*-* | bulldozer-*-* | piledriver-*-* | steamroller-*-* | excavator-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | x86_64v[1234]-*-* | nano-*-* | nehalem-*-* | westmere-*-* | sandybridge-*-* | ivybridge-*-* | haswell-*-* | zen-*-* | zen[2345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | arrowlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
+[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar-*-* | bulldozer-*-* | bd[234]-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | x86_64v[1234]-*-* | nano-*-* | nehalem-*-* | westmere-*-* | sandybridge-*-* | ivybridge-*-* | haswell-*-* | zen-*-* | zen[2345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | arrowlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
 
 define(X86_64_ADX_PATTERN,
 [[zen-*-* | zen[2345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | arrowlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
