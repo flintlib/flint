@@ -30,7 +30,9 @@ reasonable cost:
 
 The first tutorials introduce the basic techniques with constants and
 simple iterations; the later ones apply them to roots, integrals and the
-Riemann zeta function. Two of them develop a complete rigorous
+Riemann zeta function. The last one, [](tutorials/numerics/padic-interpolation),
+transfers the theme to $p$-adic numbers, whose balls $x + O(p^N)$ raise
+the same question of how much precision an algorithm can guarantee. Two of them develop a complete rigorous
 computation from scratch: [](tutorials/numerics/series) and
 [](tutorials/numerics/interval-newton).
 

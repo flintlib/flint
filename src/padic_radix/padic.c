@@ -10,6 +10,8 @@
 */
 
 #include "padic_radix.h"
+#include "impl.h"
+#include "longlong.h"
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_mat.h"
@@ -28,10 +30,9 @@
 static int
 _radix_integer_fits_digits(const radix_integer_t x, slong k, const radix_t radix)
 {
-    slong e = radix->exp;
     slong un = FLINT_ABS(x->size);
-    slong limbs = k / e;
-    slong rem = k - limbs * e;
+    slong limbs = radix_div_exp(k, radix);
+    slong rem = k - limbs * (slong) radix->exp;
 
     if (rem == 0)
         return un <= limbs;
@@ -40,6 +41,38 @@ _radix_integer_fits_digits(const radix_integer_t x, slong k, const radix_t radix
     if (un == limbs + 1)
         return x->d[limbs] < radix->bpow[rem];
     return 0;
+}
+
+/* x := x mod p^k (nonnegative residue) in place, k >= 1 */
+static inline void
+_radix_integer_mod_digits_inplace(radix_integer_t x, slong k, const radix_t radix)
+{
+    slong n = x->size, limbs, rem;
+
+    if (n < 0)
+    {
+        radix_integer_mod_digits(x, x, k, radix);
+        return;
+    }
+
+    limbs = radix_div_exp(k, radix);
+    if (n <= limbs)
+        return;
+
+    rem = k - limbs * (slong) radix->exp;
+    if (rem == 0)
+    {
+        n = limbs;
+    }
+    else
+    {
+        n = limbs + 1;
+        x->d[limbs] = n_rem_precomp(x->d[limbs], radix->bpow[rem], radix->bpow_div + rem);
+    }
+
+    while (n > 0 && x->d[n - 1] == 0)
+        n--;
+    x->size = n;
 }
 
 /*
@@ -229,7 +262,18 @@ _padic_radix_canonicalise(padic_radix_t x, gr_ctx_t ctx)
 
     if (w != 0)
     {
-        radix_integer_rshift_digits(&x->u, &x->u, w, radix);
+    {
+        slong nl = radix_div_exp(w, radix), nd = w - nl * radix->exp, n;
+        if (nl != 0)
+            radix_integer_rshift_limbs(&x->u, &x->u, nl, radix);
+        n = FLINT_ABS(x->u.size);
+        if (nd != 0 && n != 0)
+        {
+            radix_rshift_digits(x->u.d, x->u.d, n, nd, radix);
+            n -= (x->u.d[n - 1] == 0);
+            x->u.size = (x->u.size > 0) ? n : -n;
+        }
+    }
         x->v += w;
     }
 }
@@ -287,6 +331,9 @@ _padic_radix_reduce(padic_radix_t x, gr_ctx_t ctx)
     if (Neff == PADIC_RADIX_PREC_INF)
         return;   /* stays exact */
 
+    if (target == PADIC_RADIX_PREC_INF)
+        Neff = _padic_radix_cap_prec(Neff, x->v, ctx);
+
     r = Neff - x->v;
 
     if (r <= 0)
@@ -302,7 +349,7 @@ _padic_radix_reduce(padic_radix_t x, gr_ctx_t ctx)
         return;
 
     /* otherwise the result is inexact: store the nonnegative residue */
-    radix_integer_mod_digits(&x->u, &x->u, r, radix);
+    _radix_integer_mod_digits_inplace(&x->u, r, radix);
     if (x->u.size == 0)
         x->v = 0;
     x->N = FLINT_MIN(Neff, PADIC_RADIX_ERR_MAX);
@@ -328,6 +375,108 @@ _padic_radix_finish(padic_radix_t res, gr_ctx_t ctx)
 
     _padic_radix_reduce(res, ctx);
     return GR_SUCCESS;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/*    Low-level helpers                                                      */
+/* ------------------------------------------------------------------------- */
+
+static inline ulong
+_padic_radix_divrem2(ulong * r, ulong hi, ulong lo, nmod_t B)
+{
+    ulong q, rr;
+    if (B.norm == 0)
+    {
+        udiv_qrnnd_preinv(q, rr, hi, lo, B.n, B.ninv);
+        *r = rr;
+    }
+    else
+    {
+        udiv_qrnnd_preinv(q, rr, (hi << B.norm) | (lo >> (FLINT_BITS - B.norm)),
+                          lo << B.norm, B.n << B.norm, B.ninv);
+        *r = rr >> B.norm;
+    }
+    return q;
+}
+
+/* rd[0, n) = (x0 + x1 B)(y0 + y1 B) mod B^n, n in {1, 2}; normalised length */
+static inline slong
+_padic_radix_mullow_12(nn_ptr rd, ulong x0, ulong x1, ulong y0, ulong y1, slong n, nmod_t B)
+{
+    ulong hi, lo, r0, r1, q, t2, t1, t0;
+
+    umul_ppmm(hi, lo, x0, y0);
+
+    if (B.n == UWORD(1) << (FLINT_BITS - 1))
+    {
+        ulong M = B.n - 1;
+        r0 = lo & M;
+        rd[0] = r0;
+        if (n == 1)
+            return (r0 != 0);
+        q = (hi << 1) | (lo >> (FLINT_BITS - 1));
+        r1 = (q + x0 * y1 + x1 * y0) & M;
+        rd[1] = r1;
+        return (r1 != 0) ? 2 : (r0 != 0);
+    }
+
+    if (n == 1)
+    {
+        NMOD_RED2(r0, hi, lo, B);
+        rd[0] = r0;
+        return (r0 != 0);
+    }
+
+    q = _padic_radix_divrem2(&r0, hi, lo, B);
+    t2 = 0; t1 = 0; t0 = q;
+    umul_ppmm(hi, lo, x0, y1);
+    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, hi, lo);
+    umul_ppmm(hi, lo, x1, y0);
+    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, hi, lo);
+    NMOD_RED3(r1, t2, t1, t0, B);
+
+    rd[0] = r0;
+    rd[1] = r1;
+    return (r1 != 0) ? 2 : (r0 != 0);
+}
+
+/* res->u = sign * (|x| |y| mod B^n), any aliasing */
+static inline void
+_padic_radix_unit_mullow(padic_radix_t res, const padic_radix_t x, const padic_radix_t y,
+    slong n, const radix_struct * radix)
+{
+    slong xs = x->u.size, ys = y->u.size;
+    slong xn = FLINT_ABS(xs), yn = FLINT_ABS(ys), rn;
+
+    if (n <= 2)
+    {
+        ulong x0 = x->u.d[0], y0 = y->u.d[0];
+        ulong x1 = (xn > 1) ? x->u.d[1] : 0, y1 = (yn > 1) ? y->u.d[1] : 0;
+        nn_ptr rd = radix_integer_fit_limbs(&res->u, 2, radix);
+        rn = _padic_radix_mullow_12(rd, x0, x1, y0, y1, n, radix->B);
+        res->u.size = ((xs ^ ys) >= 0) ? rn : -rn;
+    }
+    else
+    {
+        radix_integer_mullow_limbs(&res->u, &x->u, &y->u, n, radix);
+    }
+}
+
+/* whether the nonzero limb L is divisible by p */
+static inline int
+_padic_radix_divisible_p(ulong L, const radix_struct * radix)
+{
+    if (radix->b.n == 2)
+        return !(L & 1);
+    return n_divisible_odd_gm(L, radix->bpow_oddinv[1].a, radix->bpow_oddinv[1].b);
+}
+
+/* digit valuation of a nonzero limb */
+static inline slong
+_padic_radix_val1(ulong L, const radix_struct * radix)
+{
+    return (radix->b.n == 2) ? (slong) flint_ctz(L) : (slong) _radix_valuation_digits_1(L, radix);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -487,24 +636,6 @@ padic_radix_set_fmpz(padic_radix_t res, const fmpz_t c, gr_ctx_t ctx)
 }
 
 int
-padic_radix_set_ui(padic_radix_t res, ulong c, gr_ctx_t ctx)
-{
-    int status = padic_radix_exact_set_ui(res, c, ctx);
-    if (status != GR_SUCCESS)
-        return status;
-    return _padic_radix_finish(res, ctx);
-}
-
-int
-padic_radix_set_si(padic_radix_t res, slong c, gr_ctx_t ctx)
-{
-    int status = padic_radix_exact_set_si(res, c, ctx);
-    if (status != GR_SUCCESS)
-        return status;
-    return _padic_radix_finish(res, ctx);
-}
-
-int
 padic_radix_get_fmpz(fmpz_t res, const padic_radix_t x, gr_ctx_t ctx)
 {
     radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
@@ -521,7 +652,7 @@ padic_radix_get_fmpz(fmpz_t res, const padic_radix_t x, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    if (x->v > ctx->size_limit)
+    if ((ulong) x->v > ctx->size_limit)
         return GR_UNABLE;
 
     radix_integer_get_fmpz(res, &x->u, radix);
@@ -547,7 +678,46 @@ padic_radix_neg(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
 {
     radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
 
+    /* inexact x with a 1-2 limb unit: -x mod p^k as B^L - X truncated to
+       k = N - v digits (the unit's low limb is nonzero: no borrow chain) */
+    if (x->N != PADIC_RADIX_EXACT && x->u.size > 0 && x->u.size <= 2)
+    {
+        slong e = radix->exp, k, L, rem, sz = x->u.size;
+        slong target = _padic_radix_target_prec(x->v, ctx);
+
+        if (x->N <= target && x->N > x->v)
+        {
+            ulong x0 = x->u.d[0], x1 = (sz > 1) ? x->u.d[1] : 0, s0, s1;
+            nn_ptr d;
+
+            k = x->N - x->v;
+            L = radix_div_exp(k + e - 1, radix);
+
+            if (L <= 2 && sz <= L)
+            {
+                s0 = radix->B.n - x0;
+                s1 = (L == 2) ? radix->B.n - 1 - x1 : 0;
+                rem = k - (L - 1) * e;
+                if (rem < e)
+                {
+                    if (L == 1)
+                        s0 = n_rem_precomp(s0, radix->bpow[rem], radix->bpow_div + rem);
+                    else
+                        s1 = n_rem_precomp(s1, radix->bpow[rem], radix->bpow_div + rem);
+                }
+                d = radix_integer_fit_limbs(&res->u, 2, radix);
+                d[0] = s0;
+                d[1] = s1;
+                res->u.size = (s1 != 0) ? 2 : 1;
+                res->v = x->v;
+                res->N = x->N;
+                return GR_SUCCESS;
+            }
+        }
+    }
+
     if (res != x)
+
         padic_radix_set(res, x, ctx);
 
     radix_integer_neg(&res->u, &res->u, radix);
@@ -566,7 +736,7 @@ padic_radix_neg(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         }
         else
         {
-            radix_integer_mod_digits(&res->u, &res->u, r, radix);
+            _radix_integer_mod_digits_inplace(&res->u, r, radix);
             if (res->u.size == 0)
                 res->v = 0;
         }
@@ -581,6 +751,21 @@ padic_radix_neg(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
     division, and addition/subtraction when the operand valuations differ. Skips
     the canonicalisation scan that _padic_radix_finalize performs.
 */
+/*
+    Exponents out of range: the result cannot be represented. GR_UNABLE is
+    returned with res set to 0 + O(p^-ERR_MAX), so that callers which keep
+    computing with the output (e.g. generic loops accumulating the status)
+    never see exponents outside the representable range.
+*/
+static int
+_padic_radix_unable(padic_radix_t res, gr_ctx_t ctx)
+{
+    radix_integer_zero(&res->u, PADIC_RADIX_CTX_RADIX(ctx));
+    res->v = 0;
+    res->N = -PADIC_RADIX_ERR_MAX;
+    return GR_UNABLE;
+}
+
 static int
 _padic_radix_finalize_assume_canonical(padic_radix_t res, gr_ctx_t ctx)
 {
@@ -595,7 +780,7 @@ _padic_radix_finalize_assume_canonical(padic_radix_t res, gr_ctx_t ctx)
     if (res->N != PADIC_RADIX_EXACT)
     {
         if (res->N < -PADIC_RADIX_ERR_MAX)
-            return GR_UNABLE;                       /* precision too low to represent */
+            return _padic_radix_unable(res, ctx);   /* precision too low to represent */
         if (res->N > PADIC_RADIX_ERR_MAX)
             res->N = PADIC_RADIX_ERR_MAX;           /* clamp down: always sound */
     }
@@ -614,7 +799,7 @@ _padic_radix_finalize_assume_canonical(padic_radix_t res, gr_ctx_t ctx)
         }
         else if (res->v < -PADIC_RADIX_ERR_MAX)
         {
-            return GR_UNABLE;                       /* valuation too small to represent */
+            return _padic_radix_unable(res, ctx);   /* valuation too small to represent */
         }
     }
 
@@ -664,7 +849,7 @@ _padic_radix_add_sub_reference(padic_radix_t res, const padic_radix_t x,
     if (Nz == PADIC_RADIX_EXACT)
         P = target;
     else if (target == PADIC_RADIX_PREC_INF)
-        P = Nz;
+        P = _padic_radix_cap_prec(Nz, vmin, ctx);
     else
         P = FLINT_MIN(Nz, target);
 
@@ -749,6 +934,11 @@ _padic_radix_add_sub_reference(padic_radix_t res, const padic_radix_t x,
                 radix_integer_set(&res->u, &y->u, radix);
         }
     }
+    else if (target == PADIC_RADIX_PREC_INF && !_padic_radix_exact_digits_ok(vmax - vmin, ctx))
+    {
+        radix_integer_clear(T, radix);
+        return GR_UNABLE;
+    }
     else if (vx < vy)
     {
         /* T holds the aligned higher-valuation operand; the combination is
@@ -813,7 +1003,7 @@ _padic_radix_add_sub(padic_radix_t res, const padic_radix_t x,
     if (Nz == PADIC_RADIX_EXACT)
         P = target;
     else if (target == PADIC_RADIX_PREC_INF)
-        P = Nz;
+        P = _padic_radix_cap_prec(Nz, vmin, ctx);
     else
         P = FLINT_MIN(Nz, target);
 
@@ -860,6 +1050,17 @@ _padic_radix_add_sub(padic_radix_t res, const padic_radix_t x,
             radix_integer_add(&res->u, &x->u, &y->u, radix);
         res->v = vmin;
         res->N = Nz;
+
+        /* Fast finish: inexact and the lowest digit did not cancel (one
+           multiplicative divisibility test), so v = vmin and Neff = P. */
+        if (Nz != PADIC_RADIX_EXACT && res->u.size != 0
+            && !_padic_radix_divisible_p(res->u.d[0], radix))
+        {
+            _radix_integer_mod_digits_inplace(&res->u, P - vmin, radix);
+            res->N = P;
+            return GR_SUCCESS;
+        }
+
         return _padic_radix_finalize(res, ctx);
     }
 
@@ -890,6 +1091,11 @@ _padic_radix_add_sub(padic_radix_t res, const padic_radix_t x,
         slong d = vmax - vmin;
         int negate = (sub && vx > vy);    /* x - y with y the lower operand */
 
+        /* in a context without finite precision, a sum beyond the size
+           limit of the context */
+        if (target == PADIC_RADIX_PREC_INF && !_padic_radix_exact_digits_ok(d, ctx))
+            return GR_UNABLE;
+
         if (sub)
             radix_integer_sublsh(&res->u, &lo->u, &hi->u, d, radix);
         else
@@ -901,6 +1107,14 @@ _padic_radix_add_sub(padic_radix_t res, const padic_radix_t x,
 
     res->v = vmin;
     res->N = Nresult;
+
+    /* Fast finish: inexact, valuation vmin, so Neff = P. */
+    if (Nresult != PADIC_RADIX_EXACT)
+    {
+        _radix_integer_mod_digits_inplace(&res->u, P - vmin, radix);
+        res->N = P;
+        return GR_SUCCESS;
+    }
 
     /* low digit is the lower-valuation operand's (a unit): already canonical. */
     return _padic_radix_finalize_assume_canonical(res, ctx);
@@ -916,6 +1130,27 @@ int
 padic_radix_sub(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx)
 {
     return _padic_radix_add_sub(res, x, y, 1, ctx);
+}
+
+/*
+    Error term of a product: N = min(v_y + N_x, v_x + N_y), an exact factor
+    contributing nothing. An inexact zero x = 0 + O(p^N_x) lies in p^N_x Z_p,
+    so N_x plays the role of its valuation (the stored v = 0 is meaningless):
+    e.g. (0 + O(p^N_x)) (0 + O(p^N_y)) = 0 + O(p^(N_x + N_y)). Using v = 0
+    would claim min(N_x, N_y), which is too optimistic when both are negative.
+*/
+static inline slong
+_padic_radix_mul_error(const padic_radix_t x, const padic_radix_t y)
+{
+    slong vx = (x->u.size == 0) ? x->N : x->v;
+    slong vy = (y->u.size == 0) ? y->N : y->v;
+    slong Nz = PADIC_RADIX_EXACT;
+
+    if (x->N != PADIC_RADIX_EXACT)
+        Nz = vy + x->N;
+    if (y->N != PADIC_RADIX_EXACT)
+        Nz = FLINT_MIN(Nz, vx + y->N);
+    return Nz;
 }
 
 /*
@@ -939,12 +1174,7 @@ _padic_radix_mul_reference(padic_radix_t res, const padic_radix_t x, const padic
         return padic_radix_zero(res, ctx);
 
     vz = vx + vy;
-
-    Nz = PADIC_RADIX_EXACT;
-    if (Nx != PADIC_RADIX_EXACT)
-        Nz = FLINT_MIN(Nz, vy + Nx);
-    if (Ny != PADIC_RADIX_EXACT)
-        Nz = FLINT_MIN(Nz, vx + Ny);
+    Nz = _padic_radix_mul_error(x, y);
 
     radix_integer_init(U, radix);
     radix_integer_mul(U, &x->u, &y->u, radix);
@@ -955,6 +1185,121 @@ _padic_radix_mul_reference(padic_radix_t res, const padic_radix_t x, const padic
 
     radix_integer_clear(U, radix);
 
+    return _padic_radix_finalize_assume_canonical(res, ctx);
+}
+
+/*
+    Multiplication core, as padic_radix_mul with: the inline 1-2 limb
+    product, a direct finish for inexact products, and (for addmul) an
+    optional cap Kcap: when the product is inexact only its digits below
+    min(Neff, Kcap) are formed (not normalised digit-wise when nomod is set;
+    a placeholder unit 1 if Kcap <= vz); N is always the true Neff.
+*/
+static int
+_padic_radix_mul_capped(padic_radix_t res, const padic_radix_t x, const padic_radix_t y,
+    slong Kcap, int nomod, gr_ctx_t ctx)
+{
+    const radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
+    slong e = radix->exp;
+    slong vx = x->v, vy = y->v, Nx = x->N, Ny = y->N;
+    slong vz, Nz, xn, yn, target;
+
+    if ((x->u.size == 0 && Nx == PADIC_RADIX_EXACT)
+     || (y->u.size == 0 && Ny == PADIC_RADIX_EXACT))
+        return padic_radix_zero(res, ctx);
+
+    vz = vx + vy;
+    Nz = _padic_radix_mul_error(x, y);
+
+    if (x->u.size == 0 || y->u.size == 0)
+    {
+        radix_integer_zero(&res->u, radix);
+        res->v = vz;
+        res->N = Nz;
+        return _padic_radix_finalize_assume_canonical(res, ctx);
+    }
+
+    xn = FLINT_ABS(x->u.size);
+    yn = FLINT_ABS(y->u.size);
+    target = _padic_radix_target_prec(vz, ctx);
+
+    if (Nz == PADIC_RADIX_EXACT)
+    {
+        if (target == PADIC_RADIX_PREC_INF)
+        {
+            if (!_padic_radix_exact_digits_ok((xn + yn) * e, ctx))
+                return GR_UNABLE;
+            radix_integer_mul(&res->u, &x->u, &y->u, radix);
+            res->N = PADIC_RADIX_EXACT;
+        }
+        else
+        {
+            slong digits = target - vz;
+            slong maxD = (xn + yn) * e;
+            slong minD = (xn + yn - 2) * e + 1;
+
+            if (digits <= 0)
+            {
+                radix_integer_zero(&res->u, radix);
+                res->N = target;
+            }
+            else if (maxD <= digits)
+            {
+                radix_integer_mul(&res->u, &x->u, &y->u, radix);
+                res->N = PADIC_RADIX_EXACT;
+            }
+            else if (minD > digits)
+            {
+                _padic_radix_unit_mullow(res, x, y, radix_div_exp(digits + e - 1, radix), radix);
+                res->N = target;
+            }
+            else
+            {
+                radix_integer_mul(&res->u, &x->u, &y->u, radix);
+                res->N = PADIC_RADIX_EXACT;
+            }
+        }
+    }
+    else
+    {
+        slong Neff = (target == PADIC_RADIX_PREC_INF) ? _padic_radix_cap_prec(Nz, vz, ctx) : FLINT_MIN(Nz, target);
+
+        if (Neff - vz <= 0)
+        {
+            radix_integer_zero(&res->u, radix);
+            res->N = Neff;
+        }
+        else
+        {
+            int inrange = (vz <= PADIC_RADIX_ERR_MAX && vz >= -PADIC_RADIX_ERR_MAX
+                           && Nz <= PADIC_RADIX_ERR_MAX);
+            slong K = (inrange && Kcap < Neff) ? Kcap : Neff;
+
+            if (K <= vz)
+            {
+                radix_integer_fit_limbs(&res->u, 1, radix)[0] = 1;
+                res->u.size = 1;
+                res->v = vz;
+                res->N = Neff;
+                return GR_SUCCESS;
+            }
+
+            _padic_radix_unit_mullow(res, x, y, radix_div_exp(K - vz + e - 1, radix), radix);
+            res->v = vz;
+
+            if (inrange)
+            {
+                res->N = Neff;
+                if (!nomod)
+                    _radix_integer_mod_digits_inplace(&res->u, K - vz, radix);
+                return GR_SUCCESS;
+            }
+
+            res->N = Nz;
+        }
+    }
+
+    res->v = vz;
     return _padic_radix_finalize_assume_canonical(res, ctx);
 }
 
@@ -986,104 +1331,7 @@ _padic_radix_mul_reference(padic_radix_t res, const padic_radix_t x, const padic
 int
 padic_radix_mul(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx)
 {
-    radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
-    slong e = radix->exp;
-    slong vx = x->v, vy = y->v, Nx = x->N, Ny = y->N;
-    slong vz, Nz, xn, yn, target;
-
-    //return _padic_radix_mul_reference(res, x, y, ctx);
-
-    /* an exact zero annihilates exactly */
-    if ((x->u.size == 0 && Nx == PADIC_RADIX_EXACT)
-     || (y->u.size == 0 && Ny == PADIC_RADIX_EXACT))
-        return padic_radix_zero(res, ctx);
-
-    vz = vx + vy;
-
-    Nz = PADIC_RADIX_EXACT;
-    if (Nx != PADIC_RADIX_EXACT)
-        Nz = FLINT_MIN(Nz, vy + Nx);
-    if (Ny != PADIC_RADIX_EXACT)
-        Nz = FLINT_MIN(Nz, vx + Ny);
-
-    /* inexact zero operand: the product unit is zero */
-    if (x->u.size == 0 || y->u.size == 0)
-    {
-        radix_integer_zero(&res->u, radix);
-        res->v = vz;
-        res->N = Nz;
-        return _padic_radix_finalize_assume_canonical(res, ctx);
-    }
-
-    xn = FLINT_ABS(x->u.size);
-    yn = FLINT_ABS(y->u.size);
-    target = _padic_radix_target_prec(vz, ctx);
-
-    /*
-        The product is written straight into res->u. All scalar operand fields
-        (vx, vy, Nx, Ny, xn, yn) are captured above, and radix_integer_mul /
-        radix_integer_mullow_limbs handle res aliasing x or y, so no temporary
-        is required.
-    */
-    if (Nz == PADIC_RADIX_EXACT)
-    {
-        /* both inputs exact */
-        if (target == PADIC_RADIX_PREC_INF)
-        {
-            radix_integer_mul(&res->u, &x->u, &y->u, radix);   /* exact ring: full product */
-            res->N = PADIC_RADIX_EXACT;
-        }
-        else
-        {
-            slong digits = target - vz;                    /* exact digits permitted */
-            slong maxD = (xn + yn) * e;                    /* upper bound on product digits */
-            slong minD = (xn + yn - 2) * e + 1;            /* lower bound on product digits */
-
-            if (digits <= 0)
-            {
-                radix_integer_zero(&res->u, radix);        /* below the horizon: 0 + O(p^target) */
-                res->N = target;
-            }
-            else if (maxD <= digits)
-            {
-                radix_integer_mul(&res->u, &x->u, &y->u, radix); /* certainly fits: exact */
-                res->N = PADIC_RADIX_EXACT;
-            }
-            else if (minD > digits)
-            {
-                slong n = (digits + e - 1) / e;            /* certainly inexact: truncate */
-                radix_integer_mullow_limbs(&res->u, &x->u, &y->u, n, radix);
-                res->N = target;
-            }
-            else
-            {
-                radix_integer_mul(&res->u, &x->u, &y->u, radix); /* borderline: reducer decides */
-                res->N = PADIC_RADIX_EXACT;
-            }
-        }
-    }
-    else
-    {
-        /* at least one inexact input: the product is inexact */
-        slong Neff = (target == PADIC_RADIX_PREC_INF) ? Nz : FLINT_MIN(Nz, target);
-        slong r = Neff - vz;                               /* surviving digits */
-
-        if (r <= 0)
-        {
-            radix_integer_zero(&res->u, radix);
-            res->N = Neff;
-        }
-        else
-        {
-            slong n = (r + e - 1) / e;
-            radix_integer_mullow_limbs(&res->u, &x->u, &y->u, n, radix);
-            res->N = Nz;                                   /* reducer recomputes Neff & truncates */
-        }
-    }
-
-    res->v = vz;
-
-    return _padic_radix_finalize_assume_canonical(res, ctx);
+    return _padic_radix_mul_capped(res, x, y, WORD_MAX, 0, ctx);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1163,6 +1411,10 @@ _padic_radix_div(padic_radix_t res, const padic_radix_t a, const padic_radix_t b
         relcap = (relcap == PADIC_RADIX_PREC_INF) ? c : FLINT_MIN(relcap, c);
     }
 
+    /* (without context precision, at most size_limit digits) */
+    if (relcap == PADIC_RADIX_PREC_INF && rel != PADIC_RADIX_PREC_INF && (ulong) rel > ctx->size_limit)
+        rel = ctx->size_limit;
+
     if (rel == PADIC_RADIX_PREC_INF && relcap == PADIC_RADIX_PREC_INF)
         return GR_UNABLE;                        /* exact ring, infinite expansion */
 
@@ -1185,7 +1437,7 @@ _padic_radix_div(padic_radix_t res, const padic_radix_t a, const padic_radix_t b
         return _padic_radix_finalize_assume_canonical(res, ctx);
     }
 
-    nlimbs = (krel + e - 1) / e;                 /* digits -> limbs (ceil) */
+    nlimbs = radix_div_exp(krel + e - 1, radix);                 /* digits -> limbs (ceil) */
 
     radix_integer_init(unit, radix);
 
@@ -1279,6 +1531,10 @@ padic_radix_inv(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         relcap = (relcap == PADIC_RADIX_PREC_INF) ? c : FLINT_MIN(relcap, c);
     }
 
+    /* (without context precision, at most size_limit digits) */
+    if (relcap == PADIC_RADIX_PREC_INF && rel != PADIC_RADIX_PREC_INF && (ulong) rel > ctx->size_limit)
+        rel = ctx->size_limit;
+
     if (rel == PADIC_RADIX_PREC_INF && relcap == PADIC_RADIX_PREC_INF)
         return GR_UNABLE;                        /* exact ring, infinite expansion */
 
@@ -1301,7 +1557,7 @@ padic_radix_inv(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         return _padic_radix_finalize_assume_canonical(res, ctx);
     }
 
-    nlimbs = (krel + e - 1) / e;                 /* digits -> limbs (ceil) */
+    nlimbs = radix_div_exp(krel + e - 1, radix);                 /* digits -> limbs (ceil) */
 
     /* res->u = x_unit^{-1} (mod p^{e*nlimbs}); invmod_limbs preserves the sign
        of x, which is also the sign of 1/x. Handles res aliasing x internally. */
@@ -1459,7 +1715,7 @@ padic_radix_sqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
     }
 
     /* Unit must be known mod 2^3 */
-    if (DIGIT_RADIX(radix) == 2 && Nx - vx < 3)
+    if (DIGIT_RADIX(radix) == 2 && Nx != PADIC_RADIX_EXACT && Nx - vx < 3)
         return GR_UNABLE;
 
     /* Relative precision of the root. sqrt preserves relative precision for odd
@@ -1484,6 +1740,10 @@ padic_radix_sqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         slong c = prec_abs - vq;                 /* bounded: no overflow */
         relcap = (relcap == PADIC_RADIX_PREC_INF) ? c : FLINT_MIN(relcap, c);
     }
+
+    /* (without context precision, at most size_limit digits) */
+    if (relcap == PADIC_RADIX_PREC_INF && rel != PADIC_RADIX_PREC_INF && (ulong) rel > ctx->size_limit)
+        rel = ctx->size_limit;
 
     if (rel == PADIC_RADIX_PREC_INF && relcap == PADIC_RADIX_PREC_INF)
         krel = PADIC_RADIX_PREC_INF;             /* exact ring, infinite expansion */
@@ -1661,6 +1921,10 @@ padic_radix_rsqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         slong c = prec_abs - vr;                 /* absolute cap relative to vr = -vq */
         relcap = (relcap == PADIC_RADIX_PREC_INF) ? c : FLINT_MIN(relcap, c);
     }
+
+    /* (without context precision, at most size_limit digits) */
+    if (relcap == PADIC_RADIX_PREC_INF && rel != PADIC_RADIX_PREC_INF && (ulong) rel > ctx->size_limit)
+        rel = ctx->size_limit;
 
     if (rel == PADIC_RADIX_PREC_INF && relcap == PADIC_RADIX_PREC_INF)
         krel = PADIC_RADIX_PREC_INF;             /* exact ring */
@@ -2012,6 +2276,20 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_ADD,             (gr_funcptr) padic_radix_add},
     {GR_METHOD_SUB,             (gr_funcptr) padic_radix_sub},
     {GR_METHOD_MUL,             (gr_funcptr) padic_radix_mul},
+    {GR_METHOD_MUL_SI,          (gr_funcptr) padic_radix_mul_si},
+    {GR_METHOD_MUL_UI,          (gr_funcptr) padic_radix_mul_ui},
+    {GR_METHOD_MUL_FMPZ,        (gr_funcptr) padic_radix_mul_fmpz},
+    {GR_METHOD_ADDMUL,          (gr_funcptr) padic_radix_addmul},
+    {GR_METHOD_SUBMUL,          (gr_funcptr) padic_radix_submul},
+    {GR_METHOD_ADDMUL_SI,       (gr_funcptr) padic_radix_addmul_si},
+    {GR_METHOD_SUBMUL_SI,       (gr_funcptr) padic_radix_submul_si},
+    {GR_METHOD_ADDMUL_UI,       (gr_funcptr) padic_radix_addmul_ui},
+    {GR_METHOD_SUBMUL_UI,       (gr_funcptr) padic_radix_submul_ui},
+    {GR_METHOD_ADDMUL_FMPZ,     (gr_funcptr) padic_radix_addmul_fmpz},
+    {GR_METHOD_SUBMUL_FMPZ,     (gr_funcptr) padic_radix_submul_fmpz},
+    {GR_METHOD_POW_UI,          (gr_funcptr) padic_radix_pow_ui},
+    {GR_METHOD_POW_SI,          (gr_funcptr) padic_radix_pow_si},
+    {GR_METHOD_POW_FMPZ,        (gr_funcptr) padic_radix_pow_fmpz},
     {GR_METHOD_INV,             (gr_funcptr) padic_radix_inv},
     {GR_METHOD_DIV,             (gr_funcptr) padic_radix_div},
     {GR_METHOD_SQRT,            (gr_funcptr) padic_radix_sqrt},
@@ -2022,9 +2300,25 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) padic_radix_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) padic_radix_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) padic_radix_dot_strided},
+    {GR_METHOD_VEC_MUL_SCALAR,  (gr_funcptr) _padic_radix_vec_mul_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR_SI,   (gr_funcptr) _padic_radix_vec_mul_scalar_si},
+    {GR_METHOD_VEC_MUL_SCALAR_UI,   (gr_funcptr) _padic_radix_vec_mul_scalar_ui},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (gr_funcptr) _padic_radix_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,   (gr_funcptr) _padic_radix_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,   (gr_funcptr) _padic_radix_vec_submul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) _padic_radix_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) _padic_radix_vec_submul_scalar_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,  (gr_funcptr) _padic_radix_vec_addmul_scalar_fmpz},
     /* todo: this ought to be automatic */
     /* todo: use different algorithm with exact precision */
-    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _padic_radix_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _padic_radix_poly_mulmid},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) padic_radix_mat_mul},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) padic_radix_mat_det},
+    {GR_METHOD_MAT_FIND_NONZERO_PIVOT, (gr_funcptr) padic_radix_mat_find_nonzero_pivot},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE, (gr_funcptr) padic_radix_mat_nonsingular_solve},
+    {GR_METHOD_MAT_INV,         (gr_funcptr) padic_radix_mat_inv},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) padic_radix_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -2102,6 +2396,9 @@ gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec
     if (n_randint(state, 2))
         flags |= PADIC_RADIX_TEST_LIMITS;
 
+    if (n_randint(state, 4) == 0)
+        flags |= PADIC_RADIX_FAST_LINALG;
+
     /* allow e.g. get_fmpz roundtrip to return unable for huge test values */
     if (flags & PADIC_RADIX_TEST_LIMITS)
         ctx->size_limit = (1 << 16);
@@ -2109,4 +2406,847 @@ gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec
     return gr_ctx_init_padic_radix(ctx, p, prec_rel, prec_abs, flags);
 }
 
+/* ------------------------------------------------------------------------- */
+/*    Fused multiply-add, scalar and vector operations, powering            */
+/* ------------------------------------------------------------------------- */
 
+static inline void
+_padic_radix_stack_init(padic_radix_struct * T, nn_ptr buf, slong alloc)
+{
+    T->u.d = buf;
+    T->u.alloc = alloc;
+    T->u.size = 0;
+    T->v = 0;
+    T->N = PADIC_RADIX_EXACT;
+}
+
+#define PADIC_RADIX_STACK_LIMBS 24
+
+/* (x0 + x1 B) * p^d mod B^L for 0 <= d < L e, L in {1, 2}: one inline
+   truncated product (d < e) or a limb shift and a one-limb product */
+static inline void
+_padic_radix_lsh_12(ulong * a0, ulong * a1, ulong x0, ulong x1, slong d, slong L,
+    const radix_struct * radix)
+{
+    ulong t[2];
+
+    if (d == 0)
+    {
+        *a0 = x0;
+        *a1 = (L == 2) ? x1 : 0;
+    }
+    else if (d < radix->exp)
+    {
+        slong n = _padic_radix_mullow_12(t, x0, x1, radix->bpow[d], 0, L, radix->B);
+        *a0 = t[0];
+        *a1 = (L == 2 && n == 2) ? t[1] : 0;
+    }
+    else
+    {
+        _padic_radix_mullow_12(t, x0, 0, radix->bpow[d - radix->exp], 0, 1, radix->B);
+        *a0 = 0;
+        *a1 = t[0];
+    }
+}
+
+/*
+    Fused addmul for small results: an inline product of the units and one
+    truncation, for positive units, an inexact product and a result of at
+    most two limbs. The operand of higher valuation is first multiplied by
+    p^(v_hi - v_lo) (an inline truncated product), and a cancelled lowest
+    digit (v_t == v_res) needs a right digit shift.
+*/
+static inline int
+_padic_radix_addmul_small(padic_radix_t res, const padic_radix_t x, const padic_radix_t y,
+    int sub, gr_ctx_t ctx)
+{
+    const radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
+    slong e = radix->exp;
+    slong xs = x->u.size, ys = y->u.size, rs = res->u.size;
+    slong vx, vy, vr, vt, Nx, Ny, Ntin, Nt, tt, tm, vmin, Nz, P, Ldig, L, rem, w;
+    ulong B = radix->B.n, a0 = 0, a1 = 0, b0 = 0, b1 = 0, s0, s1 = 0;
+    nn_ptr d;
+
+    if (xs <= 0 || ys <= 0 || rs <= 0 || rs > 2)
+        return 0;
+
+    Nx = x->N;
+    Ny = y->N;
+    if (Nx == PADIC_RADIX_EXACT && Ny == PADIC_RADIX_EXACT)
+        return 0;
+
+    vx = x->v;
+    vy = y->v;
+    vr = res->v;
+    vt = vx + vy;
+
+    Ntin = PADIC_RADIX_EXACT;
+    if (Nx != PADIC_RADIX_EXACT)
+        Ntin = vy + Nx;
+    if (Ny != PADIC_RADIX_EXACT)
+        Ntin = FLINT_MIN(Ntin, vx + Ny);
+
+    if (vt > PADIC_RADIX_ERR_MAX || vt < -PADIC_RADIX_ERR_MAX || Ntin > PADIC_RADIX_ERR_MAX
+        || vr > PADIC_RADIX_ERR_MAX || vr < -PADIC_RADIX_ERR_MAX)
+        return 0;
+
+    tt = _padic_radix_target_prec(vt, ctx);
+    Nt = (tt == PADIC_RADIX_PREC_INF) ? Ntin : FLINT_MIN(Ntin, tt);
+    if (Nt <= vt)
+        return 0;
+
+    vmin = FLINT_MIN(vt, vr);
+    Nz = FLINT_MIN(res->N, Nt);
+    tm = _padic_radix_target_prec(vmin, ctx);
+    P = (tm == PADIC_RADIX_PREC_INF) ? Nz : FLINT_MIN(Nz, tm);
+    if (vmin >= P)
+        return 0;
+
+    Ldig = P - vmin;
+    if (Ldig > 2 * e)
+        return 0;
+    L = (Ldig > e) ? 2 : 1;
+
+    if (vr < P)
+        _padic_radix_lsh_12(&a0, &a1, res->u.d[0], (rs > 1) ? res->u.d[1] : 0, vr - vmin, L, radix);
+
+    if (vt < P)
+    {
+        ulong t[2];
+        ulong x1 = (xs > 1) ? x->u.d[1] : 0, y1 = (ys > 1) ? y->u.d[1] : 0;
+        slong m = radix_div_exp(P - vt + e - 1, radix);
+        slong tn = _padic_radix_mullow_12(t, x->u.d[0], x1, y->u.d[0], y1, m, radix->B);
+        _padic_radix_lsh_12(&b0, &b1, t[0], (tn == 2) ? t[1] : 0, vt - vmin, L, radix);
+    }
+
+    if (!sub)
+    {
+        ulong cy;
+        s0 = a0 + b0;
+        cy = (s0 < a0) | (s0 >= B);
+        if (cy)
+            s0 -= B;
+        if (L == 2)
+        {
+            s1 = a1 + b1;
+            if ((s1 < a1) | (s1 >= B))
+                s1 -= B;
+            s1 += cy;
+            if (s1 == B)
+                s1 = 0;
+        }
+    }
+    else
+    {
+        int bw = (a0 < b0);
+        s0 = a0 - b0;
+        if (bw)
+            s0 += B;
+        if (L == 2)
+        {
+            s1 = a1 - b1;
+            if (a1 < b1)
+                s1 += B;
+            if (bw)
+                s1 = (s1 == 0) ? B - 1 : s1 - 1;
+        }
+    }
+
+    rem = Ldig - (L - 1) * e;
+    if (rem < e)
+    {
+        if (L == 1)
+            s0 = n_rem_precomp(s0, radix->bpow[rem], radix->bpow_div + rem);
+        else
+            s1 = n_rem_precomp(s1, radix->bpow[rem], radix->bpow_div + rem);
+    }
+
+    if (s0 == 0 && s1 == 0)
+    {
+        if (P != Nz)
+            return 0;
+        res->u.size = 0;
+        res->v = 0;
+        res->N = P;
+        return 1;
+    }
+
+    /* valuation of the sum (only nonzero when v_t == v_res) */
+    if (s0 != 0)
+        w = _padic_radix_divisible_p(s0, radix) ? _padic_radix_val1(s0, radix) : 0;
+    else
+        w = e + _padic_radix_val1(s1, radix);
+
+    if (w != 0)
+    {
+        if (P != Nz)
+            return 0;   /* defensive; cannot happen for valid inputs */
+
+        /* S >>= w digits */
+        if (w >= e)
+        {
+            s0 = n_div_precomp(s1, radix->bpow_div + (w - e));
+            s1 = 0;
+        }
+        else
+        {
+            ulong q1 = n_div_precomp(s1, radix->bpow_div + w);
+            ulong r1 = s1 - q1 * radix->bpow[w];
+            s0 = n_div_precomp(s0, radix->bpow_div + w) + r1 * radix->bpow[e - w];
+            s1 = q1;
+        }
+    }
+
+    d = radix_integer_fit_limbs(&res->u, 2, radix);
+    d[0] = s0;
+    d[1] = s1;
+    res->u.size = (s1 != 0) ? 2 : 1;
+    res->v = vmin + w;
+    res->N = P;
+    return 1;
+}
+
+/* res = res +/- x y, identical to mul into a temporary then add/sub; see
+   the comment below for the cap argument */
+static int
+_padic_radix_addmul_core(padic_radix_t res, const padic_radix_t x, const padic_radix_t y,
+    int sub, nn_ptr buf, slong alloc, gr_ctx_t ctx)
+{
+    padic_radix_struct T;
+    slong Kcap = WORD_MAX;
+    int status;
+
+    if (_padic_radix_addmul_small(res, x, y, sub, ctx))
+        return GR_SUCCESS;
+
+    if ((x->N != PADIC_RADIX_EXACT || y->N != PADIC_RADIX_EXACT)
+        && x->u.size != 0 && y->u.size != 0)
+    {
+        slong vt = x->v + y->v;
+
+        Kcap = res->N;
+        if (res->u.size != 0)
+        {
+            slong t = _padic_radix_target_prec(FLINT_MIN(vt, res->v), ctx);
+            Kcap = FLINT_MIN(Kcap, t);
+        }
+    }
+
+    if (x->u.size < 0 || y->u.size < 0)
+    {
+        padic_radix_t H;
+        padic_radix_init(H, ctx);
+        status = _padic_radix_mul_capped(H, x, y, Kcap, 1, ctx);
+        status |= _padic_radix_add_sub(res, res, H, sub, ctx);
+        padic_radix_clear(H, ctx);
+        return status;
+    }
+
+    _padic_radix_stack_init(&T, buf, alloc);
+    status = _padic_radix_mul_capped(&T, x, y, Kcap, 1, ctx);
+    status |= _padic_radix_add_sub(res, res, &T, sub, ctx);
+    return status;
+}
+
+int
+_padic_radix_addmul_sub(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, int sub, gr_ctx_t ctx)
+{
+    slong need = FLINT_ABS(x->u.size) + FLINT_ABS(y->u.size) + 2;
+    int status;
+
+    if (need <= PADIC_RADIX_STACK_LIMBS)
+    {
+        ulong buf[PADIC_RADIX_STACK_LIMBS];
+        status = _padic_radix_addmul_core(res, x, y, sub, buf, PADIC_RADIX_STACK_LIMBS, ctx);
+    }
+    else
+    {
+        nn_ptr buf;
+        TMP_INIT;
+        TMP_START;
+        buf = TMP_ALLOC(need * sizeof(ulong));
+        status = _padic_radix_addmul_core(res, x, y, sub, buf, need, ctx);
+        TMP_END;
+    }
+
+    return status;
+}
+
+int padic_radix_addmul(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx)
+{ return _padic_radix_addmul_sub(res, x, y, 0, ctx); }
+int padic_radix_submul(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx)
+{ return _padic_radix_addmul_sub(res, x, y, 1, ctx); }
+
+/* ---- scalars: |a| in radix B, valuation stripped (digit shift), then the
+   set_si rounding (_padic_radix_finish) ---- */
+static int
+_padic_radix_set_scalar(padic_radix_t C, ulong a, int neg, gr_ctx_t ctx)
+{
+    const radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
+    ulong d0, d1, B = radix->B.n;
+    slong w = 0, t, n;
+
+    C->N = PADIC_RADIX_EXACT;
+
+    if (a == 0)
+    {
+        C->u.size = 0;
+        C->v = 0;
+        return GR_SUCCESS;
+    }
+
+    if (a < B) { d0 = a; d1 = 0; }
+    else       { d1 = a / B; d0 = a - d1 * B; }
+
+    if (d0 == 0)
+    {
+        w = radix->exp;
+        d0 = d1;
+        d1 = 0;
+    }
+
+    t = _padic_radix_val1(d0, radix);
+    if (t != 0)
+    {
+        ulong q1 = n_div_precomp(d1, radix->bpow_div + t);
+        ulong r1 = d1 - q1 * radix->bpow[t];
+        d0 = n_div_precomp(d0, radix->bpow_div + t) + r1 * radix->bpow[radix->exp - t];
+        d1 = q1;
+    }
+    w += t;
+
+    if (neg && !PADIC_RADIX_CTX_SIGNED(ctx))
+    {
+        slong target = _padic_radix_target_prec(w, ctx);
+        slong need;
+
+        if (target == PADIC_RADIX_PREC_INF)
+            return GR_UNABLE;
+
+        need = (slong) radix_div_exp(FLINT_MAX(target - w, 0) + radix->exp - 1, radix) + 2;
+        if (need > C->u.alloc)
+        {
+            C->u.d = flint_malloc(need * sizeof(ulong));
+            C->u.alloc = need;
+        }
+    }
+
+    n = (d1 != 0) ? 2 : 1;
+    C->u.d[0] = d0;
+    C->u.d[1] = d1;
+    C->u.size = neg ? -n : n;
+    C->v = w;
+
+    return _padic_radix_finish(C, ctx);
+}
+
+static int
+_padic_radix_set_scalar_fmpz(padic_radix_t C, const fmpz_t a, gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*a))
+    {
+        slong s = *a;
+        return _padic_radix_set_scalar(C, (s < 0) ? -(ulong) s : (ulong) s, s < 0, ctx);
+    }
+    else
+    {
+        padic_radix_t t;
+        int status;
+        padic_radix_init(t, ctx);
+        status = padic_radix_set_fmpz(t, a, ctx);
+        if (status == GR_SUCCESS)
+        {
+            C->u = t->u;
+            C->v = t->v;
+            C->N = t->N;
+        }
+        else
+            padic_radix_clear(t, ctx);
+        return status;
+    }
+}
+
+#define PADIC_RADIX_SCALAR_DECL(C, Cbuf) \
+    ulong Cbuf[2]; padic_radix_struct C[1]; _padic_radix_stack_init(C, Cbuf, 2)
+#define PADIC_RADIX_SCALAR_CLEAR(C, Cbuf) \
+    do { if (C->u.d != Cbuf) flint_free(C->u.d); } while (0)
+#define PADIC_RADIX_SI(a) (a < 0) ? -(ulong) a : (ulong) a, a < 0
+
+int
+padic_radix_set_si(padic_radix_t res, slong a, gr_ctx_t ctx)
+{
+    PADIC_RADIX_SCALAR_DECL(C, Cbuf);
+    int status = _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx);
+    if (status == GR_SUCCESS)
+    {
+        radix_integer_set(&res->u, &C->u, PADIC_RADIX_CTX_RADIX(ctx));
+        res->v = C->v;
+        res->N = C->N;
+    }
+    PADIC_RADIX_SCALAR_CLEAR(C, Cbuf);
+    return status;
+}
+
+int
+padic_radix_set_ui(padic_radix_t res, ulong a, gr_ctx_t ctx)
+{
+    PADIC_RADIX_SCALAR_DECL(C, Cbuf);
+    int status = _padic_radix_set_scalar(C, a, 0, ctx);
+    if (status == GR_SUCCESS)
+    {
+        radix_integer_set(&res->u, &C->u, PADIC_RADIX_CTX_RADIX(ctx));
+        res->v = C->v;
+        res->N = C->N;
+    }
+    PADIC_RADIX_SCALAR_CLEAR(C, Cbuf);
+    return status;
+}
+
+#define PADIC_RADIX_SCALAR_BINOP(name, ctype, SETCALL, BODY)                          \
+int name(padic_radix_t res, const padic_radix_t x, ctype a, gr_ctx_t ctx)    \
+{                                                                            \
+    PADIC_RADIX_SCALAR_DECL(C, Cbuf);                                                 \
+    int status = SETCALL;                                                    \
+    if (status == GR_SUCCESS)                                                \
+        status = BODY;                                                       \
+    PADIC_RADIX_SCALAR_CLEAR(C, Cbuf);                                                \
+    return status;                                                           \
+}
+
+PADIC_RADIX_SCALAR_BINOP(padic_radix_mul_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), padic_radix_mul(res, x, C, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_mul_ui, ulong, _padic_radix_set_scalar(C, a, 0, ctx), padic_radix_mul(res, x, C, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_mul_fmpz, const fmpz_t, _padic_radix_set_scalar_fmpz(C, a, ctx), padic_radix_mul(res, x, C, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_addmul_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), _padic_radix_addmul_sub(res, x, C, 0, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_submul_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), _padic_radix_addmul_sub(res, x, C, 1, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_addmul_ui, ulong, _padic_radix_set_scalar(C, a, 0, ctx), _padic_radix_addmul_sub(res, x, C, 0, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_submul_ui, ulong, _padic_radix_set_scalar(C, a, 0, ctx), _padic_radix_addmul_sub(res, x, C, 1, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_addmul_fmpz, const fmpz_t, _padic_radix_set_scalar_fmpz(C, a, ctx), _padic_radix_addmul_sub(res, x, C, 0, ctx))
+PADIC_RADIX_SCALAR_BINOP(padic_radix_submul_fmpz, const fmpz_t, _padic_radix_set_scalar_fmpz(C, a, ctx), _padic_radix_addmul_sub(res, x, C, 1, ctx))
+
+/* ---- vectors ---- */
+static int
+_padic_radix_vec_addmul_submul_scalar(padic_radix_struct * vec1, const padic_radix_struct * vec2,
+    slong len, const padic_radix_struct * c, int sub, gr_ctx_t ctx)
+{
+    ulong sbuf[PADIC_RADIX_STACK_LIMBS];
+    nn_ptr buf = sbuf;
+    slong alloc = PADIC_RADIX_STACK_LIMBS, i, maxn = 0, need;
+    int status = GR_SUCCESS;
+
+    if (len <= 0)
+        return GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        maxn = FLINT_MAX(maxn, FLINT_ABS(vec2[i].u.size));
+
+    need = maxn + FLINT_ABS(c->u.size) + 2;
+    if (need > alloc)
+    {
+        buf = flint_malloc(need * sizeof(ulong));
+        alloc = need;
+    }
+
+    for (i = 0; i < len; i++)
+    {
+        need = FLINT_ABS(vec2[i].u.size) + FLINT_ABS(c->u.size) + 2;
+        if (need > alloc)
+        {
+            if (buf != sbuf)
+                flint_free(buf);
+            buf = flint_malloc(need * sizeof(ulong));
+            alloc = need;
+        }
+        status |= _padic_radix_addmul_core(vec1 + i, vec2 + i, c, sub, buf, alloc, ctx);
+    }
+
+    if (buf != sbuf)
+        flint_free(buf);
+    return status;
+}
+
+int _padic_radix_vec_addmul_scalar(padic_radix_struct * v1, const padic_radix_struct * v2, slong len, const padic_radix_t c, gr_ctx_t ctx)
+{ return _padic_radix_vec_addmul_submul_scalar(v1, v2, len, c, 0, ctx); }
+int _padic_radix_vec_submul_scalar(padic_radix_struct * v1, const padic_radix_struct * v2, slong len, const padic_radix_t c, gr_ctx_t ctx)
+{ return _padic_radix_vec_addmul_submul_scalar(v1, v2, len, c, 1, ctx); }
+
+int
+_padic_radix_vec_mul_scalar(padic_radix_struct * v1, const padic_radix_struct * v2, slong len, const padic_radix_t c, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong i;
+    for (i = 0; i < len; i++)
+        status |= padic_radix_mul(v1 + i, v2 + i, c, ctx);
+    return status;
+}
+
+#define PADIC_RADIX_VEC_SCALAR(name, ctype, SETCALL, BODY)                                  \
+int name(padic_radix_struct * vec1, const padic_radix_struct * vec2, slong len,    \
+    ctype a, gr_ctx_t ctx)                                                         \
+{                                                                                  \
+    PADIC_RADIX_SCALAR_DECL(C, Cbuf);                                                       \
+    int status;                                                                    \
+    if (len <= 0)                                                                  \
+        return GR_SUCCESS;                                                         \
+    status = SETCALL;                                                              \
+    if (status == GR_SUCCESS)                                                      \
+        status = BODY;                                                             \
+    PADIC_RADIX_SCALAR_CLEAR(C, Cbuf);                                                      \
+    return status;                                                                 \
+}
+
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_addmul_scalar_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), _padic_radix_vec_addmul_submul_scalar(vec1, vec2, len, C, 0, ctx))
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_submul_scalar_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), _padic_radix_vec_addmul_submul_scalar(vec1, vec2, len, C, 1, ctx))
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_addmul_scalar_fmpz, const fmpz_t, _padic_radix_set_scalar_fmpz(C, a, ctx), _padic_radix_vec_addmul_submul_scalar(vec1, vec2, len, C, 0, ctx))
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_mul_scalar_si, slong, _padic_radix_set_scalar(C, PADIC_RADIX_SI(a), ctx), _padic_radix_vec_mul_scalar(vec1, vec2, len, C, ctx))
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_mul_scalar_ui, ulong, _padic_radix_set_scalar(C, a, 0, ctx), _padic_radix_vec_mul_scalar(vec1, vec2, len, C, ctx))
+PADIC_RADIX_VEC_SCALAR(_padic_radix_vec_mul_scalar_fmpz, const fmpz_t, _padic_radix_set_scalar_fmpz(C, a, ctx), _padic_radix_vec_mul_scalar(vec1, vec2, len, C, ctx))
+
+/* ---- powering on the unit (here the stored unit itself) ---- */
+
+/* v_p(n) for n >= 1 */
+static slong
+_padic_radix_fmpz_val_p(const fmpz_t n, ulong p)
+{
+    if (!COEFF_IS_MPZ(*n))
+    {
+        ulong m = FLINT_ABS(*n), q;
+        slong k = 0;
+        while (m != 0 && m % p == 0)
+        {
+            q = m / p;
+            m = q;
+            k++;
+        }
+        return k;
+    }
+    else
+    {
+        fmpz_t t, pp;
+        slong k;
+        fmpz_init(t);
+        fmpz_init_set_ui(pp, p);
+        k = fmpz_remove(t, n, pp);
+        fmpz_clear(t);
+        fmpz_clear(pp);
+        return k;
+    }
+}
+
+/*
+    x^n for n >= 2, x with a nonzero unit, rounded once:
+        v = n v_x,   N = (n - 1) v_x + N_x + v_p(n)   (EXACT if x is exact).
+    The extra v_p(n): for x = a + h with v(a) = v_x, v(h) >= N_x and
+    r = N_x - v_x >= 1, every term C(n,k) a^(n-k) h^k (k >= 1) of
+    x^n - a^n has valuation >= (n-1) v_x + N_x + v_p(n) + (k-1) r - v_p(k)
+    (using v_p(C(n,k)) >= v_p(n) - v_p(k)), and v_p(k) <= k - 1 <= (k-1) r.
+    Returns -1 if the exponents leave the representable range.
+*/
+static int
+_padic_radix_pow_core(padic_radix_t res, const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx)
+{
+    const radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
+    slong e = radix->exp;
+    slong vx = x->v, Nx = x->N, xn = FLINT_ABS(x->u.size);
+    slong vout, Nout, target, Neff, r, L, un, Rn, i, nbits;
+    int exact = (Nx == PADIC_RADIX_EXACT), neg, fits;
+    nn_ptr u, R, T, rd;
+    fmpz_t t;
+    TMP_INIT;
+
+    fmpz_init(t);
+    fmpz_mul_si(t, n, vx);
+    if (fmpz_cmp_si(t, PADIC_RADIX_ERR_MAX) > 0 || fmpz_cmp_si(t, -PADIC_RADIX_ERR_MAX) < 0)
+    {
+        fmpz_clear(t);
+        return -1;
+    }
+    vout = fmpz_get_si(t);
+    if (!exact)
+    {
+        fmpz_sub_si(t, t, vx);
+        fmpz_add_si(t, t, Nx);
+        fmpz_add_ui(t, t, _padic_radix_fmpz_val_p(n, GR_PADIC_RADIX_CTX(ctx)->p));
+        if (fmpz_cmp_si(t, PADIC_RADIX_ERR_MAX) > 0 || fmpz_cmp_si(t, -PADIC_RADIX_ERR_MAX) < 0)
+        {
+            fmpz_clear(t);
+            return -1;
+        }
+        Nout = fmpz_get_si(t);
+    }
+    else
+        Nout = PADIC_RADIX_EXACT;
+    fmpz_clear(t);
+
+    target = _padic_radix_target_prec(vout, ctx);
+    Neff = exact ? target : FLINT_MIN(Nout, target);
+    if (!exact && target == PADIC_RADIX_PREC_INF)
+        Neff = _padic_radix_cap_prec(Neff, vout, ctx);
+
+    if (Neff == PADIC_RADIX_PREC_INF)
+        return -1;
+
+    if (Neff <= vout)
+    {
+        radix_integer_zero(&res->u, radix);
+        res->v = 0;
+        res->N = Neff;
+        return _padic_radix_finalize_assume_canonical(res, ctx);
+    }
+
+    neg = (x->u.size < 0) && fmpz_is_odd(n);
+
+    if (exact && xn == 1 && x->u.d[0] == 1)
+    {
+        radix_integer_fit_limbs(&res->u, 1, radix)[0] = 1;
+        res->u.size = neg ? -1 : 1;
+        res->v = vout;
+        res->N = PADIC_RADIX_EXACT;
+        return _padic_radix_finalize_assume_canonical(res, ctx);
+    }
+
+    r = Neff - vout;
+    L = radix_div_exp(r + e - 1, radix);
+
+    if (exact && fmpz_cmp_ui(n, L / (xn + 1)) < 0)
+        L = (slong) fmpz_get_ui(n) * (xn + 1);
+
+    TMP_START;
+    u = TMP_ALLOC((L + 2) * sizeof(ulong));
+    R = TMP_ALLOC((2 * L + 2) * sizeof(ulong));
+    T = TMP_ALLOC((2 * L + 2) * sizeof(ulong));
+
+    un = FLINT_MIN(xn, L);
+    flint_mpn_copyi(u, x->u.d, un);
+    fits = exact && (xn <= L);
+    while (un > 0 && u[un - 1] == 0)
+        un--;
+
+    flint_mpn_copyi(R, u, un);
+    Rn = un;
+    nbits = fmpz_bits(n);
+
+    for (i = nbits - 2; i >= 0; i--)
+    {
+        slong hi;
+
+        hi = fits ? 2 * Rn : FLINT_MIN(2 * Rn, L);
+        if (Rn <= 2 && hi <= 2)
+            Rn = _padic_radix_mullow_12(T, R[0], Rn > 1 ? R[1] : 0, R[0], Rn > 1 ? R[1] : 0, hi, radix->B);
+        else
+        {
+            radix_mulmid(T, R, Rn, R, Rn, 0, hi, radix);
+            Rn = hi;
+            while (Rn > 0 && T[Rn - 1] == 0)
+                Rn--;
+        }
+        FLINT_SWAP(nn_ptr, R, T);
+        if (fits && Rn > L)
+        {
+            fits = 0;
+            Rn = L;
+            while (Rn > 0 && R[Rn - 1] == 0)
+                Rn--;
+        }
+
+        if (fmpz_tstbit(n, i))
+        {
+            hi = fits ? Rn + un : FLINT_MIN(Rn + un, L);
+            if (Rn <= 2 && un <= 2 && hi <= 2)
+                Rn = _padic_radix_mullow_12(T, R[0], Rn > 1 ? R[1] : 0, u[0], un > 1 ? u[1] : 0, hi, radix->B);
+            else
+            {
+                radix_mulmid(T, R, Rn, u, un, 0, hi, radix);
+                Rn = hi;
+                while (Rn > 0 && T[Rn - 1] == 0)
+                    Rn--;
+            }
+            FLINT_SWAP(nn_ptr, R, T);
+            if (fits && Rn > L)
+            {
+                fits = 0;
+                Rn = L;
+                while (Rn > 0 && R[Rn - 1] == 0)
+                    Rn--;
+            }
+        }
+    }
+
+    rd = radix_integer_fit_limbs(&res->u, Rn, radix);
+    flint_mpn_copyi(rd, R, Rn);
+    res->u.size = neg ? -Rn : Rn;
+    res->v = vout;
+    res->N = exact ? (fits ? PADIC_RADIX_EXACT : target) : Nout;
+
+    TMP_END;
+    return _padic_radix_finalize_assume_canonical(res, ctx);
+}
+
+static int
+_padic_radix_pow_chain(padic_radix_t res, const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx)
+{
+    padic_radix_t R, T;
+    slong i;
+    int status = GR_SUCCESS;
+
+    padic_radix_init(R, ctx);
+    padic_radix_init(T, ctx);
+    radix_integer_set(&R->u, &x->u, PADIC_RADIX_CTX_RADIX(ctx));
+    R->v = x->v;
+    R->N = x->N;
+
+    for (i = fmpz_bits(n) - 2; i >= 0 && status == GR_SUCCESS; i--)
+    {
+        status |= padic_radix_mul(T, R, R, ctx);
+        if (status != GR_SUCCESS)
+        {
+            padic_radix_swap(R, T, ctx);
+            break;
+        }
+        if (fmpz_tstbit(n, i))
+            status |= padic_radix_mul(R, T, x, ctx);
+        else
+            padic_radix_swap(R, T, ctx);
+    }
+
+    padic_radix_swap(res, R, ctx);
+    padic_radix_clear(R, ctx);
+    padic_radix_clear(T, ctx);
+    return status;
+}
+
+/*
+    0 + O(p^N) to the n-th power: the ball p^N Z_p maps into p^(nN) Z_p
+    (for any sign of N), so the result is 0 + O(p^(nN)). The generic chain
+    gives O(p^N), which is too optimistic when N < 0 (the zero element is
+    stored with v = 0, so products of two such elements claim min(N1, N2)
+    instead of N1 + N2).
+*/
+static int
+_padic_radix_pow_zero_inexact(padic_radix_t res, slong N, const fmpz_t n, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    slong M;
+
+    fmpz_init(t);
+    fmpz_mul_si(t, n, N);
+    if (fmpz_cmp_si(t, -PADIC_RADIX_ERR_MAX) < 0)
+    {
+        fmpz_clear(t);
+        return GR_UNABLE;
+    }
+    M = (fmpz_cmp_si(t, PADIC_RADIX_ERR_MAX) > 0) ? PADIC_RADIX_ERR_MAX : fmpz_get_si(t);
+    fmpz_clear(t);
+
+    radix_integer_zero(&res->u, PADIC_RADIX_CTX_RADIX(ctx));
+    res->v = 0;
+    res->N = M;
+    return GR_SUCCESS;
+}
+
+/* an exact power computed by the multiplication chain in a context
+   without finite precision (where nothing is truncated) has about n |u|
+   limbs, which must be within the size limit of the context; in other
+   contexts the products are truncated to the precision, and powers of +-1
+   stay one limb (the valuation saturates) */
+static int
+_padic_radix_pow_chain_ok(const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    int ok;
+
+    if (x->N != PADIC_RADIX_EXACT
+        || PADIC_RADIX_CTX_PREC_REL(ctx) != PADIC_RADIX_PREC_INF
+        || PADIC_RADIX_CTX_PREC_ABS(ctx) != PADIC_RADIX_PREC_INF
+        || (FLINT_ABS(x->u.size) == 1 && x->u.d[0] == 1))
+        return 1;
+
+    fmpz_init(t);
+    fmpz_mul_ui(t, n, FLINT_ABS(x->u.size));
+    fmpz_mul_ui(t, t, PADIC_RADIX_CTX_RADIX(ctx)->exp);
+    ok = fmpz_cmp_ui(t, ctx->size_limit) <= 0;
+    fmpz_clear(t);
+    return ok;
+}
+
+static int
+_padic_radix_pow_fmpz_nonneg(padic_radix_t res, const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx)
+{
+    int status;
+
+    if (fmpz_is_zero(n))
+        return padic_radix_one(res, ctx);
+
+    if (fmpz_is_one(n))
+        return padic_radix_set(res, x, ctx);
+
+    if (x->u.size == 0)
+    {
+        if (x->N == PADIC_RADIX_EXACT)
+            return padic_radix_zero(res, ctx);
+        return _padic_radix_pow_zero_inexact(res, x->N, n, ctx);
+    }
+
+    if (res == x)
+    {
+        padic_radix_t t;
+        padic_radix_init(t, ctx);
+        status = _padic_radix_pow_core(t, x, n, ctx);
+        if (status == -1)
+            status = _padic_radix_pow_chain_ok(x, n, ctx)
+                ? _padic_radix_pow_chain(t, x, n, ctx) : GR_UNABLE;
+        padic_radix_swap(res, t, ctx);
+        padic_radix_clear(t, ctx);
+        return status;
+    }
+
+    status = _padic_radix_pow_core(res, x, n, ctx);
+    if (status == -1)
+    {
+        if (!_padic_radix_pow_chain_ok(x, n, ctx))
+            return GR_UNABLE;
+        status = _padic_radix_pow_chain(res, x, n, ctx);
+    }
+    return status;
+}
+
+int
+padic_radix_pow_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) >= 0)
+        return _padic_radix_pow_fmpz_nonneg(res, x, n, ctx);
+    else
+    {
+        fmpz_t m;
+        int status;
+        fmpz_init(m);
+        fmpz_neg(m, n);
+        status = padic_radix_inv(res, x, ctx);
+        if (status == GR_SUCCESS)
+            status = _padic_radix_pow_fmpz_nonneg(res, res, m, ctx);
+        fmpz_clear(m);
+        return status;
+    }
+}
+
+int
+padic_radix_pow_ui(padic_radix_t res, const padic_radix_t x, ulong n, gr_ctx_t ctx)
+{
+    fmpz_t m;
+    int status;
+    fmpz_init_set_ui(m, n);
+    status = _padic_radix_pow_fmpz_nonneg(res, x, m, ctx);
+    fmpz_clear(m);
+    return status;
+}
+
+int
+padic_radix_pow_si(padic_radix_t res, const padic_radix_t x, slong n, gr_ctx_t ctx)
+{
+    int status;
+    if (n >= 0)
+        return padic_radix_pow_ui(res, x, n, ctx);
+    status = padic_radix_inv(res, x, ctx);
+    if (status == GR_SUCCESS && n != -1)
+        status = padic_radix_pow_ui(res, res, -(ulong) n, ctx);
+    return status;
+}

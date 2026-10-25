@@ -76,7 +76,10 @@ are minors of the input, so their size is bounded and no fractions
 appear ([](algorithms/linear-algebra/fraction-free)).
 
 The generic functions built on these decompositions choose between
-them by the properties of the ring:
+them by the properties of the ring (`gr_mat_nonsingular_solve` and
+`gr_mat_inv` are ring methods, which a ring can replace; the $p$-adic
+`padic_radix` rings use elimination with full pivoting by valuation
+levels for the optimal precision):
 
 | Operation | Algorithm |
 |---|---|
