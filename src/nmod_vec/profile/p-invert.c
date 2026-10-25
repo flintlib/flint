@@ -9,184 +9,146 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-/* helper to create examples */
-void _nmod_vec_rand_not_zero(nn_ptr vec, flint_rand_t state, ulong len, nmod_t mod)
+/*
+    Usage: p-invert [min_bits [max_bits]]
+
+    Ratios time(naive) / time(shoup) and time(naive) / time(generic) of
+    _nmod_vec_invert_naive, _shoup and _generic (above 1: faster than the
+    naive inversions one by one), for a random prime of each bit size and
+    several lengths. Each timing is the minimum over a few batches of about
+    1 ms of calls on consecutive vectors of a pool of 2^20 random nonzero
+    entries, drawn once per bit size.
+
+    The pool must be large: the inversions (extended Euclid) are full of
+    data-dependent branches, and when the same few hundred inputs come back
+    the branch predictor learns them, which can make an inversion 2-4x
+    faster; with a small pool, the batch versions (one inversion per
+    vector) would benefit from this much more than the naive one (len
+    inversions per vector), giving ratios above len.
+*/
+
+#define POOL_ENTRIES (WORD(1) << 20)
+#define BATCH_US 1000
+#define ROUNDS 3
+
+typedef void (*invert_t)(nn_ptr, nn_srcptr, ulong, nmod_t);
+
+/* nanoseconds per call of f on consecutive vectors of the pool, *v being
+   the index of the next vector (kept from one call to the next, so that
+   the inputs do not come back soon) */
+static double
+time_invert(invert_t f, nn_ptr res, nn_srcptr pool, slong nvec, ulong len,
+            nmod_t mod, slong * v)
 {
-    for (ulong k = 0; k < len; k++)
-        vec[k] = 1 + n_randint(state, mod.n - 1);
-}
+    timeit_t t;
+    slong reps, i, r;
+    double best;
 
-typedef struct
-{
-   ulong prime;
-   slong length;
-} info_t;
+#define BATCH(nreps) \
+    do { \
+        timeit_start_us(t); \
+        for (i = 0; i < (nreps); i++) \
+        { \
+            f(res, pool + (*v) * len, len, mod); \
+            *v = (*v + 1 == nvec) ? 0 : *v + 1; \
+        } \
+        timeit_stop_us(t); \
+    } while (0)
 
-void sample_invert_naive(void * arg, ulong count)
-{
-    info_t * info = (info_t *) arg;
-    nmod_t mod;
-    nmod_init(&mod, info->prime);
-    const ulong len = info->length;
-
-    nn_ptr vec = (nn_ptr) flint_malloc(len*sizeof(ulong));
-    nn_ptr res = _nmod_vec_init(len);
-    FLINT_TEST_INIT(state);
-
-    for (ulong i = 0; i < count; i++)
+    /* number of calls for a batch of at least BATCH_US microseconds */
+    for (reps = 1; ; reps *= 2)
     {
-        _nmod_vec_rand_not_zero(vec, state, len, mod);
-
-        prof_start();
-        _nmod_vec_invert_naive(res, vec, len, mod);
-        prof_stop();
+        BATCH(reps);
+        if (t->wall >= BATCH_US)
+            break;
     }
 
-    flint_free(vec);
-    flint_free(res);
-    FLINT_TEST_CLEAR(state);
-}
-
-void sample_invert_generic(void * arg, ulong count)
-{
-    info_t * info = (info_t *) arg;
-    nmod_t mod;
-    nmod_init(&mod, info->prime);
-    const ulong len = info->length;
-
-    nn_ptr vec = (nn_ptr) flint_malloc(len*sizeof(ulong));
-    nn_ptr res = _nmod_vec_init(len);
-    FLINT_TEST_INIT(state);
-
-    for (ulong i = 0; i < count; i++)
+    best = (double) t->wall / reps;
+    for (r = 1; r < ROUNDS; r++)
     {
-        _nmod_vec_rand_not_zero(vec, state, len, mod);
-
-        prof_start();
-        _nmod_vec_invert_generic(res, vec, len, mod);
-        prof_stop();
+        BATCH(reps);
+        if ((double) t->wall / reps < best)
+            best = (double) t->wall / reps;
     }
 
-    flint_free(vec);
-    flint_free(res);
-    FLINT_TEST_CLEAR(state);
+#undef BATCH
+
+    return 1000.0 * best;
 }
 
-void sample_invert_shoup(void * arg, ulong count)
+int main(int argc, char ** argv)
 {
-    info_t * info = (info_t *) arg;
-    nmod_t mod;
-    nmod_init(&mod, info->prime);
-    const ulong len = info->length;
+    const ulong lens[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                          16, 1024, 65536};
+    const int nlens = sizeof(lens) / sizeof(lens[0]);
+    flint_bitcnt_t bits, min_bits = 2, max_bits = FLINT_BITS;
+    nn_ptr pool, res;
+    int j;
 
-    nn_ptr vec = (nn_ptr) flint_malloc(len*sizeof(ulong));
-    nn_ptr res = _nmod_vec_init(len);
+    if (argc > 1)
+        min_bits = FLINT_MAX(2, atoi(argv[1]));
+    if (argc > 2)
+        max_bits = FLINT_MIN(FLINT_BITS, atoi(argv[2]));
+
     FLINT_TEST_INIT(state);
 
-    for (ulong i = 0; i < count; i++)
+    /* warm-up (the first timings of a run can be off) */
     {
-        _nmod_vec_rand_not_zero(vec, state, len, mod);
-
-        prof_start();
-        _nmod_vec_invert_shoup(res, vec, len, mod);
-        prof_stop();
+        nmod_t mod;
+        ulong one = 1, r1;
+        slong v = 0;
+        nmod_init(&mod, 3);
+        time_invert(_nmod_vec_invert_naive, &r1, &one, 1, 1, mod, &v);
     }
 
-    flint_free(vec);
-    flint_free(res);
-    FLINT_TEST_CLEAR(state);
-}
+    flint_printf("naive / shoup | naive / generic (time ratios)\n");
+    flint_printf("bits");
+    for (j = 0; j < nlens; j++)
+        flint_printf(" %11wu", lens[j]);
+    flint_printf("\n");
 
+    pool = _nmod_vec_init(POOL_ENTRIES);
+    res = _nmod_vec_init(lens[nlens - 1]);
 
-int main(void)
-{
-    FLINT_TEST_INIT(state);
-
-    double min, max;
-    double mins_naive[18]; // note: max seems to be consistently identical or extremely close to min
-    double mins_shoup[18];
-    double mins_generic[18];
-    info_t info;
-    flint_bitcnt_t i;
-
-    flint_printf("unit: all measurements in c/l (up to constant multiplicative factor)\n");
-    flint_printf("profiled: naive | precomp shoup | generic\n");
-    flint_printf("bit/len\t");
-    for (int len = 1; len <= 16; ++len)
-        flint_printf("%d\t\t", len);
-    flint_printf("1024\t\t");
-    flint_printf("65536\n");
-
-    for (i = 2; i <= FLINT_BITS; i++)
+    for (bits = min_bits; bits <= max_bits; bits++)
     {
-        info.prime = n_randprime(state, i, 1);
+        nmod_t mod;
+        slong k, v = 0;
 
-        for (int len = 1; len <= 16; ++len)
+        nmod_init(&mod, n_randprime(state, bits, 1));
+        for (k = 0; k < POOL_ENTRIES; k++)
+            pool[k] = 1 + n_randint(state, mod.n - 1);
+
+        flint_printf("%4wu", bits);
+        for (j = 0; j < nlens; j++)
         {
-            info.length = len;
+            ulong len = lens[j];
+            slong nvec = POOL_ENTRIES / len;
+            double tn, ts, tg;
 
-            prof_repeat(&min, &max, sample_invert_naive, (void *) &info);
-            mins_naive[len-1] = min;
-            prof_repeat(&min, &max, sample_invert_shoup, (void *) &info);
-            mins_shoup[len-1] = min;
-            prof_repeat(&min, &max, sample_invert_generic, (void *) &info);
-            mins_generic[len-1] = min;
+            tn = time_invert(_nmod_vec_invert_naive, res, pool, nvec, len, mod, &v);
+            tg = time_invert(_nmod_vec_invert_generic, res, pool, nvec, len, mod, &v);
+
+            if (NMOD_CAN_USE_SHOUP(mod))
+            {
+                ts = time_invert(_nmod_vec_invert_shoup, res, pool, nvec, len, mod, &v);
+                flint_printf(" %5.2f|%5.2f", tn / ts, tn / tg);
+            }
+            else
+                flint_printf("    na|%5.2f", tn / tg);
+
+            v = 0;
         }
-
-        info.length = 1024;
-        prof_repeat(&min, &max, sample_invert_naive, (void *) &info);
-        mins_naive[16] = min;
-        prof_repeat(&min, &max, sample_invert_shoup, (void *) &info);
-        mins_shoup[16] = min;
-        prof_repeat(&min, &max, sample_invert_generic, (void *) &info);
-        mins_generic[16] = min;
-
-        info.length = 65536;
-        prof_repeat(&min, &max, sample_invert_naive, (void *) &info);
-        mins_naive[17] = min;
-        prof_repeat(&min, &max, sample_invert_shoup, (void *) &info);
-        mins_shoup[17] = min;
-        prof_repeat(&min, &max, sample_invert_generic, (void *) &info);
-        mins_generic[17] = min;
-
-        if (i < FLINT_BITS)
-        {
-            flint_printf("%wd", i);
-            for (int len = 1; len <= 16; ++len)
-                flint_printf("\t%.2lf|%.2lf|%.2lf",
-                             (mins_naive[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(len*100),
-                             (mins_shoup[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(len*100),
-                             (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(len*100));
-            flint_printf("\t%.2lf|%.2lf|%.2lf",
-                         (mins_naive[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*100),
-                         (mins_shoup[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*100),
-                         (mins_generic[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*100));
-            flint_printf("\t%.2lf|%.2lf|%.2lf",
-                         (mins_naive[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100),
-                         (mins_shoup[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100),
-                         (mins_generic[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100));
-            flint_printf("\n");
-        }
-        else
-        {
-            flint_printf("%wd", i);
-            for (int len = 1; len <= 16; ++len)
-                flint_printf("\t%.2lf| na |%.2lf",
-                             (mins_naive[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(len*100),
-                             (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(len*100));
-            flint_printf("\t%.2lf| na |%.2lf",
-                         (mins_naive[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*100),
-                         (mins_generic[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*100));
-            flint_printf("\t%.2lf| na |%.2lf",
-                         (mins_naive[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100),
-                         (mins_generic[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100));
-            flint_printf("\n");
-        }
+        flint_printf("\n");
     }
+
+    _nmod_vec_clear(pool);
+    _nmod_vec_clear(res);
 
     FLINT_TEST_CLEAR(state);
     return 0;
