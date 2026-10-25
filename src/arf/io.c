@@ -2,6 +2,7 @@
     Copyright (C) 2012 Fredrik Johansson
     Copyright (C) 2015 Arb authors
     Copyright (C) 2019 Julian Rüth
+    Copyright (C) 2026 Joel Dahne
 
     This file is part of FLINT.
 
@@ -15,6 +16,8 @@
 #include <string.h>
 #include "arf.h"
 #include "arb.h"
+#include "gr.h"
+#include "decimal.h"
 
 /* strings ********************************************************************/
 
@@ -80,6 +83,49 @@ char * arf_get_str(const arf_t x, slong d)
         mag_init(arb_radref(t));  /* no need to free */
         return arb_get_str(t, FLINT_MAX(d, 1), ARB_STR_NO_RADIUS);
     }
+}
+
+char *
+arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd)
+{
+    gr_ctx_t ctx;
+    decfloat_t y;
+    char * res;
+    char * digits;
+    fmpz_t t;
+    slong n, L, i, pos;
+
+    if (arf_is_special(x))
+        return arf_get_str(x, d);
+
+    d = FLINT_MAX(d, 1);
+
+    /* the arf and decimal rounding modes have the same encoding */
+    gr_ctx_init_decfloat(ctx, d, 0);
+    decfloat_init(y, ctx);
+    GR_MUST_SUCCEED(decfloat_set_round_arf(y, x, d, (int) rnd, ctx));
+
+    /* digits of the mantissa, with trailing zeros removed and then
+       padded to exactly d digits */
+    n = FLINT_ABS(y->m.size);
+    digits = flint_malloc(FLINT_MAX(n * DECIMAL_CTX_E(ctx), d) + 1);
+    fmpz_init(t);
+    L = _decfloat_get_digits(digits, t, y, ctx);
+    for (i = L; i < d; i++)
+        digits[i] = '0';
+    fmpz_sub_ui(t, t, d - L);
+    L = d;
+
+    res = flint_malloc(_decimal_write_number_bound(L, t) + 1);
+    pos = _decimal_write_number(res, DECFLOAT_SGNBIT(y), digits, L, t, 3);
+    res[pos] = '\0';
+
+    flint_free(digits);
+    fmpz_clear(t);
+    decfloat_clear(y, ctx);
+    gr_ctx_clear(ctx);
+
+    return res;
 }
 
 int

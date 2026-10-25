@@ -752,6 +752,13 @@ faithful: the error is at most one unit in the last digit.
 :::
 
 ::: function
+char * arf_get_str_rnd(const arf_t x, slong d, arf_rnd_t rnd)
+
+Return `x` in decimal with `d` significant digits, correctly rounded in
+the direction `rnd`, as a string to be freed with `flint_free`.
+:::
+
+::: function
 void arf_debug(const arf_t x)
 
 Prints the internal fields of `x` (exponent, size, sign and limbs).
