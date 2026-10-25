@@ -13,28 +13,16 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-void
-nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
+/* the substitution, out of line: inlined in the caller, its short dot
+   products were compiled to slower code (seen on x86-64) */
+FLINT_STATIC_NOINLINE void
+_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B,
+        int unit, nn_srcptr inv, nn_ptr tmp)
 {
-    slong i, j, n, m;
-    nmod_t mod;
-    nn_ptr inv, tmp;
-
-    n = U->r;
-    m = B->c;
-    mod = U->mod;
-
-    if (!unit)
-    {
-        inv = _nmod_vec_init(n);
-        for (i = 0; i < n; i++)
-            inv[i] = n_invmod(nmod_mat_entry(U, i, i), mod.n);
-    }
-    else
-        inv = NULL;
+    slong i, j, n = U->r, m = B->c;
+    nmod_t mod = U->mod;
 
     const dot_params_t params = _nmod_vec_dot_params(n, mod);
-    tmp = _nmod_vec_init(n);
 
     for (i = 0; i < m; i++)
     {
@@ -55,10 +43,36 @@ nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t
         for (j = 0; j < n; j++)
             nmod_mat_entry(X, j, i) = tmp[j];
     }
+}
 
-    _nmod_vec_clear(tmp);
+void
+nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
+{
+    slong i, n;
+    nmod_t mod;
+    nn_ptr inv, tmp;
+    TMP_INIT;
+
+    n = U->r;
+    mod = U->mod;
+
+    TMP_START;
+
+    /* inverses of the diagonal entries: one inversion */
     if (!unit)
-        _nmod_vec_clear(inv);
+    {
+        inv = TMP_ALLOC(n * sizeof(ulong));
+        for (i = 0; i < n; i++)
+            inv[i] = nmod_mat_entry(U, i, i);
+        _nmod_vec_invert(inv, inv, n, mod);
+    }
+    else
+        inv = NULL;
+
+    tmp = TMP_ALLOC(n * sizeof(ulong));
+    _solve_triu_classical(X, U, B, unit, inv, tmp);
+
+    TMP_END;
 }
 
 void
