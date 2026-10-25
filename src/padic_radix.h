@@ -19,6 +19,7 @@
 #endif
 
 #include "radix.h"
+#include "gr_mat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +34,8 @@ extern "C" {
 #define PADIC_RADIX_NO_ERROR  2                   /* floating-point mode: never track error (future) */
 #define PADIC_RADIX_DECIMAL   4                   /* print the unit as a decimal integer */
 #define PADIC_RADIX_TEST_LIMITS 8                 /* randtest: exercise the v/N representability limits */
+#define PADIC_RADIX_FAST_BOUNDS 16                /* polynomial products: quasi-linear (possibly pessimistic) error bounds */
+#define PADIC_RADIX_FAST_LINALG 32                /* linear algebra: fastest algorithms rather than optimal precision */
 
 typedef struct
 {
@@ -110,6 +113,32 @@ int padic_radix_sqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
 int padic_radix_rsqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_square(const padic_radix_t x, gr_ctx_t ctx);
 
+int padic_radix_mul_si(padic_radix_t res, const padic_radix_t x, slong c, gr_ctx_t ctx);
+int padic_radix_mul_ui(padic_radix_t res, const padic_radix_t x, ulong c, gr_ctx_t ctx);
+int padic_radix_mul_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t c, gr_ctx_t ctx);
+int padic_radix_addmul(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx);
+int padic_radix_submul(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, gr_ctx_t ctx);
+int _padic_radix_addmul_sub(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, int sub, gr_ctx_t ctx);
+int padic_radix_addmul_si(padic_radix_t res, const padic_radix_t x, slong c, gr_ctx_t ctx);
+int padic_radix_submul_si(padic_radix_t res, const padic_radix_t x, slong c, gr_ctx_t ctx);
+int padic_radix_addmul_ui(padic_radix_t res, const padic_radix_t x, ulong c, gr_ctx_t ctx);
+int padic_radix_submul_ui(padic_radix_t res, const padic_radix_t x, ulong c, gr_ctx_t ctx);
+int padic_radix_addmul_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t c, gr_ctx_t ctx);
+int padic_radix_submul_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t c, gr_ctx_t ctx);
+int padic_radix_pow_ui(padic_radix_t res, const padic_radix_t x, ulong n, gr_ctx_t ctx);
+int padic_radix_pow_si(padic_radix_t res, const padic_radix_t x, slong n, gr_ctx_t ctx);
+int padic_radix_pow_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t n, gr_ctx_t ctx);
+
+int _padic_radix_vec_mul_scalar(padic_radix_struct * res, const padic_radix_struct * vec, slong len, const padic_radix_t c, gr_ctx_t ctx);
+int _padic_radix_vec_mul_scalar_si(padic_radix_struct * res, const padic_radix_struct * vec, slong len, slong c, gr_ctx_t ctx);
+int _padic_radix_vec_mul_scalar_ui(padic_radix_struct * res, const padic_radix_struct * vec, slong len, ulong c, gr_ctx_t ctx);
+int _padic_radix_vec_mul_scalar_fmpz(padic_radix_struct * res, const padic_radix_struct * vec, slong len, const fmpz_t c, gr_ctx_t ctx);
+int _padic_radix_vec_addmul_scalar(padic_radix_struct * res, const padic_radix_struct * vec, slong len, const padic_radix_t c, gr_ctx_t ctx);
+int _padic_radix_vec_submul_scalar(padic_radix_struct * res, const padic_radix_struct * vec, slong len, const padic_radix_t c, gr_ctx_t ctx);
+int _padic_radix_vec_addmul_scalar_si(padic_radix_struct * res, const padic_radix_struct * vec, slong len, slong c, gr_ctx_t ctx);
+int _padic_radix_vec_submul_scalar_si(padic_radix_struct * res, const padic_radix_struct * vec, slong len, slong c, gr_ctx_t ctx);
+int _padic_radix_vec_addmul_scalar_fmpz(padic_radix_struct * res, const padic_radix_struct * vec, slong len, const fmpz_t c, gr_ctx_t ctx);
+
 truth_t padic_radix_is_zero(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_one(const padic_radix_t x, gr_ctx_t ctx);
 truth_t padic_radix_is_neg_one(const padic_radix_t x, gr_ctx_t ctx);
@@ -132,6 +161,29 @@ int padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initi
 int padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial,
     int subtract, const padic_radix_struct * vec1, slong stride1,
     const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx);
+
+int padic_radix_mat_mul_packed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int padic_radix_mat_mul_fmpz(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int padic_radix_mat_mul_mpn_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int padic_radix_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+
+int _padic_radix_poly_mulmid_KS(padic_radix_struct * res, const padic_radix_struct * poly1, slong len1, const padic_radix_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _padic_radix_poly_mulmid_mod(padic_radix_struct * res, const padic_radix_struct * poly1, slong len1, const padic_radix_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _padic_radix_poly_mulmid_packed(padic_radix_struct * res, const padic_radix_struct * poly1, slong len1, const padic_radix_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _padic_radix_poly_mulmid(padic_radix_struct * res, const padic_radix_struct * poly1, slong len1, const padic_radix_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _padic_radix_poly_mullow(padic_radix_struct * res, const padic_radix_struct * poly1, slong len1, const padic_radix_struct * poly2, slong len2, slong n, gr_ctx_t ctx);
+
+int _padic_radix_mat_charpoly_berkowitz(padic_radix_struct * cp, const gr_mat_t mat, gr_ctx_t ctx);
+int padic_radix_mat_charpoly_hessenberg(padic_radix_struct * cp, const gr_mat_t mat, gr_ctx_t ctx);
+int padic_radix_mat_charpoly_lift(padic_radix_struct * cp, const gr_mat_t mat, gr_ctx_t ctx);
+int padic_radix_mat_charpoly(padic_radix_struct * cp, const gr_mat_t mat, gr_ctx_t ctx);
+
+int padic_radix_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx);
+int padic_radix_mat_det_lu_full(padic_radix_t res, const gr_mat_t A, gr_ctx_t ctx);
+int padic_radix_mat_det_levels(padic_radix_t res, const gr_mat_t A, gr_ctx_t ctx);
+int padic_radix_mat_det(padic_radix_t res, const gr_mat_t A, gr_ctx_t ctx);
+int padic_radix_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int padic_radix_mat_inv(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx);
 
 slong _padic_radix_exp_bound(slong v, slong N, ulong p);
 

@@ -21,7 +21,8 @@ diagonalisation, Jordan forms and functions of matrices, and QR
 decompositions.
 
 Multiplication, LU decomposition, determinants, characteristic
-polynomials, triangular solving and pivot selection are methods of the
+polynomials, triangular and nonsingular solving, inversion and pivot
+selection are methods of the
 coefficient context, which a ring can replace by its own
 implementation; every algorithm here that multiplies matrices calls
 `gr_mat_mul`, so a fast ring-specific product speeds up block LU
@@ -625,12 +626,17 @@ minor of $A$) to `den`. See [](gr_mat/solve).
 
 ::: function
 int gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+int gr_mat_nonsingular_solve_generic(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 int gr_mat_nonsingular_solve_lu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 int gr_mat_nonsingular_solve_fflu(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
 Solve $AX = B$ for a square matrix $A$. Return `GR_DOMAIN` if $A$ is
 singular, even if the system has solutions, and if $X$ does not have
-entries in $R$. See [](gr_mat/solve).
+entries in $R$. `gr_mat_nonsingular_solve` calls the ring method
+`GR_METHOD_MAT_NONSINGULAR_SOLVE`, whose default
+`gr_mat_nonsingular_solve_generic` uses the LU version in fields (or
+inexact rings) and the fraction-free LU version otherwise. See
+[](gr_mat/solve).
 :::
 
 ::: function
@@ -774,9 +780,12 @@ position cannot be identified because a zero test is undecidable.
 
 ::: function
 int gr_mat_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+int gr_mat_inv_generic(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-Sets `res` to the inverse of a square matrix in the ring, computed with
-`gr_mat_nonsingular_solve` and the identity matrix. Returns `GR_DOMAIN`
+Sets `res` to the inverse of a square matrix in the ring. `gr_mat_inv`
+calls the ring method `GR_METHOD_MAT_INV`, whose default
+`gr_mat_inv_generic` uses `gr_mat_nonsingular_solve` with the identity
+matrix. Returns `GR_DOMAIN`
 if the matrix is shown to be not invertible over $R$ (this is not
 reliable over rings with zero divisors) and `GR_UNABLE` if
 invertibility cannot be decided. For the inverse over the fraction

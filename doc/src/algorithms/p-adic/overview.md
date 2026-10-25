@@ -56,7 +56,11 @@ needed for printing.
 | Trace in $\mathbf{Q}_q$ | power sums by Newton's identities | `qadic_trace` | [](algorithms/p-adic/unramified-extensions#trace) |
 | Norm in $\mathbf{Q}_q$ | Sylvester determinant, or $\exp(\operatorname{Tr}\log x)$ | `qadic_norm`, `qadic_norm_resultant`, `qadic_norm_analytic` | [](algorithms/p-adic/unramified-extensions#norm) |
 | Products of polynomials and matrices | exact products over $\Z$, then reduction | `padic_poly_mul`, `padic_mat_mul`, `qadic_mul` | [](algorithms/polynomials/multiplication-integers) |
-| Dot products, matrix products | delayed carries over radix limbs | `padic_radix_dot`, `gr_mat_mul` over `padic_radix` | |
+| Dot products, matrix products | delayed carries over radix limbs; limb-aligned packed kernel, or products modulo $B^S$ (`nmod_mat`, `mpn_mod_mat`, `fmpz_mat`); precisions by min-plus products | `padic_radix_dot`, `padic_radix_mat_mul` | [](algorithms/p-adic/block-products) |
+| Polynomial products over `padic_radix` | packed kernel, Kronecker substitution in radix $p^e$, or products modulo $B^S$ (`nmod_poly`, `mpn_mod_poly`); precisions by exact min-plus convolutions | `_padic_radix_poly_mulmid` | [](algorithms/p-adic/block-products#polynomials) |
+| Determinant over `padic_radix` | full pivoting on valuations, blocked by valuation levels (optimal precision) | `padic_radix_mat_det` | [](algorithms/p-adic/linear-algebra#det) |
+| Linear systems, inverse over `padic_radix` | Gauss–Jordan elimination by valuation levels (optimal precision) | `padic_radix_mat_nonsingular_solve`, `padic_radix_mat_inv` | [](algorithms/p-adic/linear-algebra#solve) |
+| Characteristic polynomial over `padic_radix` | Berkowitz for cyclic matrices, otherwise an exact lift with the precision of the differential | `padic_radix_mat_charpoly` | [](algorithms/p-adic/linear-algebra#charpoly) |
 
 `padic_poly_mul` and `padic_mat_mul` multiply the integer parts with
 `fmpz_poly_mul` and `fmpz_mat_mul` and reduce once; the valuations
@@ -65,7 +69,10 @@ Newton iteration over $\Z/p^{N}\Z$. Polynomial and matrix algorithms not
 listed here (division, GCD, factorisation, linear solving) are not
 implemented in the fixed-precision modules; over `padic_radix` the
 generic algorithms of `gr_poly` and `gr_mat` apply, with the precision
-loss tracked by the ball arithmetic.
+loss tracked by the ball arithmetic. For products, determinants, linear
+systems and characteristic polynomials `padic_radix` has its own
+methods, which give the optimal precision
+([](algorithms/p-adic/linear-algebra)).
 
 ## Choosing a module {#choosing}
 

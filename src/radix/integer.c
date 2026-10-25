@@ -777,9 +777,8 @@ radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radi
     ulong d;
     slong il, id;
 
-    /* todo: speed up this division */
-    il = (ulong) index / radix->exp;
-    id = (ulong) index % radix->exp;
+    il = radix_div_exp((ulong) index, radix);
+    id = index - il * (slong) radix->exp;
 
     d = radix_integer_get_limb(x, il, radix);
 
@@ -801,9 +800,8 @@ radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong inde
     ulong d, hi, lo;
     slong il, id;
 
-    /* todo: speed up this division */
-    il = (ulong) index / radix->exp;
-    id = (ulong) index % radix->exp;
+    il = radix_div_exp((ulong) index, radix);
+    id = index - il * (slong) radix->exp;
 
     d = radix_integer_get_limb(x, il, radix);
 
@@ -858,9 +856,8 @@ radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong 
 
     slong nl, nd;
 
-    /* todo: speed up this division */
-    nl = (ulong) n / radix->exp;
-    nd = (ulong) n % radix->exp;
+    nl = radix_div_exp((ulong) n, radix);
+    nd = n - nl * (slong) radix->exp;
 
     slong xn = FLINT_ABS(xsize);
     slong rn = xn + nl + (nd != 0);
@@ -913,9 +910,8 @@ void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, s
 
     slong nl, nd;
 
-    /* todo: speed up this division */
-    nl = (ulong) n / radix->exp;
-    nd = (ulong) n % radix->exp;
+    nl = radix_div_exp((ulong) n, radix);
+    nd = n - nl * (slong) radix->exp;
 
     slong rn = xn - nl;
 
@@ -1040,7 +1036,7 @@ radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n
         return;
     }
 
-    limbs = n / e;
+    limbs = radix_div_exp(n, radix);
     rem = n - limbs * e;
     tot = limbs + (rem != 0);
 
@@ -1072,7 +1068,7 @@ radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, 
         return;
     }
 
-    limbs = n / e;
+    limbs = radix_div_exp(n, radix);
     rem = n - limbs * e;
     tot = limbs + (rem != 0);
 

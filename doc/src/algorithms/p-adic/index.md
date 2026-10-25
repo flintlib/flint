@@ -1,7 +1,7 @@
 ---
 title: p-adic numbers
 short: p-adic
-summary: Arithmetic with p-adic numbers and unramified extensions: precision models, Newton and Hensel lifting, exponentials and logarithms, Frobenius and Teichmüller lifts, norms and traces.
+summary: Arithmetic with p-adic numbers and unramified extensions: precision models, error propagation in block products, optimal precision in linear algebra, Newton and Hensel lifting, exponentials and logarithms, Frobenius and Teichmüller lifts, norms and traces.
 order: 10
 ---
 

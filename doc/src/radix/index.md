@@ -39,9 +39,9 @@ radix_t
 A radix context, holding the digit radix $b$ and the limb radix $B = b^e$
 as `nmod_t` values (fields `b` and `B`), the exponent `exp` $= e$, and
 precomputed data: the powers $b^k$ for $0 \le k \le e$, data for division
-by these powers (`n_div_precomp_t`), the 2-adic valuation of $b$, inverses
-of the powers of the odd part of $b$, and a function computing digit
-valuations. A `radix_t` is passed by reference to every function of the
+by these powers (`n_div_precomp_t`), data for division by $e$ (see
+`radix_div_exp`), the 2-adic valuation of $b$, inverses of the powers of
+the odd part of $b$, and a function computing digit valuations. A `radix_t` is passed by reference to every function of the
 module.
 :::
 
@@ -50,6 +50,17 @@ DIGIT_RADIX(radix)
 LIMB_RADIX(radix)
 
 The digit radix $b$ and the limb radix $B$ of a `radix_t`, as `ulong`.
+:::
+
+::: function
+ulong radix_div_exp(ulong x, const radix_t radix)
+ulong radix_divrem_exp(ulong * r, ulong x, const radix_t radix)
+
+Return $\lfloor x / e \rfloor$ (and set $r = x \bmod e$), converting a
+number of digits to a number of limbs without a hardware division. For
+$e > 2$ this is one multiplication by a precomputed
+$\lceil 2^{\bits - 2 + \ell} / e \rceil$, $\ell = \lceil \log_2 e \rceil$, and a
+shift, exact for $x < 2^{\bits - 2}$; larger $x$ use `n_div_precomp`.
 :::
 
 ::: function

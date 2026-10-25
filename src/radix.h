@@ -55,6 +55,9 @@ typedef struct
     unsigned int bval;  /* Binary valuation of b */
     n_pair_struct * bpow_oddinv;    /* Inverses of (b>>bval)^k */
     ulong (*val_func)(ulong, const void *);  /* Function to compute digit valuation */
+    ulong exp_inv;      /* Magic multiplier for floor(x / exp), see radix_div_exp */
+    unsigned int exp_shift;
+    n_div_precomp_struct exp_div;   /* General division by exp */
     /* Extended data which may be used by some ring contexts */
     slong trunc_limbs;
     slong trunc_digits;
@@ -638,6 +641,31 @@ n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
         return n_mulhi(x, pre->m) >> pre->e;
     else
         return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+/*
+    floor(x / exp) without hardware division. For exp > 2 this is one
+    64 x 64 -> 128 multiplication by exp_inv = ceil(2^(62 + l) / exp),
+    l = ceil(log2(exp)), followed by a shift; by the Granlund-Montgomery
+    bound it is exact for x < 2^62. Larger x take the general route.
+*/
+RADIX_INLINE ulong
+radix_div_exp(ulong x, const radix_t radix)
+{
+    if (radix->exp <= 2)
+        return x >> (radix->exp - 1);
+    if (FLINT_UNLIKELY(x >> (FLINT_BITS - 2)))
+        return n_div_precomp(x, &radix->exp_div);
+    return n_mulhi(x, radix->exp_inv) >> radix->exp_shift;
+}
+
+/* q = floor(x / exp), *r = x mod exp */
+RADIX_INLINE ulong
+radix_divrem_exp(ulong * r, ulong x, const radix_t radix)
+{
+    ulong q = radix_div_exp(x, radix);
+    *r = x - q * radix->exp;
+    return q;
 }
 
 RADIX_INLINE ulong

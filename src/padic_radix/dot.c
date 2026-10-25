@@ -1,3 +1,4 @@
+#include <string.h>
 /*
     Copyright (C) 2026 Fredrik Johansson
 
@@ -11,6 +12,8 @@
 
 #include "radix.h"
 #include "padic_radix.h"
+#include "impl.h"
+int _padic_radix_addmul_sub(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, int sub, gr_ctx_t ctx);
 #include "gr.h"
 #include "longlong.h"
 #include "mpn_extras.h"
@@ -29,9 +32,7 @@ padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial,
 
     int status = GR_SUCCESS;
 
-    padic_radix_t t;
-    padic_radix_init(t, ctx);
-
+    /* mul-then-add steps as addmul (same result) */
     if (initial == NULL)
     {
         status |= padic_radix_mul(res, vec1, vec2, ctx);
@@ -43,20 +44,15 @@ padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial,
         else
             status |= padic_radix_set(res, initial, ctx);
 
-        status |= padic_radix_mul(t, vec1, vec2, ctx);
-        status |= padic_radix_add(res, res, t, ctx);
+        status |= _padic_radix_addmul_sub(res, vec1, vec2, 0, ctx);
     }
 
     for (slong i = 1; i < len; i++)
-    {
-        status |= padic_radix_mul(t, vec1 + i * stride1, vec2 + i * stride2, ctx);
-        status |= padic_radix_add(res, res, t, ctx);
-    }
+        status |= _padic_radix_addmul_sub(res, vec1 + i * stride1, vec2 + i * stride2, 0, ctx);
 
     if (subtract)
         status |= padic_radix_neg(res, res, ctx);
 
-    padic_radix_clear(t, ctx);
     return status;
 }
 
@@ -136,6 +132,128 @@ _radix_dot_normalize_acc(radix_integer_t T, nn_srcptr acc, slong nslots,
     T->size = outn;
 }
 
+/* res = P - N for normalised digit vectors (no heap temporaries) */
+static void
+_dot_set_diff(radix_integer_t res, nn_srcptr P, slong pn, nn_srcptr Nd, slong nn, const radix_t radix)
+{
+    int sgn;
+    nn_srcptr a, b;
+    slong an, bn, rn;
+    nn_ptr d;
+
+    if (pn != nn)
+        sgn = (pn > nn) ? 1 : -1;
+    else
+        sgn = (pn == 0) ? 0 : mpn_cmp(P, Nd, pn);
+    if (sgn == 0)
+    {
+        res->size = 0;
+        return;
+    }
+    if (sgn > 0) { a = P; an = pn; b = Nd; bn = nn; }
+    else         { a = Nd; an = nn; b = P; bn = pn; }
+    d = radix_integer_fit_limbs(res, an, radix);
+    if (bn == 0)
+        flint_mpn_copyi(d, a, an);
+    else
+        radix_sub(d, a, an, b, bn, radix);
+    rn = an;
+    while (rn > 0 && d[rn - 1] == 0)
+        rn--;
+    res->size = (sgn > 0) ? rn : -rn;
+}
+
+/* q = (hi B^? ...): one step of dividing by B, hi < B */
+static inline ulong
+_dot_divrem2(ulong * r, ulong hi, ulong lo, nmod_t B)
+{
+    ulong q, rr;
+    if (B.norm == 0)
+    {
+        udiv_qrnnd_preinv(q, rr, hi, lo, B.n, B.ninv);
+        *r = rr;
+    }
+    else
+    {
+        udiv_qrnnd_preinv(q, rr, (hi << B.norm) | (lo >> (FLINT_BITS - B.norm)),
+                          lo << B.norm, B.n << B.norm, B.ninv);
+        *r = rr >> B.norm;
+    }
+    return q;
+}
+
+/*
+    Fused residue combination: comb[5 s .. 5 s + 4] += acc[3 s .. 3 s + 2] * p^r
+    for every slot s, then one carry-propagating normalisation in radix B.
+    Replaces one normalisation plus one shifted addition per residue.
+*/
+static void
+_dot_comb_add(nn_ptr comb, nn_srcptr acc, ulong pr, slong nslots)
+{
+    slong s;
+    for (s = 0; s < nslots; s++)
+    {
+        ulong h0, l0, h1, l1, h2, l2, w0, w1, w2, w3, c;
+        nn_ptr t = comb + 5 * s;
+        umul_ppmm(h0, l0, acc[3 * s], pr);
+        umul_ppmm(h1, l1, acc[3 * s + 1], pr);
+        umul_ppmm(h2, l2, acc[3 * s + 2], pr);
+        /* (h2 h1 h0) shifted one word, plus (l2 l1 l0) */
+        w0 = l0;
+        add_ssaaaa(c, w1, 0, h0, 0, l1);
+        add_ssaaaa(w3, w2, h2, h1, 0, l2);
+        add_ssaaaa(w3, w2, w3, w2, 0, c);
+        /* t += (w3 w2 w1 w0) */
+        add_sssaaaaaa(c, t[1], t[0], 0, t[1], t[0], 0, w1, w0);
+        add_sssaaaaaa(t[4], t[3], t[2], t[4], t[3], t[2], 0, w3, w2);
+        add_sssaaaaaa(t[4], t[3], t[2], t[4], t[3], t[2], 0, 0, c);
+    }
+}
+
+static slong
+_dot_comb_normalize(nn_ptr d, nn_srcptr comb, slong nslots, const radix_t radix)
+{
+    nmod_t B = radix->B;
+    ulong cy[5] = { 0, 0, 0, 0, 0 }, c;
+    slong s, i, outn = 0;
+    for (s = 0; ; s++)
+    {
+        if (s < nslots)
+        {
+            nn_srcptr t = comb + 5 * s;
+            add_sssaaaaaa(c, cy[1], cy[0], 0, cy[1], cy[0], 0, t[1], t[0]);
+            add_sssaaaaaa(cy[4], cy[3], cy[2], cy[4], cy[3], cy[2], t[4], t[3], t[2]);
+            add_sssaaaaaa(cy[4], cy[3], cy[2], cy[4], cy[3], cy[2], 0, 0, c);
+        }
+        else if ((cy[0] | cy[1] | cy[2] | cy[3] | cy[4]) == 0)
+            break;
+        {
+            ulong r = 0;
+            i = 4;
+            while (i > 0 && cy[i] == 0)
+                i--;
+            if (i == 0 || (i == 1 && cy[1] < B.n))
+            {
+                /* < B^2: one step */
+                if (i == 0)
+                    cy[0] = _dot_divrem2(&r, 0, cy[0], B);
+                else
+                {
+                    cy[0] = _dot_divrem2(&r, cy[1], cy[0], B);
+                    cy[1] = 0;
+                }
+            }
+            else
+                for ( ; i >= 0; i--)
+                    cy[i] = _dot_divrem2(&r, r, cy[i], B);
+            d[outn++] = r;
+        }
+    }
+    while (outn > 0 && d[outn - 1] == 0)
+        outn--;
+    return outn;
+}
+
 int
 padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
     int subtract, const padic_radix_struct * vec1, slong stride1,
@@ -147,14 +265,15 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
     slong prec_rel = PADIC_RADIX_CTX_PREC_REL(ctx);
 
     slong k, vmin, maxhi, Nterms, N, Wdig, nslots;
-    int have_value;
+    int have_value, keep_exact;
     const padic_radix_struct * a;
     const padic_radix_struct * b;
     int init_nonzero;
 
-    nn_ptr * accp;
-    nn_ptr * accn;
-    radix_integer_t Mp, Mn, T;
+    nn_ptr accp[FLINT_BITS], accn[FLINT_BITS];   /* e < FLINT_BITS */
+    slong nused = 0;
+    ulong maskp = 0, maskn = 0;    /* residues with an accumulator */
+    TMP_INIT;
     radix_integer_t big, Ptmp;   /* running total + scratch for the radix_mulmid path */
 
     if (len <= 0)
@@ -196,9 +315,11 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
         va = a->v; vb = b->v; Na = a->N; Nb = b->N;
         vk = va + vb;
 
+        /* error term of a_k b_k; an inexact zero 0 + O(p^N) has valuation >= N
+           (its stored v = 0 is meaningless), cf. padic_radix_mul */
         Nk = PADIC_RADIX_EXACT;
-        if (Na != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, vb + Na);
-        if (Nb != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, va + Nb);
+        if (Na != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, ((b->u.size == 0) ? Nb : vb) + Na);
+        if (Nb != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, ((a->u.size == 0) ? Na : va) + Nb);
         if (Nk != PADIC_RADIX_EXACT) Nterms = DOT_MIN2(Nterms, Nk);
 
         if (a->u.size != 0 && b->u.size != 0)
@@ -237,23 +358,47 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
     }
 
     /* number of result limbs (slots) to cover */
+    keep_exact = 0;
     {
         slong nslots_ext = (maxhi - vmin + e - 1) / e + 1;
         if (N == DOT_INF)
             nslots = nslots_ext;
         else
         {
-            slong nslots_prec = (N - vmin + e - 1) / e + 2;
+            slong nslots_prec = (N - vmin + e - 1) / e;
             nslots = DOT_MIN2(nslots_prec, nslots_ext);
+
+            /* all terms exact and the exact sum possibly within the context
+               precision: compute it fully, and let finalisation keep it
+               exact if it fits (as for sums of exact products done with
+               mul and add) */
+            if (Nterms == DOT_INF && nslots_ext <= nslots_prec + 1)
+            {
+                nslots = nslots_ext;
+                keep_exact = 1;
+            }
         }
         if (nslots < 1)
             nslots = 1;
     }
-    Wdig = (N == DOT_INF) ? DOT_INF : (N - vmin);
+
+    /* in a context without finite precision, a window (the extent of the
+       terms, or the precision they determine) beyond the size limit of the
+       context: the addmul chain only builds what the partial sums need
+       (getting exact cancellations of terms with huge valuations right),
+       and gives up if that is too large */
+    if (prec_rel == PADIC_RADIX_PREC_INF && prec_abs == PADIC_RADIX_PREC_INF
+        && !_padic_radix_exact_digits_ok(FLINT_MIN(nslots, WORD_MAX / e - 1) * e, ctx))
+        return padic_radix_dot_strided_naive(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
+
+    Wdig = (N == DOT_INF || keep_exact) ? DOT_INF : (N - vmin);
 
     /* ---------------- Pass 2: accumulate ---------------- */
-    accp = flint_calloc(e, sizeof(nn_ptr));
-    accn = flint_calloc(e, sizeof(nn_ptr));
+    /* per-residue accumulators from a TMP arena, zeroed when first used */
+    TMP_START;
+#define DOT_ACC(A, M, r) do { ulong * _m = &(M); \
+        if (!((*_m >> (r)) & 1)) { A[r] = TMP_ALLOC(3 * nslots * sizeof(ulong)); \
+        flint_mpn_zero(A[r], 3 * nslots); *_m |= UWORD(1) << (r); nused++; } } while (0)
     radix_integer_init(big, radix);     /* large products go here (signed) */
     radix_integer_init(Ptmp, radix);
 
@@ -263,17 +408,17 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
         slong ni = FLINT_ABS(initial->u.size);
         nn_srcptr ui = initial->u.d;
         slong d = initial->v - vmin;        /* >= 0 */
-        slong r = d % e, o = d / e, i;
+        slong o = (slong) radix_div_exp((ulong) d, radix), r = d - o * e, i;
         nn_ptr acc;
 
         if (initial->u.size < 0)
         {
-            if (accn[r] == NULL) accn[r] = flint_calloc(3 * nslots, sizeof(ulong));
+            DOT_ACC(accn, maskn, r);
             acc = accn[r];
         }
         else
         {
-            if (accp[r] == NULL) accp[r] = flint_calloc(3 * nslots, sizeof(ulong));
+            DOT_ACC(accp, maskp, r);
             acc = accp[r];
         }
 
@@ -305,7 +450,8 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
         if (Wdig != DOT_INF && d >= Wdig)
             continue;                               /* term entirely below horizon */
 
-        r = d % e; o = d / e;
+        o = (slong) radix_div_exp((ulong) d, radix);
+        r = d - o * e;
         if (o >= nslots)
             continue;
 
@@ -350,12 +496,12 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
         /* Small product: deferred per-residue accumulator. */
         if (neg)
         {
-            if (accn[r] == NULL) accn[r] = flint_calloc(3 * nslots, sizeof(ulong));
+            DOT_ACC(accn, maskn, r);
             acc = accn[r];
         }
         else
         {
-            if (accp[r] == NULL) accp[r] = flint_calloc(3 * nslots, sizeof(ulong));
+            DOT_ACC(accp, maskp, r);
             acc = accp[r];
         }
 
@@ -395,44 +541,85 @@ padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
     }
 
     /* ---------------- Pass 3: finalise accumulators ---------------- */
-    radix_integer_init(Mp, radix);
-    radix_integer_init(Mn, radix);
-    radix_integer_init(T, radix);
-
     {
-        slong r;
-        for (r = 0; r < e; r++)
+        slong r, nacc = 0, rlast = 0;
+        int lastneg = 0;
+        nacc = nused;
+        if (nacc == 1)
         {
-            if (accp[r] != NULL)
+            lastneg = (maskn != 0);
+            rlast = flint_ctz(lastneg ? maskn : maskp);
+        }
+        if (nacc <= 1 && big->size == 0)
+        {
+            /* a single accumulator: its residue r just adds to the valuation,
+               no digit shift (finalize canonicalises) */
+            if (nacc == 0)
+                res->u.size = 0;
+            else
             {
-                _radix_dot_normalize_acc(T, accp[r], nslots, radix);
-                radix_integer_addlsh(Mp, Mp, T, r, radix);   /* Mp += T << r */
-                flint_free(accp[r]);
+                _radix_dot_normalize_acc(&res->u, lastneg ? accn[rlast] : accp[rlast], nslots, radix);
+                if (lastneg)
+                    res->u.size = -res->u.size;
             }
-            if (accn[r] != NULL)
+            res->v = vmin + rlast;
+        }
+        else
+        {
+            nn_ptr comb = TMP_ALLOC(5 * nslots * sizeof(ulong));
+            nn_ptr pd = TMP_ALLOC(2 * (nslots + 7) * sizeof(ulong)), nd = pd + nslots + 7;
+            slong pn = 0, nn = 0;
+            int side;
+            for (side = 0; side < 2; side++)
             {
-                _radix_dot_normalize_acc(T, accn[r], nslots, radix);
-                radix_integer_addlsh(Mn, Mn, T, r, radix);
-                flint_free(accn[r]);
+                nn_ptr * A = side ? accn : accp;
+                ulong m = side ? maskn : maskp;
+                if (m == 0)
+                    continue;
+                flint_mpn_zero(comb, 5 * nslots);
+                while (m != 0)
+                {
+                    r = flint_ctz(m);
+                    m &= m - 1;
+                    _dot_comb_add(comb, A[r], radix->bpow[r], nslots);
+                }
+                if (side)
+                    nn = _dot_comb_normalize(nd, comb, nslots, radix);
+                else
+                    pn = _dot_comb_normalize(pd, comb, nslots, radix);
             }
+            _dot_set_diff(&res->u, pd, pn, nd, nn, radix);       /* M = Mp - Mn (signed) */
+            if (big->size != 0)
+                radix_integer_add(&res->u, &res->u, big, radix);   /* + large-product total */
+            res->v = vmin;
         }
     }
-    flint_free(accp);
-    flint_free(accn);
+    res->N = keep_exact ? PADIC_RADIX_EXACT : N;
 
-    radix_integer_sub(&res->u, Mp, Mn, radix);       /* M = Mp - Mn (signed) */
-    if (big->size != 0)
-        radix_integer_add(&res->u, &res->u, big, radix);   /* + large-product total */
-    res->v = vmin;
-    res->N = N;
-
-    radix_integer_clear(Mp, radix);
-    radix_integer_clear(Mn, radix);
-    radix_integer_clear(T, radix);
     radix_integer_clear(big, radix);
     radix_integer_clear(Ptmp, radix);
+    TMP_END;
+#undef DOT_ACC
 
     return _padic_radix_finalize(res, ctx);
+}
+
+/*
+    Longest dot product for which the addmul chain beats the delayed dot
+    (measured): 4 terms at 1 limb of precision, 3 at 2 limbs, 2 beyond.
+*/
+static slong
+_padic_radix_dot_naive_max(gr_ctx_t ctx)
+{
+    const radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
+    slong r = PADIC_RADIX_CTX_PREC_REL(ctx), nl;
+
+    if (r == PADIC_RADIX_PREC_INF)
+        r = PADIC_RADIX_CTX_PREC_ABS(ctx);
+    if (r <= 0 || r == PADIC_RADIX_PREC_INF)
+        return 3;
+    nl = (slong) radix_div_exp((ulong) r + radix->exp - 1, radix);
+    return (nl == 1) ? 4 : (nl == 2) ? 3 : 2;
 }
 
 int
@@ -440,10 +627,20 @@ padic_radix_dot_strided(padic_radix_t res, const padic_radix_t initial,
     int subtract, const padic_radix_struct * vec1, slong stride1,
     const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
 {
-    if (len <= 7)
+    slong nmax = _padic_radix_dot_naive_max(ctx);
+    if (len <= nmax)
         return padic_radix_dot_strided_naive(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
-    else
-        return padic_radix_dot_strided_delayed(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
+    /* Short dots with differing valuation sums pay a per-residue cost in the
+       delayed dot; up to 2 limbs of precision the addmul chain wins below
+       about 8 terms in that case. */
+    if (len <= 7 && nmax >= 3)
+    {
+        slong k, v0 = vec1->v + vec2->v;
+        for (k = 1; k < len; k++)
+            if (vec1[k * stride1].v + vec2[k * stride2].v != v0)
+                return padic_radix_dot_strided_naive(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
+    }
+    return padic_radix_dot_strided_delayed(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
 }
 
 int
