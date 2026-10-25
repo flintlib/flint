@@ -91,18 +91,31 @@ TEST_FUNCTION_START(nfixed_dot, state)
         nlimbs = MINLIMBS + n_randint(state, MAXLIMBS - MINLIMBS + 1);
 
         ulong maxerr = (2 * nlimbs - 1) * len;
+        int shift, same_sign;
+
+        /* Either small entries, or entries as large as possible such that
+           the result is guaranteed to be less than 1 in magnitude (results
+           in [1/2, 1) must be handled). */
+        if (n_randint(state, 2))
+            shift = 10;
+        else
+            shift = (FLINT_CLOG2(len) + 1) / 2;
+
+        same_sign = n_randint(state, 2);
 
         for (i = 0; i < len; i++)
         {
             a = A + i * (nlimbs + 1);
-            a[0] = n_randint(state, 2);
+            a[0] = same_sign ? 0 : n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
-            a[nlimbs] >>= 10;
+            if (shift != 0)
+                a[nlimbs] >>= shift;
 
             a = B + i * (nlimbs + 1);
-            a[0] = n_randint(state, 2);
+            a[0] = same_sign ? 0 : n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
-            a[nlimbs] >>= 10;
+            if (shift != 0)
+                a[nlimbs] >>= shift;
         }
 
         switch (nlimbs)
@@ -140,8 +153,12 @@ TEST_FUNCTION_START(nfixed_dot, state)
             nfixed_add(D, D, t, nlimbs);
         }
 
+        /* The difference is computed modulo 1, so also check that the
+           signs agree unless both values are tiny (a result off by
+           exactly 1 would otherwise go unnoticed). */
         nfixed_sub(t, C, D, nlimbs);
-        if (!flint_mpn_zero_p(t + 2, nlimbs - 1) || t[1] > maxerr)
+        if (!flint_mpn_zero_p(t + 2, nlimbs - 1) || t[1] > maxerr ||
+            (C[0] != D[0] && (C[nlimbs] != 0 || D[nlimbs] != 0)))
         {
             TEST_FUNCTION_FAIL("nlimbs = %wd, len = %wd,\n\nA = %{ulong*},\n\nB = %{ulong*},\n\nC = %{ulong*},\n\nD = %{ulong*},\n\nt = %{ulong*}\n", nlimbs, len,
                 A, len * (nlimbs + 1), B, len * (nlimbs + 1),
