@@ -160,8 +160,9 @@ deg_x res = 128 (bound 128), equal: 1
 ## Use in FLINT {#use}
 
 - `nmod_mpoly_resultant` uses the algorithm for polynomials in exactly two
-  variables with positive degrees in the eliminated variable, after
-  converting to dense bivariate form (`nmod_mpoly_get_bpoly`), when the
+  variables, with single-word exponents and positive degrees in the
+  eliminated variable, after converting to dense bivariate form
+  (`nmod_mpoly_get_bpoly`), when the
   dense boxes are not too large (at most $2^{32}$ entries and points, and
   not more than 64 times the number of terms beyond $2^{26}$ entries), the
   inputs are not tiny, and `n_bpoly_mod_resultant_cutoff` predicts a gain:

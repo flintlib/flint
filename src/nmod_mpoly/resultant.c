@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
@@ -61,6 +62,10 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     int success;
 
     if (ctx->minfo->nvars != 2 || A->length == 0 || B->length == 0)
+        return 0;
+
+    /* the conversion to the dense form reads single-word exponents only */
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
         return 0;
 
     degAy = nmod_mpoly_degree_si(A, var, ctx);
@@ -115,13 +120,29 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
 
     if (success)
     {
-        /* the resultant is a polynomial in the other variable alone */
-        n_bpoly_fit_length(Rb, 1);
-        n_poly_swap(Rb->coeffs + 0, res);
-        Rb->length = 1;
-        n_bpoly_normalise(Rb);
+        if (n_poly_is_zero(res))
+        {
+            nmod_mpoly_zero(R, ctx);
+        }
+        else
+        {
+            /* the resultant is a polynomial in the other variable alone, of a
+               degree that can exceed what the exponent fields of A hold */
+            ulong exps[2];
+            flint_bitcnt_t bits;
 
-        nmod_mpoly_set_bpoly(R, A->bits, Rb, var, other, ctx);
+            exps[var] = 0;
+            exps[other] = res->length - 1;
+            bits = mpoly_exp_bits_required_ui(exps, ctx->minfo);
+            bits = mpoly_fix_bits(bits, ctx->minfo);
+            FLINT_ASSERT(bits <= FLINT_BITS);
+
+            n_bpoly_fit_length(Rb, 1);
+            n_poly_swap(Rb->coeffs + 0, res);
+            Rb->length = 1;
+
+            nmod_mpoly_set_bpoly(R, bits, Rb, var, other, ctx);
+        }
     }
 
     n_poly_clear(res);
