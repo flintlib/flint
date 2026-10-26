@@ -781,7 +781,7 @@ Returns the sum of the diagonal entries of the square matrix `mat`.
 These functions solve $LX = B$ or $UX = B$ for a square triangular matrix
 with $r$ rows and an $r \times c$ matrix $B$, or, for the `_right`
 versions, $XL = B$ or $XU = B$ for a $k \times r$ matrix $B$. Only the
-triangle and, if `unit` is 0, the diagonal of $L$ or $U$ are read, so they
+relevant triangular part and, if `unit` is 0, the diagonal of $L$ or $U$ are read, so they
 may be stored in a matrix holding other data, such as the output of
 `nmod_mat_lu`. If `unit` is nonzero the diagonal is taken to be 1.
 Otherwise every diagonal entry must be invertible modulo $n$, or a
@@ -804,9 +804,17 @@ otherwise.
 void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
-Forward, respectively back, substitution: each column of $X$ is computed
-entry by entry, each entry with one dot product and one reduction. The
-inverses of the diagonal entries are computed once.
+Forward, respectively back, substitution, for an $r \times r$ triangular
+matrix.
+If $B$ has at least $\max(4, r/4)$ columns ($\max(4, r/2)$ for
+$n > 2^{31}$, or $n > 2^{15}$ with 32-bit words), the rows of $X$ are
+computed one after the other, each as the row of $B$ minus a linear
+combination of the rows already computed, with delayed reductions: the
+products are accumulated by vectors in one, two or three words and each
+entry is reduced once (or a few times, for some moduli below $2^{32}$).
+Otherwise each column of $X$ is computed entry by entry, each
+entry with one dot product and one reduction, which is faster with few
+long columns. The inverses of the diagonal entries are computed once.
 :::
 
 ::: function
@@ -853,11 +861,20 @@ or fewer than 64 columns, and the recursive algorithm otherwise.
 void nmod_mat_solve_tril_right_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 void nmod_mat_solve_triu_right_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
-Substitution: each row of $X$ is computed entry by entry, from the last
-to the first for $L$ and from the first to the last for $U$, each entry
-with one dot product and one reduction. The columns of the triangle are
-copied to rows 64 at a time, so that the dot products read contiguous
-memory, and the inverses of the diagonal entries are computed once.
+Substitution, for an $r \times r$ triangular matrix, with three methods. If $B$
+has at least $\max(6, r/4)$ rows ($\max(6, r/2)$ for $n > 2^{31}$, or
+$n > 2^{15}$ with 32-bit words), as `nmod_mat_solve_tril_classical`
+(`nmod_mat_solve_triu_classical`) with delayed reductions on the
+transposed system, $B$ being transposed by blocks of 256 rows. Otherwise,
+if $r \le 128$ ($r \le 64$ for these larger moduli) or $B$ has at most
+4 rows, each row $x$ of $X$ is computed from the last entry to the first for
+$L$ (from the first to the last for $U$): once $x_j$ is known, $x_j$ times the
+row $j$ of the triangular matrix is added to the unreduced sums of the
+remaining entries, each reduced once. Otherwise (a large triangular matrix and
+a few rows), each entry is computed with one dot product and one reduction, the
+columns of the triangular matrix being copied to rows 64 at a time so that the
+dot products read contiguous memory. The inverses of the diagonal entries are
+computed once.
 :::
 
 ::: function

@@ -21,7 +21,7 @@
     if lower is nonzero) and k x r matrix X, with the algorithm algo
     (0: default, 1: classical, 2: recursive), in windows, with aliasing,
     and with garbage in the entries of T that must not be read (the other
-    triangle, and the diagonal if unit). Returns 0 if correct.
+    triangular part, and the diagonal if unit). Returns 0 if correct.
 */
 static int
 _solve_tri_right_check(flint_rand_t state, int lower, int algo)

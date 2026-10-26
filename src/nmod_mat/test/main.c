@@ -53,6 +53,7 @@
 #include "t-scalar_addmul_ui.c"
 #include "t-scalar_mul.c"
 #include "t-solve.c"
+#include "t-solve_tri_delayed.c"
 #include "t-solve_tril.c"
 #include "t-solve_tril_classical.c"
 #include "t-solve_tril_recursive.c"
@@ -112,6 +113,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_scalar_addmul_ui),
     TEST_FUNCTION(nmod_mat_scalar_mul),
     TEST_FUNCTION(nmod_mat_solve),
+    TEST_FUNCTION(nmod_mat_solve_tri_delayed),
     TEST_FUNCTION(nmod_mat_solve_tril),
     TEST_FUNCTION(nmod_mat_solve_tril_classical),
     TEST_FUNCTION(nmod_mat_solve_tril_recursive),

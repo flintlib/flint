@@ -12,12 +12,15 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "nmod_mat/impl.h"
 
-/* columns of the triangle copied to rows at a time, for the dot products */
+/* columns of the triangular matrix copied to rows at a time, for the dot products */
 #define TRSM_RIGHT_BLOCK 64
 
 /*
-    X L = B, row by row: x_j = (b_j - sum_{t > j} x_t L[t][j]) / L[j][j]
+    With the delayed reductions of solve_tri_delayed.c, unless the vectors
+    would be long and few (see impl.h). Otherwise, X L = B row by row:
+    x_j = (b_j - sum_{t > j} x_t L[t][j]) / L[j][j]
     for j = r - 1, ..., 0. For the dot products, the columns of L below the
     diagonal are copied to rows, TRSM_RIGHT_BLOCK of them at a time (from
     the last ones), each block serving all the rows of X.
@@ -30,15 +33,32 @@ nmod_mat_solve_tril_right_classical(nmod_mat_t X, const nmod_mat_t L,
     nmod_t mod = L->mod;
     nn_ptr inv = NULL;
     nmod_mat_t T;
+    TMP_INIT;
 
     if (r == 0 || k == 0)
         return;
 
+    /* with delayed reductions (impl.h), unless the vectors would be long */
+    if (NMOD_MAT_SOLVE_TRI_RIGHT_ROWS(r, k, mod.n))
+    {
+        _nmod_mat_solve_tri_rows_delayed(X, L, B, unit, 0, 1);
+        return;
+    }
+    if (NMOD_MAT_SOLVE_TRI_RIGHT_AXPY(r, k, mod.n))
+    {
+        _nmod_mat_solve_tri_right_axpy_delayed(X, L, B, unit, 0);
+        return;
+    }
+
+    TMP_START;
+
+    /* inverses of the diagonal entries: one inversion */
     if (!unit)
     {
-        inv = _nmod_vec_init(r);
+        inv = TMP_ALLOC(r * sizeof(ulong));
         for (j = 0; j < r; j++)
-            inv[j] = nmod_inv(nmod_mat_entry(L, j, j), mod);
+            inv[j] = nmod_mat_entry(L, j, j);
+        _nmod_vec_invert(inv, inv, r, mod);
     }
 
     nmod_mat_init(T, FLINT_MIN(r, TRSM_RIGHT_BLOCK), r, mod.n);
@@ -72,8 +92,7 @@ nmod_mat_solve_tril_right_classical(nmod_mat_t X, const nmod_mat_t L,
     }
 
     nmod_mat_clear(T);
-    if (!unit)
-        _nmod_vec_clear(inv);
+    TMP_END;
 }
 
 void
@@ -118,13 +137,9 @@ nmod_mat_solve_tril_right_recursive(nmod_mat_t X, const nmod_mat_t L,
 void
 nmod_mat_solve_tril_right(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 {
-    if (B->r < NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF ||
-        B->c < NMOD_MAT_SOLVE_TRI_COLS_CUTOFF)
-    {
-        nmod_mat_solve_tril_right_classical(X, L, B, unit);
-    }
-    else
-    {
+    /* see impl.h */
+    if (NMOD_MAT_SOLVE_TRI_RIGHT_REC(L->r, B->r, L->mod.n))
         nmod_mat_solve_tril_right_recursive(X, L, B, unit);
-    }
+    else
+        nmod_mat_solve_tril_right_classical(X, L, B, unit);
 }

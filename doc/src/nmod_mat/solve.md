@@ -204,6 +204,6 @@ b2: x[0] = 588586
 A x == b in all cases: 1
 ```
 
-The upper triangular solve reads only the upper triangle of `LU`, and the
+The upper triangular solve reads only the upper triangular part of `LU`, and the
 lower triangular solve with `unit` set reads only the entries below the
 diagonal, so both use the packed output of `nmod_mat_lu` directly.
