@@ -12,6 +12,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "nmod_mat/delayed_impl.h"
 
 static slong
 nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
@@ -114,9 +115,13 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
             else
                 e = n_mod_barrett(d * a(i, col), mod.n, npre);
 
-            f = mod.n - e;
-
-            _nmod_vec_nored_scalar_addmul_halflimb(&a(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            /* skip the update for a zero multiplier (this also keeps the
+               scalar f in [1, n - 1], as assumed by the bounds above) */
+            if (e != 0)
+            {
+                f = mod.n - e;
+                _nmod_vec_nored_scalar_addmul_halflimb(&a(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            }
 
             a(i, col) = 0;
             a(i, rank - 1) = e;
@@ -128,48 +133,6 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 #undef a
 
     return rank;
-}
-
-FLINT_FORCE_INLINE
-void mullo_2x1(ulong * r1, ulong * r0, ulong a1, ulong a0, ulong b0)
-{
-    ulong t0, t1;
-    umul_ppmm(t1, t0, a0, b0);
-    t1 += a1 * b0;
-    *r0 = t0;
-    *r1 = t1;
-}
-
-#include "mpn_extras.h"
-
-/* Precompute floor(2^(2*FLINT_BITS) / n) for Barrett-style modular reduction.
-   This could be optimized. */
-static void
-n_ll_rem_l_precomp(ulong * qhi, ulong * qlo, ulong n)
-{
-    ulong q[4];
-    ulong a[4];
-    a[0] = 0;
-    a[1] = 0;
-    a[2] = 1;
-    mpn_divrem_1(q, 0, a, 3, n);
-    *qlo = q[0];
-    *qhi = q[1];
-}
-
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
-FLINT_FORCE_INLINE ulong
-n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
-{
-    ulong c2, c1, c0;
-
-    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
-    (void) c1;
-    (void) c0;
-    xlo -= c2 * n;
-    if (xlo >= n)
-        xlo -= n;
-    return xlo;
 }
 
 static slong
@@ -326,12 +289,15 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
         for (i = row + 1; i < nrows; i++)
         {
             e = nmod_mul(d, a(i, col), mod);
-            f = mod.n - e;
 
-            if (halflimb)
-                _nmod_vec_nored_ll_scalar_addmul_halflimb(&UNREDUCED_LO(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
-            else
-                _nmod_vec_nored_ll_scalar_addmul(&UNREDUCED_LO(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            if (e != 0)
+            {
+                f = mod.n - e;
+                if (halflimb)
+                    _nmod_vec_nored_ll_scalar_addmul_halflimb(&UNREDUCED_LO(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+                else
+                    _nmod_vec_nored_ll_scalar_addmul(&UNREDUCED_LO(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            }
 
             a(i, col) = 0;
             a(i, rank - 1) = e;
@@ -344,42 +310,6 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 
     TMP_END;
     return rank;
-}
-
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l_fullword_limited(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
-    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2)));
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
-
-    return xlo;
-}
-
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    if (xhi >= mod.n) xhi -= mod.n;
-    NMOD_RED2(xlo, xhi, xlo, mod);
-
-    return xlo;
 }
 
 static slong
@@ -554,9 +484,12 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
         for (i = row + 1; i < nrows; i++)
         {
             e = nmod_mul(a(i, col), d, mod);
-            f = mod.n - e;
 
-            _nmod_vec_nored_lll_scalar_addmul(&UNREDUCED3_L0(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            if (e != 0)
+            {
+                f = mod.n - e;
+                _nmod_vec_nored_lll_scalar_addmul(&UNREDUCED3_L0(i, col + 1), &a(row, col + 1), ncols - col - 1, f);
+            }
 
             a(i, col) = 0;
             a(i, rank - 1) = e;
@@ -578,12 +511,19 @@ nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check)
 
     nrows = A->r;
     ncols = A->c;
-    const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(nrows, ncols), A->mod);
 
-    // TODO cases to re-examine after dot product changes?
-    if (params.method <= _DOT1)
+    /* the modulus 1, for which the reductions of the delayed variants
+       cannot be precomputed (all entries are zero) */
+    if (A->mod.n == 1)
+        return nmod_mat_lu_classical(P, A, rank_check);
+
+    /* number of limbs of min(nrows, ncols) * (n - 1)^2, which bounds the
+       unreduced entries (the bound of a dot product of this length) */
+    int nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(nrows, ncols), A->mod);
+
+    if (nlimbs <= 1)
         return nmod_mat_lu_classical_delayed_1(P, A, rank_check);
-    else if (params.method <= _DOT2)
+    else if (nlimbs == 2)
         return nmod_mat_lu_classical_delayed_2(P, A, rank_check);
     else
         return nmod_mat_lu_classical_delayed_3(P, A, rank_check);

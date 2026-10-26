@@ -186,6 +186,15 @@ fpv_load_u64(const ulong * p)
     return _mm512_cvtepu64_pd(_mm512_loadu_si512((const void *) p));
 }
 
+/* the first w lanes, 0 < w <= FPV_VL, zero above (only p[0], ..., p[w - 1]
+   are read: masked lanes do not fault) */
+FLINT_FORCE_INLINE fpv
+fpv_load_u64_first(const ulong * p, slong w)
+{
+    return _mm512_cvtepu64_pd(_mm512_maskz_loadu_epi64(
+                (__mmask8) ((1 << w) - 1), (const void *) p));
+}
+
 FLINT_FORCE_INLINE void
 fpv_store_u64(ulong * p, fpv a)
 {
@@ -276,6 +285,18 @@ fpv_load_u64(const ulong * p)
                          _mm256_castsi256_pd(magic));
 }
 
+FLINT_FORCE_INLINE fpv
+fpv_load_u64_first(const ulong * p, slong w)
+{
+    const __m256i magic = _mm256_set1_epi64x(FPV_MAGIC52);
+    const __m256i m = _mm256_cmpgt_epi64(_mm256_set1_epi64x(w),
+                                         _mm256_set_epi64x(3, 2, 1, 0));
+    __m256i u = _mm256_maskload_epi64((const long long *) p, m);
+
+    return _mm256_sub_pd(_mm256_castsi256_pd(_mm256_or_si256(u, magic)),
+                         _mm256_castsi256_pd(magic));
+}
+
 FLINT_FORCE_INLINE void
 fpv_store_u64(ulong * p, fpv a)
 {
@@ -358,6 +379,15 @@ FLINT_FORCE_INLINE fpv
 fpv_load_u64(const ulong * p)
 {
     return vcvtq_f64_u64(vld1q_u64((const uint64_t *) p));
+}
+
+FLINT_FORCE_INLINE fpv
+fpv_load_u64_first(const ulong * p, slong w)
+{
+    if (w >= 2)
+        return fpv_load_u64(p);
+    return vcvtq_f64_u64(vcombine_u64(vld1_u64((const uint64_t *) p),
+                                      vdup_n_u64(0)));
 }
 
 FLINT_FORCE_INLINE void
@@ -490,6 +520,16 @@ fpv_load_u64(const ulong * p)
     slong i;
     for (i = 0; i < FPV_VL; i++)
         r.v[i] = (double) p[i];
+    return r;
+}
+
+FLINT_FORCE_INLINE fpv
+fpv_load_u64_first(const ulong * p, slong w)
+{
+    fpv r;
+    slong i;
+    for (i = 0; i < FPV_VL; i++)
+        r.v[i] = (i < w) ? (double) p[i] : 0.0;
     return r;
 }
 

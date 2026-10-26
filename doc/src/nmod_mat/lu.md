@@ -168,7 +168,7 @@ pivot columns 0 2 3, others 1 4
 L*U == rows of A permuted by P: 1
 ```
 
-Row 0 of $A$ has a zero in column 0, so rows 0 and 1 are exchanged. Column
+Row 0 of $A$ has a zero in column 0, so rows 0 and 1 are swapped. Column
 1 has no pivot because it is twice column 0. In row 2 of the output, the
 entries 9 and 5 belong to $L$ and the entries $0, 2, 4$ in columns 2 to 4
 to $U$, whose pivot in this row is the 2 in column 3. Row 3 lies in the

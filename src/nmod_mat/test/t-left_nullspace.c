@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "rank_profile_helpers.h"
 
 TEST_FUNCTION_START(nmod_mat_left_nullspace, state)
 {
@@ -62,6 +63,38 @@ TEST_FUNCTION_START(nmod_mat_left_nullspace, state)
                         "ker * A != 0\n"
                         "A = %{nmod_mat}\n",
                         A);
+
+            /* the basis with identity at the rows of A not in its row rank
+               profile (the transpose of the basis of the right kernel of
+               the transpose, from its reduced row echelon form), the
+               other rows of ker zero */
+            {
+                nmod_mat_t At, K, Kt, W;
+                slong j, k;
+
+                nmod_mat_init(At, n, m, mod);
+                nmod_mat_transpose(At, A);
+                _rp_kernel_rref(Kt, At);
+                nmod_mat_init(K, nullity, m, mod);
+                nmod_mat_transpose(K, Kt);
+                nmod_mat_window_init(W, ker, 0, 0, nullity, m);
+                if (!nmod_mat_equal(W, K))
+                    TEST_FUNCTION_FAIL(
+                            "basis\n"
+                            "A = %{nmod_mat}\n"
+                            "ker = %{nmod_mat}\n"
+                            "K = %{nmod_mat}\n",
+                            A, ker, K);
+                nmod_mat_window_clear(W);
+                for (j = nullity; j < m; j++)
+                    for (k = 0; k < m; k++)
+                        if (nmod_mat_entry(ker, j, k) != 0)
+                            TEST_FUNCTION_FAIL("nonzero entry beyond the basis\n");
+
+                nmod_mat_clear(At);
+                nmod_mat_clear(K);
+                nmod_mat_clear(Kt);
+            }
 
             nmod_mat_clear(A);
             nmod_mat_clear(ker);

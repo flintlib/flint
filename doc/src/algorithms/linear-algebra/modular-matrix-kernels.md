@@ -252,8 +252,19 @@ methods for such shapes when a vector code path exists for $N$.
   with AVX2 or AVX-512 and $N \le 2^{32}$, products are split at bit 56
   as in [](algorithms/linear-algebra/dot-products#split) and folded every
   255 rows; otherwise, for $N < 2^{50}$, the floating-point modular
-  multiplication is used with a fold every four rows. This is also the
-  algorithm of `nmod_mat_nmod_vec_mul`.
+  multiplication is used with a fold every four rows. For the larger
+  moduli (with AVX2 or AVX-512; above $2^{52}$ with IFMA) the entries are
+  split into two limbs of at most 32 bits whose products are accumulated
+  in three to six vector lanes per entry of $C$, as in
+  [](algorithms/linear-algebra/dot-products#split-limbs), carried into
+  each other every few rows (for $N \le 2^{61}$, every $2^{63-b}$ rows
+  or so, $b$ the bit length of $N - 1$) or never (32-bit limbs, larger
+  $N$), and each entry is reduced once from up to three words at the end;
+  when $B$ takes more than 512 KB (half of a level 2 cache of 1 MB, a
+  compile-time parameter), the rows go 16 at a time and the accumulators
+  are kept in the level 2 cache in between. `nmod_mat_mul` uses it when $B$
+  has at least 6 columns. This is also the algorithm of
+  `nmod_mat_nmod_vec_mul` (for $B$ wide enough).
 - *Few columns* (2 to 4, or 2 to 8 with IFMA): the columns of $B$ are
   transposed once, and each row of $A$ is multiplied with all of them as
   simultaneous dot products that share the loads of the row, with the

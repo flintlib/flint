@@ -85,6 +85,55 @@ TEST_FUNCTION_START(nmod_mat_lu_classical_delayed, state)
     slong i;
     int result;
 
+    /* moduli 2^k: A = L U with L unit lower triangular and U upper
+       triangular with odd diagonal, so that all pivots are units and no
+       row is exchanged; the variants for 1, 2 and 3 limbs all occur */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t A, L, U, LU, LU2;
+        ulong mod;
+        slong m, n, k, rank, rank2;
+        slong *P, *P2;
+
+        m = n_randint(state, 30);
+        n = n_randint(state, 30);
+        mod = UWORD(1) << (1 + n_randint(state, FLINT_BITS - 1));
+
+        nmod_mat_init(L, m, m, mod);
+        nmod_mat_init(U, m, n, mod);
+        nmod_mat_init(A, m, n, mod);
+        nmod_mat_randtril(L, state, 1);
+        nmod_mat_randtriu(U, state, 0);
+        for (k = 0; k < FLINT_MIN(m, n); k++)
+            nmod_mat_entry(U, k, k) |= 1;
+        nmod_mat_mul(A, L, U);
+
+        P = flint_malloc(sizeof(slong) * (m + 1));
+        P2 = flint_malloc(sizeof(slong) * (m + 1));
+        nmod_mat_init_set(LU, A);
+        nmod_mat_init_set(LU2, A);
+        rank = nmod_mat_lu_classical_delayed(P, LU, 0);
+        rank2 = nmod_mat_lu_classical(P2, LU2, 0);
+
+        if (rank != FLINT_MIN(m, n) || rank2 != rank
+                || !nmod_mat_equal(LU, LU2) || !_perm_equal(P, P2, m)
+                || check(P, LU, A, rank) != 0)
+            TEST_FUNCTION_FAIL(
+                    "modulus 2^k\n"
+                    "A = %{nmod_mat}\n"
+                    "LU = %{nmod_mat}\n"
+                    "LU2 = %{nmod_mat}\n",
+                    A, LU, LU2);
+
+        nmod_mat_clear(A);
+        nmod_mat_clear(L);
+        nmod_mat_clear(U);
+        nmod_mat_clear(LU);
+        nmod_mat_clear(LU2);
+        flint_free(P);
+        flint_free(P2);
+    }
+
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, LU, LU2;
@@ -164,6 +213,29 @@ TEST_FUNCTION_START(nmod_mat_lu_classical_delayed, state)
             nmod_mat_clear(LU2);
             flint_free(P2);
         }
+    }
+
+    /* the modulus 1 */
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t A;
+        slong m, n, k, rank;
+        slong * P;
+
+        m = n_randint(state, 80);
+        n = n_randint(state, 80);
+        nmod_mat_init(A, m, n, 1);
+        P = flint_malloc(sizeof(slong) * (m + 1));
+
+        rank = nmod_mat_lu_classical_delayed(P, A, 0);
+        for (k = 0; k < m; k++)
+            if (P[k] != k)
+                rank = -1;
+        if (rank != 0 || nmod_mat_lu(P, A, 0) != 0)
+            TEST_FUNCTION_FAIL("modulus 1, m = %wd, n = %wd\n", m, n);
+
+        nmod_mat_clear(A);
+        flint_free(P);
     }
 
     TEST_FUNCTION_END(state);

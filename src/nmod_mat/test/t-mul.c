@@ -13,6 +13,7 @@
 #include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_mat.h"
+#include "nmod_mat/impl.h"
 
 /* Defined in t-mul.c and t-mul_classical_threaded.c */
 #ifndef nmod_mat_mul_check
@@ -119,6 +120,88 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_clear(D);
     }
 
+    /* tiny matrices (all dimensions up to 4, nmod_mat_mul uses
+       _nmod_mat_mul_tiny up to NMOD_MAT_MUL_TINY_MAX), with aliasing, and
+       _nmod_mat_mul_tiny itself up to 8; moduli for the one-, two- and
+       three-word sums */
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
+    {
+        nmod_mat_t A, B, C, D;
+        ulong mod;
+        slong m, k, n;
+        int direct = n_randint(state, 3) == 0;
+
+        m = n_randint(state, direct ? 9 : 5);
+        k = n_randint(state, direct ? 9 : 5);
+        n = n_randint(state, direct ? 9 : 5);
+
+        switch (n_randint(state, 5))
+        {
+            case 0: mod = n_randtest_not_zero(state); break;
+            case 1: mod = UWORD_MAX / 2 + 1 - n_randbits(state, 4); break;
+            case 2: mod = UWORD_MAX - n_randbits(state, 4); break;
+            case 3: mod = (UWORD_MAX >> (FLINT_BITS / 2 - 2)) - n_randbits(state, 3); break;
+            default: mod = n_randbits(state, 1 + n_randint(state, FLINT_BITS - 1)) + 1; break;
+        }
+
+        nmod_mat_init(A, m, k, mod);
+        nmod_mat_init(B, k, n, mod);
+        nmod_mat_init(C, m, n, mod);
+        nmod_mat_init(D, m, n, mod);
+
+        if (n_randint(state, 2))
+            nmod_mat_randtest(A, state);
+        else
+            nmod_mat_randfull(A, state);
+        if (n_randint(state, 2))
+            nmod_mat_randtest(B, state);
+        else
+            nmod_mat_randfull(B, state);
+        nmod_mat_randtest(C, state);
+
+        if (direct)
+            _nmod_mat_mul_tiny(C, A, B);
+        else
+            nmod_mat_mul(C, A, B);
+        nmod_mat_mul_check(D, A, B);
+
+        if (!nmod_mat_equal(C, D))
+            TEST_FUNCTION_FAIL("tiny: m = %wd, k = %wd, n = %wd, mod = %wu, direct = %d\n"
+                               "A = %{nmod_mat}\nB = %{nmod_mat}\nC = %{nmod_mat}\nD = %{nmod_mat}\n",
+                               m, k, n, mod, direct, A, B, C, D);
+
+        if (k == n)
+        {
+            nmod_mat_t T;
+            nmod_mat_init_set(T, A);
+            if (direct)
+                _nmod_mat_mul_tiny(T, T, B);
+            else
+                nmod_mat_mul(T, T, B);
+            if (!nmod_mat_equal(T, D))
+                TEST_FUNCTION_FAIL("tiny: aliasing C = A failed\n");
+            nmod_mat_clear(T);
+        }
+
+        if (m == k)
+        {
+            nmod_mat_t T;
+            nmod_mat_init_set(T, B);
+            if (direct)
+                _nmod_mat_mul_tiny(T, A, T);
+            else
+                nmod_mat_mul(T, A, T);
+            if (!nmod_mat_equal(T, D))
+                TEST_FUNCTION_FAIL("tiny: aliasing C = B failed\n");
+            nmod_mat_clear(T);
+        }
+
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        nmod_mat_clear(D);
+    }
+
     /* thin shapes (one dimension up to 8, the others larger), which
        nmod_mat_mul sends to specific code, on windows of larger matrices
        half of the time */
@@ -162,10 +245,22 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
                 break;
         }
 
-        if (n_randint(state, 4) == 0)
-            mod = n_randtest_not_zero(state);
-        else
-            mod = n_randbits(state, 1 + n_randint(state, FLINT_MIN(52, FLINT_BITS)));
+        switch (n_randint(state, 6))
+        {
+            case 0:
+                mod = n_randtest_not_zero(state);
+                break;
+            case 1:
+                /* 50 to 64 bits: the u64 path of the products with few
+                   rows (and mul_k52 up to 52 bits) */
+                mod = n_randbits(state,
+                                 FLINT_MIN(50 + n_randint(state, 15), FLINT_BITS));
+                break;
+            default:
+                mod = n_randbits(state,
+                                 1 + n_randint(state, FLINT_MIN(52, FLINT_BITS)));
+                break;
+        }
         /* nmod_mat_randfull does not reduce for the modulus 1 */
         mod = FLINT_MAX(mod, UWORD(2));
 

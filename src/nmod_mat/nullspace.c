@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -9,71 +10,40 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
 #include "nmod_mat.h"
 
 slong
 nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 {
-    slong i, j, k, m, n, rank, nullity;
-    slong * p;
-    slong * pivots;
-    slong * nonpivots;
-    nmod_mat_t tmp;
+    slong m = A->r, n = A->c, rank, nullity;
+    slong * P, * Q;
+    nmod_mat_t LU, Y;
 
-    m = A->r;
-    n = A->c;
+    P = flint_malloc((m + 1) * sizeof(slong));
+    Q = flint_malloc((n + 1) * sizeof(slong));
+    nmod_mat_init_set(LU, A);
 
-    p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
-
-    nmod_mat_init_set(tmp, A);
-    rank = nmod_mat_rref(tmp);
+    rank = nmod_mat_ple(P, Q, LU, 0);
     nullity = n - rank;
 
-    nmod_mat_zero(X);
-
-    if (rank == 0)
+    /* X may be aliased with A, which is no longer read; its first nullity
+       columns are written by nmod_mat_ple_nullspace, the others zeroed */
+    if (nullity != 0)
     {
-        for (i = 0; i < nullity; i++)
-            nmod_mat_entry(X, i, i) = UWORD(1);
+        nmod_mat_window_init(Y, X, 0, 0, n, nullity);
+        nmod_mat_ple_nullspace(Y, LU, Q, rank);
+        nmod_mat_window_clear(Y);
     }
-    else if (nullity)
+    if (X->c > nullity)
     {
-        pivots = p;            /* length = rank */
-        nonpivots = p + rank;  /* length = nullity */
-
-        for (i = j = k = 0; i < rank; i++)
-        {
-            while (nmod_mat_entry(tmp, i, j) == UWORD(0))
-            {
-                nonpivots[k] = j;
-                k++;
-                j++;
-            }
-            pivots[i] = j;
-            j++;
-        }
-        while (k < nullity)
-        {
-            nonpivots[k] = j;
-            k++;
-            j++;
-        }
-
-        for (i = 0; i < nullity; i++)
-        {
-            for (j = 0; j < rank; j++)
-            {
-                ulong c = nmod_mat_entry(tmp, j, nonpivots[i]);
-                nmod_mat_entry(X, pivots[j], i) = nmod_neg(c, A->mod);
-            }
-
-            nmod_mat_entry(X, nonpivots[i], i) = UWORD(1);
-        }
+        nmod_mat_window_init(Y, X, 0, nullity, X->r, X->c);
+        nmod_mat_zero(Y);
+        nmod_mat_window_clear(Y);
     }
 
-    flint_free(p);
-    nmod_mat_clear(tmp);
+    nmod_mat_clear(LU);
+    flint_free(P);
+    flint_free(Q);
 
     return nullity;
 }

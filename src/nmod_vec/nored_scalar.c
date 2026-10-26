@@ -36,6 +36,32 @@ _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len
         res[i] += vec[i] * c;
 }
 
+#elif FLINT_BITS == 64 && defined(__ARM_NEON)
+
+#include <arm_neon.h>
+
+void
+_nmod_vec_nored_scalar_addmul_halflimb_neon(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+{
+    const uint32x2_t vc = vdup_n_u32((uint32_t) c);
+    slong i = 0;
+
+    /* the entries of vec and c fit in 32 bits: the entries are narrowed
+       and multiplied by c with umlal (32 x 32 -> 64 bits, accumulated) */
+    for ( ; i + 3 < len; i += 4)
+    {
+        uint32x2_t v0 = vmovn_u64(vld1q_u64((const uint64_t *) (vec + i)));
+        uint32x2_t v1 = vmovn_u64(vld1q_u64((const uint64_t *) (vec + i + 2)));
+        uint64x2_t r0 = vld1q_u64((const uint64_t *) (res + i));
+        uint64x2_t r1 = vld1q_u64((const uint64_t *) (res + i + 2));
+        vst1q_u64((uint64_t *) (res + i), vmlal_u32(r0, v0, vc));
+        vst1q_u64((uint64_t *) (res + i + 2), vmlal_u32(r1, v1, vc));
+    }
+
+    for ( ; i < len; i++)
+        res[i] += vec[i] * c;
+}
+
 #endif
 
 

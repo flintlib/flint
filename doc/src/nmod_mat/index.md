@@ -296,6 +296,38 @@ entries in distinct rows and columns.
 :::
 
 ::: function
+void nmod_mat_randrank_profile(nmod_mat_t mat, flint_rand_t state, const slong * mrp_r, const slong * mrp_c, slong rank)
+
+For a prime modulus, sets `mat` to a random matrix of rank $r$ = `rank`
+whose rank profile matrix has its $r$ nonzero entries at the positions
+(`mrp_r[k]`, `mrp_c[k]`) for $0 \le k < r$, given in any order. Throws an
+exception if `rank` is negative or exceeds a dimension, or if two
+positions share a row or a column or one lies outside the matrix.
+
+::: details
+The *rank profile matrix* of an $m \times n$ matrix $A$ of rank $r$ is
+the unique $m \times n$ matrix $\mathcal{R}_A$ with $r$ entries equal to
+1, no two in the same row or column, and zeros elsewhere, such that every
+leading submatrix of $A$ (first $i$ rows, first $j$ columns) has the same
+rank as the corresponding leading submatrix of $\mathcal{R}_A$. It
+determines the row and column rank profiles of all leading submatrices of
+$A$ [@DPS2017].
+
+The matrix is computed as one product $L U$: $L$ is $m \times r$ with
+column $k$ zero above row `mrp_r[k]`, 1 in that row and random below it,
+and $U$ is $r \times n$ with row $k$ zero left of column `mrp_c[k]`,
+uniformly random and nonzero in that column, and random to the right of
+it. The random entries come from `nmod_mat_randtest`, so that the
+factors, and therefore the result, are sparse with some probability.
+Completing $L$ and $U$ into square unit lower and invertible upper
+triangular matrices gives $A = L' \mathcal{R} U'$ where $\mathcal{R}$
+has the entries 1 at the given positions, and multiplying by such
+triangular matrices does not change the rank profile matrix. If the
+modulus is 1, the matrix is zero.
+:::
+:::
+
+::: function
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 
 Performs `count` random elementary operations on `mat`, each adding or
@@ -703,9 +735,26 @@ The rows of $B$ are accumulated with delayed reductions where a vector
 code path exists: with AVX512-IFMA for $n \le 2^{52}$ (as in
 `nmod_mat_mul_u52`), with AVX2 or AVX-512 without IFMA for $n \le 2^{32}$
 (splitting each product at bit 56 as in
-[](algorithms/linear-algebra/dot-products#split)), and with a vector FMA
-for $n < 2^{50}$ (as in `nmod_mat_mul_fp50`). Otherwise each row is
-added with `_nmod_vec_scalar_addmul_nmod`.
+[](algorithms/linear-algebra/dot-products#split); the next path is used
+instead for short vectors: $k \le 6$, or $k \le 32$ and $B$ has at
+least $\max(k, 16)$ columns), with a vector FMA
+for $n < 2^{50}$ (as in `nmod_mat_mul_fp50`), and with AVX2 or AVX-512
+for the other moduli, by accumulating the products of limbs of at most
+32 bits of the entries as in
+[](algorithms/linear-algebra/dot-products#split-limbs), with one
+reduction of each entry of $c$ at the end
+([](algorithms/linear-algebra/modular-matrix-kernels#thin)). These code
+paths are not used when $B$ is too narrow for them, with thresholds on
+the length $k$ of $a$ and the number of columns that depend on the path
+(for instance, with AVX512-IFMA, from 16 columns for $k = 2$ down to 3 or
+4 columns from $k = 6$ on; 5 columns for the moduli of the last path).
+Otherwise, with one column, or up to 8 columns and $4 \le k \le 32$
+($8 \le k \le 32$ for $n > 2^{62}$), each entry of $c$ is a dot product;
+else each row is added with `_nmod_vec_scalar_addmul_nmod` when $k$ is
+less than 6 (for $n \le 2^{32}$), 8 (up to $2^{62}$) or 10, or when $B$
+has at least 2048 columns (4096 for $n \ge 2^{63}$), and the
+product is done with `nmod_mat_mul_classical` on blocks of rows of $B$
+for longer vectors.
 :::
 :::
 
@@ -730,12 +779,14 @@ Returns the sum of the diagonal entries of the square matrix `mat`.
 ## Triangular solving {#triangular}
 
 These functions solve $LX = B$ or $UX = B$ for a square triangular matrix
-with $r$ rows and an $r \times c$ matrix $B$. Only the triangle and, if
-`unit` is 0, the diagonal of $L$ or $U$ are read, so they may be stored in
-a matrix holding other data, such as the output of `nmod_mat_lu`. If
-`unit` is nonzero the diagonal is taken to be 1. Otherwise every diagonal
-entry must be invertible modulo $n$, or a `FLINT_IMPINV` exception is
-raised. $X$ may be aliased with $B$, but no other aliasing is allowed.
+with $r$ rows and an $r \times c$ matrix $B$, or, for the `_right`
+versions, $XL = B$ or $XU = B$ for a $k \times r$ matrix $B$. Only the
+relevant triangular part and, if `unit` is 0, the diagonal of $L$ or $U$ are read, so they
+may be stored in a matrix holding other data, such as the output of
+`nmod_mat_lu`. If `unit` is nonzero the diagonal is taken to be 1.
+Otherwise every diagonal entry must be invertible modulo $n$, or a
+`FLINT_IMPINV` exception is raised. $X$ may be aliased with $B$, but no
+other aliasing is allowed.
 
 ::: summary algorithms/linear-algebra/gaussian-elimination :::
 
@@ -753,9 +804,17 @@ otherwise.
 void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
-Forward, respectively back, substitution: each column of $X$ is computed
-entry by entry, each entry with one dot product and one reduction. The
-inverses of the diagonal entries are computed once.
+Forward, respectively back, substitution, for an $r \times r$ triangular
+matrix.
+If $B$ has at least $\max(4, r/4)$ columns ($\max(4, r/2)$ for
+$n > 2^{31}$, or $n > 2^{15}$ with 32-bit words), the rows of $X$ are
+computed one after the other, each as the row of $B$ minus a linear
+combination of the rows already computed, with delayed reductions: the
+products are accumulated by vectors in one, two or three words and each
+entry is reduced once (or a few times, for some moduli below $2^{32}$).
+Otherwise each column of $X$ is computed entry by entry, each
+entry with one dot product and one reduction, which is faster with few
+long columns. The inverses of the diagonal entries are computed once.
 :::
 
 ::: function
@@ -786,6 +845,67 @@ $$
 The update of the right-hand side uses `nmod_mat_submul` and the two
 half-size systems use `nmod_mat_solve_tril` (`nmod_mat_solve_triu`),
 which recurses or switches to substitution.
+:::
+:::
+
+::: function
+void nmod_mat_solve_tril_right(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
+void nmod_mat_solve_triu_right(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
+
+Sets $X = B L^{-1}$ for lower triangular $L$, respectively $X = B U^{-1}$
+for upper triangular $U$. Uses substitution if $B$ has fewer than 64 rows
+or fewer than 64 columns, and the recursive algorithm otherwise.
+:::
+
+::: function
+void nmod_mat_solve_tril_right_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
+void nmod_mat_solve_triu_right_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
+
+Substitution, for an $r \times r$ triangular matrix, with three methods. If $B$
+has at least $\max(6, r/4)$ rows ($\max(6, r/2)$ for $n > 2^{31}$, or
+$n > 2^{15}$ with 32-bit words), as `nmod_mat_solve_tril_classical`
+(`nmod_mat_solve_triu_classical`) with delayed reductions on the
+transposed system, $B$ being transposed by blocks of 256 rows. Otherwise,
+if $r \le 128$ ($r \le 64$ for these larger moduli) or $B$ has at most
+4 rows, each row $x$ of $X$ is computed from the last entry to the first for
+$L$ (from the first to the last for $U$): once $x_j$ is known, $x_j$ times the
+row $j$ of the triangular matrix is added to the unreduced sums of the
+remaining entries, each reduced once. Otherwise (a large triangular matrix and
+a few rows), each entry is computed with one dot product and one reduction, the
+columns of the triangular matrix being copied to rows 64 at a time so that the
+dot products read contiguous memory. The inverses of the diagonal entries are
+computed once.
+:::
+
+::: function
+void nmod_mat_solve_tril_right_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
+void nmod_mat_solve_triu_right_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
+
+Splits $L$ (or $U$) into blocks of $\lfloor r/2 \rfloor$ and
+$\lceil r/2 \rceil$ rows and columns and solves recursively, reducing the
+work to matrix multiplications.
+
+::: details
+For lower triangular $L$, the block formula is
+
+$$
+\begin{pmatrix} X & Y \end{pmatrix}
+\begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1} =
+\begin{pmatrix} (X - Y D^{-1} C) A^{-1} & Y D^{-1} \end{pmatrix},
+$$
+
+and for upper triangular $U$
+
+$$
+\begin{pmatrix} X & Y \end{pmatrix}
+\begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1} =
+\begin{pmatrix} X A^{-1} & (Y - X A^{-1} B) D^{-1} \end{pmatrix}.
+$$
+
+The update of the right-hand side uses `nmod_mat_submul` and the two
+half-size systems use `nmod_mat_solve_tril_right`
+(`nmod_mat_solve_triu_right`), which recurses or switches to
+substitution.
 :::
 :::
 
@@ -829,6 +949,96 @@ The same as `nmod_mat_lu` with `rank_check` 0, and in addition writes to
 `pivots_nonpivots`, an array of length $n$, the indices of the $r$ pivot
 columns of $U$ in increasing order followed by the indices of the
 $n - r$ other columns in increasing order.
+:::
+
+## PLE decomposition and rank profiles {#ple}
+
+::: summary algorithms/linear-algebra/gaussian-elimination :::
+
+::: function
+slong nmod_mat_ple(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags)
+slong nmod_mat_ple_classical(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags)
+slong nmod_mat_ple_classical_delayed(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags)
+slong nmod_mat_ple_crout(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags)
+slong nmod_mat_ple_recursive(slong * P, slong * pivots_nonpivots, nmod_mat_t A, int flags)
+
+Computes the PLE decomposition of the $m \times n$ matrix $A$ modulo a
+prime that reveals its rank profile matrix, overwrites $A$ with $L$ and
+$E$ in the storage of `nmod_mat_lu`, and returns the rank $r$. Row $i$
+of $LE$ is row `P[i]` of the original $A$ (`P` has length $m$). The
+array `pivots_nonpivots`, of length $n$, receives the pivot columns of
+$E$ followed by the other columns, both in increasing order; it may be
+`NULL`. The rows `P[r]`, ..., `P[m-1]` are also in increasing order, and
+the rank profile matrix of $A$ has its nonzero entries at
+(`P[k]`, `pivots_nonpivots[k]`) for $k < r$. If `flags` contains
+`NMOD_MAT_PLE_RANK_CHECK` and the rank is less than $\min(m, n)$, the
+function returns 0, possibly before the end, and leaves `A`, `P` and
+`pivots_nonpivots` undefined.
+
+::: details
+These conditions determine the output, so all the algorithms return the
+same; see [](nmod_mat/ple). `nmod_mat_ple_classical` is Gaussian
+elimination with a reduction after each update, and
+`nmod_mat_ple_classical_delayed` accumulates the updates of each entry
+unreduced in one to three words, as `nmod_mat_lu_classical_delayed`.
+`nmod_mat_ple_crout` computes each entry when it is needed, with dot
+products and vector-matrix products that delay their reductions.
+`nmod_mat_ple_recursive` splits the columns in half and reduces the work
+to triangular solving and matrix multiplication, as
+`nmod_mat_lu_recursive`. `nmod_mat_ple` chooses the algorithm.
+:::
+:::
+
+::: function
+void nmod_mat_ple_nullspace(nmod_mat_t X, const nmod_mat_t LU, const slong * pivots_nonpivots, slong rank)
+void nmod_mat_ple_left_nullspace(nmod_mat_t X, const nmod_mat_t LU, const slong * P, slong rank)
+
+Given the output `LU`, `P`, `pivots_nonpivots` and `rank` $= r$ of
+`nmod_mat_ple` for an $m \times n$ matrix $A$, sets the
+$n \times (n - r)$ matrix $X$ to the basis of the right nullspace
+$\{x : Ax = 0\}$ computed by `nmod_mat_nullspace`, respectively the
+$(m - r) \times m$ matrix $X$ to the basis of the left nullspace
+$\{x : xA = 0\}$ computed by `nmod_mat_left_nullspace`. $X$ must have
+exactly these dimensions.
+
+::: details
+Let $c_0 < \cdots < c_{r-1}$ be the pivot columns and
+$f_0 < \cdots < f_{n-r-1}$ the other columns, as in `pivots_nonpivots`.
+Vector $k$ of the right nullspace has a 1 in position $f_k$, zeros at
+the other $f_j$, and entry $(j, k)$ of $C = -E_1^{-1} E_2$ in position
+$c_j$, where $E_1$ and $E_2$ are the columns $c_j$ and $f_j$ of $E$; this
+costs a triangular solve, about $r^2 (n - r)$ operations. Vector $k$ of
+the left nullspace has a 1 in position `P[r+k]`, zeros at the other
+`P[r+j]`, and entry $(k, j)$ of $D = -L_2 L_1^{-1}$ in position `P[j]`,
+where $L_1$ and $L_2$ are the first $r$ and the last $m - r$ rows of $L$;
+this costs a triangular solve on the right, about $(m - r) r^2$
+operations. These are the only bases with an identity matrix in these
+positions: the columns $f_j$ for the right nullspace, and for the left
+nullspace the rows that are not in the row rank profile, in increasing
+order.
+:::
+:::
+
+::: function
+void nmod_mat_ple_nullspace_compact(nmod_mat_t X, const nmod_mat_t LU, const slong * pivots_nonpivots, slong rank)
+void nmod_mat_ple_left_nullspace_compact(nmod_mat_t X, slong * rows, const nmod_mat_t LU, const slong * P, slong rank)
+
+The same bases without their identity matrix. For the right nullspace,
+$X$ is $r \times (n - r)$ and receives $C$: its row $j$ gives the entries
+in position `pivots_nonpivots[j]` and its column $k$ corresponds to the
+vector with a 1 in position `pivots_nonpivots[r+k]`. For the left
+nullspace, $X$ is $(m - r) \times r$, `rows` (length $m$) receives the row
+rank profile of $A$ in increasing order followed by the other rows in
+increasing order, and $X$ receives the columns of $D$ sorted accordingly:
+its column $j$ gives the entries in position `rows[j]` and its row $k$
+corresponds to the vector with a 1 in position `rows[r+k]`.
+:::
+
+::: macro
+NMOD_MAT_PLE_RANK_CHECK
+
+Flag for `nmod_mat_ple`: return 0 as soon as the rank is known to be
+less than $\min(m, n)$.
 :::
 
 ## Solving linear systems {#solve}
@@ -919,7 +1129,9 @@ Sets the first $d$ columns of $X$ to a basis of the right nullspace
 $\{x : Ax = 0\}$ of the $m \times n$ matrix $A$, sets the other entries of
 $X$ to zero, and returns the nullity $d = n - \operatorname{rank}(A)$. $X$
 must have $n$ rows and at least $d$ columns; $n \times n$ always
-suffices. $X$ may be aliased with $A$.
+suffices. $X$ may be aliased with $A$. The basis is the one with an
+identity matrix in the rows of the columns of $A$ without pivot, computed
+with `nmod_mat_ple` and `nmod_mat_ple_nullspace`.
 :::
 
 ::: function
@@ -929,7 +1141,9 @@ Sets the first $d$ rows of $X$ to a basis of the left nullspace
 $\{v : vA = 0\}$ of the $m \times n$ matrix $A$, sets the other entries of
 $X$ to zero, and returns the nullity $d = m - \operatorname{rank}(A)$. $X$
 must have at least $d$ rows and $m$ columns; $m \times m$ always
-suffices.
+suffices. The basis is the one with an identity matrix in the columns of
+the rows of $A$ that are not in its row rank profile, computed with
+`nmod_mat_ple` and `nmod_mat_ple_left_nullspace`.
 :::
 
 ::: function

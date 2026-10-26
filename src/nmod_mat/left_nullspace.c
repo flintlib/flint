@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Edgar Costa
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -9,35 +10,46 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
 #include "nmod_mat.h"
 
 slong
 nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A)
 {
-    slong m = A->r;
-    slong n = A->c;
-    slong nullity, i, j;
-    nmod_mat_t At, Y;
+    slong m = A->r, rank, nullity;
+    slong * P;
+    nmod_mat_t LU, Y;
 
-    /*
-        Left nullspace of A equals right nullspace of A^T, expressed
-        as row vectors.  We defer to nmod_mat_nullspace on A^T (which
-        returns column vectors) and transpose the result.
-    */
-    nmod_mat_init(At, n, m, A->mod.n);
-    nmod_mat_transpose(At, A);
+    P = flint_malloc((m + 1) * sizeof(slong));
+    nmod_mat_init_set(LU, A);
 
-    nmod_mat_init(Y, m, m, A->mod.n);
-    nullity = nmod_mat_nullspace(Y, At);
+    /* the row order of nmod_mat_ple reveals the row rank profile, so that
+       no transposition is needed */
+    rank = nmod_mat_ple(P, NULL, LU, 0);
+    nullity = m - rank;
 
-    nmod_mat_zero(X);
-    for (i = 0; i < nullity; i++)
-        for (j = 0; j < m; j++)
-            nmod_mat_entry(X, i, j) = nmod_mat_entry(Y, j, i);
+    /* the first nullity rows and m columns of X are written by
+       nmod_mat_ple_left_nullspace, the others zeroed */
+    if (nullity != 0)
+    {
+        nmod_mat_window_init(Y, X, 0, 0, nullity, m);
+        nmod_mat_ple_left_nullspace(Y, LU, P, rank);
+        nmod_mat_window_clear(Y);
+    }
+    if (X->c > m && nullity != 0)
+    {
+        nmod_mat_window_init(Y, X, 0, m, nullity, X->c);
+        nmod_mat_zero(Y);
+        nmod_mat_window_clear(Y);
+    }
+    if (X->r > nullity)
+    {
+        nmod_mat_window_init(Y, X, nullity, 0, X->r, X->c);
+        nmod_mat_zero(Y);
+        nmod_mat_window_clear(Y);
+    }
 
-    nmod_mat_clear(Y);
-    nmod_mat_clear(At);
+    nmod_mat_clear(LU);
+    flint_free(P);
 
     return nullity;
 }

@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "rank_profile_helpers.h"
 
 TEST_FUNCTION_START(nmod_mat_nullspace, state)
 {
@@ -62,6 +63,41 @@ TEST_FUNCTION_START(nmod_mat_nullspace, state)
                         "A * ker != 0\n"
                         "A = %{nmod_mat}\n",
                         A);
+
+            /* the basis with identity at the columns without pivot (as
+               computed from the reduced row echelon form), the other
+               columns of ker zero */
+            {
+                nmod_mat_t K, W;
+                slong j, k;
+
+                _rp_kernel_rref(K, A);
+                nmod_mat_window_init(W, ker, 0, 0, n, nullity);
+                if (!nmod_mat_equal(W, K))
+                    TEST_FUNCTION_FAIL(
+                            "basis\n"
+                            "A = %{nmod_mat}\n"
+                            "ker = %{nmod_mat}\n"
+                            "K = %{nmod_mat}\n",
+                            A, ker, K);
+                nmod_mat_window_clear(W);
+                for (j = 0; j < n; j++)
+                    for (k = nullity; k < n; k++)
+                        if (nmod_mat_entry(ker, j, k) != 0)
+                            TEST_FUNCTION_FAIL("nonzero entry beyond the basis\n");
+
+                /* aliasing */
+                if (m == n)
+                {
+                    nmod_mat_t A2;
+                    nmod_mat_init_set(A2, A);
+                    if (nmod_mat_nullspace(A2, A2) != nullity || !nmod_mat_equal(A2, ker))
+                        TEST_FUNCTION_FAIL("aliasing\n");
+                    nmod_mat_clear(A2);
+                }
+
+                nmod_mat_clear(K);
+            }
 
             nmod_mat_clear(A);
             nmod_mat_clear(ker);

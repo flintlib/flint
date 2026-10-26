@@ -68,9 +68,9 @@ nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
         for (i = row + 1; i < m; i++)
         {
             e = nmod_mul(nmod_mat_entry(A, i, col), d, mod);
-            if (length != 0)
+            if (e != 0 && length != 0)
                 _nmod_vec_scalar_addmul_nmod(nmod_mat_entry_ptr(A, i, col + 1),
-                    nmod_mat_entry_ptr(A, row, + col + 1), length, nmod_neg(e, mod), mod);
+                    nmod_mat_entry_ptr(A, row, col + 1), length, nmod_neg(e, mod), mod);
 
             nmod_mat_entry(A, i, col) = 0;
             nmod_mat_entry(A, i, rank - 1) = e;

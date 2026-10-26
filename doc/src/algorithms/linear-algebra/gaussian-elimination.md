@@ -71,8 +71,13 @@ the earlier pivot columns, which span all earlier columns.
 :::
 
 The row permutation, in contrast, is not the row rank profile in
-general; algorithms that compute both profiles are described in
-[@JPS2013; @DPS2017].
+general when the pivot rows are brought into place by swaps, as in
+`nmod_mat_lu`. Using upward rotations of rows instead reveals both
+profiles, and more [@JPS2013; @DPS2017]; see [](#rank-profile). Here a
+*swap* exchanges two rows and leaves the others in place, while an
+*upward rotation* moves a row up to a given position and the rows it
+passes over down by one position each, keeping their order; a *downward
+rotation* is the inverse move.
 
 ## Classical elimination {#classical}
 
@@ -84,10 +89,11 @@ general; algorithms that compute both profiles are described in
 1. $r \gets 0$. For $c = 0, 1, \ldots, n - 1$ while $r < m$:
    1. find the first row $i \ge r$ with $A_{ic} \ne 0$; if there is none,
       continue with the next $c$;
-   2. exchange rows $i$ and $r$ and record the exchange;
+   2. swap rows $i$ and $r$ and record the swap;
    3. for each row $i > r$: $\ell \gets A_{ic} A_{rc}^{-1}$, subtract
-      $\ell$ times row $r$ from row $i$ in columns $c + 1, \ldots, n - 1$,
-      and store $\ell$ in column $r$ of row $i$;
+      $\ell$ times row $r$ from row $i$ in columns $c + 1, \ldots, n - 1$
+      (nothing to do if $\ell = 0$), and store $\ell$ in column $r$ of
+      row $i$;
    4. $r \gets r + 1$.
 :::
 
@@ -95,13 +101,78 @@ For a nonsingular $d \times d$ matrix this costs
 $\sum_{i < d} (d - 1 - i)^2 \approx d^3/3$ multiply-adds, $d$ inversions and,
 in `nmod_mat_lu_classical`, one reduction modulo $p$ per multiply-add.
 
+## Rank profile matrix {#rank-profile}
+
+::: definition {#def-rpm}
+The *rank profile matrix* of $A$, of rank $r$, is the $m \times n$ matrix
+$\mathcal{R}_A$ with $r$ entries equal to 1, no two in the same row or
+column, and zeros elsewhere, such that for all $i \le m$ and $j \le n$ the
+submatrices of $A$ and $\mathcal{R}_A$ formed by their first $i$ rows and
+first $j$ columns have the same rank.
+:::
+
+It exists and is unique [@DPS2017]: writing $\rho(i, j)$ for the rank of
+the leading $i \times j$ submatrix of $A$, the entry $(i, j)$ of
+$\mathcal{R}_A$ is
+$\rho(i+1, j+1) - \rho(i, j+1) - \rho(i+1, j) + \rho(i, j)$. Its rows
+with a nonzero entry form the row rank profile of $A$, its columns with a
+nonzero entry the column rank profile, and the same holds for every
+leading submatrix of $A$ with the entries of $\mathcal{R}_A$ that lie in
+it.
+
+::: theorem {#thm-rotations}
+Run [](#alg-classical) with step 2 replaced by the upward rotation of
+rows $r, \ldots, i$: move row $i$ to position $r$ and the rows in
+positions $r, \ldots, i - 1$ down by one position.
+Let `P[k]` be the index in $A$ of the row in position $k$ at the end.
+Then `P[r]` $< \cdots <$ `P[m-1]`, and the nonzero entries of
+$\mathcal{R}_A$ are at the positions (`P[k]`, $c_k$) for $k < r$.
+:::
+
+::: proof
+An upward rotation keeps the relative order of the rows it passes over,
+hence preserves the following property: the rows that are not yet pivot rows are in
+increasing order of their indices in $A$. This gives the first claim, and
+it shows that the pivot of column $c$ is in the row of smallest index, in
+$A$, among the rows that are not yet pivot rows and have a nonzero entry
+in column $c$. The rows of smaller index have a zero multiplier, so every
+row of $A$ is only modified by subtracting multiples of rows of smaller
+index: for every $i$, the operations transform the first $i$ rows of $A$
+by an invertible lower triangular matrix, which does not change the rank
+of the first $j$ columns of these rows. After the steps for the columns
+before $j$, these columns are zero in the rows that are not pivot rows,
+and in the first $j$ columns the pivot rows form a matrix in row echelon
+form, with nonzero rows the pivot rows whose pivot column is before $j$.
+The rank of the leading $i \times j$ submatrix of $A$ is therefore the
+number of pairs (`P[k]`, $c_k$) with `P[k]` $< i$ and $c_k < j$, which is
+the definition of $\mathcal{R}_A$.
+:::
+
+`nmod_mat_ple` uses this rule. By the proof, the pivot of a column is
+the row of smallest index in $A$ with a nonzero entry among the rows that
+are not pivot rows yet, so that the order of the rows need not be kept
+in memory: `nmod_mat_ple_classical` keeps the rows in place and records
+their order in an array, an upward rotation costing $O(i - r)$
+operations on indices, and `nmod_mat_ple_classical_delayed` swaps the
+pivot row with the row in position $r$; both put the rows in their order
+at the end, and `nmod_mat_ple_recursive` does so once for each half at
+each level of the recursion. With swaps, as in
+`nmod_mat_lu`, the pivot columns are the same, but a row swapped
+downwards passes over rows of larger index, and the pivot rows need not
+be the row rank profile. The output of `nmod_mat_ple` is unique, since
+$\mathcal{R}_A$ determines the pivot rows and columns, and the other rows
+are in increasing order: all its algorithms return the same
+decomposition. Pivoting rules that reveal $\mathcal{R}_A$ in other
+search orders, and the corresponding recursive algorithms, are studied in
+[@DPS2017].
+
 ## Delayed reduction {#delayed}
 
 The reductions dominate the cost of step 3 for small dimensions.
 `nmod_mat_lu_classical_delayed` performs the same operations but lets the
-entries of the active submatrix grow: the multiplier is turned into
-$f = p - (\ell \bmod p) \in [1, p]$, and $f$ times the pivot row is
-added without reduction, in one, two or three words. An entry is reduced
+entries of the active submatrix grow: a nonzero multiplier is turned
+into $f = p - \ell \in [1, p - 1]$, and $f$ times the pivot row is added
+without reduction, in one, two or three words. An entry is reduced
 only when it is about to be used: when its column becomes the pivot
 column, before the pivot is chosen, and when its row becomes the pivot
 row.
@@ -109,7 +180,7 @@ row.
 ::: proposition {#prop-delayed}
 Let $s = \min(m, n)$. In [](#alg-classical) with delayed reduction, every
 stored entry is congruent to the true entry modulo $p$ and is at most
-$(p - 1) + (s - 1) \, p \, (p - 1)$.
+$(p - 1) + (s - 1) (p - 1)^2 \le s (p - 1)^2$.
 :::
 
 ::: proof
@@ -118,24 +189,54 @@ subtracting $\ell$ times it, so the congruence is preserved. An entry
 $(i, j)$ is updated once for each pivot that is found while it is still
 active, in a row above $i$ and a column to the left of $j$; there are at
 most $\min(i, j) \le s - 1$ such pivots. Each update adds $f a$ with
-$f \le p$ and $a \le p - 1$, a reduced entry of the pivot row, to an
+$f \le p - 1$ and $a \le p - 1$, a reduced entry of the pivot row, to an
 initial value at most $p - 1$.
 :::
 
-FLINT chooses the number of words from `_nmod_vec_dot_params(s, mod)`,
-that is, from the bound $s (p - 1)^2$ of
-[](algorithms/linear-algebra/dot-products#limbs). This is smaller than the bound of
-[](#prop-delayed) when $s \ge p$, by a factor of at most
-$1 + 1/(p - 1)$; one word can then be too small only if
-$s (p - 1)^2$ lies within that factor of $2^{\bits}$, which requires
-$s \ge p$ and $s (p-1)^2 \approx 2^{64}$, that is, a dense matrix with
-more than two million rows and columns. The reduction of a word uses
+FLINT chooses the number of words from the bound $s (p - 1)^2$ of
+[](algorithms/linear-algebra/dot-products#limbs)
+(`_nmod_vec_dot_bound_limbs`), which bounds every entry by
+[](#prop-delayed). The reduction of a word uses
 the Lemire–Kaser–Kurz method when the bound is below $2^{32}$ and
 Barrett's otherwise ([](algorithms/arithmetic/barrett)).
+
+`nmod_mat_ple_classical_delayed` applies the same reductions to the
+elimination of [](#thm-rotations), swapping the rows of the matrix and
+of the buffer as `nmod_mat_lu_classical_delayed` does; the pivot of a
+column is found while the column is reduced, as the row of smallest
+index in $A$ with a nonzero entry (see [](#rank-profile)).
 
 For moduli of several limbs, `mpn_mod_mat_lu_classical_delayed` applies
 the same idea with unreduced entries of $2\ell + 1$ limbs
 ([delayed reduction for multiword moduli](algorithms/arithmetic/multiword-delayed-reduction#lu)).
+
+## Crout elimination {#crout}
+
+[](#alg-classical) updates the whole active submatrix after each pivot.
+The Crout schedule performs the same operations in another order,
+computing each entry of $L$ and $E$ only when it is needed [@DPS2017].
+When column $j$ is processed, with $r$ pivots in the columns before it,
+the entry $(i, j)$ of a row $i$ without pivot is
+$a_{ij} - \sum_{k < r} \ell_{ik} e_{kj}$: one dot product of the
+multipliers of row $i$ with column $j$ of $E$. When row $i$ becomes the
+pivot row $r$, its entries to the right of column $j$ are
+$a_{it} - \sum_{k < r} \ell_{ik} e_{kt}$: one vector-matrix product of
+its multipliers with the rows of $E$. The other entries are not touched
+before their column is processed.
+
+`nmod_mat_ple_crout` uses this schedule with the pivoting of
+[](#thm-rotations), swapping rows as
+`nmod_mat_ple_classical_delayed` does. Its dot products and
+vector-matrix products delay their reductions, with SIMD code
+([](algorithms/linear-algebra/dot-products),
+[](algorithms/linear-algebra/modular-matrix-kernels#thin)), so that no
+buffer of unreduced entries is needed, whereas the delayed algorithm
+needs two or three words per entry with scalar updates when
+$\min(m, n) (p - 1)^2 \ge 2^{64}$. On the other hand, the products only
+skip the zero multipliers before the first and after the last nonzero
+one of each row, while the classical and delayed algorithms skip every
+row whose multiplier is zero, which on some structured matrices saves
+most of the work.
 
 ## Recursive decomposition {#recursive}
 
@@ -162,6 +263,15 @@ the same idea with unreduced entries of $2\ell + 1$ limbs
 `nmod_mat_lu_recursive` calls `nmod_mat_lu` for the two halves, which
 switches to the classical or delayed algorithm below a crossover depending
 on the size of $p$ (see [](nmod_mat/lu#algorithms)).
+
+The recursion performs the operations of [](#alg-classical), with the
+same pivots, in another order: the pivots of the first $n_1$ columns
+depend only on these columns, step 4 applies the eliminations of the
+left half to the right half, and the row moves of step 5 act on the rows
+that are not pivot rows of the left half. `nmod_mat_ple_recursive` uses
+the upward rotations of [](#thm-rotations) in both halves, so that it
+computes the decomposition of that theorem, the same as
+`nmod_mat_ple_classical`.
 
 ::: theorem {#thm-recursive-cost}
 If two matrices of dimensions $a \times b$ and $b \times c$ can be
@@ -207,7 +317,10 @@ $$
 $$
 
 and its upper triangular analogue, which costs
-$O(c \, d^{\omega - 1})$ for $c \ge d$.
+$O(c \, d^{\omega - 1})$ for $c \ge d$. `nmod_mat_solve_tril_right` and
+`nmod_mat_solve_triu_right` solve $XT = B$ for $B$ with $d$ columns in the
+same way: by substitution along the rows of $X$, with the triangle of $T$
+transposed for the dot products, or by the transposed block formulas.
 
 ## Applications {#applications}
 
@@ -229,7 +342,16 @@ $O(c \, d^{\omega - 1})$ for $c \ge d$.
   triangular solve.
 - *Nullspace*: from the reduced form $R$, one basis vector per free
   column $f$, with a 1 in position $f$ and $-R_{i f}$ in the position of
-  the pivot of row $i$.
+  the pivot of row $i$. These entries are those of $E_1^{-1} E_2$, so the
+  basis is computed from a PLE decomposition with one triangular solve,
+  without forming $R$.
+- *Left nullspace*: from a PLE decomposition, the rows of
+  $(-L_2 L_1^{-1} \mid I)$ with their columns put in the order of the
+  rows of $A$, where $L_1$ and $L_2$ are the first $r$ and the other rows
+  of $L$; one triangular solve with $L_1$ on the right. With the
+  decomposition of [](#thm-rotations), the identity matrix is at the rows
+  of $A$ outside its row rank profile, and the basis is the transpose of
+  the basis of the nullspace of $A^T$ above.
 
 ## Division-free determinants {#det}
 

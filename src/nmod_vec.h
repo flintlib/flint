@@ -229,6 +229,8 @@ void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ul
 
 #if FLINT_BITS == 64 && defined(__AVX2__)
 void _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+#elif FLINT_BITS == 64 && defined(__ARM_NEON)
+void _nmod_vec_nored_scalar_addmul_halflimb_neon(nn_ptr res, nn_srcptr vec, slong len, ulong c);
 #endif
 
 NMOD_VEC_INLINE void
@@ -238,6 +240,12 @@ _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulo
     if (len >= 16)
     {
         _nmod_vec_nored_scalar_addmul_halflimb_avx2(res, vec, len, c);
+        return;
+    }
+#elif FLINT_BITS == 64 && defined(__ARM_NEON)
+    if (len >= 16)
+    {
+        _nmod_vec_nored_scalar_addmul_halflimb_neon(res, vec, len, c);
         return;
     }
 #endif
