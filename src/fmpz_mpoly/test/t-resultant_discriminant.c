@@ -294,8 +294,8 @@ TEST_FUNCTION_START(fmpz_mpoly_resultant_discriminant, state)
         }
         else if (which == 1)
         {
-            fmpz_mpoly_repack_bits_inplace(a, FLINT_BITS + 1 + n_randint(state, FLINT_BITS), ctx);
-            fmpz_mpoly_repack_bits_inplace(b, FLINT_BITS + 1 + n_randint(state, FLINT_BITS), ctx);
+            fmpz_mpoly_repack_bits_inplace(a, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+            fmpz_mpoly_repack_bits_inplace(b, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
         }
         else
         {

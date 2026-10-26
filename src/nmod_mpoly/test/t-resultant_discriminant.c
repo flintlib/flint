@@ -301,8 +301,8 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         }
         else if (which == 1)
         {
-            nmod_mpoly_repack_bits_inplace(a, FLINT_BITS + 1 + n_randint(state, FLINT_BITS), ctx);
-            nmod_mpoly_repack_bits_inplace(b, FLINT_BITS + 1 + n_randint(state, FLINT_BITS), ctx);
+            nmod_mpoly_repack_bits_inplace(a, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+            nmod_mpoly_repack_bits_inplace(b, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
         }
         else
         {
