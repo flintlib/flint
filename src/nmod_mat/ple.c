@@ -158,13 +158,16 @@ _nmod_mat_ple_rows_finish(slong * P, slong * Q, nmod_mat_t A, slong * orig,
       recursion: the classical algorithm too (its row operations are
       additions; 1.2-1.75x faster than the delayed algorithm on the three
       x86 machines, 1.15-2.2x slower on the M4).
-    - The recursive algorithm when min(m, n) >= 96 and m n >= 2^e, with e
-      from ple_rec_log2 (IFMA / other): 17 / 17 for p = 2 (and the modulus
-      3, not measured), 16 / 16 up to 29 bits, 17 / 16 from 30 to 32 bits
-      (14 without AVX2: 1.3-1.45x faster at n = 128-192 on the M4),
-      18 / 16 from 33 to 52 bits, 21 / 19 above. A bound on m n fits the
-      tall and wide shapes better than one on min(m, n): with the best
-      base case chosen by hand, it was within 2% of the best everywhere.
+    - The recursive algorithm when n >= N, m >= M and m n >= 2^e, with
+      (N, M, e) from ple_rec_wanted, by class (IFMA, NEON, others) and
+      modulus size. The recursion splits the columns: for a given m n it pays
+      off earlier for tall matrices than for wide ones, hence the bounds on
+      n and m. Fitted on the crossovers between the base case and one level
+      of recursion, on Zen 4 and Ice Lake SP (IFMA), Apple M4 (NEON) and
+      Cascade Lake (others), then checked with the whole recursion, also on
+      matrices of rank n / 2, on which the recursion pays off later (hence
+      the higher bounds up to 29 bits). Without IFMA, recursion is used even
+      above 2^52 for large matrices (m n >= 2^19).
     - Below, the Crout algorithm when the delayed algorithm would need two
       or three words per entry, nmod_mat_nmod_vec_mul has a SIMD path for
       the modulus (not above 2^50 on NEON, where Crout was up to 1.5x
@@ -216,18 +219,37 @@ ple_classical_wanted(slong m, slong n, flint_bitcnt_t bits, int nlimbs,
     return 0;
 }
 
-/* log2 of the bound on m n from which the recursive algorithm is used */
+/* whether the recursive algorithm is used for m x n: n >= N, m >= M and
+   m n >= 2^e, with (N, M, e) by class and modulus size */
 static int
-ple_rec_log2(flint_bitcnt_t bits)
+ple_rec_wanted(slong m, slong n, flint_bitcnt_t bits)
 {
+    slong N, M;
+    int e;
+
 #if NMOD_MAT_HAVE_MUL_U52
-    return (bits <= 2) ? 17 : (bits <= 29) ? 16 : (bits <= 32) ? 17
-         : (bits <= 52) ? 18 : 21;
+    if (bits <= 2)       N = 128, M = 128, e = 14;
+    else if (bits <= 29) N = 128, M = 128, e = 15;
+    else if (bits <= 30) N = 64, M = 64, e = 0;
+    else if (bits <= 32) N = 64, M = 128, e = 0;
+    else if (bits <= 52) N = 16, M = 128, e = 12;
+    else                 return 0;
+#elif (defined(__ARM_NEON) && defined(__aarch64__)) || defined(_M_ARM64)
+    if (bits <= 29)      N = 128, M = 128, e = 15;
+    else if (bits <= 30) N = 64, M = 64, e = 0;
+    else if (bits <= 32) N = 96, M = 96, e = 14;
+    else if (bits <= 52) N = 96, M = 96, e = 16;
+    else                 N = 96, M = 96, e = 19;
 #else
-    return (bits <= 2) ? 17 : (bits <= 29) ? 16
-         : (bits <= 32) ? (NMOD_MAT_HAVE_VECMAT_U64 ? 16 : 14)
-         : (bits <= 52) ? 16 : 19;
+    if (bits <= 2)       N = 128, M = 128, e = 14;
+    else if (bits <= 29) N = 128, M = 128, e = 15;
+    else if (bits <= 30) N = 32, M = 32, e = 13;
+    else if (bits <= 32) N = 16, M = 128, e = 11;
+    else if (bits <= 52) N = 16, M = 96, e = 12;
+    else                 N = 32, M = 32, e = 19;
 #endif
+
+    return n >= N && m >= M && (ulong) m * (ulong) n >= (UWORD(1) << e);
 }
 
 /* (S, N0) of the condition for the Crout algorithm */
@@ -261,7 +283,7 @@ _nmod_mat_ple(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots)
     if (ple_classical_wanted(m, n, bits, nlimbs, A->mod.n))
         return _nmod_mat_ple_classical(P, Q, A, max_nonpivots);
 
-    if (s >= 96 && (ulong) m * (ulong) n >= (UWORD(1) << ple_rec_log2(bits)))
+    if (ple_rec_wanted(m, n, bits))
         return _nmod_mat_ple_recursive(P, Q, A, max_nonpivots);
 
 #if NMOD_MAT_HAVE_VECMAT_U64
