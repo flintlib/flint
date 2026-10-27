@@ -61,7 +61,7 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
 
     s = POSITIVE;
 
-    if (arb_is_exact(y) && !arf_is_special(arb_midref(x)))
+    if (arb_is_exact(y) && arf_is_finite(arb_midref(x)))
     {
         const arf_struct * ymid = arb_midref(y);
 

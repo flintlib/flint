@@ -206,5 +206,45 @@ TEST_FUNCTION_START(arb_pow, state)
         arb_clear(a);
     }
 
+    /* a zero midpoint with a nonzero radius must not give nan for an exact integer exponent */
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        ulong n, prec;
+        arb_t a, b, c, d;
+
+        arb_init(a);
+        arb_init(b);
+        arb_init(c);
+        arb_init(d);
+
+        prec = 2 + n_randint(state, 100);
+
+        arf_zero(arb_midref(a));
+        mag_randtest(arb_radref(a), state, 1 + n_randint(state, 100));
+        if (mag_is_zero(arb_radref(a)))
+            mag_one(arb_radref(a));
+
+        n = 1 + n_randint(state, 100);
+        arb_set_ui(b, n);
+
+        arb_pow(c, a, b, prec);
+        arb_pow_ui(d, a, n, prec);
+
+        if (!arb_is_finite(c) || !arb_overlaps(c, d))
+        {
+            flint_printf("FAIL: zero midpoint, exact integer exponent\n\n");
+            flint_printf("a = "); arb_print(a); flint_printf("\n\n");
+            flint_printf("n = %wu\n\n", n);
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_printf("d = "); arb_print(d); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_clear(a);
+        arb_clear(b);
+        arb_clear(c);
+        arb_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }
