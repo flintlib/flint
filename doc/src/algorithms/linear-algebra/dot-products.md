@@ -80,11 +80,8 @@ in this order:
 3. If $\ell \le 11$: `_DOT1`, `_DOT2` or `_DOT3` according to the number of
    words, by [](#thm-limbs). These are handled by unrolled inline code.
 4. If $n \le 2^{\beta/2}$: `_DOT1` if one word suffices. Otherwise, on
-   64-bit machines, `_DOT2_SPLIT` if $n \le 1515531528$ and $\ell$
-   satisfies the length condition of [](#thm-split) with $t = 7$, and
-   `_DOT2_HALF` in the remaining cases (always on 32-bit machines). With
-   AVX2, `_DOT2_HALF` is selected only within the length limit of
-   [](#thm-half), and `_DOT2` beyond it. On
+   64-bit machines, `_DOT2_SPLIT` if $n \le 1515531528$, and
+   `_DOT2_HALF` in the remaining cases (always on 32-bit machines). On
    AArch64, `_DOT2` is used instead of `_DOT2_HALF`, and also instead of
    `_DOT2_SPLIT` when $\ell \ge 160$.
 5. If two words suffice: `_DOT_U52`, `_DOT_SPLIT_LIMBS` or `_DOT_U64` if
@@ -170,7 +167,9 @@ $c = 2^{56} \bmod n$.
    then $h \gets h + \lfloor l / 2^{56} \rfloor$ and
    $l \gets l \bmod 2^{56}$.
 3. Add the remaining $r < 8$ products to $l$.
-4. Return $(c h + l) \bmod n$.
+4. Return $(c h + l) \bmod n$, where $c h + l$ is computed as a two-word
+   integer: if its high word is 0 it is reduced with a one-word reduction,
+   otherwise with a two-word reduction.
 :::
 
 The AVX2 version runs this in four lanes, so that each lane receives 8
@@ -185,12 +184,12 @@ step 3, so $t = 7$ for the scalar code and $t = 3$ for the AVX2 code.
 $$
 m \le \sqrt{2^{61} - 2^{53}}
 \quad\text{and}\quad
-\ell \, m^3 + t \, m^2 \, 2^{56} < 2^{56} \, (2^{64} - 2^{56} + 1).
+\ell \, m^2 < 2^{56} \, (2^{64} - 1).
 $$
 
 The first condition is equivalent to $n \le 1515531528 \approx 2^{30.5}$.
-At $n = 1515531528$, the second holds for $\ell \le 47546087$ ($t = 7$) and
-$\ell \le 237730435$ ($t = 3$).
+At $n = 1515531528$, the second holds for $\ell \le 578721382862847481
+\approx 2^{59}$, so it puts no practical constraint on the length.
 :::
 
 ::: proof
@@ -203,26 +202,26 @@ $\lfloor \sqrt{2^{61} - 2^{53}} \rfloor = 1515531527$, it is equivalent to
 $n \le 1515531528$. The same argument covers step 3 and each lane of the
 AVX2 code, where at most 8 products are added between two folds.
 
-In step 4, $h \le (\ell - r) m^2 / 2^{56}$, $c \le m$ and
-$l \le 2^{56} - 1 + r m^2$ with $r \le t$. Hence
+In step 4, $h \le \ell \, m^2 / 2^{56} < 2^{64}$ by the second condition,
+so $h$ does not overflow, and $l < 2^{64}$. Since $c \le m$,
 
 $$
-c h + l \le \frac{\ell \, m^3}{2^{56}} + t \, m^2 + 2^{56} - 1,
+c h + l < m \, 2^{64} + 2^{64} = n \, 2^{64},
 $$
 
-which is less than $2^{64}$ under the second condition. Finally
+so the high word of the two-word integer $c h + l$ is less than $n$, as
+required by the two-word reduction (when it is 0, a one-word reduction
+gives the same result). Finally
 $c h + l \equiv h \, 2^{56} + l = S \pmod n$.
 :::
 
-The choice of 56 bits balances the two conditions: a larger split point
-allows longer vectors but smaller moduli. The table in `src/nmod_vec/dot.c`
-gives the trade-off for split points from 40 to 63 bits.
+The split at 56 bits leaves room for the 8 products of a block, which
+determines the bound on $n$; a smaller split point would allow slightly
+larger moduli. The table in `src/nmod_vec/dot.c` gives the moduli bounds
+for split points from 40 to 63 bits (its length columns refer to an
+earlier version that computed $c h + l$ in a single word).
 
-`_nmod_vec_dot_params` selects `_DOT2_SPLIT` only when both conditions
-of [](#thm-split) hold with $t = 7$, which it checks exactly with
-three-word arithmetic. It uses $t = 7$ for the AVX2 code as well, since
-`_nmod_vec_dot_strided` and the `_ptr` variant run the scalar code with
-the same parameters.
+`_nmod_vec_dot_params` selects `_DOT2_SPLIT` whenever $n \le 1515531528$.
 
 ### Splitting each product {#half}
 
@@ -235,8 +234,8 @@ result is again $(c h + l) \bmod n$ with $c = 2^{56} \bmod n$.
 
 ::: theorem {#thm-half}
 With $m = n - 1$ and $n \le 2^{32}$, `_nmod_vec_dot2_half` with AVX2 is
-correct if $\ell \, m^3 < 2^{56} (2^{64} - 2^{58})$. This holds for every
-$n \le 2^{32}$ when $\ell \le 16515072$.
+correct if $\ell \, m^2 < 2^{56} (2^{64} - 1)$. This holds for every
+$n \le 2^{32}$ when $\ell \le 72057594105036800 \approx 2^{56}$.
 :::
 
 ::: proof
@@ -246,16 +245,20 @@ receives 64 values below $2^{56}$ per block of 256 terms, so it stays below
 $2^{64}$. After the last fold, at most 63 more values go into each lane,
 so the horizontal sum of the lanes is below
 $4 \cdot 64 \cdot 2^{56} = 2^{64}$. After a final fold and the low parts
-of the last three products, $l < 2^{56} + 3 \cdot 2^{56} = 2^{58}$. Then
-$c h + l < \ell \, m^3 / 2^{56} + 2^{58}$, which is below $2^{64}$ under
-the stated condition.
+of the last three products, $l < 2^{56} + 3 \cdot 2^{56} = 2^{58}$. The
+high sum satisfies $h \le \ell \, m^2 / 2^{56} < 2^{64}$, and as in
+[](#thm-split) the two-word integer $c h + l$ is below $n \, 2^{64}$, so it
+is reduced correctly with a single two-word reduction.
 :::
 
-With AVX2, `_nmod_vec_dot_params` checks this condition exactly and
-selects `_DOT2` for longer vectors. The value of `pow2_precomp` is
-computed for `_DOT2_HALF` exactly when FLINT itself was built with AVX2:
-since `_nmod_vec_dot_params` is compiled into the library, this does not
-depend on the compiler flags of the calling program.
+`_nmod_vec_dot_params` is an inline function of `nmod_vec.h`, but it
+decides from `FLINT_HAVE_AVX2` and `FLINT_HAVE_AVX512_IFMA`, which the
+build system records in `flint-config.h`, and not from the compiler macros
+seen by the calling code. So the value of `pow2_precomp` is computed for
+`_DOT2_HALF` exactly when FLINT itself was built with AVX2, whatever the
+compiler flags of the calling program; `src/nmod_vec/dot.c` checks at
+compile time that these two macros agree with the flags FLINT is built
+with.
 
 ## SIMD kernels for moduli above $2^{32}$ {#simd}
 
@@ -322,7 +325,10 @@ The tails of fewer than 8 terms use masked loads.
 The kernels are compiled only for $\beta = 64$, `split_limbs` with AVX2
 and the IFMA kernels with AVX-512F, AVX-512DQ and AVX512-IFMA, and neither
 when `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
-`FLINT_MACHINE_VECTORS_STRICT_C` is defined. In the two-word band,
+`FLINT_MACHINE_VECTORS_STRICT_C` is defined; their functions then fall back
+to the scalar code, so `_nmod_vec_dot_params`, which only looks at
+`FLINT_HAVE_AVX2` and `FLINT_HAVE_AVX512_IFMA`, may still choose them. In
+the two-word band,
 `_nmod_vec_dot_params` tries `_DOT_U52`, then `_DOT_SPLIT_LIMBS`, then
 `_DOT_U64`; in the three-word band `_DOT3_SPLIT_LIMBS`, then `_DOT3_U64`.
 Each is subject to these parameters:

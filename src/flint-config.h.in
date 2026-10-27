@@ -24,6 +24,12 @@
 /* Define to use the fft_small module */
 #undef FLINT_HAVE_FFT_SMALL
 
+/* Define if FLINT is compiled with AVX2 */
+#undef FLINT_HAVE_AVX2
+
+/* Define if FLINT is compiled with AVX512F, AVX512DQ and AVX512IFMA */
+#undef FLINT_HAVE_AVX512_IFMA
+
 /* Define if GMP has mpn_add_n_sub_n */
 #undef FLINT_HAVE_NATIVE_mpn_add_n_sub_n
 
