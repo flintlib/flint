@@ -440,15 +440,22 @@ void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fm
 
 Set `res` to the nonnegative GCD of the entries (0 for a zero or empty
 vector), respectively of the entries and `inp`, which allows the common
-content of several vectors to be accumulated. The computation stops as
-soon as the GCD becomes 1.
+content of several vectors to be accumulated; `res` may be aliased with
+`inp` or with an entry. The computation stops as soon as the GCD becomes
+1. See [](algorithms/integers/gcd#content) for the algorithm.
 :::
 
 ::: function
 void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len)
+void _fmpz_vec_lcm_strided(fmpz_t res, const fmpz * vec, slong stride, slong len, const fmpz_t inp)
 
 Sets `res` to the nonnegative least common multiple of the entries: 0 if
-an entry is zero and 1 for an empty vector.
+an entry is zero and 1 for an empty vector. The strided version takes the
+`len` entries `vec[0]`, `vec[stride]`, ..., and the LCM also with `inp`
+unless it is `NULL`, which allows LCMs to be accumulated. `res` may be
+aliased with `inp` or with an entry. For an `fmpq` vector `a`, the
+denominators are the entries of stride 2 from `fmpq_denref(a)`. See
+[](algorithms/integers/gcd#content) for the algorithm.
 :::
 
 ## Dot products {#dot}

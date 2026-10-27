@@ -22,23 +22,19 @@
 int
 fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
 {
-    slong sz, cy;
+    slong sz;
     mp_size_t invlimbs;
     slong gcdlimbs;
-    nn_ptr temp, tempv, tempn, tempi, tempf;
+    nn_ptr temp, tempi, tempf;
     int ret;
 
     TMP_INIT;
 
     TMP_START;
     temp = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
-    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
-    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
     tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
     tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
 
-    mpn_zero(tempn, ecm_inf->n_size);
-    mpn_zero(tempv, ecm_inf->n_size);
     mpn_zero(temp, ecm_inf->n_size);
     flint_mpn_copyi(ecm_inf->u, sig, ecm_inf->n_size);
 
@@ -108,12 +104,13 @@ fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
         goto cleanup;
     }
 
-    flint_mpn_copyi(tempv, ecm_inf->v, sz);
-    flint_mpn_copyi(tempn, n, ecm_inf->n_size);
-
-    /* NOTE: invlimbs must be mp_size_t since it is strictly different from
-     * slong on Windows systems. */
-    gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
+    /* v = V 2^normbits and n = N 2^normbits (the representation scaled by
+       2^normbits), so the gcd is one = 2^normbits when V is invertible
+       modulo N, and the cofactor s of v is then an inverse of V modulo N
+       with |s| < N.
+       NOTE: invlimbs must be mp_size_t since it is strictly different from
+       slong on Windows systems. */
+    gcdlimbs = flint_mpn_gcdext(tempf, tempi, &invlimbs, ecm_inf->v, sz, n, ecm_inf->n_size);
 
     if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
         !(gcdlimbs == (slong) ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
@@ -124,32 +121,14 @@ fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
         goto cleanup;
     }
 
-    if (invlimbs < 0) /* negative inverse, add n */
-    {
-        invlimbs *= -1;
-
-        if (ecm_inf->normbits)
-        {
-            cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
-            if (cy)
-                tempi[invlimbs] = cy;
-        }
-
-        mpn_sub_n(tempi, n, tempi, ecm_inf->n_size);\
-    }
-    else
-    {
-        if (ecm_inf->normbits)
-        {
-            cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
-            if (cy)
-                tempi[invlimbs] = cy;
-        }
-    }
-
-    MPN_NORM(tempi, invlimbs);
-    mpn_zero(ecm_inf->u, ecm_inf->n_size);
-    flint_mpn_copyi(ecm_inf->u, tempi, invlimbs);
+    /* u = s 2^normbits mod n in the scaled representation, which needs all
+       n_size limbs (s 2^normbits < n, and n - s 2^normbits for s < 0) */
+    flint_mpn_zero(tempi + FLINT_ABS(invlimbs), ecm_inf->n_size + 1 - FLINT_ABS(invlimbs));
+    if (ecm_inf->normbits)
+        mpn_lshift(tempi, tempi, ecm_inf->n_size, ecm_inf->normbits);
+    if (invlimbs < 0)
+        mpn_sub_n(tempi, n, tempi, ecm_inf->n_size);
+    flint_mpn_copyi(ecm_inf->u, tempi, ecm_inf->n_size);
 
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->u, ecm_inf->t, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);

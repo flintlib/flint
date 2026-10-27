@@ -220,6 +220,7 @@ void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len);
 void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp);
 
 void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len);
+void _fmpz_vec_lcm_strided(fmpz_t res, const fmpz * vec, slong stride, slong len, const fmpz_t inp);
 
 /*  Dot product  *************************************************************/
 

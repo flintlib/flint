@@ -157,4 +157,54 @@ _crt_work_init(_crt_work_struct * W, const flint_mpn_crt_t C, nn_ptr tmp)
     W->scratch_limbs = C->tmp_limbs - (W->scratch - tmp);
 }
 
+/* gcd and half-gcd (hgcd.c, gcd.c, gcdext.c, hgcd_fft.c) ********************/
+
+/* Cutoffs in limbs, with the meaning of GMP's HGCD_THRESHOLD,
+   HGCD_APPR_THRESHOLD, HGCD_REDUCE_THRESHOLD, GCD_DC_THRESHOLD,
+   GCDEXT_DC_THRESHOLD and MATRIX22_STRASSEN_THRESHOLD; flint-mparam.h may
+   override the defaults. */
+#ifndef FLINT_MPN_HGCD_CUTOFF
+# define FLINT_MPN_HGCD_CUTOFF 160
+#endif
+#ifndef FLINT_MPN_HGCD_APPR_CUTOFF
+# define FLINT_MPN_HGCD_APPR_CUTOFF 60
+#endif
+#ifndef FLINT_MPN_HGCD_REDUCE_CUTOFF
+# define FLINT_MPN_HGCD_REDUCE_CUTOFF 2681
+#endif
+#ifndef FLINT_MPN_GCD_DC_CUTOFF
+# define FLINT_MPN_GCD_DC_CUTOFF 500
+#endif
+#ifndef FLINT_MPN_GCDEXT_DC_CUTOFF
+# define FLINT_MPN_GCDEXT_DC_CUTOFF 250
+#endif
+#ifndef FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF
+# define FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF 16
+#endif
+
+/* The cofactor t = (g - s a) / b of b, given g = gcd(a, b) and a cofactor s
+   of a with g = s a + t b, where a, b > 0 and sn is the signed size of s.
+   Writes t to tp (room for an limbs) and its signed size to *tn. */
+void _flint_mpn_gcdext_cofactor(mp_ptr tp, mp_size_t * tn,
+    mp_srcptr gp, mp_size_t gn, mp_srcptr sp, mp_size_t sn,
+    mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+
+/* Transform-space (fft_small) versions of the half-gcd matrix operations.
+   Each returns 0 (doing nothing) when the operands are too small for
+   fft_small to pay off, in which case the caller falls back to ordinary
+   products. */
+#if FLINT_HAVE_FFT_SMALL
+int _flint_mpn_hgcd_matrix_mul_fft(flint_mpn_hgcd_matrix_struct * M,
+    const flint_mpn_hgcd_matrix_struct * M1);
+mp_size_t _flint_mpn_hgcd_matrix_adjust_fft(const flint_mpn_hgcd_matrix_struct * M,
+    mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t p);
+int _flint_mpn_hgcd_matrix_apply_fft(const flint_mpn_hgcd_matrix_struct * M,
+    mp_size_t mn[2][2], mp_ptr ap, mp_ptr bp, mp_size_t n, mp_size_t nn);
+mp_size_t _flint_mpn_hgcd_matrix_adjust_mul_fft(flint_mpn_hgcd_matrix_struct * M,
+    const flint_mpn_hgcd_matrix_struct * M1,
+    mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t p);
+mp_size_t _flint_mpn_hgcd_mul_matrix_vector_fft(const flint_mpn_hgcd_matrix_struct * M,
+    mp_ptr rp, mp_srcptr ap, mp_ptr bp, mp_size_t n);
+#endif
+
 #endif

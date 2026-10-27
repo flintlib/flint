@@ -48,6 +48,9 @@
 /* Define if GMP has mpn_mod_34lsub1 */
 #undef FLINT_HAVE_NATIVE_mpn_mod_34lsub1
 
+/* Define if GMP has mpn_gcd_22 */
+#undef FLINT_HAVE_NATIVE_mpn_gcd_22
+
 /* Define if GMP has mpn_mulmid_n */
 #undef FLINT_HAVE_NATIVE_mpn_mulmid_n
 

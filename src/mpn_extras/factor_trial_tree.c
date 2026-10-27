@@ -119,7 +119,6 @@ int flint_mpn_factor_trial_tree(slong * factors,
     slong i, j, m, n, n2, nmax;
     const mp_limb_t * primes;
     mp_ptr gtemp; /* temporary space for recursive gcd's */
-    mp_ptr temp; /* temporary space for flint_mpn_gcd_full2 */
     slong rlimbs[13 - (FLINT_BITS/32)]; /* gcd lengths at each level */
     slong idx[13 - (FLINT_BITS/32)]; /* indexes of entries at each level */
     slong offset; /* offset into gtemp */
@@ -131,9 +130,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
     primes = n_primes_arr_readonly(num_primes);
 
-    gtemp = (mp_ptr)
-	    flint_malloc((3*4096/(FLINT_BITS/16) + xsize)*sizeof(mp_limb_t));
-    temp = gtemp + 2*4096/(FLINT_BITS/16);
+    gtemp = (mp_ptr) flint_malloc((2*4096/(FLINT_BITS/16))*sizeof(mp_limb_t));
 
     /* compute gcd of x with top level in tree */
     m  = FLINT_MAX(FLINT_BIT_COUNT(num_primes) - (FLINT_BITS/32), 0); /* top level in tree */
@@ -151,8 +148,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
         return 0;
     }
 
-    rlimbs[m] = flint_mpn_gcd_full2(gtemp, x, xsize,
-		                                   _factor_trial_tree[m] + 0, n, temp);
+    rlimbs[m] = flint_mpn_gcd(gtemp, x, xsize, _factor_trial_tree[m] + 0, n);
 
     if (rlimbs[m] == 1 && gtemp[0] == 1) /* gcd is 1, no factors found */
     {
@@ -187,9 +183,9 @@ int flint_mpn_factor_trial_tree(slong * factors,
 	            n = n2;
 	            MPN_NORM(_factor_trial_tree[j] + idx[j]*n2, n);
 
-                rlimbs[j] = flint_mpn_gcd_full2(gtemp + offset,
-		             _factor_trial_tree[j] + idx[j]*n2, n,
-		                               gtemp + offset - 2*n2, rlimbs[j + 1], temp);
+                rlimbs[j] = flint_mpn_gcd(gtemp + offset,
+                    _factor_trial_tree[j] + idx[j]*n2, n,
+                    gtemp + offset - 2*n2, rlimbs[j + 1]);
 
                 valid_level = j;
 

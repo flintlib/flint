@@ -62,9 +62,7 @@ _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
     u = t + len;
 
     fmpz_init(yden);
-    fmpz_one(yden);
-    for (i = 0; i < len; i++)
-        fmpz_lcm(yden, yden, fmpq_denref(ys + i));
+    _fmpz_vec_lcm_strided(yden, fmpq_denref(ys), 2, len, NULL);
     fmpz_mul(den, den, yden);
 
     /* Integer coefficients are l[i] = (yden / d[i]) * c[i] * w[i] */

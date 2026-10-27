@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2022 Daniel Schultz
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
@@ -29,9 +31,8 @@ _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den, const fmpq * a, slong len)
         return;
     }
 
-    fmpz_lcm(den, fmpq_denref(a + 0), fmpq_denref(a + 1));
-    for (i = 2; i < len; i++)
-        fmpz_lcm(den, den, fmpq_denref(a + i));
+    /* the denominators are every second fmpz */
+    _fmpz_vec_lcm_strided(den, fmpq_denref(a), 2, len, NULL);
 
     if (fmpz_is_one(den))
     {
@@ -40,10 +41,6 @@ _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den, const fmpq * a, slong len)
     }
     else
     {
-        for (i = 0; i < len; i++)
-        {
-            fmpz_divexact(num + i, den, fmpq_denref(a + i));
-            fmpz_mul(num + i, num + i, fmpq_numref(a + i));
-        }
+        _fmpq_vec_get_fmpz_vec_scaled(num, 1, a, 1, len, den);
     }
 }

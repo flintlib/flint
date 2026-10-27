@@ -10,6 +10,7 @@
 */
 
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -78,7 +79,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
 
             mf = _fmpz_promote(f);
-            val = mpz_invert(mf, &temp, COEFF_TO_PTR(c2));
+            val = flint_mpz_invert(mf, &temp, COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* inverse mod h may result in small value */
 
             return val;
@@ -107,7 +108,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else                    /* both are large */
         {
             mpz_ptr mf = _fmpz_promote(f);
-            val = mpz_invert(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            val = flint_mpz_invert(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* reduction mod h may result in small value */
 
             return val;

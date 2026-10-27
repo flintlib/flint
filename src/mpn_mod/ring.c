@@ -727,10 +727,9 @@ mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 
     flint_mpn_copyi(t, x, n);
     flint_mpn_copyi(u, d, n);
-    /* todo: does mpn_gcdext allow aliasing? */
     /* NOTE: ssize must be mp_size_t since it is strictly different from slong
      * on Windows systems. */
-    gsize = mpn_gcdext(g, s, &ssize, t, n, u, n);
+    gsize = _flint_mpn_gcdext_inplace(g, s, &ssize, t, n, u, n);
 
     if (gsize != 1 || g[0] != 1)
         return _mpn_mod_nonunit(x, g, gsize, ctx);

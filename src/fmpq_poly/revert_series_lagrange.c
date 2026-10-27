@@ -21,10 +21,7 @@ _set_vec(fmpz * rnum, fmpz_t den,
     slong j;
     fmpz_t t;
     fmpz_init(t);
-    fmpz_one(den);
-
-    for (j = 0; j < len; j++)
-        fmpz_lcm(den, den, xden + j);
+    _fmpz_vec_lcm(den, xden, len);
 
     for (j = 0; j < len; j++)
     {

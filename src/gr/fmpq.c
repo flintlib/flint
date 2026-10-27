@@ -18,6 +18,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
+#include "fmpq_vec.h"
 #include "fmpq_mat.h"
 #include "fexpr.h"
 #include "qqbar.h"
@@ -922,14 +923,8 @@ _fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, const fmpq * vec, slong len)
     }
     else
     {
-        for (i = 0; i < len; i++)
-            fmpz_lcm(den, den, fmpq_denref(vec + i));
-
-        for (i = 0; i < len; i++)
-        {
-            fmpz_divexact(c + i, den, fmpq_denref(vec + i));
-            fmpz_mul(c + i, c + i, fmpq_numref(vec + i));
-        }
+        _fmpz_vec_lcm_strided(den, fmpq_denref(vec), 2, len, NULL);
+        _fmpq_vec_get_fmpz_vec_scaled(c, 1, vec, 1, len, den);
     }
 }
 

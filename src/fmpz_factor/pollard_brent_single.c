@@ -95,9 +95,9 @@ flint_mpn_factor_pollard_brent_single(nn_ptr factor, nn_ptr n, nn_ptr ninv, nn_p
             }
 
             /* if q is 0, then gcd is n (gcd(0, a) = a). Not passing through
-               flint_mpn_gcd_full due to input parameter restrictions. */
+               flint_mpn_gcd due to input parameter restrictions. */
             if (flint_mpn_zero_p(q, n_size) == 0)
-                gcdlimbs = flint_mpn_gcd_full(factor, q, n_size, n, n_size);
+                gcdlimbs = flint_mpn_gcd(factor, q, n_size, n, n_size);
             else
             {
                 flint_mpn_copyi(factor, n, n_size);
@@ -128,7 +128,7 @@ flint_mpn_factor_pollard_brent_single(nn_ptr factor, nn_ptr n, nn_ptr ninv, nn_p
                 mpn_sub_n(subval, ys, x, n_size);
 
             if (flint_mpn_zero_p(q, n_size) == 0)
-                gcdlimbs = flint_mpn_gcd_full(factor, q, n_size, n, n_size);
+                gcdlimbs = flint_mpn_gcd(factor, q, n_size, n, n_size);
             else
             {
                 flint_mpn_copyi(factor, n, n_size);

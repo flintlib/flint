@@ -10,6 +10,7 @@
 */
 
 #include <gmp.h>
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -50,12 +51,12 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
             fptr->_mp_size  = 1;
             fptr->_mp_d     = (ulong *) f;
 
-            mpz_gcdext(dtemp, atemp, NULL,
+            flint_mpz_gcdext(dtemp, atemp, NULL,
                     fptr, COEFF_TO_PTR(*g));
         }
         else  /* f is large */
         {
-            mpz_gcdext(dtemp, atemp, NULL,
+            flint_mpz_gcdext(dtemp, atemp, NULL,
                     COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
         }
 

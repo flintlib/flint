@@ -231,21 +231,7 @@ fmpz_mpoly_q_div_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, slong c, const f
 FMPZ_MPOLY_Q_INLINE void
 _fmpz_vec_content2(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp)
 {
-    if (fmpz_is_pm1(inp))
-    {
-        fmpz_one(res);
-    }
-    else
-    {
-        slong i;
-        fmpz_abs(res, inp);
-        for (i = len - 1; i >= 0; i--)
-        {
-            fmpz_gcd(res, res, vec + i);
-            if (fmpz_is_one(res))
-                break;
-        }
-    }
+    _fmpz_vec_content_chained(res, vec, len, inp);
 }
 
 FMPZ_MPOLY_Q_INLINE void

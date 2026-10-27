@@ -137,7 +137,7 @@ static slong pp1_factor(nn_ptr factor, nn_srcptr n,
     if (xn == 0)
         goto cleanup;
 
-    ret = flint_mpn_gcd_full(factor, n2, nn, x2, xn);
+    ret = flint_mpn_gcd(factor, n2, nn, x2, xn);
 
 cleanup:
 

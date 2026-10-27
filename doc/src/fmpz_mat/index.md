@@ -488,7 +488,8 @@ $mk \times nl$. $C$ must not be aliased with $A$ or $B$.
 void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
 
 Sets `ret` to the nonnegative greatest common divisor of the entries of
-$A$, which is 0 if $A$ is zero or empty.
+$A$, which is 0 if $A$ is zero or empty. The rows are passed in turn to
+`_fmpz_vec_content_chained`, stopping when the GCD becomes 1.
 :::
 
 ::: function

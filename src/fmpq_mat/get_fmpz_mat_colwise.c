@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,27 +11,26 @@
 
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_vec.h"
+#include "fmpq_vec.h"
 #include "fmpq_mat.h"
 
 void
 fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
 {
-    fmpz_t t, lcm;
+    fmpz_t lcm;
     slong i, j;
 
     if (fmpq_mat_is_empty(mat))
         return;
 
-    fmpz_init(t);
     fmpz_init(lcm);
 
     for (j = 0; j < mat->c; j++)
     {
-        /* Compute common denominator of column */
-        fmpz_set(lcm, fmpq_mat_entry_den(mat, 0, j));
-
-        for (i = 1; i < mat->r; i++)
-            fmpz_lcm(lcm, lcm, fmpq_mat_entry_den(mat, i, j));
+        /* Compute common denominator of column (the denominators are
+           2 stride fmpz apart) */
+        _fmpz_vec_lcm_strided(lcm, fmpq_mat_entry_den(mat, 0, j), 2 * mat->stride, mat->r, NULL);
 
         if (den != NULL)
             fmpz_set(den + j, lcm);
@@ -45,15 +44,10 @@ fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
         }
         else
         {
-            for (i = 0; i < mat->r; i++)
-            {
-                fmpz_divexact(t, lcm, fmpq_mat_entry_den(mat, i, j));
-                fmpz_mul(fmpz_mat_entry(num, i, j),
-                         fmpq_mat_entry_num(mat, i, j), t);
-            }
+            _fmpq_vec_get_fmpz_vec_scaled(fmpz_mat_entry(num, 0, j), num->stride,
+                fmpq_mat_entry(mat, 0, j), mat->stride, mat->r, lcm);
         }
     }
 
-    fmpz_clear(t);
     fmpz_clear(lcm);
 }

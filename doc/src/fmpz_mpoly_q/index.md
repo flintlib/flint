@@ -572,7 +572,7 @@ operand.
 void _fmpz_vec_content2(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp)
 
 Sets `res` to the GCD of $|\mathit{inp}|$ and the `len` entries of
-`vec`, stopping early when it reaches 1.
+`vec`; the same as `_fmpz_vec_content_chained`.
 :::
 
 ::: function

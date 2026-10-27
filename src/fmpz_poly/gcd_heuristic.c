@@ -174,7 +174,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 	while (array2[limbs2 - 1] == 0) limbs2--;
 
 	/* compute integer GCD */
-   limbsg = flint_mpn_gcd_full(arrayg, array1, limbs1, array2, limbs2);
+   limbsg = flint_mpn_gcd(arrayg, array1, limbs1, array2, limbs2);
 
    /*
       Make space for unpacked gcd. May have one extra coeff due to

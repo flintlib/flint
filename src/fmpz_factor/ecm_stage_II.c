@@ -139,7 +139,7 @@ fmpz_factor_ecm_stage_II(nn_ptr f, ulong B1, ulong B2, ulong P,
         goto cleanup;
     }
 
-    gcdlimbs = flint_mpn_gcd_full(f, n, ecm_inf->n_size, g, sz);
+    gcdlimbs = flint_mpn_gcd(f, n, ecm_inf->n_size, g, sz);
 
     /* condition one -> gcd = n_ecm->one
        condition two -> gcd = n

@@ -90,9 +90,7 @@ _fmpq_poly_compose_series_brent_kung(fmpz * res, fmpz_t den, const fmpz * poly1,
        We could remove gcd of A columnwise before multiplying, but
        this is slower for small to moderate n where we want to use Brent-Kung
        and faster only for large n where we want to use Kinoshita-Li instead. */
-    fmpz_one(lcd);
-    for (i = 0; i < m; i++)
-        fmpz_lcm(lcd, lcd, A_den + i);
+    _fmpz_vec_lcm(lcd, A_den, m);
 
     for (i = 0; i < m; i++)
     {
