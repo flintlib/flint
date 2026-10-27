@@ -359,20 +359,25 @@ void _nmod_mat_solve_tri_right_axpy_delayed(nmod_mat_t X, const nmod_mat_t T,
     and k columns (left) or rows (right) of B, by class of machine (AVX-512
     IFMA, AArch64 NEON, other) and range of the modulus n: n <= 3 * 2^29,
     n <= 2^31, n < 2^32, n <= 2^52, above (accumulations of the delayed
-    kernels, dot products and matrix products differ between them).
+    kernels, dot products and matrix products differ between them), and
+    n = 2 (last entry: recursion behaves differently there).
     - left classical: by rows of X if k >= max(lk, r / lc), otherwise one dot
       product per entry;
     - right classical: by rows of X^T if k >= max(rk, r / rc), otherwise axpy
       if r <= ar or k <= ak, otherwise dot products;
-    - top level (nmod_mat_solve_tril etc.): recursive if r >= Lr, k >= Lk and
-      r k >= Lp (left), r >= Rr, k >= Rk and r k >= Rp (right), or if r and k
-      are both at least 64; otherwise classical.
+    - top level (nmod_mat_solve_tril etc.): recursive if r >= LAr and
+      k >= LAk, or if r >= Lr, k >= Lk and r k >= Lp (left); r >= RAr and
+      k >= RAk, or r >= Rr, k >= Rk and r k >= Rp (right); otherwise
+      classical.
     Fitted on uniformly random inputs (Zen 4 and Ice Lake for IFMA, Apple
-    M4 for NEON, a Cascade Lake class VM for the others).
+    M4 for NEON, Cascade Lake for the others); the recursion from timings
+    of the classical solve and of one level of recursion (r = 16..1024,
+    k = 4..1024), then checked against the previous choice with the whole
+    recursion, keeping the previous values where they did better.
 */
 typedef struct
 {
-    short lk, lc, rk, rc, ar, ak, Lr, Lk, Lp, Rr, Rk, Rp;
+    short lk, lc, rk, rc, ar, ak, LAr, LAk, Lr, Lk, Lp, RAr, RAk, Rr, Rk, Rp;
 }
 _nmod_mat_solve_tri_param_struct;
 
@@ -380,37 +385,40 @@ _nmod_mat_solve_tri_param_struct;
 
 #if NMOD_MAT_HAVE_MUL_U52
 # define _NMOD_MAT_SOLVE_TRI_PARAMS \
-    {{3, 6, 6, 4, 256, 32, 48, 12, 0, 64, 24, 0}, \
-     {3, 4, 6, 2, 128, 8, 24, 12, 0, 32, 1, 96}, \
-     {3, 2, 6, 2, 64, 4, 8, 12, 128, 24, 1, 64}, \
-     {3, 3, 4, 2, 64, 4, 8, 8, 128, 24, 1, 64}, \
-     {3, 3, 4, 2, 64, 4, _TRI_NEVER, _TRI_NEVER, 0, 512, 4, 0}}
+    {{3, 6, 6, 4, 256, 32, 48, 48, 48, 12, 512, 64, 64, 64, 1, 2048}, \
+     {3, 4, 6, 2, 128, 8, 64, 64, 24, 12, 0, 64, 64, 32, 1, 96}, \
+     {3, 2, 6, 2, 64, 4, 64, 64, 8, 12, 128, 64, 64, 24, 1, 64}, \
+     {3, 3, 4, 2, 64, 4, 64, 64, 8, 8, 128, 64, 64, 24, 1, 64}, \
+     {3, 3, 4, 2, 64, 4, 64, 64, 768, 24, 0, 128, 128, 512, 1, 0}, \
+     {3, 6, 6, 4, 256, 32, 64, 64, 48, 12, 0, 64, 64, 64, 24, 0}}
 #elif (defined(__ARM_NEON) && defined(__aarch64__)) || defined(_M_ARM64)
 # define _NMOD_MAT_SOLVE_TRI_PARAMS \
-    {{2, 12, 4, 2, 16, 63, 32, 8, 512, 48, 16, 0}, \
-     {2, 12, 4, 2, 16, 63, 16, 8, 0, 24, 16, 0}, \
-     {2, 8, 4, 4, 16, 63, 24, 8, 0, 32, 12, 0}, \
-     {3, 8, 4, 4, 256, 16, 384, 8, 0, 256, 12, 0}, \
-     {3, 12, 4, 8, 256, 16, _TRI_NEVER, _TRI_NEVER, 0, 384, 24, 0}}
+    {{2, 12, 4, 2, 16, 63, 64, 64, 32, 8, 512, 64, 64, 48, 16, 0}, \
+     {2, 12, 4, 2, 16, 63, 64, 64, 16, 8, 0, 32, 32, 32, 8, 512}, \
+     {2, 8, 4, 4, 16, 63, 64, 64, 24, 8, 0, 32, 32, 32, 8, 256}, \
+     {3, 8, 4, 4, 256, 16, 64, 64, 384, 8, 0, 64, 64, 256, 12, 0}, \
+     {3, 12, 4, 8, 256, 16, 256, 256, 512, 24, 0, _TRI_NEVER, _TRI_NEVER, 384, 12, 8192}, \
+     {2, 12, 4, 2, 16, 63, 64, 64, 32, 8, 512, 64, 64, 48, 16, 0}}
 #else
 # define _NMOD_MAT_SOLVE_TRI_PARAMS \
-    {{4, 4, 6, 4, 128, 16, 384, 2, 1024, 64, 24, 0}, \
-     {6, 4, 6, 2, 64, 4, 24, 24, 1024, 96, 1, 192}, \
-     {4, 2, 4, 1, 32, 4, 512, 1, 1024, 256, 2, 0}, \
-     {3, 3, 4, 2, 256, 8, 48, 16, 0, 192, 3, 0}, \
-     {3, 3, 4, 2, 64, 8, _TRI_NEVER, _TRI_NEVER, 0, 1024, 12, 0}}
+    {{4, 4, 6, 4, 128, 16, 48, 48, 48, 4, 4096, 64, 24, 512, 1, 0}, \
+     {6, 4, 6, 2, 64, 4, 64, 64, 24, 24, 1024, 32, 32, 32, 1, 512}, \
+     {4, 2, 4, 1, 32, 4, 48, 32, 512, 1, 1024, 64, 32, 256, 2, 0}, \
+     {3, 3, 4, 2, 256, 8, 32, 32, 32, 8, 256, 32, 32, 32, 1, 256}, \
+     {3, 3, 4, 2, 64, 8, 64, 64, _TRI_NEVER, _TRI_NEVER, 0, 256, 256, 512, 8, 0}, \
+     {4, 4, 6, 4, 128, 16, 64, 64, 384, 2, 1024, 64, 64, 64, 24, 0}}
 #endif
 
 FLINT_FORCE_INLINE const _nmod_mat_solve_tri_param_struct *
 _nmod_mat_solve_tri_param(ulong n)
 {
-    static const _nmod_mat_solve_tri_param_struct tab[5] =
+    static const _nmod_mat_solve_tri_param_struct tab[6] =
         _NMOD_MAT_SOLVE_TRI_PARAMS;
 #if FLINT_BITS == 64
-    return tab + ((n <= (UWORD(3) << 29)) ? 0 : (n <= (UWORD(1) << 31)) ? 1
+    return tab + ((n == 2) ? 5 : (n <= (UWORD(3) << 29)) ? 0 : (n <= (UWORD(1) << 31)) ? 1
                   : (n < (UWORD(1) << 32)) ? 2 : (n <= (UWORD(1) << 52)) ? 3 : 4);
 #else
-    return tab + ((n <= (UWORD(3) << 13)) ? 0 : (n <= (UWORD(1) << 15)) ? 1 : 2);
+    return tab + ((n == 2) ? 5 : (n <= (UWORD(3) << 13)) ? 0 : (n <= (UWORD(1) << 15)) ? 1 : 2);
 #endif
 }
 
@@ -424,12 +432,14 @@ _nmod_mat_solve_tri_param(ulong n)
     ((r) <= _nmod_mat_solve_tri_param(n)->ar \
      || (k) <= _nmod_mat_solve_tri_param(n)->ak)
 #define NMOD_MAT_SOLVE_TRI_LEFT_REC(r, k, n) \
-    (((r) >= 64 && (k) >= 64) \
+    (((r) >= _nmod_mat_solve_tri_param(n)->LAr \
+      && (k) >= _nmod_mat_solve_tri_param(n)->LAk) \
      || ((r) >= _nmod_mat_solve_tri_param(n)->Lr \
          && (k) >= _nmod_mat_solve_tri_param(n)->Lk \
          && (r) * (k) >= _nmod_mat_solve_tri_param(n)->Lp))
 #define NMOD_MAT_SOLVE_TRI_RIGHT_REC(r, k, n) \
-    (((r) >= 64 && (k) >= 64) \
+    (((r) >= _nmod_mat_solve_tri_param(n)->RAr \
+      && (k) >= _nmod_mat_solve_tri_param(n)->RAk) \
      || ((r) >= _nmod_mat_solve_tri_param(n)->Rr \
          && (k) >= _nmod_mat_solve_tri_param(n)->Rk \
          && (r) * (k) >= _nmod_mat_solve_tri_param(n)->Rp))
