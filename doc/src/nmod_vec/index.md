@@ -238,6 +238,10 @@ $\sum_{i=0}^{\mathit{len}-1} a_i b_i \bmod n$, where $a_i$ is `vec1[i]`
 `vec2[len - 1 - i]`, `vec2[i][offset]` or `vec2[i * stride2]`
 respectively. `params` must come from `_nmod_vec_dot_params` with the same
 modulus and a length at least `len`.
+
+`_nmod_vec_dot_params` is an inline function; the method it chooses
+depends on the instruction sets FLINT was built with (recorded in
+`flint-config.h`), not on the compiler flags of the calling code.
 :::
 
 ::: macro
@@ -295,8 +299,8 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 
 Dot product kernel for 64-bit machines that keeps the unreduced sum as
 $h \, 2^{56} + \ell$ in two words and folds $h$ in with `pow2_precomp`
-$= 2^{56} \bmod n$. Requires $n \le 1515531528$ and a bound on the length;
-see
+$= 2^{56} \bmod n$. Requires $n \le 1515531528$ (and
+$\mathit{len} < 2^{59}$); see
 [splitting at bit 56](algorithms/linear-algebra/dot-products#split).
 :::
 
@@ -308,8 +312,8 @@ ulong _nmod_vec_dot2_half_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
 Dot product kernel for $n \le 2^{\bits/2}$ that adds one-limb products
 into a two-limb sum. On
 64-bit machines with AVX2, `_nmod_vec_dot2_half` instead splits each
-product at bit 56, needs `pow2_precomp` $= 2^{56} \bmod n$ and has a length
-limit; see [splitting each product](algorithms/linear-algebra/dot-products#half).
+product at bit 56 and needs `pow2_precomp` $= 2^{56} \bmod n$; see
+[splitting each product](algorithms/linear-algebra/dot-products#half).
 :::
 
 ::: function

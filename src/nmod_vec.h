@@ -58,6 +58,40 @@
 #endif
 
 /*
+    Instruction sets of the library.
+
+    Inline code of this header that calls SIMD functions of the library must
+    follow the instruction sets FLINT was compiled with, not those of the
+    calling code. In particular _nmod_vec_dot_params (below) is inline, but
+    it must choose a method that matches
+    the kernels compiled into the library (with AVX2, _nmod_vec_dot2_half
+    needs pow2_precomp; the u52 / u64 / split-limbs methods exist only with
+    AVX512-IFMA / AVX2), whatever the compiler flags of the calling code. So
+    it depends on the instruction sets FLINT itself was compiled with, which
+    the build system records in flint-config.h as FLINT_HAVE_AVX2 and
+    FLINT_HAVE_AVX512_IFMA (1, or 0 / undefined), and not on the compiler
+    macros (__AVX2__, ...) seen by the caller. nmod_vec/dot.c checks that
+    both agree when compiling FLINT. (When the kernels of a SIMD method are
+    not compiled, e.g. with FLINT_MACHINE_VECTORS_FORCE_GENERIC, their
+    functions fall back to the scalar code, so choosing that method remains
+    correct.)
+*/
+#if FLINT_BITS == 64 && FLINT_HAVE_AVX512_IFMA
+# define NMOD_VEC_LIB_HAVE_DOT_U52 1
+# define NMOD_VEC_LIB_HAVE_DOT_U64 1
+#else
+# define NMOD_VEC_LIB_HAVE_DOT_U52 0
+# define NMOD_VEC_LIB_HAVE_DOT_U64 0
+#endif
+#if FLINT_BITS == 64 && FLINT_HAVE_AVX2
+# define NMOD_VEC_LIB_HAVE_AVX2 1
+#else
+# define NMOD_VEC_LIB_HAVE_AVX2 0
+#endif
+#define NMOD_VEC_LIB_DOT_SPLIT_LIMBS_ENABLED \
+    (NMOD_VEC_LIB_HAVE_AVX2 && NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN > 0)
+
+/*
     Minimal lengths for these to beat the scalar code, measured on Ice Lake,
     Zen 4, Cascade Lake, Broadwell and Emerald Rapids. For u64, measured
     against _DOT2 in the two-limb band and against _DOT3_ACC / _DOT3 in the
@@ -227,7 +261,8 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
-#if FLINT_BITS == 64 && defined(__AVX2__)
+/* the AVX2 version exists when FLINT itself is compiled with AVX2 */
+#if NMOD_VEC_LIB_HAVE_AVX2
 void _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len, ulong c);
 #elif FLINT_BITS == 64 && defined(__ARM_NEON)
 void _nmod_vec_nored_scalar_addmul_halflimb_neon(nn_ptr res, nn_srcptr vec, slong len, ulong c);
@@ -236,7 +271,7 @@ void _nmod_vec_nored_scalar_addmul_halflimb_neon(nn_ptr res, nn_srcptr vec, slon
 NMOD_VEC_INLINE void
 _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
 {
-#if FLINT_BITS == 64 && defined(__AVX2__)
+#if NMOD_VEC_LIB_HAVE_AVX2
     if (len >= 16)
     {
         _nmod_vec_nored_scalar_addmul_halflimb_avx2(res, vec, len, c);
@@ -272,12 +307,210 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
 #if (FLINT_BITS == 64)
 #   define DOT_SPLIT_BITS 56
 #   define DOT_SPLIT_MASK UWORD(72057594037927935) // (1L << DOT_SPLIT_BITS) - 1
+
+/*
+    res = (pow2_precomp * hi + lo) mod n, for pow2_precomp < n and any words
+    hi, lo, computed as a two-word integer c1:c0. Since pow2_precomp < n,
+    c1:c0 < n * 2**FLINT_BITS, i.e. c1 < n, as required by NMOD_RED2; this
+    puts no constraint on the length of the dot product beyond hi not
+    overflowing (see the notes at the end of nmod_vec/dot.c). When c1 is 0
+    (always the case for short and medium lengths) the one-word NMOD_RED
+    suffices. The other branch uses NMOD_RED2 directly (not NMOD2_RED2): when
+    the compiler turns the test into a select, the two branches then merge into
+    a single reduction, whereas NMOD2_RED2 would add a second one on every call
+    (seen with Apple clang 17 on an M4).
+*/
+#   define _NMOD_VEC_DOT_SPLIT_COMBINE(res, hi, lo, pow2_precomp, mod)  \
+    do {                                                                \
+        ulong c1xx, c0xx;                                               \
+        umul_ppmm(c1xx, c0xx, (pow2_precomp), (hi));                    \
+        add_ssaaaa(c1xx, c0xx, c1xx, c0xx, UWORD(0), (lo));             \
+        if (c1xx == 0)                                                  \
+            NMOD_RED(res, c0xx, mod);                                   \
+        else                                                            \
+            NMOD_RED2(res, c1xx, c0xx, mod);                            \
+    } while (0)
 #endif // FLINT_BITS == 64
 
-/* The method is chosen by the library (src/nmod_vec/dot_params.c), so that
-   it matches the kernels FLINT was compiled with, whatever the compiler flags
-   of the calling code. */
-dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod);
+#define _FIXED_LEN_MOD_BOUNDS(fixedlen, onelimb_bnd, twolimb_bnd) \
+        if (len == fixedlen)                                      \
+        {                                                         \
+            if (mod.n <= UWORD(onelimb_bnd))                      \
+            {                                                     \
+                dot_params_t params = {_DOT1, UWORD(0)};          \
+                return params;                                    \
+            }                                                     \
+            if (mod.n <= UWORD(twolimb_bnd))                      \
+            {                                                     \
+                dot_params_t params = {_DOT2, UWORD(0)};          \
+                return params;                                    \
+            }                                                     \
+            dot_params_t params = {_DOT3, UWORD(0)};              \
+            return params;                                        \
+        }
+
+FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
+{
+    if (len == 0 || mod.n == 1)
+    {
+        dot_params_t params = {_DOT0, UWORD(0)};
+        return params;
+    }
+    if ((mod.n & (mod.n - 1)) == 0)
+    {
+        dot_params_t params = {_DOT_POW2, UWORD(0)};
+        return params;
+    }
+    // from here on len >= 1, n > 1 not power of 2
+
+    // short dot products: we use only _DOT1, _DOT2, _DOT3 in that case
+    if (len <= 11)
+    {
+#if FLINT_BITS == 64
+        // 64 bits:  k limbs  <=>  n <= ceil(2**(32*k) / sqrt(len))
+        _FIXED_LEN_MOD_BOUNDS(11, 1294981365,  5561902608746059656);
+        _FIXED_LEN_MOD_BOUNDS(10, 1358187914,  5833372668713515885);
+        _FIXED_LEN_MOD_BOUNDS( 9, 1431655766,  6148914691236517206);
+        _FIXED_LEN_MOD_BOUNDS( 8, 1518500250,  6521908912666391107);
+        _FIXED_LEN_MOD_BOUNDS( 7, 1623345051,  6972213902555716131);
+        _FIXED_LEN_MOD_BOUNDS( 6, 1753413057,  7530851732716320753);
+        _FIXED_LEN_MOD_BOUNDS( 5, 1920767767,  8249634742471189718);
+        _FIXED_LEN_MOD_BOUNDS( 4, 2147483648,  9223372036854775808);
+        _FIXED_LEN_MOD_BOUNDS( 3, 2479700525, 10650232656628343402);
+        _FIXED_LEN_MOD_BOUNDS( 2, 3037000500, 13043817825332782213);
+#else  // FLINT_BITS == 64
+        // 32 bits: k limbs  <=>  n <= ceil(2**(16*k) / sqrt(len))
+        _FIXED_LEN_MOD_BOUNDS(11, 19760, 1294981365);
+        _FIXED_LEN_MOD_BOUNDS(10, 20725, 1358187914);
+        _FIXED_LEN_MOD_BOUNDS( 9, 21846, 1431655766);
+        _FIXED_LEN_MOD_BOUNDS( 8, 23171, 1518500250);
+        _FIXED_LEN_MOD_BOUNDS( 7, 24771, 1623345051);
+        _FIXED_LEN_MOD_BOUNDS( 6, 26755, 1753413057);
+        _FIXED_LEN_MOD_BOUNDS( 5, 29309, 1920767767);
+        _FIXED_LEN_MOD_BOUNDS( 4, 32768, 2147483648);
+        _FIXED_LEN_MOD_BOUNDS( 3, 37838, 2479700525);
+        _FIXED_LEN_MOD_BOUNDS( 2, 46341, 3037000500);
+#endif  // FLINT_BITS == 64
+        // remains len == 1
+        if (mod.n <= (UWORD(1) << FLINT_BITS / 2))
+        {
+            dot_params_t params = {_DOT1, UWORD(0)};
+            return params;
+        }
+        dot_params_t params = {_DOT2, UWORD(0)};
+        return params;
+    }
+
+    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    {
+        const ulong t0 = (mod.n - 1) * (mod.n - 1);
+        ulong u1 = n_mulhi(t0, len);
+        if (u1 == 0)  // 1 limb
+        {
+            dot_params_t params = {_DOT1, UWORD(0)};
+            return params;
+        }
+
+        // u1 != 0 <=> 2 limbs
+#if defined(NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        if (len >= NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        {
+            dot_params_t params = {_DOT2, UWORD(0)};
+            return params;
+        }
+#endif
+#if (FLINT_BITS == 64) // _SPLIT: see the end of dot.c for this constraint
+        if (mod.n <= UWORD(1515531528))
+        {
+            ulong pow2_precomp;
+            NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+            dot_params_t params = {_DOT2_SPLIT, pow2_precomp};
+            return params;
+        }
+#endif // FLINT_BITS == 64
+#if (FLINT_BITS == 64) && NMOD_VEC_LIB_HAVE_AVX2
+        ulong pow2_precomp;
+        NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+        dot_params_t params = {_DOT2_HALF, pow2_precomp};
+        return params;
+#elif defined(NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        dot_params_t params = {_DOT2, UWORD(0)};
+        return params;
+#else // (FLINT_BITS == 64) && NMOD_VEC_LIB_HAVE_AVX2
+        dot_params_t params = {_DOT2_HALF, UWORD(0)};
+        return params;
+#endif // (FLINT_BITS == 64) && NMOD_VEC_LIB_HAVE_AVX2
+    }
+    // from here on, mod.n > 2**(FLINT_BITS / 2)
+    // --> unreduced dot cannot fit in 1 limb
+
+    ulong t2, t1, t0, u1;
+    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
+    umul_ppmm(t2, t1, t1, len);
+    u1 = n_mulhi(t0, len);
+    add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
+
+    if (t2 == 0) // 2 limbs
+    {
+#if NMOD_VEC_LIB_HAVE_DOT_U52
+        if (mod.n <= (UWORD(1) << 52) && len >= NMOD_VEC_DOT_U52_MIN_LEN)
+        {
+            dot_params_t params = {_DOT_U52, UWORD(0)};
+            return params;
+        }
+#endif
+#if NMOD_VEC_LIB_DOT_SPLIT_LIMBS_ENABLED
+        // up to NMOD_VEC_DOT_SPLIT_LIMBS_MAX_BITS bits (with IFMA, _DOT_U64
+        // is faster beyond)
+        if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+                && mod.n <= NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N)
+        {
+            dot_params_t params = {_DOT_SPLIT_LIMBS, UWORD(0)};
+            return params;
+        }
+#endif
+#if NMOD_VEC_LIB_HAVE_DOT_U64
+        if (mod.n > (UWORD(1) << 52) && len >= NMOD_VEC_DOT_U64_MIN_LEN)
+        {
+            dot_params_t params = {_DOT_U64, UWORD(0)};
+            return params;
+        }
+#endif
+        dot_params_t params = {_DOT2, UWORD(0)};
+        return params;
+    }
+
+    // 3 limbs:
+#if NMOD_VEC_LIB_DOT_SPLIT_LIMBS_ENABLED
+    if (len >= NMOD_VEC_DOT_SPLIT_LIMBS_MIN_LEN
+            && mod.n <= NMOD_VEC_DOT_SPLIT_LIMBS_MAX_N)
+    {
+        dot_params_t params = {_DOT3_SPLIT_LIMBS, UWORD(0)};
+        return params;
+    }
+#endif
+#if NMOD_VEC_LIB_HAVE_DOT_U64
+    if (len >= NMOD_VEC_DOT3_U64_MIN_LEN)
+    {
+        dot_params_t params = {_DOT3_U64, UWORD(0)};
+        return params;
+    }
+#endif
+#if (FLINT_BITS == 64)
+    if (mod.n <= UWORD(6521908912666391107))  // room for accumulating 8 terms
+#else
+    if (mod.n <= UWORD(1518500250))           // room for accumulating 8 terms
+#endif
+    {
+        dot_params_t params = {_DOT3_ACC, UWORD(0)};
+        return params;
+    }
+
+    dot_params_t params = {_DOT3, UWORD(0)};
+    return params;
+}
+
+#undef _FIXED_LEN_MOD_BOUNDS
 
 int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 int _nmod_vec_dot_bound_limbs_from_params(slong len, nmod_t mod, dot_params_t params);
@@ -640,8 +873,8 @@ do                                                    \
     for ( ; i < (len); i++)                           \
         dp_lo += (expr1) * (expr2);                   \
                                                       \
-    res = pow2_precomp * dp_hi + dp_lo;               \
-    NMOD_RED(res, res, mod);                          \
+    _NMOD_VEC_DOT_SPLIT_COMBINE(res, dp_hi, dp_lo,    \
+                                pow2_precomp, mod);   \
 } while(0);
 #endif  // FLINT_BITS == 64
 

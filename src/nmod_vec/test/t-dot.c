@@ -67,5 +67,43 @@ TEST_FUNCTION_START(nmod_vec_dot, state)
         _nmod_vec_clear(y);
     }
 
+#if FLINT_BITS == 64
+    /*
+        One long dot product through the split code (_DOT2_SPLIT), which has
+        no length bound: all entries n - 1, with n close to the largest
+        modulus of _DOT2_SPLIT and 2^56 mod n large, through the NMOD_VEC_DOT
+        macro (no memory needed); the expected value is
+        len * (n-1)^2 = len mod n. Computing the final value
+        pow2_precomp * hi + lo in a single word would overflow here. The
+        split code is used even where _nmod_vec_dot_params does not choose it
+        for this length (AArch64 uses _DOT2 from length
+        NMOD_VEC_DOT2_SPLIT_MAX_LEN on).
+    */
+    {
+        nmod_t mod;
+        dot_params_t params;
+        volatile ulong a;
+        ulong res, n = UWORD(1515531501);
+        slong k, len = WORD(300000007);
+
+        nmod_init(&mod, n);
+#if !defined(NMOD_VEC_DOT2_SPLIT_MAX_LEN)
+        params = _nmod_vec_dot_params(len, mod);
+        if (params.method != _DOT2_SPLIT)
+            TEST_FUNCTION_FAIL("n = %wu, len = %wd: method %d, expected _DOT2_SPLIT\n",
+                               n, len, (int) params.method);
+#endif
+        params.method = _DOT2_SPLIT;
+        NMOD_RED(params.pow2_precomp, UWORD(1) << DOT_SPLIT_BITS, mod);
+
+        a = n - 1;
+        NMOD_VEC_DOT(res, k, len, a, a, mod, params);
+
+        if (res != (ulong) len % n)
+            TEST_FUNCTION_FAIL("long split dot product, n = %wu, len = %wd: got %wu, expected %wu\n",
+                               n, len, res, (ulong) len % n);
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }

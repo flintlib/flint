@@ -18,6 +18,10 @@
 
 #cmakedefine01 FLINT_HAVE_FFT_SMALL
 
+/* Instruction sets FLINT is compiled with (for inline code of the headers) */
+#cmakedefine01 FLINT_HAVE_AVX2
+#cmakedefine01 FLINT_HAVE_AVX512_IFMA
+
 #cmakedefine01 FLINT_KNOW_STRONG_ORDER
 
 #cmakedefine FLINT_BITS @FLINT_BITS@

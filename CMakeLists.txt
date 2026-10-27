@@ -202,6 +202,36 @@ else()
     set(FFT_SMALL)
 endif()
 
+# Instruction sets FLINT is compiled with, recorded in flint-config.h for the
+# inline method selection of the nmod_vec dot products (nmod_vec.h), which must
+# not depend on the compiler flags of the code that includes the header.
+set(CMAKE_REQUIRED_FLAGS "")
+if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO" AND HAS_FLAG_ARCH)
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -march=${ENABLE_ARCH}")
+endif()
+if(ENABLE_AVX2)
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${avx2_flag}")
+    if(HAS_FLAG_MFMA)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -mfma")
+    endif()
+endif()
+if(ENABLE_AVX512)
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${avx512_flag}")
+endif()
+check_c_source_compiles([[
+    #if !defined(__AVX2__)
+    # error
+    error
+    #endif
+    int main(void) { return 0; }]] FLINT_HAVE_AVX2)
+check_c_source_compiles([[
+    #if !(defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512IFMA__))
+    # error
+    error
+    #endif
+    int main(void) { return 0; }]] FLINT_HAVE_AVX512_IFMA)
+unset(CMAKE_REQUIRED_FLAGS)
+
 # Find sources
 
 set(_BUILD_DIRS

@@ -1062,6 +1062,43 @@ else
 fi
 
 ###############################################################################
+# instruction sets of the build, recorded for inline code of the headers
+###############################################################################
+
+# The inline method selection of the nmod_vec dot products (nmod_vec.h) must
+# follow the instruction sets FLINT is compiled with, not the compiler flags of
+# the code that includes the header: record them in flint-config.h.
+AC_CACHE_CHECK([if FLINT is compiled with AVX2],
+    flint_cv_have_avx2,
+    [FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
+            #if !defined(__AVX2__)
+            #error Dead man
+            error
+            #endif
+        ])],
+        flint_cv_have_avx2="yes",
+        flint_cv_have_avx2="no")])
+if test "$flint_cv_have_avx2" = "yes";
+then
+    AC_DEFINE(FLINT_HAVE_AVX2,1,[Define if FLINT is compiled with AVX2])
+fi
+
+AC_CACHE_CHECK([if FLINT is compiled with AVX512 IFMA],
+    flint_cv_have_avx512_ifma,
+    [FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
+            #if !(defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512IFMA__))
+            #error Dead man
+            error
+            #endif
+        ])],
+        flint_cv_have_avx512_ifma="yes",
+        flint_cv_have_avx512_ifma="no")])
+if test "$flint_cv_have_avx512_ifma" = "yes";
+then
+    AC_DEFINE(FLINT_HAVE_AVX512_IFMA,1,[Define if FLINT is compiled with AVX512F, AVX512DQ and AVX512IFMA])
+fi
+
+###############################################################################
 # assembly
 ###############################################################################
 
