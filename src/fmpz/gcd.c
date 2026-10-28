@@ -74,10 +74,8 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else
         {
-            /* TODO: Change to mpn_gcd in order to save some calculations that
-             * have already been already made. */
             mpz_ptr mf = _fmpz_promote(f);
-            mpz_gcd(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            flint_mpz_gcd(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);
         }
     }
@@ -184,7 +182,7 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
     }
     else
     {
-        /* Three-way mpz_gcd. */
+        /* Three-way gcd. */
         mpz_ptr rp, ap, bp, cp, tp;
         slong an, bn, cn, mn;
 
@@ -226,23 +224,23 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
             TMP_START;
 
             /* It would be more efficient to allocate temporary space for
-               gcd(a, b), but we can't be sure that mpz_gcd never attempts
+               gcd(a, b), but we can't be sure that flint_mpz_gcd never attempts
                to reallocate the output. */
             t->_mp_d = TMP_ALLOC(sizeof(ulong) * cn);
             t->_mp_size = t->_mp_alloc = cn;
             flint_mpn_copyi(t->_mp_d, cp->_mp_d, cn);
 
-            mpz_gcd(rp, ap, bp);
+            flint_mpz_gcd(rp, ap, bp);
             if (mpz_cmpabs_ui(rp, 1) != 0)
-                mpz_gcd(rp, rp, t);
+                flint_mpz_gcd(rp, rp, t);
 
             TMP_END;
         }
         else
         {
-            mpz_gcd(rp, ap, bp);
+            flint_mpz_gcd(rp, ap, bp);
             if (mpz_cmpabs_ui(rp, 1) != 0)
-                mpz_gcd(rp, rp, cp);
+                flint_mpz_gcd(rp, rp, cp);
         }
 
         /* The result may be small */

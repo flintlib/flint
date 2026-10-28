@@ -28,8 +28,7 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         fmpz_t g;
         fmpz_init(g);
 
-        _fmpz_vec_content(g, fmpz_mpoly_q_numref(res)->coeffs, fmpz_mpoly_q_numref(res)->length);
-        fmpz_gcd(g, g, fmpz_mpoly_q_denref(res)->coeffs);
+        _fmpz_vec_content_chained(g, fmpz_mpoly_q_numref(res)->coeffs, fmpz_mpoly_q_numref(res)->length, fmpz_mpoly_q_denref(res)->coeffs);
 
         if (fmpz_sgn(fmpz_mpoly_q_denref(res)->coeffs) < 0)
             fmpz_neg(g, g);
@@ -47,8 +46,7 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         fmpz_t g;
         fmpz_init(g);
 
-        _fmpz_vec_content(g, fmpz_mpoly_q_denref(res)->coeffs, fmpz_mpoly_q_denref(res)->length);
-        fmpz_gcd(g, g, fmpz_mpoly_q_numref(res)->coeffs);
+        _fmpz_vec_content_chained(g, fmpz_mpoly_q_denref(res)->coeffs, fmpz_mpoly_q_denref(res)->length, fmpz_mpoly_q_numref(res)->coeffs);
 
         if (fmpz_sgn(fmpz_mpoly_q_denref(res)->coeffs) < 0)
             fmpz_neg(g, g);

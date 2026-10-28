@@ -1610,6 +1610,9 @@ void flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b);
 void flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b);
 void flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a);
 void flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a);
+void flint_mpz_gcd(mpz_ptr g, mpz_srcptr a, mpz_srcptr b);
+void flint_mpz_gcdext(mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b);
+int flint_mpz_invert(mpz_ptr r, mpz_srcptr x, mpz_srcptr n);
 
 mp_size_t _flint_mpn_sqrtrem(mp_ptr s, mp_ptr r, mp_srcptr a, mp_size_t an);
 
@@ -1691,8 +1694,105 @@ int flint_mpn_factor_trial_tree(slong * factors, mp_srcptr x, mp_size_t xsize, s
 
 /* greatest common divisor ***************************************************/
 
-mp_size_t flint_mpn_gcd_full2(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scr);
-mp_size_t flint_mpn_gcd_full(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+/* gcd and extended gcd of nonzero normalised values, in any order; the
+   inputs are not modified */
+mp_size_t flint_mpn_gcd(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+mp_size_t flint_mpn_gcdext(mp_ptr gp, mp_ptr sp, mp_size_t * sn, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+
+/* deprecated aliases */
+#define flint_mpn_gcd_full flint_mpn_gcd
+#define flint_mpn_gcd_full2(gp, ap, an, bp, bn, scr) flint_mpn_gcd(gp, ap, an, bp, bn)
+
+/* the same with the interfaces of GMP's mpn_gcd and mpn_gcdext (ported
+   from GMP, using FLINT's multiplication and division and fft_small
+   transforms in the half-gcd matrix products): un >= vn > 0, the inputs
+   are destroyed; see the documentation */
+mp_size_t _flint_mpn_gcd_inplace(mp_ptr gp, mp_ptr up, mp_size_t un, mp_ptr vp, mp_size_t vn);
+mp_size_t _flint_mpn_gcdext_inplace(mp_ptr gp, mp_ptr sp, mp_size_t * sn, mp_ptr up, mp_size_t un, mp_ptr vp, mp_size_t vn);
+
+/* gcd of a vector (content): of the single limbs x[0], ..., x[len - 1] and
+   g (zero allowed), respectively of the normalised values {xp[i], xn[i]}
+   (xn[i] = 0 for zero) and {g, gn} (gn = 0 for none) */
+ulong flint_mpn_gcd_vec_1(mp_srcptr x, slong len, ulong g);
+mp_size_t flint_mpn_gcd_vec(mp_ptr g, mp_size_t gn, const mp_srcptr * xp, const mp_size_t * xn, slong len);
+
+/* gcd of two odd two-limb values: GMP's (assembly) mpn_gcd_22 if available,
+   which returns GMP's mp_double_limb_t, else a port of its C version */
+#if FLINT_HAVE_NATIVE_mpn_gcd_22
+typedef struct { mp_limb_t d0, d1; } flint_mpn_double_limb_t;
+# define mpn_gcd_22 __gmpn_gcd_22
+flint_mpn_double_limb_t mpn_gcd_22(mp_limb_t, mp_limb_t, mp_limb_t, mp_limb_t);
+MPN_EXTRAS_INLINE void
+_flint_mpn_gcd_22(mp_ptr g, mp_limb_t u1, mp_limb_t u0, mp_limb_t v1, mp_limb_t v0)
+{
+    flint_mpn_double_limb_t t = mpn_gcd_22(u1, u0, v1, v0);
+    g[0] = t.d0;
+    g[1] = t.d1;
+}
+#else
+void _flint_mpn_gcd_22(mp_ptr g, mp_limb_t u1, mp_limb_t u0, mp_limb_t v1, mp_limb_t v0);
+#endif
+
+/* Half-gcd (HGCD) internals, following GMP's mpn_hgcd* functions. A matrix
+   M = (p00, p01; p10, p11) with entries of n limbs (of allocation alloc),
+   respectively a single-limb matrix (u00, u01; u10, u11). */
+typedef struct
+{
+    mp_limb_t u[2][2];
+}
+flint_mpn_hgcd_matrix1_struct;
+
+typedef struct
+{
+    mp_size_t alloc;
+    mp_size_t n;
+    mp_ptr p[2][2];
+}
+flint_mpn_hgcd_matrix_struct;
+
+#define FLINT_MPN_HGCD_MATRIX_INIT_ITCH(n) (4 * (((n) + 1) / 2 + 1))
+#define FLINT_MPN_GCDEXT_LEHMER_N_ITCH(n) (4 * (n) + 3)
+
+typedef void _flint_mpn_gcd_subdiv_step_hook(void * ctx, mp_srcptr gp, mp_size_t gn, mp_srcptr qp, mp_size_t qn, int d);
+
+typedef struct
+{
+    /* result parameters */
+    mp_ptr gp;
+    mp_size_t gn;
+    mp_ptr up;
+    mp_size_t * usize;
+    /* cofactors updated in the hook */
+    mp_size_t un;
+    mp_ptr u0;
+    mp_ptr u1;
+    mp_ptr tp;
+}
+_flint_mpn_gcdext_ctx_struct;
+
+int _flint_mpn_hgcd2(mp_limb_t ah, mp_limb_t al, mp_limb_t bh, mp_limb_t bl, flint_mpn_hgcd_matrix1_struct * M);
+mp_size_t _flint_mpn_hgcd_mul_matrix1_vector(const flint_mpn_hgcd_matrix1_struct * M, mp_ptr rp, mp_srcptr ap, mp_ptr bp, mp_size_t n);
+mp_size_t _flint_mpn_hgcd_mul_matrix1_inverse_vector(const flint_mpn_hgcd_matrix1_struct * M, mp_ptr rp, mp_srcptr ap, mp_ptr bp, mp_size_t n);
+
+void _flint_mpn_hgcd_matrix_init(flint_mpn_hgcd_matrix_struct * M, mp_size_t n, mp_ptr p);
+void _flint_mpn_hgcd_matrix_update_q(flint_mpn_hgcd_matrix_struct * M, mp_srcptr qp, mp_size_t qn, unsigned int col, mp_ptr tp);
+void _flint_mpn_hgcd_matrix_mul_1(flint_mpn_hgcd_matrix_struct * M, const flint_mpn_hgcd_matrix1_struct * M1, mp_ptr tp);
+void _flint_mpn_hgcd_matrix_mul(flint_mpn_hgcd_matrix_struct * M, const flint_mpn_hgcd_matrix_struct * M1, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_matrix_adjust(const flint_mpn_hgcd_matrix_struct * M, mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t p, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_matrix22_mul_strassen_itch(mp_size_t rn, mp_size_t mn);
+void _flint_mpn_hgcd_matrix22_mul_strassen(mp_ptr r0, mp_ptr r1, mp_ptr r2, mp_ptr r3, mp_size_t rn, mp_srcptr m0, mp_srcptr m1, mp_srcptr m2, mp_srcptr m3, mp_size_t mn, mp_ptr tp);
+
+mp_size_t _flint_mpn_gcd_subdiv_step(mp_ptr ap, mp_ptr bp, mp_size_t n, mp_size_t s, _flint_mpn_gcd_subdiv_step_hook * hook, void * ctx, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_step(mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t s, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_itch(mp_size_t n);
+mp_size_t _flint_mpn_hgcd(mp_ptr ap, mp_ptr bp, mp_size_t n, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_appr_itch(mp_size_t n);
+int _flint_mpn_hgcd_appr(mp_ptr ap, mp_ptr bp, mp_size_t n, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp);
+mp_size_t _flint_mpn_hgcd_reduce_itch(mp_size_t n, mp_size_t p);
+mp_size_t _flint_mpn_hgcd_reduce(flint_mpn_hgcd_matrix_struct * M, mp_ptr ap, mp_ptr bp, mp_size_t n, mp_size_t p, mp_ptr tp);
+
+void _flint_mpn_gcdext_hook(void * p, mp_srcptr gp, mp_size_t gn, mp_srcptr qp, mp_size_t qn, int d);
+mp_size_t _flint_mpn_gcdext_lehmer_n(mp_ptr gp, mp_ptr up, mp_size_t * usize, mp_ptr ap, mp_ptr bp, mp_size_t n, mp_ptr tp);
 
 /* modular arithmetic ********************************************************/
 

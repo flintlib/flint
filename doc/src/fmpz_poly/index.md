@@ -1451,8 +1451,7 @@ void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
 
 Set `res` to the nonnegative content of the polynomial; the content
 of the zero polynomial is zero. `res` may be one of the coefficients
-of `poly` in the non-underscore version, but not in the underscore
-version.
+of `poly`. The underscore version is `_fmpz_vec_content`.
 :::
 
 ::: function

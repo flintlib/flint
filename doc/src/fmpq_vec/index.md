@@ -86,6 +86,14 @@ common multiple of the denominators of the entries (1 for an empty
 vector) and `num[i]` to $a_i \cdot \mathit{den}$.
 :::
 
+::: function
+void _fmpq_vec_get_fmpz_vec_scaled(fmpz * num, slong nstride, const fmpq * a, slong astride, slong len, const fmpz_t den)
+
+Sets `num[i * nstride]` to $a_j \cdot \mathit{den}$ for $j = i \cdot
+\mathit{astride}$ and $0 \le i < \mathit{len}$, where `den` must be a
+positive common multiple of the denominators.
+:::
+
 ## Dot product {#dot}
 
 ::: function

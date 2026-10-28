@@ -70,16 +70,20 @@ may alias outputs.
 
 Two inline operands, or an inline and a large operand, are handled by
 GMP's single-limb GCD `mpn_gcd_1` (a binary GCD, after one division of the
-large operand by the small one). Two large operands go to GMP's
-`mpz_gcd`, which uses a Lehmer-type algorithm with double-limb steps for
-small sizes and the subquadratic half-GCD of Möller for large ones; the
-extended GCD functions use `mpz_gcdext`, which is built from the same
-pieces. `fmpz_gcd3` first computes the GCD of the inline operands, if
-any, and stops as soon as it reaches 1; for three large operands it
-starts with the two shortest. FLINT's own integer half-GCD, used for
-continued fractions and rational reconstruction in `fmpq`, and the
-partial extended GCD `fmpz_xgcd_partial` are described with the GMP
-algorithms in [](algorithms/integers/gcd).
+large operand by the small one). Two large operands go to
+`flint_mpz_gcd`, which uses a Lehmer-type algorithm with double-limb
+steps for small sizes and the subquadratic half-GCD of Möller for large
+ones, ported from GMP and built on FLINT's multiplication with
+transform reuse in the matrix products; the
+extended GCD functions and `fmpz_invmod` use `flint_mpz_gcdext` and
+`flint_mpz_invert`, which are built from the same pieces and return the
+same cofactors as GMP's `mpz_gcdext` and `mpz_invert`. `fmpz_gcd3` first
+computes the GCD of the inline operands, if any, and stops as soon as it
+reaches 1; for three large operands it starts with the two shortest.
+FLINT's own integer half-GCD, used for continued fractions and rational
+reconstruction in `fmpq`, and the partial extended GCD
+`fmpz_xgcd_partial` are described with the other algorithms in
+[](algorithms/integers/gcd).
 
 ## Example {#example}
 

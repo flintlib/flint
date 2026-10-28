@@ -182,7 +182,7 @@ ll_gcd_factor(nn_ptr factor, nn_srcptr v, ulong n1, ulong n0)
     nvec[0] = n0; nvec[1] = n1;
     vvec[0] = v[0]; vvec[1] = v[1];
 
-    gs = flint_mpn_gcd_full(g, nvec, 2, vvec, v[1] ? 2 : 1);
+    gs = flint_mpn_gcd(g, nvec, 2, vvec, v[1] ? 2 : 1);
 
     if (gs == 1)
     {
@@ -243,7 +243,7 @@ ll_ecm_curve(nn_ptr factor, ulong n1, ulong n0, ulong sigma, ulong B1,
     MMUL(den, den, v);                    /* 16 * u^3 * v */
 
     /*
-       Invert den.  mpn_gcdext wants both operands given as exactly
+       Invert den.  _flint_mpn_gcdext_inplace wants both operands given as exactly
        n limbs with the modulus normalised, as in mpn_mod_inv; the gcd it
        returns is the factor of n when the inverse does not exist.
     */
@@ -261,7 +261,7 @@ ll_ecm_curve(nn_ptr factor, ulong n1, ulong n0, ulong sigma, ulong B1,
         nvec[0] = M->n0; nvec[1] = M->n1;
         tmp[0] = dord[0]; tmp[1] = dord[1];
 
-        gsize = mpn_gcdext(g, sv, &ssize, tmp, 2, nvec, 2);
+        gsize = _flint_mpn_gcdext_inplace(g, sv, &ssize, tmp, 2, nvec, 2);
 
         if (!(gsize == 1 && g[0] == 1))
         {

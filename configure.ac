@@ -862,6 +862,7 @@ then
     AC_SEARCH_LIBS([__gmpn_mulmid_n],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mulmid_n,1,Define if GMP has mpn_mulmid_n)])
     AC_SEARCH_LIBS([__gmpn_divexact],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_divexact,1,Define if GMP has mpn_divexact)])
     AC_SEARCH_LIBS([__gmpn_mod_34lsub1],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_mod_34lsub1,1,Define if GMP has mpn_mod_34lsub1)])
+    AC_SEARCH_LIBS([__gmpn_gcd_22],[gmp],[AC_DEFINE(FLINT_HAVE_NATIVE_mpn_gcd_22,1,Define if GMP has mpn_gcd_22)])
 fi
 
 if test "$enable_mpfr_check" = "yes";

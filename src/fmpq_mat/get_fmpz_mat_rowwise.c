@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,29 +11,30 @@
 
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_vec.h"
+#include "fmpq_vec.h"
 #include "fmpq_mat.h"
 
 static void
 _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
                         const fmpq_mat_struct ** mat, slong n)
 {
-    fmpz_t t, lcm;
+    fmpz_t lcm;
     slong i, j, k;
 
     if (fmpq_mat_is_empty(mat[0]))
         return;
 
-    fmpz_init(t);
     fmpz_init(lcm);
 
     for (i = 0; i < mat[0]->r; i++)
     {
         /* Compute common denominator of row */
-        fmpz_set(lcm, fmpq_mat_entry_den(mat[0], i, 0));
-
-        for (k = 0; k < n; k++)
-            for (j = (k == 0); j < mat[k]->c; j++)
-                fmpz_lcm(lcm, lcm, fmpq_mat_entry_den(mat[k], i, j));
+        _fmpz_vec_lcm_strided(lcm, fmpq_mat_entry_den(mat[0], i, 0), 2, mat[0]->c, NULL);
+        /* the other matrices may have no columns (and no entries) */
+        for (k = 1; k < n; k++)
+            if (mat[k]->c != 0)
+                _fmpz_vec_lcm_strided(lcm, fmpq_mat_entry_den(mat[k], i, 0), 2, mat[k]->c, lcm);
 
         if (den != NULL)
             fmpz_set(den + i, lcm);
@@ -41,6 +42,9 @@ _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
         for (k = 0; k < n; k++)
         {
             /* Rescale numerators in row */
+            if (mat[k]->c == 0)
+                continue;
+
             if (fmpz_is_one(lcm))
             {
                 for (j = 0; j < mat[k]->c; j++)
@@ -49,17 +53,12 @@ _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
             }
             else
             {
-                for (j = 0; j < mat[k]->c; j++)
-                {
-                    fmpz_divexact(t, lcm, fmpq_mat_entry_den(mat[k], i, j));
-                    fmpz_mul(fmpz_mat_entry(num[k], i, j),
-                             fmpq_mat_entry_num(mat[k], i, j), t);
-                }
+                _fmpq_vec_get_fmpz_vec_scaled(fmpz_mat_entry(num[k], i, 0), 1,
+                    fmpq_mat_entry(mat[k], i, 0), 1, mat[k]->c, lcm);
             }
         }
     }
 
-    fmpz_clear(t);
     fmpz_clear(lcm);
 }
 

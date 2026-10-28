@@ -117,7 +117,7 @@ n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries,
 
                 qvec[0] = q0;
                 qvec[1] = q1;
-                gsize = flint_mpn_gcd_full(gvec, nvec, 2, qvec, q1 ? 2 : 1);
+                gsize = flint_mpn_gcd(gvec, nvec, 2, qvec, q1 ? 2 : 1);
 
                 if (gsize == 1)
                 {

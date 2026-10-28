@@ -118,8 +118,9 @@ typedef const ulong * nn_srcptr;
 # define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 # define FLINT_CONST __attribute__ ((const))
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-# define FLINT_UNLIKELY(x) __builtin_expect((x),0)
-# define FLINT_LIKELY(x) __builtin_expect((x),1)
+/* !! since __builtin_expect takes a long, which is 32 bits on Windows */
+# define FLINT_UNLIKELY(x) __builtin_expect(!!(x),0)
+# define FLINT_LIKELY(x) __builtin_expect(!!(x),1)
 # define FLINT_CONSTANT_P __builtin_constant_p
 # define FLINT_UNREACHABLE __builtin_unreachable()
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))

@@ -91,7 +91,7 @@ than the bit size of the smaller of the two coefficient bounds (3
 would suffice for the theorem, including a bit for signs) and at least
 one more than the larger, packs $A(\xi)$ and $B(\xi)$ into limb arrays
 with `_fmpz_poly_bit_pack`, computes their GCD with
-`flint_mpn_gcd_full`, and unpacks the result. The divisibility test is
+`flint_mpn_gcd`, and unpacks the result. The divisibility test is
 done on the packed integers, $\gamma \mid A(\xi)$ and $\gamma \mid
 B(\xi)$, followed by unpacking the quotients: if the coefficients of
 the candidate and of the quotient are small enough that their product

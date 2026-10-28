@@ -57,6 +57,12 @@
 #define FLINT_MPN_DIVEXACT_UNBALANCED_CUTOFF 340
 #define FLINT_MPN_SQRTREM_NEWTON_CUTOFF 5155
 
+/* gcd: the half-gcd cutoff (the gcd and extended gcd cutoffs follow from
+   it) and the threads of the transform-space matrix operations, tuned
+   with src/mpn_extras/tune/tune-gcd.c */
+#define FLINT_MPN_HGCD_CUTOFF 100
+#define FLINT_MPN_HGCD_FFT_PARALLEL_CUTOFF 250
+
 /* division cutoffs, tuned with src/mpn_extras/tune/tune-div.c */
 #define FLINT_MPN_DIV_DC_CUTOFF 20
 #define FLINT_MPN_DIVAPPR_DC_CUTOFF 64

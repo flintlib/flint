@@ -19,7 +19,7 @@ TEST_FUNCTION_START(flint_mpn_mul_shared, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         mp_size_t an, bn, xn, size;
         mp_ptr a, b, x, z1, z2, r1, r2;

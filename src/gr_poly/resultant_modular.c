@@ -11,7 +11,9 @@
 
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "fmpq.h"
+#include "fmpq_vec.h"
 #include "fmpz_mpoly_factor.h"
 #include "gr_poly.h"
 
@@ -76,24 +78,20 @@ _gr_poly_resultant_modular(gr_ptr res, gr_srcptr A, slong lenA,
     }
     else
     {
-        /* clear denominators; res(A/da, B/db) = res(A, B) / (da^n db^m) */
+        /* clear denominators; res(A/da, B/db) = res(A, B) / (da^n db^m);
+           zero coefficients have no coefficient array */
         for (i = 0; i < lenA; i++)
-            for (k = 0; k < Ax[i].length; k++)
-                fmpz_lcm(da, da, fmpq_denref(((const fmpq *) Ax[i].coeffs) + k));
+            if (Ax[i].length != 0)
+                _fmpz_vec_lcm_strided(da, fmpq_denref((const fmpq *) Ax[i].coeffs), 2, Ax[i].length, da);
 
         for (i = 0; i < lenB; i++)
-            for (k = 0; k < Bx[i].length; k++)
-                fmpz_lcm(db, db, fmpq_denref(((const fmpq *) Bx[i].coeffs) + k));
+            if (Bx[i].length != 0)
+                _fmpz_vec_lcm_strided(db, fmpq_denref((const fmpq *) Bx[i].coeffs), 2, Bx[i].length, db);
 
         for (i = 0; i < lenA; i++)
         {
             fmpz_poly_fit_length(Az + i, Ax[i].length);
-            for (k = 0; k < Ax[i].length; k++)
-            {
-                const fmpq * c = ((const fmpq *) Ax[i].coeffs) + k;
-                fmpz_divexact(t, da, fmpq_denref(c));
-                fmpz_mul(Az[i].coeffs + k, fmpq_numref(c), t);
-            }
+            _fmpq_vec_get_fmpz_vec_scaled(Az[i].coeffs, 1, (const fmpq *) Ax[i].coeffs, 1, Ax[i].length, da);
             _fmpz_poly_set_length(Az + i, Ax[i].length);
             _fmpz_poly_normalise(Az + i);
         }
@@ -101,12 +99,7 @@ _gr_poly_resultant_modular(gr_ptr res, gr_srcptr A, slong lenA,
         for (i = 0; i < lenB; i++)
         {
             fmpz_poly_fit_length(Bz + i, Bx[i].length);
-            for (k = 0; k < Bx[i].length; k++)
-            {
-                const fmpq * c = ((const fmpq *) Bx[i].coeffs) + k;
-                fmpz_divexact(t, db, fmpq_denref(c));
-                fmpz_mul(Bz[i].coeffs + k, fmpq_numref(c), t);
-            }
+            _fmpq_vec_get_fmpz_vec_scaled(Bz[i].coeffs, 1, (const fmpq *) Bx[i].coeffs, 1, Bx[i].length, db);
             _fmpz_poly_set_length(Bz + i, Bx[i].length);
             _fmpz_poly_normalise(Bz + i);
         }

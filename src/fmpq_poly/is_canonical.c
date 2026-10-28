@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -27,8 +28,7 @@ int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len)
             return 0;
 
         fmpz_init(c);
-        _fmpz_poly_content(c, poly, len);
-        fmpz_gcd(c, c, den);
+        _fmpz_vec_content_chained(c, poly, len, den);
         ans = (*c == WORD(1));
         fmpz_clear(c);
 

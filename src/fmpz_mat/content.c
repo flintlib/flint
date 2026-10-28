@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015 Dharak Kharod
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,28 +11,15 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 {
-	slong rows = A->r;
-	slong cols = A->c;
-	slong i, j;
+    slong i;
 
-	fmpz_set_si(mat_gcd,0);
+    fmpz_zero(mat_gcd);
 
-	for (i = 0; i < rows; i++ )
-	{
-		for (j = 0; j < cols; j++)
-		{
-			fmpz_gcd(mat_gcd,mat_gcd, fmpz_mat_entry(A, i, j));
-
-			if (fmpz_is_one(mat_gcd))
-			{
-				return;
-			}
-		}
-	}
-
-	return;
+    for (i = 0; i < A->r && !fmpz_is_one(mat_gcd); i++)
+        _fmpz_vec_content_chained(mat_gcd, fmpz_mat_row(A, i), A->c, mat_gcd);
 }

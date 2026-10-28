@@ -1659,12 +1659,17 @@ void flint_mpz_mod(mpz_ptr r, mpz_srcptr a, mpz_srcptr b)
 void flint_mpz_divexact(mpz_ptr q, mpz_srcptr a, mpz_srcptr b)
 void flint_mpz_sqrtrem(mpz_ptr s, mpz_ptr r, mpz_srcptr a)
 void flint_mpz_sqrt(mpz_ptr s, mpz_srcptr a)
+void flint_mpz_gcd(mpz_ptr g, mpz_srcptr a, mpz_srcptr b)
+void flint_mpz_gcdext(mpz_ptr g, mpz_ptr s, mpz_ptr t, mpz_srcptr a, mpz_srcptr b)
+int flint_mpz_invert(mpz_ptr r, mpz_srcptr x, mpz_srcptr n)
 
 Drop-in replacements for the GMP functions of the same names, with
-identical semantics for signs, rounding and aliasing, and the limb-level
-work done by `flint_mpn_tdiv_qr`, `flint_mpn_divexact` and
-`flint_mpn_sqrtrem`. They are used by the `fmpz` division and square root functions for large
-operands.
+identical semantics for signs, rounding, cofactors and aliasing, and the
+limb-level work done by `flint_mpn_tdiv_qr`, `flint_mpn_divexact`,
+`flint_mpn_sqrtrem`, `flint_mpn_gcd` and `_flint_mpn_gcdext_inplace`. They are
+used by the `fmpz` division, square root, GCD and inversion functions
+for large operands. In `flint_mpz_gcdext`, any of $g$, $s$, $t$ may be
+`NULL` (not computed). In `flint_mpz_invert`, $n$ must be nonzero.
 :::
 
 ## Modular multiplication {#mulmod}
@@ -1815,18 +1820,97 @@ whose cost does not depend on $s$, for $s \ge 32$. See
 
 ## Greatest common divisor {#gcd}
 
-::: function
-mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2)
+`flint_mpn_gcd` and `flint_mpn_gcdext` compute the GCD and the extended
+GCD of two nonzero values, given in either order, without modifying them.
+`_flint_mpn_gcd_inplace` and `_flint_mpn_gcdext_inplace` are the same
+algorithms with the interfaces of GMP's `mpn_gcd` and `mpn_gcdext`, which
+restrict and destroy the operands but save copying them.
+`flint_mpn_gcd_vec_1` and `flint_mpn_gcd_vec` compute the GCD of many
+values. See [](algorithms/integers/gcd) for the algorithms.
 
-Set $(\mathit{arrayg}, \ell)$ to the greatest common divisor of
-$(\mathit{array1}, \mathit{limbs1})$ and
-$(\mathit{array2}, \mathit{limbs2})$ and return its length $\ell$.
-Unlike GMP's `mpn_gcd`, the inputs need not be odd or ordered by size,
-and they are not destroyed; they must be nonzero with nonzero top limbs. `temp` must provide
-$\mathit{limbs1} + \mathit{limbs2}$ limbs of scratch space, or be `NULL`.
-The common power of 2 is removed first and GMP's `mpn_gcd` is called on
-the odd parts.
+::: function
+mp_size_t flint_mpn_gcd(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn)
+
+Sets $(\mathit{gp}, \ell)$ to the greatest common divisor of
+$(\mathit{ap}, \mathit{an})$ and $(\mathit{bp}, \mathit{bn})$ and returns
+its length $\ell$. The operands must be nonzero with nonzero top limbs
+($\mathit{an}, \mathit{bn} \ge 1$); they are not modified. `gp` needs
+room for $\min(\mathit{an}, \mathit{bn})$ limbs; it may be equal to `ap`
+or `bp` but must not otherwise overlap them.
+:::
+
+::: function
+mp_size_t flint_mpn_gcdext(mp_ptr gp, mp_ptr sp, mp_size_t * sn, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn)
+
+Sets $(\mathit{gp}, \ell)$ to $g = \gcd(a, b)$, returning $\ell$, and
+$(\mathit{sp}, |{*\mathit{sn}}|)$ with the sign of $*\mathit{sn}$ to the
+cofactor $s$ of $a$ in $g = s a + t b$ that `mpz_gcdext` gives: normally
+$|s| < b/(2g)$, and the conventions for the exceptional cases determine
+$s$ uniquely. The other cofactor is $t = (g - s a)/b$. The operands must
+be nonzero with nonzero top limbs; they are not modified. `gp` needs room
+for $\min(\mathit{an}, \mathit{bn})$ limbs and `sp` for $\mathit{bn}$
+limbs. The outputs must not overlap each other; each may be equal to
+`ap` or `bp` (if that has the room) but must not otherwise overlap them.
+When $\mathit{an} < \mathit{bn}$, $s$ is obtained from the cofactor of
+$b$ by a multiplication and an exact division.
+:::
+
+::: macro
+flint_mpn_gcd_full
+flint_mpn_gcd_full2
+
+Deprecated. `flint_mpn_gcd_full` is an alias of `flint_mpn_gcd`, and
+`flint_mpn_gcd_full2(gp, ap, an, bp, bn, temp)` calls
+`flint_mpn_gcd(gp, ap, an, bp, bn)`, ignoring the scratch space `temp`.
+:::
+
+::: function
+mp_size_t _flint_mpn_gcd_inplace(mp_ptr gp, mp_ptr up, mp_size_t un, mp_ptr vp, mp_size_t vn)
+
+The GCD with the interface of GMP's `mpn_gcd`: sets
+$(\mathit{gp}, \ell)$ to the greatest common divisor of
+$(\mathit{up}, \mathit{un})$ and $(\mathit{vp}, \mathit{vn})$ and returns
+$\ell$. It is required that $\mathit{un} \ge \mathit{vn} > 0$, that the
+top limb of $v$ is nonzero and that at least one of the operands is odd.
+Both inputs are destroyed. `gp` needs room for $\mathit{vn}$ limbs; it
+may be equal to `up` or `vp` but must not otherwise overlap them.
+:::
+
+::: function
+mp_size_t _flint_mpn_gcdext_inplace(mp_ptr gp, mp_ptr sp, mp_size_t * sn, mp_ptr up, mp_size_t un, mp_ptr vp, mp_size_t vn)
+
+The extended GCD with the interface of GMP's `mpn_gcdext`: sets
+$(\mathit{gp}, \ell)$ to $g = \gcd(u, v)$, returning $\ell$, and
+$(\mathit{sp}, |{*\mathit{sn}}|)$ with the sign of $*\mathit{sn}$ to the
+cofactor $s$ of $u$ as for `flint_mpn_gcdext`. It is required that
+$\mathit{un} \ge \mathit{vn} > 0$ and that the top limb of $v$ is
+nonzero; the top limb of $u$ may be zero, so that $u$ can be padded to
+the length of $v$ to obtain its cofactor directly (as for a modular
+inverse). Both inputs are destroyed, and both input arrays must have room
+for one more limb. `gp` needs room for $\mathit{vn}$ limbs and `sp` for
+$\mathit{vn} + 1$ limbs; they must not overlap each other or the inputs.
+:::
+
+::: function
+ulong flint_mpn_gcd_vec_1(mp_srcptr x, slong len, ulong g)
+
+Returns the greatest common divisor of $g$ and the `len` limbs
+$x_0, \ldots, x_{\mathit{len}-1}$, any of which (and $g$) may be zero;
+the result is 0 only if all are zero.
+:::
+
+::: function
+mp_size_t flint_mpn_gcd_vec(mp_ptr g, mp_size_t gn, const mp_srcptr * xp, const mp_size_t * xn, slong len)
+
+Sets $(g, \ell)$ to the greatest common divisor of $(g, \mathit{gn})$
+and the `len` values $(\mathit{xp}_i, \mathit{xn}_i)$, and returns its
+length $\ell$ (0 if all are zero). The values are given by pointer, so
+that they need not be contiguous or copied, and must be normalised (top
+limb nonzero), with $\mathit{xn}_i = 0$ for zero; $\mathit{gn} = 0$ means
+that $g$ is not used as input. The inputs are not modified. The output
+array $g$ must have room for $\min(\mathit{gn}, \mathit{xn}_i)$ limbs,
+the minimum taken over the nonzero inputs, and must not overlap the
+values.
 :::
 
 ## Trial division and removal of factors {#trial}
@@ -2185,6 +2269,104 @@ that $2^v$ divides $a$. The small version ($b'$ of at most
 $a_{an-1} \ne 0$) streams the shifted $a$ through a Hensel remainder
 computation with $b'$ and the running remainder held in registers; $b'$
 divides $a$ if and only if the final remainder is zero.
+:::
+
+### Half-GCD
+
+::: type
+flint_mpn_hgcd_matrix1_struct
+flint_mpn_hgcd_matrix_struct
+
+A $2 \times 2$ matrix of words `u[i][j]`, and a $2 \times 2$ matrix of
+limb arrays `p[i][j]` with entries of `n` limbs (normalised in the sense
+that one of the top limbs is nonzero) and room for `alloc` limbs, as
+GMP's `struct hgcd_matrix1` and `struct hgcd_matrix`.
+:::
+
+::: function
+int _flint_mpn_hgcd2(mp_limb_t ah, mp_limb_t al, mp_limb_t bh, mp_limb_t bl, flint_mpn_hgcd_matrix1_struct * M)
+mp_size_t _flint_mpn_hgcd_mul_matrix1_vector(const flint_mpn_hgcd_matrix1_struct * M, mp_ptr rp, mp_srcptr ap, mp_ptr bp, mp_size_t n)
+mp_size_t _flint_mpn_hgcd_mul_matrix1_inverse_vector(const flint_mpn_hgcd_matrix1_struct * M, mp_ptr rp, mp_srcptr ap, mp_ptr bp, mp_size_t n)
+void _flint_mpn_gcd_22(mp_ptr g, mp_limb_t u1, mp_limb_t u0, mp_limb_t v1, mp_limb_t v0)
+
+The word-level half-GCD of the two-limb numbers $(a_h, a_l)$ and $(b_h,
+b_l)$, returning 0 if no reduction is possible; the products $(r, b)
+\gets (a, b) M$ and $(r, b) \gets M^{-1} (a, b)$ by such a matrix; and
+the GCD of two odd two-limb numbers (GMP's `mpn_gcd_22` if available,
+otherwise a port of GMP's C version). These are
+ports of the GMP functions of the same names, except that the two
+products form both outputs in a single pass, and allow `rp` to be equal
+to `ap`.
+:::
+
+::: function
+void _flint_mpn_hgcd_matrix_init(flint_mpn_hgcd_matrix_struct * M, mp_size_t n, mp_ptr p)
+void _flint_mpn_hgcd_matrix_update_q(flint_mpn_hgcd_matrix_struct * M, mp_srcptr qp, mp_size_t qn, unsigned int col, mp_ptr tp)
+void _flint_mpn_hgcd_matrix_mul_1(flint_mpn_hgcd_matrix_struct * M, const flint_mpn_hgcd_matrix1_struct * M1, mp_ptr tp)
+void _flint_mpn_hgcd_matrix_mul(flint_mpn_hgcd_matrix_struct * M, const flint_mpn_hgcd_matrix_struct * M1, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_matrix_adjust(const flint_mpn_hgcd_matrix_struct * M, mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t p, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_matrix22_mul_strassen_itch(mp_size_t rn, mp_size_t mn)
+void _flint_mpn_hgcd_matrix22_mul_strassen(mp_ptr r0, mp_ptr r1, mp_ptr r2, mp_ptr r3, mp_size_t rn, mp_srcptr m0, mp_srcptr m1, mp_srcptr m2, mp_srcptr m3, mp_size_t mn, mp_ptr tp)
+
+The matrix operations of the half-GCD, as GMP's `mpn_hgcd_matrix_*`.
+`_flint_mpn_hgcd_matrix_init` initialises $M$ to the identity for inputs
+of $n$ limbs, using `FLINT_MPN_HGCD_MATRIX_INIT_ITCH(n)` limbs at `p`. The
+product and the adjustment ($(a, b) \gets M^{-1} (a, b)$ for the low $p$
+limbs of $a$ and $b$) are computed in transform space for large operands
+([](algorithms/integers/gcd#use)). `_flint_mpn_hgcd_matrix22_mul_strassen` is GMP's
+`mpn_matrix22_mul`, the classical or a Strassen-like product of $2 \times
+2$ matrices, which the half-GCD uses below the transform-space range; it
+is not meant as a general $2 \times 2$ matrix product.
+:::
+
+::: function
+mp_size_t _flint_mpn_gcd_subdiv_step(mp_ptr ap, mp_ptr bp, mp_size_t n, mp_size_t s, _flint_mpn_gcd_subdiv_step_hook * hook, void * ctx, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_step(mp_size_t n, mp_ptr ap, mp_ptr bp, mp_size_t s, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_itch(mp_size_t n)
+mp_size_t _flint_mpn_hgcd(mp_ptr ap, mp_ptr bp, mp_size_t n, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_appr_itch(mp_size_t n)
+int _flint_mpn_hgcd_appr(mp_ptr ap, mp_ptr bp, mp_size_t n, flint_mpn_hgcd_matrix_struct * M, mp_ptr tp)
+mp_size_t _flint_mpn_hgcd_reduce_itch(mp_size_t n, mp_size_t p)
+mp_size_t _flint_mpn_hgcd_reduce(flint_mpn_hgcd_matrix_struct * M, mp_ptr ap, mp_ptr bp, mp_size_t n, mp_size_t p, mp_ptr tp)
+void _flint_mpn_gcdext_hook(void * p, mp_srcptr gp, mp_size_t gn, mp_srcptr qp, mp_size_t qn, int d)
+mp_size_t _flint_mpn_gcdext_lehmer_n(mp_ptr gp, mp_ptr up, mp_size_t * usize, mp_ptr ap, mp_ptr bp, mp_size_t n, mp_ptr tp)
+
+Ports of the GMP functions of the same names (without the leading
+`_flint`). `_flint_mpn_hgcd` reduces $a, b$ of $n$ limbs (one of the top
+limbs nonzero) until $|a - b|$ fits in $\lfloor n/2 \rfloor + 1$ limbs,
+accumulating the reduction in $M$ (initialised for $n$ limbs) so that
+$(a, b)^T$ is $M$ times the reduced pair, and returns the new size, or 0
+if no reduction is possible; `tp` must have room for
+`_flint_mpn_hgcd_itch(n)` limbs. `_flint_mpn_hgcd_appr` computes an
+approximation of the same matrix from destroyed inputs.
+:::
+
+::: macro
+FLINT_MPN_HGCD_CUTOFF
+FLINT_MPN_HGCD_APPR_CUTOFF
+FLINT_MPN_HGCD_REDUCE_CUTOFF
+FLINT_MPN_GCD_DC_CUTOFF
+FLINT_MPN_GCDEXT_DC_CUTOFF
+FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF
+FLINT_MPN_HGCD_MATRIX_MUL_FFT_CUTOFF
+FLINT_MPN_HGCD_ADJUST_FFT_CUTOFF
+FLINT_MPN_HGCD_APPLY_FFT_CUTOFF
+FLINT_MPN_HGCD_FFT_PARALLEL_CUTOFF
+
+Cutoffs in limbs. The first six have the meanings of GMP's
+`HGCD_THRESHOLD`, `HGCD_APPR_THRESHOLD`, `HGCD_REDUCE_THRESHOLD`,
+`GCD_DC_THRESHOLD`, `GCDEXT_DC_THRESHOLD` and
+`MATRIX22_STRASSEN_THRESHOLD`; the GCD and extended GCD cutoffs default
+to $3$ and $3/2$ times `FLINT_MPN_HGCD_CUTOFF`, since the first step of
+these algorithms computes a half-GCD of $n/3$, respectively $n/2$
+limbs. The next three are the sizes from which the matrix operations of
+the half-GCD are done in `fft_small` transform space (by default 150, or
+$0.3$ times a larger `FLINT_FFT_SMALL_MUL_THRESHOLD`),
+and the last the size from which their transforms and exports run on
+several threads (by default 500). They are machine dependent and
+measured by `src/mpn_extras/tune/tune-gcd.c` for `flint-mparam.h`; in
+practice the half-GCD cutoff and the parallel cutoff are the ones that
+vary between machines.
 :::
 
 ### Fixed-size arithmetic macros

@@ -22,6 +22,7 @@
 #include "t-det.c"
 #include "t-fmpq_vec_mul.c"
 #include "t-fmpz_vec_mul.c"
+#include "t-get_fmpz_mat.c"
 #include "t-gso.c"
 #include "t-init_clear.c"
 #include "t-inv.c"
@@ -72,6 +73,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_mat_det),
     TEST_FUNCTION(fmpq_mat_fmpq_vec_mul),
     TEST_FUNCTION(fmpq_mat_fmpz_vec_mul),
+    TEST_FUNCTION(fmpq_mat_get_fmpz_mat),
     TEST_FUNCTION(fmpq_mat_gso),
     TEST_FUNCTION(fmpq_mat_init_clear),
     TEST_FUNCTION(fmpq_mat_inv),

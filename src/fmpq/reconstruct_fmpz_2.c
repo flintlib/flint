@@ -600,12 +600,12 @@ done:
 
     if (m_len >= Blen)
     {
-        if (mpn_gcd(R, m11, m_len, B, Blen) != 1)
+        if (_flint_mpn_gcd_inplace(R, m11, m_len, B, Blen) != 1)
             return 0;
     }
     else
     {
-        if (mpn_gcd(R, B, Blen, m11, m_len) != 1)
+        if (_flint_mpn_gcd_inplace(R, B, Blen, m11, m_len) != 1)
             return 0;
     }
 

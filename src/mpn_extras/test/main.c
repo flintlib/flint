@@ -38,7 +38,11 @@
 #include "t-fmmamod_precond_matrix.c"
 #include "t-fmmamod_preinvn.c"
 #include "t-fmms1.c"
-#include "t-gcd_full.c"
+#include "t-gcd.c"
+#include "t-gcd_vec.c"
+#include "t-gcdext.c"
+#include "t-hgcd.c"
+#include "t-mpz_gcd.c"
 #include "t-mod_preinvn.c"
 #include "t-mul.c"
 #include "t-mul_n.c"
@@ -97,7 +101,13 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_fmmamod_precond_matrix),
     TEST_FUNCTION(flint_mpn_fmmamod_preinvn),
     TEST_FUNCTION(flint_mpn_fmms1),
-    TEST_FUNCTION(flint_mpn_gcd_full),
+    TEST_FUNCTION(flint_mpn_gcd),
+    TEST_FUNCTION(_flint_mpn_gcd_inplace),
+    TEST_FUNCTION(flint_mpn_gcd_vec),
+    TEST_FUNCTION(flint_mpn_gcdext),
+    TEST_FUNCTION(_flint_mpn_gcdext_inplace),
+    TEST_FUNCTION(flint_mpn_hgcd),
+    TEST_FUNCTION(flint_mpz_gcd),
     TEST_FUNCTION(flint_mpn_mod_preinvn),
     TEST_FUNCTION(flint_mpn_mul),
     TEST_FUNCTION(flint_mpn_mul_shared),

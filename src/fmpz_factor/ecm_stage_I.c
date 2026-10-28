@@ -43,7 +43,7 @@ fmpz_factor_ecm_stage_I(nn_ptr f, const ulong *prime_array, ulong num,
         if (sz == 0)
             return 0;
 
-        gcdlimbs = flint_mpn_gcd_full(f, n, ecm_inf->n_size, ecm_inf->z, sz);
+        gcdlimbs = flint_mpn_gcd(f, n, ecm_inf->n_size, ecm_inf->z, sz);
 
         /* condition one -> gcd = n_ecm->one
            condition two -> gcd = n

@@ -11,6 +11,7 @@
 */
 
 #include <gmp.h>
+#include "mpn_extras.h"
 #include "fmpz.h"
 
 void
@@ -158,7 +159,7 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
+        flint_mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    mf, COEFF_TO_PTR(*g));
     }
     else if (!COEFF_IS_MPZ(*g))  /* only g is small */
@@ -173,7 +174,7 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
+        flint_mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    COEFF_TO_PTR(*f), mg);
     }
     else /* both are big */
@@ -182,7 +183,7 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         _fmpz_promote(a);
         _fmpz_promote(b);
 
-        mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
+        flint_mpz_gcdext(COEFF_TO_PTR(*d), COEFF_TO_PTR(*a), COEFF_TO_PTR(*b),
                    COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
     }
 

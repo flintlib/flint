@@ -1,6 +1,6 @@
 ---
 title: Integer GCD
-summary: Greatest common divisors of multiprecision integers by the binary algorithm, Lehmer's algorithm and the subquadratic half-GCD, in the matrix formulation shared with continued fractions; GMP's implementations behind fmpz_gcd and fmpz_xgcd, and FLINT's own half-GCD for continued fractions and rational reconstruction.
+summary: Greatest common divisors of multiprecision integers by the binary algorithm, Lehmer's algorithm and the subquadratic half-GCD, in the matrix formulation shared with continued fractions; contents and least common multiples of vectors by divisibility tests; the port of GMP's implementation with transform-space matrix products behind fmpz_gcd and fmpz_xgcd, and FLINT's own half-GCD for continued fractions and rational reconstruction.
 complexity: Euclid and Lehmer $O(n^2)$; half-GCD $O(M(n) \log n)$ for $n$-limb operands.
 order: 30
 ---
@@ -152,21 +152,103 @@ Möller [@Mol2008], whose version is the one in GMP. FLINT's own version
 formulates it with intervals as in [](#cor-truncation), which makes the
 check of step 2 a comparison of the transformed endpoints with 1.
 
+## Contents and least common multiples of vectors {#content}
+
+The content of a vector $(x_1, \ldots, x_n)$, the GCD of its entries, can
+be computed as a chain of $n - 1$ GCDs, but the chain is dominated by the
+latency of the GCDs when the entries are small. The running GCD $g$ can
+only decrease, and after a few entries it is usually the content.
+Testing each entry for divisibility by $g$ first, and computing a GCD
+only when the test fails, replaces most GCDs by divisibility tests: a
+test fails only when $g$ loses a prime factor, so at most once per prime
+factor of $g$, counted with multiplicity. The tests are independent of each other, so they run
+at the throughput of the multiplier.
+
+For word-size $x$ and $g = 2^k h$ with $h$ odd, $g \mid x$ if and only if
+the low $k$ bits of $x$ are zero and $x h^{-1} \bmod B \le \lfloor (B -
+1)/h \rfloor$, where $B$ is the word base: one multiplication and one
+comparison. If the test fails, the high word $t$ of $(x h^{-1} \bmod B)
+\cdot h$ satisfies $x \equiv -B t \pmod h$, so $\gcd(x, h) = \gcd(t, h)$
+starts from an operand already reduced modulo $h$. An entry of several
+words is reduced modulo a word-size $h$ with independent multiplications,
+by Hensel remainders or by folding its words with precomputed powers $B^i
+\bmod h$. For a multi-word $g$, which is kept odd, the entries are tested
+by Hensel divisibility tests, or for long $g$ by division with
+remainder.
+
+The order of the entries matters when the content is 1 or the entries
+are large. For a polynomial, the leading and trailing coefficients are
+the most likely to differ from the others in their factors, so the
+entries at both ends of the vector come first. Single-word entries come
+before larger ones, so that $g$ usually fits in a word before the large
+entries are reduced; among the large entries, the two shortest come
+first. Once $g$ has settled, the remaining tests can be split between
+threads.
+
+The least common multiple uses the same idea. The running LCM $L$ can
+only grow, and when the entries are denominators that are all 1, all
+equal or all divisors of a common denominator, every entry divides $L$.
+Each entry $d$ is therefore first tested for $d \mid L$, and $L$ is
+updated only when the test fails. While $L$ fits in a word the tests need
+no division, and afterwards the small entries are tested in batches with
+one remainder computation of $L$ per batch.
+
+Compared with chained GCDs and LCMs (`fmpz_gcd`, `fmpz_lcm`), for vectors
+of 1000 entries on one core of a Cascade Lake Xeon:
+
+| Entries | Content | Speedup | Entries | Speedup |
+|---|---|---:|---|---:|
+| 62 bits | random (content 1) | 1.0 | all 1 | 5.0 |
+| 62 bits | 16-bit content | 57 | equal, 62 bits | 18 |
+| 62 bits | content of half the bits | 38 | divisors of a 62-bit $D$ | 6.1 |
+| 62 bits | 6-bit cofactors | 17 | $d_i = i$ | 6.6 |
+| 128 bits | 16-bit content | 2.2 | $d_i = i!$ | 3.4 |
+| 640 bits | content of half the bits | 2.7 | random, 62 bits | 3.2 |
+
+The gains are small where every entry needs a multiprecision GCD or
+division anyway: random entries with content 1, large entries with a
+word-size content, and random multi-word denominators.
+
 ## Use in FLINT {#use}
 
 **`fmpz_gcd`, `fmpz_gcd_ui`, `fmpz_gcd3`.** An inline operand reduces the
 problem to GMP's `mpn_gcd_1`, which divides the large operand by the
 small one once and finishes with a binary GCD on words. Two large
-operands go to GMP's `mpz_gcd`, that is `mpn_gcd`: Lehmer's algorithm
-with double-word steps (`mpn_hgcd2`) below GMP's threshold
-`GCD_DC_THRESHOLD` (several hundred limbs) and Möller's half-GCD above
-[@GMP].
+operands go to `flint_mpz_gcd`, that is `flint_mpn_gcd`, which sets aside
+the common power of two and calls `_flint_mpn_gcd_inplace`, a port of
+GMP's `mpn_gcd` [@GMP] that uses FLINT's multiplication and division:
+Lehmer's algorithm with double-word steps (`_flint_mpn_hgcd2`) for small
+operands and Möller's half-GCD for large ones. Unlike GMP, each Lehmer
+step applies its word matrix to both operands in a single pass, and the
+$2 \times 2$ matrix products of the half-GCD, whose entries share
+operands, are computed for large operands in transform space with
+`fft_small` ([](fft_small/transform-space)), so that each operand is
+transformed once and each result is transformed back once.
 
 **`fmpz_xgcd`, `fmpz_xgcd_canonical_bezout`, `fmpz_gcdinv`,
-`fmpz_invmod`.** GMP's `mpz_gcdext` and `mpz_invert`, built on the same
-`hgcd` machinery with cofactor tracking; for word-size operands, GMP's
+`fmpz_invmod`.** `flint_mpz_gcdext` and `flint_mpz_invert`, built on
+`_flint_mpn_gcdext_inplace`, the port of GMP's `mpn_gcdext` on the same half-GCD
+with cofactor tracking; unlike GMP, it accumulates the matrices of
+consecutive half-GCD steps from right to left before applying them to the
+cofactors, instead of updating the full-length cofactors after every
+step. For word-size operands, GMP's
 `mpn_gcdext_1` (`fmpz_xgcd_canonical_bezout`) or FLINT's `n_gcdinv`
-(`fmpz_gcdinv`, `fmpz_invmod`) ([](fmpz/gcd)).
+(`fmpz_gcdinv`, `fmpz_invmod`) are used ([](fmpz/gcd)). The modular
+inverses of `mpn_mod` call `_flint_mpn_gcdext_inplace` directly.
+
+**`_fmpz_vec_content`, `_fmpz_vec_lcm` and related functions.**
+`flint_mpn_gcd_vec_1` and `flint_mpn_gcd_vec` compute contents as in
+[](#content), of single limbs and of multi-limb values given by pointer.
+`_fmpz_vec_content`, `_fmpz_vec_content_chained`, `_fmpz_vec_lcm` and
+`_fmpz_vec_lcm_strided` read the entries of an `fmpz` vector in place,
+small entries in blocks and large entries by pointer to their limbs, and
+use threads only for long vectors of large entries. They give the
+contents and canonical forms of `fmpz_poly`, `fmpq_poly`, `fmpz_mat`,
+`fmpz_mpoly`, `fmpq_mpoly` and `fmpz_mpoly_q`, and the common
+denominators of `_fmpq_vec_get_fmpz_vec_fmpz` and the
+`fmpq_mat_get_fmpz_mat` functions, whose numerators
+`_fmpq_vec_get_fmpz_vec_scaled` forms without divisions for denominators
+equal to the LCM or to 1.
 
 **`n_gcd`, `n_xgcd`, `n_gcdinv`.** Word GCDs: `n_gcd` calls GMP's
 binary `mpn_gcd_11`; `n_xgcd` and `n_gcdinv` are FLINT's own extended
@@ -195,4 +277,4 @@ own Lehmer loop for the final steps).
 [](algorithms/number-theory/rational-reconstruction) describe these
 applications.
 
-::: functions fmpz_gcd fmpz_xgcd_canonical_bezout fmpz_xgcd_partial fmpq_get_cfrac fmpq_reconstruct_fmpz_2 :::
+::: functions fmpz_gcd fmpz_xgcd_canonical_bezout fmpz_xgcd_partial _fmpz_vec_content _fmpz_vec_lcm fmpq_get_cfrac fmpq_reconstruct_fmpz_2 :::

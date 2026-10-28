@@ -58,8 +58,8 @@ void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);
 void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
                                                     const fmpq * a, slong len);
 
-void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
-                                                    const fmpq * a, slong len);
+void _fmpq_vec_get_fmpz_vec_scaled(fmpz * num, slong nstride,
+                const fmpq * a, slong astride, slong len, const fmpz_t den);
 
 /*  Dot product  **************************************************/
 
