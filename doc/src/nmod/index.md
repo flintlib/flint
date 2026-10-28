@@ -603,9 +603,10 @@ A pointer to the `nmod_redc_ctx_struct` stored in a context created by
 ## Low-level macros {#reduction}
 
 These macros are the building blocks of the arithmetic functions above
-and of the vector, polynomial and matrix modules. Most reduce one, two or
+and of the vector, polynomial and matrix modules. Most reduce two or
 three words modulo $n$ with one or two steps of
-[Möller–Granlund division](algorithms/arithmetic/moller-granlund).
+[Möller–Granlund division](algorithms/arithmetic/moller-granlund);
+`NMOD_RED` reduces one word by [Barrett reduction](algorithms/arithmetic/barrett#nmod).
 Unless stated otherwise, the first argument
 receives the result and `mod` is an `nmod_t`. A pair `a_hi, a_lo` stands
 for the two-word integer $a_{hi} B + a_{lo}$.
@@ -613,7 +614,10 @@ for the two-word integer $a_{hi} B + a_{lo}$.
 ::: macro
 NMOD_RED(r, a, mod)
 
-Sets `r` to $a \bmod n$ for any word $a$.
+Sets `r` to $a \bmod n$ for any word $a$ and any $n$. It uses one high
+and one low product, with a constant derived from `mod.ninv`
+([](algorithms/arithmetic/barrett#nmod)), and is cheaper than reducing
+$a$ as a two-word number with `NMOD_RED2`.
 :::
 
 ::: macro
@@ -626,7 +630,8 @@ Sets `r` to $(a_{hi} B + a_{lo}) \bmod n$. Requires $a_{hi} < n$.
 NMOD2_RED2(r, a_hi, a_lo, mod)
 
 Sets `r` to $(a_{hi} B + a_{lo}) \bmod n$ with no restriction on
-$a_{hi}$. It reduces $a_{hi}$ first, so it costs two division steps.
+$a_{hi}$. It reduces $a_{hi}$ first with `NMOD_RED`, then applies
+`NMOD_RED2`.
 :::
 
 ::: macro
