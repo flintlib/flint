@@ -2348,10 +2348,25 @@ FLINT_MPN_HGCD_REDUCE_CUTOFF
 FLINT_MPN_GCD_DC_CUTOFF
 FLINT_MPN_GCDEXT_DC_CUTOFF
 FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF
+FLINT_MPN_HGCD_MATRIX_MUL_FFT_CUTOFF
+FLINT_MPN_HGCD_ADJUST_FFT_CUTOFF
+FLINT_MPN_HGCD_APPLY_FFT_CUTOFF
+FLINT_MPN_HGCD_FFT_PARALLEL_CUTOFF
 
-Cutoffs in limbs, with the meanings of GMP's `HGCD_THRESHOLD`,
-`HGCD_APPR_THRESHOLD`, `HGCD_REDUCE_THRESHOLD`, `GCD_DC_THRESHOLD`,
-`GCDEXT_DC_THRESHOLD` and `MATRIX22_STRASSEN_THRESHOLD`.
+Cutoffs in limbs. The first six have the meanings of GMP's
+`HGCD_THRESHOLD`, `HGCD_APPR_THRESHOLD`, `HGCD_REDUCE_THRESHOLD`,
+`GCD_DC_THRESHOLD`, `GCDEXT_DC_THRESHOLD` and
+`MATRIX22_STRASSEN_THRESHOLD`; the GCD and extended GCD cutoffs default
+to $3$ and $3/2$ times `FLINT_MPN_HGCD_CUTOFF`, since the first step of
+these algorithms computes a half-GCD of $n/3$, respectively $n/2$
+limbs. The next three are the sizes from which the matrix operations of
+the half-GCD are done in `fft_small` transform space (by default 150, or
+$0.3$ times a larger `FLINT_FFT_SMALL_MUL_THRESHOLD`),
+and the last the size from which their transforms and exports run on
+several threads (by default 500). They are machine dependent and
+measured by `src/mpn_extras/tune/tune-gcd.c` for `flint-mparam.h`; in
+practice the half-GCD cutoff and the parallel cutoff are the ones that
+vary between machines.
 :::
 
 ### Fixed-size arithmetic macros

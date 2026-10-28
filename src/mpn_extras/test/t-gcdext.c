@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "mpn_extras.h"
+#include "thread_support.h"
 
 /* uses _flint_mpn_gcd_test_pair and _flint_mpn_gcd_test_len (t-gcd.c) */
 
@@ -32,6 +33,9 @@ TEST_FUNCTION_START(_flint_mpn_gcdext_inplace, state)
         slong na, nb, an, bn, gn;
         mp_size_t sn;
         mp_ptr ap, bp, gp, sp;
+
+        /* the matrix operations run on several threads for large operands */
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         na = _flint_mpn_gcd_test_len(state);
         nb = n_randint(state, 2) ? na : 1 + n_randint(state, na);
@@ -89,6 +93,8 @@ TEST_FUNCTION_START(_flint_mpn_gcdext_inplace, state)
     mpz_clear(t);
     mpz_clear(ref_g);
     mpz_clear(ref_s);
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

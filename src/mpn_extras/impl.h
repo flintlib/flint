@@ -172,11 +172,16 @@ _crt_work_init(_crt_work_struct * W, const flint_mpn_crt_t C, nn_ptr tmp)
 #ifndef FLINT_MPN_HGCD_REDUCE_CUTOFF
 # define FLINT_MPN_HGCD_REDUCE_CUTOFF 2681
 #endif
+/* The first step of the half-gcd based gcd computes the half-gcd of the
+   top n - p = n/3 limbs, and that of the extended gcd of n/2 and then
+   2n/3 limbs, so that these algorithms pay off from about where those
+   half-gcds are past the half-gcd cutoff (as measured on Intel and AMD
+   machines with tune-gcd, within the flat optimum). */
 #ifndef FLINT_MPN_GCD_DC_CUTOFF
-# define FLINT_MPN_GCD_DC_CUTOFF 500
+# define FLINT_MPN_GCD_DC_CUTOFF (3 * FLINT_MPN_HGCD_CUTOFF)
 #endif
 #ifndef FLINT_MPN_GCDEXT_DC_CUTOFF
-# define FLINT_MPN_GCDEXT_DC_CUTOFF 250
+# define FLINT_MPN_GCDEXT_DC_CUTOFF (3 * FLINT_MPN_HGCD_CUTOFF / 2)
 #endif
 #ifndef FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF
 # define FLINT_MPN_HGCD_MATRIX22_STRASSEN_CUTOFF 16

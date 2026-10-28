@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "mpn_extras.h"
+#include "thread_support.h"
 #include "gmpcompat.h"
 
 /* x = random integer of at most n limbs (uniform, or with long runs of
@@ -155,6 +156,9 @@ TEST_FUNCTION_START(_flint_mpn_gcd_inplace, state)
         mp_ptr ap, bp, gp;
         int alias;
 
+        /* the matrix operations run on several threads for large operands */
+        flint_set_num_threads(1 + n_randint(state, 3));
+
         na = _flint_mpn_gcd_test_len(state);
         nb = n_randint(state, 2) ? na : 1 + n_randint(state, na);
         _flint_mpn_gcd_test_pair(a, b, state, na, nb);
@@ -200,6 +204,8 @@ TEST_FUNCTION_START(_flint_mpn_gcd_inplace, state)
     mpz_clear(a);
     mpz_clear(b);
     mpz_clear(ref);
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }
