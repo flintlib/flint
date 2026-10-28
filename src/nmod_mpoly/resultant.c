@@ -57,7 +57,7 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     slong other = 1 - var;
     slong degAy, degAx, degBy, degBx, lenA, lenB, npoints;
     double areaA, areaB;
-    n_bpoly_t Ab, Bb, Rb;
+    n_bpoly_t Ab, Bb;
     n_poly_t res;
     int success;
 
@@ -109,7 +109,6 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
 
     n_bpoly_init(Ab);
     n_bpoly_init(Bb);
-    n_bpoly_init(Rb);
     n_poly_init(res);
 
     /* var becomes the outer variable, the one the resultant eliminates */
@@ -119,36 +118,11 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     success = n_bpoly_mod_resultant(res, Ab, Bb, ctx->mod);
 
     if (success)
-    {
-        if (n_poly_is_zero(res))
-        {
-            nmod_mpoly_zero(R, ctx);
-        }
-        else
-        {
-            /* the resultant is a polynomial in the other variable alone, of a
-               degree that can exceed what the exponent fields of A hold */
-            ulong exps[2];
-            flint_bitcnt_t bits;
-
-            exps[var] = 0;
-            exps[other] = res->length - 1;
-            bits = mpoly_exp_bits_required_ui(exps, ctx->minfo);
-            bits = mpoly_fix_bits(bits, ctx->minfo);
-            FLINT_ASSERT(bits <= FLINT_BITS);
-
-            n_bpoly_fit_length(Rb, 1);
-            n_poly_swap(Rb->coeffs + 0, res);
-            Rb->length = 1;
-
-            nmod_mpoly_set_bpoly(R, bits, Rb, var, other, ctx);
-        }
-    }
+        nmod_mpoly_set_n_poly_mod(R, res, other, ctx);
 
     n_poly_clear(res);
     n_bpoly_clear(Ab);
     n_bpoly_clear(Bb);
-    n_bpoly_clear(Rb);
 
     return success;
 }
