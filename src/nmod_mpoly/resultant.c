@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
@@ -56,11 +57,15 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     slong other = 1 - var;
     slong degAy, degAx, degBy, degBx, lenA, lenB, npoints;
     double areaA, areaB;
-    n_bpoly_t Ab, Bb, Rb;
+    n_bpoly_t Ab, Bb;
     n_poly_t res;
     int success;
 
     if (ctx->minfo->nvars != 2 || A->length == 0 || B->length == 0)
+        return 0;
+
+    /* the conversion to the dense form reads single-word exponents only */
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
         return 0;
 
     degAy = nmod_mpoly_degree_si(A, var, ctx);
@@ -104,7 +109,6 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
 
     n_bpoly_init(Ab);
     n_bpoly_init(Bb);
-    n_bpoly_init(Rb);
     n_poly_init(res);
 
     /* var becomes the outer variable, the one the resultant eliminates */
@@ -114,20 +118,11 @@ _nmod_mpoly_resultant_bivariate(nmod_mpoly_t R, const nmod_mpoly_t A,
     success = n_bpoly_mod_resultant(res, Ab, Bb, ctx->mod);
 
     if (success)
-    {
-        /* the resultant is a polynomial in the other variable alone */
-        n_bpoly_fit_length(Rb, 1);
-        n_poly_swap(Rb->coeffs + 0, res);
-        Rb->length = 1;
-        n_bpoly_normalise(Rb);
-
-        nmod_mpoly_set_bpoly(R, A->bits, Rb, var, other, ctx);
-    }
+        nmod_mpoly_set_n_poly_mod(R, res, other, ctx);
 
     n_poly_clear(res);
     n_bpoly_clear(Ab);
     n_bpoly_clear(Bb);
-    n_bpoly_clear(Rb);
 
     return success;
 }

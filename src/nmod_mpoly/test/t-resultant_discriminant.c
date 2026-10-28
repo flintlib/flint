@@ -10,6 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
@@ -246,6 +249,105 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         nmod_mpoly_clear(dab, ctx);
         nmod_mpoly_clear(r, ctx);
         nmod_mpoly_clear(p, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check bivariate resultants, which take the dense algorithm at these
+       sizes, against the univariate form, for inputs whose exponent fields
+       are narrower than the resultant needs, inputs whose exponent fields
+       take more than one word, and inputs with a common factor */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, c, r, s;
+        nmod_mpoly_univar_t au, bu;
+        ulong modulus, bounds[2], exp[2];
+        slong var, dy, dx;
+        int which = n_randint(state, 3);
+
+        /* large enough for the number of points of the dense algorithm */
+        modulus = n_randint(state, FLINT_BITS - 20) + 20;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+        nmod_mpoly_ctx_init(ctx, 2, mpoly_ordering_randtest(state), modulus);
+
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(c, ctx);
+        nmod_mpoly_init(r, ctx);
+        nmod_mpoly_init(s, ctx);
+        nmod_mpoly_univar_init(au, ctx);
+        nmod_mpoly_univar_init(bu, ctx);
+
+        /* the resultant has degree about 2 dy dx > 255 in the other variable */
+        var = n_randint(state, 2);
+        dy = 6 + n_randint(state, 4);
+        dx = 22 + n_randint(state, 10);
+
+        bounds[var] = dy + 1;
+        bounds[1 - var] = dx + 1;
+        exp[var] = dy;
+        exp[1 - var] = dx;
+
+        nmod_mpoly_randtest_bounds(a, state, 20 + n_randint(state, 60), bounds, ctx);
+        nmod_mpoly_randtest_bounds(b, state, 20 + n_randint(state, 60), bounds, ctx);
+        nmod_mpoly_set_coeff_ui_ui(a, 1, exp, ctx);
+        nmod_mpoly_set_coeff_ui_ui(b, 1, exp, ctx);
+
+        if (which == 0)
+        {
+            nmod_mpoly_repack_bits_inplace(a, MPOLY_MIN_BITS, ctx);
+            nmod_mpoly_repack_bits_inplace(b, MPOLY_MIN_BITS, ctx);
+        }
+        else if (which == 1)
+        {
+            nmod_mpoly_repack_bits_inplace(a, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+            nmod_mpoly_repack_bits_inplace(b, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+        }
+        else
+        {
+            bounds[var] = 2;
+            bounds[1 - var] = 3;
+            nmod_mpoly_randtest_bounds(c, state, 4, bounds, ctx);
+            exp[var] = 1;
+            exp[1 - var] = 0;
+            nmod_mpoly_set_coeff_ui_ui(c, 1, exp, ctx);
+            nmod_mpoly_mul(a, a, c, ctx);
+            nmod_mpoly_mul(b, b, c, ctx);
+        }
+
+        nmod_mpoly_to_univar(au, a, var, ctx);
+        nmod_mpoly_to_univar(bu, b, var, ctx);
+
+        if (nmod_mpoly_univar_resultant(s, au, bu, ctx))
+        {
+            if (!nmod_mpoly_resultant(r, a, b, var, ctx))
+            {
+                flint_printf("FAIL: could not compute bivariate resultant\n");
+                flint_printf("i: %wd  which: %d\n", i, which);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            nmod_mpoly_assert_canonical(r, ctx);
+
+            if (!nmod_mpoly_equal(r, s, ctx) ||
+                (which == 2 && !nmod_mpoly_is_zero(r, ctx)))
+            {
+                flint_printf("FAIL: Check bivariate resultant\n");
+                flint_printf("i: %wd  which: %d\n", i, which);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_univar_clear(au, ctx);
+        nmod_mpoly_univar_clear(bu, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(c, ctx);
+        nmod_mpoly_clear(r, ctx);
+        nmod_mpoly_clear(s, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
 

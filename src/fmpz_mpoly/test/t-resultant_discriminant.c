@@ -10,7 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 TEST_FUNCTION_START(fmpz_mpoly_resultant_discriminant, state)
@@ -244,6 +246,105 @@ TEST_FUNCTION_START(fmpz_mpoly_resultant_discriminant, state)
         fmpz_mpoly_clear(dab, ctx);
         fmpz_mpoly_clear(r, ctx);
         fmpz_mpoly_clear(p, ctx);
+    }
+
+    /* Check bivariate resultants, which take the dense algorithm at these
+       sizes, against the univariate form, for inputs whose exponent fields
+       are narrower than the resultant needs, inputs whose exponent fields
+       take more than one word, and inputs with a common factor */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, c, r, s;
+        fmpz_mpoly_univar_t au, bu;
+        ulong bounds[2], exp[2];
+        flint_bitcnt_t coeff_bits = 1 + n_randint(state, 40);
+        slong var, dy, dx;
+        int which = n_randint(state, 3);
+
+        fmpz_mpoly_ctx_init(ctx, 2, mpoly_ordering_randtest(state));
+
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(c, ctx);
+        fmpz_mpoly_init(r, ctx);
+        fmpz_mpoly_init(s, ctx);
+        fmpz_mpoly_univar_init(au, ctx);
+        fmpz_mpoly_univar_init(bu, ctx);
+
+        /* the resultant has degree about 2 dy dx > 255 in the other variable */
+        /* the inputs have dy + 1 >= 7 coefficients in var, so that 
+         *       (dy + 1)^2 >= 49 >= MULTIPOINT_CUTOFF
+         * make sure to increase dy if MULTIPOINT_CUTOFF gets raised  */
+        var = n_randint(state, 2);
+        dy = 6 + n_randint(state, 3);
+        dx = 22 + n_randint(state, 8);
+
+        bounds[var] = dy + 1;
+        bounds[1 - var] = dx + 1;
+        exp[var] = dy;
+        exp[1 - var] = dx;
+
+        fmpz_mpoly_randtest_bounds(a, state, 15 + n_randint(state, 30), coeff_bits, bounds, ctx);
+        fmpz_mpoly_randtest_bounds(b, state, 15 + n_randint(state, 30), coeff_bits, bounds, ctx);
+        fmpz_mpoly_set_coeff_ui_ui(a, 1, exp, ctx);
+        fmpz_mpoly_set_coeff_ui_ui(b, 1, exp, ctx);
+
+        if (which == 0)
+        {
+            fmpz_mpoly_repack_bits_inplace(a, MPOLY_MIN_BITS, ctx);
+            fmpz_mpoly_repack_bits_inplace(b, MPOLY_MIN_BITS, ctx);
+        }
+        else if (which == 1)
+        {
+            fmpz_mpoly_repack_bits_inplace(a, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+            fmpz_mpoly_repack_bits_inplace(b, (2 + n_randint(state, 2)) * FLINT_BITS, ctx);
+        }
+        else
+        {
+            bounds[var] = 2;
+            bounds[1 - var] = 3;
+            fmpz_mpoly_randtest_bounds(c, state, 4, coeff_bits, bounds, ctx);
+            exp[var] = 1;
+            exp[1 - var] = 0;
+            fmpz_mpoly_set_coeff_ui_ui(c, 1, exp, ctx);
+            fmpz_mpoly_mul(a, a, c, ctx);
+            fmpz_mpoly_mul(b, b, c, ctx);
+        }
+
+        fmpz_mpoly_to_univar(au, a, var, ctx);
+        fmpz_mpoly_to_univar(bu, b, var, ctx);
+
+        if (fmpz_mpoly_univar_resultant(s, au, bu, ctx))
+        {
+            if (!fmpz_mpoly_resultant(r, a, b, var, ctx))
+            {
+                flint_printf("FAIL: could not compute bivariate resultant\n");
+                flint_printf("i: %wd  which: %d\n", i, which);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            fmpz_mpoly_assert_canonical(r, ctx);
+
+            if (!fmpz_mpoly_equal(r, s, ctx) ||
+                (which == 2 && !fmpz_mpoly_is_zero(r, ctx)))
+            {
+                flint_printf("FAIL: Check bivariate resultant\n");
+                flint_printf("i: %wd  which: %d\n", i, which);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        fmpz_mpoly_univar_clear(au, ctx);
+        fmpz_mpoly_univar_clear(bu, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(c, ctx);
+        fmpz_mpoly_clear(r, ctx);
+        fmpz_mpoly_clear(s, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);

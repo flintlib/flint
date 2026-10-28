@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly_factor.h"
@@ -67,6 +68,10 @@ _fmpz_mpoly_resultant_bivariate(fmpz_mpoly_t R, const fmpz_mpoly_t A,
     if (ctx->minfo->nvars != 2 || A->length == 0 || B->length == 0)
         return 0;
 
+    /* the conversion to the dense form reads single-word exponents only */
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
+        return 0;
+
     degAy = fmpz_mpoly_degree_si(A, var, ctx);
     degAx = fmpz_mpoly_degree_si(A, other, ctx);
     degBy = fmpz_mpoly_degree_si(B, var, ctx);
@@ -119,12 +124,29 @@ _fmpz_mpoly_resultant_bivariate(fmpz_mpoly_t R, const fmpz_mpoly_t A,
 
     if (success)
     {
-        /* the resultant is a polynomial in the other variable alone */
-        fmpz_bpoly_fit_length(Rb, 1);
-        fmpz_poly_swap(Rb->coeffs + 0, res);
-        Rb->length = fmpz_poly_is_zero(Rb->coeffs + 0) ? 0 : 1;
+        if (fmpz_poly_is_zero(res))
+        {
+            fmpz_mpoly_zero(R, ctx);
+        }
+        else
+        {
+            /* the resultant is a polynomial in the other variable alone, of a
+               degree that can exceed what the exponent fields of A hold */
+            ulong exps[2];
+            flint_bitcnt_t bits;
 
-        fmpz_mpoly_set_fmpz_bpoly(R, A->bits, Rb, var, other, ctx);
+            exps[var] = 0;
+            exps[other] = res->length - 1;
+            bits = mpoly_exp_bits_required_ui(exps, ctx->minfo);
+            bits = mpoly_fix_bits(bits, ctx->minfo);
+            FLINT_ASSERT(bits <= FLINT_BITS);
+
+            fmpz_bpoly_fit_length(Rb, 1);
+            fmpz_poly_swap(Rb->coeffs + 0, res);
+            Rb->length = 1;
+
+            fmpz_mpoly_set_fmpz_bpoly(R, bits, Rb, var, other, ctx);
+        }
     }
 
     fmpz_poly_clear(res);
