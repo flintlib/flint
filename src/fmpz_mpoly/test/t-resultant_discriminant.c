@@ -273,6 +273,9 @@ TEST_FUNCTION_START(fmpz_mpoly_resultant_discriminant, state)
         fmpz_mpoly_univar_init(bu, ctx);
 
         /* the resultant has degree about 2 dy dx > 255 in the other variable */
+        /* the inputs have dy + 1 >= 7 coefficients in var, so that 
+         *       (dy + 1)^2 >= 49 >= MULTIPOINT_CUTOFF
+         * make sure to increase dy if MULTIPOINT_CUTOFF gets raised  */
         var = n_randint(state, 2);
         dy = 6 + n_randint(state, 3);
         dx = 22 + n_randint(state, 8);
