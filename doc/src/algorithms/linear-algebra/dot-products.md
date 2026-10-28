@@ -251,14 +251,8 @@ high sum satisfies $h \le \ell \, m^2 / 2^{56} < 2^{64}$, and as in
 is reduced correctly with a single two-word reduction.
 :::
 
-`_nmod_vec_dot_params` is an inline function of `nmod_vec.h`, but it
-decides from `FLINT_HAVE_AVX2` and `FLINT_HAVE_AVX512_IFMA`, which the
-build system records in `flint-config.h`, and not from the compiler macros
-seen by the calling code. So the value of `pow2_precomp` is computed for
-`_DOT2_HALF` exactly when FLINT itself was built with AVX2, whatever the
-compiler flags of the calling program; `src/nmod_vec/dot.c` checks at
-compile time that these two macros agree with the flags FLINT is built
-with.
+The value of `pow2_precomp` is computed for `_DOT2_HALF` exactly when
+FLINT itself was built with AVX2.
 
 ## SIMD kernels for moduli above $2^{32}$ {#simd}
 
@@ -325,10 +319,7 @@ The tails of fewer than 8 terms use masked loads.
 The kernels are compiled only for $\beta = 64$, `split_limbs` with AVX2
 and the IFMA kernels with AVX-512F, AVX-512DQ and AVX512-IFMA, and neither
 when `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
-`FLINT_MACHINE_VECTORS_STRICT_C` is defined; their functions then fall back
-to the scalar code, so `_nmod_vec_dot_params`, which only looks at
-`FLINT_HAVE_AVX2` and `FLINT_HAVE_AVX512_IFMA`, may still choose them. In
-the two-word band,
+`FLINT_MACHINE_VECTORS_STRICT_C` is defined. In the two-word band,
 `_nmod_vec_dot_params` tries `_DOT_U52`, then `_DOT_SPLIT_LIMBS`, then
 `_DOT_U64`; in the three-word band `_DOT3_SPLIT_LIMBS`, then `_DOT3_U64`.
 Each is subject to these parameters:
