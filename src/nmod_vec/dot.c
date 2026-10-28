@@ -13,26 +13,6 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-/* The inline _nmod_vec_dot_params of nmod_vec.h chooses the method from the
-   instruction sets recorded in flint-config.h (FLINT_HAVE_AVX2,
-   FLINT_HAVE_AVX512_IFMA), while the kernels of this file and of dot_u52.c,
-   dot_u64.c are compiled according to the compiler macros: both must agree
-   (in particular, with AVX2 _nmod_vec_dot2_half needs pow2_precomp). */
-#if FLINT_BITS == 64 && defined(__AVX2__)
-# define _NMOD_VEC_DOT_COMPILED_AVX2 1
-#else
-# define _NMOD_VEC_DOT_COMPILED_AVX2 0
-#endif
-#if FLINT_BITS == 64 && defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512IFMA__)
-# define _NMOD_VEC_DOT_COMPILED_AVX512_IFMA 1
-#else
-# define _NMOD_VEC_DOT_COMPILED_AVX512_IFMA 0
-#endif
-#if NMOD_VEC_LIB_HAVE_AVX2 != _NMOD_VEC_DOT_COMPILED_AVX2 \
-        || NMOD_VEC_LIB_HAVE_DOT_U52 != _NMOD_VEC_DOT_COMPILED_AVX512_IFMA
-# error "FLINT_HAVE_AVX2 / FLINT_HAVE_AVX512_IFMA (flint-config.h) do not match the instruction sets FLINT is compiled with"
-#endif
-
 // currently only vectorized for AVX2
 #if (defined(__AVX2__) && FLINT_BITS == 64)
 #   include "machine_vectors.h"

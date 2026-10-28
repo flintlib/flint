@@ -238,10 +238,6 @@ $\sum_{i=0}^{\mathit{len}-1} a_i b_i \bmod n$, where $a_i$ is `vec1[i]`
 `vec2[len - 1 - i]`, `vec2[i][offset]` or `vec2[i * stride2]`
 respectively. `params` must come from `_nmod_vec_dot_params` with the same
 modulus and a length at least `len`.
-
-`_nmod_vec_dot_params` is an inline function; the method it chooses
-depends on the instruction sets FLINT was built with (recorded in
-`flint-config.h`), not on the compiler flags of the calling code.
 :::
 
 ::: macro
