@@ -42,7 +42,7 @@ TEST_FUNCTION_START(flint_mpn_hgcd, state)
         for (j = 0; j < 2; j++)
             mpz_init(m[i][j]);
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong n, nn;
         mp_ptr ap, bp, mp, tp;

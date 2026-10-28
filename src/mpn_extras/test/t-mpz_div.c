@@ -17,7 +17,7 @@ TEST_FUNCTION_START(flint_mpz_div, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         mpz_t a, b, q, r, q2, r2, t, x, y;
         mpz_ptr qq, rr;

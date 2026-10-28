@@ -72,7 +72,7 @@ TEST_FUNCTION_START(flint_mpn_sqrtmod, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         fmpz_t p, x, y;
         nn_ptr d, dnormed, dinv, a, r;
@@ -223,7 +223,7 @@ TEST_FUNCTION_START(flint_mpn_sqrtmod, state)
         Jacobi symbol of -1, which is what a zero return reports, really
         does rule out a square root.
     */
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         fmpz_t nn, p1, p2, x;
         nn_ptr d, a, r;

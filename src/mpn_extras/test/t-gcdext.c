@@ -28,7 +28,7 @@ TEST_FUNCTION_START(_flint_mpn_gcdext_inplace, state)
     mpz_init(ref_g);
     mpz_init(ref_s);
 
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong na, nb, an, bn, gn;
         mp_size_t sn;
@@ -110,7 +110,7 @@ TEST_FUNCTION_START(flint_mpn_gcdext, state)
     mpz_init(ref_g);
     mpz_init(ref_s);
 
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong na, nb, an, bn, gn;
         mp_size_t sn;

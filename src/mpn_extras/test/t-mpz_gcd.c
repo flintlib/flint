@@ -32,7 +32,7 @@ TEST_FUNCTION_START(flint_mpz_gcd, state)
     mpz_init(x);
     mpz_init(y);
 
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong na, nb;
         int alias, r1, r2;

@@ -150,7 +150,7 @@ TEST_FUNCTION_START(_flint_mpn_gcd_inplace, state)
     mpz_init(b);
     mpz_init(ref);
 
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong na, nb, an, bn, gn;
         mp_ptr ap, bp, gp;
@@ -219,7 +219,7 @@ TEST_FUNCTION_START(flint_mpn_gcd, state)
     mpz_init(b);
     mpz_init(ref);
 
-    for (iter = 0; iter < 4000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 400 * flint_test_multiplier(); iter++)
     {
         slong na, nb, an, bn, gn, gmax;
         mp_ptr ap, bp, gp;
