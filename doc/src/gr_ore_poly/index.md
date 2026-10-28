@@ -365,7 +365,7 @@ Set `poly` to a random Ore polynomial of length at most `len`
 (respectively a random length below 5), for testing.
 :::
 
-## Action on the base ring {#action}
+## Action {#action}
 
 ::: type
 gr_ore_poly_sigma_delta_t
@@ -399,18 +399,10 @@ int sigma_delta_mahler(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_
 int sigma_delta_frobenius(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx)
 
 The functions implementing $\sigma$ and $\delta$ for the predefined
-algebras, with the signature `gr_ore_poly_sigma_delta_t`.
-`sigma_delta_unable` always returns `GR_UNABLE`;
-`sigma_delta_commutative` is the identity and zero; the derivative and
-Euler derivative versions differentiate a polynomial (with
-`gr_poly_derivative`, then a multiplication by $x$); the shift and
-difference versions compute Taylor shifts $a(x \pm 1)$ (with
-`gr_poly_taylor_shift`) and their differences with $a$;
-`sigma_delta_compose` (used for $q$-shifts) composes $a$ with the stored
-$\sigma(x) = qx$; `sigma_delta_mahler` substitutes $x^b$ (an inflation);
-and `sigma_delta_frobenius` applies `gr_fq_frobenius`. All except the
-commutative and Frobenius versions require a base ring of univariate
-polynomials and return `GR_UNABLE` otherwise.
+algebras, with the signature `gr_ore_poly_sigma_delta_t`
+(`sigma_delta_unable` always returns `GR_UNABLE`;
+`sigma_delta_compose`, used for $q$-shifts, composes $a$ with the stored
+$\sigma(x)$).
 :::
 
 ::: variable
