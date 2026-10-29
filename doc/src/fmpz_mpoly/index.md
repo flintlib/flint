@@ -1332,13 +1332,25 @@ success and 0 for failure.
 int fmpz_mpoly_resultant(fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 
 Sets $R$ to the resultant of $A$ and $B$ with respect to the variable of
-index `var`, and returns 1, or returns 0 on failure. If the context has
-two variables and the inputs are dense enough and of large enough degree,
-the resultant is computed by a dense multimodular algorithm
+index `var`, and returns 1, or returns 0 on failure. If the inputs are
+dense enough and of large enough degree, the resultant is computed by
+`fmpz_mpoly_resultant_kronecker`; otherwise by Ducos' subresultant
+algorithm on the univariate forms [@Duc2000].
+:::
+
+::: function
+int fmpz_mpoly_resultant_kronecker(fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+
+Tries to set $R$ to the resultant of $A$ and $B$ with respect to the
+variable of index `var` by packing the other variables into one by
+Kronecker substitution, after removing monomial factors and deflating,
+and computing the bivariate resultant by a dense multimodular algorithm
 (`fmpz_bpoly_resultant`, which uses the evaluation and interpolation
 algorithm of [](algorithms/multivariate/modp-bivariate-resultant) modulo
-each prime); otherwise by Ducos' subresultant algorithm on
-the univariate forms [@Duc2000].
+each prime). Returns 1 for success, and 0, leaving $R$ unchanged, if an
+input has exponents of more than one word or degree 0 in the variable of
+index `var`, or if the dense box of the resultant has more than $2^{28}$
+coefficients.
 :::
 
 ::: function

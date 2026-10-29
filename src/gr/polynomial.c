@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
+#include "nmod.h"
+#include "n_poly.h"
+#include "nmod_mpoly.h"
 #include "gr.h"
 #include "gr/impl.h"
 #include "gr_vec.h"
@@ -826,12 +829,35 @@ gr_static_method_table _gr_poly_methods;
 #define MODULAR_MIN_LENGTH 7
 #define MODULAR_MIN_DEGREE 96
 
+/* The bivariate resultant of the nmod_mpoly module over a word-size prime
+   field, by whichever algorithm _n_bpoly_mod_resultant picks; a polynomial
+   over a polynomial ring over nmod has the layout of an n_bpoly (see
+   gr_poly/resultant_multipoint.c). */
+static int
+_polynomial_resultant_n_bpoly(gr_ptr res, gr_srcptr A, slong lenA,
+                              gr_srcptr B, slong lenB, gr_ctx_t cctx)
+{
+    /* the algorithms assume a prime modulus */
+    if (gr_ctx_is_field(cctx) != T_TRUE)
+        return GR_UNABLE;
+
+    FLINT_ASSERT(sizeof(gr_poly_struct) == sizeof(n_poly_struct));
+    FLINT_ASSERT(cctx->sizeof_elem == sizeof(ulong));
+
+    if (!_n_bpoly_mod_resultant((n_poly_struct *) res,
+            (const n_poly_struct *) A, lenA,
+            (const n_poly_struct *) B, lenB, NMOD_CTX(cctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
 /* res_y(A, B) where the coefficients are themselves polynomials, that is for
-   bivariate A and B. Over a word-size prime field the coefficients are
-   evaluated, univariate resultants taken at the points and the result
-   interpolated; over Z and Q that same algorithm is run modulo several primes
-   and the result reconstructed by CRT. At sizes or over rings where neither
-   applies, the generic algorithms take over. */
+   bivariate A and B. Over a word-size prime field this is the bivariate
+   resultant of the nmod_mpoly module, which picks the best of its
+   algorithms; over Z and Q that is run modulo several primes and the result
+   reconstructed by CRT. At sizes or over rings where neither applies, the
+   generic algorithms take over. */
 static int
 _polynomial_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
                               gr_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -855,8 +881,8 @@ _polynomial_gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA,
 
         if (cctx->which_ring == GR_CTX_NMOD)
         {
-            if (_gr_poly_resultant_multipoint_cutoff(lenA, lenB, npoints) &&
-                _gr_poly_resultant_multipoint(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+            if (n_bpoly_mod_resultant_cutoff(lenA, lenB, npoints) &&
+                _polynomial_resultant_n_bpoly(res, A, lenA, B, lenB, cctx) == GR_SUCCESS)
                 return GR_SUCCESS;
         }
         else if (cctx->which_ring == GR_CTX_FMPZ || cctx->which_ring == GR_CTX_FMPQ)
