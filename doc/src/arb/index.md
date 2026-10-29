@@ -1391,7 +1391,10 @@ Sets `z` to Khinchin's constant $K_0$.
 void arb_const_glaisher(arb_t z, slong prec)
 
 Sets `z` to the Glaisher-Kinkelin constant $A = \exp(1/12 -
-\zeta'(-1))$.
+\zeta'(-1))$, with the derivative from `acb_dirichlet_zeta_jet`: by
+Euler-Maclaurin summation, or at very high precision by the approximate
+functional equation (`acb_dirichlet_l_fmpq_afe_jet`) in time
+$\tilde O(p^{1.5})$.
 :::
 
 ::: function

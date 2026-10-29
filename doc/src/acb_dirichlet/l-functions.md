@@ -14,28 +14,40 @@ compute the Riemann zeta function. The methods are compared on
 
 `acb_dirichlet_l` uses, in this order:
 
-1. for $q = 1$, `acb_dirichlet_zeta`;
-2. for primitive $\chi$ and $\operatorname{Re}(s) < -1/2$ (or $s$ near 0
+1. for an exact integer $s$, `acb_dirichlet_l_si`, which uses closed forms
+   with generalized Bernoulli numbers when $s$ has the same parity as $\chi$,
+   and otherwise the Euler product, a generalization of Borwein's
+   algorithm (`acb_dirichlet_l_ui_borwein_bsplit`) or the approximate
+   functional equation;
+2. for an exact dyadic $s$ such as $1/2$ (more generally an exact rational
+   number of small height), the approximate functional equation
+   (`acb_dirichlet_l_fmpq_afe_jet`) when `_acb_dirichlet_l_fmpq_use_afe`
+   estimates it to be faster, i.e. at high precision or for large
+   conductor;
+3. for $q = 1$, `acb_dirichlet_zeta`;
+4. for primitive $\chi$ and $\operatorname{Re}(s) < -1/2$ (or $s$ near 0
    and $\chi$ even), the functional equation
    $L(s, \chi) = \epsilon(\chi) (\pi/q)^{s - 1/2} \frac{\Gamma((1-s+\delta)/2)}{\Gamma((s+\delta)/2)} \overline{L(1-\bar s, \chi)}$,
    which moves the evaluation to the right half-plane;
-3. for $\operatorname{Re}(s) \ge 8 + p/(2 \log p)$ at precision $p$, the
+5. for $\operatorname{Re}(s) \ge 8 + p/(2 \log p)$ at precision $p$, the
    Euler product `acb_dirichlet_l_euler_product`;
-4. otherwise the decomposition
+6. otherwise the decomposition
    $L(s,\chi) = q^{-s}\sum_{k=1}^q \chi(k) \zeta(s, k/q)$
    (`acb_dirichlet_l_hurwitz`), where the $\phi(q)$ Hurwitz zeta values
    come from a precomputed grid of Taylor expansions in $a$
    (`acb_dirichlet_hurwitz_precomp_init_num`) when this is cheaper than
    evaluating each by Euler–Maclaurin summation.
 
-The cost of step 4 grows linearly with $q$, so these functions are meant
+The cost of step 6 grows linearly with $q$, so these functions are meant
 for moderate moduli. For many characters with the same modulus,
 `acb_dirichlet_l_vec_hurwitz` computes all $\phi(q)$ values with one set
-of Hurwitz zeta values and a DFT. For rational $s$ at very high precision
-or large $q$, `acb_dirichlet_l_fmpq` can use the approximate functional
-equation.
+of Hurwitz zeta values and a DFT. For rational $s$ that cannot be represented exactly
+by an `acb_t` (such as $1/3$), `acb_dirichlet_l_fmpq` makes the same
+choices.
 
-`acb_dirichlet_l_jet` sums the Hurwitz zeta expansions
+For exact rational $s$ of small height, `acb_dirichlet_l_jet` uses the
+approximate functional equation when `_acb_dirichlet_l_jet_use_afe`
+estimates it to be faster; otherwise it sums the Hurwitz zeta expansions
 $\zeta(s + x, k/q)$ (deflated at $s = 1$, where the poles cancel for
 non-principal $\chi$) weighted by the character values, for any length;
 for principal characters, `deflate` removes the pole

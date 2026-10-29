@@ -29,6 +29,7 @@
 #include "t-gamma_taylor.c"
 #include "t-gamma_taylor_tab.c"
 #include "t-gamma_upper_fmpq.c"
+#include "t-gamma_upper_fmpq_jet.c"
 #include "t-gamma_upper_integration.c"
 #include "t-gamma_upper_sum_rs.c"
 #include "t-legendre_p_ui_asymp.c"
@@ -69,6 +70,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_hypgeom_gamma_taylor),
     TEST_FUNCTION(arb_hypgeom_gamma_taylor_tab),
     TEST_FUNCTION(arb_hypgeom_gamma_upper_fmpq),
+    TEST_FUNCTION(arb_hypgeom_gamma_upper_fmpq_jet),
     TEST_FUNCTION(arb_hypgeom_gamma_upper_integration),
     TEST_FUNCTION(arb_hypgeom_gamma_upper_sum_rs),
     TEST_FUNCTION(arb_hypgeom_legendre_p_ui_asymp),
