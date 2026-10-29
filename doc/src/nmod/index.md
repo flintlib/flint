@@ -614,10 +614,10 @@ for the two-word integer $a_{hi} B + a_{lo}$.
 ::: macro
 NMOD_RED(r, a, mod)
 
-Sets `r` to $a \bmod n$ for any word $a$ and any $n$. It uses one high
-and one low product, with a constant derived from `mod.ninv`
-([](algorithms/arithmetic/barrett#nmod)), and is cheaper than reducing
-$a$ as a two-word number with `NMOD_RED2`.
+Sets `r` to $a \bmod n$ for any word $a$ and any $n$. It uses one high and one
+low product (none if $n$ has `FLINT_BITS` bits), with a constant derived from
+`mod.ninv` ([](algorithms/arithmetic/barrett#nmod)), and is cheaper than
+reducing $a$ as a two-word number with `NMOD_RED2`.
 :::
 
 ::: macro

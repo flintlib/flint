@@ -88,6 +88,11 @@ against a full product, a low product and two corrections for a
 [Möller–Granlund](algorithms/arithmetic/moller-granlund) step on the
 two-word number $(0, a)$.
 
+When $n$ has `FLINT_BITS` bits (`mod.norm` $= 0$), $a < 2n$ for every word $a$,
+so `NMOD_RED` skips the product and only corrects once. The test on `mod.norm`
+is moved out of loops by the compiler, and the remaining loop of comparisons
+can then be trivially vectorized.
+
 Shifting $m$ gives the constants of the same family for other input sizes:
 $\lfloor m / 2^k \rfloor = \lfloor (2^{\nu + \bits - 1 - k} - 1)/n \rfloor$
 for $0 \le k < \nu + \bits - 1$. For instance $k = \nu - 1$ gives
