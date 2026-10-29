@@ -11,6 +11,7 @@
 */
 
 #include <math.h>
+#include "fmpq.h"
 #include "acb.h"
 #include "acb_dirichlet.h"
 
@@ -33,8 +34,10 @@ acb_dirichlet_l_general(acb_t res, const acb_t s,
     }
 }
 
+/* L(s, chi) by the functional equation, the Euler product or the Hurwitz
+   zeta function, without the special algorithms for integer s */
 void
-acb_dirichlet_l(acb_t res, const acb_t s,
+_acb_dirichlet_l_generic(acb_t res, const acb_t s,
     const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 {
     if (!acb_is_finite(s))
@@ -109,4 +112,46 @@ acb_dirichlet_l(acb_t res, const acb_t s,
     {
         acb_dirichlet_l_general(res, s, G, chi, prec);
     }
+}
+
+void
+acb_dirichlet_l(acb_t res, const acb_t s,
+    const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
+{
+    /* exact integers */
+    if (acb_is_exact(s) && acb_is_int(s) &&
+        arf_cmpabs_2exp_si(arb_midref(acb_realref(s)), FLINT_BITS - 4) < 0)
+    {
+        acb_dirichlet_l_si(res, arf_get_si(arb_midref(acb_realref(s)), ARF_RND_DOWN), G, chi, prec);
+        return;
+    }
+
+    /* exact rational numbers of small height (these are dyadic, coming
+       from an acb_t): the approximate functional equation */
+    if (acb_is_exact(s) && arb_is_zero(acb_imagref(s)))
+    {
+        fmpq_t x;
+        ulong cond;
+        int done = 0;
+
+        fmpq_init(x);
+
+        if (_acb_dirichlet_get_small_fmpq(x, s))
+        {
+            cond = (G == NULL || G->q == 1) ? 1 : dirichlet_conductor_char(G, chi);
+
+            if (_acb_dirichlet_l_fmpq_use_afe(cond, x, prec))
+            {
+                acb_dirichlet_l_fmpq_afe_jet(res, x, G, chi, 0, 1, prec);
+                done = acb_is_finite(res);
+            }
+        }
+
+        fmpq_clear(x);
+
+        if (done)
+            return;
+    }
+
+    _acb_dirichlet_l_generic(res, s, G, chi, prec);
 }

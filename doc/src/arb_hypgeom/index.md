@@ -1138,6 +1138,77 @@ Sets `res` to the series at zero of $\Gamma(-n,z)$, for an integer $n
 splitting. The truncation error is not included.
 :::
 
+The following functions compute jets $\Gamma(a + \varepsilon, z)$ (truncated
+power series in $\varepsilon$ of length `len`) for rational $a$, and are
+used by `acb_dirichlet_l_fmpq_afe_jet`. The `choose_N` functions set `err`
+to a bound for the truncation error which is valid simultaneously for every
+coefficient of the jet; this bound is computed from majorant series
+for the differentiated terms of the corresponding scalar series.
+With `len = 1`, they reduce to the corresponding scalar functions.
+Where a parameter `logz` (or `logz0`) appears, it may be passed an
+enclosure of $\log(z)$ to avoid recomputing it, or `NULL`.
+
+::: function
+void _arb_hypgeom_gamma_fmpq_jet(arb_ptr res, const fmpq_t a, slong len, slong prec)
+
+Sets `res` to the jet of $\Gamma(a + \varepsilon)$ for rational $a$ which is not a
+nonpositive integer, computed as $\gamma(a + \varepsilon, Z) + \Gamma(a + \varepsilon, Z)$ with
+an integer $Z \approx 0.55 \log(2) p$ at precision $p$, as in
+`arb_hypgeom_gamma_fmpq`: the lower series at $Z$ and the asymptotic
+series at $Z$ (at reduced precision, since $\Gamma(a+\varepsilon, Z)$ is
+small) are both evaluated by binary splitting. If the asymptotic
+series does not converge to the required accuracy (at low precision or
+for large $a$), $Z$ is increased until it does, or until the second term is
+negligible. With `len` = 1, this calls `arb_gamma_fmpq`.
+:::
+
+::: function
+slong _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_jet(mag_t err, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong len)
+void _arb_hypgeom_gamma_upper_fmpq_inf_bsplit_jet(arb_ptr res, const fmpq_t a, const arb_t z, const arb_t logz, slong N, slong len, slong prec)
+
+Jet versions of `_arb_hypgeom_gamma_upper_fmpq_inf_choose_N` and
+`_arb_hypgeom_gamma_upper_fmpq_inf_bsplit`. The truncation error
+$(a-1)\cdots(a-N) \Gamma(a-N,z)$ is bounded using majorants for the
+polynomial factor and for $\int_z^{\infty} t^{a-N-1} e^{-t} \log^j(t) / j! \, dt$.
+The `choose_N` function requires $z \ge 1$ (otherwise it returns $-1$).
+:::
+
+::: function
+slong _arb_hypgeom_gamma_lower_fmpq_0_choose_N_jet(mag_t err, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong len)
+void _arb_hypgeom_gamma_lower_fmpq_0_bsplit_jet(arb_ptr res, const fmpq_t a, const arb_t z, const arb_t logz, slong N, slong len, slong prec)
+
+Jet versions of `_arb_hypgeom_gamma_lower_fmpq_0_choose_N` and
+`_arb_hypgeom_gamma_lower_fmpq_0_bsplit`.
+:::
+
+::: function
+slong _arb_hypgeom_gamma_upper_singular_si_choose_N_jet(mag_t err, slong n, const arb_t z, const mag_t abs_tol, slong len)
+void _arb_hypgeom_gamma_upper_singular_si_bsplit_jet(arb_ptr res, slong n, const arb_t z, const arb_t logz, slong N, arb_srcptr gamma1, slong len, slong prec)
+
+Jet versions of `_arb_hypgeom_gamma_upper_singular_si_choose_N` and
+`_arb_hypgeom_gamma_upper_singular_si_bsplit`, computing the jet of
+$\Gamma(-n + \varepsilon, z)$ for an integer $n \ge 0$. This uses
+
+$$\Gamma(-n + \varepsilon, z) = \frac{(-1)^n}{n!} \frac{1}{\varepsilon}\left[\frac{\Gamma(1+\varepsilon)}{\prod_{i=1}^n (1 - \varepsilon/i)} - z^{\varepsilon}\right] - z^{-n+\varepsilon} \sum_{k \ne n} \frac{(-z)^k}{k! (k - n + \varepsilon)}.$$
+
+If `gamma1` is not `NULL`, it should contain the jet of
+$\Gamma(1 + \varepsilon)$ of length `len + 1`; otherwise this is
+computed internally.
+:::
+
+::: function
+void _arb_gamma_upper_fmpq_step_bsplit_jet(arb_ptr Gz1, const fmpq_t a, const arb_t z0, const arb_t logz0, const arb_t z1, arb_srcptr Gz0, const arb_t expmz0, const mag_t abs_tol, slong len, slong prec)
+
+Jet version of `_arb_gamma_upper_fmpq_step_bsplit`: given the jet `Gz0`
+of $\Gamma(a + \varepsilon, z_0)$ and `expmz0` containing $e^{-z_0}$, sets
+`Gz1` to the jet of $\Gamma(a + \varepsilon, z_1)$. The matrix binary splitting
+is done with power series entries. The truncation error is bounded
+using Cauchy estimates on a circle of radius $R$ around $z_0$, with an
+extra factor $\max_{j < \text{len}} \Lambda^j / j!$ where $\Lambda$ bounds
+$|\log(t)|$ on the circle; the radius $R$ is chosen with this factor
+taken into account.
+:::
+
 ::: function
 void _arb_gamma_upper_fmpq_step_bsplit(arb_t Gz1, const fmpq_t a, const arb_t z0, const arb_t z1, const arb_t Gz0, const arb_t expmz0, const mag_t abs_tol, slong prec)
 

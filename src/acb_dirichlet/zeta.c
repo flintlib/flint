@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "fmpq.h"
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
@@ -68,6 +69,25 @@ acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
     {
         acb_indeterminate(res);
         return;
+    }
+
+    /* the approximate functional equation for exact rational numbers
+       of small height (dyadic, since s is an acb_t) */
+    if (acb_is_exact(s) && arb_is_zero(acb_imagref(s)))
+    {
+        fmpq_t x;
+        int done = 0;
+
+        fmpq_init(x);
+        if (_acb_dirichlet_get_small_fmpq(x, s) && _acb_dirichlet_l_fmpq_use_afe(1, x, prec))
+        {
+            acb_dirichlet_l_fmpq_afe_jet(res, x, NULL, NULL, 0, 1, prec);
+            done = acb_is_finite(res);
+        }
+        fmpq_clear(x);
+
+        if (done)
+            return;
     }
 
     cutoff = 24.0 * prec * sqrt(prec);

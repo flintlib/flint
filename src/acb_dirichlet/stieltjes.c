@@ -717,7 +717,14 @@ acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec)
 
         /* todo: we don't want to compute all the coefficients */
         acb_one(s);
-        _acb_poly_zeta_cpx_series(z, s, a, 1, nn + 1, wp);
+
+        /* for a = 1, acb_dirichlet_zeta_jet chooses between Euler-Maclaurin
+           summation and (at very high precision) the approximate
+           functional equation */
+        if (acb_is_one(a))
+            acb_dirichlet_zeta_jet(z, s, 1, nn + 1, wp);
+        else
+            _acb_poly_zeta_cpx_series(z, s, a, 1, nn + 1, wp);
 
         arb_fac_ui(acb_realref(s), nn, prec + 10);
         acb_mul_arb(res, z + nn, acb_realref(s), prec);
