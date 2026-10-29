@@ -1,6 +1,6 @@
 ---
 title: Shoup multiplication
-functions: n_mulmod_precomp_shoup n_mulmod_shoup n_mulmod_precomp_shoup_quo_rem n_mulmod_and_precomp_shoup
+functions: n_mulmod_precomp_shoup n_mulmod_precomp_shoup_preinv n_mulmod_shoup n_mulmod_precomp_shoup_quo_rem n_mulmod_and_precomp_shoup
 ---
 
 When many products $a b_i \bmod n$ share the same $a$ and $n$, Shoup's
@@ -19,6 +19,20 @@ multiplying by fixed roots of unity in number-theoretic transforms.
   word.
 - The other operand $b$ of `n_mulmod_shoup` may be any word.
   `n_mulmod_and_precomp_shoup` requires $b < n$.
+
+## Computing the precomputed quotient {#precomp}
+
+`n_mulmod_precomp_shoup` computes $\hat a$ with a two-word by one-word
+hardware division. Its cost varies widely between processors: it is a
+few multiplications' worth on recent x86-64, but tens of cycles on
+older ones such as Skylake and Cascade Lake, and 64-bit ARM has no
+two-word division instruction (FLINT then divides in software). When the
+precomputed inverse of $n$ is at hand, as `mod.ninv` in an `nmod_t`,
+`n_mulmod_precomp_shoup_preinv` and
+`n_mulmod_precomp_shoup_quo_rem_preinv` give the same results with
+multiplications only. On recent x86-64 processors the division is fast
+and runs alongside multiplications, so the two versions are close and the
+division can even win in code that is busy multiplying.
 
 ## Tables of powers {#powers}
 
