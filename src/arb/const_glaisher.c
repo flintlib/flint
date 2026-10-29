@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2013, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,27 +10,27 @@
 */
 
 #include "arb.h"
-#include "acb_poly.h"
+#include "acb.h"
+#include "acb_dirichlet.h"
 
 static void
 arb_const_glaisher_eval(arb_t y, slong prec)
 {
     acb_struct z[2];
-    acb_t s, a;
+    acb_t s;
     slong wp;
 
     acb_init(z + 0);
     acb_init(z + 1);
     acb_init(s);
-    acb_init(a);
 
     wp = prec + 20;
 
-    /* directly evaluating at s = -1 is slightly faster
-       than evaluating at s = 2 */
+    /* zeta'(-1); acb_dirichlet_zeta_jet uses Euler-Maclaurin summation
+       directly at s = -1, or the approximate functional equation at very
+       high precision */
     acb_set_si(s, -1);
-    acb_one(a);
-    _acb_poly_zeta_cpx_series(z, s, a, 0, 2, wp);
+    acb_dirichlet_zeta_jet(z, s, 0, 2, wp);
 
     arb_one(y);
     arb_div_ui(y, y, 12, wp);
@@ -40,7 +40,6 @@ arb_const_glaisher_eval(arb_t y, slong prec)
     acb_clear(z + 0);
     acb_clear(z + 1);
     acb_clear(s);
-    acb_clear(a);
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_glaisher, arb_const_glaisher_eval)

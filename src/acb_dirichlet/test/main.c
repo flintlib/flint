@@ -33,6 +33,8 @@
 #include "t-lerch_phi.c"
 #include "t-l_euler_product.c"
 #include "t-l_fmpq_afe.c"
+#include "t-l_fmpq_afe_jet.c"
+#include "t-l_si.c"
 #include "t-l_fmpq.c"
 #include "t-l_hurwitz.c"
 #include "t-l_jet.c"
@@ -53,6 +55,7 @@
 #include "t-turing_method_bound.c"
 #include "t-xi.c"
 #include "t-zeta_bound.c"
+#include "t-zeta_jet.c"
 #include "t-zeta_jet_rs.c"
 #include "t-zeta_nzeros.c"
 #include "t-zeta_nzeros_gram.c"
@@ -87,6 +90,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_dirichlet_lerch_phi),
     TEST_FUNCTION(acb_dirichlet_l_euler_product),
     TEST_FUNCTION(acb_dirichlet_l_fmpq_afe),
+    TEST_FUNCTION(acb_dirichlet_l_fmpq_afe_jet),
+    TEST_FUNCTION(acb_dirichlet_l_si),
     TEST_FUNCTION(acb_dirichlet_l_fmpq),
     TEST_FUNCTION(acb_dirichlet_l_hurwitz),
     TEST_FUNCTION(acb_dirichlet_l_jet),
@@ -107,6 +112,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_dirichlet_turing_method_bound),
     TEST_FUNCTION(acb_dirichlet_xi),
     TEST_FUNCTION(acb_dirichlet_zeta_bound),
+    TEST_FUNCTION(acb_dirichlet_zeta_jet),
     TEST_FUNCTION(acb_dirichlet_zeta_jet_rs),
     TEST_FUNCTION(acb_dirichlet_zeta_nzeros),
     TEST_FUNCTION(acb_dirichlet_zeta_nzeros_gram),
