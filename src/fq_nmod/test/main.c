@@ -32,6 +32,7 @@
 #include "t-norm.c"
 #include "t-pow.c"
 #include "t-pth_root.c"
+#include "t-set_si.c"
 #include "t-sqr.c"
 #include "t-sqrt.c"
 #include "t-sub.c"
@@ -62,6 +63,7 @@ test_struct tests[] =
     TEST_FUNCTION(fq_nmod_norm),
     TEST_FUNCTION(fq_nmod_pow),
     TEST_FUNCTION(fq_nmod_pth_root),
+    TEST_FUNCTION(fq_nmod_set_si),
     TEST_FUNCTION(fq_nmod_sqr),
     TEST_FUNCTION(fq_nmod_sqrt),
     TEST_FUNCTION(fq_nmod_sub),
