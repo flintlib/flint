@@ -42,9 +42,12 @@ with no operation, `_nmod_vec_add` and `_nmod_vec_sub`. Otherwise it uses
 than `FLINT_BITS` bits, and `_generic` in all other cases.
 
 The threshold `FLINT_MULMOD_SHOUP_THRESHOLD` is set in `flint-mparam.h` for
-each target; on some recent x86-64 processors it is 0 (always use Shoup).
-The precomputation for Shoup's method
-costs one hardware division, which a short vector does not amortise.
+each target, for the precomputation chosen there; on some targets it is 0
+(always use Shoup).
+The precomputation for Shoup's method, `_nmod_mulmod_precomp_shoup`, uses
+the hardware division where it is fast and multiplications by `mod.ninv`
+elsewhere (`FLINT_MULMOD_SHOUP_PRECOMP_PREINV`); a short vector may not
+amortise it.
 
 ## Example {#example}
 

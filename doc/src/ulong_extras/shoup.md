@@ -32,7 +32,9 @@ precomputed inverse of $n$ is at hand, as `mod.ninv` in an `nmod_t`,
 `n_mulmod_precomp_shoup_quo_rem_preinv` give the same results with
 multiplications only. On recent x86-64 processors the division is fast
 and runs alongside multiplications, so the two versions are close and the
-division can even win in code that is busy multiplying.
+division can even win in code that is busy multiplying. The nmod
+modules choose between the two per target with
+`_nmod_mulmod_precomp_shoup` ([](nmod#reduction)).
 
 ## Tables of powers {#powers}
 

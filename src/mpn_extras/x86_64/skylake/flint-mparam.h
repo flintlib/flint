@@ -34,8 +34,18 @@
    (Haswell/Broadwell: 2 uops, 6 cycles) */
 #define FLINT_FFT_SMALL_ROUND_USE_NATIVE 0
 
-/* verified on Xeon(R) Gold 6244 (cascade lake) */
-#define FLINT_MULMOD_SHOUP_THRESHOLD 23
+/* length from which the Shoup loop, including its precomputation, beats the
+   generic loop in scalar multiplication and addmul. Measured on Xeon(R) Gold
+   6246R (cascade lake): 2 with the division-free precomputation (selected
+   below); with the hardware division it would be 24 (scalar mul) to 32
+   (addmul) (previous value: 23, verified on Xeon(R) Gold 6244) */
+#define FLINT_MULMOD_SHOUP_THRESHOLD 2
+
+/* Shoup precomputation floor(a 2^FLINT_BITS / n) without a hardware division
+   (multiplications by the precomputed inverse of n): the division is slow
+   here (or done in software). FLINT_MULMOD_SHOUP_THRESHOLD above is the
+   crossover for this precomputation. */
+#define FLINT_MULMOD_SHOUP_PRECOMP_PREINV 1
 
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
 

@@ -37,7 +37,18 @@
    Skylake) but slower on Zen 2-5 where it is 1 uop with 3 cycle latency */
 #define FLINT_FFT_SMALL_ROUND_USE_NATIVE 1
 
-#define FLINT_MULMOD_SHOUP_THRESHOLD 10
+/* length from which the Shoup loop, including its precomputation, beats the
+   generic loop in scalar multiplication and addmul. Measured on Apple M4: 0
+   with the division-free precomputation (selected below); with the (software)
+   division it would be 6 to 8 for scalar mul and 0 for addmul (previous
+   value: 10) */
+#define FLINT_MULMOD_SHOUP_THRESHOLD 0
+
+/* Shoup precomputation floor(a 2^FLINT_BITS / n) without a hardware division
+   (multiplications by the precomputed inverse of n): the division is slow
+   here (or done in software). FLINT_MULMOD_SHOUP_THRESHOLD above is the
+   crossover for this precomputation. */
+#define FLINT_MULMOD_SHOUP_PRECOMP_PREINV 1
 
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
 
