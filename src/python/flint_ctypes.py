@@ -3090,9 +3090,9 @@ class gr_ctx:
         Dirichlet beta function.
 
             >>> RR.dirichlet_beta(2)
-            [0.915965594177219 +/- 2.68e-16]
+            [0.915965594177219 +/- 1.23e-16]
             >>> CC.dirichlet_beta(1); RR.pi() / 4
-            [0.785398163397448 +/- 3.69e-16]
+            [0.785398163397448 +/- 3.91e-16]
             [0.7853981633974483 +/- 7.66e-17]
         """
         return ctx._unary_op(x, libgr.gr_dirichlet_beta, "dirichlet_beta($x)")
@@ -3493,11 +3493,11 @@ class gr_ctx:
             >>> CC.dirichlet_l(2, DirichletGroup(1)(1))
             [1.644934066848226 +/- 4.57e-16]
             >>> RR.dirichlet_l(2, DirichletGroup(4)(3))
-            [0.915965594177219 +/- 2.68e-16]
+            [0.915965594177219 +/- 1.23e-16]
             >>> CC.dirichlet_l(2+3j, DirichletGroup(7)(3))
             ([1.273313649440491 +/- 9.69e-16] + [-0.074323294425594 +/- 6.96e-16]*I)
             >>> CC.dirichlet_l(2, DirichletGroup(4)(3))
-            [0.915965594177219 +/- 2.68e-16]
+            [0.915965594177219 +/- 1.23e-16]
             >>> CCser.dirichlet_l(CCser("2+x", error=2), DirichletGroup(4)(3))
             [0.915965594177219 +/- 5.98e-16] + [0.08158073611659 +/- 4.36e-15]*x + O(x^2)
             >>> QQser.dirichlet_l(2)

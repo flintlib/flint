@@ -7,7 +7,7 @@ preprocess:
   - -march=skylake-avx512
   - -DFLINT_MACHINE_VECTORS_FORCE_GENERIC
   - -DFLINT_MACHINE_VECTORS_FORCE_GENERIC -DFLINT_MACHINE_VECTORS_STRICT_C
-  - -D__ARM_NEON -D__aarch64__ -I{stubs}
+  - -U__AVX2__ -U__FMA__ -U__AVX512F__ -D__ARM_NEON -D__aarch64__ -I{stubs}
 category: Foundations
 order: 5
 requires: 64
