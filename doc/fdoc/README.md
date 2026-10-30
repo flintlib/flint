@@ -128,7 +128,9 @@ page; it is not included in the PDF. Remove the line to remove the box.
   it differs from the page directory, e.g. `gr_domains` documents `gr.h`),
   `template-headers` (headers such as `fq_poly_templates` whose expansion
   in this module's header declares its functions) and `preprocess` (sets
-  of compiler flags under which the header is expanded).
+  of compiler flags under which the header is expanded with `$CC -E`; a set
+  that fails to preprocess is reported as a warning with the compiler's
+  error, since the functions it generates are then missing).
 * Collections: `guide/` (User guide), `algorithms/`, `tutorials/` and
   `history/`, each with groups `<collection>/<group>/index.md`.
 * `check --only fmpz_poly,algorithms/polynomials` and

@@ -148,7 +148,14 @@ void acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s, const acb_dirichlet
 void acb_dirichlet_l_jet(acb_ptr res, const acb_t s, const dirichlet_group_t G, const dirichlet_char_t chi, int deflate, slong len, slong prec);
 
 void acb_dirichlet_l_fmpq_afe(acb_t res, const fmpq_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
+void acb_dirichlet_l_fmpq_afe_jet(acb_ptr res, const fmpq_t s, const dirichlet_group_t G, const dirichlet_char_t chi, int deflate, slong len, slong prec);
 void acb_dirichlet_l_fmpq(acb_t res, const fmpq_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
+void acb_dirichlet_l_si(acb_t res, slong s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
+void acb_dirichlet_l_ui_borwein_bsplit(acb_t res, ulong s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
+void _acb_dirichlet_l_generic(acb_t res, const acb_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
+int _acb_dirichlet_l_fmpq_use_afe(ulong q, const fmpq_t s, slong prec);
+int _acb_dirichlet_l_jet_use_afe(ulong q, const fmpq_t s, int deflate, slong len, slong prec);
+int _acb_dirichlet_get_small_fmpq(fmpq_t x, const acb_t s);
 
 void _acb_dirichlet_l_series(acb_ptr res, acb_srcptr s, slong slen,
     const dirichlet_group_t G, const dirichlet_char_t chi,

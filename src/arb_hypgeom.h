@@ -201,6 +201,15 @@ void _arb_hypgeom_gamma_lower_fmpq_0_bsplit(arb_t res, const fmpq_t a, const arb
 void _arb_gamma_upper_fmpq_step_bsplit(arb_t Gz1, const fmpq_t a, const arb_t z0, const arb_t z1, const arb_t Gz0, const arb_t expmz0, const mag_t abs_tol, slong prec);
 slong _arb_hypgeom_gamma_upper_singular_si_choose_N(mag_t err, slong n, const arb_t z, const mag_t abs_tol);
 void _arb_hypgeom_gamma_upper_singular_si_bsplit(arb_t res, slong n, const arb_t z, slong N, slong prec);
+
+slong _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_jet(mag_t err, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong len);
+void _arb_hypgeom_gamma_upper_fmpq_inf_bsplit_jet(arb_ptr res, const fmpq_t a, const arb_t z, const arb_t logz, slong N, slong len, slong prec);
+slong _arb_hypgeom_gamma_lower_fmpq_0_choose_N_jet(mag_t err, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong len);
+void _arb_hypgeom_gamma_lower_fmpq_0_bsplit_jet(arb_ptr res, const fmpq_t a, const arb_t z, const arb_t logz, slong N, slong len, slong prec);
+slong _arb_hypgeom_gamma_upper_singular_si_choose_N_jet(mag_t err, slong n, const arb_t z, const mag_t abs_tol, slong len);
+void _arb_hypgeom_gamma_upper_singular_si_bsplit_jet(arb_ptr res, slong n, const arb_t z, const arb_t logz, slong N, arb_srcptr gamma1, slong len, slong prec);
+void _arb_gamma_upper_fmpq_step_bsplit_jet(arb_ptr Gz1, const fmpq_t a, const arb_t z0, const arb_t logz0, const arb_t z1, arb_srcptr Gz0, const arb_t expmz0, const mag_t abs_tol, slong len, slong prec);
+void _arb_hypgeom_gamma_fmpq_jet(arb_ptr res, const fmpq_t a, slong len, slong prec);
 int arb_hypgeom_erf_bb(arb_t res, const arb_t z, int complementary, slong prec);
 
 void arb_hypgeom_sum_fmpq_arb_forward(arb_t res, const fmpq * a, slong alen, const fmpq * b, slong blen, const arb_t z, int reciprocal, slong N, slong prec);

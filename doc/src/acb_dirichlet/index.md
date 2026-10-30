@@ -283,7 +283,11 @@ Sets `res` to $\zeta(s)$, choosing the algorithm from $s$ and `prec`:
 exact values at integers (Bernoulli numbers for negative integers,
 `arb_zeta_ui` for positive ones), the Riemann–Siegel formula for
 $|\operatorname{Im}(s)| \ge 24 \, p^{3/2}$ and
-$|\operatorname{Re}(s)| \le 10 + p/10$ at precision $p$, and
+$|\operatorname{Re}(s)| \le 10 + p/10$ at precision $p$, the approximate
+functional equation (`acb_dirichlet_l_fmpq_afe_jet`) when $s$ is an exact
+real number which is a rational number of small height (in practice a
+dyadic number such as $1/2$ or $-3/4$) and the precision is high enough
+for this to be faster, and
 Euler–Maclaurin summation otherwise, after the reflection formula for
 $\operatorname{Re}(s) < 0$. The result is indeterminate if $s$ contains
 the pole $s = 1$.
@@ -294,9 +298,16 @@ void acb_dirichlet_zeta_jet(acb_t res, const acb_t s, int deflate, slong len, sl
 
 Sets `res` (a vector of length `len`) to the Taylor coefficients of
 $\zeta(s + x)$, or of the deflated function $\zeta(s + x) - 1/(s + x - 1)$
-if `deflate` is nonzero. Euler–Maclaurin summation is used (with the
-reflection formula for $\operatorname{Re}(s) < 0$), or the Riemann–Siegel
-formula for `len` $\le 2$ high on the critical line.
+if `deflate` is nonzero. Euler–Maclaurin summation is used (after the
+reflection formula when $\operatorname{Re}(s) \le -4$, or $\le -2.5$ at
+precision below 128 bits; for larger negative $\operatorname{Re}(s)$ it is
+cheaper and loses fewer bits to sum directly at $s$, with guard bits
+proportional to $-\operatorname{Re}(s) \log_2 p$), the Riemann–Siegel
+formula for `len` $\le 2$ high on the critical line, or, for an exact
+rational number $s$ of small height (including integers) at very high
+precision, the approximate functional equation
+(`acb_dirichlet_l_fmpq_afe_jet`), whose cost is $\tilde O(p^{1.5})$
+instead of $\tilde O(p^2)$ and which needs far less memory.
 :::
 
 ::: function
@@ -531,7 +542,12 @@ With $a = 1$ these are the ordinary Stieltjes constants.
 The function uses an integral representation that allows fast computation
 for extremely large $n$ [@JB2018]. If $n$ is moderate and the precision
 high enough, it instead expands the Hurwitz zeta function in a power
-series at $s = 1$ and reads off the last coefficient. To compute all of
+series at $s = 1$ and reads off the last coefficient. For $a = 1$, the
+power series of the deflated zeta function
+$\zeta(1+x) - 1/x = \sum_n (-1)^n \gamma_n x^n / n!$ comes from
+`acb_dirichlet_zeta_jet`, which at very high precision uses the
+approximate functional equation (`acb_dirichlet_l_fmpq_afe_jet`) in
+time $\tilde O(p^{1.5})$. To compute all of
 $\gamma_0(a), \ldots, \gamma_n(a)$, expanding $\zeta(s, a)$ once (for
 instance with `acb_poly_zeta_series`) is faster than calling this function
 repeatedly, unless $n$ is at least several hundred.
@@ -562,13 +578,88 @@ default version throws an exception if $\chi$ is not primitive.
 
 ::: function
 void acb_dirichlet_l(acb_t res, const acb_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
+void _acb_dirichlet_l_generic(acb_t res, const acb_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 
-Sets `res` to $L(s,\chi)$, choosing the algorithm: the Riemann zeta
+Sets `res` to $L(s,\chi)$, choosing the algorithm. If $s$ is an exact
+integer, `acb_dirichlet_l_si` is used. If $s$ is an exact real number which
+is a rational number of small height (see `_acb_dirichlet_get_small_fmpq`),
+the approximate functional equation `acb_dirichlet_l_fmpq_afe_jet` is used
+when `_acb_dirichlet_l_fmpq_use_afe` estimates it to be faster (at high
+precision or for large conductor). Otherwise (and always in the
+underscore version): the Riemann zeta
 function for $q = 1$, the functional equation for primitive $\chi$ and
 $\operatorname{Re}(s) < -1/2$ (or near $s = 0$ for even $\chi$), the Euler
 product for large $\operatorname{Re}(s)$, and otherwise the decomposition
 into Hurwitz zeta functions with a precomputation shared by the $\phi(q)$
 values.
+:::
+
+::: function
+void acb_dirichlet_l_si(acb_t res, slong s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
+
+Sets `res` to $L(s,\chi)$ for an integer $s$, using closed forms where
+they exist. An imprimitive character is reduced to the primitive
+character $\chi_0$ modulo $q_0$ inducing it, using
+$L(s,\chi) = L(s,\chi_0) \prod_{p \mid q} (1 - \chi_0(p) p^{-s})$, and
+$q_0 = 1$ gives the Riemann zeta function. For primitive $\chi$ modulo
+$q > 1$ with parity $\delta$ ($\chi(-1) = (-1)^{\delta}$):
+
+* If $s = 1 - n \le 0$, then $L(s,\chi) = -B_{n,\chi}/n$ in terms of a
+  generalized Bernoulli number, which is zero unless $n \equiv \delta \pmod 2$.
+  (The functional equation and the Euler product are used instead when $n$
+  is large compared to the precision.)
+
+* If $s \ge 1$ and $s \equiv \delta \pmod 2$, then
+
+  $$L(s,\chi) = (-1)^{1 + (s - \delta)/2} \frac{\tau(\chi)}{2 i^{\delta}} \left(\frac{2 \pi}{q}\right)^s \frac{B_{s,\bar \chi}}{s!}$$
+
+  where $\tau(\chi)$ is the Gauss sum (the Euler product is used instead
+  for $s$ large compared to the precision). The generalized Bernoulli number
+  $B_{s,\bar\chi} = q^{s-1} \sum_{a=1}^{q} \bar\chi(a) B_s(a/q)$ is
+  computed with exact integer arithmetic grouped by the classes of residues
+  with the same character value, so that only $\operatorname{ord}(\chi)$
+  roots of unity are needed; at high precision the cost is dominated by the
+  Gauss sum, i.e. by about $q$ multiplications.
+
+* If $s = 1$ and $\chi$ is even, then
+  $L(1,\chi) = -(\tau(\chi)/q) \sum_{a=1}^{q-1} \bar\chi(a) \log|2 \sin(\pi a/q)|$,
+  computed with one logarithm per class of residues with the same character
+  value (a single logarithm for real $\chi$).
+
+* Otherwise ($s \ge 2$ and $s \not\equiv \delta \pmod 2$, where no
+  closed form is known), the algorithm is chosen among the Euler product (for
+  $s$ large compared to the precision), Catalan's constant
+  (`arb_const_catalan`, for $q = 4$, $s = 2$),
+  `acb_dirichlet_l_ui_borwein_bsplit` (at high precision, for moderate $q$),
+  the approximate functional equation (`acb_dirichlet_l_fmpq_afe`, for
+  larger $q$) and the Hurwitz zeta function.
+:::
+
+::: function
+void acb_dirichlet_l_ui_borwein_bsplit(acb_t res, ulong s, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
+
+Sets `res` to $L(s,\chi)$ for an integer $s \ge 1$ and a primitive
+character $\chi$ modulo $q$ (with `G` = `NULL` for $q = 1$), using a
+generalization of Borwein's algorithm for the Riemann zeta function
+(`arb_zeta_ui_borwein_bsplit`) with binary splitting, which costs
+$\tilde O(\phi(q) p)$ at precision $p$.
+
+If $4 \mid q$, the 2-component of $\chi$ is primitive, which implies that
+$\chi(n + Q) = -\chi(n)$ with $Q = q/2$; if $q$ is odd, we instead use
+$\sum_n (-1)^{n-1} \chi(n) n^{-s} = (1 - \chi(2) 2^{1-s}) L(s,\chi)$ with
+$Q = q$. In both cases, $L(s,\chi)$ is a linear combination over the residues
+$a$ modulo $Q$ of alternating series
+$\sum_{j \ge 0} (-1)^j (Q j + a)^{-s}$, whose terms are moments of a positive
+measure on $[0,1]$ with total mass $a^{-s}$. Borwein's acceleration with $n$ terms
+therefore has error at most $3 a^{-s} / (3+\sqrt{8})^n$ for each series. The
+series are evaluated together by one binary splitting over vectors
+(several in parallel when threads are available), and the character values only
+enter in the final linear combination.
+
+The output is indeterminate if the character is not primitive, if
+$q \equiv 2 \pmod 4$ (there are then no primitive characters), and if
+$s = 1$, $q$ is odd and $\chi(2) = 1$ (when the factor $1 - \chi(2) 2^{1-s}$
+vanishes).
 :::
 
 ::: function
@@ -611,8 +702,86 @@ Set `res` to $L(s,\chi)$ for rational $s$. The `afe` version uses the
 approximate functional equation, a rapidly convergent series of
 incomplete gamma functions (evaluated by binary splitting and the
 [bit-burst algorithm](algorithms/special-functions/error-functions#bit-burst)),
-which is fastest at very high precision or large modulus; the default version uses it when this is estimated to be
-faster and otherwise calls `acb_dirichlet_l`.
+which is fastest at very high precision or large modulus; the default version uses
+`acb_dirichlet_l_si` when $s$ is an integer, the approximate functional
+equation when this is estimated to be faster, and otherwise calls
+`_acb_dirichlet_l_generic`. Imprimitive characters are reduced to the
+primitive characters inducing them, as in `acb_dirichlet_l_fmpq_afe_jet`.
+:::
+
+::: function
+int _acb_dirichlet_l_fmpq_use_afe(ulong q, const fmpq_t s, slong prec)
+int _acb_dirichlet_l_jet_use_afe(ulong q, const fmpq_t s, int deflate, slong len, slong prec)
+
+Return whether the approximate functional equation is estimated to be
+faster than the generic algorithms for $L(s,\chi)$, respectively for its
+expansion to length `len`, where $q$ is the conductor of $\chi$
+($q = 1$ for the Riemann zeta function). These are the heuristics used by
+`acb_dirichlet_l`, `acb_dirichlet_l_fmpq`, `acb_dirichlet_l_jet`,
+`acb_dirichlet_zeta` and `acb_dirichlet_zeta_jet` (and therefore by
+`acb_dirichlet_stieltjes` and `arb_const_glaisher`, which call
+`acb_dirichlet_zeta_jet`). The cutoffs come from timings (wall time)
+with 1 and 8 threads. They decrease with $q$ (for $q > 50$, values at
+half-integers, and for $q > 200$, jets, always use the approximate
+functional equation), and with the number of threads $T$
+(`flint_get_num_threads`), since the terms of the approximate functional
+equation are computed in parallel with nearly perfect speedup while
+Euler–Maclaurin summation and the Hurwitz zeta functions gain less from
+threads. For $q = 1$ they are
+about $4 \cdot 10^4 T^{-1/2}$ bits for $\zeta(1/2)$,
+$10^5 T^{-0.9}$ bits for other values, $1.5 \cdot 10^5 T^{-1}$ bits for
+jets at $s = 1/2$ and $4.4 \cdot 10^5 T^{-0.8}$ bits for other jets of
+length 2 (somewhat higher for longer jets), the latter capped at
+$3.5 \cdot 10^5$ bits because of the $O(p^2)$ memory of Euler–Maclaurin
+summation (4 GB at $3.3 \cdot 10^5$ bits). The choice of algorithm, and
+hence the radius of the output, can therefore depend on the number of
+threads.
+:::
+
+::: function
+int _acb_dirichlet_get_small_fmpq(fmpq_t x, const acb_t s)
+
+If $s$ is an exact real number equal to a rational number with numerator
+of at most 40 bits and denominator of at most 20 bits (i.e. a dyadic
+number $m 2^{-e}$ with $e \le 20$), sets $x$ to it and returns 1;
+otherwise returns 0.
+:::
+
+::: function
+void acb_dirichlet_l_fmpq_afe_jet(acb_ptr res, const fmpq_t s, const dirichlet_group_t G, const dirichlet_char_t chi, int deflate, slong len, slong prec)
+
+Sets `res` to the Taylor coefficients $L(s), L'(s), \ldots, L^{(\text{len}-1)}(s)/(\text{len}-1)!$
+for rational $s$, with `deflate` as in `acb_dirichlet_l_jet`.
+This uses the same approximate functional equation and precision
+management as `acb_dirichlet_l_fmpq_afe`, with every quantity replaced by a
+power series in $x$ where $s \to s + x$. The required expansions
+of the incomplete gamma functions $\Gamma(a + x/2, \pi n^2 / q)$ with respect to the
+parameter are computed by jet versions of the binary splitting and
+bit-burst algorithms (see `_arb_gamma_upper_fmpq_step_bsplit_jet`), with
+truncation errors bounded separately for each coefficient.
+For fixed `len`, the cost is $\tilde O(p^{1.5})$ at precision $p$,
+roughly `len` times the cost of `acb_dirichlet_l_fmpq_afe`; this
+makes it possible to compute, for example, Glaisher's constant (via
+$\zeta'(-1)$), Stieltjes constants and their generalizations to Dirichlet
+$L$-functions, or the second-order Landau-Ramanujan constant (via
+$\zeta'(s)$ and $L'(s, \chi_{-4})$ at $s = 2^k$) in quasi-$p^{1.5}$ time.
+An imprimitive character $\chi$ modulo $q$ induced by $\chi_0$ is handled by
+evaluating $L(s + x, \chi_0)$ and multiplying by the Euler factors
+$\prod_{p \mid q} (1 - \chi_0(p) p^{-s-x})$.
+The deflation only has an effect for $q = 1$ (as in `acb_dirichlet_zeta_jet`);
+for the Riemann zeta function at $s = 1$, `deflate` must be set, and for
+a principal character modulo $q > 1$, `deflate` must not be set;
+otherwise the output is indeterminate.
+
+The terms of the approximate functional equation are independent, and are
+computed in parallel when FLINT is allowed to use several threads
+(see `flint_set_num_threads`). The terms are added up in a fixed order,
+so the output does not depend on the number of threads. Each term is
+added as soon as all earlier terms are done; a term that finishes early
+waits in a small buffer (a few terms per thread), so the memory usage is
+$O(t \cdot \text{len} \cdot p)$ bits with $t$ threads, independent of
+the number of terms $O(\sqrt{q p})$. The same applies to
+`acb_dirichlet_l_fmpq_afe`, which is the case `len = 1` of this function.
 :::
 
 ::: function
@@ -632,7 +801,13 @@ Sets `res` to the Taylor coefficients $L(s), L'(s), \ldots, L^{(\text{len}-1)}(s
 With `deflate` nonzero and principal $\chi$, the expansion of
 $L(s,\chi) - \frac{\phi(q)}{q (s-1)}$ is computed instead, which at
 $s = 1$ is the regular part of the Laurent expansion; for non-principal
-$\chi$, `deflate` has no effect.
+$\chi$, `deflate` has no effect. For $q = 1$ this calls
+`acb_dirichlet_zeta_jet`. Otherwise, if $s$ is an exact rational number of small height
+(see `_acb_dirichlet_get_small_fmpq`), the approximate functional
+equation `acb_dirichlet_l_fmpq_afe_jet` is used when
+`_acb_dirichlet_l_jet_use_afe` estimates it to be faster (this is not
+done for principal characters with deflation); otherwise the Hurwitz
+zeta expansions are summed.
 :::
 
 ::: function

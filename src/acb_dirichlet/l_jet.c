@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "acb_dirichlet.h"
 #include "acb_poly.h"
 
@@ -42,6 +43,28 @@ acb_dirichlet_l_jet(acb_ptr res, const acb_t s,
     {
         acb_dirichlet_l(res, s, G, chi, prec);
         return;
+    }
+
+    /* the approximate functional equation for exact rational numbers
+       of small height; the deflation has no effect for a nonprincipal
+       character */
+    if (acb_is_exact(s) && arb_is_zero(acb_imagref(s)) &&
+        !(deflate && dirichlet_char_is_principal(G, chi)))
+    {
+        fmpq_t x;
+        int done = 0;
+
+        fmpq_init(x);
+        if (_acb_dirichlet_get_small_fmpq(x, s) &&
+            _acb_dirichlet_l_jet_use_afe(dirichlet_conductor_char(G, chi), x, 0, len, prec))
+        {
+            acb_dirichlet_l_fmpq_afe_jet(res, x, G, chi, 0, len, prec);
+            done = _acb_vec_is_finite(res, len);
+        }
+        fmpq_clear(x);
+
+        if (done)
+            return;
     }
 
     if (dirichlet_char_is_principal(G, chi))

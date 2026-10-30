@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "fmpq.h"
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
@@ -20,8 +21,13 @@ _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong pr
     acb_init(a);
     acb_one(a);
 
-    /* use reflection formula */
-    if (arf_sgn(arb_midref(acb_realref(h))) < 0)
+    /* Use the reflection formula when Re(s) <= -4 (-2.5 at low precision,
+       where the guard bits below are relatively costly). For larger
+       Re(s) < 0, Euler-Maclaurin summation directly at s is faster (by
+       5-60%, most at s = -1, -2, ... for len = 2) and loses fewer bits
+       than the product of four series; it only needs some guard bits
+       growing with -Re(s). */
+    if (arf_cmp_d(arb_midref(acb_realref(h)), (prec < 128) ? -2.5 : -4.0) <= 0)
     {
         /* zeta(s) = (2*pi)**s * sin(pi*s/2) / pi * gamma(1-s) * zeta(1-s) */
         acb_t pi, hcopy;
@@ -92,7 +98,21 @@ _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong pr
     }
     else
     {
-        _acb_poly_zeta_cpx_series(t, h, a, deflate, len, prec);
+        slong wp = prec;
+
+        if (arf_sgn(arb_midref(acb_realref(h))) < 0)
+            wp += (slong) (-arf_get_d(arb_midref(acb_realref(h)), ARF_RND_DOWN)
+                    * FLINT_BIT_COUNT(prec) * 0.7) + 2;
+
+        _acb_poly_zeta_cpx_series(t, h, a, deflate, len, wp);
+
+        /* trivial zeros zeta(-2n) = 0 (the reflection formula gives
+           them exactly) */
+        if (!deflate && acb_is_exact(h) && acb_is_int(h) && arf_sgn(arb_midref(acb_realref(h))) < 0 &&
+            arf_is_int_2exp_si(arb_midref(acb_realref(h)), 1))
+            acb_zero(t);
+
+        _acb_vec_set_round(t, t, len, prec);
     }
 
     acb_clear(a);
@@ -115,6 +135,26 @@ acb_dirichlet_zeta_jet(acb_t res, const acb_t s, int deflate, slong len, slong p
     {
         _acb_vec_indeterminate(res, len);
         return;
+    }
+
+    /* the approximate functional equation for exact rational numbers
+       of small height */
+    if (acb_is_exact(s) && arb_is_zero(acb_imagref(s)))
+    {
+        fmpq_t x;
+        int done = 0;
+
+        fmpq_init(x);
+        if (_acb_dirichlet_get_small_fmpq(x, s) &&
+            _acb_dirichlet_l_jet_use_afe(1, x, deflate, len, prec))
+        {
+            acb_dirichlet_l_fmpq_afe_jet(res, x, NULL, NULL, deflate, len, prec);
+            done = _acb_vec_is_finite(res, len);
+        }
+        fmpq_clear(x);
+
+        if (done)
+            return;
     }
 
     if (len > 2 || deflate != 0)

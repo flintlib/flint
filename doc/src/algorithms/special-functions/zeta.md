@@ -27,14 +27,14 @@ $a$ when many values with the same $s$ are needed.
 
 | Function | Method |
 |---|---|
-| `acb_dirichlet_zeta`, `acb_zeta` | integers: Bernoulli numbers (negative), `arb_zeta_ui` (positive); $|t| \ge 24 p^{3/2}$: Riemann–Siegel; $\operatorname{Re}(s) < 0$: reflection formula; otherwise Euler–Maclaurin |
-| `acb_dirichlet_zeta_jet` | Euler–Maclaurin for any length (reflection for $\operatorname{Re}(s) < 0$); Riemann–Siegel for length $\le 2$ high on the critical line |
+| `acb_dirichlet_zeta`, `acb_zeta` | integers: Bernoulli numbers (negative), `arb_zeta_ui` (positive); $|t| \ge 24 p^{3/2}$: Riemann–Siegel; $\operatorname{Re}(s) < 0$: reflection formula; exact dyadic $s$ at high precision: approximate functional equation; otherwise Euler–Maclaurin |
+| `acb_dirichlet_zeta_jet` | Euler–Maclaurin for any length (reflection for $\operatorname{Re}(s) \le -4$); Riemann–Siegel for length $\le 2$ high on the critical line; exact rational $s$ of small height at very high precision: approximate functional equation |
 | `acb_dirichlet_hurwitz`, `acb_hurwitz_zeta` | special values ($a = 1$, $s = 0$, negative integers via Bernoulli polynomials); otherwise Euler–Maclaurin (`_acb_poly_zeta_cpx_series`) |
 | `arb_zeta_ui` | $n > 0.7p$: asymptotic; even $n$: Bernoulli numbers or Euler product; $\zeta(3)$, $\zeta(5)$: constants; small odd $n$ at huge precision: Borwein's algorithm by binary splitting; large odd $n$: Euler product; otherwise Borwein's algorithm |
 | `acb_dirichlet_hurwitz_precomp_eval` | Taylor expansion in $a$ on a grid ([](#hurwitz-taylor)) |
 | `acb_polylog` | $|z| < 1/2$: direct series; $s = 2$: `acb_hypgeom_dilog`; otherwise two Hurwitz zeta values ([](#polylog)) |
 | `acb_dirichlet_l` | [](#l-functions) |
-| `acb_dirichlet_stieltjes` | integral representation [@JB2018], or a Hurwitz zeta series at $s = 1$ |
+| `acb_dirichlet_stieltjes` | integral representation [@JB2018], or a Hurwitz zeta series at $s = 1$ (via `acb_dirichlet_zeta_jet` for $a = 1$, so with the approximate functional equation at very high precision) |
 
 ## Euler–Maclaurin summation {#euler-maclaurin}
 
@@ -307,7 +307,17 @@ for rational $s$, for which the upper incomplete gamma function with
 rational parameter can be computed efficiently (by its asymptotic series
 when possible), with each term computed at the precision its magnitude
 requires; it is faster than Euler–Maclaurin summation at very high
-precision or for large $q$.
+precision or for large $q$. `acb_dirichlet_l_fmpq_afe_jet` computes the
+Taylor expansion in $s$ in the same way, with the incomplete gamma functions
+expanded with respect to their parameter; this is used for jets of
+$\zeta(s)$ and $L(s,\chi)$ at exact rational $s$ (`acb_dirichlet_zeta_jet`,
+`acb_dirichlet_l_jet`), and thereby for Glaisher's constant and the
+Stieltjes constants $\gamma_n$ at very high precision. The cost is
+$\tilde O(p^{1.5})$ and the memory $O(p)$, compared with $\tilde O(p^2)$
+and $O(p^2)$ for Euler–Maclaurin summation. Since
+$\Gamma(s, z)$ is computed by binary splitting over rational
+parameters, only $s$ of small height can be handled; from an `acb_t`,
+these are the dyadic numbers.
 
 ## Other functions {#other}
 
@@ -324,8 +334,9 @@ $t = \log z + 2\pi i k$.
 **Stieltjes constants.** The generalised Stieltjes constants
 $\gamma_n(a)$ are the coefficients of the Laurent expansion of
 $\zeta(s, a)$ at $s = 1$. For moderate $n$, they are read off from the
-Euler–Maclaurin expansion of $\zeta(s + x, a)$ at $s = 1$ with deflation;
-for large $n$, `acb_dirichlet_stieltjes` integrates a representation
+Euler–Maclaurin expansion of $\zeta(s + x, a)$ at $s = 1$ with deflation
+(for $a = 1$ and very high precision, from the approximate functional
+equation instead); for large $n$, `acb_dirichlet_stieltjes` integrates a representation
 along a contour that avoids the cancellation of the power series method
 [@JB2018], which makes very large $n$, such as $10^{100}$, feasible.
 
@@ -347,7 +358,7 @@ along a contour that avoids the cancellation of the power series method
 - `acb_polylog`, `acb_poly_polylog_series`, `mag_polylog_tail`.
 - `acb_dirichlet_l`, `acb_dirichlet_l_hurwitz`,
   `acb_dirichlet_l_euler_product`, `acb_dirichlet_l_vec_hurwitz`,
-  `acb_dirichlet_l_fmpq_afe`, `acb_dirichlet_root_number`,
+  `acb_dirichlet_l_fmpq_afe`, `acb_dirichlet_l_fmpq_afe_jet`, `acb_dirichlet_root_number`,
   `acb_dirichlet_gauss_sum`, `acb_dirichlet_theta_arb`.
 - `acb_dirichlet_lerch_phi`, `acb_dirichlet_stieltjes`.
 

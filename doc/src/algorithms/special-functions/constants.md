@@ -1,7 +1,7 @@
 ---
 title: Mathematical constants
 summary: The formulas and algorithms behind arb_const_pi, arb_const_e, arb_const_log2, arb_const_log10, arb_const_euler, arb_const_catalan, arb_const_apery, arb_const_zeta5, arb_const_khinchin, arb_const_glaisher and arb_const_reciprocal_fibonacci, with their error bounds, and how the values are cached.
-complexity: $O(M(n) \log^2 n)$ for the hypergeometric constants by binary splitting and $O(M(n) \sqrt{n} \log n)$ for the reciprocal Fibonacci constant; Khinchin's and Glaisher's constants use sums of many full-precision terms and are much slower.
+complexity: $O(M(n) \log^2 n)$ for the hypergeometric constants by binary splitting and $O(M(n) \sqrt{n} \log n)$ for the reciprocal Fibonacci constant; Khinchin's constant and Glaisher's constant (below about $10^5$ to $3.5 \cdot 10^5$ bits, depending on the number of threads) use sums of many full-precision terms and are much slower; Glaisher's constant at higher precision costs $\tilde O(n^{1.5})$.
 order: 20
 ---
 
@@ -219,11 +219,23 @@ powers $k^{-2n}$ that is updated from one $n$ to the next.
 ## Glaisher's constant {#glaisher}
 
 The Glaisher-Kinkelin constant $A = \exp(1/12 - \zeta'(-1))$ is computed
-directly from this formula, with $\zeta'(-1)$ from the power series of the
-Hurwitz zeta function at $s = -1$ (`_acb_poly_zeta_cpx_series`, which uses
-Euler-Maclaurin summation; see [](algorithms/special-functions/zeta)). The
-reflection formula is not used, since the arithmetic of Euler-Maclaurin
-summation is cheaper at $s = -1$ than at $s = 2$.
+directly from this formula, with $\zeta'(-1)$ from `acb_dirichlet_zeta_jet`
+(see [](algorithms/special-functions/zeta)). Up to a cutoff
+(`_acb_dirichlet_l_jet_use_afe`: $3.5 \cdot 10^5$ bits with one thread,
+about $8 \cdot 10^4$ bits with 8 threads), this uses Euler-Maclaurin
+summation directly at $s = -1$; the
+reflection formula is not used for $-4 < \operatorname{Re}(s) < 0$, since
+the arithmetic of Euler-Maclaurin summation is cheaper at $s = -1$ than at
+$s = 2$ (by a factor 1.3–1.7 for $\zeta'(-1)$).
+
+Euler-Maclaurin summation needs $O(p)$ terms and $O(p)$ Bernoulli numbers
+at precision $p$, which costs $\tilde O(p^2)$ time and $O(p^2)$ bits of
+memory (several gigabytes at $p = 4 \cdot 10^5$). Above the cutoff,
+`acb_dirichlet_zeta_jet` instead computes $\zeta(-1+x)$ to
+$O(x^2)$ with the approximate functional equation
+(`acb_dirichlet_l_fmpq_afe_jet`), a sum of $O(\sqrt{p})$ incomplete
+gamma function jets evaluated by binary splitting, in time
+$\tilde O(p^{1.5})$ and with $O(p)$ memory.
 
 ## The reciprocal Fibonacci constant {#fibonacci}
 
