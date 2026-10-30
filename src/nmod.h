@@ -22,6 +22,7 @@
 #include "ulong_extras.h"
 #include "nmod_types.h"
 #include "gr_types.h"
+#include "flint-mparam.h"  /* FLINT_MULMOD_SHOUP_PRECOMP_PREINV */
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,7 +63,6 @@ extern "C" {
   } while (0)
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
-#define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
 
 #define NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod) \
   do { \
@@ -125,6 +125,28 @@ extern "C" {
     rxx = (rxx < nxx ? rxx : rxx - nxx); \
     (res) = rxx; \
   } while (0)
+
+#define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
+
+NMOD_INLINE
+ulong _nmod_mulmod_precomp_shoup(ulong a, nmod_t mod)
+{
+#if FLINT_MULMOD_SHOUP_PRECOMP_PREINV
+    return n_mulmod_precomp_shoup_preinv(a, mod.n, mod.ninv);
+#else
+    return n_mulmod_precomp_shoup(a, mod.n);
+#endif
+}
+
+NMOD_INLINE
+void _nmod_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, nmod_t mod)
+{
+#if FLINT_MULMOD_SHOUP_PRECOMP_PREINV
+    n_mulmod_precomp_shoup_quo_rem_preinv(a_pr_quo, a_pr_rem, a, mod.n, mod.ninv);
+#else
+    n_mulmod_precomp_shoup_quo_rem(a_pr_quo, a_pr_rem, a, mod.n);
+#endif
+}
 
 NMOD_INLINE ulong nmod_set_ui(ulong x, nmod_t mod)
 {

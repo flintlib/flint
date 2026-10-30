@@ -76,12 +76,12 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
         TMP_START;
         tmp = TMP_ALLOC(3 * len * sizeof(ulong));
 
-        tmp[0] = n_mulmod_precomp_shoup(vec[0], mod.n);
+        tmp[0] = _nmod_mulmod_precomp_shoup(vec[0], mod);
         tmp[1] = vec[0];
         tmp[2] = tmp[0];
         for (k = 1; k < len; k++)
         {
-            n_mulmod_precomp_shoup_quo_rem(tmp+3*k, &rem, vec[k], mod.n);
+            _nmod_mulmod_precomp_shoup_quo_rem(tmp+3*k, &rem, vec[k], mod);
             n_mulmod_and_precomp_shoup(tmp+3*k+1, tmp+3*k+2, vec[k], tmp[3*k-2], tmp[3*k], rem, tmp[3*k-1], mod.n);
         }
 

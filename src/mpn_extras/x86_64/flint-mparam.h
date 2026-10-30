@@ -39,6 +39,12 @@
 
 #define FLINT_MULMOD_SHOUP_THRESHOLD 10
 
+/* Shoup precomputation floor(a 2^FLINT_BITS / n) without a hardware division
+   (multiplications by the precomputed inverse of n): the division is slow
+   here (or done in software). FLINT_MULMOD_SHOUP_THRESHOLD above is the
+   crossover for this precomputation. */
+#define FLINT_MULMOD_SHOUP_PRECOMP_PREINV 1
+
 #define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
 
 #define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580

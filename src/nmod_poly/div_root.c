@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 ulong
@@ -23,6 +24,20 @@ _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod)
 
     t = A[len - 2];
     r = Q[len - 2] = A[len - 1];
+
+    if (NMOD_CAN_USE_SHOUP(mod))
+    {
+        const ulong c_pr = n_mulmod_precomp_shoup_preinv(c, mod.n, mod.ninv);
+
+        for (i = len - 2; i > 0; i--)
+        {
+            r = nmod_add(n_mulmod_shoup(c, r, c_pr, mod.n), t, mod);
+            t = A[i-1];
+            Q[i-1] = r;
+        }
+
+        return nmod_add(n_mulmod_shoup(c, r, c_pr, mod.n), t, mod);
+    }
 
     for (i = len - 2; i > 0; i--)
     {

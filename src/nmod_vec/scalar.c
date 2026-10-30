@@ -27,7 +27,7 @@ _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
-    const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
+    const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod);
 
     for (slong i = 0; i < len; i++)
     {
@@ -84,7 +84,7 @@ void _nmod_vec_scalar_mul_nmod_generic(nn_ptr res, nn_srcptr vec,
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
-    const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
+    const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod);
 
     for (slong i = 0; i < len; i++)
         res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);

@@ -665,3 +665,16 @@ NMOD_CAN_USE_SHOUP(mod)
 Nonzero if $n < 2^{\bits - 1}$, the condition for multiplication by a
 fixed operand with `n_mulmod_shoup`.
 :::
+
+::: function
+ulong _nmod_mulmod_precomp_shoup(ulong a, nmod_t mod)
+void _nmod_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, nmod_t mod)
+
+Same as `n_mulmod_precomp_shoup` and `n_mulmod_precomp_shoup_quo_rem` for
+the modulus of `mod`, computed with the hardware division or with
+`mod.ninv` (`n_mulmod_precomp_shoup_preinv`) depending on the target
+([](ulong_extras/shoup#precomp)): the choice is
+`FLINT_MULMOD_SHOUP_PRECOMP_PREINV` in `flint-mparam.h`, 1 for the
+division-free method. The thresholds `FLINT_MULMOD_SHOUP_THRESHOLD` of
+`flint-mparam.h` are tuned for this choice. Requires $a < n$.
+:::
