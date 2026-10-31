@@ -105,6 +105,17 @@ ulong _nmod_zip_eval_step(
     slong i;
     ulong t0, t1, t2, p0, p1;
     t2 = t1 = t0 = 0;
+    if (NMOD_IS_HALFLIMB(ctx))
+    {
+        for (i = 0; i < length; i++)
+        {
+            FLINT_ASSERT(coeffs[i] < ctx.n);
+            add_ssaaaa(t1, t0, t1, t0, 0, cur[i] * coeffs[i]);
+            cur[i] = _nmod_mul_halflimb(cur[i], inc[i], ctx);
+        }
+        NMOD2_RED2(t0, t1, t0, ctx);
+        return t0;
+    }
     for (i = 0; i < length; i++)
     {
         umul_ppmm(p1, p0, cur[i], coeffs[i]);

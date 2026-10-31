@@ -81,7 +81,7 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         _FIXED_LEN_MOD_BOUNDS( 2, 46341, 3037000500);
 #endif  // FLINT_BITS == 64
         // remains len == 1
-        if (mod.n <= (UWORD(1) << FLINT_BITS / 2))
+        if (NMOD_IS_HALFLIMB(mod))
         {
             dot_params_t params = {_DOT1, UWORD(0)};
             return params;
@@ -90,7 +90,7 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         return params;
     }
 
-    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    if (NMOD_IS_HALFLIMB(mod)) /* implies <= 2 limbs */
     {
         const ulong t0 = (mod.n - 1) * (mod.n - 1);
         ulong u1 = n_mulhi(t0, len);

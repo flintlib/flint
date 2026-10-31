@@ -29,8 +29,26 @@ may be unreduced.
 
 Any modulus $1 \le n < 2^{\bits}$ is allowed. For $n = 1$ every result is
 0. A few functions with a leading underscore are faster but restrict $n$:
-`_nmod_add` and `_nmod_sub` need $n \le 2^{\bits - 1}$, and
-`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$.
+`_nmod_add` and `_nmod_sub` need $n \le 2^{\bits - 1}$,
+`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$, and `_nmod_mul_halflimb`
+needs $n \le 2^{\bits / 2}$.
+
+## In loops {#loops}
+
+In a loop that writes to memory, do not read the modulus through a
+pointer, as `poly->mod` or `ctx->mod`. The compiler must then assume that
+the writes may change it, and reads $n$ and its inverse again at every
+iteration (7–15% slower in measurements on x86 and ARM). Copy it to a
+local variable before the loop instead:
+
+```c
+nmod_t mod = poly->mod;
+
+for (i = 0; i < len; i++)
+    res[i] = nmod_mul(a[i], b[i], mod);
+```
+
+An `nmod_t` parameter can be used directly: it is already a local copy.
 
 ## How it works {#algorithm}
 
