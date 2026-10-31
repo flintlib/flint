@@ -110,6 +110,18 @@ is, $n \ge 2^{\bits - 1}$. It saves the normalisation shift of `nmod_mul`.
 :::
 
 ::: function
+ulong _nmod_mul_halflimb(ulong a, ulong b, nmod_t mod)
+
+Returns $ab \bmod n$ for reduced operands. Requires
+$n \le 2^{\bits / 2}$, which `NMOD_IS_HALFLIMB` tests; for larger $n$
+the result is wrong. The product $ab$ then fits in one word, and is reduced
+with the one-word Barrett step of `NMOD_RED` ([](nmod#reduction)), which
+is shorter than the two-word reduction of `nmod_mul`. To use it in a loop,
+test the modulus once and write two loops, one with `_nmod_mul_halflimb` and
+one with `nmod_mul`, rather than testing it at each product.
+:::
+
+::: function
 ulong nmod_ui_mul_ui(ulong a, ulong b, nmod_t mod)
 
 Returns $ab \bmod n$ for any $a$ and $b$.
@@ -669,4 +681,12 @@ NMOD_CAN_USE_SHOUP(mod)
 
 Nonzero if $n < 2^{\bits - 1}$, the condition for multiplication by a
 fixed operand with `n_mulmod_shoup`.
+:::
+
+::: macro
+NMOD_IS_HALFLIMB(mod)
+
+Nonzero if $n \le 2^{\bits / 2}$, so that the product of two reduced
+operands fits in one limb: the condition for `_nmod_mul_halflimb`, and for
+the one-limb accumulation in dot products.
 :::

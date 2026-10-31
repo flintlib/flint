@@ -20,7 +20,7 @@
 
 int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
 {
-    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    if (NMOD_IS_HALFLIMB(mod)) /* implies <= 2 limbs */
     {
         const ulong t0 = (mod.n - 1) * (mod.n - 1);
         ulong u1, u0;

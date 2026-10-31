@@ -181,7 +181,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
     int halflimb;
     int high_reduced = 0;
 
-    halflimb = (mod.n <= (UWORD(1) << (FLINT_BITS / 2)));
+    halflimb = NMOD_IS_HALFLIMB(mod);
 
     if (!halflimb)
     {

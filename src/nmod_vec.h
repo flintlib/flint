@@ -510,7 +510,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
 
     if (params.method == _DOT_POW2)
     {
-        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+        if (NMOD_IS_HALFLIMB(mod))
             return _nmod_vec_dot1(vec1, vec2, len, mod);
         else
             return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
@@ -567,7 +567,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
 
     if (params.method == _DOT_POW2)
     {
-        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+        if (NMOD_IS_HALFLIMB(mod))
             return _nmod_vec_dot1_rev(vec1, vec2, len, mod);
         else
             return _nmod_vec_dot_pow2_rev(vec1, vec2, len, mod);
@@ -619,7 +619,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, 
 
     if (params.method == _DOT_POW2)
     {
-        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+        if (NMOD_IS_HALFLIMB(mod))
             return _nmod_vec_dot1_ptr(vec1, vec2, offset, len, mod);
         else
             return _nmod_vec_dot_pow2_ptr(vec1, vec2, offset, len, mod);
