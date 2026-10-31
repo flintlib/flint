@@ -61,12 +61,16 @@ two-word product modulo $n 2^{\mathit{norm}}$, and shifts the remainder
 back. Addition and subtraction use a comparison and need no
 multiplication.
 
-`nmod_pow_ui` uses binary exponentiation. For odd $n$ and exponents of
-at least $2^{11}$ it converts to
+`nmod_pow_ui` uses binary exponentiation. For odd $n$ it converts to
 [Montgomery form](algorithms/arithmetic/montgomery), where each
-multiplication has a shorter chain of dependent operations. The guide
-[](nmod/redc) explains how to use Montgomery form directly for other long
-chains of multiplications.
+multiplication has a shorter chain of dependent operations, as soon as
+this pays for the conversions: from exponent 8 (16 for
+$n \ge 2^{\bits - 2}$). For $n \le 2^{\bits / 2}$ the products fit in one
+word and binary exponentiation stays faster for longer: there it switches
+from exponent 1024 to half-limb Montgomery form for $n < 2^{\bits / 2 - 2}$,
+and from exponent 2048 to Montgomery form for the other odd $n$.
+The guide [](nmod/redc) explains how to use Montgomery form directly for
+other long chains of multiplications.
 
 ::: summary algorithms/arithmetic/moller-granlund :::
 

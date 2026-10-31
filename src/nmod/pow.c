@@ -11,93 +11,42 @@
 
 #include <stdint.h>
 #include "nmod.h"
+#include "nmod/pow_impl.h"
 
 ulong
 _nmod_redc_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx)
 {
-    ulong x;
-
-    while ((exp & 1) == 0)
-    {
-        a = nmod_redc_mul(a, a, ctx);
-        exp >>= 1;
-    }
-
-    x = a;
-    while (exp >>= 1)
-    {
-        a = nmod_redc_mul(a, a, ctx);
-        if (exp & 1)
-            x = nmod_redc_mul(x, a, ctx);
-    }
-
-    return x;
+    return _redc_pow_ui(a, exp, ctx);
 }
 
 ulong
 _nmod_redc_fast_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx)
 {
-    ulong x;
-
-    while ((exp & 1) == 0)
-    {
-        a = nmod_redc_fast_mul(a, a, ctx);
-        exp >>= 1;
-    }
-
-    x = a;
-    while (exp >>= 1)
-    {
-        a = nmod_redc_fast_mul(a, a, ctx);
-        if (exp & 1)
-            x = nmod_redc_fast_mul(x, a, ctx);
-    }
-
-    return x;
+    return _redc_fast_pow_ui(a, exp, ctx);
 }
 
 ulong
 _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod)
 {
-    ulong x, n = mod.n, ninv = mod.ninv, norm = mod.norm;
+    return _pow_ui_binexp(a, exp, mod.n, mod.ninv, mod.norm);
+}
 
-    a <<= norm;
-    n <<= norm;
-
-    while ((exp & 1) == 0)
-    {
-        a = n_mulmod_preinv(a, a, n, ninv, norm);
-        exp >>= 1;
-    }
-
-    x = a;
-
-    while (exp >>= 1)
-    {
-        a = n_mulmod_preinv(a, a, n, ninv, norm);
-
-        if (exp & 1)
-            x = n_mulmod_preinv(x, a, n, ninv, norm);
-    }
-
-    return x >> norm;
+ulong
+_nmod_pow_ui_binexp_halflimb(ulong a, ulong exp, nmod_t mod)
+{
+    return _pow_ui_binexp_halflimb(a, exp, mod.n, mod.ninv, mod.norm);
 }
 
 ulong
 _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod)
 {
-    ulong x;
-    nmod_redc_ctx_t ctx;
+    return _pow_ui_redc(a, exp, mod.n, mod.ninv, mod.norm);
+}
 
-    nmod_redc_ctx_init_nmod(ctx, mod);
-    a = nmod_redc_set_nmod(a, ctx);
-
-    if (nmod_redc_can_use_fast(ctx))
-        x = _nmod_redc_fast_pow_ui(a, exp, ctx);
-    else
-        x = _nmod_redc_pow_ui(a, exp, ctx);
-
-    return nmod_redc_get_nmod(x, ctx);
+ulong
+_nmod_pow_ui_redc_half(ulong a, ulong exp, nmod_t mod)
+{
+    return _pow_ui_redc_half(a, exp, mod.n, mod.ninv, mod.norm);
 }
 
 ulong
@@ -105,33 +54,7 @@ nmod_pow_ui(ulong a, ulong exp, nmod_t mod)
 {
     FLINT_ASSERT(a < mod.n);
 
-    if (exp < (UWORD(1) << 11) || mod.n % 2 == 0)
-    {
-        if (exp <= 4)
-        {
-            if (exp >= 2)
-            {
-                ulong x = nmod_mul(a, a, mod);
-
-                if (exp == 2)
-                    return x;
-                else if (exp == 3)
-                    return nmod_mul(a, x, mod);
-                else
-                    return nmod_mul(x, x, mod);
-            }
-            else
-            {
-                return (exp == 1) ? a : (mod.n != 1);
-            }
-        }
-
-        return _nmod_pow_ui_binexp(a, exp, mod);
-    }
-    else
-    {
-        return _nmod_pow_ui_redc(a, exp, mod);
-    }
+    return _pow_ui(a, exp, mod);
 }
 
 /* Powering with base = 2 */

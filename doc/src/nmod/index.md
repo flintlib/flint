@@ -186,9 +186,15 @@ $(a^{-1})^{-\mathit{exp}}$ and throws `FLINT_IMPINV` if $a$ is not
 invertible modulo $n$.
 
 ::: details
-`nmod_pow_ui` uses binary exponentiation with `n_mulmod_preinv` on the
-normalised modulus. For odd $n$ and $\mathit{exp} \ge 2^{11}$ it uses
-[Montgomery multiplication](algorithms/arithmetic/montgomery) instead.
+`nmod_pow_ui` uses binary exponentiation, with `_nmod_mul_halflimb` for
+$n \le 2^{\bits / 2}$ and `n_mulmod_preinv` on the normalised modulus
+otherwise. For odd $n$ it uses
+[Montgomery multiplication](algorithms/arithmetic/montgomery) instead from
+$\mathit{exp} \ge 8$ ($\mathit{exp} \ge 16$ for $n \ge 2^{\bits - 2}$),
+and for $n \le 2^{\bits / 2}$ from $\mathit{exp} \ge 1024$ (half-limb
+Montgomery multiplication, $n < 2^{\bits / 2 - 2}$) or
+$\mathit{exp} \ge 2048$ (other odd $n$). `n_powmod2_ui_preinv` uses the
+same algorithms.
 `nmod_pow_fmpz` calls `n_powmod2_fmpz_preinv`, after inverting $a$ with
 `n_gcdinv` if the exponent is negative, as `n_powmod2_preinv` does.
 :::
@@ -215,12 +221,16 @@ same method in Montgomery arithmetic.
 
 ::: function
 ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod)
+ulong _nmod_pow_ui_binexp_halflimb(ulong a, ulong exp, nmod_t mod)
 ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod)
+ulong _nmod_pow_ui_redc_half(ulong a, ulong exp, nmod_t mod)
 ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod)
 
 The algorithms behind `nmod_pow_ui` and `nmod_2_pow_ui`, with the same
-results. The first two require $\mathit{exp} \ge 1$ (they do not terminate
-for $\mathit{exp} = 0$), and `_nmod_pow_ui_redc` requires odd $n$.
+results. The first four require $\mathit{exp} \ge 1$ (they do not
+terminate for $\mathit{exp} = 0$). `_nmod_pow_ui_binexp_halflimb`
+requires $n \le 2^{\bits / 2}$, `_nmod_pow_ui_redc` odd $n$, and
+`_nmod_pow_ui_redc_half` odd $n < 2^{\bits / 2 - 2}$.
 `_nmod_2_pow_ui_binexp` accepts any $n$ and any exponent.
 :::
 

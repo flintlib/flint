@@ -286,6 +286,8 @@ int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod);
 
 ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod);
 ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_binexp_halflimb(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_redc_half(ulong a, ulong exp, nmod_t mod);
 ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod);
 
 NMOD_INLINE ulong
