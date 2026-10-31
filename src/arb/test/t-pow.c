@@ -246,5 +246,42 @@ TEST_FUNCTION_START(arb_pow, state)
         arb_clear(d);
     }
 
+    /* a zero midpoint must not give nan for a large exact integer exponent either */
+    {
+        arb_t a, b, c, d;
+        fmpz_t e;
+
+        arb_init(a);
+        arb_init(b);
+        arb_init(c);
+        arb_init(d);
+        fmpz_init(e);
+
+        arf_zero(arb_midref(a));
+        mag_one(arb_radref(a));
+
+        fmpz_one(e);
+        fmpz_mul_2exp(e, e, 64);
+        arb_set_fmpz(b, e);
+
+        arb_pow(c, a, b, 64);
+        arb_pow_fmpz(d, a, e, 64);
+
+        if (!arb_is_finite(c) || !arb_overlaps(c, d))
+        {
+            flint_printf("FAIL: zero midpoint, large exact integer exponent\n\n");
+            flint_printf("a = "); arb_print(a); flint_printf("\n\n");
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_printf("d = "); arb_print(d); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_clear(a);
+        arb_clear(b);
+        arb_clear(c);
+        arb_clear(d);
+        fmpz_clear(e);
+    }
+
     TEST_FUNCTION_END(state);
 }
