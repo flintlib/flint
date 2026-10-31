@@ -14,9 +14,10 @@ $$
 
 is the unreduced dot product. FLINT never reduces modulo $n$ inside the
 loop. It computes $S$ exactly, or a value congruent to $S$ that fits in
-fewer words, and reduces once at the end with the
-[Möller–Granlund](algorithms/arithmetic/moller-granlund) division used by
-`NMOD_RED`, `NMOD2_RED2` and `NMOD_RED3`. This is the technique of
+fewer words, and reduces once at the end with `NMOD_RED` (one word,
+[Barrett](algorithms/arithmetic/barrett#nmod)), `NMOD2_RED2` or `NMOD_RED3`
+(two or three words,
+[Möller–Granlund](algorithms/arithmetic/moller-granlund)). This is the technique of
 *delayed modular reduction*, systematically used in exact linear algebra
 since FFLAS [@DGP2002; @DGP2008]. Those libraries compute $S$ in
 floating-point arithmetic, which is exact while $S < 2^{53}$. FLINT

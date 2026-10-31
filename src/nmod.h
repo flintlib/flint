@@ -44,7 +44,14 @@ extern "C" {
 
 #define NMOD_RED(r, a, mod) \
   do { \
-    NMOD_RED2(r, UWORD(0), a, mod); \
+    const ulong axx = (a); \
+    ulong rxx = axx; \
+    if ((mod).norm != 0) \
+    { \
+      const ulong mxx = ((mod).ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1)); \
+      rxx -= (n_mulhi(axx, mxx) >> (FLINT_BITS - 1 - (mod).norm)) * (mod).n; \
+    } \
+    (r) = (rxx >= (mod).n) ? rxx - (mod).n : rxx; \
   } while (0)
 
 #define NMOD2_RED2(r, a_hi, a_lo, mod) \

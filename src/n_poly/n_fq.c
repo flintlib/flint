@@ -150,7 +150,7 @@ void n_fq_add_si(
 
     if (c < 0)
     {
-        ulong cc = -c;
+        ulong cc = -(ulong) c;
         if (cc >= ctx->mod.n)
             NMOD_RED(cc, cc, ctx->mod);
         a[0] = nmod_sub(a[0], cc, ctx->mod);

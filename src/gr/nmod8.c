@@ -114,7 +114,7 @@ nmod8_set_si(nmod8_t res, slong v, const gr_ctx_t ctx)
 {
     ulong t;
     nmod_t mod = NMOD8_CTX(ctx);
-    t = FLINT_ABS(v);
+    t = FLINT_UABS(v);
     NMOD_RED(t, t, mod);
     if (v < 0)
         t = nmod_neg(t, mod);
