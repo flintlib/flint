@@ -70,6 +70,7 @@ extern "C" {
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
+#define NMOD_IS_HALFLIMB(mod) ((mod).n <= (UWORD(1) << (FLINT_BITS / 2)))
 
 #define NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod) \
   do { \
@@ -228,6 +229,21 @@ ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 }
 
 NMOD_INLINE
+ulong _nmod_mul_halflimb(ulong a, ulong b, nmod_t mod)
+{
+    /* a*b fits in one word, reduce it with the Barrett step in NMOD_RED
+     * but without the branch for norm = 0 */
+    const ulong p = a * b;
+    const ulong m = (mod.ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+    ulong r;
+    FLINT_ASSERT(NMOD_IS_HALFLIMB(mod));
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    r = p - (n_mulhi(p, m) >> (FLINT_BITS - 1 - mod.norm)) * mod.n;
+    return (r >= mod.n) ? r - mod.n : r;
+}
+
+NMOD_INLINE
 ulong nmod_addmul(ulong s, ulong a, ulong b, nmod_t mod)
 {
     ulong hi, lo;
@@ -270,6 +286,8 @@ int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod);
 
 ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod);
 ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_binexp_halflimb(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_redc_half(ulong a, ulong exp, nmod_t mod);
 ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod);
 
 NMOD_INLINE ulong
