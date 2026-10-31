@@ -891,19 +891,41 @@ int nmod_mpoly_resultant(nmod_mpoly_t R,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                     slong var, const nmod_mpoly_ctx_t ctx);
 
-/* res_y(A, B) for dense bivariate A, B over a word-size prime field, by
-   evaluation at a geometric progression or at roots of unity, resultants of
-   the univariate specialisations, and interpolation. The modulus must be
-   prime. Returns 0, leaving res untouched, when the field is too small for
-   the required number of points. */
+int nmod_mpoly_resultant_kronecker(nmod_mpoly_t R,
+                        const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                    slong var, const nmod_mpoly_ctx_t ctx);
+
+int _nmod_mpoly_resultant_kronecker_cutoff(
+                        const mpoly_resultant_kronecker_t K, slong Alen,
+                                                                slong Blen);
+
+/* res_y(A, B) for dense bivariate A, B over a word-size prime field, given
+   that it has length at most rlen in x, by evaluation at a geometric
+   progression or at roots of unity, resultants of the univariate
+   specialisations, and interpolation. The modulus must be prime. Returns 0,
+   leaving res untouched, when the field is too small for the required number
+   of points. */
+int _n_bpoly_mod_resultant_multipoint(n_poly_t res, const n_poly_struct * A,
+          slong lenA, const n_poly_struct * B, slong lenB, slong rlen,
+          nmod_t mod);
+
+/* res_y(A, B) by the bivariate algorithm that suits the sizes best, the
+   resultant having length at most rlen in x (WORD_MAX if nothing better is
+   known), or with no bound. Every resultant of dense bivariate polynomials
+   over nmod in FLINT goes through these. */
+int _n_bpoly_mod_resultant_len(n_poly_t res, const n_poly_struct * A,
+          slong lenA, const n_poly_struct * B, slong lenB, slong rlen,
+          nmod_t mod);
+
 int _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * A, slong lenA,
                         const n_poly_struct * B, slong lenB, nmod_t mod);
 
 int n_bpoly_mod_resultant(n_poly_t res, const n_bpoly_t A, const n_bpoly_t B,
                                                                nmod_t mod);
 
-/* Whether the algorithm above is expected to beat the subresultant PRS at
-   these sizes, npoints being the bound on the degree in x of the resultant. */
+/* Whether the bivariate algorithms above are expected to beat the
+   subresultant PRS at these sizes, npoints being the bound on the length in x
+   of the resultant. */
 int n_bpoly_mod_resultant_cutoff(slong lenA, slong lenB, slong npoints);
 
 int nmod_mpoly_discriminant(nmod_mpoly_t R,

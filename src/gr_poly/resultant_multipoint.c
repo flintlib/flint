@@ -17,8 +17,8 @@
 #include "nmod_mpoly.h"
 #include "gr_poly.h"
 
-/* The algorithm itself is n_bpoly_mod_resultant, over the dense bivariate
-   type of the nmod_mpoly module. A polynomial over a polynomial ring over
+/* The algorithm itself is _n_bpoly_mod_resultant_multipoint, over the dense
+   bivariate type of the nmod_mpoly module. A polynomial over a polynomial ring over
    nmod has exactly that layout: a gr_poly_struct is a pointer, an alloc and a
    length, as n_bpoly_struct is, and its coefficients are gr_poly_structs
    whose own coefficients are a flat array of ulong, as n_poly_struct is. The
@@ -54,9 +54,9 @@ _gr_poly_resultant_multipoint(gr_ptr res, gr_srcptr A, slong lenA,
     FLINT_ASSERT(sizeof(gr_poly_struct) == sizeof(n_poly_struct));
     FLINT_ASSERT(cctx->sizeof_elem == sizeof(ulong));
 
-    if (!_n_bpoly_mod_resultant((n_poly_struct *) res,
+    if (!_n_bpoly_mod_resultant_multipoint((n_poly_struct *) res,
             (const n_poly_struct *) A, lenA,
-            (const n_poly_struct *) B, lenB, NMOD_CTX(cctx)))
+            (const n_poly_struct *) B, lenB, WORD_MAX, NMOD_CTX(cctx)))
         return GR_UNABLE;
 
     return GR_SUCCESS;

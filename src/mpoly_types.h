@@ -150,6 +150,30 @@ typedef struct
 
 typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
 
+/* res_y(A, B) through Kronecker substitution: the variables other than y are
+   shifted and deflated, then packed into a single variable t, so that the
+   dense bivariate resultant over (t, y) applies. See resultant_kronecker.c */
+typedef struct
+{
+    slong var;          /* the variable y eliminated */
+    slong lenA, lenB;   /* lengths in y */
+    slong tlenA, tlenB; /* bounds on the lengths in t of the packed coefficients */
+    slong nused;        /* number of variables packed into t */
+    double npoints;     /* product of bound[]: bound on the length in t of the result */
+    double nterms;      /* estimate of the number of terms of the result */
+    flint_bitcnt_t Rbits; /* exponent bits for the result */
+
+    ulong * Amin;       /* minimum exponents of A */
+    ulong * Bmin;       /* minimum exponents of B */
+    ulong * stride;     /* common deflation strides */
+    ulong * bound;      /* one more than the degree bound of the deflated resultant */
+    ulong * kstride;    /* Kronecker strides, 0 for a variable not packed */
+    ulong * rshift;     /* exponents of the monomial factor of the resultant */
+    ulong * exps;       /* scratch */
+} mpoly_resultant_kronecker_struct;
+
+typedef mpoly_resultant_kronecker_struct mpoly_resultant_kronecker_t[1];
+
 typedef struct {
     slong mvars;
     slong nvars;

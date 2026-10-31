@@ -602,7 +602,9 @@ _n_bpoly_mod_resultant_dft(n_poly_struct * res,
    Measured over nmod, it is ahead as soon as the lengths in y reach
    MULTIPOINT_CUTOFF, and just below that it still needs a resultant of large
    enough degree in x to pay for the evaluation. Lengths in y of three and
-   less are better served by a direct formula and are not expected here. */
+   less are better served by a direct formula and are not expected here.
+   n_bpoly_mod_resultant_cutoff speaks for _n_bpoly_mod_resultant_len, so for
+   the best of its algorithms; for now that is this one. */
 #define MULTIPOINT_CUTOFF 36
 #define MULTIPOINT_CUTOFF_SMALL 16
 #define MULTIPOINT_CUTOFF_POINTS 4096
@@ -621,12 +623,15 @@ n_bpoly_mod_resultant_cutoff(slong lenA, slong lenB, slong npoints)
    lenB with coefficients in (Z/pZ)[x]. The modulus must be prime, and the
    leading coefficients in y must be nonzero, the degree bound and the
    specialisation property below both reading the degrees in y off the two
-   lengths. Returns 0, leaving res untouched, when the field is too small to
-   hold a geometric progression of the required length; the transform path is
-   tried first and has its own conditions. */
+   lengths. The resultant must have length at most rlen in x, a bound the
+   caller may know better than the one read off the degrees below. Returns 0,
+   leaving res untouched, when the field is too small to hold a geometric
+   progression of the required length; the transform path is tried first and
+   has its own conditions. */
 int
-_n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * Ax, slong lenA,
-                       const n_poly_struct * Bx, slong lenB, nmod_t mod)
+_n_bpoly_mod_resultant_multipoint(n_poly_t res, const n_poly_struct * Ax,
+                           slong lenA, const n_poly_struct * Bx, slong lenB,
+                           slong rlen, nmod_t mod)
 {
     nmod_geometric_progression_t G;
     nn_ptr valA, valB, valres, resc, tmp, spow, w, f;
@@ -655,6 +660,9 @@ _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * Ax, slong lenA,
        makes npoints >= maxlen, since lenA, lenB >= 2 */
     npoints = (lenB - 1) * (blenA - 1) + (lenA - 1) * (blenB - 1) + 1;
     maxlen = FLINT_MAX(blenA, blenB);
+
+    /* the evaluation below wants at least maxlen points */
+    npoints = FLINT_MIN(npoints, FLINT_MAX(rlen, maxlen));
 
 #if FLINT_HAVE_FFT_SMALL
     if (_n_bpoly_mod_resultant_dft(res, Ax, lenA, Bx, lenB,
@@ -769,6 +777,29 @@ _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * Ax, slong lenA,
     return 1;
 }
 
+/* The bivariate resultant over Z/pZ, by whichever algorithm suits the sizes
+   best. This is the one place where one is chosen: nmod_mpoly_resultant on
+   the packed form of its inputs, fmpz_mpoly_resultant and
+   fmpq_mpoly_resultant through _fmpz_bpoly_resultant_len on the images
+   modulo primes, and the resultants of the generic polynomial rings over
+   nmod all come through here, so that an algorithm added below is used by
+   all of them in its range. The algorithms are threaded themselves.
+   Multipoint evaluation is the only one so far. */
+int
+_n_bpoly_mod_resultant_len(n_poly_t res, const n_poly_struct * Ax,
+                           slong lenA, const n_poly_struct * Bx, slong lenB,
+                           slong rlen, nmod_t mod)
+{
+    return _n_bpoly_mod_resultant_multipoint(res, Ax, lenA, Bx, lenB,
+                                                                 rlen, mod);
+}
+
+int
+_n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * Ax, slong lenA,
+                       const n_poly_struct * Bx, slong lenB, nmod_t mod)
+{
+    return _n_bpoly_mod_resultant_len(res, Ax, lenA, Bx, lenB, WORD_MAX, mod);
+}
 
 int
 n_bpoly_mod_resultant(n_poly_t res, const n_bpoly_t A, const n_bpoly_t B,
