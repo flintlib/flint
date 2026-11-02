@@ -235,6 +235,17 @@ test_ops(flint_rand_t state, slong iters, slong maxsize, slong maxn)
             arb_clear(rr); arb_clear(tt);
         }
 
+        /* pow_ui (in place when aliased): the exact power of the point */
+        {
+            ulong e = n_randint(state, 12), i;
+            if (aliased == 1) { mp_real_set(r, a); mp_real_pow_ui(r, r, e, n); }
+            else mp_real_pow_ui(r, a, e, n);
+            arf_one(tr);
+            for (i = 0; i < e; i++)
+                arf_mul(tr, tr, ta, ARF_PREC_EXACT, ARF_RND_NEAR);
+            check_contains(r, tr, "pow_ui", iter);
+        }
+
         /* div: denominator bounded away from zero, small radius */
         if (b->size >= 2)
         {

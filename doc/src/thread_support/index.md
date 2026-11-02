@@ -162,8 +162,9 @@ FLINT_PARALLEL_VERBOSE
 Flags for `flint_parallel_do`. `UNIFORM` gives each thread one contiguous
 block, which suits calls of equal cost. `STRIDED` gives thread $t$ of $T$
 the indices $i \equiv t \pmod T$, which balances costs that grow or shrink
-with $i$. `DYNAMIC` is not implemented and currently behaves like
-`UNIFORM`. `VERBOSE` prints the schedule.
+with $i$. `DYNAMIC` lets the threads take the next index from a shared
+counter as they become free, which balances calls of unequal and
+unpredictable cost. `VERBOSE` prints the schedule.
 :::
 
 ## Parallel binary splitting {#bsplit}

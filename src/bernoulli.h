@@ -68,16 +68,17 @@ FLINT_FORCE_INLINE slong bernoulli_global_prec(ulong nmax)
 /* avoid potential numerical problems for very small n */
 #define BERNOULLI_REV_MIN 32
 
+/* the largest index of the reverse iterator */
+#if FLINT_BITS == 64
+#define BERNOULLI_REV_NMAX (UWORD(1) << 30)
+#else
+#define BERNOULLI_REV_NMAX (UWORD(1) << 24)
+#endif
+
 typedef struct
 {
-    slong alloc;
-    slong prec;
-    slong max_power;
-    fmpz * powers;
-    fmpz_t pow_error;
-    arb_t prefactor;
-    arb_t two_pi_squared;
-    ulong n;
+    ulong n;            /* the index of the next number */
+    void * data;        /* the state (see rev.c), NULL for n < 32 */
 }
 bernoulli_rev_struct;
 

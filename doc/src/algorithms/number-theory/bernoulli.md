@@ -80,27 +80,101 @@ the precision and the number of terms needed decrease along the way.
 1. Choose the precision $p$ from the size of $B_{n_{\max}}$ and of its
    denominator, and $J \approx 2^{(p+1)/(n_{\max} - 1)}$.
 2. For odd $j = 3, 5, \ldots, J$ compute $P_j = \lfloor 2^p j^{-n_{\max}}
-   \rceil$ with a bound on the rounding error. Compute $F = 2\, n_{\max}!
-   / (2\pi)^{n_{\max}}$ as a ball.
+   \rfloor$ with a bound on the rounding error. Compute $F = 2\, n_{\max}!
+   / (2\pi)^{n_{\max}}$.
 3. For $n = n_{\max}, n_{\max} - 2, \ldots$:
-   1. $Z = 1 + 2^{-p} \sum_j P_j$, plus the accumulated rounding error and
-      the tail $J^{1-n}$ as a radius. This encloses $\sum_{j \text{ odd}}
-      j^{-n} = (1 - 2^{-n}) \zeta(n)$.
-   2. $\zeta(n) = Z \cdot 2^n/(2^n - 1)$; $B_n = \pm F \zeta(n)$; round
-      $d_n B_n$ to the integer in the ball.
+   1. $S = 2^{-p} \sum_j P_j$ encloses $\sum_{j \ge 3 \text{ odd}} j^{-n}$
+      up to the accumulated rounding errors and the tail of the series.
+   2. $\delta = \zeta(n) - 1 = S + (1 + S)/(2^n - 1)$; $B_n = \pm F (1 +
+      \delta)$; round $d_n B_n$ to the integer, if the error bound allows
+      it.
    3. Update $P_j \gets j^2 P_j$, $F \gets F (2\pi)^2 / (n(n-1))$.
-   4. Every 32 steps, lower $p$ and $J$ to the values needed for the
+   4. Now and then, lower $p$ and $J$ to the values needed for the
       current $n$, truncating the $P_j$.
 :::
 
 Each step costs $O(J)$ multiplications of a $p$-bit number by a word,
-$O(n/\log n \cdot n \log n) = O(n^2)$ bit operations, so all the even
-Bernoulli numbers up to $n$ cost $O(n^3)$ in the worst case but with a
-very small constant, and blocks of a range are independent, which makes
-the computation easy to parallelise. `bernoulli_fmpq_vec_no_cache` splits
-the range into blocks, runs one reverse iterator per block (largest
-blocks first) on the threads of `flint_set_num_threads`, and the cache
-used by the `arb` special functions is filled this way.
+$O(n/\log n \cdot n \log n) = O(n^2)$ bit operations, plus two
+multiplications of $p$-bit numbers, so all the even Bernoulli numbers up
+to $n$ cost $O(n^3)$ in the worst case but with a very small constant.
+
+FLINT's implementation (`bernoulli_rev_init`, `bernoulli_rev_next`)
+organizes this as follows.
+
+* **Batches.** The numbers are produced in batches of $k = 16$
+  consecutive indices ($k = 8$ below $n = 4000$) and yielded from a
+  buffer. Step 3.1 for the whole batch is one pass over the table: for each
+  $j$, the $k$ multiplications by $j^2$ and the $k$ additions into the sums
+  are done while the number $P_j$ is in cache. The frame $p$ and the number
+  of terms $J$ are lowered at every batch.
+* **The table.** With AVX-512 IFMA, the $P_j$ are stored as digits of
+  50 bits (redundant, below $2^{51}$) in 64-bit lanes, multiplied by $j^2$
+  with `vpmadd52luq`/`vpmadd52huq` and summed without carries, the digit
+  sums being converted to limbs every 4096 powers; this needs $j <
+  2^{24}$. Otherwise the table is in limbs, updated by `mpn_mul_1` and
+  summed by `mpn_add_n` directly into the accumulators, eight powers at a
+  time by blocks of 256 limbs (the carries of the products between blocks
+  being kept), so that a block of a power is stepped $k$ times while in
+  cache and the blocks of the $k$ sums serve all eight powers; streaming
+  each power and the $k$ sums $k$ times over is bound by the memory
+  bandwidth once the powers exceed the L2 cache (half the speed for powers
+  of $2 \cdot 10^5$ limbs on one thread). In step 2 the
+  powers of the primes are computed by powering in ball arithmetic and
+  those of the composites $j = ab$ ($a$ the smallest prime factor) as
+  $\lfloor P_a P_b / 2^p \rfloor$ from the top limbs of the entries of $a$
+  and $b$, so that nothing beyond the table is held; the primes, and then
+  the composites in $[L, 3L)$ for $L = 9, 27, \ldots$ (whose cofactors are
+  below $L$), are done in parallel. The table takes about
+  $\sum_{j \le J} (p - n \log_2 j) \approx n^2/24$ bits; it shrinks as $n$
+  decreases (the frame is lowered by about $2 \log_2(n/2\pi)$ bits per
+  step while $P_j$ grows by $2 \log_2 j$ bits, $j \le J \approx n/(2\pi e)$),
+  and a buffer is reallocated when it is more than about 1/8 empty.
+* **The sieve.** For $n \ge 10^5$, the table only holds the $j$ prime to
+  $3$ and $5$ and, apart, the $\{3,5\}$-smooth $j$ (3, 5, 9, 15, 25, ...,
+  a few dozen): by unique factorization
+  $1 + \sum_{j \ge 3 \text{ odd}} j^{-n} = (1 + G)(1 + S)$ with $G$ and
+  $S$ the sums over the smooth and the prime-to-15 $j \le J$, up to terms
+  $j^{-n}$ with distinct odd $j > J$, which the tail bound covers. This
+  costs one product $GS$ per number, of the size of $15^{-n}$ in the
+  frame, and removes $1 - (2/3)(4/5) = 7/15$ of the $j$ and about as much
+  of the table (more of the small $j$, which hold the most limbs, are
+  removed than of the large ones), saving more in the table pass than the
+  product costs at these sizes. The smooth powers stay in limbs (with
+  digits, their frame is lowered by shifts) and are summed by one task of
+  the pass.
+* **The products.** $F$ is a floating-point number of $W \approx p/64 + 2$
+  limbs. The two products of a step, $F (2\pi)^2$ and $F \delta$, both
+  only need the high half: $\delta$ is aligned so that both read the
+  window of limbs $[W - 1, 2W)$ of a product of $W$-limb operands, and with
+  `fft_small` the forward transform of $F$ is shared by the two products
+  and that of $(2\pi)^2$ is cached, so that a step costs four transforms.
+  $W$ is lowered in steps of about 3%, so that the transform plan serves
+  many batches. The division by $2^n - 1$ in step 3.2 is done in linear
+  time, by summing the $n$-bit chunks of the dividend from the top.
+* **Rounding.** All the error terms are tracked, and the fraction of $d_n
+  F (1 + \delta)$ must stay away from $1/2$ by more than the error bound;
+  otherwise (which is not expected to happen) $B_n$ is computed by
+  `_bernoulli_fmpq_ui`.
+* **Threads.** The numbers of a batch become independent if the
+  prefactors are obtained as $F_{n_0 - 2t} = F_{n_0} (2\pi)^{2t} /
+  (n_0 (n_0 - 1) \cdots (n_0 - 2t + 1))$ from the transform of $F_{n_0}$
+  and cached transforms of $(2\pi)^{2t}$, at the cost of a division by a
+  short multi-limb integer per number. With threads, the numbers of a
+  batch are tasks taken by the threads (the expensive ones first), and the
+  threads then take chunks of powers for the table pass of the next batch,
+  summing into their own accumulators, which the tasks of the next batch
+  add up. The threads are requested when a batch starts, and the serial
+  scheme is used if none are free.
+
+Threading inside each number (for example in the transforms) does not
+pay at these sizes, while separate iterators on disjoint ranges of $n$,
+which parallelise perfectly, each need their own table and initialisation
+and, to yield the numbers in order, the buffering of a whole range.
+`bernoulli_fmpq_vec_no_cache` (which fills the cache used by the `arb`
+special functions) stores the whole range anyway: with up to three
+threads it runs one iterator, and with more it runs independent iterators
+on 32 blocks of the range (largest blocks first), which cost about 1.45
+times as much in total but parallelise perfectly.
 
 ## Harvey's multimodular algorithm {#multimodular}
 
@@ -185,8 +259,8 @@ of $\cosh$ modulo primes (`arith_euler_number_vec`).
 | `_bernoulli_fmpq_ui_zeta` | the zeta function via `arb_bernoulli_ui_zeta` |
 | `_bernoulli_fmpq_ui_multi_mod` | `bernoulli_mod_p_harvey` on many primes in parallel, plus the zeta function for the high part |
 | `bernoulli_mod_p_harvey` | Harvey's algorithm with Kummer's congruence |
-| `bernoulli_rev_init`, `bernoulli_rev_next` | the reverse iterator [](#alg-rev) |
-| `bernoulli_fmpq_vec_no_cache`, `bernoulli_cache_compute` | reverse iterators on blocks, in parallel |
+| `bernoulli_rev_init`, `bernoulli_rev_next` | the reverse iterator [](#alg-rev), in batches, threaded |
+| `bernoulli_fmpq_vec_no_cache`, `bernoulli_cache_compute` | one reverse iterator, or iterators on blocks in parallel (more than three threads) |
 | `arith_bernoulli_number_vec` | Ramanujan's recursion ($n < 700$) or power series modulo primes |
 | `arith_euler_number`, `arith_euler_number_vec` | the beta function and multimodular methods; power series modulo primes |
 

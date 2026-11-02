@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -36,12 +36,12 @@ static const __u32 __bernoulli_denom_small[] =
     UWORD(1074),
 };
 
+/* For even n > 178: the product of the primes d + 1 over the divisors d
+   of n (von Staudt-Clausen), the divisors enumerated from the
+   factorization of n -- a few hundred primality tests at most for
+   n < 2^32, instead of a scan of the primes up to n + 1. */
 void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
-    slong i;
-    ulong p;
-    const ulong * primes;
-
     if (n % 2 == 1)
     {
         fmpz_set_ui(den, 1 + (n == 1));
@@ -52,17 +52,38 @@ void arith_bernoulli_number_denom(fmpz_t den, ulong n)
     }
     else
     {
-        n_prime_pi_bounds(&p, &p, n);
-        primes = n_primes_arr_readonly(p + 2);
+        n_factor_t fac;
+        ulong * divs;
+        slong i, j, e, nd, m, ndiv;
 
-        fmpz_set_ui(den, UWORD(6));
-        for (i = 2; i < n; i++)
+        n_factor_init(&fac);
+        n_factor(&fac, n, 1);
+
+        ndiv = 1;
+        for (i = 0; i < fac.num; i++)
+            ndiv *= fac.exp[i] + 1;
+        divs = flint_malloc(ndiv * sizeof(ulong));
+
+        divs[0] = 1;
+        nd = 1;
+        for (i = 0; i < fac.num; i++)
         {
-            p = primes[i];
-            if (p - 1 > n)
-                break;
-            if (n % (p - 1) == 0)
-                fmpz_mul_ui(den, den, p);
+            ulong p = fac.p[i], pe = 1;
+
+            m = nd;
+            for (e = 1; e <= fac.exp[i]; e++)
+            {
+                pe *= p;
+                for (j = 0; j < m; j++)
+                    divs[nd++] = divs[j] * pe;
+            }
         }
+
+        fmpz_one(den);
+        for (i = 0; i < nd; i++)
+            if (n_is_prime(divs[i] + 1))
+                fmpz_mul_ui(den, den, divs[i] + 1);
+
+        flint_free(divs);
     }
 }
