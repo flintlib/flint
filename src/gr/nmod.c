@@ -755,8 +755,16 @@ _gr_nmod_vec_mul(ulong * res, const ulong * vec1, const ulong * vec2, slong len,
     slong i;
     nmod_t mod = NMOD_CTX(ctx);
 
-    for (i = 0; i < len; i++)
-        res[i] = nmod_mul(vec1[i], vec2[i], mod);
+    if (NMOD_IS_HALFLIMB(mod))
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod_mul_halflimb(vec1[i], vec2[i], mod);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = nmod_mul(vec1[i], vec2[i], mod);
+    }
 
     return GR_SUCCESS;
 }
@@ -912,6 +920,13 @@ _gr_nmod_vec_product(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 
             for (i = 2; i < len; i++)
                 p = _nmod_mul_fullword(p, vec[i], mod);
+        }
+        else if (NMOD_IS_HALFLIMB(mod))
+        {
+            p = _nmod_mul_halflimb(vec[0], vec[1], mod);
+
+            for (i = 2; i < len; i++)
+                p = _nmod_mul_halflimb(p, vec[i], mod);
         }
         else
         {

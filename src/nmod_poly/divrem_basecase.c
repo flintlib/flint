@@ -322,7 +322,7 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R,
         R2[2 * i + 1] = 0;
     }
 
-    halflimb = (mod.n <= (UWORD(1) << (FLINT_BITS / 2)));
+    halflimb = NMOD_IS_HALFLIMB(mod);
 
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
