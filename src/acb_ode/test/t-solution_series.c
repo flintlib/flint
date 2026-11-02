@@ -35,7 +35,7 @@ TEST_GR_FUNCTION_START(acb_ode_solution_series, state, count_success, count_doma
         int expect_success = 0, ordinary = 0;
         const char * fail = NULL;
         slong n = 0, n2 = 0;
-        ulong flags = 0, lflags = 0;
+        ulong flags = 0;
 
         slong prec = 2 + n_randint(state, 200);
 
@@ -103,7 +103,7 @@ TEST_GR_FUNCTION_START(acb_ode_solution_series, state, count_success, count_doma
             status |= acb_ode_exponents(expos, dop, Dop, CC);
         }
 
-        status |= acb_ode_local_diffop(ldop, &lflags, dop, Dop, Euler);
+        status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
 
         if (status != GR_SUCCESS || expos->ngroups == 0)
         {

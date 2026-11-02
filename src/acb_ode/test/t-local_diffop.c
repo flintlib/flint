@@ -41,7 +41,6 @@ TEST_FUNCTION_START(acb_ode_local_diffop, state)
         int status = GR_SUCCESS;
         const char * fail = NULL;
         gr_ctx_t Pol, Dop, Pol1, Euler;
-        ulong flags = 0;
 
         gr_ctx_struct * rings[] = { ZZ, QQ, ZZi, QQbar };
         gr_ctx_struct * Cst = rings[n_randint(state, 4)];
@@ -75,8 +74,7 @@ TEST_FUNCTION_START(acb_ode_local_diffop, state)
         }
         GR_MUST_SUCCEED(status);
 
-        /* todo: test handling of flags? (more or less done indirectly elsewhere) */
-        status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+        status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
 
         if (status != GR_SUCCESS)
         {

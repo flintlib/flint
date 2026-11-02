@@ -1181,7 +1181,6 @@ test_euler_pm_i(void)
     acb_mat_t mat;
     slong prec = 128;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -1199,7 +1198,7 @@ test_euler_pm_i(void)
 
     acb_set_d(pt, 0.5);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "x^2*D^2 + x*D + 1", Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -1951,7 +1950,6 @@ test_whittaker(void)
     acb_mat_t mat;
     slong prec = 128;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -1970,7 +1968,7 @@ test_whittaker(void)
     acb_set_si(pt, 10);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "4*x^2*D^2 - x^2 + 8*x - 11",
                                         Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -2021,7 +2019,6 @@ test_lclm_xpow(void)
     acb_mat_t mat;
     slong prec = 128;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -2041,7 +2038,7 @@ test_lclm_xpow(void)
     acb_div_ui(pt, pt, 3, prec);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
             "(49*x^2 - 21*x)*D^2 - (49*x^2 + 12)*D + 21*x + 12", Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -2099,7 +2096,6 @@ test_hyp0f1_sqrt2(void)
     acb_mat_t mat;
     slong prec = 128;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -2117,7 +2113,7 @@ test_hyp0f1_sqrt2(void)
 
     acb_onei(pt);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "x^2*D^2 + x*D - x - 2", Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -2172,7 +2168,6 @@ test_hyp0f2_cbrt2(void)
     acb_mat_t mat;
     slong prec = 128;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -2192,7 +2187,7 @@ test_hyp0f2_cbrt2(void)
     acb_one(pt);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
             "x^3*D^3 + 3*x^2*D^2 + x*D - x - 2", Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -2251,7 +2246,6 @@ my_mittag_leffler_2(acb_t res, const acb_t z, slong prec)
     acb_ode_exponents_t expos;
     acb_mat_t mat;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_gr_poly(Pol, ZZ);
@@ -2264,7 +2258,7 @@ my_mittag_leffler_2(acb_t res, const acb_t z, slong prec)
     acb_mat_init(mat, 1, 2);
 
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "4*x^2*D^2 + 2*x*D - x", Dop));
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, z,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -3113,7 +3107,6 @@ large_entries(acb_mat_t mat, const char * a_str, slong prec)
     gr_ptr a, b;
     acb_t pt;
     int status = GR_SUCCESS;
-    ulong flags = 0;
 
     gr_ctx_init_complex_qqbar(QQbar);
     gr_ctx_init_complex_acb(CC, prec);
@@ -3133,7 +3126,7 @@ large_entries(acb_mat_t mat, const char * a_str, slong prec)
     GR_MUST_SUCCEED(gr_sub(b, b, a, QQbar));
     GR_MUST_SUCCEED(gr_set_other(pt, b, QQbar, CC));
     shift_dop(dop, dop, a, Dop);
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     status |= acb_ode_exponents(expos, ldop, Euler, CC);
 
     grp = expos->groups;

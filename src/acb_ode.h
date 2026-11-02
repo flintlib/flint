@@ -392,8 +392,10 @@ WARN_UNUSED_RESULT int acb_ode_solution_series(gr_poly_vec_t series, const gr_or
 
 void acb_ode_randtest_acb(acb_poly_struct * dop, acb_struct * lcroots, acb_ode_exponents_t expos, flint_rand_t state, slong disp, slong lcdeg, slong clen, slong len, slong prec);
 void acb_ode_local_diffop_ctx_init(gr_ctx_t Pol, gr_ore_poly_ctx_t Euler, gr_ctx_t Dop, gr_ctx_t Cst);
-WARN_UNUSED_RESULT int acb_ode_local_diffop(gr_ore_poly_t ldop, ulong * flags, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ore_poly_ctx_t Euler);
+WARN_UNUSED_RESULT int _acb_ode_local_diffop(gr_poly_struct * ldop, const gr_poly_struct * dop, slong len, ore_algebra_t src_alg, gr_ctx_t Pol);
+WARN_UNUSED_RESULT int acb_ode_local_diffop(gr_ore_poly_t ldop, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ore_poly_ctx_t Euler);
 WARN_UNUSED_RESULT int acb_ode_lc_roots(acb_ptr lcrt, const gr_ore_poly_t dop, gr_ctx_t Dop, int include_zero, gr_ctx_t CC);
+ulong acb_ode_analyze(const gr_ore_poly_t dop, ulong flags, gr_ctx_t Dop);
 
 #ifdef __cplusplus
 }

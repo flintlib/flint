@@ -297,7 +297,9 @@ acb_ode_fundamental_matrix_vec(
     acb_ode_local_diffop_ctx_init(Pol1, Euler, Dop, Cst);
     GR_TMP_INIT(ldop, Euler);
 
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    flags |= acb_ode_analyze(dop, flags, Dop);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
+    flags |= acb_ode_analyze(ldop, flags, Euler);
 
     if (expos == NULL)
     {

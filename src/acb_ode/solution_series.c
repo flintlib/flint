@@ -53,7 +53,9 @@ acb_ode_solution_series(gr_poly_vec_t series,
     acb_ode_local_diffop_ctx_init(wCCx, Euler, Dop, wCC);
     GR_TMP_INIT(ldop, Euler);
 
-    status |= acb_ode_local_diffop(ldop, &flags, dop, Dop, Euler);
+    flags |= acb_ode_analyze(dop, flags, Dop);
+    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
+    flags |= acb_ode_analyze(ldop, flags, Euler);
 
     if (!(flags & ACB_ODE_REGULAR))
         status |= GR_UNABLE;

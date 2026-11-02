@@ -918,11 +918,19 @@ int acb_ode_local_diffop(gr_ore_poly_t ldop, ulong * flags, const gr_ore_poly_t 
 
 Set `ldop` to an operator in `Euler` equal to `dop` up to multiplication from
 the left by a power of `x`, removing common power-of-$x$ factors from the
-coefficients of the result. Update the flag set `* flags` by setting the flags
-`ACB_ODE_NONZERO`, `ACB_ODE_REGULAR`, and `ACB_ODE_ORDINARY` when the operator
-is determined, respectively, to be nonzero, to have a regular (in the sense of
-ordinary or regular singular) point at the origin, and to have an ordinary point
-at the origin.
+coefficients of the result.
+:::
+
+::: function
+ulong acb_ode_analyze(const gr_ore_poly_t dop, ulong flags, gr_ctx_t Dop);
+
+Return a combination of the flags `ACB_ODE_NONZERO`, `ACB_ODE_REGULAR`, and
+`ACB_ODE_ORDINARY` indicating if the operator has been determined, respectively,
+to be nonzero, to have a regular (in the sense of ordinary or regular singular)
+point at the origin, and to have an ordinary point at the origin.
+The absence of a flag in the result does not imply that the corresponding
+property does not hold. Already known properties can be passed as `flags` in the
+same format.
 :::
 
 ::: function
