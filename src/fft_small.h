@@ -491,6 +491,10 @@ void _mpn_ctx_mpn_mullow_np2(mpn_ctx_t R, nn_ptr z, ulong zh,
 /* limbs [zl, zh): exact for zl = 0, lower approximation otherwise */
 void _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl,
                     ulong zh, nn_srcptr a, ulong an, nn_srcptr b, ulong bn);
+/* the same window with its lowest nlow limbs diverted to zlow */
+void _mpn_ctx_mpn_mul_window_np2_split(mpn_ctx_t R, nn_ptr z, nn_ptr zlow,
+                    ulong nlow, ulong zl, ulong zh, nn_srcptr a, ulong an,
+                    nn_srcptr b, ulong bn);
 /* Garner + register-window recomposition of two-prime lanes; see the
    definition for the contract. depth == UWORD_MAX means the lanes are
    already plain residues. */
@@ -499,12 +503,20 @@ void _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
                     ulong zl, ulong zh, double * d0, double * d1,
                     ulong nchunks, ulong navail8, ulong bits,
                     ulong depth);
+void _fft_small_np2_crt_recompose_split(const mpn_ctx_struct * R, nn_ptr z,
+                    nn_ptr zlow, ulong nlow, ulong zl, ulong zh,
+                    double * d0, double * d1, ulong nchunks,
+                    ulong navail8, ulong bits, ulong depth);
 int _fft_small_np2_choose(const mpn_ctx_struct * R, ulong an, ulong bn,
                     ulong len_bound, ulong * bits, ulong * depth);
 void _fft_small_np2_pack(double * d, double * d2, nn_srcptr x, ulong xn,
                     ulong len, ulong itrunc, ulong bits);
 
 void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi, const ulong* a, ulong an, const ulong* b, ulong bn);
+/* The window [lo, hi) with its lowest nlow limbs written to zlow and the
+   remaining hi - lo - nlow limbs to z: the guard limbs of a high product
+   land in a separate buffer, the output in place. */
+void _mpn_ctx_mpn_mul_range_split(mpn_ctx_t R, ulong* z, ulong* zlow, ulong nlow, ulong lo, ulong hi, const ulong* a, ulong an, const ulong* b, ulong bn);
 
 /* ------------------------------------------------------------------------ */
 /* FFT plans and transformed operands                                       */

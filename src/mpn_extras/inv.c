@@ -263,31 +263,40 @@ flint_mpn_inv(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
     and above, _mp_real_inv_newton with one guard limb instead of three,
     rounded up by more than its error bound.
 */
-void
-flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
+/* the cases of flint_mpn_invapprox: the exact division chains (xn <= 2)
+   and register-based division with the numerator on the stack, which are
+   as fast as any approximation; the Newton iteration from its cutoffs;
+   the division of B^n in between */
+#define _INVAPPROX_BASECASE(x, xn, n) ((xn) <= 2 || ((xn) <= FLINT_MPN_DIV_SMALL_BN && \
+    (n) < 3 * FLINT_MPN_DIV_SMALL_BN && FLINT_MPN_DIV_SMALL_SHAPE((n) + 1, (xn), 0)))
+#define _INVAPPROX_NEWTON(x, xn, n, qn) (!_INVAPPROX_BASECASE(x, xn, n) && \
+    FLINT_MIN((xn), (qn)) >= INV_NEWTON_CUTOFF((xn), (qn)))
+
+/*
+    flint_mpn_invapprox with the scratch of the Newton iteration supplied:
+    U has n - xn + 4 limbs, and the n - xn + 2 limbs of the result are
+    written to U or U + 2, which is returned.
+*/
+mp_ptr
+_flint_mpn_invapprox_buf(mp_ptr U, mp_srcptr x, mp_size_t xn, mp_size_t n)
 {
     mp_size_t qn = n - xn + 2, p;
-    mp_ptr U;
-    TMP_INIT;
 
     FLINT_ASSERT(xn >= 1);
     FLINT_ASSERT(n >= xn);
     FLINT_ASSERT(x[xn - 1] != 0);
 
-    /* the exact division chains (xn <= 2) and register-based division with
-       the numerator on the stack are as fast as any approximation */
-    if (xn <= 2 || (xn <= FLINT_MPN_DIV_SMALL_BN && n < 3 * FLINT_MPN_DIV_SMALL_BN
-        && FLINT_MPN_DIV_SMALL_SHAPE(n + 1, xn, 0)))
+    if (_INVAPPROX_BASECASE(x, xn, n))
     {
-        _flint_mpn_inv_basecase(q, x, xn, n);
-        return;
+        _flint_mpn_inv_basecase(U, x, xn, n);
+        return U;
     }
 
     if (FLINT_MIN(xn, qn) < INV_NEWTON_CUTOFF(xn, qn))
     {
         mp_limb_t one = 1;
-        flint_mpn_divapprox_fraction(q, &one, 1, x, xn, n);
-        return;
+        flint_mpn_divapprox_fraction(U, &one, 1, x, xn, n);
+        return U;
     }
 
     /* x as alpha in [1/B, 1) with xn fraction limbs; 1/alpha with
@@ -295,11 +304,28 @@ flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
        4 units of the guard limb U[1] at the integer scale (the integer
        part is {U + 2, p}). Adding 5 units and truncating gives
        floor(B^n / x) or floor(B^n / x) + 1. */
-    TMP_START;
-    p = n - xn + 2;
-    U = TMP_ALLOC((p + 2) * sizeof(mp_limb_t));
+    p = qn;
     _mp_real_inv_newton(U, x, xn, p);
     mpn_add_1(U + 1, U + 1, p + 1, 5);
-    flint_mpn_copyi(q, U + 2, qn);
+    return U + 2;
+}
+
+void
+flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
+{
+    mp_size_t qn = n - xn + 2;
+    mp_ptr U;
+    TMP_INIT;
+
+    if (!_INVAPPROX_NEWTON(x, xn, n, qn))
+    {
+        /* written to q directly */
+        _flint_mpn_invapprox_buf(q, x, xn, n);
+        return;
+    }
+
+    TMP_START;
+    U = TMP_ALLOC((qn + 2) * sizeof(mp_limb_t));
+    flint_mpn_copyi(q, _flint_mpn_invapprox_buf(U, x, xn, n), qn);
     TMP_END;
 }

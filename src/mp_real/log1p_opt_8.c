@@ -120,7 +120,7 @@ _mp_real_log1p_series_8(nn_ptr res, nn_srcptr x)
     P[5] = V[4];
     P[6] = V[5];
     P[7] = V[6];
-    flint_mpn_sqrhigh(z, x, 8);
+    flint_mpn_sqrhigh_n(z, x, 8);
     flint_mpn_mulhigh_n(T, z, P, 8);
     NN_SUB_8(res, x, T);
 }

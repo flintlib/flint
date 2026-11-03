@@ -52,10 +52,13 @@
 #include "t-mulmid_complex.c"
 #include "t-mul_toom22.c"
 #include "t-mullow_n.c"
+#include "t-divhigh.c"
+#include "t-mulhigh.c"
+#include "t-sqrthigh.c"
 #include "t-mulhigh_n.c"
 #include "t-mulhigh_n_tab.c"
 #include "t-mulhigh_n_recursive.c"
-#include "t-mulhigh_normalised.c"
+#include "t-mulhigh_n_normalised.c"
 #include "t-mulmid.c"
 #include "t-mulmid_n.c"
 #include "t-mulmod_2expp1.c"
@@ -67,8 +70,8 @@
 #include "t-remove_2exp.c"
 #include "t-remove_power.c"
 #include "t-sqr.c"
-#include "t-sqrhigh.c"
-#include "t-sqrhigh_normalised.c"
+#include "t-sqrhigh_n.c"
+#include "t-sqrhigh_n_normalised.c"
 
 /* Array of test functions ***************************************************/
 
@@ -118,9 +121,12 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul_toom22),
     TEST_FUNCTION(flint_mpn_mullow_n),
     TEST_FUNCTION(flint_mpn_mulhigh_n_tab),
+    TEST_FUNCTION(flint_mpn_divhigh),
+    TEST_FUNCTION(flint_mpn_mulhigh),
+    TEST_FUNCTION(flint_mpn_sqrthigh),
     TEST_FUNCTION(flint_mpn_mulhigh_n),
     TEST_FUNCTION(flint_mpn_mulhigh_n_recursive),
-    TEST_FUNCTION(flint_mpn_mulhigh_normalised),
+    TEST_FUNCTION(flint_mpn_mulhigh_n_normalised),
     TEST_FUNCTION(flint_mpn_mulmid),
     TEST_FUNCTION(flint_mpn_mulmid_n),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
@@ -132,8 +138,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_remove_2exp),
     TEST_FUNCTION(flint_mpn_remove_power),
     TEST_FUNCTION(flint_mpn_sqr),
-    TEST_FUNCTION(flint_mpn_sqrhigh),
-    TEST_FUNCTION(flint_mpn_sqrhigh_normalised)
+    TEST_FUNCTION(flint_mpn_sqrhigh_n),
+    TEST_FUNCTION(flint_mpn_sqrhigh_n_normalised)
 };
 
 /* main function *************************************************************/

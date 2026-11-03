@@ -770,8 +770,8 @@ _sqr_complex_high(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
         nn_ptr h1 = TMP_ALLOC(3 * n * sizeof(ulong));
         nn_ptr h2 = h1 + n, h3 = h2 + n;
 
-        flint_mpn_sqrhigh(h1, ar, n);
-        flint_mpn_sqrhigh(h2, ai, n);
+        flint_mpn_sqrhigh_n(h1, ar, n);
+        flint_mpn_sqrhigh_n(h2, ai, n);
         flint_mpn_mulhigh_n(h3, ar, ai, n);
 
         _high_combine(zr, zr_sgn, h1, 0, h2, 1, n);

@@ -156,7 +156,7 @@ _rt_log1p_series_11(nn_ptr res, nn_srcptr x)
     P[8] = V[6];
     P[9] = V[7];
     P[10] = V[8];
-    flint_mpn_sqrhigh(z, x, 11);
+    flint_mpn_sqrhigh_n(z, x, 11);
     flint_mpn_mulhigh_n(T, z, P, 11);
     mpn_sub_n(res, x, T, 11);
 }
@@ -341,7 +341,7 @@ _rt_log1p_series_12(nn_ptr res, nn_srcptr x)
     P[9] = V[7];
     P[10] = V[8];
     P[11] = V[9];
-    flint_mpn_sqrhigh(z, x, 12);
+    flint_mpn_sqrhigh_n(z, x, 12);
     flint_mpn_mulhigh_n(T, z, P, 12);
     mpn_sub_n(res, x, T, 12);
 }
@@ -555,7 +555,7 @@ _rt_log1p_series_13(nn_ptr res, nn_srcptr x)
     P[10] = V[8];
     P[11] = V[9];
     P[12] = V[10];
-    flint_mpn_sqrhigh(z, x, 13);
+    flint_mpn_sqrhigh_n(z, x, 13);
     flint_mpn_mulhigh_n(T, z, P, 13);
     mpn_sub_n(res, x, T, 13);
 }
@@ -800,7 +800,7 @@ _rt_log1p_series_14(nn_ptr res, nn_srcptr x)
     P[11] = V[9];
     P[12] = V[10];
     P[13] = V[11];
-    flint_mpn_sqrhigh(z, x, 14);
+    flint_mpn_sqrhigh_n(z, x, 14);
     flint_mpn_mulhigh_n(T, z, P, 14);
     mpn_sub_n(res, x, T, 14);
 }

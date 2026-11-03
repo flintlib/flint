@@ -176,13 +176,38 @@ _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n)
     return bot;
 }
 
+/* The basecase writes the output before it has finished reading the
+   operand: an aliased call goes through a stack buffer (Mulders and the
+   FFT allow aliasing as they are). */
+/* kept out of line: the stack buffer would otherwise cost the common
+   path a stack protector and a larger frame */
+FLINT_STATIC_NOINLINE mp_limb_t
+_flint_mpn_sqrhigh_basecase_aliased(mp_ptr res, mp_srcptr u, mp_size_t n)
+{
+    mp_limb_t t[FLINT_MPN_SQRHIGH_MULDERS_CUTOFF];
+    mp_limb_t g = _flint_mpn_sqrhigh_basecase(t, u, n);
+    flint_mpn_copyi(res, t, n);
+    return g;
+}
+
+static inline mp_limb_t
+_flint_mpn_sqrhigh_basecase_alias(mp_ptr res, mp_srcptr u, mp_size_t n)
+{
+    FLINT_ASSERT(n <= FLINT_MPN_SQRHIGH_MULDERS_CUTOFF);
+
+    if (res == u)
+        return _flint_mpn_sqrhigh_basecase_aliased(res, u, n);
+    else
+        return _flint_mpn_sqrhigh_basecase(res, u, n);
+}
+
 #if FLINT_HAVE_FFT_SMALL
 
 mp_limb_t
 _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
 {
     if (n <= FLINT_MPN_SQRHIGH_MULDERS_CUTOFF)
-        return _flint_mpn_sqrhigh_basecase(res, u, n);
+        return _flint_mpn_sqrhigh_basecase_alias(res, u, n);
     else if (n <= FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF)
         return _flint_mpn_sqrhigh_mulders(res, u, n);
     else
@@ -195,7 +220,7 @@ mp_limb_t
 _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
 {
     if (n <= FLINT_MPN_SQRHIGH_MULDERS_CUTOFF)
-        return _flint_mpn_sqrhigh_basecase(res, u, n);
+        return _flint_mpn_sqrhigh_basecase_alias(res, u, n);
     else if (n <= FLINT_MPN_SQRHIGH_SQR_CUTOFF)
         return _flint_mpn_sqrhigh_mulders(res, u, n);
     else
@@ -205,14 +230,13 @@ _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
 #endif
 
 
-mp_limb_pair_t _flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_pair_t _flint_mpn_sqrhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     mp_limb_pair_t ret;
 
     FLINT_ASSERT(n >= 1);
-    FLINT_ASSERT(rp != xp);
 
-    ret.m1 = flint_mpn_sqrhigh(rp, xp, n);
+    ret.m1 = flint_mpn_sqrhigh_n(rp, xp, n);
 
     if (rp[n - 1] >> (FLINT_BITS - 1))
     {

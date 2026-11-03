@@ -174,7 +174,7 @@ _mp_real_series_tapered(nn_ptr res, nn_srcptr x, slong n,
     P = T + n;
 
     g = FLINT_BIT_COUNT(N) + 1;
-    flint_mpn_sqrhigh(z, x, n);
+    flint_mpn_sqrhigh_n(z, x, n);
     cur = _mp_real_series_tapered_horner(V, z, n, r, func, 0, N, g);
 
     flint_mpn_zero(P, n - cur);

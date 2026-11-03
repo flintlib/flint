@@ -125,7 +125,7 @@ _mp_real_sin_cos_notab_r_noerr(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
        sine's square */
     for (i = 0; i <= h; i++)
     {
-        flint_mpn_sqrhigh(sc, g, wn);       /* g^2, wn fraction limbs */
+        flint_mpn_sqrhigh_n(sc, g, wn);       /* g^2, wn fraction limbs */
         mpn_lshift(w, g, wn, 1);            /* 2g < 1 throughout */
         {
             ulong bw = mpn_sub_n(w, w, sc, wn);

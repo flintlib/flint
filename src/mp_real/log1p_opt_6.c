@@ -90,7 +90,7 @@ _mp_real_log1p_series_6(nn_ptr res, nn_srcptr x)
     P[3] = V[2];
     P[4] = V[3];
     P[5] = V[4];
-    flint_mpn_sqrhigh(z, x, 6);
+    flint_mpn_sqrhigh_n(z, x, 6);
     flint_mpn_mulhigh_n(T, z, P, 6);
     NN_SUB_6(res, x, T);
 }

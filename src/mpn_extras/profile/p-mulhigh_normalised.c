@@ -43,7 +43,7 @@ int main(void)
             TIMEIT_STOP_VALUES(__, t1);
 
             TIMEIT_START;
-            flint_mpn_mulhigh_normalised(rn, xp, yp, n);
+            flint_mpn_mulhigh_n_normalised(rn, xp, yp, n);
             TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%7.2fx", t2 / t1);

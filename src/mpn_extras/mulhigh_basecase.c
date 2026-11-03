@@ -23,9 +23,18 @@ mp_limb_t flint_mpn_mulhigh_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_8(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_9(mp_ptr, mp_srcptr, mp_srcptr);
 
+/* The wrappers below write r before they have finished reading x and y:
+   an operand that is the output is copied first (the assembly kernels
+   read their operands into registers and allow aliasing). */
+#define MULHIGH_ALIAS_COPY(n) \
+    mp_limb_t __xc[n], __yc[n]; \
+    if (r == x) { flint_mpn_copyi(__xc, x, n); x = __xc; } \
+    if (r == y) { flint_mpn_copyi(__yc, y, n); y = __yc; }
+
 static mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, w2, cy;
+    MULHIGH_ALIAS_COPY(10)
 
     w0 = flint_mpn_mulhigh_9(r, x + 1, y);
     r[9] = mpn_addmul_1(r, x + 1, 9, y[9]);
@@ -41,6 +50,7 @@ static mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
 static mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, w2, cy;
+    MULHIGH_ALIAS_COPY(11)
 
 #if 0
     w0 = flint_mpn_mulhigh_10(r, x + 1, y);
@@ -69,6 +79,7 @@ static mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
 static mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, w2, cy;
+    MULHIGH_ALIAS_COPY(12)
 
 #if 0
     w0 = flint_mpn_mulhigh_11(r, x + 1, y);
@@ -102,6 +113,7 @@ static mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
 static mp_limb_t flint_mpn_mulhigh_13(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, w2, cy;
+    MULHIGH_ALIAS_COPY(13)
 
     w0 = flint_mpn_mulhigh_12(r, x + 1, y);
     r[12] = mpn_addmul_1(r, x + 1, 12, y[12]);

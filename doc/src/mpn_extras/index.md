@@ -365,12 +365,12 @@ Sets $(\mathit{res}, n)$ to an approximation of
 $\lfloor uv / B^n \rfloor$ and returns an approximation of limb $n - 1$
 of the product. Together they form a lower bound for
 $\lfloor uv / B^{n-1} \rfloor$ that is wrong by a few units of the
-returned limb at most. Requires $n \ge 1$. The output may alias the
-inputs only for $n$ at most `FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH`.
+returned limb at most. Requires $n \ge 1$. The output may alias an
+input (see [](mpn_extras/mulhigh#high)).
 :::
 
 ::: function
-mp_limb_t flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
+mp_limb_t flint_mpn_sqrhigh_n(mp_ptr res, mp_srcptr u, mp_size_t n)
 
 The square $u^2$ with the contract of `flint_mpn_mulhigh_n`.
 :::
@@ -382,16 +382,48 @@ A pair of limbs, with fields `m1` and `m2`.
 :::
 
 ::: function
-mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
-mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_pair_t flint_mpn_mulhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t flint_mpn_sqrhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 
-`flint_mpn_mulhigh_n` and `flint_mpn_sqrhigh` followed by normalisation:
+`flint_mpn_mulhigh_n` and `flint_mpn_sqrhigh_n` followed by normalisation:
 if the top bit of the high product is clear, the $(n+1)$-limb result
 (high limbs and returned limb) is shifted left by one bit. Returns the
 low limb in `m1` and the shift (0 or 1) in `m2`. For normalised inputs
 the product is at least $B^{2n}/4$, so the result is normalised. This is
 the form needed for floating-point mantissas (`mp_real`, `arf`). The
-output must not alias the inputs.
+output may alias an input.
+:::
+
+::: function
+mp_limb_t flint_mpn_mulhigh(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn, mp_size_t n)
+mp_limb_t flint_mpn_sqrhigh(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n)
+
+General high products: the top $n$ limbs of the product $xy$ (resp.
+$x^2$) of operands of any lengths, written to $(\mathit{res}, n)$, and
+the limb just below them, returned. With $\mathit{zn} = \mathit{xn} +
+\mathit{yn}$ the limb count of the product and $d = \mathit{zn} - n - 1$,
+the $(n+1)$-limb number $h = \mathit{res} \cdot B + r$ satisfies
+$0 \le \lfloor xy / B^d \rfloor - h \le$
+`FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n)` $= 2n + 4$ (likewise
+`FLINT_MPN_SQRHIGH_GUARD_ERR_BOUND(n)`). The product is zero padded
+above if it is shorter than $n + 1$ limbs (then exact, with $r = 0$).
+Operands longer than $n$ limbs are truncated internally, the leading
+cross term of the dropped limbs being added back, so the cost is that of
+a product of operands of at most $n$ limbs. `res` may be one of the
+operands. For $\mathit{xn} = \mathit{yn} = n$ this is
+`flint_mpn_mulhigh_n`; see [](mpn_extras/mulhigh#general) for the other
+shapes.
+:::
+
+::: function
+mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn, mp_size_t n)
+mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n)
+
+`flint_mpn_mulhigh` and `flint_mpn_sqrhigh` followed by normalisation as
+in `flint_mpn_mulhigh_n_normalised`: the guard limb is returned in `m1`,
+the shift (0 or 1) in `m2`, and the deficit is at most
+`FLINT_MPN_MULHIGH_NORMALISED_GUARD_ERR_BOUND(n)` $= 2(2n + 4) + 1$ units
+of the shifted guard limb. The inputs must have their top bits set.
 :::
 
 ::: function
@@ -480,11 +512,11 @@ the multiplication basecase), Mulders' algorithm (from
 :::
 
 ::: function
-mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
-mp_limb_pair_t _flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_pair_t _flint_mpn_mulhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t _flint_mpn_sqrhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 
-The non-inline part of `flint_mpn_mulhigh_normalised` and
-`flint_mpn_sqrhigh_normalised`, used beyond the hard-coded sizes.
+The non-inline part of `flint_mpn_mulhigh_n_normalised` and
+`flint_mpn_sqrhigh_n_normalised`, used beyond the hard-coded sizes.
 :::
 
 ::: function
@@ -561,8 +593,12 @@ shape (padding internally) but is economical only in its own regime.
 only with `fft_small`.
 
 ::: details
-`flint_mpn_mulmid` computes full products with `flint_mpn_mul`. Otherwise
-it truncates both operands to $\mathit{zhi}$ limbs and uses: for
+`flint_mpn_mulmid` computes full products with `flint_mpn_mul`, and
+windows of at least two limbs reaching the top of the product with
+`flint_mpn_mulhigh` (which truncates the operands to what the window can
+see, and whose deficit of $2n + 4$ units of the lowest limb is within the
+contract). Otherwise it truncates both operands to $\mathit{zhi}$ limbs
+and uses: for
 $\min(\mathit{an}, \mathit{bn}, \mathit{zhi} - \mathit{zlo}) < 48$, the
 low product if $\mathit{zlo} = 0$, $\mathit{zhi} \ge 8$ and both operands
 have at least $7 \mathit{zhi}/8$ limbs, and the schoolbook method
@@ -1235,13 +1271,17 @@ forming the numerator $B^n$ in the common case.
 
 ::: function
 void flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n)
+mp_ptr _flint_mpn_invapprox_buf(mp_ptr U, mp_srcptr x, mp_size_t xn, mp_size_t n)
 
 Approximate reciprocal with the interface of `flint_mpn_inv`: sets
 $(q, n - \mathit{xn} + 2)$ to $\lfloor B^n / x \rfloor$ or
 $\lfloor B^n / x \rfloor + 1$. It uses the algorithms of `flint_mpn_inv`
 (with the same cutoffs) without the correction steps, and above the
 Newton cutoffs `_mp_real_inv_newton` with one guard limb instead of
-three, so that it is never slower.
+three, so that it is never slower. The underscore version takes a buffer
+$U$ of $n - \mathit{xn} + 4$ limbs, which also serves as the scratch of
+the Newton iteration, and returns the pointer ($U$ or $U + 2$) to the
+result, saving a temporary and a copy.
 :::
 
 ::: function
@@ -1608,6 +1648,112 @@ and conquer algorithm (requires $\mathit{an} \ge 5$ and needs no remainder
 space beyond $\lceil \mathit{an}/2 \rceil + 1$ limbs), the Newton
 algorithm, GMP's `mpn_sqrtrem`, and the checked root and square test
 after the test modulo 256.
+:::
+
+## Floating-point quotients and roots {#fphigh}
+
+The kernels of floating-point division and square roots, shared by
+`arf`, `arb` and `nfloat`: for normalised *fractions* $A = (a, \mathit{an})
+/ B^{\mathit{an}}$ and $Y = (b, \mathit{bn}) / B^{\mathit{bn}}$ in
+$[1/2, 1)$ (top bit set), they write $n + 1$ limbs, the lowest a *guard
+limb*, which lie in $[B^{n+1}/2, B^{n+1})$ and approximate a quantity
+$T$ of the form (value in $[1/2, 1)$) $\cdot B^{n+1}$ to within a small
+constant number of units of the guard limb, in either direction:
+
+| function | $T$ | bound |
+|---|---|---|
+| `flint_mpn_divhigh` | $2^{-s} (A / Y) B^{n+1}$ with $s = [A \ge Y]$ returned | `FLINT_MPN_DIVHIGH_GUARD_ERR_BOUND` (16) |
+| `flint_mpn_invhigh` | the same for $A = 1/2$, so $1/Y = 2^{s+1} Q / B^{n+1}$ | 16 |
+| `flint_mpn_sqrthigh` | $S B^{n+1}$, $S = \sqrt{A / 2^t}$ | `FLINT_MPN_SQRTHIGH_GUARD_ERR_BOUND` (32) |
+| `flint_mpn_rsqrthigh` | $M B^{n+1}$, $M = (2^{2-t} A)^{-1/2}$ | `FLINT_MPN_RSQRTHIGH_GUARD_ERR_BOUND` (256) |
+
+Here $t \in \{0, 1\}$ is the parity of the exponent of $x = A 2^e$, so
+that $\sqrt{x} = S\, 2^{(e+t)/2}$ and $1/\sqrt{x} = M\, 2^{(1-t) - (e-t)/2}$
+with $S \in [1/2, 1)$ and $M \in (1/2, 1]$ ($M = 1$ only for $t = 1$,
+$A = 1/2$, where the result is clamped to $B^{n+1} - 1$). For the
+quotient, the shift is taken from the operands truncated to $n + 2$
+limbs, so $2^{-s} A / Y$ may fall just outside $[1/2, 1)$; the result is
+clamped to the normalised range, within the bound.
+
+A guard limb more than the bound away from $0$ and $B - 1$ certifies the
+rounding of the $n$-limb truncation in every mode (the error cannot
+carry into the kept limbs, and the value is not exact), which is how the
+floating-point types round correctly without an exact division or root
+in all but a fraction $2^{-55}$ of the cases, and lets `arb` take the
+measured rounding error plus one unit for the approximation as the
+radius. The `_exact` variants compute the floor of $T$ from the full
+operands (the shift of `flint_mpn_divhigh_exact` then from the full
+comparison; they accept $n \ge 0$) and return whether $T$ is not an
+integer, i.e. whether the floating-point result is inexact; they are
+the fallbacks when the guard limb is within the bound of a rounding
+boundary, including for every exact quotient and root.
+
+::: function
+ulong flint_mpn_divhigh(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n)
+ulong flint_mpn_invhigh(nn_ptr q, nn_srcptr b, slong bn, slong n)
+int flint_mpn_divhigh_exact(nn_ptr q, ulong * s, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n)
+
+The quotient with the contract above ($n \ge 1$); the first two return
+$s$, the third writes it to `s` and returns the inexact flag. $q$ must
+not overlap the operands.
+
+::: details
+The operands are truncated to $n + 2$ limbs (an error below $8 B^{-(n+2)}$
+on the quotient, i.e. $8/B$ units). With $n = 1$ the top two limbs of
+each operand go through two $3/2$ divisions on 64-bit machines (the
+truncation to two limbs costs 8 units); a divisor of one limb is a chain
+of $2/1$ divisions, a short one (`FLINT_MPN_DIV_SMALL_SHAPE`) the
+register-based division, both exact; longer divisors use the schoolbook
+approximate division with the $3/2$ inverse up to 80 result limbs and
+`flint_mpn_divapprox` beyond, which give the floor or one more. Beyond
+80 limbs, a numerator of at most $n/8$ limbs (in particular
+`flint_mpn_invhigh`) multiplies the approximate reciprocal of the
+divisor (`flint_mpn_invapprox`, with the lower Newton cutoffs of the
+inversion) instead, within two units. The exact
+variant forms the numerator $A B^k / 2^s$ exactly (extending the divisor
+instead when $k < 0$) and divides with remainder.
+:::
+:::
+
+::: function
+void flint_mpn_sqrthigh(nn_ptr s, nn_srcptr a, slong an, int t, slong n)
+int flint_mpn_sqrthigh_exact(nn_ptr s, nn_srcptr a, slong an, int t, slong n)
+int flint_mpn_sqrthigh_exact_half(nn_ptr s, nn_srcptr a, slong an, int t, slong n)
+int flint_mpn_sqrthigh_exact_rem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, int t, slong n)
+void flint_mpn_rsqrthigh(nn_ptr y, nn_srcptr a, slong an, int t, slong n)
+int flint_mpn_rsqrthigh_exact(nn_ptr y, nn_srcptr a, slong an, int t, slong n)
+
+The square root and the reciprocal square root with the contract above
+($n \ge 1$ for the approximations; the exact variants also accept $n = 0$,
+a single limb). `flint_mpn_sqrthigh_exact_half` returns more precisely
+0 (exact), 1 (the root within the first half unit above the floor), 2
+(exactly half a unit above: a tie, which needs dropped limbs of $a$) or
+3 (above that), which decides every rounding mode at $n + 1$ limbs; it
+forms the remainder of the integer root (for the floor $F$ of the
+radicand $X$ with the dropped fraction $f$, the root exceeds $F + 1/2$
+iff $X - F^2 > F$, or $X - F^2 = F$ and $f \ge 1/4$), which the plain
+variant skips; `flint_mpn_sqrthigh_exact_rem` writes that remainder to
+`r` ($n + 2$ limbs, zero-padded) and returns the inexact flag.
+`flint_mpn_rsqrthigh_exact` requires $M < 1$.
+
+::: details
+On 64-bit machines, roots of one and two limbs (two and three with the
+guard limb) come from the register kernels of `mpn_extras/fp_small.h`:
+the double precision value refined by one Newton step with the exact
+residual at 128 bits (`_flint_mpn_small_rsqrt_2`, within 8 units), the
+square root as the product with the operand (within 24 units) and a
+further step at three limbs (within 3 units, resp. 2 for the reciprocal
+square root). Longer square roots are `flint_mpn_sqrtrem` of the operand
+truncated or zero-extended to $2(n+1)$ limbs below
+`FLINT_MPN_SQRTREM_NEWTON_CUTOFF`$/4$ result limbs and the Newton
+iteration of `mp_real` beyond. Longer reciprocal square roots use a
+Newton iteration on short products from the two-limb base (error below
+196 units at four limbs, below 1.03 beyond) up to 96 limbs and the
+iteration of `mp_real` beyond. The exact variants take
+`flint_mpn_sqrtrem` of the exact radicand (for the reciprocal,
+$\lfloor B^{2(n+1)+\mathit{an}} / (2^{2-t} a) \rfloor$ by a division
+with remainder), the result being exact iff all remainders vanish.
+:::
 :::
 
 ## Powering {#powering}

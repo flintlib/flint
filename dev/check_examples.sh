@@ -198,7 +198,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/I21 = \[43\.3273391411077 \+\/- 4\.52e-14] \+ \[\+\/- 1\.95e-14\]\*I/) { $found=1; last } END { exit !$found }'
+    echo "$res" | perl -0ne 'if (/I21 = \[43\.3273391411077 \+\/- 3\.24e-14] \+ \[\+\/- 6\.58e-15\]\*I/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";
     then
         echo "FAIL"
@@ -296,7 +296,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/\[3\.14159265358979323846\{\.\.\.959 digits\.\.\.\}76611195909216420199 \+\/- 8\.09e-1001\]/) { $found=1; last } END { exit !$found }'
+    echo "$res" | perl -0ne 'if (/\[3\.14159265358979323846\{\.\.\.959 digits\.\.\.\}76611195909216420199 \+\/- 7\.60e-1001\]/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";
     then
         echo "FAIL"

@@ -36,6 +36,17 @@ flint_mpn_mulmid(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn,
         return;
     }
 
+    /* a high window: the general high product truncates the operands to
+       what the window can see and has the tighter deficit bound */
+    if (zhi == an + bn && zhi - zlo >= 2)
+    {
+        if (a == b && an == bn)
+            z[0] = flint_mpn_sqrhigh(z + 1, a, an, zhi - zlo - 1);
+        else
+            z[0] = flint_mpn_mulhigh(z + 1, a, an, b, bn, zhi - zlo - 1);
+        return;
+    }
+
     an = FLINT_MIN(an, zhi);
     bn = FLINT_MIN(bn, zhi);
 

@@ -1,6 +1,6 @@
 ---
 title: High and low products
-functions: flint_mpn_mulhigh_n flint_mpn_sqrhigh flint_mpn_mullow_n flint_mpn_mul_or_mullow_n flint_mpn_mul_or_mulhigh_n
+functions: flint_mpn_mulhigh_n flint_mpn_sqrhigh_n flint_mpn_mulhigh flint_mpn_sqrhigh flint_mpn_mullow_n flint_mpn_mul_or_mullow_n flint_mpn_mul_or_mulhigh_n
 ---
 
 Many algorithms need only part of a product. Newton iteration for the
@@ -43,7 +43,7 @@ notions [@HZ2011]:
   lowest one having an error of $O(n)$ units;
 - the *exact* high product is $\lfloor uv/B^n \rfloor$.
 
-`flint_mpn_mulhigh_n` and `flint_mpn_sqrhigh` compute precise high
+`flint_mpn_mulhigh_n` and `flint_mpn_sqrhigh_n` compute precise high
 products: the $n$ limbs written to `res` and the returned limb $r$ form
 an $(n+1)$-limb number $h = \mathit{res} \cdot B + r$ with
 
@@ -62,8 +62,86 @@ exact value can be found from a low product, as
 Above `FLINT_MPN_MULHIGH_MUL_CUTOFF` limbs (without `fft_small`) the full
 product is computed and the result is exact.
 
-For floating-point arithmetic, `flint_mpn_mulhigh_normalised` also shifts
-the result so that its top bit is set.
+More precisely, the deficit $\lfloor uv/B^{n-1} \rfloor - h$ is at most
+`FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND(n)` $= 2n - 4$ for $n \ge 3$ (zero for
+$n \le 2$, where the kernels are exact). All backends accumulate every
+partial-product limb landing in columns $n - 1$ and above; the dropped low
+halves of the $n - 1$ products on the diagonal $p + q = n - 2$ contribute
+less than $n - 1$ units and the diagonals below less than $n - 2 + (n-3)/B$,
+and a careful count gives a dropped amount below $2n - 3$ units, so the
+integer deficit is at most $2n - 4$. This is sharp: the inputs
+$x_i = B - \sqrt{B} - 1$, $y_i = B - \sqrt{B} + 1$ attain $2n - 4$. The same
+bound `FLINT_MPN_SQRHIGH_N_GUARD_ERR_BOUND(n)` holds for `flint_mpn_sqrhigh_n`.
+
+For floating-point arithmetic, `flint_mpn_mulhigh_n_normalised` and
+`flint_mpn_sqrhigh_n_normalised` also shift the result left by one bit when
+necessary so that the top bit of `res[n-1]` is set, returning the guard
+limb (shifted along) in `m1` and the shift (0 or 1) in `m2`, so that the
+value is $(\mathit{res} \cdot B + m_1) 2^{-m_2}$ in units of $B^{n-1}$. The
+inputs must have their top bits set. The
+shift doubles the deficit and can add one unit, giving the bounds
+`FLINT_MPN_MULHIGH_N_NORMALISED_GUARD_ERR_BOUND(n)` and
+`FLINT_MPN_SQRHIGH_N_NORMALISED_GUARD_ERR_BOUND(n)` $= 2(2n - 4) + 1$.
+
+All the high products (`flint_mpn_mulhigh_n`, `flint_mpn_sqrhigh_n`,
+`flint_mpn_mulhigh`, `flint_mpn_sqrhigh` and their normalised variants)
+allow the output to be one of the operands (the same pointer; partial
+overlap is not supported). The assembly kernels read their operands into
+registers, Mulders' algorithm works on a scratch buffer and the FFT
+transforms both operands before writing; the basecase routines, the C
+wrappers for 10 to 13 limbs on x86-64 and the unbalanced paths of the
+general products copy an aliased operand to scratch first.
+
+## High products of any shape {#general}
+
+Floating-point multiplication needs the top $n$ limbs of the product of
+mantissas of any lengths $\mathit{xn}$ and $\mathit{yn}$, with $n$ set by
+the precision; the dot products need the same with the guard limb as data.
+`flint_mpn_mulhigh` and `flint_mpn_sqrhigh` compute this directly, with
+the deficit of the guard limb at most `FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n)`
+$= 2n + 4$ for every shape, so that callers no longer truncate, pad or
+pick a method themselves. The shapes reduce as follows.
+
+- Operands longer than $n$ limbs are truncated to their top $n$ limbs.
+  Dropping the low limbs of $x$ loses $x_{\mathrm{lo}} y < B^{\mathit{xn}-n}
+  B^{\mathit{yn}} = B^{d+1}$, up to $B$ units of the guard limb, of which
+  the dominant part, the high half of the product of the limb just below
+  the cut with the top limb of $y$, is added back; what remains is below
+  3 units per truncated operand.
+- $\mathit{xn} = \mathit{yn} = n$: `flint_mpn_mulhigh_n` (deficit at
+  most $2n - 4$).
+- $n \le 6$, or nearly the whole product wanted: the full product, since
+  a full product with its own kernel followed by a copy beats any split
+  there (the normalised variants use the normalised kernel on one operand
+  padded by one or two limbs from $n = 8$, where its in-register shift
+  wins over the full product and a shift).
+- Both operands at least `FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF` limbs: the
+  window $[d - 1, \mathit{zn})$ of the product through `fft_small`, with
+  its two lowest limbs diverted to a separate buffer (the lowest absorbs
+  the carry deficit of the window, below $\min(\mathit{xn}, \mathit{yn})
+  B$ units of it, the next is the guard limb), so the output is written in
+  place without a larger temporary. One operand in that range and the
+  other below it: the full product, which the FFT computes faster than
+  any split.
+- $\min(\mathit{xn}, \mathit{yn}) \ge 7n/8$, or $\ge 3n/4$ from $n = 48$:
+  both operands zero padded below to $n$ limbs for `flint_mpn_mulhigh_n`,
+  which computes the same limbs of the product with the same deficit
+  (thresholds measured on Zen 3; on an architecture whose high products
+  save less of the full product, 7/8 would also be right at larger $n$).
+- $\mathit{xn} = n > \mathit{yn}$: with $x = x_{\mathrm{hi}} B^{\mathit{yn}}
+  + x_{\mathrm{lo}}$, the full product $x_{\mathrm{hi}} y$ lands exactly
+  on the output and the balanced high product of $x_{\mathrm{lo}} y$ is
+  added to it.
+- Both operands shorter than $n$ and not nearly balanced: the full
+  product (splitting off high products does not pay in the Karatsuba
+  range).
+
+Adding the truncation remainder to the deficit of the balanced products
+gives a dropped amount below $(2n - 3) + 6$, hence the integer bound
+$2n + 2$ for $n \ge 3$ and 5 for $n \le 2$; the macro states $2n + 4$.
+Squares follow the same scheme with `flint_mpn_sqrhigh_n`, the cross
+term of a truncation counted twice, and a full square where the product
+case would split.
 
 ## Middle products {#middle}
 
@@ -73,8 +151,9 @@ operands of any lengths, as a lower approximation with a deficit of
 less than $\min(\mathit{an}, \mathit{bn}, \mathit{zlo}) \cdot B$ units of
 its lowest limb, exact for $\mathit{zlo} = 0$. For $n$-limb operands, the low product is the window
 $[0, n)$ and the high product is (up to the error bound) the window
-$[n - 1, 2n)$; `flint_mpn_mulmid` calls `flint_mpn_mullow_n` and
-`flint_mpn_mulhigh_n` for windows of these shapes. The balanced middle product of a $(2n-1)$-limb and
+$[n - 1, 2n)$; `flint_mpn_mulmid` calls `flint_mpn_mullow_n` for
+windows of the former shape and `flint_mpn_mulhigh` for every window
+reaching the top of the product. The balanced middle product of a $(2n-1)$-limb and
 an $n$-limb operand (the window $[n, 2n)$), which is what a Newton step
 for the reciprocal needs, can be computed in the time of an $n \times n$
 product by the transposition principle [@HQZ2004]; FLINT has it from

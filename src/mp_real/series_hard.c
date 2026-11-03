@@ -261,7 +261,7 @@ _rs_powers(_rs_struct * R, slong k_lo, slong k_hi, nn_ptr buf)
             *buf++ = 0;         /* the zero limb below v^m */
         R->pw[j] = buf;
         if (a == b)
-            flint_mpn_sqrhigh(buf, R->pw[a] + (xn - RS_LZ(a) - n), n);
+            flint_mpn_sqrhigh_n(buf, R->pw[a] + (xn - RS_LZ(a) - n), n);
         else
             flint_mpn_mulhigh_n(buf, R->pw[a] + (xn - RS_LZ(a) - n),
                 R->pw[b] + (xn - RS_LZ(b) - n), n);
@@ -485,7 +485,7 @@ _mp_real_exp_series_hard(nn_ptr res, nn_srcptr x, slong N, int zb)
     {
         /* x^2 (over one limb more than its own at zb = 32) */
         n = xn - 2 * (zb / FLINT_BITS);
-        flint_mpn_sqrhigh(buf, x + (xs - n), n);
+        flint_mpn_sqrhigh_n(buf, x + (xs - n), n);
         mpn_rshift(ta, buf, g2, 1);
         for (i = 0; i < xn; i++)
             res[i] = (i < g2) ? ta[i] : 0;
@@ -598,9 +598,9 @@ static void
 _rs_square(nn_ptr z, nn_srcptr x, slong xn, int xzb)
 {
     if (xzb == 64)
-        flint_mpn_sqrhigh(z, x + 1, xn - 2);
+        flint_mpn_sqrhigh_n(z, x + 1, xn - 2);
     else
-        flint_mpn_sqrhigh(z, x, xn);
+        flint_mpn_sqrhigh_n(z, x, xn);
 }
 
 /* (res, xn) = sum_k (-+1)^k x^(2k+1) / (2k+1) for x < 2^-xzb, xzb = 64

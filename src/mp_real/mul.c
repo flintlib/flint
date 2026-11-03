@@ -21,10 +21,15 @@
 /* Products: mp_real_mul, mp_real_mul_ui, mp_real_mul_complex and the
    windowed residual _mp_real_submul_bounded. */
 
-/* the windowed middle product beats the full product from this many
-   kept limbs on (measured on x86-64: at 32 limbs the window costs 1.3
-   times the full product, at 64 the two are even, at 256 the window
-   is 30% faster) */
+/* the high product beats the full product from this many kept limbs
+   on; the cutoffs are tuned on x86-64 */
+#ifndef MP_REAL_MULHIGH_CUTOFF
+#define MP_REAL_MULHIGH_CUTOFF 6
+#endif
+#ifndef MP_REAL_SQRHIGH_CUTOFF
+#define MP_REAL_SQRHIGH_CUTOFF 6
+#endif
+/* the complex product's high half from this many kept limbs on */
 #ifndef MP_REAL_MULMID_CUTOFF
 #define MP_REAL_MULMID_CUTOFF 64
 #endif
@@ -153,11 +158,9 @@ mp_real_mul(mp_real_t res, const mp_real_t a, const mp_real_t b, slong n)
     ps = sa + sb;
 
     if (ps <= keep + 5 || ps <= keep + keep / 16
-        || keep < MP_REAL_MULMID_CUTOFF || (ad == bd && sa == sb))
+        || keep < ((ad == bd && sa == sb) ? MP_REAL_SQRHIGH_CUTOFF : MP_REAL_MULHIGH_CUTOFF))
     {
-        /* full product (a square always: flint_mpn_sqr at two thirds
-           of a product beats the window of a middle product, which
-           costs 0.9 of one whatever its size), written straight into the destination
+        /* full product, written straight into the destination
            buffer unless it would overwrite an operand; when its top
            limb is zero one more limb is kept, or the window would
            hold only keep - 1 significant ones */
@@ -211,12 +214,12 @@ mp_real_mul(mp_real_t res, const mp_real_t a, const mp_real_t b, slong n)
     }
     else
     {
-        /* windowed middle product: window [ps - keep - 2, ps), one
-           limb more when the top limb of the product is zero (short of
-           a carry from below).  The two guard limbs hold the deficit of
-           the window, up to (min(sa, sb) + 2) B units of its bottom
-           limb, below one ulp of the result (with one guard limb it was
-           that many ulps: 1500 for operands of 1500 limbs) */
+        /* high product: the limbs [ps - keep - 2, ps) of the product,
+           one more when its top limb is zero (short of a carry from
+           below), i.e. keep + 1 limbs plus the guard limb returned by
+           flint_mpn_mulhigh (the operands truncated to that length
+           inside it). The deficit is at most 2 (keep + 1) + 4 units of
+           the guard limb, below one ulp of the result */
         slong zlo, zn;
         int aliased = (res == a || res == b);
         nn_ptr t;
@@ -239,13 +242,15 @@ mp_real_mul(mp_real_t res, const mp_real_t a, const mp_real_t b, slong n)
             t = res->d;
         }
 
-        flint_mpn_mulmid(t, ad, sa, bd, sb, zlo, ps);
+        if (ad == bd && sa == sb)
+            t[0] = flint_mpn_sqrhigh(t + 1, ad, sa, zn - 1);
+        else
+            t[0] = flint_mpn_mulhigh(t + 1, ad, sa, bd, sb, zn - 1);
 
         /* deficit (below the true window) plus the discarded low
-           limbs: < (min + 2) B + 1 ulps of the window bottom */
-        e = _mp_real_bnd_add(e, _mp_real_bnd(0, FLINT_MIN(FLINT_MIN(sa, sb), zlo) + 2,
-            rexp - ps + zlo + 1));
-        e = _mp_real_bnd_add(e, _mp_real_bnd(0, 1, rexp - ps + zlo));
+           limbs: at most 2 (zn - 1) + 4 + 1 ulps of the window bottom */
+        e = _mp_real_bnd_add(e, _mp_real_bnd(0, FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(zn - 1) + 1,
+            rexp - ps + zlo));
 
         if (aliased)
         {

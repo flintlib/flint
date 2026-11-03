@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2014, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,26 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <mpfr.h>
 #include "mpn_extras.h"
 #include "arf.h"
 
+/*
+    arf_rsqrt through the root kernel of arf (arf/mpn_div.c, see arf_div).
+*/
 int
 arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 {
-    slong xn, zn, val;
-    nn_srcptr xptr;
-    nn_ptr tmp, zptr;
-    mpfr_t xf, zf;
-    int inexact, odd_exp;
-    ARF_MUL_TMP_DECL
-
-    if (rnd >= ARF_RND_FAST)
-    {
-        if (_arf_want_newton_rsqrt(x, prec))
-            return _arf_rsqrt_newton(z, x, prec, rnd);
-        rnd = arf_rnd_relaxed_to_strict(rnd);
-    }
+    nn_srcptr xd;
+    nn_ptr zd;
+    slong xn, rn, fix;
+    int t, inexact;
+    fmpz_t e;
+    ARF_KERNEL_DECL
 
     if (arf_is_special(x))
     {
@@ -56,39 +51,31 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
         return 0;
     }
 
-    ARF_GET_MPN_READONLY(xptr, xn, x);
-    odd_exp = fmpz_is_odd(ARF_EXPREF(x)) ? 1 : 0;
+    if (prec == ARF_PREC_EXACT)
+        flint_throw(FLINT_ERROR, "arf_rsqrt: exact precision not supported\n");
 
-    zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+    t = fmpz_is_odd(ARF_EXPREF(x));
+    ARF_GET_MPN_READONLY(xd, xn, x);
+    rn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+    ARF_KERNEL_ALLOC(zd, rn, z, x, x);
 
-    ARF_MUL_TMP_ALLOC(tmp, zn)
+    /* the exponent (1 - t) - (e - t) / 2 (e - t is even), the kernel's
+       correction relative to it */
+    fmpz_init(e);
+    if (!COEFF_IS_MPZ(ARF_EXP(x)))
+        *e = (1 - t) - ((ARF_EXP(x) - t) >> 1);
+    else
+    {
+        fmpz_sub_ui(e, ARF_EXPREF(x), t);
+        fmpz_tdiv_q_2exp(e, e, 1);
+        fmpz_neg(e, e);
+        fmpz_add_ui(e, e, 1 - t);
+    }
 
-    zf->_mpfr_d = tmp;
-    zf->_mpfr_prec = prec;
-    zf->_mpfr_sign = 1;
-    zf->_mpfr_exp = 0;
+    inexact = _arf_mpn_rsqrt(zd, &fix, xd, xn, t, prec, _arf_rnd_resolve(rnd, 0));
 
-    xf->_mpfr_d = (nn_ptr) xptr;
-    xf->_mpfr_prec = xn * FLINT_BITS;
-    xf->_mpfr_sign = 1;
-    xf->_mpfr_exp = odd_exp;
-
-    inexact = mpfr_rec_sqrt(zf, xf, arf_rnd_to_mpfr(rnd));
-    inexact = (inexact != 0);
-
-    val = 0;
-    while (tmp[val] == 0)
-        val++;
-
-    ARF_GET_MPN_WRITE(zptr, zn - val, z);
-    flint_mpn_copyi(zptr, tmp + val, zn - val);
-
-    fmpz_fdiv_q_2exp(ARF_EXPREF(z), ARF_EXPREF(x), 1);
-    fmpz_neg(ARF_EXPREF(z), ARF_EXPREF(z));
-
-    fmpz_add_si(ARF_EXPREF(z), ARF_EXPREF(z), zf->_mpfr_exp);
-
-    ARF_MUL_TMP_FREE(tmp, zn)
-
+    ARF_KERNEL_FINISH(z, zd, rn, 0);
+    _fmpz_add_fast(ARF_EXPREF(z), e, fix);
+    fmpz_clear(e);
     return inexact;
 }

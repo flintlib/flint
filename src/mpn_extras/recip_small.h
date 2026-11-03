@@ -90,7 +90,7 @@ _flint_mpn_recip_small_step(nn_ptr I, nn_srcptr F, slong n, nn_srcptr Iq,
     {
         /* E^2 = E'^2 B^-2z: limb k of the high product S of E' (n - z
            limbs) goes to the position k - z */
-        flint_mpn_sqrhigh(S, E, n - z);
+        flint_mpn_sqrhigh_n(S, E, n - z);
         if (order >= 4)
         {
             /* E^3 = E'^3 B^-3z: limb k of the high product of the top
@@ -170,7 +170,7 @@ _flint_mpn_recip_small(nn_ptr I, nn_srcptr F, slong n, slong bits)
     sub_dddmmmsss(E1[2], E1[1], E1[0], UWORD(0), UWORD(0), UWORD(0), p3, p2, p1);
 
     /* G = E + E^2 */
-    flint_mpn_sqrhigh(G1, E1, 3);
+    flint_mpn_sqrhigh_n(G1, E1, 3);
     NN_ADD_3(G1, G1, E1);
 
     /* I_1 = (I_0 - 3 ulps) + I_0 G (the low word dropped), below 1 */
