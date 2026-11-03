@@ -17,6 +17,7 @@
 #include "t-mul.c"
 #include "t-divrem.c"
 #include "t-apply.c"
+#include "t-indicial_polynomial.c"
 #include "t-ddx_to_euler.c"
 #include "t-euler_to_ddx.c"
 #include "t-shift_convert.c"
@@ -33,6 +34,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ore_poly_mul),
     TEST_FUNCTION(gr_ore_poly_divrem),
     TEST_FUNCTION(gr_ore_poly_apply),
+    TEST_FUNCTION(gr_ore_poly_indicial_polynomial),
     TEST_FUNCTION(gr_ore_poly_ddx_to_euler),
     TEST_FUNCTION(gr_ore_poly_euler_to_ddx),
     TEST_FUNCTION(gr_ore_poly_shift_convert),

@@ -599,3 +599,27 @@ $\mathit{lenU}$ of $R$. (In FLINT 3.6 and
 earlier the last step, $k = 0$, was skipped, so that for example
 $D^2 + D + 1$ divided by $D$ gave $Q = D$ and $R = 1 + D$.)
 :::
+
+## Indicial polynomial {#indicial}
+
+::: function
+int _gr_ore_poly_indicial_polynomial(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t ctx)
+int gr_ore_poly_indicial_polynomial(gr_poly_t ind, const gr_ore_poly_t op, gr_ctx_t ctx)
+
+Compute the indicial polynomial of `op`.
+The precise definition depends on `ctx`.
+Currently only some rings of differential operators are supported;
+in this case, `ind` is the polynomial in $n$ that appears as the valuation
+coefficient of the polynomial in $x$ obtained by applying `op` to $x^n$.
+:::
+
+::: function
+int _gr_ore_poly_indicial_polynomial_euler_derivative(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t ctx)
+
+Compute the indicial polynomial of `op` at the origin.
+The Ore polynomial ring `ctx` is assumed to be of type
+`ORE_ALGEBRA_EULER_DERIVATIVE` with coefficients of type
+`gr_poly_t`.
+If the constant coefficients of `op` all vanish at the origin, the result is
+the zero polynomial.
+:::

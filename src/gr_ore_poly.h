@@ -300,6 +300,12 @@ WARN_UNUSED_RESULT int gr_ore_poly_divrem(gr_ore_poly_t Q, gr_ore_poly_t R, cons
 WARN_UNUSED_RESULT int gr_ore_poly_div(gr_ore_poly_t Q, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_rem(gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx);
 
+/* Indicial polynomial */
+
+int _gr_ore_poly_indicial_polynomial_euler_derivative(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t ctx);
+int _gr_ore_poly_indicial_polynomial(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t ctx);
+int gr_ore_poly_indicial_polynomial(gr_poly_t ind, const gr_ore_poly_t op, gr_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
