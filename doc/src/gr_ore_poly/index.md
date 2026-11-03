@@ -248,6 +248,15 @@ thread-safe is inherited from the base ring; commutativity and the
 absence of zero divisors are currently reported as `T_UNKNOWN`.
 :::
 
+::: function
+int gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Cst, gr_ctx_struct ** Pol, const gr_ctx_t Ore)
+
+If `Ore` is an Ore polynomial ring over a generic polynomial ring,
+set `* Pol` to a pointer to the base ring of `Ore` and `* Cst` to a pointer to
+that base ring's base ring and return `GR_SUCCESS`. Otherwise return
+`GR_UNABLE`.
+:::
+
 ## Memory management {#memory}
 
 ::: function

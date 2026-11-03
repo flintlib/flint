@@ -114,6 +114,8 @@ WARN_UNUSED_RESULT int _gr_ore_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * 
 WARN_UNUSED_RESULT int _gr_ore_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
 WARN_UNUSED_RESULT int gr_ore_poly_gens_recursive(gr_vec_t vec, gr_ore_poly_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Cst, gr_ctx_struct ** Pol, const gr_ctx_t Ore);
+
 int gr_ore_poly_ctx_write(gr_stream_t out, gr_ore_poly_ctx_t ctx);
 
 truth_t gr_ore_poly_ctx_is_ring(gr_ore_poly_ctx_t ctx);
