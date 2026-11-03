@@ -1546,6 +1546,49 @@ $n_{\mathrm{start}} \le k < n_{\mathrm{end}}$, and returns the largest
 relative step $|\delta_k|/|z_k|$ before damping.
 :::
 
+## Vector functions {#vector}
+
+::: function
+acb_poly_struct * _acb_poly_vec_init(slong n)
+void _acb_poly_vec_clear(acb_poly_struct * vec, slong n)
+
+Allocate a vector of `n` polynomials initialised to zero, and free
+such a vector.
+:::
+
+::: function
+void _acb_poly_vec_zero(acb_poly_struct *dest, slong n)
+void _acb_poly_vec_fit_length(acb_poly_struct * vec, slong n, slong len)
+void _acb_poly_vec_set_length(acb_poly_struct * vec, slong n, slong len)
+void _acb_poly_vec_normalise(acb_poly_struct * vec, slong n)
+
+Apply the corresponding `acb_poly` functions entrywise.
+:::
+
+::: function
+void _acb_poly_vec_set(acb_poly_struct * dest, const acb_poly_struct * src, slong n)
+
+Copy entrywise.
+:::
+
+::: function
+slong _acb_poly_vec_length(const acb_poly_struct * vec, slong n)
+
+Return the maximum of the lengths of the entries.
+:::
+
+::: function
+void _acb_poly_vec_set_block(acb_poly_struct * dest, const acb_poly_struct * src, slong n, slong base, slong len)
+
+Set each entry of `dest` to the block of `len` coefficients starting at offset `base` in the corresponding entry of `src`.
+:::
+
+::: function
+int _acb_poly_vec_overlaps(const acb_poly_struct * vec1, const acb_poly_struct * vec2, slong n)
+
+Apply `acb_poly_overlaps` entrywise and return whether it holds for all entries.
+:::
+
 ## Internal functions {#internal}
 
 ::: function
