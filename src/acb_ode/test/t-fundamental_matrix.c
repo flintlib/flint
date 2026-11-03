@@ -105,7 +105,8 @@ TEST_GR_FUNCTION_START(acb_ode_fundamental_matrix, state, count_success, count_d
         slong dop_len_bound = 8;
         if (Pol->which_ring == GR_CTX_GR_POLY
             && (POLYNOMIAL_ELEM_CTX(Pol)->methods == _ca_methods
-                || POLYNOMIAL_ELEM_CTX(Pol)->methods ==  _qqbar_methods))
+                || POLYNOMIAL_ELEM_CTX(Pol)->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR
+                || POLYNOMIAL_ELEM_CTX(Pol)->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_QQBAR))
             dop_len_bound = 4;
         if (n_randint(state, 4))
             dop_len_bound = FLINT_MIN(dop_len_bound, 5);
