@@ -186,6 +186,8 @@ void arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res2, ulong n, const arb_t 
 void arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec);
 
 void arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong prec);
+int _arb_hypgeom_legendre_p_ui_root_bitburst(arb_t res, arb_t weight, ulong n, ulong k, slong prec);
+int _arb_hypgeom_legendre_p_ui_root_taylor(arb_t res, arb_t weight, ulong n, ulong k, slong prec);
 
 void arb_hypgeom_central_bin_ui(arb_t res, ulong n, slong prec);
 

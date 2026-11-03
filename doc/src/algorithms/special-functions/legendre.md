@@ -1,6 +1,6 @@
 ---
 title: Legendre functions and orthogonal polynomials
-summary: Legendre polynomials of large degree by the method of Johansson and Mezzarobba (hypergeometric series at 0 and 1, an asymptotic expansion with explicit error bounds, and a recurrence, chosen by cost and cancellation), Gauss–Legendre nodes and weights, associated Legendre functions of both kinds through 2F1 and connection formulas, spherical harmonics, and the classical orthogonal polynomials and their extensions to non-integer degree.
+summary: Legendre polynomials of large degree by the method of Johansson and Mezzarobba (hypergeometric series at 0 and 1, an asymptotic expansion with explicit error bounds, and a recurrence, chosen by cost and cancellation), Gauss–Legendre nodes and weights by Newton iteration, bit-burst Newton steps and Newton–Taylor steps with certified Taylor bounds, associated Legendre functions of both kinds through 2F1 and connection formulas, spherical harmonics, and the classical orthogonal polynomials and their extensions to non-integer degree.
 order: 48
 ---
 
@@ -57,10 +57,16 @@ expansions are available.
   terms needed decreases as $n$ grows; for $n$ much larger than the
   precision a handful of terms suffice, independently of $n$.
 - **Recurrence** (`arb_hypgeom_legendre_p_ui_rec`): the three-term
-  recurrence $(k+1)P_{k+1} = (2k+1)xP_k - kP_{k-1}$, evaluated in
-  fixed-point arithmetic with machine words and a rigorous bound for
-  the accumulated rounding error. It is stable on $(-1, 1)$, costs
-  $O(n)$ cheap operations, and is the fastest method for moderate $n$
+  recurrence $(k+1)P_{k+1} = (2k+1)xP_k - kP_{k-1}$, scaled by its
+  denominators: $u_k = k!\,P_k$ satisfies $u_{k+1} = (2k+1)x u_k - k^2
+  u_{k-1}$ without division. The values are kept as limb vectors of
+  fixed length with a common exponent (the low limb is dropped as they
+  grow), each step is a high product `flint_mpn_mulhigh_n` by $x$ and
+  two operations by words, and the result is divided by $n!$ at the
+  end. The rounding errors are bounded a priori with the
+  error-propagation estimate of [@JM2018, Proposition 5], which uses
+  only $|P_k(x)| \le 1$. It is stable on $(-1, 1)$, costs $O(n)$
+  short-product operations, and is the fastest method for moderate $n$
   and precision.
 
 `arb_hypgeom_legendre_p_ui` selects the method from estimates of the
@@ -83,15 +89,195 @@ $r \cdot \max|P_n'|$ and $r \cdot \max|P_n''|$ on the ball
 
 The roots $1 > x_0 > \cdots > x_{n-1} > -1$ of $P_n$ and the weights
 $w_k = 2/((1-x_k^2)P_n'(x_k)^2)$ are computed by
-`arb_hypgeom_legendre_p_ui_root`: an initial approximation with an
-explicit error bound due to Petras [@Pet1999], Newton iteration with a
-priori error bounds at low precision, and interval Newton iteration at
-doubling precisions above; each step evaluates $P_n$ and $P_n'$ with
-the method above, and the doubling of the precision means that the
-final evaluation dominates the cost. This is what makes high-degree
-Gauss–Legendre quadrature in `acb_calc_integrate` practical at high
-precision [@JM2018]. See
-[](arb_hypgeom/legendre-roots).
+`arb_hypgeom_legendre_p_ui_root`. By the symmetry $x_{n-1-k} = -x_k$,
+$w_{n-1-k} = w_k$ only the positive roots, $0 \le k < \lfloor n/2
+\rfloor$, are computed; the middle root of odd $n$ is $0$. There are
+three methods, chosen by $n$ and the precision $p$:
+
+| condition | method |
+|---|---|
+| $n < 64$ or $p < 128$ | Newton iteration with evaluations of $P_n$ [@JM2018] |
+| $0.3n \le p \le 15n$ | bit-burst Newton steps (`_arb_hypgeom_legendre_p_ui_root_bitburst`) |
+| otherwise | Newton–Taylor steps (`_arb_hypgeom_legendre_p_ui_root_taylor`) |
+
+The last two certify their result with an interval Newton step and an
+isolating enclosure; if a certification step fails, the first method
+is used.
+
+### Initial approximation and isolation {#roots-isolation}
+
+All methods start from the approximation of Petras [@Pet1999]: with
+$\phi = \frac{4k+3}{4n+2}\pi$ (that is, $(4k'-1)\pi/(4n+2)$ for the
+1-based index $k' = k + 1$),
+$$
+x_k \approx \cos\psi, \qquad \psi = \phi + \frac{2\cos\phi}{(4n+2)^2
+\sin\phi}\left(1 - \frac{11}{(4n+2)^2 \sin^2\phi}\right),
+$$
+with an error of at most $\phi^2 \cdot 22 y^4 (1 + 2y^2)$, $y =
+1/((4k'-1)\pi)$, a bound that is squared by each Newton step.
+
+The bit-burst and Newton–Taylor methods identify the root through this
+enclosure at about $64 + 2\log_2 n$ bits: it is checked to lie in $(0,
+1)$ and to be disjoint from the enclosures of $x_{k-1}$ and $x_{k+1}$,
+so that it contains $x_k$ and no other root. Their final interval
+Newton step proves that a candidate interval contains exactly one root
+of $P_n$, and containment of that interval in the Petras enclosure
+proves that it is $x_k$.
+
+### Newton iteration with full evaluations {#roots-newton}
+
+1. Starting from Petras' approximation, Newton steps at a precision
+   about 20% above the target square the a priori error bound until it
+   is below $2^{-p}$.
+2. When 40 bits plus a padding of $8 + 2\log_2 n$ bits is less than
+   half of $p$, step 1 is carried out only at a low starting precision,
+   and the enclosure is refined by interval Newton steps $x \mapsto m -
+   P_n(m)/P_n'(X)$ at doubling precisions, where $m$ is the midpoint of
+   the current enclosure $X$ and $P_n'(X)$ is bounded by $P_n'(m)$ plus
+   a bound for $P_n''$ from `arb_hypgeom_legendre_p_ui_deriv_bound`
+   times the radius.
+3. The weight comes from $P_n'$ at the enclosure of $x_k$.
+
+All evaluations of $P_n$ and $P_n'$ use `arb_hypgeom_legendre_p_ui`;
+the last one, at full precision and with a full-precision argument,
+dominates the cost.
+
+### Taylor bounds {#roots-taylor-bounds}
+
+The other two methods use the Taylor series $P_n(m + t) = \sum_j c_j
+t^j$ at a real point $m$. For $z$ in the disk $|z - m| \le r$, the
+Laplace integral
+$$
+P_n(z) = \frac{1}{\pi} \int_0^\pi \left(z + \sqrt{z^2-1}\cos\varphi\right)^n d\varphi
+$$
+gives $|P_n(z)| \le M = \max \rho(z)^n$ with $\rho(z) = \max|z \pm
+i\sqrt{1-z^2}|$, since the integrand is a convex combination of the
+two endpoints; $M$ is bounded on a box enclosing the disk, which must
+lie in the half-plane $\operatorname{Re}(1 - z^2) > 0$. The Cauchy
+estimates $|c_j| \le M/r^j$ give, for $|t| \le \tau = q r$ with $q <
+1/2$,
+$$
+\sum_{j > R} |c_j| \tau^j \le \frac{M q^{R+1}}{1-q}, \qquad
+\sum_{j > R} j |c_j| \tau^{j-1} \le \frac{M}{r}\,\frac{(R+1) q^R}{(1-q)^2}.
+$$
+The radius is $r = 0.99\min(\sqrt{1-m^2}/n,\ (1-m)/4)$, about the
+distance over which $P_n$ changes by a bounded factor: about $1/n$ in
+the interior and $(k+1)^2/n^2$ near $\pm 1$.
+
+### Bit-burst Newton steps {#roots-bitburst}
+
+For precision comparable to $n$, the root is computed by the bit-burst
+idea for holonomic functions [@CC1990; @vdH1999]: every evaluation
+point has only about twice as many bits as the accuracy of the
+approximation it represents, so that the full-precision work multiplies
+full-precision numbers only by short integers.
+
+1. **Starting point.** $x^{(0)} = A/2^B$, from Petras' approximation
+   and three Newton steps in double precision. The first transfer needs
+   $|x^{(0)} - x_k|$ well below the radius $r$ of the Taylor bounds.
+   With $B = w - 2 - \lceil \log_2 2n \rceil$ for the word size $w$,
+   the multipliers of stage 0 fit in a word; this is used when $2B \ge
+   w$ and $2^{-B} \le r/64$. Otherwise $B$ is the larger of $62 -
+   \lceil \log_2 2n \rceil$ and $\log_2(1/r) + 8$, and for $r <
+   2^{-44}$, beyond the accuracy of double precision, $x^{(0)}$ is the
+   midpoint of Petras' enclosure, whose error is a small fraction of
+   $r$.
+2. **Stage 0** computes $P_n$ and $P_{n-1}$ at $x^{(0)}$ to the working
+   precision. With $u_j = j!\,2^{Bj} P_j(x^{(0)})$ the three-term
+   recurrence becomes
+   $$
+   u_{j+1} = (2j+1) A\, u_j - j^2 2^{2B} u_{j-1},
+   $$
+   with no division. With the word-size choice of $B$ and below 130000
+   bits, the recurrence runs on two's complement limb windows of fixed
+   size (one `mpn_mul_1` and one `mpn_submul_1` per step), dropping the
+   low limbs as the values grow; otherwise exact products of blocks of
+   steps, each of about the working precision and formed by binary
+   splitting, are applied in turn to a ball vector.
+3. **Transfer stages.** The Newton correction $-P_n/P_n'$ is rounded
+   to $\delta = D/2^E$ with about twice as many bits as the current
+   accuracy, and $(P_n, P_n')$ are moved from $x = A/2^B$ to $x +
+   \delta$ by the Taylor series. From the Legendre equation
+   $(1-x^2)y'' - 2xy' + n(n+1)y = 0$, the terms $a_j = c_j \delta^j$
+   satisfy
+   $$
+   \gamma_j a_{j+2} = \alpha_j a_{j+1} + \beta_j a_j, \quad
+   \alpha_j = 2AD(j+1)^2 2^{E-B}, \quad
+   \beta_j = D^2 (j(j+1) - n(n+1)), \quad
+   \gamma_j = \sigma (j+1)(j+2) 2^{2(E-B)},
+   $$
+   with $\sigma = 2^{2B} - A^2$. The sums $\sum a_j$ and $\sum j a_j$,
+   which give $P_n(x + \delta)$ and $\delta P_n'(x+\delta)$, are
+   computed in fixed point, with the terms as integers whose lengths
+   decrease with $j$, so that the precision tapers by itself; the
+   powers of two are split off from the divisions. When $K \cdot p$
+   exceeds $10^{10}$, exact blocks of steps formed by binary splitting
+   are applied in ball arithmetic instead. The number of terms $K$ is
+   chosen so that the terms beyond it are below the working precision,
+   and their sum is bounded by the Taylor bound above. Each stage
+   doubles the size of the integers and halves the number of terms.
+4. **Final step.** At the last point, within about $2^{-p/2}$ of $x_k$,
+   an interval Newton step on the Taylor polynomial of degree 2 plus
+   its tail bound encloses $x_k$, and $P_n'(x_k)$ for the weight comes
+   from the same expansion.
+
+The products of $2 \times 2$ blocks use `fmpz_mat_mul_fft_small` for
+entries above 10000 bits.
+
+**Error bound for the limb recurrence.** When a step drops limbs, the
+new $u_{j+1}$ and the new $u_j$ lose less than one unit $2^{wS}$ of
+the lowest kept limb each ($S$ the limb exponent of the window); in
+terms of $P_i = u_i / (i!\,2^{Bi})$, these are errors in $P_{j+1}$ and,
+through the multiplier, in $P_{j+2}$, of at most $(j+2)\, 2^{B + wS} /
+((j+1)!\,2^{B(j+1)})$ together. The computed sequence is the exact one
+plus, for each error $e$ in $P_i$, the solution $y$ of the recurrence
+with $y_i = e$, $y_{i-1} = 0$. With $x = \cos\theta$, $s = \sin\theta$
+and
+$$
+E_m = m\,(y_m^2 - 2x y_m y_{m-1} + y_{m-1}^2) = m (y_{m-1} - x y_m)^2 + m s^2 y_m^2,
+$$
+the recurrence $(m+1) y_{m+1} = (2m+1) x y_m - m y_{m-1}$ gives
+$$
+E_{m+1} = \frac{m^2}{m+1} (y_{m-1} - x y_m)^2 + (m+1) s^2 y_m^2 \le \frac{m+1}{m} E_m,
+$$
+so $E_m \le (m/i) E_i = m e^2$ and $s^2 y_m^2 \le E_m/m \le e^2$:
+every error reaches $P_n$ and $P_{n-1}$ multiplied by at most $1/s$.
+The bound is accumulated during the recurrence in `mag_t` arithmetic.
+
+**Error bound for the fixed-point transfers.** The products in the
+recurrence for $a_j$ are exact and each division by $\gamma_j$
+truncates, adding less than one unit. With $\epsilon_j$ the error of
+$a_j$ in units,
+$$
+\epsilon_{j+2} \le \frac{|\alpha_j| \epsilon_{j+1} + |\beta_j| \epsilon_j}{\gamma_j} + 1,
+$$
+a contracting recurrence since $|\delta|$ is small compared with the
+radius of convergence; it is also evaluated in `mag_t` arithmetic,
+starting from the radii of $P_n$ and $\delta P_n'$.
+
+### Newton–Taylor steps {#roots-taylor}
+
+For precision much larger or much smaller than $n$:
+
+1. An enclosure $m \pm \tau$ of $x_k$ at a quarter of the precision,
+   computed recursively by the method chosen for that precision.
+2. One evaluation of $P_n(m)$ and $P_n'(m)$ at the full precision with
+   `arb_hypgeom_legendre_p_ui`, and the Taylor coefficients $c_j$ from
+   the recurrence
+   $$
+   (1-m^2)(j+1)(j+2) c_{j+2} = 2m(j+1)^2 c_{j+1} + (j(j+1) - n(n+1)) c_j,
+   $$
+   with the precision of $c_j$ tapered by $\tau^j$. The degree $R$ is
+   the smallest for which the Taylor bound at $|t| \le \tau$ is below
+   the working precision.
+3. The fixed-point iteration $d \leftarrow -(c_0 + \sum_{j \ge 2} c_j
+   d^j)/c_1$ on midpoints, which gains about a quarter of the precision
+   per step, and a final interval Newton step on the Taylor polynomial
+   of degree $R$ plus its tail bound.
+
+The single full-precision evaluation of $P_n$ dominates the cost when
+the precision is much larger than $n$; when it is much smaller, that
+evaluation uses the asymptotic expansion.
 
 ## Legendre functions {#legendre-functions}
 
@@ -167,7 +353,9 @@ away from $z = 1$, and the ${}_2F_1$ series near it.
 - `arb_hypgeom_legendre_p_ui` and its methods
   `arb_hypgeom_legendre_p_ui_zero`, `arb_hypgeom_legendre_p_ui_one`,
   `arb_hypgeom_legendre_p_ui_asymp`, `arb_hypgeom_legendre_p_ui_rec`;
-  `arb_hypgeom_legendre_p_ui_root` for quadrature, used by
+  `arb_hypgeom_legendre_p_ui_root` and its methods
+  `_arb_hypgeom_legendre_p_ui_root_bitburst` and
+  `_arb_hypgeom_legendre_p_ui_root_taylor` for quadrature, used by
   `acb_calc_integrate` and `arb_fpwrap`.
 - `acb_hypgeom_legendre_p`, `acb_hypgeom_legendre_q`,
   `acb_hypgeom_legendre_p_uiui_rec`, `acb_hypgeom_spherical_y` and the

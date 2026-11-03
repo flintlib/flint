@@ -914,9 +914,11 @@ The algorithm is that of Johansson and Mezzarobba [@JM2018]; see
   Fostier [@Bog2012]. The parameter $K$ is the exact number of terms;
   if the truncated expansion is not the exact polynomial, a bound for
   the remainder is added.
-- `arb_hypgeom_legendre_p_ui_rec` uses the three-term recurrence in
-  fixed-point arithmetic; it is meant for $x \in (-1,1)$, moderate $n$
-  and modest precision.
+- `arb_hypgeom_legendre_p_ui_rec` uses the three-term recurrence
+  scaled by its denominators, on limb vectors with high products and no
+  division until the end; it is meant for $x \in (-1,1)$, moderate $n$
+  and modest precision, and falls back to the expansion at 1 if the
+  ball is not contained in $(-1, 1)$.
 - `arb_hypgeom_legendre_p_ui` reduces to $x \ge 0$ by symmetry, picks
   the cheapest method from estimates of the number of terms and of the
   cancellation in each series, raises the working precision to
@@ -934,6 +936,32 @@ with the roots in decreasing order $1 > x_0 > x_1 > \cdots > x_{n-1} >
 weight $w_k = 2 / ((1 - x_k^2) P'_n(x_k)^2)$ of Gauss–Legendre
 quadrature on $[-1, 1]$. Requires $0 \le k < n$. See
 [](arb_hypgeom/legendre-roots).
+
+::: details
+For $n \ge 64$ and a precision of at least 128 bits, the positive roots
+are computed by `_arb_hypgeom_legendre_p_ui_root_bitburst` when the
+precision is between $0.3n$ and $15n$ and by
+`_arb_hypgeom_legendre_p_ui_root_taylor` otherwise; for smaller $n$ or
+precision, or if their certification fails, by Newton iteration with
+evaluations of $P_n$. See [](algorithms/special-functions/legendre#roots).
+:::
+:::
+
+::: function
+int _arb_hypgeom_legendre_p_ui_root_bitburst(arb_t res, arb_t weight, ulong n, ulong k, slong prec)
+int _arb_hypgeom_legendre_p_ui_root_taylor(arb_t res, arb_t weight, ulong n, ulong k, slong prec)
+
+Computes the root $x_k$ of $P_n$ and, if `weight` is not `NULL`, its
+weight as `arb_hypgeom_legendre_p_ui_root`, for a positive root, $0 \le
+k < \lfloor n/2 \rfloor$ and $n \le 2^{28}$ ($2^{14}$ on 32-bit
+systems), by bit-burst Newton steps
+with Taylor transfers (efficient when `prec` is comparable to $n$) or by
+Newton–Taylor steps from a lower-precision enclosure (efficient when
+`prec` is much larger or much smaller than $n$). Returns 1 on success,
+and 0 if the arguments are out of range or a certification step failed,
+in which case `res` and `weight` are undefined. See
+[](algorithms/special-functions/legendre#roots-bitburst) and
+[](algorithms/special-functions/legendre#roots-taylor).
 :::
 
 ## Dilogarithm {#dilog}

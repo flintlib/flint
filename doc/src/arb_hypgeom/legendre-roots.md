@@ -1,6 +1,6 @@
 ---
 title: Roots of Legendre polynomials and Gauss–Legendre nodes
-functions: arb_hypgeom_legendre_p_ui_root
+functions: arb_hypgeom_legendre_p_ui_root _arb_hypgeom_legendre_p_ui_root_bitburst _arb_hypgeom_legendre_p_ui_root_taylor
 ---
 
 `arb_hypgeom_legendre_p_ui_root` computes an enclosure of the $k$-th
@@ -17,42 +17,10 @@ with $k < \lceil n/2 \rceil$ need to be computed, since $x_{n-1-k} =
 -x_k$ and $w_{n-1-k} = w_k$; the function uses this symmetry itself.
 An index $k \ge n$ raises an exception. The function is the one used
 by `acb_calc_integrate` to generate its quadrature rules
-([](algorithms/ball-arithmetic/integration)). The method is that of Johansson and Mezzarobba [@JM2018].
+([](algorithms/ball-arithmetic/integration)). The algorithms are
+described in [](algorithms/special-functions/legendre#roots).
 
 ::: summary algorithms/special-functions/legendre :::
-
-## Algorithm {#algorithm}
-
-1. **Initial approximation.** With $\phi = \frac{4k+3}{4n+2}\pi$ (that
-   is, $(4k'-1)\pi/(4n+2)$ for the 1-based index $k' = k + 1$), the
-   approximation
-   $$
-   x \approx \cos\psi, \qquad \psi = \phi + \frac{2\cos\phi}{(4n+2)^2
-   \sin\phi}\left(1 - \frac{11}{(4n+2)^2 \sin^2\phi}\right)
-   $$
-   of Petras [@Pet1999] has an explicit error bound, of the order of
-   $\phi^2 \cdot 22 y^4 (1 + 2y^2)$ with $y = 1/((4k'-1)\pi)$.
-2. **Newton iteration with a priori bounds.** Petras also shows that
-   Newton's method converges quadratically from this approximation, so
-   the error bound is squared at each step; the iteration runs, at a
-   precision about 20% above the target, until the bound is below
-   $2^{-\mathit{prec}}$. This gives a rigorous enclosure for modest
-   precision.
-3. **Interval Newton refinement.** At high precision (when 40 bits
-   plus a padding of $8 + 2\log_2 n$ bits is less than half of
-   `prec`), the steps above are carried out only at a low starting
-   precision, and the enclosure is refined by interval Newton steps
-   $x \mapsto m - P_n(m)/P_n'(X)$ at doubling precisions, where $m$ is
-   the midpoint of the current enclosure $X$ and $P_n'(X)$ is bounded
-   by $P_n'(m)$ plus a bound for $P_n''$ from
-   `arb_hypgeom_legendre_p_ui_deriv_bound` times the radius.
-4. **Weight.** $P_n'(x_k)$ is computed with
-   `arb_hypgeom_legendre_p_ui` at the enclosure of $x_k$.
-
-All evaluations of $P_n$ and $P_n'$ go through
-`arb_hypgeom_legendre_p_ui`, which chooses between the hypergeometric
-series at 0 and at 1, the asymptotic expansion in $n$ and the
-recurrence (see [](algorithms/special-functions/legendre)).
 
 ## Example {#example}
 
