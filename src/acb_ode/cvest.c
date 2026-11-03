@@ -80,8 +80,14 @@ acb_ode_cvest_update(acb_ode_cvest_t cvest,  /* aliasing allowed */
         || cvest->loss_rate >= _old.loss_rate * 1.0125)
         cvest->prec_wanted = ARF_PREC_EXACT;
     else if (cvest->terms_wanted > 0)
-        cvest->prec_wanted = prec - 0.875 * cvest->neglogterm
-                           + cvest->terms_wanted * cvest->loss_rate;
+    {
+        double pw = prec - 0.875 * cvest->neglogterm
+                    + cvest->terms_wanted * cvest->loss_rate;
+        if (pw < (double) ARF_PREC_EXACT / 2)
+            cvest->prec_wanted = (slong) pw;
+        else
+            cvest->prec_wanted = ARF_PREC_EXACT;
+    }
     else
         cvest->prec_wanted = prec + 4;
 }
