@@ -704,6 +704,7 @@ the modulus of `mod`, computed with the hardware division or with
 `FLINT_MULMOD_SHOUP_PRECOMP_PREINV` in `flint-mparam.h`, 1 for the
 division-free method. The thresholds `FLINT_MULMOD_SHOUP_THRESHOLD` of
 `flint-mparam.h` are tuned for this choice. Requires $a < n$.
+:::
 
 ::: macro
 NMOD_IS_HALFLIMB(mod)

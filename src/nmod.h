@@ -135,8 +135,6 @@ extern "C" {
     (res) = rxx; \
   } while (0)
 
-#define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
-
 NMOD_INLINE
 ulong _nmod_mulmod_precomp_shoup(ulong a, nmod_t mod)
 {
