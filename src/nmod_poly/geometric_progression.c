@@ -35,7 +35,7 @@ void _nmod_geometric_progression_evaluate_init_nonfullword(nmod_geometric_progre
 
     /* precomputations for Shoup multiplication */
     ulong r_pow_i2 = r;
-    ulong r_pr_quo = n_mulmod_precomp_shoup(r_pow_i2, mod.n);
+    ulong r_pr_quo = _nmod_mulmod_precomp_shoup(r_pow_i2, mod);
 
     G->ev_f->coeffs[0] = 1;
     for (slong i = 1; i < 2*len - 1; i++)
@@ -44,7 +44,7 @@ void _nmod_geometric_progression_evaluate_init_nonfullword(nmod_geometric_progre
         n_mulmod_and_precomp_shoup(&r_pow_i2, &r_pr_quo, q, r_pow_i2, q_pr_quo, q_pr_rem, r_pr_quo, mod.n);
     }
 
-    r_pr_quo = n_mulmod_precomp_shoup(inv_r, mod.n);
+    r_pr_quo = _nmod_mulmod_precomp_shoup(inv_r, mod);
     G->ev_s[0] = 1;
     for (slong i = 1; i < len; i++)
     {
@@ -103,7 +103,7 @@ void _nmod_geometric_progression_interpolate_init_nonfullword(nmod_geometric_pro
     G->int_f->coeffs[0] = 1;
     G->int_s2[0] = 1;
 
-    const ulong one_precomp = n_mulmod_precomp_shoup(UWORD(1), mod.n);
+    const ulong one_precomp = _nmod_mulmod_precomp_shoup(UWORD(1), mod);
     ulong q_pow_i = 1;
     ulong q_pow_i_pr = one_precomp;
     ulong inv_q_pow_i = 1;
@@ -661,8 +661,8 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
         ulong q_pr_quo;
         ulong inv_q_pr_rem;
         ulong inv_q_pr_quo;
-        n_mulmod_precomp_shoup_quo_rem(&q_pr_quo, &q_pr_rem, q, mod.n);
-        n_mulmod_precomp_shoup_quo_rem(&inv_q_pr_quo, &inv_q_pr_rem, inv_q, mod.n);
+        _nmod_mulmod_precomp_shoup_quo_rem(&q_pr_quo, &q_pr_rem, q, mod);
+        _nmod_mulmod_precomp_shoup_quo_rem(&inv_q_pr_quo, &inv_q_pr_rem, inv_q, mod);
 
         if (function & UWORD(1))  /* evaluate */
             _nmod_geometric_progression_evaluate_init_nonfullword(G, r, len, mod, q, q_pr_quo, q_pr_rem, inv_r, inv_q, inv_q_pr_quo, inv_q_pr_rem);

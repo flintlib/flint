@@ -472,6 +472,30 @@ void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a,
 }
 
 ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup_preinv(ulong a, ulong n, ulong ninv)
+{
+    ulong a_precomp, r;
+    unsigned int norm = flint_clz(n);
+    FLINT_ASSERT(a < n);
+    /* a B / n == (a 2^norm) B / (n 2^norm): normalised divisor,  */
+    /* and high word is below it (since a < n)                    */
+    udiv_qrnnd_preinv(a_precomp, r, a << norm, UWORD(0), n << norm, ninv);
+    (void) r;
+    return a_precomp;
+}
+
+ULONG_EXTRAS_INLINE
+void n_mulmod_precomp_shoup_quo_rem_preinv(ulong * a_pr_quo, ulong * a_pr_rem,
+                                           ulong a, ulong n, ulong ninv)
+{
+    ulong r;
+    unsigned int norm = flint_clz(n);
+    FLINT_ASSERT(a < n);
+    udiv_qrnnd_preinv(*a_pr_quo, r, a << norm, UWORD(0), n << norm, ninv);
+    *a_pr_rem = r >> norm;
+}
+
+ULONG_EXTRAS_INLINE
 ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
 {
     return - a_pr_quo * n;

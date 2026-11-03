@@ -46,7 +46,7 @@ TEST_FUNCTION_START(n_mulmod_and_precomp_shoup, state)
         result = result && (ab_precomp == n_mulmod_precomp_shoup(ab, d));
 
         if (!result)
-            TEST_FUNCTION_FAIL("a = %wu, b = %wu, d = %wu, \n",
+            TEST_FUNCTION_FAIL("a = %wu, b = %wu, d = %wu,\n"
                     "a_pr_quo = %wu, a_pr_rem = %wu, b_precomp = %wu\n"
                     "q = %wu, r1 = %wu, r2 = %wu, ab_precomp = %wu\n",
                     a, b, d, a_pr_quo, a_pr_rem, b_precomp, q, ab, r, ab_precomp);

@@ -228,7 +228,7 @@ tri_inv_diag(nn_ptr inv, const nmod_mat_t T)
 
     if (NMOD_CAN_USE_SHOUP(mod))
         for (j = 0; j < r; j++)
-            inv[r + j] = n_mulmod_precomp_shoup(inv[j], mod.n);
+            inv[r + j] = _nmod_mulmod_precomp_shoup(inv[j], mod);
 }
 
 FLINT_FORCE_INLINE ulong

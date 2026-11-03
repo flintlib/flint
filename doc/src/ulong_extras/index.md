@@ -501,6 +501,17 @@ function recovers the remainder from a known quotient.
 :::
 
 ::: function
+ulong n_mulmod_precomp_shoup_preinv(ulong a, ulong n, ulong ninv)
+void n_mulmod_precomp_shoup_quo_rem_preinv(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n, ulong ninv)
+
+Same as `n_mulmod_precomp_shoup` and `n_mulmod_precomp_shoup_quo_rem`,
+given `ninv` from `n_preinvert_limb(n)` (the `ninv` of an `nmod_t`). They
+use multiplications instead of a hardware division: much faster where the
+division is slow (e.g. Skylake or Cascade Lake, and 64-bit ARM), about as fast
+on recent x86-64 processors. Require $a < n$; any $n \ne 0$.
+:::
+
+::: function
 void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp, ulong a, ulong b, ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp, ulong n)
 
 Sets `*ab` to $ab \bmod n$ and `*ab_precomp` to its precomputed data

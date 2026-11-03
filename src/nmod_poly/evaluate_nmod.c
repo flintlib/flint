@@ -34,7 +34,7 @@ _nmod_vec_set_powers_precomp(nn_ptr res, ulong x, slong len, nmod_t mod)
     slong i;
     res[0] = 1;
     res[1] = x;
-    ulong xpre = n_mulmod_precomp_shoup(x, mod.n);
+    ulong xpre = _nmod_mulmod_precomp_shoup(x, mod);
 
     for (i = 2; i < len; i++)
         res[i] = n_mulmod_shoup(x, res[i - 1], xpre, mod.n);
@@ -68,7 +68,7 @@ _nmod_poly_evaluate_nmod_rectangular(nn_srcptr poly,
     if (NMOD_CAN_USE_SHOUP(mod))
     {
         _nmod_vec_set_powers_precomp(xs, x, m + 1, mod);
-        xmpre = n_mulmod_precomp_shoup(xs[m], mod.n);
+        xmpre = _nmod_mulmod_precomp_shoup(xs[m], mod);
 
         y = _nmod_vec_dot(poly + (r - 1) * m + 1, xs + 1, len - (r - 1) * m - 1, mod, params);
         y = nmod_add(y, poly[(r - 1) * m], mod);
@@ -218,7 +218,7 @@ _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 
     if (modn <= LAZY_MAX)
     {
-        const ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
+        const ulong c_precomp = _nmod_mulmod_precomp_shoup(c, mod);
         ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(poly, len, c, c_precomp, modn);
         /* Correct excess. */
         if (val >= 2*modn)
@@ -229,7 +229,7 @@ _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
     }
     else
     {
-        const ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
+        const ulong c_precomp = _nmod_mulmod_precomp_shoup(c, mod);
         return _nmod_poly_evaluate_nmod_precomp(poly, len, c, c_precomp, modn);
     }
 }
