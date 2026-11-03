@@ -394,6 +394,14 @@ accuracy relative to the quotients.
 :::
 :::
 
+::: function
+void mp_real_pow_ui(mp_real_t res, const mp_real_t x, ulong e, slong n)
+
+Set `res` to $x^e$ ($1$ for $e = 0$) by left-to-right binary powering,
+each of the at most $2 \log_2 e$ products at precision $n$; the relative
+radius grows about in proportion to $e$.
+:::
+
 ## Roots and the arithmetic-geometric mean {#roots}
 
 ::: function
@@ -587,11 +595,12 @@ void mp_real_const_gamma_1_3(mp_real_t res, slong n, int cache)
 void mp_real_const_gamma_1_4(mp_real_t res, slong n, int cache)
 void mp_real_const_2_div_pi(mp_real_t res, slong n, int cache)
 void mp_real_const_inv_log2_frac(mp_real_t res, slong n, int cache)
+void mp_real_const_khinchin(mp_real_t res, slong n, int cache)
 
 Set `res` to a ball containing $c = \pi/4$, $\log 2$, Euler's constant
 $\gamma$, $e$, $\log 10$, Catalan's constant $G$, $\zeta(3)$,
-$\zeta(5)$, $\Gamma(1/3)$, $\Gamma(1/4)$, $2/\pi$ resp.
-$1/\log 2 - 1$, accurate to about $n$ limbs. With `cache` = 0 the value
+$\zeta(5)$, $\Gamma(1/3)$, $\Gamma(1/4)$, $2/\pi$, $1/\log 2 - 1$
+resp. Khinchin's constant $K$, accurate to about $n$ limbs. With `cache` = 0 the value
 is computed from scratch; with `cache` = 1 it is read from (and if
 necessary added to) a process-wide cache of floors, and the ball is the
 cached floor with a radius of one ulp.
@@ -621,6 +630,7 @@ void _mp_real_const_gamma_1_3(nn_ptr res, ulong * err, slong n, int cache)
 void _mp_real_const_gamma_1_4(nn_ptr res, ulong * err, slong n, int cache)
 void _mp_real_const_2_div_pi(nn_ptr res, ulong * err, slong n, int cache)
 void _mp_real_const_inv_log2_frac(nn_ptr res, ulong * err, slong n, int cache)
+void _mp_real_const_khinchin(nn_ptr res, ulong * err, slong n, int cache)
 
 Set `res` to exactly $\lfloor c B^n \rfloor$ for the constants $c$ of
 `mp_real_const_pi4` and its siblings,
@@ -667,6 +677,29 @@ Euler's constant with a forced choice of the logarithms used in the
 Brent–McMillan formula: `set` = 0, 1, 2, 3 selects the primes $\{2\}$,
 $\{2, 3\}$, $\{2, 3, 5\}$, $\{2, 3, 5, 7\}$, and $-1$ the automatic
 choice. For tuning.
+:::
+
+::: function
+void _mp_real_const_khinchin_tune(mp_real_t res, slong n, slong K0, slong n1, slong nb)
+
+Khinchin's constant with forced parameters: the logarithm rows
+$2 \le k < K_0$, the Bernoulli columns $n < n_1$ (the rest is summed
+directly), and the number $nb$ of ranges of Bernoulli columns run at
+once, each with its own iterator and about $1/nb$ of the threads (fewer
+ranges take less memory). A zero parameter selects the default. The
+parameters are clamped to $3 \le K_0 \le 300$,
+$\max(n + 1, \bits\, n/40 + 1) \le n_1 \le M + 1$ for $n$ limbs ($M$ the last
+column needed with $K_0$, so that the $k$ summed directly stay below
+$2^{20}$) and $1 \le nb \le$ the number of threads. For tuning.
+:::
+
+::: function
+void _mp_real_const_khinchin_params(slong * K0, slong * n1, slong * nb, slong n)
+
+Sets `K0`, `n1` and `nb` to the default parameters of
+`_mp_real_const_khinchin_tune` at `n` limbs (`nb` for the current number
+of threads). The profile program
+`p-const_khinchin_tune` measures them against their neighbours.
 :::
 
 ## Elementary functions {#elementary}

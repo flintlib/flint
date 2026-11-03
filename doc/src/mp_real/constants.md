@@ -1,14 +1,16 @@
 ---
 title: Mathematical constants
-functions: mp_real_const_pi4 _mp_real_const_pi4 _mp_real_const_clear_cache mp_real_const_func _mp_real_const_arb _mp_real_const_euler_tune
+functions: mp_real_const_pi4 _mp_real_const_pi4 _mp_real_const_clear_cache mp_real_const_func _mp_real_const_arb _mp_real_const_euler_tune _mp_real_const_khinchin_tune _mp_real_const_khinchin_params
 ---
 
-`mp_real` computes twelve constants: $\pi/4$, $\log 2$, Euler's constant
+`mp_real` computes thirteen constants: $\pi/4$, $\log 2$, Euler's constant
 $\gamma$, $e$, $\log 10$, Catalan's constant $G$, $\zeta(3)$,
-$\zeta(5)$, $\Gamma(1/3)$, $\Gamma(1/4)$, $2/\pi$ and $1/\log 2 - 1$.
+$\zeta(5)$, $\Gamma(1/3)$, $\Gamma(1/4)$, $2/\pi$, $1/\log 2 - 1$ and
+Khinchin's constant $K$.
 They are the implementations behind `arb_const_pi`, `arb_const_log2`,
 `arb_const_euler`, `arb_const_e`, `arb_const_log10`,
-`arb_const_catalan`, `arb_const_apery`, `arb_const_zeta5` and the
+`arb_const_catalan`, `arb_const_apery`, `arb_const_zeta5`,
+`arb_const_khinchin` and the
 $\Gamma$ values of `arb_hypgeom_gamma_fmpq`, and they are used inside
 the module by the argument reductions of the elementary functions.
 
@@ -46,7 +48,7 @@ The `arb` constants call `_mp_real_const_arb`, which computes with
 
 ## Algorithms {#algorithms}
 
-All constants except $\log 10$ are hypergeometric series summed by
+All constants except $\log 10$ and $K$ are hypergeometric series summed by
 `mp_real_hypgeom_series`, with formulas chosen from y-cruncher's
 formula collection as the fastest in this implementation:
 
@@ -62,11 +64,13 @@ formula collection as the fastest in this implementation:
 | $\zeta(5)$ | Sun's identity $\zeta(5) = (3S + 56\pi^2\zeta(3))/540$ |
 | $\Gamma(1/3)$ | $(810^{1/4}\pi/X)^{1/3}$ with Guillera's series $X$ |
 | $\Gamma(1/4)$ | Ebisu's series, or $\sqrt{(2\pi)^{3/2}/\operatorname{agm}(1, \sqrt 2)}$ from $2^{16}$ limbs |
+| $K$ | $\log K \log 2 = \sum_{k \ge 2} -\log(1 - 1/k)\log(1 + 1/k)$: logarithms of primes, exact Bernoulli numbers and recycled powers |
 
 The independent parts (the series and $\pi$ in $\zeta(5)$ and the
 $\Gamma$ values, the three logarithms of $\log 10$, the logarithms
-needed by $\gamma$) run on separate threads. The details, including the
-dual-number splitting for $\gamma$, are in
+needed by $\gamma$, the parts of the double sum for $K$) run on
+separate threads. The details, including the dual-number splitting for
+$\gamma$ and the algorithm for $K$, are in
 [](algorithms/floating-point/constants).
 
 ::: summary algorithms/floating-point/constants :::

@@ -34,25 +34,6 @@
    to the full precision with one evaluation of S, u and r - 1 series
    terms, each at the precision it contributes at. */
 
-/* res = x^m by binary powering at precision n, m >= 1 */
-static void
-_pow_ui(mp_real_t res, const mp_real_t x, ulong m, slong n)
-{
-    if (m == 1)
-        mp_real_set(res, x);
-    else
-    {
-        mp_real_t t;
-        mp_real_init(t);
-        _pow_ui(t, x, m / 2, n);
-        mp_real_mul(t, t, t, n);
-        if (m % 2)
-            mp_real_mul(t, t, x, n);
-        mp_real_swap(res, t);
-        mp_real_clear(t);
-    }
-}
-
 /* the highest order of a step (the tuned orders are 3 and 4) */
 #define ROOT_MAX_ORDER 16
 
@@ -193,7 +174,7 @@ _root_step(mp_real_t res, const mp_real_t v, const mp_real_t z0, ulong k,
     mp_real_set_ui(T, 1);
     if (!recip)
     {
-        _pow_ui(S, z0, k - 1, p);
+        mp_real_pow_ui(S, z0, k - 1, p);
         mp_real_mul(S, S, v, p);
     }
     /* a short v (sqrt(2)): the root too takes its residual from z0^k
@@ -201,7 +182,7 @@ _root_step(mp_real_t res, const mp_real_t v, const mp_real_t z0, ulong k,
        where S z0 would be a product of two full-size operands */
     zk_first = recip || v->size <= p / 16;
     if (zk_first)
-        _pow_ui(T, z0, k, p);
+        mp_real_pow_ui(T, z0, k, p);
     if (rz0 < -8)
     {
         /* |1 - v z0^k| below 2k 2^rz0, plus the rounding of the

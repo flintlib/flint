@@ -68,7 +68,8 @@ worker(slong i, void * _work)
 void
 bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)
 {
-    if (a > (UWORD(1) << 31) || num > 1000000000)
+    if (num > 1000000000 || a > BERNOULLI_REV_NMAX
+        || (num > 0 && a + num - 1 > BERNOULLI_REV_NMAX))
     {
         flint_throw(FLINT_ERROR, "bernoulli_fmpq_vec_no_cache: excessive input\n");
     }
@@ -79,7 +80,11 @@ bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)
         return;
     }
 
-    if (num < 200 || flint_get_num_threads() == 1)
+    /* one iterator (which uses the threads inside each batch) with up to
+       three threads; independent iterators on 32 blocks of the range with
+       more threads (they cost about 1.45 times as much in all, but scale
+       perfectly) */
+    if (num < 200 || flint_get_num_threads() <= 3)
     {
         bernoulli_vec_compute_one_thread(res, a, a + num);
     }

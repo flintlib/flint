@@ -95,16 +95,23 @@ bernoulli_rev_t
 
 An iterator that generates the even-indexed Bernoulli numbers $B_n,
 B_{n-2}, B_{n-4}, \ldots, B_0$ in decreasing order, without caching. An
-array of length one of `bernoulli_rev_struct`.
+array of length one of `bernoulli_rev_struct`, whose field `n` is the
+index of the next number; the rest of the state is private.
 
 ::: details
-The numbers are computed from the zeta series $\zeta(k) = \sum_{j \ge
-1} j^{-k}$ summed directly in fixed-point arithmetic, with a table of the
-odd powers $j^{-n}$ that is updated by multiplication by $j^2$ when $n$
-decreases by 2 [@Blo2009]. The reverse order is what makes the updates
-multiplications rather than divisions, and lets the precision and the
-number of terms decrease as $n$ decreases. See
-[](algorithms/number-theory/bernoulli#zeta).
+The numbers are computed from the zeta function, in batches of 16
+consecutive indices (8 below $n = 4000$): one pass over a table of the
+odd powers $j^{-n}$ in fixed point, each multiplied by $j^2$ per step
+[@Blo2009], gives the zeta values of the whole batch, and each number is
+then the product of the prefactor $2\, n!/(2\pi)^n$, kept as a
+floating-point number, by $\zeta(n)$, rounded to an integer with a
+certified error bound. The precision and the number of terms decrease as
+$n$ decreases. With several threads (`flint_set_num_threads`), the numbers
+of a batch are computed in parallel, together with the table pass of the
+next batch; the threads are requested when a batch starts, so that the
+iterator runs serially if none are free (for example inside another
+parallel computation). See
+[](algorithms/number-theory/bernoulli#reverse).
 :::
 :::
 
@@ -112,7 +119,14 @@ number of terms decrease as $n$ decreases. See
 void bernoulli_rev_init(bernoulli_rev_t iter, ulong n)
 
 Initialises `iter` so that the first call to `bernoulli_rev_next` returns
-$B_n$. An odd $n$ is replaced by $n - 1$.
+$B_n$. An odd $n$ is replaced by $n - 1$. Throws if $n >$
+`BERNOULLI_REV_NMAX`. The table is built on the threads available,
+without temporaries beyond itself, and takes about $m^2/24$ bits of memory
+for the current index $m$ (5 GB for $m = 10^6$), or about $8/15$ of that
+from $n = 10^5$, where the powers of the $j$ divisible by 3 or 5 are left
+out (see [](algorithms/number-theory/bernoulli#reverse)), being given back as the
+iteration proceeds; each thread working in it adds some 60 numbers of the
+size of $B_m$.
 :::
 
 ::: function
@@ -136,7 +150,8 @@ void bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)
 Sets `res` to the `num` consecutive Bernoulli numbers $B_a, B_{a+1},
 \ldots, B_{a + \mathit{num} - 1}$, without reading or writing the cache.
 To reuse a vector, use `bernoulli_cache_compute` and `bernoulli_fmpq_ui`
-instead. Throws if $a > 2^{31}$ or $\mathit{num} > 10^9$.
+instead. Throws if $\mathit{num} > 10^9$ or if an index exceeds
+`BERNOULLI_REV_NMAX`.
 
 ::: details
 For $a = 0$ and $\mathit{num} \le 128$ the function calls
@@ -235,4 +250,13 @@ absolute precision $\mathit{wp}$: $\mathit{wp} - s_1 \log_2 i$, at least
 BERNOULLI_REV_MIN
 
 The reverse iterator uses a table for $n <$ `BERNOULLI_REV_MIN` (32).
+:::
+
+::: macro
+BERNOULLI_REV_NMAX
+
+The largest index of the reverse iterator: $2^{30}$ ($2^{24}$ on 32-bit
+machines), so that the bit counts of the iterator fit a `slong` and the
+integers $n (n - 1)$, $j^2$ and the divisors of its prefactors fit a few
+limbs.
 :::

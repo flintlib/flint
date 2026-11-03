@@ -524,6 +524,7 @@ void _mp_real_const_gamma_1_3_compute(mp_real_t res, slong n);
 void _mp_real_const_gamma_1_4_compute(mp_real_t res, slong n);
 void _mp_real_const_2_div_pi_compute(mp_real_t res, slong n);
 void _mp_real_const_inv_log2_frac_compute(mp_real_t res, slong n);
+void _mp_real_const_khinchin_compute(mp_real_t res, slong n);
 
 /* ball-valued workers of the logarithm and arctangent (newton.c,
    log_agm.c) for a fixed-point input */

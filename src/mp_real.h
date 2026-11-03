@@ -167,6 +167,8 @@ void mp_real_mul_complex(mp_real_t rr, mp_real_t ri, const mp_real_t ar, const m
 void _mp_real_submul_bounded(mp_real_t res, const mp_real_t a, const mp_real_t b, const mp_real_t c, slong E, slong n);
 void mp_real_div(mp_real_t res, const mp_real_t a, const mp_real_t b, slong n);
 void mp_real_div_ui(mp_real_t res, const mp_real_t a, ulong c, slong n);
+/* res = x^e by binary powering (x^0 = 1) */
+void mp_real_pow_ui(mp_real_t res, const mp_real_t x, ulong e, slong n);
 
 /* roots and the AGM */
 void mp_real_sqrt(mp_real_t res, const mp_real_t x, slong n);
@@ -219,11 +221,11 @@ int _mp_real_get_fixed_floor(nn_ptr y, slong n, const mp_real_t x);
 /* constants ****************************************************************/
 
 /* c = pi/4, log 2, Euler's constant, e, log 10, Catalan's constant,
-   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi, 1/log 2 - 1.  The
-   ball versions evaluate c to about n limbs; the limb versions write
-   floor(c B^n) -- n limbs for c < 1 (pi/4, log 2, Euler, Catalan, 2/pi,
-   1/log 2 - 1), n + 1 with a units limb for
-   the others -- and set *err = 1.  cache = 0 computes from scratch;
+   zeta(3), zeta(5), Gamma(1/3), Gamma(1/4), 2/pi, 1/log 2 - 1,
+   Khinchin's constant.  The ball versions evaluate c to about n limbs;
+   the limb versions write floor(c B^n) -- n limbs for c < 1 (pi/4,
+   log 2, Euler, Catalan, 2/pi, 1/log 2 - 1), n + 1 with a units limb
+   for the others -- and set *err = 1.  cache = 0 computes from scratch;
    cache = 1 reads a shared cache of floors (one per constant, read by
    every thread; thread_support.h), extending it to at least
    max(n + 5, 1.5 times the cached precision) when it is short
@@ -241,6 +243,7 @@ void mp_real_const_gamma_1_3(mp_real_t res, slong n, int cache);
 void mp_real_const_gamma_1_4(mp_real_t res, slong n, int cache);
 void mp_real_const_2_div_pi(mp_real_t res, slong n, int cache);
 void mp_real_const_inv_log2_frac(mp_real_t res, slong n, int cache);
+void mp_real_const_khinchin(mp_real_t res, slong n, int cache);
 
 void _mp_real_const_pi4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_log2(nn_ptr res, ulong * err, slong n, int cache);
@@ -254,6 +257,7 @@ void _mp_real_const_gamma_1_3(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_gamma_1_4(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_2_div_pi(nn_ptr res, ulong * err, slong n, int cache);
 void _mp_real_const_inv_log2_frac(nn_ptr res, ulong * err, slong n, int cache);
+void _mp_real_const_khinchin(nn_ptr res, ulong * err, slong n, int cache);
 
 /* frees the shared caches of the constants (no other thread may be
    using them; flint_cleanup_master does the same) */
@@ -272,6 +276,17 @@ void _mp_real_const_arb(arb_t res, mp_real_const_func f, slong prec);
 
 /* Euler's constant with a forced choice of logarithms (tuning) */
 void _mp_real_const_euler_tune(mp_real_t res, slong n, int set);
+
+/* Khinchin's constant with forced parameters K0 (logarithm rows below
+   K0), n1 (Bernoulli columns below n1) and nb (Bernoulli chunks run at
+   once); 0 = default.  They are clamped to 3 <= K0 <= 300,
+   max(n + 1, FLINT_BITS n / 40 + 1) <= n1 <= M + 1 (M the last column
+   for K0) and
+   1 <= nb <= the number of threads */
+void _mp_real_const_khinchin_tune(mp_real_t res, slong n, slong K0, slong n1, slong nb);
+/* the default K0, n1 and nb at n limbs (nb for the current number of
+   threads) */
+void _mp_real_const_khinchin_params(slong * K0, slong * n1, slong * nb, slong n);
 
 /* series ********************************************************************/
 

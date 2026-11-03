@@ -172,21 +172,32 @@ _parallel_tasks_core(void (* f)(slong, void *), void * args,
     else
     {
         /* budgets proportional to the costs of the first w tasks, at
-           least one each, summing to nt (the rounding leftovers to the
-           costliest) */
-        double total = 0.0;
+           least one each, summing to nt: one each plus the share of the
+           nt - w others, rounded down, the leftovers going to the
+           largest remainders (the first of equal ones) */
+        double total = 0.0, rem[FLINT_BITS * 4];
         slong sum = 0;
         for (i = 0; i < w; i++)
             total += FLINT_MAX(cost[i], 0.0);
         for (i = 0; i < w; i++)
         {
-            budget[i] = (total > 0.0)
-                ? (slong) ((double) (nt - w) * FLINT_MAX(cost[i], 0.0) / total) + 1
-                : nt / w;
+            double share = (total > 0.0)
+                ? (double) (nt - w) * FLINT_MAX(cost[i], 0.0) / total
+                : (double) (nt - w) / w;
+            budget[i] = (slong) share + 1;
+            rem[i] = share - (double) (budget[i] - 1);
             sum += budget[i];
             W[i].first = i;
         }
-        budget[0] += nt - sum;
+        for ( ; sum < nt; sum++)
+        {
+            slong k = 0, j;
+            for (j = 1; j < w; j++)
+                if (rem[j] > rem[k])
+                    k = j;
+            budget[k]++;
+            rem[k] = -1.0;
+        }
         S.next = w;
     }
 

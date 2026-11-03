@@ -1,7 +1,7 @@
 ---
 title: Constants in mp_real
-summary: The series and formulas behind the mp_real constants (π, log 2, e, Euler's constant, log 10, Catalan's constant, ζ(3), ζ(5), Γ(1/3), Γ(1/4)), the dual-number binary splitting for Euler's constant, and the cache of exact floors.
-complexity: $O(M(n)\log^2 n)$ for each constant; $\Gamma(1/4)$ from $2^{16}$ limbs in $O(M(n)\log n)$ plus the cost of $\pi$.
+summary: The series and formulas behind the mp_real constants (π, log 2, e, Euler's constant, log 10, Catalan's constant, ζ(3), ζ(5), Γ(1/3), Γ(1/4), Khinchin's constant), the dual-number binary splitting for Euler's constant, the zeta-value sum for Khinchin's constant, and the cache of exact floors.
+complexity: $O(M(n)\log^2 n)$ for each constant; $\Gamma(1/4)$ from $2^{16}$ limbs in $O(M(n)\log n)$ plus the cost of $\pi$; Khinchin's constant in $O(n^3/\log^3 n)$ word operations.
 order: 70
 ---
 
@@ -100,6 +100,122 @@ smooth over $\{2, 3, 5, 7\}$ is scored by this cost plus that of its
 logarithms, and the best is taken (`_mp_real_const_euler_tune` forces
 the set of primes). Below 3456 bits $\gamma$ comes from a static table.
 
+## Khinchin's constant {#khinchin}
+
+Khinchin's constant is not known to have a fast series. With
+$f(x) = -\log(1-x)\log(1+x) = \sum_{n \ge 1} c_n x^{2n}$,
+$c_n = A_n/n$ and $A_n = 1 - \tfrac12 + \tfrac13 - \cdots + \tfrac{1}{2n-1}$,
+$$
+S = \log K \log 2 = \sum_{k \ge 2} f(1/k)
+  = \sum_{k=2}^{K_0-1} f(1/k) + \sum_{n \ge 1} c_n\,\zeta(2n, K_0),
+$$
+the classical sum over $\zeta(2n) - 1$ [@BBC1997] being the case
+$K_0 = 2$. Each cell $(k, n)$ of the double sum $\sum_k\sum_n c_n k^{-2n}$
+is covered in one of three ways.
+
+*Rows* $k < K_0$ use $f(1/k) = (\ell_k - \ell_{k-1})(\ell_{k+1} - \ell_k)$
+with $\ell_m = \log m$, an integer combination of the logarithms
+$\lambda_j$ of the primes up to $K_0$, which come from one set of
+Machin-type series ([](algorithms/floating-point/diophantine-reduction#machin)).
+The sum of the rows is a quadratic form $\sum C_{ij}\lambda_i\lambda_j$
+with small integer $C$, so it costs one full product per prime rather
+than one per row.
+
+*Columns* $n \ge n_1$ sum $\zeta(2n, K_0) = \sum_{k \ge K_0} k^{-2n}$ directly,
+in fixed point with $W$ fraction limbs, over the $k$ with
+$k^{-2n} \ge B^{-W}$. The powers are recycled from column to column,
+downward: $k^{-2n}B^{W+e}$ is kept as an integer with $e$ extended limbs
+and stepped by one `mpn_mul_1` by $k^2$, several times faster than the
+division by $k^2$ an upward recurrence needs. A downward step multiplies
+the absolute error by $k^2$ but keeps the relative error, so a power is
+created (binary powering and one division) with the relative accuracy
+needed at the bottom of its range, its bottom limb is dropped whenever
+its error count passes $2^{20}B$ (so that the truncations, one unit of
+the next limb each, cost a negligible relative amount over thousands of
+drops), and the range is cut into up to three segments, each created
+afresh, so that the products shorten with the accuracy actually
+needed. Only $k \in [K_0, 2K_0)$ and the odd $k \ge 2K_0$ are summed:
+the even $k \ge 2K_0$ contribute $4^{-n}\zeta(2n, K_0)$, so the partial
+sum is divided by $1 - 4^{-n}$ by a few shifted additions.
+
+Streaming every power, and the column sum, once per column is bound by
+the memory bandwidth once the powers outgrow the L2 cache, and the more
+so the more threads share it. The columns are therefore taken in batches of 16 with one
+partial sum per column, and the powers eight at a time by blocks of 256
+limbs of the column sums: each block of a power is stepped through the
+16 columns while in cache, and the blocks of the 16 sums serve the
+eight powers. The drops of bottom limbs depend only on the error counts,
+so they are scheduled before the products, which are those of the
+column-by-column recurrence; the carries between blocks are kept per
+power and column. This roughly halves the time per limb and step on one
+thread for powers of $2 \cdot 10^5$ limbs, at a cost of 16 column sums
+of $W$ limbs per task. The subtracted powers $k < K_0$ of the Bernoulli
+columns (below) are summed the same way.
+
+*Columns* $n < n_1$ use $\zeta(2n, K_0) = \zeta(2n) - 1 - \sum_{k<K_0} k^{-2n}$
+with $\zeta(2n) = |B_{2n}|(2\pi)^{2n}/(2(2n)!)$ and the exact Bernoulli
+numbers of the reverse iterator `bernoulli_rev` [@Blo2009], which recycles odd
+powers downward at the precision of $B_{2n}$, below the working
+precision for these $n$. The factor $t_n = (2\pi)^{2n}/(2n)!$ would
+cost one full product per column; instead the columns are taken in
+blocks $[lo, hi]$ of $b \approx \min(2\sqrt{n_1}, 128)$ and computed in
+units of $t_{hi}$,
+$$
+\frac{\zeta(2m)}{t_{hi}} = \frac{|B_{2m}|\,(2m+1)\cdots(2\,hi)}{2}\,(2\pi)^{-2(hi-m)},
+$$
+with the powers $(2\pi)^{-2j}$, $j \le b$, computed once: a column then
+costs one product of the integer by a full-precision power, and a block
+four full products.
+
+The weights $c_n$ are applied by summation by parts: with $a_1 = 1$,
+$a_i = -1/((2i-2)(2i-1))$, so that $A_n = a_1 + \cdots + a_n$, and
+$R_i = \sum_{lo \le n \le hi,\, n \ge i} X_n/n$,
+$$
+\sum_{n=lo}^{hi} c_n X_n = A_{lo-1}R_{lo} + \sum_{i=lo}^{hi} a_i R_i,
+$$
+two single-limb divisions and two additions per column instead of a
+product by the real $A_n$. Since $\zeta(2n, K_0) \approx K_0^{-2n}$, the
+suffix sums of the direct columns only occupy the low limbs, and their
+cost tapers off with the column. All fixed-point errors are counted in
+ulps and bounded rigorously, including the omitted terms
+$\sum_{k \ge k_1} k^{-2n} \le k_1^{-2n}(1 + k_1/(2n-1))$ and the columns
+beyond the last one.
+
+A direct column $n$ costs about $(K(n) - K_0)/2$ products of single limbs
+by numbers of up to $W$ limbs, with $K(n) = B^{W/2n}$, and a Bernoulli
+column about two products of the size $s_n$ of $B_{2n}$ (in the
+iterator) and one of size $s_n$ by $W$ limbs; $n_1$ is chosen where
+$K(n_1)$ is between $2^3$ and $2^{13}$ (measured), growing with the
+precision up to $3 \cdot 10^6$ bits. Beyond, $n_1$ is chosen so that
+$B_{2n_1}$ has about as many bits as the working precision, so that the
+direct column $n_1$ takes about as many powers as the iterator does
+there ($K(n_1) \approx 2^{16.8}$ at $10^7$ digits); otherwise the
+Bernoulli columns, whose cost grows like the cube of the precision with
+$n_1$ fixed, would take nearly all the time. For
+$n$ limbs, the full products cost $O(n\,M(n)/\log n)$ in all, and the
+power sums of the iterator and the direct columns $O(n^3/\log^3 n)$ word
+operations, which dominate at very high precision.
+
+The sums being linear, the direct columns are split into groups of $k$
+(two per thread), the subtracted powers $\sum_{k<K_0} k^{-2n}$ into ranges
+of columns (with $A_{lo-1} = H_{2lo-3} - H_{lo-2}$ from exact harmonic
+numbers) and the Bernoulli columns into ranges of $n$, each with its own
+summation by parts, which run as independent tasks together with the
+rows. Each range of Bernoulli columns has its own iterator, whose power
+table takes about $(2\,hi)^2/24$ bits ([](algorithms/number-theory/bernoulli#reverse)),
+which dominates the memory at high precision: with one range per thread,
+some five times the table of the top range at once (about 5 GB at
+$2 \cdot 10^6$ digits). The ranges are therefore run one per thread only
+while their tables total below 1 GiB; beyond, as many ranges run at once
+as stay below it (at least one), each with the threads left over, used
+inside the iterator and for the columns: a group of 16 columns takes its
+16 numbers from the iterator, then their products by the powers of
+$(2\pi)^{-2}$ in parallel, the prefix sums $R_i$, and the divisions by
+$(2i-2)(2i-1)$ in parallel, the $\sum a_i$ of a block being summed
+exactly. The direct columns, the subtracted powers and the rows then
+follow. `_mp_real_const_khinchin_tune` forces $K_0$, $n_1$ and the
+number of Bernoulli ranges run at once.
+
 ## The cache of floors {#cache}
 
 The constants are needed over and over by the argument reductions, at
@@ -137,8 +253,8 @@ published with a release store, so readers never wait.
   implement the formulas and the cache.
 - `arb_const_pi`, `arb_const_log2`, `arb_const_e`, `arb_const_euler`,
   `arb_const_log10`, `arb_const_catalan`, `arb_const_apery`,
-  `arb_const_zeta5` and `arb_hypgeom_gamma_fmpq` (at $1/3$ and $1/4$)
-  call `_mp_real_const_arb`.
+  `arb_const_zeta5`, `arb_const_khinchin` and `arb_hypgeom_gamma_fmpq`
+  (at $1/3$ and $1/4$) call `_mp_real_const_arb`.
 - The argument reductions of the elementary functions read $\pi/4$,
   $2/\pi$, $\log 2$ and $1/\log 2 - 1$ from the cache (static tables up
   to 64 limbs), and the AGM logarithm $\pi/4$ and $\log 2$.

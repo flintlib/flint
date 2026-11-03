@@ -18,6 +18,7 @@
 #include "t-prec.c"
 #include "t-bitwise_rs_stress.c"
 #include "t-const_euler.c"
+#include "t-const_khinchin.c"
 #include "t-const_log2.c"
 #include "t-const_misc.c"
 #include "t-const_pi4.c"
@@ -80,6 +81,7 @@ test_struct tests[] =
     TEST_FUNCTION(mp_real_prec),
     TEST_FUNCTION(mp_real_bitwise_rs_stress),
     TEST_FUNCTION(mp_real_const_euler),
+    TEST_FUNCTION(mp_real_const_khinchin),
     TEST_FUNCTION(mp_real_const_log2),
     TEST_FUNCTION(mp_real_const_misc),
     TEST_FUNCTION(mp_real_const_pi4),
