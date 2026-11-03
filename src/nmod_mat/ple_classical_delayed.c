@@ -289,7 +289,7 @@ _ple_delayed_23(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots,
         if (C.mod.norm == 0)
             return _nmod_mat_ple_classical(P, Q, A, max_nonpivots);
 
-        C.halflimb = (C.mod.n <= (UWORD(1) << (FLINT_BITS / 2)));
+        C.halflimb = NMOD_IS_HALFLIMB(C.mod);
         C.high_reduced = 0;
         if (!C.halflimb)
         {

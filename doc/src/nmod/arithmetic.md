@@ -29,8 +29,26 @@ may be unreduced.
 
 Any modulus $1 \le n < 2^{\bits}$ is allowed. For $n = 1$ every result is
 0. A few functions with a leading underscore are faster but restrict $n$:
-`_nmod_add` and `_nmod_sub` need $n \le 2^{\bits - 1}$, and
-`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$.
+`_nmod_add` and `_nmod_sub` need $n \le 2^{\bits - 1}$,
+`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$, and `_nmod_mul_halflimb`
+needs $n \le 2^{\bits / 2}$.
+
+## In loops {#loops}
+
+In a loop that writes to memory, do not read the modulus through a
+pointer, as `poly->mod` or `ctx->mod`. The compiler must then assume that
+the writes may change it, and reads $n$ and its inverse again at every
+iteration (7–15% slower in measurements on x86 and ARM). Copy it to a
+local variable before the loop instead:
+
+```c
+nmod_t mod = poly->mod;
+
+for (i = 0; i < len; i++)
+    res[i] = nmod_mul(a[i], b[i], mod);
+```
+
+An `nmod_t` parameter can be used directly: it is already a local copy.
 
 ## How it works {#algorithm}
 
@@ -43,12 +61,16 @@ two-word product modulo $n 2^{\mathit{norm}}$, and shifts the remainder
 back. Addition and subtraction use a comparison and need no
 multiplication.
 
-`nmod_pow_ui` uses binary exponentiation. For odd $n$ and exponents of
-at least $2^{11}$ it converts to
+`nmod_pow_ui` uses binary exponentiation. For odd $n$ it converts to
 [Montgomery form](algorithms/arithmetic/montgomery), where each
-multiplication has a shorter chain of dependent operations. The guide
-[](nmod/redc) explains how to use Montgomery form directly for other long
-chains of multiplications.
+multiplication has a shorter chain of dependent operations, as soon as
+this pays for the conversions: from exponent 8 (16 for
+$n \ge 2^{\bits - 2}$). For $n \le 2^{\bits / 2}$ the products fit in one
+word and binary exponentiation stays faster for longer: there it switches
+from exponent 1024 to half-limb Montgomery form for $n < 2^{\bits / 2 - 2}$,
+and from exponent 2048 to Montgomery form for the other odd $n$.
+The guide [](nmod/redc) explains how to use Montgomery form directly for
+other long chains of multiplications.
 
 ::: summary algorithms/arithmetic/moller-granlund :::
 

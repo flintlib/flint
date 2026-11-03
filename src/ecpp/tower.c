@@ -931,19 +931,20 @@ _nsystem_entry(slong * a, slong * b, slong N, slong b0, slong D)
     slong c = (*b * *b - D) / (4 * *a);
     slong x, y, ap, bp, u, v, k, r, s;
     ulong g;
+    ulong Ninv;
 
     /* Q(x, y) coprime to N, |x|, |y| small: try (1,0), (0,1), then a grid */
     ap = 0; x = 1; y = 0;
-    for (r = 0; r <= 8 && n_gcd(FLINT_ABS(ap), N) != 1; r++)
+    for (r = 0; r <= 8 && n_gcd(FLINT_UABS(ap), N) != 1; r++)
     {
-        for (s = -r; s <= r && (r == 0 || n_gcd(FLINT_ABS(ap), N) != 1); s++)
+        for (s = -r; s <= r && (r == 0 || n_gcd(FLINT_UABS(ap), N) != 1); s++)
         {
             x = (r == 0) ? 1 : r;
             y = (r == 0) ? 0 : s;
             if (n_gcd(FLINT_ABS(x), FLINT_ABS(y)) != 1)
                 continue;
             ap = *a * x * x + *b * x * y + c * y * y;
-            if (n_gcd(FLINT_ABS(ap), N) == 1)
+            if (n_gcd(FLINT_UABS(ap), N) == 1)
                 break;
             x = s; y = r;   /* the pair (s, r) as well */
             if (n_gcd(FLINT_ABS(x), FLINT_ABS(y)) != 1)
@@ -951,7 +952,7 @@ _nsystem_entry(slong * a, slong * b, slong N, slong b0, slong D)
             ap = *a * x * x + *b * x * y + c * y * y;
         }
     }
-    if (n_gcd(FLINT_ABS(ap), N) != 1)
+    if (n_gcd(FLINT_UABS(ap), N) != 1)
         return;     /* not reached for primitive forms; leave the form alone */
 
     /* complete (x, y) to [[x, u], [y, v]] with x v - y u = 1 */
@@ -972,10 +973,13 @@ _nsystem_entry(slong * a, slong * b, slong N, slong b0, slong D)
     k %= N;
     if (k < 0)
         k += N;
-    g = n_invmod(n_mod2_preinv(FLINT_ABS(ap) % N, N, n_preinvert_limb(N)), N);
+
+    Ninv = n_preinvert_limb(N);
+    g = n_invmod(n_mod2_preinv(FLINT_UABS(ap), N, Ninv), N);
     if (ap < 0)
-        g = (N - g) % N;
-    k = (slong) n_mulmod2_preinv((ulong) k, g, N, n_preinvert_limb(N));
+        g = n_negmod(g, N);
+    k = (slong) n_mulmod2_preinv((ulong) k, g, N, Ninv);
+
     *a = ap;
     *b = bp + 2 * ap * k;
 }

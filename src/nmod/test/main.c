@@ -13,6 +13,8 @@
 
 #include "t-divides.c"
 #include "t-gr_redc.c"
+#include "t-mul.c"
+#include "t-pow_ui.c"
 #include "t-redc.c"
 #include "t-sqrt.c"
 
@@ -22,6 +24,8 @@ test_struct tests[] =
 {
     TEST_FUNCTION(gr_nmod_redc),
     TEST_FUNCTION(nmod_divides),
+    TEST_FUNCTION(nmod_mul),
+    TEST_FUNCTION(nmod_pow_ui),
     TEST_FUNCTION(nmod_redc),
     TEST_FUNCTION(nmod_sqrt),
 };

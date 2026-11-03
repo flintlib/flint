@@ -116,7 +116,7 @@ nmod32_set_si(nmod32_t res, slong v, const gr_ctx_t ctx)
 {
     ulong t;
     nmod_t mod = NMOD32_CTX(ctx);
-    t = FLINT_ABS(v);
+    t = FLINT_UABS(v);
     NMOD_RED(t, t, mod);
     if (v < 0)
         t = nmod_neg(t, mod);
@@ -453,8 +453,14 @@ _nmod32_vec_mul(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, sl
     slong i;
     nmod_t mod = NMOD32_CTX(ctx);
 
+#if FLINT_BITS == 64
+    /* n < 2^32: the products fit in one limb */
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_mul_halflimb(vec1[i], vec2[i], mod);
+#else
     for (i = 0; i < len; i++)
         res[i] = nmod_mul(vec1[i], vec2[i], mod);
+#endif
 
     return GR_SUCCESS;
 }

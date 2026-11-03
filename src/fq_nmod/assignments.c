@@ -22,10 +22,9 @@ void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UN
 
 void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
 {
-    ulong rx = x < 0 ? -x : x;
-    rx =  n_mod2_preinv(rx, ctx->mod.n, ctx->mod.ninv);
+    ulong rx = n_mod2_preinv(FLINT_UABS(x), ctx->mod.n, ctx->mod.ninv);
     if (x < 0)
-        rx = ctx->mod.n - rx;
+        rx = nmod_neg(rx, ctx->mod);
 
     nmod_poly_zero(rop);
     nmod_poly_set_coeff_ui(rop, 0, rx);

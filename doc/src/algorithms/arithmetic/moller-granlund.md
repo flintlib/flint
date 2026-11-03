@@ -133,8 +133,10 @@ this algorithm is the default modular reduction for all of FLINT's
 arithmetic modulo word-size integers.
 
 - `nmod_mul` multiplies and reduces the two-word product with one step;
-  the macros `NMOD_RED`, `NMOD_RED2` and `NMOD_RED3` reduce one, two and
-  three words with one, one and two steps. They are used throughout
+  the macros `NMOD_RED2` and `NMOD_RED3` reduce two and three words with
+  one and two steps. `NMOD_RED`, for one word, uses instead a Barrett step
+  whose constant is derived from the same reciprocal
+  ([](algorithms/arithmetic/barrett#nmod)). They are used throughout
   `nmod_vec`, `nmod_poly`, `nmod_mat`, `nmod_mpoly` and the `gr` contexts
   for $\Z/n\Z$; in particular every dot product in `nmod_vec` ends with one
   such reduction ([](algorithms/linear-algebra/dot-products)).
