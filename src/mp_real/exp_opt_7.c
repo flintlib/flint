@@ -96,7 +96,7 @@ _mp_real_exp_series_7(nn_ptr res, nn_srcptr x)
     B[4] = A[3];
     B[5] = A[4];
     B[6] = A[5];
-    flint_mpn_sqrhigh(x2, x, 7);
+    flint_mpn_sqrhigh_n(x2, x, 7);
     flint_mpn_mulhigh_n(T, x2, B, 7);
     cy = mpn_add_n(res, x, T, 7);
     res[7] = 1 + cy;

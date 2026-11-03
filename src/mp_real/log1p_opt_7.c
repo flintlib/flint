@@ -100,7 +100,7 @@ _mp_real_log1p_series_7(nn_ptr res, nn_srcptr x)
     P[4] = V[3];
     P[5] = V[4];
     P[6] = V[5];
-    flint_mpn_sqrhigh(z, x, 7);
+    flint_mpn_sqrhigh_n(z, x, 7);
     flint_mpn_mulhigh_n(T, z, P, 7);
     NN_SUB_7(res, x, T);
 }

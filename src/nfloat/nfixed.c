@@ -255,7 +255,7 @@ FLINT_FORCE_INLINE
 void nfixed_sqr(nn_ptr res, nn_srcptr a, slong nlimbs)
 {
     res[0] = 0;
-    flint_mpn_sqrhigh(res + 1, a + 1, nlimbs);
+    flint_mpn_sqrhigh_n(res + 1, a + 1, nlimbs);
 }
 #endif
 

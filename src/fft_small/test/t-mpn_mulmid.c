@@ -49,6 +49,30 @@ check_window(mpn_ctx_t R, const ulong* a, ulong an, const ulong* b, ulong bn,
         if (got != exp)
             mulmid_fail("window disagrees with full-top run / zero pad", an, bn, lo, hi);
     }
+
+    /* the split variant must give the same limbs, with the lowest nlow of
+       them diverted; nlow up to 4 (including the whole window) */
+    {
+        ulong zlow[4];
+        ulong nlow = n_min(hi - lo, 1 + (lo + hi) % 4);
+        ulong* split = scratch + (hi - lo);
+
+        for (ulong k = 0; k < nlow; k++)
+            zlow[k] = ~UWORD(0);
+        for (ulong k = 0; k < hi - lo; k++)
+            split[k] = ~UWORD(0);
+
+        _mpn_ctx_mpn_mul_range_split(R, split, zlow, nlow, lo, hi, a, an, b, bn);
+
+        for (ulong k = 0; k < hi - lo; k++)
+        {
+            ulong got = (k < nlow) ? zlow[k] : split[k - nlow];
+            if (got != scratch[k])
+                mulmid_fail("split window disagrees with plain window", an, bn, lo, hi);
+        }
+        if (split[hi - lo - nlow] != ~UWORD(0) && nlow > 0)
+            mulmid_fail("split window wrote past its output", an, bn, lo, hi);
+    }
 }
 
 /*
@@ -69,7 +93,7 @@ void test_mulmid(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state,
     /* windows reach up to 3 limbs past the top of products of up to
        maxsize limbs */
     full    = FLINT_ARRAY_ALLOC(maxsize + 3, ulong);
-    scratch = FLINT_ARRAY_ALLOC(maxsize + 3, ulong);
+    scratch = FLINT_ARRAY_ALLOC(2 * (maxsize + 3) + 1, ulong);
 
     fmpz_init(fa);
     fmpz_init(fb);

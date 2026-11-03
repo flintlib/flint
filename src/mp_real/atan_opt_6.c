@@ -33,7 +33,7 @@ _mp_real_atan_series_6(nn_ptr res, nn_srcptr x)
     (void) v; (void) w1; (void) w0; (void) h; (void) l;
     (void) i; (void) Z; (void) V; (void) T; (void) P;
 
-    flint_mpn_sqrhigh(z, x, 6);
+    flint_mpn_sqrhigh_n(z, x, 6);
 
     v = UWORD(0x1745d1745d1745d1);
 

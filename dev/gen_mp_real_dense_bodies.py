@@ -546,8 +546,8 @@ def gen_sin_cos(n, L, fn_name, series_name, static):
     for i in range(n):
         o("    XF[%d] = x%d;" % (i, i))
         o("    YF[%d] = y%d;" % (i, i))
-    o("    flint_mpn_sqrhigh(X2, XF, %d);" % n)
-    o("    flint_mpn_sqrhigh(Y2, YF, %d);" % n)
+    o("    flint_mpn_sqrhigh_n(X2, XF, %d);" % n)
+    o("    flint_mpn_sqrhigh_n(Y2, YF, %d);" % n)
     o("    flint_mpn_mulhigh_n(XY, XF, YF, %d);" % n)
     # the masked operands of the chains below in memory (XF, YF are
     # free now): operands computed on the spot would need registers of

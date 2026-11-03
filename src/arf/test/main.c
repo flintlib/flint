@@ -49,8 +49,11 @@
 #include "t-mul.c"
 #include "t-mul_fmpz.c"
 #include "t-mul_si.c"
+#include "t-mpn_complex.c"
+#include "t-mpn_div.c"
+#include "t-mpn_round_guarded.c"
+#include "t-mpn_set_round.c"
 #include "t-mul_ui.c"
-#include "t-mul_via_mpfr.c"
 #include "t-neg_round.c"
 #include "t-nint.c"
 #include "t-root.c"
@@ -116,8 +119,11 @@ test_struct tests[] =
     TEST_FUNCTION(arf_mul),
     TEST_FUNCTION(arf_mul_fmpz),
     TEST_FUNCTION(arf_mul_si),
+    TEST_FUNCTION(_arf_mpn_complex),
+    TEST_FUNCTION(_arf_mpn_div),
+    TEST_FUNCTION(_arf_mpn_round_guarded),
+    TEST_FUNCTION(_arf_mpn_set_round),
     TEST_FUNCTION(arf_mul_ui),
-    TEST_FUNCTION(arf_mul_via_mpfr),
     TEST_FUNCTION(arf_neg_round),
     TEST_FUNCTION(arf_nint),
     TEST_FUNCTION(arf_root),

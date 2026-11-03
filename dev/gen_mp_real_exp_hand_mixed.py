@@ -13,7 +13,7 @@ and each level is evaluated at ceil(bits/64) limbs.  Levels of one and
 two limbs stay in registers (n_mulhi, the 2x1 and sloppy 2x2 forms);
 from three limbs up they live in arrays and use flint_mpn_mulhigh_n,
 with the dedicated 3x2 form where a 2-limb operand embeds with a zero
-low limb.  x^2 uses flint_mpn_sqrhigh.
+low limb.  x^2 uses flint_mpn_sqrhigh_n.
 """
 import sys
 from math import factorial, lgamma
@@ -159,7 +159,7 @@ def emit(o, n, r, name):
         src = "B"
     else:
         src = "A"
-    o("    flint_mpn_sqrhigh(x2, x, %d);" % n)
+    o("    flint_mpn_sqrhigh_n(x2, x, %d);" % n)
     o("    flint_mpn_mulhigh_n(T, x2, %s, %d);" % (src, n))
     o("    cy = mpn_add_n(res, x, T, %d);" % n)
     o("    res[%d] = 1 + cy;" % n)

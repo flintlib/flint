@@ -158,14 +158,21 @@ void acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd
 
 Set `res` to an approximation of $1/x$, respectively $x/y$. A real or
 purely imaginary divisor is handled by real divisions of the parts;
-otherwise $1/(a + bi) = (a - bi)/(a^2 + b^2)$ is used, with $a^2 + b^2$
-computed by `arf_sosq`.
+otherwise, above two limbs of precision, the complex kernels of
+[](arf#mpn) compute the parts within about an ulp (relative to the
+magnitude of the result for the quotient, whose numerator parts may
+cancel) at $\lceil \mathit{prec} / B \rceil$ limbs, rounded to `prec`
+bits in the direction `rnd`, for operands with moderate exponents;
+otherwise $1/(a + bi) = (a - bi)/(a^2 + b^2)$ with $a^2 + b^2$ computed
+by `arf_sosq`.
 :::
 
 ::: function
 void acf_approx_sqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
 
-Sets `res` to an approximation of the principal square root of `x`.
+Sets `res` to an approximation of the principal square root of `x`,
+through the complex kernel of [](arf#mpn) for operands with
+nonzero parts and moderate exponents.
 :::
 
 ::: function

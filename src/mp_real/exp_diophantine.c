@@ -387,7 +387,7 @@ _mp_real_log_reduce(slong * rel, const mp_real_rel_struct * tab,
    bits, with the mantissa capped at cap limbs: once a squaring would
    exceed the cap, the operand is truncated to cap limbs (the dropped
    limbs going into the exponent) and only the high limbs of the
-   square are computed (flint_mpn_sqrhigh: a lower bound within
+   square are computed (flint_mpn_sqrhigh_n: a lower bound within
    2 cap ulps of its returned limb), so the top levels of the chain
    cost a cap-limb squaring however large the true product is.  The
    result is then a lower bound within about (levels 2 cap) B^-cap
@@ -429,7 +429,7 @@ _mp_real_prime_powers(nn_ptr res, nn_ptr tmp, slong * e_out,
 
                 ex += an - cap;
                 ex *= 2;   /* (a B^ex)^2 = a^2 B^(2 ex) */
-                lo = flint_mpn_sqrhigh(b, a + (an - cap), cap);
+                lo = flint_mpn_sqrhigh_n(b, a + (an - cap), cap);
                 if (b[cap - 1] == 0)
                 {
                     /* a zero top limb: shift in the returned limb
@@ -677,7 +677,7 @@ _mp_real_exp_diophantine_tune_noerr(nn_ptr y, nn_srcptr x, slong n, slong num,
         }
         else
         {
-            flint_mpn_mulmid(N, E, wn + 1, p, pn, ps - cap, ps);
+            _mp_real_mulhigh_window(N, E, wn + 1, p, pn, ps - cap);
             Nn = cap;
             eN += ps - cap;
         }

@@ -234,7 +234,7 @@ class Gen:
             assert n == self.gn(j) + delta
             assert n <= self.gn(a) and n <= self.gn(b)
             if a == b:
-                body.append("    flint_mpn_sqrhigh(x%d, %s, %d);"
+                body.append("    flint_mpn_sqrhigh_n(x%d, %s, %d);"
                             % (j, self.src(a, n), n))
             else:
                 body.append("    flint_mpn_mulhigh_n(x%d, %s, %s, %d);"
@@ -354,7 +354,7 @@ class Gen:
             decl.append("    mp_limb_t t[%d];" % (self.gn(2) + 1))
             a, b, delta = self.pair(2)
             n = xn - self.lz(a) - self.lz(b)
-            body.append("    flint_mpn_sqrhigh(x2, %s, %d);" % (self.src(1, n), n))
+            body.append("    flint_mpn_sqrhigh_n(x2, %s, %d);" % (self.src(1, n), n))
             g2 = self.gn(2)
             body.append("    mpn_rshift(t, x2, %d, 1);" % g2)
             for i in range(g2):

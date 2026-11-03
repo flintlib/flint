@@ -12,6 +12,35 @@
 #include "test_helpers.h"
 #include "arf.h"
 
+
+/* z within tol/100 ulp of the exact value v (at prec bits), and z == v
+   when inexact == 0 */
+static int
+_relaxed_ok(const arf_t z, const arf_t v, slong prec, ulong tol, int inexact)
+{
+    arf_t err, t;
+    fmpz_t e;
+    int ok;
+
+    if (arf_is_special(v))
+        return arf_equal(z, v);
+
+    arf_init(err);
+    arf_init(t);
+    fmpz_init(e);
+    arf_sub(err, z, v, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_abs(err, err);
+    arf_mul_ui(err, err, 100, ARF_PREC_EXACT, ARF_RND_DOWN);
+    fmpz_sub_ui(e, ARF_EXPREF(v), prec);
+    arf_set_ui(t, tol);
+    arf_mul_2exp_fmpz(t, t, e);
+    ok = (arf_cmp(err, t) <= 0) && (inexact || arf_equal(z, v));
+    arf_clear(err);
+    arf_clear(t);
+    fmpz_clear(e);
+    return ok;
+}
+
 TEST_FUNCTION_START(arf_complex_mul, state)
 {
     slong iter, iter2;
@@ -46,6 +75,37 @@ TEST_FUNCTION_START(arf_complex_mul, state)
                 case 2:  rnd = ARF_RND_FLOOR; break;
                 case 3:  rnd = ARF_RND_CEIL; break;
                 default: rnd = ARF_RND_NEAR; break;
+            }
+
+            /* relaxed rounding modes: check the 1 / 0.51 ulp contracts */
+            if (n_randint(state, 4) == 0 && arf_is_finite(a) && arf_is_finite(b)
+                && arf_is_finite(c) && arf_is_finite(d)
+                && !arf_is_special(a) && !arf_is_special(b)
+                && !arf_is_special(c) && !arf_is_special(d)
+                && ARF_IS_LAGOM(a) && ARF_IS_LAGOM(b) && ARF_IS_LAGOM(c) && ARF_IS_LAGOM(d)
+                && FLINT_ABS(ARF_EXP(a) + ARF_EXP(c) - ARF_EXP(b) - ARF_EXP(d)) < 20000
+                && FLINT_ABS(ARF_EXP(a) + ARF_EXP(d) - ARF_EXP(b) - ARF_EXP(c)) < 20000)
+            {
+                ulong tol;
+                rnd = n_randint(state, 2) ? ARF_RND_FAST : ARF_RND_ACCURATE;
+                tol = (rnd == ARF_RND_ACCURATE) ? 51 : 100;
+                r1 = arf_complex_mul(e1, f1, a, b, c, d, prec, rnd);
+                arf_complex_mul_fallback(e2, f2, a, b, c, d, ARF_PREC_EXACT, ARF_RND_DOWN);
+                if (!_relaxed_ok(e1, e2, prec, tol, r1 & 1) || !_relaxed_ok(f1, f2, prec, tol, r1 >> 1))
+                {
+                    flint_printf("FAIL (relaxed)!\n");
+                    flint_printf("prec = %wd, rnd = %d, r1 = %d\n\n", prec, rnd, r1);
+                    flint_printf("a = "); arf_print(a); flint_printf("\n\n");
+                    flint_printf("b = "); arf_print(b); flint_printf("\n\n");
+                    flint_printf("c = "); arf_print(c); flint_printf("\n\n");
+                    flint_printf("d = "); arf_print(d); flint_printf("\n\n");
+                    flint_printf("e1 = "); arf_print(e1); flint_printf("\n\n");
+                    flint_printf("e2 = "); arf_print(e2); flint_printf("\n\n");
+                    flint_printf("f1 = "); arf_print(f1); flint_printf("\n\n");
+                    flint_printf("f2 = "); arf_print(f2); flint_printf("\n\n");
+                    flint_abort();
+                }
+                continue;
             }
 
             switch (n_randint(state, 5))

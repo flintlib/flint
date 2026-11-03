@@ -281,8 +281,8 @@ _mp_real_sin_cos_opt_8(nn_ptr ysin, nn_ptr ycos, nn_srcptr v)
     YF[6] = y6;
     XF[7] = x7;
     YF[7] = y7;
-    flint_mpn_sqrhigh(X2, XF, 8);
-    flint_mpn_sqrhigh(Y2, YF, 8);
+    flint_mpn_sqrhigh_n(X2, XF, 8);
+    flint_mpn_sqrhigh_n(Y2, YF, 8);
     flint_mpn_mulhigh_n(XY, XF, YF, 8);
     XF[0] &= mx;
     YF[0] &= mx;

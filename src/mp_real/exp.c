@@ -342,7 +342,7 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec, int notab)
         flint_mpn_copyi(a, v, n);                   /* A = v + v^3/6 */
         if (d >= 2)
         {
-            flint_mpn_sqrhigh(q, v, n);
+            flint_mpn_sqrhigh_n(q, v, n);
             mpn_rshift(q, q, n, 1);                 /* v^2/2 */
             if (d >= 3)
             {

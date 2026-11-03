@@ -12,8 +12,9 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-/* Division, inversion and (reciprocal) square roots of exact balls above
-   the Newton cutoffs of arf (ARF_INV_NEWTON_CUTOFF etc.): the radius must
+/* Division, inversion and (reciprocal) square roots of exact balls at
+   precisions where the Newton iterations of mp_real are used inside the
+   mpn kernels (above the former Newton cutoffs of arf): the radius must
    be zero exactly when the result is exact, and the ball must contain the
    exact result. Uses its own deterministically seeded generator, since
    the inexact cases that were reported as exact are rare (about 1 in
@@ -22,6 +23,12 @@
    iterations end at a limb boundary (the case where the bug showed). */
 
 #define PREC_ABOVE(cutoff) (64 * ((cutoff) / 64 + 2) - 8)
+
+/* the former cutoffs of arf, in bits */
+#define ARF_INV_NEWTON_CUTOFF 5000
+#define ARF_DIV_NEWTON_CUTOFF 12000
+#define ARF_SQRT_NEWTON_CUTOFF 100000
+#define ARF_RSQRT_NEWTON_CUTOFF 4000
 
 /* y random in (1, 2) with a full prec-bit mantissa */
 static void

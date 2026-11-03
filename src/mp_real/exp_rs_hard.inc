@@ -67,7 +67,7 @@ _mp_real_exp_rs_9(nn_ptr res, nn_srcptr x)
     nn_ptr x3 = x3p + 1;
     x3p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 7);
+    flint_mpn_sqrhigh_n(x2, x + 1, 7);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 6);
 
     umul_ppmm(t[1], t[0], x2[6], exp_series_cs[8]);
@@ -101,9 +101,9 @@ _mp_real_exp_rs_10(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 8);
+    flint_mpn_sqrhigh_n(x2, x + 1, 8);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 7);
-    flint_mpn_sqrhigh(x4, x2 + 2, 6);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 6);
 
     umul_ppmm(t[1], t[0], x[8], exp_series_cs[9]);
     t[2] = exp_series_cs[8];
@@ -137,9 +137,9 @@ _mp_real_exp_rs_11(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 9);
+    flint_mpn_sqrhigh_n(x2, x + 1, 9);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 8);
-    flint_mpn_sqrhigh(x4, x2 + 2, 7);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 7);
 
     umul_ppmm(t[1], t[0], x2[8], exp_series_cs[10]);
     t[2] = mpn_addmul_1(t, x + 8, 2, exp_series_cs[9]);
@@ -174,9 +174,9 @@ _mp_real_exp_rs_12(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 10);
+    flint_mpn_sqrhigh_n(x2, x + 1, 10);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 9);
-    flint_mpn_sqrhigh(x4, x2 + 2, 8);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 8);
 
     umul_ppmm(t[1], t[0], x3[8], exp_series_cs[11]);
     t[2] = mpn_addmul_1(t, x2 + 8, 2, exp_series_cs[10]);
@@ -212,9 +212,9 @@ _mp_real_exp_rs_13(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 11);
+    flint_mpn_sqrhigh_n(x2, x + 1, 11);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 10);
-    flint_mpn_sqrhigh(x4, x2 + 2, 9);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 9);
 
     t[0] = 0;
     t[1] = exp_series_cs[12];
@@ -253,9 +253,9 @@ _mp_real_exp_rs_14(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 12);
+    flint_mpn_sqrhigh_n(x2, x + 1, 12);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 11);
-    flint_mpn_sqrhigh(x4, x2 + 2, 10);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 10);
 
     umul_ppmm(t[1], t[0], x[12], exp_series_cs[13]);
     t[2] = exp_series_cs[12];
@@ -294,9 +294,9 @@ _mp_real_exp_rs_15(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 13);
+    flint_mpn_sqrhigh_n(x2, x + 1, 13);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 12);
-    flint_mpn_sqrhigh(x4, x2 + 2, 11);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 11);
 
     umul_ppmm(t[1], t[0], x2[12], exp_series_cs[14]);
     t[2] = mpn_addmul_1(t, x + 12, 2, exp_series_cs[13]);
@@ -335,7 +335,7 @@ _mp_real_exp_rs_16(nn_ptr res, nn_srcptr x)
     nn_ptr x3 = x3p + 1;
     x3p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 14);
+    flint_mpn_sqrhigh_n(x2, x + 1, 14);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 13);
 
     t[0] = 0;
@@ -380,9 +380,9 @@ _mp_real_exp_rs_17(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 15);
+    flint_mpn_sqrhigh_n(x2, x + 1, 15);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 14);
-    flint_mpn_sqrhigh(x4, x2 + 2, 13);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 13);
 
     t[0] = 0;
     t[1] = exp_series_cs[16];
@@ -426,9 +426,9 @@ _mp_real_exp_rs_18(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 16);
+    flint_mpn_sqrhigh_n(x2, x + 1, 16);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 15);
-    flint_mpn_sqrhigh(x4, x2 + 2, 14);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 14);
 
     umul_ppmm(t[1], t[0], x[16], exp_series_cs[17]);
     t[2] = exp_series_cs[16];
@@ -472,9 +472,9 @@ _mp_real_exp_rs_19(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 17);
+    flint_mpn_sqrhigh_n(x2, x + 1, 17);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 16);
-    flint_mpn_sqrhigh(x4, x2 + 2, 15);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 15);
 
     umul_ppmm(t[1], t[0], x2[16], exp_series_cs[18]);
     t[2] = mpn_addmul_1(t, x + 16, 2, exp_series_cs[17]);
@@ -519,9 +519,9 @@ _mp_real_exp_rs_20(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 18);
+    flint_mpn_sqrhigh_n(x2, x + 1, 18);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 17);
-    flint_mpn_sqrhigh(x4, x2 + 2, 16);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 16);
 
     umul_ppmm(t[1], t[0], x3[16], exp_series_cs[19]);
     t[2] = mpn_addmul_1(t, x2 + 16, 2, exp_series_cs[18]);
@@ -567,9 +567,9 @@ _mp_real_exp_rs_21(nn_ptr res, nn_srcptr x)
     nn_ptr x4 = x4p + 1;
     x4p[0] = 0;
 
-    flint_mpn_sqrhigh(x2, x + 1, 19);
+    flint_mpn_sqrhigh_n(x2, x + 1, 19);
     flint_mpn_mulhigh_n(x3, x + 2, x2 + 1, 18);
-    flint_mpn_sqrhigh(x4, x2 + 2, 17);
+    flint_mpn_sqrhigh_n(x4, x2 + 2, 17);
 
     t[0] = 0;
     t[1] = exp_series_cs[20];

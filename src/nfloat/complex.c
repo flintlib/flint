@@ -521,8 +521,8 @@ _nfloat_complex_sqr_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
     }
     else
     {
-        a2[0] = flint_mpn_sqrhigh(a2 + 1, NFLOAT_D(a), n);
-        b2[0] = flint_mpn_sqrhigh(b2 + 1, NFLOAT_D(b), n);
+        a2[0] = flint_mpn_sqrhigh_n(a2 + 1, NFLOAT_D(a), n);
+        b2[0] = flint_mpn_sqrhigh_n(b2 + 1, NFLOAT_D(b), n);
 
         if (n == 3)
         {
@@ -653,9 +653,9 @@ _nfloat_complex_sqr_karatsuba(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a,
     aa[0] = mpn_rshift(aa + 1, NFLOAT_D(a), n, adelta);
     bb[0] = mpn_rshift(bb + 1, NFLOAT_D(b), n, bdelta);
     _flint_mpn_signed_add_n(v, aa, asgnbit, bb, bsgnbit, n + 1);
-    flint_mpn_sqrhigh(s, v, n + 1);
-    flint_mpn_sqrhigh(t, aa, n + 1);
-    flint_mpn_sqrhigh(u, bb, n + 1);
+    flint_mpn_sqrhigh_n(s, v, n + 1);
+    flint_mpn_sqrhigh_n(t, aa, n + 1);
+    flint_mpn_sqrhigh_n(u, bb, n + 1);
     mpn_add_n(v, t, u, n + 1);
     ssgnbit = flint_mpn_signed_sub_n(s, s, v, n + 1);
     tsgnbit = flint_mpn_signed_sub_n(t, t, u, n + 1);

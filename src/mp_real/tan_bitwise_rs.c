@@ -155,8 +155,8 @@ _mp_real_tan_halfangle_finish(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
 
         if (ysin != NULL || ytan != NULL)
             flint_mpn_mulhigh_n(A, T, D, n);
-        flint_mpn_sqrhigh(B, D, n);
-        flint_mpn_sqrhigh(C, T, n);
+        flint_mpn_sqrhigh_n(B, D, n);
+        flint_mpn_sqrhigh_n(C, T, n);
 
         flint_mpn_store(N, 2 * n, ~UWORD(0));
         N[2 * n - 1] = ~UWORD(0) >> 1;          /* 2^(128n-1) - 1 */

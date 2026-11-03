@@ -172,10 +172,10 @@ _mp_real_atan_rs_11(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 9);
-    flint_mpn_sqrhigh(z2, z + 2, 7);
+    flint_mpn_sqrhigh_n(z, x + 1, 9);
+    flint_mpn_sqrhigh_n(z2, z + 2, 7);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 5);
-    flint_mpn_sqrhigh(z4, z2 + 4, 3);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 3);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -213,10 +213,10 @@ _mp_real_atan_rs_12(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 10);
-    flint_mpn_sqrhigh(z2, z + 2, 8);
+    flint_mpn_sqrhigh_n(z, x + 1, 10);
+    flint_mpn_sqrhigh_n(z2, z + 2, 8);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 6);
-    flint_mpn_sqrhigh(z4, z2 + 4, 4);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 4);
 
     RS_MUL_NEG(sa, 2, z + 8, atan_series_cs[5], fl_s);
     sa[3] = fl_s;
@@ -253,10 +253,10 @@ _mp_real_atan_rs_13(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 11);
-    flint_mpn_sqrhigh(z2, z + 2, 9);
+    flint_mpn_sqrhigh_n(z, x + 1, 11);
+    flint_mpn_sqrhigh_n(z2, z + 2, 9);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 7);
-    flint_mpn_sqrhigh(z4, z2 + 4, 5);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 5);
 
     RS_MUL_NEG(sa, 3, z + 8, atan_series_cs[5], fl_s);
     sa[4] = fl_s;
@@ -293,10 +293,10 @@ _mp_real_atan_rs_14(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 12);
-    flint_mpn_sqrhigh(z2, z + 2, 10);
+    flint_mpn_sqrhigh_n(z, x + 1, 12);
+    flint_mpn_sqrhigh_n(z2, z + 2, 10);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 8);
-    flint_mpn_sqrhigh(z4, z2 + 4, 6);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 6);
 
     sa[2] = mpn_mul_1(sa, z2 + 8, 2, atan_series_cs[6]);
     sa[3] = 0;
@@ -337,12 +337,12 @@ _mp_real_atan_rs_15(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 13);
-    flint_mpn_sqrhigh(z2, z + 2, 11);
+    flint_mpn_sqrhigh_n(z, x + 1, 13);
+    flint_mpn_sqrhigh_n(z2, z + 2, 11);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 9);
-    flint_mpn_sqrhigh(z4, z2 + 4, 7);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 7);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 5);
-    flint_mpn_sqrhigh(z6, z3 + 6, 3);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 3);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -384,10 +384,10 @@ _mp_real_atan_rs_16(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 14);
-    flint_mpn_sqrhigh(z2, z + 2, 12);
+    flint_mpn_sqrhigh_n(z, x + 1, 14);
+    flint_mpn_sqrhigh_n(z2, z + 2, 12);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 10);
-    flint_mpn_sqrhigh(z4, z2 + 4, 8);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 8);
 
     RS_MUL_NEG(sa, 2, z3 + 8, atan_series_cs[7], fl_s);
     sa[3] = fl_s;
@@ -426,8 +426,8 @@ _mp_real_atan_rs_17(nn_ptr res, nn_srcptr x)
     nn_ptr z2 = z2p + 1;
     z2p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 15);
-    flint_mpn_sqrhigh(z2, z + 2, 13);
+    flint_mpn_sqrhigh_n(z, x + 1, 15);
+    flint_mpn_sqrhigh_n(z2, z + 2, 13);
 
     RS_MUL_NEG(sa, 3, z + 12, atan_series_cs[7], fl_s);
     sa[4] = fl_s;
@@ -472,12 +472,12 @@ _mp_real_atan_rs_18(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 16);
-    flint_mpn_sqrhigh(z2, z + 2, 14);
+    flint_mpn_sqrhigh_n(z, x + 1, 16);
+    flint_mpn_sqrhigh_n(z2, z + 2, 14);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 12);
-    flint_mpn_sqrhigh(z4, z2 + 4, 10);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 10);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 8);
-    flint_mpn_sqrhigh(z6, z3 + 6, 6);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 6);
 
     sa[2] = mpn_mul_1(sa, z2 + 12, 2, atan_series_cs[8]);
     sa[3] = 0;
@@ -518,8 +518,8 @@ _mp_real_atan_rs_19(nn_ptr res, nn_srcptr x)
     nn_ptr z2 = z2p + 1;
     z2p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 17);
-    flint_mpn_sqrhigh(z2, z + 2, 15);
+    flint_mpn_sqrhigh_n(z, x + 1, 17);
+    flint_mpn_sqrhigh_n(z2, z + 2, 15);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -570,12 +570,12 @@ _mp_real_atan_rs_20(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 18);
-    flint_mpn_sqrhigh(z2, z + 2, 16);
+    flint_mpn_sqrhigh_n(z, x + 1, 18);
+    flint_mpn_sqrhigh_n(z2, z + 2, 16);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 14);
-    flint_mpn_sqrhigh(z4, z2 + 4, 12);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 12);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 10);
-    flint_mpn_sqrhigh(z6, z3 + 6, 8);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 8);
 
     RS_MUL_NEG(sa, 2, z3 + 12, atan_series_cs[9], fl_s);
     sa[3] = fl_s;
@@ -620,10 +620,10 @@ _mp_real_atan_rs_21(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 19);
-    flint_mpn_sqrhigh(z2, z + 2, 17);
+    flint_mpn_sqrhigh_n(z, x + 1, 19);
+    flint_mpn_sqrhigh_n(z2, z + 2, 17);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 15);
-    flint_mpn_sqrhigh(z4, z2 + 4, 13);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 13);
 
     RS_MUL_NEG(sa, 3, z + 16, atan_series_cs[9], fl_s);
     sa[4] = fl_s;
@@ -669,10 +669,10 @@ _mp_real_atan_rs_22(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 20);
-    flint_mpn_sqrhigh(z2, z + 2, 18);
+    flint_mpn_sqrhigh_n(z, x + 1, 20);
+    flint_mpn_sqrhigh_n(z2, z + 2, 18);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 16);
-    flint_mpn_sqrhigh(z4, z2 + 4, 14);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 14);
 
     sa[2] = mpn_mul_1(sa, z2 + 16, 2, atan_series_cs[10]);
     sa[3] = 0;
@@ -720,10 +720,10 @@ _mp_real_atan_rs_23(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 21);
-    flint_mpn_sqrhigh(z2, z + 2, 19);
+    flint_mpn_sqrhigh_n(z, x + 1, 21);
+    flint_mpn_sqrhigh_n(z2, z + 2, 19);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 17);
-    flint_mpn_sqrhigh(z4, z2 + 4, 15);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 15);
 
     sa[3] = mpn_mul_1(sa, z2 + 16, 3, atan_series_cs[10]);
     sa[4] = 0;
@@ -771,10 +771,10 @@ _mp_real_atan_rs_24(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 22);
-    flint_mpn_sqrhigh(z2, z + 2, 20);
+    flint_mpn_sqrhigh_n(z, x + 1, 22);
+    flint_mpn_sqrhigh_n(z2, z + 2, 20);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 18);
-    flint_mpn_sqrhigh(z4, z2 + 4, 16);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 16);
 
     RS_MUL_NEG(sa, 2, z3 + 16, atan_series_cs[11], fl_s);
     sa[3] = fl_s;
@@ -824,10 +824,10 @@ _mp_real_atan_rs_25(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 23);
-    flint_mpn_sqrhigh(z2, z + 2, 21);
+    flint_mpn_sqrhigh_n(z, x + 1, 23);
+    flint_mpn_sqrhigh_n(z2, z + 2, 21);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 19);
-    flint_mpn_sqrhigh(z4, z2 + 4, 17);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 17);
 
     RS_MUL_NEG(sa, 3, z3 + 16, atan_series_cs[11], fl_s);
     sa[4] = fl_s;
@@ -877,10 +877,10 @@ _mp_real_atan_rs_26(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 24);
-    flint_mpn_sqrhigh(z2, z + 2, 22);
+    flint_mpn_sqrhigh_n(z, x + 1, 24);
+    flint_mpn_sqrhigh_n(z2, z + 2, 22);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 20);
-    flint_mpn_sqrhigh(z4, z2 + 4, 18);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 18);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -935,10 +935,10 @@ _mp_real_atan_rs_27(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 25);
-    flint_mpn_sqrhigh(z2, z + 2, 23);
+    flint_mpn_sqrhigh_n(z, x + 1, 25);
+    flint_mpn_sqrhigh_n(z2, z + 2, 23);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 21);
-    flint_mpn_sqrhigh(z4, z2 + 4, 19);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 19);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -996,12 +996,12 @@ _mp_real_atan_rs_28(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 26);
-    flint_mpn_sqrhigh(z2, z + 2, 24);
+    flint_mpn_sqrhigh_n(z, x + 1, 26);
+    flint_mpn_sqrhigh_n(z2, z + 2, 24);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 22);
-    flint_mpn_sqrhigh(z4, z2 + 4, 20);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 20);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 18);
-    flint_mpn_sqrhigh(z6, z3 + 6, 16);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 16);
 
     RS_MUL_NEG(sa, 2, z + 24, atan_series_cs[13], fl_s);
     sa[3] = fl_s;
@@ -1055,10 +1055,10 @@ _mp_real_atan_rs_29(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 27);
-    flint_mpn_sqrhigh(z2, z + 2, 25);
+    flint_mpn_sqrhigh_n(z, x + 1, 27);
+    flint_mpn_sqrhigh_n(z2, z + 2, 25);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 23);
-    flint_mpn_sqrhigh(z4, z2 + 4, 21);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 21);
 
     RS_MUL_NEG(sa, 3, z + 24, atan_series_cs[13], fl_s);
     sa[4] = fl_s;
@@ -1113,10 +1113,10 @@ _mp_real_atan_rs_30(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 28);
-    flint_mpn_sqrhigh(z2, z + 2, 26);
+    flint_mpn_sqrhigh_n(z, x + 1, 28);
+    flint_mpn_sqrhigh_n(z2, z + 2, 26);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 24);
-    flint_mpn_sqrhigh(z4, z2 + 4, 22);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 22);
 
     sa[2] = mpn_mul_1(sa, z2 + 24, 2, atan_series_cs[14]);
     sa[3] = 0;
@@ -1173,10 +1173,10 @@ _mp_real_atan_rs_31(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 29);
-    flint_mpn_sqrhigh(z2, z + 2, 27);
+    flint_mpn_sqrhigh_n(z, x + 1, 29);
+    flint_mpn_sqrhigh_n(z2, z + 2, 27);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 25);
-    flint_mpn_sqrhigh(z4, z2 + 4, 23);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 23);
 
     sa[3] = mpn_mul_1(sa, z2 + 24, 3, atan_series_cs[14]);
     sa[4] = 0;
@@ -1233,10 +1233,10 @@ _mp_real_atan_rs_32(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 30);
-    flint_mpn_sqrhigh(z2, z + 2, 28);
+    flint_mpn_sqrhigh_n(z, x + 1, 30);
+    flint_mpn_sqrhigh_n(z2, z + 2, 28);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 26);
-    flint_mpn_sqrhigh(z4, z2 + 4, 24);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 24);
 
     RS_MUL_NEG(sa, 2, z3 + 24, atan_series_cs[15], fl_s);
     sa[3] = fl_s;
@@ -1295,10 +1295,10 @@ _mp_real_atan_rs_33(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 31);
-    flint_mpn_sqrhigh(z2, z + 2, 29);
+    flint_mpn_sqrhigh_n(z, x + 1, 31);
+    flint_mpn_sqrhigh_n(z2, z + 2, 29);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 27);
-    flint_mpn_sqrhigh(z4, z2 + 4, 25);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 25);
 
     RS_MUL_NEG(sa, 3, z3 + 24, atan_series_cs[15], fl_s);
     sa[4] = fl_s;
@@ -1357,10 +1357,10 @@ _mp_real_atan_rs_34(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 32);
-    flint_mpn_sqrhigh(z2, z + 2, 30);
+    flint_mpn_sqrhigh_n(z, x + 1, 32);
+    flint_mpn_sqrhigh_n(z2, z + 2, 30);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 28);
-    flint_mpn_sqrhigh(z4, z2 + 4, 26);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 26);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -1424,10 +1424,10 @@ _mp_real_atan_rs_35(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 33);
-    flint_mpn_sqrhigh(z2, z + 2, 31);
+    flint_mpn_sqrhigh_n(z, x + 1, 33);
+    flint_mpn_sqrhigh_n(z2, z + 2, 31);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 29);
-    flint_mpn_sqrhigh(z4, z2 + 4, 27);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 27);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -1530,10 +1530,10 @@ _mp_real_atanh_rs_11(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 9);
-    flint_mpn_sqrhigh(z2, z + 2, 7);
+    flint_mpn_sqrhigh_n(z, x + 1, 9);
+    flint_mpn_sqrhigh_n(z2, z + 2, 7);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 5);
-    flint_mpn_sqrhigh(z4, z2 + 4, 3);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 3);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -1569,10 +1569,10 @@ _mp_real_atanh_rs_12(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 10);
-    flint_mpn_sqrhigh(z2, z + 2, 8);
+    flint_mpn_sqrhigh_n(z, x + 1, 10);
+    flint_mpn_sqrhigh_n(z2, z + 2, 8);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 6);
-    flint_mpn_sqrhigh(z4, z2 + 4, 4);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 4);
 
     sa[2] = mpn_mul_1(sa, z + 8, 2, atan_series_cs[5]);
     sa[3] = 0;
@@ -1607,10 +1607,10 @@ _mp_real_atanh_rs_13(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 11);
-    flint_mpn_sqrhigh(z2, z + 2, 9);
+    flint_mpn_sqrhigh_n(z, x + 1, 11);
+    flint_mpn_sqrhigh_n(z2, z + 2, 9);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 7);
-    flint_mpn_sqrhigh(z4, z2 + 4, 5);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 5);
 
     sa[3] = mpn_mul_1(sa, z + 8, 3, atan_series_cs[5]);
     sa[4] = 0;
@@ -1645,10 +1645,10 @@ _mp_real_atanh_rs_14(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 12);
-    flint_mpn_sqrhigh(z2, z + 2, 10);
+    flint_mpn_sqrhigh_n(z, x + 1, 12);
+    flint_mpn_sqrhigh_n(z2, z + 2, 10);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 8);
-    flint_mpn_sqrhigh(z4, z2 + 4, 6);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 6);
 
     sa[2] = mpn_mul_1(sa, z2 + 8, 2, atan_series_cs[6]);
     sa[3] = 0;
@@ -1687,12 +1687,12 @@ _mp_real_atanh_rs_15(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 13);
-    flint_mpn_sqrhigh(z2, z + 2, 11);
+    flint_mpn_sqrhigh_n(z, x + 1, 13);
+    flint_mpn_sqrhigh_n(z2, z + 2, 11);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 9);
-    flint_mpn_sqrhigh(z4, z2 + 4, 7);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 7);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 5);
-    flint_mpn_sqrhigh(z6, z3 + 6, 3);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 3);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -1732,10 +1732,10 @@ _mp_real_atanh_rs_16(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 14);
-    flint_mpn_sqrhigh(z2, z + 2, 12);
+    flint_mpn_sqrhigh_n(z, x + 1, 14);
+    flint_mpn_sqrhigh_n(z2, z + 2, 12);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 10);
-    flint_mpn_sqrhigh(z4, z2 + 4, 8);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 8);
 
     sa[2] = mpn_mul_1(sa, z3 + 8, 2, atan_series_cs[7]);
     sa[3] = 0;
@@ -1776,12 +1776,12 @@ _mp_real_atanh_rs_17(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 15);
-    flint_mpn_sqrhigh(z2, z + 2, 13);
+    flint_mpn_sqrhigh_n(z, x + 1, 15);
+    flint_mpn_sqrhigh_n(z2, z + 2, 13);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 11);
-    flint_mpn_sqrhigh(z4, z2 + 4, 9);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 9);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 7);
-    flint_mpn_sqrhigh(z6, z3 + 6, 5);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 5);
 
     sa[3] = mpn_mul_1(sa, z + 12, 3, atan_series_cs[7]);
     sa[4] = 0;
@@ -1822,12 +1822,12 @@ _mp_real_atanh_rs_18(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 16);
-    flint_mpn_sqrhigh(z2, z + 2, 14);
+    flint_mpn_sqrhigh_n(z, x + 1, 16);
+    flint_mpn_sqrhigh_n(z2, z + 2, 14);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 12);
-    flint_mpn_sqrhigh(z4, z2 + 4, 10);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 10);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 8);
-    flint_mpn_sqrhigh(z6, z3 + 6, 6);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 6);
 
     sa[2] = mpn_mul_1(sa, z2 + 12, 2, atan_series_cs[8]);
     sa[3] = 0;
@@ -1870,12 +1870,12 @@ _mp_real_atanh_rs_19(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 17);
-    flint_mpn_sqrhigh(z2, z + 2, 15);
+    flint_mpn_sqrhigh_n(z, x + 1, 17);
+    flint_mpn_sqrhigh_n(z2, z + 2, 15);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 13);
-    flint_mpn_sqrhigh(z4, z2 + 4, 11);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 11);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 9);
-    flint_mpn_sqrhigh(z6, z3 + 6, 7);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 7);
 
     sa[3] = mpn_mul_1(sa, z2 + 12, 3, atan_series_cs[8]);
     sa[4] = 0;
@@ -1918,12 +1918,12 @@ _mp_real_atanh_rs_20(nn_ptr res, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 18);
-    flint_mpn_sqrhigh(z2, z + 2, 16);
+    flint_mpn_sqrhigh_n(z, x + 1, 18);
+    flint_mpn_sqrhigh_n(z2, z + 2, 16);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 14);
-    flint_mpn_sqrhigh(z4, z2 + 4, 12);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 12);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 10);
-    flint_mpn_sqrhigh(z6, z3 + 6, 8);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 8);
 
     sa[2] = mpn_mul_1(sa, z3 + 12, 2, atan_series_cs[9]);
     sa[3] = 0;
@@ -1966,10 +1966,10 @@ _mp_real_atanh_rs_21(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 19);
-    flint_mpn_sqrhigh(z2, z + 2, 17);
+    flint_mpn_sqrhigh_n(z, x + 1, 19);
+    flint_mpn_sqrhigh_n(z2, z + 2, 17);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 15);
-    flint_mpn_sqrhigh(z4, z2 + 4, 13);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 13);
 
     sa[3] = mpn_mul_1(sa, z + 16, 3, atan_series_cs[9]);
     sa[4] = 0;
@@ -2013,10 +2013,10 @@ _mp_real_atanh_rs_22(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 20);
-    flint_mpn_sqrhigh(z2, z + 2, 18);
+    flint_mpn_sqrhigh_n(z, x + 1, 20);
+    flint_mpn_sqrhigh_n(z2, z + 2, 18);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 16);
-    flint_mpn_sqrhigh(z4, z2 + 4, 14);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 14);
 
     sa[2] = mpn_mul_1(sa, z2 + 16, 2, atan_series_cs[10]);
     sa[3] = 0;
@@ -2062,10 +2062,10 @@ _mp_real_atanh_rs_23(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 21);
-    flint_mpn_sqrhigh(z2, z + 2, 19);
+    flint_mpn_sqrhigh_n(z, x + 1, 21);
+    flint_mpn_sqrhigh_n(z2, z + 2, 19);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 17);
-    flint_mpn_sqrhigh(z4, z2 + 4, 15);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 15);
 
     sa[3] = mpn_mul_1(sa, z2 + 16, 3, atan_series_cs[10]);
     sa[4] = 0;
@@ -2111,10 +2111,10 @@ _mp_real_atanh_rs_24(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 22);
-    flint_mpn_sqrhigh(z2, z + 2, 20);
+    flint_mpn_sqrhigh_n(z, x + 1, 22);
+    flint_mpn_sqrhigh_n(z2, z + 2, 20);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 18);
-    flint_mpn_sqrhigh(z4, z2 + 4, 16);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 16);
 
     sa[2] = mpn_mul_1(sa, z3 + 16, 2, atan_series_cs[11]);
     sa[3] = 0;
@@ -2162,10 +2162,10 @@ _mp_real_atanh_rs_25(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 23);
-    flint_mpn_sqrhigh(z2, z + 2, 21);
+    flint_mpn_sqrhigh_n(z, x + 1, 23);
+    flint_mpn_sqrhigh_n(z2, z + 2, 21);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 19);
-    flint_mpn_sqrhigh(z4, z2 + 4, 17);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 17);
 
     sa[3] = mpn_mul_1(sa, z3 + 16, 3, atan_series_cs[11]);
     sa[4] = 0;
@@ -2213,10 +2213,10 @@ _mp_real_atanh_rs_26(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 24);
-    flint_mpn_sqrhigh(z2, z + 2, 22);
+    flint_mpn_sqrhigh_n(z, x + 1, 24);
+    flint_mpn_sqrhigh_n(z2, z + 2, 22);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 20);
-    flint_mpn_sqrhigh(z4, z2 + 4, 18);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 18);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -2269,10 +2269,10 @@ _mp_real_atanh_rs_27(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 25);
-    flint_mpn_sqrhigh(z2, z + 2, 23);
+    flint_mpn_sqrhigh_n(z, x + 1, 25);
+    flint_mpn_sqrhigh_n(z2, z + 2, 23);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 21);
-    flint_mpn_sqrhigh(z4, z2 + 4, 19);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 19);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -2326,10 +2326,10 @@ _mp_real_atanh_rs_28(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 26);
-    flint_mpn_sqrhigh(z2, z + 2, 24);
+    flint_mpn_sqrhigh_n(z, x + 1, 26);
+    flint_mpn_sqrhigh_n(z2, z + 2, 24);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 22);
-    flint_mpn_sqrhigh(z4, z2 + 4, 20);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 20);
 
     sa[2] = mpn_mul_1(sa, z + 24, 2, atan_series_cs[13]);
     sa[3] = 0;
@@ -2382,10 +2382,10 @@ _mp_real_atanh_rs_29(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 27);
-    flint_mpn_sqrhigh(z2, z + 2, 25);
+    flint_mpn_sqrhigh_n(z, x + 1, 27);
+    flint_mpn_sqrhigh_n(z2, z + 2, 25);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 23);
-    flint_mpn_sqrhigh(z4, z2 + 4, 21);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 21);
 
     sa[3] = mpn_mul_1(sa, z + 24, 3, atan_series_cs[13]);
     sa[4] = 0;
@@ -2438,10 +2438,10 @@ _mp_real_atanh_rs_30(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 28);
-    flint_mpn_sqrhigh(z2, z + 2, 26);
+    flint_mpn_sqrhigh_n(z, x + 1, 28);
+    flint_mpn_sqrhigh_n(z2, z + 2, 26);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 24);
-    flint_mpn_sqrhigh(z4, z2 + 4, 22);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 22);
 
     sa[2] = mpn_mul_1(sa, z2 + 24, 2, atan_series_cs[14]);
     sa[3] = 0;
@@ -2496,10 +2496,10 @@ _mp_real_atanh_rs_31(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 29);
-    flint_mpn_sqrhigh(z2, z + 2, 27);
+    flint_mpn_sqrhigh_n(z, x + 1, 29);
+    flint_mpn_sqrhigh_n(z2, z + 2, 27);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 25);
-    flint_mpn_sqrhigh(z4, z2 + 4, 23);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 23);
 
     sa[3] = mpn_mul_1(sa, z2 + 24, 3, atan_series_cs[14]);
     sa[4] = 0;
@@ -2554,10 +2554,10 @@ _mp_real_atanh_rs_32(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 30);
-    flint_mpn_sqrhigh(z2, z + 2, 28);
+    flint_mpn_sqrhigh_n(z, x + 1, 30);
+    flint_mpn_sqrhigh_n(z2, z + 2, 28);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 26);
-    flint_mpn_sqrhigh(z4, z2 + 4, 24);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 24);
 
     sa[2] = mpn_mul_1(sa, z3 + 24, 2, atan_series_cs[15]);
     sa[3] = 0;
@@ -2614,10 +2614,10 @@ _mp_real_atanh_rs_33(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 31);
-    flint_mpn_sqrhigh(z2, z + 2, 29);
+    flint_mpn_sqrhigh_n(z, x + 1, 31);
+    flint_mpn_sqrhigh_n(z2, z + 2, 29);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 27);
-    flint_mpn_sqrhigh(z4, z2 + 4, 25);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 25);
 
     sa[3] = mpn_mul_1(sa, z3 + 24, 3, atan_series_cs[15]);
     sa[4] = 0;
@@ -2674,10 +2674,10 @@ _mp_real_atanh_rs_34(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 32);
-    flint_mpn_sqrhigh(z2, z + 2, 30);
+    flint_mpn_sqrhigh_n(z, x + 1, 32);
+    flint_mpn_sqrhigh_n(z2, z + 2, 30);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 28);
-    flint_mpn_sqrhigh(z4, z2 + 4, 26);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 26);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -2739,10 +2739,10 @@ _mp_real_atanh_rs_35(nn_ptr res, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 33);
-    flint_mpn_sqrhigh(z2, z + 2, 31);
+    flint_mpn_sqrhigh_n(z, x + 1, 33);
+    flint_mpn_sqrhigh_n(z2, z + 2, 31);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 29);
-    flint_mpn_sqrhigh(z4, z2 + 4, 27);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 27);
 
     sa[0] = 0;
     sa[1] = 0;
@@ -2847,10 +2847,10 @@ _mp_real_sin_cos_rs_11(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 9);
-    flint_mpn_sqrhigh(z2, z + 2, 7);
+    flint_mpn_sqrhigh_n(z, x + 1, 9);
+    flint_mpn_sqrhigh_n(z2, z + 2, 7);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 5);
-    flint_mpn_sqrhigh(z4, z2 + 4, 3);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 3);
 
     if (ysin != NULL)
     {
@@ -2916,10 +2916,10 @@ _mp_real_sin_cos_rs_12(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z4 = z4p + 1;
     z4p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 10);
-    flint_mpn_sqrhigh(z2, z + 2, 8);
+    flint_mpn_sqrhigh_n(z, x + 1, 10);
+    flint_mpn_sqrhigh_n(z2, z + 2, 8);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 6);
-    flint_mpn_sqrhigh(z4, z2 + 4, 4);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 4);
 
     if (ysin != NULL)
     {
@@ -2986,12 +2986,12 @@ _mp_real_sin_cos_rs_13(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 11);
-    flint_mpn_sqrhigh(z2, z + 2, 9);
+    flint_mpn_sqrhigh_n(z, x + 1, 11);
+    flint_mpn_sqrhigh_n(z2, z + 2, 9);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 7);
-    flint_mpn_sqrhigh(z4, z2 + 4, 5);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 5);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 3);
-    flint_mpn_sqrhigh(z6, z3 + 6, 1);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 1);
 
     if (ysin != NULL)
     {
@@ -3060,12 +3060,12 @@ _mp_real_sin_cos_rs_14(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 12);
-    flint_mpn_sqrhigh(z2, z + 2, 10);
+    flint_mpn_sqrhigh_n(z, x + 1, 12);
+    flint_mpn_sqrhigh_n(z2, z + 2, 10);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 8);
-    flint_mpn_sqrhigh(z4, z2 + 4, 6);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 6);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 4);
-    flint_mpn_sqrhigh(z6, z3 + 6, 2);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 2);
 
     if (ysin != NULL)
     {
@@ -3140,12 +3140,12 @@ _mp_real_sin_cos_rs_15(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 13);
-    flint_mpn_sqrhigh(z2, z + 2, 11);
+    flint_mpn_sqrhigh_n(z, x + 1, 13);
+    flint_mpn_sqrhigh_n(z2, z + 2, 11);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 9);
-    flint_mpn_sqrhigh(z4, z2 + 4, 7);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 7);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 5);
-    flint_mpn_sqrhigh(z6, z3 + 6, 3);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 3);
 
     if (ysin != NULL)
     {
@@ -3221,12 +3221,12 @@ _mp_real_sin_cos_rs_16(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 14);
-    flint_mpn_sqrhigh(z2, z + 2, 12);
+    flint_mpn_sqrhigh_n(z, x + 1, 14);
+    flint_mpn_sqrhigh_n(z2, z + 2, 12);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 10);
-    flint_mpn_sqrhigh(z4, z2 + 4, 8);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 8);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 6);
-    flint_mpn_sqrhigh(z6, z3 + 6, 4);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 4);
 
     if (ysin != NULL)
     {
@@ -3301,12 +3301,12 @@ _mp_real_sin_cos_rs_17(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 15);
-    flint_mpn_sqrhigh(z2, z + 2, 13);
+    flint_mpn_sqrhigh_n(z, x + 1, 15);
+    flint_mpn_sqrhigh_n(z2, z + 2, 13);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 11);
-    flint_mpn_sqrhigh(z4, z2 + 4, 9);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 9);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 7);
-    flint_mpn_sqrhigh(z6, z3 + 6, 5);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 5);
 
     if (ysin != NULL)
     {
@@ -3385,14 +3385,14 @@ _mp_real_sin_cos_rs_18(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 16);
-    flint_mpn_sqrhigh(z2, z + 2, 14);
+    flint_mpn_sqrhigh_n(z, x + 1, 16);
+    flint_mpn_sqrhigh_n(z2, z + 2, 14);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 12);
-    flint_mpn_sqrhigh(z4, z2 + 4, 10);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 10);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 8);
-    flint_mpn_sqrhigh(z6, z3 + 6, 6);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 6);
     flint_mpn_mulhigh_n(z7, z3 + 8, z4 + 6, 4);
-    flint_mpn_sqrhigh(z8, z4 + 8, 2);
+    flint_mpn_sqrhigh_n(z8, z4 + 8, 2);
 
     if (ysin != NULL)
     {
@@ -3477,14 +3477,14 @@ _mp_real_sin_cos_rs_19(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 17);
-    flint_mpn_sqrhigh(z2, z + 2, 15);
+    flint_mpn_sqrhigh_n(z, x + 1, 17);
+    flint_mpn_sqrhigh_n(z2, z + 2, 15);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 13);
-    flint_mpn_sqrhigh(z4, z2 + 4, 11);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 11);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 9);
-    flint_mpn_sqrhigh(z6, z3 + 6, 7);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 7);
     flint_mpn_mulhigh_n(z7, z3 + 8, z4 + 6, 5);
-    flint_mpn_sqrhigh(z8, z4 + 8, 3);
+    flint_mpn_sqrhigh_n(z8, z4 + 8, 3);
 
     if (ysin != NULL)
     {
@@ -3568,12 +3568,12 @@ _mp_real_sin_cos_rs_20(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 18);
-    flint_mpn_sqrhigh(z2, z + 2, 16);
+    flint_mpn_sqrhigh_n(z, x + 1, 18);
+    flint_mpn_sqrhigh_n(z2, z + 2, 16);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 14);
-    flint_mpn_sqrhigh(z4, z2 + 4, 12);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 12);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 10);
-    flint_mpn_sqrhigh(z6, z3 + 6, 8);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 8);
 
     if (ysin != NULL)
     {
@@ -3658,14 +3658,14 @@ _mp_real_sin_cos_rs_21(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 19);
-    flint_mpn_sqrhigh(z2, z + 2, 17);
+    flint_mpn_sqrhigh_n(z, x + 1, 19);
+    flint_mpn_sqrhigh_n(z2, z + 2, 17);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 15);
-    flint_mpn_sqrhigh(z4, z2 + 4, 13);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 13);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 11);
-    flint_mpn_sqrhigh(z6, z3 + 6, 9);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 9);
     flint_mpn_mulhigh_n(z7, z3 + 8, z4 + 6, 7);
-    flint_mpn_sqrhigh(z8, z4 + 8, 5);
+    flint_mpn_sqrhigh_n(z8, z4 + 8, 5);
 
     if (ysin != NULL)
     {
@@ -3752,14 +3752,14 @@ _mp_real_sin_cos_rs_22(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x + 1, 20);
-    flint_mpn_sqrhigh(z2, z + 2, 18);
+    flint_mpn_sqrhigh_n(z, x + 1, 20);
+    flint_mpn_sqrhigh_n(z2, z + 2, 18);
     flint_mpn_mulhigh_n(z3, z + 4, z2 + 2, 16);
-    flint_mpn_sqrhigh(z4, z2 + 4, 14);
+    flint_mpn_sqrhigh_n(z4, z2 + 4, 14);
     flint_mpn_mulhigh_n(z5, z2 + 6, z3 + 4, 12);
-    flint_mpn_sqrhigh(z6, z3 + 6, 10);
+    flint_mpn_sqrhigh_n(z6, z3 + 6, 10);
     flint_mpn_mulhigh_n(z7, z3 + 8, z4 + 6, 8);
-    flint_mpn_sqrhigh(z8, z4 + 8, 6);
+    flint_mpn_sqrhigh_n(z8, z4 + 8, 6);
 
     if (ysin != NULL)
     {
@@ -3934,12 +3934,12 @@ _mp_real_sin_cos_rs32_8(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z6 = z6p + 1;
     z6p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x, 8);
-    flint_mpn_sqrhigh(z2, z + 1, 6);
+    flint_mpn_sqrhigh_n(z, x, 8);
+    flint_mpn_sqrhigh_n(z2, z + 1, 6);
     flint_mpn_mulhigh_n(z3, z + 2, z2 + 1, 5);
-    flint_mpn_sqrhigh(z4, z2 + 2, 4);
+    flint_mpn_sqrhigh_n(z4, z2 + 2, 4);
     flint_mpn_mulhigh_n(z5, z2 + 3, z3 + 2, 3);
-    flint_mpn_sqrhigh(z6, z3 + 3, 2);
+    flint_mpn_sqrhigh_n(z6, z3 + 3, 2);
 
     if (ysin != NULL)
     {
@@ -4001,14 +4001,14 @@ _mp_real_sin_cos_rs32_9(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x, 9);
-    flint_mpn_sqrhigh(z2, z + 1, 7);
+    flint_mpn_sqrhigh_n(z, x, 9);
+    flint_mpn_sqrhigh_n(z2, z + 1, 7);
     flint_mpn_mulhigh_n(z3, z + 2, z2 + 1, 6);
-    flint_mpn_sqrhigh(z4, z2 + 2, 5);
+    flint_mpn_sqrhigh_n(z4, z2 + 2, 5);
     flint_mpn_mulhigh_n(z5, z2 + 3, z3 + 2, 4);
-    flint_mpn_sqrhigh(z6, z3 + 3, 3);
+    flint_mpn_sqrhigh_n(z6, z3 + 3, 3);
     flint_mpn_mulhigh_n(z7, z3 + 4, z4 + 3, 2);
-    flint_mpn_sqrhigh(z8, z4 + 4, 1);
+    flint_mpn_sqrhigh_n(z8, z4 + 4, 1);
 
     if (ysin != NULL)
     {
@@ -4074,14 +4074,14 @@ _mp_real_sin_cos_rs32_10(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     nn_ptr z8 = z8p + 1;
     z8p[0] = 0;
 
-    flint_mpn_sqrhigh(z, x, 10);
-    flint_mpn_sqrhigh(z2, z + 1, 8);
+    flint_mpn_sqrhigh_n(z, x, 10);
+    flint_mpn_sqrhigh_n(z2, z + 1, 8);
     flint_mpn_mulhigh_n(z3, z + 2, z2 + 1, 7);
-    flint_mpn_sqrhigh(z4, z2 + 2, 6);
+    flint_mpn_sqrhigh_n(z4, z2 + 2, 6);
     flint_mpn_mulhigh_n(z5, z2 + 3, z3 + 2, 5);
-    flint_mpn_sqrhigh(z6, z3 + 3, 4);
+    flint_mpn_sqrhigh_n(z6, z3 + 3, 4);
     flint_mpn_mulhigh_n(z7, z3 + 4, z4 + 3, 3);
-    flint_mpn_sqrhigh(z8, z4 + 4, 2);
+    flint_mpn_sqrhigh_n(z8, z4 + 4, 2);
 
     if (ysin != NULL)
     {

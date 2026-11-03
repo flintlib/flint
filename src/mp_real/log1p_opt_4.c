@@ -69,7 +69,7 @@ _mp_real_log1p_series_4(nn_ptr res, nn_srcptr x)
     P[1] = V[0];
     P[2] = V[1];
     P[3] = V[2];
-    flint_mpn_sqrhigh(z, x, 4);
+    flint_mpn_sqrhigh_n(z, x, 4);
     flint_mpn_mulhigh_n(T, z, P, 4);
     NN_SUB_4(res, x, T);
 }

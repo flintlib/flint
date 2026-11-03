@@ -15,7 +15,7 @@
 #define N_MIN 1
 #define N_MAX 64
 
-TEST_FUNCTION_START(flint_mpn_sqrhigh_normalised, state)
+TEST_FUNCTION_START(flint_mpn_sqrhigh_n_normalised, state)
 {
     slong ix;
     int result;
@@ -33,11 +33,19 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh_normalised, state)
         rp_u = flint_malloc(sizeof(mp_limb_t) * (n + 1));
         xp = flint_malloc(sizeof(mp_limb_t) * n);
 
-        flint_mpn_rrandom(xp, state, n);
+        if (n_randint(state, 4) == 0)
+        {
+            /* adversarial: deficit close to the bound (see t-sqrhigh.c) */
+            mp_size_t i;
+            for (i = 0; i < n; i++)
+                xp[i] = (i & 1) ? -(UWORD(1) << (FLINT_BITS / 2)) - 1 : -(UWORD(1) << (FLINT_BITS / 2)) + 1;
+        }
+        else
+            flint_mpn_rrandom(xp, state, n);
         xp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
-        rp_u[0] = flint_mpn_sqrhigh(rp_u + 1, xp, n);
-        res_norm = flint_mpn_sqrhigh_normalised(rp_n + 1, xp, n);
+        rp_u[0] = flint_mpn_sqrhigh_n(rp_u + 1, xp, n);
+        res_norm = flint_mpn_sqrhigh_n_normalised(rp_n + 1, xp, n);
 
         retlimb = res_norm.m1;
         normalised = res_norm.m2;
@@ -80,6 +88,33 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh_normalised, state)
                         "rp_n = %{ulong*}\n"
                         "rp_u = %{ulong*}\n",
                         ix, n, xp, n, rp_n, n + 1, rp_u, n + 1);
+        }
+
+
+        /* Check the deficit against the exact (normalised) product */
+        {
+            mp_ptr full = flint_malloc(sizeof(mp_limb_t) * 2 * n);
+            mp_limb_t bound = FLINT_MPN_SQRHIGH_N_NORMALISED_GUARD_ERR_BOUND(n);
+            mp_size_t i;
+
+            flint_mpn_sqr(full, xp, n);
+            if (normalised)
+                mpn_lshift(full, full, 2 * n, 1);
+
+            /* exact top n + 1 limbs minus computed: must be in [0, bound] */
+            result = (mpn_sub_n(full + n - 1, full + n - 1, rp_n, n + 1) == 0);
+            for (i = n; i < 2 * n; i++)
+                result = result && (full[i] == 0);
+            result = result && (full[n - 1] <= bound);
+            if (!result)
+                TEST_FUNCTION_FAIL(
+                        "Deficit out of bounds\n"
+                        "ix = %wd\n"
+                        "n = %wd\n"
+                        "xp = %{ulong*}\n"
+                        "deficit = %{ulong}, bound = %{ulong}\n",
+                        ix, n, xp, n, full[n - 1], bound);
+            flint_free(full);
         }
 
         flint_free(rp_n);

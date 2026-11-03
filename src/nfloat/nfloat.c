@@ -871,68 +871,6 @@ nfloat_im(nfloat_ptr res, nfloat_srcptr FLINT_UNUSED(x), gr_ctx_t ctx)
     return nfloat_zero(res, ctx);
 }
 
-static mp_limb_pair_t
-_flint_mpn_mulhigh_normalised2(nn_ptr rp, nn_srcptr xp, nn_srcptr yp, slong n)
-{
-    mp_limb_pair_t ret;
-
-    FLINT_ASSERT(n >= 1);
-
-    if (rp == xp || rp == yp)
-    {
-        nn_ptr t;
-        TMP_INIT;
-        TMP_START;
-        t = TMP_ALLOC(sizeof(ulong) * n);
-        ret = _flint_mpn_mulhigh_normalised2(t, xp, yp, n);
-        flint_mpn_copyi(rp, t, n);
-        TMP_END;
-        return ret;
-    }
-
-    if (xp == yp)
-        ret.m1 = flint_mpn_sqrhigh(rp, xp, n);
-    else
-        ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
-
-    if (LIMB_MSB_IS_SET(rp[n - 1]))
-    {
-        ret.m2 = 0;
-    }
-    else
-    {
-        ret.m2 = 1;
-        mpn_lshift(rp, rp, n, 1);
-        rp[0] |= (ret.m1 >> (FLINT_BITS - 1));
-        ret.m1 <<= 1;
-    }
-
-    return ret;
-}
-
-/* handles aliasing */
-FLINT_FORCE_INLINE
-mp_limb_pair_t flint_mpn_mulhigh_normalised2(nn_ptr rp, nn_srcptr xp, nn_srcptr yp, slong n)
-{
-    FLINT_ASSERT(n >= 1);
-
-    if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
-        return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
-    else
-        return _flint_mpn_mulhigh_normalised2(rp, xp, yp, n);
-}
-
-/* handles aliasing */
-FLINT_FORCE_INLINE
-mp_limb_pair_t flint_mpn_sqrhigh_normalised2(nn_ptr rp, nn_srcptr xp, slong n)
-{
-    FLINT_ASSERT(n >= 1);
-
-    if (FLINT_HAVE_SQRHIGH_NORMALISED_FUNC(n))
-        return flint_mpn_sqrhigh_normalised_func_tab[n](rp, xp);
-    else
-        return _flint_mpn_mulhigh_normalised2(rp, xp, xp, n);
-}
 
 FLINT_FORCE_INLINE int
 n_signed_sub(ulong * r, ulong x, ulong y)
@@ -2426,6 +2364,17 @@ _nfloat_vec_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
     return status;
 }
 
+/* the high products allow aliasing; a product of an operand with itself
+   goes through the squaring code */
+FLINT_FORCE_INLINE
+mp_limb_pair_t flint_mpn_mulhigh_normalised2(nn_ptr rp, nn_srcptr xp, nn_srcptr yp, slong n)
+{
+    if (xp == yp)
+        return flint_mpn_sqrhigh_n_normalised(rp, xp, n);
+    else
+        return flint_mpn_mulhigh_n_normalised(rp, xp, yp, n);
+}
+
 int
 nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 {
@@ -2566,7 +2515,7 @@ nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
     }
     else
     {
-        mul_res = flint_mpn_sqrhigh_normalised2(NFLOAT_D(res), NFLOAT_D(x), NFLOAT_CTX_NLIMBS(ctx));
+        mul_res = flint_mpn_sqrhigh_n_normalised(NFLOAT_D(res), NFLOAT_D(x), NFLOAT_CTX_NLIMBS(ctx));
         NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x) - mul_res.m2;
     }
 

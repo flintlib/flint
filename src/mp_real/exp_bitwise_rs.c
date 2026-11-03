@@ -489,8 +489,7 @@ _mp_real_exp_recon_prod(nn_ptr y, slong ylen, const slong * used,
         {
             /* window two limbs below the kept result: both
                sacrificial limbs absorb the deficit */
-            flint_mpn_mulmid(prod + q - 2, y, ylen, m, mlen,
-                q - 2, plen);
+            _mp_real_mulhigh_window(prod + q - 2, y, ylen, m, mlen, q - 2);
             if (b)
                 mpn_rshift(prod + q - 2, prod + q - 2,
                     plen - q + 2, (int) b);

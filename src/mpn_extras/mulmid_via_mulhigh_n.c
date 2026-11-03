@@ -100,7 +100,7 @@ flint_mpn_mulmid_via_mulhigh_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b,
     if (off == 0 && zn == n)
     {
         if (squaring)
-            flint_mpn_sqrhigh(z, xp, n);
+            flint_mpn_sqrhigh_n(z, xp, n);
         else
             flint_mpn_mulhigh_n(z, xp, yp, n);
     }
@@ -109,7 +109,7 @@ flint_mpn_mulmid_via_mulhigh_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b,
         res = TMP_ARRAY_ALLOC(n, mp_limb_t);
 
         if (squaring)
-            flint_mpn_sqrhigh(res, xp, n);
+            flint_mpn_sqrhigh_n(res, xp, n);
         else
             flint_mpn_mulhigh_n(res, xp, yp, n);
 

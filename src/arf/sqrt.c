@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2014, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,26 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <mpfr.h>
 #include "mpn_extras.h"
+#include "mpn_extras/fp_small.h"
 #include "arf.h"
 
+/*
+    arf_sqrt through the root limb-array kernels of arf (arf/mpn_div.c) (see arf_div), with the
+    one-limb roots in registers.
+*/
 int
 arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 {
-    slong xn, zn, val;
+    slong xn;
     nn_srcptr xptr;
-    nn_ptr tmp, zptr;
-    mpfr_t xf, zf;
-    int inexact, odd_exp;
-    ARF_MUL_TMP_DECL
-
-    if (rnd >= ARF_RND_FAST)
-    {
-        if (_arf_want_newton_sqrt(x, prec))
-            return _arf_sqrt_newton(z, x, prec, rnd);
-        rnd = arf_rnd_relaxed_to_strict(rnd);
-    }
+    int t, inexact;
 
     if (arf_is_special(x))
     {
@@ -52,39 +46,98 @@ arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
         return 0;
     }
 
+    if (prec == ARF_PREC_EXACT)
+        flint_throw(FLINT_ERROR, "arf_sqrt: exact precision not supported\n");
+
     ARF_GET_MPN_READONLY(xptr, xn, x);
-    odd_exp = fmpz_is_odd(ARF_EXPREF(x)) ? 1 : 0;
+    t = fmpz_is_odd(ARF_EXPREF(x));
 
-    zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+#if FLINT_BITS == 64
+    if (xn == 1 && prec <= FLINT_BITS && !COEFF_IS_MPZ(ARF_EXP(x)))
+    {
+        /* the exact floor s of sqrt(a B / 2^t) (one limb, top bit set) with
+           its remainder r = a B / 2^t - s^2 <= 2 s, in registers: s is
+           rounded to prec bits with [r != 0] as the sticky bit, and for
+           prec = FLINT_BITS with the half bit [r > s] (sqrt >= s + 1/2
+           iff r >= s + 1/4; a tie is impossible) */
+        ulong s, r1, r0, low, half, mask;
+        slong ee = (ARF_EXP(x) + t) >> 1;
+        int up, tie_even;
 
-    ARF_MUL_TMP_ALLOC(tmp, zn)
+        _flint_mpn_isqrt_2_rem(&s, &r1, &r0, xptr[0] >> t, (xptr[0] << (FLINT_BITS - 1)) & (-(ulong) t));
+        inexact = ((r1 | r0) != 0);
 
-    zf->_mpfr_d = tmp;
-    zf->_mpfr_prec = prec;
-    zf->_mpfr_sign = 1;
-    zf->_mpfr_exp = 0;
+        /* the bits of s below prec, and whether the value is above the
+           midpoint of the rounding interval */
+        if (prec == FLINT_BITS)
+        {
+            mask = 0;
+            low = 0;
+            up = (r1 != 0 || r0 > s);
+            tie_even = 0;
+        }
+        else
+        {
+            mask = (UWORD(1) << (FLINT_BITS - prec)) - 1;
+            half = UWORD(1) << (FLINT_BITS - prec - 1);
+            low = s & mask;
+            inexact |= (low != 0);
+            up = (low > half) || (low == half && (r1 | r0) != 0);
+            tie_even = (low == half && (r1 | r0) == 0 && ((s >> (FLINT_BITS - prec)) & 1));
+        }
 
-    xf->_mpfr_d = (nn_ptr) xptr;
-    xf->_mpfr_prec = xn * FLINT_BITS;
-    xf->_mpfr_sign = 1;
-    xf->_mpfr_exp = odd_exp;
+        switch (_arf_rnd_resolve(rnd, 0))
+        {
+            case ARF_RND_NEAR: up = up || tie_even; break;
+            case ARF_RND_UP: up = inexact; break;
+            default: up = 0;
+        }
 
-    inexact = mpfr_sqrt(zf, xf, arf_rnd_to_mpfr(rnd));
-    inexact = (inexact != 0);
+        s = (s & ~mask) + (up ? (mask + 1) : 0);
+        if (s == 0)
+        {
+            s = UWORD(1) << (FLINT_BITS - 1);
+            ee++;
+        }
 
-    val = 0;
-    while (tmp[val] == 0)
-        val++;
+        /* z = s B^-1 2^ee */
+        ARF_DEMOTE(z);
+        ARF_NOPTR_D(z)[0] = s;
+        ARF_XSIZE(z) = ARF_MAKE_XSIZE(1, 0);
+        fmpz_set_si(ARF_EXPREF(z), ee);
+        return inexact;
+    }
+#endif
 
-    ARF_GET_MPN_WRITE(zptr, zn - val, z);
-    flint_mpn_copyi(zptr, tmp + val, zn - val);
+    {
+        nn_srcptr xd;
+        nn_ptr zd;
+        slong xn, rn, fix;
+        fmpz_t e;
+        ARF_KERNEL_DECL
 
-    fmpz_fdiv_q_2exp(ARF_EXPREF(z), ARF_EXPREF(x), 1);
-    fmpz_add_si(ARF_EXPREF(z), ARF_EXPREF(z), zf->_mpfr_exp);
+        ARF_GET_MPN_READONLY(xd, xn, x);
+        rn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+        ARF_KERNEL_ALLOC(zd, rn, z, x, x);
 
-    ARF_MUL_TMP_FREE(tmp, zn)
+        /* the exponent (e + t) / 2 of the root (e + t is even) from the
+           fmpz exponent, the kernel's correction relative to it */
+        fmpz_init(e);
+        if (!COEFF_IS_MPZ(ARF_EXP(x)))
+            *e = (ARF_EXP(x) + t) >> 1;
+        else
+        {
+            fmpz_add_ui(e, ARF_EXPREF(x), t);
+            fmpz_tdiv_q_2exp(e, e, 1);
+        }
 
-    return inexact;
+        inexact = _arf_mpn_sqrt(zd, &fix, xd, xn, t, prec, _arf_rnd_resolve(rnd, 0));
+
+        ARF_KERNEL_FINISH(z, zd, rn, 0);
+        _fmpz_add_fast(ARF_EXPREF(z), e, fix);
+        fmpz_clear(e);
+        return inexact;
+    }
 }
 
 int

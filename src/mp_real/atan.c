@@ -206,7 +206,7 @@ _at_mid(mp_real_t res, const mp_real_t m, slong prec)
             v = TMP_ALLOC(3 * n * sizeof(ulong));
             q = v + n;
             trunc = _mp_real_elem_copy(v, n, n, m);
-            flint_mpn_sqrhigh(q + n, v, n);
+            flint_mpn_sqrhigh_n(q + n, v, n);
             flint_mpn_mulhigh_n(q, q + n, v, n);
             mpn_divrem_1(q, 0, q, n, 3);
             mp_real_fit_length(res, n + 1);

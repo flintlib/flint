@@ -69,7 +69,7 @@ _mp_real_log1p_series_5(nn_ptr res, nn_srcptr x)
     P[2] = V[1];
     P[3] = V[2];
     P[4] = V[3];
-    flint_mpn_sqrhigh(z, x, 5);
+    flint_mpn_sqrhigh_n(z, x, 5);
     flint_mpn_mulhigh_n(T, z, P, 5);
     NN_SUB_5(res, x, T);
 }

@@ -34,7 +34,7 @@ _mp_real_sin_cos_series_7(nn_ptr ysin, nn_ptr ycos, nn_srcptr x)
     (void) sV; (void) cV;
 
     /* the one squaring shared by both series */
-    flint_mpn_sqrhigh(z, x, 7);
+    flint_mpn_sqrhigh_n(z, x, 7);
 
     sw1 = UWORD(0x00002e3bc74aad8e); sw0 = UWORD(0x671f5583911ca002);
 
@@ -422,8 +422,8 @@ _mp_real_sin_cos_opt_7(nn_ptr ysin, nn_ptr ycos, nn_srcptr v)
     YF[5] = y5;
     XF[6] = x6;
     YF[6] = y6;
-    flint_mpn_sqrhigh(X2, XF, 7);
-    flint_mpn_sqrhigh(Y2, YF, 7);
+    flint_mpn_sqrhigh_n(X2, XF, 7);
+    flint_mpn_sqrhigh_n(Y2, YF, 7);
     flint_mpn_mulhigh_n(XY, XF, YF, 7);
     XF[0] &= mx;
     YF[0] &= mx;

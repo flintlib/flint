@@ -267,7 +267,8 @@ _fft_small_np2_pack(double * d, double * d2, nn_srcptr x, ulong xn, ulong len,
     Returns 0, doing nothing, if the transposed product is not shorter.
 */
 static int
-_mpn_ctx_mpn_mul_window_np2_tr(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
+_mpn_ctx_mpn_mul_window_np2_tr(mpn_ctx_t R, nn_ptr z, nn_ptr zlow, ulong nlow,
+                        ulong zl, ulong zh,
                         nn_srcptr a, ulong an, nn_srcptr b, ulong bn,
                         ulong bits, ulong alen, ulong blen, ulong zlen)
 {
@@ -364,7 +365,7 @@ _mpn_ctx_mpn_mul_window_np2_tr(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
     sd_fft_trunc_tr(Q0, d0, depth, otr, ztr);
     sd_fft_trunc_tr(Q1, d1, depth, otr, ztr);
 
-    _fft_small_np2_crt_recompose(R, z, zl - c0 * bits / 64,
+    _fft_small_np2_crt_recompose_split(R, z, zlow, nlow, zl - c0 * bits / 64,
                                  zh - c0 * bits / 64, d0, d1, m, otr,
                                  bits, depth);
 
@@ -373,6 +374,16 @@ _mpn_ctx_mpn_mul_window_np2_tr(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
 
 void
 _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
+                        nn_srcptr a, ulong an, nn_srcptr b, ulong bn)
+{
+    _mpn_ctx_mpn_mul_window_np2_split(R, z, NULL, 0, zl, zh, a, an, b, bn);
+}
+
+/* As above, with the lowest nlow limbs of the window written to zlow and
+   the remaining zh - zl - nlow limbs to z. */
+void
+_mpn_ctx_mpn_mul_window_np2_split(mpn_ctx_t R, nn_ptr z, nn_ptr zlow,
+                        ulong nlow, ulong zl, ulong zh,
                         nn_srcptr a, ulong an, nn_srcptr b, ulong bn)
 {
     ulong bits, depth;
@@ -399,7 +410,8 @@ _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
 
     FLINT_ASSERT(an >= bn && bn >= 1);
 
-    if (!sqr && _mpn_ctx_mpn_mul_window_np2_tr(R, z, zl, zh, a, an, b, bn,
+    if (!sqr && _mpn_ctx_mpn_mul_window_np2_tr(R, z, zlow, nlow, zl, zh,
+                                              a, an, b, bn,
                                               bits, alen, blen, zlen))
         return;
 
@@ -437,8 +449,18 @@ _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
     sd_ifft_trunc(Q0, d0, depth, ztr);
     sd_ifft_trunc(Q1, d1, depth, ztr);
 
-    _fft_small_np2_crt_recompose(R, z, zl, zn, d0, d1, zlen,
-                                 (ulong) ztr, bits, depth);
+    _fft_small_np2_crt_recompose_split(R, z, zlow, nlow, zl, zn, d0, d1,
+                                       zlen, (ulong) ztr, bits, depth);
+}
+
+/* limb i of a window whose lowest nlow limbs go to zlow and the rest to z */
+static inline void
+_np2_write_limb(nn_ptr z, nn_ptr zlow, ulong nlow, ulong i, ulong val)
+{
+    if (i < nlow)
+        zlow[i] = val;
+    else
+        z[i - nlow] = val;
 }
 
 /* Garner and register-window recomposition of two-prime lanes
@@ -462,6 +484,17 @@ void
 _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
     ulong zl, ulong zh, double * d0, double * d1, ulong nchunks,
     ulong navail8, ulong bits, ulong depth)
+{
+    _fft_small_np2_crt_recompose_split(R, z, NULL, 0, zl, zh, d0, d1,
+                                       nchunks, navail8, bits, depth);
+}
+
+/* As above, with the lowest nlow limbs of the window, [zl, zl + nlow),
+   written to zlow instead of z, which receives [zl + nlow, zh). */
+void
+_fft_small_np2_crt_recompose_split(const mpn_ctx_struct * R, nn_ptr z,
+    nn_ptr zlow, ulong nlow, ulong zl, ulong zh, double * d0, double * d1,
+    ulong nchunks, ulong navail8, ulong bits, ulong depth)
 {
     const sd_fft_ctx_struct * Q0 = R->ffts + 0, * Q1 = R->ffts + 1;
     ulong p1u = (ulong) Q0->p;
@@ -541,7 +574,12 @@ _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
             add_ssaaaa(acc1, acc0, acc1, acc0, vhi, vlo);
         }
 
-        for (j = jlo; j < jtop; j++)
+        /* the diverted limbs [zl, zl + nlow) first, with the branchy
+           writer (a few iterations), then the rest through the shifted
+           base zbase = z - nlow - zl without any test per limb */
+        nn_ptr zbase = z - nlow - zl;
+
+        for (j = jlo; j < jtop && w0 < zl + nlow; j++)
         {
             ulong r1 = (ulong) d0[j], tt = (ulong) d1[j];
             ulong vhi, vlo, x0, x1, x2;
@@ -549,7 +587,37 @@ _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
 
             while (w0 < w)
             {
-                z[w0++ - zl] = acc0;
+                _np2_write_limb(z, zlow, nlow, w0 - zl, acc0);
+                w0++;
+                acc0 = acc1; acc1 = acc2; acc2 = acc3; acc3 = 0;
+            }
+
+            umul_ppmm(vhi, vlo, p1u, tt);
+            add_ssaaaa(vhi, vlo, vhi, vlo, 0, r1);
+
+            x0 = vlo << sh;
+            x1 = ((vlo >> (63 - sh)) >> 1) | (vhi << sh);
+            x2 = (vhi >> (63 - sh)) >> 1;
+
+            add_ssssaaaaaaaa(acc3, acc2, acc1, acc0,
+                             acc3, acc2, acc1, acc0, 0, x2, x1, x0);
+        }
+        while (w0 < zh && w0 < zl + nlow)
+        {
+            _np2_write_limb(z, zlow, nlow, w0 - zl, acc0);
+            w0++;
+            acc0 = acc1; acc1 = acc2; acc2 = acc3; acc3 = 0;
+        }
+
+        for ( ; j < jtop; j++)
+        {
+            ulong r1 = (ulong) d0[j], tt = (ulong) d1[j];
+            ulong vhi, vlo, x0, x1, x2;
+            ulong pos = j * bits, w = pos >> 6, sh = pos & 63;
+
+            while (w0 < w)
+            {
+                zbase[w0++] = acc0;
                 acc0 = acc1; acc1 = acc2; acc2 = acc3; acc3 = 0;
             }
 
@@ -565,7 +633,7 @@ _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
         }
         while (w0 < zh)
         {
-            z[w0++ - zl] = acc0;
+            zbase[w0++] = acc0;
             acc0 = acc1; acc1 = acc2; acc2 = acc3; acc3 = 0;
         }
     }

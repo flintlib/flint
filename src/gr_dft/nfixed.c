@@ -293,19 +293,7 @@ _nfx_mul_op(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     nn_srcptr a = x, b = y;
 
     r[0] = a[0] ^ b[0];
-
-    if (res != x && res != y)
-    {
-        flint_mpn_mulhigh_n(r + 1, a + 1, b + 1, n);
-    }
-    else
-    {
-        ulong t[GR_DFT_NFIXED_MAX_NLIMBS];
-        slong i;
-        flint_mpn_mulhigh_n(t, a + 1, b + 1, n);
-        for (i = 0; i < n; i++)
-            r[i + 1] = t[i];
-    }
+    flint_mpn_mulhigh_n(r + 1, a + 1, b + 1, n);   /* allows aliasing */
 
     return GR_SUCCESS;
 }
@@ -337,19 +325,7 @@ _nfx_sqr_op(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     nn_srcptr a = x;
 
     r[0] = 0;
-
-    if (res != x)
-    {
-        flint_mpn_sqrhigh(r + 1, a + 1, n);
-    }
-    else
-    {
-        ulong t[GR_DFT_NFIXED_MAX_NLIMBS];
-        slong i;
-        flint_mpn_sqrhigh(t, a + 1, n);
-        for (i = 0; i < n; i++)
-            r[i + 1] = t[i];
-    }
+    flint_mpn_sqrhigh_n(r + 1, a + 1, n);   /* allows aliasing */
 
     return GR_SUCCESS;
 }

@@ -30,20 +30,41 @@
 #define rpcH (rpc + n - 1)
 
 
-/* Defined in t-mulhigh.c and t-sqrhigh.c */
+/* Defined in t-mulhigh_n.c and t-sqrhigh.c */
 #ifndef lower_bound
-# define lower_bound lower_bound
-static ulong lower_bound(ulong n)
+# define lower_bound(n) FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND(n)
+
+/* Inputs maximising the dropped low half-products on the diagonal
+   p + q = n - 2 while keeping the dropped diagonal p + q = n - 3 nearly
+   maximal: the deficit reaches 2n - 4 units of the guard limb, the
+   maximum possible. For
+   squaring the two values alternate, which pairs them on the diagonal
+   when n is odd. */
+static void adversarial(mp_ptr xp, mp_ptr yp, mp_size_t n, flint_rand_t state)
 {
-    /* These are calculated by hand lower bound for the returned limb */
-    if (n < 3)
-        return 0;
-    else
-        return 2 * n;
+    mp_size_t i;
+    mp_limb_t a = -(UWORD(1) << (FLINT_BITS / 2)) - 1, b = -(UWORD(1) << (FLINT_BITS / 2)) + 1;
+
+    for (i = 0; i < n; i++)
+    {
+        if (yp == xp)
+            xp[i] = (i & 1) ? a : b;
+        else
+            xp[i] = a, yp[i] = b;
+    }
+
+    /* the top limbs do not matter for the dropped part; randomising them
+       exercises the carry propagation */
+    if (n_randint(state, 2))
+    {
+        xp[n - 1] = n_randtest(state) | (UWORD(1) << (FLINT_BITS - 1));
+        if (yp != xp)
+            yp[n - 1] = n_randtest(state) | (UWORD(1) << (FLINT_BITS - 1));
+    }
 }
 #endif
 
-TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
+TEST_FUNCTION_START(flint_mpn_sqrhigh_n, state)
 {
     slong ix;
     int result;
@@ -70,7 +91,10 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
         xp = flint_malloc(sizeof(mp_limb_t) * n);
 
-        flint_mpn_rrandom(xp, state, n);
+        if (n_randint(state, 4) == 0)
+            adversarial(xp, xp, n, state);
+        else
+            flint_mpn_rrandom(xp, state, n);
 
         if (n <= FLINT_MAX(FLINT_MPN_SQRHIGH_MULDERS_CUTOFF, FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH))
         {
@@ -80,7 +104,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
             rp = flint_malloc(sizeof(mp_limb_t) * n);
 
             ret0 = _flint_mpn_mulhigh_n_naive(rpc, xp, xp, n);
-            ret1 = flint_mpn_sqrhigh(rp, xp, n);
+            ret1 = flint_mpn_sqrhigh_n(rp, xp, n);
 
             result = (mpn_cmp(rp, rpc, n) == 0 && ret0 == ret1);
             if (!result)
@@ -94,13 +118,14 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                         "Expected limbs: %{ulong*}\n"
                         "Got limbs:      %{ulong*}\n",
                         ix, n, xp, n, ret0, ret1, rpc, n, rp, n);
+            flint_free(rp);
         }
-        else
+
         {
             /* Check that it is coherent with bounds */
             rp = flint_malloc(sizeof(mp_limb_t) * (n + 1));
 
-            rp[0] = flint_mpn_sqrhigh(rp + 1, xp, n);
+            rp[0] = flint_mpn_sqrhigh_n(rp + 1, xp, n);
             flint_mpn_sqr(rpc, xp, n);
 
             result = (mpn_cmp(rp, rpcH, n + 1) <= 0);
@@ -129,6 +154,20 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                         "Lower bound: %{ulong*}\n"
                         "Got:         %{ulong*}\n",
                         ix, n, xp, n, rpcH, n + 1, rp, n + 1);
+        }
+
+        /* aliasing: the output may be the operand */
+        {
+            mp_ptr xc = flint_malloc(sizeof(mp_limb_t) * n);
+            mp_limb_t ret1;
+
+            flint_mpn_copyi(xc, xp, n);
+            ret1 = flint_mpn_sqrhigh_n(xc, xc, n);
+            result = (mpn_cmp(xc, rp + 1, n) == 0 && ret1 == rp[0]);
+            if (!result)
+                TEST_FUNCTION_FAIL("aliasing res = x failed\nn = %wd\n", n);
+
+            flint_free(xc);
         }
 
         flint_free(xp);

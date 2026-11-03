@@ -75,23 +75,12 @@ value.
 
 ::: details
 A unit in the last place here is $2^{e - \mathit{prec}}$ where $2^{e-1}
-\le |f| < 2^e$ for the exact result $f$. Below a cutoff the functions use
-the standard algorithm with `ARF_RND_DOWN`, respectively
-`ARF_RND_NEAR` (see `arf_rnd_relaxed_to_strict`). Above it, they use the
-Newton iterations of [mp_real](mp_real): inversion from 5000 bits (with
-a divisor of more than $\mathit{prec}/2$ bits), division from 12000 bits,
-reciprocal square root from 4000 bits and square root from 100000 bits.
-The Newton result carries 8 (fast) or 11 (accurate) guard bits and is
-rounded to nearest, which gives errors of at most 0.5625 and 0.508 units;
-its exponent is that of $f$, or it is exactly $2^e$, so adding one unit in
-the last place of the result is a valid error bound. The inexact flag
-is not that of the final rounding of the Newton approximation, which
-says nothing about $f$, but is determined separately: $1/x$ and
-$1/\sqrt{x}$ are dyadic only for powers of two (resp. powers of four),
-which are handled without Newton iteration, and an exact quotient or
-square root that fits in `prec` bits is found exactly by the iteration,
-so it is verified by one exact multiplication, made only when the bit
-lengths and the low bits of the mantissas allow an exact result.
+\le |f| < 2^e$ for the exact result $f$. The functions treat the
+relaxed modes as the strict modes of `arf_rnd_relaxed_to_strict`
+(`ARF_RND_DOWN` for `ARF_RND_FAST`, `ARF_RND_NEAR` for
+`ARF_RND_ACCURATE`), which the limb-array kernels (see [](#mpn))
+perform correctly at every precision, so the inexact flag is as
+reliable as with the strict modes.
 :::
 :::
 
@@ -566,9 +555,17 @@ Set `z` to $xy$, correctly rounded.
 `arf_mul` is a macro that calls `arf_mul_rnd_down` for `ARF_RND_DOWN`
 and `arf_mul_rnd_any` otherwise. Rounding down is the mode used by
 ball arithmetic, and `arf_mul_rnd_down` has dedicated code for one- and
-two-limb operands; for operands between 25 limbs and a few hundred limbs
-it calls MPFR, whose short product computes only the top half of the
-mantissa.
+two-limb operands (`arf_mul_rnd_any` rounds those in registers too).
+Longer products are formed in full and rounded when the full product
+is cheap or not much longer than the output (up to 16 limbs in total,
+and the shapes of `_arf_mul_prefer_full`); otherwise only their top
+limbs are computed, with a guard limb (the high products of
+[mpn_extras](mpn_extras#short), `flint_mpn_mulhigh_normalised` and the
+balanced kernels), and the result is rounded from the guard limb when
+it certifies the rounding (`_arf_mpn_round_guarded`), the full product
+deciding otherwise (probability about $2^{-55}$ for random operands,
+and always for a product that is exact at `prec` bits). MPFR is no
+longer used.
 :::
 :::
 
@@ -598,6 +595,18 @@ multiply-add).
 int arf_fma(arf_ptr res, arf_srcptr x, arf_srcptr y, arf_srcptr z, slong prec, arf_rnd_t rnd)
 
 Sets `res` to $xy + z$ with a single rounding.
+
+::: details
+`arf_addmul`, `arf_submul` and `arf_fma` share one core: the exact
+product and one exact addition, rounded once. From 24 limbs of
+precision and of each factor, the product is truncated instead
+(`flint_mpn_mulhigh`: its top limbs above the rounding point with two
+guard limbs, a lower bound of the product within a known number of
+units of the lowest limb), the exact sum of `z` and that bound is
+formed, and it is rounded when its bits between the rounding point and
+the error band certify the rounding (`_arf_rounding_certain`); the
+exact product decides otherwise.
+:::
 :::
 
 ::: function
@@ -621,12 +630,16 @@ zero gives NaN. The relaxed modes `ARF_RND_FAST` and `ARF_RND_ACCURATE`
 are accepted.
 
 ::: details
-The standard algorithm computes a truncated quotient with at least 32
-extra bits (`flint_mpn_tdiv_q`) and decides exactness by multiplying back
-only when the low bits of the quotient are zero. Division by a power of
-two is a rounding of the numerator. With a relaxed mode and a large
-precision, Newton iteration from [mp_real](mp_real) is used instead (see
-`ARF_RND_FAST`).
+The quotient kernel `_arf_mpn_div` (see [](#mpn)): exact register
+divisions at up to two limbs and for one-limb divisors (such as the
+integers of `arf_div_ui`), the floor with the remainder deciding the
+rounding; otherwise `flint_mpn_divhigh` (see [](mpn_extras#fphigh)):
+the rounding is certified by the guard limb unless it lies within the
+error bound of a rounding boundary (probability about $2^{-55}$, but
+always for exact quotients), in which case the exact truncated quotient
+and remainder (`flint_mpn_divhigh_exact`) decide the rounding and the
+inexact flag. Division by a power of two is a rounding of the
+numerator.
 :::
 :::
 
@@ -637,6 +650,16 @@ int arf_sqrt_fmpz(arf_t z, const fmpz_t x, slong prec, arf_rnd_t rnd)
 
 Set `z` to $\sqrt{x}$, correctly rounded for the strict modes. A negative
 `x` gives NaN. The relaxed modes are accepted.
+
+::: details
+As `arf_div`, with `_arf_mpn_sqrt`: the exact truncated root of the
+mantissa padded to $2 \, \mathit{rn}$ limbs (`flint_mpn_sqrthigh_exact`,
+with the half bit for rounding to nearest at a limb boundary) up to the
+Newton range, which is cheaper than the guard limb; the one-limb root
+in registers (`_flint_mpn_isqrt_2_rem`), here inlined for one-limb
+operands at up to one limb of precision. A power of two with an odd
+exponent is exact.
+:::
 :::
 
 ::: function
@@ -645,6 +668,12 @@ int arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 Sets `z` to $1/\sqrt{x}$, correctly rounded for the strict modes. A
 negative `x` gives NaN and $x = 0$ gives $+\infty$. The relaxed modes
 are accepted.
+
+::: details
+As `arf_div`, with `_arf_mpn_rsqrt` (`flint_mpn_rsqrthigh` and
+`flint_mpn_rsqrthigh_exact`). The result is dyadic only for a power of
+four, handled exactly; all other results are inexact.
+:::
 :::
 
 ::: function
@@ -713,13 +742,18 @@ of the return value is the inexact flag of $e$ and bit 1 that of $f$.
 ::: details
 If one of $a, b, c, d$ is zero, the product is computed with two real
 multiplications and no additions, even if another component is infinite
-or NaN; special values follow from this rule. `arf_complex_mul` forms
-the exact products of the mantissas and rounds $ac - bd$ and $ad + bc$
-once each; when all four mantissas have at least 20 limbs and the
-exponents of the real and imaginary parts are within 64 bits of each
-other, it uses Karatsuba's three-product formula $ad + bc = (a+b)(c+d) -
-ac - bd$. `arf_complex_mul_fallback` is the plain version with four
-products, kept for testing.
+or NaN; special values follow from this rule. From 13 limbs of
+precision (up to 2000 limbs), for balanced parts of comparable
+magnitude, the complex high product (`flint_mpn_mulhigh_n_complex`)
+gives both parts within a few units of a guard limb, and the rounding
+is certified as in `arf_mul`. Otherwise `arf_complex_mul` forms the
+exact products and rounds $ac - bd$ and $ad + bc$ once each: when all
+four mantissas have at least 20 limbs and the exponents of the real
+and imaginary parts are within 64 bits of each other, with the exact
+complex product `flint_mpn_mul_complex` (Karatsuba's three products,
+or shared `fft_small` transforms), else with four real products.
+`arf_complex_mul_fallback` is the plain version with four products,
+kept for testing.
 :::
 :::
 
@@ -728,6 +762,13 @@ int arf_complex_sqr(arf_t e, arf_t f, const arf_t a, const arf_t b, slong prec, 
 
 Sets $e + fi = (a + bi)^2$, with the same conventions as
 `arf_complex_mul`, but faster.
+
+::: details
+As `arf_complex_mul` with the square kernels: the complex high square
+(`flint_mpn_sqrhigh_n_complex`), and for the exact square
+`flint_mpn_sqr_complex` from 24 limbs, below that two real squares and
+one product.
+:::
 :::
 
 ## Input and output {#io}
@@ -844,10 +885,19 @@ Sets `z` to $xy$ when at least one of `x` and `y` is a special value.
 ::: function
 int arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 int arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
-int arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 
-The implementations of `arf_mul`: for any rounding mode, for
-`ARF_RND_DOWN`, and through `mpfr_mul`.
+The implementations of `arf_mul`: for any rounding mode, and for
+`ARF_RND_DOWN`.
+:::
+
+::: function
+int _arf_mul_prefer_full(slong xn, slong yn, slong n)
+
+Whether the product of mantissas of `xn` and `yn` limbs of which the
+top `n` limbs are wanted is computed in full rather than as a high
+product: small products (up to `ARF_MUL_FULL_SMALL` = 64 limb
+products), and the shapes for which the general high product would
+form the full product anyway (`_flint_mpn_mulhigh_prefer_full`).
 :::
 
 ::: function
@@ -872,8 +922,7 @@ Sets the mantissa of `y` to the `xn` limbs at `x` (top limb nonzero),
 negated if `sgnbit` is 1, rounded to `prec` bits, and returns the inexact
 flag. Writes the exponent shift caused by leading zero bits and by
 rounding up to a power of two to `exp_shift` without setting the exponent
-of `y`. `x` may point into the limbs of `y`, as the Newton division code
-does.
+of `y`. `x` may point into the limbs of `y`.
 :::
 
 ::: function
@@ -917,30 +966,246 @@ to inline storage.
 :::
 
 ::: function
-int _arf_want_newton_inv(const arf_t x, slong prec)
-int _arf_want_newton_div(const arf_t x, const arf_t y, slong prec)
-int _arf_want_newton_sqrt(const arf_t x, slong prec)
-int _arf_want_newton_rsqrt(const arf_t x, slong prec)
-int _arf_want_newton_inv_large(const arf_t x, slong prec)
-int _arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec)
+void _arf_set_mpn_canonical(arf_ptr z, slong n, int sgnbit)
+void _arf_set_mpn_canonical_copy(arf_ptr z, nn_srcptr d, slong n, int sgnbit)
 
-Decide whether a relaxed-mode inversion, division, square root or
-reciprocal square root at precision `prec` uses Newton iteration; the
-`_large` versions contain the tests that are made only above the
-precision cutoffs.
+Set the mantissa of `z` from the `n` normalised limbs a kernel wrote at
+the start of its buffer (allocated with `ARF_GET_MPN_WRITE` for at
+least `n` limbs), respectively from the limbs `d` in scratch: zero low
+limbs are stripped and a result of two or fewer limbs moves into the
+inline limbs, so that `z` is in canonical form. The exponent is left
+for the caller. `ARF_KERNEL_DECL`, `ARF_KERNEL_ALLOC(zd, alloc, z, x, y)`
+and `ARF_KERNEL_FINISH(z, zd, n, sgnbit)` wrap the buffer management
+for a kernel writing `alloc` limbs into `z`: the buffer of `z` itself,
+unless `z` is one of the operands `x`, `y` or the result may be short
+enough for the inline limbs, in which case the kernel works in scratch
+and the result is copied.
+:::
+
+## Limb-array kernels {#mpn}
+
+The arithmetic of long mantissas is done by kernels on limb arrays,
+shared with [nfloat](nfloat) and [acf](acf). A mantissa is a
+normalised limb array $\{x, \mathit{xn}\}$ (top bit set), standing for
+the value
+$$x \cdot 2^{e - \mathit{xn} \cdot \bits}$$
+for an exponent $e$ which stays with the caller, as does the sign. A
+kernel writes its result into $\{z, \mathit{rn}\}$ with $\mathit{rn}
+= \lceil \mathit{prec} / \bits \rceil$ limbs, normalised with the bits
+below `prec` zero, and sets `*zexp` to the *correction* of the natural
+exponent of the operation ($e_x - e_y$ for a quotient, and so on); the
+caller adds it to that exponent. The rounded kernels take a sign-free
+mode (`ARF_RND_DOWN`, `ARF_RND_UP` or `ARF_RND_NEAR`; `_arf_rnd_resolve`
+gives it) and return the inexact flag: inside, they form an
+approximation with a guard limb, round it when the guard limb certifies
+that the exact value rounds the same way, and compute the exact value
+otherwise. The `_approx` kernels write $\mathit{rn}$ limbs within an
+ulp of the magnitude of the result and nothing else: the form for
+`nfloat`, which rounds nothing. No kernel allocates memory visibly:
+scratch beyond a small stack buffer (`ARF_MPN_STACK_LIMBS` limbs,
+`ARF_MPN_TMP_DECL`, `ARF_MPN_TMP_ALLOC`) comes from a thread-local
+buffer (`_arf_mpn_tmp`, one buffer, not for nested use within the
+kernels).
+
+::: function
+arf_rnd_t _arf_rnd_resolve(arf_rnd_t rnd, int sgnbit)
+
+The sign-free strict mode rounding a value of sign bit `sgnbit` in the
+mode `rnd`: `ARF_RND_FLOOR` and `ARF_RND_CEIL` become `ARF_RND_DOWN` or
+`ARF_RND_UP`, the relaxed modes become the strict modes of
+`arf_rnd_relaxed_to_strict`, and the others are returned as they are.
 :::
 
 ::: function
-int _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
-int _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
-int _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
-int _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
+int _arf_mpn_set_round(nn_ptr res, slong * exp, nn_srcptr x, slong xn, slong prec, arf_rnd_t rnd)
 
-Compute $1/x$, $x/y$, $\sqrt{x}$ and $1/\sqrt{x}$ for a relaxed mode
-`rnd` by Newton iteration, with the error bounds stated for
-`ARF_RND_FAST`. Require finite nonzero (positive, for the roots) input.
-Return the inexact flag of the result (0 if and only if `res` equals
-the exact value; see `ARF_RND_FAST` for how it is determined).
+Rounds the exact value $(x / B^{\mathit{xn}}) 2^E$, where `x` has a
+nonzero top limb (leading zero bits allowed), to `prec` bits in the
+sign-free mode `rnd`, writing the $\mathit{rn}$ normalised limbs `res`
+with the bits below `prec` zero: the result is $(\mathit{res} /
+B^{\mathit{rn}}) 2^{E + \mathit{exp}}$. Returns the inexact flag. `res`
+may be `x` or lie below it in the same buffer (in-place rounding; then
+$\mathit{xn} \ge \mathit{rn}$).
+:::
+
+::: function
+int _arf_mpn_round_guarded(nn_ptr res, slong * exp, nn_srcptr a, slong n, ulong g, int e, slong prec, arf_rnd_t rnd, int side)
+
+Given the $n$ normalised limbs `a` and the limb `g` below them, which
+together approximate a value to within $2^e$ ulps of `g` (in either
+direction for `side` = 0, strictly above the approximation for `side` =
+1, strictly below it for `side` = $-1$), rounds the value to
+$\mathit{prec} \le n \cdot \bits$ bits when the guard limb certifies
+the rounding: writes the $\lceil \mathit{prec} / \bits \rceil$ limbs to
+`res` (which may be `a`, or lie below it in the same buffer), sets `exp`
+to the change of the exponent ($-1$, 0 or 1) and returns 1, the value
+being inexact. Returns $-1$ when the window does not certify the
+rounding; the exact value must then be computed.
+
+::: details
+With the approximation $A$ within $2^e$ ulps of the exact value $P$ and
+$k \ge \bits$ discarded bits, the bits $e, \ldots, \bits - 2$ of `g`
+being neither all zero nor all ones gives $2^e \le A \bmod 2^{k-1} <
+2^{k-1} - 2^e$, so that $P$ lies strictly between the same rounding
+boundaries as $A$ (the truncation point and the half point) and is not
+exact; the rounding of $A$ is then the rounding of $P$ in every mode
+[@AJ2025]. The check fails with probability about $2^{e + 1 - \bits}$.
+With the direction of the error known, only the boundary in that
+direction matters: all zeros will do for a value above the
+approximation (which then rounds like the approximation with sticky
+bits), all ones for one below; and a value just below an approximation
+that is exact at `prec` bits rounds to it, or to the value below it when
+rounding toward zero.
+:::
+:::
+
+::: function
+int _arf_rounding_certain(nn_srcptr a, slong an, slong e, slong prec)
+
+Whether rounding $\{a, \mathit{an}\}$ (an approximation of a value $P$
+within $2^e$ units of $a_0$, on either side) to `prec` bits gives the
+same result as rounding $P$, in every strict rounding mode, with $P$
+inexact: the bits of `a` from bit $e$ of its lowest limb up to the bit
+below the rounding point (at most one limb of them) are neither all
+zero nor all ones. The same argument as above, for an approximation
+whose error band is given by a bit position rather than a guard limb.
+:::
+
+::: function
+int _arf_mpn_increment(nn_ptr res, slong rn, slong sb)
+int _arf_mpn_decrement(nn_ptr res, slong rn, slong sb)
+
+The $\mathit{rn}$ normalised limbs `res`, whose bits below `sb` are
+zero, moved up or down by one unit of $2^{\mathit{sb}}$. The increment
+returns the carry (1 when the result is a power of two, with the
+exponent increased); the decrement returns $-1$ when `res` was a power
+of two, the result being the $\mathit{rn} \cdot \bits - \mathit{sb}$
+ones just below it, normalised (the exponent decreases), else 0.
+:::
+
+::: function
+void _arf_mpn_mul_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec)
+
+The product $xy$ truncated to $\mathit{rn}$ limbs, within an ulp of
+$\mathit{rn}$ limbs: the exact product when it fits or the shape prefers
+it (`_arf_mul_prefer_full`), else the normalised high product with its
+guard limb dropped. `z` must not alias an operand.
+:::
+
+::: function
+int _arf_mpn_div(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec, arf_rnd_t rnd)
+int _arf_mpn_inv(nn_ptr z, slong * zexp, nn_srcptr y, slong yn, slong prec, arf_rnd_t rnd)
+int _arf_mpn_sqrt(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec, arf_rnd_t rnd)
+int _arf_mpn_rsqrt(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec, arf_rnd_t rnd)
+
+The quotient $x / y$, the reciprocal $1 / y$, the square root of $x$
+and its reciprocal, correctly rounded to `prec` bits in the sign-free
+mode `rnd` into $\{z, \mathit{rn}\}$, returning the inexact flag, with
+`*zexp` the correction to the natural exponent: $e_x - e_y$ for the
+quotient (the correction 0 or 1), $-e_y$ for the reciprocal (1 or 2),
+and for the roots of $x = A \cdot 2^e$ with $t = e \bmod 2$ given,
+$(e + t) / 2$ for $\sqrt{x}$ and $(1 - t) - (e - t) / 2$ for
+$1 / \sqrt{x}$ (the corrections 0 or 1).
+
+The output may alias an operand. Zero low limbs of the mantissas
+(nfloat pads its mantissas to a fixed length) are stripped first, so
+that integers and other short operands take the fast paths.
+
+::: details
+Small sizes are exact and in registers (`mpn_extras/fp_small.h`, with
+`arf/mpn_small.h` for callers with fixed small sizes): a quotient of
+one limb from one-limb operands by one $2/1$ division, a quotient of
+up to two limbs from operands of up to two (divisor: three) limbs by
+two or three $3/2$ divisions, each giving the floor with the remainder,
+from which the rounding is decided (the remainder encoded as the limb
+below the floor: its top bit the half bit, a low bit the sticky bit); a
+divisor of a single limb at any size by a chain of $2/1$ divisions
+(`flint_mpn_divrem_1_preinv`, GMP's `mpn_divrem_1` from eight limbs).
+The one-limb square root is the exact integer root of the two-limb
+radicand (`_flint_mpn_isqrt_2_rem`, the remainder deciding the half
+bit); the two-limb roots and the one-limb reciprocal root come from the
+three- resp. two-limb register kernels, certified when their guard limb
+lies away from the rounding boundaries.
+
+Longer quotients and reciprocal roots use the guard-limb kernels of
+`mpn_extras` (`flint_mpn_divhigh`, `flint_mpn_rsqrthigh`, see
+[](mpn_extras#fphigh)): $\mathit{rn} + 1$ limbs with the top bit set,
+the lowest a guard limb within a small bound of the exact value in
+either direction, certified by `_arf_mpn_round_guarded`, with the exact
+floor of the same quantity (the `_exact` variants, with an inexact
+flag) as the fallback. Longer square roots are exact integer roots of
+the mantissa padded to $2 \, \mathit{rn}$ limbs
+(`flint_mpn_sqrthigh_exact`; for rounding to nearest at a limb boundary
+the variant with the half bit up to 24 limbs, the guard-limb root
+beyond), which is cheaper than the guard limb below the Newton range.
+A divisor that is a power of two shifts; a root of a power of two with
+an odd exponent is a power of two.
+:::
+:::
+
+::: function
+void _arf_mpn_div_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec)
+void _arf_mpn_inv_approx(nn_ptr z, slong * zexp, nn_srcptr y, slong yn, slong prec)
+void _arf_mpn_sqrt_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec)
+void _arf_mpn_rsqrt_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec)
+
+As above, but the $\mathit{rn}$ limbs are written without rounding and
+without a flag (the kernels of nfloat without directed rounding): the
+quotients are the truncation or one ulp more (an error below an ulp,
+up to the truncation of operands beyond $\mathit{rn} + 2$ limbs; the
+truncation itself for a divisor with a single nonzero limb), the square
+root is the truncation, and the reciprocal square root is within
+$1 + 2^{-37}$ ulp.
+
+::: details
+The quotient uses the register and chain paths above without the
+rounding step, and otherwise the schoolbook approximate division at
+$\mathit{rn}$ limbs (`_flint_mpn_divapprox_basecase_preinv1`, the floor
+or one more) up to 80 limbs, with the divisor truncated to
+$\mathit{rn} + 2$ limbs and the dividend to $\mathit{rn} + \mathit{yn}$;
+beyond that, and for two-limb divisors, the guard-limb quotient
+truncated. The square root is the exact root up to the Newton range,
+and the reciprocal square root the one- or two-limb register kernel
+without certification, or the guard-limb root truncated.
+:::
+:::
+
+::: function
+void _arf_mpn_cinv_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, nn_srcptr b, slong bn, slong eb, slong prec)
+void _arf_mpn_cdiv_approx(nn_ptr re, slong * reexp, int * reneg, nn_ptr im, slong * imexp, int * imneg, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, int sb, nn_srcptr c, slong cn, slong ec, int sc, nn_srcptr d, slong dn, slong ed, int sd, slong prec)
+void _arf_mpn_csqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec)
+void _arf_mpn_crsqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec)
+
+The reciprocal, the quotient, the square root and the reciprocal
+square root of complex numbers given as mantissa/exponent pairs: a part
+is $\{a, \mathit{an}\} \, 2^{e_a - \mathit{an} B}$ with a normalised
+mantissa, a nonzero magnitude and an `slong` exponent far from overflow
+(the callers scale extreme operands). The `_approx` flavour writes
+$\mathit{rn}$ limbs per part, each within about an ulp of the magnitude
+of the result (the parts truncated), with the exponents of
+the parts (`WORD_MIN` for an exactly cancelled part of the quotient);
+the outputs are the magnitudes of the parts, the signs being the
+caller's unless stated. The reciprocal is $(a - b i) t$ with
+$t = 1/(a^2 + b^2)$, written as $a t$ and $b t$. The quotient
+$(a + b i)/(c + d i) = (u + v i) t$ with $u = a c + b d$,
+$v = b c - a d$ and $t = 1/(c^2 + d^2)$ takes the signs of the operands
+and returns those of the parts. The square root is $(q, b/(2q))$ with
+$q = \sqrt{(|z| + |a|)/2}$ for $a \ge 0$ and $(|b|/(2q), q)$ for $a < 0$
+(the imaginary part has the sign of $b$); the reciprocal square root is
+$(T v, b v)$ resp. $(b v, T v)$ with $T = |z| + |a|$ and
+$v = 1/\sqrt{2 |z|^2 T}$ (the imaginary part has the sign opposite to
+$b$). The outputs may alias the operands' limbs.
+
+::: details
+The compositions of `nfloat_complex` on the `_approx` kernels, every
+intermediate held at $\mathit{rn} + 1$ limbs (the guard limb keeps the
+few ulps of the compositions below the ulp of the output, as the
+$2^{2 - \mathit{prec}}$ of `acf`'s callers requires) and each kernel
+within an ulp: $|z|^2$ from two approximate squares and a truncated
+sum, one reciprocal shared by the two parts of a quotient (a division
+costs several products), $|z|$ by the exact root, the larger part of a
+root first so that nothing cancels.
+:::
 :::
 
 ::: function

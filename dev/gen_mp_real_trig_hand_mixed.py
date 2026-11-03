@@ -149,7 +149,7 @@ def emit_sqrhigh(o, dst, src, L):
         o("    _mp_real_sqrhi_2x2(&%s[1], &%s[0], %s[1], %s[0]);"
           % (dst, dst, src, src))
     else:
-        o("    flint_mpn_sqrhigh(%s, %s, %d);" % (dst, src, L))
+        o("    flint_mpn_sqrhigh_n(%s, %s, %d);" % (dst, src, L))
 
 
 def emit_mulhigh(o, dst, a, b, L):

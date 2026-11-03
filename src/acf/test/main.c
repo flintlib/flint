@@ -11,6 +11,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-approx_div.c"
 #include "t-approx_dot.c"
 #include "t-init_clear.c"
 
@@ -18,6 +19,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(acf_approx_div),
     TEST_FUNCTION(acf_approx_dot),
     TEST_FUNCTION(acf_init_clear)
 };

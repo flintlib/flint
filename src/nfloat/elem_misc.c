@@ -951,7 +951,7 @@ nfloat_atanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
     The same with high squarings, for n >= NFLOAT_HYPOT_SQRHIGH_MIN_LIMBS
     (or for exponent gaps d >= 3/8 FLINT_BITS n from
     NFLOAT_HYPOT_SQRHIGH_MIN_LIMBS_GAP limbs):
-    with A = the n + 1 top limbs of X^2 (flint_mpn_sqrhigh: a lower bound
+    with A = the n + 1 top limbs of X^2 (flint_mpn_sqrhigh_n: a lower bound
     for X^2 / B^(n-1) within 2n - 3 units) and C those of Y^2 shifted
     right by 2d bits (within 2n - 2 units), T = A + C is a lower bound for
     V = (X^2 + Y^2 2^(-2d)) / B^(n-1) within Etot = 4n - 5 units, and
@@ -984,10 +984,10 @@ _nfloat_hypot_sqrhigh(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong d,
     ulong g, delta;
 
     /* A, C with the extra limb at index 0 */
-    A[0] = flint_mpn_sqrhigh(H, NFLOAT_D(x), n);
+    A[0] = flint_mpn_sqrhigh_n(H, NFLOAT_D(x), n);
     flint_mpn_copyi(A + 1, H, n);
     A[n + 1] = 0;
-    C[0] = flint_mpn_sqrhigh(H, NFLOAT_D(y), n);
+    C[0] = flint_mpn_sqrhigh_n(H, NFLOAT_D(y), n);
     flint_mpn_copyi(C + 1, H, n);
 
     /* C >>= 2d (2d <= FLINT_BITS n + 4 < FLINT_BITS (n + 1)) */
