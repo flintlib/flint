@@ -158,13 +158,13 @@ void acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd
 
 Set `res` to an approximation of $1/x$, respectively $x/y$. A real or
 purely imaginary divisor is handled by real divisions of the parts;
-otherwise the complex kernels of [](arf#mpn) compute the
-parts within about an ulp (relative to the magnitude of the result for
-the quotient, whose numerator parts may cancel) at
-$\lceil \mathit{prec} / B \rceil$ limbs, rounded to `prec` bits in the
-direction `rnd`, for operands with moderate exponents; otherwise
-$1/(a + bi) = (a - bi)/(a^2 + b^2)$ with $a^2 + b^2$ computed by
-`arf_sosq`.
+otherwise, above two limbs of precision, the complex kernels of
+[](arf#mpn) compute the parts within about an ulp (relative to the
+magnitude of the result for the quotient, whose numerator parts may
+cancel) at $\lceil \mathit{prec} / B \rceil$ limbs, rounded to `prec`
+bits in the direction `rnd`, for operands with moderate exponents;
+otherwise $1/(a + bi) = (a - bi)/(a^2 + b^2)$ with $a^2 + b^2$ computed
+by `arf_sosq`.
 :::
 
 ::: function

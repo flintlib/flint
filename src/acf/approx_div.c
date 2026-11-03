@@ -16,6 +16,11 @@
    with moderate exponents; the results at rn limbs rounded to prec */
 #define _ACF_KERNEL_STACK 40
 
+/* below three limbs the real operations (arf_sosq, acf_mul and two
+   arf_div) are faster than the complex kernels: up to 1.5 times at one
+   limb (measured) */
+#define _ACF_DIV_KERNEL_MIN_PREC (2 * FLINT_BITS + 1)
+
 static int
 _acf_approx_inv_kernel(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
 {
@@ -25,7 +30,8 @@ _acf_approx_inv_kernel(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
     ulong stack[2 * _ACF_KERNEL_STACK];
     nn_ptr re, im;
 
-    if (!_acf_part_kernel_ok(a) || !_acf_part_kernel_ok(b) || prec < 2 || prec > (WORD(1) << (FLINT_BITS - 8)))
+    if (prec < _ACF_DIV_KERNEL_MIN_PREC || prec > (WORD(1) << (FLINT_BITS - 8)) ||
+        !_acf_part_kernel_ok(a) || !_acf_part_kernel_ok(b))
         return 0;
 
     ARF_GET_MPN_READONLY(ad, an, a);
@@ -53,8 +59,8 @@ _acf_approx_div_kernel(acf_t res, const acf_t x, const acf_t y, slong prec, arf_
     nn_ptr re, im;
     int rneg, ineg;
 
-    if (!_acf_part_kernel_ok(a) || !_acf_part_kernel_ok(b) || !_acf_part_kernel_ok(c) || !_acf_part_kernel_ok(d) ||
-        prec < 2 || prec > (WORD(1) << (FLINT_BITS - 8)))
+    if (prec < _ACF_DIV_KERNEL_MIN_PREC || prec > (WORD(1) << (FLINT_BITS - 8)) ||
+        !_acf_part_kernel_ok(a) || !_acf_part_kernel_ok(b) || !_acf_part_kernel_ok(c) || !_acf_part_kernel_ok(d))
         return 0;
 
     ARF_GET_MPN_READONLY(ad, an, a);
