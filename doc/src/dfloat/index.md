@@ -118,7 +118,7 @@ int dfloat_is_supported(void)
 Returns whether the module works on this target. It requires that the
 module was compiled without contraction of floating-point expressions
 (`-ffp-contract=off` or the equivalent pragma), with doubles evaluated
-in double precision (`FLT_EVAL_METHOD` 0, so not with x87 arithmetic),
+in double precision (`FLT_EVAL_METHOD` 0, 1 or 16, so not with x87 arithmetic),
 and that `fma` is correctly rounded, which is tested once at run time.
 Where it returns 0, the other functions of this module must not be
 called; `gr_ctx_init_dfloat` returns `GR_UNABLE` and the power sums

@@ -1127,11 +1127,15 @@ tolerance cannot be reached. Assumes $z > 0$.
 
 ::: function
 void _arb_hypgeom_gamma_upper_fmpq_inf_bsplit(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
+void _arb_hypgeom_gamma_upper_fmpq_inf_bsplit_sum(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
 
 Sets `res` to the asymptotic series of $\Gamma(a,z)$ at infinity,
 including the prefactor $z^{a-1} e^{-z}$, truncated before the term of
 index $N$ and computed by binary splitting. The truncation error is
-not included.
+not included. The `_sum` version omits the prefactor, so that
+$\Gamma(a,z) \approx z^{a-1} e^{-z} \cdot$ `res`; callers summing many
+values (for example at $z = \lambda N$ for consecutive $N$) can then
+supply $e^{-z}$ cheaply, as a power of a shared exponential.
 :::
 
 ::: function
@@ -1144,10 +1148,13 @@ a bound for the truncation error. Assumes $z > 0$.
 
 ::: function
 void _arb_hypgeom_gamma_lower_fmpq_0_bsplit(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
+void _arb_hypgeom_gamma_lower_fmpq_0_bsplit_sum(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
 
 Sets `res` to the series $\gamma(a,z) = \frac{z^a e^{-z}}{a} \sum_n
 \frac{z^n}{(a+1)_n}$ truncated before the term of index $N$ and
-computed by binary splitting. The truncation error is not included.
+computed by binary splitting. The truncation error is not included. The
+`_sum` version sets `res` to the sum $\sum_{n < N} z^n / (a+1)_n$
+alone, without the prefactor $z^a e^{-z} / a$.
 :::
 
 ::: function

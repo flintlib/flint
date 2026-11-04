@@ -10,8 +10,9 @@ rigorous error bounds, for real and complex balls and for power
 series: the elementary functions and constants of [`arb`](arb) and
 [`acb`](acb), the gamma and hypergeometric functions of
 [`arb_hypgeom`](arb_hypgeom) and [`acb_hypgeom`](acb_hypgeom), the zeta
-and $L$-functions of [`acb_dirichlet`](acb_dirichlet), and the
-elliptic, modular and theta functions of [`acb_elliptic`](acb_elliptic),
+and $L$-functions of [`acb_dirichlet`](acb_dirichlet), the multiple
+zeta values, multiple polylogarithms and Epstein zeta functions of
+[`acb_mzeta`](acb_mzeta), and the elliptic, modular and theta functions of [`acb_elliptic`](acb_elliptic),
 [`acb_modular`](acb_modular) and [`acb_theta`](acb_theta). Each section
 gives the formulas, the error bounds with proofs or references, the way
 the method and the working precision are chosen, and the functions that
