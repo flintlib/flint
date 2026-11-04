@@ -1014,7 +1014,7 @@ _arf_mpn_tmp(slong alloc)
     {
         if (__arf_mpn_tmp_alloc == 0)
             flint_register_cleanup_function(_arf_mpn_tmp_cleanup);
-        __arf_mpn_tmp = flint_realloc(__arf_mpn_tmp, sizeof(ulong) * alloc);
+        __arf_mpn_tmp = (nn_ptr) flint_realloc(__arf_mpn_tmp, sizeof(ulong) * alloc);
         __arf_mpn_tmp_alloc = alloc;
     }
     return __arf_mpn_tmp;
