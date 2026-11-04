@@ -38,6 +38,7 @@
 #include "t-legendre_p_ui_one.c"
 #include "t-legendre_p_ui_rec.c"
 #include "t-legendre_p_ui_root.c"
+#include "t-legendre_p_ui_root_methods.c"
 #include "t-legendre_p_ui_zero.c"
 #include "t-lgamma.c"
 #include "t-rising_ui.c"
@@ -79,6 +80,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_hypgeom_legendre_p_ui_one),
     TEST_FUNCTION(arb_hypgeom_legendre_p_ui_rec),
     TEST_FUNCTION(arb_hypgeom_legendre_p_ui_root),
+    TEST_FUNCTION(arb_hypgeom_legendre_p_ui_root_methods),
     TEST_FUNCTION(arb_hypgeom_legendre_p_ui_zero),
     TEST_FUNCTION(arb_hypgeom_lgamma),
     TEST_FUNCTION(arb_hypgeom_rising_ui),

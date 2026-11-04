@@ -2586,7 +2586,7 @@ class gr_ctx:
             >>> RR.legendre_p_root(5, 1)
             [0.538469310105683 +/- 1.15e-16]
             >>> RR.legendre_p(5, 0, RR.legendre_p_root(5, 1))
-            [+/- 8.15e-16]
+            [+/- 7.42e-16]
             >>> RR.legendre_p_root(5, 1, weight=True)
             ([0.538469310105683 +/- 1.15e-16], [0.4786286704993664 +/- 7.10e-17])
         """
