@@ -428,6 +428,67 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
   } while (0)
 #endif
 
+/* Products of one- and two-word operands, words listed most significant
+   first: full 2x1 and 2x2 products, low two and low three words of a 2x2
+   product, and the square of a two-word integer */
+
+#define FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)           \
+    do {                                                    \
+        ulong t1;                                           \
+        umul_ppmm(r1, r0, a0, b0);                          \
+        umul_ppmm(r2, t1, a1, b0);                          \
+        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
+    } while (0)
+
+#define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
+    do {                                                                  \
+        ulong __v1, __v2, __u1, __u2;                                     \
+        ulong __r3, __r2, __r1, __r0;                                     \
+        ulong __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);         \
+        umul_ppmm(__r1, __r0, __a0, __b0);                                \
+        umul_ppmm(__r3, __r2, __a1, __b1);                                \
+        umul_ppmm(__v2, __v1, __a0, __b1);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __v2, __v1); \
+        umul_ppmm(__u2, __u1, __a1, __b0);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
+    } while (0)
+
+/* Low two words of 2x2 product */
+#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
+    do { \
+        umul_ppmm(r1, r0, a0, b0); \
+        (r1) += (a0) * (b1) + (a1) * (b0); \
+    } while (0)
+
+/* Low three words of 2x2 product */
+#define FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)                \
+    do {                                                               \
+        ulong __t1, __t2, __u1, __u2;                                  \
+        ulong __r2, __r1, __r0;                                        \
+        ulong __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);      \
+        umul_ppmm(__r1, __r0, __a0, __b0);                             \
+        __r2 = __a1 * __b1;                                            \
+        umul_ppmm(__t2, __t1, __a0, __b1);                             \
+        add_ssaaaa(__r2, __r1, __r2, __r1, __t2, __t1);                \
+        umul_ppmm(__u2, __u1, __a1, __b0);                             \
+        add_ssaaaa(__r2, __r1, __r2, __r1, __u2, __u1);                \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2;                         \
+    } while (0)
+
+#define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
+    do {                                                                     \
+        ulong __u1, __u2, __u3;                                              \
+        ulong __r3, __r2, __r1, __r0;                                        \
+        ulong __a1 = (a1), __a0 = (a0);                                      \
+        umul_ppmm(__u2, __u1, __a0, __a1);                                   \
+        add_sssaaaaaa(__u3, __u2, __u1, 0, __u2, __u1, 0, __u2, __u1);       \
+        umul_ppmm(__r1, __r0, __a0, __a0);                                   \
+        umul_ppmm(__r3, __r2, __a1, __a1);                                   \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __u3, __u2, __u1); \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
+    } while (0)
+
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di) \
   do { \
     ulong _n2, _n10, _nmask, _nadj, _q1; \

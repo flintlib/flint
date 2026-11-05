@@ -419,62 +419,8 @@ static void _crt_2(
 #undef DO_CRT
 }
 
-/* Ad hoc modular reduction to do better than NMOD2_RED2 and NMOD_RED3.
-   This should eventually be moved out and used elsewhere. */
-
-/* Precompute floor(2^(2*FLINT_BITS) / n) for Barrett-style modular reduction.
-   This could be optimized (not necessary here, but relevant for other
-   applications). */
-static void
-n_ll_rem_l_precomp(ulong * qhi, ulong * qlo, ulong n)
-{
-    ulong q[4];
-    ulong a[4];
-    a[0] = 0;
-    a[1] = 0;
-    a[2] = 1;
-    mpn_divrem_1(q, 0, a, 3, n);
-    *qlo = q[0];
-    *qhi = q[1];
-}
-
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
-FLINT_FORCE_INLINE ulong
-n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
-{
-    ulong c2, c1, c0;
-    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
-    (void) c1;
-    (void) c0;
-    xlo -= c2 * n;
-    if (xlo >= n)
-        xlo -= n;
-    return xlo;
-}
-
-/* 3 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l_nonfullword(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo, ulong alpha2, ulong alpha1)
-{
-    ulong c2, c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    FLINT_ASSERT(n < (UWORD(1) << (FLINT_BITS - 1)));
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
-    (void) c1;
-    (void) c0;
-    xlo -= c2 * n;
-    if (xlo >= n)
-        xlo -= n;
-
-    return xlo;
-}
+/* Modular reductions: for n < 2^(FLINT_BITS - 1), the Barrett reductions
+ * n_ll_mod_barrett and n_lll_mod_barrett of ulong_extras. */
 
 /* 3 -> 1 limb mod, n >= 2^(FLINT_BITS-1), using linear combination + Granlund-Möller */
 FLINT_FORCE_INLINE ulong
@@ -563,18 +509,21 @@ static void _crt_3(
 
         /* Extra precomputation for branch 2 */
         if (!high_reduced)
-            n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+            n_ll_barrett_precomp_preinv(&qhi, &qlo, &alpha1, &alpha2, mod.n, mod.ninv);
     }
     else
     {
         /* Extra precomputation for branch 3 and 4 of mod code */
-        alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS / 2), mod);
-        alpha1 = nmod_mul(alpha1, alpha1, mod);
-        alpha2 = nmod_mul(alpha1, alpha1, mod);
-
-        /* Extra precomputation for branch 3 */
         if (!mod_fullword)
-            n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+        {
+            n_ll_barrett_precomp_preinv(&qhi, &qlo, &alpha1, &alpha2, mod.n, mod.ninv);
+        }
+        else
+        {
+            alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS / 2), mod);
+            alpha1 = nmod_mul(alpha1, alpha1, mod);
+            alpha2 = nmod_mul(alpha1, alpha1, mod);
+        }
 
         if (mod_fullword && (mod.n < ((UWORD(1) << 63) + (UWORD(1) << 30))))
             fullword_limited = 1;
@@ -614,7 +563,7 @@ static void _crt_3(
                 {
                     DO_CRT
                     FLINT_ASSERT(r[2] == 0);
-                    z[i+j-zl] = n_ll_rem_l_nonfullword(r[1], r[0], mod.n, qhi, qlo);
+                    z[i+j-zl] = n_ll_mod_barrett(r[1], r[0], mod.n, qhi, qlo);
                 }
             }
         }
@@ -625,7 +574,7 @@ static void _crt_3(
                 for (ulong j = jstart; j < jstop; j += 1)
                 {
                     DO_CRT
-                    z[i+j-zl] = n_lll_rem_l_nonfullword(r[2], r[1], r[0], mod.n, qhi, qlo, alpha2, alpha1);
+                    z[i+j-zl] = n_lll_mod_barrett(r[2], r[1], r[0], mod.n, qhi, qlo, alpha1, alpha2);
                 }
             }
             else if (fullword_limited)

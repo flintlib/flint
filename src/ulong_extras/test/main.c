@@ -66,6 +66,7 @@
 #include "t-ll_factor_ecm.c"
 #include "t-ll_factor_rho.c"
 #include "t-ll_mod_preinv.c"
+#include "t-ll_mod_barrett.c"
 #include "t-ll_small_powmod.c"
 #include "t-mod2_precomp.c"
 #include "t-mod2_preinv.c"
@@ -170,6 +171,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_ll_factor_ecm),
     TEST_FUNCTION(n_ll_factor_rho),
     TEST_FUNCTION(n_ll_mod_preinv),
+    TEST_FUNCTION(n_ll_mod_barrett),
     TEST_FUNCTION(n_ll_small_powmod),
     TEST_FUNCTION(n_mod2_precomp),
     TEST_FUNCTION(n_mod2_preinv),
