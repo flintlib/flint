@@ -143,6 +143,7 @@ _acb_ode_fundamental_matrix_vec(
         slong prec)
 {
     mag_t cvrad, mag;
+    acb_ode_bound_t  _bound;
 
     slong nder = 0;
     for (slong p = 0; p < npts; p++)
@@ -166,6 +167,16 @@ _acb_ode_fundamental_matrix_vec(
                 for (slong j = 0; j < dop_len - 1; j++)
                     acb_indeterminate(acb_mat_entry_ptr(mat + p, i, j));
         goto cleanup;
+    }
+
+    if (bound == NULL)
+    {
+        acb_ode_bound_init(_bound);
+        slong dop_clen = _acb_poly_vec_length(dop, dop_len);
+        slong pol_part_len = dop_clen / 2 + 3;
+        acb_ode_bound_precompute(_bound, dop, dop_len, lcrt,
+                                 pol_part_len, MAG_BITS);
+        bound = _bound;
     }
 
     for (slong g = 0, j = 0; g < expos->ngroups; g++)
@@ -211,6 +222,9 @@ _acb_ode_fundamental_matrix_vec(
 
         j += glen;
     }
+
+    if (bound == _bound)
+        acb_ode_bound_clear(_bound);
 
 cleanup:
     mag_clear(cvrad);
@@ -365,12 +379,6 @@ acb_ode_fundamental_matrix_vec(
     if (dop->length == 1)
         goto cleanup;
 
-    acb_ode_bound_init(bound);
-    slong dop_clen = _acb_poly_vec_length(acb_ldop->coeffs, acb_ldop->length);
-    slong pol_part_len = dop_clen / 2 + 3;
-    acb_ode_bound_precompute(bound, acb_ldop->coeffs, acb_ldop->length, lcrt,
-                             pol_part_len, MAG_BITS);
-
     _acb_ode_fundamental_matrix_vec(mat, acb_ldop->coeffs, acb_ldop->length,
                                     expos, lcrt, bound,
                                     pts, npts,
@@ -379,7 +387,6 @@ acb_ode_fundamental_matrix_vec(
                                     flags,
                                     prec);
 
-    acb_ode_bound_clear(bound);
 cleanup:
     if (_lcrt == lcrt)
         _acb_vec_clear(_lcrt, lc->length - 1);

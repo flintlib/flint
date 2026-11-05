@@ -237,12 +237,13 @@ Like `acb_ode_fundamental_matrix` but evaluate the fundamental matrix at
 multiple points.
 The output parameter `mat` should point to an array of `npts` matrices,
 not necessarily with the same number of rows.
+The caller can optionally provide an object `bound` pre-filled using
+`acb_ode_bound_precompute`.
 
 The underscore method assumes that `dop` has order at least one and does
 not allow the `expos` and `lcrt` parameters to be omitted.
-Additionally, the caller must provide an object `bound` pre-filled using
-`acb_ode_bound_precompute` and a summation callback `sum_worker`
-with an arbitrary user data pointer `worker_data`.
+Additionally, it takes a summation callback `sum_worker` with an arbitrary user
+data pointer `worker_data`.
 The user data is accessible to `sum_worker` in the `data` field of its
 `sum` argument.
 :::
