@@ -58,7 +58,7 @@ belong to the same group.
 
 There is currently no support for inhomogeneous equations.
 
-## Evaluation of fundamental matrices {#evaluation-of-fundamental-matrices}
+## Fundamental matrices, transition matrices {#transition-matrices}
 
 ::: type
 acb_ode_basis_t
@@ -137,7 +137,8 @@ order of `dop`, is set to a vector of initial coefficients of the Taylor
 expansion at `pt` of the corresponding element of the basis of type `basis`
 of the solution space, with solution groups ordered as in `expos`.
 (Extraneous columns are left untouched. Note that when `expos` is omitted
-on input, the order of the columns is not fully specified.)
+on input, the order of the columns is not fully specified, but depends only on
+the operator.)
 The row dimension of `mat` determines the number of Taylor coefficients to
 be evaluated.
 The current implementation is not designed to evaluate a number of
@@ -235,15 +236,58 @@ Like `acb_ode_fundamental_matrix` but evaluate the fundamental matrix at
 multiple points.
 The output parameter `mat` should point to an array of `npts` matrices,
 not necessarily with the same number of rows.
-The caller can optionally provide an object `bound` pre-filled using
-`acb_ode_bound_precompute`.
 
 The underscore method assumes that `dop` has order at least one and does
 not allow the `expos` and `lcrt` parameters to be omitted.
-Additionally, it takes a summation callback `sum_worker` with an arbitrary user
-data pointer `worker_data`.
-The user data is accessible to `sum_worker` in the `data` field of its
+It also requires a summation callback `sum_worker` with an arbitrary user data
+pointer `worker_data`.
+The user data is made accessible to `sum_worker` in the `data` field of its
 `sum` argument.
+In addition, the caller may optionally provide an object `bound` pre-filled
+using `acb_ode_bound_precompute`.
+:::
+
+::: function
+int acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, gr_vec_t path, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec)
+int _acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_poly_struct * dop, slong dop_len, gr_ctx_t Cst, const acb_ptr lcrt, gr_srcptr path, slong path_len, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec)
+
+Set `mat` to the transition matrix (a.k.a. connection matrix) along the path
+`path` of the differential operator `dop` (in `Dop`), that is, the matrix that
+maps the coordinates of a solution in the echelonized local basis of solutions
+at the origin of the path to those of its analytic continuation along the path
+in the echelonized local basis at the end of the path.
+
+The analytic continuation path is piecewise linear and given as a list
+$a_0, \dots, a_n$ of vertices in `Pts`. The vertices may be ordinary or regular
+singular points of `dop`.
+
+These functions reduce to calling `acb_ode_fundamental_matrix` or similar
+functions on each step of the provided path without subdividing or deforming
+the path. For every step $[a_i,a_{i+1}]$ with ordinary $a_{i+1}$, the point
+$a_{i+1}$ must lie closer to $a_i$ than any singular point (except possibly for
+$a_i$ itself); if $a_{i+1}$ is a singular point, $a_i$ must instead lie closer
+to $a_{i+1}$ than any other singular point.
+
+When one of the vertices is a singular point, the steps starting and/or ending
+at that vertex use the principal branch of the local logarithm, so that the
+interpretation of the path depends on the direction of the adjoining segments
+relative to the local branch cut. A path starting or ending at a singular point
+corresponds to analytic continuation between ordinary points close to the
+endpoints on the outgoing and incoming steps, and a path with an intermediate
+vertex at a singular point that arrives from below and continues above or
+vice versa is equivalent to one passing to the right of the singular point.
+
+The local exponent structures at the origin and the end of the path may
+optionally be passed as `expos0` and `expos1`; this is useful for specifying the
+order of the basis elements when one of the endpoints is singular.
+
+The `flags` argument is reserved for future use.
+
+In the underscore variant, the operator `dop` is assumed to have order at
+least one and is given by its coefficients when written in terms of the
+standard derivation, which must be generic polynomials over `Cst`.
+In addition, the caller must provide in `lcrt` the roots of the leading
+coefficient of `dop`, *zero included*, with multiple roots repeated.
 :::
 
 ## Series solutions {#series-solutions}
@@ -913,23 +957,27 @@ generator names derived from those of `Dop`.
 :::
 
 ::: function
-int acb_ode_local_diffop(gr_ore_poly_t ldop, ulong * flags, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ore_poly_ctx_t Euler)
+int acb_ode_local_diffop(gr_ore_poly_t ldop, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ore_poly_ctx_t Euler)
+int _acb_ode_local_diffop(gr_poly_struct * ldop, const gr_poly_struct * dop, slong len, ore_algebra_t src_alg, gr_ctx_t Pol);
 
 Set `ldop` to an operator in `Euler` equal to `dop` up to multiplication from
 the left by a power of `x`, removing common power-of-$x$ factors from the
 coefficients of the result.
+The underscore version takes the coefficients of the operator, written in terms
+of the standard derivation, as a vector of elements of `Pol`. It assumes that
+`Pol` is a generic polynomial ring.
 :::
 
 ::: function
-ulong acb_ode_analyze(const gr_ore_poly_t dop, ulong flags, gr_ctx_t Dop);
+ulong acb_ode_analyze(const gr_ore_poly_t dop, ulong flags, gr_ctx_t Dop)
 
 Return a combination of the flags `ACB_ODE_NONZERO`, `ACB_ODE_REGULAR`, and
-`ACB_ODE_ORDINARY` indicating if the operator has been determined, respectively,
-to be nonzero, to have a regular (in the sense of ordinary or regular singular)
-point at the origin, and to have an ordinary point at the origin.
-The absence of a flag in the result does not imply that the corresponding
-property does not hold. Already known properties can be passed as `flags` in the
-same format.
+`ACB_ODE_ORDINARY` indicating whether the operator has been determined,
+respectively, to be nonzero, to have a regular (in the sense of ordinary or
+regular singular) point at the origin, and to have an ordinary point at the
+origin. The absence of a flag in the result does not imply that the
+corresponding property does not hold. Already known properties can be passed as
+`flags` in the same format.
 :::
 
 ::: function

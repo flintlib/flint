@@ -277,7 +277,6 @@ acb_ode_fundamental_matrix_vec(
     acb_ode_exponents_t _expos;
     gr_ore_poly_struct * ldop, * acb_ldop;
     acb_struct * _lcrt = NULL;
-    acb_ode_bound_t bound;
     slong wp = prec;
 
     int status = GR_SUCCESS;
@@ -292,6 +291,8 @@ acb_ode_fundamental_matrix_vec(
 
     if (dop->length < 1)
         return GR_DOMAIN;
+
+    /* todo: clear denominators when relevant (especially when Cst is QQ) */
 
     slong order = dop->length - 1;
     gr_poly_struct * lc = (gr_poly_struct *) (dop->coeffs) + order;
@@ -380,7 +381,7 @@ acb_ode_fundamental_matrix_vec(
         goto cleanup;
 
     _acb_ode_fundamental_matrix_vec(mat, acb_ldop->coeffs, acb_ldop->length,
-                                    expos, lcrt, bound,
+                                    expos, lcrt, NULL,
                                     pts, npts,
                                     basis,
                                     acb_ode_sum_divconquer, NULL,

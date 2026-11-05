@@ -376,7 +376,7 @@ void _acb_ode_solution_growth(mag_t order, mag_t base, const acb_poly_struct * d
 slong acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len, mag_srcptr rad, mag_srcptr cvrad, slong tgt_prec);
 
 /****************************************************************************
- * Fundamental matrices
+ * Fundamental matrices, transition matrices
  ****************************************************************************/
 
 typedef void (* acb_ode_sum_worker_t)(acb_ode_sum_t sum, slong nterms, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec);
@@ -385,6 +385,9 @@ void _acb_ode_fundamental_matrix_vec( acb_mat_struct * mat, const acb_poly_struc
 WARN_UNUSED_RESULT int acb_ode_fundamental_matrix_vec( acb_mat_struct * mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, acb_srcptr lcrt, acb_srcptr pts, slong npts, acb_ode_basis_t basis, ulong flags, slong prec);
 WARN_UNUSED_RESULT int acb_ode_fundamental_matrix( acb_mat_t mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, acb_srcptr lcrt, const acb_t pt, acb_ode_basis_t basis, ulong flags, slong prec);
 WARN_UNUSED_RESULT int acb_ode_solution_series(gr_poly_vec_t series, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_group_t group, const gr_vec_t ini, slong n, ulong flags, gr_ctx_t CC);
+
+WARN_UNUSED_RESULT int _acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_poly_struct * dop, slong dop_len, gr_ctx_t Cst, const acb_ptr lcrt, gr_srcptr path, slong path_len, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec);
+WARN_UNUSED_RESULT int acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, gr_vec_t path, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec);
 
 /****************************************************************************
  * Utilities
