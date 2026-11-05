@@ -1717,7 +1717,7 @@ flint_mpn_tdiv_r(mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
     mp_ptr q;
     TMP_INIT;
     TMP_START;
-    q = TMP_ALLOC((an - bn + 1) * sizeof(mp_limb_t));
+    q = (mp_ptr) TMP_ALLOC((an - bn + 1) * sizeof(mp_limb_t));
     flint_mpn_tdiv_qr(q, r, a, an, b, bn);
     TMP_END;
 }
