@@ -1,6 +1,6 @@
 ---
 title: Division with a precomputed inverse
-functions: n_preinvert_limb n_mod2_preinv n_divrem2_preinv n_div2_preinv n_ll_mod_preinv n_lll_mod_preinv
+functions: n_preinvert_limb n_mod2_preinv n_mod2_preinv_lazy n_divrem2_preinv n_div2_preinv n_ll_mod_preinv n_lll_mod_preinv
 ---
 
 Division by a word $n$ costs tens of cycles in hardware. When $n$ is used
@@ -25,14 +25,23 @@ divisions share one $n$.
 
 ## Algorithm {#algorithm}
 
-The dividend is shifted left by $s$ bits into two words, and the quotient is
-estimated as the high word of $v u_1 + u$, where $v$ is the reciprocal and
-$u_1$ the high word of the shifted dividend. The estimate is off by at most
-one in each direction, which is fixed with one comparison and, rarely, a
-second one. The remainder is shifted back at the end.
+The functions for a one-word dividend (`n_mod2_preinv`, `n_divrem2_preinv`,
+`n_div2_preinv`, `n_divrem_preinv`, `n_divrem_preinv_unnorm`) use the
+Barrett step of `NMOD_RED`. Its constant is derived from the reciprocal
+with a shift, so it needs no extra precomputation. The quotient is
+estimated as the high word of the product of the dividend by this
+constant, shifted right; the estimate is at most one too small, which is
+fixed with one comparison. `n_mod2_preinv_lazy` skips this comparison.
 
-`n_ll_mod_preinv` first reduces the high word modulo $n$ (if it is not
-already smaller than $n$) and then performs one division step;
+::: summary algorithms/arithmetic/barrett :::
+
+For a two-word dividend, the dividend is shifted left by $s$ bits, and the
+quotient is estimated as the high word of $v u_1 + u$, where $v$ is the
+reciprocal and $u_1$ the high word of the shifted dividend. The estimate
+is off by at most one in each direction, which is fixed with one
+comparison and, rarely, a second one. The remainder is shifted back at
+the end. `n_ll_mod_preinv` first reduces the high word modulo $n$ (if it
+is not already smaller than $n$) and then performs one division step;
 `n_lll_mod_preinv` performs two steps.
 
 ::: summary algorithms/arithmetic/moller-granlund :::

@@ -244,7 +244,7 @@ _fq_zech_poly_mulmid_univariate(fq_zech_struct * rop,
 
     /* floor(x / p) = floor(x * pinv / 2^FLINT_BITS) for x, p < 2^32 */
 #if FLINT_BITS == 64
-    pinv = (qm1 < (UWORD(1) << 32)) ? (UWORD_MAX / p + 1) : 0;
+    pinv = (qm1 < (UWORD(1) << 32)) ? n_lemire_precomp_preinv(p, fctx->mod.ninv) : 0;
 #else
     pinv = 0;
 #endif

@@ -138,7 +138,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     if (NMOD_ADDMUL_FITS_HALFWORD(mod))
     {
         ulong n = mod.n;
-        ulong ninv = n_lemire_precomp(n);
+        ulong ninv = n_lemire_precomp_preinv(n, mod.ninv);
 
         q1 = n_mod_lemire(A[lenA-1] * invL, n, ninv);
         t  = n_mod_lemire(q1 * B[lenB-2], n, ninv);
@@ -165,7 +165,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     else if (NMOD_ADDMUL_FITS_WORD(mod))
     {
         ulong n = mod.n;
-        ulong ninv = n_barrett_precomp(n);
+        ulong ninv = n_barrett_precomp_preinv(n, mod.ninv);
 
         q1 = n_mod_barrett(A[lenA-1] * invL, n, ninv);
         t  = n_mod_barrett(q1 * B[lenB-2], n, ninv);
@@ -244,8 +244,8 @@ _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R,
     unreduced_fits_halflimb = unreduced_bound < UWORD(1) << (FLINT_BITS / 2);
     reduced_fits_quarterlimb = NMOD_BITS(mod) <= FLINT_BITS / 4;
 
-    ulong npre = n_barrett_precomp(mod.n);
-    ulong npre2 = n_lemire_precomp(mod.n);
+    ulong npre = n_barrett_precomp_preinv(mod.n, mod.ninv);
+    ulong npre2 = n_lemire_precomp_preinv(mod.n, mod.ninv);
 
     TMP_INIT;
     TMP_START;

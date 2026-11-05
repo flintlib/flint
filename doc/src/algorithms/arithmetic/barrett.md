@@ -17,16 +17,16 @@ sieving and table lookups. Throughout, $B = 2^{\bits}$.
 Barrett's method [@Bar1987] estimates the quotient as follows.
 
 ::: proposition {#prop-barrett}
-Let $2 \le n < B$, $m = \lfloor B/n \rfloor$ and $0 \le x < B$, and let
-$\tilde q = \lfloor x m / B \rfloor$. Then
+Let $1 \le n < B$, let $m$ be an integer with $B/n - 1 \le m \le B/n$
+and $0 \le x < B$, and let $\tilde q = \lfloor x m / B \rfloor$. Then
 $\lfloor x/n \rfloor - 1 \le \tilde q \le \lfloor x/n \rfloor$, so
 $0 \le x - \tilde q n < 2n$.
 :::
 
 ::: proof
-From $B/n - 1 < m \le B/n$ we get
+From $B/n - 1 \le m \le B/n$ we get
 $$
-\frac{x}{n} - 1 < \frac{x}{n} - \frac{x}{B} < \frac{x m}{B} \le \frac{x}{n},
+\frac{x}{n} - 1 < \frac{x}{n} - \frac{x}{B} \le \frac{x m}{B} \le \frac{x}{n},
 $$
 using $x < B$. Taking floors gives the claim.
 :::
@@ -34,7 +34,12 @@ using $x < B$. Taking floors gives the claim.
 The value $x - \tilde q n$ is at most $x$, so it is computed exactly with
 word arithmetic even when $2n > B$. `n_mod_barrett_lazy` returns it, and
 `n_mod_barrett` subtracts $n$ once if needed. `n_barrett_precomp` computes
-$m$ with one division.
+$m = \lfloor B/n \rfloor$ with one division, for $n \ge 2$;
+`n_barrett_precomp_preinv` computes $m = \lfloor (B - 1)/n \rfloor$
+without a division ([below](#nmod)), for $n \ge 1$. Both satisfy the
+hypothesis: $\lfloor (B - 1)/n \rfloor \ge ((B - 1) - (n - 1))/n = B/n - 1$,
+since the remainder of $B - 1$ by $n$ is at most $n - 1$. They differ only
+when $n$ is a power of two, where the second one is $B/n - 1$.
 
 ## Barrett reduction with an `nmod_t` {#nmod}
 
@@ -93,11 +98,22 @@ so `NMOD_RED` skips the product and only corrects once. The test on `mod.norm`
 is moved out of loops by the compiler, and the remaining loop of comparisons
 can then be trivially vectorized.
 
+`n_mod2_preinv`, `n_divrem2_preinv`, `n_div2_preinv` and `n_divrem_preinv`
+use the same step with $\mathit{norm}$ computed from $n$, and the last
+three also return $\tilde q$, corrected. Before the correction, the proof
+of [](#thm-nmod-red) gives
+$a - \tilde q n < n + a (1 + \rho)/2^{\nu + \bits - 1} < n + 2$, since
+$a < B$ and $1 + \rho \le n < 2^{\nu}$; `n_mod2_preinv_lazy` returns this
+value.
+
 Shifting $m$ gives the constants of the same family for other input sizes:
 $\lfloor m / 2^k \rfloor = \lfloor (2^{\nu + \bits - 1 - k} - 1)/n \rfloor$
-for $0 \le k < \nu + \bits - 1$. For instance $k = \nu - 1$ gives
-$\lfloor (B - 1)/n \rfloor$, which is the constant of `n_barrett_precomp`
-unless $n$ is a power of two.
+for $0 \le k < \nu + \bits - 1$. Indeed, with $e = \nu + \bits - 1$,
+$\lfloor m/2^k \rfloor = \lfloor (2^e - 1)/(2^k n) \rfloor
+= \lfloor \lfloor (2^e - 1)/2^k \rfloor / n \rfloor$ by the nested floor
+identity used in [](#lem-nmod-m), and $\lfloor (2^e - 1)/2^k \rfloor = 2^{e - k} - 1$.
+For instance $k = \nu - 1$ gives $\lfloor (B - 1)/n \rfloor$, which
+`n_barrett_precomp_preinv` computes this way, without a division.
 
 ## Lemire–Kaser–Kurz reduction {#lemire}
 
@@ -108,6 +124,12 @@ denotes the fractional part; multiplying it by $n$ and keeping the high
 word gives $x \bmod n$. The approximation is exact when $n$ and $x$ are
 below $2^{\bits/2}$, which is the condition required by `n_mod_lemire`.
 The method needs no correction step, but its range restriction makes it
-useful only for half-word values.
+useful only for half-word values. `n_lemire_precomp` computes
+$c = \lfloor (B - 1)/n \rfloor + 1$ with one division;
+`n_lemire_precomp_preinv` adds one to the constant of
+`n_barrett_precomp_preinv` instead, which gives the same word for every
+$n \ge 1$. For $n \ge 2$ this is $c$, since
+$\lfloor (B - 1)/n \rfloor + 1 = \lceil B/n \rceil$ for all integers
+$B, n \ge 1$.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_mod_lemire n_lemire_precomp NMOD_RED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED :::

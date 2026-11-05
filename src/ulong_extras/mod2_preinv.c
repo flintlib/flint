@@ -10,37 +10,41 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 
-/*
-   Method of Niels Moller and Torbjorn Granlund see paper:
-   Improved Division by Invariant Integers: (algorithm 4)
-   https://gmplib.org/~tege/division-paper.pdf
-*/
-
-#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
+/* Barrett step of NMOD_RED (doc: algorithms/arithmetic/barrett#nmod) */
 
 ulong
 n_mod2_preinv(ulong a, ulong n, ulong ninv)
 {
-    ulong norm, q1, q0, r;
+    nmod_t mod;
+    ulong r;
 
     FLINT_ASSERT(n != 0);
 
-    norm = flint_clz(n);
-    n <<= norm;
+    mod.n = n;
+    mod.ninv = ninv;
+    mod.norm = flint_clz(n);
+    NMOD_RED(r, a, mod);
+    return r;
+}
 
+/* NMOD_RED without its final correction. For norm >= 1, the quotient
+   estimate before the floor is below a / n by less than 2 / n (proof of
+   algorithms/arithmetic/barrett#thm-nmod-red), so the result is below
+   n + 2; for norm = 0 it is exact. */
+ulong
+n_mod2_preinv_lazy(ulong a, ulong n, ulong ninv)
+{
+    unsigned int norm = flint_clz(n);
+
+    FLINT_ASSERT(n != 0);
+
+    if (norm == 0)
+        return (a >= n) ? a - n : a;
+    else
     {
-        const ulong u1 = r_shift(a, FLINT_BITS - norm);
-        const ulong u0 = (a << norm);
-
-        umul_ppmm(q1, q0, ninv, u1);
-        add_ssaaaa(q1, q0, q1, q0, u1, u0);
-
-        r = u0 - (q1 + 1) * n;
-
-        if (r > q0)
-            r += n;
-
-        return (r < n) ? (r >> norm) : ((r - n) >> norm);
+        const ulong m = (ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+        return a - (n_mulhi(a, m) >> (FLINT_BITS - 1 - norm)) * n;
     }
 }

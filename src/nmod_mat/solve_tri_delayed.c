@@ -67,12 +67,12 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
             if (m * sq + (mod.n - 1) < (UWORD(1) << (FLINT_BITS / 2)))
             {
                 R->red = 0;
-                R->c0 = n_lemire_precomp(mod.n);
+                R->c0 = n_lemire_precomp_preinv(mod.n, mod.ninv);
             }
             else
             {
                 R->red = 1;
-                R->c0 = n_barrett_precomp(mod.n);
+                R->c0 = n_barrett_precomp_preinv(mod.n, mod.ninv);
             }
             return;
         }
@@ -90,7 +90,7 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
     if (R->nlimbs == 1)
     {
         R->red = 1;
-        R->c0 = n_barrett_precomp(mod.n);
+        R->c0 = n_barrett_precomp_preinv(mod.n, mod.ninv);
     }
     else if (R->nlimbs == 2)
     {
