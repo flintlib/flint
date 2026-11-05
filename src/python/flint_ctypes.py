@@ -5086,8 +5086,343 @@ class RealAlgebraicField_qqbar(QQbarField):
         libgr.gr_ctx_init_real_qqbar(self._ref)
         self._elem_type = qqbar
 
+class _arb_mat_struct(ctypes.Structure):
+    _fields_ = [('entries', ctypes.c_void_p),
+                ('r', c_slong),
+                ('c', c_slong),
+                ('stride', c_slong)]
+
+class _arb_array:
+    """
+    Contiguous array of arb balls (arb_ptr) holding the given values,
+    converted at precision prec.
+    """
+    def __init__(self, values, prec):
+        R = RealField_arb(prec)
+        values = [R(v) for v in values]
+        self.n = len(values)
+        self.arr = (arb_struct * max(self.n, 1))()
+        for i in range(self.n):
+            libflint.arb_init(ctypes.byref(self.arr[i]))
+            libflint.arb_set(ctypes.byref(self.arr[i]), values[i]._ref)
+
+    def ptr(self):
+        return ctypes.byref(self.arr)
+
+    def __del__(self):
+        for i in range(self.n):
+            libflint.arb_clear(ctypes.byref(self.arr[i]))
+
+class _acb_array:
+    def __init__(self, values, prec):
+        C = ComplexField_acb(prec)
+        values = [C(v) for v in values]
+        self.n = len(values)
+        self.arr = (acb_struct * max(self.n, 1))()
+        for i in range(self.n):
+            libflint.acb_init(ctypes.byref(self.arr[i]))
+            libflint.acb_set(ctypes.byref(self.arr[i]), values[i]._ref)
+
+    def ptr(self):
+        return ctypes.byref(self.arr)
+
+    def __del__(self):
+        for i in range(self.n):
+            libflint.acb_clear(ctypes.byref(self.arr[i]))
+
+def _ulong_array(values):
+    values = [int(v) for v in values]
+    for v in values:
+        if v < 0 or v >= 2**FLINT_BITS:
+            raise ValueError("expected nonnegative integers")
+    return (ctypes.c_ulong * max(len(values), 1))(*values)
+
 class gr_arb_ctx(gr_ctx):
-    pass
+
+    def _mzeta_result(ctx, res, known_real=False):
+        """
+        Converts an acb result to an element of ctx: for a real field, the
+        real part, if the value is known to be real (the imaginary part of
+        the ball then only contains rounding errors) or its imaginary part
+        is exactly zero.
+        """
+        if not libflint.acb_is_finite(res._ref):
+            raise FlintUnableError("unable to compute the value")
+        if isinstance(ctx, RealField_arb):
+            if not (known_real or libflint.arb_is_zero(ctypes.byref(res._data.imag))):
+                raise FlintDomainError("the value is not known to be real")
+            return ctx(res.re())
+        return ctx(res)
+
+    def mzv(ctx, s, star=False):
+        """
+        Multiple zeta value
+        `\\zeta(s_1, \\ldots, s_r) = \\sum_{n_1 > \\cdots > n_r \\ge 1} n_1^{-s_1} \\cdots n_r^{-s_r}`
+        (the convention of PARI/GP's ``zetamult``; `s_1 \\ge 2`), or with
+        ``star=True`` the star value (`n_1 \\ge \\cdots \\ge n_r`).
+
+            >>> RR.mzv([2, 1])
+            [1.202056903159594 +/- ...]
+            >>> RR.mzv([2, 1]).overlaps(RR.zeta(3))
+            True
+            >>> RR.mzv([3, 1]) - RR.pi()**4 / 360
+            [+/- ...]
+            >>> RR.mzv([2, 1], star=True) / RR.zeta(3)
+            [2.000000000000000 +/- ...]
+            >>> RealField_arb(333).mzv([3, 1, 3, 1])
+            [0.005229569563530960100930652283899231589890420784634635522547448...]
+            >>> RR.mzv([1, 2])
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: unable to compute the value
+
+        """
+        s = list(s)
+        prec = ctx.prec
+        res = RealField_arb(prec)()
+        if star:
+            libflint.acb_mzeta_mzv_star(res._ref, _ulong_array(s), c_slong(len(s)), c_slong(prec))
+        else:
+            libflint.acb_mzeta_mzv(res._ref, _ulong_array(s), c_slong(len(s)), c_slong(prec))
+        if not libflint.arb_is_finite(res._ref):
+            raise FlintUnableError("unable to compute the value")
+        return ctx(res)
+
+    def mzv_t(ctx, s, t):
+        """
+        Yamamoto's interpolated multiple zeta value
+        `\\sum_p t^{r - \\operatorname{depth}(p)} \\zeta(p)` over the
+        indices `p` obtained from `s` by replacing commas by plus signs
+        (``zetamult(s, t)`` in PARI/GP): `t = 0` gives the MZV, `t = 1` the
+        star value.
+
+            >>> RR.mzv_t([3, 1, 2], 0) - RR.mzv([3, 1, 2])
+            [+/- ...]
+            >>> RR.mzv_t([3, 1, 2], 1) - RR.mzv([3, 1, 2], star=True)
+            [+/- ...]
+            >>> CC.mzv_t([2, 1], CC(1)/2)
+            [1.803085354739391 +/- ...]
+
+        """
+        s = list(s)
+        prec = ctx.prec
+        C = ComplexField_acb(prec)
+        t = C(t)
+        res = C()
+        libflint.acb_mzeta_mzv_t(res._ref, _ulong_array(s), c_slong(len(s)), t._ref, c_slong(prec))
+        return ctx._mzeta_result(res, libflint.arb_is_zero(ctypes.byref(t._data.imag)))
+
+    def mzv_all(ctx, k, star=False, weight=False):
+        """
+        All multiple zeta values of weight `2, \\ldots, k` (or of weight `k`
+        only, with ``weight=True``), as a list ordered by the index `m` of
+        PARI/GP's ``zetamultall`` (the word `x_0 y x_1` has `m = (1y)_2`).
+        With ``star=True``, the star values.
+
+            >>> RR.mzv_all(4)
+            [[1.644934066848226 +/- ...], [1.202056903159594 +/- ...], [1.202056903159594 +/- ...], [1.082323233711138 +/- ...], [0.2705808084277845 +/- ...], [0.81174242528335... +/- ...], [1.082323233711138 +/- ...]]
+            >>> [RR.mzv_composition(m) for m in range(1, 8)]
+            [[2], [3], [2, 1], [4], [3, 1], [2, 2], [2, 1, 1]]
+            >>> all(RR.mzv_index(RR.mzv_composition(m)) == m for m in range(1, 64))
+            True
+            >>> RR.mzv_all(5, star=True, weight=True)[0] - RR.zeta(5)
+            [+/- ...]
+
+        """
+        k = int(k)
+        if k < 2 or k > FLINT_BITS - 2:
+            raise ValueError("expected 2 <= k <= FLINT_BITS - 2")
+        prec = ctx.prec
+        n = 2**(k - 2) if weight else 2**(k - 1) - 1
+        flags = (1 if star else 0) | (4 if weight else 0)
+        arr = _arb_array([0] * n, prec)
+        libflint.acb_mzeta_mzv_all(arr.ptr(), ctypes.c_ulong(k), ctypes.c_int(flags), c_slong(prec))
+        R = RealField_arb(prec)
+        out = []
+        for i in range(n):
+            x = R()
+            libflint.arb_set(x._ref, ctypes.byref(arr.arr[i]))
+            out.append(ctx(x))
+        return out
+
+    def mzv_index(ctx, s):
+        """
+        The index `m` of an admissible composition `s` (as in PARI/GP's
+        ``zetamultconvert``).
+
+            >>> RR.mzv_index([2, 1])
+            3
+            >>> RR.mzv_index([3, 1, 2])
+            22
+
+        """
+        s = list(s)
+        libflint.acb_mzeta_mzv_index.restype = ctypes.c_ulong
+        m = libflint.acb_mzeta_mzv_index(_ulong_array(s), c_slong(len(s)))
+        if m == 0:
+            raise ValueError("not an admissible composition")
+        return m
+
+    def mzv_composition(ctx, m):
+        """
+        The composition of index `m` (inverse of :meth:`mzv_index`).
+
+            >>> RR.mzv_composition(22)
+            [3, 1, 2]
+
+        """
+        m = int(m)
+        if m < 1 or m >= 2**(FLINT_BITS - 1):
+            raise ValueError("expected 1 <= m < 2^(FLINT_BITS - 1)")
+        buf = (ctypes.c_ulong * FLINT_BITS)()
+        libflint.acb_mzeta_mzv_index_composition.restype = c_slong
+        r = libflint.acb_mzeta_mzv_index_composition(buf, ctypes.c_ulong(m))
+        return [int(buf[i]) for i in range(r)]
+
+    def multi_polylog(ctx, s, x):
+        """
+        Multiple polylogarithm
+        `\\operatorname{Li}_{s_1, \\ldots, s_r}(x_1, \\ldots, x_r) = \\sum_{n_1 > \\cdots > n_r \\ge 1} x_1^{n_1} \\cdots x_r^{n_r} / (n_1^{s_1} \\cdots n_r^{s_r})`
+        (``polylogmult`` in PARI/GP). Arguments for which the
+        implemented algorithms do not apply raise ``FlintUnableError``.
+
+            >>> RR.multi_polylog([2], [RR(1)/2]) - RR.polylog(2, RR(1)/2)
+            [+/- ...]
+            >>> RR.multi_polylog([2, 1], [1, 1]) - RR.zeta(3)
+            [+/- ...]
+            >>> CC.multi_polylog([2], [1j])
+            ([-0.205616758356028... +/- ...] + [0.915965594177219... +/- ...]*I)
+            >>> RR.multi_polylog([1, 1], [-1, -1])
+            [...]
+
+        """
+        s = list(s)
+        x = list(x)
+        if len(s) != len(x):
+            raise ValueError("s and x must have the same length")
+        prec = ctx.prec
+        C = ComplexField_acb(prec)
+        arr = _acb_array(x, prec + 16)
+        res = C()
+        libflint.acb_mzeta_polylog(res._ref, _ulong_array(s), arr.ptr(), c_slong(len(s)), c_slong(prec))
+        real = all(libflint.arb_is_zero(ctypes.byref(arr.arr[i].imag)) for i in range(len(x)))
+        return ctx._mzeta_result(res, real)
+
+    def mzv_colored(ctx, s, e, N):
+        """
+        Colored multiple zeta value
+        `\\operatorname{Li}_{s}(\\zeta^{e_1}, \\ldots, \\zeta^{e_r})`,
+        `\\zeta = e^{2 \\pi i / N}` (supported for `N \\le 8`); `N = 2`
+        gives the alternating sums.
+
+            >>> RR.mzv_colored([1], [1], 2) + RR.log(2)
+            [+/- ...]
+            >>> RR.mzv_colored([2, 1], [1, 1], 2)
+            [...]
+            >>> (CC.mzv_colored([2], [1], 4) - CC.polylog(2, 1j)).overlaps(0)
+            True
+
+        """
+        s = list(s)
+        e = list(e)
+        if len(s) != len(e):
+            raise ValueError("s and e must have the same length")
+        prec = ctx.prec
+        C = ComplexField_acb(prec)
+        res = C()
+        libflint.acb_mzeta_mzv_colored(res._ref, _ulong_array(s), _ulong_array(e), c_slong(len(s)), ctypes.c_ulong(int(N)), c_slong(prec))
+        real = all((2 * int(ei)) % int(N) == 0 for ei in e)
+        return ctx._mzeta_result(res, real)
+
+    def epstein_zeta(ctx, nu, A, x=None, y=None, regularized=False):
+        """
+        Epstein zeta function of the lattice `\\Lambda = A \\mathbb{Z}^d`
+        (the basis vectors are the columns of `A`)
+
+        .. math ::
+
+            Z_{\\Lambda,\\nu}(x; y) = \\sum_{z \\in \\Lambda}{}' \\frac{e^{-2 \\pi i y \\cdot z}}{|x - z|^{\\nu}}
+
+        (the prime omits `z = x`), continued analytically in `\\nu`; with
+        ``regularized=True``, the regularized function
+        `e^{2 \\pi i x \\cdot y} Z - \\hat s_\\nu(y) / V`. The data of the
+        most recently used lattices is cached (per thread), so repeated
+        evaluations with the same lattice are cheaper. Exact rational
+        input (``A``, ``x``, ``y``) is handled by a dedicated algorithm at
+        high precision.
+
+        The NaCl Madelung constant, `Z(1/r)` on `\\mathbb{Z}^d` and the
+        hexagonal lattice:
+
+            >>> RR.epstein_zeta(1, [[1,0,0],[0,1,0],[0,0,1]], [0,0,0], [0.5,0.5,0.5])
+            [-1.747564594633182 +/- ...]
+            >>> RR.epstein_zeta(3, [[1]]) - 2 * RR.zeta(3)
+            [+/- ...]
+            >>> RR.epstein_zeta(4, [[1, 0], [0, 1]]) - 4 * RR.zeta(2) * RR.dirichlet_beta(2)
+            [+/- ...]
+            >>> hexl = [[1, RR(1)/2], [0, RR(3).sqrt()/2]]
+            >>> RR.epstein_zeta(3, hexl)
+            [11.034175734914... +/- ...]
+            >>> CC.epstein_zeta(CC(1)/2 + 14j, hexl, [0.1, 0.2], [0.3, -0.1])
+            ([3.59410246... +/- ...] + [-4.43190134... +/- ...]*I)
+
+        At high precision (here exact input, handled by shells):
+
+            >>> RealField_arb(1000).epstein_zeta(1, [[1,0,0],[0,1,0],[0,0,1]], [0,0,0], [0.5,0.5,0.5]) + RealField_arb(1000).madelung_nacl()
+            [+/- ...]
+            >>> R = RealField_arb(300)
+            >>> R.epstein_zeta(3, [[2, 1], [1, 2]], [R(1)/3, R(1)/3])
+            [11.42894916603...]
+
+        """
+        prec = ctx.prec
+        A = [list(row) for row in A]
+        d = len(A)
+        if d < 1 or any(len(row) != d for row in A):
+            raise ValueError("A must be a square matrix")
+        if x is None:
+            x = [0] * d
+        if y is None:
+            y = [0] * d
+        x = list(x)
+        y = list(y)
+        if len(x) != d or len(y) != d:
+            raise ValueError("x and y must have length d")
+        wp = prec + 32
+        Aarr = _arb_array([A[i][j] for i in range(d) for j in range(d)], wp)
+        M = _arb_mat_struct()
+        M.entries = ctypes.cast(Aarr.arr, ctypes.c_void_p)
+        M.r = d
+        M.c = d
+        M.stride = d
+        xa = _arb_array(x, wp)
+        ya = _arb_array(y, wp)
+        C = ComplexField_acb(prec)
+        nu = ComplexField_acb(wp)(nu)
+        res = C()
+        libflint.acb_mzeta_epstein(res._ref, nu._ref, ctypes.byref(M), xa.ptr(), ya.ptr(),
+            ctypes.c_int(1 if regularized else 0), c_slong(prec))
+        # real for real nu if x = 0 or y = 0 (pairing z and -z, resp. no phase)
+        real = libflint.arb_is_zero(ctypes.byref(nu._data.imag)) and not regularized and \
+            (all(libflint.arb_is_zero(ctypes.byref(xa.arr[i])) for i in range(d)) or
+             all(libflint.arb_is_zero(ctypes.byref(ya.arr[i])) for i in range(d)))
+        return ctx._mzeta_result(res, real)
+
+    def madelung_nacl(ctx):
+        """
+        The Madelung constant of sodium chloride,
+        `M = -\\sum' (-1)^{i+j+k} (i^2+j^2+k^2)^{-1/2}`.
+
+            >>> RR.madelung_nacl()
+            [1.747564594633182 +/- ...]
+            >>> RealField_arb(3333).madelung_nacl()
+            [1.747564594633182190636212035544397403485161436624741758152825350765040623532761179890758362694607889930832581538753710593282029944183828013036933002156599363282376607172297568659238037167203810410603421455606438277778683217313224369755877342625047478782128508605679166816757399...]
+
+        """
+        prec = ctx.prec
+        res = RealField_arb(prec)()
+        libflint.acb_mzeta_madelung_nacl(res._ref, c_slong(prec))
+        return ctx(res)
 
 
 class RealField_arb(gr_arb_ctx):

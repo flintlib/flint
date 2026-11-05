@@ -3,6 +3,7 @@ title: References
 ---
 
 [AbbottBronsteinMulders1999]: Fast deterministic computation of determinants of dense matrices, ACM International Symposium on Symbolic and Algebraic Computation (1999)
+[Akh2017]: P. Akhilesh, "Double tails of multiple zeta values", Journal of Number Theory 170 (2017), 228-249, https://arxiv.org/abs/2105.12156
 [Apostol1997]: Apostol, Tom : Modular functions and Dirichlet series in number theory, Springer (1997)
 [Ari2011]: J. Arias de Reyna, "High precision computation of Riemann’s zeta function by the Riemann-Siegel formula, I", Mathematics of Computation 80 (2011), 995-1009
 [Ari2012]: J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
@@ -10,8 +11,10 @@ title: References
 [Arn2010]: J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
 [Arn2012]: J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
 [ArnoldMonagan2011]: Arnold, Andrew and Monagan, Michael : Calculating cyclotomic polynomials, Mathematics of Computation 80:276 (2011) 2359--2379
+[BBBL2001]: J. M. Borwein, D. M. Bradley, D. J. Broadhurst and P. Lisoněk, "Special values of multiple polylogarithms", Transactions of the American Mathematical Society 353 (2001), 907-941, https://arxiv.org/abs/math/9910045
 [BBC1997]: D. H. Bailey, J. M. Borwein and R. E. Crandall, "On the Khintchine constant", Mathematics of Computation 66 (1997) 417-431
 [BBC2000]: J. Borwein, D. M. Bradley and R. E. Crandall, "Computational strategies for the Riemann zeta function", Journal of Computational and Applied Mathematics 121 (2000) 247-296
+[BBG2024]: A. A. Buchheit, J. K. Busse and R. Gutendorf, "Computation and properties of the Epstein zeta function with high-performance implementation in EpsteinLib", preprint (2024), https://arxiv.org/abs/2412.16317
 [BBK2014]: D. H. Bailey, J. M. Borwein and A. D. Kaiser. "Automated simplification of large symbolic expressions". Journal of Symbolic Computation Volume 60, January 2014, Pages 120-136. https://doi.org/10.1016/j.jsc.2013.09.001
 [BD1992]: D. Buchmann and S. Düllmann. "Distributed class group computation." Informatik: Festschrift zum 60. Geburtstag von Günter Hotz (1992): 69-79.
 [BF2020]: F. Beukers and J. Forsgård. "Gamma-evaluations of hypergeometric series". Preprint, 2020. https://arxiv.org/abs/2004.08117
@@ -49,6 +52,7 @@ title: References
 [Coh1996]: Cohen, Henri : A course in computational algebraic number theory, Springer, 1996
 [Coh2000]: H. Cohen. *Advanced topics in computational number theory*. Springer, 2000. https://doi.org/10.1007/978-1-4419-8489-0
 [Col1971]: Collins, George E. : The Calculation of Multivariate Polynomial Resultants, SYMSAC '71, ACM 1971 212--222
+[Cra1999]: R. E. Crandall, "New representations for the Madelung constant", Experimental Mathematics 8 (1999), 367-379
 [CraPom2005]: R. Crandall and C. Pomerance, *Prime Numbers: A Computational Perspective*, second edition, Springer (2005).
 [DHBHS2004]: B. Deconinck, M. Heil, A. Bobenko, M. van Hoeij, and M. Schmies, "Computing Riemann theta functions", Math. Comp. 73:247 (2004), 1417--1442. https://arxiv.org/abs/nlin/0206009
 [Dix1982]: J. D. Dixon, "Exact solution of linear equations using p-adic expansions", Numerische Mathematik 40 (1982) 137-141
@@ -65,6 +69,7 @@ title: References
 [Morain2007]: F. Morain, "Implementing the asymptotically fast version of the elliptic curve primality proving algorithm", Mathematics of Computation 76 (2007), 493-505
 [PARI]: The PARI Group, PARI/GP, https://pari.math.u-bordeaux.fr/ ; the `primecert` implementation of FastECPP is by Jared Asuncion
 [Schertz2002]: R. Schertz, "Weber's class invariants revisited", Journal de Theorie des Nombres de Bordeaux 14 (2002), 325-343
+[Yam2013]: S. Yamamoto, "Interpolation of multiple zeta and zeta-star values", Journal of Algebra 385 (2013), 102-114, https://arxiv.org/abs/1203.1118
 [YuiZagier1997]: N. Yui and D. Zagier, "On the singular values of Weber modular functions", Mathematics of Computation 66 (1997), 1645-1662
 [EM2004]: O. Espinosa and V. Moll, "A generalized polygamma function", Integral Transforms and Special Functions (2004), 101-115.
 [EK2025]: N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
@@ -73,6 +78,7 @@ title: References
 [FieHof2014]: Fieker C. and Hofmann T.: "Computing in quotients of rings of integers" LMS Journal of Computation and Mathematics, 17(A), 349-365
 [Fil1992]: S. Fillebrown, "Faster Computation of Bernoulli Numbers", Journal of Algorithms 13 (1992) 431-445
 [ForJan2015]: M. Forisek and J. Jancina, "Fast Primality Testing for Integers That Fit into a Machine Word", SOFSEM 2015, https://ceur-ws.org/Vol-1326/020-Forisek.pdf
+[FP1985]: U. Fincke and M. Pohst, "Improved methods for calculating vectors of short length in a lattice, including a complexity analysis", Mathematics of Computation 44 (1985), 463-471, https://doi.org/10.1090/S0025-5718-1985-0777278-8
 [GCL1992]: K. O. Geddes, S. R. Czapor and G. Labahn. *Algorithms for computer algebra*. Springer, 1992. https://doi.org/10.1007/b102438
 [GG2003]: J. von zur Gathen and J. Gerhard, *Modern Computer Algebra*, second edition, Cambridge University Press (2003)
 [GieLobSau1998]: M. Giesbrecht, A. Lobo and B. D. Saunders, "Certifying inconsistency of sparse linear systems", Proceedings of the 1998 International Symposium on Symbolic and Algebraic Computation (ISSAC) (1998) 113-119
@@ -81,6 +87,7 @@ title: References
 [GatSho1992]: J. von zur Gathen and V. Shoup, "Computing Frobenius maps and factoring polynomials", Computational Complexity 2 (1992), 187-224. https://doi.org/10.1007/BF01272074
 [Gas2018]: D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
 [Gly2010]: D. G. Glynn, "The permanent of a square matrix", European Journal of Combinatorics, Volume 31, Issue 7, October 2010, Pages 1887-1891, https://doi.org/10.1016/j.ejc.2010.01.010
+[Gon2001]: A. B. Goncharov, "Multiple polylogarithms and mixed Tate motives", preprint (2001), https://arxiv.org/abs/math/0103059
 [Gos1974]: R. W. Gosper, "Acceleration of series", MIT AI Memo no.304, (March-1974). https://dspace.mit.edu/handle/1721.1/6088
 [Got1959]: E. Gottschling, "Explizite Bestimmung der Randflächen es Fundamentalbereiches der Modulgruppe zweiten Grades'', Math. Annalen 138 (1959), 103--124. https://doi.org/10.1007/BF01342938
 [GowWag2008]: Jason Gower and Sam Wagstaff : "Square form factoring" Math. Comp. 77, 2008, pp 551-588, https://doi.org/10.1090/S0025-5718-07-02010-8
