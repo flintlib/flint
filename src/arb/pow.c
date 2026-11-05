@@ -66,8 +66,10 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
         const arf_struct * ymid = arb_midref(y);
 
         /* small half-integer or integer */
-        if (arf_cmpabs_2exp_si(ymid, BINEXP_LIMIT) < 0 &&
-            arf_is_int_2exp_si(ymid, -1))
+        if ((arf_cmpabs_2exp_si(ymid, BINEXP_LIMIT) < 0 &&
+             arf_is_int_2exp_si(ymid, -1)) ||
+            (arf_cmpabs_2exp_si(ymid, 1024) < 0 &&
+             arf_is_int(ymid) && arf_is_zero(arb_midref(x))))
         {
             fmpz_t e;
             fmpz_init(e);
