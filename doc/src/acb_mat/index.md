@@ -508,25 +508,34 @@ version otherwise; it throws an exception for a non-square matrix.
 These functions perform floating-point linear algebra on the midpoints
 of the input, *without any error control*. The input radii are ignored,
 and the output matrices hold the approximate results with zero radii.
-They use the same algorithms as the rigorous versions (partial
-pivoting, block recursion for large matrices).
+They are the generic algorithms of `gr_mat` (Gaussian elimination
+with partial pivoting, block recursive for large matrices) run over a
+floating-point ring holding the midpoints: from dimension 4 (and, for
+the triangular solvers, four right-hand sides), `dfloat` or `nfloat`,
+with the midpoints scaled by powers of two, when the precision allows
+and the exponents fit, which is several times faster; otherwise, or if
+that fails, `acf_t` (`acf`) at `prec` bits, or 53 if that is less
+([](algorithms/ball-arithmetic/linear-systems#backends)).
 
 ::: function
 void acb_mat_approx_solve_triu(acb_mat_t X, const acb_mat_t U, const acb_mat_t B, int unit, slong prec)
 void acb_mat_approx_solve_tril(acb_mat_t X, const acb_mat_t L, const acb_mat_t B, int unit, slong prec)
 
 Approximately solve $UX = B$ or $LX = B$ for a triangular matrix with
-nonzero diagonal (not checked); with `unit` set, the diagonal is taken
-to be ones and not read.
+nonzero diagonal; with `unit` set, the diagonal is taken to be ones and
+not read. If a diagonal entry is zero, `X` is set to NaN.
 :::
 
 ::: function
 int acb_mat_approx_lu(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
 void acb_mat_approx_solve_lu_precomp(acb_mat_t X, const slong * perm, const acb_mat_t A, const acb_mat_t B, slong prec)
 
-Compute an approximate LU decomposition with partial pivoting, returning
-zero if an exactly zero pivot column is encountered, and solve with such
-a decomposition (assumed to come from `acb_mat_approx_lu`).
+Compute an approximate LU decomposition $PA = LU$ with partial pivoting,
+in the layout of `gr_mat_lu`, returning zero if $A$ does not have full
+rank in the floating-point arithmetic (an exactly zero pivot column is
+encountered), in which case `P` and `LU` are meaningless; and solve
+with such a decomposition (assumed to come from `acb_mat_approx_lu`; NaN if
+a diagonal entry of $U$ is zero).
 :::
 
 ::: function
@@ -534,8 +543,9 @@ int acb_mat_approx_solve(acb_mat_t X, const acb_mat_t A, const acb_mat_t B, slon
 int acb_mat_approx_inv(acb_mat_t X, const acb_mat_t A, slong prec)
 
 Approximately solve $AX = B$ or invert $A$. Return zero if the
-approximate LU decomposition fails, nonzero otherwise; a nonzero return
-value says nothing about the accuracy of the result.
+approximate LU decomposition fails, leaving `X` unchanged, and nonzero
+otherwise; a nonzero return value says nothing about the accuracy of
+the result.
 :::
 
 ## Characteristic polynomial and companion matrix {#charpoly}
@@ -654,15 +664,20 @@ is only a heuristic, and the output may be accurate even if zero is
 returned.
 
 ::: details
-The matrix is reduced to Hessenberg form by Householder reflections and
-the eigenvalues are computed by the implicitly shifted QR algorithm,
-working on the midpoints at `prec` bits. `tol` (default
-$2^{-\mathit{prec}} / (100n)$ if `NULL`) is the tolerance for
-negligible subdiagonal entries, and `maxiter` (default $14n +
-\mathit{prec}/10$ if 0 or negative) bounds the number of iterations.
-The eigenvectors are computed from the triangular Schur form by
-back-substitution and transformed back with the accumulated unitary
-transformation.
+This is `gr_mat_eig_qr` (reduction to Hessenberg form by Householder
+reflections, the implicitly shifted QR algorithm and back substitution
+in the Schur form for the eigenvectors) on the midpoints. `tol`
+(default $2^{-\mathit{prec}} / (100n)$ if `NULL`) is the tolerance for
+negligible subdiagonal entries, relative to the norm, and `maxiter`
+(default $14n + \mathit{prec}/10$ if 0 or negative) bounds the number
+of iterations. From dimension 4, the midpoints are scaled and converted
+to `dfloat` or `nfloat_complex` when the precision and the exponents
+allow; if that fails (including when the iteration does not converge),
+or otherwise, the computation is done over `acf` at `prec` bits (at
+least 53), where the approximations are written even if the iteration
+does not converge
+([](algorithms/ball-arithmetic/linear-systems#backends)). The matrix
+must be square.
 :::
 :::
 

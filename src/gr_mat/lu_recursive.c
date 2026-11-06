@@ -96,6 +96,10 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
         gr_mat_t T;
         gr_mat_init(T, A10->r, A01->c, ctx);
         status |= gr_mat_nonsingular_solve_tril(A01, A00, A01, 1, ctx);
+        /* TODO: a fused gr_mat_submul (C <- C - A B, as a ring method
+           with implementations tuned for the floating-point and modular
+           types) would save the temporary and a pass over it here and in
+           the recursive triangular solvers. */
         status |= gr_mat_mul(T, A10, A01, ctx);
         status |= gr_mat_sub(A11, A11, T, ctx);
         gr_mat_clear(T, ctx);

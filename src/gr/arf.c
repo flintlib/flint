@@ -594,6 +594,13 @@ _gr_arf_nan(arf_t res, const gr_ctx_t ctx)
 }
 
 static int
+_gr_arf_abs2(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    arf_mul(res, x, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
+static int
 _gr_arf_abs(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_abs(res, x);
@@ -1456,6 +1463,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_NINT,            (gr_funcptr) _gr_arf_nint},
 
     {GR_METHOD_ABS,             (gr_funcptr) _gr_arf_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) _gr_arf_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_arf_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_arf_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_arf_im},

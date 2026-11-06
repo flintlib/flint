@@ -301,6 +301,12 @@ Compute $2x$ as $x + x$ and $x^2$ as $x \cdot x$.
 :::
 
 ::: function
+int gr_generic_abs2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+Computes $|x|^2$ as the square of `gr_abs`, the default of `gr_abs2`.
+:::
+
+::: function
 int gr_generic_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
 int gr_generic_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 

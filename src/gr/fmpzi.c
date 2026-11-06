@@ -864,6 +864,16 @@ _gr_fmpzi_abs(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 }
 */
 
+/* |x|^2 = a^2 + b^2 is the norm, a Gaussian integer with zero
+   imaginary part.  (abs itself is not implemented: it leaves Z[i].) */
+static int
+_gr_fmpzi_abs2(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
+{
+    fmpzi_norm(fmpzi_realref(res), x);
+    fmpz_zero(fmpzi_imagref(res));
+    return GR_SUCCESS;
+}
+
 static int
 _gr_fmpzi_i(fmpzi_t res, const gr_ctx_t ctx)
 {
@@ -1087,6 +1097,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
 /*
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpzi_abs},
 */
+    {GR_METHOD_ABS2,            (gr_funcptr) _gr_fmpzi_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpzi_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpzi_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpzi_im},

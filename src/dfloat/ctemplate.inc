@@ -667,15 +667,165 @@ DFLOAT_FUNC_NOINLINE void DCV(vec_mul)(DC(ptr) res, DC(srcptr) x, DC(srcptr) y, 
         DC(_mul_impl)(res + i, x + i, y + i);
 }
 
+/* ---- SIMD helpers for the complex vector kernels ---- */
+
+#ifdef DFLOAT_HAVE_SIMD
+
+/* the parts of x[0], x[stride], x[2 stride], x[3 stride] in SoA form
+   (lane k gets element k) */
+FLINT_FORCE_INLINE void
+DC(_vload4)(vec4d * re, vec4d * im, DC(srcptr) x, slong stride)
+{
+    const double * p0 = x[0].re.d, * p1 = x[stride].re.d;
+    const double * p2 = x[2 * stride].re.d, * p3 = x[3 * stride].re.d;
+    int k;
+    UNROLL
+    for (k = 0; k < N; k++)
+    {
+        re[k] = vec4d_set_d4(p0[k], p1[k], p2[k], p3[k]);
+        im[k] = vec4d_set_d4(p0[N + k], p1[N + k], p2[N + k], p3[N + k]);
+    }
+}
+
+FLINT_FORCE_INLINE void
+DC(_vstore4)(DC(ptr) x, slong stride, const vec4d * re, const vec4d * im)
+{
+    double * p0 = x[0].re.d, * p1 = x[stride].re.d;
+    double * p2 = x[2 * stride].re.d, * p3 = x[3 * stride].re.d;
+    double t[4];
+    int k;
+    UNROLL
+    for (k = 0; k < N; k++)
+    {
+        vec4d_store_unaligned(t, re[k]);
+        p0[k] = t[0]; p1[k] = t[1]; p2[k] = t[2]; p3[k] = t[3];
+        vec4d_store_unaligned(t, im[k]);
+        p0[N + k] = t[0]; p1[N + k] = t[1]; p2[N + k] = t[2]; p3[N + k] = t[3];
+    }
+}
+
+FLINT_FORCE_INLINE void
+DC(_vbcast)(vec4d * m, const double * c)
+{
+    int k;
+    UNROLL
+    for (k = 0; k < N; k++)
+        m[k] = vec4d_set_d(c[k]);
+}
+
+/* nonzero if some lane of some of the given results is nonfinite (the
+   sum of the absolute values of the components is inf or nan) */
+FLINT_FORCE_INLINE int
+DC(_vany_nonfinite4)(const vec4d * a, const vec4d * b, const vec4d * c, const vec4d * d)
+{
+    vec4d big = vec4d_set_d(DBL_MAX);
+    vec4d m = vec4d_bit_or(vec4d_cmp_nle(DF(_vabs_sum)(a), big), vec4d_cmp_nle(DF(_vabs_sum)(b), big));
+    m = vec4d_bit_or(m, vec4d_cmp_nle(DF(_vabs_sum)(c), big));
+    m = vec4d_bit_or(m, vec4d_cmp_nle(DF(_vabs_sum)(d), big));
+    return VANY(m);
+}
+
+/* nonzero if some lane is an exactly real complex number (zero head of
+   the imaginary part): DC(_mul_impl) takes its two-product branch for
+   such a factor, so the lane formula would not reproduce it */
+FLINT_FORCE_INLINE int
+DC(_vany_real)(const vec4d * im)
+{
+    return VANY(vec4d_cmp_eq(im[0], vec4d_zero()));
+}
+
+#endif
+
+/* ---- the complex product by a fixed scalar, vectorized ----
+
+   The scalar loops below are the definitions; the SIMD loops run the
+   same kernels (in the same order, on the same operands) four elements
+   at a time, with the zero head shift of the scalar wrappers done in
+   the lanes, so that the results are identical, and redo a block of
+   four in scalar only when some lane has a nonfinite value (which the
+   scalar code folds into the head) or, for the products below, an
+   exactly real factor (for which DC(_mul_impl) takes another branch).
+   The products follow
+   DC(_mul_impl) exactly: x c = (x_re c_re - x_im c_im) + (x_im c_re +
+   x_re c_im) i. */
+
+#ifdef DFLOAT_HAVE_SIMD
+/* the plain kernels in the lanes, each result followed by the zero
+   head shift of the scalar wrappers (DF(_vshift_zero_head)), so that
+   the lanes reproduce DF(_mul_impl), DF(_add_impl) and DF(_sub_impl)
+   up to their treatment of nonfinite values, which the callers leave
+   to the scalar code */
+FLINT_FORCE_INLINE void
+DC(_vmul)(vec4d * r, const vec4d * x, const vec4d * y)
+{
+    DF(_v_mul_kernel)(r, NULL, x, y, 0, DFLOAT_KERNEL_STRONG);
+    DF(_vshift_zero_head)(r);
+}
+
+FLINT_FORCE_INLINE void
+DC(_vaddsub)(vec4d * r, const vec4d * x, const vec4d * y, int negate)
+{
+    DF(_v_addsub_kernel)(r, NULL, x, y, negate, 0, DFLOAT_KERNEL_STRONG);
+    DF(_vshift_zero_head)(r);
+}
+
+/* lanes: (tre, tim) = x c for the broadcast scalar (cre, cim) */
+FLINT_FORCE_INLINE void
+DC(_vmul_scalar4)(vec4d * tre, vec4d * tim, const vec4d * xre, const vec4d * xim,
+    const vec4d * cre, const vec4d * cim)
+{
+    vec4d p[N], q[N], r[N], s[N];
+    DC(_vmul)(p, xre, cre);
+    DC(_vmul)(q, xim, cim);
+    DC(_vmul)(r, xre, cim);
+    DC(_vmul)(s, xim, cre);
+    DC(_vaddsub)(tim, s, r, 0);
+    DC(_vaddsub)(tre, p, q, 1);
+}
+#endif
+
 DFLOAT_FUNC_NOINLINE void DCV(vec_mul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c)
 {
     DC(struct) cc = *c;
-    slong i;
+    slong i = 0;
     if (DC_EXACT_ZERO(&cc.im))
+    {
         DFV(vec_mul_scalar)((DF(ptr)) res, (DF(srcptr)) x, 2 * len, &cc.re);
-    else
-        for (i = 0; i < len; i++)
-            DC(_mul_impl)(res + i, x + i, &cc);
+        return;
+    }
+#ifdef DFLOAT_HAVE_SIMD
+    if (len >= 4)
+    {
+        vec4d cre[N], cim[N];
+        DC(_vbcast)(cre, cc.re.d);
+        DC(_vbcast)(cim, cc.im.d);
+        for (; i + 4 <= len; i += 4)
+        {
+            vec4d xre[N], xim[N], tre[N], tim[N];
+            int special;
+            DC(_vload4)(xre, xim, x + i, 1);
+            special = DC(_vany_real)(xim);
+            if (FLINT_LIKELY(!special))
+            {
+                DC(_vmul_scalar4)(tre, tim, xre, xim, cre, cim);
+                special = DC(_vany_nonfinite4)(tre, tim, tre, tim);
+            }
+            if (FLINT_LIKELY(!special))
+            {
+                DC(_vstore4)(res + i, 1, tre, tim);
+            }
+            else
+            {
+                DC(_mul_impl)(res + i, x + i, &cc);
+                DC(_mul_impl)(res + i + 1, x + i + 1, &cc);
+                DC(_mul_impl)(res + i + 2, x + i + 2, &cc);
+                DC(_mul_impl)(res + i + 3, x + i + 3, &cc);
+            }
+        }
+    }
+#endif
+    for (; i < len; i++)
+        DC(_mul_impl)(res + i, x + i, &cc);
 }
 
 static void
@@ -683,7 +833,7 @@ DCV(_vec_addmul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c, int 
 {
     DC(struct) cc = *c;
     DC(t) t;
-    slong i;
+    slong i = 0;
     if (DC_EXACT_ZERO(&cc.im))
     {
         if (sub)
@@ -692,7 +842,46 @@ DCV(_vec_addmul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c, int 
             DFV(vec_addmul_scalar)((DF(ptr)) res, (DF(srcptr)) x, 2 * len, &cc.re);
         return;
     }
-    for (i = 0; i < len; i++)
+#ifdef DFLOAT_HAVE_SIMD
+    if (len >= 4)
+    {
+        vec4d cre[N], cim[N];
+        DC(_vbcast)(cre, cc.re.d);
+        DC(_vbcast)(cim, cc.im.d);
+        for (; i + 4 <= len; i += 4)
+        {
+            vec4d xre[N], xim[N], rre[N], rim[N], tre[N], tim[N], ore[N], oim[N];
+            int special;
+            DC(_vload4)(xre, xim, x + i, 1);
+            special = DC(_vany_real)(xim);
+            if (FLINT_LIKELY(!special))
+            {
+                DC(_vload4)(rre, rim, res + i, 1);
+                DC(_vmul_scalar4)(tre, tim, xre, xim, cre, cim);
+                DC(_vaddsub)(ore, rre, tre, sub);
+                DC(_vaddsub)(oim, rim, tim, sub);
+                special = DC(_vany_nonfinite4)(tre, tim, ore, oim);
+            }
+            if (FLINT_LIKELY(!special))
+            {
+                DC(_vstore4)(res + i, 1, ore, oim);
+            }
+            else
+            {
+                int k;
+                for (k = 0; k < 4; k++)
+                {
+                    DC(_mul_impl)(t, x + i + k, &cc);
+                    if (sub)
+                        DC(_sub_inline)(res + i + k, res + i + k, t);
+                    else
+                        DC(_add_inline)(res + i + k, res + i + k, t);
+                }
+            }
+        }
+    }
+#endif
+    for (; i < len; i++)
     {
         DC(_mul_impl)(t, x + i, &cc);
         if (sub)
@@ -701,6 +890,286 @@ DCV(_vec_addmul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c, int 
             DC(_add_inline)(res + i, res + i, t);
     }
 }
+
+/* ---- 2 x 2 transformation of a pair of vectors ----
+
+   (u_i, v_i) <- (M0 u_i + M1 v_i, M2 u_i + M3 v_i).  Each part of each
+   output is a sum of four real products, computed as such: the
+   products and a single renormalization of their sum (_addn_kernel),
+   which is both cheaper and more accurate than complex products and
+   sums.  The coefficients are, per output part
+   (with nMk the negated imaginary part of Mk):
+
+     u_re = M0r u_re + nM0i u_im + M1r v_re + nM1i v_im
+     u_im = M0r u_im +  M0i u_re + M1r v_im +  M1i v_re
+
+   and the same with M2, M3 for v.  The terms with an exactly zero
+   coefficient are left out, which changes nothing but the sign of a
+   zero result (a zero product contributes exact zeros to every order
+   sum): with a real diagonal (the plane rotations with real cosine)
+   every part is a sum of three products, with a real matrix of two. */
+
+#define DC_APPLY_GENERIC 0
+#define DC_APPLY_REAL_DIAG 1
+#define DC_APPLY_REAL 2
+
+/* r = a[0] b[0] + ... + a[nt-1] b[nt-1], scalar (2 <= nt <= 4): the
+   products, then their sum with a single renormalization */
+FLINT_FORCE_INLINE void
+DC(_sdotn)(double * r, const double * const * a, const double * const * b, int nt)
+{
+    double p[4][N], v;
+    const double * xs[4];
+    int m;
+    for (m = 0; m < nt; m++)
+    {
+        DF(_mul_kernel)(p[m], NULL, a[m], b[m], 0);
+        xs[m] = p[m];
+    }
+    if (FLINT_UNLIKELY(DF(_s_addn_kernel)(r, NULL, xs, nt, 0, DFLOAT_KERNEL_STRONG)))
+        DF(_shift_zero_head)(r);
+    v = a[0][0] * b[0][0];
+    for (m = 1; m < nt; m++)
+        v += a[m][0] * b[m][0];
+    DF(_fix_nonfinite_v)(r, v);
+}
+
+/* the coefficient table: M0r M0i nM0i M1r M1i nM1i M2r ... nM3i */
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_coeffs)(DF(struct) * cf, DC(srcptr) M)
+{
+    int j;
+    for (j = 0; j < 4; j++)
+    {
+        cf[3 * j] = M[j].re;
+        cf[3 * j + 1] = M[j].im;
+        DF(_neg_inline)(cf + 3 * j + 2, &M[j].im);
+    }
+}
+
+/* The terms of one output part (part = 0..3 for u_re, u_im, v_re,
+   v_im) for the given variant, as indices into the coefficient table
+   and the operands (0..3 for u_re, u_im, v_re, v_im); returns the
+   number of terms.  With constant arguments this folds to constants.
+   DC_APPLY_REAL_DIAG: M0 and M3 exactly real; DC_APPLY_REAL: all four
+   exactly real (a matrix with only M1, M2 real is rare and runs as
+   generic). */
+FLINT_FORCE_INLINE int
+DC(_apply_2x2_terms)(int * ci, int * xi, int part, int variant)
+{
+    /* the part reads row r of M (entries Mj, Mk with j = 2 r, k = j + 1),
+       whose diagonal entry is Mj for r = 0 and Mk for r = 1 */
+    int r = (part >= 2), j = 2 * r, k = j + 1, im = part & 1, n = 0;
+    int skip_j, skip_k;
+    skip_j = (variant == DC_APPLY_REAL) || (variant == DC_APPLY_REAL_DIAG && r == 0);
+    skip_k = (variant == DC_APPLY_REAL) || (variant == DC_APPLY_REAL_DIAG && r == 1);
+    /* Mj times u */
+    ci[n] = 3 * j; xi[n] = im; n++;
+    if (!skip_j)
+    {
+        ci[n] = 3 * j + (im ? 1 : 2); xi[n] = !im; n++;
+    }
+    /* Mk times v */
+    ci[n] = 3 * k; xi[n] = 2 + im; n++;
+    if (!skip_k)
+    {
+        ci[n] = 3 * k + (im ? 1 : 2); xi[n] = 2 + !im; n++;
+    }
+    return n;
+}
+
+/* one part (0..3: u_re, u_im, v_re, v_im) of the output, scalar */
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_part)(double * r, const DF(struct) * cf, const double * const * x, int part, int variant)
+{
+    int ci[4], xi[4], nt, m;
+    const double * as[4], * bs[4];
+    nt = DC(_apply_2x2_terms)(ci, xi, part, variant);
+    for (m = 0; m < nt; m++)
+    {
+        as[m] = cf[ci[m]].d;
+        bs[m] = x[xi[m]];
+    }
+    DC(_sdotn)(r, as, bs, nt);
+}
+
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_1)(DC(ptr) u, DC(ptr) v, const DF(struct) * cf, int variant)
+{
+    DC(struct) a = *u, b = *v;
+    const double * x[4];
+    x[0] = a.re.d; x[1] = a.im.d; x[2] = b.re.d; x[3] = b.im.d;
+    /* (the parts written out, so that each is specialized) */
+    DC(_apply_2x2_part)(u->re.d, cf, x, 0, variant);
+    DC(_apply_2x2_part)(u->im.d, cf, x, 1, variant);
+    DC(_apply_2x2_part)(v->re.d, cf, x, 2, variant);
+    DC(_apply_2x2_part)(v->im.d, cf, x, 3, variant);
+}
+
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_scalar)(DC(ptr) u, DC(ptr) v, slong stride, slong len, const DF(struct) * cf, int variant)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        DC(_apply_2x2_1)(u + i * stride, v + i * stride, cf, variant);
+}
+
+#ifdef DFLOAT_HAVE_SIMD
+/* one part of the output in the lanes, as DC(_apply_2x2_part) */
+FLINT_FORCE_INLINE void
+DC(_vapply_2x2_part)(vec4d * r, const vec4d (* c)[N], vec4d (* x)[N], int part, int variant)
+{
+    int ci[4], xi[4], nt, m;
+    vec4d p[4][N];
+    const vec4d * xs[4];
+    nt = DC(_apply_2x2_terms)(ci, xi, part, variant);
+    for (m = 0; m < nt; m++)
+    {
+        DC(_vmul)(p[m], c[ci[m]], x[xi[m]]);
+        xs[m] = p[m];
+    }
+    DF(_v_addn_kernel)(r, NULL, xs, nt, 0, DFLOAT_KERNEL_STRONG);
+    DF(_vshift_zero_head)(r);
+}
+
+/* four (or, at the end, fewer) consecutive pairs in the lanes, as
+   DC(_apply_2x2_1); with fewer than four the unused lanes compute a
+   copy of the first pair and are not stored */
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_block)(DC(ptr) u, DC(ptr) v, slong stride, slong cnt,
+    const vec4d (* c)[N], const DF(struct) * cf, int variant)
+{
+    vec4d x[4][N], o[4][N];
+    int k;
+
+    if (cnt == 4)
+    {
+        DC(_vload4)(x[0], x[1], u, stride);
+        DC(_vload4)(x[2], x[3], v, stride);
+    }
+    else
+    {
+        DC(struct) ub[4], vb[4];
+        for (k = 0; k < 4; k++)
+        {
+            ub[k] = u[(k < cnt ? k : 0) * stride];
+            vb[k] = v[(k < cnt ? k : 0) * stride];
+        }
+        DC(_vload4)(x[0], x[1], ub, 1);
+        DC(_vload4)(x[2], x[3], vb, 1);
+    }
+
+    DC(_vapply_2x2_part)(o[0], c, x, 0, variant);
+    DC(_vapply_2x2_part)(o[1], c, x, 1, variant);
+    DC(_vapply_2x2_part)(o[2], c, x, 2, variant);
+    DC(_vapply_2x2_part)(o[3], c, x, 3, variant);
+
+    if (FLINT_UNLIKELY(DC(_vany_nonfinite4)(o[0], o[1], o[2], o[3])))
+    {
+        DC(_apply_2x2_scalar)(u, v, stride, cnt, cf, variant);
+    }
+    else if (cnt == 4)
+    {
+        DC(_vstore4)(u, stride, o[0], o[1]);
+        DC(_vstore4)(v, stride, o[2], o[3]);
+    }
+    else
+    {
+        DC(struct) ub[4], vb[4];
+        DC(_vstore4)(ub, 1, o[0], o[1]);
+        DC(_vstore4)(vb, 1, o[2], o[3]);
+        for (k = 0; k < cnt; k++)
+        {
+            u[k * stride] = ub[k];
+            v[k * stride] = vb[k];
+        }
+    }
+}
+
+FLINT_FORCE_INLINE void
+DC(_apply_2x2_simd)(DC(ptr) u, DC(ptr) v, slong stride, slong len, const DF(struct) * cf, int variant)
+{
+    vec4d c[12][N];
+    slong i;
+    int j;
+    for (j = 0; j < 12; j++)
+        DC(_vbcast)(c[j], cf[j].d);
+    for (i = 0; i + 4 <= len; i += 4)
+        DC(_apply_2x2_block)(u + i * stride, v + i * stride, stride, 4, (const vec4d (*)[N]) c, cf, variant);
+    if (i < len)
+        DC(_apply_2x2_block)(u + i * stride, v + i * stride, stride, len - i, (const vec4d (*)[N]) c, cf, variant);
+}
+#endif
+
+/* the SIMD code also handles the short vectors: a block with unused
+   lanes costs about as much as a single pair in scalar at N = 2, 3 and
+   less at N = 4 */
+#if N == 1
+#define DC_APPLY_2X2_SIMD_MIN 4
+#elif N < 4
+#define DC_APPLY_2X2_SIMD_MIN 2
+#else
+#define DC_APPLY_2X2_SIMD_MIN 1
+#endif
+
+DFLOAT_FUNC_NOINLINE void
+DCV(vec_apply_2x2)(DC(ptr) u, DC(ptr) v, slong stride, slong len, DC(srcptr) M)
+{
+    DF(struct) cf[12];
+    int variant;
+
+    DC(_apply_2x2_coeffs)(cf, M);
+
+    if (DC_EXACT_ZERO(&M[0].im) && DC_EXACT_ZERO(&M[3].im))
+        variant = (DC_EXACT_ZERO(&M[1].im) && DC_EXACT_ZERO(&M[2].im)) ? DC_APPLY_REAL : DC_APPLY_REAL_DIAG;
+    else
+        variant = DC_APPLY_GENERIC;
+
+#ifdef DFLOAT_HAVE_SIMD
+    if (len >= DC_APPLY_2X2_SIMD_MIN)
+    {
+        if (variant == DC_APPLY_GENERIC)
+            DC(_apply_2x2_simd)(u, v, stride, len, cf, DC_APPLY_GENERIC);
+        else if (variant == DC_APPLY_REAL_DIAG)
+            DC(_apply_2x2_simd)(u, v, stride, len, cf, DC_APPLY_REAL_DIAG);
+        else
+            DC(_apply_2x2_simd)(u, v, stride, len, cf, DC_APPLY_REAL);
+        return;
+    }
+#endif
+
+    if (variant == DC_APPLY_GENERIC)
+        DC(_apply_2x2_scalar)(u, v, stride, len, cf, DC_APPLY_GENERIC);
+    else if (variant == DC_APPLY_REAL_DIAG)
+        DC(_apply_2x2_scalar)(u, v, stride, len, cf, DC_APPLY_REAL_DIAG);
+    else
+        DC(_apply_2x2_scalar)(u, v, stride, len, cf, DC_APPLY_REAL);
+}
+
+#undef DC_APPLY_2X2_SIMD_MIN
+#undef DC_APPLY_GENERIC
+#undef DC_APPLY_REAL_DIAG
+#undef DC_APPLY_REAL
+
+/* ---- squared absolute value ---- */
+
+FLINT_FORCE_INLINE void
+DC(_abs2_impl)(DF(t) res, DC(srcptr) x)
+{
+    if (DC_EXACT_ZERO(&x->im))
+        DF(_sqr_impl)(res, &x->re);
+    else if (DC_EXACT_ZERO(&x->re))
+        DF(_sqr_impl)(res, &x->im);
+    else
+    {
+        DF(t) a, b;
+        DF(_sqr_impl)(a, &x->re);
+        DF(_sqr_impl)(b, &x->im);
+        DF(_add_impl)(res, a, b);
+    }
+}
+
+void DC(abs2)(DF(t) res, DC(srcptr) x) { DC(_abs2_impl)(res, x); }
 
 DFLOAT_FUNC_NOINLINE void DCV(vec_addmul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c) { DCV(_vec_addmul_scalar)(res, x, len, c, 0); }
 DFLOAT_FUNC_NOINLINE void DCV(vec_submul_scalar)(DC(ptr) res, DC(srcptr) x, slong len, DC(srcptr) c) { DCV(_vec_addmul_scalar)(res, x, len, c, 1); }
@@ -1158,6 +1627,50 @@ static int GRC(abs)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 static int GRC(im)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { res->re = x->im; DF(_zero_inline)(&res->im); return GR_SUCCESS; }
+static int GRC(abs2)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx) { DC(_abs2_impl)(&res->re, x); DF(_zero_inline)(&res->im); return GR_SUCCESS; }
+
+/* only real numbers are ordered (as for acf and nfloat_complex) */
+static int GRC(cmp)(int * res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx)
+{
+    if (!DF(_is_zero_inline)(&x->im) || !DF(_is_zero_inline)(&y->im))
+    {
+        *res = 0;
+        if (DF(_is_nan_inline)(&x->im) || DF(_is_nan_inline)(&y->im))
+            return GR_UNABLE;
+        return GR_DOMAIN;
+    }
+    return GRF(cmp)(res, &x->re, &y->re, ctx);
+}
+
+/* |x| against |y|: by |x|^2 against |y|^2 (no square root) when the
+   larger head of each argument lies in [2^-400, 2^480] or is zero, so
+   that the squares neither overflow nor lose their tails to underflow
+   at any N (a smaller part whose square underflows is then below the
+   precision of the larger one's); otherwise through the scaled abs */
+static int GRC(cmpabs)(int * res, DC(srcptr) x, DC(srcptr) y, gr_ctx_t ctx)
+{
+    double hx = FLINT_MAX(fabs(x->re.d[0]), fabs(x->im.d[0]));
+    double hy = FLINT_MAX(fabs(y->re.d[0]), fabs(y->im.d[0]));
+    DF(t) a, b;
+    if ((hx == 0.0 || (hx >= 0x1p-400 && hx <= 0x1p480)) &&
+        (hy == 0.0 || (hy >= 0x1p-400 && hy <= 0x1p480)))
+    {
+        DC(_abs2_impl)(a, x);
+        DC(_abs2_impl)(b, y);
+    }
+    else
+    {
+        DC(abs)(a, x);
+        DC(abs)(b, y);
+    }
+    return GRF(cmp)(res, a, b, ctx);
+}
+
+static int GRC(vec_apply_2x2)(DC(ptr) u, DC(ptr) v, slong stride, slong len, DC(srcptr) M, gr_ctx_t ctx)
+{
+    DCV(vec_apply_2x2)(u, v, stride, len, M);
+    return GR_SUCCESS;
+}
 
 static void GRC(vec_init)(DC(ptr) vec, slong len, gr_ctx_t ctx)
 {
@@ -1239,9 +1752,176 @@ static DC_COLD int GRC(rsqrt_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
 { int status = GRC(rsqrt)(res, x, ctx); DC(_canon)(res); return status; }
 static DC_COLD int GRC(abs_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
 { int status = GRC(abs)(res, x, ctx); DC(_canon)(res); return status; }
+static DC_COLD int GRC(abs2_strong)(DC(ptr) res, DC(srcptr) x, gr_ctx_t ctx)
+{ GRC(abs2)(res, x, ctx); DC(_canon)(res); return GR_SUCCESS; }
+static DC_COLD int GRC(vec_apply_2x2_strong)(DC(ptr) u, DC(ptr) v, slong stride, slong len, DC(srcptr) M, gr_ctx_t ctx)
+{
+    slong i;
+    DCV(vec_apply_2x2)(u, v, stride, len, M);
+    for (i = 0; i < len; i++)
+    {
+        DC(_canon)(u + i * stride);
+        DC(_canon)(v + i * stride);
+    }
+    return GR_SUCCESS;
+}
+
+/* ---- LU decomposition: the basecase, as DFV(gr_mat_lu_classical)
+   (the elimination column by column, four rows at a time in the SIMD
+   lanes, with the products of DC(_vmul_scalar4); the pivot of largest
+   |Re| + |Im| of the heads) ---- */
+
+#define DC_ENTRY(M, i, j) (((DC(ptr)) (M)->entries) + (i) * (M)->stride + (j))
+
+static slong
+DC(_lu_pivot)(const gr_mat_t M, slong start_row, slong col)
+{
+    slong i, best = -1;
+    double bv = 0.0, v;
+    for (i = start_row; i < M->r; i++)
+    {
+        DC(srcptr) x = DC_ENTRY(M, i, col);
+        v = fabs(x->re.d[0]) + fabs(x->im.d[0]);
+        if (v != v)
+            return i;
+        if (v > bv)
+        {
+            bv = v;
+            best = i;
+        }
+    }
+    return best;
+}
+
+static void
+DC(_lu_eliminate)(gr_mat_t LU, slong row, slong col, slong rank_col, DC(srcptr) d)
+{
+    slong m = LU->r, n = LU->c, j = row + 1, c;
+    DC(struct) e[4];
+    DC(t) t;
+    DC(srcptr) prow = DC_ENTRY(LU, row, 0);
+
+#ifdef DFLOAT_HAVE_SIMD
+    for ( ; j + 4 <= m; j += 4)
+    {
+        slong k;
+        vec4d ere[N], eim[N];
+        for (k = 0; k < 4; k++)
+            DC(_mul_impl)(e + k, DC_ENTRY(LU, j + k, col), d);
+        DC(_vload4)(ere, eim, e, 1);
+        for (c = col + 1; c < n; c++)
+        {
+            vec4d pre[N], pim[N], xre[N], xim[N], tre[N], tim[N], rre[N], rim[N];
+            DC(ptr) x = DC_ENTRY(LU, j, c);
+            DC(_vbcast)(pre, prow[c].re.d);
+            DC(_vbcast)(pim, prow[c].im.d);
+            DC(_vload4)(xre, xim, x, LU->stride);
+            DC(_vmul_scalar4)(tre, tim, ere, eim, pre, pim);
+            DC(_vaddsub)(rre, xre, tre, 1);
+            DC(_vaddsub)(rim, xim, tim, 1);
+            if (FLINT_LIKELY(!DC(_vany_nonfinite4)(tre, tim, rre, rim)))
+            {
+                DC(_vstore4)(x, LU->stride, rre, rim);
+            }
+            else
+            {
+                for (k = 0; k < 4; k++)
+                {
+                    DC(_mul_impl)(t, e + k, prow + c);
+                    DC(_sub_inline)(DC_ENTRY(LU, j + k, c), DC_ENTRY(LU, j + k, c), t);
+                }
+            }
+        }
+        for (k = 0; k < 4; k++)
+        {
+            DC(_zero_inline)(DC_ENTRY(LU, j + k, col));
+            DC(_set_inline)(DC_ENTRY(LU, j + k, rank_col), e + k);
+        }
+    }
+#endif
+
+    for ( ; j < m; j++)
+    {
+        DC(_mul_impl)(e, DC_ENTRY(LU, j, col), d);
+        for (c = col + 1; c < n; c++)
+        {
+            DC(_mul_impl)(t, e, prow + c);
+            DC(_sub_inline)(DC_ENTRY(LU, j, c), DC_ENTRY(LU, j, c), t);
+        }
+        DC(_zero_inline)(DC_ENTRY(LU, j, col));
+        DC(_set_inline)(DC_ENTRY(LU, j, rank_col), e);
+    }
+}
+
+int DCV(gr_mat_lu_classical)(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+
+int
+DCV(gr_mat_lu_classical)(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    slong i, m = A->r, n = A->c, r, rank = 0, row = 0, col = 0;
+    DC(t) d;
+    int status = GR_SUCCESS;
+
+    for (i = 0; i < m; i++)
+        P[i] = i;
+
+    if (m == 0 || n == 0)
+    {
+        *res_rank = 0;
+        return GR_SUCCESS;
+    }
+
+    status |= gr_mat_set(LU, A, ctx);
+
+    while (row < m && col < n)
+    {
+        r = DC(_lu_pivot)(LU, row, col);
+
+        if (r == -1)
+        {
+            if (rank_check)
+            {
+                rank = 0;
+                break;
+            }
+            col++;
+            continue;
+        }
+
+        rank++;
+
+        if (r != row)
+            _gr_mat_swap_rows(LU, P, row, r, ctx);
+
+        DC(inv)(d, DC_ENTRY(LU, row, col));
+        DC(_lu_eliminate)(LU, row, col, rank - 1, d);
+
+        row++;
+        col++;
+    }
+
+    *res_rank = rank;
+    return status;
+}
+
+#undef DC_ENTRY
+
+static int GRC(mat_mul)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{ return DFV(gr_mat_mul_cplx)(C, A, B, 1, ctx); }
+
+static int GRC(mat_lu)(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    if (A->r < DFLOAT_MAT_LU_CUTOFF || A->c < DFLOAT_MAT_LU_CUTOFF)
+        return DCV(gr_mat_lu_classical)(rank, P, LU, A, rank_check, ctx);
+    else
+        return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
+}
+static DC_COLD int GRC(mat_mul_strong)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{ return DFV(gr_mat_mul_cplx_strong)(C, A, B, 1, ctx); }
 
 gr_method_tab_input DCV(gr_strong_methods_input)[] =
 {
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) GRC(mat_mul_strong)},
     {GR_METHOD_ADD,             (gr_funcptr) GRC(add_strong)},
     {GR_METHOD_SUB,             (gr_funcptr) GRC(sub_strong)},
     {GR_METHOD_MUL,             (gr_funcptr) GRC(mul_strong)},
@@ -1260,6 +1940,8 @@ gr_method_tab_input DCV(gr_strong_methods_input)[] =
     {GR_METHOD_SQRT,            (gr_funcptr) GRC(sqrt_strong)},
     {GR_METHOD_RSQRT,           (gr_funcptr) GRC(rsqrt_strong)},
     {GR_METHOD_ABS,             (gr_funcptr) GRC(abs_strong)},
+    {GR_METHOD_ABS2,            (gr_funcptr) GRC(abs2_strong)},
+    {GR_METHOD_VEC_APPLY_2X2,   (gr_funcptr) GRC(vec_apply_2x2_strong)},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -1324,6 +2006,16 @@ gr_method_tab_input DCV(gr_methods_input)[] =
     {GR_METHOD_VEC_EXP,         (gr_funcptr) GRC(vec_exp)},
     {GR_METHOD_VEC_GATHER,      (gr_funcptr) GRC(vec_gather)},
     {GR_METHOD_VEC_SCATTER,     (gr_funcptr) GRC(vec_scatter)},
+    {GR_METHOD_ABS2,            (gr_funcptr) GRC(abs2)},
+    {GR_METHOD_CMP,             (gr_funcptr) GRC(cmp)},
+    {GR_METHOD_CMPABS,          (gr_funcptr) GRC(cmpabs)},
+    {GR_METHOD_VEC_APPLY_2X2,   (gr_funcptr) GRC(vec_apply_2x2)},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) GRC(mat_mul)},
+    {GR_METHOD_MAT_LU,          (gr_funcptr) GRC(mat_lu)},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL, (gr_funcptr) DFV(gr_mat_nonsingular_solve_tril)},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU, (gr_funcptr) DFV(gr_mat_nonsingular_solve_triu)},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
+    {GR_METHOD_MAT_FIND_NONZERO_PIVOT, (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
     {0,                         (gr_funcptr) NULL},
 };
 

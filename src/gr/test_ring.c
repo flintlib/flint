@@ -3167,6 +3167,73 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
+/* abs2(x) = |x|^2 must agree with abs(x)^2 and with x * conj(x)
+   wherever those are available. */
+static int
+gr_test_abs2(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS, status2;
+    gr_ptr x, y, z;
+    char * fail_str = "";
+
+    GR_TMP_INIT3(x, y, z, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    if (n_randint(state, 2))
+    {
+        status |= gr_set(y, x, R);
+        status |= gr_abs2(y, y, R);
+    }
+    else
+    {
+        status |= gr_abs2(y, x, R);
+    }
+
+    if (status == GR_SUCCESS)
+    {
+        status2 = gr_abs(z, x, R);
+        status2 |= gr_sqr(z, z, R);
+
+        if (status2 == GR_SUCCESS && gr_equal(y, z, R) == T_FALSE)
+        {
+            fail_str = "abs2(x) != abs(x)^2\n";
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if (status == GR_SUCCESS)
+    {
+        status2 = gr_conj(z, x, R);
+        status2 |= gr_mul(z, z, x, R);
+
+        if (status2 == GR_SUCCESS && gr_equal(y, z, R) == T_FALSE)
+        {
+            fail_str = "abs2(x) != x * conj(x)\n";
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("FAIL: abs2\n");
+        flint_printf("%s\n", fail_str);
+        flint_printf("R = "); gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("abs2(x) = \n"); gr_println(y, R);
+        flint_printf("reference = \n"); gr_println(z, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR3(x, y, z, R);
+
+    return status;
+}
+
 static int
 gr_test_rsqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
@@ -5024,6 +5091,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     gr_test_iter(R, state, "sqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
+    gr_test_iter(R, state, "abs2", gr_test_abs2, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
     gr_test_iter(R, state, "rsqrt", gr_test_rsqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
 
     gr_test_iter(R, state, "pow: aliasing", gr_test_pow_aliasing, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));

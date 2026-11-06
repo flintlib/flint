@@ -628,6 +628,66 @@ DF(_mul_d_kernel)(double * res, double * err, const double * x, double y, int tr
 
 #define V_NONZERO(a) vec4d_cmp_ne((a), vec4d_zero())
 
+/* DF(_shift_zero_head) in the lanes, for a plain result of a kernel:
+   in the lanes where the kernel would have returned its flag (a zero
+   head, or a zero component followed by a nonzero one), the nonzero
+   components are moved up in order and the rest set to +0, exactly as
+   the scalar wrappers do; the other lanes are left as they are.  This
+   lets the vector loops keep a block whose results are exactly zero
+   or cancel exactly (an exact zero factor, a real number viewed as a
+   complex one, the identity matrix), where a scalar redo of the block
+   would cost several times the vector work.  (Zeros are moved by a
+   stable bubble of blends, N - 1 passes of decreasing length.) */
+FLINT_FORCE_INLINE void
+DF(_vshift_zero_head)(vec4d * t)
+{
+#if N > 1
+    vec4d zero = vec4d_zero(), need, head, s[N], z;
+    int i, pass;
+
+    /* the lanes with a zero before a nonzero component; a zero head
+       without one means a zero value, which the scalar code (called
+       on any zero head) only normalizes to +0 */
+    head = vec4d_cmp_eq(t[0], zero);
+    need = vec4d_bit_and(head, V_NONZERO(t[1]));
+    UNROLL
+    for (i = 1; i + 1 < N; i++)
+        need = vec4d_bit_or(need, vec4d_bit_and(vec4d_cmp_eq(t[i], zero), V_NONZERO(t[i + 1])));
+    if (FLINT_LIKELY(vec4d_movemask(need) == 0))
+    {
+        if (vec4d_movemask(head) != 0)
+        {
+            UNROLL
+            for (i = 0; i < N; i++)
+                t[i] = vec4d_bit_andnot(head, t[i]);
+        }
+        return;
+    }
+    need = vec4d_bit_or(need, head);
+
+    UNROLL
+    for (i = 0; i < N; i++)
+        s[i] = t[i];
+    UNROLL
+    for (pass = 0; pass < N - 1; pass++)
+    {
+        UNROLL
+        for (i = 0; i + 1 < N - pass; i++)
+        {
+            z = vec4d_cmp_eq(s[i], zero);
+            s[i] = vec4d_blendv(s[i], s[i + 1], z);
+            s[i + 1] = vec4d_bit_andnot(z, s[i + 1]);
+        }
+    }
+    /* the scalar code writes +0 for every zero, including -0 */
+    UNROLL
+    for (i = 0; i < N; i++)
+        t[i] = vec4d_blendv(t[i], vec4d_bit_andnot(vec4d_cmp_eq(s[i], zero), s[i]), need);
+#else
+    (void) t;
+#endif
+}
+
 /* 4 consecutive balls (or plain values, stride N) to and from SoA */
 FLINT_FORCE_INLINE void
 DF(_vload4)(vec4d * m, const double * x, int stride)
@@ -820,18 +880,21 @@ DB(_vmul4)(DB(ptr) res, DB(srcptr) x, DB(srcptr) y, int mode)
     return 0;
 }
 
-/* plain: 4 at a time, nonfinite results folded into the head by the
-   scalar fallback */
+/* plain: 4 at a time, with the zero head shift of the scalar wrappers
+   done in the lanes (exact zeros, as in real data seen as complex or
+   in structured matrices, are common enough that redoing such blocks in
+   scalar would cost most of the gain); nonfinite results are folded into
+   the head by the scalar fallback */
 FLINT_FORCE_INLINE int
 DF(_vaddsub4)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, int negate)
 {
     vec4d mx[N], my[N], mr[N], chk;
-    int flag;
     DF(_vload4)(mx, x->d, N);
     DF(_vload4)(my, y->d, N);
-    flag = DF(_v_addsub_kernel)(mr, NULL, mx, my, negate, 0, DFLOAT_KERNEL_STRONG);
+    DF(_v_addsub_kernel)(mr, NULL, mx, my, negate, 0, DFLOAT_KERNEL_STRONG);
+    DF(_vshift_zero_head)(mr);
     chk = DF(_vabs_sum)(mr);
-    if (FLINT_UNLIKELY(flag || VANY(vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)))))
+    if (FLINT_UNLIKELY(VANY(vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)))))
         return 1;
     DF(_vstore4)(res->d, mr, N);
     return 0;
@@ -841,12 +904,12 @@ FLINT_FORCE_INLINE int
 DF(_vmul4)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y)
 {
     vec4d mx[N], my[N], mr[N], chk;
-    int flag;
     DF(_vload4)(mx, x->d, N);
     DF(_vload4)(my, y->d, N);
-    flag = DF(_v_mul_kernel)(mr, NULL, mx, my, 0, DFLOAT_KERNEL_STRONG);
+    DF(_v_mul_kernel)(mr, NULL, mx, my, 0, DFLOAT_KERNEL_STRONG);
+    DF(_vshift_zero_head)(mr);
     chk = DF(_vabs_sum)(mr);
-    if (FLINT_UNLIKELY(flag || VANY(vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)))))
+    if (FLINT_UNLIKELY(VANY(vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)))))
         return 1;
     DF(_vstore4)(res->d, mr, N);
     return 0;
@@ -1735,33 +1798,98 @@ void DFV(vec_mul)(DF(ptr) res, DF(srcptr) x, DF(srcptr) y, slong len)
         DF(_mul_impl)(res + i, x + i, y + i);
 }
 
+/* res = x c, res += x c (sub = 0) or res -= x c (sub = 1): the scalar
+   loops are the definitions; the SIMD loop runs the same kernels in the
+   lanes (with the zero head shifts there), so that the results are the
+   same, and redoes a block in scalar only for a nonfinite value */
+FLINT_FORCE_INLINE void
+DFV(_vec_mul_scalar_m)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c, int acc, int sub)
+{
+    slong i = 0;
+    DF(t) t;
+#ifdef DFLOAT_HAVE_SIMD
+    if (len >= 4)
+    {
+        vec4d mc[N];
+        int k;
+        for (k = 0; k < N; k++)
+            mc[k] = vec4d_set_d(c->d[k]);
+        for (; i + 4 <= len; i += 4)
+        {
+            vec4d mx[N], mp[N], mr[N], ms[N], chk;
+            DF(_vload4)(mx, x[i].d, N);
+            DF(_v_mul_kernel)(mp, NULL, mx, mc, 0, DFLOAT_KERNEL_STRONG);
+            DF(_vshift_zero_head)(mp);
+            if (acc)
+            {
+                DF(_vload4)(mr, res[i].d, N);
+                DF(_v_addsub_kernel)(ms, NULL, mr, mp, sub, 0, DFLOAT_KERNEL_STRONG);
+                DF(_vshift_zero_head)(ms);
+                chk = vec4d_add(DF(_vabs_sum)(mp), DF(_vabs_sum)(ms));
+            }
+            else
+            {
+                for (k = 0; k < N; k++)
+                    ms[k] = mp[k];
+                chk = DF(_vabs_sum)(ms);
+            }
+            if (FLINT_LIKELY(!VANY(vec4d_cmp_nle(chk, vec4d_set_d(DBL_MAX)))))
+            {
+                DF(_vstore4)(res[i].d, ms, N);
+            }
+            else
+            {
+                for (k = 0; k < 4; k++)
+                {
+                    if (!acc)
+                        DF(_mul_impl)(res + i + k, x + i + k, c);
+                    else
+                    {
+                        DF(_mul_impl)(t, x + i + k, c);
+                        if (sub)
+                            DF(_sub_impl)(res + i + k, res + i + k, t);
+                        else
+                            DF(_add_impl)(res + i + k, res + i + k, t);
+                    }
+                }
+            }
+        }
+    }
+#endif
+    for (; i < len; i++)
+    {
+        if (!acc)
+            DF(_mul_impl)(res + i, x + i, c);
+        else
+        {
+            DF(_mul_impl)(t, x + i, c);
+            if (sub)
+                DF(_sub_impl)(res + i, res + i, t);
+            else
+                DF(_add_impl)(res + i, res + i, t);
+        }
+    }
+}
+
 void DFV(vec_mul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
 {
-    slong i;
-    for (i = 0; i < len; i++)
-        DF(_mul_impl)(res + i, x + i, c);
+    DF(t) cc;
+    DF(_set_inline)(cc, c);     /* c may alias an entry of res */
+    DFV(_vec_mul_scalar_m)(res, x, len, cc, 0, 0);
 }
 
 void DFV(vec_addmul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
 {
-    slong i;
-    DF(t) t;
-    for (i = 0; i < len; i++)
-    {
-        DF(_mul_impl)(t, x + i, c);
-        DF(_add_impl)(res + i, res + i, t);
-    }
+    DF(t) cc;
+    DF(_set_inline)(cc, c);
+    DFV(_vec_mul_scalar_m)(res, x, len, cc, 1, 0);
 }
 
 void DFV(vec_submul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
 {
-    slong i;
-    DF(t) t;
-    for (i = 0; i < len; i++)
-    {
-        DF(_mul_impl)(t, x + i, c);
-        DF(_sub_impl)(res + i, res + i, t);
-    }
+    DF(t) cc;
+    DF(_set_inline)(cc, c);
+    DFV(_vec_mul_scalar_m)(res, x, len, cc, 1, 1);
 }
 
 /* the dot products, forward (rev = 0) or with y reversed (rev = 1, the
@@ -1770,20 +1898,23 @@ void DFV(vec_submul_scalar)(DF(ptr) res, DF(srcptr) x, slong len, DF(srcptr) c)
    the end; the reversed one loads the blocks of y in reverse lane
    order, so that both run the same loop */
 /* one block of 4 terms of a plain dot product into the lane
-   accumulators ACC (a block with a special case is redone in scalar) */
+   accumulators ACC, with the zero head shifts in the lanes (a block
+   with a nonfinite value is redone in scalar) */
 #define DFV_DOT_BLOCK(ACC, I) \
     do { \
         vec4d _mx[N], _my[N], _prod[N], _sum[N], _chk; \
-        int _k, _flag; \
+        int _k; \
         DF(_vload4)(_mx, x[I].d, N); \
         if (rev) \
             DF(_vload4_rev)(_my, y[len - 4 - (I)].d, N); \
         else \
             DF(_vload4)(_my, y[I].d, N); \
-        _flag = DF(_v_mul_kernel)(_prod, NULL, _mx, _my, 0, DFLOAT_KERNEL_STRONG); \
-        _flag |= DF(_v_addsub_kernel)(_sum, NULL, ACC, _prod, 0, 0, DFLOAT_KERNEL_STRONG); \
+        DF(_v_mul_kernel)(_prod, NULL, _mx, _my, 0, DFLOAT_KERNEL_STRONG); \
+        DF(_vshift_zero_head)(_prod); \
+        DF(_v_addsub_kernel)(_sum, NULL, ACC, _prod, 0, 0, DFLOAT_KERNEL_STRONG); \
+        DF(_vshift_zero_head)(_sum); \
         _chk = DF(_vabs_sum)(_sum); \
-        if (FLINT_LIKELY(!_flag && !VANY(vec4d_cmp_nle(_chk, vec4d_set_d(DBL_MAX))))) \
+        if (FLINT_LIKELY(!VANY(vec4d_cmp_nle(_chk, vec4d_set_d(DBL_MAX))))) \
         { \
             for (_k = 0; _k < N; _k++) \
                 ACC[_k] = _sum[_k]; \
@@ -7309,6 +7440,98 @@ static int GRF(vec_scatter)(DF(ptr) vec, const slong * idx, DF(srcptr) src, slon
     return GR_SUCCESS;
 }
 
+#include "mat.inc"
+
+/* the matrix methods: the SIMD product (flint_dgemm for N = 1), and
+   the generic block recursive LU decomposition and triangular solving
+   on top of it above the cutoffs, the classical algorithms below;
+   partial pivoting by the largest magnitude */
+#ifndef DFLOAT_MAT_MUL_CUTOFF
+#define DFLOAT_MAT_MUL_CUTOFF ((N == 1) ? 5 : 2)
+#endif
+#ifndef DFLOAT_MAT_LU_CUTOFF
+#define DFLOAT_MAT_LU_CUTOFF 16
+#endif
+#ifndef DFLOAT_MAT_TRI_CUTOFF
+#define DFLOAT_MAT_TRI_CUTOFF 16
+#endif
+
+int DFV(gr_mat_mul_cplx)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int cplx, gr_ctx_t ctx);
+
+int DFV(gr_mat_mul_cplx)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int cplx, gr_ctx_t ctx)
+{
+    slong dim = FLINT_MIN(A->r, FLINT_MIN(A->c, B->c));
+    int status;
+
+    if (dim < DFLOAT_MAT_MUL_CUTOFF)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    status = DFV(_mat_mul_gr)(C, A, B, cplx, ctx);
+    if (status == GR_UNABLE)
+        status = gr_mat_mul_classical(C, A, B, ctx);
+    return status;
+}
+
+static int GRF(mat_mul)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    return DFV(gr_mat_mul_cplx)(C, A, B, 0, ctx);
+}
+
+int DFV(gr_mat_lu)(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
+int DFV(gr_mat_nonsingular_solve_tril)(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
+int DFV(gr_mat_nonsingular_solve_triu)(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
+
+int DFV(gr_mat_lu)(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    if (A->r < DFLOAT_MAT_LU_CUTOFF || A->c < DFLOAT_MAT_LU_CUTOFF)
+        return DFV(gr_mat_lu_classical)(rank, P, LU, A, rank_check, ctx);
+    else
+        return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
+}
+
+/* (shared by the real and the complex rings) */
+int DFV(gr_mat_nonsingular_solve_tril)(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    if (B->r < DFLOAT_MAT_TRI_CUTOFF || B->c < DFLOAT_MAT_TRI_CUTOFF)
+    {
+        if (B->c >= 4)
+            return DF(_mat_solve_tri_rows)(X, L, B, unit, 0, ctx);
+        return gr_mat_nonsingular_solve_tril_classical(X, L, B, unit, ctx);
+    }
+    else
+        return gr_mat_nonsingular_solve_tril_recursive(X, L, B, unit, ctx);
+}
+
+int DFV(gr_mat_nonsingular_solve_triu)(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    if (B->r < DFLOAT_MAT_TRI_CUTOFF || B->c < DFLOAT_MAT_TRI_CUTOFF)
+    {
+        if (B->c >= 4)
+            return DF(_mat_solve_tri_rows)(X, U, B, unit, 1, ctx);
+        return gr_mat_nonsingular_solve_triu_classical(X, U, B, unit, ctx);
+    }
+    else
+        return gr_mat_nonsingular_solve_triu_recursive(X, U, B, unit, ctx);
+}
+
+/* the strong product: the plain one, canonicalised */
+int DFV(gr_mat_mul_cplx_strong)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int cplx, gr_ctx_t ctx);
+
+int DFV(gr_mat_mul_cplx_strong)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int cplx, gr_ctx_t ctx)
+{
+    int status = DFV(gr_mat_mul_cplx)(C, A, B, cplx, ctx);
+    slong i, j, w = cplx ? 2 : 1;
+    for (i = 0; i < C->r; i++)
+        for (j = 0; j < w * C->c; j++)
+            DF(_canonicalise_inplace)(((DF(ptr)) C->entries)[w * i * C->stride + j].d);
+    return status;
+}
+
+static int GRF(mat_mul_strong)(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    return DFV(gr_mat_mul_cplx_strong)(C, A, B, 0, ctx);
+}
+
 /* ---- strong (canonical) variants: the same, followed by a
    canonicalisation of the result ---- */
 
@@ -7371,6 +7594,7 @@ GRF_STRONG_DOT(vec_dot_rev)
 /* overrides applied on top of the weak table */
 gr_method_tab_input DFV(gr_strong_methods_input)[] =
 {
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) GRF(mat_mul_strong)},
     {GR_METHOD_ADD,             (gr_funcptr) GRF(add_strong)},
     {GR_METHOD_SUB,             (gr_funcptr) GRF(sub_strong)},
     {GR_METHOD_MUL,             (gr_funcptr) GRF(mul_strong)},
@@ -7515,6 +7739,12 @@ gr_method_tab_input DFV(gr_methods_input)[] =
     {GR_METHOD_VEC_SET_OTHER,   (gr_funcptr) GRF(vec_set_other)},
     {GR_METHOD_VEC_GATHER,      (gr_funcptr) GRF(vec_gather)},
     {GR_METHOD_VEC_SCATTER,     (gr_funcptr) GRF(vec_scatter)},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) GRF(mat_mul)},
+    {GR_METHOD_MAT_LU,          (gr_funcptr) DFV(gr_mat_lu)},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL, (gr_funcptr) DFV(gr_mat_nonsingular_solve_tril)},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU, (gr_funcptr) DFV(gr_mat_nonsingular_solve_triu)},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
+    {GR_METHOD_MAT_FIND_NONZERO_PIVOT, (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -23,13 +23,17 @@ form by Householder reflections and runs the implicitly shifted QR
 algorithm with deflation to obtain a Schur form $A \approx Q T Q^*$
 [@GVL1996]; the diagonal of $T$ gives the eigenvalues, and the
 eigenvectors are obtained by back substitution in $T$ and multiplication
-by $Q$. The implementation is adapted from mpmath's `eigen.py`. An
-off-diagonal entry is treated as zero when it is smaller than the
+by $Q$. An off-diagonal entry is treated as zero when it is smaller than the
 tolerance, by default $2^{-p}/(100n)$ relative to the neighbouring
 diagonal entries, and the iteration gives up if no deflation occurs
 within $14n + p/10$ QR steps (by default); the function then returns 0,
-but still writes its current approximations, which may be usable. All arithmetic is done on midpoints at
-$p$ bits.
+but still writes its current approximations, which may be usable. All
+arithmetic is done on midpoints at $p$ bits. This is `gr_mat_eig_qr`
+([](algorithms/linear-algebra/qr-eigenvalues)), run from dimension 4 on
+the midpoints scaled and converted to the multi-double formats of
+`dfloat` or to `nfloat_complex` when the precision allows, and over
+`acf_t` otherwise
+([](algorithms/ball-arithmetic/linear-systems#backends)).
 
 ## A global enclosure {#global}
 
@@ -182,3 +186,5 @@ interior of the corresponding entry of $\mathcal{Y}$ (tested with
   with `acb_mat_set_arb_mat`.
 - `gr_mat_diagonalization` over `gr_ctx_init_complex_acb` calls
   `acb_mat_approx_eig_qr` and `acb_mat_eig_simple` ([](gr_mat)).
+- `gr_mat_eig_qr` computes the same approximations over any complex
+  floating-point ring ([](gr_mat/eig)).
