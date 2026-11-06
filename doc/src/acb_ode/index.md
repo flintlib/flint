@@ -126,8 +126,6 @@ provided by the caller (see `acb_ode_exponents_t`).
 When the exponent structure can be computed by `acb_ode_exponents`
 (typically, over an exact field of constants with a complete zero test),
 though, `expos` may be set to `NULL`.
-Note however that, in this case, the order of the exponent groups is
-unspecified.
 
 Similarly, the user should provide in `lcrt` enclosures of the nonzero roots
 of the leading coefficient of `dop`, with multiple roots repeated. However,
