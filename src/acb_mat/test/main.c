@@ -11,6 +11,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-approx_backend.c"
 #include "t-approx_eig_qr.c"
 #include "t-charpoly.c"
 #include "t-companion.c"
@@ -47,7 +48,9 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(acb_mat_approx_backend),
     TEST_FUNCTION(acb_mat_approx_eig_qr),
+    TEST_FUNCTION(acb_mat_approx_eig_qr_backend),
     TEST_FUNCTION(acb_mat_charpoly),
     TEST_FUNCTION(acb_mat_companion),
     TEST_FUNCTION(acb_mat_det),

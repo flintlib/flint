@@ -136,6 +136,7 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_NINT,            (gr_funcptr) nfloat_nint},
 
     {GR_METHOD_ABS,             (gr_funcptr) nfloat_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) nfloat_sqr},
     {GR_METHOD_CONJ,            (gr_funcptr) nfloat_set},
     {GR_METHOD_RE,              (gr_funcptr) nfloat_set},
     {GR_METHOD_IM,              (gr_funcptr) nfloat_im},

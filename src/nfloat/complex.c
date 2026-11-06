@@ -2224,6 +2224,35 @@ nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr 
 }
 
 int
+nfloat_complex_abs2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
+{
+    ulong t[NFLOAT_MAX_ALLOC];
+    ulong u[NFLOAT_MAX_ALLOC];
+    int status = GR_SUCCESS;
+
+    if (NFLOAT_CTX_HAS_INF_NAN(ctx))
+        return GR_UNABLE;
+
+    if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(x, ctx)))
+    {
+        status = nfloat_sqr(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), ctx);
+    }
+    else if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_RE(x, ctx)))
+    {
+        status = nfloat_sqr(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_IM(x, ctx), ctx);
+    }
+    else
+    {
+        status |= nfloat_sqr(t, NFLOAT_COMPLEX_RE(x, ctx), ctx);
+        status |= nfloat_sqr(u, NFLOAT_COMPLEX_IM(x, ctx), ctx);
+        status |= nfloat_add(NFLOAT_COMPLEX_RE(res, ctx), t, u, ctx);
+    }
+
+    status |= nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+    return status;
+}
+
+int
 nfloat_complex_abs(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     int status;
@@ -2397,6 +2426,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
 */
 
     {GR_METHOD_ABS,             (gr_funcptr) nfloat_complex_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) nfloat_complex_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) nfloat_complex_conj},
     {GR_METHOD_RE,              (gr_funcptr) nfloat_complex_re},
     {GR_METHOD_IM,              (gr_funcptr) nfloat_complex_im},

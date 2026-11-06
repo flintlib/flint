@@ -657,6 +657,7 @@ typedef enum
     GR_METHOD_VEC_PRODUCT,
 
     GR_METHOD_VEC_DOT,
+    GR_METHOD_VEC_APPLY_2X2,
     GR_METHOD_VEC_DOT_REV,
     GR_METHOD_VEC_DOT_STRIDED,
     GR_METHOD_VEC_DOT_UI,
@@ -1299,6 +1300,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_trunc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 GR_INLINE WARN_UNUSED_RESULT int gr_nint(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NINT)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ABS)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_abs2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ABS2)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_i(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, I)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CONJ)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RE)(res, x, ctx); }

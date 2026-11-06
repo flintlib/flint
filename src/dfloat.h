@@ -467,6 +467,7 @@ void X##_inv(T res, TS x); \
 void X##_sqrt(T res, TS x); \
 void X##_rsqrt(T res, TS x); \
 void X##_abs(RT res, TS x); \
+void X##_abs2(RT res, TS x); \
 void X##_arg(RT res, TS x); \
 int X##_is_zero(TS x); \
 int X##_is_one(TS x); \
@@ -497,7 +498,8 @@ void _##X##_vec_addmul_scalar(TP res, TS x, slong len, TS c); \
 void _##X##_vec_submul_scalar(TP res, TS x, slong len, TS c); \
 void _##X##_vec_dot(T res, TS initial, int subtract, TS x, TS y, slong len); \
 void _##X##_vec_dot_rev(T res, TS initial, int subtract, TS x, TS y, slong len); \
-void _##X##_vec_exp(TP res, TS x, slong len);
+void _##X##_vec_exp(TP res, TS x, slong len); \
+void _##X##_vec_apply_2x2(TP u, TP v, slong stride, slong len, TS M);
 
 #define DFLOAT_DECLARE_COMPLEX_BALL(X, T, TP, TS, RT, RS) \
 void X##_zero(T res); \

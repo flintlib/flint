@@ -38,7 +38,12 @@ their neighbours) or `maxiter` iterations (by default $14n +
 \mathit{prec}/10$) have been done, and finally back-substitution in the
 triangular Schur form for the eigenvectors. The return value only says
 whether the iteration converged numerically. The cost is $O(n^3)$
-operations at `prec` bits.
+operations at `prec` bits; from dimension 4 they are done in the
+multi-double formats of `dfloat` up to 206 bits and with
+`nfloat_complex` up to 4224 bits, which is 1.3 to 60 times faster than
+with `acf_t` ([](algorithms/ball-arithmetic/linear-systems#backends)).
+The function is a wrapper of `gr_mat_eig_qr` ([](gr_mat/eig)), which
+does the same over any complex floating-point ring.
 
 ## Certification {#certification}
 
@@ -169,12 +174,12 @@ int main(void)
     return 0;
 }
 ```
-```output
-global enclosure radius: 3.24e-18
-[-0.0392285082075 +/- 2.44e-14] + [+/- 1.32e-16]*I
-[-0.00114669579895 +/- 3.57e-15] + [+/- 1.33e-16]*I
-[0.558734852147 +/- 1.64e-13] + [+/- 1.36e-16]*I
-[1.15783082805 +/- 1.11e-13] + [+/- 1.39e-16]*I
+```output radius-tol
+global enclosure radius: 1.10e-18
+[-0.0392285082075 +/- 2.43e-14] + [+/- 2.38e-17]*I
+[-0.00114669579895 +/- 3.46e-15] + [+/- 2.38e-17]*I
+[0.558734852147 +/- 1.64e-13] + [+/- 2.45e-17]*I
+[1.15783082805 +/- 1.11e-13] + [+/- 2.68e-17]*I
 ```
 
 The matrix $A = T \operatorname{diag}(1, 1, 2) T^{-1}$ below has the
@@ -242,9 +247,9 @@ int main(void)
 ```output
 simple: 0
 multiple: 1
-[1.000000000 +/- 4.41e-19] + [+/- 2.17e-19]*I
-[1.000000000 +/- 4.41e-19] + [+/- 2.17e-19]*I
-[2.000000000 +/- 3.26e-18] + [+/- 1.63e-18]*I
+[1.000000000 +/- 2.92e-20] + [+/- 5.83e-20]*I
+[1.000000000 +/- 2.92e-20] + [+/- 5.83e-20]*I
+[2.000000000 +/- 8.23e-40] + [+/- 8.23e-40]*I
 ```
 
 Since this matrix is diagonalisable, the cluster enclosure is about as
