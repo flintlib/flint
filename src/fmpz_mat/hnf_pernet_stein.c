@@ -238,6 +238,11 @@ add_rows(fmpz_mat_t H, slong start_row, slong *pivots, slong num_pivots)
             {
                 fmpz_fdiv_q(q, fmpz_mat_entry(H, i2, pivots[i]),
                         fmpz_mat_entry(H, i, pivots[i]));
+
+                /* usual case: H was reduced before this row came in */
+                if (fmpz_is_zero(q))
+                    continue;
+
                 for (j2 = pivots[i]; j2 < H->c; j2++)
                 {
                     fmpz_submul(fmpz_mat_entry(H, i2, j2), q,
