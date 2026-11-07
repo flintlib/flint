@@ -3739,6 +3739,7 @@ gr_factor_always_able(gr_ctx_t ctx)
                 case GR_CTX_COMPLEX_ALGEBRAIC_CA:
                 case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
                 case GR_CTX_FMPZ:
+                case GR_CTX_FMPQ:
                     return 1;
             }
         default:
