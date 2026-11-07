@@ -11,36 +11,6 @@
 
 #include "radix.h"
 
-/* Inline version of flint_mpn_divrem_2_1_preinv_unnorm for speed.  */
-FLINT_FORCE_INLINE mp_limb_t
-flint_mpn_divrem_2_1_preinv_unnorm1(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
-{
-    mp_limb_t u0, u1, r;
-
-    FLINT_ASSERT(norm >= 1);
-
-    u1 = up[1];
-    u0 = up[0];
-    if (u1 < d)
-    {
-        d <<= norm;
-        qp[1] = 0;
-        r = (u1 << norm) | (u0 >> (FLINT_BITS - norm));
-    }
-    else
-    {
-        /* Hack: this branch is unreachable, but leaving it in results
-           in faster code with GCC on Zen 3. */
-        d <<= norm;
-        r = (u1 >> (FLINT_BITS - norm));
-        udiv_qrnnd_preinv(qp[1], r, r, (u1 << norm) | (u0 >> (FLINT_BITS - norm)), d, dinv);
-    }
-
-    udiv_qrnnd_preinv(qp[0], r, r, u0 << norm, d, dinv);
-    return r >> norm;
-}
-
-
 ulong
 radix_mul_1(nn_ptr z, nn_srcptr a, slong n, ulong c, const radix_t radix)
 {
@@ -70,40 +40,61 @@ radix_mul_1(nn_ptr z, nn_srcptr a, slong n, ulong c, const radix_t radix)
     }
     else
     {
-        if (mod.norm == 0)
+        /*
+            Decoupled carries: each product is split on its own as
+            a[i] c = q_i B + r_i, with q_i <= B - 2 since a[i] c <= (B - 1)^2,
+            and z[i] = (r_i + q_(i-1) + cb) mod B, where the carry cb is 0
+            or 1. The divisions are then independent, and the chain from
+            one limb to the next is a few additions and comparisons.
+        */
+        const ulong B = mod.n;
+        ulong q, r, qp = 0, cb = 0;
+
+        if (mod.norm >= 2)
         {
-            ulong cy0 = 0;
-            ulong cy1 = 0;
-            ulong r;
+            /* a[i] c < 2^(2 nu) <= 2^(nu + FLINT_BITS - 2), and
+               r + qp + cb <= 2B - 2 fits a word */
+            for (i = 0; i < n; i++)
+            {
+                umul_ppmm(hi, lo, a[i], c);
+                NMOD_DIVREM2_BOUNDED(q, r, hi, lo, mod);
+                r += qp + cb;
+                cb = (r >= B);
+                z[i] = r - (B & -cb);
+                qp = q;
+            }
+        }
+        else if (mod.norm == 1)
+        {
+            /* division of 2 a[i] c by the normalized 2B */
+            const ulong d = B << 1;
 
             for (i = 0; i < n; i++)
             {
                 umul_ppmm(hi, lo, a[i], c);
-                add_ssaaaa(cy1, cy0, cy1, cy0, hi, lo);
-                r = n_divrem_norm(&cy1, cy1, mod.n);
-                udiv_qrnnd_preinv(cy0, r, r, cy0, mod.n, mod.ninv);
-                z[i] = r;
+                udiv_qrnnd_preinv(q, r, (hi << 1) | (lo >> (FLINT_BITS - 1)), lo << 1, d, mod.ninv);
+                r = (r >> 1) + qp + cb;
+                cb = (r >= B);
+                z[i] = r - (B & -cb);
+                qp = q;
             }
-
-            FLINT_ASSERT(cy0 < mod.n);
-            FLINT_ASSERT(cy1 == 0);
-            return cy0;
         }
         else
         {
-            ulong cy[2] = { 0, 0, };
-
+            /* r + qp + cb may not fit a word: compare r with B - (qp + cb),
+               which is at least 1 */
             for (i = 0; i < n; i++)
             {
                 umul_ppmm(hi, lo, a[i], c);
-                add_ssaaaa(cy[1], cy[0], cy[1], cy[0], hi, lo);
-                z[i] = flint_mpn_divrem_2_1_preinv_unnorm1(cy, cy, mod.n, mod.ninv, mod.norm);
+                udiv_qrnnd_preinv(q, r, hi, lo, B, mod.ninv);
+                qp += cb;
+                cb = (r >= B - qp);
+                z[i] = r + qp - (B & -cb);
+                qp = q;
             }
-
-            FLINT_ASSERT(cy[0] < mod.n);
-            FLINT_ASSERT(cy[1] == 0);
-            return cy[0];
         }
+
+        FLINT_ASSERT(qp + cb < B);
+        return qp + cb;
     }
 }
-

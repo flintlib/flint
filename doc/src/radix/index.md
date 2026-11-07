@@ -209,6 +209,17 @@ ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix
 
 Sets $(\mathit{res}, n)$ to $ac \bmod B^n$ and returns the carry
 $\lfloor ac / B^n \rfloor$. Requires $n \ge 1$ and $c < B$.
+
+::: details
+When $B^2$ does not fit a word, each product is divided by $B$ on its
+own, $a_i c = q_i B + r_i$ with $q_i \le B - 2$, and limb $i$ of the
+result is $r_i + q_{i-1}$ plus a carry of 0 or 1 from limb $i - 1$, with
+one conditional subtraction of $B$. The divisions are independent, so
+that only additions and comparisons remain on the carry chain. They are
+Barrett steps (`NMOD_DIVREM2_BOUNDED`,
+[](algorithms/arithmetic/barrett#bounded)) for $B < 2^{\bits - 2}$, and 2/1
+divisions with a precomputed inverse otherwise.
+:::
 :::
 
 ::: function
@@ -285,6 +296,15 @@ into one product in the binary radix $\beta$ (each limb padded to two
 words); and an unoptimised reference implementation through `fmpz_poly`.
 
 ::: details
+`radix_mulmid_classical` divides each column sum, plus the carry from the
+previous column, by $B$. When the sums do not fit a word, with $\nu$ the
+number of bits of $B$, this is a Barrett step (`NMOD_DIVREM2_BOUNDED`) if
+the shorter operand has at most $2^{\bits - 2 - \nu}$ limbs, which keeps
+the sums below $2^{\nu + \bits - 2}$
+([](algorithms/arithmetic/barrett#bounded)), for instance up to 4 limbs
+for $B = 10^{18}$ on a 64-bit machine, and otherwise a division of the
+two- or three-word sum.
+
 `radix_mulmid_fft_small` first drops the limbs of each operand above
 $\mathit{hi}$ and the low limbs that meet the other operand only below
 $\mathit{lo}$ (they contribute only carries from below the window,

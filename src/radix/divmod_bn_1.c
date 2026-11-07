@@ -10,34 +10,7 @@
 */
 
 #include "radix.h"
-
-/* Inline version of flint_mpn_divrem_2_1_preinv_unnorm for speed
-   (mirrors radix_mul_1). */
-FLINT_FORCE_INLINE mp_limb_t
-_radix_divrem_2_1_unnorm1(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
-{
-    mp_limb_t u0, u1, r;
-
-    FLINT_ASSERT(norm >= 1);
-
-    u1 = up[1];
-    u0 = up[0];
-    if (u1 < d)
-    {
-        d <<= norm;
-        qp[1] = 0;
-        r = (u1 << norm) | (u0 >> (FLINT_BITS - norm));
-    }
-    else
-    {
-        d <<= norm;
-        r = (u1 >> (FLINT_BITS - norm));
-        udiv_qrnnd_preinv(qp[1], r, r, (u1 << norm) | (u0 >> (FLINT_BITS - norm)), d, dinv);
-    }
-
-    udiv_qrnnd_preinv(qp[0], r, r, u0 << norm, d, dinv);
-    return r >> norm;
-}
+#include "impl.h"
 
 /*
     Single-limb Hensel division: the bn == 1 case of radix_divmod_bn_classical,

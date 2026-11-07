@@ -671,6 +671,14 @@ low product and one correction, with the constant of `NMOD_RED`
 :::
 
 ::: macro
+NMOD_DIVREM2_BOUNDED(q, r, a_hi, a_lo, mod)
+
+Sets `q` and `r` to the quotient and the remainder of $a_{hi} B + a_{lo}$ by
+$n$, under the same conditions as `NMOD_RED2_BOUNDED`. The quotient is less
+than $2^{\bits - 1}$, and the correction is branch-free.
+:::
+
+::: macro
 NMOD_RED3(r, a_hi, a_me, a_lo, mod)
 
 Sets `r` to $(a_{hi} B^2 + a_{me} B + a_{lo}) \bmod n$. Requires

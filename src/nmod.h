@@ -75,6 +75,22 @@ extern "C" {
     (r) = (rxx >= (mod).n) ? rxx - (mod).n : rxx; \
   } while (0)
 
+/* the same, also setting q to the quotient (which is < 2^(FLINT_BITS - 1));
+   the correction is branch-free */
+#define NMOD_DIVREM2_BOUNDED(q, r, a_hi, a_lo, mod) \
+  do { \
+    const ulong hxx = (a_hi); \
+    const ulong lxx = (a_lo); \
+    const ulong mxx = ((mod).ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1)); \
+    const unsigned int sxx = FLINT_BITS - 2 - (mod).norm; \
+    const ulong xxx = (hxx << (FLINT_BITS - sxx)) | (lxx >> sxx); \
+    const ulong qxx = n_mulhi(xxx, mxx) >> 1; \
+    const ulong rxx = lxx - qxx * (mod).n; \
+    const ulong cxx = -(ulong) (rxx >= (mod).n); \
+    (q) = qxx - cxx; \
+    (r) = rxx - (cxx & (mod).n); \
+  } while (0)
+
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
   do { \
     ulong v_hi;	\

@@ -179,7 +179,10 @@ shifted right by one bit, then $a - \tilde q n$ and the correction: one high
 product, one low product and one comparison, as in `NMOD_RED`, against a
 full product, a low product and two corrections for a
 [Möller–Granlund](algorithms/arithmetic/moller-granlund) step (`NMOD_RED2`,
-which instead takes any $a < nB$).
+which instead takes any $a < nB$). `NMOD_DIVREM2_BOUNDED` also gives the
+quotient $\lfloor a/n \rfloor$, which is $\tilde q$ or $\tilde q + 1$ and
+less than $2^{\bits - 1}$, with a branch-free correction; the
+[radix](radix#multiplication) multiplications use it for their carries.
 
 The bound holds for a sum of $k$ products of residues when
 $\nu + \lceil \log_2 k \rceil \le \bits - 2$, since such a sum is below
@@ -207,4 +210,4 @@ $n \ge 1$. For $n \ge 2$ this is $c$, since
 $\lfloor (B - 1)/n \rfloor + 1 = \lceil B/n \rceil$ for all integers
 $B, n \ge 1$.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED NMOD_DIVREM2_BOUNDED :::
