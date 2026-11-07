@@ -34,8 +34,8 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
     unreduced_fits_halflimb = unreduced_bound < UWORD(1) << (FLINT_BITS / 2);
     reduced_fits_quarterlimb = NMOD_BITS(mod) <= FLINT_BITS / 4;
 
-    ulong npre = n_barrett_precomp(mod.n);
-    ulong npre2 = n_lemire_precomp(mod.n);
+    ulong npre = n_barrett_precomp_preinv(mod.n, mod.ninv);
+    ulong npre2 = n_lemire_precomp_preinv(mod.n, mod.ninv);
 
 #define a(ii, jj) (aa[(ii) * stride + (jj)])
 

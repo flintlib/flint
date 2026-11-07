@@ -264,8 +264,8 @@ _ple_delayed_1(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots)
     bound = (C.mod.n - 1) * (C.mod.n - 1) * FLINT_MIN(A->r, A->c);
     C.lemire = bound < (UWORD(1) << (FLINT_BITS / 2));
     C.lemire_mul = NMOD_BITS(C.mod) <= FLINT_BITS / 4;
-    C.npre = n_barrett_precomp(C.mod.n);
-    C.npre2 = n_lemire_precomp(C.mod.n);
+    C.npre = n_barrett_precomp_preinv(C.mod.n, C.mod.ninv);
+    C.npre2 = n_lemire_precomp_preinv(C.mod.n, C.mod.ninv);
 
     return _ple_delayed(P, Q, A, max_nonpivots, 1, NULL, &C);
 }

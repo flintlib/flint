@@ -22,6 +22,14 @@ TEST_FUNCTION_START(n_divrem2_preinv, state)
 
         d = n_randtest_not_zero(state);
         n = n_randtest(state);
+        if (n_randint(state, 2) == 0)
+        {
+            /* close to a multiple of d */
+            ulong s = n_randint(state, 3);
+            n = (n / d) * d;
+            if (n <= UWORD_MAX - s)
+                n += s;
+        }
 
         norm = flint_clz(d);
         dinv = n_preinvert_limb_prenorm(d << norm);

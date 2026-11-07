@@ -202,8 +202,13 @@ $n$ (top bit set).
 
 ::: function
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
+ulong n_mod2_preinv_lazy(ulong a, ulong n, ulong ninv)
 
 Returns $a \bmod n$. No restrictions on $a$; $n \ne 0$.
+`n_mod2_preinv_lazy` skips the final correction: it returns a value
+congruent to $a$ modulo $n$ and smaller than $n + 2$, that is $a \bmod n$
+or, when $a \bmod n$ is $0$ or $1$, possibly $a \bmod n + n$. It is exact
+for $n \ge 2^{\bits - 1}$.
 :::
 
 ::: function
@@ -298,8 +303,16 @@ or $n$.
 
 ::: function
 ulong n_barrett_precomp(ulong n)
+ulong n_barrett_precomp_preinv(ulong n, ulong ninv)
 
-Returns the precomputed inverse for `n_mod_barrett`. Requires $n \ge 2$.
+Return the precomputed inverse for `n_mod_barrett`.
+`n_barrett_precomp` computes $\lfloor B/n \rfloor$ with one division and
+requires $n \ge 2$. `n_barrett_precomp_preinv` computes
+$\lfloor (B - 1)/n \rfloor$ from the inverse `ninv` of $n$ returned by
+`n_preinvert_limb` (also the `ninv` field of an `nmod_t`), without a
+division, for any $n \ge 1$. The two values differ only when $n$ is a
+power of two, where the second is one less, and both are valid for
+`n_mod_barrett`; for $n = 1$ the second is `UWORD_MAX`.
 :::
 
 ::: function
@@ -332,8 +345,12 @@ support $n = 1$ if `npre` is set to `UWORD_MAX`.
 
 ::: function
 ulong n_lemire_precomp(ulong n)
+ulong n_lemire_precomp_preinv(ulong n, ulong ninv)
 
-Returns the precomputed inverse for `n_mod_lemire`. Requires $n \ge 1$.
+Return the precomputed inverse for `n_mod_lemire`, $\lfloor (B - 1)/n
+\rfloor + 1$ (zero for $n = 1$). Require $n \ge 1$.
+`n_lemire_precomp_preinv` computes the same value from the inverse `ninv`
+of $n$, as `n_barrett_precomp_preinv`, without a division.
 :::
 
 ::: function

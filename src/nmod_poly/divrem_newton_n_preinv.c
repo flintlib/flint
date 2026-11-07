@@ -94,7 +94,7 @@ _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
     }
     else if (NMOD_BITS(mod) < FLINT_BITS / 2)
     {
-        ulong ninv = n_barrett_precomp(mod.n);
+        ulong ninv = n_barrett_precomp_preinv(mod.n, mod.ninv);
 
         for (i = lenA - 1; i >= n; i--)
         {
