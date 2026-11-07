@@ -11,9 +11,42 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "nmod_poly.h"
 #include "mpoly.h"
 #include "nmod_mpoly.h"
+
+/* keeps the terms of A of weighted degree w[0] e[0] + ... at most d */
+static void
+_nmod_mpoly_truncate_weighted(nmod_mpoly_t A, const ulong * w, ulong d,
+                              const nmod_mpoly_ctx_t ctx)
+{
+    slong i, k, len = 0, nvars = ctx->minfo->nvars;
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    ulong * e = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    ulong s;
+
+    for (i = 0; i < A->length; i++)
+    {
+        mpoly_get_monomial_ui(e, A->exps + N*i, A->bits, ctx->minfo);
+
+        s = 0;
+        for (k = 0; k < nvars; k++)
+            s += w[k]*e[k];
+
+        if (s > d)
+            continue;
+
+        A->coeffs[len] = A->coeffs[i];
+        mpoly_monomial_set(A->exps + N*len, A->exps + N*i, N);
+        len++;
+    }
+
+    _nmod_mpoly_set_length(A, len, ctx);
+
+    flint_free(e);
+}
 
 TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
 {
@@ -349,6 +382,172 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         nmod_mpoly_clear(r, ctx);
         nmod_mpoly_clear(s, ctx);
         nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check resultants in several variables, which go through Kronecker
+       substitution into the dense bivariate algorithm, against the
+       univariate form: with exponents that deflate, monomial factors,
+       variables absent from both inputs, common factors, narrow exponent
+       fields, aliasing, and fields too small for the dense algorithm */
+    {
+        slong save_threads = flint_get_num_threads();
+
+        for (i = 0; i < 40 * flint_test_multiplier(); i++)
+        {
+            nmod_mpoly_ctx_t ctx;
+            nmod_mpoly_t a, b, c, r, s;
+            nmod_mpoly_univar_t au, bu;
+            ulong modulus, * bounds, * exp;
+            fmpz * shift, * stride;
+            slong nvars, var, j, k;
+            int common = (n_randint(state, 4) == 0);
+
+            /* now and then too small for the number of evaluation points */
+            if (n_randint(state, 4) == 0)
+                modulus = n_randint(state, FLINT_BITS - 1) + 1;
+            else
+                modulus = n_randint(state, FLINT_BITS - 20) + 20;
+            modulus = n_randbits(state, modulus);
+            modulus = n_nextprime(modulus, 1);
+
+            nvars = 2 + n_randint(state, 3);
+            nmod_mpoly_ctx_init(ctx, nvars, mpoly_ordering_randtest(state), modulus);
+
+            nmod_mpoly_init(a, ctx);
+            nmod_mpoly_init(b, ctx);
+            nmod_mpoly_init(c, ctx);
+            nmod_mpoly_init(r, ctx);
+            nmod_mpoly_init(s, ctx);
+            nmod_mpoly_univar_init(au, ctx);
+            nmod_mpoly_univar_init(bu, ctx);
+
+            bounds = (ulong *) flint_malloc(2*nvars*sizeof(ulong));
+            exp = bounds + nvars;
+            shift = _fmpz_vec_init(nvars);
+            stride = _fmpz_vec_init(nvars);
+
+            flint_set_num_threads(1 + n_randint(state, 4));
+
+            var = n_randint(state, nvars);
+            for (k = 0; k < nvars; k++)
+            {
+                if (k == var)
+                {
+                    bounds[k] = 2 + n_randint(state, 4);
+                    fmpz_one(stride + k);
+                }
+                else
+                {
+                    bounds[k] = (n_randint(state, 4) == 0) ? 1 : 2 + n_randint(state, 3);
+                    /* a common factor undoes the deflation, which would
+                       only leave larger inputs */
+                    fmpz_set_ui(stride + k, common ? 1 : 1 + n_randint(state, 3));
+                    fmpz_set_ui(shift + k, n_randint(state, 3));
+                }
+            }
+
+            nmod_mpoly_randtest_bounds(a, state, 1 + n_randint(state, 40), bounds, ctx);
+            nmod_mpoly_randtest_bounds(b, state, 1 + n_randint(state, 40), bounds, ctx);
+
+            /* half of the time only the terms of bounded weighted degree, for
+               which bounds on the degrees of the resultant of weight above 0
+               in y are the smaller ones */
+            if (n_randint(state, 2))
+            {
+                ulong d;
+
+                for (j = 0; j < 2; j++)
+                {
+                    d = 0;
+                    for (k = 0; k < nvars; k++)
+                    {
+                        exp[k] = 1 + n_randint(state, 3);
+                        d += exp[k]*(bounds[k] - 1);
+                    }
+                    d = d/2 + n_randint(state, d/2 + 1);
+                    _nmod_mpoly_truncate_weighted(j == 0 ? a : b, exp, d, ctx);
+                }
+            }
+
+            /* exponents e -> shift + stride e in the variables other than var,
+               with a different monomial factor for b */
+            nmod_mpoly_inflate(a, a, shift, stride, ctx);
+            k = (var + 1) % nvars;
+            fmpz_add_ui(shift + k, shift + k, 1);
+            nmod_mpoly_inflate(b, b, shift, stride, ctx);
+
+            if (common)
+            {
+                for (k = 0; k < nvars; k++)
+                {
+                    bounds[k] = 2;
+                    exp[k] = (k == var);
+                }
+                nmod_mpoly_randtest_bounds(c, state, 3, bounds, ctx);
+                nmod_mpoly_set_coeff_ui_ui(c, 1, exp, ctx);
+                nmod_mpoly_mul(a, a, c, ctx);
+                nmod_mpoly_mul(b, b, c, ctx);
+            }
+
+            if (n_randint(state, 2))
+            {
+                nmod_mpoly_repack_bits_inplace(a, MPOLY_MIN_BITS, ctx);
+                nmod_mpoly_repack_bits_inplace(b, MPOLY_MIN_BITS, ctx);
+            }
+
+            nmod_mpoly_to_univar(au, a, var, ctx);
+            nmod_mpoly_to_univar(bu, b, var, ctx);
+
+            if (nmod_mpoly_univar_resultant(s, au, bu, ctx))
+            {
+                if (nmod_mpoly_resultant_kronecker(r, a, b, var, ctx))
+                {
+                    nmod_mpoly_assert_canonical(r, ctx);
+
+                    if (!nmod_mpoly_equal(r, s, ctx))
+                    {
+                        flint_printf("FAIL: Check Kronecker resultant\n");
+                        flint_printf("i: %wd  nvars: %wd  var: %wd\n", i, nvars, var);
+                        fflush(stdout);
+                        flint_abort();
+                    }
+                }
+
+                nmod_mpoly_set(r, a, ctx);
+                if (!nmod_mpoly_resultant(r, r, b, var, ctx))
+                {
+                    flint_printf("FAIL: could not compute multivariate resultant\n");
+                    flint_printf("i: %wd  nvars: %wd  var: %wd\n", i, nvars, var);
+                    fflush(stdout);
+                    flint_abort();
+                }
+
+                nmod_mpoly_assert_canonical(r, ctx);
+
+                if (!nmod_mpoly_equal(r, s, ctx) ||
+                    (common && !nmod_mpoly_is_zero(r, ctx)))
+                {
+                    flint_printf("FAIL: Check multivariate resultant\n");
+                    flint_printf("i: %wd  nvars: %wd  var: %wd\n", i, nvars, var);
+                    fflush(stdout);
+                    flint_abort();
+                }
+            }
+
+            flint_free(bounds);
+            _fmpz_vec_clear(shift, nvars);
+            _fmpz_vec_clear(stride, nvars);
+            nmod_mpoly_univar_clear(au, ctx);
+            nmod_mpoly_univar_clear(bu, ctx);
+            nmod_mpoly_clear(a, ctx);
+            nmod_mpoly_clear(b, ctx);
+            nmod_mpoly_clear(c, ctx);
+            nmod_mpoly_clear(r, ctx);
+            nmod_mpoly_clear(s, ctx);
+            nmod_mpoly_ctx_clear(ctx);
+        }
+
+        flint_set_num_threads(save_threads);
     }
 
     TEST_FUNCTION_END(state);

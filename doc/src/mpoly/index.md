@@ -1153,6 +1153,72 @@ exponent vectors of $a$ and $b$ and returns 1; otherwise returns 0. Used
 to detect GCDs whose cofactors are monomials.
 :::
 
+## Helpers for resultants {#resultant}
+
+The resultant functions of `nmod_mpoly` and `fmpz_mpoly` take a resultant
+in several variables through the dense bivariate algorithms by Kronecker
+substitution; see
+[](algorithms/multivariate/modp-bivariate-resultant#kronecker). The
+exponent side of the substitution is common to the coefficient rings and
+is recorded in an `mpoly_resultant_kronecker_t`.
+
+::: type
+mpoly_resultant_kronecker_struct
+mpoly_resultant_kronecker_t
+
+Data about $\mathrm{Res}_y(A, B)$ for the variable $y$ of index `var`:
+the lengths `lenA`, `lenB` of $A$ and $B$ in $y$; for each other variable
+$x_j$ the minimal exponents `Amin[j]`, `Bmin[j]`, the common deflation
+stride `stride[j]`, the bound `bound[j]` $= D_j$ (one more than a bound on
+the degree in $x_j$ of the resultant of the shifted and deflated
+polynomials) and the Kronecker stride `kstride[j]` (0 for a variable that
+does not occur); bounds `tlenA`, `tlenB` on the lengths of the packed
+coefficients in $t$; the number `nused` of variables packed into $t$; the
+number of points `npoints` $= \prod_j D_j$; the number `nterms` of
+monomials of that box within the bound on the total degree of the
+resultant, which estimates its number of terms; the exponents `rshift` of
+the monomial factor of the resultant; and the exponent bits `Rbits` for
+the resultant.
+:::
+
+::: function
+void mpoly_resultant_kronecker_init(mpoly_resultant_kronecker_t K, slong nvars)
+void mpoly_resultant_kronecker_clear(mpoly_resultant_kronecker_t K)
+
+Initialise for $\mathit{nvars} > 0$ variables, and free.
+:::
+
+::: function
+int mpoly_resultant_kronecker_set(mpoly_resultant_kronecker_t K, const ulong * Aexps, slong Alen, flint_bitcnt_t Abits, const ulong * Bexps, slong Blen, flint_bitcnt_t Bbits, slong var, double max_points, const mpoly_ctx_t mctx)
+
+Sets up the substitution for $\mathrm{Res}_y(A, B)$, where $A$ and $B$
+have the monomials `(Aexps, Alen)` and `(Bexps, Blen)`: each variable
+other than $y$ is shifted down to its minimal exponent in each input and
+deflated by the GCD of the remaining exponents in both, the bounds $D_j$
+are the smallest given by
+[](algorithms/multivariate/modp-bivariate-resultant#lem-wdeg), and the
+variables that still occur are given the Kronecker strides
+$S_j = \prod_{i < j} D_i$. Returns 0 if the substitution does not apply:
+an input with exponents of more than one word, a degree in $y$ below 1,
+no other variable left, more than `max_points` points, or exponents of
+the resultant that do not fit in one word.
+:::
+
+::: function
+void mpoly_resultant_kronecker_pack(slong * ey, slong * et, const ulong * exps, slong len, flint_bitcnt_t bits, int B, const mpoly_resultant_kronecker_t K, const mpoly_ctx_t mctx)
+
+Sets `ey[i]` and `et[i]` to the exponent of $y$ and the exponent of $t$
+of the monomial `i` of `(exps, len)`, which are the monomials of $A$, or of
+$B$ if `B` is set.
+:::
+
+::: function
+void mpoly_resultant_kronecker_unpack(ulong * exp, ulong t, const mpoly_resultant_kronecker_t K, const mpoly_ctx_t mctx)
+
+Sets `exp`, packed with `K->Rbits` bits, to the monomial of the resultant
+whose image under the substitution is $t^t$.
+:::
+
 ## Helpers for factorisation {#factor}
 
 ::: macro

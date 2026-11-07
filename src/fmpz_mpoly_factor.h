@@ -376,6 +376,11 @@ void fmpz_bpoly_clear(fmpz_bpoly_t A);
 int _fmpz_bpoly_resultant(fmpz_poly_t res, fmpz_poly_struct * A, slong lenA,
                         fmpz_poly_struct * B, slong lenB, int proved);
 
+/* The same, given that the resultant has length at most rlen in x. */
+int _fmpz_bpoly_resultant_len(fmpz_poly_t res, fmpz_poly_struct * A,
+          slong lenA, fmpz_poly_struct * B, slong lenB, slong rlen,
+          int proved);
+
 int fmpz_bpoly_resultant(fmpz_poly_t res, const fmpz_bpoly_t A,
                         const fmpz_bpoly_t B, int proved);
 

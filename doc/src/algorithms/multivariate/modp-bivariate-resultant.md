@@ -1,6 +1,6 @@
 ---
 title: Bivariate resultants by evaluation and interpolation
-summary: The resultant $\mathrm{Res}_y(A, B) \in \mathbb{F}_p[x]$ of two bivariate polynomials, computed from univariate resultants at many values of $x$ (a geometric progression or roots of unity) and interpolation, with the degree bound, the correction for specialisations that lower the degree, and FLINT's cutoffs.
+summary: The resultant $\mathrm{Res}_y(A, B) \in \mathbb{F}_p[x]$ of two bivariate polynomials, computed from univariate resultants at many values of $x$ (a geometric progression or roots of unity) and interpolation, with the degree bound, the correction for specialisations that lower the degree, the reduction of more variables to two by Kronecker substitution, and FLINT's cutoffs.
 complexity: $O((n_A + n_B) M(N) + N M(n_A) \log n_A)$ operations in $\mathbb{F}_p$ for $N = n_B d_A + n_A d_B + 1$ points, where $n_A, n_B$ are the degrees in the eliminated variable and $d_A, d_B$ those in the other one.
 order: 80
 ---
@@ -32,7 +32,8 @@ is a product of one entry from each row.
 :::
 
 Hence $R$ is determined by its values at $N = n_B d_A + n_A d_B + 1$
-distinct points. The value at $x = a$ must be computed from the
+distinct points, the number Collins [@Col1971] takes for each variable in
+turn. The value at $x = a$ must be computed from the
 specialisations $f = A(a, y)$ and $g = B(a, y)$, whose degrees may be
 lower than $n_A$ and $n_B$ when $a$ is a root of a leading coefficient.
 
@@ -99,6 +100,98 @@ inverse transform (or a geometric interpolation with $r = \sqrt{w}$ when
 that is cheaper). Both loops over the points run in parallel on the
 threads set with `flint_set_num_threads` when the work is large enough.
 
+## More variables: Kronecker substitution {#kronecker}
+
+Let now $A, B \in \mathbb{F}_p[x_1, \ldots, x_k][y]$, of degrees $n_A$,
+$n_B \ge 1$ in $y$ and $d_{A,j}$, $d_{B,j}$ in $x_j$. A ring homomorphism
+$\phi$ of the coefficient ring that keeps the leading coefficients in $y$
+nonzero commutes with the resultant, since the resultant is a polynomial
+in the coefficients: $\phi(\mathrm{Res}_y(A, B)) = \mathrm{Res}_y(\phi(A),
+\phi(B))$. Three such maps reduce the problem to [](#alg-res).
+
+1. *Monomial factors.* If $A = x^a A'$, then $\mathrm{Res}_y(A, B) =
+   x^{a n_B} \mathrm{Res}_y(A', B)$, and similarly for $B$; both are
+   shifted down to their minimal exponent in each $x_j$.
+2. *Deflation.* If every exponent of $x_j$ left in $A$ and $B$ is a
+   multiple of $g_j$, the map $x_j \mapsto x_j^{g_j}$ is injective and its
+   inverse is applied to both.
+3. *Kronecker substitution* [@Kro1882]. With $D_j$ one more than a
+   bound on the degree in $x_j$ of the resultant of the shifted and
+   deflated polynomials, the map $x_j \mapsto t^{S_j}$ with $S_j = D_1
+   \cdots D_{j-1}$ is injective on the polynomials of degree less than
+   $D_j$ in each $x_j$.
+
+The resultant is then recovered from its image in $\mathbb{F}_p[t]$ by
+reading off the digits of each exponent of $t$ in the mixed radix $(D_1,
+\ldots, D_k)$, and [](#alg-res) needs $D_1 \cdots D_k$ points: exactly one
+per coefficient of the dense box of the resultant. The packed
+coefficients of $A$ and $B$ hold at most as many entries, so the memory
+used is of the order of the size of that box. The bounds come from the
+following refinement of [](#lem-deg).
+
+::: lemma Weighted degree bound {#lem-wdeg}
+Let $w \ge 0$, and let $a(w)$ be the largest value of $e + w m$ over the
+terms $x_j^e y^m$ of $A$ (the other variables being ignored), and $b(w)$
+that over the terms of $B$. Then
+$$
+\deg_{x_j} \mathrm{Res}_y(A, B) \le n_B\, a(w) + n_A\, b(w) - w\, n_A n_B.
+$$
+:::
+
+::: proof
+Row $i < n_B$ of the Sylvester matrix holds the coefficient of $y^{c-i}$
+in $A$ in column $c$, a polynomial of degree at most $a(w) + w i - w c$ in
+$x_j$, and row $n_B + i$ holds that of $B$, of degree at most $b(w) + w i
+- w c$. A term of the determinant takes one entry in each row and each
+column, so its degree is at most the sum of these over the rows less $w$
+times the sum of the column indices, which is the right-hand side.
+:::
+
+The weight $w = 0$ gives $n_B d_{A,j} + n_A d_{B,j}$ as in
+[](#lem-deg), which is reached by polynomials dense in a box. The weight
+$w = 1$ gives the Bézout bound $d_A d_B$ when $A$ and $B$ have total
+degrees $d_A$ and $d_B$ in $(x_j, y)$ and the same degrees in $y$: half as
+much, and the box of the resultant of two such polynomials in three
+variables has four times fewer coefficients. The right-hand side is a
+convex, piecewise linear function of $w$, and $a(w)$ only depends on the
+upper convex hull of the points $(m, e)$, so its minimum is at $w = 0$ or
+at a slope $w$ of that hull for $A$ or for $B$; FLINT takes the minimum
+over these. Since $b(w) \ge w n_B$, the bound is at least $n_B d_{A,j}$
+and $n_A d_{B,j}$, so the substitution is also injective on $A$ and $B$,
+and keeps their leading coefficients in $y$ nonzero.
+
+The images of $A$ and $B$ have degree at most $\sum_j d_{A,j} S_j$ and
+$\sum_j d_{B,j} S_j$ in $t$, so that the bound of [](#lem-deg) on the
+degree of their resultant is
+$$
+\sum_j (n_B d_{A,j} + n_A d_{B,j}) S_j + 1 \ge \sum_j (D_j - 1) S_j + 1
+  = D_1 \cdots D_k,
+$$
+with equality when every $D_j$ comes from the weight 0, and
+[](#alg-res) is told the number of points $D_1 \cdots D_k$. Applied to
+the substitution $x_j \mapsto s x_j$ for all $j$ at once,
+[](#lem-wdeg) also bounds the total degree of the resultant in the $x_j$,
+which tells how much of the box the resultant can fill: about half of it
+for inputs dense in total degree with two variables packed, a sixth with
+three.
+
+Over $\mathbb{Z}$ the substitution changes neither the coefficients nor
+their norms, so the multimodular algorithm and its coefficient bound
+apply to the images unchanged.
+
+Collins [@Col1971] eliminates the variables one at a time instead: each
+$x_j$ in turn is evaluated at $n_B d_{A,j} + n_A d_{B,j} + 1$ points,
+down to univariate resultants, which are interpolated back one variable
+at a time. Both take one univariate resultant per point of the box. The
+substitution turns the nested evaluations and interpolations into a
+single one in $t$, which [](#alg-res) does with fast algorithms on
+structured points. Hu and Monagan [@HuMon2016] pack the variables of a
+sparse GCD problem the same way, leaving the main variable alone. For
+GCDs some substitutions are unlucky and have to be detected. There are
+none for the resultant: it commutes with every substitution that keeps
+the leading coefficients in $y$ nonzero, so being injective on the
+resultant is enough.
+
 ## Example {#example}
 
 Two random polynomials of degree 8 in each variable modulo the prime
@@ -159,25 +252,48 @@ deg_x res = 128 (bound 128), equal: 1
 
 ## Use in FLINT {#use}
 
-- `nmod_mpoly_resultant` uses the algorithm for polynomials in exactly two
-  variables, with single-word exponents and positive degrees in the
-  eliminated variable, after converting to dense bivariate form
-  (`nmod_mpoly_get_bpoly`), when the
-  dense boxes are not too large (at most $2^{32}$ entries and points, and
-  not more than 64 times the number of terms beyond $2^{26}$ entries), the
-  inputs are not tiny, and `n_bpoly_mod_resultant_cutoff` predicts a gain:
-  $(n_A + 1)(n_B + 1) \ge 36$, or $\ge 16$ with at least 4096 points.
-  Otherwise, or if $\mathbb{F}_p$ is too small ([](#alg-res) fails), it
+- `nmod_mpoly_resultant_kronecker` applies [](#kronecker) and then
+  [](#alg-res) to polynomials in two or more variables with single-word
+  exponents and positive degrees in the eliminated variable, packing the
+  terms directly into the dense bivariate form; it declines when the dense
+  form would have more than $2^{32}$ entries or points, or when
+  $\mathbb{F}_p$ is too small ([](#alg-res) fails).
+- `nmod_mpoly_resultant` uses it when the dense form does not exceed the
+  input by more than 64 times beyond $2^{26}$ entries and a gain is
+  predicted. With a single variable packed into $t$ (the bivariate case),
+  the inputs must not be tiny and `n_bpoly_mod_resultant_cutoff` must
+  predict a gain: $(n_A + 1)(n_B + 1) \ge 36$, or $\ge 16$ with at least
+  4096 points. With two or more, both inputs must have at least 5 terms
+  and $(T^2/6)^{L - 2} (N'/N)^{16} \ge e^{5.5} N^{1/2}$, where $T$ is the
+  smaller number of terms, $L$ the smaller length in $y$, $N$ the number
+  of points and $N' \le N$ the number of monomials of the box within the
+  bound on the total degree: the subresultant algorithm pays for the terms
+  of the resultant, and the dense algorithm for its whole box. Otherwise it
   uses the subresultant algorithm of Ducos [@Duc2000] on the univariate
   forms (`nmod_mpoly_univar_resultant`).
-- `n_bpoly_mod_resultant` and `_n_bpoly_mod_resultant` implement
-  [](#alg-res) on `n_bpoly_t`.
-- `fmpz_mpoly_resultant` uses `_n_bpoly_mod_resultant` modulo many primes
-  and combines the results by the Chinese remainder theorem (see
-  [](fmpz_mpoly)).
-- `gr_poly_resultant_multipoint`, for polynomials over $\mathbb{F}_p[x]$
-  in the generic rings framework, passes its arguments to
-  `_n_bpoly_mod_resultant` (the memory layouts of `gr_poly` over `nmod`
-  and of `n_bpoly` coincide).
+- `_n_bpoly_mod_resultant_multipoint` implements [](#alg-res) on
+  `n_bpoly_t`, taking the number of points from the caller. It is reached
+  through `_n_bpoly_mod_resultant_len` (and `n_bpoly_mod_resultant`,
+  `_n_bpoly_mod_resultant`), where the bivariate algorithm is chosen by the
+  sizes for every dense bivariate resultant over $\mathbb{F}_p$: those of
+  the Kronecker forms above, of the images modulo primes below and of the
+  generic polynomial rings. [](#alg-res) is the only algorithm there so
+  far; one added there, an algorithm of lower complexity at large degrees
+  for instance [@Vil2018], is used by all of these in its range.
+- `fmpz_mpoly_resultant_kronecker` applies [](#kronecker) and then
+  `_fmpz_bpoly_resultant_len`, which uses `_n_bpoly_mod_resultant_len`
+  modulo many primes and combines the results by the Chinese remainder
+  theorem (see [](fmpz_mpoly)), up to $2^{30}$ entries and $2^{28}$
+  points.
+  `fmpz_mpoly_resultant` uses it under the same conditions as over
+  $\mathbb{F}_p$, except that with two or more variables packed it needs
+  at least 4 terms and $(T^2/6)^{L - 2} (N'/N)^{16} \ge e^{8}$, the
+  number of points mattering little against the coefficient growth of the
+  subresultant algorithm. `fmpq_mpoly_resultant` goes through `fmpz_mpoly_resultant`.
+- `gr_poly_resultant` over a polynomial ring over `nmod` passes its
+  arguments to `_n_bpoly_mod_resultant` when `n_bpoly_mod_resultant_cutoff`
+  predicts a gain, and `gr_poly_resultant_multipoint` to
+  `_n_bpoly_mod_resultant_multipoint` (the memory layouts of `gr_poly`
+  over `nmod` and of `n_bpoly` coincide).
 
-::: functions nmod_mpoly_resultant n_bpoly_mod_resultant n_bpoly_mod_resultant_cutoff :::
+::: functions nmod_mpoly_resultant nmod_mpoly_resultant_kronecker n_bpoly_mod_resultant n_bpoly_mod_resultant_cutoff :::
