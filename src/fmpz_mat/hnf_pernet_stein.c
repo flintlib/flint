@@ -432,6 +432,101 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
     fmpq_mat_clear(x);
 }
 
+/*
+    number and size of the random right-hand sides below, and the size of
+    the prime for their LU, as in fmpz_mat_solve_dixon_den
+*/
+#define ELDIV_RHS_COLS 8
+#define ELDIV_RHS_BOUND 1024
+#define ELDIV_PRIME_BITS 30
+
+/*
+    HNF of the nonsingular square matrix C with |det C| = g, computed
+    modulo a word-sized multiple e of its largest elementary divisor d_n
+    if one is found; returns 0 otherwise.
+
+    Every (n-1)-minor of a matrix is divisible by |det| / d_n, so g is
+    large whenever the determinant spreads over many elementary divisors,
+    e.g. for an HNF with many pivots 2. Recursing on such a C removes one
+    row per level, about n levels with a determinant each.
+
+    e is the common denominator of C^{-1} B for a random B with
+    ELDIV_RHS_COLS columns. It divides d_n and misses a prime p dividing
+    d_n with probability about p^-ELDIV_RHS_COLS. For any e,
+    fmpz_mat_hnf_modular_eldiv returns the HNF of L(C) + eZ^n, which has
+    determinant g exactly when eZ^n is contained in L(C), so comparing
+    the product of its pivots with g certifies it.
+*/
+static int
+hnf_square_small_eldiv(fmpz_mat_t H, const fmpz_mat_t C, const fmpz_t g,
+        flint_rand_t state)
+{
+    slong i, j, n = C->r, * P;
+    int ok;
+    ulong p;
+    fmpz_t e, den, det;
+    fmpz_mat_t B, X;
+    nmod_mat_t LU;
+
+    fmpz_init(e);
+    fmpz_init(den);
+    fmpz_mat_init(B, n, 1);
+    fmpz_mat_init(X, n, 1);
+    nmod_mat_init(LU, n, n, 2);
+    P = _perm_init(n);
+
+    /*
+        one column at a time, sharing one LU modulo p: this stops early
+        when e is large, and deep in the recursion C can have a row of huge
+        entries, on which the Dixon solver is far slower with several
+        columns than with one. den is the lcm of the column's denominators.
+    */
+    p = _fmpz_mat_find_good_prime_and_lu2(LU, P, C, g, ELDIV_PRIME_BITS, 1);
+
+    fmpz_one(e);
+    ok = 1;
+    for (j = 0; ok && j < ELDIV_RHS_COLS; j++)
+    {
+        for (i = 0; i < n; i++)
+            fmpz_set_si(fmpz_mat_entry(B, i, 0),
+                (slong) n_randint(state, 2 * ELDIV_RHS_BOUND + 1)
+                    - ELDIV_RHS_BOUND);
+
+        ok = _fmpz_mat_solve_dixon_den_given_lu(X, den, C, B, LU, P, p);
+
+        if (ok)
+        {
+            fmpz_lcm(e, e, den);
+            ok = fmpz_abs_fits_ui(e);
+        }
+    }
+
+    /* e = 1 cannot pass the check, as g > 1 */
+    ok = ok && !fmpz_is_one(e);
+
+    if (ok)
+    {
+        fmpz_init(det);
+        fmpz_mat_set(H, C);
+        fmpz_mat_hnf_modular_eldiv(H, e);
+
+        fmpz_one(det);
+        for (i = 0; i < n; i++)
+            fmpz_mul(det, det, fmpz_mat_entry(H, i, i));
+
+        ok = fmpz_equal(det, g);
+        fmpz_clear(det);
+    }
+
+    _perm_clear(P);
+    nmod_mat_clear(LU);
+    fmpz_mat_clear(X);
+    fmpz_mat_clear(B);
+    fmpz_clear(den);
+    fmpz_clear(e);
+    return ok;
+}
+
 void
 fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
 {
@@ -552,8 +647,12 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
         {
             fmpz_mat_init(H1, r - 1, r - 1);
 
-            if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, recurse */
-                fmpz_mat_hnf_pernet_stein(H1, C, state);
+            /* if g is too big, try a small modulus, else recurse */
+            if (COEFF_IS_MPZ(*g) && C->r > 3)
+            {
+                if (!hnf_square_small_eldiv(H1, C, g, state))
+                    fmpz_mat_hnf_pernet_stein(H1, C, state);
+            }
             else                    /* use modulo determinant algorithm to compute HNF of C */
                 fmpz_mat_hnf_modular(H1, C, g);
 
