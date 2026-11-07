@@ -165,7 +165,8 @@ exploit this. For an $m \times n$ matrix of rank $r$,
    small with high probability for random input. Compute its HNF modulo
    $g$ (`fmpz_mat_hnf_modular`). If $g$ is large, try instead the
    common denominator $e$ of $C^{-1} B$ for a few random columns $B$, a
-   divisor of the largest elementary divisor of $C$: if $e$ fits in a
+   divisor of the largest elementary divisor of $C$
+   [@AbbottBronsteinMulders1999; @Pan1988; @EGV2000]: if $e$ fits in a
    word, the HNF modulo $e$ (`fmpz_mat_hnf_modular_eldiv`) is that of
    $C$ exactly when its pivots multiply to $g$. Otherwise recurse on $C$.
    Since every $(n-1)$-minor is divisible by $|\det A| / d_n$, $g$ is
