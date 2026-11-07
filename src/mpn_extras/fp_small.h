@@ -40,7 +40,7 @@ _flint_mpn_fdiv_1_kernel_preinv(ulong * rem, ulong * s, ulong a, ulong b, ulong 
     t = (a >= b);
     nh = a >> t;
     nl = (a << (FLINT_BITS - 1)) & (-t);
-    FLINT_MPN_UDIV_QR_2BY1(q, r, nh, nl, b, binv);
+    udiv_qrnnd_preinv(q, r, nh, nl, b, binv);
     *rem = r;
     *s = t;
     return q;

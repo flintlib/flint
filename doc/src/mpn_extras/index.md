@@ -1460,18 +1460,16 @@ dividends.
 :::
 
 ::: macro
-FLINT_MPN_UDIV_QR_2BY1(q, r, nh, nl, d, di)
 FLINT_MPN_UDIV_QR_3BY2(q, r1, r0, n2, n1, n0, d1, d0, dinv)
 FLINT_MPN_UDIV_QR_3BY2_HW(q, r1, r0, n2, n1, n0, d1, d0)
 
-Möller–Granlund 2/1 division of $(n_h, n_l)$ by the normalised limb $d$
-with inverse `di` = $\lfloor (B^2 - 1)/d \rfloor - B$ (requires
-$n_h < d$), and 3/2 division of $(n_2, n_1, n_0)$ by the normalised
+Möller–Granlund 3/2 division of $(n_2, n_1, n_0)$ by the normalised
 $(d_1, d_0)$ with `dinv` = `flint_mpn_preinv1(d1, d0)` (requires
-$(n_2, n_1) < (d_1, d_0)$) [@GraMol2010]. The `HW` version does the 3/2
-division without an inverse, by one hardware 2/1 division and at most two
-corrections (a step of Knuth's algorithm D); it is only sensible where
-hardware division is fast (`FLINT_PREINVERT_LIMB_USE_NATIVE`).
+$(n_2, n_1) < (d_1, d_0)$) [@GraMol2010]; the 2/1 division is
+`udiv_qrnnd_preinv` of [](longlong). The `HW` version does the 3/2
+division without an inverse, by one hardware 2/1 division and at most
+two corrections (a step of Knuth's algorithm D); it is only sensible
+where hardware division is fast (`FLINT_PREINVERT_LIMB_USE_NATIVE`).
 :::
 
 ::: macro
