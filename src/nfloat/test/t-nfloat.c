@@ -122,6 +122,7 @@ TEST_FUNCTION_START(nfloat, state)
 
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_abs, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_abs2, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sgn, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqr, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0);

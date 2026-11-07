@@ -565,6 +565,7 @@ int nfloat_complex_mul_2exp_si(nfloat_complex_ptr res, nfloat_complex_srcptr x, 
 int nfloat_complex_cmp(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
 int nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
 int nfloat_complex_abs(nfloat_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_abs2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
 
 int nfloat_complex_exp(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
 int nfloat_complex_expm1(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);

@@ -199,6 +199,7 @@ GR_VEC_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { 
 typedef int ((*gr_method_vec_reduce_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_apply_2x2_op)(gr_ptr, gr_ptr, slong, slong, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_strided_op)(gr_ptr, gr_srcptr, int, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_si_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const slong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_ui_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const ulong *, slong, gr_ctx_ptr));
@@ -206,6 +207,7 @@ typedef int ((*gr_method_vec_dot_fmpz_op)(gr_ptr, gr_srcptr, int, gr_srcptr, con
 
 #define GR_VEC_REDUCE_OP(ctx, NAME) (((gr_method_vec_reduce_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_APPLY_2X2_OP(ctx, NAME) (((gr_method_vec_apply_2x2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_STRIDED_OP(ctx, NAME) (((gr_method_vec_dot_strided_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_SI_OP(ctx, NAME) (((gr_method_vec_dot_si_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_UI_OP(ctx, NAME) (((gr_method_vec_dot_ui_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -215,6 +217,9 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sum(gr_ptr res, gr_srcptr vec, slon
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_product(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_REDUCE_OP(ctx, VEC_PRODUCT)(res, vec, len, ctx); }
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
+WARN_UNUSED_RESULT int _gr_vec_apply_2x2_generic(gr_ptr u, gr_ptr v, slong stride, slong len, gr_srcptr M, gr_ctx_t ctx);
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_apply_2x2(gr_ptr u, gr_ptr v, slong stride, slong len, gr_srcptr M, gr_ctx_t ctx) { return GR_VEC_APPLY_2X2_OP(ctx, VEC_APPLY_2X2)(u, v, stride, len, M, ctx); }
+
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_STRIDED_OP(ctx, VEC_DOT_STRIDED)(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_SI_OP(ctx, VEC_DOT_SI)(res, initial, subtract, vec1, vec2, len, ctx); }

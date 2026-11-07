@@ -1428,6 +1428,14 @@ FLINT_FORCE_INLINE vec8dz vec8dz_fnmadd(vec8dz a, vec8dz b, vec8dz c) {
     return _mm512_fnmadd_pd(a, b, c);
 }
 
+FLINT_FORCE_INLINE vec8dz vec8dz_fmsub(vec8dz a, vec8dz b, vec8dz c) {
+    return _mm512_fmsub_pd(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_fnmsub(vec8dz a, vec8dz b, vec8dz c) {
+    return _mm512_fnmsub_pd(a, b, c);
+}
+
 FLINT_FORCE_INLINE vec8dz vec8dz_floor(vec8dz a) {
     return _mm512_floor_pd(a);
 }

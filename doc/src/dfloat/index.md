@@ -118,7 +118,7 @@ int dfloat_is_supported(void)
 Returns whether the module works on this target. It requires that the
 module was compiled without contraction of floating-point expressions
 (`-ffp-contract=off` or the equivalent pragma), with doubles evaluated
-in double precision (`FLT_EVAL_METHOD` 0, so not with x87 arithmetic),
+in double precision (`FLT_EVAL_METHOD` 0, 1 or 16, so not with x87 arithmetic),
 and that `fma` is correctly rounded, which is tested once at run time.
 Where it returns 0, the other functions of this module must not be
 called; `gr_ctx_init_dfloat` returns `GR_UNABLE` and the power sums
@@ -157,13 +157,31 @@ loses exactness ($(2^{60} + 1) \cdot 3$ then gets a radius of about
 $2^{-46}$).
 
 The rings implement only operations with native code: the arithmetic,
-the elementary functions documented below and their vector versions.
+the elementary functions documented below and their vector versions,
+and for the plain formats the matrix methods described next.
 Special functions such as `gr_gamma` and `gr_zeta` return `GR_UNABLE`;
 use an `arb_t` ring for them. The constants `gr_pi`, `gr_euler` and
 `gr_catalan` are table lookups. Conversions with `gr_set_other` exist
 between the `dfloat` rings and from and to `arb_t`, `acb_t`, `fmpz`
 and `fmpq`; see [](dfloat/balls) for the rules on nonfinite values and
 status codes.
+
+The plain rings, real and complex, implement the matrix methods that the
+`gr_mat` algorithms build on: the product (`gr_mat_mul`), the LU
+decomposition (`gr_mat_lu`), triangular solving
+(`gr_mat_nonsingular_solve_tril` and `gr_mat_nonsingular_solve_triu`),
+the determinant (through the LU decomposition) and the pivot search (the
+entry of largest magnitude, `gr_mat_find_nonzero_pivot_large_abs`), so
+that `gr_mat_nonsingular_solve`, `gr_mat_inv`, `gr_mat_det` and the
+eigensolver `gr_mat_eig_qr` run as floating-point linear algebra with
+partial pivoting. The product is `flint_dgemm` for `d1` (one `dgemm` of
+twice the size for `d1c`) and a SIMD kernel otherwise, which for very
+large matrices hands over to `arb_mat_approx_mul` or `acb_mat_approx_mul`;
+the LU decomposition and the triangular solvers are block recursive with
+SIMD base cases. The complex rings also implement `gr_abs2`, `gr_cmpabs`
+and `_gr_vec_apply_2x2` for the eigensolver. The ball rings use the
+generic algorithms. See [](algorithms/floating-point/dfloat-matrices) for
+the algorithms and [](dfloat/performance#linear-algebra) for timings.
 :::
 :::
 
@@ -1130,6 +1148,16 @@ void _d4_vec_rsqrt(d4_ptr res, d4_srcptr x, slong len)
 Elementwise sum, difference, product, product with the scalar $c$,
 accumulation of $\pm c\, x_i$ into `res`, quotient, square root and
 reciprocal square root.
+
+::: details
+In the sums, products and products by a scalar, a result whose
+components need shifting up (a zero head, or a zero before a nonzero
+component, from an exactly zero factor or an exact cancellation) is
+shifted in its lane as the scalar operation shifts it, so that data with
+many exact zeros (real numbers stored as complex ones, structured
+matrices) keeps the SIMD speed; only nonfinite results are redone in
+scalar code.
+:::
 :::
 
 ::: function
@@ -1487,6 +1515,10 @@ void d1c_arg(d1_t res, d1c_srcptr x)
 void d2c_arg(d2_t res, d2c_srcptr x)
 void d3c_arg(d3_t res, d3c_srcptr x)
 void d4c_arg(d4_t res, d4c_srcptr x)
+void d1c_abs2(d1_t res, d1c_srcptr x)
+void d2c_abs2(d2_t res, d2c_srcptr x)
+void d3c_abs2(d3_t res, d3c_srcptr x)
+void d4c_abs2(d4_t res, d4c_srcptr x)
 void d1cb_neg(d1cb_t res, d1cb_srcptr x)
 void d2cb_neg(d2cb_t res, d2cb_srcptr x)
 void d3cb_neg(d3cb_t res, d3cb_srcptr x)
@@ -1551,9 +1583,10 @@ void d4cb_arg(d4b_t res, d4cb_srcptr x)
 Arithmetic: negation, conjugate, sum, difference, product, square,
 product with a real number (`mul_re`) or with $i$ (`mul_onei`),
 multiplication by $2^e$, quotient, inverse, principal square root and
-reciprocal square root, absolute value and argument
-$\operatorname{atan2}(b, a) \in (-\pi, \pi]$ (0 for 0) as real
-elements. The ball versions of `div`, `inv` and `rsqrt` return a status
+reciprocal square root, absolute value, argument
+$\operatorname{atan2}(b, a) \in (-\pi, \pi]$ (0 for 0) and squared
+absolute value $a^2 + b^2$ (`abs2`, with no square root; the square of
+the nonzero part when the other is exactly zero) as real elements. The ball versions of `div`, `inv` and `rsqrt` return a status
 (`GR_DOMAIN` only for an exactly zero divisor or argument, `GR_UNABLE`
 if it contains zero).
 
@@ -1872,6 +1905,43 @@ Vector operations, implemented with the real vector operations:
 the dot products are two real dot products per block of 32 terms (3 to
 4 times faster than a loop of complex products); `vec_exp` uses the
 real `vec_exp` and `vec_sin_cos` on blocks of 32 elements.
+
+::: details
+The products by a complex scalar (`vec_mul_scalar`,
+`vec_addmul_scalar`, `vec_submul_scalar`) run the four real products and
+the two sums of each complex product in the SIMD lanes, four elements at
+a time, with the same results as the scalar loop; blocks with an
+exactly real element or a nonfinite result are done in scalar code. A
+scalar that is exactly real or imaginary uses the real operations on
+the parts.
+:::
+:::
+
+::: function
+void _d1c_vec_apply_2x2(d1c_ptr u, d1c_ptr v, slong stride, slong len, d1c_srcptr M)
+void _d2c_vec_apply_2x2(d2c_ptr u, d2c_ptr v, slong stride, slong len, d2c_srcptr M)
+void _d3c_vec_apply_2x2(d3c_ptr u, d3c_ptr v, slong stride, slong len, d3c_srcptr M)
+void _d4c_vec_apply_2x2(d4c_ptr u, d4c_ptr v, slong stride, slong len, d4c_srcptr M)
+
+Sets $(u_i, v_i)$ to $(M_0 u_i + M_1 v_i, M_2 u_i + M_3 v_i)$ for the
+elements $u_i$ = `u[i * stride]` and $v_i$ = `v[i * stride]`,
+$0 \le i < \mathit{len}$: the plane rotations of the QR algorithm, on rows
+(`stride` 1) or on columns. The vectors must not overlap and `M` must
+not alias them. This is the `vec_apply_2x2` method of the plain complex
+rings (see `_gr_vec_apply_2x2`).
+
+::: details
+Each part of each output is the sum of the real products of the parts
+of the inputs with the parts of the coefficients, computed as exact
+products and a single renormalisation of their sum, in SIMD four
+elements at a time (including the last, partial block). The terms with
+an exactly zero coefficient part are left out: with a real diagonal (a
+rotation with a real cosine) each part is a sum of three products, with
+a real matrix of two. The result for an element does not depend on its
+position in the vector. With real cosines, a rotation costs about 15,
+45 and 100 ns per pair of elements for `d2c`, `d3c` and `d4c`; it takes
+about three quarters of the time of `gr_mat_eig_qr` for $N \ge 2$.
+:::
 :::
 
 ## Sieved power sums and Platt's multi-evaluation {#powsum}

@@ -33,7 +33,7 @@ _leaf_residue(nn_srcptr res, const flint_mpn_crt_t C, slong j)
 
     /* hi < leaf modulus, see crt_init.c */
     if (C->leaf[j].mod.norm != 0)
-        return _n_ll_rem_l_nonfullword(hi, lo, C->leaf[j].mod.n, C->leaf[j].qhi, C->leaf[j].qlo);
+        return n_ll_mod_barrett(hi, lo, C->leaf[j].mod.n, C->leaf[j].qhi, C->leaf[j].qlo);
     NMOD_RED2_FULLWORD(u, hi, lo, C->leaf[j].mod);
     return u;
 }

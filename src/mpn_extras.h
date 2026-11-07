@@ -312,62 +312,9 @@ char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int ne
 #define MPN_RIGHT_SHIFT_LOW(hi, lo, n) \
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n)))) : (lo))
 
-#define FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)           \
-    do {                                                    \
-        mp_limb_t t1;                                       \
-        umul_ppmm(r1, r0, a0, b0);                          \
-        umul_ppmm(r2, t1, a1, b0);                          \
-        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
-    } while (0)
-
-#define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
-    do {                                                                  \
-        mp_limb_t __v1, __v2, __u1, __u2;                                 \
-        mp_limb_t __r3, __r2, __r1, __r0;                                 \
-        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
-        umul_ppmm(__r1, __r0, __a0, __b0);                                \
-        umul_ppmm(__r3, __r2, __a1, __b1);                                \
-        umul_ppmm(__v2, __v1, __a0, __b1);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __v2, __v1); \
-        umul_ppmm(__u2, __u1, __a1, __b0);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
-    } while (0)
-
-/* Low two words of 2x2 product */
-#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
-    do { \
-        umul_ppmm(r1, r0, a0, b0); \
-        (r1) += (a0) * (b1) + (a1) * (b0); \
-    } while (0)
-
-/* Low three words of 2x2 product */
-#define FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)                \
-    do {                                                               \
-        mp_limb_t __t1, __t2, __u1, __u2;                              \
-        mp_limb_t __r2, __r1, __r0;                                    \
-        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);  \
-        umul_ppmm(__r1, __r0, __a0, __b0);                             \
-        __r2 = __a1 * __b1;                                            \
-        umul_ppmm(__t2, __t1, __a0, __b1);                             \
-        add_ssaaaa(__r2, __r1, __r2, __r1, __t2, __t1);                \
-        umul_ppmm(__u2, __u1, __a1, __b0);                             \
-        add_ssaaaa(__r2, __r1, __r2, __r1, __u2, __u1);                \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2;                         \
-    } while (0)
-
-#define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
-    do {                                                                     \
-        mp_limb_t __u1, __u2, __u3;                                          \
-        mp_limb_t __r3, __r2, __r1, __r0;                                    \
-        mp_limb_t __a1 = (a1), __a0 = (a0);                                  \
-        umul_ppmm(__u2, __u1, __a0, __a1);                                   \
-        add_sssaaaaaa(__u3, __u2, __u1, 0, __u2, __u1, 0, __u2, __u1);       \
-        umul_ppmm(__r1, __r0, __a0, __a0);                                   \
-        umul_ppmm(__r3, __r2, __a1, __a1);                                   \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __u3, __u2, __u1); \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
-    } while (0)
+/* FLINT_MPN_MUL_2X1, FLINT_MPN_MUL_2X2, FLINT_MPN_MULLOW_2X2,
+   FLINT_MPN_MUL_3P2X2 and FLINT_MPN_SQR_2X2 (products of one- and two-limb
+   operands in registers) are in longlong.h */
 
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
 /* Assumes n >= 2 */

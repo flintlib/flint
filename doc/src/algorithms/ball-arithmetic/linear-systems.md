@@ -99,6 +99,92 @@ number, and the method succeeds as soon as the precision exceeds $\log_2
 \kappa(A)$ by a few bits, independently of $n$. The interval elimination
 of step 3 is rarely the bottleneck because $RA$ is almost diagonal.
 
+## Floating-point backends for the approximate functions {#backends}
+
+The approximate functions that compute $R$ and the approximate
+solutions (`arb_mat_approx_lu`, `arb_mat_approx_solve`,
+`arb_mat_approx_inv`, `arb_mat_approx_solve_lu_precomp`,
+`arb_mat_approx_solve_tril`, `arb_mat_approx_solve_triu`, their complex
+versions, and `acb_mat_approx_eig_qr` for
+[eigenvalues](algorithms/ball-arithmetic/eigenvalues)) work only on the
+midpoints and promise no accuracy beyond that of floating-point
+arithmetic at precision $p$. They therefore convert the midpoints to a
+faster floating-point type when one can do the work, call the generic
+algorithm of `gr_mat` there, and convert the result back:
+
+1. The multi-double formats of `dfloat`
+   ([](algorithms/floating-point/dfloat-matrices)), `dN` or `dNc` with
+   the smallest $N \le 4$ such that $p + 2(N - 1) \le 53N$: up to 53,
+   104, 155 and 206 bits. The padding of $2(N-1)$ bits covers the slightly
+   lower effective accuracy of the expansions: measured on random
+   matrices, solutions are as accurate as with `arf_t` at $53N$ bits
+   (within one bit), while the eigenvalues lose about 1.5 bits with
+   `d2c` and up to 3 bits on average (6 at worst) with `d4c`. Since
+   `nfloat` is faster for small matrices at three and four doubles,
+   `dfloat` is used for LU decompositions and solving only from
+   dimension $8N$ when $N \ge 2$ (always for $N = 1$ and for
+   eigenvalues). `dfloat` must be supported on the target
+   (`dfloat_is_supported`).
+2. Otherwise, `nfloat` or `nfloat_complex` at $p$ rounded up to a
+   multiple of 64 bits, if this is at most 4224 bits.
+3. Otherwise, or if both fail, `arf_t` (`acf_t` for complex matrices) at
+   $p$ bits, or 53 if $p$ is smaller (at a handful of bits the QR
+   iteration gives meaningless results); the entries are not converted
+   or scaled.
+
+The same generic algorithms of `gr_mat` run in all three cases; the
+functions have no other implementation. `dfloat` and `nfloat` are used
+from dimension 4, and for triangular solving only with four or more
+right-hand sides (below that, the conversions cost as much as the
+solving).
+
+*Scaling.* The doubles have exponents in $[-1022, 1023]$ (and the last
+component of an expansion lies $53(N-1)$ bits below the first), the
+`nfloat` exponents are bounded by about $2^{61}$, while the exponents of
+`arf_t` are unbounded. The matrix and the right-hand side are therefore
+scaled by powers of two, exactly, to bring their largest entries into
+$[1/2, 1)$, and the result is scaled back: $X = 2^{s_A - s_B} X'$ for
+$A' = 2^{s_A} A$ and $B' = 2^{s_B} B$, eigenvalues by $2^{-s_A}$, while
+eigenvectors and the relative deflation tolerance are unaffected. The
+$U$ factor of an LU decomposition is scaled, the unit triangular $L$
+factor is not (it contains the ones of its diagonal, so its range is
+fixed). After scaling, `dfloat` is used only if the exponents of the
+nonzero entries span at most $(1022 - 53N)/2 - 32$ bits (452, 426, 399
+and 373 for $N = 1, \ldots, 4$), so that products of two entries keep
+all their components above the subnormal range; a matrix with a wider
+range, such as $\operatorname{diag}(1, 2^{-2000})$, goes to `nfloat`.
+Inputs with nonfinite midpoints or exponents beyond $\pm 2^{61}$ go to
+`arf_t` directly.
+
+*Fallbacks.* A backend fails if a conversion or an operation overflows
+or underflows (which `nfloat` reports), if the `dfloat` result has a
+nonfinite entry, if an LU decomposition finds the matrix singular, or
+if the QR iteration does not converge; the next backend is then tried
+on the original data, and `arf_t`, which does not fail on exponents,
+has the last word: it decides that a matrix is singular, and the
+eigenvalue function then writes its approximations even if the
+iteration has not converged. The results are written only when the
+computation has succeeded, so the outputs may alias the inputs.
+
+Times in milliseconds for $64 \times 64$ matrices with random entries,
+one thread, for the former implementations on `arf_t` and with the
+backends (with the conversions; `dfloat` up to 200 bits, `nfloat`
+above):
+
+| $p$ | 53 | 100 | 150 | 200 | 256 | 1024 | 4096 |
+|---|---|---|---|---|---|---|---|
+| `arb_mat_approx_inv`, `arf_t` | 2.9 | 3.3 | 7.3 | 8.1 | 8.2 | 28 | 265 |
+| `arb_mat_approx_inv`, backend | 0.31 | 0.81 | 1.7 | 2.7 | 3.9 | 18 | 162 |
+| `acb_mat_approx_inv`, `acf` | 12 | 13 | 28 | 32 | 32 | 108 | 1055 |
+| `acb_mat_approx_inv`, backend | 0.68 | 2.3 | 4.7 | 8.5 | 12 | 58 | 497 |
+| `acb_mat_approx_eig_qr`, `acf` | 228 | 284 | 562 | 649 | 730 | 3350 | |
+| `acb_mat_approx_eig_qr`, backend | 4.0 | 23 | 59 | 116 | 329 | 2492 | |
+
+(`acb_mat_approx_eig_qr` with right eigenvectors.) Since these
+functions dominate the time of `arb_mat_solve`, `arb_mat_inv` and the
+eigenvalue enclosures at low precision, those become several times
+faster as well; the ball arithmetic of the certification is unchanged.
+
 ## Certifying an approximate solution {#preapprox}
 
 If an approximate solution $T$ and an approximate inverse $R$ are already
@@ -182,7 +268,8 @@ variants), which do not precondition.
   versions ([](#det)).
 - The approximate functions `arb_mat_approx_lu`, `arb_mat_approx_solve`,
   `arb_mat_approx_inv` and `arb_mat_approx_mul` work with midpoints only
-  and give no error bounds.
+  and give no error bounds; all but the product use the floating-point
+  backends of [](#backends).
 - Generic code: `gr_mat_det` over the ball contexts calls `arb_mat_det`
   and `acb_mat_det`, and `gr_mat_mul` calls the ball matrix
   multiplication, but `gr_mat_nonsingular_solve` and `gr_mat_inv` use

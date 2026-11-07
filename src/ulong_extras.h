@@ -255,6 +255,52 @@ ulong n_mod2_preinv_lazy(ulong a, ulong n, ulong ninv);
 ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, ulong n, ulong ninv);
 ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
 
+/* Barrett reduction of 2 or 3 words by n < 2^(FLINT_BITS - 1),
+ * see doc: algorithms/arithmetic/barrett#two-words  */
+ULONG_EXTRAS_INLINE void
+n_ll_barrett_precomp_preinv(ulong * qhi, ulong * qlo, ulong * b1, ulong * b2,
+                            ulong n, ulong ninv)
+{
+    unsigned int norm = flint_clz(n);
+    ulong d = n << norm, q, r;
+
+    FLINT_ASSERT(n >= 2);
+
+    udiv_qrnnd_preinv(q, r, UWORD(1) << norm, UWORD(0), d, ninv);
+    *qhi = q;
+    *b1 = r >> norm;
+    udiv_qrnnd_preinv(q, r, r, UWORD(0), d, ninv);
+    *qlo = q;
+    *b2 = r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_ll_mod_barrett(ulong hi, ulong lo, ulong n, ulong qhi, ulong qlo)
+{
+    ulong c2, c1, c0;
+
+    FLINT_ASSERT(n < (UWORD(1) << (FLINT_BITS - 1)));
+
+    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, hi, lo);
+    (void) c1;
+    (void) c0;
+    lo -= c2 * n;
+    return (lo >= n) ? lo - n : lo;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_lll_mod_barrett(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo,
+                  ulong b1, ulong b2)
+{
+    ulong h, l, t1, t0;
+
+    umul_ppmm(h, l, y2, b2);
+    umul_ppmm(t1, t0, y1, b1);
+    add_ssaaaa(h, l, h, l, t1, t0);
+    add_ssaaaa(h, l, h, l, UWORD(0), y0);
+    return n_ll_mod_barrett(h, l, n, qhi, qlo);
+}
+
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 

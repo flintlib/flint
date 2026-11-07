@@ -544,6 +544,33 @@ _gr_complex_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_complex_ctx_t ctx)
     return status;
 }
 
+/* |x|^2 = a^2 + b^2 in the real ring; no square root. */
+static int
+_gr_complex_abs2(gr_ptr res, gr_srcptr x, gr_complex_ctx_t ctx)
+{
+    gr_srcptr a = RE(x, ctx), b = IM(x, ctx);
+    gr_ptr c = RE(res, ctx), d = IM(res, ctx);
+    gr_ctx_struct * real_ctx = REAL_CTX(ctx);
+    int status = GR_SUCCESS;
+
+    if (c == a)
+    {
+        /* res aliases x: square b into d first, then a into c */
+        status |= gr_sqr(d, b, real_ctx);
+        status |= gr_sqr(c, a, real_ctx);
+        status |= gr_add(c, c, d, real_ctx);
+    }
+    else
+    {
+        status |= gr_sqr(c, a, real_ctx);
+        status |= gr_addmul(c, b, b, real_ctx);
+    }
+
+    status |= gr_zero(d, real_ctx);
+
+    return status;
+}
+
 static int
 _gr_complex_abs(gr_ptr res, gr_srcptr x, gr_complex_ctx_t ctx)
 {
@@ -711,6 +738,7 @@ gr_method_tab_input _gr_complex_methods_input[] =
 */
 
     {GR_METHOD_ABS,               (gr_funcptr) _gr_complex_abs},
+    {GR_METHOD_ABS2,              (gr_funcptr) _gr_complex_abs2},
     {GR_METHOD_RE,               (gr_funcptr) _gr_complex_re},
     {GR_METHOD_IM,               (gr_funcptr) _gr_complex_im},
     {GR_METHOD_CONJ,             (gr_funcptr) _gr_complex_conj},

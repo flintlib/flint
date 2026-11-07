@@ -2806,6 +2806,20 @@ gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr v
 }
 
 /* todo: when to multiply repeatedly by x vs squaring? */
+/* |x|^2.  Rings that can compute this without a square root -- any
+   floating-point complex ring, via a sum of squares -- should override
+   this; the fallback is significantly more expensive. */
+int
+gr_generic_abs2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    status |= gr_abs(res, x, ctx);
+    status |= gr_sqr(res, res, ctx);
+
+    return status;
+}
+
 int
 gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
@@ -3320,6 +3334,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_PRODUCT,             (gr_funcptr) _gr_vec_product_generic},
 
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
+    {GR_METHOD_VEC_APPLY_2X2,           (gr_funcptr) _gr_vec_apply_2x2_generic},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED,         (gr_funcptr) gr_generic_vec_dot_strided},
     {GR_METHOD_VEC_DOT_UI,              (gr_funcptr) gr_generic_vec_dot_ui},
@@ -3327,6 +3342,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_DOT_FMPZ,            (gr_funcptr) gr_generic_vec_dot_fmpz},
 
     {GR_METHOD_VEC_RECIPROCALS,         (gr_funcptr) gr_generic_vec_reciprocals},
+    {GR_METHOD_ABS2,                    (gr_funcptr) gr_generic_abs2},
     {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
 
     {GR_METHOD_VEC_SET_OTHER,           (gr_funcptr) gr_generic_vec_set_other},

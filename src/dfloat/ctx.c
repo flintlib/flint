@@ -88,7 +88,9 @@ dfloat_is_supported(void)
 {
 #if !DFLOAT_NO_CONTRACTION
     return 0;
-#elif defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
+#elif defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0 && FLT_EVAL_METHOD != 1 && FLT_EVAL_METHOD != 16
+    /* 0 and 1 evaluate double operations in double; 16 (ISO/IEC TS
+       18661-3, e.g. GCC with AVX512-FP16) only widens _Float16 */
     return 0;
 #else
     /* 0: not yet known, 1: supported, -1: not supported (the race of

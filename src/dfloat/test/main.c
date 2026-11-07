@@ -31,11 +31,13 @@
 #include "t-ball_arith.c"
 #include "t-canonical.c"
 #include "t-complex.c"
+#include "t-complex_vec.c"
 #include "t-elementary.c"
 #include "t-exp.c"
 #include "t-gr.c"
 #include "t-gr_vec.c"
 #include "t-logatan.c"
+#include "t-mat.c"
 #include "t-nonfinite.c"
 #include "t-platt_smk.c"
 #include "t-powsum.c"
@@ -52,11 +54,13 @@ test_struct tests[] =
     TEST_FUNCTION(ball_arith),
     TEST_FUNCTION(canonical),
     TEST_FUNCTION(complex),
+    TEST_FUNCTION(complex_vec),
     TEST_FUNCTION(elementary),
     TEST_FUNCTION(exp),
     TEST_FUNCTION(gr),
     TEST_FUNCTION(gr_vec),
     TEST_FUNCTION(logatan),
+    TEST_FUNCTION(mat),
     TEST_FUNCTION(nonfinite),
     TEST_FUNCTION(platt_smk),
     TEST_FUNCTION(powsum),

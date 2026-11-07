@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-addmul_rad_mag_fast.c"
+#include "t-approx_backend.c"
 #include "t-charpoly.c"
 #include "t-cho.c"
 #include "t-companion.c"
@@ -57,6 +58,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(arb_mat_addmul_rad_mag_fast),
+    TEST_FUNCTION(arb_mat_approx_backend),
     TEST_FUNCTION(arb_mat_charpoly),
     TEST_FUNCTION(arb_mat_cho),
     TEST_FUNCTION(arb_mat_companion),

@@ -18,8 +18,13 @@
 #include "arf.h"
 #include "arb.h"
 #include "acb.h"
+#include "arb_mat.h"
+#include "acb_mat.h"
 #include "gr.h"
 #include "gr_generic.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
+#include "thread_support.h"
 
 #define N 3
 #define DF(name) d3_##name

@@ -316,6 +316,25 @@ power of two, where the second is one less, and both are valid for
 :::
 
 ::: function
+void n_ll_barrett_precomp_preinv(ulong * qhi, ulong * qlo, ulong * b1, ulong * b2, ulong n, ulong ninv)
+
+Sets $(\mathit{qhi}, \mathit{qlo})$ to the two words of
+$\lfloor B^2/n \rfloor$, $b_1$ to $B \bmod n$ and $b_2$ to $B^2 \bmod n$,
+from the inverse `ninv` of $n$ returned by `n_preinvert_limb`, with two
+division steps and no hardware division. Requires $n \ge 2$.
+:::
+
+::: function
+ulong n_ll_mod_barrett(ulong hi, ulong lo, ulong n, ulong qhi, ulong qlo)
+ulong n_lll_mod_barrett(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo, ulong b1, ulong b2)
+
+Return $(\mathit{hi} \, B + \mathit{lo}) \bmod n$ and
+$(y_2 B^2 + y_1 B + y_0) \bmod n$, with the constants of
+`n_ll_barrett_precomp_preinv`. No restrictions on the words; requires
+$2 \le n < 2^{\bits - 1}$.
+:::
+
+::: function
 ulong n_mod_barrett(ulong x, ulong n, ulong npre)
 ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
 

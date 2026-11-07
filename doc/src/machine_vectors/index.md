@@ -593,14 +593,19 @@ Availability by type as for the loads.
 vec1d vec1d_fmsub(vec1d a, vec1d b, vec1d c)
 vec4d vec4d_fmsub(vec4d a, vec4d b, vec4d c)
 vec8d vec8d_fmsub(vec8d a, vec8d b, vec8d c)
+vec8dz vec8dz_fmsub(vec8dz a, vec8dz b, vec8dz c)
 vec1d vec1d_fnmsub(vec1d a, vec1d b, vec1d c)
 vec4d vec4d_fnmsub(vec4d a, vec4d b, vec4d c)
 vec8d vec8d_fnmsub(vec8d a, vec8d b, vec8d c)
+vec8dz vec8dz_fnmsub(vec8dz a, vec8dz b, vec8dz c)
 
 Returns $ab - c$ and $-ab - c$, rounded once except for `vec4d_fmsub`
 on the generic backends. NEON computes $ab - c$ as $-(c - ab)$, which
 differs from `vec4d_fmsub_fused` in the sign of an exact zero.
-`vec4d_fmsub` is available on all backends, the others on AVX2 and NEON.
+`vec4d_fmsub` is available on all backends, the `z` versions with
+AVX-512 (where they are single instructions, so also usable where a
+fused result is required, as `vec4d_fmsub_fused`), and the others on
+AVX2 and NEON.
 :::
 
 ::: function

@@ -187,6 +187,23 @@ upper_bsplit(arb_t M, arb_t S, arb_t Q, const fmpz_t ap, const fmpz_t aq, const 
 }
 
 void
+_arb_hypgeom_gamma_upper_fmpq_inf_bsplit_sum(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
+{
+    arb_t M, S, Q;
+
+    arb_init(M);
+    arb_init(S);
+    arb_init(Q);
+
+    upper_bsplit(M, S, Q, fmpq_numref(a), fmpq_denref(a), z, 0, FLINT_MAX(N, 0), 0, prec);
+    arb_div(res, S, Q, prec);
+
+    arb_clear(M);
+    arb_clear(S);
+    arb_clear(Q);
+}
+
+void
 _arb_hypgeom_gamma_upper_fmpq_inf_bsplit(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
 {
     arb_t M, S, Q;
@@ -197,10 +214,7 @@ _arb_hypgeom_gamma_upper_fmpq_inf_bsplit(arb_t res, const fmpq_t a, const arb_t 
     arb_init(Q);
     fmpq_init(a1);
 
-    N = FLINT_MAX(N, 0);
-
-    upper_bsplit(M, S, Q, fmpq_numref(a), fmpq_denref(a), z, 0, N, 0, prec);
-    arb_div(S, S, Q, prec);
+    _arb_hypgeom_gamma_upper_fmpq_inf_bsplit_sum(S, a, z, N, prec);
 
     fmpq_sub_ui(a1, a, 1);
     arb_pow_fmpq(M, z, a1, prec);
@@ -347,6 +361,23 @@ lower_bsplit(arb_t M, arb_t S, arb_t Q, const fmpz_t ap, const fmpz_t aq, const 
 }
 
 void
+_arb_hypgeom_gamma_lower_fmpq_0_bsplit_sum(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
+{
+    arb_t M, S, Q;
+
+    arb_init(M);
+    arb_init(S);
+    arb_init(Q);
+
+    lower_bsplit(M, S, Q, fmpq_numref(a), fmpq_denref(a), z, 0, FLINT_MAX(N, 0), 0, prec);
+    arb_div(res, S, Q, prec);
+
+    arb_clear(M);
+    arb_clear(S);
+    arb_clear(Q);
+}
+
+void
 _arb_hypgeom_gamma_lower_fmpq_0_bsplit(arb_t res, const fmpq_t a, const arb_t z, slong N, slong prec)
 {
     arb_t M, S, Q;
@@ -355,10 +386,7 @@ _arb_hypgeom_gamma_lower_fmpq_0_bsplit(arb_t res, const fmpq_t a, const arb_t z,
     arb_init(S);
     arb_init(Q);
 
-    N = FLINT_MAX(N, 0);
-
-    lower_bsplit(M, S, Q, fmpq_numref(a), fmpq_denref(a), z, 0, N, 0, prec);
-    arb_div(S, S, Q, prec);
+    _arb_hypgeom_gamma_lower_fmpq_0_bsplit_sum(S, a, z, N, prec);
 
     arb_pow_fmpq(M, z, a, prec);
     arb_mul(S, S, M, prec);
@@ -405,7 +433,7 @@ _arb_hypgeom_gamma_upper_singular_si_choose_N(mag_t err, slong n, const arb_t z,
 
             if (mag_cmp(u, abs_tol) < 0)
             {
-                mag_swap(err, t);
+                mag_swap(err, u);   /* the whole omitted tail */
                 break;
             }
         }

@@ -123,7 +123,7 @@ gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X,
 
     if (status == GR_SUCCESS)
     {
-        /* gr_mat_submul(XX, BX, UB, XY); */
+        /* gr_mat_submul(XX, BX, UB, XY); (TODO: see lu_recursive.c) */
         gr_mat_init(T, UB->r, XY->c, ctx);
         status |= gr_mat_mul(T, UB, XY, ctx);
         status |= gr_mat_sub(XX, BX, T, ctx);

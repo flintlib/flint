@@ -71,7 +71,7 @@ _ple_red(const ulong * x, int words, const _ple_red_ctx * C)
         if (C->high_reduced)
             NMOD_RED2(r, x[1], x[0], C->mod);
         else
-            r = n_ll_rem_l_nonfullword(x[1], x[0], C->mod.n, C->qhi, C->qlo);
+            r = n_ll_mod_barrett(x[1], x[0], C->mod.n, C->qhi, C->qlo);
     }
     else
     {
@@ -300,7 +300,10 @@ _ple_delayed_23(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots,
         }
         C.qhi = C.qlo = 0;
         if (!C.high_reduced)
-            n_ll_rem_l_precomp(&C.qhi, &C.qlo, C.mod.n);
+        {
+            ulong b1, b2;
+            n_ll_barrett_precomp_preinv(&C.qhi, &C.qlo, &b1, &b2, C.mod.n, C.mod.ninv);
+        }
     }
     else
     {

@@ -9,8 +9,9 @@ order: 6
 This header provides the primitive operations on machine words that
 multiprecision arithmetic is built from: counting leading and trailing
 zero bits, adding and subtracting integers of two to eleven limbs held in
-separate variables, the full two-word product of two words, and the
-division of a two-word integer by a word. Most of them are macros that
+separate variables, the full two-word product of two words, products of
+one- and two-word integers, and the division of a two-word integer by a
+word. Most of them are macros that
 assign to their first arguments, in the style of GMP's `longlong.h`, from
 which the names come: in `add_ssaaaa(s1, s0, a1, a0, b1, b0)` each letter
 stands for one argument, `s` for a word of the sum and `a`, `b` for the
@@ -123,6 +124,20 @@ smul_ppmm(p1, p0, u, v)
 Sets $(p_1, p_0)$ to the two-word product of $u$ and $v$ interpreted as
 signed words, in two's complement: $p_1$ read as an `slong` is the
 signed high word.
+:::
+
+::: macro
+FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)
+FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)
+FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0)
+FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)
+FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)
+
+Products of one- and two-word operands: the full $2 \times 1$ and
+$2 \times 2$ products, the low two and the low three words of a
+$2 \times 2$ product, and the square of a two-word integer. Words are
+listed most significant first. They are built from `umul_ppmm` and the
+additions above.
 :::
 
 ## Division {#division}

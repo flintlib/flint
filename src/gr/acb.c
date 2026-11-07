@@ -956,6 +956,21 @@ _gr_acb_abs(acb_t res, const acb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* |z|^2 = re^2 + im^2, avoiding the square root in acb_abs.  Computed
+   into a temporary since res may alias x. */
+static int
+_gr_acb_abs2(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    arb_t t;
+    arb_init(t);
+    arb_sqr(t, acb_realref(x), ACB_CTX_PREC(ctx));
+    arb_addmul(t, acb_imagref(x), acb_imagref(x), ACB_CTX_PREC(ctx));
+    arb_nonnegative_part(acb_realref(res), t);
+    arb_zero(acb_imagref(res));
+    arb_clear(t);
+    return GR_SUCCESS;
+}
+
 static int
 _gr_acb_conj(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -2552,6 +2567,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_NINT,            (gr_funcptr) _gr_acb_nint},
     {GR_METHOD_I,               (gr_funcptr) _gr_acb_i},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_acb_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) _gr_acb_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_acb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_acb_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_acb_im},

@@ -334,18 +334,9 @@ for operands in either order, with the one- and two-limb balanced cases
 inlined and squaring detected when `x == y`.
 :::
 
-::: macro
-FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)
-FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)
-FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0)
-FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)
-FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)
-
-Products of one- and two-limb operands in registers: the full
-$2 \times 1$ and $2 \times 2$ products, the low two and the low three
-limbs of a $2 \times 2$ product, and a $2$-limb square. Limbs are listed
-most significant first.
-:::
+Products of one- and two-limb operands held in registers
+(`FLINT_MPN_MUL_2X2` and its variants) are macros of `longlong.h`: see
+[](longlong#multiplication).
 
 ## High and low products {#short}
 

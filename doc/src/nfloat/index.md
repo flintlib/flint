@@ -1005,10 +1005,14 @@ int nfloat_complex_mul(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_c
 int nfloat_complex_sqr(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 int nfloat_complex_mul_2exp_si(nfloat_complex_ptr res, nfloat_complex_srcptr x, slong y, gr_ctx_t ctx)
 int nfloat_complex_abs(nfloat_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
+int nfloat_complex_abs2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 
 Conjugate, real and imaginary parts (as complex numbers), negation,
-sum, difference, product, square, multiplication by $2^y$ and absolute
-value (a real number, correctly rounded as by `nfloat_hypot`).
+sum, difference, product, square, multiplication by $2^y$, absolute
+value (a real number, correctly rounded as by `nfloat_hypot`) and
+squared absolute value $a^2 + b^2$ (as a complex number with zero
+imaginary part, the `gr_abs2` method; the square of the nonzero part
+when the other is zero).
 :::
 
 ::: function
