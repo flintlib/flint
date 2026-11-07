@@ -10,7 +10,11 @@ word $x$ modulo $n$, rather than a two-word product, using a precomputed
 approximation of $B/n$. They are cheaper than a two-word
 [Möller–Granlund](algorithms/arithmetic/moller-granlund) reduction when
 the value to be reduced is known to fit in one word, as in hashing,
-sieving and table lookups. Throughout, $B = 2^{\bits}$.
+sieving and table lookups. Barrett's method also reduces two and three
+words for $n < B/2$ with a two-word constant ([](#two-words)), and two-word
+values below $2^{\nu + \bits - 2}$, where $\nu$ is the bit length of $n$,
+with the one-word constant of `NMOD_RED` ([](#bounded)). Throughout,
+$B = 2^{\bits}$.
 
 ## Barrett reduction {#barrett}
 
@@ -139,6 +143,53 @@ steps of [](algorithms/arithmetic/moller-granlund#alg-div) with the inverse
 remainder $2^{\mathit{norm}} b_1$, the second the low word of $Q$ and
 $2^{\mathit{norm}} b_2$ (`n_ll_barrett_precomp_preinv`).
 
+## Two words below a bound {#bounded}
+
+The constant $m$ of [](#nmod) reduces two-word integers below
+$2^{\nu + \bits - 2}$, which covers the products of two residues when
+$\nu \le \bits - 2$. The estimate uses the top $\bits$ bits of the input.
+
+::: theorem {#thm-bounded}
+Let $3 \le \nu \le \bits - 1$, $m$ as in [](#lem-nmod-m),
+$0 \le a < 2^{\nu + \bits - 2}$, $x = \lfloor a / 2^{\nu - 2} \rfloor$ and
+$\tilde q = \lfloor x m / 2^{\bits + 1} \rfloor$. Then $x < B$ and
+$\lfloor a/n \rfloor - 1 \le \tilde q \le \lfloor a/n \rfloor$, so
+$0 \le a - \tilde q n < 2n$.
+:::
+
+::: proof
+The bound on $a$ gives $x < 2^{\bits}$. From $m \le 2^{\nu + \bits - 1}/n$
+and $x \le a / 2^{\nu - 2}$ we get $x m / 2^{\bits + 1} \le a/n$. For the
+other side, write $mn = 2^{\nu + \bits - 1} - 1 - \rho$ with $0 \le \rho < n$
+([](#lem-nmod-m)) and use $x > a/2^{\nu - 2} - 1$:
+$$
+\frac{x m}{2^{\bits + 1}} > \frac{a m}{2^{\nu + \bits - 1}} - \frac{m}{2^{\bits + 1}}
+= \frac{a}{n} - \frac{a (1 + \rho)}{n\, 2^{\nu + \bits - 1}} - \frac{m}{2^{\bits + 1}}
+> \frac{a}{n} - \frac{1}{2} - \frac{1}{2},
+$$
+since $a < 2^{\nu + \bits - 2}$, $1 + \rho \le n$ and $m < B$. So $\tilde q$,
+an integer greater than $a/n - 1$, is at least $\lfloor a/n \rfloor - 1$.
+:::
+
+Since $2n \le 2^{\bits}$, the value $a - \tilde q n$ is the low word of
+$a_{lo} - \tilde q n$ with $a = a_{hi} B + a_{lo}$, and one correction
+gives $a \bmod n$; also $\tilde q < 2^{\bits - 1}$. `NMOD_RED2_BOUNDED`
+computes $x$ with a double-word shift, $\tilde q$ as the high word of $x m$
+shifted right by one bit, then $a - \tilde q n$ and the correction: one high
+product, one low product and one comparison, as in `NMOD_RED`, against a
+full product, a low product and two corrections for a
+[Möller–Granlund](algorithms/arithmetic/moller-granlund) step (`NMOD_RED2`,
+which instead takes any $a < nB$).
+
+The bound holds for a sum of $k$ products of residues when
+$\nu + \lceil \log_2 k \rceil \le \bits - 2$, since such a sum is below
+$k\, 2^{2\nu}$. The final reductions of two-limb
+[dot products](algorithms/linear-algebra/dot-products#scalar) and the
+unpacking of [Kronecker substitution](algorithms/polynomials/kronecker#ks)
+test it from the length or the field size. For $\nu = \bits$ the method
+fails, as $a - \tilde q n$ may not fit in a word; for $\nu \le 2$ the shift
+by $\nu - 2$ is not defined.
+
 ## Lemire–Kaser–Kurz reduction {#lemire}
 
 The method of Lemire, Kaser and Kurz [@LKK2019] computes the remainder
@@ -156,4 +207,4 @@ $n \ge 1$. For $n \ge 2$ this is $c$, since
 $\lfloor (B - 1)/n \rfloor + 1 = \lceil B/n \rceil$ for all integers
 $B, n \ge 1$.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED :::

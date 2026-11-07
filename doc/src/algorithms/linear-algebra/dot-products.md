@@ -15,8 +15,8 @@ $$
 is the unreduced dot product. FLINT never reduces modulo $n$ inside the
 loop. It computes $S$ exactly, or a value congruent to $S$ that fits in
 fewer words, and reduces once at the end with `NMOD_RED` (one word,
-[Barrett](algorithms/arithmetic/barrett#nmod)), `NMOD2_RED2` or `NMOD_RED3`
-(two or three words,
+[Barrett](algorithms/arithmetic/barrett#nmod)), a two-word reduction chosen
+from the length ([](#final2)) or `NMOD_RED3` (three words,
 [Möller–Granlund](algorithms/arithmetic/moller-granlund)). This is the technique of
 *delayed modular reduction*, systematically used in exact linear algebra
 since FFLAS [@DGP2002; @DGP2008]. Those libraries compute $S$ in
@@ -126,6 +126,36 @@ them at the end.
 
 `_DOT2_HALF` is for $n \le 2^{\beta/2}$ when $S$ needs two words. The
 products fit in one word and are added to a two-word sum.
+
+The final reduction of a two-word sum $S = s_1 B + s_0$, where $B = 2^{\beta}$,
+depends on the bit length $\nu$ of $n$ and on $\lambda = \lceil \log_2 \ell \rceil$,
+the bit length of $\ell - 1$ (`_NMOD_VEC_DOT2_RED`):
+
+::: proposition {#final2}
+1. If $\nu + \lambda \le \beta - 2$ and $\nu \ge 3$, then
+   $S < 2^{\nu + \beta - 2}$, and `NMOD_RED2_BOUNDED`
+   ([](algorithms/arithmetic/barrett#bounded)) reduces it.
+2. If $\nu + \lambda \le \beta$, then $s_1 < n$, and `NMOD_RED2` reduces it.
+3. Otherwise `NMOD2_RED2` reduces $s_1$ first.
+:::
+
+::: proof
+Since $\ell \le 2^{\lambda}$ and $n - 1 < 2^{\nu}$, [](#lem-bound) gives
+$S < 2^{2\nu + \lambda} \le 2^{\nu + \beta - 2}$ in the first case, and
+$S \le (n - 1) \cdot \ell (n - 1) < n\, 2^{\nu + \lambda} \le n B$ in the
+second. The first case also needs $\nu \ge 3$ (and $\nu < \beta$, which
+holds there), as `NMOD_RED2_BOUNDED` requires; the dot products chosen by
+`_nmod_vec_dot_params` never need two words for $n \le 3$, since one
+word then suffices for every length below $2^{\beta - 2}$.
+:::
+
+For instance, for $\ell \le 4$ the first case holds up to
+$\nu = \beta - 4$ and the second up to $\nu = \beta - 2$; for
+$\ell \le 16$, up to $\nu = \beta - 6$ and $\nu = \beta - 4$. The first
+reduction costs about the same as `NMOD_RED`, the second one product and one
+correction more, and the third one more `NMOD_RED`. For the short dot
+products, $\ell$ is a constant, so the choice is a comparison of `mod.norm`
+with a constant.
 
 `_DOT3` adds each two-word product to a three-word sum. `_DOT3_ACC` saves
 work by adding blocks of 8 products in two words and only the block sums in

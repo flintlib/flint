@@ -62,6 +62,19 @@ extern "C" {
     NMOD_RED2(r, v_hi, a_lo, mod); \
   } while (0)
 
+/* (a_hi B + a_lo) mod n for a_hi B + a_lo < 2^(nu + FLINT_BITS - 2), where nu = FLINT_BITS - norm
+ * satisfies 3 <= nu <= FLINT_BITS - 1, see doc/src/algorithms/arithmetic/barrett.md */
+#define NMOD_RED2_BOUNDED(r, a_hi, a_lo, mod) \
+  do { \
+    const ulong hxx = (a_hi); \
+    const ulong lxx = (a_lo); \
+    const ulong mxx = ((mod).ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1)); \
+    const unsigned int sxx = FLINT_BITS - 2 - (mod).norm; \
+    const ulong xxx = (hxx << (FLINT_BITS - sxx)) | (lxx >> sxx); \
+    const ulong rxx = lxx - (n_mulhi(xxx, mxx) >> 1) * (mod).n; \
+    (r) = (rxx >= (mod).n) ? rxx - (mod).n : rxx; \
+  } while (0)
+
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
   do { \
     ulong v_hi;	\
