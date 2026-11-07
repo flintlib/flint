@@ -32,35 +32,8 @@ void mullo_2x1(ulong * r1, ulong * r0, ulong a1, ulong a0, ulong b0)
     *r1 = t1;
 }
 
-/* Precompute floor(2^(2*FLINT_BITS) / n) for Barrett-style modular reduction.
-   This could be optimized. */
-static inline void
-n_ll_rem_l_precomp(ulong * qhi, ulong * qlo, ulong n)
-{
-    ulong q[4];
-    ulong a[4];
-    a[0] = 0;
-    a[1] = 0;
-    a[2] = 1;
-    mpn_divrem_1(q, 0, a, 3, n);
-    *qlo = q[0];
-    *qhi = q[1];
-}
-
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
-FLINT_FORCE_INLINE ulong
-n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
-{
-    ulong c2, c1, c0;
-
-    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
-    (void) c1;
-    (void) c0;
-    xlo -= c2 * n;
-    if (xlo >= n)
-        xlo -= n;
-    return xlo;
-}
+/* two words, n < 2^(FLINT_BITS - 1): n_ll_barrett_precomp_preinv and
+   n_ll_mod_barrett of ulong_extras */
 
 FLINT_FORCE_INLINE ulong
 n_lll_rem_l_fullword_limited(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)

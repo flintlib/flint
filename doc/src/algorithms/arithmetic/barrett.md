@@ -99,6 +99,30 @@ for $0 \le k < \nu + \bits - 1$. For instance $k = \nu - 1$ gives
 $\lfloor (B - 1)/n \rfloor$, which is the constant of `n_barrett_precomp`
 unless $n$ is a power of two.
 
+## Two and three words {#two-words}
+
+For $n < B/2$, the same estimate reduces a two-word $x < B^2$ with the
+two-word constant $Q = \lfloor B^2/n \rfloor$: [](#prop-barrett) with
+$B^2$ in place of $B$ shows that $\tilde q = \lfloor x Q / B^2 \rfloor$
+satisfies $0 \le x - \tilde q n < 2n < B$. So the remainder is computed
+from the low words of $x$ and $\tilde q n$ alone, and one subtraction of
+$n$ finishes. `n_ll_mod_barrett` takes the low word of $\tilde q$, the
+third word of $Q x$, from the low three words of this product
+(`FLINT_MPN_MUL_3P2X2`, three word products).
+
+A three-word $y = y_2 B^2 + y_1 B + y_0$ is first folded into two words,
+$x = y_2 b_2 + y_1 b_1 + y_0 \equiv y \pmod n$ with $b_1 = B \bmod n$
+and $b_2 = B^2 \bmod n$. Since $b_1, b_2 \le n - 1$,
+$x \le (B - 1)(2n - 1) < B^2$ for $n < B/2$, whatever the words $y_i$
+(`n_lll_mod_barrett`).
+
+The three constants are the quotient and the remainders of the division of
+$2^{\mathit{norm}} B^2$ by the normalized $d = 2^{\mathit{norm}} n$, in two
+steps of [](algorithms/arithmetic/moller-granlund#alg-div) with the inverse
+`ninv`: the first gives the high word $\lfloor B/n \rfloor$ of $Q$ and the
+remainder $2^{\mathit{norm}} b_1$, the second the low word of $Q$ and
+$2^{\mathit{norm}} b_2$ (`n_ll_barrett_precomp_preinv`).
+
 ## Lemire–Kaser–Kurz reduction {#lemire}
 
 The method of Lemire, Kaser and Kurz [@LKK2019] computes the remainder
@@ -110,4 +134,4 @@ below $2^{\bits/2}$, which is the condition required by `n_mod_lemire`.
 The method needs no correction step, but its range restriction makes it
 useful only for half-word values.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_mod_lemire n_lemire_precomp NMOD_RED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp NMOD_RED :::

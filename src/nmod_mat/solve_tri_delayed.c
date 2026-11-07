@@ -98,8 +98,9 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
             R->red = 0;
         else if (mod.norm > 0)
         {
+            ulong b1, b2;
             R->red = 1;
-            n_ll_rem_l_precomp(&R->c1, &R->c0, mod.n);
+            n_ll_barrett_precomp_preinv(&R->c1, &R->c0, &b1, &b2, mod.n, mod.ninv);
         }
         else
             R->red = 2;
@@ -143,7 +144,7 @@ tri_red(nn_srcptr a, const tri_red_struct * R, const int nlimbs)
         if (R->red == 0)
             NMOD_RED2(r, a[1], a[0], mod);
         else if (R->red == 1)
-            r = n_ll_rem_l_nonfullword(a[1], a[0], mod.n, R->c1, R->c0);
+            r = n_ll_mod_barrett(a[1], a[0], mod.n, R->c1, R->c0);
         else
             NMOD2_RED2(r, a[1], a[0], mod);
     }
