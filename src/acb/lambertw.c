@@ -619,10 +619,10 @@ _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int fla
         arb_nonnegative_part(acb_imagref(ezb1), acb_imagref(ezb1));
 
         /* Check series expansion again, because now there is no crossing. */
-        if (!acb_lambertw_try_near_branch_point(res, za, eza1, k, flags, goal))
+        if (!acb_lambertw_try_near_branch_point(za, za, eza1, k, flags, goal))
             acb_lambertw_cleared_cut_fix_small(za, za, eza1, k, flags, goal);
 
-        if (!acb_lambertw_try_near_branch_point(res, zb, ezb1, kk, flags, goal))
+        if (!acb_lambertw_try_near_branch_point(zb, zb, ezb1, kk, flags, goal))
             acb_lambertw_cleared_cut_fix_small(zb, zb, ezb1, kk, flags, goal);
 
         acb_conj(zb, zb);
