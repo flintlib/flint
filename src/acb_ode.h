@@ -390,6 +390,9 @@ WARN_UNUSED_RESULT int acb_ode_solution_series(gr_poly_vec_t series, const gr_or
 WARN_UNUSED_RESULT int _acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_poly_struct * dop, slong dop_len, gr_ctx_t Cst, const acb_ptr lcrt, gr_srcptr path, slong path_len, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec);
 WARN_UNUSED_RESULT int acb_ode_transition_matrix_fixed(acb_mat_t mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, gr_vec_t path, gr_ctx_t Pts, const acb_ode_exponents_t expos0, const acb_ode_exponents_t expos1, ulong flags, slong prec);
 
+void _acb_ode_local_monodromy(acb_mat_t mono, const acb_poly_struct * dop, slong dop_len, const acb_ode_exponents_t expos, slong prec);
+WARN_UNUSED_RESULT int acb_ode_local_monodromy(acb_mat_t mono, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, ulong flags, slong prec);
+
 /****************************************************************************
  * Utilities
  ****************************************************************************/

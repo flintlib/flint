@@ -21,6 +21,7 @@
 #include "t-indicial_polynomial_from_exponents.c"
 #include "t-lc_roots.c"
 #include "t-local_diffop.c"
+#include "t-local_monodromy.c"
 #include "t-poly_negdivrevhigh.c"
 #include "t-poly_taylor_shift_aps_trunc.c"
 #include "t-randtest_acb.c"
@@ -46,6 +47,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_ode_indicial_polynomial_from_exponents),
     TEST_FUNCTION(acb_ode_lc_roots),
     TEST_FUNCTION(acb_ode_local_diffop),
+    TEST_FUNCTION(acb_ode_local_monodromy),
     TEST_FUNCTION(acb_ode_poly_negdivrevhigh),
     TEST_FUNCTION(acb_ode_poly_taylor_shift_aps_trunc),
     TEST_FUNCTION(acb_ode_randtest_acb),

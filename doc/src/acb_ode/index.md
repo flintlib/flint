@@ -285,6 +285,41 @@ In addition, the caller must provide in `lcrt` the roots of the leading
 coefficient of `dop`, *zero included*, with multiple roots repeated.
 :::
 
+::: function
+int acb_ode_local_monodromy(acb_mat_t mono, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, ulong flags, slong prec)
+void _acb_ode_local_monodromy(acb_mat_t mono, const acb_poly_struct * dop, slong dop_len, const acb_ode_exponents_t expos, slong prec)
+
+Set `mono` to the local monodromy matrix of `dop` at the origin, that is, the
+matrix that maps the coordinates of a solution in the
+`ACB_ODE_BASIS_ECHELON` basis at the origin (with solution groups ordered as
+in `expos`) to those of its analytic continuation along a small loop
+encircling the origin once counterclockwise.
+Equivalently, if $Y$ denotes the row vector of basis elements (defined using
+the principal branches of $x^\lambda$ and $\log(x)$), the analytic
+continuation of $Y$ along the loop is $Y \cdot \mathit{mono}$.
+The result is the transition matrix (as computed by
+`acb_ode_transition_matrix_fixed`) along any path that leaves the origin,
+turns once counterclockwise around it without enclosing any other singular
+point, and returns to the origin.
+
+The origin must be an ordinary or regular singular point of `dop`, and `mono`
+must be a square matrix of size equal to the order of `dop`.
+The operators supported by the non-underscore method and the meaning of
+the `expos` and `flags` arguments are the same as for
+`acb_ode_fundamental_matrix`; however, the computation does not depend on
+the location of the other singular points.
+The underscore method requires `expos` and expects `dop` to be given by its
+coefficients with respect to the Euler derivation, with the origin a regular
+singular point.
+
+On each block corresponding to a group of exponents with leader $\lambda$,
+the monodromy matrix is $e^{2\pi i\lambda} \exp(2\pi i N)$ where the
+nilpotent matrix $N$ represents the map
+$\sum_k f_k(x) \log(x)^k/k! \mapsto \sum_k f_{k+1}(x) \log(x)^k/k!$.
+The entries of $N$ are computed from the first few terms of the series
+expansions of the basis elements.
+:::
+
 ## Series solutions {#series-solutions}
 
 ::: function
