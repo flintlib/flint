@@ -345,8 +345,9 @@ $r / (1 + (|m| - r)^2)$.
   x^2})$, and `arb_atan2` combines `arb_atan` with $\pi$.
 - `arb_sin_pi` and `arb_cos_pi` reduce $x$ modulo $1/2$ exactly before
   multiplying by $\pi$, so they are exact at integers and half-integers
-  and accurate near the zeros. `arb_sin_cos_pi_fmpq` evaluates small
-  denominators as algebraic numbers
+  and accurate near the zeros; a dyadic $x$ with a small denominator,
+  like a rational $x$ in `arb_sin_cos_pi_fmpq` and `arb_tan_pi_fmpq`, is
+  evaluated as an algebraic number where that is faster
   ([](algorithms/special-functions/rational-sines)).
 - `arb_pow` with exact arguments and a positive base (or an integer
   exponent) evaluates $x^y$ in one go; otherwise it is $\exp(y \log x)$

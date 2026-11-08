@@ -32,8 +32,13 @@ scp_rand_q(flint_rand_t state)
 {
     ulong q;
 
-    switch (n_randint(state, 6))
+    switch (n_randint(state, 7))
     {
+        case 6:
+            /* 2^k q0, q0 = 1, 3, 5: the half-angle chains */
+            q = UWORD(1) << n_randint(state, 24);
+            q *= (n_randint(state, 3) == 0) ? 1 : (n_randint(state, 2) ? 3 : 5);
+            break;
         case 0:
             q = 1 + n_randint(state, 16);
             break;
@@ -110,7 +115,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
         else
             n = 1 + n_randint(state, 40);
 
-        alg = n_randint(state, 4);
+        alg = n_randint(state, 5);
         r = n_randint(state, 2) ? 0 : 2 + n_randint(state, 15);
         which = n_randint(state, 3);    /* 0 both, 1 sin only, 2 cos only */
 
@@ -132,9 +137,11 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
         maxerr = 6 * 768 + 130;
         {
             ulong qr = q / n_gcd(p, q);
+            ulong q0 = qr >> flint_ctz(qr);
             if ((alg == 2 && qr <= (UWORD(1) << (FLINT_BITS - 9)))
                 || qr <= 4 || qr == 6
-                || (alg == 3 && (qr == 5 || qr == 8 || qr == 10 || qr == 12)))
+                || (alg == 3 && (qr == 5 || qr == 8 || qr == 10 || qr == 12))
+                || (alg == 4 && qr <= (UWORD(1) << (FLINT_BITS - 8)) && (q0 == 1 || q0 == 3 || q0 == 5)))
                 maxerr = 4;
         }
 
@@ -259,6 +266,51 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
         arb_clear(c);
         arb_clear(t);
         arb_clear(a);
+        fmpq_clear(pq);
+    }
+
+    /* _mp_real_tan_pi_ui_div_ui (fixed point, 0 <= 4t <= q) and the
+       predicates of the dispatch */
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        ulong t, q, err;
+        slong n;
+        nn_ptr y;
+        arb_t s, c, ref;
+        fmpq_t pq;
+
+        q = scp_rand_q(state);
+        if (q > (UWORD(1) << (FLINT_BITS - 3)))
+            q >>= 3;
+        q = FLINT_MAX(q, 1);
+        t = n_randint(state, q / 4 + 1);
+        n = 1 + n_randint(state, (iter % 20 == 0) ? 1500 : 60);
+
+        (void) _mp_real_sin_cos_pi_ui_div_ui_algebraic(q, n);
+        (void) _mp_real_tan_pi_ui_div_ui_algebraic(q, n);
+
+        y = flint_malloc((n + 1) * sizeof(ulong));
+        arb_init(s);
+        arb_init(c);
+        arb_init(ref);
+        fmpq_init(pq);
+
+        err = _mp_real_tan_pi_ui_div_ui(y, t, q, n);
+        fmpq_set_ui(pq, t, q);
+        ref_sin_cos_pi_fmpq(s, c, pq, FLINT_BITS * n + 200);
+        arb_div(ref, s, c, FLINT_BITS * n + 200);
+
+        if (err > 16 || !scp_fixed_ok(y, err, n, ref))
+        {
+            flint_printf("FAIL: tan fixed, t = %wu, q = %wu, n = %wd, err = %wu\n", t, q, n, err);
+            flint_printf("ref = "); arb_printd(ref, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        flint_free(y);
+        arb_clear(s);
+        arb_clear(c);
+        arb_clear(ref);
         fmpq_clear(pq);
     }
 

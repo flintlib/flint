@@ -1221,17 +1221,26 @@ Set `y` to $\tan(\pi x)$, respectively $\cot(\pi x)$.
 void arb_sin_cos_pi_fmpq(arb_t s, arb_t c, const fmpq_t x, slong prec)
 void arb_sin_pi_fmpq(arb_t s, const fmpq_t x, slong prec)
 void arb_cos_pi_fmpq(arb_t c, const fmpq_t x, slong prec)
+void arb_tan_pi_fmpq(arb_t t, const fmpq_t x, slong prec)
 
-Set `s` to $\sin(\pi x)$ and `c` to $\cos(\pi x)$ for a rational $x$ in
-lowest terms.
+Set `s` to $\sin(\pi x)$, `c` to $\cos(\pi x)$ and `t` to $\tan(\pi x)$
+for a rational $x$, with full relative accuracy also near the zeros. The
+tangent is indeterminate exactly at the poles (the half-integers). The
+rational values ($0$, $\pm 1/2$, $\pm 1$, and $\tan(\pi x) = \pm 1$)
+are exact.
 
 ::: details
-Symmetries first reduce $x$ to $[0, 1/4]$. Then either $\pi x$ is
-approximated and the usual functions are called, or, for small
-denominators, the value is computed as an algebraic number (a root of a
-Chebyshev-type polynomial), whichever is estimated to be faster. Since the
-reduced argument is in the first octant, the first method gives full
-relative accuracy even near the zeros.
+For a word-size denominator at precisions where an algebraic method is
+faster than evaluating the function of $\pi x$ (square roots for small
+denominators, half-angle steps for $q = 2^k q_0$ with $q_0 = 1, 3, 5$, a
+Chebyshev iteration for denominators of up to about 12 bits at 30000
+bits and more at higher precision), the value is computed as an
+algebraic number by `mp_real_sin_cos_pi_ui_div_ui` resp.
+`mp_real_tan_pi_ui_div_ui`, or, below 12288 bits and from a precision
+growing with the number of half-angle steps, for the square roots by
+`arb_sqrt`; otherwise symmetries reduce $x$ exactly to $[0, 1/4]$ and the
+functions of $\pi x$ are evaluated there. See
+[](algorithms/special-functions/rational-sines).
 :::
 :::
 
@@ -1884,17 +1893,6 @@ $|x| \ge 2^{\mathit{maglim}}$ the result is $[0 \pm \infty]$ (positive
 `x`) or a tiny ball near 0 (resp. $-1$); within that range the exponent of
 the result may be a bignum. `arb_log_arf` and `arb_atan_arf` above are
 the point evaluations of the logarithm and the arctangent.
-:::
-
-::: function
-void _arb_sin_pi_fmpq_algebraic(arb_t s, ulong p, ulong q, slong prec)
-void _arb_cos_pi_fmpq_algebraic(arb_t c, ulong p, ulong q, slong prec)
-void _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
-
-Compute $\sin(\pi p/q)$ and $\cos(\pi p/q)$ as algebraic numbers: an
-isolated root of the minimal polynomial of the cosine
-(`fmpz_poly_cos_minpoly`) is refined by Newton iteration. This is used for
-small denominators, where it is faster than evaluating the functions.
 :::
 
 ::: function

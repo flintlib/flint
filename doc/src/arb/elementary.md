@@ -143,7 +143,7 @@ cos(1000000.5 pi)     [+/- 3.64e-13]
 | `arb_log`, `arb_log1p`, `arb_log_ui`, `arb_log_base_ui`, `arb_log_hypot` | `arb_log_base_ui` is exact for exact powers |
 | `arb_pow`, `arb_pow_ui`, `arb_pow_fmpq`, `arb_root_ui`, `arb_sqrt`, `arb_rsqrt` | integer and half-integer exponents by repeated multiplication |
 | `arb_sin`, `arb_cos`, `arb_sin_cos`, `arb_tan`, `arb_cot`, `arb_sec`, `arb_csc`, `arb_sinc` | `arb_sin_cos` computes both for the price of one |
-| `arb_sin_pi`, `arb_cos_pi`, `arb_tan_pi`, `arb_cot_pi`, `arb_csc_pi`, `arb_sinc_pi`, `arb_sin_cos_pi_fmpq` | exact at integers and half-integers |
+| `arb_sin_pi`, `arb_cos_pi`, `arb_tan_pi`, `arb_cot_pi`, `arb_csc_pi`, `arb_sinc_pi`, `arb_sin_cos_pi_fmpq`, `arb_tan_pi_fmpq` | exact at integers and half-integers |
 | `arb_atan`, `arb_atan2`, `arb_asin`, `arb_acos` | `arb_atan2` is the argument of $a + bi$ |
 | `arb_sinh`, `arb_cosh`, `arb_sinh_cosh`, `arb_tanh`, `arb_coth`, `arb_sech`, `arb_csch` | accurate near 0 |
 | `arb_asinh`, `arb_acosh`, `arb_atanh` | |

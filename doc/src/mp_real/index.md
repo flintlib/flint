@@ -813,8 +813,8 @@ $n + \lceil(\operatorname{bits}(q) + 16)/\bits\rceil$ limbs gives the
 relative accuracy. The tangent uses the closed forms $\sqrt 3$,
 $1/\sqrt 3$, $\sqrt 2 \mp 1$, $2 \mp \sqrt 3$ for $q = 3, 6, 8, 12$ and
 $\sqrt{5 \mp 2\sqrt 5}$, $\sqrt{1 \mp 2/\sqrt 5}$ for $q = 5, 10$ (from
-12 limbs), the Chebyshev sine and cosine and one division for the
-denominators where they win, and the tangent kernel otherwise.
+12 limbs), the half-angle or Chebyshev sine and cosine and one division
+for the denominators where they win, and the tangent kernel otherwise.
 :::
 :::
 
@@ -1191,6 +1191,15 @@ one-sided bounds. For the tangent, `recip` = 1 means that the value is
 $\pm 1 / Y$ rather than $\pm Y$; the kernel chooses the limbs so that
 $Y$ normalises with a left shift of at most
 `MP_REAL_TRIG_FP_NORM_SHIFT` bits.
+
+::: details
+In the `pi` versions, a reduced argument $t = m/2^j$ with a denominator
+of at most $\bits - 8$ bits is evaluated by
+`_mp_real_sin_cos_pi_ui_div_ui` resp. `_mp_real_tan_pi_ui_div_ui`
+instead of the kernel on $\pi t$ wherever their algebraic methods win
+(`_mp_real_sin_cos_pi_ui_div_ui_algebraic`): $\sin(\pi/4)$ by one square
+root, $3/16$ by half angles from about 24 limbs, and so on.
+:::
 :::
 
 ::: function
@@ -1498,23 +1507,43 @@ void _mp_real_sin_cos_pi_ui_div_ui_tune(nn_ptr ys, nn_ptr yc, ulong * err, ulong
 
 Set $(y_s, n + 1)$ and $(y_c, n + 1)$ (either may be `NULL`) to
 $\sin(\pi p/q)$ and $\cos(\pi p/q)$ for $q \ge 1$ and $0 \le p \le q/2$.
-`err` is at most 4 for the closed forms and the Chebyshev iteration and
+`err` is at most 4 for the closed forms, the half angles and the
+Chebyshev iteration and
 the kernel's bound plus 2 (at most $6r + 130$, $r \le 768$) when the
 sine and cosine kernel is used.
 
 ::: details
 After reduction of the fraction, $q \le 2$ gives exact values, $q = 3,
 4, 6$ quadratic irrationals from `_mp_real_rsqrt_ui_newton`, and $q = 5,
-8, 10, 12$ closed forms with square roots from about 12 limbs (24 for
-$q = 8$). For denominators up to a precision-dependent bit length (none
-below 48 limbs, 12 bits at 512 limbs, 48 bits at 65536 limbs, any beyond)
-the value is refined as a root of a Chebyshev polynomial by a
-high-order iteration costing $O(M(n) \log q)$; otherwise the kernel of
-`mp_real_sin_cos_bits` is applied to $\pi p/q$. The `_tune` version
-takes the algorithm (`alg` = 0 tuned, 1 kernel, 2 Chebyshev iteration,
-3 closed forms) and the order of the iteration (`r` = 0 for the default
-12, at most 16). See [](algorithms/special-functions/rational-sines#chebyshev).
+10, 12$ closed forms with square roots from about 12 limbs. A
+denominator $q = 2^k q_0$ with $q_0 = 1, 3, 5$ (including $q = 8$) is
+evaluated by half-angle steps from a closed form, one square root per
+halving, from about $(k + 1)^2$ limbs (16 for $q = 8$). For denominators up
+to a precision-dependent bit length (none below 48 limbs, 12 bits at 512
+limbs, 48 bits at 65536 limbs, any beyond) the value is refined as a
+root of a Chebyshev polynomial by a high-order iteration costing
+$O(M(n) \log q)$; otherwise the kernel of `mp_real_sin_cos_bits` is
+applied to $\pi p/q$. The `_tune` version takes the algorithm (`alg` = 0
+tuned, 1 kernel, 2 Chebyshev iteration, 3 closed forms, 4 half angles)
+and the order of the iteration (`r` = 0 for the default 12, at most
+16). See [](algorithms/special-functions/rational-sines).
 :::
+:::
+
+::: function
+int _mp_real_sin_cos_pi_ui_div_ui_algebraic(ulong q, slong n)
+int _mp_real_tan_pi_ui_div_ui_algebraic(ulong q, slong n)
+ulong _mp_real_tan_pi_ui_div_ui(nn_ptr y, ulong t, ulong q, slong n)
+
+The first two return whether the tuned dispatch of
+`_mp_real_sin_cos_pi_ui_div_ui` resp. that of the tangent evaluates the
+denominator $q$ (in lowest terms) at $n$ limbs by an algebraic method
+(closed forms, square roots, half angles, the Chebyshev iteration),
+which is then faster than the kernel on $\pi p/q$; the functions of
+$\pi x$ at dyadic $x$ and the functions of $\pi p/q$ in `arb` use them
+to choose. `_mp_real_tan_pi_ui_div_ui` sets $(y, n + 1)$ to
+$\tan(\pi t/q)$ for $0 \le 4t \le q$ at $n$ fraction limbs and returns
+the error bound in ulps (`UWORD_MAX` if none fits).
 :::
 
 ## Fixed-point Newton inverses and roots {#newton}

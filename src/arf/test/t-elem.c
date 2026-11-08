@@ -228,6 +228,52 @@ TEST_FUNCTION_START(arf_elem, state)
         arf_elem_check_pair("arf_sinh_cosh", arf_sinh_cosh, arf_sinh, arf_cosh, arb_sinh_cosh, 0, state);
     }
 
+    /* the functions of pi x at dyadic x = m / 2^k with a small
+       denominator (the algebraic methods of mp_real), against sin and
+       cos of pi x by the general functions */
+    for (iter = 0; iter < iters / 4; iter++)
+    {
+        arf_t x, r;
+        arb_t t, rs, rc, rt;
+        slong prec, k;
+        arf_rnd_t rnd;
+        int status;
+
+        arf_init(x);
+        arf_init(r);
+        arb_init(t);
+        arb_init(rs);
+        arb_init(rc);
+        arb_init(rt);
+
+        k = 1 + n_randint(state, n_randint(state, 4) ? 8 : 24);
+        arf_set_si(x, 2 * (slong) n_randint(state, UWORD(1) << FLINT_MIN(k + 3, 30)) + 1);
+        if (n_randint(state, 2))
+            arf_neg(x, x);
+        arf_mul_2exp_si(x, x, -k);
+        prec = 2 + n_randint(state, (iter % 4 == 0) ? 20000 : 4000);
+        rnd = (arf_rnd_t) n_randint(state, 7);
+
+        arb_const_pi(t, prec + 200);
+        arb_mul_arf(t, t, x, prec + 200);
+        arb_sin_cos(rs, rc, t, prec + 200);
+        arb_div(rt, rs, rc, prec + 200);
+
+        status = arf_sin_pi(r, x, prec, rnd);
+        arf_elem_verify("arf_sin_pi (dyadic)", x, r, status, rs, prec, rnd, WORD_MAX);
+        status = arf_cos_pi(r, x, prec, rnd);
+        arf_elem_verify("arf_cos_pi (dyadic)", x, r, status, rc, prec, rnd, WORD_MAX);
+        status = arf_tan_pi(r, x, prec, rnd);
+        arf_elem_verify("arf_tan_pi (dyadic)", x, r, status, rt, prec, rnd, WORD_MAX);
+
+        arf_clear(x);
+        arf_clear(r);
+        arb_clear(t);
+        arb_clear(rs);
+        arb_clear(rc);
+        arb_clear(rt);
+    }
+
     /* the exact integer values at every precision: log10(10^k) = k,
        log2(2^k) = k, exp10(k) = 10^k, exp2(k) = 2^k, rounded to prec
        (the value of the relaxed modes rounded as their strict mode, as

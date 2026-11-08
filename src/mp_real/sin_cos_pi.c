@@ -834,6 +834,200 @@ _scp_quadratic(nn_ptr ys, nn_ptr yc, ulong * err, ulong t, ulong q, slong n)
     mp_real_clear(v);
 }
 
+/* HALF ANGLES.  For q = 2^k q0 with q0 = 1, 3 or 5, cos(pi t/q) follows
+   from a closed form at a denominator q0 2^j <= 6 by half-angle steps
+
+       cos(theta/2) = sqrt((1 + cos theta)/2)                (theta <= pi/2),
+       cos(theta/2) = sqrt((1 - cos(pi - theta))/2)          (theta > pi/2),
+
+   one square root per halving of the denominator.  The second form
+   cancels: 1 - cos(pi s/(q/2)) >= 1 - cos(2 pi/q) > 2^(1 - 2 bits(q))
+   loses at most 2 bits(q) bits, which the working precision includes
+   for every step (the balls carry the actual error).  Of sin(pi t/q)
+   and cos(pi t/q), the one above 1/sqrt(2) is the chain (cos for 4t <=
+   q, else sin(pi t/q) = cos(pi (q - 2t)/(2q)), one more step) and the
+   other its complement sqrt(1 - x^2), whose cancellation costs 2 bits(q)
+   more bits. */
+
+/* whether the half-angle chain applies: the odd part of q is 1, 3 or 5
+   (and 2q fits) */
+static int
+_scp_half_ok(ulong q)
+{
+    ulong q0 = q >> flint_ctz(q);
+    return q <= SCP_CHEB_Q_MAX && (q0 == 1 || q0 == 3 || q0 == 5);
+}
+
+/* the ball cos(pi t/q) at w limbs for 0 <= 2t <= q, _scp_half_ok(q) */
+static void
+_scp_half_cos(mp_real_t c, ulong t, ulong q, slong w)
+{
+    ulong g = n_gcd(t, q);
+
+    t /= g;
+    q /= g;
+
+    if (t == 0)
+        mp_real_set_ui(c, 1);
+    else if (2 * t == q)
+        mp_real_zero(c);
+    else if (q == 3)
+    {
+        mp_real_set_ui(c, 1);
+        mp_real_mul_2exp_si(c, c, -1);
+    }
+    else if (q == 4)
+        mp_real_rsqrt_ui(c, 2, w);
+    else if (q == 6)
+    {
+        /* sqrt(3)/2 = 3 rsqrt(3) / 2 */
+        mp_real_rsqrt_ui(c, 3, w);
+        mp_real_mul_ui(c, c, 3, w);
+        mp_real_mul_2exp_si(c, c, -1);
+    }
+    else if (q == 5)
+    {
+        /* cos(pi/5), cos(2 pi/5) = (sqrt(5) +- 1)/4 */
+        mp_real_t one;
+        mp_real_init(one);
+        mp_real_set_ui(one, 1);
+        mp_real_rsqrt_ui(c, 5, w);
+        mp_real_mul_ui(c, c, 5, w);
+        if (t == 1)
+            mp_real_add(c, c, one, w);
+        else
+            mp_real_sub(c, c, one, w);
+        mp_real_mul_2exp_si(c, c, -2);
+        mp_real_clear(one);
+    }
+    else
+    {
+        mp_real_t one;
+
+        FLINT_ASSERT(q % 2 == 0);
+        mp_real_init(one);
+        mp_real_set_ui(one, 1);
+        if (4 * t <= q)
+        {
+            _scp_half_cos(c, t, q / 2, w);
+            mp_real_add(c, one, c, w);
+        }
+        else
+        {
+            _scp_half_cos(c, q / 2 - t, q / 2, w);
+            mp_real_sub(c, one, c, w);
+        }
+        mp_real_mul_2exp_si(c, c, -1);
+        mp_real_sqrt(c, c, w);
+        mp_real_clear(one);
+    }
+}
+
+/* whether the chain beats the kernel and the Chebyshev iteration at n
+   limbs, for q > 12: with L = 1 + the halvings, from about L^2 limbs (24
+   for q = 16, 48 for 64, 128 for 1024; 1.5-2 times faster than the
+   kernel from there to a few hundred limbs), up to 1024 limbs for L > 6
+   (beyond, within 10% of the Chebyshev iteration either way) and at any
+   size for L <= 6 (10-20% faster than the Chebyshev iteration up to
+   32768 limbs; measured on 64-bit x86, by 64-bit limbs); for the cosine
+   alone (the chain itself, no complement) also beyond 1024 limbs for L
+   > 6 (0.75-0.95 times the time of the Chebyshev iteration, about even
+   around 1536 limbs) */
+static int
+_scp_half_worth(ulong q, slong n, int cos_only)
+{
+    slong L = flint_ctz(q) + 1;
+    n = n / (64 / FLINT_BITS);
+    return q > 12 && n >= L * L && (n < 1024 || L <= 6 || cos_only);
+}
+
+/* the working limbs of the chain for n limbs: a step of the second
+   form multiplies the absolute error by at most 1/(4 cos(theta/2)) <=
+   q/4 (the value is at least sin(pi/(2q)) > 1/q), at most bits(2q) bits
+   for each of the L = 1 + the halvings steps, and the complement sqrt(1
+   - x^2) as much once more */
+static slong
+_scp_half_limbs(ulong q, slong n)
+{
+    slong kb = FLINT_BIT_COUNT(q) + 1;
+    slong steps = flint_ctz(q) + 2;
+    return n + (steps * kb + 16 + FLINT_BITS - 1) / FLINT_BITS;
+}
+
+/* sin and cos of pi t/q as balls at w = _scp_half_limbs(q, n) limbs,
+   0 < 2t < q in lowest terms, _scp_half_ok(q); either output NULL.  A
+   single output is its own chain (sin(pi t/q) = cos(pi (q - 2t)/(2q)));
+   for both, the one above 1/sqrt(2) is the chain and the other its
+   complement sqrt(1 - x^2) */
+static void
+_scp_half_ball(mp_real_t sn, mp_real_t cs, ulong t, ulong q, slong w)
+{
+    mp_real_t x, y;
+    int cos_chain;
+
+    if (sn == NULL || cs == NULL)
+    {
+        if (cs != NULL)
+            _scp_half_cos(cs, t, q, w);
+        else if (sn != NULL)
+            _scp_half_cos(sn, q - 2 * t, 2 * q, w);
+        return;
+    }
+
+    cos_chain = (4 * t <= q);
+    mp_real_init(x);
+    mp_real_init(y);
+
+    if (cos_chain)
+        _scp_half_cos(x, t, q, w);
+    else
+        _scp_half_cos(x, q - 2 * t, 2 * q, w);
+
+    {
+        mp_real_t one;
+        mp_real_init(one);
+        mp_real_set_ui(one, 1);
+        mp_real_mul(y, x, x, w);
+        mp_real_sub(y, one, y, w);
+        mp_real_sqrt(y, y, w);
+        mp_real_clear(one);
+    }
+
+    if (cos_chain)
+    {
+        mp_real_swap(cs, x);
+        mp_real_swap(sn, y);
+    }
+    else
+    {
+        mp_real_swap(sn, x);
+        mp_real_swap(cs, y);
+    }
+
+    mp_real_clear(x);
+    mp_real_clear(y);
+}
+
+/* the same as fixed-point numbers (ys, n + 1), (yc, n + 1) */
+static void
+_scp_half(nn_ptr ys, nn_ptr yc, ulong * err, ulong t, ulong q, slong n)
+{
+    mp_real_t cs, sn;
+    ulong e1 = 0, e2 = 0;
+
+    mp_real_init(cs);
+    mp_real_init(sn);
+    _scp_half_ball(ys ? sn : NULL, yc ? cs : NULL, t, q, _scp_half_limbs(q, n));
+    if (ys != NULL)
+        e1 = _mp_real_ball_get_fixed1(ys, sn, n);
+    if (yc != NULL)
+        e2 = _mp_real_ball_get_fixed1(yc, cs, n);
+    if (err != NULL)
+        *err = FLINT_MAX(e1, e2);
+    mp_real_clear(cs);
+    mp_real_clear(sn);
+}
+
 static void _scp_lowest(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q,
     slong n, int alg, int r);
 
@@ -863,6 +1057,31 @@ _mp_real_sin_cos_pi_ui_div_ui_tune(nn_ptr ys, nn_ptr yc, ulong * err,
     _scp_lowest(ys, yc, err, p / g, q / g, n, alg, r);
 }
 
+/* the method for a denominator q > 6 in lowest terms at n limbs (both:
+   both outputs wanted; cos_only: the cosine alone): 3 = square roots for q = 5, 8, 10, 12 from
+   SCP_QUADRATIC_MIN_BITS on, except q = 8, whose half-angle chain is
+   faster (0.75 times for both outputs from 16 limbs to 512, 0.4-0.7 for
+   one at any size) but for both outputs from 1024 limbs (1.2 times
+   slower); 4 = half angles; 2 = the Chebyshev iteration; 1 = the
+   kernel */
+static int
+_scp_choose(ulong q, slong n, int both, int cos_only)
+{
+    if (q == 8)
+    {
+        if (both && n / (64 / FLINT_BITS) >= 1024)
+            return 3;
+        return (n / (64 / FLINT_BITS) >= 16) ? 4 : 1;
+    }
+    if (q == 5 || q == 10 || q == 12)
+        return (FLINT_BITS * n >= SCP_QUADRATIC_MIN_BITS(q)) ? 3 : 1;
+    if (_scp_half_ok(q) && _scp_half_worth(q, n, cos_only))
+        return 4;
+    if (q <= SCP_CHEB_Q_MAX && (slong) FLINT_BIT_COUNT(q) <= _scp_cheb_kbmax(n))
+        return 2;
+    return 1;
+}
+
 /* the dispatch for a fraction in lowest terms with 0 < p <= q/2 */
 static void
 _scp_lowest(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n,
@@ -885,8 +1104,15 @@ _scp_lowest(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n,
     }
     else if (q == 4)
     {
-        _scp_set_fixed_sqrt(ys, n, 2);
-        _scp_set_fixed_sqrt(yc, n, 2);
+        /* sin = cos = sqrt(2)/2, one root */
+        if (ys != NULL)
+        {
+            _scp_set_fixed_sqrt(ys, n, 2);
+            if (yc != NULL)
+                flint_mpn_copyi(yc, ys, n + 1);
+        }
+        else
+            _scp_set_fixed_sqrt(yc, n, 2);
         e = 4;
     }
     else if (q == 6)
@@ -895,18 +1121,16 @@ _scp_lowest(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n,
         _scp_set_fixed_sqrt(yc, n, 3);
         e = 4;
     }
-    else if ((q == 5 || q == 8 || q == 10 || q == 12) && (alg == 3
-            || (alg == 0 && FLINT_BITS * n >= SCP_QUADRATIC_MIN_BITS(q))))
-    {
-        _scp_quadratic(ys, yc, &e, p, q, n);
-    }
     else
     {
         if (alg == 0)
-            alg = (q <= SCP_CHEB_Q_MAX
-                && (slong) FLINT_BIT_COUNT(q) <= _scp_cheb_kbmax(n)) ? 2 : 1;
+            alg = _scp_choose(q, n, ys != NULL && yc != NULL, ys == NULL);
 
-        if (alg == 2 && q <= SCP_CHEB_Q_MAX)
+        if (alg == 3 && (q == 5 || q == 8 || q == 10 || q == 12))
+            _scp_quadratic(ys, yc, &e, p, q, n);
+        else if (alg == 4 && _scp_half_ok(q))
+            _scp_half(ys, yc, &e, p, q, n);
+        else if (alg == 2 && q <= SCP_CHEB_Q_MAX)
             _scp_cheb(ys, yc, &e, p, q, n, r);
         else
             _scp_kernel(ys, yc, &e, p, q, n);
@@ -1009,8 +1233,9 @@ mp_real_sin_cos_pi_ui_div_ui(mp_real_t res1, mp_real_t res2, ulong p,
 /* T = tan(pi t/q) for 0 < 2t < q, gcd(t, q) = 1, q >= 3, q != 4, to a
    relative accuracy of about B^-w (w >= 2 + the bits of q in limbs):
    closed forms for q = 3, 6, 8, 12 and (from the size at which they
-   beat the kernel for sin and cos) q = 5, 10; the Chebyshev sine and
-   cosine divided, where they beat the kernel; else the tan kernel on
+   beat the kernel for sin and cos) q = 5, 10; the half-angle or
+   Chebyshev sine and cosine divided, where they beat the kernel; else
+   the tan kernel on
    v = pi t/q, or on its complement pi/2 - v for 4t > q, then inverted */
 static void
 _scp_tan_ball(mp_real_t T, ulong t, ulong q, slong w)
@@ -1067,6 +1292,14 @@ _scp_tan_ball(mp_real_t T, ulong t, ulong q, slong w)
             mp_real_add(T, u, T, w);
         mp_real_sqrt(T, T, w);
         mp_real_clear(u);
+    }
+    else if (_scp_half_ok(q) && _scp_half_worth(q, w, 0))
+    {
+        mp_real_t cs;
+        mp_real_init(cs);
+        _scp_half_ball(T, cs, t, q, _scp_half_limbs(q, w));
+        mp_real_div(T, T, cs, w);
+        mp_real_clear(cs);
     }
     else if (q <= SCP_CHEB_Q_MAX && (slong) FLINT_BIT_COUNT(q) <= _scp_cheb_kbmax(w))
     {
@@ -1161,4 +1394,61 @@ mp_real_tan_pi_ui_div_ui(mp_real_t res, ulong p, ulong q, slong n)
     mp_real_swap(res, T);
     mp_real_clear(T);
     return 1;
+}
+
+/* predicates and the fixed-point tangent for the callers of the
+   fixed-point kernels (the functions of pi x at a dyadic x with a small
+   denominator, arb's functions of pi p/q) ***********************************/
+
+int
+_mp_real_sin_cos_pi_ui_div_ui_algebraic(ulong q, slong n)
+{
+    /* (below 12 limbs, only the closed forms: a quick exit) */
+    if (q <= 6)
+        return 1;
+    if (n < 12 * (64 / FLINT_BITS))
+        return 0;
+    return _scp_choose(q, n, 0, 0) != 1;
+}
+
+int
+_mp_real_tan_pi_ui_div_ui_algebraic(ulong q, slong n)
+{
+    if (q <= 4 || q == 6 || q == 8 || q == 12)
+        return 1;
+    return _mp_real_sin_cos_pi_ui_div_ui_algebraic(q, n);
+}
+
+ulong
+_mp_real_tan_pi_ui_div_ui(nn_ptr y, ulong t, ulong q, slong n)
+{
+    mp_real_t T;
+    ulong g, e;
+
+    FLINT_ASSERT(q >= 1 && 4 * t <= q);
+    FLINT_ASSERT(n >= 1);
+
+    g = n_gcd(t, q);
+    t /= g;
+    q /= g;
+
+    if (t == 0)
+    {
+        _scp_set_fixed_ui(y, n, 0);
+        return 0;
+    }
+
+    if (q == 4)
+    {
+        _scp_set_fixed_ui(y, n, 1);
+        return 0;
+    }
+
+    /* the value lies in (0, 1): a relative accuracy at the guard limbs
+       of mp_real_tan_pi_ui_div_ui is an absolute one */
+    mp_real_init(T);
+    _scp_tan_ball(T, t, q, n + 1 + (FLINT_BIT_COUNT(q) + 16 + FLINT_BITS - 1) / FLINT_BITS);
+    e = _mp_real_ball_get_fixed1(y, T, n);
+    mp_real_clear(T);
+    return e;
 }

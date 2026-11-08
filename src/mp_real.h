@@ -643,9 +643,20 @@ void _mp_real_atanh_rs(nn_ptr res, ulong * err, nn_srcptr x, slong n);
    bitwise parameter, when the sin/cos kernel is used, else at most 4
    (computed at run time).  alg: 0 = tuned, 1 = the kernel on pi p/q,
    2 = the Chebyshev (U_(q-1) root) iteration of order r (0 =
-   default), 3 = square roots for q = 5, 8, 10, 12. */
+   default), 3 = square roots for q = 5, 8, 10, 12, 4 = half-angle
+   steps for q = 2^k q0, q0 = 1, 3, 5. */
 void _mp_real_sin_cos_pi_ui_div_ui(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n);
 void _mp_real_sin_cos_pi_ui_div_ui_tune(nn_ptr ys, nn_ptr yc, ulong * err, ulong p, ulong q, slong n, int alg, int r);
+
+/* whether the tuned dispatch above (resp. that of the tangent) evaluates
+   a denominator q (in lowest terms) at n limbs by an algebraic method
+   (closed forms, square roots, half angles, the Chebyshev iteration),
+   which is then faster than the general kernel on pi p/q; and tan(pi
+   t/q) for 0 <= 4t <= q as (y, n + 1) at n fraction limbs, returning the
+   error bound in ulps (sin_cos_pi.c) */
+int _mp_real_sin_cos_pi_ui_div_ui_algebraic(ulong q, slong n);
+int _mp_real_tan_pi_ui_div_ui_algebraic(ulong q, slong n);
+ulong _mp_real_tan_pi_ui_div_ui(nn_ptr y, ulong t, ulong q, slong n);
 
 /* Bitwise argument reduction with tabulated log(1 + 2^-i) resp.
    atan(2^-i), for any x in [0, 1); r = 0 selects a tuned reduction

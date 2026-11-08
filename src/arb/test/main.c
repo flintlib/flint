@@ -62,7 +62,6 @@
 #include "t-cos.c"
 #include "t-cosh.c"
 #include "t-cos_pi.c"
-#include "t-cos_pi_fmpq_algebraic.c"
 #include "t-cos_pi_fmpq.c"
 #include "t-coth.c"
 #include "t-cot_pi.c"
@@ -159,14 +158,14 @@
 #include "t-sinc.c"
 #include "t-sin_cos.c"
 #include "t-sin_cos_pi.c"
-#include "t-sin_cos_pi_fmpq_algebraic.c"
+#include "t-sin_cos_pi_dyadic.c"
 #include "t-sin_cos_pi_fmpq.c"
 #include "t-sinc_pi.c"
 #include "t-sinh.c"
 #include "t-sinh_cosh.c"
 #include "t-sin_pi.c"
-#include "t-sin_pi_fmpq_algebraic.c"
 #include "t-sin_pi_fmpq.c"
+#include "t-tan_pi_fmpq.c"
 #include "t-special.c"
 #include "t-sqrt1pm1.c"
 #include "t-sqrt.c"
@@ -252,7 +251,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_cos),
     TEST_FUNCTION(arb_cosh),
     TEST_FUNCTION(arb_cos_pi),
-    TEST_FUNCTION(arb_cos_pi_fmpq_algebraic),
     TEST_FUNCTION(arb_cos_pi_fmpq),
     TEST_FUNCTION(arb_coth),
     TEST_FUNCTION(arb_cot_pi),
@@ -349,14 +347,14 @@ test_struct tests[] =
     TEST_FUNCTION(arb_sinc),
     TEST_FUNCTION(arb_sin_cos),
     TEST_FUNCTION(arb_sin_cos_pi),
-    TEST_FUNCTION(arb_sin_cos_pi_fmpq_algebraic),
+    TEST_FUNCTION(arb_sin_cos_pi_dyadic),
     TEST_FUNCTION(arb_sin_cos_pi_fmpq),
     TEST_FUNCTION(arb_sinc_pi),
     TEST_FUNCTION(arb_sinh),
     TEST_FUNCTION(arb_sinh_cosh),
     TEST_FUNCTION(arb_sin_pi),
-    TEST_FUNCTION(arb_sin_pi_fmpq_algebraic),
     TEST_FUNCTION(arb_sin_pi_fmpq),
+    TEST_FUNCTION(arb_tan_pi_fmpq),
     TEST_FUNCTION(arb_special),
     TEST_FUNCTION(arb_sqrt1pm1),
     TEST_FUNCTION(arb_sqrt),

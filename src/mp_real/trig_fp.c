@@ -289,12 +289,29 @@ _tiny(slong e, slong n, slong nk)
     return 2 * e + 4 <= -FLINT_BITS * (pn + 1);
 }
 
+/* whether the reduced t = (T, tl) B^(te - tl) in (0, 1/4] is m / 2^j with
+   m odd and j <= FLINT_BITS - 8 (a denominator the algebraic methods of
+   sin_cos_pi.c take) */
+static int
+_dyadic_t(ulong * m, slong * j, nn_srcptr T, slong tl, slong te)
+{
+    unsigned int c;
+
+    if (tl != 1 || te != 0)
+        return 0;
+    c = flint_ctz(T[0]);
+    *j = FLINT_BITS - c;
+    *m = T[0] >> c;
+    return *j <= FLINT_BITS - 8;
+}
+
 int
 _mp_real_sin_cos_pi_fp(nn_ptr ys, nn_ptr yc, slong * w, slong * k, ulong * err, nn_srcptr d, slong n, slong e, slong pb, slong wmax, int rel)
 {
     nn_ptr T, v, xbuf;
     mp_real_t X;
-    slong tl, te, z, ww, nk = _mp_real_elem_limbs(pb);
+    slong tl, te, z, ww, tj, nk = _mp_real_elem_limbs(pb);
+    ulong tm;
     int a, sneg, r;
     TMP_INIT;
 
@@ -354,6 +371,17 @@ _mp_real_sin_cos_pi_fp(nn_ptr ys, nn_ptr yc, slong * w, slong * k, ulong * err, 
     else
         ww = nk;
 
+    /* a dyadic t = m / 2^j with a small denominator: the algebraic
+       methods of sin_cos_pi.c where they beat the kernel */
+    if (_dyadic_t(&tm, &tj, T, tl, te)
+        && _mp_real_sin_cos_pi_ui_div_ui_algebraic(UWORD(1) << tj, ww))
+    {
+        _mp_real_sin_cos_pi_ui_div_ui((a & 1) ? yc : ys, (a & 1) ? ys : yc, err, tm, UWORD(1) << tj, ww);
+        *w = ww;
+        TMP_END;
+        return _signs(a, sneg);
+    }
+
     /* v = pi t within 3 ulps */
     v = TMP_ALLOC((ww + 1) * sizeof(ulong));
     _mp_real_trig_pi_v_fixed(v, T, tl, te, ww);
@@ -370,7 +398,8 @@ _mp_real_tan_pi_fp(nn_ptr y, slong * w, slong * k, ulong * err, int * recip, nn_
 {
     nn_ptr T, v, xbuf;
     mp_real_t X;
-    slong tl, te, z, ww, nk = _mp_real_elem_limbs(pb);
+    slong tl, te, z, ww, tj, nk = _mp_real_elem_limbs(pb);
+    ulong tm;
     int a, sneg, r;
     TMP_INIT;
 
@@ -416,6 +445,17 @@ _mp_real_tan_pi_fp(nn_ptr y, slong * w, slong * k, ulong * err, int * recip, nn_
 
     z = (slong) flint_clz(T[tl - 1]) - FLINT_BITS * te;
     ww = _limbs(pb, z, a & 1, wmax);
+
+    /* a dyadic t with a small denominator (see above) */
+    if (_dyadic_t(&tm, &tj, T, tl, te)
+        && _mp_real_tan_pi_ui_div_ui_algebraic(UWORD(1) << tj, ww)
+        && (*err = _mp_real_tan_pi_ui_div_ui(y, tm, UWORD(1) << tj, ww)) != UWORD_MAX)
+    {
+        *w = ww;
+        *recip = a & 1;
+        TMP_END;
+        return (a & 1) ? !sneg : sneg;
+    }
 
     v = TMP_ALLOC((ww + 1) * sizeof(ulong));
     _mp_real_trig_pi_v_fixed(v, T, tl, te, ww);

@@ -1,18 +1,20 @@
 ---
 title: Sines and cosines of rational multiples of π
-summary: Evaluating cos(πR/Q) and sin(πR/Q) as algebraic numbers - a Chebyshev step of arbitrary order with hypergeometric corrections that needs no division or square root (mp_real), and Newton refinement of a root of the minimal polynomial (arb).
-complexity: $O(M(n)\log Q)$ for the Chebyshev iteration; Newton refinement costs $O(M(n))$ times the degree of the minimal polynomial.
+summary: Evaluating cos(πR/Q), sin(πR/Q) and tan(πR/Q) as algebraic numbers - closed forms and half-angle steps by square roots, a Chebyshev step of arbitrary order with hypergeometric corrections that needs no division or square root, and the choice between these and the general kernels in mp_real, arb and the functions of πx at dyadic x.
+complexity: $O(M(n)\log Q)$ for the Chebyshev iteration, about $k + 1$ square roots for the half-angle steps at $Q = 2^k Q_0$.
 order: 15
 ---
 
 The values $\cos(\pi R/Q)$ are algebraic of degree at most $Q$, and at
-high precision it is cheaper to refine one as a root of a polynomial
-than to evaluate the cosine with the general kernels of
-[](algorithms/special-functions/elementary). FLINT does this in two
-ways: `mp_real_sin_cos_pi_ui_div_ui` refines an approximation by a
-Chebyshev step whose order grows with the precision, and
-`arb_sin_cos_pi_fmpq` refines a root of the minimal polynomial by
-Newton iteration for small denominators.
+high precision it is cheaper to compute one as an algebraic number than
+to evaluate the cosine with the general kernels of
+[](algorithms/special-functions/elementary).
+`mp_real_sin_cos_pi_ui_div_ui` (and `mp_real_tan_pi_ui_div_ui`) chooses
+by the denominator and the precision between closed forms with square
+roots, half-angle steps, a Chebyshev step whose order grows with the
+precision, and the general kernel on $\pi R/Q$; `arb_sin_cos_pi_fmpq`,
+`arb_tan_pi_fmpq` and the functions of $\pi x$ at a dyadic $x$ with a
+small denominator use it where it is faster.
 
 ## The Chebyshev step {#chebyshev}
 
@@ -66,20 +68,71 @@ at 65536 limbs, and all denominators beyond). Of $\cos(\pi t/q)$ and
 $\sin(\pi t/q) = \cos(\pi(q - 2t)/(2q))$ the one with the smaller
 denominator is iterated and the other is $\sqrt{1 - x^{*2}}$.
 
-## Minimal polynomials {#minpoly}
+## Square roots and half angles {#half-angle}
 
-`arb_sin_cos_pi_fmpq` reduces $x$ to $[0, 1/4]$ by symmetries and then
-evaluates $\cos(\pi R/Q)$ either as $\cos$ of an enclosure of
-$\pi R/Q$ or, when the denominator is small against the precision
-(up to $Q = 1000$, from about $1500 + 150 Q$ bits), as a root of the
-minimal polynomial of $2\cos(2\pi/Q)$ (`fmpz_poly_cos_minpoly`): a
-starting value at about 100 bits plus the size of the coefficients is
-refined by Newton iteration in ball arithmetic
-(`_arb_poly_newton_refine_root`), whose convergence on an interval
-around the start is checked first. Denominators up to 6 use closed
-forms, and an even denominator is halved by the half-angle formula
-$\cos(\theta/2) = \sqrt{(1 + \cos\theta)/2}$.
+The denominators up to 6 have closed forms ($\cos(\pi/3) = 1/2$,
+$\cos(\pi/4) = \sqrt 2/2$, $\cos(\pi/5) = (\sqrt 5 + 1)/4$,
+$\cos(\pi/6) = \sqrt 3/2$), and $Q = 10, 12$ quadratic ones. For
+$Q = 2^k Q_0$ with $Q_0 = 1, 3, 5$, the half-angle formulas
+$$
+\cos\frac\theta2 = \sqrt{\frac{1 + \cos\theta}{2}} \quad
+\Bigl(\theta \le \frac\pi2\Bigr), \qquad
+\cos\frac\theta2 = \sqrt{\frac{1 - \cos(\pi - \theta)}{2}} \quad
+\Bigl(\theta > \frac\pi2\Bigr)
+$$
+lead from a closed form at the denominator $2^j Q_0 \le 6$ to
+$\cos(\pi R/Q)$ in $k$ or fewer square roots. The second form cancels:
+$1 - \cos(\pi s/(Q/2)) \ge 1 - \cos(2\pi/Q)$, and the absolute error of
+the step grows by at most a factor $Q/4$, so each step costs at most
+$\operatorname{bits}(Q)$ guard bits. Of $\sin(\pi R/Q)$ and
+$\cos(\pi R/Q)$, one value alone is its own chain ($\sin(\pi R/Q) =
+\cos(\pi(Q - 2R)/(2Q))$, one step more); for both, the larger is the
+chain and the other $\sqrt{1 - x^2}$, which costs $2\operatorname{bits}(Q)$
+more guard bits for the cancellation. With $L = k + 1$, the chain beats
+the general kernel from about $L^2$ limbs ($Q = 8$ from 16 limbs,
+$Q = 16$ from 24, $Q = 1024$ from 128), and for $L \le 6$ it stays
+10-20% faster than the Chebyshev step at any size; for larger $L$ it is
+used up to 1024 limbs, and beyond for the cosine alone (5-25% faster
+than the Chebyshev step there, which wins for the sine and for both).
+
+## Choosing the method {#choice}
+
+`_mp_real_sin_cos_pi_ui_div_ui` takes, in this order, the exact values
+($Q \le 2$), the closed forms ($Q = 3, 4, 6$; $Q = 5, 10, 12$ from 12
+limbs), the half-angle steps for $Q = 2^k Q_0$ where they win, the
+Chebyshev step for denominators up to the tuned bit length, and the
+kernel on $\pi R/Q$ (or its complement) otherwise; the tangent uses the
+closed forms $\sqrt 3$, $\sqrt 2 \mp 1$, $2 \mp \sqrt 3$, and the
+sine and cosine of the half-angle steps or the Chebyshev step divided,
+where they win, and the tangent kernel otherwise.
+`_mp_real_sin_cos_pi_ui_div_ui_algebraic` tells whether the choice is
+other than the kernel.
+
+The callers use this predicate:
+
+- `_mp_real_sin_cos_pi_fp` and `_mp_real_tan_pi_fp`, the fixed-point
+  kernels behind `arb_sin_pi`, `arf_sin_pi`, `nfloat_sin_pi` and their
+  relatives, reduce $x$ exactly to $t \in [0, 1/4]$; when $t = m/2^j$
+  with $j \le \bits - 8$ and the predicate holds, $\sin(\pi t)$ and
+  $\cos(\pi t)$ (or $\tan(\pi t)$) come from the algebraic methods:
+  $\sin(\pi/4)$ is one square root at any precision, $\sin(3\pi/16)$
+  half-angle steps from about 24 limbs.
+- `arb_sin_cos_pi_fmpq`, `arb_sin_pi_fmpq`, `arb_cos_pi_fmpq` and
+  `arb_tan_pi_fmpq` reduce $x$ exactly to $v/w \in [0, 1/4]$ by
+  symmetries. Below 12288 bits, square roots through `arb_sqrt` are
+  faster than those of mp_real: the closed forms for $w \le 6$, and the
+  half-angle steps for $w = 2^k Q_0$ from a precision growing with the
+  number $r = k - 1, k, k + 1$ ($Q_0 = 1, 3, 5$) of square roots (768
+  bits for $r \le 3$ to 3072 bits for $r = 8$ for both values, 256 to
+  6144 bits up to $r = 10$ for one of them; not for the tangent at $w =
+  8, 12$, whose closed forms in mp_real are faster). Otherwise a
+  word-size denominator goes to `mp_real_sin_cos_pi_ui_div_ui` resp.
+  `mp_real_tan_pi_ui_div_ui` where the predicate holds, and the
+  remaining cases evaluate the functions of an enclosure of $\pi v/w$,
+  with full relative accuracy since the reduced argument is small or
+  away from the zeros; the tangent is the quotient of the sine and
+  cosine (or its inverse).
 
 ## Use in FLINT {#use}
 
-::: functions mp_real_sin_cos_pi_ui_div_ui _mp_real_sin_cos_pi_ui_div_ui arb_sin_cos_pi_fmpq :::
+::: functions mp_real_sin_cos_pi_ui_div_ui _mp_real_sin_cos_pi_ui_div_ui arb_sin_cos_pi_fmpq arb_tan_pi_fmpq :::
