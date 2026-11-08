@@ -84,11 +84,13 @@ _nmod_poly_power_sums_naive(nn_ptr res, nn_srcptr poly, slong len, slong n,
                             nmod_t mod)
 {
     slong i, k;
+    ulong kmod = 0;     /* k mod n, as nmod_mul needs reduced operands */
 
     NMOD_RED(res[0], (ulong) (len - 1), mod);
     for (k = 1; k < FLINT_MIN(n, len); k++)
     {
-        res[k] = nmod_mul(poly[len - 1 - k], k, mod);
+        kmod = (kmod + 1 == mod.n) ? 0 : kmod + 1;
+        res[k] = nmod_mul(poly[len - 1 - k], kmod, mod);
         for (i = 1; i < k; i++)
             res[k] =
                 nmod_add(res[k], nmod_mul(poly[len - 1 - k + i], res[i], mod),

@@ -158,6 +158,11 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
 
         ulong mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
 
+        /* NMOD_RED3 needs the top word below n; it is below
+           2^(bits - 2 FLINT_BITS) <= 2^(nu - 1) <= n if bits - 2 FLINT_BITS
+           < nu (always so for Kronecker products), otherwise reduce it first */
+        int reduce_top = (bits - 2 * FLINT_BITS >= NMOD_BITS(mod));
+
         for (i = nlo; i < nhi; i++)
         {
             if (current_bit == 0)
@@ -166,6 +171,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
                 temp_upper = mpn[current_limb++];
                 temp_upper2 = mpn[current_limb] & mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit = bits - 2 * FLINT_BITS;
@@ -184,6 +191,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
                 temp_upper2 = mpn[current_limb] >> current_bit;
                 temp_upper2 &= mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit += bits - 2 * FLINT_BITS;
@@ -210,6 +219,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
 
                 temp_upper2 &= mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit += bits - 3 * FLINT_BITS;

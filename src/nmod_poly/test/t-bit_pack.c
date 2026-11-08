@@ -158,5 +158,67 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
         flint_free(res);
     }
 
+    /*
+        the same with 2 FLINT_BITS < bits < 3 FLINT_BITS: the top word of a
+        field can exceed n; against n_lll_mod_preinv on the fields read with
+        shifts, after reducing their top word
+    */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        nmod_t mod;
+        ulong n, ninv, bits;
+        slong j, len, nlo, limbs;
+        nn_ptr mpn, res;
+        flint_bitcnt_t nu = 1 + n_randint(state, FLINT_BITS);
+
+        n = n_randbits(state, nu);
+        if (n == 1)
+            n = 2;
+        nmod_init(&mod, n);
+        ninv = n_preinvert_limb(n);
+
+        bits = 2 * FLINT_BITS + 1 + n_randint(state, FLINT_BITS - 1);
+        len = 1 + n_randint(state, 40);
+        nlo = n_randint(state, len);
+        limbs = (len * bits - 1) / FLINT_BITS + 4;
+
+        mpn = flint_malloc(sizeof(ulong) * limbs);
+        res = flint_malloc(sizeof(ulong) * len);
+
+        for (j = 0; j < limbs; j++)
+            mpn[j] = n_randint(state, 4) ? n_randtest(state) : UWORD_MAX;
+
+        _nmod_poly_bit_unpack(res, nlo, len, mpn, bits, mod);
+
+        for (j = nlo; j < len; j++)
+        {
+            ulong lo, mi, hi, r;
+            ulong start = j * bits;
+            slong w = start / FLINT_BITS;
+            unsigned int sh = start % FLINT_BITS;
+
+            /* the field of bits bits starting at bit start */
+            lo = mpn[w] >> sh;
+            mi = mpn[w + 1] >> sh;
+            hi = mpn[w + 2] >> sh;
+            if (sh != 0)
+            {
+                lo |= mpn[w + 1] << (FLINT_BITS - sh);
+                mi |= mpn[w + 2] << (FLINT_BITS - sh);
+                hi |= mpn[w + 3] << (FLINT_BITS - sh);
+            }
+            hi &= (UWORD(1) << (bits - 2 * FLINT_BITS)) - 1;
+            r = n_lll_mod_preinv(hi % n, mi, lo, n, ninv);
+
+            if (res[j - nlo] != r)
+                TEST_FUNCTION_FAIL("arbitrary fields, three words\nn = %wu, bits = %wu, len = %wd, nlo = %wd, j = %wd\n"
+                                   "hi = %wu, mi = %wu, lo = %wu\ngot %wu, expected %wu\n",
+                                   n, bits, len, nlo, j, hi, mi, lo, res[j - nlo], r);
+        }
+
+        flint_free(mpn);
+        flint_free(res);
+    }
+
     TEST_FUNCTION_END(state);
 }

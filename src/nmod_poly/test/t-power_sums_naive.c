@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
@@ -195,6 +196,52 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
         nmod_poly_clear(d);
+    }
+
+    /* Small moduli, more roots than n: the index k of the first loop of
+       _nmod_poly_power_sums_naive exceeds n (and 2^nu); compare with the
+       power sums of the roots */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b;
+        nmod_t mod;
+        nn_ptr roots;
+        ulong n;
+        slong d, m, r, s;
+
+        n = 2 + n_randint(state, 30);
+        nmod_init(&mod, n);
+        d = 1 + n_randint(state, 60);
+        m = 1 + n_randint(state, 70);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        roots = _nmod_vec_init(d);
+
+        _nmod_vec_randtest(roots, state, d, mod);
+        nmod_poly_product_roots_nmod_vec(a, roots, d);
+        nmod_poly_power_sums_naive(b, a, m);
+
+        for (s = 0; s < m; s++)
+        {
+            tot = 0;
+            for (r = 0; r < d; r++)
+                tot = nmod_add(tot, nmod_pow_ui(roots[r], s, mod), mod);
+
+            if (nmod_poly_get_coeff_ui(b, s) != tot)
+            {
+                flint_printf("FAIL: power sums with small modulus\n");
+                flint_printf("n = %wu, d = %wd, s = %wd\n", n, d, s);
+                flint_printf("a = "), nmod_poly_print(a), flint_printf("\n");
+                flint_printf("b = "), nmod_poly_print(b), flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        _nmod_vec_clear(roots);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
     }
 
     TEST_FUNCTION_END(state);
