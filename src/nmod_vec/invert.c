@@ -29,8 +29,12 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
         TMP_START;
         tmp = TMP_ALLOC(len * sizeof(ulong));
         tmp[0] = vec[0];
-        for (k = 1; k < len; k++)
-            tmp[k] = nmod_mul(vec[k], tmp[k-1], mod);
+        if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+            for (k = 1; k < len; k++)
+                tmp[k] = _nmod_mul_bounded(vec[k], tmp[k-1], mod);
+        else
+            for (k = 1; k < len; k++)
+                tmp[k] = nmod_mul(vec[k], tmp[k-1], mod);
 
         /* current inverse is (vec[0] * ... * vec[len-1])^{-1} */
         k = len - 1;
@@ -41,12 +45,25 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
          *        = vec[k]^{-1}
          * inv = (vec[0] * ... * vec[k-1])^{-1}
          **/
-        for (; k > 0; k--)
+        if (NMOD_CAN_USE_MUL_BOUNDED(mod))
         {
-            /* read vec[k] before writing res[k], to allow aliasing */
-            ulong v = vec[k];
-            res[k] = nmod_mul(inv, tmp[k-1], mod);
-            inv = nmod_mul(inv, v, mod);
+            for (; k > 0; k--)
+            {
+                /* read vec[k] before writing res[k], to allow aliasing */
+                ulong v = vec[k];
+                res[k] = _nmod_mul_bounded(inv, tmp[k-1], mod);
+                inv = _nmod_mul_bounded(inv, v, mod);
+            }
+        }
+        else
+        {
+            for (; k > 0; k--)
+            {
+                /* read vec[k] before writing res[k], to allow aliasing */
+                ulong v = vec[k];
+                res[k] = nmod_mul(inv, tmp[k-1], mod);
+                inv = nmod_mul(inv, v, mod);
+            }
         }
         res[0] = inv;
         TMP_END;

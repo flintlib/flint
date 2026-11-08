@@ -35,8 +35,8 @@ _nmod_mat_charpoly_berkowitz(nn_ptr cp, const nmod_mat_t mat, nmod_t mod)
     }
     else if (n == 2)
     {
-        cp[0] = nmod_sub(nmod_mul(nmod_mat_entry(mat, 0, 0), nmod_mat_entry(mat, 1, 1), mod),
-                         nmod_mul(nmod_mat_entry(mat, 0, 1), nmod_mat_entry(mat, 1, 0), mod), mod);
+        cp[0] = nmod_fmma(nmod_mat_entry(mat, 0, 0), nmod_mat_entry(mat, 1, 1),
+                          nmod_neg(nmod_mat_entry(mat, 0, 1), mod), nmod_mat_entry(mat, 1, 0), mod);
         cp[1] = nmod_add(nmod_mat_entry(mat, 0, 0), nmod_mat_entry(mat, 1, 1), mod);
         cp[1] = nmod_neg(cp[1], mod);
         cp[2] = 1;

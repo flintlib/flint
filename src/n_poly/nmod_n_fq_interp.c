@@ -943,11 +943,17 @@ void nmod_evals_fmma(
 
     n_poly_fit_length(a, len);
 
-    for (i = 0; i < len; i++)
+    if (NMOD_CAN_USE_FMMA_BOUNDED(ctx))
     {
-        ulong t = nmod_mul(b->coeffs[i], c->coeffs[i], ctx);
-        NMOD_ADDMUL(t, d->coeffs[i], e->coeffs[i], ctx);
-        a->coeffs[i] = t;
+        for (i = 0; i < len; i++)
+            a->coeffs[i] = _nmod_fmma_bounded(b->coeffs[i], c->coeffs[i],
+                                              d->coeffs[i], e->coeffs[i], ctx);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            a->coeffs[i] = nmod_fmma(b->coeffs[i], c->coeffs[i],
+                                     d->coeffs[i], e->coeffs[i], ctx);
     }
 
     a->length = _nmod_vec_is_zero(a->coeffs, len) ? 0 : len;

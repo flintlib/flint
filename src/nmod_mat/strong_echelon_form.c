@@ -155,12 +155,25 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
                 v = (nmod_mat_entry(A, row, col))/g;
                 /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
 
-                for (k = col; k < m; k++)
+                if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
                 {
-                    t1 = nmod_add(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, nmod_mat_entry(A, i, k), mod), mod);
-                    t2 = nmod_add(nmod_mul(u, nmod_mat_entry(A, row, k), mod), nmod_mul(v, nmod_mat_entry(A, i, k), mod), mod);
-                    nmod_mat_entry(A, row, k) = t1;
-                    nmod_mat_entry(A, i, k) = t2;
+                    for (k = col; k < m; k++)
+                    {
+                        t1 = _nmod_fmma_bounded(s, nmod_mat_entry(A, row, k), t, nmod_mat_entry(A, i, k), mod);
+                        t2 = _nmod_fmma_bounded(u, nmod_mat_entry(A, row, k), v, nmod_mat_entry(A, i, k), mod);
+                        nmod_mat_entry(A, row, k) = t1;
+                        nmod_mat_entry(A, i, k) = t2;
+                    }
+                }
+                else
+                {
+                    for (k = col; k < m; k++)
+                    {
+                        t1 = nmod_fmma(s, nmod_mat_entry(A, row, k), t, nmod_mat_entry(A, i, k), mod);
+                        t2 = nmod_fmma(u, nmod_mat_entry(A, row, k), v, nmod_mat_entry(A, i, k), mod);
+                        nmod_mat_entry(A, row, k) = t1;
+                        nmod_mat_entry(A, i, k) = t2;
+                    }
                 }
             }
         }
@@ -223,13 +236,25 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             v = (nmod_mat_entry(A, row, row))/g;
             /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
 
-            for (k = row; k < m; k++)
+            if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
             {
-                t1 = nmod_add(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, extra_row[k], mod), mod);
-                t2 = nmod_add(nmod_mul(u, nmod_mat_entry(A, row, k), mod), nmod_mul(v, extra_row[k], mod), mod);
-                nmod_mat_entry(A, row, k) = t1;
-                extra_row[k] = t2;
-
+                for (k = row; k < m; k++)
+                {
+                    t1 = _nmod_fmma_bounded(s, nmod_mat_entry(A, row, k), t, extra_row[k], mod);
+                    t2 = _nmod_fmma_bounded(u, nmod_mat_entry(A, row, k), v, extra_row[k], mod);
+                    nmod_mat_entry(A, row, k) = t1;
+                    extra_row[k] = t2;
+                }
+            }
+            else
+            {
+                for (k = row; k < m; k++)
+                {
+                    t1 = nmod_fmma(s, nmod_mat_entry(A, row, k), t, extra_row[k], mod);
+                    t2 = nmod_fmma(u, nmod_mat_entry(A, row, k), v, extra_row[k], mod);
+                    nmod_mat_entry(A, row, k) = t1;
+                    extra_row[k] = t2;
+                }
             }
         }
     }

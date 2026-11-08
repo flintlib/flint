@@ -118,10 +118,21 @@ _nmod_poly_evaluate_nmod_horner(nn_srcptr poly, slong len, ulong c, nmod_t mod)
     val = poly[m];
     m--;
 
-    for ( ; m >= 0; m--)
+    if (NMOD_CAN_USE_MUL_BOUNDED(mod))
     {
-        val = nmod_mul(val, c, mod);
-        val = n_addmod(val, poly[m], mod.n);
+        for ( ; m >= 0; m--)
+        {
+            val = _nmod_mul_bounded(val, c, mod);
+            val = n_addmod(val, poly[m], mod.n);
+        }
+    }
+    else
+    {
+        for ( ; m >= 0; m--)
+        {
+            val = nmod_mul(val, c, mod);
+            val = n_addmod(val, poly[m], mod.n);
+        }
     }
 
     return val;

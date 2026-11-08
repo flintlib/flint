@@ -88,7 +88,7 @@ _n_is_divisible(nn_ptr q, ulong b, ulong a, nmod_t N)
 
 ulong _nmod_mat_det_howell(nmod_mat_t A)
 {
-    ulong s, t, t1, det = 1, unit = 1;
+    ulong s, t, det = 1, unit = 1;
     slong m, n, row, col, i, k;
     nmod_t mod = A->mod;
 
@@ -130,11 +130,18 @@ ulong _nmod_mat_det_howell(nmod_mat_t A)
                 /* now g = s*x - t*y mod n */
 		unit = nmod_mul(unit, s, mod);
 
-                for (k = col; k < m; k++)
-                {
+                /* s x - t y as s x + (n - t) y */
+                t = nmod_neg(t, mod);
 
-                    t1 = nmod_sub(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, nmod_mat_entry(A, i, k), mod), mod);
-                    nmod_mat_entry(A, row, k) = t1;
+                if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+                {
+                    for (k = col; k < m; k++)
+                        nmod_mat_entry(A, row, k) = _nmod_fmma_bounded(s, nmod_mat_entry(A, row, k), t, nmod_mat_entry(A, i, k), mod);
+                }
+                else
+                {
+                    for (k = col; k < m; k++)
+                        nmod_mat_entry(A, row, k) = nmod_fmma(s, nmod_mat_entry(A, row, k), t, nmod_mat_entry(A, i, k), mod);
                 }
 
 		/* now it's divisible, restart this row */
