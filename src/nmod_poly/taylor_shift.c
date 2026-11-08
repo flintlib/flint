@@ -117,6 +117,12 @@ _nmod_poly_taylor_shift_horner(nn_ptr poly, ulong c, slong n, nmod_t mod)
             for (j = i; j < n - 1; j++)
                 poly[j] = nmod_sub(poly[j], poly[j + 1], mod);
     }
+    else if (c != 0 && NMOD_CAN_USE_MUL_BOUNDED(mod))
+    {
+        for (i = n - 2; i >= 0; i--)
+            for (j = i; j < n - 1; j++)
+                poly[j] = _nmod_addmul_bounded(poly[j], poly[j + 1], c, mod);
+    }
     else if (c != 0)
     {
         for (i = n - 2; i >= 0; i--)

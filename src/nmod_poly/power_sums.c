@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
@@ -78,16 +79,24 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
     }
 }
 
-/* todo: should use dot products */
+/* Newton's identities: for the monic poly of degree d = len - 1 with
+   coefficients a_j, the power sums are p_0 = d and, for k >= 1,
+   p_k = -(k a_(d-k) + sum_(i=1)^(k-1) a_(d-k+i) p_i), with a_j = 0 for j < 0.
+   For k <= 13 (at most 12 products a_(d-k+i) p_i) the sum is computed term
+   by term: there the parameters and the short-length dispatch of
+   _nmod_vec_dot cost more than they save. The longer sums are dot
+   products. */
 void
 _nmod_poly_power_sums_naive(nn_ptr res, nn_srcptr poly, slong len, slong n,
                             nmod_t mod)
 {
     slong i, k;
+    slong kmax = FLINT_MIN(n, len);
+    slong kshort = FLINT_MIN(kmax, 14);
     ulong kmod = 0;     /* k mod n, as nmod_mul needs reduced operands */
 
     NMOD_RED(res[0], (ulong) (len - 1), mod);
-    for (k = 1; k < FLINT_MIN(n, len); k++)
+    for (k = 1; k < kshort; k++)
     {
         kmod = (kmod + 1 == mod.n) ? 0 : kmod + 1;
         res[k] = nmod_mul(poly[len - 1 - k], kmod, mod);
@@ -97,14 +106,22 @@ _nmod_poly_power_sums_naive(nn_ptr res, nn_srcptr poly, slong len, slong n,
                          mod);
         res[k] = nmod_neg(res[k], mod);
     }
-    for (k = len; k < n; k++)
+
+    if (kshort < kmax || n > len)
     {
-        res[k] = 0;
-        for (i = k - len + 1; i < k; i++)
-            res[k] =
-                nmod_add(res[k], nmod_mul(poly[len - 1 - k + i], res[i], mod),
-                         mod);
-        res[k] = nmod_neg(res[k], mod);
+        dot_params_t params = _nmod_vec_dot_params(len - 1, mod);
+
+        for (k = kshort; k < kmax; k++)
+        {
+            kmod = (kmod + 1 == mod.n) ? 0 : kmod + 1;
+            res[k] = _nmod_vec_dot(poly + len - k, res + 1, k - 1, mod, params);
+            res[k] = nmod_neg(nmod_addmul(res[k], poly[len - 1 - k], kmod, mod), mod);
+        }
+        for (k = len; k < n; k++)
+        {
+            res[k] = _nmod_vec_dot(poly, res + k - len + 1, len - 1, mod, params);
+            res[k] = nmod_neg(res[k], mod);
+        }
     }
 }
 

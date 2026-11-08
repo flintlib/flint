@@ -311,13 +311,79 @@ ulong nmod_addmul(ulong s, ulong a, ulong b, nmod_t mod)
        (r) = nmod_addmul((r), (a), (b), (mod)); \
     } while (0)
 
-// TODO doc  a*b + c*d
 NMOD_INLINE
 ulong nmod_fmma(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
 {
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    FLINT_ASSERT(c < mod.n);
+    FLINT_ASSERT(d < mod.n);
+
+    /* for n < 2^(FLINT_BITS - 1), one reduction of the two-word sum.
+     * NOTE: the test is on n rather than on mod.norm, so that the other branch
+     * is not compiled for norm = 0 specifically (after observing issues with clang
+     * which turned its corrections into branches). */
+    if (mod.n < (UWORD(1) << (FLINT_BITS - 1)))
+    {
+        ulong h1, l1, h2, l2;
+        umul_ppmm(h1, l1, a, b);
+        umul_ppmm(h2, l2, c, d);
+        add_ssaaaa(h1, l1, h1, l1, h2, l2);
+        NMOD_RED2_NONFULLWORD(l1, h1, l1, mod);
+        return l1;
+    }
+
     a = nmod_mul(a, b, mod);
     NMOD_ADDMUL(a, c, d, mod);
     return a;
+}
+
+/* Bounded variants of nmod_mul, nmod_addmul and nmod_fmma (see the documentation) */
+#define NMOD_CAN_USE_MUL_BOUNDED(mod) \
+    ((mod).norm >= 2 && (mod).norm <= FLINT_BITS - 3)
+#define NMOD_CAN_USE_FMMA_BOUNDED(mod) \
+    ((mod).norm >= 3 && (mod).norm <= FLINT_BITS - 3)
+
+NMOD_INLINE
+ulong _nmod_mul_bounded(ulong a, ulong b, nmod_t mod)
+{
+    ulong hi, lo, res;
+    FLINT_ASSERT(NMOD_CAN_USE_MUL_BOUNDED(mod));
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    umul_ppmm(hi, lo, a, b);
+    NMOD_RED2_BOUNDED(res, hi, lo, mod);
+    return res;
+}
+
+NMOD_INLINE
+ulong _nmod_addmul_bounded(ulong s, ulong a, ulong b, nmod_t mod)
+{
+    ulong hi, lo;
+    FLINT_ASSERT(NMOD_CAN_USE_MUL_BOUNDED(mod));
+    FLINT_ASSERT(s < mod.n);
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    umul_ppmm(hi, lo, a, b);
+    add_ssaaaa(hi, lo, hi, lo, 0, s);
+    NMOD_RED2_BOUNDED(lo, hi, lo, mod);
+    return lo;
+}
+
+NMOD_INLINE
+ulong _nmod_fmma_bounded(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
+{
+    ulong h1, l1, h2, l2;
+    FLINT_ASSERT(NMOD_CAN_USE_FMMA_BOUNDED(mod));
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    FLINT_ASSERT(c < mod.n);
+    FLINT_ASSERT(d < mod.n);
+    umul_ppmm(h1, l1, a, b);
+    umul_ppmm(h2, l2, c, d);
+    add_ssaaaa(h1, l1, h1, l1, h2, l2);
+    NMOD_RED2_BOUNDED(l1, h1, l1, mod);
+    return l1;
 }
 
 NMOD_INLINE

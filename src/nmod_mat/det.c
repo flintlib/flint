@@ -17,8 +17,7 @@
 static ulong
 _nmod_mat_det_2x2(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
 {
-    b = nmod_neg(b, mod);
-    return nmod_addmul(nmod_mul(a, d, mod), b, c, mod);
+    return nmod_fmma(a, d, nmod_neg(b, mod), c, mod);
 }
 
 static ulong

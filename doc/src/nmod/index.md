@@ -133,6 +133,8 @@ ulong nmod_fmma(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
 
 Return $s + ab$ and $ab + cd$ modulo $n$, for reduced operands.
 `nmod_addmul` forms $s + ab$ as a two-word integer and reduces it once.
+`nmod_fmma` does the same with $ab + cd$ when $n < 2^{\bits - 1}$ (the
+sum is then below $2n^2 < nB$); for larger $n$ it reduces $ab$ first.
 :::
 
 ::: macro
@@ -140,6 +142,32 @@ NMOD_ADDMUL(r, a, b, mod)
 
 Sets `r` to $(r + ab) \bmod n$, for reduced `r`, `a` and `b`. This is
 `r = nmod_addmul(r, a, b, mod)`.
+:::
+
+::: function
+ulong _nmod_mul_bounded(ulong a, ulong b, nmod_t mod)
+ulong _nmod_addmul_bounded(ulong s, ulong a, ulong b, nmod_t mod)
+ulong _nmod_fmma_bounded(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
+
+Return $ab$, $s + ab$ and $ab + cd$ modulo $n$, for reduced operands, with
+one reduction by `NMOD_RED2_BOUNDED` ([](nmod#reduction)), which is
+cheaper than the reductions of `nmod_mul`, `nmod_addmul` and `nmod_fmma`.
+The first two require `NMOD_CAN_USE_MUL_BOUNDED(mod)`, that is
+$3 \le \nu \le \bits - 2$ where $\nu$ is the number of bits of $n$; the
+third requires `NMOD_CAN_USE_FMMA_BOUNDED(mod)`, that is
+$3 \le \nu \le \bits - 3$. For other $n$ the result is wrong. As for
+`_nmod_mul_halflimb`, test the modulus once and write two loops rather than
+testing it at each product: a test inside `nmod_mul` was measured to make
+some compilers evaluate both reductions, or branch, at each product.
+:::
+
+::: macro
+NMOD_CAN_USE_MUL_BOUNDED(mod)
+NMOD_CAN_USE_FMMA_BOUNDED(mod)
+
+Whether $3 \le \nu \le \bits - 2$, respectively $3 \le \nu \le \bits - 3$,
+where $\nu$ is the number of bits of $n$: the conditions of the bounded
+variants above.
 :::
 
 ::: function

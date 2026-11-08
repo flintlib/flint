@@ -36,6 +36,17 @@ void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec,
     }
 }
 
+/* the generic version for NMOD_CAN_USE_MUL_BOUNDED(mod); the dispatcher
+   tests the modulus, so that the generic version keeps its code */
+static void
+_scalar_addmul_bounded(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_addmul_bounded(res[i], vec[i], c, mod);
+}
+
 void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
@@ -47,6 +58,8 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_sub(res, res, vec, len, mod);
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD && NMOD_BITS(mod) != FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
+    else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+        _scalar_addmul_bounded(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
 }
@@ -90,6 +103,20 @@ void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
         res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
 }
 
+/* as _scalar_addmul_bounded; clang vectorizes this loop into code slower
+   than the scalar loop (measured on x86) */
+static void
+_scalar_mul_bounded(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    slong i;
+
+#if defined(__clang__)
+#pragma clang loop vectorize(disable)
+#endif
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_mul_bounded(vec[i], c, mod);
+}
+
 void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
@@ -106,6 +133,8 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
             _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+    else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+        _scalar_mul_bounded(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
 }
