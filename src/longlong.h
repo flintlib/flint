@@ -348,6 +348,9 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
 
 /* Division */
 #if !defined(udiv_qrnnd)
+/* No two-by-one division instruction (arm64, or x86 without assembly):
+   udiv_qrnnd is the C code below, slow enough that some loops avoid it. */
+# define FLINT_UDIV_QRNND_GENERIC 1
 # define udiv_qrnnd_int(q, r, n1, n0, d) \
   do { \
     ulong __d1, __d0, __q1, __q0, __r1, __r0, __m; \

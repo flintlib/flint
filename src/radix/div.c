@@ -35,7 +35,6 @@ radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 }
 
 
-/* todo: optimise */
 ulong
 radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix)
 {
@@ -46,6 +45,46 @@ radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix)
     r = a[an - 1] % d;
     res[an - 1] = q;
 
+#if defined(FLINT_UDIV_QRNND_GENERIC)
+    /* without a division instruction, precompute the inverse of d once */
+    if (an >= 2)
+    {
+        nmod_t dmod;
+        nmod_init(&dmod, d);
+
+        /* r B + a[i] < d B <= 2^(nu_d + FLINT_BITS - 2) for B < 2^(FLINT_BITS - 2),
+           nu_d the bit length of d: the bounded step if 3 <= nu_d <= FLINT_BITS - 2 */
+        if (radix->B.norm >= 2 && NMOD_CAN_USE_MUL_BOUNDED(dmod))
+        {
+            for (i = an - 2; i >= 0; i--)
+            {
+                umul_ppmm(hi, lo, r, B);
+                add_ssaaaa(hi, lo, hi, lo, 0, a[i]);
+                NMOD_DIVREM2_BOUNDED(q, r, hi, lo, dmod);
+                res[i] = q;
+            }
+        }
+        else
+        {
+            const unsigned int norm = dmod.norm;
+            const ulong dn = d << norm;
+
+            for (i = an - 2; i >= 0; i--)
+            {
+                umul_ppmm(hi, lo, r, B);
+                add_ssaaaa(hi, lo, hi, lo, 0, a[i]);
+                if (norm != 0)
+                {
+                    hi = (hi << norm) | (lo >> (FLINT_BITS - norm));
+                    lo <<= norm;
+                }
+                udiv_qrnnd_preinv(q, r, hi, lo, dn, dmod.ninv);
+                r >>= norm;
+                res[i] = q;
+            }
+        }
+    }
+#else
     for (i = an - 2; i >= 0; i--)
     {
         umul_ppmm(hi, lo, r, B);
@@ -53,6 +92,7 @@ radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix)
         udiv_qrnnd(q, r, hi, lo, d);
         res[i] = q;
     }
+#endif
 
     return r;
 }
