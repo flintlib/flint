@@ -17,11 +17,6 @@
 /* Defined in t-log.c and t-neg_log.c */
 #ifndef arf_log
 #define arf_log arf_log
-void
-arf_log(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
-{
-    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_log, x, NULL, prec, rnd);
-}
 #endif
 
 TEST_FUNCTION_START(mag_log, state)

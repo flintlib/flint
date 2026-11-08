@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "mp_real.h"
+#include "arb/elem.h"
 
 static void
 arb_const_log2_hypgeom_eval(arb_t s, slong prec)
@@ -24,21 +23,8 @@ _ARB_DEF_CACHED_CONSTANT(static, arb_const_log2_hypgeom, arb_const_log2_hypgeom_
 void
 arb_const_log2(arb_t res, slong prec)
 {
-    if (prec < ARB_LOG_TAB2_LIMBS * FLINT_BITS - 16)
-    {
-        slong exp;
-
-        /* just reading the table is known to give the correct rounding */
-        _arf_set_round_mpn(arb_midref(res), &exp, arb_log_log2_tab,
-            ARB_LOG_TAB2_LIMBS, 0, prec, ARF_RND_NEAR);
-        _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), exp);
-
-        /* 1/2 ulp error */
-        _fmpz_set_si_small(MAG_EXPREF(arb_radref(res)), exp - prec);
-        MAG_MAN(arb_radref(res)) = MAG_ONE_HALF;
-    }
+    if (prec <= FLINT_BITS * (MP_REAL_CONST_STATIC_N - 1) - 16)
+        _arb_const_set_floor(res, MP_REAL_CONST_ID_LOG2, 0, prec);
     else
-    {
-        arb_const_log2_hypgeom(res, prec);
-    }
+        _arb_const_round_cached(res, arb_const_log2_hypgeom, prec);
 }

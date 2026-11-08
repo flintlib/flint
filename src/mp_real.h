@@ -33,11 +33,78 @@ extern "C" {
      at index n, those of size n + 2 two integral limbs.  Functions
      _mp_real_*.
 
-   Functions on limb arrays, or with unchecked preconditions, start
-   with an underscore.  The limb-level functions with an ulp-accurate
-   contract take ulong * err right after their outputs and write a
-   bound on |res - f(x)| in output ulps (err may be NULL); the
-   documentation gives the largest value each can write. */
+   - floating-point mantissas, the representation of arf and nfloat: a
+     normalised limb array (d, n) (top bit set) with a radix-2 exponent
+     e and a sign, standing for (-1)^sgnbit (d, n) 2^(e - n FLINT_BITS).
+     Functions taking these end in _fp (_mp_real_exp_fp, ...).  They
+     frame the argument themselves and return an unnormalised
+     fixed-point result (y, nk + 1) at nk kernel limbs with an error
+     count, plus a radix-2 shift as the return value where the result
+     carries a binary exponent; the callers (nfloat, arf, arb, ...)
+     round and normalise.  Temporaries are sized by nk, so any
+     precision is allowed.
+
+   Radix-B exponents are limb counts and radix-2 exponents bit counts,
+   both slong.  Functions on limb arrays, or with unchecked
+   preconditions, start with an underscore.  The limb-level functions
+   with an ulp-accurate contract take ulong * err right after their
+   outputs and write a bound on |res - f(x)| in output ulps (err may be
+   NULL), two-sided unless the function documents a side; the
+   documentation gives the largest value each can write.  The _fp
+   functions take the absolute accuracy wanted in bits, pb = p +
+   _mp_real_elem_guard_bits(p) (+ extra) for a relative accuracy of
+   about 2^-p, and run their kernels at nk = _mp_real_elem_limbs(pb)
+   limbs, plus the leading zero bits of a result that needs relative
+   accuracy.  The guard bits cover the kernels' error bounds and the
+   argument reduction: the bounds stay below 2^12 units below
+   MP_REAL_ELEM_GUARD_LARGE_PREC bits and grow with the bitwise
+   parameter beyond, to about 2^13 for exp and 2^14 for the hyperbolic
+   functions, which take MP_REAL_ELEM_GUARD_BITS_LARGE guard bits. */
+
+#define MP_REAL_ELEM_GUARD_BITS 12
+#define MP_REAL_ELEM_GUARD_BITS_LARGE 16
+#define MP_REAL_ELEM_GUARD_LARGE_PREC 4096
+
+FLINT_FORCE_INLINE slong
+_mp_real_elem_guard_bits(slong p)
+{
+    return (p < MP_REAL_ELEM_GUARD_LARGE_PREC) ? MP_REAL_ELEM_GUARD_BITS : MP_REAL_ELEM_GUARD_BITS_LARGE;
+}
+
+/* the kernel limbs for pb bits (at least two limbs on 32-bit machines,
+   as some kernels require) */
+FLINT_FORCE_INLINE slong
+_mp_real_elem_limbs(slong pb)
+{
+    slong n = (pb + FLINT_BITS - 1) / FLINT_BITS;
+#if FLINT_BITS == 32
+    n = FLINT_MAX(n, 2);
+#endif
+    return n;
+}
+
+/* The output limbs _mp_real_log_fp, _mp_real_log_fp_huge (for a bignum
+   exponent of cn limbs) and _mp_real_log1p_fp need for an argument of n
+   limbs (and exponent e for log1p) at pb bits; the callers size their
+   buffers with these */
+FLINT_FORCE_INLINE slong
+_mp_real_log_fp_ylen(slong pb, slong n)
+{
+    return _mp_real_elem_limbs(pb) + n + 5;
+}
+
+FLINT_FORCE_INLINE slong
+_mp_real_log_fp_huge_ylen(slong pb, slong cn)
+{
+    return _mp_real_elem_limbs(pb) + cn + 3;
+}
+
+FLINT_FORCE_INLINE slong
+_mp_real_log1p_fp_ylen(slong pb, slong n, slong e)
+{
+    slong nk = _mp_real_elem_limbs(pb);
+    return nk + n + 6 + ((e < 0) ? -e : FLINT_MIN(e, FLINT_BITS * (nk + 3))) / FLINT_BITS;
+}
 
 /* mp_real_t *****************************************************************/
 
@@ -393,6 +460,168 @@ void mp_real_asinh_bits(mp_real_t res, const mp_real_t x, slong prec);
 int mp_real_acosh_bits(mp_real_t res, const mp_real_t x, slong prec);
 int mp_real_atanh_bits(mp_real_t res, const mp_real_t x, slong prec);
 
+/* elementary functions of floating-point mantissas **************************/
+
+/* exp(x) for x = (-1)^sgnbit (d, n) 2^(e - n FLINT_BITS) with
+   e <= MP_REAL_EXP_FP_MAX_EXP = FLINT_BITS - 3: sets Y = (y, nk + 1) (y
+   needs nk + 2 limbs; nk = _mp_real_elem_limbs(pb) throughout) and *err <= 9r + 104 (r the kernel's bitwise
+   parameter, below 2^11 in all), and returns k such that
+   exp(x) = Y 2^(k - FLINT_BITS nk) within *err units.  Y lies within
+   *err units of [B^nk, 2 B^nk) (so that y[nk] <= 2) except on the paths
+   with k = 0 for |x| < 1, where Y < e B^nk.  The reduction |x| = q log 2 + t uses log 2 at nk + 1
+   limbs from the shared tables (exp_fp.c). */
+#define MP_REAL_EXP_FP_MAX_EXP (FLINT_BITS - 3)
+slong _mp_real_exp_fp(nn_ptr y, ulong * err, nn_srcptr d, slong n, slong e, int sgnbit, slong pb);
+
+/* exp(x) for FLINT_BITS - 3 < e: exp(x) = Y 2^(K - FLINT_BITS nk) with
+   the bignum K = (-1)^(returned sign) (q, *qn), q needing
+   (e + FLINT_BITS - 1) / FLINT_BITS + 2 limbs; Y and *err as above (Y
+   within *err units of [B^nk, 2 B^nk)).  Costs two products of about e + FLINT_BITS nk bits
+   (the quotient from the tabulated 1/log 2). */
+int _mp_real_exp_fp_huge(nn_ptr y, ulong * err, nn_ptr q, slong * qn, nn_srcptr d, slong n, slong e, int sgnbit, slong pb);
+
+/* expm1(x) = (-1)^sgnbit Y 2^(k - FLINT_BITS nk) with
+   Y - *elo <= |expm1(x)| 2^(FLINT_BITS nk - k) <= Y + *ehi, for
+   e <= MP_REAL_EXP_FP_MAX_EXP; k = 0 for |x| < 1, where the result keeps
+   its relative accuracy when the caller adds -e bits to pb */
+slong _mp_real_expm1_fp(nn_ptr y, ulong * elo, ulong * ehi, nn_srcptr d, slong n, slong e, int sgnbit, slong pb);
+
+/* 2^x = Y 2^(k - FLINT_BITS nk) within *err units, for e <= FLINT_BITS - 3;
+   an integer x gives Y = B^nk, *err = 0 and k = x exactly */
+slong _mp_real_exp2_fp(nn_ptr y, ulong * err, nn_srcptr d, slong n, slong e, int sgnbit, slong pb);
+
+/* log(x) resp. log2(x) (base2) for x = (d, n) 2^(e - n FLINT_BITS) > 0,
+   |e| <= 2^(FLINT_BITS - 3): sets Y = (y, *len) (y needs nk + n + 5
+   limbs), *ue the radix-2 exponent of its unit and *err, and returns 1
+   when log x < 0, 0 otherwise, so that
+   log x = (-1)^sign Y 2^(*ue) within *err units.  x = 1 gives *len = 0.
+   Near 1 the kernel runs at as many more limbs as the cancellation
+   costs (at most n more: the leading zero bits of |x - 1|, which the
+   callers of nearly-exact precision handle directly), so the result
+   keeps its relative accuracy.  err <= 3r + 70 (r the bitwise
+   parameter), times 3/2 plus 3 for log2: below 2^12 in all (log_fp.c);
+   y has _mp_real_log_fp_ylen(pb, n) limbs. */
+int _mp_real_log_fp(nn_ptr y, slong * len, slong * ue, ulong * err, nn_srcptr d, slong n, slong e, int base2, slong pb);
+
+/* log(x) for x = (d, n) 2^(e - n FLINT_BITS) with a bignum e - 1 =
+   (-1)^cneg (c, cn) (c normalised, |c| >= 2), as above with y needing
+   _mp_real_log_fp_huge_ylen(pb, cn) = nk + cn + 3 limbs; the result has
+   cn + nk limbs */
+int _mp_real_log_fp_huge(nn_ptr y, slong * len, slong * ue, ulong * err, nn_srcptr d, slong n, nn_srcptr c, slong cn, int cneg, slong pb);
+
+/* log1p(x) for x = (-1)^sgnbit (d, n) 2^(e - n FLINT_BITS) > -1 with
+   e < 2^(FLINT_BITS - 3), as _mp_real_log_fp: |x| < 1/2 by the kernel of
+   log(1 +- s) at -e more bits, else on 1 + x formed exactly when e <=
+   FLINT_BITS nk + 2, beyond as log x plus a term below a unit; y needs
+   _mp_real_log1p_fp_ylen(pb, n, e) limbs */
+int _mp_real_log1p_fp(nn_ptr y, slong * len, slong * ue, ulong * err, nn_srcptr d, slong n, slong e, int sgnbit, slong pb);
+
+/* The magnitude limit of the trigonometric functions of x (not those of
+   pi x): the reduction modulo pi/2 of |x| < 2^e needs pi to about e
+   bits, so mp_real_sin_cos_bits, mp_real_tan_bits and the callers of the
+   _fp functions below (arf, arb, nfloat) give up (a [0 +- 1] ball, nan
+   or GR_UNABLE) beyond 2^MP_REAL_TRIG_MAGLIM(prec), which keeps the cost
+   polynomial in prec */
+#define MP_REAL_TRIG_MAGLIM(prec) FLINT_MAX(65536, 4 * (prec))
+
+/* Trigonometric functions of the magnitude |x| = (d, n) 2^(e - n FLINT_BITS)
+   (trig_fp.c), d normalised, -WORD_MAX / 2 <= e and e <=
+   MP_REAL_TRIG_MAGLIM(pb) for sin_cos and tan (the reduction costs
+   O(M(e)) time; the functions of pi x reduce exactly at any e): the caller applies the sign of x
+   to the odd functions.  The outputs are fixed-point values (y, *w + 1)
+   at *w fraction limbs within *err ulps, nk <= *w <= wmax, where the
+   kernels add limbs beyond nk for the relative accuracy of a sine
+   (tangent) near its zeros as far as wmax allows (beyond, the result is
+   as accurate as wmax limbs make it and the caller sees the error
+   count); for sin_cos, rel says which outputs need that relative
+   accuracy (bit 0 the sine, bit 1 the cosine: an output wanted only
+   for a bound costs no extra limbs).  Buffers need wmax + 2 limbs (the sine and tangent of the pi
+   functions max(n, nk) + 3 as well).  The return value carries the signs: bit 0 the sine
+   (tangent) negative, bit 1 the cosine negative, or MP_REAL_TRIG_EXACT
+   with the quadrant a in bits 0-1 when the value is exact (sine, cosine
+   = 0, 1 / 1, 0 / 0, -1 / -1, 0 for a = 0, 1, 2, 3; the tangent 0 for a
+   even, a pole for a odd; with MP_REAL_TRIG_ONE the tangent +-1, bit 0
+   its sign), or MP_REAL_TRIG_TINY for tiny x of the pi functions, where
+   the sine resp. tangent is pi x (1 -+ delta) as the product
+   (y, max(n, nk) + 3) 2^(*k) with *err = 6: the sine lies in
+   (Y - 1, Y + 6) units and the tangent in [Y, Y + 6); the cosine is
+   B^nk at nk limbs, above the value by less than a unit.  err <= 6r + 134 for the sine and
+   cosine (r the bitwise parameter), 19 (6r + 128) / 4 + 8 for the
+   tangent (the quotient of the sine and cosine kernels, at most 22
+   limbs on 64-bit) resp. 8r + 262 (the tangent kernel).  *recip = 1 means that tan |x| is (-1)^sign / Y instead of
+   (-1)^sign Y: the kernel chooses the limbs so that Y normalises with a
+   left shift of at most MP_REAL_TRIG_FP_NORM_SHIFT bits (when wmax
+   allows). */
+#define MP_REAL_TRIG_EXACT 8
+#define MP_REAL_TRIG_TINY 16
+#define MP_REAL_TRIG_ONE 32
+#define MP_REAL_TRIG_FP_NORM_SHIFT (FLINT_BITS - 24)
+int _mp_real_sin_cos_fp(nn_ptr ys, nn_ptr yc, slong * w, ulong * err, nn_srcptr d, slong n, slong e, slong pb, slong wmax, int rel);
+int _mp_real_tan_fp(nn_ptr y, slong * w, ulong * err, int * recip, nn_srcptr d, slong n, slong e, slong pb, slong wmax);
+int _mp_real_sin_cos_pi_fp(nn_ptr ys, nn_ptr yc, slong * w, slong * k, ulong * err, nn_srcptr d, slong n, slong e, slong pb, slong wmax, int rel);
+int _mp_real_tan_pi_fp(nn_ptr y, slong * w, slong * k, ulong * err, int * recip, nn_srcptr d, slong n, slong e, slong pb, slong wmax);
+
+/* Arctangents (atan_fp.c).  _mp_real_atan_fp sets (y, w + 1) to
+   atan |x| B^w within err ulps for |x| = (d, n) 2^(e - n FLINT_BITS),
+   with w = min(nk + limbs(-e), wmax) for |x| < 1 (the relative accuracy
+   of small arguments; the caller handles tiny x) and w = nk otherwise;
+   y needs wmax + 1 limbs.  _mp_real_atan2_fp evaluates theta = c pi/4 +
+   sigma atan(t) for t = (Mnum / Mden) 2^-d < 1 with the mantissas
+   Mnum = (num, nn), Mden = (den, dn) in [1/2, 1), d >= 0, c in {0, 2, 4}
+   and sigma = +-1 (the caller sorts |x|, |y| and applies the sign of y):
+   (y, len) 2^ue within elo units below and ehi above.  For c = 0 and a
+   tiny t (2(d - 1) >= FLINT_BITS (nk + 1) + 4) this is the ratio itself
+   at nk + 1 limbs (theta = t (1 - delta), delta t below a unit); else
+   atan at w = min(nk + limbs(d - 1), wmax) (c = 0) resp. nk limbs, with
+   len = w + 1, ue = -FLINT_BITS w and elo = ehi.  y needs wmax + 2 limbs
+   (wmax >= nk + 1). */
+void _mp_real_atan_fp(nn_ptr y, slong * w, ulong * err, nn_srcptr d, slong n, slong e, slong pb, slong wmax);
+void _mp_real_atan2_fp(nn_ptr y, slong * len, slong * ue, ulong * elo, ulong * ehi, nn_srcptr num, slong nn, nn_srcptr den, slong dn, slong d, int c, int sigma, slong pb, slong wmax);
+
+/* For (y, len) > 0 known within err units of 2^ue, sets (t, wn) to its
+   leading limbs normalised (top bit set), so that Y = T 2^(*te) within
+   the returned number of units of 2^(*te) (shifted-out bits count as one
+   more unit).  Returns UWORD_MAX if the scaled bound would exceed
+   2^(FLINT_BITS - 3). */
+ulong _mp_real_fp_normalize(nn_ptr t, slong * te, nn_srcptr y, slong len, slong ue, ulong err, slong wn);
+
+/* Hyperbolic functions of |x| = (d, n) 2^(e - n FLINT_BITS), e <=
+   MP_REAL_EXP_FP_MAX_EXP, not tiny (hyperbolic_fp.c): from E = exp |x|
+   and one approximate reciprocal, at w = nk limbs for |x| >= 1 and
+   w = nk + ceil((1 - e) / FLINT_BITS) for |x| < 1 (the cancellation in
+   E - 1/E).  _mp_real_sinh_cosh_fp sets Ys = (ys, w + 1) and
+   Yc = (yc, w + 1) (either NULL; w + 2 limbs each) with sinh |x| =
+   Ys 2^(k - FLINT_BITS w) and cosh x = Yc 2^(k - FLINT_BITS w) within
+   *err units, returning k (-1 for |x| < 1); _mp_real_tanh_fp sets
+   tanh |x| = (q, w + 1) B^-w within *err units (q needs w + 2 limbs).
+   err <= 2 (that of the exponential + 3) + 2. */
+slong _mp_real_sinh_cosh_fp(nn_ptr ys, nn_ptr yc, slong * w, ulong * err, nn_srcptr d, slong n, slong e, slong pb);
+void _mp_real_tanh_fp(nn_ptr q, slong * w, ulong * err, nn_srcptr d, slong n, slong e, slong pb);
+
+/* |x|^y = exp(t), t = y log |x|, for the mantissas x = (xd, xn) 2^(xe -
+   xn FLINT_BITS) (|xe| <= 2^(FLINT_BITS - 3)) and y = (-1)^ysgn (yd, yn)
+   2^(ye - yn FLINT_BITS) (pow_fp.c): sets Y = (y, nk + 1) (y needs nk + 2
+   limbs) and *err such that |x|^y = Y 2^(K - FLINT_BITS nk) within *err
+   units, with the exponent K = (-1)^(returned sign) (q, *qn), q needing
+   (tbmax + FLINT_BITS - 1) / FLINT_BITS + 2 limbs (*qn = 0 for K = 0).
+   Instead of the sign it returns MP_REAL_POW_ONE for |x| = 1 (the
+   result is 1), MP_REAL_POW_TINY when |t| < 2^-(FLINT_BITS nk + 4), so
+   that |x|^y = 1 + delta with 0 < |delta| < 2^-(FLINT_BITS nk + 3) and
+   delta of the sign *tsgn (1 for negative), or MP_REAL_POW_HUGE when
+   |t| >= 2^tbmax (tbmax >= FLINT_BITS - 3) up to the accuracy of the
+   computed t (a true |t| slightly below 2^tbmax may give HUGE; a cheap
+   lower bound on |t| from the exponents and the leading bits of x
+   decides most such arguments without evaluating log |x|), the sign of
+   t in *tsgn.  The logarithm runs at nk + ceil((tb + 12) /
+   FLINT_BITS) limbs for the bound 2^tb on |t|; *err is that of the
+   exponential plus the propagated error of t, which can reach about
+   2^57 units when the units are finer than pb bits (the relative error
+   stays below 2^-(pb - 12)). */
+#define MP_REAL_POW_ONE 2
+#define MP_REAL_POW_TINY 3
+#define MP_REAL_POW_HUGE 4
+int _mp_real_pow_fp(nn_ptr y, ulong * err, nn_ptr q, slong * qn, int * tsgn, nn_srcptr xd, slong xn, slong xe, nn_srcptr yd, slong yn, slong ye, int ysgn, slong pb, slong tbmax);
+
 /* elementary functions on fixed-point numbers ******************************/
 
 /* Rectangular-splitting series for x < 2^-32: outputs (res, n + 1)
@@ -445,7 +674,7 @@ void _mp_real_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, ulong * err, nn_srcptr t, 
 
 /* exp, sin and cos on [0, 1) by halving and the reduced functions, no
    tables; outputs (y, n + 1); err <= 128.  The _r versions force the
-   halving depth r (tuning). */
+   halving depth r >= 16 (tuning). */
 void _mp_real_exp_notab(nn_ptr y, ulong * err, nn_srcptr x, slong n);
 void _mp_real_exp_notab_r(nn_ptr y, ulong * err, nn_srcptr x, slong n, int r);
 void _mp_real_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, ulong * err, nn_srcptr x, slong n);
@@ -553,7 +782,11 @@ nn_srcptr _mp_real_machin_c_row_raw(const mp_real_machin_struct * tab, slong i,
 #define MP_REAL_ATAN_GAUSS_MAX 64
 FLINT_DLL extern const signed char _mp_real_gaussian_primes[2 * MP_REAL_ATAN_GAUSS_MAX];
 
-/* the angles pi/2, 2 arg(pi_j), j < num, as arb balls */
+/* the logarithms log p_j of the first num primes and the angles pi/2,
+   2 arg(pi_j) of the first num nonreal Gaussian primes, j < num, as arb
+   balls at prec bits (arb_log_primes_vec_bsplit and
+   arb_atan_gauss_primes_vec_bsplit wrap these) */
+void _mp_real_log_primes_vec_arb(arb_ptr res, slong num, slong prec);
 void _mp_real_atan_gauss_vec_arb(arb_ptr res, slong num, slong prec);
 
 #ifdef __cplusplus

@@ -143,8 +143,11 @@ _tan_div(nn_ptr y, nn_srcptr s, ulong es, nn_srcptr c, ulong ec, slong n)
 FLINT_FORCE_INLINE void
 _tan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
 {
-    slong z = _mp_real_elem_lzb(v, n);
+    slong z;
     ulong e;
+
+    FLINT_ASSERT(n >= 1 && (FLINT_BITS == 64 || n >= 2));
+    z = _mp_real_elem_lzb(v, n);
 
     if (z == WORD_MAX)
     {
@@ -603,7 +606,7 @@ mp_real_tan_bits(mp_real_t res, const mp_real_t x, slong prec)
     }
 
     /* ridiculously large arguments */
-    if (FLINT_BITS * (x->exp - 1) >= FLINT_MAX(65536, 4 * prec))
+    if (FLINT_BITS * (x->exp - 1) >= MP_REAL_TRIG_MAGLIM(prec))
     {
         mp_real_zero(res);
         return 0;

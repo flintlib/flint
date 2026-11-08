@@ -669,11 +669,6 @@ _gr_acf_csgn(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acf_rsqrt(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-}
-
-int
 _gr_acf_floor(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
 }
@@ -840,77 +835,73 @@ _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-#define ACF_FUNC_VIA_ACB(res, acb_func, x) \
-    acb_t r, t; \
-    slong prec, wp, extra; \
-    int status = GR_SUCCESS; \
-    prec = ACF_CTX_PREC(ctx); \
-    acb_init(r); \
-    *arb_midref(acb_realref(t)) = *acf_realref(x); \
-    *arb_midref(acb_imagref(t)) = *acf_imagref(x); \
-    mag_init(arb_radref(acb_realref(t))); \
-    mag_init(arb_radref(acb_imagref(t))); \
-    for (extra = 10 + prec * 0.01; ; extra += FLINT_MAX(extra, 32)) \
-    { \
-        wp = prec + extra; \
-        if (wp > 10 * prec + 1000) \
-        { \
-            status = GR_UNABLE; \
-            arf_nan(acf_realref(res)); \
-            arf_nan(acf_imagref(res)); \
-            break; \
-        } \
-        acb_func(r, t, wp); \
-        if (acb_rel_accuracy_bits(r) >= prec) \
-        { \
-            arf_set_round(acf_realref(res), arb_midref(acb_realref(r)), prec, ACF_CTX_RND(ctx)); \
-            arf_set_round(acf_imagref(res), arb_midref(acb_imagref(r)), prec, ACF_CTX_RND(ctx)); \
-            break; \
-        } \
-    } \
-    acb_clear(r); \
-    return status; \
-
-#define ACF_FUNC2_VIA_ACB(res, acb_func, x, y) \
-    acb_t r, t, u; \
-    slong prec, wp, extra; \
-    int status = GR_SUCCESS; \
-    prec = ACF_CTX_PREC(ctx); \
-    acb_init(r); \
-    *arb_midref(acb_realref(t)) = *acf_realref(x); \
-    *arb_midref(acb_imagref(t)) = *acf_imagref(x); \
-    mag_init(arb_radref(acb_realref(t))); \
-    mag_init(arb_radref(acb_imagref(t))); \
-    *arb_midref(acb_realref(u)) = *acf_realref(y); \
-    *arb_midref(acb_imagref(u)) = *acf_imagref(y); \
-    mag_init(arb_radref(acb_realref(u))); \
-    mag_init(arb_radref(acb_imagref(u))); \
-    for (extra = 10 + prec * 0.01; ; extra += FLINT_MAX(extra, 32)) \
-    { \
-        wp = prec + extra; \
-        if (wp > 10 * prec + 1000) \
-        { \
-            status = GR_UNABLE; \
-            arf_nan(acf_realref(res)); \
-            arf_nan(acf_imagref(res)); \
-            break; \
-        } \
-        acb_func(r, t, u, wp); \
-        if (acb_rel_accuracy_bits(r) >= prec) \
-        { \
-            arf_set_round(acf_realref(res), arb_midref(acb_realref(r)), prec, ACF_CTX_RND(ctx)); \
-            arf_set_round(acf_imagref(res), arb_midref(acb_imagref(r)), prec, ACF_CTX_RND(ctx)); \
-            break; \
-        } \
-    } \
-    acb_clear(r); \
-    return status; \
-
-/* todo: lots of special cases */
 static int
 _gr_acf_pow(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
-    ACF_FUNC2_VIA_ACB(res, acb_pow, x, y)
+    acf_pow(res, x, y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
+/* the elementary functions of acf (acf/elem.c, acf/elem_acb.c), each
+   part rounded in the mode of the context; GR_UNABLE for nan parts
+   (poles, arguments beyond the ranges of the real functions) */
+#define ACF_NAN_STATUS(z) ((arf_is_nan(acf_realref(z)) || arf_is_nan(acf_imagref(z))) ? GR_UNABLE : GR_SUCCESS)
+#define ACF_ELEM(name) \
+    static int _gr_acf_##name(acf_t res, const acf_t x, const gr_ctx_t ctx) \
+    { acf_##name(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx)); return ACF_NAN_STATUS(res); }
+#define ACF_ELEM2(name) \
+    static int _gr_acf_##name(acf_t res1, acf_t res2, const acf_t x, const gr_ctx_t ctx) \
+    { acf_##name(res1, res2, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx)); return ACF_NAN_STATUS(res1) | ACF_NAN_STATUS(res2); }
+
+ACF_ELEM(exp)
+ACF_ELEM(exp_pi_i)
+ACF_ELEM(log)
+ACF_ELEM(sin)
+ACF_ELEM(cos)
+ACF_ELEM2(sin_cos)
+ACF_ELEM(sin_pi)
+ACF_ELEM(cos_pi)
+ACF_ELEM2(sin_cos_pi)
+ACF_ELEM(sinh)
+ACF_ELEM(cosh)
+ACF_ELEM2(sinh_cosh)
+ACF_ELEM(tan)
+ACF_ELEM(cot)
+ACF_ELEM(sec)
+ACF_ELEM(csc)
+ACF_ELEM(tan_pi)
+ACF_ELEM(cot_pi)
+ACF_ELEM(sec_pi)
+ACF_ELEM(csc_pi)
+ACF_ELEM(tanh)
+ACF_ELEM(coth)
+ACF_ELEM(sech)
+ACF_ELEM(csch)
+ACF_ELEM(expm1)
+ACF_ELEM(log1p)
+ACF_ELEM(sinc)
+ACF_ELEM(sinc_pi)
+ACF_ELEM(asin)
+ACF_ELEM(acos)
+ACF_ELEM(atan)
+ACF_ELEM(acot)
+ACF_ELEM(asec)
+ACF_ELEM(acsc)
+ACF_ELEM(asin_pi)
+ACF_ELEM(acos_pi)
+ACF_ELEM(atan_pi)
+ACF_ELEM(asinh)
+ACF_ELEM(acosh)
+ACF_ELEM(atanh)
+ACF_ELEM(acoth)
+ACF_ELEM(asech)
+ACF_ELEM(acsch)
+
+static int
+_gr_acf_rsqrt(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    acf_approx_rsqrt(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    return GR_SUCCESS;
 }
 
 static int
@@ -931,42 +922,6 @@ _gr_acf_pi(acf_t res, const gr_ctx_t ctx)
     arf_zero(acf_imagref(res));
     arb_clear(t);
     return GR_SUCCESS;
-}
-
-static int
-_gr_acf_exp(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_exp, x)
-}
-
-static int
-_gr_acf_expm1(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_expm1, x)
-}
-
-static int
-_gr_acf_log(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_log, x)
-}
-
-static int
-_gr_acf_log1p(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_log1p, x)
-}
-
-static int
-_gr_acf_sin(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_sin, x)
-}
-
-static int
-_gr_acf_cos(acf_t res, const acf_t x, const gr_ctx_t ctx)
-{
-    ACF_FUNC_VIA_ACB(res, acb_cos, x)
 }
 
 /*
@@ -1472,7 +1427,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_acf_pow_fmpq},
 */
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_acf_sqrt},
-/*    {GR_METHOD_RSQRT,           (gr_funcptr) _gr_acf_rsqrt}, */
+    {GR_METHOD_RSQRT,           (gr_funcptr) _gr_acf_rsqrt},
 
     {GR_METHOD_POS_INF,         (gr_funcptr) _gr_acf_pos_inf},
     {GR_METHOD_NEG_INF,         (gr_funcptr) _gr_acf_neg_inf},
@@ -1503,10 +1458,47 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) _gr_acf_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acf_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acf_expm1},
+    {GR_METHOD_EXP_PI_I,        (gr_funcptr) _gr_acf_exp_pi_i},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acf_log},
     {GR_METHOD_LOG1P,           (gr_funcptr) _gr_acf_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acf_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acf_cos},
+    {GR_METHOD_SIN_COS,         (gr_funcptr) _gr_acf_sin_cos},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_acf_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) _gr_acf_cos_pi},
+    {GR_METHOD_SIN_COS_PI,      (gr_funcptr) _gr_acf_sin_cos_pi},
+    {GR_METHOD_SINH,            (gr_funcptr) _gr_acf_sinh},
+    {GR_METHOD_COSH,            (gr_funcptr) _gr_acf_cosh},
+    {GR_METHOD_SINH_COSH,       (gr_funcptr) _gr_acf_sinh_cosh},
+    {GR_METHOD_TAN,             (gr_funcptr) _gr_acf_tan},
+    {GR_METHOD_COT,             (gr_funcptr) _gr_acf_cot},
+    {GR_METHOD_SEC,             (gr_funcptr) _gr_acf_sec},
+    {GR_METHOD_CSC,             (gr_funcptr) _gr_acf_csc},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) _gr_acf_tan_pi},
+    {GR_METHOD_COT_PI,          (gr_funcptr) _gr_acf_cot_pi},
+    {GR_METHOD_SEC_PI,          (gr_funcptr) _gr_acf_sec_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) _gr_acf_csc_pi},
+    {GR_METHOD_TANH,            (gr_funcptr) _gr_acf_tanh},
+    {GR_METHOD_COTH,            (gr_funcptr) _gr_acf_coth},
+    {GR_METHOD_SECH,            (gr_funcptr) _gr_acf_sech},
+    {GR_METHOD_CSCH,            (gr_funcptr) _gr_acf_csch},
+    {GR_METHOD_SINC,            (gr_funcptr) _gr_acf_sinc},
+    {GR_METHOD_SINC_PI,         (gr_funcptr) _gr_acf_sinc_pi},
+    {GR_METHOD_ASIN,            (gr_funcptr) _gr_acf_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) _gr_acf_acos},
+    {GR_METHOD_ATAN,            (gr_funcptr) _gr_acf_atan},
+    {GR_METHOD_ACOT,            (gr_funcptr) _gr_acf_acot},
+    {GR_METHOD_ASEC,            (gr_funcptr) _gr_acf_asec},
+    {GR_METHOD_ACSC,            (gr_funcptr) _gr_acf_acsc},
+    {GR_METHOD_ASIN_PI,         (gr_funcptr) _gr_acf_asin_pi},
+    {GR_METHOD_ACOS_PI,         (gr_funcptr) _gr_acf_acos_pi},
+    {GR_METHOD_ATAN_PI,         (gr_funcptr) _gr_acf_atan_pi},
+    {GR_METHOD_ASINH,           (gr_funcptr) _gr_acf_asinh},
+    {GR_METHOD_ACOSH,           (gr_funcptr) _gr_acf_acosh},
+    {GR_METHOD_ATANH,           (gr_funcptr) _gr_acf_atanh},
+    {GR_METHOD_ACOTH,           (gr_funcptr) _gr_acf_acoth},
+    {GR_METHOD_ASECH,           (gr_funcptr) _gr_acf_asech},
+    {GR_METHOD_ACSCH,           (gr_funcptr) _gr_acf_acsch},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_APPLY_2X2,   (gr_funcptr) _gr_acf_vec_apply_2x2},

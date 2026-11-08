@@ -106,7 +106,11 @@ _mp_real_atans_fill(nn_ptr tab, slong nc, slong i_from, slong rc)
         th = _arb_vec_init(4);
 
         if (i_from <= 3)
-            arb_atan_gauss_primes_vec_bsplit(th, 4, wp);
+        {
+            /* the arguments arg(pi_j) = theta_j / 2 */
+            _mp_real_atan_gauss_vec_arb(th, 4, wp);
+            _arb_vec_scalar_mul_2exp_si(th, th, 4, -1);
+        }
 
         for (i = i_from; i < iter_start && i <= rc; i++)
         {

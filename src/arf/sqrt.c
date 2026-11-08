@@ -20,8 +20,10 @@
 int
 arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 {
+#if FLINT_BITS == 64
     slong xn;
     nn_srcptr xptr;
+#endif
     int t, inexact;
 
     if (arf_is_special(x))
@@ -49,10 +51,10 @@ arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     if (prec == ARF_PREC_EXACT)
         flint_throw(FLINT_ERROR, "arf_sqrt: exact precision not supported\n");
 
-    ARF_GET_MPN_READONLY(xptr, xn, x);
     t = fmpz_is_odd(ARF_EXPREF(x));
 
 #if FLINT_BITS == 64
+    ARF_GET_MPN_READONLY(xptr, xn, x);
     if (xn == 1 && prec <= FLINT_BITS && !COEFF_IS_MPZ(ARF_EXP(x)))
     {
         /* the exact floor s of sqrt(a B / 2^t) (one limb, top bit set) with

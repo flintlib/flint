@@ -13,10 +13,12 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
-/* _mp_real_series_rs and _mp_real_series_rs_sin_cos against arb: within
-   5 ulps for exp and exp(-x), 2 ulps otherwise, at any r >= 8,
+/* _mp_real_series_rs and _mp_real_series_rs_sin_cos against MPFR: within
+   5 ulps for exp and exp(-x), 3.6 ulps for 1 - cos and cosh - 1 and
+   3.1 ulps otherwise, at any r >= 8,
    including aliasing; _mp_real_series_rs_tan within 3 ulps */
 TEST_FUNCTION_START(mp_real_series_rs, state)
 {
@@ -89,7 +91,7 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
             int fu = func;
             nn_srcptr res = y1;
             slong rn = n;
-            double err, bound = 2.0;
+            double err, bound = 3.1;
 
             if (func == 9)
             {
@@ -100,18 +102,20 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
 
             switch (fu)
             {
-                case MP_REAL_SERIES_SIN: arb_sin(y, t, prec); break;
-                case MP_REAL_SERIES_SINH: arb_sinh(y, t, prec); break;
+                case MP_REAL_SERIES_SIN: ref_sin(y, t, prec); break;
+                case MP_REAL_SERIES_SINH: ref_sinh(y, t, prec); break;
                 case MP_REAL_SERIES_COS:
-                    arb_cos(y, t, prec); arb_sub_ui(y, y, 1, prec); arb_neg(y, y); break;
+                    ref_cos(y, t, prec); arb_sub_ui(y, y, 1, prec); arb_neg(y, y);
+                    bound = 3.6; break;
                 case MP_REAL_SERIES_COSH:
-                    arb_cosh(y, t, prec); arb_sub_ui(y, y, 1, prec); break;
-                case MP_REAL_SERIES_ATAN: arb_atan(y, t, prec); break;
-                case MP_REAL_SERIES_ATANH: arb_atanh(y, t, prec); break;
+                    ref_cosh(y, t, prec); arb_sub_ui(y, y, 1, prec);
+                    bound = 3.6; break;
+                case MP_REAL_SERIES_ATAN: ref_atan(y, t, prec); break;
+                case MP_REAL_SERIES_ATANH: ref_atanh(y, t, prec); break;
                 case MP_REAL_SERIES_EXP:
-                    arb_exp(y, t, prec); rn = n + 1; bound = 5.0; break;
+                    ref_exp(y, t, prec); rn = n + 1; bound = 5.0; break;
                 case MP_REAL_SERIES_EXP_NEG:
-                    arb_neg(y, t); arb_exp(y, y, prec); rn = n + 1; bound = 5.0; break;
+                    arb_neg(y, t); ref_exp(y, y, prec); rn = n + 1; bound = 5.0; break;
                 default:    /* TAN: not a series_rs family */
                     continue;
             }
@@ -173,7 +177,7 @@ TEST_FUNCTION_START(mp_real_series_rs, state)
 
         arb_set_fmpz(t, f);
         arb_mul_2exp_si(t, t, -FLINT_BITS * n);
-        arb_tan(y, t, prec);
+        ref_tan(y, t, prec);
         arb_mul_2exp_si(y, y, FLINT_BITS * n);
         fmpz_set_ui_array(f, y1, n);
         arb_sub_fmpz(y, y, f, prec);

@@ -12,10 +12,11 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* every algorithm of _mp_real_sin_cos_reduced agrees with arb within
+/* every algorithm of _mp_real_sin_cos_reduced agrees with MPFR within
    the documented budget on both outputs, for random (wn, r) with
    t < 2^-r */
 
@@ -33,7 +34,7 @@ _check(nn_srcptr ysin, nn_srcptr yg, nn_srcptr t, slong wn,
     fmpz_set_ui_array(f, t, wn);
     arb_set_fmpz(ta, f);
     arb_mul_2exp_si(ta, ta, -FLINT_BITS * wn);
-    arb_sin_cos(refs, refc, ta, FLINT_BITS * wn + 128);
+    ref_sin_cos(refs, refc, ta, FLINT_BITS * wn + 128);
     /* g = 1 - cos */
     arb_sub_ui(refc, refc, 1, FLINT_BITS * wn + 128);
     arb_neg(refc, refc);

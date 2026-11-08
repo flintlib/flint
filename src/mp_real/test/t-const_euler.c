@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 static int
@@ -58,7 +59,7 @@ TEST_FUNCTION_START(mp_real_const_euler, state)
             _mp_real_const_euler_tune(x, n, set);
 
         mp_real_get_arb(a, x);
-        arb_const_euler(ref, FLINT_BITS * n + 64);
+        ref_const_euler(ref, FLINT_BITS * n + 64);
 
         if (!arb_overlaps(a, ref)
             || arb_rel_accuracy_bits(a) < FLINT_BITS * (n - 1) - 32)
@@ -82,7 +83,7 @@ TEST_FUNCTION_START(mp_real_const_euler, state)
             slong n = sizes[i] + (slong) n_randint(state, 4);
             nn_ptr y = flint_malloc(n * sizeof(ulong));
 
-            arb_const_euler(ref, FLINT_BITS * n + 192);
+            ref_const_euler(ref, FLINT_BITS * n + 192);
             _mp_real_const_euler(y, NULL, n, 1);
             if (!_floor_matches_euler(y, n, ref))
                 TEST_FUNCTION_FAIL("floor mismatch: n = %wd\n", n);

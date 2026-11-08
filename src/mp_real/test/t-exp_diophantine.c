@@ -14,10 +14,11 @@
 #include "ulong_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* _mp_real_exp_diophantine agrees with arb within its budget for x
+/* _mp_real_exp_diophantine agrees with MPFR within its budget for x
    anywhere in [0, 1), across the sizes and weight budgets that
    steer the reduction (few rows and small p, q at low weight;
    the full relation table and the negative-residual lifting at
@@ -63,7 +64,7 @@ TEST_FUNCTION_START(mp_real_exp_diophantine, state)
         const _mp_real_tab_struct * LP = _mp_real_log_primes_ensure(num, nv);
 
         arb_init(l); fmpz_init(f); fmpz_init(g);
-        arb_log_ui(l, n_nth_prime(j + 1), FLINT_BITS * nv + 200);
+        ref_log_ui(l, n_nth_prime(j + 1), FLINT_BITS * nv + 200);
         arb_mul_2exp_si(l, l, FLINT_BITS * nv);
         arb_floor(l, l, FLINT_BITS * nv + 200);
         if (!arb_get_unique_fmpz(f, l))
@@ -130,7 +131,7 @@ TEST_FUNCTION_START(mp_real_exp_diophantine, state)
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
 
         _mp_real_exp_diophantine(y, &test_err_out, x, n);
         u = _ulps_mp(y, n + 1, e, n);
@@ -190,7 +191,7 @@ TEST_FUNCTION_START(mp_real_exp_diophantine, state)
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
 
         _mp_real_exp_diophantine(y, &test_err_out, x, n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
         u = _ulps_mp(y, n + 1, e, n);
         if (u > TEST_ERR(DOC_EXP_DIOPHANTINE_MAX_ERR))
             TEST_FUNCTION_FAIL("deep: ulp = %f\n", u);

@@ -19,7 +19,7 @@
    with |epsilon_i| decreasing down the rows, C = 8, among the
    logarithms of the first k primes (log_rel_*) and among pi/2 and
    the doubled arguments 2 arg(pi_j) of the first k nonreal Gaussian
-   primes (atan_rel_*).  Output of _arb_log_precompute_reductions
+   primes (atan_rel_*).  Output of _mp_real_precompute_reductions
    (LLL on the scaled vector at increasing precision) via
    tune/gen-rel-tables; the tables for k = 13 are those of arb's
    log_reduce.c.  The reciprocals 1/epsilon_i that the descent uses

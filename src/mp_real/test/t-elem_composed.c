@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 
 /* mp_real_log1p_bits, expm1, sinh_cosh, tanh, asin, acos, asinh, acosh,
    atanh: the output ball contains f at a random point of the input ball,
@@ -61,16 +62,16 @@ ref(arb_t y, const arb_t x, int f, slong prec)
 {
     switch (f)
     {
-        case F_LOG1P: arb_log1p(y, x, prec); break;
-        case F_EXPM1: arb_expm1(y, x, prec); break;
-        case F_SINH: arb_sinh(y, x, prec); break;
-        case F_COSH: arb_cosh(y, x, prec); break;
-        case F_TANH: arb_tanh(y, x, prec); break;
-        case F_ASIN: arb_asin(y, x, prec); break;
-        case F_ACOS: arb_acos(y, x, prec); break;
-        case F_ASINH: arb_asinh(y, x, prec); break;
-        case F_ACOSH: arb_acosh(y, x, prec); break;
-        default: arb_atanh(y, x, prec); break;
+        case F_LOG1P: ref_log1p(y, x, prec); break;
+        case F_EXPM1: ref_expm1(y, x, prec); break;
+        case F_SINH: ref_sinh(y, x, prec); break;
+        case F_COSH: ref_cosh(y, x, prec); break;
+        case F_TANH: ref_tanh(y, x, prec); break;
+        case F_ASIN: ref_asin(y, x, prec); break;
+        case F_ACOS: ref_acos(y, x, prec); break;
+        case F_ASINH: ref_asinh(y, x, prec); break;
+        case F_ACOSH: ref_acosh(y, x, prec); break;
+        default: ref_atanh(y, x, prec); break;
     }
 }
 

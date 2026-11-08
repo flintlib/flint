@@ -64,3 +64,65 @@ _mp_real_elem_half_ratio(nn_ptr w, nn_srcptr s, slong n, int minus)
     flint_mpn_divapprox_fraction(w, s, n, D, n + 1, n);
     TMP_END;
 }
+
+/* Normalisation of fixed-point results *************************************/
+
+ulong
+_mp_real_fp_normalize(nn_ptr t, slong * te, nn_srcptr y, slong len, slong ue, ulong err, slong wn)
+{
+    slong sh, i;
+    unsigned int c;
+
+    while (y[len - 1] == 0)
+        len--;
+
+    c = flint_clz(y[len - 1]);
+    sh = FLINT_BITS * len - c - FLINT_BITS * wn;    /* right shift */
+    *te = ue + sh;
+
+    if (sh >= 0)
+    {
+        slong ls = sh / FLINT_BITS;
+        unsigned int bs = sh % FLINT_BITS;
+        int dropped = 0;
+
+        for (i = 0; i < ls; i++)
+            dropped |= (y[i] != 0);
+
+        if (bs == 0)
+            _flint_mpn_copy_small(t, y + ls, wn);
+        else
+        {
+            dropped |= ((y[ls] << (FLINT_BITS - bs)) != 0);
+            for (i = 0; i < wn; i++)
+                t[i] = (y[ls + i] >> bs) | ((ls + i + 1 < len) ? (y[ls + i + 1] << (FLINT_BITS - bs)) : 0);
+        }
+
+        if (sh >= FLINT_BITS)
+            err = 1;
+        else
+            err = (err >> sh) + (sh != 0);
+
+        return err + dropped;
+    }
+    else
+    {
+        slong ls = (-sh) / FLINT_BITS;
+        unsigned int bs = (-sh) % FLINT_BITS;
+
+        _flint_mpn_zero_small(t, ls);
+        if (bs == 0)
+            _flint_mpn_copy_small(t + ls, y, len);
+        else
+        {
+            t[ls] = y[0] << bs;
+            for (i = 1; i < len; i++)
+                t[ls + i] = (y[i] << bs) | (y[i - 1] >> (FLINT_BITS - bs));
+        }
+
+        /* the error scales up by 2^-sh (UWORD_MAX signals overflow) */
+        if (-sh >= FLINT_BITS - 2 || err > (UWORD(1) << (FLINT_BITS - 3 + sh)))
+            return UWORD_MAX;
+        return err << (-sh);
+    }
+}

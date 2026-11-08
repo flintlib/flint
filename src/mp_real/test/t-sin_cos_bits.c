@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 
 /* mp_real_sin_cos_bits: the output balls contain sin and cos of a
    random point of the input ball, for tiny, unit, one-limb, many-limb,
@@ -153,7 +154,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_bits, state)
         }
         arb_set_arf(t, pt);
         ip = arf_is_zero(pt) ? 0 : FLINT_MAX(0, fmpz_get_si(ARF_EXPREF(pt)));
-        arb_sin_cos(ts, tc, t, prec + 100 + ip);
+        ref_sin_cos(ts, tc, t, prec + 100 + ip);
 
         if (!arb_overlaps(ts, sa) || !arb_overlaps(tc, ca))
         {

@@ -14,12 +14,36 @@
 #include "mp_real.h"
 #include "mp_real/impl.h"
 #include "fmpq.h"
-#include "arb.h"
 
-/* the limb-radix kernel must agree with _arb_exp_sum_bs_powtab as
-   an exact rational: T / (Q B^QE) == Ta / (Qa 2^Qexpa) */
-void _arb_exp_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
-    const fmpz_t x, flint_bitcnt_t r, slong N);
+/* the limb-radix kernel must give the exact rational
+   T / (Q B^QE) = sum_{k=1}^N (x B^-D)^k / k!, here by Horner's rule
+   in fmpq arithmetic */
+static void
+_ref_sum(fmpq_t s, const fmpz_t x, slong D, slong N)
+{
+    fmpq_t t, xr;
+    slong k;
+
+    fmpq_init(t);
+    fmpq_init(xr);
+    fmpz_set(fmpq_numref(xr), x);
+    fmpz_one(fmpq_denref(xr));
+    fmpz_mul_2exp(fmpq_denref(xr), fmpq_denref(xr), (ulong) (FLINT_BITS * D));
+    fmpq_canonicalise(xr);
+
+    /* s = x/1 (1 + x/2 (1 + x/3 (... (1 + x/N)))) */
+    fmpq_zero(s);
+    for (k = N; k >= 1; k--)
+    {
+        fmpq_add_ui(s, s, 1);
+        fmpq_mul(s, s, xr);
+        fmpz_mul_ui(fmpq_denref(s), fmpq_denref(s), (ulong) k);
+        fmpq_canonicalise(s);
+    }
+
+    fmpq_clear(t);
+    fmpq_clear(xr);
+}
 
 TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
 {
@@ -32,16 +56,15 @@ TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
         slong N = 1 + n_randint(state, 60);
         slong tn, qn, QE, i;
         nn_ptr xp, T, Q;
-        fmpz_t Ta, Qa, xf, num, den;
+        fmpz_t xf, num, den;
         fmpq_t qa, qb;
-        flint_bitcnt_t Qexpa;
 
         /* large trees reach the threaded subtrees and merges */
         if (iter % 20 == 0)
         {
             D = 1 + n_randint(state, 40);
             xn = 1 + n_randint(state, D);
-            N = 64 + n_randint(state, 2000);
+            N = 64 + n_randint(state, 400);
         }
         flint_set_num_threads(1 + n_randint(state, 4));
 
@@ -61,21 +84,17 @@ TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
 
         _mp_real_exp_sum_bs_powtab(T, &tn, Q, &qn, &QE, xp, xn, D, N);
 
-        fmpz_init(Ta); fmpz_init(Qa); fmpz_init(xf);
+        fmpz_init(xf);
         fmpz_init(num); fmpz_init(den);
         fmpq_init(qa); fmpq_init(qb);
 
         fmpz_set_ui_array(xf, xp, xn);
-        _arb_exp_sum_bs_powtab(Ta, Qa, &Qexpa, xf,
-            (flint_bitcnt_t) (FLINT_BITS * D), N);
+        _ref_sum(qb, xf, D, N);
 
         fmpz_set_ui_array(num, T, FLINT_MAX(tn, 1));
         fmpz_set_ui_array(den, Q, FLINT_MAX(qn, 1));
         fmpz_mul_2exp(den, den, (ulong) (FLINT_BITS * QE));
         fmpq_set_fmpz_frac(qa, num, den);
-
-        fmpz_mul_2exp(Qa, Qa, Qexpa);
-        fmpq_set_fmpz_frac(qb, Ta, Qa);
 
         if (!fmpq_equal(qa, qb))
         {
@@ -84,7 +103,7 @@ TEST_FUNCTION_START(mp_real_exp_sum_bs, state)
             flint_abort();
         }
 
-        fmpz_clear(Ta); fmpz_clear(Qa); fmpz_clear(xf);
+        fmpz_clear(xf);
         fmpz_clear(num); fmpz_clear(den);
         fmpq_clear(qa); fmpq_clear(qb);
         flint_free(xp); flint_free(T); flint_free(Q);

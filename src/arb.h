@@ -476,7 +476,6 @@ void arb_div_2expm1_ui(arb_t z, const arb_t x, ulong n, slong prec);
 void arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_root_ui(arb_t z, const arb_t x, ulong k, slong prec);
 void arb_root(arb_t z, const arb_t x, ulong k, slong prec); /* back compat */
-void _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slong n, slong max_rel, double C);
 void arb_log(arb_t z, const arb_t x, slong prec);
 void arb_log_arf(arb_t z, const arf_t x, slong prec);
 void arb_log_ui(arb_t z, ulong x, slong prec);
@@ -679,169 +678,14 @@ void _arb_vec_trim(arb_ptr res, arb_srcptr vec, slong len);
 
 int _arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len);
 
-/* arctangent implementation */
+/* logarithms of primes and arguments of Gaussian primes (by mp_real) */
 
-#define ARB_ATAN_TAB1_BITS 8
-#define ARB_ATAN_TAB1_PREC 512
-#define ARB_ATAN_TAB1_LIMBS (ARB_ATAN_TAB1_PREC / FLINT_BITS)
-
-#define ARB_ATAN_TAB21_BITS 5
-#define ARB_ATAN_TAB22_BITS 5
-#define ARB_ATAN_TAB2_PREC 4608
-#define ARB_ATAN_TAB2_LIMBS (ARB_ATAN_TAB2_PREC / FLINT_BITS)
-
-FLINT_DLL extern const ulong arb_atan_tab1[1 << ARB_ATAN_TAB1_BITS][ARB_ATAN_TAB1_LIMBS];
-FLINT_DLL extern const ulong arb_atan_tab21[1 << ARB_ATAN_TAB21_BITS][ARB_ATAN_TAB2_LIMBS];
-FLINT_DLL extern const ulong arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS];
-FLINT_DLL extern const ulong arb_atan_pi2_minus_one[ARB_ATAN_TAB2_LIMBS];
-
-void
-_arb_atan_taylor_naive(nn_ptr y, ulong * error,
-    nn_srcptr x, slong xn, ulong N, int alternating);
-
-void _arb_atan_taylor_rs(nn_ptr y, ulong * error,
-    nn_srcptr x, slong xn, ulong N, int alternating);
-
-#define ARB_ATAN_NEWTON_PREC 3400
-
-void arb_atan_newton(arb_t res, const arb_t x, slong prec);
-void arb_atan_arf_newton(arb_t res, const arf_t x, slong prec);
-
-/* logarithm implementation */
-
-#define ARB_LOG_TAB11_BITS 7
-#define ARB_LOG_TAB12_BITS 7
-#define ARB_LOG_TAB1_PREC 512
-#define ARB_LOG_TAB1_LIMBS (ARB_LOG_TAB1_PREC / FLINT_BITS)
-
-#define ARB_LOG_TAB21_BITS 5
-#define ARB_LOG_TAB22_BITS 5
-#define ARB_LOG_TAB2_PREC 4608
-#define ARB_LOG_TAB2_LIMBS (ARB_LOG_TAB2_PREC / FLINT_BITS)
-
-FLINT_DLL extern const ulong arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS];
-FLINT_DLL extern const ulong arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS];
-FLINT_DLL extern const ulong arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS];
-FLINT_DLL extern const ulong arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS];
-FLINT_DLL extern const nn_srcptr arb_log_log2_tab;
-
-void arb_log_newton(arb_t res, const arb_t x, slong prec);
-void arb_log_arf_newton(arb_t res, const arf_t x, slong prec);
-
-/* logarithms of primes */
-
-#define ARB_LOG_PRIME_CACHE_NUM 13
-
-FLINT_DLL extern const ulong arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS];
 void arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
-
-void _arb_log_p_ensure_cached(slong prec);
-arb_srcptr _arb_log_p_cache_vec(void);
-
-/* exponential implementation */
-
-/* only goes up to log(2) * 256 */
-#define ARB_EXP_TAB1_NUM 178
-#define ARB_EXP_TAB1_BITS 8
-#define ARB_EXP_TAB1_PREC 512
-#define ARB_EXP_TAB1_LIMBS (ARB_EXP_TAB1_PREC / FLINT_BITS)
-
-/* only goes up to log(2) * 32 */
-#define ARB_EXP_TAB21_NUM 23
-#define ARB_EXP_TAB21_BITS 5
-#define ARB_EXP_TAB22_NUM (1 << ARB_EXP_TAB22_BITS)
-#define ARB_EXP_TAB22_BITS 5
-#define ARB_EXP_TAB2_PREC 4608
-#define ARB_EXP_TAB2_LIMBS (ARB_EXP_TAB2_PREC / FLINT_BITS)
-
-FLINT_DLL extern const ulong arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS];
-FLINT_DLL extern const ulong arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS];
-FLINT_DLL extern const ulong arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS];
-
-void _arb_exp_taylor_naive(nn_ptr y, ulong * error,
-    nn_srcptr x, slong xn, ulong N);
-
-void _arb_exp_taylor_rs(nn_ptr y, ulong * error,
-    nn_srcptr x, slong xn, ulong N);
-
-void arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one);
-void arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one);
-
-int _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error,
-                                                const arf_t x, slong wn);
-
-slong _arb_exp_taylor_bound(slong mag, slong prec);
-
-void _arb_exp_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
-    const fmpz_t x, flint_bitcnt_t r, slong N);
-
-void _arb_exp_sum_bs_simple(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
-    const fmpz_t x, flint_bitcnt_t r, slong N);
-
-#define ARB_LOG_REDUCTION_DEFAULT_MAX_PREC 4000000
-#define ARB_EXP_LOG_REDUCTION_PREC 2240
-#define ARB_LOG_NEWTON_PREC 2800
-
-void arb_exp_arf_log_reduction(arb_t res, const arf_t x, slong prec, int minus_one);
-void arb_exp_arf_generic(arb_t z, const arf_t x, slong prec, int minus_one);
-void arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim);
-
-/* sin/cos implementation */
-
-/* only goes up to (pi/4) * 256 */
-#define ARB_SIN_COS_TAB1_NUM 203
-#define ARB_SIN_COS_TAB1_BITS 8
-#define ARB_SIN_COS_TAB1_PREC 512
-#define ARB_SIN_COS_TAB1_LIMBS (ARB_SIN_COS_TAB1_PREC / FLINT_BITS)
-
-/* only goes up to (pi/4) * 32 */
-#define ARB_SIN_COS_TAB21_NUM 26
-#define ARB_SIN_COS_TAB21_BITS 5
-#define ARB_SIN_COS_TAB22_NUM (1 << ARB_SIN_COS_TAB22_BITS)
-#define ARB_SIN_COS_TAB22_BITS 5
-#define ARB_SIN_COS_TAB2_PREC 4608
-#define ARB_SIN_COS_TAB2_LIMBS (ARB_SIN_COS_TAB2_PREC / FLINT_BITS)
-
-FLINT_DLL extern const ulong arb_sin_cos_tab1[2 * ARB_SIN_COS_TAB1_NUM][ARB_SIN_COS_TAB1_LIMBS];
-FLINT_DLL extern const ulong arb_sin_cos_tab21[2 * ARB_SIN_COS_TAB21_NUM][ARB_SIN_COS_TAB2_LIMBS];
-FLINT_DLL extern const ulong arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LIMBS];
-
-#define ARB_PI4_TAB_LIMBS (4608 / FLINT_BITS)
-FLINT_DLL extern const ulong arb_pi4_tab[ARB_PI4_TAB_LIMBS];
-
-void _arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error,
-    nn_srcptr x, slong xn, ulong N);
-
-void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos,
-    ulong * error, nn_srcptr x, slong xn, ulong N,
-    int sinonly, int alternating);
-
-int _arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant,
-    ulong * error, const arf_t x, slong wn);
-
-void arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec);
-void arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
-void arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
-
-void _arb_sin_cos_wide(arb_t s, arb_t c, const arf_t x, const mag_t r, slong prec);
-void arb_sin_cos_wide(arb_t s, arb_t c, const arb_t x, slong prec);
-
-void _arb_sin_cos_generic(arb_t s, arb_t c, const arf_t x, const mag_t xrad, slong prec);
-void arb_sin_cos_generic(arb_t s, arb_t c, const arb_t x, slong prec);
-
 void arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
 
-#define ARB_ATAN_GAUSS_PRIME_CACHE_NUM 13
+/* the elementary functions of an exact argument (arb/elem.h) */
 
-#define ARB_SIN_COS_ATAN_REDUCTION_DEFAULT_MAX_PREC 4000000
-#define ARB_SIN_COS_ATAN_REDUCTION_PREC 2600
-
-FLINT_DLL extern const ulong arb_atan_gauss_tab[ARB_ATAN_GAUSS_PRIME_CACHE_NUM][ARB_ATAN_TAB2_LIMBS];
-
-void _arb_atan_gauss_p_ensure_cached(slong prec);
-arb_srcptr _arb_atan_gauss_p_cache_vec(void);
-
-void arb_sin_cos_arf_atan_reduction(arb_t res1, arb_t res2, const arf_t x, slong prec);
+void arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim);
 
 
 ARB_INLINE flint_bitcnt_t
@@ -869,14 +713,6 @@ _arb_mpn_leading_zeros(nn_srcptr d, slong n)
             return FLINT_BITS * zero_limbs;
     }
 }
-
-void _arb_atan_sum_bs_simple(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
-    const fmpz_t x, flint_bitcnt_t r, slong N);
-
-void _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
-    const fmpz_t x, flint_bitcnt_t r, slong N);
-
-void arb_atan_arf_bb(arb_t z, const arf_t x, slong prec);
 
 void arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, slong prec);
 

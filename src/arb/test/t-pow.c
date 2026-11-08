@@ -246,5 +246,98 @@ TEST_FUNCTION_START(arb_pow, state)
         arb_clear(d);
     }
 
+    /* wide bases (integer, half-integer and other exponents, bases
+       reaching into the negative numbers): the result contains the
+       powers of points of the base, and a zero midpoint with a large
+       integer exponent gives a finite result */
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    {
+        arb_t x, y, z, p, q;
+        slong prec, k;
+
+        arb_init(x);
+        arb_init(y);
+        arb_init(z);
+        arb_init(p);
+        arb_init(q);
+
+        prec = 2 + n_randint(state, 200);
+
+        arb_randtest(x, state, 1 + n_randint(state, 100), 3);
+        mag_randtest(arb_radref(x), state, 3);
+        if (n_randint(state, 4) == 0)
+            arf_zero(arb_midref(x));
+
+        switch (n_randint(state, 4))
+        {
+            case 0:
+                arb_set_si(y, (slong) n_randint(state, 40) - 20);
+                break;
+            case 1:
+                arb_set_si(y, (slong) n_randint(state, 40) - 20);
+                arb_mul_2exp_si(y, y, -1);
+                break;
+            case 2:
+                arb_set_ui(y, n_randint(state, 1000));
+                arb_mul_2exp_si(y, y, 60 + n_randint(state, 40));
+                arb_add_ui(y, y, n_randint(state, 2), ARF_PREC_EXACT);
+                break;
+            default:
+                arb_randtest(y, state, 1 + n_randint(state, 50), 2);
+                break;
+        }
+
+        arb_pow(z, x, y, prec);
+
+        for (k = 0; k < 5; k++)
+        {
+            /* a point of the base, and a point of the exponent */
+            {
+                arf_t t, u;
+                arf_init(t);
+                arf_init(u);
+                arf_set_mag(t, arb_radref(x));
+                arf_set_d(u, 2.0 * n_randint(state, 1001) / 1000.0 - 1.0);
+                arf_mul(t, t, u, ARF_PREC_EXACT, ARF_RND_DOWN);
+                arf_add(arb_midref(p), arb_midref(x), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+                mag_zero(arb_radref(p));
+                arf_set_mag(t, arb_radref(y));
+                arf_set_d(u, 2.0 * n_randint(state, 1001) / 1000.0 - 1.0);
+                arf_mul(t, t, u, ARF_PREC_EXACT, ARF_RND_DOWN);
+                arf_add(arb_midref(q), arb_midref(y), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+                mag_zero(arb_radref(q));
+                arf_clear(t);
+                arf_clear(u);
+            }
+
+            arb_pow(p, p, q, prec + 30);
+
+            if (arb_is_finite(p) && !arb_overlaps(z, p))
+            {
+                flint_printf("FAIL: wide base (point not contained)\n\n");
+                flint_printf("x = "); arb_printd(x, 15); flint_printf("\n");
+                flint_printf("y = "); arb_printd(y, 15); flint_printf("\n");
+                flint_printf("z = "); arb_printd(z, 15); flint_printf("\n");
+                flint_printf("p = "); arb_printd(p, 15); flint_printf("\n");
+                flint_abort();
+            }
+        }
+
+        /* a zero midpoint with a positive integer exponent is finite */
+        if (arf_is_zero(arb_midref(x)) && arb_is_int(y) && arb_is_positive(y) && !arb_is_finite(z))
+        {
+            flint_printf("FAIL: zero midpoint, integer exponent: not finite\n\n");
+            flint_printf("x = "); arb_printd(x, 15); flint_printf("\n");
+            flint_printf("y = "); arb_printd(y, 15); flint_printf("\n");
+            flint_abort();
+        }
+
+        arb_clear(x);
+        arb_clear(y);
+        arb_clear(z);
+        arb_clear(p);
+        arb_clear(q);
+    }
+
     TEST_FUNCTION_END(state);
 }

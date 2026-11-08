@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 #include "bitwise_boundary.h"
@@ -84,9 +85,9 @@ TEST_FUNCTION_START(mp_real_sin_cos_bitwise_rs, state)
         for (which = 0; which < 2; which++)
         {
             if (which == 0)
-                arb_sin(e, xa, prec);
+                ref_sin(e, xa, prec);
             else
-                arb_cos(e, xa, prec);
+                ref_cos(e, xa, prec);
 
             fmpz_set_ui_array(f, (which == 0) ? ysin : ycos, n + 1);
             arb_set_fmpz(va, f);
@@ -147,7 +148,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_bitwise_rs, state)
                 arb_init(es);
                 arb_init(ec);
                 _test_bitwise_arb(xa, x, n);
-                arb_sin_cos(es, ec, xa, FLINT_BITS * n + 128);
+                ref_sin_cos(es, ec, xa, FLINT_BITS * n + 128);
                 u = _test_bitwise_ulps(s1, n + 1, n, es);
                 v = _test_bitwise_ulps(c1, n + 1, n, ec);
                 arb_clear(xa);
@@ -185,7 +186,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_bitwise_rs, state)
         arb_init(es);
         arb_init(ec);
         _test_bitwise_arb(xa, x, n);
-        arb_sin_cos(es, ec, xa, FLINT_BITS * n + 128);
+        ref_sin_cos(es, ec, xa, FLINT_BITS * n + 128);
         u = _test_bitwise_ulps(ys, n + 1, n, es);
         v = _test_bitwise_ulps(yc, n + 1, n, ec);
         arb_clear(xa);

@@ -73,7 +73,7 @@ limbs to thousands at 65536 limbs. The tables of the bitwise and
 diophantine kernels are computed on first use and cached for the
 process. A single evaluation at huge precision is cheaper without them:
 `mp_real_exp_notab_squaring` and `mp_real_exp_agm` avoid all tables. See
-[](algorithms/floating-point/elementary-functions) for the algorithms.
+[](algorithms/special-functions/elementary) for the algorithms.
 
 ## Example {#example}
 

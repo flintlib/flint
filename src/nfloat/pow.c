@@ -12,14 +12,10 @@
 #include "elem.h"
 
 /*
-    Powers x^y = exp(y log |x|), with the sign (-1)^y for x < 0 and integer
-    y (NaN otherwise). With |t| < 2^tb for t = y log |x| (which overflows
-    the result unless |t| < 2^(FLINT_BITS - 3)), the logarithm is computed in fixed point
-    to a relative accuracy of about 2^-(p + tb + 12) and multiplied exactly
-    by the mantissa of y, so that t is known to an absolute accuracy far
-    below 2^-p, and the exponential of t is evaluated with the same
-    reduction as exp. Simple
-    cases (y = +-1, 2, +-1/2, x = 1, powers of two to integer powers) are
+    Powers x^y = exp(y log |x|) by the kernel _mp_real_pow_fp (mp_real.h),
+    with the sign (-1)^y for x < 0 and integer y (NaN otherwise); the
+    result overflows unless |y log |x|| < 2^(FLINT_BITS - 3).  Simple cases
+    (y = +-1, 2, +-1/2, x = 1, powers of two to integer powers) are
     handled directly.
 */
 
@@ -58,172 +54,38 @@ _nfloat_is_pow2(nfloat_srcptr x, slong n)
 }
 
 #if FLINT_BITS == 64
-/*
-    In-register fast paths at one and two limbs (64-bit only): log |x| =
-    Lambda at three fraction limbs (_nfloat_small_log_3 on the mantissa,
-    within NFLOAT_SMALL_LOG_ERR_3 = 26 units of B^-3, also near |x| = 1
-    since only the absolute error of t matters; at one limb and |y| <
-    2^40 the two-limb version within 18 units of B^-2 suffices, 2^-82
-    relative to the result), t = y Lambda exactly
-    from the mantissas and truncated to three resp. four fraction limbs,
-    then the reduction and kernel of the exp fast paths. The error of t,
-    below (26 |y| + 1) 2^-192, adds twice as many units of the result
-    (exp(t +- delta) = exp(t)(1 +- 2 delta)): within 28 units of B^-2 for
-    |y| < 2^63 at one limb, and below 2^-146 relative for |y| < 2^40 at
-    two limbs. Other y, and |t| >= 2^61 (beyond the exponent range), take
-    the general code.
-*/
-
+/* the in-register paths of arf/elem.h, rounded into the context */
 #define NFLOAT_POW_FAST_DECLINE (-1)
-
-/* (r[0], ..., r[len - 1]) = (a[0], ..., a[len - 1]) >> s for 1 <= s <
-   2 FLINT_BITS, truncated */
-#define NFLOAT_POW_RSHIFT(r, a, len, s) \
-    do { \
-        slong __i; \
-        ulong __s = (s); \
-        if (__s >= FLINT_BITS) \
-        { \
-            for (__i = 0; __i < (len) - 1; __i++) \
-                (r)[__i] = (a)[__i + 1]; \
-            (r)[(len) - 1] = 0; \
-            __s -= FLINT_BITS; \
-        } \
-        else \
-        { \
-            for (__i = 0; __i < (len); __i++) \
-                (r)[__i] = (a)[__i]; \
-        } \
-        if (__s != 0) \
-        { \
-            for (__i = 0; __i < (len) - 1; __i++) \
-                (r)[__i] = ((r)[__i] >> __s) | ((r)[__i + 1] << (FLINT_BITS - __s)); \
-            (r)[(len) - 1] >>= __s; \
-        } \
-    } while (0)
 
 static int
 _nfloat_pow_fast_1(nfloat_ptr res, ulong dx, slong ex, ulong dy, slong ey, int ysgn, int rsgn, gr_ctx_t ctx)
 {
-    ulong l3, l2, l1, l0, h, l, q, t2, t1, t0, y2, y1, y0, eprop;
-    ulong P[5], Z[5];
-    slong k;
-    int neg;
-
-    if (ey > FLINT_BITS - 1 || ey < -(FLINT_BITS - 1))
+    ulong y2 = 0, y1 = 0, y0 = 0, err = 0;
+    slong k = 0;
+    if (_arf_small_pow_1(&y2, &y1, &y0, &k, &err, dx, ex, dy, ey, ysgn) == ARF_ELEM_UNCERTAIN)
         return NFLOAT_POW_FAST_DECLINE;
-
-    if (ey <= 40)
-    {
-        /* Lambda at two fraction limbs suffices: (l3, l2, l1, 0) */
-        neg = _nfloat_small_log_2(&l3, &l2, &l1, dx, 0, ex);
-        l0 = 0;
-    }
-    else
-        neg = _nfloat_small_log_3(&l3, &l2, &l1, &l0, dx, 0, 0, ex);
-
-    /* P = Lambda my exactly, the value P / B^4 */
-    umul_ppmm(P[1], P[0], l0, dy);
-    umul_ppmm(h, l, l1, dy);
-    add_ssaaaa(P[2], P[1], h, l, UWORD(0), P[1]);
-    umul_ppmm(h, l, l2, dy);
-    add_ssaaaa(P[3], P[2], h, l, UWORD(0), P[2]);
-    umul_ppmm(h, l, l3, dy);
-    add_ssaaaa(P[4], P[3], h, l, UWORD(0), P[3]);
-
-    /* Z = floor(|t| B^3) = P >> (FLINT_BITS - ey) */
-    NFLOAT_POW_RSHIFT(Z, P, 5, FLINT_BITS - ey);
-    if (Z[4] != 0 || Z[3] >= (UWORD(1) << 61))
-        return NFLOAT_POW_FAST_DECLINE;
-
-    q = _nfloat_small_exp_reduce_3(&t2, &t1, &t0, Z[3], Z[2], Z[1], Z[0]);
-    if (neg ^ ysgn)
-    {
-        nn_srcptr L = _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, 3);
-        sub_dddmmmsss(t2, t1, t0, L[2], L[1], L[0], t2, t1, t0);
-        k = -(slong) (q + 1);
-    }
-    else
-        k = (slong) q;
-
-    _mp_real_small_exp_2(&y2, &y1, &y0, t2, t1);
-
-    /* 2 (18 2^ey 2^64 + 1) 2^-64 units with Lambda at two limbs,
-       2 (26 2^ey + 1) 2^-64 units at three */
-    if (ey <= 40)
-        eprop = (ey >= 0) ? (UWORD(36) << ey) + 2 : 38;
-    else
-        eprop = (UWORD(52) >> (FLINT_BITS - ey)) + 2;
-    return _nfloat_small_set_1(res, y2, y1, y0, k, NFLOAT_SMALL_EXP_ERR_2 + eprop, rsgn, ctx);
+    return _nfloat_small_set_1(res, y2, y1, y0, k, err, rsgn, ctx);
 }
 
 static int
 _nfloat_pow_fast_2(nfloat_ptr res, ulong dx1, ulong dx0, slong ex, ulong dy1, ulong dy0,
     slong ey, int ysgn, int rsgn, gr_ctx_t ctx)
 {
-    ulong l3, l2, l1, l0, h, l, q, t3, t2, t1, t0, y3, y2, y1, y0, eprop;
-    ulong a4, a3, a2, a1, a0, b4, b3, b2, b1, b0;
-    ulong P[6], Z[6];
-    slong k;
-    int neg;
-
-    if (ey > 40 || ey < -(FLINT_BITS - 1))
+    ulong y3 = 0, y2 = 0, y1 = 0, y0 = 0, err = 0;
+    slong k = 0;
+    if (_arf_small_pow_2(&y3, &y2, &y1, &y0, &k, &err, dx1, dx0, ex, dy1, dy0, ey, ysgn) == ARF_ELEM_UNCERTAIN)
         return NFLOAT_POW_FAST_DECLINE;
-
-    neg = _nfloat_small_log_3(&l3, &l2, &l1, &l0, dx1, dx0, 0, ex);
-
-    /* P = Lambda (my1, my0) exactly, the value P / B^5 */
-    umul_ppmm(a1, a0, l0, dy0);
-    umul_ppmm(h, l, l1, dy0);
-    add_ssaaaa(a2, a1, h, l, UWORD(0), a1);
-    umul_ppmm(h, l, l2, dy0);
-    add_ssaaaa(a3, a2, h, l, UWORD(0), a2);
-    umul_ppmm(h, l, l3, dy0);
-    add_ssaaaa(a4, a3, h, l, UWORD(0), a3);
-
-    umul_ppmm(b1, b0, l0, dy1);
-    umul_ppmm(h, l, l1, dy1);
-    add_ssaaaa(b2, b1, h, l, UWORD(0), b1);
-    umul_ppmm(h, l, l2, dy1);
-    add_ssaaaa(b3, b2, h, l, UWORD(0), b2);
-    umul_ppmm(h, l, l3, dy1);
-    add_ssaaaa(b4, b3, h, l, UWORD(0), b3);
-
-    P[0] = a0;
-    add_sssssaaaaaaaaaa(P[5], P[4], P[3], P[2], P[1], UWORD(0), a4, a3, a2, a1,
-        b4, b3, b2, b1, b0);
-
-    /* Z = floor(|t| B^4) = P >> (FLINT_BITS - ey) */
-    NFLOAT_POW_RSHIFT(Z, P, 6, FLINT_BITS - ey);
-    if (Z[5] != 0 || Z[4] >= (UWORD(1) << 61))
-        return NFLOAT_POW_FAST_DECLINE;
-
-    q = _nfloat_small_exp_reduce_4(&t3, &t2, &t1, &t0, Z[4], Z[3], Z[2], Z[1], Z[0]);
-    if (neg ^ ysgn)
-    {
-        nn_srcptr L = _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, 4);
-        sub_ddddmmmmssss(t3, t2, t1, t0, L[3], L[2], L[1], L[0], t3, t2, t1, t0);
-        k = -(slong) (q + 1);
-    }
-    else
-        k = (slong) q;
-
-    _mp_real_small_exp_3(&y3, &y2, &y1, &y0, t3, t2, t1);
-
-    /* 2 (26 2^ey + 1) units of B^-3 */
-    eprop = (ey >= 0) ? (UWORD(52) << ey) + 2 : 54;
-    return _nfloat_small_set_2(res, y3, y2, y1, y0, k, NFLOAT_SMALL_EXP_ERR_3 + eprop, rsgn, ctx);
+    return _nfloat_small_set_2(res, y3, y2, y1, y0, k, err, rsgn, ctx);
 }
 #endif
 
 int
 nfloat_pow(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 {
-    _nfloat_fix_t L;
     ulong out[NFLOAT_ELEM_MAX_LIMBS + 2];
-    slong n, w, nk, k, tb;
+    slong n, nk, k;
     ulong err;
-    int odd = 0, isint, rsgn, tsgn;
+    int odd = 0, isint, rsgn;
 
     if (NFLOAT_IS_SPECIAL(x) || NFLOAT_IS_SPECIAL(y))
     {
@@ -294,89 +156,23 @@ nfloat_pow(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     }
 #endif
 
-    /* |t| < 2^tb with tb = e_y + bits(|E| + 1) (|log |x|| < |E| + 1); log |x|
-       to tb + 4 more bits of relative accuracy */
     {
-        slong E = NFLOAT_EXP(x);
-        slong ey = NFLOAT_EXP(y);
-        ulong aE = (E < 0) ? -(ulong) E : (ulong) E;
+        ulong q[3];
+        slong qn;
+        int tsgn, code;
 
-        tb = FLINT_MAX(ey, -FLINT_BITS * n - 8) + FLINT_BIT_COUNT(aE + 1);
-        if (tb > NFLOAT_EXP_MAX_ARG_EXP + 2)
-            tb = NFLOAT_EXP_MAX_ARG_EXP + 2;
-        tb = FLINT_MAX(tb, 0);
-    }
+        nk = _nfloat_elem_limbs(ctx, 0);
+        code = _mp_real_pow_fp(out, &err, q, &qn, &tsgn, NFLOAT_D(x), n, NFLOAT_EXP(x),
+            NFLOAT_D(y), n, NFLOAT_EXP(y), NFLOAT_SGNBIT(y), _nfloat_elem_bits(ctx, 0), MP_REAL_EXP_FP_MAX_EXP);
 
-    /* t at w >= nk limbs, tb + 12 more bits than the result: the
-       propagated error below takes a right shift */
-    nk = _nfloat_elem_limbs(ctx, 0);
-    w = nk + (tb + 12 + FLINT_BITS - 1) / FLINT_BITS;
-
-    /* log |x| = (L->d, L->len) 2^(L->e) within L->err units, to tb + 12
-       more bits of relative accuracy than the function precision: an
-       absolute accuracy for t = y log |x| of about 2^-(p + 12) */
-    _nfloat_log_fix(L, NFLOAT_D(x), n, NFLOAT_EXP(x), tb + 12, ctx);
-    if (L->len == 0)
-        return GR_UNABLE;
-
-    {
-        ulong P[2 * NFLOAT_ELEM_MAX_LIMBS + 2];
-        ulong Tm[NFLOAT_ELEM_MAX_LIMBS + 2];
-        slong pl, te, texp, sh, dd;
-        ulong et, eprop;
-
-        /* t = y L exactly from the mantissas: P 2^(L->e + e_y - FLINT_BITS n),
-           within L->err |Y| 2^(L->e + e_y - FLINT_BITS n) < L->err 2^(L->e + e_y) */
-        if (L->len >= n)
-            flint_mpn_mul(P, L->d, L->len, NFLOAT_D(y), n);
-        else
-            flint_mpn_mul(P, NFLOAT_D(y), n, L->d, L->len);
-        pl = L->len + n;
-        while (P[pl - 1] == 0)
-            pl--;
-
-        /* the top w limbs, normalized: t = Tm 2^te within the units for
-           the dropped bits plus the error of L, L->err 2^(L->e + e_y - te) */
-        et = _nfloat_elem_normalize(Tm, &te, P, pl,
-            L->e + NFLOAT_EXP(y) - FLINT_BITS * n, 0, w);
-
-        texp = te + FLINT_BITS * w;
-        tsgn = L->sgnbit ^ NFLOAT_SGNBIT(y);
-
-        /* |t| >= 2^(FLINT_BITS - 3) overflows or underflows */
-        if (texp > NFLOAT_EXP_MAX_ARG_EXP)
+        if (code == MP_REAL_POW_HUGE)
             return tsgn ? _nfloat_underflow(res, rsgn, ctx) : _nfloat_overflow(res, rsgn, ctx);
-
-        /* tiny t: 1 + delta, |delta| < 2|t| */
-        if (texp < -FLINT_BITS * n - 4)
-            return _nfloat_one_plus_tiny(res, rsgn, tsgn, -FLINT_BITS * n, ctx);
-
-        /* exp(t +- delta) = exp(t)(1 +- 2 delta) and exp(t) < 2^(FLINT_BITS nk + 1)
-           units: delta 2^(FLINT_BITS nk + 2) units, for the truncation
-           delta = et 2^te and the error of L, L->err 2^(L->e + e_y) */
-        k = _nfloat_exp_mpn(out, &err, Tm, w, texp, tsgn, nk);
-
-        sh = te + FLINT_BITS * nk + 2;
-        dd = L->e + NFLOAT_EXP(y) + FLINT_BITS * nk + 2;
-        eprop = 0;
-
-        if (sh <= -FLINT_BITS)
-            eprop += 1;
-        else if (sh <= 0)
-            eprop += (et >> (-sh)) + 1;
-        else
-            return GR_UNABLE;
-
-        if (dd <= -FLINT_BITS)
-            eprop += 1;
-        else if (dd <= 0)
-            eprop += (L->err >> (-dd)) + 1;
-        else if (dd <= FLINT_BITS - 4 && L->err < (UWORD(1) << (FLINT_BITS - 4 - dd)))
-            eprop += L->err << dd;     /* (below 2^(FLINT_BITS - 4): kernel units are finer than p) */
-        else
-            return GR_UNABLE;
-
-        err += eprop;
+        /* |delta| < 2^-(FLINT_BITS nk + 3), nk from the function
+           precision, which may be below the context's */
+        if (code == MP_REAL_POW_TINY)
+            return _nfloat_one_plus_tiny(res, rsgn, tsgn, -FLINT_BITS * nk - 3, ctx);
+        FLINT_ASSERT(code == 0 || code == 1);
+        k = (qn == 0) ? 0 : (code ? -(slong) q[0] : (slong) q[0]);
     }
 
     return _nfloat_set_mpn_err(res, out, nk + 1, k - FLINT_BITS * nk, err, err, rsgn, ctx);

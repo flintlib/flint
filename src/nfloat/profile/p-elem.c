@@ -47,6 +47,25 @@ func_t;
 
 static int _mpfr_sin(mpfr_ptr r, mpfr_srcptr x, mpfr_rnd_t rnd) { return mpfr_sin(r, x, rnd); }
 
+/* sin(pi x): mpfr_sinpi from MPFR 4.2, else pi x at 32 more bits (enough
+   for the timings, the arguments being below 2^4) */
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4, 2, 0)
+static int _mpfr_sinpi(mpfr_ptr r, mpfr_srcptr x, mpfr_rnd_t rnd) { return mpfr_sinpi(r, x, rnd); }
+#else
+static int
+_mpfr_sinpi(mpfr_ptr r, mpfr_srcptr x, mpfr_rnd_t rnd)
+{
+    mpfr_t t;
+    int s;
+    mpfr_init2(t, mpfr_get_prec(r) + 32);
+    mpfr_const_pi(t, MPFR_RNDN);
+    mpfr_mul(t, t, x, MPFR_RNDN);
+    s = mpfr_sin(r, t, rnd);
+    mpfr_clear(t);
+    return s;
+}
+#endif
+
 static const func_t funcs[] =
 {
     { "exp", GR_METHOD_EXP, 1, (void (*)(void)) mpfr_exp, -4, 4, 0 },
@@ -68,7 +87,7 @@ static const func_t funcs[] =
     { "asinh", GR_METHOD_ASINH, 1, (void (*)(void)) mpfr_asinh, -4, 4, 0 },
     { "acosh", GR_METHOD_ACOSH, 1, (void (*)(void)) mpfr_acosh, 0.01, 4, 1 },
     { "atanh", GR_METHOD_ATANH, 1, (void (*)(void)) mpfr_atanh, -4, -0.01, 0 },
-    { "sin_pi", GR_METHOD_SIN_PI, 1, (void (*)(void)) mpfr_sinpi, -4, 4, 0 },
+    { "sin_pi", GR_METHOD_SIN_PI, 1, (void (*)(void)) _mpfr_sinpi, -4, 4, 0 },
     { "pow", GR_METHOD_POW, 2, (void (*)(void)) mpfr_pow, -2, 2, 1 },
 };
 

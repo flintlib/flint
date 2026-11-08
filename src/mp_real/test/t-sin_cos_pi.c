@@ -15,10 +15,11 @@
 #include "fmpq.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 
 /* _mp_real_sin_cos_pi_ui_div_ui (every algorithm and order, the closed
    forms for q = 3, 4, 5, 6, 8, 10, 12) and
-   mp_real_sin_cos_pi_ui_div_ui against arb_sin_cos_pi_fmpq: the
+   mp_real_sin_cos_pi_ui_div_ui against MPFR: the
    fixed-point outputs lie within their bound, which respects the
    documented maximum (a few ulps for the Chebyshev iteration); the
    balls contain the values (overlap the reference), have a relative accuracy of about n limbs,
@@ -118,7 +119,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
         fmpq_init(pq);
 
         fmpq_set_ui(pq, p, q);
-        arb_sin_cos_pi_fmpq(sref, cref, pq, FLINT_BITS * n + 100);
+        ref_sin_cos_pi_fmpq(sref, cref, pq, FLINT_BITS * n + 100);
 
         ys = flint_malloc((n + 1) * sizeof(ulong));
         yc = flint_malloc((n + 1) * sizeof(ulong));
@@ -164,7 +165,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
 
             p = n_randint(state, 2) ? n_randtest(state) : n_randint(state, 4 * q + 1);
             fmpq_set_ui(pq, p, q);
-            arb_sin_cos_pi_fmpq(sref, cref, pq, FLINT_BITS * (m + 4) + 100);
+            ref_sin_cos_pi_fmpq(sref, cref, pq, FLINT_BITS * (m + 4) + 100);
 
             mp_real_sin_cos_pi_ui_div_ui(which != 2 ? s : NULL,
                 which != 1 ? c : NULL, p, q, m);
@@ -229,7 +230,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
 
         ok = mp_real_tan_pi_ui_div_ui(y, p, q, n);
         fmpq_set_ui(pq, p, q);
-        arb_sin_cos_pi_fmpq(s, c, pq, FLINT_BITS * n + 200);
+        ref_sin_cos_pi_fmpq(s, c, pq, FLINT_BITS * n + 200);
         mp_real_get_arb(a, y);
 
         if (arb_is_zero(c))

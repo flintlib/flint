@@ -34,7 +34,7 @@
    THE REDUCTION (_mp_real_log_reduce) is a greedy descent through a
    precomputed table of integer relations: row i holds coefficients
    d_i with sum_j d_ij log(p_j) = epsilon_i, |epsilon_i| decreasing
-   down the table (output of _arb_log_precompute_reductions, coefficient
+   down the table (output of _mp_real_precompute_reductions, coefficient
    bound 2^8 per row; rel_tab.c).
    After the free log 2 step, each row subtracts the nearest integer
    multiple of epsilon_i from the residual, keeping a running tally

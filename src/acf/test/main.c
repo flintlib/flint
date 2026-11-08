@@ -12,7 +12,9 @@
 /* Include functions *********************************************************/
 
 #include "t-approx_div.c"
+#include "t-arith.c"
 #include "t-approx_dot.c"
+#include "t-elem.c"
 #include "t-init_clear.c"
 
 /* Array of test functions ***************************************************/
@@ -20,7 +22,9 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(acf_approx_div),
+    TEST_FUNCTION(acf_arith),
     TEST_FUNCTION(acf_approx_dot),
+    TEST_FUNCTION(acf_elem),
     TEST_FUNCTION(acf_init_clear)
 };
 

@@ -1123,6 +1123,7 @@ void _arf_mpn_cdiv_approx(nn_ptr re, slong * reexp, int * reneg, nn_ptr im, slon
 void _arf_mpn_csqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec);
 void _arf_mpn_crsqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec);
 
+
 /* The buffer of alloc limbs for a kernel writing its result into z: the
    limbs of z (allocated), unless z is one of the operands x, y (through
    its struct or a shallow copy of its buffer) or the result may be
@@ -1292,6 +1293,114 @@ int arf_sqrt_fmpz(arf_t z, const fmpz_t x, slong prec, arf_rnd_t rnd);
 int arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd);
 
 int arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd);
+
+/* Elementary functions (arf/exp.c, ...), with the same conventions as
+   arf_div: correctly rounded in the strict modes (a Ziv loop over the
+   fixed-point kernels of mp_real (_mp_real_exp_fp, ...), which always
+   terminates since the values are irrational apart from the exact cases
+   2^k = exp2(k), exp(0) = 1 and expm1(0) = 0), within 1 ulp in any
+   direction for ARF_RND_FAST and within 0.51 ulp for ARF_RND_ACCURATE
+   (where the return value is not a reliable inexact flag); the strict
+   modes return the inexact flag.  ARF_PREC_EXACT is not supported.
+   Arguments beyond 2^max(128, 2 prec) in absolute value, whose
+   exponentials would have excessive exponents, give nan (as arb gives
+   an infinite radius); within that range the exponent of the result may
+   be a bignum. */
+int arf_exp(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_expm1(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_exp2(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* logarithms (arf/log.c): the exact cases are log 1 = 0, log2 of a power
+   of two and log1p 0 = 0; log and log2 of a negative number give nan,
+   of zero -inf; log1p below -1 gives nan, at -1 -inf.  Any exponent is
+   supported. */
+int arf_log(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_log2(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_log1p(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* trigonometric functions (arf/sin_cos.c) and those of pi x: exact at
+   0 and, for the functions of pi x, at the multiples of 1/2 (sin, cos
+   in {0, +-1}, tan 0 or nan at a pole) and tan at the odd multiples of
+   1/4 (+-1); nan for infinite arguments and beyond
+   2^max(65536, 4 prec); res1 and res2 must be distinct */
+int arf_sin(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_cos(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sin_cos(arf_ptr res1, arf_ptr res2, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_tan(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sin_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_cos_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sin_cos_pi(arf_ptr res1, arf_ptr res2, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_tan_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* the reciprocal trigonometric functions and sinc (arf/sin_cos.c): nan
+   at the poles (and for the special arguments of cot, csc), sec(0) = 1,
+   sinc(0) = 1 */
+int arf_cot(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sec(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_csc(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sinc(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_cot_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sec_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_csc_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* hyperbolic functions (arf/hyperbolic.c): exact at 0 (sinh, tanh: 0;
+   cosh, sech: 1; coth, csch: nan) and at +-inf (sinh: +-inf, cosh: +inf,
+   tanh, coth: +-1, sech, csch: 0); nan beyond 2^max(128, 2 prec) for
+   sinh, cosh, sech and csch (tanh and coth are +-1 within a unit there) */
+int arf_sinh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_cosh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sinh_cosh(arf_ptr res1, arf_ptr res2, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_tanh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_coth(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sech(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_csch(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* powers (arf/pow.c): x^y = exp(y log |x|) with the sign of x for an
+   odd integer y (nan for x < 0 and a non-integer y); x^0 = 1 and 1^y = 1
+   for any x resp. y, 0^y = 0 or +inf, the infinities as usual.  The
+   result is exact (and reported so) whenever it is a dyadic number:
+   powers of two, integer powers, roots of perfect powers.  nan when
+   |y log x| reaches the limit of exp.  exp10(x) = 10^x likewise. */
+int arf_pow(arf_ptr res, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
+int arf_exp10(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* the constant pi (arf/atan.c), and (-1)^neg pi 2^k */
+int arf_const_pi(arf_ptr res, slong prec, arf_rnd_t rnd);
+int arf_const_pi_mul_2exp(arf_ptr res, slong k, int neg, slong prec, arf_rnd_t rnd);
+
+/* the less common elementary functions (arf/elem_misc.c), composed of
+   the others: the inverse trigonometric and hyperbolic functions
+   (asin, acos: nan outside [-1, 1]; acosh: nan below 1; atanh: +-inf at
+   +-1; acot(0) = pi/2; asec, acsc, acoth: nan inside (-1, 1); asech:
+   +inf at 0, nan outside (0, 1]; acsch(0) = nan), the inverse
+   trigonometric functions divided by pi, sinc(pi x) (exact zeros at the
+   nonzero integers) and log10 (exact at the powers of ten).  Any
+   exponents are supported. */
+int arf_log10(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_sinc_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_asin(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acos(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_asin_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acos_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_atan_pi(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acot(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_asec(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acsc(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_asinh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acosh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_atanh(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acoth(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_asech(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_acsch(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+
+/* arctangents (arf/atan.c): atan is exact only at 0 and gives +-pi/2 for
+   +-inf; atan2(y, x) follows the usual conventions, with atan2(0, x) = 0
+   for x >= 0 (including +0 and +inf) and pi for x < 0, atan2(y, 0) =
+   +-pi/2, atan2(+-inf, x) = +-pi/2 for finite x, atan2(y, +inf) = 0,
+   atan2(y, -inf) = +-pi, atan2(+-inf, +-inf) = +-pi/4 resp. +-3 pi/4.
+   Any exponents are supported. */
+int arf_atan(arf_ptr res, arf_srcptr x, slong prec, arf_rnd_t rnd);
+int arf_atan2(arf_ptr res, arf_srcptr y, arf_srcptr x, slong prec, arf_rnd_t rnd);
 
 /* Magnitude bounds */
 

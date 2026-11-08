@@ -170,6 +170,84 @@ acf_mul(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd)
 void acf_approx_inv(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
 void acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd);
 void acf_approx_sqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+void acf_approx_rsqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+
+/* the reciprocal, quotient and square roots with each part rounded in
+   the mode rnd as for the elementary functions below (acf/inv.c,
+   acf/sqrt.c): the
+   reciprocal and quotient from the exact numerators and denominators,
+   the roots by retries of the kernels in the strict modes; the return
+   value carries the inexact flags of the parts.  A zero divisor gives
+   the results of arf_div; sqrt(0) = 0 and rsqrt(0) = +inf. */
+int acf_inv(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd);
+int acf_sqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_rsqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+
+/* elementary functions (acf/elem.c): in the strict modes each part
+   correctly rounded in the mode rnd as the real functions of arf round
+   their results; in ARF_RND_FAST resp. ARF_RND_ACCURATE each part
+   within 1 resp. 0.51 ulp of the larger part of the value (the relative
+   accuracy of the complex number: a much smaller part may be inaccurate
+   or zero); the return value carries the inexact flags of the
+   parts (bit 0 the real part, bit 1 the imaginary part; bits 2 and 3
+   those of res2) in the strict modes.  A nan or infinite part gives
+   nan parts; the arguments beyond the ranges of the real functions
+   (exp beyond 2^max(128, 2 prec), the trigonometric functions beyond
+   2^max(65536, 4 prec)) likewise.  log(0) = -inf, pow(0, y) = 0 for
+   Re(y) > 0 and x^0 = 1. */
+int acf_exp(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_exp_pi_i(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_log(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sin(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_cos(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sin_cos(acf_t res1, acf_t res2, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sin_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_cos_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sin_cos_pi(acf_t res1, acf_t res2, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sinh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_cosh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sinh_cosh(acf_t res1, acf_t res2, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_pow(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd);
+
+/* tan, cot, sec, csc, their pi versions and the hyperbolic ones
+   (acf/elem.c): the parts as quotients by |cos z|^2 or |sin z|^2 */
+int acf_tan(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_cot(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sec(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_csc(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_tan_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_cot_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sec_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_csc_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_tanh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_coth(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sech(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_csch(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+
+/* the inverse functions (principal branches, the reciprocal ones as
+   f(1/z) as in gr), expm1, log1p and sinc (acf/elem_acb.c): from balls of
+   acb at increasing precisions, with the values on the axes whose parts
+   are exactly zero or a multiple of pi/2 set directly */
+int acf_expm1(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_log1p(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sinc(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_sinc_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_asin(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acos(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_atan(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acot(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_asec(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acsc(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_asin_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acos_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_atan_pi(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_asinh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acosh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_atanh(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acoth(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_asech(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
+int acf_acsch(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd);
 
 void acf_approx_dot(acf_t res, const acf_t initial, int subtract, acf_srcptr x, slong xstep, acf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd);
 

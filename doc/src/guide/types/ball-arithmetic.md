@@ -265,8 +265,8 @@ int main(void)
 }
 ```
 ```output
-prec =   63: accuracy   8 bits, f = [-1.36e-15 +/- 2.24e-18]
-prec =  126: accuracy  71 bits, f = [-1.359140914229521e-15 +/- 3.72e-31]
+prec =   63: accuracy   9 bits, f = [-1.36e-15 +/- 2.15e-18]
+prec =  126: accuracy  72 bits, f = [-1.359140914229521e-15 +/- 3.72e-31]
 ```
 
 (Computing $1 + 1/n$ first and then its logarithm, instead of using
@@ -380,7 +380,7 @@ Using   512 bits, sin(x) = [+/- 6.18e+724]
 Using  1024 bits, sin(x) = [+/- 4.61e+570]
 Using  2048 bits, sin(x) = [+/- 2.57e+262]
 Using  4096 bits, sin(x) = [-0.7190842207 +/- 1.20e-11]
-arb_sin, 64 bits:  [-0.7190842207119598 +/- 5.36e-17]
+arb_sin, 64 bits:  [-0.7190842207119598 +/- 5.34e-17]
 ```
 
 At 4096 bits the sign is known (the radius printed there is the error of

@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* _mp_real_series_tapered: |res - f(t)| < 6 ulps for t < 2^-r and
@@ -65,16 +66,16 @@ TEST_FUNCTION_START(mp_real_series_tapered, state)
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
         if (func == MP_REAL_SERIES_TAN)
-            arb_tan(t, xa, FLINT_BITS * n + 64);
+            ref_tan(t, xa, FLINT_BITS * n + 64);
         else if (func == MP_REAL_SERIES_ATAN)
-            arb_atan(t, xa, FLINT_BITS * n + 64);
+            ref_atan(t, xa, FLINT_BITS * n + 64);
         else if (func == MP_REAL_SERIES_ATANH)
-            arb_atanh(t, xa, FLINT_BITS * n + 64);
+            ref_atanh(t, xa, FLINT_BITS * n + 64);
         else if (func == MP_REAL_SERIES_SIN)
-            arb_sin(t, xa, FLINT_BITS * n + 64);
+            ref_sin(t, xa, FLINT_BITS * n + 64);
         else
         {
-            arb_cos(t, xa, FLINT_BITS * n + 64);
+            ref_cos(t, xa, FLINT_BITS * n + 64);
             arb_sub_ui(t, t, 1, FLINT_BITS * n + 64);
             arb_neg(t, t);
         }

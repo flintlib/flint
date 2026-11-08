@@ -9,7 +9,10 @@ This section describes how FLINT implements floating-point arithmetic
 outside the `arb` ball arithmetic (which has its own group,
 [](algorithms/ball-arithmetic/overview)): the fixed-precision `nfloat`
 type and its kernels, the limb-level `mp_real` balls and their
-elementary functions, constants and hypergeometric series, double-word
-to quad-double expansions and balls in `dfloat`, and interval
-arithmetic with doubles. Start with the overview, which compares all
-floating-point types in FLINT and says which to use.
+hypergeometric series, correctly rounded elementary functions, decimal
+arithmetic, double-word to quad-double expansions and balls in
+`dfloat`, and interval arithmetic with doubles. The algorithms of the
+elementary functions and constants themselves are described with the
+special functions ([](algorithms/special-functions/elementary),
+[](algorithms/special-functions/constants)). Start with the overview,
+which compares all floating-point types in FLINT and says which to use.

@@ -17,6 +17,7 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 #include "impl.h"
+#include "../mp_real/impl.h"
 
 FLINT_FORCE_INLINE int
 nfloat_mpfr_rounding_mode(gr_ctx_t ctx)
@@ -3378,11 +3379,10 @@ int nfloat_pi(nfloat_ptr res, gr_ctx_t ctx)
 {
     slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-    FLINT_ASSERT(nlimbs <= ARB_PI4_TAB_LIMBS);
-
+    /* the floor of pi/4 (mp_real/impl.h): the mantissa of pi, truncated */
     NFLOAT_EXP(res) = 2;
     NFLOAT_SGNBIT(res) = 0;
-    flint_mpn_copyi(NFLOAT_D(res), arb_pi4_tab + ARB_PI4_TAB_LIMBS - nlimbs, nlimbs);
+    flint_mpn_copyi(NFLOAT_D(res), _mp_real_const_ptr(MP_REAL_CONST_ID_PI4, nlimbs), nlimbs);
 
     return GR_SUCCESS;
 }

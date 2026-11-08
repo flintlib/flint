@@ -12,9 +12,10 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
-/* The table-driven kernels at two and three limbs (small.h) against arb,
+/* The table-driven kernels at two and three limbs (small.h) against MPFR,
    within their stated error bounds, with arguments at the table
    boundaries and, for atan(Y / X), ratios close to multiples of 2^-9;
    the paired exp(v), exp(-v); and the three-limb divisions against
@@ -126,7 +127,7 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
                 _mp_real_small_exp_2_mpn(y, &err, v);
             else
                 _mp_real_small_exp_3_mpn(y, &err, v);
-            arb_exp(ref, a, prec);
+            ref_exp(ref, a, prec);
             if (!_small_check(ref, y, n + 1, n, err))
                 TEST_FUNCTION_FAIL("exp, n = %wd, v = %{ulong*}\n", n, v, n);
         }
@@ -138,7 +139,7 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
                 _mp_real_small_log1p_2_mpn(y, &err, v);
             else
                 _mp_real_small_log1p_3_mpn(y, &err, v);
-            arb_log1p(ref, a, prec);
+            ref_log1p(ref, a, prec);
             if (!_small_check(ref, y, n, n, err))
                 TEST_FUNCTION_FAIL("log1p, n = %wd, v = %{ulong*}\n", n, v, n);
         }
@@ -150,7 +151,7 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
                 _mp_real_small_sin_cos_2_mpn(y, y2, &err, v);
             else
                 _mp_real_small_sin_cos_3_mpn(y, y2, &err, v);
-            arb_sin_cos(ref, b, a, prec);
+            ref_sin_cos(ref, b, a, prec);
             if (!_small_check(ref, y, n + 1, n, err) || !_small_check(b, y2, n + 1, n, err))
                 TEST_FUNCTION_FAIL("sin_cos, n = %wd, v = %{ulong*}\n", n, v, n);
         }
@@ -162,7 +163,7 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
                 _mp_real_small_atan_2_mpn(y, &err, v);
             else
                 _mp_real_small_atan_3_mpn(y, &err, v);
-            arb_atan(ref, a, prec);
+            ref_atan(ref, a, prec);
             if (!_small_check(ref, y, n, n, err))
                 TEST_FUNCTION_FAIL("atan, n = %wd, v = %{ulong*}\n", n, v, n);
         }
@@ -174,9 +175,9 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
             else
                 _mp_real_small_exp_pm_3(y + 3, y + 2, y + 1, y, y2 + 3, y2 + 2, y2 + 1, y2, v[2], v[1], v[0]);
             err = (n == 2) ? MP_REAL_SMALL_EXP_ERR_2 : MP_REAL_SMALL_EXP_ERR_3;
-            arb_exp(ref, a, prec);
+            ref_exp(ref, a, prec);
             arb_neg(b, a);
-            arb_exp(b, b, prec);
+            ref_exp(b, b, prec);
             if (!_small_check(ref, y, n + 1, n, err) || !_small_check(b, y2, n + 1, n, err))
                 TEST_FUNCTION_FAIL("exp_pm, n = %wd, v = %{ulong*}\n", n, v, n);
         }
@@ -303,7 +304,7 @@ TEST_FUNCTION_START(mp_real_small_kernels, state)
             _small_get_arf(arb_midref(a), v, n, n);
             _small_get_arf(arb_midref(b), x, n, n);
             arb_div(ref, a, b, prec);
-            arb_atan(ref, ref, prec);
+            ref_atan(ref, ref, prec);
             if (!_small_check(ref, y, n, n, err))
                 TEST_FUNCTION_FAIL("atan ratio, n = %wd, Y = %{ulong*}, X = %{ulong*}\n", n, v, n, x, n);
         }

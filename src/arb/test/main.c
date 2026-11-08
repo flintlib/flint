@@ -30,17 +30,11 @@
 #include "t-asin.c"
 #include "t-asinh.c"
 #include "t-atan2.c"
-#include "t-atan_arf_bb.c"
 #include "t-atan_arf.c"
-#include "t-atan_arf_newton.c"
 #include "t-atan.c"
 #include "t-atan_frac_bsplit.c"
 #include "t-atan_gauss_primes_vec_bsplit.c"
 #include "t-atanh.c"
-#include "t-atan_newton.c"
-#include "t-atan_sum_bs_powtab.c"
-#include "t-atan_tab.c"
-#include "t-atan_taylor_rs.c"
 #include "t-bell_fmpz.c"
 #include "t-bell_sum_taylor.c"
 #include "t-bernoulli_poly_ui.c"
@@ -56,6 +50,7 @@
 #include "t-const_glaisher.c"
 #include "t-const_khinchin.c"
 #include "t-const_log10.c"
+#include "t-const_floor.c"
 #include "t-const_log2.c"
 #include "t-const_pi.c"
 #include "t-const_reciprocal_fibonacci.c"
@@ -94,14 +89,9 @@
 #include "t-dump_str.c"
 #include "t-euler_number_fmpz.c"
 #include "t-euler_number_ui.c"
-#include "t-exp_arf_bb.c"
-#include "t-exp_arf_rs_generic.c"
 #include "t-exp.c"
 #include "t-exp_invexp.c"
 #include "t-expm1.c"
-#include "t-exp_sum_bs_powtab.c"
-#include "t-exp_tab.c"
-#include "t-exp_taylor_rs.c"
 #include "t-fac_ui.c"
 #include "t-fib.c"
 #include "t-floor.c"
@@ -117,8 +107,6 @@
 #include "t-get_mag.c"
 #include "t-get_mag_lower.c"
 #include "t-get_mag_lower_nonnegative.c"
-#include "t-get_mpn_fixed_mod_log2.c"
-#include "t-get_mpn_fixed_mod_pi4.c"
 #include "t-get_rand_fmpq.c"
 #include "t-get_simplest_fmpq.c"
 #include "t-get_str.c"
@@ -132,9 +120,7 @@
 #include "t-log_base_ui.c"
 #include "t-log.c"
 #include "t-log_hypot.c"
-#include "t-log_newton.c"
 #include "t-log_primes_vec_bsplit.c"
-#include "t-log_tab.c"
 #include "t-log_ui_from_prev.c"
 #include "t-max.c"
 #include "t-min.c"
@@ -171,15 +157,10 @@
 #include "t-sgn.c"
 #include "t-sin.c"
 #include "t-sinc.c"
-#include "t-sin_cos_arf_bb.c"
-#include "t-sin_cos_arf_generic.c"
 #include "t-sin_cos.c"
-#include "t-sin_cos_generic.c"
 #include "t-sin_cos_pi.c"
 #include "t-sin_cos_pi_fmpq_algebraic.c"
 #include "t-sin_cos_pi_fmpq.c"
-#include "t-sin_cos_tab.c"
-#include "t-sin_cos_taylor_rs.c"
 #include "t-sinc_pi.c"
 #include "t-sinh.c"
 #include "t-sinh_cosh.c"
@@ -201,6 +182,7 @@
 #include "t-sub_si.c"
 #include "t-sub_ui.c"
 #include "t-tanh.c"
+#include "t-tan.c"
 #include "t-tan_pi.c"
 #include "t-trim.c"
 #include "t-ui_pow_ui.c"
@@ -238,17 +220,11 @@ test_struct tests[] =
     TEST_FUNCTION(arb_asin),
     TEST_FUNCTION(arb_asinh),
     TEST_FUNCTION(arb_atan2),
-    TEST_FUNCTION(arb_atan_arf_bb),
     TEST_FUNCTION(arb_atan_arf),
-    TEST_FUNCTION(arb_atan_arf_newton),
     TEST_FUNCTION(arb_atan),
     TEST_FUNCTION(arb_atan_frac_bsplit),
     TEST_FUNCTION(arb_atan_gauss_primes_vec_bsplit),
     TEST_FUNCTION(arb_atanh),
-    TEST_FUNCTION(arb_atan_newton),
-    TEST_FUNCTION(arb_atan_sum_bs_powtab),
-    TEST_FUNCTION(arb_atan_tab),
-    TEST_FUNCTION(arb_atan_taylor_rs),
     TEST_FUNCTION(arb_bell_fmpz),
     TEST_FUNCTION(arb_bell_sum_taylor),
     TEST_FUNCTION(arb_bernoulli_poly_ui),
@@ -264,6 +240,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_const_glaisher),
     TEST_FUNCTION(arb_const_khinchin),
     TEST_FUNCTION(arb_const_log10),
+    TEST_FUNCTION(arb_const_floor),
     TEST_FUNCTION(arb_const_log2),
     TEST_FUNCTION(arb_const_pi),
     TEST_FUNCTION(arb_const_reciprocal_fibonacci),
@@ -302,14 +279,9 @@ test_struct tests[] =
     TEST_FUNCTION(arb_dump_str),
     TEST_FUNCTION(arb_euler_number_fmpz),
     TEST_FUNCTION(arb_euler_number_ui),
-    TEST_FUNCTION(arb_exp_arf_bb),
-    TEST_FUNCTION(arb_exp_arf_rs_generic),
     TEST_FUNCTION(arb_exp),
     TEST_FUNCTION(arb_exp_invexp),
     TEST_FUNCTION(arb_expm1),
-    TEST_FUNCTION(arb_exp_sum_bs_powtab),
-    TEST_FUNCTION(arb_exp_tab),
-    TEST_FUNCTION(arb_exp_taylor_rs),
     TEST_FUNCTION(arb_fac_ui),
     TEST_FUNCTION(arb_fib),
     TEST_FUNCTION(arb_floor),
@@ -325,8 +297,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_get_mag),
     TEST_FUNCTION(arb_get_mag_lower),
     TEST_FUNCTION(arb_get_mag_lower_nonnegative),
-    TEST_FUNCTION(arb_get_mpn_fixed_mod_log2),
-    TEST_FUNCTION(arb_get_mpn_fixed_mod_pi4),
     TEST_FUNCTION(arb_get_rand_fmpq),
     TEST_FUNCTION(arb_get_simplest_fmpq),
     TEST_FUNCTION(arb_get_str),
@@ -340,9 +310,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_log_base_ui),
     TEST_FUNCTION(arb_log),
     TEST_FUNCTION(arb_log_hypot),
-    TEST_FUNCTION(arb_log_newton),
     TEST_FUNCTION(arb_log_primes_vec_bsplit),
-    TEST_FUNCTION(arb_log_tab),
     TEST_FUNCTION(arb_log_ui_from_prev),
     TEST_FUNCTION(arb_max),
     TEST_FUNCTION(arb_min),
@@ -379,15 +347,10 @@ test_struct tests[] =
     TEST_FUNCTION(arb_sgn),
     TEST_FUNCTION(arb_sin),
     TEST_FUNCTION(arb_sinc),
-    TEST_FUNCTION(arb_sin_cos_arf_bb),
-    TEST_FUNCTION(arb_sin_cos_arf_generic),
     TEST_FUNCTION(arb_sin_cos),
-    TEST_FUNCTION(arb_sin_cos_generic),
     TEST_FUNCTION(arb_sin_cos_pi),
     TEST_FUNCTION(arb_sin_cos_pi_fmpq_algebraic),
     TEST_FUNCTION(arb_sin_cos_pi_fmpq),
-    TEST_FUNCTION(arb_sin_cos_tab),
-    TEST_FUNCTION(arb_sin_cos_taylor_rs),
     TEST_FUNCTION(arb_sinc_pi),
     TEST_FUNCTION(arb_sinh),
     TEST_FUNCTION(arb_sinh_cosh),
@@ -409,6 +372,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_sub_si),
     TEST_FUNCTION(arb_sub_ui),
     TEST_FUNCTION(arb_tanh),
+    TEST_FUNCTION(arb_tan),
     TEST_FUNCTION(arb_tan_pi),
     TEST_FUNCTION(arb_trim),
     TEST_FUNCTION(arb_ui_pow_ui),
