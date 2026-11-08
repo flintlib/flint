@@ -10,6 +10,7 @@
 */
 
 #include "radix.h"
+#include "impl.h"
 
 ulong
 radix_mul_1(nn_ptr z, nn_srcptr a, slong n, ulong c, const radix_t radix)
@@ -26,6 +27,29 @@ radix_mul_1(nn_ptr z, nn_srcptr a, slong n, ulong c, const radix_t radix)
 
     if (sbits <= FLINT_BITS)
     {
+#if RADIX_ARM64_CARRIES
+        /*
+            Decoupled carries as below, with one-word products: a[i] c is
+            below B^2 <= 2^FLINT_BITS and is split on its own as
+            q_i B + r_i (q_i <= B - 2), and z[i] = (r_i + q_(i-1) + cb) mod B
+            with a carry cb of 0 or 1; r_i + q_(i-1) + cb <= 2B - 2.
+        */
+        const ulong B = mod.n;
+        ulong q, r, qp = 0, cb = 0;
+        FLINT_ASSERT(mod.norm != 0);
+
+        for (i = 0; i < n; i++)
+        {
+            r = n_divrem_preinv_unnorm(&q, a[i] * c, B, mod.ninv, mod.norm);
+            r += qp + cb;
+            cb = (r >= B);
+            z[i] = r - (B & -cb);
+            qp = q;
+        }
+
+        FLINT_ASSERT(qp + cb < B);
+        return qp + cb;
+#else
         ulong cy = 0;
         FLINT_ASSERT(mod.norm != 0);
 
@@ -37,6 +61,7 @@ radix_mul_1(nn_ptr z, nn_srcptr a, slong n, ulong c, const radix_t radix)
 
         FLINT_ASSERT(cy < mod.n);
         return cy;
+#endif
     }
     else
     {

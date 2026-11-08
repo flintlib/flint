@@ -271,7 +271,12 @@ radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, co
 
                 add_sssaaaaaa(cy[2], cy[1], cy[0], cy[2], cy[1], cy[0], s2, s1, s0);
 
+#if RADIX_ARM64_CARRIES
+                /* below (an + 1) B^2 < 2^(nu + 2 FLINT_BITS - 2) */
+                z[i - zlo] = _radix_divrem_3_1_bounded(cy, cy, mod);
+#else
                 z[i - zlo] = flint_mpn_divrem_3_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
+#endif
             }
 
             if (zhi == 2 * an)
@@ -521,7 +526,12 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
                     add_sssaaaaaa(cy[2], cy[1], cy[0], cy[2], cy[1], cy[0], 0, hi, lo);
                 }
 
+#if RADIX_ARM64_CARRIES
+                /* below (bn + 1) B^2 < 2^(nu + 2 FLINT_BITS - 2) */
+                z[i - zlo] = _radix_divrem_3_1_bounded(cy, cy, mod);
+#else
                 z[i - zlo] = flint_mpn_divrem_3_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
+#endif
             }
 
             if (zhi == an + bn)

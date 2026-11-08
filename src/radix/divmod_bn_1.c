@@ -10,7 +10,6 @@
 */
 
 #include "radix.h"
-#include "impl.h"
 
 /*
     Single-limb Hensel division: the bn == 1 case of radix_divmod_bn_classical,
@@ -49,9 +48,9 @@ radix_divmod_bn_1(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, ulong b,
     slong n, const radix_t radix)
 {
     nmod_t mod = radix->B;
-    ulong binv, bb;
+    const ulong B = mod.n;
+    ulong binv, bb, k, m, r, hi, lo, cy = 0;
     slong i;
-    slong sbits;
 
     FLINT_ASSERT(an >= 1);
     FLINT_ASSERT(n >= 1);
@@ -62,75 +61,88 @@ radix_divmod_bn_1(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, ulong b,
     if (!radix_invmod_bn(&binv, &bb, 1, 1, radix))
         return 0;
 
-    sbits = 2 * NMOD_BITS(mod);
+    /*
+        The carry without a division by B: binv b = 1 + k B with k < B. For
+        w < B, write w binv = m B + q_i with q_i = w binv mod B; then
+        q_i b = w (1 + k B) - m b B = w + (w k - m b) B, so that
+        floor(q_i b / B) = w k - m b, exactly, computed modulo 2^FLINT_BITS.
+        With w = (a_i - c) mod B and the borrow t = [a_i < c], c + w = a_i + t B
+        and c + q_i b = a_i + (t + w k - m b) B: the next carry is
+        t + w k - m b <= B - 1. The division of w binv by B gives both q_i
+        and m, and only that division remains on the chain.
+    */
+    umul_ppmm(hi, lo, binv, b);
 
-    if (sbits <= FLINT_BITS)
+    if (2 * NMOD_BITS(mod) <= FLINT_BITS)
     {
-        ulong cy = 0;
-
-        FLINT_ASSERT(mod.norm != 0);
+        /* w binv < B^2 fits a word */
+        r = n_divrem_preinv_unnorm(&k, lo, B, mod.ninv, mod.norm);
+        FLINT_ASSERT(hi == 0 && r == 1);
 
         for (i = 0; i < n; i++)
         {
             ulong ai = (i < an) ? a[i] : 0;
-            ulong w = nmod_sub(ai, cy, mod);
-            ulong qi = nmod_mul(w, binv, mod);
-            q[i] = qi;
-            cy += qi * b;
-            (void) n_divrem_preinv_unnorm(&cy, cy, mod.n, mod.ninv, mod.norm);
+            ulong t = (ai < cy);
+            ulong w = ai - cy + (B & -t);
+            q[i] = n_divrem_preinv_unnorm(&m, w * binv, B, mod.ninv, mod.norm);
+            cy = w * k - m * b + t;
         }
-
-        FLINT_ASSERT(cy < mod.n);
-
-        if (rem != NULL)
-            rem[0] = nmod_sub((n < an) ? a[n] : 0, cy, mod);
     }
-    else if (mod.norm == 0)
+    else if (mod.norm >= 2)
     {
-        ulong hi, lo, r;
-        ulong cy0 = 0, cy1 = 0;
+        /* w binv < B^2 <= 2^(nu + FLINT_BITS - 2) */
+        NMOD_DIVREM2_BOUNDED(k, r, hi, lo, mod);
+        FLINT_ASSERT(r == 1);
 
         for (i = 0; i < n; i++)
         {
             ulong ai = (i < an) ? a[i] : 0;
-            ulong w = nmod_sub(ai, cy0, mod);
-            ulong qi = nmod_mul(w, binv, mod);
-            q[i] = qi;
-            umul_ppmm(hi, lo, qi, b);
-            add_ssaaaa(cy1, cy0, cy1, cy0, hi, lo);
-            r = n_divrem_norm(&cy1, cy1, mod.n);
-            udiv_qrnnd_preinv(cy0, r, r, cy0, mod.n, mod.ninv);
-            (void) r;
+            ulong t = (ai < cy);
+            ulong w = ai - cy + (B & -t);
+            umul_ppmm(hi, lo, w, binv);
+            NMOD_DIVREM2_BOUNDED(m, q[i], hi, lo, mod);
+            cy = w * k - m * b + t;
         }
+    }
+    else if (mod.norm == 1)
+    {
+        const ulong d = B << 1;
 
-        FLINT_ASSERT(cy0 < mod.n);
-        FLINT_ASSERT(cy1 == 0);
+        udiv_qrnnd_preinv(k, r, (hi << 1) | (lo >> (FLINT_BITS - 1)), lo << 1, d, mod.ninv);
+        FLINT_ASSERT((r >> 1) == 1);
 
-        if (rem != NULL)
-            rem[0] = nmod_sub((n < an) ? a[n] : 0, cy0, mod);
+        for (i = 0; i < n; i++)
+        {
+            ulong ai = (i < an) ? a[i] : 0;
+            ulong t = (ai < cy);
+            ulong w = ai - cy + (B & -t);
+            umul_ppmm(hi, lo, w, binv);
+            udiv_qrnnd_preinv(m, r, (hi << 1) | (lo >> (FLINT_BITS - 1)), lo << 1, d, mod.ninv);
+            q[i] = r >> 1;
+            cy = w * k - m * b + t;
+        }
     }
     else
     {
-        ulong hi, lo;
-        ulong cy[2] = { 0, 0 };
+        udiv_qrnnd_preinv(k, r, hi, lo, B, mod.ninv);
+        FLINT_ASSERT(r == 1);
 
         for (i = 0; i < n; i++)
         {
             ulong ai = (i < an) ? a[i] : 0;
-            ulong w = nmod_sub(ai, cy[0], mod);
-            ulong qi = nmod_mul(w, binv, mod);
-            q[i] = qi;
-            umul_ppmm(hi, lo, qi, b);
-            add_ssaaaa(cy[1], cy[0], cy[1], cy[0], hi, lo);
-            (void) _radix_divrem_2_1_unnorm1(cy, cy, mod.n, mod.ninv, mod.norm);
+            ulong t = (ai < cy);
+            ulong w = ai - cy + (B & -t);
+            umul_ppmm(hi, lo, w, binv);
+            udiv_qrnnd_preinv(m, q[i], hi, lo, B, mod.ninv);
+            cy = w * k - m * b + t;
         }
-
-        FLINT_ASSERT(cy[0] < mod.n);
-        FLINT_ASSERT(cy[1] == 0);
-
-        if (rem != NULL)
-            rem[0] = nmod_sub((n < an) ? a[n] : 0, cy[0], mod);
     }
+
+    (void) r;
+    FLINT_ASSERT(cy < mod.n);
+
+    if (rem != NULL)
+        rem[0] = nmod_sub((n < an) ? a[n] : 0, cy, mod);
 
     return 1;
 }
