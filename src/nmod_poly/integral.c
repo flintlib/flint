@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_integral(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
@@ -33,17 +34,18 @@ void _nmod_poly_integral(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
             t = n_mod2_preinv(t, mod.n, mod.ninv);
         t = n_invmod(t, mod.n);
 
-        res[2] = n_mulmod2_preinv(res[2], t, mod.n, mod.ninv);
+        /* t is reduced, and k - 1 < len - 1 < n (or the inverse fails) */
+        res[2] = nmod_mul(res[2], t, mod);
         t = n_addmod(t, t, mod.n);
 
         if (len >= 4)
         {
-            res[3] = n_mulmod2_preinv(res[3], t, mod.n, mod.ninv);
+            res[3] = nmod_mul(res[3], t, mod);
 
             for (k = 4; k < len; k++)
             {
-                t = n_mulmod2_preinv(t, k - 1, mod.n, mod.ninv);
-                res[k] = n_mulmod2_preinv(res[k], t, mod.n, mod.ninv);
+                t = nmod_mul(t, k - 1, mod);
+                res[k] = nmod_mul(res[k], t, mod);
             }
         }
     }

@@ -12,6 +12,7 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 
 typedef struct
 {
@@ -120,9 +121,11 @@ fchain_precomp(ulong m, ulong n, double npre)
     return current;
 }
 
+/* the operands are reduced: nmod_mul rather than n_mulmod2_preinv */
 static n_pair_t
-fchain2_preinv(ulong m, ulong n, ulong ninv)
+fchain2_nmod(ulong m, nmod_t mod)
 {
+    const ulong n = mod.n;
     n_pair_t current = {0, 0}, old;
     int length;
     ulong power, xy;
@@ -135,20 +138,20 @@ fchain2_preinv(ulong m, ulong n, ulong ninv)
 
     for (; length > 0; length--)
     {
-        xy = n_mulmod2_preinv(old.x, old.y, n, ninv);
+        xy = nmod_mul(old.x, old.y, mod);
 
         xy = n_addmod(xy, UWORD(3), n);
 
         if (m & power)
         {
             current.y =
-                n_submod(n_mulmod2_preinv(old.y, old.y, n, ninv), UWORD(2), n);
+                n_submod(nmod_mul(old.y, old.y, mod), UWORD(2), n);
             current.x = xy;
         }
         else
         {
             current.x =
-                n_submod(n_mulmod2_preinv(old.x, old.x, n, ninv), UWORD(2), n);
+                n_submod(nmod_mul(old.x, old.x, mod), UWORD(2), n);
             current.y = xy;
         }
 
@@ -185,11 +188,12 @@ n_is_probabprime_fibonacci(ulong n)
     }
     else
     {
-        ulong ninv = n_preinvert_limb(n);
+        nmod_t mod;
+        nmod_init(&mod, n);
 
-        V = fchain2_preinv(m, n, ninv);
-        return (n_mulmod2_preinv(n - UWORD(3), V.x, n, ninv) ==
-                n_mulmod2_preinv(UWORD(2), V.y, n, ninv));
+        V = fchain2_nmod(m, mod);
+        return (nmod_mul(n - UWORD(3), V.x, mod) ==
+                nmod_mul(UWORD(2), V.y, mod));
     }
 }
 
@@ -230,9 +234,11 @@ lchain_precomp(ulong m, ulong a, ulong n, double npre)
     return current;
 }
 
+/* the operands are reduced: nmod_mul rather than n_mulmod2_preinv */
 static n_pair_t
-lchain2_preinv(ulong m, ulong a, ulong n, ulong ninv)
+lchain2_nmod(ulong m, ulong a, nmod_t mod)
 {
+    const ulong n = mod.n;
     n_pair_t current = {0, 0}, old;
     int length, i;
     ulong power, xy, xx, yy;
@@ -245,17 +251,17 @@ lchain2_preinv(ulong m, ulong a, ulong n, ulong ninv)
 
     for (i = 0; i < length; i++)
     {
-        xy = n_submod(n_mulmod2_preinv(old.x, old.y, n, ninv), a, n);
+        xy = n_submod(nmod_mul(old.x, old.y, mod), a, n);
 
         if (m & power)
         {
-            yy = n_submod(n_mulmod2_preinv(old.y, old.y, n, ninv), UWORD(2), n);
+            yy = n_submod(nmod_mul(old.y, old.y, mod), UWORD(2), n);
             current.x = xy;
             current.y = yy;
         }
         else
         {
-            xx = n_submod(n_mulmod2_preinv(old.x, old.x, n, ninv), UWORD(2), n);
+            xx = n_submod(nmod_mul(old.x, old.x, mod), UWORD(2), n);
             current.x = xx;
             current.y = xy;
         }
@@ -339,11 +345,12 @@ n_is_probabprime_lucas(ulong n)
     }
     else
     {
-        ulong ninv = n_preinvert_limb(n);
-        V = lchain2_preinv(n + 1, A, n, ninv);
+        nmod_t mod;
+        nmod_init(&mod, n);
+        V = lchain2_nmod(n + 1, A, mod);
 
-        left = n_mulmod2_preinv(A, V.x, n, ninv);
-        right = n_mulmod2_preinv(2, V.y, n, ninv);
+        left = nmod_mul(A, V.x, mod);
+        right = nmod_mul(2, V.y, mod);
     }
 
     return (left == right);
