@@ -22,13 +22,16 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
     {
         gr_ctx_struct ctx[3];
         gr_ptr x, y, z, w;
-        int status, direct_status;
+        int st01, st12, st02;
         slong j;
+        int check_domain = 1;
 
         for (j = 0; j < 3; j++)
         {
-            switch (n_randint(state, 12))
+            switch (n_randint(state, 16))
             {
+                /* most of the time, test conversions between subrings of the
+                   complex numbers */
                 case 0: gr_ctx_init_fmpz(ctx + j); break;
                 case 1: gr_ctx_init_fmpq(ctx + j); break;
                 case 2: gr_ctx_init_fmpzi(ctx + j); break;
@@ -40,7 +43,11 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
                 case 8: gr_ctx_init_complex_algebraic_ca(ctx + j); break;
                 case 9: gr_ctx_init_complex_extended_ca(ctx + j); break;
                 case 10: gr_ctx_init_real_qqbar(ctx + j); break;
-                default: gr_ctx_init_complex_qqbar(ctx + j); break;
+                case 11: gr_ctx_init_complex_qqbar(ctx + j); break;
+
+                default:
+                         gr_ctx_init_random(ctx + j, state);
+                         check_domain = 0;
             }
         }
 
@@ -51,33 +58,28 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
 
         GR_MUST_SUCCEED(gr_randtest(x, state, ctx + 0));
 
-        direct_status = gr_set_other(w, x, ctx + 0, ctx + 2);
-        status = gr_set_other(y, x, ctx + 0, ctx + 1);
+        st01 = gr_set_other(y, x, ctx + 0, ctx + 1);
+        st12 = gr_set_other(z, y, ctx + 1, ctx + 2);
+        st02 = gr_set_other(w, x, ctx + 0, ctx + 2);
 
-        if (status == GR_SUCCESS)
+        if (((st01 | st12 | st02) == GR_SUCCESS && gr_equal(z, w, ctx + 2) == T_FALSE)
+            || (check_domain && (st01 | st12) == GR_SUCCESS && st02 == GR_DOMAIN)
+            || (check_domain && (st01 | st02) == GR_SUCCESS && st12 == GR_DOMAIN))
         {
-            status = gr_set_other(z, y, ctx + 1, ctx + 2);
-
-            /* y may be an enclosure of x, but domain errors must still agree */
-            if (direct_status == GR_SUCCESS &&
-                ((status == GR_SUCCESS && gr_equal(z, w, ctx + 2) == T_FALSE)
-                 || status == GR_DOMAIN))
-            {
-                flint_printf("FAIL\n\n");
-                for (j = 0; j < 3; j++)
-                    gr_ctx_println(ctx + j);
-                flint_printf("status = %d\n", status);
-                flint_printf("x = "); gr_println(x, ctx + 0);
-                flint_printf("y = "); gr_println(y, ctx + 1);
-                flint_printf("z = "); gr_println(z, ctx + 2);
-                flint_printf("w = "); gr_println(w, ctx + 2);
-                flint_abort();
-            }
+            flint_printf("FAIL\n\n");
+            flint_printf("%{gr_ctx}\n --> %{gr_ctx}\n --> %{gr_ctx}\n",
+                            ctx, ctx + 1, ctx + 2);
+            flint_printf("st12 = %d\n", st12);
+            flint_printf("x = "); gr_println(x, ctx + 0);
+            flint_printf("y = "); gr_println(y, ctx + 1);
+            flint_printf("z = "); gr_println(z, ctx + 2);
+            flint_printf("w = "); gr_println(w, ctx + 2);
+            flint_abort();
         }
 
-        count_success += (status == GR_SUCCESS);
-        count_domain += ((status & GR_DOMAIN) != 0);
-        count_unable += ((status & GR_UNABLE) != 0);
+        count_success += (st12 == GR_SUCCESS);
+        count_domain += ((st12 & GR_DOMAIN) != 0);
+        count_unable += ((st12 & GR_UNABLE) != 0);
 
         gr_heap_clear(x, ctx + 0);
         gr_heap_clear(y, ctx + 1);
