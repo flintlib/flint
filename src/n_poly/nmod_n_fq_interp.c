@@ -943,7 +943,14 @@ void nmod_evals_fmma(
 
     n_poly_fit_length(a, len);
 
-    if (NMOD_CAN_USE_FMMA_BOUNDED(ctx))
+    if (ctx.norm > FLINT_BITS / 2)
+    {
+        /* n < 2^(FLINT_BITS / 2 - 1): b c + d e < 2 n^2 fits one word */
+        for (i = 0; i < len; i++)
+            NMOD_RED(a->coeffs[i], b->coeffs[i] * c->coeffs[i]
+                                   + d->coeffs[i] * e->coeffs[i], ctx);
+    }
+    else if (NMOD_CAN_USE_FMMA_BOUNDED(ctx))
     {
         for (i = 0; i < len; i++)
             a->coeffs[i] = _nmod_fmma_bounded(b->coeffs[i], c->coeffs[i],

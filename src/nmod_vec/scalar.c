@@ -36,8 +36,18 @@ void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec,
     }
 }
 
-/* the generic version for NMOD_CAN_USE_MUL_BOUNDED(mod); the dispatcher
+/* the generic version for n < 2^(FLINT_BITS / 2), where res[i] + vec[i] c
+   < n^2 fits one word, and for NMOD_CAN_USE_MUL_BOUNDED(mod); the dispatcher
    tests the modulus, so that the generic version keeps its code */
+static void
+_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        NMOD_RED(res[i], res[i] + vec[i] * c, mod);
+}
+
 static void
 _scalar_addmul_bounded(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 {
@@ -58,6 +68,8 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_sub(res, res, vec, len, mod);
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD && NMOD_BITS(mod) != FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
+    else if (mod.norm >= FLINT_BITS / 2)
+        _scalar_addmul_halflimb(res, vec, len, c, mod);
     else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
         _scalar_addmul_bounded(res, vec, len, c, mod);
     else
@@ -103,8 +115,17 @@ void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
         res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
 }
 
-/* as _scalar_addmul_bounded; clang vectorizes this loop into code slower
-   than the scalar loop (measured on x86) */
+/* as _scalar_addmul_halflimb and _scalar_addmul_bounded; clang vectorizes
+   the bounded loop into code slower than the scalar loop (measured on x86) */
+static void
+_scalar_mul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_mul_halflimb(vec[i], c, mod);
+}
+
 static void
 _scalar_mul_bounded(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 {
@@ -133,6 +154,8 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
             _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+    else if (NMOD_IS_HALFLIMB(mod))
+        _scalar_mul_halflimb(res, vec, len, c, mod);
     else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
         _scalar_mul_bounded(res, vec, len, c, mod);
     else

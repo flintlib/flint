@@ -155,7 +155,18 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
                 v = (nmod_mat_entry(A, row, col))/g;
                 /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
 
-                if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+                if (mod.norm > FLINT_BITS / 2)
+                {
+                    /* n < 2^(FLINT_BITS / 2 - 1): the sums fit one word */
+                    for (k = col; k < m; k++)
+                    {
+                        NMOD_RED(t1, s * nmod_mat_entry(A, row, k) + t * nmod_mat_entry(A, i, k), mod);
+                        NMOD_RED(t2, u * nmod_mat_entry(A, row, k) + v * nmod_mat_entry(A, i, k), mod);
+                        nmod_mat_entry(A, row, k) = t1;
+                        nmod_mat_entry(A, i, k) = t2;
+                    }
+                }
+                else if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
                 {
                     for (k = col; k < m; k++)
                     {
@@ -236,7 +247,17 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             v = (nmod_mat_entry(A, row, row))/g;
             /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
 
-            if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+            if (mod.norm > FLINT_BITS / 2)
+            {
+                for (k = row; k < m; k++)
+                {
+                    NMOD_RED(t1, s * nmod_mat_entry(A, row, k) + t * extra_row[k], mod);
+                    NMOD_RED(t2, u * nmod_mat_entry(A, row, k) + v * extra_row[k], mod);
+                    nmod_mat_entry(A, row, k) = t1;
+                    extra_row[k] = t2;
+                }
+            }
+            else if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
             {
                 for (k = row; k < m; k++)
                 {

@@ -29,7 +29,10 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
         TMP_START;
         tmp = TMP_ALLOC(len * sizeof(ulong));
         tmp[0] = vec[0];
-        if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+        if (NMOD_IS_HALFLIMB(mod))
+            for (k = 1; k < len; k++)
+                tmp[k] = _nmod_mul_halflimb(vec[k], tmp[k-1], mod);
+        else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
             for (k = 1; k < len; k++)
                 tmp[k] = _nmod_mul_bounded(vec[k], tmp[k-1], mod);
         else
@@ -45,7 +48,17 @@ void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
          *        = vec[k]^{-1}
          * inv = (vec[0] * ... * vec[k-1])^{-1}
          **/
-        if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+        if (NMOD_IS_HALFLIMB(mod))
+        {
+            for (; k > 0; k--)
+            {
+                /* read vec[k] before writing res[k], to allow aliasing */
+                ulong v = vec[k];
+                res[k] = _nmod_mul_halflimb(inv, tmp[k-1], mod);
+                inv = _nmod_mul_halflimb(inv, v, mod);
+            }
+        }
+        else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
         {
             for (; k > 0; k--)
             {
