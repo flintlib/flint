@@ -174,6 +174,12 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_DECCBALL:
             return deccball_get_fmpq(res, x, x_ctx);
 
+        case GR_CTX_RR_ARB:
+            return gr_generic_set_arb(res, x, ctx);
+
+        case GR_CTX_CC_ACB:
+            return gr_generic_set_acb(res, x, ctx);
+
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
             if (qqbar_is_rational(x))
