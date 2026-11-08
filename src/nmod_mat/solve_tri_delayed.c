@@ -32,7 +32,7 @@ typedef struct
     nmod_t mod;
     int nlimbs;
     int halflimb;   /* n <= 2^(FLINT_BITS / 2): products fit in one limb */
-    int red;        /* variant of the reduction */
+    int red;        /* variant of the reduction (two limbs: 3 for NMOD_RED2_BOUNDED) */
     slong m;        /* one limb: products between two reductions */
     ulong c0, c1;   /* precomputations of the reduction */
 }
@@ -94,7 +94,12 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
     }
     else if (R->nlimbs == 2)
     {
-        if (u1 < mod.n)
+        /* below 2^(nu + FLINT_BITS - 2) if u1 < 2^(nu - 2), with
+           3 <= nu = FLINT_BITS - norm <= FLINT_BITS - 1 */
+        if (mod.norm >= 1 && mod.norm <= FLINT_BITS - 3
+                && u1 < (UWORD(1) << (FLINT_BITS - 2 - mod.norm)))
+            R->red = 3;
+        else if (u1 < mod.n)
             R->red = 0;
         else if (mod.norm > 0)
         {
@@ -141,7 +146,9 @@ tri_red(nn_srcptr a, const tri_red_struct * R, const int nlimbs)
     }
     else if (nlimbs == 2)
     {
-        if (R->red == 0)
+        if (R->red == 3)
+            NMOD_RED2_BOUNDED(r, a[1], a[0], mod);
+        else if (R->red == 0)
             NMOD_RED2(r, a[1], a[0], mod);
         else if (R->red == 1)
             r = n_ll_mod_barrett(a[1], a[0], mod.n, R->c1, R->c0);
