@@ -66,7 +66,13 @@ _nmod_poly_interpolate_nmod_vec_barycentric(nn_ptr poly,
     for (i = 0; i < n; i++)
     {
         w[i] = UWORD(1);
-        if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+        if (NMOD_IS_HALFLIMB(mod))
+        {
+            for (j = 0; j < n; j++)
+                if (i != j)
+                    w[i] = _nmod_mul_halflimb(w[i], nmod_sub(xs[i], xs[j], mod), mod);
+        }
+        else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
         {
             for (j = 0; j < n; j++)
                 if (i != j)

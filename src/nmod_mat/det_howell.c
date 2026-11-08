@@ -133,7 +133,13 @@ ulong _nmod_mat_det_howell(nmod_mat_t A)
                 /* s x - t y as s x + (n - t) y */
                 t = nmod_neg(t, mod);
 
-                if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+                if (mod.norm > FLINT_BITS / 2)
+                {
+                    /* n < 2^(FLINT_BITS / 2 - 1): the sum fits one word */
+                    for (k = col; k < m; k++)
+                        NMOD_RED(nmod_mat_entry(A, row, k), s * nmod_mat_entry(A, row, k) + t * nmod_mat_entry(A, i, k), mod);
+                }
+                else if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
                 {
                     for (k = col; k < m; k++)
                         nmod_mat_entry(A, row, k) = _nmod_fmma_bounded(s, nmod_mat_entry(A, row, k), t, nmod_mat_entry(A, i, k), mod);

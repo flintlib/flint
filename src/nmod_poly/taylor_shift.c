@@ -117,6 +117,13 @@ _nmod_poly_taylor_shift_horner(nn_ptr poly, ulong c, slong n, nmod_t mod)
             for (j = i; j < n - 1; j++)
                 poly[j] = nmod_sub(poly[j], poly[j + 1], mod);
     }
+    else if (c != 0 && mod.norm >= FLINT_BITS / 2)
+    {
+        /* n < 2^(FLINT_BITS / 2): poly[j] + poly[j + 1] c < n^2 fits one word */
+        for (i = n - 2; i >= 0; i--)
+            for (j = i; j < n - 1; j++)
+                NMOD_RED(poly[j], poly[j] + poly[j + 1] * c, mod);
+    }
     else if (c != 0 && NMOD_CAN_USE_MUL_BOUNDED(mod))
     {
         for (i = n - 2; i >= 0; i--)

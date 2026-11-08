@@ -118,7 +118,13 @@ _nmod_poly_evaluate_nmod_horner(nn_srcptr poly, slong len, ulong c, nmod_t mod)
     val = poly[m];
     m--;
 
-    if (NMOD_CAN_USE_MUL_BOUNDED(mod))
+    if (mod.norm >= FLINT_BITS / 2)
+    {
+        /* n < 2^(FLINT_BITS / 2): val c + poly[m] < n^2 fits one word */
+        for ( ; m >= 0; m--)
+            NMOD_RED(val, val * c + poly[m], mod);
+    }
+    else if (NMOD_CAN_USE_MUL_BOUNDED(mod))
     {
         for ( ; m >= 0; m--)
         {
