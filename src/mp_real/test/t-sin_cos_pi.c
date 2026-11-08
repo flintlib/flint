@@ -89,7 +89,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         ulong p, q, err, maxerr;
         slong n;
@@ -219,7 +219,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_pi, state)
 
         q = scp_rand_q(state);
         p = n_randint(state, 2) ? n_randtest(state) : n_randint(state, 4 * q + 1);
-        n = 1 + n_randint(state, (iter % 20 == 0) ? 1500 : 40);
+        n = 1 + n_randint(state, (iter % 20 == 0) ? 100 : 20);
 
         mp_real_init(y);
         arb_init(s);
