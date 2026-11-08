@@ -28,6 +28,19 @@ _nmod_poly_KS2_reduce2_bounded(nn_ptr res, slong s, nn_srcptr op, slong n,
 }
 
 /*
+   Reduces n three-word values below 2^(nu + 2*FLINT_BITS - 2), nu the bit
+   length of n, 3 <= nu < FLINT_BITS, stored consecutively in op (the case
+   w = 3 of _nmod_poly_KS2_reduce, with the bound)
+*/
+static void
+_nmod_poly_KS2_reduce3_bounded(nn_ptr res, slong s, nn_srcptr op, slong n,
+                               nmod_t mod)
+{
+   for (; n; n--, res += s, op += 3)
+      NMOD_RED3_BOUNDED(*res, op[2], op[1], op[0], mod);
+}
+
+/*
    Multiplication/squaring using Kronecker substitution at 2^b and -2^b.
 */
 void
@@ -191,11 +204,15 @@ _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1,
       unpack coefficients of he, and reduce mod m; the coefficients are below
       2^bits, so that NMOD_RED2_BOUNDED applies to two-word ones if
       bits <= nu + FLINT_BITS - 2 (then 3 <= nu <= FLINT_BITS - 2, since
-      bits = 2 nu + clog2(n2) > FLINT_BITS)
+      bits = 2 nu + clog2(n2) > FLINT_BITS), and NMOD_RED3_BOUNDED to
+      three-word ones if bits <= nu + 2*FLINT_BITS - 2 and nu < FLINT_BITS
+      (then nu >= 3)
    */
    _nmod_poly_KS2_unpack(z, v3e, n3e, 2 * b, 1);
    if (w == 2 && bits <= 2 * FLINT_BITS - 2 - mod.norm)
       _nmod_poly_KS2_reduce2_bounded(res, 2, z, n3e, mod);
+   else if (w == 3 && mod.norm != 0 && bits <= 3 * FLINT_BITS - 2 - mod.norm)
+      _nmod_poly_KS2_reduce3_bounded(res, 2, z, n3e, mod);
    else
       _nmod_poly_KS2_reduce(res, 2, z, n3e, w, mod);
 
@@ -209,6 +226,8 @@ _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1,
    _nmod_poly_KS2_unpack(z, v3o, n3o, 2 * b, b + 1);
    if (w == 2 && bits <= 2 * FLINT_BITS - 2 - mod.norm)
       _nmod_poly_KS2_reduce2_bounded(res + 1, 2, z, n3o, mod);
+   else if (w == 3 && mod.norm != 0 && bits <= 3 * FLINT_BITS - 2 - mod.norm)
+      _nmod_poly_KS2_reduce3_bounded(res + 1, 2, z, n3o, mod);
    else
       _nmod_poly_KS2_reduce(res + 1, 2, z, n3o, w, mod);
 

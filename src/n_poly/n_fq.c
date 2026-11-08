@@ -11,6 +11,7 @@
 
 #include <gmp.h>
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
 
@@ -299,7 +300,7 @@ void _n_fq_reduce(
                 umul_ppmm(t1, t0, A[lenA - 1 - j], Binv[i - j]);
                 for (j++; j <= i; j++)
                     MAC(t2, t1, t0, A[lenA - 1 - j], Binv[i - j]);
-                NMOD_RED3(Q[lenQ - 1 - i], t2, t1, t0, ctx->mod);
+                _NMOD_VEC_DOT3_RED(Q[lenQ - 1 - i], t2, t1, t0, ctx->mod);
             }
 
             for (i = 0; i < deg; i++)
@@ -307,7 +308,7 @@ void _n_fq_reduce(
                 ulong t2 = 0, t1 = 0, t0 = 0;
                 for (j = FLINT_MAX(0, i - lenQ + 1); j <= i; j++)
                     MAC(t2, t1, t0, B[j], Q[i - j]);
-                NMOD_RED3(t0, t2, t1, t0, ctx->mod);
+                _NMOD_VEC_DOT3_RED(t0, t2, t1, t0, ctx->mod);
                 R[i] = nmod_sub(A[i], t0, ctx->mod);
             }
         }
@@ -352,8 +353,8 @@ void _n_fq_madd2(
                 MAC(t2, t1, t0, b[i - j], c[0 + j]);
                 MAC(s2, s1, s0, b[d - 1 - j], c[d - 1 - i + j]);
             }
-            NMOD_RED3(a[i], t2, t1, t0, ctx->mod);
-            NMOD_RED3(a[2*d - 2 - i], s2, s1, s0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[i], t2, t1, t0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[2*d - 2 - i], s2, s1, s0, ctx->mod);
         }
 
         {
@@ -364,7 +365,7 @@ void _n_fq_madd2(
             {
                 MAC(t2, t1, t0, b[d - 1 - j], c[0 + j]);
             }
-            NMOD_RED3(a[d - 1], t2, t1, t0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[d - 1], t2, t1, t0, ctx->mod);
         }
     }
     else
@@ -408,8 +409,8 @@ void _n_fq_mul2(
                 MAC(t2, t1, t0, b[i - j], c[0 + j]);
                 MAC(s2, s1, s0, b[d - 1 - j], c[d - 1 - i + j]);
             }
-            NMOD_RED3(a[i], t2, t1, t0, ctx->mod);
-            NMOD_RED3(a[2*d - 2 - i], s2, s1, s0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[i], t2, t1, t0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[2*d - 2 - i], s2, s1, s0, ctx->mod);
         }
 
         {
@@ -419,7 +420,7 @@ void _n_fq_mul2(
             {
                 MAC(t2, t1, t0, b[d - 1 - j], c[0 + j]);
             }
-            NMOD_RED3(a[d - 1], t2, t1, t0, ctx->mod);
+            _NMOD_VEC_DOT3_RED(a[d - 1], t2, t1, t0, ctx->mod);
         }
     }
     else
@@ -637,7 +638,7 @@ void _n_fq_reduce2_lazy3(
 {
     slong i;
     for (i = 0; i < 2*d - 1; i++)
-        NMOD_RED3(a[i], a[3*i + 2], a[3*i + 1], a[3*i + 0], ctx);
+        _NMOD_VEC_DOT3_RED(a[i], a[3*i + 2], a[3*i + 1], a[3*i + 0], ctx);
 }
 
 void _n_fq_madd2_lazy3(

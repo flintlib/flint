@@ -98,6 +98,14 @@ extern "C" {
     NMOD_RED2(r, v_hi, a_lo, mod); \
   } while (0)
 
+/* T mod n for T < 2^(nu + 2 FLINT_BITS - 2), 3 <= nu < FLINT_BITS (see the documentation) */
+#define NMOD_RED3_BOUNDED(r, a_hi, a_me, a_lo, mod) \
+  do { \
+    ulong v_hi;	\
+    NMOD_RED2_BOUNDED(v_hi, a_hi, a_me, mod); \
+    NMOD_RED2(r, v_hi, a_lo, mod); \
+  } while (0)
+
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
 #define NMOD_IS_HALFLIMB(mod) ((mod).n <= (UWORD(1) << (FLINT_BITS / 2)))

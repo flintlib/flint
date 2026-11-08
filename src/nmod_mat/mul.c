@@ -111,6 +111,8 @@ _nmod_mat_mul_tiny_impl(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
     }
     else
     {
+        /* the sums are below k 2^(2 nu) <= 2^(2 nu + 3): NMOD_RED3_BOUNDED
+           applies if nu <= FLINT_BITS - 1 (here nu > FLINT_BITS / 2) */
         for (i = 0; i < m; i++)
         {
             const ulong * a = nmod_mat_entry_ptr(A, i, 0);
@@ -122,7 +124,10 @@ _nmod_mat_mul_tiny_impl(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
                     umul_ppmm(h, l, a[q], nmod_mat_entry(B, q, j));
                     add_sssaaaaaa(s2, s1, s0, s2, s1, s0, UWORD(0), h, l);
                 }
-                NMOD_RED3(t[i * n + j], s2, s1, s0, mod);
+                if (mod.norm != 0)
+                    NMOD_RED3_BOUNDED(t[i * n + j], s2, s1, s0, mod);
+                else
+                    NMOD_RED3(t[i * n + j], s2, s1, s0, mod);
             }
         }
     }

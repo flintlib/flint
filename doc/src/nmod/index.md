@@ -714,6 +714,17 @@ $a_{hi} < n$.
 :::
 
 ::: macro
+NMOD_RED3_BOUNDED(r, a_hi, a_me, a_lo, mod)
+
+Sets `r` to $(a_{hi} B^2 + a_{me} B + a_{lo}) \bmod n$. Requires
+$a_{hi} B^2 + a_{me} B + a_{lo} < 2^{\nu + 2\bits - 2}$, where $\nu$ is the
+number of bits of $n$, and $3 \le \nu < \bits$: for instance a sum of fewer
+than $2^{2\bits - 2 - \nu}$ products of two residues. The top two words are
+then below $2^{\nu + \bits - 2}$ and are reduced by `NMOD_RED2_BOUNDED`
+($a_{hi}$ needs no reduction first), and one `NMOD_RED2` finishes.
+:::
+
+::: macro
 NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod)
 NMOD_RED2_NONFULLWORD(r, a_hi, a_lo, mod)
 

@@ -167,6 +167,34 @@ _nmod_poly_KS2_recover_reduce2b(nn_ptr res, slong s, nn_srcptr op1,
 }
 
 /*
+   The loop of _nmod_poly_KS2_recover_reduce3(), each coefficient reduced
+   with RED
+*/
+#define _KS2_RECOVER_REDUCE3_LOOP(RED)                                      \
+   for (; n; n--)                                                           \
+   {                                                                        \
+      y0H = *op2--;                                                         \
+      y0L = *op2--;                                                         \
+      x1L = *op1++;                                                         \
+      x1H = *op1++;                                                         \
+      if ((y0H < x0H) || (y0H == x0H  &&  y0L < x0L))                       \
+         y1H -= (y1L-- == 0);                                               \
+                                                                            \
+      RED(*res, (y1H << b1) + (y1L >> b2),                                  \
+                (y1L << b1) + x0H, x0L, mod);                               \
+      res += s;                                                             \
+                                                                            \
+      if (borrow)                                                           \
+         y1H += (++y1L == 0);                                               \
+      borrow = ((x1H < y1H) || (x1H == y1H  &&  x1L < y1L));                \
+      sub_ddmmss(x1H, x1L, x1H, x1L, y1H, y1L);                             \
+      sub_ddmmss(y1H, y1L, y0H, y0L, x0H, x0L);                             \
+      y1H &= maskH;                                                         \
+      x0L = x1L;                                                            \
+      x0H = x1H & maskH;                                                    \
+   }
+
+/*
    Same as _nmod_poly_KS2_recover_reduce(), but requires
    2 * FLINT_BITS < 2 * b <= 3 * FLINT_BITS.
 */
@@ -198,30 +226,22 @@ _nmod_poly_KS2_recover_reduce3(nn_ptr res, slong s, nn_srcptr op1,
    b1 = b - FLINT_BITS;
    b2 = 2 * FLINT_BITS - b;
 
-   /* plain reduction version */
-   for (; n; n--)
+   /*
+      plain reduction version; the coefficients are below 2^(2b), so that
+      NMOD_RED3_BOUNDED applies if 2b <= nu + 2*FLINT_BITS - 2 and
+      nu < FLINT_BITS, nu the bit length of n (then nu >= 3)
+   */
+   if (mod.norm != 0 && 2 * b <= 3 * FLINT_BITS - 2 - mod.norm)
    {
-      y0H = *op2--;
-      y0L = *op2--;
-      x1L = *op1++;
-      x1H = *op1++;
-      if ((y0H < x0H) || (y0H == x0H  &&  y0L < x0L))
-         y1H -= (y1L-- == 0);
-
-      NMOD_RED3(*res, (y1H << b1) + (y1L >> b2),
-                             (y1L << b1) + x0H, x0L, mod);
-      res += s;
-
-      if (borrow)
-         y1H += (++y1L == 0);
-      borrow = ((x1H < y1H) || (x1H == y1H  &&  x1L < y1L));
-      sub_ddmmss(x1H, x1L, x1H, x1L, y1H, y1L);
-      sub_ddmmss(y1H, y1L, y0H, y0L, x0H, x0L);
-      y1H &= maskH;
-      x0L = x1L;
-      x0H = x1H & maskH;
+      _KS2_RECOVER_REDUCE3_LOOP(NMOD_RED3_BOUNDED)
+   }
+   else
+   {
+      _KS2_RECOVER_REDUCE3_LOOP(NMOD_RED3)
    }
 }
+
+#undef _KS2_RECOVER_REDUCE3_LOOP
 
 
 /*
