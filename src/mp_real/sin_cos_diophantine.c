@@ -661,8 +661,8 @@ _mp_real_trig_diophantine(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan, nn_srcptr x,
             int sx, sy;
             /* high halves: limbs [cap, 2 cap) of each square, the
                returned limb below them dropped (within 3 ulps) */
-            flint_mpn_sqrhigh(N, wr, cap);
-            flint_mpn_sqrhigh(sq, wi, cap);
+            flint_mpn_sqrhigh_n(N, wr, cap);
+            flint_mpn_sqrhigh_n(sq, wi, cap);
             N[cap] = mpn_add_n(N, N, sq, cap);
             Nn = cap + 1;
             while (Nn > 0 && N[Nn - 1] == 0)

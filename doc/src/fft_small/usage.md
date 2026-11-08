@@ -26,7 +26,7 @@ parentheses.
 | `flint_mpn_mul`, `flint_mpn_mul_n` | `mpn_mul_default_mpn_ctx` | $y_n \ge T$, or $x_n + y_n > 2T$ and $3 y_n > T$, for $x_n \ge y_n$; $T$ = `FLINT_FFT_SMALL_MUL_THRESHOLD` = 500 (240 on Zen 3 and 4, 810 on Apple M1, 1000 on other ARM, Broadwell and generic x86-64) |
 | `flint_mpn_sqr` | `mpn_mul_default_mpn_ctx` | $n \ge$ `FLINT_FFT_SMALL_SQR_THRESHOLD` = 500 (400, 865, 1400) |
 | `flint_mpn_mulhigh_n`, `flint_mpn_mullow_n` | `_mpn_ctx_mpn_mul_range` | $n >$ `FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF` = 500 (300 on Zen) |
-| `flint_mpn_sqrhigh` | `_mpn_ctx_mpn_mul_range` | $n >$ `FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF` = 580 (470 on Zen) |
+| `flint_mpn_sqrhigh_n` | `_mpn_ctx_mpn_mul_range` | $n >$ `FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF` = 580 (470 on Zen) |
 | `flint_mpn_mulmid` | `_mpn_ctx_mpn_mul_range` | $\min(a_n, b_n) \ge T$ (the squaring threshold if $a = b$), and windows of at least 48 limbs; a window shorter than the longer operand is computed as a transposed product when that has the shorter transform |
 | `flint_mpn_mul_complex` and its variants | `_fft_small_mpn_mul_complex` and relatives (`_fft_small_mpn_mul_shared` for a real or imaginary operand times a complex one) | parts of at least 230 limbs (270 for squares) |
 | `flint_mpn_mul_shared` | `_fft_small_mpn_mul_shared` | the longer product passes the test of `flint_mpn_mul` with $T$ = `FLINT_MPN_MUL_SHARED_THRESHOLD` and the shorter one with $T/2$; $T$ = `FLINT_FFT_SMALL_MUL_THRESHOLD` (240 on the `sapphirerapids` target) |

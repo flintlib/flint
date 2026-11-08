@@ -223,8 +223,9 @@ HEADER_DIRS	:=	\
 		double_interval	dlog								\
 		arb_fmpz_poly	arb_fpwrap							\
 		acb_dft			acb_elliptic	acb_modular			\
-		acb_dirichlet	acb_theta		acb_ode				\
-		dirichlet		bernoulli		                    \
+		acb_dirichlet	acb_theta	acb_mzeta				\
+		acb_ode												\
+		dirichlet		bernoulli							\
 		bool_mat		partitions							\
 															\
 		gr			gr_generic	gr_vec		gr_mat			\

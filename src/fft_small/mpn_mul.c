@@ -1680,6 +1680,48 @@ static void crt_worker_func(void* varg)
 void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
                             const ulong* a, ulong an, const ulong* b, ulong bn)
 {
+    _mpn_ctx_mpn_mul_range_split(R, z, NULL, 0, lo, hi, a, an, b, bn);
+}
+
+/* zero the absolute limbs [from, to) of a split window */
+static void
+_split_zero(ulong* z, ulong* zlow, ulong nlow, ulong lo, ulong from, ulong to)
+{
+    for ( ; from < to; from++)
+    {
+        if (from - lo < nlow)
+            zlow[from - lo] = 0;
+        else
+            z[from - lo - nlow] = 0;
+    }
+}
+
+/* copy limbs [from, to) of the window from src (anchored at limb lo) */
+static void
+_split_copy(ulong* z, ulong* zlow, ulong nlow, ulong lo, const ulong* src,
+            ulong from, ulong to)
+{
+    for ( ; from < to; from++)
+    {
+        if (from - lo < nlow)
+            zlow[from - lo] = src[from - lo];
+        else
+            z[from - lo - nlow] = src[from - lo];
+    }
+}
+
+/*
+    The window [lo, hi) as above, with its lowest nlow limbs written to zlow
+    and the remaining hi - lo - nlow limbs to z (nlow <= hi - lo; nlow = 0 is
+    the plain window). The reconstruction below only writes absolute limbs
+    at or above gap = E0*bits/64 through the shifted base, and E0 is chosen
+    so that gap >= lo + nlow; the limbs below gap come from the bottom band
+    alone (or the serial fallback), whose slice is split by hand.
+*/
+void _mpn_ctx_mpn_mul_range_split(mpn_ctx_t R, ulong* z, ulong* zlow, ulong nlow,
+                            ulong lo, ulong hi,
+                            const ulong* a, ulong an, const ulong* b, ulong bn)
+{
     ulong zn, alen, blen, zlen, atrunc, btrunc, ztrunc, depth, stride;
     ulong c_lo, c_hi, nn;
     double* abuf;
@@ -1699,24 +1741,32 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
     if (lo >= hi)
         return;
 
+    FLINT_ASSERT(nlow <= hi - lo);
+
     /* limbs at or above the top of the product are zero */
     if (hi > zn)
     {
         if (lo >= zn)
         {
-            flint_mpn_zero(z, hi - lo);
+            _split_zero(z, zlow, nlow, lo, lo, hi);
             return;
         }
-        flint_mpn_zero(z + (zn - lo), hi - zn);
+        _split_zero(z, zlow, nlow, lo, zn, hi);
         hi = zn;
+        if (nlow > hi - lo)
+        {
+            /* the diverted limbs are not all below the top of the product */
+            _split_zero(z, zlow, nlow, lo, hi, lo + nlow);
+            nlow = hi - lo;
+        }
     }
 
     if (FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
     {
         if (an >= bn)
-            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, a, an, b, bn);
+            _mpn_ctx_mpn_mul_window_np2_split(R, z, zlow, nlow, lo, hi, a, an, b, bn);
         else
-            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, b, bn, a, an);
+            _mpn_ctx_mpn_mul_window_np2_split(R, z, zlow, nlow, lo, hi, b, bn, a, an);
         return;
     }
 
@@ -1745,7 +1795,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
     if (c_lo >= c_hi)
     {
         /* no coefficient touches the window: it is all zero */
-        flint_mpn_zero(z, hi - lo);
+        _split_zero(z, zlow, nlow, lo, lo, hi);
         flint_free(worker_struct_buffer);
         flint_give_back_threads(P.handles, P.nhandles);
         return;
@@ -2006,8 +2056,9 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
         ulong nthreads = P.nthreads;
 
         /* BLK_SZ-aligned easy interval [E0, E1) of coefficients whose whole */
-        /* span lies inside the window [lo, hi) */
-        ulong E0 = n_round_up(n_cdiv(lo*FLINT_BITS, bits), BLK_SZ);
+        /* span lies inside the window [lo, hi), starting at or above the */
+        /* diverted limbs [lo, lo + nlow) */
+        ulong E0 = n_round_up(n_cdiv((lo + nlow)*FLINT_BITS, bits), BLK_SZ);
         ulong E1 = ((hi >= n + 1) ? hi - (n + 1) : UWORD(0))*FLINT_BITS/bits;
         E1 &= -BLK_SZ;
         if (E1 < E0)
@@ -2038,25 +2089,28 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
             tab[P.np - 3](tmp, L0, hi, c_lo, c_hi, R->ffts, abuf, stride,
                           R->crts, bits, c_lo, c_lo, NULL, NULL);
 
-            flint_mpn_copyi(z, tmp + (lo - L0), hi - lo);
+            _split_copy(z, zlow, nlow, lo, tmp + (lo - L0), lo, hi);
             flint_free(tmp);
         }
         else
         {
             ulong L0 = (c_lo*bits)/64;
             ulong span = E1 - E0;
-            ulong gap = E0*bits/64;            /* absolute limb of E0 (>= lo) */
+            ulong gap = E0*bits/64;      /* absolute limb of E0 (>= lo + nlow) */
             ulong boundbuf[MPN_MULMID_BOUNDBUF];
 
+            FLINT_ASSERT(gap >= lo + nlow);
+
             /* limbs [lo, gap) get only the bottom band (or stay zero) */
-            if (gap > lo)
-                flint_mpn_zero(z, gap - lo);
+            _split_zero(z, zlow, nlow, lo, lo, gap);
 
             for (ulong l = 0; l < nthreads; l++)
             {
                 crt_worker_struct* X = w + l;
                 X->from_ffts = tab[P.np - 3];
-                X->z = z;
+                /* the writers only touch absolute limbs >= gap >= lo + nlow,
+                   so z - nlow is a valid base for them */
+                X->z = z - nlow;
                 X->lo = lo;
                 X->hi = hi;
                 X->c_lo = c_lo;
@@ -2088,7 +2142,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
                     ulong start = w[i].start_easy*bits/64;
                     if (i == P.nhandles)
                     {
-                        cf = flint_mpn_add_inplace_c(z + (start - lo), hi - start,
+                        cf = flint_mpn_add_inplace_c(z + (start - lo - nlow), hi - start,
                                                   w[i - 1].overhang_buffer, n, cf);
                     }
                     else
@@ -2096,7 +2150,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
                         ulong stop = w[i].stop_easy*bits/64;
                         if (stop > start)
                         {
-                            cf = flint_mpn_add_inplace_c(z + (start - lo), stop - start,
+                            cf = flint_mpn_add_inplace_c(z + (start - lo - nlow), stop - start,
                                                   w[i - 1].overhang_buffer, n, cf);
                         }
                         else
@@ -2111,13 +2165,21 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
                 }
             }
 
-            /* add the bottom band (limbs >= lo of coefficients [c_lo, E0)) */
+            /* add the bottom band (limbs >= lo of coefficients [c_lo, E0)):
+               the diverted limbs [lo, lo + nlow) are zero apart from the
+               band, so they are a copy of it without carries */
             if (c_lo < E0)
             {
                 ulong topabs = ((E0 - 1)*bits)/64 + n;
                 ulong tw = topabs - L0 + 1;
-                flint_mpn_add_inplace_c(z, hi - lo,
-                                        boundbuf + (lo - L0), tw - (lo - L0), 0);
+                ulong k;
+
+                for (k = 0; k < nlow && lo + k - L0 < tw; k++)
+                    zlow[k] = boundbuf[lo + k - L0];
+
+                if (tw > lo + nlow - L0)
+                    flint_mpn_add_inplace_c(z, hi - lo - nlow,
+                                        boundbuf + (lo + nlow - L0), tw - (lo + nlow - L0), 0);
             }
         }
     }

@@ -12,6 +12,9 @@
 
 #include "thread_pool.h"
 #include "thread_support.h"
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
+#endif
 
 /* Automatically initialised to zero when threads are started */
 FLINT_TLS_PREFIX int _flint_num_workers = 0;
@@ -148,6 +151,41 @@ worker(void * _work)
         work.f(i, work.args);
 }
 
+/* dynamic scheduling: the threads take the next index from a shared
+   counter as they become free */
+typedef struct
+{
+    do_func_t f;
+    void * args;
+    slong next;
+    slong n;
+#if FLINT_USES_PTHREAD
+    pthread_mutex_t mutex;
+#endif
+}
+work_queue_t;
+
+static void
+dynamic_worker(void * _queue)
+{
+    work_queue_t * Q = (work_queue_t *) _queue;
+    slong i;
+
+    for (;;)
+    {
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&Q->mutex);
+#endif
+        i = Q->next++;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&Q->mutex);
+#endif
+        if (i >= Q->n)
+            return;
+        Q->f(i, Q->args);
+    }
+}
+
 void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int flags)
 {
     slong i;
@@ -179,6 +217,33 @@ void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int 
 
             for (i = 0; i < n; i++)
                 f(i, args);
+        }
+        else if (flags & FLINT_PARALLEL_DYNAMIC)
+        {
+            work_queue_t Q;
+
+            if (flags & FLINT_PARALLEL_VERBOSE)
+                flint_printf("dynamic scheduling of %wd indices\n", n);
+
+            Q.f = f;
+            Q.args = args;
+            Q.next = 0;
+            Q.n = n;
+#if FLINT_USES_PTHREAD
+            pthread_mutex_init(&Q.mutex, NULL);
+#endif
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wake(global_thread_pool, handles[i], 0, dynamic_worker, &Q);
+
+            dynamic_worker(&Q);
+
+            for (i = 0; i < num_workers; i++)
+                thread_pool_wait(global_thread_pool, handles[i]);
+
+            flint_give_back_threads(handles, num_workers);
+#if FLINT_USES_PTHREAD
+            pthread_mutex_destroy(&Q.mutex);
+#endif
         }
         else
         {

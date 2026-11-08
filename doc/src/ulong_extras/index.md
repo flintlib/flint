@@ -202,8 +202,13 @@ $n$ (top bit set).
 
 ::: function
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
+ulong n_mod2_preinv_lazy(ulong a, ulong n, ulong ninv)
 
 Returns $a \bmod n$. No restrictions on $a$; $n \ne 0$.
+`n_mod2_preinv_lazy` skips the final correction: it returns a value
+congruent to $a$ modulo $n$ and smaller than $n + 2$, that is $a \bmod n$
+or, when $a \bmod n$ is $0$ or $1$, possibly $a \bmod n + n$. It is exact
+for $n \ge 2^{\bits - 1}$.
 :::
 
 ::: function
@@ -298,8 +303,35 @@ or $n$.
 
 ::: function
 ulong n_barrett_precomp(ulong n)
+ulong n_barrett_precomp_preinv(ulong n, ulong ninv)
 
-Returns the precomputed inverse for `n_mod_barrett`. Requires $n \ge 2$.
+Return the precomputed inverse for `n_mod_barrett`.
+`n_barrett_precomp` computes $\lfloor B/n \rfloor$ with one division and
+requires $n \ge 2$. `n_barrett_precomp_preinv` computes
+$\lfloor (B - 1)/n \rfloor$ from the inverse `ninv` of $n$ returned by
+`n_preinvert_limb` (also the `ninv` field of an `nmod_t`), without a
+division, for any $n \ge 1$. The two values differ only when $n$ is a
+power of two, where the second is one less, and both are valid for
+`n_mod_barrett`; for $n = 1$ the second is `UWORD_MAX`.
+:::
+
+::: function
+void n_ll_barrett_precomp_preinv(ulong * qhi, ulong * qlo, ulong * b1, ulong * b2, ulong n, ulong ninv)
+
+Sets $(\mathit{qhi}, \mathit{qlo})$ to the two words of
+$\lfloor B^2/n \rfloor$, $b_1$ to $B \bmod n$ and $b_2$ to $B^2 \bmod n$,
+from the inverse `ninv` of $n$ returned by `n_preinvert_limb`, with two
+division steps and no hardware division. Requires $n \ge 2$.
+:::
+
+::: function
+ulong n_ll_mod_barrett(ulong hi, ulong lo, ulong n, ulong qhi, ulong qlo)
+ulong n_lll_mod_barrett(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo, ulong b1, ulong b2)
+
+Return $(\mathit{hi} \, B + \mathit{lo}) \bmod n$ and
+$(y_2 B^2 + y_1 B + y_0) \bmod n$, with the constants of
+`n_ll_barrett_precomp_preinv`. No restrictions on the words; requires
+$2 \le n < 2^{\bits - 1}$.
 :::
 
 ::: function
@@ -313,8 +345,12 @@ support $n = 1$ if `npre` is set to `UWORD_MAX`.
 
 ::: function
 ulong n_lemire_precomp(ulong n)
+ulong n_lemire_precomp_preinv(ulong n, ulong ninv)
 
-Returns the precomputed inverse for `n_mod_lemire`. Requires $n \ge 1$.
+Return the precomputed inverse for `n_mod_lemire`, $\lfloor (B - 1)/n
+\rfloor + 1$ (zero for $n = 1$). Require $n \ge 1$.
+`n_lemire_precomp_preinv` computes the same value from the inverse `ninv`
+of $n$, as `n_barrett_precomp_preinv`, without a division.
 :::
 
 ::: function
@@ -498,6 +534,17 @@ ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
 Compute both the quotient $\lfloor aB/n \rfloor$ and the remainder
 $aB \bmod n$, as needed by `n_mulmod_and_precomp_shoup`. The second
 function recovers the remainder from a known quotient.
+:::
+
+::: function
+ulong n_mulmod_precomp_shoup_preinv(ulong a, ulong n, ulong ninv)
+void n_mulmod_precomp_shoup_quo_rem_preinv(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n, ulong ninv)
+
+Same as `n_mulmod_precomp_shoup` and `n_mulmod_precomp_shoup_quo_rem`,
+given `ninv` from `n_preinvert_limb(n)` (the `ninv` of an `nmod_t`). They
+use multiplications instead of a hardware division: much faster where the
+division is slow (e.g. Skylake or Cascade Lake, and 64-bit ARM), about as fast
+on recent x86-64 processors. Require $a < n$; any $n \ne 0$.
 :::
 
 ::: function

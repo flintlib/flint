@@ -7,8 +7,9 @@ functions: flint_parallel_do do_func_t FLINT_PARALLEL_UNIFORM
 splits into $n$ independent pieces of work. The loop body receives the
 index $i$ and a pointer to arguments shared by all calls, and typically
 writes its result to slot $i$ of an output array, so no locking is needed.
-The work is divided among the threads before any of them starts, according
-to the scheduling flag.
+The work is divided among the threads according to the scheduling flag:
+before any of them starts, or, with dynamic scheduling, as they become
+free.
 
 ## Thread limit {#limit}
 
@@ -24,13 +25,15 @@ available, the loop runs serially on the calling thread.
 Let $T$ be the number of threads obtained, including the calling thread,
 which takes the last share ($t = T - 1$).
 
-- With `FLINT_PARALLEL_UNIFORM` (and currently also with
-  `FLINT_PARALLEL_DYNAMIC` or no flag), thread $t$ gets the contiguous
+- With `FLINT_PARALLEL_UNIFORM` (or no flag), thread $t$ gets the contiguous
   block of indices $t s \le i < \min((t + 1) s, n)$, where
   $s = \lceil n/T \rceil$. The last blocks may be shorter or empty.
 - With `FLINT_PARALLEL_STRIDED`, thread $t$ gets the indices
   $t, t + T, t + 2T, \ldots$ below $n$.
-- `FLINT_PARALLEL_VERBOSE` may be combined with either flag. It prints
+- With `FLINT_PARALLEL_DYNAMIC`, each thread, the calling one included,
+  takes the next index not yet taken (in increasing order, from a counter
+  shared under a mutex) whenever it finishes a call, until none are left.
+- `FLINT_PARALLEL_VERBOSE` may be combined with any of these flags. It prints
   $T$ and the share of each thread, unless the limit or $n$ is at most 1,
   in which case the loop runs serially and nothing is printed.
 
@@ -38,7 +41,10 @@ Strided scheduling is the right choice when the cost of `f(i, ...)` grows
 or shrinks with $i$, for example when $i$ indexes coefficients of
 increasing size: the work of any two threads then differs by at most the
 cost of the most expensive call. Blocks are better when costs are equal, since each
-thread touches a contiguous part of memory.
+thread touches a contiguous part of memory. Dynamic scheduling suits calls
+whose costs vary without a pattern, or are large enough that the
+synchronization per call is negligible; listing the most expensive calls
+first then balances best.
 
 ::: summary algorithms/parallel/parallel-loops :::
 

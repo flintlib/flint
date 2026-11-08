@@ -26,6 +26,17 @@ TEST_FUNCTION_START(n_mod_lemire, state)
 
         npre = n_lemire_precomp(n);
 
+        /* same value from the inverse of n, for any n */
+        {
+            ulong n2 = n_randint(state, 2) ? n : n_randtest_not_zero(state);
+            ulong p1 = n_lemire_precomp(n2);
+            ulong p2 = n_lemire_precomp_preinv(n2, n_preinvert_limb(n2));
+
+            if (p1 != p2)
+                TEST_FUNCTION_FAIL("n_lemire_precomp_preinv\n"
+                    "n = %wu, expected %wu, got %wu\n", n2, p1, p2);
+        }
+
         do {
             x = n_randtest_not_zero(state);
         } while (x >= (UWORD(1) << (FLINT_BITS / 2)));

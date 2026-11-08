@@ -288,7 +288,7 @@ _lg_mid(mp_real_t res, const mp_real_t m, slong prec)
         q = s + n;
         c = q + n;
         _lg_distance(s, n, m, (int) E);
-        flint_mpn_sqrhigh(q, s, n);
+        flint_mpn_sqrhigh_n(q, s, n);
         if (d == 3)
         {
             flint_mpn_mulhigh_n(c, q, s, n);

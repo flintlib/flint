@@ -34,8 +34,8 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
     unreduced_fits_halflimb = unreduced_bound < UWORD(1) << (FLINT_BITS / 2);
     reduced_fits_quarterlimb = NMOD_BITS(mod) <= FLINT_BITS / 4;
 
-    ulong npre = n_barrett_precomp(mod.n);
-    ulong npre2 = n_lemire_precomp(mod.n);
+    ulong npre = n_barrett_precomp_preinv(mod.n, mod.ninv);
+    ulong npre2 = n_lemire_precomp_preinv(mod.n, mod.ninv);
 
 #define a(ii, jj) (aa[(ii) * stride + (jj)])
 
@@ -181,7 +181,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
     int halflimb;
     int high_reduced = 0;
 
-    halflimb = (mod.n <= (UWORD(1) << (FLINT_BITS / 2)));
+    halflimb = NMOD_IS_HALFLIMB(mod);
 
     if (!halflimb)
     {
@@ -192,10 +192,10 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             high_reduced = 1;
     }
 
-    ulong qlo = 0, qhi = 0;
+    ulong qlo = 0, qhi = 0, b1, b2;
 
     if (!high_reduced)
-        n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+        n_ll_barrett_precomp_preinv(&qhi, &qlo, &b1, &b2, mod.n, mod.ninv);
 
     while (row < nrows && col < ncols)
     {
@@ -209,7 +209,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             else
             {
                 for (j = row; j < nrows; j++)
-                    a(j, col) = n_ll_rem_l_nonfullword(UNREDUCED_HI(j, col), UNREDUCED_LO(j, col), mod.n, qhi, qlo);
+                    a(j, col) = n_ll_mod_barrett(UNREDUCED_HI(j, col), UNREDUCED_LO(j, col), mod.n, qhi, qlo);
             }
         }
 
@@ -260,7 +260,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
                     ulong hi, lo;
                     lo = UNREDUCED_LO(row, j);
                     hi = UNREDUCED_HI(row, j);
-                    a(row, j) = n_ll_rem_l_nonfullword(UNREDUCED_HI(pivot_row, j), UNREDUCED_LO(pivot_row, j), mod.n, qhi, qlo);
+                    a(row, j) = n_ll_mod_barrett(UNREDUCED_HI(pivot_row, j), UNREDUCED_LO(pivot_row, j), mod.n, qhi, qlo);
                     UNREDUCED_LO(pivot_row, j) = lo;
                     UNREDUCED_HI(pivot_row, j) = hi;
                 }
@@ -277,7 +277,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
             else
             {
                 for (j = col + 1; j < ncols; j++)
-                    a(row, j) = n_ll_rem_l_nonfullword(UNREDUCED_HI(row, j), UNREDUCED_LO(row, j), mod.n, qhi, qlo);
+                    a(row, j) = n_ll_mod_barrett(UNREDUCED_HI(row, j), UNREDUCED_LO(row, j), mod.n, qhi, qlo);
             }
         }
 

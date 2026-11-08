@@ -34,6 +34,16 @@ TEST_FUNCTION_START(arb_hypgeom_legendre_p_ui_rec, state)
 
         arb_randtest(x, state, 2 + n_randint(state, 1000), 1);
         arb_mul_2exp_si(x, x, -n_randint(state, 15));
+        /* close to +-1 */
+        if (n_randint(state, 8) == 0)
+        {
+            arf_one(arb_midref(x));
+            arf_mul_2exp_si(arb_midref(x), arb_midref(x), -(slong) n_randint(state, 40));
+            arf_sub_ui(arb_midref(x), arb_midref(x), 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+            if (n_randint(state, 2))
+                arf_neg(arb_midref(x), arb_midref(x));
+            mag_zero(arb_radref(x));
+        }
         if (n_randint(state, 2))
             mag_zero(arb_radref(x));
 
@@ -50,6 +60,44 @@ TEST_FUNCTION_START(arb_hypgeom_legendre_p_ui_rec, state)
             flint_printf("r3 = "); arb_printn(r3, 50, 0); flint_printf("\n\n");
             flint_printf("r4 = "); arb_printn(r4, 50, 0); flint_printf("\n\n");
             flint_abort();
+        }
+
+        /* for an exact x, the absolute error of P_n is at most about
+           2^-prec1 plus the final rounding,
+           and that of P_n' about n 2^-prec1 / (1 - x^2) */
+        if (arb_is_exact(x) && arf_cmpabs_2exp_si(arb_midref(x), 0) < 0)
+        {
+            mag_t b, t;
+            mag_init(b);
+            mag_init(t);
+
+            mag_set_ui_2exp_si(b, 1, 2 - prec1);
+            if (mag_cmp(arb_radref(r1), b) > 0)
+            {
+                flint_printf("FAIL: accuracy of P_n\n\n");
+                flint_printf("n = %wu, prec1 = %wd\n\n", n, prec1);
+                flint_printf("x = "); arb_printn(x, 50, 0); flint_printf("\n\n");
+                flint_printf("r1 = "); arb_printn(r1, 50, 0); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            /* b = 4 n 2^-prec1 / (1 - |x|) */
+            arf_get_mag(t, arb_midref(x));
+            mag_one(b);
+            mag_sub_lower(t, b, t);
+            mag_set_ui_2exp_si(b, FLINT_MAX(n, 1), 2 - prec1);
+            mag_div(b, b, t);
+            if (mag_cmp(arb_radref(r3), b) > 0)
+            {
+                flint_printf("FAIL: accuracy of P_n'\n\n");
+                flint_printf("n = %wu, prec1 = %wd\n\n", n, prec1);
+                flint_printf("x = "); arb_printn(x, 50, 0); flint_printf("\n\n");
+                flint_printf("r3 = "); arb_printn(r3, 50, 0); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            mag_clear(b);
+            mag_clear(t);
         }
 
         arb_clear(x);

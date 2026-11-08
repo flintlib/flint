@@ -29,7 +29,10 @@
    Guard limbs: relative errors double per squaring, so the
    accumulated error is about 2^h (E + h (2 wn)) ulps of the
    working precision, with E the reduced call's budget and 2 wn
-   the sqrhigh slack per step; h + lg n + 8 guard BITS cover it, and
+   the sqrhigh slack per step (2 (wn + 1) - 4 by
+   FLINT_MPN_SQRHIGH_N_GUARD_ERR_BOUND for wn + 1 limbs; the geometric
+   sum actually needs only 2^h times one step's slack); h + lg n + 8
+   guard BITS cover it, and
    the guard limbs also make the halving shift exact.  With the
    guard in place the amplified component stays below one output
    ulp, leaving the final truncation and, on the shift-free path,
@@ -114,7 +117,7 @@ _mp_real_exp_notab_r_noerr(nn_ptr y, nn_srcptr x, slong n, int r)
        is that returned limb followed by all but the top window limb */
     for (i = 0; i < h; i++)
     {
-        T[0] = flint_mpn_sqrhigh(T + 1, Y, wn + 1);
+        T[0] = flint_mpn_sqrhigh_n(T + 1, Y, wn + 1);
         FLINT_ASSERT(T[wn + 1] <= 1);   /* value below 4 up to slack */
         FLINT_SWAP(nn_ptr, Y, T);
     }

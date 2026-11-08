@@ -881,6 +881,16 @@ DEF_FUNC(nint)
 DEF_FUNC_NOPREC(abs)
 DEF_FUNC_NOPREC(sgn)
 
+/* |x|^2 = x^2, intersected with [0, inf) since a ball straddling zero
+   would otherwise square to a ball containing negative values. */
+static int
+_gr_arb_abs2(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_sqr(res, x, ARB_CTX_PREC(ctx));
+    arb_nonnegative_part(res, res);
+    return GR_SUCCESS;
+}
+
 static int
 _gr_arb_conj(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
@@ -2064,6 +2074,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_arb_trunc},
     {GR_METHOD_NINT,            (gr_funcptr) _gr_arb_nint},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_arb_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) _gr_arb_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_arb_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_arb_set},
     {GR_METHOD_IM,              (gr_funcptr) _gr_arb_im},

@@ -16,9 +16,6 @@
 #include "arb.h"
 #include "arb/impl.h"
 
-void mpfr_mulhigh_n(nn_ptr rp, nn_srcptr np, nn_srcptr mp, slong n);
-void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);
-
 /* Add ((a * b) / 2^MAG_BITS) * 2^exp into srad*2^srad_exp.
    Assumes that srad_exp >= exp and that overflow cannot occur.  */
 #define RAD_ADDMUL(srad, srad_exp, a, b, exp) \
@@ -137,33 +134,38 @@ add_errors(mag_t rad, uint64_t Aerr, slong Aexp, uint64_t Berr, slong Bexp, uint
 #endif
 }
 
-static void
-mulhigh(nn_ptr res, nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn, slong nn)
-{
-    nn_ptr tmp, xxx, yyy;
-    slong k;
-    ARF_MUL_TMP_DECL;
+/* Output limbs of the high product from which it beats the full
+   product of the term (measured: the hardcoded full products and the
+   cost of the guard limb keep the full product ahead up to 12 limbs,
+   the high product is 10% faster at 16 and 20% at 24). */
+#define DOT_MULHIGH_MIN 14
 
-    ARF_MUL_TMP_ALLOC(tmp, 2 * nn);
-    xxx = tmp;
-    yyy = tmp + nn;
+/* Bits of the term below the accumulator required beyond the guard limb
+   of a high product used as data (see _arb_dot_addmul_generic); the
+   exact requirement depends on the length and is checked there. */
+#define DOT_GUARD_SLACK 59
 
-    mpn_copyi(xxx + nn - FLINT_MIN(xn, nn), xptr + xn - FLINT_MIN(xn, nn), FLINT_MIN(xn, nn));
-    mpn_copyi(yyy + nn - FLINT_MIN(yn, nn), yptr + yn - FLINT_MIN(yn, nn), FLINT_MIN(yn, nn));
+/*
+    Adds the product of x (xn limbs) and y (yn limbs), shifted right by
+    shift bits, to the sn-limb accumulator (which has one extra dummy limb
+    on top). The product is formed in tmp, which has 2 (sn + 2) + 1
+    limbs.
 
-    for (k = 0; k < nn - xn; k++)
-        xxx[k] = 0;
-    for (k = 0; k < nn - yn; k++)
-        yyy[k] = 0;
-
-    if (xptr == yptr && xn == yn)
-        mpfr_sqrhigh_n(res, xxx, nn);
-    else
-        mpfr_mulhigh_n(res, xxx, yyy, nn);
-
-    ARF_MUL_TMP_FREE(tmp, 2 * nn);
-}
-
+    Only the top term_prec = 64 sn - shift bits of the term can land in the
+    accumulator. We compute the term with an extra limb, nn = ceil((term_prec
+    + 64) / 64) limbs from the top, so that everything approximate happens
+    at least 64 bits below the bottom of the accumulator: truncating an
+    operand to its top nn limbs perturbs the term by less than 2^-64 ulp
+    of the accumulator, and a high product of nh output limbs with its
+    guard limb used as data (flint_mpn_mulhigh, which truncates the
+    operands itself) has a deficit below FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(nh)
+    = 2 nh + 4 units of the guard limb, less than one accumulator ulp, which
+    is charged to serr. Products that would be computed in full by the high
+    product anyway, or that fit in the window or nearly so, are computed
+    exactly: they then cost nothing in the error bound (the bits falling
+    below the accumulator are accounted for by the caller's truncation
+    charge).
+*/
 void
 _arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
     nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
@@ -172,7 +174,7 @@ _arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
     slong shift_bits, shift_limbs, term_prec;
     ulong cy;
     nn_ptr sstart, tstart;
-    slong tn, nn;
+    slong tn, nn, nh;
 
     shift_bits = shift % FLINT_BITS;
     shift_limbs = shift / FLINT_BITS;
@@ -190,11 +192,8 @@ _arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
        the way down to s. */
     term_prec = sn * FLINT_BITS - shift;
 
-    /* The mulhigh error relative to the top of the sum will
-       be bounded by nn * 2^(-shift) * 2^(-FLINT_BITS*nn).
-       One extra limb ensures that this is <1 sum-ulp. */
-    term_prec += FLINT_BITS;
-    nn = (term_prec + FLINT_BITS - 1) / FLINT_BITS;
+    /* One extra limb: all approximations are then < 1 sum-ulp in total. */
+    nn = (term_prec + 2 * FLINT_BITS - 1) / FLINT_BITS;
 
     /* Sanity check; must conform to the pre-allocated memory! */
     if (nn > sn + 2)
@@ -202,41 +201,67 @@ _arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
         flint_throw(FLINT_ERROR, "nn > sn + 2\n");
     }
 
-    /* Use mulhigh? */
-    if (term_prec >= MUL_MPFR_MIN_LIMBS * FLINT_BITS &&
-        term_prec <= MUL_MPFR_MAX_LIMBS * FLINT_BITS &&
-        xn * FLINT_BITS > 0.9 * term_prec &&
-        yn * FLINT_BITS > 0.9 * term_prec)
+    /* The product is written at tmp + 1, leaving one limb for the shift. */
+    tstart = tmp + 1;
+
+    /* High product with its guard limb used as data: nh output limbs plus
+       the guard limb cover the term_prec bits that can land in the
+       accumulator with at least DOT_GUARD_SLACK bits to spare, so that the
+       deficit is below one accumulator ulp. This is the common case of
+       operands with about the working precision; operands both shorter
+       than nh limbs take the full product (at the tabulated sizes), as
+       _flint_mpn_mulhigh_prefer_full decides. */
+    nh = (ulong) (term_prec + FLINT_BITS - 1 - DOT_GUARD_SLACK) / FLINT_BITS;
+
+    if (nh >= DOT_MULHIGH_MIN && (xn >= nh || yn >= nh || nh > FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH))
     {
-        mulhigh(tmp, xptr, xn, yptr, yn, nn);
-        tstart = tmp + nn;
-        tn = nn;
-        serr[0]++;
-    }
-    else
-    {
-        if (xn > nn || yn > nn)
+        /* the deficit is at most 2 nh + 4 units of the guard limb, so the
+           slack must exceed log2(2 nh + 4) bits */
+        if (term_prec > (nh + 1) * FLINT_BITS - (slong) FLINT_BIT_COUNT(FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(nh)) - 1)
+            nh++;
+
+        if (xn == nh && yn == nh)
         {
-            if (xn > nn)
-            {
-                xptr += (xn - nn);
-                xn = nn;
-            }
-
-            if (yn > nn)
-            {
-                yptr += (yn - nn);
-                yn = nn;
-            }
-
+            /* the balanced shape has its own kernels */
+            tstart[0] = (xptr == yptr) ? flint_mpn_sqrhigh_n(tstart + 1, xptr, nh)
+                                       : flint_mpn_mulhigh_n(tstart + 1, xptr, yptr, nh);
+            tn = nh + 1;
             serr[0]++;
+            goto have_product;
+        }
+        else if (!_flint_mpn_mulhigh_prefer_full(xn, yn, nh))
+        {
+            tstart[0] = (xptr == yptr && xn == yn) ? flint_mpn_sqrhigh(tstart + 1, xptr, xn, nh)
+                                                   : flint_mpn_mulhigh(tstart + 1, xptr, xn, yptr, yn, nh);
+            tn = nh + 1;
+            serr[0]++;
+            goto have_product;
+        }
+    }
+
+    /* Short term (the common case at moderate precision): as before, the
+       full product, of operands truncated to nn limbs if longer. */
+    if (xn > nn || yn > nn)
+    {
+        if (xn > nn)
+        {
+            xptr += xn - nn;
+            xn = nn;
         }
 
-        tn = xn + yn;
-        FLINT_MPN_MUL_WITH_SPECIAL_CASES(tmp + 1, xptr, xn, yptr, yn);
-        tstart = tmp + 1;
+        if (yn > nn)
+        {
+            yptr += yn - nn;
+            yn = nn;
+        }
+
+        serr[0]++;
     }
 
+    tn = xn + yn;
+    FLINT_MPN_MUL_WITH_SPECIAL_CASES(tstart, xptr, xn, yptr, yn);
+
+have_product:
     if (shift_bits != 0)
     {
         tstart[-1] = mpn_rshift(tstart, tstart, tn, shift_bits);

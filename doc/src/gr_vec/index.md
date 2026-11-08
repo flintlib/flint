@@ -442,6 +442,30 @@ int _gr_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1
 As `_gr_vec_dot`, with the second vector an array of `slong`, `ulong` or `fmpz` integers.
 :::
 
+::: function
+int _gr_vec_apply_2x2(gr_ptr u, gr_ptr v, slong stride, slong len, gr_srcptr M, gr_ctx_t ctx)
+int _gr_vec_apply_2x2_generic(gr_ptr u, gr_ptr v, slong stride, slong len, gr_srcptr M, gr_ctx_t ctx)
+
+Applies the $2 \times 2$ matrix $M$, given row by row as a vector of
+length 4, to the pairs of elements of `u` and `v`:
+$(u_i, v_i) \gets (M_0 u_i + M_1 v_i,\; M_2 u_i + M_3 v_i)$ for
+$0 \le i < n$, where $n$ = `len` and $u_i$, $v_i$ are the elements at
+offset $i \cdot s$ for $s$ = `stride` (in elements). With $M$ a plane
+rotation this is the *rot* operation of the BLAS, the building block of
+the QR algorithm ([](gr_mat/eig)); the general form also serves Schur
+reordering. The vectors must not overlap and $M$ must not alias them.
+
+::: details
+This is the ring method `GR_METHOD_VEC_APPLY_2X2`. Since each new pair
+depends on both old elements, the generic version computes each pair
+into temporaries with two dot products of length 2 and does not rely on
+`_gr_vec_dot` allowing its output to overlap its inputs. The plain
+complex `dfloat` rings override it with a SIMD kernel
+(`_d2c_vec_apply_2x2` and so on), which drops the products by the parts
+of $M$ that are exactly zero.
+:::
+:::
+
 ## Sorting and permutations {#sorting}
 
 

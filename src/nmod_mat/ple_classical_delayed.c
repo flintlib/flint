@@ -71,7 +71,7 @@ _ple_red(const ulong * x, int words, const _ple_red_ctx * C)
         if (C->high_reduced)
             NMOD_RED2(r, x[1], x[0], C->mod);
         else
-            r = n_ll_rem_l_nonfullword(x[1], x[0], C->mod.n, C->qhi, C->qlo);
+            r = n_ll_mod_barrett(x[1], x[0], C->mod.n, C->qhi, C->qlo);
     }
     else
     {
@@ -264,8 +264,8 @@ _ple_delayed_1(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots)
     bound = (C.mod.n - 1) * (C.mod.n - 1) * FLINT_MIN(A->r, A->c);
     C.lemire = bound < (UWORD(1) << (FLINT_BITS / 2));
     C.lemire_mul = NMOD_BITS(C.mod) <= FLINT_BITS / 4;
-    C.npre = n_barrett_precomp(C.mod.n);
-    C.npre2 = n_lemire_precomp(C.mod.n);
+    C.npre = n_barrett_precomp_preinv(C.mod.n, C.mod.ninv);
+    C.npre2 = n_lemire_precomp_preinv(C.mod.n, C.mod.ninv);
 
     return _ple_delayed(P, Q, A, max_nonpivots, 1, NULL, &C);
 }
@@ -289,7 +289,7 @@ _ple_delayed_23(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots,
         if (C.mod.norm == 0)
             return _nmod_mat_ple_classical(P, Q, A, max_nonpivots);
 
-        C.halflimb = (C.mod.n <= (UWORD(1) << (FLINT_BITS / 2)));
+        C.halflimb = NMOD_IS_HALFLIMB(C.mod);
         C.high_reduced = 0;
         if (!C.halflimb)
         {
@@ -300,7 +300,10 @@ _ple_delayed_23(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots,
         }
         C.qhi = C.qlo = 0;
         if (!C.high_reduced)
-            n_ll_rem_l_precomp(&C.qhi, &C.qlo, C.mod.n);
+        {
+            ulong b1, b2;
+            n_ll_barrett_precomp_preinv(&C.qhi, &C.qlo, &b1, &b2, C.mod.n, C.mod.ninv);
+        }
     }
     else
     {

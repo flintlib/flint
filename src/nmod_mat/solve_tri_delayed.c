@@ -67,12 +67,12 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
             if (m * sq + (mod.n - 1) < (UWORD(1) << (FLINT_BITS / 2)))
             {
                 R->red = 0;
-                R->c0 = n_lemire_precomp(mod.n);
+                R->c0 = n_lemire_precomp_preinv(mod.n, mod.ninv);
             }
             else
             {
                 R->red = 1;
-                R->c0 = n_barrett_precomp(mod.n);
+                R->c0 = n_barrett_precomp_preinv(mod.n, mod.ninv);
             }
             return;
         }
@@ -90,7 +90,7 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
     if (R->nlimbs == 1)
     {
         R->red = 1;
-        R->c0 = n_barrett_precomp(mod.n);
+        R->c0 = n_barrett_precomp_preinv(mod.n, mod.ninv);
     }
     else if (R->nlimbs == 2)
     {
@@ -98,8 +98,9 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
             R->red = 0;
         else if (mod.norm > 0)
         {
+            ulong b1, b2;
             R->red = 1;
-            n_ll_rem_l_precomp(&R->c1, &R->c0, mod.n);
+            n_ll_barrett_precomp_preinv(&R->c1, &R->c0, &b1, &b2, mod.n, mod.ninv);
         }
         else
             R->red = 2;
@@ -143,7 +144,7 @@ tri_red(nn_srcptr a, const tri_red_struct * R, const int nlimbs)
         if (R->red == 0)
             NMOD_RED2(r, a[1], a[0], mod);
         else if (R->red == 1)
-            r = n_ll_rem_l_nonfullword(a[1], a[0], mod.n, R->c1, R->c0);
+            r = n_ll_mod_barrett(a[1], a[0], mod.n, R->c1, R->c0);
         else
             NMOD2_RED2(r, a[1], a[0], mod);
     }
@@ -228,7 +229,7 @@ tri_inv_diag(nn_ptr inv, const nmod_mat_t T)
 
     if (NMOD_CAN_USE_SHOUP(mod))
         for (j = 0; j < r; j++)
-            inv[r + j] = n_mulmod_precomp_shoup(inv[j], mod.n);
+            inv[r + j] = _nmod_mulmod_precomp_shoup(inv[j], mod);
 }
 
 FLINT_FORCE_INLINE ulong

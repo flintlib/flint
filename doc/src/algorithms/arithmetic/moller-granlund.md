@@ -140,9 +140,10 @@ arithmetic modulo word-size integers.
   `nmod_vec`, `nmod_poly`, `nmod_mat`, `nmod_mpoly` and the `gr` contexts
   for $\Z/n\Z$; in particular every dot product in `nmod_vec` ends with one
   such reduction ([](algorithms/linear-algebra/dot-products)).
-- `n_mod2_preinv`, `n_divrem2_preinv` and `n_div2_preinv` shift a one-word
-  dividend into two words and run [](#alg-div) once. The condition
-  $u_1 < d$ holds automatically after shifting.
+- `n_mod2_preinv`, `n_divrem2_preinv`, `n_div2_preinv` and
+  `n_divrem_preinv`, for a one-word dividend, use instead the Barrett step
+  of `NMOD_RED` with the constant derived from the same reciprocal
+  ([](algorithms/arithmetic/barrett#nmod)).
 - `n_ll_mod_preinv` first reduces the high word modulo $n$ if necessary and
   then runs the algorithm on the two-word dividend.
 - `n_lll_mod_preinv` reduces the top two words and then the bottom two.

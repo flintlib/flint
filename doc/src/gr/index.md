@@ -1045,6 +1045,22 @@ of $\mathbb{C}$.
 :::
 
 ::: function
+int gr_abs2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+Sets `res` to the squared absolute value $|x|^2$: $x \bar{x}$ in a
+subring of $\mathbb{C}$, which stays in the ring and needs no square
+root (unlike `gr_abs`), and $x^2$ in an ordered ring. Numerical
+algorithms that only compare or scale by magnitudes should use this
+rather than `gr_abs`.
+
+::: details
+The default method (`gr_generic_abs2`) squares the result of `gr_abs`;
+the real and complex floating-point and ball rings, `fmpzi`, `qqbar`
+and the generic complex rings compute a sum of squares directly.
+:::
+:::
+
+::: function
 int gr_i(gr_ptr res, gr_ctx_t ctx)
 
 Sets `res` to the imaginary unit $i$; `GR_DOMAIN` in real rings.

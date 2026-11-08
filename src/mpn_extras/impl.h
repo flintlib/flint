@@ -51,19 +51,7 @@ do {                                    \
     For fullword moduli we use Granlund-Möller after the folding.
 */
 
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), x < ~2^(FLINT_BITS) n */
-FLINT_FORCE_INLINE ulong
-_n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
-{
-    ulong c2, c1, c0;
-    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
-    (void) c1;
-    (void) c0;
-    xlo -= c2 * n;
-    if (xlo >= n)
-        xlo -= n;
-    return xlo;
-}
+/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1): n_ll_mod_barrett (ulong_extras) */
 
 /* arbitrary (hi, lo) mod n */
 FLINT_FORCE_INLINE ulong
@@ -76,7 +64,7 @@ _nmod_red2_any(ulong hi, ulong lo, const flint_mpn_crt_leaf_struct * L)
 
     if (mod.norm != 0)
     {
-        return _n_ll_rem_l_nonfullword(h, l, mod.n, L->qhi, L->qlo);
+        return n_ll_mod_barrett(h, l, mod.n, L->qhi, L->qlo);
     }
     else
     {
@@ -102,7 +90,7 @@ _nmod_red3_any(ulong y2, ulong y1, ulong y0, const flint_mpn_crt_leaf_struct * L
         /* no carry: sum < 2^64 (n + n) + 2^64 <= 2^128 */
         add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
         add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-        return _n_ll_rem_l_nonfullword(xhi, xlo, mod.n, L->qhi, L->qlo);
+        return n_ll_mod_barrett(xhi, xlo, mod.n, L->qhi, L->qlo);
     }
     else
     {

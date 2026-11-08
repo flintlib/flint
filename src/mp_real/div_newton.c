@@ -133,8 +133,7 @@ _mp_real_inv_newton_step2(nn_ptr Q, nn_srcptr A, slong An, slong n)
     {
         /* V = T * |1 - A'T| with n+2 fraction limbs */
         V = TMP_ALLOC((Tn + Uhighn - (m - 2)) * sizeof(ulong));
-        flint_mpn_mulmid(V, T, Tn, Uhigh, Uhighn,
-            m - 2, Tn + Uhighn);
+        _mp_real_mulhigh_window(V, T, Tn, Uhigh, Uhighn, m - 2);
         Vhigh = V + 2;
         Vhighn = Tn + Uhighn - (m - 2) - 2;
 
@@ -255,7 +254,7 @@ _mp_real_inv_newton_step3(nn_ptr Q, nn_srcptr A, slong An, slong n)
     if (Ugn > 0)
     {
         V = TMP_ALLOC((Tn + Ugn - (m - 2)) * sizeof(ulong));
-        flint_mpn_mulmid(V, T, Tn, Ug, Ugn, m - 2, Tn + Ugn);
+        _mp_real_mulhigh_window(V, T, Tn, Ug, Ugn, m - 2);
         if (Unegative)
             mpn_add(Q, Q, n + 2, V + 2, Tn + Ugn - (m - 2) - 2);
         else
@@ -345,7 +344,7 @@ _mp_real_div_newton(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A,
     if (Bn2 > 2)
     {
         TB = TMP_ALLOC((Tn + 2) * sizeof(ulong));
-        flint_mpn_mulmid(TB, T, Tn, B2, Bn2, Bn2 - 2, Bn2 + Tn);
+        _mp_real_mulhigh_window(TB, T, Tn, B2, Bn2, Bn2 - 2);
         TBhigh = TB + 2;
     }
     else
@@ -435,7 +434,7 @@ _mp_real_div_newton(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A,
     if (Uhighn != 0)
     {
         V = TMP_ALLOC((Tn + Uhighn - (m - 2)) * sizeof(ulong));
-        flint_mpn_mulmid(V, T, Tn, Uhigh, Uhighn, m - 2, Tn + Uhighn);
+        _mp_real_mulhigh_window(V, T, Tn, Uhigh, Uhighn, m - 2);
         Vhigh = V + 2;
         Vhighn = Tn + Uhighn - (m - 2) - 2;
 

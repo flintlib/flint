@@ -323,7 +323,7 @@ void flint_mpn_crt_init_tuned(flint_mpn_crt_t C, nn_srcptr primes,
     for (i = 0; i < n; i++)
     {
         nmod_init(C->prime_mod + i, primes[i]);
-        C->prime_barrett[i] = (primes[i] == 1) ? UWORD_MAX : n_barrett_precomp(primes[i]);
+        C->prime_barrett[i] = n_barrett_precomp_preinv(primes[i], C->prime_mod[i].ninv);
     }
 
     nl = 0;
@@ -342,14 +342,13 @@ void flint_mpn_crt_init_tuned(flint_mpn_crt_t C, nn_srcptr primes,
         C->leaf_start[nl] = i;
         {
             flint_mpn_crt_leaf_struct * L = C->leaf + nl;
-            ulong q[4], a[4] = {0, 0, 1, 0};
             nmod_init(&L->mod, prod);
-            L->r64 = (-prod) % prod;
-            L->r128 = nmod_mul(L->r64, L->r64, L->mod);
-            mpn_divrem_1(q, 0, a, 3, prod);
-            L->qlo = q[0];
-            L->qhi = q[1];
-            L->npre = (prod == 1) ? UWORD_MAX : n_barrett_precomp(prod);
+            if (prod == 1)
+                L->r64 = L->r128 = L->qhi = L->qlo = 0;
+            else
+                n_ll_barrett_precomp_preinv(&L->qhi, &L->qlo, &L->r64, &L->r128,
+                                            prod, L->mod.ninv);
+            L->npre = n_barrett_precomp_preinv(prod, L->mod.ninv);
         }
         total_bits += FLINT_BITS - C->leaf[nl].mod.norm;
         nl++;

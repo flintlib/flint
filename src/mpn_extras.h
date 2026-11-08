@@ -60,6 +60,45 @@ void flint_mpn_copyd(mp_ptr xp, mp_srcptr yp, mp_size_t n)
         xp[ix] = yp[ix];
 }
 
+/* Copying and zeroing for short operands. The plain loops above are
+   turned into calls to memcpy / memset by the compiler, which cost more
+   than the operation itself for a few limbs. */
+FLINT_FORCE_INLINE
+void _flint_mpn_copy_small(mp_ptr d, mp_srcptr s, mp_size_t n)
+{
+    switch (n)
+    {
+        case 8: d[7] = s[7]; /* fallthrough */
+        case 7: d[6] = s[6]; /* fallthrough */
+        case 6: d[5] = s[5]; /* fallthrough */
+        case 5: d[4] = s[4]; /* fallthrough */
+        case 4: d[3] = s[3]; /* fallthrough */
+        case 3: d[2] = s[2]; /* fallthrough */
+        case 2: d[1] = s[1]; /* fallthrough */
+        case 1: d[0] = s[0]; /* fallthrough */
+        case 0: break;
+        default: flint_mpn_copyi(d, s, n);
+    }
+}
+
+FLINT_FORCE_INLINE
+void _flint_mpn_zero_small(mp_ptr d, mp_size_t n)
+{
+    switch (n)
+    {
+        case 8: d[7] = 0; /* fallthrough */
+        case 7: d[6] = 0; /* fallthrough */
+        case 6: d[5] = 0; /* fallthrough */
+        case 5: d[4] = 0; /* fallthrough */
+        case 4: d[3] = 0; /* fallthrough */
+        case 3: d[2] = 0; /* fallthrough */
+        case 2: d[1] = 0; /* fallthrough */
+        case 1: d[0] = 0; /* fallthrough */
+        case 0: break;
+        default: flint_mpn_zero(d, n);
+    }
+}
+
 FLINT_FORCE_INLINE
 void flint_mpn_store(mp_ptr xp, mp_size_t n, mp_limb_t y)
 {
@@ -273,62 +312,9 @@ char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int ne
 #define MPN_RIGHT_SHIFT_LOW(hi, lo, n) \
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n)))) : (lo))
 
-#define FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)           \
-    do {                                                    \
-        mp_limb_t t1;                                       \
-        umul_ppmm(r1, r0, a0, b0);                          \
-        umul_ppmm(r2, t1, a1, b0);                          \
-        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
-    } while (0)
-
-#define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
-    do {                                                                  \
-        mp_limb_t __v1, __v2, __u1, __u2;                                 \
-        mp_limb_t __r3, __r2, __r1, __r0;                                 \
-        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
-        umul_ppmm(__r1, __r0, __a0, __b0);                                \
-        umul_ppmm(__r3, __r2, __a1, __b1);                                \
-        umul_ppmm(__v2, __v1, __a0, __b1);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __v2, __v1); \
-        umul_ppmm(__u2, __u1, __a1, __b0);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
-    } while (0)
-
-/* Low two words of 2x2 product */
-#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
-    do { \
-        umul_ppmm(r1, r0, a0, b0); \
-        (r1) += (a0) * (b1) + (a1) * (b0); \
-    } while (0)
-
-/* Low three words of 2x2 product */
-#define FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)                \
-    do {                                                               \
-        mp_limb_t __t1, __t2, __u1, __u2;                              \
-        mp_limb_t __r2, __r1, __r0;                                    \
-        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);  \
-        umul_ppmm(__r1, __r0, __a0, __b0);                             \
-        __r2 = __a1 * __b1;                                            \
-        umul_ppmm(__t2, __t1, __a0, __b1);                             \
-        add_ssaaaa(__r2, __r1, __r2, __r1, __t2, __t1);                \
-        umul_ppmm(__u2, __u1, __a1, __b0);                             \
-        add_ssaaaa(__r2, __r1, __r2, __r1, __u2, __u1);                \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2;                         \
-    } while (0)
-
-#define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
-    do {                                                                     \
-        mp_limb_t __u1, __u2, __u3;                                          \
-        mp_limb_t __r3, __r2, __r1, __r0;                                    \
-        mp_limb_t __a1 = (a1), __a0 = (a0);                                  \
-        umul_ppmm(__u2, __u1, __a0, __a1);                                   \
-        add_sssaaaaaa(__u3, __u2, __u1, 0, __u2, __u1, 0, __u2, __u1);       \
-        umul_ppmm(__r1, __r0, __a0, __a0);                                   \
-        umul_ppmm(__r3, __r2, __a1, __a1);                                   \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __u3, __u2, __u1); \
-        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
-    } while (0)
+/* FLINT_MPN_MUL_2X1, FLINT_MPN_MUL_2X2, FLINT_MPN_MULLOW_2X2,
+   FLINT_MPN_MUL_3P2X2 and FLINT_MPN_SQR_2X2 (products of one- and two-limb
+   operands in registers) are in longlong.h */
 
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
 /* Assumes n >= 2 */
@@ -679,6 +665,89 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
 #define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
+
+/* Error bounds (in ulp of the returned guard limb, i.e. of limb n - 1 of
+   the 2n-limb product) of the precise high products flint_mpn_mulhigh_n
+   and flint_mpn_sqrhigh_n: the computed n + 1 limbs never exceed the exact
+   ones and fall short of them by at most this amount.
+
+   All backends accumulate every partial-product limb landing in columns
+   n - 1 and above (the low halves of the products on the diagonal
+   p + q = n - 2 are dropped, as is everything below). The dropped amount
+   D satisfies D / B^(n-1) < (n - 1)(1 - 1/B) + (n - 2)(1 - 1/B)^2 +
+   (n - 3)/B < 2n - 3 (Ahlback and Johansson, "Fast basecases for
+   arbitrary-size multiplication"), so the integer deficit, which is
+   floor(D / B^(n-1)), is at most 2n - 4. This is attained: the inputs
+   x_i = B - 2^(FLINT_BITS/2) - 1, y_i = B - 2^(FLINT_BITS/2) + 1 give
+   exactly 2n - 4 (the low half of each product on the diagonal is B - 1,
+   and the products below are nearly maximal). The exact 1- and 2-limb
+   kernels have no error. For the normalised variants the shift doubles
+   the deficit and can add one unit. */
+#define FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND(n) ((n) <= 2 ? 0 : 2 * (n) - 4)
+#define FLINT_MPN_SQRHIGH_N_GUARD_ERR_BOUND(n) FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND(n)
+#define FLINT_MPN_MULHIGH_N_NORMALISED_GUARD_ERR_BOUND(n) (2 * FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND(n) + 1)
+#define FLINT_MPN_SQRHIGH_N_NORMALISED_GUARD_ERR_BOUND(n) FLINT_MPN_MULHIGH_N_NORMALISED_GUARD_ERR_BOUND(n)
+
+/* The same bounds for the general high products flint_mpn_mulhigh and
+   flint_mpn_sqrhigh (top n limbs of a product of any shape plus a guard
+   limb): the shapes reduce to the balanced ones, with operands longer than
+   n limbs truncated at a cost below 3 units of the guard limb each after
+   the leading correction term is added back (see mulhigh_general.c), so
+   the deficit stays below (2n - 3) + 6. */
+#define FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n) (2 * (n) + 4)
+#define FLINT_MPN_SQRHIGH_GUARD_ERR_BOUND(n) FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n)
+#define FLINT_MPN_MULHIGH_NORMALISED_GUARD_ERR_BOUND(n) (2 * FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n) + 1)
+#define FLINT_MPN_SQRHIGH_NORMALISED_GUARD_ERR_BOUND(n) FLINT_MPN_MULHIGH_NORMALISED_GUARD_ERR_BOUND(n)
+
+/* General high products: the top n limbs of x * y (resp. x^2), written to
+   res, and the limb below them, returned, as a lower approximation with
+   deficit at most FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(n) units of the
+   returned limb; the product is zero padded above if it is shorter than
+   n + 1 limbs. The normalised variants also shift the result left by one
+   bit when its top bit is clear, as flint_mpn_mulhigh_n_normalised. res
+   may be one of the operands (all the high products allow this). */
+mp_limb_t flint_mpn_mulhigh(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn, mp_size_t n);
+mp_limb_t flint_mpn_sqrhigh(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
+mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn, mp_size_t n);
+mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr res, mp_srcptr x, mp_size_t xn, mp_size_t n);
+
+/* Whether the product of xn x yn limbs of which the top n limbs are
+   wanted should be computed in full rather than as a high product: nearly
+   all of it is wanted, or no operand is longer than the output and the
+   high product would be a full product internally (in the range of the
+   hardcoded kernels, or both operands shorter than the output and not
+   nearly balanced, cf. mulhigh_general.c, whose fallback length this
+   matches); never for the balanced shape xn = yn = n, which has its own
+   kernels. */
+FLINT_FORCE_INLINE int
+_flint_mpn_mulhigh_prefer_full(slong xn, slong yn, slong n)
+{
+    slong zn = xn + yn;
+
+    if (zn <= n + FLINT_MAX(2, n / 16))
+        return 1;
+
+    if (xn == n && yn == n)
+        return 0;
+
+    /* a short factor (a coefficient of a few limbs) times one not longer
+       than the output: the high product could only skip a triangle of at
+       most 1/8 of the work (1/4 for outputs of up to 64 limbs), less than
+       its normalisation and copies */
+    if (FLINT_MAX(xn, yn) <= n + 1 &&
+        (4 * FLINT_MIN(xn, yn) <= n || (n <= 64 && 2 * FLINT_MIN(xn, yn) <= n)))
+        return 1;
+
+    if (xn <= n && yn <= n)
+    {
+        if (n <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH)
+            return 1;
+        if (xn < n && yn < n && 8 * FLINT_MIN(xn, yn) < 7 * n)
+            return 1;
+    }
+
+    return 0;
+}
 
 /* Dot products with fixed limb sizes *****************************************/
 
@@ -1139,7 +1208,7 @@ mp_limb_t _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n);
 mp_limb_t _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n);
 
 MPN_EXTRAS_INLINE
-mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_t flint_mpn_sqrhigh_n(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
@@ -1149,30 +1218,30 @@ mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
         return _flint_mpn_sqrhigh(rp, xp, n);
 }
 
-mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n);
+mp_limb_pair_t _flint_mpn_mulhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n);
 
 MPN_EXTRAS_INLINE
-mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t flint_mpn_mulhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
         return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
-        return _flint_mpn_mulhigh_normalised(rp, xp, yp, n);
+        return _flint_mpn_mulhigh_n_normalised(rp, xp, yp, n);
 }
 
-mp_limb_pair_t _flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n);
+mp_limb_pair_t _flint_mpn_sqrhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n);
 
 MPN_EXTRAS_INLINE
-mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_pair_t flint_mpn_sqrhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_SQRHIGH_NORMALISED_FUNC(n))
         return flint_mpn_sqrhigh_normalised_func_tab[n](rp, xp);
     else
-        return _flint_mpn_sqrhigh_normalised(rp, xp, n);
+        return _flint_mpn_sqrhigh_n_normalised(rp, xp, n);
 }
 
 /* division ******************************************************************/
@@ -1423,6 +1492,7 @@ void _flint_mpn_tdiv_q_divconquer(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr
 void flint_mpn_divapprox(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn);
 void flint_mpn_divapprox_fraction(mp_ptr Q, mp_srcptr A, mp_size_t An, mp_srcptr B, mp_size_t Bn, mp_size_t f);
 void flint_mpn_invapprox(mp_ptr q, mp_srcptr x, mp_size_t xn, mp_size_t n);
+mp_ptr _flint_mpn_invapprox_buf(mp_ptr U, mp_srcptr x, mp_size_t xn, mp_size_t n);
 
 #if defined(mpn_modexact_1_odd)
 MPN_EXTRAS_INLINE
@@ -1441,6 +1511,58 @@ int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     return flint_mpz_divisible_ui_p(&s, d);
 }
 #endif
+
+/* Floating-point quotients, square roots and reciprocal square roots
+   with a guard limb (divhigh.c, sqrthigh.c), the kernels shared by arf,
+   arb and nfloat. The operands are normalised fractions A = {a, an} /
+   B^an, Y = {b, bn} / B^bn in [1/2, 1) (top bit set); t is the parity of
+   the exponent of x = A 2^e. Each function writes n + 1 limbs, the lowest
+   a guard limb, which lie in [B^(n+1) / 2, B^(n+1)) and approximate
+
+     divhigh:   2^-s (A / Y) B^(n+1), returning s = [A >= Y] (so that the
+                quotient is A / Y = 2^s Q / B^(n+1); the shift is taken
+                from the operands truncated to n + 2 limbs)
+     invhigh:   the same for A = 1/2, i.e. 1/Y = 2^(s+1) Q / B^(n+1)
+     sqrthigh:  S B^(n+1) with S = sqrt(A / 2^t) in [1/2, 1), so that
+                sqrt(x) = S 2^((e + t) / 2)
+     rsqrthigh: M B^(n+1) with M = (2^(2-t) A)^(-1/2) in (1/2, 1], so that
+                1/sqrt(x) = M 2^((1 - t) - (e - t) / 2) (clamped to
+                B^(n+1) - 1 when M = 1, i.e. t = 1 and A = 1/2)
+
+   to within the absolute error bounds below (in units of the guard limb,
+   in either direction). The _exact variants compute the floor of the
+   same quantity from the full operands (the shift s of divhigh_exact
+   then from the full comparison) and return whether it is not an
+   integer, i.e. whether the floating-point result is inexact; they are
+   the fallbacks of directed rounding when the guard limb is within the
+   error bound of a rounding boundary. sqrthigh_exact_half returns more
+   precisely 0 (exact), 1 (the value within the first half unit above
+   the floor), 2 (exactly half a unit above: a tie, possible only with
+   dropped limbs of a) or 3 (above that), which decides every rounding
+   mode at n + 1 limbs (it forms the remainder of the integer root,
+   which costs for long inputs); sqrthigh_exact_rem also writes that
+   remainder X - F^2 (n + 2 limbs, zero-padded) for X the radicand of
+   the n + 1 limbs. rsqrthigh_exact requires M < 1. */
+#define FLINT_MPN_DIVHIGH_GUARD_ERR_BOUND 16
+#define FLINT_MPN_SQRTHIGH_GUARD_ERR_BOUND 32
+#define FLINT_MPN_RSQRTHIGH_GUARD_ERR_BOUND 256
+ulong flint_mpn_divhigh(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n);
+ulong flint_mpn_invhigh(nn_ptr q, nn_srcptr b, slong bn, slong n);
+int flint_mpn_divhigh_exact(nn_ptr q, ulong * s, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n);
+void flint_mpn_sqrthigh(nn_ptr s, nn_srcptr a, slong an, int t, slong n);
+int flint_mpn_sqrthigh_exact(nn_ptr s, nn_srcptr a, slong an, int t, slong n);
+int flint_mpn_sqrthigh_exact_half(nn_ptr s, nn_srcptr a, slong an, int t, slong n);
+int flint_mpn_sqrthigh_exact_rem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, int t, slong n);
+void flint_mpn_rsqrthigh(nn_ptr y, nn_srcptr a, slong an, int t, slong n);
+int flint_mpn_rsqrthigh_exact(nn_ptr y, nn_srcptr a, slong an, int t, slong n);
+/* the fixed-point Newton iteration of flint_mpn_rsqrthigh (N >= 2 limbs,
+   error below 196 units of the lowest limb at N = 4, 1.03 otherwise, 8 at
+   N = 2), which flint_mpn_rsqrthigh uses for n + 1 <=
+   FLINT_MPN_RSQRTHIGH_MP_REAL_CUTOFF result limbs and the mp_real
+   iteration beyond; exported for tuning the cutoff, and for callers in
+   that range (the kernels of arf) to skip the dispatch */
+#define FLINT_MPN_RSQRTHIGH_MP_REAL_CUTOFF 96
+void _flint_mpn_rsqrthigh_newton(nn_ptr Y, slong N, nn_srcptr a, slong an, ulong t);
 
 /* historical name of the quotient-only division */
 #define mpn_tdiv_q(qp, np, nn, dp, dn) flint_mpn_tdiv_q(qp, np, nn, dp, dn)
@@ -1542,7 +1664,7 @@ flint_mpn_tdiv_r(mp_ptr r, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn)
     mp_ptr q;
     TMP_INIT;
     TMP_START;
-    q = TMP_ALLOC((an - bn + 1) * sizeof(mp_limb_t));
+    q = (mp_ptr) TMP_ALLOC((an - bn + 1) * sizeof(mp_limb_t));
     flint_mpn_tdiv_qr(q, r, a, an, b, bn);
     TMP_END;
 }

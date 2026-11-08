@@ -371,6 +371,18 @@ WARN_UNUSED_RESULT int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_de
 WARN_UNUSED_RESULT int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_hessenberg_reduce(gr_mat_t A, gr_ptr tau, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_hessenberg_expand_q(gr_mat_t Q, gr_srcptr tau, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_apply_2x2_rows(gr_mat_t A, slong i1, slong i2, slong c0, slong c1, gr_srcptr M, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_apply_2x2_cols(gr_mat_t A, slong j1, slong j2, slong r0, slong r1, gr_srcptr M, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_conjugate_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_hessenberg_qr_step(gr_mat_t A, gr_mat_t Q, slong n0, slong n1, gr_srcptr shift, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_hessenberg_qr(gr_mat_t A, gr_mat_t Q, gr_srcptr tol, slong maxiter, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eig_triu_r(gr_mat_t ER, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eig_triu_l(gr_mat_t EL, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_schur_reorder(gr_mat_t T, gr_mat_t V, slong ifst, slong ilst, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_mat_eig_qr(gr_ptr E, gr_mat_t L, gr_mat_t R, const gr_mat_t A, gr_srcptr tol, slong maxiter, int * converged, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eig_qr(gr_ptr E, gr_mat_t L, gr_mat_t R, const gr_mat_t A, gr_srcptr tol, slong maxiter, gr_ctx_t ctx);
 truth_t gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx);
 
 int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);

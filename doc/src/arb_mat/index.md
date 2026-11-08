@@ -553,25 +553,34 @@ version otherwise; it throws an exception for a non-square matrix.
 These functions perform floating-point linear algebra on the midpoints
 of the input, *without any error control*. The input radii are ignored,
 and the output matrices hold the approximate results with zero radii.
-They use the same algorithms as the rigorous versions (partial
-pivoting, block recursion for large matrices).
+They are the generic algorithms of `gr_mat` (Gaussian elimination
+with partial pivoting, block recursive for large matrices) run over a
+floating-point ring holding the midpoints: from dimension 4 (and, for
+the triangular solvers, four right-hand sides), `dfloat` or `nfloat`,
+with the midpoints scaled by powers of two, when the precision allows
+and the exponents fit, which is several times faster; otherwise, or if
+that fails, `arf_t` (`arf`) at `prec` bits, or 53 if that is less
+([](algorithms/ball-arithmetic/linear-systems#backends)).
 
 ::: function
 void arb_mat_approx_solve_triu(arb_mat_t X, const arb_mat_t U, const arb_mat_t B, int unit, slong prec)
 void arb_mat_approx_solve_tril(arb_mat_t X, const arb_mat_t L, const arb_mat_t B, int unit, slong prec)
 
 Approximately solve $UX = B$ or $LX = B$ for a triangular matrix with
-nonzero diagonal (not checked); with `unit` set, the diagonal is taken
-to be ones and not read.
+nonzero diagonal; with `unit` set, the diagonal is taken to be ones and
+not read. If a diagonal entry is zero, `X` is set to NaN.
 :::
 
 ::: function
 int arb_mat_approx_lu(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
 void arb_mat_approx_solve_lu_precomp(arb_mat_t X, const slong * perm, const arb_mat_t A, const arb_mat_t B, slong prec)
 
-Compute an approximate LU decomposition with partial pivoting, returning
-zero if an exactly zero pivot column is encountered, and solve with such
-a decomposition (assumed to come from `arb_mat_approx_lu`).
+Compute an approximate LU decomposition $PA = LU$ with partial pivoting,
+in the layout of `gr_mat_lu`, returning zero if $A$ does not have full
+rank in the floating-point arithmetic (an exactly zero pivot column is
+encountered), in which case `P` and `LU` are meaningless; and solve
+with such a decomposition (assumed to come from `arb_mat_approx_lu`; NaN if
+a diagonal entry of $U$ is zero).
 :::
 
 ::: function
@@ -579,8 +588,9 @@ int arb_mat_approx_solve(arb_mat_t X, const arb_mat_t A, const arb_mat_t B, slon
 int arb_mat_approx_inv(arb_mat_t X, const arb_mat_t A, slong prec)
 
 Approximately solve $AX = B$ or invert $A$. Return zero if the
-approximate LU decomposition fails, nonzero otherwise; a nonzero return
-value says nothing about the accuracy of the result.
+approximate LU decomposition fails, leaving `X` unchanged, and nonzero
+otherwise; a nonzero return value says nothing about the accuracy of
+the result.
 :::
 
 ## Cholesky and LDL decompositions {#cholesky}

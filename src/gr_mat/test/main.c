@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-adjugate.c"
+#include "t-eig_qr.c"
 #include "t-charpoly.c"
 #include "t-charpoly_danilevsky.c"
 #include "t-charpoly_faddeev_bsgs.c"
@@ -21,6 +22,7 @@
 #include "t-companion.c"
 #include "t-concat_horizontal.c"
 #include "t-concat_vertical.c"
+#include "t-conjugate_transpose.c"
 #include "t-det_berkowitz.c"
 #include "t-det_cofactor.c"
 #include "t-det_fflu.c"
@@ -32,6 +34,8 @@
 #include "t-hessenberg.c"
 #include "t-hessenberg_gauss.c"
 #include "t-hessenberg_householder.c"
+#include "t-hessenberg_qr.c"
+#include "t-hessenberg_reduce.c"
 #include "t-hilbert.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
@@ -62,6 +66,7 @@
 #include "t-rref_den_fflu.c"
 #include "t-rref_fflu.c"
 #include "t-rref_lu.c"
+#include "t-schur_reorder.c"
 #include "t-set_str.c"
 #include "t-scalar.c"
 #include "t-solve.c"
@@ -80,6 +85,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_mat_adjugate),
+    TEST_FUNCTION(gr_mat_eig_qr),
     TEST_FUNCTION(gr_mat_charpoly),
     TEST_FUNCTION(gr_mat_charpoly_danilevsky),
     TEST_FUNCTION(gr_mat_charpoly_faddeev_bsgs),
@@ -89,6 +95,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_companion),
     TEST_FUNCTION(gr_mat_concat_horizontal),
     TEST_FUNCTION(gr_mat_concat_vertical),
+    TEST_FUNCTION(gr_mat_conjugate_transpose),
     TEST_FUNCTION(gr_mat_det_berkowitz),
     TEST_FUNCTION(gr_mat_det_cofactor),
     TEST_FUNCTION(gr_mat_det_fflu),
@@ -101,6 +108,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
     TEST_FUNCTION(gr_mat_hessenberg_householder),
+    TEST_FUNCTION(gr_mat_hessenberg_qr),
+    TEST_FUNCTION(gr_mat_hessenberg_reduce),
     TEST_FUNCTION(gr_mat_hilbert),
     TEST_FUNCTION(gr_mat_inv),
     TEST_FUNCTION(gr_mat_invert_rows_cols),
@@ -131,6 +140,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_rref_den_fflu),
     TEST_FUNCTION(gr_mat_rref_fflu),
     TEST_FUNCTION(gr_mat_rref_lu),
+    TEST_FUNCTION(gr_mat_schur_reorder),
     TEST_FUNCTION(gr_mat_scalar),
     TEST_FUNCTION(gr_mat_set_str),
     TEST_FUNCTION(gr_mat_solve),

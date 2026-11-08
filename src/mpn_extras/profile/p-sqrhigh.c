@@ -57,7 +57,7 @@ int main(void)
         mpn_random2(xp, n);
 
         TIMEIT_START;
-        flint_mpn_sqrhigh(rf, xp, n);
+        flint_mpn_sqrhigh_n(rf, xp, n);
         TIMEIT_STOP_VALUES(__, t1);
 
         TIMEIT_START;

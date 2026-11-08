@@ -303,6 +303,26 @@ matrices, in which case the entries are swapped in place.
 :::
 
 ::: function
+int gr_mat_conjugate_transpose(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+Sets `res` to the conjugate transpose $A^*$ of `mat` (the transpose in a
+real ring). Aliasing is allowed for square matrices.
+:::
+
+::: function
+int gr_mat_apply_2x2_rows(gr_mat_t A, slong i1, slong i2, slong c0, slong c1, gr_srcptr M, gr_ctx_t ctx)
+int gr_mat_apply_2x2_cols(gr_mat_t A, slong j1, slong j2, slong r0, slong r1, gr_srcptr M, gr_ctx_t ctx)
+
+Multiply rows $i_1, i_2$ of $A$, restricted to the columns
+$c_0 \le j < c_1$, on the left by the $2 \times 2$ matrix $M$ (given row
+by row as a vector of length 4), respectively columns $j_1, j_2$,
+restricted to the rows $r_0 \le i < r_1$, on the right by $M^T$: the
+rows (columns) $u, v$ become $M_0 u + M_1 v$ and $M_2 u + M_3 v$. With
+$M$ a plane rotation, these are the building blocks of the QR
+algorithm ([](gr_mat/eig)). They call `_gr_vec_apply_2x2`.
+:::
+
+::: function
 int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 void _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
@@ -1001,6 +1021,78 @@ numerical algorithms; over `acb`, an approximation from the QR algorithm
 is certified with `acb_mat_eig_simple`
 ([](algorithms/ball-arithmetic/eigenvalues)).
 :::
+:::
+
+## Numerical eigenvalues {#eig}
+
+Floating-point eigensolvers, for rings of approximate real or complex
+numbers such as `acf`, `nfloat_complex` and the complex `dfloat` rings.
+They compute no error bounds; see [](gr_mat/eig) for how to use them and
+how to certify their results.
+
+::: function
+int gr_mat_eig_qr(gr_ptr E, gr_mat_t L, gr_mat_t R, const gr_mat_t A, gr_srcptr tol, slong maxiter, gr_ctx_t ctx)
+int _gr_mat_eig_qr(gr_ptr E, gr_mat_t L, gr_mat_t R, const gr_mat_t A, gr_srcptr tol, slong maxiter, int * converged, gr_ctx_t ctx)
+
+Computes approximations of the eigenvalues of the square matrix $A$ by
+reduction to Hessenberg form and the shifted QR algorithm, writing them
+to the vector `E` of length $n$, together with right eigenvectors as the
+columns of `R` and left eigenvectors as the rows of `L` (each may be
+`NULL`). The eigenvectors are not normalised: for distinct eigenvalues
+$LR$ is diagonal, but not the identity. `tol` is a deflation tolerance
+relative to the norm of $A$ (`NULL` for $2^{-p}/(100n)$ at the precision $p$ of the
+ring) and `maxiter` limits the number of QR steps per eigenvalue (a
+nonpositive value selects $14n + p/10$). Returns `GR_UNABLE` if the
+iteration does not converge, in which case `E`, `L` and `R` are not
+written; this always happens in a real ring when $A$ has nonreal
+eigenvalues. The underscore version with `converged` not `NULL` instead computes
+the outputs from the current state of the iteration when it does not
+converge, setting `*converged` to 0 (and to 1 otherwise), as
+`acb_mat_approx_eig_qr` does.
+:::
+
+::: function
+int gr_mat_hessenberg_reduce(gr_mat_t A, gr_ptr tau, gr_ctx_t ctx)
+int gr_mat_hessenberg_expand_q(gr_mat_t Q, gr_srcptr tau, gr_ctx_t ctx)
+
+Reduce a square matrix in place to upper Hessenberg form $H = Q^* A Q$
+by Householder reflections, leaving the reflectors below the
+subdiagonal and in the vector `tau` of length $n$, and expand them into
+the unitary matrix $Q$, given in `Q` a copy of the output of the
+reduction.
+:::
+
+::: function
+int gr_mat_hessenberg_qr_step(gr_mat_t A, gr_mat_t Q, slong n0, slong n1, gr_srcptr shift, gr_ctx_t ctx)
+int gr_mat_hessenberg_qr(gr_mat_t A, gr_mat_t Q, gr_srcptr tol, slong maxiter, gr_ctx_t ctx)
+
+Perform one implicitly shifted QR step with the given shift on the
+active block $A_{n_0:n_1, n_0:n_1}$ of the upper Hessenberg matrix $A$,
+respectively iterate such steps with deflation until $A$ is upper
+triangular to within the tolerance (a Schur form), accumulating the
+transformations into the columns of `Q` if it is not `NULL`. On
+success, $Q_\text{out} = Q_\text{in} V$ and $A_\text{out} = V^* A_\text{in} V$
+with $V$ unitary. `tol` and `maxiter` are as for `gr_mat_eig_qr`.
+:::
+
+::: function
+int gr_mat_eig_triu_r(gr_mat_t ER, const gr_mat_t A, gr_ctx_t ctx)
+int gr_mat_eig_triu_l(gr_mat_t EL, const gr_mat_t A, gr_ctx_t ctx)
+
+Compute right eigenvectors (the columns of `ER`) or left eigenvectors
+(the rows of `EL`) of the upper triangular matrix $A$ by back
+substitution, with scaling against overflow. The output must not alias
+$A$.
+:::
+
+::: function
+int gr_mat_schur_reorder(gr_mat_t T, gr_mat_t V, slong ifst, slong ilst, gr_ctx_t ctx)
+
+Given an upper triangular matrix $T$ (a complex Schur form), moves the
+diagonal entry at position `ifst` to position `ilst` by unitary
+similarity transformations, shifting the entries in between by one
+place, and multiplies `V` on the right by the transformation if it is
+not `NULL`.
 :::
 
 ## Jordan form and matrix functions {#functions}

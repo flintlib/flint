@@ -521,8 +521,8 @@ _nfloat_complex_sqr_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
     }
     else
     {
-        a2[0] = flint_mpn_sqrhigh(a2 + 1, NFLOAT_D(a), n);
-        b2[0] = flint_mpn_sqrhigh(b2 + 1, NFLOAT_D(b), n);
+        a2[0] = flint_mpn_sqrhigh_n(a2 + 1, NFLOAT_D(a), n);
+        b2[0] = flint_mpn_sqrhigh_n(b2 + 1, NFLOAT_D(b), n);
 
         if (n == 3)
         {
@@ -653,9 +653,9 @@ _nfloat_complex_sqr_karatsuba(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a,
     aa[0] = mpn_rshift(aa + 1, NFLOAT_D(a), n, adelta);
     bb[0] = mpn_rshift(bb + 1, NFLOAT_D(b), n, bdelta);
     _flint_mpn_signed_add_n(v, aa, asgnbit, bb, bsgnbit, n + 1);
-    flint_mpn_sqrhigh(s, v, n + 1);
-    flint_mpn_sqrhigh(t, aa, n + 1);
-    flint_mpn_sqrhigh(u, bb, n + 1);
+    flint_mpn_sqrhigh_n(s, v, n + 1);
+    flint_mpn_sqrhigh_n(t, aa, n + 1);
+    flint_mpn_sqrhigh_n(u, bb, n + 1);
     mpn_add_n(v, t, u, n + 1);
     ssgnbit = flint_mpn_signed_sub_n(s, s, v, n + 1);
     tsgnbit = flint_mpn_signed_sub_n(t, t, u, n + 1);
@@ -2224,6 +2224,35 @@ nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr 
 }
 
 int
+nfloat_complex_abs2(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
+{
+    ulong t[NFLOAT_MAX_ALLOC];
+    ulong u[NFLOAT_MAX_ALLOC];
+    int status = GR_SUCCESS;
+
+    if (NFLOAT_CTX_HAS_INF_NAN(ctx))
+        return GR_UNABLE;
+
+    if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(x, ctx)))
+    {
+        status = nfloat_sqr(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), ctx);
+    }
+    else if (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_RE(x, ctx)))
+    {
+        status = nfloat_sqr(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_IM(x, ctx), ctx);
+    }
+    else
+    {
+        status |= nfloat_sqr(t, NFLOAT_COMPLEX_RE(x, ctx), ctx);
+        status |= nfloat_sqr(u, NFLOAT_COMPLEX_IM(x, ctx), ctx);
+        status |= nfloat_add(NFLOAT_COMPLEX_RE(res, ctx), t, u, ctx);
+    }
+
+    status |= nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+    return status;
+}
+
+int
 nfloat_complex_abs(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     int status;
@@ -2397,6 +2426,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
 */
 
     {GR_METHOD_ABS,             (gr_funcptr) nfloat_complex_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) nfloat_complex_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) nfloat_complex_conj},
     {GR_METHOD_RE,              (gr_funcptr) nfloat_complex_re},
     {GR_METHOD_IM,              (gr_funcptr) nfloat_complex_im},

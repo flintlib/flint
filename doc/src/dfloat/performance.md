@@ -1,6 +1,6 @@
 ---
 title: Performance of dfloat
-summary: Timings of the dfloat arithmetic, vector operations, elementary functions and complex functions, compared with nfloat and arb, and what they imply for choosing a format.
+summary: Timings of the dfloat arithmetic, vector operations, elementary functions, complex functions and linear algebra, compared with nfloat and arb, and what they imply for choosing a format.
 order: 3
 ---
 
@@ -149,6 +149,56 @@ per term (`loop`: a loop of complex `gr_mul` and `gr_add`):
 | `d2` | 1.83 | 8.30 | 32.1 | 4.86 | 21.6 | 65.0 |
 | `d3` | 5.06 | 22.1 | 69.7 | 9.88 | 36.7 | 95.7 |
 | `d4` | 10.0 | 42.8 | 144 | 16.5 | 61.7 | 197 |
+
+## Linear algebra {#linear-algebra}
+
+The plain rings implement matrix multiplication, LU decomposition and
+triangular solving ([](dfloat#rings)). Times in milliseconds for
+$256 \times 256$ matrices with random entries, one thread, on an Intel
+Xeon (Sapphire Rapids class, 2.7 GHz, a virtual machine), with the module
+compiled for AVX-512 and, for comparison, for AVX2 only (`-march=haswell`);
+`nfloat` at 64, 128, 192 and 256 bits and `arf`/`acf` at $53N$ bits
+(the complex rows: `nfloat_complex` and `acf`). Solving with one
+right-hand side costs the same as the decomposition.
+
+| Format | mul | lu | mul (AVX2) | lu (AVX2) | `nfloat` mul | `nfloat` lu | `arf` mul | `arf` lu |
+|---|---|---|---|---|---|---|---|---|
+| `d1` | 0.47 | 0.59 | 0.47 | 0.64 | 19 | 31 | 15 | 44 |
+| `d2` | 8.3 | 3.9 | 13 | 5.4 | 43 | 37 | 26 | 49 |
+| `d3` | 22 | 9.6 | 33 | 13 | 59 | 50 | 54 | 83 |
+| `d4` | 47 | 19 | 72 | 27 | 82 | 56 | 71 | 95 |
+| `d1c` | 2.0 | 1.6 | 2.0 | 1.7 | 69 | 94 | 69 | 166 |
+| `d2c` | 34 | 14 | 53 | 20 | 141 | 129 | 114 | 186 |
+| `d3c` | 88 | 33 | 133 | 49 | 201 | 169 | 230 | 301 |
+| `d4c` | 192 | 74 | 296 | 106 | 272 | 175 | 303 | 353 |
+
+The `d1` and `d1c` products are BLAS products, independent of the
+SIMD width of the module. For $N \ge 2$ the product kernel runs 1.5
+times faster with AVX-512 (eight lanes) than with AVX2 (four lanes), and
+the decomposition, which also spends time in its base cases and the
+generic recursion, 1.4 times faster. The decomposition is 2 to 10 times
+faster than with `nfloat` and 2.5 to 70 times faster than with `arf`.
+At $n = 16$ the decomposition is 7, 1.5, 1.3 and 1.0 times faster than
+with `nfloat` for `d1` to `d4`, and 15, 3, 2.4 and 1.4 times for the
+complex formats; with the conversions from `arf` and solving with many
+right-hand sides, `nfloat` is faster for small matrices at three and
+four doubles, which the approximate functions of `arb_mat` and
+`acb_mat` take into account when they choose a type
+([](algorithms/ball-arithmetic/linear-systems#backends)).
+
+Times of `gr_mat_eig_qr` with right eigenvectors for a random
+$100 \times 100$ complex matrix, in milliseconds:
+
+| $N$ | `dNc` | `dNc` (AVX2) | `nfloat_complex` | `acf` |
+|---|---|---|---|---|
+| 1 | 11 | 11 | 586 | 1001 |
+| 2 | 76 | 77 | 701 | 1242 |
+| 3 | 203 | 211 | 1029 | 2535 |
+| 4 | 408 | 416 | 1219 | 2678 |
+
+About three quarters of the time is spent in the plane rotations
+(`_dNc_vec_apply_2x2`), which gather four elements at a time into the
+lanes in both builds, so the eigensolver does not gain from AVX-512.
 
 ## Benchmarking notes {#benchmarking}
 

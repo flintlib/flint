@@ -597,6 +597,20 @@ _gr_acf_nan(acf_t res, const gr_ctx_t ctx)
 }
 
 static int
+_gr_acf_abs2(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    if (arf_is_zero(acf_imagref(x)))
+        arf_mul(acf_realref(res), acf_realref(x), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    else if (arf_is_zero(acf_realref(x)))
+        arf_mul(acf_realref(res), acf_imagref(x), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    else
+        arf_sosq(acf_realref(res), acf_realref(x), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+
+    arf_zero(acf_imagref(res));
+    return GR_SUCCESS;
+}
+
+static int
 _gr_acf_abs(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_zero(acf_imagref(x)))
@@ -953,6 +967,46 @@ static int
 _gr_acf_cos(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_cos, x)
+}
+
+/*
+    Override of _gr_vec_apply_2x2 calling acf_approx_dot directly. Both
+    results go to temporaries before being swapped into place: the pair
+    (u[i], v[i]) is read through the shallow vector w, and acf_approx_dot
+    may write its output before it has read all of its input (in its
+    simple version, used for short vectors and for exponents that are
+    not small).
+*/
+static int
+_gr_acf_vec_apply_2x2(acf_ptr u, acf_ptr v, slong stride, slong len, acf_srcptr M, gr_ctx_t ctx)
+{
+    slong prec = ACF_CTX_PREC(ctx);
+    arf_rnd_t rnd = ACF_CTX_RND(ctx);
+    slong i;
+    acf_struct w[2];
+    acf_t t1, t2;
+
+    if (len <= 0)
+        return GR_SUCCESS;
+
+    acf_init(t1);
+    acf_init(t2);
+
+    for (i = 0; i < len; i++)
+    {
+        w[0] = u[i * stride];
+        w[1] = v[i * stride];
+
+        acf_approx_dot(t1, NULL, 0, M, 1, w, 1, 2, prec, rnd);
+        acf_approx_dot(t2, NULL, 0, M + 2, 1, w, 1, 2, prec, rnd);
+        acf_swap(t1, u + i * stride);
+        acf_swap(t2, v + i * stride);
+    }
+
+    acf_clear(t1);
+    acf_clear(t2);
+
+    return GR_SUCCESS;
 }
 
 static int
@@ -1434,6 +1488,7 @@ gr_method_tab_input _acf_methods_input[] =
 */
 
     {GR_METHOD_ABS,             (gr_funcptr) _gr_acf_abs},
+    {GR_METHOD_ABS2,            (gr_funcptr) _gr_acf_abs2},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_acf_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_acf_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_acf_im},
@@ -1454,6 +1509,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_COS,             (gr_funcptr) _gr_acf_cos},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
+    {GR_METHOD_VEC_APPLY_2X2,   (gr_funcptr) _gr_acf_vec_apply_2x2},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_acf_vec_dot_strided},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acf_poly_mulmid},

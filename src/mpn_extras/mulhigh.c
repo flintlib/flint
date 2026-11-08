@@ -207,26 +207,51 @@ _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     return bot;
 }
 
+/* The basecase routines (the recursive one and the assembly or C basecase)
+   write the output before they have finished reading the operands: an
+   aliased call goes through a stack buffer. Mulders works on a scratch
+   buffer and the FFT transforms both operands before writing, so they
+   allow aliasing as they are. */
+/* kept out of line: the stack buffer would otherwise cost the common
+   path a stack protector and a larger frame */
+FLINT_STATIC_NOINLINE mp_limb_t
+_flint_mpn_mulhigh_n_basecase2_aliased(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    mp_limb_t t[FLINT_MPN_MULHIGH_MULDERS_CUTOFF];
+    mp_limb_t g = _flint_mpn_mulhigh_n_basecase2(t, u, v, n);
+    flint_mpn_copyi(res, t, n);
+    return g;
+}
+
+static inline mp_limb_t
+_flint_mpn_mulhigh_n_basecase2_alias(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    FLINT_ASSERT(n <= FLINT_MPN_MULHIGH_MULDERS_CUTOFF);
+
+    if (res == u || res == v)
+        return _flint_mpn_mulhigh_n_basecase2_aliased(res, u, v, n);
+    else
+        return _flint_mpn_mulhigh_n_basecase2(res, u, v, n);
+}
+
 #if FLINT_HAVE_FFT_SMALL
 
 mp_limb_t
 _flint_mpn_mulhigh_n_fft_small(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    mp_ptr tmp;
-    mp_limb_t bot;
-    tmp = flint_malloc(sizeof(mp_limb_t) * (n + 2));
-    flint_mpn_mulmid_fft_small(tmp, u, n, v, n, n - 2, 2 * n);
-    memcpy(res, tmp + 2, sizeof(mp_limb_t) * n);
-    bot = tmp[1];
-    flint_free(tmp);
-    return bot;
+    /* the window [n - 2, 2n) with its two lowest limbs diverted: the
+       lowest absorbs the carry deficit, the next is the guard limb */
+    mp_limb_t zlow[2];
+    _mpn_ctx_mpn_mul_range_split(get_default_mpn_ctx(), res, zlow, 2,
+                                 n - 2, 2 * n, u, n, v, n);
+    return zlow[1];
 }
 
 mp_limb_t
 _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
     if (n <= FLINT_MPN_MULHIGH_MULDERS_CUTOFF)
-        return _flint_mpn_mulhigh_n_basecase2(res, u, v, n);
+        return _flint_mpn_mulhigh_n_basecase2_alias(res, u, v, n);
     else if (n <= FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF)
         return _flint_mpn_mulhigh_n_mulders(res, u, v, n);
     else
@@ -239,7 +264,7 @@ mp_limb_t
 _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
     if (n <= FLINT_MPN_MULHIGH_MULDERS_CUTOFF)
-        return _flint_mpn_mulhigh_n_basecase2(res, u, v, n);
+        return _flint_mpn_mulhigh_n_basecase2_alias(res, u, v, n);
     else if (n <= FLINT_MPN_MULHIGH_MUL_CUTOFF)
         return _flint_mpn_mulhigh_n_mulders(res, u, v, n);
     else
@@ -248,13 +273,11 @@ _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 
 #endif
 
-mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t _flint_mpn_mulhigh_n_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
     mp_limb_pair_t ret;
-
-    FLINT_ASSERT(rp != xp && rp != yp);
 
     ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
 

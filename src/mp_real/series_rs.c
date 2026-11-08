@@ -519,7 +519,7 @@ _rs_powers(nn_ptr pw, slong pslot, slong n, slong s_bits, slong m, slong pad)
         else
         {
             if (a == bb)
-                flint_mpn_sqrhigh(SL(i), SL(a) + zb, K);
+                flint_mpn_sqrhigh_n(SL(i), SL(a) + zb, K);
             else
                 flint_mpn_mulhigh_n(SL(i), SL(a) + zb, SL(bb) + za, K);
             flint_mpn_zero(SL(i) + K, n - K);
@@ -554,7 +554,7 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     work = tmp + (n + 3);
     z = pw + PAD;
 
-    flint_mpn_sqrhigh(z, x, n);
+    flint_mpn_sqrhigh_n(z, x, n);
     _rs_powers(pw, pslot, n, s_bits, m, PAD);
 
     /* the products go through tmp: ysin and yg may alias x */
@@ -661,7 +661,7 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
     if (fam == RS_EXP)
         flint_mpn_copyi(pw + PAD, x, n);
     else
-        flint_mpn_sqrhigh(pw + PAD, x, n);
+        flint_mpn_sqrhigh_n(pw + PAD, x, n);
     _rs_powers(pw, pslot, n, s_bits, m, PAD);
 
     _rs_sum(s, pw, pslot, n, s_bits, m, fam, alt, work, N, h);
@@ -848,7 +848,7 @@ _mp_real_series_rs_tan(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r)
 
 #define SL(j) (pw + ((j) - 1) * pslot + TAN_PAD)
 
-    flint_mpn_sqrhigh(z, x, n);
+    flint_mpn_sqrhigh_n(z, x, n);
     _rs_powers(pw, pslot, n, 2 * rr, m, TAN_PAD);
     flint_mpn_zero(s, n + TAN_PAD);
 

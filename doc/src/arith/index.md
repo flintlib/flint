@@ -116,7 +116,8 @@ void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 Sets `den` to the denominator of $B_n$ in lowest terms: 1 for odd $n \ge
 3$ and $n = 0$, 2 for $n = 1$, and for even $n \ge 2$ the product of the
 primes $p$ with $(p - 1) \mid n$, by the von Staudt–Clausen theorem. Values
-for $n \le 178$ are read from a table.
+for $n \le 178$ are read from a table; beyond, the divisors $d$ of $n$ are
+enumerated from its factorization and $d + 1$ is tested for primality.
 :::
 
 ::: function

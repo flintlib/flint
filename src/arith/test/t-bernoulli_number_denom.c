@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,10 +14,22 @@
 #include "fmpz.h"
 #include "arith.h"
 
+/* the product of the primes p <= n + 1 with (p - 1) | n, n even >= 2 */
+static void
+denom_naive(fmpz_t den, ulong n)
+{
+    ulong p;
+
+    fmpz_one(den);
+    for (p = 2; p <= n + 1; p = n_nextprime(p, 1))
+        if (n % (p - 1) == 0)
+            fmpz_mul_ui(den, den, p);
+}
+
 TEST_FUNCTION_START(arith_bernoulli_number_denom, state)
 {
     fmpz_t s, t;
-    slong n;
+    slong n, iter;
 
 
     fmpz_init(s);
@@ -36,6 +48,32 @@ TEST_FUNCTION_START(arith_bernoulli_number_denom, state)
         flint_printf("FAIL: Hash disagrees with known value\n");
         fflush(stdout);
         flint_abort();
+    }
+
+    /* even n beyond the table against the definition; highly composite
+       n among them */
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    {
+        ulong m;
+
+        if (iter % 4 == 0)
+            m = 2 * n_randint(state, 50000);
+        else if (iter % 4 == 1)
+            m = 720720 * (1 + n_randint(state, 3));
+        else
+            m = 2 * (90 + n_randint(state, 1000));
+
+        arith_bernoulli_number_denom(s, m);
+        denom_naive(t, m);
+
+        if (m >= 2 && !fmpz_equal(s, t))
+        {
+            flint_printf("FAIL: n = %wu\n", m);
+            fmpz_print(s); flint_printf("\n");
+            fmpz_print(t); flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
     }
 
     fmpz_clear(s);

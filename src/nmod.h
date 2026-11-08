@@ -22,6 +22,7 @@
 #include "ulong_extras.h"
 #include "nmod_types.h"
 #include "gr_types.h"
+#include "flint-mparam.h"  /* FLINT_MULMOD_SHOUP_PRECOMP_PREINV */
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,6 +71,7 @@ extern "C" {
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
+#define NMOD_IS_HALFLIMB(mod) ((mod).n <= (UWORD(1) << (FLINT_BITS / 2)))
 
 #define NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod) \
   do { \
@@ -132,6 +134,26 @@ extern "C" {
     rxx = (rxx < nxx ? rxx : rxx - nxx); \
     (res) = rxx; \
   } while (0)
+
+NMOD_INLINE
+ulong _nmod_mulmod_precomp_shoup(ulong a, nmod_t mod)
+{
+#if FLINT_MULMOD_SHOUP_PRECOMP_PREINV
+    return n_mulmod_precomp_shoup_preinv(a, mod.n, mod.ninv);
+#else
+    return n_mulmod_precomp_shoup(a, mod.n);
+#endif
+}
+
+NMOD_INLINE
+void _nmod_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, nmod_t mod)
+{
+#if FLINT_MULMOD_SHOUP_PRECOMP_PREINV
+    n_mulmod_precomp_shoup_quo_rem_preinv(a_pr_quo, a_pr_rem, a, mod.n, mod.ninv);
+#else
+    n_mulmod_precomp_shoup_quo_rem(a_pr_quo, a_pr_rem, a, mod.n);
+#endif
+}
 
 NMOD_INLINE ulong nmod_set_ui(ulong x, nmod_t mod)
 {
@@ -228,6 +250,21 @@ ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 }
 
 NMOD_INLINE
+ulong _nmod_mul_halflimb(ulong a, ulong b, nmod_t mod)
+{
+    /* a*b fits in one word, reduce it with the Barrett step in NMOD_RED
+     * but without the branch for norm = 0 */
+    const ulong p = a * b;
+    const ulong m = (mod.ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+    ulong r;
+    FLINT_ASSERT(NMOD_IS_HALFLIMB(mod));
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    r = p - (n_mulhi(p, m) >> (FLINT_BITS - 1 - mod.norm)) * mod.n;
+    return (r >= mod.n) ? r - mod.n : r;
+}
+
+NMOD_INLINE
 ulong nmod_addmul(ulong s, ulong a, ulong b, nmod_t mod)
 {
     ulong hi, lo;
@@ -270,6 +307,8 @@ int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod);
 
 ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod);
 ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_binexp_halflimb(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_redc_half(ulong a, ulong exp, nmod_t mod);
 ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod);
 
 NMOD_INLINE ulong

@@ -156,11 +156,11 @@ int main(void)
     return 0;
 }
 ```
-```output
-n = 10:  lu 3.74e-15  precond 2.10e-18
-n = 20:  lu 1.39e-09  precond 2.08e-16
-n = 40:  lu 3.34e-01  precond 7.47e-17
-n = 80:  precond 2.87e-16
+```output rel-tol=0.5
+n = 10:  lu 3.74e-15  precond 2.24e-18
+n = 20:  lu 1.39e-09  precond 2.01e-16
+n = 40:  lu 3.34e-01  precond 7.39e-17
+n = 80:  precond 2.83e-16
 ```
 
 The second program computes an approximate solution of a Hilbert
@@ -204,13 +204,13 @@ int main(void)
     return 0;
 }
 ```
-```output
-[-6.00000000000000 +/- 8.0698e-29]
-[210.000000000000 +/- 8.0698e-29]
-[-1680.00000000000 +/- 8.0698e-29]
-[5040.00000000000 +/- 8.0698e-29]
-[-6300.00000000000 +/- 8.0698e-29]
-[2772.00000000000 +/- 8.0698e-29]
+```output radius-tol
+[-6.00000000000000 +/- 7.9666e-29]
+[210.000000000000 +/- 7.9666e-29]
+[-1680.00000000000 +/- 7.9666e-29]
+[5040.00000000000 +/- 7.9666e-29]
+[-6300.00000000000 +/- 7.9666e-29]
+[2772.00000000000 +/- 7.9666e-29]
 ```
 
 The Hilbert matrix itself is only known to 128 bits (its entries $1/(j

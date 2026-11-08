@@ -35,8 +35,9 @@ TEST_FUNCTION_START(thread_support_parallel_do, state)
     {
         int * resx;
         int * resy;
+        int * resz;
         slong i, n;
-        f_param_t workx, worky;
+        f_param_t workx, worky, workz;
 
         n = n_randint(state, 1000);
 
@@ -44,16 +45,19 @@ TEST_FUNCTION_START(thread_support_parallel_do, state)
 
         resx = flint_malloc(n * sizeof(int));
         resy = flint_malloc(n * sizeof(int));
+        resz = flint_malloc(n * sizeof(int));
 
         workx.res = resx;
         worky.res = resy;
+        workz.res = resz;
 
         flint_parallel_do(f, &workx, n, n_randint(state, 5), FLINT_PARALLEL_UNIFORM);
         flint_parallel_do(f, &worky, n, n_randint(state, 5), FLINT_PARALLEL_STRIDED);
+        flint_parallel_do(f, &workz, n, n_randint(state, 5), FLINT_PARALLEL_DYNAMIC);
 
         for (i = 0; i < n; i++)
         {
-            if (resx[i] != resy[i] || resx[i] != i * i)
+            if (resx[i] != resy[i] || resx[i] != resz[i] || resx[i] != i * i)
                 TEST_FUNCTION_FAIL(
                         "num_threads = %wd, i = %wd/%wd\n",
                         flint_get_num_threads(), i, n);
@@ -61,6 +65,7 @@ TEST_FUNCTION_START(thread_support_parallel_do, state)
 
         flint_free(resx);
         flint_free(resy);
+        flint_free(resz);
     }
 
     TEST_FUNCTION_END(state);

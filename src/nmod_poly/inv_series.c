@@ -42,8 +42,15 @@ _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slo
         B = FLINT_MIN(K, 32);
 
         /* Qinv[k] = q t^k for 0 <= k < K */
-        for (k = 1; k < B; k++)
-            Qinv[k] = nmod_mul(Qinv[k - 1], t, mod);
+        if (NMOD_CAN_USE_SHOUP(mod))
+        {
+            const ulong t_pr = n_mulmod_precomp_shoup_preinv(t, mod.n, mod.ninv);
+            for (k = 1; k < B; k++)
+                Qinv[k] = n_mulmod_shoup(t, Qinv[k - 1], t_pr, mod.n);
+        }
+        else
+            for (k = 1; k < B; k++)
+                Qinv[k] = nmod_mul(Qinv[k - 1], t, mod);
 
         if (K > B)
         {
@@ -74,7 +81,17 @@ _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slo
         ulong s;
         const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(n, Qlen) - 1, mod);
 
-        for (i = 1; i < n; i++)
+        if (q != 1 && NMOD_CAN_USE_SHOUP(mod))
+        {
+            const ulong q_pr = n_mulmod_precomp_shoup_preinv(q, mod.n, mod.ninv);
+            for (i = 1; i < n; i++)
+            {
+                l = FLINT_MIN(i, Qlen - 1);
+                s = _nmod_vec_dot_rev(Q+1, Qinv + i-l, l, mod, params);
+                Qinv[i] = nmod_neg(n_mulmod_shoup(q, s, q_pr, mod.n), mod);
+            }
+        }
+        else for (i = 1; i < n; i++)
         {
             l = FLINT_MIN(i, Qlen - 1);
             s = _nmod_vec_dot_rev(Q+1, Qinv + i-l, l, mod, params);

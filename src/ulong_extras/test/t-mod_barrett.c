@@ -21,7 +21,25 @@ TEST_FUNCTION_START(n_mod_barrett, state)
         ulong n, x, npre, r1, r2, r3;
 
         n = n_randtest_not_zero(state);
-        npre = (n == 1) ? UWORD_MAX : n_barrett_precomp(n);
+        if (n_randint(state, 8) == 0)
+            n = UWORD(1) << n_randint(state, FLINT_BITS);
+
+        if (n_randint(state, 2))
+        {
+            npre = (n == 1) ? UWORD_MAX : n_barrett_precomp(n);
+        }
+        else
+        {
+            /* floor((2^FLINT_BITS - 1) / n): one less than
+               n_barrett_precomp(n) when n is a power of two */
+            ulong npre2 = (n == 1) ? UWORD_MAX : n_barrett_precomp(n) - ((n & (n - 1)) == 0);
+
+            npre = n_barrett_precomp_preinv(n, n_preinvert_limb(n));
+
+            if (npre != npre2)
+                TEST_FUNCTION_FAIL("n_barrett_precomp_preinv\n"
+                    "n = %wu, npre = %wu, expected %wu\n", n, npre, npre2);
+        }
 
         x = n_randtest(state);
 

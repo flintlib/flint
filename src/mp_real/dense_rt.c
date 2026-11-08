@@ -1046,8 +1046,8 @@ _rt_sin_cos(nn_ptr ysin, nn_ptr ycos, nn_srcptr v, slong n, int sl)
     }
 
     /* X^2, Y^2, XY, N = X^2 + Y^2 (in [1, 1.3] up to rounding) */
-    flint_mpn_sqrhigh(X2, X, n);
-    flint_mpn_sqrhigh(Y2, Y, n);
+    flint_mpn_sqrhigh_n(X2, X, n);
+    flint_mpn_sqrhigh_n(Y2, Y, n);
     flint_mpn_mulhigh_n(XY, X, Y, n);
     di = X[n];
     if (di)

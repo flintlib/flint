@@ -20,6 +20,7 @@
 
 #include <gmp.h>
 #include "longlong.h"
+#include "mpn_extras.h"
 #include "mag.h"
 #include "arf_types.h"
 
@@ -723,14 +724,6 @@ void arf_randtest_special(arf_t x, flint_rand_t state, slong bits, slong mag_bit
 
 void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 
-#define MUL_MPFR_MIN_LIMBS 25
-
-#if FLINT_HAVE_FFT_SMALL
-#define MUL_MPFR_MAX_LIMBS 800
-#else
-#define MUL_MPFR_MAX_LIMBS 10000
-#endif
-
 #define ARF_MUL_STACK_ALLOC 40
 #define ARF_MUL_TLS_ALLOC 1000
 
@@ -743,35 +736,33 @@ extern void _arf_mul_tmp_cleanup(void);
     ulong tmp_stack[ARF_MUL_STACK_ALLOC]; \
 
 #define ARF_MUL_TMP_ALLOC(tmp, alloc) \
-    if (alloc <= ARF_MUL_STACK_ALLOC) \
+    if ((alloc) <= ARF_MUL_STACK_ALLOC) \
     { \
         tmp = tmp_stack; \
     } \
-    else if (alloc <= ARF_MUL_TLS_ALLOC) \
+    else if ((alloc) <= ARF_MUL_TLS_ALLOC) \
     { \
-        if (__arf_mul_alloc < alloc) \
+        if (__arf_mul_alloc < (alloc)) \
         { \
             if (__arf_mul_alloc == 0) \
             { \
                 flint_register_cleanup_function(_arf_mul_tmp_cleanup); \
             } \
-            __arf_mul_tmp = flint_realloc(__arf_mul_tmp, sizeof(ulong) * alloc); \
-            __arf_mul_alloc = alloc; \
+            __arf_mul_tmp = flint_realloc(__arf_mul_tmp, sizeof(ulong) * (alloc)); \
+            __arf_mul_alloc = (alloc); \
         } \
         tmp = __arf_mul_tmp; \
     } \
     else \
     { \
-        tmp = flint_malloc(sizeof(ulong) * alloc); \
+        tmp = flint_malloc(sizeof(ulong) * (alloc)); \
     }
 
 #define ARF_MUL_TMP_FREE(tmp, alloc) \
-    if (alloc > ARF_MUL_TLS_ALLOC) \
+    if ((alloc) > ARF_MUL_TLS_ALLOC) \
         flint_free(tmp);
 
 void arf_mul_special(arf_t z, const arf_t x, const arf_t y);
-
-int arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
 
 int arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
 
@@ -781,6 +772,40 @@ int arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec);
     ((rnd == ARF_RND_DOWN)                      \
         ? arf_mul_rnd_down(z, x, y, prec)        \
         : arf_mul_rnd_any(z, x, y, prec, rnd))
+
+/* Products of at most this many limb multiplications are formed in full
+   even when part of them is discarded: cheaper than the truncation and
+   normalisation of a high product (measured: up to 7 x 7 limbs for an
+   output of n - 1 limbs). */
+#define ARF_MUL_FULL_SMALL 64
+
+/* whether the product of xn x yn limbs of which the top n limbs are
+   wanted is computed in full rather than as a high product: small
+   products, and the shapes for which the general high product would
+   form the full product anyway */
+ARF_INLINE int
+_arf_mul_prefer_full(slong xn, slong yn, slong n)
+{
+    if (xn + yn <= 14 || xn * yn <= ARF_MUL_FULL_SMALL)
+        return 1;
+    return _flint_mpn_mulhigh_prefer_full(xn, yn, n);
+}
+
+/* the normalised high product of rn limbs into z, with its guard limb
+   and the shift (0 or 1) by which it was normalised: the balanced
+   kernels directly (the general functions reduce to them after a dozen
+   checks, which matter at small sizes) */
+ARF_INLINE mp_limb_pair_t
+_arf_mpn_mulhigh_normalised(nn_ptr z, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong rn)
+{
+    if (x == y && xn == yn)
+        return (xn == rn) ? flint_mpn_sqrhigh_n_normalised(z, x, rn)
+                          : flint_mpn_sqrhigh_normalised(z, x, xn, rn);
+    else if (xn == rn && yn == rn)
+        return flint_mpn_mulhigh_n_normalised(z, x, y, rn);
+    else
+        return flint_mpn_mulhigh_normalised(z, x, xn, y, yn, rn);
+}
 
 ARF_INLINE int
 arf_neg_mul(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
@@ -839,30 +864,30 @@ extern void _arf_add_tmp_cleanup(void);
     ulong tmp_stack[ARF_ADD_STACK_ALLOC]; \
 
 #define ARF_ADD_TMP_ALLOC(tmp, alloc) \
-    if (alloc <= ARF_ADD_STACK_ALLOC) \
+    if ((alloc) <= ARF_ADD_STACK_ALLOC) \
     { \
         tmp = tmp_stack; \
     } \
-    else if (alloc <= ARF_ADD_TLS_ALLOC) \
+    else if ((alloc) <= ARF_ADD_TLS_ALLOC) \
     { \
-        if (__arf_add_alloc < alloc) \
+        if (__arf_add_alloc < (alloc)) \
         { \
             if (__arf_add_alloc == 0) \
             { \
                 flint_register_cleanup_function(_arf_add_tmp_cleanup); \
             } \
-            __arf_add_tmp = flint_realloc(__arf_add_tmp, sizeof(ulong) * alloc); \
-            __arf_add_alloc = alloc; \
+            __arf_add_tmp = flint_realloc(__arf_add_tmp, sizeof(ulong) * (alloc)); \
+            __arf_add_alloc = (alloc); \
         } \
         tmp = __arf_add_tmp; \
     } \
     else \
     { \
-        tmp = flint_malloc(sizeof(ulong) * alloc); \
+        tmp = flint_malloc(sizeof(ulong) * (alloc)); \
     }
 
 #define ARF_ADD_TMP_FREE(tmp, alloc) \
-    if (alloc > ARF_ADD_TLS_ALLOC) \
+    if ((alloc) > ARF_ADD_TLS_ALLOC) \
         flint_free(tmp);
 
 int _arf_add_mpn(arf_t z, nn_srcptr xp, slong xn, int xsgnbit,
@@ -945,39 +970,239 @@ int arf_sosq(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
 
 int arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
 
-#define ARF_INV_NEWTON_CUTOFF 5000
-#define ARF_DIV_NEWTON_CUTOFF 12000
-#define ARF_SQRT_NEWTON_CUTOFF 100000
-#define ARF_RSQRT_NEWTON_CUTOFF 4000
+/*
+    Floating-point kernels on limb arrays: msb-aligned mantissas with a
+    radix-2 exponent (the representation of arf and nfloat). A mantissa
+    is a normalised limb array {x, xn} (top bit set) standing for the
+    value {x, xn} 2^(e - xn FLINT_BITS), B = 2^FLINT_BITS, for an
+    exponent e which stays with the caller, as does the sign. A kernel
+    writes its result as {z, rn} with rn = ceil(prec / FLINT_BITS) limbs
+    (normalised, the bits below prec zero) and sets *zexp to the
+    correction of the natural exponent of the operation (ex - ey for a
+    quotient, and so on). The rounded kernels take a sign-free mode
+    (ARF_RND_DOWN, ARF_RND_UP or ARF_RND_NEAR; _arf_rnd_resolve gives it)
+    and return the inexact flag; the _approx kernels return rn limbs
+    within an ulp of the magnitude and nothing else. Scratch beyond a
+    small stack buffer lives in a thread-local buffer.
+*/
 
-/* Newton iteration backends for the relaxed rounding modes (rnd must be
-   ARF_RND_FAST or ARF_RND_ACCURATE). */
-int _arf_want_newton_inv_large(const arf_t x, slong prec);
-int _arf_want_newton_div_large(const arf_t x, const arf_t y, slong prec);
-
-ARF_INLINE int _arf_want_newton_inv(const arf_t x, slong prec)
+/* the sign-free strict mode rounding a value of sign sgnbit in the mode
+   rnd (the relaxed modes as arf_rnd_relaxed_to_strict: ARF_RND_FAST
+   toward zero, ARF_RND_ACCURATE to nearest) */
+ARF_INLINE arf_rnd_t
+_arf_rnd_resolve(arf_rnd_t rnd, int sgnbit)
 {
-    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_inv_large(x, prec);
+    if (rnd == ARF_RND_FLOOR || rnd == ARF_RND_CEIL)
+        return ((rnd == ARF_RND_CEIL) ^ sgnbit) ? ARF_RND_UP : ARF_RND_DOWN;
+    if (rnd >= ARF_RND_FAST)
+        return (rnd == ARF_RND_ACCURATE) ? ARF_RND_NEAR : ARF_RND_DOWN;
+    return rnd;
 }
 
-ARF_INLINE int _arf_want_newton_div(const arf_t x, const arf_t y, slong prec)
+/* limbs of scratch held on the stack by the kernels; larger scratch comes
+   from a thread-local buffer (one buffer: not for nested use) */
+#define ARF_MPN_STACK_LIMBS 64
+
+extern FLINT_TLS_PREFIX nn_ptr __arf_mpn_tmp;
+extern FLINT_TLS_PREFIX slong __arf_mpn_tmp_alloc;
+void _arf_mpn_tmp_cleanup(void);
+
+ARF_INLINE nn_ptr
+_arf_mpn_tmp(slong alloc)
 {
-    return prec >= ARF_INV_NEWTON_CUTOFF && _arf_want_newton_div_large(x, y, prec);
+    if (__arf_mpn_tmp_alloc < alloc)
+    {
+        if (__arf_mpn_tmp_alloc == 0)
+            flint_register_cleanup_function(_arf_mpn_tmp_cleanup);
+        __arf_mpn_tmp = (nn_ptr) flint_realloc(__arf_mpn_tmp, sizeof(ulong) * alloc);
+        __arf_mpn_tmp_alloc = alloc;
+    }
+    return __arf_mpn_tmp;
 }
 
-ARF_INLINE int _arf_want_newton_sqrt(const arf_t x, slong prec)
+#define ARF_MPN_TMP_DECL ulong __arf_mpn_stack[ARF_MPN_STACK_LIMBS];
+#define ARF_MPN_TMP_ALLOC(tmp, alloc) \
+    (tmp) = ((alloc) <= ARF_MPN_STACK_LIMBS) ? __arf_mpn_stack : _arf_mpn_tmp(alloc);
+
+/* res (rn limbs, top bit set, the bits below sb zero) rounded up by one
+   unit of 2^sb; returns the carry (the result is then B^rn / 2, a power
+   of two: the exponent increases) */
+ARF_INLINE int
+_arf_mpn_increment(nn_ptr res, slong rn, slong sb)
 {
-    return prec >= ARF_SQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+    ulong cy = (sb == 0) ? 1 : (UWORD(1) << sb);
+    slong i;
+
+    for (i = 0; i < rn; i++)
+    {
+        res[i] += cy;
+        cy = (res[i] < cy);
+        if (!cy)
+            return 0;
+    }
+
+    res[rn - 1] = UWORD(1) << (FLINT_BITS - 1);
+    _flint_mpn_zero_small(res, rn - 1);
+    return 1;
 }
 
-ARF_INLINE int _arf_want_newton_rsqrt(const arf_t x, slong prec)
+/* res decremented by one unit of 2^sb; when res was the power of two
+   B^rn / 2, the result is the prec = rn FLINT_BITS - sb ones below it,
+   normalised: returns -1 (the exponent decreases), else 0 */
+ARF_INLINE int
+_arf_mpn_decrement(nn_ptr res, slong rn, slong sb)
 {
-    return prec >= ARF_RSQRT_NEWTON_CUTOFF && !arf_is_special(x) && arf_sgn(x) > 0;
+    ulong one = (sb == 0) ? 1 : (UWORD(1) << sb);
+    slong i;
+
+    if (res[rn - 1] == (UWORD(1) << (FLINT_BITS - 1)) && (rn == 1 || flint_mpn_zero_p(res, rn - 1)))
+    {
+        ulong mask = (sb == 0) ? ~UWORD(0) : (~UWORD(0) << sb);
+        for (i = 0; i < rn; i++)
+            res[i] = ~UWORD(0);
+        res[0] &= mask;
+        return -1;
+    }
+
+    for (i = 0; i < rn; i++)
+    {
+        ulong t = res[i];
+        res[i] = t - one;
+        if (t >= one)
+            return 0;
+        one = 1;
+    }
+    return 0;
 }
-int _arf_inv_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
-int _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd);
-int _arf_sqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
-int _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd);
+
+/* {x, xn} (any length, x[xn - 1] != 0) rounded to prec bits into {res,
+   rn}, *exp the correction of the exponent of {x, xn} B^-xn: returns
+   the inexact flag; res may be x or a lower position in its buffer */
+int _arf_mpn_set_round(nn_ptr res, slong * exp, nn_srcptr x, slong xn, slong prec, arf_rnd_t rnd);
+
+/* An approximation {a, n} (top bit set) of a value T, with a guard limb g
+   below it within 2^e units (two-sided, or one-sided when side = 1 (T
+   above) or -1 (T below)), rounded to prec <= n FLINT_BITS bits into
+   {res, rn} when the bits e .. FLINT_BITS - 2 of g certify that T rounds
+   like the approximation and is inexact (neither all zero nor all
+   ones): returns 1 with *exp the carry (0 or 1), or -1 when the guard
+   limb cannot certify the rounding (the exact value must decide). */
+int _arf_mpn_round_guarded(nn_ptr res, slong * exp, nn_srcptr a, slong n, ulong g, int e, slong prec, arf_rnd_t rnd, int side);
+
+/* whether rounding {a, an} (an approximation of a value P within 2^e
+   units of a[0], on either side) to prec bits gives the same result as
+   rounding P, in every strict rounding mode, with P inexact: the bits of
+   a from bit e of its lowest limb up to the bit below the rounding point
+   are neither all zero nor all ones */
+int _arf_rounding_certain(nn_srcptr a, slong an, slong e, slong prec);
+
+/* x y truncated to rn = ceil(prec / FLINT_BITS) limbs, within an ulp of
+   rn limbs; z must not alias an operand */
+void _arf_mpn_mul_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec);
+
+/* quotients and roots (arf/mpn_div.c): x / y and 1 / y; for the roots
+   x = A 2^e with A = {x, xn} B^-xn in [1/2, 1) and t = e mod 2, so that
+   sqrt(x) = {z, rn} B^-rn 2^((e + t) / 2 + *zexp) and
+   1 / sqrt(x) = {z, rn} B^-rn 2^((1 - t) - (e - t) / 2 + *zexp) */
+int _arf_mpn_div(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec, arf_rnd_t rnd);
+int _arf_mpn_inv(nn_ptr z, slong * zexp, nn_srcptr y, slong yn, slong prec, arf_rnd_t rnd);
+int _arf_mpn_sqrt(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec, arf_rnd_t rnd);
+int _arf_mpn_rsqrt(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec, arf_rnd_t rnd);
+void _arf_mpn_div_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong prec);
+void _arf_mpn_inv_approx(nn_ptr z, slong * zexp, nn_srcptr y, slong yn, slong prec);
+void _arf_mpn_sqrt_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec);
+void _arf_mpn_rsqrt_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, int t, slong prec);
+
+/* complex reciprocals, quotients and roots (arf/mpn_complex.c): the
+   magnitudes of the parts of 1 / (a + b i), (a + b i) / (c + d i),
+   sqrt(a + b i) and 1 / sqrt(a + b i), the exponents given as slongs
+   and the signs of the operands as sa, ...; see the file for the
+   signs of the results */
+void _arf_mpn_cinv_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, nn_srcptr b, slong bn, slong eb, slong prec);
+void _arf_mpn_cdiv_approx(nn_ptr re, slong * reexp, int * reneg, nn_ptr im, slong * imexp, int * imneg, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, int sb, nn_srcptr c, slong cn, slong ec, int sc, nn_srcptr d, slong dn, slong ed, int sd, slong prec);
+void _arf_mpn_csqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec);
+void _arf_mpn_crsqrt_approx(nn_ptr re, slong * reexp, nn_ptr im, slong * imexp, nn_srcptr a, slong an, slong ea, int sa, nn_srcptr b, slong bn, slong eb, slong prec);
+
+/* The buffer of alloc limbs for a kernel writing its result into z: the
+   limbs of z (allocated), unless z is one of the operands x, y (through
+   its struct or a shallow copy of its buffer) or the result may be
+   short enough for the inline limbs, in which case the kernel works in
+   scratch and the result is copied (ARF_KERNEL_FINISH). */
+#define ARF_KERNEL_DECL \
+    ulong __kstack[ARF_MUL_STACK_ALLOC]; \
+    nn_ptr __ktmp = NULL;
+
+#define ARF_KERNEL_ALLOC(zd, alloc, z, x, y) \
+    do { \
+        int __kalias = ((z) == (x) || (z) == (y) || (ARF_HAS_PTR(z) && \
+            (ARF_PTR_D(z) == (nn_ptr) ARF_NOPTR_D(x) || ARF_PTR_D(z) == (nn_ptr) ARF_NOPTR_D(y) || \
+             (ARF_HAS_PTR(x) && ARF_PTR_D(z) == ARF_PTR_D(x)) || (ARF_HAS_PTR(y) && ARF_PTR_D(z) == ARF_PTR_D(y))))); \
+        if (__kalias || (alloc) <= ARF_NOPTR_LIMBS + 1) \
+        { \
+            __ktmp = ((alloc) <= ARF_MUL_STACK_ALLOC) ? __kstack : flint_malloc(sizeof(ulong) * (alloc)); \
+            (zd) = __ktmp; \
+        } \
+        else \
+            ARF_GET_MPN_WRITE(zd, alloc, z); \
+    } while (0)
+
+/* the n normalised limbs of the result into z (n = 0: zero) */
+#define ARF_KERNEL_FINISH(z, zd, n, sgnbit) \
+    do { \
+        if ((n) == 0) \
+            arf_zero(z); \
+        else if (__ktmp != NULL) \
+            _arf_set_mpn_canonical_copy(z, zd, n, sgnbit); \
+        else \
+            _arf_set_mpn_canonical(z, n, sgnbit); \
+        if (__ktmp != NULL && __ktmp != __kstack) \
+            flint_free(__ktmp); \
+    } while (0)
+
+/* z from the n normalised limbs a kernel wrote into its buffer (of n
+   limbs): zero low limbs stripped, two or fewer limbs moved into the
+   inline limbs */
+ARF_INLINE void
+_arf_set_mpn_canonical(arf_ptr z, slong n, int sgnbit)
+{
+    nn_ptr d = ARF_HAS_PTR(z) ? ARF_PTR_D(z) : ARF_NOPTR_D(z);
+    slong k = 0;
+
+    while (d[k] == 0)
+        k++;
+    n -= k;
+
+    if (n <= ARF_NOPTR_LIMBS && ARF_HAS_PTR(z))
+    {
+        /* the kept limbs move into the struct, freeing the buffer */
+        ulong t0 = d[k], t1 = (n == 2) ? d[k + 1] : 0;
+        _arf_demote(z);
+        ARF_NOPTR_D(z)[0] = t0;
+        ARF_NOPTR_D(z)[1] = t1;
+    }
+    else if (k != 0)
+        flint_mpn_copyi(d, d + k, n);
+
+    ARF_XSIZE(z) = ARF_MAKE_XSIZE(n, sgnbit);
+}
+
+/* z from the n normalised limbs a kernel wrote in scratch (zero low
+   limbs stripped) */
+ARF_INLINE void
+_arf_set_mpn_canonical_copy(arf_ptr z, nn_srcptr d, slong n, int sgnbit)
+{
+    nn_ptr zd;
+
+    while (d[0] == 0)
+    {
+        d++;
+        n--;
+    }
+
+    ARF_GET_MPN_WRITE(zd, n, z);
+    flint_mpn_copyi(zd, d, n);
+    ARF_XSIZE(z) = ARF_MAKE_XSIZE(n, sgnbit);
+}
 
 /* strict mode with which the standard algorithms realise a relaxed mode */
 ARF_INLINE arf_rnd_t arf_rnd_relaxed_to_strict(arf_rnd_t rnd)
@@ -1179,6 +1404,14 @@ int arf_complex_mul_fallback(arf_t e, arf_t f,
         const arf_t a, const arf_t b,
         const arf_t c, const arf_t d,
         slong prec, arf_rnd_t rnd);
+
+/* the exact complex product (flint_mpn_mul_complex) of finite nonzero
+   LAGOM operands, and the approximate product of long balanced operands
+   for the dot products (only the bits above 2^bottom matter: the
+   complex high product kernel at the length they need, the error below
+   2^bottom; returns 0 when the shape is unsuitable) */
+void _arf_complex_mul_exact(arf_t e, arf_t f, const arf_t a, const arf_t b, const arf_t c, const arf_t d);
+int _arf_complex_mul_high_approx(arf_t e, arf_t f, const arf_t a, const arf_t b, const arf_t c, const arf_t d, slong bottom);
 
 int arf_complex_sqr(arf_t e, arf_t f, const arf_t a, const arf_t b,
                                       slong prec, arf_rnd_t rnd);

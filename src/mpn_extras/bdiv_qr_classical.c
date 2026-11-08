@@ -22,8 +22,8 @@
 
     Both products use the assembly-optimised low and high multiplication:
     flint_mpn_mulhigh_n is a lower approximation of the top bn + 1 limbs of
-    qb b whose deficit is below B (at most 2 bn units of the returned guard
-    limb), and the true value of the guard limb, limb bn - 1 of qb b, is the
+    qb b whose deficit is below B (at most 2 bn - 4 units of the returned
+    guard limb, FLINT_MPN_MULHIGH_N_GUARD_ERR_BOUND), and the true value of the guard limb, limb bn - 1 of qb b, is the
     known W[bn-1]; a borrow into the high part occurred iff the computed
     guard limb exceeds it. t is bn limbs of scratch. R may alias W.
 */

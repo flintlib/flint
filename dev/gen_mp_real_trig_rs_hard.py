@@ -491,12 +491,12 @@ class SGen:
             body.append("    z%dp[0] = 0;" % self.m)
             body.append("")
         if zbits == 64:
-            body.append("    flint_mpn_sqrhigh(z, x + 1, %d);" % gn_z)
+            body.append("    flint_mpn_sqrhigh_n(z, x + 1, %d);" % gn_z)
         elif zbits == 16 and xn <= 2:
             self.inl_scratch(decl)
             self.inl_sqrhigh(body, "z", "x", xn)
         else:
-            body.append("    flint_mpn_sqrhigh(z, x, %d);" % xn)
+            body.append("    flint_mpn_sqrhigh_n(z, x, %d);" % xn)
         for j in powers:
             n = self.gn(j)
             a = j // 2
@@ -505,7 +505,7 @@ class SGen:
                     self.inl_scratch(decl)
                     self.inl_sqrhigh(body, "z%d" % j, self.src(a, n), n)
                 else:
-                    body.append("    flint_mpn_sqrhigh(z%d, %s, %d);"
+                    body.append("    flint_mpn_sqrhigh_n(z%d, %s, %d);"
                                 % (j, self.src(a, n), n))
             elif zbits == 16 and n == 2:
                 self.inl_scratch(decl)
@@ -649,9 +649,9 @@ class SGen:
             decl.append("    mp_limb_t z[%d];" % (gn_z + zdelta))
             decl.append("    mp_limb_t th[%d];" % gn_z)
             if zbits == 64:
-                body.append("    flint_mpn_sqrhigh(z, x + 1, %d);" % gn_z)
+                body.append("    flint_mpn_sqrhigh_n(z, x + 1, %d);" % gn_z)
             else:
-                body.append("    flint_mpn_sqrhigh(z, x, %d);" % xn)
+                body.append("    flint_mpn_sqrhigh_n(z, x, %d);" % xn)
         body.append("    if (ysin != NULL)")
         body.append("    {")
         for i in range(xn):

@@ -96,66 +96,44 @@ ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
 ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
 
-/*
-   Method of Niels Moller and Torbjorn Granlund see paper:
-   Improved Division by Invariant Integers: (algorithm 4)
-   https://gmplib.org/~tege/division-paper.pdf
-*/
-ULONG_EXTRAS_INLINE ulong
-n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
-{
-    ulong q1, q0, r;
-    n <<= norm;
-    const ulong u1 = (norm == 0) ? 0 : a >> (FLINT_BITS - norm);
-    const ulong u0 = (a << norm);
-    umul_ppmm(q1, q0, ninv, u1);
-    add_ssaaaa(q1, q0, q1, q0, u1, u0);
-    (*q) = q1 + 1;
-    r = u0 - (*q) * n;
-    if (r > q0)
-    {
-        r += n;
-        (*q)--;
-    }
-    if (r >= n)
-    {
-        (*q)++;
-        r -= n;
-    }
-    return r >> norm;
-}
-
-ULONG_EXTRAS_INLINE ulong
-n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
-{
-    ulong q1, q0, r;
-    FLINT_ASSERT(norm >= 1);
-    n <<= norm;
-    const ulong u1 = a >> (FLINT_BITS - norm);
-    const ulong u0 = (a << norm);
-    umul_ppmm(q1, q0, ninv, u1);
-    add_ssaaaa(q1, q0, q1, q0, u1, u0);
-    (*q) = q1 + 1;
-    r = u0 - (*q) * n;
-    if (r > q0)
-    {
-        r += n;
-        (*q)--;
-    }
-    if (r >= n)
-    {
-        (*q)++;
-        r -= n;
-    }
-    return r >> norm;
-}
-
 ULONG_EXTRAS_INLINE ulong
 n_divrem_norm(ulong * q, ulong a, ulong n)
 {
     ulong q0 = (a >= n);
     *q = q0;
     return a - (n & (-q0));
+}
+
+/*
+   Barrett step of NMOD_RED (doc: algorithms/arithmetic/barrett#nmod), with
+   the constant m = 2^(FLINT_BITS - 1) + floor(ninv / 2) derived from the
+   inverse of n: for norm >= 1, the quotient estimate
+   floor(a m / 2^(2 FLINT_BITS - 1 - norm)) is at most one too small.
+*/
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    const ulong m = (ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+    ulong q0, r;
+    FLINT_ASSERT(norm >= 1);
+    q0 = n_mulhi(a, m) >> (FLINT_BITS - 1 - norm);
+    r = a - q0 * n;
+    if (r >= n)
+    {
+        q0++;
+        r -= n;
+    }
+    *q = q0;
+    return r;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    if (norm == 0)
+        return n_divrem_norm(q, a, n);
+    else
+        return n_divrem_preinv_unnorm(q, a, n, ninv, norm);
 }
 
 ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv);
@@ -272,9 +250,56 @@ ulong n_preinvert_limb_prenorm(ulong n);
 ulong n_mod_precomp(ulong a, ulong n, double ninv);
 ulong n_mod2_precomp(ulong a, ulong n, double ninv);
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
+ulong n_mod2_preinv_lazy(ulong a, ulong n, ulong ninv);
 
 ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, ulong n, ulong ninv);
 ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
+
+/* Barrett reduction of 2 or 3 words by n < 2^(FLINT_BITS - 1),
+ * see doc: algorithms/arithmetic/barrett#two-words  */
+ULONG_EXTRAS_INLINE void
+n_ll_barrett_precomp_preinv(ulong * qhi, ulong * qlo, ulong * b1, ulong * b2,
+                            ulong n, ulong ninv)
+{
+    unsigned int norm = flint_clz(n);
+    ulong d = n << norm, q, r;
+
+    FLINT_ASSERT(n >= 2);
+
+    udiv_qrnnd_preinv(q, r, UWORD(1) << norm, UWORD(0), d, ninv);
+    *qhi = q;
+    *b1 = r >> norm;
+    udiv_qrnnd_preinv(q, r, r, UWORD(0), d, ninv);
+    *qlo = q;
+    *b2 = r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_ll_mod_barrett(ulong hi, ulong lo, ulong n, ulong qhi, ulong qlo)
+{
+    ulong c2, c1, c0;
+
+    FLINT_ASSERT(n < (UWORD(1) << (FLINT_BITS - 1)));
+
+    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, hi, lo);
+    (void) c1;
+    (void) c0;
+    lo -= c2 * n;
+    return (lo >= n) ? lo - n : lo;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_lll_mod_barrett(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo,
+                  ulong b1, ulong b2)
+{
+    ulong h, l, t1, t0;
+
+    umul_ppmm(h, l, y2, b2);
+    umul_ppmm(t1, t0, y1, b1);
+    add_ssaaaa(h, l, h, l, t1, t0);
+    add_ssaaaa(h, l, h, l, UWORD(0), y0);
+    return n_ll_mod_barrett(h, l, n, qhi, qlo);
+}
 
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
@@ -408,6 +433,15 @@ ulong n_barrett_precomp(ulong n)
     return q;
 }
 
+/* floor((2^FLINT_BITS - 1) / n) from the inverse of n, without a division:
+   floor(m / 2^(FLINT_BITS - 1 - norm)) with m as in n_divrem_preinv_unnorm */
+ULONG_EXTRAS_INLINE
+ulong n_barrett_precomp_preinv(ulong n, ulong ninv)
+{
+    FLINT_ASSERT(n != 0);
+    return ((ninv >> 1) | (UWORD(1) << (FLINT_BITS - 1))) >> (FLINT_BITS - 1 - flint_clz(n));
+}
+
 ULONG_EXTRAS_INLINE
 ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
 {
@@ -427,6 +461,13 @@ ULONG_EXTRAS_INLINE
 ulong n_lemire_precomp(ulong n)
 {
     return UWORD_MAX / n + 1;
+}
+
+/* n_lemire_precomp(n) from the inverse of n, without a division */
+ULONG_EXTRAS_INLINE
+ulong n_lemire_precomp_preinv(ulong n, ulong ninv)
+{
+    return n_barrett_precomp_preinv(n, ninv) + 1;
 }
 
 ULONG_EXTRAS_INLINE
@@ -469,6 +510,30 @@ ULONG_EXTRAS_INLINE
 void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
 {
     udiv_qrnnd(*a_pr_quo, *a_pr_rem, a, UWORD(0), n);
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup_preinv(ulong a, ulong n, ulong ninv)
+{
+    ulong a_precomp, r;
+    unsigned int norm = flint_clz(n);
+    FLINT_ASSERT(a < n);
+    /* a B / n == (a 2^norm) B / (n 2^norm): normalised divisor,  */
+    /* and high word is below it (since a < n)                    */
+    udiv_qrnnd_preinv(a_precomp, r, a << norm, UWORD(0), n << norm, ninv);
+    (void) r;
+    return a_precomp;
+}
+
+ULONG_EXTRAS_INLINE
+void n_mulmod_precomp_shoup_quo_rem_preinv(ulong * a_pr_quo, ulong * a_pr_rem,
+                                           ulong a, ulong n, ulong ninv)
+{
+    ulong r;
+    unsigned int norm = flint_clz(n);
+    FLINT_ASSERT(a < n);
+    udiv_qrnnd_preinv(*a_pr_quo, r, a << norm, UWORD(0), n << norm, ninv);
+    *a_pr_rem = r >> norm;
 }
 
 ULONG_EXTRAS_INLINE

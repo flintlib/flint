@@ -199,7 +199,7 @@ _mp_real_rsqrt_ui_newton(nn_ptr Y, ulong a, slong n)
     /* Y -+= Yhi w: limb i of the product has weight B^(i - m - n - 2);
        from index m (two guard limbs), Vp + 2 is at B^-n */
     Vp = TMP_ALLOC((wn + 2) * sizeof(ulong));
-    flint_mpn_mulmid(Vp, Yhi, m, W, wn, m, m + wn);
+    _mp_real_mulhigh_window(Vp, Yhi, m, W, wn, m);
     {
         slong vn = wn - 2;
         if (vn > 0)
@@ -337,7 +337,7 @@ _mp_real_rsqrt_newton(nn_ptr Q, nn_srcptr A, slong An, slong n)
     {
         /* Q +-= T w */
         V = TMP_ALLOC((Tn + Ugn - (m - 2)) * sizeof(ulong));
-        flint_mpn_mulmid(V, T, Tn, Ug, Ugn, m - 2, Tn + Ugn);
+        _mp_real_mulhigh_window(V, T, Tn, Ug, Ugn, m - 2);
         Vhigh = V + 2;
         Vhighn = Tn + Ugn - (m - 2) - 2;
 
@@ -415,7 +415,7 @@ _mp_real_sqrt_newton(nn_ptr Q, nn_srcptr A, slong An, slong n)
     if (A2n > 2)
     {
         TS = TMP_ALLOC((Tn + 2) * sizeof(ulong));
-        flint_mpn_mulmid(TS, T, Tn, A2, A2n, A2n - 2, A2n + Tn);
+        _mp_real_mulhigh_window(TS, T, Tn, A2, A2n, A2n - 2);
         TShigh = TS + 2;
     }
     else

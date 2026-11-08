@@ -10,6 +10,38 @@
 */
 
 #include "acf.h"
+#include "approx_kernel.h"
+
+#define _ACF_KERNEL_STACK 40
+
+/* through the kernel of arf (arf/mpn_complex.c): both parts nonzero, finite, with
+   moderate exponents */
+static int
+_acf_approx_sqrt_kernel(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
+{
+    arf_srcptr a = acf_realref(x), b = acf_imagref(x);
+    nn_srcptr ad, bd;
+    slong an, bn, rn, er, ei;
+    ulong stack[2 * _ACF_KERNEL_STACK];
+    nn_ptr re, im;
+
+    if (!_acf_part_kernel_ok(a) || !_acf_part_kernel_ok(b) || prec < 2 || prec > (WORD(1) << (FLINT_BITS - 8)))
+        return 0;
+
+    ARF_GET_MPN_READONLY(ad, an, a);
+    ARF_GET_MPN_READONLY(bd, bn, b);
+    rn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+    re = (rn <= _ACF_KERNEL_STACK) ? stack : flint_malloc(2 * rn * sizeof(ulong));
+    im = re + rn;
+
+    _arf_mpn_csqrt_approx(re, &er, im, &ei, ad, an, ARF_EXP(a), ARF_SGNBIT(a), bd, bn, ARF_EXP(b), prec);
+    _acf_set_part(acf_realref(res), re, rn, er, 0, prec, rnd);
+    _acf_set_part(acf_imagref(res), im, rn, ei, ARF_SGNBIT(b), prec, rnd);
+
+    if (re != stack)
+        flint_free(re);
+    return 1;
+}
 
 void
 acf_approx_sqrt(acf_t y, const acf_t x, slong prec, arf_rnd_t rnd)
@@ -22,6 +54,9 @@ acf_approx_sqrt(acf_t y, const acf_t x, slong prec, arf_rnd_t rnd)
 #define b acf_imagref(x)
 #define c acf_realref(y)
 #define d acf_imagref(y)
+
+    if (_acf_approx_sqrt_kernel(y, x, prec, rnd))
+        return;
 
     if (arf_is_zero(b))
     {

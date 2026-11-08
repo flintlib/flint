@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2014, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,7 +11,6 @@
 
 #include "mpn_extras.h"
 #include "arf.h"
-
 
 static void
 arf_div_special(arf_t z, const arf_t x, const arf_t y)
@@ -32,16 +31,22 @@ arf_div_special(arf_t z, const arf_t x, const arf_t y)
         arf_neg_inf(z);
 }
 
+/*
+    arf_div through the quotient kernel of arf (arf/mpn_div.c): the
+    strict modes correctly rounded (the quotient with a guard limb when
+    its guard window certifies the rounding, the exact quotient with the
+    remainder otherwise), the relaxed modes as the strict modes of
+    arf_rnd_relaxed_to_strict (the inexact flag is reliable in all
+    modes).
+*/
 int
 arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 {
-    slong xn, yn, zn, sn, tn, alloc;
-    nn_srcptr xptr, yptr;
-    nn_ptr tmp;
-    nn_ptr tptr, zptr;
-    int inexact;
-    slong fix, fix2;
-    ARF_MUL_TMP_DECL
+    nn_srcptr xd, yd;
+    nn_ptr zd;
+    slong xn, yn, rn, fix;
+    int inexact, sgnbit;
+    ARF_KERNEL_DECL
 
     if (arf_is_special(x) || arf_is_special(y))
     {
@@ -49,21 +54,14 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
         return 0;
     }
 
-    if (rnd >= ARF_RND_FAST)
-    {
-        if (_arf_want_newton_div(x, y, prec))
-            return _arf_div_newton(z, x, y, prec, rnd);
-        rnd = arf_rnd_relaxed_to_strict(rnd);
-    }
-
-    ARF_GET_MPN_READONLY(xptr, xn, x);
-    ARF_GET_MPN_READONLY(yptr, yn, y);
-
-    /* Division by a power of two */
-    if (yn == 1 && yptr[0] == LIMB_TOP)
+    /* Division by a power of two (exact: allowed at ARF_PREC_EXACT) */
+    if (ARF_IS_POW2(y))
     {
         fmpz_t t;
         fmpz_init_set(t, ARF_EXPREF(y));
+
+        if (rnd >= ARF_RND_FAST)
+            rnd = arf_rnd_relaxed_to_strict(rnd);
 
         if (ARF_SGNBIT(y))
             inexact = arf_neg_round(z, x, prec, rnd);
@@ -75,61 +73,18 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
         return inexact;
     }
 
-    sn = FLINT_MAX(prec - xn * FLINT_BITS + yn * FLINT_BITS, 0) + 32;
-    sn = (sn + FLINT_BITS - 1) / FLINT_BITS;
+    if (prec == ARF_PREC_EXACT)
+        flint_throw(FLINT_ERROR, "arf_div: exact precision not supported\n");
 
-    /* Need space for numerator (tn), quotient (zn), and one extra limb at the
-       top of tptr for the multiplication to check the remainder. */
-    tn = xn + sn;
-    zn = tn - yn + 1;
-    alloc = zn + (tn + 1);
+    ARF_GET_MPN_READONLY(xd, xn, x);
+    ARF_GET_MPN_READONLY(yd, yn, y);
+    sgnbit = ARF_SGNBIT(x) ^ ARF_SGNBIT(y);
+    rn = (prec + FLINT_BITS - 1) / FLINT_BITS;
+    ARF_KERNEL_ALLOC(zd, rn, z, x, y);
 
-    ARF_MUL_TMP_ALLOC(tmp, alloc)
+    inexact = _arf_mpn_div(zd, &fix, xd, xn, yd, yn, prec, _arf_rnd_resolve(rnd, sgnbit));
 
-    zptr = tmp;
-    tptr = tmp + zn;
-
-    flint_mpn_zero(tptr, sn);
-    flint_mpn_copyi(tptr + sn, xptr, xn);
-    /* exact truncated quotient; dispatches to GMP or to Newton division */
-    flint_mpn_tdiv_q(zptr, tptr, tn, yptr, yn);
-
-    if (zptr[zn - 1] == 0)
-    {
-        zn--;
-        fix2 = 0;
-    }
-    else
-    {
-        fix2 = FLINT_BITS;
-    }
-
-    /* The remainder can only be zero if the last several bits of the
-       extended quotient are zero. */
-    if ((zptr[0] & ((LIMB_ONE << 24) - 1)) == 0)
-    {
-        /* The quotient is exact iff multiplying by y gives back the
-           input. Note: the multiplication may write sn + xn + 1 limbs, but
-           tptr[sn + xn] is guaranteed to be zero in that case since the
-           approximate quotient cannot be larger than the true quotient. */
-        if (zn >= yn)
-            flint_mpn_mul(tptr, zptr, zn, yptr, yn);
-        else
-            flint_mpn_mul(tptr, yptr, yn, zptr, zn);
-
-        /* The quotient is not exact. Perturbing the approximate quotient
-           and rounding gives the correct the result. */
-        if (!flint_mpn_zero_p(tptr, sn) ||
-            mpn_cmp(tptr + sn, xptr, xn) != 0)
-        {
-            zptr[0]++;
-        }
-    }
-
-    inexact = _arf_set_round_mpn(z, &fix, zptr, zn,
-            ARF_SGNBIT(x) ^ ARF_SGNBIT(y), prec, rnd);
-    _fmpz_sub2_fast(ARF_EXPREF(z), ARF_EXPREF(x), ARF_EXPREF(y), fix + fix2);
-    ARF_MUL_TMP_FREE(tmp, alloc)
-
+    ARF_KERNEL_FINISH(z, zd, rn, sgnbit);
+    _fmpz_sub2_fast(ARF_EXPREF(z), ARF_EXPREF(x), ARF_EXPREF(y), fix);
     return inexact;
 }

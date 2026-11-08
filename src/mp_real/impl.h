@@ -524,6 +524,7 @@ void _mp_real_const_gamma_1_3_compute(mp_real_t res, slong n);
 void _mp_real_const_gamma_1_4_compute(mp_real_t res, slong n);
 void _mp_real_const_2_div_pi_compute(mp_real_t res, slong n);
 void _mp_real_const_inv_log2_frac_compute(mp_real_t res, slong n);
+void _mp_real_const_khinchin_compute(mp_real_t res, slong n);
 
 /* ball-valued workers of the logarithm and arctangent (newton.c,
    log_agm.c) for a fixed-point input */
@@ -1871,8 +1872,30 @@ _mp_real_elem_set_error(mp_real_t res, int one, slong e)
 void _mp_real_newton_series(mp_real_t res, const mp_real_t w, slong uexp,
     slong p, const ulong * c, slong N, int odd, int alternating);
 
+/* The window [zlo, an + bn) of the product a * b, i.e. its top
+   an + bn - zlo limbs, as a lower approximation with the deficit in the
+   lowest limb (the window's guard limb): flint_mpn_mulhigh with that limb
+   as its returned guard limb, the squaring variant when the operands are
+   the same, or flint_mpn_mulmid for a window of one limb. The deficit is
+   at most FLINT_MPN_MULHIGH_GUARD_ERR_BOUND(an + bn - zlo - 1) units of
+   the lowest limb. */
+FLINT_FORCE_INLINE void
+_mp_real_mulhigh_window(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo)
+{
+    slong zn = an + bn - zlo;
+
+    if (zn < 2)
+        flint_mpn_mulmid(z, a, an, b, bn, zlo, an + bn);
+    else if (a == b && an == bn)
+        z[0] = flint_mpn_sqrhigh(z + 1, a, an, zn - 1);
+    else
+        z[0] = flint_mpn_mulhigh(z + 1, a, an, b, bn, zn - 1);
+}
+
+
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif
