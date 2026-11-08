@@ -205,6 +205,8 @@ _newton_to_monomial(nn_ptr ys, nn_srcptr xs, slong n, nmod_t mod)
         t = ys[i];
         ys[i] = ys[i + 1];
 
+        /* nmod_mul would do, but compilers tend to turn its
+           corrections into mispredicted branches in this loop */
         for (j = i + 1; j < n - 1; j++)
         {
             ys[j] = nmod_sub(ys[j + 1],

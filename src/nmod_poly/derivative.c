@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_derivative(nn_ptr x_prime, nn_srcptr x, slong len, nmod_t mod)
@@ -22,7 +23,7 @@ void _nmod_poly_derivative(nn_ptr x_prime, nn_srcptr x, slong len, nmod_t mod)
 		if (k <= 1)
             x_prime[j - 1] = k == 0 ? WORD(0) : x[j];
         else
-            x_prime[j - 1] = n_mulmod2_preinv(x[j], k, mod.n, mod.ninv);
+            x_prime[j - 1] = nmod_mul(x[j], k, mod);
 
         if (++k == mod.n) k = WORD(0);
 	}

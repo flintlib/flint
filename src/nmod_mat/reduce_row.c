@@ -113,7 +113,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                for (j = i + 1; j < L[m]; j++)
                {
                   NMOD_RED(A(m, j), rowm[j], M->mod);
-                  A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  A(m, j) = nmod_mul(A(m, j), h, M->mod);
                }
                break;
             case 2:
@@ -122,7 +122,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                   for (j = i + 1; j < L[m]; j++)
                   {
                      NMOD_RED2_BOUNDED(A(m, j), rowm[2*j + 1], rowm[2*j], M->mod);
-                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                     A(m, j) = nmod_mul(A(m, j), h, M->mod);
                   }
                }
                else
@@ -130,7 +130,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                   for (j = i + 1; j < L[m]; j++)
                   {
                      NMOD2_RED2(A(m, j), rowm[2*j + 1], rowm[2*j], M->mod);
-                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                     A(m, j) = nmod_mul(A(m, j), h, M->mod);
                   }
                }
                break;
@@ -140,7 +140,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                   for (j = i + 1; j < L[m]; j++)
                   {
                      NMOD_RED3_BOUNDED(A(m, j), rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], M->mod);
-                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                     A(m, j) = nmod_mul(A(m, j), h, M->mod);
                   }
                }
                else
@@ -149,7 +149,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                   {
                      NMOD_RED(rowm[3*j + 2], rowm[3*j + 2], M->mod);
                      NMOD_RED3(A(m, j), rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], M->mod);
-                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                     A(m, j) = nmod_mul(A(m, j), h, M->mod);
                   }
                }
                break;

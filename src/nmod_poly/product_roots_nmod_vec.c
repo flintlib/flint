@@ -32,6 +32,8 @@ _nmod_poly_product_roots_nmod_vec(nn_ptr poly, nn_srcptr xs, slong n, nmod_t mod
             poly[n-i-1] = nmod_neg(n_mulmod2_preinv(poly[n-i], xs[i],
                 mod.n, mod.ninv), mod);
 
+            /* nmod_mul would do, but compilers tend to turn its
+               corrections into mispredicted branches in this loop */
             for (j = 0; j < i - 1; j++)
             {
                 poly[n-i+j] = nmod_sub(poly[n-i+j],
