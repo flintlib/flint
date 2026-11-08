@@ -45,14 +45,15 @@
 
 /*
     One row a of A (k entries) against the r transposed columns bt
-    (stride kp, zero-padded to kp entries): c[j] = sum_i a[i] bt[j][i].
+    (stride kp, zero-padded to kp entries): c[j] = sum_i a[i] bt[j][i],
+    reduced by NMOD_RED2_BOUNDED if bounded (see cols_u52).
     r and u (accumulator pairs per column, r * u <= 8) are constants at
     each call site. The lanes are summed every chunk of iterations, when
     the u pairs of a column hold at most 508 halves per lane (below 2^61).
 */
 FLINT_FORCE_INLINE void
 cols_u52_row(ulong * c, const ulong * a, const ulong * bt, slong kp,
-             slong k, int r, int u, nmod_t mod)
+             slong k, int r, int u, nmod_t mod, int bounded)
 {
     const slong chunk = (504 / u) * (8 * u);   /* terms per chunk */
     __m512i lo[COLS_U52_MAXACC], hi[COLS_U52_MAXACC], x, y;
@@ -118,8 +119,12 @@ cols_u52_row(ulong * c, const ulong * a, const ulong * bt, slong kp,
                 lo[j] = hi[j] = _mm512_setzero_si512();
     }
 
-    for (j = 0; j < r; j++)
-        NMOD2_RED2(c[j], t1[j], t0[j], mod);
+    if (bounded)
+        for (j = 0; j < r; j++)
+            NMOD_RED2_BOUNDED(c[j], t1[j], t0[j], mod);
+    else
+        for (j = 0; j < r; j++)
+            NMOD2_RED2(c[j], t1[j], t0[j], mod);
 }
 
 static void
@@ -127,6 +132,10 @@ cols_u52(nmod_mat_t C, const nmod_mat_t A, const ulong * bt, slong kp, int r)
 {
     const slong m = A->r, k = A->c;
     const nmod_t mod = A->mod;
+    /* dot products of k terms below k 2^(2 nu): NMOD_RED2_BOUNDED if
+       nu + bitcount(k - 1) <= FLINT_BITS - 2, nu >= 3 (as in nmod_vec.h) */
+    const int bd = (FLINT_BIT_COUNT((ulong) k - 1) + 2 <= mod.norm)
+                   && (mod.norm <= FLINT_BITS - 3);
     slong i;
 
     for (i = 0; i < m; i++)
@@ -136,14 +145,14 @@ cols_u52(nmod_mat_t C, const nmod_mat_t A, const ulong * bt, slong kp, int r)
 
         switch (r)
         {
-            case 1: cols_u52_row(c, a, bt, kp, k, 1, 4, mod); break;
-            case 2: cols_u52_row(c, a, bt, kp, k, 2, 4, mod); break;
-            case 3: cols_u52_row(c, a, bt, kp, k, 3, 2, mod); break;
-            case 4: cols_u52_row(c, a, bt, kp, k, 4, 2, mod); break;
-            case 5: cols_u52_row(c, a, bt, kp, k, 5, 1, mod); break;
-            case 6: cols_u52_row(c, a, bt, kp, k, 6, 1, mod); break;
-            case 7: cols_u52_row(c, a, bt, kp, k, 7, 1, mod); break;
-            case 8: cols_u52_row(c, a, bt, kp, k, 8, 1, mod); break;
+            case 1: cols_u52_row(c, a, bt, kp, k, 1, 4, mod, bd); break;
+            case 2: cols_u52_row(c, a, bt, kp, k, 2, 4, mod, bd); break;
+            case 3: cols_u52_row(c, a, bt, kp, k, 3, 2, mod, bd); break;
+            case 4: cols_u52_row(c, a, bt, kp, k, 4, 2, mod, bd); break;
+            case 5: cols_u52_row(c, a, bt, kp, k, 5, 1, mod, bd); break;
+            case 6: cols_u52_row(c, a, bt, kp, k, 6, 1, mod, bd); break;
+            case 7: cols_u52_row(c, a, bt, kp, k, 7, 1, mod, bd); break;
+            case 8: cols_u52_row(c, a, bt, kp, k, 8, 1, mod, bd); break;
             default: FLINT_UNREACHABLE;
         }
     }
@@ -346,7 +355,10 @@ cols_fp50_row(ulong * c, const ulong * a, const ulong * bt, slong kp,
             umul_ppmm(s1, s0, a[p], bt[j * kp + p]);
             add_ssaaaa(t1, t0, t1, t0, s1, s0);
         }
-        NMOD2_RED2(c[j], t1, t0, mod);
+        /* below 2^54 + (FPV_VL - 1) (n - 1)^2 < 2^(2 nu + 3), at most
+           2^(nu + FLINT_BITS - 2) since 32 < nu <= 50 */
+        FLINT_ASSERT(mod.norm >= FLINT_BITS - 50 && mod.norm < FLINT_BITS - 32);
+        NMOD_RED2_BOUNDED(c[j], t1, t0, mod);
     }
 }
 

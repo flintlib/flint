@@ -57,7 +57,12 @@ _ple_noinv_update(ulong * row, const ulong * prow, slong len, ulong d,
 {
     slong j;
 
-    if (mod.norm > 0)
+    if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+    {
+        for (j = 0; j < len; j++)
+            row[j] = _nmod_fmma_bounded(d, row[j], ne, prow[j], mod);
+    }
+    else if (mod.norm > 0)
     {
         /* the sum of the two products is below n 2^FLINT_BITS */
         for (j = 0; j < len; j++)

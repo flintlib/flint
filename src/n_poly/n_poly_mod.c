@@ -953,28 +953,30 @@ void n_poly_mod_scalar_addmul_nmod(
 
     if (ctx.norm >= (FLINT_BITS + 1)/2)
     {
+        /* the values are below n^2 < 2^FLINT_BITS: one word, reduced by
+           NMOD_RED (a Barrett step, cheaper than NMOD_RED2) */
         for (i = 0; i + 2 <= FLINT_MIN(Blen, Clen); i += 2)
         {
-            NMOD_RED2(t0, UWORD(0), Bcoeffs[i + 0] + d0*Ccoeffs[i + 0], ctx);
-            NMOD_RED2(t1, UWORD(0), Bcoeffs[i + 1] + d0*Ccoeffs[i + 1], ctx);
+            NMOD_RED(t0, Bcoeffs[i + 0] + d0*Ccoeffs[i + 0], ctx);
+            NMOD_RED(t1, Bcoeffs[i + 1] + d0*Ccoeffs[i + 1], ctx);
             Acoeffs[i + 0] = t0;
             Acoeffs[i + 1] = t1;
         }
         for ( ; i < FLINT_MIN(Blen, Clen); i++)
         {
-            NMOD_RED2(Acoeffs[i], UWORD(0), Bcoeffs[i] + d0*Ccoeffs[i], ctx);
+            NMOD_RED(Acoeffs[i], Bcoeffs[i] + d0*Ccoeffs[i], ctx);
         }
 
         for ( ; i + 2 <= Clen; i += 2)
         {
-            NMOD_RED2(t0, UWORD(0), d0*Ccoeffs[i + 0], ctx);
-            NMOD_RED2(t1, UWORD(0), d0*Ccoeffs[i + 1], ctx);
+            NMOD_RED(t0, d0*Ccoeffs[i + 0], ctx);
+            NMOD_RED(t1, d0*Ccoeffs[i + 1], ctx);
             Acoeffs[i + 0] = t0;
             Acoeffs[i + 1] = t1;
         }
         for ( ; i < Clen; i++)
         {
-            NMOD_RED2(Acoeffs[i], UWORD(0), d0*Ccoeffs[i], ctx);
+            NMOD_RED(Acoeffs[i], d0*Ccoeffs[i], ctx);
         }
     }
     else

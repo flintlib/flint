@@ -205,7 +205,20 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
 
         R[0] = nmod_addmul(A[0], q0, B[0], mod);
 
-        if (NMOD_BITS(mod) != FLINT_BITS)
+        if (NMOD_CAN_USE_FMMA_BOUNDED(mod))
+        {
+            /* a residue plus two products, below 2 n^2 < 2^(2 nu + 1)
+               <= 2^(nu + FLINT_BITS - 2) as for _nmod_fmma_bounded */
+            for (i = 1; i < lenB - 1; i++)
+            {
+                umul_ppmm(t1, t0, q1, B[i - 1]);
+                umul_ppmm(s1, s0, q0, B[i]);
+                add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+                add_ssaaaa(t1, t0, t1, t0, s1, s0);
+                NMOD_RED2_BOUNDED(R[i], t1, t0, mod);
+            }
+        }
+        else if (NMOD_BITS(mod) != FLINT_BITS)
         {
             for (i = 1; i < lenB - 1; i++)
             {
@@ -310,7 +323,7 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R,
     slong iR, i;
     nn_ptr R2, ptrQ = Q - lenB + 1;
     ulong r, c;
-    int halflimb;
+    int halflimb, bounded;
 
     TMP_INIT;
     TMP_START;
@@ -324,9 +337,18 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R,
 
     halflimb = NMOD_IS_HALFLIMB(mod);
 
+    /* each entry is a residue plus at most lenA - lenB + 1 products, below
+       2^(2 nu + bitcount(lenA - lenB + 1)): at most 2^(nu + FLINT_BITS - 2)
+       if nu + bitcount(lenA - lenB + 1) <= FLINT_BITS - 2, with nu >= 3 */
+    bounded = (NMOD_BITS(mod) >= 3) && (NMOD_BITS(mod)
+               + FLINT_BIT_COUNT(lenA - lenB + 1) <= FLINT_BITS - 2);
+
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
-        r = n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
+        if (bounded)
+            NMOD_RED2_BOUNDED(r, R2[2 * iR + 1], R2[2 * iR], mod);
+        else
+            r = n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
 
         if (r == 0)
         {
@@ -351,8 +373,12 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R,
         }
     }
 
-    for (iR = 0; iR < lenB - 1; iR++)
-        R[iR] = n_ll_mod_preinv(R2[2*iR+1], R2[2*iR], mod.n, mod.ninv);
+    if (bounded)
+        for (iR = 0; iR < lenB - 1; iR++)
+            NMOD_RED2_BOUNDED(R[iR], R2[2*iR+1], R2[2*iR], mod);
+    else
+        for (iR = 0; iR < lenB - 1; iR++)
+            R[iR] = n_ll_mod_preinv(R2[2*iR+1], R2[2*iR], mod.n, mod.ninv);
 
     TMP_END;
 }

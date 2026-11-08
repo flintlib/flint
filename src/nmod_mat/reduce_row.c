@@ -16,6 +16,7 @@
 slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
 {
    slong n = M->c, i, j, r, bits, limbs;
+   int bounded;
    ulong * AA = M->entries;
    ulong h, hi, lo;
    ulong * rowm;
@@ -28,6 +29,11 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
 
    bits = FLINT_BIT_COUNT(M->mod.n)*2 + FLINT_BIT_COUNT(m + 1);
    limbs = (bits + FLINT_BITS - 1)/FLINT_BITS;
+
+   /* two limbs: the entries are below 2^bits <= 2^(nu + FLINT_BITS - 2)
+      if nu + bitcount(m + 1) <= FLINT_BITS - 2, nu = bitcount(n) >= 3 */
+   bounded = (limbs == 2) && M->mod.n >= 4
+          && bits <= (slong) FLINT_BIT_COUNT(M->mod.n) + FLINT_BITS - 2;
 
    TMP_START;
 
@@ -47,7 +53,10 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                NMOD_RED(A(m, i), rowm[i], M->mod);
                break;
             case 2:
-               NMOD2_RED2(A(m, i), rowm[2*i + 1], rowm[2*i], M->mod);
+               if (bounded)
+                  NMOD_RED2_BOUNDED(A(m, i), rowm[2*i + 1], rowm[2*i], M->mod);
+               else
+                  NMOD2_RED2(A(m, i), rowm[2*i + 1], rowm[2*i], M->mod);
                break;
             case 3:
                NMOD_RED(rowm[3*i + 2], rowm[3*i + 2], M->mod);                                      \
@@ -101,10 +110,21 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                }
                break;
             case 2:
-               for (j = i + 1; j < L[m]; j++)
+               if (bounded)
                {
-                  NMOD2_RED2(A(m, j), rowm[2*j + 1], rowm[2*j], M->mod);
-                  A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  for (j = i + 1; j < L[m]; j++)
+                  {
+                     NMOD_RED2_BOUNDED(A(m, j), rowm[2*j + 1], rowm[2*j], M->mod);
+                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  }
+               }
+               else
+               {
+                  for (j = i + 1; j < L[m]; j++)
+                  {
+                     NMOD2_RED2(A(m, j), rowm[2*j + 1], rowm[2*j], M->mod);
+                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  }
                }
                break;
             case 3:
