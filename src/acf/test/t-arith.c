@@ -41,11 +41,15 @@ arith_ball_rounds_to(arf_t res, const arb_t r, slong prec, arf_rnd_t rnd)
 {
     arf_t lo, hi;
     int ok;
+    /* (the endpoints rounded outward at the precision of the midpoint and
+       more: exact for an exact ball, and no huge exact sum for a radius
+       far below the midpoint) */
+    slong wp = FLINT_MAX(prec, (slong) arf_bits(arb_midref(r))) + 64;
 
     arf_init(lo);
     arf_init(hi);
-    arb_get_lbound_arf(lo, r, ARF_PREC_EXACT);
-    arb_get_ubound_arf(hi, r, ARF_PREC_EXACT);
+    arb_get_lbound_arf(lo, r, wp);
+    arb_get_ubound_arf(hi, r, wp);
     arf_set_round(lo, lo, prec, rnd);
     arf_set_round(hi, hi, prec, rnd);
     ok = arf_equal(lo, hi);

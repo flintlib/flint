@@ -1893,10 +1893,12 @@ _arf_small_tanh_2(ulong * t3, ulong * t2, ulong * t1, ulong * t0, slong * k, ulo
 
 /* (r[0], ..., r[len - 1]) = (a[0], ..., a[len - 1]) >> s for 1 <= s <
    2 FLINT_BITS, truncated */
+/* r = a >> s for 0 <= s < 2 FLINT_BITS (len limbs, truncated) */
 #define _ARF_POW_RSHIFT(r, a, len, s) \
     do { \
         slong __i; \
         ulong __s = (s); \
+        FLINT_ASSERT(__s < 2 * FLINT_BITS); \
         if (__s >= FLINT_BITS) \
         { \
             for (__i = 0; __i < (len) - 1; __i++) \

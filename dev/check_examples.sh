@@ -198,7 +198,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/I21 = \[43\.3273391411077 \+\/- 4\.52e-14] \+ \[\+\/- 1\.95e-14\]\*I/) { $found=1; last } END { exit !$found }'
+    echo "$res" | perl -0ne 'if (/I21 = \[43\.3273391411077 \+\/- 4\.25e-14] \+ \[\+\/- 1\.67e-14\]\*I/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";
     then
         echo "FAIL"

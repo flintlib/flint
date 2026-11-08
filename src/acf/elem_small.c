@@ -672,7 +672,9 @@ _acf_small_log_abs_2(_acf_frame_struct * re, ulong da1, ulong da0, slong ea, ulo
 
         if (derr)
         {
-            if (2 * E - ed > 120)
+            /* (the error of S scaled to the units of D: it must fit a
+               word, with room for the series' count) */
+            if (2 * E - ed > FLINT_BITS - 8)
                 return ARF_ELEM_UNCERTAIN;
             derr = UWORD(1) << (2 * E - ed);
         }

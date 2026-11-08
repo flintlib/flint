@@ -596,7 +596,21 @@ _acf_small_pow_term_1(ulong * Z, ulong r2, ulong r1, ulong r0, slong k, ulong m,
     else if (-sh >= 5 * FLINT_BITS)
         flint_mpn_zero(Z, 5);
     else
-        _ARF_POW_RSHIFT(Z, P, 5, -sh);
+    {
+        /* (shifts of up to five limbs: _ARF_POW_RSHIFT takes less than
+           two) */
+        slong q = (-sh) / FLINT_BITS, i;
+        unsigned int b = (-sh) % FLINT_BITS;
+
+        for (i = 0; i < 5; i++)
+            Z[i] = (i + q < 5) ? P[i + q] : 0;
+        if (b != 0)
+        {
+            for (i = 0; i < 4; i++)
+                Z[i] = (Z[i] >> b) | (Z[i + 1] << (FLINT_BITS - b));
+            Z[4] >>= b;
+        }
+    }
 }
 
 /* the signed sum S = (-1)^s1 A + (-1)^s2 B of 5-limb magnitudes, as a

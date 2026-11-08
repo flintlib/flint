@@ -104,11 +104,15 @@ ball_rounds_to(arf_t res, const arb_t r, slong prec, arf_rnd_t rnd)
 {
     arf_t lo, hi;
     int ok;
+    /* (the endpoints rounded outward at the precision of the midpoint and
+       more: exact for an exact ball, and no huge exact sum for a radius
+       far below the midpoint) */
+    slong wp = FLINT_MAX(prec, (slong) arf_bits(arb_midref(r))) + 64;
 
     arf_init(lo);
     arf_init(hi);
-    arb_get_lbound_arf(lo, r, ARF_PREC_EXACT);
-    arb_get_ubound_arf(hi, r, ARF_PREC_EXACT);
+    arb_get_lbound_arf(lo, r, wp);
+    arb_get_ubound_arf(hi, r, wp);
     arf_set_round(lo, lo, prec, rnd);
     arf_set_round(hi, hi, prec, rnd);
     ok = arf_equal(lo, hi);
@@ -328,6 +332,64 @@ TEST_FUNCTION_START(acf_elem, state)
         acb_clear(z);
         acb_clear(w);
         acb_clear(w2);
+    }
+
+    /* the register path of pow with a far smaller real part of x and
+       of y (shifts of the terms y log x by several limbs), in every
+       mode: x = -291173 2^-223 - 123 2^5 i, y = -57 2^-198 - i, and
+       random parts of such sizes */
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    {
+        acf_t x, y, r;
+        acb_t z, zy, w;
+        arf_rnd_t rnd;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        acb_init(z);
+        acb_init(zy);
+        acb_init(w);
+
+        if (iter == 0)
+        {
+            arf_set_si_2exp_si(acf_realref(x), -291173, -223);
+            arf_set_si_2exp_si(acf_imagref(x), -123, 5);
+            arf_set_si_2exp_si(acf_realref(y), -57, -198);
+            arf_set_si_2exp_si(acf_imagref(y), -1, 0);
+        }
+        else
+        {
+            arf_set_si_2exp_si(acf_realref(x), (slong) n_randint(state, 1000000) + 1, -(slong) n_randint(state, 400));
+            arf_set_si_2exp_si(acf_imagref(x), (slong) n_randint(state, 1000) + 1, (slong) n_randint(state, 20) - 10);
+            arf_set_si_2exp_si(acf_realref(y), (slong) n_randint(state, 1000) + 1, -(slong) n_randint(state, 400));
+            arf_set_si_2exp_si(acf_imagref(y), (slong) n_randint(state, 7) + 1, (slong) n_randint(state, 4) - 2);
+            if (n_randint(state, 2)) arf_neg(acf_realref(x), acf_realref(x));
+            if (n_randint(state, 2)) arf_neg(acf_imagref(x), acf_imagref(x));
+            if (n_randint(state, 2)) arf_neg(acf_realref(y), acf_realref(y));
+            if (n_randint(state, 2)) arf_neg(acf_imagref(y), acf_imagref(y));
+            if (n_randint(state, 2)) arf_swap(acf_realref(x), acf_imagref(x));
+        }
+
+        arb_set_arf(acb_realref(z), acf_realref(x));
+        arb_set_arf(acb_imagref(z), acf_imagref(x));
+        arb_set_arf(acb_realref(zy), acf_realref(y));
+        arb_set_arf(acb_imagref(zy), acf_imagref(y));
+        acb_pow(w, z, zy, 1000);
+
+        for (rnd = 0; rnd <= ARF_RND_ACCURATE; rnd++)
+        {
+            acf_pow(r, x, y, 64, rnd);
+            check_part("pow", "real", acf_realref(r), acb_realref(w), acb_imagref(w), x, y, 64, rnd);
+            check_part("pow", "imag", acf_imagref(r), acb_imagref(w), acb_realref(w), x, y, 64, rnd);
+        }
+
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
+        acb_clear(z);
+        acb_clear(zy);
+        acb_clear(w);
     }
 
     TEST_FUNCTION_END(state);
