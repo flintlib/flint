@@ -214,6 +214,13 @@ The default conversion from another ring: `gr_set` if `xctx` is `ctx`, `gr_set_f
 :::
 
 ::: function
+int gr_generic_set_arb(gr_ptr res, const arb_t x, gr_ctx_t ctx)
+int gr_generic_set_acb(gr_ptr res, const acb_t x, gr_ctx_t ctx)
+
+Sets `res` to the value of the exact ball `x`, using `gr_set_fmpz_2exp_fmpz` and `gr_i`. Returns `GR_UNABLE` if `x` is inexact, and also if `x` is infinite and the ring may contain infinities.
+:::
+
+::: function
 int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 
 Sets `res` to $p/q$ by converting $p$ and $q$ with `gr_set_fmpz`, inverting $q$ and multiplying; returns `GR_DOMAIN` if $q$ is not invertible in the ring.

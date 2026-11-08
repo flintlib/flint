@@ -12,6 +12,7 @@
 #include <string.h>
 #include "fmpq.h"
 #include "arb.h"
+#include "acb.h"
 #include "arith.h"
 #include "bernoulli.h"
 #include "fexpr.h"
@@ -361,6 +362,64 @@ int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx)
     {
         return GR_UNABLE;
     }
+}
+
+/* generated using Claude Opus 5.5 */
+int gr_generic_set_arb(gr_ptr res, const arb_t x, gr_ctx_t ctx)
+{
+    fmpz_t m, e;
+    int status;
+
+    if (!arb_is_exact(x))
+        return GR_UNABLE;
+
+    if (!arf_is_finite(arb_midref(x)))
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, ctx);
+        if (gr_pos_inf(t, ctx) == GR_DOMAIN && gr_uinf(t, ctx) == GR_DOMAIN)
+            status = GR_DOMAIN;
+        else
+            status = GR_UNABLE;
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
+    fmpz_init(m);
+    fmpz_init(e);
+    arf_get_fmpz_2exp(m, e, arb_midref(x));
+    status = gr_set_fmpz_2exp_fmpz(res, m, e, ctx);
+    fmpz_clear(m);
+    fmpz_clear(e);
+    return status;
+}
+
+/* generated using Claude Opus 5.5 */
+int gr_generic_set_acb(gr_ptr res, const acb_t x, gr_ctx_t ctx)
+{
+    gr_ptr t, u;
+    int status;
+
+    if (arb_is_zero(acb_imagref(x)))
+        return gr_generic_set_arb(res, acb_realref(x), ctx);
+
+    GR_TMP_INIT2(t, u, ctx);
+
+    status = gr_i(t, ctx);
+    if (status == GR_SUCCESS)
+    {
+        status |= gr_generic_set_arb(u, acb_imagref(x), ctx);
+        status |= gr_mul(t, t, u, ctx);
+        status |= gr_generic_set_arb(u, acb_realref(x), ctx);
+        status |= gr_add(res, u, t, ctx);
+    }
+    else if (status == GR_DOMAIN && arb_contains_zero(acb_imagref(x)))
+    {
+        status = GR_UNABLE;
+    }
+
+    GR_TMP_CLEAR2(t, u, ctx);
+    return status;
 }
 
 int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
