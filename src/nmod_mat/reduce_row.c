@@ -30,10 +30,12 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
    bits = FLINT_BIT_COUNT(M->mod.n)*2 + FLINT_BIT_COUNT(m + 1);
    limbs = (bits + FLINT_BITS - 1)/FLINT_BITS;
 
-   /* two limbs: the entries are below 2^bits <= 2^(nu + FLINT_BITS - 2)
-      if nu + bitcount(m + 1) <= FLINT_BITS - 2, nu = bitcount(n) >= 3 */
-   bounded = (limbs == 2) && M->mod.n >= 4
-          && bits <= (slong) FLINT_BIT_COUNT(M->mod.n) + FLINT_BITS - 2;
+   /* the entries of rowm (a residue plus at most m products of residues)
+      are below 2^bits: NMOD_RED2_BOUNDED (two limbs) and NMOD_RED3_BOUNDED
+      (three limbs) apply if bits <= nu + (limbs - 1) FLINT_BITS - 2, where
+      nu = bitcount(n) satisfies 3 <= nu < FLINT_BITS */
+   bounded = M->mod.n >= 4 && M->mod.norm != 0
+          && bits <= (slong) FLINT_BIT_COUNT(M->mod.n) + (limbs - 1) * FLINT_BITS - 2;
 
    TMP_START;
 
@@ -59,8 +61,13 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                   NMOD2_RED2(A(m, i), rowm[2*i + 1], rowm[2*i], M->mod);
                break;
             case 3:
-               NMOD_RED(rowm[3*i + 2], rowm[3*i + 2], M->mod);                                      \
-               NMOD_RED3(A(m, i), rowm[3*i + 2], rowm[3*i + 1], rowm[3*i], M->mod);
+               if (bounded)
+                  NMOD_RED3_BOUNDED(A(m, i), rowm[3*i + 2], rowm[3*i + 1], rowm[3*i], M->mod);
+               else
+               {
+                  NMOD_RED(rowm[3*i + 2], rowm[3*i + 2], M->mod);
+                  NMOD_RED3(A(m, i), rowm[3*i + 2], rowm[3*i + 1], rowm[3*i], M->mod);
+               }
                break;
          }
       }
@@ -128,11 +135,22 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                }
                break;
             case 3:
-               for (j = i + 1; j < L[m]; j++)
+               if (bounded)
                {
-                  NMOD_RED(rowm[3*j + 2], rowm[3*j + 2], M->mod);                                      \
-                  NMOD_RED3(A(m, j), rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], M->mod);
-                  A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  for (j = i + 1; j < L[m]; j++)
+                  {
+                     NMOD_RED3_BOUNDED(A(m, j), rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], M->mod);
+                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  }
+               }
+               else
+               {
+                  for (j = i + 1; j < L[m]; j++)
+                  {
+                     NMOD_RED(rowm[3*j + 2], rowm[3*j + 2], M->mod);
+                     NMOD_RED3(A(m, j), rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], M->mod);
+                     A(m, j) = n_mulmod2_preinv(A(m, j), h, M->mod.n, M->mod.ninv);
+                  }
                }
                break;
             }

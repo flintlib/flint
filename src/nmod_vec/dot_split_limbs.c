@@ -215,10 +215,7 @@ split_limbs_add_shifted(ulong * t2, ulong * t1, ulong * t0, ulong x, int sh)
     if (t2 == 0)                                                            \
         NMOD2_RED2(res, t1, t0, mod);                                       \
     else                                                                    \
-    {                                                                       \
-        NMOD_RED(t2, t2, mod);                                              \
-        NMOD_RED3(res, t2, t1, t0, mod);                                    \
-    }                                                                       \
+        _NMOD_VEC_DOT3_RED(res, t2, t1, t0, mod);                           \
     return res;
 
 ulong

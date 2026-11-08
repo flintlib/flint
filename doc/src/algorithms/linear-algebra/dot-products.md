@@ -174,8 +174,11 @@ and $k = 2$.
 :::
 
 The final reduction of a three-word sum $t_2 B^2 + t_1 B + t_0$, where
-$B = 2^{\beta}$, first reduces $t_2$ modulo $n$ and then performs two
-two-by-one divisions (`NMOD_RED3`).
+$B = 2^{\beta}$: the sum is below $\ell \, 2^{2\nu} < 2^{\nu + 2\beta - 2}$
+for every length $\ell < 2^{\beta - 1}$ when $\nu \le \beta - 1$, so
+`NMOD_RED3_BOUNDED` applies, a bounded step on $(t_2, t_1)$ and one
+two-by-one division. For $\nu = \beta$ it first reduces $t_2$ modulo $n$ and
+then performs two two-by-one divisions (`NMOD_RED3`).
 
 ## Splitting at bit 56 {#split}
 

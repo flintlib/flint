@@ -379,6 +379,20 @@ do                                                                    \
         NMOD2_RED2(res, hi, lo, mod);                                 \
 } while (0)
 
+/* res = (t2 B^2 + t1 B + t0) mod n for a three-limb dot product */
+#define _NMOD_VEC_DOT3_RED(res, t2, t1, t0, mod)                      \
+do                                                                    \
+{                                                                     \
+    if ((mod).norm >= 1 && (mod).norm <= FLINT_BITS - 3)             \
+        NMOD_RED3_BOUNDED(res, t2, t1, t0, mod);                      \
+    else                                                              \
+    {                                                                 \
+        ulong t2rxx;                                                  \
+        NMOD_RED(t2rxx, t2, mod);                                     \
+        NMOD_RED3(res, t2rxx, t1, t0, mod);                           \
+    }                                                                 \
+} while (0)
+
 // auxiliary for short dot products
 // (fixedlen small constant: compiler unrolls the loops completely)
 #define _NMOD_VEC_DOT_SHORT1(fixedlen,expr1,expr2)       \
@@ -417,9 +431,8 @@ do                                                                    \
                                 UWORD(0), s1, s0);           \
             }                                                \
                                                              \
-            NMOD_RED(t2, t2, mod);                           \
             ulong res;                                       \
-            NMOD_RED3(res, t2, t1, t0, mod);                 \
+            _NMOD_VEC_DOT3_RED(res, t2, t1, t0, mod);        \
             return res;                                      \
         }                                                    \
 
@@ -813,8 +826,7 @@ do                                                                    \
                     t2zz, t1zz, t0zz,                                 \
                     UWORD(0), u1zz, u0zz);                            \
                                                                       \
-    NMOD_RED(t2zz, t2zz, mod);                                        \
-    NMOD_RED3(res, t2zz, t1zz, t0zz, mod);                            \
+    _NMOD_VEC_DOT3_RED(res, t2zz, t1zz, t0zz, mod);                   \
 } while(0);
 
 // _DOT3   (three limbs, general)
@@ -834,8 +846,7 @@ do                                                                    \
                         UWORD(0), s1zz, s0zz);                        \
     }                                                                 \
                                                                       \
-    NMOD_RED(t2zz, t2zz, mod);                                        \
-    NMOD_RED3(res, t2zz, t1zz, t0zz, mod);                            \
+    _NMOD_VEC_DOT3_RED(res, t2zz, t1zz, t0zz, mod);                   \
 } while(0);
 
 /* ---- macros for dot product with expressions, general ---- */

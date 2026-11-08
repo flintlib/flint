@@ -134,8 +134,7 @@ u64_dot_acc_dump(ulong * t2, ulong * t1, ulong * t0, const u64_dot_acc * a)
     }                                                                       \
                                                                             \
     u64_dot_acc_dump(&t2, &t1, &t0, &acc);                                  \
-    NMOD_RED(t2, t2, mod);                                                  \
-    NMOD_RED3(res, t2, t1, t0, mod);                                        \
+    _NMOD_VEC_DOT3_RED(res, t2, t1, t0, mod);                               \
     return res;
 
 ulong
