@@ -24,6 +24,7 @@
 
 #include "limb_types.h"
 #include "longlong.h"
+#include "flint-mparam.h"  /* FLINT_PREINVERT_LIMB_USE_NATIVE */
 
 #ifdef __cplusplus
 extern "C" {
@@ -299,6 +300,220 @@ n_lll_mod_barrett(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo,
     add_ssaaaa(h, l, h, l, t1, t0);
     add_ssaaaa(h, l, h, l, UWORD(0), y0);
     return n_ll_mod_barrett(h, l, n, qhi, qlo);
+}
+
+/* Division by an invariant word d >= 1 with a multiplier of one word (Granlund-Montgomery,
+ * in the variant of Robison), see doc: ulong_extras#div-precomp */
+typedef struct
+{
+    ulong m;
+    unsigned int e;
+    unsigned int c;
+}
+n_div_precomp_struct;
+
+typedef n_div_precomp_struct n_div_precomp_t[1];
+
+/* from dinv = n_preinvert_limb(d), without a division: for d not a power
+   of two, floor(2^(FLINT_BITS + e) / d) = (dinv >> 1) | 2^(FLINT_BITS - 1),
+   the constant of NMOD_RED (see doc: algorithms/arithmetic/barrett#nmod),
+   and the remainder of that division is -q d mod 2^FLINT_BITS */
+ULONG_EXTRAS_INLINE void
+n_div_precomp_init_preinv(n_div_precomp_t pre, ulong d, ulong dinv)
+{
+    pre->e = FLINT_BIT_COUNT(d) - 1;
+
+    if ((d & (d - 1)) == 0)
+    {
+        pre->m = 0;
+        pre->c = 0;
+    }
+    else
+    {
+        ulong q = (dinv >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+        ulong r = -(q * d);
+
+        if (d - r < (UWORD(1) << pre->e))
+        {
+            pre->m = q + 1;
+            pre->c = 0;
+        }
+        else
+        {
+            pre->m = q;
+            pre->c = 1;
+        }
+    }
+}
+
+ULONG_EXTRAS_INLINE void
+n_div_precomp_init(n_div_precomp_t pre, ulong d)
+{
+#if !FLINT_PREINVERT_LIMB_USE_NATIVE
+    /* n_preinvert_limb avoids the two-word division here (slow, or C code
+       on arm64): from the inverse, not needed for a power of two */
+    n_div_precomp_init_preinv(pre, d, (d & (d - 1)) ? n_preinvert_limb(d) : 0);
+#else
+    pre->e = FLINT_BIT_COUNT(d) - 1;
+
+    if ((d & (d - 1)) == 0)
+    {
+        pre->m = 0;
+        pre->c = 0;
+    }
+    else
+    {
+        ulong q, r;
+        udiv_qrnnd(q, r, UWORD(1) << pre->e, 0, d);
+        if (d - r < (UWORD(1) << pre->e))
+        {
+            pre->m = q + 1;
+            pre->c = 0;
+        }
+        else
+        {
+            pre->m = q;
+            pre->c = 1;
+        }
+    }
+#endif
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp_m0(ulong x, const n_div_precomp_t pre)
+{
+    return x >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(x, pre->m) >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong n_incsat(ulong x)
+{
+    ulong t = x + 1;
+    return (t > x) ? t : x;
+}
+
+/* Assumes x != UWORD_MAX */
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp_m0(ulong x, ulong FLINT_UNUSED(d), const n_div_precomp_t pre)
+{
+    return x & ((UWORD(1) << pre->e) - 1);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c0(x, pre);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1(x, pre);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_bounded(x, pre);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1_bounded(x, pre);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp(x, pre);
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp_m0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_m0(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c0(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c1(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_c1_bounded(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_bounded(x, pre);
+    *r = x - d * q;
+    return q;
 }
 
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);

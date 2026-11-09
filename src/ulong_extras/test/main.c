@@ -23,6 +23,7 @@
 #include "t-CRT.c"
 #include "t-discrete_log_bsgs.c"
 #include "t-div2_preinv.c"
+#include "t-div_precomp.c"
 #include "t-divides.c"
 #include "t-divrem2_precomp.c"
 #include "t-divrem2_preinv.c"
@@ -128,6 +129,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_CRT),
     TEST_FUNCTION(n_discrete_log_bsgs),
     TEST_FUNCTION(n_div2_preinv),
+    TEST_FUNCTION(n_div_precomp),
     TEST_FUNCTION(n_divides),
     TEST_FUNCTION(n_divrem2_precomp),
     TEST_FUNCTION(n_divrem2_preinv),

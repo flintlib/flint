@@ -161,12 +161,15 @@ most some $Y$, typically for sums of products of residues. The high word
 of $x$ is below $n$ for every such input exactly when
 $Y b_2 + (B - 1)(b_1 + 1) < nB$, since the left-hand side is the largest
 fold, reached at $y_2 = Y$ and $y_1 = y_0 = B - 1$
-(`_nmod_red3_fold_can_skip_sub`, `NMOD_RED3_FOLD_FULLWORD_NOSUB`). For
-$n = B/2 + \delta$ with $0 < \delta < 2^{\bits / 2 - 2}$, where
-$b_1 = B/2 - \delta$ and $b_2 = 4\delta^2$, it holds for
-$Y \le B/(4\delta)$, in particular for $Y \le 2^{\bits / 2}$; for other
-full-word moduli and small $Y$ it fails only when $2n - B$ is very small
-compared with $b_2 Y / B$.
+(`_nmod_red3_fold_can_skip_sub`, `NMOD_RED3_FOLD_FULLWORD_NOSUB`). It
+holds for every $n \ge B/2$ as soon as $2Y(Y + 1) \le B$, which covers the
+sums of up to about $2^{\bits/2}$ products. Write $n = B/2 + \delta$; the
+condition reads $Y b_2 < 2\delta B - n + 1$. If $2\delta \ge Y + 1$, it
+follows from $b_2 \le n - 1$. Otherwise $\delta \le Y/2 < 2^{\bits/2 - 1}$,
+so $b_1 = B/2 - \delta$, $b_2 = 4\delta^2$ (or $b_1 = b_2 = 0$ when
+$\delta = 0$), and $Y \le B/(2(Y + 1)) < B/(4\delta)$ gives
+$Y b_2 \le \delta B < 2\delta B - n + 1$. For larger $Y$ it can fail, for
+$n$ just above $B/2$.
 `_nmod_red3_precomp_init` evaluates the test once per modulus and bound,
 and `_nmod_red3_precomp` then chooses between `n_lll_mod_barrett` and the
 two folds.

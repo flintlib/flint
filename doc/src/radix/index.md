@@ -890,75 +890,14 @@ $r = x - s^2$, and throws an exception for negative $x$.
 negative $x$).
 :::
 
-## Division by an invariant word {#div-precomp}
+## Utilities {#utilities}
 
-The following inline functions divide words by a fixed word $d \ge 1$ with
-a precomputed multiplier, by the method of Granlund and Montgomery
-[@GraMon1994] in the variant of Robison [@Rob2005] that needs no
-multiplier wider than a word. They are used for the digit shifts of this
-module, where $d$ is a power of $b$.
-
-::: type
-n_div_precomp_struct
-n_div_precomp_t
-
-Precomputed data for division by $d$: the exponent $\ell =
-\lfloor \log_2 d \rfloor$ (field `e`), a multiplier `m` and a flag `c`.
-If $d$ is a power of two, $m = 0$. Otherwise, with
-$q = \lfloor 2^{\ell + \bits}/d \rfloor$, either $m = q + 1$ and $c = 0$
-(the *round-up* method, when it is exact for all words) or $m = q$ and
-$c = 1$ (the *round-down* method with an increment).
-:::
+The digit shifts of this module divide by the powers of $b$ with the
+functions for division by an invariant word of ulong_extras
+([](ulong_extras#div-precomp)).
 
 ::: type
 n_pair_struct
 
 A pair of words (fields `a` and `b`).
-:::
-
-::: function
-void n_div_precomp_init(n_div_precomp_t pre, ulong d)
-
-Computes the data for division by $d \ge 1$.
-:::
-
-::: function
-ulong n_div_precomp(ulong x, const n_div_precomp_t pre)
-ulong n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
-ulong n_div_precomp_m0(ulong x, const n_div_precomp_t pre)
-ulong n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
-ulong n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
-ulong n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
-
-Return $\lfloor x/d \rfloor$ for any word $x$: `n_div_precomp` selects
-the method from `pre`, and the other functions are the individual methods
-for callers that know the case: $x \gg \ell$ for a power of two ($m = 0$),
-$\lfloor xm / 2^{\bits} \rfloor \gg \ell$ for $c = 0$, and
-$\lfloor (x + 1) m / 2^{\bits} \rfloor \gg \ell$ for $c = 1$, where
-$x + 1$ saturates at $\beta - 1$. The `bounded` versions require
-$x \ne \beta - 1$ and skip the saturation.
-:::
-
-::: function
-ulong n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_rem_precomp_m0(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp_m0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-ulong n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-
-The remainder $x \bmod d$, and the quotient with the remainder stored in
-`*r`, with the same variants as the quotient functions.
-:::
-
-::: function
-ulong n_incsat(ulong x)
-
-Returns $x + 1$, or $x$ if $x = \beta - 1$ (saturating increment).
 :::

@@ -82,10 +82,6 @@ static int u32_is_base2_pseudoprime(uint32_t x)
 /* Faster arithmetic for 32-bit probable prime test on 64-bit machines. */
 #if FLINT_BITS == 64
 
-/* Use the division routines currently defined internally in radix.h;
-   todo - move to ulong_extras */
-#include "radix.h"
-
 static ulong
 n_2_powmod_c0(uint32_t exp, ulong n, const n_div_precomp_t pre)
 {
