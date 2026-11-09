@@ -1069,6 +1069,58 @@ _gr_fmpq_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int f
     return GR_SUCCESS;
 }
 
+/* generated using Claude Code (claude-opus-5-5) */
+static int
+_gr_fmpq_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt,
+                     int flags, gr_ctx_t ctx)
+{
+    const gr_poly_struct * poly = elt;
+    slong len = poly->length;
+    fmpz_poly_t num;
+    fmpz_t den;
+    fmpz_poly_factor_t zfac;
+    gr_ctx_t Pol;
+    int status = GR_SUCCESS;
+
+    if (len == 0)
+        return GR_DOMAIN;
+
+    fmpz_poly_init2(num, len);
+    fmpz_init(den);
+    fmpz_poly_factor_init(zfac);
+    gr_ctx_init_gr_poly(Pol, ctx);
+
+    _fmpq_vec_get_fmpz_vec_den(num->coeffs, den, poly->coeffs, len);
+    _fmpz_poly_set_length(num, len);
+    fmpz_poly_factor(zfac, num);
+
+    status |= gr_poly_set_scalar(c, gr_poly_coeff_srcptr(poly, len - 1, ctx), ctx);
+
+    gr_vec_set_length(fac, zfac->num, Pol);
+    fmpz_vec_set_length(mult, zfac->num);
+
+    for (slong i = 0; i < zfac->num; i++)
+    {
+        fmpz_poly_struct * f = zfac->p + i;
+        gr_poly_struct * g = gr_vec_entry_ptr(fac, i, Pol);
+        fmpz * lc = f->coeffs + f->length - 1;
+
+        gr_poly_fit_length(g, f->length, ctx);
+        for (slong j = 0; j < f->length; j++)
+            fmpq_set_fmpz_frac((fmpq *) g->coeffs + j, f->coeffs + j, lc);
+        _gr_poly_set_length(g, f->length, ctx);
+
+        fmpz_set_si(mult->entries + i, zfac->exp[i]);
+    }
+
+    gr_ctx_clear(Pol);
+    fmpz_poly_factor_clear(zfac);
+    fmpz_clear(den);
+    fmpz_poly_clear(num);
+
+    return status;
+}
+
 static int
 _gr_fmpq_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
@@ -1270,6 +1322,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpq_vec_sum},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpq_poly_mulmid},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpq_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
