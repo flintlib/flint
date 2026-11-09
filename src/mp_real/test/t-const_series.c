@@ -13,10 +13,11 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "ball_helpers.h"
 
-/* the series constants pi and log 2 at up to 1000 limbs against arb,
+/* the series constants pi and log 2 at up to 1000 limbs against MPFR,
    at a radius within a couple of guard limbs */
 
 static void
@@ -37,7 +38,7 @@ test_log2(void)
 
         mp_real_const_log2(v, n, 0);
         mp_real_get_arb(p1, v);
-        arb_const_log2(p2, FLINT_BITS * n + 64);
+        ref_const_log2(p2, FLINT_BITS * n + 64);
 
         if (!arb_overlaps(p1, p2))
         {
@@ -86,7 +87,7 @@ test_pi(void)
         mp_real_const_pi4(pi, n, 0);
         mp_real_mul_2exp_si(pi, pi, 2);
         mp_real_get_arb(p1, pi);
-        arb_const_pi(p2, FLINT_BITS * n + 64);
+        ref_const_pi(p2, FLINT_BITS * n + 64);
 
         if (!arb_overlaps(p1, p2))
         {

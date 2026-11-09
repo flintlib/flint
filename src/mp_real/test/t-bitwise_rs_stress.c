@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
@@ -127,7 +128,7 @@ TEST_FUNCTION_START(mp_real_bitwise_rs_stress, state)
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_exp(exact, xa, prec);
+        ref_exp(exact, xa, prec);
         u = ulp_error_vs_arb(res, n + 1, exact, n);
         if (u > TEST_ERR(DOC_EXP_BITWISE_RS_MAX_ERR(n, r)))
             TEST_FUNCTION_FAIL("exp: n = %wd, r = %d, ulp = %f\n",
@@ -196,7 +197,7 @@ TEST_FUNCTION_START(mp_real_bitwise_rs_stress, state)
             arb_set_fmpz(xa, f);
             arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
             arb_add_ui(xa, xa, 1, prec);
-            arb_log(exact, xa, prec);
+            ref_log(exact, xa, prec);
             u = ulp_error_vs_arb(res, n, exact, n);
             if (u > TEST_ERR(DOC_LOG1P_BITWISE_RS_MAX_ERR(n, rl)))
                 TEST_FUNCTION_FAIL("log: n = %wd, r = %d, ulp = %f\n",
@@ -252,12 +253,12 @@ TEST_FUNCTION_START(mp_real_bitwise_rs_stress, state)
             fmpz_set_ui_array(f, x, n);
             arb_set_fmpz(xa, f);
             arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-            arb_sin(exact, xa, prec);
+            ref_sin(exact, xa, prec);
             u = ulp_error_vs_arb(ys, n + 1, exact, n);
             if (u > TEST_ERR(DOC_SIN_COS_BITWISE_RS_MAX_ERR(n, rt)))
                 TEST_FUNCTION_FAIL("sin: n = %wd, r = %d, ulp = %f\n",
                     n, rt, u);
-            arb_cos(exact, xa, prec);
+            ref_cos(exact, xa, prec);
             u = ulp_error_vs_arb(yc, n + 1, exact, n);
             if (u > TEST_ERR(DOC_SIN_COS_BITWISE_RS_MAX_ERR(n, rt)))
                 TEST_FUNCTION_FAIL("cos: n = %wd, r = %d, ulp = %f\n",
@@ -349,7 +350,7 @@ TEST_FUNCTION_START(mp_real_bitwise_rs_stress, state)
             fmpz_set_ui_array(f, x, n);
             arb_set_fmpz(xa, f);
             arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-            arb_atan(exact, xa, prec);
+            ref_atan(exact, xa, prec);
             u = ulp_error_vs_arb(ya, n, exact, n);
             if (u > TEST_ERR(DOC_ATAN_BITWISE_RS_MAX_ERR(n, rt)))
                 TEST_FUNCTION_FAIL("atan: n = %wd, r = %d, ulp = %f\n",
@@ -388,13 +389,13 @@ TEST_FUNCTION_START(mp_real_bitwise_rs_stress, state)
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_exp(exact, xa, prec);
+        ref_exp(exact, xa, prec);
         u = ulp_error_vs_arb(y, n + 1, exact, n);
         if (u > TEST_ERR(DOC_EXP_BITWISE_RS_MAX_ERR(n, 64)))
             TEST_FUNCTION_FAIL("exp after cleanup: ulp = %f\n", u);
 
         _mp_real_tan_bitwise_rs(y, &test_err_out, x, n, 64);
-        arb_tan(exact, xa, prec);
+        ref_tan(exact, xa, prec);
         u = ulp_error_vs_arb(y, n + 1, exact, n);
         if (u > TEST_ERR(DOC_TAN_BITWISE_RS_MAX_ERR(n, 64)))
             TEST_FUNCTION_FAIL("tan after cleanup: ulp = %f\n", u);

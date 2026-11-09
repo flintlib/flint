@@ -12,6 +12,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
+#include "arb.h"
 #include "mp_real.h"
 #include "thread_support.h"
 #include "impl.h"
@@ -36,6 +37,28 @@
    for the logarithm of the same ratio beyond a crossover precision,
    or arb's static 4608-bit table of the first 13 logarithms at small
    precisions), floored through the balls. */
+
+/* res_j = log p_j, j < num, as arb balls at prec bits */
+void
+_mp_real_log_primes_vec_arb(arb_ptr res, slong num, slong prec)
+{
+    mp_real_struct * v;
+    slong j;
+
+    v = flint_malloc(num * sizeof(mp_real_struct));
+    for (j = 0; j < num; j++)
+        mp_real_init(v + j);
+
+    _mp_real_log_primes_vec(v, num, (prec + FLINT_BITS - 1) / FLINT_BITS + 2);
+
+    for (j = 0; j < num; j++)
+    {
+        mp_real_get_arb(res + j, v + j);
+        arb_set_round(res + j, res + j, prec);
+        mp_real_clear(v + j);
+    }
+    flint_free(v);
+}
 
 /* the shared cache of the table (thread_support.h, impl.h) */
 static flint_shared_cache_struct _mp_real_log_primes_cache =

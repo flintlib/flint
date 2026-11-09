@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "arb/elem.h"
 
 static void
 arb_log_abs(arb_t res, const arb_t a, slong prec)
@@ -65,6 +66,11 @@ arb_log_hypot(arb_t res, const arb_t a, const arb_t b, slong prec)
         arb_log_abs(res, b, prec);
         return;
     }
+
+#if FLINT_BITS == 64
+    if (_arb_log_hypot_atan2_small(res, a, b, 0, prec))
+        return;
+#endif
 
     if (!arb_is_finite(a) || !arb_is_finite(b))
     {

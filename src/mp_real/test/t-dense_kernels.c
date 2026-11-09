@@ -14,6 +14,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 #if FLINT_BITS == 64
@@ -178,25 +179,25 @@ TEST_FUNCTION_START(mp_real_dense_kernels, state)
 
         if (!_mp_real_exp_opt(y, &err, x, n))
             TEST_FUNCTION_FAIL("exp: no kernel at n = %wd\n", n);
-        arb_exp(c, v, prec);
+        ref_exp(c, v, prec);
         if (!_within(y, n + 1, n, c, err))
             TEST_FUNCTION_FAIL("exp: n = %wd, iter = %wd\n", n, iter);
 
         if (!_mp_real_log1p_opt(y, &err, x, n))
             TEST_FUNCTION_FAIL("log1p: no kernel at n = %wd\n", n);
-        arb_log1p(c, v, prec);
+        ref_log1p(c, v, prec);
         if (!_within(y, n, n, c, err))
             TEST_FUNCTION_FAIL("log1p: n = %wd, iter = %wd\n", n, iter);
 
         if (!_mp_real_atan_opt(y, &err, x, n))
             TEST_FUNCTION_FAIL("atan: no kernel at n = %wd\n", n);
-        arb_atan(c, v, prec);
+        ref_atan(c, v, prec);
         if (!_within(y, n, n, c, err))
             TEST_FUNCTION_FAIL("atan: n = %wd, iter = %wd\n", n, iter);
 
         if (!_mp_real_sin_cos_opt(y, y2, &err, x, n))
             TEST_FUNCTION_FAIL("sin_cos: no kernel at n = %wd\n", n);
-        arb_sin_cos(s, c, v, prec);
+        ref_sin_cos(s, c, v, prec);
         if (!_within(y, n + 1, n, s, err) || !_within(y2, n + 1, n, c, err))
             TEST_FUNCTION_FAIL("sin_cos: n = %wd, iter = %wd\n", n, iter);
 

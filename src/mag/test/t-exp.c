@@ -17,11 +17,6 @@
 /* Defined in t-exp.c and t-expinv.c */
 #ifndef arf_exp
 #define arf_exp arf_exp
-void
-arf_exp(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
-{
-    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_exp, x, NULL, prec, rnd);
-}
 #endif
 
 TEST_FUNCTION_START(mag_exp, state)

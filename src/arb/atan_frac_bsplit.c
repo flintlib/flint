@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2012-2014, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,74 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "arb.h"
+#include "mp_real.h"
 
-/* todo: arb arithmetic when sizes exceed prec */
-
-static void
-bsplit(fmpz_t p1, fmpz_t q1, fmpz_t r1,
-        const fmpz_t p, const fmpz_t q,
-        const fmpz_t ppow2, const fmpz_t qpow2,
-        int alternate, slong a, slong b, int cont)
-{
-    if (b - a == 1)
-    {
-        if (a == 0)
-        {
-            fmpz_set(p1, p);
-            fmpz_mul_ui(q1, q, 2*a+1);
-            fmpz_mul_ui(r1, p, 2*a+1);
-        }
-        else
-        {
-            fmpz_set(p1, ppow2);
-            fmpz_set(q1, qpow2);
-            fmpz_mul_ui(q1, q1, 2*a+1);
-            fmpz_mul_ui(r1, p1, 2*a+1);
-        }
-
-        if (alternate)
-        {
-            fmpz_neg(p1, p1);
-            fmpz_neg(q1, q1);
-        }
-    }
-    else
-    {
-        fmpz_t p2, q2, r2;
-        slong m;
-
-        m = (a + b) / 2;
-
-        fmpz_init(p2);
-        fmpz_init(q2);
-        fmpz_init(r2);
-
-        bsplit(p1, q1, r1, p, q, ppow2, qpow2, alternate, a, m, 1);
-        bsplit(p2, q2, r2, p, q, ppow2, qpow2, alternate, m, b, cont);
-
-        fmpz_mul(p1, p1, q2);
-        fmpz_addmul(p1, r1, p2);
-        fmpz_mul(q1, q1, q2);
-        if (cont)
-            fmpz_mul(r1, r1, r2);
-
-        fmpz_clear(p2);
-        fmpz_clear(q2);
-        fmpz_clear(r2);
-    }
-}
-
-#define LOG2 0.69314718055994530942
-
+/* atan(p/q) resp. atanh(p/q): by the binary splitting of mp_real
+   (_mp_real_atan_frac_bsplit, _mp_real_atanh_frac_bsplit: 0 < p < q
+   given as limb arrays, p/q at most about 0.99) at a high precision
+   relative to the ratio, else by the kernels on the fraction, which
+   are faster (also for |p/q| close to 1; the atanh of such a ratio is
+   indeterminate at |p| >= |q|) */
 void
 arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, slong prec)
 {
-    fmpz_t P, Q, R, p2, q2;
-    double logqp;
-    slong N;
-    mag_t err;
+    mp_real_t t;
+    nn_srcptr pd, qd;
+    slong pn, qn;
+    ulong ptmp, qtmp;
+    int neg;
 
     if (fmpz_is_zero(p))
     {
@@ -84,66 +33,63 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
         return;
     }
 
-    if (fmpz_is_zero(q) || fmpz_cmpabs(p, q) >= 0)
+    if (fmpz_is_zero(q))
     {
         arb_indeterminate(s);
         return;
     }
 
-    if (fmpz_sgn(p) < 0)
+    neg = (fmpz_sgn(p) < 0) ^ (fmpz_sgn(q) < 0);
+
+    /* the limbs of |p| and |q| */
+    if (COEFF_IS_MPZ(*p))
     {
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_neg(t, p);
-        arb_atan_frac_bsplit(s, t, q, hyperbolic, prec);
+        pd = COEFF_TO_PTR(*p)->_mp_d;
+        pn = FLINT_ABS(COEFF_TO_PTR(*p)->_mp_size);
+    }
+    else
+    {
+        ptmp = FLINT_ABS(*p);
+        pd = &ptmp;
+        pn = 1;
+    }
+    if (COEFF_IS_MPZ(*q))
+    {
+        qd = COEFF_TO_PTR(*q)->_mp_d;
+        qn = FLINT_ABS(COEFF_TO_PTR(*q)->_mp_size);
+    }
+    else
+    {
+        qtmp = FLINT_ABS(*q);
+        qd = &qtmp;
+        qn = 1;
+    }
+
+    /* the kernels of the fraction unless the precision is high for the
+       ratio (binary splitting wins above about C (16 / lg(q/p))^2 bits
+       with C = 10^4 for atan and 4 10^4 for atanh, lg(q/p) from the bit
+       lengths), or |p/q| >= 1/2 (roughly) */
+    {
+        slong lg = FLINT_BITS * (qn - pn) + (slong) FLINT_BIT_COUNT(qd[qn - 1]) - (slong) FLINT_BIT_COUNT(pd[pn - 1]);
+        if (lg <= 1 || (double) prec < (hyperbolic ? 4e4 : 1e4) * (16.0 / lg) * (16.0 / lg))
+        {
+            arb_fmpz_div_fmpz(s, p, q, prec + 10);
+            if (hyperbolic)
+                arb_atanh(s, s, prec);
+            else
+                arb_atan(s, s, prec);
+            return;
+        }
+    }
+
+    mp_real_init(t);
+    if (hyperbolic)
+        _mp_real_atanh_frac_bsplit(t, pd, pn, qd, qn, (prec + FLINT_BITS - 1) / FLINT_BITS + 1);
+    else
+        _mp_real_atan_frac_bsplit(t, pd, pn, qd, qn, (prec + FLINT_BITS - 1) / FLINT_BITS + 1);
+    mp_real_get_arb(s, t);
+    arb_set_round(s, s, prec);
+    if (neg)
         arb_neg(s, s);
-        fmpz_clear(t);
-        return;
-    }
-
-    fmpz_init(P);
-    fmpz_init(Q);
-    fmpz_init(R);
-    fmpz_init(p2);
-    fmpz_init(q2);
-    mag_init(err);
-
-    /* If N >= 1 and p/q <= 1/2, the error is bounded by (p/q)^(2N+1).
-    For error <= 2^-prec, it is sufficient to pick
-    N >= (1/2) * (prec * log(2) / log(q/p) - 1). */
-
-    {
-        slong qexp, pexp;
-        double logp, logq;
-
-        logp = fmpz_get_d_2exp(&pexp, p);
-        logq = fmpz_get_d_2exp(&qexp, q);
-
-        logqp = fabs(logq) / logp;
-        logqp = mag_d_log_lower_bound(logqp) * (1.0 - 1e-12);
-        logqp = logqp + (qexp - pexp) * LOG2 * (1.0 - 1e-12);
-    }
-
-    N = ceil((prec * (0.5 * LOG2) / logqp) * (1.0 + 1e-12));
-    N = FLINT_MAX(N, 1);
-    N = FLINT_MIN(N, 4 * prec);
-
-    fmpz_mul(p2, p, p);
-    fmpz_mul(q2, q, q);
-    bsplit(P, Q, R, p, q, p2, q2, !hyperbolic, 0, N, 0);
-
-    mag_set_fmpz(err, p);
-    mag_div_fmpz(err, err, q);
-    mag_geom_series(err, err, 2 * N + 1);
-    mag_div_ui(err, err, 2 * N + 1);
-
-    arb_fmpz_div_fmpz(s, P, Q, prec);
-    arb_add_error_mag(s, err);
-
-    fmpz_clear(p2);
-    fmpz_clear(q2);
-    fmpz_clear(P);
-    fmpz_clear(Q);
-    fmpz_clear(R);
-    mag_clear(err);
+    mp_real_clear(t);
 }

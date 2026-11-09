@@ -35,6 +35,7 @@
 #include "t-complex_mul.c"
 #include "t-complex_sqr.c"
 #include "t-div.c"
+#include "t-elem.c"
 #include "t-dump_file.c"
 #include "t-dump_str.c"
 #include "t-floor.c"
@@ -62,6 +63,8 @@
 #include "t-set_fmpq.c"
 #include "t-set_fmpz_2exp.c"
 #include "t-set_round.c"
+#include "t-atan2.c"
+#include "t-pow.c"
 #include "t-set_round_fmpz.c"
 #include "t-set_round_mpz.c"
 #include "t-set_round_ui.c"
@@ -105,6 +108,7 @@ test_struct tests[] =
     TEST_FUNCTION(arf_complex_mul),
     TEST_FUNCTION(arf_complex_sqr),
     TEST_FUNCTION(arf_div),
+    TEST_FUNCTION(arf_elem),
     TEST_FUNCTION(arf_dump_file),
     TEST_FUNCTION(arf_dump_str),
     TEST_FUNCTION(arf_floor),
@@ -132,6 +136,8 @@ test_struct tests[] =
     TEST_FUNCTION(arf_set_fmpq),
     TEST_FUNCTION(arf_set_fmpz_2exp),
     TEST_FUNCTION(arf_set_round),
+    TEST_FUNCTION(arf_atan2),
+    TEST_FUNCTION(arf_pow),
     TEST_FUNCTION(arf_set_round_fmpz),
     TEST_FUNCTION(arf_set_round_mpz),
     TEST_FUNCTION(arf_set_round_ui),

@@ -208,7 +208,7 @@ step 5: prec =  204, accuracy =  184 bits
 step 6: prec =  398, accuracy =  380 bits
 step 7: prec =  790, accuracy =  772 bits
 step 8: prec = 1574, accuracy = 1558 bits
-step 9: prec = 3146, accuracy = 3129 bits
+step 9: prec = 3146, accuracy = 3130 bits
 step 10: prec = 3360, accuracy = 3357 bits
 [0.5671432904{...980 digits...}6227976096 +/- 4.92e-1001]
 overlaps W(1): 1

@@ -12,10 +12,11 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* _mp_real_exp_notab and _mp_real_sin_cos_notab agree with arb within the
+/* _mp_real_exp_notab and _mp_real_sin_cos_notab agree with MPFR within the
    documented budgets for x anywhere in [0, 1): the leading-zero
    count of x steers the halving depth, so it is swept alongside the
    size, and the forced-depth workers run over every depth the tuned
@@ -96,19 +97,19 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
 
         _mp_real_exp_notab(y, &test_err_out, x, n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
         u = _ulps(y, n + 1, e, n);
         if (u > TEST_ERR(DOC_EXP_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("exp: n = %wd, zz = %wd, "
                 "ulp = %f\n", n, zz, u);
 
         _mp_real_sin_cos_notab(ys, yc, &test_err_out, x, n);
-        arb_sin(e, xa, prec);
+        ref_sin(e, xa, prec);
         u = _ulps(ys, n + 1, e, n);
         if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("sin: n = %wd, zz = %wd, "
                 "ulp = %f\n", n, zz, u);
-        arb_cos(e, xa, prec);
+        ref_cos(e, xa, prec);
         u = _ulps(yc, n + 1, e, n);
         if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("cos: n = %wd, zz = %wd, "
@@ -120,19 +121,19 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
             static const int rs[3] = { 16, 24, 32 };
 
             _mp_real_exp_notab_r(y, &test_err_out, x, n, rs[rr]);
-            arb_exp(e, xa, prec);
+            ref_exp(e, xa, prec);
             u = _ulps(y, n + 1, e, n);
             if (u > TEST_ERR(DOC_EXP_NOTAB_MAX_ERR))
                 TEST_FUNCTION_FAIL("exp r = %d: n = %wd, "
                     "zz = %wd, ulp = %f\n", rs[rr], n, zz, u);
 
             _mp_real_sin_cos_notab_r(ys, yc, &test_err_out, x, n, rs[rr]);
-            arb_sin(e, xa, prec);
+            ref_sin(e, xa, prec);
             u = _ulps(ys, n + 1, e, n);
             if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
                 TEST_FUNCTION_FAIL("sin r = %d: n = %wd, "
                     "zz = %wd, ulp = %f\n", rs[rr], n, zz, u);
-            arb_cos(e, xa, prec);
+            ref_cos(e, xa, prec);
             u = _ulps(yc, n + 1, e, n);
             if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
                 TEST_FUNCTION_FAIL("cos r = %d: n = %wd, "
@@ -168,17 +169,17 @@ TEST_FUNCTION_START(mp_real_exp_notab, state)
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
 
         _mp_real_exp_notab(y, &test_err_out, x, n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
         u = _ulps(y, n + 1, e, n);
         if (u > TEST_ERR(DOC_EXP_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("deep exp: ulp = %f\n", u);
 
         _mp_real_sin_cos_notab(ys, yc, &test_err_out, x, n);
-        arb_sin(e, xa, prec);
+        ref_sin(e, xa, prec);
         u = _ulps(ys, n + 1, e, n);
         if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("deep sin: ulp = %f\n", u);
-        arb_cos(e, xa, prec);
+        ref_cos(e, xa, prec);
         u = _ulps(yc, n + 1, e, n);
         if (u > TEST_ERR(DOC_SIN_COS_NOTAB_MAX_ERR))
             TEST_FUNCTION_FAIL("deep cos: ulp = %f\n", u);

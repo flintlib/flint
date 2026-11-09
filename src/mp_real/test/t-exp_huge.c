@@ -13,9 +13,10 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 
 /* mp_real_exp_notab_log2, mp_real_exp_notab_squaring and mp_real_exp_agm
-   against arb_exp: the outputs contain exp of the input ball, and for
+   against MPFR: the outputs contain exp of the input ball, and for
    exact inputs have a relative accuracy of about n limbs, for arguments
    from tiny to 2^31 (2^26 on 32-bit machines) in absolute value of
    either sign, at precisions
@@ -92,7 +93,7 @@ TEST_FUNCTION_START(mp_real_exp_huge, state)
         if (x->size != 0 && n_randint(state, 4) == 0)
             x->err = 1 + n_randint(state, 100);
         mp_real_get_arb(a, x);
-        arb_exp(ref, a, FLINT_BITS * n + 200);
+        ref_exp(ref, a, FLINT_BITS * n + 200);
 
         for (i = 0; i < 2; i++)
         {

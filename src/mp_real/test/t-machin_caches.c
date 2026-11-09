@@ -15,6 +15,7 @@
 #include "fmpq.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* the cached log p_j and 2 arg(pi_j) are the exact floors at every
@@ -64,13 +65,13 @@ TEST_FUNCTION_START(mp_real_machin_caches, state)
                 fmpq_set_si(q, _mp_real_gaussian_primes[2 * j + 1],
                     _mp_real_gaussian_primes[2 * j]);
                 arb_set_fmpq(y, q, prec);
-                arb_atan(v, y, prec);
+                ref_atan(v, y, prec);
                 arb_mul_2exp_si(v, v, 1);
             }
             else
             {
                 e = _mp_real_machin_entry(T, j, nr);
-                arb_log_ui(v, n_primes_next(iter_p), prec);
+                ref_log_ui(v, n_primes_next(iter_p), prec);
             }
 
             arb_mul_2exp_si(v, v, FLINT_BITS * nr);

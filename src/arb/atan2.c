@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "arb/elem.h"
 
 void
 arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
@@ -71,6 +72,12 @@ arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
             mag_mul_2exp_si(arb_radref(r), arb_radref(r), -1);
         }
     }
+#if FLINT_BITS == 64
+    else if (_arb_log_hypot_atan2_small(r, a, b, 1, prec))
+    {
+        /* (the register paths) */
+    }
+#endif
     /* strictly in the right half-plane -- atan(b/a) */
     else if (arf_sgn(am) > 0 && arf_cmpabs_mag(am, ar) > 0)
     {

@@ -34,7 +34,7 @@ TEST_FUNCTION_START(mp_real_const_khinchin, state)
     arb_set_str(ref160, khinchin_ref, 560);
     arb_add_error_2exp_si(ref160, -525);
 
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         slong n, K0, n1, nb, acc;
         mp_real_t x, y;

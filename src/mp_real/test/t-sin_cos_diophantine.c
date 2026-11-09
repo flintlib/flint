@@ -14,10 +14,11 @@
 #include "fmpq.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* _mp_real_sin_cos_diophantine agrees with arb within its budget for x
+/* _mp_real_sin_cos_diophantine agrees with MPFR within its budget for x
    anywhere in [0, 1), across sizes, weight budgets and prime counts,
    and the cached angles are exact floors */
 
@@ -63,7 +64,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_diophantine, state)
         fmpq_set_si(q, _mp_real_gaussian_primes[2 * j + 1],
             _mp_real_gaussian_primes[2 * j]);
         arb_set_fmpq(l, q, FLINT_BITS * nv + 200);
-        arb_atan(l, l, FLINT_BITS * nv + 200);
+        ref_atan(l, l, FLINT_BITS * nv + 200);
         arb_mul_2exp_si(l, l, 1);
         arb_mul_2exp_si(l, l, FLINT_BITS * nv);
         arb_floor(l, l, FLINT_BITS * nv + 200);
@@ -127,7 +128,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_diophantine, state)
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_sin_cos(s, c, xa, prec);
+        ref_sin_cos(s, c, xa, prec);
 
         _mp_real_sin_cos_diophantine(ys, yc, &test_err_out, x, n);
         u = FLINT_MAX(_ulps_sc(ys, n + 1, s, n), _ulps_sc(yc, n + 1, c, n));
@@ -143,7 +144,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_diophantine, state)
         {
             arb_t ta;
             arb_init(ta);
-            arb_tan(ta, xa, prec);
+            ref_tan(ta, xa, prec);
             _mp_real_tan_diophantine(ys, &test_err_out, x, n);
             u = _ulps_sc(ys, n + 1, ta, n);
             if (u > TEST_ERR(DOC_SIN_COS_DIOPHANTINE_MAX_ERR))

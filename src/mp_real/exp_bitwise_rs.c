@@ -172,7 +172,7 @@ _mp_real_exp_logs_fill(nn_ptr tab, slong nc, slong i_from, slong rc)
         lp = _arb_vec_init(7);
 
         if (i_from <= 6)
-            arb_log_primes_vec_bsplit(lp, 7, wp);
+            _mp_real_log_primes_vec_arb(lp, 7, wp);
 
         for (i = i_from; i < iter_start && i <= rc; i++)
         {

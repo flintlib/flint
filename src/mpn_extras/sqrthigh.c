@@ -217,6 +217,9 @@ _sqrthigh_exact_rem(nn_ptr s, nn_ptr R, int * cmp, ulong * dropped, nn_srcptr a,
     need = FLINT_MPN_SQRTREM_USE_GMP(xn) ? 2 * xn : xn;
     X = (need <= SQRTHIGH_STACK_LIMBS) ? stack : flint_malloc(need * sizeof(ulong));
     W = (need == xn) ? R : X + xn;
+    /* (_sqrt_operand writes all xn limbs; zeroed first since gcc 15
+       cannot see that through its branches) */
+    flint_mpn_zero(X, xn);
     *dropped = _sqrt_operand(X, cmp, a, an, t, n);
     rn = flint_mpn_sqrtrem(s, W, X, xn);
     if (W != R)

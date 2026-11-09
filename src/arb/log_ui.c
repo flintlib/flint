@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
+#include <math.h>
 #include "arb.h"
 
 /* Assumption: p/q <= 2 */
@@ -28,36 +28,40 @@ atanh_bs(arb_t s, ulong p, ulong q, slong prec)
     fmpz_clear(qq);
 }
 
-static int n_width(ulong k)
-{
-    int a, b;
-    a = flint_clz(k);
-    b = flint_ctz(k);
-    return FLINT_BITS - a - b;
-}
-
+/* log k from log(prev): the kernels of mp_real (arb_log_arf) at most
+   precisions, else log k = log prev + 2 atanh(p/q), p/q = (k - prev) /
+   (k + prev), by binary splitting, which wins only at a high precision
+   growing with the ratio: measured against the kernels, at prec above
+   about 4 10^4 (16 / lg(q/p))^2 bits */
 void
 arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec)
 {
-    if (prev < 2 || prec < 600 ||
-        (prec < ARB_LOG_TAB2_PREC - 64 && n_width(k) <= ARB_LOG_TAB21_BITS + 1)
-        || k < prev || (k + prev) < prev ||
-        (k - prev) >= 0.25 * (k + prev))
+    ulong p, q;
+    double lg;
+
+    if (prev < 2 || k <= prev || (k + prev) < prev)
     {
         arf_t t;
         arf_init_set_ui(t, k);
         arb_log_arf(s, t, prec);
-        /* no need to clear t */
+        return;
+    }
+
+    p = k - prev;
+    q = k + prev;
+    lg = log2((double) q / (double) p);
+
+    if (prec < 4e4 * (16.0 / lg) * (16.0 / lg))
+    {
+        arf_t t;
+        arf_init_set_ui(t, k);
+        arb_log_arf(s, t, prec);
     }
     else
     {
         arb_t t;
-        ulong p, q;
 
         arb_init(t);
-
-        p = k - prev;
-        q = k + prev;
 
         if ((p % 2 == 0) && (q % 2 == 0))
         {

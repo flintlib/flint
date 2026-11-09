@@ -650,11 +650,27 @@ _mp_real_sin_cos_reduced_export(nn_ptr ysin, nn_ptr yg, ulong * err,
        series at small sizes); g = 1 - cos exactly, since cos <= 1 */
     if (alg == 1 || (alg == 0 && _sin_cos_reduced_alg(wn, r) == 1))
     {
+        /* (either output may be NULL here) */
         _mp_real_sin_cos_rs(ysin, yg, err, t, wn);
-        if (yg[wn] != 0)
-            flint_mpn_zero(yg, wn);         /* cos = 1 */
-        else
-            mpn_neg(yg, yg, wn);
+        if (yg != NULL)
+        {
+            if (yg[wn] != 0)
+                flint_mpn_zero(yg, wn);         /* cos = 1 */
+            else
+                mpn_neg(yg, yg, wn);
+        }
+        return;
+    }
+
+    if (ysin == NULL || yg == NULL)
+    {
+        /* the other algorithms compute both */
+        nn_ptr tmp;
+        TMP_INIT;
+        TMP_START;
+        tmp = TMP_ALLOC((wn + 1) * sizeof(ulong));
+        _mp_real_sin_cos_reduced_export((ysin != NULL) ? ysin : tmp, (yg != NULL) ? yg : tmp, err, t, wn, r, alg);
+        TMP_END;
         return;
     }
 

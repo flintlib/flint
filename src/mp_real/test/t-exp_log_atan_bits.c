@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 
 /* mp_real_exp_bits, mp_real_log_bits, mp_real_atan_bits: the output
    ball contains f at a random point of the input ball, for tiny, unit,
@@ -168,11 +169,11 @@ TEST_FUNCTION_START(mp_real_exp_log_atan_bits, state)
             wp = prec + 100 + (arf_is_zero(pt) ? 0
                 : FLINT_ABS(fmpz_get_si(ARF_EXPREF(pt))));
             if (func == 0)
-                arb_exp(ty, t, wp);
+                ref_exp(ty, t, wp);
             else if (func == 1)
-                arb_log(ty, t, wp);
+                ref_log(ty, t, wp);
             else
-                arb_atan(ty, t, wp);
+                ref_atan(ty, t, wp);
 
             if (!arb_overlaps(ty, ya))
             {

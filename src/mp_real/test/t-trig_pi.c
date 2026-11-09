@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "ball_helpers.h"
 
 /* mp_real_sin_cos_pi_bits and mp_real_tan_pi_bits: the outputs contain
@@ -162,8 +163,8 @@ TEST_FUNCTION_START(mp_real_trig_pi, state)
         mp_real_random_point(pt, x, state);
         wp = 2 * prec + 3 * FLINT_BITS * (x->size + 8) + 200;
         arb_set_arf(t, pt);
-        arb_sin_cos_pi(rs, rc, t, wp);
-        arb_tan_pi(rt, t, wp);
+        ref_sin_cos_pi(rs, rc, t, wp);
+        ref_tan_pi(rt, t, wp);
 
         if (which < 3)
         {
@@ -218,7 +219,7 @@ TEST_FUNCTION_START(mp_real_trig_pi, state)
                 arb_init(w);
                 arb_set(w, xa);
                 mag_mul_ui(arb_radref(w), arb_radref(w), 3);
-                arb_cos_pi(t, w, wp);
+                ref_cos_pi(t, w, wp);
                 if (!arb_contains_zero(t) || !mp_real_is_zero(y1))
                 {
                     flint_printf("FAIL: tan status 0, prec %wd\n", prec);

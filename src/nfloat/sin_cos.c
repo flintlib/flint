@@ -74,100 +74,20 @@ _nfloat_trig_slow(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, 
     return status;
 }
 
-/* fraction limbs for a reduced argument with z leading zero bits; with
-   div (the cotangent of the reduced argument), enough that the tangent
-   normalizes to _nfloat_elem_limbs(ctx, 0) limbs with a left shift of at
-   most NFLOAT_ELEM_MAX_NORM_SHIFT bits */
-static slong
-_nfloat_trig_limbs(gr_ctx_t ctx, slong z, int div)
-{
-    slong w = _nfloat_elem_limbs(ctx, z);
-
-    if (div && z > NFLOAT_ELEM_MAX_NORM_SHIFT - 1)
-        w = FLINT_MAX(w, _nfloat_elem_limbs(ctx, 0) + (z - NFLOAT_ELEM_MAX_NORM_SHIFT + 1 + FLINT_BITS - 1) / FLINT_BITS);
-
-    return w;
-}
-
-/* the trigonometric functions of v (sin and cos for which = 0, tan for
-   which = 1) with |x| = a pi/2 + s v (or pi |x| = ...), assembled into
-   rs, rc (either may be NULL) resp. rt; v at w limbs within eps ulps */
+/* the sine and cosine results of the kernels (ys, yc at w fraction
+   limbs within err ulps, with the signs code) into rs, rc (either may
+   be NULL); the sine of x is odd */
 static int
-_nfloat_trig_eval(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nn_srcptr v, slong w,
-    ulong eps, int a, int s, int xsgn, gr_ctx_t ctx)
+_nfloat_trig_set(nfloat_ptr rs, nfloat_ptr rc, nn_ptr ys, nn_ptr yc, slong w, ulong err, int code, int xsgn, gr_ctx_t ctx)
 {
-    ulong ys[NFLOAT_ELEM_MAX_LIMBS + 2], yc[NFLOAT_ELEM_MAX_LIMBS + 2];
-    ulong err;
     int status = GR_SUCCESS;
 
-    if (rt == NULL)
-    {
-        int sneg = (s < 0), negs, negc;
-        nfloat_ptr os = (a & 1) ? rc : rs;
-        nfloat_ptr oc = (a & 1) ? rs : rc;
+    if (rs != NULL)
+        status |= _nfloat_set_mpn_err(rs, ys, w + 1, -FLINT_BITS * w, err, err, (code & 1) ^ xsgn, ctx);
+    if (rc != NULL)
+        status |= _nfloat_set_mpn_err(rc, yc, w + 1, -FLINT_BITS * w, err, err, (code >> 1) & 1, ctx);
 
-        _mp_real_sin_cos_kernel(ys, yc, &err, v, w);
-        err += eps;
-
-        /* sin |x| = s sin v, cos v, -s sin v, -cos v;
-           cos |x| = cos v, -s sin v, -cos v, s sin v   (a = 0, 1, 2, 3) */
-        if (a & 1)
-        {
-            negs = (a == 3);
-            negc = sneg ^ (a == 1);
-        }
-        else
-        {
-            negs = sneg ^ (a == 2);
-            negc = (a == 2);
-        }
-
-        /* os gets sin v, oc gets cos v; the sine of x is odd */
-        if (os != NULL)
-            status |= _nfloat_set_mpn_err(os, ys, w + 1, -FLINT_BITS * w, err, err,
-                ((a & 1) ? negc : negs) ^ ((os == rs) ? xsgn : 0), ctx);
-        if (oc != NULL)
-            status |= _nfloat_set_mpn_err(oc, yc, w + 1, -FLINT_BITS * w, err, err,
-                ((a & 1) ? negs : negc) ^ ((oc == rs) ? xsgn : 0), ctx);
-        return status;
-    }
-    else
-    {
-        int neg;
-
-        _mp_real_tan_kernel(ys, &err, v, w);
-        err += 2 * eps;     /* tan' <= 2 on [0, pi/4] */
-
-        if (!(a & 1))
-        {
-            /* s tan v */
-            neg = (s < 0) ^ xsgn;
-            return _nfloat_set_mpn_err(rt, ys, w + 1, -FLINT_BITS * w, err, err, neg, ctx);
-        }
-        else
-        {
-            /* -s / tan v: tan v normalized to wn limbs, then one division */
-            ulong t[NFLOAT_ELEM_MAX_LIMBS + 1], one[NFLOAT_ELEM_MAX_LIMBS + 1];
-            ulong q[NFLOAT_ELEM_MAX_LIMBS + 2];
-            slong te, wn = _nfloat_elem_limbs(ctx, 0);
-            ulong et, eq;
-
-            neg = (s > 0) ^ xsgn;
-
-            if (flint_mpn_zero_p(ys, w + 1))
-                return GR_UNABLE;
-
-            et = _nfloat_elem_normalize(t, &te, ys, w + 1, -FLINT_BITS * w, err, wn);
-            if (et == UWORD_MAX)
-                return GR_UNABLE;
-            _nfloat_zero_limbs(one, wn);
-            one[wn - 1] = UWORD(1) << (FLINT_BITS - 1);
-            eq = _nfloat_elem_div(q, one, 0, t, et, wn);
-
-            /* 1 / (T 2^te) = Q 2^(1 - 2 FLINT_BITS wn - te) */
-            return _nfloat_set_mpn_err(rt, q, wn + 1, 1 - 2 * FLINT_BITS * wn - te, eq, eq, neg, ctx);
-        }
-    }
+    return status;
 }
 
 #if FLINT_BITS == 64
@@ -219,284 +139,6 @@ _nfloat_trig_eval(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nn_srcptr v, slon
 
 /* the outputs from sin v, cos v as fixed-point numbers Y 2^(-FLINT_BITS w)
    by the assignment of _nfloat_trig_eval */
-#define NFLOAT_TRIG_FAST_SIGNS(negs_out, negc_out, a, sneg, xsgn) \
-    do { \
-        int __negs, __negc; \
-        if ((a) & 1) { __negs = ((a) == 3); __negc = (sneg) ^ ((a) == 1); } \
-        else { __negs = (sneg) ^ ((a) == 2); __negc = ((a) == 2); } \
-        /* sin |x| from sin v (a even) or cos v (a odd), and conversely */ \
-        negs_out = ((a) & 1) ? __negc : __negs; \
-        negc_out = ((a) & 1) ? __negs : __negc; \
-    } while (0)
-
-/* reduction of x: v = (v1, v0) at two fraction limbs (ev = 2 for |x| >= 1) */
-FLINT_FORCE_INLINE int
-_nfloat_trig_reduce_fast_1(int * ra, int * rsneg, ulong * v1, ulong * v0, ulong d, slong e)
-{
-    nn_srcptr P = _mp_real_const_ptr(MP_REAL_CONST_ID_PI4, 3);
-    ulong K = _mp_real_const_ptr(MP_REAL_CONST_ID_2_DIV_PI, 1)[0];
-    ulong xi, x1, q, q2, h, l, h2, l2, p3, p2, p1, p0, t3, t2, t1, t0, u3, u2, u1, u0;
-    int sneg = 0;
-
-    /* |x| = (xi, x1) with the binary point after xi; 0 <= e < FLINT_BITS */
-    xi = (e == 0) ? 0 : (d >> (FLINT_BITS - e));
-    x1 = (e == 0) ? d : (d << e);
-
-    /* q = floor(|x| 2/pi), or one less (the one-limb K errs by
-       |x| 2^-64 < 1/2) */
-    umul_ppmm(h, l, x1, K);
-    umul_ppmm(h2, l2, xi, K);
-    add_ssaaaa(q, l2, h2, l2, UWORD(0), h);
-    (void) l;
-
-    /* t = |x| - 2q P >= 0 */
-    q2 = 2 * q;
-    umul_ppmm(p1, p0, q2, P[0]);
-    umul_ppmm(h, l, q2, P[1]);
-    add_ssaaaa(p2, p1, h, l, UWORD(0), p1);
-    umul_ppmm(h, l, q2, P[2]);
-    add_ssaaaa(p3, p2, h, l, UWORD(0), p2);
-    sub_ddddmmmmssss(t3, t2, t1, t0, xi, x1, UWORD(0), UWORD(0), p3, p2, p1, p0);
-
-    /* u = 2P (pi/2) */
-    u3 = P[2] >> (FLINT_BITS - 1);
-    u2 = (P[2] << 1) | (P[1] >> (FLINT_BITS - 1));
-    u1 = (P[1] << 1) | (P[0] >> (FLINT_BITS - 1));
-    u0 = P[0] << 1;
-
-    if (t3 > u3 || (t3 == u3 && (t2 > u2 || (t2 == u2 && (t1 > u1 || (t1 == u1 && t0 >= u0))))))
-    {
-        sub_ddddmmmmssss(t3, t2, t1, t0, t3, t2, t1, t0, u3, u2, u1, u0);
-        q++;
-    }
-
-    /* fold t > pi/4 */
-    if (t3 != 0 || t2 > P[2] || (t2 == P[2] && (t1 > P[1] || (t1 == P[1] && t0 > P[0]))))
-    {
-        sub_ddddmmmmssss(t3, t2, t1, t0, u3, u2, u1, u0, t3, t2, t1, t0);
-        q++;
-        sneg = 1;
-    }
-
-    if (t2 < (UWORD(1) << 32))
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    *ra = q & 3;
-    *rsneg = sneg;
-    *v1 = t2;
-    *v0 = t1;
-    return 0;
-}
-
-FLINT_FORCE_INLINE int
-_nfloat_trig_reduce_fast_2(int * ra, int * rsneg, ulong * v2, ulong * v1, ulong * v0,
-    ulong d1, ulong d0, slong e)
-{
-    nn_srcptr P = _mp_real_const_ptr(MP_REAL_CONST_ID_PI4, 4);
-    ulong K = _mp_real_const_ptr(MP_REAL_CONST_ID_2_DIV_PI, 1)[0];
-    ulong xi, x2, x1, q, q2, h, l, h2, l2, p4, p3, p2, p1, p0;
-    ulong t4, t3, t2, t1, t0, u4, u3, u2, u1, u0;
-    int sneg = 0;
-
-    /* |x| = (xi, x2, x1) with the binary point after xi; 0 <= e < FLINT_BITS */
-    if (e == 0)
-    {
-        xi = 0; x2 = d1; x1 = d0;
-    }
-    else
-    {
-        xi = d1 >> (FLINT_BITS - e);
-        x2 = (d1 << e) | (d0 >> (FLINT_BITS - e));
-        x1 = d0 << e;
-    }
-
-    umul_ppmm(h, l, x2, K);
-    umul_ppmm(h2, l2, xi, K);
-    add_ssaaaa(q, l2, h2, l2, UWORD(0), h);
-    (void) l;
-
-    q2 = 2 * q;
-    umul_ppmm(p1, p0, q2, P[0]);
-    umul_ppmm(h, l, q2, P[1]);
-    add_ssaaaa(p2, p1, h, l, UWORD(0), p1);
-    umul_ppmm(h, l, q2, P[2]);
-    add_ssaaaa(p3, p2, h, l, UWORD(0), p2);
-    umul_ppmm(h, l, q2, P[3]);
-    add_ssaaaa(p4, p3, h, l, UWORD(0), p3);
-    sub_dddddmmmmmsssss(t4, t3, t2, t1, t0, xi, x2, x1, UWORD(0), UWORD(0), p4, p3, p2, p1, p0);
-
-    u4 = P[3] >> (FLINT_BITS - 1);
-    u3 = (P[3] << 1) | (P[2] >> (FLINT_BITS - 1));
-    u2 = (P[2] << 1) | (P[1] >> (FLINT_BITS - 1));
-    u1 = (P[1] << 1) | (P[0] >> (FLINT_BITS - 1));
-    u0 = P[0] << 1;
-
-    if (t4 > u4 || (t4 == u4 && (t3 > u3 || (t3 == u3 && (t2 > u2 || (t2 == u2
-            && (t1 > u1 || (t1 == u1 && t0 >= u0))))))))
-    {
-        sub_dddddmmmmmsssss(t4, t3, t2, t1, t0, t4, t3, t2, t1, t0, u4, u3, u2, u1, u0);
-        q++;
-    }
-
-    if (t4 != 0 || t3 > P[3] || (t3 == P[3] && (t2 > P[2] || (t2 == P[2]
-            && (t1 > P[1] || (t1 == P[1] && t0 > P[0]))))))
-    {
-        sub_dddddmmmmmsssss(t4, t3, t2, t1, t0, u4, u3, u2, u1, u0, t4, t3, t2, t1, t0);
-        q++;
-        sneg = 1;
-    }
-
-    if (t3 < (UWORD(1) << 24))
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    *ra = q & 3;
-    *rsneg = sneg;
-    *v2 = t3;
-    *v1 = t2;
-    *v0 = t1;
-    return 0;
-}
-
-/* v = pi t = 3t + (pi - 3) t for t = (t2, t1, t0) <= 1/4 */
-FLINT_FORCE_INLINE void
-_nfloat_trig_pi_times(ulong * v2, ulong * v1, ulong * v0, ulong t2, ulong t1, ulong t0)
-{
-    nn_srcptr P = _mp_real_const_ptr(MP_REAL_CONST_ID_PI4, 4);
-    ulong c2, c1, c0, s2, s1, s0;
-
-    /* pi - 3 at three fraction limbs, floored: the fraction of 4P */
-    c2 = (P[3] << 2) | (P[2] >> (FLINT_BITS - 2));
-    c1 = (P[2] << 2) | (P[1] >> (FLINT_BITS - 2));
-    c0 = (P[1] << 2) | (P[0] >> (FLINT_BITS - 2));
-
-    _mp_real_small_mulhi_3x3(&s2, &s1, &s0, c2, c1, c0, t2, t1, t0);
-    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, t2, t1, t0);
-    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, (t2 << 1) | (t1 >> (FLINT_BITS - 1)),
-        (t1 << 1) | (t0 >> (FLINT_BITS - 1)), t0 << 1);
-    *v2 = s2; *v1 = s1; *v0 = s0;
-}
-
-/* 2|x| = m + (f2, f1, f0) to the reduction pi |x| = a pi/2 + s v: t at
-   three limbs (exact if f0's lowest bit is zero) */
-FLINT_FORCE_INLINE int
-_nfloat_trig_pi_fold(int * ra, int * rsneg, ulong * v2, ulong * v1, ulong * v0,
-    ulong m, ulong f2, ulong f1, ulong f0)
-{
-    if (f2 == 0 && f1 == 0 && f0 == 0)
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    if (f2 < (UWORD(1) << (FLINT_BITS - 1)) || (f2 == (UWORD(1) << (FLINT_BITS - 1)) && f1 == 0 && f0 == 0))
-    {
-        *ra = m & 3;
-        *rsneg = 0;
-    }
-    else
-    {
-        *ra = (m + 1) & 3;
-        *rsneg = 1;
-        sub_dddmmmsss(f2, f1, f0, UWORD(0), UWORD(0), UWORD(0), f2, f1, f0);
-    }
-
-    /* t = f / 2 */
-    _nfloat_trig_pi_times(v2, v1, v0, f2 >> 1, (f2 << (FLINT_BITS - 1)) | (f1 >> 1),
-        (f1 << (FLINT_BITS - 1)) | (f0 >> 1));
-    return 0;
-}
-
-/* reduction of pi x, one limb, -31 <= e < FLINT_BITS */
-FLINT_FORCE_INLINE int
-_nfloat_trig_pi_reduce_fast_1(int * ra, int * rsneg, ulong * v1, ulong * v0, ulong d, slong e)
-{
-    ulong m, f1, f0, v2, w1, w0;
-
-    if (e >= 1)
-    {
-        if (e == FLINT_BITS - 1)
-            return NFLOAT_TRIG_FAST_DECLINE;
-        m = d >> (FLINT_BITS - 1 - e);
-        f1 = d << (e + 1);
-        f0 = 0;
-    }
-    else if (e == 0)
-    {
-        m = 1;
-        f1 = d << 1;
-        f0 = 0;
-    }
-    else
-    {
-        unsigned int s = -e - 1;
-        m = 0;
-        f1 = d >> s;
-        f0 = (s == 0) ? 0 : (d << (FLINT_BITS - s));
-    }
-
-    if (_nfloat_trig_pi_fold(ra, rsneg, &v2, &w1, &w0, m, f1, f0, 0) != 0)
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    if (v2 < (UWORD(1) << 32))
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    *v1 = v2;
-    *v0 = w1;
-    return 0;
-}
-
-/* reduction of pi x, two limbs, -39 <= e < FLINT_BITS */
-FLINT_FORCE_INLINE int
-_nfloat_trig_pi_reduce_fast_2(int * ra, int * rsneg, ulong * v2, ulong * v1, ulong * v0,
-    ulong d1, ulong d0, slong e)
-{
-    ulong m, f2, f1, f0;
-
-    if (e >= 1)
-    {
-        if (e == FLINT_BITS - 1)
-        {
-            m = d1;
-            f2 = d0;
-            f1 = 0;
-        }
-        else
-        {
-            m = d1 >> (FLINT_BITS - 1 - e);
-            f2 = (d1 << (e + 1)) | (d0 >> (FLINT_BITS - 1 - e));
-            f1 = d0 << (e + 1);
-        }
-        f0 = 0;
-    }
-    else if (e == 0)
-    {
-        m = 1;
-        f2 = (d1 << 1) | (d0 >> (FLINT_BITS - 1));
-        f1 = d0 << 1;
-        f0 = 0;
-    }
-    else
-    {
-        unsigned int s = -e - 1;
-        m = 0;
-        if (s == 0)
-        {
-            f2 = d1; f1 = d0; f0 = 0;
-        }
-        else
-        {
-            f2 = d1 >> s;
-            f1 = (d1 << (FLINT_BITS - s)) | (d0 >> s);
-            f0 = d0 << (FLINT_BITS - s);
-        }
-    }
-
-    if (_nfloat_trig_pi_fold(ra, rsneg, v2, v1, v0, m, f2, f1, f0) != 0)
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    if (*v2 < (UWORD(1) << 24))
-        return NFLOAT_TRIG_FAST_DECLINE;
-
-    return 0;
-}
-
 /* the outputs from v at two limbs (v within ev ulps) */
 static int
 _nfloat_trig_out_fast_1(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, int a, int sneg,
@@ -524,7 +166,7 @@ _nfloat_trig_out_fast_1(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
             ulong perr = 0;
             int sg;
 
-            NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+            ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
             sg = (a & 1) ? ncv : nsv;
             if (sh != 0)
             {
@@ -561,7 +203,7 @@ _nfloat_trig_out_fast_1(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
             unsigned int sh = flint_clz(D1);
             int sg;
 
-            NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+            ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
             sg = (dis ? nsv : ncv) ^ ((cot == NFLOAT_TRIG_CSC) ? xsgn : 0);
             if (sh != 0)
             {
@@ -598,7 +240,7 @@ _nfloat_trig_out_fast_1(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
         }
     }
 
-    NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+    ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
     os = (a & 1) ? rc : rs;
     oc = (a & 1) ? rs : rc;
 
@@ -638,7 +280,7 @@ _nfloat_trig_out_fast_2(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
             ulong perr = 0;
             int sg;
 
-            NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+            ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
             sg = (a & 1) ? ncv : nsv;
             if (sh != 0)
             {
@@ -680,7 +322,7 @@ _nfloat_trig_out_fast_2(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
             unsigned int sh = flint_clz(D2);
             int sg;
 
-            NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+            ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
             sg = (dis ? nsv : ncv) ^ ((cot == NFLOAT_TRIG_CSC) ? xsgn : 0);
             if (sh != 0)
             {
@@ -718,7 +360,7 @@ _nfloat_trig_out_fast_2(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, int cot, in
         }
     }
 
-    NFLOAT_TRIG_FAST_SIGNS(nsv, ncv, a, sneg, xsgn);
+    ARF_SMALL_TRIG_SIGNS(nsv, ncv, a, sneg, xsgn);
     os = (a & 1) ? rc : rs;
     oc = (a & 1) ? rs : rc;
 
@@ -752,7 +394,7 @@ _nfloat_trig_fast(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, 
 
         if (pi)
         {
-            if (e < -31 || _nfloat_trig_pi_reduce_fast_1(&a, &sneg, &v1, &v0, d, e) != 0)
+            if (e < -31 || _arf_small_trig_pi_reduce_1(&a, &sneg, &v1, &v0, d, e) != 0)
                 return NFLOAT_TRIG_FAST_DECLINE;
             ev = 2;
         }
@@ -767,7 +409,7 @@ _nfloat_trig_fast(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, 
         }
         else
         {
-            if (_nfloat_trig_reduce_fast_1(&a, &sneg, &v1, &v0, d, e) != 0)
+            if (_arf_small_trig_reduce_1(&a, &sneg, &v1, &v0, d, e) != 0)
                 return NFLOAT_TRIG_FAST_DECLINE;
             ev = 2;
         }
@@ -780,7 +422,7 @@ _nfloat_trig_fast(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, 
 
         if (pi)
         {
-            if (e < -39 || _nfloat_trig_pi_reduce_fast_2(&a, &sneg, &v2, &v1, &v0, d1, d0, e) != 0)
+            if (e < -39 || _arf_small_trig_pi_reduce_2(&a, &sneg, &v2, &v1, &v0, d1, d0, e) != 0)
                 return NFLOAT_TRIG_FAST_DECLINE;
             ev = 8;
         }
@@ -803,7 +445,7 @@ _nfloat_trig_fast(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, 
         }
         else
         {
-            if (_nfloat_trig_reduce_fast_2(&a, &sneg, &v2, &v1, &v0, d1, d0, e) != 0)
+            if (_arf_small_trig_reduce_2(&a, &sneg, &v2, &v1, &v0, d1, d0, e) != 0)
                 return NFLOAT_TRIG_FAST_DECLINE;
             ev = 2;
         }
@@ -830,11 +472,10 @@ _nfloat_trig_recip_fast(nfloat_ptr res, nfloat_srcptr x, int pi, int which, gr_c
 static int
 _nfloat_trig(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, gr_ctx_t ctx)
 {
-    ulong v[NFLOAT_ELEM_MAX_LIMBS + 1];
-    ulong xbuf[NFLOAT_MAX_LIMBS + 1];
-    mp_real_t X;
-    slong n, e, w, z;
-    int xsgn, a, s;
+    ulong ys[NFLOAT_ELEM_MAX_LIMBS + 2], yc[NFLOAT_ELEM_MAX_LIMBS + 2];
+    ulong err;
+    slong n, e, w, pb;
+    int xsgn;
     int status;
 
     n = NFLOAT_CTX_NLIMBS(ctx);
@@ -864,54 +505,30 @@ _nfloat_trig(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, gr_ct
     }
 #endif
 
-    if (e <= 0)
-    {
-        /* |x| < 1 unreduced: v = |x| with z = -e leading zero bits */
-        int trunc;
-        z = -e;
-        w = _nfloat_elem_limbs(ctx, (rs != NULL || rt != NULL) ? z : 0);
-        trunc = _nfloat_get_fixed(v, w, w, NFLOAT_D(x), n, e);
-        return _nfloat_trig_eval(rs, rc, rt, v, w, trunc, 0, 1, xsgn, ctx);
-    }
-
     if (e > NFLOAT_TRIG_MAX_EXP)
         return _nfloat_trig_slow(rs, rc, rt, x, 0, ctx);
 
-    w = _nfloat_elem_limbs(ctx, 0);
-    _nfloat_mp_real_view(X, xbuf, x, ctx);
+    pb = _nfloat_elem_bits(ctx, 0);
 
-    for (;;)
+    if (rt == NULL)
     {
-        int need_rel, r;
-
-        /* the reduction of mp_real_sin_cos_bits */
-        r = _mp_real_trig_reduce(v, X, w);
-        a = r & 3;
-        s = (r & 4) ? -1 : 1;
-
-        /* the output sin v (or tan v) needs relative accuracy */
-        need_rel = (rt != NULL) || (rs != NULL && !(a & 1)) || (rc != NULL && (a & 1));
-
-        if (!need_rel)
-            break;
-
-        z = _mp_real_elem_lzb(v, w);
-
-        /* v within 3 ulps: z is accurate unless v is that small */
-        if (z >= FLINT_BITS * w - 4)
-            z = FLINT_BITS * w;
-
-        if (_nfloat_trig_limbs(ctx, z, rt != NULL && (a & 1)) <= w)
-            break;
-
-        w = _nfloat_trig_limbs(ctx, z, rt != NULL && (a & 1));
+        int code = _mp_real_sin_cos_fp(ys, yc, &w, &err, NFLOAT_D(x), n, e, pb, NFLOAT_ELEM_MAX_LIMBS, (rs != NULL) | ((rc != NULL) << 1));
 
         /* more cancellation than the temporaries allow */
-        if (w > NFLOAT_ELEM_MAX_LIMBS)
+        if (w == NFLOAT_ELEM_MAX_LIMBS)
             return _nfloat_trig_slow(rs, rc, rt, x, 0, ctx);
-    }
 
-    return _nfloat_trig_eval(rs, rc, rt, v, w, 3, a, s, xsgn, ctx);
+        return _nfloat_trig_set(rs, rc, ys, yc, w, err, code, xsgn, ctx);
+    }
+    else
+    {
+        int recip, neg = _mp_real_tan_fp(ys, &w, &err, &recip, NFLOAT_D(x), n, e, pb, NFLOAT_ELEM_MAX_LIMBS);
+
+        if (w == NFLOAT_ELEM_MAX_LIMBS)
+            return _nfloat_trig_slow(rs, rc, rt, x, 0, ctx);
+
+        return _nfloat_set_mpn_err_recip(rt, ys, w + 1, -FLINT_BITS * w, err, recip, neg ^ xsgn, ctx);
+    }
 }
 
 int
@@ -978,11 +595,10 @@ nfloat_tan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 static int
 _nfloat_trig_pi(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, gr_ctx_t ctx)
 {
-    ulong T[NFLOAT_MAX_LIMBS + 1], xbuf[NFLOAT_MAX_LIMBS + 1];
-    ulong v[NFLOAT_ELEM_MAX_LIMBS + 2];
-    mp_real_t X;
-    slong n, e, w, z, tl, te;
-    int xsgn, a, s, r;
+    ulong ys[2 * NFLOAT_ELEM_MAX_LIMBS + 4], yc[NFLOAT_ELEM_MAX_LIMBS + 2];
+    ulong err;
+    slong n, e, w, k, pb;
+    int xsgn;
     int status = GR_SUCCESS;
 
     n = NFLOAT_CTX_NLIMBS(ctx);
@@ -1040,54 +656,70 @@ _nfloat_trig_pi(nfloat_ptr rs, nfloat_ptr rc, nfloat_ptr rt, nfloat_srcptr x, gr
     }
 #endif
 
-    /* |x| = a/2 + s t exactly, t in [0, 1/4] (the reduction of
-       mp_real_sin_cos_pi_bits) */
-    _nfloat_mp_real_view(X, xbuf, x, ctx);
-    r = _mp_real_trig_pi_reduce(T, &tl, &te, X);
-    a = r & 3;
-    s = (r & 4) ? -1 : 1;
+    pb = _nfloat_elem_bits(ctx, 0);
 
-    if (tl == 0)
+    if (rt == NULL)
     {
-        /* x a multiple of 1/2: sin, cos in {0, 1, -1}, tan in {0, pole} */
-        if (rt != NULL)
-            return (a & 1) ? nfloat_nan(rt, ctx) : nfloat_zero(rt, ctx);
+        int code = _mp_real_sin_cos_pi_fp(ys, yc, &w, &k, &err, NFLOAT_D(x), n, e, pb, NFLOAT_ELEM_MAX_LIMBS, (rs != NULL) | ((rc != NULL) << 1));
 
-        if (a & 1)
+        FLINT_ASSERT(!(code & MP_REAL_TRIG_TINY));
+
+        if (code & MP_REAL_TRIG_EXACT)
         {
-            if (rs != NULL)
+            /* x a multiple of 1/2: sin, cos in {0, 1, -1} */
+            int a = code & 3;
+
+            if (a & 1)
             {
-                status |= nfloat_one(rs, ctx);
-                NFLOAT_SGNBIT(rs) = (a == 3) ^ xsgn;
+                if (rs != NULL)
+                {
+                    status |= nfloat_one(rs, ctx);
+                    NFLOAT_SGNBIT(rs) = (a == 3) ^ xsgn;
+                }
+                if (rc != NULL)
+                    status |= nfloat_zero(rc, ctx);
             }
-            if (rc != NULL)
-                status |= nfloat_zero(rc, ctx);
-        }
-        else
-        {
-            if (rs != NULL)
-                status |= nfloat_zero(rs, ctx);
-            if (rc != NULL)
+            else
             {
-                status |= nfloat_one(rc, ctx);
-                NFLOAT_SGNBIT(rc) = (a == 2);
+                if (rs != NULL)
+                    status |= nfloat_zero(rs, ctx);
+                if (rc != NULL)
+                {
+                    status |= nfloat_one(rc, ctx);
+                    NFLOAT_SGNBIT(rc) = (a == 2);
+                }
             }
+            return status;
         }
-        return status;
+
+        if (w == NFLOAT_ELEM_MAX_LIMBS)
+            return _nfloat_trig_slow(rs, rc, rt, x, 3, ctx);
+
+        return _nfloat_trig_set(rs, rc, ys, yc, w, err, code, xsgn, ctx);
     }
+    else
+    {
+        int recip, code = _mp_real_tan_pi_fp(ys, &w, &k, &err, &recip, NFLOAT_D(x), n, e, pb, NFLOAT_ELEM_MAX_LIMBS);
 
-    /* 2^-(z + 1) <= t < 2^-z: relative accuracy for t with z leading
-       zero bits */
-    z = (slong) flint_clz(T[tl - 1]) - FLINT_BITS * te;
-    w = _nfloat_trig_limbs(ctx, z, rt != NULL && (a & 1));
-    if (w > NFLOAT_ELEM_MAX_LIMBS)
-        return _nfloat_trig_slow(rs, rc, rt, x, 3, ctx);
+        FLINT_ASSERT(!(code & MP_REAL_TRIG_TINY));
 
-    /* v = pi t within 3 ulps */
-    _mp_real_trig_pi_v_fixed(v, T, tl, te, w);
-    v[w] = 0;
+        if (code & MP_REAL_TRIG_EXACT)
+        {
+            if (code & MP_REAL_TRIG_ONE)
+            {
+                status = nfloat_one(rt, ctx);
+                NFLOAT_SGNBIT(rt) = (code & 1) ^ xsgn;
+                return status;
+            }
+            /* a multiple of 1/2: 0 or a pole */
+            return (code & 1) ? nfloat_nan(rt, ctx) : nfloat_zero(rt, ctx);
+        }
 
-    return _nfloat_trig_eval(rs, rc, rt, v, w, 3, a, s, xsgn, ctx);
+        if (w == NFLOAT_ELEM_MAX_LIMBS)
+            return _nfloat_trig_slow(rs, rc, rt, x, 3, ctx);
+
+        return _nfloat_set_mpn_err_recip(rt, ys, w + 1, -FLINT_BITS * w, err, recip, code ^ xsgn, ctx);
+    }
 }
 
 int

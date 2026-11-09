@@ -175,7 +175,7 @@ the inverse transform saves.
 ## Power tables with precomputed transforms {#powtab}
 
 The bit-burst splittings of the exponential and of the sine and cosine
-([](algorithms/floating-point/elementary-functions#bit-burst)) have
+([](algorithms/special-functions/elementary-series#bit-burst)) have
 $P(k) = x$ (resp. $x^2$), a constant, so $R_1$ of a merge over
 $[a, b)$ with midpoint $m$ is the power $x^{m-a}$. The tree splits at
 fixed midpoints $m = a + \lfloor(b - a)/2\rfloor$, so only $O(\log N)$
@@ -232,9 +232,9 @@ threads. The result does not depend on the number of threads.
 
 - `mp_real_hypgeom_series` and `mp_real_hypgeom_series_int64`
   implement the general engine, with transform reuse in the merges;
-  the constants of [](algorithms/floating-point/constants) and Zuniga's
+  the constants of [](algorithms/special-functions/constants) and Zuniga's
   series for logarithms and arctangents
-  ([](algorithms/floating-point/diophantine-reduction#zuniga)) are
+  ([](algorithms/special-functions/diophantine-reduction#zuniga)) are
   computed with it.
 - `_mp_real_exp_sum_bs_powtab` and `_mp_real_sin_cos_sum_bs_powtab`
   implement the bit-burst splittings with transformed power tables

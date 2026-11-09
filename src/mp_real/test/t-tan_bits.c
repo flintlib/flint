@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "ball_helpers.h"
 
 /* mp_real_tan_bits: when the status is 1, the output contains tan of a
@@ -106,7 +107,7 @@ TEST_FUNCTION_START(mp_real_tan_bits, state)
                 slong k = (slong) n_randint(state, 1000) - 500;
                 slong d = n_randint(state, 2 * prec + 100);
 
-                arb_const_pi(t, prec + d + 200);
+                ref_const_pi(t, prec + d + 200);
                 arb_mul_si(t, t, k, prec + d + 200);
                 arb_mul_2exp_si(t, t, -1);
                 arf_set_round(m, arb_midref(t), prec + d + 20, ARF_RND_DOWN);
@@ -143,7 +144,7 @@ TEST_FUNCTION_START(mp_real_tan_bits, state)
         mp_real_random_point(pt, x, state);
         wp = 2 * prec + FLINT_BITS * (x->size + 8) + 200;
         arb_set_arf(t, pt);
-        arb_tan(ref, t, wp);
+        ref_tan(ref, t, wp);
 
         big = (FLINT_BITS * (x->exp - 1) >= FLINT_MAX(65536, 4 * prec));
 
@@ -177,7 +178,7 @@ TEST_FUNCTION_START(mp_real_tan_bits, state)
             arb_init(w);
             arb_set(w, xa);
             mag_mul_ui(arb_radref(w), arb_radref(w), 3);
-            arb_cos(t, w, prec + FLINT_BITS * (x->size + 8) + 100);
+            ref_cos(t, w, prec + FLINT_BITS * (x->size + 8) + 100);
             pole = arb_contains_zero(t);
             arb_clear(w);
 

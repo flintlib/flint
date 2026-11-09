@@ -7,8 +7,8 @@ order: 12
 
 The sections below describe how FLINT evaluates special functions with
 rigorous error bounds, for real and complex balls and for power
-series: the elementary functions and constants of [`arb`](arb) and
-[`acb`](acb), the gamma and hypergeometric functions of
+series: the elementary functions and constants of [`arf`](arf),
+[`nfloat`](nfloat), [`arb`](arb), [`acb`](acb) and [`acf`](acf), the gamma and hypergeometric functions of
 [`arb_hypgeom`](arb_hypgeom) and [`acb_hypgeom`](acb_hypgeom), the zeta
 and $L$-functions of [`acb_dirichlet`](acb_dirichlet), the multiple
 zeta values, multiple polylogarithms and Epstein zeta functions of
@@ -22,6 +22,16 @@ bounds, rectangular and binary splitting — and maps every function
 family to its methods.
 
 ::: summary algorithms/special-functions/overview :::
+
+The elementary functions and the constants underlie everything else:
+they are evaluated by the fixed-point kernels of `mp_real`, which
+`arf`, `nfloat`, `arb`, `acb` and `acf` wrap.
+
+::: summary algorithms/special-functions/elementary :::
+
+::: summary algorithms/special-functions/complex-elementary :::
+
+::: summary algorithms/special-functions/constants :::
 
 The sections on the gamma function and on hypergeometric functions
 describe the two main families of algorithms; those after them

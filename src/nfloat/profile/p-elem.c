@@ -45,8 +45,6 @@ typedef struct
 }
 func_t;
 
-static int _mpfr_sin(mpfr_ptr r, mpfr_srcptr x, mpfr_rnd_t rnd) { return mpfr_sin(r, x, rnd); }
-
 static const func_t funcs[] =
 {
     { "exp", GR_METHOD_EXP, 1, (void (*)(void)) mpfr_exp, -4, 4, 0 },
@@ -55,7 +53,7 @@ static const func_t funcs[] =
     { "log", GR_METHOD_LOG, 1, (void (*)(void)) mpfr_log, -4, 4, 1 },
     { "log1p", GR_METHOD_LOG1P, 1, (void (*)(void)) mpfr_log1p, -4, 4, 1 },
     { "log2", GR_METHOD_LOG2, 1, (void (*)(void)) mpfr_log2, -4, 4, 1 },
-    { "sin", GR_METHOD_SIN, 1, (void (*)(void)) _mpfr_sin, -4, 4, 0 },
+    { "sin", GR_METHOD_SIN, 1, (void (*)(void)) mpfr_sin, -4, 4, 0 },
     { "cos", GR_METHOD_COS, 1, (void (*)(void)) mpfr_cos, -4, 4, 0 },
     { "tan", GR_METHOD_TAN, 1, (void (*)(void)) mpfr_tan, -4, 4, 0 },
     { "atan", GR_METHOD_ATAN, 1, (void (*)(void)) mpfr_atan, -4, 4, 0 },
@@ -68,7 +66,6 @@ static const func_t funcs[] =
     { "asinh", GR_METHOD_ASINH, 1, (void (*)(void)) mpfr_asinh, -4, 4, 0 },
     { "acosh", GR_METHOD_ACOSH, 1, (void (*)(void)) mpfr_acosh, 0.01, 4, 1 },
     { "atanh", GR_METHOD_ATANH, 1, (void (*)(void)) mpfr_atanh, -4, -0.01, 0 },
-    { "sin_pi", GR_METHOD_SIN_PI, 1, (void (*)(void)) mpfr_sinpi, -4, 4, 0 },
     { "pow", GR_METHOD_POW, 2, (void (*)(void)) mpfr_pow, -2, 2, 1 },
 };
 

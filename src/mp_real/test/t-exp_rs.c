@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
@@ -33,7 +34,7 @@ mask_top(nn_ptr x, slong n, slong zbits)
 
 /* reference: the tapered series of series_rs.c at the given size */
 static void
-ref_exp(nn_ptr res, nn_srcptr x, slong n)
+rs_ref_exp(nn_ptr res, nn_srcptr x, slong n)
 {
     slong zb = _mp_real_elem_lzb(x, n);
 
@@ -66,7 +67,7 @@ TEST_FUNCTION_START(mp_real_exp_rs, state)
         /* compare against the tapered series at one extra limb */
         xr[0] = 0;
         flint_mpn_copyi(xr + 1, x, n);
-        ref_exp(ref, xr, n + 1);
+        rs_ref_exp(ref, xr, n + 1);
 
         r2[0] = 0;
         flint_mpn_copyi(r2 + 1, res, n + 1);
@@ -89,9 +90,7 @@ TEST_FUNCTION_START(mp_real_exp_rs, state)
             TEST_FUNCTION_FAIL("zbits = %d, n = %wd, d1 = %wu, d0 = %wu\n",
                 zbits, n, d[1], d[0]);
 
-        /* absolute check (note: this will become circular once arb_exp
-           itself is built on the mp_real module; it can then be
-           replaced by an mpfr comparison) */
+        /* absolute check against MPFR */
         if (1)
         {
             arb_t xa, e, va, delta;
@@ -106,7 +105,7 @@ TEST_FUNCTION_START(mp_real_exp_rs, state)
             fmpz_set_ui_array(t, x, n);
             arb_set_fmpz(xa, t);
             arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-            arb_exp(e, xa, prec);
+            ref_exp(e, xa, prec);
 
             fmpz_set_ui_array(t, res, n + 1);
             arb_set_fmpz(va, t);

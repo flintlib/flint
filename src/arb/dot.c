@@ -611,7 +611,10 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
     sn = FLINT_MAX(sn, 2);
 
     /* Exponent for the main sum. */
-    sum_exp = max_exp + extend;
+    /* (a zero midpoint sum, which is never added to, at the exponent of
+       its errors or 0, so that the exponents of the error terms of the
+       output stay in range) */
+    sum_exp = ((max_exp != WORD_MIN) ? max_exp : max_rad_exp) + extend;
 
     /* We need sn + 1 limb for the sum (sn limbs + 1 dummy limb
        for carry or borrow that avoids an extra branch). We need
@@ -963,6 +966,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
         {
             arf_zero(arb_midref(res));
             inexact = 0;
+            exp = 0;
         }
         else
         {

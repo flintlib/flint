@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "arb.h"
 
@@ -49,9 +50,9 @@ TEST_FUNCTION_START(mp_real_tab_bsplit, state)
         arb_one(v);
         arb_mul_2exp_si(v, v, -i);
         if (is_log)
-            arb_log1p(t, v, FLINT_BITS * n + 64);
+            ref_log1p(t, v, FLINT_BITS * n + 64);
         else
-            arb_atan(t, v, FLINT_BITS * n + 64);
+            ref_atan(t, v, FLINT_BITS * n + 64);
         arb_get_lbound_arf(lb, t, FLINT_BITS * n + 64);
         arf_mul_2exp_si(lb, lb, FLINT_BITS * n);
         arf_get_fmpz(f, lb, ARF_RND_FLOOR);

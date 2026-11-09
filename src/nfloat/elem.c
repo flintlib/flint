@@ -72,6 +72,8 @@ _nfloat_set_mpn_trunc(nfloat_ptr res, nn_srcptr y, slong len, slong e, int sgnbi
 int
 _nfloat_set_mpn_err(nfloat_ptr res, nn_ptr y, slong len, slong e, ulong elo, ulong ehi, int sgnbit, gr_ctx_t ctx)
 {
+    FLINT_ASSERT(len >= 1);
+
     if (!NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
         return _nfloat_set_mpn_trunc(res, y, len, e, sgnbit, ctx);
     else
@@ -106,8 +108,7 @@ _nfloat_one_plus_tiny(nfloat_ptr res, int sgnbit, int dsgn, slong e, gr_ctx_t ct
 {
     slong n = NFLOAT_CTX_NLIMBS(ctx);
 
-    FLINT_ASSERT(e <= -FLINT_BITS * n);
-    (void) e;
+    FLINT_ASSERT(e <= -2);
 
     NFLOAT_SGNBIT(res) = sgnbit;
 
@@ -117,21 +118,27 @@ _nfloat_one_plus_tiny(nfloat_ptr res, int sgnbit, int dsgn, slong e, gr_ctx_t ct
 
         if (up && !dsgn)
         {
-            /* 1 + 2^(1 - FLINT_BITS n) */
+            /* 1 + 2^e, at least 1 + 2^(1 - FLINT_BITS n) (one ulp) */
+            slong b = FLINT_MAX(FLINT_BITS * n - 1 + e, 0);
             NFLOAT_EXP(res) = 1;
             _nfloat_zero_limbs(NFLOAT_D(res), n);
-            NFLOAT_D(res)[0] = 1;
+            NFLOAT_D(res)[b / FLINT_BITS] = UWORD(1) << (b % FLINT_BITS);
             NFLOAT_D(res)[n - 1] |= UWORD(1) << (FLINT_BITS - 1);
             return GR_SUCCESS;
         }
 
         if (!up && dsgn)
         {
-            /* 1 - 2^(-FLINT_BITS n) */
-            slong i;
+            /* 1 - 2^e, at most 1 - 2^(-FLINT_BITS n) (one ulp below 1):
+               the bits from FLINT_BITS n + e on */
+            slong b = FLINT_MAX(FLINT_BITS * n + e, 0), i;
             NFLOAT_EXP(res) = 0;
             for (i = 0; i < n; i++)
                 NFLOAT_D(res)[i] = UWORD_MAX;
+            for (i = 0; i < b / FLINT_BITS; i++)
+                NFLOAT_D(res)[i] = 0;
+            if (b % FLINT_BITS != 0)
+                NFLOAT_D(res)[b / FLINT_BITS] = UWORD_MAX << (b % FLINT_BITS);
             return GR_SUCCESS;
         }
     }
@@ -185,66 +192,6 @@ _nfloat_set_tiny_rel_err(nfloat_ptr res, nfloat_srcptr x, int side, gr_ctx_t ctx
 }
 
 ulong
-_nfloat_elem_normalize(nn_ptr t, slong * te, nn_srcptr y, slong len, slong ue, ulong err, slong wn)
-{
-    slong sh, i;
-    unsigned int c;
-
-    while (y[len - 1] == 0)
-        len--;
-
-    c = flint_clz(y[len - 1]);
-    sh = FLINT_BITS * len - c - FLINT_BITS * wn;    /* right shift */
-    *te = ue + sh;
-
-    if (sh >= 0)
-    {
-        slong ls = sh / FLINT_BITS;
-        unsigned int bs = sh % FLINT_BITS;
-        int dropped = 0;
-
-        for (i = 0; i < ls; i++)
-            dropped |= (y[i] != 0);
-
-        if (bs == 0)
-            _nfloat_copy_limbs(t, y + ls, wn);
-        else
-        {
-            dropped |= ((y[ls] << (FLINT_BITS - bs)) != 0);
-            for (i = 0; i < wn; i++)
-                t[i] = (y[ls + i] >> bs) | ((ls + i + 1 < len) ? (y[ls + i + 1] << (FLINT_BITS - bs)) : 0);
-        }
-
-        if (sh >= FLINT_BITS)
-            err = 1;
-        else
-            err = (err >> sh) + (sh != 0);
-
-        return err + dropped;
-    }
-    else
-    {
-        slong ls = (-sh) / FLINT_BITS;
-        unsigned int bs = (-sh) % FLINT_BITS;
-
-        _nfloat_zero_limbs(t, ls);
-        if (bs == 0)
-            _nfloat_copy_limbs(t + ls, y, len);
-        else
-        {
-            t[ls] = y[0] << bs;
-            for (i = 1; i < len; i++)
-                t[ls + i] = (y[i] << bs) | (y[i - 1] >> (FLINT_BITS - bs));
-        }
-
-        /* the error scales up by 2^-sh (UWORD_MAX signals overflow) */
-        if (-sh >= FLINT_BITS - 2 || err > (UWORD(1) << (FLINT_BITS - 3 + sh)))
-            return UWORD_MAX;
-        return err << (-sh);
-    }
-}
-
-ulong
 _nfloat_elem_div(nn_ptr q, nn_srcptr a, ulong ea, nn_srcptr d, ulong ed, slong w)
 {
     ulong t[2 * NFLOAT_ELEM_MAX_LIMBS];
@@ -262,202 +209,42 @@ _nfloat_elem_div(nn_ptr q, nn_srcptr a, ulong ea, nn_srcptr d, ulong ed, slong w
     return 2 * ea + 5 * ed + 2;
 }
 
-/* Approximate reals with relative error bounds ****************************/
-
-#define RF_ERR_MAX (UWORD(1) << (FLINT_BITS - 4))
-
-FLINT_FORCE_INLINE ulong
-_rf_err_add(ulong a, ulong b)
+int
+_nfloat_set_mpn_err_recip(nfloat_ptr res, nn_ptr y, slong len, slong ue, ulong err, int recip, int neg, gr_ctx_t ctx)
 {
-    if (a >= RF_ERR_MAX || b >= RF_ERR_MAX)
-        return UWORD_MAX;
-    return a + b;
-}
-
-void
-_nfloat_rf_set_mpn(_nfloat_rf_t r, nn_srcptr y, slong len, slong ue, ulong err, slong w)
-{
-    slong te;
-    r->err = _nfloat_elem_normalize(r->d, &te, y, len, ue, err, w);
-    r->exp = te + FLINT_BITS * w;
-}
-
-void
-_nfloat_rf_mul(_nfloat_rf_t r, const _nfloat_rf_t a, const _nfloat_rf_t b, slong w)
-{
-    ulong t[NFLOAT_ELEM_MAX_LIMBS + 1];
-    ulong err;
-    slong exp;
-
-    /* (A + ea)(B + eb) / B^w - AB / B^w <= ea + eb + ea eb / B^w, plus two
-       for the high product */
-    flint_mpn_mulhigh_n(t, a->d, b->d, w);
-    err = _rf_err_add(_rf_err_add(a->err, b->err), 3);
-    exp = a->exp + b->exp;
-
-    if (!LIMB_MSB_IS_SET(t[w - 1]))
-    {
-        mpn_lshift(t, t, w, 1);
-        err = _rf_err_add(err, err);
-        exp--;
-    }
-
-    _nfloat_copy_limbs(r->d, t, w);
-    r->exp = exp;
-    r->err = err;
-}
-
-void
-_nfloat_rf_div(_nfloat_rf_t r, const _nfloat_rf_t a, const _nfloat_rf_t b, slong w)
-{
-    ulong q[NFLOAT_ELEM_MAX_LIMBS + 2];
-    ulong err;
-    slong exp;
-
-    if (a->err >= RF_ERR_MAX || b->err >= RF_ERR_MAX)
-    {
-        r->err = UWORD_MAX;
-        return;
-    }
-
-    err = _nfloat_elem_div(q, a->d, a->err, b->d, b->err, w);
-    exp = a->exp - b->exp;
-
-    /* Q = A B^w / D in (B^w / 2, 2 B^w) */
-    if (q[w] != 0)
-    {
-        ulong lost = q[0] & 1;
-        mpn_rshift(q, q, w + 1, 1);
-        q[w - 1] |= (UWORD(1) << (FLINT_BITS - 1));
-        err = (err >> 1) + 1 + lost;
-        exp++;
-    }
-
-    _nfloat_copy_limbs(r->d, q, w);
-    r->exp = exp;
-    r->err = err;
-}
-
-void
-_nfloat_rf_inv(_nfloat_rf_t r, const _nfloat_rf_t a, slong w)
-{
-    _nfloat_rf_t one;
-    _nfloat_zero_limbs(one->d, w);
-    one->d[w - 1] = UWORD(1) << (FLINT_BITS - 1);
-    one->exp = 1;
-    one->err = 0;
-    _nfloat_rf_div(r, one, a, w);
-}
-
-/* T = (a, w) + or - (b, w) 2^-sh as w + 1 limbs, the shifted-out bits
-   lost (one more unit) */
-static ulong
-_rf_aligned(nn_ptr T, nn_srcptr a, nn_srcptr b, slong sh, slong w, int sub, ulong eb)
-{
-    ulong t[NFLOAT_ELEM_MAX_LIMBS + 1];
-    ulong err;
-    slong ls = sh / FLINT_BITS, i;
-    unsigned int bs = sh % FLINT_BITS;
-    int dropped = 0;
-
-    if (ls >= w)
-    {
-        _nfloat_zero_limbs(t, w);
-        dropped = 1;
-        err = 1;
-    }
+    if (!recip)
+        return _nfloat_set_mpn_err(res, y, len, ue, err, err, neg, ctx);
     else
     {
-        for (i = 0; i < ls; i++)
-            dropped |= (b[i] != 0);
-        if (bs != 0)
+        /* 1 / Y: Y normalized to wn limbs, then one division */
+        ulong t[NFLOAT_ELEM_MAX_LIMBS + 1], one[NFLOAT_ELEM_MAX_LIMBS + 1];
+        ulong q[NFLOAT_ELEM_MAX_LIMBS + 2];
+        slong te, wn = _nfloat_elem_limbs(ctx, 0);
+        ulong et, eq;
+
+        while (len > 0 && y[len - 1] == 0)
+            len--;
+        if (len == 0)
+            return GR_UNABLE;
+
+        /* (one limb less when Y is too short of wn limbs for the
+           scaled error to fit a word, as in _arf_set_mpn_err_quot) */
+        for (;;)
         {
-            dropped |= ((b[ls] << (FLINT_BITS - bs)) != 0);
-            mpn_rshift(t, b + ls, w - ls, bs);
+            et = _mp_real_fp_normalize(t, &te, y, len, ue, err, wn);
+            if (et != UWORD_MAX && et < (UWORD(1) << (FLINT_BITS - 4)))
+                break;
+            if (wn == 1)
+                return GR_UNABLE;
+            wn--;
         }
-        else
-            _nfloat_copy_limbs(t, b + ls, w - ls);
-        _nfloat_zero_limbs(t + w - ls, ls);
-        err = (sh >= FLINT_BITS) ? 1 : (eb >> sh) + (sh != 0);
+        _nfloat_zero_limbs(one, wn);
+        one[wn - 1] = UWORD(1) << (FLINT_BITS - 1);
+        eq = _nfloat_elem_div(q, one, 0, t, et, wn);
+
+        /* 1 / (T 2^te) = Q 2^(1 - 2 FLINT_BITS wn - te) */
+        return _nfloat_set_mpn_err(res, q, wn + 1, 1 - 2 * FLINT_BITS * wn - te, eq, eq, neg, ctx);
     }
-
-    if (sub)
-        T[w] = -mpn_sub_n(T, a, t, w);
-    else
-        T[w] = mpn_add_n(T, a, t, w);
-
-    return err + dropped;
-}
-
-void
-_nfloat_rf_add(_nfloat_rf_t r, const _nfloat_rf_t a, const _nfloat_rf_t b, slong w)
-{
-    ulong T[NFLOAT_ELEM_MAX_LIMBS + 2];
-    ulong err;
-    slong te;
-
-    if (a->exp < b->exp)
-    {
-        _nfloat_rf_add(r, b, a, w);
-        return;
-    }
-
-    if (a->err >= RF_ERR_MAX || b->err >= RF_ERR_MAX)
-    {
-        r->err = UWORD_MAX;
-        return;
-    }
-
-    err = a->err + _rf_aligned(T, a->d, b->d, a->exp - b->exp, w, 0, b->err);
-    r->err = _nfloat_elem_normalize(r->d, &te, T, w + 1, a->exp - FLINT_BITS * w, err, w);
-    r->exp = te + FLINT_BITS * w;
-}
-
-int
-_nfloat_rf_sub(_nfloat_rf_t r, const _nfloat_rf_t a, const _nfloat_rf_t b, slong w)
-{
-    ulong T[NFLOAT_ELEM_MAX_LIMBS + 2];
-    ulong err;
-    slong te;
-    int neg = 0;
-
-    if (a->err >= RF_ERR_MAX || b->err >= RF_ERR_MAX)
-    {
-        r->err = UWORD_MAX;
-        return 0;
-    }
-
-    if (a->exp < b->exp || (a->exp == b->exp && mpn_cmp(a->d, b->d, w) < 0))
-    {
-        const _nfloat_rf_struct * t = a;
-        a = b;
-        b = t;
-        neg = 1;
-    }
-
-    err = a->err + _rf_aligned(T, a->d, b->d, a->exp - b->exp, w, 1, b->err);
-
-    if (flint_mpn_zero_p(T, w + 1))
-    {
-        r->err = UWORD_MAX;
-        return neg;
-    }
-
-    r->err = _nfloat_elem_normalize(r->d, &te, T, w + 1, a->exp - FLINT_BITS * w, err, w);
-    r->exp = te + FLINT_BITS * w;
-    return neg;
-}
-
-int
-_nfloat_set_rf(nfloat_ptr res, const _nfloat_rf_t r, int sgnbit, slong w, gr_ctx_t ctx)
-{
-    ulong t[NFLOAT_ELEM_MAX_LIMBS + 2];
-
-    if (r->err >= RF_ERR_MAX)
-        return GR_UNABLE;
-
-    _nfloat_copy_limbs(t, r->d, w);
-    return _nfloat_set_mpn_err(res, t, w, r->exp - FLINT_BITS * w, r->err, r->err, sgnbit, ctx);
 }
 
 /* Ball evaluation ***********************************************************/
@@ -517,7 +304,7 @@ _nfloat_set_mp_real(nfloat_ptr res, const mp_real_t x, slong shift, int * status
     if (x->err != 0)
     {
         mbits = FLINT_BITS * (size - 1) + FLINT_BIT_COUNT(x->d[size - 1]) - 1;
-        if (mbits - (slong) FLINT_BIT_COUNT(x->err) < NFLOAT_CTX_FUNC_PREC(ctx) + NFLOAT_ELEM_GUARD_BITS)
+        if (mbits - (slong) FLINT_BIT_COUNT(x->err) < _nfloat_elem_bits(ctx, 0))
             return 0;
     }
 
@@ -546,7 +333,7 @@ _nfloat_eval_ball(nfloat_ptr res, _nfloat_ball_func_t f, nfloat_srcptr x, nfloat
     max_prec = 16 * NFLOAT_CTX_PREC(ctx) + 100000;
     if (min_prec <= NFLOAT_TRIG_BALL_MAX_EXP / 4 + 64)
         max_prec = FLINT_MAX(max_prec, 2 * min_prec);
-    prec = FLINT_MAX(min_prec, NFLOAT_CTX_FUNC_PREC(ctx) + NFLOAT_ELEM_GUARD_BITS + 32);
+    prec = FLINT_MAX(min_prec, _nfloat_elem_bits(ctx, 32));
 
     for ( ; prec <= max_prec; prec *= 2)
     {

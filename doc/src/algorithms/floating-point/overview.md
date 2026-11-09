@@ -55,13 +55,14 @@ products and elementary functions. See [](algorithms/floating-point/nfloat).
 two levels: fixed-point numbers on word arrays, and balls `mp_real_t`
 whose radius is counted in units of the last word. It is the backend
 for evaluating elementary functions, constants and hypergeometric
-series quickly at any precision: the `nfloat` elementary functions run
-on its fixed-point kernels. See
-[](algorithms/floating-point/mp-real-balls),
-[](algorithms/floating-point/elementary-functions),
-[](algorithms/floating-point/diophantine-reduction),
-[](algorithms/floating-point/hypergeometric-series) and
-[](algorithms/floating-point/constants).
+series quickly at any precision: the elementary functions of `arf`,
+`nfloat` and `arb` run on its fixed-point kernels. See
+[](algorithms/floating-point/mp-real-balls) and
+[](algorithms/floating-point/hypergeometric-series) here, and
+[](algorithms/special-functions/elementary) and
+[](algorithms/special-functions/constants) for the functions and
+constants; [](algorithms/floating-point/correct-rounding) describes how
+`arf` rounds the elementary functions correctly.
 
 ## Decimal arithmetic {#decimal}
 

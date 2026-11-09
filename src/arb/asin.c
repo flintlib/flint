@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
+#include "arb/elem.h"
 
 void
 arb_asin(arb_t z, const arb_t x, slong prec)
@@ -50,6 +50,9 @@ arb_asin(arb_t z, const arb_t x, slong prec)
             return;
         }
     }
+
+    if (_arb_arc_fast(z, x, ARF_ARC_ASIN, prec))
+        return;
 
     arb_init(t);
 

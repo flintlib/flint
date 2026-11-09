@@ -40,7 +40,7 @@ wall_us(void)
 }
 
 /* precomputation of the diophantine (multi-prime) scheme, from scratch: the cache
-   build (arb_log_primes_vec_bsplit, floored) */
+   build (_mp_real_log_primes_vec_arb, floored) */
 static double
 precomp_diophantine(slong num, slong n)
 {

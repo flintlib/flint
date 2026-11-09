@@ -608,6 +608,57 @@ slong _mp_real_series_tapered_horner(nn_ptr V, nn_srcptr z, slong n, flint_bitcn
 void _mp_real_series_rs_tan(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r);
 int _mp_real_series_rs_tan_ok(slong n, flint_bitcnt_t r);
 
+/* Whether |t| = |y log |x|| > 2^lim is certain from a cheap lower bound,
+   for |x| = (xd, xn) 2^xe != 1 (xd normalised, |xe| < 2^(FLINT_BITS -
+   3)) and |y| >= 2^(ye - 1): |log |x|| > (|xe| - 1) log 2 >= 2^(bits(|xe|
+   - 1) - 2) for |xe| >= 2, > log 2 > 1/2 for xe = -1, and, with c the
+   length of the leading run of ones of the mantissa (xe = 0: 1 - |x| >
+   2^-(c + 1)) resp. of zeros of the mantissa without its top bit, the
+   top bit counted (xe = 1: |x| - 1 >= 2^-c, log |x| > (|x| - 1) / 2),
+   |log |x|| > 2^-(c + 2).  The run is scanned only when its length can
+   matter (up to ye - 3 - lim bits): for the usual arguments, with ye -
+   3 < lim and |xe| small, the test is a few comparisons.
+   _mp_real_pow_fp and arf_pow use it to give up at the limit of exp
+   without evaluating log |x| at the many bits that would decide |t|
+   exactly (pow_fp.c). */
+FLINT_FORCE_INLINE int
+_mp_real_pow_t_exceeds(nn_srcptr xd, slong xn, slong xe, slong ye, slong lim)
+{
+    slong c, cap, i;
+
+    if (xe >= 2 || xe <= -2)
+        return ye + (slong) FLINT_BIT_COUNT(FLINT_ABS(xe) - 1) - 3 >= lim;
+    if (xe == -1)
+        return ye - 2 >= lim;
+
+    /* |t| > 2^(ye - c - 3) >= 2^lim needs c <= cap */
+    cap = ye - 3 - lim;
+    if (cap < 0)
+        return 0;
+
+    c = 0;
+    for (i = xn - 1; i >= 0; i--)
+    {
+        ulong w = (xe == 0) ? ~xd[i] : xd[i];
+        if (xe == 1 && i == xn - 1)
+            w &= ~(UWORD(1) << (FLINT_BITS - 1));
+        if (w != 0)
+        {
+            c += flint_clz(w);
+            break;
+        }
+        c += FLINT_BITS;
+        if (c > cap)
+            return 0;
+    }
+
+    /* (xe = 0 with all ones: the run ends below the mantissa; xe = 1
+       with all zeros would be |x| = 1) */
+    if (i < 0 && xe == 1)
+        return 0;
+    return c <= cap;
+}
+
 /* the static tables (elem_tables.c) cover n <= nmax, r >= rmin */
 #include "elem_tables.h"
 
@@ -653,8 +704,10 @@ _mp_real_series_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n, flint_bitc
 {
     if (n < MP_REAL_SERIES_RS_MIN_SIN_COS && (slong) r >= MP_REAL_SERIES_SIN_RMIN)
     {
-        _mp_real_series_tapered(ysin, x, n, r, MP_REAL_SERIES_SIN);
-        _mp_real_series_tapered(yg, x, n, r, MP_REAL_SERIES_COS);
+        if (ysin != NULL)
+            _mp_real_series_tapered(ysin, x, n, r, MP_REAL_SERIES_SIN);
+        if (yg != NULL)
+            _mp_real_series_tapered(yg, x, n, r, MP_REAL_SERIES_COS);
     }
     else
         _mp_real_series_rs_sin_cos(ysin, yg, x, n, r, 0);
@@ -967,6 +1020,23 @@ _mp_real_machin_entry(const _mp_real_tab_struct * T, slong j, slong nv)
    such values into nc-limb cache entries (0 if undetermined) */
 void _mp_real_log_primes_vec(mp_real_struct * res, slong num, slong n);
 void _mp_real_atan_gauss_vec(mp_real_struct * res, slong num, slong n);
+
+/* the first 13 logarithms of primes and arguments of nonreal Gaussian
+   primes to 4608 bits, as fixed-point floors (log_p_tab.c,
+   atan_gauss_tab.c; the exponents in machin_bsplit.c), the initial
+   caches; FLINT_DLL for the tests */
+#define MP_REAL_LOG_P_TAB_NUM 13
+#define MP_REAL_LOG_P_TAB_BITS 4608
+#define MP_REAL_LOG_P_TAB_LIMBS (MP_REAL_LOG_P_TAB_BITS / FLINT_BITS)
+FLINT_DLL extern const ulong _mp_real_log_p_tab[MP_REAL_LOG_P_TAB_NUM][MP_REAL_LOG_P_TAB_LIMBS];
+FLINT_DLL extern const ulong _mp_real_atan_gauss_tab[MP_REAL_LOG_P_TAB_NUM][MP_REAL_LOG_P_TAB_LIMBS];
+
+/* short integer relations sum_j c_j alpha_j = eps by lattice reduction
+   (precompute_reductions.c), the source of the tables of rel_tab_data.c:
+   rel receives the coefficient rows (terminated by
+   MP_REAL_REL_TERMINATOR) and eps the values, for eps decreasing
+   roughly by the factor C, up to max_rel rows */
+void _mp_real_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slong n, slong max_rel, double C);
 void _mp_real_log_ratio_zuniga(mp_real_t res, const fmpz_t u, const fmpz_t v, slong n);
 void _mp_real_atan_ratio_zuniga(mp_real_t res, const fmpz_t d, const fmpz_t t, slong n);
 int _mp_real_store_floors(nn_ptr e, slong nc, mp_real_struct * v, slong num);
@@ -1038,7 +1108,7 @@ void _mp_real_phase_end(mp_real_phase_t * ph);
    atan.c) ******************************************************************/
 
 /* (ys, n + 1), (yc, n + 1) = sin v, cos v for v in [0, 1) at n fraction
-   limbs, both outputs required, by the kernel mp_real_sin_cos_bits
+   limbs (n >= 2 on 32-bit machines; one output may be NULL), by the kernel mp_real_sin_cos_bits
    uses (per-size, bitwise, diophantine or notab by n, or a reduced
    series for small v); err <= 6r + 128 with r <= 768 the bitwise
    parameter, at most 128 for the others (sin_cos.c) */
@@ -1073,9 +1143,11 @@ void _mp_real_trig_pi_v_fixed(nn_ptr V, nn_srcptr T, slong tl, slong te, slong N
 /* (y, n + 1) = tan v for v in [0, 1) at n fraction limbs (the tangent
    series or sin and 1 - cos of the reduced argument and a division for
    small v, else the per-size, bitwise or diophantine kernels, or sin,
-   cos and a division beyond 65536 limbs); err <= 8r + 256 with r <= 768
-   the bitwise parameter, 4 for the diophantine kernel, computed at run
-   time (below 1000) for the divisions (tan.c) */
+   cos and a division beyond 65536 limbs; n >= 2 on 32-bit machines);
+   err <= 8r + 256 with r <= 768 the bitwise parameter (19 (6r + 128) / 4
+   + 2 through the sine and cosine kernel at most 22 limbs on 64-bit
+   machines), 4 for the diophantine kernel, computed at run time (below
+   1000) for the divisions (tan.c) */
 void _mp_real_tan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n);
 
 /* res = (-1)^neg / y for y = (Y, L) B^ey (L limbs, top zero limbs
@@ -1698,7 +1770,7 @@ void _mp_real_exp_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n);
 /* (y, n + 1) = exp(-v) for v in [0, 1) at n fraction limbs by the
    alternating series (or cosh - sinh) when v has enough leading zero
    bits for the series to beat the reduction and the kernel, returning
-   1 (err <= 10); else returns 0 and leaves y alone (exp.c) */
+   1 (err <= 30); else returns 0 and leaves y alone (exp.c) */
 int _mp_real_exp_neg_series(nn_ptr y, ulong * err, nn_srcptr v, slong n);
 
 /* (y, n) = atan(v) for v in [0, 1) at n fraction limbs: the kernel
@@ -1706,9 +1778,10 @@ int _mp_real_exp_neg_series(nn_ptr y, ulong * err, nn_srcptr v, slong n);
    Newton beyond 600 limbs); err <= 4r + 64 (atan.c) */
 void _mp_real_atan_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n);
 
-/* (y, n) = log1p(v) for v in [0, 1) at n <= 600 fraction limbs: the
-   per-size or bitwise kernel of mp_real_log_bits; err <= 3r + 64
-   (log.c) */
+/* (y, n) = log1p(v) for v in [0, 1) at n fraction limbs (n >= 2 on
+   32-bit machines): the per-size or bitwise kernel of mp_real_log_bits
+   up to 600 limbs, err <= 3r + 64; beyond, log 2 - (-log((1 + v) / 2))
+   by the Newton iteration, err <= 4 (log.c) */
 void _mp_real_log1p_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n);
 
 /* the number of leading zero bits of s = |u - 1| from which
@@ -1735,6 +1808,90 @@ _mp_real_elem_frame(nn_ptr buf, slong n, const mp_real_t x,
     }
     *trunc = _mp_real_elem_copy(buf, n, n, x);
     return buf;
+}
+
+/* Sets (v, vn) to floor(|x| B^fn) mod B^vn for the floating-point
+   mantissa |x| = (d, n) 2^(e - FLINT_BITS n) (the caller ensures
+   |x| < B^(vn - fn) when the value matters in full); returns 1 if
+   nonzero bits of |x| B^fn were dropped below the unit, otherwise 0.
+   The exponent must leave room for the shift: |e| <= WORD_MAX / 4. */
+FLINT_FORCE_INLINE int
+_mp_real_fp_get_fixed(nn_ptr v, slong vn, slong fn, nn_srcptr d, slong n, slong e)
+{
+    slong s, ls, j;
+    unsigned int bs;
+    int inexact;
+
+    FLINT_ASSERT(e >= -(WORD_MAX / 4) && e <= WORD_MAX / 4);
+    s = e + FLINT_BITS * (fn - n);
+
+    if (s >= 0)
+    {
+        ls = s / FLINT_BITS;
+        bs = s % FLINT_BITS;
+
+        /* (explicit helpers: the compiler would turn plain loops into
+           calls to memset and memcpy, expensive for a few limbs) */
+        _flint_mpn_zero_small(v, FLINT_MIN(ls, vn));
+
+        if (ls < vn)
+        {
+            slong m = FLINT_MIN(n, vn - ls);
+
+            if (bs == 0)
+            {
+                _flint_mpn_copy_small(v + ls, d, m);
+                _flint_mpn_zero_small(v + ls + m, vn - ls - m);
+            }
+            else
+            {
+                v[ls] = d[0] << bs;
+                for (j = 1; j < m; j++)
+                    v[ls + j] = (d[j] << bs) | (d[j - 1] >> (FLINT_BITS - bs));
+                if (ls + m < vn)
+                {
+                    v[ls + m] = d[m - 1] >> (FLINT_BITS - bs);
+                    _flint_mpn_zero_small(v + ls + m + 1, vn - ls - m - 1);
+                }
+            }
+        }
+
+        return 0;
+    }
+    else
+    {
+        s = -s;
+        ls = s / FLINT_BITS;
+        bs = s % FLINT_BITS;
+
+        if (ls >= n)
+        {
+            _flint_mpn_zero_small(v, vn);
+            return 1;
+        }
+
+        inexact = 0;
+        for (j = 0; j < ls; j++)
+            inexact |= (d[j] != 0);
+
+        if (bs == 0)
+        {
+            for (j = 0; j < vn; j++)
+                v[j] = (ls + j < n) ? d[ls + j] : 0;
+        }
+        else
+        {
+            inexact |= ((d[ls] << (FLINT_BITS - bs)) != 0);
+            for (j = 0; j < vn; j++)
+            {
+                ulong lo = (ls + j < n) ? d[ls + j] : 0;
+                ulong hi = (ls + j + 1 < n) ? d[ls + j + 1] : 0;
+                v[j] = (lo >> bs) | (hi << (FLINT_BITS - bs));
+            }
+        }
+
+        return inexact;
+    }
 }
 
 /* leading zero bits of the fraction (v, n), WORD_MAX if zero */

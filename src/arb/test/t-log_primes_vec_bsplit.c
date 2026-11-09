@@ -25,7 +25,7 @@ TEST_FUNCTION_START(arb_log_primes_vec_bsplit, state)
         ulong p, pprev;
 
         prec = 2 + n_randint(state, 700);
-        n = n_randint(state, 30);
+        n = n_randint(state, n_randint(state, 4) ? 30 : 100);
 
         flint_set_num_threads(1 + n_randint(state, 3));
 

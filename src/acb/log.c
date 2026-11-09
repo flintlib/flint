@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "acb/impl.h"
 
 void
 acb_log(acb_t r, const acb_t z, slong prec)
@@ -55,6 +56,10 @@ acb_log(acb_t r, const acb_t z, slong prec)
         {
             acb_indeterminate(r);
         }
+    }
+    else if (_acb_elem_small(r, NULL, z, ACB_ELEM_LOG, prec))
+    {
+        /* (the register paths) */
     }
     else
     {

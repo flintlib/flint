@@ -121,9 +121,9 @@ int main(void)
 }
 ```
 ```output
-sin(10^30)            [-0.0901169019121380580 +/- 3.16e-20]
+sin(10^30)            [-0.09011690191213805803 +/- 4.57e-21]
 sin([10^30 +/- r])    [+/- 1.00]
-exp(1000)             [1.970071114017046994e+434 +/- 2.66e+415]
+exp(1000)             [1.9700711140170469939e+434 +/- 9.93e+414]
 expm1(10^-30)         [1.0000000000000000000e-30 +/- 6.36e-50]
 exp(10^-30) - 1       [+/- 1.01e-30]
 log([2 +/- 1e-10])    [0.6931471806 +/- 9.01e-11]
@@ -143,7 +143,7 @@ cos(1000000.5 pi)     [+/- 3.64e-13]
 | `arb_log`, `arb_log1p`, `arb_log_ui`, `arb_log_base_ui`, `arb_log_hypot` | `arb_log_base_ui` is exact for exact powers |
 | `arb_pow`, `arb_pow_ui`, `arb_pow_fmpq`, `arb_root_ui`, `arb_sqrt`, `arb_rsqrt` | integer and half-integer exponents by repeated multiplication |
 | `arb_sin`, `arb_cos`, `arb_sin_cos`, `arb_tan`, `arb_cot`, `arb_sec`, `arb_csc`, `arb_sinc` | `arb_sin_cos` computes both for the price of one |
-| `arb_sin_pi`, `arb_cos_pi`, `arb_tan_pi`, `arb_cot_pi`, `arb_csc_pi`, `arb_sinc_pi`, `arb_sin_cos_pi_fmpq` | exact at integers and half-integers |
+| `arb_sin_pi`, `arb_cos_pi`, `arb_tan_pi`, `arb_cot_pi`, `arb_csc_pi`, `arb_sinc_pi`, `arb_sin_cos_pi_fmpq`, `arb_tan_pi_fmpq` | exact at integers and half-integers |
 | `arb_atan`, `arb_atan2`, `arb_asin`, `arb_acos` | `arb_atan2` is the argument of $a + bi$ |
 | `arb_sinh`, `arb_cosh`, `arb_sinh_cosh`, `arb_tanh`, `arb_coth`, `arb_sech`, `arb_csch` | accurate near 0 |
 | `arb_asinh`, `arb_acosh`, `arb_atanh` | |

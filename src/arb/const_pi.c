@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "mp_real.h"
+#include "arb/elem.h"
 
 static void
 arb_const_pi_chudnovsky_eval(arb_t s, slong prec)
@@ -25,21 +24,8 @@ _ARB_DEF_CACHED_CONSTANT(static, arb_const_pi_chudnovsky, arb_const_pi_chudnovsk
 void
 arb_const_pi(arb_t res, slong prec)
 {
-    if (prec < ARB_PI4_TAB_LIMBS * FLINT_BITS - 16)
-    {
-        slong exp;
-
-        /* just reading the table is known to give the correct rounding */
-        _arf_set_round_mpn(arb_midref(res), &exp, arb_pi4_tab,
-            ARB_PI4_TAB_LIMBS, 0, prec, ARF_RND_NEAR);
-        _fmpz_set_si_small(ARF_EXPREF(arb_midref(res)), 2 + exp);
-
-        /* 1/2 ulp error */
-        _fmpz_set_si_small(MAG_EXPREF(arb_radref(res)), 2 + exp - prec);
-        MAG_MAN(arb_radref(res)) = MAG_ONE_HALF;
-    }
+    if (prec <= FLINT_BITS * (MP_REAL_CONST_STATIC_N - 1) - 16)
+        _arb_const_set_floor(res, MP_REAL_CONST_ID_PI4, 2, prec);
     else
-    {
-        arb_const_pi_chudnovsky(res, prec);
-    }
+        _arb_const_round_cached(res, arb_const_pi_chudnovsky, prec);
 }

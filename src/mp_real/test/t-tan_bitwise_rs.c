@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 #include "bitwise_boundary.h"
@@ -62,7 +63,7 @@ x = flint_malloc((n + 2) * sizeof(ulong));
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_tan(e, xa, prec);
+        ref_tan(e, xa, prec);
 
         fmpz_set_ui_array(f, res, n + 1);
         arb_set_fmpz(va, f);
@@ -110,7 +111,7 @@ x = flint_malloc((n + 2) * sizeof(ulong));
                 arb_init(xa);
                 arb_init(e);
                 _test_bitwise_arb(xa, x, n);
-                arb_tan(e, xa, FLINT_BITS * n + 128);
+                ref_tan(e, xa, FLINT_BITS * n + 128);
                 u = _test_bitwise_ulps(t1, n + 1, n, e);
                 arb_clear(xa);
                 arb_clear(e);
@@ -142,7 +143,7 @@ x = flint_malloc((n + 2) * sizeof(ulong));
         arb_init(xa);
         arb_init(e);
         _test_bitwise_arb(xa, x, n);
-        arb_tan(e, xa, FLINT_BITS * n + 128);
+        ref_tan(e, xa, FLINT_BITS * n + 128);
         u = _test_bitwise_ulps(res, n + 1, n, e);
         arb_clear(xa);
         arb_clear(e);

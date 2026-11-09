@@ -30,7 +30,8 @@
    by whole zero limbs).
 
    Error bounds (15 ulps returned): hardcoded routines <= 12 ulps;
-   series_rs.c within 2 ulps, plus 1 for forming cos = 1 - (1 - cos).
+   series_rs.c within 3.1 ulps (sin) resp. 3.6 ulps (1 - cos), plus 1 for
+   forming cos = 1 - (1 - cos).
    Alternating-series bounds are two-sided, hyperbolic ones
    one-sided. */
 

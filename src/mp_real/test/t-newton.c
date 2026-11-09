@@ -14,10 +14,11 @@
 #include "ulong_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* _mp_real_neglog_newton and _mp_real_atan_newton agree with arb within
+/* _mp_real_neglog_newton and _mp_real_atan_newton agree with MPFR within
    their budgets over the whole input ranges (random inputs, inputs
    with long runs of zero or one bits including the endpoints, and
    inputs whose top limbs are zero so that the starting value is
@@ -117,14 +118,14 @@ TEST_FUNCTION_START(mp_real_newton, state)
 
         if (which == 0)
         {
-            arb_log(r, xa, FLINT_BITS * n + 64);
+            ref_log(r, xa, FLINT_BITS * n + 64);
             arb_neg(r, r);
             _mp_real_neglog_newton_tune(y, &test_err_out, x, n, forward, N);
             bound = TEST_ERR(DOC_NEGLOG_NEWTON_MAX_ERR);
         }
         else
         {
-            arb_atan(r, xa, FLINT_BITS * n + 64);
+            ref_atan(r, xa, FLINT_BITS * n + 64);
             _mp_real_atan_newton_tune(y, &test_err_out, x, n, forward, N);
             bound = TEST_ERR(DOC_ATAN_NEWTON_MAX_ERR);
         }

@@ -1062,16 +1062,24 @@ $a = p/q$ is small and as $\exp(a \log x)$ otherwise.
 ::: function
 void arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
 
-Sets `z` to $x^y$: by binary exponentiation if `y` is a small exact
-integer, as $(x^{1/2})^{2y}$ if `y` is a small exact half-integer, and as
-$\exp(y \log x)$ otherwise, with $x^y = \pm(-x)^y$ for negative $x$ and
-exact integer $y$.
+Sets `z` to $x^y$: for an exact integer `y` by binary exponentiation
+(small exponents) or as $\exp(y \log x)$, with $x^y = \pm(-x)^y$ for
+negative $x$; as $(x^{1/2})^{2y}$ if `y` is a small exact half-integer;
+as $\exp(y \log x)$ otherwise (exact arguments in one evaluation). For a wide base and an exact
+integer exponent, the result is the hull of the range of $x^y$ over the
+ball, from the powers of its endpoints, which is tighter than the ball
+arithmetic of binary exponentiation (the base is wide when its radius
+exceeds $|m| / (4 |y|)$ for the midpoint $m$, or when it contains 0).
 
 ::: details
 $x^0 = 1$ for every $x$, and $0^y$ is 0 for positive $y$ and
-indeterminate otherwise. For a ball $x = [a \pm a]$ with $a > 0$, which
-contains 0, and nonnegative $y$, the result is the finite ball $[u/2 \pm
-u/2]$ with $u \ge (2a)^y$ rather than an indeterminate value. Otherwise a
+indeterminate otherwise. A ball containing 0 raised to a negative
+integer power is indeterminate. For a ball $x$ containing 0 and positive
+numbers and a nonnegative `y` (containing no integer if $x$ also
+contains negative numbers, whose integer powers are real), the result
+is the finite ball $[u/2 \pm u/2]$ with $u \ge R^y$ over the ball for the upper
+endpoint $R$ of $x$ (the range of $x^y$ over the nonnegative part of
+$x$, where it is real), rather than an indeterminate value. Otherwise a
 base containing nonpositive numbers gives an indeterminate result unless
 $y$ is an exact integer.
 :::
@@ -1124,11 +1132,9 @@ indeterminate.
 ::: details
 `arb_log` computes the logarithm of the midpoint with `arb_log_arf` and
 bounds the propagated error for $x = [m \pm r]$, $r < m$, by
-$\log(1 + r/(m - r))$. Up to about 2800 bits, `arb_log_arf` reduces the
-argument with precomputed tables and sums an arctangent series by
-rectangular splitting; above, it uses a Newton-type iteration on
-`arb_exp`, and logarithms of smooth integers use precomputed logarithms
-of primes.
+$\log(1 + r/(m - r))$. Logarithms of integers with all prime factors
+among the first 13 primes are assembled from cached logarithms of
+primes (from 256 bits).
 :::
 :::
 
@@ -1136,11 +1142,13 @@ of primes.
 void arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec)
 
 Sets `s` to $\log k$, given `log_prev` $= \log(\mathit{prev})$ with
-$\mathit{prev} < k$. At high precision it uses $\log k = \log
-\mathit{prev} + 2 \operatorname{atanh}((k - \mathit{prev}) / (k +
-\mathit{prev}))$ with the atanh series evaluated by binary splitting,
-which is fast when $\mathit{prev}$ is large and $k - \mathit{prev}$
-small; otherwise it ignores `log_prev`.
+$\mathit{prev} < k$. At a precision high enough for the ratio (about
+$4 \cdot 10^4 (16 / \log_2((k + \mathit{prev}) / (k - \mathit{prev})))^2$
+bits, where it beats the kernels) it uses $\log k = \log \mathit{prev} +
+2 \operatorname{atanh}((k - \mathit{prev}) / (k + \mathit{prev}))$ with the
+atanh series evaluated by binary splitting, which is fast when
+$\mathit{prev}$ is large and $k - \mathit{prev}$ small; otherwise it
+ignores `log_prev`.
 :::
 
 ::: function
@@ -1161,6 +1169,7 @@ void arb_log_hypot(arb_t res, const arb_t x, const arb_t y, slong prec)
 
 Sets `res` to $\log \sqrt{x^2 + y^2}$, accurately also when $x^2 + y^2$
 is close to 1. This is the real part of the complex logarithm.
+
 :::
 
 ## Trigonometric functions {#trig}
@@ -1212,17 +1221,26 @@ Set `y` to $\tan(\pi x)$, respectively $\cot(\pi x)$.
 void arb_sin_cos_pi_fmpq(arb_t s, arb_t c, const fmpq_t x, slong prec)
 void arb_sin_pi_fmpq(arb_t s, const fmpq_t x, slong prec)
 void arb_cos_pi_fmpq(arb_t c, const fmpq_t x, slong prec)
+void arb_tan_pi_fmpq(arb_t t, const fmpq_t x, slong prec)
 
-Set `s` to $\sin(\pi x)$ and `c` to $\cos(\pi x)$ for a rational $x$ in
-lowest terms.
+Set `s` to $\sin(\pi x)$, `c` to $\cos(\pi x)$ and `t` to $\tan(\pi x)$
+for a rational $x$, with full relative accuracy also near the zeros. The
+tangent is indeterminate exactly at the poles (the half-integers). The
+rational values ($0$, $\pm 1/2$, $\pm 1$, and $\tan(\pi x) = \pm 1$)
+are exact.
 
 ::: details
-Symmetries first reduce $x$ to $[0, 1/4]$. Then either $\pi x$ is
-approximated and the usual functions are called, or, for small
-denominators, the value is computed as an algebraic number (a root of a
-Chebyshev-type polynomial), whichever is estimated to be faster. Since the
-reduced argument is in the first octant, the first method gives full
-relative accuracy even near the zeros.
+For a word-size denominator at precisions where an algebraic method is
+faster than evaluating the function of $\pi x$ (square roots for small
+denominators, half-angle steps for $q = 2^k q_0$ with $q_0 = 1, 3, 5$, a
+Chebyshev iteration for denominators of up to about 12 bits at 30000
+bits and more at higher precision), the value is computed as an
+algebraic number by `mp_real_sin_cos_pi_ui_div_ui` resp.
+`mp_real_tan_pi_ui_div_ui`, or, below 12288 bits and from a precision
+growing with the number of half-angle steps, for the square roots by
+`arb_sqrt`; otherwise symmetries reduce $x$ exactly to $[0, 1/4]$ and the
+functions of $\pi x$ are evaluated there. See
+[](algorithms/special-functions/rational-sines).
 :::
 :::
 
@@ -1254,12 +1272,9 @@ Set `z` to $\operatorname{atan} x$.
 
 ::: details
 `arb_atan` computes the arctangent of the midpoint with `arb_atan_arf`
-and adds the propagated error, bounded by $r / (1 + (|m| - r)^2)$ for $r <
-|m|$ and by $\min(\pi, r)$ in general; inaccurate input is evaluated at
-the endpoints. `arb_atan_arf` uses tables and a Taylor series below 3400
-bits and a Newton iteration on `arb_sin_cos` above; the bit-burst
-algorithm `arb_atan_arf_bb` is the fallback when the tables are not
-precise enough.
+and adds the propagated error, bounded by
+$r / (1 + (|m| - r)^2)$ for $r < |m|$ and by $\min(\pi, r)$ in general;
+inaccurate input is evaluated at the endpoints.
 :::
 :::
 
@@ -1298,9 +1313,13 @@ $(e^x \pm e^{-x})/2$ is used.
 void arb_tanh(arb_t y, const arb_t x, slong prec)
 void arb_coth(arb_t y, const arb_t x, slong prec)
 
-Set `y` to $\tanh x$, respectively $\coth x$, computed as $(e^{2x} -
-1)/(e^{2x} + 1)$ via `arb_expm1` for small $|x|$ and as $\pm(1 - 2e^{\mp
-2x}/(1 + e^{\mp 2x}))$ for large $|x|$ (and the reciprocals).
+Set `y` to $\tanh x$, respectively $\coth x$. For a ball of radius
+below $2^{-10}$ the radius is propagated with the
+derivative $\operatorname{sech}^2 x \le 2 (1 - |\tanh x|)(1 + 4r)$, and
+a wider ball is enclosed sharply by the values at its endpoints ($\tanh$
+being increasing).  The hyperbolic cotangent is computed as $(e^{2x} +
+1)/(e^{2x} - 1)$ via `arb_expm1` for small $|x|$ and as $1 + 2e^{-2|x|}/(1 -
+e^{-2|x|})$ for large $|x|$.
 :::
 
 ::: function
@@ -1333,8 +1352,8 @@ Sets `z` to $\operatorname{acosh} x$. If `x` contains numbers less than
 
 Each function returns a ball of radius about one unit in the last place
 at precision `prec`. Values are cached per thread ($\pi$ and $\log 2$
-are read from static tables below about 4600 bits and $\gamma$ below
-about 3400 bits), so
+are read from the static tables of `mp_real` below about 4000 bits and
+$\gamma$ below about 3400 bits), so
 repeated calls at the same or a lower precision cost a rounding;
 `flint_cleanup` frees the caches. The formulas and their cost are
 described in [](algorithms/special-functions/constants).
@@ -1859,285 +1878,42 @@ void _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
 Print the entries with `arb_printn`, respectively `arb_printd`.
 :::
 
-## Internals of the elementary functions {#internals}
+## Logarithms of primes and related functions {#log-primes}
 
-These functions and tables implement the elementary functions and are
-described in [](algorithms/special-functions/elementary). They use
-fixed-point numbers: arrays of $n$ limbs representing a number in $[0,
-1)$ (or with an extra integer limb where stated) with an error measured in
-units of $2^{-64n}$ (ulps).
-
-::: function
-void _arb_exp_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
-void _arb_exp_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
-
-Set $y \approx \sum_{k=0}^{N-1} x^k/k!$ and write an error bound in ulps
-to `error`; `y` has `xn` fractional limbs and one integer limb. The naive
-version uses the forward recurrence, the `rs` version rectangular
-splitting with a table of reciprocal factorials, avoiding divisions.
-Require $N \le 287$, $0 \le x \le 1/16$ and $\mathit{xn} > 0$.
-:::
-
-::: function
-void _arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N)
-void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N, int sinonly, int alternating)
-
-Set `ysin` and `ycos` to approximations of $\sum_{k=0}^{N-1} (-1)^k
-x^{2k+1}/(2k+1)!$ and $\sum_{k=0}^{N-1} (-1)^k x^{2k}/(2k)!$, with `xn`
-fractional limbs, and write an error bound in ulps to `error`. Require $N
-\le 143$, $0 \le x \le 1/16$ and $\mathit{xn} > 0$.
-
-::: details
-In the `rs` version, `sinonly` = 1 computes only the sine, and
-`alternating` = 0 computes the series without signs (the hyperbolic
-sine, intended for use with `sinonly`, as in the exponential at high
-precision, where $\cosh$ is then obtained from $\sqrt{1 + \sinh^2}$).
-:::
-:::
-
-::: function
-void _arb_atan_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
-void _arb_atan_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
-
-Set $y \approx \sum_{k=0}^{N-1} (\pm 1)^k x^{2k+1}/(2k+1)$, alternating
-(the arctangent series) if `alternating` is 1 and not (the atanh series,
-used for logarithms) if it is 0, and write an error bound in ulps to
-`error`. Require $N \le 255$, $0 \le x \le 1/16$ and $\mathit{xn} > 0$.
-:::
-
-::: function
-int _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error, const arf_t x, slong wn)
-
-Attempts to write $x = q \log 2 + w$ with $0 \le w < \log 2$, `w` a
-fixed-point number of `wn` limbs with error `error` ulps. Returns 0 if
-the precision of the internal table of $\log 2$ is insufficient.
-:::
-
-::: function
-int _arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant, ulong * error, const arf_t x, slong wn)
-
-Attempts to write $|x| = q \pi/4 + w$ with $0 \le w < \pi/4$, `w` a
-fixed-point number of `wn` limbs with error `error` ulps, and writes $q
-\bmod 8$ to `octant`. `q` may be `NULL`. Returns 0 if the precision of the
-internal table of $\pi$ is insufficient.
-:::
-
-::: function
-slong _arb_exp_taylor_bound(slong mag, slong prec)
-
-Returns an $N$ such that $|\sum_{k=N}^{\infty} x^k/k!| \le
-2^{-\mathit{prec}}$ for $|x| \le 2^{\mathit{mag}} \le 1/4$.
-:::
-
-::: function
-flint_bitcnt_t _arb_mpn_leading_zeros(nn_srcptr d, slong n)
-
-Returns the number of leading zero bits of the `n`-limb number `d`.
-:::
+The elementary functions of `arb` are evaluated by the fixed-point
+kernels of `mp_real`, shared with `arf` and `nfloat`
+([](algorithms/special-functions/elementary)). The functions below
+expose a few of the building blocks.
 
 ::: function
 void arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
 
-Sets `z` to $e^x$, or $e^x - 1$ if `minus_one` is set, for an exact `x`,
-choosing among all algorithms; inputs with $|x| \ge 2^{\mathit{maglim}}$
-give the crude overflow results of `arb_exp`.
-
-::: details
-Tiny $x$ uses $1 + x$ with error $x^2$. Below 2240 bits the argument is
-reduced modulo $\log 2$ and by one or two table lookups in
-`arb_exp_tab1`, respectively `arb_exp_tab21` and `arb_exp_tab22`, and a
-Taylor series is evaluated with `_arb_exp_taylor_rs`. From 2240 bits to 4
-million bits, `arb_exp_arf_log_reduction` is used, and above that
-`arb_exp_arf_generic`.
-:::
-:::
-
-::: function
-void arb_exp_arf_generic(arb_t z, const arf_t x, slong prec, int minus_one)
-
-Computes $e^x$ (or $e^x - 1$) without tables: reduces by $\log 2$ if
-$|x|$ is large and then calls `arb_exp_arf_rs_generic` or
-`arb_exp_arf_bb` depending on the precision, the size of $x$, the length
-of its mantissa and the number of available threads.
-:::
-
-::: function
-void arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one)
-
-Computes $e^x$ (or $e^x - 1$) by argument halving and rectangular
-splitting of the Taylor series in ball arithmetic, for intermediate
-precision.
-:::
-
-::: function
-void arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
-
-Computes $e^x$ (or $e^x - 1$, accurately) by the bit-burst algorithm:
-$x$ is split into chunks of doubling length and the series for each chunk
-is evaluated by binary splitting.
-
-::: details
-Raises an exception for extremely small or large $x$, which must be
-handled by the caller. The argument is first halved until $|x| <
-2^{-d}$ with $d \approx 16$ to speed up convergence, so $|x| \approx
-2^m$ costs $m + d$ squarings at the end.
-:::
-:::
-
-::: function
-void arb_exp_arf_log_reduction(arb_t res, const arf_t x, slong prec, int minus_one)
-
-Computes $e^x$ (or $e^x - 1$) by reduction with logarithms of small
-primes [@HJ2024]: finds integers $c_i$ with $r = x - \sum c_i \log p_i$
-small, evaluates $e^r$ and multiplies by $\prod p_i^{c_i}$.
-:::
-
-::: function
-void _arb_exp_sum_bs_simple(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp, const fmpz_t x, flint_bitcnt_t r, slong N)
-void _arb_exp_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp, const fmpz_t x, flint_bitcnt_t r, slong N)
-
-Compute $T$, $Q$ and $Q_{\exp}$ with $T/(Q \cdot 2^{Q_{\exp}}) =
-\sum_{k=1}^{N} (x/2^r)^k/k!$ by binary splitting (the sum runs to $N$
-inclusive and omits the constant term). The `powtab` version precomputes
-powers of $x$, which uses more memory and is faster; $N$ should have
-many trailing zero bits.
-:::
-
-::: function
-void arb_log_newton(arb_t res, const arb_t x, slong prec)
-void arb_log_arf_newton(arb_t res, const arf_t x, slong prec)
-
-Compute $\log x$ from a lower-precision value $t \approx \log x$ by the
-higher-order iteration $\log x = t + \log(1 + (x e^{-t} - 1))$, with the
-logarithm of the small correction evaluated by a short series. Used for
-`arb_log_arf` above 2800 bits.
-:::
-
-::: function
-void arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
-
-Computes $\operatorname{atan} x$ by the bit-burst algorithm.
-
-::: details
-The argument-halving formula $\operatorname{atan}(x) = 2
-\operatorname{atan}(x / (1 + \sqrt{1 + x^2}))$ is applied up to 8 times,
-and then $\operatorname{atan}(x) = \operatorname{atan}(p/q) +
-\operatorname{atan}(w)$ with $w = (qx - p)/(px + q)$, $p = \lfloor qx
-\rfloor$, is applied repeatedly with growing $q = 2^k$, the arctangents of
-the rational numbers $p/q$ being computed by binary splitting.
-:::
-:::
-
-::: function
-void _arb_atan_sum_bs_simple(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp, const fmpz_t x, flint_bitcnt_t r, slong N)
-void _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp, const fmpz_t x, flint_bitcnt_t r, slong N)
-
-Compute $T$, $Q$ and $Q_{\exp}$ with $T/(Q \cdot 2^{Q_{\exp}}) =
-\sum_{k=1}^{N} (-1)^k (x/2^r)^{2k}/(2k+1)$ by binary splitting; the sum
-must be multiplied by $x/2^r$ and the linear term added to give the
-arctangent.
+Sets `z` to $e^x$ ($e^x - 1$ for `minus_one`) for an exact `x`. For
+$|x| \ge 2^{\mathit{maglim}}$ the result is $[0 \pm \infty]$ (positive
+`x`) or a tiny ball near 0 (resp. $-1$); within that range the exponent of
+the result may be a bignum. `arb_log_arf` and `arb_atan_arf` above are
+the point evaluations of the logarithm and the arctangent.
 :::
 
 ::: function
 void arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, slong prec)
 
 Sets `s` to $\operatorname{atan}(p/q)$, or $\operatorname{atanh}(p/q)$ if
-`hyperbolic` is set, by binary splitting of the Taylor series.
-:::
-
-::: function
-void arb_atan_newton(arb_t res, const arb_t x, slong prec)
-void arb_atan_arf_newton(arb_t res, const arf_t x, slong prec)
-
-Compute $\operatorname{atan} x$ from a lower-precision value $t$ by
-$\operatorname{atan} x = t + \operatorname{atan}((x \cos t - \sin
-t)/(\cos t + x \sin t))$, with the correction evaluated by a short
-Taylor series, so that the precision multiplies by 5 to 11 per step.
-Arguments with $|x| > 16$ use $\operatorname{atan} x = \pm\pi/2 -
-\operatorname{atan}(1/x)$. Used for `arb_atan_arf` from 3400 bits.
-:::
-
-::: function
-void arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
-
-Computes $\sin x$ and $\cos x$ without tables. If $|x|$ is not certainly
-below $\pi/2$, the argument is reduced to the first octant using an
-enclosure of $\pi$ and the function is called recursively; otherwise
-`arb_sin_cos_arf_rs_generic` or `arb_sin_cos_arf_bb` is used depending on
-the precision. Either output may be `NULL`.
-:::
-
-::: function
-void arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
-
-Computes $\sin x$ and $\cos x$ for $|x| \le 1$ by argument reduction
-$x \to x/2^q$, rectangular splitting of the Taylor series and the double-angle
-formula, in ball arithmetic, for $|x| < 1$. Either output may be
-`NULL`.
-:::
-
-::: function
-void arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
-
-Computes $\sin x$ and $\cos x$ by the bit-burst algorithm. Requires $|x|
-< \pi/2$, which is not checked.
-:::
-
-::: function
-void arb_sin_cos_arf_atan_reduction(arb_t res1, arb_t res2, const arf_t x, slong prec)
-
-Computes $\sin x$ and $\cos x$ by reduction with the arguments of small
-Gaussian primes [@HJ2024]: $x - \sum c_i \theta_i$ is made small with
-$\theta_i = \arg(a_i + b_i i)$, and the result is multiplied by the
-Gaussian integer $\prod (a_i + b_i i)^{c_i}$ normalised to modulus 1. Used
-for `arb_sin_cos` from 2600 bits to 4 million bits.
-:::
-
-::: function
-void arb_sin_cos_wide(arb_t s, arb_t c, const arb_t x, slong prec)
-void _arb_sin_cos_wide(arb_t s, arb_t c, const arf_t x, const mag_t r, slong prec)
-
-Compute enclosures of the ranges of $\sin$ and $\cos$ on a wide ball $x =
-[m \pm r]$, with both endpoints optimal to within about $2^{-30}$.
-
-::: details
-The sine and cosine are evaluated in `double` arithmetic at the endpoints,
-and the extrema $\pm 1$ are included when a peak lies between them; the
-result is converted back to a ball. The accumulated error of the simple
-floating-point algorithm is below $2^{-30}$, the dominant part coming from
-a single approximate reduction by $\pi/2$, which is safe in `double`
-arithmetic up to about $2^{20}$; larger arguments are first reduced in
-`arb_t` arithmetic.
-:::
-:::
-
-::: function
-void arb_sin_cos_generic(arb_t s, arb_t c, const arb_t x, slong prec)
-void _arb_sin_cos_generic(arb_t s, arb_t c, const arf_t x, const mag_t xrad, slong prec)
-
-Compute $\sin$ and $\cos$ of the ball $[x \pm \mathit{xrad}]$, handling
-special values and the propagated error and calling
-`arb_sin_cos_arf_generic`. This is the fallback of `arb_sin_cos` for the
-cases without a fast path.
-:::
-
-::: function
-void _arb_sin_pi_fmpq_algebraic(arb_t s, ulong p, ulong q, slong prec)
-void _arb_cos_pi_fmpq_algebraic(arb_t c, ulong p, ulong q, slong prec)
-void _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
-
-Compute $\sin(\pi p/q)$ and $\cos(\pi p/q)$ as algebraic numbers: an
-isolated root of the minimal polynomial of the cosine
-(`fmpz_poly_cos_minpoly`) is refined by Newton iteration. This is used for
-small denominators, where it is faster than evaluating the functions.
+`hyperbolic` is set: by binary splitting of the Taylor series in
+`mp_real` (`_mp_real_atan_frac_bsplit`) when the precision is high
+relative to the ratio (above about $10^4 (16 / \log_2(q/p))^2$ bits for
+the arctangent and four times that for the hyperbolic one, where it
+beats the kernels), else by the functions of the fraction.
 :::
 
 ::: function
 void arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
 Sets `res` to $\log p$ for the first `n` primes, by binary splitting
-applied to simultaneous Machin-type formulas. Not optimised for large `n`
-or small `prec`.
+applied to simultaneous Machin-type formulas in `mp_real` (which also
+keeps the cached values its argument reductions use) for the first 64,
+and from $\log p = \operatorname{atanh}(1/(2p^2 - 1)) + (\log(p - 1) +
+\log(p + 1))/2$ with $p \pm 1$ factored over the earlier primes beyond.
 :::
 
 ::: function
@@ -2145,86 +1921,8 @@ void arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
 Sets `res` to the arguments of the first `n` Gaussian primes $a + bi$
 with $a > b > 0$ (one per rational prime $p \equiv 1 \bmod 4$, and $1 +
-i$), by binary splitting applied to simultaneous Machin-type formulas.
-:::
-
-::: function
-void _arb_log_p_ensure_cached(slong prec)
-arb_srcptr _arb_log_p_cache_vec(void)
-void _arb_atan_gauss_p_ensure_cached(slong prec)
-arb_srcptr _arb_atan_gauss_p_cache_vec(void)
-
-Make sure that the thread-local caches of the logarithms of the first
-`ARB_LOG_PRIME_CACHE_NUM` primes, respectively of the arguments of the
-first `ARB_ATAN_GAUSS_PRIME_CACHE_NUM` Gaussian primes, hold at least
-`prec` bits, and return the cached vectors.
-:::
-
-::: function
-void _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slong n, slong max_rel, double C)
-
-Precomputes, by lattice reduction, short integer relations
-$\sum_j c_j \alpha_j = \varepsilon$ with small $|\varepsilon|$ between
-the constants $\alpha_0, \ldots, \alpha_{n-1}$ (logarithms of primes or
-arguments of Gaussian primes), as used by the reduction algorithm of
-[@HJ2024]: `rel` receives the coefficient vectors and `eps` the values
-$\varepsilon$, for successively smaller $\varepsilon$ decreasing roughly
-by the factor `C`, up to `max_rel` relations. The tables actually used
-are precomputed in `mp_real`.
-:::
-
-::: macro
-ARB_LOG_PRIME_CACHE_NUM
-ARB_ATAN_GAUSS_PRIME_CACHE_NUM
-ARB_LOG_REDUCTION_DEFAULT_MAX_PREC
-ARB_SIN_COS_ATAN_REDUCTION_DEFAULT_MAX_PREC
-ARB_EXP_LOG_REDUCTION_PREC
-ARB_SIN_COS_ATAN_REDUCTION_PREC
-ARB_LOG_NEWTON_PREC
-ARB_ATAN_NEWTON_PREC
-
-The number of cached logarithms of primes and arguments of Gaussian
-primes (13 each), the precision range in which the reduction algorithms
-are used for the exponential and for sine and cosine (from 2240,
-respectively 2600 bits, to 4 million bits), and the precisions from which
-the logarithm (2800 bits) and the arctangent (3400 bits) use Newton
-iteration.
-:::
-
-::: variable
-arb_exp_tab1
-arb_exp_tab21
-arb_exp_tab22
-arb_sin_cos_tab1
-arb_sin_cos_tab21
-arb_sin_cos_tab22
-arb_log_tab11
-arb_log_tab12
-arb_log_tab21
-arb_log_tab22
-arb_atan_tab1
-arb_atan_tab21
-arb_atan_tab22
-
-Precomputed fixed-point tables for the table-based argument reduction.
-The `tab1` tables (512 bits) serve one-step reduction with 8 index bits;
-the `tab21` and `tab22` tables (4608 bits) serve two-step reduction with
-5 + 5 index bits. They hold $e^{p/2^8}$, $\sin$ and $\cos$ of $p/2^8$,
-$\log(1 + p/2^7)$ and $\operatorname{atan}(p/2^8)$ and the analogous
-values for the two-step tables.
-:::
-
-::: variable
-arb_pi4_tab
-arb_log_log2_tab
-arb_atan_pi2_minus_one
-arb_log_p_tab
-arb_atan_gauss_tab
-
-Fixed-point values of $\pi/4$, $\log 2$ and $\pi/2 - 1$ to 4608 bits, and
-of the logarithms of the first 13 primes and the arguments of the first
-13 Gaussian primes, used by the argument reductions and as the initial
-cache of the constants.
+i$; $n \le 64$), by binary splitting applied to simultaneous Machin-type
+formulas in `mp_real`.
 :::
 
 ## Other internal functions {#internal}

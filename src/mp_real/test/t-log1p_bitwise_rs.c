@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 #include "bitwise_boundary.h"
@@ -72,7 +73,7 @@ TEST_FUNCTION_START(mp_real_log1p_bitwise_rs, state)
         arb_set_fmpz(xa, t);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
         arb_add_ui(xa, xa, 1, prec);
-        arb_log(e, xa, prec);
+        ref_log(e, xa, prec);
 
         fmpz_set_ui_array(t, res, n);
         arb_set_fmpz(va, t);
@@ -123,7 +124,7 @@ TEST_FUNCTION_START(mp_real_log1p_bitwise_rs, state)
                 fmpz_set_ui_array(t, x, n);
                 arb_set_fmpz(xa, t);
                 arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-                arb_log1p(e, xa, prec);
+                ref_log1p(e, xa, prec);
                 fmpz_set_ui_array(t, res, n);
                 arb_set_fmpz(va, t);
                 arb_mul_2exp_si(va, va, -FLINT_BITS * n);
@@ -164,7 +165,7 @@ TEST_FUNCTION_START(mp_real_log1p_bitwise_rs, state)
         arb_init(xa);
         arb_init(e);
         _test_bitwise_arb(xa, x, n);
-        arb_log1p(e, xa, FLINT_BITS * n + 128);
+        ref_log1p(e, xa, FLINT_BITS * n + 128);
         u = _test_bitwise_ulps(res, n, n, e);
         arb_clear(xa);
         arb_clear(e);
