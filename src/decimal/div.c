@@ -135,6 +135,8 @@ _decfloat_div(decfloat_t res, const decfloat_t x, const decfloat_t y, slong prec
     nn_ptr a, q, r;
     TMP_INIT;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x) || DECFLOAT_IS_SPECIAL(y))
     {
         _set_rounding_exact(info, err, ctx);

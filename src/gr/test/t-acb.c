@@ -18,6 +18,16 @@ TEST_FUNCTION_START(gr_acb, state)
     int flags = 0;
     slong prec;
 
+    /* the precision is clamped to [2, WORD_MAX / 8] */
+    gr_ctx_init_complex_acb(CC, WORD_MAX);
+    if (_gr_ctx_get_real_prec(CC) != WORD_MAX / 8)
+        flint_abort();
+    gr_ctx_clear(CC);
+    gr_ctx_init_complex_acb(CC, -1);
+    if (_gr_ctx_get_real_prec(CC) != 2)
+        flint_abort();
+    gr_ctx_clear(CC);
+
     for (prec = 64; prec <= 256; prec *= 2)
     {
         gr_ctx_init_complex_acb(CC, prec);

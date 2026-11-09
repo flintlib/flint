@@ -662,5 +662,46 @@ TEST_FUNCTION_START(decball, state)
         gr_ctx_clear(ctx0);
     }
 
+    /* regression: containment decided at a precision p above the context
+       precision (an intermediate bound was rounded to the context
+       precision, so [29 +/- r] and [30 +/- r] contained each other).
+       With r = 3634 10^10 (DECMAG_MAX_PREC >= 4 digits on all word
+       sizes), 1 + r has 14 digits, more than p, and rounding it to the
+       2-digit context precision decreases it. */
+    {
+        gr_ctx_t ctx;
+        decball_t X, Y;
+
+        _gr_ctx_init_decimal(ctx, DECIMAL_CTX_BALL, 6, 2, DECIMAL_RND_NEAR, DECIMAL_ALLOW_UNDERFLOW | DECIMAL_SLOPPY_RADIUS);
+        decimal_ctx_set_rad_prec(ctx, 4);
+        decball_init(X, ctx);
+        decball_init(Y, ctx);
+
+        GR_MUST_SUCCEED(decball_set_si(X, 29, ctx));
+        GR_MUST_SUCCEED(decball_set_si(Y, 30, ctx));
+        _decmag_set_ui_10exp_si(&X->rad, 3634, 10, ctx);
+        _decmag_set_ui_10exp_si(&Y->rad, 3634, 10, ctx);
+
+        if (_decball_contains(X, Y, ctx) || _decball_contains(Y, X, ctx) || !_decball_overlaps(X, Y, ctx))
+        {
+            flint_printf("FAIL: contains (precision above the context)\n");
+            flint_printf("X = %{gr}\nY = %{gr}\n", X, ctx, Y, ctx);
+            flint_abort();
+        }
+
+        /* the boundary case: Y inside X exactly when |xm - ym| + yr <= xr */
+        _decmag_set_ui_10exp_si(&X->rad, 3635, 10, ctx);
+        if (!_decball_contains(X, Y, ctx) || _decball_contains(Y, X, ctx))
+        {
+            flint_printf("FAIL: contains (boundary)\n");
+            flint_printf("X = %{gr}\nY = %{gr}\n", X, ctx, Y, ctx);
+            flint_abort();
+        }
+
+        decball_clear(X, ctx);
+        decball_clear(Y, ctx);
+        gr_ctx_clear(ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }

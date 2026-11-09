@@ -111,7 +111,8 @@ _deccball_acb_gr_extra(deccball_ptr * res, slong nres, deccball_srcptr * args, s
         re[i] = &args[i]->re.mid;
         im[i] = &args[i]->im.mid;
     }
-    if (_decimal_arb_args_infeasible(method, re, im, nargs, PREC(ctx), ctx))
+    if (PREC(ctx) == DECIMAL_PREC_EXACT
+        || _decimal_arb_args_infeasible(method, re, im, nargs, PREC(ctx), ctx))
         return GR_UNABLE;
 
     wp = _decimal_digits_to_bits(PREC(ctx));

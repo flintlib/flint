@@ -25,6 +25,8 @@ _decfloat_mul_10exp(decfloat_t res, const decfloat_t x, const fmpz_t t, slong pr
     slong n;
     int negative, status;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x) || fmpz_is_zero(t))
         return decfloat_set_round_info(res, x, prec, rnd, info, err, ctx);
 

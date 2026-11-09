@@ -2763,7 +2763,6 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
     ctx->size_limit = WORD_MAX;
 
     ACB_CTX_PREC(ctx) = FLINT_MAX(2, FLINT_MIN(prec, WORD_MAX / 8));
-    ACB_CTX_PREC(ctx) = prec;
     ACB_CTX_FLAGS(ctx) = 0;
 
     ctx->methods = _acb_methods;

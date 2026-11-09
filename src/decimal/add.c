@@ -99,6 +99,8 @@ _decfloat_add(decfloat_t res, const decfloat_t x, const decfloat_t y, int negate
     ulong tstack[DECIMAL_ADD_STACK_LIMBS];
     TMP_INIT;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x) || DECFLOAT_IS_SPECIAL(y))
         return _decfloat_add_special(res, x, y, negate_y, prec, rnd, info, err, ctx);
 

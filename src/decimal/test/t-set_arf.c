@@ -316,5 +316,58 @@ TEST_FUNCTION_START(decfloat_set_arf, state)
         gr_ctx_clear(bctx);
     }
 
+    /* regression: a wide ball (relative accuracy below 20 bits) with a huge
+       exponent; scaling the whole ball by 10^-E used interval arithmetic
+       in arb_div, inflating the radius by about 0.2% (and shifting the
+       midpoint) */
+    {
+        gr_ctx_t bctx;
+        decball_t X;
+        arb_t a, b, m;
+        decmag_t r, u;
+
+        _gr_ctx_init_decimal(bctx, DECIMAL_CTX_BALL, DECIMAL_WORD_DIGITS, 19, DECIMAL_RND_NEAR_ZERO, DECIMAL_ALLOW_INF | DECIMAL_ALLOW_NAN);
+        decball_init(X, bctx);
+        arb_init(a);
+        arb_init(b);
+        arb_init(m);
+        _decmag_init(r, bctx);
+        _decmag_init(u, bctx);
+
+        if (arb_load_str(a, "-3001ffffe0000000003ffffff 165d801 1 165d850"))
+            flint_abort();
+
+        GR_MUST_SUCCEED(decball_set_arb(X, a, bctx));
+        GR_MUST_SUCCEED(decball_get_arb(b, X, 200, bctx));
+
+        /* as above: radius at most (rad(a) + ulp) (1 + 10^-3) */
+        _decmag_set_mag(r, arb_radref(a), bctx);
+        _decmag_set_ulp(u, &X->mid, 19, bctx);
+        _decmag_add(r, r, u, bctx);
+        _decmag_mul_ui(r, r, 1001, bctx);
+        _decmag_div_ui(r, r, 1000, bctx);
+
+        /* the midpoint is the correctly rounded midpoint of a */
+        arf_set(arb_midref(m), arb_midref(a));
+        mag_zero(arb_radref(m));
+        arb_sub_arf(m, m, arb_midref(b), 200);
+
+        if (!arb_contains(b, a) || _decmag_cmp(&X->rad, r, bctx) > 0 ||
+            arf_cmpabs_2exp_si(arb_midref(m), ARF_EXP(arb_midref(a)) - 50) > 0)
+        {
+            flint_printf("FAIL: set_arb radius (wide, huge exponent)\n");
+            flint_printf("a = %{arb}\nX = %{gr}\nr = %s\n", a, X, bctx, _decmag_get_str(r, bctx));
+            flint_abort();
+        }
+
+        decball_clear(X, bctx);
+        arb_clear(a);
+        arb_clear(b);
+        arb_clear(m);
+        _decmag_clear(r, bctx);
+        _decmag_clear(u, bctx);
+        gr_ctx_clear(bctx);
+    }
+
     TEST_FUNCTION_END(state);
 }

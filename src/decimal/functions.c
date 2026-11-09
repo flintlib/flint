@@ -106,6 +106,9 @@ _decball_arb_gr_extra(decball_ptr * res, slong nres, decball_srcptr * args, slon
     slong i, wp;
     int status = GR_SUCCESS;
 
+    if (DECIMAL_CTX_IS_EXACT(ctx))
+        return GR_UNABLE;
+
     for (i = 0; i < nargs; i++)
         mids[i] = &args[i]->mid;
     if (_decimal_arb_args_infeasible(method, mids, NULL, nargs, DECIMAL_CTX_PREC(ctx), ctx))
