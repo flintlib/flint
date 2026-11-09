@@ -159,6 +159,10 @@ $3 \le \nu \le \bits - 3$. For other $n$ the result is wrong. As for
 `_nmod_mul_halflimb`, test the modulus once and write two loops rather than
 testing it at each product: a test inside `nmod_mul` was measured to make
 some compilers evaluate both reductions, or branch, at each product.
+For $n \le 2^{\bits / 2}$, $ab$ and $s + ab$ fit in one word, and
+`_nmod_mul_halflimb`, or `NMOD_RED` of $s + ab$, is cheaper still; so is
+`NMOD_RED` of $ab + cd$ for $n \le 2^{\bits / 2 - 1}$. The loops of FLINT
+test for these moduli first.
 :::
 
 ::: macro

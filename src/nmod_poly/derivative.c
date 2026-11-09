@@ -11,12 +11,21 @@
 
 #include "ulong_extras.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_derivative(nn_ptr x_prime, nn_srcptr x, slong len, nmod_t mod)
 {
 	slong j;
     ulong k = 1;
+
+    /* n = 1: every coefficient is 0 (and k would not be reduced below) */
+    if (mod.n == 1)
+    {
+        if (len > 1)
+            _nmod_vec_zero(x_prime, len - 1);
+        return;
+    }
 
 	for (j = 1; j < len; j++)
 	{

@@ -16,7 +16,7 @@
 
 TEST_FUNCTION_START(nmod_poly_integral, state)
 {
-    int i, result = 1;
+    int i, j, result = 1;
 
     /* Check with derivative */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -83,6 +83,28 @@ TEST_FUNCTION_START(nmod_poly_integral, state)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+    }
+
+    /* n = 1: every coefficient of the integral is 0, for vectors of any
+       length (which nmod_poly_t does not reach, as it is normalised) */
+    {
+        ulong x[20] = {0}, y[20];
+        nmod_t mod;
+        slong len;
+
+        nmod_init(&mod, 1);
+
+        for (len = 1; len <= 20; len++)
+        {
+            for (j = 0; j < len; j++)
+                y[j] = 1;
+
+            _nmod_poly_integral(y, x, len, mod);
+
+            for (j = 0; j < len; j++)
+                if (y[j] != 0)
+                    TEST_FUNCTION_FAIL("n = 1, len = %wd, coefficient %d = %wu\n", len, j, y[j]);
+        }
     }
 
     TEST_FUNCTION_END(state);

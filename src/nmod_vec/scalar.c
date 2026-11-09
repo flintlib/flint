@@ -44,6 +44,11 @@ _scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mo
 {
     slong i;
 
+    /* clang vectorizes this loop into slower code at short lengths
+       (measured on x86) */
+#if defined(__clang__)
+#pragma clang loop vectorize(disable)
+#endif
     for (i = 0; i < len; i++)
         NMOD_RED(res[i], res[i] + vec[i] * c, mod);
 }
@@ -57,6 +62,16 @@ _scalar_addmul_bounded(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod
         res[i] = _nmod_addmul_bounded(res[i], vec[i], c, mod);
 }
 
+/* For n < 2^(FLINT_BITS / 2), the one reduction of res[i] + vec[i] c is
+   faster than Shoup's product and addition. Built with clang, Shoup's loop is
+   vectorized and becomes faster from 32 terms on (on Ice Lake; from 256 on
+   Apple M4), so that the one-word loop goes first only below 32 terms. */
+#if defined(__clang__)
+#define HALFLIMB_BEFORE_SHOUP(len) ((len) < 32)
+#else
+#define HALFLIMB_BEFORE_SHOUP(len) 1
+#endif
+
 void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
@@ -66,6 +81,8 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_add(res, res, vec, len, mod);
     else if (c == mod.n - UWORD(1))
         _nmod_vec_sub(res, res, vec, len, mod);
+    else if (mod.norm >= FLINT_BITS / 2 && HALFLIMB_BEFORE_SHOUP(len))
+        _scalar_addmul_halflimb(res, vec, len, c, mod);
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD && NMOD_BITS(mod) != FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
     else if (mod.norm >= FLINT_BITS / 2)

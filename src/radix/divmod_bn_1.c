@@ -30,9 +30,8 @@
         q_i = w * binv mod B           (so that c + q_i*b == a_i (mod B))
         c   = (c + q_i*b) div B        (new carry; (c + q_i*b) mod B == a_i)
 
-    The body is exactly radix_mul_1's "accumulate q_i*b into the carry and
-    reduce" step, with two extra single-limb operations (the subtraction giving
-    w and the multiplication giving q_i) per limb.
+    The carry needs no division of its own: the division of w*binv by B that
+    gives q_i also gives the new carry (see the comment in the function).
 
     q receives n limbs (room for n) and may alias a (a_i is read before q_i is
     written, and limbs of a at positions >= n are untouched).

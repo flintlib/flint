@@ -218,7 +218,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                 NMOD_RED2_BOUNDED(R[i], t1, t0, mod);
             }
         }
-        else if (NMOD_BITS(mod) != FLINT_BITS)
+        else
         {
             for (i = 1; i < lenB - 1; i++)
             {
