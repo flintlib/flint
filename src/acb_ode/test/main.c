@@ -30,6 +30,7 @@
 #include "t-sum_forward.c"
 #include "t-sum_update_tail_bounds.c"
 #include "t-transition_matrix_fixed.c"
+#include "t-transition_matrix_fixed_vs_ref.c"
 
 test_struct tests[] =
 {
@@ -53,7 +54,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_ode_sum_divconquer),
     TEST_FUNCTION(acb_ode_sum_forward),
     TEST_FUNCTION(acb_ode_sum_update_tail_bounds),
-    TEST_FUNCTION(acb_ode_transition_matrix_fixed)
+    TEST_FUNCTION(acb_ode_transition_matrix_fixed),
+    TEST_FUNCTION(acb_ode_transition_matrix_fixed_vs_ref)
 };
 
 TEST_MAIN(tests)

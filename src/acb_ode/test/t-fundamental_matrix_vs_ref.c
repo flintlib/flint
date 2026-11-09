@@ -25,69 +25,7 @@
 #include "gr.h"
 #include "gr_ore_poly.h"
 #include "gr_poly.h"
-
-/****************************************************************************/
-
-/* Return zero unless got overlaps ref and has a relative accuracy of at
-   least min_acc bits. When ref contains zero, we instead require got to be
-   bounded by 2^-min_acc in absolute value. */
-static int
-check_entry(const acb_t got, const acb_t ref, slong min_acc)
-{
-    mag_t m;
-    int ok;
-
-    FLINT_ASSERT(acb_is_finite(ref));
-
-    if (!acb_overlaps(got, ref))
-        return 0;
-    if (!acb_contains_zero(ref))
-        return acb_rel_accuracy_bits(got) >= min_acc;
-
-    FLINT_ASSERT(mag_cmp_2exp_si(arb_radref(acb_realref(ref)), -30) <= 0);
-    FLINT_ASSERT(mag_cmp_2exp_si(arb_radref(acb_imagref(ref)), -30) <= 0);
-
-    mag_init(m);
-    acb_get_mag(m, got);
-    ok = mag_cmp_2exp_si(m, -min_acc) <= 0;
-    mag_clear(m);
-
-    return ok;
-}
-
-static void
-check_acb(const acb_t got, const acb_t ref, slong min_acc, const char * name)
-{
-    if (!check_entry(got, ref, min_acc))
-    {
-        flint_printf("FAIL: %s\n", name);
-        flint_printf("got = %{acb}\n", got);
-        flint_printf("ref = %{acb}\n", ref);
-        flint_printf("accuracy = %wd bits, required %wd\n",
-                     acb_rel_accuracy_bits(got), min_acc);
-        flint_abort();
-    }
-}
-
-static void
-check_status(int status, const char * name)
-{
-    if (status != GR_SUCCESS)
-    {
-        flint_printf("FAIL (unexpected failure): %s\n", name);
-        flint_abort();
-    }
-}
-
-static void
-set_acb_str(acb_t res, const char * s, slong prec)
-{
-    gr_ctx_t CC;
-
-    gr_ctx_init_complex_acb(CC, prec);
-    GR_MUST_SUCCEED(gr_set_str(res, s, CC));
-    gr_ctx_clear(CC);
-}
+#include "acb_ode_test_helpers.h"
 
 /****************************************************************************
  * Ordinary points
@@ -137,7 +75,7 @@ test_exp(void)
     acb_one(z);
     check_status(my_exp(res, z, prec), "exp");
     acb_exp(ref, z, prec);
-    check_acb(res, ref, prec - 16, "exp");
+    check_acb(res, ref, prec - 4, "exp");
 
     acb_clear(ref);
     acb_clear(res);
@@ -157,10 +95,10 @@ test_exp_complex(void)
     acb_init(res);
     acb_init(ref);
 
-    set_acb_str(z, "pi + I", prec);
+    acb_set_str(z, "pi + I", prec);
     check_status(my_exp(res, z, prec), "exp_complex");
     acb_exp(ref, z, prec);
-    check_acb(res, ref, prec - 16, "exp_complex");
+    check_acb(res, ref, prec - 8, "exp_complex");
 
     acb_clear(ref);
     acb_clear(res);
@@ -196,7 +134,7 @@ test_cos_sin(void)
     acb_poly_init(c);
     acb_mat_init(mat, 2, 2);
 
-    set_acb_str(pt, "pi/3", prec);
+    acb_set_str(pt, "pi/3", prec);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "D^2 + 1", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -207,9 +145,9 @@ test_cos_sin(void)
     acb_poly_sin_cos_series(s, c, x, 2, prec);
     for (slong i = 0; i < 2; i++)
     {
-        check_acb(acb_mat_entry(mat, i, 0), c->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 0), c->coeffs + i, prec - 8,
                   "cos_sin");
-        check_acb(acb_mat_entry(mat, i, 1), s->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 1), s->coeffs + i, prec - 8,
                   "cos_sin");
     }
 
@@ -256,15 +194,15 @@ test_log1p(void)
     check_status(status, "log1p");
 
     acb_one(c);
-    check_acb(acb_mat_entry(mat, 0, 0), c, prec - 16, "log1p");
+    check_acb(acb_mat_entry(mat, 0, 0), c, prec - 4, "log1p");
     acb_zero(c);
-    check_acb(acb_mat_entry(mat, 1, 0), c, prec - 16, "log1p");
+    check_acb(acb_mat_entry(mat, 1, 0), c, prec - 4, "log1p");
 
     acb_poly_set_coeff_si(x, 1, 1);
     acb_poly_set_coeff_acb(x, 0, pt);
     acb_poly_log1p_series(f, x, 2, prec);
     for (slong i = 0; i < 2; i++)
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 4,
                   "log1p");
 
     acb_mat_clear(mat);
@@ -321,7 +259,7 @@ test_log1p_order3(void)
                 acb_set(c, pt);
             else
                 acb_set_si(c, i == j);
-            check_acb(acb_mat_entry(mat, i, j), c, prec - 16, "log1p_order3");
+            check_acb(acb_mat_entry(mat, i, j), c, prec - 4, "log1p_order3");
         }
     }
 
@@ -333,7 +271,7 @@ test_log1p_order3(void)
     acb_poly_sub(f, f, x, prec);
     acb_poly_scalar_mul_2exp_si(f, f, 1);
     for (slong i = 0; i < 3; i++)
-        check_acb(acb_mat_entry(mat, i, 2), f->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 2), f->coeffs + i, prec - 4,
                   "log1p_order3");
 
     acb_mat_clear(mat);
@@ -386,8 +324,8 @@ test_ordinary_order3(void)
     {
         for (slong j = 0; j < 3; j++)
         {
-            set_acb_str(ref, ref_str[3 * i + j], prec);
-            check_acb(acb_mat_entry(mat, i, j), ref, prec - 16,
+            acb_set_str(ref, ref_str[3 * i + j], prec);
+            check_acb(acb_mat_entry(mat, i, j), ref, prec - 4,
                       "ordinary_order3");
         }
     }
@@ -444,7 +382,7 @@ ref_dawson(acb_t res, const acb_t z, slong prec)
     acb_neg(c, c);
     acb_exp(c, c, prec);
     acb_mul(res, res, c, prec);
-    set_acb_str(c, "sqrt(pi)/2", prec);
+    acb_set_str(c, "sqrt(pi)/2", prec);
     acb_mul(res, res, c, prec);
 
     acb_clear(c);
@@ -468,7 +406,7 @@ test_dawson(void)
     acb_one(z);
     check_status(my_dawson(res, z, prec), "dawson");
     ref_dawson(ref, z, prec);
-    check_acb(res, ref, prec - 16, "dawson");
+    check_acb(res, ref, prec - 4, "dawson");
 
     acb_clear(ref);
     acb_clear(res);
@@ -495,7 +433,7 @@ my_erf(acb_t res, const acb_t z, slong prec)
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "D^2 + 2*x*D", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, z,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
-    set_acb_str(c, "2/sqrt(pi)", prec);
+    acb_set_str(c, "2/sqrt(pi)", prec);
     acb_mul(res, acb_mat_entry(mat, 0, 1), c, prec);
 
     acb_clear(c);
@@ -526,7 +464,7 @@ test_erf(void)
     acb_one(z);
     check_status(my_erf(res, z, prec), "erf");
     acb_hypgeom_erf(ref, z, prec);
-    check_acb(res, ref, prec - 16, "erf");
+    check_acb(res, ref, prec - 8, "erf");
 
     acb_clear(ref);
     acb_clear(res);
@@ -549,7 +487,7 @@ test_erf_imag(void)
     acb_onei(z);
     check_status(my_erf(res, z, prec), "erf_imag");
     acb_hypgeom_erf(ref, z, prec);
-    check_acb(res, ref, prec - 16, "erf_imag");
+    check_acb(res, ref, prec - 8, "erf_imag");
 
     acb_clear(ref);
     acb_clear(res);
@@ -576,7 +514,7 @@ my_erfi(acb_t res, const acb_t z, slong prec)
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "D^2 - 2*x*D", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, z,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
-    set_acb_str(c, "2/sqrt(pi)", prec);
+    acb_set_str(c, "2/sqrt(pi)", prec);
     acb_mul(res, acb_mat_entry(mat, 0, 1), c, prec);
 
     acb_clear(c);
@@ -607,7 +545,7 @@ test_erfi(void)
     acb_one(z);
     check_status(my_erfi(res, z, prec), "erfi");
     acb_hypgeom_erfi(ref, z, prec);
-    check_acb(res, ref, prec - 16, "erfi");
+    check_acb(res, ref, prec - 8, "erfi");
 
     acb_clear(ref);
     acb_clear(res);
@@ -673,7 +611,7 @@ test_airy_ai(void)
     acb_one(z);
     check_status(my_airy_ai_jet(res, z, 1, prec), "airy_ai");
     acb_hypgeom_airy(ref, NULL, NULL, NULL, z, prec);
-    check_acb(res, ref, prec - 16, "airy_ai");
+    check_acb(res, ref, prec - 8, "airy_ai");
 
     acb_clear(ref);
     acb_clear(res);
@@ -701,7 +639,7 @@ test_airy_ai_jet(void)
     check_status(my_airy_ai_jet(res, z, 11, prec), "airy_ai_jet");
     acb_hypgeom_airy_jet(ref, NULL, z, 11, prec);
     for (slong i = 0; i < 11; i++)
-        check_acb(res + i, ref + i, prec - 32, "airy_ai_jet");
+        check_acb(res + i, ref + i, prec - 20, "airy_ai_jet");
 
     _acb_vec_clear(ref, 11);
     _acb_vec_clear(res, 11);
@@ -730,7 +668,7 @@ test_exp_gaussian(void)
     acb_init(ref);
     acb_mat_init(mat, 1, 1);
 
-    set_acb_str(pt, "sqrt(2)", prec);
+    acb_set_str(pt, "sqrt(2)", prec);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "D - I", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -738,7 +676,7 @@ test_exp_gaussian(void)
 
     acb_mul_onei(ref, pt);
     acb_exp(ref, ref, prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 16, "exp_gaussian");
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 8, "exp_gaussian");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -782,8 +720,8 @@ test_exp_zeta7(void)
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
     check_status(status, "exp_zeta7");
 
-    set_acb_str(ref, "exp(exp(2*pi*I/7))", prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 16, "exp_zeta7");
+    acb_set_str(ref, "exp(exp(2*pi*I/7))", prec);
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 4, "exp_zeta7");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -803,7 +741,7 @@ test_exp_zeta7(void)
 static void
 test_cosh_sqrt_pi(void)
 {
-    gr_ctx_t CC, Pol, Dop;
+    gr_ctx_t RR, Pol, Dop;
     gr_ore_poly_t dop;
     acb_t pt, s;
     acb_poly_t x, sh, ch;
@@ -811,8 +749,8 @@ test_cosh_sqrt_pi(void)
     slong prec = 128;
     int status = GR_SUCCESS;
 
-    gr_ctx_init_complex_acb(CC, prec);
-    gr_ctx_init_gr_poly(Pol, CC);
+    gr_ctx_init_real_arb(RR, prec);
+    gr_ctx_init_gr_poly(Pol, RR);
     gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
     gr_ore_poly_init(dop, Dop);
     acb_init(pt);
@@ -828,7 +766,7 @@ test_cosh_sqrt_pi(void)
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
     check_status(status, "cosh_sqrt_pi");
 
-    set_acb_str(s, "sqrt(pi)", prec);
+    acb_set_str(s, "sqrt(pi)", prec);
     acb_poly_set_coeff_si(x, 1, 1);
     acb_poly_set_coeff_acb(x, 0, pt);
     acb_poly_scalar_mul(x, x, s, prec);
@@ -836,9 +774,9 @@ test_cosh_sqrt_pi(void)
     acb_poly_scalar_div(sh, sh, s, prec);
     for (slong i = 0; i < 2; i++)
     {
-        check_acb(acb_mat_entry(mat, i, 0), ch->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 0), ch->coeffs + i, prec - 4,
                   "cosh_sqrt_pi");
-        check_acb(acb_mat_entry(mat, i, 1), sh->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 1), sh->coeffs + i, prec - 4,
                   "cosh_sqrt_pi");
     }
 
@@ -851,7 +789,7 @@ test_cosh_sqrt_pi(void)
     gr_ore_poly_clear(dop, Dop);
     gr_ctx_clear(Dop);
     gr_ctx_clear(Pol);
-    gr_ctx_clear(CC);
+    gr_ctx_clear(RR);
 }
 
 /* sage: (Du - CBF(i*pi)).numerical_transition_matrix([0,1])
@@ -882,7 +820,7 @@ test_exp_i_pi(void)
     check_status(status, "exp_i_pi");
 
     acb_set_si(ref, -1);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 16, "exp_i_pi");
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 8, "exp_i_pi");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -897,23 +835,22 @@ test_exp_i_pi(void)
 static int
 neher(acb_t res, const acb_t z, slong prec)
 {
-    gr_ctx_t ZZ, Pol, Dop;
+    gr_ctx_t QQ, Pol, Dop;
     gr_ore_poly_t dop;
     acb_mat_t mat;
     acb_t c;
     int status = GR_SUCCESS;
 
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Pol, ZZ);
+    gr_ctx_init_fmpq(QQ);
+    gr_ctx_init_gr_poly(Pol, QQ);
     gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
     gr_ore_poly_init(dop, Dop);
     acb_mat_init(mat, 1, 4);
     acb_init(c);
 
-    /* the operator is scaled by 2 to clear denominators */
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
-            "2*D^4 - (2*x^2 + 20*x + 52)*D^3 + (40*x + 199)*D^2"
-            " - (2*x^2 + 20*x + 50)*D + 4*x^2 + 8*x - 59", Dop));
+            "D^4 - (x^2 + 10*x + 26)*D^3 + (20*x + 199/2)*D^2"
+            " - (x^2 + 10*x + 25)*D + 2*x^2 + 4*x - 59/2", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, z,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
 
@@ -929,7 +866,7 @@ neher(acb_t res, const acb_t z, slong prec)
     gr_ore_poly_clear(dop, Dop);
     gr_ctx_clear(Dop);
     gr_ctx_clear(Pol);
-    gr_ctx_clear(ZZ);
+    gr_ctx_clear(QQ);
 
     return status;
 }
@@ -953,8 +890,8 @@ test_neher(void)
 
     acb_one(z);
     check_status(neher(res, z, prec), "neher");
-    set_acb_str(ref, "10.873127314 +/- 1e-9", prec);
-    check_acb(res, ref, prec - 64, "neher");
+    acb_set_str(ref, "10.873127314 +/- 1e-9", prec);
+    check_acb(res, ref, prec - 32, "neher");
 
     acb_clear(ref);
     acb_clear(res);
@@ -977,8 +914,8 @@ test_neher_3_2(void)
 
     acb_set_d(z, 1.5);
     check_status(neher(res, z, prec), "neher_3_2");
-    set_acb_str(ref, "15.68591174618322 +/- 1e-14", prec);
-    check_acb(res, ref, prec - 64, "neher_3_2");
+    acb_set_str(ref, "15.68591174618322 +/- 1e-14", prec);
+    check_acb(res, ref, prec - 56, "neher_3_2");
 
     acb_clear(ref);
     acb_clear(res);
@@ -1026,8 +963,8 @@ test_high_degree(void)
     {
         for (slong j = 0; j < 2; j++)
         {
-            set_acb_str(ref, ref_str[2 * i + j], prec);
-            check_acb(acb_mat_entry(mat, i, j), ref, prec - 16,
+            acb_set_str(ref, ref_str[2 * i + j], prec);
+            check_acb(acb_mat_entry(mat, i, j), ref, prec - 4,
                       "high_degree");
         }
     }
@@ -1095,9 +1032,9 @@ test_apparent_singularity(void)
     acb_poly_sub(g, g, e, prec);
     for (slong i = 0; i < 2; i++)
     {
-        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec - 4,
                   "apparent_singularity");
-        check_acb(acb_mat_entry(mat, i, 1), g->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 1), g->coeffs + i, prec - 4,
                   "apparent_singularity");
     }
 
@@ -1151,8 +1088,7 @@ test_inverse(void)
     acb_poly_set_coeff_acb(x, 0, pt);
     acb_poly_inv_series(f, x, 2, prec);
     for (slong i = 0; i < 2; i++)
-        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec - 16,
-                  "inverse");
+        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec, "inverse");
 
     acb_mat_clear(mat);
     acb_poly_clear(f);
@@ -1213,7 +1149,7 @@ test_euler_pm_i(void)
             acb_neg(expo, expo);
         acb_poly_pow_acb_series(f, x, expo, 2, prec);
         for (slong i = 0; i < 2; i++)
-            check_acb(acb_mat_entry(mat, i, j), f->coeffs + i, prec - 16,
+            check_acb(acb_mat_entry(mat, i, j), f->coeffs + i, prec - 4,
                       "euler_pm_i");
     }
 
@@ -1265,8 +1201,8 @@ test_large_exponent(void)
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
     check_status(status, "large_exponent");
 
-    set_acb_str(ref, "exp(1/2)/2^(1001/2)", prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 32, "large_exponent");
+    acb_set_str(ref, "exp(1/2)/2^(1001/2)", prec);
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 8, "large_exponent");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -1309,8 +1245,8 @@ test_large_negative_exponent(void)
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
     check_status(status, "large_negative_exponent");
 
-    set_acb_str(ref, "exp(1/2)*2^(1001/2)", prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 32,
+    acb_set_str(ref, "exp(1/2)*2^(1001/2)", prec);
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 8,
               "large_negative_exponent");
 
     acb_mat_clear(mat);
@@ -1326,31 +1262,6 @@ test_large_negative_exponent(void)
    origin. Their local bases there are e(x)*(1 - c*x^1000),
    e(x)*x^1000*log(x), e(x)*x^1000, where e(x) = exp(x) and c = 1/1000! for
    the first one, and e(x) = 1/(1 + x) and c = 1 for the second one. */
-
-static int
-large_dispersion(acb_mat_t mat, const char * dop_str, const acb_t pt,
-                 slong prec)
-{
-    gr_ctx_t ZZ, Pol, Dop;
-    gr_ore_poly_t dop;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Pol, ZZ);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, dop_str, Dop));
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(ZZ);
-
-    return status;
-}
 
 /* Jets of length 3 at pt of the three basis elements */
 static void
@@ -1387,29 +1298,29 @@ ref_large_dispersion(acb_poly_struct * ref, const acb_poly_t e, const acb_t c,
    The tail bounds for n < 1000 are astronomical, as the staircase bound
    includes the values of the rational function near the resonance n = 1000,
    where |ind(n)/n^3| ~ (n/1000 - 1)^2 is tiny. They only become usable well
-   past n = 1000. In addition, the coefficients of the first basis element
-   lose all accuracy as n approaches 1000, and spurious log terms appear
-   unless the working precision is large enough (prec >= ~1536). Hence the
-   first column is only checked at high precision.
+   past n = 1000. Unless the working precision is large enough (currently
+   prec >= ~1250), the summation stops before that point for the first basis
+   element. Hence the first column is only checked at high precision.
    [ore_algebra] */
 static void
 test_large_dispersion_exp(void)
 {
-    const char * dop_str = "x^2*D^3 + (-3*x^2 - 1997*x)*D^2"
-                           " + (3*x^2 + 3994*x + 998001)*D"
-                           " - x^2 - 1997*x - 998001";
-    const slong precs[] = { 128, 2048 };
-    slong min_acc[] = { 112, 2000 };
+    const slong precs[] = { 128, 1536 };
     /* todo: improve stopping heuristics in the presence of transient error
        bounds larger than about 2^2^word size */
-    if (FLINT_BITS < 64)
-        for (slong i = 0; i < 2; i++)
-            min_acc[i] = WORD_MIN;
+    const slong loss = (FLINT_BITS < 64) ? WORD_MAX : 8;
+    gr_ctx_t ZZ, Pol, Dop;
+    gr_ore_poly_t dop;
     acb_t pt, c;
     acb_poly_t x, e;
     acb_poly_struct * ref;
     acb_mat_t mat;
+    int status = GR_SUCCESS;
 
+    gr_ctx_init_fmpz(ZZ);
+    gr_ctx_init_gr_poly(Pol, ZZ);
+    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
+    gr_ore_poly_init(dop, Dop);
     acb_init(pt);
     acb_init(c);
     acb_poly_init(x);
@@ -1418,13 +1329,17 @@ test_large_dispersion_exp(void)
     acb_mat_init(mat, 3, 3);
 
     acb_set_d(pt, 0.5);
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
+            "x^2*D^3 + (-3*x^2 - 1997*x)*D^2 + (3*x^2 + 3994*x + 998001)*D"
+            " - x^2 - 1997*x - 998001", Dop));
 
     for (slong k = 0; k < 2; k++)
     {
         slong prec = precs[k];
 
-        check_status(large_dispersion(mat, dop_str, pt, prec),
-                     "large_dispersion_exp");
+        status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
+                                             ACB_ODE_BASIS_ECHELON, 0, prec);
+        check_status(status, "large_dispersion_exp");
 
         acb_poly_set_coeff_si(x, 1, 1);
         acb_poly_set_coeff_acb(x, 0, pt);
@@ -1436,7 +1351,7 @@ test_large_dispersion_exp(void)
         for (slong i = 0; i < 3; i++)
             for (slong j = (k == 0); j < 3; j++)
                 check_acb(acb_mat_entry(mat, i, j), ref[j].coeffs + i,
-                          min_acc[k], "large_dispersion_exp");
+                          prec - loss, "large_dispersion_exp");
     }
 
     acb_mat_clear(mat);
@@ -1445,6 +1360,10 @@ test_large_dispersion_exp(void)
     acb_poly_clear(x);
     acb_clear(c);
     acb_clear(pt);
+    gr_ore_poly_clear(dop, Dop);
+    gr_ctx_clear(Dop);
+    gr_ctx_clear(Pol);
+    gr_ctx_clear(ZZ);
 }
 
 /* sage: dop = (x^3 + x^2)*Dx^3 + (-1994*x^2 - 1997*x)*Dx^2 + (994007*x + 998001)*Dx + 998001
@@ -1459,12 +1378,19 @@ test_large_dispersion_exp(void)
 static void
 test_large_dispersion_inv(void)
 {
+    gr_ctx_t ZZ, Pol, Dop;
+    gr_ore_poly_t dop;
     acb_t pt, c;
     acb_poly_t x, e;
     acb_poly_struct * ref;
     acb_mat_t mat;
     slong prec = 128;
+    int status = GR_SUCCESS;
 
+    gr_ctx_init_fmpz(ZZ);
+    gr_ctx_init_gr_poly(Pol, ZZ);
+    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
+    gr_ore_poly_init(dop, Dop);
     acb_init(pt);
     acb_init(c);
     acb_poly_init(x);
@@ -1473,10 +1399,12 @@ test_large_dispersion_inv(void)
     acb_mat_init(mat, 3, 3);
 
     acb_set_d(pt, 0.5);
-    check_status(large_dispersion(mat,
-                     "(x^3 + x^2)*D^3 + (-1994*x^2 - 1997*x)*D^2"
-                     " + (994007*x + 998001)*D + 998001", pt, prec),
-                 "large_dispersion_inv");
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
+            "(x^3 + x^2)*D^3 + (-1994*x^2 - 1997*x)*D^2"
+            " + (994007*x + 998001)*D + 998001", Dop));
+    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
+                                         ACB_ODE_BASIS_ECHELON, 0, prec);
+    check_status(status, "large_dispersion_inv");
 
     acb_poly_set_coeff_si(x, 1, 1);
     acb_add_si(c, pt, 1, prec);
@@ -1487,7 +1415,7 @@ test_large_dispersion_inv(void)
 
     for (slong i = 0; i < 3; i++)
         for (slong j = 0; j < 3; j++)
-            check_acb(acb_mat_entry(mat, i, j), ref[j].coeffs + i, prec - 16,
+            check_acb(acb_mat_entry(mat, i, j), ref[j].coeffs + i, prec - 8,
                       "large_dispersion_inv");
 
     acb_mat_clear(mat);
@@ -1496,6 +1424,10 @@ test_large_dispersion_inv(void)
     acb_poly_clear(x);
     acb_clear(c);
     acb_clear(pt);
+    gr_ore_poly_clear(dop, Dop);
+    gr_ctx_clear(Dop);
+    gr_ctx_clear(Pol);
+    gr_ctx_clear(ZZ);
 }
 
 /* sage: alg = QQbar(-20)^(1/3)
@@ -1530,7 +1462,7 @@ test_bessel(void)
     acb_init(ref);
     acb_mat_init(mat, 2, 2);
 
-    set_acb_str(pt, "(-20)^(1/3)", prec);
+    acb_set_str(pt, "(-20)^(1/3)", prec);
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "x*D^2 + D + x", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
@@ -1545,18 +1477,18 @@ test_bessel(void)
     acb_set_si(d, 2);
     acb_log(d, d, prec);
     acb_sub(c, c, d, prec);
-    set_acb_str(d, "pi/2", prec);
+    acb_set_str(d, "pi/2", prec);
 
     /* f1 = d*Y0 - c*J0, f1' = -d*Y1 + c*J1, f2 = J0, f2' = -J1 */
     acb_mul(ref, d, y0, prec);
     acb_submul(ref, c, j0, prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 32, "bessel");
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 12, "bessel");
     acb_mul(ref, c, j1, prec);
     acb_submul(ref, d, y1, prec);
-    check_acb(acb_mat_entry(mat, 1, 0), ref, prec - 32, "bessel");
-    check_acb(acb_mat_entry(mat, 0, 1), j0, prec - 32, "bessel");
+    check_acb(acb_mat_entry(mat, 1, 0), ref, prec - 12, "bessel");
+    check_acb(acb_mat_entry(mat, 0, 1), j0, prec - 12, "bessel");
     acb_neg(ref, j1);
-    check_acb(acb_mat_entry(mat, 1, 1), ref, prec - 32, "bessel");
+    check_acb(acb_mat_entry(mat, 1, 1), ref, prec - 12, "bessel");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -1627,13 +1559,13 @@ test_bessel_i_k(void)
 
     acb_mul_2exp_si(ref, k1, 1);
     acb_submul(ref, c, i1, prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 32, "bessel_i_k");
+    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 8, "bessel_i_k");
     acb_mul_2exp_si(ref, k0, 1);
     acb_addmul(ref, c, i0, prec);
     acb_neg(ref, ref);
-    check_acb(acb_mat_entry(mat, 1, 0), ref, prec - 32, "bessel_i_k");
-    check_acb(acb_mat_entry(mat, 0, 1), i1, prec - 32, "bessel_i_k");
-    check_acb(acb_mat_entry(mat, 1, 1), i0, prec - 32, "bessel_i_k");
+    check_acb(acb_mat_entry(mat, 1, 0), ref, prec - 8, "bessel_i_k");
+    check_acb(acb_mat_entry(mat, 0, 1), i1, prec - 8, "bessel_i_k");
+    check_acb(acb_mat_entry(mat, 1, 1), i0, prec - 8, "bessel_i_k");
 
     acb_mat_clear(mat);
     acb_clear(ref);
@@ -1687,8 +1619,8 @@ test_singular_hardcoded(void)
     {
         for (slong j = 0; j < 2; j++)
         {
-            set_acb_str(ref, ref_str[2 * i + j], prec);
-            check_acb(acb_mat_entry(mat, i, j), ref, prec - 32,
+            acb_set_str(ref, ref_str[2 * i + j], prec);
+            check_acb(acb_mat_entry(mat, i, j), ref, prec - 4,
                       "singular_hardcoded");
         }
     }
@@ -1753,10 +1685,10 @@ test_ci(void)
     acb_init(res);
     acb_init(ref);
 
-    set_acb_str(z, "sqrt(2)", prec);
+    acb_set_str(z, "sqrt(2)", prec);
     check_status(my_ci(res, z, prec), "ci");
     acb_hypgeom_ci(ref, z, prec);
-    check_acb(res, ref, prec - 32, "ci");
+    check_acb(res, ref, prec - 8, "ci");
 
     acb_clear(ref);
     acb_clear(res);
@@ -1777,10 +1709,10 @@ test_ci_complex(void)
     acb_init(res);
     acb_init(ref);
 
-    set_acb_str(z, "1 + 456/123*I", prec);
+    acb_set_str(z, "1 + 456/123*I", prec);
     check_status(my_ci(res, z, prec), "ci_complex");
     acb_hypgeom_ci(ref, z, prec);
-    check_acb(res, ref, prec - 32, "ci_complex");
+    check_acb(res, ref, prec - 8, "ci_complex");
 
     acb_clear(ref);
     acb_clear(res);
@@ -1832,17 +1764,17 @@ test_log2_lclm(void)
     acb_poly_scalar_mul_2exp_si(g, g, -1);
     for (slong i = 0; i < 4; i++)
     {
-        check_acb(acb_mat_entry(mat, i, 0), g->coeffs + i, prec - 32,
+        check_acb(acb_mat_entry(mat, i, 0), g->coeffs + i, prec - 8,
                   "log2_lclm");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 32,
+        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 8,
                   "log2_lclm");
         acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 2), c, prec - 32, "log2_lclm");
+        check_acb(acb_mat_entry(mat, i, 2), c, prec - 8, "log2_lclm");
     }
     acb_poly_exp_series(f, x, 4, prec);
     acb_poly_add_si(f, f, -1, prec);
     for (slong i = 0; i < 4; i++)
-        check_acb(acb_mat_entry(mat, i, 3), f->coeffs + i, prec - 32,
+        check_acb(acb_mat_entry(mat, i, 3), f->coeffs + i, prec - 8,
                   "log2_lclm");
 
     acb_mat_clear(mat);
@@ -1983,7 +1915,7 @@ test_whittaker(void)
             acb_neg(mu, mu);
         whittaker_m_jet(f, kappa, mu, pt, 2, prec);
         for (slong i = 0; i < 2; i++)
-            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 32,
+            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 20,
                       "whittaker");
     }
 
@@ -2059,7 +1991,7 @@ test_lclm_xpow(void)
             acb_poly_pow_acb_series(f, x, expo, 2, prec);
         }
         for (slong i = 0; i < 2; i++)
-            check_acb(acb_mat_entry(mat, i, j), f->coeffs + i, prec - 32,
+            check_acb(acb_mat_entry(mat, i, j), f->coeffs + i, prec - 12,
                       "lclm_xpow");
     }
 
@@ -2129,7 +2061,7 @@ test_hyp0f1_sqrt2(void)
         acb_add_si(b, b, 1, prec);
         xpow_pfq_jet(f, a, NULL, 0, b, 1, pt, 2, prec);
         for (slong i = 0; i < 2; i++)
-            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 32,
+            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 12,
                       "hyp0f1_sqrt2");
     }
 
@@ -2194,8 +2126,8 @@ test_hyp0f2_cbrt2(void)
     check_status(status, "hyp0f2_cbrt2");
 
     /* Im(a_0) < 0 < Im(a_1), a_2 real */
-    set_acb_str(c, "2^(1/3)", prec);
-    set_acb_str(expo + 0, "exp(-2*pi*I/3)", prec);
+    acb_set_str(c, "2^(1/3)", prec);
+    acb_set_str(expo + 0, "exp(-2*pi*I/3)", prec);
     acb_mul(expo + 0, expo + 0, c, prec);
     acb_conj(expo + 1, expo + 0);
     acb_set(expo + 2, c);
@@ -2215,7 +2147,7 @@ test_hyp0f2_cbrt2(void)
         }
         xpow_pfq_jet(f, expo + k, NULL, 0, b, 2, pt, 3, prec);
         for (slong i = 0; i < 3; i++)
-            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 32,
+            check_acb(acb_mat_entry(mat, i, j), f + i, prec - 8,
                       "hyp0f2_cbrt2");
     }
 
@@ -2309,7 +2241,7 @@ test_mittag_leffler_2(void)
     acb_set_si(z, 2);
     check_status(my_mittag_leffler_2(res, z, prec), "mittag_leffler_2");
     ref_mittag_leffler_2(ref, z, prec);
-    check_acb(res, ref, prec - 32, "mittag_leffler_2");
+    check_acb(res, ref, prec - 4, "mittag_leffler_2");
 
     acb_clear(ref);
     acb_clear(res);
@@ -2336,7 +2268,7 @@ my_mittag_leffler_half(acb_t res, const acb_t z, slong prec)
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "D^2 - 2*x*D - 2", Dop));
     status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, z,
                                          ACB_ODE_BASIS_ECHELON, 0, prec);
-    set_acb_str(c, "2/sqrt(pi)", prec);
+    acb_set_str(c, "2/sqrt(pi)", prec);
     acb_mul(res, acb_mat_entry(mat, 0, 1), c, prec);
     acb_add(res, res, acb_mat_entry(mat, 0, 0), prec);
 
@@ -2389,7 +2321,7 @@ test_mittag_leffler_half(void)
     check_status(my_mittag_leffler_half(res, z, prec),
                  "mittag_leffler_half");
     ref_mittag_leffler_half(ref, z, prec);
-    check_acb(res, ref, prec - 32, "mittag_leffler_half");
+    check_acb(res, ref, prec - 8, "mittag_leffler_half");
 
     acb_clear(ref);
     acb_clear(res);
@@ -2445,7 +2377,7 @@ test_log(void)
     acb_set_si(z, 2);
     check_status(my_log(res, z, prec), "log");
     acb_log(ref, z, prec);
-    check_acb(res, ref, prec - 16, "log");
+    check_acb(res, ref, prec - 4, "log");
 
     acb_clear(ref);
     acb_clear(res);
@@ -2470,8 +2402,8 @@ test_log_on_cut(void)
 
     acb_set_si(z, -2);
     check_status(my_log(res, z, prec), "log_on_cut");
-    set_acb_str(ref, "log(2) + pi*I", prec);
-    check_acb(res, ref, prec - 16, "log_on_cut");
+    acb_set_str(ref, "log(2) + pi*I", prec);
+    check_acb(res, ref, prec - 4, "log_on_cut");
 
     acb_clear(ref);
     acb_clear(res);
@@ -2496,8 +2428,8 @@ test_log_below_cut(void)
     arb_set_si(acb_imagref(z), -1);
     arb_mul_2exp_si(acb_imagref(z), acb_imagref(z), -1000);
     check_status(my_log(res, z, prec), "log_below_cut");
-    set_acb_str(ref, "log(2) - pi*I", prec);
-    check_acb(res, ref, prec - 16, "log_below_cut");
+    acb_set_str(ref, "log(2) - pi*I", prec);
+    check_acb(res, ref, prec - 4, "log_below_cut");
 
     acb_clear(ref);
     acb_clear(res);
@@ -2549,8 +2481,8 @@ test_arctan_shifted(void)
     for (slong i = 0; i < 2; i++)
     {
         acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 0), c, prec - 16, "arctan_shifted");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 16,
+        check_acb(acb_mat_entry(mat, i, 0), c, prec - 4, "arctan_shifted");
+        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 4,
                   "arctan_shifted");
     }
 
@@ -2563,638 +2495,6 @@ test_arctan_shifted(void)
     gr_ctx_clear(Dop);
     gr_ctx_clear(Pol);
     gr_ctx_clear(ZZ);
-}
-
-/* res(x) = dop(x + a), i.e., dop rewritten in terms of the local variable
-   x - a */
-static void
-shift_dop(gr_ore_poly_t res, const gr_ore_poly_t dop, gr_srcptr a,
-          gr_ore_poly_ctx_t Dop)
-{
-    gr_ctx_struct * Cst;
-
-    GR_MUST_SUCCEED(gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Cst, NULL, Dop));
-
-    GR_MUST_SUCCEED(gr_ore_poly_set(res, dop, Dop));
-    for (slong i = 0; i < res->length; i++)
-    {
-        gr_poly_struct * c = gr_ore_poly_coeff_ptr(res, i, Dop);
-        GR_MUST_SUCCEED(gr_poly_taylor_shift(c, c, a, Cst));
-    }
-}
-
-/* sage: r = QQbar(I*sqrt(2))
-   sage: b = a + a.conjugate() + r
-   sage: (Dx*(x^2+2)*Dx).numerical_transition_matrix([r, b])[0,0]
-   [0.4904146265058631...] + [2.526112944919405...]*I
-   (with a as in test_log_on_cut, so that b - r = -2.) Expansion at the
-   singular point i*sqrt(2). In terms of t = x - i*sqrt(2), the basis is
-   log(t) - log(1 + t/(2*i*sqrt(2))), 1.
-   [ore_algebra] */
-static void
-test_log_algebraic_singularity(void)
-{
-    gr_ctx_t QQbar, Pol, Dop;
-    gr_ore_poly_t dop;
-    gr_ptr a;
-    acb_t t, c;
-    acb_poly_t x, f, g;
-    acb_mat_t mat;
-    slong prec = 128;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_complex_qqbar(QQbar);
-    gr_ctx_init_gr_poly(Pol, QQbar);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-    a = gr_heap_init(QQbar);
-    acb_init(t);
-    acb_init(c);
-    acb_poly_init(x);
-    acb_poly_init(f);
-    acb_poly_init(g);
-    acb_mat_init(mat, 2, 2);
-
-    acb_set_si(t, -2);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "(x^2 + 2)*D^2 + 2*x*D", Dop));
-    GR_MUST_SUCCEED(gr_set_str(a, "I*sqrt(2)", QQbar));
-    shift_dop(dop, dop, a, Dop);
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, t,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-    check_status(status, "log_algebraic_singularity");
-
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_poly_set_coeff_acb(x, 0, t);
-    acb_poly_log_series(f, x, 2, prec);
-    set_acb_str(c, "1/(2*I*sqrt(2))", prec);
-    acb_poly_scalar_mul(g, x, c, prec);
-    acb_poly_log1p_series(g, g, 2, prec);
-    acb_poly_sub(f, f, g, prec);
-    for (slong i = 0; i < 2; i++)
-    {
-        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec - 32,
-                  "log_algebraic_singularity");
-        acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 1), c, prec - 32,
-                  "log_algebraic_singularity");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(g);
-    acb_poly_clear(f);
-    acb_poly_clear(x);
-    acb_clear(c);
-    acb_clear(t);
-    gr_heap_clear(a, QQbar);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(QQbar);
-}
-
-/* Transition matrix of dop_str, an operator in QQbar[x]<D>, along the
-   polygonal path with vertices path[0], ..., path[len-1] (elements of QQbar
-   given as strings). The vertices must be ordinary points, and each step
-   must stay within the disk of convergence of the local solutions at its
-   origin. */
-static int
-transition_matrix_path(acb_mat_t mat, const char * dop_str,
-                       const char ** path, slong len, slong prec)
-{
-    gr_ctx_t QQbar, CC, Pol, Dop;
-    gr_ore_poly_t dop, sdop;
-    gr_ptr a, b;
-    acb_t pt;
-    acb_mat_t step;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_complex_qqbar(QQbar);
-    gr_ctx_init_complex_acb(CC, prec);
-    gr_ctx_init_gr_poly(Pol, QQbar);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-    gr_ore_poly_init(sdop, Dop);
-    a = gr_heap_init(QQbar);
-    b = gr_heap_init(QQbar);
-    acb_init(pt);
-    acb_mat_init(step, acb_mat_nrows(mat), acb_mat_ncols(mat));
-
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, dop_str, Dop));
-    GR_MUST_SUCCEED(gr_set_str(a, path[0], QQbar));
-    acb_mat_one(mat);
-
-    for (slong k = 1; k < len && status == GR_SUCCESS; k++)
-    {
-        GR_MUST_SUCCEED(gr_set_str(b, path[k], QQbar));
-        shift_dop(sdop, dop, a, Dop);
-        GR_MUST_SUCCEED(gr_sub(a, b, a, QQbar));
-        GR_MUST_SUCCEED(gr_set_other(pt, a, QQbar, CC));
-        status |= acb_ode_fundamental_matrix(step, sdop, Dop, NULL, NULL, pt,
-                                             ACB_ODE_BASIS_ECHELON, 0, prec);
-        acb_mat_mul(mat, step, mat, prec);
-        gr_swap(a, b, QQbar);
-    }
-
-    acb_mat_clear(step);
-    acb_clear(pt);
-    gr_heap_clear(b, QQbar);
-    gr_heap_clear(a, QQbar);
-    gr_ore_poly_clear(sdop, Dop);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(CC);
-    gr_ctx_clear(QQbar);
-
-    return status;
-}
-
-/* sage: dop = (x^2 + 1)*Dx^2 + 2*x*Dx
-   sage: dop.numerical_transition_matrix([0, 1], 1e-20)
-   [  [1.00...] [0.7853981633974483096...]]
-   [  [+/- ...] [0.5000000000000000000...]]
-   The basis is 1, arctan(x). The evaluation point lies on the boundary of
-   the disk of convergence at 0, hence the intermediate point 1/2.
-   [ore_algebra] */
-static void
-test_arctan(void)
-{
-    const char * path[] = { "0", "1/2", "1" };
-    acb_t pt, c;
-    acb_poly_t x, f;
-    acb_mat_t mat;
-    slong prec = 128;
-
-    acb_init(pt);
-    acb_init(c);
-    acb_poly_init(x);
-    acb_poly_init(f);
-    acb_mat_init(mat, 2, 2);
-
-    check_status(transition_matrix_path(mat, "(x^2 + 1)*D^2 + 2*x*D",
-                                        path, 3, prec), "arctan");
-
-    acb_one(pt);
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_poly_set_coeff_acb(x, 0, pt);
-    acb_poly_atan_series(f, x, 2, prec);
-    for (slong i = 0; i < 2; i++)
-    {
-        acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 0), c, prec - 16, "arctan");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 16,
-                  "arctan");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(f);
-    acb_poly_clear(x);
-    acb_clear(c);
-    acb_clear(pt);
-}
-
-/* sage: dop.numerical_transition_matrix([0, 1+i], 1e-10)
-   [ [1.00...] + [+/- ...]*I  [1.017221967...] + [0.4023594781...]*I]
-   [ [+/- ...] + [+/- ...]*I  [0.200000000...] + [-0.400000000...]*I]
-   (continued from test_arctan)
-   [ore_algebra] */
-static void
-test_arctan_complex(void)
-{
-    const char * path[] = { "0", "1/2", "1 + I/2", "1 + I" };
-    acb_t pt, c;
-    acb_poly_t x, f;
-    acb_mat_t mat;
-    slong prec = 128;
-
-    acb_init(pt);
-    acb_init(c);
-    acb_poly_init(x);
-    acb_poly_init(f);
-    acb_mat_init(mat, 2, 2);
-
-    check_status(transition_matrix_path(mat, "(x^2 + 1)*D^2 + 2*x*D",
-                                        path, 4, prec), "arctan_complex");
-
-    set_acb_str(pt, "1 + I", prec);
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_poly_set_coeff_acb(x, 0, pt);
-    acb_poly_atan_series(f, x, 2, prec);
-    for (slong i = 0; i < 2; i++)
-    {
-        acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 0), c, prec - 16, "arctan_complex");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 16,
-                  "arctan_complex");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(f);
-    acb_poly_clear(x);
-    acb_clear(c);
-    acb_clear(pt);
-}
-
-/* sage: dop = (x+1)*(x^2+1)*Dx^3-(x-1)*(x^2-3)*Dx^2-2*(x^2+2*x-1)*Dx
-   sage: dop.numerical_transition_matrix( [0, 1+i], 1e-12)
-   [ [1.00...] + [+/- ...]*I  [1.017221967...] + [0.402359478...]*I  [-1.097056...] + [3.76999161...]*I]
-   [ [+/- ...] + [+/- ...]*I  [0.200000000...] + [-0.40000000...]*I  [2.5373878...] + [5.37471057...]*I]
-   [ [+/- ...] + [+/- ...]*I  [-0.04000000...] + [0.280000000...]*I  [1.5486939...] + [1.72735528...]*I]
-   The basis is 1, arctan(x), 2*(exp(x) - 1 - arctan(x)).
-   [ore_algebra] */
-static void
-test_exp_arctan(void)
-{
-    const char * path[] = { "0", "1/2", "1", "1 + I/2", "1 + I" };
-    acb_t pt, c;
-    acb_poly_t x, f, g;
-    acb_mat_t mat;
-    slong prec = 128;
-
-    acb_init(pt);
-    acb_init(c);
-    acb_poly_init(x);
-    acb_poly_init(f);
-    acb_poly_init(g);
-    acb_mat_init(mat, 3, 3);
-
-    check_status(transition_matrix_path(mat,
-            "(x + 1)*(x^2 + 1)*D^3 - (x - 1)*(x^2 - 3)*D^2"
-            " - 2*(x^2 + 2*x - 1)*D", path, 5, prec), "exp_arctan");
-
-    set_acb_str(pt, "1 + I", prec);
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_poly_set_coeff_acb(x, 0, pt);
-    acb_poly_atan_series(f, x, 3, prec);
-    acb_poly_exp_series(g, x, 3, prec);
-    acb_poly_sub(g, g, f, prec);
-    acb_poly_add_si(g, g, -1, prec);
-    acb_poly_scalar_mul_2exp_si(g, g, 1);
-    for (slong i = 0; i < 3; i++)
-    {
-        acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 0), c, prec - 16, "exp_arctan");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 16,
-                  "exp_arctan");
-        check_acb(acb_mat_entry(mat, i, 2), g->coeffs + i, prec - 16,
-                  "exp_arctan");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(g);
-    acb_poly_clear(f);
-    acb_poly_clear(x);
-    acb_clear(c);
-    acb_clear(pt);
-}
-
-/* sage: (Dx*x*Dx).numerical_transition_matrix([1, i, -1, -i, 1])
-   [ [1.0000...] + [+/- ...]*I [+/- ...] + [6.2831853071795...]*I]
-   [   [+/- ...] + [+/- ...]*I          [1.0000...] + [+/- ...]*I]
-   Monodromy of log(x) around the origin, with additional vertices so that
-   each step stays inside the disk of convergence.
-   [ore_algebra] */
-static void
-test_log_monodromy(void)
-{
-    const char * path[] = {
-        "1", "3/4 + 3/4*I", "I", "-3/4 + 3/4*I", "-1",
-        "-3/4 - 3/4*I", "-I", "3/4 - 3/4*I", "1",
-    };
-    acb_t ref;
-    acb_mat_t mat;
-    slong prec = 128;
-
-    acb_init(ref);
-    acb_mat_init(mat, 2, 2);
-
-    check_status(transition_matrix_path(mat, "x*D^2 + D", path, 9, prec),
-                 "log_monodromy");
-
-    for (slong i = 0; i < 2; i++)
-    {
-        for (slong j = 0; j < 2; j++)
-        {
-            if (i == 0 && j == 1)
-                set_acb_str(ref, "2*pi*I", prec);
-            else
-                acb_set_si(ref, i == j);
-            check_acb(acb_mat_entry(mat, i, j), ref, prec - 32,
-                      "log_monodromy");
-        }
-    }
-
-    acb_mat_clear(mat);
-    acb_clear(ref);
-}
-
-/* sage: ode = D + 1/4/(t - 1/2)
-   sage: ode.numerical_transition_matrix([0,1+I,1], 1e-110,
-   ....:                                 algorithm='binsplit')
-   [[0.707...2078...] + [0.707...]*I]
-   The solution is (1 - 2*t)^(-1/4); continuing it from 0 to 1 through the
-   upper half plane yields exp(i*pi/4). The operator is scaled to
-   (4*x - 2)*Dx + 1 and the path subdivided around the singular point 1/2.
-   [ore_algebra] */
-static void
-test_quartic_branch(void)
-{
-    const char * path[] = {
-        "0", "I/4", "I/2", "1/2 + 3/4*I", "1 + I/2", "1",
-    };
-    acb_t ref;
-    acb_mat_t mat;
-    slong prec = 384;
-
-    acb_init(ref);
-    acb_mat_init(mat, 1, 1);
-
-    check_status(transition_matrix_path(mat, "(4*x - 2)*D + 1", path, 6,
-                                        prec), "quartic_branch");
-
-    set_acb_str(ref, "exp(pi*I/4)", prec);
-    check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 96, "quartic_branch");
-
-    acb_mat_clear(mat);
-    acb_clear(ref);
-}
-
-/* sage: dop = (z+1)*(3*z^2-z+2)*Dz^3 + (5*z^3+4*z^2+2*z+4)*Dz^2 \
-   ....:       + (z+1)*Dz + (4*z^3+2*z^2+5)
-   sage: path = [0,-2/5+3/5*i,-2/5+i,-1/5+7/5*i]
-   sage: dop.numerical_solution([0,i,0], path, 1e-150)
-   [-1.5598481440603221187326507993405933893413346644879595004537063375459901302359572361012065551669069...] +
-   [-0.7107764943512671843673286878693314397759047479618104045777076954591551406949345143368742955333566...]*I
-   The path is subdivided so that each step has a ratio below 1/2 and, from
-   -2/5 + 4/5*i on, below 1/5. (At ratios of about 0.35, the steps starting
-   from -2/5 + 4/5*i, -2/5 + i, and -3/10 + 6/5*i lose 25-35% of the working
-   precision.) The reference value only has about 320 bits, but we check
-   that the result is accurate to the requested 1e-150.
-   [ore_algebra] */
-static void
-test_order3_high_prec(void)
-{
-    const char * path[] = {
-        "0", "-2/15 + 1/5*I", "-4/15 + 2/5*I", "-2/5 + 3/5*I",
-        "-2/5 + 4/5*I", "-2/5 + 9/10*I", "-2/5 + I",
-        "-7/20 + 11/10*I", "-3/10 + 6/5*I", "-1/4 + 13/10*I", "-1/5 + 7/5*I",
-    };
-    acb_t ref, res;
-    acb_mat_t mat;
-    slong prec = 544;
-
-    acb_init(ref);
-    acb_init(res);
-    acb_mat_init(mat, 3, 3);
-
-    check_status(transition_matrix_path(mat,
-            "(x + 1)*(3*x^2 - x + 2)*D^3 + (5*x^3 + 4*x^2 + 2*x + 4)*D^2"
-            " + (x + 1)*D + 4*x^3 + 2*x^2 + 5", path, 11, prec),
-            "order3_high_prec");
-
-    acb_mul_onei(res, acb_mat_entry(mat, 0, 1));
-    set_acb_str(ref,
-        "[-1.5598481440603221187326507993405933893413346644879595004537063375"
-        "459901302359572361012065551669069 +/- 1e-97]"
-        " + [-0.710776494351267184367328687869331439775904747961810404577707"
-        "6954591551406949345143368742955333566 +/- 1e-97]*I", prec);
-    check_acb(res, ref, 500, "order3_high_prec");
-
-    acb_mat_clear(mat);
-    acb_clear(res);
-    acb_clear(ref);
-}
-
-/* The operator dop4 annihilating the generating series of face-centered
-   cubic lattice walks (4d), from the examples of ore_algebra. */
-#define FCC_DOP4 \
-    "(-1 + x)*x^3*(2 + x)*(3 + x)*(6 + x)*(8 + x)*(4 + 3*x)^2*D^4" \
-    " + 2*x^2*(4 + 3*x)*(-3456 - 2304*x + 3676*x^2 + 4920*x^3 + 2079*x^4" \
-    " + 356*x^5 + 21*x^6)*D^3" \
-    " + 6*x*(-5376 - 5248*x + 11080*x^2 + 25286*x^3 + 19898*x^4" \
-    " + 7432*x^5 + 1286*x^6 + 81*x^7)*D^2" \
-    " + 12*(-384 + 224*x + 3716*x^2 + 7633*x^3 + 6734*x^4 + 2939*x^5" \
-    " + 604*x^6 + 45*x^7)*D" \
-    " + 12*x*(256 + 632*x + 702*x^2 + 382*x^3 + 98*x^4 + 9*x^5)"
-
-/* Fundamental matrix at 1/2 of FCC_DOP4 in its local basis at a */
-static int
-fcc4(acb_mat_t mat, slong a, slong prec)
-{
-    gr_ctx_t ZZ, Pol, Dop;
-    gr_ore_poly_t dop;
-    gr_ptr c;
-    acb_t pt;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Pol, ZZ);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-    c = gr_heap_init(ZZ);
-    acb_init(pt);
-
-    acb_set_d(pt, 0.5);
-    acb_sub_si(pt, pt, a, prec);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, FCC_DOP4, Dop));
-    GR_MUST_SUCCEED(gr_set_si(c, a, ZZ));
-    shift_dop(dop, dop, c, Dop);
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-
-    acb_clear(pt);
-    gr_heap_clear(c, ZZ);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(ZZ);
-
-    return status;
-}
-
-/* sage: fcc.dop4.numerical_solution([0, 1, 0, 0], [1, 1/2],
-   ....:                             algorithm="binsplit")
-   [0.6757976924611368...] + [-2.987541622123742...]*I
-   Expansion at the regular singular point 1 (exponents 0, 1, 1, 2).
-   [ore_algebra] */
-static void
-test_fcc4_singular_base(void)
-{
-    acb_t ref;
-    acb_mat_t mat;
-    slong prec = 128;
-
-    acb_init(ref);
-    acb_mat_init(mat, 4, 4);
-
-    check_status(fcc4(mat, 1, prec), "fcc4_singular_base");
-
-    set_acb_str(ref, "[0.6757976924611368 +/- 1e-16]"
-                     " + [-2.987541622123742 +/- 1e-15]*I", prec);
-    check_acb(acb_mat_entry(mat, 0, 1), ref, prec - 48, "fcc4_singular_base");
-
-    acb_mat_clear(mat);
-    acb_clear(ref);
-}
-
-/* sage: fcc.dop4.numerical_solution([0, 0, 0, 1], [0, 1], 1e-60)
-   [1.10584379792120476018299547088585107443954623663875285836...]
-   + [+/- ...]*I
-   Connection between the regular singular points 0 and 1: solve
-   M1*y = M0*[0, 0, 0, 1], where M0, M1 are the fundamental matrices of the
-   local bases at 0 and 1, both evaluated at 1/2. The value at 1 is the
-   coordinate y[0] on the basis element of leading monomial 1.
-   [ore_algebra] */
-static void
-test_fcc4_connection(void)
-{
-    acb_t ref;
-    acb_mat_t mat0, mat1, rhs, y;
-    slong prec = 192;
-
-    acb_init(ref);
-    acb_mat_init(mat0, 4, 4);
-    acb_mat_init(mat1, 4, 4);
-    acb_mat_init(rhs, 4, 1);
-    acb_mat_init(y, 4, 1);
-
-    check_status(fcc4(mat0, 0, prec), "fcc4_connection");
-    check_status(fcc4(mat1, 1, prec), "fcc4_connection");
-
-    for (slong i = 0; i < 4; i++)
-        acb_set(acb_mat_entry(rhs, i, 0), acb_mat_entry(mat0, i, 3));
-    if (!acb_mat_solve(y, mat1, rhs, prec))
-    {
-        flint_printf("FAIL: fcc4_connection (singular matrix)\n");
-        flint_abort();
-    }
-
-    set_acb_str(ref,
-        "[1.10584379792120476018299547088585107443954623663875285836"
-        " +/- 1e-56] + [+/- 1e-48]*I", prec);
-    check_acb(acb_mat_entry(y, 0, 0), ref, prec - 96, "fcc4_connection");
-
-    acb_mat_clear(y);
-    acb_mat_clear(rhs);
-    acb_mat_clear(mat1);
-    acb_mat_clear(mat0);
-    acb_clear(ref);
-}
-
-/* A random operator with prescribed singularities and exponents (from
-   Chyzak, Goyer, Mezzarobba, 2022) that defines transition matrices with
-   large entries, from the doctests of ore_algebra. Its leading coefficient
-   is c*(x - 75/17)^3*(x - 4)^3. */
-#define CGM_DOP \
-    "(21829048560*x^6 - 550862460720*x^5 + 5789380916880*x^4" \
-    " - 32434807101840*x^3 + 102165545592000*x^2 - 171548863200000*x" \
-    " + 119964240000000)*D^3 + (-506769209364*x^5 + 10798395588024*x^4" \
-    " - 91979496877620*x^3 + 391481933812992*x^2 - 832564302926400*x" \
-    " + 707776470720000)*D^2 + (251156588660*x^4 - 10005924091768*x^3" \
-    " + 99364591554260*x^2 - 379332696633792*x + 503580376843200)*D" \
-    " + 38987126730300*x^3 - 113173203800613*x^2 - 1127681839519020*x" \
-    " + 3827710032458400"
-
-/* Fundamental matrix at 143/34 of CGM_DOP in its local basis at a, with the
-   exponent groups sorted by increasing real part as in ore_algebra */
-static int
-large_entries(acb_mat_t mat, const char * a_str, slong prec)
-{
-    gr_ctx_t QQbar, CC, Pol, Dop, Pol1, Euler;
-    gr_ore_poly_t dop, ldop;
-    acb_ode_exponents_t expos;
-    acb_ode_group_struct * grp;
-    gr_ptr a, b;
-    acb_t pt;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_complex_qqbar(QQbar);
-    gr_ctx_init_complex_acb(CC, prec);
-    gr_ctx_init_gr_poly(Pol, QQbar);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    acb_ode_local_diffop_ctx_init(Pol1, Euler, Dop, QQbar);
-    gr_ore_poly_init(dop, Dop);
-    gr_ore_poly_init(ldop, Euler);
-    acb_ode_exponents_init(expos);
-    a = gr_heap_init(QQbar);
-    b = gr_heap_init(QQbar);
-    acb_init(pt);
-
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, CGM_DOP, Dop));
-    GR_MUST_SUCCEED(gr_set_str(a, a_str, QQbar));
-    GR_MUST_SUCCEED(gr_set_str(b, "143/34", QQbar));
-    GR_MUST_SUCCEED(gr_sub(b, b, a, QQbar));
-    GR_MUST_SUCCEED(gr_set_other(pt, b, QQbar, CC));
-    shift_dop(dop, dop, a, Dop);
-    status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
-    status |= acb_ode_exponents(expos, ldop, Euler, CC);
-
-    grp = expos->groups;
-    for (slong i = 1; i < expos->ngroups; i++)
-        for (slong j = i; j > 0 && arb_lt(acb_realref(grp[j].leader),
-                                          acb_realref(grp[j - 1].leader)); j--)
-            FLINT_SWAP(acb_ode_group_struct, grp[j], grp[j - 1]);
-
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-
-    acb_clear(pt);
-    gr_heap_clear(b, QQbar);
-    gr_heap_clear(a, QQbar);
-    acb_ode_exponents_clear(expos);
-    gr_ore_poly_clear(ldop, Euler);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Euler);
-    gr_ctx_clear(Pol1);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(CC);
-    gr_ctx_clear(QQbar);
-
-    return status;
-}
-
-/* sage: dop.numerical_transition_matrix([75/17,4]).trace()
-   [-2.048077478517672...e+95...] + [-2.818936813156118...e+95...]*I
-   with dop = CGM_DOP. Both 75/17 and 4 are regular singular points. As in
-   test_fcc4_connection, we compute the transition matrix as M1^(-1)*M0,
-   where M0, M1 are the fundamental matrices of the local bases at 75/17 and
-   4 evaluated at the midpoint 143/34. Both evaluations lose about half of
-   the working precision (presumably due to the triple roots), and the
-   linear solve about 200 more bits, hence the high precision.
-   [ore_algebra] */
-static void
-test_large_entries(void)
-{
-    acb_t ref, tr;
-    acb_mat_t mat0, mat1, mat;
-    slong prec = 768;
-
-    acb_init(ref);
-    acb_init(tr);
-    acb_mat_init(mat0, 3, 3);
-    acb_mat_init(mat1, 3, 3);
-    acb_mat_init(mat, 3, 3);
-
-    check_status(large_entries(mat0, "75/17", prec), "large_entries");
-    check_status(large_entries(mat1, "4", prec), "large_entries");
-
-    if (!acb_mat_solve(mat, mat1, mat0, prec))
-    {
-        flint_printf("FAIL: large_entries (singular matrix)\n");
-        flint_abort();
-    }
-    acb_mat_trace(tr, mat, prec);
-
-    set_acb_str(ref, "[-2.048077478517672e+95 +/- 1e+80]"
-                     " + [-2.818936813156118e+95 +/- 1e+80]*I", prec);
-    check_acb(tr, ref, 64, "large_entries");
-
-    acb_mat_clear(mat);
-    acb_mat_clear(mat1);
-    acb_mat_clear(mat0);
-    acb_clear(tr);
-    acb_clear(ref);
 }
 
 TEST_FUNCTION_START(acb_ode_fundamental_matrix_vs_ref, state)
@@ -3243,16 +2543,6 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix_vs_ref, state)
     test_log_below_cut();
 
     test_arctan_shifted();
-    test_log_algebraic_singularity();
-    test_arctan();
-    test_arctan_complex();
-    test_exp_arctan();
-    test_log_monodromy();
-    test_quartic_branch();
-    test_order3_high_prec();
-    test_fcc4_singular_base();
-    test_fcc4_connection();
-    test_large_entries();
 
     TEST_FUNCTION_END(state);
 }
