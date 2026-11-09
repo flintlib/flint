@@ -489,22 +489,24 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
     } while (0)
 
+/* division of nh B + nl by d, with B/2 <= d < B, nh < d and di = n_preinvert_limb_prenorm(d) */
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di) \
   do { \
-    ulong _n2, _n10, _nmask, _nadj, _q1; \
-    ulong _xh, _xl; \
-    _n2 = (nh); \
-    _n10 = (nl); \
-    _nmask = (slong) (_n10) >> (FLINT_BITS - 1); \
-    _nadj = _n10 + (_nmask & (d)); \
-    umul_ppmm(_xh, _xl, di, _n2 - _nmask); \
-    add_ssaaaa(_xh, _xl, _xh, _xl, _n2, _nadj); \
-    _q1 = ~_xh; \
-    umul_ppmm(_xh, _xl, _q1, d); \
-    add_ssaaaa(_xh, _xl, _xh, _xl, nh, nl); \
-    _xh -= (d); /* xh = 0 or -1 */ \
-    (r) = _xl + ((d) & _xh); \
-    (q) = _xh - _q1; \
+    const ulong _nh = (nh), _nl = (nl), _d = (d); \
+    ulong _qh, _ql, _r, _mask; \
+    umul_ppmm(_qh, _ql, _nh, (di)); \
+    add_ssaaaa(_qh, _ql, _qh, _ql, _nh + 1, _nl); \
+    _r = _nl - _qh * _d; \
+    _mask = -(ulong) (_r > _ql); \
+    _qh += _mask; \
+    _r += _mask & _d; \
+    if (FLINT_UNLIKELY(_r >= _d)) \
+    { \
+      _r -= _d; \
+      _qh++; \
+    } \
+    (r) = _r; \
+    (q) = _qh; \
   } while (0)
 
 #ifdef __cplusplus

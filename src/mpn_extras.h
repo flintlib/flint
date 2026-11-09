@@ -1384,25 +1384,6 @@ flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d0)
     return v;
 }
 
-/* Moller-Granlund 2/1 division: (nh, nl) = q d + r with nh < d, d normalized
-   and di = floor((B^2 - 1) / d) - B */
-#define FLINT_MPN_UDIV_QR_2BY1(q, r, nh, nl, d, di) \
-    do { \
-        mp_limb_t __q0, __r, __mask; \
-        umul_ppmm((q), __q0, (nh), (di)); \
-        add_ssaaaa((q), __q0, (q), __q0, (nh) + 1, (nl)); \
-        __r = (nl) - (q) * (d); \
-        __mask = -(mp_limb_t) (__r > __q0); \
-        (q) += __mask; \
-        __r += __mask & (d); \
-        if (FLINT_UNLIKELY(__r >= (d))) \
-        { \
-            __r -= (d); \
-            (q)++; \
-        } \
-        (r) = __r; \
-    } while (0)
-
 /* The same 3/2 division without an inverse, by one hardware 2/1 division
    of (n2, n1) by d1 and at most two corrections (a step of Knuth's
    algorithm D); only sensible where hardware division is fast
