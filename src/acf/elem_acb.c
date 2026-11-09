@@ -426,6 +426,28 @@ _acf_acb_loop(acf_t res, int f, const acf_t x, int want, slong prec, arf_rnd_t r
                 s1 = (want & 1) ? _acf_round_ball_strict(t1, acb_realref(r), wp + 8, prec, rnd) : 0;
                 s2 = (want & 2) ? _acf_round_ball_strict(t2, acb_imagref(r), wp + 8, prec, rnd) : 0;
 
+                /* a part left undecided by a ball of relative accuracy
+                   well above prec: near a rounding boundary, from the
+                   expansion of f at the nearest exact point (acf/near.c)
+                   when x is close to one */
+                if (s1 == ARF_ELEM_UNCERTAIN || s2 == ARF_ELEM_UNCERTAIN)
+                {
+                    arf_t beta;
+                    int i, side;
+                    arf_init(beta);
+                    for (i = 0; i < 2; i++)
+                    {
+                        arb_srcptr v = i ? acb_imagref(r) : acb_realref(r);
+                        int * st = i ? &s2 : &s1;
+                        if (*st != ARF_ELEM_UNCERTAIN || arb_rel_accuracy_bits(v) < prec + 40)
+                            continue;
+                        _acf_round_boundary(beta, arb_midref(v), prec, rnd);
+                        if (_acf_near_side(&side, ACF_NEAR_EXPM1 + f, i, x, beta, 0))
+                            *st = _acf_round_side(i ? t2 : t1, beta, side, prec, rnd);
+                    }
+                    arf_clear(beta);
+                }
+
                 if (s1 != ARF_ELEM_UNCERTAIN && s2 != ARF_ELEM_UNCERTAIN)
                 {
                     status = s1 | (s2 << 1);

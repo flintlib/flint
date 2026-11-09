@@ -816,30 +816,62 @@ _acf_elem(acf_t res1, acf_t res2, int f, const acf_t x, const acf_t y, slong pre
         D1 = _acf_part_gap(R1, R2);
         D2 = _acf_part_gap(R2, R1);
         s1 = _acf_elem_set(R1, R1, D1, p, K, ebu[0], exact & 1, prec, rnd1);
-        if (s1 == ARF_ELEM_UNCERTAIN)
-            s2 = s1;
-        else
+        /* (tan and cot: the imaginary part -+(1 + delta) from delta
+           when the window fails, R3 holding the denominator) */
+        if (rnd < ARF_RND_FAST && (f == CELEM_TAN || f == CELEM_COT || f == CELEM_TAN_PI || f == CELEM_COT_PI)
+            && !arf_is_zero(R2) && arf_cmpabs_2exp_si(b, 0) >= 0 && arf_cmpabs_2exp_si(R2, -1) > 0)
         {
-            /* (tan and cot: the imaginary part -+(1 + delta) from delta
-               when the window fails, R3 holding the denominator) */
-            if (rnd < ARF_RND_FAST && (f == CELEM_TAN || f == CELEM_COT || f == CELEM_TAN_PI || f == CELEM_COT_PI)
-                && !arf_is_zero(R2) && arf_cmpabs_2exp_si(b, 0) >= 0 && arf_cmpabs_2exp_si(R2, -1) > 0)
-            {
-                s2 = _acf_elem_set(R2, R2, D2, p, K, ebu[1], exact & 2, prec, rnd);
-                /* (R2 is left alone when uncertain) */
-                if (s2 == ARF_ELEM_UNCERTAIN && _acf_tan_delta(R3, f, a, b, R3, p) && arf_cmpabs_2exp_si(R3, -prec - 3) < 0)
-                    s2 = _arf_one_plus_tiny(R2, ARF_SGNBIT(R2), arf_sgn(R3) < 0, prec, rnd);
-            }
-            else
-                s2 = _acf_elem_set(R2, R2, D2, p, K, ebu[1], exact & 2, prec, rnd);
+            s2 = _acf_elem_set(R2, R2, D2, p, K, ebu[1], exact & 2, prec, rnd);
+            /* (R2 is left alone when uncertain) */
+            if (s2 == ARF_ELEM_UNCERTAIN && _acf_tan_delta(R3, f, a, b, R3, p) && arf_cmpabs_2exp_si(R3, -prec - 3) < 0)
+                s2 = _arf_one_plus_tiny(R2, ARF_SGNBIT(R2), arf_sgn(R3) < 0, prec, rnd);
         }
+        else if (f == CELEM_LOG)
+        {
+            /* (the imaginary part of the logarithm is atan2(b, a), a
+               real function of exact numbers: rounded by arf, which
+               also decides the values near a boundary, arg x near
+               b / a for a tiny b / a) */
+            s2 = arf_atan2(R2, b, a, prec, rnd);
+        }
+        else
+            s2 = _acf_elem_set(R2, R2, D2, p, K, ebu[1], exact & 2, prec, rnd);
         s3 = s4 = 0;
-        if (res2 != NULL && s2 != ARF_ELEM_UNCERTAIN)
+        if (res2 != NULL)
         {
             D1 = _acf_part_gap(R3, R4);
             D2 = _acf_part_gap(R4, R3);
             s3 = _acf_elem_set(R3, R3, D1, p, K, WORD_MIN, exact & 4, prec, rnd);
-            s4 = (s3 == ARF_ELEM_UNCERTAIN) ? s3 : _acf_elem_set(R4, R4, D2, p, K, WORD_MIN, exact & 8, prec, rnd);
+            s4 = _acf_elem_set(R4, R4, D2, p, K, WORD_MIN, exact & 8, prec, rnd);
+        }
+
+        /* parts left undecided at a working precision well above prec:
+           near a rounding boundary, from the expansion of f at the
+           nearest exact point (acf/near.c) when x is close to one */
+        if ((s1 == ARF_ELEM_UNCERTAIN || s2 == ARF_ELEM_UNCERTAIN || s3 == ARF_ELEM_UNCERTAIN || s4 == ARF_ELEM_UNCERTAIN)
+            && p >= prec + 40 && f != CELEM_POW)
+        {
+            static const int fn1[] = { ACF_NEAR_EXP, ACF_NEAR_EXP_PI_I, ACF_NEAR_SIN, ACF_NEAR_SIN_PI, ACF_NEAR_LOG,
+                ACF_NEAR_NONE, ACF_NEAR_TAN, ACF_NEAR_COT, ACF_NEAR_SEC, ACF_NEAR_CSC,
+                ACF_NEAR_TAN_PI, ACF_NEAR_COT_PI, ACF_NEAR_SEC_PI, ACF_NEAR_CSC_PI };
+            int * st[4] = { &s1, &s2, &s3, &s4 };
+            arf_ptr Rp[4] = { R1, R2, R3, R4 };
+            arf_t beta;
+            int i, side;
+
+            arf_init(beta);
+            for (i = 0; i < 4; i++)
+            {
+                arf_rnd_t ri = (i == 0) ? rnd1 : rnd;
+                int fn = (i < 2) ? fn1[f] : (f == CELEM_SIN_COS) ? ACF_NEAR_COS : ACF_NEAR_COS_PI;
+
+                if (*st[i] != ARF_ELEM_UNCERTAIN || ri >= ARF_RND_FAST || arf_is_special(Rp[i]))
+                    continue;
+                _acf_round_boundary(beta, Rp[i], prec, ri);
+                if (_acf_near_side(&side, fn, i & 1, x, beta, 0))
+                    *st[i] = _acf_round_side(Rp[i], beta, side, prec, ri);
+            }
+            arf_clear(beta);
         }
 
         if (s1 != ARF_ELEM_UNCERTAIN && s2 != ARF_ELEM_UNCERTAIN && s3 != ARF_ELEM_UNCERTAIN && s4 != ARF_ELEM_UNCERTAIN)
@@ -1557,6 +1589,12 @@ acf_pow(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd)
         if (s >= 0)
             return s;
     }
+
+    /* near the exact cases (x a power of two times a unit, times 1 + h
+       with h tiny) and for a tiny y: the expansions of acf/near.c, which
+       decide the values close to a rounding boundary exactly */
+    if (_acf_pow_near(res, &s, x, y, prec, rnd))
+        return s;
 
     /* exp(y log x) with the principal logarithm (the composition takes
        zero parts: the logarithm of a real or imaginary x has an exact

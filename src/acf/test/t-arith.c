@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "acf.h"
 #include "acb.h"
+#include "fmpz.h"
 
 /* acf_inv, acf_div, acf_sqrt and acf_rsqrt against acb at a higher
    precision: correctly rounded parts in the strict modes (whenever the
@@ -242,6 +243,181 @@ TEST_FUNCTION_START(acf_arith, state)
         acb_clear(z);
         acb_clear(w);
         acb_clear(zy);
+    }
+
+    /* parts near a rounding boundary: x = 2^e (m + c 2^-k i) (and y
+       likewise) with k far beyond the precision, whose quotients and
+       roots lie within about 2^-k or 2^-2k of a dyadic number, against
+       acb at a precision resolving that distance; and parts of exponents
+       beyond the kernels (2^57 and bignums), against acb */
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
+    {
+        acf_t x, y, r;
+        acb_t z, zy, w;
+        slong prec, k, wp, which;
+        arf_rnd_t rnd;
+        int i;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        acb_init(z);
+        acb_init(zy);
+        acb_init(w);
+
+        prec = 2 + n_randint(state, 140);
+        k = prec + 8 + n_randint(state, 3000);
+        which = n_randint(state, 4);
+
+        for (i = 0; i < 2; i++)
+        {
+            acf_ptr v = i ? y : x;
+            slong m = (n_randint(state, 2) ? 1 : 2 * (slong) n_randint(state, 5) + 1) * (n_randint(state, 2) ? 1 : -1);
+            arf_set_si(acf_realref(v), m);
+            arf_set_si_2exp_si(acf_imagref(v), (slong) n_randint(state, 9) - 4, -(slong) (n_randint(state, 2) ? k : k / 2 + 1));
+            if (n_randint(state, 2))
+                arf_swap(acf_realref(v), acf_imagref(v));
+            if (n_randint(state, 4) == 0)
+            {
+                /* huge exponents, the same for both parts */
+                fmpz_t e;
+                fmpz_init(e);
+                fmpz_set_ui(e, n_randint(state, 2) ? (UWORD(1) << 57) : 1);
+                if (fmpz_is_one(e))
+                    fmpz_mul_2exp(e, e, 70);
+                if (n_randint(state, 2))
+                    fmpz_neg(e, e);
+                arf_mul_2exp_fmpz(acf_realref(v), acf_realref(v), e);
+                arf_mul_2exp_fmpz(acf_imagref(v), acf_imagref(v), e);
+                fmpz_clear(e);
+            }
+            else
+            {
+                slong e = (slong) n_randint(state, 41) - 20;
+                arf_mul_2exp_si(acf_realref(v), acf_realref(v), e);
+                arf_mul_2exp_si(acf_imagref(v), acf_imagref(v), e);
+            }
+        }
+        if (which >= 2 && n_randint(state, 4) == 0)
+            acf_mul(x, y, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+
+        arb_set_arf(acb_realref(z), acf_realref(x));
+        arb_set_arf(acb_imagref(z), acf_imagref(x));
+        arb_set_arf(acb_realref(zy), acf_realref(y));
+        arb_set_arf(acb_imagref(zy), acf_imagref(y));
+        wp = 3 * k + 2 * prec + 200;
+
+        if (which == 0) acb_inv(w, z, wp);
+        else if (which == 1) acb_div(w, z, zy, wp);
+        else if (which == 2) acb_sqrt(w, z, wp);
+        else acb_rsqrt(w, z, wp);
+
+        for (rnd = 0; rnd <= ARF_RND_ACCURATE; rnd++)
+        {
+            const char * name = (which == 0) ? "inv" : (which == 1) ? "div" : (which == 2) ? "sqrt" : "rsqrt";
+            if (which == 0) acf_inv(r, x, prec, rnd);
+            else if (which == 1) acf_div(r, x, y, prec, rnd);
+            else if (which == 2) acf_sqrt(r, x, prec, rnd);
+            else acf_rsqrt(r, x, prec, rnd);
+            if (acb_rel_accuracy_bits(w) > prec + 10)
+            {
+                arith_check_part(name, "real (near)", acf_realref(r), acb_realref(w), acb_imagref(w), x, (which == 1) ? y : NULL, prec, rnd);
+                arith_check_part(name, "imag (near)", acf_imagref(r), acb_imagref(w), acb_realref(w), x, (which == 1) ? y : NULL, prec, rnd);
+            }
+        }
+
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
+        acb_clear(z);
+        acb_clear(zy);
+        acb_clear(w);
+    }
+
+    /* far beyond any working precision: 1 + eps i with eps = 2^-(2^62)
+       (a bignum exponent), whose reciprocal has the real part 1 / (1 +
+       eps^2), just below 1, and the imaginary part -eps / (1 + eps^2),
+       just above -eps; the square root (1 + eps^2/8 + ..., eps/2 (1 -
+       ...)), each part just beyond a power of two */
+    {
+        acf_t x, r;
+        arf_t eps, e1, e2, t;
+        fmpz_t e;
+        int rnd;
+
+        acf_init(x);
+        acf_init(r);
+        arf_init(eps);
+        arf_init(e1);
+        arf_init(e2);
+        arf_init(t);
+        fmpz_init(e);
+
+        fmpz_one(e);
+        fmpz_mul_2exp(e, e, 62);
+        fmpz_neg(e, e);
+        arf_one(eps);
+        arf_mul_2exp_fmpz(eps, eps, e);
+        arf_one(acf_realref(x));
+        arf_set(acf_imagref(x), eps);
+
+        for (rnd = 0; rnd <= ARF_RND_NEAR; rnd++)
+        {
+            int st, toward0 = (rnd == ARF_RND_DOWN), up = (rnd == ARF_RND_UP);
+
+            /* inv: the real part just below 1, the imaginary part just
+               above -eps (the numbers beneath a power of two 2^t at 64
+               bits: 2^t (1 - 2^-64)) */
+            st = acf_inv(r, x, 64, rnd);
+            arf_one(e1);
+            if (toward0 || rnd == ARF_RND_FLOOR)
+            {
+                arf_set_si_2exp_si(t, 1, -64);
+                arf_sub(e1, e1, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+            }
+            arf_neg(e2, eps);
+            if (toward0 || rnd == ARF_RND_CEIL)
+            {
+                arf_mul_2exp_si(t, e2, -64);
+                arf_sub(e2, e2, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+            }
+            if (!arf_equal(acf_realref(r), e1) || !arf_equal(acf_imagref(r), e2) || st != 3)
+            {
+                flint_printf("FAIL: inv(1 + eps i), rnd = %d\n", rnd);
+                acf_printd(r, 20); flint_printf("\n");
+                flint_abort();
+            }
+
+            /* sqrt: the real part just above 1, the imaginary part just
+               below eps/2 */
+            st = acf_sqrt(r, x, 64, rnd);
+            arf_one(e1);
+            if (up || rnd == ARF_RND_CEIL)
+            {
+                arf_set_si_2exp_si(t, 1, -63);
+                arf_add(e1, e1, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+            }
+            arf_mul_2exp_si(e2, eps, -1);
+            if (toward0 || rnd == ARF_RND_FLOOR)
+            {
+                arf_mul_2exp_si(t, e2, -64);
+                arf_sub(e2, e2, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+            }
+            if (!arf_equal(acf_realref(r), e1) || !arf_equal(acf_imagref(r), e2) || st != 3)
+            {
+                flint_printf("FAIL: sqrt(1 + eps i), rnd = %d\n", rnd);
+                acf_printd(r, 20); flint_printf("\n");
+                flint_abort();
+            }
+        }
+
+        acf_clear(x);
+        acf_clear(r);
+        arf_clear(eps);
+        arf_clear(e1);
+        arf_clear(e2);
+        arf_clear(t);
+        fmpz_clear(e);
     }
 
     TEST_FUNCTION_END(state);

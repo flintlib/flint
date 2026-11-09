@@ -216,12 +216,19 @@ by formulas that keep each part accurate, including a part that is
 exponentially smaller than the other, at an increasing working
 precision until the rounding of each part is decided (in the strict
 modes). Exact results are recognised (for example the zeros of
-$\sin(\pi x)$, exact integer powers and dyadic square roots); a dyadic
-value that the tests miss would keep the retries from converging, so
-beyond a working precision of $4 \mathit{prec} + 65536$ bits (plus up to
-$2^{21}$ bits for arguments whose parts have very different exponents)
-the approximation is rounded as it stands, without the guarantee of
-correct rounding. The tangent family gives nan beyond about
+$\sin(\pi x)$, exact integer powers and dyadic square roots), and a
+part still undecided at a working precision well above `prec` (one that
+lies extremely close to a rounding boundary, as when the parts of the
+argument differ in size by very many bits) is decided exactly from its
+side of that boundary: by a polynomial identity for `acf_inv`,
+`acf_div`, `acf_sqrt` and `acf_rsqrt`, and from the expansion of the
+function at its nearby exact point (0, $\pm 1$, $\pm i$, the multiples of
+1/4 for the functions of $\pi z$, the branch points and poles, infinity)
+for the others, without a precision growing with that distance. A value
+that neither decides (none is known) would keep the retries from
+converging, so beyond a working precision of $4 \mathit{prec} + 65536$
+bits (plus up to $2^{21}$ bits for arguments whose parts have very
+different exponents) the approximation is rounded as it stands. The tangent family gives nan beyond about
 $|\operatorname{Im} z| = 2^{131072}$. The formulas, the exact cases and the rounding are described
 in [](algorithms/special-functions/complex-elementary).
 
@@ -326,8 +333,11 @@ bi)/(a^2 + b^2)$ and $(a + bi)/(c + di) = ((ac + bd) + (bc - ad) i) /
 (c^2 + d^2)$ with the numerators and the denominator formed exactly, so
 that each part is one correctly rounded quotient of exact numbers; when
 the terms of a sum lie more than $2 \mathit{prec} + 128$ bits apart (so
-that they cannot cancel) the sum is rounded to a working precision
-instead and the quotient certified as for the elementary functions.
+that they cannot cancel) the sum is rounded to `prec` + 64 bits instead,
+the quotient certified from its error bound, and a part that this leaves
+undecided decided exactly by the sign of $N - \beta s$ for its exact
+numerator $N$, the denominator $s$ and the rounding boundary $\beta$
+next to it (a sum of exact terms, whatever their sizes).
 A real or purely imaginary divisor is handled by real divisions of the
 parts; a zero divisor gives the results of `arf_div` (infinities and
 nan).
@@ -339,10 +349,11 @@ int acf_rsqrt(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
 
 Set `res` to the principal square root of `x`, respectively its
 reciprocal, with each part correctly rounded (the relaxed modes as
-described above). The dyadic roots (and their reciprocals, when
-$|x|$ is a power of two) are computed exactly; otherwise the complex
-kernels of [](arf#mpn) at an increasing working precision, as for the
-elementary functions (the compositions of real operations for extreme
-exponents). Real and purely imaginary arguments are handled by the real
+described above). The dyadic roots are computed exactly; otherwise the
+complex kernels of [](arf#mpn) (or, for exponents beyond them, the
+compositions $q = \sqrt{(|x| + |a|)/2}$, $|b|/(2q)$ and their quotients
+by $|x|$ at `prec` + 64 bits), and a part that these leave undecided is
+decided exactly from the sign of a polynomial in $a$, $b$ and the
+rounding boundary next to it, without retries. Real and purely imaginary arguments are handled by the real
 roots; `rsqrt(0)` is $+\infty$.
 :::

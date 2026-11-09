@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "acf.h"
 #include "acb.h"
+#include "fmpz.h"
 
 /* The elementary functions of acf against acb at a higher precision:
    in the strict modes each part is the correctly rounded value (checked
@@ -390,6 +391,267 @@ TEST_FUNCTION_START(acf_elem, state)
         acb_clear(z);
         acb_clear(zy);
         acb_clear(w);
+    }
+
+    /* near the exact points of each function (0, +-1, +-i, the
+       multiples of 1/4 and points far out): x = z0 + h with tiny parts of
+       h beyond the precision (and in patterns that cancel to first or
+       second order), against acb at a precision resolving the distance
+       to the rounding boundaries, in the strict modes (the parts lie
+       within about |h| or |h|^2 of a dyadic number) */
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
+    {
+        acf_t x, r;
+        acb_t z, w;
+        arf_t t;
+        slong prec, k1, k2, wp, which, kind;
+        arf_rnd_t rnd;
+
+        acf_init(x);
+        acf_init(r);
+        acb_init(z);
+        acb_init(w);
+        arf_init(t);
+
+        prec = 2 + n_randint(state, 100);
+        which = n_randint(state, NF);
+        k1 = prec + 8 + n_randint(state, 1000);
+        k2 = n_randint(state, 3) ? prec + 8 + n_randint(state, 1000) : 2 * k1 + n_randint(state, 3);
+
+        /* h */
+        arf_set_si_2exp_si(acf_realref(x), (slong) n_randint(state, 7) - 3, -k1);
+        arf_set_si_2exp_si(acf_imagref(x), (slong) n_randint(state, 7) - 3, -k2);
+        if (n_randint(state, 2))
+            arf_swap(acf_realref(x), acf_imagref(x));
+
+        /* z0 */
+        kind = n_randint(state, 6);
+        if (kind == 1)
+            arf_add_si(acf_realref(x), acf_realref(x), n_randint(state, 2) ? 1 : -1, ARF_PREC_EXACT, ARF_RND_DOWN);
+        else if (kind == 2)
+            arf_add_si(acf_imagref(x), acf_imagref(x), n_randint(state, 2) ? 1 : -1, ARF_PREC_EXACT, ARF_RND_DOWN);
+        else if (kind == 3)
+        {
+            arf_set_si_2exp_si(t, (slong) n_randint(state, 17) - 8, -2);
+            arf_add(acf_realref(x), acf_realref(x), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+        }
+        else if (kind == 4 && (which == 2 || funcs[which].name[0] == 'a'))
+        {
+            /* far out (the logarithm and the inverse functions): 2^e (1 +
+               h) times a unit */
+            slong e = 8 + n_randint(state, 300);
+            arf_add_ui(acf_realref(x), acf_realref(x), 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+            arf_mul_2exp_si(acf_realref(x), acf_realref(x), e);
+            arf_mul_2exp_si(acf_imagref(x), acf_imagref(x), e);
+            if (n_randint(state, 2))
+                arf_swap(acf_realref(x), acf_imagref(x));
+            if (n_randint(state, 2))
+                arf_neg(acf_realref(x), acf_realref(x));
+        }
+
+        if (!arf_is_zero(acf_realref(x)) && !arf_is_zero(acf_imagref(x)))
+        {
+            wp = 3 * FLINT_MAX(k1, k2) + 4 * prec + 1000;
+            arb_set_arf(acb_realref(z), acf_realref(x));
+            arb_set_arf(acb_imagref(z), acf_imagref(x));
+            funcs[which].g(w, z, wp);
+            if (acb_is_finite(w))
+            {
+                for (rnd = 0; rnd <= ARF_RND_NEAR; rnd++)
+                {
+                    funcs[which].f(r, x, prec, rnd);
+                    check_part(funcs[which].name, "real (near)", acf_realref(r), acb_realref(w), acb_imagref(w), x, NULL, prec, rnd);
+                    check_part(funcs[which].name, "imag (near)", acf_imagref(r), acb_imagref(w), acb_realref(w), x, NULL, prec, rnd);
+                }
+            }
+        }
+
+        acf_clear(x);
+        acf_clear(r);
+        acb_clear(z);
+        acb_clear(w);
+        arf_clear(t);
+    }
+
+    /* pow near its exact cases: x = 2^K i^u (1 + h) with tiny h and y an
+       integer, a small dyadic number or complex, and tiny y */
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
+    {
+        acf_t x, y, r;
+        acb_t z, zy, w;
+        slong prec, k1, k2, wp, i;
+        arf_rnd_t rnd;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        acb_init(z);
+        acb_init(zy);
+        acb_init(w);
+
+        prec = 2 + n_randint(state, 100);
+        k1 = prec + 40 + n_randint(state, 800);
+        k2 = n_randint(state, 3) ? prec + 40 + n_randint(state, 800) : 2 * k1 + n_randint(state, 3);
+
+        if (n_randint(state, 4) != 0)
+        {
+            arf_set_si_2exp_si(acf_realref(x), (slong) n_randint(state, 7) - 3, -k1);
+            arf_set_si_2exp_si(acf_imagref(x), (slong) n_randint(state, 7) - 3, -k2);
+            arf_add_ui(acf_realref(x), acf_realref(x), 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+            arf_mul_2exp_si(acf_realref(x), acf_realref(x), (slong) n_randint(state, 9) - 4);
+            arf_mul_2exp_si(acf_imagref(x), acf_imagref(x), (slong) n_randint(state, 9) - 4);
+            for (i = n_randint(state, 4); i > 0; i--)
+            {
+                arf_swap(acf_realref(x), acf_imagref(x));
+                arf_neg(acf_realref(x), acf_realref(x));
+            }
+            switch (n_randint(state, 4))
+            {
+                case 0: arf_set_si(acf_realref(y), (slong) n_randint(state, 9) - 4); arf_zero(acf_imagref(y)); break;
+                case 1: arf_set_si_2exp_si(acf_realref(y), (slong) n_randint(state, 9) - 4, -(slong) n_randint(state, 3)); arf_zero(acf_imagref(y)); break;
+                default:
+                    arf_set_si_2exp_si(acf_realref(y), (slong) n_randint(state, 9) - 4, -(slong) n_randint(state, 3));
+                    arf_set_si_2exp_si(acf_imagref(y), (slong) n_randint(state, 9) - 4, -(slong) n_randint(state, 3));
+                    break;
+            }
+        }
+        else
+        {
+            arf_set_si_2exp_si(acf_realref(x), (slong) n_randint(state, 31) - 15, -(slong) n_randint(state, 4));
+            arf_set_si_2exp_si(acf_imagref(x), (slong) n_randint(state, 31) - 15, -(slong) n_randint(state, 4));
+            arf_set_si_2exp_si(acf_realref(y), (slong) n_randint(state, 7) - 3, -k1);
+            arf_set_si_2exp_si(acf_imagref(y), (slong) n_randint(state, 7) - 3, -k2);
+        }
+
+        wp = 3 * FLINT_MAX(k1, k2) + 4 * prec + 1000;
+        arb_set_arf(acb_realref(z), acf_realref(x));
+        arb_set_arf(acb_imagref(z), acf_imagref(x));
+        arb_set_arf(acb_realref(zy), acf_realref(y));
+        arb_set_arf(acb_imagref(zy), acf_imagref(y));
+        acb_pow(w, z, zy, wp);
+        if (acb_is_finite(w) && !(arf_is_zero(acf_realref(x)) && arf_is_zero(acf_imagref(x))))
+        {
+            for (rnd = 0; rnd <= ARF_RND_NEAR; rnd++)
+            {
+                acf_pow(r, x, y, prec, rnd);
+                check_part("pow", "real (near)", acf_realref(r), acb_realref(w), acb_imagref(w), x, y, prec, rnd);
+                check_part("pow", "imag (near)", acf_imagref(r), acb_imagref(w), acb_realref(w), x, y, prec, rnd);
+            }
+        }
+
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
+        acb_clear(z);
+        acb_clear(zy);
+        acb_clear(w);
+    }
+
+    /* far beyond any working precision, eps = 2^-(2^62) (a bignum
+       exponent): each part just beside a power of two P at 64 bits,
+       above (side 1) or below (side -1) it, with the rounding to P or to
+       its neighbour P (1 + 2^-63) resp. P (1 - 2^-64):
+
+         exp(eps (1 + i)) = (1 + eps + ..., eps (1 + eps + ...))
+         cos(eps (1 + i)) = (1 - eps^4/6 + ..., -eps^2 (1 - eps^4/36))
+         log(1 + eps i)  = (eps^2/2 (1 - eps^2/2), eps (1 - eps^2/3))
+         (1 + eps i)^2   = (1 - eps^2, 2 eps exactly) */
+    {
+        acf_t x, y, r;
+        arf_t eps, P;
+        fmpz_t e;
+        int f, part, rnd, st;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        arf_init(eps);
+        arf_init(P);
+        fmpz_init(e);
+        fmpz_one(e);
+        fmpz_mul_2exp(e, e, 62);
+        fmpz_neg(e, e);
+        arf_one(eps);
+        arf_mul_2exp_fmpz(eps, eps, e);
+
+        for (f = 0; f < 4; f++)
+        {
+            /* the powers of two P = 2^c eps^d (signs) and the sides */
+            static const int sgn[4][2] = { {1, 1}, {1, -1}, {1, 1}, {1, 1} };
+            static const int epsp[4][2] = { {0, 1}, {0, 2}, {2, 1}, {0, 1} };
+            static const int c2[4][2] = { {0, 0}, {0, 0}, {-1, 0}, {0, 1} };
+            static const int side[4][2] = { {1, 1}, {-1, 1}, {-1, -1}, {-1, 0} };
+
+            if (f == 0 || f == 1)
+            {
+                arf_set(acf_realref(x), eps);
+                arf_set(acf_imagref(x), eps);
+            }
+            else
+            {
+                arf_one(acf_realref(x));
+                arf_set(acf_imagref(x), eps);
+            }
+
+            for (rnd = 0; rnd <= ARF_RND_NEAR; rnd++)
+            {
+                if (f == 0) st = acf_exp(r, x, 64, rnd);
+                else if (f == 1) st = acf_cos(r, x, 64, rnd);
+                else if (f == 2) st = acf_log(r, x, 64, rnd);
+                else
+                {
+                    arf_set_si(acf_realref(y), 2);
+                    arf_zero(acf_imagref(y));
+                    st = acf_pow(r, x, y, 64, rnd);
+                }
+
+                for (part = 0; part < 2; part++)
+                {
+                    int sd = side[f][part], toward;
+                    arf_ptr got = part ? acf_imagref(r) : acf_realref(r);
+
+                    arf_set_si(P, sgn[f][part]);
+                    if (epsp[f][part] >= 1) arf_mul(P, P, eps, ARF_PREC_EXACT, ARF_RND_DOWN);
+                    if (epsp[f][part] >= 2) arf_mul(P, P, eps, ARF_PREC_EXACT, ARF_RND_DOWN);
+                    arf_mul_2exp_si(P, P, c2[f][part]);
+
+                    /* the value lies on side sd of P (in value): rounded to
+                       the neighbour when the mode moves that way */
+                    toward = (sd > 0) ? (rnd == ARF_RND_CEIL || (rnd == ARF_RND_UP && arf_sgn(P) > 0) || (rnd == ARF_RND_DOWN && arf_sgn(P) < 0))
+                                      : (rnd == ARF_RND_FLOOR || (rnd == ARF_RND_DOWN && arf_sgn(P) > 0) || (rnd == ARF_RND_UP && arf_sgn(P) < 0));
+                    if (sd != 0 && toward)
+                    {
+                        /* |value| above |P|: |P| (1 + 2^-63); below: |P| (1 - 2^-64) */
+                        arf_t T;
+                        arf_init(T);
+                        if ((sd > 0) == (arf_sgn(P) > 0))
+                        {
+                            arf_mul_2exp_si(T, P, -63);
+                            arf_add(P, P, T, ARF_PREC_EXACT, ARF_RND_DOWN);
+                        }
+                        else
+                        {
+                            arf_mul_2exp_si(T, P, -64);
+                            arf_sub(P, P, T, ARF_PREC_EXACT, ARF_RND_DOWN);
+                        }
+                        arf_clear(T);
+                    }
+
+                    if (!arf_equal(got, P) || ((st >> part) & 1) != (sd != 0))
+                    {
+                        flint_printf("FAIL: eps case %d, part %d, rnd = %d, status %d\n", f, part, rnd, st);
+                        flint_abort();
+                    }
+                }
+            }
+        }
+
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
+        arf_clear(eps);
+        arf_clear(P);
+        fmpz_clear(e);
     }
 
     TEST_FUNCTION_END(state);

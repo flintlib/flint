@@ -152,12 +152,61 @@ and cosine of $\pi x$ at the half-integers (the imaginary part of
 $(-2)^3$, say), integer powers (and small dyadic powers of exact roots)
 with at most $2^{24}$ bits, the powers of $2^j(\pm 1 \pm i)$ for any
 integer exponent, dyadic square roots, and the parts that are exactly
-zero or a multiple of $\pi/2$ on the axes. A dyadic value the tests
-missed would make the retries fail to converge, so they stop at a
-working precision of $4\,\mathit{prec} + 65536$ bits (plus twice the
-spread of the exponents of the argument's parts, up to $2^{20}$ bits, for
-the functions computed from balls below), and the approximation is then
-rounded as it stands.
+zero or a multiple of $\pi/2$ on the axes.
+
+**Values next to a rounding boundary.** A part can also lie within any
+distance of a dyadic number without being one, when the parts of the
+argument differ in size by many bits: the real part of $1/(1 +
+2^{-k}i)$ is $1/(1 + 2^{-2k})$, that of $e^{\varepsilon(1 + i)}$ is $1 +
+\varepsilon + O(\varepsilon^3)$. Retrying until the gap shows would take a
+working precision proportional to it. Instead, a part still undecided
+at a working precision well above `prec` is compared exactly with the
+rounding boundary $\beta$ that its approximation is next to (the
+nearest number of `prec` bits, or of `prec` + 1 bits for `ARF_RND_NEAR`):
+the part rounds like $\beta \pm$ a sliver for the sign of $V - \beta$, or
+like $\beta$ for $V = \beta$.
+
+- For `acf_inv`, `acf_div`, `acf_sqrt` and `acf_rsqrt` the sign of $V -
+  \beta$ is that of a polynomial in the inputs and $\beta$: $a - \beta(a^2
+  + b^2)$ for the real part of $1/(a + bi)$; for the square root $q =
+  \sqrt{(r + |a|)/2}$, $q > \beta \Leftrightarrow r > 2\beta^2 - |a|$, which
+  squares to $b^2 - 4\beta^4 + 4\beta^2|a| > 0$ (and likewise for $|b|/(2q)$
+  and the quotients by $r$ of the reciprocal root). These are sums of
+  exact terms, whose sign is found by adding the terms in decreasing
+  magnitude exactly until the rest cannot reach half the partial sum, so
+  that no sum spans the gap to a negligible term. Such a part is decided
+  at `prec` + 64 bits whatever the gap.
+- For the elementary functions, a transcendental part can come that
+  close to a dyadic number only near an exact point $z_0$ of the function
+  (0; $\pm 1, \pm i$ for the logarithm; the multiples of $1/4$ for the
+  functions of $\pi z$; $\pm 1$ for the square-root branch points of the
+  inverse sine and cosine; the simple poles of cot, csc and their
+  relatives; infinity for the inverse functions), where
+  $$
+  f(z_0 + h) = C + u\,s \sum_{j = j_0}^{N} q_j (\pi^k H)^j + O(|H|^{N+1})
+  $$
+  with $H$ a rotation of $h$ (or $1/z$ at infinity), rational $q_j$ (the
+  series of `fmpq_poly`), $j_0 = -1$ at a pole, $C \in \mathbb{Q}(i)\pi^c$,
+  a unit $u$ and $s = \sqrt{w h}$ at a branch point when it is dyadic.
+  Multiplied by a positive denominator ($\pi^k|H|^2$ at a pole,
+  $|z|^{2N}$ at infinity), $\operatorname{Re}$ or $\operatorname{Im}$ of
+  the expansion minus $\beta$ is a sum of exact monomials in the parts of
+  $H$ and $s$ with integer coefficients and powers of $\pi$: exact within
+  each power of $\pi$ (which catches exact cancellations such as
+  $e^{2^{-2k-1} + 2^{-k}i}$, whose real part is $1 - 2^{-4k}/12 + \ldots$)
+  and summed with $\pi$ as a ball across them, the sign decided when the
+  sum exceeds the bound on the omitted terms. The imaginary part of the
+  logarithm is $\operatorname{atan2}(b, a)$, rounded by `arf` directly.
+  The power $x^y$ near $x = 2^K i^u(1 + h)$ is $x_0^y\sum_j \binom{y}{j}
+  h^j$ with the binomial sum as exact terms and $x_0^y$ exact when it is
+  dyadic, and for a tiny $y$ it is $1 + \operatorname{expm1}(y \log x)$ in
+  ball arithmetic.
+
+A value that neither decides (none is known) would keep the retries from
+converging, so they stop at a working precision of $4\,\mathit{prec} +
+65536$ bits (plus twice the spread of the exponents of the argument's
+parts, up to $2^{20}$ bits, for the functions computed from balls
+below), and the approximation is then rounded as it stands.
 
 **Inverse functions.** The inverse trigonometric and hyperbolic
 functions, `expm1`, `log1p` and the $\operatorname{sinc}$ functions round

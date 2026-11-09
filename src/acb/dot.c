@@ -472,13 +472,16 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
     padding = 4 + FLINT_BIT_COUNT(len);
     re_sn = (re_prec + extend + padding + FLINT_BITS - 1) / FLINT_BITS;
     re_sn = FLINT_MAX(re_sn, 2);
-    re_sum_exp = re_max_exp + extend;
+    /* (a zero midpoint sum, which is never added to, at the exponent of
+       its errors or 0, so that the exponents of the error terms of the
+       output stay in range) */
+    re_sum_exp = ((re_max_exp != WORD_MIN) ? re_max_exp : (re_max_rad_exp != WORD_MIN) ? re_max_rad_exp : 0) + extend;
 
     extend = FLINT_BIT_COUNT(im_nonzero) + 1;
     padding = 4 + FLINT_BIT_COUNT(len);
     im_sn = (im_prec + extend + padding + FLINT_BITS - 1) / FLINT_BITS;
     im_sn = FLINT_MAX(im_sn, 2);
-    im_sum_exp = im_max_exp + extend;
+    im_sum_exp = ((im_max_exp != WORD_MIN) ? im_max_exp : (im_max_rad_exp != WORD_MIN) ? im_max_rad_exp : 0) + extend;
 
     /* We need sn + 1 limb for the sum (sn limbs + 1 dummy limb
        for carry or borrow that avoids an extra branch). We need

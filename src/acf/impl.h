@@ -56,4 +56,49 @@ int _acf_elem_set(arf_t res, const arf_t R, slong D, slong p, ulong K, slong ebu
    dyadic (acf/elem.c) */
 int _acf_sqrt_exact(acf_t res, const acf_t x);
 
+/* Exact rounding decisions (acf/side.c): lists of exact terms, the sign
+   of their sum for any exponents, the rounding boundary nearest to an
+   approximation, and the rounding of a value from its side of that
+   boundary. */
+#define ACF_TERMS_MAX 32
+
+typedef struct
+{
+    arf_struct t[ACF_TERMS_MAX];
+    slong n;
+}
+_acf_terms_struct;
+
+typedef _acf_terms_struct _acf_terms_t[1];
+
+void _acf_terms_init(_acf_terms_t T);
+void _acf_terms_clear(_acf_terms_t T);
+void _acf_terms_add_monomial(_acf_terms_t T, slong c, arf_srcptr x1, arf_srcptr x2, arf_srcptr x3, arf_srcptr x4);
+void _acf_terms_mul(_acf_terms_t R, const _acf_terms_t X, const _acf_terms_t Y, slong c);
+void _acf_terms_append(_acf_terms_t R, const _acf_terms_t X);
+int _acf_sign_sum(const _acf_terms_t T);
+void _acf_round_boundary(arf_t beta, const arf_t y, slong prec, arf_rnd_t rnd);
+int _acf_round_side(arf_t res, const arf_t beta, int side, slong prec, arf_rnd_t rnd);
+
+/* the functions of _acf_near_side (acf/near.c): the side of a part of
+   f(x) against a boundary, from the expansion at the nearest exact point */
+enum
+{
+    ACF_NEAR_EXP, ACF_NEAR_EXP_PI_I, ACF_NEAR_SIN, ACF_NEAR_COS,
+    ACF_NEAR_SIN_PI, ACF_NEAR_COS_PI, ACF_NEAR_LOG, ACF_NEAR_TAN,
+    ACF_NEAR_COT, ACF_NEAR_SEC, ACF_NEAR_CSC, ACF_NEAR_TAN_PI,
+    ACF_NEAR_COT_PI, ACF_NEAR_SEC_PI, ACF_NEAR_CSC_PI,
+    ACF_NEAR_EXPM1, ACF_NEAR_LOG1P, ACF_NEAR_SINC, ACF_NEAR_SINC_PI,
+    ACF_NEAR_ASIN, ACF_NEAR_ACOS, ACF_NEAR_ATAN, ACF_NEAR_ACOT,
+    ACF_NEAR_ASEC, ACF_NEAR_ACSC, ACF_NEAR_ASINH, ACF_NEAR_ACOSH,
+    ACF_NEAR_ATANH, ACF_NEAR_ACOTH, ACF_NEAR_ASECH, ACF_NEAR_ACSCH,
+    ACF_NEAR_ASIN_PI, ACF_NEAR_ACOS_PI, ACF_NEAR_ATAN_PI, ACF_NEAR_NONE
+};
+
+int _acf_near_side(int * side, int fn, int part, const acf_t x, const arf_t beta, int bpi);
+
+/* x^y near its exact cases (x = 2^K i^u (1 + h) with h tiny) and for a
+   tiny y: 1 with the result and its flags, or 0 (acf/near.c) */
+int _acf_pow_near(acf_t res, int * status, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd);
+
 #endif

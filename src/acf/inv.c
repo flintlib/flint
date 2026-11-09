@@ -20,8 +20,12 @@
     part is a correctly rounded quotient of two exact numbers) when
     the terms of each sum lie within ACF_DIV_EXACT_GAP bits of each
     other, otherwise (terms too far apart to interact, so without
-    cancellation) rounded to a working precision and the quotient
-    certified by _arf_set_mpn_err, with retries.
+    cancellation) rounded to prec + 64 bits and the quotient certified
+    by _arf_set_mpn_err.  A part that this leaves undecided lies within
+    2^-58 ulps of a rounding boundary beta (the far terms of the sums
+    can put it within any distance), and its side of beta is the sign of
+    N - beta s for its exact numerator N (s > 0): a sum of exact terms,
+    whatever their exponents (acf/side.c).
 */
 
 #define ACF_DIV_EXACT_GAP(prec) (2 * (prec) + 128)
@@ -75,11 +79,50 @@ _acf_sum2(arf_t res, const arf_t x, const arf_t y, const arf_t z, const arf_t w,
     arf_clear(u);
 }
 
-/* (u + vi) / s with u, v, s exact or within 2^-(p - 2) relative, into
-   res (whose parts may alias nothing of the inputs), with the sign of
-   the imaginary part flipped (negimag); returns the inexact flags */
+/* the side of the part (imag = 0: real, 1: imaginary) of x / y (of 1 / x
+   for y = NULL) against beta: sgn(N - beta s) with s = |y|^2 (|x|^2) and
+   N = ac + bd resp. bc - ad (a resp. -b) */
 static int
-_acf_quotient(acf_t res, const arf_t u, const arf_t v, const arf_t s, int inexact, slong p, slong prec, arf_rnd_t rnd)
+_acf_div_side(const acf_t x, const acf_t y, int imag, const arf_t beta)
+{
+    arf_srcptr a = acf_realref(x), b = acf_imagref(x);
+    arf_srcptr c = (y == NULL) ? a : acf_realref(y), d = (y == NULL) ? b : acf_imagref(y);
+    _acf_terms_t T;
+    int side;
+
+    _acf_terms_init(T);
+    if (y == NULL)
+    {
+        if (imag)
+            _acf_terms_add_monomial(T, -1, b, NULL, NULL, NULL);
+        else
+            _acf_terms_add_monomial(T, 1, a, NULL, NULL, NULL);
+    }
+    else if (imag)
+    {
+        _acf_terms_add_monomial(T, 1, b, c, NULL, NULL);
+        _acf_terms_add_monomial(T, -1, a, d, NULL, NULL);
+    }
+    else
+    {
+        _acf_terms_add_monomial(T, 1, a, c, NULL, NULL);
+        _acf_terms_add_monomial(T, 1, b, d, NULL, NULL);
+    }
+    _acf_terms_add_monomial(T, -1, beta, c, c, NULL);
+    _acf_terms_add_monomial(T, -1, beta, d, d, NULL);
+    side = _acf_sign_sum(T);
+    _acf_terms_clear(T);
+    return side;
+}
+
+/* (u + vi) / s into res (which aliases nothing of the inputs) with u, v,
+   s exact or (inexact) within 2^-(p - 2) relative: the quotients
+   correctly rounded, or within 1 + 2 + 2 ulps at p bits (the division,
+   and the relative errors of the operands: K = 6) and certified, an
+   undecided part from its side of the boundary (x / y, or 1 / x for y
+   = NULL); returns the inexact flags */
+static int
+_acf_quotient(acf_t res, const arf_t u, const arf_t v, const arf_t s, int inexact, slong p, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd)
 {
     int s1, s2;
 
@@ -91,22 +134,32 @@ _acf_quotient(acf_t res, const arf_t u, const arf_t v, const arf_t s, int inexac
     }
     else
     {
-        /* the quotients within 1 + 2 + 2 ulps at p bits (the division,
-           and the relative errors of the operands): K = 6 */
-        /* (at p bits, the precision of the sums: their relative errors
-           2^(1 - p) are 2 ulps at p bits, not at the limb boundary) */
-        arf_t q1, q2;
-        arf_init(q1);
-        arf_init(q2);
-        arf_div(q1, u, s, p, ARF_RND_DOWN);
-        arf_div(q2, v, s, p, ARF_RND_DOWN);
-        s1 = _acf_elem_set(acf_realref(res), q1, _acf_part_gap(q1, q2), p, 6, WORD_MIN, 0, prec, rnd);
-        s2 = (s1 == ARF_ELEM_UNCERTAIN) ? s1 : _acf_elem_set(acf_imagref(res), q2, _acf_part_gap(q2, q1), p, 6, WORD_MIN, 0, prec, rnd);
-        arf_clear(q1);
-        arf_clear(q2);
-        if (s1 == ARF_ELEM_UNCERTAIN || s2 == ARF_ELEM_UNCERTAIN)
-            return ARF_ELEM_UNCERTAIN;
-        return s1 | (s2 << 1);
+        arf_t q[2], beta;
+        arf_rnd_t r1 = (rnd >= ARF_RND_FAST) ? arf_rnd_relaxed_to_strict(rnd) : rnd;
+        int st[2], i;
+
+        arf_init(q[0]);
+        arf_init(q[1]);
+        arf_init(beta);
+        arf_div(q[0], u, s, p, ARF_RND_DOWN);
+        arf_div(q[1], v, s, p, ARF_RND_DOWN);
+        for (i = 0; i < 2; i++)
+        {
+            arf_ptr r = i ? acf_imagref(res) : acf_realref(res);
+
+            st[i] = _acf_elem_set(r, q[i], _acf_part_gap(q[i], q[1 - i]), p, 6, WORD_MIN, 0, prec, rnd);
+            if (st[i] == ARF_ELEM_UNCERTAIN)
+            {
+                /* (an undecided part is far from zero: its numerator
+                   is the larger term within 2^-(p - 2)) */
+                _acf_round_boundary(beta, q[i], prec, r1);
+                st[i] = _acf_round_side(r, beta, _acf_div_side(x, y, i, beta), prec, r1);
+            }
+        }
+        arf_clear(q[0]);
+        arf_clear(q[1]);
+        arf_clear(beta);
+        return st[0] | (st[1] << 1);
     }
 }
 
@@ -146,20 +199,11 @@ acf_inv(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
     arf_init_neg_shallow(nb, b);
     acf_init(r);
 
-    for (p = prec + 64; ; p *= 2)
-    {
-        inexact = 0;
-        _acf_sum2(s, a, a, b, b, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
-        status = _acf_quotient(r, a, nb, s, inexact, p, prec, rnd);
-        if (status != ARF_ELEM_UNCERTAIN)
-            break;
-        if (p > 4 * prec + ACF_ELEM_RETRY_LIMIT_BITS)
-        {
-            /* (the approximations rounded as they stand) */
-            status = _acf_quotient(r, a, nb, s, 0, p, prec, (rnd >= ARF_RND_FAST) ? arf_rnd_relaxed_to_strict(rnd) : rnd);
-            break;
-        }
-    }
+    p = prec + 64;
+    inexact = 0;
+    _acf_sum2(s, a, a, b, b, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
+    status = _acf_quotient(r, a, nb, s, inexact, p, x, NULL, prec, rnd);
+
     acf_swap(res, r);
     arf_clear(s);
     acf_clear(r);
@@ -213,21 +257,12 @@ acf_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd)
     arf_init(v);
     acf_init(r);
 
-    for (p = prec + 64; ; p *= 2)
-    {
-        inexact = 0;
-        _acf_sum2(s, c, c, d, d, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
-        _acf_sum2(u, a, c, b, d, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
-        _acf_sum2(v, b, c, a, d, 1, ACF_DIV_EXACT_GAP(prec), p, &inexact);
-        status = _acf_quotient(r, u, v, s, inexact, p, prec, rnd);
-        if (status != ARF_ELEM_UNCERTAIN)
-            break;
-        if (p > 4 * prec + ACF_ELEM_RETRY_LIMIT_BITS)
-        {
-            status = _acf_quotient(r, u, v, s, 0, p, prec, (rnd >= ARF_RND_FAST) ? arf_rnd_relaxed_to_strict(rnd) : rnd);
-            break;
-        }
-    }
+    p = prec + 64;
+    inexact = 0;
+    _acf_sum2(s, c, c, d, d, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
+    _acf_sum2(u, a, c, b, d, 0, ACF_DIV_EXACT_GAP(prec), p, &inexact);
+    _acf_sum2(v, b, c, a, d, 1, ACF_DIV_EXACT_GAP(prec), p, &inexact);
+    status = _acf_quotient(r, u, v, s, inexact, p, x, y, prec, rnd);
 
     acf_swap(res, r);
     arf_clear(s);
