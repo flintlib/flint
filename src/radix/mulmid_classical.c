@@ -10,6 +10,7 @@
 */
 
 #include "radix.h"
+#include "impl.h"
 
 static void
 radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, const radix_t radix)
@@ -57,6 +58,48 @@ radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, co
             cy += s0;
 
             z[i - zlo] = n_divrem_preinv_unnorm(&cy, cy, mod.n, mod.ninv, mod.norm);
+        }
+
+        if (zhi == 2 * an)
+        {
+            FLINT_ASSERT(cy < mod.n);
+            z[2 * an - 1 - zlo] = cy;
+        }
+    }
+    else if (FLINT_BIT_COUNT(an - 1) + 2 <= mod.norm && mod.norm <= FLINT_BITS - 3)
+    {
+        /* an <= 2^(FLINT_BITS - 2 - nu) and nu >= 3: a column has at most
+           an products, so that the carry is at most an (B - 1) and the
+           sums with the carry are below an (B - 1) B < 2^(nu + FLINT_BITS - 2);
+           NMOD_DIVREM2_BOUNDED gives the digit and the next carry */
+        ulong cy = 0;
+        ulong s0, s1;
+
+        for (i = zlo; i < FLINT_MIN(zhi, 2 * an - 1); i++)
+        {
+            start = FLINT_MAX(0, i - an + 1);
+            stop = FLINT_MIN(an - 1, (i + 1) / 2 - 1);
+
+            s0 = s1 = 0;
+
+            for (j = 0; j < stop - start + 1; j++)
+            {
+                umul_ppmm(hi, lo, a[start + j], a[(i - stop) + (stop - start + 1) - 1 - j]);
+                add_ssaaaa(s1, s0, s1, s0, hi, lo);
+            }
+
+            s1 = (s1 << 1) | (s0 >> (FLINT_BITS - 1));
+            s0 = (s0 << 1);
+
+            if (i % 2 == 0 && i / 2 < an)
+            {
+                umul_ppmm(hi, lo, a[i / 2], a[i / 2]);
+                add_ssaaaa(s1, s0, s1, s0, hi, lo);
+            }
+
+            add_ssaaaa(s1, s0, s1, s0, 0, cy);
+
+            NMOD_DIVREM2_BOUNDED(cy, z[i - zlo], s1, s0, mod);
         }
 
         if (zhi == 2 * an)
@@ -125,7 +168,7 @@ radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, co
 
                 add_ssaaaa(cy[1], cy[0], cy[1], cy[0], s1, s0);
 
-                z[i - zlo] = flint_mpn_divrem_2_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
+                z[i - zlo] = _radix_divrem_2_1_unnorm1(cy, cy, mod.n, mod.ninv, mod.norm);
             }
         }
 
@@ -340,6 +383,38 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
             z[an + bn - 1 - zlo] = cy;
         }
     }
+    else if (FLINT_BIT_COUNT(bn - 1) + 2 <= mod.norm && mod.norm <= FLINT_BITS - 3)
+    {
+        /* bn <= 2^(FLINT_BITS - 2 - nu) and nu >= 3: a column has at most
+           bn products, so that the carry is at most bn (B - 1) and the
+           sums with the carry are below bn (B - 1) B < 2^(nu + FLINT_BITS - 2);
+           NMOD_DIVREM2_BOUNDED gives the digit and the next carry */
+        ulong cy = 0;
+        ulong s0, s1;
+
+        for (i = zlo; i < FLINT_MIN(zhi, an + bn - 1); i++)
+        {
+            n1 = FLINT_MIN(an - 1, i);
+            n2 = FLINT_MIN(bn - 1, i);
+
+            s1 = 0;
+            s0 = cy;
+
+            for (j = 0; j < n1 + n2 - i + 1; j++)
+            {
+                umul_ppmm(hi, lo, a[i - n2 + j], b[n2 - j]);
+                add_ssaaaa(s1, s0, s1, s0, hi, lo);
+            }
+
+            NMOD_DIVREM2_BOUNDED(cy, z[i - zlo], s1, s0, mod);
+        }
+
+        if (zhi == an + bn)
+        {
+            FLINT_ASSERT(cy < mod.n);
+            z[an + bn - 1 - zlo] = cy;
+        }
+    }
     else if (sbits <= 2 * FLINT_BITS)
     {
         ulong cy[2] = { 0, 0, };
@@ -373,7 +448,7 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
                     add_ssaaaa(cy[1], cy[0], cy[1], cy[0], hi, lo);
                 }
 
-                z[i - zlo] = flint_mpn_divrem_2_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
+                z[i - zlo] = _radix_divrem_2_1_unnorm1(cy, cy, mod.n, mod.ninv, mod.norm);
             }
         }
 

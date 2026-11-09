@@ -35,7 +35,13 @@ $$
 
 All three methods compute the integers $h_k$ exactly and reduce them
 modulo $n$ at the end, with one-, two- or three-word reductions
-(`NMOD_RED`, `NMOD2_RED2`, `NMOD_RED3`).
+(`NMOD_RED`, `NMOD2_RED2`, `NMOD_RED3`). Two-word values below
+$2^{\beta + \bits - 2}$ are reduced with `NMOD_RED2_BOUNDED`
+([](algorithms/arithmetic/barrett#bounded)), which costs about as much as
+a one-word reduction. This applies when the fields of the method (or the
+bound $2\beta + \lceil \log_2 \ell_2 \rceil$ in KS2) have at most
+$\beta + \bits - 2$ bits, that is, roughly when
+$\beta + \log_2 \ell_2 \le \bits - 2$.
 
 ## Plain Kronecker substitution {#ks}
 
