@@ -152,6 +152,7 @@
 #include "t-set_interval_mag.c"
 #include "t-set_interval_mpfr.c"
 #include "t-set_interval_neg_pos_mag.c"
+#include "t-set_mpn_err.c"
 #include "t-set_str.c"
 #include "t-sgn.c"
 #include "t-sin.c"
@@ -341,6 +342,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_set_interval_mag),
     TEST_FUNCTION(arb_set_interval_mpfr),
     TEST_FUNCTION(arb_set_interval_neg_pos_mag),
+    TEST_FUNCTION(arb_set_mpn_err),
     TEST_FUNCTION(arb_set_str),
     TEST_FUNCTION(arb_sgn),
     TEST_FUNCTION(arb_sin),

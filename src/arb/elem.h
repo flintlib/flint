@@ -94,8 +94,8 @@ void _arb_const_round_cached(arb_t res, void (*cached)(arb_t, slong), slong prec
 /* the radius err 2^eu plus, when inexact, the rounding error below
    2^(exp - prec - 1) of the midpoint (exp its exponent before the
    rounding, whose carry only coarsens the ulp): one mag_set, the sum
-   of the two terms at the finer of their exponents (err < 2^20; the
-   coarser term at most 2^40 units of the finer, else a 2^-40 slack) */
+   of the two terms in units 2^eu (err < 2^20; the rounding term at
+   most 2^40 units, else in units 2^(eu + d - 40) with a 2^-40 slack) */
 FLINT_FORCE_INLINE void
 _arb_small_set_rad(mag_t rad, ulong err, slong eu, int inexact, slong exp, slong prec)
 {
@@ -112,14 +112,13 @@ _arb_small_set_rad(mag_t rad, ulong err, slong eu, int inexact, slong exp, slong
 
     FLINT_ASSERT(err < (UWORD(1) << 20));
     d = exp - prec - 1 - eu;
+    /* (d >= 0: an inexact midpoint has a bit of the frame, at or above
+       the unit 2^eu, below its rounding point 2^(exp - prec)) */
+    FLINT_ASSERT(d >= 0);
     if (d >= 40)
         mag_set_ui_2exp_si(rad, (UWORD(1) << 40) + 1 + ((d < 60) ? (err >> (d - 40)) : 0), eu + d - 40);
-    else if (d >= 0)
-        mag_set_ui_2exp_si(rad, err + (UWORD(1) << d), eu);
-    else if (d >= -40)
-        mag_set_ui_2exp_si(rad, (err << (-d)) + 1, eu + d);
     else
-        mag_set_ui_2exp_si(rad, err + 1, eu);
+        mag_set_ui_2exp_si(rad, err + (UWORD(1) << d), eu);
 }
 
 /* the three- resp. four-limb frames of the register paths: Y 2^(k - 2

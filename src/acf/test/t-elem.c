@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "test_helpers.h"
 #include "acf.h"
+#include "acf/impl.h"
 #include "acb.h"
 #include "fmpz.h"
 
@@ -547,6 +549,170 @@ TEST_FUNCTION_START(acf_elem, state)
         acb_clear(w);
     }
 
+    /* _acf_near_side directly: the side of a part of f(x) against a
+       boundary beta (times pi^bpi) next to it, beta the part rounded to a
+       few bits (plus or minus an ulp, or not), at x = z0 + h as above, at
+       the integers and quarter integers for the pi functions and at the
+       branch points of acos (+-1 + h with -+2h a dyadic square), against
+       acb whenever acb decides the side */
+    {
+        static const struct { int fn; const char * name; int branch; } nf[] = {
+            { ACF_NEAR_EXP, "exp", 0 }, { ACF_NEAR_EXP_PI_I, "exp_pi_i", 0 },
+            { ACF_NEAR_SIN, "sin", 0 }, { ACF_NEAR_COS, "cos", 0 },
+            { ACF_NEAR_SIN_PI, "sin_pi", 0 }, { ACF_NEAR_COS_PI, "cos_pi", 0 },
+            { ACF_NEAR_LOG, "log", 0 }, { ACF_NEAR_TAN, "tan", 0 },
+            { ACF_NEAR_COT, "cot", 0 }, { ACF_NEAR_SEC, "sec", 0 },
+            { ACF_NEAR_CSC, "csc", 0 }, { ACF_NEAR_TAN_PI, "tan_pi", 0 },
+            { ACF_NEAR_COT_PI, "cot_pi", 0 }, { ACF_NEAR_SEC_PI, "sec_pi", 0 },
+            { ACF_NEAR_CSC_PI, "csc_pi", 0 }, { ACF_NEAR_EXPM1, "expm1", 0 },
+            { ACF_NEAR_LOG1P, "log1p", 0 }, { ACF_NEAR_SINC, "sinc", 0 },
+            { ACF_NEAR_SINC_PI, "sinc_pi", 0 }, { ACF_NEAR_ASIN, "asin", 1 },
+            { ACF_NEAR_ACOS, "acos", 1 }, { ACF_NEAR_ATAN, "atan", 0 },
+            { ACF_NEAR_ACOT, "acot", 0 }, { ACF_NEAR_ASEC, "asec", 0 },
+            { ACF_NEAR_ACSC, "acsc", 0 }, { ACF_NEAR_ASINH, "asinh", 0 },
+            { ACF_NEAR_ACOSH, "acosh", 1 }, { ACF_NEAR_ATANH, "atanh", 0 },
+            { ACF_NEAR_ACOTH, "acoth", 0 }, { ACF_NEAR_ASECH, "asech", 0 },
+            { ACF_NEAR_ACSCH, "acsch", 0 }, { ACF_NEAR_ASIN_PI, "asin_pi", 1 },
+            { ACF_NEAR_ACOS_PI, "acos_pi", 1 }, { ACF_NEAR_ATAN_PI, "atan_pi", 0 },
+        };
+        slong nnf = (slong) (sizeof(nf) / sizeof(nf[0]));
+
+        for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+        {
+            acf_t x;
+            acb_t z, w;
+            arb_t ref, d, pi;
+            arf_t beta, t;
+            slong prec, k1, k2, wp, i, which, g, kind;
+            int part, bpi, side, expect;
+
+            acf_init(x);
+            acb_init(z);
+            acb_init(w);
+            arb_init(ref);
+            arb_init(d);
+            arb_init(pi);
+            arf_init(beta);
+            arf_init(t);
+
+            prec = 2 + n_randint(state, 100);
+            k1 = prec + 8 + n_randint(state, 600);
+            k2 = n_randint(state, 3) ? prec + 8 + n_randint(state, 600) : 2 * k1 + n_randint(state, 3);
+            kind = n_randint(state, 7);
+
+            do
+                which = n_randint(state, nnf);
+            while (kind == 6 && !nf[which].branch);
+
+            for (g = 0; strcmp(funcs[g].name, nf[which].name) != 0; g++) ;
+
+            if (kind == 6)
+            {
+                /* +-1 + h, h = -+s^2/2, s = 2^-k1 (a + b i), |a| != |b| */
+                slong a, b, c = n_randint(state, 2) ? 1 : -1;
+                a = 2 * (slong) n_randint(state, 4) + 1;
+                do
+                    b = 2 * (slong) n_randint(state, 4) + 1;
+                while (b == a);
+                if (n_randint(state, 2)) a = -a;
+                if (n_randint(state, 2)) b = -b;
+                arf_set_si_2exp_si(acf_realref(x), -c * (a * a - b * b), -2 * k1 - 1);
+                arf_set_si_2exp_si(acf_imagref(x), -c * 2 * a * b, -2 * k1 - 1);
+                arf_add_si(acf_realref(x), acf_realref(x), c, ARF_PREC_EXACT, ARF_RND_DOWN);
+                k2 = 2 * k1 + 2;
+            }
+            else
+            {
+                arf_set_si_2exp_si(acf_realref(x), (slong) n_randint(state, 7) - 3, -k1);
+                arf_set_si_2exp_si(acf_imagref(x), (slong) n_randint(state, 7) - 3, -k2);
+                if (n_randint(state, 2))
+                    arf_swap(acf_realref(x), acf_imagref(x));
+
+                if (kind == 1)
+                    arf_add_si(acf_realref(x), acf_realref(x), n_randint(state, 2) ? 1 : -1, ARF_PREC_EXACT, ARF_RND_DOWN);
+                else if (kind == 2)
+                    arf_add_si(acf_imagref(x), acf_imagref(x), n_randint(state, 2) ? 1 : -1, ARF_PREC_EXACT, ARF_RND_DOWN);
+                else if (kind == 3 || kind == 4)
+                {
+                    /* integers resp. multiples of 1/4 */
+                    arf_set_si_2exp_si(t, (slong) n_randint(state, 17) - 8, (kind == 3) ? 0 : -2);
+                    arf_add(acf_realref(x), acf_realref(x), t, ARF_PREC_EXACT, ARF_RND_DOWN);
+                }
+                else if (kind == 5)
+                {
+                    /* far out */
+                    slong e = 8 + n_randint(state, 300);
+                    arf_add_ui(acf_realref(x), acf_realref(x), 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+                    arf_mul_2exp_si(acf_realref(x), acf_realref(x), e);
+                    arf_mul_2exp_si(acf_imagref(x), acf_imagref(x), e);
+                    if (n_randint(state, 2))
+                        arf_swap(acf_realref(x), acf_imagref(x));
+                    if (n_randint(state, 2))
+                        arf_neg(acf_realref(x), acf_realref(x));
+                }
+            }
+
+            if (n_randint(state, 2))
+                arf_neg(acf_imagref(x), acf_imagref(x));
+
+            if (!arf_is_zero(acf_realref(x)) && !arf_is_zero(acf_imagref(x)))
+            {
+                wp = 3 * FLINT_MAX(k1, k2) + 4 * prec + 1000;
+                arb_set_arf(acb_realref(z), acf_realref(x));
+                arb_set_arf(acb_imagref(z), acf_imagref(x));
+                funcs[g].g(w, z, wp);
+                arb_const_pi(pi, wp);
+
+                for (part = 0; part <= 1 && acb_is_finite(w); part++)
+                {
+                    arb_set(ref, part ? acb_imagref(w) : acb_realref(w));
+                    bpi = n_randint(state, 2);
+                    if (bpi)
+                        arb_div(d, ref, pi, wp);
+                    else
+                        arb_set(d, ref);
+                    arf_set_round(beta, arb_midref(d), prec, ARF_RND_NEAR);
+                    i = (slong) n_randint(state, 3) - 1;
+                    if (i != 0 && !arf_is_zero(beta))
+                    {
+                        arf_mag_set_ulp(arb_radref(d), beta, prec);
+                        arf_set_mag(t, arb_radref(d));
+                        if (i < 0)
+                            arf_sub(beta, beta, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+                        else
+                            arf_add(beta, beta, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+                    }
+
+                    /* ref - pi^bpi beta */
+                    arb_set_arf(d, beta);
+                    if (bpi)
+                        arb_mul(d, d, pi, wp);
+                    arb_sub(d, ref, d, wp);
+                    expect = arb_is_positive(d) ? 1 : arb_is_negative(d) ? -1 : 0;
+
+                    side = 0;
+                    if (_acf_near_side(&side, nf[which].fn, part, x, beta, bpi) && expect != 0 && side != expect)
+                    {
+                        flint_printf("FAIL: _acf_near_side (%s, part %d, bpi %d)\n", nf[which].name, part, bpi);
+                        flint_printf("x = "); acf_printd(x, 30); flint_printf("\n");
+                        flint_printf("beta = "); arf_printd(beta, 30); flint_printf("\n");
+                        flint_printf("side = %d, expected %d\n", side, expect);
+                        flint_abort();
+                    }
+                }
+            }
+
+            acf_clear(x);
+            acb_clear(z);
+            acb_clear(w);
+            arb_clear(ref);
+            arb_clear(d);
+            arb_clear(pi);
+            arf_clear(beta);
+            arf_clear(t);
+        }
+    }
+
     /* far beyond any working precision, eps = 2^-(2^62) (a bignum
        exponent): each part just beside a power of two P at 64 bits,
        above (side 1) or below (side -1) it, with the rounding to P or to
@@ -652,6 +818,162 @@ TEST_FUNCTION_START(acf_elem, state)
         arf_clear(eps);
         arf_clear(P);
         fmpz_clear(e);
+    }
+
+    /* special inputs: nan and infinite parts (nan results when the
+       other part is nonzero), exact powers of 2^j (+-1 +- i), huge
+       exponents (nan beyond the magnitude limits), and the two-stage
+       evaluation of t = y log x for a huge y */
+    {
+        acf_t x, y, r, r2;
+        acb_t z, zy, w;
+        slong i, n;
+        int k, s1, s2;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        acf_init(r2);
+        acb_init(z);
+        acb_init(zy);
+        acb_init(w);
+
+        for (i = 0; i <= NF + 4; i++)
+        {
+            for (k = 0; k < 12; k++)
+            {
+                arf_ptr bad = (k & 1) ? acf_imagref(x) : acf_realref(x);
+                arf_ptr other = (k & 1) ? acf_realref(x) : acf_imagref(x);
+                if ((k >> 1) % 3 == 0) arf_nan(bad);
+                else if ((k >> 1) % 3 == 1) arf_pos_inf(bad);
+                else arf_neg_inf(bad);
+                arf_set_si(other, (k >= 6) ? -3 : 1);
+                arf_set_si(acf_realref(y), 2);
+                arf_set_si(acf_imagref(y), 1);
+
+                if (i < NF) funcs[i].f(r, x, 64, ARF_RND_DOWN);
+                else if (i == NF) acf_sin_cos(r, r2, x, 64, ARF_RND_DOWN);
+                else if (i == NF + 1) acf_sin_cos_pi(r, r2, x, 64, ARF_RND_DOWN);
+                else if (i == NF + 2) acf_sinh_cosh(r, r2, x, 64, ARF_RND_DOWN);
+                else if (i == NF + 3) acf_pow(r, x, y, 64, ARF_RND_DOWN);
+                else acf_pow(r, y, x, 64, ARF_RND_DOWN);
+
+                if (!arf_is_nan(acf_realref(r)) || !arf_is_nan(acf_imagref(r)))
+                {
+                    flint_printf("FAIL: nonfinite input, function %wd, case %d\n", i, k);
+                    acf_printd(r, 10); flint_printf("\n");
+                    flint_abort();
+                }
+            }
+        }
+
+        /* (2^j (+-1 +- i))^n, small n (exact dyadic powers) and large n
+           of both parities (the exact powers of units) */
+        for (s1 = -1; s1 <= 1; s1 += 2)
+            for (s2 = -1; s2 <= 1; s2 += 2)
+                for (n = -10; n <= 10; n++)
+                {
+                    slong m = (n == 9) ? (WORD(1) << 24) + 5 : (n == -9) ? -(WORD(1) << 24) - 3 :
+                              (n == 10) ? (WORD(1) << 30) + 2 : (n == -10) ? -(WORD(1) << 30) - 6 : n;
+                    arf_set_si_2exp_si(acf_realref(x), s1, 3);
+                    arf_set_si_2exp_si(acf_imagref(x), s2, 3);
+                    arf_set_si(acf_realref(y), m);
+                    arf_zero(acf_imagref(y));
+                    arb_set_arf(acb_realref(z), acf_realref(x));
+                    arb_set_arf(acb_imagref(z), acf_imagref(x));
+                    acb_pow_si(w, z, m, 4000);
+                    for (k = 0; k <= ARF_RND_NEAR; k++)
+                    {
+                        acf_pow(r, x, y, 64, k);
+                        check_part("pow (unit)", "real", acf_realref(r), acb_realref(w), acb_imagref(w), x, y, 64, k);
+                        check_part("pow (unit)", "imag", acf_imagref(r), acb_imagref(w), acb_realref(w), x, y, 64, k);
+                    }
+                }
+
+        /* beyond the magnitude limits: (1 + i)^(2^(2^40)), sin_pi(1/4 +
+           2^(2^70) i), (3/2 + i/2)^(2^(2^70)) */
+        {
+            fmpz_t e;
+            fmpz_init(e);
+            for (k = 0; k < 3; k++)
+            {
+                fmpz_one(e);
+                fmpz_mul_2exp(e, e, (k == 0) ? 40 : 70);
+                if (k == 0)
+                {
+                    arf_one(acf_realref(x));
+                    arf_one(acf_imagref(x));
+                }
+                else
+                {
+                    arf_set_si_2exp_si(acf_realref(x), (k == 1) ? 1 : 3, (k == 1) ? -2 : -1);
+                    arf_set_si_2exp_si(acf_imagref(x), 1, -1);
+                }
+                arf_one(acf_realref(y));
+                arf_mul_2exp_fmpz(acf_realref(y), acf_realref(y), e);
+                arf_zero(acf_imagref(y));
+                if (k == 1)
+                {
+                    arf_swap(acf_imagref(x), acf_realref(y));
+                    acf_sin_pi(r, x, 64, ARF_RND_DOWN);
+                }
+                else
+                    acf_pow(r, x, y, 64, ARF_RND_DOWN);
+                if (!arf_is_nan(acf_realref(r)) || !arf_is_nan(acf_imagref(r)))
+                {
+                    flint_printf("FAIL: magnitude limit, case %d\n", k);
+                    flint_abort();
+                }
+            }
+            fmpz_clear(e);
+        }
+
+        /* x = 1 + 2^-69990 i, y = 2^70000: t = y log x about 2^10 i, found
+           in two stages */
+        arf_one(acf_realref(x));
+        arf_set_si_2exp_si(acf_imagref(x), 1, -69990);
+        arf_set_si_2exp_si(acf_realref(y), 1, 70000);
+        arf_zero(acf_imagref(y));
+        arb_set_arf(acb_realref(z), acf_realref(x));
+        arb_set_arf(acb_imagref(z), acf_imagref(x));
+        arb_set_arf(acb_realref(zy), acf_realref(y));
+        arb_set_arf(acb_imagref(zy), acf_imagref(y));
+        acb_pow(w, z, zy, 141000);
+        for (k = 0; k <= ARF_RND_ACCURATE; k++)
+        {
+            acf_pow(r, x, y, 64, k);
+            check_part("pow (huge y)", "real", acf_realref(r), acb_realref(w), acb_imagref(w), x, y, 64, k);
+            check_part("pow (huge y)", "imag", acf_imagref(r), acb_imagref(w), acb_realref(w), x, y, 64, k);
+        }
+
+        /* x = 2^(2^60) (3/2 + i/2), y = 2^-130 (1 + i) at 64 bits: a tiny y
+           (|y| <= 2^(-64 - prec)) with t = y log x about 2^-70, beyond the
+           rounding scale of the real part 1 + Re(expm1(t)) */
+        arf_set_si_2exp_si(acf_realref(x), 3, -1);
+        arf_set_si_2exp_si(acf_imagref(x), 1, -1);
+        arf_mul_2exp_si(acf_realref(x), acf_realref(x), WORD(1) << 60);
+        arf_mul_2exp_si(acf_imagref(x), acf_imagref(x), WORD(1) << 60);
+        arf_set_si_2exp_si(acf_realref(y), 1, -130);
+        arf_set_si_2exp_si(acf_imagref(y), 1, -130);
+        arb_set_arf(acb_realref(z), acf_realref(x));
+        arb_set_arf(acb_imagref(z), acf_imagref(x));
+        arb_set_arf(acb_realref(zy), acf_realref(y));
+        arb_set_arf(acb_imagref(zy), acf_imagref(y));
+        acb_pow(w, z, zy, 512);
+        for (k = 0; k <= ARF_RND_ACCURATE; k++)
+        {
+            acf_pow(r, x, y, 64, k);
+            check_part("pow (tiny y, huge x)", "real", acf_realref(r), acb_realref(w), acb_imagref(w), x, y, 64, k);
+            check_part("pow (tiny y, huge x)", "imag", acf_imagref(r), acb_imagref(w), acb_realref(w), x, y, 64, k);
+        }
+
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
+        acf_clear(r2);
+        acb_clear(z);
+        acb_clear(zy);
+        acb_clear(w);
     }
 
     TEST_FUNCTION_END(state);

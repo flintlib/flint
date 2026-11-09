@@ -468,16 +468,10 @@ _acf_small_log_abs_1(_acf_frame_struct * re, ulong da, slong ea, ulong db, slong
             ulong u1;
             FLINT_ASSERT(p >= FLINT_BITS && p < 2 * FLINT_BITS);
             u1 = UWORD(1) << (p - FLINT_BITS);
-            if (s1 >= u1)
-            {
-                sub_ddmmss(d1, d0, s1, s0, u1, UWORD(0));
-                dneg = 0;
-            }
-            else
-            {
-                sub_ddmmss(d1, d0, u1, UWORD(0), s1, s0);
-                dneg = 1;
-            }
+            /* (|x|^2 >= M^2 >= 1 for E >= 1: S at least the unit) */
+            FLINT_ASSERT(s1 >= u1);
+            sub_ddmmss(d1, d0, s1, s0, u1, UWORD(0));
+            dneg = 0;
         }
 
         if (d1 == 0 && d0 == 0)
@@ -633,16 +627,10 @@ _acf_small_log_abs_2(_acf_frame_struct * re, ulong da1, ulong da0, slong ea, ulo
             FLINT_ASSERT(p >= 3 * FLINT_BITS && p < 4 * FLINT_BITS);
             u[3] = UWORD(1) << (p - 3 * FLINT_BITS);
             u[2] = u[1] = u[0] = 0;
-            if (mpn_cmp(s, u, 4) >= 0)
-            {
-                mpn_sub_n(d, s, u, 4);
-                dneg = 0;
-            }
-            else
-            {
-                mpn_sub_n(d, u, s, 4);
-                dneg = 1;
-            }
+            /* (|x|^2 >= M^2 >= 1 for E >= 1: S at least the unit) */
+            FLINT_ASSERT(mpn_cmp(s, u, 4) >= 0);
+            mpn_sub_n(d, s, u, 4);
+            dneg = 0;
         }
 
         dn = 4;

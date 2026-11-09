@@ -152,7 +152,8 @@ TEST_FUNCTION_START(acf_arith, state)
         acb_init(w);
         acb_init(zy);
 
-        prec = 2 + n_randint(state, (iter % 10 == 0) ? 500 : 140);
+        /* (occasionally beyond 40 limbs: the heap buffers of the kernels) */
+        prec = 2 + n_randint(state, (iter % 100 == 0) ? 4000 : (iter % 10 == 0) ? 500 : 140);
         rnd = (arf_rnd_t) n_randint(state, 7);
         which = n_randint(state, 5);
         aliasing = n_randint(state, 4) == 0;
@@ -332,6 +333,47 @@ TEST_FUNCTION_START(acf_arith, state)
         acb_clear(z);
         acb_clear(zy);
         acb_clear(w);
+    }
+
+    /* nan and infinite parts: nan results (with a nonzero other part) */
+    for (iter = 0; iter < 100; iter++)
+    {
+        acf_t x, y, r;
+        int which = iter % 5, i;
+
+        acf_init(x);
+        acf_init(y);
+        acf_init(r);
+        for (i = 0; i < 2; i++)
+        {
+            arf_ptr v = i ? acf_imagref(x) : acf_realref(x);
+            switch (n_randint(state, 3))
+            {
+                case 0: arf_nan(v); break;
+                case 1: arf_pos_inf(v); break;
+                default: arf_neg_inf(v); break;
+            }
+        }
+        arf_set_si(n_randint(state, 2) ? acf_realref(x) : acf_imagref(x), (slong) n_randint(state, 7) - 3);
+        if (arf_is_zero(acf_realref(x)) || arf_is_zero(acf_imagref(x)))
+            arf_set_si(arf_is_zero(acf_realref(x)) ? acf_realref(x) : acf_imagref(x), 5);
+        arf_set_si(acf_realref(y), 3);
+        arf_set_si(acf_imagref(y), -1);
+        if (which == 0) acf_inv(r, x, 64, ARF_RND_DOWN);
+        else if (which == 1) acf_div(r, x, y, 64, ARF_RND_DOWN);
+        else if (which == 2) acf_div(r, y, x, 64, ARF_RND_DOWN);
+        else if (which == 3) acf_sqrt(r, x, 64, ARF_RND_DOWN);
+        else acf_rsqrt(r, x, 64, ARF_RND_DOWN);
+        if (!arf_is_nan(acf_realref(r)) || !arf_is_nan(acf_imagref(r)))
+        {
+            flint_printf("FAIL: nonfinite (%d)\n", which);
+            acf_printd(x, 10); flint_printf("\n");
+            acf_printd(r, 10); flint_printf("\n");
+            flint_abort();
+        }
+        acf_clear(x);
+        acf_clear(y);
+        acf_clear(r);
     }
 
     /* far beyond any working precision: 1 + eps i with eps = 2^-(2^62)

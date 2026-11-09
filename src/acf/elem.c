@@ -201,13 +201,9 @@ _acf_elem_inner(arf_t R1, arf_t R2, arf_t R3, arf_t R4, int f, const arf_t a, co
                         FLINT_ABS(ARF_EXP(T) - ARF_EXP(U));
                     arf_add(T, T, U, (gap <= 4 * p + 128) ? ARF_PREC_EXACT : p + 64, ARF_RND_DOWN);
 
-                    if (arf_cmpabs_2exp_si(T, -1) < 0)
-                        arf_log1p(R1, T, p, ARF_RND_FAST);
-                    else
-                    {
-                        arf_add_ui(T, T, 1, p + 64, ARF_RND_DOWN);
-                        arf_log(R1, T, p, ARF_RND_FAST);
-                    }
+                    /* (|D| < 1/4 + 2^-p: the test above) */
+                    FLINT_ASSERT(arf_cmpabs_2exp_si(T, -1) < 0);
+                    arf_log1p(R1, T, p, ARF_RND_FAST);
                 }
                 else
                     arf_log(R1, T, p, ARF_RND_FAST);
@@ -311,18 +307,16 @@ _acf_elem_inner(arf_t R1, arf_t R2, arf_t R3, arf_t R4, int f, const arf_t a, co
                    not) */
                 if (!arf_is_special(E))
                 {
+                    /* (R is not zero: the sine and cosine of U do not
+                       vanish together, and E > 0) */
                     arf_srcptr R = (arf_cmpabs(R1, R2) >= 0) ? R1 : R2;
+                    fmpz_t d;
 
-                    if (!arf_is_zero(R))
-                    {
-                        fmpz_t d;
-                        fmpz_init(d);
-                        fmpz_sub(d, ARF_EXPREF(E), ARF_EXPREF(R));
-                        ebu[0] = fmpz_fits_si(d) ? fmpz_get_si(d) - 1 : (fmpz_sgn(d) > 0 ? WORD_MAX / 2 : WORD_MIN);
-                        fmpz_clear(d);
-                    }
-                    else
-                        ebu[0] = WORD_MAX / 2;
+                    FLINT_ASSERT(!arf_is_zero(R));
+                    fmpz_init(d);
+                    fmpz_sub(d, ARF_EXPREF(E), ARF_EXPREF(R));
+                    ebu[0] = fmpz_fits_si(d) ? fmpz_get_si(d) - 1 : (fmpz_sgn(d) > 0 ? WORD_MAX / 2 : WORD_MIN);
+                    fmpz_clear(d);
                     ebu[1] = ebu[0];
                 }
             }
@@ -522,9 +516,9 @@ _acf_part_gap(const arf_t R, const arf_t Rref)
    m - p.  In the relaxed modes the error bounds are measured against an
    ulp of the larger part: a smaller part (D >= 2) is accepted with an
    error of up to 2^(D - 1) times that allowed for itself (its rounding
-   then adds at most half an ulp of the larger part), and a zero R with
-   an absolute error below 2^-4 (ARF_RND_FAST) resp. 2^-8
-   (ARF_RND_ACCURATE) ulp of the larger part at prec bits becomes zero.  Returns the inexact flag or ARF_ELEM_UNCERTAIN. */
+   then adds at most half an ulp of the larger part).  A zero R is an
+   exact zero unless an absolute error is given (then undecided: the
+   retries resolve it).  Returns the inexact flag or ARF_ELEM_UNCERTAIN. */
 int
 _acf_elem_set(arf_t res, const arf_t R, slong D, slong p, ulong K, slong ebu, int exact, slong prec, arf_rnd_t rnd)
 {
@@ -546,11 +540,6 @@ _acf_elem_set(arf_t res, const arf_t R, slong D, slong p, ulong K, slong ebu, in
         {
             arf_zero(res);
             return 0;
-        }
-        if (relaxed && ebu + ((rnd == ARF_RND_FAST) ? 4 : 8) <= p - prec)
-        {
-            arf_zero(res);
-            return 1;
         }
         return ARF_ELEM_UNCERTAIN;
     }
@@ -1266,20 +1255,14 @@ _acf_sqrt_exact(acf_t res, const acf_t x)
 
     if (arf_is_zero(b))
     {
+        /* sqrt(a) for a > 0, i sqrt|a| for a < 0 */
+        int pos = arf_sgn(a) > 0;
         arf_abs(t, a);
         ok = !arf_sqrt(q, t, arf_bits(t) / 2 + 2, ARF_RND_DOWN);
         if (ok)
         {
-            if (arf_sgn(a) > 0)
-            {
-                arf_set(acf_realref(res), q);
-                arf_zero(acf_imagref(res));
-            }
-            else
-            {
-                arf_zero(acf_realref(res));
-                arf_set(acf_imagref(res), q);
-            }
+            arf_swap(pos ? acf_realref(res) : acf_imagref(res), q);
+            arf_zero(pos ? acf_imagref(res) : acf_realref(res));
         }
     }
     else if (arf_is_zero(a))

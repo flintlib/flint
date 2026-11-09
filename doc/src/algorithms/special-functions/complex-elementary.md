@@ -191,10 +191,12 @@ like $\beta$ for $V = \beta$.
   Multiplied by a positive denominator ($\pi^k|H|^2$ at a pole,
   $|z|^{2N}$ at infinity), $\operatorname{Re}$ or $\operatorname{Im}$ of
   the expansion minus $\beta$ is a sum of exact monomials in the parts of
-  $H$ and $s$ with integer coefficients and powers of $\pi$: exact within
-  each power of $\pi$ (which catches exact cancellations such as
-  $e^{2^{-2k-1} + 2^{-k}i}$, whose real part is $1 - 2^{-4k}/12 + \ldots$)
-  and summed with $\pi$ as a ball across them, the sign decided when the
+  $H$ and $s$ with integer coefficients and powers of $\pi$: summed
+  with the exact sign within each power of $\pi$, at any spread of the
+  exponents (which catches exact cancellations such as
+  $e^{2^{-2k-1} + 2^{-k}i}$, whose real part is $1 - 2^{-4k}/12 + \ldots$),
+  correctly rounded by `arf_sum` where several powers of $\pi$ combine,
+  and with $\pi$ as a ball across them, the sign decided when the
   sum exceeds the bound on the omitted terms. The imaginary part of the
   logarithm is $\operatorname{atan2}(b, a)$, rounded by `arf` directly.
   The power $x^y$ near $x = 2^K i^u(1 + h)$ is $x_0^y\sum_j \binom{y}{j}

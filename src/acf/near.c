@@ -219,11 +219,23 @@ _acf_sign_sum_ptr(arf_t S, arf_srcptr * t, slong n)
     return arf_sgn(S);
 }
 
+/* The sum of the n exact terms t as a ball at precision w: the correctly
+   rounded sum (arf_sum, for any spread of the exponents) within an ulp,
+   so that the ball has the sign of the sum, or is an exact zero. */
+static void
+_acf_sum_ball(arb_t res, arf_srcptr t, slong n, slong w)
+{
+    if (arf_sum(arb_midref(res), t, n, w, ARF_RND_DOWN))
+        arf_mag_set_ulp(arb_radref(res), arb_midref(res), w);
+    else
+        mag_zero(arb_radref(res));
+}
+
 /* The sign of the sum of the terms of P (with their powers of pi), when
    its absolute value exceeds rem: 1 and *side, or 0 (undecided).  Each
-   power of pi gathers an exact sum G_k, whose sign and value (exact, or
-   within half of itself, refined in ball arithmetic at precision w)
-   enter the sum of the pi^k G_k in ball arithmetic. */
+   power of pi gathers a sum G_k (all k >= 0), exact for a single power,
+   and otherwise as a ball at precision w with the sign of G_k, entering
+   the sum of the pi^k G_k in ball arithmetic. */
 static int
 _acf_pt_sign(int * side, const _acf_pt_t P, const mag_t rem)
 {
@@ -256,12 +268,8 @@ _acf_pt_sign(int * side, const _acf_pt_t P, const mag_t rem)
         mag_init(m);
         arf_get_mag_lower(m, S);
         mag_mul_2exp_si(m, m, -1);
-        if (kmin != 0)
-        {
-            /* (pi^k > 3^k resp. > 1/4^|k|) */
-            if (kmin > 0) mag_mul_ui_lower(m, m, 3);
-            else mag_mul_2exp_si(m, m, 2 * kmin);
-        }
+        /* (pi^kmin >= 1) */
+        FLINT_ASSERT(kmin >= 0);
         if (s != 0 && mag_cmp(m, rem) > 0)
         {
             *side = s;
@@ -272,6 +280,7 @@ _acf_pt_sign(int * side, const _acf_pt_t P, const mag_t rem)
     else
     {
         arb_t tot, g, pik, pi;
+        arf_struct * tj = flint_malloc(P->n * sizeof(arf_struct));
         arb_init(tot);
         arb_init(g);
         arb_init(pik);
@@ -284,29 +293,16 @@ _acf_pt_sign(int * side, const _acf_pt_t P, const mag_t rem)
             for (j = kmin; j <= kmax; j++)
             {
                 slong n = 0;
-                int s;
 
+                /* (shallow copies of the terms with pi^j, read only) */
                 for (i = 0; i < P->n; i++)
                     if (P->k[i] == j)
-                        t[n++] = P->t + i;
+                        tj[n++] = P->t[i];
                 if (n == 0)
                     continue;
-                s = _acf_sign_sum_ptr(S, t, n);
-                if (s == 0)
+                _acf_sum_ball(g, tj, n, w);
+                if (arb_is_zero(g))
                     continue;
-                /* G_j in ball arithmetic: S, or the terms rounded */
-                arb_zero(g);
-                for (i = 0; i < n; i++)
-                    arb_add_arf(g, g, t[i], w);
-                if (!arb_is_nonzero(g) || arb_sgn_nonzero(g) != s)
-                {
-                    /* (the rounded sum too coarse: S within half of
-                       itself, as a ball) */
-                    arb_set_arf(g, S);
-                    mag_set_ui(arb_radref(g), 0);
-                    arf_get_mag(arb_radref(g), S);
-                    mag_mul_2exp_si(arb_radref(g), arb_radref(g), -1);
-                }
                 arb_pow_ui(pik, pi, j, w);
                 arb_addmul(tot, g, pik, w);
             }
@@ -330,6 +326,7 @@ _acf_pt_sign(int * side, const _acf_pt_t P, const mag_t rem)
         arb_clear(g);
         arb_clear(pik);
         arb_clear(pi);
+        flint_free(tj);
     }
 
     arf_clear(S);
@@ -620,8 +617,7 @@ _acf_local_side(int * side, const _acf_local_struct * L, const acf_t H, int inf,
 enum
 {
     S_EXP, S_EXPM1, S_SIN, S_COS, S_TAN, S_SEC, S_TCOT, S_TCSC, S_LOG1P,
-    S_ATAN, S_ATANH, S_ASIN, S_ASINH, S_SINC, S_TANQ, S_COTQ, S_ACOSB,
-    S_ACOSHB
+    S_ATAN, S_ASIN, S_SINC, S_TANQ, S_COTQ, S_ACOSB
 };
 
 static void
@@ -655,9 +651,7 @@ _acf_series(fmpq_poly_t Q, int kind, slong n)
             break;
         case S_LOG1P: fmpq_poly_set_coeff_si(t, 0, 1); fmpq_poly_log_series(Q, t, n); break;
         case S_ATAN: fmpq_poly_atan_series(Q, t, n); break;
-        case S_ATANH: fmpq_poly_atanh_series(Q, t, n); break;
         case S_ASIN: fmpq_poly_asin_series(Q, t, n); break;
-        case S_ASINH: fmpq_poly_asinh_series(Q, t, n); break;
         case S_SINC:
             fmpq_poly_sin_series(Q, t, n + 1);
             fmpq_poly_shift_right(Q, Q, 1);
@@ -676,15 +670,11 @@ _acf_series(fmpq_poly_t Q, int kind, slong n)
                 fmpq_poly_div_series(Q, t, Q, n);
             break;
         case S_ACOSB:
-        case S_ACOSHB:
             {
-                /* asin(sqrt(v)) / sqrt(v) resp. asinh: the odd series
-                   halved in degree */
+                /* asin(sqrt(v)) / sqrt(v): the odd series halved in
+                   degree */
                 slong i;
-                if (kind == S_ACOSB)
-                    fmpq_poly_asin_series(u, t, 2 * n);
-                else
-                    fmpq_poly_asinh_series(u, t, 2 * n);
+                fmpq_poly_asin_series(u, t, 2 * n);
                 fmpq_poly_zero(Q);
                 for (i = 0; i < n; i++)
                 {
@@ -1124,38 +1114,14 @@ _acf_near_side(int * side, int fn, int part, const acf_t x, const arf_t beta, in
     return ok;
 }
 
-/* The sum of the terms of T (all with k = 0) as a ball: exact zero, or
-   the sum at precision w (within half of itself at worst) */
+/* The sum of the terms of T (all with k = 0) as a ball at precision w
+   with the sign of the sum (or an exact zero) */
 static void
 _acf_pt_get_arb(arb_t res, const _acf_pt_t T, slong w)
 {
-    arf_srcptr * t;
-    arf_t S;
-    slong i;
-    int s;
-
     arb_zero(res);
-    if (T->n == 0)
-        return;
-
-    t = flint_malloc(T->n * sizeof(arf_srcptr));
-    arf_init(S);
-    for (i = 0; i < T->n; i++)
-        t[i] = T->t + i;
-    s = _acf_sign_sum_ptr(S, t, T->n);
-    if (s != 0)
-    {
-        for (i = 0; i < T->n; i++)
-            arb_add_arf(res, res, T->t + i, w);
-        if (!arb_is_nonzero(res) || arb_sgn_nonzero(res) != s)
-        {
-            arb_set_arf(res, S);
-            arf_get_mag(arb_radref(res), S);
-            mag_mul_2exp_si(arb_radref(res), arb_radref(res), -1);
-        }
-    }
-    arf_clear(S);
-    flint_free(t);
+    if (T->n != 0)
+        _acf_sum_ball(res, T->t, T->n, w);
 }
 
 /* the rounding of a ball r to prec bits in the strict mode rnd: the

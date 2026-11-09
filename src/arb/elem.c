@@ -98,7 +98,7 @@ _arb_small_arg_series(arb_t z, nn_srcptr d, slong xn, slong e, int sgnbit, int k
    compositions of arf/elem_arc_fast.c: the value at the midpoint, plus
    the radius times a bound D for |f'| over the ball (the derivatives
    being monotone in |x| where they are unbounded: asin, acos, atanh at
-   |m| + r, acosh at |m| - r; asinh and acot below 1); 0 when the paths
+   |m| + r, acosh at |m| - r; asinh below 1); 0 when the paths
    do not apply (precision or mantissa beyond two limbs, the ball
    reaching the domain's boundary, exponents beyond the paths') */
 int
@@ -136,10 +136,10 @@ _arb_arc_fast(arb_t res, const arb_t x, int f, slong prec)
            arithmetic do better) */
         ok = 0;
     }
-    else if (f == ARF_ARC_ASINH || f == ARF_ARC_ACOT)
+    else if (f == ARF_ARC_ASINH)
     {
-        /* 1 / sqrt(1 + l^2) resp. 1 / (1 + l^2) at l = |m| - r (or 0),
-           decreasing in |x|: about 1 / |m| for a large argument */
+        /* 1 / sqrt(1 + l^2) at l = |m| - r (or 0), decreasing in |x|:
+           about 1 / |m| for a large argument */
         mag_t l;
         mag_init(l);
         arf_get_mag_lower(l, arb_midref(x));
@@ -147,10 +147,7 @@ _arb_arc_fast(arb_t res, const arb_t x, int f, slong prec)
         mag_mul_lower(l, l, l);
         mag_one(D);
         mag_add_lower(l, l, D);
-        if (f == ARF_ARC_ASINH)
-            mag_rsqrt(D, l);
-        else
-            mag_inv(D, l);
+        mag_rsqrt(D, l);
         mag_clear(l);
     }
     else
