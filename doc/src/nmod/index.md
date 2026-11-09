@@ -729,6 +729,47 @@ then below $2^{\nu + \bits - 2}$ and are reduced by `NMOD_RED2_BOUNDED`
 :::
 
 ::: macro
+NMOD_RED3_FOLD_FULLWORD(r, a_hi, a_me, a_lo, b1, b2, mod)
+NMOD_RED3_FOLD_FULLWORD_NOSUB(r, a_hi, a_me, a_lo, b1, b2, mod)
+
+Set `r` to $(a_{hi} B^2 + a_{me} B + a_{lo}) \bmod n$ for any words and
+`mod.norm` $= 0$, given $b_1 = B \bmod n$ and $b_2 = B^2 \bmod n$ (as
+computed by `n_ll_barrett_precomp_preinv`). They fold the input into the
+two words of $a_{hi} b_2 + a_{me} b_1 + a_{lo}$, then take one
+`NMOD_RED2_FULLWORD` step
+([](algorithms/arithmetic/barrett#fold)). The first subtracts $n$ from
+the high word of the fold when needed; the second skips that subtraction
+and requires $a_{hi} \le Y$ for a bound $Y$ such that
+`_nmod_red3_fold_can_skip_sub(Y, b1, b2, mod)` is nonzero. For
+$n < 2^{\bits - 1}$, use `n_lll_mod_barrett`.
+:::
+
+::: type
+nmod_red3_precomp_struct
+
+Data for reducing three words modulo $n \ge 2$: the fields `qhi`, `qlo`,
+`b1` and `b2` set by `n_ll_barrett_precomp_preinv`, and a flag `nosub`.
+:::
+
+::: function
+int _nmod_red3_fold_can_skip_sub(ulong ymax, ulong b1, ulong b2, nmod_t mod)
+void _nmod_red3_precomp_init(nmod_red3_precomp_struct * P, ulong ymax, nmod_t mod)
+ulong _nmod_red3_precomp(ulong a_hi, ulong a_me, ulong a_lo, const nmod_red3_precomp_struct * P, nmod_t mod)
+
+`_nmod_red3_fold_can_skip_sub` returns whether
+$Y b_2 + (B - 1)(b_1 + 1) < nB$ with $Y$ = `ymax`, the exact condition for
+`NMOD_RED3_FOLD_FULLWORD_NOSUB` on inputs with $a_{hi} \le Y$.
+`_nmod_red3_precomp_init` sets `P` for $n \ge 2$ and inputs with
+$a_{hi} \le$ `ymax` (pass `UWORD_MAX` if no bound is known), and
+`_nmod_red3_precomp` returns $(a_{hi} B^2 + a_{me} B + a_{lo}) \bmod n$
+for such inputs: by `n_lll_mod_barrett` for $n < 2^{\bits - 1}$, and by
+one of the two folds above otherwise. In a loop, testing `P->nosub` before
+the loop and calling `NMOD_RED3_FOLD_FULLWORD_NOSUB` directly when it is
+set is faster with clang, which leaves the tests of `_nmod_red3_precomp`
+in the loop and then compiles the reductions with branches.
+:::
+
+::: macro
 NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod)
 NMOD_RED2_NONFULLWORD(r, a_hi, a_lo, mod)
 

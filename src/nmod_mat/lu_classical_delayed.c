@@ -351,24 +351,10 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
         }
     }
 
-    /* Special case for moduli close to 2^63. */
-    int fullword_limited = (mod.norm == 0) &&
-            mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2));
-
-    ulong alpha1, alpha2;
-
-    if (fullword_limited)
-    {
-        alpha1 = -mod.n;               /* 2^FLINT_BITS */
-        alpha2 = 4 * alpha1 * alpha1;  /* 2^(2 FLINT_BITS) */
-    }
-    else
-    {
-        alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS - 1), mod);
-        alpha1 = nmod_add(alpha1, alpha1, mod);    /* 2^FLINT_BITS */
-        alpha2 = nmod_mul(alpha1, alpha1, mod);    /* 2^(2 FLINT_BITS) */
-    }
-
+    /* the unreduced entries are below min(nrows, ncols) B^2; the case
+       without subtraction is tested out of the loops (faster with clang) */
+    nmod_red3_precomp_struct R3;
+    _nmod_red3_precomp_init(&R3, FLINT_MIN(nrows, ncols), mod);
 
     while (row < nrows && col < ncols)
     {
@@ -376,19 +362,17 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
         /* can be skipped on the first iteration */
         if (col != 0)
         {
-            if (fullword_limited)
+            if (R3.nosub)
             {
                 for (j = row; j < nrows; j++)
-                    a(j, col) = n_lll_rem_l_fullword_limited(UNREDUCED3_L2(j, col),
-                        UNREDUCED3_L1(j, col),
-                        UNREDUCED3_L0(j, col), mod, alpha2, alpha1);
+                    NMOD_RED3_FOLD_FULLWORD_NOSUB(a(j, col), UNREDUCED3_L2(j, col),
+                        UNREDUCED3_L1(j, col), UNREDUCED3_L0(j, col), R3.b1, R3.b2, mod);
             }
             else
             {
                 for (j = row; j < nrows; j++)
-                    a(j, col) = n_lll_rem_l(UNREDUCED3_L2(j, col),
-                        UNREDUCED3_L1(j, col),
-                        UNREDUCED3_L0(j, col), mod, alpha2, alpha1);
+                    a(j, col) = _nmod_red3_precomp(UNREDUCED3_L2(j, col),
+                        UNREDUCED3_L1(j, col), UNREDUCED3_L0(j, col), &R3, mod);
             }
         }
 
@@ -420,59 +404,41 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
             nmod_mat_swap_rows(A, P, row, pivot_row);
 
             /* swap rows in unreduced submatrix, and reduce new pivot row */
-            if (fullword_limited)
+            for (j = col + 1; j < ncols; j++)
             {
-                for (j = col + 1; j < ncols; j++)
-                {
-                    ulong t2, t1, t0;
-                    t0 = UNREDUCED3_L0(row, j);
-                    t1 = UNREDUCED3_L1(row, j);
-                    t2 = UNREDUCED3_L2(row, j);
+                ulong t2, t1, t0;
+                t0 = UNREDUCED3_L0(row, j);
+                t1 = UNREDUCED3_L1(row, j);
+                t2 = UNREDUCED3_L2(row, j);
 
-                    a(row, j) = n_lll_rem_l_fullword_limited(UNREDUCED3_L2(pivot_row, j),
-                                UNREDUCED3_L1(pivot_row, j),
-                                UNREDUCED3_L0(pivot_row, j), mod, alpha2, alpha1);
+                if (R3.nosub)
+                    NMOD_RED3_FOLD_FULLWORD_NOSUB(a(row, j), UNREDUCED3_L2(pivot_row, j),
+                            UNREDUCED3_L1(pivot_row, j),
+                            UNREDUCED3_L0(pivot_row, j), R3.b1, R3.b2, mod);
+                else
+                    a(row, j) = _nmod_red3_precomp(UNREDUCED3_L2(pivot_row, j),
+                            UNREDUCED3_L1(pivot_row, j),
+                            UNREDUCED3_L0(pivot_row, j), &R3, mod);
 
-                    UNREDUCED3_L0(pivot_row, j) = t0;
-                    UNREDUCED3_L1(pivot_row, j) = t1;
-                    UNREDUCED3_L2(pivot_row, j) = t2;
-                }
-            }
-            else
-            {
-                for (j = col + 1; j < ncols; j++)
-                {
-                    ulong t2, t1, t0;
-                    t0 = UNREDUCED3_L0(row, j);
-                    t1 = UNREDUCED3_L1(row, j);
-                    t2 = UNREDUCED3_L2(row, j);
-
-                    a(row, j) = n_lll_rem_l(UNREDUCED3_L2(pivot_row, j),
-                                UNREDUCED3_L1(pivot_row, j),
-                                UNREDUCED3_L0(pivot_row, j), mod, alpha2, alpha1);
-
-                    UNREDUCED3_L0(pivot_row, j) = t0;
-                    UNREDUCED3_L1(pivot_row, j) = t1;
-                    UNREDUCED3_L2(pivot_row, j) = t2;
-                }
+                UNREDUCED3_L0(pivot_row, j) = t0;
+                UNREDUCED3_L1(pivot_row, j) = t1;
+                UNREDUCED3_L2(pivot_row, j) = t2;
             }
         }
         else if (row != 0)
         {
             /* reduce current pivot row */
-            if (fullword_limited)
+            if (R3.nosub)
             {
                 for (j = col + 1; j < ncols; j++)
-                    a(row, j) = n_lll_rem_l_fullword_limited(UNREDUCED3_L2(row, j),
-                                UNREDUCED3_L1(row, j),
-                                UNREDUCED3_L0(row, j), mod, alpha2, alpha1);
+                    NMOD_RED3_FOLD_FULLWORD_NOSUB(a(row, j), UNREDUCED3_L2(row, j),
+                            UNREDUCED3_L1(row, j), UNREDUCED3_L0(row, j), R3.b1, R3.b2, mod);
             }
             else
             {
                 for (j = col + 1; j < ncols; j++)
-                    a(row, j) = n_lll_rem_l(UNREDUCED3_L2(row, j),
-                                UNREDUCED3_L1(row, j),
-                                UNREDUCED3_L0(row, j), mod, alpha2, alpha1);
+                    a(row, j) = _nmod_red3_precomp(UNREDUCED3_L2(row, j),
+                            UNREDUCED3_L1(row, j), UNREDUCED3_L0(row, j), &R3, mod);
             }
         }
 

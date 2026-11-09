@@ -35,6 +35,7 @@ typedef struct
     int red;        /* variant of the reduction (two limbs: 3 for NMOD_RED2_BOUNDED) */
     slong m;        /* one limb: products between two reductions */
     ulong c0, c1;   /* precomputations of the reduction */
+    nmod_red3_precomp_struct red3;  /* three limbs */
 }
 tri_red_struct;
 
@@ -112,22 +113,8 @@ tri_red_init(tri_red_struct * R, slong r, nmod_t mod)
     }
     else
     {
-        /* as in lu_classical_delayed.c: c1 = 2^FLINT_BITS,
-           c0 = 2^(2 FLINT_BITS) mod n (not reduced when "limited") */
-        if (mod.norm == 0 && mod.n < (UWORD(1) << (FLINT_BITS - 1))
-                                     + (UWORD(1) << (FLINT_BITS / 2 - 2)))
-        {
-            R->red = 1;
-            R->c1 = -mod.n;
-            R->c0 = 4 * R->c1 * R->c1;
-        }
-        else
-        {
-            R->red = 0;
-            R->c1 = nmod_set_ui(UWORD(1) << (FLINT_BITS - 1), mod);
-            R->c1 = nmod_add(R->c1, R->c1, mod);
-            R->c0 = nmod_mul(R->c1, R->c1, mod);
-        }
+        /* the top limbs of the accumulators are at most u2 */
+        _nmod_red3_precomp_init(&R->red3, u2, mod);
     }
 }
 
@@ -157,10 +144,10 @@ tri_red(nn_srcptr a, const tri_red_struct * R, const int nlimbs)
     }
     else
     {
-        if (R->red == 1)
-            r = n_lll_rem_l_fullword_limited(a[2], a[1], a[0], mod, R->c0, R->c1);
+        if (R->red3.nosub)
+            NMOD_RED3_FOLD_FULLWORD_NOSUB(r, a[2], a[1], a[0], R->red3.b1, R->red3.b2, mod);
         else
-            r = n_lll_rem_l(a[2], a[1], a[0], mod, R->c0, R->c1);
+            r = _nmod_red3_precomp(a[2], a[1], a[0], &R->red3, mod);
     }
 
     return r;

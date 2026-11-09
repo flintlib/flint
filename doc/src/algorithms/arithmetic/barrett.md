@@ -141,7 +141,35 @@ $2^{\mathit{norm}} B^2$ by the normalized $d = 2^{\mathit{norm}} n$, in two
 steps of [](algorithms/arithmetic/moller-granlund#alg-div) with the inverse
 `ninv`: the first gives the high word $\lfloor B/n \rfloor$ of $Q$ and the
 remainder $2^{\mathit{norm}} b_1$, the second the low word of $Q$ and
-$2^{\mathit{norm}} b_2$ (`n_ll_barrett_precomp_preinv`).
+$2^{\mathit{norm}} b_2$ (`n_ll_barrett_precomp_preinv`). This also holds
+for $n \ge B/2$, for which only $b_1$ and $b_2$ are used (next section).
+
+## Three words, full-word moduli {#fold}
+
+For $n \ge B/2$ the estimate with $Q$ no longer leaves a remainder that
+fits a word, and FLINT keeps the fold above, followed by one
+[Möller–Granlund](algorithms/arithmetic/moller-granlund) step on the two
+words of $x$ (`NMOD_RED3_FOLD_FULLWORD`). Here $b_1 \le B - n$ and
+$b_2 \le n - 1$, so $b_1 + b_2 + 1 \le B$ and
+$x \le (B - 1)(b_1 + b_2 + 1) \le (B - 1) B$: $x$ fits two words, and its
+high word, below $B < 2n$, is brought below $n$ by one conditional
+subtraction, as the Möller–Granlund step requires. This is cheaper than
+reducing $y_2$ and then taking two Möller–Granlund steps (`NMOD_RED3`).
+
+The subtraction can be skipped when the top words $y_2$ are known to be at
+most some $Y$, typically for sums of products of residues. The high word
+of $x$ is below $n$ for every such input exactly when
+$Y b_2 + (B - 1)(b_1 + 1) < nB$, since the left-hand side is the largest
+fold, reached at $y_2 = Y$ and $y_1 = y_0 = B - 1$
+(`_nmod_red3_fold_can_skip_sub`, `NMOD_RED3_FOLD_FULLWORD_NOSUB`). For
+$n = B/2 + \delta$ with $0 < \delta < 2^{\bits / 2 - 2}$, where
+$b_1 = B/2 - \delta$ and $b_2 = 4\delta^2$, it holds for
+$Y \le B/(4\delta)$, in particular for $Y \le 2^{\bits / 2}$; for other
+full-word moduli and small $Y$ it fails only when $2n - B$ is very small
+compared with $b_2 Y / B$.
+`_nmod_red3_precomp_init` evaluates the test once per modulus and bound,
+and `_nmod_red3_precomp` then chooses between `n_lll_mod_barrett` and the
+two folds.
 
 ## Two words below a bound {#bounded}
 
@@ -227,4 +255,4 @@ $n \ge 1$. For $n \ge 2$ this is $c$, since
 $\lfloor (B - 1)/n \rfloor + 1 = \lceil B/n \rceil$ for all integers
 $B, n \ge 1$.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED NMOD_DIVREM2_BOUNDED NMOD_RED3_BOUNDED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED NMOD_DIVREM2_BOUNDED NMOD_RED3_BOUNDED NMOD_RED3_FOLD_FULLWORD _nmod_red3_precomp :::

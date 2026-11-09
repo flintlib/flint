@@ -106,6 +106,31 @@ extern "C" {
     NMOD_RED2(r, v_hi, a_lo, mod); \
   } while (0)
 
+/* (a_hi B^2 + a_me B + a_lo) mod n for n >= 2^(FLINT_BITS - 1), with
+ * b1 = B mod n and b2 = B^2 mod n: see doc: algorithms/arithmetic/barrett#fold */
+#define NMOD_RED3_FOLD_FULLWORD(r, a_hi, a_me, a_lo, b1, b2, mod) \
+  do { \
+    ulong fhxx, flxx, fh2xx, fl2xx; \
+    umul_ppmm(fhxx, flxx, (a_hi), (b2)); \
+    umul_ppmm(fh2xx, fl2xx, (a_me), (b1)); \
+    add_ssaaaa(fhxx, flxx, fhxx, flxx, fh2xx, fl2xx); \
+    add_ssaaaa(fhxx, flxx, fhxx, flxx, UWORD(0), (a_lo)); \
+    if (fhxx >= (mod).n) fhxx -= (mod).n; \
+    NMOD_RED2_FULLWORD(r, fhxx, flxx, mod); \
+  } while (0)
+
+/* the same without the subtraction, for a_hi <= ymax where
+ * _nmod_red3_fold_can_skip_sub(ymax, b1, b2, mod) */
+#define NMOD_RED3_FOLD_FULLWORD_NOSUB(r, a_hi, a_me, a_lo, b1, b2, mod) \
+  do { \
+    ulong fhxx, flxx, fh2xx, fl2xx; \
+    umul_ppmm(fhxx, flxx, (a_hi), (b2)); \
+    umul_ppmm(fh2xx, fl2xx, (a_me), (b1)); \
+    add_ssaaaa(fhxx, flxx, fhxx, flxx, fh2xx, fl2xx); \
+    add_ssaaaa(fhxx, flxx, fhxx, flxx, UWORD(0), (a_lo)); \
+    NMOD_RED2_FULLWORD(r, fhxx, flxx, mod); \
+  } while (0)
+
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
 #define NMOD_IS_HALFLIMB(mod) ((mod).n <= (UWORD(1) << (FLINT_BITS / 2)))
@@ -171,6 +196,61 @@ extern "C" {
     rxx = (rxx < nxx ? rxx : rxx - nxx); \
     (res) = rxx; \
   } while (0)
+
+/* Three-word reductions for any modulus n >= 2, with the constants computed
+ * once: n_lll_mod_barrett for n < 2^(FLINT_BITS - 1), the fold otherwise
+ * (NMOD_RED3_FOLD_FULLWORD, or its version without the subtraction when the
+ * top words are known to be at most ymax). */
+typedef struct
+{
+    ulong qhi, qlo;     /* floor(B^2 / n), used for n < 2^(FLINT_BITS - 1) */
+    ulong b1, b2;       /* B mod n, B^2 mod n */
+    int nosub;          /* NMOD_RED3_FOLD_FULLWORD_NOSUB applies */
+}
+nmod_red3_precomp_struct;
+
+/* whether a_hi b2 + a_me b1 + a_lo < n B for every a_hi <= ymax and all
+ * words a_me, a_lo, that is, ymax b2 + (B - 1)(b1 + 1) < n B: then the fold
+ * of NMOD_RED3_FOLD_FULLWORD has a high word below n */
+NMOD_INLINE int
+_nmod_red3_fold_can_skip_sub(ulong ymax, ulong b1, ulong b2, nmod_t mod)
+{
+    ulong h, l, cy;
+
+    umul_ppmm(h, l, ymax, b2);
+    /* (B - 1)(b1 + 1) = b1 B + (B - 1 - b1), with b1 < n */
+    add_sssaaaaaa(cy, h, l, UWORD(0), h, l, UWORD(0), b1, ~b1);
+    return cy == 0 && h < mod.n;
+}
+
+/* the top words of the values to reduce are at most ymax (used for full-word
+ * n only; UWORD_MAX for no bound) */
+NMOD_INLINE void
+_nmod_red3_precomp_init(nmod_red3_precomp_struct * P, ulong ymax, nmod_t mod)
+{
+    n_ll_barrett_precomp_preinv(&P->qhi, &P->qlo, &P->b1, &P->b2, mod.n, mod.ninv);
+    P->nosub = (mod.norm == 0)
+                && _nmod_red3_fold_can_skip_sub(ymax, P->b1, P->b2, mod);
+}
+
+/* forced inline: called in inner loops (clang does not inline it otherwise);
+ * in a loop, testing P->nosub out of it and calling
+ * NMOD_RED3_FOLD_FULLWORD_NOSUB directly is faster with clang */
+FLINT_FORCE_INLINE ulong
+_nmod_red3_precomp(ulong a_hi, ulong a_me, ulong a_lo,
+                   const nmod_red3_precomp_struct * P, nmod_t mod)
+{
+    ulong r;
+
+    if (mod.norm != 0)
+        return n_lll_mod_barrett(a_hi, a_me, a_lo, mod.n, P->qhi, P->qlo, P->b1, P->b2);
+    else if (P->nosub)
+        NMOD_RED3_FOLD_FULLWORD_NOSUB(r, a_hi, a_me, a_lo, P->b1, P->b2, mod);
+    else
+        NMOD_RED3_FOLD_FULLWORD(r, a_hi, a_me, a_lo, P->b1, P->b2, mod);
+
+    return r;
+}
 
 NMOD_INLINE
 ulong _nmod_mulmod_precomp_shoup(ulong a, nmod_t mod)

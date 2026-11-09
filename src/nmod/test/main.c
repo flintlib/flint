@@ -16,6 +16,7 @@
 #include "t-mul.c"
 #include "t-pow_ui.c"
 #include "t-red2_bounded.c"
+#include "t-red3_fold.c"
 #include "t-redc.c"
 #include "t-sqrt.c"
 
@@ -28,6 +29,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mul),
     TEST_FUNCTION(nmod_pow_ui),
     TEST_FUNCTION(nmod_red2_bounded),
+    TEST_FUNCTION(nmod_red3_fold),
     TEST_FUNCTION(nmod_redc),
     TEST_FUNCTION(nmod_sqrt),
 };

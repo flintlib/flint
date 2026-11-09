@@ -48,8 +48,7 @@ typedef struct
     int halflimb;           /* two words: n <= 2^(FLINT_BITS/2) */
     int high_reduced;       /* two words: high words below n */
     ulong qhi, qlo;         /* two words: floor(2^(2 FLINT_BITS) / n) */
-    int fullword_limited;   /* three words: n close to 2^(FLINT_BITS-1) */
-    ulong alpha1, alpha2;   /* three words: 2^FLINT_BITS, 2^(2 FLINT_BITS) mod n */
+    nmod_red3_precomp_struct red3;  /* three words */
 }
 _ple_red_ctx;
 
@@ -75,11 +74,10 @@ _ple_red(const ulong * x, int words, const _ple_red_ctx * C)
     }
     else
     {
-        if (C->fullword_limited)
-            r = n_lll_rem_l_fullword_limited(x[2], x[1], x[0], C->mod,
-                                             C->alpha2, C->alpha1);
+        if (C->red3.nosub)
+            NMOD_RED3_FOLD_FULLWORD_NOSUB(r, x[2], x[1], x[0], C->red3.b1, C->red3.b2, C->mod);
         else
-            r = n_lll_rem_l(x[2], x[1], x[0], C->mod, C->alpha2, C->alpha1);
+            r = _nmod_red3_precomp(x[2], x[1], x[0], &C->red3, C->mod);
     }
 
     return r;
@@ -307,21 +305,8 @@ _ple_delayed_23(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots,
     }
     else
     {
-        /* moduli close to 2^(FLINT_BITS - 1) */
-        C.fullword_limited = (C.mod.norm == 0) && C.mod.n <
-                (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2));
-
-        if (C.fullword_limited)
-        {
-            C.alpha1 = -C.mod.n;                 /* 2^FLINT_BITS */
-            C.alpha2 = 4 * C.alpha1 * C.alpha1;  /* 2^(2 FLINT_BITS) */
-        }
-        else
-        {
-            C.alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS - 1), C.mod);
-            C.alpha1 = nmod_add(C.alpha1, C.alpha1, C.mod);  /* 2^FLINT_BITS */
-            C.alpha2 = nmod_mul(C.alpha1, C.alpha1, C.mod);  /* 2^(2 FLINT_BITS) */
-        }
+        /* the unreduced entries are below min(m, n) B^2 */
+        _nmod_red3_precomp_init(&C.red3, FLINT_MIN(m, n), C.mod);
     }
 
     TMP_START;
