@@ -40,6 +40,8 @@ _decfloat_sqrt(decfloat_t res, const decfloat_t x, slong prec, int rnd,
     nn_ptr a, s, r;
     TMP_INIT;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x))
     {
         _set_rounding_exact(info, err, ctx);
@@ -199,7 +201,7 @@ decfloat_rsqrt_round(decfloat_t res, const decfloat_t x, slong prec, int rnd, gr
        sticky flag from the square root, and verify that rounding is
        decided; otherwise increase the working precision. */
     status = GR_UNABLE;
-    for (wp = prec + 10; wp < 100 * prec + 1000; wp *= 2)
+    for (wp = prec + 10; wp < _decimal_wp_cap(prec, 100, 1000); wp *= 2)
     {
         status = _decfloat_sqrt(s, x, wp, DECIMAL_RND_DOWN, &info, NULL, ctx);
         if (status != GR_SUCCESS)

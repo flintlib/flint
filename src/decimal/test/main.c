@@ -27,6 +27,7 @@
 #include "t-cfunctions.c"
 #include "t-api.c"
 #include "t-qqbar.c"
+#include "t-extreme.c"
 
 /* Array of test functions ***************************************************/
 
@@ -48,6 +49,7 @@ test_struct tests[] =
     TEST_FUNCTION(deccfloat_functions),
     TEST_FUNCTION(decimal_api),
     TEST_FUNCTION(decimal_qqbar),
+    TEST_FUNCTION(decimal_extreme),
 };
 
 /* main function *************************************************************/

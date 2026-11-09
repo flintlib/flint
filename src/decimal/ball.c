@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <ctype.h>
 #include <string.h>
 #include "qqbar.h"
 #include "decimal.h"
@@ -471,7 +472,8 @@ decball_rsqrt(decball_t res, const decball_t x, gr_ctx_t ctx)
         return GR_UNABLE;
 
     decball_init(t, ctx);
-    status = decball_sqrt_round(t, x, DECIMAL_CTX_PREC(ctx) + 5, ctx);
+    /* no guard digits at DECIMAL_PREC_EXACT (WORD_MAX + 5 would overflow) */
+    status = decball_sqrt_round(t, x, DECIMAL_CTX_IS_EXACT(ctx) ? DECIMAL_PREC_EXACT : DECIMAL_CTX_PREC(ctx) + 5, ctx);
     if (status == GR_SUCCESS)
         status = decball_inv_round(res, t, DECIMAL_CTX_PREC(ctx), ctx);
     decball_clear(t, ctx);
@@ -569,6 +571,15 @@ decball_mul_2exp_fmpz(decball_t res, const decball_t x, const fmpz_t e, gr_ctx_t
            computed without exponent limits */
         gr_ctx_t bctx;
         arb_t t;
+
+        /* WORD_MAX + 5 would overflow (and be clamped to 1 digit) */
+        if (DECIMAL_CTX_IS_EXACT(ctx))
+        {
+            decball_clear(p, ctx);
+            fmpz_clear(one);
+            return GR_UNABLE;
+        }
+
         _gr_ctx_init_decimal(bctx, DECIMAL_CTX_BALL, DECIMAL_CTX_E(ctx), DECIMAL_CTX_PREC(ctx) + 5, DECIMAL_RND_DOWN, 0);
         decimal_ctx_set_rad_prec(bctx, DECIMAL_CTX_RAD_PREC(ctx));
         arb_init(t);
@@ -652,24 +663,147 @@ decball_set_interval_mid_rad(decball_t res, const decball_t m, const decball_t r
     return status;
 }
 
+/* Parses s[0, len) if it is a plain literal or "[mid +/- rad]" with
+   plain literals mid and rad (the output of decball_get_str), returning
+   GR_DOMAIN otherwise. The radius is read exactly. As in the generic
+   expression parser, a radius below 10^emin is replaced by 10^emin if
+   underflow is allowed and is an error otherwise; but a radius above
+   10^emax is kept as it is (the generic parser would fail or give an
+   infinite radius, as it reads the radius as an element), so that balls
+   with such radii, which arithmetic produces, can be read back. */
+int
+_decball_set_str_canonical(decball_t res, const char * s, slong len, gr_ctx_t ctx)
+{
+    decfloat_t t;
+    char * buf;
+    slong i, a, b, pm = -1;
+    int status;
+
+    while (len > 0 && isspace((unsigned char) s[0]))
+    {
+        s++;
+        len--;
+    }
+    while (len > 0 && isspace((unsigned char) s[len - 1]))
+        len--;
+
+    if (len == 0)
+        return GR_DOMAIN;
+
+    if (s[0] == '[')
+    {
+        if (len < 2 || s[len - 1] != ']')
+            return GR_DOMAIN;
+        /* a single "+/-" and no nested brackets */
+        for (i = 1; i < len - 1; i++)
+        {
+            if (s[i] == '[' || s[i] == ']')
+                return GR_DOMAIN;
+            if (s[i] == '+' && i + 2 < len - 1 && s[i + 1] == '/' && s[i + 2] == '-')
+            {
+                if (pm != -1)
+                    return GR_DOMAIN;
+                pm = i;
+            }
+        }
+        if (pm == -1)
+            return GR_DOMAIN;
+    }
+
+    buf = flint_malloc(len + 1);
+    decfloat_init(t, ctx);
+
+    if (pm == -1)
+    {
+        memcpy(buf, s, len);
+        buf[len] = '\0';
+        status = _decfloat_set_str_literal(t, buf, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS, ctx);
+        if (status == GR_SUCCESS)
+            status = decball_set_decfloat(res, t, ctx);
+    }
+    else
+    {
+        /* the midpoint: rounded like a plain literal */
+        for (a = 1; a < pm && isspace((unsigned char) s[a]); a++) ;
+        for (b = pm; b > a && isspace((unsigned char) s[b - 1]); b--) ;
+        memcpy(buf, s + a, b - a);
+        buf[b - a] = '\0';
+        status = (b > a) ? _decfloat_set_str_literal(t, buf, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS, ctx) : GR_DOMAIN;
+
+        if (status == GR_SUCCESS)
+        {
+            decball_t m;
+            decball_init(m, ctx);
+            status = decball_set_decfloat(m, t, ctx);
+
+            /* the radius: an upper bound for |rad| */
+            for (a = pm + 3; a < len - 1 && isspace((unsigned char) s[a]); a++) ;
+            for (b = len - 1; b > a && isspace((unsigned char) s[b - 1]); b--) ;
+            memcpy(buf, s + a, b - a);
+            buf[b - a] = '\0';
+            if (status == GR_SUCCESS)
+                status = (b > a) ? _decfloat_set_str_literal(t, buf, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS, ctx) : GR_DOMAIN;
+
+            if (status == GR_SUCCESS)
+            {
+                decmag_t r;
+                _decmag_init(r, ctx);
+
+                if (DECFLOAT_IS_NAN(t))
+                {
+                    _decmag_inf(r, ctx);
+                }
+                else if (!DECFLOAT_IS_SPECIAL(t) && DECIMAL_CTX_EMIN(ctx) != WORD_MIN)
+                {
+                    /* a radius below 10^emin underflows as for any number:
+                       it is replaced by 10^emin if underflow is allowed */
+                    fmpz_t E;
+                    fmpz_init(E);
+                    decfloat_get_sci_exp(E, t, ctx);
+                    if (fmpz_cmp_si(E, DECIMAL_CTX_EMIN(ctx)) >= 0)
+                        _decmag_set_decfloat(r, t, ctx);
+                    else if (DECIMAL_CTX_ALLOW_UNDERFLOW(ctx))
+                        _decmag_set_10exp_si(r, DECIMAL_CTX_EMIN(ctx), ctx);
+                    else
+                        status = GR_UNABLE;
+                    fmpz_clear(E);
+                }
+                else
+                {
+                    _decmag_set_decfloat(r, t, ctx);
+                }
+
+                if (status == GR_SUCCESS)
+                {
+                    decball_swap(res, m, ctx);
+                    _decmag_add(&res->rad, &res->rad, r, ctx);
+                }
+
+                _decmag_clear(r, ctx);
+            }
+
+            decball_clear(m, ctx);
+        }
+    }
+
+    decfloat_clear(t, ctx);
+    flint_free(buf);
+    return status;
+}
+
 int
 decball_set_str(decball_t res, const char * s, gr_ctx_t ctx)
 {
-    decfloat_t t;
     int status;
 
-    /* fast path for plain literals; everything else (including
-       "mid +/- rad" and "[mid +/- rad]") goes through the generic
-       expression parser, which calls decball_set_interval_mid_rad */
-    decfloat_init(t, ctx);
-    status = _decfloat_set_str_literal(t, s, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS, ctx);
+    /* fast path for plain literals and the printed form "[mid +/- rad]";
+       everything else goes through the generic expression parser, which
+       calls decball_set_interval_mid_rad */
+    status = _decball_set_str_canonical(res, s, strlen(s), ctx);
 
-    if (status == GR_SUCCESS)
-        status = decball_set_decfloat(res, t, ctx);
-    else if (status == GR_DOMAIN)
+    if (status == GR_DOMAIN)
         status = gr_generic_set_str_ring_exponents(res, s, ctx);
 
-    decfloat_clear(t, ctx);
     return status;
 }
 
@@ -762,7 +896,7 @@ decball_set_other(decball_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 acb_t z;
                 int status;
 
-                gr_ctx_init_complex_acb(cctx, 20 + 4 * DECIMAL_CTX_PREC(ctx));
+                gr_ctx_init_complex_acb(cctx, 20 + (DECIMAL_CTX_IS_EXACT(ctx) ? 64 : 4 * DECIMAL_CTX_PREC(ctx)));
                 acb_init(z);
 
                 status = gr_set_other(z, x, x_ctx, cctx);
@@ -1387,11 +1521,23 @@ _decball_contains_fmpq(const decball_t x, const fmpq_t y, gr_ctx_t ctx)
     }
     else
     {
-        if (!fmpz_fits_si(&x->rad.exp))
+        /* with H bounding the bit sizes of m and y, |y - m| < 2^H, and
+           |y - m| >= 2^-H unless y = m; a radius outside [2^-H, 2^H]
+           decides without forming 10^|exp| (which may be enormous) */
+        slong H = fmpz_bits(fmpq_numref(m)) + fmpz_bits(fmpq_denref(m))
+                + fmpz_bits(fmpq_numref(y)) + fmpz_bits(fmpq_denref(y)) + 2;
+
+        if (DECMAG_IS_ZERO(&x->rad))
         {
-            result = fmpz_sgn(&x->rad.exp) > 0;   /* huge radius: contains; tiny: treat as not (mid is a decimal, y is not) */
-            if (!result)
-                result = fmpq_equal(m, y);
+            result = fmpq_equal(m, y);
+        }
+        else if (fmpz_cmp_si(&x->rad.exp, H) > 0)
+        {
+            result = 1;   /* rad >= 10^exp > 2^H */
+        }
+        else if (fmpz_cmp_si(&x->rad.exp, -H - 2 * DECMAG_MAX_PREC) < 0)
+        {
+            result = fmpq_equal(m, y);   /* rad < 10^(-H - rad_prec) < 2^-H */
         }
         else
         {
@@ -1504,8 +1650,10 @@ _decball_decide_leq(const decfloat_t xm, const decfloat_t ym, const decfloat_t B
             break;
         }
 
-        /* upper bound U = S + ulp(S) + ulp(D) for the inexact terms */
-        decfloat_set(U, S, ctx);
+        /* upper bound U = S + ulp(S) + ulp(D) for the inexact terms (an
+           exact copy: decfloat_set would round S to the context precision,
+           which may be less than p, giving U < S) */
+        GR_MUST_SUCCEED(decfloat_set_round(U, S, DECIMAL_PREC_EXACT, DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS, ctx));
         if (infoS.inexact)
         {
             _decfloat_ulp(u, S, p, ctx);

@@ -500,7 +500,9 @@ void
 _decmag_set_10exp_si(decmag_t res, slong e, gr_ctx_t ctx)
 {
     res->m = DECIMAL_CTX_RAD_POW1(ctx);
-    fmpz_set_si(&res->exp, e - (DECIMAL_CTX_RAD_PREC(ctx) - 1));
+    /* e - (rad_prec - 1) can overflow for e near WORD_MIN */
+    fmpz_set_si(&res->exp, e);
+    fmpz_sub_ui(&res->exp, &res->exp, DECIMAL_CTX_RAD_PREC(ctx) - 1);
 }
 
 void
@@ -1417,7 +1419,7 @@ _decmag_mul_10exp_si(decmag_t res, const decmag_t x, slong e, gr_ctx_t ctx)
 {
     _decmag_set(res, x, ctx);
     if (!DECMAG_IS_SPECIAL(x))
-        _fmpz_add_fast(&res->exp, &res->exp, e);
+        fmpz_add_si(&res->exp, &res->exp, e);   /* e is arbitrary, not small */
 }
 
 void

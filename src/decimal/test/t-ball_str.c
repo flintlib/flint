@@ -238,5 +238,76 @@ TEST_FUNCTION_START(decball_str, state)
         gr_ctx_clear(ctx);
     }
 
+    /* regression: a radius above 10^emax (radii are not subject to the
+       exponent limits) must read back; it was parsed as an element */
+    {
+        gr_ctx_t ctx, cctx;
+        decball_t x;
+        deccball_t z;
+        char * s;
+
+        _gr_ctx_init_decimal(ctx, DECIMAL_CTX_BALL, 2, 30, DECIMAL_RND_NEAR, DECIMAL_ALLOW_NAN | DECIMAL_ALLOW_UNDERFLOW);
+        decimal_ctx_set_rad_prec(ctx, 4);   /* DECMAG_MAX_PREC >= 4 */
+        decimal_ctx_set_exp_limits(ctx, -174, 6);
+
+        _check_parse("[-8 +/- 5.318e10]", "[-8 +/- 5.318e10]", ctx);
+        _check_parse("[ -8  +/-  5e7 ]", "[-8 +/- 5e7]", ctx);
+
+        /* a radius below 10^emin underflows to 10^emin (underflow allowed) */
+        _check_parse("[-8 +/- 1e-200]", "[-8 +/- 1e-174]", ctx);
+        _check_parse("[-8 +/- 3e-174]", "[-8 +/- 3e-174]", ctx);
+
+        decball_init(x, ctx);
+        /* midpoints remain subject to the limits */
+        if (gr_set_str(x, "5e10", ctx) == GR_SUCCESS || gr_set_str(x, "[5e10 +/- 1]", ctx) == GR_SUCCESS)
+        {
+            flint_printf("FAIL: midpoint above the exponent limit\n");
+            flint_abort();
+        }
+        /* without underflow, a radius below 10^emin is an error */
+        decimal_ctx_set_flags(ctx, DECIMAL_CTX_FLAGS(ctx) & ~DECIMAL_ALLOW_UNDERFLOW);
+        if (gr_set_str(x, "[-8 +/- 1e-200]", ctx) != GR_UNABLE)
+        {
+            flint_printf("FAIL: radius below the exponent limit\n");
+            flint_abort();
+        }
+        _check_parse("[-8 +/- 5.318e10]", "[-8 +/- 5.318e10]", ctx);
+        decball_clear(x, ctx);
+
+        /* complex balls */
+        _gr_ctx_init_decimal(cctx, DECIMAL_CTX_CBALL, 2, 30, DECIMAL_RND_NEAR, DECIMAL_ALLOW_NAN | DECIMAL_ALLOW_UNDERFLOW);
+        decimal_ctx_set_rad_prec(cctx, 4);
+        decimal_ctx_set_exp_limits(cctx, -174, 6);
+        deccball_init(z, cctx);
+        {
+            const char * strs[] = {
+                "([-8 +/- 5.318e10] + [0 +/- 1]*I)",
+                "([0.5 +/- 1e9] - 3*I)",
+                "[2 +/- 1e12]*I",
+                "[2 +/- 1e12]",
+                "([1 +/- 1e-174] + 2*I)",
+            };
+            slong i;
+            for (i = 0; i < 5; i++)
+            {
+                if (gr_set_str(z, strs[i], cctx) != GR_SUCCESS)
+                {
+                    flint_printf("FAIL: complex parse\ns = %s\n", strs[i]);
+                    flint_abort();
+                }
+                s = deccball_get_str(z, cctx);
+                if (strcmp(s, strs[i]))
+                {
+                    flint_printf("FAIL: complex roundtrip\ns = %s\ngot %s\n", strs[i], s);
+                    flint_abort();
+                }
+                flint_free(s);
+            }
+        }
+        deccball_clear(z, cctx);
+        gr_ctx_clear(cctx);
+        gr_ctx_clear(ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }

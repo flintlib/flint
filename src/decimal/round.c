@@ -139,6 +139,8 @@ _decimal_round_mantissa(nn_ptr d, slong n, int negative, int eps, slong prec, in
     slong vql;   /* virtual ql for the error bound */
     int cmp, sticky, up;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     FLINT_ASSERT(n >= 1);
     FLINT_ASSERT(d[n - 1] != 0);
     FLINT_ASSERT(!(prec == DECIMAL_PREC_EXACT && eps));
@@ -326,10 +328,16 @@ _decfloat_finalize_info(decfloat_t res, decimal_rounding_info * info, gr_ctx_t c
 
         if (COEFF_IS_MPZ(res->exp) || res->exp > WORD_MAX / (2 * e) || res->exp < -(WORD_MAX / (2 * e)))
         {
-            if (fmpz_sgn(&res->exp) > 0)
-                overflow = 1;
-            else
-                underflow = 1;
+            /* E does not fit an slong comfortably, but may still be within
+               [emin, emax] (e.g. emax = WORD_MAX means no upper limit):
+               compare exactly */
+            fmpz_t Ez;
+            fmpz_init(Ez);
+            fmpz_mul_ui(Ez, &res->exp, e);
+            fmpz_add_si(Ez, Ez, (n - 1) * e + _radix_size_digits_1(res->m.d[n - 1], DECIMAL_CTX_RADIX(ctx)) - 1);
+            if (fmpz_cmp_si(Ez, emax) > 0) overflow = 1;
+            if (fmpz_cmp_si(Ez, emin) < 0) underflow = 1;
+            fmpz_clear(Ez);
         }
         else
         {
@@ -374,6 +382,8 @@ _decfloat_set_round_limbs(decfloat_t res, nn_srcptr d_in, slong n, int negative,
 {
     nn_ptr d = (nn_ptr) d_in;
     slong off, newn;
+
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
 
     while (n > 0 && d[n - 1] == 0)
         n--;
@@ -428,6 +438,8 @@ int
 decfloat_set_round_info(decfloat_t res, const decfloat_t x, slong prec, int rnd,
     decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
 {
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x))
     {
         if (info != NULL)

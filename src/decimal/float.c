@@ -421,7 +421,7 @@ _decfloat_limb_index(const decfloat_t x, slong k)
 {
     slong j;
 
-    if (COEFF_IS_MPZ(x->exp))
+    if (COEFF_IS_MPZ(x->exp) || k > COEFF_MAX || k < COEFF_MIN)
         return -1;
     /* |k| and |exp| are both below 2^(FLINT_BITS - 2) */
     j = k - x->exp;
@@ -444,10 +444,18 @@ ulong
 decfloat_get_digit_si(const decfloat_t x, slong k, gr_ctx_t ctx)
 {
     slong e = DECIMAL_CTX_E(ctx);
-    slong q = (k >= 0) ? k / e : -((-k + e - 1) / e);    /* floor(k / e) */
-    ulong c = decfloat_get_limb_si(x, q, ctx);
+    /* q = floor(k / e), r = k - q e in [0, e), without overflow */
+    slong q = k / e, r = k % e;
+    ulong c;
 
-    return (c / n_pow(10, k - q * e)) % 10;
+    if (r < 0)
+    {
+        q--;
+        r += e;
+    }
+
+    c = decfloat_get_limb_si(x, q, ctx);
+    return (c / n_pow(10, r)) % 10;
 }
 
 int
@@ -476,6 +484,11 @@ decfloat_set_limb_si(decfloat_t res, const decfloat_t x, slong k, ulong c, gr_ct
     negative = x->m.size < 0;
 
     if (COEFF_IS_MPZ(x->exp))
+        return GR_UNABLE;
+
+    /* bound k first: for extreme k, span and k - lo below overflow
+       (|x->exp| <= COEFF_MAX, so these sums cannot) */
+    if (k > x->exp + DECIMAL_CONV_DIGITS_LIMIT || k < x->exp - DECIMAL_CONV_DIGITS_LIMIT)
         return GR_UNABLE;
 
     lo = FLINT_MIN(x->exp, k);
@@ -514,13 +527,21 @@ int
 decfloat_set_digit_si(decfloat_t res, const decfloat_t x, slong k, ulong c, gr_ctx_t ctx)
 {
     slong e = DECIMAL_CTX_E(ctx);
-    slong q = (k >= 0) ? k / e : -((-k + e - 1) / e);
+    /* q = floor(k / e), r = k - q e in [0, e), without overflow for
+       extreme k (unlike -k or q * e) */
+    slong q = k / e, r = k % e;
     ulong p, old;
+
+    if (r < 0)
+    {
+        q--;
+        r += e;
+    }
 
     if (c > 9)
         return GR_DOMAIN;
 
-    p = n_pow(10, k - q * e);
+    p = n_pow(10, r);
     old = decfloat_get_limb_si(x, q, ctx);
     return decfloat_set_limb_si(res, x, q, old - ((old / p) % 10) * p + c * p, ctx);
 }

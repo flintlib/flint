@@ -28,6 +28,9 @@ OPTIMIZE_OSIZE
 slong
 _decimal_digits_to_bits(slong prec)
 {
+    /* saturate: the double -> slong conversion below is undefined for
+       prec > DECIMAL_PREC_MAX, notably DECIMAL_PREC_EXACT */
+    prec = FLINT_MIN(prec, DECIMAL_PREC_MAX);
     return (slong) (prec * 3.3219280948873623479) + 30;
 }
 
@@ -324,15 +327,23 @@ _decimal_arb_10_pow_fmpz(arb_t res, const fmpz_t t, slong wp)
     }
 }
 
-/* Conversion of a ball with a huge exponent, by scaling with a power of
-   ten computed to wp bits. If eps is not NULL, it is set to a bound for
-   the contribution of the scaling error to the radius. */
+/* Conversion of a ball with a huge exponent, by scaling the midpoint with
+   a power of ten computed to wp bits. If eps is not NULL, it is set to a
+   bound for the contribution of the scaling error to the radius. */
 static int
 _decball_set_arb_scaled(decball_t res, const arb_t x, slong wp, decmag_ptr eps, gr_ctx_t ctx)
 {
     fmpz_t E;
-    arb_t y, p;
+    arb_t y, p, xm;
     int status;
+
+    /* Only the (exact) midpoint is scaled; the radius of x is converted
+       directly below. Scaling the whole ball would inflate the radius
+       when x is wide: arb_div then uses interval arithmetic with mag
+       precision, with an error of about 2^-30 |x| (which is not small
+       relative to rad(x) when rad(x) > 2^-20 |x|). */
+    *arb_midref(xm) = *arb_midref(x);
+    mag_init(arb_radref(xm));
 
     fmpz_init(E);
     arb_init(y);
@@ -348,9 +359,9 @@ _decball_set_arb_scaled(decball_t res, const arb_t x, slong wp, decmag_ptr eps, 
         fmpz_abs(absE, E);
         arb_ui_pow_ui(p, 10, fmpz_get_ui(absE), wp);
         if (fmpz_sgn(E) <= 0)
-            arb_mul(y, x, p, wp);
+            arb_mul(y, xm, p, wp);
         else
-            arb_div(y, x, p, wp);
+            arb_div(y, xm, p, wp);
         fmpz_clear(absE);
     }
     else
@@ -358,7 +369,7 @@ _decball_set_arb_scaled(decball_t res, const arb_t x, slong wp, decmag_ptr eps, 
         fmpz_neg(E, E);
         _decimal_arb_10_pow_fmpz(p, E, wp);
         fmpz_neg(E, E);
-        arb_mul(y, x, p, wp);
+        arb_mul(y, xm, p, wp);
     }
 
     if (eps != NULL)
@@ -385,6 +396,15 @@ _decball_set_arb_scaled(decball_t res, const arb_t x, slong wp, decmag_ptr eps, 
         status = decball_mul_10exp_fmpz(res, res, E, ctx);
     if (status == GR_SUCCESS && eps != NULL)
         _decmag_mul_10exp_fmpz(eps, eps, E, ctx);
+
+    if (status == GR_SUCCESS && !mag_is_zero(arb_radref(x)))
+    {
+        decmag_t r;
+        _decmag_init(r, ctx);
+        _decmag_set_mag(r, arb_radref(x), ctx);
+        _decmag_add(&res->rad, &res->rad, r, ctx);
+        _decmag_clear(r, ctx);
+    }
 
     fmpz_clear(E);
     arb_clear(y);
@@ -519,7 +539,7 @@ decball_set_arb(decball_t res, const arb_t x, gr_ctx_t ctx)
     /* scale with a power of ten, at increasing precision until the
        scaling error is negligible compared to the radius */
     wp = _decimal_digits_to_bits(prec) + 30;
-    wp_max = 64 * wp + 4096;
+    wp_max = _decimal_wp_cap(wp, 64, 4096);
 
     for (;;)
     {
@@ -550,6 +570,10 @@ decball_via_arb(decball_t res, const decball_t x, int (*func)(arb_t, const arb_t
     arb_t a;
     slong wp;
     int status;
+
+    /* as decfloat_via_arb: no exact results via arb */
+    if (DECIMAL_CTX_IS_EXACT(ctx))
+        return GR_UNABLE;
 
     wp = _decimal_digits_to_bits(DECIMAL_CTX_PREC(ctx));
 
@@ -1083,7 +1107,7 @@ _decfloat_set_round_arb_err(decfloat_t res, decmag_ptr err, const arb_t x, slong
     decimal_ctx_set_rad_prec(bctx, DECMAG_MAX_PREC);
     decball_init(Y, bctx);
 
-    wp_max = 64 * prec + 1000;
+    wp_max = _decimal_wp_cap(prec, 64, 1000);
 
     for (wp = prec + 10; wp <= wp_max; wp *= 2)
     {
