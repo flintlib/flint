@@ -30,8 +30,12 @@ may be unreduced.
 Any modulus $1 \le n < 2^{\bits}$ is allowed. For $n = 1$ every result is
 0. A few functions with a leading underscore are faster but restrict $n$:
 `_nmod_add` and `_nmod_sub` need $n \le 2^{\bits - 1}$,
-`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$, and `_nmod_mul_halflimb`
-needs $n \le 2^{\bits / 2}$.
+`_nmod_mul_fullword` needs $n \ge 2^{\bits - 1}$, `_nmod_mul_halflimb`
+needs $n \le 2^{\bits / 2}$, `_nmod_mul_bounded` and
+`_nmod_addmul_bounded` need $4 \le n < 2^{\bits - 2}$, and
+`_nmod_fmma_bounded` needs $4 \le n < 2^{\bits - 3}$. The last four are
+meant for loops that test the modulus once, before the loop
+([](nmod#arithmetic)).
 
 ## In loops {#loops}
 

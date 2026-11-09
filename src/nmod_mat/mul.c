@@ -47,7 +47,8 @@ _blas_1pass_cutoff(slong num_threads)
     C = A * B with all dimensions at most tmax (a constant at each call
     site, <= 8): the bound k (n - 1)^2 on the dot products tells whether
     they fit one word, two words with the high word below n (one reduction
-    by NMOD_RED2), or three words. The bound with k = tmax decides for most
+    by NMOD_RED2_BOUNDED if nu + bitcount(k) <= FLINT_BITS - 2, else by
+    NMOD_RED2), or three words. The bound with k = tmax decides for most
     moduli; the bound with the actual k only for the others.
 */
 FLINT_FORCE_INLINE void
@@ -89,6 +90,25 @@ _nmod_mat_mul_tiny_impl(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
                 for (q = 0; q < k; q++)
                     s0 += a[q] * nmod_mat_entry(B, q, j);
                 NMOD_RED(t[i * n + j], s0, mod);
+            }
+        }
+    }
+    else if (words == 2 && NMOD_BITS(mod) + FLINT_BIT_COUNT((ulong) k) <= FLINT_BITS - 2)
+    {
+        /* the sums are below k 2^(2 nu) <= 2^(nu + FLINT_BITS - 2) (and
+           nu >= 3, as two words are needed) */
+        for (i = 0; i < m; i++)
+        {
+            const ulong * a = nmod_mat_entry_ptr(A, i, 0);
+            for (j = 0; j < n; j++)
+            {
+                s1 = s0 = 0;
+                for (q = 0; q < k; q++)
+                {
+                    umul_ppmm(h, l, a[q], nmod_mat_entry(B, q, j));
+                    add_ssaaaa(s1, s0, s1, s0, h, l);
+                }
+                NMOD_RED2_BOUNDED(t[i * n + j], s1, s0, mod);
             }
         }
     }

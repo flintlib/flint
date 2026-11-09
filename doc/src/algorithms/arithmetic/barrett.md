@@ -186,12 +186,29 @@ less than $2^{\bits - 1}$, with a branch-free correction; the
 
 The bound holds for a sum of $k$ products of residues when
 $\nu + \lceil \log_2 k \rceil \le \bits - 2$, since such a sum is below
-$k\, 2^{2\nu}$. The final reductions of two-limb
-[dot products](algorithms/linear-algebra/dot-products#scalar) and the
-unpacking of [Kronecker substitution](algorithms/polynomials/kronecker#ks)
-test it from the length or the field size. For $\nu = \bits$ the method
-fails, as $a - \tilde q n$ may not fit in a word; for $\nu \le 2$ the shift
-by $\nu - 2$ is not defined.
+$k\, 2^{2\nu}$. For $\nu = \bits$ the method fails, as $a - \tilde q n$
+may not fit in a word; for $\nu \le 2$ the shift by $\nu - 2$ is not
+defined.
+
+A three-word integer $a < 2^{\nu + 2\bits - 2}$, for instance a sum of
+fewer than $2^{2\bits - 2 - \nu}$ products of residues, is reduced in two
+steps (`NMOD_RED3_BOUNDED`). Its top two words $\lfloor a/B \rfloor$ are
+below $2^{\nu + \bits - 2}$, so the step above reduces them to some
+$r < n$, with no reduction of the top word first; then $rB + a_0$, which
+is congruent to $a$, is reduced by one
+[Möller–Granlund](algorithms/arithmetic/moller-granlund) step
+(`NMOD_RED2`). `NMOD_RED3` instead takes two Möller–Granlund steps.
+
+These reductions apply where the length, the field size or the modulus
+bounds the value: the final reductions of two- and three-limb
+[dot products](algorithms/linear-algebra/dot-products#scalar), hence the
+classical polynomial and matrix products; the unpacking of
+[Kronecker substitution](algorithms/polynomials/kronecker#ks); in
+`nmod_mat`, the row reductions, the triangular solves with delayed
+reductions and the SIMD products by few columns; the basecase polynomial
+division; and the loops that call `_nmod_mul_bounded`,
+`_nmod_addmul_bounded` and `_nmod_fmma_bounded` ([](nmod#arithmetic)),
+such as Horner evaluation, Taylor shifts and the inversion of a vector.
 
 ## Lemire–Kaser–Kurz reduction {#lemire}
 
@@ -210,4 +227,4 @@ $n \ge 1$. For $n \ge 2$ this is $c$, since
 $\lfloor (B - 1)/n \rfloor + 1 = \lceil B/n \rceil$ for all integers
 $B, n \ge 1$.
 
-::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED NMOD_DIVREM2_BOUNDED :::
+::: functions n_mod_barrett n_mod_barrett_lazy n_barrett_precomp n_barrett_precomp_preinv n_mod2_preinv n_mod2_preinv_lazy n_ll_barrett_precomp_preinv n_ll_mod_barrett n_lll_mod_barrett n_mod_lemire n_lemire_precomp n_lemire_precomp_preinv NMOD_RED NMOD_RED2_BOUNDED NMOD_DIVREM2_BOUNDED NMOD_RED3_BOUNDED :::

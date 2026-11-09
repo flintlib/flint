@@ -11,10 +11,18 @@
 
 #include "ulong_extras.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_integral(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
 {
+    /* n = 1: every coefficient is 0 (and k - 1 would not be reduced below) */
+    if (mod.n == 1)
+    {
+        _nmod_vec_zero(res, len);
+        return;
+    }
+
     if (len > 2)
     {
         slong k;
@@ -34,7 +42,8 @@ void _nmod_poly_integral(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
             t = n_mod2_preinv(t, mod.n, mod.ninv);
         t = n_invmod(t, mod.n);
 
-        /* t is reduced, and k - 1 < len - 1 < n (or the inverse fails) */
+        /* t is reduced, and k - 1 < len - 1 < n: a prime factor of n >= 2 is
+           larger than len - 1, or the inverse fails */
         res[2] = nmod_mul(res[2], t, mod);
         t = n_addmod(t, t, mod.n);
 
