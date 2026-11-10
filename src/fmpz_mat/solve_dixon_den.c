@@ -730,8 +730,10 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
     fmpz_mat_t y;
     slong i, j, k, n, cols, num_primes, next_full, last_probe, probe_gap, ieff;
     /* estimated work done since the start / since the last digit-size
-       change, in word-operation units (see fmpz_mat_solve_tuning_struct) */
-    double work_switch, step_work;
+       change, in word-operation units (see fmpz_mat_solve_tuning_struct);
+       step_work and switch_work: the last step, for the probe and the
+       digit-size schedule */
+    double work_switch, step_work, switch_work, Ay1_cost;
     int probe_ok = 0, probe_stable;
     flint_rand_t state;
 
@@ -799,6 +801,18 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
                 fmpz_abs(Bmax, fmpz_mat_entry(B, i, j));
     fmpz_mul_ui(Amax, Amax, n);   /* n * ||A|| */
 
+    /* Cost of A y per column of a word-size y, from the actual entry
+       sizes: with a few huge rows, n^2 limbs(||A||) overstates it by up
+       to a factor n, and the digit-size change below would be taken long
+       before it pays off. */
+    Ay1_cost = 0.0;
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+        {
+            slong ka = FLINT_MAX(1, fmpz_size(fmpz_mat_entry(A, i, j)));
+            Ay1_cost += FLINT_MIN((double) ka, FMPZ_MAT_SOLVE_MUL_COST(ka, 1));
+        }
+
     /* Random probe vector with small entries; s = u^T x[:,0] mod p^i is
        maintained incrementally. */
     flint_rand_init(state);
@@ -849,6 +863,7 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
     probe_gap = 1;
     work_switch = 0.0;
     step_work = 1.0;
+    switch_work = 1.0;
     probe_stable = 0;
 
     while (1)
@@ -905,7 +920,7 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
                     slong rem_bits = bits_A + FLINT_MAX(0, (slong) fmpz_bits(snum_prev) - 4 - (slong) FLINT_BIT_COUNT(n * cols))
                         + (slong) fmpz_bits(sden_prev) + FLINT_BIT_COUNT(n) + FLINT_BITS
                         - (slong) fmpz_bits(ppow);
-                    gate_work = (double) FLINT_MAX(0, rem_bits) / fmpz_bits(q) * step_work;
+                    gate_work = (double) FLINT_MAX(0, rem_bits) / fmpz_bits(q) * switch_work;
                 }
                 else
                     gate_work = work_switch;
@@ -1144,10 +1159,20 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
             {
                 /* triangular solves or gemv, plus A y */
                 step_work = 2.0 * (double) n * n * cols * tun_nmod;
+                switch_work = step_work;
                 if (use_mm || !use_fmpz_mul)
+                {
                     step_work += (double) n * n * cols * num_primes * tun_nmod;
+                    switch_work = step_work;
+                }
                 else
+                {
+                    /* the probe schedule was tuned against A y priced by
+                       the largest entry of A; the digit-size change needs
+                       its actual cost */
                     step_work += (double) n * n * cols * FLINT_MIN((double) KA, FMPZ_MAT_SOLVE_MUL_COST(KA, 1));
+                    switch_work += (double) cols * Ay1_cost;
+                }
             }
             else if (use_mm)
             {
@@ -1157,7 +1182,9 @@ _fmpz_mat_solve_dixon_den_lu(fmpz_mat_t Z, fmpz_t den,
             }
             else
                 step_work = 2.0 * _fmpz_mat_solve_matmul_cost(n, cols, Kq, Kq);
-            work_switch += step_work;
+            if (kexp > 1)
+                switch_work = step_work;
+            work_switch += switch_work;
         }
 
         /* ppow = p^(i+1) */
