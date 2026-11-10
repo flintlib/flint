@@ -693,6 +693,13 @@ int fmpz_mpoly_univar_discriminant(fmpz_mpoly_t d,
 int fmpz_mpoly_resultant(fmpz_mpoly_t R, const fmpz_mpoly_t A,
                   const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
+int fmpz_mpoly_resultant_kronecker(fmpz_mpoly_t R, const fmpz_mpoly_t A,
+                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
+
+int _fmpz_mpoly_resultant_kronecker_cutoff(
+                        const mpoly_resultant_kronecker_t K, slong Alen,
+                                                                slong Blen);
+
 int fmpz_mpoly_discriminant(fmpz_mpoly_t R, const fmpz_mpoly_t A,
                                         slong var, const fmpz_mpoly_ctx_t ctx);
 

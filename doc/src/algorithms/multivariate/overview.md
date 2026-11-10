@@ -87,8 +87,9 @@ extension fields when the field is too small:
 Resultants and discriminants (`fmpz_mpoly_resultant`,
 `fmpz_mpoly_discriminant`) use the subresultant algorithm of Ducos
 [@Duc2000] on univariate polynomials with multivariate coefficients, except
-that bivariate dense inputs go through a multimodular evaluation and
-interpolation method:
+that inputs with enough terms are reduced to two variables by Kronecker
+substitution and go through a (multimodular) evaluation and interpolation
+method:
 
 ::: summary algorithms/multivariate/modp-bivariate-resultant :::
 

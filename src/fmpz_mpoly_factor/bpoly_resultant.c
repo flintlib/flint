@@ -140,7 +140,7 @@ _bivariate_resultant_nmod(nn_ptr out, slong outlen,
         Bp[i].length = len;
     }
 
-    if (!_n_bpoly_mod_resultant(rp, Ap, lenA, Bp, lenB, mod))
+    if (!_n_bpoly_mod_resultant_len(rp, Ap, lenA, Bp, lenB, outlen, mod))
         return 0;
 
     /* outlen comes from the degree bound on the resultant, so the image
@@ -154,10 +154,11 @@ _bivariate_resultant_nmod(nn_ptr out, slong outlen,
 }
 
 /* The images at the several primes are independent, and are split over the
-   thread pool. Each worker reduces the inputs and runs the multipoint
-   algorithm in its own buffers; the multipoint algorithm is itself threaded,
-   but the pool hands out each thread once, so an inner call simply finds
-   none left and runs serially rather than oversubscribing. */
+   thread pool. Each worker reduces the inputs and takes the bivariate
+   resultant over Z/pZ (_n_bpoly_mod_resultant_len, whichever algorithm that
+   picks) in its own buffers; that is itself threaded, but the pool hands out
+   each thread once, so an inner call simply finds none left and runs
+   serially rather than oversubscribing. */
 typedef struct
 {
     const fmpz_poly_struct * A;
@@ -296,12 +297,14 @@ _crt_reconstruct(fmpz * out, slong len, nn_srcptr residues, slong stride,
 }
 
 /* res_y(A, B) over Z, where A and B are seen as polynomials in y of lengths
-   lenA and lenB with coefficients in Z[x]. A and B are working copies, which
-   are modified. See fmpz_mpoly_factor.h for what proved means. */
+   lenA and lenB with coefficients in Z[x], and the resultant has length at
+   most rlen in x. A and B are working copies, which are modified. See
+   fmpz_mpoly_factor.h for what proved means. */
 int
-_fmpz_bpoly_resultant(fmpz_poly_t res,
-                      fmpz_poly_struct * A, slong lenA,
-                      fmpz_poly_struct * B, slong lenB, int proved)
+_fmpz_bpoly_resultant_len(fmpz_poly_t res,
+                          fmpz_poly_struct * A, slong lenA,
+                          fmpz_poly_struct * B, slong lenB,
+                          slong rlen, int proved)
 {
     fmpz_poly_t pa, pb, t;
     fmpz_t ca, cb, l, bound, u;
@@ -374,6 +377,18 @@ _fmpz_bpoly_resultant(fmpz_poly_t res,
 
     /* deg_x(res) <= deg_y(B) deg_x(A) + deg_y(A) deg_x(B) */
     outlen = (lenB - 1) * (dxA - 1) + (lenA - 1) * (dxB - 1) + 1;
+
+    /* the bound of the caller, less the degree of the contents taken out;
+       the evaluation wants at least as many points as the lengths in x */
+    if (rlen < outlen)
+    {
+        if (pa->length > 1)
+            rlen -= (lenB - 1) * (pa->length - 1);
+        if (pb->length > 1)
+            rlen -= (lenA - 1) * (pb->length - 1);
+
+        outlen = FLINT_MIN(outlen, FLINT_MAX(rlen, FLINT_MAX(dxA, dxB)));
+    }
 
     fmpz_init(bound);
     _bivariate_resultant_bound(bound, A, lenA, B, lenB);
@@ -576,6 +591,13 @@ _fmpz_bpoly_resultant(fmpz_poly_t res,
     fmpz_poly_clear(t);
 
     return status;
+}
+
+int
+_fmpz_bpoly_resultant(fmpz_poly_t res, fmpz_poly_struct * A, slong lenA,
+                      fmpz_poly_struct * B, slong lenB, int proved)
+{
+    return _fmpz_bpoly_resultant_len(res, A, lenA, B, lenB, WORD_MAX, proved);
 }
 
 int

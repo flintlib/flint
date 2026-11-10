@@ -603,17 +603,22 @@ other variables; the second packs the result into `Abits` bits.
 ::: function
 int fmpz_bpoly_resultant(fmpz_poly_t res, const fmpz_bpoly_t A, const fmpz_bpoly_t B, int proved)
 int _fmpz_bpoly_resultant(fmpz_poly_t res, fmpz_poly_struct * A, slong lenA, fmpz_poly_struct * B, slong lenB, int proved)
+int _fmpz_bpoly_resultant_len(fmpz_poly_t res, fmpz_poly_struct * A, slong lenA, fmpz_poly_struct * B, slong lenB, slong rlen, int proved)
 
 Set `res` to the resultant of $A$ and $B$ with respect to $x$, a
 polynomial in $y$, by reduction modulo word-size primes, resultants of
-the images and Chinese remaindering. If `proved` is nonzero, enough primes
+the images (by `_n_bpoly_mod_resultant_len`, with whichever algorithm it
+picks) and Chinese remaindering. If `proved` is nonzero, enough primes
 are used for their product to exceed twice a Hadamard-type bound on the
 coefficients of the resultant, which makes the result exact; otherwise the
 reconstruction stops once it has been left unchanged by primes whose
 product exceeds $2^{100}$, which is a heuristic. Return 0 if no image could
 be computed. The underscore version works in place on the coefficient
 arrays, whose contents it removes, and requires $\mathit{lenA} \ge
-\mathit{lenB} \ge 2$. This is the dense case of `fmpz_mpoly_resultant`
+\mathit{lenB} \ge 2$; `_fmpz_bpoly_resultant_len` is the same given that
+the resultant has length at most `rlen`, which saves evaluation points
+when that is less than the bound read off the degrees. This is the dense
+case of `fmpz_mpoly_resultant`
 and the modular resultant of the generic polynomial module; see
 [](algorithms/multivariate/modp-bivariate-resultant).
 :::

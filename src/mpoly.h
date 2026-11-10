@@ -1287,6 +1287,24 @@ void mpoly_from_mpolyl_perm_inflate(
 
 void mpoly_gcd_info_init(mpoly_gcd_info_t Iv, slong nvars);
 
+/* Kronecker substitution for resultants *************************************/
+
+void mpoly_resultant_kronecker_init(mpoly_resultant_kronecker_t K, slong nvars);
+
+void mpoly_resultant_kronecker_clear(mpoly_resultant_kronecker_t K);
+
+int mpoly_resultant_kronecker_set(mpoly_resultant_kronecker_t K,
+                   const ulong * Aexps, slong Alen, flint_bitcnt_t Abits,
+                   const ulong * Bexps, slong Blen, flint_bitcnt_t Bbits,
+                   slong var, double max_points, const mpoly_ctx_t mctx);
+
+void mpoly_resultant_kronecker_pack(slong * ey, slong * et,
+                   const ulong * exps, slong len, flint_bitcnt_t bits, int B,
+                   const mpoly_resultant_kronecker_t K, const mpoly_ctx_t mctx);
+
+void mpoly_resultant_kronecker_unpack(ulong * exp, ulong t,
+                   const mpoly_resultant_kronecker_t K, const mpoly_ctx_t mctx);
+
 void mpoly_gcd_info_clear(mpoly_gcd_info_t Iv);
 
 void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,

@@ -22,6 +22,7 @@
 [Gao2001]: S. Gao. Absolute irreducibility of polynomials via Newton polytopes. Journal of Algebra 237 (2001), 501–520. https://doi.org/10.1006/jabr.2000.8586
 [GaoLau2001]: S. Gao and A. G. B. Lauder. Decomposition of polytopes and polynomials. Discrete and Computational Geometry 26 (2001), 89–104. https://doi.org/10.1007/s00454-001-0024-0
 [Duc2000]: L. Ducos. Optimizations of the subresultant algorithm. Journal of Pure and Applied Algebra 145 (2000), 149–163. https://doi.org/10.1016/S0022-4049(98)00081-4
+[Vil2018]: G. Villard. On computing the resultant of generic bivariate polynomials. Proceedings of ISSAC 2018, ACM, 391–398. https://doi.org/10.1145/3208976.3209020
 [BHKS2009]: K. Belabas, M. van Hoeij, J. Klüners and A. Steel. Factoring polynomials over global fields. Journal de Théorie des Nombres de Bordeaux 21 (2009), 15–39. https://doi.org/10.5802/jtnb.655
 [Mus1975]: D. R. Musser. Multivariate polynomial factorization. Journal of the ACM 22:2 (1975), 291–308. https://doi.org/10.1145/321879.321890
 [Sch-mpoly]: D. Schultz. Algorithms for multivariate polynomials. Notes in the FLINT source tree, src/mpoly/doc/MPolyAlgorithms.tex.

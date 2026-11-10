@@ -29,8 +29,8 @@ Brown's dense interpolation [@Bro1971], Zippel's sparse interpolation
 [@Zip1979] and Hensel lifting ([](algorithms/multivariate/gcd),
 [](algorithms/multivariate/hensel-lifting)), and fall back to images over extension
 fields $\mathbb{F}_{p^k}$ when the prime field is too small for random
-evaluation points; see [](algorithms/multivariate/modp-gcd). Bivariate
-resultants are computed by evaluation and interpolation
+evaluation points; see [](algorithms/multivariate/modp-gcd). Resultants
+are computed by evaluation and interpolation after a Kronecker substitution
 ([](algorithms/multivariate/modp-bivariate-resultant)). Factorisation is in
 `nmod_mpoly_factor.h`.
 
@@ -887,10 +887,24 @@ int nmod_mpoly_resultant(nmod_mpoly_t R, const nmod_mpoly_t A, const nmod_mpoly_
 Sets `R` to the resultant of `A` and `B` with respect to the variable of
 index `var`, that is, the determinant of their Sylvester matrix as
 polynomials in that variable. Returns 1 for success. The modulus must be
-prime. For polynomials in exactly two variables of sufficient size the
-resultant is computed by evaluating the other variable at many points and
-interpolating ([](algorithms/multivariate/modp-bivariate-resultant));
-otherwise by the subresultant algorithm of Ducos on the univariate forms.
+prime. When the inputs are of sufficient size, the resultant is computed
+by `nmod_mpoly_resultant_kronecker`; otherwise by the subresultant
+algorithm of Ducos on the univariate forms.
+:::
+
+::: function
+int nmod_mpoly_resultant_kronecker(nmod_mpoly_t R, const nmod_mpoly_t A, const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+Tries to set `R` to the resultant of `A` and `B` with respect to the
+variable of index `var` by packing the other variables into one by
+Kronecker substitution, after removing monomial factors and deflating,
+and evaluating that variable at many points and interpolating
+([](algorithms/multivariate/modp-bivariate-resultant)). Returns 1 for
+success, and 0, leaving `R` unchanged, if an input has exponents of more
+than one word or degree 0 in the variable of index `var`, if the dense box
+of the resultant has more than $2^{32}$ coefficients, or if the field has
+too few elements for that many evaluation points. The modulus must be
+prime.
 :::
 
 ::: function
@@ -1543,19 +1557,35 @@ updating `lastdeg`, the degree in the last variable.
 ::: function
 int n_bpoly_mod_resultant(n_poly_t res, const n_bpoly_t A, const n_bpoly_t B, nmod_t mod)
 int _n_bpoly_mod_resultant(n_poly_t res, const n_poly_struct * A, slong lenA, const n_poly_struct * B, slong lenB, nmod_t mod)
+int _n_bpoly_mod_resultant_len(n_poly_t res, const n_poly_struct * A, slong lenA, const n_poly_struct * B, slong lenB, slong rlen, nmod_t mod)
+int _n_bpoly_mod_resultant_multipoint(n_poly_t res, const n_poly_struct * A, slong lenA, const n_poly_struct * B, slong lenB, slong rlen, nmod_t mod)
 int n_bpoly_mod_resultant_cutoff(slong lenA, slong lenB, slong npoints)
 
 `n_bpoly_mod_resultant` sets `res` to the resultant with respect to the
 main variable $y$ of the bivariate polynomials `A` and `B` over
 $\mathbb{F}_p$ (stored as polynomials in $y$ whose coefficients are
-polynomials in $x$), by evaluation at many values of $x$ and
-interpolation; see [](algorithms/multivariate/modp-bivariate-resultant).
-It returns 0, leaving `res` unchanged, when $\mathbb{F}_p$ does not contain
+polynomials in $x$). It returns 0, leaving `res` unchanged, when no
+algorithm applies, which happens when $\mathbb{F}_p$ does not contain
 enough suitable points. `_n_bpoly_mod_resultant` is the same for
 coefficient arrays with $\mathit{lenA} \ge \mathit{lenB} \ge 2$ and
-nonzero leading coefficients. `n_bpoly_mod_resultant_cutoff` returns
-whether this method is expected to beat the subresultant algorithm for the
-given lengths in $y$ and number of points.
+nonzero leading coefficients, and `_n_bpoly_mod_resultant_len` is the same
+again given that the resultant has length at most `rlen` in $x$ (or
+`WORD_MAX`), which saves work when that is less than the bound read off the
+degrees.
+
+These choose the algorithm, by the sizes, and every dense bivariate
+resultant over $\mathbb{F}_p$ in FLINT goes through them: those of
+`nmod_mpoly_resultant` after Kronecker substitution, the images modulo
+primes of `fmpz_bpoly_resultant` (and so of `fmpz_mpoly_resultant` and
+`fmpq_mpoly_resultant`), and the resultants of `gr_poly` over polynomial
+rings over `nmod`. An algorithm added to `_n_bpoly_mod_resultant_len` is
+therefore used by all of these in its range. For now the only one is
+`_n_bpoly_mod_resultant_multipoint`, evaluation at many values of $x$ and
+interpolation (see [](algorithms/multivariate/modp-bivariate-resultant)),
+which returns 0 when $\mathbb{F}_p$ does not contain enough suitable
+points. The algorithms are threaded. `n_bpoly_mod_resultant_cutoff`
+returns whether the best of them is expected to beat the subresultant
+algorithm for the given lengths in $y$ and number of points.
 :::
 
 ### Dense coefficient arrays

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_mpoly.h"
 #include "fmpq_mpoly.h"
 
@@ -16,25 +18,24 @@ int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
            const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 {
     int success;
-    fmpz_mpoly_univar_t Ax, Bx;
+    fmpz_t degA, degB;
 
-    fmpz_mpoly_univar_init(Ax, ctx->zctx);
-    fmpz_mpoly_univar_init(Bx, ctx->zctx);
+    /* the degrees are read before R, which may alias A or B, is written */
+    fmpz_init(degA);
+    fmpz_init(degB);
+    fmpz_mpoly_degree_fmpz(degA, A->zpoly, var, ctx->zctx);
+    fmpz_mpoly_degree_fmpz(degB, B->zpoly, var, ctx->zctx);
 
-    fmpz_mpoly_to_univar(Ax, A->zpoly, var, ctx->zctx);
-    fmpz_mpoly_to_univar(Bx, B->zpoly, var, ctx->zctx);
-
-    /* the same resultant as of the two univariates above, but going through
-       fmpz_mpoly_resultant lets the dense bivariate algorithm take it */
+    /* res(cA A, cB B) = cA^deg(B) cB^deg(A) res(A, B) */
     success = fmpz_mpoly_resultant(R->zpoly, A->zpoly, B->zpoly, var, ctx->zctx);
 
-    if (success && Ax->length > 0 && Bx->length > 0)
+    if (success && fmpz_sgn(degA) >= 0 && fmpz_sgn(degB) >= 0)
     {
         fmpq_t t;
         fmpq_init(t);
 
-        success = fmpq_pow_fmpz(t, A->content, Bx->exps + 0) &&
-                  fmpq_pow_fmpz(R->content, B->content, Ax->exps + 0);
+        success = fmpq_pow_fmpz(t, A->content, degB) &&
+                  fmpq_pow_fmpz(R->content, B->content, degA);
         if (success)
             fmpq_mul(R->content, R->content, t);
 
@@ -47,8 +48,8 @@ int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
 
     fmpq_mpoly_reduce(R, ctx);
 
-    fmpz_mpoly_univar_clear(Ax, ctx->zctx);
-    fmpz_mpoly_univar_clear(Bx, ctx->zctx);
+    fmpz_clear(degA);
+    fmpz_clear(degB);
 
     return success;
 }
