@@ -206,8 +206,28 @@ _acb_hypgeom_gamma_incomplete_integration_bounds(mag_t M, mag_t Ds,
         || !gamma_ctx_init(&G, s, z, 0, upper, BOUND_DROP, BOUND_TAILTOL, 1.0, 64))
         return 0;
 
-    _sd_mag_set_exp_d(M, G.C.logL[0]);
-    _sd_mag_set_exp_d(Ds, G.C.logL[2]);
+    /* (the contour is planned heuristically; the bounds along it are
+       rigorous) */
+    {
+        mag_struct L[3];
+        int k;
+
+        for (k = 0; k < 3; k++)
+            mag_init(L + k);
+        ok = _sd_contour_bounds(L, &G.C, &G.P, G.alpha, 0, G.nu, G.start);
+        mag_set(M, L);
+        mag_set(Ds, L + 2);
+        for (k = 0; k < 3; k++)
+            mag_clear(L + k);
+    }
+
+    if (!ok)
+    {
+        mag_inf(M);
+        mag_inf(Ds);
+        gamma_ctx_clear(&G);
+        return 0;
+    }
 
     if (G.upper != upper)
     {

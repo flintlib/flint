@@ -441,8 +441,10 @@ _acb_hypgeom_bessel_integration_bounds(mag_t M, mag_t Dz, mag_t Dnu,
     sd_work W;
     sd_contour C;
     acb_t alpha;
+    arb_t t;
+    mag_struct L[3], L2[3];
+    mag_t pre;
     sd_end vm = sd_end_make(SD_MINUS, 0), vp0 = sd_end_make(SD_PLUS, 0), vp1 = sd_end_make(SD_PLUS, -1);
-    double L[3], pre;
     int ok, rot, k;
 
     mag_inf(M);
@@ -455,13 +457,24 @@ _acb_hypgeom_bessel_integration_bounds(mag_t M, mag_t Dz, mag_t Dnu,
     acb_init(alpha);
     rot = bessel_rot(kind, z);
     bessel_alpha(alpha, z, rot);
-    ok = _sd_problem_init(&P, alpha, 1, nu, NULL, BOUND_DROP, BOUND_TAILTOL, 1.0);
-    acb_clear(alpha);
-    if (!ok)
+    if (!_sd_problem_init(&P, alpha, 1, nu, NULL, BOUND_DROP, BOUND_TAILTOL, 1.0))
+    {
+        acb_clear(alpha);
         return 0;
+    }
+
+    arb_init(t);
+    mag_init(pre);
+    for (k = 0; k < 3; k++)
+    {
+        mag_init(L + k);
+        mag_init(L2 + k);
+    }
 
     _sd_work_init(&W, &P);
 
+    /* the contours are planned heuristically; the bounds along them
+       are rigorous */
     if (kind == KIND_K)
         ok = _sd_plan(&C, &W, &P, vm, (rot == -1) ? vp1 : vp0, 1);
     else if (kind == KIND_Y)
@@ -471,8 +484,7 @@ _acb_hypgeom_bessel_integration_bounds(mag_t M, mag_t Dz, mag_t Dnu,
 
     if (ok)
     {
-        for (k = 0; k < 3; k++)
-            L[k] = C.logL[k];
+        ok = _sd_contour_bounds(L, &C, &P, alpha, 1, nu, NULL);
         _sd_contour_clear(&C);
     }
 
@@ -482,30 +494,66 @@ _acb_hypgeom_bessel_integration_bounds(mag_t M, mag_t Dz, mag_t Dnu,
         ok = _sd_plan(&C, &W, &P, vm, vp1, 1);
         if (ok)
         {
+            ok = _sd_contour_bounds(L2, &C, &P, alpha, 1, nu, NULL);
             for (k = 0; k < 3; k++)
-                L[k] = _sd_logaddexp(L[k], C.logL[k]);
+                mag_add(L + k, L + k, L2 + k);
             _sd_contour_clear(&C);
         }
     }
 
     _sd_work_clear(&W);
 
-    if (!ok)
-        return 0;
-
-    /* the prefactors; for I and K, |e^{-+ i pi nu/2}|, whose
-       nu-derivative adds (pi/2) |F| */
-    pre = (kind == KIND_K) ? -log(2.0) : -log(2.0 * SD_PI);
-    if (kind == KIND_I || kind == KIND_K)
+    if (ok)
     {
-        pre += ((kind == KIND_I) ? rot : -rot) * SD_PI * P.nu.im / 2 + SD_PI * P.rnu / 2;
-        L[2] = _sd_logaddexp(L[2], L[0] + log(SD_PI / 2));
+        /* the prefactors 1/2 or 1/(2 pi); for I and K, also
+           |e^{-+ i pi nu/2}|, whose nu-derivative adds (pi/2) |F| */
+        if (kind == KIND_K)
+            mag_set_ui_2exp_si(pre, 1, -1);
+        else
+        {
+            mag_const_pi_lower(pre);
+            mag_mul_2exp_si(pre, pre, 1);
+            mag_inv(pre, pre);
+        }
+
+        if (kind == KIND_I || kind == KIND_K)
+        {
+            mag_t f;
+            mag_init(f);
+
+            arb_const_pi(t, 64);
+            arb_mul(t, t, acb_imagref(nu), 64);
+            arb_mul_2exp_si(t, t, -1);
+            if (((kind == KIND_I) ? rot : -rot) < 0)
+                arb_neg(t, t);
+            else if (rot == 0)
+                arb_zero(t);
+            arb_exp(t, t, 64);
+            arb_get_mag(f, t);
+            mag_mul(pre, pre, f);
+
+            mag_const_pi(f);
+            mag_mul_2exp_si(f, f, -1);
+            mag_addmul(L + 2, L, f);
+            mag_clear(f);
+        }
+
+        mag_mul(M, L, pre);
+        mag_mul(Dz, L + 1, pre);
+        mag_mul_2exp_si(Dz, Dz, -1);
+        mag_mul(Dnu, L + 2, pre);
+        ok = mag_is_finite(M) && mag_is_finite(Dz) && mag_is_finite(Dnu);
     }
 
-    _sd_mag_set_exp_d(M, L[0] + pre);
-    _sd_mag_set_exp_d(Dz, L[1] + pre - log(2.0));
-    _sd_mag_set_exp_d(Dnu, L[2] + pre);
-    return 1;
+    acb_clear(alpha);
+    arb_clear(t);
+    mag_clear(pre);
+    for (k = 0; k < 3; k++)
+    {
+        mag_clear(L + k);
+        mag_clear(L2 + k);
+    }
+    return ok;
 }
 
 static void

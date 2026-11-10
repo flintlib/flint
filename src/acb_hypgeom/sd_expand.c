@@ -73,9 +73,18 @@
     by square roots and logarithms.  As for the quadrature, the
     tolerance is 2^-prec times the L1 norm of the integrand on the
     whole contour: the expansion of a piece with a small contribution
-    needs fewer terms and less precision, and a piece below the
-    tolerance is only bounded.  Whether the expansions are used is
-    decided from estimates of their cost and that of the quadrature.
+    needs fewer terms and less precision, and a piece estimated to be
+    below the tolerance is left to the quadrature.
+
+    What is rigorous and what is not.  Whether the expansions are used,
+    and their parameters (r, the number of terms n, tau_0 and the
+    vertices where the polygon takes over), are chosen heuristically in
+    double precision (sde_prepare and the functions before it) so that
+    the error bound comes out below the tolerance.  The bound itself is
+    then computed in arb and mag arithmetic from enclosures of the
+    saddle, A and c (sde_bound_radius, sde_bound_truncation,
+    sde_bound_rest, and sd_bound.c for the path beyond tau_0), and is
+    valid for any choice of the parameters.
 */
 
 #include <math.h>
@@ -141,18 +150,24 @@ sde_coeffs(acb_ptr b, const acb_t A, const acb_t nu, slong n, slong prec, slong 
     acb_clear(S); acb_clear(H); acb_clear(Dn); acb_clear(t);
 }
 
-/* the plan for one piece: all in doubles, with the rounding errors of
-   the bounds covered by the margins noted */
+/* The plan for one piece.  Heuristic: everything from here to
+   sde_prepare is done in double precision to choose the parameters of
+   the expansion (the radius r, the number of terms, the points tau_0
+   where the expansion is cut off) so that the rigorous error bound,
+   which is computed afterwards from these parameters (sde_bound_*),
+   meets the tolerance. */
 typedef struct
 {
     int n;                /* number of coefficients b_1, ..., b_n, or 0
-                             for a piece below the tolerance, with the
-                             bound logE12 for its integral (-1: not
-                             yet checked) */
-    double r, rho;        /* |u| < r for |tau| < rho */
+                             for a piece estimated to be below the
+                             tolerance, which is left to the quadrature
+                             (-1: not yet checked) */
+    double r, rho;        /* |u| < r for |tau| < rho (estimate) */
     int j[2];             /* the vertices beyond which the polygon is only bounded */
     double tau0[2];
-    double logE12;        /* log of the bound for the first two error terms */
+    int len;              /* the terms of the error bound up to this
+                             index are bounded individually */
+    double logtol;        /* log of the tolerance, relative to e^c */
     slong prec;           /* relative precision needed for this piece */
     double cost;
 }
@@ -233,7 +248,7 @@ sde_tail_table(double * tab, int len, double tau0, double rho)
 /* number of coefficients such that the truncation error is below
    exp(logtol), or -1; tau0 < 0.9 rho */
 static int
-sde_choose_n(double * logerr, double r, double rho, double tau0, double logtol, int nmax)
+sde_choose_n(double * logerr, int * lenout, double r, double rho, double tau0, double logtol, int nmax)
 {
     double * tab, lr = log(r);
     int len, n, res = -1;
@@ -244,6 +259,7 @@ sde_choose_n(double * logerr, double r, double rho, double tau0, double logtol, 
     len = FLINT_MIN(len, nmax + 64);
     len = (int) fmin(len, (logtol - 3.0 - lr + log1p(-tau0 / rho)) / log(tau0 / rho) + 2.0);
     len = FLINT_MAX(len, 2);
+    *lenout = len;
     tab = flint_malloc(sizeof(double) * (len + 1));
     sde_tail_table(tab, len, tau0, rho);
 
@@ -294,7 +310,7 @@ double
 _sd_expand_cost(double absA, double q, int real, slong prec)
 {
     double r, rho, tau0, logerr;
-    int n;
+    int n, len;
 
     if (!(absA > 0.0) || !(q < 1e300))
         return INFINITY;
@@ -304,7 +320,7 @@ _sd_expand_cost(double absA, double q, int real, slong prec)
     if (!(tau0 < 0.85 * rho))
         return INFINITY;
 
-    n = sde_choose_n(&logerr, r, rho, tau0, -(prec + 8.0) * SD_LN2, 100000);
+    n = sde_choose_n(&logerr, &len, r, rho, tau0, -(prec + 8.0) * SD_LN2, 100000);
     if (n < 0)
         return INFINITY;
     if (n > tau0 * tau0)
@@ -343,7 +359,7 @@ sde_prepare(sde_plan * pl, const sd_problem * P, const sd_piece * pc, double log
     {
         /* to be checked if the expansions are used */
         pl->n = -1;
-        pl->cost = 3.0;
+        pl->cost = 15.0;
         return 1;
     }
     if (tol > -12.0)
@@ -355,8 +371,7 @@ sde_prepare(sde_plan * pl, const sd_problem * P, const sd_piece * pc, double log
         {
             pl->n = 0;
             pl->prec = 2;
-            pl->logE12 = lE1;
-            pl->cost = 3.0;
+            pl->cost = 15.0;
             return 1;
         }
     }
@@ -427,7 +442,7 @@ sde_prepare(sde_plan * pl, const sd_problem * P, const sd_piece * pc, double log
             return 0;
 
         /* each of the two sides is bounded with the larger tau0 */
-        nn = sde_choose_n(&lE2, pl->r, pl->rho, tmax, tol - log(8.0), 200000);
+        nn = sde_choose_n(&lE2, &pl->len, pl->r, pl->rho, tmax, tol - log(8.0), 200000);
         if (nn < 0)
             return 0;
         n = nn;
@@ -440,18 +455,8 @@ sde_prepare(sde_plan * pl, const sd_problem * P, const sd_piece * pc, double log
     }
 
     pl->n = n;
+    pl->logtol = tol - log(8.0);
 
-    /* both sides */
-    lE2 += log(2.0);
-    lE1 = -INFINITY;
-    for (side = 0; side < 2; side++)
-    {
-        double t0 = pl->tau0[side], t = t0 / pl->rho;
-        lE1 = _sd_logaddexp(lE1, log(pl->r) - t0 * t0 - 2.0 * log(t0)
-            + log(t) - 2.0 * log1p(-t));
-    }
-    lE1 += 1e-9 * (fabs(lE1) + 1.0);
-    pl->logE12 = _sd_logaddexp(lE1, lE2);
     pl->cost = sde_cost(n, wp - (prec - pl->prec), real);
     return 1;
 }
@@ -537,102 +542,219 @@ cleanup:
     return ok;
 }
 
-/* the integral over the rest of the polygon from the vertex j outwards
-   (in the direction step), and over the segment from the ball W to that
-   vertex: log of the bound, relative to exp(top) */
-static double
-sde_rest(const sd_problem * P, const sd_piece * pc, const acb_t W, int j, int step, double top)
+/* Rigorous.  rho = a lower bound for sqrt(|A| / 2) r sqrt(1 - G(r)),
+
+       G(r) = 2 (cosh r - 1 - r^2/2) / r^2 + 2 |nu / A| (sinh r - r) / r^2,
+
+   for the exact number r > 0 and the balls A and nu; returns 0 if G(r)
+   is not certified to be less than 1. */
+static int
+sde_bound_radius(arb_t rho, const acb_t A, const acb_t nu, double r)
 {
-    cd a, phi, d1, d2;
-    double g[2], rw, s, sh, v;
-    mag_t t;
-    int i;
+    arb_t R, G, sh, ch, t;
+    mag_t q, a;
+    int ok = 0;
 
-    a.re = arf_get_d(arb_midref(acb_realref(W)), ARF_RND_NEAR);
-    a.im = arf_get_d(arb_midref(acb_imagref(W)), ARF_RND_NEAR);
+    arb_init(R); arb_init(G); arb_init(sh); arb_init(ch); arb_init(t);
+    mag_init(q); mag_init(a);
 
-    /* the radius of a disk around a containing W */
-    mag_init(t);
-    mag_hypot(t, arb_radref(acb_realref(W)), arb_radref(acb_imagref(W)));
-    rw = mag_get_d(t) * (1.0 + 1e-12) + 4.0 * SD_EPS * (cd_abs(a) + 1e-300);
-    mag_clear(t);
+    acb_get_mag(q, nu);
+    acb_get_mag_lower(a, A);
 
-    if (!(rw < 0.5) || !(cd_abs(a) < 1e300))
-        return INFINITY;
+    if (r > 0.0 && r < 100.0 && !mag_is_zero(a) && mag_is_finite(q))
+    {
+        mag_div(q, q, a);                       /* |nu / A| */
 
-    /* the stub inside the disk: sup of Re(phi(a + d) - phi(a)) as in
-       sd_integrate.c */
-    _sd_phi(&phi, &d1, &d2, P, a);
-    sh = sinh(0.5 * rw);
-    v = phi.re - top + (cd_abs(d1) * rw + cd_abs(d2) * 2.0 * sh * sh
-            + cd_abs(cd_add(d1, P->nu)) * rw * rw * rw * 0.17) * (1.0 + 1e-12)
-        + _sd_margin(P, a) + 64.0 * SD_EPS * (P->aal * exp(a.re + rw)
-            + ((P->abe != 0.0) ? P->abe * exp(-a.re + rw) : 0.0) + P->anu * rw);
-    s = v + log(rw);
+        arb_set_d(R, r);
+        arb_sinh_cosh(sh, ch, R, 128);
+        arb_mul(t, R, R, 128);                  /* r^2 */
+        arb_sub(sh, sh, R, 128);                /* sinh r - r */
+        arb_sub_ui(ch, ch, 1, 128);
+        arb_mul_2exp_si(G, t, -1);
+        arb_sub(ch, ch, G, 128);                /* cosh r - 1 - r^2 / 2 */
+        /* upper bounds, before multiplying by the upper bound of q */
+        arb_get_ubound_arf(arb_midref(sh), sh, 128);
+        mag_zero(arb_radref(sh));
+        arf_set_mag(arb_midref(G), q);
+        mag_zero(arb_radref(G));
+        arb_mul(G, G, sh, 128);
+        arb_add(G, G, ch, 128);
+        arb_div(G, G, t, 128);
+        arb_mul_2exp_si(G, G, 1);
 
-    /* the segment, the panels and the tail */
-    s = _sd_logaddexp(s, _sd_panel(g, P, a, pc->pts[j], top));
-    for (i = j; i + step >= 0 && i + step < pc->npts; i += step)
-        s = _sd_logaddexp(s, _sd_panel(g, P, pc->pts[i], pc->pts[i + step], top));
-    s = _sd_logaddexp(s, pc->logtail[(step > 0) ? 1 : 0]);
+        arb_sub_ui(G, G, 1, 128);
+        arb_neg(G, G);                          /* 1 - G */
+        if (arb_is_positive(G))
+        {
+            arb_sqrt(G, G, 128);
+            arf_set_mag(arb_midref(t), a);
+            mag_zero(arb_radref(t));
+            arb_mul_2exp_si(t, t, -1);
+            arb_sqrt(t, t, 128);
+            arb_mul(G, G, t, 128);
+            arb_mul(G, G, R, 128);
+            arb_get_lbound_arf(arb_midref(rho), G, 128);
+            mag_zero(arb_radref(rho));
+            ok = arb_is_finite(rho) && arb_is_positive(rho);
+        }
+    }
 
-    return s;
+    arb_clear(R); arb_clear(G); arb_clear(sh); arb_clear(ch); arb_clear(t);
+    mag_clear(q); mag_clear(a);
+    return ok;
 }
 
-/* the expansion for one piece: res = the integral over the piece
-   (in the order of its vertices), without the sign */
+/* Rigorous.  For one side, with the exact numbers r, tau_0 > 0 and a
+   lower bound rho for the radius of analyticity (t = tau_0 / rho):
+
+       err >= r sum_{k > n} min((k/2) Gamma(k/2), tau_0^k) rho^(-k)
+              + r e^(-tau_0^2) tau_0^(-2) t / (1 - t)^2,
+       rem >= r t^(n+1) / (1 - t),
+
+   the bounds for the truncation of the expansion (the first sum, with
+   the terms up to k = len bounded individually and the rest by the
+   geometric series) and of the Taylor polynomial of u at tau_0.
+   Returns 0 unless t < 1 and tau_0^2 >= n - 2 are certified. */
+static int
+sde_bound_truncation(mag_t err, mag_t rem, const arb_t rho, double r, double tau0, slong n, slong len)
+{
+    arb_t T, t, omt, u;
+    mag_struct g[2];
+    mag_t pw, tp, tm, irho, sum, term, rr, iomt;
+    slong k;
+    int ok = 0;
+
+    arb_init(T); arb_init(t); arb_init(omt); arb_init(u);
+    mag_init(g); mag_init(g + 1); mag_init(pw); mag_init(tp); mag_init(tm);
+    mag_init(irho); mag_init(sum); mag_init(term); mag_init(rr); mag_init(iomt);
+
+    arb_set_d(T, tau0);
+    arb_div(t, T, rho, 128);
+    arb_sub_ui(omt, t, 1, 128);
+    arb_neg(omt, omt);                          /* 1 - t */
+    arb_mul(u, T, T, 128);                      /* tau_0^2 */
+    arb_sub_si(T, u, n - 2, 128);
+
+    if (tau0 > 0.0 && arb_is_positive(omt) && arb_is_nonnegative(T) && r > 0.0)
+    {
+        len = FLINT_MAX(len, n + 1);
+
+        mag_set_d(rr, r);
+        arb_get_mag(tm, t);
+        arb_inv(T, rho, 128);
+        arb_get_mag(irho, T);
+        arb_inv(T, omt, 128);
+        arb_get_mag(iomt, T);
+
+        /* Gamma(k/2 + 1) for k = n + 1, n + 2 */
+        for (k = 0; k < 2; k++)
+        {
+            arb_set_ui(T, n + 1 + k + 2);
+            arb_mul_2exp_si(T, T, -1);
+            arb_gamma(T, T, 64);
+            arb_get_mag(g + k, T);
+        }
+
+        mag_pow_ui(pw, irho, n + 1);
+        mag_pow_ui(tp, tm, n + 1);
+
+        /* rem */
+        mag_mul(rem, tp, iomt);
+        mag_mul(rem, rem, rr);
+
+        for (k = n + 1; k <= len; k++)
+        {
+            int par = (k - (n + 1)) & 1;
+
+            mag_mul(term, g + par, pw);
+            mag_min(term, term, tp);
+            mag_add(sum, sum, term);
+
+            /* Gamma((k + 2)/2 + 1) = (k + 2)/2 Gamma(k/2 + 1) */
+            mag_mul_ui(g + par, g + par, k + 2);
+            mag_mul_2exp_si(g + par, g + par, -1);
+            mag_mul(pw, pw, irho);
+            mag_mul(tp, tp, tm);
+        }
+
+        /* sum_{k > len} t^k */
+        mag_mul(term, tp, iomt);
+        mag_add(sum, sum, term);
+
+        /* e^(-tau_0^2) tau_0^(-2) t / (1 - t)^2 */
+        arb_neg(T, u);
+        arb_exp(T, T, 128);
+        arb_div(T, T, u, 128);
+        arb_mul(T, T, t, 128);
+        arb_div(T, T, omt, 128);
+        arb_div(T, T, omt, 128);
+        arb_get_mag(term, T);
+        mag_add(sum, sum, term);
+
+        mag_mul(err, sum, rr);
+        ok = mag_is_finite(err) && mag_is_finite(rem);
+    }
+
+    arb_clear(T); arb_clear(t); arb_clear(omt); arb_clear(u);
+    mag_clear(g); mag_clear(g + 1); mag_clear(pw); mag_clear(tp); mag_clear(tm);
+    mag_clear(irho); mag_clear(sum); mag_clear(term); mag_clear(rr); mag_clear(iomt);
+    return ok;
+}
+
+/* Rigorous.  err >= the integral of |exp(phi - c)| over a path from the
+   ball W to the valley at the given end of the piece: the segment
+   from W to the vertex j, the polygon from there to its end, and the
+   ray into the valley.  Returns 0 if the ray is not certified. */
+static int
+sde_bound_rest(mag_t err, const sd_problem * P, const sd_piece * pc,
+    const acb_t alpha, const acb_t nu, const acb_t W, const acb_t c, int j, int end, double logtol)
+{
+    acb_t b;
+    mag_t t;
+    int ok;
+
+    acb_init(b);
+    mag_init(t);
+
+    arb_set_d(acb_realref(b), pc->pts[j].re);
+    arb_set_d(acb_imagref(b), pc->pts[j].im);
+    _sd_bound_segment(err, 1, alpha, 1, nu, W, b, c);
+
+    ok = _sd_bound_end(t, alpha, 1, nu, pc, c, j, end, P->lin_dir, P, logtol);
+    mag_add(err, err, t);
+
+    acb_clear(b);
+    mag_clear(t);
+    return ok && mag_is_finite(err);
+}
+
+/* The expansion for one piece: res = the integral over the piece (in
+   the order of its vertices), without the sign.  The parameters of the
+   plan (n, r, tau_0 and the vertices j) were chosen heuristically; the
+   error bound is computed here from the enclosures of the saddle, A
+   and c, and is valid whatever the plan is. */
 static int
 sde_piece(acb_t res, const sde_plan * pl, const sd_problem * P, const sd_piece * pc,
     const acb_t alpha, const acb_t nu, slong prec, slong wp)
 {
     acb_ptr b;
     acb_t w, A, c, S, t, u;
-    arb_t gam, tau;
-    mag_t err, m;
-    cd dir, phi, d1, d2, * bd = NULL;
-    double absA, lE3, dc;
+    arb_t gam, tau, rho;
+    mag_t err, e, rem;
+    cd dir, phi, d1, d2;
     slong n = pl->n, k;
-    int ok = 0, side, mid = pc->mid, bacc = 0;
-
-    if (n == 0)
-    {
-        /* 0 +- exp(logE12 + Re c) */
-        double L = pl->logE12 + pc->c.re;
-
-        mag_init(err);
-        _sd_mag_set_exp_d(err, L + 1e-9 + 4.0 * SD_EPS * (fabs(pl->logE12) + fabs(pc->c.re)));
-        acb_zero(res);
-        acb_add_error_mag(res, err);
-        mag_clear(err);
-        return acb_is_finite(res);
-    }
+    int ok = 0, side, mid = pc->mid;
 
     b = _acb_vec_init(n + 2);
     acb_init(w); acb_init(A); acb_init(c);
     acb_init(S); acb_init(t); acb_init(u);
-    arb_init(gam); arb_init(tau);
-    mag_init(err); mag_init(m);
+    arb_init(gam); arb_init(tau); arb_init(rho);
+    mag_init(err); mag_init(e); mag_init(rem);
 
-    /* the plan was made with phi'' at the double saddle */
+    /* (the sign of A and the branch of the saddle from the doubles) */
     _sd_phi(&phi, &d1, &d2, P, pc->pts[mid]);
 
     if (!sde_saddle(w, A, c, alpha, nu, pc->pts[mid], d2, wp + 30))
-        goto cleanup;
-
-    absA = cd_abs(d2);
-    acb_get_mag_lower(m, A);
-    if (!(mag_get_d(m) >= absA * (1.0 - 0.25 * SDE_SLACK)))
-        goto cleanup;
-    acb_get_mag(m, A);
-    if (!(mag_get_d(m) <= absA * (1.0 + 0.25 * SDE_SLACK)))
-        goto cleanup;
-    /* the bounds of the planner are relative to exp of the double
-       value of Re c */
-    arb_set_d(acb_realref(t), pc->c.re);
-    arb_sub(acb_realref(t), acb_realref(t), acb_realref(c), 60);
-    arb_get_mag(m, acb_realref(t));
-    dc = mag_get_d(m);
-    if (!(dc < 0.5))
         goto cleanup;
 
     /* b_1 = sqrt(-2/A), along the outgoing path */
@@ -645,12 +767,18 @@ sde_piece(acb_t res, const sde_plan * pl, const sd_problem * P, const sd_piece *
         double bi = arf_get_d(arb_midref(acb_imagref(b + 1)), ARF_RND_NEAR);
         double dot = br * dir.re + bi * dir.im;
 
-        /* the polygon leaves the saddle along +-b_1 up to a small angle */
+        /* (the polygon leaves the saddle along +-b_1 up to a small
+           angle; with the other sign the result would still be an
+           enclosure, with a large bound for the rest of the path) */
         if (!(fabs(dot) > 0.5 * hypot(br, bi) * cd_abs(dir)))
             goto cleanup;
         if (dot < 0.0)
             acb_neg(b + 1, b + 1);
     }
+
+    /* the radius of analyticity */
+    if (!sde_bound_radius(rho, A, nu, pl->r))
+        goto cleanup;
 
     /* the recurrence only needs the relative accuracy of the result,
        not the bits for the cancellation in c */
@@ -670,66 +798,31 @@ sde_piece(acb_t res, const sde_plan * pl, const sd_problem * P, const sd_piece *
     if (!acb_is_finite(S))
         goto cleanup;
 
-    /* the coefficients as doubles, if they are accurate (and not in
-       the range where the conversion underflows) */
-    bd = flint_malloc((n + 1) * sizeof(cd));
-    bacc = 1;
-    for (k = 1; k <= n && bacc; k++)
-    {
-        bd[k].re = arf_get_d(arb_midref(acb_realref(b + k)), ARF_RND_NEAR);
-        bd[k].im = arf_get_d(arb_midref(acb_imagref(b + k)), ARF_RND_NEAR);
-        bacc = acb_rel_accuracy_bits(b + k) >= 32
-            && (fabs(bd[k].re) > 1e-290 || arf_is_zero(arb_midref(acb_realref(b + k))))
-            && (fabs(bd[k].im) > 1e-290 || arf_is_zero(arb_midref(acb_imagref(b + k))))
-            && fabs(bd[k].re) < 1e290 && fabs(bd[k].im) < 1e290;
-    }
-
-    /* the rest of the path on each side */
-    lE3 = -INFINITY;
+    /* the error, relative to exp(c), on each side */
     for (side = 0; side < 2; side++)
     {
-        double t0 = pl->tau0[side], tt = t0 / pl->rho, rem;
+        double t0 = pl->tau0[side];
+
+        if (!sde_bound_truncation(e, rem, rho, pl->r, t0, n, pl->len))
+            goto cleanup;
+        mag_add(err, err, e);
 
         /* u(+-tau_0): the Taylor polynomial and its remainder */
-        rem = pl->r * pow(tt, n + 1) / (1.0 - tt) * (1.0 + 1e-9);
-        if (bacc && n < 10000)
+        arb_set_d(tau, side ? t0 : -t0);
+        acb_zero(u);
+        for (k = n; k >= 1; k--)
         {
-            /* in doubles: |b_k| tau_0^k <= r t^k, and the errors of the
-               coefficients and of the n additions and multiplications
-               are relatively below 2^-29 and 2^-50 n */
-            double tau0 = side ? t0 : -t0, ur = 0.0, ui = 0.0;
-
-            for (k = n; k >= 1; k--)
-            {
-                ur = (ur + bd[k].re) * tau0;
-                ui = (ui + bd[k].im) * tau0;
-            }
-            rem += 1e-8 * pl->r / (1.0 - tt);
-            arb_set_d(acb_realref(u), ur);
-            arb_set_d(acb_imagref(u), ui);
+            acb_add(u, u, b + k, 64);
+            acb_mul_arb(u, u, tau, 64);
         }
-        else
-        {
-            arb_set_d(tau, side ? t0 : -t0);
-            acb_zero(u);
-            for (k = n; k >= 1; k--)
-            {
-                acb_add(u, u, b + k, 64);
-                acb_mul_arb(u, u, tau, 64);
-            }
-        }
-        mag_set_d(m, rem);
-        acb_add_error_mag(u, m);
+        acb_add_error_mag(u, rem);
         acb_add(u, u, w, 64);
 
-        lE3 = _sd_logaddexp(lE3, sde_rest(P, pc, u, pl->j[side], side ? 1 : -1, pc->c.re));
+        if (!sde_bound_rest(e, P, pc, alpha, nu, u, c, pl->j[side], side, pl->logtol))
+            goto cleanup;
+        mag_add(err, err, e);
     }
 
-    lE3 += dc * (1.0 + 1e-9) + 1e-9;
-    lE3 = _sd_logaddexp(lE3, pl->logE12);
-    if (!(lE3 < 700.0))
-        goto cleanup;
-    _sd_mag_set_exp_d(err, lE3);
     acb_add_error_mag(S, err);
 
     acb_exp(t, c, wp);
@@ -737,12 +830,11 @@ sde_piece(acb_t res, const sde_plan * pl, const sd_problem * P, const sd_piece *
     ok = acb_is_finite(res);
 
 cleanup:
-    flint_free(bd);
     _acb_vec_clear(b, n + 2);
     acb_clear(w); acb_clear(A); acb_clear(c);
     acb_clear(S); acb_clear(t); acb_clear(u);
-    arb_clear(gam); arb_clear(tau);
-    mag_clear(err); mag_clear(m);
+    arb_clear(gam); arb_clear(tau); arb_clear(rho);
+    mag_clear(err); mag_clear(e); mag_clear(rem);
     return ok;
 }
 
@@ -754,7 +846,8 @@ _sd_expand(acb_t res, const sd_contour * C, const sd_problem * P,
     acb_t sum, gsum, t;
     double cost = 0.0, qcost = 0.0, mag = 0.0;
     slong wp;
-    int i, pass, ok = 1;
+    int i, pass, ok = 1, nsel = 0;
+    char sel[SD_MAXPIECES];
 
     /* only implemented for the symmetric kernel */
     if (!sym || C->npieces == 0 || !acb_is_exact(alpha) || !acb_is_exact(nu)
@@ -787,7 +880,7 @@ _sd_expand(acb_t res, const sd_contour * C, const sd_problem * P,
                     maxratio * C->npieces * _sd_quad_cost(prec + 17.0 + log2(mag))))
                 return 0;
             cost += pl[i].cost;
-            qcost += (pl[i].n <= 0) ? 3.0 : _sd_quad_cost(pl[i].prec + 12.0 + log2(mag));
+            qcost += (pl[i].n <= 0) ? 15.0 : _sd_quad_cost(pl[i].prec + 12.0 + log2(mag));
         }
 
         if (cost > maxratio * qcost)
@@ -799,6 +892,11 @@ _sd_expand(acb_t res, const sd_contour * C, const sd_problem * P,
     for (i = 0; i < C->npieces && ok; i++)
     {
         const sd_piece * pc = C->piece + i;
+
+        sel[i] = (pl[i].n == 0);
+        nsel += sel[i];
+        if (sel[i])
+            continue;
 
         ok = sde_piece(t, pl + i, P, pc, alpha, nu, pl[i].prec,
                 wp - (prec - pl[i].prec) + 2 * FLINT_BIT_COUNT(pl[i].n));
@@ -815,10 +913,26 @@ _sd_expand(acb_t res, const sd_contour * C, const sd_problem * P,
         acb_mul_onei(t, t);
         acb_mul_si(t, t, (P->lin_dir.im > 0.0) ? -2 : 2, wp);
         acb_exp(t, t, wp);
+        /* (the geometric series must converge: |q| < 1) */
+        {
+            mag_t qm;
+            mag_init(qm);
+            acb_get_mag(qm, t);
+            ok = mag_cmp_2exp_si(qm, 0) < 0;
+            mag_clear(qm);
+        }
         acb_sub_ui(t, t, 1, wp);
         acb_neg(t, t);
         acb_div(gsum, gsum, t, wp);
         acb_add(sum, sum, gsum, wp);
+    }
+
+    /* the pieces estimated to be below the tolerance: by quadrature
+       (cheaply, with the tolerance of the whole contour) */
+    if (ok && nsel > 0)
+    {
+        ok = _sd_integrate_pieces(t, C, P, alpha, sym, nu, NULL, prec, sel);
+        acb_add(sum, sum, t, wp);
     }
 
     if (ok)

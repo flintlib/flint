@@ -12,6 +12,7 @@
 
 #include <math.h>
 #include "test_helpers.h"
+#include "thread_support.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
 #include "acb_hypgeom/impl.h"
@@ -129,6 +130,10 @@ TEST_FUNCTION_START(acb_hypgeom_gamma_incomplete_integration, state)
         acb_t s, z, s0, z0, r, f;
         slong prec;
         int upper, ok;
+
+        /* the quadrature in arb arithmetic evaluates its nodes in
+           parallel */
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         acb_init(s); acb_init(z); acb_init(s0); acb_init(z0);
         acb_init(r); acb_init(f);
@@ -354,6 +359,120 @@ TEST_FUNCTION_START(acb_hypgeom_gamma_incomplete_integration, state)
         acb_clear(s); acb_clear(z); acb_clear(s0); acb_clear(z0);
         acb_clear(r); acb_clear(f);
     }
+
+    /* Wide input balls with large parameters, where chords can need
+       bisection: the enclosure on the balls against the result at a
+       point of the balls. */
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t s, z, s0, z0, r, f;
+        slong prec;
+        int upper, ok, ok0;
+
+        acb_init(s); acb_init(z); acb_init(s0); acb_init(z0);
+        acb_init(r); acb_init(f);
+
+        upper = n_randint(state, 2);
+        prec = 10 + n_randint(state, 250);
+
+        gamma_rand_exact(s, state, 4 + (int) n_randint(state, 30));
+        if (n_randint(state, 2))
+            gamma_rand_exact(z, state, 4 + (int) n_randint(state, 30));
+        else
+        {
+            gamma_rand_exact(f, state, 2);
+            acb_mul(z, s, f, 53);
+            acb_get_mid(z, z);
+        }
+
+        gamma_rand_ball(s0, s, state);
+        gamma_rand_ball(z0, z, state);
+
+        /* very wide (the points remain inside) */
+        if (n_randint(state, 2))
+        {
+            mag_t m;
+            mag_init(m);
+            acb_get_mag(m, s);
+            mag_mul_2exp_si(m, m, -1 - (slong) n_randint(state, 4));
+            acb_add_error_mag(s, m);
+            acb_get_mag(m, z);
+            mag_mul_2exp_si(m, m, -1 - (slong) n_randint(state, 4));
+            acb_add_error_mag(z, m);
+            mag_clear(m);
+        }
+
+        ok = _acb_hypgeom_gamma_incomplete_integration(r, s, z, upper, prec);
+        ok0 = ok && _acb_hypgeom_gamma_incomplete_integration(f, s0, z0, upper, prec + 20);
+
+        /* (a ball z crossing the branch cut gives the union of the two
+           sides, of which the point is on one) */
+        if (ok && ok0 && !acb_overlaps(r, f))
+        {
+            flint_printf("FAIL: enclosure (wide balls)\n\n");
+            flint_printf("upper = %d, prec = %wd\n", upper, prec);
+            flint_printf("s = "); acb_printd(s, 30); flint_printf("\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+            flint_printf("s0 = "); acb_printd(s0, 30); flint_printf("\n");
+            flint_printf("z0 = "); acb_printd(z0, 30); flint_printf("\n");
+            flint_printf("r = "); acb_printd(r, 30); flint_printf("\n");
+            flint_printf("f = "); acb_printd(f, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        acb_clear(s); acb_clear(z); acb_clear(s0); acb_clear(z0);
+        acb_clear(r); acb_clear(f);
+    }
+
+    /* Real parameters too large for the contours (2^44 and beyond) in
+       the transition region z ~ s, where the upper function falls back
+       on the real-variable integral:
+       Gamma(s+1, z) = s Gamma(s, z) + z^s e^-z. */
+    for (iter = 0; iter < 20 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t s, s1, z, g0, g1, t;
+        slong prec = 40 + n_randint(state, 100);
+
+        acb_init(s); acb_init(s1); acb_init(z);
+        acb_init(g0); acb_init(g1); acb_init(t);
+
+        acb_set_d(s, ldexp(1.0 + n_randint(state, 1000) / 1000.0, 45 + (int) n_randint(state, 5)) + 0.5);
+        /* z = s (1 + small) */
+        acb_set_d(z, 1.0 + ldexp((double) n_randint(state, 1000), -10 - (int) n_randint(state, 20)));
+        acb_mul(z, z, s, 53);
+        acb_get_mid(z, z);
+        acb_add_ui(s1, s, 1, 200);
+
+        acb_hypgeom_gamma_upper(g0, s, z, 0, prec);
+        acb_hypgeom_gamma_upper(g1, s1, z, 0, prec);
+
+        /* g1 / (z^s e^-z) - s g0 / (z^s e^-z) = 1 */
+        acb_log(t, z, prec + 80);
+        acb_mul(t, t, s, prec + 80);
+        acb_sub(t, t, z, prec + 80);
+        acb_neg(t, t);
+        acb_exp(t, t, prec + 80);
+        acb_mul(g1, g1, t, prec);
+        acb_mul(g0, g0, t, prec);
+        acb_submul(g1, g0, s, prec);
+        acb_sub_ui(g1, g1, 1, prec);
+
+        if (!acb_contains_zero(g1))
+        {
+            flint_printf("FAIL: recurrence (beyond the contours)\n\n");
+            flint_printf("prec = %wd\n", prec);
+            flint_printf("s = "); acb_printd(s, 30); flint_printf("\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+            flint_printf("g0 = "); acb_printd(g0, 30); flint_printf("\n");
+            flint_printf("g1 = "); acb_printd(g1, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        acb_clear(s); acb_clear(s1); acb_clear(z);
+        acb_clear(g0); acb_clear(g1); acb_clear(t);
+    }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

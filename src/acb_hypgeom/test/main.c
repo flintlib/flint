@@ -72,6 +72,7 @@
 #include "t-pfq_sum_rs.c"
 #include "t-rising_ui.c"
 #include "t-rising_ui_jet.c"
+#include "t-sd_bound.c"
 #include "t-shi_series.c"
 #include "t-si.c"
 #include "t-si_series.c"
@@ -144,6 +145,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_pfq_sum_rs),
     TEST_FUNCTION(acb_hypgeom_rising_ui),
     TEST_FUNCTION(acb_hypgeom_rising_ui_jet),
+    TEST_FUNCTION(acb_hypgeom_sd_bound),
     TEST_FUNCTION(acb_hypgeom_shi_series),
     TEST_FUNCTION(acb_hypgeom_si),
     TEST_FUNCTION(acb_hypgeom_si_series),

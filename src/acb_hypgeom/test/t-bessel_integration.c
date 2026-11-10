@@ -12,6 +12,7 @@
 
 #include <math.h>
 #include "test_helpers.h"
+#include "thread_support.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
 #include "acb_hypgeom/impl.h"
@@ -164,6 +165,10 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_integration, state)
         slong prec, rprec;
         int kind, scaled, ok;
 
+        /* the quadrature in arb arithmetic evaluates its nodes in
+           parallel */
+        flint_set_num_threads(1 + n_randint(state, 3));
+
         acb_init(nu); acb_init(z); acb_init(nu0); acb_init(z0);
         acb_init(r); acb_init(r2); acb_init(s); acb_init(s2);
 
@@ -173,6 +178,16 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_integration, state)
 
         rand_exact(nu, state, 5);
         rand_exact(z, state, 5);
+        /* negative integers, where the order is reflected */
+        if (iter % 8 == 2)
+        {
+            acb_set_si(nu, -1 - (slong) n_randint(state, 30));
+            if (iter % 16 == 2)
+            {
+                kind = kinds[n_randint(state, 3)];
+                scaled = 0;
+            }
+        }
         acb_set(nu0, nu);
         acb_set(z0, z);
 
@@ -224,8 +239,100 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_integration, state)
             flint_abort();
         }
 
+        /* the public functions: the same (up to the state of the
+           cache of quadrature rules), or indeterminate */
+        if (!scaled)
+        {
+            acb_indeterminate(s);
+            acb_indeterminate(s2);
+
+            switch (kind)
+            {
+                case KIND_J: acb_hypgeom_bessel_j_integration(s, nu, z, prec); break;
+                case KIND_Y: acb_hypgeom_bessel_y_integration(s, nu, z, prec); break;
+                case KIND_H1: acb_hypgeom_bessel_h1_integration(s, nu, z, prec); break;
+                case KIND_H2: acb_hypgeom_bessel_h2_integration(s, nu, z, prec); break;
+                case KIND_I: acb_hypgeom_bessel_i_integration(s, nu, z, prec); break;
+                case KIND_K: acb_hypgeom_bessel_k_integration(s, nu, z, prec); break;
+                default:
+                    if (n_randint(state, 2))
+                        acb_hypgeom_bessel_jy_integration(s, s2, nu, z, prec);
+                    else
+                    {
+                        acb_hypgeom_bessel_jy_integration(NULL, s2, nu, z, prec);
+                        if (ok)
+                            acb_set(s, r);
+                    }
+            }
+
+            if (ok ? (acb_is_finite(s) != acb_is_finite(r) || !acb_overlaps(s, r)
+                        || (kind == KIND_JY && (acb_is_finite(s2) != acb_is_finite(r2)
+                            || !acb_overlaps(s2, r2))))
+                   : (acb_is_finite(s) || (kind == KIND_JY && acb_is_finite(s2))))
+            {
+                flint_printf("FAIL: public function\n\n");
+                flint_printf("kind = %d, prec = %wd, ok = %d\n", kind, prec, ok);
+                flint_printf("nu = "); acb_printd(nu, 30); flint_printf("\n");
+                flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+                flint_printf("r = "); acb_printd(r, 30); flint_printf("\n");
+                flint_printf("s = "); acb_printd(s, 30); flint_printf("\n");
+                flint_printf("r2 = "); acb_printd(r2, 30); flint_printf("\n");
+                flint_printf("s2 = "); acb_printd(s2, 30); flint_printf("\n");
+                flint_abort();
+            }
+        }
+
         acb_clear(nu); acb_clear(z); acb_clear(nu0); acb_clear(z0);
         acb_clear(r); acb_clear(r2); acb_clear(s); acb_clear(s2);
+    }
+
+    /* acb_hypgeom_bessel_jy against acb_hypgeom_bessel_j and
+       acb_hypgeom_bessel_y, also for large parameters */
+    for (iter = 0; iter < 400 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t nu, z, j, y, j2, y2;
+        slong prec;
+        int both;
+
+        acb_init(nu); acb_init(z); acb_init(j); acb_init(y); acb_init(j2); acb_init(y2);
+
+        prec = 10 + n_randint(state, 190);
+        rand_exact(nu, state, 4 + (int) n_randint(state, 14));
+        rand_exact(z, state, 4 + (int) n_randint(state, 14));
+        /* of comparable size, where neither the series nor the
+           asymptotic expansions are used */
+        if (n_randint(state, 2))
+        {
+            rand_exact(j, state, 2);
+            acb_mul(z, nu, j, 53);
+            acb_get_mid(z, z);
+        }
+        if (n_randint(state, 3) == 0)
+        {
+            rand_ball(j, nu, state);
+            rand_ball(y, z, state);
+        }
+
+        both = n_randint(state, 4) != 0;
+        acb_hypgeom_bessel_jy(both ? j : NULL, y, nu, z, prec);
+        if (both)
+            acb_hypgeom_bessel_j(j2, nu, z, prec);
+        acb_hypgeom_bessel_y(y2, nu, z, prec);
+
+        if ((both && !acb_overlaps(j, j2)) || !acb_overlaps(y, y2))
+        {
+            flint_printf("FAIL: jy\n\n");
+            flint_printf("prec = %wd, both = %d\n", prec, both);
+            flint_printf("nu = "); acb_printd(nu, 30); flint_printf("\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+            flint_printf("j = "); acb_printd(j, 30); flint_printf("\n");
+            flint_printf("j2 = "); acb_printd(j2, 30); flint_printf("\n");
+            flint_printf("y = "); acb_printd(y, 30); flint_printf("\n");
+            flint_printf("y2 = "); acb_printd(y2, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        acb_clear(nu); acb_clear(z); acb_clear(j); acb_clear(y); acb_clear(j2); acb_clear(y2);
     }
 
     /* Large parameters, where the series are of no use: the Wronskians
@@ -473,6 +580,8 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_integration, state)
 
             acb_init(alpha); acb_init(nu); acb_init(r1); acb_init(r2);
 
+            flint_set_num_threads(1 + n_randint(state, 3));
+
             prec = 20 + n_randint(state, n_randint(state, 20) ? 150 : 1000);
             tol = prec * SD_LN2 + 12.0;
 
@@ -538,6 +647,116 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_integration, state)
             flint_abort();
         }
     }
+
+    /* Wide input balls with large parameters, where chords can need
+       bisection: the enclosure on the balls against the result at a
+       point of the balls. */
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t nu, z, nu0, z0, r, r2, s, s2;
+        slong prec;
+        int kind, scaled, ok, ok0;
+
+        acb_init(nu); acb_init(z); acb_init(nu0); acb_init(z0);
+        acb_init(r); acb_init(r2); acb_init(s); acb_init(s2);
+
+        kind = kinds[n_randint(state, 7)];
+        scaled = (kind == KIND_I || kind == KIND_K) && n_randint(state, 2);
+        prec = 10 + n_randint(state, 250);
+
+        rand_exact(nu, state, 4 + (int) n_randint(state, 30));
+        if (n_randint(state, 2))
+            rand_exact(z, state, 4 + (int) n_randint(state, 30));
+        else
+        {
+            rand_exact(s, state, 2);
+            acb_mul(z, nu, s, 53);
+            acb_get_mid(z, z);
+        }
+
+        rand_ball(nu0, nu, state);
+        rand_ball(z0, z, state);
+
+        /* very wide (the points remain inside) */
+        if (n_randint(state, 2))
+        {
+            mag_t m;
+            mag_init(m);
+            acb_get_mag(m, nu);
+            mag_mul_2exp_si(m, m, -1 - (slong) n_randint(state, 4));
+            acb_add_error_mag(nu, m);
+            acb_get_mag(m, z);
+            mag_mul_2exp_si(m, m, -1 - (slong) n_randint(state, 4));
+            acb_add_error_mag(z, m);
+            mag_clear(m);
+        }
+
+        ok = _acb_hypgeom_bessel_integration(r, r2, kind, nu, z, scaled, prec);
+        ok0 = ok && _acb_hypgeom_bessel_integration(s, s2, kind, nu0, z0, scaled, prec + 20);
+
+        if (ok && ok0 && (!acb_overlaps(r, s) || (kind == KIND_JY && !acb_overlaps(r2, s2))))
+        {
+            flint_printf("FAIL: enclosure (wide balls)\n\n");
+            flint_printf("kind = %d, scaled = %d, prec = %wd\n", kind, scaled, prec);
+            flint_printf("nu = "); acb_printd(nu, 30); flint_printf("\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+            flint_printf("nu0 = "); acb_printd(nu0, 30); flint_printf("\n");
+            flint_printf("z0 = "); acb_printd(z0, 30); flint_printf("\n");
+            flint_printf("r = "); acb_printd(r, 30); flint_printf("\n");
+            flint_printf("s = "); acb_printd(s, 30); flint_printf("\n");
+            flint_printf("r2 = "); acb_printd(r2, 30); flint_printf("\n");
+            flint_printf("s2 = "); acb_printd(s2, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        acb_clear(nu); acb_clear(z); acb_clear(nu0); acb_clear(z0);
+        acb_clear(r); acb_clear(r2); acb_clear(s); acb_clear(s2);
+    }
+
+    /* Real parameters too large for the contours (2^44 and beyond),
+       where I and K fall back on the real-variable integrals:
+       I_nu K_{nu+1} + I_{nu+1} K_nu = 1/z. */
+    for (iter = 0; iter < 20 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t nu, nu1, z, i0, i1, k0, k1, w;
+        slong prec = 40 + n_randint(state, 100);
+
+        acb_init(nu); acb_init(nu1); acb_init(z);
+        acb_init(i0); acb_init(i1); acb_init(k0); acb_init(k1); acb_init(w);
+
+        acb_set_d(nu, ldexp(1.0 + n_randint(state, 1000) / 1000.0, 45 + (int) n_randint(state, 5)));
+        acb_set_d(z, ldexp(1.0 + n_randint(state, 1000) / 1000.0, 45 + (int) n_randint(state, 5)));
+        acb_add_ui(nu1, nu, 1, 200);
+
+        acb_hypgeom_bessel_i(i0, nu, z, prec);
+        acb_hypgeom_bessel_i(i1, nu1, z, prec);
+        acb_hypgeom_bessel_k(k0, nu, z, prec);
+        acb_hypgeom_bessel_k(k1, nu1, z, prec);
+
+        acb_mul(w, i0, k1, prec);
+        acb_addmul(w, i1, k0, prec);
+        acb_mul(w, w, z, prec);
+        acb_sub_ui(w, w, 1, prec);
+
+        if (!acb_contains_zero(w))
+        {
+            flint_printf("FAIL: Wronskian (beyond the contours)\n\n");
+            flint_printf("prec = %wd\n", prec);
+            flint_printf("nu = "); acb_printd(nu, 30); flint_printf("\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n");
+            flint_printf("i0 = "); acb_printd(i0, 30); flint_printf("\n");
+            flint_printf("i1 = "); acb_printd(i1, 30); flint_printf("\n");
+            flint_printf("k0 = "); acb_printd(k0, 30); flint_printf("\n");
+            flint_printf("k1 = "); acb_printd(k1, 30); flint_printf("\n");
+            flint_printf("w = "); acb_printd(w, 30); flint_printf("\n");
+            flint_abort();
+        }
+
+        acb_clear(nu); acb_clear(nu1); acb_clear(z);
+        acb_clear(i0); acb_clear(i1); acb_clear(k0); acb_clear(k1); acb_clear(w);
+    }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

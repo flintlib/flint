@@ -20,12 +20,16 @@ derivatives that are tight in all parameter regimes.
 
 The method has three layers: a contour is *planned* heuristically in
 double precision; *bounds* for the integral of the absolute value of
-the integrand along the planned contour are computed rigorously, still
-in double precision; and the integral is *evaluated* by Gauss–Legendre
-quadrature with certified error bounds, in multi-double or
-arbitrary-precision ball arithmetic. Since the integrand is entire,
-correctness never depends on the quality of the contour, only the
-accuracy and the speed. When the parameters are large, the quadrature
+the integrand along parts of the planned contour are computed
+rigorously, in `arb` and `mag` arithmetic; and the integral is
+*evaluated* by Gauss–Legendre quadrature with certified error bounds,
+in multi-double or arbitrary-precision ball arithmetic. Since the
+integrand is entire, correctness never depends on the quality of the
+contour, only the accuracy and the speed: everything computed in
+double precision (the contour, the choice of quadrature rules,
+tolerances and working precisions) is a choice among valid
+alternatives, and every term of the error bound is computed in ball
+arithmetic for the choice made. When the parameters are large, the quadrature
 can be replaced by a *saddle-point expansion* of the integral along
 the same contour ([](#expansions)), which is cheaper, especially at
 high precision.
@@ -279,8 +283,12 @@ continues along a ray.
   c - r_\alpha) e^{x_e}$ and $a = \max(-\operatorname{Re}(\beta
   e^{-w_e}), 0) + \max(-\operatorname{Re} \nu, 0) + r_\nu$. If $K > 0$,
   the tail is at most $e^{G + K} \int_1^\infty e^{-K u} u^{a - 1} du$, an
-  incomplete gamma function which is bounded in closed form. The valley
-  index $k$ is read off from $y_e$.
+  incomplete gamma function which is bounded in closed form: by $1/K$
+  if $a \le 1$, by $1 / (K - a + 1)$ if $1 < a < K + 1$ (since $u^{b}
+  \le e^{b (u - 1)}$), and otherwise by $(2/K) (2b/K)^{b} e^{K/2 - b}$
+  with $b = a - 1$. The ray stays in the valley with the index $k$
+  nearest to $(y_e + \arg \alpha - \pi) / (2 \pi)$, which is checked
+  against the valley required.
 - *Into $V^{-}(k)$*: the same, by the symmetry $\varphi(-w; \alpha,
   \beta, \nu) = \varphi(w; \beta, \alpha, -\nu)$.
 - *Into the linear valley*, along $w_e + t e^{i \theta}$ with $\mu =
@@ -296,14 +304,26 @@ continues along a ray.
 The weights $g$ are carried along: they are at most $g(w_e) u$ on a
 horizontal ray, and $|w| \le |w_e| + t$ on any ray.
 
-**Rounding.** All of this is evaluated in double precision. Only
-$O(1)$ absolute accuracy of $\operatorname{Re} \varphi$ matters, and
-an explicit margin $16 \epsilon (|\alpha| e^{x} + |\beta| e^{-x} +
-|\nu| |w| + 1)$ is added to every exponent, with the radii of the
-input balls enlarged to cover the rounding of the midpoints to
-doubles. This requires $|\alpha|, |\nu| < 2^{44}$. The bounds cost a
-few hundred evaluations of `exp`, `sin` and `cos`: some tens of
-microseconds.
+**Arithmetic.** The bounds are needed in two roles. While the contour
+is planned, and to set the tolerances of the quadrature, they are
+*estimated* in double precision with the functions of the C library,
+with the radii of the input balls as above; nothing depends on the
+accuracy of these estimates except the quality of the contour (this
+requires $|\alpha|, |\nu| < 2^{44}$). Where a bound enters the radius
+of a result or is returned to the user, it is *computed* in ball
+arithmetic (`sd_bound.c`): $\varphi$ and its derivatives are evaluated
+in `acb` arithmetic at 128 bits with the input balls themselves as
+parameters, which takes care of the suprema over the balls, of
+rounding, and of the cancellation between the terms of $\varphi$
+(of magnitude up to $2^{44} e^{|x|}$) and the reference value; the
+bounds for the vertices, which are doubles, and the sums are exact
+`arf` numbers and `mag` upper bounds. Such an evaluation costs 2 to 3
+microseconds. Three bounds are computed this way: for the integrand on
+a disk ([](#quadrature)), for the weighted integrals over a segment
+(as for a panel above; the endpoints can be balls), and for the tails.
+The rigorous $L^1$ norms of a whole contour, with all its panels, are
+only needed for the derivative bounds used with inexact input
+([](#choice)).
 
 ## Quadrature {#quadrature}
 
@@ -338,8 +358,9 @@ $$
 \operatorname{Re}(\varphi(m + u) - \varphi(m)) \le |\varphi'(m)| R +
 |\varphi''(m)| (\cosh R - 1) + |\varphi'''(m)| (\sinh R - R),
 $$
-to which $r_\alpha e^{x + R} + r_\beta e^{-x + R} + r_\nu (|m| + R)$
-is added for the input balls ([](#thm-l1)).
+where the derivatives are evaluated on the input balls (in the double
+precision estimate, $r_\alpha e^{x + R} + r_\beta e^{-x + R} + r_\nu
+(|m| + R)$ is added instead, as in [](#thm-l1)).
 
 **Chords.** The vertices of the planned polygon are doubles, and the
 rule is applied on *chords* joining two of them. For a chord, the
@@ -351,10 +372,17 @@ close to the chord). The rules are those with $n = 1, 2, 4, 6, 8, 12,
 16, 22, 32, \ldots$ nodes, in steps of about $2^{1/2}$ up to about
 $p/2$ nodes at $p$ bits, from the
 cache of `acb_calc_integrate` (which is shared; a conversion to
-double-based balls is cached in addition). Panels on
-which the bound of [](#bounds) is below the tolerance are not
-integrated; their bound is added to the radius. A panel on which no
-rule is certified is bisected.
+double-based balls is cached in addition). All of this is decided
+from double precision estimates of the bound of [](#thm-gl). For the
+chord, $n$ and $X$ chosen, the bound is then computed rigorously, with
+$M$ from the identity below evaluated in ball arithmetic at the
+midpoint of the chord, and added to the radius. The outer parts of
+each polygon, where the integrand is estimated to be below the
+tolerance, are not integrated: the rigorous bounds for their panels
+(merged into longer segments where the bound allows) and for the
+tails are added to the radius. If no rule is found for a panel, the
+integration fails; this only happens for input balls so wide that the
+result would have no accuracy.
 
 **Starting point.** For the incomplete gamma functions, the contour
 starts at the double approximation of the midpoint of
@@ -383,8 +411,10 @@ rule on a chord:
   several threads are available (`flint_set_num_threads`).
 
 **Tapering.** A node where $|e^{\varphi - c}| = 2^{-k}$ only needs to
-be evaluated with $k$ bits less for the same absolute error. With
-`arb` arithmetic the precision is chosen per node from a double
+be evaluated with $k$ bits less for the same absolute error (but not
+with fewer bits than the cancellation at the node takes, plus a few,
+or the error of the exponent would be amplified by the exponential).
+With `arb` arithmetic the precision is chosen per node from a double
 precision estimate of $\operatorname{Re}(\varphi - c)$; with `dfloat`,
 $N$ is chosen per chord. Since the integrand decays like a Gaussian
 along the contour, this saves about a third of the work at high
@@ -482,7 +512,11 @@ incomplete gamma functions, where the contour starts at a finite
 point). As for the quadrature, the tolerance is relative to the
 $L^1$ norm of the integrand on the whole contour, so that the
 expansion at a subdominant saddle needs fewer terms, and a piece
-below the tolerance is only bounded. The expansions replace the
+estimated to be below the tolerance is left to the quadrature. The
+parameters $r$, $n$ and $\tau_0$ are chosen in double precision; the
+error bound is then computed in `arb` and `mag` arithmetic from the
+enclosures of $A$, $c$ and $w_s$, with the rest of the path bounded by
+the segment and tail bounds of [](#bounds). The expansions replace the
 quadrature when their estimated cost (from $n$ and the precision) is
 lower; otherwise the contour is integrated as before. With the
 expansions, the Bessel functions of exact arguments $|\nu|, |z|
@@ -599,7 +633,8 @@ where the function is much smaller than its two saddle contributions.
   `acb_hypgeom_gamma_upper_nointegration`,
   `acb_hypgeom_gamma_lower_nointegration`.
 - The implementation is in `src/acb_hypgeom/sd_plan.c` (contours and
-  bounds), `sd_integrate.c` (quadrature), `sd_expand.c` (saddle-point
+  estimates, in double precision), `sd_bound.c` (the rigorous bounds),
+  `sd_integrate.c` (quadrature), `sd_expand.c` (saddle-point
   expansions), `bessel_integration.c` and
   `gamma_incomplete_integration.c` (the two families), with the
   dispatchers in `bessel.c` and `gamma_incomplete.c`.

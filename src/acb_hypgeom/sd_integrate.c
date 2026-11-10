@@ -31,16 +31,26 @@
         Re(phi(m+u) - phi(m)) <= |phi'(m)| R + |phi''(m)| (cosh R - 1)
                                  + |phi'''(m)| (sinh R - R),
 
-    plus r_alpha e^(x+R) + r_beta e^(-x+R) + r_nu (|m| + R) for the input
-    balls.  The number of nodes and X are chosen per chord for the
-    target error, and the panels of the planned polygon are merged into
-    longer chords while this does not increase the estimated number of
-    nodes.  Panels on which the integrand is below the tolerance are
-    bounded (by the majorants of the planner) instead of integrated, as
-    are the tails beyond the polygons.  The input balls are used directly
-    in the ball evaluation, so the result encloses the integral on the
-    whole input balls; the tolerance is relaxed to what the input balls
-    permit.
+    for all parameters in the input balls when phi and its derivatives
+    are evaluated on the balls.
+
+    What is rigorous and what is not.  The polygons, the choice of the
+    chords, of the number of nodes and of X for each chord, the
+    tolerances and the working precisions are heuristic: they are
+    chosen in double precision from estimates (here and in sd_plan.c)
+    so that the errors come out below the target, and the panels of the
+    planned polygon are merged into longer chords while this does not
+    increase the estimated number of nodes.  The result is then an
+    enclosure whatever these choices are, because every term of its
+    radius is computed rigorously for the choices made: the values of
+    the rules in ball arithmetic with the input balls as parameters (so
+    that the result encloses the integral on the whole input balls),
+    the errors of the rules from the bound above with M computed by
+    _sd_bound_disk, and the parts of the polygons where the integrand is
+    estimated to be below the tolerance and the tails beyond the
+    polygons, which are not integrated, by _sd_bound_segment and
+    _sd_bound_tail (sd_bound.c, in arb and mag arithmetic).  The
+    tolerance is relaxed to what the input balls permit.
 
     A finite starting point (a ball) is joined to its double
     approximation, the first vertex of the contour, by one more chord
@@ -53,7 +63,8 @@
     |nu| |w|, leaves prec bits), and in acb arithmetic at any precision.
     In both, the precision is lowered where the integrand is small: a
     node where |exp(phi - c)| is 2^(-k) needs k bits less (per chord
-    with dfloat, per node with acb).
+    with dfloat, per node with acb), but not below what the cancellation
+    at the node requires for the exponent to be accurate.
 */
 
 #include "thread_support.h"
@@ -197,6 +208,11 @@ typedef struct
     int sym;
     int N;                   /* the largest dfloat precision, or 0 for acb */
     double bits;             /* prec and guard bits, plus the cancellation */
+    double cabs;             /* |c| of the reference value */
+    double lref;             /* the level of Re(phi - c) below which the
+                                precision is lowered: that of the largest
+                                reference value, relative to the one of
+                                the piece */
     slong wp;                /* working precision for acb arithmetic */
     int imax;                /* the largest rule */
     slong budget;            /* of nodes */
@@ -206,22 +222,23 @@ typedef struct
 }
 sdq_ctx;
 
-/* The smallest rule (its index, or -1) with a certified error below
-   exp(logtol) on any chord with half-length at most ah whose
-   Bernstein ellipses with parameter X are contained in the disks
-   |w - m| <= ah X + r0, and the log of that error bound: the supremum
-   of |exp(phi(w) - c)| (Re c = top) over the disk and the input balls
-   is bounded as in the header comment, with a rounding margin.  Also
-   sets *nreq to the number of nodes required if it could be any real
-   number. */
+/* Heuristic (in double precision; the error bound of the rule chosen
+   is computed rigorously by sdq_gl_error).  The smallest rule (its
+   index, or -1) whose error is estimated to be below exp(logtol) on any
+   chord with half-length at most ah whose Bernstein ellipses with
+   parameter X are contained in the disks |w - m| <= ah X + r0, with the
+   best X, which is returned in *Xbest: the supremum of
+   |exp(phi(w) - c)| (Re c = top) over the disk and the input balls is
+   estimated as in the header comment.  Also sets *nreq to the number
+   of nodes required if it could be any real number. */
 static int
-sdq_choose(double * logerr, double * nreq, const sdq_ctx * ctx, cd m, double ah, double r0, double top, double logtol)
+sdq_choose(double * Xbest, double * nreq, const sdq_ctx * ctx, cd m, double ah, double r0, double top, double logtol)
 {
     static const double Xs[] = { 2.0, 3.0, 4.0, 6.0, 8.0, 12.0, 24.0,
         1e2, 1e3, 1e4, 1e6, 1e8, 1e10, 1e12 };
     const sd_problem * P = ctx->P;
     cd phi, d1, d2;
-    double am = cd_abs(m), A, B, D, base, bestn = INFINITY, bestneed = 0.0, bestlrho = 1.0;
+    double am = cd_abs(m), A, B, D, base, bestn = INFINITY;
     int ix, i;
 
     _sd_phi(&phi, &d1, &d2, P, m);
@@ -255,8 +272,7 @@ sdq_choose(double * logerr, double * nreq, const sdq_ctx * ctx, cd m, double ah,
         if (!(n < bestn))
             break;
         bestn = n;
-        bestneed = need;
-        bestlrho = lrho;
+        *Xbest = X;
     }
 
     *nreq = fmax(bestn, 1.0);
@@ -267,15 +283,71 @@ sdq_choose(double * logerr, double * nreq, const sdq_ctx * ctx, cd m, double ah,
     if (i > ctx->imax)
         return -1;
 
-    *logerr = bestneed - (2 * sdq_steps[i] - 1) * bestlrho + logtol;
     return i;
 }
 
 static int
-sdq_choose_chord(double * logerr, double * nreq, const sdq_ctx * ctx, cd a, cd b, double top, double logtol)
+sdq_choose_chord(double * Xbest, double * nreq, const sdq_ctx * ctx, cd a, cd b, double top, double logtol)
 {
-    return sdq_choose(logerr, nreq, ctx, cd_scale(cd_add(a, b), 0.5),
+    return sdq_choose(Xbest, nreq, ctx, cd_scale(cd_add(a, b), 0.5),
         0.5 * cd_abs(cd_sub(b, a)), 0.0, top, logtol);
+}
+
+/* Rigorous.  err = a bound for the error of the n-point Gauss-Legendre
+   rule for the integral of exp(phi(w) - c) over any chord with
+   half-length at most ah whose midpoint is within r0 of m (a ball),
+   for all parameters in the balls:
+
+       (64 / 15) M ah / ((rho - 1) rho^(2 n - 1)),   rho = X + sqrt(X^2 - 1),
+
+   where M bounds the integrand on the disk |w - m| <= ah X + r0, which
+   contains the Bernstein ellipses with parameter rho of these chords
+   (X > 1 is an exact number). */
+static void
+sdq_gl_error(mag_t err, const sdq_ctx * ctx, const acb_t c, const acb_t m,
+    const mag_t ah, const mag_t r0, double X, slong n)
+{
+    arb_t rho, t;
+    mag_t R, M;
+
+    arb_init(rho);
+    arb_init(t);
+    mag_init(R);
+    mag_init(M);
+
+    if (!(X > 1.0) || !(X < 1e300))
+    {
+        mag_inf(err);
+    }
+    else
+    {
+        /* R = ah X + r0 */
+        mag_set_d(R, X);
+        mag_mul(R, R, ah);
+        mag_add(R, R, r0);
+        _sd_bound_disk(M, ctx->alpha, ctx->sym, ctx->nu, m, R, c);
+
+        /* (rho - 1) rho^(2 n - 1) */
+        arb_set_d(rho, X);
+        arb_mul(t, rho, rho, 64);
+        arb_sub_ui(t, t, 1, 64);
+        arb_sqrt(t, t, 64);
+        arb_add(rho, rho, t, 64);
+        arb_pow_ui(t, rho, 2 * n - 1, 64);
+        arb_sub_ui(rho, rho, 1, 64);
+        arb_mul(t, t, rho, 64);
+        arb_ui_div(t, 64, t, 64);
+        arb_div_ui(t, t, 15, 64);
+
+        arb_get_mag(err, t);
+        mag_mul(err, err, M);
+        mag_mul(err, err, ah);
+    }
+
+    arb_clear(rho);
+    arb_clear(t);
+    mag_clear(R);
+    mag_clear(M);
 }
 
 /* distance from p to the segment [a, b] */
@@ -316,13 +388,31 @@ typedef struct
 }
 sdq_acb_work;
 
+/* The number of bits lost to cancellation in phi(w) - c at w, plus 10:
+   the smallest precision at which the exponent is accurate enough for
+   the exponential not to inflate its error.  (Where the integrand is
+   small, the precision is lowered by its size; far out in the valleys
+   the terms of phi are larger than where the integrand is not
+   negligible, which is what the working precision allows for.) */
+static double
+sdq_min_bits(const sdq_ctx * ctx, cd w)
+{
+    const sd_problem * P = ctx->P;
+    double sz = P->aal * exp(w.re) + ((P->abe != 0.0) ? P->abe * exp(-w.re) : 0.0)
+        + P->anu * cd_abs(w) + ctx->cabs + 2.0;
+
+    if (!(sz < 1e300))
+        return 1100.0;
+    return log2(sz) + 10.0;
+}
+
 /* t = the term of the node k; w, e are temporaries */
 static void
 sdq_node_acb(acb_t t, const sdq_acb_work * W, slong k, acb_t w, acb_t e, arb_ptr r)
 {
     const sdq_ctx * ctx = W->ctx;
     slong n = W->n, kk, p;
-    cd phi, d1, d2;
+    cd phi, d1, d2, wd;
     double xd;
     arb_ptr sh = r, ch = r + 1, sn = r + 2, cs = r + 3;
 
@@ -331,9 +421,11 @@ sdq_node_acb(acb_t t, const sdq_acb_work * W, slong k, acb_t w, acb_t e, arb_ptr
     if (2 * k >= n)
         xd = -xd;
 
-    _sd_phi(&phi, &d1, &d2, ctx->P, cd_add(W->md, cd_scale(W->hd, xd)));
-    p = W->wp + (slong) fmin((phi.re - W->c.re) / SD_LN2 + 2.0, 0.0);
+    wd = cd_add(W->md, cd_scale(W->hd, xd));
+    _sd_phi(&phi, &d1, &d2, ctx->P, wd);
+    p = W->wp + (slong) fmin((phi.re - W->c.re - ctx->lref) / SD_LN2 + 2.0, 0.0);
     p = FLINT_MAX(p, 32);
+    p = FLINT_MAX(p, (slong) sdq_min_bits(ctx, wd));
 
     /* w = m +- h x (the cached nodes can have a higher precision) */
     arb_set_round(sh, W->x + kk, p);
@@ -470,7 +562,8 @@ sdq_chord(acb_t res, sdq_ctx * ctx, cd c, cd a, cd b, int gi, double lmax)
         return;
     }
 
-    N = (int) ceil((ctx->bits + fmin(lmax + 1.0, 0.0) / SD_LN2) / 53.0);
+    N = (int) ceil(fmax(ctx->bits + fmin(lmax - ctx->lref + 1.0, 0.0) / SD_LN2,
+            fmax(sdq_min_bits(ctx, a), sdq_min_bits(ctx, b))) / 53.0);
     N = FLINT_MAX(N, 1);
     N = FLINT_MIN(N, ctx->N);
 
@@ -491,107 +584,86 @@ sdq_chord(acb_t res, sdq_ctx * ctx, cd c, cd a, cd b, int gi, double lmax)
 }
 
 /* the chord from the starting point (a ball) to its approximation, the
-   first vertex of the contour; the ellipses of all the chords from
-   points of the ball are contained in disks around the vertex */
+   first vertex of the contour; the midpoints of all the chords from
+   points of the ball are within their half-length of the vertex */
 static int
 sdq_start_chord(acb_t res, sdq_ctx * ctx, cd c, double logtol)
 {
     const sd_problem * P = ctx->P;
-    double ah = 0.5 * P->start_rad, logerr, nreq;
-    acb_t b;
-    mag_t err;
-    int gi;
+    double X, nreq;
+    acb_t b, cc;
+    mag_t err, ah;
+    int gi, ok = 0;
 
     acb_zero(res);
-    if (ah == 0.0)
-        return 1;
-
-    gi = sdq_choose(&logerr, &nreq, ctx, P->start, ah, ah, c.re, logtol);
-    if (gi < 0)
-        return 0;
 
     acb_init(b);
+    acb_init(cc);
     mag_init(err);
+    mag_init(ah);
+
+    /* the largest half-length */
     acb_set_cd(b, P->start);
-    sdq_chord_acb(res, ctx, c, ctx->start, b, P->start, P->start, gi);
-    _sd_mag_set_exp_d(err, logerr);
-    acb_add_error_mag(res, err);
+    acb_sub(cc, ctx->start, b, 64);
+    acb_get_mag(ah, cc);
+    mag_mul_2exp_si(ah, ah, -1);
+
+    if (mag_is_zero(ah))
+    {
+        ok = 1;
+    }
+    else if (mag_is_finite(ah))
+    {
+        double ahd = mag_get_d(ah);
+
+        gi = sdq_choose(&X, &nreq, ctx, P->start, ahd, ahd, c.re, logtol);
+        if (gi >= 0)
+        {
+            sdq_chord_acb(res, ctx, c, ctx->start, b, P->start, P->start, gi);
+            acb_set_cd(cc, c);
+            sdq_gl_error(err, ctx, cc, b, ah, ah, X, sdq_steps[gi]);
+            acb_add_error_mag(res, err);
+            ok = 1;
+        }
+    }
+
     acb_clear(b);
+    acb_clear(cc);
     mag_clear(err);
-    return 1;
-}
-
-/* add to res the integral over the segment [a, b], bisecting it until
-   each part is negligible or a rule is found */
-static int
-sdq_bisect(acb_t res, sdq_ctx * ctx, cd c, cd a, cd b, double logtol, int depth)
-{
-    double g[2], mb, logerr, nreq;
-    mag_t err;
-    int gi, ok = 1;
-
-    mag_init(err);
-    mb = _sd_panel(g, ctx->P, a, b, c.re);
-
-    if (mb <= logtol)
-    {
-        _sd_mag_set_exp_d(err, mb);
-        acb_add_error_mag(res, err);
-    }
-    else if ((gi = sdq_choose_chord(&logerr, &nreq, ctx, a, b, c.re, logtol)) >= 0
-        && (ctx->budget -= sdq_steps[gi]) >= 0)
-    {
-        cd phi, d1, d2;
-        acb_t t;
-
-        acb_init(t);
-        _sd_phi(&phi, &d1, &d2, ctx->P, a);
-        sdq_chord(t, ctx, c, a, b, gi, phi.re - c.re + 0.5 * cd_abs(d1) * cd_abs(cd_sub(b, a)));
-        _sd_mag_set_exp_d(err, logerr);
-        acb_add_error_mag(t, err);
-        acb_add(res, res, t, ctx->wp);
-        acb_clear(t);
-    }
-    else if (depth > 0 && ctx->budget >= 0)
-    {
-        cd m = cd_scale(cd_add(a, b), 0.5);
-        ok = sdq_bisect(res, ctx, c, a, m, logtol - SD_LN2, depth - 1)
-          && sdq_bisect(res, ctx, c, m, b, logtol - SD_LN2, depth - 1);
-    }
-    else
-        ok = 0;
-
-    mag_clear(err);
+    mag_clear(ah);
     return ok;
 }
 
 /* The quadrature along a piece: res (relative to exp(c)) with the tails
-   and quadrature errors as radius; returns 0 if a chord cannot be
-   resolved. */
+   and quadrature errors as radius; returns 0 if a tail is not certified
+   or no rule is found for a chord.  The vertices where the tails begin
+   and the chords are chosen heuristically; the bounds for the tails and
+   for the errors of the rules are rigorous. */
 static int
 sdq_piece_integrate(acb_t res, sdq_ctx * ctx, const sd_piece * pc, double logtol, double cutoff)
 {
     const sd_problem * P = ctx->P;
     const cd * pts = pc->pts;
-    int npts = pc->npts, i, j, gi, gj, k, ok = 1;
-    double * rephi, * mb, logerr, logerr2, nreq, nreq2, g[2], top = pc->c.re;
-    mag_t err;
-    acb_t t;
+    int npts = pc->npts, i, j, gi, gj, k, ok = 1, i0, i1;
+    double * rephi, * mb, X, X2, nreq, nreq2, g[2], top = pc->c.re, sum;
+    mag_t err, ah, zero;
+    acb_t t, c, m;
 
     acb_zero(res);
     mag_init(err);
+    mag_init(ah);
+    mag_init(zero);
     acb_init(t);
+    acb_init(c);
+    acb_init(m);
 
-    for (k = 0; k < 2; k++)
-    {
-        _sd_mag_set_exp_d(err, pc->logtail[k]);
-        acb_add_error_mag(res, err);
-    }
+    acb_set_cd(c, pc->c);
 
     rephi = flint_malloc(sizeof(double) * 2 * (npts + 1));
     mb = rephi + npts + 1;
 
-    /* the integrand at the vertices, and the majorants of the panels */
+    /* estimates of the integrand at the vertices and of the integrals
+       over the panels */
     for (i = 0; i < npts; i++)
     {
         cd phi, d1, d2;
@@ -601,38 +673,58 @@ sdq_piece_integrate(acb_t res, sdq_ctx * ctx, const sd_piece * pc, double logtol
             mb[i] = _sd_panel(g, P, pts[i], pts[i + 1], top);
     }
 
+    /* The ends: the polygon is integrated between the outermost
+       vertices i0 and i1 beyond which the integral is estimated to be
+       below the tolerance; the rest, with the tails into the valleys,
+       is bounded. */
+    i0 = 0;
+    i1 = npts - 1;
+    /* (logtail is -inf at an end which is not in a valley) */
+    sum = pc->logtail[0];
+    while (i0 + 1 < npts && _sd_logaddexp(sum, mb[i0]) <= logtol)
+        sum = _sd_logaddexp(sum, mb[i0++]);
+    sum = pc->logtail[1];
+    while (i1 > i0 && _sd_logaddexp(sum, mb[i1 - 1]) <= logtol)
+        sum = _sd_logaddexp(sum, mb[--i1]);
+    for (k = 0; k < 2 && ok; k++)
+    {
+        ok = _sd_bound_end(err, ctx->alpha, ctx->sym, ctx->nu, pc, c, k ? i1 : i0, k, P->lin_dir, P, logtol - 2.0);
+        acb_add_error_mag(res, err);
+    }
+
     /* greedy chords [i, j] */
-    i = 0;
-    while (i < npts - 1 && ok)
+    i = i0;
+    while (i < i1 && ok)
     {
         double lmax;
 
-        /* panels below the tolerance are bounded, not integrated */
+        j = i + 1;
+
+        /* a panel estimated to be below the tolerance is bounded, not
+           integrated */
         if (mb[i] <= logtol)
         {
-            double sum = mb[i];
-            j = i + 1;
-            while (j + 1 < npts && _sd_logaddexp(sum, mb[j]) <= logtol)
-                sum = _sd_logaddexp(sum, mb[j++]);
-            _sd_mag_set_exp_d(err, sum);
+            acb_set_cd(m, pts[i]);
+            acb_set_cd(t, pts[j]);
+            _sd_bound_segment(err, 1, ctx->alpha, ctx->sym, ctx->nu, m, t, c);
             acb_add_error_mag(res, err);
             i = j;
             continue;
         }
 
-        j = i + 1;
-        gi = sdq_choose_chord(&logerr, &nreq, ctx, pts[i], pts[j], top, logtol);
+        gi = sdq_choose_chord(&X, &nreq, ctx, pts[i], pts[j], top, logtol);
         if (gi < 0)
         {
-            /* a long panel */
-            ok = sdq_bisect(res, ctx, pc->c, pts[i], pts[j], logtol, 20);
-            i = j;
-            continue;
+            /* No rule is found for this panel.  This only happens
+               for input balls so wide that the result would have no
+               accuracy; the integration fails. */
+            ok = 0;
+            break;
         }
 
         /* extend the chord over the following panels while this lowers
            its number of nodes per panel */
-        while (j + 1 < npts && mb[j] > logtol)
+        while (j < i1 && mb[j] > logtol)
         {
             /* the vertices between must stay close to the chord where
                the integrand is not negligible */
@@ -643,13 +735,13 @@ sdq_piece_integrate(acb_t res, sdq_ctx * ctx, const sd_piece * pc, double logtol
             if (k <= j)
                 break;
 
-            gj = sdq_choose_chord(&logerr2, &nreq2, ctx, pts[i], pts[j + 1], top, logtol);
+            gj = sdq_choose_chord(&X2, &nreq2, ctx, pts[i], pts[j + 1], top, logtol);
             if (gj < 0 || nreq2 * (j - i) > nreq * (j + 1 - i))
                 break;
 
             j++;
             gi = gj;
-            logerr = logerr2;
+            X = X2;
             nreq = nreq2;
         }
 
@@ -665,7 +757,21 @@ sdq_piece_integrate(acb_t res, sdq_ctx * ctx, const sd_piece * pc, double logtol
             lmax = fmax(lmax, rephi[k]);
 
         sdq_chord(t, ctx, pc->c, pts[i], pts[j], gi, lmax);
-        _sd_mag_set_exp_d(err, logerr);
+
+        /* the error of the rule: the midpoint and the half-length of
+           the chord between two doubles */
+        acb_set_cd(m, pts[i]);
+        {
+            acb_t b;
+            acb_init(b);
+            acb_set_cd(b, pts[j]);
+            acb_sub(b, b, m, 128);
+            acb_mul_2exp_si(b, b, -1);
+            acb_get_mag(ah, b);
+            acb_add(m, m, b, 128);
+            acb_clear(b);
+        }
+        sdq_gl_error(err, ctx, c, m, ah, zero, X, sdq_steps[gi]);
         acb_add_error_mag(t, err);
         acb_add(res, res, t, ctx->wp);
 
@@ -674,7 +780,11 @@ sdq_piece_integrate(acb_t res, sdq_ctx * ctx, const sd_piece * pc, double logtol
 
     flint_free(rephi);
     mag_clear(err);
+    mag_clear(ah);
+    mag_clear(zero);
     acb_clear(t);
+    acb_clear(c);
+    acb_clear(m);
     return ok;
 }
 
@@ -695,6 +805,13 @@ sdq_log_rad(const acb_t x)
 int
 _sd_integrate(acb_t res, const sd_contour * C, const sd_problem * P,
     const acb_t alpha, int sym, const acb_t nu, const acb_t start, slong prec)
+{
+    return _sd_integrate_pieces(res, C, P, alpha, sym, nu, start, prec, NULL);
+}
+
+int
+_sd_integrate_pieces(acb_t res, const sd_contour * C, const sd_problem * P,
+    const acb_t alpha, int sym, const acb_t nu, const acb_t start, slong prec, const char * sel)
 {
     sdq_ctx ctx;
     cd cref;
@@ -755,7 +872,11 @@ _sd_integrate(acb_t res, const sd_contour * C, const sd_problem * P,
     ctx.nu = nu;
     ctx.start = start;
     ctx.sym = sym;
-    ctx.bits = qprec + SDQ_GUARD + log2(mag);
+    /* The errors are to be small compared to the integral, which is
+       about exp(logL): narrower than exp(Re c_ref) by the width of the
+       saddle. */
+    ctx.bits = qprec + SDQ_GUARD + log2(mag) + fmax((cref.re - logL) / SD_LN2, 0.0);
+    ctx.cabs = cd_abs(cref);
     ctx.wp = (slong) ctx.bits + 8;
     ctx.par_set[0] = ctx.par_set[1] = ctx.par_set[2] = ctx.par_set[3] = 0;
     ctx.budget = 4000 + 40 * (slong) qprec;
@@ -788,6 +909,11 @@ _sd_integrate(acb_t res, const sd_contour * C, const sd_problem * P,
         /* the tolerance for this piece, relative to exp(Re c) */
         double logtol = logL - (qprec + 12.0) * SD_LN2 - pc->c.re;
 
+        if (sel != NULL && !sel[i])
+            continue;
+
+        ctx.lref = cref.re - pc->c.re;
+
         ok = sdq_piece_integrate(t, &ctx, pc, logtol, cutoff);
 
         if (ok && i == 0 && start != NULL)
@@ -819,6 +945,14 @@ _sd_integrate(acb_t res, const sd_contour * C, const sd_problem * P,
         acb_mul_onei(c, c);
         acb_mul_si(c, c, (P->lin_dir.im > 0.0) ? -2 : 2, ctx.wp);
         acb_exp(c, c, ctx.wp);
+        /* (the geometric series must converge: |q| < 1) */
+        {
+            mag_t qm;
+            mag_init(qm);
+            acb_get_mag(qm, c);
+            ok = mag_cmp_2exp_si(qm, 0) < 0;
+            mag_clear(qm);
+        }
         acb_sub_ui(c, c, 1, ctx.wp);
         acb_neg(c, c);
         acb_div(gsum, gsum, c, ctx.wp);

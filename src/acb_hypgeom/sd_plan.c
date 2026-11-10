@@ -11,48 +11,53 @@
 */
 
 /*
-    Steepest-descent contours with rigorous L1 bounds for integrals of
-    exp(phi(w)),
+    Steepest-descent contours for integrals of exp(phi(w)),
 
         phi(w) = alpha e^w + beta e^(-w) - nu w,
 
     between two valleys at infinity, or from a finite starting point to
-    a valley.  Since the integrand is entire, any path between the two
-    ends gives the same integral, so the L1 norms
+    a valley.
 
-        int g(w) exp(Re phi(w)) |dw|,   g = 1, e^x + e^(-x), |w|
+    EVERYTHING IN THIS FILE IS HEURISTIC.  It is done in double
+    precision with the functions of the C library, without regard to
+    rounding errors, overflow or underflow, and nothing computed here
+    enters an error bound.  Since the integrand is entire, any path
+    between the two ends gives the same integral, so the contour found
+    here only determines how accurate and how expensive the evaluation
+    along it is.  The output consists of exact data: polygons with
+    vertices in double precision, reference values c in double
+    precision, and the kinds of the ends of the polygons (a valley, with
+    its index, or none).  The rigorous part is in sd_bound.c: bounds
+    for the integrand on disks, for its integral over segments, and for
+    the tails along rays from the ends of the polygons into the valleys
+    (where it is also verified that a ray stays in the valley claimed
+    here), all for parameters in the input balls, in arb and mag
+    arithmetic.  The quantities called bounds below (the estimates of
+    the L1 norms logL, logtail and the panel estimates) are the double
+    precision counterparts of those bounds; they are used to decide
+    where a path can end, to choose between routes, and to set the
+    tolerances of the quadrature and of the expansions.
 
-    along any such path bound the integral and its derivatives with
-    respect to the parameters.  Along a steepest-descent path the
-    integrand has constant phase, so the bound is tight for a single
-    saddle, and the integral itself can be evaluated along the path
-    without cancellation (sd_integrate.c).
+    Along a steepest-descent path the integrand has constant phase, so
+    the L1 norm is close to the absolute value of the integral for a
+    single saddle, and the integral can be evaluated along the path
+    without cancellation (sd_integrate.c, sd_expand.c).
 
-    Re phi is linear in the parameters, so its supremum over input
-    balls is Re phi(mid) + r_alpha e^x + r_beta e^(-x) + r_nu |w|.
-
-    The contour is planned in double precision: the saddle points of
-    phi (the zeros of phi', given by a quadratic equation in e^w, with
-    a pair of nearby saddles replaced by a single cubic one), the
-    descent paths from them traced by the midpoint rule (ending in a
-    valley or, on a Stokes line, in a lower saddle), and a search for
-    the cheapest route through the resulting graph.  A finite starting
-    point is treated as a saddle with a single descent path.  The bound
-    is then made rigorous panel by panel: on each straight panel
-    Re phi is majorized by its second-order Taylor polynomial at the
-    panel midpoint plus |h|^3 sup |phi'''| / 6 (|phi'''| <= |alpha| e^x
-    + |beta| e^(-x)), whose exponential integrates in closed form; the
-    tails from the ends of the polygon into the valleys are bounded
-    along rays in closed form.  Where the descent flow does not
-    separate the valleys (flat landscapes: small parameters), a fixed
-    polygon of straight segments is used instead.  Floating-point
-    rounding is covered by an explicit margin in the exponent (the
-    parameters must be below 2^44 or so).  Only absolute O(1) accuracy
-    of Re phi is needed, so this is cheap: some hundred evaluations of
-    the exponential and trigonometric functions in double precision.
-
-    The bounds cannot see cancellation between saddle contributions:
-    for oscillatory functions they bound the envelope.
+    The contour is planned as follows: the saddle points of phi (the
+    zeros of phi', given by a quadratic equation in e^w, with a pair of
+    nearby saddles replaced by a single cubic one), the descent paths
+    from them traced by the midpoint rule (ending in a valley or, on a
+    Stokes line, in a lower saddle), and a search for the cheapest
+    route through the resulting graph.  A finite starting point is
+    treated as a saddle with a single descent path.  On each straight
+    panel, Re phi is majorized by its second-order Taylor polynomial at
+    the panel midpoint plus |h|^3 sup |phi'''| / 6 (|phi'''| <=
+    |alpha| e^x + |beta| e^(-x)), whose exponential integrates in closed
+    form; the tails from the ends of the polygon into the valleys are
+    estimated along rays in closed form.  Where the descent flow does
+    not separate the valleys (flat landscapes: small parameters), a
+    fixed polygon of straight segments is used instead.  The parameters
+    must be below 2^44 or so.
 */
 
 #include "acb.h"
@@ -111,7 +116,8 @@ sd_weight(const sd_problem * P, double xlo, double xhi)
     return exp(xhi) + ((P->abe != 0.0) ? exp(-xlo) : 0.0);
 }
 
-/* rounding margin for Re phi evaluated in double precision at w */
+/* an allowance for the rounding of Re phi evaluated in double
+   precision at w (in the estimates) */
 double
 _sd_margin(const sd_problem * P, cd w)
 {
@@ -142,17 +148,24 @@ sd_centre(const sd_problem * P, sd_end v)
     return 20.0 * P->lin_dir.im;
 }
 
-/* log of int_1^inf exp(-K u) u^a du (an upper bound), K > 0 */
+/* log of int_1^inf exp(-K u) u^a du (an estimate from above), K > 0 */
 static double
 sd_log_gamma_tail(double K, double a)
 {
+    double v;
+
     if (a <= 0.0)
         return -K - log(K);
     /* u^a e^{-Ku/2} <= max(e^{-K/2}, (2a/(eK))^a), times int e^{-Ku/2} */
-    return log(2.0 / K) - 0.5 * K + fmax(-0.5 * K, a * log(2.0 * a / (2.718281828459045 * K)));
+    v = log(2.0 / K) - 0.5 * K + fmax(-0.5 * K, a * log(2.0 * a / (2.718281828459045 * K)));
+    /* u^a <= e^{a(u-1)} */
+    if (a < K)
+        v = fmin(v, -K - log(K - a));
+    return v;
 }
 
-/* Rigorous tail bounds (logarithms, relative to top) along the
+/* Estimates of the tail bounds (logarithms, relative to top; the
+   rigorous counterpart is _sd_bound_tail) along the
    horizontal ray from we to Re w -> +inf, for the three weights;
    returns 0 if the ray is not certifiably downhill.  With w = x + i ye
    and u = e^(x - xe) >= 1,
@@ -247,9 +260,10 @@ sd_tail(double tail[3], const sd_problem * P, cd we, double top, int type, int *
     return sd_tail_linear(tail, P, we, top, k);
 }
 
-/* The panel [wa, wb]: the logarithm of a bound for the integral of
-   exp(Re phi - top) |dw| over the panel and the input balls; g is set
-   to the suprema of the second and third weights on the panel. */
+/* The panel [wa, wb]: an estimate of the logarithm of the bound of
+   _sd_bound_segment for the integral of exp(Re phi - top) |dw| over
+   the panel and the input balls; g is set to the suprema of the second
+   and third weights on the panel. */
 double
 _sd_panel(double g[2], const sd_problem * P, cd wa, cd wb, double top)
 {
@@ -426,7 +440,7 @@ sd_trace(sd_half * H, const sd_problem * P, const sd_work * W, int self, cd dir)
         /* Deep in a valley, the tails along the rays of several
            valleys can be negligible; the path is heading into the one
            whose ray is best aligned with it. */
-        if (drop > P->drop - log(acc[0]) && (step - ntest) >= 4)
+        if (drop > P->drop - log(acc[0]) && (step - ntest) >= 1)
         {
             double tail[3], best = -INFINITY, dot;
             int k;
@@ -602,6 +616,7 @@ typedef struct
     int npts;
     double top;
     double logtail[2][3];
+    sd_end ends[2];          /* of the fixed polygon */
 }
 sd_route;
 
@@ -870,6 +885,8 @@ sd_fixed_build(sd_route * R, const sd_problem * P, const cd * base, int nb,
             R->pts = pts;
             R->npts = n;
             R->top = top;
+            R->ends[0] = ends[0];
+            R->ends[1] = ends[1];
             for (k = 0; k < 3; k++)
                 R->logL[k] = top + _sd_logaddexp(log(acc[k]),
                     _sd_logaddexp(R->logtail[0][k], R->logtail[1][k]));
@@ -966,6 +983,8 @@ sd_contour_add(sd_contour * C, const sd_route * R, const sd_work * W, int sgn, i
         pc->sign = sgn;
         pc->logtail[0] = R->logtail[0][0];
         pc->logtail[1] = R->logtail[1][0];
+        pc->end[0] = R->ends[0];
+        pc->end[1] = R->ends[1];
         pc->mid = -1;
         C->own[C->nown++] = R->pts;
     }
@@ -981,6 +1000,8 @@ sd_contour_add(sd_contour * C, const sd_route * R, const sd_work * W, int sgn, i
         pc->sign = sgn * R->sign[e];
         pc->logtail[0] = -INFINITY;
         pc->logtail[1] = h->logtail[0];
+        pc->end[0] = sd_end_make(0, 0);
+        pc->end[1] = h->label;
         pc->mid = -1;
 
         /* passing through a saddle: join the two half-paths, so that
@@ -1001,6 +1022,8 @@ sd_contour_add(sd_contour * C, const sd_route * R, const sd_work * W, int sgn, i
             pc->sign = sgn;
             pc->logtail[0] = pc->logtail[1];
             pc->logtail[1] = h2->logtail[0];
+            pc->end[0] = pc->end[1];
+            pc->end[1] = h2->label;
             /* (for the saddle-point expansion) */
             if (W->saddles[h->saddle].kind == 2
                 && h->label.type != SD_SADDLE && h2->label.type != SD_SADDLE)
@@ -1121,9 +1144,9 @@ _sd_plan(sd_contour * C, sd_work * W, const sd_problem * P, sd_end vs, sd_end ve
     return 1;
 }
 
-/* res = exp(L), rounded up */
+/* res = exp(L) approximately (for tolerances and estimates only) */
 void
-_sd_mag_set_exp_d(mag_t res, double L)
+_sd_mag_approx_exp_d(mag_t res, double L)
 {
     double e;
 

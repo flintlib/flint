@@ -123,39 +123,20 @@ method_nointegration(acb_t res, int kind, int scaled, const acb_t nu, const acb_
     }
 }
 
-/* e^{-z} (scaled I) or e^{z} (scaled K): multiply res by it, and set
-   bound to an upper bound for its absolute value over the ball z */
+/* an upper bound for the absolute value of e^{-z} (scaled I) or e^{z}
+   (scaled K) over the ball z */
 static void
-scale_factor(acb_t res, mag_t bound, int kind, const acb_t z, slong wp)
+scale_factor_bound(mag_t bound, int kind, const acb_t z)
 {
-    acb_t e;
     arb_t r;
 
-    acb_init(e);
     arb_init(r);
-
     if (kind == KIND_I)
-        acb_neg(e, z);
+        arb_neg(r, acb_realref(z));
     else
-        acb_set(e, z);
-
-    if (res != NULL)
-    {
-        acb_exp(e, e, wp);
-        acb_mul(res, res, e, wp);
-    }
-
-    if (bound != NULL)
-    {
-        if (kind == KIND_I)
-            arb_neg(r, acb_realref(z));
-        else
-            arb_set(r, acb_realref(z));
-        arb_exp(r, r, MAG_BITS);
-        arb_get_mag(bound, r);
-    }
-
-    acb_clear(e);
+        arb_set(r, acb_realref(z));
+    arb_exp(r, r, MAG_BITS);
+    arb_get_mag(bound, r);
     arb_clear(r);
 }
 
@@ -236,7 +217,7 @@ propagated_error(mag_t err, const mag_t Dz, const mag_t Dnu, const mag_t M,
 
     if (scaled)
     {
-        scale_factor(NULL, rr, kind, z, 0);
+        scale_factor_bound(rr, kind, z);
         mag_mul(err, err, rr);
     }
 
