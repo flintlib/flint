@@ -2188,7 +2188,7 @@ class gr_ctx:
             [3.687403801213274e+5558022 +/- 9.15e+5558006]
             >>> CC.gamma_upper(1000000+300000j, 1000000+100000j)
             ([1.406340755759173e+5554875 +/- 4.88e+5554859] + [1.022429026389862e+5554875 +/- 4.89e+5554859]*I)
-"""
+        """
         return ctx._binary_op_with_flag(x, y, regularized, libgr.gr_gamma_upper, "gamma_upper($x, $y)")
 
     def gamma_lower(ctx, x, y, regularized=0):
@@ -2219,7 +2219,7 @@ class gr_ctx:
             [2.990111070531928e+5563372 +/- 5.43e+5563356]
             >>> CC.gamma_lower(1000000+300000j, 900000+100000j)
             ([-8.84673548262914e+5551618 +/- 2.44e+5551603] + [1.301118150325418e+5551619 +/- 3.24e+5551603]*I)
-"""
+        """
         return ctx._binary_op_with_flag(x, y, regularized, libgr.gr_gamma_lower, "gamma_lower($x, $y)")
 
     def beta_lower(ctx, a, b, x, regularized=0):
@@ -2330,7 +2330,7 @@ class gr_ctx:
             >>> w = CC.exp_pi_i(QQ(1)/100); sum(CC.bessel_j(0, w*k) for k in range(101))
             ([0.78030446659 +/- 1.60e-12] + [0.627563446856 +/- 8.64e-13]*I)
 
-Large orders and arguments, at low and high precision:
+        Large orders and arguments, at low and high precision:
 
             >>> RR.bessel_j(50, 200)
             [0.01569389897857308 +/- 7.97e-18]
@@ -2341,7 +2341,7 @@ Large orders and arguments, at low and high precision:
             >>> ComplexField_acb(128).bessel_j(0.25+1000j, 1600)
             ([5.1229574694966498142869466717001526684e+679 +/- 2.30e+641] + [1.10967661067048576169131564470196230074e+680 +/- 7.16e+641]*I)
 
-Inexact (ball) orders and arguments:
+        Inexact (ball) orders and arguments:
 
             >>> RR.bessel_j(RR("2 +/- 1e-9"), 50)
             [-0.059712801 +/- 3.72e-10]
@@ -2352,7 +2352,7 @@ Inexact (ball) orders and arguments:
             [-0.000882149278209982 +/- 3.29e-19]
             >>> CC.bessel_j(0.25+1000000j, 1600000)
             ([-3.71526118503640e+682184 +/- 2.13e+682169] + [6.16857807310086e+682183 +/- 3.30e+682168]*I)
-"""
+        """
         return ctx._binary_op(x, y, libgr.gr_bessel_j, "bessel_j($n, $x)")
 
     def bessel_y(ctx, x, y):
@@ -2370,7 +2370,7 @@ Inexact (ball) orders and arguments:
 
             >>> RR.bessel_y(1000000, 1200000)
             [-0.0004260904466181696 +/- 6.16e-20]
-"""
+        """
         return ctx._binary_op(x, y, libgr.gr_bessel_y, "bessel_y($n, $x)")
 
     def bessel_i(ctx, x, y, scaled=False):
@@ -2386,7 +2386,7 @@ Inexact (ball) orders and arguments:
 
             >>> RR.bessel_i(1000000, 1200000)
             [6.720256496895146e+348979 +/- 9.73e+348963]
-"""
+        """
         if scaled:
             return ctx._binary_op(x, y, libgr.gr_bessel_i_scaled, "bessel_i($n, $x, scaled=True)")
         else:
@@ -2405,7 +2405,7 @@ Inexact (ball) orders and arguments:
 
             >>> RR.bessel_k(1000000, 1200000)
             [4.76309497978413e-348987 +/- 4.02e-349002]
-"""
+        """
         if scaled:
             return ctx._binary_op(x, y, libgr.gr_bessel_k_scaled, "bessel_k($n, $x, scaled=True)")
         else:
@@ -2419,7 +2419,7 @@ Inexact (ball) orders and arguments:
             ([0.565159103992485 +/- 1.88e-16]*I, ([-0.565159103992485 +/- 1.93e-16] + [0.383186043874565 +/- 2.19e-16]*I))
             >>> RR.bessel_j_y(10, 30)
             ([-0.1298768939985888 +/- 6.74e-17], [0.0750567021223971 +/- 2.34e-17])
-"""
+        """
         return ctx._binary_binary_op(x, y, libgr.gr_bessel_j_y, "bessel_j_y($n, $x)")
 
     def airy(ctx, x):
@@ -6827,7 +6827,7 @@ class acb(gr_elem):
 
     def secondary_zeta(self):
         """
-Secondary zeta function (ad-hoc wrapper for testing).
+        Secondary zeta function (ad-hoc wrapper for testing).
 
             >>> CC(0.5+10j).secondary_zeta()
             ([0.1725005546943535 +/- 4.73e-17] + [-0.1680692210280708 +/- 4.12e-17]*I)
@@ -6841,7 +6841,7 @@ Secondary zeta function (ad-hoc wrapper for testing).
             ...     for s in [1, -1, -3, "1 +/- 0.001", "-5 +/- 0.001"]]
             [True, True, True, True, True]
 
-Dyadic values:
+        Dyadic values:
 
             >>> for n in range(10):
             ...     print(CC(-2*n).secondary_zeta())
@@ -6855,7 +6855,7 @@ Dyadic values:
             [-1521.003639221191 +/- 4.07e-13]
             [-36986.37416267395 +/- 1.96e-13]
             [-1146735.990261555 +/- 2.82e-10]
-"""
+        """
         C = self.parent()
         prec = C.prec
         res = C()
