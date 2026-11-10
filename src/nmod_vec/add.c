@@ -17,13 +17,36 @@ void _nmod_vec_add(nn_ptr res, nn_srcptr vec1,
 {
     slong i;
 
+#if defined(__clang__)
+    /* In place, clang checks at run time that the output does not overlap
+       the inputs; when res equals an input that check fails and the loop
+       runs in scalar code (Nov 2026: 2.5-5.5x slower with clang 18, 19,
+       21, 22 and Apple clang 17). gcc vectorizes the in-place case
+       already: there the extra loops would only add a cost (up to 2 ns per
+       call on short vectors). */
+    if (res == vec2)
+        FLINT_SWAP(nn_srcptr, vec1, vec2);
+#endif
+
     if (mod.norm)
     {
+#if defined(__clang__)
+        if (res == vec1)
+            for (i = 0 ; i < len; i++)
+                res[i] = _nmod_add(res[i], vec2[i], mod);
+        else
+#endif
         for (i = 0 ; i < len; i++)
-        res[i] = _nmod_add(vec1[i], vec2[i], mod);
+            res[i] = _nmod_add(vec1[i], vec2[i], mod);
     } else
     {
+#if defined(__clang__)
+        if (res == vec1)
+            for (i = 0 ; i < len; i++)
+                res[i] = nmod_add(res[i], vec2[i], mod);
+        else
+#endif
         for (i = 0 ; i < len; i++)
-        res[i] = nmod_add(vec1[i], vec2[i], mod);
+            res[i] = nmod_add(vec1[i], vec2[i], mod);
     }
 }
