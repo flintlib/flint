@@ -163,7 +163,15 @@ exploit this. For an $m \times n$ matrix of rank $r$,
 3. Replace the pair $c, d$ by $sc + td$; the resulting
    $(r - 1) \times (r - 1)$ matrix $C$ has determinant $\pm g$, which is
    small with high probability for random input. Compute its HNF modulo
-   $g$ (`fmpz_mat_hnf_modular`), or recursively if $g$ is large.
+   $g$ (`fmpz_mat_hnf_modular`). If $g$ is large, try instead the
+   common denominator $e$ of $C^{-1} B$ for a few random columns $B$, a
+   divisor of the largest elementary divisor of $C$
+   [@AbbottBronsteinMulders1999; @Pan1988; @EGV2000]: if $e$ fits in a
+   word, the HNF modulo $e$ (`fmpz_mat_hnf_modular_eldiv`) is that of
+   $C$ exactly when its pivots multiply to $g$. Otherwise recurse on $C$.
+   Since every $(n-1)$-minor is divisible by $|\det A| / d_n$, $g$ is
+   large for any input whose determinant spreads over many elementary
+   divisors, and the recursion then removes one row per level.
 4. *Add columns*: the HNF $H_C$ of $C$ is $UC$ with $U = H_C C^{-1}$
    unimodular, so the HNF of the same $r - 1$ rows on all columns is $U$
    times these rows. The other columns are obtained by solving a linear
