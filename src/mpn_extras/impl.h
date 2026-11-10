@@ -45,64 +45,51 @@ do {                                    \
 
 /*
     Tail reductions for the dot products. For nonfullword moduli
-    (n < 2^63) we fold the top limbs using r64 = 2^64 mod n and
-    r128 = 2^128 mod n and then apply Barrett reduction with the two-limb
-    precomputed quotient (qhi, qlo) = floor(2^128 / n), as in fft_small.
-    For fullword moduli we use Granlund-Möller after the folding.
+    (n < 2^63), Barrett reduction with the two-limb precomputed quotient
+    (qhi, qlo) = floor(2^128 / n), which takes any two limbs; for fullword
+    moduli, Granlund-Möller. Three limbs are first folded into two using
+    r64 = 2^64 mod n and r128 = 2^128 mod n, before the test on n (the fold
+    of n_lll_mod_barrett and NMOD_RED3_FOLD_FULLWORD; done first, it is a
+    little faster here).
 */
-
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1): n_ll_mod_barrett (ulong_extras) */
 
 /* arbitrary (hi, lo) mod n */
 FLINT_FORCE_INLINE ulong
 _nmod_red2_any(ulong hi, ulong lo, const flint_mpn_crt_leaf_struct * L)
 {
-    ulong h, l, u;
+    ulong u;
     nmod_t mod = L->mod;
-    umul_ppmm(h, l, hi, L->r64);
-    add_ssaaaa(h, l, h, l, 0, lo);
 
     if (mod.norm != 0)
-    {
-        return n_ll_mod_barrett(h, l, mod.n, L->qhi, L->qlo);
-    }
-    else
-    {
-        if (h >= mod.n)
-            h -= mod.n;
-        NMOD_RED2_FULLWORD(u, h, l, mod);
-        return u;
-    }
+        return n_ll_mod_barrett(hi, lo, mod.n, L->qhi, L->qlo);
+
+    /* hi < 2^64 < 2 n */
+    if (hi >= mod.n)
+        hi -= mod.n;
+    NMOD_RED2_FULLWORD(u, hi, lo, mod);
+    return u;
 }
 
-/* (y2, y1, y0) mod n with y2 < n */
+/* arbitrary (y2, y1, y0) mod n */
 FLINT_FORCE_INLINE ulong
 _nmod_red3_any(ulong y2, ulong y1, ulong y0, const flint_mpn_crt_leaf_struct * L)
 {
-    ulong c1, c0, t1, t0, xhi, xlo, cy;
+    ulong h, l, t1, t0, r;
     nmod_t mod = L->mod;
 
-    umul_ppmm(t1, t0, y2, L->r128);
-    umul_ppmm(c1, c0, y1, L->r64);
+    umul_ppmm(h, l, y2, L->r128);
+    umul_ppmm(t1, t0, y1, L->r64);
+    add_ssaaaa(h, l, h, l, t1, t0);
+    add_ssaaaa(h, l, h, l, UWORD(0), y0);
 
     if (mod.norm != 0)
-    {
-        /* no carry: sum < 2^64 (n + n) + 2^64 <= 2^128 */
-        add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-        add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-        return n_ll_mod_barrett(xhi, xlo, mod.n, L->qhi, L->qlo);
-    }
-    else
-    {
-        add_sssaaaaaa(cy, xhi, xlo, 0, t1, t0, 0, c1, c0);
-        add_sssaaaaaa(cy, xhi, xlo, cy, xhi, xlo, 0, 0, y0);
-        while (cy)
-            add_sssaaaaaa(cy, xhi, xlo, 0, xhi, xlo, 0, 0, L->r128);
-        if (xhi >= mod.n)
-            xhi -= mod.n;
-        NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
-        return xlo;
-    }
+        return n_ll_mod_barrett(h, l, mod.n, L->qhi, L->qlo);
+
+    /* h < 2 n for fullword n (see NMOD_RED3_FOLD_FULLWORD) */
+    if (h >= mod.n)
+        h -= mod.n;
+    NMOD_RED2_FULLWORD(r, h, l, mod);
+    return r;
 }
 
 /* 1-limb reduction with Barrett precomputation (n = 1 supported with npre = UWORD_MAX) */

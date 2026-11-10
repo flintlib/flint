@@ -383,42 +383,6 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R,
     TMP_END;
 }
 
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l_fullword_limited(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
-    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2)));
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
-
-    return xlo;
-}
-
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    if (xhi >= mod.n) xhi -= mod.n;
-    NMOD_RED2(xlo, xhi, xlo, mod);
-
-    return xlo;
-}
-
 static void
 _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R,
                                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
@@ -440,37 +404,18 @@ _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R,
         R3[3 * i + 2] = 0;
     }
 
-    /* Special case for moduli close to 2^63, which are often used
-       in multimodular algorithms. */
-    int fullword_limited = (mod.norm == 0) &&
-            mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2));
-
-    ulong alpha1, alpha2;
-
-    if (fullword_limited)
-    {
-        alpha1 = -mod.n;               /* 2^FLINT_BITS */
-        alpha2 = 4 * alpha1 * alpha1;  /* 2^(2 FLINT_BITS) */
-    }
-    else
-    {
-        alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS - 1), mod);
-        alpha1 = nmod_add(alpha1, alpha1, mod);    /* 2^FLINT_BITS */
-        alpha2 = nmod_mul(alpha1, alpha1, mod);    /* 2^(2 FLINT_BITS) */
-    }
+    /* each entry is a coefficient of A plus at most lenA - lenB + 1
+       products of residues, below (lenA - lenB + 1) B^2 */
+    nmod_red3_precomp_struct R3P;
+    _nmod_red3_precomp_init(&R3P, lenA - lenB + 1, mod);
 
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
-        if (fullword_limited)
-        {
-            r = n_lll_rem_l_fullword_limited(R3[3 * iR + 2], R3[3 * iR + 1],
-                                 R3[3 * iR], mod, alpha2, alpha1);
-        }
+        if (R3P.nosub)
+            NMOD_RED3_FOLD_FULLWORD_NOSUB(r, R3[3 * iR + 2], R3[3 * iR + 1],
+                                          R3[3 * iR], R3P.b1, R3P.b2, mod);
         else
-        {
-            r = n_lll_rem_l(R3[3 * iR + 2], R3[3 * iR + 1],
-                                 R3[3 * iR], mod, alpha2, alpha1);
-        }
+            r = _nmod_red3_precomp(R3[3 * iR + 2], R3[3 * iR + 1], R3[3 * iR], &R3P, mod);
 
         if (r == 0)
         {
@@ -491,14 +436,13 @@ _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R,
         }
     }
 
-    if (fullword_limited)
+    if (R3P.nosub)
         for (iR = 0; iR < lenB - 1; iR++)
-            R[iR] = n_lll_rem_l_fullword_limited(R3[3 * iR + 2], R3[3 * iR + 1],
-                                     R3[3 * iR], mod, alpha2, alpha1);
+            NMOD_RED3_FOLD_FULLWORD_NOSUB(R[iR], R3[3 * iR + 2], R3[3 * iR + 1],
+                                          R3[3 * iR], R3P.b1, R3P.b2, mod);
     else
         for (iR = 0; iR < lenB - 1; iR++)
-            R[iR] = n_lll_rem_l(R3[3 * iR + 2], R3[3 * iR + 1],
-                                     R3[3 * iR], mod, alpha2, alpha1);
+            R[iR] = _nmod_red3_precomp(R3[3 * iR + 2], R3[3 * iR + 1], R3[3 * iR], &R3P, mod);
 
     TMP_END;
 }

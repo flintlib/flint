@@ -361,6 +361,82 @@ Returns $x \bmod n$ using the method of Lemire, Kaser and Kurz
 correct for $n, x < 2^{\bits / 2}$.
 :::
 
+### Division by an invariant word {#div-precomp}
+
+The following inline functions divide words by a fixed word $d \ge 1$ with
+a precomputed multiplier, by the method of Granlund and Montgomery
+[@GraMon1994] in the variant of Robison [@Rob2005] that needs no
+multiplier wider than a word. They are used for the digit shifts of
+[radix](radix), where $d$ is a power of the digit radix, and in the
+32-bit probable prime test.
+
+::: type
+n_div_precomp_struct
+n_div_precomp_t
+
+Precomputed data for division by $d$: the exponent $\ell =
+\lfloor \log_2 d \rfloor$ (field `e`), a multiplier `m` and a flag `c`.
+If $d$ is a power of two, $m = 0$. Otherwise, with
+$q = \lfloor 2^{\ell + \bits}/d \rfloor$, either $m = q + 1$ and $c = 0$
+(the *round-up* method, when it is exact for all words) or $m = q$ and
+$c = 1$ (the *round-down* method with an increment).
+:::
+
+::: function
+void n_div_precomp_init(n_div_precomp_t pre, ulong d)
+void n_div_precomp_init_preinv(n_div_precomp_t pre, ulong d, ulong dinv)
+
+Compute the data for division by $d \ge 1$. The second one takes `dinv` =
+`n_preinvert_limb(d)` and needs no division, since for $d$ not a power of
+two $\lfloor 2^{\ell + \bits}/d \rfloor$ is the constant
+`(dinv >> 1) | (UWORD(1) << (FLINT_BITS - 1))` of `NMOD_RED`
+([](algorithms/arithmetic/barrett#nmod)). The first one uses a two-word
+division where `n_preinvert_limb` does (`FLINT_PREINVERT_LIMB_USE_NATIVE`:
+a fast hardware divider), and otherwise calls the second one with
+`n_preinvert_limb(d)`.
+:::
+
+::: function
+ulong n_div_precomp(ulong x, const n_div_precomp_t pre)
+ulong n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
+ulong n_div_precomp_m0(ulong x, const n_div_precomp_t pre)
+ulong n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
+ulong n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
+ulong n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
+
+Return $\lfloor x/d \rfloor$ for any word $x$: `n_div_precomp` selects
+the method from `pre`, and the other functions are the individual methods
+for callers that know the case: $x \gg \ell$ for a power of two ($m = 0$),
+$\lfloor xm / 2^{\bits} \rfloor \gg \ell$ for $c = 0$, and
+$\lfloor (x + 1) m / 2^{\bits} \rfloor \gg \ell$ for $c = 1$, where
+$x + 1$ saturates at $\beta - 1$. The `bounded` versions require
+$x \ne \beta - 1$ and skip the saturation.
+:::
+
+::: function
+ulong n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_rem_precomp_m0(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp_m0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+ulong n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+
+The remainder $x \bmod d$, and the quotient with the remainder stored in
+`*r`, with the same variants as the quotient functions.
+:::
+
+::: function
+ulong n_incsat(ulong x)
+
+Returns $x + 1$, or $x$ if $x = \beta - 1$ (saturating increment).
+:::
+
 ## Divisibility {#divisibility}
 
 ::: function

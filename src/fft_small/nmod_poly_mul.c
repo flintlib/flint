@@ -420,48 +420,8 @@ static void _crt_2(
 }
 
 /* Modular reductions: for n < 2^(FLINT_BITS - 1), the Barrett reductions
- * n_ll_mod_barrett and n_lll_mod_barrett of ulong_extras. */
-
-/* 3 -> 1 limb mod, n >= 2^(FLINT_BITS-1), using linear combination + Granlund-Möller */
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l_fullword(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    if (xhi >= mod.n) xhi -= mod.n;
-    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
-
-    return xlo;
-}
-
-/* For moduli just larger than 2^63, the conditional subtraction can be shown
-   to be redundant. */
-FLINT_FORCE_INLINE ulong
-n_lll_rem_l_fullword_limited(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
-{
-    ulong c1, c0, t1, t0;
-    ulong xhi, xlo;
-
-    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
-    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2)));
-
-    umul_ppmm(t1, t0, y2, alpha2);
-    umul_ppmm(c1, c0, y1, alpha1);
-    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
-    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
-
-    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
-
-    return xlo;
-}
+ * n_ll_mod_barrett and n_lll_mod_barrett of ulong_extras; for full-word n,
+ * the fold NMOD_RED3_FOLD_FULLWORD(_NOSUB) of nmod.h. */
 
 static void _crt_3(
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
@@ -498,9 +458,9 @@ static void _crt_3(
     (void) u0;
     two_limbs = (u2 == 0);
 
-    /* For moduli close to 2^63, we can avoid the high word reduction
-       before NMOD_RED2. */
-    int fullword_limited = 0;
+    /* Full-word modulus: the fold leaves a high word below n, so that the
+       subtraction can be skipped (see _nmod_red3_fold_can_skip_sub). */
+    int fold_nosub = 0;
 
     /* Branch 1 and 2 of mod code */
     if (two_limbs && !mod_fullword)
@@ -513,20 +473,14 @@ static void _crt_3(
     }
     else
     {
-        /* Extra precomputation for branch 3 and 4 of mod code */
-        if (!mod_fullword)
-        {
-            n_ll_barrett_precomp_preinv(&qhi, &qlo, &alpha1, &alpha2, mod.n, mod.ninv);
-        }
-        else
-        {
-            alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS / 2), mod);
-            alpha1 = nmod_mul(alpha1, alpha1, mod);
-            alpha2 = nmod_mul(alpha1, alpha1, mod);
-        }
+        /* Extra precomputation for branch 3 and 4 of mod code: alpha1 =
+           2^64 mod n, alpha2 = 2^128 mod n, and (qhi, qlo) for n < 2^63 */
+        n_ll_barrett_precomp_preinv(&qhi, &qlo, &alpha1, &alpha2, mod.n, mod.ninv);
 
-        if (mod_fullword && (mod.n < ((UWORD(1) << 63) + (UWORD(1) << 30))))
-            fullword_limited = 1;
+        /* the coefficients are at most (n - 1)^2 min_an_bn, with top word
+           at most u2 */
+        if (mod_fullword)
+            fold_nosub = _nmod_red3_fold_can_skip_sub(u2, alpha1, alpha2, mod);
     }
 
 #define DO_CRT \
@@ -577,12 +531,12 @@ static void _crt_3(
                     z[i+j-zl] = n_lll_mod_barrett(r[2], r[1], r[0], mod.n, qhi, qlo, alpha1, alpha2);
                 }
             }
-            else if (fullword_limited)
+            else if (fold_nosub)
             {
                 for (ulong j = jstart; j < jstop; j += 1)
                 {
                     DO_CRT
-                    z[i+j-zl] = n_lll_rem_l_fullword_limited(r[2], r[1], r[0], mod, alpha2, alpha1);
+                    NMOD_RED3_FOLD_FULLWORD_NOSUB(z[i+j-zl], r[2], r[1], r[0], alpha1, alpha2, mod);
                 }
             }
             else
@@ -590,7 +544,7 @@ static void _crt_3(
                 for (ulong j = jstart; j < jstop; j += 1)
                 {
                     DO_CRT
-                    z[i+j-zl] = n_lll_rem_l_fullword(r[2], r[1], r[0], mod, alpha2, alpha1);
+                    NMOD_RED3_FOLD_FULLWORD(z[i+j-zl], r[2], r[1], r[0], alpha1, alpha2, mod);
                 }
             }
         }

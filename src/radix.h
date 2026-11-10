@@ -29,16 +29,6 @@ extern "C" {
 
 typedef struct
 {
-    ulong m;
-    unsigned int e;
-    unsigned int c;
-}
-n_div_precomp_struct;
-
-typedef n_div_precomp_struct n_div_precomp_t[1];
-
-typedef struct
-{
     ulong a;
     ulong b;
 }
@@ -563,86 +553,6 @@ int radix_integer_is_square(const radix_integer_t x, const radix_t radix);
 
 /* Utilities */
 
-RADIX_INLINE void
-n_div_precomp_init(n_div_precomp_t pre, ulong d)
-{
-    pre->e = FLINT_BIT_COUNT(d) - 1;
-
-    if ((d & (d - 1)) == 0)
-    {
-        pre->m = 0;
-        pre->c = 0;
-    }
-    else
-    {
-        ulong q, r;
-        udiv_qrnnd(q, r, UWORD(1) << pre->e, 0, d);
-        if (d - r < (UWORD(1) << pre->e))
-        {
-            pre->m = q + 1;
-            pre->c = 0;
-        }
-        else
-        {
-            pre->m = q;
-            pre->c = 1;
-        }
-    }
-}
-
-RADIX_INLINE ulong
-n_div_precomp_m0(ulong x, const n_div_precomp_t pre)
-{
-    return x >> pre->e;
-}
-
-RADIX_INLINE ulong
-n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
-{
-    return n_mulhi(x, pre->m) >> pre->e;
-}
-
-RADIX_INLINE ulong n_incsat(ulong x)
-{
-    ulong t = x + 1;
-    return (t > x) ? t : x;
-}
-
-/* Assumes x != UWORD_MAX */
-RADIX_INLINE ulong
-n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
-{
-    return n_mulhi(x + 1, pre->m) >> pre->e;
-}
-
-RADIX_INLINE ulong
-n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
-{
-    return n_mulhi(n_incsat(x), pre->m) >> pre->e;
-}
-
-RADIX_INLINE ulong
-n_div_precomp(ulong x, const n_div_precomp_t pre)
-{
-    if (pre->m == 0)
-        return x >> pre->e;
-    else if (pre->c == 0)
-        return n_mulhi(x, pre->m) >> pre->e;
-    else
-        return n_mulhi(n_incsat(x), pre->m) >> pre->e;
-}
-
-RADIX_INLINE ulong
-n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
-{
-    if (pre->m == 0)
-        return x >> pre->e;
-    else if (pre->c == 0)
-        return n_mulhi(x, pre->m) >> pre->e;
-    else
-        return n_mulhi(x + 1, pre->m) >> pre->e;
-}
-
 /*
     floor(x / exp) without hardware division. For exp > 2 this is one
     64 x 64 -> 128 multiplication by exp_inv = ceil(2^(62 + l) / exp),
@@ -668,89 +578,6 @@ radix_divrem_exp(ulong * r, ulong x, const radix_t radix)
     return q;
 }
 
-RADIX_INLINE ulong
-n_rem_precomp_m0(ulong x, ulong FLINT_UNUSED(d), const n_div_precomp_t pre)
-{
-    return x & ((UWORD(1) << pre->e) - 1);
-}
-
-RADIX_INLINE ulong
-n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    return x - d * n_div_precomp_c0(x, pre);
-}
-
-RADIX_INLINE ulong
-n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    return x - d * n_div_precomp_c1(x, pre);
-}
-
-RADIX_INLINE ulong
-n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    return x - d * n_div_precomp_bounded(x, pre);
-}
-
-RADIX_INLINE ulong
-n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    return x - d * n_div_precomp_c1_bounded(x, pre);
-}
-
-RADIX_INLINE ulong
-n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    return x - d * n_div_precomp(x, pre);
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp_m0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_m0(x, pre);
-    *r = x - d * q;
-    return q;
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_c0(x, pre);
-    *r = x - d * q;
-    return q;
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_c1(x, pre);
-    *r = x - d * q;
-    return q;
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_c1_bounded(x, pre);
-    *r = x - d * q;
-    return q;
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp(x, pre);
-    *r = x - d * q;
-    return q;
-}
-
-RADIX_INLINE ulong
-n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_bounded(x, pre);
-    *r = x - d * q;
-    return q;
-}
 
 
 #ifdef __cplusplus
