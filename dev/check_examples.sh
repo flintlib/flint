@@ -281,6 +281,23 @@ then
 elif test "$1" = "multi_crt";
 then
     echo "multi_crt....SKIPPED"
+elif test "$1" = "ode_transition_matrix";
+then
+    echo -n "ode_transition_matrix...."
+    res=$($2/ode_transition_matrix "Dx - 1" 0 1)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/\n\[\[2\.71828182845904523\d* \+\/- [^\]]*\] \+ \[\+\/- [^\]]*\]\*I\]\n/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 elif test "$1" = "padic";
 then
     echo "padic....SKIPPED"

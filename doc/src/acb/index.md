@@ -1200,6 +1200,14 @@ Copy, copy with rounding, swap, negate, and apply `acb_trim` entrywise.
 :::
 
 ::: function
+void _acb_vec_get_mag(mag_t bound, acb_srcptr vec, slong len)
+void _acb_vec_get_mag_lower(mag_t bound, acb_srcptr vec, slong len)
+
+Set `bound` to an upper, respectively a lower bound for the absolute values of
+the entries of `vec`.
+:::
+
+::: function
 void _acb_vec_get_real(arb_ptr re, acb_srcptr vec, slong len)
 void _acb_vec_get_imag(arb_ptr im, acb_srcptr vec, slong len)
 void _acb_vec_set_real_imag(acb_ptr vec, arb_srcptr re, arb_srcptr im, slong len)
