@@ -226,6 +226,11 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_DECCBALL:
             return deccball_get_fmpz(res, x, x_ctx);
 
+        case GR_CTX_RR_ARB:
+        case GR_CTX_CC_ACB:
+            /* exact integers only */
+            return gr_get_fmpz(res, x, x_ctx);
+
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
             if (qqbar_is_integer(x))

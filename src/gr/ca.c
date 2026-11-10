@@ -359,6 +359,11 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
             }
 
+        case GR_CTX_RR_ARB:
+            return gr_generic_set_arb(res, x, ctx);
+
+        case GR_CTX_CC_ACB:
+            return gr_generic_set_acb(res, x, ctx);
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);

@@ -237,7 +237,7 @@ _gr_fmpzi_set_d(fmpzi_t res, double x, const gr_ctx_t ctx)
 }
 
 static int
-_gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
     {
@@ -253,6 +253,12 @@ _gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
             return fmpzi_set_qqbar(res, x) ? GR_SUCCESS : GR_DOMAIN;
+
+        case GR_CTX_RR_ARB:
+            return gr_generic_set_arb(res, x, ctx);
+
+        case GR_CTX_CC_ACB:
+            return gr_generic_set_acb(res, x, ctx);
     }
 
     return GR_UNABLE;

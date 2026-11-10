@@ -19,6 +19,7 @@
 #endif
 
 #include "fmpz_types.h"
+#include "acb_types.h"
 #include "gr_types.h"
 
 #ifdef __cplusplus
@@ -120,6 +121,8 @@ WARN_UNUSED_RESULT truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_arb(gr_ptr res, const arb_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_acb(gr_ptr res, const acb_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx);
 
 #define GR_PARSE_BALANCE_ADDITIONS 1

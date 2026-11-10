@@ -342,6 +342,11 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
             return GR_SUCCESS;
 
+        case GR_CTX_RR_ARB:
+            return gr_generic_set_arb(res, x, ctx);
+
+        case GR_CTX_CC_ACB:
+            return gr_generic_set_acb(res, x, ctx);
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
