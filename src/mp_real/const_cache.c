@@ -42,6 +42,7 @@ typedef struct
 {
     _const_compute_func compute;
     int units;                  /* 1: c in [1, B), a units limb */
+    const char * name;          /* for the progress reports */
 }
 _const_info_t;
 
@@ -54,19 +55,19 @@ enum
 };
 
 static const _const_info_t _const_info[C_NUM] = {
-    { _mp_real_const_pi4_compute, 0 },
-    { _mp_real_const_log2_compute, 0 },
-    { _mp_real_const_euler_compute, 0 },
-    { _mp_real_const_e_compute, 1 },
-    { _mp_real_const_log10_compute, 1 },
-    { _mp_real_const_catalan_compute, 0 },
-    { _mp_real_const_zeta3_compute, 1 },
-    { _mp_real_const_zeta5_compute, 1 },
-    { _mp_real_const_gamma_1_3_compute, 1 },
-    { _mp_real_const_gamma_1_4_compute, 1 },
-    { _mp_real_const_2_div_pi_compute, 0 },
-    { _mp_real_const_inv_log2_frac_compute, 0 },
-    { _mp_real_const_khinchin_compute, 1 },
+    { _mp_real_const_pi4_compute, 0, "pi/4" },
+    { _mp_real_const_log2_compute, 0, "log 2" },
+    { _mp_real_const_euler_compute, 0, "euler" },
+    { _mp_real_const_e_compute, 1, "e" },
+    { _mp_real_const_log10_compute, 1, "log 10" },
+    { _mp_real_const_catalan_compute, 0, "catalan" },
+    { _mp_real_const_zeta3_compute, 1, "zeta(3)" },
+    { _mp_real_const_zeta5_compute, 1, "zeta(5)" },
+    { _mp_real_const_gamma_1_3_compute, 1, "gamma(1/3)" },
+    { _mp_real_const_gamma_1_4_compute, 1, "gamma(1/4)" },
+    { _mp_real_const_2_div_pi_compute, 0, "2/pi" },
+    { _mp_real_const_inv_log2_frac_compute, 0, "1/log 2 - 1" },
+    { _mp_real_const_khinchin_compute, 1, "khinchin" },
 };
 
 /* a version of the entry of a constant: floor(c B^n) in n + units limbs */
@@ -112,6 +113,12 @@ _const_floor(nn_ptr e, int id, slong n)
             mp_real_mul_2exp_si(v, v, -FLINT_BITS);
         if (_mp_real_get_fixed_floor(e, n + c->units, v))
             break;
+        /* rare for the fast constants (a run of 0 or B - 1 limbs), but
+           also what an evaluation less accurate than its precision
+           shows as */
+        if (mp_real_get_verbose())
+            _mp_real_log("const %s: floor not determined at %wd limbs with %wd guard limbs (relative radius < 2^%wd), recomputing",
+                c->name, n, guard, mp_real_rel_radius_lt_2exp_si(v));
         guard += 2 + guard / 2;
     }
     mp_real_clear(v);

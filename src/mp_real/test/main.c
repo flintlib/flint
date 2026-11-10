@@ -19,6 +19,9 @@
 #include "t-bitwise_rs_stress.c"
 #include "t-const_euler.c"
 #include "t-const_khinchin.c"
+#include "t-const_khinchin_afe.c"
+#include "t-gamma_upper_half.c"
+#include "t-linrec.c"
 #include "t-const_log2.c"
 #include "t-const_misc.c"
 #include "t-const_pi4.c"
@@ -58,6 +61,8 @@
 #include "t-newton.c"
 #include "t-exp_diophantine.c"
 #include "t-exp_huge.c"
+#include "t-exp_window.c"
+#include "t-hypgeom_sum.c"
 #include "t-exp_notab.c"
 #include "t-exp_reduced.c"
 #include "t-exp_sum_bs.c"
@@ -119,9 +124,14 @@ test_struct tests[] =
     TEST_FUNCTION(mp_real_agm),
     TEST_FUNCTION(mp_real_const_series),
     TEST_FUNCTION(mp_real_hypgeom_series),
+    TEST_FUNCTION(mp_real_hypgeom_sum),
+    TEST_FUNCTION(mp_real_gamma_upper_half),
+    TEST_FUNCTION(mp_real_linrec),
+    TEST_FUNCTION(mp_real_const_khinchin_afe),
     TEST_FUNCTION(mp_real_newton),
     TEST_FUNCTION(mp_real_exp_diophantine),
     TEST_FUNCTION(mp_real_exp_huge),
+    TEST_FUNCTION(mp_real_exp_window),
     TEST_FUNCTION(mp_real_exp_notab),
     TEST_FUNCTION(mp_real_exp_reduced),
     TEST_FUNCTION(mp_real_exp_sum_bs),

@@ -1,6 +1,6 @@
 ---
 title: Mathematical constants
-functions: mp_real_const_pi4 _mp_real_const_pi4 _mp_real_const_clear_cache mp_real_const_func _mp_real_const_arb _mp_real_const_euler_tune _mp_real_const_khinchin_tune _mp_real_const_khinchin_params
+functions: mp_real_const_pi4 _mp_real_const_pi4 _mp_real_const_clear_cache mp_real_const_func _mp_real_const_arb _mp_real_const_euler_tune _mp_real_const_khinchin_tune _mp_real_const_khinchin_params _mp_real_const_khinchin_afe
 ---
 
 `mp_real` computes thirteen constants: $\pi/4$, $\log 2$, Euler's constant
@@ -65,6 +65,7 @@ formula collection as the fastest in this implementation:
 | $\Gamma(1/3)$ | $(810^{1/4}\pi/X)^{1/3}$ with Guillera's series $X$ |
 | $\Gamma(1/4)$ | Ebisu's series, or $\sqrt{(2\pi)^{3/2}/\operatorname{agm}(1, \sqrt 2)}$ from $2^{16}$ limbs |
 | $K$ | $\log K \log 2 = \sum_{k \ge 2} -\log(1 - 1/k)\log(1 + 1/k)$: logarithms of primes, exact Bernoulli numbers and recycled powers |
+| $K$ (from $1.5 \cdot 10^6$ digits) | the dilogarithm series of [@BBC1997] split by a theta transformation: $O(\sqrt n)$ binary splittings |
 
 The independent parts (the series and $\pi$ in $\zeta(5)$ and the
 $\Gamma$ values, the three logarithms of $\log 10$, the logarithms

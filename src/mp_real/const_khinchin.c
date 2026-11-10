@@ -1636,8 +1636,15 @@ _mp_real_const_khinchin_tune(mp_real_t res, slong n, slong K0, slong n1, slong n
     mp_real_clear(Alo);
 }
 
+/* the theta splitting (const_khinchin_afe.c) costs p^(3/2 + o(1)) against
+   the p^(2 + o(1)) or more of the zeta series above; it is faster from
+   somewhere between 1 and 2 million digits (depending on the machine and
+   the thread count) */
 void
 _mp_real_const_khinchin_compute(mp_real_t res, slong n)
 {
-    _mp_real_const_khinchin_tune(res, n, 0, 0, 0);
+    if (n >= MP_REAL_KHINCHIN_AFE_CUTOFF)
+        _mp_real_const_khinchin_afe(res, n, 0, 0);
+    else
+        _mp_real_const_khinchin_tune(res, n, 0, 0, 0);
 }

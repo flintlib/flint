@@ -1,7 +1,7 @@
 ---
 title: Mathematical constants
-summary: The formulas and algorithms behind the constants of FLINT (π, e, log 2, log 10, Euler's constant, Catalan's constant, ζ(3), ζ(5), Γ(1/3), Γ(1/4), Khinchin's, Glaisher's and the reciprocal Fibonacci constant) - binary splitting of hypergeometric series, the dual-number splitting for Euler's constant, sums of zeta values for Khinchin's constant - with their error bounds, and how the values are cached.
-complexity: $O(M(n) \log^2 n)$ for the hypergeometric constants by binary splitting ($\Gamma(1/4)$ from $2^{16}$ limbs in $O(M(n)\log n)$ plus the cost of $\pi$) and $O(M(n) \sqrt{n} \log n)$ for the reciprocal Fibonacci constant; Khinchin's constant in $O(n^3/\log^3 n)$ word operations; Glaisher's constant (below about $10^5$ to $3.5 \cdot 10^5$ bits, depending on the number of threads) uses sums of many full-precision terms and is much slower, and costs $\tilde O(n^{1.5})$ at higher precision.
+summary: The formulas and algorithms behind the constants of FLINT (π, e, log 2, log 10, Euler's constant, Catalan's constant, ζ(3), ζ(5), Γ(1/3), Γ(1/4), Khinchin's, Glaisher's and the reciprocal Fibonacci constant) - binary splitting of hypergeometric series, the dual-number splitting for Euler's constant, sums of zeta values and, at very high precision, an approximate functional equation for Khinchin's constant - with their error bounds, and how the values are cached.
+complexity: $O(M(n) \log^2 n)$ for the hypergeometric constants by binary splitting ($\Gamma(1/4)$ from $2^{16}$ limbs in $O(M(n)\log n)$ plus the cost of $\pi$) and $O(M(n) \sqrt{n} \log n)$ for the reciprocal Fibonacci constant; Khinchin's constant in $O(n^3/\log^3 n)$ word operations by sums of zeta values and in $O(\sqrt n\, M(n) \log^2 n)$ by the approximate functional equation; Glaisher's constant (below about $10^5$ to $3.5 \cdot 10^5$ bits, depending on the number of threads) uses sums of many full-precision terms and is much slower, and costs $\tilde O(n^{1.5})$ at higher precision.
 order: 20
 ---
 
@@ -242,6 +242,9 @@ with $\pi$.
 
 ## Khinchin's constant {#khinchin}
 
+### Zeta expansion
+
+Up to about $1.5 \cdot 10^6$ digits,
 Khinchin's constant $K$ is computed from the formula [@BBC1997]
 
 $$
@@ -286,7 +289,7 @@ For an error of $2^{-p}$ it therefore suffices to take $M \ge p / (2
 
 ### The algorithm {#khinchin-algorithm}
 
-Khinchin's constant is not known to have a fast series. With
+With
 $f(x) = -\log(1-x)\log(1+x) = \sum_{n \ge 1} c_n x^{2n}$,
 $c_n = A_n/n$ and $A_n = 1 - \tfrac12 + \tfrac13 - \cdots + \tfrac{1}{2n-1}$,
 $$
@@ -400,6 +403,123 @@ exactly. The direct columns, the subtracted powers and the rows then
 follow. `_mp_real_const_khinchin_tune` forces $K_0$, $n_1$ and the
 number of Bernoulli ranges run at once.
 
+### The approximate functional equation {#khinchin-afe}
+
+From `MP_REAL_KHINCHIN_AFE_CUTOFF` limbs (about $1.5 \cdot 10^6$
+digits), `mp_real_const_khinchin` uses `_mp_real_const_khinchin_afe`,
+which needs $O(\sqrt n)$ evaluations of cost $O(M(n)\log^2 n)$ each
+instead of the cubic power sums above. It starts from the dilogarithm
+series of [@BBC1997, §3],
+$$
+\log K \log 2 = \log^2 2 + \operatorname{Li}_2(-\tfrac12)
+  + \tfrac12 \sum_{k \ge 2} (-1)^k \operatorname{Li}_2(4/k^2),
+$$
+and the Laplace transform $\operatorname{Li}_2(4/K) = \int_0^\infty
+e^{-Ku} G(u)\,du$ for $K > 4$, with $G(u) = E(4u)/u$ and $E(x) =
+\sum_{n \ge 1} x^n/(n \cdot n!)$. The sum over $k \ge 3$ is then an
+integral of $G$ against a theta function. Splitting the integral at
+$u_0 = 4^{-a}$ and applying the transformation of $\theta_4$ on
+$(0, u_0]$ gives, for every $u_0 > 0$,
+$$
+\log K \log 2 = \log^2 2 + \operatorname{Li}_2(-\tfrac12) + \frac{\pi^2}{12}
+  + \frac12\Bigl(\sum_{k \ge 3} (-1)^k I_k + \sum_{m \ge 0} J_m + M\Bigr)
+$$
+with
+$$
+I_k = \int_{u_0}^\infty e^{-k^2 u} G(u)\,du, \quad
+J_m = \sqrt\pi \int_0^{u_0} u^{-1/2} e^{-\pi^2(m+1/2)^2/u} G(u)\,du, \quad
+M = \int_0^{u_0} \bigl(e^{-u} - e^{-4u} - \tfrac12\bigr) G(u)\,du.
+$$
+For $p$ bits, about $\sqrt{p \log 2/u_0}$ terms $I_k$ and
+$\sqrt{p u_0 \log 2}/\pi$ terms $J_m$ are needed; the default
+$u_0 = 1/16$ balances their costs. $\operatorname{Li}_2(-\tfrac12)$
+comes from $\operatorname{Li}_2(1/9)$ and $\log 3$ by Landen's identity,
+and $M$ is a rational series.
+
+This is a generalization of the approximate functional equation of the
+Dirichlet $L$-functions
+([](algorithms/special-functions/zeta#l-functions)), which is the same
+construction for the summand $k^{-s}$: there the function $G$ is a power
+of $u$, so that every term of the two series is a single incomplete
+gamma function. Here $G$ is an entire function, and the terms $I_k$ and
+$J_m$ are themselves series, which can still be evaluated by binary
+splitting since their coefficients are rational.
+
+*The $k$-terms.* With $K = k^2$ and $x = Ku_0$,
+$I_k = e^{-x}\sum_{n \ge 1} (4/K)^n e_n(x)/n^2$, $e_n$ the truncated
+exponential series. The terms satisfy a triangular $2 \times 2$
+recurrence with rational coefficients, summed by matrix binary
+splitting; the factors $e^{-k^2 u_0}$ of consecutive $k$ are propagated
+by multiplications by $e^{-(2k+1)u_0}$. The tail after $N$ terms is
+bounded through the Poisson weights in $e^{-x}e_n(x)$.
+
+*The dual terms.* $J_m = \sqrt\pi\,\nu_{3/2}(c)$ with
+$c = \pi^2(m+\tfrac12)^2$ and the moments
+$\nu_t(c) = \int_0^{u_0} u^{-t} e^{-c/u} E(4u)\,du$.
+Integration by parts relates $\nu_{t+1}$ to $\nu_t$, to the similar
+moments $Y_t$ of $e^{4u}$ and $C_t$ of 1, and to the boundary values
+at $u_0$, which carry the factor $e^{-c/u_0}$; and $-d/dc$ shifts $t$ by
+one. So $\nu_{3/2}$ is a holonomic function of $c$ of order four whose
+only finite singularity is $c = 0$, and it is evaluated by the bit-burst
+algorithm: starting values at a 64-bit dyadic $c_0$ near $c$, from a
+shift series in terms of
+$\Gamma(\tfrac12, c_0/u_0)$ (by `mp_real_gamma_upper_half_frac`) and
+$e^{-c_0/u_0}$, then Taylor steps to dyadic points with $64 \cdot 4^j$
+fractional bits converging to $c$. The parts of the shift series cancel
+by up to $e^{c_0/u_0}$ individually but their weighted sums only by
+about $e^{4\sqrt{c_0}}$, so $O(\sqrt{c_0})$ guard bits suffice. All
+Taylor remainders, the tails of the starting values and the final
+distance to $c$ are bounded rigorously through upper incomplete gamma
+functions; the bounds carry the factor $e^{-c_0/u_0}$, so that the late
+stages are computed only to the significant bits of $J_m$, which is of
+order $e^{-c/u_0}$.
+
+*Matrix binary splitting.* The $k$-terms, the dual terms (starting
+values and Taylor steps), $M$ and the continued fraction for
+$\Gamma(\tfrac12, y)$ all use one internal engine
+(`_mp_real_linrec_eval`) for recurrences
+$X_{l+1} = (A_l X_l + f_l B_l v)/q_l$ with sums
+$S \mathrel{+}= (S^A_l X_l + f_l S^B_l v)/q_l$ and a scalar geometric
+forcing $f_{l+1} = \varphi_l f_l/q_l$, given by integer leaf matrices.
+The range is cut into chunks whose exact products (integer matrices over
+a common denominator) have about half the working precision in bits.
+Within a chunk, binary splitting combines the two halves in one
+augmented product that shares the transforms of each entry among the
+products (`fmpz_mat_mul_fft_small`, since `fmpz_mat_mul` does not choose
+the transformed product for such small matrices) when the entries have
+at least about $1.2 \cdot 10^4$ bits and the inner dimension $d+g+s$ is
+at least 6; for the narrow products of the $k$-terms, separate products
+were faster at all sizes measured. Each chunk's matrix is then applied
+to the state vector $(X, f v)$: above the chunks there are only
+matrix-vector products. The state is kept scaled by the product of the
+denominators so far, which is divided out once at the end. For large
+entries the application is one truncated transformed product
+(`fmpz_mat_mul_fft_small_trunc`, which transforms each state entry once
+for all the rows and accumulates the rows in the transformed domain),
+each state entry converted to fixed point with its own exponent, so
+that it keeps its relative accuracy as in ball arithmetic; for small
+entries it is done in ball arithmetic.
+
+*Parallelism and memory.* The terms are independent tasks. The dual
+terms are the most expensive and take about four times the memory of a
+$k$-term, so they start first and at most `maxdual` of them run at once
+(by default half the threads, until the last chunk of $k$-terms has
+started; then any thread may take one), while the other threads take
+chunks of consecutive $k$-terms, starting each chunk with $e^{-k^2 u_0}$ and
+$e^{-(2k+1) u_0}$ as powers of a shared $e^{-u_0}$ (about $3 \log_2 k$
+multiplications instead of two exponentials). The exact products of
+large chunks also fork onto idle threads. Each finished term is added to one fixed-point integer
+with an integer error count, so no term is kept and the result does not
+depend on the order in which the terms finish. The memory is then that
+of the running terms, linear in the precision times the number of
+threads, and dominated by the transforms of the shared-transform
+products, which fft_small limits to
+`flint_fft_small_max_transformed_ring_size` per product (blocking the
+products beyond). At $10^6$ digits, a dual term takes about 370 numbers of the
+working precision with all transforms resident and a $k$-term about 90.
+The user can reduce memory in exchange for a slight increase
+in running time by decreasing `flint_fft_small_max_transformed_ring_size`.
+
 ## Glaisher's constant {#glaisher}
 
 The Glaisher-Kinkelin constant $A = \exp(1/12 - \zeta'(-1))$ is computed
@@ -491,6 +611,9 @@ arguments](algorithms/special-functions/gamma#rational)). The argument
 reductions of the elementary functions read $\pi/4$, $2/\pi$, $\log 2$
 and $1/\log 2 - 1$ from the cache of floors (static tables up to 64
 limbs), and the AGM logarithm $\pi/4$ and $\log 2$.
+`_mp_real_const_khinchin_afe` implements the approximate functional
+equation for Khinchin's constant, with `mp_real_gamma_upper_half_frac`
+for its starting values.
 
 The tutorial [](tutorials/numerics/constants) computes $\pi$ and other
 constants to many digits in complete programs.

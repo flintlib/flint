@@ -81,6 +81,22 @@ keeps the exponent of the result in the safe range of
 [](algorithms/floating-point/mp-real-balls); the floating-point entry
 points return a larger quotient as a multiprecision integer.
 
+Both reductions turn a short argument into a full-length one, which
+costs a full exponential however few bits the argument has, whereas the
+cost of the bit-burst evaluation grows with the number of bits. So
+beyond the bitwise kernels, $m \in (-1, 0)$ is evaluated as
+$1/\exp(|m|)$ when $|m| < 2^{-128}$, or when $|m|$ is short enough for
+the next rule (always above 65536 limbs, where the table-free kernel is
+a bit-burst anyway); and in the range of the diophantine kernel, an
+argument $v \in [0, 1)$ with $z$ leading zero bits and $\ell$
+significant bits below them goes to the bit-burst directly when $\ell$
+is below a bound that grows with $z$ and the precision: from 64 bits
+($z \ge 16$) at 600 to 2000 limbs to 1024 ($z < 16$), 4096 ($z \ge 16$)
+and 32768 bits ($z \ge 64$) from 30000 limbs. At 51907 limbs, for
+example, $\exp(-x)$ with $x$ a 64-bit number below $2^{-64}$ takes
+0.046 s instead of 0.31 s, and $\exp(x)$ 0.039 s instead of 0.30 s (the
+profile program `p-exp_window` measures these choices).
+
 **Logarithm.** For $m = 2^E u$ with $u \in [1/2, 1)$,
 $\log m = (E - 1)\log 2 + \operatorname{log1p}(2u - 1)$ (up to 600
 limbs) or $E\log 2 - (-\log u)$ (beyond). Near $m = 1$ both forms cancel

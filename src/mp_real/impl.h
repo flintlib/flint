@@ -21,6 +21,7 @@
 #include "longlong.h"
 #include "double_extras.h"
 #include "mpn_extras.h"
+#include "fmpz_types.h"
 #include "mp_real.h"
 
 #ifdef __cplusplus
@@ -1083,6 +1084,82 @@ void _mp_real_pqt_merge(mp_real_t P, mp_real_t Q, mp_real_t T, mp_real_t P2,
 #ifndef MP_REAL_PAR_MIN_LIMBS
 #define MP_REAL_PAR_MIN_LIMBS 64
 #endif
+
+/* conversions between balls, fixed-point integers and mag bounds
+   (linrec.c): r = floor(mid(x) 2^-e) with err += rad(x) + 2^e (the
+   floor's error, counted even when it is exact); the radius of x += m;
+   upper and lower bounds of |x| over the ball, and the radius */
+void _mp_real_get_fmpz_fixed(fmpz_t r, mag_t err, const mp_real_t x, slong e);
+void _mp_real_add_error_mag(mp_real_t x, const mag_t m);
+void _mp_real_get_mag(mag_t res, const mp_real_t x);
+void _mp_real_get_mag_lower(mag_t res, const mp_real_t x);
+void _mp_real_get_rad_mag(mag_t res, const mp_real_t x);
+
+/* Linear recurrences with running sums and a scalar-geometric forcing,
+   by binary splitting of integer matrices (linrec.c).  For l = a, a + 1,
+   ..., with a state X in R^d, s sums S, g forcing columns applied to a
+   fixed vector v of reals (the forcing constants) through a scalar f,
+
+       X_(l+1) = (A_l X_l + f_l B_l v) / q_l,
+       S      += (SA_l X_l + f_l SB_l v) / q_l,
+       f_(l+1) = phi_l f_l / q_l,
+
+   with integer matrices and integers q_l, phi_l.  The leaf l writes
+   T = [A B; SA SB] ((d + s) x (d + g), zeroed on entry), phi (if
+   g > 0) and q. */
+typedef void (* _mp_real_linrec_leaf_func)(fmpz_mat_t T, fmpz_t phi,
+    fmpz_t q, slong l, const void * ctx);
+
+/* optionally, the exact node over a short range [a, b) at once (b - a at
+   most bottom_len; NULL for none), typically in limb arrays */
+typedef void (* _mp_real_linrec_bottom_func)(fmpz_mat_t T, fmpz_t phi,
+    fmpz_t q, slong a, slong b, const void * ctx);
+
+typedef struct
+{
+    slong d, s, g;
+    _mp_real_linrec_leaf_func leaf;
+    const void * ctx;
+    _mp_real_linrec_bottom_func bottom;
+    slong bottom_len;
+}
+_mp_real_linrec_struct;
+
+/* The recurrence over [a, b) (b > a) applied to a state at n limbs: X
+   (d x r, row-major) is replaced by X_b given X_a, the increments of the
+   sums are added to S (s x r), and f is replaced by f_b (for g > 0,
+   which needs r = 1; f and v may be NULL for g = 0).  The exact products
+   over chunks of about FLINT_BITS n / 2 bits are applied in ball
+   arithmetic; they fork on the thread budget of the caller. */
+void _mp_real_linrec_eval(mp_real_ptr X, mp_real_ptr S, mp_real_t f,
+    const _mp_real_linrec_struct * rec, slong a, slong b, mp_real_srcptr v,
+    slong r, slong n);
+
+/* Khinchin's constant by the theta splitting (khinchin_afe*.c).  With
+   u0 = 4^-a, the context holds the shared read-only data of the terms:
+   the precision of the sum (absolute, bits), the forcing constants
+   g1 = E(4 u0) = sum (4 u0)^n / (n n!) and e4 = e^(4 u0). */
+typedef struct
+{
+    slong a;            /* u0 = 4^-a */
+    ulong u0d;          /* 4^a */
+    slong prec;         /* bits of absolute accuracy of the terms */
+    mp_real_t g1;
+    mp_real_t e4;
+    mp_real_t eu;       /* e^-u0, to prec + 192 bits (for the k-terms) */
+}
+_mp_real_khinchin_afe_struct;
+
+/* I_k = e^(-k^2 u0) sum_(n>=1) (4/k^2)^n e_n(k^2 u0) / n^2 to absolute
+   accuracy about 2^-prec, given ek = e^(-k^2 u0) to at least the
+   relative accuracy needed (NULL: computed) */
+void _mp_real_khinchin_afe_kterm(mp_real_t res, ulong k,
+    const _mp_real_khinchin_afe_struct * ctx, const mp_real_t ek);
+/* J_m = sqrt(pi) int_0^u0 u^(-1/2) e^(-c/u) E(4u) / u du at
+   c = cstar = pi^2 (m + 1/2)^2 (a ball to at least 2 prec bits), to
+   absolute accuracy about 2^-prec */
+void _mp_real_khinchin_afe_dual(mp_real_t res, const mp_real_t cstar,
+    const _mp_real_khinchin_afe_struct * ctx);
 
 /* verbose reports (verbose.c): _mp_real_log prints unconditionally
    (the caller checks the level), _mp_real_progress at most once per
