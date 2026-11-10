@@ -64,10 +64,11 @@
 #include "dfloat.h"
 
 /* The rules used are those of the cache of acb_calc_integrate, with
-   numbers of nodes in steps of about 2^(1/2), up to 4096 nodes (steps
-   of 2^(1/4) would save 8-10% of the nodes, at the price of about
-   twice as many rules to precompute). */
-#define SDQ_STEPS 23
+   numbers of nodes in steps of about 2^(1/2) (steps of 2^(1/4) would
+   save 8-10% of the nodes, at the price of about twice as many rules
+   to precompute), up to about half the precision in bits, as in
+   acb_calc_integrate. */
+#define SDQ_STEPS ACB_CALC_GL_STEPS
 #define sdq_steps _acb_calc_gl_steps
 /* the largest rule with dfloat: 256 nodes */
 #define SDQ_DFLOAT_STEPS 15
@@ -301,23 +302,108 @@ acb_set_cd(acb_t res, cd z)
 /* The rule sdq_steps[gi] on the chord [a, b] in acb arithmetic.  The
    endpoints are balls; ad and bd are their double approximations, used
    to estimate the size of the integrand at each node, which is then
-   evaluated with the corresponding number of bits less. */
+   evaluated with the corresponding number of bits less.  The nodes are
+   evaluated in parallel when there are several threads and enough
+   work for them. */
+typedef struct
+{
+    const sdq_ctx * ctx;
+    cd c, md, hd;
+    acb_srcptr m, h, cc;
+    arb_srcptr x, wts;
+    slong n, wp;
+    acb_ptr v;
+}
+sdq_acb_work;
+
+/* t = the term of the node k; w, e are temporaries */
+static void
+sdq_node_acb(acb_t t, const sdq_acb_work * W, slong k, acb_t w, acb_t e, arb_ptr r)
+{
+    const sdq_ctx * ctx = W->ctx;
+    slong n = W->n, kk, p;
+    cd phi, d1, d2;
+    double xd;
+    arb_ptr sh = r, ch = r + 1, sn = r + 2, cs = r + 3;
+
+    kk = (2 * k < n) ? k : n - 1 - k;
+    xd = arf_get_d(arb_midref(W->x + kk), ARF_RND_NEAR);
+    if (2 * k >= n)
+        xd = -xd;
+
+    _sd_phi(&phi, &d1, &d2, ctx->P, cd_add(W->md, cd_scale(W->hd, xd)));
+    p = W->wp + (slong) fmin((phi.re - W->c.re) / SD_LN2 + 2.0, 0.0);
+    p = FLINT_MAX(p, 32);
+
+    /* w = m +- h x (the cached nodes can have a higher precision) */
+    arb_set_round(sh, W->x + kk, p);
+    acb_mul_arb(w, W->h, sh, p);
+    if (2 * k >= n)
+        acb_sub(w, W->m, w, p);
+    else
+        acb_add(w, W->m, w, p);
+
+    /* E = e^w - e^-w = 2 (sinh x cos y + i cosh x sin y), or e^w */
+    arb_sin_cos(sn, cs, acb_imagref(w), p);
+    if (ctx->sym)
+    {
+        arb_sinh_cosh(sh, ch, acb_realref(w), p);
+        arb_mul(acb_realref(e), sh, cs, p);
+        arb_mul(acb_imagref(e), ch, sn, p);
+        acb_mul_2exp_si(e, e, 1);
+    }
+    else
+    {
+        arb_exp(ch, acb_realref(w), p);
+        arb_mul(acb_realref(e), ch, cs, p);
+        arb_mul(acb_imagref(e), ch, sn, p);
+    }
+
+    /* exp(alpha E - nu w - c) */
+    acb_mul(t, ctx->alpha, e, p);
+    acb_submul(t, ctx->nu, w, p);
+    acb_sub(t, t, W->cc, p);
+    acb_exp(t, t, p);
+
+    arb_set_round(sh, W->wts + kk, p);
+    acb_mul_arb(t, t, sh, p);
+}
+
+static void
+sdq_node_worker(slong k, void * arg)
+{
+    const sdq_acb_work * W = (const sdq_acb_work *) arg;
+    acb_t w, e;
+    arb_struct r[4];
+    int i;
+
+    acb_init(w); acb_init(e);
+    for (i = 0; i < 4; i++)
+        arb_init(r + i);
+
+    sdq_node_acb(W->v + k, W, k, w, e, r);
+
+    acb_clear(w); acb_clear(e);
+    for (i = 0; i < 4; i++)
+        arb_clear(r + i);
+}
+
 static void
 sdq_chord_acb(acb_t res, const sdq_ctx * ctx, cd c, const acb_t a, const acb_t b,
     cd ad, cd bd, int gi)
 {
-    cd md = cd_scale(cd_add(ad, bd), 0.5), hd = cd_scale(cd_sub(bd, ad), 0.5), phi, d1, d2;
-    slong n = sdq_steps[gi], k, kk, wp = ctx->wp, p;
-    arb_srcptr x, wts;
+    sdq_acb_work W;
+    slong n = sdq_steps[gi], k, wp = ctx->wp;
     acb_t m, h, w, e, t, sum, cc;
-    arb_t sh, ch, sn, cs;
-    double xd;
+    arb_struct r[4];
+    int i;
 
     acb_init(m); acb_init(h); acb_init(w); acb_init(e);
     acb_init(t); acb_init(sum); acb_init(cc);
-    arb_init(sh); arb_init(ch); arb_init(sn); arb_init(cs);
+    for (i = 0; i < 4; i++)
+        arb_init(r + i);
 
-    _acb_calc_gl_nodes(&x, &wts, gi, wp);
+    _acb_calc_gl_nodes(&W.x, &W.wts, gi, wp);
 
     acb_add(m, a, b, wp);
     acb_mul_2exp_si(m, m, -1);
@@ -325,57 +411,41 @@ sdq_chord_acb(acb_t res, const sdq_ctx * ctx, cd c, const acb_t a, const acb_t b
     acb_mul_2exp_si(h, h, -1);
     acb_set_cd(cc, c);
 
-    for (k = 0; k < n; k++)
+    W.ctx = ctx;
+    W.c = c;
+    W.md = cd_scale(cd_add(ad, bd), 0.5);
+    W.hd = cd_scale(cd_sub(bd, ad), 0.5);
+    W.m = m; W.h = h; W.cc = cc;
+    W.n = n;
+    W.wp = wp;
+
+    /* in parallel if the work is well above the overhead of starting
+       the threads (some microseconds per node at a few hundred bits) */
+    if (flint_get_num_threads() >= 2 && n >= 8 && (double) n * (double) wp >= 30000.0)
     {
-        kk = (2 * k < n) ? k : n - 1 - k;
-        xd = arf_get_d(arb_midref(x + kk), ARF_RND_NEAR);
-        if (2 * k >= n)
-            xd = -xd;
-
-        _sd_phi(&phi, &d1, &d2, ctx->P, cd_add(md, cd_scale(hd, xd)));
-        p = wp + (slong) fmin((phi.re - c.re) / SD_LN2 + 2.0, 0.0);
-        p = FLINT_MAX(p, 32);
-
-        /* w = m +- h x (the cached nodes can have a higher precision) */
-        arb_set_round(sh, x + kk, p);
-        acb_mul_arb(w, h, sh, p);
-        if (2 * k >= n)
-            acb_sub(w, m, w, p);
-        else
-            acb_add(w, m, w, p);
-
-        /* E = e^w - e^-w = 2 (sinh x cos y + i cosh x sin y), or e^w */
-        arb_sin_cos(sn, cs, acb_imagref(w), p);
-        if (ctx->sym)
+        W.v = _acb_vec_init(n);
+        flint_parallel_do(sdq_node_worker, &W, n, -1, FLINT_PARALLEL_STRIDED);
+        /* in the order of the serial loop: the result does not depend
+           on the number of threads */
+        for (k = 0; k < n; k++)
+            acb_add(sum, sum, W.v + k, wp);
+        _acb_vec_clear(W.v, n);
+    }
+    else
+    {
+        for (k = 0; k < n; k++)
         {
-            arb_sinh_cosh(sh, ch, acb_realref(w), p);
-            arb_mul(acb_realref(e), sh, cs, p);
-            arb_mul(acb_imagref(e), ch, sn, p);
-            acb_mul_2exp_si(e, e, 1);
+            sdq_node_acb(t, &W, k, w, e, r);
+            acb_add(sum, sum, t, wp);
         }
-        else
-        {
-            arb_exp(ch, acb_realref(w), p);
-            arb_mul(acb_realref(e), ch, cs, p);
-            arb_mul(acb_imagref(e), ch, sn, p);
-        }
-
-        /* exp(alpha E - nu w - c) */
-        acb_mul(t, ctx->alpha, e, p);
-        acb_submul(t, ctx->nu, w, p);
-        acb_sub(t, t, cc, p);
-        acb_exp(t, t, p);
-
-        arb_set_round(sh, wts + kk, p);
-        acb_mul_arb(t, t, sh, p);
-        acb_add(sum, sum, t, wp);
     }
 
     acb_mul(res, sum, h, wp);
 
     acb_clear(m); acb_clear(h); acb_clear(w); acb_clear(e);
     acb_clear(t); acb_clear(sum); acb_clear(cc);
-    arb_clear(sh); arb_clear(ch); arb_clear(sn); arb_clear(cs);
+    for (i = 0; i < 4; i++)
+        arb_clear(r + i);
 }
 
 /* the rule on the chord [a, b] between two vertices; lmax is an

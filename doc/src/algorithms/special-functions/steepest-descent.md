@@ -348,7 +348,8 @@ minimized over $X$; starting from each vertex, the chord is extended
 over the following panels of the polygon for as long as this lowers
 its number of nodes per panel (provided the vertices skipped stay
 close to the chord). The rules are those with $n = 1, 2, 4, 6, 8, 12,
-16, 22, 32, \ldots, 4096$ nodes, in steps of about $2^{1/2}$, from the
+16, 22, 32, \ldots$ nodes, in steps of about $2^{1/2}$ up to about
+$p/2$ nodes at $p$ bits, from the
 cache of `acb_calc_integrate` (which is shared; a conversion to
 double-based balls is cached in addition). Panels on
 which the bound of [](#bounds) is below the tolerance are not
@@ -378,7 +379,8 @@ rule on a chord:
   with a few vector operations, and complex numbers are kept as pairs
   of real vectors;
 - at higher precision, or if `dfloat` is not supported, in `arb`
-  arithmetic.
+  arithmetic, with the nodes of a chord evaluated in parallel when
+  several threads are available (`flint_set_num_threads`).
 
 **Tapering.** A node where $|e^{\varphi - c}| = 2^{-k}$ only needs to
 be evaluated with $k$ bits less for the same absolute error. With
