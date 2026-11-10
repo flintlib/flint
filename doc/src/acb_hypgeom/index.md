@@ -543,6 +543,7 @@ void acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s, const acb_t z, int 
 void acb_hypgeom_gamma_upper_1f1a(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper_1f1b(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper_singular(acb_t res, slong s, const acb_t z, int regularized, slong prec)
+void acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 
 Sets `res` to the upper incomplete gamma function $\Gamma(s,z) =
@@ -568,14 +569,23 @@ $$
 $$
 for an integer $n = -s \ge 0$ (the singular case, where the second and
 third formulas have removable singularities; it sums the finite sum
-directly and assumes that $n$ is not too large). The automatic version
-handles $z = 0$ and $s = 1, 2, 3$ by closed forms, returns 0 for $Q$ at
-nonpositive integer $s$, uses the asymptotic expansion for large $|z|$
-(with a region test for complex $s$ and $z$), the singular formula for
-integer $s \le 0$, and otherwise the first ${}_1F_1$ form for
-$\operatorname{Re} z \le 0$ and the second for $\operatorname{Re} z >
-0$. Real arguments with an inaccurate result are retried with
-`arb_hypgeom_gamma_upper_integration`.
+directly and assumes that $n$ is not too large). The `nointegration`
+version chooses between these: it handles $z = 0$ and $s = 1, 2, 3$ by
+closed forms, returns 0 for $Q$ at nonpositive integer $s$, uses the
+asymptotic expansion for large $|z|$ (with a region test for complex
+$s$ and $z$), the singular formula for integer $s \le 0$, and
+otherwise the first ${}_1F_1$ form for $\operatorname{Re} z \le 0$ and
+the second for $\operatorname{Re} z > 0$.
+
+The automatic version `acb_hypgeom_gamma_upper` combines the series
+and the asymptotic expansion, at an increasing working precision, with
+rigorous numerical integration along a steepest-descent contour, and
+for inexact input with evaluation at the midpoint and derivative
+bounds, as described in
+[](algorithms/special-functions/steepest-descent#choice). It gives
+accurate enclosures also where $|s|$ and $|z|$ are both large and for
+wide input balls. The integration is available for $|s|, |z| <
+2^{44}$.
 :::
 :::
 
@@ -589,13 +599,17 @@ as in `acb_hypgeom_gamma_upper`.
 :::
 
 ::: function
+void acb_hypgeom_gamma_lower_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_lower(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 
 Sets `res` to the lower incomplete gamma function $\gamma(s,z) =
 \int_0^z t^{s-1} e^{-t} dt = \frac{z^s}{s} {}_1F_1(s, s+1, -z)$ if
 `regularized` is 0, to $P(s,z) = \gamma(s,z) / \Gamma(s)$ if
 `regularized` is 1, and to $\gamma^{*}(s,z) = z^{-s} P(s,z)$, which is
-entire in $s$ and $z$, if `regularized` is 2.
+entire in $s$ and $z$, if `regularized` is 2. The `nointegration`
+version evaluates the hypergeometric function; the automatic version
+also uses numerical integration and midpoint evaluation, as
+`acb_hypgeom_gamma_upper` does.
 :::
 
 ::: function
@@ -790,7 +804,9 @@ is nonzero) of the power series $z$, truncated to length `len`.
 ## Bessel functions {#bessel}
 
 The methods for the Bessel, Airy and Coulomb wave functions are
-described in [](algorithms/special-functions/bessel-airy).
+described in [](algorithms/special-functions/bessel-airy), and the
+numerical integration of the Bessel functions in
+[](algorithms/special-functions/steepest-descent).
 
 ::: function
 void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
@@ -829,21 +845,36 @@ using $J_{-n}(z) = (-1)^n J_n(z)$ for negative integer $\nu$.
 :::
 
 ::: function
+void acb_hypgeom_bessel_j_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the Bessel function of the first kind $J_\nu(z)$.
 
 ::: details
-For $|z| < 8$ the function sums the convergent series. Otherwise it
-uses the asymptotic expansion if $|z| \ge 2^{64}$ or $2|z| \ge
-\mathit{prec}$, and the convergent series otherwise, with the working
-precision increased by an estimate $(|z| - |\operatorname{Im} z|)/\log 2$
-of the cancellation (no increase when the terms have equal signs or
-$\nu > |z|^2/4$). For inexact input with integer $\nu$ the series is
-evaluated at the midpoint and the propagated error is bounded with
-`acb_hypgeom_bessel_j_deriv_bound`. If the enclosure has less than one
-bit of accuracy, it is intersected with a direct bound for
-$|J_\nu(z)|$.
+The `nointegration` version chooses between the convergent series and
+the asymptotic expansion. For $|z| < 8$ it sums the convergent series.
+Otherwise it uses the asymptotic expansion if $|z| \ge 2^{64}$ or
+$2|z| \ge \mathit{prec}$ (and the expansion can reach the precision
+for the given $\nu$), and the convergent series otherwise, with the
+working precision increased by an estimate of the cancellation: $(|z|
+- |\operatorname{Im} z|)/\log 2$ bits, or less if the terms of the
+series grow less than that for large $|\nu|$ (no increase when the
+terms have equal signs or $\nu > |z|^2/4$). For inexact input with
+integer $\nu$ the series is evaluated at the midpoint and the
+propagated error is bounded with `acb_hypgeom_bessel_j_deriv_bound`.
+If the enclosure has less than one bit of accuracy, it is intersected
+with a direct bound for $|J_\nu(z)|$.
+
+The automatic version `acb_hypgeom_bessel_j` combines the series and
+the asymptotic expansion, at an increasing working precision, with
+rigorous numerical integration along a steepest-descent contour
+(`acb_hypgeom_bessel_j_integration`), and for inexact input with
+evaluation at the midpoint and derivative bounds, as described in
+[](algorithms/special-functions/steepest-descent#choice). It gives
+accurate enclosures also for large order and argument, including the
+transition region $z \approx \nu$, and for wide input balls. The same
+applies to the automatic versions of the other Bessel functions
+below.
 :::
 :::
 
@@ -851,9 +882,11 @@ $|J_\nu(z)|$.
 void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong d)
 
 Sets `res` to an upper bound, possibly crude, for $|J_\nu^{(d)}(z)|$
-($|J_\nu(z)|$ for $d = 0$). Implemented only for integer $\nu$, using
-for example $|J_n^{(d)}(z)| \le e^{|\operatorname{Im} z|}$; for
-non-integer $\nu$ the bound is infinite.
+($|J_\nu(z)|$ for $d = 0$). For integer $\nu$ this uses for example
+$|J_n^{(d)}(z)| \le e^{|\operatorname{Im} z|}$; for non-integer
+$\nu$ the bound is infinite (`acb_hypgeom_bessel_j` then bounds the
+derivative through the differential equation; see
+[](algorithms/special-functions/steepest-descent#choice)).
 :::
 
 ::: function
@@ -868,6 +901,7 @@ constant term of $z$ is an inexact ball containing zero.
 :::
 
 ::: function
+void acb_hypgeom_bessel_y_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the Bessel function of the second kind
@@ -879,16 +913,65 @@ $$
 Y_n(z) = -\frac{2}{\pi} \left( i^n K_n(iz) +
     \left[\log(iz)-\log(z)\right] J_n(z) \right).
 $$
-The output is indeterminate if $\nu$ is inexact and contains an
-integer.
+The `nointegration` version uses these formulas only, and its output
+is indeterminate if $\nu$ is inexact and contains an integer. The
+automatic version also uses numerical integration and midpoint
+evaluation, as `acb_hypgeom_bessel_j` does, and has no such
+restriction.
 :::
 
 ::: function
+void acb_hypgeom_bessel_jy_nointegration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
 
-Sets `res1` to $J_\nu(z)$ and `res2` to $Y_\nu(z)$, computed together.
-The Hankel functions $H_\nu^{(1)}(z), H_\nu^{(2)}(z) = J_\nu(z) \pm i
-Y_\nu(z)$ can be formed from them.
+Sets `res1` to $J_\nu(z)$ and `res2` to $Y_\nu(z)$, computed together
+(`res1` can be `NULL`). The Hankel functions $H_\nu^{(1)}(z),
+H_\nu^{(2)}(z) = J_\nu(z) \pm i Y_\nu(z)$ can be formed from them.
+:::
+
+::: function
+void acb_hypgeom_bessel_h1_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h2_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
+
+Sets `res` to the Hankel function $H^{(1)}_\nu(z)$ or
+$H^{(2)}_\nu(z)$ computed with the asymptotic expansion: these are
+the two terms $2 A_{\pm} B_{\pm}$ of `acb_hypgeom_bessel_j_asymp`.
+This requires $\operatorname{Re}(z) > 0$; the output is indeterminate
+otherwise.
+:::
+
+::: function
+void acb_hypgeom_bessel_j_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_y_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_jy_integration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h1_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h2_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_i_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_k_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+
+Sets `res` to the respective Bessel or Hankel function, computed by
+rigorous numerical integration of the Schläfli integral with integrand
+$\exp(z \sinh w - \nu w)$ along steepest-descent contours, as
+described in [](algorithms/special-functions/steepest-descent).
+
+::: details
+The cost is nearly independent of $\nu$ and $z$: about 0.1 ms at 64
+bits, 0.5 ms at 190 bits (up to which the quadrature uses
+[`dfloat`](dfloat) arithmetic), 5 ms at 512 bits and 100 ms at 2048
+bits. For exact $\nu$ and $z$ of large magnitude, the quadrature is
+replaced by saddle-point expansions where these are cheaper, which
+they are mainly at higher precision (for $\nu, z \approx 10^{10}$,
+by a factor 1.5 to 3 at 128 bits and 3 to 8 at 333 and 1000 bits).
+The result encloses the function on the input balls and loses
+only a few bits, except when the function is much smaller than the
+contributions of the saddle points to the integral: near a zero, or
+for $J_\nu$ and $I_\nu$ when $\nu$ is close to (but not exactly) a
+negative integer. Wide input balls are cheaper than exact input, and a
+ball $z$ crossing the branch cut gives the union of the enclosures on
+the two sides. The output is indeterminate if $z$ contains zero, if
+the midpoints of $\nu$ or $z$ are not smaller than $2^{44}$, or if no
+contour is found.
+:::
 :::
 
 ## Modified Bessel functions {#modified-bessel}
@@ -896,6 +979,7 @@ Y_\nu(z)$ can be formed from them.
 ::: function
 void acb_hypgeom_bessel_i_asymp(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 void acb_hypgeom_bessel_i_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
+void acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_i(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_i_scaled(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
@@ -909,9 +993,10 @@ I_{\nu}(z) = \frac{1}{\Gamma(\nu+1)} \left(\frac{z}{2}\right)^{\nu}
 $$
 or an automatic choice. `acb_hypgeom_bessel_i_scaled` computes
 $e^{-z} I_\nu(z)$; the `asymp` and `0f1` versions compute the scaled
-function if `scaled` is nonzero. For real arguments with an inaccurate
-result, the automatic versions also try
-`arb_hypgeom_bessel_i_integration`.
+function if `scaled` is nonzero. The `nointegration` version chooses
+between the series and the asymptotic expansion; the automatic
+versions also use numerical integration and midpoint evaluation, as
+`acb_hypgeom_bessel_j` does.
 :::
 
 ::: function
@@ -964,13 +1049,16 @@ indeterminate if $\nu$ is inexact and contains an integer.
 :::
 
 ::: function
+void acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_k(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_k_scaled(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the modified Bessel function of the second kind
-$K_\nu(z)$, or to $e^z K_\nu(z)$, choosing between the asymptotic
-expansion and the convergent series. For real arguments with an
-inaccurate result they also try `arb_hypgeom_bessel_k_integration`.
+$K_\nu(z)$, or to $e^z K_\nu(z)$. The `nointegration` version chooses
+between the asymptotic expansion and the convergent series (its output
+is indeterminate if $\nu$ is inexact and contains an integer); the
+automatic versions also use numerical integration and midpoint
+evaluation, as `acb_hypgeom_bessel_j` does.
 :::
 
 ## Airy functions {#airy}
@@ -1510,9 +1598,11 @@ and the error bounds are described in
 void acb_hypgeom_pfq_bound_factor(mag_t C, acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, ulong n)
 
 Sets `C` to a factor such that $\left|\sum_{k=n}^{\infty} T(k)\right|
-\le C |T(n)|$. The bound is infinite if $p > q$, if $\operatorname{Re}(b_i
-+ n) > 0$ fails for some $i$, or if $n$ is too small for the term ratio
-to be bounded below 1, even when the series converges. See
+\le C |T(n)|$. The bound is infinite if $p > q$, or if $n$ is too small
+for the terms to have started to decrease, even when the series
+converges. If $\operatorname{Re}(b_i + n) \le 0$ for some $i$, so that
+the terms can grow again near $k = -b_i$, the bound is computed
+piecewise and depends on the distance from $b_i$ to the integers. See
 [](algorithms/special-functions/hypergeometric#tail-bound).
 :::
 

@@ -88,7 +88,7 @@ acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
                          acb_srcptr b, slong q, const acb_t z,
                          slong prec, slong n_max)
 {
-    slong n_skip, n_min, n_terminating, nint;
+    slong n_skip, n_min, n_terminating, nint, n_pole = 0;
     slong k, n;
     double log2_z;
     double * are;
@@ -144,9 +144,13 @@ acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
         bre[k] = arf_get_d(arb_midref(acb_realref(b + k)), ARF_RND_DOWN);
         bim[k] = arf_get_d(arb_midref(acb_imagref(b + k)), ARF_RND_DOWN);
 
-        if (bre[k] <= 0.25)
+        /* Sum past the negative-integer poles of the Pochhammer
+           symbols (unless this is too far out) where the terms grow
+           again near the pole to a size that matters; the tail bound
+           accounts for the growth otherwise. */
+        if (bre[k] <= 0.25 && 2 - bre[k] < n_max)
         {
-            n_min = FLINT_MAX(n_min, 2 - bre[k]);
+            n_pole = FLINT_MAX(n_pole, 2 - bre[k]);
 
             /* Also avoid near-integers here (can even allow exact
                integers when computing regularized hypergeometric functions). */
@@ -161,6 +165,45 @@ acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
 
     success = acb_hypgeom_pfq_choose_n_double(&n, are, aim, p, bre, bim, q,
         log2_z, n_skip, n_min, n_max, prec);
+
+    if (n_pole > n)
+    {
+        /* the sizes (log2) of the terms beyond n, up to the pole */
+        double term = 0.0, term_max = 0.0, t, u;
+        slong m, j;
+
+        for (m = n_skip; m < n_pole; m++)
+        {
+            t = 1.0;
+            for (j = 0; j < FLINT_MAX(p, q); j++)
+            {
+                if (j < p)
+                {
+                    u = (are[j]+m-1)*(are[j]+m-1) + (aim[j]*aim[j]);
+                    t *= D_ABS(u);
+                }
+                if (j < q)
+                {
+                    u = (bre[j]+m-1)*(bre[j]+m-1) + (bim[j]*bim[j]);
+                    u = D_ABS(u);
+                    if (u > 1e-100)
+                        t /= u;
+                }
+            }
+            term += 0.5 * log(t) * 1.4426950408889634074 + log2_z;
+            if (m <= n)
+                term_max = FLINT_MAX(term_max, term);
+            else if (term > term_max - prec - 4)
+                break;
+        }
+
+        if (m < n_pole)
+        {
+            n_min = n_pole;
+            success = acb_hypgeom_pfq_choose_n_double(&n, are, aim, p, bre, bim, q,
+                log2_z, n_skip, n_min, n_max, prec);
+        }
+    }
 
     if (!success)
     {

@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2014-2015, 2025 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -12,6 +14,7 @@
 #include <math.h>
 #include "acb.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 /*
 Bound |J^{(d)}_nu(z)|, or |J_nu(z)| itself with d = 0.
@@ -21,14 +24,11 @@ acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong
 {
     if (!acb_is_int(nu))
     {
-        /* Not yet implemented. */
-        /* Things we could use:
-
-           - For complex z, complex n, integer d >= 0:
-                |J^{(d)}_n(z)| <= max(|J_{n-d}(z)|, ..., |J_{n+d}(z)|).
-            - Asymptotic expansion (general case)
-                Bounds are messy and not useful when |nu| is large.
-        */
+        /* Not implemented here: acb_hypgeom_bessel_j evaluates at the
+           midpoint of z with a derivative bound obtained from the
+           differential equation, or integrates on the input balls.
+           For higher derivatives we could use
+                |J^{(d)}_n(z)| <= max(|J_{n-d}(z)|, ..., |J_{n+d}(z)|). */
         mag_inf(res);
         return;
     }
@@ -508,9 +508,49 @@ acb_hypgeom_bessel_j_transition(acb_t res, const acb_t nu, const acb_t z, slong 
         }
     }
 
-    /* Estimate cancellation as (|x|-im(|x|)) * (1/log(2)) bits.
-       TODO: estimate more accurately for large nu */
+    /* Estimate cancellation as (|x|-im(|x|)) * (1/log(2)) bits, and
+       for large nu, as the growth of the terms (z^2/4)^k / (k! (nu+1)_k)
+       of the 0F1 series up to their peak (a few bits extra for the
+       oscillation) */
     cancellation = (zz - fabs(b)) * 1.44269504088896;
+    {
+        double nr = arf_get_d(arb_midref(acb_realref(nu)), ARF_RND_DOWN);
+        double ni = arf_get_d(arb_midref(acb_imagref(nu)), ARF_RND_DOWN);
+        double nn = hypot(nr, ni);
+        double kp = 0.5 * (sqrt(nn * nn + zz * zz) - nn), growth = 0.0, r, sum = 0.0;
+        slong k, kmax;
+
+        /* the peak: beyond the near-pole of (nu+1)_k for negative Re nu
+           (where the terms grow again, to a size that matters only if
+           |z| is not small compared to |nu|) */
+        kmax = (slong) (kp + 2.0 + ((nr < 0.0 && zz > -0.5 * nr) ? 2.0 * (-nr) : 0.0));
+
+        if (nn < 1e15 && zz < 1e15 && nn >= 2.0 && kp >= 1.0 && kmax < 20000)
+        {
+            double lnu, anu, first;
+
+            for (k = 0; k < kmax; k++)
+            {
+                r = log(0.25 * zz * zz) - log((k + 1.0) * hypot(nr + 1.0 + k, ni));
+                sum += r;
+                growth = FLINT_MAX(growth, sum);
+            }
+
+            /* the peak term relative to the function: the sum of the
+               series is J / [(z/2)^nu / Gamma(nu+1)], where (for
+               Re nu >= 0) |J| is at most about e^{|Im z|} and otherwise
+               about the first term; log |Gamma(nu+1)| by Stirling's
+               formula */
+            lnu = log(nn);
+            anu = atan2(ni, nr);
+            first = nr * log(0.5 * zz) - ni * atan2(b, a)
+                - ((nr + 0.5) * lnu - ni * anu - nr) - 0.9189385332;
+            if (nr >= 0.0)
+                growth += FLINT_MAX(first - fabs(b), 0.0);
+            growth = growth * 1.44269504088896 + 10.0;
+            cancellation = FLINT_MIN(cancellation, growth);
+        }
+    }
     cancellation = FLINT_MIN(cancellation, 4 * prec);
     cancellation = FLINT_MAX(cancellation, 0);
 
@@ -557,8 +597,29 @@ acb_hypgeom_bessel_j_transition(acb_t res, const acb_t nu, const acb_t z, slong 
     }
 }
 
+/* whether the asymptotic expansions at infinity are expected to reach
+   prec bits: their error is about e^{-2 sqrt(|z| (|z| - 2 |nu|))} (and
+   they diverge before reaching any accuracy for |nu| comparable to |z|) */
+int
+_acb_hypgeom_bessel_asymp_converges(const acb_t nu, const acb_t z, slong prec)
+{
+    double zn, num;
+
+    if (!acb_is_finite(nu) || !acb_is_finite(z))
+        return 0;
+
+    zn = hypot(arf_get_d(arb_midref(acb_realref(z)), ARF_RND_NEAR),
+               arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_NEAR));
+    num = hypot(arf_get_d(arb_midref(acb_realref(nu)), ARF_RND_NEAR),
+                arf_get_d(arb_midref(acb_imagref(nu)), ARF_RND_NEAR));
+
+    if (!(zn < 1.8e19))
+        return 1;
+    return zn > 2.2 * num && 2.885 * sqrt(zn * (zn - 2.0 * num)) - 10.0 >= (double) prec;
+}
+
 void
-acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
+acb_hypgeom_bessel_j_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
     if (!acb_is_finite(nu) || !acb_is_finite(z))
     {
@@ -585,11 +646,13 @@ acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
             acb_t t;
             acb_init(t);
 
-            /* Assuming small nu, the asymptotic series can be used roughly when
+            /* For small nu, the asymptotic series can be used roughly when
                [(1+log(2))/log(2) = 2.44269504088896] * z > p
-               We are a bit more conservative and use the factor 2. */
+               We are a bit more conservative and use the factor 2; for
+               larger nu, the expansion must also be expected to converge. */
 
-            if (mag_cmp_2exp_si(zmag, 64) >= 0 || 2 * mag_get_d(zmag) >= prec)
+            if (mag_cmp_2exp_si(zmag, 64) >= 0 || (2 * mag_get_d(zmag) >= prec
+                    && _acb_hypgeom_bessel_asymp_converges(nu, z, prec)))
                 acb_hypgeom_bessel_j_asymp(t, nu, z, prec);
             else
                 acb_hypgeom_bessel_j_transition(t, nu, z, prec);

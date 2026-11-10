@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2014-2015, 2021 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -12,6 +14,7 @@
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 static void
 acb_hypgeom_bessel_i_asymp_prefactors(acb_t A, acb_t B, acb_t C,
@@ -201,8 +204,8 @@ acb_hypgeom_bessel_i_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, s
     acb_clear(t);
 }
 
-static void
-acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
+void
+_acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 {
     mag_t zmag;
 
@@ -210,7 +213,8 @@ acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int
     acb_get_mag(zmag, z);
 
     if (mag_cmp_2exp_si(zmag, 4) < 0 ||
-        (mag_cmp_2exp_si(zmag, 64) < 0 && 2 * mag_get_d(zmag) < prec))
+        (mag_cmp_2exp_si(zmag, 64) < 0 && (2 * mag_get_d(zmag) < prec
+            || !_acb_hypgeom_bessel_asymp_converges(nu, z, prec))))
         acb_hypgeom_bessel_i_0f1(res, nu, z, scaled, prec);
     else
         acb_hypgeom_bessel_i_asymp(res, nu, z, scaled, prec);
@@ -218,58 +222,8 @@ acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int
     mag_clear(zmag);
 }
 
-static void
-_acb_hypgeom_bessel_i(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
-{
-    acb_t res2;
-    slong acc, max, t;
-
-    acb_init(res2);
-
-    acb_hypgeom_bessel_i_nointegration(res2, nu, z, scaled, prec);
-
-    acc = acb_rel_accuracy_bits(res2);
-
-    if (acc < 0.5 * prec)
-    {
-        max = prec;
-        t = acb_rel_accuracy_bits(z);
-        max = FLINT_MIN(max, t);
-        t = acb_rel_accuracy_bits(nu);
-        max = FLINT_MIN(max, t);
-
-        if (max > 2 && acc < 0.5 * max)
-        {
-            if (acb_is_real(nu) && acb_is_real(z) && arf_cmp_2exp_si(arb_midref(acb_realref(nu)), -1) > 0 &&
-                arf_cmpabs_2exp_si(arb_midref(acb_realref(nu)), 60) < 0 &&
-                arf_cmpabs_2exp_si(arb_midref(acb_realref(z)), 60) < 0)
-            {
-
-                arb_hypgeom_bessel_i_integration(acb_realref(res),
-                        acb_realref(nu), acb_realref(z), scaled, prec);
-                arb_zero(acb_imagref(res));
-
-                if (acb_rel_accuracy_bits(res) > acb_rel_accuracy_bits(res2) ||
-                    (acb_is_finite(res) && !acb_is_finite(res2)))
-                {
-                    acb_swap(res, res2);
-                }
-            }
-        }
-    }
-
-    acb_swap(res, res2);
-    acb_clear(res2);
-}
-
 void
-acb_hypgeom_bessel_i(acb_t res, const acb_t nu, const acb_t z, slong prec)
+acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
-    _acb_hypgeom_bessel_i(res, nu, z, 0, prec);
-}
-
-void
-acb_hypgeom_bessel_i_scaled(acb_t res, const acb_t nu, const acb_t z, slong prec)
-{
-    _acb_hypgeom_bessel_i(res, nu, z, 1, prec);
+    _acb_hypgeom_bessel_i_nointegration(res, nu, z, 0, prec);
 }

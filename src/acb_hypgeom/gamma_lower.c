@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2016 Arb authors
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -13,7 +15,7 @@
 #include "acb_hypgeom.h"
 
 void
-acb_hypgeom_gamma_lower(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
+acb_hypgeom_gamma_lower_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 {
     acb_t s1, nz, t, u;
 
