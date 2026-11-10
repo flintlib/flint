@@ -159,6 +159,40 @@ _ex_neg_series_min_z(slong n)
     return WORD_MAX;
 }
 
+/* the significant bits of the fraction (v, n) below its z leading zero
+   bits (v nonzero) */
+static slong
+_ex_frac_len(nn_srcptr v, slong n, slong z)
+{
+    slong lo = 0;
+    while (v[lo] == 0)
+        lo++;
+    return FLINT_BITS * (n - lo) - z - (slong) flint_ctz(v[lo]);
+}
+
+/* In the range of the diophantine kernel, a short argument (z leading
+   zero bits, len significant bits below them) goes straight to the
+   bit-burst of _mp_real_exp_notab, whose cost grows with len, instead
+   of a reduction that makes it full-length (p-exp_window; e.g. at 51907
+   limbs, z = 64: 0.036 s for len = 64, 0.26 s for 16384, against a flat
+   0.30-0.35 s; at z = 0 the burst wins up to len = 1024) */
+static int
+_ex_direct_burst(slong n, slong z, slong len)
+{
+    slong lmax;
+
+    if (n < 2000)
+        lmax = (z >= 16) ? 64 : 0;
+    else if (n < 8000)
+        lmax = (z >= 64) ? 512 : (z >= 16) ? 256 : 64;
+    else if (n < 30000)
+        lmax = (z >= 64) ? 8192 : (z >= 16) ? 1024 : 512;
+    else
+        lmax = (z >= 64) ? 32768 : (z >= 16) ? 4096 : 1024;
+
+    return len <= lmax;
+}
+
 /* (y, n + 1) = exp(v), v in [0, 1) at n fraction limbs */
 static void
 _ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n, int notab)
@@ -187,7 +221,7 @@ _ex_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n, int notab)
         if (!_mp_real_exp_opt(y, err, v, n))
             _mp_real_exp_bitwise_rs(y, err, v, n, 0);
     }
-    else if (n <= EX_DIOPHANTINE_MAX)
+    else if (n <= EX_DIOPHANTINE_MAX && !_ex_direct_burst(n, z, _ex_frac_len(v, n, z)))
         _mp_real_exp_diophantine(y, err, v, n);
     else
         _mp_real_exp_notab(y, err, v, n);
@@ -393,6 +427,51 @@ _ex_mid(mp_real_t res, const mp_real_t m, slong prec, int notab)
         _mp_real_elem_finish(res, n, err + 3 * trunc, 0);
         TMP_END;
         return;
+    }
+
+    if (m->exp <= 0 && n > EX_BITWISE_MAX)
+    {
+        /* m in (-1, 0) beyond the bitwise range: the reduction by log 2
+           would make t = log 2 - |m| full-length, so a short or small
+           |m| takes 1 / exp(|m|) from the kernel instead (p-exp_window:
+           e.g. at 51907 limbs, |m| < 2^-1024 with 64 bits: 0.03 s
+           against 0.32 s; beyond the diophantine range never slower).
+           TODO: let the bit-burst kernel (_mp_real_exp_reduced and
+           _mp_real_exp_notab, whose interface takes v in [0, 1)) take
+           a negative argument directly -- the binary splitting of the
+           slices works for negative rationals -- to save the
+           reciprocal, which is a large share when |m| is tiny (at
+           15577 limbs, |m| < 2^-1024: 0.0068 s against 0.0043 s for
+           exp(|m|)), and to cover the long arguments with fewer than
+           128 leading zero bits below 65536 limbs, which keep the
+           reduction by log 2 here. */
+        nn_srcptr v;
+        nn_ptr buf;
+        ulong err;
+        int trunc;
+        slong zv;
+        TMP_INIT;
+
+        TMP_START;
+        buf = TMP_ALLOC(n * sizeof(ulong));
+        v = _mp_real_elem_frame(buf, n, m, res->d, NULL, &trunc);
+        zv = _mp_real_elem_lzb(v, n);
+        if (zv != WORD_MAX && (n > EX_DIOPHANTINE_MAX || zv >= 128
+                || _ex_direct_burst(n, zv, _ex_frac_len(v, n, zv))))
+        {
+            mp_real_t u;
+
+            mp_real_init(u);
+            mp_real_fit_length(u, n + 1);
+            _ex_kernel(u->d, &err, v, n, notab);
+            _mp_real_elem_finish(u, n, err + 3 * trunc, 0);
+            mp_real_set_ui(res, 1);
+            mp_real_div(res, res, u, n);
+            mp_real_clear(u);
+            TMP_END;
+            return;
+        }
+        TMP_END;
     }
 
     if (m->exp <= 0 && z >= _ex_neg_series_min_z(n))

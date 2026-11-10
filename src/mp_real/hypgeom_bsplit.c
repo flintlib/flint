@@ -3809,120 +3809,32 @@ _eval_d(const double * f, slong len, double k)
     return v;
 }
 
-void
-mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
-    slong n)
-{
-    _mp_real_hypgeom_series(res, s, n, -1);
-}
-
-void
-_mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
-    slong n, int gcd)
+/* T / Qt = sum_(k=1)^N P(k)/Q(k) prod_(j<k) R(j)/Q(j) by the binary
+   splitting, the top levels truncated to wp limbs; with allow_content,
+   *N may be rounded up (N' - N < 2 N / 24, the leaves holding at
+   least HYP_LEAF_TERMS_MIN terms) to the balanced tree of the
+   content-power mode, else exactly *N terms are summed.  gcd as for _mp_real_hypgeom_series (-1: automatic). */
+static void
+_hyp_sum(mp_real_t T, mp_real_t Qt, const fmpz * P, slong Plen,
+    const fmpz * Q, slong Qlen, const fmpz * R, slong Rlen, slong * Nptr,
+    slong wp, int gcd, int allow_content)
 {
     hyp_struct H;
     hyp_sieve_info si;
     hyp_thread ts;
     hyp_flist FQt, FRt;
-    tail_struct tl;
-    fmpz * P, * Q, * R, * Qc, * Rc, * A = NULL;
-    double * Pd, * Qd, * Rd;
-    fmpz_t coefP, coefQ, coefD;
-    slong Plen = s->Plen, Qlen = s->Qlen, Rlen = s->Rlen, Alen = 0;
-    slong N, K, J, L, i, wp, depth, Lmax;
-    double target, Sest, lS, tau, pt;
-    mp_real_t T, Qt, Rt, num, den, t;
+    fmpz * Qc, * Rc, * A = NULL;
+    slong N = *Nptr, K, J, L, i, depth, Lmax, Alen = 0;
+    double pt;
+    mp_real_t Rt, num, t;
 
-    if (s->power != 1 && s->power != -1)
-        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: power must be 1 or -1\n");
-
-    /* at least 128 bits: with two 32-bit limbs, a small top limb of Q
-       leaves too few bits for its rounding errors (the final division
-       requires a relative radius below 2^-30) */
-    wp = FLINT_MAX(n, 128 / FLINT_BITS);
-
-    P = _fmpz_vec_init(Plen + Qlen + Rlen + 3 + Qlen + Rlen + 2);
-    Q = P + Plen + 1;
-    R = Q + Qlen + 1;
-    Qc = R + Rlen + 1;
+    Qc = _fmpz_vec_init(Qlen + Rlen + 2);
     Rc = Qc + Qlen + 1;
-    fmpz_init(coefP);
-    fmpz_init(coefQ);
-    fmpz_init(coefD);
     fmpz_init(H.cQ);
     fmpz_init(H.cR);
-
-    for (i = 0; i < Plen; i++)
-        _fmpz_set_signed_mpn(P + i, s->P + i);
-    for (i = 0; i < Qlen; i++)
-        _fmpz_set_signed_mpn(Q + i, s->Q + i);
-    for (i = 0; i < Rlen; i++)
-        _fmpz_set_signed_mpn(R + i, s->R + i);
-    _fmpz_set_signed_mpn(coefP, &s->coefP);
-    _fmpz_set_signed_mpn(coefQ, &s->coefQ);
-    _fmpz_set_signed_mpn(coefD, &s->coefD);
-
-    while (Qlen > 0 && fmpz_is_zero(Q + Qlen - 1))
-        Qlen--;
-    if (Qlen == 0)
-        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: Q = 0\n");
-    if (fmpz_is_zero(coefD))
-        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: coefD = 0\n");
-    while (Plen > 0 && fmpz_is_zero(P + Plen - 1))
-        Plen--;
-    while (Rlen > 0 && fmpz_is_zero(R + Rlen - 1))
-        Rlen--;
-
+    mp_real_init(Rt);
+    mp_real_init(num);
     mp_real_init(t);
-
-    /* the trivial sum */
-    if (Plen == 0 || fmpz_is_zero(coefP))
-    {
-        mp_real_set_fmpz(res, coefQ);
-        mp_real_set_fmpz(t, coefD);
-        if (s->power == 1)
-            mp_real_div(res, res, t, wp);
-        else
-            mp_real_div(res, t, res, wp);
-        mp_real_clear(t);
-        goto cleanup_early;
-    }
-
-    tail_init(&tl, P, Plen, Q, Qlen, R, Rlen);
-    Pd = tl.Pd;
-    Qd = tl.Qd;
-    Rd = tl.Rd;
-
-    /* magnitude estimate of S coefD / coefP from the first terms (only
-       used to choose the target) */
-    {
-        double sum = 0.0, prod = 1.0, q;
-        for (i = 1; i <= 40; i++)
-        {
-            q = _eval_d(Qd, Qlen, i);
-            if (q == 0.0)
-                break;
-            sum += _eval_d(Pd, Plen, i) / q * prod;
-            prod *= _eval_d(Rd, Rlen, i) / q;
-            if (!(fabs(prod) > 1e-30 * fabs(sum)) || !isfinite(prod))
-                break;
-        }
-        Sest = fabs(_ratio_d(coefQ, coefP) + sum);
-        if (!(Sest > 0.0) || !isfinite(Sest))
-            Sest = 1.0;
-        if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
-            Sest = 0x1p1000;
-        lS = log2(Sest);
-        if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
-            lS = (double) fmpz_bits(coefQ) - (double) fmpz_bits(coefP);
-    }
-
-    /* target: tail below 2^-(FLINT_BITS wp + 16) Sest */
-    target = lS - (double) (FLINT_BITS * wp + 16);
-
-    /* the number of terms */
-    N = tail_find(&tau, &tl, target);
-    N = FLINT_MAX(N, 1);
 
     /* leaves of L terms: about HYP_LEAF_LIMBS limbs of T, between
        HYP_LEAF_TERMS_MIN and HYP_LEAF_TERMS_MAX terms; pt is an upper
@@ -3940,7 +3852,7 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     {
         double cbits = (double) fmpz_bits(H.cQ) - 0.5, qbits;
         qbits = _log2_bound_fmpz(Q, Qlen, N) - cbits;
-        H.content = (N > Lmax && wp >= 64 && cbits >= 8.0 * qbits);
+        H.content = (allow_content && N > Lmax && wp >= 64 && cbits >= 8.0 * qbits);
     }
 
     /* in content mode, the same rule for R: separate its content only
@@ -4017,9 +3929,6 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
         + H.P->W + H.A->W + H.Q->W + H.R->W + 8;
     H.vlimbs = H.P->W + 2 * H.Q->W + 2 * H.R->W + H.A->W + 8;
 
-    /* the tail at the final N (rounded up in content mode) */
-    tau = FLINT_MIN(tau, tail_bound(&tl, N));
-
     H.L = L;
     H.J = J;
     H.wp = wp;
@@ -4028,12 +3937,6 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     if (H.content)
         H.tbits = FLINT_MAX(_log2_bound_fmpz(Q, Qlen, N)
             - ((double) fmpz_bits(H.cQ) - 1.0), 1.0) + 2.0;
-
-    mp_real_init(T);
-    mp_real_init(Qt);
-    mp_real_init(Rt);
-    mp_real_init(num);
-    mp_real_init(den);
 
     /* one allocation: the leaf buffers, then the coefficients */
     {
@@ -4130,6 +4033,137 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
 
     flint_free(H.buf);
 
+    *Nptr = N;
+
+    mp_real_clear(Rt);
+    mp_real_clear(num);
+    mp_real_clear(t);
+    if (A != NULL)
+        _fmpz_vec_clear(A, Alen);
+    _fmpz_vec_clear(Qc, Qlen + Rlen + 2);
+    fmpz_clear(H.cQ);
+    fmpz_clear(H.cR);
+}
+
+void
+mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
+    slong n)
+{
+    _mp_real_hypgeom_series(res, s, n, -1);
+}
+
+void
+_mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
+    slong n, int gcd)
+{
+    tail_struct tl;
+    fmpz * P, * Q, * R;
+    double * Pd, * Qd, * Rd;
+    fmpz_t coefP, coefQ, coefD;
+    slong Plen = s->Plen, Qlen = s->Qlen, Rlen = s->Rlen;
+    slong N, i, wp;
+    double target, Sest, lS, tau;
+    mp_real_t T, Qt, Rt, num, den, t;
+
+    if (s->power != 1 && s->power != -1)
+        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: power must be 1 or -1\n");
+
+    /* at least 128 bits: with two 32-bit limbs, a small top limb of Q
+       leaves too few bits for its rounding errors (the final division
+       requires a relative radius below 2^-30) */
+    wp = FLINT_MAX(n, 128 / FLINT_BITS);
+
+    P = _fmpz_vec_init(Plen + Qlen + Rlen + 3);
+    Q = P + Plen + 1;
+    R = Q + Qlen + 1;
+    fmpz_init(coefP);
+    fmpz_init(coefQ);
+    fmpz_init(coefD);
+
+    for (i = 0; i < Plen; i++)
+        _fmpz_set_signed_mpn(P + i, s->P + i);
+    for (i = 0; i < Qlen; i++)
+        _fmpz_set_signed_mpn(Q + i, s->Q + i);
+    for (i = 0; i < Rlen; i++)
+        _fmpz_set_signed_mpn(R + i, s->R + i);
+    _fmpz_set_signed_mpn(coefP, &s->coefP);
+    _fmpz_set_signed_mpn(coefQ, &s->coefQ);
+    _fmpz_set_signed_mpn(coefD, &s->coefD);
+
+    while (Qlen > 0 && fmpz_is_zero(Q + Qlen - 1))
+        Qlen--;
+    if (Qlen == 0)
+        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: Q = 0\n");
+    if (fmpz_is_zero(coefD))
+        flint_throw(FLINT_ERROR, "mp_real_hypgeom_series: coefD = 0\n");
+    while (Plen > 0 && fmpz_is_zero(P + Plen - 1))
+        Plen--;
+    while (Rlen > 0 && fmpz_is_zero(R + Rlen - 1))
+        Rlen--;
+
+    mp_real_init(t);
+
+    /* the trivial sum */
+    if (Plen == 0 || fmpz_is_zero(coefP))
+    {
+        mp_real_set_fmpz(res, coefQ);
+        mp_real_set_fmpz(t, coefD);
+        if (s->power == 1)
+            mp_real_div(res, res, t, wp);
+        else
+            mp_real_div(res, t, res, wp);
+        mp_real_clear(t);
+        goto cleanup_early;
+    }
+
+    tail_init(&tl, P, Plen, Q, Qlen, R, Rlen);
+    Pd = tl.Pd;
+    Qd = tl.Qd;
+    Rd = tl.Rd;
+
+    /* magnitude estimate of S coefD / coefP from the first terms (only
+       used to choose the target) */
+    {
+        double sum = 0.0, prod = 1.0, q;
+        for (i = 1; i <= 40; i++)
+        {
+            q = _eval_d(Qd, Qlen, i);
+            if (q == 0.0)
+                break;
+            sum += _eval_d(Pd, Plen, i) / q * prod;
+            prod *= _eval_d(Rd, Rlen, i) / q;
+            if (!(fabs(prod) > 1e-30 * fabs(sum)) || !isfinite(prod))
+                break;
+        }
+        Sest = fabs(_ratio_d(coefQ, coefP) + sum);
+        if (!(Sest > 0.0) || !isfinite(Sest))
+            Sest = 1.0;
+        if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
+            Sest = 0x1p1000;
+        lS = log2(Sest);
+        if (fabs(_ratio_d(coefQ, coefP)) >= 0x1p1000)
+            lS = (double) fmpz_bits(coefQ) - (double) fmpz_bits(coefP);
+    }
+
+    /* target: tail below 2^-(FLINT_BITS wp + 16) Sest */
+    target = lS - (double) (FLINT_BITS * wp + 16);
+
+    /* the number of terms */
+    N = tail_find(&tau, &tl, target);
+    N = FLINT_MAX(N, 1);
+
+    mp_real_init(T);
+    mp_real_init(Qt);
+    mp_real_init(Rt);
+    mp_real_init(num);
+    mp_real_init(den);
+
+    _hyp_sum(T, Qt, P, Plen, Q, Qlen, R, Rlen, &N, wp, gcd, 1);
+
+    /* the tail at the final N (rounded up in content mode) */
+    tau = FLINT_MIN(tau, tail_bound(&tl, N));
+
+
     /* num = coefQ Q + coefP T (+/- |coefP| 2^tau |Q|), den = coefD Q */
     _mp_real_mul_fmpz(num, T, coefP, wp);
     if (tau > -HUGE_VAL)
@@ -4166,16 +4200,54 @@ _mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s,
     mp_real_clear(t);
 
     tail_clear(&tl);
-    if (A != NULL)
-        _fmpz_vec_clear(A, Alen);
 
 cleanup_early:
-    _fmpz_vec_clear(P, s->Plen + s->Qlen + s->Rlen + 3 + s->Qlen + s->Rlen + 2);
+    _fmpz_vec_clear(P, s->Plen + s->Qlen + s->Rlen + 3);
     fmpz_clear(coefP);
     fmpz_clear(coefQ);
     fmpz_clear(coefD);
-    fmpz_clear(H.cQ);
-    fmpz_clear(H.cR);
+}
+
+slong
+mp_real_hypgeom_sum(mp_real_t T, mp_real_t Q,
+    const mp_real_hypgeom_int_struct * P, slong Plen,
+    const mp_real_hypgeom_int_struct * Qp, slong Qlen,
+    const mp_real_hypgeom_int_struct * R, slong Rlen, slong N, int exact,
+    slong n)
+{
+    fmpz * Pz, * Qz, * Rz;
+    slong i, wp = FLINT_MAX(n, 128 / FLINT_BITS), len = Plen + Qlen + Rlen + 3;
+
+    Pz = _fmpz_vec_init(len);
+    Qz = Pz + Plen + 1;
+    Rz = Qz + Qlen + 1;
+    for (i = 0; i < Plen; i++)
+        _fmpz_set_signed_mpn(Pz + i, P + i);
+    for (i = 0; i < Qlen; i++)
+        _fmpz_set_signed_mpn(Qz + i, Qp + i);
+    for (i = 0; i < Rlen; i++)
+        _fmpz_set_signed_mpn(Rz + i, R + i);
+    while (Plen > 0 && fmpz_is_zero(Pz + Plen - 1))
+        Plen--;
+    while (Qlen > 0 && fmpz_is_zero(Qz + Qlen - 1))
+        Qlen--;
+    while (Rlen > 0 && fmpz_is_zero(Rz + Rlen - 1))
+        Rlen--;
+    if (Qlen == 0)
+        flint_throw(FLINT_ERROR, "mp_real_hypgeom_sum: Q = 0\n");
+
+    if (N <= 0 || Plen == 0)
+    {
+        mp_real_zero(T);
+        mp_real_set_ui(Q, 1);
+    }
+    else
+    {
+        _hyp_sum(T, Q, Pz, Plen, Qz, Qlen, Rz, Rlen, &N, wp, -1, !exact);
+    }
+
+    _fmpz_vec_clear(Pz, len);
+    return FLINT_MAX(N, 0);
 }
 
 /* ---- the int64 convenience wrapper ---- */

@@ -641,8 +641,9 @@ $1/\log 2 - 1$) and $n + 1$ limbs, with a units limb, for the others.
 
 ::: details
 The floor is read off a ball computed with a few guard limbs, which is
-recomputed with more guard limbs until its radius determines the floor.
-The value 1 written to `err` bounds $c - \lfloor c B^n \rfloor B^{-n}$
+recomputed with more guard limbs until its radius determines the floor
+(with a message at any `mp_real_set_verbose` level above 0, since this
+is rare unless the evaluation falls short of its precision). The value 1 written to `err` bounds $c - \lfloor c B^n \rfloor B^{-n}$
 in ulps; the error is one-sided.
 :::
 :::
@@ -700,6 +701,31 @@ Sets `K0`, `n1` and `nb` to the default parameters of
 `_mp_real_const_khinchin_tune` at `n` limbs (`nb` for the current number
 of threads). The profile program
 `p-const_khinchin_tune` measures them against their neighbours.
+:::
+
+::: function
+void _mp_real_const_khinchin_afe(mp_real_t res, slong n, slong a, slong maxdual)
+
+Khinchin's constant by the theta splitting of the dilogarithm series
+(an approximate functional equation), in $p^{3/2 + o(1)}$ time for $p$
+bits. The split point is $u_0 = 4^{-a}$ with $1 \le a \le 7$ ($a = 0$
+selects the default 2) and `maxdual` is the largest number of dual
+terms computed at once (0 selects the default: half the threads while
+$k$-terms remain to be started, then all of them; a dual
+term takes about four times the memory of a $k$-term, most of it in
+transforms limited by `flint_fft_small_max_transformed_ring_size`). The
+result does not
+depend on the parameters or the number of threads. For tuning; see
+[](algorithms/special-functions/constants#khinchin-afe).
+:::
+
+::: macro
+MP_REAL_KHINCHIN_AFE_CUTOFF
+
+The precision in limbs from which `mp_real_const_khinchin` uses
+`_mp_real_const_khinchin_afe` instead of the zeta-value sum, by default
+`5000000 / FLINT_BITS` (about $1.5 \cdot 10^6$ digits). It may be
+defined when compiling FLINT.
 :::
 
 ## Elementary functions {#elementary}
@@ -1052,6 +1078,25 @@ of 1 to 2 microseconds dominates. The computation uses the threads of
 :::
 
 ::: function
+slong mp_real_hypgeom_sum(mp_real_t T, mp_real_t Q, const mp_real_hypgeom_int_struct * P, slong Plen, const mp_real_hypgeom_int_struct * Qp, slong Qlen, const mp_real_hypgeom_int_struct * R, slong Rlen, slong N, int exact, slong n)
+
+Set `T` and `Q` to balls with
+$$
+\frac{T}{Q} = \sum_{k=1}^{N'} \frac{P(k)}{Q(k)} \prod_{j=1}^{k-1} \frac{R(j)}{Q(j)}
+$$
+and return $N'$: the binary splitting of `mp_real_hypgeom_series`
+without its choice of the number of terms, its tail bound and its final
+division, which are left to the caller (for a divergent series, say, or
+a tail bound of its own). With `exact` = 1, $N' = N$; with `exact` = 0,
+$N \le N' < N(1 + 1/12)$ may be larger, so that the content-power mode
+(a balanced tree, for $Q$ or $R$ with a large constant factor, as in
+power series of $p/q$) can be used. $T/Q$ is accurate to about
+$\bits(n - 1)$ bits relative to the largest term. $Q(k)$ must not
+vanish for $1 \le k \le N'$; there is no convergence condition. For
+$N \le 0$, $T = 0$ and $Q = 1$.
+:::
+
+::: function
 void _mp_real_atan_frac_bsplit(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong n)
 void _mp_real_atanh_frac_bsplit(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong n)
 
@@ -1071,6 +1116,47 @@ module use these functions for arguments of few bits relative to the
 precision, and Zuniga's series ([](algorithms/special-functions/diophantine-reduction))
 otherwise.
 :::
+:::
+
+### The incomplete gamma function {#gamma-upper-half}
+
+::: function
+void mp_real_gamma_upper_half_frac(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong n)
+
+Set `res` to a ball containing
+$\Gamma(\tfrac12, y) = \int_y^\infty t^{-1/2} e^{-t}\,dt = \sqrt{\pi}
+\operatorname{erfc}(\sqrt y)$ for $y = p/q$, with $p$ and $q$ positive
+integers given as limb arrays of lengths `pn` and `qn` (leading zero
+limbs are allowed), with a relative accuracy of about $\bits(n - 1)$
+bits. Throws if $p$ or $q$ is zero, or if $y \ge 2^{\bits - 6}$ (the
+result would leave the exponent range of `mp_real_exp`).
+
+::: details
+The method is the first that applies of: the asymptotic series, when it
+is accurate enough (roughly $y > \bits\,n \log 2$); Legendre's
+continued fraction, when its estimated length is clearly below that of
+the lower series; and the lower series
+$\sqrt{\pi} - \gamma(\tfrac12, y)$, evaluated with about $1.44y$ extra
+bits for the cancellation. All three are binary splittings of exact
+rational recurrences, and all error bounds are rigorous: the asymptotic
+series is a `mp_real_hypgeom_sum` with its remainder bounded by the
+first omitted term, the convergents of the fraction enclose the value,
+and the lower series is a `mp_real_hypgeom_series`.
+:::
+:::
+
+::: function
+int _mp_real_gamma_upper_half_frac_asymp(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong N, slong n)
+int _mp_real_gamma_upper_half_frac_cf(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong N, slong n)
+void _mp_real_gamma_upper_half_frac_lower(mp_real_t res, nn_srcptr p, slong pn, nn_srcptr q, slong qn, slong n)
+
+$\Gamma(\tfrac12, y)$ by one method: the asymptotic series with $N$
+terms ($N = 0$ chooses the number of terms), Legendre's continued
+fraction with $N$ steps, resp. the lower series. The first two return 0,
+leaving `res` undefined, if the result would not be accurate to about
+$n$ limbs (the series diverges before reaching the accuracy, or the
+fraction is too short); otherwise they return 1. The domain is that of
+`mp_real_gamma_upper_half_frac`. For testing and tuning.
 :::
 
 ## Progress reports {#verbose}

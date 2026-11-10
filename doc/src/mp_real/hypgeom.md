@@ -1,6 +1,6 @@
 ---
 title: Hypergeometric series
-functions: mp_real_hypgeom_int_struct mp_real_hypgeom_series_struct mp_real_hypgeom_series _mp_real_atan_frac_bsplit
+functions: mp_real_hypgeom_int_struct mp_real_hypgeom_series_struct mp_real_hypgeom_series mp_real_hypgeom_sum _mp_real_atan_frac_bsplit mp_real_gamma_upper_half_frac
 ---
 
 `mp_real_hypgeom_series` sums a geometrically convergent hypergeometric
@@ -66,6 +66,21 @@ dominates.
 specialised splitting of the Taylor series of
 $\operatorname{atan}(p/q)$ and $\operatorname{atanh}(p/q)$, used by the
 Machin-type formulas of the module.
+
+`mp_real_gamma_upper_half_frac` evaluates the incomplete gamma function
+$\Gamma(\tfrac12, y) = \sqrt\pi\operatorname{erfc}(\sqrt y)$ at $y = p/q$
+given by limb arrays, choosing between the asymptotic series (large $y$),
+Legendre's continued fraction (moderately large $y$) and the lower series
+$\sqrt\pi - \gamma(\tfrac12, y)$, a hypergeometric series evaluated with
+about $1.44y$ guard bits for the cancellation. The asymptotic series is
+summed by `mp_real_hypgeom_sum` with the remainder bounded by the first
+omitted term, and the fraction by the module's matrix binary splitting,
+consecutive convergents enclosing the value.
+
+`mp_real_hypgeom_sum` is the binary splitting of
+`mp_real_hypgeom_series` on its own: the caller chooses the number of
+terms, bounds the tail and divides. This serves divergent series (such
+as asymptotic expansions) and callers with tail bounds of their own.
 
 ## Example {#example}
 

@@ -355,6 +355,17 @@ void _mp_real_const_khinchin_tune(mp_real_t res, slong n, slong K0, slong n1, sl
    threads) */
 void _mp_real_const_khinchin_params(slong * K0, slong * n1, slong * nb, slong n);
 
+/* Khinchin's constant by the theta splitting (an approximate functional
+   equation) of the dilogarithm series, in p^(3/2 + o(1)) time: the
+   split point u0 = 4^-a (1 <= a <= 7, 0 = default 2) and the most dual
+   terms computed at once (0 = default: half the threads while k-terms
+   remain, then all); used by
+   mp_real_const_khinchin from MP_REAL_KHINCHIN_AFE_CUTOFF limbs */
+void _mp_real_const_khinchin_afe(mp_real_t res, slong n, slong a, slong maxdual);
+#ifndef MP_REAL_KHINCHIN_AFE_CUTOFF
+#define MP_REAL_KHINCHIN_AFE_CUTOFF (5000000 / FLINT_BITS)
+#endif
+
 /* series ********************************************************************/
 
 /* atan(p/q) resp. atanh(p/q), 0 <= p < q (p/q at most about 0.99) */
@@ -388,6 +399,39 @@ typedef struct
 mp_real_hypgeom_series_struct;
 
 void mp_real_hypgeom_series(mp_real_t res, const mp_real_hypgeom_series_struct * s, slong n);
+
+/* T / Q = sum_(k=1)^N' P(k)/Q(k) prod_(j=1)^(k-1) R(j)/Q(j), the binary
+   splitting of mp_real_hypgeom_series without its choice of the number
+   of terms, its tail bound and its division: T and Q are balls, and T/Q
+   is accurate to about n - 1 limbs (as for mp_real_hypgeom_series)
+   relative to the largest term.  N' = N with exact = 1; with
+   exact = 0, N <= N' < N (1 + 1/12) may be larger, for a balanced tree
+   when Q or R has a large constant factor (as for p/q-power series,
+   where it saves 15-20%).  Returns N'.  Q(k) must not vanish for
+   1 <= k <= N'; there is no convergence condition. */
+slong mp_real_hypgeom_sum(mp_real_t T, mp_real_t Q,
+    const mp_real_hypgeom_int_struct * P, slong Plen,
+    const mp_real_hypgeom_int_struct * Qp, slong Qlen,
+    const mp_real_hypgeom_int_struct * R, slong Rlen, slong N, int exact,
+    slong n);
+
+/* Gamma(1/2, y) = sqrt(pi) erfc(sqrt(y)) for y = p/q, p and q positive
+   integers given as limb arrays (leading zero limbs allowed), to a
+   relative accuracy of about B^-n: by the asymptotic series when it is
+   accurate enough (y above about FLINT_BITS n log 2), else by Legendre's
+   continued fraction or the lower series, whichever is estimated
+   cheaper.  The method-specific versions take the number of terms
+   resp. steps N (0 = automatic for the asymptotic series) and return 0
+   (res undefined) if the result would not reach the accuracy; the
+   lower series always succeeds.  Throws unless 0 < y < 2^(FLINT_BITS - 6). */
+void mp_real_gamma_upper_half_frac(mp_real_t res, nn_srcptr p, slong pn,
+    nn_srcptr q, slong qn, slong n);
+int _mp_real_gamma_upper_half_frac_asymp(mp_real_t res, nn_srcptr p, slong pn,
+    nn_srcptr q, slong qn, slong N, slong n);
+int _mp_real_gamma_upper_half_frac_cf(mp_real_t res, nn_srcptr p, slong pn,
+    nn_srcptr q, slong qn, slong N, slong n);
+void _mp_real_gamma_upper_half_frac_lower(mp_real_t res, nn_srcptr p, slong pn,
+    nn_srcptr q, slong qn, slong n);
 void mp_real_hypgeom_series_int64(mp_real_t res, int power, int64_t coefP,
     int64_t coefQ, int64_t coefD, const int64_t * P, slong Plen,
     const int64_t * Q, slong Qlen, const int64_t * R, slong Rlen, slong n);
