@@ -15,6 +15,7 @@
 #include "fmpq.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* every relation of every precomputed table holds for the actual
@@ -48,7 +49,7 @@ TEST_FUNCTION_START(mp_real_rel_tab, state)
             if (g)
                 _mp_real_atan_gauss_vec_arb(alpha, st->num, prec);
             else
-                arb_log_primes_vec_bsplit(alpha, st->num, prec);
+                _mp_real_log_primes_vec_arb(alpha, st->num, prec);
 
             for (j = 0; j < t->rows; j++)
             {
@@ -90,7 +91,7 @@ TEST_FUNCTION_START(mp_real_rel_tab, state)
             if (g)
                 _mp_real_atan_gauss_vec_arb(alpha, num, prec);
             else
-                arb_log_primes_vec_bsplit(alpha, num, prec);
+                _mp_real_log_primes_vec_arb(alpha, num, prec);
             for (j = 0; j < t->rows; j += 7)
             {
                 arb_t s;
@@ -132,7 +133,7 @@ TEST_FUNCTION_START(mp_real_rel_tab, state)
             {
                 fmpz_one(p);
                 _mp_real_machin_get_x(q, mt, j);
-                arb_atan_frac_bsplit(y + j, p, q, g == 0, prec);
+                ref_atan_frac(y + j, p, q, g == 0, prec);
             }
             for (i = 0; i < mt->num; i++)
             {
@@ -151,14 +152,14 @@ TEST_FUNCTION_START(mp_real_rel_tab, state)
                     fmpz_clear(cc);
                 }
                 if (g == 0)
-                    arb_log_ui(r, n_nth_prime(i + 1), prec);
+                    ref_log_ui(r, n_nth_prime(i + 1), prec);
                 else
                 {
                     fmpq_t fr;
                     fmpq_init(fr);
                     fmpq_set_si(fr, _mp_real_gaussian_primes[2 * i + 1], _mp_real_gaussian_primes[2 * i]);
                     arb_set_fmpq(r, fr, prec);
-                    arb_atan(r, r, prec);
+                    ref_atan(r, r, prec);
                     fmpq_clear(fr);
                 }
                 if (!arb_overlaps(s, r) || arb_rel_accuracy_bits(s) < prec - 100)

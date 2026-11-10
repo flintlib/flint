@@ -178,6 +178,8 @@ _decfloat_mul(decfloat_t res, const decfloat_t x, const decfloat_t y, slong prec
     fmpz_t exp;
     nn_ptr t;
 
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
+
     if (DECFLOAT_IS_SPECIAL(x) || DECFLOAT_IS_SPECIAL(y))
     {
         _set_rounding_exact(info, err, ctx);

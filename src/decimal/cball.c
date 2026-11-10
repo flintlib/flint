@@ -14,6 +14,7 @@
     enclosures), like acb.
 */
 
+#include <ctype.h>
 #include <string.h>
 #include "qqbar.h"
 #include "decimal.h"
@@ -28,6 +29,8 @@
 #include "gr_mat.h"
 
 #define PREC(ctx) DECIMAL_CTX_PREC(ctx)
+/* precision with k guard digits; DECIMAL_PREC_EXACT stays exact (WORD_MAX + k would overflow) */
+#define GUARD_PREC(ctx, k) (DECIMAL_CTX_IS_EXACT(ctx) ? DECIMAL_PREC_EXACT : PREC(ctx) + (k))
 #define EXACT_RND (DECIMAL_RND_DOWN | DECIMAL_RND_NOLIMITS)
 
 /* status for real-valued conversions of a nonreal ball */
@@ -239,9 +242,9 @@ deccball_div(deccball_t res, const deccball_t x, const deccball_t y, gr_ctx_t ct
     else
     {
         decball_init(den, ctx);
-        status = _decball_dot2(den, &y->re, &y->re, &y->im, &y->im, 0, PREC(ctx) + 5, ctx);
-        status |= _decball_dot2(re, &x->re, &y->re, &x->im, &y->im, 0, PREC(ctx) + 5, ctx);
-        status |= _decball_dot2(im, &x->im, &y->re, &x->re, &y->im, 1, PREC(ctx) + 5, ctx);
+        status = _decball_dot2(den, &y->re, &y->re, &y->im, &y->im, 0, GUARD_PREC(ctx, 5), ctx);
+        status |= _decball_dot2(re, &x->re, &y->re, &x->im, &y->im, 0, GUARD_PREC(ctx, 5), ctx);
+        status |= _decball_dot2(im, &x->im, &y->re, &x->re, &y->im, 1, GUARD_PREC(ctx, 5), ctx);
         if (status == GR_SUCCESS)
         {
             status = decball_div_round(re, re, den, PREC(ctx), ctx);
@@ -531,8 +534,8 @@ deccball_cmpabs(int * res, const deccball_t x, const deccball_t y, gr_ctx_t ctx)
 
     decball_init(s, ctx);
     decball_init(t, ctx);
-    status = _decball_dot2(s, &x->re, &x->re, &x->im, &x->im, 0, PREC(ctx) + 5, ctx);
-    status |= _decball_dot2(t, &y->re, &y->re, &y->im, &y->im, 0, PREC(ctx) + 5, ctx);
+    status = _decball_dot2(s, &x->re, &x->re, &x->im, &x->im, 0, GUARD_PREC(ctx, 5), ctx);
+    status |= _decball_dot2(t, &y->re, &y->re, &y->im, &y->im, 0, GUARD_PREC(ctx, 5), ctx);
     if (status == GR_SUCCESS)
         status = decball_cmp(res, s, t, ctx);
     else
@@ -759,21 +762,76 @@ deccball_set_fmpz_2exp_fmpz(deccball_t res, const fmpz_t m, const fmpz_t e, gr_c
     return status;
 }
 
+/* The printed forms "A", "B*I", "(A + B*I)" and "(A - B*I)" with A and B
+   real balls as printed by decball_get_str; GR_DOMAIN for anything else.
+   As for real balls, radii are read without exponent limits. */
+static int
+_deccball_set_str_canonical(deccball_t res, const char * s, gr_ctx_t ctx)
+{
+    slong len = strlen(s), i, depth;
+    int status;
+
+    while (len > 0 && isspace((unsigned char) s[0]))
+    {
+        s++;
+        len--;
+    }
+    while (len > 0 && isspace((unsigned char) s[len - 1]))
+        len--;
+
+    /* (A +/- B*I) */
+    if (len >= 4 && s[0] == '(' && s[len - 1] == ')' && s[len - 2] == 'I' && s[len - 3] == '*')
+    {
+        /* the separator " + " or " - " outside brackets */
+        for (i = 1, depth = 0; i + 2 < len - 3; i++)
+        {
+            if (s[i] == '[')
+                depth++;
+            else if (s[i] == ']')
+                depth--;
+            else if (depth == 0 && s[i] == ' ' && (s[i + 1] == '+' || s[i + 1] == '-') && s[i + 2] == ' ')
+                break;
+        }
+
+        if (i + 2 >= len - 3)
+            return GR_DOMAIN;
+
+        status = _decball_set_str_canonical(&res->re, s + 1, i - 1, ctx);
+        if (status == GR_SUCCESS)
+            status = _decball_set_str_canonical(&res->im, s + i + 3, len - 3 - (i + 3), ctx);
+        if (status == GR_SUCCESS && s[i + 1] == '-')
+            status = decball_neg(&res->im, &res->im, ctx);
+        return status;
+    }
+
+    /* B*I */
+    if (len >= 3 && s[len - 1] == 'I' && s[len - 2] == '*')
+    {
+        status = _decball_set_str_canonical(&res->im, s, len - 2, ctx);
+        if (status == GR_SUCCESS)
+            status = decball_zero(&res->re, ctx);
+        return status;
+    }
+
+    /* A */
+    status = _decball_set_str_canonical(&res->re, s, len, ctx);
+    if (status == GR_SUCCESS)
+        status = decball_zero(&res->im, ctx);
+    return status;
+}
+
 int
 deccball_set_str(deccball_t res, const char * s, gr_ctx_t ctx)
 {
-    decfloat_t t;
     int status;
 
-    decfloat_init(t, ctx);
-    status = _decfloat_set_str_literal(t, s, DECIMAL_PREC_EXACT, EXACT_RND, ctx);
+    /* fast path for the printed forms; everything else goes through the
+       generic expression parser */
+    status = _deccball_set_str_canonical(res, s, ctx);
 
-    if (status == GR_SUCCESS)
-        status = deccball_set_decfloat(res, t, ctx);
-    else if (status == GR_DOMAIN)
+    if (status == GR_DOMAIN)
         status = gr_generic_set_str_ring_exponents(res, s, ctx);
 
-    decfloat_clear(t, ctx);
     return status;
 }
 
@@ -942,7 +1000,7 @@ deccball_set_other(deccball_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 acb_t z;
                 int status;
 
-                gr_ctx_init_complex_acb(cctx, 20 + 4 * PREC(ctx));
+                gr_ctx_init_complex_acb(cctx, 20 + (DECIMAL_CTX_IS_EXACT(ctx) ? 64 : 4 * PREC(ctx)));
                 acb_init(z);
 
                 status = gr_set_other(z, x, x_ctx, cctx);

@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "acb/impl.h"
 
 void
 acb_sin_cos(acb_t s, acb_t c, const acb_t z, slong prec)
@@ -27,6 +28,10 @@ acb_sin_cos(acb_t s, acb_t c, const acb_t z, slong prec)
         arb_sinh_cosh(acb_imagref(s), acb_realref(c), b, prec);
         arb_zero(acb_realref(s));
         arb_zero(acb_imagref(c));
+    }
+    else if (_acb_elem_small(s, c, z, ACB_ELEM_SIN_COS, prec))
+    {
+        /* (the register paths) */
     }
     else
     {

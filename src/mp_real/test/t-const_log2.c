@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* _mp_real_const_log2 must return EXACTLY
@@ -57,7 +58,7 @@ TEST_FUNCTION_START(mp_real_const_log2, state)
             slong n = sizes[i] + (slong) n_randint(state, 4);
             nn_ptr y = flint_malloc(n * sizeof(ulong));
 
-            arb_const_log2(ref, FLINT_BITS * n + 192);
+            ref_const_log2(ref, FLINT_BITS * n + 192);
             _mp_real_const_log2(y, NULL, n, 1);
             if (!_floor_matches_l2(y, n, ref))
                 TEST_FUNCTION_FAIL("floor mismatch: n = %wd\n", n);

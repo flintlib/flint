@@ -42,5 +42,65 @@ TEST_FUNCTION_START(udiv_qrnnd_preinv, state)
                     nh, nl, d, dinv, q1, q2, r1, r2);
     }
 
+    /*
+        Edge cases: d = 2^(FLINT_BITS - 1), 2^(FLINT_BITS - 1) + 1, B - 2,
+        B - 1 or random, nh in {0, 1, d - 2, d - 1} or random, nl in
+        {0, 1, B - 1} or random; also with q and r overwriting nl and nh,
+        as in a loop over the limbs of a dividend.
+    */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        ulong d, dinv, nh, nl, q1, r1, q2, r2;
+
+        switch (n_randint(state, 5))
+        {
+            case 0: d = UWORD(1) << (FLINT_BITS - 1); break;
+            case 1: d = (UWORD(1) << (FLINT_BITS - 1)) + 1; break;
+            case 2: d = UWORD_MAX - 1; break;
+            case 3: d = UWORD_MAX; break;
+            default: d = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
+        }
+
+        switch (n_randint(state, 5))
+        {
+            case 0: nh = 0; break;
+            case 1: nh = 1; break;
+            case 2: nh = d - 2; break;
+            case 3: nh = d - 1; break;
+            default: nh = n_randlimb(state) % d;
+        }
+
+        switch (n_randint(state, 4))
+        {
+            case 0: nl = 0; break;
+            case 1: nl = 1; break;
+            case 2: nl = UWORD_MAX; break;
+            default: nl = n_randlimb(state);
+        }
+
+        dinv = n_preinvert_limb_prenorm(d);
+
+        udiv_qrnnd(q2, r2, nh, nl, d);
+        udiv_qrnnd_preinv(q1, r1, nh, nl, d, dinv);
+
+        if (q1 != q2 || r1 != r2)
+            TEST_FUNCTION_FAIL(
+                    "edge cases\n"
+                    "nh = %wu, nl = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n",
+                    nh, nl, d, dinv, q1, q2, r1, r2);
+
+        r1 = nh;
+        q1 = nl;
+        udiv_qrnnd_preinv(q1, r1, r1, q1, d, dinv);
+
+        if (q1 != q2 || r1 != r2)
+            TEST_FUNCTION_FAIL(
+                    "aliasing\n"
+                    "nh = %wu, nl = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n",
+                    nh, nl, d, dinv, q1, q2, r1, r2);
+    }
+
     TEST_FUNCTION_END(state);
 }

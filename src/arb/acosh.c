@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
+#include "arb/elem.h"
 
 void
 arb_acosh(arb_t z, const arb_t x, slong prec)
@@ -18,7 +18,7 @@ arb_acosh(arb_t z, const arb_t x, slong prec)
     {
         arb_zero(z);
     }
-    else
+    else if (!_arb_arc_fast(z, x, ARF_ARC_ACOSH, prec))
     {
         arb_t t;
         arb_init(t);

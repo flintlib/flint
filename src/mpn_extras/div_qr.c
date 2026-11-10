@@ -256,7 +256,7 @@ _div_small(mp_ptr qp, mp_ptr rp, mp_srcptr ap, const mp_size_t an, mp_srcptr bp,
 
         FLINT_MPN_INVERT_LIMB(v, d[0]);
         for (i = start; i >= 0; i--)
-            FLINT_MPN_UDIV_QR_2BY1(qp[i], r, r, NLIMB(i), d[0], v);
+            udiv_qrnnd_preinv(qp[i], r, r, NLIMB(i), d[0], v);
         R[0] = r;
     }
     else if (BN == 2)

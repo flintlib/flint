@@ -12,10 +12,11 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* Every run-time entry of the dense tables (dense_rt.c), in both tiers,
-   against arb: a lower bound for log(1 + x), -log(1 - x) resp. atan(x)
+   against MPFR: a lower bound for log(1 + x), -log(1 - x) resp. atan(x)
    within one ulp.  (The kernels absorb a few ulps, so a wrong entry
    shows in their results only as an occasional error of a unit in a
    middle limb -- as with the last-level log1p entry of argument
@@ -58,15 +59,15 @@ TEST_FUNCTION_START(mp_real_dense_rt_tables, state)
                     arb_mul_2exp_si(x, x, -2 * FLINT_BITS);
 
                     if (which == MP_REAL_DENSE_RT_EXP)
-                        arb_log1p(f, x, prec);
+                        ref_log1p(f, x, prec);
                     else if (which == MP_REAL_DENSE_RT_LOG1P)
                     {
                         arb_neg(f, x);
-                        arb_log1p(f, f, prec);
+                        ref_log1p(f, f, prec);
                         arb_neg(f, f);
                     }
                     else
-                        arb_atan(f, x, prec);
+                        ref_atan(f, x, prec);
 
                     /* d = f B^w - entry, required in [0, 1] */
                     fmpz_set_ui_array(t, r, w);

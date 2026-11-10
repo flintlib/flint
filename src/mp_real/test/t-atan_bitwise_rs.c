@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 #include "bitwise_boundary.h"
@@ -74,7 +75,7 @@ TEST_FUNCTION_START(mp_real_atan_bitwise_rs, state)
         fmpz_set_ui_array(f, x, n);
         arb_set_fmpz(xa, f);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_atan(e, xa, prec);
+        ref_atan(e, xa, prec);
 
         fmpz_set_ui_array(f, res, n);
         arb_set_fmpz(va, f);
@@ -131,7 +132,7 @@ TEST_FUNCTION_START(mp_real_atan_bitwise_rs, state)
                 fmpz_set_ui_array(f, x, n);
                 arb_set_fmpz(xa, f);
                 arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-                arb_atan(e, xa, prec);
+                ref_atan(e, xa, prec);
                 fmpz_set_ui_array(f, res, n);
                 arb_set_fmpz(va, f);
                 arb_mul_2exp_si(va, va, -FLINT_BITS * n);
@@ -172,7 +173,7 @@ TEST_FUNCTION_START(mp_real_atan_bitwise_rs, state)
         arb_init(xa);
         arb_init(e);
         _test_bitwise_arb(xa, x, n);
-        arb_atan(e, xa, FLINT_BITS * n + 128);
+        ref_atan(e, xa, FLINT_BITS * n + 128);
         u = _test_bitwise_ulps(res, n, n, e);
         arb_clear(xa);
         arb_clear(e);

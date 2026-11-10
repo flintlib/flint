@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
@@ -69,7 +70,7 @@ TEST_FUNCTION_START(mp_real_exp_bitwise_rs, state)
         fmpz_set_ui_array(t, x, n);
         arb_set_fmpz(xa, t);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
 
         fmpz_set_ui_array(t, res, n + 1);
         arb_set_fmpz(va, t);
@@ -120,7 +121,7 @@ TEST_FUNCTION_START(mp_real_exp_bitwise_rs, state)
             fmpz_set_ui_array(t, x, n);
             arb_set_fmpz(xa, t);
             arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-            arb_exp(e, xa, prec);
+            ref_exp(e, xa, prec);
             fmpz_set_ui_array(t, res, n + 1);
             arb_set_fmpz(va, t);
             arb_mul_2exp_si(va, va, -FLINT_BITS * n);
@@ -192,7 +193,7 @@ TEST_FUNCTION_START(mp_real_exp_bitwise_rs, state)
         fmpz_set_ui_array(t, x, n);
         arb_set_fmpz(xa, t);
         arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
-        arb_exp(e, xa, prec);
+        ref_exp(e, xa, prec);
         fmpz_set_ui_array(t, res, n + 1);
         arb_set_fmpz(va, t);
         arb_mul_2exp_si(va, va, -FLINT_BITS * n);

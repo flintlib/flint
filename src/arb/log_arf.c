@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,385 +9,294 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "arb/impl.h"
-#include "mpn_extras.h"
+#include "arb/elem.h"
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
+#define ARB_LOG_SMOOTH_MIN_PREC 256
 
-#if 0
-/* requires x != 1 */
+/*
+    log(x) and log(1 + x) of an exact x into a ball (arb/elem.h): the
+    arguments near 1 (resp. tiny) directly from x - 1 (log(1 + t) = t
+    within t^2 for |t| <= 1/2), the register fast paths at one and two
+    limbs, else the kernels _mp_real_log_fp (any exponent, the bignum
+    ones by _mp_real_log_fp_huge) and _mp_real_log1p_fp.
+*/
+
+/* log(1 + D) for the exact D = x - 1 with |D| < 2^-z, z >= prec + 2:
+   D within D^2 */
 static void
-arf_log_via_mpfr(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
+_arb_log_near_one(arb_t z, const arf_t x, slong zb, slong prec)
 {
-    mpfr_t xf, zf;
-    nn_ptr zptr, tmp;
-    nn_srcptr xptr;
-    slong xn, zn, val;
+    int inexact = arf_sub_ui(arb_midref(z), x, 1, prec, ARB_RND);
+    mag_set_ui_2exp_si(arb_radref(z), 1, -2 * zb);
+    if (inexact)
+        arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
+}
+
+/* log(x) for a bignum exponent E of the mantissa (d, xn) */
+static void
+_arb_log_arf_huge(arb_t z, nn_srcptr d, slong xn, const fmpz_t E, slong prec)
+{
+    fmpz_t c;
+    nn_ptr carr, y;
+    slong cn, len, ue;
+    ulong err;
+    int cneg, neg;
     TMP_INIT;
+
+    fmpz_init(c);
+    fmpz_sub_ui(c, E, 1);
+    cneg = fmpz_sgn(c) < 0;
+    cn = fmpz_size(c);
+    fmpz_abs(c, c);
+
     TMP_START;
+    carr = TMP_ALLOC((cn + _mp_real_log_fp_huge_ylen(_arb_elem_bits(prec), cn)) * sizeof(ulong));
+    y = carr + cn;
+    fmpz_get_ui_array(carr, cn, c);
 
-    zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
-    tmp = TMP_ALLOC(zn * sizeof(ulong));
-
-    ARF_GET_MPN_READONLY(xptr, xn, x);
-
-    xf->_mpfr_d = (nn_ptr) xptr;
-    xf->_mpfr_prec = xn * FLINT_BITS;
-    xf->_mpfr_sign = ARF_SGNBIT(x) ? -1 : 1;
-    xf->_mpfr_exp = ARF_EXP(x);
-
-    zf->_mpfr_d = tmp;
-    zf->_mpfr_prec = prec;
-    zf->_mpfr_sign = 1;
-    zf->_mpfr_exp = 0;
-
-    mpfr_set_emin(MPFR_EMIN_MIN);
-    mpfr_set_emax(MPFR_EMAX_MAX);
-
-    mpfr_log(zf, xf, arf_rnd_to_mpfr(rnd));
-
-    val = 0;
-    while (tmp[val] == 0)
-        val++;
-
-    ARF_GET_MPN_WRITE(zptr, zn - val, z);
-    flint_mpn_copyi(zptr, tmp + val, zn - val);
-    if (zf->_mpfr_sign < 0)
-        ARF_NEG(z);
-
-    fmpz_set_si(ARF_EXPREF(z), zf->_mpfr_exp);
+    neg = _mp_real_log_fp_huge(y, &len, &ue, &err, d, xn, carr, cn, cneg, _arb_elem_bits(prec));
+    _arb_set_mpn_err(z, y, len, ue, err, err, neg, prec);
 
     TMP_END;
+    fmpz_clear(c);
 }
-#endif
 
-static void
-arb_log_arf_huge(arb_t z, const arf_t x, slong prec)
+/* log n for an integer n > 1 whose prime factors are among the first
+   MP_REAL_LOG_P_TAB_NUM primes (2 to 41), from the shared cache of
+   their logarithms in mp_real (exact floors at nv fraction limbs: the
+   sum sum_j c_j log p_j is short of log n by at most sum_j c_j units):
+   returns 0 if n has another factor */
+static int
+_arb_log_ui_smooth(arb_t z, ulong n, slong prec)
 {
-    arf_t t;
-    arb_t c;
-    fmpz_t exp;
-    slong wp;
+    static const unsigned char primes[MP_REAL_LOG_P_TAB_NUM] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
+    ulong c[MP_REAL_LOG_P_TAB_NUM], csum = 0;
+    slong j, nv;
+    const _mp_real_tab_struct * T;
+    nn_ptr acc;
+    TMP_INIT;
 
-    arf_init(t);
-    arb_init(c);
-    fmpz_init(exp);
+    for (j = 0; j < MP_REAL_LOG_P_TAB_NUM; j++)
+    {
+        c[j] = 0;
+        while (n % primes[j] == 0)
+        {
+            n /= primes[j];
+            c[j]++;
+        }
+        csum += c[j];
+    }
+    if (n != 1)
+        return 0;
 
-    fmpz_neg(exp, ARF_EXPREF(x));
-    arf_mul_2exp_fmpz(t, x, exp);
+    nv = _arb_elem_limbs(prec);
+    T = _mp_real_log_primes_ensure(MP_REAL_LOG_P_TAB_NUM, nv);
 
-    wp = prec + 4 - fmpz_bits(exp);
-    wp = FLINT_MAX(wp, 4);
-
-    arb_log_arf(z, t, wp);
-    arb_const_log2(c, prec + 4);
-    arb_submul_fmpz(z, c, exp, prec);
-
-    arf_clear(t);
-    arb_clear(c);
-    fmpz_clear(exp);
+    TMP_START;
+    acc = TMP_ALLOC((nv + 2) * sizeof(ulong));
+    flint_mpn_zero(acc, nv + 2);
+    for (j = 0; j < MP_REAL_LOG_P_TAB_NUM; j++)
+        if (c[j] != 0)
+            acc[nv + 1] += mpn_addmul_1(acc, _mp_real_machin_entry(T, j, nv), nv + 1, c[j]);
+    _arb_set_mpn_err(z, acc, nv + 2, -FLINT_BITS * nv, 0, csum, 0, prec);
+    TMP_END;
+    return 1;
 }
 
 void
 arb_log_arf(arb_t z, const arf_t x, slong prec)
 {
-    if (arf_is_special(x))
+    nn_srcptr d;
+    slong xn, e, len, ue, zb;
+    ulong err;
+    int neg;
+
+    if (arf_is_special(x) || ARF_SGNBIT(x))
     {
         if (arf_is_pos_inf(x))
             arb_pos_inf(z);
+        else if (arf_is_zero(x))
+            arb_neg_inf(z);
         else
             arb_indeterminate(z);
+        return;
     }
-    else if (ARF_SGNBIT(x))
+
+    e = ARF_EXP(x);
+    ARF_GET_MPN_READONLY(d, xn, x);
+
+    if (FLINT_UNLIKELY(COEFF_IS_MPZ(e) || e >= (WORD(1) << (FLINT_BITS - 3)) || e <= -(WORD(1) << (FLINT_BITS - 3))))
     {
-        arb_indeterminate(z);
+        _arb_log_arf_huge(z, d, xn, ARF_EXPREF(x), prec);
+        return;
     }
-    else if (ARF_IS_POW2(x))
+
+    /* a smooth integer (a few factors among the first 13 primes) at a
+       precision where the sum of cached logarithms beats the kernel */
+    if (xn == 1 && e >= 2 && e <= FLINT_BITS && prec >= ARB_LOG_SMOOTH_MIN_PREC
+        && (e == FLINT_BITS || (d[0] << e) == 0) && _arb_log_ui_smooth(z, d[0] >> (FLINT_BITS - e), prec))
+        return;
+
+    /* near 1: the leading zero bits of |x - 1| */
+    if (e == 0 || e == 1)
     {
-        if (fmpz_is_one(ARF_EXPREF(x)))
+        zb = _arf_log_lzb(d, xn, e);
+        if (zb == WORD_MAX)
         {
             arb_zero(z);
-        }
-        else
-        {
-            fmpz_t exp;
-            fmpz_init(exp);
-            _fmpz_add_fast(exp, ARF_EXPREF(x), -1);
-            arb_const_log2(z, prec + 2);
-            arb_mul_fmpz(z, z, exp, prec);
-            fmpz_clear(exp);
-        }
-    }
-    else if (COEFF_IS_MPZ(ARF_EXP(x)))
-    {
-        arb_log_arf_huge(z, x, prec);
-    }
-    else
-    {
-        slong exp, wp, wn, N, r, closeness_to_one;
-        nn_srcptr xp;
-        slong xn, tn;
-        nn_ptr tmp, w, t, u;
-        ulong p1, q1bits, p2, q2bits, error, error2, cy;
-        int negative, inexact, used_taylor_series;
-        TMP_INIT;
-
-        exp = ARF_EXP(x);
-        negative = 0;
-
-        ARF_GET_MPN_READONLY(xp, xn, x);
-
-        /* compute a c >= 0 such that |x-1| <= 2^(-c) if c > 0 */
-        closeness_to_one = 0;
-
-        if (exp == 0)
-        {
-            slong i;
-
-            closeness_to_one = FLINT_BITS - FLINT_BIT_COUNT(~xp[xn - 1]);
-
-            if (closeness_to_one == FLINT_BITS)
-            {
-                for (i = xn - 2; i > 0 && xp[i] == LIMB_ONES; i--)
-                    closeness_to_one += FLINT_BITS;
-
-                closeness_to_one += (FLINT_BITS - FLINT_BIT_COUNT(~xp[i]));
-            }
-        }
-        else if (exp == 1)
-        {
-            closeness_to_one = FLINT_BITS - FLINT_BIT_COUNT(xp[xn - 1] & (~LIMB_TOP));
-
-            if (closeness_to_one == FLINT_BITS)
-            {
-                slong i;
-
-                for (i = xn - 2; xp[i] == 0; i--)
-                    closeness_to_one += FLINT_BITS;
-
-                closeness_to_one += (FLINT_BITS - FLINT_BIT_COUNT(xp[i]));
-            }
-
-            closeness_to_one--;
-        }
-
-        /* if |t-1| <= 0.5               */
-        /* |log(1+t) - t| <= t^2         */
-        /* |log(1+t) - (t-t^2/2)| <= t^3 */
-        if (closeness_to_one > prec + 1)
-        {
-            inexact = arf_sub_ui(arb_midref(z), x, 1, prec, ARB_RND);
-            mag_set_ui_2exp_si(arb_radref(z), 1, -2 * closeness_to_one);
-            if (inexact)
-                arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
             return;
         }
-        else if (2 * closeness_to_one > prec + 1)
+        if (zb >= prec + 2)
         {
-            arf_t t, u;
-            arf_init(t);
-            arf_init(u);
-            arf_sub_ui(t, x, 1, ARF_PREC_EXACT, ARF_RND_DOWN);
-            arf_mul(u, t, t, ARF_PREC_EXACT, ARF_RND_DOWN);
-            arf_mul_2exp_si(u, u, -1);
-            inexact = arf_sub(arb_midref(z), t, u, prec, ARB_RND);
-            mag_set_ui_2exp_si(arb_radref(z), 1, -3 * closeness_to_one);
-            if (inexact)
-                arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
-            arf_clear(t);
-            arf_clear(u);
+            _arb_log_near_one(z, x, zb, prec);
             return;
         }
+    }
 
-        /* Absolute working precision (NOT rounded to a limb multiple) */
-        wp = prec + closeness_to_one + 5;
-
-
-        /* Too high precision to use table */
-        if (wp > ARB_LOG_NEWTON_PREC || wp > ARB_LOG_TAB2_PREC)
-        {
-            /* Special case: check for smooth integers */
-            if (xn == 1 && exp <= FLINT_BITS && exp >= 1)
-            {
-                ulong n;
-
-                n = xp[0] >> (FLINT_BITS - exp);
-                if ((n << (FLINT_BITS - exp)) == xp[0])
-                {
-                    if (_arb_log_ui_smooth(z, n, prec))
-                    {
-                        return;
-                    }
-                }
-            }
-
-#if 0
-            /* The earlier test for COEFF_IS_MPZ(ARF_EXP(x)) rules out
-               too large exponents for MPFR, except on Windows 64 where
-               MPFR still uses 32-bit exponents. */
-            if (exp < MPFR_EMIN_MIN || exp > MPFR_EMAX_MAX)
-            {
-                arb_log_arf_huge(z, x, prec);
-            }
-            else
-            {
-                arf_log_via_mpfr(arb_midref(z), x, prec, ARB_RND);
-                arf_mag_set_ulp(arb_radref(z), arb_midref(z), prec);
-            }
-#else
-            arb_log_arf_newton(z, x, prec);
+#if FLINT_BITS == 64
+    if (xn == 1 && prec <= FLINT_BITS && (ARF_SMALL_LOG_OK_1(d[0], e)))
+    {
+        ulong r2 = 0, r1 = 0, r0 = 0;
+        neg = _arf_small_log_2(&r2, &r1, &r0, d[0], 0, e);
+        _arb_small_set_1(z, r2, r1, r0, 0, ARF_SMALL_LOG_ERR_2, neg, prec);
+        return;
+    }
+    if (xn <= 2 && prec <= 2 * FLINT_BITS && (ARF_SMALL_LOG_OK_2(d[xn - 1], e)))
+    {
+        ulong r3 = 0, r2 = 0, r1 = 0, r0 = 0;
+        neg = _arf_small_log_3(&r3, &r2, &r1, &r0, d[xn - 1], (xn == 2) ? d[0] : 0, 0, e);
+        _arb_small_set_2(z, r3, r2, r1, r0, 0, ARF_SMALL_LOG_ERR_3, neg, prec);
+        return;
+    }
 #endif
+
+    {
+        nn_ptr y;
+        TMP_INIT;
+        TMP_START;
+        y = TMP_ALLOC(_mp_real_log_fp_ylen(_arb_elem_bits(prec), xn) * sizeof(ulong));
+        neg = _mp_real_log_fp(y, &len, &ue, &err, d, xn, e, 0, _arb_elem_bits(prec));
+        _arb_set_mpn_err(z, y, len, ue, err, err, neg, prec);
+        TMP_END;
+    }
+}
+
+void
+_arb_log1p_arf(arb_t z, const arf_t x, slong prec)
+{
+    nn_srcptr d;
+    slong xn, e, len, ue;
+    ulong err;
+    int sgnbit, neg;
+
+    if (arf_is_special(x))
+    {
+        if (arf_is_zero(x))
+            arb_zero(z);
+        else if (arf_is_pos_inf(x))
+            arb_pos_inf(z);
+        else
+            arb_indeterminate(z);
+        return;
+    }
+
+    sgnbit = ARF_SGNBIT(x);
+    e = ARF_EXP(x);
+    ARF_GET_MPN_READONLY(d, xn, x);
+
+    if (FLINT_UNLIKELY(COEFF_IS_MPZ(e) || e >= (WORD(1) << (FLINT_BITS - 3))))
+    {
+        if (fmpz_sgn(ARF_EXPREF(x)) < 0)
+        {
+            /* tiny: log(1 + x) = x within x^2 < 2^(2E) (relative) */
+            fmpz_t t;
+            int inexact;
+            fmpz_init(t);
+            fmpz_mul_2exp(t, ARF_EXPREF(x), 1);
+            inexact = arf_set_round(arb_midref(z), x, prec, ARB_RND);
+            mag_one(arb_radref(z));
+            mag_mul_2exp_fmpz(arb_radref(z), arb_radref(z), t);
+            if (inexact)
+                arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
+            fmpz_clear(t);
             return;
         }
-
-        /* Working precision in limbs */
-        wn = (wp + FLINT_BITS - 1) / FLINT_BITS;
-
-        TMP_START;
-
-        tmp = TMP_ALLOC_LIMBS(4 * wn + 3);
-        w = tmp;        /* requires wn+1 limbs */
-        t = w + wn + 1; /* requires wn+1 limbs */
-        u = t + wn + 1; /* requires 2wn+1 limbs */
-
-        /* read x-1 */
-        if (xn <= wn)
-        {
-            flint_mpn_zero(w, wn - xn);
-            mpn_lshift(w + wn - xn, xp, xn, 1);
-            error = 0;
-        }
         else
         {
-            mpn_lshift(w, xp + xn - wn, wn, 1);
-            error = 1;
-        }
-
-        /* First table-based argument reduction */
-        if (wp <= ARB_LOG_TAB1_PREC)
-            q1bits = ARB_LOG_TAB11_BITS;
-        else
-            q1bits = ARB_LOG_TAB21_BITS;
-
-        p1 = w[wn-1] >> (FLINT_BITS - q1bits);
-
-        /* Special case: covers logarithms of small integers */
-        if (xn == 1 && (w[wn-1] == (p1 << (FLINT_BITS - q1bits))))
-        {
-            p2 = 0;
-            flint_mpn_zero(t, wn);
-            used_taylor_series = 0;
-            N = r = 0; /* silence compiler warning */
-        }
-        else
-        {
-            /* log(1+w) = log(1+p/q) + log(1 + (qw-p)/(p+q)) */
-            w[wn] = mpn_mul_1(w, w, wn, UWORD(1) << q1bits) - p1;
-            mpn_divrem_1(w, 0, w, wn + 1, p1 + (UWORD(1) << q1bits));
-            error += 1;
-
-            /* Second table-based argument reduction (fused with log->atanh
-               conversion) */
-            if (wp <= ARB_LOG_TAB1_PREC)
-                q2bits = ARB_LOG_TAB11_BITS + ARB_LOG_TAB12_BITS;
-            else
-                q2bits = ARB_LOG_TAB21_BITS + ARB_LOG_TAB22_BITS;
-
-            p2 = w[wn-1] >> (FLINT_BITS - q2bits);
-
-            u[2 * wn] = mpn_lshift(u + wn, w, wn, q2bits);
-            flint_mpn_zero(u, wn);
-            flint_mpn_copyi(t, u + wn, wn + 1);
-            t[wn] += p2 + (UWORD(1) << (q2bits + 1));
-            u[2 * wn] -= p2;
-            mpn_tdiv_q(w, u, 2 * wn + 1, t, wn + 1);
-
-            /* propagated error from 1 ulp error: 2 atanh'(1/3) = 2.25 */
-            error += 3;
-
-            /* |w| <= 2^-r */
-            r = _arb_mpn_leading_zeros(w, wn);
-
-            /* N >= (wp-r)/(2r) */
-            N = (wp - r + (2*r-1)) / (2*r);
-            N = FLINT_MAX(N, 0);
-
-            /* Evaluate Taylor series */
-            _arb_atan_taylor_rs(t, &error2, w, wn, N, 0);
-            /* Multiply by 2 */
-            mpn_lshift(t, t, wn, 1);
-            /* Taylor series evaluation error (multiply by 2) */
-            error += error2 * 2;
-
-            used_taylor_series = 1;
-        }
-
-        /* Size of output number */
-        tn = wn;
-
-        /* First table lookup */
-        if (p1 != 0)
-        {
-            if (wp <= ARB_LOG_TAB1_PREC)
-                mpn_add_n(t, t, arb_log_tab11[p1] + ARB_LOG_TAB1_LIMBS - tn, tn);
-            else
-                mpn_add_n(t, t, arb_log_tab21[p1] + ARB_LOG_TAB2_LIMBS - tn, tn);
-            error++;
-        }
-
-        /* Second table lookup */
-        if (p2 != 0)
-        {
-            if (wp <= ARB_LOG_TAB1_PREC)
-                mpn_add_n(t, t, arb_log_tab12[p2] + ARB_LOG_TAB1_LIMBS - tn, tn);
-            else
-                mpn_add_n(t, t, arb_log_tab22[p2] + ARB_LOG_TAB2_LIMBS - tn, tn);
-            error++;
-        }
-
-        /* add exp * log(2) */
-        exp--;
-
-        if (exp > 0)
-        {
-            cy = mpn_addmul_1(t, arb_log_log2_tab + ARB_LOG_TAB2_LIMBS - tn, tn, exp);
-            t[tn] = cy;
-            tn += (cy != 0);
-            error += exp;
-        }
-        else if (exp < 0)
-        {
-            t[tn] = 0;
-            u[tn] = mpn_mul_1(u, arb_log_log2_tab + ARB_LOG_TAB2_LIMBS - tn, tn, -exp);
-
-            if (mpn_cmp(t, u, tn + 1) >= 0)
-            {
-                mpn_sub_n(t, t, u, tn + 1);
-            }
+            /* x <= -1: nan (-inf at -1); else log(1 + x) = log x within
+               a term below the error */
+            if (sgnbit)
+                arb_indeterminate(z);
             else
             {
-                mpn_sub_n(t, u, t, tn + 1);
-                negative = 1;
+                arb_log_arf(z, x, prec);
+                /* log(1 + x) - log x < 1/x: far below an ulp */
+                mag_add_ui_2exp_si(arb_radref(z), arb_radref(z), 1, -prec - 10);
             }
-
-            error += (-exp);
-
-            tn += (t[tn] != 0);
+            return;
         }
+    }
 
-        /* The accumulated arithmetic error */
-        mag_set_ui_2exp_si(arb_radref(z), error, -wn * FLINT_BITS);
-
-        /* Truncation error from the Taylor series */
-        if (used_taylor_series)
-            mag_add_ui_2exp_si(arb_radref(z), arb_radref(z), 1, -r*(2*N+1) + 1);
-
-        /* Set the midpoint */
-        inexact = _arf_set_mpn_fixed(arb_midref(z), t, tn, wn, negative, prec, ARB_RND);
+    /* tiny: |log(1 + x) - x| <= x^2 for |x| <= 1/2 */
+    if (e <= -prec - 2)
+    {
+        int inexact = arf_set_round(arb_midref(z), x, prec, ARB_RND);
+        mag_set_ui_2exp_si(arb_radref(z), 1, 2 * e);
         if (inexact)
             arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
+        return;
+    }
 
+
+    if (sgnbit && e >= 1)
+    {
+        /* x <= -1 */
+        if (e == 1 && d[xn - 1] == LIMB_TOP && flint_mpn_zero_p(d, xn - 1))
+            arb_neg_inf(z);
+        else
+            arb_indeterminate(z);
+        return;
+    }
+
+#if FLINT_BITS == 64
+    if (xn == 1 && prec <= FLINT_BITS)
+    {
+        ulong r2 = 0, r1 = 0, r0 = 0;
+        if (_arf_small_log1p_1(&r2, &r1, &r0, &err, &neg, d[0], e, sgnbit) == 0)
+        {
+            _arb_small_set_1(z, r2, r1, r0, 0, err, neg, prec);
+            return;
+        }
+    }
+    else if (xn <= 2 && prec <= 2 * FLINT_BITS)
+    {
+        ulong r3 = 0, r2 = 0, r1 = 0, r0 = 0;
+        if (_arf_small_log1p_2(&r3, &r2, &r1, &r0, &err, &neg, d[xn - 1], (xn == 2) ? d[0] : 0, e, sgnbit) == 0)
+        {
+            _arb_small_set_2(z, r3, r2, r1, r0, 0, err, neg, prec);
+            return;
+        }
+    }
+#endif
+
+    /* small (3e <= -prec - 2, |x| < 1/4): log(1 + x) = x - x^2/2 + x^3/3
+       within |x|^4 / 2 < 2^(4e - 1), by the series in fixed point
+       (arf/elem.c) */
+    if (e <= -((prec + 4) / 3) && e <= -2)
+    {
+        _arb_small_arg_series(z, d, xn, e, sgnbit, sgnbit ? ARB_SMALL_SERIES_LOG1P_NEG : ARB_SMALL_SERIES_LOG1P_POS, prec);
+        arb_add_error_2exp_si(z, 4 * e - 1);
+        return;
+    }
+
+
+    {
+        nn_ptr y;
+        TMP_INIT;
+        TMP_START;
+        y = TMP_ALLOC(_mp_real_log1p_fp_ylen(_arb_elem_bits(prec), xn, e) * sizeof(ulong));
+        neg = _mp_real_log1p_fp(y, &len, &ue, &err, d, xn, e, sgnbit, _arb_elem_bits(prec));
+        _arb_set_mpn_err(z, y, len, ue, err, err, neg, prec);
         TMP_END;
     }
 }

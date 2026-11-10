@@ -603,7 +603,7 @@ or to the nearest integer (ties to even). The results are exact.
 The elementary functions are computed natively, on the mantissas, with
 the fixed-point kernels of the `mp_real` module (table-based argument
 reduction and rectangular splitting of the Taylor series [@Joh2014c];
-see [](algorithms/floating-point/elementary-functions)); `nfloat`
+see [](algorithms/special-functions/elementary)); `nfloat`
 precisions never need bit-burst evaluation. The
 results are not correctly rounded: without directed rounding the error
 is at most about one ulp at the function precision of the context (see

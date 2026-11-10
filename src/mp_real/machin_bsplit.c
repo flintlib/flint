@@ -26,8 +26,8 @@
    Machin-type sets of machin_tab.c (the atanh / atan of 1/x_j), one
    followup series each beyond the set, as in arb's
    arb_log_primes_vec_bsplit and arb_atan_gauss_primes_vec_bsplit;
-   small precisions read arb's 4608-bit tables of the first 13 values
-   directly.
+   small precisions read the 4608-bit tables of the first 13 values
+   (log_p_tab.c, atan_gauss_tab.c) directly.
 
    The atanh terms of the logarithms are not evaluated by their Taylor
    series but by Zuniga's Ramanujan-type series [Zun2025] for
@@ -321,8 +321,8 @@ _atan_frac(mp_real_t res, ulong p, nn_srcptr x, slong xn, slong n)
 
 /* ---- the static tables ---- */
 
-#define STATIC_NUM 13
-#define STATIC_LIMBS (4608 / FLINT_BITS)
+#define STATIC_NUM MP_REAL_LOG_P_TAB_NUM
+#define STATIC_LIMBS MP_REAL_LOG_P_TAB_LIMBS
 
 /* x = table entry (a fraction of STATIC_LIMBS limbs) times 2^e, within
    one ulp of the table */
@@ -575,7 +575,7 @@ _mp_real_log_primes_vec(mp_real_struct * res, slong num, slong n)
     if (num <= STATIC_NUM && n + 1 < STATIC_LIMBS)
     {
         for (i = 0; i < num; i++)
-            _set_static(res + i, arb_log_p_tab[i],
+            _set_static(res + i, _mp_real_log_p_tab[i],
                 (i >= 1) + (i >= 4) + (i >= 16));
         return;
     }
@@ -658,7 +658,7 @@ _mp_real_atan_gauss_vec(mp_real_struct * res, slong num, slong n)
         static const char exponents[STATIC_NUM] =
             { 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1 };
         for (i = 0; i < num; i++)
-            _set_static(res + i, arb_atan_gauss_tab[i], exponents[i] + 1);
+            _set_static(res + i, _mp_real_atan_gauss_tab[i], exponents[i] + 1);
         return;
     }
 

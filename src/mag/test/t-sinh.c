@@ -14,11 +14,6 @@
 #include "arf.h"
 #include "mag.h"
 
-void
-arf_sinh(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
-{
-    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_sinh, x, NULL, prec, rnd);
-}
 
 TEST_FUNCTION_START(mag_sinh, state)
 {

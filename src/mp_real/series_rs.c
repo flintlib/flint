@@ -103,9 +103,19 @@
    omitted tail at most 1/8.  So |P - P~| < 4.6 for exp and below
    7.5 for the others.  The final product x P (resp. v P, v with its
    own ulp) damps that by x < 2^-r = 2^-(h + 8) (resp. v < 2^-(h + 8))
-   to below 1/32 ulp of the result and adds at most 1 ulp for
-   the mulhigh (and 1/2 for v's error times P <= 1/2 in the cosines),
-   so every result is within 5 ulps for exp and 2 ulps otherwise.
+   to below 1/32 ulp of the result.  The product itself is taken
+   directly over the significant limbs of its operands
+   (_rs_mulhigh_zl): below 1 + eps ulps for the mulhigh (eps = 2n/B,
+   floor or floor minus one of its top limbs), and up to one ulp for
+   each operand truncated below them, x and 1 - P for sin, sinh, atan
+   and atanh (3 + eps), P for the cosines (2 + eps), where v's own
+   error, below 3 units (_rs_square: the sqrhigh and the truncation of
+   x), times P <= 1/2 + 2^-2r adds 3/2 more.  So every result is within
+   5 ulps for exp, 3.6 ulps for 1 - cos and cosh - 1 and 3.1 ulps for
+   the others (measured: 3.3 for 1 - cos, 2.2 for atan, 2.1 for sin;
+   the truncations cost most where x fills its top significant limb,
+   r a multiple of 64).  The callers allow 6 ulps (impl.h) resp. 15
+   (trig_rs.c).
    (For exp the term v, a_1 = 1, is left out of the sum and added
    exactly after the final division.)  Outputs may alias x. */
 
@@ -528,6 +538,109 @@ _rs_powers(nn_ptr pw, slong pslot, slong n, slong s_bits, slong m, slong pad)
 #undef SL
 }
 
+/* z = x^2 (n limbs, within 3 units of 2^-need) for x < 2^-r at n limbs
+   from the significant limbs of x only: the top r / 64 limbs of x are
+   zero (as are the top 2 r / 64 of z), and the square of the top K
+   significant limbs of x, K = n - 2 zl - floor((64 n - need - 2) / 64),
+   has an error below 3 B^-(2 zl + K) <= 3 2^-(need + 2) (sqrhigh
+   1 + 2K/B units, the truncation of x twice x 2^-(64 (zl + K)) < 2
+   B^-(2 zl + K) for r >= 64 zl), i.e. below 3 units of z for
+   need = 64 n */
+static void
+_rs_square(nn_ptr z, nn_srcptr x, slong n, slong r, slong need)
+{
+    slong zl = r / FLINT_BITS, K;
+
+    K = n - 2 * zl - FLINT_MAX(FLINT_BITS * n - need - 2, 0) / FLINT_BITS;
+    K = FLINT_MIN(K, n - zl);
+
+    if (K <= 0)
+    {
+        flint_mpn_zero(z, n);
+        return;
+    }
+
+    flint_mpn_zero(z, n - 2 * zl - K);
+    flint_mpn_sqrhigh_n(z + n - 2 * zl - K, x + n - zl - K, K);
+    flint_mpn_zero(z + n - 2 * zl, 2 * zl);
+}
+
+/* tmp = x s / B^n (n limbs, within 3 + 2n/B units) for x with zl zero top limbs
+   and s = (s, n) + s[n] B^n < 2, over the significant limbs only: for
+   s = 1 + c or 1 - c with a small c (the sums P of the odd families,
+   near 1), as x +- x c / B^n with the product over the significant
+   limbs of both (K = n - zl - zc limbs, zc the zero top limbs of c:
+   the truncations of x and c below their top K limbs cost less than
+   one unit each, the mulhigh one more); else over the n - zl
+   significant limbs of x */
+static void
+_rs_mulhigh_zl(nn_ptr tmp, nn_srcptr x, nn_srcptr s, slong n, slong zl)
+{
+    slong zc, K;
+    ulong cy;
+    nn_ptr c;
+    int neg;
+    TMP_INIT;
+
+    if (zl >= n)
+    {
+        /* (x = 0 at n limbs) */
+        flint_mpn_zero(tmp, n);
+        return;
+    }
+
+    if (s[n] == 0 && (s[n - 1] >> (FLINT_BITS - 1)) == 0)
+    {
+        /* s < 1/2: x s / B^n = x' s' / B^(n - zl) for the significant
+           limbs x' of x and the top n - zl limbs s' of s, within
+           2 + 2n/B units (the low limbs of s one, the mulhigh 1 + 2n/B) */
+        flint_mpn_mulhigh_n(tmp, x, s + zl, n - zl);
+        flint_mpn_zero(tmp + n - zl, zl);
+        return;
+    }
+
+    TMP_START;
+    if (s[n] == 1)
+    {
+        c = (nn_ptr) s;
+        neg = 0;
+    }
+    else
+    {
+        /* c = 1 - s */
+        c = TMP_ALLOC(n * sizeof(ulong));
+        mpn_neg(c, s, n);
+        neg = 1;
+    }
+
+    for (zc = 0; zc < n && c[n - 1 - zc] == 0; zc++)
+        ;
+    K = n - zl - zc;
+
+    flint_mpn_copyi(tmp, x, n);
+    if (K > 0)
+    {
+        nn_ptr t = TMP_ALLOC((K + 1) * sizeof(ulong));
+
+        /* x c / B^n = x' c' / B^(2n - zl - zc - K) for the top K limbs
+           x', c' of each: below B^K */
+        flint_mpn_mulhigh_n(t, x + n - zl - K, c + n - zc - K, K);
+        if (neg)
+        {
+            cy = mpn_sub_n(tmp, tmp, t, K);
+            if (cy)
+                mpn_sub_1(tmp + K, tmp + K, n - K, cy);
+        }
+        else
+        {
+            cy = mpn_add_n(tmp, tmp, t, K);
+            if (cy)
+                mpn_add_1(tmp + K, tmp + K, n - K, cy);
+        }
+    }
+    TMP_END;
+}
+
 void
 _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     flint_bitcnt_t r, int hyperbolic)
@@ -554,8 +667,19 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     work = tmp + (n + 3);
     z = pw + PAD;
 
-    flint_mpn_sqrhigh_n(z, x, n);
-    _rs_powers(pw, pslot, n, s_bits, m, PAD);
+    /* z = x^2 to its own ulp, as the product z P of the cosine needs
+       (the sums alone would need block 0's window, 64 n - h bits plus at
+       most 16 guard bits, h = r - 8 for the sine): the same z for the
+       sine alone, so that it equals the sine of the pair (one square of
+       at most r / 64 more limbs) */
+    _rs_square(z, x, n, r, FLINT_BITS * n);
+    /* (a single block needs no boundary product: powers to N - 1 only) */
+    {
+        slong Nmax = N;
+        if (yg != NULL)
+            Nmax = FLINT_MAX(Nmax, _rs_terms(RS_EVEN, FLINT_BITS * n - (2 * (slong) r - 8), s_bits));
+        _rs_powers(pw, pslot, n, s_bits, (Nmax <= m) ? FLINT_MAX(Nmax - 1, 1) : m, PAD);
+    }
 
     /* the products go through tmp: ysin and yg may alias x */
     if (yg != NULL)
@@ -563,7 +687,7 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
         _rs_sum(s, pw, pslot, n, s_bits, m, RS_EVEN, alt, work,
             _rs_terms(RS_EVEN, FLINT_BITS * n - (2 * (slong) r - 8), s_bits),
             2 * (slong) r - 8);
-        flint_mpn_mulhigh_n(tmp, z, s, n);  /* s < 1 */
+        _rs_mulhigh_zl(tmp, z, s, n, 2 * ((slong) r / FLINT_BITS));  /* s < 1 */
         if (ysin == NULL)
         {
             flint_mpn_copyi(yg, tmp, n);
@@ -577,9 +701,7 @@ _mp_real_series_rs_sin_cos(nn_ptr ysin, nn_ptr yg, nn_srcptr x, slong n,
     {
         _rs_sum(s, pw, pslot, n, s_bits, m, RS_ODD, alt, work, N,
             (slong) r - 8);
-        flint_mpn_mulhigh_n(tmp, x, s, n);
-        if (s[n] != 0)
-            mpn_addmul_1(tmp, x, n, s[n]);
+        _rs_mulhigh_zl(tmp, x, s, n, (slong) r / FLINT_BITS);
         flint_mpn_copyi(ysin, tmp, n);
         if (yg != NULL)
             flint_mpn_copyi(yg, s + n + 3, n);
@@ -661,8 +783,8 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
     if (fam == RS_EXP)
         flint_mpn_copyi(pw + PAD, x, n);
     else
-        flint_mpn_sqrhigh_n(pw + PAD, x, n);
-    _rs_powers(pw, pslot, n, s_bits, m, PAD);
+        _rs_square(pw + PAD, x, n, r, FLINT_BITS * n - h + 16);
+    _rs_powers(pw, pslot, n, s_bits, (N <= m) ? FLINT_MAX(N - 1, 1) : m, PAD);
 
     _rs_sum(s, pw, pslot, n, s_bits, m, fam, alt, work, N, h);
 
@@ -676,9 +798,7 @@ _mp_real_series_rs(nn_ptr res, nn_srcptr x, slong n, flint_bitcnt_t r,
     else
     {
         /* through tmp: res may alias x */
-        flint_mpn_mulhigh_n(tmp, x, s, n);
-        if (s[n] != 0)
-            mpn_addmul_1(tmp, x, n, s[n]);
+        _rs_mulhigh_zl(tmp, x, s, n, (slong) r / FLINT_BITS);
         flint_mpn_copyi(res, tmp, n);
     }
 

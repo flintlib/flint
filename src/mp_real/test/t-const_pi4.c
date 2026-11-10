@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* _mp_real_const_pi4 must return EXACTLY
@@ -57,7 +58,7 @@ TEST_FUNCTION_START(mp_real_const_pi4, state)
             slong n = sizes[i] + (slong) n_randint(state, 4);
             nn_ptr y = flint_malloc(n * sizeof(ulong));
 
-            arb_const_pi(ref, FLINT_BITS * n + 192);
+            ref_const_pi(ref, FLINT_BITS * n + 192);
             arb_mul_2exp_si(ref, ref, -2);
             {
                 ulong e;

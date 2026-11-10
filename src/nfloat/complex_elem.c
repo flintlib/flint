@@ -14,6 +14,8 @@
 #include "gr_generic.h"
 #include "mpn_extras.h"
 #include "nfloat.h"
+#include "elem.h"
+#include "../acf/elem.h"
 
 /*
     Complex elementary functions, as compositions of the real functions
@@ -370,6 +372,70 @@ _c_tan_cot(nfloat_complex_ptr res, nfloat_srcptr a, nfloat_srcptr b, int pi, int
 
     return status;
 }
+
+#if FLINT_BITS == 64
+/* The register paths shared with acf (acf/elem.h) at one and two limbs:
+   the frames of the parts, rounded by _nfloat_small_set_1 / _2 when
+   their relative accuracy covers the precision with 8 guard bits (the
+   products of tiny parts lose it); -1 when the path declines. */
+
+static int
+_c_frame_set(nfloat_ptr res, const _acf_frame_struct * f, int two, gr_ctx_t ctx)
+{
+    slong bits;
+
+    if (two)
+    {
+        if (f->y[3] != 0)
+            bits = 3 * FLINT_BITS + FLINT_BIT_COUNT(f->y[3]);
+        else if (f->y[2] != 0)
+            bits = 2 * FLINT_BITS + FLINT_BIT_COUNT(f->y[2]);
+        else
+            return -1;
+        if (bits - (slong) FLINT_BIT_COUNT(f->err) < 2 * FLINT_BITS + 8)
+            return -1;
+        return _nfloat_small_set_2(res, f->y[3], f->y[2], f->y[1], f->y[0], f->k, f->err, f->sgnbit, ctx);
+    }
+    else
+    {
+        if (f->y[2] != 0)
+            bits = 2 * FLINT_BITS + FLINT_BIT_COUNT(f->y[2]);
+        else if (f->y[1] != 0)
+            bits = FLINT_BITS + FLINT_BIT_COUNT(f->y[1]);
+        else
+            return -1;
+        if (bits - (slong) FLINT_BIT_COUNT(f->err) < FLINT_BITS + 8)
+            return -1;
+        return _nfloat_small_set_1(res, f->y[2], f->y[1], f->y[0], f->k, f->err, f->sgnbit, ctx);
+    }
+}
+
+/* log(a + bi) for normal a and b at n <= 2 limbs into res (which may
+   alias nothing of a, b): the status, or -1 when declined */
+static int
+_c_small(nfloat_complex_ptr res, nfloat_complex_ptr FLINT_UNUSED(unused), nfloat_srcptr a, nfloat_srcptr b, int FLINT_UNUSED(f), gr_ctx_t ctx)
+{
+    _acf_frame_struct F1, F2;
+    slong n = NFLOAT_CTX_NLIMBS(ctx), ea = NFLOAT_EXP(a), eb = NFLOAT_EXP(b);
+    ulong da1 = NFLOAT_D(a)[n - 1], da0 = (n == 2) ? NFLOAT_D(a)[0] : 0;
+    ulong db1 = NFLOAT_D(b)[n - 1], db0 = (n == 2) ? NFLOAT_D(b)[0] : 0;
+    int two = (n == 2), st, s1, s2;
+
+    if (FLINT_ABS(ea) >= (WORD(1) << 40) || FLINT_ABS(eb) >= (WORD(1) << 40))
+        return -1;
+
+    st = two ? _acf_small_log_2(&F1, &F2, da1, da0, ea, NFLOAT_SGNBIT(a), db1, db0, eb, NFLOAT_SGNBIT(b))
+             : _acf_small_log_1(&F1, &F2, da1, ea, NFLOAT_SGNBIT(a), db1, eb, NFLOAT_SGNBIT(b));
+    if (st != 0)
+        return -1;
+
+    s1 = _c_frame_set(RE(res), &F1, two, ctx);
+    s2 = (s1 < 0) ? s1 : _c_frame_set(IM(res), &F2, two, ctx);
+    if (s1 < 0 || s2 < 0)
+        return -1;
+    return s1 | s2;
+}
+#endif
 
 /* exp(a + bi) */
 static int
@@ -812,6 +878,9 @@ _nfloat_complex_func(nfloat_complex_ptr res, nfloat_complex_srcptr x, cfunc_t f,
     nfloat_srcptr a = RE(x), b = IM(x);
     int recip_arg = 0, rot = 0, div_pi = 0;
     int status = GR_SUCCESS;
+#if FLINT_BITS == 64
+    int small_status;
+#endif
 
     CZ(wbuf);
     RZ(t);
@@ -888,6 +957,30 @@ _nfloat_complex_func(nfloat_complex_ptr res, nfloat_complex_srcptr x, cfunc_t f,
         status |= _cfunc_real[f].real(RE(w), a, ctx);
         nfloat_zero(IM(w), ctx);
     }
+#if FLINT_BITS == 64
+    else if (NFLOAT_CTX_NLIMBS(ctx) <= 2 && !NFLOAT_IS_SPECIAL(a) && !NFLOAT_IS_SPECIAL(b) &&
+        (f == C_LOG || f == C_LOG2 || f == C_LOG10 || f == C_LOG_PI_I) &&
+        (small_status = _c_small(w, NULL, a, b, C_LOG, ctx)) >= 0)
+    {
+        /* (the logarithm by the register path shared with acf, which
+           beats the composition below; the exponential and the
+           trigonometric functions of nfloat are compositions of
+           register paths already, as fast as the shared ones) */
+        status |= small_status;
+        if (f == C_LOG2 || f == C_LOG10)
+        {
+            status |= nfloat_set_ui(t, (f == C_LOG2) ? 2 : 10, ctx);
+            status |= nfloat_log(t, t, ctx);
+            status |= _c_div_real(w, w, t, ctx);
+        }
+        else if (f == C_LOG_PI_I)
+        {
+            status |= nfloat_pi(t, ctx);
+            status |= _c_div_real(w, w, t, ctx);
+            _c_mul_i_pow(w, w, 3, ctx);
+        }
+    }
+#endif
     else switch (f)
     {
         case C_EXP:

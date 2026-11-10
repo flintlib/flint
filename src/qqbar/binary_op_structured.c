@@ -388,15 +388,15 @@ _qqbar_guess_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op, slong m, 
     fmpz * rel;
     fmpz_poly_t g, Q2;
     fmpz_t RP, RQ, R;
-    slong i, dx, dy, N, B, lR, lg, llc;
+    slong i, dx, dy, N, B, lR, lg, llc, len = m + 1;
     int success = 0;
 
     dx = qqbar_degree(x);
     dy = qqbar_degree(y);
     N = dx * dy;
 
-    vec = _acb_vec_init(m + 1);
-    rel = _fmpz_vec_init(m + 1);
+    vec = _acb_vec_init(len);
+    rel = _fmpz_vec_init(len);
     acb_init(w);
     fmpz_poly_init(g);
 
@@ -480,8 +480,8 @@ _qqbar_guess_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op, slong m, 
         fmpz_clear(R);
     }
 
-    _acb_vec_clear(vec, m + 1);
-    _fmpz_vec_clear(rel, m + 1);
+    _acb_vec_clear(vec, len);
+    _fmpz_vec_clear(rel, len);
     acb_clear(w);
     fmpz_poly_clear(g);
 

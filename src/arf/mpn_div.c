@@ -390,7 +390,11 @@ _arf_mpn_div_approx(nn_ptr z, slong * zexp, nn_srcptr x, slong xn, nn_srcptr y, 
         {
             ulong qq[4];
             slong qn = _div_register(qq + 1, &s, x, xn, y, yn, 0);
-            _arf_mpn_copy_limbs(z, qq + 1 + qn - rn, rn);
+            /* (rn <= 2 here: the limbs copied directly, which also tells
+               the compiler that the reads stay within qq) */
+            z[0] = qq[1 + qn - rn];
+            if (rn == 2)
+                z[1] = qq[2 + qn - rn];
             *zexp = (slong) s;
         }
         return;

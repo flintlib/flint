@@ -13,6 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
@@ -54,7 +55,7 @@ close_1ulp(nn_srcptr y, slong ylen, nn_srcptr ref, ulong bhi, ulong blo)
 /* references: the tapered series of series_rs.c at the given size, in
    the output format of the _rs functions */
 static void
-ref_sin_cos(nn_ptr ys, nn_ptr yc, nn_srcptr x, slong n, int alt)
+rs_ref_sin_cos(nn_ptr ys, nn_ptr yc, nn_srcptr x, slong n, int alt)
 {
     slong zb = _mp_real_elem_lzb(x, n);
 
@@ -75,7 +76,7 @@ ref_sin_cos(nn_ptr ys, nn_ptr yc, nn_srcptr x, slong n, int alt)
 }
 
 static void
-ref_atan(nn_ptr res, nn_srcptr x, slong n, int alt)
+rs_ref_atan(nn_ptr res, nn_srcptr x, slong n, int alt)
 {
     slong zb = _mp_real_elem_lzb(x, n);
 
@@ -135,7 +136,7 @@ TEST_FUNCTION_START(mp_real_trig_rs, state)
             TEST_FUNCTION_FAIL("single/combined mismatch: zbits = %d, "
                 "n = %wd, alt = %d\n", zbits, n, alt);
 
-        ref_sin_cos(refs, refc, xr, n + 1, alt);
+        rs_ref_sin_cos(refs, refc, xr, n + 1, alt);
 
         if (test_err_out > DOC_SIN_COS_RS_MAX_ERR(n))
             TEST_FUNCTION_FAIL("err = %wu above the documented maximum\n", test_err_out);
@@ -153,7 +154,7 @@ TEST_FUNCTION_START(mp_real_trig_rs, state)
         if (alt) _mp_real_atan_rs(a1, &test_err_out, x, n);
         else _mp_real_atanh_rs(a1, &test_err_out, x, n);
 
-        ref_atan(refa, xr, n + 1, alt);
+        rs_ref_atan(refa, xr, n + 1, alt);
 
         if (test_err_out > DOC_ATAN_RS_MAX_ERR(n))
             TEST_FUNCTION_FAIL("err = %wu above the documented maximum\n", test_err_out);
@@ -188,11 +189,11 @@ TEST_FUNCTION_START(mp_real_trig_rs, state)
                 double u;
 
                 if (which == 0)
-                    (alt ? arb_sin : arb_sinh)(f, xa, prec);
+                    (alt ? ref_sin : ref_sinh)(f, xa, prec);
                 else if (which == 1)
-                    (alt ? arb_cos : arb_cosh)(f, xa, prec);
+                    (alt ? ref_cos : ref_cosh)(f, xa, prec);
                 else
-                    (alt ? arb_atan : arb_atanh)(f, xa, prec);
+                    (alt ? ref_atan : ref_atanh)(f, xa, prec);
 
                 fmpz_set_ui_array(t, y, ylen);
                 arb_set_fmpz(va, t);

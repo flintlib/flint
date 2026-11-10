@@ -180,7 +180,10 @@ _exp_reduced_alg(slong wn, flint_bitcnt_t r)
    (exp_sum_bs.c), which forks its subtrees and merges.  This is the
    pair of strategies of arb_exp_arf_bb: parallel exponentials, and
    a serial loop over parallel binary splittings at the largest
-   precisions.  The results do not depend on the thread count. */
+   precisions.  The scheduling does not change the result; the choice of
+   the burst steps above does depend on the thread count, so that the
+   last bits of a result (within its error bound) may differ between
+   thread counts. */
 /* the burst's factors as parallel tasks: tasks 0 .. nb - 2 are the
    slices, in order of decreasing cost (the leading slice has the most
    terms), f[k] = Q B^QE + T of slice k with fq[k] = Q B^QE its

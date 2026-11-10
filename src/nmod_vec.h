@@ -365,6 +365,20 @@ ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong o
 
 /* ------------- dot product, general --------------- */
 
+/* (hi B + lo) mod n for a dot product, reduction chosen from nu and len:
+   doc/src/algorithms/linear-algebra/dot-products.md, proposition final2 */
+#define _NMOD_VEC_DOT2_RED(res, hi, lo, len, mod)                     \
+do                                                                    \
+{                                                                     \
+    const flint_bitcnt_t bcxx = FLINT_BIT_COUNT((ulong) (len) - 1);   \
+    if (bcxx + 2 <= (mod).norm && (mod).norm <= FLINT_BITS - 3)       \
+        NMOD_RED2_BOUNDED(res, hi, lo, mod);                          \
+    else if (bcxx <= (mod).norm)                                      \
+        NMOD_RED2(res, hi, lo, mod);                                  \
+    else                                                              \
+        NMOD2_RED2(res, hi, lo, mod);                                 \
+} while (0)
+
 // auxiliary for short dot products
 // (fixedlen small constant: compiler unrolls the loops completely)
 #define _NMOD_VEC_DOT_SHORT1(fixedlen,expr1,expr2)       \
@@ -385,7 +399,7 @@ ulong _nmod_vec_dot_split_limbs_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong o
                 umul_ppmm(s1, s0, (expr1), (expr2));        \
                 add_ssaaaa(u1, u0, u1, u0, s1, s0);         \
             }                                               \
-            NMOD2_RED2(s0, u1, u0, mod);                    \
+            _NMOD_VEC_DOT2_RED(s0, u1, u0, fixedlen, mod);  \
             return s0;                                      \
         }                                                   \
 
@@ -690,7 +704,7 @@ do                                                                    \
         const ulong prodzz = (expr1) * (expr2);                       \
         add_ssaaaa(s1zz, s0zz, s1zz, s0zz, 0, prodzz);                \
     }                                                                 \
-    NMOD2_RED2(res, s1zz, s0zz, mod);                                 \
+    _NMOD_VEC_DOT2_RED(res, s1zz, s0zz, len, mod);                    \
 } while(0);
 
 // _DOT2   (two limbs, general)
@@ -740,7 +754,7 @@ do                                                                    \
     }                                                                 \
                                                                       \
     add_ssaaaa(u1zz, u0zz, u1zz, u0zz, v1zz, v0zz);                   \
-    NMOD2_RED2(res, u1zz, u0zz, mod);                                 \
+    _NMOD_VEC_DOT2_RED(res, u1zz, u0zz, len, mod);                    \
 } while(0);
 
 // _DOT3_ACC   (three limbs, delayed accumulations)

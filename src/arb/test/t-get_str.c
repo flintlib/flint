@@ -73,6 +73,34 @@ TEST_FUNCTION_START(arb_get_str, state)
         arb_clear(y);
     }
 
+    /* regression: a midpoint m 2^t with t = WORD_MIN (an overflow in the
+       decimal conversion made GMP raise SIGFPE) */
+    {
+        arb_t x;
+        char * s;
+
+        arb_init(x);
+        arf_set_ui_2exp_si(arb_midref(x), 3, WORD_MIN);
+
+        s = arb_get_str(x, 10, 0);
+#if FLINT_BITS == 64
+        if (strncmp(s, "[2.172445387e-2776511644261678566 +/- ", 38))
+        {
+            flint_printf("FAIL (t = WORD_MIN)\n\ns = %s\n\n", s);
+            flint_abort();
+        }
+#endif
+        flint_free(s);
+
+        mag_set_ui_2exp_si(arb_radref(x), 1, WORD_MIN / 2);
+        s = arb_get_str(x, 10, 0);
+        flint_free(s);
+        s = arb_get_str(x, 10, ARB_STR_MORE);
+        flint_free(s);
+
+        arb_clear(x);
+    }
+
     /* tightness: exact values, tiny radii, one-ulp rule */
     {
         arb_t x;

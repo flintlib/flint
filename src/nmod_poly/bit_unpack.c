@@ -15,6 +15,59 @@
 #include "nmod_poly.h"
 #include "fmpz.h"
 
+/* the loop of the case FLINT_BITS < bits < 2 FLINT_BITS of
+   _nmod_poly_bit_unpack, each coefficient reduced with RED */
+#define _BIT_UNPACK2_LOOP(RED)                                              \
+    for (i = nlo; i < nhi; i++)                                             \
+    {                                                                       \
+        if (current_bit == 0)                                               \
+        {                                                                   \
+            temp_lower = mpn[current_limb++];                               \
+            temp_upper = mpn[current_limb] & mask;                          \
+                                                                            \
+            RED(res[i], temp_upper, temp_lower, mod);                       \
+                                                                            \
+            current_bit = bits - FLINT_BITS;                                \
+        }                                                                   \
+        else if (current_bit > double_boundary_limit_bit)                   \
+        {                                                                   \
+            /* the coeff will be across two limb boundaries */              \
+            temp_lower = mpn[current_limb++] >> current_bit;                \
+            temp_lower |=                                                   \
+                (mpn[current_limb] << (FLINT_BITS - current_bit));          \
+                                                                            \
+            temp_upper = mpn[current_limb++] >> current_bit;                \
+            temp_upper |=                                                   \
+                (mpn[current_limb] << (FLINT_BITS - current_bit));          \
+            temp_upper &= mask;                                             \
+                                                                            \
+            RED(res[i], temp_upper, temp_lower, mod);                       \
+                                                                            \
+            current_bit += bits - 2 * FLINT_BITS;                           \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            /* the coeff will be across one limb boundary */                \
+            temp_lower =                                                    \
+                (mpn[current_limb] >> current_bit) | (mpn[current_limb + 1] \
+                                                      << (FLINT_BITS -      \
+                                                          current_bit));    \
+            current_limb++;                                                 \
+                                                                            \
+            temp_upper = mpn[current_limb] >> current_bit;                  \
+            temp_upper &= mask;                                             \
+                                                                            \
+            RED(res[i], temp_upper, temp_lower, mod);                       \
+                                                                            \
+            current_bit += bits - FLINT_BITS;                               \
+            if (current_bit == FLINT_BITS)                                  \
+            {                                                               \
+                current_bit = 0;                                            \
+                current_limb++;                                             \
+            }                                                               \
+        }                                                                   \
+    }
+
 /* Assumes len > 0, bits > 0. */
 void
 _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bitcnt_t bits,
@@ -87,54 +140,16 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
 
         ulong mask = (UWORD(1) << (bits - FLINT_BITS)) - UWORD(1);
 
-        for (i = nlo; i < nhi; i++)
+        /* the coefficients are below 2^bits: NMOD_RED2_BOUNDED applies if
+           bits <= nu + FLINT_BITS - 2 and nu < FLINT_BITS, nu the bit length
+           of n (then nu >= 3, since bits > FLINT_BITS) */
+        if (mod.norm != 0 && bits <= 2 * FLINT_BITS - 2 - mod.norm)
         {
-            if (current_bit == 0)
-            {
-                temp_lower = mpn[current_limb++];
-                temp_upper = mpn[current_limb] & mask;
-
-                NMOD2_RED2(res[i], temp_upper, temp_lower, mod);
-
-                current_bit = bits - FLINT_BITS;
-            }
-            else if (current_bit > double_boundary_limit_bit)
-            {
-                /* the coeff will be across two limb boundaries */
-                temp_lower = mpn[current_limb++] >> current_bit;
-                temp_lower |=
-                    (mpn[current_limb] << (FLINT_BITS - current_bit));
-
-                temp_upper = mpn[current_limb++] >> current_bit;
-                temp_upper |=
-                    (mpn[current_limb] << (FLINT_BITS - current_bit));
-                temp_upper &= mask;
-
-                NMOD2_RED2(res[i], temp_upper, temp_lower, mod);
-
-                current_bit += bits - 2 * FLINT_BITS;
-            }
-            else
-            {
-                /* the coeff will be across one limb boundary */
-                temp_lower =
-                    (mpn[current_limb] >> current_bit) | (mpn[current_limb + 1]
-                                                          << (FLINT_BITS -
-                                                              current_bit));
-                current_limb++;
-
-                temp_upper = mpn[current_limb] >> current_bit;
-                temp_upper &= mask;
-
-                NMOD2_RED2(res[i], temp_upper, temp_lower, mod);
-
-                current_bit += bits - FLINT_BITS;
-                if (current_bit == FLINT_BITS)
-                {
-                    current_bit = 0;
-                    current_limb++;
-                }
-            }
+            _BIT_UNPACK2_LOOP(NMOD_RED2_BOUNDED)
+        }
+        else
+        {
+            _BIT_UNPACK2_LOOP(NMOD2_RED2)
         }
     }
     else                        /* 2*FLINT_BITS < bits < 3*FLINT_BITS */
@@ -142,6 +157,11 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
         ulong mask = (UWORD(1) << (bits - 2 * FLINT_BITS)) - UWORD(1);
+
+        /* NMOD_RED3 needs the top word below n; it is below
+           2^(bits - 2 FLINT_BITS) <= 2^(nu - 1) <= n if bits - 2 FLINT_BITS
+           < nu (always so for Kronecker products), otherwise reduce it first */
+        int reduce_top = (bits - 2 * FLINT_BITS >= NMOD_BITS(mod));
 
         for (i = nlo; i < nhi; i++)
         {
@@ -151,6 +171,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
                 temp_upper = mpn[current_limb++];
                 temp_upper2 = mpn[current_limb] & mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit = bits - 2 * FLINT_BITS;
@@ -169,6 +191,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
                 temp_upper2 = mpn[current_limb] >> current_bit;
                 temp_upper2 &= mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit += bits - 2 * FLINT_BITS;
@@ -195,6 +219,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
 
                 temp_upper2 &= mask;
 
+                if (reduce_top)
+                    NMOD_RED(temp_upper2, temp_upper2, mod);
                 NMOD_RED3(res[i], temp_upper2, temp_upper, temp_lower, mod);
 
                 current_bit += bits - 3 * FLINT_BITS;
@@ -202,6 +228,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
         }
     }
 }
+
+#undef _BIT_UNPACK2_LOOP
 
 void
 nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)

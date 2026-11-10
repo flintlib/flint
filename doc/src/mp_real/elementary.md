@@ -59,9 +59,9 @@ reduction up to 65536 limbs (Newton–Taylor inversion of it for log and
 atan), and table-free bit-burst evaluation beyond. The hyperbolic and
 inverse functions are compositions of exp, log and atan arranged to
 avoid cancellation. The guide [](mp_real/fixed-point) lists the kernels,
-and [](algorithms/floating-point/elementary-functions) describes them.
+and [](algorithms/special-functions/elementary) describes them.
 
-::: summary algorithms/floating-point/elementary-functions :::
+::: summary algorithms/special-functions/elementary :::
 
 ## Example {#example}
 

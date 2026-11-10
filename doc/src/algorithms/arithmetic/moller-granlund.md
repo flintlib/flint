@@ -150,3 +150,7 @@ arithmetic modulo word-size integers.
 - `n_mulmod2_preinv` multiplies and reduces the two-word product with
   `n_ll_mod_preinv`; `n_mulmod_preinv` skips the normalisation shift by
   requiring a normalised modulus.
+- The macro `udiv_qrnnd_preinv` of [](longlong) is [](#alg-div) for a
+  normalised divisor, with the quotient. The divisions of limb arrays by
+  a limb in [](mpn_extras), the carries of [](radix) arithmetic and the
+  divisions by a leading coefficient in [](fmpz_mpoly) use it.

@@ -448,7 +448,8 @@ decfloat_set_round_str(decfloat_t res, const char * s, slong prec, int rnd, gr_c
         int saved_rnd = DECIMAL_CTX_RND(ctx);
         int status;
 
-        DECIMAL_CTX_PREC(ctx) = prec;
+        /* clamps prec to [1, DECIMAL_PREC_MAX] (or DECIMAL_PREC_EXACT) */
+        decimal_ctx_set_prec(ctx, prec);
         DECIMAL_CTX_RND(ctx) = rnd;
         status = gr_generic_set_str_ring_exponents(res, s, ctx);
         DECIMAL_CTX_PREC(ctx) = saved_prec;

@@ -628,7 +628,8 @@ These macros are the building blocks of the arithmetic functions above
 and of the vector, polynomial and matrix modules. Most reduce two or
 three words modulo $n$ with one or two steps of
 [Möller–Granlund division](algorithms/arithmetic/moller-granlund);
-`NMOD_RED` reduces one word by [Barrett reduction](algorithms/arithmetic/barrett#nmod).
+`NMOD_RED` reduces one word, and `NMOD_RED2_BOUNDED` two words below a
+bound, by [Barrett reduction](algorithms/arithmetic/barrett#nmod).
 Unless stated otherwise, the first argument
 receives the result and `mod` is an `nmod_t`. A pair `a_hi, a_lo` stands
 for the two-word integer $a_{hi} B + a_{lo}$.
@@ -654,6 +655,27 @@ NMOD2_RED2(r, a_hi, a_lo, mod)
 Sets `r` to $(a_{hi} B + a_{lo}) \bmod n$ with no restriction on
 $a_{hi}$. It reduces $a_{hi}$ first with `NMOD_RED`, then applies
 `NMOD_RED2`.
+:::
+
+::: macro
+NMOD_RED2_BOUNDED(r, a_hi, a_lo, mod)
+
+Sets `r` to $(a_{hi} B + a_{lo}) \bmod n$. Requires
+$a_{hi} B + a_{lo} < 2^{\nu + \bits - 2}$, where $\nu$ is the number of
+bits of $n$, and $3 \le \nu < \bits$: for instance a product of two
+residues if $\nu \le \bits - 2$, or a sum of $k$ such products if
+$\nu + \lceil \log_2 k \rceil \le \bits - 2$. It costs one high and one
+low product and one correction, with the constant of `NMOD_RED`
+([](algorithms/arithmetic/barrett#bounded)), and is cheaper than
+`NMOD_RED2`.
+:::
+
+::: macro
+NMOD_DIVREM2_BOUNDED(q, r, a_hi, a_lo, mod)
+
+Sets `q` and `r` to the quotient and the remainder of $a_{hi} B + a_{lo}$ by
+$n$, under the same conditions as `NMOD_RED2_BOUNDED`. The quotient is less
+than $2^{\bits - 1}$, and the correction is branch-free.
 :::
 
 ::: macro

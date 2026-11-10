@@ -46,6 +46,7 @@
 #include "t-set_fmpz_trunc.c"
 #include "t-unique_integer.c"
 #include "t-partitions_hrr.c"
+#include "t-pow_t_exceeds.c"
 #include "t-tab_bsplit.c"
 #include "t-arith.c"
 #include "t-api.c"
@@ -111,6 +112,7 @@ test_struct tests[] =
     TEST_FUNCTION(mp_real_set_fmpz_trunc),
     TEST_FUNCTION(mp_real_unique_integer),
     TEST_FUNCTION(mp_real_partitions_hrr),
+    TEST_FUNCTION(mp_real_pow_t_exceeds),
     TEST_FUNCTION(mp_real_api),
     TEST_FUNCTION(mp_real_submul_bounded),
     TEST_FUNCTION(mp_real_mul_complex),

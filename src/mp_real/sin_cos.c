@@ -115,6 +115,9 @@ _sc_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
 {
     slong top = n - 1, z;
 
+    FLINT_ASSERT(n >= 1 && (FLINT_BITS == 64 || n >= 2));
+    FLINT_ASSERT(ys != NULL || yc != NULL);
+
     while (top >= 0 && v[top] == 0)
         top--;
     z = (top < 0) ? WORD_MAX : FLINT_BITS * (n - 1 - top) + flint_clz(v[top]);
@@ -122,38 +125,65 @@ _sc_kernel(nn_ptr ys, nn_ptr yc, ulong * err, nn_srcptr v, slong n)
     if (z >= _sc_series_min_z(n)
         && !(z < 32 || (n >= 11 && n <= 16 && z < 48)))
     {
+        /* (the series paths take either output NULL) */
         if (z == WORD_MAX)
         {
-            flint_mpn_zero(ys, n + 1);
-            flint_mpn_zero(yc, n);
-            yc[n] = 1;
+            if (ys != NULL)
+                flint_mpn_zero(ys, n + 1);
+            if (yc != NULL)
+            {
+                flint_mpn_zero(yc, n);
+                yc[n] = 1;
+            }
             *err = 0;
         }
         else
         {
             /* sin v and g = 1 - cos v (below 1/2); z >= 32 */
             _mp_real_sin_cos_reduced(ys, yc, err, v, n, (flint_bitcnt_t) z, 0);
-            ys[n] = 0;
-            yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
+            if (ys != NULL)
+                ys[n] = 0;
+            if (yc != NULL)
+                yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
         }
     }
     else if (z >= _sc_series_min_z(n))
     {
         /* sin v and g = 1 - cos v by the tapered series */
         _mp_real_series_sin_cos(ys, yc, v, n, (flint_bitcnt_t) z);
-        ys[n] = 0;
-        yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
+        if (ys != NULL)
+            ys[n] = 0;
+        if (yc != NULL)
+            yc[n] = mpn_neg(yc, yc, n) ? 0 : 1;
         *err = 6;
     }
-    else if (n <= SC_BITWISE_MAX)
-    {
-        if (!_mp_real_sin_cos_opt(ys, yc, err, v, n))
-            _mp_real_sin_cos_bitwise_rs(ys, yc, err, v, n, 0);
-    }
-    else if (n <= SC_DIOPHANTINE_MAX)
-        _mp_real_sin_cos_diophantine(ys, yc, err, v, n);
     else
-        _mp_real_sin_cos_notab(ys, yc, err, v, n);
+    {
+        /* the kernels proper compute both */
+        nn_ptr tmp = NULL;
+        TMP_INIT;
+
+        TMP_START;
+        if (ys == NULL || yc == NULL)
+        {
+            tmp = TMP_ALLOC((n + 1) * sizeof(ulong));
+            if (ys == NULL)
+                ys = tmp;
+            else
+                yc = tmp;
+        }
+
+        if (n <= SC_BITWISE_MAX)
+        {
+            if (!_mp_real_sin_cos_opt(ys, yc, err, v, n))
+                _mp_real_sin_cos_bitwise_rs(ys, yc, err, v, n, 0);
+        }
+        else if (n <= SC_DIOPHANTINE_MAX)
+            _mp_real_sin_cos_diophantine(ys, yc, err, v, n);
+        else
+            _mp_real_sin_cos_notab(ys, yc, err, v, n);
+        TMP_END;
+    }
 }
 
 /* guard bits for a kernel result accurate to about 2^-p (absolute):
@@ -588,7 +618,7 @@ mp_real_sin_cos_bits(mp_real_t rs, mp_real_t rc, const mp_real_t x, slong prec)
     }
 
     /* ridiculously large arguments */
-    if (FLINT_BITS * (x->exp - 1) >= FLINT_MAX(65536, 4 * prec))
+    if (FLINT_BITS * (x->exp - 1) >= MP_REAL_TRIG_MAGLIM(prec))
     {
         if (rs != NULL)
         {

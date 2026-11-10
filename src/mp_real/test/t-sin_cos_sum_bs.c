@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* the joint truncated splitting kernel: for random D, xn <= D, N
@@ -95,7 +96,7 @@ TEST_FUNCTION_START(mp_real_sin_cos_sum_bs, state)
         arb_mul_2exp_si(t, t, -FLINT_BITS * D);
         arb_mul(vb, vb, t, prec);
 
-        arb_sin_cos(rb, ra, t, prec);
+        ref_sin_cos(rb, ra, t, prec);
         arb_sub_ui(ra, ra, 1, prec);
         arb_neg(ra, ra);
 

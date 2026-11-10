@@ -213,6 +213,6 @@ the module (`mp_real_hypgeom_series`, the bit-burst steps) rely on exact
 balls staying exact and short and on inexact ones losing limbs as they
 lose accuracy; the elementary functions use balls around their
 fixed-point kernels so that every error is accounted for
-([](algorithms/floating-point/elementary-functions)).
+([](algorithms/special-functions/elementary)).
 
 ::: functions mp_real_add mp_real_mul mp_real_div mp_real_unique_integer :::

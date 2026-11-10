@@ -101,8 +101,8 @@ TEST_FUNCTION_START(acb_lambertw, state)
         if (!acb_overlaps(w1, w2))
         {
             flint_printf("FAIL: overlap\n\n");
-            flint_printf("iter %wd, flags = %d, branch = ", flags, iter); fmpz_print(k);
-            flint_printf(" prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
+            flint_printf("iter %wd, flags = %d, branch = ", iter, flags); fmpz_print(k);
+            flint_printf(", prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
             flint_printf("x1 = "); acb_printd(x1, 50); flint_printf("\n\n");
             flint_printf("x2 = "); acb_printd(x2, 50); flint_printf("\n\n");
             flint_printf("w1 = "); acb_printd(w1, 50); flint_printf("\n\n");
@@ -116,8 +116,8 @@ TEST_FUNCTION_START(acb_lambertw, state)
         if (!acb_contains(t, x1))
         {
             flint_printf("FAIL: functional equation\n\n");
-            flint_printf("iter %wd, flags = %d, branch = ", flags, iter); fmpz_print(k);
-            flint_printf("prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
+            flint_printf("iter %wd, flags = %d, branch = ", iter, flags); fmpz_print(k);
+            flint_printf(", prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
             flint_printf("x1 = "); acb_printd(x1, 50); flint_printf("\n\n");
             flint_printf("x2 = "); acb_printd(x2, 50); flint_printf("\n\n");
             flint_printf("w1 = "); acb_printd(w1, 50); flint_printf("\n\n");
@@ -143,8 +143,8 @@ TEST_FUNCTION_START(acb_lambertw, state)
             if (!acb_overlaps(w1, w2))
             {
                 flint_printf("FAIL: conjugation\n\n");
-                flint_printf("iter %wd, flags = %d, branch = ", flags, iter); fmpz_print(k);
-                flint_printf("prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
+                flint_printf("iter %wd, flags = %d, branch = ", iter, flags); fmpz_print(k);
+                flint_printf(", prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
                 flint_printf("x1 = "); acb_printd(x1, 50); flint_printf("\n\n");
                 flint_printf("x2 = "); acb_printd(x2, 50); flint_printf("\n\n");
                 flint_printf("w1 = "); acb_printd(w1, 50); flint_printf("\n\n");
@@ -158,6 +158,75 @@ TEST_FUNCTION_START(acb_lambertw, state)
         acb_clear(t);
         acb_clear(w1);
         acb_clear(w2);
+        fmpz_clear(k);
+    }
+
+    /* A ball around the branch point -1/e that also touches the branch
+       cut (imaginary part in [-eps, 2^7]): on the branches 0 and +-1 the
+       enclosure must contain W at points inside the ball on either side
+       of the cut, also when the branch point series is used on the side
+       without a crossing. */
+    for (iter = -1; iter <= 1; iter++)
+    {
+        acb_t z, z0, w, w0;
+        fmpz_t k;
+        slong prec, i;
+        int conj;
+
+        acb_init(z);
+        acb_init(z0);
+        acb_init(w);
+        acb_init(w0);
+        fmpz_init_set_si(k, iter);
+
+        for (conj = 0; conj <= 1; conj++)
+        {
+            for (prec = 32; prec <= 256; prec *= 2)
+            {
+                arb_const_e(acb_realref(z), prec);
+                arb_inv(acb_realref(z), acb_realref(z), prec);
+                arb_neg(acb_realref(z), acb_realref(z));
+                arb_set_si(acb_imagref(z), 64);
+                mag_set_ui(arb_radref(acb_imagref(z)), 64);
+                mag_add_ui_2exp_si(arb_radref(acb_imagref(z)),
+                    arb_radref(acb_imagref(z)), 1, -prec);
+                if (conj)
+                    acb_conj(z, z);
+
+                acb_lambertw(w, z, k, 0, prec);
+
+                for (i = 0; i < 4; i++)
+                {
+                    /* points on the boundary of the ball and on both sides
+                       of the cut next to the branch point */
+                    arf_set(arb_midref(acb_realref(z0)), arb_midref(acb_realref(z)));
+                    mag_zero(arb_radref(acb_realref(z0)));
+                    arb_set_si(acb_imagref(z0), (i == 0) ? 128 : (i == 1) ? 1 : 0);
+                    if (i == 3)
+                        arf_set_si_2exp_si(arb_midref(acb_imagref(z0)), -1, -prec - 1);
+                    if (conj)
+                        acb_conj(z0, z0);
+
+                    acb_lambertw(w0, z0, k, 0, 2 * prec);
+
+                    if (!acb_overlaps(w, w0))
+                    {
+                        flint_printf("FAIL: ball at the branch point\n\n");
+                        flint_printf("k = %wd, prec = %wd, i = %wd\n\n", iter, prec, i);
+                        flint_printf("z = "); acb_printd(z, 30); flint_printf("\n\n");
+                        flint_printf("z0 = "); acb_printd(z0, 30); flint_printf("\n\n");
+                        flint_printf("w = "); acb_printd(w, 30); flint_printf("\n\n");
+                        flint_printf("w0 = "); acb_printd(w0, 30); flint_printf("\n\n");
+                        flint_abort();
+                    }
+                }
+            }
+        }
+
+        acb_clear(z);
+        acb_clear(z0);
+        acb_clear(w);
+        acb_clear(w0);
         fmpz_clear(k);
     }
 

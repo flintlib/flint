@@ -34,7 +34,7 @@
 
    Tables for k = 2, 4, 6, 8, 10, 12, 13, 16, 20, 24, 32, 40, 48 are
    precomputed (rel_tab_data.c); _mp_real_rel_table generates any other
-   k on first use through _arb_log_precompute_reductions (fast up to
+   k on first use through _mp_real_precompute_reductions (fast up to
    ~20 primes, seconds around 48) and caches it per thread, and
    _mp_real_rel_table_is_cached tells whether a call would find the
    table ready.  The returned structure carries the reciprocals
@@ -168,11 +168,11 @@ _mp_real_rel_table(int gaussian, slong num)
         if (gaussian)
             _mp_real_atan_gauss_vec_arb(alpha, num, 3000);
         else
-            arb_log_primes_vec_bsplit(alpha, num, 3000);
+            _mp_real_log_primes_vec_arb(alpha, num, 3000);
 
         d = flint_malloc((REL_MAX_ROWS + 1) * num * sizeof(short));
         eps = flint_malloc((REL_MAX_ROWS + 1) * sizeof(double));
-        _arb_log_precompute_reductions(d, eps, alpha, num, REL_MAX_ROWS, 8.0);
+        _mp_real_precompute_reductions(d, eps, alpha, num, REL_MAX_ROWS, 8.0);
         _arb_vec_clear(alpha, num);
 
         for (rows = 0; d[rows * num] != MP_REAL_REL_TERMINATOR; rows++)

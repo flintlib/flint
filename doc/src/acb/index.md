@@ -663,6 +663,21 @@ Sets `res` to the root of unity $\exp(2\pi i / \mathit{order})$.
 void acb_exp(acb_t r, const acb_t z, slong prec)
 
 Sets `r` to $e^z = e^a (\cos b + i \sin b)$ for $z = a + bi$.
+
+::: details
+The exponential, $\exp(\pi i z)$, the logarithm and the trigonometric
+functions (of $z$ and of $\pi z$) share a fast path at precisions up to
+two limbs (64-bit): for midpoints of at most two limbs with radii
+below $2^{-8}$, the parts come from the register compositions of the
+kernels of the real functions shared with `acf` (`acf/elem.h`), each
+part rounded with the error of its frame as the radius, plus the
+propagation of the input radii through the partial derivatives of the
+parts over the ball (the parts of the other function of the pair, for
+the sine and cosine; the gradients $(a, b)/|z|^2$ and $(-b, a)/|z|^2$
+for the logarithm, whose ball must stay off the branch cut). Wider
+balls, zero parts and larger arguments take the compositions of the
+real functions of `arb`.
+:::
 :::
 
 ::: function

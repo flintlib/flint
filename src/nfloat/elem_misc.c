@@ -49,7 +49,6 @@ typedef enum
     ELEM_EXP10, ELEM_LOG10,
     ELEM_COT, ELEM_SEC, ELEM_CSC, ELEM_SINC,
     ELEM_COT_PI, ELEM_SEC_PI, ELEM_CSC_PI, ELEM_SINC_PI,
-    ELEM_COTH, ELEM_SECH, ELEM_CSCH,
     ELEM_ASIN, ELEM_ACOS, ELEM_ATAN, ELEM_ACOT, ELEM_ASEC, ELEM_ACSC,
     ELEM_ASINH, ELEM_ACOSH, ELEM_ATANH, ELEM_ACOTH, ELEM_ASECH, ELEM_ACSCH
 }
@@ -61,7 +60,6 @@ static const unsigned char _elem_err[] =
     0, 8,
     8, 5, 5, 5,
     8, 5, 5, 5,
-    5, 5, 5,
     11, 11, 3, 3, 11, 11,
     23, 15, 9, 9, 17, 25
 };
@@ -183,39 +181,6 @@ _nfloat_elem_ball(mp_real_t r, slong * shift, const mp_real_t x, const mp_real_t
             {
                 mp_real_set_ui(c, 1);
                 ok = _ball_div(r, c, (f == ELEM_SEC || f == ELEM_SEC_PI) ? b : a, n);
-            }
-            break;
-
-        case ELEM_COTH:
-            mp_real_tanh_bits(a, x, wp);
-            mp_real_set_ui(b, 1);
-            ok = _ball_div(r, b, a, n);
-            break;
-
-        case ELEM_SECH:
-        case ELEM_CSCH:
-            if (mp_real_abs_bound_lt_2exp_si(x) > FLINT_BITS - 6)
-            {
-                /* sech x = 2 exp(-|x|) (1 - delta), |csch x| =
-                   2 exp(-|x|) (1 + delta'), 0 < delta, delta' <
-                   4 exp(-2|x|) < 2^(-2^(FLINT_BITS - 7)), far below
-                   2^-(wp + 64) */
-                mp_real_set(a, x);
-                a->negative = 1;
-                _ball_exp_2exp(r, shift, a, wp);
-                *shift += 1;
-                mp_real_add_rel_error_2exp_si(r, -wp - 64);
-                if (f == ELEM_CSCH)
-                    r->negative = x->negative;
-            }
-            else
-            {
-                if (f == ELEM_SECH)
-                    mp_real_sinh_cosh_bits(NULL, a, x, wp);
-                else
-                    mp_real_sinh_cosh_bits(a, NULL, x, wp);
-                mp_real_set_ui(b, 1);
-                ok = _ball_div(r, b, a, n);
             }
             break;
 
@@ -349,23 +314,6 @@ _nfloat_elem_inner(nfloat_ptr res, elem_func_t f, int div_pi, nfloat_srcptr x, n
             }
             break;
 
-        case ELEM_COTH:
-            NFLOAT_SGNBIT(X) = sgn;
-            CHK(nfloat_tanh(A, X, ictx));
-            CHK(nfloat_inv(R, A, ictx));
-            break;
-
-        case ELEM_SECH:
-            CHK(nfloat_cosh(A, X, ictx));
-            CHK(nfloat_inv(R, A, ictx));
-            break;
-
-        case ELEM_CSCH:
-            NFLOAT_SGNBIT(X) = sgn;
-            CHK(nfloat_sinh(A, X, ictx));
-            CHK(nfloat_inv(R, A, ictx));
-            break;
-
         case ELEM_ASIN:
         case ELEM_ACOS:
         case ELEM_ASEC:
@@ -473,13 +421,32 @@ _nfloat_elem_inner(nfloat_ptr res, elem_func_t f, int div_pi, nfloat_srcptr x, n
     return _nfloat_set_mpn_err(res, t, m, NFLOAT_EXP(R) - FLINT_BITS * m, K + 2, K + 2, NFLOAT_SGNBIT(R), ctx);
 }
 
+#if FLINT_BITS == 64
+/* the in-register compositions of arf/elem_arc_fast.c, rounded into
+   the context (NFLOAT_FAST_DECLINE when they do not apply) */
+int
+_nfloat_arc_fast(nfloat_ptr res, nfloat_srcptr x, int f, int div_pi, gr_ctx_t ctx)
+{
+    _arf_arc_out_struct out;
+    slong n = NFLOAT_CTX_NLIMBS(ctx);
+
+    if (_arf_arc_fast(&out, NFLOAT_D(x), n, NFLOAT_EXP(x), NFLOAT_SGNBIT(x), f, div_pi) == ARF_ELEM_UNCERTAIN)
+        return NFLOAT_FAST_DECLINE;
+
+    if (n == 1)
+        return _nfloat_small_set_1(res, out.T[2], out.T[1], out.T[0], out.k, out.err, out.sgnbit, ctx);
+    else
+        return _nfloat_small_set_2(res, out.T[3], out.T[2], out.T[1], out.T[0], out.k, out.err, out.sgnbit, ctx);
+}
+#endif
+
 static int
 _nfloat_elem(nfloat_ptr res, elem_func_t f, int div_pi, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 {
     int status;
 
 #if FLINT_BITS == 64
-    /* the inverse functions at one and two limbs (elem_arc_fast.c) */
+    /* the inverse functions at one and two limbs (arf/elem_arc_fast.c) */
     if (f >= ELEM_ASIN && f <= ELEM_ACSCH && NFLOAT_CTX_NLIMBS(ctx) <= 2)
     {
         static const unsigned char arc[] = {
@@ -637,65 +604,6 @@ nfloat_sinc(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
     }
 #endif
     return _nfloat_elem(res, ELEM_SINC, 0, x, NULL, ctx);
-}
-
-int
-nfloat_coth(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
-{
-    if (NFLOAT_IS_SPECIAL(x))
-        return nfloat_nan(res, ctx);
-#if FLINT_BITS == 64
-    {
-        int status = _nfloat_tanh_coth_fast(res, x, 1, ctx);
-        if (status != NFLOAT_FAST_DECLINE)
-            return status;
-    }
-#endif
-
-    return _nfloat_elem(res, ELEM_COTH, 0, x, NULL, ctx);
-}
-
-int
-nfloat_sech(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
-{
-    if (NFLOAT_IS_SPECIAL(x))
-        return NFLOAT_IS_ZERO(x) ? nfloat_one(res, ctx) : nfloat_nan(res, ctx);
-    /* sech x < 2 exp(-|x|) underflows for |x| >= 2^(FLINT_BITS - 3) */
-    if (NFLOAT_EXP(x) > FLINT_BITS - 3)
-        return _nfloat_underflow(res, 0, ctx);
-    /* 1 - delta, 0 < delta < x^2 / 2 */
-    if (2 * NFLOAT_EXP(x) <= -FLINT_BITS * NFLOAT_CTX_NLIMBS(ctx))
-        return _nfloat_one_plus_tiny(res, 0, 1, -FLINT_BITS * NFLOAT_CTX_NLIMBS(ctx), ctx);
-#if FLINT_BITS == 64
-    {
-        int status = _nfloat_tanh_coth_fast(res, x, 2, ctx);
-        if (status != NFLOAT_FAST_DECLINE)
-            return status;
-    }
-#endif
-    /* (cosh overflows in the inner context) */
-    if (NFLOAT_EXP(x) > FLINT_BITS - 6)
-        return _nfloat_eval_ball(res, _nfloat_elem_ball, x, NULL, 2 * ELEM_SECH, 0, ctx);
-    return _nfloat_elem(res, ELEM_SECH, 0, x, NULL, ctx);
-}
-
-int
-nfloat_csch(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
-{
-    if (NFLOAT_IS_SPECIAL(x))
-        return nfloat_nan(res, ctx);
-    if (NFLOAT_EXP(x) > FLINT_BITS - 3)
-        return _nfloat_underflow(res, NFLOAT_SGNBIT(x), ctx);
-#if FLINT_BITS == 64
-    {
-        int status = _nfloat_tanh_coth_fast(res, x, 3, ctx);
-        if (status != NFLOAT_FAST_DECLINE)
-            return status;
-    }
-#endif
-    if (NFLOAT_EXP(x) > FLINT_BITS - 6)
-        return _nfloat_eval_ball(res, _nfloat_elem_ball, x, NULL, 2 * ELEM_CSCH, 0, ctx);
-    return _nfloat_elem(res, ELEM_CSCH, 0, x, NULL, ctx);
 }
 
 /* functions of pi x */

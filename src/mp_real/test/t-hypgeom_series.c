@@ -15,6 +15,7 @@
 #include "fmpz_poly.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 /* the series in signed-mpn form, pointing into the fmpz coefficients
@@ -188,13 +189,13 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
                 INT64_C(4270934400), piP, 5, piQ, 4, piR, 4, n);
             mp_real_rsqrt_ui(y, 10005, n);
             mp_real_mul(x, x, y, n);
-            arb_const_pi(b, FLINT_BITS * n + 64);
+            ref_const_pi(b, FLINT_BITS * n + 64);
         }
         else
         {
             mp_real_hypgeom_series_int64(x, 1, 1, 1497, 2160, l2P, 4, l2Q, 3,
                 l2R, 3, n);
-            arb_const_log2(b, FLINT_BITS * n + 64);
+            ref_const_log2(b, FLINT_BITS * n + 64);
         }
 
         mp_real_get_arb(a, x);
@@ -264,9 +265,9 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
         arb_set_fmpz(b, p);
         arb_div_fmpz(b, b, q, FLINT_BITS * n + 64);
         if (hyp)
-            arb_atanh(b, b, FLINT_BITS * n + 64);
+            ref_atanh(b, b, FLINT_BITS * n + 64);
         else
-            arb_atan(b, b, FLINT_BITS * n + 64);
+            ref_atan(b, b, FLINT_BITS * n + 64);
 
         if (!arb_overlaps(a, b)
             || arb_rel_accuracy_bits(a) < FLINT_BITS * (n - 1) - 32)
@@ -698,14 +699,14 @@ TEST_FUNCTION_START(mp_real_hypgeom_series, state)
         {
             mp_real_rsqrt_ui(y, 10005, n);
             mp_real_mul(x, x, y, n);
-            arb_const_pi(b, prec);
+            ref_const_pi(b, prec);
         }
         else if (which == 1)
-            arb_const_log2(b, prec);
+            ref_const_log2(b, prec);
         else if (which == 2)
-            arb_const_catalan(b, prec);
+            ref_const_catalan(b, prec);
         else
-            arb_const_apery(b, prec);
+            ref_const_apery(b, prec);
 
         mp_real_get_arb(a, x);
         if (!arb_overlaps(a, b)

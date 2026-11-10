@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "acb/impl.h"
 
 void
 acb_exp_pi_i(acb_t r, const acb_t z, slong prec)
@@ -27,6 +28,10 @@ acb_exp_pi_i(acb_t r, const acb_t z, slong prec)
         arb_neg(acb_realref(r), acb_realref(r));
         arb_exp(acb_realref(r), acb_realref(r), prec);
         arb_zero(acb_imagref(r));
+    }
+    else if (_acb_elem_small(r, NULL, z, ACB_ELEM_EXP_PI_I, prec))
+    {
+        /* (the register paths) */
     }
     else
     {

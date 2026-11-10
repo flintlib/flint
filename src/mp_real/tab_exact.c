@@ -28,7 +28,9 @@
    borrowed through.  The ensure functions rescan for such guard
    limbs and recompute the (astronomically rare) offenders here, and
    route the small-index arb-combination entries through
-   _mp_real_tab_store_floor with this as the retry fallback. */
+   _mp_real_tab_store_floor with this as the retry fallback.  Nothing
+   here may use the elementary functions of arb, which are built on
+   these tables (the thread filling a table holds its lock). */
 
 /* write e = floor(x 2^(64 nc)) if x's radius determines that floor
    uniquely; returns 0 otherwise.  prec must be at least the working
@@ -62,24 +64,61 @@ _mp_real_tab_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec)
 
 /* e = floor(v 2^(64 nc)) exactly, v = log(1 + 2^-i) (which = 0) or
    atan(2^-i) (which = 1), retrying at increasing precision until
-   the floor is unique */
+   the floor is unique.  The values come from the Machin-type binary
+   splitting of mp_real (log(1 + 2^-i) = 2 atanh(1 / (2^(i+1) + 1)),
+   atan(2^-i) = atan(1 / 2^i), and atan(1) = atan(1/2) + atan(1/3)),
+   which uses no shared table: the elementary functions of arb are
+   built on the tables being filled here. */
 void
 _mp_real_tab_entry_exact(nn_ptr e, int which, ulong i, slong nc)
 {
     arb_t x;
-    slong wp;
+    mp_real_t v, u;
+    nn_ptr q;
+    slong qn, wn;
+    ulong p = 1;
 
     arb_init(x);
-    for (wp = FLINT_BITS * nc + 64; ; wp *= 2)
+    mp_real_init(v);
+    mp_real_init(u);
+
+    /* q = 2^(i+1) + 1 or 2^i (an i of any size: the rescans of the
+       tables call this for every entry) */
+    qn = (slong) ((i + 1) / FLINT_BITS) + 1;
+    q = flint_calloc(qn, sizeof(ulong));
+
+    for (wn = nc + 1; ; wn *= 2)
     {
-        arb_one(x);
-        arb_mul_2exp_si(x, x, -(slong) i);
         if (which == 0)
-            arb_log1p(x, x, wp);
+        {
+            flint_mpn_zero(q, qn);
+            q[(i + 1) / FLINT_BITS] = UWORD(1) << ((i + 1) % FLINT_BITS);
+            q[0] |= 1;
+            _mp_real_atanh_frac_bsplit(v, &p, 1, q, qn, wn);
+            mp_real_mul_2exp_si(v, v, 1);
+        }
+        else if (i == 0)
+        {
+            q[0] = 2;
+            _mp_real_atan_frac_bsplit(v, &p, 1, q, 1, wn);
+            q[0] = 3;
+            _mp_real_atan_frac_bsplit(u, &p, 1, q, 1, wn);
+            mp_real_add(v, v, u, wn);
+        }
         else
-            arb_atan(x, x, wp);
-        if (_mp_real_tab_store_floor(e, x, nc, wp))
+        {
+            flint_mpn_zero(q, qn);
+            q[i / FLINT_BITS] = UWORD(1) << (i % FLINT_BITS);
+            _mp_real_atan_frac_bsplit(v, &p, 1, q, qn, wn);
+        }
+
+        mp_real_get_arb(x, v);
+        if (_mp_real_tab_store_floor(e, x, nc, FLINT_BITS * wn))
             break;
     }
+
+    flint_free(q);
     arb_clear(x);
+    mp_real_clear(v);
+    mp_real_clear(u);
 }

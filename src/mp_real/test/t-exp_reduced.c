@@ -12,10 +12,11 @@
 #include "test_helpers.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 #include "max_err.h"
 
-/* every algorithm of _mp_real_exp_reduced agrees with arb within the
+/* every algorithm of _mp_real_exp_reduced agrees with MPFR within the
    documented budget, for random (wn, r) with t < 2^-r */
 
 TEST_FUNCTION_START(mp_real_exp_reduced, state)
@@ -48,7 +49,7 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
         fmpz_set_ui_array(f, t, wn);
         arb_set_fmpz(ta, f);
         arb_mul_2exp_si(ta, ta, -FLINT_BITS * wn);
-        arb_exp(ref, ta, FLINT_BITS * wn + 128);
+        ref_exp(ref, ta, FLINT_BITS * wn + 128);
 
         for (alg = 0; alg <= 4; alg++)
         {
@@ -136,7 +137,7 @@ TEST_FUNCTION_START(mp_real_exp_reduced, state)
             fmpz_set_ui_array(f, t, wn);
             arb_set_fmpz(ta, f);
             arb_mul_2exp_si(ta, ta, -FLINT_BITS * wn);
-            arb_exp(ref, ta, FLINT_BITS * wn + 128);
+            ref_exp(ref, ta, FLINT_BITS * wn + 128);
 
             _mp_real_exp_reduced(y, &test_err_out, t, wn, r, cases[c].alg);
 

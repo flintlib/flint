@@ -166,8 +166,11 @@ udiv_qrnnd_preinv(q, r, n1, n0, d, dinv)
 As `udiv_qrnnd`, but faster: uses the precomputed inverse
 `dinv = n_preinvert_limb_prenorm(d)` instead of a hardware division. The
 divisor $d$ must be normalised (its top bit set) and $n_1 < d$. This is
-the division algorithm of Möller and Granlund
-[](algorithms/arithmetic/moller-granlund).
+Algorithm 4 of Möller and Granlund
+([](algorithms/arithmetic/moller-granlund)): one full and one low
+product, and a final correction that is rarely needed. The inputs are
+read before `q` and `r` are written, so `q` and `r` may be variables
+that are also inputs.
 :::
 
 ## Internal macros {#internal}

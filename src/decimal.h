@@ -84,6 +84,12 @@ extern "C" {
 /* Largest finite precision (digits) we allow */
 #define DECIMAL_PREC_MAX        (WORD_MAX / 64)
 
+/* Sanity check for precision arguments: DECIMAL_PREC_EXACT, or a positive
+   precision which internal working precisions (with guard digits, see
+   _decimal_wp_cap) keep below WORD_MAX / 4. Zero, negative and wrapped
+   values are invalid. */
+#define DECIMAL_PREC_IS_VALID(prec) ((prec) == DECIMAL_PREC_EXACT || ((prec) >= 1 && (prec) <= WORD_MAX / 4))
+
 /* Conversions to integers/rationals and exact additions refuse to
    materialize more than this many digits (GR_UNABLE is returned). */
 #define DECIMAL_CONV_DIGITS_LIMIT (WORD(1) << 28)
@@ -733,6 +739,7 @@ int decball_set_fmpz(decball_t res, const fmpz_t x, gr_ctx_t ctx);
 int decball_set_fmpq(decball_t res, const fmpq_t x, gr_ctx_t ctx);
 int decball_set_d(decball_t res, double x, gr_ctx_t ctx);
 int decball_set_str(decball_t res, const char * s, gr_ctx_t ctx);
+int _decball_set_str_canonical(decball_t res, const char * s, slong len, gr_ctx_t ctx);
 int decball_set_other(decball_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 int _decball_set_decfloat_other(decball_t res, const decfloat_t x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 int _decball_set_decball_other(decball_t res, const decball_t y, gr_ctx_t x_ctx, gr_ctx_t ctx);
@@ -936,10 +943,20 @@ int _decball_lambertw_fmpz(decball_t res, const decball_t x, const fmpz_t k, gr_
    operands of up to operand_digits digits: arguments longer than the
    working precision are only seen exactly once the working precision
    exceeds their length. */
+/* c prec + d (c > 0, 0 <= d < WORD_MAX / 8), saturated at WORD_MAX / 4 so that
+   neither the cap nor a doubling loop bounded by it overflows */
+DECIMAL_INLINE slong
+_decimal_wp_cap(slong prec, slong c, slong d)
+{
+    if (prec > (WORD_MAX / 4 - d) / c)
+        return WORD_MAX / 4;
+    return c * prec + d;
+}
+
 DECIMAL_INLINE slong
 _decimal_ziv_wp_max(slong prec, slong operand_digits)
 {
-    return 64 * prec + 1000 + 2 * FLINT_MIN(operand_digits, DECIMAL_CONV_DIGITS_LIMIT);
+    return _decimal_wp_cap(prec, 64, 1000 + 2 * FLINT_MIN(operand_digits, DECIMAL_CONV_DIGITS_LIMIT));
 }
 
 /* Whether a gr method is an elementary function, whose evaluation at high

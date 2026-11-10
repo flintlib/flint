@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "arb.h"
 #include "mp_real.h"
+#include "ref.h"
 #include "mp_real/impl.h"
 
 TEST_FUNCTION_START(mp_real_atan_frac_bsplit, state)
@@ -77,7 +78,7 @@ TEST_FUNCTION_START(mp_real_atan_frac_bsplit, state)
         else
             _mp_real_atan_frac_bsplit(b, p, pn, q, qn, n);
         mp_real_get_arb(r, b);
-        arb_atan_frac_bsplit(s, P, Q, hyperbolic, FLINT_BITS * n + 64);
+        ref_atan_frac(s, P, Q, hyperbolic, FLINT_BITS * n + 64);
 
         if (!arb_overlaps(r, s) || arb_rel_accuracy_bits(r) < FLINT_BITS * n)
         {

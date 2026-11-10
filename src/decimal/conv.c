@@ -333,7 +333,8 @@ _decfloat_set_round_fmpz_2exp_scaled_guard(decfloat_t res, const fmpz_t m, slong
     p = fmpz_bits(m);
     negative = fmpz_sgn(m) < 0;
 
-    if (FLINT_ABS(t) > limit)
+    /* not FLINT_ABS(t), which overflows for t = WORD_MIN */
+    if (t > limit || t < -limit)
         return 0;
 
     size = _scaled_params(&s, p, t, prec, guard, e);
@@ -449,7 +450,7 @@ int
 _decfloat_set_round_fmpz_2exp_scaled(decfloat_t res, const fmpz_t m, slong t, slong prec, int rnd,
     decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
 {
-    slong guard = 20, guard_max = 40 * prec + 4000;
+    slong guard = 20, guard_max = _decimal_wp_cap(prec, 40, 4000);
     decimal_rounding_info info2;
     int r;
 
@@ -496,6 +497,8 @@ _decfloat_set_round_fmpz_2exp_err(decfloat_t res, const fmpz_t m, const fmpz_t t
     decimal_rounding_info * info, decmag_ptr err, gr_ctx_t ctx)
 {
     int status;
+
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
 
     if (fmpz_is_zero(m))
     {
@@ -1046,7 +1049,9 @@ _decfloat_maybe_dyadic(const decfloat_t x, gr_ctx_t ctx)
     if (DECFLOAT_IS_SPECIAL(x) || fmpz_sgn(&x->exp) >= 0)
         return 1;
 
-    k = COEFF_IS_MPZ(x->exp) ? e : FLINT_MIN(e, -x->exp * e);
+    /* exp <= -1 limbs, so at least e fractional digits (computing
+       FLINT_MIN(e, -exp * e) here would overflow for large exponents) */
+    k = e;
     d = x->m.d[0];
     if (k <= DECIMAL_POW5_MAX_EXP)
         return (d % _pow5_tab[k]) == 0;

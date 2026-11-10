@@ -529,13 +529,37 @@ mp_real_log_bits(mp_real_t res, const mp_real_t x, slong prec)
 
 /* the wrappers for the other files (see impl.h) */
 
+/* log1p(v) for v = (v, n) in [0, 1) at n fraction limbs: the bitwise
+   kernel up to LG_BITWISE_MAX limbs, beyond (as in mp_real_log) by the
+   Newton kernel as log 2 - (-log u) with u = (1 + v) / 2 in [1/2, 1),
+   truncated to n limbs (half a unit, (-log)' <= 2: one unit), and the
+   floor of log 2 (one unit) */
 void
 _mp_real_log1p_kernel(nn_ptr y, ulong * err, nn_srcptr v, slong n)
 {
-    FLINT_ASSERT(n <= LG_BITWISE_MAX);
+    FLINT_ASSERT(n >= 1 && (FLINT_BITS == 64 || n >= 2));
 
-    if (!_mp_real_log1p_opt(y, err, v, n))
-        _mp_real_log1p_bitwise_rs(y, err, v, n, 0);
+    if (n <= LG_BITWISE_MAX)
+    {
+        if (!_mp_real_log1p_opt(y, err, v, n))
+            _mp_real_log1p_bitwise_rs(y, err, v, n, 0);
+    }
+    else
+    {
+        nn_ptr u;
+        TMP_INIT;
+
+        TMP_START;
+        u = TMP_ALLOC(n * sizeof(ulong));
+        mpn_rshift(u, v, n, 1);
+        u[n - 1] |= UWORD(1) << (FLINT_BITS - 1);
+        _mp_real_neglog_newton(y, err, u, n);
+        /* (log1p(v) >= 0: a negative difference is within the error) */
+        if (mpn_sub_n(y, _mp_real_const_ptr(MP_REAL_CONST_ID_LOG2, n), y, n))
+            flint_mpn_zero(y, n);
+        *err += 2;
+        TMP_END;
+    }
 }
 
 slong

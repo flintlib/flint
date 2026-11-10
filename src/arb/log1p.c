@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
+#include "arb/elem.h"
 
 static void
 arb_log1p_tiny(arb_t r, const arb_t z, slong prec)
@@ -50,6 +50,12 @@ arb_log1p(arb_t r, const arb_t z, slong prec)
     if (arb_is_zero(z))
     {
         arb_zero(r);
+        return;
+    }
+
+    if (mag_is_zero(arb_radref(z)))
+    {
+        _arb_log1p_arf(r, arb_midref(z), prec);
         return;
     }
 

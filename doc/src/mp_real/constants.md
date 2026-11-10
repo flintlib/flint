@@ -71,9 +71,9 @@ $\Gamma$ values, the three logarithms of $\log 10$, the logarithms
 needed by $\gamma$, the parts of the double sum for $K$) run on
 separate threads. The details, including the dual-number splitting for
 $\gamma$ and the algorithm for $K$, are in
-[](algorithms/floating-point/constants).
+[](algorithms/special-functions/constants).
 
-::: summary algorithms/floating-point/constants :::
+::: summary algorithms/special-functions/constants :::
 
 ## Example {#example}
 

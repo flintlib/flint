@@ -71,6 +71,23 @@ _nmod_poly_KS2_recover_reduce1(nn_ptr res, slong s, nn_srcptr op1,
 }
 
 
+/* The loop of _nmod_poly_KS2_recover_reduce2(), each coefficient reduced with RED */
+#define _KS2_RECOVER_REDUCE2_LOOP(RED)                                      \
+   for (; n; n--)                                                           \
+   {                                                                        \
+      y0 = *op2--;                                                          \
+      x1 = *op1++;                                                          \
+      if (y0 < x0)                                                          \
+         y1--;                                                              \
+      RED(*res, y1 >> b2, x0 + (y1 << b), mod);                             \
+      res += s;                                                             \
+      y1 += borrow;                                                         \
+      borrow = (x1 < y1);                                                   \
+      x1 -= y1;                                                             \
+      y1 = (y0 - x0) & mask;                                                \
+      x0 = x1 & mask;                                                       \
+   }
+
 /*
    Same as _nmod_poly_KS2_recover_reduce(), but requires
    FLINT_BITS < 2 * b < 2*FLINT_BITS
@@ -96,22 +113,20 @@ _nmod_poly_KS2_recover_reduce2(nn_ptr res, slong s, nn_srcptr op1,
 
    b2 = FLINT_BITS - b;
 
-   /* plain reduction version */
-   for (; n; n--)
+   /* plain reduction version; the coefficients are below 2^(2b), so that
+      NMOD_RED2_BOUNDED applies if 2b <= nu + FLINT_BITS - 2 and
+      nu < FLINT_BITS, nu the bit length of n (then nu >= 3) */
+   if (mod.norm != 0 && 2 * b <= 2 * FLINT_BITS - 2 - mod.norm)
    {
-      y0 = *op2--;
-      x1 = *op1++;
-      if (y0 < x0)
-         y1--;
-      NMOD2_RED2(*res, y1 >> b2, x0 + (y1 << b), mod);
-      res += s;
-      y1 += borrow;
-      borrow = (x1 < y1);
-      x1 -= y1;
-      y1 = (y0 - x0) & mask;
-      x0 = x1 & mask;
+      _KS2_RECOVER_REDUCE2_LOOP(NMOD_RED2_BOUNDED)
+   }
+   else
+   {
+      _KS2_RECOVER_REDUCE2_LOOP(NMOD2_RED2)
    }
 }
+
+#undef _KS2_RECOVER_REDUCE2_LOOP
 
 
 /*

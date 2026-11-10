@@ -281,6 +281,19 @@ _decball_set_qqbar_part(decball_t res, const qqbar_t x, int part, gr_ctx_t ctx)
         return status;
     }
 
+    /* as in the decfloat version: exact only for a rational part (the
+       refinement loop below cannot reach DECIMAL_PREC_EXACT) */
+    if (prec == DECIMAL_PREC_EXACT)
+    {
+        fmpq_init(q);
+        if (_qqbar_part_get_fmpq(q, x, part))
+            status = decball_set_fmpq(res, q, ctx);
+        else
+            status = GR_UNABLE;
+        fmpq_clear(q);
+        return status;
+    }
+
     maybe_rational = _qqbar_part_maybe_rational(x, part);
 
     _decimal_ball_ctx_init(bctx, prec, ctx);
@@ -331,6 +344,8 @@ decfloat_set_round_qqbar(decfloat_t res, const qqbar_t x, slong prec, int rnd, g
 {
     if (qqbar_sgn_im(x) != 0)
         return GR_DOMAIN;
+
+    FLINT_ASSERT(DECIMAL_PREC_IS_VALID(prec));
 
     return _decfloat_set_round_qqbar_part(res, x, 0, prec, rnd, ctx);
 }

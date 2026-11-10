@@ -27,7 +27,7 @@ processors.
 | [Shoup](algorithms/arithmetic/shoup) | `n_mulmod_shoup` | one word per fixed *multiplier* | $n < 2^{\bits - 1}$, one operand fixed | 1 high + 2 low products |
 | [Montgomery](algorithms/arithmetic/montgomery) | `nmod_redc_mul`, `nmod_redc_fast_mul` | $-n^{-1} \bmod B$, in `nmod_redc_ctx_t` | odd $n$; values in Montgomery form | 1 full + 1 low + 1 high product |
 | Montgomery, half word | `nmod_redc_half_mul` | $-n^{-1} \bmod 2^{\bits/2}$ | odd $n < 2^{\bits/2 - 1}$ | single-word products only |
-| [Barrett](algorithms/arithmetic/barrett#barrett) | `n_mod_barrett`, `NMOD_RED` | $\lfloor B/n \rfloor$, or derived from `nmod_t` ([](algorithms/arithmetic/barrett#nmod)) | reduces one word | 1 high + 1 low product per reduction |
+| [Barrett](algorithms/arithmetic/barrett#barrett) | `n_mod_barrett`, `NMOD_RED`, `NMOD_RED2_BOUNDED` | $\lfloor B/n \rfloor$, or derived from `nmod_t` ([](algorithms/arithmetic/barrett#nmod)) | reduces one word, or two words below $2^{\nu + \bits - 2}$ ([](algorithms/arithmetic/barrett#bounded)) | 1 high + 1 low product per reduction |
 | [Lemire–Kaser–Kurz](algorithms/arithmetic/barrett#lemire) | `n_mod_lemire` | $\lceil B/n \rceil$ | $n, x < 2^{\bits/2}$ | 1 low + 1 high product per reduction |
 | Floating point | `n_mulmod_precomp`, all `_precomp` functions | `double` $1/n$ | most functions need $n < 2^{53}$ | double-precision operations and conversions |
 
@@ -35,7 +35,8 @@ The `nmod_t` type, initialised by `nmod_init`, bundles $n$ with its
 Möller–Granlund inverse and normalisation shift. It is the representation
 used by `nmod`, `nmod_vec`, `nmod_poly`, `nmod_mat` and the default `gr`
 context for $\Z/n\Z$. The reduction macros `NMOD_RED`, `NMOD_RED2` and
-`NMOD_RED3` reduce one, two or three words with it, and `nmod_addmul`
+`NMOD_RED3` reduce one, two or three words with it, `NMOD_RED2_BOUNDED`
+two words below $2^{\nu + \bits - 2}$ ($\nu$ the bit length of $n$), and `nmod_addmul`
 saves a reduction by forming $s + ab$ as a two-word integer before
 reducing.
 

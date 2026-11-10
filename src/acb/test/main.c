@@ -35,6 +35,7 @@
 #include "t-digamma.c"
 #include "t-div.c"
 #include "t-dot.c"
+#include "t-elem_small.c"
 #include "t-dot_fmpz.c"
 #include "t-dot_si.c"
 #include "t-dot_siui.c"
@@ -114,6 +115,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_digamma),
     TEST_FUNCTION(acb_div),
     TEST_FUNCTION(acb_dot),
+    TEST_FUNCTION(acb_elem_small),
     TEST_FUNCTION(acb_dot_fmpz),
     TEST_FUNCTION(acb_dot_si),
     TEST_FUNCTION(acb_dot_siui),

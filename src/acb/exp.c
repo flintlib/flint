@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "acb/impl.h"
 
 void
 acb_exp(acb_t r, const acb_t z, slong prec)
@@ -25,23 +26,23 @@ acb_exp(acb_t r, const acb_t z, slong prec)
     {
         arb_sin_cos(acb_imagref(r), acb_realref(r), b, prec);
     }
+    else if (_acb_elem_small(r, NULL, z, ACB_ELEM_EXP, prec))
+    {
+        /* (the register paths) */
+    }
     else
     {
-        arb_t t, u, v;
+        /* exp(a) (cos b + i sin b) with one temporary: the exponential
+           first (a is then no longer needed), the sine and cosine into
+           the parts of r (arb_sin_cos handles the aliasing of b) */
+        arb_t t;
 
         arb_init(t);
-        arb_init(u);
-        arb_init(v);
-
         arb_exp(t, a, prec);
-        arb_sin_cos(u, v, b, prec);
-
-        arb_mul(acb_realref(r), t, v, prec);
-        arb_mul(acb_imagref(r), t, u, prec);
-
+        arb_sin_cos(acb_imagref(r), acb_realref(r), b, prec);
+        arb_mul(acb_realref(r), acb_realref(r), t, prec);
+        arb_mul(acb_imagref(r), acb_imagref(r), t, prec);
         arb_clear(t);
-        arb_clear(u);
-        arb_clear(v);
     }
 #undef a
 #undef b

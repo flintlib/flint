@@ -262,6 +262,8 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
         slong lo = FLINT_MAX(sh, 0), drop = FLINT_MAX(-sh, 0);
         slong len = m->size - drop;
 
+        FLINT_ASSERT(len >= 1);
+
         flint_mpn_zero(X, lo);
         mpn_neg(X + lo, m->d + drop, len);      /* nonzero: borrows */
         for (j = lo + len; j <= N; j++)
@@ -284,14 +286,16 @@ _ex_reduce(mp_real_t res, const mp_real_t m, slong n, int notab)
 
 /* (y, n + 1) = exp(-v) for v in [0, 1) at n fraction limbs with z >=
    _ex_neg_series_min_z(n) leading zero bits: the hardcoded cosh - sinh
-   at z >= 32 up to 8 limbs, else the alternating series; err <= 10 */
+   at z >= 32 up to EX_NEG_HC_MAX limbs (err <= 2 * 15), else the
+   alternating series (err <= 10) */
+#define EX_NEG_HC_MAX 8
 FLINT_FORCE_INLINE void
 _ex_neg_series(nn_ptr y, ulong * err, nn_srcptr v, slong n, slong z)
 {
-    if (z >= 32 && n <= 8)
+    if (z >= 32 && n <= EX_NEG_HC_MAX)
     {
         /* exp(-v) = cosh v - sinh v by the hardcoded series */
-        ulong sh[9], ch[9];
+        ulong sh[EX_NEG_HC_MAX + 1], ch[EX_NEG_HC_MAX + 1];
         _mp_real_sinh_cosh_rs(sh, ch, err, v, n);
         mpn_sub_n(y, ch, sh, n + 1);
         *err *= 2;

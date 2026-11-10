@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "acb/impl.h"
 
 void
 acb_cos_pi(acb_t r, const acb_t z, slong prec)
@@ -30,6 +31,10 @@ acb_cos_pi(acb_t r, const acb_t z, slong prec)
         arb_cosh(acb_realref(r), t, prec);
         arb_zero(acb_imagref(r));
         arb_clear(t);
+    }
+    else if (_acb_elem_small(NULL, r, z, ACB_ELEM_SIN_COS_PI, prec))
+    {
+        /* (the register paths) */
     }
     else
     {

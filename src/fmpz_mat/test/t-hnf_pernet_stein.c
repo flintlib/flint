@@ -152,5 +152,89 @@ TEST_FUNCTION_START(fmpz_mat_hnf_pernet_stein, state)
         fmpz_mat_clear(A);
     }
 
+    /*
+        nonsingular matrices with many elementary divisors 2 and 6, whose
+        (n-1)-minors are all multiples of |det| / d_n, far beyond a word
+    */
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    {
+        fmpz_mat_t A, H, H2;
+        fmpz_t det;
+        slong n, i, j, k;
+        int equal;
+
+        n = 80 + n_randint(state, 30);
+
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(H, n, n);
+        fmpz_mat_init(H2, n, n);
+        fmpz_init(det);
+
+        /* an HNF: pivots 2 or 6, a few reduced entries above them */
+        fmpz_one(det);
+        for (i = 0; i < n; i++)
+        {
+            fmpz_set_ui(fmpz_mat_entry(A, i, i), n_randint(state, 4) ? 2 : 6);
+            fmpz_mul(det, det, fmpz_mat_entry(A, i, i));
+        }
+
+        for (k = 0; k < n / 4; k++)
+        {
+            i = n_randint(state, n);
+            j = n_randint(state, n);
+            if (i < j)
+                fmpz_set_ui(fmpz_mat_entry(A, i, j),
+                    n_randint(state, fmpz_get_ui(fmpz_mat_entry(A, j, j))));
+        }
+
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, n_randint(state, 4 * n));
+
+        fmpz_mat_hnf_pernet_stein(H, A, state);
+
+        if (!fmpz_mat_is_in_hnf(H))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("matrix not in hnf!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_hnf_modular(H2, A, det);
+        equal = fmpz_mat_equal(H, H2);
+
+        if (!equal)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("hnfs produced by different methods should be the same!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H2); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_hnf_pernet_stein(H2, H, state);
+        equal = fmpz_mat_equal(H, H2);
+
+        if (!equal)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("hnf of a matrix in hnf should be the same!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H2); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_clear(det);
+        fmpz_mat_clear(H2);
+        fmpz_mat_clear(H);
+        fmpz_mat_clear(A);
+    }
+
     TEST_FUNCTION_END(state);
 }

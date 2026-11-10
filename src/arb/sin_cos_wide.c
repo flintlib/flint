@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "arb.h"
+#include "arb/elem.h"
 
 #define ONE_OVER_PI 0.31830988618379067154
 #define PI 3.1415926535897932385
@@ -148,7 +148,7 @@ _arb_sin_cos_wide(arb_t sinx, arb_t cosx, const arf_t xmid, const mag_t xrad, sl
 
     mag = arf_abs_bound_lt_2exp_si(xmid);
 
-    if (mag > FLINT_MAX(65536, 4 * prec) || mag_cmp_2exp_si(xrad, 3) >= 0)
+    if (mag > MP_REAL_TRIG_MAGLIM(prec) || mag_cmp_2exp_si(xrad, 3) >= 0)
     {
         if (sinx != NULL)
             arb_zero_pm_one(sinx);

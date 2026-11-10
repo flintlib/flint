@@ -14,11 +14,6 @@
 #include "arf.h"
 #include "mag.h"
 
-void
-arf_log1p(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
-{
-    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_log1p, x, NULL, prec, rnd);
-}
 
 TEST_FUNCTION_START(mag_log1p, state)
 {

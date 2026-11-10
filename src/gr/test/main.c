@@ -62,6 +62,7 @@
 #include "t-polynomial_nmod8.c"
 #include "t-psl2z.c"
 #include "t-qqbar.c"
+#include "t-set_other.c"
 #include "t-vector_acb.c"
 #include "t-vector_arb.c"
 #include "t-vector_fmpz.c"
@@ -119,6 +120,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_polynomial_nmod8),
     TEST_FUNCTION(gr_psl2z),
     TEST_FUNCTION(gr_qqbar),
+    TEST_FUNCTION(gr_set_other),
     TEST_FUNCTION(gr_vector_acb),
     TEST_FUNCTION(gr_vector_arb),
     TEST_FUNCTION(gr_vector_fmpz),

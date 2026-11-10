@@ -152,9 +152,9 @@ theta_0000 = 1.08984692468251 + 0e-36*I
 theta_0001 = 1.08302269779695 + 0e-36*I
 theta_0010 = 0.917636847761688 + 0e-36*I
 theta_0011 = 0.909521428594988 + 0e-36*I
-theta_0100 = 0.415757702796908 + 0e-37*I
+theta_0100 = 0.415757702796908 - 0e-37*I
 theta_0101 = odd, contains zero: 1
-theta_0110 = 0.415757702796908 + 0e-37*I
+theta_0110 = 0.415757702796908 - 0e-37*I
 theta_0111 = odd, contains zero: 1
 theta_1000 = 0.913579138133896 + 0e-37*I
 theta_1001 = 0.913579138133896 + 0e-37*I
@@ -165,7 +165,7 @@ theta_1101 = odd, contains zero: 1
 theta_1110 = odd, contains zero: 1
 theta_1111 = 0e-37 - 0.267577401846795*I
 jet of theta_1010: 0e-37 + 0e-37*I, -2.84869460392 + 0e-36*I, 0e-37 - 0.0214389410501*I
-theta_11 + theta_1 = [+/- 6.09e-38] + [+/- 8.80e-38]*I
+theta_11 + theta_1 = [+/- 2.49e-38] + [+/- 4.37e-38]*I
 ```
 
 The three entries of the jet are $\theta$, $\partial\theta/\partial z_0$
