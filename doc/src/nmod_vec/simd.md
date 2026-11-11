@@ -1,10 +1,10 @@
 ---
 title: SIMD kernels of the element-wise operations
-functions: _nmod_vec_reduce
 ---
 
 On x86-64 with AVX-512 (F, DQ and VL) or AVX2, and on ARM64 with NEON,
-`_nmod_vec_reduce` runs vector kernels chosen from the size of $n$. The
+`_nmod_vec_reduce` and `_nmod_vec_mul` run vector kernels chosen from the
+size of $n$. The
 instruction set is the one FLINT is compiled for (for instance
 `-march=native`, which `configure` sets by default): there is no run-time
 detection, and `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
@@ -101,3 +101,49 @@ which AVX2 and NEON split into two such products.
 The full Barrett step of `NMOD_RED`, with the high half of a $64 \times 64$
 product emulated from 32-bit products, was 1.3 to 1.6 times slower than
 these kernels.
+
+## Products of two vectors {#mul}
+
+`_nmod_vec_mul` multiplies reduced entries. Its kernels:
+
+| $\nu$ | AVX-512 | AVX2 | NEON |
+|---|---|---|---|
+| 2 to 32 | halflimb | halflimb | halflimb, hybrid from 16 entries |
+| 33 to 50 | ifma50 (with AVX512-IFMA), else fp50 | fp50 | fp50 |
+| 51 to 62 | red2bounded | scalar code | scalar code |
+| 63, 64 | scalar code | scalar code | scalar code |
+
+The halflimb kernels, for $\nu \le 32$, take a 32-bit Barrett step on the
+product $p = ab < 2^{2\nu}$, which fits a word:
+$q = \lfloor \lfloor p/2^s \rfloor m_1 / 2^{\nu + 31 - s} \rfloor$ with
+$s = \nu - 2$, or $s = 30$ for $\nu = 31$ and $s = 32$ for $\nu = 32$, so
+that $\lfloor p/2^s \rfloor < 2^{32}$. For $\nu \le 30$, $p < 2^{\nu + 30}$
+and [](algorithms/arithmetic/barrett#thm-bounded) with 32-bit words, as
+in [](#lem-reduce-fold29), gives $p - qn < 2n$. For $\nu = 31, 32$ the same
+argument gives $p/n - q < 1 + 2^s/n + n^2/2^{\nu + 31}$, where the last two
+terms, convex in $n$, stay below 3 on $[2^{\nu - 1}, 2^{\nu})$: so
+$p - qn < 4n$, and the kernels correct by $2n$, then by $n$.
+
+The fp50 kernels compute $ab - qn$ in $(-n, n)$ with $q$ the rounded
+quotient, as `vec4d_mulmod`
+([](algorithms/simd/fp-modular-arithmetic#multiplication)), and add $n$ to
+a negative result. The ifma50 kernel splits $p = p_1 2^{52} + p_0$ with two
+52-bit products, takes $s = \lfloor p/2^{\nu - 2} \rfloor < 2^{\nu + 2}$
+and $q = \lfloor s \lfloor m/2^{13} \rfloor / 2^{52} \rfloor$ (for $\nu = 50$,
+$\lfloor s \lfloor m/2^{12} \rfloor / 2^{53} \rfloor$, so that the constant
+fits 52 bits), and computes $p_0 - qn$ modulo $2^{52}$ as
+$p_0 + q(2^{52} - n)$, which is exact since $p - qn < 2n < 2^{52}$: for
+$\nu = 50$ this is [](algorithms/arithmetic/barrett#thm-bounded) with
+52-bit words, and for $\nu \le 49$ its proof still applies, since
+$p < 2^{2\nu} \le 2^{\nu + 49}$, half the bound of that theorem, leaves
+room for the halved constant.
+
+The red2bounded kernel, for $51 \le \nu \le 62$, forms the full product
+and reduces it as `NMOD_RED2_BOUNDED`
+([](algorithms/arithmetic/barrett#bounded)), whose estimate
+$\tilde q = \lfloor x m / 2^{65} \rfloor$ leaves a remainder below $2n$;
+the high word of $xm$ is computed from three 32-bit products and may be up
+to 2 too small, so the quotient may be one less and the remainder is below
+$3n$: two corrections. Without AVX-512, this kernel, with its 64-bit
+products emulated, was slower than the scalar code.
+

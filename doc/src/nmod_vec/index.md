@@ -156,6 +156,18 @@ void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 Sets `res` to the entry-wise negation of `vec`.
 :::
 
+## Entry-wise product {#mul}
+
+::: function
+void _nmod_vec_mul(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+
+Sets `res[i]` to `vec1[i] * vec2[i]` modulo $n$ for $0 \le i < \mathit{len}$.
+The output may be either input. With AVX-512, AVX2 or NEON it uses vector
+kernels ([](nmod_vec/simd#mul)) for $n$ of up to 62 bits (50 bits without
+AVX-512); otherwise, the loops of `_nmod_mul_halflimb`, `_nmod_mul_bounded`
+or `nmod_mul`, by the size of $n$.
+:::
+
 ## Scalar multiplication {#scalar}
 
 ::: function

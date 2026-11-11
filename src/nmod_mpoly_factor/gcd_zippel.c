@@ -130,14 +130,6 @@ static ulong * nmod_mat_row_ref(nmod_mat_t M, slong i)
     return nmod_mat_entry_ptr(M, i, 0);
 }
 
-static void _nmod_vec_mul(ulong * a, ulong * b, ulong * c,
-                                                           slong n, nmod_t ctx)
-{
-    for (n--; n >= 0; n--)
-        a[n] = nmod_mul(b[n], c[n], ctx);
-}
-
-
 /*
     Try to set G to the gcd of A and B given the form f of G.
 

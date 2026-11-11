@@ -21,6 +21,7 @@
 #include "t-nmod.c"
 #include "t-nmod_pow_fmpz.c"
 #include "t-nored_scalar_addmul.c"
+#include "t-mul.c"
 #include "t-reduce.c"
 #include "t-scalar_addmul_nmod.c"
 #include "t-scalar_mul_nmod.c"
@@ -40,6 +41,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_vec_nmod),
     TEST_FUNCTION(nmod_vec_nmod_pow_fmpz),
     TEST_FUNCTION(nmod_vec_nored_scalar_addmul),
+    TEST_FUNCTION(nmod_vec_mul),
     TEST_FUNCTION(nmod_vec_reduce),
     TEST_FUNCTION(nmod_vec_scalar_addmul_nmod),
     TEST_FUNCTION(nmod_vec_scalar_mul_nmod),

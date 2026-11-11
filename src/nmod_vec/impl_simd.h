@@ -53,6 +53,18 @@
 # define NMOD_VEC_SIMD_NEON 0
 #endif
 
+/* AVX-512 extensions used where present */
+#if NMOD_VEC_SIMD_ZMM && defined(__AVX512IFMA__)
+# define NMOD_VEC_SIMD_IFMA 1
+#else
+# define NMOD_VEC_SIMD_IFMA 0
+#endif
+#if NMOD_VEC_SIMD_ZMM && defined(__AVX512VBMI2__)
+# define NMOD_VEC_SIMD_VBMI2 1
+#else
+# define NMOD_VEC_SIMD_VBMI2 0
+#endif
+
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM
 # include <immintrin.h>
 #endif
@@ -148,6 +160,74 @@ FLINT_FORCE_INLINE __m512i _nv_zmm_csub(__m512i a, __m512i b)
             _nv_zmm_mst((r) + _i, _k, STEP1(_nv_zmm_mld(_k, (a) + _i))); \
         } \
     } while (0)
+
+#define _NV_ZMM_LOOP2(STEP2, r, a, b, len) \
+    do { \
+        slong _i; \
+        if ((len) >= NMOD_VEC_SIMD_PEEL_MIN) \
+        { \
+            slong _h = _NV_ZMM_PEEL_H(r); \
+            if (_h != 0 && _NV_ZMM_SAME64(r, a) && _NV_ZMM_SAME64(r, b)) \
+            { \
+                __mmask8 _k = _nv_zmm_mask(_h); \
+                _nv_zmm_mst((r), _k, STEP2(_nv_zmm_mld(_k, (a)), _nv_zmm_mld(_k, (b)))); \
+                (r) += _h; (a) += _h; (b) += _h; (len) -= _h; \
+            } \
+        } \
+        _NV_ZMM_UNROLL \
+        for (_i = 0; _i + 8 <= (len); _i += 8) \
+            _nv_zmm_st((r) + _i, STEP2(_nv_zmm_ld((a) + _i), _nv_zmm_ld((b) + _i))); \
+        if (_i < (len)) \
+        { \
+            __mmask8 _k = _nv_zmm_mask((len) - _i); \
+            _nv_zmm_mst((r) + _i, _k, STEP2(_nv_zmm_mld(_k, (a) + _i), _nv_zmm_mld(_k, (b) + _i))); \
+        } \
+    } while (0)
+
+/* the high word of x y, exact (4 products of 32-bit halves); yh = y with
+   its halves swapped */
+FLINT_FORCE_INLINE __m512i _nv_zmm_mulhi(__m512i x, __m512i y, __m512i yh)
+{
+    const __m512i lo = _mm512_set1_epi64(0xFFFFFFFF);
+    __m512i xh = _mm512_shuffle_epi32(x, 0xB1);
+    __m512i w0 = _mm512_mul_epu32(x, y);
+    __m512i w1 = _mm512_mul_epu32(x, yh);
+    __m512i w2 = _mm512_mul_epu32(xh, y);
+    __m512i w3 = _mm512_mul_epu32(xh, yh);
+    __m512i s1 = _mm512_add_epi64(w1, _mm512_srli_epi64(w0, 32));
+    __m512i s2 = _mm512_add_epi64(w2, _mm512_and_si512(s1, lo));
+    return _mm512_add_epi64(_mm512_add_epi64(w3, _mm512_srli_epi64(s1, 32)),
+                            _mm512_srli_epi64(s2, 32));
+}
+
+/* the high word of x y minus 0, 1 or 2 (3 products: the product of the
+   low halves and the carries of the low word are left out) */
+FLINT_FORCE_INLINE __m512i _nv_zmm_mulhi_lazy(__m512i x, __m512i y, __m512i yh)
+{
+    __m512i xh = _mm512_shuffle_epi32(x, 0xB1);
+    __m512i w1 = _mm512_mul_epu32(x, yh);
+    __m512i w2 = _mm512_mul_epu32(xh, y);
+    __m512i w3 = _mm512_mul_epu32(xh, yh);
+    return _mm512_add_epi64(w3, _mm512_add_epi64(_mm512_srli_epi64(w1, 32),
+                                                 _mm512_srli_epi64(w2, 32)));
+}
+
+/* the full product: returns the high word, the low one in *lo */
+FLINT_FORCE_INLINE __m512i _nv_zmm_mul_full(__m512i x, __m512i y, __m512i * lo)
+{
+    const __m512i lm = _mm512_set1_epi64(0xFFFFFFFF);
+    __m512i xh = _mm512_shuffle_epi32(x, 0xB1);
+    __m512i yh = _mm512_shuffle_epi32(y, 0xB1);
+    __m512i w0 = _mm512_mul_epu32(x, y);
+    __m512i w1 = _mm512_mul_epu32(x, yh);
+    __m512i w2 = _mm512_mul_epu32(xh, y);
+    __m512i w3 = _mm512_mul_epu32(xh, yh);
+    __m512i s1 = _mm512_add_epi64(w1, _mm512_srli_epi64(w0, 32));
+    __m512i s2 = _mm512_add_epi64(w2, _mm512_and_si512(s1, lm));
+    *lo = _mm512_or_si512(_mm512_slli_epi64(s2, 32), _mm512_and_si512(w0, lm));
+    return _mm512_add_epi64(_mm512_add_epi64(w3, _mm512_srli_epi64(s1, 32)),
+                            _mm512_srli_epi64(s2, 32));
+}
 
 #endif /* NMOD_VEC_SIMD_ZMM */
 
