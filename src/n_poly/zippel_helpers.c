@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 #include "n_poly.h"
@@ -104,6 +105,17 @@ ulong _nmod_zip_eval_step(
 {
     slong i;
     ulong t0, t1, t2, p0, p1;
+
+    /* From 16 terms and up to 62 bits, a dot product, then the vector
+       product (two passes). The fused loop below stays for fewer terms and
+       at 63-64 bits, where the split was 0.7-0.95x (Nov 2026). */
+    if (length >= 16 && NMOD_BITS(ctx) <= 62)
+    {
+        t0 = _nmod_vec_dot(cur, coeffs, length, ctx, _nmod_vec_dot_params(length, ctx));
+        _nmod_vec_mul(cur, cur, inc, length, ctx);
+        return t0;
+    }
+
     t2 = t1 = t0 = 0;
     if (NMOD_IS_HALFLIMB(ctx))
     {
@@ -176,6 +188,10 @@ void _n_fqp_zip_eval_step(
     slong i, j;
     ulong p0, p1;
     ulong * tmp;
+    /* Up to 50 bits, cur = cur inc is one vector product after the sums
+       (0.97-1.33x); above, it stays in the loop: the separate pass was
+       0.93-1.22x at 51-62 bits and 0.58-0.96x at 63-64 (Nov 2026). */
+    const int split = (NMOD_BITS(mod) <= 50);
     TMP_INIT;
 
     if (length < 1)
@@ -194,7 +210,8 @@ void _n_fqp_zip_eval_step(
         umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[i], (coeffs + d*i)[j]);
         tmp[3*j+2] = 0;
     }
-    cur[i] = nmod_mul(cur[i], inc[i], mod);
+    if (!split)
+        cur[i] = nmod_mul(cur[i], inc[i], mod);
 
     for (i = 1; i < length; i++)
     {
@@ -204,8 +221,12 @@ void _n_fqp_zip_eval_step(
             add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
                           tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
         }
-        cur[i] = nmod_mul(cur[i], inc[i], mod);
+        if (!split)
+            cur[i] = nmod_mul(cur[i], inc[i], mod);
     }
+
+    if (split)
+        _nmod_vec_mul(cur, cur, inc, length, mod);
 
     for (j = 0; j < d; j++)
         NMOD_RED3(res[j], tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], mod);
@@ -263,6 +284,8 @@ int _nmod_zip_vand_solve(
     for (j = 0; j < mlength; j++)
         scratch[j] = nmod_pow_ui(monomials[j], mlength, ctx);
 
+    /* The products scratch[j] monomials[j] stay in the loop: a separate
+       _nmod_vec_mul was 0.87-1.11x (Nov 2026). */
     for (i = mlength; i < elength; i++)
     {
         V0 = V1 = V2 = S = 0;
@@ -450,6 +473,8 @@ int _n_fqp_zip_vand_solve(
     for (j = 0; j < mlength; j++)
         scratch[j] = nmod_pow_ui(monomials[j], mlength, mod);
 
+    /* The products scratch[j] monomials[j] stay in the loop, as in
+       _nmod_zip_vand_solve. */
     for (i = mlength; i < elength; i++)
     {
         _nmod_vec_zero(V_p, 3*d);

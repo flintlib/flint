@@ -20,6 +20,10 @@
     the constant of the Barrett step of NMOD_RED; its top half m >> 32 gives
     the quotients of the kernels for nu >= 33, and its shifts the constants of
     those below.
+
+    _nmod_vec_add, _sub and _neg have no kernels: the compilers vectorize
+    their loops, and hand-written kernels gained only 1.0-1.2x on long
+    vectors and 1.2-1.5x on short ones (Nov 2026).
 */
 
 #ifndef NMOD_VEC_IMPL_SIMD_H

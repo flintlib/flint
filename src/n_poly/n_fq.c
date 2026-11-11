@@ -462,8 +462,16 @@ void _n_fq_reduce2_lazy1(
     nmod_t ctx)
 {
     slong i;
-    for (i = 0; i < 2*d - 1; i++)
-        NMOD_RED(a[i], a[i], ctx);
+
+    /* short vectors (d <= 4) keep the inline loop: through the vector call
+       they were 0.49-0.82x at 3 entries, 0.70-1.07x at 5-7 (Nov 2026) */
+    if (2*d - 1 < 8)
+    {
+        for (i = 0; i < 2*d - 1; i++)
+            NMOD_RED(a[i], a[i], ctx);
+    }
+    else
+        _nmod_vec_reduce(a, a, 2*d - 1, ctx);
 }
 
 void _n_fq_madd2_lazy1(

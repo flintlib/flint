@@ -82,7 +82,9 @@ _ple_noinv_update(ulong * row, const ulong * prow, slong len, ulong d,
     }
 }
 
-/* out of line, so that it does not weigh on the other function */
+/* out of line, so that it does not weigh on the other function; its row
+   updates stay open-coded: rows have at most PLE_NOINV_MAX = 8 entries, where
+   _nmod_vec_scalar_mul_nmod and _nmod_vec_mul were slower (Nov 2026) */
 FLINT_STATIC_NOINLINE slong
 _ple_classical_noinv(slong * P, slong * Q, nmod_mat_t A, slong max_nonpivots)
 {

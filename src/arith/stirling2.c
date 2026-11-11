@@ -268,8 +268,7 @@ arith_stirling_number_2_nmod_vec(nn_ptr res, const unsigned int * divtab, ulong 
 
     c = nmod_inv(t[0], mod);
     t[0] = 1;
-    for (i = 1; i < len; i++)
-        t[i] = _nmod_mul_fullword(t[i], c, mod);
+    _nmod_vec_scalar_mul_nmod(t + 1, t + 1, len - 1, c, mod);
 
     /* compute powers */
     u[0] = nmod_pow_ui(0, n, mod);
@@ -283,8 +282,7 @@ arith_stirling_number_2_nmod_vec(nn_ptr res, const unsigned int * divtab, ulong 
             u[i] = _nmod_mul_fullword(u[divtab[2 * i]], u[divtab[2 * i + 1]], mod);
     }
 
-    for (i = 1; i < len; i++)
-        u[i] = _nmod_mul_fullword(u[i], t[i], mod);
+    _nmod_vec_mul(u + 1, u + 1, t + 1, len - 1, mod);
 
     for (i = 1; i < len; i += 2)
         t[i] = nmod_neg(t[i], mod);

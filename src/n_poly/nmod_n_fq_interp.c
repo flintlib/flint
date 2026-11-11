@@ -877,8 +877,6 @@ void nmod_evals_mul(
     slong len,
     nmod_t ctx)
 {
-    slong i;
-
     if (b->length == 0 || c->length == 0)
     {
         a->length = 0;
@@ -887,8 +885,7 @@ void nmod_evals_mul(
 
     n_poly_fit_length(a, len);
 
-    for (i = 0; i < len; i++)
-        a->coeffs[i] = nmod_mul(b->coeffs[i], c->coeffs[i], ctx);
+    _nmod_vec_mul(a->coeffs, b->coeffs, c->coeffs, len, ctx);
 
     a->length = _nmod_vec_is_zero(a->coeffs, len) ? 0 : len;
 }

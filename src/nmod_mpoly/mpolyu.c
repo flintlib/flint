@@ -761,15 +761,11 @@ void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s)
 void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, ulong c,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j;
+    slong i;
 
     for (i = 0; i < A->length; i++)
-    {
-        for (j = 0; j < (A->coeffs + i)->length; j++)
-        {
-            A->coeffs[i].coeffs[j] = nmod_mul(A->coeffs[i].coeffs[j], c, ctx->mod);
-        }
-    }
+        _nmod_vec_scalar_mul_nmod(A->coeffs[i].coeffs, A->coeffs[i].coeffs,
+                                  A->coeffs[i].length, c, ctx->mod);
 }
 
 

@@ -169,6 +169,8 @@ _fq_zech_reduce_coeffs(ulong * R, slong d, int lazy,
                     R[jj[k] + i - d] += c * (p - a[k]);
         }
 
+        /* d entries, few for the fields of fq_zech: _nmod_vec_reduce was
+           0.49-1.05x for d <= 10 (Nov 2026) */
         for (i = 0; i < d; i++)
             NMOD_RED(R[i], R[i], fctx->mod);
     }

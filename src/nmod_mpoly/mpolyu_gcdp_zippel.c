@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "n_poly.h"
@@ -65,7 +66,7 @@ static void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
 static void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j;
+    slong i;
 
     FLINT_ASSERT(A->length == B->length);
     for (i = 0; i < A->length; i++)
@@ -73,12 +74,8 @@ static void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
         FLINT_ASSERT(A->exps[i] == B->exps[i]);
 
         FLINT_ASSERT((A->coeffs + i)->length == (B->coeffs + i)->length);
-        for (j = 0; j < (A->coeffs + i)->length; j++)
-        {
-            (A->coeffs + i)->coeffs[j] = nmod_mul((A->coeffs + i)->coeffs[j],
-                                                  (B->coeffs + i)->coeffs[j],
-                                                             ctx->mod);
-        }
+        _nmod_vec_mul((A->coeffs + i)->coeffs, (A->coeffs + i)->coeffs,
+                      (B->coeffs + i)->coeffs, (A->coeffs + i)->length, ctx->mod);
     }
 }
 

@@ -246,7 +246,7 @@ _geom_eval_worker(slong widx, void * argsv)
 {
     _geom_eval_args_t * A = argsv;
     nn_ptr tmp = A->tmpbuf + widx * A->maxlen;
-    slong i, k;
+    slong i;
 
     for (i = widx; i < A->lenA + A->lenB; i += A->nworkers)
     {
@@ -264,8 +264,7 @@ _geom_eval_worker(slong widx, void * argsv)
             out = A->valB + (i - A->lenA) * A->stride;
         }
 
-        for (k = 0; k < P->length; k++)
-            tmp[k] = nmod_mul(P->coeffs[k], A->spow[k], A->mod);
+        _nmod_vec_mul(tmp, P->coeffs, A->spow, P->length, A->mod);
 
         _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(out, tmp,
             P->length, A->G, A->blen, A->mod);
@@ -543,8 +542,7 @@ _n_bpoly_mod_resultant_dft(n_poly_struct * res,
         flint_parallel_do(_multipoint_res_worker, &rargs, rargs.nworkers, 0, 0);
 
         if (!use_ifft)
-            for (k = 1; k < maxlen; k++)
-                spow[k] = nmod_mul(spow[k], wpow[k], mod);
+            _nmod_vec_mul(spow + 1, spow + 1, wpow + 1, maxlen - 1, mod);
     }
 
     n_poly_fit_length(res, npoints);
@@ -635,7 +633,7 @@ _n_bpoly_mod_resultant_multipoint(n_poly_t res, const n_poly_struct * Ax,
 {
     nmod_geometric_progression_t G;
     nn_ptr valA, valB, valres, resc, tmp, spow, w, f;
-    slong i, j, k, blenA, blenB, npoints, maxlen, batch, nblocks, block, nworkers;
+    slong i, j, blenA, blenB, npoints, maxlen, batch, nblocks, block, nworkers;
     ulong r, q, t;
     _geom_eval_args_t eargs;
     _multipoint_res_args_t rargs;
@@ -750,8 +748,7 @@ _n_bpoly_mod_resultant_multipoint(n_poly_t res, const n_poly_struct * Ax,
             _num_workers((double) blen * lenA * lenB));
         flint_parallel_do(_multipoint_res_worker, &rargs, rargs.nworkers, 0, 0);
 
-        for (k = 1; k < maxlen; k++)
-            spow[k] = nmod_mul(spow[k], w[k], mod);
+        _nmod_vec_mul(spow + 1, spow + 1, w + 1, maxlen - 1, mod);
     }
 
     nmod_geometric_progression_clear(G);

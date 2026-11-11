@@ -294,6 +294,8 @@ _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R,
         }
     }
 
+    /* The remainder keeps these loops: _nmod_vec_reduce was 1.00-1.12x on
+       x86 but 0.88-0.97x on the Apple M4 (Nov 2026). */
     if (lenB > 1)
     {
         if (unreduced_fits_halflimb)
