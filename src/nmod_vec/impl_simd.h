@@ -184,6 +184,42 @@ FLINT_FORCE_INLINE __m512i _nv_zmm_csub(__m512i a, __m512i b)
         } \
     } while (0)
 
+/* the same for the products by a scalar: STEPS(x) is the product of the
+   entries x of vec, and with add the entries s of r are added, the sum
+   corrected by csub with SN (n) */
+#define _NV_ZMM_SADD(t, r, add, SN) \
+    ((add) ? _nv_zmm_csub(_mm512_add_epi64((t), _nv_zmm_ld(r)), (SN)) : (t))
+#define _NV_ZMM_SADDM(t, r, k, add, SN) \
+    ((add) ? _nv_zmm_csub(_mm512_add_epi64((t), _nv_zmm_mld((k), (r))), (SN)) : (t))
+
+#define _NV_ZMM_SLOOP(STEPS, r, a, len, add, SN) \
+    do { \
+        slong _i; \
+        if ((len) >= NMOD_VEC_SIMD_PEEL_MIN) \
+        { \
+            slong _h = _NV_ZMM_PEEL_H(r); \
+            if (_h != 0 && _NV_ZMM_SAME64(r, a)) \
+            { \
+                __mmask8 _k = _nv_zmm_mask(_h); \
+                __m512i _t = STEPS(_nv_zmm_mld(_k, (a))); \
+                _nv_zmm_mst((r), _k, _NV_ZMM_SADDM(_t, (r), _k, (add), (SN))); \
+                (r) += _h; (a) += _h; (len) -= _h; \
+            } \
+        } \
+        _NV_ZMM_UNROLL \
+        for (_i = 0; _i + 8 <= (len); _i += 8) \
+        { \
+            __m512i _t = STEPS(_nv_zmm_ld((a) + _i)); \
+            _nv_zmm_st((r) + _i, _NV_ZMM_SADD(_t, (r) + _i, (add), (SN))); \
+        } \
+        if (_i < (len)) \
+        { \
+            __mmask8 _k = _nv_zmm_mask((len) - _i); \
+            __m512i _t = STEPS(_nv_zmm_mld(_k, (a) + _i)); \
+            _nv_zmm_mst((r) + _i, _k, _NV_ZMM_SADDM(_t, (r) + _i, _k, (add), (SN))); \
+        } \
+    } while (0)
+
 /* the high word of x y, exact (4 products of 32-bit halves); yh = y with
    its halves swapped */
 FLINT_FORCE_INLINE __m512i _nv_zmm_mulhi(__m512i x, __m512i y, __m512i yh)

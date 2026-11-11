@@ -3,8 +3,9 @@ title: SIMD kernels of the element-wise operations
 ---
 
 On x86-64 with AVX-512 (F, DQ and VL) or AVX2, and on ARM64 with NEON,
-`_nmod_vec_reduce` and `_nmod_vec_mul` run vector kernels chosen from the
-size of $n$. The
+`_nmod_vec_reduce`, `_nmod_vec_mul`, `_nmod_vec_scalar_mul_nmod` and
+`_nmod_vec_scalar_addmul_nmod` run vector kernels chosen from the size of
+$n$. The
 instruction set is the one FLINT is compiled for (for instance
 `-march=native`, which `configure` sets by default): there is no run-time
 detection, and `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
@@ -147,3 +148,37 @@ to 2 too small, so the quotient may be one less and the remainder is below
 $3n$: two corrections. Without AVX-512, this kernel, with its 64-bit
 products emulated, was slower than the scalar code.
 
+## Products by a scalar {#scalar}
+
+`_nmod_vec_scalar_mul_nmod` and `_nmod_vec_scalar_addmul_nmod`, for
+$c \notin \{0, 1, n - 1\}$, use [Shoup's method](algorithms/arithmetic/shoup)
+in several radixes, with $\hat c = \lfloor c 2^{64}/n \rfloor$ computed
+once; `_nmod_vec_scalar_addmul_nmod` adds the result and corrects once
+more.
+
+| $\nu$ | AVX-512 | AVX2 | NEON |
+|---|---|---|---|
+| 2 to 32 | shoup32 | shoup32 | shoup32 |
+| 33 to 50 | shoup52 (with AVX512-IFMA), else fp50 | fp50 | fp50 (`scalar_mul` only) |
+| 51 | shoup52 (with AVX512-IFMA), else shoup64lazy | scalar code | scalar code |
+| 52 to 62 | shoup64lazy | scalar code | scalar code |
+| 63 | shoup64 | scalar code | scalar code |
+| 64 | scalar code | scalar code | scalar code |
+
+In radix $R = 2^{32}$ or $2^{52}$, with $\lfloor \hat c / 2^{64 - k} \rfloor
+= \lfloor cR/n \rfloor$ for $R = 2^k$, [](algorithms/arithmetic/shoup#lem-quot)
+holds for entries $x < R$: the quotient $q = \lfloor x \lfloor cR/n \rfloor / R \rfloor$
+is $\lfloor xc/n \rfloor$ or one less, and $xc - qn < 2n$. With 32-bit
+products (shoup32) the difference is computed exactly in 64 bits; with
+IFMA (shoup52) it is computed modulo $2^{52}$ as $xc + q(2^{52} - n)$,
+which requires $2n < 2^{52}$, hence $\nu \le 51$. In shoup64lazy the high
+word of $x \hat c$ is computed from three 32-bit products and may be up to
+2 too small, so $xc - qn < 4n$, below $2^{64}$ for $\nu \le 62$, and the
+kernel corrects by $2n$, then by $n$; in shoup64, for $\nu = 63$, it is
+exact.
+
+The fp50 kernels are the doubles of [](#mul), with $c$ in place of the second
+entry; on AVX-512 without IFMA, they were faster than shoup64lazy at 33 to 50
+bits. On AVX2, Shoup's method above 32 bits, with emulated 64-bit products, and
+on NEON, Shoup's method above 32 bits and the doubles for `scalar_addmul`, were
+slower than the scalar code.

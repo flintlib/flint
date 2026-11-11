@@ -29,7 +29,9 @@ Shoup's method does not apply. Only `_nmod_vec_scalar_mul_nmod` has a
 ## Choice of variant {#choice}
 
 `_nmod_vec_scalar_mul_nmod` handles $c = 0$, $c = 1$ and $c = n - 1$ by
-zeroing, copying and negating. Otherwise:
+zeroing, copying and negating. Otherwise, with AVX-512, AVX2 or NEON and
+from 8 entries, it uses the vector kernels of [](nmod_vec/simd#scalar)
+where one applies to the size of $n$. Otherwise:
 
 - If $n$ has `FLINT_BITS` bits, it uses `_redc` for odd $n$ and length at
   least 8, and otherwise a generic loop without normalisation shifts.
@@ -37,7 +39,8 @@ zeroing, copying and negating. Otherwise:
   `FLINT_MULMOD_SHOUP_THRESHOLD` on, and `_generic` below.
 
 `_nmod_vec_scalar_addmul_nmod` handles $c = 0$, $c = 1$ and $c = n - 1$
-with no operation, `_nmod_vec_add` and `_nmod_vec_sub`. Otherwise it uses
+with no operation, `_nmod_vec_add` and `_nmod_vec_sub`, then the vector
+kernels as above. Otherwise it uses
 `_shoup` from length `FLINT_MULMOD_SHOUP_THRESHOLD` on when $n$ has fewer
 than `FLINT_BITS` bits, and `_generic` in all other cases.
 
