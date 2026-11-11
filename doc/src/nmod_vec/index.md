@@ -14,7 +14,8 @@ modules over $\Z/n\Z$. Dot products, the most heavily used operation, choose
 among several strategies depending on the length, the size of $n$ and the
 instruction set; see [](nmod_vec/dot). Multiplication by a scalar and
 inversion of all entries are explained in [](nmod_vec/scalar) and
-[](nmod_vec/invert).
+[](nmod_vec/invert), and the SIMD kernels of the element-wise operations
+in [](nmod_vec/simd).
 
 ## Conventions {#conventions}
 
@@ -103,7 +104,8 @@ are zero. The entries need not be reduced.
 void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
 Sets each entry of `res` to the corresponding entry of `vec` reduced
-modulo $n$. The entries of `vec` may be any words.
+modulo $n$. The entries of `vec` may be any words. With AVX-512, AVX2 or
+NEON it uses vector kernels ([](nmod_vec/simd#reduce)).
 :::
 
 ## Printing {#printing}

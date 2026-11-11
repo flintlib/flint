@@ -117,7 +117,10 @@ $\lfloor m/2^k \rfloor = \lfloor (2^e - 1)/(2^k n) \rfloor
 = \lfloor \lfloor (2^e - 1)/2^k \rfloor / n \rfloor$ by the nested floor
 identity used in [](#lem-nmod-m), and $\lfloor (2^e - 1)/2^k \rfloor = 2^{e - k} - 1$.
 For instance $k = \nu - 1$ gives $\lfloor (B - 1)/n \rfloor$, which
-`n_barrett_precomp_preinv` computes this way, without a division.
+`n_barrett_precomp_preinv` computes this way, without a division, and on
+64-bit machines $k = 32$ gives the 32-bit constant
+$\lfloor m/2^{32} \rfloor = 2^{31} + \lfloor \mathit{ninv}/2^{33} \rfloor$ of the
+SIMD kernels of `_nmod_vec_reduce` ([](nmod_vec/simd#reduce)).
 
 ## Two and three words {#two-words}
 
