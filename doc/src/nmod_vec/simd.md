@@ -5,7 +5,7 @@ title: SIMD kernels of the element-wise operations
 On x86-64 with AVX-512 (F, DQ and VL) or AVX2, and on ARM64 with NEON,
 `_nmod_vec_reduce`, `_nmod_vec_mul`, `_nmod_vec_scalar_mul_nmod` and
 `_nmod_vec_scalar_addmul_nmod` run vector kernels chosen from the size of
-$n$. The
+$n$, and so do their lazy variants ([](#lazy)). The
 instruction set is the one FLINT is compiled for (for instance
 `-march=native`, which `configure` sets by default): there is no run-time
 detection, and `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
@@ -182,3 +182,54 @@ entry; on AVX-512 without IFMA, they were faster than shoup64lazy at 33 to 50
 bits. On AVX2, Shoup's method above 32 bits, with emulated 64-bit products, and
 on NEON, Shoup's method above 32 bits and the doubles for `scalar_addmul`, were
 slower than the scalar code.
+
+## Lazy variants {#lazy}
+
+`_nmod_vec_reduce_lazy`, `_nmod_vec_mul_lazy`,
+`_nmod_vec_scalar_mul_nmod_lazy` and `_nmod_vec_scalar_addmul_nmod_lazy`
+require $n < 2^{62}$ and run the kernels above without their last
+correction, so that their outputs are in $[0, 2n)$. Before that
+correction, every kernel already has a value below $2n$:
+
+- the remainders of top32 for $\nu \ge 34$, fold29, halflimb for $\nu \le 30$,
+  ifma50, shoup32 and shoup52 are below $2n$ ([](#lem-reduce-top32),
+  [](#lem-reduce-fold29), [](#mul), [](#scalar));
+- top32 at $\nu = 33$, fold32, halflimb at $\nu = 31, 32$, red2bounded and
+  shoup64lazy correct by $n$ or $2n$ first, which leaves a value below
+  $2n$ from a remainder below $3n$ or $4n$;
+- the doubles kernels give $z + n$ in $(0, 2n)$ instead of correcting
+  $z \in (-n, n)$.
+
+`_nmod_vec_scalar_addmul_nmod_lazy` also accepts entries of `res` in
+$[0, 2n)$: the sum with a product in $[0, 2n)$ is below $4n < 2^{64}$ and
+is corrected once, by $2n$. On AVX2 this sum is corrected on 64-bit lanes,
+since $4n$ may exceed $2^{32}$ at 31 bits; in the doubles kernels,
+$z + s - n \in (-2n, 2n)$ gets $2n$ added when negative. The entries of
+`vec` must be reduced, also when `vec` is `res`.
+
+The doubles kernels of AVX-512 and AVX2 convert $z + n$ to an integer by
+adding $2^{52} + n$ instead of $2^{52}$ (the sum is an integer below
+$2^{53}$, so it is exact), one addition fewer than adding $n$ first; NEON
+converts with one instruction and adds $n$.
+
+The lazy functions run the exact code, whose outputs are reduced, for
+vectors of fewer than 8 entries, without SIMD, for $n = 1$, and in the
+following cases:
+
+| Function | AVX-512 | AVX2 | NEON |
+|---|---|---|---|
+| `_nmod_vec_reduce_lazy` | none | none | $\nu \le 5$ |
+| `_nmod_vec_mul_lazy` | none | $51 \le \nu \le 62$ | $51 \le \nu \le 62$ |
+| `_nmod_vec_scalar_mul_nmod_lazy` | none | $51 \le \nu \le 62$ | $51 \le \nu \le 62$ |
+| `_nmod_vec_scalar_addmul_nmod_lazy` | none | $51 \le \nu \le 62$ | $33 \le \nu \le 62$ |
+
+`_nmod_vec_scalar_mul_nmod_lazy` also runs the exact code for
+$c \in \{0, 1, n - 1\}$ (a zeroing, a copy or a negation), and
+`_nmod_vec_scalar_addmul_nmod_lazy` leaves `res` unchanged for $c = 0$.
+Where `_nmod_vec_scalar_addmul_nmod_lazy` runs the exact code, it first
+reduces `res`.
+
+Against the exact functions, on long vectors (Nov 2026): reduce
+1.11-1.64x, mul 0.99-1.29x, scalar_mul 1.08-1.60x, scalar_addmul
+1.04-1.35x, NEON 1.13-1.60x; shoup52 1.10-1.21x; the fold of $n$ into
+$2^{52}$ 1.03-1.16x more for the doubles kernels.

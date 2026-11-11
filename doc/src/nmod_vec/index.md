@@ -20,7 +20,9 @@ in [](nmod_vec/simd).
 ## Conventions {#conventions}
 
 - Unless stated otherwise, input entries must be reduced, that is, lie in
-  $[0, n)$, and output entries are reduced. This is not checked.
+  $[0, n)$, and output entries are reduced. This is not checked. The
+  functions with the suffix `_lazy` give outputs in $[0, 2n)$, congruent to
+  the reduced ones, and require $n < 2^{62}$.
 - Lengths are passed separately. A vector of length 0 is valid.
 - Element-wise functions allow the output to be the same array as an input,
   but not a partially overlapping one.
@@ -108,6 +110,14 @@ modulo $n$. The entries of `vec` may be any words. With AVX-512, AVX2 or
 NEON it uses vector kernels ([](nmod_vec/simd#reduce)).
 :::
 
+::: function
+void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+
+The same as `_nmod_vec_reduce` for $n < 2^{62}$, except that the entries
+of `res` are only in $[0, 2n)$: the vector kernels skip their last
+correction ([](nmod_vec/simd#lazy)).
+:::
+
 ## Printing {#printing}
 
 ::: function
@@ -168,6 +178,14 @@ AVX-512); otherwise, the loops of `_nmod_mul_halflimb`, `_nmod_mul_bounded`
 or `nmod_mul`, by the size of $n$.
 :::
 
+::: function
+void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+
+The same as `_nmod_vec_mul` for $n < 2^{62}$, except that the entries of
+`res` are only in $[0, 2n)$ ([](nmod_vec/simd#lazy)). The inputs must be
+reduced.
+:::
+
 ## Scalar multiplication {#scalar}
 
 ::: function
@@ -202,6 +220,17 @@ and `_nmod_vec_scalar_addmul_nmod_generic` also need reduced entries of
 `_nmod_vec_scalar_addmul_nmod_shoup` accepts entries of `vec` that are not
 reduced.
 :::
+:::
+
+::: function
+void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+
+The same as `_nmod_vec_scalar_mul_nmod` and `_nmod_vec_scalar_addmul_nmod` for
+$n < 2^{62}$, except that the entries of `res` are only in $[0, 2n)$ on output
+and, for `_nmod_vec_scalar_addmul_nmod_lazy`, may be in $[0, 2n)$ on input
+([](nmod_vec/simd#lazy)). They require $c < n$ and reduced entries of
+`vec`; when `vec` is `res`, its entries must therefore be reduced.
 :::
 
 ## Inversion {#inversion}

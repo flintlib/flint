@@ -348,4 +348,32 @@ FLINT_FORCE_INLINE uint64x2_t _nv_neon_csub(uint64x2_t a, uint64x2_t b)
 
 #endif /* NMOD_VEC_SIMD_NEON */
 
+/* AVX2 and NEON: doubles through machine_vectors.h ***********************/
+
+#if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
+
+# include "machine_vectors.h"
+
+/*
+    The lazy output of the doubles kernels: stores z + n, in (0, 2n), for z
+    an integer in (-n, n). On AVX2, n is folded into the constant 2^52 of the
+    conversion to integers (t52n = 2^52 + n): one addition fewer than z + n
+    then vec4d_convert_limited_vec4n (1.04-1.16x for mul and scalar_mul,
+    Nov 2026); NEON converts with one instruction, so it adds n.
+*/
+FLINT_FORCE_INLINE void
+_nv_st4_lazy(ulong * r, vec4d z, vec4d vn, vec4d t52n)
+{
+#if NMOD_VEC_SIMD_YMM
+    _mm256_storeu_si256((__m256i *) r, _mm256_castpd_si256(
+        _mm256_xor_pd(_mm256_add_pd(z, t52n), _mm256_set1_pd(0x1.0p52))));
+    (void) vn;
+#else
+    vec4n_store_unaligned(r, vec4d_convert_limited_vec4n(vec4d_add(z, vn)));
+    (void) t52n;
+#endif
+}
+
+#endif
+
 #endif

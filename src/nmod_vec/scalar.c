@@ -16,9 +16,6 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "impl_simd.h"
-#if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
-# include "machine_vectors.h"
-#endif
 
 /*
     SIMD kernels of the products by a scalar c (not 0, 1 or n - 1), by the
@@ -37,7 +34,11 @@
         corrections 2n then n (5-20% faster than with the exact high word).
       shoup64 (nu = 63, AVX-512): Shoup with the exact high word.
     For nu = 64, the scalar code (Montgomery for odd n). The sum of
-    scalar_addmul is corrected once more. Measured and not kept (Nov 2026):
+    scalar_addmul is corrected once more. The lazy variants (n < 2^62) skip
+    the last correction of the product (fp50: z + n), and scalar_addmul_lazy
+    adds res in [0, 2n) and corrects the sum, below 4n, by 2n: 1.08-1.60x for
+    scalar_mul and 1.04-1.35x for scalar_addmul on long vectors, 1.10-1.21x
+    for shoup52 (Nov 2026). Measured and not kept (Nov 2026):
     on AVX2, Shoup above 32 bits with emulated 64-bit products (0.8x on
     Broadwell); on NEON, Shoup above 32 bits (0.48-0.82x) and fp50 for
     scalar_addmul (0.89-0.96x on long vectors).
@@ -46,13 +47,20 @@
 #if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
 FLINT_FORCE_INLINE void
 _smul_tail(nn_ptr res, nn_srcptr vec, slong i, slong len, ulong c, ulong c_pr,
-           nmod_t mod, int add)
+           nmod_t mod, int add, int lazy)
 {
     NMOD_VEC_NO_VECTORIZE
     for ( ; i < len; i++)
     {
         ulong t = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
-        res[i] = add ? nmod_add(res[i], t, mod) : t;
+        if (add && lazy)
+        {
+            /* res[i] in [0, 2n): the sum is below 3n */
+            t += res[i];
+            res[i] = (t >= 2 * mod.n) ? t - 2 * mod.n : t;
+        }
+        else
+            res[i] = add ? nmod_add(res[i], t, mod) : t;
     }
 }
 #endif
@@ -60,21 +68,26 @@ _smul_tail(nn_ptr res, nn_srcptr vec, slong i, slong len, ulong c, ulong c_pr,
 #if NMOD_VEC_SIMD_ZMM
 
 FLINT_FORCE_INLINE __m512i
-_smul_shoup32_step_zmm(__m512i x, __m512i vc, __m512i vcp, __m512i vn)
+_smul_shoup32_step_zmm(__m512i x, __m512i vc, __m512i vcp, __m512i vn, int lazy)
 {
     __m512i q = _mm512_srli_epi64(_mm512_mul_epu32(x, vcp), 32);
-    return _nv_zmm_csub(_mm512_sub_epi64(_mm512_mul_epu32(x, vc), _mm512_mul_epu32(q, vn)), vn);
+    __m512i t = _mm512_sub_epi64(_mm512_mul_epu32(x, vc), _mm512_mul_epu32(q, vn));
+    return lazy ? t : _nv_zmm_csub(t, vn);
 }
 
+/* lazy, here and below: the products without their last correction, and
+   for addmul the sum (below 4n) corrected by 2n */
 FLINT_FORCE_INLINE void
-_smul_shoup32_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
+_smul_shoup32_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add,
+                  int lazy)
 {
     const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod);
     const __m512i vn = _nv_zmm_set1(mod.n);
+    const __m512i v2n = _nv_zmm_set1(2 * mod.n);
     const __m512i vc = _nv_zmm_set1(c);
     const __m512i vcp = _nv_zmm_set1(c_pr >> 32);
-#define STEP(x) _smul_shoup32_step_zmm((x), vc, vcp, vn)
-    _NV_ZMM_SLOOP(STEP, r, a, len, add, vn);
+#define STEP(x) _smul_shoup32_step_zmm((x), vc, vcp, vn, lazy)
+    _NV_ZMM_SLOOP(STEP, r, a, len, add, lazy ? v2n : vn);
 #undef STEP
 }
 
@@ -83,15 +96,17 @@ _smul_shoup32_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add
    then n */
 FLINT_FORCE_INLINE __m512i
 _smul_shoup64lazy_step_zmm(__m512i x, __m512i vc, __m512i vcp, __m512i vcph,
-                           __m512i vn, __m512i v2n)
+                           __m512i vn, __m512i v2n, int lazy)
 {
     __m512i q = _nv_zmm_mulhi_lazy(x, vcp, vcph);
     __m512i t = _mm512_sub_epi64(_mm512_mullo_epi64(x, vc), _mm512_mullo_epi64(q, vn));
-    return _nv_zmm_csub(_nv_zmm_csub(t, v2n), vn);
+    t = _nv_zmm_csub(t, v2n);
+    return lazy ? t : _nv_zmm_csub(t, vn);
 }
 
 FLINT_FORCE_INLINE void
-_smul_shoup64lazy_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
+_smul_shoup64lazy_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add,
+                      int lazy)
 {
     const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod);
     const __m512i vn = _nv_zmm_set1(mod.n);
@@ -99,8 +114,8 @@ _smul_shoup64lazy_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int
     const __m512i vc = _nv_zmm_set1(c);
     const __m512i vcp = _nv_zmm_set1(c_pr);
     const __m512i vcph = _nv_zmm_set1(c_pr >> 32);
-#define STEP(x) _smul_shoup64lazy_step_zmm((x), vc, vcp, vcph, vn, v2n)
-    _NV_ZMM_SLOOP(STEP, r, a, len, add, vn);
+#define STEP(x) _smul_shoup64lazy_step_zmm((x), vc, vcp, vcph, vn, v2n, lazy)
+    _NV_ZMM_SLOOP(STEP, r, a, len, add, lazy ? v2n : vn);
 #undef STEP
 }
 
@@ -132,33 +147,38 @@ _smul_shoup64_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add
    floor(x c' / 2^52) is floor(x c / n) or one less, so x c - q n is in
    [0, 2n), below 2^52: computed as (x c + q (2^52 - n)) mod 2^52 */
 FLINT_FORCE_INLINE __m512i
-_smul_shoup52_step_zmm(__m512i x, __m512i vc, __m512i vcp, __m512i vnneg, __m512i vn)
+_smul_shoup52_step_zmm(__m512i x, __m512i vc, __m512i vcp, __m512i vnneg, __m512i vn,
+                       int lazy)
 {
     const __m512i zero = _mm512_setzero_si512();
     const __m512i mask = _mm512_set1_epi64((UWORD(1) << 52) - 1);
     __m512i q = _mm512_madd52hi_epu64(zero, x, vcp);
     __m512i t = _mm512_madd52lo_epu64(_mm512_madd52lo_epu64(zero, x, vc), q, vnneg);
-    return _nv_zmm_csub(_mm512_and_si512(t, mask), vn);
+    t = _mm512_and_si512(t, mask);
+    return lazy ? t : _nv_zmm_csub(t, vn);
 }
 
 FLINT_FORCE_INLINE void
-_smul_shoup52_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
+_smul_shoup52_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add,
+                  int lazy)
 {
     const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod);
     const __m512i vn = _nv_zmm_set1(mod.n);
+    const __m512i v2n = _nv_zmm_set1(2 * mod.n);
     const __m512i vc = _nv_zmm_set1(c);
     const __m512i vcp = _nv_zmm_set1(c_pr >> 12);
     const __m512i vnneg = _nv_zmm_set1((UWORD(1) << 52) - mod.n);
-#define STEP(x) _smul_shoup52_step_zmm((x), vc, vcp, vnneg, vn)
-    _NV_ZMM_SLOOP(STEP, r, a, len, add, vn);
+#define STEP(x) _smul_shoup52_step_zmm((x), vc, vcp, vnneg, vn, lazy)
+    _NV_ZMM_SLOOP(STEP, r, a, len, add, lazy ? v2n : vn);
 #undef STEP
 }
 
 #else
 
-/* 33 <= nu <= 50: doubles, as _mul_fp50_step_zmm */
+/* 33 <= nu <= 50: doubles, as _mul_fp50_step_zmm (lazy: z + n) */
 FLINT_FORCE_INLINE __m512i
-_smul_fp50_step_zmm(__m512i xi, __m512d vcd, __m512d vn, __m512d vninv)
+_smul_fp50_step_zmm(__m512i xi, __m512d vcd, __m512d vn, __m512d vninv,
+                    __m512d t52n, int lazy)
 {
     const __m512d t52 = _mm512_set1_pd(0x1.0p52);
     __m512d x = _mm512_sub_pd(_mm512_castsi512_pd(_mm512_or_si512(xi, _mm512_castpd_si512(t52))), t52);
@@ -166,42 +186,49 @@ _smul_fp50_step_zmm(__m512i xi, __m512d vcd, __m512d vn, __m512d vninv)
     __m512d q = _mm512_roundscale_pd(_mm512_mul_pd(h, vninv), _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
     __m512d l = _mm512_fmsub_pd(x, vcd, h);
     __m512d z = _mm512_add_pd(_mm512_fnmadd_pd(q, vn, h), l);
+    if (lazy)
+        return _mm512_castpd_si512(_mm512_xor_pd(_mm512_add_pd(z, t52n), t52));
     z = _mm512_mask_add_pd(z, _mm512_cmp_pd_mask(z, _mm512_setzero_pd(), _CMP_LT_OQ), z, vn);
     return _mm512_castpd_si512(_mm512_xor_pd(_mm512_add_pd(z, t52), t52));
 }
 
 FLINT_FORCE_INLINE void
-_smul_fp50_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
+_smul_fp50_zmm(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add, int lazy)
 {
     const __m512d vn = _mm512_set1_pd((double) mod.n);
     const __m512d vninv = _mm512_set1_pd(1.0 / (double) mod.n);
     const __m512d vcd = _mm512_set1_pd((double) c);
+    const __m512d t52n = _mm512_set1_pd(0x1.0p52 + (double) mod.n);
     const __m512i vnz = _nv_zmm_set1(mod.n);
-#define STEP(x) _smul_fp50_step_zmm((x), vcd, vn, vninv)
-    _NV_ZMM_SLOOP(STEP, r, a, len, add, vnz);
+    const __m512i v2nz = _nv_zmm_set1(2 * mod.n);
+#define STEP(x) _smul_fp50_step_zmm((x), vcd, vn, vninv, t52n, lazy)
+    _NV_ZMM_SLOOP(STEP, r, a, len, add, lazy ? v2nz : vnz);
 #undef STEP
 }
 
 #endif
 
+/* returns 0 when no kernel applies; lazy (nu <= 62): outputs in [0, 2n),
+   and for addmul res in [0, 2n) on input */
 FLINT_FORCE_INLINE int
-_nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod, int add)
+_nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod,
+                          int add, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
 
     if (nu == 64 || nu < 2)
         return 0;
     else if (nu <= 32)
-        _smul_shoup32_zmm(res, vec, len, c, mod, add);
+        _smul_shoup32_zmm(res, vec, len, c, mod, add, lazy);
 #if NMOD_VEC_SIMD_IFMA
     else if (nu <= 51)
-        _smul_shoup52_zmm(res, vec, len, c, mod, add);
+        _smul_shoup52_zmm(res, vec, len, c, mod, add, lazy);
 #else
     else if (nu <= 50)
-        _smul_fp50_zmm(res, vec, len, c, mod, add);
+        _smul_fp50_zmm(res, vec, len, c, mod, add, lazy);
 #endif
     else if (nu <= 62)
-        _smul_shoup64lazy_zmm(res, vec, len, c, mod, add);
+        _smul_shoup64lazy_zmm(res, vec, len, c, mod, add, lazy);
     else
         _smul_shoup64_zmm(res, vec, len, c, mod, add);
     return 1;
@@ -209,11 +236,15 @@ _nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t 
 
 #elif NMOD_VEC_SIMD_YMM
 
-/* nu <= 32; c32: nu <= 31, the corrections on 32-bit lanes */
+/* nu <= 32; c32: nu <= 31, the corrections on 32-bit lanes; lazy: the
+   product without its correction, and for addmul the sum (below 4n)
+   corrected by 2n on 64-bit lanes */
 FLINT_FORCE_INLINE slong
-_smul_shoup32_ymm(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t mod, int add, int c32)
+_smul_shoup32_ymm(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t mod,
+                  int add, int c32, int lazy)
 {
     const __m256i vn = _nv_ymm_set1_32(mod.n);
+    const __m256i v2n = _nv_ymm_set1(2 * mod.n);
     const __m256i vc = _nv_ymm_set1_32(c);
     const __m256i vcp = _nv_ymm_set1_32(c_pr >> 32);
     slong i;
@@ -223,11 +254,15 @@ _smul_shoup32_ymm(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t 
         __m256i x = _nv_ymm_ld(a + i);
         __m256i q = _mm256_srli_epi64(_mm256_mul_epu32(x, vcp), 32);
         __m256i t = _mm256_sub_epi64(_mm256_mul_epu32(x, vc), _mm256_mul_epu32(q, vn));
-        t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
+        if (!lazy)
+            t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
         if (add)
         {
             t = _mm256_add_epi64(t, _nv_ymm_ld(r + i));
-            t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
+            if (lazy)
+                t = _nv_ymm_csub_s(t, v2n);
+            else
+                t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
         }
         _nv_ymm_st(r + i, t);
     }
@@ -236,11 +271,13 @@ _smul_shoup32_ymm(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t 
 
 #elif NMOD_VEC_SIMD_NEON
 
-/* nu <= 32 */
+/* nu <= 32; lazy as in _smul_shoup32_ymm */
 FLINT_FORCE_INLINE slong
-_smul_shoup32_neon(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t mod, int add)
+_smul_shoup32_neon(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t mod,
+                   int add, int lazy)
 {
     const uint64x2_t vn = vdupq_n_u64(mod.n);
+    const uint64x2_t vs = vdupq_n_u64(lazy ? 2 * mod.n : mod.n);
     const uint32x2_t vnl = vdup_n_u32((uint32_t) mod.n);
     const uint32x2_t vc = vdup_n_u32((uint32_t) c);
     const uint32x2_t vcp = vdup_n_u32((uint32_t) (c_pr >> 32));
@@ -251,12 +288,17 @@ _smul_shoup32_neon(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t
         uint32x2_t x0 = vmovn_u64(_nv_neon_ld(a + i)), x1 = vmovn_u64(_nv_neon_ld(a + i + 2));
         uint32x2_t q0 = vshrn_n_u64(vmull_u32(x0, vcp), 32);
         uint32x2_t q1 = vshrn_n_u64(vmull_u32(x1, vcp), 32);
-        uint64x2_t t0 = _nv_neon_csub(vmlsl_u32(vmull_u32(x0, vc), q0, vnl), vn);
-        uint64x2_t t1 = _nv_neon_csub(vmlsl_u32(vmull_u32(x1, vc), q1, vnl), vn);
+        uint64x2_t t0 = vmlsl_u32(vmull_u32(x0, vc), q0, vnl);
+        uint64x2_t t1 = vmlsl_u32(vmull_u32(x1, vc), q1, vnl);
+        if (!lazy)
+        {
+            t0 = _nv_neon_csub(t0, vn);
+            t1 = _nv_neon_csub(t1, vn);
+        }
         if (add)
         {
-            t0 = _nv_neon_csub(vaddq_u64(t0, _nv_neon_ld(r + i)), vn);
-            t1 = _nv_neon_csub(vaddq_u64(t1, _nv_neon_ld(r + i + 2)), vn);
+            t0 = _nv_neon_csub(vaddq_u64(t0, _nv_neon_ld(r + i)), vs);
+            t1 = _nv_neon_csub(vaddq_u64(t1, _nv_neon_ld(r + i + 2)), vs);
         }
         _nv_neon_st(r + i, t0);
         _nv_neon_st(r + i + 2, t1);
@@ -269,23 +311,35 @@ _smul_shoup32_neon(nn_ptr r, nn_srcptr a, slong len, ulong c, ulong c_pr, nmod_t
 #if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
 
 /* 33 <= nu <= 50: doubles, with a 4-wide step for 4 to 7 remaining
-   entries; for addmul, z + s - n is in [-n, n) */
+   entries; for addmul, z + s - n is in [-n, n). Lazy: z + n by _nv_st4_lazy,
+   and for addmul z + s - n in (-2n, 2n), with z in (-n, n) not corrected and
+   s in [0, 2n), brought to [0, 2n) */
 FLINT_FORCE_INLINE slong
-_smul_fp50(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
+_smul_fp50(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add, int lazy)
 {
     const vec8d vn = vec8d_set_d((double) mod.n);
+    const vec8d v2n = vec8d_set_d(2.0 * (double) mod.n);
     const vec8d vninv = vec8d_set_d(1.0 / (double) mod.n);
     const vec8d vc = vec8d_set_d((double) c);
+    const vec4d t52n = vec4d_set_d(0x1.0p52 + (double) mod.n);
     slong i;
 
     for (i = 0; i + 8 <= len; i += 8)
     {
         vec8d x = vec8n_convert_limited_vec8d(vec8n_load_unaligned(a + i));
-        vec8d z = vec8d_reduce_pm1no_to_0n(vec8d_mulmod(x, vc, vn, vninv), vn);
+        vec8d z = vec8d_mulmod(x, vc, vn, vninv);
+        if (lazy && !add)
+        {
+            _nv_st4_lazy(r + i, z.e1, vn.e1, t52n);
+            _nv_st4_lazy(r + i + 4, z.e2, vn.e1, t52n);
+            continue;
+        }
+        if (!lazy)
+            z = vec8d_reduce_pm1no_to_0n(z, vn);
         if (add)
         {
             vec8d s = vec8n_convert_limited_vec8d(vec8n_load_unaligned(r + i));
-            z = vec8d_reduce_pm1no_to_0n(vec8d_sub(vec8d_add(z, s), vn), vn);
+            z = vec8d_reduce_pm1no_to_0n(vec8d_sub(vec8d_add(z, s), vn), lazy ? v2n : vn);
         }
         vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z.e1));
         vec4n_store_unaligned(r + i + 4, vec4d_convert_limited_vec4n(z.e2));
@@ -293,20 +347,29 @@ _smul_fp50(nn_ptr r, nn_srcptr a, slong len, ulong c, nmod_t mod, int add)
     if (i + 4 <= len)
     {
         vec4d x = vec4n_convert_limited_vec4d(vec4n_load_unaligned(a + i));
-        vec4d z = vec4d_reduce_pm1no_to_0n(vec4d_mulmod(x, vc.e1, vn.e1, vninv.e1), vn.e1);
-        if (add)
+        vec4d z = vec4d_mulmod(x, vc.e1, vn.e1, vninv.e1);
+        if (lazy && !add)
+            _nv_st4_lazy(r + i, z, vn.e1, t52n);
+        else
         {
-            vec4d s = vec4n_convert_limited_vec4d(vec4n_load_unaligned(r + i));
-            z = vec4d_reduce_pm1no_to_0n(vec4d_sub(vec4d_add(z, s), vn.e1), vn.e1);
+            if (!lazy)
+                z = vec4d_reduce_pm1no_to_0n(z, vn.e1);
+            if (add)
+            {
+                vec4d s = vec4n_convert_limited_vec4d(vec4n_load_unaligned(r + i));
+                z = vec4d_reduce_pm1no_to_0n(vec4d_sub(vec4d_add(z, s), vn.e1),
+                                             lazy ? v2n.e1 : vn.e1);
+            }
+            vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z));
         }
-        vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z));
         i += 4;
     }
     return i;
 }
 
 FLINT_FORCE_INLINE int
-_nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod, int add)
+_nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod,
+                          int add, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     ulong c_pr;
@@ -322,14 +385,14 @@ _nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t 
     c_pr = _nmod_mulmod_precomp_shoup(c, mod);
     if (nu <= 32)
 #if NMOD_VEC_SIMD_YMM
-        i = (nu <= 31) ? _smul_shoup32_ymm(res, vec, len, c, c_pr, mod, add, 1)
-                       : _smul_shoup32_ymm(res, vec, len, c, c_pr, mod, add, 0);
+        i = (nu <= 31) ? _smul_shoup32_ymm(res, vec, len, c, c_pr, mod, add, 1, lazy)
+                       : _smul_shoup32_ymm(res, vec, len, c, c_pr, mod, add, 0, lazy);
 #else
-        i = _smul_shoup32_neon(res, vec, len, c, c_pr, mod, add);
+        i = _smul_shoup32_neon(res, vec, len, c, c_pr, mod, add, lazy);
 #endif
     else
-        i = _smul_fp50(res, vec, len, c, mod, add);
-    _smul_tail(res, vec, i, len, c, c_pr, mod, add);
+        i = _smul_fp50(res, vec, len, c, mod, add, lazy);
+    _smul_tail(res, vec, i, len, c, c_pr, mod, add, lazy);
     return 1;
 }
 
@@ -402,7 +465,7 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
     else if (c == mod.n - UWORD(1))
         _nmod_vec_sub(res, res, vec, len, mod);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1))
+    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 0))
         return;
 #endif
     else if (mod.norm >= FLINT_BITS / 2 && HALFLIMB_BEFORE_SHOUP(len))
@@ -489,7 +552,7 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
     else if (c == mod.n - UWORD(1))
         _nmod_vec_neg(res, vec, len, mod);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0))
+    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 0))
         return;
 #endif
     else if (NMOD_BITS(mod) == FLINT_BITS)
@@ -505,4 +568,37 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
         _scalar_mul_bounded(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
+}
+
+/*
+    The lazy variants. Where no kernel applies (short vectors, no SIMD, AVX2
+    above 50 bits, NEON above 50 bits and addmul above 32 bits), the exact
+    code runs, whose outputs are also in [0, 2n); scalar_addmul first brings
+    res to [0, n) there. The cases c = 1 and c = n - 1 of scalar_addmul go to
+    the kernels, since _nmod_vec_add and _nmod_vec_sub need reduced inputs.
+*/
+void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec,
+                                    slong len, ulong c, nmod_t mod)
+{
+    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && c > UWORD(1) && c != mod.n - UWORD(1)
+        && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 1))
+        return;
+#endif
+    _nmod_vec_scalar_mul_nmod(res, vec, len, c, mod);
+}
+
+void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec,
+                                       slong len, ulong c, nmod_t mod)
+{
+    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+    if (c == UWORD(0))
+        return;
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 1))
+        return;
+#endif
+    _nmod_vec_reduce(res, res, len, mod);
+    _nmod_vec_scalar_addmul_nmod(res, vec, len, c, mod);
 }

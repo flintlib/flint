@@ -240,6 +240,13 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
+/* outputs in [0, 2n) instead of [0, n), for n < 2^62 */
+/* for scalar_addmul_nmod_lazy, the input res may be in [0, 2n) */
+void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod);
+void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+
 /* the AVX2 version exists when FLINT itself is compiled with AVX2 */
 #if NMOD_VEC_LIB_HAVE_AVX2
 void _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len, ulong c);

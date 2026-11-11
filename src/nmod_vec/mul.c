@@ -12,9 +12,6 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "impl_simd.h"
-#if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
-# include "machine_vectors.h"
-#endif
 
 /*
     The SIMD kernels, by the size nu of n, for reduced inputs, with the
@@ -34,6 +31,9 @@
     form of red2bounded, with its 64-bit products emulated, ran below the
     scalar code on Broadwell, and on Ice Lake below the AVX-512 one
     (Nov 2026).
+    _nmod_vec_mul_lazy (n < 2^62) skips the last correction of each kernel
+    (fp50: z + n instead of the correction of z in (-n, n)), so its outputs
+    are in [0, 2n): 0.99-1.29x on long vectors (Nov 2026).
 */
 
 /* the loops of #2950 for each size of n */
@@ -91,26 +91,26 @@ _mul_tail(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong i, slong len, nmod_t
 
 FLINT_FORCE_INLINE __m512i
 _mul_halflimb_step_zmm(__m512i x, __m512i y, __m512i vs, __m512i vm, __m512i vt,
-                       __m512i vn, __m512i v2n, int two)
+                       __m512i vn, __m512i v2n, int two, int lazy)
 {
     __m512i p = _mm512_mul_epu32(x, y);
     __m512i q = _mm512_srlv_epi64(_mm512_mul_epu32(_mm512_srlv_epi64(p, vs), vm), vt);
     p = _mm512_sub_epi64(p, _mm512_mul_epu32(q, vn));
     if (two)
         p = _nv_zmm_csub(p, v2n);
-    return _nv_zmm_csub(p, vn);
+    return lazy ? p : _nv_zmm_csub(p, vn);
 }
 
 FLINT_FORCE_INLINE void
 _mul_halflimb_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod,
-                  int s, int t, int two)
+                  int s, int t, int two, int lazy)
 {
     const __m512i vn = _nv_zmm_set1(mod.n);
     const __m512i v2n = _nv_zmm_set1(2 * mod.n);
     const __m512i vm = _nv_zmm_set1(NMOD_VEC_SIMD_M(mod) >> 32);
     const __m512i vs = _nv_zmm_set1(s);
     const __m512i vt = _nv_zmm_set1(t);
-#define STEP(x, y) _mul_halflimb_step_zmm((x), (y), vs, vm, vt, vn, v2n, two)
+#define STEP(x, y) _mul_halflimb_step_zmm((x), (y), vs, vm, vt, vn, v2n, two, lazy)
     _NV_ZMM_LOOP2(STEP, r, a, b, len);
 #undef STEP
 }
@@ -125,7 +125,7 @@ _mul_halflimb_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod,
 */
 FLINT_FORCE_INLINE __m512i
 _mul_ifma50_step_zmm(__m512i x, __m512i y, __m512i vs, __m512i vpow, __m512i vw,
-                     __m512i vnneg, __m512i vn, int half)
+                     __m512i vnneg, __m512i vn, int half, int lazy)
 {
     const __m512i zero = _mm512_setzero_si512();
     const __m512i mask = _mm512_set1_epi64((UWORD(1) << 52) - 1);
@@ -135,11 +135,13 @@ _mul_ifma50_step_zmm(__m512i x, __m512i y, __m512i vs, __m512i vpow, __m512i vw,
     __m512i q = _mm512_madd52hi_epu64(zero, s, vw);
     if (half)
         q = _mm512_srli_epi64(q, 1);
-    return _nv_zmm_csub(_mm512_and_si512(_mm512_madd52lo_epu64(plo, q, vnneg), mask), vn);
+    plo = _mm512_and_si512(_mm512_madd52lo_epu64(plo, q, vnneg), mask);
+    return lazy ? plo : _nv_zmm_csub(plo, vn);
 }
 
 FLINT_FORCE_INLINE void
-_mul_ifma50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int half)
+_mul_ifma50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod,
+                int half, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     const __m512i vn = _nv_zmm_set1(mod.n);
@@ -147,7 +149,7 @@ _mul_ifma50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int h
     const __m512i vw = _nv_zmm_set1(NMOD_VEC_SIMD_M(mod) >> (half ? 12 : 13));
     const __m512i vs = _nv_zmm_set1(nu - 2);
     const __m512i vpow = _nv_zmm_set1(UWORD(1) << (54 - nu));
-#define STEP(x, y) _mul_ifma50_step_zmm((x), (y), vs, vpow, vw, vnneg, vn, half)
+#define STEP(x, y) _mul_ifma50_step_zmm((x), (y), vs, vpow, vw, vnneg, vn, half, lazy)
     _NV_ZMM_LOOP2(STEP, r, a, b, len);
 #undef STEP
 }
@@ -155,9 +157,12 @@ _mul_ifma50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int h
 #else
 
 /* 33 <= nu <= 50: in doubles, the product and its error with an fma, the
-   quotient rounded, the remainder in (-n, n) and corrected */
+   quotient rounded, the remainder z in (-n, n) and corrected; lazy: z + n,
+   with n folded into the constant 2^52 of the conversion (t52n = 2^52 + n,
+   one addition fewer: 1.03-1.11x, Nov 2026) */
 FLINT_FORCE_INLINE __m512i
-_mul_fp50_step_zmm(__m512i xi, __m512i yi, __m512d vn, __m512d vninv)
+_mul_fp50_step_zmm(__m512i xi, __m512i yi, __m512d vn, __m512d vninv,
+                   __m512d t52n, int lazy)
 {
     const __m512d t52 = _mm512_set1_pd(0x1.0p52);
     __m512d x = _mm512_sub_pd(_mm512_castsi512_pd(_mm512_or_si512(xi, _mm512_castpd_si512(t52))), t52);
@@ -166,16 +171,19 @@ _mul_fp50_step_zmm(__m512i xi, __m512i yi, __m512d vn, __m512d vninv)
     __m512d q = _mm512_roundscale_pd(_mm512_mul_pd(h, vninv), _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
     __m512d l = _mm512_fmsub_pd(x, y, h);
     __m512d z = _mm512_add_pd(_mm512_fnmadd_pd(q, vn, h), l);
+    if (lazy)
+        return _mm512_castpd_si512(_mm512_xor_pd(_mm512_add_pd(z, t52n), t52));
     z = _mm512_mask_add_pd(z, _mm512_cmp_pd_mask(z, _mm512_setzero_pd(), _CMP_LT_OQ), z, vn);
     return _mm512_castpd_si512(_mm512_xor_pd(_mm512_add_pd(z, t52), t52));
 }
 
 FLINT_FORCE_INLINE void
-_mul_fp50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
+_mul_fp50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int lazy)
 {
     const __m512d vn = _mm512_set1_pd((double) mod.n);
     const __m512d vninv = _mm512_set1_pd(1.0 / (double) mod.n);
-#define STEP(x, y) _mul_fp50_step_zmm((x), (y), vn, vninv)
+    const __m512d t52n = _mm512_set1_pd(0x1.0p52 + (double) mod.n);
+#define STEP(x, y) _mul_fp50_step_zmm((x), (y), vn, vninv, t52n, lazy)
     _NV_ZMM_LOOP2(STEP, r, a, b, len);
 #undef STEP
 }
@@ -189,7 +197,7 @@ _mul_fp50_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
 */
 FLINT_FORCE_INLINE __m512i
 _mul_red2bounded_step_zmm(__m512i x, __m512i y, __m512i vs, __m512i vs2, __m512i vm,
-                          __m512i vmh, __m512i vn, __m512i v2n)
+                          __m512i vmh, __m512i vn, __m512i v2n, int lazy)
 {
     __m512i lo, hi, s, q;
 #if NMOD_VEC_SIMD_VBMI2
@@ -202,12 +210,13 @@ _mul_red2bounded_step_zmm(__m512i x, __m512i y, __m512i vs, __m512i vs2, __m512i
     s = _mm512_or_si512(_mm512_sllv_epi64(hi, vs2), _mm512_srlv_epi64(lo, vs));
 #endif
     q = _mm512_srli_epi64(_nv_zmm_mulhi_lazy(s, vm, vmh), 1);
-    lo = _mm512_sub_epi64(lo, _mm512_mullo_epi64(q, vn));
-    return _nv_zmm_csub(_nv_zmm_csub(lo, v2n), vn);
+    lo = _nv_zmm_csub(_mm512_sub_epi64(lo, _mm512_mullo_epi64(q, vn)), v2n);
+    return lazy ? lo : _nv_zmm_csub(lo, vn);
 }
 
 FLINT_FORCE_INLINE void
-_mul_red2bounded_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
+_mul_red2bounded_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod,
+                     int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     const ulong m = NMOD_VEC_SIMD_M(mod);
@@ -217,13 +226,15 @@ _mul_red2bounded_zmm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
     const __m512i vmh = _nv_zmm_set1(m >> 32);
     const __m512i vs = _nv_zmm_set1(nu - 2);
     const __m512i vs2 = _nv_zmm_set1(66 - nu);
-#define STEP(x, y) _mul_red2bounded_step_zmm((x), (y), vs, vs2, vm, vmh, vn, v2n)
+#define STEP(x, y) _mul_red2bounded_step_zmm((x), (y), vs, vs2, vm, vmh, vn, v2n, lazy)
     _NV_ZMM_LOOP2(STEP, r, a, b, len);
 #undef STEP
 }
 
-static int
-_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+/* returns 0 when no kernel applies; lazy: without the last correction */
+FLINT_FORCE_INLINE int
+_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod,
+                   int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
 
@@ -234,23 +245,23 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
         int s, t, two;
         _HALFLIMB_SHIFTS(s, t, two, nu);
         if (two)
-            _mul_halflimb_zmm(res, vec1, vec2, len, mod, s, t, 1);
+            _mul_halflimb_zmm(res, vec1, vec2, len, mod, s, t, 1, lazy);
         else
-            _mul_halflimb_zmm(res, vec1, vec2, len, mod, s, t, 0);
+            _mul_halflimb_zmm(res, vec1, vec2, len, mod, s, t, 0, lazy);
     }
     else if (nu <= 50)
 #if NMOD_VEC_SIMD_IFMA
     {
         if (nu == 50)
-            _mul_ifma50_zmm(res, vec1, vec2, len, mod, 1);
+            _mul_ifma50_zmm(res, vec1, vec2, len, mod, 1, lazy);
         else
-            _mul_ifma50_zmm(res, vec1, vec2, len, mod, 0);
+            _mul_ifma50_zmm(res, vec1, vec2, len, mod, 0, lazy);
     }
 #else
-        _mul_fp50_zmm(res, vec1, vec2, len, mod);
+        _mul_fp50_zmm(res, vec1, vec2, len, mod, lazy);
 #endif
     else
-        _mul_red2bounded_zmm(res, vec1, vec2, len, mod);
+        _mul_red2bounded_zmm(res, vec1, vec2, len, mod, lazy);
     return 1;
 }
 
@@ -259,7 +270,8 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 #elif NMOD_VEC_SIMD_YMM
 
 FLINT_FORCE_INLINE slong
-_mul_halflimb_ymm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t, int two)
+_mul_halflimb_ymm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t,
+                  int two, int lazy)
 {
     const __m256i vn = _nv_ymm_set1_32(mod.n);
     const __m256i v2n = _nv_ymm_set1(2 * mod.n);
@@ -274,9 +286,9 @@ _mul_halflimb_ymm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int
         __m256i q = _mm256_srlv_epi64(_mm256_mul_epu32(_mm256_srlv_epi64(p, vs), vm), vt);
         p = _mm256_sub_epi64(p, _mm256_mul_epu32(q, vn));
         if (two)
-            p = _nv_ymm_csub_s(_nv_ymm_csub_s(p, v2n), vn);
-        else
-            p = _nv_ymm_csub_32(p, vn);
+            p = _nv_ymm_csub_s(p, v2n);
+        if (!lazy)
+            p = two ? _nv_ymm_csub_s(p, vn) : _nv_ymm_csub_32(p, vn);
         _nv_ymm_st(r + i, p);
     }
     return i;
@@ -289,28 +301,43 @@ _mul_halflimb_ymm(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int
 #if !NMOD_VEC_SIMD_ZMM && (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON)
 
 /* 33 <= nu <= 50, as _mul_fp50_step_zmm; a 4-wide step for 4 to 7 remaining
-   entries (with the 8-wide loop alone, 0.94-0.97x at 4 entries on the M4) */
+   entries (with the 8-wide loop alone, 0.94-0.97x at 4 entries on the M4);
+   lazy: z + n by _nv_st4_lazy */
 FLINT_FORCE_INLINE slong
-_mul_fp50(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
+_mul_fp50(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int lazy)
 {
     const vec8d vn = vec8d_set_d((double) mod.n);
     const vec8d vninv = vec8d_set_d(1.0 / (double) mod.n);
+    const vec4d t52n = vec4d_set_d(0x1.0p52 + (double) mod.n);
     slong i;
 
     for (i = 0; i + 8 <= len; i += 8)
     {
         vec8d x = vec8n_convert_limited_vec8d(vec8n_load_unaligned(a + i));
         vec8d y = vec8n_convert_limited_vec8d(vec8n_load_unaligned(b + i));
-        vec8d z = vec8d_reduce_pm1no_to_0n(vec8d_mulmod(x, y, vn, vninv), vn);
-        vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z.e1));
-        vec4n_store_unaligned(r + i + 4, vec4d_convert_limited_vec4n(z.e2));
+        vec8d z = vec8d_mulmod(x, y, vn, vninv);
+        if (lazy)
+        {
+            _nv_st4_lazy(r + i, z.e1, vn.e1, t52n);
+            _nv_st4_lazy(r + i + 4, z.e2, vn.e1, t52n);
+        }
+        else
+        {
+            z = vec8d_reduce_pm1no_to_0n(z, vn);
+            vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z.e1));
+            vec4n_store_unaligned(r + i + 4, vec4d_convert_limited_vec4n(z.e2));
+        }
     }
     if (i + 4 <= len)
     {
         vec4d x = vec4n_convert_limited_vec4d(vec4n_load_unaligned(a + i));
         vec4d y = vec4n_convert_limited_vec4d(vec4n_load_unaligned(b + i));
-        vec4d z = vec4d_reduce_pm1no_to_0n(vec4d_mulmod(x, y, vn.e1, vninv.e1), vn.e1);
-        vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(z));
+        vec4d z = vec4d_mulmod(x, y, vn.e1, vninv.e1);
+        if (lazy)
+            _nv_st4_lazy(r + i, z, vn.e1, t52n);
+        else
+            vec4n_store_unaligned(r + i, vec4d_convert_limited_vec4n(
+                                      vec4d_reduce_pm1no_to_0n(z, vn.e1)));
         i += 4;
     }
     return i;
@@ -320,8 +347,9 @@ _mul_fp50(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod)
 
 #if NMOD_VEC_SIMD_YMM && !NMOD_VEC_SIMD_ZMM
 
-static int
-_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+FLINT_FORCE_INLINE int
+_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod,
+                   int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     slong i;
@@ -333,12 +361,12 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
         int s, t, two;
         _HALFLIMB_SHIFTS(s, t, two, nu);
         if (two)
-            i = _mul_halflimb_ymm(res, vec1, vec2, len, mod, s, t, 1);
+            i = _mul_halflimb_ymm(res, vec1, vec2, len, mod, s, t, 1, lazy);
         else
-            i = _mul_halflimb_ymm(res, vec1, vec2, len, mod, s, t, 0);
+            i = _mul_halflimb_ymm(res, vec1, vec2, len, mod, s, t, 0, lazy);
     }
     else
-        i = _mul_fp50(res, vec1, vec2, len, mod);
+        i = _mul_fp50(res, vec1, vec2, len, mod, lazy);
     _mul_tail(res, vec1, vec2, i, len, mod);
     return 1;
 }
@@ -354,7 +382,8 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
         (p) = vmlsl_u32((p), vmovn_u64(vshlq_u64(vmull_u32(vmovn_u64(vshlq_u64((p), vs)), vm), vt)), vnl); \
         if (two) \
             (p) = _nv_neon_csub((p), v2n); \
-        (p) = _nv_neon_csub((p), vn); \
+        if (!lazy) \
+            (p) = _nv_neon_csub((p), vn); \
     } while (0)
 
 #define _MUL_HALFLIMB_CONSTS_NEON \
@@ -366,7 +395,8 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
     const int64x2_t vt = vdupq_n_s64(-(int64_t) t)
 
 FLINT_FORCE_INLINE slong
-_mul_halflimb_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t, int two)
+_mul_halflimb_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t,
+                   int two, int lazy)
 {
     _MUL_HALFLIMB_CONSTS_NEON;
     slong i;
@@ -385,7 +415,8 @@ _mul_halflimb_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, in
 /* the same, by blocks of 8: 4 entries in NEON and 4 with NMOD_RED (the
    product fits one word) */
 FLINT_FORCE_INLINE slong
-_mul_halflimb_hybrid_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t, int two)
+_mul_halflimb_hybrid_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s,
+                          int t, int two, int lazy)
 {
     _MUL_HALFLIMB_CONSTS_NEON;
     slong i, k;
@@ -405,18 +436,20 @@ _mul_halflimb_hybrid_neon(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t 
 
 /* the hybrid loop from NMOD_VEC_SIMD_HYBRID_MIN entries, then the NEON one */
 FLINT_FORCE_INLINE slong
-_mul_halflimb_neon_all(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s, int t, int two)
+_mul_halflimb_neon_all(nn_ptr r, nn_srcptr a, nn_srcptr b, slong len, nmod_t mod, int s,
+                       int t, int two, int lazy)
 {
     slong i = 0;
     if (len >= NMOD_VEC_SIMD_HYBRID_MIN)
-        i = _mul_halflimb_hybrid_neon(r, a, b, len, mod, s, t, two);
-    return i + _mul_halflimb_neon(r + i, a + i, b + i, len - i, mod, s, t, two);
+        i = _mul_halflimb_hybrid_neon(r, a, b, len, mod, s, t, two, lazy);
+    return i + _mul_halflimb_neon(r + i, a + i, b + i, len - i, mod, s, t, two, lazy);
 }
 
 /* above 50 bits the scalar code (the bounded loop of #2950 up to 62 bits,
    1.1-1.2x faster than nmod_mul on the M4) */
-static int
-_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+FLINT_FORCE_INLINE int
+_nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod,
+                   int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     slong i;
@@ -428,12 +461,12 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
         int s, t, two;
         _HALFLIMB_SHIFTS(s, t, two, nu);
         if (two)
-            i = _mul_halflimb_neon_all(res, vec1, vec2, len, mod, s, t, 1);
+            i = _mul_halflimb_neon_all(res, vec1, vec2, len, mod, s, t, 1, lazy);
         else
-            i = _mul_halflimb_neon_all(res, vec1, vec2, len, mod, s, t, 0);
+            i = _mul_halflimb_neon_all(res, vec1, vec2, len, mod, s, t, 0, lazy);
     }
     else
-        i = _mul_fp50(res, vec1, vec2, len, mod);
+        i = _mul_fp50(res, vec1, vec2, len, mod, lazy);
     _mul_tail(res, vec1, vec2, i, len, mod);
     return 1;
 }
@@ -443,7 +476,18 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 void _nmod_vec_mul(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_mul_simd(res, vec1, vec2, len, mod))
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 0))
+        return;
+#endif
+    _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);
+}
+
+/* the scalar code reduces fully, which is also in [0, 2n) */
+void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+{
+    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 1))
         return;
 #endif
     _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);

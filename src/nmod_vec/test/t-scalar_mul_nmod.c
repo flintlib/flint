@@ -51,18 +51,20 @@ _smul_modulus(flint_rand_t state, int nu, int k)
 
 #define SMUL_MAXLEN 160
 
-/* scalar_mul and scalar_addmul against nmod_mul and nmod_add: every bit
-   size, c at the corners, lengths 0 to 3 vectors of 8 words plus a tail
-   and around the peeling threshold of 128, offsets 0, 1, 2 and 7 words
-   from a 64-byte boundary, in place and not; the words around the output
-   must not change; returns 0 on success */
+/* scalar_mul and scalar_addmul, and their lazy variants up to 62 bits,
+   against nmod_mul and nmod_add: every bit size, c at the corners, lengths
+   0 to 3 vectors of 8 words plus a tail and around the peeling threshold of
+   128, offsets 0, 1, 2 and 7 words from a 64-byte boundary, in place and
+   not; the lazy outputs must be below 2n, and the lazy scalar_addmul gets
+   res in [0, 2n) (reduced in place, where it is also the input vec); the
+   words around the output must not change; returns 0 on success */
 static int
 _smul_check_all(flint_rand_t state)
 {
     const ulong guard = UWORD_MAX / 3;
     nn_ptr a, r, r0, want;
     slong i, len, off;
-    int nu, k, ci, add, inplace, bad = 0;
+    int nu, k, ci, add, inplace, lazy, bad = 0;
 
     a = flint_aligned_alloc(64, (SMUL_MAXLEN + 16) * sizeof(ulong));
     r = flint_aligned_alloc(64, (SMUL_MAXLEN + 16) * sizeof(ulong));
@@ -76,15 +78,16 @@ _smul_check_all(flint_rand_t state)
         ulong n = _smul_modulus(state, nu, k);
         nmod_init(&mod, n);
 
-        for (ci = 0; ci < 4; ci++)
+        for (ci = 0; ci < 6; ci++)
         {
             ulong c = (ci == 0) ? 2 % n : (ci == 1) ? n - 2 : (ci == 2) ? n / 2
-                                                    : n_randint(state, n);
+                    : (ci == 3) ? n_randint(state, n) : (ci == 4) ? 1 : n - 1;
 
             for (len = 0; len <= 140; len += (len < 35 || len >= 120) ? 1 : 17)
             for (off = 0; off < 8; off += (off < 2) ? 1 : 5)
             for (add = 0; add < 2; add++)
             for (inplace = 0; inplace < 2; inplace++)
+            for (lazy = 0; lazy < 1 + (nu <= 62); lazy++)
             {
                 nn_srcptr src = inplace ? r + off : a + off;
 
@@ -92,6 +95,9 @@ _smul_check_all(flint_rand_t state)
                 {
                     a[i] = guard;
                     r[i] = (add && i >= off && i < off + len) ? _smul_residue(state, n) : guard;
+                    if (add && lazy && !inplace && i >= off && i < off + len
+                            && n_randint(state, 2))
+                        r[i] += n;
                 }
                 for (i = 0; i < len; i++)
                 {
@@ -104,25 +110,31 @@ _smul_check_all(flint_rand_t state)
                     ulong x = inplace ? r[off + i] : a[off + i];
                     want[i] = nmod_mul(x, c, mod);
                     if (add)
-                        want[i] = nmod_add(want[i], r[off + i], mod);
+                        want[i] = nmod_add(want[i], r[off + i] % n, mod);
                 }
                 for (i = 0; i < SMUL_MAXLEN + 16; i++)
                     r0[i] = r[i];
 
-                if (add)
+                if (add && lazy)
+                    _nmod_vec_scalar_addmul_nmod_lazy(r + off, src, len, c, mod);
+                else if (add)
                     _nmod_vec_scalar_addmul_nmod(r + off, src, len, c, mod);
+                else if (lazy)
+                    _nmod_vec_scalar_mul_nmod_lazy(r + off, src, len, c, mod);
                 else
                     _nmod_vec_scalar_mul_nmod(r + off, src, len, c, mod);
 
                 for (i = 0; i < SMUL_MAXLEN + 16; i++)
                 {
-                    ulong w = (i >= off && i < off + len) ? want[i - off] : r0[i];
-                    if (r[i] != w && !bad)
+                    int in = (i >= off && i < off + len);
+                    ulong w = in ? want[i - off] : r0[i];
+                    int good = (in && lazy) ? (r[i] / 2 < n && r[i] % n == w) : (r[i] == w);
+                    if (!good && !bad)
                     {
-                        flint_printf("%s: nu = %d, n = %wu, c = %wu, len = %wd, "
+                        flint_printf("%s%s: nu = %d, n = %wu, c = %wu, len = %wd, "
                                      "off = %wd, in place %d, i = %wd\n",
-                                     add ? "addmul" : "mul", nu, n, c, len, off,
-                                     inplace, i - off);
+                                     add ? "addmul" : "mul", lazy ? "_lazy" : "", nu, n, c,
+                                     len, off, inplace, i - off);
                         bad = 1;
                     }
                 }
@@ -142,7 +154,7 @@ TEST_FUNCTION_START(nmod_vec_scalar_mul_nmod, state)
     int i, result;
 
     if (_smul_check_all(state))
-        TEST_FUNCTION_FAIL("scalar_mul / scalar_addmul: wrong result (see above)\n");
+        TEST_FUNCTION_FAIL("scalar_mul / scalar_addmul (lazy or not): wrong result (see above)\n");
 
     {
         nmod_t mod;

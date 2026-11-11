@@ -18,6 +18,7 @@ typedef struct
 {
    flint_bitcnt_t bits;
    slong len;
+   int lazy;
 } info_t;
 
 void sample(void * arg, ulong count)
@@ -41,8 +42,12 @@ void sample(void * arg, ulong count)
    nmod_init(&mod, n);
 
    prof_start();
-   for (i = 0; i < count; i++)
-      _nmod_vec_reduce(vec2, vec, len, mod);
+   if (info->lazy)
+      for (i = 0; i < count; i++)
+         _nmod_vec_reduce_lazy(vec2, vec, len, mod);
+   else
+      for (i = 0; i < count; i++)
+         _nmod_vec_reduce(vec2, vec, len, mod);
    prof_stop();
 
    _nmod_vec_clear(vec);
@@ -52,13 +57,14 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-   double min, max;
+   double min, minl, max;
    info_t info;
    flint_bitcnt_t i;
    slong lens[4] = {8, 32, 256, 1000};
    int k;
 
-   flint_printf("cycles per entry (c/l), random words, by bit size of n and length\n");
+   flint_printf("cycles per entry (c/l), random words, by bit size of n and length;\n"
+                "up to 62 bits, then _nmod_vec_reduce_lazy\n");
    for (i = 2; i <= FLINT_BITS; i++)
    {
       info.bits = i;
@@ -66,9 +72,16 @@ int main(void)
       for (k = 0; k < 4; k++)
       {
          info.len = lens[k];
+         info.lazy = 0;
          prof_repeat(&min, &max, sample, (void *) &info);
          flint_printf("  len %4wd %5.2lf", lens[k],
                (min / (double) FLINT_CLOCK_SCALE_FACTOR) / lens[k]);
+         if (i <= 62)
+         {
+            info.lazy = 1;
+            prof_repeat(&minl, &max, sample, (void *) &info);
+            flint_printf(" %5.2lf", (minl / (double) FLINT_CLOCK_SCALE_FACTOR) / lens[k]);
+         }
       }
       flint_printf("\n");
    }

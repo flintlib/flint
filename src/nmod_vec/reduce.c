@@ -33,6 +33,9 @@
         then a coarser Barrett step; two corrections (2n, then n).
         NMOD2_RED2 would instead reduce the high half, then take a
         Moller-Granlund step.
+    _nmod_vec_reduce_lazy (n < 2^62) skips the last correction of each
+    kernel, so its outputs are in [0, 2n): 1.11-1.64x on long vectors
+    (Nov 2026).
     The Barrett step of NMOD_RED itself, with the 64 x 64 high product
     emulated in SIMD, ran 1.3-1.6x slower than these (Nov 2026).
 */
@@ -76,22 +79,23 @@ _reduce_tail(nn_ptr res, nn_srcptr vec, slong i, slong len, nmod_t mod)
     slower on Zen 4.
 */
 FLINT_FORCE_INLINE __m512i
-_reduce_top32_step_zmm(__m512i x, __m512i vm, __m512i vs, __m512i vn, int two)
+_reduce_top32_step_zmm(__m512i x, __m512i vm, __m512i vs, __m512i vn, int two,
+                       int lazy)
 {
     __m512i q = _mm512_srlv_epi64(_mm512_mul_epu32(_mm512_shuffle_epi32(x, 0xB1), vm), vs);
     x = _mm512_sub_epi64(x, _mm512_mullo_epi64(q, vn));
     if (two)
         x = _nv_zmm_csub(x, vn);
-    return _nv_zmm_csub(x, vn);
+    return lazy ? x : _nv_zmm_csub(x, vn);
 }
 
 FLINT_FORCE_INLINE void
-_reduce_top32_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two)
+_reduce_top32_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two, int lazy)
 {
     const __m512i vn = _nv_zmm_set1(mod.n);
     const __m512i vm = _nv_zmm_set1(NMOD_VEC_SIMD_M(mod) >> 32);
     const __m512i vs = _nv_zmm_set1(FLINT_BITS - 1 - mod.norm);
-#define STEP(x) _reduce_top32_step_zmm((x), vm, vs, vn, two)
+#define STEP(x) _reduce_top32_step_zmm((x), vm, vs, vn, two, lazy)
     _NV_ZMM_LOOP1(STEP, r, a, len);
 #undef STEP
 }
@@ -107,17 +111,17 @@ _reduce_fullword_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
 
 FLINT_FORCE_INLINE __m512i
 _reduce_fold29_step_zmm(__m512i x, __m512i vsh, __m512i vc, __m512i vmask,
-                        __m512i vs, __m512i vm, __m512i vn)
+                        __m512i vs, __m512i vm, __m512i vn, int lazy)
 {
     __m512i t = _mm512_add_epi64(_mm512_mul_epu32(_mm512_srlv_epi64(x, vsh), vc),
                                  _mm512_and_si512(x, vmask));
     __m512i q = _mm512_srli_epi64(_mm512_mul_epu32(_mm512_srlv_epi64(t, vs), vm), 33);
     t = _mm512_sub_epi64(t, _mm512_mul_epu32(q, vn));
-    return _nv_zmm_csub(t, vn);
+    return lazy ? t : _nv_zmm_csub(t, vn);
 }
 
 FLINT_FORCE_INLINE void
-_reduce_fold29_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
+_reduce_fold29_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     ulong c;
@@ -129,14 +133,15 @@ _reduce_fold29_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
         const __m512i vm = _nv_zmm_set1(NMOD_VEC_SIMD_M(mod) >> 32);
         const __m512i vsh = _nv_zmm_set1(nu + 29);
         const __m512i vs = _nv_zmm_set1(nu - 2);
-#define STEP(x) _reduce_fold29_step_zmm((x), vsh, vc, vmask, vs, vm, vn)
+#define STEP(x) _reduce_fold29_step_zmm((x), vsh, vc, vmask, vs, vm, vn, lazy)
         _NV_ZMM_LOOP1(STEP, r, a, len);
 #undef STEP
     }
 }
 
 FLINT_FORCE_INLINE __m512i
-_reduce_fold32_step_zmm(__m512i x, __m512i vc, __m512i vmp, __m512i vs, __m512i vn, __m512i v2n)
+_reduce_fold32_step_zmm(__m512i x, __m512i vc, __m512i vmp, __m512i vs, __m512i vn,
+                        __m512i v2n, int lazy)
 {
     const __m512i lo = _mm512_set1_epi64(0xFFFFFFFF);
     __m512i t = _mm512_add_epi64(_mm512_mul_epu32(_mm512_shuffle_epi32(x, 0xB1), vc),
@@ -144,11 +149,12 @@ _reduce_fold32_step_zmm(__m512i x, __m512i vc, __m512i vmp, __m512i vs, __m512i 
     __m512i s = _mm512_srlv_epi64(t, vs);
     __m512i q = _mm512_add_epi64(s, _mm512_srli_epi64(_mm512_mul_epu32(s, vmp), 32));
     t = _mm512_sub_epi64(t, _mm512_mul_epu32(q, vn));
-    return _nv_zmm_csub(_nv_zmm_csub(t, v2n), vn);
+    t = _nv_zmm_csub(t, v2n);
+    return lazy ? t : _nv_zmm_csub(t, vn);
 }
 
 FLINT_FORCE_INLINE void
-_reduce_fold32_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
+_reduce_fold32_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int lazy)
 {
     ulong c;
     NMOD_RED(c, UWORD(1) << 32, mod);
@@ -158,28 +164,28 @@ _reduce_fold32_zmm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
         const __m512i vc = _nv_zmm_set1(c);
         const __m512i vmp = _nv_zmm_set1((NMOD_VEC_SIMD_M(mod) >> 31) - (UWORD(1) << 32));
         const __m512i vs = _nv_zmm_set1(FLINT_BITS - mod.norm);
-#define STEP(x) _reduce_fold32_step_zmm((x), vc, vmp, vs, vn, v2n)
+#define STEP(x) _reduce_fold32_step_zmm((x), vc, vmp, vs, vn, v2n, lazy)
         _NV_ZMM_LOOP1(STEP, r, a, len);
 #undef STEP
     }
 }
 
-/* returns 0 when no kernel applies */
-static int
-_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+/* returns 0 when no kernel applies; lazy (nu <= 62): without the last correction */
+FLINT_FORCE_INLINE int
+_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
 
     if (nu == 64)
         _reduce_fullword_zmm(res, vec, len, mod);
     else if (nu >= 34)
-        _reduce_top32_zmm(res, vec, len, mod, 0);
+        _reduce_top32_zmm(res, vec, len, mod, 0, lazy);
     else if (nu == 33)
-        _reduce_top32_zmm(res, vec, len, mod, 1);
+        _reduce_top32_zmm(res, vec, len, mod, 1, lazy);
     else if (nu >= 6)
-        _reduce_fold29_zmm(res, vec, len, mod);
+        _reduce_fold29_zmm(res, vec, len, mod, lazy);
     else if (nu >= 2)
-        _reduce_fold32_zmm(res, vec, len, mod);
+        _reduce_fold32_zmm(res, vec, len, mod, lazy);
     else
         return 0;
     return 1;
@@ -192,10 +198,11 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 /*
     nu >= 33: q n as two vpmuludq (q < 2^32); mode 0: 34 <= nu <= 62,
     1: nu = 33 (two corrections), 2: nu = 63 (the remainder may exceed
-    2^63: unsigned comparison)
+    2^63: unsigned comparison); lazy (modes 0 and 1): without the last
+    correction
 */
 FLINT_FORCE_INLINE slong
-_reduce_top32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int mode)
+_reduce_top32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int mode, int lazy)
 {
     const __m256i vn = _nv_ymm_set1(mod.n);
     const __m256i vnl = _nv_ymm_set1_32(mod.n);
@@ -217,7 +224,8 @@ _reduce_top32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int mode)
         {
             if (mode == 1)
                 x = _nv_ymm_csub_s(x, vn);
-            x = _nv_ymm_csub_s(x, vn);
+            if (!lazy)
+                x = _nv_ymm_csub_s(x, vn);
         }
         _nv_ymm_st(r + i, x);
     }
@@ -239,7 +247,7 @@ _reduce_fullword_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
 
 /* 6 <= nu <= 32; c32: nu <= 31, the correction on 32-bit lanes */
 FLINT_FORCE_INLINE slong
-_reduce_fold29_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int c32)
+_reduce_fold29_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int c32, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     ulong c;
@@ -260,7 +268,8 @@ _reduce_fold29_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int c32)
                                          _mm256_and_si256(x, vmask));
             __m256i q = _mm256_srli_epi64(_mm256_mul_epu32(_mm256_srlv_epi64(t, vs), vm), 33);
             t = _mm256_sub_epi64(t, _mm256_mul_epu32(q, vn));
-            t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
+            if (!lazy)
+                t = c32 ? _nv_ymm_csub_32(t, vn) : _nv_ymm_csub_s(t, vn);
             _nv_ymm_st(r + i, t);
         }
     }
@@ -269,7 +278,7 @@ _reduce_fold29_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int c32)
 
 /* 2 <= nu <= 5 */
 FLINT_FORCE_INLINE slong
-_reduce_fold32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
+_reduce_fold32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int lazy)
 {
     ulong c;
     slong i;
@@ -290,15 +299,17 @@ _reduce_fold32_ymm(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
             __m256i s = _mm256_srlv_epi64(t, vs);
             __m256i q = _mm256_add_epi64(s, _mm256_srli_epi64(_mm256_mul_epu32(s, vmp), 32));
             t = _mm256_sub_epi64(t, _mm256_mul_epu32(q, vn));
-            t = _nv_ymm_csub_s(_nv_ymm_csub_s(t, v2n), vn);
+            t = _nv_ymm_csub_s(t, v2n);
+            if (!lazy)
+                t = _nv_ymm_csub_s(t, vn);
             _nv_ymm_st(r + i, t);
         }
     }
     return i;
 }
 
-static int
-_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+FLINT_FORCE_INLINE int
+_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     slong i;
@@ -306,17 +317,17 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
     if (nu == 64)
         i = _reduce_fullword_ymm(res, vec, len, mod);
     else if (nu == 63)
-        i = _reduce_top32_ymm(res, vec, len, mod, 2);
+        i = _reduce_top32_ymm(res, vec, len, mod, 2, 0);
     else if (nu >= 34)
-        i = _reduce_top32_ymm(res, vec, len, mod, 0);
+        i = _reduce_top32_ymm(res, vec, len, mod, 0, lazy);
     else if (nu == 33)
-        i = _reduce_top32_ymm(res, vec, len, mod, 1);
-    else if (nu == 32)
-        i = _reduce_fold29_ymm(res, vec, len, mod, 0);
+        i = _reduce_top32_ymm(res, vec, len, mod, 1, lazy);
+    else if (nu == 32 || (lazy && nu >= 6))
+        i = _reduce_fold29_ymm(res, vec, len, mod, 0, lazy);
     else if (nu >= 6)
-        i = _reduce_fold29_ymm(res, vec, len, mod, 1);
+        i = _reduce_fold29_ymm(res, vec, len, mod, 1, 0);
     else if (nu >= 2)
-        i = _reduce_fold32_ymm(res, vec, len, mod);
+        i = _reduce_fold32_ymm(res, vec, len, mod, lazy);
     else
         return 0;
     _reduce_tail(res, vec, i, len, mod);
@@ -327,9 +338,10 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
 #elif NMOD_VEC_SIMD_NEON
 
-/* 33 <= nu <= 63, four entries per step; two: nu = 33 */
+/* 33 <= nu <= 63, four entries per step; two: nu = 33; lazy (nu <= 62):
+   without the last correction, here and below */
 FLINT_FORCE_INLINE slong
-_reduce_top32_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two)
+_reduce_top32_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two, int lazy)
 {
     const uint64x2_t vn = vdupq_n_u64(mod.n);
     const uint32x2_t vnl = vdup_n_u32((uint32_t) mod.n);
@@ -350,15 +362,21 @@ _reduce_top32_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two)
             x0 = _nv_neon_csub(x0, vn);
             x1 = _nv_neon_csub(x1, vn);
         }
-        _nv_neon_st(r + i, _nv_neon_csub(x0, vn));
-        _nv_neon_st(r + i + 2, _nv_neon_csub(x1, vn));
+        if (!lazy)
+        {
+            x0 = _nv_neon_csub(x0, vn);
+            x1 = _nv_neon_csub(x1, vn);
+        }
+        _nv_neon_st(r + i, x0);
+        _nv_neon_st(r + i + 2, x1);
     }
     return i;
 }
 
 /* the same, by blocks of 8: 4 entries in NEON and 4 with NMOD_RED */
 FLINT_FORCE_INLINE slong
-_reduce_top32_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two)
+_reduce_top32_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two,
+                          int lazy)
 {
     const uint64x2_t vn = vdupq_n_u64(mod.n);
     const uint32x2_t vnl = vdup_n_u32((uint32_t) mod.n);
@@ -379,8 +397,13 @@ _reduce_top32_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int two)
             x0 = _nv_neon_csub(x0, vn);
             x1 = _nv_neon_csub(x1, vn);
         }
-        _nv_neon_st(r + i, _nv_neon_csub(x0, vn));
-        _nv_neon_st(r + i + 2, _nv_neon_csub(x1, vn));
+        if (!lazy)
+        {
+            x0 = _nv_neon_csub(x0, vn);
+            x1 = _nv_neon_csub(x1, vn);
+        }
+        _nv_neon_st(r + i, x0);
+        _nv_neon_st(r + i + 2, x1);
         for (k = 4; k < 8; k++)
             NMOD_RED(r[i + k], a[i + k], mod);
     }
@@ -407,7 +430,8 @@ _reduce_fullword_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
         (t) = vmlal_u32(vandq_u64((x), vmask), vmovn_u64(vshlq_u64((x), vsh)), vc); \
         _q = vshrn_n_u64(vmull_u32(vmovn_u64(vshlq_u64((t), vs)), vm), 32); \
         (t) = vmlsl_u32((t), vshr_n_u32(_q, 1), vnl); \
-        (t) = _nv_neon_csub((t), vn); \
+        if (!lazy) \
+            (t) = _nv_neon_csub((t), vn); \
     } while (0)
 
 #define _REDUCE_FOLD29_CONSTS_NEON \
@@ -426,7 +450,7 @@ _reduce_fullword_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
     vs = vdupq_n_s64(-(int64_t) (nu - 2))
 
 FLINT_FORCE_INLINE slong
-_reduce_fold29_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
+_reduce_fold29_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int lazy)
 {
     slong i;
     _REDUCE_FOLD29_CONSTS_NEON;
@@ -444,7 +468,7 @@ _reduce_fold29_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
 
 /* the same, by blocks of 8: 4 entries in NEON and 4 with NMOD_RED */
 FLINT_FORCE_INLINE slong
-_reduce_fold29_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
+_reduce_fold29_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod, int lazy)
 {
     slong i, k;
     _REDUCE_FOLD29_CONSTS_NEON;
@@ -468,8 +492,8 @@ _reduce_fold29_hybrid_neon(nn_ptr r, nn_srcptr a, slong len, nmod_t mod)
     entries, then the NEON loops do the rest (the hybrid alone with the
     scalar tail ran at 0.71x at 4 entries).
 */
-static int
-_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+FLINT_FORCE_INLINE int
+_nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy)
 {
     const int nu = FLINT_BITS - mod.norm;
     slong i = 0;
@@ -481,20 +505,20 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
     else if (nu >= 34)
     {
         if (len >= NMOD_VEC_SIMD_HYBRID_MIN)
-            i = _reduce_top32_hybrid_neon(res, vec, len, mod, 0);
-        i += _reduce_top32_neon(res + i, vec + i, len - i, mod, 0);
+            i = _reduce_top32_hybrid_neon(res, vec, len, mod, 0, lazy);
+        i += _reduce_top32_neon(res + i, vec + i, len - i, mod, 0, lazy);
     }
     else if (nu == 33)
     {
         if (len >= NMOD_VEC_SIMD_HYBRID_MIN)
-            i = _reduce_top32_hybrid_neon(res, vec, len, mod, 1);
-        i += _reduce_top32_neon(res + i, vec + i, len - i, mod, 1);
+            i = _reduce_top32_hybrid_neon(res, vec, len, mod, 1, lazy);
+        i += _reduce_top32_neon(res + i, vec + i, len - i, mod, 1, lazy);
     }
     else
     {
         if (len >= NMOD_VEC_SIMD_HYBRID_MIN)
-            i = _reduce_fold29_hybrid_neon(res, vec, len, mod);
-        i += _reduce_fold29_neon(res + i, vec + i, len - i, mod);
+            i = _reduce_fold29_hybrid_neon(res, vec, len, mod, lazy);
+        i += _reduce_fold29_neon(res + i, vec + i, len - i, mod, lazy);
     }
     _reduce_tail(res, vec, i, len, mod);
     return 1;
@@ -505,7 +529,18 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 {
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_reduce_simd(res, vec, len, mod))
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_reduce_simd(res, vec, len, mod, 0))
+        return;
+#endif
+    _nmod_vec_reduce_scalar(res, vec, len, mod);
+}
+
+/* the scalar code reduces fully, which is also in [0, 2n) */
+void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+{
+    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_reduce_simd(res, vec, len, mod, 1))
         return;
 #endif
     _nmod_vec_reduce_scalar(res, vec, len, mod);

@@ -71,6 +71,13 @@ void sample(void * arg, ulong count)
          _nmod_vec_mul(res, vec1, vec2, 1000, mod);
       prof_stop();
       break;
+
+   case 3:
+      prof_start();
+      for (i = 0; i < count; i++)
+         _nmod_vec_mul_lazy(res, vec1, vec2, 1000, mod);
+      prof_stop();
+      break;
    }
 
    _nmod_vec_clear(vec1);
@@ -80,7 +87,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-   double min1, min2, min3, max;
+   double min1, min2, min3, min4, max;
    info_t info;
    flint_bitcnt_t i;
 
@@ -93,7 +100,16 @@ int main(void)
       info.fullword = 2;
       prof_repeat(&min3, &max, sample, (void *) &info);
 
-      if (i != FLINT_BITS)
+      if (i <= 62)
+      {
+        info.fullword = 3;
+        prof_repeat(&min4, &max, sample, (void *) &info);
+        flint_printf("bits %wd, mul = %.1lf c/l, _nmod_vec_mul = %.2lf c/l, _lazy = %.2lf c/l\n",
+           i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+      }
+      else if (i != FLINT_BITS)
       {
         flint_printf("bits %wd, mul = %.1lf c/l, _nmod_vec_mul = %.2lf c/l\n",
            i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
