@@ -54,7 +54,7 @@ for non-integer $\nu$. At integer $\nu = n$, $K_n$ is computed as a
 limit with power series in $\nu$ (`acb_hypgeom_bessel_k_0f1_series`),
 and $Y_n(z) = -\frac{2}{\pi}(i^n K_n(iz) + [\log(iz) - \log z] J_n(z))$.
 
-**Choice of method.** `acb_hypgeom_bessel_j` uses the convergent series
+**Choice of method.** `acb_hypgeom_bessel_j_nointegration` uses the convergent series
 for $|z| < 8$, and the asymptotic expansion for $|z| \ge 2^{64}$ or
 $2|z| \ge p$; the asymptotic expansion of $U^*$ reaches about
 $(1 + \log 2)/\log 2 \cdot |z| \approx 2.44|z|$ bits for small $\nu$,
@@ -64,9 +64,15 @@ estimated cancellation. The terms of the ${}_0F_1$ series for
 $J_\nu(x + yi)$ grow to about $e^{|z|}$ while the function has size
 about $e^{|y|}$, so about $(|z| - |y|)/\log 2$ bits are lost; no
 precision is added when the terms do not cancel (purely imaginary $z$
-with real $\nu > 0$ or integer $\nu$, or $\nu > |z|^2/4$). The modified
-functions $I_\nu$ and $K_\nu$ use the series for $|z| < 16$ and for
-$2|z| < p$, and the asymptotic expansion otherwise.
+with real $\nu > 0$ or integer $\nu$, or $\nu > |z|^2/4$). For large
+$|\nu|$ the terms $(z^2/4)^k / (k! (\nu+1)_k)$ grow less than this
+before they start to decrease, and the precision is raised only by
+their actual growth, which is estimated in double precision. The
+modified functions $I_\nu$ and $K_\nu$ use the series for $|z| < 16$
+and for $2|z| < p$, and the asymptotic expansion otherwise. In all
+cases the asymptotic expansion is used only if it can reach $p$ bits,
+which for large $|\nu|$ requires about $2.9 \sqrt{|z| (|z| - 2
+|\nu|)} \ge p$; otherwise the series is used.
 
 **Propagated error.** For inexact $z$ and integer $\nu$, $J_\nu$ is
 evaluated at the midpoint and the error is bounded with
@@ -75,12 +81,25 @@ $|J_n^{(d)}(z)| \le e^{|\operatorname{Im} z|}$; this avoids the large
 overestimation that ball arithmetic produces when a wide ball is pushed
 through a series with cancellation. When the resulting enclosure is
 still poor, it is intersected with the direct bound for $|J_\nu(z)|$.
+The automatic functions do the same for all four Bessel functions and
+any exact $\nu$, with the derivative bounded through the differential
+equation ([](algorithms/special-functions/steepest-descent#choice)).
 
-**Large orders and integration.** For real $\nu$ and $z$, if the result
-has less than half the target accuracy (typically because $\nu$ is
-large compared to $z$ and the precision), `acb_hypgeom_bessel_i` and
-`acb_hypgeom_bessel_k` retry with rigorous numerical integration of an
-integral representation (`arb_hypgeom_bessel_i_integration`,
+**Large orders and integration.** When $\nu$ and $z$ are both large
+and of comparable size, neither the series nor the asymptotic
+expansion is efficient, and for wide input balls the series loses
+accuracy to its cancellation. The automatic functions
+`acb_hypgeom_bessel_j`, `acb_hypgeom_bessel_y`, `acb_hypgeom_bessel_i`
+and `acb_hypgeom_bessel_k` therefore combine the methods of this
+section, which are available separately as
+`acb_hypgeom_bessel_j_nointegration` and so on, with rigorous
+numerical integration of the Schläfli integral along steepest-descent
+contours and with derivative bounds from the same contours; this is
+the subject of [](algorithms/special-functions/steepest-descent). For
+real parameters too large for that method ($\ge 2^{44}$),
+`acb_hypgeom_bessel_i` and `acb_hypgeom_bessel_k` still fall back on
+the real integral representations
+(`arb_hypgeom_bessel_i_integration`,
 `arb_hypgeom_bessel_k_integration`).
 
 **Power series.** The Taylor expansion of $J_\nu$ at a point $z_0 \ne
@@ -255,7 +274,11 @@ coefficients.
   `acb_hypgeom_bessel_k` and their scaled versions, with the methods
   `acb_hypgeom_bessel_j_0f1`, `acb_hypgeom_bessel_j_asymp`,
   `acb_hypgeom_bessel_i_0f1`, `acb_hypgeom_bessel_i_asymp`,
-  `acb_hypgeom_bessel_k_0f1`, `acb_hypgeom_bessel_k_asymp`; the real
+  `acb_hypgeom_bessel_k_0f1`, `acb_hypgeom_bessel_k_asymp`,
+  `acb_hypgeom_bessel_h1_asymp`, `acb_hypgeom_bessel_h2_asymp`, the
+  combinations of these without integration
+  (`acb_hypgeom_bessel_j_nointegration` and so on) and the integration
+  ([](algorithms/special-functions/steepest-descent)); the real
   wrappers in [`arb_hypgeom`](arb_hypgeom); the generic
   `gr_bessel_j_jet` and `_gr_poly_bessel_j_series`.
 - ${}_0F_1$: `acb_hypgeom_0f1` uses the Bessel connection formulas for

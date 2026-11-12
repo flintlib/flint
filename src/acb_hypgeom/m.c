@@ -13,6 +13,7 @@
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 void
 acb_hypgeom_m_asymp(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
@@ -298,8 +299,8 @@ acb_hypgeom_m_choose(int * asymp, int * kummer, slong * wp,
     }
 }
 
-static void
-acb_hypgeom_m_nointegration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
+void
+_acb_hypgeom_m_nointegration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
 {
     int asymp, kummer;
     slong wp;
@@ -326,7 +327,7 @@ acb_hypgeom_m(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regula
 
     acb_init(res2);
 
-    acb_hypgeom_m_nointegration(res2, a, b, z, regularized, prec);
+    _acb_hypgeom_m_nointegration(res2, a, b, z, regularized, prec);
 
     acc = acb_rel_accuracy_bits(res2);
 

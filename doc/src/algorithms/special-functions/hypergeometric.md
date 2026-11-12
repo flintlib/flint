@@ -68,11 +68,31 @@ by $|T(n)| \sum_{j \ge 0} D^j$.
 
 `acb_hypgeom_pfq_bound_factor` computes $C = (1-D)^{-1}$ with upper
 bounds in `mag_t` arithmetic, pairing the upper parameter $a_i$ with
-the lower parameter $b_i$; $C$ is infinite if $p > q$, if some
-$\operatorname{Re}(b_i + n) \le 0$, or if $D \ge 1$. The bound can
-therefore be infinite for a small $n$ even if the series converges;
-the number of terms must be large enough that the terms have started
-to decrease. `acb_hypgeom_pfq_direct` sums $n$ terms with
+the lower parameter $b_i$; $C$ is infinite if $p > q$ or if $D \ge 1$.
+The bound can therefore be infinite for a small $n$ even if the series
+converges; the number of terms must be large enough that the terms
+have started to decrease.
+
+If $\operatorname{Re}(b_i + n) \le 0$ for some $i$, then $b_i$ is close
+to or beyond a negative integer $-m_i$ with $m_i \ge n$, the terms can
+grow again near $k = m_i$, and there is no uniform bound $D < 1$ for
+the term ratio. The range $[n, \infty)$ is then split into
+subranges $[k_j, k_{j+1})$ on each of which every $|b_i + k|$ is
+monotone (or which consist of a single index $m_i$, where $|b_i + k|$
+is at least the distance from $b_i$ to the integers), the ratio is
+bounded by $D_j$ on the $j$-th subrange as in the proof above, and
+$$
+\sum_{k \ge n} \frac{|T(k)|}{|T(n)|} \le \sum_j P_j S_j, \qquad
+P_j = \prod_{l < j} D_l^{k_{l+1} - k_l}, \qquad
+S_j = \sum_{t=0}^{k_{j+1} - k_j - 1} D_j^{t},
+$$
+with the last subrange infinite. The subranges are refined
+geometrically on both sides of each $m_i$, so that $O(\log m_i)$ of
+them suffice. This allows the series to be truncated before the
+indices where a lower parameter passes a nonpositive integer, when
+the terms are already small there; `acb_hypgeom_pfq_choose_n` takes
+such a truncation point only if the terms stay below the tolerance up
+to and beyond these indices. `acb_hypgeom_pfq_direct` sums $n$ terms with
 `acb_hypgeom_pfq_sum`, which also returns $T(n)$, and adds $C|T(n)|$
 to the radius. If $T(n)$ is exactly zero, the series has terminated
 and no error is added; this is how polynomials such as ${}_pF_q$ with a
