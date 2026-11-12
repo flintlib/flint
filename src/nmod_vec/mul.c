@@ -31,7 +31,7 @@
     form of red2bounded, with its 64-bit products emulated, ran below the
     scalar code on Broadwell, and on Ice Lake below the AVX-512 one
     (Nov 2026).
-    _nmod_vec_mul_lazy (n < 2^62) skips the last correction of each kernel
+    _nmod_vec_mul_lazy (n < 2^(FLINT_BITS - 2)) skips the last correction of each kernel
     (fp50: z + n instead of the correction of z in (-n, n)), so its outputs
     are in [0, 2n): 0.99-1.29x on long vectors (Nov 2026).
 */
@@ -55,8 +55,18 @@ _nmod_vec_mul_scalar(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod
         for (i = 0; i < len; i++)
             res[i] = _nmod_mul_bounded(vec1[i], vec2[i], mod);
     }
+    else if (mod.norm == 0)
+    {
+        /* 1.06-1.23x the loop of nmod_mul (Nov 2026) */
+        for (i = 0; i < len; i++)
+            NMOD_MUL_FULLWORD(res[i], vec1[i], vec2[i], mod);
+    }
     else
     {
+        /* 63 bits: clang compiles this loop slower than the same loops
+           inline in the callers of main on older machines such as Cascade Lake
+           (0.70x) and Broadwell (0.77x), Nov 2026; see doc:
+           algorithms/arithmetic/moller-granlund#branches */
         for (i = 0; i < len; i++)
             res[i] = nmod_mul(vec1[i], vec2[i], mod);
     }
@@ -238,7 +248,7 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 {
     const int nu = FLINT_BITS - mod.norm;
 
-    if (nu > 62 || nu < 2)
+    if (nu > NMOD_VEC_SIMD_MUL_MAX_BITS || nu < 2)
         return 0;
     else if (nu <= 32)
     {
@@ -354,9 +364,20 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
     const int nu = FLINT_BITS - mod.norm;
     slong i;
 
-    if (nu > 50 || nu < 2)
+    if (nu > NMOD_VEC_SIMD_MUL_MAX_BITS || nu < 2)
         return 0;
-    else if (nu <= 32)
+
+    i = _nv_ymm_peel(res, vec1, vec2, len);
+    if (i != 0)
+    {
+        _mul_tail(res, vec1, vec2, 0, i, mod);
+        res += i;
+        vec1 += i;
+        vec2 += i;
+        len -= i;
+    }
+
+    if (nu <= 32)
     {
         int s, t, two;
         _HALFLIMB_SHIFTS(s, t, two, nu);
@@ -454,7 +475,7 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
     const int nu = FLINT_BITS - mod.norm;
     slong i;
 
-    if (nu > 50 || nu < 2)
+    if (nu > NMOD_VEC_SIMD_MUL_MAX_BITS || nu < 2)
         return 0;
     else if (nu <= 32)
     {
@@ -473,22 +494,44 @@ _nmod_vec_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 
 #endif
 
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+
+/* out of line (impl_simd.h); n has 2 to NMOD_VEC_SIMD_MUL_MAX_BITS bits */
+FLINT_STATIC_NOINLINE void
+_mul_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+{
+    _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 0);
+}
+
+FLINT_STATIC_NOINLINE void
+_mul_lazy_simd(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
+{
+    _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 1);
+}
+
+# define _MUL_SIMD_APPLIES(len, mod) ((len) >= NMOD_VEC_SIMD_MIN_LEN \
+        && NMOD_BITS(mod) <= NMOD_VEC_SIMD_MUL_MAX_BITS && (mod).n > 1)
+
+#endif
+
 void _nmod_vec_mul(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 0))
-        return;
+    if (_MUL_SIMD_APPLIES(len, mod))
+        _mul_simd(res, vec1, vec2, len, mod);
+    else
 #endif
-    _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);
+        _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);
 }
 
 /* the scalar code reduces fully, which is also in [0, 2n) */
 void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_mul_simd(res, vec1, vec2, len, mod, 1))
-        return;
+    if (_MUL_SIMD_APPLIES(len, mod))
+        _mul_lazy_simd(res, vec1, vec2, len, mod);
+    else
 #endif
-    _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);
+        _nmod_vec_mul_scalar(res, vec1, vec2, len, mod);
 }

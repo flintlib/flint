@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include "flint.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 
 #if FLINT_BITS == 64 \
         && !defined(FLINT_MACHINE_VECTORS_FORCE_GENERIC) \
@@ -76,13 +77,33 @@
 # include <arm_neon.h>
 #endif
 
+/* NMOD_VEC_SIMD_MIN_LEN, NMOD_VEC_SIMD_SCALAR_MAX_BITS (nmod_vec.h): doc: nmod_vec/simd */
+#if (NMOD_VEC_SIMD_ZMM && NMOD_VEC_SIMD_MIN_LEN != FLINT_NMOD_VEC_AVX512_MIN_LEN) \
+        || NMOD_VEC_SIMD_ZMM != (NMOD_VEC_SIMD_SCALAR_MAX_BITS(0) == 63) \
+        || (NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON) != (NMOD_VEC_SIMD_SCALAR_MAX_BITS(0) != 0)
+# error "the conditions of the macros of nmod_vec.h and of the kernels differ"
+#endif
+
+/* the bits of n for which _nmod_vec_mul and _nmod_vec_reduce have a
+   kernel: 2 to NMOD_VEC_SIMD_MUL_MAX_BITS, and from NMOD_VEC_SIMD_REDUCE_MIN_BITS */
+#if NMOD_VEC_SIMD_ZMM
+# define NMOD_VEC_SIMD_MUL_MAX_BITS 62
+#else
+# define NMOD_VEC_SIMD_MUL_MAX_BITS 50
+#endif
+#if NMOD_VEC_SIMD_NEON
+# define NMOD_VEC_SIMD_REDUCE_MIN_BITS 6
+#else
+# define NMOD_VEC_SIMD_REDUCE_MIN_BITS 2
+#endif
+
 /*
-    Below this length the operations run their scalar loops: inside FLINT
-    functions, where the length varies from call to call, the kernels lost
-    on vectors of fewer than 8 entries (0.43-0.94x, Nov 2026), although an
-    isolated benchmark at one fixed length shows a gain from 4 entries.
+    The dispatchers test the length and the size of n, then call the kernels
+    out of line (FLINT_STATIC_NOINLINE), so that calls running the scalar
+    code skip the kernels' setup: inline, it made the dispatchers save up
+    to five registers on entry, and short calls without a kernel ran at
+    0.77-0.89x a direct call of the scalar code (AVX2, Nov 2026).
 */
-#define NMOD_VEC_SIMD_MIN_LEN 8
 
 /* the constant m above */
 #define NMOD_VEC_SIMD_M(mod) ((UWORD(1) << 63) | ((mod).ninv >> 1))
@@ -94,6 +115,9 @@
 #else
 # define NMOD_VEC_NO_VECTORIZE
 #endif
+
+/* the length from which the loops peel to an aligned output (below) */
+#define NMOD_VEC_SIMD_PEEL_MIN 128
 
 /* AVX-512 ****************************************************************/
 
@@ -131,8 +155,6 @@ FLINT_FORCE_INLINE __m512i _nv_zmm_csub(__m512i a, __m512i b)
     entries; the macros advance r, a, b and decrease len, so they take local
     copies.
 */
-#define NMOD_VEC_SIMD_PEEL_MIN 128
-
 #define _NV_ZMM_SAME64(p, q) (((((uintptr_t) (p)) ^ ((uintptr_t) (q))) & 63) == 0)
 #define _NV_ZMM_PEEL_H(r) ((slong) (((-(uintptr_t) (r)) & 63) >> 3))
 
@@ -317,6 +339,27 @@ FLINT_FORCE_INLINE __m256i _nv_ymm_csub_u(__m256i a, __m256i b, __m256i bx)
 FLINT_FORCE_INLINE __m256i _nv_ymm_csub_32(__m256i a, __m256i b)
 {
     return _mm256_min_epu32(a, _mm256_sub_epi32(a, b));
+}
+
+/*
+    The peel of the AVX2 kernels: from NMOD_VEC_SIMD_PEEL_MIN entries, when
+    the output r is not 32-byte aligned and the inputs a and b (b = a for
+    one input) have the same offset modulo 32 bytes, the number of entries
+    up to the next 32-byte boundary of r, which the scalar code does first;
+    otherwise 0. Without it, the 256-bit loads and stores of vectors 16 bytes
+    past a 64-byte boundary (as flint_malloc often returns) cross cache
+    lines: 5-12% slower on recent cores and 5-18% on Broadwell; with it,
+    1.02-1.20x (Nov 2026).
+*/
+FLINT_FORCE_INLINE slong
+_nv_ymm_peel(const void * r, const void * a, const void * b, slong len)
+{
+    const uintptr_t ur = (uintptr_t) r;
+
+    if (len < NMOD_VEC_SIMD_PEEL_MIN || (ur & 31) == 0
+            || (((ur ^ (uintptr_t) a) | (ur ^ (uintptr_t) b)) & 31) != 0)
+        return 0;
+    return (slong) (((-ur) & 31) >> 3);
 }
 
 #endif /* NMOD_VEC_SIMD_YMM */

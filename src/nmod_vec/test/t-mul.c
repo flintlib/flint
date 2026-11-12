@@ -93,7 +93,7 @@ TEST_FUNCTION_START(nmod_vec_mul, state)
     /* every bit size, lengths 0 to 3 vectors of 8 words plus a tail, and
        around the peeling threshold of 128; offsets 0, 1, 2 and 7 words
        from a 64-byte boundary; the output apart, equal to the first input
-       or to the second; _nmod_vec_mul_lazy up to 62 bits */
+       or to the second; _nmod_vec_mul_lazy up to FLINT_BITS - 2 bits */
     for (nu = 1; nu <= FLINT_BITS; nu++)
     for (k = 0; k < 4; k++)
     {
@@ -104,7 +104,7 @@ TEST_FUNCTION_START(nmod_vec_mul, state)
         for (len = 0; len <= 140; len += (len < 35 || len >= 120) ? 1 : 17)
         for (off = 0; off < 8; off += (off < 2) ? 1 : 5)
         for (alias = 0; alias < 3; alias++)
-        for (lazy = 0; lazy < 1 + (nu <= 62); lazy++)
+        for (lazy = 0; lazy < 1 + (nu <= FLINT_BITS - 2); lazy++)
         {
             nn_ptr out = (alias == 0) ? r : (alias == 1) ? a : b;
 
@@ -144,7 +144,7 @@ TEST_FUNCTION_START(nmod_vec_mul, state)
             b0[i] = b[offb + i] = _mul_residue(state, n);
         }
 
-        lazy = NMOD_BITS(mod) <= 62 && n_randint(state, 2);
+        lazy = NMOD_BITS(mod) <= FLINT_BITS - 2 && n_randint(state, 2);
         if (lazy)
             _nmod_vec_mul_lazy(r + offr, a + offa, b + offb, len, mod);
         else

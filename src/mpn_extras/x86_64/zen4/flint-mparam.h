@@ -171,6 +171,13 @@
 #define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 40
 
 /*
+    nmod_vec: the 512-bit kernels of _nmod_vec_reduce, _mul,
+    _scalar_mul_nmod and _scalar_addmul_nmod run from this length on
+    (NMOD_VEC_SIMD_MIN_LEN in src/nmod_vec.h)
+*/
+#define FLINT_NMOD_VEC_AVX512_MIN_LEN 8
+
+/*
     nmod_vec_dot: split limbs are used for moduli up to 2^this; see
     src/nmod_vec.h (not measured on this target: default; with
     AVX512-IFMA, u64 takes over above)

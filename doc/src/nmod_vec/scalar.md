@@ -30,8 +30,9 @@ Shoup's method does not apply. Only `_nmod_vec_scalar_mul_nmod` has a
 
 `_nmod_vec_scalar_mul_nmod` handles $c = 0$, $c = 1$ and $c = n - 1$ by
 zeroing, copying and negating. Otherwise, with AVX-512, AVX2 or NEON and
-from 8 entries, it uses the vector kernels of [](nmod_vec/simd#scalar)
-where one applies to the size of $n$. Otherwise:
+from `NMOD_VEC_SIMD_MIN_LEN` entries ([](nmod_vec/simd)), it uses the vector
+kernels of [](nmod_vec/simd#scalar) where one applies to the size of $n$.
+Otherwise:
 
 - If $n$ has `FLINT_BITS` bits, it uses `_redc` for odd $n$ and length at
   least 8, and otherwise a generic loop without normalisation shifts.

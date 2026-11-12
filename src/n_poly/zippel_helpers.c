@@ -176,6 +176,13 @@ void _n_fq_zip_eval_step(
 }
 
 
+/* On NEON, _n_fqp_zip_eval_step splits only from d = 3 (below) */
+#if FLINT_BITS == 64 && defined(__ARM_NEON) && defined(__aarch64__)
+# define FQP_ZIP_SPLIT_MIN_D 3
+#else
+# define FQP_ZIP_SPLIT_MIN_D 1
+#endif
+
 void _n_fqp_zip_eval_step(
     ulong * res,            /* in Fq: size d */
     ulong * cur,            /* in Fp: size length */
@@ -188,10 +195,6 @@ void _n_fqp_zip_eval_step(
     slong i, j;
     ulong p0, p1;
     ulong * tmp;
-    /* Up to 50 bits, cur = cur inc is one vector product after the sums
-       (0.97-1.33x); above, it stays in the loop: the separate pass was
-       0.93-1.22x at 51-62 bits and 0.58-0.96x at 63-64 (Nov 2026). */
-    const int split = (NMOD_BITS(mod) <= 50);
     TMP_INIT;
 
     if (length < 1)
@@ -203,30 +206,54 @@ void _n_fqp_zip_eval_step(
     TMP_START;
     tmp = (ulong *) TMP_ALLOC(3*d*sizeof(ulong));
 
-    i = 0;
-
-    for (j = 0; j < d; j++)
-    {
-        umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[i], (coeffs + d*i)[j]);
-        tmp[3*j+2] = 0;
-    }
-    if (!split)
-        cur[i] = nmod_mul(cur[i], inc[i], mod);
-
-    for (i = 1; i < length; i++)
+    /* Up to 50 bits, the sums, then cur = cur inc as one vector product
+       (1.04-1.63x on Ice Lake, Zen 4 and Broadwell); on NEON from d = 3,
+       as at d = 2 the separate pass was 0.64-0.68x on the M4. Otherwise
+       main's loop, which updates cur with the sums: the separate pass was
+       0.93-1.22x at 51-62 bits and 0.58-0.96x at 63-64, and one loop with a
+       test inside lost with gcc even above 50 bits (Nov 2026). */
+    if (NMOD_BITS(mod) <= 50 && d >= FQP_ZIP_SPLIT_MIN_D)
     {
         for (j = 0; j < d; j++)
         {
-            umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
-            add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
-                          tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[0], coeffs[j]);
+            tmp[3*j+2] = 0;
         }
-        if (!split)
-            cur[i] = nmod_mul(cur[i], inc[i], mod);
-    }
 
-    if (split)
+        for (i = 1; i < length; i++)
+        {
+            for (j = 0; j < d; j++)
+            {
+                umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
+                add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
+                              tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            }
+        }
+
         _nmod_vec_mul(cur, cur, inc, length, mod);
+    }
+    else
+    {
+        i = 0;
+
+        for (j = 0; j < d; j++)
+        {
+            umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[i], (coeffs + d*i)[j]);
+            tmp[3*j+2] = 0;
+        }
+        cur[i] = nmod_mul(cur[i], inc[i], mod);
+
+        for (i = 1; i < length; i++)
+        {
+            for (j = 0; j < d; j++)
+            {
+                umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
+                add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
+                              tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            }
+            cur[i] = nmod_mul(cur[i], inc[i], mod);
+        }
+    }
 
     for (j = 0; j < d; j++)
         NMOD_RED3(res[j], tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], mod);

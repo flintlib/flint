@@ -597,10 +597,10 @@ ulong n_ll_redc(ull_t x, ulong n, ulong nred)
     ulong lo = n_mulhi(ull_lo(x) * (-nred), n), hi;
     hi = ull_hi(x);
 
-    if (hi < lo)
-        return hi - lo + n;
-    else
-        return hi - lo;
+    /* correction written branch-free: gcc 14 compiled the if-else form as a
+       branch, and misprediction on unpredictable data slowed things down
+       (products by a scalar 2-4.7x slower, Nov 2026). */
+    return (hi - lo) + (n & -(ulong) (hi < lo));
 }
 
 /* Computes (ab)/R mod n, reducing to [0,n). */

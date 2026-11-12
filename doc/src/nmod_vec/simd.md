@@ -9,18 +9,35 @@ $n$, and so do their lazy variants ([](#lazy)). The
 instruction set is the one FLINT is compiled for (for instance
 `-march=native`, which `configure` sets by default): there is no run-time
 detection, and `FLINT_MACHINE_VECTORS_FORCE_GENERIC` or
-`FLINT_MACHINE_VECTORS_STRICT_C` turn the kernels off. Below 8 entries the
-scalar code runs: inside FLINT functions, where the length varies from call
-to call, the kernels lost on such short vectors.
+`FLINT_MACHINE_VECTORS_STRICT_C` turn the kernels off. Below
+`NMOD_VEC_SIMD_MIN_LEN` entries the scalar code runs: 8, or with the 512-bit
+kernels `FLINT_NMOD_VEC_AVX512_MIN_LEN` of `flint-mparam.h`, which is 16 on
+Intel processors. Inside FLINT functions, where the length varies from call
+to call, the kernels lost on vectors of fewer than 8 entries. On Intel, a
+512-bit load of entries written just before by narrow stores waits for these
+stores, which cannot forward their data to it: 8 to 15 such entries ran at
+0.60-0.95x (Ice Lake, Cascade Lake, Nov 2026), and Zen 4 has no such loss.
 
 With AVX-512, the last entries are handled by one masked vector rather
 than a scalar tail. From 128 entries, when the output is not aligned to 64
 bytes and every vector has the same offset modulo 64 bytes, one masked
-vector first handles the entries up to the next 64-byte boundary, so that
-the main loop reads and writes whole cache lines. On ARM64, from 16
-entries, the NEON kernels are interleaved with the scalar code, 4 entries
-of each per block of 8 (the scalar multiplier runs beside the NEON one);
-the NEON kernels alone handle the rest.
+vector first handles the entries up to the next 64-byte boundary, so that the
+main loop reads and writes whole cache lines. With AVX2, under the same
+conditions modulo 32 bytes, the scalar code first handles the entries up to the
+next 32-byte boundary, so that the 256-bit loads and stores do not cross cache
+lines. On ARM64, from 16 entries, the NEON kernels are interleaved with the
+scalar code, 4 entries of each per block of 8 (the scalar multiplier runs
+beside the NEON one); the NEON kernels alone handle the rest.
+
+On Intel processors up to Ice Lake (Skylake-SP, Cascade Lake, Ice Lake-SP),
+512-bit multiplications lower the clock of the core for some time after they
+run. After the multiplying kernels the clock was 12-22% lower on Cascade Lake.
+The kernels remain faster than the scalar code, but the scalar code that
+follows them runs slower: functions that alternate short kernel calls with
+scalar work are slightly impacted (e.g. `nmod_mpoly_gcd` and the geometric
+evaluation and interpolation, ran at 0.80-0.90x on Cascade Lake). Intel
+Sapphire Rapids and AMD Zen 4 show no such fixed offset, and Ice Lake and Rocket
+Lake client processors little or none.
 
 Below, $n$ has $\nu$ bits, $2^{\nu - 1} \le n < 2^{\nu}$, and
 $m = \lfloor (2^{\nu + 63} - 1)/n \rfloor$ is the constant of `NMOD_RED`
@@ -187,7 +204,8 @@ slower than the scalar code.
 
 `_nmod_vec_reduce_lazy`, `_nmod_vec_mul_lazy`,
 `_nmod_vec_scalar_mul_nmod_lazy` and `_nmod_vec_scalar_addmul_nmod_lazy`
-require $n < 2^{62}$ and run the kernels above without their last
+require $n < 2^{\bits - 2}$, that is $n < 2^{62}$ on the 64-bit machines
+that have these kernels, and run the kernels above without their last
 correction, so that their outputs are in $[0, 2n)$. Before that
 correction, every kernel already has a value below $2n$:
 
@@ -213,8 +231,8 @@ $2^{53}$, so it is exact), one addition fewer than adding $n$ first; NEON
 converts with one instruction and adds $n$.
 
 The lazy functions run the exact code, whose outputs are reduced, for
-vectors of fewer than 8 entries, without SIMD, for $n = 1$, and in the
-following cases:
+vectors of fewer than `NMOD_VEC_SIMD_MIN_LEN` entries, without SIMD, for $n =
+1$, and in the following cases:
 
 | Function | AVX-512 | AVX2 | NEON |
 |---|---|---|---|
@@ -222,6 +240,16 @@ following cases:
 | `_nmod_vec_mul_lazy` | none | $51 \le \nu \le 62$ | $51 \le \nu \le 62$ |
 | `_nmod_vec_scalar_mul_nmod_lazy` | none | $51 \le \nu \le 62$ | $51 \le \nu \le 62$ |
 | `_nmod_vec_scalar_addmul_nmod_lazy` | none | $51 \le \nu \le 62$ | $33 \le \nu \le 62$ |
+
+In these cases and without SIMD, from 8 entries and for $n > 2^{32}$, the
+products by a scalar run instead Shoup's product without its last
+correction, which is in $[0, 2n)$ ([](algorithms/arithmetic/shoup#lem-quot)),
+and `_nmod_vec_scalar_addmul_nmod_lazy` adds `res` and corrects the sum, below
+$4n$, by $2n$: against the exact code, 1.05-1.66x at 8 to 12 entries and
+1.06-1.53x from 16 entries (Nov 2026). For $n < 2^{32}$,
+`_nmod_vec_scalar_addmul_nmod_lazy` runs the one-word loop of the exact code
+on `res` in $[0, 2n)$ directly: $\mathtt{res}[i] + \mathtt{vec}[i] c < 2n +
+(n - 1)^2 \le n^2$ fits one word.
 
 `_nmod_vec_scalar_mul_nmod_lazy` also runs the exact code for
 $c \in \{0, 1, n - 1\}$ (a zeroing, a copy or a negation), and
@@ -232,4 +260,5 @@ reduces `res`.
 Against the exact functions, on long vectors (Nov 2026): reduce
 1.11-1.64x, mul 0.99-1.29x, scalar_mul 1.08-1.60x, scalar_addmul
 1.04-1.35x, NEON 1.13-1.60x; shoup52 1.10-1.21x; the fold of $n$ into
-$2^{52}$ 1.03-1.16x more for the doubles kernels.
+$2^{52}$ 1.03-1.16x more for the doubles kernels. With the ifma50 kernel,
+`_nmod_vec_mul_lazy` gained nothing (0.87-1.10x).

@@ -22,7 +22,8 @@ in [](nmod_vec/simd).
 - Unless stated otherwise, input entries must be reduced, that is, lie in
   $[0, n)$, and output entries are reduced. This is not checked. The
   functions with the suffix `_lazy` give outputs in $[0, 2n)$, congruent to
-  the reduced ones, and require $n < 2^{62}$.
+  the reduced ones, and require $n < 2^{\bits - 2}$ ($2^{62}$ on 64-bit
+  machines).
 - Lengths are passed separately. A vector of length 0 is valid.
 - Element-wise functions allow the output to be the same array as an input,
   but not a partially overlapping one.
@@ -102,6 +103,27 @@ Returns the largest bit length of an entry of `vec`, or 0 if all entries
 are zero. The entries need not be reduced.
 :::
 
+::: macro
+NMOD_VEC_SIMD_MIN_LEN
+
+The length from which `_nmod_vec_reduce`, `_nmod_vec_mul`,
+`_nmod_vec_scalar_mul_nmod`, `_nmod_vec_scalar_addmul_nmod` and their lazy
+variants run their vector kernels ([](nmod_vec/simd)): 8, or with AVX-512
+`FLINT_NMOD_VEC_AVX512_MIN_LEN` of `flint-mparam.h`, which is 16 on Intel
+processors. A caller with short vectors can keep an inline loop below this
+length.
+:::
+
+::: macro
+NMOD_VEC_SIMD_SCALAR_MAX_BITS(add)
+
+The largest number of bits of $n$ for which `_nmod_vec_scalar_mul_nmod`
+(`add` = 0), `_nmod_vec_scalar_addmul_nmod` (`add` = 1) and their lazy
+variants run a vector kernel ([](nmod_vec/simd#scalar)): 63 with AVX-512, 50
+with AVX2, 50 and 32 with NEON, and 0 without vector kernels. Above it,
+and below `NMOD_VEC_SIMD_MIN_LEN` entries, they run their scalar code.
+:::
+
 ::: function
 void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
@@ -113,7 +135,7 @@ NEON it uses vector kernels ([](nmod_vec/simd#reduce)).
 ::: function
 void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
-The same as `_nmod_vec_reduce` for $n < 2^{62}$, except that the entries
+The same as `_nmod_vec_reduce` for $n < 2^{\bits - 2}$, except that the entries
 of `res` are only in $[0, 2n)$: the vector kernels skip their last
 correction ([](nmod_vec/simd#lazy)).
 :::
@@ -174,14 +196,14 @@ void _nmod_vec_mul(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 Sets `res[i]` to `vec1[i] * vec2[i]` modulo $n$ for $0 \le i < \mathit{len}$.
 The output may be either input. With AVX-512, AVX2 or NEON it uses vector
 kernels ([](nmod_vec/simd#mul)) for $n$ of up to 62 bits (50 bits without
-AVX-512); otherwise, the loops of `_nmod_mul_halflimb`, `_nmod_mul_bounded`
-or `nmod_mul`, by the size of $n$.
+AVX-512); otherwise, the loops of `_nmod_mul_halflimb`, `_nmod_mul_bounded`,
+`nmod_mul` or, for $n$ of 64 bits, `NMOD_MUL_FULLWORD`, by the size of $n$.
 :::
 
 ::: function
 void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
-The same as `_nmod_vec_mul` for $n < 2^{62}$, except that the entries of
+The same as `_nmod_vec_mul` for $n < 2^{\bits - 2}$, except that the entries of
 `res` are only in $[0, 2n)$ ([](nmod_vec/simd#lazy)). The inputs must be
 reduced.
 :::
@@ -227,7 +249,7 @@ void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong 
 void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
 The same as `_nmod_vec_scalar_mul_nmod` and `_nmod_vec_scalar_addmul_nmod` for
-$n < 2^{62}$, except that the entries of `res` are only in $[0, 2n)$ on output
+$n < 2^{\bits - 2}$, except that the entries of `res` are only in $[0, 2n)$ on output
 and, for `_nmod_vec_scalar_addmul_nmod_lazy`, may be in $[0, 2n)$ on input
 ([](nmod_vec/simd#lazy)). They require $c < n$ and reduced entries of
 `vec`; when `vec` is `res`, its entries must therefore be reduced.

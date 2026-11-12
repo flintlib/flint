@@ -34,7 +34,7 @@
         corrections 2n then n (5-20% faster than with the exact high word).
       shoup64 (nu = 63, AVX-512): Shoup with the exact high word.
     For nu = 64, the scalar code (Montgomery for odd n). The sum of
-    scalar_addmul is corrected once more. The lazy variants (n < 2^62) skip
+    scalar_addmul is corrected once more. The lazy variants (n < 2^(FLINT_BITS - 2)) skip
     the last correction of the product (fp50: z + n), and scalar_addmul_lazy
     adds res in [0, 2n) and corrects the sum, below 4n, by 2n: 1.08-1.60x for
     scalar_mul and 1.04-1.35x for scalar_addmul on long vectors, 1.10-1.21x
@@ -216,7 +216,7 @@ _nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t 
 {
     const int nu = FLINT_BITS - mod.norm;
 
-    if (nu == 64 || nu < 2)
+    if (nu > NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) || nu < 2)
         return 0;
     else if (nu <= 32)
         _smul_shoup32_zmm(res, vec, len, c, mod, add, lazy);
@@ -375,14 +375,19 @@ _nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t 
     ulong c_pr;
     slong i;
 
-#if NMOD_VEC_SIMD_NEON
-    if (nu > (add ? 32 : 50) || nu < 2)
+    if (nu > NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) || nu < 2)
         return 0;
-#else
-    if (nu > 50 || nu < 2)
-        return 0;
-#endif
     c_pr = _nmod_mulmod_precomp_shoup(c, mod);
+#if NMOD_VEC_SIMD_YMM
+    i = _nv_ymm_peel(res, vec, vec, len);
+    if (i != 0)
+    {
+        _smul_tail(res, vec, 0, i, c, c_pr, mod, add, lazy);
+        res += i;
+        vec += i;
+        len -= i;
+    }
+#endif
     if (nu <= 32)
 #if NMOD_VEC_SIMD_YMM
         i = (nu <= 31) ? _smul_shoup32_ymm(res, vec, len, c, c_pr, mod, add, 1, lazy)
@@ -395,6 +400,39 @@ _nmod_vec_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t 
     _smul_tail(res, vec, i, len, c, c_pr, mod, add, lazy);
     return 1;
 }
+
+#endif
+
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+
+/* out of line (impl_simd.h); n has 2 to NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) bits */
+FLINT_STATIC_NOINLINE void
+_scalar_mul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 0);
+}
+
+FLINT_STATIC_NOINLINE void
+_scalar_addmul_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 0);
+}
+
+FLINT_STATIC_NOINLINE void
+_scalar_mul_lazy_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 1);
+}
+
+FLINT_STATIC_NOINLINE void
+_scalar_addmul_lazy_simd(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 1);
+}
+
+/* n > 1 holds there, since c is not 0 */
+# define _SCALAR_SIMD_APPLIES(len, mod, add) ((len) >= NMOD_VEC_SIMD_MIN_LEN \
+        && NMOD_BITS(mod) <= NMOD_VEC_SIMD_SCALAR_MAX_BITS(add))
 
 #endif
 
@@ -465,12 +503,14 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
     else if (c == mod.n - UWORD(1))
         _nmod_vec_sub(res, res, vec, len, mod);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 0))
-        return;
+    else if (_SCALAR_SIMD_APPLIES(len, mod, 1))
+        _scalar_addmul_simd(res, vec, len, c, mod);
 #endif
+    else if (NMOD_BITS(mod) == FLINT_BITS)
+        _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
     else if (mod.norm >= FLINT_BITS / 2 && HALFLIMB_BEFORE_SHOUP(len))
         _scalar_addmul_halflimb(res, vec, len, c, mod);
-    else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD && NMOD_BITS(mod) != FLINT_BITS)
+    else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
     else if (mod.norm >= FLINT_BITS / 2)
         _scalar_addmul_halflimb(res, vec, len, c, mod);
@@ -552,14 +592,16 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
     else if (c == mod.n - UWORD(1))
         _nmod_vec_neg(res, vec, len, mod);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    else if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 0))
-        return;
+    else if (_SCALAR_SIMD_APPLIES(len, mod, 0))
+        _scalar_mul_simd(res, vec, len, c, mod);
 #endif
     else if (NMOD_BITS(mod) == FLINT_BITS)
+    {
         if (len >= 8 && mod.n % 2 != 0)
             _nmod_vec_scalar_mul_nmod_redc(res, vec, len, c, mod);
         else
             _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
+    }
     else if (len >= FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
     else if (NMOD_IS_HALFLIMB(mod))
@@ -571,34 +613,81 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
 }
 
 /*
-    The lazy variants. Where no kernel applies (short vectors, no SIMD, AVX2
-    above 50 bits, NEON above 50 bits and addmul above 32 bits), the exact
-    code runs, whose outputs are also in [0, 2n); scalar_addmul first brings
-    res to [0, n) there. The cases c = 1 and c = n - 1 of scalar_addmul go to
-    the kernels, since _nmod_vec_add and _nmod_vec_sub need reduced inputs.
+    The lazy variants. Below the kernels' length, and where no kernel
+    applies (no SIMD, AVX2 above 50 bits, NEON above 50 bits and addmul
+    above 32 bits):
+      above 32 bits, from 8 entries, Shoup's product without its last
+      correction, in [0, 2n) (doc: algorithms/arithmetic/shoup#lem-quot),
+      and for addmul the sum with res, below 4n, corrected by 2n. Against
+      the exact code: 1.05-1.66x at 8-12 entries (0.92 once, Zen 4 with
+      AVX2 only), 1.06-1.53x from 16 (Nov 2026).
+      scalar_addmul, n < 2^32: the one-word loop of the exact code, since
+      res + vec c < 2n + (n - 1)^2 <= n^2 fits one word for res in [0, 2n)
+      (with a reduction of res first: 0.56-0.77x the exact code).
+      Otherwise the exact code, whose outputs are in [0, 2n) too;
+      scalar_addmul first brings res to [0, n) there.
+    The cases c = 1 and c = n - 1 of scalar_addmul go to the kernels or to
+    the loops above, since _nmod_vec_add and _nmod_vec_sub need reduced
+    inputs.
 */
+#define NMOD_VEC_LAZY_SHOUP_MIN_LEN 8
+
+static void
+_scalar_mul_lazy_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod), n = mod.n;
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = c * vec[i] - n_mulhi(vec[i], c_pr) * n;
+}
+
+static void
+_scalar_addmul_lazy_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+{
+    const ulong c_pr = _nmod_mulmod_precomp_shoup(c, mod), n = mod.n, n2 = 2 * mod.n;
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        ulong t = c * vec[i] - n_mulhi(vec[i], c_pr) * n + res[i];
+        res[i] = (t >= n2) ? t - n2 : t;
+    }
+}
+
 void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec,
                                     slong len, ulong c, nmod_t mod)
 {
-    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
+    if (c <= UWORD(1) || c == mod.n - UWORD(1))
+        _nmod_vec_scalar_mul_nmod(res, vec, len, c, mod);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && c > UWORD(1) && c != mod.n - UWORD(1)
-        && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 0, 1))
-        return;
+    else if (_SCALAR_SIMD_APPLIES(len, mod, 0))
+        _scalar_mul_lazy_simd(res, vec, len, c, mod);
 #endif
-    _nmod_vec_scalar_mul_nmod(res, vec, len, c, mod);
+    else if (len >= NMOD_VEC_LAZY_SHOUP_MIN_LEN && NMOD_BITS(mod) > 32)
+        _scalar_mul_lazy_shoup(res, vec, len, c, mod);
+    else
+        _nmod_vec_scalar_mul_nmod(res, vec, len, c, mod);
 }
 
 void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec,
                                        slong len, ulong c, nmod_t mod)
 {
-    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
     if (c == UWORD(0))
         return;
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_scalar_mul_simd(res, vec, len, c, mod, 1, 1))
-        return;
+    else if (_SCALAR_SIMD_APPLIES(len, mod, 1))
+        _scalar_addmul_lazy_simd(res, vec, len, c, mod);
 #endif
-    _nmod_vec_reduce(res, res, len, mod);
-    _nmod_vec_scalar_addmul_nmod(res, vec, len, c, mod);
+    else if (NMOD_BITS(mod) <= FLINT_BITS / 2)
+        _scalar_addmul_halflimb(res, vec, len, c, mod);
+    else if (len >= NMOD_VEC_LAZY_SHOUP_MIN_LEN)
+        _scalar_addmul_lazy_shoup(res, vec, len, c, mod);
+    else
+    {
+        _nmod_vec_reduce(res, res, len, mod);
+        _nmod_vec_scalar_addmul_nmod(res, vec, len, c, mod);
+    }
 }

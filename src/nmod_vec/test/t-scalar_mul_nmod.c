@@ -51,7 +51,7 @@ _smul_modulus(flint_rand_t state, int nu, int k)
 
 #define SMUL_MAXLEN 160
 
-/* scalar_mul and scalar_addmul, and their lazy variants up to 62 bits,
+/* scalar_mul and scalar_addmul, and their lazy variants up to FLINT_BITS - 2 bits,
    against nmod_mul and nmod_add: every bit size, c at the corners, lengths
    0 to 3 vectors of 8 words plus a tail and around the peeling threshold of
    128, offsets 0, 1, 2 and 7 words from a 64-byte boundary, in place and
@@ -87,7 +87,7 @@ _smul_check_all(flint_rand_t state)
             for (off = 0; off < 8; off += (off < 2) ? 1 : 5)
             for (add = 0; add < 2; add++)
             for (inplace = 0; inplace < 2; inplace++)
-            for (lazy = 0; lazy < 1 + (nu <= 62); lazy++)
+            for (lazy = 0; lazy < 1 + (nu <= FLINT_BITS - 2); lazy++)
             {
                 nn_srcptr src = inplace ? r + off : a + off;
 

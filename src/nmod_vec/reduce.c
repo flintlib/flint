@@ -33,7 +33,7 @@
         then a coarser Barrett step; two corrections (2n, then n).
         NMOD2_RED2 would instead reduce the high half, then take a
         Moller-Granlund step.
-    _nmod_vec_reduce_lazy (n < 2^62) skips the last correction of each
+    _nmod_vec_reduce_lazy (n < 2^(FLINT_BITS - 2)) skips the last correction of each
     kernel, so its outputs are in [0, 2n): 1.11-1.64x on long vectors
     (Nov 2026).
     The Barrett step of NMOD_RED itself, with the 64 x 64 high product
@@ -314,6 +314,18 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy
     const int nu = FLINT_BITS - mod.norm;
     slong i;
 
+    if (nu < 2)
+        return 0;
+
+    i = _nv_ymm_peel(res, vec, vec, len);
+    if (i != 0)
+    {
+        _reduce_tail(res, vec, 0, i, mod);
+        res += i;
+        vec += i;
+        len -= i;
+    }
+
     if (nu == 64)
         i = _reduce_fullword_ymm(res, vec, len, mod);
     else if (nu == 63)
@@ -326,10 +338,8 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy
         i = _reduce_fold29_ymm(res, vec, len, mod, 0, lazy);
     else if (nu >= 6)
         i = _reduce_fold29_ymm(res, vec, len, mod, 1, 0);
-    else if (nu >= 2)
-        i = _reduce_fold32_ymm(res, vec, len, mod, lazy);
     else
-        return 0;
+        i = _reduce_fold32_ymm(res, vec, len, mod, lazy);
     _reduce_tail(res, vec, i, len, mod);
     return 1;
 }
@@ -498,7 +508,7 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy
     const int nu = FLINT_BITS - mod.norm;
     slong i = 0;
 
-    if (nu <= 5)
+    if (nu < NMOD_VEC_SIMD_REDUCE_MIN_BITS)
         return 0;
     else if (nu == 64)
         i = _reduce_fullword_neon(res, vec, len, mod);
@@ -526,22 +536,44 @@ _nmod_vec_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod, int lazy
 
 #endif
 
+#if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
+
+/* out of line (impl_simd.h); n has at least NMOD_VEC_SIMD_REDUCE_MIN_BITS bits */
+FLINT_STATIC_NOINLINE void
+_reduce_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+{
+    _nmod_vec_reduce_simd(res, vec, len, mod, 0);
+}
+
+FLINT_STATIC_NOINLINE void
+_reduce_lazy_simd(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+{
+    _nmod_vec_reduce_simd(res, vec, len, mod, 1);
+}
+
+# define _REDUCE_SIMD_APPLIES(len, mod) ((len) >= NMOD_VEC_SIMD_MIN_LEN \
+        && NMOD_BITS(mod) >= NMOD_VEC_SIMD_REDUCE_MIN_BITS)
+
+#endif
+
 void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 {
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_reduce_simd(res, vec, len, mod, 0))
-        return;
+    if (_REDUCE_SIMD_APPLIES(len, mod))
+        _reduce_simd(res, vec, len, mod);
+    else
 #endif
-    _nmod_vec_reduce_scalar(res, vec, len, mod);
+        _nmod_vec_reduce_scalar(res, vec, len, mod);
 }
 
 /* the scalar code reduces fully, which is also in [0, 2n) */
 void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 {
-    FLINT_ASSERT(NMOD_BITS(mod) <= 62);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
 #if NMOD_VEC_SIMD_ZMM || NMOD_VEC_SIMD_YMM || NMOD_VEC_SIMD_NEON
-    if (len >= NMOD_VEC_SIMD_MIN_LEN && _nmod_vec_reduce_simd(res, vec, len, mod, 1))
-        return;
+    if (_REDUCE_SIMD_APPLIES(len, mod))
+        _reduce_lazy_simd(res, vec, len, mod);
+    else
 #endif
-    _nmod_vec_reduce_scalar(res, vec, len, mod);
+        _nmod_vec_reduce_scalar(res, vec, len, mod);
 }
