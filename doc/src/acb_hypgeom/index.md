@@ -607,7 +607,9 @@ Sets `res` to the lower incomplete gamma function $\gamma(s,z) =
 `regularized` is 0, to $P(s,z) = \gamma(s,z) / \Gamma(s)$ if
 `regularized` is 1, and to $\gamma^{*}(s,z) = z^{-s} P(s,z)$, which is
 entire in $s$ and $z$, if `regularized` is 2. The `nointegration`
-version evaluates the hypergeometric function; the automatic version
+version evaluates the hypergeometric function by its series and
+asymptotic expansion (without the fallback of `acb_hypgeom_m` on
+numerical integration for real parameters); the automatic version
 also uses numerical integration and midpoint evaluation, as
 `acb_hypgeom_gamma_upper` does.
 :::

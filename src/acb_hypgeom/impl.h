@@ -37,6 +37,11 @@ void acb_poly_reciprocal_majorant(arb_poly_t res, const acb_poly_t poly, slong p
 
 /* Series and asymptotic expansions, optionally scaled */
 int _acb_hypgeom_bessel_asymp_converges(const acb_t nu, const acb_t z, slong prec);
+double _acb_hypgeom_bessel_debye_re(double nr, double ni, double wr, double wi);
+
+/* 1F1 by the series and asymptotic expansions only (acb_hypgeom_m falls back
+   on numerical integration for real parameters if these are inaccurate) */
+void _acb_hypgeom_m_nointegration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 void _acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec);
 void _acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec);
 

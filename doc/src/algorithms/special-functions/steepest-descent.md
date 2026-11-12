@@ -321,9 +321,14 @@ bounds for the vertices, which are doubles, and the sums are exact
 microseconds. Three bounds are computed this way: for the integrand on
 a disk ([](#quadrature)), for the weighted integrals over a segment
 (as for a panel above; the endpoints can be balls), and for the tails.
-The rigorous $L^1$ norms of a whole contour, with all its panels, are
-only needed for the derivative bounds used with inexact input
-([](#choice)).
+The rigorous $L^1$ norms of a whole contour are only needed for the
+derivative bounds used with inexact input ([](#choice)). Since the
+integrand is entire, the polygon between two vertices can be replaced
+by the straight segment between them: this is done wherever the bound
+for the segment is not much larger than the double precision estimate
+for the panels it replaces (or small compared to the whole), which
+leaves some 15 to 20 segments per contour, at the cost of bounds which
+are up to about twice as large as with all the panels.
 
 ## Quadrature {#quadrature}
 
@@ -531,43 +536,96 @@ are 2 to 8 times faster at 333 bits and, for $|\nu|, |z| \gtrsim
 `acb_hypgeom_bessel_k` (and the scaled versions),
 `acb_hypgeom_gamma_upper` and `acb_hypgeom_gamma_lower` choose between
 the convergent series, the asymptotic expansion and the integration
-with the same scheme. The methods are tried at a working precision
-that doubles from one round to the next; each result is a rigorous
-enclosure, so the best is kept and the first that is accurate enough
-is returned.
+with the same scheme. For each method, the number of guard bits it
+needs and its cost are estimated in double precision; the cheapest is
+tried first, at the precision raised by its guard bits. Each result is
+a rigorous enclosure, so the estimates only affect the running time:
+the best result is kept, and the first that is accurate enough is
+returned.
 
-- Unless the integration is expected to be cheaper, the first attempt
-  is the classical implementation
-  (`acb_hypgeom_bessel_j_nointegration` and so on) at the precision
-  raised by the estimated cancellation of the series, or the
-  asymptotic expansion directly where it reaches the precision (for
-  $K$, $Y$ and the incomplete gamma functions; the implementations of
-  $J$ and $I$ change from the series to the expansion by themselves,
-  the series being cheaper up to about $|z| = p/2$). For the Bessel
-  functions the expansion reaches $p$ bits when $2.9 |z| \ge p$ and
-  $|z| > 1.9 |\nu| + 2$, and the series loses about $1.45 (|z| -
+**Guard bits.** With exact input, a method which loses $c$ bits to
+cancellation gives full accuracy when evaluated with $c$ more bits.
+
+- The series for the Bessel functions lose the size of their largest
+  term relative to the function. The largest term is found from the
+  ratios of the terms (for $J$ and $I$ at the index
+  $\tfrac12 (\sqrt{(|\nu|+1)^2 + |z|^2} - |\nu| - 1)$; the series with
+  $-\nu$ needed for $Y$ and $K$ also peaks beyond $k = |\nu|$), and the
+  size of the function from the leading-order (Debye) approximations,
+  $\log |J_\nu(z)| \approx \operatorname{Re} \xi$ beyond the turning
+  point and $|\operatorname{Re} \xi|$ in the oscillatory region,
+  $\xi = \sqrt{\nu^2 - z^2} - \nu \log((\nu + \sqrt{\nu^2 - z^2}) / z)$,
+  and similarly for the other functions (with $iz$ for $I$ and $K$).
+  For small orders this is the classical $1.45 (|z| -
   |\operatorname{Im} z|)$ bits for $J$ and $Y$, $1.45 (|z| -
-  |\operatorname{Re} z|)$ for $I$ and $2.9 \operatorname{Re} z$ for
-  $K$ (less if the terms grow less than that, for large $|\nu|$). For
-  the incomplete gamma functions the number of terms of the expansion
-  is estimated from the ratios $|s - k| / |z|$ of its terms, and the
-  cancellation is that of the lower series in the better of its two
-  forms, plus $\log_2 |\Gamma(s) / \Gamma(s,z)|$ for the upper
-  function. With these estimates, small orders and arguments are
-  normally settled by this first attempt.
-- In each further round, the series and the expansion are tried in the
-  order of their estimated cost; the series recovers what remains of
-  its cancellation as the precision doubles, and the expansion either
-  reaches the precision or does not.
-- The integration is tried *first* if its estimated cost is below that
-  of the cheaper of the expansion (where that converges) and the
-  series at the precision raised by its cancellation, and otherwise as
-  soon as it is cheaper than the next round. Its cost is modelled as a
-  constant per descent path which depends on the precision only: about
-  45 microseconds at 64 bits and 200 at 190 bits, and growing
-  quadratically from there; beyond 200 bits and for exact input, the
-  cost of the saddle-point expansion ([](#expansions)) is used
-  instead where that is lower.
+  |\operatorname{Re} z|)$ for $I$ and $1.45 (|z| + \operatorname{Re}
+  z)$ for $K$; for $\nu > z$ the alternating series for $J$ loses twice
+  the growth of its terms, since $J$ is then exponentially small,
+  whereas the series for $I$ loses nothing. $Y$ at noninteger order is
+  computed from $J_{\pm\nu}$, each with its own guard bits, and loses
+  $-\log_2 |\sin \pi\nu|$ bits more near an integer. These
+  estimates are used for orders close to the positive real axis, where
+  they were validated (to within about 25 bits); for other complex
+  orders the classical ones are used, limited by the growth of the
+  terms.
+- The asymptotic expansions $\sum_k a_k(\nu) / (cz)^k$ of the Bessel
+  functions have terms which grow up to the index $k_1 = \sqrt{|z|^2 +
+  |\nu|^2} - |z|$ (to about $e^{|\nu|^2/(2|z|)}$) and are smallest at
+  $k_2 = \sqrt{|z|^2 + |\nu|^2} + |z|$. The growth is lost to
+  cancellation, except for $K$ on the positive real axis where the
+  terms have the same sign; off the real axis, the component whose
+  sum is small loses correspondingly more. The expansion reaches the
+  precision if its smallest term, times the factor of about
+  $e^{|\nu|^2/|z|}$ by which the error bound of the implementation
+  exceeds the first omitted term, is small enough. The implementation
+  uses at most $50 + 10 p$ terms at the precision $p$, so that the
+  precision is also raised where more terms are needed.
+- For the incomplete gamma functions, the series $\gamma(s,z) = s^{-1}
+  z^s e^{-z} \sum_k z^k / (s+1)_k$ loses nothing for $|z| < |s|$ and
+  $1.45 (|z| - \operatorname{Re} z)$ bits otherwise (the form
+  ${}_1F_1(s; s+1; -z)$, which loses $1.45 (|z| + \operatorname{Re}
+  z)$ bits, is used for $\operatorname{Re} z < 0$, $|z| > |s|$). The
+  upper function is computed as $\Gamma(s) - \gamma(s,z)$ for
+  $\operatorname{Re} s \ge 1$, which loses $\log_2 |\Gamma(s) /
+  \Gamma(s,z)|$ bits more. For a positive integer $s$, the asymptotic
+  expansion of $\Gamma(s,z)$ terminates after $s$ terms and is exact.
+
+**Costs.** The numbers of terms follow from the same ratios (for the
+expansions, by bisection on the size of the terms), and the costs per
+term were measured at 300 to 30000 bits; they grow slowly with the
+precision. The cost of the integration is modelled as a constant per
+descent path which depends on the precision only: about 45
+microseconds at 64 bits and 200 at 190 bits, and from there on growing
+with the exponent 1.6 up to 1000 bits and 2.7 beyond; for
+exact input, the cost of the saddle-point expansion
+([](#expansions)) is used instead where that is lower. Up to 200 bits,
+where the integration runs in double-double to quad-double arithmetic,
+simpler estimates for the series and the expansions are used, which
+were tuned on the double precision wrappers.
+
+**Order of the attempts.**
+
+- The first attempt is the cheapest of the three by these estimates,
+  with its guard bits. Small orders and arguments are normally settled
+  by it, and so are large ones where the estimates are accurate: in a
+  survey of 1700 exact inputs with real orders and $|\nu|$, $|z|$
+  between 0 and 30 times the precision, at 333 and 1000 bits, the
+  automatic functions take a median of 0.9 to 1.1 times the time of the
+  best single method run with exactly the guard bits it needs, and at
+  most about 4 times; a spot check of 760 such inputs at 3333, 10000
+  and 30000 bits gives the same picture (medians of 1.0, 90th
+  percentiles of 1.2 to 1.5, at most 3), the largest ratios being for
+  complex arguments near the turning point and for $Y$ and $K$ at
+  large integer orders. Guard bits for the series are increased by one
+  percent, which costs less than a second attempt.
+- An attempt which falls short by a known number of bits (it has some
+  correct bits, but not enough) is repeated with that many more bits;
+  otherwise the precision is doubled from one round to the next. In
+  each round the series and the expansion are tried in the order of
+  their estimated cost, but the expansion only where it is expected to
+  reach the precision, and neither twice at the same precision.
+- The integration is tried before any attempt whose estimated cost is
+  higher than its own.
 - For inexact input, the accuracy of the series is limited by the
   input balls passing through its cancellation. A result within a few
   bits of the accuracy that the input permits (estimated from the
@@ -601,11 +659,13 @@ is returned.
   directly, and the evaluation at the midpoints of the balls with the
   error $\sup |\partial_z F|\, r_z + \sup |\partial_\nu F|\, r_\nu$
   added from the bounds of [](#bounds). Both give about the same
-  radius; the integration is preferred unless it is more than about
-  four times as expensive, and its result is final. These cost a few
-  times as much as the series at small arguments; inputs given with a
-  few tens of bits more than the precision avoid them, since the
-  series on the balls is then accurate enough.
+  radius; the integration is preferred unless it is expected to cost
+  more than about 1.5 times the evaluation at the midpoint together
+  with the bounds (which take 0.1 to 0.2 milliseconds), and its result
+  is final. At small arguments and low precision these cost a few
+  times as much as the series; inputs given with a few tens of bits
+  more than the precision avoid them, since the series on the balls is
+  then accurate enough.
 - Inputs without any accuracy are passed to the classical
   implementation directly.
 

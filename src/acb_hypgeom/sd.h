@@ -270,6 +270,8 @@ int _sd_expand(acb_t res, const sd_contour * C, const sd_problem * P,
    and the cost of the quadrature along the two descent paths of a
    saddle with the given number of bits in the arithmetic. */
 double _sd_expand_cost(double absA, double q, int real, slong prec);
+/* a lower bound for that estimate, which is itself not free */
+double _sd_expand_cost_lower(double absA, int real, slong prec);
 double _sd_quad_cost(double bits);
 
 #ifdef __cplusplus

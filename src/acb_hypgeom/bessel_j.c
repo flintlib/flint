@@ -538,16 +538,25 @@ acb_hypgeom_bessel_j_transition(acb_t res, const acb_t nu, const acb_t z, slong 
 
             /* the peak term relative to the function: the sum of the
                series is J / [(z/2)^nu / Gamma(nu+1)], where (for
-               Re nu >= 0) |J| is at most about e^{|Im z|} and otherwise
-               about the first term; log |Gamma(nu+1)| by Stirling's
-               formula */
+               Re nu >= 0) |J| is about e^{|Im z|} in the oscillatory
+               region and e^{Re xi} beyond the turning point, with the
+               exponent xi of the Debye approximation (there the
+               alternating series loses twice the growth of its
+               terms); otherwise |J| is about the first term.
+               log |Gamma(nu+1)| by Stirling's formula */
             lnu = log(nn);
             anu = atan2(ni, nr);
             first = nr * log(0.5 * zz) - ni * atan2(b, a)
                 - ((nr + 0.5) * lnu - ni * anu - nr) - 0.9189385332;
             if (nr >= 0.0)
-                growth += FLINT_MAX(first - fabs(b), 0.0);
-            growth = growth * 1.44269504088896 + 10.0;
+            {
+                double lj = fabs(b);
+                if (nn > zz)
+                    lj = FLINT_MIN(lj, _acb_hypgeom_bessel_debye_re(nr, ni, a, b));
+                growth += FLINT_MAX(first - lj, 0.0);
+            }
+            /* (with a margin of one percent: the estimate is of leading order) */
+            growth = growth * 1.457 + 10.0;
             cancellation = FLINT_MIN(cancellation, growth);
         }
     }

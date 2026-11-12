@@ -672,6 +672,65 @@ _sd_bound_end(mag_t res, const acb_t alpha, int sym, const acb_t nu,
     return ok && mag_is_finite(res);
 }
 
+/* The weighted integrals of |exp(phi - c)| |dw| between the vertices i
+   and j > i of a polygon, added to res, with the polygon replaced by
+   fewer straight segments where that does not cost much: the segment
+   between the two vertices is used if its bound is not much larger
+   than the double precision estimate of the bounds for the polygon
+   between them (m[j] - m[i], where m[k] is the sum of the estimates for
+   the first k edges), or small compared to the estimate for the whole
+   polygon (m[n]); otherwise the range is split.  The estimates only
+   serve to choose the segments. */
+static void
+sdb_polygon_merged(mag_ptr res, const acb_t alpha, int sym, const acb_t nu,
+    const cd * pts, const acb_t c, int i, int j, const sd_problem * P,
+    double top, const double * m, int n)
+{
+    mag_struct t[3];
+    mag_t tol;
+    acb_t a, b;
+    double g[2], thr;
+    int k, split;
+
+    acb_init(a); acb_init(b);
+    mag_init(tol);
+    for (k = 0; k < 3; k++)
+        mag_init(t + k);
+
+    thr = 1.5 * (m[j] - m[i]) + 0.03 * m[n];
+
+    split = (j > i + 1) && !(_sd_panel(g, P, pts[i], pts[j], top) <= log(thr));
+
+    if (!split)
+    {
+        acb_set_d_d(a, pts[i].re, pts[i].im);
+        acb_set_d_d(b, pts[j].re, pts[j].im);
+        _sd_bound_segment(t, 3, alpha, sym, nu, a, b, c);
+        if (j > i + 1)
+        {
+            mag_set_d(tol, 1.25 * thr);
+            split = mag_cmp(t, tol) > 0;
+        }
+    }
+
+    if (!split)
+    {
+        for (k = 0; k < 3; k++)
+            mag_add(res + k, res + k, t + k);
+    }
+    else
+    {
+        int mid = i + (j - i) / 2;
+        sdb_polygon_merged(res, alpha, sym, nu, pts, c, i, mid, P, top, m, n);
+        sdb_polygon_merged(res, alpha, sym, nu, pts, c, mid, j, P, top, m, n);
+    }
+
+    acb_clear(a); acb_clear(b);
+    mag_clear(tol);
+    for (k = 0; k < 3; k++)
+        mag_clear(t + k);
+}
+
 /* The weighted L1 norms of exp(phi) along the contour, as absolute
    bounds (not relative to the reference values of the pieces).  With a
    starting point (a ball), the contour begins with the segment from
@@ -714,13 +773,33 @@ _sd_contour_bounds(mag_ptr L, const sd_contour * C, const sd_problem * P,
                 mag_add(S + k, S + k, t + k);
         }
 
-        for (j = 0; j + 1 < pc->npts; j++)
+        /* the polygon, with fewer segments where the bounds allow it
+           (any path between two vertices will do) */
+        if (pc->npts >= 2)
         {
-            acb_set_d_d(a, pc->pts[j].re, pc->pts[j].im);
-            acb_set_d_d(b, pc->pts[j + 1].re, pc->pts[j + 1].im);
-            _sd_bound_segment(t, 3, alpha, sym, nu, a, b, c);
-            for (k = 0; k < 3; k++)
-                mag_add(S + k, S + k, t + k);
+            double * m = flint_malloc(sizeof(double) * pc->npts);
+            double g[2];
+
+            m[0] = 0.0;
+            for (j = 0; j + 1 < pc->npts; j++)
+                m[j + 1] = m[j] + exp(_sd_panel(g, P, pc->pts[j], pc->pts[j + 1], pc->c.re));
+
+            if (m[pc->npts - 1] > 0.0 && m[pc->npts - 1] < 1e300)
+                sdb_polygon_merged(S, alpha, sym, nu, pc->pts, c, 0, pc->npts - 1,
+                    P, pc->c.re, m, pc->npts - 1);
+            else
+            {
+                for (j = 0; j + 1 < pc->npts; j++)
+                {
+                    acb_set_d_d(a, pc->pts[j].re, pc->pts[j].im);
+                    acb_set_d_d(b, pc->pts[j + 1].re, pc->pts[j + 1].im);
+                    _sd_bound_segment(t, 3, alpha, sym, nu, a, b, c);
+                    for (k = 0; k < 3; k++)
+                        mag_add(S + k, S + k, t + k);
+                }
+            }
+
+            flint_free(m);
         }
 
         for (j = 0; j < 2 && ok; j++)

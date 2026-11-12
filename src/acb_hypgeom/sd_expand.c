@@ -306,6 +306,17 @@ _sd_quad_cost(double bits)
     return 650.0 * pow(bits / 256.0, 2.1);
 }
 
+/* A lower bound for _sd_expand_cost, at no cost: an expansion at a
+   saddle with |phi''| = absA gains at most about log2(absA) bits per
+   coefficient. */
+double
+_sd_expand_cost_lower(double absA, int real, slong prec)
+{
+    if (!(absA > 0.0))
+        return INFINITY;
+    return sde_cost((int) fmin(0.7 * (double) prec / log2(2.0 + absA), 1e9), prec + 40, real);
+}
+
 double
 _sd_expand_cost(double absA, double q, int real, slong prec)
 {

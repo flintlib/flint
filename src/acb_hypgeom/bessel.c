@@ -15,54 +15,59 @@
    expansion at infinity, and rigorous numerical integration along
    steepest-descent contours (bessel_integration.c).
 
-   The methods are tried in order of cheapness at a doubling working
-   precision, each result verified a posteriori and the best kept:
+   For each method, the number of guard bits it needs (its
+   cancellation) and its cost are estimated in double precision (see
+   bessel_model); the cheapest is tried first, with its guard bits.
+   Every result is a rigorous enclosure and is verified a posteriori,
+   so that the estimates only affect the running time; the best result
+   is kept.
 
-     * first, unless the integration is expected to be cheaper, the
-       series-and-asymptotics implementation
-       (acb_hypgeom_bessel_*_nointegration) at the precision raised by
-       the estimated cancellation of the series, or for K and Y the
-       asymptotic expansion directly where it reaches the precision;
-       this settles the easy cases (small orders and arguments in
-       particular);
+     * The first attempt, unless the integration is expected to be
+       cheaper: the series at the precision raised by its cancellation
+       (for J and Y through the implementations
+       acb_hypgeom_bessel_*_nointegration, which do that by themselves),
+       or the asymptotic expansion with guard bits for its own
+       cancellation where it reaches the precision and is cheaper.
 
-     * for an inexact z and exact nu, evaluation at the midpoint of z
+     * With exact input, an attempt which falls short by a known number
+       of bits is repeated with that many more bits.  Otherwise the
+       working precision doubles from one round to the next, and in
+       each round the series and the expansion are tried in the order
+       of their cost (the expansion only where it is expected to get
+       there).
+
+     * Numerical integration evaluates the function on the input balls
+       directly with essentially optimal accuracy, at a cost nearly
+       independent of the parameters (some hundred microseconds at
+       machine precision): it is tried first when its estimated cost is
+       below that of the series and expansions, and otherwise before
+       any attempt which is expected to cost more.
+
+     * For an inexact z and exact nu, evaluation at the midpoint of z
        with the propagated error bounded through the differential
        equation (see midpoint_route_ode), at little more than the cost
-       of an evaluation with exact input;
+       of an evaluation with exact input.
 
-     * the series and the asymptotic expansion, in whichever order the
-       cheaper one comes first (the series costs ~|z| terms, the
-       expansion ~wp/2), starting at the precision raised by the
-       estimated cancellation of the series, which absorbs the rest as
-       the precision doubles, the expansion being self-limiting;
-
-     * numerical integration, which evaluates the function on the input
-       balls directly with essentially optimal accuracy, at a cost
-       nearly independent of the parameters (some hundred microseconds
-       at machine precision): it is tried first when its estimated cost
-       is below that of the series and expansions, and otherwise as
-       soon as it is cheaper than their next round;
-
-     * for other inexact inputs, once the working precision exceeds the
+     * For other inexact inputs, once the working precision exceeds the
        input accuracy, evaluation at the input midpoints with the
        propagated error added from rigorous derivative bounds,
 
            |F(p) - F(mid)| <= sup |dF/dz| rz + sup |dF/dnu| rnu
 
-       (bounds from the same steepest-descent contours); since the
+       (bounds from the same steepest-descent contours); the
        integration gives about the same enclosure without evaluating
-       anything at the midpoint, it is preferred here unless much more
-       expensive, and its result is then final;
+       anything at the midpoint, and is preferred unless more
+       expensive; its result is then final.
 
-     * finally the series-and-asymptotics implementation at the target
+     * Finally the series-and-asymptotics implementation at the target
        precision.
 
    An attempt that fails or returns a poor enclosure is cheap relative
-   to the one that succeeds, and the doubling schedule bounds the total
-   wasted work by a constant factor of the final attempt. */
+   to the one that succeeds, and the schedule bounds the total wasted
+   work by a constant factor of the final attempt. */
 
 #include <math.h>
+
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
@@ -76,6 +81,36 @@
 
 static void bessel(acb_t res, int kind, int scaled, const acb_t nu,
     const acb_t z, slong prec);
+
+/* (in the main loop of bessel(): an attempt at the working precision wp
+   which has fallen short of the accuracy to accept by a known number
+   of bits) */
+/* (the integration, if it has not been tried and is not expected to
+   cost more than the attempt which would come next) */
+#define TRY_INTEGRATION_IF(next_cost) \
+    do { \
+        if (int_ok && !int_tried && !inexact && c_int <= (next_cost)) \
+        { \
+            int_tried = 1; \
+            if (_acb_hypgeom_bessel_integration(t, NULL, kind, nu, z, scaled, prec)) \
+            { \
+                int_done = 1; \
+                keep_best(best, &best_acc, t); \
+                if (best_acc >= accept) \
+                    goto done; \
+            } \
+        } \
+    } while (0)
+
+#define NOTE_ATTEMPT() \
+    do { \
+        if (!inexact && acb_is_finite(t)) \
+        { \
+            slong a__ = acb_rel_accuracy_bits(t); \
+            if (a__ > 0 && a__ < accept) \
+                need_wp = FLINT_MIN(need_wp, wp + (accept - a__) + 20); \
+        } \
+    } while (0)
 static void
 method_series(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong wp)
 {
@@ -420,36 +455,540 @@ cleanup:
     return ok;
 }
 
-/* Rough cost estimates (in microseconds on a typical machine; only the
-   ratios matter) of the series at the working precision wp (~1.4 |z| +
-   wp/10 terms, plus the limit formula at integer order with ~|nu|
-   terms), of the asymptotic expansions (~wp/2 terms, see below), and of the
-   integration at precision prec: per descent path from a saddle, in
-   N-fold double precision up to N = 4, and from there on growing
-   quadratically. */
-static double
-series_cost(int kind, double num, double zn, int intorder, slong wp)
+/* The estimates on which the choice of method is based.  All of this
+   is heuristic, in double precision: it decides which method is tried
+   first and with how many guard bits, and nothing else; every result
+   is verified a posteriori. */
+typedef struct
 {
-    double terms = 1.4 * zn + (double) wp / 10.0 + 10.0, c;
+    double num, zn;     /* |nu|, |z| */
+    double nr, ni, zr, zi;
+    double lz, az;      /* log |z/2|, arg z */
+    double nser;        /* index of the largest term of the series for J and I */
+    double xi;          /* Re(xi) of the Debye approximations (see below; 0 for small orders) */
+    double cancel;      /* bits lost by the series to cancellation */
+    double cancel_pos, cancel_neg;  /* for Y at noninteger order (see series_cancellation) */
+    double areach;      /* bits which the asymptotic expansion can reach */
+    double aloss;       /* bits lost by the asymptotic expansion */
+    double apen;        /* bits by which its error bound exceeds the first omitted term */
+    double apeak;       /* size of its largest term, in bits */
+    int real;
+    int intorder;
+    int hp;             /* which cost model (see series_cost) */
+}
+bessel_model;
 
-    /* Y and K through J_{-nu} and I_{-nu} need ~|nu| terms before the
-       terms start decreasing when |z| is not small compared to |nu|
-       (and the limit formula at integer order has a sum of |nu| terms) */
-    if ((kind == KIND_Y || kind == KIND_K) && zn > 0.5 * num)
-        terms += 1.5 * num;
-    c = terms * (0.3 + 0.001 * (double) wp);
-    if (intorder)
-        c += 10.0 + 0.1 * (double) wp + 2.0 * (1.4 * zn + 10.0) * (0.3 + 0.001 * (double) wp);
+/* log Gamma(x) for x > 0, roughly (these estimates are evaluated on
+   every call of the functions, so that their cost matters at low
+   precision) */
+static double
+d_lgamma(double x)
+{
+    if (x < 8.0)
+        return lgamma(x);
+    return (x - 0.5) * log(x) - x + 0.9189385332046727 + 1.0 / (12.0 * x);
+}
+
+/* Re log Gamma(x + iy), roughly: Stirling's formula after shifting the
+   argument to the right.  For x < 1/2, the reflection formula without
+   the factor pi / sin(pi (x + iy)) unless regularize is zero: with
+   regularize set, this is the size of Gamma away from its poles and
+   zeros, which is what matters for the terms of a series at (or near)
+   an integer order. */
+static double
+d_lgamma_re(double x, double y, int regularize)
+{
+    double s = 0.0, r2;
+
+    if (x < 0.5)
+    {
+        s = -d_lgamma_re(1.0 - x, -y, 0);
+        if (!regularize || fabs(y) > 0.5)
+        {
+            double sn = sin(3.14159265358979323846 * x);
+            double ay = 3.14159265358979323846 * fabs(y);
+            /* log |sin(pi (x + iy))| */
+            s += 1.1447298858494002
+                - ((ay > 20.0) ? ay - 0.6931471805599453
+                               : 0.5 * log(fmax(sn * sn + sinh(ay) * sinh(ay), 1e-300)));
+        }
+        return s;
+    }
+
+    if (y == 0.0)
+        return d_lgamma(x);
+
+    while (x < 8.0)
+    {
+        s -= 0.5 * log(x * x + y * y);
+        x += 1.0;
+    }
+
+    r2 = x * x + y * y;
+    return s + (x - 0.5) * 0.5 * log(r2) - y * atan2(y, x) - x
+        + 0.9189385332046727 + x / (12.0 * r2);
+}
+
+/* Re(xi), xi = s - nu log((nu + s) / w), s = sqrt(nu^2 - w^2) on the
+   branch continuous with s = nu at w = 0: the exponent of the
+   leading-order (Debye) approximations, J_nu(w) ~ e^xi for |nu| > |w|
+   and of size e^|Re xi| in the oscillatory region, Y_nu(w) of size
+   e^|Re xi|, and I_nu(z) ~ e^xi, K_nu(z) ~ e^-xi with w = iz. */
+double
+_acb_hypgeom_bessel_debye_re(double nr, double ni, double wr, double wi)
+{
+    double qr, qi, m, sr, si, ur, ui, d;
+
+    qr = (nr - ni) * (nr + ni) - (wr - wi) * (wr + wi);
+    qi = 2.0 * (nr * ni - wr * wi);
+    m = hypot(qr, qi);
+    sr = sqrt(0.5 * fmax(m + qr, 0.0));
+    si = sqrt(0.5 * fmax(m - qr, 0.0));
+    if (qi < 0.0)
+        si = -si;
+    if (sr * nr + si * ni < 0.0)
+    {
+        sr = -sr;
+        si = -si;
+    }
+
+    ur = nr + sr;
+    ui = ni + si;
+    m = hypot(ur, ui);
+    if (!(m > 0.0))
+        return sr;
+
+    d = atan2(ui, ur) - atan2(wi, wr);
+    if (d > 3.14159265358979323846)
+        d -= 6.283185307179586;
+    if (d < -3.14159265358979323846)
+        d += 6.283185307179586;
+
+    return sr - (nr * (log(m) - log(hypot(wr, wi))) - ni * d);
+}
+
+/* log of the absolute value of the k-th term (z/2)^(2k +- nu) /
+   (k! Gamma(k +- nu + 1)) of the series for J and I (sign = 1) or of
+   the series with -nu which Y and K also need (sign = -1) */
+static double
+series_log_term(const bessel_model * B, double k, int sign)
+{
+    return 2.0 * k * B->lz + sign * (B->nr * B->lz - B->ni * B->az) - d_lgamma(k + 1.0)
+        - d_lgamma_re(k + 1.0 + sign * B->nr, sign * B->ni, 1);
+}
+
+/* The cancellation (in bits) which the series must absorb through its
+   working precision: the largest term relative to the function, whose
+   size is estimated by the Debye approximations (so that this also
+   accounts for J being exponentially small beyond the turning point,
+   where the alternating series loses twice the growth of its terms,
+   and for the series of K and Y with large orders, which do not cancel
+   as long as their terms decrease). */
+static double
+series_cancellation(int kind, bessel_model * B)
+{
+    double zre = fabs(B->zr), zim = fabs(B->zi), num = B->num, zn = B->zn;
+    double cancel, lmax, lfun, x;
+
+    /* the classical estimates: the terms grow to about e^|z|, while J
+       and Y are of size e^|Im z|, I of size e^|Re z| and K of size
+       e^(-Re z) */
+    if (kind == KIND_K)
+        cancel = 1.45 * (zn + B->zr);
+    else
+        cancel = 1.45 * (zn - ((kind == KIND_I) ? zre : zim));
+
+    B->cancel_pos = B->cancel_neg = cancel;
+
+    /* (the terms of the series for J and I decrease from the first one) */
+    if ((kind == KIND_J || kind == KIND_I) && B->nser < 1.0 && B->nr >= 0.0)
+        return 0.0;
+
+    /* (these are accurate for small orders; the estimates below are
+       for Re(nu) >= 0, and have only been validated for orders close
+       to the real axis) */
+    if (num <= 2.0 || B->nr < 0.0 || fabs(B->ni) > 0.05 * num
+        || !(num < 1e100 && zn < 1e100 && zn > 1e-100))
+    {
+        if ((kind == KIND_J || kind == KIND_I) && B->nser >= 1.0 && num < 1e15)
+        {
+            double growth = 2.0 * B->nser * B->lz - d_lgamma(B->nser + 1.0)
+                - (d_lgamma(B->nser + num + 1.0) - d_lgamma(num + 1.0));
+            cancel = fmin(cancel, 1.45 * growth + 10.0);
+        }
+        return fmax(cancel, 0.0);
+    }
+
+    x = B->xi;
+
+    /* the largest term of the series with +nu: the first one or the one
+       at the peak */
+    lmax = series_log_term(B, 0.0, 1);
+    if (B->nser >= 1.0)
+        lmax = fmax(lmax, series_log_term(B, B->nser, 1));
+
+    if (kind == KIND_J || kind == KIND_I)
+    {
+        lfun = (num > zn) ? x : fabs(x);
+    }
+    else
+    {
+        /* the series with -nu: the terms decrease from the first one
+           while k (|nu| - k) > |z|^2 / 4, and peak again beyond k = |nu| */
+        double s = sqrt(num * num + zn * zn);
+
+        lmax = fmax(lmax, series_log_term(B, 0.0, -1));
+        lmax = fmax(lmax, series_log_term(B, 0.5 * (num + s), -1));
+        if (zn < num)
+            lmax = fmax(lmax, series_log_term(B, 0.5 * (num - sqrt(num * num - zn * zn)), -1));
+
+        if (kind == KIND_K)
+            lfun = (B->zr >= 0.0) ? -x : fabs(x);
+        else
+            lfun = fabs(x);
+
+        /* (the combination of the two series is divided by sin(pi nu),
+           which is large for complex orders: that is not cancellation) */
+        lfun += fmax(3.14159265358979323846 * fabs(B->ni) - 0.6931471805599453, 0.0);
+
+        /* Y at noninteger order is computed from J_nu and J_{-nu} by an
+           implementation which raises the precision of each series by
+           its own cancellation, and there is none between the two:
+           nothing to add to the working precision (the two amounts
+           enter the cost) */
+        if (kind == KIND_Y && !B->intorder)
+        {
+            double lpos = series_log_term(B, 0.0, 1);
+            if (B->nser >= 1.0)
+                lpos = fmax(lpos, series_log_term(B, B->nser, 1));
+            B->cancel_pos = fmax(1.45 * (lpos - ((num > zn) ? x : fabs(x))) + 6.0, 0.0);
+            B->cancel_neg = fmax(1.45 * (lmax - lfun) + 6.0, 0.0);
+            return 0.0;
+        }
+    }
+
+    /* (the estimates are of leading order: a margin of one percent
+       costs less than a second attempt) */
+    return fmax(1.465 * (lmax - lfun) + 6.0, 0.0);
+}
+
+/* The number of terms of the series for J and I needed at the working
+   precision wp: beyond the peak at nser, until the terms have decreased
+   by wp bits.  The ratio of consecutive terms at the index k is
+   |z|^2 / (4 k (k + |nu|)), and the terms decrease by about half the
+   log of the ratio at the last index per term on average. */
+static double
+series_terms(const bessel_model * B, slong wp)
+{
+    double num = B->num, zn = B->zn, N, r, bits = 0.6931471805599453 * (double) wp;
+    int i;
+
+    if (!(num < 1e15 && zn < 1e15 && zn > 1e-300))
+        return 1.4 * zn + (double) wp / 10.0 + 10.0;
+
+    N = B->nser + 10.0 + 0.25 * (double) wp;
+    for (i = 0; i < 2; i++)
+    {
+        r = log(4.0 * N * (N + num) / (zn * zn));
+        N = B->nser + 2.0 + 2.0 * bits / fmax(r, 0.05);
+    }
+
+    return N + 5.0;
+}
+
+/* Rough cost estimates (in microseconds on a typical machine; only the
+   ratios matter) of the series at the working precision wp, of the
+   asymptotic expansions, and of the integration at precision prec: per
+   descent path from a saddle, in N-fold double precision up to N = 4,
+   and from there on growing with the exponent 1.6 up to about 1000
+   bits and 2.7 beyond (measured up to 10000 bits; the number of nodes
+   grows with the precision).  The cost per term of the series grows
+   slowly with the precision (measured: like its cube root for real and
+   its square root for complex arguments, up to some thousand bits). */
+static double
+series_term_cost(const bessel_model * B, double wp)
+{
+    return B->real ? 0.07 * cbrt(wp) : 0.03 * sqrt(wp);
+}
+
+static double
+series_cost(int kind, const bessel_model * B, slong wp)
+{
+    double terms, c, per_term;
+
+    /* Up to about 200 bits (where the integration runs in N-fold double
+       precision), simpler estimates which were tuned there: ~1.4 |z| +
+       wp/10 terms, plus ~|nu| for Y and K when |z| is not small
+       compared to |nu| and for the limit formula at integer order. */
+    if (!B->hp)
+    {
+        double p = (double) wp + ((kind == KIND_Y && !B->intorder) ? B->cancel_pos : 0.0);
+
+        terms = 1.4 * B->zn + p / 10.0 + 10.0;
+        if ((kind == KIND_Y || kind == KIND_K) && B->zn > 0.5 * B->num)
+            terms += 1.5 * B->num;
+        c = terms * (0.3 + 0.001 * p);
+        if (B->intorder)
+            c += 10.0 + 0.1 * p + 2.0 * (1.4 * B->zn + 10.0) * (0.3 + 0.001 * p);
+        return c;
+    }
+
+    terms = series_terms(B, wp);
+    per_term = series_term_cost(B, (double) wp);
+
+    if (kind == KIND_Y && !B->intorder)
+    {
+        /* the series for J_nu and J_{-nu}, each at the precision raised
+           by its cancellation; the terms of the second start decreasing
+           at about (|nu| + sqrt(|nu|^2 + |z|^2)) / 2 if |z| is not
+           small compared to |nu| */
+        double tneg;
+
+        tneg = (terms - B->nser) + ((B->zn > 0.5 * B->num)
+                ? 0.5 * (B->num + sqrt(B->num * B->num + B->zn * B->zn)) : 0.0);
+        return 4.0 + 0.02 * (double) wp * log2(2.0 + B->num)
+            + terms * series_term_cost(B, (double) wp + B->cancel_pos)
+            + tneg * series_term_cost(B, (double) wp + B->cancel_neg);
+    }
+
+    /* Y and K need the series with -nu as well, which has ~|nu| more
+       terms before they start decreasing when |z| is not small compared
+       to |nu| (the limit formula at integer order has a sum of |nu| terms) */
+    if (kind == KIND_Y || kind == KIND_K)
+    {
+        terms *= 2.0;
+        if (B->zn > 0.5 * B->num)
+            terms += 1.5 * B->num;
+    }
+
+    /* (the prefactor: a power and a gamma function) */
+    c = 2.0 + 0.01 * (double) wp * log2(2.0 + B->num) + terms * per_term;
+    /* (the limit formula: a finite sum of |nu| terms as well) */
+    if (B->intorder)
+        c += 10.0 + 0.1 * (double) wp + 2.0 * (1.4 * B->zn + 10.0 + B->num) * per_term;
     return c;
 }
 
-/* (for large orders, the terms of the expansion first grow, to about
-   e^(|nu|^2 / (2 |z|)) at index |nu|^2 / (2 |z|)) */
+/* log of the absolute value of the k-th term
+   prod_{j <= k} (4 nu^2 - (2j-1)^2) / (k! (8z)^k) of the asymptotic
+   expansions */
 static double
-asymp_cost(double num, double zn, slong wp)
+asymp_log_term(double k, double num, double zn)
 {
-    double t = fmin(num * num / zn, 1e9);
-    return 30.0 + (0.4 * (double) wp + 1.4 * t) * (0.3 + 0.001 * ((double) wp + 0.72 * t));
+    double v;
+
+    if (k <= 0.0)
+        return 0.0;
+    if (k < num)
+        v = d_lgamma(num + k + 0.5) - d_lgamma(num - k + 0.5);
+    else
+        v = d_lgamma(num + k + 0.5) + d_lgamma(k - num + 0.5);
+    return v - d_lgamma(k + 1.0) - k * log(2.0 * zn);
+}
+
+/* The asymptotic expansions sum_k a_k / (c z)^k: for large orders, the
+   terms first grow, up to the index k1 = sqrt(|z|^2 + |nu|^2) - |z| (to
+   about e^(|nu|^2 / (2 |z|)) if |nu| is small compared to |z|); they
+   are smallest (about e^(-2|z|) for small orders) at the index
+   k2 = sqrt(|z|^2 + |nu|^2) + |z|.  The sum is the function divided by
+   its leading behaviour e^(+-iz) or e^(+-z), of size e^(-+d) with
+   d = |Re xi| - |Im z| (|Re z| for I): 0 on the real axis, where the
+   expansions lose the growth of their terms to cancellation, and more
+   than that off the axis for the component with the small sum.  For K,
+   the sum is of size e^(Re z - Re xi), which on the positive real axis
+   is the size of the largest term (the terms have the same sign: no
+   cancellation).  The error bounds of the implementation exceed the
+   first omitted term by a factor of about e^(|nu|^2 / |z|), and need
+   |z| > |nu| for K; the number of terms is limited to 50 + 10 times
+   the working precision. */
+static void
+asymp_model(bessel_model * B, int kind)
+{
+    double num = B->num, zn = B->zn, s, peak, low, lsum;
+
+    B->apen = 0.0;
+    B->apeak = 0.0;
+
+    /* (of no use for small |z|, and not needed where the simpler
+       criterion is used and fails) */
+    if (zn < 4.0 || (!B->hp && !(zn > 1.9 * num + 2.0)))
+    {
+        B->aloss = 0.0;
+        B->areach = 0.0;
+        return;
+    }
+
+    if (num <= 2.0)
+    {
+        B->aloss = 0.0;
+        B->areach = 2.885 * zn;
+        return;
+    }
+
+    if (!(num < 1e15 && zn < 1e15) || (kind == KIND_K && zn < num))
+    {
+        B->aloss = 0.0;
+        B->areach = (zn > 1e15 * num) ? 2.885 * zn : 0.0;
+        return;
+    }
+
+    /* (complex orders: the simpler criterion and estimates) */
+    if (fabs(B->ni) > 0.05 * num)
+    {
+        B->apen = 1.45 * num * num / zn;
+        B->aloss = B->apeak = 0.72 * num * num / zn;
+        B->areach = (zn > 1.9 * num + 2.0) ? 2.885 * zn - B->apen : 0.0;
+        return;
+    }
+
+    B->apen = 1.45 * num * num / zn;
+
+    s = sqrt(zn * zn + num * num);
+    peak = fmax(asymp_log_term(num * num / (s + zn), num, zn), 0.0);
+    low = asymp_log_term(s + zn, num, zn);
+
+    if (kind == KIND_K)
+        lsum = fmin(B->zr - B->xi, peak);
+    else
+        lsum = -fabs(fabs(B->xi) - fabs((kind == KIND_I) ? B->zr : B->zi));
+
+    B->apeak = 1.45 * peak;
+    B->aloss = 1.45 * fmax(peak - lsum, 0.0);
+    B->areach = 1.45 * (lsum - low) - B->apen;
+}
+
+/* whether the asymptotic expansion reaches wp bits, with a number of
+   guard bits which is not out of proportion */
+static int
+asymp_converges(const bessel_model * B, slong wp)
+{
+    /* (the simpler criterion: beyond the turning point region,
+       empirically from |z| ~ 1.9 |nu|, where the error is about
+       e^(-2 |z|)) */
+    if (!B->hp)
+        return B->zn > 1.9 * B->num + 2.0 && 2.885 * B->zn >= (double) wp + 3.0;
+
+    return B->areach >= (double) wp + 3.0 && B->aloss <= 3.0 * (double) wp + 100.0;
+}
+
+/* the number of terms of the expansion for wp bits: the implementation
+   adds terms until they are smaller than the unit roundoff at its
+   working precision (wp + aloss bits) divided by the factor in the
+   error bound, that is, from the peak until the terms have decreased by
+   apeak + wp + aloss + apen bits (by bisection) */
+static double
+asymp_terms(const bessel_model * B, slong wp)
+{
+    double num = B->num, zn = B->zn, bits = (double) wp + B->aloss + B->apen + B->apeak;
+    double s, lo, hi, target;
+    int i;
+
+    if (num <= 2.0 || !(num < 1e15 && zn < 1e15))
+    {
+        /* n! / (2 |z|)^n = 2^(-bits): at most 0.4 terms per bit, fewer
+           for large |z| */
+        double n = 0.4 * bits;
+
+        if (zn < 1e15)
+            for (i = 0; i < 3; i++)
+                n = fmin(0.6931471805599453 * bits / fmax(1.0 - log((n + 1.0) / (2.0 * zn)), 1.0), 0.4 * bits);
+        return n;
+    }
+
+    s = sqrt(zn * zn + num * num);
+    lo = num * num / (s + zn);
+    hi = s + zn;
+    target = fmax(asymp_log_term(lo, num, zn), 0.0) - 0.6931471805599453 * bits;
+
+    lo = fmax(lo, 1.0);
+    for (i = 0; i < 7; i++)
+    {
+        double mid = sqrt(lo * hi);
+        if (asymp_log_term(mid, num, zn) > target)
+            lo = mid;
+        else
+            hi = mid;
+    }
+
+    return hi;
+}
+
+/* the precision at which to evaluate the expansion for wp bits: with
+   guard bits for its cancellation, and large enough for the number of
+   terms to be allowed */
+static slong
+asymp_prec(const bessel_model * B, slong wp)
+{
+    double p = (double) wp + fmin(B->aloss, 3.0 * (double) wp + 100.0);
+
+    if (B->num > 2.0)
+        p = fmax(p, fmin(0.11 * asymp_terms(B, wp) + 20.0, 4.0 * (double) wp + 100.0));
+
+    return (slong) p;
+}
+
+/* the cost of the expansion for wp bits (two expansions except for K) */
+static double
+asymp_cost(int kind, const bessel_model * B, slong wp)
+{
+    double N, wpe;
+
+    if (!B->hp)
+    {
+        double t = fmin(B->num * B->num / B->zn, 1e9);
+        return 30.0 + (0.4 * (double) wp + 1.4 * t) * (0.3 + 0.001 * ((double) wp + 0.72 * t));
+    }
+
+    N = asymp_terms(B, wp);
+    wpe = fmax((double) wp + B->aloss, 0.11 * N);
+
+    /* (measured up to 30000 bits: the cost per term grows linearly with
+       the precision up to some hundred bits, like its square root up to
+       some thousand, and slowly from there) */
+    return 5.0 + (N + 20.0) * ((wpe < 350.0) ? 0.0024 * wpe
+            : (wpe < 3500.0) ? 0.045 * sqrt(wpe) : 2.66 * pow(wpe / 3500.0, 0.15))
+        * ((kind == KIND_K) ? 0.45 : 1.0);
+}
+
+static void
+bessel_model_init(bessel_model * B, int kind, const acb_t nu, const acb_t z,
+    int real_case, int intorder, slong goal)
+{
+    B->hp = (goal > 200);
+    B->nr = arf_get_d(arb_midref(acb_realref(nu)), ARF_RND_NEAR);
+    B->ni = arf_get_d(arb_midref(acb_imagref(nu)), ARF_RND_NEAR);
+    B->zr = arf_get_d(arb_midref(acb_realref(z)), ARF_RND_NEAR);
+    B->zi = arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_NEAR);
+    B->num = hypot(B->nr, B->ni);
+    B->zn = hypot(B->zr, B->zi);
+    B->real = real_case;
+    B->intorder = intorder;
+    B->nser = 0.5 * (-(B->num + 1.0) + sqrt((B->num + 1.0) * (B->num + 1.0) + B->zn * B->zn));
+    B->lz = log(0.5 * B->zn);
+    B->az = (B->zi == 0.0 && B->zr > 0.0) ? 0.0 : atan2(B->zi, B->zr);
+    B->xi = 0.0;
+    if (B->num > 2.0 && B->num < 1e100 && B->zn < 1e100 && B->zn > 1e-100
+        && !((kind == KIND_J || kind == KIND_I) && B->nser < 1.0 && B->zn < 4.0))
+    {
+        if (kind == KIND_J || kind == KIND_Y)
+            B->xi = _acb_hypgeom_bessel_debye_re(B->nr, B->ni, B->zr, B->zi);
+        else
+            B->xi = _acb_hypgeom_bessel_debye_re(B->nr, B->ni, -B->zi, B->zr);
+    }
+    B->cancel = series_cancellation(kind, B);
+
+    /* Y at a noninteger order close to an integer:
+       (J_nu cos(pi nu) - J_{-nu}) / sin(pi nu) loses the bits by which
+       sin(pi nu) is small */
+    if (kind == KIND_Y && !intorder && fabs(B->ni) < 0.25 && B->num < 1e15)
+    {
+        double d = fabs(B->nr - floor(B->nr + 0.5));
+        d = hypot(d, B->ni);
+        if (d < 0.25)
+            B->cancel += fmin(-log2(fmax(3.2 * d, 1e-300)), 1000.0);
+    }
+
+    asymp_model(B, kind);
 }
 
 /* |phi''| = |sqrt(nu^2 -+ z^2)| at the saddles of the integrals for exact
@@ -486,85 +1025,75 @@ saddle_curvature(int kind, const acb_t nu, const acb_t z)
 
 /* absA: saddle_curvature() */
 static double
-integration_cost(int kind, double num, double zn, int real, double absA, slong prec)
+integration_cost(int kind, const bessel_model * B, double absA, slong prec, double other)
 {
+    double num = B->num, zn = B->zn;
+    int real = B->real;
     static const double dcost[4] = { 30.0, 45.0, 100.0, 200.0 };
     double bits = (double) prec + 12.0 + log2(2.0 + zn + num), c;
     int npaths;
 
     if (bits <= 4 * 53)
         c = dcost[(int) ((bits - 1.0) / 53.0)];
+    else if (bits <= 1024.0)
+        c = 550.0 * pow(bits / 256.0, 1.6);
     else
-        c = 600.0 * (bits / 256.0) * (bits / 256.0);
-
-    /* per saddle (two paths): the planning of the contour and the
-       expansion in place of the quadrature, where that matters */
-    if (absA > 0.0 && bits > 4 * 53)
-        c = fmin(c, 0.5 * (45.0 + 0.1 * bits + _sd_expand_cost(absA, num / absA, real, prec)));
+        c = 550.0 * 9.19 * pow(bits / 1024.0, 2.7);
 
     /* one saddle for K and for J, I in the monotone regime; two for
        the oscillatory functions (one with real variables, where the
-       contributions are complex conjugates) */
+       contributions are complex conjugates, and one for J and I where
+       the contribution e^(-|Re xi|) of the second is negligible
+       compared to e^(|Re xi|)) */
     if (kind == KIND_K)
         npaths = 2;
     else if (kind == KIND_Y || zn > num)
-        npaths = real ? 2 : 4;
+        npaths = (real || (B->hp && kind != KIND_Y && 2.9 * fabs(B->xi) > bits + 20.0)) ? 2 : 4;
     else
         npaths = 2;
+
+    /* per saddle (two paths): the planning of the contour and the
+       expansion in place of the quadrature, where that matters (its
+       estimate takes from a few microseconds to some hundred at
+       thousands of bits, and is only computed if a cheap lower bound
+       for it leaves the integration a chance against the other
+       methods, of cost other) */
+    if (absA > 0.0 && bits > 4 * 53
+        && npaths * 0.5 * (45.0 + 0.1 * bits + _sd_expand_cost_lower(absA, real, prec))
+            < fmin(other, npaths * c))
+        c = fmin(c, 0.5 * (45.0 + 0.1 * bits + _sd_expand_cost(absA, num / absA, real, prec)));
 
     return npaths * c;
 }
 
-/* The cancellation (in bits) which the series must absorb through its
-   working precision: the terms grow to about e^|z| while J and Y are of
-   size e^|Im z|, I of size e^|Re z| and K of size e^(-Re z); for J and
-   I, no more than the largest term (z/2)^(2k) / (k! (nu+1)_k), at
-   k ~ nser, exceeds the first one (for large orders, the terms hardly
-   grow). */
-static double
-series_cancellation(int kind, double num, double zn, double nser, const acb_t z)
-{
-    double zre = fabs(arf_get_d(arb_midref(acb_realref(z)), ARF_RND_NEAR));
-    double zim = fabs(arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_NEAR));
-    double cancel, growth;
-
-    if (kind == KIND_K)
-        return 2.9 * zre;
-
-    cancel = 1.45 * (zn - ((kind == KIND_I) ? zre : zim));
-
-    if (kind != KIND_Y && nser >= 1.0 && num < 1e15)
-    {
-        growth = 2.0 * nser * log(0.5 * zn) - lgamma(nser + 1.0)
-            - (lgamma(nser + num + 1.0) - lgamma(num + 1.0));
-        cancel = fmin(cancel, 1.45 * growth + 10.0);
-    }
-
-    return fmax(cancel, 0.0);
-}
-
-/* whether the asymptotic expansion reaches wp bits: its error is about
-   e^(-2 |z|) for |z| beyond the turning point region (empirically, from
-   |z| ~ 1.9 |nu|) */
-static int
-asymp_converges(double num, double zn, slong wp)
-{
-    return zn > 1.9 * num + 2.0 && 2.885 * zn >= (double) wp + 3.0;
-}
-
 /* the expected cost of the series and expansions until success at the
-   goal precision: the asymptotic expansion where it converges, else the
-   series at the precision raised by its cancellation; infinite where
-   neither applies */
+   goal precision: the cheaper of the asymptotic expansion, where it
+   converges, and the series at the precision raised by its
+   cancellation; infinite where neither applies.  Also sets
+   *asymp_first to whether the expansion is the cheaper one. */
 static double
-first_cost(int kind, double num, double zn, double cancel,
-    int intorder, int series_plausible, slong goal)
+first_cost(int * asymp_first, int kind, const bessel_model * B,
+    int series_plausible, slong goal)
 {
-    if (asymp_converges(num, zn, goal))
-        return asymp_cost(num, zn, goal + 30);
+    double ca = INFINITY, cs = INFINITY;
+    slong swp = goal + 30 + (slong) fmin(B->cancel, 1e9);
+    int conv = asymp_converges(B, goal);
+
+    /* (the series has at least nser terms and the expansion at least
+       0.35 per bit: there is often no need to count them) */
+    if (B->hp && series_plausible && conv
+        && 1.2 * B->nser * series_term_cost(B, (double) swp)
+            > 4.0 * (5.0 + (0.4 * ((double) goal + 30.0 + B->aloss + B->apen + B->apeak) + 20.0)
+                * 0.0024 * ((double) goal + 30.0 + B->aloss)))
+        series_plausible = 0;
+
     if (series_plausible)
-        return 1.2 * series_cost(kind, num, zn, intorder, goal + 30 + (slong) cancel);
-    return INFINITY;
+        cs = 1.2 * series_cost(kind, B, swp);
+    if (conv && (!B->hp || 5.0 + (0.35 * ((double) goal + 30.0) + 20.0) * 0.02 * sqrt((double) goal + 30.0) < cs))
+        ca = asymp_cost(kind, B, goal + 30);
+
+    *asymp_first = (ca <= cs) && (ca < INFINITY);
+    return fmin(ca, cs);
 }
 
 /* whether the integration can be attempted at all (the contours are
@@ -667,6 +1196,9 @@ static void
 bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong prec)
 {
     double zn, num, nser, nlim, cancel, c_int, c_first;
+    bessel_model B;
+    int asymp_first;
+    slong wp_next, need_wp;
     slong wp, acc_in, goal, target, accept, best_acc = -WORD_MAX;
     acb_t best, t;
     int inexact, real_case, round, series_plausible, intorder;
@@ -752,9 +1284,10 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
        and K cost a small multiple); at integer order, Y and K are
        computed from a limit formula which also includes a finite sum of
        |nu| terms (this is feasible for moderately large |nu|) */
-    nser = 0.5 * (-(num + 1.0) + sqrt((num + 1.0) * (num + 1.0) + zn * zn));
     intorder = (kind == KIND_Y || kind == KIND_K) && acb_contains_int(nu);
     nlim = intorder ? num : 0.0;
+    bessel_model_init(&B, kind, nu, z, real_case, intorder, goal);
+    nser = B.nser;
 
     series_plausible = (nser <= 10.0 * (16.0 * (double) goal + 480.0))
                         && (nlim <= 20.0 * (double) goal + 20000.0);
@@ -766,10 +1299,9 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
        than the series (at the precision raised by the cancellation it
        must absorb) or the asymptotic expansion, where that converges */
     int_ok = integration_applicable(nu, z);
-    c_int = integration_cost(kind, num, zn, real_case,
-                saddle_curvature(kind, nu, z), FLINT_MIN(prec, mprec));
-    cancel = series_cancellation(kind, num, zn, nser, z);
-    c_first = first_cost(kind, num, zn, cancel, intorder, series_plausible, goal);
+    cancel = fmin(B.cancel, 1e9);
+    c_first = first_cost(&asymp_first, kind, &B, series_plausible, goal);
+    c_int = integration_cost(kind, &B, saddle_curvature(kind, nu, z), FLINT_MIN(prec, mprec), c_first);
     int_first = int_ok && (c_int < c_first);
 
     acb_init(best);
@@ -784,22 +1316,27 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
     wp = goal;
     if (goal < prec)
         wp = FLINT_MIN(prec, goal + (slong) FLINT_MIN((double) goal, 1.45 * zn));
-    else if (series_plausible && !asymp_converges(num, zn, goal))
+    else if (series_plausible && !asymp_first)
         wp = goal + (slong) FLINT_MIN(cancel, 4.0 * (double) goal);
 
     for (wp = wp + 30, round = 0; wp <= 16 * goal + 480;
-            wp = 2 * wp + 30, round++)
+            wp = wp_next, round++)
     {
-        int m, series_first, series_done = 0;
-        slong iter_start_acc = best_acc;
+        int m, series_first, series_done = 0, asymp_done = 0;
+        slong iter_start_acc = best_acc, awp, swp;
 
-        /* the series needs ~nser terms, the expansion ~wp/2; where the
-           expansion is known to reach the working precision (its error
-           is ~ e^{-2 |z|}), it comes first since
-           it is self-limiting (and the limit formula for Y and K at
-           integer order is expensive) */
-        series_first = (FLINT_MAX(nser, nlim) <= 0.5 * (double) wp)
-            && !asymp_converges(num, zn, wp);
+        need_wp = WORD_MAX;
+
+        /* the cheaper of the series and the expansion comes first */
+        series_first = !asymp_first;
+
+        /* the expansion with guard bits for its own cancellation, and
+           the series with those for its cancellation (which the
+           working precision includes if the series is the first choice) */
+        awp = inexact ? wp + (slong) FLINT_MIN(B.aloss, (double) wp + 100.0) : asymp_prec(&B, wp);
+        swp = wp;
+        if (!inexact && asymp_first && goal >= prec)
+            swp += (slong) FLINT_MIN(cancel, 4.0 * (double) goal);
 
         /* First, unless the integration is expected to be cheaper, the
            series-and-asymptotics implementation, which is tuned for
@@ -808,39 +1345,81 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
            of the series. */
         if (round == 0 && !int_first)
         {
-            slong p0 = prec + 10;
-            int conv, direct;
+            /* (guard bits for the rounding errors: a few more at high
+               precision, where the sums are longer) */
+            slong p0 = prec + 10 + FLINT_MIN(prec / 40, 15), p0a;
+            int conv, direct, series0;
 
-            /* K and Y by the expansion as soon as it converges (their
-               series cancel heavily or are expensive); the
-               implementations of J and I switch from the series (which
-               is cheaper up to about |z| = prec / 2) by themselves,
-               but for inexact input the expansion is preferable as
-               there is no cancellation to inflate the input radii */
-            conv = asymp_converges(num, zn, goal);
-            direct = conv && (kind == KIND_K || inexact)
+            /* The expansion directly: for K as soon as it converges
+               (its series cancels heavily); where it is the cheaper
+               method by the estimates (at low precision, where the
+               simpler estimates are used, the implementations of J and
+               I switch from the series by themselves instead); and for
+               inexact input well beyond the turning point, where there
+               is no cancellation to inflate the input radii. */
+            conv = asymp_converges(&B, goal);
+            direct = conv && (kind == KIND_K || (B.hp && asymp_first)
+                    || (inexact && zn > 1.9 * num + 2.0))
                 && !(kind == KIND_Y && !arb_is_positive(acb_realref(z)));
+            p0a = inexact ? wp + (slong) FLINT_MIN(B.aloss, (double) goal + 100.0)
+                          : asymp_prec(&B, p0);
 
-            if (kind != KIND_J && !direct
-                && !(conv && 2.0 * zn >= (double) p0))
+            /* With exact input, when the series is the choice: the
+               series itself for I and K (whose implementations only
+               choose between the series and the expansion, by a simpler
+               criterion and without guard bits for the latter), and
+               also for J where its implementation would choose the
+               expansion.  Otherwise the implementation of J raises the
+               precision of the series by its cancellation. */
+            series0 = !inexact && !direct && !asymp_first
+                && (kind == KIND_I || kind == KIND_K
+                    || (kind == KIND_J && zn >= 8.0 && 2.0 * zn >= (double) p0
+                        && _acb_hypgeom_bessel_asymp_converges(nu, z, p0)));
+
+            if ((kind != KIND_J || series0) && !direct
+                && (series0 || !(conv && 2.0 * zn >= (double) p0)))
                 p0 += (slong) FLINT_MIN(cancel, 4.0 * (double) goal);
 
             /* (with an inexact z, the cancellation of the series
                inflates the radius regardless of the precision, and so
                does the expansion close to where it stops converging;
                the evaluation at the midpoint is then better) */
-            if (!(inexact && acb_is_exact(nu) && cancel >= 4.0
-                    && !asymp_converges(num, zn, goal + 12)))
+            if (!(inexact && cancel >= (acb_is_exact(nu) ? 4.0 : 16.0)
+                    && !(asymp_converges(&B, goal + 12) && zn > 1.9 * num + 2.0)))
             {
                 if (direct)
-                    method_asymp(t, kind, scaled, nu, z, inexact ? wp : p0);
+                {
+                    method_asymp(t, kind, scaled, nu, z, p0a);
+                    asymp_done = 1;
+                }
+                else if (series0)
+                {
+                    method_series(t, kind, scaled, nu, z, p0);
+                    series_done = 1;
+                }
                 else
+                {
                     method_nointegration(t, kind, scaled, nu, z, inexact ? wp : p0);
+                    /* (this is the series, for exact input) */
+                    series_done = !inexact;
+                }
                 keep_best(best, &best_acc, t);
                 /* (if only z is inexact, the evaluation at the midpoint
                    is cheap and nearly optimal: less slack) */
                 if (best_acc >= ((inexact && acb_is_exact(nu)) ? target - 2 : accept))
                     goto done;
+
+                /* a near miss with exact input is a matter of guard
+                   bits: the accuracy is recovered bit for bit */
+                if (!inexact && best_acc > 0)
+                {
+                    wp += (accept - best_acc) + 20;
+                    asymp_done = series_done = 0;
+                    awp = asymp_prec(&B, wp);
+                    swp = wp;
+                    if (asymp_first && goal >= prec)
+                        swp += (slong) FLINT_MIN(cancel, 4.0 * (double) goal);
+                }
             }
 
             /* inexact z only: the evaluation at the midpoint with the
@@ -862,7 +1441,7 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
            or once it is cheaper than the next round of the series and
            expansions */
         if (int_ok && !int_tried
-            && (int_first || c_int <= (series_first ? series_cost(kind, num, zn, intorder, wp) : asymp_cost(num, zn, wp))))
+            && (int_first || c_int <= (series_first ? series_cost(kind, &B, wp) : asymp_cost(kind, &B, wp))))
         {
             int_tried = 1;
             if (_acb_hypgeom_bessel_integration(t, NULL, kind, nu, z, scaled, prec))
@@ -885,7 +1464,7 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
 
             /* the integration evaluates on the input balls directly,
                and is preferred unless much more expensive */
-            if (int_ok && !int_tried && c_int <= 4.0 * (c_first + 50.0))
+            if (int_ok && !int_tried && c_int <= 1.5 * (c_first + 150.0))
             {
                 int_tried = 1;
                 if (_acb_hypgeom_bessel_integration(t, NULL, kind, nu, z, scaled, prec))
@@ -916,11 +1495,16 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
             if ((m == 0) == series_first)
             {
                 if (nser <= 4.0 * (double) prec + 1000.0 && series_plausible
-                    && !(inexact && round == 0 && kind == KIND_Y))
+                    && !(inexact && round == 0 && kind == KIND_Y)
+                    && !series_done)
                 {
-                    method_series(t, kind, scaled, nu, z, wp);
+                    /* (the integration first if the series has become
+                       the more expensive of the two) */
+                    TRY_INTEGRATION_IF(series_cost(kind, &B, swp));
+                    method_series(t, kind, scaled, nu, z, swp);
                     keep_best(best, &best_acc, t);
                     series_done = 1;
+                    NOTE_ATTEMPT();
                 }
             }
             else if (kind == KIND_Y && !arb_is_positive(acb_realref(z)))
@@ -932,12 +1516,17 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
                 {
                     acb_hypgeom_bessel_y_nointegration(t, nu, z, wp);
                     keep_best(best, &best_acc, t);
+                    NOTE_ATTEMPT();
                 }
             }
-            else
+            else if (!asymp_done && (inexact || round >= 2 || asymp_converges(&B, accept)))
             {
-                method_asymp(t, kind, scaled, nu, z, wp);
+                /* (with exact input, not where the expansion is not
+                   expected to get there, unless nothing else has) */
+                TRY_INTEGRATION_IF(asymp_cost(kind, &B, wp));
+                method_asymp(t, kind, scaled, nu, z, awp);
                 keep_best(best, &best_acc, t);
+                NOTE_ATTEMPT();
             }
             if (best_acc >= accept)
                 goto done;
@@ -951,8 +1540,16 @@ bessel(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slong pre
            need more terms than a lower precision allows), unless the
            series is hopelessly long. */
         if (round >= 1 && best_acc < iter_start_acc + wp / 8
-            && (best_acc > 0 || !series_plausible))
+            && (best_acc > 0 || !series_plausible)
+            && need_wp == WORD_MAX)
             break;
+
+        /* the next working precision: where an attempt of this round
+           has fallen short by a known number of bits (with exact
+           input), that many more; otherwise doubled */
+        wp_next = 2 * wp + 30;
+        if (need_wp < wp_next)
+            wp_next = FLINT_MAX(need_wp, wp + 30);
     }
 
     /* inexact inputs which are more accurate than the precision can
@@ -1105,10 +1702,14 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z,
         int series_plausible = (nser <= 10.0 * (16.0 * (double) goal + 480.0))
                                 && (!intorder || num <= 20.0 * (double) goal + 20000.0);
 
-        if (integration_cost(KIND_Y, num, zn, bessel_real_case(KIND_Y, nu, z),
-                    saddle_curvature(KIND_Y, nu, z), goal)
-            < first_cost(KIND_Y, num, zn, series_cancellation(KIND_Y, num, zn, nser, z),
-                    intorder, series_plausible, goal)
+        bessel_model B;
+        int asymp_first;
+
+        bessel_model_init(&B, KIND_Y, nu, z, bessel_real_case(KIND_Y, nu, z), intorder, goal);
+
+        double c_first = first_cost(&asymp_first, KIND_Y, &B, series_plausible, goal);
+
+        if (integration_cost(KIND_Y, &B, saddle_curvature(KIND_Y, nu, z), goal, c_first) < c_first
             && _acb_hypgeom_bessel_integration(t, u, ACB_HYPGEOM_KIND_BESSEL_JY, nu, z, 0, prec)
             && acb_rel_accuracy_bits(t) >= accept
             && acb_rel_accuracy_bits(u) >= accept)
