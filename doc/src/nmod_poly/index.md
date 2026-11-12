@@ -612,12 +612,13 @@ void nmod_poly_mul_classical(nmod_poly_t res, const nmod_poly_t poly1, const nmo
 
 Set `res` to the product by the classical algorithm, with
 $O(\mathit{len1} \cdot \mathit{len2})$ operations. The underscore version
-requires $\mathit{len1} \ge \mathit{len2} \ge 1$ and does not allow
-aliasing.
+requires $\mathit{len1}, \mathit{len2} \ge 1$, in either order, and does
+not allow aliasing.
 
 ::: details
 If $(n-1)^2 \min(\mathit{len1}, \mathit{len2})$ fits in one word, the
-products are accumulated without reduction and every coefficient is
+products are accumulated without reduction, one pass over the longer
+operand for each coefficient of the shorter one, and every coefficient is
 reduced once at the end. Otherwise each coefficient is a dot product
 computed with `_nmod_vec_dot_rev`, whose method is chosen once for the
 longest dot product. Squaring uses the symmetry of the product and does
@@ -630,8 +631,8 @@ void _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_src
 void nmod_poly_mullow_classical(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc)
 
 Set `res` to the product modulo $x^{\mathit{trunc}}$ by the classical
-algorithm. The underscore version requires $\mathit{len1} \ge
-\mathit{len2} \ge 1$ and $1 \le \mathit{trunc} \le \mathit{len1} +
+algorithm. The underscore version requires $\mathit{len1}, \mathit{len2}
+\ge 1$, in either order, and $1 \le \mathit{trunc} \le \mathit{len1} +
 \mathit{len2} - 1$, and does not allow aliasing.
 :::
 

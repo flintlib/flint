@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 TEST_FUNCTION_START(nmod_poly_mullow_classical, state)
@@ -138,6 +139,47 @@ TEST_FUNCTION_START(nmod_poly_mullow_classical, state)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
         nmod_poly_clear(d);
+    }
+
+    /* Check the underscore function with the operands in either order */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_t mod;
+        nn_ptr a, b, p, r;
+        slong la, lb, trunc;
+
+        nmod_init(&mod, n_randtest_not_zero(state));
+        la = 1 + n_randint(state, 50);
+        lb = 1 + n_randint(state, 50);
+        trunc = 1 + n_randint(state, la + lb - 1);
+
+        a = _nmod_vec_init(la);
+        b = _nmod_vec_init(lb);
+        p = _nmod_vec_init(la + lb - 1);
+        r = _nmod_vec_init(trunc);
+        _nmod_vec_randtest(a, state, la, mod);
+        _nmod_vec_randtest(b, state, lb, mod);
+
+        if (la >= lb)
+            _nmod_poly_mul(p, a, la, b, lb, mod);
+        else
+            _nmod_poly_mul(p, b, lb, a, la, mod);
+
+        _nmod_poly_mullow_classical(r, a, la, b, lb, trunc, mod);
+
+        result = _nmod_vec_equal(r, p, trunc);
+        if (!result)
+        {
+            flint_printf("FAIL (operands in either order):\n");
+            flint_printf("n = %wu, la = %wd, lb = %wd, trunc = %wd\n", mod.n, la, lb, trunc);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        _nmod_vec_clear(a);
+        _nmod_vec_clear(b);
+        _nmod_vec_clear(p);
+        _nmod_vec_clear(r);
     }
 
     TEST_FUNCTION_END(state);
