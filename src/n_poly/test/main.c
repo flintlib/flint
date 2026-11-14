@@ -16,6 +16,8 @@
 #include "t-n_fq_poly_gcd.c"
 #include "t-n_fq_poly_mul.c"
 #include "t-n_fq_poly_sub.c"
+#include "t-n_poly_mod_scalar_addmul_nmod.c"
+#include "t-zip_eval_step.c"
 
 /* Array of test functions ***************************************************/
 
@@ -26,6 +28,8 @@ test_struct tests[] =
     TEST_FUNCTION(n_fq_poly_gcd),
     TEST_FUNCTION(n_fq_poly_mul),
     TEST_FUNCTION(n_fq_poly_sub),
+    TEST_FUNCTION(n_poly_mod_scalar_addmul_nmod),
+    TEST_FUNCTION(zip_eval_step),
 };
 
 /* main function *************************************************************/

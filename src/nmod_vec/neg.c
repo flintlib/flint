@@ -15,6 +15,14 @@
 void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 {
     slong i;
+
+    /* in place with clang, see _nmod_vec_add */
+#if defined(__clang__)
+    if (res == vec)
+        for (i = 0 ; i < len; i++)
+            res[i] = nmod_neg(res[i], mod);
+    else
+#endif
     for (i = 0 ; i < len; i++)
         res[i] = nmod_neg(vec[i], mod);
 }

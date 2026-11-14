@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2026 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -51,6 +52,30 @@ TEST_FUNCTION_START(nmod_mat_scalar_mul, state)
 
         if (!nmod_mat_equal(A, C))
             TEST_FUNCTION_FAIL("");
+
+        /* entry by entry, into a window of a larger matrix (rows that do
+           not follow each other) and from one */
+        {
+            nmod_mat_t big, W;
+            slong i, j, r0 = n_randint(state, 3), c0 = n_randint(state, 4);
+
+            nmod_mat_init(big, m + 2, n + 3, mod);
+            nmod_mat_randtest(big, state);
+            nmod_mat_window_init(W, big, r0, c0, r0 + m, c0 + n);
+            nmod_mat_scalar_mul(W, B, c);
+            for (i = 0; i < m; i++)
+                for (j = 0; j < n; j++)
+                    if (nmod_mat_entry(W, i, j) != nmod_mul(c, nmod_mat_entry(B, i, j), B->mod))
+                        TEST_FUNCTION_FAIL("window: i = %wd, j = %wd\n", i, j);
+            nmod_mat_set(D, W);
+            nmod_mat_scalar_mul(C, W, c);
+            for (i = 0; i < m; i++)
+                for (j = 0; j < n; j++)
+                    if (nmod_mat_entry(C, i, j) != nmod_mul(c, nmod_mat_entry(D, i, j), B->mod))
+                        TEST_FUNCTION_FAIL("from a window: i = %wd, j = %wd\n", i, j);
+            nmod_mat_window_clear(W);
+            nmod_mat_clear(big);
+        }
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

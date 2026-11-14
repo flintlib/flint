@@ -461,10 +461,16 @@ Sets $B = cA$. Requires $c < n$.
 
 ::: details
 The cases $c = 0$, $1$ and $n - 1$ are a zeroing, a copy and a negation.
-Otherwise, for $n < 2^{\bits - 1}$ and matrices with at least
-`FLINT_MULMOD_SHOUP_THRESHOLD` entries, the products use
-[Shoup multiplication](algorithms/arithmetic/shoup) with a quotient
-precomputed for $c$, and `nmod_mul` otherwise.
+Otherwise `_nmod_vec_scalar_mul_nmod` computes the products, in one call
+on all the entries when the rows of $A$ and $B$ follow each other in
+memory (stride equal to the number of columns), else row by row for rows
+of at least `NMOD_VEC_SIMD_MIN_LEN` entries when a vector kernel applies
+to $n$ (`NMOD_VEC_SIMD_SCALAR_MAX_BITS`, [](nmod_vec)), of at least 8
+entries when $n \ge 2^{\bits - 1}$, and of at least 16 entries otherwise.
+Shorter rows of a window are done entry by entry, with
+[Shoup multiplication](algorithms/arithmetic/shoup) for $n < 2^{\bits - 1}$
+and matrices with at least `FLINT_MULMOD_SHOUP_THRESHOLD` entries, and
+`nmod_mul` otherwise.
 :::
 :::
 
@@ -478,8 +484,10 @@ Sets $B = cA$ for any integer $c$, which is first reduced modulo $n$.
 void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c)
 
 Sets $C = A + cB$. Unlike `nmod_mat_scalar_mul`, $c$ may be any word; it
-is reduced modulo $n$ first. Uses Shoup multiplication under the same
-conditions as `nmod_mat_scalar_mul`.
+is reduced modulo $n$ first. As in `nmod_mat_scalar_mul`, the products
+are computed by `_nmod_vec_scalar_addmul_nmod` (or, when $C$ is $B$ but
+not $A$, by `_nmod_vec_scalar_mul_nmod` followed by an addition), on all
+the entries at once or row by row, and entry by entry for shorter rows.
 :::
 
 ## Matrix multiplication {#mul}

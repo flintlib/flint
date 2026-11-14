@@ -462,8 +462,30 @@ void _n_fq_reduce2_lazy1(
     nmod_t ctx)
 {
     slong i;
-    for (i = 0; i < 2*d - 1; i++)
-        NMOD_RED(a[i], a[i], ctx);
+
+    /* Below NMOD_VEC_SIMD_MIN_LEN entries, the inline loop: through the
+       vector call it was 0.49-0.82x at 3 entries, 0.70-1.07x at 5-7. Clang
+       vectorizes it with masked loads and stores (0.43-0.72x at 3-7
+       entries): the pragmas keep it scalar, and not unrolled on ARM64
+       (Apple M4: 1.01-1.09x main, 0.83-0.93x unrolled). Vectorized without
+       the masks on x86, it lost up to 3x on Zen 4 with clang 21. Nov 2026. */
+    if (ctx.norm == 0)
+    {
+        for (i = 0; i < 2*d - 1; i++)
+            NMOD_RED(a[i], a[i], ctx);
+    }
+    else if (2*d - 1 < NMOD_VEC_SIMD_MIN_LEN)
+    {
+#if defined(__clang__) && defined(__aarch64__)
+#pragma clang loop vectorize(disable) unroll(disable)
+#elif defined(__clang__)
+#pragma clang loop vectorize(disable)
+#endif
+        for (i = 0; i < 2*d - 1; i++)
+            NMOD_RED(a[i], a[i], ctx);
+    }
+    else
+        _nmod_vec_reduce(a, a, 2*d - 1, ctx);
 }
 
 void _n_fq_madd2_lazy1(

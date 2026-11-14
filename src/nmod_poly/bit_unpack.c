@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "nmod_vec.h"
 
 /* the loop of the case FLINT_BITS < bits < 2 FLINT_BITS of
    _nmod_poly_bit_unpack, each coefficient reduced with RED */
@@ -192,8 +193,8 @@ _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, flint_bit
     }
     else if (bits == FLINT_BITS)
     {
-        for (i = nlo; i < nhi; i++)
-            NMOD_RED(res[i], mpn[i], mod);
+        /* the output starts at res + nlo (res was moved back by nlo above) */
+        _nmod_vec_reduce(res + nlo, mpn + nlo, nhi - nlo, mod);
     }
     else if (bits == 2 * FLINT_BITS)
     {

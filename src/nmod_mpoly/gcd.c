@@ -895,6 +895,9 @@ static int _try_monomial_cofactors(
     NA = mpoly_words_per_exp(A->bits, ctx->minfo);
     a0inv = nmod_inv(a0, ctx->mod);
     T->length = A->length;
+    /* The coefficients are scaled in this loop: a separate
+       _nmod_vec_scalar_mul_nmod was 0.83-1.01x, the scaling being negligible
+       next to the exponents (Nov 2026). */
     for (i = 0; i < A->length; i++)
     {
         mpoly_get_monomial_ffmpz(Texps, A->exps + NA*i, A->bits, ctx->minfo);

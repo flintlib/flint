@@ -173,6 +173,16 @@
 #define FLINT_NMOD_VEC_DOT_U52_MIN_LEN 32
 
 /*
+    nmod_vec: the 512-bit kernels of _nmod_vec_reduce, _mul,
+    _scalar_mul_nmod and _scalar_addmul_nmod run from this length on
+    (NMOD_VEC_SIMD_MIN_LEN in src/nmod_vec.h). On Intel, a 512-bit load of
+    entries written just before by narrow stores waits for these stores
+    (no store forwarding): 8-15 such entries ran at 0.60-0.95x, and from
+    16 entries the kernels gained (Ice Lake, Cascade Lake, Nov 2026)
+*/
+#define FLINT_NMOD_VEC_AVX512_MIN_LEN 16
+
+/*
     radix_mulmid: with fft_small, the classical algorithm is used below this
     many limb products per limb of the convolution that fft_small computes;
     see src/radix.h (not measured on this target: as Ice Lake)

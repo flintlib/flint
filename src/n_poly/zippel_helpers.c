@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 #include "n_poly.h"
@@ -104,6 +105,17 @@ ulong _nmod_zip_eval_step(
 {
     slong i;
     ulong t0, t1, t2, p0, p1;
+
+    /* From 16 terms and up to 62 bits, a dot product, then the vector
+       product (two passes). The fused loop below stays for fewer terms and
+       at 63-64 bits, where the split was 0.7-0.95x (Nov 2026). */
+    if (length >= 16 && NMOD_BITS(ctx) <= 62)
+    {
+        t0 = _nmod_vec_dot(cur, coeffs, length, ctx, _nmod_vec_dot_params(length, ctx));
+        _nmod_vec_mul(cur, cur, inc, length, ctx);
+        return t0;
+    }
+
     t2 = t1 = t0 = 0;
     if (NMOD_IS_HALFLIMB(ctx))
     {
@@ -164,6 +176,13 @@ void _n_fq_zip_eval_step(
 }
 
 
+/* On NEON, _n_fqp_zip_eval_step splits only from d = 3 (below) */
+#if FLINT_BITS == 64 && defined(__ARM_NEON) && defined(__aarch64__)
+# define FQP_ZIP_SPLIT_MIN_D 3
+#else
+# define FQP_ZIP_SPLIT_MIN_D 1
+#endif
+
 void _n_fqp_zip_eval_step(
     ulong * res,            /* in Fq: size d */
     ulong * cur,            /* in Fp: size length */
@@ -187,24 +206,53 @@ void _n_fqp_zip_eval_step(
     TMP_START;
     tmp = (ulong *) TMP_ALLOC(3*d*sizeof(ulong));
 
-    i = 0;
-
-    for (j = 0; j < d; j++)
-    {
-        umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[i], (coeffs + d*i)[j]);
-        tmp[3*j+2] = 0;
-    }
-    cur[i] = nmod_mul(cur[i], inc[i], mod);
-
-    for (i = 1; i < length; i++)
+    /* Up to 50 bits, the sums, then cur = cur inc as one vector product
+       (1.04-1.63x on Ice Lake, Zen 4 and Broadwell); on NEON from d = 3,
+       as at d = 2 the separate pass was 0.64-0.68x on the M4. Otherwise
+       main's loop, which updates cur with the sums: the separate pass was
+       0.93-1.22x at 51-62 bits and 0.58-0.96x at 63-64, and one loop with a
+       test inside lost with gcc even above 50 bits (Nov 2026). */
+    if (NMOD_BITS(mod) <= 50 && d >= FQP_ZIP_SPLIT_MIN_D)
     {
         for (j = 0; j < d; j++)
         {
-            umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
-            add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
-                          tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[0], coeffs[j]);
+            tmp[3*j+2] = 0;
+        }
+
+        for (i = 1; i < length; i++)
+        {
+            for (j = 0; j < d; j++)
+            {
+                umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
+                add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
+                              tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            }
+        }
+
+        _nmod_vec_mul(cur, cur, inc, length, mod);
+    }
+    else
+    {
+        i = 0;
+
+        for (j = 0; j < d; j++)
+        {
+            umul_ppmm(tmp[3*j+1], tmp[3*j+0], cur[i], (coeffs + d*i)[j]);
+            tmp[3*j+2] = 0;
         }
         cur[i] = nmod_mul(cur[i], inc[i], mod);
+
+        for (i = 1; i < length; i++)
+        {
+            for (j = 0; j < d; j++)
+            {
+                umul_ppmm(p1, p0, cur[i], (coeffs + d*i)[j]);
+                add_sssaaaaaa(tmp[3*j+2], tmp[3*j+1], tmp[3*j+0],
+                              tmp[3*j+2], tmp[3*j+1], tmp[3*j+0], 0, p1, p0);
+            }
+            cur[i] = nmod_mul(cur[i], inc[i], mod);
+        }
     }
 
     for (j = 0; j < d; j++)
@@ -263,6 +311,8 @@ int _nmod_zip_vand_solve(
     for (j = 0; j < mlength; j++)
         scratch[j] = nmod_pow_ui(monomials[j], mlength, ctx);
 
+    /* The products scratch[j] monomials[j] stay in the loop: a separate
+       _nmod_vec_mul was 0.87-1.11x (Nov 2026). */
     for (i = mlength; i < elength; i++)
     {
         V0 = V1 = V2 = S = 0;
@@ -450,6 +500,8 @@ int _n_fqp_zip_vand_solve(
     for (j = 0; j < mlength; j++)
         scratch[j] = nmod_pow_ui(monomials[j], mlength, mod);
 
+    /* The products scratch[j] monomials[j] stay in the loop, as in
+       _nmod_zip_vand_solve. */
     for (i = mlength; i < elength; i++)
     {
         _nmod_vec_zero(V_p, 3*d);

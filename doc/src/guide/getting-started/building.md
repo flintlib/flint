@@ -101,6 +101,11 @@ pass for example `CFLAGS="-O2 -march=x86-64-v3"` (requiring AVX2) or
 overridden with `--host` or `--build`; on systems with several ABIs,
 `ABI=32` or `ABI=64` selects one.
 
+With clang (versions 19 to 22 at least), compiling for generic x86-64 or for
+Intel processors up to Ice Lake - Tiger Lake makes some loops of modular
+arithmetic 2 to 4 times slower than with GCC; see
+[](algorithms/arithmetic/moller-granlund#branches).
+
 ### Threads and the memory manager {#threads}
 
 FLINT is built with POSIX threads and thread-local storage by default.

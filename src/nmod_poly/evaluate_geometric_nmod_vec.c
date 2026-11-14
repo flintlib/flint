@@ -59,6 +59,8 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     TMP_START;
     nn_ptr a = TMP_ALLOC(alen * sizeof(ulong));
 
+    /* Not written with _nmod_vec_mul: the reversed indices would need an
+       extra pass, for a negligible part of the time (tried Nov 2026) */
     for (slong i = val; i < plen; i++)
         a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
 
@@ -68,8 +70,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     if (!done)
         _nmod_poly_mulmid(vs, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
 
-    for (slong i = 0; i < len; i++)
-        vs[i] = nmod_mul(G->ev_s[i], vs[i], mod);
+    _nmod_vec_mul(vs, G->ev_s, vs, len, mod);
 
     TMP_END;
 }

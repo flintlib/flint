@@ -64,6 +64,20 @@ void sample(void * arg, ulong count)
            res[j] = _nmod_mul_fullword(vec1[j], vec2[j], mod);
       prof_stop();
       break;
+
+   case 2:
+      prof_start();
+      for (i = 0; i < count; i++)
+         _nmod_vec_mul(res, vec1, vec2, 1000, mod);
+      prof_stop();
+      break;
+
+   case 3:
+      prof_start();
+      for (i = 0; i < count; i++)
+         _nmod_vec_mul_lazy(res, vec1, vec2, 1000, mod);
+      prof_stop();
+      break;
    }
 
    _nmod_vec_clear(vec1);
@@ -73,7 +87,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-   double min1, min2, max;
+   double min1, min2, min3, min4, max;
    info_t info;
    flint_bitcnt_t i;
 
@@ -83,20 +97,33 @@ int main(void)
 
       info.fullword = 0;
       prof_repeat(&min1, &max, sample, (void *) &info);
+      info.fullword = 2;
+      prof_repeat(&min3, &max, sample, (void *) &info);
 
-      if (i != FLINT_BITS)
+      if (i <= 62)
       {
-        flint_printf("bits %wd, mul = %.1lf c/l\n",
-           i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+        info.fullword = 3;
+        prof_repeat(&min4, &max, sample, (void *) &info);
+        flint_printf("bits %wd, mul = %.1lf c/l, _nmod_vec_mul = %.2lf c/l, _lazy = %.2lf c/l\n",
+           i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+      }
+      else if (i != FLINT_BITS)
+      {
+        flint_printf("bits %wd, mul = %.1lf c/l, _nmod_vec_mul = %.2lf c/l\n",
+           i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
       }
       else
       {
         info.fullword = 1;
         prof_repeat(&min2, &max, sample, (void *) &info);
 
-        flint_printf("bits %wd, mul = %.1lf c/l, mul_fullword = %.1lf c/l\n",
+        flint_printf("bits %wd, mul = %.1lf c/l, mul_fullword = %.1lf c/l, _nmod_vec_mul = %.2lf c/l\n",
            i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
-              (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+              (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+              (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
       }
    }
 

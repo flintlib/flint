@@ -50,7 +50,8 @@ $0 \le u_1 < d$ and $0 \le u_0 < B$.
 :::
 
 Step 4 can be implemented without branches using a mask, and step 5 is
-rarely taken. Compared with the older method of Granlund and Montgomery
+rarely taken ([](#branches) explains what compilers do with them).
+Compared with the older method of Granlund and Montgomery
 [@GraMon1994], which needs a high product and a full product in the
 correction, this algorithm replaces one full product with a cheaper low
 product.
@@ -154,3 +155,43 @@ arithmetic modulo word-size integers.
   normalised divisor, with the quotient. The divisions of limb arrays by
   a limb in [](mpn_extras), the carries of [](radix) arithmetic and the
   divisions by a leading coefficient in [](fmpz_mpoly) use it.
+
+## Branches and compilers {#branches}
+
+Whether step 4 is taken depends on the input. For the product of two random
+residues, as in `nmod_mul`, it is taken for about half of the inputs when $d$
+is just above $B/2$, for about 83% when $d = 3B/4$, and for almost all of them
+when $d$ is just below $B$ (here $d = n 2^s$ is the normalised modulus). Step 5
+is almost never taken.
+
+FLINT writes step 4 as a plain `if` and leaves the code to the compiler. GCC
+compiles it to a conditional move, without a branch. So does clang, except in a
+loop of independent reductions, such as `res[i] = nmod_mul(a[i], b[i], mod)` or
+a loop of `NMOD_RED2`: there, when compiling for some x86 processors, it turns
+the conditional move back into a branch. On random inputs this branch is often
+mispredicted, and such loops take 2 to 4 times longer than with the conditional
+move (unless $n$ is just below a power of two, where the branch is well
+predicted). This was observed with clang 18, 19 and 22 when compiling for
+
+- generic x86-64 (`-march=x86-64`, `x86-64-v3` or `x86-64-v4`);
+- Intel processors up to Ice Lake, Tiger Lake and Rocket Lake:
+  `-march=haswell`, `broadwell`, `skylake`, `skylake-avx512`,
+  `cascadelake`, `icelake-client`, `icelake-server`, `tigerlake` and
+  `rocketlake`, and the Atom processors `goldmont` and `tremont`.
+
+The code for Alder Lake and later desktop processors (`-march=alderlake`,
+`raptorlake`, `meteorlake`, `arrowlake`, ...), Sapphire Rapids and later
+servers, all AMD Zen processors, and ARM64 keeps the conditional move. What
+matters is the processor that the code is compiled for, not the one that runs
+it: `configure` compiles FLINT for the host processor
+([](guide/getting-started/building#cpu)), and a program that calls the inline
+function `nmod_mul` in a loop is compiled with its own flags.
+
+Reductions that depend on each other, as in Horner's rule or powering, are not
+affected (clang keeps the conditional move), nor are functions compiled out of
+line such as `n_mulmod2_preinv` and `n_ll_mod_preinv`.
+
+Some options to avoid the slowdown are: compile with GCC; or compile with clang
+and the flag `-mllvm -x86-cmov-converter=false`. The loops above then take the
+same time for every $n$: 2 to 4 times less than with the branch for most $n$,
+about 20% more when $n$ is just below a power of two.

@@ -69,6 +69,36 @@
 #endif
 
 /*
+    The length from which _nmod_vec_reduce, _nmod_vec_mul,
+    _nmod_vec_scalar_mul_nmod, _nmod_vec_scalar_addmul_nmod and their lazy
+    variants run their SIMD kernels (doc: nmod_vec/simd), below which they
+    run their scalar code: FLINT_NMOD_VEC_AVX512_MIN_LEN of flint-mparam.h
+    with the 512-bit kernels (16 on Intel), else 8. A caller with short
+    vectors can keep an inline loop below this length.
+    NMOD_VEC_SIMD_SCALAR_MAX_BITS(add): the largest number of bits of n for
+    which _nmod_vec_scalar_mul_nmod (add = 0), _nmod_vec_scalar_addmul_nmod
+    (add = 1) and their lazy variants have a kernel, 0 without SIMD.
+    impl_simd.h checks that these conditions are those of its kernels.
+*/
+#if FLINT_BITS == 64 && !defined(FLINT_MACHINE_VECTORS_FORCE_GENERIC) \
+        && !defined(FLINT_MACHINE_VECTORS_STRICT_C)
+# if defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512VL__)
+#  define NMOD_VEC_SIMD_MIN_LEN FLINT_NMOD_VEC_AVX512_MIN_LEN
+#  define NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) 63
+# elif defined(__AVX2__)
+#  define NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) 50
+# elif defined(__ARM_NEON) && defined(__aarch64__)
+#  define NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) ((add) ? 32 : 50)
+# endif
+#endif
+#ifndef NMOD_VEC_SIMD_MIN_LEN
+# define NMOD_VEC_SIMD_MIN_LEN 8
+#endif
+#ifndef NMOD_VEC_SIMD_SCALAR_MAX_BITS
+# define NMOD_VEC_SIMD_SCALAR_MAX_BITS(add) 0
+#endif
+
+/*
     Minimal lengths for these to beat the scalar code, measured on Ice Lake,
     Zen 4, Cascade Lake, Broadwell and Emerald Rapids. For u64, measured
     against _DOT2 in the two-limb band and against _DOT3_ACC / _DOT3 in the
@@ -229,6 +259,8 @@ void _nmod_vec_add(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod);
 
+void _nmod_vec_mul(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+
 void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_mul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
@@ -237,6 +269,13 @@ void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong
 void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+
+/* outputs in [0, 2n) instead of [0, n), for n < 2^(FLINT_BITS - 2) */
+/* for scalar_addmul_nmod_lazy, the input res may be in [0, 2n) */
+void _nmod_vec_reduce_lazy(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod);
+void _nmod_vec_mul_lazy(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_addmul_nmod_lazy(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
 /* the AVX2 version exists when FLINT itself is compiled with AVX2 */
 #if NMOD_VEC_LIB_HAVE_AVX2

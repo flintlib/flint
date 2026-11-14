@@ -54,6 +54,12 @@ for (i = 0; i < len; i++)
 
 An `nmod_t` parameter can be used directly: it is already a local copy.
 
+Note: compiled with clang (observed on versions 19 to 22) for generic x86-64 or
+for non-recent Intel processors (up to Ice Lake - Tiger Lake), a loop of
+independent products such as this one may take 2 to 4 times longer than with
+GCC: clang puts there a branch that random inputs often mispredict
+(see [](algorithms/arithmetic/moller-granlund#branches)).
+
 ## How it works {#algorithm}
 
 `nmod_init` stores $n$, the number `norm` of leading zero bits of $n$, and

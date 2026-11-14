@@ -65,8 +65,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
 
     /* f = sum_{i=val}^{len-1} v[i] * G->int_s1[i] x**{i-val} */
     /*   == sum_{i=0}^{f_len-1} v[i+val] * G->int_s1[i+val] x**i */
-    for (slong i = 0; i < f_len; i++)
-        f[i] = nmod_mul(v[i+val], G->int_s1[i+val], mod);
+    _nmod_vec_mul(f, v + val, G->int_s1 + val, f_len, mod);
 
     /* h = (x**val * f) * G->int_f  mod x**len                     */
     /*   == x**val (f * G->int_f  mod x**(len-val))                */
@@ -119,6 +118,8 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
             break;
 
     /* compute reversed and scaled f */
+    /* Not written with _nmod_vec_mul: the reversed indices would need an
+       extra pass, for a negligible part of the time (tried Nov 2026) */
     for (slong i = 0; i < h_len-val; i++)
         f[i] = nmod_mul(h[h_len-1-i], G->int_s2[h_len-1-i], mod);
 
@@ -130,6 +131,9 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
 
     /* final scaling */
     _nmod_vec_zero(poly+h_len, len-h_len);
+    /* Not written with _nmod_vec_mul either: the reversed indices would
+       need an extra pass, for a negligible part of the time (tried
+       Nov 2026) */
     for (slong i = 0; i < h_len; i++)
         poly[i] = nmod_mul(h[len-1-i], G->int_s1[i], mod);
 

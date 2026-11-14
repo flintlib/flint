@@ -63,6 +63,10 @@ _nmod_poly_interpolate_nmod_vec_barycentric(nn_ptr poly,
 
     _nmod_poly_product_roots_nmod_vec(P, xs, n, mod);
 
+    /* The weights entry by entry: computing them as n vector products (for
+       each j, all i at once with _nmod_vec_mul) was tried in Nov 2026; it
+       was 0.86-1.29x for the 6-15 points that _nmod_poly_interpolate_nmod_vec
+       sends here, and gained only from 32 points. */
     for (i = 0; i < n; i++)
     {
         w[i] = UWORD(1);
