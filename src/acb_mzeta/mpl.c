@@ -210,10 +210,10 @@ g_suffixes_scaled(acb_ptr res, const g_series_ctx * G, slong N, slong wp,
     for (n = 1; n <= N; n++)
     {
         const fmpz * power, * remaining_product;
-        /* Unscaled states are bounded by q^n (1 + log N)^(d-1).
-           Allow for this factor and the sum of rounding errors before
-           reducing state precision. Accumulate all sums at wp. */
-        double drop = FLINT_MAX(0.0, floor(n * decay - guard));
+        /* A depth-d series starts at degree d. Measure decay from that
+           degree to retain relative accuracy for small arguments. The
+           guard allows for the harmonic factor and accumulated rounding. */
+        double drop = FLINT_MAX(0.0, floor((n - G->depth) * decay - guard));
         slong state_prec = wp - (slong) FLINT_MIN(wp - min_prec, drop);
 
         if (n > hi)
