@@ -15,7 +15,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-/* Assumes poly1 and poly2 are not length 0 and 0 < n <= len1 + len2 - 1 */
+/* Assumes poly1 and poly2 are not length 0, and 0 < n <= len1 + len2 - 1 */
 void
 _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong n, nmod_t mod)
@@ -26,6 +26,13 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
+
+    /* either order is allowed: the longer operand first from here on */
+    if (len1 < len2)
+    {
+        FLINT_SWAP(nn_srcptr, poly1, poly2);
+        FLINT_SWAP(slong, len1, len2);
+    }
 
     if (n == 1)
     {
@@ -41,17 +48,16 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
 
     squaring = (poly1 == poly2 && len1 == len2);
 
-    // TODO could what is below make more direct use of nmod_vec_dot?
     log_len = FLINT_BIT_COUNT(len2);
     bits = FLINT_BITS - (slong) mod.norm;
     bits = 2 * bits + log_len;
 
     if (bits <= FLINT_BITS)
     {
-        flint_mpn_zero(res, n);
-
         if (squaring)
         {
+            flint_mpn_zero(res, n);
+
             for (i = 0; i < len1; i++)
             {
                 c = poly1[i];
@@ -67,12 +73,17 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
         }
         else
         {
+            /* the longer operand in the inner loop, see comment in _nmod_poly_mul_classical */
+            c = poly2[0];
             for (i = 0; i < len1; i++)
-            {
-                ulong c = poly1[i];
+                res[i] = poly1[i] * c;
+            flint_mpn_zero(res + len1, n - len1);
 
-                for (j = 0; j < FLINT_MIN(len2, n - i); j++)
-                    res[i + j] += c * poly2[j];
+            for (j = 1; j < len2; j++)
+            {
+                c = poly2[j];
+                for (i = 0; i < FLINT_MIN(len1, n - j); i++)
+                    res[i + j] += poly1[i] * c;
             }
         }
 
