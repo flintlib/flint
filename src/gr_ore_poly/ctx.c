@@ -23,8 +23,6 @@
 #include "mpoly.h"
 #include "ulong_extras.h"
 
-static const char * default_var = "D";
-
 int gr_ore_poly_ctx_write(gr_stream_t out, gr_ore_poly_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -77,9 +75,6 @@ int _gr_ore_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
     slong len;
     len = strlen(s);
 
-    if (GR_ORE_POLY_CTX(ctx)->var == default_var)
-        GR_ORE_POLY_CTX(ctx)->var = NULL;
-
     GR_ORE_POLY_CTX(ctx)->var = flint_realloc(GR_ORE_POLY_CTX(ctx)->var, len + 1);
     memcpy(GR_ORE_POLY_CTX(ctx)->var, s, len + 1);
     return GR_SUCCESS;
@@ -130,8 +125,7 @@ gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
     if (GR_ORE_POLY_CTX(ctx)->which_algebra != ORE_ALGEBRA_CUSTOM)
         flint_free(GR_ORE_POLY_CTX(ctx)->ore_data);
 
-    if (GR_ORE_POLY_CTX(ctx)->var != default_var)
-        flint_free(GR_ORE_POLY_CTX(ctx)->var);
+    flint_free(GR_ORE_POLY_CTX(ctx)->var);
 }
 
 truth_t
@@ -309,8 +303,49 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
+/* generated using claude-opus-5-5 */
 static void
-_gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const ore_algebra_t which_algebra)
+_gr_ore_poly_ctx_set_default_gen_name(gr_ore_poly_ctx_t ctx, slong base_var)
+{
+    /* following the conventions of ore_algebra where they exist */
+    static const char * prefix[ORE_POLY_NUM_ALGEBRAS] = {
+        [ORE_ALGEBRA_CUSTOM] = "D",
+        [ORE_ALGEBRA_COMMUTATIVE] = "C",
+        [ORE_ALGEBRA_DERIVATIVE] = "D",
+        [ORE_ALGEBRA_EULER_DERIVATIVE] = "T",
+        [ORE_ALGEBRA_FORWARD_SHIFT] = "S",
+        [ORE_ALGEBRA_FORWARD_DIFFERENCE] = "F",
+        [ORE_ALGEBRA_BACKWARD_SHIFT] = "B",
+        [ORE_ALGEBRA_BACKWARD_DIFFERENCE] = "N",
+        [ORE_ALGEBRA_Q_SHIFT] = "Q",
+        [ORE_ALGEBRA_MAHLER] = "M",
+        [ORE_ALGEBRA_FROBENIUS] = "Frob",
+    };
+
+    ore_algebra_t alg = GR_ORE_POLY_CTX(ctx)->which_algebra;
+    const char * head = prefix[alg];
+    char * var = NULL;
+    size_t len;
+
+    if (alg != ORE_ALGEBRA_CUSTOM && alg != ORE_ALGEBRA_COMMUTATIVE
+            && alg != ORE_ALGEBRA_FROBENIUS && base_var >= 0)
+    {
+        if (gr_ctx_gen_name(&var, base_var, GR_ORE_POLY_ELEM_CTX(ctx)) != GR_SUCCESS)
+            var = NULL;
+    }
+
+    len = strlen(head);
+    GR_ORE_POLY_CTX(ctx)->var = flint_malloc(len + (var != NULL ? strlen(var) : 0) + 1);
+    strcpy(GR_ORE_POLY_CTX(ctx)->var, head);
+    if (var != NULL)
+    {
+        strcpy(GR_ORE_POLY_CTX(ctx)->var + len, var);
+        flint_free(var);
+    }
+}
+
+static void
+_gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
 {
     ctx->which_ring = GR_CTX_GR_ORE_POLY;
     ctx->sizeof_elem = sizeof(gr_ore_poly_struct);
@@ -318,9 +353,9 @@ _gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const ore_algeb
 
     GR_ORE_POLY_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     GR_ORE_POLY_CTX(ctx)->degree_limit = WORD_MAX;
-    GR_ORE_POLY_CTX(ctx)->var = (char *) default_var;
     GR_ORE_POLY_CTX(ctx)->which_algebra = which_algebra;
     GR_ORE_POLY_CTX(ctx)->sigma_delta = _gr_ore_poly_default_sigma_delta[which_algebra];
+    _gr_ore_poly_ctx_set_default_gen_name(ctx, base_var);
 
     ctx->methods = _gr_ore_poly_methods;
 
@@ -334,7 +369,7 @@ _gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const ore_algeb
 void
 gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
 {
-    _gr_ore_poly_ctx_init(ctx, base_ring, which_algebra);
+    _gr_ore_poly_ctx_init(ctx, base_ring, base_var, which_algebra);
 
     /* todo: FLINT_ASSERT(base_var < gr_ctx_ngens(base_ring)) */
 
@@ -347,7 +382,7 @@ gr_ore_poly_ctx_init_custom(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
                             const gr_ore_poly_sigma_delta_t sigma_delta,
                             void * ore_data)
 {
-    _gr_ore_poly_ctx_init(ctx, base_ring, ORE_ALGEBRA_CUSTOM);
+    _gr_ore_poly_ctx_init(ctx, base_ring, -1, ORE_ALGEBRA_CUSTOM);
     GR_ORE_POLY_CTX(ctx)->sigma_delta = sigma_delta;
     GR_ORE_POLY_CTX(ctx)->ore_data = ore_data;
 }
