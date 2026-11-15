@@ -338,10 +338,13 @@ length.
 
 ::: function
 int gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
+int gr_poly_randtest_shiftful(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
 
 Sets `poly` to a random polynomial of length at most `len`, with
 coefficients from `gr_randtest`. The distribution is meant for testing:
-it is not uniform and produces many special values.
+it is not uniform and produces many special values. The *shiftful*
+version returns, with high probability, a product of factors some of
+which are repeated or differ by Taylor shifts by integers.
 :::
 
 ## Comparisons and predicates {#predicates}
