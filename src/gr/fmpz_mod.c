@@ -367,19 +367,26 @@ _gr_fmpz_mod_set_other(fmpz_t res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
 {
     if (v_ctx->which_ring == GR_CTX_FMPZ_MOD)
     {
-        if (!fmpz_equal(FMPZ_MOD_CTX(ctx)->n, FMPZ_MOD_CTX(v_ctx)->n))
+        if (fmpz_equal(FMPZ_MOD_CTX(v_ctx)->n, FMPZ_MOD_CTX(ctx)->n))
+            fmpz_set(res, v);
+        else if (fmpz_divisible(FMPZ_MOD_CTX(v_ctx)->n, FMPZ_MOD_CTX(ctx)->n))
+            fmpz_mod_set_fmpz(res, v, FMPZ_MOD_CTX(ctx));
+        else
             return GR_DOMAIN;
 
-        fmpz_set(res, v);
         return GR_SUCCESS;
     }
 
     if (v_ctx->which_ring == GR_CTX_NMOD)
     {
-        if (!fmpz_equal_ui(FMPZ_MOD_CTX(ctx)->n, NMOD_CTX(v_ctx).n))
+        if (fmpz_equal_ui(FMPZ_MOD_CTX(ctx)->n, NMOD_CTX(v_ctx).n))
+            fmpz_set_ui(res, * (ulong *) v);
+        else if (fmpz_abs_fits_ui(FMPZ_MOD_CTX(ctx)->n)
+                 && NMOD_CTX(v_ctx).n % fmpz_get_ui(FMPZ_MOD_CTX(ctx)->n) == 0)
+            fmpz_set_ui(res, (* (ulong *) v) % fmpz_get_ui(FMPZ_MOD_CTX(ctx)->n));
+        else
             return GR_DOMAIN;
 
-        fmpz_set_ui(res, * (ulong *) v);
         return GR_SUCCESS;
     }
 

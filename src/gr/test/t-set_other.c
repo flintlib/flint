@@ -12,11 +12,17 @@
 /* generated using Claude Opus 5.5 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "gr.h"
+#include "nmod.h"
 
 TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_unable)
 {
     slong iter;
+    fmpz_t M, d;
+
+    fmpz_init(M);
+    fmpz_init(d);
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
@@ -25,10 +31,50 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
         int st01, st12, st02;
         slong j;
         int check_domain = 1;
+        int status;
+
+        /* modulus of the previous ring if it was Z/MZ, zero otherwise */
+        fmpz_zero(M);
 
         for (j = 0; j < 3; j++)
         {
-            switch (n_randint(state, 16))
+            if (!fmpz_is_zero(M) && n_randint(state, 4) != 0)
+            {
+                /* Z/MZ with M a divisor of the previous modulus */
+                fmpz_randtest_not_zero(d, state, 200);
+                fmpz_gcd(d, M, d);
+                if (n_randint(state, 2))
+                    fmpz_divexact(d, M, d);
+                fmpz_swap(M, d);
+
+                status = GR_UNABLE;
+                switch (fmpz_abs_fits_ui(M) ? n_randint(state, 4) : 0)
+                {
+                    case 0:
+                        gr_ctx_init_fmpz_mod(ctx + j, M);
+                        status = GR_SUCCESS;
+                        break;
+                    case 1:
+                        status = gr_ctx_init_nmod_redc(ctx + j, fmpz_get_ui(M));
+                        break;
+                    case 2:
+                        status = gr_ctx_init_nmod_redc_fast(ctx + j, fmpz_get_ui(M));
+                        break;
+                }
+                if (status != GR_SUCCESS)
+                    GR_MUST_SUCCEED(gr_ctx_init_nmod(ctx + j, fmpz_get_ui(M)));
+
+                continue;
+            }
+
+            /* conversions between Z/M'Z and Z/MZ with random M are likely
+               to fail */
+            if (!fmpz_is_zero(M))
+                check_domain = 0;
+
+            fmpz_zero(M);
+
+            switch (n_randint(state, 20))
             {
                 /* most of the time, test conversions between subrings of the
                    complex numbers */
@@ -44,6 +90,25 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
                 case 9: gr_ctx_init_complex_extended_ca(ctx + j); break;
                 case 10: gr_ctx_init_real_qqbar(ctx + j); break;
                 case 11: gr_ctx_init_complex_qqbar(ctx + j); break;
+
+                /* modular rings, possibly followed by compatible ones */
+                case 12:
+                    fmpz_set_ui(M, n_randtest_not_zero(state));
+                    GR_MUST_SUCCEED(gr_ctx_init_nmod(ctx + j, fmpz_get_ui(M)));
+                    break;
+                case 13:
+                    fmpz_set_ui(M, n_randtest(state) | 3);
+                    GR_MUST_SUCCEED(gr_ctx_init_nmod_redc(ctx + j, fmpz_get_ui(M)));
+                    break;
+                case 14:
+                    fmpz_set_ui(M, (n_randtest(state) >> 2) | 3);
+                    GR_MUST_SUCCEED(gr_ctx_init_nmod_redc_fast(ctx + j, fmpz_get_ui(M)));
+                    break;
+                case 15:
+                    fmpz_randtest_not_zero(M, state, 200);
+                    fmpz_abs(M, M);
+                    gr_ctx_init_fmpz_mod(ctx + j, M);
+                    break;
 
                 default:
                          gr_ctx_init_random(ctx + j, state);
@@ -89,6 +154,9 @@ TEST_GR_FUNCTION_START(gr_set_other, state, count_success, count_domain, count_u
         for (j = 0; j < 3; j++)
             gr_ctx_clear(ctx + j);
     }
+
+    fmpz_clear(M);
+    fmpz_clear(d);
 
     TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }
