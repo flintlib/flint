@@ -84,6 +84,13 @@ _gr_mpoly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     if (i < 0 || i >= GR_MPOLY_NVARS(ctx))
         return GR_DOMAIN;
 
+    if (GR_MPOLY_VARS(ctx) == NULL)
+    {
+        * name = flint_malloc(22);
+        flint_sprintf(* name, "x%wd", i + 1);
+        return GR_SUCCESS;
+    }
+
     char * var = GR_MPOLY_VARS(ctx)[i];
     size_t len = strlen(var);
     * name = flint_malloc(len + 1);
