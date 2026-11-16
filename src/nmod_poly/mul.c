@@ -10,23 +10,51 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "impl.h"
+
+/* whether _nmod_poly_mul_classical accumulates in one word (dot method
+   _DOT1): (n - 1)^2 len2 < 2^64, up to the rounding of the bounds of
+   _nmod_vec_dot_params for len2 <= 11 */
+static int
+_mul_classical_one_word(slong len2, nmod_t mod)
+{
+    return NMOD_BITS(mod) <= FLINT_BITS / 2
+        && n_mulhi((mod.n - 1) * (mod.n - 1), len2) == 0;
+}
 
 void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
+    int squaring = (poly1 == poly2 && len1 == len2);
+
+    /* rows of length len1 (see impl.h), unless the classical code
+       accumulates in one word */
+    int rows = _nmod_poly_want_rows(len1, len2, _NMOD_POLY_ROWS_RATIO(mod), mod)
+                    && !squaring && !_mul_classical_one_word(len2, mod);
 
     if (len2 <= 5)
     {
-        _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
+        if (rows)
+            _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1, mod);
+        else
+            _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
         return;
     }
 
-    if (_nmod_poly_mullow_want_fft_small(len1, len2, len1 + len2 - 1, (poly1 == poly2 && len1 == len2), mod))
+    if (_nmod_poly_mullow_want_fft_small(len1, len2, len1 + len2 - 1, squaring, mod))
     {
         _nmod_poly_mullow_fft_small(res, poly1, len1, poly2, len2, len1 + len2 - 1, mod);
+        return;
+    }
+
+    if (rows)
+    {
+        _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1, mod);
         return;
     }
 

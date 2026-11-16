@@ -515,6 +515,11 @@ name choose the algorithm from the lengths and the number of bits of $n$:
 
 - the classical algorithm, computing each coefficient as a dot product
   with `_nmod_vec_dot_rev` (see [](nmod_vec/dot)), for short operands;
+- for a shorter operand of 3 to 16 coefficients (6 with NEON), the same
+  products in rows: one `_nmod_vec_scalar_addmul_nmod` of the longer
+  operand per coefficient of the shorter one, where these scalar products
+  have a vector kernel (see [](nmod_vec/simd)) and the products do not fit
+  one word;
 - [Kronecker substitution](algorithms/polynomials/kronecker) (`KS`), which
   packs the coefficients into integers and multiplies those with
   `flint_mpn_mul`, and its multipoint variants `KS2` and `KS4` [@Har2009a],

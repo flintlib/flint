@@ -50,5 +50,44 @@ TEST_FUNCTION_START(nmod_poly_mullow, state)
         nmod_poly_clear(c);
     }
 
+    /* Compare with the classical algorithm with a short operand (rows of
+       scalar products in _nmod_poly_mullow), moduli of 30 bits or more */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+        slong trunc;
+        ulong n = n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, 300));
+        nmod_poly_randtest(c, state, 1 + n_randint(state, 18));
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(b, c);
+
+        trunc = n_randint(state, b->length + c->length + 1);
+
+        nmod_poly_mullow(a, b, c, trunc);
+        nmod_poly_mullow_classical(d, b, c, trunc);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (short operand):\n");
+            flint_printf("n = %wu, lengths %wd, %wd, trunc = %wd\n",
+                         n, b->length, c->length, trunc);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

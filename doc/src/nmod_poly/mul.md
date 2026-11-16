@@ -16,9 +16,10 @@ and middle products are the building blocks of power series arithmetic and
 
 ## Algorithm selection {#selection}
 
-`_nmod_poly_mul` uses the classical algorithm if the shorter operand has
-length at most 5. Otherwise it asks `_nmod_poly_mullow_want_fft_small`
-whether `fft_small` is faster, and if not it uses, with $c =
+`_nmod_poly_mul` uses the classical algorithm, or the rows described
+below, if the shorter operand has length at most 5. Otherwise it asks
+`_nmod_poly_mullow_want_fft_small` whether `fft_small` is faster, then
+uses the rows if they apply, and otherwise, with $c =
 \min(\mathit{len1}, 2\,\mathit{len2})$ and $b$ the number of bits of $n$:
 
 - classical if $3c < 2 \max(b, 10)$;
@@ -59,15 +60,35 @@ is efficient when $b$ is small compared to the word size. `KS2` and
 `KS4` replace one large integer product by two or four products of half
 or a quarter of the field width.
 
-`nmod_poly_mullow` uses the classical algorithm for truncation lengths
-below $10 + b^2/10$ (from 16 for 8-bit to 419 for 64-bit moduli), KS
-otherwise, and `fft_small` from separately tuned cutoffs.
-`nmod_poly_mulmid` first drops the operand coefficients that do not
-contribute to the requested range and then uses the classical algorithm,
-`fft_small` (which computes a middle product at the cost of a product of
-the output length, [](algorithms/polynomials/middle-product)), or KS for
-small moduli. `nmod_poly_mulhigh` calls `nmod_poly_mulmid` for all but
-tiny inputs and sets the low coefficients to zero.
+For a shorter operand of length $\mathit{len2}$ from 3 to 16 (to 6 with
+NEON, where longer rows lose), the products of the classical algorithm are
+computed in rows: one `_nmod_vec_scalar_addmul_nmod` of the longer operand
+per coefficient of the shorter one, rather than one dot product of at most
+$\mathit{len2}$ terms per output coefficient, whose call, setup and final
+reduction dominate for such short lengths. The rows run the vector kernels
+of these scalar products ([](nmod_vec/simd)), so they are used where a
+kernel exists for $b$ (`NMOD_VEC_SIMD_SCALAR_MAX_BITS`: up to 63 bits with
+AVX-512, 50 with AVX2, 32 with NEON), $n$ is not a power of 2, the
+classical algorithm does not accumulate its products in one word (from 30
+to 32 bits on, depending on $\mathit{len2}$), the product is not a square,
+and every row has at least `NMOD_VEC_SIMD_MIN_LEN` coefficients and $r
+\cdot \mathit{len2}$, with $r = 2$ for the 512-bit kernels and up to 32
+bits and $r = 4$ for the AVX2 kernels above 32 bits; middle products use
+$2r$, since all their dot products have $\mathit{len2}$ terms. They
+replace the classical algorithm and Kronecker substitution, not
+`fft_small`.
+
+`nmod_poly_mullow` uses the rows under the same conditions, its shortest
+row having $\mathit{trunc} - \mathit{len2} + 1$ coefficients, otherwise
+the classical algorithm for truncation lengths below $10 + b^2/10$ (from
+16 for 8-bit to 419 for 64-bit moduli), KS otherwise, and `fft_small` from
+separately tuned cutoffs. `nmod_poly_mulmid` first drops the operand
+coefficients that do not contribute to the requested range and then uses
+the rows, the classical algorithm, `fft_small` (which computes a middle
+product at the cost of a product of the output length,
+[](algorithms/polynomials/middle-product)), or KS for small moduli.
+`nmod_poly_mulhigh` calls `nmod_poly_mulmid` for all but tiny inputs and
+sets the low coefficients to zero.
 
 ## Examples {#examples}
 

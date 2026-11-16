@@ -11,19 +11,31 @@
 */
 
 #include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "impl.h"
 
 void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     slong bits;
+    int squaring, rows;
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
+    squaring = (poly1 == poly2 && len1 == len2);
+
+    /* rows of length len1 down to n - len2 + 1 (see impl.h), unless the
+       classical code accumulates in one word */
+    rows = _nmod_poly_want_rows(n - len2 + 1, len2, _NMOD_POLY_ROWS_RATIO(mod), mod)
+                && !squaring && 2 * NMOD_BITS(mod) + FLINT_BIT_COUNT(len2) > FLINT_BITS;
 
     if (len2 <= 5)
     {
-        _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
+        if (rows)
+            _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, 0, n, mod);
+        else
+            _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
         return;
     }
 
@@ -33,7 +45,7 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
         return;
     }
 
-    if (_nmod_poly_mullow_want_fft_small(len1, len2, n, (poly1 == poly2 && len1 == len2), mod))
+    if (_nmod_poly_mullow_want_fft_small(len1, len2, n, squaring, mod))
     {
         _nmod_poly_mullow_fft_small(res, poly1, len1, poly2, len2, n, mod);
         return;
@@ -41,7 +53,9 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
 
     bits = NMOD_BITS(mod);
 
-    if (n < 10 + bits * bits / 10)
+    if (rows)
+        _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, 0, n, mod);
+    else if (n < 10 + bits * bits / 10)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
         _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, n, mod);
