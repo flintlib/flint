@@ -316,25 +316,6 @@ acb_ode_fundamental_matrix_vec(
     status |= acb_ode_local_diffop(ldop, dop, Dop, Euler);
     flags |= acb_ode_analyze(ldop, flags, Euler);
 
-    if (expos == NULL)
-    {
-        acb_ode_exponents_init(_expos);
-
-        if (flags & ACB_ODE_ORDINARY)
-            acb_ode_exponents_ordinary(_expos, order);
-        else
-        {
-            gr_ctx_t CC;
-            gr_ctx_init_complex_acb(CC, prec);
-
-            status |= acb_ode_exponents(_expos, ldop, Euler, CC);
-
-            gr_ctx_clear(CC);
-        }
-
-        expos = _expos;
-    }
-
     /* When starting with an operator over an exact domain, try to ensure that
        the precision of the operator with ball coefficients we pass downstream
        is not the limiting factor for the computation of the coefficients.
@@ -368,6 +349,18 @@ acb_ode_fundamental_matrix_vec(
         status |= gr_poly_set((gr_ptr) acb_ldop, (gr_ptr) ldop, wCCx);
     else
         status |= gr_poly_set_gr_poly_other((gr_ptr) acb_ldop, (gr_ptr) ldop, Pol1, wCCx);
+
+    if (expos == NULL)
+    {
+        acb_ode_exponents_init(_expos);
+
+        if (flags & ACB_ODE_ORDINARY)
+            acb_ode_exponents_ordinary(_expos, order);
+        else
+            status |= acb_ode_exponents(_expos, ldop, Euler, wCC);
+
+        expos = _expos;
+    }
 
     gr_poly_struct * llc = (gr_poly_struct *) (acb_ldop->coeffs) + order;
     if (!(flags & ACB_ODE_NONZERO)
