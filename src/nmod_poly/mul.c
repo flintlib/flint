@@ -30,12 +30,21 @@ void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
-    int squaring = (poly1 == poly2 && len1 == len2);
+    int squaring, rows;
+
+    /* first, as the rule of the rows costs about 10 ns */
+    if (_nmod_poly_want_ifma(len2, mod, 0))
+    {
+        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1, mod);
+        return;
+    }
+
+    squaring = (poly1 == poly2 && len1 == len2);
 
     /* rows of length len1 (see impl.h), unless the classical code
        accumulates in one word */
-    int rows = _nmod_poly_want_rows(len1, len2, _NMOD_POLY_ROWS_RATIO(mod), mod)
-                    && !squaring && !_mul_classical_one_word(len2, mod);
+    rows = _nmod_poly_want_rows(len1, len2, _NMOD_POLY_ROWS_RATIO(mod), mod)
+                && !squaring && !_mul_classical_one_word(len2, mod);
 
     if (len2 <= 5)
     {

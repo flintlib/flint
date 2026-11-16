@@ -17,7 +17,8 @@ and middle products are the building blocks of power series arithmetic and
 ## Algorithm selection {#selection}
 
 `_nmod_poly_mul` uses the classical algorithm, or the rows described
-below, if the shorter operand has length at most 5. Otherwise it asks
+below, if the shorter operand has length at most 5. Otherwise it uses the
+IFMA kernel described below if it applies, then asks
 `_nmod_poly_mullow_want_fft_small` whether `fft_small` is faster, then
 uses the rows if they apply, and otherwise, with $c =
 \min(\mathit{len1}, 2\,\mathit{len2})$ and $b$ the number of bits of $n$:
@@ -41,6 +42,9 @@ following ranges, measured with the installed library on x86-64 with
 | 40 | $\le 26$ | — | 27–59 | 60–91 | $\ge 92$ |
 | 50 | $\le 33$ | — | 34–38 | 39–161 | $\ge 162$ |
 | 64 | $\le 42$ | — | — | 43–93 | $\ge 94$ |
+
+With AVX512-IFMA, the IFMA kernel takes the lengths from 8 up to its bound
+for $b \le 52$.
 
 The `fft_small` cutoffs come from tables indexed by the bit size and are
 somewhat higher for squaring. A modulus that is one of the 50-bit primes
@@ -78,14 +82,41 @@ $2r$, since all their dot products have $\mathit{len2}$ terms. They
 replace the classical algorithm and Kronecker substitution, not
 `fft_small`.
 
-`nmod_poly_mullow` uses the rows under the same conditions, its shortest
-row having $\mathit{trunc} - \mathit{len2} + 1$ coefficients, otherwise
-the classical algorithm for truncation lengths below $10 + b^2/10$ (from
-16 for 8-bit to 419 for 64-bit moduli), KS otherwise, and `fft_small` from
+When FLINT is built for a processor with AVX512-IFMA (Intel from Ice Lake
+on for some machines, AMD from Zen 4 on), the products for $n \le 2^{52}$ and a shorter
+operand of 8 to $L$ coefficients (4 to $L$ for 52-bit moduli) go to a
+vector kernel of the classical algorithm, which computes any range of the
+product, in place of the rows, the classical algorithm, Kronecker
+substitution and `fft_small`. It computes the output coefficients by
+blocks of 48 or 64, whose sums stay in vector registers for all their
+terms: each step multiplies one coefficient of the shorter operand,
+broadcast, by 8 consecutive coefficients of the longer one with
+`vpmadd52luq` and `vpmadd52huq`, which accumulate the low and the high
+52-bit halves of the products (the low halves alone for $n \le 2^{26}$).
+With at most 511 terms the sums stay below $2^{61}$, and each output
+coefficient takes one reduction at the end: a Montgomery reduction in
+radix $2^{52}$ for odd $n > 2^{26}$, the shorter operand having been
+multiplied by $2^{104}$ modulo $n$ beforehand, and otherwise the reduction
+of the IFMA kernel of `nmod_mat_mul`. Below 8 coefficients the rows are
+faster (except for 52-bit moduli, where they run the slower scalar
+products of 51 to 63 bits), and above $L$, `fft_small`. The bound $L$
+depends on the processor (`FLINT_NMOD_POLY_IFMA_MAX_LEN` in
+`flint-mparam.h`) and follows the number of 50-bit primes that `fft_small`
+needs: on Ice Lake, $L = 192$ up to 20 bits (one prime), 511 for 21 to 26
+bits (two primes, and one IFMA per product), 384 for 27 to 45 bits (two
+primes) and 511 above (three primes), and 96 for the primes of `fft_small`
+itself; on Zen 4, where `fft_small` is faster, 192, 384, 192, 384 and 64.
+
+`nmod_poly_mullow` uses the IFMA kernel under the same conditions, up to
+511 coefficients for a truncated product (256 on Zen 4 for the primes of
+`fft_small`), and the rows under the same conditions, its shortest row
+having $\mathit{trunc} - \mathit{len2} + 1$ coefficients, otherwise the
+classical algorithm for truncation lengths below $10 + b^2/10$ (from 16
+for 8-bit to 419 for 64-bit moduli), KS otherwise, and `fft_small` from
 separately tuned cutoffs. `nmod_poly_mulmid` first drops the operand
 coefficients that do not contribute to the requested range and then uses
-the rows, the classical algorithm, `fft_small` (which computes a middle
-product at the cost of a product of the output length,
+the IFMA kernel, the rows, the classical algorithm, `fft_small` (which
+computes a middle product at the cost of a product of the output length,
 [](algorithms/polynomials/middle-product)), or KS for small moduli.
 `nmod_poly_mulhigh` calls `nmod_poly_mulmid` for all but tiny inputs and
 sets the low coefficients to zero.

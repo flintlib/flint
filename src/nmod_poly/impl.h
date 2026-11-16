@@ -14,6 +14,7 @@
 
 #include "nmod_types.h"
 #include "nmod_vec.h"
+#include "flint-mparam.h"  /* FLINT_NMOD_POLY_IFMA_* */
 
 /*
     Products with a short operand by rows (_nmod_poly_mulmid_rows): one
@@ -69,6 +70,70 @@ _nmod_poly_mulmid_rows_min_len(slong len1, slong len2, slong nlo, slong nhi)
     return FLINT_MIN(FLINT_MIN(j0 + len1, nhi) - FLINT_MAX(j0, nlo),
                      FLINT_MIN(j1 + len1, nhi) - FLINT_MAX(j1, nlo));
 }
+
+/*
+    Classical products with AVX512-IFMA (_nmod_poly_mulmid_ifma, any window
+    of the product): for moduli n <= 2^52 and a shorter operand of
+    _NMOD_POLY_IFMA_MIN_LEN(bits) to at most 511 coefficients, used in place
+    of the rows, of the classical code, of KS and of fft_small. The
+    function exists in every build (it runs the classical code without
+    IFMA), the dispatchers only call it when NMOD_POLY_HAVE_IFMA.
+
+    _NMOD_POLY_IFMA_MIN_LEN: below 8 coefficients the rows are faster
+    (rows / kernel 0.82-0.86 at 7 on Ice Lake, 31 to 50 bits), except for
+    52-bit moduli, where the rows run the slower scalar products of 51 to
+    63 bits: the kernel from 4 (1.05-1.22x faster at 4, 1.5-1.9x at 6 and
+    7; Zen 4 and Ice Lake, Nov 2026).
+
+    The largest len2 (above, fft_small) comes from flint-mparam.h:
+    FLINT_NMOD_POLY_IFMA_MAX_LEN(bits) for full and middle products, the
+    crossover with the dispatchers without the kernel on products of
+    lengths L and L, 4L and L, 16L and L (the unbalanced ones cross first).
+    It follows the number of 50-bit primes fft_small needs: one up to 20
+    bits, two up to 45 bits (the kernel takes one IFMA per product up to 26
+    bits, two above), three above; Zen 4 crosses about twice as early as
+    Ice Lake from 21 bits on. Modulo the 50-bit primes of fft_small, which
+    need no CRT, FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME. Low products cross
+    later: up to 511 (at the primes of fft_small,
+    FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME).
+*/
+#if FLINT_BITS == 64 && defined(__AVX512F__) && defined(__AVX512DQ__) \
+        && defined(__AVX512IFMA__) \
+        && !defined(FLINT_MACHINE_VECTORS_FORCE_GENERIC) \
+        && !defined(FLINT_MACHINE_VECTORS_STRICT_C)
+# define NMOD_POLY_HAVE_IFMA 1
+#else
+# define NMOD_POLY_HAVE_IFMA 0
+#endif
+
+#if !defined(FLINT_NMOD_POLY_IFMA_MAX_LEN) \
+    || !defined(FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME) \
+    || !defined(FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME)
+# error "flint-mparam.h must define FLINT_NMOD_POLY_IFMA_MAX_LEN, FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME and FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME"
+#endif
+
+#define _NMOD_POLY_IFMA_MIN_LEN(bits) ((bits) == 52 ? 4 : 8)
+
+/* whether n is one of the primes of the default fft_small context */
+int _nmod_poly_is_fft_small_prime(nmod_t mod);
+
+/* low: whether the product is a low product (mullow) */
+static inline int
+_nmod_poly_want_ifma(slong len2, nmod_t mod, int low)
+{
+    slong bits = NMOD_BITS(mod);
+
+    if (!NMOD_POLY_HAVE_IFMA || mod.n > (UWORD(1) << 52)
+            || len2 < _NMOD_POLY_IFMA_MIN_LEN(bits)
+            || len2 > (low ? 511 : FLINT_NMOD_POLY_IFMA_MAX_LEN(bits)))
+        return 0;
+
+    return len2 <= (low ? FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME
+                        : FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME)
+        || bits != 50 || !_nmod_poly_is_fft_small_prime(mod);
+}
+
+void _nmod_poly_mulmid_ifma(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod);
 
 void _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);
 void _nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);

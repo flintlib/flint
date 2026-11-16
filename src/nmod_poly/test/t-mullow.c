@@ -89,5 +89,47 @@ TEST_FUNCTION_START(nmod_poly_mullow, state)
         nmod_poly_clear(d);
     }
 
+    /* Compare with the classical algorithm for moduli up to 52 bits and a
+       shorter operand of up to 600 coefficients (IFMA kernel, then
+       fft_small) */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+        slong trunc;
+        ulong n = FLINT_MAX(n_randtest_bits(state, 1 + n_randint(state, 52)), 1);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, n_randint(state, 4) ? 40 : 600));
+        nmod_poly_randtest(c, state, b->length + n_randint(state, n_randint(state, 8) ? 300 : 3000));
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(b, c);
+        if (n_randint(state, 5) == 0)
+            nmod_poly_set(c, b);
+
+        trunc = n_randint(state, b->length + c->length + 1);
+
+        nmod_poly_mullow(a, b, c, trunc);
+        nmod_poly_mullow_classical(d, b, c, trunc);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (moduli up to 52 bits):\n");
+            flint_printf("n = %wu, lengths %wd, %wd, trunc = %wd\n",
+                         n, b->length, c->length, trunc);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

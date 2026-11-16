@@ -23,6 +23,14 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
+
+    /* first, as the rule of the rows costs about 10 ns */
+    if (_nmod_poly_want_ifma(len2, mod, n < len1 + len2 - 1))
+    {
+        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, n, mod);
+        return;
+    }
+
     squaring = (poly1 == poly2 && len1 == len2);
 
     /* rows of length len1 down to n - len2 + 1 (see impl.h), unless the
