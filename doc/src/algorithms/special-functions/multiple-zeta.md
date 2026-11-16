@@ -1,6 +1,6 @@
 ---
 title: Multiple zeta values and multiple polylogarithms
-summary: Multiple zeta values by Akhilesh's double tails in fixed-point arithmetic with exact error counting, and in quasi-linear time by Hölder convolution and binary splitting; star values and Yamamoto's interpolation from shared subwords; multiple polylogarithms and colored multiple zeta values through Goncharov's iterated integrals, as power series at 0 or split at 1/2, by binary splitting with majorant truncation bounds.
+summary: Multiple zeta values by Akhilesh's double tails in fixed-point arithmetic with exact error counting, and in quasi-linear time by Hölder convolution and binary splitting; star values and Yamamoto's interpolation from shared subwords; multiple polylogarithms and colored multiple zeta values through Goncharov's iterated integrals, using power series at 0 directly or after splitting the path at 1/2. The series are summed by recurrence or binary splitting with a certified truncation bound.
 order: 51
 ---
 
@@ -241,56 +241,99 @@ $$
 which follows by expanding each $dt/(t - a) = -a^{-1} \sum_k (t/a)^k dt$
 and integrating term by term.
 
-**Power series at 0.** Write $F_l(t) = G(a_l, \ldots, a_L; t) = \sum_n f_l(n) t^n$.
-Then $f_l(n) = f_{l+1}(n)/n$ if $a_l = 0$, and $f_l(n) = -S_l(n-1)/(n a_l)$
-with $S_l(n) = S_l(n-1)/a_l + f_{l+1}(n)$ otherwise. After scaling by
-$z^n$, the values $T_l(n) = z^n S_l(n)$ for the nonzero letters and the
-partial sums $A_l(n) = \sum_{m \le n} f_l(m) z^m \to F_l(z)$ for all
-$l$ satisfy a lower triangular linear recurrence (with $g_{l+1}$
-expanded down to the next nonzero letter). Multiplying the rows by
-$n^C$, $C$ one more than the longest run of zeros, the product of the
-matrices is computed by binary splitting in complex ball arithmetic
-(exactly while the entries are exact and short). This gives
-$G(a_l, \ldots, a_L; z)$ for all suffixes at once.
+**Power series at 0.** For a word of the form $0^{s_1-1}, b_1, \ldots,
+0^{s_d-1}, b_d$ with $b_i \ne 0$, the series for $|z| < R$ is
+$$
+G(a_1, \ldots, a_L; z) = (-1)^d
+\sum_{n_1 > \cdots > n_d \ge 1}
+\prod_{i=1}^d \frac{r_i^{n_i-n_{i+1}}}{n_i^{s_i}},
+$$
+where $R = \min_i |b_i|$, $r_i = z/b_i$, and $n_{d+1} = 0$.
+
+At $n_i=n$, the sum over the $d-i$ inner indices, scaled by
+$((n-1)!)^c$ with $c=\max_j s_j$, is
+$$
+\begin{aligned}
+U_i(n) &= ((n-1)!)^c \sum_{n > n_{i+1} > \cdots > n_d \ge 1}
+    r_i^{n-n_{i+1}} \prod_{j=i+1}^d \frac{r_j^{n_j-n_{j+1}}}{n_j^{s_j}},
+    && i<d,\\
+U_d(n) &= ((n-1)!)^c r_d^n.
+\end{aligned}
+$$
+Splitting the sum for $U_i(n+1)$ into $n_{i+1}<n$ and $n_{i+1}=n$
+gives the recurrence
+$$
+U_i(n+1) = r_i \bigl(n^c U_i(n) + n^{c-s_{i+1}} U_{i+1}(n)\bigr),
+\qquad 1 \le i < d,
+$$
+with $U_i(1)=0$ for $i<d$.
+
+FLINT approximates $G$ by the partial sum through degree $N$. Grouping
+the terms by $n_1=n$ expresses this sum in terms of $U_1$,
+$$
+G_N = (-1)^d \sum_{n=1}^{N}
+    \frac{U_1(n)}{n^{s_1}((n-1)!)^c}.
+$$
+Each leading zero contributes a factor $1/n$ to a degree-$n$ term.
+Thus suffixes starting at $b_i$ or in the run of zeros before it share
+$U_i$, and one series evaluation gives the partial sums for all suffixes.
+
+FLINT uses this recurrence for general inputs, with Horner's rule at
+depth one. For binary splitting, advancing the unscaled coefficients
+$U_i(n)/((n-1)!)^c$ to degree $n+1$ and adding the degree-$n$ terms to
+the partial sums gives a lower triangular matrix, with the coefficients
+in reverse order followed by the partial sums. Multiplying each matrix
+by $n^c$ clears the denominators $n^e$ with $e \le c$. The accumulated
+scale $(N!)^c$ is divided out at the end.
+
+FLINT uses binary splitting when the internal working precision is at
+least 8192 bits and all $r_i$ are finite exact dyadics with exponents
+in the supported range. Products over short intervals are computed
+exactly and combined in ball arithmetic.
+Both methods choose $N$ using the following bound on the tail of the
+series.
 
 ::: theorem Truncation {#thm-mpl-trunc}
-Let $R$ be the smallest absolute value of a nonzero letter, $d$ the
-number of nonzero letters, and $q = |z|/R < 1$. Truncating the series
-after $n = N$ changes each $F_l(z)$ by at most
+If $q < 1$ bounds all $|z/b_i|$, the absolute error from truncating
+each suffix series after degree $N$ is at most
 $$
-\log(N+1)^d\, e\, (1 + 1/N)\, \frac{q^{N+1}}{1 - q (1 + 1/N)}
-\qquad (q (1 + 1/N) < 1).
+\frac{q^{N+1}}{(1-q)(N+1)} M(1+\log(N+1)),
 $$
+where $M(x) = \max_{0 \le j < d} x^j/j!$.
 :::
 
 ::: proof
-The coefficients of $-1/(t - a) = a^{-1} \sum_k (t/a)^k$ are bounded in
-absolute value by those of $1/(|a| - t)$, and integration preserves
-coefficientwise majorization, so $|f_l(n)| \le \tilde f_l(n)$, the
-coefficients of the series $\tilde F_l$ with the letters $|a_l|$. For
-$0 < \rho < R$, by induction from $\tilde F_{L+1} = 1$:
-a letter 0 does not increase $\tilde F(\rho)$ (for a series with
-nonnegative coefficients vanishing at 0, $\sum_n c_n \rho^n / n \le \sum_n c_n \rho^n$),
-and a nonzero letter $b$ multiplies it by at most
-$\int_0^\rho dt/(|b| - t) \le \log(R/(R - \rho))$, since $\tilde F$ is
-increasing. Hence $\tilde F_l(\rho) \le \log(R/(R-\rho))^d$ and, by
-Cauchy's inequality, $|f_l(n) z^n| \le \log(R/(R-\rho))^d (|z|/\rho)^n$.
-With $\rho = R N/(N+1)$, $\log(R/(R - \rho)) = \log(N+1)$ and
-$|z|/\rho = q (1 + 1/N)$; sum the geometric tail and use
-$(1 + 1/N)^{N+1} \le e (1 + 1/N)$.
+For a suffix of depth $k$, each degree-$n$ term has a numerator of modulus
+at most $q^n$. Bounding each reciprocal power by the reciprocal of its index
+and counting the $(k-1)!$ permutations of the distinct inner indices
+gives the following bound for the absolute sum of the degree-$n$ terms.
+$$
+\frac{q^n}{n}\frac{H_{n-1}^{k-1}}{(k-1)!}
+\le \frac{q^n}{n} M(1+\log n),
+$$
+where $H_m$ is the $m$-th harmonic number. The binomial theorem gives
+$M(x+t) \le M(x)e^t$ for $x,t \ge 0$, so $M(1+\log n)/n$ is
+nonincreasing. Bounding this factor by its value at $N+1$ and summing
+the geometric series proves the result.
 :::
 
-**Splitting at $\tfrac12$.** The series at 1 converges geometrically
-with ratio $1/R$. If $R \ge 2$ it is used directly; otherwise, if every
-nonzero letter $a$ and every nonzero $1 - a$ has absolute value at least
-$\tfrac34$, the path is split at $\tfrac12$ (Chen's formula) and
-$t \mapsto 1 - t$ is substituted above it:
+For point inputs, the largest ratio in modulus is $|z|/R$. FLINT bounds
+this ratio over the input balls and evaluates the remainder bound with
+outward rounding. It increases the cutoff until the bound is at most
+$2^{-p-8}$, where $p$ is the requested precision of the series
+evaluation, and adds the bound to the error radius.
+
+**Splitting at $\tfrac12$.** For $R>1$, the series at 1 converges
+geometrically with ratio $1/R$. If $R \ge 2$, FLINT sums it directly.
+Otherwise, if every nonzero letter $a$ and every nonzero $1 - a$ has
+absolute value at least $\tfrac34$, the path is split at $\tfrac12$
+by Chen's formula with $t \mapsto 1 - t$ on the upper half.
 $$
 G(a_1, \ldots, a_L; 1) = \sum_{j=0}^{L} (-1)^j\, G(1 - a_j, \ldots, 1 - a_1; \tfrac12)\, G(a_{j+1}, \ldots, a_L; \tfrac12),
 $$
-where both families are suffixes of one word (the second of $a$, the
-first of the reversed word $1 - a_L, \ldots, 1 - a_1$), so two binary
-splitting runs with ratio at most $\tfrac23$ give all the factors.
+The factors come from two series evaluations with ratio at most
+$\tfrac23$, for the suffixes of $a_1, \ldots, a_L$ and of the reversed
+word $1 - a_L, \ldots, 1 - a_1$.
 Arguments outside these regions, such as letters close to $\tfrac12$ or
 points $x$ outside the unit disk, are not supported.
 
@@ -307,4 +350,4 @@ most $\tfrac12$ for $N \le 6$).
   `acb_mzeta_mzv_all`: double tails; Hölder convolution in
   `acb_mzeta_mzv` from 25000 bits.
 - `acb_mzeta_polylog`, `acb_mzeta_mzv_colored`: Goncharov's iterated
-  integrals by binary splitting.
+  integrals by series recurrence or binary splitting.
