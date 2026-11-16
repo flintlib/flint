@@ -372,7 +372,7 @@ void acb_ode_apply_diffop_basecase( acb_poly_struct * g, const acb_poly_struct *
 void _acb_ode_apply_diffop_polmul( acb_poly_struct * g, slong goff, const acb_poly_struct * dop, slong dop_len, acb_srcptr expo, slong offset, const acb_poly_struct * f, slong foff, slong flen, slong nlogs, slong start, slong len, slong prec);
 void acb_ode_apply_diffop_polmul( acb_poly_struct * g, const acb_poly_struct * dop, slong dop_len, acb_srcptr expo, slong offset, const acb_poly_struct * f, slong nlogs, slong start, slong len, slong prec);
 
-void _acb_ode_solution_growth(mag_t order, mag_t base, const acb_poly_struct * dop, slong dop_len);
+void _acb_ode_solution_growth(mag_t order, mag_t base, mag_t maj_base, const acb_poly_struct * dop, slong dop_len);
 slong acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len, mag_srcptr rad, mag_srcptr cvrad, slong tgt_prec);
 
 /****************************************************************************

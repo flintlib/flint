@@ -12,88 +12,107 @@
 #include <math.h>
 
 #include "acb_types.h"
-#include "acb_poly.h"
 #include "acb_ode.h"
-#include "ulong_extras.h"
+#include "mag.h"
+
+#define LOG2 0.69314718055994531
 
 /* XXX
    - Include overestimation of tail bound? how?
-   - Cap to input accuracy?
-   - Better overestimation estimate based on the roots of the characteristic
-     equation (cf. _acb_ode_solution_growth). Idea (implicit in a debugging
-     session with claude): if the dominant root (or root cluster) α has
-     multiplicity m, the coefficient sequence grows roughly like the solutions
-     of (1 - α S^{-1})^m, while the radii grow roughly like the solutions of
-     (1 + |α| S^{-1})^m - 2 (absolute values everywhere, flip sign of lc). The
-     magnitude ratio of the dominant roots is 1/(2^{1/m}-1) <= m/ln(2), so we
-     expect to lose about log2(m/ln(2)) bits per term. */
+   - Cap to input accuracy? */
 slong
-acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len,
+acb_ode_choose_prec(slong * rec_prec,
+                    const acb_poly_struct * dop, slong dop_len,
                     mag_srcptr rad, mag_srcptr cvrad, slong tgt_prec)
 {
-    slong sum_prec, prec0, prec;
+    slong sum_prec, prec0, wp;
     double lgmag, nterms;
-    mag_t ratio;
-
-    mag_init(ratio);
+    mag_t order, base, maj_base, maj_ratio;
 
     prec0 = tgt_prec + 2*dop_len;
 
-    /* rough estimate of bits lost to overestimation when unrolling a recurrence
-       in interval arithmetic
-       todo: linear error analysis */
-    slong dop_clen = _acb_poly_vec_length(dop, dop_len);
-    prec = 8 + prec0 * (1 + n_clog(FLINT_MAX(1, dop_clen - 3), 2));
-
-    lgmag = 0.;
     if (mag_is_zero(rad))
     {
-        nterms = 1; /* todo: better choice? */
+        /* this assumes that we only care about the sum */
+        if (rec_prec != NULL)
+            * rec_prec = prec0;
+        return prec0;
     }
-    else if (mag_is_finite(cvrad))
+
+    mag_init(order);
+    mag_init(base);
+    mag_init(maj_base);
+    mag_init(maj_ratio);
+
+    _acb_ode_solution_growth(order, base, maj_base, dop, dop_len);
+    if (!mag_is_finite(order))  /* cvrad may be more accurate or > generic */
     {
-        mag_div_lower(ratio, cvrad, rad);
-        nterms = prec / mag_get_d_log2_approx(ratio);
+        if (mag_is_finite(cvrad))
+            mag_inv(base, cvrad);
+        else
+            mag_div_ui(base, base, 10);  /* kludge */
+    }
+    if (mag_cmp(maj_base, base) > 0)
+        mag_div(maj_ratio, maj_base, base);
+    else
+        /* this should only happen due to inaccurate root-finding */
+        mag_one(maj_ratio);
+
+    mag_mul(base, base, rad);
+    double log2_base_d = mag_get_d_log2_approx(base);
+
+    if (!mag_is_finite(order))
+    {
+        lgmag = 0.;
+        nterms = prec0 / (- log2_base_d);
     }
     else
     {
-        /* estimate hump height based on worst-case asymptotic behavior */
-        mag_t order, base;
-
-        mag_init(order);
-        mag_init(base);
-
-        _acb_ode_solution_growth(order, base, dop, dop_len);
-
-        /* mag so we don't have to worry about overflows */
-        mag_mul(base, base, rad);
-
-        double base_d = mag_get_d(base);
         double order_d = mag_get_d(order);
 
-        double hump = exp(log(base_d) * order_d + 1.);
-        /* cap the cancellation we'll attempt to absorb */
-        hump = FLINT_MIN(hump, 100. + prec * log2(prec));
-        double den = log2(prec) / order_d;
-        if (base_d < 1.)
-            den = FLINT_MAX(den, - log2(base_d));
-        nterms = hump + prec / den;
+        /* estimate hump height based on worst-case asymptotic behavior */
+        double hump = exp(LOG2 * log2_base_d * order_d + 1.);
+        /* cap the cancellation that we will attempt to absorb */
+        hump = FLINT_MIN(hump, 100. + prec0 * log2(prec0));
+        double den = log2(prec0) / order_d;
+        if (log2_base_d < 0.)
+            den = FLINT_MAX(den, - log2_base_d);
+        nterms = hump + prec0 / den;
         lgmag = FLINT_MAX(0., order_d * hump * log2(hump));
-
-        mag_clear(order);
-        mag_clear(base);
     }
 
+    /* accumulation precision */
+
     double prec1 = 2 * lgmag + log2(nterms);
-    if (!(fabs(prec1) <= prec0))
+    if (prec1 < 0.)
+        prec1 = 0.;
+    else if (!(prec1 <= prec0))
         prec1 = prec0;
 
     sum_prec = 8 + 1.125 * (prec0 + prec1);
-    prec = FLINT_MAX(prec, sum_prec);
+    sum_prec = FLINT_MAX(FLINT_MIN(sum_prec, 1000 + 10 * tgt_prec), tgt_prec);
 
-    mag_clear(ratio);
+    /* If the coefficients are computed iteratively in ball arithmetic, their
+       radii grow roughly like a generic solution of the majorant recurrence, so
+       we expect to lose about log2(maj_ratio) bits per term.
+
+       (If the characteristic roots are well separated,
+       maj_ratio ≈ 1/(2^{1/m}-1) <= m/ln(2)
+       where m is the total multiplicity of characteristic roots of minimal
+       modulus, i.e., when the leading coefficient is non-constant, the total
+       multiplicity of minimal singularities.)
+
+       todo: Linear error analysis. */
+
+    wp = sum_prec + nterms * mag_get_d_log2_approx(maj_ratio);
+    wp = FLINT_MAX(FLINT_MIN(wp, 10000 + 20 * tgt_prec), sum_prec);
+
+    mag_clear(order);
+    mag_clear(base);
+    mag_clear(maj_base);
+    mag_clear(maj_ratio);
 
     if (rec_prec != NULL)
-        * rec_prec = prec;
+        * rec_prec = wp;
     return sum_prec;
 }

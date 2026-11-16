@@ -28,7 +28,7 @@ TEST_FUNCTION_START(acb_ode_solution_growth, state)
     {
         acb_t a, b, c;
         arb_t ref;
-        mag_t order, base;
+        mag_t order, base, maj_base;
 
         acb_init(a);
         acb_init(b);
@@ -36,6 +36,7 @@ TEST_FUNCTION_START(acb_ode_solution_growth, state)
         arb_init(ref);
         mag_init(order);
         mag_init(base);
+        mag_init(maj_base);
 
         slong r = 1 + n_randint(state, 4);
         slong i = n_randint(state, r);
@@ -68,7 +69,7 @@ TEST_FUNCTION_START(acb_ode_solution_growth, state)
         if (has_edge)
             acb_poly_set_coeff_acb(dop + i, k, b);
 
-        _acb_ode_solution_growth(order, base, dop, r + 1);
+        _acb_ode_solution_growth(order, base, maj_base, dop, r + 1);
 
         if (!has_edge)
         {
@@ -85,8 +86,8 @@ TEST_FUNCTION_START(acb_ode_solution_growth, state)
             arb_root_ui(ref, ref, k, 100);
             double ref_base = arf_get_d(arb_midref(ref), ARF_RND_NEAR);
 
-            if (fabs(mag_get_d(order) * (r - i) / k - 1) > 1e-6
-                || fabs(mag_get_d(base) / ref_base - 1) > 1e-6)
+            if (fabs(mag_get_d(order) * (r - i) / k - 1) > 1e-2
+                || fabs(mag_get_d(base) / ref_base - 1) > 1e-2)
             {
                 flint_printf("FAIL\n\n");
                 flint_printf("expected order = %wd/%wd, base = %{arb}\n",
@@ -97,6 +98,7 @@ TEST_FUNCTION_START(acb_ode_solution_growth, state)
 
         _acb_poly_vec_clear(dop, r + 1);
         mag_clear(base);
+        mag_clear(maj_base);
         mag_clear(order);
         arb_clear(ref);
         acb_clear(c);

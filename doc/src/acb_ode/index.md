@@ -1342,12 +1342,16 @@ $F_{T}(n)$ at the given (nonnegative) `n`.
 ## Miscellaneous bounds and estimates {#miscellaneous-bounds-and-estimates}
 
 ::: function
-void _acb_ode_solution_growth(mag_t order, mag_t base, const acb_poly_struct * dop, slong dop_len)
+void _acb_ode_solution_growth(mag_t order, mag_t base, mag_t maj_base, const acb_poly_struct * dop, slong dop_len)
 
-Estimate parameters `order` and `base` such that the coefficient sequences
-of series solutions of `dop` are
-$\mathrm O(\mathit{base}^n/n!^{1/\mathit{order}})$.
-Assumes that the leading coefficient of `dop` is a constant.
+Estimate parameters `order`, `base`, and `maj_base` such that the coefficient
+sequences of series solutions of `dop` are in
+$\mathrm O(\mathit{base}^n/n!^{1/\mathit{order}})$
+and, when they are computed iteratively in naive interval arithmetic, their
+radii are in
+$\mathrm O(\mathit{maj\_base}^n/n!^{1/\mathit{order}})$.
+Assumes that the leading coefficient of `dop` does not vanish at zero (i.e.,
+that the origin is regular), so that `order` belongs to $[0, +\infty]$.
 The outputs are currently not rigorous bounds.
 :::
 
