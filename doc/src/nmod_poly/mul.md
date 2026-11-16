@@ -107,6 +107,24 @@ bits (two primes, and one IFMA per product), 384 for 27 to 45 bits (two
 primes) and 511 above (three primes), and 96 for the primes of `fft_small`
 itself; on Zen 4, where `fft_small` is faster, 192, 384, 192, 384 and 64.
 
+For $2^{52} < n < 2^{64}$ the kernel writes each coefficient as $x_0 +
+2^{52} x_1$ with $x_1 < 2^{12}$ and accumulates the products in three
+limbs of weights $1$, $2^{52}$ and $2^{104}$, with seven IFMA instructions
+per product of vectors. Where `vpmullq` is fast (Zen 4), from
+`FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN` coefficients, it computes instead the
+exact sums modulo $2^{64}$ with `vpmullq` and `vpaddq`, modulo $p_1 =
+2^{52} - 47$ with two IFMA and modulo $p_2 = 2^{26} - 5$ with one, and
+recovers them by the Chinese remainder theorem (the sums are below $511
+n^2 < 2^{137}$, and $2^{64} p_1 p_2 > 2^{141}$). The three limbs of each
+output coefficient are reduced by a two-limb Montgomery reduction for odd
+$n$, the shorter operand having been multiplied by $2^{104}$ modulo $n$,
+and by a mask for powers of 2; other even moduli, which would need a
+scalar reduction of each output, do not go to the kernel. The kernel is
+used there for a shorter operand of 8 coefficients (12 on Zen 4, 4 for
+64-bit moduli, which have no rows) to $L$, $L = 256$ on Intel and 128 on
+Zen 4 (511 for low products), when the product has at least 16 output
+coefficients.
+
 `nmod_poly_mullow` uses the IFMA kernel under the same conditions, up to
 511 coefficients for a truncated product (256 on Zen 4 for the primes of
 `fft_small`), and the rows under the same conditions, its shortest row

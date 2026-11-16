@@ -15,23 +15,30 @@
 #include "nmod_poly.h"
 #include "nmod_poly/impl.h"
 
-/* a modulus n <= 2^52, often at the boundaries of the kernel's cases:
-   low halves alone and u52_red up to 2^26, REDC for odd n above, a mask
-   for powers of 2 */
+/* a modulus, often at the boundaries of the kernel's cases: up to 2^52,
+   low halves alone and u52_red up to 2^26, REDC for odd n above; above
+   2^52, REDC for odd n, NMOD_RED3 for even n; a mask for powers of 2.
+   On 32-bit builds (no kernel: the classical code), those below 2^32. */
 static ulong
 _ifma_modulus(flint_rand_t state)
 {
     static const ulong special[] = {
         1, 2, 3, 1023, 1024, 1025, 1027,
         (UWORD(1) << 26) - 5, UWORD(1) << 26, (UWORD(1) << 26) + 1,
+#if FLINT_BITS == 64
         (UWORD(1) << 32) - 5, UWORD(1) << 40,
-        (UWORD(1) << 51) + 1, (UWORD(1) << 52) - 1, UWORD(1) << 52 };
+        (UWORD(1) << 51) + 1, (UWORD(1) << 52) - 1, UWORD(1) << 52,
+        (UWORD(1) << 52) + 1, (UWORD(1) << 52) + 2, (UWORD(1) << 53) - 1,
+        UWORD(1) << 53,
+#endif
+        UWORD(1) << (FLINT_BITS - 1), (UWORD(1) << (FLINT_BITS - 1)) + 2,
+        UWORD_MAX - 58, UWORD_MAX - 1, UWORD_MAX };
     ulong n;
 
     if (n_randint(state, 4) == 0)
         return special[n_randint(state, sizeof(special) / sizeof(ulong))];
 
-    n = n_randtest_bits(state, 1 + n_randint(state, 52));
+    n = n_randtest_bits(state, 1 + n_randint(state, FLINT_BITS));
     return FLINT_MAX(n, 1);
 }
 
@@ -50,13 +57,15 @@ TEST_FUNCTION_START(nmod_poly_mulmid_ifma, state)
 {
     slong iter;
 
-    /* any window, against the classical algorithm; the coefficients after
-       the window are not written */
+    /* any window, against the classical algorithm, with the CRT variant
+       for n > 2^52 one time out of two; the coefficients after the window
+       are not written */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         nmod_t mod;
         nn_ptr a, b, c, d;
         slong la, lb, len, nlo, nhi, i;
+        int crt;
 
         nmod_init(&mod, _ifma_modulus(state));
 
@@ -86,15 +95,19 @@ TEST_FUNCTION_START(nmod_poly_mulmid_ifma, state)
         _ifma_randvec(b, lb, state, mod.n);
         c[nhi - nlo] = 12345;
 
-        _nmod_poly_mulmid_ifma(c, a, la, b, lb, nlo, nhi, mod);
+        crt = n_randint(state, 2);
+        if (crt)
+            _nmod_poly_mulmid_ifma_crt(c, a, la, b, lb, nlo, nhi, mod);
+        else
+            _nmod_poly_mulmid_ifma(c, a, la, b, lb, nlo, nhi, mod);
         _nmod_poly_mulmid_classical(d, a, la, b, lb, nlo, nhi, mod);
 
         if (!_nmod_vec_equal(c, d, nhi - nlo) || c[nhi - nlo] != 12345)
         {
             for (i = 0; i < nhi - nlo && c[i] == d[i]; i++) ;
             flint_printf("FAIL (window):\n");
-            flint_printf("n = %wu, la = %wd, lb = %wd, nlo = %wd, nhi = %wd, first difference at %wd\n",
-                         mod.n, la, lb, nlo, nhi, i);
+            flint_printf("n = %wu, la = %wd, lb = %wd, nlo = %wd, nhi = %wd, crt = %d, first difference at %wd\n",
+                         mod.n, la, lb, nlo, nhi, crt, i);
             fflush(stdout);
             flint_abort();
         }
@@ -105,17 +118,19 @@ TEST_FUNCTION_START(nmod_poly_mulmid_ifma, state)
         _nmod_vec_clear(d);
     }
 
-#if !FLINT_WANT_ASSERT
+#if NMOD_POLY_HAVE_IFMA && !FLINT_WANT_ASSERT
     /* words >= n (up to 2^64 - 1) in the coefficients t and above of both
        operands of a full product: the outputs below t, which do not read
        them, are unchanged (the kernel is lane-local); not with asserts,
        which reject such words in the multiplication of the shorter operand
-       by 2^104 mod n (odd n > 2^26) */
+       by 2^104 mod n (odd n > 2^26), and not without the kernel (the
+       classical code takes reduced inputs) */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_t mod;
         nn_ptr a, b, c, d;
         slong la, lb, t, i;
+        int crt;
 
         nmod_init(&mod, _ifma_modulus(state));
 
@@ -139,12 +154,16 @@ TEST_FUNCTION_START(nmod_poly_mulmid_ifma, state)
         for (i = t; i < lb; i++)
             b[i] = n_randint(state, 2) ? UWORD_MAX - n_randint(state, 5) : n_randtest(state);
 
-        _nmod_poly_mulmid_ifma(c, a, la, b, lb, 0, la + lb - 1, mod);
+        crt = n_randint(state, 2);
+        if (crt)
+            _nmod_poly_mulmid_ifma_crt(c, a, la, b, lb, 0, la + lb - 1, mod);
+        else
+            _nmod_poly_mulmid_ifma(c, a, la, b, lb, 0, la + lb - 1, mod);
 
         if (!_nmod_vec_equal(c, d, t))
         {
             flint_printf("FAIL (words >= n):\n");
-            flint_printf("n = %wu, la = %wd, lb = %wd, t = %wd\n", mod.n, la, lb, t);
+            flint_printf("n = %wu, la = %wd, lb = %wd, t = %wd, crt = %d\n", mod.n, la, lb, t, crt);
             fflush(stdout);
             flint_abort();
         }

@@ -33,7 +33,7 @@ void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
     int squaring, rows;
 
     /* first, as the rule of the rows costs about 10 ns */
-    if (_nmod_poly_want_ifma(len2, mod, 0))
+    if (_nmod_poly_want_ifma(len2, len1 + len2 - 1, mod, 0))
     {
         _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1, mod);
         return;

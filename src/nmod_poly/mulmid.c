@@ -87,7 +87,7 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
     m = nhi - nlo;
 
     /* first, as the rule of the rows costs about 10 ns */
-    if (m > 5 && _nmod_poly_want_ifma(len2, mod, nlo == 0 && nhi < len1 + len2 - 1))
+    if (m > 5 && _nmod_poly_want_ifma(len2, m, mod, nlo == 0 && nhi < len1 + len2 - 1))
     {
         _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;

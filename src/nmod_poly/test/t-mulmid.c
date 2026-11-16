@@ -186,14 +186,14 @@ TEST_FUNCTION_START(nmod_poly_mulmid, state)
         nmod_poly_clear(d);
     }
 
-    /* Compare with the classical algorithm for moduli up to 52 bits and a
+    /* Compare with the classical algorithm for moduli of any size and a
        shorter operand of up to 600 coefficients (IFMA kernel, then
        fft_small), middle products and arbitrary windows */
     for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t a, b, c, d;
         slong nlo, nhi, len;
-        ulong m = FLINT_MAX(n_randtest_bits(state, 1 + n_randint(state, 52)), 1);
+        ulong m = FLINT_MAX(n_randtest_bits(state, 1 + n_randint(state, FLINT_BITS)), 1);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -224,7 +224,7 @@ TEST_FUNCTION_START(nmod_poly_mulmid, state)
 
         if (!nmod_poly_equal(c, d))
         {
-            flint_printf("FAIL: nmod_poly_mulmid (moduli up to 52 bits)\n");
+            flint_printf("FAIL: nmod_poly_mulmid (moduli of any size)\n");
             flint_printf("n = %wu, lengths %wd, %wd, nlo = %wd, nhi = %wd\n",
                          m, a->length, b->length, nlo, nhi);
             fflush(stdout);

@@ -520,10 +520,11 @@ name choose the algorithm from the lengths and the number of bits of $n$:
   operand per coefficient of the shorter one, where these scalar products
   have a vector kernel (see [](nmod_vec/simd)) and the products do not fit
   one word;
-- with AVX512-IFMA, for $n \le 2^{52}$ and a shorter operand of 8 (4 for
-  52-bit moduli) to 64 to 511 coefficients, depending on the processor and
-  on $n$, a vector kernel of the classical algorithm that accumulates the
-  products of 8 coefficients at a time in registers;
+- with AVX512-IFMA, for a shorter operand of at least 4 to 12 and at most
+  64 to 511 coefficients, depending on the processor and on $n$, a vector
+  kernel of the classical algorithm that accumulates the products of 8
+  coefficients at a time in registers (above $2^{52}$, for odd $n$ and
+  powers of 2);
 - [Kronecker substitution](algorithms/polynomials/kronecker) (`KS`), which
   packs the coefficients into integers and multiplies those with
   `flint_mpn_mul`, and its multipoint variants `KS2` and `KS4` [@Har2009a],
