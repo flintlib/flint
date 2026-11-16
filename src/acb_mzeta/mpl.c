@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <limits.h>
 #include <math.h>
+#include <gmp.h>
 #include "thread_support.h"
 #include "acb.h"
+#include "acf.h"
+#include "fmpz_vec.h"
 #include "impl.h"
 
 /* Multiple polylogarithms through Goncharov's iterated integrals
@@ -193,12 +197,16 @@ g_suffixes_scaled(acb_ptr res, const g_series_ctx * G, slong N, slong wp,
     }
     else
     {
+        acb_t one;
+
         disks = flint_malloc(G->depth * sizeof(g_disk_struct));
         for (j = 0; j < G->L; j++)
             if (G->state_index[j] >= 0)
                 g_disk_init(disks + G->state_index[j], G->ratios + j);
-        acb_one(disks[0].midpoint);
-        g_disk_multiply(disks, disks[0].midpoint, wp);
+        acb_init(one);
+        acb_one(one);
+        g_disk_multiply(disks, one, wp);
+        acb_clear(one);
         g_disk_update_midpoint(disks);
         g_disk_get_value(disks[0].value, disks);
     }
@@ -514,9 +522,476 @@ g_series_cutoff(mag_t tail, const mag_t q, double qd, slong d, slong prec)
     return N;
 }
 
-int
-_acb_mzeta_G_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z,
-    slong prec)
+typedef struct
+{
+    acb_ptr e;
+    slong n;
+}
+cmat_struct;
+
+#define CE(M, i, j) ((M)->e + (i) * (M)->n + (j))
+
+static void
+cmat_init(cmat_struct * M, slong n)
+{
+    M->n = n;
+    M->e = _acb_vec_init(n * n);
+}
+
+static void
+cmat_clear(cmat_struct * M)
+{
+    _acb_vec_clear(M->e, M->n * M->n);
+}
+
+static void
+cmat_mul(cmat_struct * C, const cmat_struct * A, const cmat_struct * B, slong prec)
+{
+    slong n = A->n, i, j, l;
+    for (i = 0; i < n; i++)
+        for (j = 0; j <= i; j++)
+        {
+            acb_ptr c = CE(C, i, j);
+            acb_zero(c);
+            for (l = j; l <= i; l++)
+                if (!acb_is_zero(CE(A, i, l)) && !acb_is_zero(CE(B, l, j)))
+                    acb_addmul(c, CE(A, i, l), CE(B, l, j), prec);
+        }
+}
+
+typedef struct
+{
+    slong L, d, dim, C;
+    slong * tidx;       /* state index of T_l (a_l != 0), else -1 */
+    slong * next;       /* the first l' >= l with a_{l'} != 0 */
+    acb_ptr zb;         /* z / a_l for nonzero letters */
+    acb_ptr mzb;        /* -z / a_l */
+    int use_dyadic;
+    int is_real;
+}
+gctx;
+
+enum { G_BSPLIT_BLOCK_SIZE = 8 };
+
+/* state indices: T_l for nonzero letters in order of decreasing l, then
+   the A_l in order of decreasing l */
+static slong
+aidx(const gctx * G, slong l)
+{
+    return G->d + (G->L - 1 - l);
+}
+
+static void
+leaf(cmat_struct * Q, const gctx * G, ulong n, slong prec)
+{
+    slong L = G->L, l;
+    acb_t t;
+    fmpz_t p;
+
+    acb_init(t);
+    fmpz_init(p);
+    _acb_vec_zero(Q->e, Q->n * Q->n);
+
+    for (l = 0; l < L; l++)
+    {
+        /* g_l(n) = (1/n^c) (-z/(n a_l')) T_l'(n-1), l' = next(l), c = l' - l;
+           times n^C */
+        slong lp = G->next[l], c = lp - l + 1, r = aidx(G, l);
+        fmpz_set_ui(p, n);
+        fmpz_pow_ui(p, p, G->C - c);
+        acb_mul_fmpz(t, G->mzb + lp, p, prec);
+        acb_set(CE(Q, r, G->tidx[lp]), t);
+        /* A_l(n-1) n^C */
+        fmpz_set_ui(p, n);
+        fmpz_pow_ui(p, p, G->C);
+        acb_set_fmpz(CE(Q, r, r), p);
+
+        if (G->tidx[l] >= 0)
+        {
+            /* T_l(n) = (z/a_l) T_l(n-1) + g_{l+1}(n) */
+            slong rt = G->tidx[l];
+            acb_mul_fmpz(CE(Q, rt, rt), G->zb + l, p, prec);
+            if (l + 1 < L)
+            {
+                slong lq = G->next[l + 1], cq = lq - (l + 1) + 1;
+                fmpz_set_ui(p, n);
+                fmpz_pow_ui(p, p, G->C - cq);
+                acb_mul_fmpz(CE(Q, rt, G->tidx[lq]), G->mzb + lq, p, prec);
+            }
+        }
+    }
+
+    acb_clear(t);
+    fmpz_clear(p);
+}
+
+/* Return a signed view of the mantissa and its binary exponent.
+   Strip padding from a single limb so it can be used as a multiplier. */
+static inline slong
+g_arf_mantissa(mpz_t m, const arf_t x, ulong * limb)
+{
+    nn_srcptr xp;
+    slong xn, e;
+
+    ARF_GET_MPN_READONLY(xp, xn, x);
+    e = ARF_EXP(x) - xn * FLINT_BITS;
+    if (xn == 1)
+    {
+        int shift = flint_ctz(xp[0]);
+        *limb = xp[0] >> shift;
+        xp = limb;
+        e += shift;
+    }
+
+    mpz_roinit_n(m, (mp_srcptr) xp, ARF_SGNBIT(x) ? -xn : xn);
+    return e;
+}
+
+/* Compute z - xy exactly. Borrow the limbs of the arf operands and
+   shift only the addend with the higher binary exponent. */
+static inline void
+g_arf_submul(arf_t z, const arf_t x, const arf_t y, mpz_t sum, mpz_t prod)
+{
+    mpz_t zm, xm, ym;
+    ulong zl, xl, yl;
+    slong ze, pe;
+
+    if (arf_is_zero(x) || arf_is_zero(y))
+        return;
+
+    if (ARF_IS_POW2(y))
+    {
+        arf_t t;
+        arf_init_set_shallow(t, x);
+        fmpz_init(ARF_EXPREF(t));
+        _fmpz_add2_fast(ARF_EXPREF(t), ARF_EXPREF(x), ARF_EXPREF(y), -1);
+        if (ARF_SGNBIT(y))
+            arf_add(z, z, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+        else
+            arf_sub(z, z, t, ARF_PREC_EXACT, ARF_RND_DOWN);
+        fmpz_clear(ARF_EXPREF(t));
+        return;
+    }
+
+    if (arf_is_zero(z))
+    {
+        arf_neg_mul(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+        return;
+    }
+
+    /* The integer calculation requires machine-sized exponents and a
+       result whose limb count fits the mpz representation. */
+    if (!ARF_IS_LAGOM(x) || !ARF_IS_LAGOM(y) || !ARF_IS_LAGOM(z))
+    {
+        arf_submul(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+        return;
+    }
+    pe = g_arf_mantissa(xm, x, &xl);
+    pe += g_arf_mantissa(ym, y, &yl);
+    ze = g_arf_mantissa(zm, z, &zl);
+
+    if (FLINT_ABS(pe - ze) / FLINT_BITS >=
+        INT_MAX - ARF_SIZE(x) - ARF_SIZE(y) - ARF_SIZE(z) - 2)
+    {
+        arf_submul(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+        return;
+    }
+
+    if (pe <= ze)
+    {
+        mpz_mul_2exp(sum, zm, ze - pe);
+        mpz_submul(sum, xm, ym);
+    }
+    else
+    {
+        mpz_mul(prod, xm, ym);
+        mpz_mul_2exp(prod, prod, pe - ze);
+        mpz_sub(sum, zm, prod);
+        pe = ze;
+    }
+
+    arf_set_mpz(z, sum);
+    arf_mul_2exp_si(z, z, pe);
+}
+
+/* Subtract xy. The caller supplies -Im(y). */
+static inline void
+g_acf_submul(acf_t z, const acf_t x, const acf_t y, const arf_t neg_im,
+    mpz_t sum, mpz_t prod)
+{
+    g_arf_submul(acf_realref(z), acf_realref(x), acf_realref(y), sum, prod);
+    g_arf_submul(acf_realref(z), acf_imagref(x), neg_im, sum, prod);
+    g_arf_submul(acf_imagref(z), acf_realref(x), acf_imagref(y), sum, prod);
+    g_arf_submul(acf_imagref(z), acf_imagref(x), acf_realref(y), sum, prod);
+}
+
+static void
+g_acf_set_coefficient(acf_t c, arf_t neg_im, acb_srcptr ratio,
+    const fmpz_t power, int is_real)
+{
+    arf_mul_fmpz(acf_realref(c), arb_midref(acb_realref(ratio)),
+        power, ARF_PREC_EXACT, ARF_RND_DOWN);
+    if (!is_real)
+    {
+        arf_mul_fmpz(acf_imagref(c), arb_midref(acb_imagref(ratio)),
+            power, ARF_PREC_EXACT, ARF_RND_DOWN);
+        arf_neg(neg_im, acf_imagref(c));
+    }
+}
+
+/* Compute the product of the scaled one-term matrices over (a, b].
+   The first d columns are computed exactly. The other nonzero entries
+   are diagonal and equal to the common denominator. */
+static void
+g_bsplit_dyadic_interval(cmat_struct * P, fmpz_t Den, const gctx * G,
+    ulong a, ulong b)
+{
+    const slong exact = ARF_PREC_EXACT;
+    const arf_rnd_t rnd = ARF_RND_DOWN;
+    slong d = G->d, l, j, i, row, col, next;
+    acf_ptr entries = _acf_vec_init(G->dim * d);
+    fmpz * powers = _fmpz_vec_init(G->C + 1);
+    const fmpz * common = powers + G->C;
+    acf_t coeff;
+    arf_t neg_im, common_arf;
+    mpz_t sum, prod;
+    ulong n;
+
+    acf_init(coeff);
+    arf_init(neg_im);
+    arf_init(common_arf);
+    mpz_init(sum);
+    mpz_init(prod);
+    fmpz_one(Den);
+    fmpz_one(powers);
+    for (i = 0; i < d; i++)
+        arf_one(acf_realref(entries + i * d + i));
+
+    for (n = a + 1; n <= b; n++)
+    {
+        for (i = 1; i <= G->C; i++)
+            fmpz_mul_ui(powers + i, powers + i - 1, n);
+        arf_set_fmpz(common_arf, common);
+        for (l = 0; l < G->L; l++)
+        {
+            next = G->next[l];
+            row = aidx(G, l);
+            col = G->tidx[next];
+            g_acf_set_coefficient(coeff, neg_im, G->zb + next,
+                powers + G->C - (next - l + 1), G->is_real);
+            for (j = 0; j <= col; j++)
+            {
+                acf_ptr x = entries + row * d + j;
+                acf_srcptr y = entries + col * d + j;
+                arf_mul(acf_realref(x), acf_realref(x), common_arf, exact, rnd);
+                if (G->is_real)
+                    g_arf_submul(acf_realref(x), acf_realref(y), acf_realref(coeff), sum, prod);
+                else
+                {
+                    arf_mul(acf_imagref(x), acf_imagref(x), common_arf, exact, rnd);
+                    g_acf_submul(x, y, coeff, neg_im, sum, prod);
+                }
+            }
+        }
+        for (l = 0; l < G->L; l++)
+        {
+            row = G->tidx[l];
+            if (row < 0)
+                continue;
+            g_acf_set_coefficient(coeff, neg_im, G->zb + l, common, G->is_real);
+            for (j = 0; j <= row; j++)
+            {
+                acf_ptr x = entries + row * d + j;
+                if (G->is_real)
+                    arf_mul(acf_realref(x), acf_realref(x), acf_realref(coeff), exact, rnd);
+                else
+                    acf_mul(x, x, coeff, exact, rnd);
+            }
+            if (l + 1 < G->L)
+            {
+                next = G->next[l + 1];
+                col = G->tidx[next];
+                g_acf_set_coefficient(coeff, neg_im, G->zb + next,
+                    powers + G->C - (next - l), G->is_real);
+                for (j = 0; j <= col; j++)
+                {
+                    acf_ptr x = entries + row * d + j;
+                    acf_srcptr y = entries + col * d + j;
+                    if (G->is_real)
+                        g_arf_submul(acf_realref(x), acf_realref(y), acf_realref(coeff), sum, prod);
+                    else
+                        g_acf_submul(x, y, coeff, neg_im, sum, prod);
+                }
+            }
+        }
+        fmpz_mul(Den, Den, common);
+    }
+
+    _acb_vec_zero(P->e, P->n * P->n);
+    for (i = 0; i < G->dim; i++)
+        for (j = 0; j < FLINT_MIN(i + 1, d); j++)
+        {
+            acf_ptr x = entries + i * d + j;
+            acb_ptr y = CE(P, i, j);
+            arf_swap(arb_midref(acb_realref(y)), acf_realref(x));
+            if (!G->is_real)
+                arf_swap(arb_midref(acb_imagref(y)), acf_imagref(x));
+        }
+    for (i = d; i < G->dim; i++)
+        acb_set_fmpz(CE(P, i, i), Den);
+
+    acf_clear(coeff);
+    arf_clear(neg_im);
+    arf_clear(common_arf);
+    mpz_clear(sum);
+    mpz_clear(prod);
+    _fmpz_vec_clear(powers, G->C + 1);
+    _acf_vec_clear(entries, G->dim * d);
+}
+
+static int
+g_bsplit_dyadic_ratios(gctx * G)
+{
+    slong l;
+
+    G->is_real = 1;
+    for (l = 0; l < G->L; l++)
+    {
+        acb_srcptr r = G->zb + l;
+
+        if (G->tidx[l] < 0)
+            continue;
+        if (!acb_is_exact(r) || !acb_is_finite(r))
+            return 0;
+        if (!ARF_IS_LAGOM(arb_midref(acb_realref(r))) ||
+            !ARF_IS_LAGOM(arb_midref(acb_imagref(r))))
+            return 0;
+        G->is_real &= arb_is_zero(acb_imagref(r));
+    }
+    return 1;
+}
+
+static void
+bsplit(cmat_struct * P, fmpz_t Den, const gctx * G, ulong a, ulong b, slong prec)
+{
+    if (G->use_dyadic && b - a <= G_BSPLIT_BLOCK_SIZE)
+        g_bsplit_dyadic_interval(P, Den, G, a, b);
+    else if (b - a == 1)
+    {
+        leaf(P, G, b, prec);
+        fmpz_set_ui(Den, b);
+        fmpz_pow_ui(Den, Den, G->C);
+    }
+    else
+    {
+        ulong m = a + (b - a) / 2;
+        cmat_struct P1, P2;
+        fmpz_t D2;
+        cmat_init(&P1, G->dim);
+        cmat_init(&P2, G->dim);
+        fmpz_init(D2);
+        bsplit(&P1, Den, G, a, m, prec);
+        bsplit(&P2, D2, G, m, b, prec);
+        cmat_mul(P, &P2, &P1, prec);
+        fmpz_mul(Den, Den, D2);
+        cmat_clear(&P1);
+        cmat_clear(&P2);
+        fmpz_clear(D2);
+    }
+}
+
+/* the first column of the product, the lowest segment as a vector */
+static void
+bsplit_col(acb_ptr v, fmpz_t Den, const gctx * G, ulong a, ulong b, slong col, slong prec)
+{
+    slong n = G->dim, i, l;
+    if (b - a <= (G->use_dyadic ? G_BSPLIT_BLOCK_SIZE : 4))
+    {
+        cmat_struct P;
+        cmat_init(&P, n);
+        bsplit(&P, Den, G, a, b, prec);
+        for (i = 0; i < n; i++)
+            acb_set(v + i, CE(&P, i, col));
+        cmat_clear(&P);
+    }
+    else
+    {
+        ulong m = a + (b - a) / 2;
+        cmat_struct P2;
+        acb_ptr v1;
+        fmpz_t D2;
+        cmat_init(&P2, n);
+        v1 = _acb_vec_init(n);
+        fmpz_init(D2);
+        bsplit_col(v1, Den, G, a, m, col, prec);
+        bsplit(&P2, D2, G, m, b, prec);
+        for (i = 0; i < n; i++)
+        {
+            acb_zero(v + i);
+            for (l = 0; l <= i; l++)
+                if (!acb_is_zero(CE(&P2, i, l)) && !acb_is_zero(v1 + l))
+                    acb_addmul(v + i, CE(&P2, i, l), v1 + l, prec);
+        }
+        fmpz_mul(Den, Den, D2);
+        cmat_clear(&P2);
+        _acb_vec_clear(v1, n);
+        fmpz_clear(D2);
+    }
+}
+
+/* Evaluate the same truncated series by multiplying the one-term
+   matrices after clearing each term's denominator n^C. Return -1
+   if automatic selection requires integer intervals and they are unavailable. */
+static int
+g_suffixes_bsplit(acb_ptr res, const g_series_ctx * ctx, slong N,
+    const mag_t tail, slong wp, int force_bsplit)
+{
+    gctx G;
+    slong l;
+    acb_ptr v;
+    fmpz_t den;
+    arb_t den_ball;
+    int ok = 1;
+
+    G.L = ctx->L;
+    G.d = ctx->depth;
+    G.dim = G.d + G.L;
+    G.C = ctx->max_index;
+    G.tidx = ctx->state_index;
+    G.next = ctx->block_end;
+    G.zb = ctx->ratios;
+    G.use_dyadic = g_bsplit_dyadic_ratios(&G);
+    if (!force_bsplit && !G.use_dyadic)
+        return -1;
+
+    G.mzb = _acb_vec_init(G.L);
+    _acb_vec_neg(G.mzb, G.zb, G.L);
+    v = _acb_vec_init(G.dim);
+    fmpz_init(den);
+    arb_init(den_ball);
+
+    /* X(0) is the unit vector for the last nonzero letter. */
+    bsplit_col(v, den, &G, 0, N, G.tidx[G.L - 1], wp);
+    arb_set_fmpz(den_ball, den);
+    for (l = 0; l < G.L; l++)
+    {
+        acb_div_arb(res + l, v + aidx(&G, l), den_ball, wp);
+        acb_add_error_mag(res + l, tail);
+        if (!acb_is_finite(res + l))
+            ok = 0;
+    }
+    acb_one(res + G.L);
+
+    arb_clear(den_ball);
+    fmpz_clear(den);
+    _acb_vec_clear(v, G.dim);
+    _acb_vec_clear(G.mzb, G.L);
+    return ok;
+}
+
+static int
+g_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z, slong prec,
+    int force_bsplit)
 {
     g_series_ctx G;
     slong l, d, run, N, wp;
@@ -596,7 +1071,12 @@ _acb_mzeta_G_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z,
             if (G.state_index[l] >= 0)
                 acb_div(G.ratios + l, z, a + l, wp);
 
-        ok = g_suffixes_series(res, &G, N, tail, wp, qd);
+        /* Integer intervals keep binary splitting competitive at high precision. */
+        ok = -1;
+        if (force_bsplit || wp >= 8192)
+            ok = g_suffixes_bsplit(res, &G, N, tail, wp, force_bsplit);
+        if (ok < 0)
+            ok = g_suffixes_series(res, &G, N, tail, wp, qd);
     }
 
     flint_free(G.state_index);
@@ -607,6 +1087,20 @@ _acb_mzeta_G_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z,
     mag_clear(tail);
     mag_clear(t);
     return ok;
+}
+
+int
+_acb_mzeta_G_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z,
+    slong prec)
+{
+    return g_suffixes(res, a, L, z, prec, 0);
+}
+
+int
+_acb_mzeta_G_suffixes_bsplit(acb_ptr res, acb_srcptr a, slong L,
+    const acb_t z, slong prec)
+{
+    return g_suffixes(res, a, L, z, prec, 1);
 }
 
 /* G(a_1, ..., a_L; 1): directly if q = 1/R <= 1/2, else split at 1/2:

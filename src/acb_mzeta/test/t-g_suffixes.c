@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2026 Zhenjie Li
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -149,6 +151,58 @@ TEST_FUNCTION_START(acb_mzeta_G_suffixes, state)
         _acb_vec_clear(a, L);
         _acb_vec_clear(series, L + 1);
         _acb_vec_clear(high, L + 1);
+    }
+
+    /* Exact real and complex dyadic ratios, including separated exponents. */
+    {
+        slong i, j;
+        acb_t z;
+        acb_ptr a = _acb_vec_init(4);
+        acb_ptr binary = _acb_vec_init(5);
+        acb_ptr series = _acb_vec_init(5);
+
+        acb_init(z);
+        for (j = 0; j < 3; j++)
+        {
+            slong prec = j == 2 ? 8192 : 256;
+            slong series_prec = j == 2 ? prec - 128 : prec + 64;
+            acb_one(z);
+            acb_set_si(a + 1, 2);
+            acb_set_si(a + 2, 4);
+            acb_set_si(a + 3, 8);
+            if (j == 1)
+            {
+                acb_set_si(z, 3);
+                acb_mul_2exp_si(z, z, -2);
+                acb_set_si(a + 1, -2);
+                acb_set_si(a + 2, 3);
+                acb_set_si(a + 3, 2);
+                arb_set_si(acb_imagref(a + 3), -2);
+            }
+            if (j == 2)
+            {
+                acb_set_si(a + 1, 2);
+                arb_set_si(acb_imagref(a + 1), -2);
+                acb_set_si(a + 3, 1);
+                arb_set_si(acb_imagref(a + 3), 1);
+                acb_mul_2exp_si(a + 3, a + 3, 299);
+            }
+            if (!_acb_mzeta_G_suffixes_bsplit(binary, a, 4, z, prec) ||
+                !_acb_mzeta_G_suffixes(series, a, 4, z, series_prec))
+                flint_abort();
+            for (i = 0; i <= 4; i++)
+                if (acb_rel_accuracy_bits(binary + i) < prec - (j == 2 ? 320 : 8) ||
+                    !acb_overlaps(binary + i, series + i))
+                {
+                    flint_printf("FAIL (dyadic series, suffix %wd)\n", i);
+                    flint_abort();
+                }
+        }
+
+        acb_clear(z);
+        _acb_vec_clear(a, 4);
+        _acb_vec_clear(binary, 5);
+        _acb_vec_clear(series, 5);
     }
 
     /* Check the direct result against the first suffix for real and

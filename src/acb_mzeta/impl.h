@@ -270,6 +270,10 @@ void _acb_mzeta_mzv_bsplit(arb_t res, const unsigned char * w, slong k, slong pr
 int _acb_mzeta_G_suffixes(acb_ptr res, acb_srcptr a, slong L, const acb_t z,
     slong prec);
 
+/* The same series evaluated by binary splitting. */
+int _acb_mzeta_G_suffixes_bsplit(acb_ptr res, acb_srcptr a, slong L,
+    const acb_t z, slong prec);
+
 /* G(a; 1) directly or by Hoelder convolution at 1/2; 0 if not applicable */
 int _acb_mzeta_G_one(acb_t res, acb_srcptr a, slong L, slong prec);
 
