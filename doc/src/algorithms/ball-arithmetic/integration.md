@@ -38,15 +38,19 @@ $(\rho - \rho^{-1})/2$.
 
 ::: theorem {#thm-gl}
 If $f$ is analytic inside $E_\rho$ and $|f(z)| \le M$ there, then
-$$|I - Q_n| \le \frac{64 M}{15 (\rho^2 - 1) \rho^{2n}} \le \frac{64 M}{15 (\rho - 1) \rho^{2n - 1}}.$$
+$$|I - Q_n| \le \frac{64 M}{15 (\rho^2 - 1) \rho^{2n - 2}} \le \frac{64 M}{15 (\rho - 1) \rho^{2n - 1}}.$$
 :::
 
 ::: proof
-The first inequality is due to Trefethen [@Tre2008] (see also
-[@Tre2013, Chapter 19]); it follows from the Chebyshev expansion of $f$,
-whose coefficients are bounded by $2M\rho^{-k}$, and the exactness of the
-rule on polynomials of degree less than $2n$. The second follows from
-$(\rho^2 - 1)\rho^{2n} = (\rho - 1)(\rho + 1)\rho^{2n} \ge (\rho -
+The first inequality is due to Trefethen [@Tre2008, Theorem 4.5] (see
+also [@Tre2013, Chapter 19]), who states it as $64 M / (15 (\rho^2 - 1)
+\rho^{2n})$ for the rule with $n + 1$ points. Write $f = \sum_k a_k
+T_k$ with $|a_k| \le 2M\rho^{-k}$. The rule is exact for $k < 2n$ and
+for odd $k$, and for even $k \ge 2n$ the error on $T_k$ is at most
+$2 + 2/(k^2 - 1) \le 32/15$ when $k \ge 4$, and $|{-2/3} - 2T_2(0)| =
+4/3$ for $k = 2$, $n = 1$. Summing $2M \cdot \tfrac{32}{15} \rho^{-k}$
+over even $k \ge 2n$ gives the first bound. The second follows from
+$(\rho^2 - 1)\rho^{2n-2} = (\rho - 1)(\rho + 1)\rho^{2n-2} \ge (\rho -
 1)\rho^{2n-1}$.
 :::
 
