@@ -43,8 +43,9 @@
 
    (C the upper Cholesky factor of Q, summing one coordinate at a time;
    t_min a lower bound for the t_n of the non-excluded points, r1 <= r),
-   so the error of n nodes is at most (64/15) h M rho^(-2n) / (rho^2 - 1)
-   with M the bound of |f| on the ellipse.  The tail beyond W = e^Y is
+   so the error of n nodes is at most (64/15) h M rho^(2-2n) / (rho^2 - 1)
+   with M the bound of |f| on the ellipse (Trefethen's bound, which he
+   states with rho^(-2n) for n + 1 nodes).  The tail beyond W = e^Y is
    bounded by Phi_all(W/2) e^(W t_min/2) int_W^oo w^(Re a - 1) e^(-w t_min) dw.
    The node counts and the working precisions taper with these bounds. */
 
@@ -893,10 +894,10 @@ theta_side_sum(acb_t res, theta_side_struct * S, gl_cache_struct * G, slong bits
         arb_get_mag(m, u);
         mag_mul(M, M, m);
 
-        /* n: (64/15) h M rho^-2n / (rho^2 - 1) <= 2^-(bits + 4) / nint */
+        /* n: (64/15) h M rho^(2-2n) / (rho^2 - 1) <= 2^-(bits + 4) / nint */
         Md = mag_get_d_log2_approx(M);
         rmind = log2(rhod);
-        n = (slong) ceil((Md + (bits + 4) + log2(64.0 / 15 * hd / (rhod * rhod - 1)) + log2((double) nint)) / (2 * rmind));
+        n = 1 + (slong) ceil((Md + (bits + 4) + log2(64.0 / 15 * hd / (rhod * rhod - 1)) + log2((double) nint)) / (2 * rmind));
         n = FLINT_MAX(n, 1);
         n = ((n + 7) / 8) * 8;
         if (n > 1000000)
@@ -908,10 +909,10 @@ theta_side_sum(acb_t res, theta_side_struct * S, gl_cache_struct * G, slong bits
            cost less than new nodes */
         n = gl_cache_degree(G, n);
 
-        /* the error bound */
+        /* the error bound (64/15) h M rho^(2-2n) / (rho^2 - 1) */
         arb_sqr(t, rho, prec0);
         arb_sub_ui(t, t, 1, prec0);
-        arb_pow_ui(u, rho, 2 * n, prec0);
+        arb_pow_ui(u, rho, 2 * n - 2, prec0);
         arb_mul(t, t, u, prec0);
         arb_mul_ui(u, h, 64, prec0);
         arb_div_ui(u, u, 15, prec0);
