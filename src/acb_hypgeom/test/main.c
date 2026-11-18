@@ -18,6 +18,7 @@
 #include "t-airy.c"
 #include "t-airy_series.c"
 #include "t-bessel_i.c"
+#include "t-bessel_integration.c"
 #include "t-bessel_j.c"
 #include "t-bessel_j_deriv_bound.c"
 #include "t-bessel_k.c"
@@ -42,6 +43,7 @@
 #include "t-erf_series.c"
 #include "t-fresnel.c"
 #include "t-fresnel_series.c"
+#include "t-gamma_incomplete_integration.c"
 #include "t-gamma_lower.c"
 #include "t-gamma_lower_series.c"
 #include "t-gamma_stirling_sum.c"
@@ -60,6 +62,7 @@
 #include "t-log_rising_ui_jet.c"
 #include "t-m.c"
 #include "t-pfq.c"
+#include "t-pfq_bound_factor.c"
 #include "t-pfq_series_direct.c"
 #include "t-pfq_series_sum_bs.c"
 #include "t-pfq_series_sum_rs.c"
@@ -69,6 +72,7 @@
 #include "t-pfq_sum_rs.c"
 #include "t-rising_ui.c"
 #include "t-rising_ui_jet.c"
+#include "t-sd_bound.c"
 #include "t-shi_series.c"
 #include "t-si.c"
 #include "t-si_series.c"
@@ -87,6 +91,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_airy),
     TEST_FUNCTION(acb_hypgeom_airy_series),
     TEST_FUNCTION(acb_hypgeom_bessel_i),
+    TEST_FUNCTION(acb_hypgeom_bessel_integration),
     TEST_FUNCTION(acb_hypgeom_bessel_j),
     TEST_FUNCTION(acb_hypgeom_bessel_j_deriv_bound),
     TEST_FUNCTION(acb_hypgeom_bessel_k),
@@ -111,6 +116,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_erf_series),
     TEST_FUNCTION(acb_hypgeom_fresnel),
     TEST_FUNCTION(acb_hypgeom_fresnel_series),
+    TEST_FUNCTION(acb_hypgeom_gamma_incomplete_integration),
     TEST_FUNCTION(acb_hypgeom_gamma_lower),
     TEST_FUNCTION(acb_hypgeom_gamma_lower_series),
     TEST_FUNCTION(acb_hypgeom_gamma_stirling_sum),
@@ -129,6 +135,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_log_rising_ui_jet),
     TEST_FUNCTION(acb_hypgeom_m),
     TEST_FUNCTION(acb_hypgeom_pfq),
+    TEST_FUNCTION(acb_hypgeom_pfq_bound_factor),
     TEST_FUNCTION(acb_hypgeom_pfq_series_direct),
     TEST_FUNCTION(acb_hypgeom_pfq_series_sum_bs),
     TEST_FUNCTION(acb_hypgeom_pfq_series_sum_rs),
@@ -138,6 +145,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_pfq_sum_rs),
     TEST_FUNCTION(acb_hypgeom_rising_ui),
     TEST_FUNCTION(acb_hypgeom_rising_ui_jet),
+    TEST_FUNCTION(acb_hypgeom_sd_bound),
     TEST_FUNCTION(acb_hypgeom_shi_series),
     TEST_FUNCTION(acb_hypgeom_si),
     TEST_FUNCTION(acb_hypgeom_si_series),

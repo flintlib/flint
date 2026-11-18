@@ -18,6 +18,50 @@
 #include "acb_hypgeom.h"
 #include "secondary_zeta.h"
 
+/* Gamma(s, z) for the sums below.  Only the absolute accuracy of the
+   terms matters, and the working precision already allows for the
+   size of the terms, so the series and asymptotic expansions are used
+   directly, with the real-variable integration as a fallback when
+   they lose more than half of the precision (near the poles of
+   Gamma(s), for instance).  The automatic selection of
+   acb_hypgeom_gamma_upper costs more here, since it recovers the full
+   relative accuracy of every term; it is used only if nothing else
+   gives a result. */
+static void
+secondary_zeta_gamma_upper(acb_t res, const acb_t s, const acb_t z, slong prec)
+{
+    slong acc, max;
+
+    acb_hypgeom_gamma_upper_nointegration(res, s, z, 0, prec);
+    acc = acb_rel_accuracy_bits(res);
+
+    if (acc < 0.5 * prec)
+    {
+        max = FLINT_MIN(prec, acb_rel_accuracy_bits(z));
+        max = FLINT_MIN(max, acb_rel_accuracy_bits(s));
+
+        if (max > 2 && acc < 0.5 * max
+            && acb_is_real(s) && acb_is_real(z)
+            && arf_cmp_2exp_si(arb_midref(acb_realref(z)), -16) > 0
+            && arf_cmpabs_2exp_si(arb_midref(acb_realref(s)), 60) < 0
+            && arf_cmpabs_2exp_si(arb_midref(acb_realref(z)), 60) < 0)
+        {
+            acb_t t;
+            acb_init(t);
+            arb_hypgeom_gamma_upper_integration(acb_realref(t),
+                acb_realref(s), acb_realref(z), 0, prec);
+            if (acb_is_finite(t) && (!acb_is_finite(res)
+                || acb_rel_accuracy_bits(t) > acc))
+                acb_swap(res, t);
+            acb_clear(t);
+        }
+    }
+
+    if (!acb_is_finite(res))
+        acb_hypgeom_gamma_upper(res, s, z, 0, prec);
+}
+
+
 /*
     Secondary zeta function
 
@@ -667,7 +711,7 @@ _acb_dirichlet_secondary_zeta_term_A(acb_t res, const acb_t s,
             acb_set_arb(zarg, az2);
 
             /* Gamma(s/2, a gamma_n^2) */
-            acb_hypgeom_gamma_upper(gu, shalf, zarg, 0, wp);
+            secondary_zeta_gamma_upper(gu, shalf, zarg, wp);
 
             /* gamma_n^{-s} = exp(-s log gamma_n) */
             arb_log(g2, gammas + n, wp);
@@ -988,7 +1032,7 @@ _acb_dirichlet_secondary_zeta_term_P(acb_t res, const acb_t s,
 
         /* gu = Gamma((1-s)/2, log^2 n/(4a)) */
         acb_set_arb(term, z_re);             /* reuse term as the z argument */
-        acb_hypgeom_gamma_upper(gu, shalf_arg, term, 0, wp);
+        secondary_zeta_gamma_upper(gu, shalf_arg, term, wp);
 
         /* powfac = (2/log n)^{1-s} = exp((1-s) log(2/log n)) */
         arb_set_ui(t, 2);

@@ -208,7 +208,7 @@ int main(void)
 [11.7915344390142816137430449119 +/- 2.55e-29]
 [14.9309177084877859477625939974 +/- 1.14e-29]
 [18.0710639679109225431478829756 +/- 1.82e-29]
-6 blocks, 1776 function evaluations
+6 blocks, 384 function evaluations
 ```
 
 All six intervals have flag 1, so $J_0$ has exactly six zeros in
