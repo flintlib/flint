@@ -317,6 +317,7 @@ typedef struct
     /* error bounds */
     mag_t mag;
     mag_t magpow;
+    mag_t max_local_error_pow;
     arb_poly_t itg_pol, itg_num;  /* XXX also keep track of itg_n? */
 
     /* options */

@@ -86,7 +86,11 @@ _acb_ode_transition_matrix_step(acb_mat_t mat,
         return GR_UNABLE;
     }
 
-    gr_ctx_init_complex_acb(CC, prec);
+    /* Compute dx at precision a little higher than prec to avoid stupidly
+       limiting the accuracy of the sum in easy cases. But this precision may
+       still be the limiting factor, e.g., when evaluating at a non-dyadic
+       point a series with a large coefficient hump. */
+    gr_ctx_init_complex_acb(CC, 1.125 * prec);
     gr_ctx_init_gr_poly(Pol, Cst);
     gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
 

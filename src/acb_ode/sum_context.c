@@ -31,6 +31,7 @@ acb_ode_sum_zero(acb_ode_sum_t sum)
             acb_one(sum->pows + i);
 
     mag_one(sum->magpow);
+    mag_zero(sum->max_local_error_pow);
 }
 
 void
@@ -65,6 +66,7 @@ acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts,
 
     mag_init(sum->mag);
     mag_init(sum->magpow);
+    mag_init(sum->max_local_error_pow);
     arb_poly_init(sum->itg_pol);
     arb_poly_init(sum->itg_num);
 
@@ -96,6 +98,7 @@ acb_ode_sum_clear(acb_ode_sum_t sum)
 
     mag_clear(sum->mag);
     mag_clear(sum->magpow);
+    mag_clear(sum->max_local_error_pow);
     mag_clear(sum->cvrad);
     arb_poly_clear(sum->itg_pol);
     arb_poly_clear(sum->itg_num);

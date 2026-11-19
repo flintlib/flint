@@ -175,6 +175,78 @@ next_sums(acb_ode_sol_t sol, slong base, slong n,
     acb_clear(tmp);
 }
 
+static void
+next_pows(acb_ode_sum_t sum)
+{
+    mag_t err;
+    acb_t zmid, znmid;
+
+    mag_init(err);
+    acb_init(zmid);
+    acb_init(znmid);
+
+    slong n = sum->n;
+
+    for (slong j = 0; j < sum->npts; j++)
+    {
+        slong prec = FLINT_MIN(sum->wp, sum->sum_wp);
+
+        acb_ptr znp1 = sum->pows + ((n + 1) % sum->nder) * sum->npts + j;
+        acb_ptr zn   = sum->pows + (n       % sum->nder) * sum->npts + j;
+        acb_ptr z = sum->pts + j;
+
+        if (acb_is_zero(z))
+        {
+            acb_zero(znp1);
+            continue;
+        }
+
+        FLINT_ASSERT(!mag_is_zero(sum->magpow));
+
+        acb_zero(zmid);
+        acb_zero(znmid);
+        arf_swap(arb_midref(acb_realref(zmid)), arb_midref(acb_realref(z)));
+        arf_swap(arb_midref(acb_imagref(zmid)), arb_midref(acb_imagref(z)));
+        arf_swap(arb_midref(acb_realref(znmid)), arb_midref(acb_realref(zn)));
+        arf_swap(arb_midref(acb_imagref(znmid)), arb_midref(acb_imagref(zn)));
+
+        acb_mul(znp1, znmid, zmid, prec);
+
+        arf_swap(arb_midref(acb_realref(zmid)), arb_midref(acb_realref(z)));
+        arf_swap(arb_midref(acb_imagref(zmid)), arb_midref(acb_imagref(z)));
+        if (zn != znp1)
+        {
+            arf_swap(arb_midref(acb_realref(znmid)), arb_midref(acb_realref(zn)));
+            arf_swap(arb_midref(acb_imagref(znmid)), arb_midref(acb_imagref(zn)));
+        }
+
+        /* like the tail bounds, this error analysis is pessimistic when the
+           evaluation points are not all of the same order of magnitude */
+
+        mag_hypot(err, arb_radref(acb_realref(znp1)),
+                  arb_radref(acb_imagref(znp1)));
+        mag_div(err, err, sum->magpow);
+        mag_max(sum->max_local_error_pow, err, sum->max_local_error_pow);
+
+        /* could be precomputed */
+        mag_hypot(err, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+
+        /* global error on z^{n+1} -- a bit crude */
+        mag_add(err, sum->max_local_error_pow, err);
+        mag_mul(err, err, sum->magpow);
+        mag_mul_ui(err, err, n + 1);
+
+        mag_set(arb_radref(acb_realref(znp1)), err);
+        mag_set(arb_radref(acb_imagref(znp1)), err);
+    }
+
+    mag_mul(sum->magpow, sum->magpow, sum->mag);
+
+    mag_clear(err);
+    acb_clear(zmid);
+    acb_clear(znmid);
+}
+
 void
 _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
 {
@@ -227,19 +299,10 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
     }
 
     /* compute the next power of each evaluation point */
-    /* XXX wasteful near the end */
+    /* XXX wasteful near the end of the summation */
 
     if (sum->nder > 0)
-        for (slong j = 0; j < sum->npts; j++)
-        {
-            slong prec = FLINT_MIN(sum->wp, sum->sum_wp);
-            acb_mul(sum->pows + ((n + 1) % sum->nder) * sum->npts + j,
-                    sum->pows + (n       % sum->nder) * sum->npts + j,
-                    sum->pts + j,
-                    prec);
-        }
-
-    mag_mul(sum->magpow, sum->magpow, sum->mag);
+        next_pows(sum);
 
     sum->n++;
 
