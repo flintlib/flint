@@ -50,7 +50,7 @@ acb_ode_cvest_update(acb_ode_cvest_t cvest,  /* aliasing allowed */
     /* running estimate of convergence rate in bits/term,
        exponential discounting */
     double cvg_rate_stride = (cvest->neglogterm - _old.neglogterm)/stride;
-    cvest->cvg_rate = _old.cvg_rate/2 + cvg_rate_stride/2;
+    cvest->cvg_rate = 3 * _old.cvg_rate / 4 + cvg_rate_stride / 4;
 
     /* number of terms still needed for full accuracy at the current rate of
        convergence */

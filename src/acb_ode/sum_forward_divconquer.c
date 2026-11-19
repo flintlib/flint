@@ -49,7 +49,8 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
         /* at the moment we only test convergence when a full residual is
            naturally available, but in principle it would make sense to do so
            between the two recursive calls in sum_divconquer, or even in/just
-           after sum_forward_1 (and that would be useful for operators of high degree) */
+           after sum_forward_1 (and that would be useful for operators of high
+           degree) */
 
         if (high >= low + block_len &&
             /* enough previous terms for the heuristic convergence check */
@@ -66,9 +67,10 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
             /* gradually decrease the working precision when it appears wasteful */
             slong prec_wanted = 0;
             for (slong m = 0; m < sum->nsols; m++)
-                prec_wanted = FLINT_MAX(prec_wanted, sum->sol[m].cvest->prec_wanted);
+                prec_wanted = FLINT_MAX(prec_wanted,
+                                        sum->sol[m].cvest->prec_wanted);
             if (prec_wanted < sum->wp)
-                sum->wp -= (sum->wp - prec_wanted)/2;
+                sum->wp -= (sum->wp - prec_wanted)/4;
         }
 
         divconquer_block(sum, mid);
