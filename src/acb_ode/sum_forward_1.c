@@ -50,6 +50,13 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
            && acb_is_zero((rhs + rhs_nlogs - 1)->coeffs + n - base))
         rhs_nlogs--;
 
+    while (rhs_nlogs > 0
+           && rhs_nlogs + mult > sol->nlogs + sol->future_logs)
+    {
+        FLINT_ASSERT(acb_contains_zero((rhs + rhs_nlogs - 1)->coeffs + n - base));
+        rhs_nlogs--;
+    }
+
     /* Compute the high-log part of the new term from the coefficient of x^{λ+n}
        on the rhs and the indicial polynomial */
 
@@ -85,7 +92,10 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
         acb_set((sol->series + k)->coeffs + n - base, c);
 
         if (!acb_is_zero(c))
+        {
+            FLINT_ASSERT(k < sol->nlogs + sol->future_logs);
             ini_nlogs = k + 1;
+        }
     }
     for (; k < rhs_nlogs + mult; k++)
     {
@@ -114,6 +124,8 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
     for (slong s = group->nshifts - 1; group->shifts[s].n > n; s--)
         future_shifts += group->shifts[s].mult;
     sol->future_logs = FLINT_MIN(sol->future_logs, future_shifts);
+
+    FLINT_ASSERT(sol->future_logs >= 0);
 
     for (slong k = 0; k < rhs_nlogs; k++)
         acb_clear(new_term + k);
