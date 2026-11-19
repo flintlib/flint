@@ -138,20 +138,29 @@ TEST_FUNCTION_START(nmod_poly_mulmid, state)
     }
 
     /* Compare with the classical algorithm with a short operand (rows of
-       scalar products in _nmod_poly_mulmid), moduli of 30 bits or more,
-       middle products and arbitrary windows */
+       scalar products in _nmod_poly_mulmid, rows in one word), moduli of
+       30 bits or more, of at most 32 bits and powers of 2, middle products,
+       arbitrary windows and squares */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t a, b, c, d;
         slong nlo, nhi, len;
-        ulong m = n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
+        int square;
+        ulong m = (n_randint(state, 4) == 0)
+                ? UWORD(1) << (1 + n_randint(state, FLINT_BITS - 1))
+                : n_randint(state, 2)
+                ? n_randtest_bits(state, 2 + n_randint(state, FLINT_BITS / 2 - 1))
+                : n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         nmod_poly_init(d, m);
         nmod_poly_randtest(a, state, 1 + n_randint(state, 300));
-        nmod_poly_randtest(b, state, 1 + n_randint(state, 18));
+        nmod_poly_randtest(b, state, 1 + n_randint(state, 50));
+        square = (n_randint(state, 8) == 0);
+        if (square)
+            nmod_poly_set(a, b);
 
         len = FLINT_MAX(a->length + b->length - 1, 0);
         if (n_randint(state, 2))
@@ -168,8 +177,8 @@ TEST_FUNCTION_START(nmod_poly_mulmid, state)
         if (n_randint(state, 2))
             nmod_poly_swap(a, b);
 
-        nmod_poly_mulmid(c, a, b, nlo, nhi);
-        nmod_poly_mulmid_classical(d, a, b, nlo, nhi);
+        nmod_poly_mulmid(c, a, square ? a : b, nlo, nhi);
+        nmod_poly_mulmid_classical(d, a, square ? a : b, nlo, nhi);
 
         if (!nmod_poly_equal(c, d))
         {

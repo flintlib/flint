@@ -39,3 +39,28 @@ _nmod_poly_mulmid_rows(nn_ptr res, nn_srcptr poly1, slong len1,
                                      poly2[j], mod);
     }
 }
+
+/*
+    The same when the sums of len2 products fit in one word
+    (_nmod_poly_one_word): the rows accumulate without reduction, with
+    _nmod_vec_nored_scalar_addmul_halflimb, and the outputs are reduced once
+    at the end.
+*/
+void
+_nmod_poly_mulmid_rows_one_word(nn_ptr res, nn_srcptr poly1, slong len1,
+                       nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+{
+    slong j, lo, hi;
+
+    _nmod_vec_zero(res, nhi - nlo);
+
+    for (j = FLINT_MAX(0, nlo - len1 + 1); j < FLINT_MIN(len2, nhi); j++)
+    {
+        lo = FLINT_MAX(j, nlo);
+        hi = FLINT_MIN(j + len1, nhi);
+        _nmod_vec_nored_scalar_addmul_halflimb(res + lo - nlo, poly1 + lo - j,
+                                               hi - lo, poly2[j]);
+    }
+
+    _nmod_vec_reduce(res, res, nhi - nlo, mod);
+}

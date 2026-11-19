@@ -51,12 +51,15 @@ TEST_FUNCTION_START(nmod_poly_mullow, state)
     }
 
     /* Compare with the classical algorithm with a short operand (rows of
-       scalar products in _nmod_poly_mullow), moduli of 30 bits or more */
+       scalar products in _nmod_poly_mullow), moduli of 30 bits or more and
+       powers of 2 */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
         slong trunc;
-        ulong n = n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
+        ulong n = n_randint(state, 4) == 0
+                ? UWORD(1) << (1 + n_randint(state, FLINT_BITS - 1))
+                : n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

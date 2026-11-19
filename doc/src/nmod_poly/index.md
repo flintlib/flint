@@ -515,11 +515,13 @@ name choose the algorithm from the lengths and the number of bits of $n$:
 
 - the classical algorithm, computing each coefficient as a dot product
   with `_nmod_vec_dot_rev` (see [](nmod_vec/dot)), for short operands;
-- for a shorter operand of 3 to 16 coefficients (6 with NEON), the same
+- for a shorter operand of 3 to 16 coefficients (12 with NEON), the same
   products in rows: one `_nmod_vec_scalar_addmul_nmod` of the longer
   operand per coefficient of the shorter one, where these scalar products
   have a vector kernel (see [](nmod_vec/simd)) and the products do not fit
-  one word;
+  one word or the shorter operand has at most 4 coefficients; for middle
+  products whose sums fit in one word, rows without reduction, for a
+  shorter operand of up to 64 coefficients;
 - with AVX512-IFMA, for a shorter operand of at least 4 to 12 and at most
   64 to 511 coefficients, depending on the processor and on $n$, a vector
   kernel of the classical algorithm that accumulates the products of 8

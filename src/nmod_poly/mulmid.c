@@ -103,8 +103,14 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 
     if (len2 <= 5 || m <= 5)
     {
-        if (rows)
+        /* with NEON the rows in one word come first: on the M4 they beat
+           the rows by 1.3-1.7x for len2 = 3 to 5 (Nov 2026) */
+        if (rows && !(_NMOD_POLY_NEON && _nmod_poly_mulmid_want_one_word(len2, m, mod)))
             _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        else if (_nmod_poly_mulmid_want_one_word(len2, m, mod)
+                 && !(nlo == 0 && nhi == len1 + len2 - 1)
+                 && !(poly1 == poly2 && len1 == len2))
+            _nmod_poly_mulmid_rows_one_word(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         else
             _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
@@ -113,6 +119,15 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
     if (nlo == 0 && nhi == len1 + len2 - 1)
     {
         _nmod_poly_mul(res, poly1, len1, poly2, len2, mod);
+        return;
+    }
+
+    /* rows in one word (see impl.h), in place of the rows, the classical
+       code, KS and fft_small */
+    if (_nmod_poly_mulmid_want_one_word(len2, m, mod)
+            && !(poly1 == poly2 && len1 == len2))
+    {
+        _nmod_poly_mulmid_rows_one_word(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
 
@@ -125,9 +140,15 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 
     slong bits = NMOD_BITS(mod);
 
-    /* KS computes the whole product: worth it for tiny moduli, and for
-       16 bits or less when the output is much longer than len2 */
-    if (len2 >= 8 && ((bits <= 8 && m >= len2) || (bits <= 16 && m >= 8 * len2)))
+    /* KS computes the whole product: worth it for tiny moduli, for 16
+       bits or less when the output is much longer than len2, and with NEON
+       up to 12 bits for len2 > 10 or squares from 8 outputs (on the M4 KS
+       beats the classical code there, which leads for other products with
+       len2 <= 10 below 16 outputs, Nov 2026) */
+    if (len2 >= 8 && ((bits <= 8 && m >= len2) || (bits <= 16 && m >= 8 * len2)
+                      || (_NMOD_POLY_NEON && bits <= 12
+                          && (len2 > 10 || (poly1 == poly2 && len1 == len2))
+                          && m >= FLINT_MAX(8, (len2 + 3) / 4))))
         _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
     else if (rows)
         _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, nlo, nhi, mod);

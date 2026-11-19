@@ -23,7 +23,14 @@ IFMA kernel described below if it applies, then asks
 uses the rows if they apply, and otherwise, with $c =
 \min(\mathit{len1}, 2\,\mathit{len2})$ and $b$ the number of bits of $n$:
 
-- classical if $3c < 2 \max(b, 10)$;
+- classical if $3c < 2 \max(b, 10)$, or if it accumulates its products
+  in one word ($(n - 1)^2 \mathit{len2} < 2^{64}$, $n$ not a power of 2)
+  and $\mathit{len2} < c(b)$, with $c(b) = \max(12, 2b)$ below 22 bits
+  and $4b - 24$ from 22 bits, provided that $\mathit{len1} \ge
+  2\,\mathit{len2}$; from 20 bits, also for balanced operands with
+  $\mathit{len2} < c(b)$ and for squares with $\mathit{len2} < 8b - 96$;
+  with NEON, where KS is faster at these lengths, only for squares from 22
+  bits with $\mathit{len2} < 2b - 8$;
 - [Kronecker substitution](algorithms/polynomials/kronecker) (`KS`) if
   $cb < 800$;
 - `KS2`, evaluation at $\pm 2^k$, if $c(b+1)^2 < 100\,000$;
@@ -37,7 +44,7 @@ following ranges, measured with the installed library on x86-64 with
 |---|---|---|---|---|---|
 | 8 | $L \le 6$ | 7–99 | 100–305 | — | $\ge 306$ |
 | 16 | $\le 10$ | 11–49 | 50–98 | — | $\ge 99$ |
-| 20 | $\le 13$ | 14–39 | 40–81 | — | $\ge 82$ |
+| 20 | $\le 39$ | — | 40–81 | — | $\ge 82$ |
 | 30 | $\le 19$ | 20–26 | 27–104 | 105–184 | $\ge 185$ |
 | 40 | $\le 26$ | — | 27–59 | 60–91 | $\ge 92$ |
 | 50 | $\le 33$ | — | 34–38 | 39–161 | $\ge 162$ |
@@ -64,7 +71,7 @@ is efficient when $b$ is small compared to the word size. `KS2` and
 `KS4` replace one large integer product by two or four products of half
 or a quarter of the field width.
 
-For a shorter operand of length $\mathit{len2}$ from 3 to 16 (to 6 with
+For a shorter operand of length $\mathit{len2}$ from 3 to 16 (to 12 with
 NEON, where longer rows lose), the products of the classical algorithm are
 computed in rows: one `_nmod_vec_scalar_addmul_nmod` of the longer operand
 per coefficient of the shorter one, rather than one dot product of at most
@@ -72,15 +79,19 @@ $\mathit{len2}$ terms per output coefficient, whose call, setup and final
 reduction dominate for such short lengths. The rows run the vector kernels
 of these scalar products ([](nmod_vec/simd)), so they are used where a
 kernel exists for $b$ (`NMOD_VEC_SIMD_SCALAR_MAX_BITS`: up to 63 bits with
-AVX-512, 50 with AVX2, 32 with NEON), $n$ is not a power of 2, the
-classical algorithm does not accumulate its products in one word (from 30
-to 32 bits on, depending on $\mathit{len2}$), the product is not a square,
+AVX-512, 50 with AVX2, 32 with NEON), the classical algorithm does not
+accumulate its products in one word (from 30 to 32 bits on, depending on
+$\mathit{len2}$) or $\mathit{len2} \le 4$, the product is not a square,
 and every row has at least `NMOD_VEC_SIMD_MIN_LEN` coefficients and $r
 \cdot \mathit{len2}$, with $r = 2$ for the 512-bit kernels and up to 32
 bits and $r = 4$ for the AVX2 kernels above 32 bits; middle products use
 $2r$, since all their dot products have $\mathit{len2}$ terms. They
 replace the classical algorithm and Kronecker substitution, not
-`fft_small`.
+`fft_small`. For a power of 2, whose dot products need no reduction, the
+rows must be twice as long, $n$ at most $2^{31}$ ($2^{48}$ with the
+512-bit kernels), and full products keep KS below $2^{16}$ for
+$\mathit{len2} > 8$ (with NEON, KS or the classical algorithm for
+$\mathit{len2} > 6$).
 
 When FLINT is built for a processor with AVX512-IFMA (Intel from Ice Lake
 on for some machines, AMD from Zen 4 on), the products for $n \le 2^{52}$ and a shorter
@@ -130,12 +141,29 @@ coefficients.
 `fft_small`), and the rows under the same conditions, its shortest row
 having $\mathit{trunc} - \mathit{len2} + 1$ coefficients, otherwise the
 classical algorithm for truncation lengths below $10 + b^2/10$ (from 16
-for 8-bit to 419 for 64-bit moduli), KS otherwise, and `fft_small` from
-separately tuned cutoffs. `nmod_poly_mulmid` first drops the operand
-coefficients that do not contribute to the requested range and then uses
-the IFMA kernel, the rows, the classical algorithm, `fft_small` (which
-computes a middle product at the cost of a product of the output length,
-[](algorithms/polynomials/middle-product)), or KS for small moduli.
+for 8-bit to 419 for 64-bit moduli; with NEON below 10 up to 23 bits) and,
+when it accumulates its products in one word ($2b + \lceil \log_2
+(\mathit{len2} + 1) \rceil \le 64$), from 16 bits or for $\mathit{len2}
+< c(b)$ below (with NEON, below 24 bits, for $\mathit{len2} < 6$ below
+16 bits and $\mathit{len2} < 7$ from 16 bits), KS
+otherwise, and `fft_small` from separately tuned cutoffs.
+`nmod_poly_mulmid` first drops the operand coefficients that do not
+contribute to the requested range and then uses the IFMA kernel, the
+rows, the classical algorithm, `fft_small` (which computes a middle
+product at the cost of a product of the output length,
+[](algorithms/polynomials/middle-product)), or KS for small moduli. When
+the sums of $\mathit{len2}$ products fit in one word ($(n - 1)^2
+\mathit{len2} < 2^{64}$), a middle product of $m \ge \max(8,
+\mathit{len2})$ coefficients that is not a square takes rows without
+reduction instead, for $\mathit{len2}$ from 6 (from 3 where the rows above
+do not apply) to 16 below 6 bits, 32 below 10 bits and 64 above (with
+NEON, for $m \ge 16$ and $\mathit{len2}$ from 3 to 10 below 14 bits, 64
+above; there KS is also taken up to 12 bits for $\mathit{len2} > 10$
+and for squares):
+each row is accumulated with
+`_nmod_vec_nored_scalar_addmul_halflimb` and each output coefficient is
+reduced once at the end, which the dot products of the classical
+algorithm cannot do for a middle product.
 `nmod_poly_mulhigh` calls `nmod_poly_mulmid` for all but tiny inputs and
 sets the low coefficients to zero.
 

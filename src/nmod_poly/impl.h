@@ -13,6 +13,7 @@
 #define NMOD_POLY_IMPL_H
 
 #include "nmod_types.h"
+#include "ulong_extras.h"  /* n_mulhi */
 #include "nmod_vec.h"
 #include "flint-mparam.h"  /* FLINT_NMOD_POLY_IFMA_* */
 
@@ -26,24 +27,35 @@
     these scalar products have a vector kernel for the modulus and every row
     is long enough: the shortest row, of length row_len, reaches the length
     of the kernels and ratio * len2, since a row costs a few times more than
-    a dot product on top of their common arithmetic. Not for powers of 2,
-    whose dot products need no reduction (the rows lose from 52 bits).
+    a dot product on top of their common arithmetic. For powers of 2, whose
+    dot products need no reduction, only up to 2^31 (2^48 with the 512-bit
+    kernels) and with rows twice as long, 2 ratio len2: there the rows are
+    1.1-4x faster than the classical code, which wins on shorter rows and
+    from 2^32 with AVX2 (the fp50 kernel) or 2^50 with AVX-512 (measured Nov
+    2026).
 
     _NMOD_POLY_ROWS_RATIO: the ratio for full and low products, 4 with the
     AVX2 kernels above 32 bits (doubles, peeling to an aligned address,
     scalar tails), 2 with the 512-bit kernels (the only ones above 50 bits,
     masked tails) and up to 32 bits.
 
-    _NMOD_POLY_ROWS_MAX_LEN2: the largest len2, 6 with the NEON kernels
-    (on the M4 the rows are 1.15-2.0x faster for len2 = 3 to 6, and
-    0.59-0.88x from 8, Nov 2026).
+    _NMOD_POLY_ROWS_MAX_LEN2: the largest len2, 12 with the NEON kernels
+    (on the M4, at 31-32 bits, where the classical code does not
+    accumulate in one word, the rows are 1.2-1.6x faster up to len2 =
+    12-13, measured Nov 2026).
+
+    _NMOD_POLY_NEON: 1 with the NEON kernels (aarch64), where KS compares
+    better with the classical code in one word (on the M4, see mul.c,
+    mullow.c and _nmod_poly_mulmid_want_one_word).
 */
 #define _NMOD_POLY_ROWS_RATIO(mod) \
     ((NMOD_VEC_SIMD_SCALAR_MAX_BITS(1) > 50 || NMOD_BITS(mod) <= 32) ? 2 : 4)
 
 #if defined(__ARM_NEON) && defined(__aarch64__)
-# define _NMOD_POLY_ROWS_MAX_LEN2 6
+# define _NMOD_POLY_NEON 1
+# define _NMOD_POLY_ROWS_MAX_LEN2 12
 #else
+# define _NMOD_POLY_NEON 0
 # define _NMOD_POLY_ROWS_MAX_LEN2 16
 #endif
 
@@ -53,10 +65,71 @@ _nmod_poly_want_rows(slong row_len, slong len2, slong ratio, nmod_t mod)
     return len2 >= 3 && len2 <= _NMOD_POLY_ROWS_MAX_LEN2
         && NMOD_BITS(mod) <= NMOD_VEC_SIMD_SCALAR_MAX_BITS(1)
         && row_len >= FLINT_MAX(NMOD_VEC_SIMD_MIN_LEN, ratio * len2)
-        && (mod.n & (mod.n - 1)) != 0;
+        && ((mod.n & (mod.n - 1)) != 0
+            || (NMOD_BITS(mod) <= (NMOD_VEC_SIMD_SCALAR_MAX_BITS(1) > 50 ? 49 : 32)
+                && row_len >= 2 * ratio * len2));
 }
 
 void _nmod_poly_mulmid_rows(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod);
+
+/* whether sums of len2 products of coefficients fit in one word: (n - 1)^2
+   len2 < 2^64, which implies n <= 2^32 for len2 >= 2 */
+static inline int
+_nmod_poly_one_word(slong len2, nmod_t mod)
+{
+    return NMOD_BITS(mod) <= FLINT_BITS / 2
+        && n_mulhi((mod.n - 1) * (mod.n - 1), len2) == 0;
+}
+
+/*
+    Without NEON, the classical code accumulating in one word beats KS (or
+    KS2, KS4) for a shorter operand of len2 < c(b) coefficients, b the
+    number of bits of n, when the longer one has at least 2 len2 (full
+    products, _nmod_poly_mul) or is cut to n >= 2 len2 (low products): c(b)
+    = max(12, 2b) below 22 bits, 4b - 24 from 22 bits (fft_small takes
+    over at cutoff_len 80-100 up to 21 bits, about 300 above). Measured
+    crossovers on a Cascade Lake, gcc / clang, len1 >= 4 len2 (Nov 2026):
+    12 / 9 at 4 bits, 16 / 12 at 8 bits, 18-32 / 18-20 at 12 bits, up to
+    fft_small at 18-20 bits with gcc, 72-112 / 36-96 at 22-28 bits; Ice
+    Lake and Zen 4 (without their IFMA kernel) and low products n x n/4 at
+    least as far.
+*/
+static inline slong
+_nmod_poly_one_word_cutoff(slong bits)
+{
+    return (bits < 22) ? FLINT_MAX(12, 2 * bits) : 4 * bits - 24;
+}
+
+/*
+    Middle products by rows accumulating in one word
+    (_nmod_poly_mulmid_rows_one_word): _nmod_poly_mulmid uses them for m
+    output coefficients and len2 = 3 to 16 below 6 bits, 32 below 10 bits
+    and 64 above, when m >= max(8, len2), in place of the rows (from len2 =
+    6; below, only where the rows do not apply), of the classical code (one
+    dot product per output, which has no one-word path), of KS and of
+    fft_small; not for full products, which go to _nmod_poly_mul, nor for
+    squares, where the classical code computes half of the products. With
+    NEON, for m >= 16 and len2 up to 10 below 14 bits, 64 above, and before
+    the rows. Measured (Nov 2026): within 3% of the best of the other
+    algorithms from 8 outputs for len2 = 5 to 14 with gcc, 10 to 16 with
+    clang, from about len2 outputs above (Cascade Lake, Ice Lake, Zen 4);
+    on the M4 from 16 outputs, and KS faster for len2 >= 12 below 14 bits.
+*/
+static inline int
+_nmod_poly_mulmid_want_one_word(slong len2, slong m, nmod_t mod)
+{
+    slong bits = NMOD_BITS(mod);
+
+    if (_NMOD_POLY_NEON)
+        return m >= 16 && len2 >= 3 && len2 <= (bits < 14 ? 10 : 64)
+            && _nmod_poly_one_word(len2, mod);
+
+    return m >= FLINT_MAX(8, len2) && len2 >= 3
+        && len2 <= (bits < 6 ? 16 : bits < 10 ? 32 : 64)
+        && _nmod_poly_one_word(len2, mod);
+}
+
+void _nmod_poly_mulmid_rows_one_word(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod);
 
 /* the shortest row of _nmod_poly_mulmid_rows: the row length is a concave
    function of the index of the coefficient of poly2, so it is that of the
