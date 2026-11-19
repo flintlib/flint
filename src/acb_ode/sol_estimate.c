@@ -35,17 +35,28 @@ acb_ode_sol_estimate_terms(mag_t est,
 
             acb_get_mag(m, c);
             mag_add(est, est, m);
+        }
+    }
+
+    for (slong k = 0; k < sol->nlogs; k++)
+    {
+        for (slong i = 0; i < len; i++)
+        {
+            acb_ptr c = (sol->series + k)->coeffs + off + i;
 
             slong acc = acb_rel_accuracy_bits(c);
-            /* This is a bit of a kludge to prevent zeros in the coefficient
-               sequence from making the overall accuracy estimate negative.
-               Maybe returning the absolute accuracy of c * radpow instead
-               would actually be more useful (what exactly does cvest_update
-               need?). */
+            /* For balls containing zero, take the accuracy relative to est.
+               This is a bit of a kludge to prevent zeros in the coefficient
+               sequence from making the overall accuracy estimate negative. */
             if (acc >= 0)
                 all_bad = 0;
             else
-                acc = acb_rel_one_accuracy_bits(c);
+            {
+                mag_max(m, arb_radref(acb_realref(c)),
+                        arb_radref(acb_imagref(c)));
+                mag_div(m, m, est);
+                acc = - mag_get_d_log2_approx(m);
+            }
             accuracy = FLINT_MIN(accuracy, acc);
         }
     }
