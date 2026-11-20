@@ -51,12 +51,12 @@ int main(void)
     gr_ore_poly_init(L, Dx);
     gr_ore_poly_init(M, Dx);
     gr_ore_poly_init(P, Dx);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "D", Dx));
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "Dx", Dx));
     GR_MUST_SUCCEED(gr_ore_poly_set_str(M, "x", Dx));
     GR_MUST_SUCCEED(gr_ore_poly_mul(P, L, M, Dx));
-    flint_printf("D * x         = "); gr_ore_poly_print(P, Dx); flint_printf("\n");
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "x*D^2 + D - x", Dx));
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(M, "D + x^2", Dx));
+    flint_printf("Dx * x        = "); gr_ore_poly_print(P, Dx); flint_printf("\n");
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "x*Dx^2 + Dx - x", Dx));
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(M, "Dx + x^2", Dx));
     GR_MUST_SUCCEED(gr_ore_poly_mul(P, L, M, Dx));
     flint_printf("L * M         = "); gr_ore_poly_print(P, Dx); flint_printf("\n");
     gr_ore_poly_clear(L, Dx);
@@ -66,12 +66,11 @@ int main(void)
 
     /* recurrence operators: S x = (x + 1) S */
     gr_ore_poly_ctx_init(Sx, QQx, 0, ORE_ALGEBRA_FORWARD_SHIFT);
-    GR_MUST_SUCCEED(_gr_ore_poly_ctx_set_gen_name(Sx, "S"));
     gr_ore_poly_init(L, Sx);
     gr_ore_poly_init(P, Sx);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "S - x - 1", Sx));
+    GR_MUST_SUCCEED(gr_ore_poly_set_str(L, "Sx - x - 1", Sx));
     GR_MUST_SUCCEED(gr_ore_poly_mul(P, L, L, Sx));
-    flint_printf("(S - x - 1)^2 = "); gr_ore_poly_print(P, Sx); flint_printf("\n");
+    flint_printf("(Sx - x - 1)^2 = "); gr_ore_poly_print(P, Sx); flint_printf("\n");
     gr_ore_poly_clear(L, Sx);
     gr_ore_poly_clear(P, Sx);
     gr_ore_poly_ctx_clear(Sx);
@@ -82,9 +81,9 @@ int main(void)
 }
 ```
 ```output
-D * x         = 1 + x*D
-L * M         = (4*x - x^3) + (-x + 5*x^2)*D + (1 + x^3)*D^2 + x*D^3
-(S - x - 1)^2 = (1 + 2*x + x^2) + (-3 - 2*x)*S + S^2
+Dx * x        = 1 + x*Dx
+L * M         = (4*x - x^3) + (-x + 5*x^2)*Dx + (1 + x^3)*Dx^2 + x*Dx^3
+(Sx - x - 1)^2 = (1 + 2*x + x^2) + (-3 - 2*x)*Sx + Sx^2
 ```
 
 ## Ore algebras {#algebras}
@@ -153,7 +152,7 @@ gr_ore_poly_ctx_t
 The context of an Ore polynomial ring, a `gr_ctx_t`. Its data (type
 `_gr_ore_poly_ctx_struct`, compatible with the context data of
 `gr_poly` rings) holds the base ring, a degree limit, the name of the
-generator (`D` by default), the algebra type, the function computing
+generator, the algebra type, the function computing
 $\sigma$ and $\delta$, and algebra-specific data (type
 `gr_ore_poly_ore_data_t`: the index of the distinguished generator
 `base_var`, $\sigma(x)$ and $q$ for $q$-shifts, or the Mahler base).
@@ -233,6 +232,10 @@ int gr_ore_poly_gens_recursive(gr_vec_t vec, gr_ore_poly_ctx_t ctx)
 Set the name of the generator $D$ to `s` (respectively `s[0]`), and set
 `vec` to the generators of the base ring (as constant Ore polynomials)
 followed by $D$.
+
+The default name of the generator depends on the algebra, e.g. `Dx`
+for derivatives or `Sx` for shifts acting on a generator `x` of the
+base ring.
 :::
 
 ::: function
