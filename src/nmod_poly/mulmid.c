@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "impl.h"
 
 /*
     After trimming, the middle product computes nhi - nlo coefficients from
@@ -52,6 +53,7 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
     slong t, m;
+    int rows;
 
     len1 = FLINT_MIN(len1, nhi);
     len2 = FLINT_MIN(len2, nhi);
@@ -84,15 +86,48 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 
     m = nhi - nlo;
 
+    /* first, as the rule of the rows costs about 10 ns */
+    if (m > 5 && _nmod_poly_want_ifma(len2, m, mod, nlo == 0 && nhi < len1 + len2 - 1))
+    {
+        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        return;
+    }
+
+    /* rows (see impl.h), with twice the ratio of full and low products:
+       here every dot product has len2 terms, while theirs are shorter near
+       the ends; full products go to _nmod_poly_mul, which has its own rule */
+    rows = m >= NMOD_VEC_SIMD_MIN_LEN && !(nlo == 0 && nhi == len1 + len2 - 1)
+            && _nmod_poly_want_rows(_nmod_poly_mulmid_rows_min_len(len1, len2, nlo, nhi),
+                                    len2, 2 * _NMOD_POLY_ROWS_RATIO(mod), mod)
+            && !(poly1 == poly2 && len1 == len2);
+
     if (len2 <= 5 || m <= 5)
     {
-        _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        /* with NEON the rows in one word come first: on the M4 they beat
+           the rows by 1.3-1.7x for len2 = 3 to 5 (Nov 2026) */
+        if (rows && !(_NMOD_POLY_NEON && _nmod_poly_mulmid_want_one_word(len2, m, mod)))
+            _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        else if (_nmod_poly_mulmid_want_one_word(len2, m, mod)
+                 && !(nlo == 0 && nhi == len1 + len2 - 1)
+                 && !(poly1 == poly2 && len1 == len2))
+            _nmod_poly_mulmid_rows_one_word(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        else
+            _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
 
     if (nlo == 0 && nhi == len1 + len2 - 1)
     {
         _nmod_poly_mul(res, poly1, len1, poly2, len2, mod);
+        return;
+    }
+
+    /* rows in one word (see impl.h), in place of the rows, the classical
+       code, KS and fft_small */
+    if (_nmod_poly_mulmid_want_one_word(len2, m, mod)
+            && !(poly1 == poly2 && len1 == len2))
+    {
+        _nmod_poly_mulmid_rows_one_word(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         return;
     }
 
@@ -105,10 +140,18 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
 
     slong bits = NMOD_BITS(mod);
 
-    /* KS computes the whole product: worth it for tiny moduli, and for
-       16 bits or less when the output is much longer than len2 */
-    if (len2 >= 8 && ((bits <= 8 && m >= len2) || (bits <= 16 && m >= 8 * len2)))
+    /* KS computes the whole product: worth it for tiny moduli, for 16
+       bits or less when the output is much longer than len2, and with NEON
+       up to 12 bits for len2 > 10 or squares from 8 outputs (on the M4 KS
+       beats the classical code there, which leads for other products with
+       len2 <= 10 below 16 outputs, Nov 2026) */
+    if (len2 >= 8 && ((bits <= 8 && m >= len2) || (bits <= 16 && m >= 8 * len2)
+                      || (_NMOD_POLY_NEON && bits <= 12
+                          && (len2 > 10 || (poly1 == poly2 && len1 == len2))
+                          && m >= FLINT_MAX(8, (len2 + 3) / 4))))
         _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+    else if (rows)
+        _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, nlo, nhi, mod);
     else
         _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
 #else
@@ -116,7 +159,9 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
         slong bits = NMOD_BITS(mod);
         slong n = FLINT_MIN(nhi, len1 + len2 - 1 - nlo);
 
-        if (n < 10 + bits * bits / 10)
+        if (rows)
+            _nmod_poly_mulmid_rows(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+        else if (n < 10 + bits * bits / 10)
             _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
         else
             _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);

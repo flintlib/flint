@@ -191,4 +191,22 @@
 */
 #define FLINT_RADIX_MULMID_FFT_SMALL_CUTOFF_RATIO 50
 
+/*
+    nmod_poly: with AVX512-IFMA, the classical kernel of mul, mullow and
+    mulmid takes a shorter operand of up to FLINT_NMOD_POLY_IFMA_MAX_LEN(b)
+    coefficients for b-bit moduli, ..._MAX_LEN_FFT_PRIME modulo the primes
+    of fft_small; low products up to 511 coefficients,
+    ..._LOW_MAX_LEN_FFT_PRIME modulo these primes; above, fft_small; for
+    53- to 63-bit moduli, from ..._MIN_LEN_ABOVE_52 coefficients; for
+    n > 2^52, the variant by CRT from ..._CRT_MIN_LEN (0: never); see
+    src/nmod_poly/impl.h (measured on Zen 4)
+*/
+#define FLINT_NMOD_POLY_IFMA_MAX_LEN(bits) \
+    ((bits) <= 20 ? 192 : (bits) <= 26 ? 384 : (bits) <= 45 ? 192 \
+     : (bits) <= 52 ? 384 : 128)
+#define FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME 64
+#define FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME 256
+#define FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN 64
+#define FLINT_NMOD_POLY_IFMA_MIN_LEN_ABOVE_52 12
+
 #endif

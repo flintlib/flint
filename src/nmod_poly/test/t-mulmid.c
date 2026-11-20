@@ -137,5 +137,114 @@ TEST_FUNCTION_START(nmod_poly_mulmid, state)
         nmod_poly_clear(d);
     }
 
+    /* Compare with the classical algorithm with a short operand (rows of
+       scalar products in _nmod_poly_mulmid, rows in one word), moduli of
+       30 bits or more, of at most 32 bits and powers of 2, middle products,
+       arbitrary windows and squares */
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    {
+        nmod_poly_t a, b, c, d;
+        slong nlo, nhi, len;
+        int square;
+        ulong m = (n_randint(state, 4) == 0)
+                ? UWORD(1) << (1 + n_randint(state, FLINT_BITS - 1))
+                : n_randint(state, 2)
+                ? n_randtest_bits(state, 2 + n_randint(state, FLINT_BITS / 2 - 1))
+                : n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
+
+        nmod_poly_init(a, m);
+        nmod_poly_init(b, m);
+        nmod_poly_init(c, m);
+        nmod_poly_init(d, m);
+        nmod_poly_randtest(a, state, 1 + n_randint(state, 300));
+        nmod_poly_randtest(b, state, 1 + n_randint(state, 50));
+        square = (n_randint(state, 8) == 0);
+        if (square)
+            nmod_poly_set(a, b);
+
+        len = FLINT_MAX(a->length + b->length - 1, 0);
+        if (n_randint(state, 2))
+        {
+            nlo = FLINT_MAX(FLINT_MIN(b->length - 1, len), 0);
+            nhi = FLINT_MAX(a->length, nlo);
+        }
+        else
+        {
+            nlo = n_randint(state, len + 1);
+            nhi = nlo + n_randint(state, len + 1 - nlo + 1);
+        }
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(a, b);
+
+        nmod_poly_mulmid(c, a, square ? a : b, nlo, nhi);
+        nmod_poly_mulmid_classical(d, a, square ? a : b, nlo, nhi);
+
+        if (!nmod_poly_equal(c, d))
+        {
+            flint_printf("FAIL: nmod_poly_mulmid (short operand)\n");
+            flint_printf("n = %wu, lengths %wd, %wd, nlo = %wd, nhi = %wd\n",
+                         m, a->length, b->length, nlo, nhi);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
+    /* Compare with the classical algorithm for moduli of any size and a
+       shorter operand of up to 600 coefficients (IFMA kernel, then
+       fft_small), middle products and arbitrary windows */
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
+    {
+        nmod_poly_t a, b, c, d;
+        slong nlo, nhi, len;
+        ulong m = FLINT_MAX(n_randtest_bits(state, 1 + n_randint(state, FLINT_BITS)), 1);
+
+        nmod_poly_init(a, m);
+        nmod_poly_init(b, m);
+        nmod_poly_init(c, m);
+        nmod_poly_init(d, m);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, n_randint(state, 4) ? 40 : 600));
+        nmod_poly_randtest(a, state, b->length + n_randint(state, n_randint(state, 8) ? 300 : 3000));
+
+        len = FLINT_MAX(a->length + b->length - 1, 0);
+        if (n_randint(state, 2))
+        {
+            nlo = FLINT_MAX(FLINT_MIN(b->length - 1, len), 0);
+            nhi = FLINT_MAX(a->length, nlo);
+        }
+        else
+        {
+            nlo = n_randint(state, len + 1);
+            nhi = nlo + n_randint(state, len + 1 - nlo + 1);
+        }
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(a, b);
+        if (n_randint(state, 5) == 0)
+            nmod_poly_set(b, a);
+
+        nmod_poly_mulmid(c, a, b, nlo, nhi);
+        nmod_poly_mulmid_classical(d, a, b, nlo, nhi);
+
+        if (!nmod_poly_equal(c, d))
+        {
+            flint_printf("FAIL: nmod_poly_mulmid (moduli of any size)\n");
+            flint_printf("n = %wu, lengths %wd, %wd, nlo = %wd, nhi = %wd\n",
+                         m, a->length, b->length, nlo, nhi);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }

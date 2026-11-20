@@ -161,5 +161,83 @@ TEST_FUNCTION_START(nmod_poly_mul, state)
     }
 #endif
 
+    /* Check against the classical algorithm with a short operand (rows of
+       scalar products in _nmod_poly_mul), moduli of 30 bits or more and
+       powers of 2 (rows up to 2^31, or 2^48 with AVX-512) */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+
+        ulong n = n_randint(state, 4) == 0
+                ? UWORD(1) << (1 + n_randint(state, FLINT_BITS - 1))
+                : n_randtest_bits(state, 30 + n_randint(state, FLINT_BITS - 29));
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, 300));
+        nmod_poly_randtest(c, state, 1 + n_randint(state, 18));
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(b, c);
+
+        nmod_poly_mul(a, b, c);
+        nmod_poly_mul_classical(d, b, c);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (short operand):\n");
+            flint_printf("n = %wu, lengths %wd, %wd\n", n, b->length, c->length);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
+    /* Check against the classical algorithm for moduli of any size and a
+       shorter operand of up to 600 coefficients (IFMA kernel, then
+       fft_small), squarings included */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t a, b, c, d;
+
+        ulong n = FLINT_MAX(n_randtest_bits(state, 1 + n_randint(state, FLINT_BITS)), 1);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, state, 1 + n_randint(state, n_randint(state, 4) ? 40 : 600));
+        nmod_poly_randtest(c, state, b->length + n_randint(state, n_randint(state, 8) ? 300 : 3000));
+
+        if (n_randint(state, 2))
+            nmod_poly_swap(b, c);
+        if (n_randint(state, 5) == 0)
+            nmod_poly_set(c, b);
+
+        nmod_poly_mul(a, b, c);
+        nmod_poly_mul_classical(d, b, c);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL (moduli of any size):\n");
+            flint_printf("n = %wu, lengths %wd, %wd\n", n, b->length, c->length);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
     TEST_FUNCTION_END(state);
 }
