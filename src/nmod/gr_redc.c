@@ -189,20 +189,16 @@ _gr_nmod_redc_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
 static int
 _gr_nmod_redc_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 {
-    if (v_ctx->which_ring == GR_CTX_NMOD)
+    if (v_ctx->which_ring == GR_CTX_NMOD
+        && NMOD_CTX(v_ctx).n == GR_NMOD_REDC_N(ctx))
     {
-        if (GR_NMOD_REDC_N(ctx) != NMOD_CTX(v_ctx).n)
-            return GR_DOMAIN;
-
         res[0] = nmod_redc_set_nmod(((ulong *) v)[0], GR_NMOD_REDC_CTX(ctx));
         return GR_SUCCESS;
     }
 
-    if (v_ctx->which_ring == GR_CTX_NMOD_REDC || v_ctx->which_ring == GR_CTX_NMOD_REDC_FAST)
+    if ((v_ctx->which_ring == GR_CTX_NMOD_REDC || v_ctx->which_ring == GR_CTX_NMOD_REDC_FAST)
+        && GR_NMOD_REDC_N(v_ctx) == GR_NMOD_REDC_N(ctx))
     {
-        if (NMOD_CTX(ctx).n != GR_NMOD_REDC_N(v_ctx))
-            return GR_DOMAIN;
-
         ulong c = ((ulong *) v)[0];
 
         if (!GR_NMOD_REDC_IS_FAST(ctx))
