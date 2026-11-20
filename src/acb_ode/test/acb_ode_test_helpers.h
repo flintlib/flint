@@ -11,18 +11,12 @@
 
 /* Generated using Claude Code (Fable 5, Opus 5.5). */
 
-/* Helpers for comparing results with reference values in the tests of this
-   module */
-
 #ifndef ACB_ODE_TEST_HELPERS_H
 #define ACB_ODE_TEST_HELPERS_H
 
 #include "acb.h"
 #include "gr.h"
 
-/* Check that got overlaps ref and has a relative accuracy of at least min_acc
-   bits, or, when ref contains zero, that got is bounded by 2^-min_acc in
-   absolute value */
 static void
 check_acb(const acb_t got, const acb_t ref, slong min_acc, const char * name)
 {

@@ -22,7 +22,7 @@
 /* Test that for exact inputs, the radii of acb_ode_fundamental_matrix results
    tend to zero as prec tends to infinity. */
 
-#define MAX_RETRIES 4
+#define MAX_RETRIES 3
 
 TEST_FUNCTION_START(acb_ode_fundamental_matrix_convergence, state)
 {
@@ -49,7 +49,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix_convergence, state)
         flint_rand_get_seed(&seed1, &seed2, state);
 
         slong prec = 32 + n_randint(state, 300);
-        slong target = 3 * prec / 4;
+        slong target = 9 * prec / 10;
         slong hp = (prec << MAX_RETRIES) + 8;
 
         int exact = n_randint(state, 2);

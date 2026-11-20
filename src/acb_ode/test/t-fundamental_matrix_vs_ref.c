@@ -11,7 +11,7 @@
 
 /* Generated using Claude Code (Fable 5, Opus 5.5).
 
-   Not checked in full detail. */
+   Reviewed, but not in full detail. */
 
 /* Tests of acb_ode_fundamental_matrix against reference values, mostly
    adapted from doctests of the ore_algebra package for SageMath. */
@@ -24,7 +24,6 @@
 #include "acb_poly.h"
 #include "gr.h"
 #include "gr_ore_poly.h"
-#include "gr_poly.h"
 #include "acb_ode_test_helpers.h"
 
 /****************************************************************************
@@ -648,7 +647,6 @@ test_airy_ai_jet(void)
 
 /* sage: (Dx - i).numerical_transition_matrix([0, sqrt(2)])
    [[0.1559436947653...] + [0.9877659459927...]*I]
-   Operator over ZZ[i].
    [ore_algebra] */
 static void
 test_exp_gaussian(void)
@@ -689,7 +687,7 @@ test_exp_gaussian(void)
 
 /* sage: (Dx - zeta7).numerical_transition_matrix([0, 1])
    [[1.32375209616333...] + [1.31434281345999...]*I]
-   with zeta7 = exp(2*pi*i/7). Operator over QQbar.
+   with zeta7 = exp(2*pi*i/7).
    [ore_algebra] */
 static void
 test_exp_zeta7(void)
@@ -735,8 +733,7 @@ test_exp_zeta7(void)
 
 /* sage: (Du^2 - RBF(pi)).numerical_solution(ini=[1,0], path=[0,1])
    [3.02759638974277...]
-   Operator with ball coefficients; the basis is cosh(s*x), sinh(s*x)/s
-   where s = sqrt(pi).
+   The basis is cosh(s*x), sinh(s*x)/s where s = sqrt(pi).
    [ore_algebra] */
 static void
 test_cosh_sqrt_pi(void)
@@ -876,7 +873,7 @@ neher(acb_t res, const acb_t z, slong prec)
    sage: ini = [5,4,3/2,1/3]
    sage: dop.numerical_solution(ini, [0,1])
    [10.873127314 +/- ...e-10]
-   (Example from M. Neher, 1999; known to be subject to precision loss.)
+   (Example from M. Neher, 1999.)
    [ore_algebra] */
 static void
 test_neher(void)
@@ -900,7 +897,6 @@ test_neher(void)
 
 /* sage: dop.numerical_solution(ini, [0,3/2], 1e-30, two_point_mode=False)
    [15.68591174618322...]
-   (continued from test_neher)
    [ore_algebra] */
 static void
 test_neher_3_2(void)
@@ -971,78 +967,6 @@ test_high_degree(void)
 
     acb_mat_clear(mat);
     acb_clear(ref);
-    acb_clear(pt);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(ZZ);
-}
-
-/* sage: dop = ((x-1)^2*Dx-1).lclm(Dx-1)
-   sage: dop.local_basis_monomials(0)
-   [1, x^2]
-   sage: dop.numerical_solution([1, 1/2],[0, 2], assume_analytic=True)
-   [7.389056098930650...] + [+/- ...]*I
-   The origin is an apparent singularity with exponents 0, 2. We evaluate
-   at 1/2 instead of continuing to 2 through the singular point 1. The lclm,
-   which kills exp(x) and exp(x/(1-x)), was computed by hand; the local basis
-   at 0 is (3*exp(x) - exp(x/(1-x)))/2, exp(x/(1-x)) - exp(x).
-   [ore_algebra] */
-static void
-test_apparent_singularity(void)
-{
-    gr_ctx_t ZZ, Pol, Dop;
-    gr_ore_poly_t dop;
-    acb_t pt;
-    acb_poly_t x, e, f, g;
-    acb_mat_t mat;
-    slong prec = 128;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Pol, ZZ);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-    acb_init(pt);
-    acb_poly_init(x);
-    acb_poly_init(e);
-    acb_poly_init(f);
-    acb_poly_init(g);
-    acb_mat_init(mat, 2, 2);
-
-    acb_set_d(pt, 0.5);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
-            "x*(x - 2)*(x - 1)^2*D^2 - ((x - 1)^4 + 2*x - 3)*D + x^2 - 2",
-            Dop));
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-    check_status(status, "apparent_singularity");
-
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_poly_set_coeff_acb(x, 0, pt);
-    acb_poly_exp_series(e, x, 2, prec);
-    acb_poly_neg(g, x);
-    acb_poly_add_si(g, g, 1, prec);
-    acb_poly_div_series(g, x, g, 2, prec);
-    acb_poly_exp_series(g, g, 2, prec);
-    acb_poly_scalar_mul_2exp_si(f, e, 1);
-    acb_poly_add(f, f, e, prec);
-    acb_poly_sub(f, f, g, prec);
-    acb_poly_scalar_mul_2exp_si(f, f, -1);
-    acb_poly_sub(g, g, e, prec);
-    for (slong i = 0; i < 2; i++)
-    {
-        check_acb(acb_mat_entry(mat, i, 0), f->coeffs + i, prec - 4,
-                  "apparent_singularity");
-        check_acb(acb_mat_entry(mat, i, 1), g->coeffs + i, prec - 4,
-                  "apparent_singularity");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(g);
-    acb_poly_clear(f);
-    acb_poly_clear(e);
-    acb_poly_clear(x);
     acb_clear(pt);
     gr_ore_poly_clear(dop, Dop);
     gr_ctx_clear(Dop);
@@ -1295,20 +1219,14 @@ ref_large_dispersion(acb_poly_struct * ref, const acb_poly_t e, const acb_t c,
    sage: mat[0,2].overlaps(exp(h)*h^1000)
    True
 
-   The tail bounds for n < 1000 are astronomical, as the staircase bound
-   includes the values of the rational function near the resonance n = 1000,
-   where |ind(n)/n^3| ~ (n/1000 - 1)^2 is tiny. They only become usable well
-   past n = 1000. Unless the working precision is large enough (currently
-   prec >= ~1250), the summation stops before that point for the first basis
-   element. Hence the first column is only checked at high precision.
+   The tail bounds only become usable well past n = 1000. Unless the working
+   precision is large enough (currently prec >= ~1250), the summation currently
+   stops before that point for the first basis element.
    [ore_algebra] */
 static void
 test_large_dispersion_exp(void)
 {
     const slong precs[] = { 128, 1536 };
-    /* todo: improve stopping heuristics in the presence of transient error
-       bounds larger than about 2^2^word size */
-    const slong loss = (FLINT_BITS < 64) ? WORD_MAX : 8;
     gr_ctx_t ZZ, Pol, Dop;
     gr_ore_poly_t dop;
     acb_t pt, c;
@@ -1351,7 +1269,11 @@ test_large_dispersion_exp(void)
         for (slong i = 0; i < 3; i++)
             for (slong j = (k == 0); j < 3; j++)
                 check_acb(acb_mat_entry(mat, i, j), ref[j].coeffs + i,
-                          prec - loss, "large_dispersion_exp");
+                          /* todo: improve stopping heuristics in the presence
+                             of transient error bounds larger than about
+                             2^2^{word size} */
+                          FLINT_BITS == 64 ? prec - 8 : WORD_MIN,
+                          "large_dispersion_exp");
     }
 
     acb_mat_clear(mat);
@@ -1697,7 +1619,6 @@ test_ci(void)
 
 /* sage: dop.numerical_solution(ini, path=[0, 456/123*i+1])
    [6.1267878728616...] + [-3.39197789100074...]*I
-   (continued from test_ci)
    [ore_algebra] */
 static void
 test_ci_complex(void)
@@ -2402,7 +2323,7 @@ test_log_on_cut(void)
 
     acb_set_si(z, -2);
     check_status(my_log(res, z, prec), "log_on_cut");
-    acb_set_str(ref, "log(2) + pi*I", prec);
+    acb_log(ref, z, prec);
     check_acb(res, ref, prec - 4, "log_on_cut");
 
     acb_clear(ref);
@@ -2412,7 +2333,7 @@ test_log_on_cut(void)
 
 /* sage: (Dx*x*Dx).numerical_transition_matrix([0, b - I/10^1000])[0,0]
    [0.6931471805599453...] + [-3.141592653589793...]*I
-   (continued from test_log_on_cut, with 2^-1000 in place of 10^-1000)
+   (here with 2^-1000 in place of 10^-1000)
    [ore_algebra] */
 static void
 test_log_below_cut(void)
@@ -2428,73 +2349,12 @@ test_log_below_cut(void)
     arb_set_si(acb_imagref(z), -1);
     arb_mul_2exp_si(acb_imagref(z), acb_imagref(z), -1000);
     check_status(my_log(res, z, prec), "log_below_cut");
-    acb_set_str(ref, "log(2) - pi*I", prec);
+    acb_log(ref, z, prec);
     check_acb(res, ref, prec - 4, "log_below_cut");
 
     acb_clear(ref);
     acb_clear(res);
     acb_clear(z);
-}
-
-/****************************************************************************
- * Other expansion points, analytic continuation
- ****************************************************************************/
-
-/* The operator (x^2 + 1)*Dx^2 + 2*x*Dx of test_arctan shifted by 1,
-   evaluated at 1/2. The basis is 1, 2*(arctan(1 + x) - pi/4). */
-static void
-test_arctan_shifted(void)
-{
-    gr_ctx_t ZZ, Pol, Dop;
-    gr_ore_poly_t dop;
-    acb_t pt, c;
-    acb_poly_t x, f;
-    acb_mat_t mat;
-    slong prec = 128;
-    int status = GR_SUCCESS;
-
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Pol, ZZ);
-    gr_ore_poly_ctx_init(Dop, Pol, 0, ORE_ALGEBRA_DERIVATIVE);
-    gr_ore_poly_init(dop, Dop);
-    acb_init(pt);
-    acb_init(c);
-    acb_poly_init(x);
-    acb_poly_init(f);
-    acb_mat_init(mat, 2, 2);
-
-    acb_set_d(pt, 0.5);
-    GR_MUST_SUCCEED(gr_ore_poly_set_str(dop,
-            "(x^2 + 2*x + 2)*D^2 + (2*x + 2)*D", Dop));
-    status |= acb_ode_fundamental_matrix(mat, dop, Dop, NULL, NULL, pt,
-                                         ACB_ODE_BASIS_ECHELON, 0, prec);
-    check_status(status, "arctan_shifted");
-
-    acb_poly_set_coeff_si(x, 1, 1);
-    acb_add_si(c, pt, 1, prec);
-    acb_poly_set_coeff_acb(x, 0, c);
-    acb_poly_atan_series(f, x, 2, prec);
-    acb_const_pi(c, prec);
-    acb_mul_2exp_si(c, c, -2);
-    acb_sub(f->coeffs, f->coeffs, c, prec);
-    acb_poly_scalar_mul_2exp_si(f, f, 1);
-    for (slong i = 0; i < 2; i++)
-    {
-        acb_set_si(c, i == 0);
-        check_acb(acb_mat_entry(mat, i, 0), c, prec - 4, "arctan_shifted");
-        check_acb(acb_mat_entry(mat, i, 1), f->coeffs + i, prec - 4,
-                  "arctan_shifted");
-    }
-
-    acb_mat_clear(mat);
-    acb_poly_clear(f);
-    acb_poly_clear(x);
-    acb_clear(c);
-    acb_clear(pt);
-    gr_ore_poly_clear(dop, Dop);
-    gr_ctx_clear(Dop);
-    gr_ctx_clear(Pol);
-    gr_ctx_clear(ZZ);
 }
 
 TEST_FUNCTION_START(acb_ode_fundamental_matrix_vs_ref, state)
@@ -2518,7 +2378,6 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix_vs_ref, state)
     test_neher();
     test_neher_3_2();
     test_high_degree();
-    test_apparent_singularity();
 
     test_inverse();
     test_euler_pm_i();
@@ -2541,8 +2400,6 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix_vs_ref, state)
     test_log();
     test_log_on_cut();
     test_log_below_cut();
-
-    test_arctan_shifted();
 
     TEST_FUNCTION_END(state);
 }

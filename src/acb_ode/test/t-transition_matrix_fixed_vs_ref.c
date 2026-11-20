@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Generated using Claude Code (Fable 5, Opus 5.5). */
+/* Generated using Claude Code (Fable 5, Opus 5.5).
+
+   Reviewed, but not in full detail. */
 
 /* Tests of acb_ode_transition_matrix_fixed against reference values, mostly
-   adapted from doctests of the ore_algebra package for SageMath. When the
-   operator and the points of the path are taken over the same ring, we use
-   the same context for both, so that the steps are computed exactly. */
+   adapted from doctests of the ore_algebra package for SageMath. */
 
 #include "test_helpers.h"
 #include "acb.h"
@@ -410,8 +410,7 @@ test_quartic_branch(void)
    [-1.5598481440603221187326507993405933893413346644879595004537063375459901302359572361012065551669069...] +
    [-0.7107764943512671843673286878693314397759047479618104045777076954591551406949345143368742955333566...]*I
    The path is subdivided so that each step has a ratio below 1/2 and, from
-   -2/5 + 4/5*i on, below 1/5. The reference value only has about 320 bits,
-   but we check that the result is accurate to the requested 1e-150.
+   -2/5 + 4/5*i on, below 1/5.
    [ore_algebra] */
 static void
 test_order3_high_prec(void)
@@ -573,12 +572,9 @@ test_fcc4_connection(void)
    [-2.048077478517672...e+95...] + [-2.818936813156118...e+95...]*I
    where dop is a random operator with prescribed singularities and exponents
    (from Chyzak, Goyer, Mezzarobba, 2022) that defines transition matrices
-   with large entries, from the doctests of ore_algebra. Its leading
-   coefficient is c*(x - 75/17)^3*(x - 4)^3. Both 75/17 and 4 are regular
-   singular points. The default local bases at both ends are ordered in the
-   reverse order compared to ore_algebra (by decreasing real part of the
-   exponents), which leaves the trace unchanged. The linear solve currently
-   loses about 200 bits.
+   with large entries, from the doctests of ore_algebra. The default local
+   bases at both ends are currently ordered in the reverse order compared to
+   ore_algebra, which leaves the trace unchanged.
    [ore_algebra] */
 static void
 test_large_entries(void)
@@ -621,6 +617,7 @@ test_large_entries(void)
 
     acb_set_str(ref, "[-2.048077478517672e+95 +/- 1e+80]"
                      " + [-2.818936813156118e+95 +/- 1e+80]*I", prec);
+    /* Ill-conditioned linear solve */
     check_acb(tr, ref, prec - 216, "large_entries");
 
     acb_mat_clear(mat);
@@ -937,10 +934,7 @@ test_loop_through_singularity(void)
    [0.6931471805599453...] + [3.141592653589793...]*I
    sage: ((x-1)*Dx*x*Dx).numerical_transition_matrix([0, b - I/10^1000])[0,0]
    [0.6931471805599453...] + [-3.141592653589793...]*I
-   Here b = -2, and the entry is the value at b of the solution log(x). The
-   second path leaves 0 through the lower half-plane instead of perturbing b
-   (which would make the exact Taylor shifts very expensive). The step from
-   -1/2 - i/4 to -9/10 currently loses about 10% of the working precision.
+   Here b = -2, and the entry is the value at b of the solution log(x).
    [ore_algebra] */
 static void
 test_log_subdivided(void)
@@ -967,14 +961,16 @@ test_log_subdivided(void)
     GR_MUST_SUCCEED(gr_ore_poly_set_str(dop, "(x^2 - x)*D^2 + (x - 1)*D",
                                         Dop));
 
-    GR_MUST_SUCCEED(gr_vec_set_str(path0, "[0, -1/2, -9/10, -8/5, -2]", 1,
-                                   QQ));
+    GR_MUST_SUCCEED(gr_vec_set_str(path0, "[0, -1/2, -9/10, -8/5, -2]", 1, QQ));
     status |= acb_ode_transition_matrix_fixed(mat, dop, Dop, path0, QQ,
                                               NULL, NULL, 0, prec);
     check_status(status, "log_subdivided");
-    acb_set_str(ref, "log(2) + pi*I", prec);
+    acb_set_str(ref, "log(-2)", prec);
     check_acb(acb_mat_entry(mat, 0, 0), ref, prec - 4, "log_subdivided");
 
+    /* The test from ore_algebra doesn't really make sense without automatic
+       subdivision, but this variant is still interesting as it loses a
+       significant proportion of the initial precision. */
     GR_MUST_SUCCEED(gr_vec_set_str(path1,
             "[0, -1/2 - I/4, -9/10, -8/5, -2]", 1, QQbar));
     status |= acb_ode_transition_matrix_fixed(mat, dop, Dop, path1, QQbar,
