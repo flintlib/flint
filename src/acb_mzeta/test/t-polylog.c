@@ -145,5 +145,42 @@ TEST_FUNCTION_START(acb_mzeta_polylog, state)
         _acb_vec_clear(x, 8);
     }
 
+    /* Small arguments must retain relative accuracy after precision tapering. */
+    {
+        const ulong s[] = {2, 1, 1};
+        const slong exponents[] = {30, 42, 60};
+        const slong prec = 128;
+        acb_ptr x = _acb_vec_init(3);
+        acb_t res, ref;
+
+        acb_init(res);
+        acb_init(ref);
+        acb_one(x + 1);
+        acb_one(x + 2);
+
+        for (iter = 0; iter < 3; iter++)
+        {
+            slong accuracy;
+
+            acb_set_ui(x, 3);
+            acb_mul_2exp_si(x, x, -exponents[iter]);
+            acb_mzeta_polylog(res, s, x, 3, prec);
+            acb_mzeta_polylog(ref, s, x, 3, 2 * prec);
+            accuracy = acb_rel_accuracy_bits(res);
+
+            if (!acb_is_finite(res) || !acb_is_finite(ref) ||
+                !acb_overlaps(res, ref) || accuracy < prec - 2)
+            {
+                flint_printf("FAIL (small argument, e = %wd, accuracy = %wd)\n",
+                    exponents[iter], accuracy);
+                flint_abort();
+            }
+        }
+
+        acb_clear(res);
+        acb_clear(ref);
+        _acb_vec_clear(x, 3);
+    }
+
     TEST_FUNCTION_END(state);
 }

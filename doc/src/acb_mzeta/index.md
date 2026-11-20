@@ -112,14 +112,17 @@ $$
 (the convention of PARI/GP's `polylogmult`). The value is computed from
 Goncharov's iterated integrals $G(a_1, \ldots, a_L; 1)$ with letters
 $a_i \in \{0, 1/y_1, \ldots, 1/y_r\}$, $y_i = x_1 \cdots x_i$, as power
-series at 0 by binary splitting, either directly (when all nonzero
-letters have absolute value at least 2) or after splitting the path at
+series at 0, either directly (when all nonzero letters have absolute
+value at least 2) or after splitting the path at
 $\tfrac12$ (when the nonzero letters $a_i$ and $1 - a_i$ have absolute
 value at least $\tfrac34$); see
 [](algorithms/special-functions/multiple-zeta#polylog). Other arguments,
 for example $x$ outside the unit disk or letters close to $\tfrac12$,
 are not supported yet, and the result is then indeterminate, as it is
 for divergent sums ($s_1 = 1$, $x_1 = 1$).
+
+The series is summed by recurrence or, at high working precision with
+exact dyadic ratios, by binary splitting.
 :::
 
 ::: function
