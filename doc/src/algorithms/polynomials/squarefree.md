@@ -106,6 +106,10 @@ uses the following algorithm, the classical gcd iteration [@Mus1971]
 
 **Output:** the pairs $(g_i, i)$ with $g_i \ne 1$, the $g_i$ monic.
 
+First set $c = \operatorname{lc}(f)$ and replace $f$ by $f/c$.
+The scalar $c$ is the unit in the factorisation; the steps below
+return the monic factors of the normalised polynomial.
+
 1. If $f' = 0$: compute $h$ with $h^p = f$ by taking $p$-th roots of the
    coefficients, factor $h$ recursively, multiply all exponents by $p$ and
    return.
@@ -124,7 +128,8 @@ divisible by $p$, those output in step 4 are, and all are distinct.
 :::
 
 ::: proof
-Write $f = \prod_g g^{e_g}$. By [](#lem-gcd-derivative), after step 2,
+Write the normalised input as $f = \prod_g g^{e_g}$.
+By [](#lem-gcd-derivative), after step 2,
 $$
 d = \prod_{p \nmid e_g} g^{e_g - 1} \prod_{p \mid e_g} g^{e_g}, \qquad v =
 \prod_{p \nmid e_g} g.
@@ -141,6 +146,14 @@ recursion is applied to a polynomial of degree at most $n/p$, whose
 squarefree factorisation, with exponents multiplied by $p$, gives the
 factors of $f$ with multiplicities divisible by $p$.
 :::
+
+For example, over $\mathbb{F}_3$, take $f = 2x^3(x-1)^2$.
+After removing $c = 2$, the algorithm starts with
+$d = x^3(x-1)$ and $v = x-1$. The two iterations of step 3 output
+nothing for $i = 1$ and $(x-1, 2)$ for $i = 2$, leaving $d = x^3$.
+Step 4 recurses on $x$ and multiplies its exponent by 3, giving
+$(x, 3)$. Thus $g_2 = x-1$ and $g_3 = x$, with the scalar 2 kept
+separately in the factorisation of the original polynomial.
 
 As in Yun's algorithm, the degrees of the gcds in step 3 add up to at
 most $n$, so the cost is $O(M(n) \log n)$, plus at most $n/p$ $p$-th
@@ -164,7 +177,9 @@ over a perfect field, to test $\gcd(f, f') = 1$: if $f' = 0$ and $\deg f
 factorisation domains of characteristic 0, after making $f$ monic (over a
 field) or removing its content (otherwise), and
 [](#alg-sqf-fq) for finite fields, where the $p$-th roots of the
-coefficients are computed with `gr_fq_pth_root`.
+coefficients are computed with `gr_fq_pth_root`. In the finite-field
+implementation the leading coefficient is saved separately and the
+factors are made monic as they are found.
 `gr_poly_squarefree_part` and `gr_poly_is_squarefree` use the methods of
 the previous section. The finite field modules wrap the generic code;
 `fmpz_poly_factor_squarefree` has its own implementation of Yun's
