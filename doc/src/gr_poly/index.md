@@ -1471,15 +1471,37 @@ for entries of length at least 1024.
 ## Resultants {#resultant}
 
 For nonzero polynomials $f = a_m x^m + \cdots + a_0$ and $g = b_n x^n +
-\cdots + b_0$ of degrees $m$ and $n$, the resultant is
+\cdots + b_0$ of degrees $m$ and $n$ over a commutative ring $R$, the
+resultant is the determinant of their Sylvester matrix:
 
 $$
-\operatorname{res}(f, g) = a_m^n b_n^m \prod_{f(\alpha) = 0,\, g(\beta) = 0} (\alpha - \beta)
-= \det \operatorname{Syl}(f, g),
+\operatorname{res}(f, g) = \det \operatorname{Syl}(f, g).
 $$
 
-the determinant of the Sylvester matrix. The resultant is defined to be
-zero if $f$ or $g$ is zero.
+If $f = a_m \prod_{i=1}^m (x - \alpha_i)$ and
+$g = b_n \prod_{j=1}^n (x - \beta_j)$ in a commutative ring extension,
+then
+
+$$
+\operatorname{res}(f, g) = a_m^n b_n^m
+\prod_{i=1}^m \prod_{j=1}^n (\alpha_i - \beta_j).
+$$
+
+In particular, over a field the roots can be taken in an algebraic
+closure, with each root listed according to its multiplicity.
+
+The determinant definition also applies when no such factorisation
+exists. For example, over $R = \Z/4\Z$, the polynomial $2x + 1$ has no
+root in any nonzero $R$-algebra: $2t = -1$ would imply
+$0 = (2t)^2 = 1$. Nevertheless,
+
+$$
+\operatorname{res}(2x + 1, x)
+= \det \begin{pmatrix} 2 & 1 \\ 1 & 0 \end{pmatrix}
+= -1 = 3 \quad \text{in } R.
+$$
+
+The resultant is defined to be zero if $f$ or $g$ is zero.
 
 ::: function
 int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
