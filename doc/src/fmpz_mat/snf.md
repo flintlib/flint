@@ -54,10 +54,11 @@ gcd and lcm. Otherwise it alternates row-style Hermite normal forms of
 the matrix and of its transpose (`fmpz_mat_hnf`, hence the Pernet–Stein
 algorithm for large matrices) until the matrix is diagonal, then makes the
 diagonal a divisibility chain by gcd and lcm steps and makes it
-nonnegative. Each Hermite form is upper triangular and the next one of
-the transpose clears the entries above the diagonal while possibly
-creating new ones below; the number of rounds is small in practice, and
-Kannan and Bachem showed that it is polynomial [@KanBac1979]. A
+nonnegative. After a complete row/column pair, the nonzero entries lie
+in a nonsingular leading block; subsequent passes alternate upper and
+lower triangular forms of that block. The number of rounds is small in
+practice. For a polynomial bound on HNF passes, see
+[](algorithms/linear-algebra/hermite-smith#prop-hnf-passes). A
 defensive bound (`_fmpz_mat_snf_iter_bound`) raises an exception if it is
 ever exceeded.
 
