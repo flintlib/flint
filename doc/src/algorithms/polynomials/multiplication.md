@@ -70,9 +70,12 @@ high products (`_nmod_poly_mullow_classical`,
 `_nmod_poly_mulmid_classical`, `_nmod_poly_mulhigh_classical`) compute
 only the requested dot products, so they cost proportionally less.
 
-FLINT does not use Karatsuba's method [@KO1962] for `nmod_poly`: Kronecker
-substitution reaches the Karatsuba and Toom–Cook range of integer
-multiplication with less overhead.
+When FLINT is built with AVX2, `nmod_poly` uses Karatsuba's method
+[@KO1962] with vectorised base cases for $n < 2^{50}$ and shorter operands
+of about 12 to a few hundred coefficients ([](nmod_poly/mul#selection)).
+Otherwise it does not use it: Kronecker substitution reaches the
+Karatsuba and Toom–Cook range of integer multiplication with less
+overhead.
 
 ## Kronecker substitution {#ks}
 

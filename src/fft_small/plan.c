@@ -340,38 +340,52 @@ have_choice:
     return 1;
 }
 
-/* Return whether to compute the FFT directly modulo `mod`, rather than
-   modulo precomputed FFT primes followed by CRT reconstruction.
-   Direct computation requires `mod.n` to be prime and `mod.n - 1`
-   to have sufficiently high 2-valuation.
+/* Return whether to compute the FFT directly modulo n, rather than
+   modulo precomputed FFT primes followed by CRT reconstruction, for
+   operands of length up to bn and a transform of length 2^depth.
+   Direct computation requires n to be prime and n - 1 to have
+   sufficiently high 2-valuation.
    This is usually faster when CRT would need multiple primes, but it pays
    the setup cost of initializing and clearing a temporary `sd_fft_ctx_t`,
-   which is only significant for very short operands.  */
-static int
-_nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
+   which is only significant for very short operands.
+   The nmod_poly product rules call it to know which moduli fft_small
+   handles with one prime. */
+int
+_nmod_poly_should_directly_fft(ulong bn, ulong depth, ulong n)
 {
-    /* cache the last modulus found to be prime */
+    /* cache the last modulus found to be prime, and the last one found
+       to be composite */
     static FLINT_TLS_PREFIX ulong last_prime = 0;
+    static FLINT_TLS_PREFIX ulong last_composite = 0;
 
     if (bn < 100)
         return 0;
 
-    if (NMOD_BITS(mod) < 20)
+    if (FLINT_BIT_COUNT(n) < 20)
         return 0;
 
-    if (!fft_small_prime_supports_depth(mod.n, depth))
+    /* the 2-valuation first: it is the cheapest test, and fails for most
+       moduli */
+    if (n_trailing_zeros(n - 1) < depth)
+        return 0;
+
+    if (!fft_small_prime_supports_depth(n, depth))
         return 0;
 
     /* check the most expensive condition last */
-    if (mod.n == last_prime)
+    if (n == last_prime)
         return 1;
 
-    if (n_is_prime(mod.n))
+    if (n == last_composite)
+        return 0;
+
+    if (n_is_prime(n))
     {
-        last_prime = mod.n;
+        last_prime = n;
         return 1;
     }
 
+    last_composite = n;
     return 0;
 }
 
@@ -403,7 +417,7 @@ static int _fft_small_plan_set_bound_nmod(fft_small_plan_t P,
     }
 
     if (direct_len != 0 &&
-        _nmod_poly_should_directly_fft(direct_len, P->depth, mod))
+        _nmod_poly_should_directly_fft(direct_len, P->depth, mod.n))
     {
         sd_fft_ctx_init_prime(P->direct_fft, mod.n);
         P->np = 1;

@@ -21,12 +21,12 @@
 #endif
 
 int
-_nmod_poly_is_fft_small_prime(nmod_t mod)
+_nmod_poly_is_fft_small_prime(ulong n)
 {
 #if FLINT_HAVE_FFT_SMALL
-    return _fft_small_mpn_ctx_prime_index(get_default_mpn_ctx(), mod.n) >= 0;
+    return _fft_small_mpn_ctx_prime_index(get_default_mpn_ctx(), n) >= 0;
 #else
-    (void) mod;
+    (void) n;
     return 0;
 #endif
 }
@@ -746,7 +746,7 @@ _ifma64(nn_ptr res, nn_srcptr a, slong la, slong nlo, slong nhi,
    k0 - la + 1 to k0 + 8R - 1 */
 #define IFMA_MARGIN 72
 
-/* inlined in the two functions below: 2-4 ns less per call at lengths 8
+/* inlined in the three functions below: 2-4 ns less per call at lengths 8
    to 16 (Zen 4, Ice Lake); mod by pointer, as gcc 14 and 15 read a copy by
    value with one 16-byte load from the two 8-byte stores of the
    dispatchers, which waits for these stores (about 10 ns per call) */
@@ -828,6 +828,14 @@ _nmod_poly_mulmid_ifma_crt(nn_ptr res, nn_srcptr poly1, slong len1,
     _mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi, &mod, 1);
 }
 
+void
+_nmod_poly_mulmid_ifma_ptr(nn_ptr res, nn_srcptr poly1, slong len1,
+                           nn_srcptr poly2, slong len2, slong nlo, slong nhi, const nmod_t * mod)
+{
+    _mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi, mod,
+                 FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN);
+}
+
 #else
 
 /* no AVX512-IFMA at compile time (or a 32-bit build) */
@@ -843,6 +851,13 @@ _nmod_poly_mulmid_ifma_crt(nn_ptr res, nn_srcptr poly1, slong len1,
                            nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
     _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, mod);
+}
+
+void
+_nmod_poly_mulmid_ifma_ptr(nn_ptr res, nn_srcptr poly1, slong len1,
+                           nn_srcptr poly2, slong len2, slong nlo, slong nhi, const nmod_t * mod)
+{
+    _nmod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, *mod);
 }
 
 #endif

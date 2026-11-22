@@ -51,6 +51,12 @@ int fft_small_mulmod_satisfies_bounds(ulong n);
    root of that order to exist. Primality of n is assumed, not checked. */
 int fft_small_prime_supports_depth(ulong n, ulong depth);
 
+/* Whether the products modulo n with operands of length up to bn and a
+   transform of length 2^depth are computed modulo n itself, without CRT:
+   bn >= 100, n of at least 20 bits, fft_small_prime_supports_depth and n
+   prime (the last prime and the last composite seen are cached). */
+int _nmod_poly_should_directly_fft(ulong bn, ulong depth, ulong n);
+
 FLINT_FORCE_INLINE ulong n_pow2(int k)
 {
     return UWORD(1) << k;

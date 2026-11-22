@@ -759,9 +759,16 @@ FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
 #endif
 }
 
+/* the products of the low 32 bits of the lanes, as unsigned 64-bit integers
+ * (vec4n_mul) or as signed ones, modulo 2^64 (vec4n_mul_signed); AVX2 only */
 FLINT_FORCE_INLINE vec4n vec4n_mul(vec4n u, vec4n v)
 {
     return _mm256_mul_epu32(u, v);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_mul_signed(vec4n u, vec4n v)
+{
+    return _mm256_mul_epi32(u, v);
 }
 
 // compilers accept non-(compile-time-)constant b with srli

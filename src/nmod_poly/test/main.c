@@ -94,6 +94,7 @@
 #include "t-mulmid_classical.c"
 #include "t-mulmid_fft_small.c"
 #include "t-mulmid_ifma.c"
+#include "t-mulmid_karatsuba.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmod.c"
 #include "t-mulmod_precond.c"
@@ -231,6 +232,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mulmid_classical),
     TEST_FUNCTION(nmod_poly_mulmid_fft_small),
     TEST_FUNCTION(nmod_poly_mulmid_ifma),
+    TEST_FUNCTION(nmod_poly_mulmid_karatsuba),
     TEST_FUNCTION(nmod_poly_mulmid_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
     TEST_FUNCTION(nmod_poly_mulmod_precond),

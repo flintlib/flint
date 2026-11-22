@@ -48,50 +48,18 @@ _nmod_poly_mulmid_want_fft_small(slong len2, slong m, nmod_t mod)
 #endif
 }
 
-void
-_nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
+/* the dispatch after the IFMA kernel and the Karatsuba (see impl.h) */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mulmid_other(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
-    slong t, m;
+    slong m;
     int rows;
 
-    len1 = FLINT_MIN(len1, nhi);
-    len2 = FLINT_MIN(len2, nhi);
-
-    /* drop the low coefficients that no output coefficient uses */
-    t = nlo - (len2 - 1);
-    if (t > 0)
-    {
-        poly1 += t;
-        len1 -= t;
-        nlo -= t;
-        nhi -= t;
-    }
-
-    t = nlo - (len1 - 1);
-    if (t > 0)
-    {
-        poly2 += t;
-        len2 -= t;
-        nlo -= t;
-        nhi -= t;
-    }
-
-    /* longer operand first: fft_small reads the second length */
-    if (len1 < len2)
-    {
-        FLINT_SWAP(nn_srcptr, poly1, poly2);
-        FLINT_SWAP(slong, len1, len2);
-    }
+    /* trim, longer operand first (fft_small reads the second length) */
+    _nmod_poly_mulmid_trim(&poly1, &len1, &poly2, &len2, &nlo, &nhi);
 
     m = nhi - nlo;
-
-    /* first, as the rule of the rows costs about 10 ns */
-    if (m > 5 && _nmod_poly_want_ifma(len2, m, mod, nlo == 0 && nhi < len1 + len2 - 1))
-    {
-        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi, mod);
-        return;
-    }
 
     /* rows (see impl.h), with twice the ratio of full and low products:
        here every dot product has len2 terms, while theirs are shorter near
@@ -167,6 +135,84 @@ _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
             _nmod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, mod);
     }
 #endif
+}
+
+/* as in _nmod_poly_mul, for the trimmed operands */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mulmid_kernels_n(nn_ptr res, nn_srcptr poly1, slong len1,
+                            nn_srcptr poly2, slong len2, slong nlo, slong nhi,
+                            nmod_t mod)
+{
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, nlo, nhi);
+
+    switch (_nmod_poly_dispatch_n(len1, len2, nhi - nlo, kind, mod))
+    {
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo,
+                                        nhi, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma_ptr(res, poly1, len1, poly2, len2, nlo,
+                                       nhi, &mod);
+            break;
+        default:
+            _nmod_poly_mulmid_other(res, poly1, len1, poly2, len2, nlo, nhi,
+                                    mod);
+    }
+}
+
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mulmid_kernels(nn_ptr res, nn_srcptr poly1, slong len1,
+                          nn_srcptr poly2, slong len2, slong nlo, slong nhi,
+                          nmod_t mod)
+{
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, nlo, nhi);
+
+    switch (_nmod_poly_dispatch(len1, len2, nhi - nlo, kind, NMOD_BITS(mod)))
+    {
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, nlo, nhi,
+                                   mod);
+            break;
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo,
+                                        nhi, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_BY_N:
+            _nmod_poly_mulmid_kernels_n(res, poly1, len1, poly2, len2, nlo,
+                                        nhi, mod);
+            break;
+        default:
+            _nmod_poly_mulmid_other(res, poly1, len1, poly2, len2, nlo, nhi,
+                                    mod);
+    }
+}
+
+void
+_nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1,
+                            nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+{
+    /* short operands or few outputs, or no kernel in this build (see
+       impl.h): at once the other algorithms (the Karatsuba from 12
+       coefficients) */
+#if NMOD_POLY_HAVE_IFMA
+    if (nhi - nlo <= 5
+            || FLINT_MIN(len1, len2) < _NMOD_POLY_IFMA_MIN_LEN(NMOD_BITS(mod)))
+#else
+    if (!_NMOD_POLY_HAVE_KERNELS
+            || FLINT_MIN(FLINT_MIN(len1, len2), nhi - nlo) < 12)
+#endif
+    {
+        _nmod_poly_mulmid_other(res, poly1, len1, poly2, len2, nlo, nhi,
+                                mod);
+        return;
+    }
+
+    _nmod_poly_mulmid_trim(&poly1, &len1, &poly2, &len2, &nlo, &nhi);
+
+    /* as in _nmod_poly_mul (_nmod_poly_mulmid_other trims the operands
+       again, which changes nothing) */
+    _nmod_poly_mulmid_kernels(res, poly1, len1, poly2, len2, nlo, nhi, mod);
 }
 
 void

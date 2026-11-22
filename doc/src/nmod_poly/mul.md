@@ -4,9 +4,11 @@ functions: nmod_poly_mul nmod_poly_mullow nmod_poly_mulhigh nmod_poly_mulmid
 ---
 
 `nmod_poly_mul` is the function to use for products in
-$(\Z/n\Z)[x]$. It chooses among the classical algorithm, three variants of
-Kronecker substitution and the small-prime FFT of `fft_small` according to
-the lengths and the bit size of $n$. `nmod_poly_mullow`,
+$(\Z/n\Z)[x]$. It chooses among the classical algorithm (also computed
+by rows of scalar products, or by a vector kernel with AVX512-IFMA),
+Karatsuba's algorithm with AVX2, three variants of Kronecker substitution
+and the small-prime FFT of `fft_small` according to the lengths and the
+bit size of $n$. `nmod_poly_mullow`,
 `nmod_poly_mulhigh` and `nmod_poly_mulmid` compute the low part, the high
 part or an arbitrary range of coefficients of the product; the truncated
 and middle products are the building blocks of power series arithmetic and
@@ -18,7 +20,8 @@ and middle products are the building blocks of power series arithmetic and
 
 `_nmod_poly_mul` uses the classical algorithm, or the rows described
 below, if the shorter operand has length at most 5. Otherwise it uses the
-IFMA kernel described below if it applies, then asks
+IFMA kernel or the Karatsuba with AVX2 described below if they apply, then
+asks
 `_nmod_poly_mullow_want_fft_small` whether `fft_small` is faster, then
 uses the rows if they apply, and otherwise, with $c =
 \min(\mathit{len1}, 2\,\mathit{len2})$ and $b$ the number of bits of $n$:
@@ -51,7 +54,10 @@ following ranges, measured with the installed library on x86-64 with
 | 64 | $\le 42$ | — | — | 43–93 | $\ge 94$ |
 
 With AVX512-IFMA, the IFMA kernel takes the lengths from 8 up to its bound
-for $b \le 52$.
+for $b \le 52$. With AVX2, the Karatsuba takes most of the lengths from 12
+to 320 for $b \le 26$ (544 up to 20 bits without AVX512-IFMA, up to 2048
+where `fft_small` needs two primes) and from 12 to 192 above, up to 512
+from about 46 bits.
 
 The `fft_small` cutoffs come from tables indexed by the bit size and are
 somewhat higher for squaring. A modulus that is one of the 50-bit primes
@@ -117,6 +123,14 @@ needs: on Ice Lake, $L = 192$ up to 20 bits (one prime), 511 for 21 to 26
 bits (two primes, and one IFMA per product), 384 for 27 to 45 bits (two
 primes) and 511 above (three primes), and 96 for the primes of `fft_small`
 itself; on Zen 4, where `fft_small` is faster, 192, 384, 192, 384 and 64.
+For balanced shapes, full products with $\mathit{len1} \le 2\,\mathit{len2}
++ 1$ and middle products of at most $3\,\mathit{len2}$ coefficients, the
+bound is `FLINT_NMOD_POLY_IFMA_BALANCED_MAX_LEN`: on Zen 4, 256 for 27 to
+45 bits, where the kernel is 1.2–2x faster than `fft_small` at 256 (but
+for the primes that `fft_small` transforms directly, without CRT). Middle
+products of few outputs, $m$ coefficients with $\mathit{len2} \ge 4m$, go
+to the kernel up to 511 coefficients whatever the bound: it computes $m\,
+\mathit{len2}$ products there.
 
 For $2^{52} < n < 2^{64}$ the kernel writes each coefficient as $x_0 +
 2^{52} x_1$ with $x_1 < 2^{12}$ and accumulates the products in three
@@ -134,11 +148,58 @@ scalar reduction of each output, do not go to the kernel. The kernel is
 used there for a shorter operand of 8 coefficients (12 on Zen 4, 4 for
 64-bit moduli, which have no rows) to $L$, $L = 256$ on Intel and 128 on
 Zen 4 (511 for low products), when the product has at least 16 output
-coefficients.
+coefficients, or for middle products with a shorter operand of at least 12
+coefficients from 8 output coefficients, for low products from 14 (12
+from 62 bits), and for every kind from 11 from 62 bits.
+
+When FLINT is built for a processor with AVX2 (x86-64), products modulo
+$n < 2^{50}$ whose shorter operand has from about 12 to a few hundred
+coefficients use Karatsuba's algorithm [@KO1962], in place of the rows,
+the classical algorithm, Kronecker substitution and `fft_small`. The
+shorter length is padded to a multiple of 16 and a longer operand is cut
+into blocks of that length (a short last block is computed with shorter
+blocks). The recursion halves the number of blocks of 16, an odd number
+$b$ into $\lceil b/2 \rceil$ and $\lfloor b/2 \rfloor$, down to
+products of $16 \times 16$ coefficients computed in vector registers: one
+coefficient of an operand, broadcast, times 4 consecutive coefficients of
+the other. A middle product of $m$ coefficients is computed by the
+transposed algorithm [@HQZ2004]
+([](algorithms/polynomials/middle-product)), at the cost of a product of
+size $\min(\mathit{len2}, m)$; a low product is a full product of the
+truncated operands.
+
+Where all its sums fit in a word, the recursion runs on integers modulo
+$2^{64}$ and each output coefficient is reduced once at the end. After $d$
+halvings an operand coefficient is a sum of up to $2^d$ input
+coefficients, which must stay below $2^{32}$ (below $2^{31}$ in absolute
+value for middle products, whose recursion subtracts), and the
+coefficients of the product, sums of $\mathit{len2}$ products, must stay
+below $2^{64}$: this allows $n$ up to $2^{26}$ for 1024 coefficients,
+$2^{28}$ for 256 and $2^{30}$ for 16 (one bit less for middle products).
+Otherwise, with FMA, the recursion runs on doubles: each product $wb$ is
+split exactly as $h + l$ by an FMA, $h$ is reduced at once with the
+quotient $\operatorname{round}(w \cdot (b/n))$, and the sums are reduced
+every 8 terms and at each level of the recursion.
+
+Roughly, the Karatsuba is used from 12 coefficients (8 for unbalanced
+products and squares above 32 bits without AVX-512) up to 320 coefficients
+for moduli of at most 26 bits (544 up to 20 bits without AVX512-IFMA, 2048
+where `fft_small` needs two primes), 192 for larger moduli, and 512 from
+about 46 bits. The rules are stricter for moduli of 2 to 7 bits, where
+Kronecker substitution packs several coefficients per word, and for
+lengths that pad badly (5, 7 or 9 to 11 blocks, nearly empty last blocks).
+With AVX512-IFMA the IFMA kernel comes first; the Karatsuba takes, where
+it computes in one word, the longer blocks (above
+`FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN`: 192 up to 26 bits; above, 24 on Zen 4
+and 48 on Sapphire Rapids) and at 27 to 30 bits some products of one
+block. The exact rules are in `src/nmod_poly/impl.h` and
+`src/nmod_poly/mulmid_karatsuba.c`, with a few parameters in
+`flint-mparam.h`.
 
 `nmod_poly_mullow` uses the IFMA kernel under the same conditions, up to
 511 coefficients for a truncated product (256 on Zen 4 for the primes of
-`fft_small`), and the rows under the same conditions, its shortest row
+`fft_small`), the Karatsuba as above, and the rows under the same
+conditions, its shortest row
 having $\mathit{trunc} - \mathit{len2} + 1$ coefficients, otherwise the
 classical algorithm for truncation lengths below $10 + b^2/10$ (from 16
 for 8-bit to 419 for 64-bit moduli; with NEON below 10 up to 23 bits) and,
@@ -149,8 +210,8 @@ when it accumulates its products in one word ($2b + \lceil \log_2
 otherwise, and `fft_small` from separately tuned cutoffs.
 `nmod_poly_mulmid` first drops the operand coefficients that do not
 contribute to the requested range and then uses the IFMA kernel, the
-rows, the classical algorithm, `fft_small` (which computes a middle
-product at the cost of a product of the output length,
+Karatsuba, the rows, the classical algorithm, `fft_small` (which computes a
+middle product at the cost of a product of the output length,
 [](algorithms/polynomials/middle-product)), or KS for small moduli. When
 the sums of $\mathit{len2}$ products fit in one word ($(n - 1)^2
 \mathit{len2} < 2^{64}$), a middle product of $m \ge \max(8,
