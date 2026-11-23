@@ -864,12 +864,22 @@ nu_enclosure_is_tight(const acb_t res, int kind, int scaled, const acb_t nu,
         mag_set_ui_2exp_si(h, 1, e);
     }
 
+    /* (the midpoint plus h, with the bits that this takes, unless the
+       step is negligible compared to the order: an exact sum with an
+       order such as 10^(-10^13) + 10^13 i would need 10^14 bits, which
+       overflow the shifts of the arithmetic on 32-bit systems) */
     if (e <= (slong) floor(log2(Rd)) - 4)
     {
+        arf_srcptr m = arb_midref(acb_realref(nu));
+        slong E = arf_is_zero(m) ? e : arf_abs_bound_lt_2exp_si(m);
+
+        if (E > e + 4000)
+            goto cleanup;
+
         acb_get_mid(nu2, nu);
         acb_get_mid(zm, z);
         arf_set_mag(x, h);
-        arb_add_arf(acb_realref(nu2), acb_realref(nu2), x, ARF_PREC_EXACT);
+        arb_add_arf(acb_realref(nu2), acb_realref(nu2), x, FLINT_MAX(E - e, 0) + 128);
 
         if (plain)
         {
@@ -900,6 +910,7 @@ nu_enclosure_is_tight(const acb_t res, int kind, int scaled, const acb_t nu,
         }
     }
 
+cleanup:
     acb_clear(nu2); acb_clear(zm); acb_clear(w);
     mag_clear(r); mag_clear(h); mag_clear(u); mag_clear(v);
     arf_clear(x);
@@ -981,7 +992,14 @@ ode_derivative(acb_t g1, int kind, int scaled, const acb_t nu, const acb_t zm,
     acb_init(t);
     acb_init(u);
 
-    acb_add_ui(nu1, nu, 1, ARF_PREC_EXACT);
+    /* (exactly, unless the real part of nu is so small that this takes
+       more than a few thousand bits: then a ball, on which the function
+       is evaluated as well) */
+    if (arf_is_zero(arb_midref(acb_realref(nu)))
+            || arf_cmpabs_2exp_si(arb_midref(acb_realref(nu)), -4000) >= 0)
+        acb_add_ui(nu1, nu, 1, ARF_PREC_EXACT);
+    else
+        acb_add_ui(nu1, nu, 1, lp + 64);
 
     if ((kind == KIND_Y || kind == KIND_K) && acb_is_int(nu))
     {

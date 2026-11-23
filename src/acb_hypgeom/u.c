@@ -380,7 +380,8 @@ u_near_order(const acb_t b, slong prec)
     slong n, J = 0;
     double lq;
 
-    if (!acb_is_finite(b) || acb_is_int(b) || arf_cmpabs_2exp_si(m, 40) >= 0)
+    /* (n below must fit in an slong, also on 32-bit systems) */
+    if (!acb_is_finite(b) || acb_is_int(b) || arf_cmpabs_2exp_si(m, FLINT_MIN(40, FLINT_BITS - 3)) >= 0)
         return 0;
 
     acb_init(eps);
@@ -969,7 +970,7 @@ u_majorant(mag_t M, acb_srcptr w, int stage, void * FLINT_UNUSED(ctx))
            disc of radius 1/4 around it: the bound from the terms of
            the limit) */
         if (!mag_is_finite(M) && acb_is_finite(w + 1)
-            && arf_cmpabs_2exp_si(arb_midref(acb_realref(w + 1)), 40) < 0)
+            && arf_cmpabs_2exp_si(arb_midref(acb_realref(w + 1)), FLINT_MIN(40, FLINT_BITS - 3)) < 0)
         {
             slong n = arf_get_si(arb_midref(acb_realref(w + 1)), ARF_RND_NEAR);
             mag_t r;

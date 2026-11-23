@@ -1882,11 +1882,13 @@ sd_bits(const acb_t x)
 {
     slong e = -1000, f;
 
+    /* (not ARF_EXP, which is not a number for an exponent beyond the
+       range of a small fmpz) */
     if (!arf_is_zero(arb_midref(acb_realref(x))))
-        e = ARF_EXP(arb_midref(acb_realref(x)));
+        e = arf_abs_bound_lt_2exp_si(arb_midref(acb_realref(x)));
     if (!arf_is_zero(arb_midref(acb_imagref(x))))
     {
-        f = ARF_EXP(arb_midref(acb_imagref(x)));
+        f = arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(x)));
         e = FLINT_MAX(e, f);
     }
     return e;

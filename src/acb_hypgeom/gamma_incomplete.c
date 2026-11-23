@@ -1219,11 +1219,15 @@ gamma_incomplete_core_u(acb_t res, const acb_t s, const acb_t z, int upper,
         nterm = sre;
         if (!isfinite(asymp_terms(num, zn, goal + 8, 0.0)))
         {
-            if (zn > 1e-300)
+            /* (none for s - 1 <= |z|, where the largest term is the last
+               one: computed as the difference of two equal expressions,
+               it can be a rounding error on x87, where one of them may
+               be kept with extended precision) */
+            if (zn > 1e-300 && sre - 1.0 > zn)
             {
-                double jm = fmin(sre - 1.0, zn), lzn = log(zn);
+                double lzn = log(zn);
 
-                aloss = 1.45 * fmax(jm * lzn - lgamma(jm + 1.0)
+                aloss = 1.45 * fmax(zn * lzn - lgamma(zn + 1.0)
                     - fmax(zre, (sre - 1.0) * lzn - lgamma(sre)), 0.0);
             }
 

@@ -3551,7 +3551,11 @@ cel_integrate(acb_t res, const acb_t dir, const acb_t lambda, acb_srcptr mu,
             ok = 0;
         else
         {
-            lost = logI - mag_get_d_log2_approx(lo) * CEL_LN2;
+            /* (log2 |res| from the exponent, which mag_get_d_log2_approx
+               clamps to the range of a small fmpz, 2^30 on 32-bit
+               systems) */
+            lost = logI - (fmpz_get_d(MAG_EXPREF(lo))
+                + log2(MAG_MAN(lo) * ldexp(1.0, -MAG_BITS))) * CEL_LN2;
             if (lost > 4.0 && level == 0)
             {
                 if (lost < 0.5 * prec + 100.0)

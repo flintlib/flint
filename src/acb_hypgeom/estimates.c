@@ -21,7 +21,7 @@
    so that nothing here needs to be rigorous. */
 
 #define M_INVLOG2 1.4426950408889634
-#define M_NEGINF (-1e300)
+#define M_NEGINF (-0x1p996)  /* (exact also in extended precision, as on x87: -1e300 is not) */
 
 typedef _acb_hypgeom_cd m_cd;
 
@@ -320,7 +320,7 @@ void
 _acb_hypgeom_est_1f1_logabs(double * first, double * second, m_cd a, m_cd b, m_cd z, double cap)
 {
     m_cd a1, c1, ba, p, q, disc, t, u, phi, d2, d3, one_t, z2;
-    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = 1e300;
+    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = INFINITY;
     int i, real;
 
     *first = *second = cap;
@@ -403,7 +403,7 @@ _acb_hypgeom_est_1f1_logabs(double * first, double * second, m_cd a, m_cd b, m_c
 
     if (vhi > M_NEGINF)
     {
-        if (chosen < 1e300)
+        if (chosen < INFINITY)
         {
             *first = FLINT_MIN(chosen, cap);
             *second = FLINT_MIN((chosen == vhi) ? vlo : vhi, cap);
@@ -610,7 +610,7 @@ void
 _acb_hypgeom_est_u_logabs(double * first, double * second, m_cd a, m_cd b, m_cd z, double cap)
 {
     m_cd a1, c1, p, q, disc, t, u, phi, d2, d3, one_t, z2, lz, lt;
-    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = 1e300, shift = 0.0, argz;
+    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = INFINITY, shift = 0.0, argz;
     int i;
 
     *first = *second = cap;
@@ -687,13 +687,13 @@ _acb_hypgeom_est_u_logabs(double * first, double * second, m_cd a, m_cd b, m_cd 
         vlo = FLINT_MIN(vlo, h);
 
         u = _acb_hypgeom_cd_mul(z, t);
-        if (a.re > 0.0 && u.re > 0.0 && (chosen == 1e300 || h > chosen))
+        if (a.re > 0.0 && u.re > 0.0 && (chosen == INFINITY || h > chosen))
             chosen = h;
     }
 
     if (vhi > M_NEGINF)
     {
-        if (chosen < 1e300)
+        if (chosen < INFINITY)
         {
             *first = FLINT_MIN(chosen, cap);
             *second = FLINT_MIN((chosen == vhi) ? vlo : vhi, cap);
@@ -707,7 +707,7 @@ _acb_hypgeom_est_u_logabs(double * first, double * second, m_cd a, m_cd b, m_cd 
         /* (An estimate far above the cap is that of a saddle point
            which does not contribute: the other one first.) */
         if (*first >= cap && *second < cap
-            && ((chosen < 1e300) ? chosen : vhi) > cap + 10.0)
+            && ((chosen < INFINITY) ? chosen : vhi) > cap + 10.0)
         {
             *first = *second;
             *second = cap;
@@ -1029,7 +1029,7 @@ _acb_hypgeom_est_2f1_logabs(double * first, double * second,
     m_cd a, m_cd b, m_cd c, m_cd z, double cap)
 {
     m_cd b1, c1, cb, q2, q1, disc, t[2], u, v, phi, d2, d3, one_t, one_zt;
-    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = 1e300;
+    double C, h, vhi = M_NEGINF, vlo = 1e300, chosen = INFINITY;
     int i, nroots, converges;
 
     *first = *second = cap;
@@ -1121,13 +1121,13 @@ _acb_hypgeom_est_2f1_logabs(double * first, double * second,
         vhi = FLINT_MAX(vhi, h);
         vlo = FLINT_MIN(vlo, h);
 
-        if (converges && t[i].re > 0.0 && t[i].re < 1.0 && (chosen == 1e300 || h > chosen))
+        if (converges && t[i].re > 0.0 && t[i].re < 1.0 && (chosen == INFINITY || h > chosen))
             chosen = h;
     }
 
     if (vhi > M_NEGINF)
     {
-        if (chosen < 1e300)
+        if (chosen < INFINITY)
         {
             *first = FLINT_MIN(chosen, cap);
             *second = FLINT_MIN((chosen == vhi) ? vlo : vhi, cap);
@@ -1148,7 +1148,7 @@ _acb_hypgeom_est_2f1_logabs(double * first, double * second,
        (For example a = 1000, b = 1, c = 2000, z = 0.99: the saddle
        points are beyond 1, where the integrand is 2^-4677, and the
        function is 1.98.) */
-    if (converges && chosen == 1e300)
+    if (converges && chosen == INFINITY)
     {
         double e = M_NEGINF;
         m_cd lam, mu, one_z;
@@ -1495,7 +1495,8 @@ _acb_hypgeom_est_integration_cost(double prec, int real)
 
 /* The relative accuracy that an inexact parameter x is good for in a
    function f with d log(f) / dx of order 1: its relative accuracy
-   minus log2 |x|.  (WORD_MAX for an exact x.) */
+   minus log2 |x|.  (WORD_MAX for an exact x; 0 from |x| = 2^60, the
+   same on 32-bit and 64-bit systems.) */
 slong
 _acb_hypgeom_est_input_accuracy(const acb_t x)
 {
@@ -1512,7 +1513,7 @@ _acb_hypgeom_est_input_accuracy(const acb_t x)
     acb_get_mag(m, x);
     if (mag_cmp_2exp_si(m, 0) > 0)
     {
-        if (mag_cmp_2exp_si(m, FLINT_BITS - 4) < 0)
+        if (mag_cmp_2exp_si(m, 60) < 0)
             acc -= FLINT_MIN(MAG_EXP(m), acc);
         else
             acc = 0;

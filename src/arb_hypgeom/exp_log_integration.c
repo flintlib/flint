@@ -1363,13 +1363,16 @@ _arb_hypgeom_integrate_exp_log(arb_t res, const arb_t lambda, arb_srcptr mu,
     return ok;
 }
 
-/* log |x|, approximately */
+/* log |x|, approximately (from above, within log 2), for any exponent:
+   arf_abs_bound_lt_2exp_si is clamped to the range of an slong, which
+   integrals with large parameters exceed on 32-bit systems (with
+   parameters of 2^36, 1F1 has an integral of 2^(-1.3 10^11)) */
 static double
 el_log_abs(const arb_t x)
 {
     if (arf_is_zero(arb_midref(x)) || !arb_is_finite(x))
         return -INFINITY;
-    return EL_LN2 * (double) arf_abs_bound_lt_2exp_si(arb_midref(x));
+    return EL_LN2 * fmpz_get_d(ARF_EXPREF(arb_midref(x)));
 }
 
 /* an estimate of max phi on (0, B) from a few points */

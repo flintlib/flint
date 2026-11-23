@@ -193,7 +193,22 @@ _acb_hypgeom_inexact_enclosure(acb_t res, slong * need_prec, const acb_t v, acb_
 
                 for (j = 0; j < n; j++)
                     acb_get_mid(w + j, args + j);
-                arb_add_arf(acb_realref(w + i), acb_realref(w + i), h, ARF_PREC_EXACT);
+
+                /* (the midpoint plus h with the bits that this takes;
+                   a ball containing m + h if that is more than a few
+                   thousand, whose function value still contains
+                   f(m + h): an exact sum with a midpoint of 2^(-10^13)
+                   would need 10^13 bits) */
+                {
+                    arf_srcptr mi = arb_midref(acb_realref(w + i));
+                    slong E = arf_is_zero(mi) ? 0 : arf_abs_bound_lt_2exp_si(mi);
+                    slong eh = arf_abs_bound_lt_2exp_si(h);
+
+                    if (arf_is_zero(mi) || (E <= eh + 4 * p2 + 4000 && E >= eh - 4 * p2 - 4000))
+                        arb_add_arf(acb_realref(w + i), acb_realref(w + i), h, ARF_PREC_EXACT);
+                    else
+                        arb_add_arf(acb_realref(w + i), acb_realref(w + i), h, p2 + 64);
+                }
 
                 f(fw, w, p2, ctx);
 

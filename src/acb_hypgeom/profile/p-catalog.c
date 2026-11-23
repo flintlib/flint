@@ -1347,11 +1347,19 @@ run_isolated(buf_t out, work_func work, void * arg, double timeout, int * sig)
             /* (in case the parent is killed) */
             alarm((unsigned int) FLINT_MIN(timeout + 5.0, 1e6));
 
+            /* (no limit where it does not fit in an rlim_t: 4096 MB
+               would be 0 with a 32-bit rlim_t, and every measurement
+               would abort) */
             if (opt.maxmem > 0)
             {
                 struct rlimit lim;
-                lim.rlim_cur = lim.rlim_max = (rlim_t) opt.maxmem * 1024 * 1024;
-                setrlimit(RLIMIT_AS, &lim);
+                double bytes = (double) opt.maxmem * 1048576.0;
+
+                if (bytes < (double) ((rlim_t) -1) && (rlim_t) -1 > 0)
+                {
+                    lim.rlim_cur = lim.rlim_max = (rlim_t) opt.maxmem * 1024 * 1024;
+                    setrlimit(RLIMIT_AS, &lim);
+                }
             }
 
             if (!opt.verbose)

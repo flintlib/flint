@@ -1029,7 +1029,14 @@ sdq_log_rad(const acb_t x)
 
     mag_init(t);
     mag_hypot(t, arb_radref(acb_realref(x)), arb_radref(acb_imagref(x)));
-    r = mag_get_d_log2_approx(t) * SD_LN2;
+    /* (from the exponent: mag_get_d_log2_approx is clamped to the
+       range of a small fmpz, 2^30 on 32-bit systems) */
+    if (mag_is_zero(t))
+        r = (double) COEFF_MIN * SD_LN2;
+    else if (mag_is_inf(t))
+        r = (double) COEFF_MAX * SD_LN2;
+    else
+        r = (fmpz_get_d(MAG_EXPREF(t)) + log2(MAG_MAN(t) * ldexp(1.0, -MAG_BITS))) * SD_LN2;
     mag_clear(t);
     return r;
 }
