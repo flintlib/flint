@@ -100,12 +100,10 @@ integration. Evaluating $f$ in interval arithmetic on the whole box
 overestimates because of the dependency problem; the *mean value form*
 $$f(X) \subseteq f(m) + f'(X)(X - m), \qquad m = \operatorname{mid}(X),$$
 gives a much tighter enclosure for narrow $X$, since the overestimation
-of $f'(X)$ is multiplied by the small width of $X - m$. The integration
-code of `arb_hypgeom` (`arb_hypgeom_1f1_integration`,
-`arb_hypgeom_2f1_integration`, `arb_hypgeom_u_integration`) uses
-`di_t` intervals to bound the logarithm of the integrand
-$t^{a-1}(1 - t)^{b - a - 1}e^{zt}$ on subintervals of the edges of a
-rectangle, in exactly this form: the value at the midpoint
+of $f'(X)$ is multiplied by the small width of $X - m$. With `di_t`
+intervals, the logarithm of an integrand such as
+$t^{a-1}(1 - t)^{b - a - 1}e^{zt}$ is bounded on subintervals of the
+edges of a rectangle in exactly this form: the value at the midpoint
 (`di_fast_mid`) plus the derivative on the subinterval times
 $[0, r]$ with $r$ from `di_fast_ubound_radius`.
 

@@ -9,8 +9,7 @@ order: 6
 This module implements interval arithmetic with `double` endpoints,
 for computing cheap but rigorous enclosures where the precision of a
 double is enough, such as bounds on the magnitude of an integrand or of
-the terms of a series. It is used by the numerical integration code of
-`arb_hypgeom` (for example `arb_hypgeom_1f1_integration`). Unlike the
+the terms of a series. Unlike the
 IEEE 1788 approach, which switches the rounding mode of the processor,
 the operations here compute the endpoints in the default
 round-to-nearest mode and then widen them by a few ulps, which is

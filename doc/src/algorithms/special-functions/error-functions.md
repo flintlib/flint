@@ -106,7 +106,7 @@ $$
 + \frac{(-1)^n}{(n+1)!} z \, {}_2F_2(1,1;2,2+n;-z)
 - z^{-n} \sum_{k=0}^{n-1} \frac{(-z)^k}{(k-n) k!}
 $$
-is used instead. `acb_hypgeom_gamma_upper` chooses the asymptotic
+is used instead. `acb_hypgeom_gamma_upper_nointegration` chooses the asymptotic
 expansion for nonnegative real $s$ and $z$ when $(z - 2.39)^8 > (1.03
 s)^8 + (0.33\,p)^8$ (an empirical fit of the region where it reaches
 $p$ bits), and for other arguments when `acb_hypgeom_u_use_asymp`
@@ -118,6 +118,23 @@ choices. The regularized forms $Q(s,z) = \Gamma(s,z)/\Gamma(s)$,
 $P(s,z) = \gamma(s,z)/\Gamma(s)$ and $\gamma^*(s,z) = z^{-s}P(s,z)$ are
 computed directly with regularized hypergeometric functions, so that
 they are defined at the poles of $\Gamma(s)$.
+
+These choices work well except in the transition region where $|s|$
+and $|z|$ are both large and comparable, and for wide input balls. The
+automatic functions `acb_hypgeom_gamma_upper` and
+`acb_hypgeom_gamma_lower` therefore try the series and the asymptotic
+expansion at an increasing working precision, together with rigorous
+numerical integration along a steepest-descent contour and, for
+inexact input, evaluation at the midpoint with derivative bounds; see
+[](algorithms/special-functions/steepest-descent). For the lower
+function they sum the series themselves, in the third form also when
+$|z| < |s|$ (its terms $z^k / (s+1)_k$ then do not grow, whatever the
+sign of $\operatorname{Re} z$), at a working precision raised by the
+cancellation of the form used. The regularized
+functions are obtained from the result by multiplying with $1 /
+\Gamma(s)$ or $z^{-s}$ at a precision raised by the logarithm of
+$|s|$, or directly from the series if the result is not finite (at
+the poles of $\Gamma(s)$).
 
 ### Rational parameters and the bit-burst algorithm {#bit-burst}
 
@@ -227,7 +244,10 @@ the bound reaches it before it starts to grow.
   iteration, see [](arb_hypgeom/erf)); Fresnel integrals
   `acb_hypgeom_fresnel`.
 - Incomplete gamma and beta functions: `acb_hypgeom_gamma_upper` and
-  its methods, `acb_hypgeom_gamma_lower`, `acb_hypgeom_beta_lower`,
+  its methods, `acb_hypgeom_gamma_lower`, the versions
+  `acb_hypgeom_gamma_upper_nointegration` and
+  `acb_hypgeom_gamma_lower_nointegration` restricted to the methods of
+  this section, `acb_hypgeom_beta_lower`,
   the real wrappers, `arb_hypgeom_gamma_upper_integration`, and the
   rational-parameter functions `_arb_hypgeom_gamma_upper_fmpq_inf_bsplit`,
   `_arb_hypgeom_gamma_lower_fmpq_0_bsplit`,

@@ -1,6 +1,6 @@
 ---
 title: The Gauss hypergeometric function
-summary: Evaluation of 2F1(a,b;c;z) on the whole complex plane — the linear fractional transformations and how one is chosen, limits at integer parameter differences by power series perturbation, polynomial and special cases, analytic continuation by Taylor series with Cauchy–Kovalevskaya majorant bounds near exp(±πi/3), and numerical integration for real arguments.
+summary: Evaluation of 2F1(a,b;c;z) on the whole complex plane — the linear fractional transformations and how one is chosen, limits at integer parameter differences by power series perturbation, polynomial and special cases, analytic continuation by Taylor series with Cauchy–Kovalevskaya majorant bounds near exp(±πi/3), and the choice between the series and numerical integration for large parameters.
 order: 47
 ---
 
@@ -64,6 +64,16 @@ computes $|z|$, $|z/(z-1)|$, $|1/z|$, $|1/(1-z)|$, $|1-z|$ and $|1 -
 The union of the disks $|w| \le 3/4$ for the six maps covers the plane
 except two small regions around $e^{\pm \pi i/3}$, the fixed points of
 the group of transformations, where every $|w|$ is close to 1.
+
+This choice is by $z$ alone. The parameters change the number of
+terms of the series and the cancellation of each formula by large
+factors, and the limit cases cost three times as much per term;
+`acb_hypgeom_2f1` uses the choice above only for small parameters
+(up to 30 for the series at $z$ and $z/(z-1)$; up to 12 for a
+connection formula with $|w| \le 1/2$ which is not a limit case), and
+otherwise evaluates the formula with the least estimated cost among
+all of them, see
+[](algorithms/special-functions/hypergeometric#choice-2f1).
 
 ## Limits at integer parameter differences {#limits}
 
@@ -155,20 +165,34 @@ majorant series at $|x|\nu < 1$ is below $2^{-p}$, and adds the tail
 bound for $f$ and $f'$ to the result. The points must therefore be
 well separated from 0 and 1 compared to the step length.
 
-## Numerical integration {#integration}
+## Large parameters and numerical integration {#integration}
 
-For large real parameters, the series in all the transformations
-converge slowly and cancel. If the result of the steps above has less
-than half the requested accuracy and all arguments are real (and below
-$2^{60}$), `acb_hypgeom_2f1` evaluates
+For large parameters, the series in all the transformations converge
+slowly and cancel. `acb_hypgeom_2f1` then estimates the cancellation
+and the number of terms of four series, in $z$ and in $z/(z-1)$ with
+the parameters $(a, b)$ or $(c - a, c - b)$, raises the working
+precision accordingly, and compares their costs with that of the
+integral
 $$
 {}_2F_1(a,b;c;z) = \frac{\Gamma(c)}{\Gamma(b)\Gamma(c-b)} \int_0^1
-t^{b-1}(1-t)^{c-b-1}(1-zt)^{-a}\, dt
+t^{b-1}(1-t)^{c-b-1}(1-zt)^{-a}\, dt,
 $$
-with `arb_hypgeom_2f1_integration` (for $b \ge 1$, $c - b \ge 1$ and $z
-< 1$, possibly after exchanging $a$ and $b$), using the rigorous
-integration of `acb_calc_integrate` [@Joh2018a], and returns the better
-enclosure.
+evaluated by rigorous quadrature: for real arguments with
+`arb_hypgeom_2f1_integration` (for $b \ge 1$, $c - b \ge 1$ and $z <
+1$, possibly after exchanging $a$ and $b$), and for complex arguments,
+or if that does not apply, with `acb_hypgeom_2f1_integration` along a
+path of steepest descent (for $\operatorname{Re} b \ge 1$,
+$\operatorname{Re}(c - b) \ge 1$; for $z$ on the cut $(1, \infty)$ the
+path passes below $1/z$). Where this integral does not exist at $1$,
+combinations of two integrals past a singular point give the functions
+with $a, b > c$ for $\operatorname{Re} z < 0$ and those of the type of
+the Jacobi polynomials, $a < 0 < c < b$, for $|z - \tfrac12| <
+\tfrac12$, where they oscillate.
+Where the transformations to $1/z$, $1/(1-z)$, $1-z$ or $1-1/z$ are
+chosen, they are evaluated first and repeated once with the bits that
+are found missing. See
+[](algorithms/special-functions/hypergeometric#choice) and
+[](algorithms/special-functions/hypergeometric#integration).
 
 ## Use in FLINT {#use}
 

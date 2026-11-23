@@ -12,12 +12,15 @@
 /* Include functions *********************************************************/
 
 #include "t-0f1.c"
+#include "t-1f1_integration.c"
 #include "t-2f1.c"
 #include "t-2f1_continuation.c"
+#include "t-2f1_integration.c"
 #include "t-airy_bound.c"
 #include "t-airy.c"
 #include "t-airy_series.c"
 #include "t-bessel_i.c"
+#include "t-bessel_integration.c"
 #include "t-bessel_j.c"
 #include "t-bessel_j_deriv_bound.c"
 #include "t-bessel_k.c"
@@ -42,6 +45,7 @@
 #include "t-erf_series.c"
 #include "t-fresnel.c"
 #include "t-fresnel_series.c"
+#include "t-gamma_incomplete_integration.c"
 #include "t-gamma_lower.c"
 #include "t-gamma_lower_series.c"
 #include "t-gamma_stirling_sum.c"
@@ -50,6 +54,9 @@
 #include "t-gamma_upper_series.c"
 #include "t-gegenbauer_c.c"
 #include "t-hermite_h.c"
+#include "t-inexact_enclosure.c"
+#include "t-inexact_input.c"
+#include "t-large_parameters.c"
 #include "t-jacobi_p.c"
 #include "t-laguerre_l.c"
 #include "t-legendre_p.c"
@@ -60,6 +67,7 @@
 #include "t-log_rising_ui_jet.c"
 #include "t-m.c"
 #include "t-pfq.c"
+#include "t-pfq_bound_factor.c"
 #include "t-pfq_series_direct.c"
 #include "t-pfq_series_sum_bs.c"
 #include "t-pfq_series_sum_rs.c"
@@ -69,11 +77,14 @@
 #include "t-pfq_sum_rs.c"
 #include "t-rising_ui.c"
 #include "t-rising_ui_jet.c"
+#include "t-sd_bound.c"
+#include "t-sd_frames.c"
 #include "t-shi_series.c"
 #include "t-si.c"
 #include "t-si_series.c"
 #include "t-spherical_y.c"
 #include "t-u_asymp.c"
+#include "t-u_integration.c"
 #include "t-u.c"
 
 /* Array of test functions ***************************************************/
@@ -81,12 +92,15 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(acb_hypgeom_0f1),
+    TEST_FUNCTION(acb_hypgeom_1f1_integration),
     TEST_FUNCTION(acb_hypgeom_2f1),
     TEST_FUNCTION(acb_hypgeom_2f1_continuation),
+    TEST_FUNCTION(acb_hypgeom_2f1_integration),
     TEST_FUNCTION(acb_hypgeom_airy_bound),
     TEST_FUNCTION(acb_hypgeom_airy),
     TEST_FUNCTION(acb_hypgeom_airy_series),
     TEST_FUNCTION(acb_hypgeom_bessel_i),
+    TEST_FUNCTION(acb_hypgeom_bessel_integration),
     TEST_FUNCTION(acb_hypgeom_bessel_j),
     TEST_FUNCTION(acb_hypgeom_bessel_j_deriv_bound),
     TEST_FUNCTION(acb_hypgeom_bessel_k),
@@ -111,6 +125,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_erf_series),
     TEST_FUNCTION(acb_hypgeom_fresnel),
     TEST_FUNCTION(acb_hypgeom_fresnel_series),
+    TEST_FUNCTION(acb_hypgeom_gamma_incomplete_integration),
     TEST_FUNCTION(acb_hypgeom_gamma_lower),
     TEST_FUNCTION(acb_hypgeom_gamma_lower_series),
     TEST_FUNCTION(acb_hypgeom_gamma_stirling_sum),
@@ -119,6 +134,9 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_gamma_upper_series),
     TEST_FUNCTION(acb_hypgeom_gegenbauer_c),
     TEST_FUNCTION(acb_hypgeom_hermite_h),
+    TEST_FUNCTION(acb_hypgeom_inexact_enclosure),
+    TEST_FUNCTION(acb_hypgeom_inexact_input),
+    TEST_FUNCTION(acb_hypgeom_large_parameters),
     TEST_FUNCTION(acb_hypgeom_jacobi_p),
     TEST_FUNCTION(acb_hypgeom_laguerre_l),
     TEST_FUNCTION(acb_hypgeom_legendre_p),
@@ -129,6 +147,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_log_rising_ui_jet),
     TEST_FUNCTION(acb_hypgeom_m),
     TEST_FUNCTION(acb_hypgeom_pfq),
+    TEST_FUNCTION(acb_hypgeom_pfq_bound_factor),
     TEST_FUNCTION(acb_hypgeom_pfq_series_direct),
     TEST_FUNCTION(acb_hypgeom_pfq_series_sum_bs),
     TEST_FUNCTION(acb_hypgeom_pfq_series_sum_rs),
@@ -138,12 +157,15 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_pfq_sum_rs),
     TEST_FUNCTION(acb_hypgeom_rising_ui),
     TEST_FUNCTION(acb_hypgeom_rising_ui_jet),
+    TEST_FUNCTION(acb_hypgeom_sd_bound),
+    TEST_FUNCTION(acb_hypgeom_sd_frames),
     TEST_FUNCTION(acb_hypgeom_shi_series),
     TEST_FUNCTION(acb_hypgeom_si),
     TEST_FUNCTION(acb_hypgeom_si_series),
     TEST_FUNCTION(acb_hypgeom_spherical_y),
     TEST_FUNCTION(acb_hypgeom_u_asymp),
-    TEST_FUNCTION(acb_hypgeom_u)
+    TEST_FUNCTION(acb_hypgeom_u),
+    TEST_FUNCTION(acb_hypgeom_u_integration)
 };
 
 /* main function *************************************************************/

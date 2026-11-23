@@ -38,4 +38,21 @@ void _arb_hypgeom_legendre_p_ui_disk_radius(mag_t r, const arb_t m, ulong n);
 int _arb_hypgeom_legendre_p_ui_root_bitburst_param(arb_t res, arb_t weight, ulong n, ulong k, slong prec, slong limb_max_prec, double transfer_blocks_min, slong fft_bits);
 void _arb_hypgeom_legendre_p_ui_root_enclosure(arb_t res, arb_t weight, ulong n, ulong k, slong prec);
 
+/* res = int_0^B exp(lambda t + sum_{j < m} mu_j log(al_j + be_j t)) dt
+   by rigorous quadrature (exp_log_integration.c), where B is a double
+   or infinite, sing0 is the index of the term vanishing at 0 (or -1),
+   and the tolerance is relative to the integral or to exp(logscale).
+   Returns 0 if the integral is not computed. */
+int _arb_hypgeom_integrate_exp_log(arb_t res, const arb_t lambda, arb_srcptr mu,
+    arb_srcptr al, arb_srcptr be, int m, int sing0, double B, double logscale, slong prec);
+
+/* the Euler integrals int_0^1 e^(z t) t^a1 (1 - t)^ba1 dt,
+   int_0^inf e^(-z t) t^a1 (1 + t)^ba1 dt and
+   int_0^1 t^b1 (1 - t)^cb1 (1 - z t)^nega dt by the same; return 0 if
+   not computed */
+int _arb_hypgeom_1f1_integral(arb_t res, const arb_t a1, const arb_t ba1, const arb_t z, slong prec);
+int _arb_hypgeom_u_integral(arb_t res, const arb_t a1, const arb_t ba1, const arb_t z, slong prec);
+int _arb_hypgeom_2f1_integral(arb_t res, const arb_t b1, const arb_t cb1, const arb_t nega,
+    const arb_t z, slong prec);
+
 #endif

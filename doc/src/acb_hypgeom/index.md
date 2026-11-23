@@ -30,8 +30,8 @@ functions, and the generic interface [`gr_special`](gr_special) calls
 both for its real and complex ball contexts.
 
 Each function chooses between convergent series, asymptotic
-expansions, transformation formulas, analytic continuation and, for
-real arguments, numerical integration, and sets its working precision
+expansions, transformation formulas, analytic continuation and
+numerical integration, and sets its working precision
 from an estimate of the cancellation; the algorithms and error bounds
 are described in [](algorithms/special-functions/hypergeometric), and
 [](algorithms/special-functions/overview) maps each function
@@ -54,7 +54,9 @@ conventions with examples.
   the cancellation in the series they use and increase the working
   precision internally, and reduce it to what the accuracy of the input
   justifies. For inexact input they usually evaluate at the midpoint
-  and bound the propagated error with derivative bounds.
+  and bound the propagated error with derivative bounds; the Bessel
+  and incomplete gamma functions of real arguments are evaluated at
+  the corners of the input box where they are monotone.
 - **Branch cuts.** Multivalued functions use the principal branch, with
   the branch cut on $(-\infty, 0]$ for functions built from $\log z$
   and $z^a$ ($U$, $\operatorname{Ei}$, $\operatorname{Ci}$, Coulomb
@@ -306,15 +308,160 @@ $$
 `acb_hypgeom_m_1f1` sums the convergent series, after Kummer's
 transformation $M(a,b,z) = e^z M(b-a,b,-z)$ if $\operatorname{Re} z <
 0$ (unless the series terminates), and handles $\mathbf{M}$ at
-nonpositive integer $b$ by the limit formula. `acb_hypgeom_m` chooses:
-terminating series are summed directly; otherwise it compares the
-accuracy of the asymptotic expansion (about $|z|/\log 2$ bits) with
-that of the convergent series after cancellation, uses Kummer's
-transformation for negative real part, and sets the working precision
-accordingly. If the result has less than half the requested accuracy
-and all arguments are real and moderate, it also tries
-`arb_hypgeom_1f1_integration` and keeps the better enclosure. See
+nonpositive integer $b$ by the limit formula. `acb_hypgeom_m` chooses
+between these, with a working precision that covers the cancellation,
+and numerical integration (`arb_hypgeom_1f1_integration` for real
+arguments with $a \ge 1$ and $b - a \ge 1$,
+`acb_hypgeom_1f1_integration` along paths of steepest descent
+otherwise, which also covers the oscillating functions with
+$\operatorname{Re} a < 1$ or $\operatorname{Re}(b - a) < 1$). For
+integers $0 < a < b$, the asymptotic expansion is a finite sum of $b$
+terms, which is used for any $z$ where it is shorter than the series
+([](algorithms/special-functions/hypergeometric#confluent)). For $|a| \le 30$ and $b$ small or in
+the right half-plane, the choice is made from $z$: the asymptotic
+expansion if $|z| \ge (\mathit{prec} + 5) \log 2$, otherwise the series
+with $(\sqrt{x^2 + y^2} - |x|)/\log 2$ additional bits for $z = x +
+yi$. For larger parameters, if the expansion is that choice and does
+not reach the precision for a large $b$, or if that result is not
+accurate, the
+function estimates the cancellation and the number of terms of both
+series, the reach of the asymptotic expansion and the cost of an
+integral, and tries the cheapest method first, as described in
+[](algorithms/special-functions/hypergeometric#choice). With exact
+parameters the result is accurate to nearly the full precision
+whenever one of the methods applies at a reasonable cost; there is no
+limit on the size of the parameters, but for parameters of size
+$10^5$ and more in the regions where only the series applies, the
+result can be a wide ball. See
 [](algorithms/special-functions/hypergeometric#confluent).
+
+With inexact input, the function is evaluated at the midpoints, and
+its variation over the input is bounded with Cauchy's estimates from a
+bound for the function on a polydisc (from the Euler integral where
+its integrand is positive, from the integrals on balls, or from the
+series with divided differences for the first derivatives). The result
+is accurate to nearly what the input allows when the cancellation of
+the series is smaller than the accuracy of the input or an integral
+applies; if the input is as accurate as the working precision, this is
+attempted only as far as it costs no more than twice the function on
+exact input, and the result can otherwise be less accurate by the
+cancellation of the series (increase the precision in that case).
+Input which is more accurate than the working precision by more bits
+than a series loses is treated as exact input. A polynomial ($a$ or
+$b - a$ a nonpositive integer) with exact parameters and an inexact
+argument is computed from its Taylor expansion at the midpoint of $z$,
+and is as accurate as the argument allows. See
+[](algorithms/special-functions/hypergeometric#inexact).
+:::
+:::
+
+::: function
+void acb_hypgeom_1f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
+void acb_hypgeom_u_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec)
+
+Compute $M(a,b,z)$ (or $\mathbf{M}(a,b,z)$ if `regularized` is set) and
+$U(a,b,z)$ for complex parameters and argument by rigorous numerical
+integration of
+$$
+M(a,b,z) = \frac{\Gamma(b)}{\Gamma(a) \Gamma(b-a)} \int_0^1
+e^{zt} t^{a-1} (1-t)^{b-a-1} \, dt, \qquad
+U(a,b,z) = \frac{1}{\Gamma(a)} \int_0^{\infty e^{i\theta}} e^{-zt} t^{a-1}
+(1+t)^{b-a-1} \, dt
+$$
+along paths of steepest descent. The first requires
+$\operatorname{Re}(a) \ge 1$ and $\operatorname{Re}(b - a) \ge 1$, and
+the second $\operatorname{Re}(a) \ge 1$ or
+$\operatorname{Re}(a - b + 1) \ge 1$ (through
+$U(a,b,z) = z^{1-b} U(a-b+1,2-b,z)$) and a ball $z$ which does not
+cross the negative real axis. If only one of the conditions for $M$
+holds, and for $U$ with $\operatorname{Re}(b - a) \ge 1$ or
+$\operatorname{Re}(a) \le 0$, the functions are computed from the two
+integrals
+$$
+I_{\pm} = \Gamma(b-a)\, U(b-a, b, z e^{\pm \pi i}) = \int_0^{\infty e^{i\theta_\pm}}
+e^{zt} t^{b-a-1} (1+t)^{a-1} \, dt
+$$
+over rays below and above $-1$, for $z$ in the right half-plane (for
+$e^z M(b-a,b,-z)$ in the left half-plane):
+$$
+\mathbf{M}(a,b,z) = \frac{e^z\, \Gamma(1-a)}{2\pi i\, \Gamma(b-a)}
+\left(e^{\pi i b} I_+ - e^{-\pi i b} I_-\right), \qquad
+U(a,b,z) = \frac{e^z\, \Gamma(1-a)}{2\pi i}
+\left(e^{\pi i (b-a)} I_+ - e^{-\pi i (b-a)} I_-\right).
+$$
+These are accurate where the functions oscillate (for real arguments,
+between the turning points) and lose accuracy to cancellation
+elsewhere. The result is indeterminate if no formula applies or no
+path is found. The cost depends little on the size of the
+parameters, which makes these the methods for large parameters, where
+the series lose their accuracy to cancellation.
+
+::: details
+The integrands are $\exp(\varphi(t))$ with
+$\varphi(t) = \lambda t + \sum_j \mu_j \log(\alpha_j + \beta_j t)$, as for
+`arb_hypgeom_1f1_integration`, with complex parameters.
+
+*The path* is chosen in double precision. The saddle points are the
+roots of $\varphi'$, a quadratic polynomial. From each saddle point the
+two lines of steepest descent are followed numerically until they have
+run into an end point of the integral, into another zero of the
+integrand, or out to infinity where $e^{\lambda t}$ decays; an end
+point where the integrand does not vanish starts a line of its own.
+A line is left for the straight chord to the zero it leads to as soon
+as the exponent descends along that chord; this is sampled at the
+scales of the chord and at smaller ones, down to $1/5000$ of its
+length, since close to a saddle point with a large $\varphi''$ a chord
+at an angle of more than $\pi/4$ to the line rises over a short part
+of its length (with parameters of the size $2 \cdot 10^4$, by more
+than 80 bits, which would be lost).
+With the saddle points as edges between these valleys, the path is a
+chain of edges from one end to the other, joined where the integrand
+is negligible. If there are several, the lowest one for which branch
+cuts can be found is taken, and if there is none (small parameters,
+where the lines can wind around the end points) the original contour.
+
+*Large parameters.* With parameters of the size $N$ a saddle point has
+the width $N^{-1/2}$, and both the position of the path and the
+exponent on it must be known to that resolution, which the exponent as
+written, a sum of terms of the size $N$, does not give in double
+precision. Each saddle point (and each end point where a line starts)
+therefore gets a *frame*: the kernel is translated to the base point
+$t_0$, computed as an exact number close to the root, and written as
+$$\varphi(t_0 + \delta) - \varphi(t_0) = \varphi'(t_0)\, \delta + \sum_j \mu_j
+\left(\log(1 + \zeta_j) - \zeta_j\right), \qquad \zeta_j = \frac{\beta_j \delta}{\alpha_j + \beta_j t_0},$$
+where $\varphi'(t_0)$ (which nearly vanishes) is computed once in ball
+arithmetic and $\log(1 + \zeta) - \zeta$ is evaluated without
+cancellation. The lines are traced and the part of the path around the
+base point is integrated in these coordinates, with the translated
+coefficients $\alpha_j + \beta_j t_0$ computed exactly, and the parts are
+joined at exact vertices. The working precision of the planning grows
+with the bits of the parameters; the cost of the quadrature itself
+does not.
+
+*Branch cuts.* Along the lines the logarithms are followed
+continuously. For the quadrature each term is given a cut which avoids
+the path and the original contour: $\log w = \operatorname{Log}(c w) +
+\gamma$ with a Gaussian integer $c$ and the constant $\gamma$ which makes
+this the principal branch on the original contour. If these cuts avoid
+both, the integrand so defined is analytic in a simply connected domain
+which contains both, and the integrals agree. That the cuts avoid the
+path is verified on every cell of the quadrature, and that they avoid
+the contour separately, both in ball arithmetic; nothing else about
+the path needs to be right, so that a poor path costs accuracy or time
+but not correctness.
+
+*The quadrature* is the cell scheme of `arb_hypgeom_1f1_integration` on
+the chords of the path. On a chord $[m - h, m + h]$ the exponent is
+expanded to the second order, $\varphi(m + u) - \varphi(m) = p \zeta + q
+\zeta^2 + \ldots$ with $\zeta = u/h$, and the two terms are maximised on
+the Bernstein ellipse; on a contour of steepest descent through a
+saddle point this is the growth of a Gaussian off its axis. The
+integrand is evaluated in vectorized `dfloat` arithmetic as
+$\exp((\varphi(m) - c) + \lambda u + \sum_j \mu_j \log(1 + u/d_j))$, with the
+complex logarithms through real logarithms and arctangents, or in `acb`
+arithmetic. Cells at the end points are integrated with the power
+series of the regular factor, and the tail of the integral for $U$ is
+bounded on a ray.
 :::
 :::
 
@@ -365,8 +512,15 @@ U(a,b,z) = \frac{\Gamma(1-b)}{\Gamma(a-b+1)} M(a,b,z) +
 \frac{\Gamma(b-1)}{\Gamma(a)} z^{1-b} M(a-b+1,2-b,z).
 $$
 If $b$ is an integer the limit is computed with
-`acb_hypgeom_u_1f1_series`; the output is indeterminate if $b$ is
-inexact and contains an integer.
+`acb_hypgeom_u_1f1_series`. If $b$ is within $2^{-12}$ of an integer
+$n$ (a point, a ball which contains $n$ or one which does not), where
+the two terms of the formula cancel, the function evaluates the Taylor
+expansion of $U$ with respect to $b$ at $n$, whose coefficients are
+those of the power series, with a bound for the remainder; see
+[](algorithms/special-functions/hypergeometric#confluent) for the bound
+and for the orders up to which this is done. The output is
+indeterminate if $b$ is inexact and contains an integer without being
+that close to it.
 :::
 
 ::: function
@@ -379,11 +533,23 @@ For small nonpositive integer $a$, $U$ is a polynomial in $z$ computed
 by its three-term recurrence (with binary splitting for $-a \ge 20$).
 If $a$ or $a - b + 1$ is a nonpositive integer, or `acb_hypgeom_u_use_asymp`
 returns true, the (terminating or convergent enough) asymptotic series
-is used. Otherwise the function compares the expected accuracy of the
-asymptotic series with that of `acb_hypgeom_u_1f1`, whose cancellation
-it estimates as $|z|/\log 2$ bits, and chooses the working precision.
-As with `acb_hypgeom_m`, real arguments with an inaccurate result are
-retried with `arb_hypgeom_u_integration`.
+is used; a terminating series whose terms cancel is evaluated again
+with more precision if the input is exact, from its Taylor expansion
+at the midpoint of $z$ if only $z$ is inexact, and by integration or
+at the midpoints of the input otherwise. Otherwise, if $|a| \le 30$ or $|a - b + 1| \le 30$, the
+function compares the expected accuracy of the asymptotic series with
+that of `acb_hypgeom_u_1f1`, whose cancellation it estimates as
+$|z|/\log 2$ bits, and chooses the working precision. For larger
+parameters, or if that result is not accurate, it estimates the
+cancellation of the two series of `acb_hypgeom_u_1f1`, the reach of
+the asymptotic series and the cost of an integral
+(`arb_hypgeom_u_integration` for real arguments with $z > 0$,
+`acb_hypgeom_u_integration` otherwise), and tries the cheapest method
+first with the working precision that the estimate calls for; see
+[](algorithms/special-functions/hypergeometric#choice). Inexact input
+is handled as for `acb_hypgeom_m`, by evaluation at the midpoints with
+a bound for the variation
+([](algorithms/special-functions/hypergeometric#inexact)).
 :::
 :::
 
@@ -543,6 +709,7 @@ void acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s, const acb_t z, int 
 void acb_hypgeom_gamma_upper_1f1a(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper_1f1b(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper_singular(acb_t res, slong s, const acb_t z, int regularized, slong prec)
+void acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_upper(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 
 Sets `res` to the upper incomplete gamma function $\Gamma(s,z) =
@@ -568,14 +735,28 @@ $$
 $$
 for an integer $n = -s \ge 0$ (the singular case, where the second and
 third formulas have removable singularities; it sums the finite sum
-directly and assumes that $n$ is not too large). The automatic version
-handles $z = 0$ and $s = 1, 2, 3$ by closed forms, returns 0 for $Q$ at
-nonpositive integer $s$, uses the asymptotic expansion for large $|z|$
-(with a region test for complex $s$ and $z$), the singular formula for
-integer $s \le 0$, and otherwise the first ${}_1F_1$ form for
-$\operatorname{Re} z \le 0$ and the second for $\operatorname{Re} z >
-0$. Real arguments with an inaccurate result are retried with
-`arb_hypgeom_gamma_upper_integration`.
+directly and assumes that $n$ is not too large). The `nointegration`
+version chooses between these: it handles $z = 0$ and $s = 1, 2, 3$ by
+closed forms, returns 0 for $Q$ at nonpositive integer $s$, uses the
+asymptotic expansion for large $|z|$ (with a region test for complex
+$s$ and $z$), the singular formula for integer $s \le 0$, and
+otherwise the first ${}_1F_1$ form for $\operatorname{Re} z \le 0$ and
+the second for $\operatorname{Re} z > 0$.
+
+The automatic version `acb_hypgeom_gamma_upper` combines the series
+and the asymptotic expansion, at an increasing working precision, with
+rigorous numerical integration along a steepest-descent contour, and
+for inexact input with evaluation at the midpoint and derivative
+bounds, as described in
+[](algorithms/special-functions/steepest-descent#choice). It gives
+accurate enclosures also where $|s|$ and $|z|$ are both large and for
+wide input balls. For a positive integer $s$ the terminating
+expansion is one of the methods for any $z$, and for $s = 1, 2, 3$
+the closed forms are returned at once. For input which is as accurate
+as the precision (rounded at this precision), up to 1000 bits, a
+result of the series or the expansion on the input balls which is up
+to 12 bits less accurate than the input permits is accepted. The
+integration is available for $|s|, |z| < 2^{860}$.
 :::
 :::
 
@@ -589,13 +770,19 @@ as in `acb_hypgeom_gamma_upper`.
 :::
 
 ::: function
+void acb_hypgeom_gamma_lower_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 void acb_hypgeom_gamma_lower(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 
 Sets `res` to the lower incomplete gamma function $\gamma(s,z) =
 \int_0^z t^{s-1} e^{-t} dt = \frac{z^s}{s} {}_1F_1(s, s+1, -z)$ if
 `regularized` is 0, to $P(s,z) = \gamma(s,z) / \Gamma(s)$ if
 `regularized` is 1, and to $\gamma^{*}(s,z) = z^{-s} P(s,z)$, which is
-entire in $s$ and $z$, if `regularized` is 2.
+entire in $s$ and $z$, if `regularized` is 2. The `nointegration`
+version evaluates the hypergeometric function by its series and
+asymptotic expansion (without the fallback of `acb_hypgeom_m` on
+numerical integration for real parameters); the automatic version
+also uses numerical integration and midpoint evaluation, as
+`acb_hypgeom_gamma_upper` does.
 :::
 
 ::: function
@@ -790,7 +977,9 @@ is nonzero) of the power series $z$, truncated to length `len`.
 ## Bessel functions {#bessel}
 
 The methods for the Bessel, Airy and Coulomb wave functions are
-described in [](algorithms/special-functions/bessel-airy).
+described in [](algorithms/special-functions/bessel-airy), and the
+numerical integration of the Bessel functions in
+[](algorithms/special-functions/steepest-descent).
 
 ::: function
 void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
@@ -829,21 +1018,41 @@ using $J_{-n}(z) = (-1)^n J_n(z)$ for negative integer $\nu$.
 :::
 
 ::: function
+void acb_hypgeom_bessel_j_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the Bessel function of the first kind $J_\nu(z)$.
 
 ::: details
-For $|z| < 8$ the function sums the convergent series. Otherwise it
-uses the asymptotic expansion if $|z| \ge 2^{64}$ or $2|z| \ge
-\mathit{prec}$, and the convergent series otherwise, with the working
-precision increased by an estimate $(|z| - |\operatorname{Im} z|)/\log 2$
-of the cancellation (no increase when the terms have equal signs or
-$\nu > |z|^2/4$). For inexact input with integer $\nu$ the series is
-evaluated at the midpoint and the propagated error is bounded with
-`acb_hypgeom_bessel_j_deriv_bound`. If the enclosure has less than one
-bit of accuracy, it is intersected with a direct bound for
-$|J_\nu(z)|$.
+The `nointegration` version chooses between the convergent series and
+the asymptotic expansion. For $|z| < 8$ it sums the convergent series.
+Otherwise it uses the asymptotic expansion if $|z| \ge 2^{64}$ or
+$2|z| \ge \mathit{prec}$ (and the expansion can reach the precision
+for the given $\nu$), and the convergent series otherwise, with the
+working precision increased by an estimate of the cancellation: $(|z|
+- |\operatorname{Im} z|)/\log 2$ bits, or less if the terms of the
+series grow less than that for large $|\nu|$ (no increase when the
+terms have equal signs or $\nu > |z|^2/4$). For inexact input with
+integer $\nu$ the series is evaluated at the midpoint and the
+propagated error is bounded with `acb_hypgeom_bessel_j_deriv_bound`.
+If the enclosure has less than one bit of accuracy, it is intersected
+with a direct bound for $|J_\nu(z)|$.
+
+The automatic version `acb_hypgeom_bessel_j` combines the series and
+the asymptotic expansion, at an increasing working precision, with
+rigorous numerical integration along a steepest-descent contour
+(`acb_hypgeom_bessel_j_integration`), and for inexact input with
+evaluation at the midpoint and derivative bounds, as described in
+[](algorithms/special-functions/steepest-descent#choice). It gives
+accurate enclosures also for large order and argument, including the
+transition region $z \approx \nu$, and for wide input balls. For a
+half-integer order and exact input, the asymptotic expansions
+terminate, and are used for any $z$ where they cost less than the
+other methods. For input which is as accurate as the precision
+(rounded at this precision), up to 1000 bits, a result of the series
+or the expansion on the input balls which is up to 12 bits less
+accurate than the input permits is accepted. The same applies to the
+automatic versions of the other Bessel functions below.
 :::
 :::
 
@@ -851,9 +1060,11 @@ $|J_\nu(z)|$.
 void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong d)
 
 Sets `res` to an upper bound, possibly crude, for $|J_\nu^{(d)}(z)|$
-($|J_\nu(z)|$ for $d = 0$). Implemented only for integer $\nu$, using
-for example $|J_n^{(d)}(z)| \le e^{|\operatorname{Im} z|}$; for
-non-integer $\nu$ the bound is infinite.
+($|J_\nu(z)|$ for $d = 0$). For integer $\nu$ this uses for example
+$|J_n^{(d)}(z)| \le e^{|\operatorname{Im} z|}$; for non-integer
+$\nu$ the bound is infinite (`acb_hypgeom_bessel_j` then bounds the
+derivative through the differential equation; see
+[](algorithms/special-functions/steepest-descent#choice)).
 :::
 
 ::: function
@@ -868,6 +1079,7 @@ constant term of $z$ is an inexact ball containing zero.
 :::
 
 ::: function
+void acb_hypgeom_bessel_y_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the Bessel function of the second kind
@@ -879,16 +1091,65 @@ $$
 Y_n(z) = -\frac{2}{\pi} \left( i^n K_n(iz) +
     \left[\log(iz)-\log(z)\right] J_n(z) \right).
 $$
-The output is indeterminate if $\nu$ is inexact and contains an
-integer.
+The `nointegration` version uses these formulas only, and its output
+is indeterminate if $\nu$ is inexact and contains an integer. The
+automatic version also uses numerical integration and midpoint
+evaluation, as `acb_hypgeom_bessel_j` does, and has no such
+restriction.
 :::
 
 ::: function
+void acb_hypgeom_bessel_jy_nointegration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
 
-Sets `res1` to $J_\nu(z)$ and `res2` to $Y_\nu(z)$, computed together.
-The Hankel functions $H_\nu^{(1)}(z), H_\nu^{(2)}(z) = J_\nu(z) \pm i
-Y_\nu(z)$ can be formed from them.
+Sets `res1` to $J_\nu(z)$ and `res2` to $Y_\nu(z)$, computed together
+(`res1` can be `NULL`). The Hankel functions $H_\nu^{(1)}(z),
+H_\nu^{(2)}(z) = J_\nu(z) \pm i Y_\nu(z)$ can be formed from them.
+:::
+
+::: function
+void acb_hypgeom_bessel_h1_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h2_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
+
+Sets `res` to the Hankel function $H^{(1)}_\nu(z)$ or
+$H^{(2)}_\nu(z)$ computed with the asymptotic expansion: these are
+the two terms $2 A_{\pm} B_{\pm}$ of `acb_hypgeom_bessel_j_asymp`.
+This requires $\operatorname{Re}(z) > 0$; the output is indeterminate
+otherwise.
+:::
+
+::: function
+void acb_hypgeom_bessel_j_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_y_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_jy_integration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h1_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_h2_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_i_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+void acb_hypgeom_bessel_k_integration(acb_t res, const acb_t nu, const acb_t z, slong prec)
+
+Sets `res` to the respective Bessel or Hankel function, computed by
+rigorous numerical integration of the Schläfli integral with integrand
+$\exp(z \sinh w - \nu w)$ along steepest-descent contours, as
+described in [](algorithms/special-functions/steepest-descent).
+
+::: details
+The cost is nearly independent of $\nu$ and $z$: about 0.1 ms at 64
+bits, 0.5 ms at 190 bits (up to which the quadrature uses
+[`dfloat`](dfloat) arithmetic), 5 ms at 512 bits and 100 ms at 2048
+bits. For exact $\nu$ and $z$ of large magnitude, the quadrature is
+replaced by saddle-point expansions where these are cheaper, which
+they are mainly at higher precision (for $\nu, z \approx 10^{10}$,
+by a factor 1.5 to 3 at 128 bits and 3 to 8 at 333 and 1000 bits).
+The result encloses the function on the input balls and loses
+only a few bits, except when the function is much smaller than the
+contributions of the saddle points to the integral: near a zero, or
+for $J_\nu$ and $I_\nu$ when $\nu$ is close to (but not exactly) a
+negative integer. Wide input balls are cheaper than exact input, and a
+ball $z$ crossing the branch cut gives the union of the enclosures on
+the two sides. The output is indeterminate if $z$ contains zero, if
+the midpoints of $\nu$ or $z$ are not smaller than $2^{900}$, or if no
+contour is found.
+:::
 :::
 
 ## Modified Bessel functions {#modified-bessel}
@@ -896,6 +1157,7 @@ Y_\nu(z)$ can be formed from them.
 ::: function
 void acb_hypgeom_bessel_i_asymp(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 void acb_hypgeom_bessel_i_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
+void acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_i(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_i_scaled(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
@@ -909,9 +1171,10 @@ I_{\nu}(z) = \frac{1}{\Gamma(\nu+1)} \left(\frac{z}{2}\right)^{\nu}
 $$
 or an automatic choice. `acb_hypgeom_bessel_i_scaled` computes
 $e^{-z} I_\nu(z)$; the `asymp` and `0f1` versions compute the scaled
-function if `scaled` is nonzero. For real arguments with an inaccurate
-result, the automatic versions also try
-`arb_hypgeom_bessel_i_integration`.
+function if `scaled` is nonzero. The `nointegration` version chooses
+between the series and the asymptotic expansion; the automatic
+versions also use numerical integration and midpoint evaluation, as
+`acb_hypgeom_bessel_j` does.
 :::
 
 ::: function
@@ -964,13 +1227,16 @@ indeterminate if $\nu$ is inexact and contains an integer.
 :::
 
 ::: function
+void acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_k(acb_t res, const acb_t nu, const acb_t z, slong prec)
 void acb_hypgeom_bessel_k_scaled(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
 Sets `res` to the modified Bessel function of the second kind
-$K_\nu(z)$, or to $e^z K_\nu(z)$, choosing between the asymptotic
-expansion and the convergent series. For real arguments with an
-inaccurate result they also try `arb_hypgeom_bessel_k_integration`.
+$K_\nu(z)$, or to $e^z K_\nu(z)$. The `nointegration` version chooses
+between the asymptotic expansion and the convergent series (its output
+is indeterminate if $\nu$ is inexact and contains an integer); the
+automatic versions also use numerical integration and midpoint
+evaluation, as `acb_hypgeom_bessel_j` does.
 :::
 
 ## Airy functions {#airy}
@@ -1158,12 +1424,78 @@ are unnecessary.
 The function handles special parameters first (terminating series,
 $z = 0$ and $z = 1$, $a = c$ or $b = c$ for $\mathbf{F}$, reduction to a
 polynomial by the Pfaff transformation when $c - a$ or $c - b$ is a
-nonpositive integer), then chooses with `acb_hypgeom_2f1_choose` between
-direct summation, one of five transformations and the corner case, and
-retries real arguments with `arb_hypgeom_2f1_integration` if the result
-is inaccurate. See [](acb_hypgeom/2f1) and
+nonpositive integer). For small parameters it then chooses with
+`acb_hypgeom_2f1_choose` between direct summation, one of five
+transformations and the corner case. Otherwise it estimates the number
+of terms and the cancellation of the four series at $z$ and $z/(z-1)$,
+of the connection formulas at $1/z$, $1/(1-z)$, $1-z$ and $1-1/z$
+(with their limit cases) and of the corner case from the parameters
+and $z$, evaluates the one with the least estimated cost at the
+working precision which that estimate calls for, and continues with
+the missing bits or with another formula if the result is inaccurate
+([](algorithms/special-functions/hypergeometric#choice-2f1)). It
+uses `arb_hypgeom_2f1_integration` for real arguments, and
+`acb_hypgeom_2f1_integration` for complex arguments, where that is
+estimated to cost less, or if the results are inaccurate. A polynomial whose terms cancel (${}_2F_1(423, 412, 153,
+-1)$, a polynomial of degree 259 in $z/(z-1)$ which loses 600 bits) is
+evaluated again with more precision if the input is exact, from its
+Taylor expansion at the midpoint of $z$ if only $z$ is inexact, or by
+integration. See [](acb_hypgeom/2f1) and
 [](algorithms/special-functions/gauss-2f1).
 :::
+:::
+
+::: function
+void acb_hypgeom_2f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t z, int regularized, slong prec)
+
+Computes ${}_2F_1(a,b,c,z)$ (regularized if the bit
+`ACB_HYPGEOM_2F1_REGULARIZED` is set in `regularized`) for complex
+parameters and argument by rigorous numerical integration of
+$$
+{}_2F_1(a,b,c,z) = \frac{\Gamma(c)}{\Gamma(b) \Gamma(c-b)} \int_0^1
+t^{b-1} (1-t)^{c-b-1} (1-zt)^{-a} \, dt
+$$
+along a path of steepest descent, as `acb_hypgeom_1f1_integration`.
+Requires $\operatorname{Re}(b) \ge 1$ and
+$\operatorname{Re}(c - b) \ge 1$, possibly after exchanging $a$ and $b$;
+the result is indeterminate otherwise, or if no path is found. Here
+the integrand has a third singular point $1/z$, a zero of the integrand
+if $\operatorname{Re}(a) < 0$, through which the path can lead. For
+$\operatorname{Re}(z) > 1$ the path is also sought among those which
+pass $1/z$ on the side away from the segment $[0, 1]$; for $z$ on the
+cut $(1, \infty)$ (with an imaginary part which is zero exactly) it
+passes below $1/z$, which gives the limit from the lower half-plane.
+For $\operatorname{Re}(z) > 1$ the integrals of ${}_2F_1(a,b,c,z) = (1 -
+z)^{c-a-b} {}_2F_1(c-a,c-b,c,z)$, which exist for the same parameters,
+are used as well, and first if their integrand has a zero at $1/z$
+and not a pole.
+A ball $z$ which meets the cut from both sides, or contains 1, gives
+an indeterminate result.
+
+If this integral does not exist at $1$, the function is computed for
+$\operatorname{Re}(z) < 0$, $\operatorname{Re}(b) \ge 1$ and
+$\operatorname{Re}(a - c) \ge 0$ (possibly after exchanging $a$ and
+$b$) from two integrals,
+$$
+{}_2F_1(a,b,c,z) = \frac{\Gamma(c)\, \Gamma(b - c + 1)}{2 \pi i\, \Gamma(b)}
+\left(e^{\pi i c} J_- - e^{-\pi i c} J_+\right), \qquad
+J = \int_0^1 t^{b-1} (1-t)^{a-c} (1 - (1-z) t)^{-a} \, dt,
+$$
+taken from 0 to 1 past the point $1/(1-z)$ on the lower and on the
+upper side; see [](algorithms/special-functions/hypergeometric#integration).
+This covers parameters $a$, $b$ larger than $c$ where the function
+oscillates, such as ${}_2F_1(423, 412, 153, z)$ for $z < 0$; where it
+does not oscillate, no paths are found or the two integrals cancel.
+
+For $\operatorname{Re}(a) \le 0$, $\operatorname{Re}(b) \ge 1$
+(possibly after exchanging $a$ and $b$) and $|z - \tfrac12| <
+\tfrac12$, the function is computed from the integral over a loop
+from 0 around 1, which is a combination of the same two integrals
+with the parameters $b - c + 1$, $b$, $a + b - c + 1$ at $1 - 1/z$.
+This covers the functions of the type of the Jacobi polynomials, $a <
+0 < c < b$, where they oscillate: ${}_2F_1(-n, n + 1, 1, z)$ for $0 <
+z < 1$ with $n = 10^6$, for example. $b - c + 1$ must not be a
+nonpositive integer.
 :::
 
 ::: function
@@ -1321,6 +1653,16 @@ H_n(z) = 2^n \sqrt{\pi} \left(
     \frac{1}{\Gamma((1-n)/2)}\, {}_1F_1\left(-\frac{n}{2},\frac{1}{2},z^2\right)
     - \frac{2z}{\Gamma(-n/2)}\, {}_1F_1\left(\frac{1-n}{2},\frac{3}{2},z^2\right)\right).
 $$
+
+::: details
+For a nonnegative integer $n < 30$ the three-term recurrence is used.
+Otherwise, for $\operatorname{Re} z > 0$ and $|z|^2$ large compared to
+the precision, $H_n(z) = 2^n U(-n/2, 1/2, z^2)$ is computed by the
+asymptotic series of $U$, and for a nonnegative integer $n$ by
+`acb_hypgeom_u`, which copes with the cancellation of the terms of
+the polynomial (also for an inexact $z$); in the other cases the
+formula above is used with `acb_hypgeom_m`.
+:::
 :::
 
 ::: function
@@ -1510,9 +1852,13 @@ and the error bounds are described in
 void acb_hypgeom_pfq_bound_factor(mag_t C, acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, ulong n)
 
 Sets `C` to a factor such that $\left|\sum_{k=n}^{\infty} T(k)\right|
-\le C |T(n)|$. The bound is infinite if $p > q$, if $\operatorname{Re}(b_i
-+ n) > 0$ fails for some $i$, or if $n$ is too small for the term ratio
-to be bounded below 1, even when the series converges. See
+\le C |T(n)|$. The bound is infinite if $p > q$, or if $n$ is too small
+for the terms to have started to decrease, even when the series
+converges. If $\operatorname{Re}(b_i + n) \le 0$ for some $i$, so that
+the terms can grow again near $k = -b_i$, or if the simplest bound for
+the term ratio is not less than 1, the bound is computed piecewise on
+ranges of indices (and depends on the distance from $b_i$ to the
+integers). See
 [](algorithms/special-functions/hypergeometric#tail-bound).
 :::
 
@@ -1529,7 +1875,13 @@ encountered, since cancellation is assumed to be significant. It also
 picks a reasonable truncation point for divergent (asymptotic) series,
 where the terms first decrease and then increase, stops at the last
 nonzero term of a terminating series, skips past parameters close to
-nonpositive integers, and returns at most $50 + 10\,\mathit{prec}$. It
+nonpositive integers, sums past a second maximum of the terms (which
+can follow $k = -\operatorname{Re} a_i$ for an upper parameter with
+negative real part), truncates before a nonpositive integer $-b_i$
+only if the terms beyond the truncation point and the bound of
+`acb_hypgeom_pfq_bound_factor` there are below the tolerance (a few
+truncation points are tried), and returns at most $50 +
+10\,\mathit{prec}$. It
 can give poor results if the parameters are extremely large or
 extremely close to nonpositive integers.
 :::
@@ -1540,6 +1892,9 @@ slong acb_hypgeom_pfq_series_choose_n(const acb_poly_struct * a, slong p, const 
 
 Like `acb_hypgeom_pfq_choose_n` for power series parameters and
 argument, using their constant terms; the result is at least `len`.
+An upper parameter whose constant term is a nonpositive integer $-m$
+and which has higher coefficients does not end the series: the terms
+beyond $m$ are counted without the factor that vanishes at $x = 0$.
 :::
 
 ::: function
@@ -1571,10 +1926,12 @@ The outputs must not alias the inputs. No truncation error is added.
 - `acb_hypgeom_pfq_sum` uses rectangular splitting if $n > 4$, $\mathit{prec}
   \ge 128$ and the parameters have few bits (and binary splitting if
   in addition $\mathit{prec} \ge 256$ and $z$ has fewer than
-  $\mathit{prec}/100$ bits), fast multipoint evaluation from 1500
-  bits when $n \ge 30 + 100000/(\mathit{prec} - 1000)$, and otherwise
-  binary splitting for $n > 8$ and the forward recurrence for $n \le
-  8$.
+  $\mathit{prec}/100$ bits, or if the parameters are complex and so
+  large that the error bounds of rectangular splitting would grow by
+  more than about $\mathit{prec}/10$ bits), fast multipoint evaluation
+  from 1500 bits when $n \ge 30 + 100000/(\mathit{prec} - 1000)$, and
+  otherwise binary splitting for $n > 8$ and the forward recurrence
+  for $n \le 8$.
 :::
 :::
 
@@ -1600,7 +1957,9 @@ $$
 computed directly from the series with `acb_hypgeom_pfq_sum` and a
 rigorous bound for the truncation error $\varepsilon$ from
 `acb_hypgeom_pfq_bound_factor`. If $n < 0$, the number of terms is
-chosen with `acb_hypgeom_pfq_choose_n`. If $T(n)$ is exactly zero (a
+chosen with `acb_hypgeom_pfq_choose_n`. If the bound is infinite and
+the series does not terminate within $n$ terms, the result is
+indeterminate and the series is not summed. If $T(n)$ is exactly zero (a
 terminating series), no error is added. For real input the error is
 added to the real part only.
 :::
@@ -1622,7 +1981,14 @@ divided by $\prod_i \Gamma(b_i)$, computed so that a lower parameter
 whose constant term is a nonpositive integer causes no division by
 zero. The `forward`, `bs` and `rs` versions use the forward recurrence,
 binary splitting and rectangular splitting, and the default version
-chooses automatically.
+chooses automatically: rectangular splitting above 900 bits for short
+parameters and a long argument; for a series with more terms than
+bits, short parameters and complex data, rectangular splitting (or
+binary splitting if the argument is short as well) at any precision,
+because the forward recurrence then loses most of the precision to the
+growth of the radii; binary splitting above 600 bits if parameters and
+argument are short, and for `len` above 20; the forward recurrence
+otherwise. See [](algorithms/special-functions/hypergeometric#summation).
 :::
 :::
 

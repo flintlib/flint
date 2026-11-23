@@ -40,6 +40,24 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_y, state)
         if (n_randint(state, 4) == 0)
             arb_zero(acb_imagref(z));
 
+        /* a large order with a comparatively small argument makes the
+           automatic functions use numerical integration, which is relatively
+           expensive (and tested separately in t-bessel_integration); test this
+           only occasionally */
+        if (n_randint(state, 16) != 0)
+        {
+            mag_t a, b;
+            mag_init(a);
+            mag_init(b);
+            acb_get_mag(a, nu);
+            acb_get_mag(b, z);
+            mag_mul_2exp_si(b, b, 4);
+            if (mag_cmp_2exp_si(a, 8) >= 0 && mag_cmp_2exp_si(a, 48) <= 0 && mag_cmp(a, b) >= 0)
+                acb_mul_2exp_si(nu, nu, -MAG_EXP(a) + n_randint(state, 8));
+            mag_clear(a);
+            mag_clear(b);
+        }
+
         acb_add_ui(nu1, nu, 1, prec);
 
         if (n_randint(state, 2))

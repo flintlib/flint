@@ -64,6 +64,34 @@ acb_hypgeom_pfq_series_sum(acb_poly_t s, acb_poly_t t,
         return;
     }
 
+    /* More terms than bits of precision, with complex numbers: the
+       forward recurrence loses about 0.16 bits per term to the
+       wrapping effect of the balls (all of the precision for the limit
+       cases of the connection formulas of 2F1 at |z| > 0.8, say, below
+       900 bits).  RS multiplies by z only about sqrt(n) times, at 1.3
+       to 1.7 times the cost; with few bits in z, binary splitting
+       does not lose anything. */
+    if (len <= 5 && n >= 64 && n > prec && abits < FLINT_MAX(prec * 0.1, 32))
+    {
+        int real = acb_poly_is_real(z);
+
+        for (i = 0; i < p && real; i++)
+            real = acb_poly_is_real(a + i);
+        for (i = 0; i < q && real; i++)
+            real = acb_poly_is_real(b + i);
+
+        if (!real)
+        {
+            if (zbits > prec * 0.1)
+                acb_hypgeom_pfq_series_sum_rs(s, t, a, p, b, q, z,
+                    regularized, n, len, prec);
+            else
+                acb_hypgeom_pfq_series_sum_bs(s, t, a, p, b, q, z,
+                    regularized, n, len, prec);
+            return;
+        }
+    }
+
     /* Prefer BS with small coefficients and high precision, or when
        computing derivatives of high order. */
     if ((abits < prec * 0.1 && zbits < prec * 0.1 && prec > 600) || len > 20)
