@@ -252,28 +252,40 @@ _gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
 {
     if (v_ctx->which_ring == GR_CTX_NMOD)
     {
-        if (NMOD_CTX(ctx).n != NMOD_CTX(v_ctx).n)
+        if (NMOD_CTX(v_ctx).n == NMOD_CTX(ctx).n)
+            res[0] = *((ulong *) v);
+        else if (NMOD_CTX(v_ctx).n % NMOD_CTX(ctx).n == 0)
+            NMOD_RED(res[0], *((ulong *) v), NMOD_CTX(ctx));
+        else
             return GR_DOMAIN;
 
-        *res = *((ulong *) v);
         return GR_SUCCESS;
     }
 
     if (v_ctx->which_ring == GR_CTX_NMOD_REDC || v_ctx->which_ring == GR_CTX_NMOD_REDC_FAST)
     {
-        if (NMOD_CTX(ctx).n != GR_NMOD_REDC_N(v_ctx))
+        if (GR_NMOD_REDC_N(v_ctx) == NMOD_CTX(ctx).n)
+            res[0] = nmod_redc_get_nmod(((ulong *) v)[0], GR_NMOD_REDC_CTX(v_ctx));
+        else if (GR_NMOD_REDC_N(v_ctx) % NMOD_CTX(ctx).n == 0)
+        {
+            res[0] = nmod_redc_get_nmod(((ulong *) v)[0], GR_NMOD_REDC_CTX(v_ctx));
+            NMOD_RED(res[0], res[0], NMOD_CTX(ctx));
+        }
+        else
             return GR_DOMAIN;
 
-        res[0] = nmod_redc_get_nmod(((ulong *) v)[0], GR_NMOD_REDC_CTX(v_ctx));
         return GR_SUCCESS;
     }
 
     if (v_ctx->which_ring == GR_CTX_FMPZ_MOD)
     {
-        if (!fmpz_equal_ui(FMPZ_MOD_CTX(v_ctx)->n, NMOD_CTX(ctx).n))
+        if (fmpz_equal_ui(FMPZ_MOD_CTX(v_ctx)->n, NMOD_CTX(ctx).n))
+            res[0] = fmpz_get_ui(v);
+        else if (fmpz_fdiv_ui(FMPZ_MOD_CTX(v_ctx)->n, NMOD_CTX(ctx).n) == 0)
+            res[0] = fmpz_get_nmod(v, NMOD_CTX(ctx));
+        else
             return GR_DOMAIN;
 
-        res[0] = fmpz_get_ui(v);
         return GR_SUCCESS;
     }
 
