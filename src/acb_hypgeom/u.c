@@ -377,7 +377,7 @@ u_near_order(const acb_t b, slong prec)
     arf_srcptr m = arb_midref(acb_realref(b));
     acb_t eps;
     mag_t e;
-    slong n, J = 0;
+    slong n, J = 0, bbits;
     double lq;
 
     /* (n below must fit in an slong, also on 32-bit systems) */
@@ -388,7 +388,8 @@ u_near_order(const acb_t b, slong prec)
     mag_init(e);
 
     n = arf_get_si(m, ARF_RND_NEAR);
-    acb_sub_si(eps, b, n, FLINT_MAX(prec, acb_bits(b)) + 64);
+    bbits = acb_bits(b);
+    acb_sub_si(eps, b, n, FLINT_MAX(prec, bbits) + 64);
     acb_get_mag(e, eps);
 
     if (mag_cmp_2exp_si(e, U_NEAR_MAX_EXP) < 0)
@@ -460,7 +461,7 @@ u_near_integer(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong pre
     acb_poly_t aa, bb, zz, s;
     acb_t eps, r;
     mag_t e, q, M, rem;
-    slong n, J, wp;
+    slong n, J, wp, bbits;
     double lq;
     int real, iter, ok = 0;
 
@@ -476,7 +477,8 @@ u_near_integer(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong pre
     real = acb_is_real(a) && acb_is_real(b) && acb_is_real(z) && arb_is_positive(acb_realref(z));
 
     n = arf_get_si(arb_midref(acb_realref(b)), ARF_RND_NEAR);
-    acb_sub_si(eps, b, n, FLINT_MAX(prec, acb_bits(b)) + 64);
+    bbits = acb_bits(b);
+    acb_sub_si(eps, b, n, FLINT_MAX(prec, bbits) + 64);
     acb_get_mag(e, eps);
     mag_mul_2exp_si(q, e, U_NEAR_RADIUS_EXP);
     lq = -mag_get_d_log2_approx(q) - 0.01;
@@ -812,7 +814,7 @@ u_integrate(acb_t best, slong * bestacc, const acb_t a, const acb_t b, const acb
        integral): along paths of steepest descent */
     if (racc < enough)
     {
-        acb_hypgeom_u_integration(t, a, b, z, iprec);
+        _acb_hypgeom_u_integration_paths(t, a, b, z, iprec);
         acc = acb_rel_accuracy_bits(t);
 
         if (acc > *bestacc || (acb_is_finite(t) && !acb_is_finite(best)))
@@ -1007,7 +1009,7 @@ u_majorant(mag_t M, acb_srcptr w, int stage, void * FLINT_UNUSED(ctx))
     else
     {
         /* the integrals along paths of steepest descent */
-        acb_hypgeom_u_integration(t, w, w + 1, w + 2, 30);
+        _acb_hypgeom_u_integration_paths(t, w, w + 1, w + 2, 30);
         acb_get_mag(M, t);
     }
 
@@ -1075,7 +1077,7 @@ u_inexact(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec, sl
        integer.) */
     q = hypot(nb - floor(nb + 0.5), sb);
     if (fabs(sb) < R[1])
-        R[1] = FLINT_MIN(R[1], FLINT_MAX(0.1 * fabs(nb - floor(nb + 0.5)), (0.249 - q) / 1.4143));
+        R[1] = fmin(R[1], fmax(0.1 * fabs(nb - floor(nb + 0.5)), (0.249 - q) / 1.4143));
 
     real = acb_is_real(a) && acb_is_real(b) && acb_is_real(z) && arb_is_positive(acb_realref(z));
 
@@ -1234,7 +1236,7 @@ u_poly_cost(const acb_t a, const acb_t b, const acb_t z, double wp, double nterm
     double pbits, zterm;
 
     pbits = acb_bits(a);
-    pbits = FLINT_MAX(pbits, acb_bits(b));
+    pbits = fmax(pbits, acb_bits(b));
 
     /* (an argument of many bits: see f_poly_cost in 2f1.c) */
     zterm = (acb_bits(z) > 64) ? (real ? 1.3e-4 : 4e-4) * wp : 0.0;
@@ -1477,7 +1479,7 @@ acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec
                     {
                         if (bestacc < accept)
                             u_poly_refine(best, &bestacc, a, b, z, prec, accept, nterms, real, 1e300,
-                                FLINT_MAX(5e4, tried ? 16.0 * u_poly_cost(a, b, z, prec, nterms, real)
+                                fmax(5e4, tried ? 16.0 * u_poly_cost(a, b, z, prec, nterms, real)
                                     : 0.5 * cint));
                     }
                     else if (bestacc < accept - 18)
@@ -1533,11 +1535,7 @@ acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec
 
     _acb_hypgeom_est_u_logabs(&lu, &lu2, A, B, Z, Lmax + 2.0);
 
-    pbits = FLINT_MAX(arf_bits(arb_midref(acb_realref(a))), arf_bits(arb_midref(acb_imagref(a))));
-    pbits = FLINT_MAX(pbits, arf_bits(arb_midref(acb_realref(b))));
-    pbits = FLINT_MAX(pbits, arf_bits(arb_midref(acb_imagref(b))));
-    pbits = FLINT_MAX(pbits, arf_bits(arb_midref(acb_realref(z))));
-    pbits = FLINT_MAX(pbits, arf_bits(arb_midref(acb_imagref(z))));
+    pbits = fmax(fmax(acb_bits(a), acb_bits(b)), acb_bits(z));
 
     /* The asymptotic series */
     {
@@ -1616,7 +1614,7 @@ inexact_input:
         if (intb && B2.re <= 0.0)
             T1 = FLINT_MAX(T1, 2.0 - B2.re);
         if (tw < 1e8 && T0 < 1e9 && T1 < 1e9)
-            cmain = FLINT_MIN(cmain, (T0 + T1) * _acb_hypgeom_est_series_term_cost(tw, pbits, real)
+            cmain = fmin(cmain, (T0 + T1) * _acb_hypgeom_est_series_term_cost(tw, pbits, real)
                         * (intb ? limit_factor : 1.0) + 40.0 + 0.01 * pow(tw, 1.5));
 
         cint = (int_ok == 0) ? 1e300

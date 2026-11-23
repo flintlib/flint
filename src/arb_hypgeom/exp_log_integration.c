@@ -454,7 +454,7 @@ el_cell_value(arb_t res, el_ctx * ctx, const arb_t m, const arb_t h, double md, 
        double: at a high precision, a cell far below the peak) */
     N = (dfloat_is_supported() && bits <= 4 * 53 && gi < ACB_CALC_GL_DFLOAT_STEPS
             && lmax / EL_LN2 > -900.0)
-        ? FLINT_MAX(1, (int) ceil(bits / 53.0)) : 0;
+        ? (int) ceil(fmax(bits / 53.0, 1.0)) : 0;
 
     if (N != 0)
     {

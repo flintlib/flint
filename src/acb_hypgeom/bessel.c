@@ -726,7 +726,8 @@ midpoint_route_cauchy(acb_t res, int kind, int scaled, const acb_t nu, const acb
                 mag_div(u, M, t);
                 mag_div(u, u, R);
                 arf_set_mag(xl, u);
-                k = FLINT_MAX(k, 4 + arf_abs_bound_lt_2exp_si(xl));
+                k = 4 + arf_abs_bound_lt_2exp_si(xl);
+                k = FLINT_MAX(k, 12);
                 k = FLINT_MIN(k, 4 * mprec + 1000);
             }
             mag_mul_2exp_si(h, R, -k);
@@ -2142,7 +2143,7 @@ attainable_accuracy(int kind, const acb_t nu, const acb_t z, double num,
     {
         t = acb_rel_accuracy_bits(z);
         if (t > 0)
-            t -= (slong) FLINT_MIN(log2(1.0 + zn + num), 1e6);
+            t -= (slong) fmin(log2(1.0 + zn + num), 1e6);
         acc = FLINT_MIN(acc, t);
     }
 
@@ -2298,11 +2299,13 @@ bessel_slack(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slo
        accounts (heuristically) for the conditioning */
     if (inexact)
     {
-        acc_in = FLINT_MIN(acb_rel_one_accuracy_bits(nu),
-                           acb_rel_accuracy_bits(z));
+        acc_in = acb_rel_one_accuracy_bits(nu);
+        target = acb_rel_accuracy_bits(z);
+        acc_in = FLINT_MIN(acc_in, target);
         acc_in = FLINT_MAX(acc_in, 0);
         goal = FLINT_MIN(prec, acc_in);
-        target = FLINT_MIN(goal, attainable_accuracy(kind, nu, z, num, zn, prec));
+        target = attainable_accuracy(kind, nu, z, num, zn, prec);
+        target = FLINT_MIN(goal, target);
     }
     else
     {
@@ -2436,7 +2439,7 @@ bessel_slack(acb_t res, int kind, int scaled, const acb_t nu, const acb_t z, slo
             if (!acb_is_finite(t))
                 break;
 
-            loss += (double) (accept - FLINT_MAX(acb_rel_accuracy_bits(t), 0)) + 10.0;
+            loss += (double) accept - fmax((double) acb_rel_accuracy_bits(t), 0.0) + 10.0;
         }
     }
 
@@ -2880,11 +2883,15 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z,
     acb_init(t);
     acb_init(u);
 
-    acc_in = FLINT_MIN(acb_rel_one_accuracy_bits(nu), acb_rel_accuracy_bits(z));
+    acc_in = acb_rel_one_accuracy_bits(nu);
+    accept = acb_rel_accuracy_bits(z);
+    acc_in = FLINT_MIN(acc_in, accept);
     acc_in = FLINT_MAX(acc_in, 0);
     goal = FLINT_MIN(prec, acc_in);
-    target = FLINT_MIN(goal, attainable_accuracy(KIND_Y, nu, z, num, zn, prec));
-    target = FLINT_MIN(target, attainable_accuracy(KIND_J, nu, z, num, zn, prec));
+    target = attainable_accuracy(KIND_Y, nu, z, num, zn, prec);
+    accept = attainable_accuracy(KIND_J, nu, z, num, zn, prec);
+    target = FLINT_MIN(target, accept);
+    target = FLINT_MIN(target, goal);
     accept = target - ((acb_is_exact(nu) && acb_is_exact(z)) ? 5 : 8);
 
     hopeless = goal <= 0 || target < 4 || !acb_is_finite(nu) || !acb_is_finite(z)

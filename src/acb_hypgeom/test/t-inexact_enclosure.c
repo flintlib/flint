@@ -815,7 +815,8 @@ TEST_FUNCTION_START(acb_hypgeom_inexact_enclosure, state)
             cplx ? n_randint(state, 4000) / 1000.0 - 2.0 : 0.0);
         _ie_add_error(z, state, e, cplx);
         real = acb_is_real(z);
-        goal = FLINT_MIN(prec, acb_rel_accuracy_bits(z));
+        goal = acb_rel_accuracy_bits(z);
+        goal = FLINT_MIN(prec, goal);
         goal = FLINT_MAX(goal, 2);
 
         s1 = _acb_hypgeom_inexact_taylor(r1, &order1, z, _ie_binomial_coeff, _ie_binomial_recur,

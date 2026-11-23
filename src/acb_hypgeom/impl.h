@@ -242,4 +242,10 @@ int _acb_hypgeom_u_integral(acb_t res, const acb_t a1, const acb_t ba1, const ac
 int _acb_hypgeom_2f1_integral(acb_t res, const acb_t b1, const acb_t cb1, const acb_t nega,
     const acb_t z, slong prec);
 
+/* acb_hypgeom_{1f1,u,2f1}_integration without the real-line integral for
+   real input (for callers which have tried that already) */
+void _acb_hypgeom_1f1_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
+void _acb_hypgeom_u_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec);
+void _acb_hypgeom_2f1_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t z, int regularized, slong prec);
+
 #endif

@@ -167,7 +167,7 @@ _acb_hypgeom_est_1f1_peak(double * kpk, m_cd a, m_cd b, m_cd z)
             best = v;
             kb = k;
             lo = kprev;
-            hi = FLINT_MIN(kmax, ceil(k * 1.5));
+            hi = fmin(kmax, ceil(k * 1.5));
         }
         kprev = k;
     }
@@ -879,7 +879,7 @@ _acb_hypgeom_est_2f1_peak(double * kpk, m_cd a, m_cd b, m_cd c, double lz)
     if (v < 1e300)
         return v;
 
-    klast = FLINT_MIN(m_last_index(a), m_last_index(b));
+    klast = fmin(m_last_index(a), m_last_index(b));
     kmax = 4.0 * (hypot(a.re, a.im) + hypot(b.re, b.im) + hypot(c.re, c.im)) / FLINT_MAX(-lz, 1e-6) + 64.0;
     kmax = FLINT_MIN(kmax, 1e12);
     kmax = FLINT_MIN(kmax, klast);
@@ -895,7 +895,7 @@ _acb_hypgeom_est_2f1_peak(double * kpk, m_cd a, m_cd b, m_cd c, double lz)
             best = v;
             kb = k;
             lo = kprev;
-            hi = FLINT_MIN(kmax, ceil(k * 1.5));
+            hi = fmin(kmax, ceil(k * 1.5));
         }
         kprev = k;
     }
@@ -957,7 +957,7 @@ _acb_hypgeom_est_2f1_terms_max(m_cd a, m_cd b, m_cd c, double lz, double kpk, do
     if (f_scan(&kpk, &lo, a, b, c, lz, target, kmax) < 1e300)
         return lo;
 
-    klast = FLINT_MIN(m_last_index(a), m_last_index(b));
+    klast = fmin(m_last_index(a), m_last_index(b));
     lo = kpk;
     hi = kpk + 16.0;
 
@@ -1434,7 +1434,7 @@ _acb_hypgeom_est_series_term_cost(double wp, double bits, int real)
        the fit above grows like wp^3 beyond the measurements, and the
        series must remain cheaper than an integral, whose cost grows
        like wp^2.7, at a high enough precision) */
-    extra = FLINT_MIN(extra, 1.8e-4 * wp * log2(wp + 2.0));
+    extra = fmin(extra, 1.8e-4 * wp * log2(wp + 2.0));
 
     if (real)
         return 0.25 + 0.006 * sqrt(wp) + 1.5e-5 * wp + 7e-4 * bits + extra;

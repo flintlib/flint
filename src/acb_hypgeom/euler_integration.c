@@ -17,6 +17,7 @@
 #include <math.h>
 #include "acb.h"
 #include "acb_hypgeom.h"
+#include "arb_hypgeom.h"
 #include "acb_hypgeom/impl.h"
 
 int
@@ -329,7 +330,7 @@ _acb_hypgeom_2f1_integral(acb_t res, const acb_t b1, const acb_t cb1, const acb_
 }
 
 void
-acb_hypgeom_1f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z,
+_acb_hypgeom_1f1_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t z,
     int regularized, slong prec)
 {
     acb_t t, a1, ba1, I;
@@ -441,7 +442,7 @@ _acb_hypgeom_u_integration(acb_t res, const acb_t a, const acb_t b, const acb_t 
 }
 
 void
-acb_hypgeom_u_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec)
+_acb_hypgeom_u_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec)
 {
     acb_t res2;
     acb_init(res2);
@@ -940,7 +941,7 @@ _acb_hypgeom_2f1_integration_cut(acb_t res, const acb_t a, const acb_t b, const 
 }
 
 void
-acb_hypgeom_2f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t c,
+_acb_hypgeom_2f1_integration_paths(acb_t res, const acb_t a, const acb_t b, const acb_t c,
     const acb_t z, int regularized, slong prec)
 {
     acb_t res2;
@@ -1050,4 +1051,133 @@ acb_hypgeom_2f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t
 
     acb_set_round(res, res2, prec);
     acb_clear(res2);
+}
+
+/* The public functions: for real input first the integral on the real
+   line (arb_hypgeom), which is faster at low precision and loses no bits
+   to the complex arithmetic of the paths, and the paths if that does not
+   apply or falls short of what the input allows. */
+
+static slong
+euler_enough(const acb_t a, const acb_t b, const acb_t c, const acb_t z, slong prec)
+{
+    slong acc = prec, t;
+
+    t = acb_rel_accuracy_bits(a);
+    acc = FLINT_MIN(acc, t);
+    t = acb_rel_accuracy_bits(b);
+    acc = FLINT_MIN(acc, t);
+    if (c != NULL)
+    {
+        t = acb_rel_accuracy_bits(c);
+        acc = FLINT_MIN(acc, t);
+    }
+    t = acb_rel_accuracy_bits(z);
+    acc = FLINT_MIN(acc, t);
+    return acc - 16;
+}
+
+/* keeps the more accurate of res (the real result, in its real part)
+   and the result along the paths */
+static void
+euler_keep(acb_t res, const acb_t t)
+{
+    if (acb_rel_accuracy_bits(t) > acb_rel_accuracy_bits(res)
+        || (acb_is_finite(t) && !acb_is_finite(res)))
+        acb_set(res, t);
+}
+
+void
+acb_hypgeom_1f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z,
+    int regularized, slong prec)
+{
+    acb_t t;
+
+    if (!(acb_is_real(a) && acb_is_real(b) && acb_is_real(z)))
+    {
+        _acb_hypgeom_1f1_integration_paths(res, a, b, z, regularized, prec);
+        return;
+    }
+
+    acb_init(t);
+    arb_hypgeom_1f1_integration(acb_realref(t), acb_realref(a), acb_realref(b),
+        acb_realref(z), regularized, prec);
+    arb_zero(acb_imagref(t));
+    if (!arb_is_finite(acb_realref(t)))
+        acb_indeterminate(t);
+
+    if (acb_rel_accuracy_bits(t) < euler_enough(a, b, NULL, z, prec))
+    {
+        acb_t u;
+        acb_init(u);
+        _acb_hypgeom_1f1_integration_paths(u, a, b, z, regularized, prec);
+        euler_keep(t, u);
+        acb_clear(u);
+    }
+
+    acb_swap(res, t);
+    acb_clear(t);
+}
+
+void
+acb_hypgeom_u_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec)
+{
+    acb_t t;
+
+    if (!(acb_is_real(a) && acb_is_real(b) && acb_is_real(z)))
+    {
+        _acb_hypgeom_u_integration_paths(res, a, b, z, prec);
+        return;
+    }
+
+    acb_init(t);
+    arb_hypgeom_u_integration(acb_realref(t), acb_realref(a), acb_realref(b),
+        acb_realref(z), prec);
+    arb_zero(acb_imagref(t));
+    if (!arb_is_finite(acb_realref(t)))
+        acb_indeterminate(t);
+
+    if (acb_rel_accuracy_bits(t) < euler_enough(a, b, NULL, z, prec))
+    {
+        acb_t u;
+        acb_init(u);
+        _acb_hypgeom_u_integration_paths(u, a, b, z, prec);
+        euler_keep(t, u);
+        acb_clear(u);
+    }
+
+    acb_swap(res, t);
+    acb_clear(t);
+}
+
+void
+acb_hypgeom_2f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t c,
+    const acb_t z, int regularized, slong prec)
+{
+    acb_t t;
+
+    if (!(acb_is_real(a) && acb_is_real(b) && acb_is_real(c) && acb_is_real(z)))
+    {
+        _acb_hypgeom_2f1_integration_paths(res, a, b, c, z, regularized, prec);
+        return;
+    }
+
+    acb_init(t);
+    arb_hypgeom_2f1_integration(acb_realref(t), acb_realref(a), acb_realref(b),
+        acb_realref(c), acb_realref(z), regularized, prec);
+    arb_zero(acb_imagref(t));
+    if (!arb_is_finite(acb_realref(t)))
+        acb_indeterminate(t);
+
+    if (acb_rel_accuracy_bits(t) < euler_enough(a, b, c, z, prec))
+    {
+        acb_t u;
+        acb_init(u);
+        _acb_hypgeom_2f1_integration_paths(u, a, b, c, z, regularized, prec);
+        euler_keep(t, u);
+        acb_clear(u);
+    }
+
+    acb_swap(res, t);
+    acb_clear(t);
 }

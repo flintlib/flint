@@ -154,7 +154,7 @@ attainable_accuracy(const acb_t s, const acb_t z, int upper, double sn, double z
                     if (upper ? (zr <= sr - 1.0) : (zr >= sr))
                         lcr = FLINT_MIN(lcr, lb);
 
-                    lc = FLINT_MIN(lc, log2(1.0 + exp2(FLINT_MIN(lcr, 1e6))));
+                    lc = fmin(lc, log2(1.0 + exp2(fmin(lcr, 1e6))));
                 }
             }
 
@@ -167,7 +167,7 @@ attainable_accuracy(const acb_t s, const acb_t z, int upper, double sn, double z
     {
         t = upper ? acb_rel_one_accuracy_bits(s) : acb_rel_accuracy_bits(s);
         if (t > 0)
-            t -= (slong) FLINT_MIN(log2(1.0 + sn * (1.0 + fabs(
+            t -= (slong) fmin(log2(1.0 + sn * (1.0 + fabs(
                 log(2.0 * (sn + 1.0)) - log(fmax(zn, 1e-300))))), 1e6);
         acc = FLINT_MIN(acc, t);
     }
@@ -764,7 +764,8 @@ midpoint_route_cauchy(acb_t res, const acb_t s, const acb_t z, int upper,
                 mag_div(u, M, t);
                 mag_div(u, u, R);
                 arf_set_mag(e, u);
-                k = FLINT_MAX(k, 4 + arf_abs_bound_lt_2exp_si(e));
+                k = 4 + arf_abs_bound_lt_2exp_si(e);
+                k = FLINT_MAX(k, 12);
                 k = FLINT_MIN(k, 4 * mprec + 1000);
             }
             mag_mul_2exp_si(h, R, -k);
@@ -1025,7 +1026,7 @@ series_cancellation(int upper, int by_lower, double sre, double sn, double zn, d
         {
             double m = (zn > sn) ? (zn - sn) - sn * log(zn / sn) : 0.0;
 
-            c = FLINT_MIN(c, 1.45 * m + log2(1.0 + sqrt(sn)) + 4.0);
+            c = fmin(c, 1.45 * m + log2(1.0 + sqrt(sn)) + 4.0);
         }
     }
     else
@@ -1097,11 +1098,13 @@ gamma_incomplete_core_u(acb_t res, const acb_t s, const acb_t z, int upper,
        terminate after the first cheap attempt; the target also
        accounts (heuristically) for the conditioning */
     /* (Gamma(s,z) is entire in s, while gamma(s,z) has a pole at 0) */
-    acc_in = FLINT_MIN(upper ? acb_rel_one_accuracy_bits(s) : acb_rel_accuracy_bits(s),
-                       acb_rel_accuracy_bits(z));
+    acc_in = upper ? acb_rel_one_accuracy_bits(s) : acb_rel_accuracy_bits(s);
+    target = acb_rel_accuracy_bits(z);
+    acc_in = FLINT_MIN(acc_in, target);
     acc_in = FLINT_MAX(acc_in, 0);
     goal = FLINT_MIN(prec, acc_in);
-    target = FLINT_MIN(goal, attainable_accuracy(s, z, upper, num, zn, prec));
+    target = attainable_accuracy(s, z, upper, num, zn, prec);
+    target = FLINT_MIN(goal, target);
 
     /* Accept results this close to the target.  For inexact input the
        target is only a heuristic estimate of what is attainable; a
@@ -1264,7 +1267,8 @@ gamma_incomplete_core_u(acb_t res, const acb_t s, const acb_t z, int upper,
 
             if (lsmall > 0.0)
             {
-                awpl = FLINT_MAX(16, goal + 8 - (slong) fmin(lsmall, 1e9));
+                awpl = goal + 8 - (slong) fmin(lsmall, 1e9);
+                awpl = FLINT_MAX(awpl, 16);
                 asymp_ok = asymp_ok || isfinite(asymp_terms(num, zn, awpl, nterm));
                 /* (only for exact input: the bits are needed otherwise) */
                 if (asymp_ok && !inexact)
@@ -1707,7 +1711,7 @@ gamma_incomplete_x(acb_t res, const acb_t s, const acb_t z, int upper,
            took 124 ms instead of 47 at 33333 bits.) */
         if (lsm < -3.0 && (acb_is_exact(s) || lsm + lsum < -3.0))
         {
-            slong p2 = prec + (slong) fmax(lsm, -1e9) + 30, acc;
+            slong p2 = prec + (slong) fmax(lsm, -1e9) + 30, acc, acc2;
 
             acb_init(g);
             gamma_incomplete_x(g, s, z, !upper, 1, FLINT_MAX(p2, 32), 1, uprec);
@@ -1716,7 +1720,9 @@ gamma_incomplete_x(acb_t res, const acb_t s, const acb_t z, int upper,
             {
                 acb_sub_ui(g, g, 1, prec + 10);
                 acb_neg(g, g);
-                acc = FLINT_MIN(acb_rel_accuracy_bits(s), acb_rel_accuracy_bits(z));
+                acc = acb_rel_accuracy_bits(s);
+                acc2 = acb_rel_accuracy_bits(z);
+                acc = FLINT_MIN(acc, acc2);
                 acc = FLINT_MIN(prec, FLINT_MAX(acc, 0));
                 /* (as good as it gets for the input) */
                 if (acb_rel_accuracy_bits(g) >= acc - 8)
@@ -1743,7 +1749,9 @@ gamma_incomplete_x(acb_t res, const acb_t s, const acb_t z, int upper,
         int ds, dx, mono;
         slong acc0, acc;
 
-        acc0 = FLINT_MIN(acb_rel_accuracy_bits(s), acb_rel_accuracy_bits(z));
+        acc0 = acb_rel_accuracy_bits(s);
+        acc = acb_rel_accuracy_bits(z);
+        acc0 = FLINT_MIN(acc0, acc);
         acc0 = FLINT_MAX(acc0, 0);
         acc = attainable_accuracy(s, z, upper,
             fabs(arf_get_d(arb_midref(acb_realref(s)), ARF_RND_NEAR)),

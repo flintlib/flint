@@ -245,13 +245,14 @@ bessel_order_bits(const acb_t nu)
 static slong
 bessel_large_bits(const acb_t z)
 {
-    slong e;
+    slong e, f;
 
     if (!acb_is_finite(z) || (arf_cmpabs_2exp_si(arb_midref(acb_realref(z)), 64) < 0
         && arf_cmpabs_2exp_si(arb_midref(acb_imagref(z)), 64) < 0))
         return 0;
     e = arf_abs_bound_lt_2exp_si(arb_midref(acb_realref(z)));
-    e = FLINT_MAX(e, arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(z))));
+    f = arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(z)));
+    e = FLINT_MAX(e, f);
     return FLINT_MIN(e, 1100);
 }
 

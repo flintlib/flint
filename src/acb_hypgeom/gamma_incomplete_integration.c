@@ -161,12 +161,14 @@ gamma_nosplit(acb_t res, acb_t FLINT_UNUSED(res2), const acb_t s, const acb_t z,
     gamma_ctx G;
     double tol = prec * SD_LN2 + 12.0;
     int ok, upper = *(int *) param;
-    slong wp = prec + 30, e;
+    slong wp = prec + 30, e, e2;
 
     /* The starting point log z is needed to more bits for large s
        and z: the integrand varies at the rate |z - s| there (and
        log z has up to 10 bits before the point). */
-    e = FLINT_MAX(acb_bits_size(s), acb_bits_size(z));
+    e = acb_bits_size(s);
+    e2 = acb_bits_size(z);
+    e = FLINT_MAX(e, e2);
     if (e > 30)
         wp += e - 18;
 

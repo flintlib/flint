@@ -368,7 +368,7 @@ _acb_hypgeom_inexact_terms_bound(mag_t M, acb_srcptr a, slong p, acb_srcptr b, s
                 if (!(L + k > 0.0))
                     qp = 1e300;
                 else if (j < p)
-                    qp *= FLINT_MAX(1.0, (fabs(ar[j]) + fabs(ai[j]) + arad[j] + k) * (1.0 + 1e-10) / (L + k));
+                    qp *= fmax(1.0, (fabs(ar[j]) + fabs(ai[j]) + arad[j] + k) * (1.0 + 1e-10) / (L + k));
                 else
                     qp /= (L + k);
             }

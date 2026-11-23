@@ -445,7 +445,7 @@ static void
 sdq_node_acb(acb_t t, const sdq_acb_work * W, slong k, acb_t w, acb_t e, arb_ptr r)
 {
     const sdq_ctx * ctx = W->ctx;
-    slong n = W->n, kk, p;
+    slong n = W->n, kk, p, q;
     cd phi, d1, d2, wd;
     double xd;
     arb_ptr sh = r, ch = r + 1, sn = r + 2, cs = r + 3;
@@ -459,7 +459,8 @@ sdq_node_acb(acb_t t, const sdq_acb_work * W, slong k, acb_t w, acb_t e, arb_ptr
     _sd_phi(&phi, &d1, &d2, ctx->P, ctx->F, wd);
     p = W->wp + (slong) fmax(fmin((phi.re - W->top - ctx->lref) / SD_LN2 + 2.0, 0.0), -1e9);
     p = FLINT_MAX(p, 32);
-    p = FLINT_MAX(p, (slong) sdq_min_bits(ctx, wd));
+    q = (slong) sdq_min_bits(ctx, wd);
+    p = FLINT_MAX(p, q);
 
     /* w = m +- h x (the cached nodes can have a higher precision) */
     if (ctx->F->rel)
@@ -1143,7 +1144,7 @@ _sd_integrate_pieces(acb_t res, const sd_contour * C, const sd_problem * P,
 
     if (dfloat_is_supported() && ctx.bits <= 4 * 53)
     {
-        ctx.N = FLINT_MAX(1, (int) ceil(ctx.bits / 53.0));
+        ctx.N = (int) ceil(fmax(ctx.bits / 53.0, 1.0));
         ctx.wp = 53 * ctx.N + 10;
         ctx.imax = SDQ_DFLOAT_STEPS - 1;
         ctx.scratch = flint_malloc(SDQ_DFLOAT_NMAX * 12 * (ctx.N + 1) * sizeof(double));

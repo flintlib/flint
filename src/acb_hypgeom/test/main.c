@@ -56,6 +56,7 @@
 #include "t-hermite_h.c"
 #include "t-inexact_enclosure.c"
 #include "t-inexact_input.c"
+#include "t-integration_real.c"
 #include "t-large_parameters.c"
 #include "t-jacobi_p.c"
 #include "t-laguerre_l.c"
@@ -136,6 +137,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_hypgeom_hermite_h),
     TEST_FUNCTION(acb_hypgeom_inexact_enclosure),
     TEST_FUNCTION(acb_hypgeom_inexact_input),
+    TEST_FUNCTION(acb_hypgeom_integration_real),
     TEST_FUNCTION(acb_hypgeom_large_parameters),
     TEST_FUNCTION(acb_hypgeom_jacobi_p),
     TEST_FUNCTION(acb_hypgeom_laguerre_l),

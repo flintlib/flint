@@ -556,7 +556,7 @@ f_majorant(mag_t M, acb_srcptr w, int stage, void * ctx)
     else
     {
         /* the integral along a path of steepest descent */
-        acb_hypgeom_2f1_integration(t, w, w + 1, w + 2, w + 3, flags, 30);
+        _acb_hypgeom_2f1_integration_paths(t, w, w + 1, w + 2, w + 3, flags, 30);
         acb_get_mag(M, t);
     }
 
@@ -602,8 +602,8 @@ f_inexact(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t z,
        The disc for z must not meet the cut. */
     spar = 2.0 + log(2.0 + hypot(na, sa) + hypot(nb, sb) + hypot(nc, sc)) + fabs(log(d1));
     R[0] = R[1] = R[2] = 1.0 / (n * spar);
-    q = FLINT_MIN(hypot(na, sa), hypot(nb, sb));
-    q = FLINT_MIN(q, hypot(na, sa) * hypot(nb, sb) / FLINT_MAX(hypot(nc, sc), 1.0));
+    q = fmin(hypot(na, sa), hypot(nb, sb));
+    q = fmin(q, hypot(na, sa) * hypot(nb, sb) / fmax(hypot(nc, sc), 1.0));
     R[3] = FLINT_MIN(d1, 1.0) / (n * (1.0 + q));
     dcut = (nz > 1.0) ? fabs(sz) : d1;
     R[3] = FLINT_MIN(R[3], 0.05 * dcut);
@@ -787,7 +787,7 @@ f_integrate(acb_t best, slong * bestacc, const acb_t a, const acb_t b, const acb
        integral): along paths of steepest descent */
     if (racc < enough)
     {
-        acb_hypgeom_2f1_integration(t, a, b, c, z, flags, iprec);
+        _acb_hypgeom_2f1_integration_paths(t, a, b, c, z, flags, iprec);
         acc = acb_rel_accuracy_bits(t);
 
         if (acc > *bestacc || (acb_is_finite(t) && !acb_is_finite(best)))
@@ -1005,8 +1005,8 @@ f_poly_cost(const acb_t a, const acb_t b, const acb_t c, const acb_t z, double w
     double pbits, zterm;
 
     pbits = acb_bits(a);
-    pbits = FLINT_MAX(pbits, acb_bits(b));
-    pbits = FLINT_MAX(pbits, acb_bits(c));
+    pbits = fmax(pbits, acb_bits(b));
+    pbits = fmax(pbits, acb_bits(c));
 
     /* (an argument of many bits is multiplied in by rectangular
        splitting, at about 1.3e-4 wp microseconds per term for real
@@ -1489,7 +1489,7 @@ acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b,
                 - arf_get_d(arb_midref(acb_imagref(b)), ARF_RND_NEAR);
 
             w = FLINT_MIN(FLINT_MAX(1.0 - sr, 0.0), 1.0);
-            f = FLINT_MIN(FLINT_MAX(hypot(sr, si), 1.0 / (1.0 + 0.69 * (double) lost)), 1.0);
+            f = fmin(fmax(hypot(sr, si), 1.0 / (1.0 + 0.69 * (double) lost)), 1.0);
             w = w * (double) lost + log(f) * F_INVLOG2;
 
             if (w > 0.0)
@@ -1796,21 +1796,14 @@ acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b,
     if (int_ok < 0)
         int_ok = f_integral_domain(a, b, c, z, A, B, C, Z, prec);
 
-    M.pbits = FLINT_MAX(arf_bits(arb_midref(acb_realref(a))), arf_bits(arb_midref(acb_imagref(a))));
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_realref(b))));
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_imagref(b))));
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_realref(c))));
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_imagref(c))));
-    M.parbits = M.pbits;
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_realref(z))));
-    M.pbits = FLINT_MAX(M.pbits, arf_bits(arb_midref(acb_imagref(z))));
+    M.parbits = fmax(fmax(acb_bits(a), acb_bits(b)), acb_bits(c));
+    M.pbits = fmax(M.parbits, acb_bits(z));
 
     /* (z / (z - 1), as the series at it gets it) */
     acb_sub_ui(t, z, 1, prec);
     acb_div(t, z, t, prec);
-    M.wpbits = FLINT_MAX(M.parbits, arf_bits(arb_midref(acb_realref(t))));
-    M.wpbits = FLINT_MAX(M.wpbits, arf_bits(arb_midref(acb_imagref(t))));
-    M.maxpar = FLINT_MAX(hypot(A.re, A.im), FLINT_MAX(hypot(B.re, B.im), hypot(C.re, C.im)));
+    M.wpbits = fmax(M.parbits, acb_bits(t));
+    M.maxpar = fmax(hypot(A.re, A.im), fmax(hypot(B.re, B.im), hypot(C.re, C.im)));
     M.real = real;
     M.cpar = (A.im != 0.0 || B.im != 0.0 || C.im != 0.0);
     M.intpar = !M.cpar && A.re == floor(A.re) && B.re == floor(B.re) && C.re == floor(C.re);
@@ -1841,7 +1834,7 @@ acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b,
         {
             M.pk[i] = _acb_hypgeom_est_2f1_peak(M.kpk + i, M.fa[i], M.fb[i], C, M.flz[i]);
             Lam[i] = pref[i] + M.pk[i];
-            cap = FLINT_MIN(cap, Lam[i] + log(M.kpk[i] + 1.0 / (-M.flz[i]) + 6.0));
+            cap = fmin(cap, Lam[i] + log(M.kpk[i] + 1.0 / (-M.flz[i]) + 6.0));
         }
     }
 
@@ -1883,7 +1876,7 @@ acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b,
             if (valid[i])
             {
                 Lam[i] = M.E[i - F_CONN].Lam;
-                cap = FLINT_MIN(cap, Lam[i] + log(2.0 * (FLINT_MAX(M.E[i - F_CONN].kpk[0],
+                cap = fmin(cap, Lam[i] + log(2.0 * (FLINT_MAX(M.E[i - F_CONN].kpk[0],
                     M.E[i - F_CONN].kpk[1]) + 1.0 / (-M.E[i - F_CONN].lw) + 6.0)));
             }
         }

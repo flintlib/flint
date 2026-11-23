@@ -165,7 +165,10 @@ TEST_FUNCTION_START(acb_hypgeom_sd_frames, state)
         else if (type == 2)
             rand_large(nu, state, e - (slong) n_randint(state, 60), real);
         else
-            rand_large(nu, state, FLINT_MIN(e + (slong) n_randint(state, 30), 850), real);
+            {
+            slong e2 = e + (slong) n_randint(state, 30);
+            rand_large(nu, state, FLINT_MIN(e2, 850), real);
+        }
 
         if (real && arb_is_negative(acb_realref(z)))
             acb_neg(z, z);
@@ -252,9 +255,15 @@ TEST_FUNCTION_START(acb_hypgeom_sd_frames, state)
         {
             nlarge++;
 
-            acc = FLINT_MIN(acb_rel_accuracy_bits(a0), acb_rel_accuracy_bits(a1));
-            acc = FLINT_MIN(acc, acb_rel_accuracy_bits(b0));
-            acc = FLINT_MIN(acc, acb_rel_accuracy_bits(b1));
+            slong acc2;
+
+            acc = acb_rel_accuracy_bits(a0);
+            acc2 = acb_rel_accuracy_bits(a1);
+            acc = FLINT_MIN(acc, acc2);
+            acc2 = acb_rel_accuracy_bits(b0);
+            acc = FLINT_MIN(acc, acc2);
+            acc2 = acb_rel_accuracy_bits(b1);
+            acc = FLINT_MIN(acc, acc2);
 
             if (!acb_contains_zero(t) || (exact && acc < prec - 16))
             {

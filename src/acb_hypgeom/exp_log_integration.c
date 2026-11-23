@@ -716,7 +716,7 @@ cel_cell_value(acb_t res, cel_ctx * ctx, const acb_t m, const acb_t h, cel_cd md
        double: at a high precision, a cell far below the highest point) */
     N = (dfloat_is_supported() && bits <= 4 * 53 && gi < ACB_CALC_GL_DFLOAT_STEPS
             && taper > -900.0)
-        ? FLINT_MAX(1, (int) ceil(bits / 53.0)) : 0;
+        ? (int) ceil(fmax(bits / 53.0, 1.0)) : 0;
 
     /* The exponent as a polynomial in x, exp(sum_k c_k x^k) with
        c_0 = phi(m) - c, c_1 = phi'(m) h and
@@ -736,7 +736,7 @@ cel_cell_value(acb_t res, cel_ctx * ctx, const acb_t m, const acb_t h, cel_cd md
         lmag2 += cel_abs(d1) * ah;
         bits2 = ctx->prec + 10.0 + log2(lmag2);
         bits2 = fmax(bits2 + taper, log2(lmag2) + 14.0);
-        N2 = (bits2 <= 4 * 53) ? FLINT_MAX(1, (int) ceil(bits2 / 53.0)) : 0;
+        N2 = (bits2 <= 4 * 53) ? (int) ceil(fmax(bits2 / 53.0, 1.0)) : 0;
 
         if (N2 != 0 && (N == 0 || N2 < N))
         {

@@ -1898,13 +1898,15 @@ int
 _sd_problem_init_frames(sd_problem * P, const acb_t alpha, int sym, const acb_t nu,
     const acb_t start, double drop, double tailtol, double maxdrop, int big)
 {
-    slong bits;
+    slong bits, bits2;
 
     if (!acb_is_finite(alpha) || !acb_is_finite(nu) || (start != NULL && !acb_is_finite(start)))
         return 0;
 
     /* doubles represent the parameters accurately enough below 2^44 */
-    bits = FLINT_MAX(sd_bits(alpha), sd_bits(nu));
+    bits = sd_bits(alpha);
+    bits2 = sd_bits(nu);
+    bits = FLINT_MAX(bits, bits2);
     if (bits >= 1000 || COEFF_IS_MPZ(bits))
         return 0;
     /* (also for a starting point where alpha e^w is large) */

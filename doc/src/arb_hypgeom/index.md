@@ -340,49 +340,12 @@ e^{zt} t^{a-1} (1-t)^{b-a-1} \, dt.
 $$
 The result is finite only if $a \ge 1$ and $b - a \ge 1$.
 
-::: details
-The integrand is $\exp(\varphi(t))$ with
-$\varphi(t) = \lambda t + \sum_j \mu_j \log(\alpha_j + \beta_j t)$, as are
-those of `arb_hypgeom_u_integration` and
-`arb_hypgeom_2f1_integration`, and the three integrals are computed by
-one quadrature for this form (`exp_log_integration.c`):
-
-- The interval is divided into cells, starting from the part around the
-  peak of the integrand outside which the integrand is negligible. On a
-  cell with the midpoint $m$,
-  $\varphi(m + u) - \varphi(m) = \varphi'(m) u + \sum_j \mu_j
-  (\log(1 + u/d_j) - u/d_j)$ with $d_j = m + \alpha_j / \beta_j$, where
-  the large terms of $\varphi$ have cancelled. This bounds the integrand
-  on the cell and on the Bernstein ellipses around it, which gives the
-  number of nodes of a Gauss–Legendre rule and a bound for its error
-  [@Joh2018a]; a cell is bisected if its halves need fewer nodes together.
-- Cells where the bound is below the tolerance are not integrated. At
-  an end point where the integrand is $t^{\mu}$ times an analytic function
-  (non-integer $a$, say), the first cell is integrated term by term
-  with the power series of that function, so that the singularity costs
-  no subdivision. An integral over $(0,1)$ is computed as two integrals
-  over $(0,1/2)$, in $t$ and in $1-t$.
-- The integrand is evaluated in vectorized machine arithmetic
-  ([`dfloat`](dfloat) balls of one to four doubles) up to about 190
-  bits, and beyond that in `arb` arithmetic with the precision lowered
-  at the nodes where the integrand is small.
-
-The cells and rules are chosen from estimates in double precision; all
-the bounds which enter the result are computed in ball arithmetic.
-Parameters up to $2^{40}$ are handled in this way. Beyond that (or if
-the quadrature fails) the integral is computed by the code for complex
-parameters, `acb_hypgeom_1f1_integration`, which works in coordinates
-centred on the saddle points and so with parameters of any size
-(tested up to $10^{100}$). The gamma functions of the prefactor are
-computed with the bits of the parameters as extra precision.
-
-The method is useful when the parameters are large, where the series
-expansions need many terms and lose accuracy to cancellation.
-`acb_hypgeom_m` uses it for real arguments when it estimates that
-the series, with the working precision that their cancellation calls
-for, would cost more
-([](algorithms/special-functions/hypergeometric#choice)).
-:::
+The cost depends little on the size of the parameters, which makes
+this the method for large parameters, where the series need many terms
+and lose accuracy to cancellation; parameters of any size are
+supported (beyond $2^{40}$ the integral is taken along a path of
+steepest descent). See
+[](algorithms/special-functions/hypergeometric#integration).
 :::
 
 ::: function

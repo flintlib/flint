@@ -344,12 +344,6 @@ typedef _acb_hypgeom_cd m_cd;
 #define m_series_term_cost _acb_hypgeom_est_series_term_cost
 #define m_integration_cost _acb_hypgeom_est_integration_cost
 
-static double
-m_arb_bits(const arb_t x)
-{
-    return (double) arf_bits(arb_midref(x));
-}
-
 /* ------------------------------------------------------------------------- */
 /* Inexact input                                                               */
 /* ------------------------------------------------------------------------- */
@@ -554,7 +548,7 @@ m_majorant(mag_t M, acb_srcptr w, int stage, void * ctx)
            integral of the absolute value of the integrand */
         acb_t t;
         acb_init(t);
-        acb_hypgeom_1f1_integration(t, w, w + 1, w + 2, regularized, 30);
+        _acb_hypgeom_1f1_integration_paths(t, w, w + 1, w + 2, regularized, 30);
         acb_get_mag(M, t);
         acb_clear(t);
     }
@@ -592,7 +586,7 @@ m_inexact(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularize
        of the size of log |parameters|, and in z of size 1 or |a / b|. */
     spar = 2.0 + log(2.0 + hypot(na, sa) + hypot(nb, sb) + hypot(nz, sz));
     R[0] = R[1] = 1.0 / (n * spar);
-    R[2] = 1.0 / (n * (1.0 + hypot(na, sa) / FLINT_MAX(hypot(nb, sb), 1.0)));
+    R[2] = 1.0 / (n * (1.0 + hypot(na, sa) / fmax(hypot(nb, sb), 1.0)));
 
     /* (inside of the domains of the integrals, if the midpoint is) */
     if (nb - na > 0.0)
@@ -813,7 +807,7 @@ m_integrate(acb_t best, slong * bestacc, const acb_t a, const acb_t b, const acb
        integral): along paths of steepest descent */
     if (racc < enough)
     {
-        acb_hypgeom_1f1_integration(t, a, b, z, regularized, iprec);
+        _acb_hypgeom_1f1_integration_paths(t, a, b, z, regularized, iprec);
         acc = acb_rel_accuracy_bits(t);
 
         if (acc > *bestacc || (acb_is_finite(t) && !acb_is_finite(best)))
@@ -993,11 +987,7 @@ acb_hypgeom_m(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regula
     m_logabs(&lm, &lm2, A, B, Z, FLINT_MIN(Lam[0], Z.re + Lam[1]) + 2.0);
     Lam[1] += Z.re;
 
-    pbits = FLINT_MAX(m_arb_bits(acb_realref(a)), m_arb_bits(acb_imagref(a)));
-    pbits = FLINT_MAX(pbits, m_arb_bits(acb_realref(b)));
-    pbits = FLINT_MAX(pbits, m_arb_bits(acb_imagref(b)));
-    pbits = FLINT_MAX(pbits, m_arb_bits(acb_realref(z)));
-    pbits = FLINT_MAX(pbits, m_arb_bits(acb_imagref(z)));
+    pbits = fmax(fmax(acb_bits(a), acb_bits(b)), acb_bits(z));
 
     /* The asymptotic expansion: the two series
        (-z)^(-a) / Gamma(b-a) 2F0(a, a-b+1, -1/z) and
@@ -1132,7 +1122,7 @@ inexact_input:
             T = (s == 0) ? m_num_terms(A, B, Z, kpk[0], Lam[0] - tw / M_INVLOG2)
                          : m_num_terms(BA, B, Zn, kpk[1], Lam[1] - Z.re - tw / M_INVLOG2);
             if (tw < 1e8 && T < 1e9)
-                cmain = FLINT_MIN(cmain, T * m_series_term_cost(tw, pbits, real) + 7e-5 * pow(tw, 1.6));
+                cmain = fmin(cmain, T * m_series_term_cost(tw, pbits, real) + 7e-5 * pow(tw, 1.6));
         }
 
         cint = (int_ok == 0) ? 1e300

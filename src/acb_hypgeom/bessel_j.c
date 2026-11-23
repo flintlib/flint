@@ -552,7 +552,7 @@ acb_hypgeom_bessel_j_transition(acb_t res, const acb_t nu, const acb_t z, slong 
             {
                 double lj = fabs(b);
                 if (nn > zz)
-                    lj = FLINT_MIN(lj, _acb_hypgeom_bessel_debye_re(nr, ni, a, b));
+                    lj = fmin(lj, _acb_hypgeom_bessel_debye_re(nr, ni, a, b));
                 growth += FLINT_MAX(first - lj, 0.0);
             }
             /* (with a margin of one percent: the estimate is of leading order) */

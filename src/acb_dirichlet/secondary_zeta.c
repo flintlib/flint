@@ -37,8 +37,11 @@ secondary_zeta_gamma_upper(acb_t res, const acb_t s, const acb_t z, slong prec)
 
     if (acc < 0.5 * prec)
     {
-        max = FLINT_MIN(prec, acb_rel_accuracy_bits(z));
-        max = FLINT_MIN(max, acb_rel_accuracy_bits(s));
+        slong accs = acb_rel_accuracy_bits(s);
+
+        max = acb_rel_accuracy_bits(z);
+        max = FLINT_MIN(max, prec);
+        max = FLINT_MIN(max, accs);
 
         if (max > 2 && acc < 0.5 * max
             && acb_is_real(s) && acb_is_real(z)
