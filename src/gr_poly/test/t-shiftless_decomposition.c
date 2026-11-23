@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
     for (slong i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         gr_ctx_t ctx;
-        gr_poly_t f, u;
+        gr_poly_t f;
 
         if (n_randint(state, 2))
             gr_ctx_init_fmpz(ctx);
@@ -47,29 +47,8 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
 
         gr_ptr a = gr_heap_init(ctx);
         gr_poly_init(f, ctx);
-        gr_poly_init(u, ctx);
 
         int status = GR_SUCCESS;
-
-        status |= gr_poly_one(f, ctx);
-        slong li = 1 + n_randint(state, 5);
-
-        for (slong i = 0; i < li && status == GR_SUCCESS; i++)
-        {
-            for (slong j = 0; j < 10 && gr_poly_is_zero(u, ctx) == T_TRUE; j++)
-                gr_poly_randtest(u, state, 2 + n_randint(state, 3), ctx);
-            slong lj = 1 + n_randint(state, 5);
-            for (slong j = 0; j < lj && status == GR_SUCCESS; j++)
-            {
-                if (n_randint(state, 2))
-                {
-                    status |= gr_set_si(a, n_randint(state, 1ul << 20), ctx);
-                    status |= gr_poly_taylor_shift(u, u, a, ctx);
-                }
-                if (n_randint(state, 2))
-                    status |= gr_poly_mul(f, f, u, ctx);
-            }
-        }
 
         gr_ptr c;
         gr_ctx_t Pol, ZZ, ZZvec;
@@ -83,6 +62,10 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
         gr_vec_init(slfac, n_randint(state, 4), Pol);
         gr_vec_init(slshifts, n_randint(state, 4), ZZvec);
         gr_vec_init(slmult, n_randint(state, 4), ZZvec);
+
+        status |= gr_poly_randtest_shiftful(f, state, 1 + n_randint(state, 30), ctx);
+        if (status != GR_SUCCESS)
+            goto cleanup;
 
         status |= gr_poly_shiftless_decomposition(c, (gr_poly_vec_struct *) slfac, slshifts, slmult, f, ctx);
 
@@ -187,6 +170,7 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
             }
         }
 
+cleanup:
         gr_vec_clear(slmult, ZZvec);
         gr_vec_clear(slshifts, ZZvec);
         gr_vec_clear(slfac, Pol);
@@ -194,7 +178,6 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
 
         gr_heap_clear(a, ctx);
         gr_poly_clear(f, ctx);
-        gr_poly_clear(u, ctx);
         gr_ctx_clear(Pol);
         gr_ctx_clear(ctx);
         gr_ctx_clear(ZZvec);
