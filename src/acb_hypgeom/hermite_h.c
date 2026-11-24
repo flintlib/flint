@@ -86,11 +86,27 @@ acb_hypgeom_hermite_h(acb_t res, const acb_t n, const acb_t z, slong prec)
         acb_neg(a, a);
         acb_one(b);
         acb_mul_2exp_si(b, b, -1);
-        acb_hypgeom_u_asymp(u, a, b, t, -1, prec);
-        acb_mul_2exp_si(t, z, 1);
-        acb_pow(t, t, n, prec);
-        acb_mul(u, u, t, prec);
-        acb_set(res, u);
+
+        if (acb_is_int(n) && arb_is_nonnegative(acb_realref(n))
+            && (arf_is_int_2exp_si(arb_midref(acb_realref(n)), 1)
+                || arb_is_positive(acb_realref(t)) || !arb_contains_zero(acb_imagref(t))))
+        {
+            /* A polynomial, 2^n U(-n/2, 1/2, z^2), whose terms can
+               cancel: by the automatic function (for odd n it has the
+               factor sqrt(z^2), with z^2 off the branch cut). */
+            acb_hypgeom_u(u, a, b, t, prec);
+            acb_set_ui(t, 2);
+            acb_pow(t, t, n, prec);
+            acb_mul(res, u, t, prec);
+        }
+        else
+        {
+            acb_hypgeom_u_asymp(u, a, b, t, -1, prec);
+            acb_mul_2exp_si(t, z, 1);
+            acb_pow(t, t, n, prec);
+            acb_mul(u, u, t, prec);
+            acb_set(res, u);
+        }
     }
     else
     {

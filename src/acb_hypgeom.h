@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -122,15 +124,34 @@ void acb_hypgeom_u_1f1_series(acb_poly_t res,
 
 void acb_hypgeom_u_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec);
 void acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec);
+void acb_hypgeom_u_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec);
 
 int acb_hypgeom_u_use_asymp(const acb_t z, slong prec);
 
 void acb_hypgeom_m_asymp(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 void acb_hypgeom_m_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 void acb_hypgeom_m(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
+void acb_hypgeom_1f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 void acb_hypgeom_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 
 void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong d);
+void acb_hypgeom_bessel_j_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_y_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_jy_nointegration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+
+void acb_hypgeom_bessel_j_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_y_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_jy_integration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_h1_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_h2_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_i_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_k_integration(acb_t res, const acb_t nu, const acb_t z, slong prec);
+
+void acb_hypgeom_bessel_h1_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec);
+void acb_hypgeom_bessel_h2_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec);
+
 void acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec);
 void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec);
 void acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec);
@@ -173,11 +194,13 @@ void acb_hypgeom_gamma_upper_1f1a(acb_t res, const acb_t s, const acb_t z, int m
 void acb_hypgeom_gamma_upper_1f1b(acb_t res, const acb_t s, const acb_t z, int modified, slong prec);
 void acb_hypgeom_gamma_upper_singular(acb_t res, slong s, const acb_t z, int modified, slong prec);
 void acb_hypgeom_gamma_upper(acb_t res, const acb_t s, const acb_t z, int modified, slong prec);
+void acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec);
 
 void _acb_hypgeom_gamma_upper_series(acb_ptr g, const acb_t s, acb_srcptr h, slong hlen, int regularized, slong n, slong prec);
 void acb_hypgeom_gamma_upper_series(acb_poly_t g, const acb_t s, const acb_poly_t h, int regularized, slong n, slong prec);
 
 void acb_hypgeom_gamma_lower(acb_t res, const acb_t s, const acb_t z, int modified, slong prec);
+void acb_hypgeom_gamma_lower_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec);
 
 void _acb_hypgeom_gamma_lower_series(acb_ptr g, const acb_t s, acb_srcptr h, slong hlen, int regularized, slong n, slong prec);
 void acb_hypgeom_gamma_lower_series(acb_poly_t g, const acb_t s, const acb_poly_t h, int regularized, slong n, slong prec);
@@ -259,6 +282,7 @@ void acb_hypgeom_2f1_corner(acb_t res, const acb_t a, const acb_t b, const acb_t
 int acb_hypgeom_2f1_choose(const acb_t z);
 
 void acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t z, int regularized, slong prec);
+void acb_hypgeom_2f1_integration(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t z, int regularized, slong prec);
 
 #define ACB_HYPGEOM_2F1_REGULARIZED 1
 #define ACB_HYPGEOM_2F1_AB 2   /* a-b integer */

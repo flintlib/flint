@@ -13,6 +13,23 @@
 #include "arb.h"
 #include "arb_hypgeom.h"
 
+/* a random exact number of the size 10^e: an integer or with a few
+   fractional bits */
+static void
+_randbig_1f1(arb_t x, flint_rand_t state, slong e)
+{
+    arb_t t;
+    arb_init(t);
+    arb_set_ui(x, 1 + n_randint(state, 1000000));
+    arb_mul_2exp_si(x, x, -10);
+    arb_set_ui(t, 10);
+    arb_pow_ui(t, t, e, 4000);
+    arb_mul(x, x, t, 4000);
+    if (n_randint(state, 2))
+        arb_floor(x, x, 4000);
+    arb_clear(t);
+}
+
 TEST_FUNCTION_START(arb_hypgeom_1f1_integration, state)
 {
     slong iter;
@@ -104,6 +121,62 @@ TEST_FUNCTION_START(arb_hypgeom_1f1_integration, state)
         arb_clear(z);
         arb_clear(r1);
         arb_clear(r2);
+    }
+
+    /* Large parameters: Kummer's transformation
+       1F1(a, b, z) = e^z 1F1(b - a, b, -z), and 1F1(a, b, 0) = 1 */
+    for (iter = 0; iter < 200 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        arb_t a, b, z, r1, r2, t;
+        slong prec1, prec2, e;
+        int regularized, which;
+
+        arb_init(a); arb_init(b); arb_init(z); arb_init(r1); arb_init(r2); arb_init(t);
+
+        prec1 = 30 + n_randint(state, 200);
+        prec2 = prec1 + 10 + n_randint(state, 100);
+        e = 3 + n_randint(state, n_randint(state, 4) ? 40 : 110);
+        regularized = n_randint(state, 2);
+        which = n_randint(state, 8) == 0;
+
+        _randbig_1f1(a, state, e - n_randint(state, 3));
+        _randbig_1f1(b, state, e - n_randint(state, 3));
+        _randbig_1f1(z, state, e - n_randint(state, 3));
+        arb_add(b, b, a, 4000);
+        arb_add_ui(b, b, 1, 4000);
+        if (n_randint(state, 2))
+            arb_neg(z, z);
+
+        if (which == 0)
+        {
+            arb_hypgeom_1f1_integration(r1, a, b, z, regularized, prec1);
+            arb_sub(t, b, a, 4000);
+            arb_neg(r2, z);
+            arb_hypgeom_1f1_integration(r2, t, b, r2, regularized, prec2);
+            arb_exp(t, z, prec2 + 4000);
+            arb_mul(r2, r2, t, prec2 + 400);
+        }
+        else
+        {
+            arb_zero(z);
+            arb_hypgeom_1f1_integration(r1, a, b, z, 0, prec1);
+            arb_one(r2);
+        }
+
+            if (!arb_is_finite(r1) || !arb_is_finite(r2) || !arb_overlaps(r1, r2)
+                || arb_rel_accuracy_bits(r1) < prec1 - 15)
+            {
+                flint_printf("FAIL: large parameters (%d)\n\n", which);
+                flint_printf("a = "); arb_printd(a, 50); flint_printf("\n\n");
+                flint_printf("b = "); arb_printd(b, 50); flint_printf("\n\n");
+                flint_printf("z = "); arb_printd(z, 50); flint_printf("\n\n");
+                flint_printf("prec1 = %wd, prec2 = %wd\n\n", prec1, prec2);
+                flint_printf("r1 = "); arb_printd(r1, 50); flint_printf("\n\n");
+                flint_printf("r2 = "); arb_printd(r2, 50); flint_printf("\n\n");
+                flint_abort();
+            }
+
+        arb_clear(a); arb_clear(b); arb_clear(z); arb_clear(r1); arb_clear(r2); arb_clear(t);
     }
 
     TEST_FUNCTION_END(state);

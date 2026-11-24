@@ -14,15 +14,19 @@
 #include "arb_hypgeom.h"
 #include "arb_calc.h"
 #include "acb_calc.h"
+#include "acb_calc/impl.h"
 
 /*
   Gauss-Legendre quadrature nodes are cached to speed up multiple integrations
   and adaptive subdivision. The steps of 2^(n/2) used here give slightly better
   performance than steps of 2^n (we use at most 1.4x more points than
   needed and not 2x more points) but may require more precomputation.
+  The cache is shared with the steepest-descent quadrature in
+  acb_hypgeom (through acb_calc/impl.h).
 */
 
-#define GL_STEPS 38
+#define GL_STEPS ACB_CALC_GL_STEPS
+#define gl_steps _acb_calc_gl_steps
 
 const slong gl_steps[GL_STEPS] = {1, 2, 4, 6, 8, 12, 16, 22, 32, 46, 64,
     90, 128, 182, 256, 362, 512, 724, 1024, 1448, 2048, 2896, 4096,
@@ -81,13 +85,10 @@ nodes_worker(slong jj, nodes_work_t * work)
     arb_hypgeom_legendre_p_ui_root(work->nodes + jj, work->weights + jj, work->n, jj, work->wp);
 }
 
-/* if k >= 0, compute the node and weight of index k */
-/* if k < 0, compute the first (n+1)/2 nodes and weights (the others are given by symmetry) */
-static void
-acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
+void
+_acb_calc_gl_nodes(arb_srcptr * x, arb_srcptr * w, slong i, slong prec)
 {
-    slong n, kk, wp;
-    int all;
+    slong n, wp;
 
     if (i < 0 || i >= GL_STEPS || prec < 2)
         flint_throw(FLINT_ERROR, "(%s)\n", __func__);
@@ -96,11 +97,6 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
         gl_init();
 
     n = gl_steps[i];
-
-    if (k >= n)
-        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-    all = (k < 0);
 
     if (gl_cache->gl_prec[i] < prec)
     {
@@ -124,12 +120,33 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
         gl_cache->gl_prec[i] = wp;
     }
 
+    *x = gl_cache->gl_nodes[i];
+    *w = gl_cache->gl_weights[i];
+}
+
+/* if k >= 0, compute the node and weight of index k */
+/* if k < 0, compute the first (n+1)/2 nodes and weights (the others are given by symmetry) */
+static void
+acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
+{
+    slong n, kk;
+    int all;
+    arb_srcptr xs, ws;
+
+    _acb_calc_gl_nodes(&xs, &ws, i, prec);
+    n = gl_steps[i];
+
+    if (k >= n)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+
+    all = (k < 0);
+
     if (all)
     {
         for (k = 0; k < (n + 1) / 2; k++)
         {
-            arb_set_round(x + k, gl_cache->gl_nodes[i] + k, prec);
-            arb_set_round(w + k, gl_cache->gl_weights[i] + k, prec);
+            arb_set_round(x + k, xs + k, prec);
+            arb_set_round(w + k, ws + k, prec);
         }
     }
     else
@@ -140,11 +157,11 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
             kk = n - 1 - k;
 
         if (2 * k < n)
-            arb_set_round(x, gl_cache->gl_nodes[i] + kk, prec);
+            arb_set_round(x, xs + kk, prec);
         else
-            arb_neg_round(x, gl_cache->gl_nodes[i] + kk, prec);
+            arb_neg_round(x, xs + kk, prec);
 
-        arb_set_round(w, gl_cache->gl_weights[i] + kk, prec);
+        arb_set_round(w, ws + kk, prec);
     }
 }
 

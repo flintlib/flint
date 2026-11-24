@@ -340,17 +340,12 @@ e^{zt} t^{a-1} (1-t)^{b-a-1} \, dt.
 $$
 The result is finite only if $a \ge 1$ and $b - a \ge 1$.
 
-::: details
-The integral is computed with `acb_calc_integrate`, which bounds the
-error of Gauss–Legendre quadrature rigorously [@Joh2018a]; the bounds
-for the integrand on the edges of the integration region are computed
-with intervals of doubles
-([interval arithmetic with doubles](algorithms/floating-point/double-intervals#mean-value)). The method
-is useful when the parameters are large, where the series expansions
-need many terms and lose accuracy to cancellation. `acb_hypgeom_m`
-falls back to it for real arguments when its other methods give less
-than half the requested accuracy.
-:::
+The cost depends little on the size of the parameters, which makes
+this the method for large parameters, where the series need many terms
+and lose accuracy to cancellation; parameters of any size are
+supported (beyond $2^{40}$ the integral is taken along a path of
+steepest descent). See
+[](algorithms/special-functions/hypergeometric#integration).
 :::
 
 ::: function

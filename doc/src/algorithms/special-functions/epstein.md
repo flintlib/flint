@@ -295,7 +295,7 @@ On the Bernstein ellipse $E_\rho$ of an interval with center $y_c$ and
 semi-minor axis below $\pi/2$, $\operatorname{Re}(w) \ge e^{y_c - h(\rho + 1/\rho)/2} \cos\theta_{\max}$
 and $|e^{a y}| \le e^{\operatorname{Re}(a) \operatorname{Re}(y) + |\operatorname{Im}(a)| \theta_{\max}}$,
 so [](#lem-phi) bounds $|f|$ by some $M$, and $n$ nodes have error at
-most $\frac{64}{15} h M \rho^{-2n}/(\rho^2 - 1)$
+most $\frac{64}{15} h M \rho^{2-2n}/(\rho^2 - 1)$
 ([](algorithms/ball-arithmetic/integration#thm-gl)). For the tail,
 $\Phi(w) \le e^{-(w - W/2) t_{\min}} \Phi_0(W/2)$ for $w \ge W/2$ and
 $w^{s-1} \le W^{s-1} e^{(s-1)(w - W)/W}$, $s \ge \operatorname{Re}(a)$,

@@ -251,5 +251,168 @@ TEST_FUNCTION_START(acb_hypgeom_m, state)
         acb_clear(u);
     }
 
+    /* Inexact input which is much more accurate than the precision,
+       where the series cancel: as accurate as for exact input. */
+    {
+        static const double par[4][3] = { { 166.625, 0.375, -300.0 }, { -300.0, 0.375, 50.0 },
+            { -300.5, 0.375, 50.0 }, { 40.25, 80.5, -200.0 } };
+        acb_t a, b, z, w1, w2;
+        slong i, p;
+
+        acb_init(a);
+        acb_init(b);
+        acb_init(z);
+        acb_init(w1);
+        acb_init(w2);
+
+        for (i = 0; i < 8; i++)
+        {
+            p = (i < 4) ? 64 : 333;
+
+            acb_set_d(a, par[i % 4][0]);
+            acb_set_d(b, par[i % 4][1]);
+            acb_set_d(z, par[i % 4][2]);
+
+            acb_hypgeom_m(w2, a, b, z, 0, 3000);
+
+            mag_set_ui_2exp_si(arb_radref(acb_realref(a)), 1, -2000);
+            mag_set_ui_2exp_si(arb_radref(acb_realref(b)), 1, -2000);
+            mag_set_ui_2exp_si(arb_radref(acb_realref(z)), 1, -2000);
+
+            acb_hypgeom_m(w1, a, b, z, 0, p);
+
+            if (!acb_overlaps(w1, w2) || acb_rel_accuracy_bits(w2) < 2000
+                || acb_rel_accuracy_bits(w1) < p - 14)
+            {
+                flint_printf("FAIL: accurate input, case %wd\n\n", i);
+                flint_printf("w1 = "); acb_printd(w1, 30); flint_printf("\n\n");
+                flint_printf("w2 = "); acb_printd(w2, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
+        acb_clear(a);
+        acb_clear(b);
+        acb_clear(z);
+        acb_clear(w1);
+        acb_clear(w2);
+    }
+
+    /* A parameter rounded at the precision, where the series cancel by
+       more bits than the input has: the integrals on the input, if
+       they cost at most four times the series at the precision at
+       which they succeed (the two integrals for U; 3 is the case in
+       which the value is computed by them at this precision). */
+    {
+        static const double par[4][4] = { { -1000.0, 2000.5, 1000.0, 64 },
+            { -1000.0, 2000.5, 535.0, 64 }, { -10000.0, 1.0, 10000.0, 64 },
+            { -10000.0, 1.0, 10000.0, 333 } };
+        acb_t a, b, z, w1, w2;
+        slong i, p;
+
+        acb_init(a);
+        acb_init(b);
+        acb_init(z);
+        acb_init(w1);
+        acb_init(w2);
+
+        for (i = 0; i < 4; i++)
+        {
+            p = (slong) par[i][3];
+
+            /* a = n - 1/3 */
+            acb_set_ui(a, 1);
+            acb_div_ui(a, a, 3, p);
+            acb_neg(a, a);
+            acb_add_si(a, a, (slong) par[i][0], p);
+            acb_set_d(b, par[i][1]);
+            acb_set_d(z, par[i][2]);
+
+            acb_hypgeom_m(w1, a, b, z, 0, p);
+
+            acb_get_mid(a, a);
+            acb_hypgeom_m(w2, a, b, z, 0, 3 * p + 100);
+
+            if (!acb_overlaps(w1, w2) || acb_rel_accuracy_bits(w2) < 2 * p
+                || acb_rel_accuracy_bits(w1) < p - 28)
+            {
+                flint_printf("FAIL: rounded input, case %wd\n\n", i);
+                flint_printf("w1 = "); acb_printd(w1, 30); flint_printf("\n\n");
+                flint_printf("w2 = "); acb_printd(w2, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
+        acb_clear(a);
+        acb_clear(b);
+        acb_clear(z);
+        acb_clear(w1);
+        acb_clear(w2);
+    }
+
+    /* Integers 0 < a < b: the finite asymptotic expansion where it is
+       shorter than the series, with the bits which its two parts lose
+       for small |z|; against the series. */
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t a, b, z, w1, w2;
+        slong prec, e;
+
+        acb_init(a);
+        acb_init(b);
+        acb_init(z);
+        acb_init(w1);
+        acb_init(w2);
+
+        prec = 30 + n_randint(state, 400);
+
+        acb_set_ui(a, 1 + n_randint(state, 40));
+        acb_add_ui(b, a, 1 + n_randint(state, 40), prec);
+
+        /* |z| from 2^-40 to 2^12 */
+        e = (slong) n_randint(state, 53) - 40;
+        arb_set_si(acb_realref(z), (slong) n_randint(state, 2000) - 1000);
+        if (n_randint(state, 2))
+            arb_set_si(acb_imagref(z), (slong) n_randint(state, 2000) - 1000);
+        if (acb_is_zero(z))
+            acb_one(z);
+        acb_mul_2exp_si(z, z, e - 10);
+
+        acb_hypgeom_m_1f1(w2, a, b, z, 0, 2 * prec + 6000);
+
+        if (n_randint(state, 2) == 0)
+        {
+            acb_hypgeom_m(w1, a, b, z, 0, prec);
+        }
+        else
+        {
+            acb_t g;
+            acb_init(g);
+            acb_hypgeom_m(w1, a, b, z, 1, prec);
+            acb_rgamma(g, b, 2 * prec + 6000);
+            acb_mul(w2, w2, g, 2 * prec + 6000);
+            acb_clear(g);
+        }
+
+        if (!acb_overlaps(w1, w2) || acb_rel_accuracy_bits(w2) < prec + 20
+            || acb_rel_accuracy_bits(w1) < prec - 12)
+        {
+            flint_printf("FAIL: integers 0 < a < b\n\n");
+            flint_printf("prec = %wd\n\n", prec);
+            flint_printf("a = "); acb_printd(a, 30); flint_printf("\n\n");
+            flint_printf("b = "); acb_printd(b, 30); flint_printf("\n\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n\n");
+            flint_printf("w1 = "); acb_printd(w1, 30); flint_printf("\n\n");
+            flint_printf("w2 = "); acb_printd(w2, 30); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        acb_clear(a);
+        acb_clear(b);
+        acb_clear(z);
+        acb_clear(w1);
+        acb_clear(w2);
+    }
+
     TEST_FUNCTION_END(state);
 }

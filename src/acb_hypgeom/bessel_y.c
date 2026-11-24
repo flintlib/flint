@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2015 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -34,7 +36,7 @@ phase(acb_t res, const arb_t re, const arb_t im)
 }
 
 void
-acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
+acb_hypgeom_bessel_jy_nointegration(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)
 {
     acb_t jnu, t, u, v;
 
@@ -52,7 +54,7 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slo
     acb_init(u);
     acb_init(v);
 
-    acb_hypgeom_bessel_j(jnu, nu, z, prec);
+    acb_hypgeom_bessel_j_nointegration(jnu, nu, z, prec);
 
     if (acb_is_int(nu))
     {
@@ -60,7 +62,7 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slo
             && arb_is_positive(acb_realref(z));
 
         acb_mul_onei(t, z);
-        acb_hypgeom_bessel_k(t, nu, t, prec);
+        acb_hypgeom_bessel_k_nointegration(t, nu, t, prec);
         acb_onei(u);
         acb_pow(u, u, nu, prec);
         acb_mul(t, t, u, prec);
@@ -83,7 +85,7 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slo
         acb_sin_cos_pi(t, u, nu, prec);
         acb_mul(v, jnu, u, prec);
         acb_neg(u, nu);
-        acb_hypgeom_bessel_j(u, u, z, prec);
+        acb_hypgeom_bessel_j_nointegration(u, u, z, prec);
         acb_sub(v, v, u, prec);
         acb_div(res2, v, t, prec);
     }
@@ -98,7 +100,7 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slo
 }
 
 void
-acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)
+acb_hypgeom_bessel_y_nointegration(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
-    acb_hypgeom_bessel_jy(NULL, res, nu, z, prec);
+    acb_hypgeom_bessel_jy_nointegration(NULL, res, nu, z, prec);
 }

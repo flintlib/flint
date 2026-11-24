@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2015 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -388,7 +390,7 @@ _acb_is_nonnegative_real(const acb_t z)
     return arb_is_zero(acb_imagref(z)) && arb_is_nonnegative(acb_realref(z));
 }
 
-static void
+void
 acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 {
     if (!acb_is_finite(s) || !acb_is_finite(z))
@@ -522,48 +524,4 @@ acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, i
         else
             acb_hypgeom_gamma_upper_1f1a(res, s, z, regularized, prec);
     }
-}
-
-void
-acb_hypgeom_gamma_upper(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
-{
-    acb_t res2;
-    slong acc, max, t;
-
-    acb_init(res2);
-
-    acb_hypgeom_gamma_upper_nointegration(res2, s, z, regularized, prec);
-
-    acc = acb_rel_accuracy_bits(res2);
-
-    if (acc < 0.5 * prec)
-    {
-        max = prec;
-        t = acb_rel_accuracy_bits(z);
-        max = FLINT_MIN(max, t);
-        t = acb_rel_accuracy_bits(s);
-        max = FLINT_MIN(max, t);
-
-        if (max > 2 && acc < 0.5 * max)
-        {
-            if (acb_is_real(s) && acb_is_real(z) &&
-                arf_cmp_2exp_si(arb_midref(acb_realref(z)), -16) > 0 &&
-                arf_cmpabs_2exp_si(arb_midref(acb_realref(s)), 60) < 0 &&
-                arf_cmpabs_2exp_si(arb_midref(acb_realref(z)), 60) < 0)
-            {
-                arb_hypgeom_gamma_upper_integration(acb_realref(res),
-                        acb_realref(s), acb_realref(z), regularized, prec);
-                arb_zero(acb_imagref(res));
-
-                if (acb_rel_accuracy_bits(res) > acb_rel_accuracy_bits(res2) ||
-                    (acb_is_finite(res) && !acb_is_finite(res2)))
-                {
-                    acb_swap(res, res2);
-                }
-            }
-        }
-    }
-
-    acb_swap(res, res2);
-    acb_clear(res2);
 }

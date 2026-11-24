@@ -333,9 +333,6 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
                 slong moreprec;
 
                 /* take err into account when finding truncation point */
-                /* we should take Cn into account as well, but this depends
-                   on n which is to be determined; it's easier to look
-                   only at exp(...) which should be larger anyway */
                 if (mag_cmp_2exp_si(err, 10 * prec) > 0)
                     moreprec = 10 * prec;
                 else if (mag_cmp_2exp_si(err, 0) < 0)
@@ -345,6 +342,21 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
 
                 n = acb_hypgeom_pfq_choose_n_max(aa, p, aa + p, q, w,
                     prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec));
+
+                /* the factor C_n of the error bound grows with n
+                   outside of the right half-plane: account for its
+                   size at the first choice of n */
+                if (R != 1 && n > 1)
+                {
+                    acb_hypgeom_mag_Cn(Cn, R, nu, sigma, n);
+
+                    if (mag_cmp_2exp_si(Cn, 2) > 0 && mag_cmp_2exp_si(Cn, 10 * prec) < 0)
+                    {
+                        moreprec += MAG_EXP(Cn);
+                        n = acb_hypgeom_pfq_choose_n_max(aa, p, aa + p, q, w,
+                            prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec));
+                    }
+                }
             }
 
             acb_hypgeom_pfq_sum_invz(s, t, aa, p, aa + p, q, w, winv, n, prec);

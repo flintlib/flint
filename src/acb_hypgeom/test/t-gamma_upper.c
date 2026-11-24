@@ -343,5 +343,192 @@ TEST_FUNCTION_START(acb_hypgeom_gamma_upper, state)
         arb_clear(rhs);
     }
 
+    /* A positive integer s (the terminating expansion where it is the
+       cheapest method, the closed forms for s <= 3): against
+       (s-1)! e^(-z) sum_{j<s} z^j / j! at a precision which covers the
+       cancellation of the sum, with nearly the full accuracy. */
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t s, z, w, r, t;
+        slong prec, rprec, n, j;
+
+        acb_init(s);
+        acb_init(z);
+        acb_init(w);
+        acb_init(r);
+        acb_init(t);
+
+        prec = 30 + n_randint(state, 400);
+        n = 1 + n_randint(state, (n_randint(state, 4) == 0) ? 600 : 40);
+        acb_set_si(s, n);
+
+        /* |z| from 2^-8 to 2^10 */
+        arb_set_si(acb_realref(z), (slong) n_randint(state, 2000) - 1000);
+        if (n_randint(state, 2))
+            arb_set_si(acb_imagref(z), (slong) n_randint(state, 2000) - 1000);
+        if (acb_is_zero(z))
+            acb_one(z);
+        acb_mul_2exp_si(z, z, -(slong) n_randint(state, 18));
+
+        acb_hypgeom_gamma_upper(w, s, z, 0, prec);
+
+        rprec = 2 * prec + 6000;
+        acb_one(t);
+        acb_zero(r);
+        for (j = 0; j < n; j++)
+        {
+            acb_add(r, r, t, rprec);
+            acb_mul(t, t, z, rprec);
+            acb_div_ui(t, t, j + 1, rprec);
+        }
+        acb_neg(t, z);
+        acb_exp(t, t, rprec);
+        acb_mul(r, r, t, rprec);
+        acb_gamma(t, s, rprec);
+        acb_mul(r, r, t, rprec);
+
+        if (!acb_overlaps(w, r) || acb_rel_accuracy_bits(r) < prec + 20
+            || acb_rel_accuracy_bits(w) < prec - 12)
+        {
+            flint_printf("FAIL: positive integer s\n\n");
+            flint_printf("prec = %wd\n\n", prec);
+            flint_printf("s = "); acb_printd(s, 30); flint_printf("\n\n");
+            flint_printf("z = "); acb_printd(z, 30); flint_printf("\n\n");
+            flint_printf("w = "); acb_printd(w, 30); flint_printf("\n\n");
+            flint_printf("r = "); acb_printd(r, 30); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        acb_clear(s);
+        acb_clear(z);
+        acb_clear(w);
+        acb_clear(r);
+        acb_clear(t);
+    }
+
+    /* Inexact input: the result contains the values at points of the
+       input balls, for the upper and the lower function, regularized
+       or not: with s = 1, 2, 3 (closed forms), other integers and
+       fractions, exact or a ball, and with an argument which is exact
+       or a ball, small, of moderate size or far out, also across the
+       negative real axis. */
+    for (iter = 0; iter < 4000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        acb_t s, z, w, r, sp, zp;
+        arf_t x;
+        slong prec, rprec;
+        int upper, regularized, k, mode;
+
+        acb_init(s);
+        acb_init(z);
+        acb_init(w);
+        acb_init(r);
+        acb_init(sp);
+        acb_init(zp);
+        arf_init(x);
+
+        prec = 30 + n_randint(state, 300);
+        rprec = prec + 100;
+        upper = n_randint(state, 2);
+        regularized = n_randint(state, 2);
+        mode = n_randint(state, 4);
+
+        /* s */
+        if (mode == 0)
+            acb_set_si(s, 1 + n_randint(state, 3));
+        else if (mode == 1)
+            acb_set_si(s, (slong) n_randint(state, 40) - 5);
+        else
+        {
+            acb_set_si(s, (slong) n_randint(state, 600) - 100);
+            acb_div_ui(s, s, 3 + 5 * n_randint(state, 2), prec);
+            if (n_randint(state, 2))
+                acb_get_mid(s, s);
+        }
+        if (n_randint(state, 3) == 0)
+            mag_set_ui_2exp_si(arb_radref(acb_realref(s)), 1, -(slong) (8 + n_randint(state, prec + 10)));
+
+        /* z */
+        arb_set_si(acb_realref(z), (slong) n_randint(state, 1024) - 200);
+        if (n_randint(state, 3) == 0)
+            arb_set_si(acb_imagref(z), (slong) n_randint(state, 1024) - 512);
+        switch (n_randint(state, 4))
+        {
+            case 0: acb_mul_2exp_si(z, z, -30); break;
+            case 1: acb_mul_2exp_si(z, z, 10); break;
+            default: acb_mul_2exp_si(z, z, -4);
+        }
+        if (n_randint(state, 2))
+        {
+            mag_set_ui_2exp_si(arb_radref(acb_realref(z)), 1, -(slong) (8 + n_randint(state, prec + 10)));
+            /* (across the real axis) */
+            if (n_randint(state, 3) == 0)
+                mag_set_ui_2exp_si(arb_radref(acb_imagref(z)), 1, -(slong) (8 + n_randint(state, prec + 10)));
+        }
+
+        if (upper)
+            acb_hypgeom_gamma_upper(w, s, z, regularized, prec);
+        else
+            acb_hypgeom_gamma_lower(w, s, z, regularized, prec);
+
+        for (k = 0; k < 3; k++)
+        {
+            /* a point of each ball: the midpoint plus the radius times
+               -1, -1/2, 0, 1/2 or 1 */
+            acb_get_mid(sp, s);
+            acb_get_mid(zp, z);
+
+#define SHIFT(mid, rad) \
+    do { \
+        arf_set_mag(x, rad); \
+        arf_mul_si(x, x, (slong) n_randint(state, 5) - 2, ARF_PREC_EXACT, ARF_RND_DOWN); \
+        arf_mul_2exp_si(x, x, -1); \
+        arf_add(mid, mid, x, ARF_PREC_EXACT, ARF_RND_DOWN); \
+    } while (0)
+
+            SHIFT(arb_midref(acb_realref(sp)), arb_radref(acb_realref(s)));
+            SHIFT(arb_midref(acb_realref(zp)), arb_radref(acb_realref(z)));
+            SHIFT(arb_midref(acb_imagref(zp)), arb_radref(acb_imagref(z)));
+
+            if (upper)
+                acb_hypgeom_gamma_upper(r, sp, zp, regularized, rprec);
+            else
+                acb_hypgeom_gamma_lower(r, sp, zp, regularized, rprec);
+
+            if (!acb_overlaps(w, r))
+            {
+                flint_printf("FAIL: point of the input balls (upper = %d, regularized = %d)\n\n", upper, regularized);
+                flint_printf("prec = %wd\n\n", prec);
+                flint_printf("s = "); acb_printd(s, 30); flint_printf("\n\n");
+                flint_printf("z = ");  acb_printd(z, 30); flint_printf("\n\n");
+                flint_printf("sp = "); acb_printd(sp, 30); flint_printf("\n\n");
+                flint_printf("zp = ");  acb_printd(zp, 30); flint_printf("\n\n");
+                flint_printf("w = "); acb_printd(w, 30); flint_printf("\n\n");
+                flint_printf("r = "); acb_printd(r, 30); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
+        /* exact input: nearly the full accuracy, where there is a value */
+        if (acb_is_exact(s) && acb_is_exact(z) && acb_is_finite(w)
+            && !acb_contains_zero(w) && acb_rel_accuracy_bits(w) < prec - 16)
+        {
+            flint_printf("FAIL: accuracy (upper = %d, regularized = %d)\n\n", upper, regularized);
+            flint_printf("prec = %wd\n\n", prec);
+            flint_printf("s = "); acb_printd(s, 30); flint_printf("\n\n");
+            flint_printf("z = ");  acb_printd(z, 30); flint_printf("\n\n");
+            flint_printf("w = "); acb_printd(w, 30); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        acb_clear(s);
+        acb_clear(z);
+        acb_clear(w);
+        acb_clear(r);
+        acb_clear(sp);
+        acb_clear(zp);
+        arf_clear(x);
+    }
+
     TEST_FUNCTION_END(state);
 }
