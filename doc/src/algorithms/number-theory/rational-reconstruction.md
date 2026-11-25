@@ -29,11 +29,97 @@ If $n_1/d_1$ and $n_2/d_2$ both satisfy the conditions, then $n_1 d_2
 < m$, so $n_1 d_2 = n_2 d_1$.
 :::
 
-The condition $2ND < m$ cannot be weakened much: the number of fractions
-with $|n| \le N$ and $0 < d \le D$ in lowest terms is about $(12/\pi^2)
-ND$, so their residues cannot all be distinct if $ND$ is much larger than
-$m$. With the balanced choice $N = D \approx \sqrt{m/2}$, about
-$6/\pi^2 \approx 61\%$ of all residues are reconstructible.
+## Reconstructible residues {#density}
+
+A reduced fraction $n/d$ has a residue modulo $m$ only when
+$\gcd(d,m)=1$ [@Mon2004]. This condition also follows from
+$n \equiv ad \pmod m$ and $\gcd(n,d)=1$: any prime dividing both $d$ and
+$m$ would divide $n$.
+
+Let $F_m(N,D)$ count the reduced fractions with $|n| \le N$,
+$1 \le d \le D$ and $\gcd(d,m)=1$, for integer bounds $N,D \ge 1$.
+Under $2ND < m$, [](#lem-unique) shows that these fractions have distinct
+residues, so $F_m(N,D)$ is exactly the number of reconstructible residues.
+Writing $\mu$ for the Möbius function, we have
+
+$$
+F_m(N,D) = 1 + 2
+\sum_{\substack{1 \le d \le D \\ \gcd(d,m)=1}}
+\sum_{e \mid d} \mu(e) \left\lfloor \frac{N}{e} \right\rfloor.
+$$
+
+The term 1 counts zero. For positive numerators, the identity
+$\sum_{e \mid \gcd(n,d)} \mu(e) = 1$ if $\gcd(n,d)=1$, and 0 otherwise,
+gives the inner sum; negative numerators give the factor 2.
+
+If $m$ is prime and $D<m$, every denominator in the sum is a unit.
+Interchanging the sums, with $E=\min(N,D)$, gives
+
+$$
+\begin{aligned}
+F_m(N,D)
+&= 1 + 2\sum_{e \le E} \mu(e)
+  \left\lfloor \frac{N}{e} \right\rfloor
+  \left\lfloor \frac{D}{e} \right\rfloor \\
+&= \frac{12}{\pi^2} ND
+   + O\bigl((N+D)\log(2E)\bigr).
+\end{aligned}
+$$
+
+For $m=p^k$ with a fixed prime $p$ and balanced bounds $N=D=B$, the
+denominator condition is $p \nmid d$. Writing $d=ej$ in the exact count
+therefore gives
+
+$$
+\begin{aligned}
+F_{p^k}(B,B)
+&= 1 + 2\sum_{\substack{e \le B \\ p \nmid e}} \mu(e)
+  \left\lfloor \frac{B}{e} \right\rfloor
+  \left(\left\lfloor \frac{B}{e} \right\rfloor
+       -\left\lfloor \frac{B}{pe} \right\rfloor\right) \\
+&= \frac{12}{\pi^2}\frac{p}{p+1} B^2 + O_p(B\log B).
+\end{aligned}
+$$
+
+To obtain the estimates, replace each floor by its argument plus $O(1)$.
+The rounding errors sum to $O((N+D)\log(2E))$ and $O_p(B\log B)$,
+respectively, since $\sum_{e \le E}1/e \le 1+\log E$.
+Extending the main sums to infinity adds $O(ND/E)$ and $O_p(B)$, using
+$\sum_{e>E}1/e^2 \le 1/E$. The constants follow from the Euler products
+
+$$
+\sum_{e \ge 1}\frac{\mu(e)}{e^2} = \frac{6}{\pi^2},
+\qquad
+\sum_{\substack{e \ge 1 \\ p \nmid e}}\frac{\mu(e)}{e^2}
+= \frac{6}{\pi^2(1-p^{-2})}.
+$$
+
+Since $ND/E=\max(N,D)$, the tails are absorbed by the stated errors.
+In the prime-power case, multiplying the second Euler product by
+$2(1-1/p)B^2$ gives the factor $p/(p+1)$ in the leading term.
+
+The prime-modulus count also explains the scale of the uniqueness bound:
+if the bounds are enlarged so that $N,D \to \infty$ and $ND/m \to \infty$,
+while $D<m$, there are more bounded fractions than residues.
+
+For the balanced choice
+$B=\lfloor\sqrt{\lfloor(m-1)/2\rfloor}\rfloor$, we have $B^2/m \to 1/2$.
+The proportion of reconstructible residues therefore tends to
+$6/\pi^2 \approx 61\%$ as $m$ tends to infinity through primes.
+For $m=p^k$ with $p$ fixed and $k \to \infty$, it instead tends to
+$(6/\pi^2)p/(p+1)$, giving $4/\pi^2 \approx 40.5\%$ for powers of 2.
+
+For example, $m=64$ has balanced bound $B=5$. The admissible reduced
+fractions have the following denominators and numerators:
+
+| Denominator | Numerators | Count |
+| --- | --- | --- |
+| $1$ | $-5,-4,\ldots,5$ | 11 |
+| $3$ | $\pm1,\pm2,\pm4,\pm5$ | 8 |
+| $5$ | $\pm1,\pm2,\pm3,\pm4$ | 8 |
+
+Since $2B^2=50<64$, these 27 fractions give distinct residues by
+[](#lem-unique). Thus exactly 27 of the 64 residues are reconstructible.
 
 ## The extended Euclidean algorithm {#euclid}
 
