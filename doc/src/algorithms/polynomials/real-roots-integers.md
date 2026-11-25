@@ -47,6 +47,16 @@ higher degree, is usually much sharper;
 `fmpz_poly_positive_root_upper_bound_2exp` computes it as a power of
 two, following Tsigaridas' SLV library.
 
+::: warning Positive-root scaling {#root-scaling-warning}
+[Issue #2893](https://github.com/flintlib/flint/issues/2893) reports that
+`fmpz_poly_positive_root_upper_bound_2exp` can return a bound below a
+positive root. For $f = 2x^4 - 2x^3 - 2x^2 - 3x - 4$, the reported
+exponent is 1, giving the bound 2. But $f(2) = -2$ and $f(3) = 77$,
+so $f$ has a root in $(2, 3)$. This affects the preliminary scaling of
+general inputs; the interval algorithm below assumes that its input
+already has all positive roots in $(0, 1)$.
+:::
+
 ## Descartes' rule of signs {#descartes}
 
 ::: theorem Descartes' rule of signs {#thm-descartes}
@@ -73,24 +83,78 @@ $[a, b]$ contains exactly one root, then $V = 1$.
 
 ### The Vincent–Collins–Akritas algorithm {#vca}
 
+Write $I(c,k) = (c 2^{-k}, (c+1)2^{-k})$, where
+$0 \le c < 2^k$ and $k \ge 0$. During the traversal, let $F$ denote
+$f$ after removing its factor $x$, if any, and the factors $x-r$ for
+exact roots $r$ already recorded. The working polynomial satisfies
+
+$$
+g(x) = \lambda F\left(\frac{x+c}{2^k}\right), \qquad \lambda > 0.
+$$
+
+The polynomial $F$ is only used to describe this invariant; it need
+not be stored. Common powers of 2 may be divided out of $g$
+throughout. Let $v_2(m)$ denote the exponent of 2 in a positive integer
+$m$.
+
 ::: algorithm Descartes bisection (VCA) {#alg-vca}
 **Input:** squarefree $f$ with all positive roots in $(0, 1)$.
 
-**Output:** isolating intervals $(c 2^{-k}, (c + 1) 2^{-k})$ and exact
-roots $c 2^{-k}$ of $f$ in $(0, 1)$.
+**Output:** isolating intervals $I(c,k)$ and exact dyadic roots of $f$
+in $(0, 1)$.
 
-1. Start with the interval $(0, 1)$, that is, $c = 0$, $k = 0$ and
-   $g = f$, where $g(x) = 2^{kn} f((x + c)/2^k)$ represents $f$ on
-   $(c 2^{-k}, (c + 1) 2^{-k})$ mapped to $(0, 1)$.
-2. If $g(0) = 0$, record the exact root $c 2^{-k}$ and divide $g$ by $x$.
-3. Let $v = V(T(g))$. If $v = 0$, the interval has no root; if $v = 1$,
-   it is an isolating interval. Otherwise bisect: replace $g$ by
-   $2^n g(x/2)$ and $(c, k)$ by $(2c, k + 1)$, and go to 2.
-4. After an interval with $v \le 1$, move to the next interval at the
-   same or a higher level: replace $c$ by $c + 1$ and $g$ by $g(x + 1)$,
-   then go up while $c$ is even, halving $c$ and replacing $g$ by
-   $g(2x)$ (divided by the power of 2 of its content); stop when back
-   at level 0.
+1. Start with $c = k = 0$ and $g = f$. If $g(0) = 0$, divide $g$ by
+   $x$ without recording 0, which is outside the open interval.
+2. If $g(0) = 0$, record the exact root $r = c 2^{-k}$ and divide
+   $g$ by $x$.
+3. Let $d = \deg g$ and $v = V(T(g))$, using degree $d$ in $T(g)$.
+   If $v = 0$, the interval has no root; if $v = 1$, record it as an
+   isolating interval. Otherwise bisect: replace $g$ by
+   $2^d g(x/2)$ and $(c,k)$ by $(2c,k+1)$, and go to 2.
+4. Let $s = v_2(c+1)$. If $s = k$, stop. Otherwise replace $g$ by
+   $g(2^s x+1)$ and $(c,k)$ by $((c+1)/2^s,k-s)$, and go to 2.
+:::
+
+To check the invariant in step 2, write $F = (x-r)F_1$. Since
+$r = c 2^{-k}$, division of $g$ by $x$ gives
+$\lambda 2^{-k} F_1((x+c)/2^k)$, of the required form with the recorded
+root removed. Substitution of $x/2$ in step 3 gives the left child
+$I(2c,k+1)$, again up to a positive scalar.
+
+In step 4, $1 \le c+1 \le 2^k$ implies $s \le k$. Put
+$c' = (c+1)/2^s$ and $k' = k-s$. The new interval starts at the old
+right endpoint, since
+$c'2^{-k'} = (c+1)2^{-k}$, and
+
+$$
+g(2^s x+1)
+ = \lambda F\left(\frac{2^s x+c+1}{2^k}\right)
+ = \lambda F\left(\frac{x+c'}{2^{k'}}\right).
+$$
+
+Factoring the power of 2 from $c+1$ skips the completed ancestors in
+the depth-first traversal. If $s=k$, the old right endpoint is 1 and
+the traversal is complete. This is the relative transformation of
+Rouillier and Zimmermann [@RZ2004, §4, Propositions 7–8]; their
+half-open intervals require different endpoint bookkeeping.
+
+::: example Returning to a larger interval {#vca-traversal-example}
+For $f = (8x-1)(8x-3)(8x-7)$, the roots are $1/8$, $3/8$ and $7/8$.
+All roots are real, so the Descartes counts at the visited nodes are
+exact:
+
+| $(c,k)$ | $I(c,k)$ | $V(T(g))$ |
+| --- | --- | --- |
+| $(0,0)$ | $(0,1)$ | 3 |
+| $(0,1)$ | $(0,1/2)$ | 2 |
+| $(0,2)$ | $(0,1/4)$ | 1 |
+| $(1,2)$ | $(1/4,1/2)$ | 1 |
+| $(1,1)$ | $(1/2,1)$ | 1 |
+
+After $(c,k)=(1,2)$, step 4 has $s=1$ and replaces $g$ by
+$g(2x+1)$, giving $(c',k')=(1,1)$. Keeping $k=2$ would incorrectly
+assign this polynomial to the preceding interval $(1/4,1/2)$.
+At the last node $s=k=1$, so the algorithm stops.
 :::
 
 By the two-circle theorem, an interval whose length is small compared
@@ -101,10 +165,12 @@ polynomial in $n$ and the bit size $\tau$ of the coefficients. The implementatio
 with the in-place transformations of step 4, so that only one
 polynomial is stored, and scales by powers of two with
 `_fmpz_poly_scale_2exp`, which also removes common powers of 2. The
-positive roots of a general $f$ are first mapped into $(0, 1)$ by
-`_fmpz_poly_scale_positive_roots_0_1`, using the local-max bound, and
-the negative roots are the positive roots of $f(-x)$. See also
-Rouillier and Zimmermann [@RZ2004] for a memory-efficient formulation.
+depth $k$ here corresponds to the exponent $-k$ stored by the API:
+its output interval is $(c 2^{-k}, (c+1)2^{-k})$. For general input,
+`_fmpz_poly_scale_positive_roots_0_1` uses the local-max bound to
+scale the positive roots into $(0,1)$, subject to the
+[scaling warning](#root-scaling-warning); the negative roots are the
+positive roots of $f(-x)$.
 
 ## Sturm sequences {#sturm}
 
