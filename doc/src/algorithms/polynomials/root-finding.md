@@ -61,23 +61,72 @@ randomised equal-degree factorisation for $d = 1$, due to Berlekamp
    and $u_2 \gets \gcd(g, t + 1)$. For $q = 2^k$: $t \gets T(x) \bmod g$;
    $u_1 \gets \gcd(g, t)$ and $u_2 \gets \gcd(g, t + 1)$.
 4. Split $u_1$ and $u_2$ into linear factors: while a piece $u$ has
-   degree at least 2, choose a random $c \in \mathbb{F}_q$ and replace $u$
-   by $\gcd(u, (x + c)^{(q-1)/2} - 1)$ and its cofactor if this is a
-   proper split (for even $q$, use $T(\alpha x + c)$ with random $\alpha
-   \ne 0$).
+   degree at least 2, choose $c \in \mathbb{F}_q$ uniformly at random and
+   replace $u$ by $\gcd(u, (x + c)^{(q-1)/2} - 1)$ and its cofactor if
+   this is a proper split (for even $q$, use $T(\alpha x + c)$ with
+   $\alpha$ chosen uniformly from $\mathbb{F}_q^\times$).
 5. Output the roots of the linear pieces with multiplicity $i$.
 :::
 
 Step 3 discards all factors of $g$ of degree at least 2 and already
-splits the roots into two classes; this initial split is Rabin's. In step
-4 a root $\rho$ of $u$ goes into the gcd if and only if $\rho + c$ is a
-nonzero square, which for a uniformly random $c$ happens with probability
-about $1/2$, independently enough for distinct roots that a piece of
-degree $m$ is split with probability at least $4/9$
-([](algorithms/polynomials/factoring-finite-fields#lem-split)) and
-the expected depth of the recursion is $O(\log n)$. Each level costs
-exponentiations of total degree $O(n)$, so the expected total cost is
-$O(M(n) \log q \log n)$, dominated by the exponentiations.
+splits the roots into two classes; this initial split is Rabin's.
+
+::: lemma Affine-shift splitting {#lem-affine-split}
+Let $u$ be a product of distinct linear factors over $\mathbb{F}_q$,
+and let $\rho \ne \sigma$ be two of its roots. With the uniform choices
+in step 4, the probability that they go into different factors is at
+least $2/5$ for odd $q$ and at least $1/2$ for even $q$. These are also
+lower bounds for the probability of a proper split of $u$.
+:::
+
+::: proof
+Suppose first that $q$ is odd. Let $\chi$ be the quadratic character,
+with $\chi(0) = 0$, and put $\delta = \sigma - \rho$. For uniform $c$,
+the element $t = \rho + c$ is uniform, and the roots are separated
+exactly when one of $t$, $t + \delta$ is a nonzero square.
+
+Let $S$ be the set of nonzero squares and $N = |S \cap (S - \delta)|$.
+The character sum
+$$
+\sum_{t \in \mathbb{F}_q} \chi(t(t + \delta)) = -1
+$$
+follows by counting pairs $(t,z)$ with $z^2 = t(t + \delta)$. Their
+number is $q$ plus this sum. The change of variables $X = 2t + \delta$,
+$Y = 2z$ gives $(X-Y)(X+Y) = \delta^2$, which has $q-1$ solutions,
+one for each nonzero value of $X-Y$.
+
+Expanding $(1+\chi(t))(1+\chi(t+\delta))$ and omitting $t = 0,-\delta$
+therefore gives $4N = q-3-\chi(\delta)-\chi(-\delta)$. The separation
+probability is
+$$
+\frac{q-1-2N}{q} = \frac{q+1+\chi(\delta)+\chi(-\delta)}{2q}.
+$$
+If $q \equiv 3 \pmod 4$, this is $(q+1)/(2q) > 1/2$. Otherwise $q \ge 5$
+and it is at least $(q-1)/(2q) \ge 2/5$.
+
+For $q = 2^k$, the two absolute traces differ by $T(\alpha\delta)$.
+The map $T$ is a nonzero $\mathbb{F}_2$-linear functional: its defining
+polynomial is nonzero and has degree less than $q$. Thus $q/2$ elements
+have trace 1, all nonzero. For uniform nonzero $\alpha$, the separation
+probability is $q/(2(q-1)) \ge 1/2$. Separating any pair gives a proper
+split, proving the last assertion.
+:::
+
+The bound $2/5$ is sharp. Over $\mathbb{F}_5$, the piece $u = x^2-1$
+has roots 1 and 4, both nonzero squares, so it can remain whole after
+step 3. Step 4 splits it only for $c = 2,3$, two of the five shifts.
+The $4/9$ bound for a uniform element of the Berlekamp subalgebra does
+not apply to these correlated affine shifts.
+
+Conditioning on a proper split cannot decrease a pair's separation
+probability, since separating the pair already gives a proper split.
+With fresh choices at each attempt, a fixed pair remains together
+after $h$ recursive cuts with probability at most $(3/5)^h$. A union
+bound over the fewer than $n^2$ pairs gives expected recursion depth
+$O(\log n)$. Each proper split needs $O(1)$ attempts in expectation.
+Each level costs exponentiations of total degree $O(n)$, so the
+expected total cost remains $O(M(n) \log q \log n)$, dominated by the
+exponentiations.
 
 **Powers of $x + c$.** An exponentiation $x^e \bmod u$ is cheaper than
 $a^e \bmod u$ for a general $a$, since the multiplications by $x$ in the
