@@ -28,11 +28,30 @@ output length $n$ cost about $M(n)$ each
 
 ## Generic version {#generic}
 
-The iterations described here are implemented once in `gr_poly` and are
-valid over any commutative ring, not only $\Z/p\Z$: each step uses ring
-operations and one inversion of the constant coefficient (the leading
-coefficient of the divisor for division with remainder), and the
-algorithms return `GR_DOMAIN` if that coefficient is not invertible.
+The iterations described here are implemented once in `gr_poly` and
+apply over a commutative ring $R$ under the following hypotheses.
+
+* Inversion and quotients of power series require the denominator's
+  constant coefficient to be a unit; division with remainder requires
+  a unit leading coefficient in the divisor.
+* The square root iterations below require $2$ to be a unit and a
+  chosen unit square root of $h(0)$, so that the reciprocal square root
+  can be formed.
+* For $\exp(h)$ with $h(0) = 0$ and the normalized logarithm $\log(f)$
+  with $f(0) = 1$, assume that $1, \ldots, n - 1$ are units to compute
+  modulo $x^n$. These divisions occur in formal integration and in the
+  exponential recurrence. Particular inputs can admit exact divisions
+  when these integers are not units.
+
+Invertibility of a constant coefficient alone does not suffice for all
+these operations. Over $\Z/2\Z$, the coefficient of $x$ in
+$(a_0 + a_1 x)^2$ is zero, so $1 + x$ has no square root modulo $x^2$.
+Over $\Z$, the equations $E(0) = 1$ and $E' \equiv E \pmod{x^2}$ for
+$E = e_0 + e_1 x + e_2 x^2$ force $e_0 = e_1 = 1$ and $2e_2 = 1$.
+Thus the formal exponential of $x$ does not exist modulo $x^3$ over $\Z$.
+The characteristic restriction in [@BrentKung1978, p. 583] serves the
+same purpose over a coefficient field.
+
 Over real and complex balls they give enclosures of the exact result,
 since every operation does. The generic dispatchers use the basecase
 for short inputs or when the ring has only classical multiplication
@@ -85,7 +104,9 @@ Q \cdot g (1 + e) = 1 - e^2, \qquad Q \cdot g (1 + e + e^2) = 1 - e^3,
 $$
 
 so $g(1 + e)$ is correct to $2m$ terms and $g(1 + e + e^2)$ to $3m$.
-The first is the Newton step of [](#lem-newton) for $\Phi = 1/y - Q$.
+The first is the Newton step of [](#lem-newton) for
+$\Phi(x, y) = Qy - 1$ with $u = g$, since $\Phi_y = Q$ and
+$g \equiv Q^{-1} \pmod{x^m}$.
 The low $m$ coefficients of $Qg$ are $1, 0, \ldots, 0$, so only the
 window $w = (Qg)_{[m, n)}$ has to be computed, which is a middle
 product, and $e = -x^m w$.
@@ -251,7 +272,12 @@ of [](#alg-divrem) otherwise.
 
 ## Square roots {#sqrt}
 
-Let $2$ be invertible and let $h(0)$ have a square root in $R$.
+Let $2$ be invertible and fix a unit $s_0 \in R$ with $s_0^2 = h(0)$.
+Write $h^{1/2}$ for the square root with constant coefficient $s_0$,
+and $h^{-1/2}$ for its reciprocal. Each successive coefficient of the
+square root is determined by a linear equation with coefficient
+$2s_0$, a unit.
+
 For the reciprocal square root, let $g \equiv h^{-1/2} \pmod{x^m}$ and
 $e = 1 - hg^2 = O(x^m)$. Since $h = g^{-2}(1 - e)$,
 
@@ -296,9 +322,11 @@ the high half of its square (`_nmod_poly_mulhigh`) with the input.
 
 ## Exponential and logarithm {#exp}
 
-For $h(0) = 0$, $\log$ and $\exp$ of power series are defined if
-$1, 2, \ldots, n - 1$ are invertible, which for prime modulus $p$ means
-$n \le p$. The logarithm is
+For $\exp(h)$ with $h(0) = 0$ and the normalized logarithm $\log(f)$
+with $f(0) = 1$, assume that $1, 2, \ldots, n - 1$ are invertible to
+compute modulo $x^n$. For prime modulus $p$ this means $n \le p$.
+More generally, when $f(0)$ is a unit and a scalar value $\log f(0)$
+is available in $R$, the logarithm is
 
 $$
 \log f = \log f(0) + \int \frac{f'}{f},
