@@ -32,11 +32,15 @@ within the bounds has residue $a$.
 A return value of 1 proves only that the fraction found is the unique one
 *within the bounds*. If the true answer of a computation is larger than
 the bounds, the function either fails or returns a different, small
-fraction with the same residue. About $6/\pi^2 \approx 61\%$ of all
-residues have a reconstruction with the balanced bounds, so a successful
-reconstruction of a residue that is not known to come from a small
-fraction is weak evidence. Multimodular algorithms therefore either use a
-priori bounds on the answer (Hadamard's bound for determinants and
+fraction with the same residue. For prime $m$ tending to infinity, the
+proportion of residues reconstructible with the balanced bounds tends to
+$6/\pi^2 \approx 61\%$. For composite moduli the denominator must be a
+unit, which changes the count; for powers of 2 the limit is
+$4/\pi^2 \approx 40.5\%$
+([](algorithms/number-theory/rational-reconstruction#density)).
+A successful reconstruction of a residue that is not known to come from
+a small fraction is weak evidence. Multimodular algorithms therefore either
+use a priori bounds on the answer (Hadamard's bound for determinants and
 solutions of linear systems, for example) and choose $m$ larger than $2ND$,
 or verify the reconstructed result, or add primes until the reconstruction
 stabilises.
