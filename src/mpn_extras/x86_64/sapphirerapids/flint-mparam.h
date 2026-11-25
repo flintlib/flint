@@ -244,6 +244,13 @@
       measured with AVX-512 (on Cascade Lake), where the rows and the
       classical code have 512-bit kernels, 0 for those measured with AVX2
       (on Comet Lake).
+    - without AVX512-IFMA, the longest blocks of the one-word Karatsuba
+      where fft_small needs one prime, from 12 bits (above, fft_small):
+      FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN, and where it needs two:
+      FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN (half of it for squares);
+      320 and 1024 by default (measured on Meteor Lake), 544 and 2048 on
+      Broadwell and Skylake-family cores (measured on Comet Lake and
+      Cascade Lake).
     (..._KARA_MAX_LEN measured on a Sapphire Rapids VM, the others
     as on Ice Lake)
 */
@@ -255,5 +262,8 @@
 #else
 # define FLINT_NMOD_POLY_KARA_AVX512_RULES 0
 #endif
+
+#define FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN 320
+#define FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN 1024
 
 #endif

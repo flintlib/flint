@@ -229,8 +229,10 @@ _nmod_poly_mulmid_rows_min_len(slong len1, slong len2, slong nlo, slong nhi)
     || !defined(FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN) \
     || !defined(FLINT_NMOD_POLY_IFMA_KARA_BLOCK_MIN_LEN) \
     || !defined(FLINT_NMOD_POLY_IFMA_KARA_LOW_MIN_LEN) \
-    || !defined(FLINT_NMOD_POLY_KARA_AVX512_RULES)
-# error "flint-mparam.h must define FLINT_NMOD_POLY_IFMA_MAX_LEN, FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME, FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME, FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN, FLINT_NMOD_POLY_IFMA_MIN_LEN_ABOVE_52, FLINT_NMOD_POLY_IFMA_BALANCED_MAX_LEN, FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN, FLINT_NMOD_POLY_IFMA_KARA_BLOCK_MIN_LEN, FLINT_NMOD_POLY_IFMA_KARA_LOW_MIN_LEN and FLINT_NMOD_POLY_KARA_AVX512_RULES"
+    || !defined(FLINT_NMOD_POLY_KARA_AVX512_RULES) \
+    || !defined(FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN) \
+    || !defined(FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN)
+# error "flint-mparam.h must define FLINT_NMOD_POLY_IFMA_MAX_LEN, FLINT_NMOD_POLY_IFMA_MAX_LEN_FFT_PRIME, FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME, FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN, FLINT_NMOD_POLY_IFMA_MIN_LEN_ABOVE_52, FLINT_NMOD_POLY_IFMA_BALANCED_MAX_LEN, FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN, FLINT_NMOD_POLY_IFMA_KARA_BLOCK_MIN_LEN, FLINT_NMOD_POLY_IFMA_KARA_LOW_MIN_LEN, FLINT_NMOD_POLY_KARA_AVX512_RULES, FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN and FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN"
 #endif
 
 #define _NMOD_POLY_IFMA_MIN_LEN(bits) \
@@ -731,8 +733,10 @@ _nmod_poly_karatsuba_small_moduli_ok(slong s, int kind, slong bits,
     In one word, the longest blocks when fft_small needs one prime, by kind
     and bit size: shorter below 14 bits, where KS is fast; from 12 bits,
     320 (fft_small steps up at 257). Without IFMA, when one prime holds by
-    the sizes (2b + log2(len2) <= 50), 544 from 12 bits, past the next step
-    of fft_small at 513 (but 448 for middle products of 449-512).
+    the sizes (2b + log2(len2) <= 50), FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN
+    from 12 bits: 320 by default; 544 on Broadwell and Skylake-family
+    cores, past the next step of fft_small at 513 (but 448 for middle
+    products of 449-512).
 */
 static inline slong
 _nmod_poly_karatsuba_one_prime_max(int kind, slong bits, slong s, int sizes)
@@ -753,8 +757,11 @@ _nmod_poly_karatsuba_one_prime_max(int kind, slong bits, slong s, int sizes)
 
 #if !NMOD_POLY_HAVE_IFMA
     if (bits >= 12 && sizes)
-        top = (kind == _NMOD_POLY_KIND_MID && s > 448 && s <= 512)
-            ? 448 : 544;
+    {
+        top = FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN;
+        if (top > 448 && kind == _NMOD_POLY_KIND_MID && s > 448 && s <= 512)
+            top = 448;
+    }
 #else
     (void) s;
     (void) sizes;
@@ -777,10 +784,11 @@ _nmod_poly_karatsuba_one_prime_max(int kind, slong bits, slong s, int sizes)
       sizes, _nmod_poly_karatsuba_one_prime_max; for a prime n that it
       transforms directly (from 20 bits and 100 coefficients), 512 for
       every kind, since it sets that transform up at each product; with two
-      primes, 1024 for squares and, with IFMA, low and middle products, else
-      2048. Two thirds of that for unbalanced shapes.
-    Measured in Nov 2026 on Cascade Lake, Comet Lake, Ice Lake, Zen 4 and a
-    Sapphire Rapids VM.
+      primes, with IFMA 2048 for full products and 1024 for the others,
+      without IFMA FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN (half of it for
+      squares). Two thirds of that for unbalanced shapes.
+    Measured in Nov 2026 on Cascade Lake, Comet Lake, Ice Lake, Meteor Lake,
+    Zen 4 and a Sapphire Rapids VM.
 */
 static inline int
 _nmod_poly_want_karatsuba_one_word(slong len1, slong len2, slong m,
@@ -834,9 +842,15 @@ _nmod_poly_want_karatsuba_one_word(slong len1, slong len2, slong m,
     else if (direct)
         hi = 512;
     else
-        hi = (kind == _NMOD_POLY_KIND_SQR
-              || (NMOD_POLY_HAVE_IFMA && kind != _NMOD_POLY_KIND_MUL))
-            ? 1024 : 2048;
+    {
+#if NMOD_POLY_HAVE_IFMA
+        hi = (kind == _NMOD_POLY_KIND_MUL) ? 2048 : 1024;
+#else
+        hi = FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN;
+        if (kind == _NMOD_POLY_KIND_SQR)
+            hi /= 2;
+#endif
+    }
 
     if (unbalanced)
         hi = 2 * hi / 3;

@@ -55,9 +55,10 @@ following ranges, measured with the installed library on x86-64 with
 
 With AVX512-IFMA, the IFMA kernel takes the lengths from 8 up to its bound
 for $b \le 52$. With AVX2, the Karatsuba takes most of the lengths from 12
-to 320 for $b \le 26$ (544 up to 20 bits without AVX512-IFMA, up to 2048
-where `fft_small` needs two primes) and from 12 to 192 above, up to 512
-from about 46 bits.
+to 320 for $b \le 26$ (up to 1024 or 2048 where `fft_small` needs two
+primes; without AVX512-IFMA on Broadwell and Skylake-family cores, 544
+up to 20 bits and 2048) and from 12 to 192 above, up to 512 from about 46
+bits.
 
 The `fft_small` cutoffs come from tables indexed by the bit size and are
 somewhat higher for squaring. A modulus that is one of the 50-bit primes
@@ -183,8 +184,9 @@ every 8 terms and at each level of the recursion.
 
 Roughly, the Karatsuba is used from 12 coefficients (8 for unbalanced
 products and squares above 32 bits without AVX-512) up to 320 coefficients
-for moduli of at most 26 bits (544 up to 20 bits without AVX512-IFMA, 2048
-where `fft_small` needs two primes), 192 for larger moduli, and 512 from
+for moduli of at most 26 bits (1024 or 2048 where `fft_small` needs two
+primes; without AVX512-IFMA on Broadwell and Skylake-family cores, 544 up
+to 20 bits and 2048), 192 for larger moduli, and 512 from
 about 46 bits. The rules are stricter for moduli of 2 to 7 bits, where
 Kronecker substitution packs several coefficients per word, and for
 lengths that pad badly (5, 7 or 9 to 11 blocks, nearly empty last blocks).
