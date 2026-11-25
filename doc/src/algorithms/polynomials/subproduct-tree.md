@@ -167,7 +167,8 @@ For few points, quadratic methods are faster:
 ## Geometric progressions {#geometric}
 
 Let the points be $x_j = q^j$, $0 \le j < n$, and write $q = r^2$
-(FLINT is given $r$, so that no square root is needed).
+with $r$ a unit in $R$ (FLINT is given $r$, so that no square root is
+needed). Evaluation does not require the points to be distinct.
 
 ::: lemma Bluestein's trick {#lem-bluestein}
 Let $f$ have length $\ell$. Since
@@ -205,17 +206,32 @@ $O(n)$ multiplications. It requires $q^k - 1$ to be invertible for
 $1 \le k < n$: the points must be distinct, and for composite
 modulus their differences must be invertible.
 
-Extrapolation, computing $f(q^k)$ for $k$ outside $[0, \ell)$ from the
-values $f(q^0), \ldots, f(q^{\ell - 1})$ of a polynomial of length $\ell$,
-is a single middle product as well:
+Extrapolation computes values outside the supplied index interval from
+$f(q^0), \ldots, f(q^{\ell-1})$, without constructing the coefficients of
+$f$. Under the invertibility conditions below, a block of new values is
+obtained by a single middle product. The arithmetic-progression analogue
+is described in [@BGS2007, §3].
 
 ::: lemma {#lem-extrapolate}
-For $k \notin [0, \ell)$,
+Let $\ell \ge 1$ and let $f$ have length at most $\ell$. Assume that
+$q^i-q^j$ is a unit for $0 \le i \ne j < \ell$, and put
+
+$$
+w_i = \prod_{\substack{0 \le j < \ell \\ j \ne i}} (q^i-q^j)^{-1}.
+$$
+
+For every integer $k$,
+
+$$
+f(q^k) = \sum_{i=0}^{\ell-1} f(q^i) w_i
+\prod_{\substack{0 \le j < \ell \\ j \ne i}} (q^k-q^j).
+$$
+
+If, in addition, $q^{k-i}-1$ is a unit for every $0 \le i < \ell$, then
 
 $$
 f(q^k) = \prod_{j=0}^{\ell-1} (q^k - q^j) \sum_{i=0}^{\ell-1}
-\frac{f(q^i) \, w_i \, q^{-i}}{q^{k-i} - 1}, \qquad
-w_i = \prod_{j \ne i} (q^i - q^j)^{-1}.
+\frac{f(q^i) \, w_i \, q^{-i}}{q^{k-i} - 1}.
 $$
 
 The sum is a convolution of the sequence $f(q^i) w_i q^{-i}$ with the
@@ -224,9 +240,38 @@ $q^m - 1$ times powers of $q$.
 :::
 
 ::: proof
-This is Lagrange's formula $f(z) = P(z) \sum_i f(q^i) w_i/(z - q^i)$,
-valid for $z$ not a node, with $z = q^k$ and $q^k - q^i = q^i (q^{k-i} - 1)$.
+The polynomial Lagrange formula in [](#interpolation), evaluated at
+$z=q^k$, gives the first identity, including when $q^k$ is an input
+point. Under the additional unit conditions, factor
+$P(q^k)=\prod_{j=0}^{\ell-1}(q^k-q^j)$ out of the sum and use
+$q^k-q^i=q^i(q^{k-i}-1)$ to obtain the second identity.
 :::
+
+An index outside $[0,\ell)$ need not give a new point. Over a field, if
+$q$ has finite multiplicative order $d$ and $\ell \le d$, reduce $k$
+modulo $d$. If the resulting index lies in $[0,\ell)$, the value is
+already supplied; otherwise the reciprocal formula applies. Over a
+composite residue ring, distinct points alone do not suffice: the
+differences must be units.
+
+For example, in $\Z/7\Z$, take $r=3$, so that $q=2$ has order $3$.
+For $f(x)=x$ and $\ell=2$, the input values are $f(1)=1$, $f(2)=2$ and
+the weights are $w_0=6$, $w_1=1$. At $k=2$ the reciprocal formula gives
+
+$$
+f(4)=(4-1)(4-2)\left(\frac{6}{4-1}+\frac{2}{4-2}\right)
+=6(2+1)=4 \pmod 7.
+$$
+
+But $k=3$ is outside $[0,2)$ and $q^3=1$. The reciprocal formula then
+contains $1/(q^3-1)$, which is undefined, whereas the polynomial identity
+gives the supplied value $f(1)=1$.
+
+FLINT's interpolation and extrapolation precomputation of length $L$
+requires $q^s-1$ to be a unit for $1 \le s < L$; the negative powers
+satisfy $q^{-s}-1=-q^{-s}(q^s-1)$, so $q^{-s}-1$ is a unit as well.
+Over a prime field this is equivalent to the order of $q$ being at least
+$L$, with equality allowed.
 
 ## Use in FLINT {#use}
 

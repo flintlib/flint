@@ -1838,10 +1838,12 @@ a single middle product by Bluestein's chirp transform [@Blu1970]
 and interpolation is two products [@BS2005]. The functions take $r$ with
 $q = r^2$, so that $q^{i^2/2} = r^{i^2}$ needs no square root, and use the
 points $1, r^2, r^4, \ldots$. The value $r$ must be reduced and
-invertible modulo $n$. For interpolation and extrapolation the points must
-be distinct with $r^{2k} - 1$ invertible, which for prime $n$ means that
-the multiplicative order of $r^2$ exceeds the number of points. See
-[](nmod_poly/multipoint#geometric).
+invertible modulo $n$. For interpolation and extrapolation,
+precomputation to length $L$ requires $r^{2s}-1$ to be invertible for
+$1 \le s < L$. For prime $n$ this means that the multiplicative order
+of $r^2$ is at least $L$. Evaluation-only precomputation allows repeated
+points. See [](nmod_poly/multipoint#geometric) and
+[](algorithms/polynomials/subproduct-tree#lem-extrapolate).
 
 ::: type
 nmod_geometric_progression_struct
