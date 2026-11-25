@@ -1,7 +1,7 @@
 ---
 title: Roots of polynomials over finite fields
 summary: Roots in $\mathbb{F}_q$ by squarefree factorisation, the split $\gcd(f, x^{(q-1)/2} \pm 1)$ and random shifts, with powers of $x + c$ computed through Taylor shifts; roots modulo prime powers by Hensel lifting of all roots, and modulo composite $n$ by the Chinese remainder theorem.
-complexity: Over $\mathbb{F}_q$, degree $n$: $O(M(n) \log q \log n)$ expected. Over $\Z/p^k\Z$: one root finding modulo $p$ plus $O(\log k)$ lifting steps per root, each one evaluation of $f$ and $f'$. Over $\Z/n\Z$: the product of the numbers of roots modulo the prime powers, which can be exponential in the number of prime factors.
+complexity: Over $\mathbb{F}_q$, degree $n$: $O(M(n) \log q \log n)$ expected. Over $\Z/p^k\Z$: one root finding modulo $p$ followed by $O(\log k)$ lifting rounds; work depends on intermediate root counts. Over $\Z/n\Z$: the product of the numbers of roots modulo the prime powers, which can be exponential in the number of prime factors.
 order: 80
 ---
 
@@ -148,6 +148,28 @@ same way.
 The number of roots can be large: the roots of $x^2$ modulo $p^k$ are
 the multiples of $p^{\lceil k/2 \rceil}$, of which there are
 $p^{\lfloor k/2 \rfloor}$.
+
+**Lifting work.** Doubling the exponent from 1 to $k$ takes
+$L = \lceil \log_2 k \rceil$ rounds. Put $e_j = \min(k,2^j)$ and let
+$R_j$ be the number of roots modulo $p^{e_j}$. In a complete enumeration,
+round $j$ evaluates $f$ and $f'$ once at each of the $R_j$ input roots,
+so the number of pairs of polynomial evaluations is
+$$
+\sum_{j=0}^{L-1} R_j.
+$$
+Solving the linear congruences, enumerating their solutions and computing
+multiplicities require additional work. If all roots modulo $p$ are
+simple, each lifts uniquely, so $R_0 = \cdots = R_L$ and the count is
+$L R_0$.
+
+Singular roots can branch and then fail to lift, so the final root count
+alone does not bound this work. For any prime $p$, take $f = x^2-p^3$
+and $k = 4$. Modulo $p$ there is one root, 0. Modulo $p^2$, the roots are
+exactly the $p$ multiples of $p$. There are no roots modulo $p^4$: a root
+would satisfy $p^3 \mid x^2$, hence $p^2 \mid x$ and $p^4 \mid x^2$,
+contrary to $x^2 \equiv p^3 \pmod{p^4}$. Thus $R_0 = 1$, $R_1 = p$
+and $R_2 = 0$. The count above is $1+p$, although the final root list is
+empty.
 
 ## Composite moduli {#composite}
 
