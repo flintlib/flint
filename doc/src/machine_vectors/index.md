@@ -103,7 +103,7 @@ following table summarises them.
 | `vec4d`: `one`, `set_d4`, `get_index`, `neg`, `abs`, `div`, `min`, `max`, `sqrt`, `round`, `fmsub`, `_fused`, comparisons, `blendv`, masks and bits, `unpacklo`, `unpackhi`, permutations, gathers | yes | yes | yes |
 | `vec4n`: loads, stores, `set_n`, `zero`, `add`, `sub`, bitwise and/or, shifts, `shift_lanes_up` | yes | yes | yes |
 | Modular arithmetic, `addmod`, conversions, `vec4d_fnmsub`, the fused unpack-and-permute operations, `vec4n` unpacks and `permute2`, the transpose macros, `vec4n_store_unaligned_halves`, `vec8n`, the remaining `vec1d` and `vec8d` operations | yes | yes | no |
-| `round_mul`, `reduce_2n_to_n`, `vec4d_reduce_0n_to_pmhn`, `vec4d_addsub`, `vec4d_half`, `vec4d_same`, `vec4d_same_mod`, `vec8d_same`, `vec4n_mul`, `vec4n_horizontal_sum`, `vec4n_permute_3_2_1_0`, `vec8n_bit_shift_right`, printing | yes | no | no |
+| `round_mul`, `reduce_2n_to_n`, `vec4d_reduce_0n_to_pmhn`, `vec4d_addsub`, `vec4d_half`, `vec4d_same`, `vec4d_same_mod`, `vec8d_same`, `vec4n_mul`, `vec4n_mul_signed`, `vec4n_horizontal_sum`, `vec4n_permute_3_2_1_0`, `vec8n_bit_shift_right`, printing | yes | no | no |
 | `vec4n_set_n4` | yes | no | yes |
 | Other `vec2d` operations, `vec2n`, `vec1n`, `vec8d_one`, `vec8n_add`, `vec8n_sub` | no | yes | no |
 | `vec8d_floor` | no | no | yes |
@@ -840,9 +840,12 @@ one vector to the next. All backends.
 
 ::: function
 vec4n vec4n_mul(vec4n u, vec4n v)
+vec4n vec4n_mul_signed(vec4n u, vec4n v)
 
 Returns the 64-bit products of the low 32 bits of each lane,
-$(u_i \bmod 2^{32})(v_i \bmod 2^{32})$. AVX2 only.
+$(u_i \bmod 2^{32})(v_i \bmod 2^{32})$. The signed version reads the
+low 32 bits of each lane as an integer in $[-2^{31}, 2^{31})$ and
+returns the product in two's complement. AVX2 only.
 :::
 
 ::: function

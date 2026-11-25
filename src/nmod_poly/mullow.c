@@ -15,7 +15,9 @@
 #include "nmod_poly.h"
 #include "impl.h"
 
-void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
+/* the dispatch after the IFMA kernel and the Karatsuba (see impl.h) */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mullow_other(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     slong bits;
@@ -23,13 +25,6 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
-
-    /* first, as the rule of the rows costs about 10 ns */
-    if (_nmod_poly_want_ifma(len2, n, mod, n < len1 + len2 - 1))
-    {
-        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, n, mod);
-        return;
-    }
 
     squaring = (poly1 == poly2 && len1 == len2);
 
@@ -81,6 +76,65 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
         _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, n, mod);
+}
+
+/* as in _nmod_poly_mul, for len1, len2 <= n */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mullow_kernels_n(nn_ptr res, nn_srcptr poly1, slong len1,
+                            nn_srcptr poly2, slong len2, slong n, nmod_t mod)
+{
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, 0, n);
+
+    switch (_nmod_poly_dispatch_n(len1, len2, n, kind, mod))
+    {
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, 0, n, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma_ptr(res, poly1, len1, poly2, len2, 0, n, &mod);
+            break;
+        default:
+            _nmod_poly_mullow_other(res, poly1, len1, poly2, len2, n, mod);
+    }
+}
+
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mullow_kernels(nn_ptr res, nn_srcptr poly1, slong len1,
+                          nn_srcptr poly2, slong len2, slong n, nmod_t mod)
+{
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, 0, n);
+
+    switch (_nmod_poly_dispatch(len1, len2, n, kind, NMOD_BITS(mod)))
+    {
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, n, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, 0, n, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_BY_N:
+            _nmod_poly_mullow_kernels_n(res, poly1, len1, poly2, len2, n, mod);
+            break;
+        default:
+            _nmod_poly_mullow_other(res, poly1, len1, poly2, len2, n, mod);
+    }
+}
+
+void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
+                             nn_srcptr poly2, slong len2, slong n, nmod_t mod)
+{
+    slong s = FLINT_MIN(len2, n);
+
+    /* as in _nmod_poly_mul */
+    if (!_NMOD_POLY_HAVE_KERNELS
+            || (s < _NMOD_POLY_DISPATCH_MIN_LEN(NMOD_BITS(mod))
+                && !_nmod_poly_karatsuba_from_8(s, n,
+                    _nmod_poly_product_kind(poly1, len1, poly2, len2, 0, n),
+                    NMOD_BITS(mod))))
+        _nmod_poly_mullow_other(res, poly1, len1, poly2, len2, n, mod);
+    else
+        _nmod_poly_mullow_kernels(res, poly1, FLINT_MIN(len1, n), poly2,
+                                  FLINT_MIN(len2, n), n, mod);
 }
 
 void nmod_poly_mullow(nmod_poly_t res,

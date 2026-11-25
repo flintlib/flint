@@ -26,7 +26,8 @@
 
 /* The vec4n operations used by the radix-2^56 shift-and-add loops of
    mp_real (loads and stores, add, sub, bitwise and/or, shifts by a
-   common count, the lane shift), lane by lane against scalar
+   common count, the lane shift) and, with AVX2, the 32 x 32 -> 64-bit
+   products of nmod_vec and nmod_poly, lane by lane against scalar
    references, with the backend that machine_vectors.h selects for
    this build.  Only meaningful with 64-bit lanes. */
 
@@ -85,6 +86,17 @@ TEST_FUNCTION_START(machine_vectors_vec4n, state)
 
         ref[0] = b[3]; ref[1] = a[0]; ref[2] = a[1]; ref[3] = a[2];
         T_CHECK("shift_lanes_up", vec4n_shift_lanes_up(va, vb), ref);
+
+#if defined(__AVX2__) && !defined(FLINT_MACHINE_VECTORS_GENERIC)
+        /* AVX2 only */
+        for (i = 0; i < 4; i++)
+            ref[i] = (ulong) (uint32_t) a[i] * (ulong) (uint32_t) b[i];
+        T_CHECK("mul", vec4n_mul(va, vb), ref);
+        for (i = 0; i < 4; i++)
+            ref[i] = (ulong) ((slong) (int32_t) (uint32_t) a[i]
+                              * (slong) (int32_t) (uint32_t) b[i]);
+        T_CHECK("mul_signed", vec4n_mul_signed(va, vb), ref);
+#endif
 
         for (i = 0; i < 4; i++) ref[i] = a[0];
         T_CHECK("set_n", vec4n_set_n(a[0]), ref);

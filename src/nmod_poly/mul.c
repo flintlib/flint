@@ -54,18 +54,13 @@ _mul_want_classical_one_word(slong len1, slong len2, int squaring, nmod_t mod)
     return len2 < c && _mul_classical_one_word(len2, mod);
 }
 
-void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
+/* the dispatch after the IFMA kernel and the Karatsuba (see impl.h) */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mul_other(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
     int squaring, rows;
-
-    /* first, as the rule of the rows costs about 10 ns */
-    if (_nmod_poly_want_ifma(len2, len1 + len2 - 1, mod, 0))
-    {
-        _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, len1 + len2 - 1, mod);
-        return;
-    }
 
     squaring = (poly1 == poly2 && len1 == len2);
 
@@ -113,6 +108,71 @@ void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
         _nmod_poly_mul_KS2(res, poly1, len1, poly2, len2, mod);
     else
         _nmod_poly_mul_KS4(res, poly1, len1, poly2, len2, mod);
+}
+
+/* where n decides (see impl.h): the IFMA kernel, with the one-word
+   Karatsuba before it for longer operands, else the Karatsuba if its rule
+   takes the product, else the other algorithms */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mul_kernels_n(nn_ptr res, nn_srcptr poly1, slong len1,
+                         nn_srcptr poly2, slong len2, nmod_t mod)
+{
+    slong m = len1 + len2 - 1;
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, 0, m);
+
+    switch (_nmod_poly_dispatch_n(len1, len2, m, kind, mod))
+    {
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, 0, m, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma_ptr(res, poly1, len1, poly2, len2, 0, m, &mod);
+            break;
+        default:
+            _nmod_poly_mul_other(res, poly1, len1, poly2, len2, mod);
+    }
+}
+
+/* from the lengths and the bit size of n (see impl.h) */
+FLINT_STATIC_NOINLINE void
+_nmod_poly_mul_kernels(nn_ptr res, nn_srcptr poly1, slong len1,
+                       nn_srcptr poly2, slong len2, nmod_t mod)
+{
+    slong m = len1 + len2 - 1;
+    int kind = _nmod_poly_product_kind(poly1, len1, poly2, len2, 0, m);
+
+    switch (_nmod_poly_dispatch(len1, len2, m, kind, NMOD_BITS(mod)))
+    {
+        case _NMOD_POLY_DISPATCH_IFMA:
+            _nmod_poly_mulmid_ifma(res, poly1, len1, poly2, len2, 0, m, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_KARATSUBA:
+            _nmod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, 0, m, mod);
+            break;
+        case _NMOD_POLY_DISPATCH_BY_N:
+            _nmod_poly_mul_kernels_n(res, poly1, len1, poly2, len2, mod);
+            break;
+        default:
+            _nmod_poly_mul_other(res, poly1, len1, poly2, len2, mod);
+    }
+}
+
+void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
+                             nn_srcptr poly2, slong len2, nmod_t mod)
+{
+    /* short operands (all operands in a build without kernels) at once to
+       the other algorithms, longer ones to _nmod_poly_mul_kernels, which
+       decides from the bit size of n; both calls come last, so that the
+       compiler can make them jumps (tail calls, see impl.h) */
+    if (!_NMOD_POLY_HAVE_KERNELS
+            || (len2 < _NMOD_POLY_DISPATCH_MIN_LEN(NMOD_BITS(mod))
+                && !_nmod_poly_karatsuba_from_8(len2, len1 + len2 - 1,
+                    _nmod_poly_product_kind(poly1, len1, poly2, len2, 0,
+                                            len1 + len2 - 1),
+                    NMOD_BITS(mod))))
+        _nmod_poly_mul_other(res, poly1, len1, poly2, len2, mod);
+    else
+        _nmod_poly_mul_kernels(res, poly1, len1, poly2, len2, mod);
 }
 
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)

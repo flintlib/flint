@@ -196,8 +196,11 @@
     of fft_small; low products up to 511 coefficients,
     ..._LOW_MAX_LEN_FFT_PRIME modulo these primes; above, fft_small; for
     53- to 63-bit moduli, from ..._MIN_LEN_ABOVE_52 coefficients; for
-    n > 2^52, the variant by CRT from ..._CRT_MIN_LEN (0: never); see
-    src/nmod_poly/impl.h (not measured on this target: default)
+    n > 2^52, the variant by CRT from ..._CRT_MIN_LEN (0: never); for
+    balanced shapes (full products of len1 <= 2 len2 + 1, middle products
+    of at most 3 len2 outputs), up to ..._BALANCED_MAX_LEN(b); see
+    src/nmod_poly/impl.h
+    (not measured on this target: default)
 */
 #define FLINT_NMOD_POLY_IFMA_MAX_LEN(bits) \
     ((bits) <= 20 ? 192 : (bits) <= 26 ? 511 : (bits) <= 45 ? 384 \
@@ -206,5 +209,40 @@
 #define FLINT_NMOD_POLY_IFMA_LOW_MAX_LEN_FFT_PRIME 511
 #define FLINT_NMOD_POLY_IFMA_CRT_MIN_LEN 0
 #define FLINT_NMOD_POLY_IFMA_MIN_LEN_ABOVE_52 8
+#define FLINT_NMOD_POLY_IFMA_BALANCED_MAX_LEN(bits) FLINT_NMOD_POLY_IFMA_MAX_LEN(bits)
+
+/*
+    nmod_poly, Karatsuba (see src/nmod_poly/impl.h):
+    - with AVX512-IFMA, full and middle products of blocks longer than
+      FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN(b) go to the one-word Karatsuba
+      rather than to the IFMA kernel; so do, with one block, balanced full
+      products and squares from ..._KARA_BLOCK_MIN_LEN(b) coefficients and
+      middle products by 16 coefficients if that bound is at most 16
+      (17: never), and low products from blocks of ..._KARA_LOW_MIN_LEN(b)
+      (0: never);
+    - FLINT_NMOD_POLY_KARA_AVX512_RULES: 1 for the rules of the doubles
+      measured with AVX-512 (on Cascade Lake), where the rows and the
+      classical code have 512-bit kernels, 0 for those measured with AVX2
+      (on Comet Lake).
+    - without AVX512-IFMA, the longest blocks of the one-word Karatsuba
+      where fft_small needs one prime, from 12 bits (above, fft_small):
+      FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN, and where it needs two:
+      FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN (half of it for squares);
+      320 and 1024 by default (measured on Meteor Lake), 544 and 2048 on
+      Broadwell and Skylake-family cores (measured on Comet Lake and
+      Cascade Lake).
+    (not measured on this target: default)
+*/
+#define FLINT_NMOD_POLY_IFMA_KARA_MAX_LEN(bits) 192
+#define FLINT_NMOD_POLY_IFMA_KARA_BLOCK_MIN_LEN(bits) 17
+#define FLINT_NMOD_POLY_IFMA_KARA_LOW_MIN_LEN(bits) 0
+#if defined(__AVX512F__)
+# define FLINT_NMOD_POLY_KARA_AVX512_RULES 1
+#else
+# define FLINT_NMOD_POLY_KARA_AVX512_RULES 0
+#endif
+
+#define FLINT_NMOD_POLY_KARA_ONE_PRIME_MAX_LEN 320
+#define FLINT_NMOD_POLY_KARA_TWO_PRIMES_MAX_LEN 1024
 
 #endif

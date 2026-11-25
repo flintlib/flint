@@ -1369,6 +1369,18 @@ $2^{\max(\mathtt{depth}, 4)} \mid n - 1$ (the context initialisation
 Primality is assumed.
 :::
 
+::: function
+int _nmod_poly_should_directly_fft(ulong bn, ulong depth, ulong n)
+
+Returns whether `fft_small_plan_init_nmod` computes products modulo $n$
+with operands of length up to `bn` and a transform of length
+$2^{\mathtt{depth}}$ modulo $n$ itself, without Chinese remaindering:
+$\mathtt{bn} \ge 100$, $n$ has at least 20 bits,
+`fft_small_prime_supports_depth` holds and $n$ is prime. The last prime
+and the last composite tested are cached per thread. The product rules
+of `nmod_poly` call it to give these primes the bounds of one prime.
+:::
+
 ## Chinese remaindering and integer conversion {#crt}
 
 Data and helpers behind the conversions of the multiplication drivers.

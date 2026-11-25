@@ -95,9 +95,12 @@ TEST_FUNCTION_START(nmod_poly_mulmid_ifma, state)
         _ifma_randvec(b, lb, state, mod.n);
         c[nhi - nlo] = 12345;
 
-        crt = n_randint(state, 2);
-        if (crt)
+        /* crt = 2: the entry point with mod by pointer, of the dispatchers */
+        crt = n_randint(state, 3);
+        if (crt == 1)
             _nmod_poly_mulmid_ifma_crt(c, a, la, b, lb, nlo, nhi, mod);
+        else if (crt == 2)
+            _nmod_poly_mulmid_ifma_ptr(c, a, la, b, lb, nlo, nhi, &mod);
         else
             _nmod_poly_mulmid_ifma(c, a, la, b, lb, nlo, nhi, mod);
         _nmod_poly_mulmid_classical(d, a, la, b, lb, nlo, nhi, mod);
