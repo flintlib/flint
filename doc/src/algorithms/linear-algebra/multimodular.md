@@ -376,19 +376,20 @@ without knowing the size of the solution:
    the entries of the current solution modulo $m$, with weights
    $u_{ij} \in [1, 16]$, is maintained incrementally at negligible cost.
    It is the residue of the rational number
-   $s^* = \sum u_{ij} X^*_{ij}$, whose denominator is the common
-   denominator of the solution with high probability, and whose numerator
-   has about the size of the largest numerator.
+   $s^* = \sum u_{ij} X^*_{ij}$. The reduced denominator of $s^*$ divides
+   the common denominator of the solution, but cancellation can make it
+   smaller; see [](#probe-details).
 2. *Probe reconstruction* (`_fmpz_mat_solve_probe_reconstruct`). First $s$
    and $s d'$, for the denominator $d'$ found by the previous probe, are
    tested for being small in the symmetric range, with a margin of 30
    bits. Otherwise the continued fraction expansion of $s/m$ is computed.
-   The true value $u/v$ is the convergent preceding a large partial
-   quotient as soon as $m > 2^{30} |u| v$, whatever the balance between
-   $u$ and $v$, which halves the precision that a fixed split
-   $N = D = \sqrt{m/2}$ would need [@Mon2004]. A partial quotient of at
-   least 30 bits is required, so a spurious result has probability about
-   $2^{-30}$.
+   A partial quotient of largest bit length, with at least 30 bits, is
+   used to choose asymmetric numerator and denominator bounds for rational
+   reconstruction. The returned numerator and denominator must also have
+   a combined bit length at least 30 bits below that of $m$. This searches
+   for small numerator-denominator products without assuming that the two
+   factors have similar sizes [@Mon2004]. Probe success is only a reason
+   to attempt reconstruction of the whole solution.
 3. *Attempt.* When the probe has succeeded, and either the certificate can
    hold at the current modulus or an explicit check $AZ = dB$ is estimated
    to cost less than the lifting steps still missing, the whole solution
@@ -405,6 +406,66 @@ every accepted solution satisfies [](#thm-certificate) or has been
 verified by a multiplication. Finally the gcd of the denominator and the
 entries is divided out, so that the denominator is the least common
 denominator.
+
+#### Probe denominators and reconstruction candidates {#probe-details}
+
+Write $X^* = Z_*/d_*$, where $d_* > 0$ is the least common denominator
+of the solution and $Z_*$ is an integer $n \times k$ matrix. Set
+$$
+c = \sum_{i,j} u_{ij} (Z_*)_{ij}.
+$$
+Then $s^* = c/d_*$ has reduced denominator
+$$
+\frac{d_*}{\gcd(d_*, c)},
+\qquad |c| \le 16nk \lVert Z_* \rVert.
+$$
+Thus the exact probe can lose denominator factors, and its numerator can
+be much smaller than the largest solution numerator, including zero.
+For example, for the scalar solution $X^* = 1/(16!)$, every weight
+$w \in \{1, \ldots, 16\}$ divides $16!$. The exact probe $w/(16!)$ has
+reduced denominator $(16!)/w$, which equals the solution denominator only
+for $w = 1$. Under the uniform choice of $w$, this has probability $1/16$.
+The divisor statement concerns the exact probe; a spurious reconstruction
+need not have a denominator dividing $d_*$.
+
+The fractions reconstructed from a continued fraction must also be
+distinguished from its convergents. If $a/v$ is a convergent of $s/m$,
+the associated Euclidean candidate is $u/v$, where
+$$
+u = vs - am, \qquad u \equiv vs \pmod m.
+$$
+A large following partial quotient is used to detect a small product
+$|u|v$ [@Mon2004, §3]. It does not make $u/v$ itself a convergent of
+$s/m$. For example, for any integer $t \ge 2$,
+$$
+m = 3t + 1, \qquad s = 2t + 1, \qquad
+\frac{s}{m} = [0; 1, 2, t].
+$$
+The convergent preceding $t$ is $2/3$, whereas $3s - 2m = 1$ gives the
+reconstruction candidate $1/3$. Here $\gcd(3,m) = 1$, and $t$ can be
+arbitrarily large.
+
+For bounds $|u| \le N_0$, $0 < v \le D_0$, with $N_0,D_0 \ge 1$,
+[](#thm-ratrec) guarantees unique reconstruction when $m > 2N_0D_0$.
+Using balanced bounds covering the same rectangle instead gives the
+condition $m > 2\max(N_0,D_0)^2$. If one bound stays fixed while the other
+grows, the first condition has half the leading bit-length requirement
+of the second. This explains the potential saving from an asymmetric
+window; the probe's chosen window and safety margins can require more
+precision.
+
+The fixed 30-bit criteria do not give an input-independent error
+probability for the whole probe. Monagan's statistical analysis uses
+assumptions on the input distribution and a threshold that grows with
+the bit length of $m$ [@Mon2004, §3]. For a direct example of a spurious
+small-integer probe, at a modulus $m > 2^{30}$ take the scalar system
+$A = (1)$, $B = (m)$. Its exact solution is $m$, so every allowed weight
+$w$ gives $s^* = wm \ne 0$ but residue $s = 0$. The small-integer trial
+accepts $0/1$ for every weight. The candidate solution $Z = (0)$, $d = 1$
+fails [](#thm-certificate), since it would require $m < m$, and also
+fails the exact multiplication check. The probe therefore affects when
+work is attempted, while the certificate or multiplication establishes
+the answer.
 
 ## Consistency of general systems {#can-solve}
 
