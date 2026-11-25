@@ -217,20 +217,70 @@ arithmetic) and `fmpz_mat_is_reduced_gram`.
 ## Removals {#removals}
 
 In [van Hoeij's factoring algorithm](algorithms/polynomials/factoring-integers#van-hoeij)
-[@vHo2002; @vHN2010], only the lattice
-vectors of norm at most a bound are of interest, and vectors with large
-Gram–Schmidt norm at the end of a reduced basis can be discarded. The
-functions with removal take a bound `gs_B` and return the number `newd` of
-vectors to keep: after the reduction, the last vectors whose squared
-Gram–Schmidt norm exceeds the bound (by a factor 2 in the floating-point
-estimate) are dropped from the count, and the first `newd` vectors are
-$(\delta, \eta)$-reduced. A vector of a reduced basis whose Gram–Schmidt
-norm exceeds the bound cannot contribute to a vector of norm at most the
-bound with the following vectors. During the reduction, the
-dimension is decreased as soon as the last vector is estimated to exceed
-the bound. The knapsack variant `fmpz_lll_d_with_removal_knapsack`
-additionally size-reduces each new vector in advance the first time it is
-reached, which pays off for the knapsack-type lattices of factoring.
+[@vHo2002; @vHN2010], only lattice vectors within a prescribed length
+bound are of interest. Write $H \ge 0$ for the bound on squared
+Euclidean lengths, passed as `gs_B`.
+
+::: lemma Removing a trailing block {#lem-lll-removal}
+Let $b_1,\ldots,b_d$ be a basis of a lattice $L$, and let
+$0 \le r \le d$. If $r_{ii}=\lVert b_i^* \rVert^2 > H$ for every
+$i>r$, then every $v \in L$ with $\lVert v \rVert^2 \le H$ belongs to
+$\Z b_1+\cdots+\Z b_r$.
+:::
+
+::: proof
+Write $v=\sum_{i=1}^d z_i b_i$, with $z_i \in \Z$. If any coefficient
+with index greater than $r$ is nonzero, let $k$ be the largest index
+with $z_k \ne 0$. Orthogonal projection onto $b_k^*$ gives
+
+$$
+\lVert v \rVert^2 \ge z_k^2 \lVert b_k^* \rVert^2
+ \ge r_{kk} > H,
+$$
+
+a contradiction.
+:::
+
+This is the projection argument in [@LLL1982, proof of (1.11)],
+used for the last vector in [@vHN2010, Lemma 2]. It does not require
+the basis to be LLL-reduced. Repeatedly removing the last vector
+whose squared Gram–Schmidt length exceeds $H$ therefore preserves
+every vector within the bound. The inequality is strict: vectors of
+squared length exactly $H$ must also be retained.
+
+::: example A large length before the trailing block {#lll-removal-example}
+Consider
+
+$$
+b_1=(4,0,0), \qquad b_2=(2,3,0), \qquad b_3=(0,0,5).
+$$
+
+Their squared Gram–Schmidt lengths are $16,9,25$, and the only
+nonzero Gram–Schmidt coefficient is $\mu_{21}=1/2$. The basis is
+$(3/4,1/2)$-LLL-reduced: the two Lovász inequalities are
+$8 \le 9$ and $27/4 \le 25$.
+
+For $H=13$, the lemma permits removing $b_3$. It does not permit
+removing $b_1$, despite $r_{11}=16>13$, since
+
+$$
+v=b_2-b_1=(-2,3,0), \qquad \lVert v \rVert^2=13.
+$$
+
+Removing $b_1$ would lose this vector. The retained basis can thus
+contain a vector longer than the bound.
+:::
+
+The functions with removal return the number `newd` of leading
+vectors to keep; the first `newd` vectors are
+$(\delta,\eta)$-reduced. The floating-point variants compare an
+estimate of half the squared Gram–Schmidt length with `gs_B`,
+and the wrappers certify the result as described in [](#certify).
+During the reduction, the dimension is decreased as soon as the
+last vector is estimated to exceed the removal bound. The knapsack
+variant `fmpz_lll_d_with_removal_knapsack` additionally size-reduces
+each new vector in advance the first time it is reached, which pays
+off for the knapsack-type lattices of factoring.
 
 ## Truncation: ULLL {#ulll}
 
