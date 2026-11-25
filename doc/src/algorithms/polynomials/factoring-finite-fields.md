@@ -191,16 +191,24 @@ operations, plus $O(M(n) \log q)$ for $h_1$.
 :::
 
 ::: proof
-By [](#lem-interval), the factors of $v$ that divide $I_j$ are those
-whose degree divides some integer in $(\ell j, \ell(j+1)]$. By induction
-on $j$, when $F_j$ is computed every factor of $v$ has degree greater
-than $\ell j$ (smaller degrees $d$ divide $d$ itself, which lies in an
-earlier interval), so $F_j$ is the product of the factors with degree in
-$(\ell j, \ell(j+1)]$. Omitting the terms for degrees above $\tfrac12 \deg
-v$ loses nothing, because if $v$ had a factor of such a degree $d$ and
-were reducible, it would also have a factor of degree $\le \deg v - d <
-d$, already removed. The stopping rule and step 3 are justified as in the
-classical algorithm. Reducing $H_{j-1}$ and the matrix of powers of
+At the start of iteration $j$, write $N = \deg v$ and
+$D = \ell(j+1)$. By induction, every irreducible factor of $v$ has degree
+greater than $\ell j$. By [](#lem-interval), $F_j$ is therefore the
+product of the factors whose degrees lie in
+$(\ell j, \min(D, N/2)]$.
+
+An irreducible factor $w$ of degree $e \in (\ell j, D]$ can be omitted
+only if $e > N/2$. There is at most one such factor. Every other
+irreducible factor has degree at most $N-e < N/2 < e \le D$, so it is
+captured by $F_j$ in this same iteration. The new $v$ is then $w$, and
+the stopping rule holds since $e \le D < 2(D+1)$.
+
+If no factor in $(\ell j, D]$ is omitted, $F_j$ removes all factors in
+that interval. Every remaining factor has degree at least $D+1$, so
+$\deg v < 2(D+1)$ implies that $v$ is either 1 or irreducible. This
+justifies the stopping rule and step 3 in both cases.
+
+Reducing $H_{j-1}$ and the matrix of powers of
 $h_\ell$ modulo the new $v$ after a split is valid since $v$ divides the
 old modulus.
 
@@ -219,6 +227,15 @@ multiplications per interval of step 2.2, and one gcd per interval and
 per degree in the fine phase, $O(\sqrt{n} M(n) \log n)$ in total, which
 is dominated by the compositions.
 :::
+
+**Example.** Over $\mathbb{F}_2$, take $g = u w$ with
+$u = x^3+x+1$ and $w = x^4+x+1$. Both factors are irreducible: neither
+has a root in $\mathbb{F}_2$, and $w$ has remainder 1 modulo
+$x^2+x+1$, the only monic irreducible quadratic over $\mathbb{F}_2$.
+With $\ell=2$, the first interval removes nothing. At the start of
+$j=1$, $N=7$ and $D=4$. The term for degree 4 is omitted, giving
+$F_1=u$ and the new $v=w$, which step 3 outputs. Thus the smaller factor
+is removed in the current interval, not in an earlier one.
 
 The baby steps are computed in `_gr_poly_iterated_frobenius_preinv`,
 by repeated exponentiation by $q$ if $q$ is small (see
