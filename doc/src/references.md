@@ -131,7 +131,7 @@ title: References
 [Joh2018b]: F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. https://mpmath.org/
 [JvdP2002]: M. J. Jacobson Jr. and A. J. van der Poorten. "Computational aspects of NUCOMP." In International Algorithmic Number Theory Symposium, pp. 120-133. Berlin, Heidelberg: Springer Berlin Heidelberg, 2002.
 [Kahan1991]: Kahan, William: Computing a Real Cube Root. https://csclub.uwaterloo.ca/~pbarfuss/qbrt.pdf
-[KanBac1979]: Kannan, R. and Bachem, A. : Polynomial algorithms for computing and the Smith and Hermite normal forms of an integer matrix, SIAM J. Computation vol. 9 (1979) 499--507
+[KanBac1979]: R. Kannan and A. Bachem, "Polynomial algorithms for computing the Smith and Hermite normal forms of an integer matrix", SIAM Journal on Computing 8:4 (1979), 499--507. https://doi.org/10.1137/0208040
 [Kar1998]: E. A. Karatsuba, "Fast evaluation of the Hurwitz zeta function and Dirichlet L-series", Problems of Information Transmission 34:4 (1998), 342-353, http://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=ppi&paperid=425&option_lang=eng
 [KL2024]: Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
 [Knu1997]: Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
