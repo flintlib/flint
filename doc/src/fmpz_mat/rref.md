@@ -77,14 +77,67 @@ the multimodular method.
 ### Fraction-free back substitution {#rref-fflu}
 
 `fmpz_mat_rref_fflu` computes the fraction-free echelon form with
-`fmpz_mat_fflu`. Writing its first $r$ rows, up to a permutation of the
-columns, as $(U \mid V)$ with $U$ upper triangular, the reduced form is
-$(I \mid U^{-1} V)$, and $\mathit{den} \cdot U^{-1} V$ is integral since
-$\mathit{den} = \det U$ up to sign. Its columns are computed by back
-substitution with exact divisions by the pivots, scaled to the common
-denominator `den`; only the non-pivot columns need to be updated. This is
-the fraction-free Gauss–Jordan elimination of [@NakTurWil1997]
-restricted to the part $V$.
+`fmpz_mat_fflu`.
+Let $(U \mid V)$ be its first $r$ echelon rows, with the stored
+lower-triangular multipliers omitted and the pivot columns placed first.
+The nonzero rows of the reduced form are $(I \mid U^{-1}V)$.
+
+Suppose $r>0$ and put $d=\mathit{den}=p_{r-1}$. Let $M$ be the
+$r \times r$ submatrix of the original $A$ on the pivot rows, in the order
+chosen by elimination, and the pivot columns in their original order.
+Let $N$ consist of the same rows on the remaining columns. Elimination on
+these rows gives an invertible matrix $E$ over $\Q$ such that
+
+$$
+EM=U,\qquad EN=V,\qquad U^{-1}V=M^{-1}N.
+$$
+
+The [pivot-minor identity](algorithms/linear-algebra/fraction-free#thm-sylvester)
+gives $d=\det M$. The diagonal entries of $U$ are all the Bareiss pivots
+[@Jef2010, §3], so
+
+$$
+d=p_{r-1}=\det M,\qquad \det U=\prod_{k=0}^{r-1}p_k.
+$$
+
+Cramer's rule therefore gives the integral matrix
+
+$$
+d\,U^{-1}V=\operatorname{adj}(M)N.
+$$
+
+Its columns are computed by back substitution with exact divisions by the
+pivots, scaled to the common denominator $d$; only the non-pivot columns
+need to be updated. Each quotient is exact because back substitution
+recovers an entry of this integral matrix. This is the fraction-free
+Gauss–Jordan elimination of [@NakTurWil1997] restricted to the part $V$.
+
+For example, take
+
+$$
+A=\begin{pmatrix}2&1&1\\1&2&0\end{pmatrix},\qquad
+(U\mid V)=\begin{pmatrix}2&1&1\\0&3&-1\end{pmatrix}.
+$$
+
+The second echelon row is $2(1,2,0)-(2,1,1)=(0,3,-1)$.
+The pivots are $2,3$, so $d=3$ and $\det U=6$. Here $M$ is the first
+two columns of $A$, with $\det M=3$, and $N=(1,0)^T$. Thus
+
+$$
+d\,U^{-1}V=
+\begin{pmatrix}2&-1\\-1&2\end{pmatrix}
+\begin{pmatrix}1\\0\end{pmatrix}
+=\begin{pmatrix}2\\-1\end{pmatrix}.
+$$
+
+Back substitution gives the same column: its bottom entry is
+$3(-1)/3=-1$, and its top entry is $(3\cdot1-1(-1))/2=2$. The scaled
+reduced form is therefore
+
+$$
+R=\begin{pmatrix}3&0&2\\0&3&-1\end{pmatrix},\qquad
+R/3=(I\mid M^{-1}N).
+$$
 
 ### Multimodular echelon form {#rref-mul}
 
