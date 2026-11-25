@@ -139,13 +139,49 @@ memory traffic of the rank-one updates.
 
 ## Minimal polynomial {#minpoly}
 
+In this section, let $M$ be an $r \times r$ matrix over a field $K$.
+For matrices over $\Z/p\Z$, this requires $p$ to be prime.
+
 The minimal polynomial $\mu_M$ of $M$ is the monic generator of the ideal
-of polynomials $f$ with $f(M) = 0$. For a vector $v$, the minimal
-polynomial $\mu_{M,v}$ of $v$ with respect to $M$ is the monic generator
-of the ideal of $f$ with $f(M) v = 0$; its degree is the dimension of the
-Krylov space $K(v) = \operatorname{span}\{v, Mv, M^2 v, \ldots\}$, and its
+of polynomials $f \in K[x]$ with $f(M) = 0$. By Cayley-Hamilton this
+ideal contains $\chi_M$. Choose a monic annihilator of least degree.
+Dividing any annihilator by it leaves an annihilating remainder of
+smaller degree. A nonzero remainder could be made monic over $K$,
+contradicting minimality, so the remainder is zero. Thus the chosen
+polynomial generates the ideal, and the monic generator is unique.
+
+For a vector $v \in K^r$, the minimal polynomial $\mu_{M,v}$ of $v$ with
+respect to $M$ is the monic generator of the ideal of $f$ with
+$f(M) v = 0$; its degree is the dimension of the Krylov space
+$K(v) = \operatorname{span}\{v, Mv, M^2 v, \ldots\}$, and its
 coefficients express the first vector $M^d v$ that is linearly dependent
 on the previous ones.
+
+The annihilator ideal need not be principal over a composite residue
+ring. For example, let $R = \Z/4\Z$ and $A = \operatorname{diag}(0,2)$.
+For $f = \sum_i f_i x^i \in R[x]$, we have
+$f(A) = \operatorname{diag}(f_0, f_0 + 2f_1)$, so
+
+$$
+\{f \in R[x] : f(A) = 0\} = (2x, x^2).
+$$
+
+Suppose this ideal were $(g)$, with $g = \sum_i g_i x^i$. Then $g_0 = 0$
+and $g_1$ is even. Since $x^2 = gh$ for some $h = \sum_i h_i x^i$,
+comparison of the coefficients of $x$ and $x^2$ gives
+
+$$
+g_1 h_0 = 0, \qquad g_2 h_0 + g_1 h_1 = 1.
+$$
+
+The second equation forces $h_0$ to be odd, hence a unit, and the first
+then gives $g_1 = 0$. Every multiple of $g$ therefore has zero
+coefficient of $x$, contradicting $2x \in (g)$.
+There is no monic linear annihilator: evaluating $x+c$ at 0 forces
+$c=0$, but its value at 2 is then 2. Thus $x^2$ and $x^2+2x$ are distinct
+monic annihilators of least degree. The characteristic polynomial
+$\chi_A = x(x-2) = x^2+2x$ exists, but does not generate the annihilator
+ideal.
 
 ::: theorem {#thm-lcm}
 Over a field, if $K(v_1) + \cdots + K(v_s)$ is the whole space, then
@@ -159,10 +195,23 @@ $L(M) M^i v_j = M^i L(M) v_j = 0$ for all $i$ and $j$, so $L(M)$
 vanishes on a spanning set and $L(M) = 0$. Hence $\mu_M$ divides $L$.
 :::
 
+For example, over $\Z/3\Z$, let $D = \operatorname{diag}(0,0,1)$.
+The three unit vectors have one-dimensional Krylov spaces, with
+
+$$
+\mu_{D,e_0} = x, \qquad \mu_{D,e_1} = x, \qquad
+\mu_{D,e_2} = x-1.
+$$
+
+Their Krylov spaces span the whole space, so the theorem gives
+$\mu_D = \operatorname{lcm}(x,x,x-1) = x(x-1)$.
+The repeated factor $x$ appears only once in this least common multiple,
+whereas $\chi_D = x^2(x-1)$.
+
 `nmod_mat_minpoly` applies this with unit vectors.
 
 ::: algorithm Minimal polynomial {#alg-minpoly}
-**Input:** $M \in (\Z/p\Z)^{r \times r}$.
+**Input:** $M \in (\Z/p\Z)^{r \times r}$, with $p$ prime.
 
 **Output:** $\mu_M$.
 
