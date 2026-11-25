@@ -12,7 +12,7 @@
 [Sto2000]: A. Storjohann, *Algorithms for Matrix Canonical Forms*, PhD thesis, ETH Zürich (2000), https://doi.org/10.3929/ethz-a-004141007
 [How1986]: J. A. Howell, "Spans in the module $(\mathbb{Z}_m)^s$", Linear and Multilinear Algebra 19 (1986), 67-77
 [Ber1984]: S. J. Berkowitz, "On computing the determinant in small parallel time using a small number of processors", Information Processing Letters 18 (1984), 147-150
-[Dan1937]: A. M. Danilevsky, "On the numerical solution of the secular equation" (in Russian), Matematicheskii Sbornik 2(44):1 (1937), 169-171
+[Dan1937]: A. M. Danilevsky, "On the numerical solution of the secular equation" (in Russian), Matematicheskii Sbornik 2(44):1 (1937), 169-172, https://www.mathnet.ru/rus/sm5564
 [KG1985]: W. Keller-Gehrig, "Fast algorithms for the characteristic polynomial", Theoretical Computer Science 36 (1985), 309-317, https://doi.org/10.1016/0304-3975(85)90049-0
 [DPW2005]: J.-G. Dumas, C. Pernet and Z. Wan, "Efficient computation of the characteristic polynomial", Proceedings of the 2005 International Symposium on Symbolic and Algebraic Computation (ISSAC) (2005), 140-147
 [PS2007]: C. Pernet and A. Storjohann, "Faster algorithms for the characteristic polynomial", Proceedings of the 2007 International Symposium on Symbolic and Algebraic Computation (ISSAC) (2007), 307-314

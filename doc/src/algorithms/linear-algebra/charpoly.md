@@ -101,6 +101,19 @@ Danilevsky's method [@Dan1937] transforms $M$ by similarity transforms
 into a block triangular matrix whose diagonal blocks are companion
 matrices, whose characteristic polynomials can be read off; see also
 [@Coh1996] for the related Hessenberg method.
+
+In the companion convention used here, a block $C$ of size $d$ has top
+row $c_1, \ldots, c_d$, ones on the subdiagonal and zeros in all other
+entries below the top row. Expanding $\det(xI - C)$ along its first row
+gives
+
+$$
+\chi_C(x) = x^d - c_1 x^{d-1} - \cdots - c_d.
+$$
+
+The coefficient array in ascending degree order is therefore
+$(-c_d, \ldots, -c_1, 1)$.
+
 `nmod_mat_charpoly_danilevsky` works on a copy of $M$ from the bottom row
 upwards. At step $i$, the rows below $r - i$ already form the last rows of
 a companion matrix, and the step makes row $r - i$ equal to the unit
@@ -110,20 +123,48 @@ vector $e_{r-i-1}$:
    $h = 0$, look for a nonzero entry further left in the same row and
    move it into place by exchanging two rows and the corresponding two
    columns (a similarity transform by a permutation).
-2. If the row has no nonzero entry left of the diagonal, the trailing
-   block of size $i$ is a companion matrix and is decoupled from the rest:
-   multiply the result by its characteristic polynomial, read off its
-   bottom row, and continue with the leading block of size $r - i$.
-3. Otherwise, apply the similarity transform by the identity matrix with
-   row $r - i - 1$ replaced by row $r - i$ of $M$, whose inverse involves
-   $h^{-1}$. This turns row $r - i$ into $e_{r-i-1}$ and costs one
-   rank-one update of the matrix and one row of dot products, $O(r^2)$
-   operations.
+2. If the row has no nonzero entry left of the diagonal, then
+   $M = \begin{pmatrix} A & E \\ 0 & C \end{pmatrix}$ with $C$ a companion
+   block of size $i$. Since $\chi_M = \chi_A \chi_C$, multiply the result
+   by $\chi_C$, read from the top row of $C$, and continue with the
+   leading block $A$ of size $r - i$.
+3. Otherwise, let $S$ be the identity matrix with row $r - i - 1$
+   replaced by row $r - i$ of $M$, and apply $M \gets SMS^{-1}$.
+   The inverse of $S$ involves $h^{-1}$. This turns row $r - i$ into
+   $e_{r-i-1}$ and costs one rank-one update of the matrix and one row
+   of dot products, $O(r^2)$ operations.
 
 When the leading block is a full companion matrix, its characteristic
 polynomial is multiplied into the result. There are $r - 1$ steps of
 cost $O(r^2)$, so $O(r^3)$ operations in all. Every dot product is
 computed with a single reduction.
+
+For example, over $\Z/7\Z$, take
+
+$$
+M = \begin{pmatrix} 5 & 1 & 0 \\ 0 & 1 & 2 \\ 0 & 3 & 4 \end{pmatrix},
+\qquad
+S = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 3 & 4 \\ 0 & 0 & 1 \end{pmatrix}.
+$$
+
+The first pivot is $h = 3$. Since $\det S = 3$ is a unit and $SM = BS$
+for
+
+$$
+B = \begin{pmatrix} 5 & 5 & 1 \\ 0 & 5 & 2 \\ 0 & 1 & 0 \end{pmatrix},
+$$
+
+the similarity step gives $B = SMS^{-1}$. At the next step, the second
+row has no nonzero entry left of its diagonal, so the trailing block
+has size 2 and top row $(5, 2)$. Its characteristic polynomial is
+$x^2 - 5x - 2$, and hence
+
+$$
+\chi_M(x) = (x - 5)(x^2 - 5x - 2).
+$$
+
+The nonzero upper-right block does not affect this factorization. The
+bottom row $(1, 0)$ records the companion pattern, not its coefficients.
 
 Over a field the algorithm cannot fail. Over $\Z/N\Z$ with composite $N$,
 step 3 needs the inverse of $h$; if $h$ is a nonzero zero divisor, the
