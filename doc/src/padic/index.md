@@ -379,10 +379,14 @@ zero and $e \ne 0$ the result is zero, also for $e < 0$. Assumes that
 $ev$ does not overflow a `slong`.
 
 ::: details
-If the input $p^v u$ is only known modulo $p^N$, then $x^e$ is only
-known modulo $p^{N + (e - 1)v}$, which is a loss of precision when
-$v < 0$ ([](algorithms/p-adic/precision)). The function computes the
-power of the stored value exactly and does not account for this.
+If a nonzero input $x=p^v u$ is known modulo $p^N$ with $N>v$ and
+$e \ne 0$,
+a conservative bound gives $x^e$ modulo $p^{N+(e-1)v}$. This can lose
+absolute precision when $v<0$ and $e>1$, while divisibility of $e$ by $p$
+can improve the bound; positive exponents are treated in
+[](algorithms/p-adic/precision#prop-power). For negative exponents,
+apply inversion first. The function computes the power of the stored
+value to the output precision and does not propagate input uncertainty.
 :::
 :::
 
