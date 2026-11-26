@@ -1,6 +1,6 @@
 ---
 title: Middle products and the transposition principle
-summary: The middle product, a window of coefficients of a product, is the transpose of polynomial multiplication and costs no more than an ordinary product of the corresponding size; FLINT computes it with dot products, a cyclic convolution whose wrap-around misses the window, or transposed FFTs, and uses it in Newton iteration and geometric evaluation.
+summary: The middle product, a window of coefficients of a product, is the transpose of polynomial multiplication and has the same asymptotic cost as an ordinary product of the corresponding size; FLINT computes it with dot products, a cyclic convolution whose wrap-around misses the window, or transposed FFTs, and uses it in Newton iteration and geometric evaluation.
 complexity: A middle product of lengths $m + n - 1$ and $n$ (output length $m$) costs $mn$ multiplications classically and about one product of lengths $m$ and $n$ with the FFT.
 order: 30
 ---
@@ -43,39 +43,63 @@ the fallback through a low product gains nothing.
 
 ## The transposition principle {#tellegen}
 
-A *linear straight-line program* computes $y = Ax$ for a fixed matrix
-$A \in K^{r \times s}$ by a sequence of additions, subtractions and
-multiplications by constants applied to the inputs $x_1, \ldots, x_s$
-and to earlier results. Its length is the number of such operations.
+Let $K$ be a commutative ring with identity. A *linear straight-line
+program* computes $y = Ax$ for a fixed matrix $A \in K^{r \times s}$
+from the inputs $x_1, \ldots, x_s$ by additions and multiplications by
+constants in $K$. Each addition and each scalar multiplication counts
+as one operation, including multiplication by $-1$; copies and
+assignments of zero are free. Thus a subtraction is represented by a
+negation followed by an addition. The length of the program is its
+number of operations in this model.
 
 ::: theorem Tellegen's principle {#thm-tellegen}
 If $A \in K^{r \times s}$ has no zero rows and no zero columns and $y = Ax$
 is computed by a linear straight-line program of length $L$, then
 $x' = A^T y'$ is computed by a linear straight-line program of length
-$L + r - s$.
+at most $L + r - s$.
 :::
 
 ::: proof
-(Sketch; see [@BCS1997, Ch. 13] for details.) Represent the program as
-a directed acyclic graph whose vertices are the inputs, the
-intermediate results and the outputs, with an edge, weighted by the
-constant factor, from each operand of an operation to its result. Then
-$A_{ij}$ is the sum, over all paths from input $j$ to output $i$, of the
-products of the weights. Reversing every edge gives a graph in which the
-same sums describe $A^T$; the multiplications by constants stay on
-their edges. A vertex with $d$ incoming edges costs $d - 1$ additions,
-so with $E$ edges and $V$ vertices the original program has
-$\sum (\mathrm{indeg}(v) - 1) = E - V + s$ additions, the sum running
-over all vertices except the $s$ inputs. In the reversed graph the
-in-degrees are the original out-degrees and the sources are the $r$
-outputs, so it has $E - V + r$ additions. The hypothesis on $A$ ensures
-that no input or output is isolated.
+Represent the program by a directed acyclic graph. Remove unused
+results and free zero assignments, simplifying operations with zero,
+and give each output a separate free copy vertex. Every remaining
+vertex lies on a path from an input to an output. The hypothesis on
+$A$ ensures that all $s$ inputs and $r$ outputs remain.
+
+An addition has two incoming edges of weight $1$, a copy has one, and
+a scalar multiplication has one edge weighted by its scalar. Then
+$A_{ij}$ is the sum, over all paths from input $j$ to output $i$, of
+the products of the weights. Reversing every edge gives the same
+path sums for $A^T$, since the scalars commute.
+
+Let the graph have $E$ edges, $V$ vertices and $C$ scalar-multiplication
+edges. A vertex with $d$ incoming edges is evaluated with $d-1$
+additions, besides the scalar multiplications on those edges. All
+noninput vertices have positive in-degree, so the original graph
+uses $E-V+s$ additions and has cost $C+E-V+s \le L$. All nonoutput
+vertices have positive out-degree. The reversed graph therefore uses
+$E-V+r$ additions and the same $C$ scalar multiplications, giving
+cost at most $L+r-s$.
 :::
 
-The principle turns any algorithm for a linear map into one for its
-transpose with essentially the same cost. Transposing an algorithm by
-hand is mechanical but error-prone; [@BLS2003] give a methodology and
-many examples.
+The operation model matters for the exact dimension term. If
+subtraction is instead a single charged operation, let a program of
+length $L$ contain $S$ subtractions. Expanding them into negations and
+additions gives length at most $L+S$, so the corresponding bound is
+$L+S+r-s$. For example, over $\mathbb Q$ the matrix $A=(1\;\;-1)$ has
+the one-subtraction program $x_1-x_2$. Substituting $L=1$, $r=1$ and
+$s=2$ into $L+r-s$ would incorrectly give zero operations for
+$y \mapsto (y,-y)$. In the addition-and-scalar-multiplication model,
+the forward program has length $2$ and its transpose has length $1$,
+as the theorem predicts.
+
+Zero rows and columns can be deleted before applying the theorem.
+The transpose then ignores the inputs corresponding to zero rows
+and inserts zero outputs for zero columns. Thus, in either operation
+model, a linear program yields one for its transpose with cost
+$O(L+r+s)$. See [@BCS1997, Ch. 13] and
+[@BLS2003, Sec. 3, Props. 1-2] for the transposition principle and its
+use in polynomial algorithms.
 
 ## Middle product as transposed multiplication {#transpose}
 
@@ -98,9 +122,9 @@ $(c \operatorname{rev}(b))_{i+n-1} = \sum_l c_{i+n-1-l} b_{n-1-l}$,
 which is the same sum with $j = n - 1 - l$.
 :::
 
-By [](#thm-tellegen), any algorithm that multiplies polynomials of
-lengths $m$ and $n$ yields an algorithm for the middle product with
-essentially the same number of operations. [@HQZ2004] give explicit
+By [](#thm-tellegen), a linear program for multiplication with $b$
+held fixed yields a middle-product algorithm with the same asymptotic
+cost, including the input and output dimensions. [@HQZ2004] give explicit
 transposed versions of Karatsuba's and the FFT algorithms; for the FFT
 the transposed algorithm is particularly simple, as shown next.
 
@@ -162,7 +186,7 @@ ordinary products ([](algorithms/polynomials/multiplication#fft-small)).
 ### Transposed FFT {#transposed-fft}
 
 The transposition principle can also be applied to the FFT product
-itself. Fix $b$ of length $n$ and an output length $m$, and let
+itself. Fix $b$ of length $n \ge 1$ and an output length $m \ge 1$, and let
 $T \ge m + n - 1$ be the truncation of a transform of length $2^d$.
 Multiplication by $b$ is computed as
 $$\mu_b = R \circ I \circ D \circ F,$$
@@ -170,28 +194,37 @@ where $F : K^m \to K^T$ evaluates a polynomial of length $m$ at the
 first $T$ points (a truncated forward transform), $D$ multiplies
 pointwise by the transform of $b$ and a normalising constant, $I$ is the
 truncated inverse transform of length $T$, and $R : K^T \to K^{m+n-1}$
-keeps the first $m + n - 1$ coefficients.
+keeps the first $m + n - 1$ coefficients. Let $L_F$ and $L_I$ be the
+costs of linear programs for $F$ and $I$ in the operation model of
+[](#tellegen).
 
 ::: theorem Transposed convolution {#thm-transposed-fft}
 With this notation, $\mu_b^T = F^T \circ D \circ I^T \circ R^T$, where
 $R^T$ pads a vector of length $m + n - 1$ with zeros to length $T$. Hence
 $v \mapsto F^T(D(I^T(v)))$ computes the middle product
 $\bigl(\sum_j b_j v_{i+j}\bigr)_{0 \le i < m}$ of [](#lem-transpose)
-with the transforms of a product of lengths $m$ and $n$, and the
-transposed transforms $F^T$ and $I^T$ cost as much as $F$ and $I$.
+with the transforms of a product of lengths $m$ and $n$. With $b$
+held fixed, its cost is at most $L_F+L_I+2T-m$, hence
+$O(L_F+L_I+T)$.
 :::
 
 ::: proof
 The factorisation of $\mu_b$ holds as an identity of linear maps,
 because the truncated transforms compute the product exactly for every
 input of length $m$ once $T \ge m + n - 1$. Transposing reverses the
-order of the factors, and $D$ is diagonal. The transforms are linear
-straight-line programs (butterflies, copies and zeroings), so by
-[](#thm-tellegen) their transposes are computed by programs of the same
-length; in fact each butterfly is replaced by its transpose and the
-order of the butterflies is reversed, which gives the same numbers of
-additions and multiplications.
+order of the factors, and $D$ is diagonal. The evaluation map $F$ has
+no zero rows or columns, since the FFT points are units, and $I$ is
+invertible. By [](#thm-tellegen), $F^T$ costs at most $L_F+T-m$ and
+$I^T$ at most $L_I$. The diagonal map $D$ uses at most $T$ scalar
+multiplications, and $R^T$ only inserts zeros. Adding these costs
+gives the bound.
 :::
+
+The dimension term cannot in general be omitted. When $m=1$, the
+forward transform of a constant is $F(x)=(x,\ldots,x)$, computed by
+copies with no arithmetic. Its transpose sums $T$ inputs with $T-1$
+additions. Full butterflies can have matching operation counts under
+transposition without the same being true of every truncation.
 
 ::: algorithm Transposed FFT middle product {#alg-tr-fft}
 **Input:** $b$ of length $n$, $v$ of length at most $m + n - 1$.
