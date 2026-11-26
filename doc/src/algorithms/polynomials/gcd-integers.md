@@ -160,13 +160,15 @@ to the size of $G$ rather than to an a priori bound:
   are independent and run in parallel. The batch size grows
   geometrically, so at most a constant fraction of the work is wasted.
 - **Probes.** Instead of reconstructing $H$ after every batch, only a
-  random signed sum $s = \sum_i \pm h_i$ of its coefficients is
-  reconstructed, incrementally, which costs one integer CRT. A full
-  reconstruction, by a single fast multi-CRT of all stored images, is
-  attempted when the symmetric residue of $s$ is 8 bits smaller than
-  the modulus, which happens by accident with probability about
-  $2^{-7}$; or when the product of the primes exceeds the Mignotte
-  bound.
+  signed sum of the coefficient images is reconstructed incrementally,
+  which costs one integer CRT. The signs are fixed deterministic
+  pseudorandom signs. A small symmetric residue schedules a full
+  reconstruction by one fast multi-CRT of all stored images; it does
+  not certify the coefficients. The usual margin is 8 bits, with a
+  2-bit margin also tried for candidates of length at most 8 during
+  the first two stored primes. An accumulated Mignotte bit bound
+  provides a second trigger. See [](#probes) for the trigger and its heuristic
+  probability interpretation.
 - **Primes.** The first prime is a 20-bit prime unless the
   coefficients are small: the modular GCD is cheapest for small primes,
   and the first prime usually proves that the GCD is 1 (an image of
@@ -186,6 +188,67 @@ to the size of $G$ rather than to an a priori bound:
   more primes if needed, until they stabilise; then $C \cdot (A/C) = A$
   follows from the congruences if the modulus exceeds twice a bound
   for both sides, and is otherwise checked with one multiplication.
+
+### Probes and certification {#probes}
+
+For good primes, the consistently normalised images are reductions of
+$H=\sum_{i=0}^d h_i x^i$. With fixed signs $w_i\in\{-1,1\}$, the
+scalar probe is
+$$
+s=\sum_{i=0}^d w_i h_i,
+\qquad
+|s|\le\sum_{i=0}^d |h_i|\le(d+1)\|H\|_\infty.
+$$
+If $M$ is the product of the retained primes, the probe CRT gives the
+symmetric representative $\widetilde{s}$ of $s\bmod M$. Smallness of
+this one linear combination does not imply smallness of the individual
+coefficients. Coefficientwise reconstruction is guaranteed when
+$M>2\|H\|_\infty$, but the converse inference from a small probe fails
+because of cancellation.
+
+Define $\operatorname{bits}(0)=0$ and
+$\operatorname{bits}(u)=1+\lfloor\log_2|u|\rfloor$ for $u\ne0$.
+Writing $K=\operatorname{bits}(M)$, the usual trigger is
+$$
+\operatorname{bits}(\widetilde{s})+8\le K.
+$$
+To interpret the often-used estimate of about $2^{-7}$, suppose that
+an undetermined scalar residue is uniformly distributed over the $M$
+symmetric representatives. For $K\ge8$, the trigger is equivalent to
+$|\widetilde{s}|<2^{K-8}$. There are exactly $2^{K-7}-1$ such integers,
+so under this model its probability is
+$$
+\frac{2^{K-7}-1}{M}.
+$$
+This counts a small scalar residue under the stated model; it is not
+an input-independent bound on premature polynomial reconstruction.
+The implemented signs are deterministic, and even exact reconstruction
+of the scalar need not determine the polynomial.
+
+For example, let $M\ge256$ be a product of distinct primes, and set
+$$
+G_M=x^2+Mx+M,\qquad A=xG_M,\qquad B=(x+1)G_M.
+$$
+These inputs are monic and primitive. Since $B-A=G_M$, their GCD is
+$G_M$. For every prime $p\mid M$, their reductions are $x^3$ and
+$x^2(x+1)$, whose monic GCD is $x^2$. Thus all these primes are good,
+the normalising coefficient is 1, and the symmetric CRT candidate
+modulo $M$ is $C=x^2$.
+
+The first three implemented signs, in ascending coefficient order,
+are $(-1,1,-1)$ on both 32-bit and 64-bit builds. The exact probe of
+$G_M$ is therefore $-M+M-1=-1$, the same as the probe of $C$.
+For the concrete CRT stage $M=17\cdot19=323$, one has $K=9$ and
+$\operatorname{bits}(-1)+8=9$, so the usual trigger holds although
+$C\ne G_M$. The candidate fails the exact divisibility condition:
+$B(0)=M\ne0$, so $x^2$ does not divide $B$.
+
+Certification by [](#thm-certify) is therefore essential. Quotient
+probes likewise only schedule a reconstructed quotient; its product
+with the candidate divisor is still checked by coefficient bounds or
+exact multiplication. Probe cancellation can cause an extra attempt,
+while the divisibility certificate determines whether a candidate is
+accepted.
 
 ## Extended GCD and cofactors {#xgcd}
 
