@@ -48,7 +48,8 @@ $a > v$ and $b > w$. Then
 3. $1/(x + \delta) \in 1/x + O(p^{a - 2v})$;
 4. $(x + \delta)^e \in x^e + O(p^{a + (e - 1)v})$ for $e \ge 1$.
 
-In each case the precision on the right cannot be improved in general.
+The first three precision bounds are sharp. The power bound is
+conservative; [](#prop-power) gives the sharp bound.
 :::
 
 ::: proof
@@ -60,15 +61,91 @@ $1/(x + \delta) - 1/x = -\delta / (x(x + \delta))$ and
 $\operatorname{ord}_p(x + \delta) = v$ since $a > v$. The fourth follows
 from $(x + \delta)^e - x^e = \sum_{i \ge 1} \binom{e}{i} x^{e - i}
 \delta^i$, whose terms have valuation at least $(e - i)v + ia \ge
-(e - 1)v + a$. Taking $\delta = p^a$ and $\varepsilon = p^b$ shows that
-the bounds are attained.
+(e - 1)v + a$. The first two bounds are attained by setting one
+perturbation to zero and the other to the appropriate power of $p$.
+For inversion, $\delta = p^a$ attains the bound.
 :::
 
 In terms of relative precision the statements are simpler: a product or
 quotient of elements known to relative precisions $r$ and $s$ is known
-to relative precision $\min(r, s)$, a power to the relative precision of
-its base, and a sum to an absolute precision that may correspond to a
-much smaller relative precision if the leading digits cancel.
+to relative precision $\min(r, s)$. A positive integer power preserves
+at least the relative precision of its base, and can gain digits when
+$p$ divides the exponent. A sum has an absolute precision that may
+correspond to a much smaller relative precision if the leading digits
+cancel.
+
+::: proposition Precision of positive integer powers {#prop-power}
+Let $x \in \mathbf{Q}_p^\times$ with $\operatorname{ord}_p(x) = v$,
+and let $a>v$ be an integer. Suppose $\operatorname{ord}_p(\delta) \ge a$.
+For an integer $e \ge 1$, put
+$r = a - v$ and $h = \operatorname{ord}_p(e)$. Then
+
+$$
+(x + \delta)^e \in x^e + O(p^{ev + r + h}).
+$$
+
+This bound is sharp unless $p = 2$, $r = 1$ and $h \ge 1$. In that case
+the sharp bound is
+
+$$
+(x + \delta)^e \in x^e + O(2^{ev + h + 2}).
+$$
+
+Here sharpness means that the exponent cannot be increased while
+allowing every $\delta$ with $\operatorname{ord}_p(\delta) \ge a$.
+For the basic $p$-power congruence, see [@Car2017, Lemma 2.18].
+:::
+
+::: proof
+Write $\delta = xt$ and $e = up^h$, where $p \nmid u$. Raising $1+t$
+to the power $u$ preserves $s = \operatorname{ord}_p(t) \ge 1$:
+the term $ut$ in $(1+t)^u-1$ has valuation $s$, and all the other
+terms have valuation at least $2s$. For odd $p$, or for $p=2$ and
+$s \ge 2$, the term $pt$ in $(1+t)^p-1$ is the unique term of least
+valuation $s+1$: $p \mid \binom pi$ for $1<i<p$, and $ps>s+1$
+in these cases. Each subsequent $p$-th power therefore raises the
+valuation of the error by one. This proves the stated bound for odd
+$p$ or $r \ge 2$; if $h=0$, the first observation suffices for every $p$.
+
+Suppose now that $p=2$, $r=1$ and $h \ge 1$. If
+$\operatorname{ord}_2(t) \ge 2$, the preceding argument already gives
+valuation at least $h+2$. Otherwise $z=1+t$ is an odd $2$-adic integer,
+so $(z-1)(z+1)=z^2-1$ is divisible by $8$: both factors are even and
+one is divisible by $4$. After the first square the error has valuation
+at least $3$, and the remaining $h-1$ squares raise it to at least
+$h+2$. The odd power $u$ preserves this valuation. Multiplication by
+$x^e$ adds $ev$.
+
+Taking $t=p^r$ attains the bound outside the exceptional case.
+In that case take $t=2$: the first square gives $3^2-1=8$, and the
+remaining squares and odd power give valuation exactly $h+2$.
+:::
+
+::: example Cubing and squaring unit balls {#ex-power-precision}
+For $z \in \mathbf{Z}_3$,
+
+$$
+(1+3z)^3-1=9z+27z^2+27z^3 \in 9\mathbf{Z}_3.
+$$
+
+Thus cubing $1+O(3)$ gives a value in $1+O(3^2)$. At $z=1$ the
+difference is $63$, of valuation $2$, so this precision is sharp.
+For $z \in \mathbf{Z}_2$,
+
+$$
+(1+2z)^2-1=4z(z+1) \in 8\mathbf{Z}_2.
+$$
+
+Thus squaring $1+O(2)$ gives a value in $1+O(2^3)$, sharply since
+$3^2-1=8$. The elementary power bound in [](#prop-ring) gives only
+one digit in both examples.
+:::
+
+For positive exponents, the unit-power path of `padic_radix_pow_ui`,
+`padic_radix_pow_si` and `padic_radix_pow_fmpz` propagates the bound
+$a+(e-1)v+h=ev+r+h$ before truncating to the context precision.
+It does not include the extra digit in the exceptional $2$-adic case;
+its multiplication-chain fallback can retain less precision.
 
 ::: proposition Precision of roots and transcendental functions {#prop-functions}
 Let $u$ be a unit of $\mathbf{Z}_p$ and $\operatorname{ord}_p(\delta)
@@ -158,8 +235,8 @@ element that may be zero returns `GR_UNABLE`.
   canonicalisation and reduction for `padic_t`; `padic_poly_reduce`,
   `padic_poly_canonicalise`, `padic_mat_reduce` and `qadic_reduce` do
   the same for the other structures.
-- `padic_pow_si` and `padic_poly_pow` state the precision loss of
-  [](#prop-ring) for negative valuations but do not apply it.
+- `padic_pow_si` and `padic_poly_pow` state the conservative power
+  bound of [](#prop-ring) for negative valuations but do not apply it.
 - `padic_radix_add`, `padic_radix_mul`, `padic_radix_div`,
   `padic_radix_inv`, `padic_radix_sqrt`, `padic_radix_exp` and
   `padic_radix_log` apply the rules above to their error terms;
