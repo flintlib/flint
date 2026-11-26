@@ -2482,10 +2482,14 @@ A &= a + p \left( \tfrac{1 - aG - bH}{p}\, a \bmod h \right),
 \end{aligned}
 $$
 
-with the products reduced modulo $p_1$. Requires $1 < p_1 \le p$
-(so $p_1 \mid p$ for prime powers of the same prime), $f, g, h$ of
-degree at least 1, and $a, b$ nonzero. The outputs $G, H, A, B$ may be
-aliased only with $g, h, a, b$ respectively.
+with the products reduced modulo $p_1$. Here $p$ and $p_1$ are moduli,
+with $1<p_1$ and $p_1\mid p$. Requires $g,h$ monic of positive degree,
+$\deg f=\deg g+\deg h$, $\deg a<\deg h$, $\deg b<\deg g$, and $a,b$
+nonzero. The target must satisfy
+$\operatorname{lc}(f)\equiv1\pmod P$, which holds when $f$ is monic.
+The necessity of this condition and normalisation of a nonmonic target
+are explained in [](algorithms/polynomials/hensel-lifting#normalisation).
+The outputs $G,H,A,B$ may be aliased only with $g,h,a,b$ respectively.
 :::
 
 ::: function
