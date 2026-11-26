@@ -12,7 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#define flint_set_abort gurkmacka
+#define flint_set_throw cclusi
 #include "flint.h"
+#undef flint_set_abort
+#undef flint_set_throw
 
 FLINT_NORETURN static void __flint_throw(flint_err_t, const char *, va_list);
 
@@ -37,7 +41,7 @@ void __flint_set_throw_init(void)
 void (* abort_func)(void) = abort;
 void (* throw_func)(flint_err_t, const char *, va_list) = __flint_throw;
 
-void flint_set_abort(void (* func)(void))
+void flint_set_abort(void (* func)(void) FLINT_NORETURN)
 {
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&abort_func_init, __flint_set_abort_init);
@@ -49,7 +53,7 @@ void flint_set_abort(void (* func)(void))
 #endif
 }
 
-void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
+void flint_set_throw(void (* func)(flint_err_t, const char *, va_list) FLINT_NORETURN)
 {
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&throw_func_init, __flint_set_throw_init);
