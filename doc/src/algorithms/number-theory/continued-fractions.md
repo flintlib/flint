@@ -151,20 +151,103 @@ q_l)/q \rfloor$ [@HarWri2008, Chapter III].
 
 ## Dedekind sums {#dedekind}
 
-By the reciprocity law of Dedekind sums [@RadGro1972], $s(h, k)$ is a
-simple function of the continued fraction of $k/h$: with the partial
-quotients $c_1, \ldots, c_n$ and the convergent matrix $M = (m_{ij})$ of
-$k/(h \bmod k)$,
-
+For an integer $h$ and a positive integer $k$, write
 $$
-12\, s(h, k) = \sum_{i=1}^{n} (-1)^{i+1} c_i + \frac{m_{21} - (-1)^{n}
-m_{12}}{m_{11}} - 3 \cdot [n \text{ odd}]
+s(h,k)=\sum_{i=1}^{k-1} ((i/k))((hi/k)),
+\qquad
+((x))=\begin{cases}
+x-\lfloor x\rfloor-1/2 & x\notin\Z,\\
+0 & x\in\Z.
+\end{cases}
 $$
+The sum is periodic in $h$ modulo $k$. FLINT returns zero for $k\le0$
+by convention. For $k>0$, put $r=h\bmod k$; if $r=0$, every second
+factor in the sum vanishes, so $s(h,k)=0$ without forming $k/r$.
 
-[@Hickerson1977]. FLINT evaluates it with word-size quotients when $k$
-fits in a word and otherwise with the half-GCD code, which accumulates the
-alternating sum of the terms instead of storing them. The cost is that of
-a GCD.
+::: lemma Positive scaling {#lem-dedekind-scaling}
+For integers $h,k,d$ with $k,d>0$,
+$$
+s(dh,dk)=s(h,k).
+$$
+:::
+
+::: proof
+The terms indexed by multiples of $k$ have second factor zero.
+Write every other index as $t+jk$, with $1\le t<k$ and $0\le j<d$.
+Its second factor is $((ht/k))$, by periodicity, while
+$$
+\sum_{j=0}^{d-1}\left(\left(\frac{t+jk}{dk}\right)\right)
+=\sum_{j=0}^{d-1}\left(\frac{t}{dk}+\frac jd-\frac12\right)
+=\frac tk-\frac12=((t/k)).
+$$
+Summing over $t$ proves the identity.
+:::
+
+For $r>0$, let $g=\gcd(r,k)$, $H=r/g$ and $K=k/g$. The scaling
+identity gives $s(h,k)=s(H,K)$, so the coprime reciprocity law
+[@RadGro1972] applies to the reduced arguments. With the partial
+quotients $c_1,\ldots,c_n$ and convergent matrix $M=(m_{ij})$ of
+$k/r=K/H$, it gives
+$$
+12\,s(h,k)=\sum_{i=1}^{n}(-1)^{i+1}c_i
++\frac{m_{21}-(-1)^n m_{12}}{m_{11}}-3\cdot[n\text{ odd}]
+$$
+[@Hickerson1977]. The first column of $M$ is $(K,H)^T$: the
+Euclidean algorithm ends at $g$, and $(k,r)^T=M(g,0)^T$. In
+particular, $m_{11}=K$, even when $h$ and $k$ are not coprime.
+
+FLINT evaluates the formula with word-size quotients when $k$ fits in
+a word and otherwise with the half-GCD code, which accumulates the
+alternating sum of the terms instead of storing them. The cost is that
+of a GCD. The empty quotient product $M=I$ and alternating sum zero
+also give zero in the formula when $r=0$.
+
+::: proposition Size and denominator {#prop-dedekind-bounds}
+Let $h$ be an integer, let $k>0$, and put $K=k/\gcd(h,k)$. If
+$s(h,k)=p/q$ in lowest terms with $q>0$, then
+$$
+|s(h,k)|\le\frac{(K-1)(K-2)}{12K},
+\qquad q\mid6K.
+$$
+The size bound is attained for $h/\gcd(h,k)\equiv\pm1\pmod K$.
+In particular, $|s(h,k)|<k/12$ and $q\mid6k$.
+:::
+
+::: proof
+For $K=1$ the sum is zero and both assertions follow. Otherwise
+reduce to $s(H,K)$ with $\gcd(H,K)=1$. The residues
+$R_i=Hi\bmod K$, $1\le i<K$, permute $1,\ldots,K-1$.
+Cauchy–Schwarz therefore gives
+$$
+|s(H,K)|\le\sum_{i=1}^{K-1}\left(\frac iK-\frac12\right)^2
+=\frac{(K-1)(K-2)}{12K}.
+$$
+For $H\equiv1\pmod K$ the two sawtooth factors agree; for
+$H\equiv-1\pmod K$ they are negatives of one another, giving equality.
+
+Put $T=\sum_{i=1}^{K-1}iR_i$. Expanding the defining sum gives
+$$
+s(H,K)=\frac{T}{K^2}-\frac{K-1}{4}.
+$$
+Since $R_i\equiv Hi\pmod K$,
+$$
+6T\equiv6H\sum_{i=1}^{K-1}i^2
+=HK(K-1)(2K-1)\equiv0\pmod K.
+$$
+Consequently
+$6K\,s(H,K)=6T/K-3K(K-1)/2$ is an integer, since $K(K-1)$ is
+even. This proves $q\mid6K$.
+Finally, $K\mid k$ and $(K-1)(K-2)/(12K)<K/12\le k/12$.
+:::
+
+For example, $h=2$, $k=6$ reduce to $H=1$, $K=3$. The continued
+fraction of $6/2$ has one quotient, 3, with
+$M=E_3=\left(\begin{smallmatrix}3&1\\1&0\end{smallmatrix}\right)$.
+Thus $12s(2,6)=3+2/3-3=2/3$, or $s(2,6)=1/18$.
+The defining sum after reduction gives the same value:
+$s(1,3)=(-1/6)^2+(1/6)^2=1/18$. This attains the size bound, and its
+denominator is $6K=18$. For $h=6$, $k=6$, the remainder $r$ is zero;
+the value is zero and no continued fraction of $6/0$ is formed.
 
 ## Use in FLINT {#use}
 

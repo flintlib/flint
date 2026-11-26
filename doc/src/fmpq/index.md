@@ -705,7 +705,8 @@ operations.
 
 ## Dedekind sums {#dedekind}
 
-The Dedekind sum $s(h, k)$ is defined for integers $h$ and $k$ by
+The Dedekind sum $s(h,k)$ is defined for an integer $h$ and a positive
+integer $k$ by
 
 $$
 s(h,k) = \sum_{i=1}^{k-1} \left(\left(\frac{i}{k}\right)\right)
@@ -717,35 +718,51 @@ $$
 
 It appears in the transformation formula of the Dedekind eta function and
 in the exponential sums of the partition function [@Apostol1997],
-[@RadGro1972]. It depends only on $h \bmod k$, satisfies $s(-h, k) =
--s(h, k)$ and $s(gh, gk) = s(h, k)$, and the empty sum gives $s(h, k) =
-0$ for $k \le 1$.
+[@RadGro1972]. It depends only on $h\bmod k$ and satisfies
+$s(-h,k)=-s(h,k)$ and $s(gh,gk)=s(h,k)$ for positive integers $g$.
+For $k=1$ the sum is empty and equals zero. FLINT also sets $s(h,k)=0$
+for $k\le0$ by convention.
 
 ::: function
 void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-Set $s$ to $s(h, k)$, for any integers $h$ and $k$. The naive version
-evaluates the defining sum with $k$ terms. `fmpq_dedekind_sum` uses the
-continued fraction of $k/h$ and costs about as much as an extended GCD.
+Set $s$ to $s(h,k)$, for any integers $h$ and $k$, with the zero
+convention above for $k\le0$. The naive version evaluates the defining
+sum directly. For $k>0$, `fmpq_dedekind_sum` reduces $h$ modulo $k$;
+a zero remainder gives zero, and otherwise it uses the continued
+fraction of $k/(h\bmod k)$. The cost is about that of an extended GCD.
 
 ::: details
 By the reciprocity law $s(h,k) + s(k,h) = (h/k + k/h + 1/(hk))/12 - 1/4$
-for coprime $h, k > 0$, the sum telescopes along the Euclidean algorithm
-[@Hickerson1977]. With the partial quotients $a_1, \ldots, a_n$ of $k/(h
-\bmod k)$, the convergent matrix $\prod_i \left(\begin{smallmatrix} a_i &
-1 \\ 1 & 0 \end{smallmatrix}\right) = \left(\begin{smallmatrix} m_{11} &
-m_{12} \\ m_{21} & m_{22} \end{smallmatrix}\right)$ and the alternating
-sum $t = a_1 - a_2 + \cdots \pm a_n$,
+for coprime $h,k>0$, the sum telescopes along the Euclidean algorithm
+[@Hickerson1977]. For $k>0$, put $r=h\bmod k$, $g=\gcd(r,k)$,
+$H=r/g$ and $K=k/g$. Positive scaling gives $s(h,k)=s(H,K)$.
+If $r=0$, the value is zero and no fraction $k/r$ is expanded.
+Otherwise, with the partial quotients $a_1,\ldots,a_n$ of $k/r=K/H$,
+the convergent matrix
+$\prod_i\left(\begin{smallmatrix}a_i&1\\1&0\end{smallmatrix}\right)
+=\left(\begin{smallmatrix}m_{11}&m_{12}\\m_{21}&m_{22}
+\end{smallmatrix}\right)$ and alternating sum
+$t=a_1-a_2+\cdots\pm a_n$,
 
 $$
 12\, s(h, k) = t + \frac{m_{21} - (-1)^{n} m_{12}}{m_{11}} - 3 \cdot
 [n \text{ odd}].
 $$
 
-The function evaluates this in machine words when $k$ fits in a `slong`
-and with the half-GCD continued fraction code otherwise. Writing $s(h,k)
-= p/q$ in lowest terms, $|s| < k/12$ and $q \mid 6k$.
+The matrix has $m_{11}=K$ and $m_{21}=H$, so it uses the reduced
+arguments even when $h$ and $k$ are not coprime. The function evaluates
+the formula in machine words when $k$ fits in a `slong` and with the
+half-GCD continued fraction code otherwise.
+
+For $k>0$, writing $s(h,k)=p/q$ in lowest terms with $q>0$,
+$$
+|s(h,k)|\le\frac{(K-1)(K-2)}{12K},\qquad q\mid6K.
+$$
+In particular, $|s(h,k)|<k/12$ and $q\mid6k$. The scaling identity and
+these bounds are proved in
+[](algorithms/number-theory/continued-fractions#prop-dedekind-bounds).
 :::
 :::
 
