@@ -1,7 +1,7 @@
 ---
 title: Matrices of polynomials
 summary: How FLINT multiplies matrices over $\Z[x]$ and $(\Z/n\Z)[x]$ — classical products of polynomials, Kronecker substitution into one integer matrix product, evaluation and interpolation, and transforming each entry once with the small-prime FFT — and how it computes determinants, ranks, inverses and solutions by fraction-free elimination or by evaluation and interpolation.
-complexity: For $d \times d$ matrices of polynomials of degree less than $\ell$, multiplication costs $O(d^\omega \ell)$ products over the coefficient ring plus $O(d^2 \ell \log \ell)$ for evaluation and interpolation; fraction-free elimination costs $O(d^3)$ operations on polynomials of degree up to $d\ell$.
+complexity: For $d \times d$ matrices of polynomials of degree less than $\ell$, multiplication costs $O(d^\omega \ell)$ products over the coefficient ring plus $O(d^2 \ell \log \ell)$ for evaluation and interpolation; fraction-free solving with a $d \times d$ coefficient matrix of degree at most $a$ and $k$ right-hand sides of degree at most $b$ costs $O(d^3 + d^2 k)$ polynomial operations at degrees $O(da+b)$.
 order: 70
 ---
 
@@ -149,11 +149,78 @@ elimination.
 polynomial ring, with exact polynomial divisions. Solutions and inverses
 are returned with a polynomial denominator: `fmpz_poly_mat_solve(X, den,
 A, B)` gives $AX = \mathit{den} \cdot B$ with $\mathit{den} = \pm \det A$.
-By [](algorithms/linear-algebra/fraction-free#thm-sylvester) all
-intermediate entries are minors of the input, of degree at most
-$d(\ell - 1)$, so the cost is $O(d^3)$ multiplications and exact
-divisions of polynomials of that degree, $O(d^3 M(d \ell))$ coefficient
-operations over $\Z/n\Z$. The rank is the number of pivots.
+The rank is the number of pivots. The degree bounds for solving must
+include the degrees of the entries of $B$.
+
+### Degree growth in solving {#solve-degrees}
+
+::: proposition Solution degrees {#prop-solve-degrees}
+Let $R = \Z$ or $R = \mathbb{F}_p$ for a prime $p$. Let
+$A \in R[x]^{d \times d}$ be nonsingular and
+$B \in R[x]^{d \times k}$, with $d,k \ge 1$. Suppose that the entries of
+$A$ have degree at most $a \ge 0$ and those of $B$ have degree at most
+$b \ge 0$, with $\deg 0 = -\infty$. Put
+$\Delta = \det A$ and $Y = \operatorname{adj}(A) B$. Then
+$$
+AY = \Delta B, \qquad
+\deg \Delta \le da, \qquad
+\deg Y_{ij} \le (d-1)a+b.
+$$
+These are bounds for a determinant-scaled solution, before any common
+factor is cancelled.
+:::
+
+::: proof
+Cofactor expansion gives $A\operatorname{adj}(A) = (\det A)I$.
+Each term in $\det A$ is a product of $d$ entries of $A$, giving the
+bound $da$. Each cofactor has degree at most $(d-1)a$, so each term in
+$Y_{ij} = \sum_h \operatorname{adj}(A)_{ih} B_{hj}$ has degree at most
+$(d-1)a+b$. Addition can only lower this bound. Equivalently, $Y_{ij}$
+is the determinant obtained by replacing column $i$ of $A$ by column
+$j$ of $B$: its terms use $d-1$ entries from $A$ and one from $B$.
+:::
+
+For inversion, $B = I$ and $b = 0$, so the adjugate entries have degree
+at most $(d-1)a$. For general right-hand sides, their degree cannot be
+omitted. For example, over $\Z[x]$ let $N \ge 2$ and take
+$$
+A = \begin{pmatrix} x & 1 \\ 1 & x \end{pmatrix}, \qquad
+B = \begin{pmatrix} 0 \\ x^N \end{pmatrix}.
+$$
+Then
+$$
+\Delta = x^2-1, \qquad
+Y = \begin{pmatrix} -x^N \\ x^{N+1} \end{pmatrix}, \qquad
+AY = \begin{pmatrix} 0 \\ x^{N+2}-x^N \end{pmatrix} = \Delta B.
+$$
+Here $a=1$ and $b=N$; the numerator degree $N+1$ attains the bound in
+[](#prop-solve-degrees), while the coefficient matrix is fixed.
+
+### Cost of fraction-free solving {#solve-cost}
+
+The fraction-free LU decomposition is computed once. Its stored entries
+are minors of $A$ by
+[](algorithms/linear-algebra/fraction-free#thm-sylvester), so their degrees
+are at most $da$. For entries of length at most $\ell$, take
+$a=\ell-1$, giving the bound $d(\ell-1)$. This takes $O(d^3)$ polynomial
+multiplications and exact divisions, as in the fraction-free method of
+[@Jef2010, §3].
+
+The precomputed factors are then used for forward and back substitution
+for each column of $B$, taking $O(d^2 k)$ polynomial operations. The
+forward-substitution entries are minors of the augmented matrix with
+one column from $B$, hence have degree at most $(d-1)a+b$; the final
+entries have the same bound by [](#prop-solve-degrees). Products before
+exact division can have larger degree, but still $O(da+b)$. Thus over
+$\mathbb{F}_p$ the cost is
+$$
+O\bigl(d^3 M(1+da) + d^2 k M(1+da+b)\bigr)
+$$
+coefficient operations, where $M(t)$ is the cost of multiplying
+polynomials of length at most $t$, using fast multiplication and exact
+division. In particular, the $O(d^3 M(d\ell))$ bound applies when
+$k = O(d)$ and $b = O(d\ell)$. Over $\Z[x]$, the bit sizes of the
+integer coefficients must also be included in a bit-complexity bound.
 
 ## Use in FLINT {#use}
 
