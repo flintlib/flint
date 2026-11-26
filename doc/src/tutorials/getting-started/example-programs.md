@@ -128,6 +128,7 @@ built on them) and are described in [](tutorials/numerics).
 | `integrals` | Computes a list of difficult integrals with rigorous error bounds using `acb_calc_integrate` | `integrals -i 4` |
 | `integrals_double_exp` | Computes integrals with the double exponential (tanh-sinh) quadrature | `integrals_double_exp -p 333` |
 | `taylor_integrals` | Computes integrals (an elliptic integral and others) with the Taylor series method of [](acb_calc) | `taylor_integrals 50` |
+| `ode_transition_matrix` | Computes the transition matrix of a linear differential operator along a piecewise linear path with [](acb_ode) | `ode_transition_matrix "Dx - 1" 0 1` |
 | `fpwrap` | Demonstrates the floating-point wrappers of [](arb_fpwrap) | `fpwrap` |
 | `functions_benchmark` | Times standard elementary and special functions at several precisions | `functions_benchmark` |
 
