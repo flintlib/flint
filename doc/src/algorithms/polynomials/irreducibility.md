@@ -66,17 +66,15 @@ divides $x^{q^i} - x$ only if $n \mid i$.
 
 Ben-Or's test computes $h_1, h_2, \ldots$ one after the other and stops at
 the first nontrivial gcd. Its worst case, reached for irreducible $f$, is
-$n/2$ steps; but a random polynomial has a factor of small degree with
-high probability: by an analogue of Mertens' theorem, the probability
-that a random monic polynomial of degree $n$ has no irreducible factor of
-degree at most $i$ tends to about $e^{-\gamma}/i$ for large $n$ and $i$, so
-the expected number of steps on random input is small [@GaoPan1997]. Since a random polynomial of degree $n$
-is irreducible with probability about $1/n$, this early exit is what
-matters when searching for irreducible polynomials, and Gao and Panario
-[@GaoPan1997] found Ben-Or's test much faster than Rabin's in that
-setting. `gr_poly_is_irreducible_ben_or` implements it, with each step a
-composition with the precomputed matrix of powers of $h_1$ when $q$ is
-large, and an exponentiation by $q$ otherwise.
+$\lfloor n/2 \rfloor$ steps. A random polynomial often has a factor of
+small degree, so early exit matters when searching for irreducible
+polynomials, which occur with probability about $1/n$. The probabilities
+for uniform monic input are given in [](#small-factors); the Mertens
+approximation $e^{-\gamma}/i$ requires a specified range of $n$ and $i$.
+Gao and Panario [@GaoPan1997] found Ben-Or's test much faster than Rabin's
+in that setting. `gr_poly_is_irreducible_ben_or` implements it, with each
+step a composition with the precomputed matrix of powers of $h_1$ when
+$q$ is large, and an exponentiation by $q$ otherwise.
 
 The *distinct-degree test* `gr_poly_is_irreducible_ddf` runs the coarse
 phase of the baby-step giant-step distinct-degree factorisation
@@ -90,6 +88,92 @@ for most reducible ones, though only after the $\ell$ baby steps.
 
 Both tests first check squarefreeness with one gcd ($\gcd(f, f') = 1$),
 which is cheap and rejects some inputs immediately.
+
+## Probability of small factors {#small-factors}
+
+Fix a prime power $q$. Let $I_q(d)$ be the number of monic irreducible
+polynomials of degree $d$ over $\mathbb{F}_q$, and let $P_{n,i}$ be the
+probability that a uniformly chosen monic polynomial of degree $n \ge 1$
+has no irreducible factor of degree at most $i \ge 0$. Taking degrees in
+[](algorithms/polynomials/factoring-finite-fields#thm-xqd) and applying
+Möbius inversion gives
+$$
+q^m = \sum_{d \mid m} d I_q(d), \qquad
+I_q(d) = \frac{1}{d} \sum_{e \mid d} \mu(e) q^{d/e}.
+$$
+Here $\mu$ is the Möbius function. For asymptotic estimates when
+$i = O(\log n)$, see [@GaoPan1997, §3, Theorem 3.1]. The following exact
+count also identifies an elementary range for the Mertens approximation.
+
+::: proposition {#prop-small-factors}
+For integers $n \ge 1$ and $i \ge 0$,
+$$
+P_{n,i} = q^{-n} [z^n]
+\frac{\prod_{d=1}^{i}(1-z^d)^{I_q(d)}}{1-qz}.
+$$
+In particular, if $n \ge D_i = \sum_{d=1}^{i} d I_q(d)$, then
+$$
+P_{n,i} = G_i, \qquad
+G_i = \prod_{d=1}^{i}(1-q^{-d})^{I_q(d)}.
+$$
+For fixed $q$, $G_i \sim e^{-\gamma}/i$ as $i \to \infty$, where
+$\gamma$ is Euler's constant. Thus $P_{n,i} \sim e^{-\gamma}/i$, for
+example, as $i \to \infty$ with $n \ge D_i$.
+:::
+
+::: proof
+Unique factorisation gives the formal generating function
+$$
+\prod_{d \ge 1}(1-z^d)^{-I_q(d)}
+= \sum_{n \ge 0} q^n z^n = \frac{1}{1-qz}.
+$$
+Removing the factors of degree at most $i$ gives the coefficient formula.
+Its numerator has degree $D_i$. Once $n \ge D_i$, multiplication by
+$\sum_{j \ge 0}q^j z^j$ includes every numerator coefficient, giving its
+value at $z=1/q$, namely $G_i$.
+
+For $i \ge 1$, expand the logarithm of $G_i$ and group terms by
+$m=dk$. The identity $\sum_{d \mid m}d I_q(d)=q^m$ gives
+$$
+-\log G_i = H_i +
+\sum_{m>i}\frac{q^{-m}}{m}
+\sum_{\substack{d \mid m \\ d \le i}} d I_q(d)
+= H_i + O(q^{-i/2}/i), \qquad
+H_i = \sum_{m=1}^{i}\frac{1}{m}.
+$$
+Indeed, in the tail every $d$ is a proper divisor of $m$, so $d \le m/2$.
+Using $d I_q(d) \le q^d$, its inner sum is at most
+$\sum_{d=1}^{\lfloor m/2\rfloor}q^d \le 2q^{m/2}$, and the remaining
+tail is bounded by a geometric series. Finally,
+$H_i=\log i+\gamma+O(1/i)$ gives the stated asymptotic.
+:::
+
+The approximation is not uniform throughout Ben-Or's range. At
+$i=\lfloor n/2\rfloor$, for $n \ge 2$, the surviving polynomials are
+exactly the irreducible ones by [](#thm-ben-or), so
+$$
+P_{n,\lfloor n/2\rfloor} = \frac{I_q(n)}{q^n}
+= \frac{1}{n} + O(q^{-n/2}/n).
+$$
+The error follows from the Möbius formula: all terms other than $q^n$
+have distinct exponents at most $n/2$, and their absolute sum is at most
+$\sum_{j=1}^{\lfloor n/2\rfloor}q^j \le 2q^{n/2}$. For even $n$,
+substituting $i=n/2$ into $e^{-\gamma}/i$ would give $2e^{-\gamma}/n$
+instead of the leading term $1/n$.
+
+These counts concern uniform input before filtering. For example, over
+$\mathbb{F}_2$ at $n=4$ and $i=2$, exactly
+$I_2(4)=(2^4-2^2)/4=3$ of the $16$ monic quartics survive. There are
+$q^n-q^{n-1}$ monic squarefree polynomials of degree $n \ge 2$: using
+$1+z^d=(1-z^{2d})/(1-z^d)$ in the generating function above gives
+$$
+\prod_{g\text{ monic irreducible}}(1+z^{\deg g})
+= \frac{1-qz^2}{1-qz}.
+$$
+Thus the same three quartics are $3/8$ of the squarefree inputs, compared
+with $3/16$ of all monic inputs. The squarefree check above and the root
+filter below must be taken into account when using these probabilities
+to describe the inputs reaching a later stage of FLINT's tests.
 
 ## FLINT's strategy {#strategy}
 
