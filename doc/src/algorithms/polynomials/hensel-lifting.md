@@ -18,16 +18,18 @@ for many factors is described in [@GG2003, Ch. 15].
 ## Lifting two factors {#two}
 
 The basic step lifts a factorisation into two coprime factors together
-with their Bézout cofactors. Below, $m$ and $m_1$ are moduli with $m_1
-\mid m$ (for example $m = p^e$ and $m_1 = p^{e'}$ with $e' \le e$), and
-congruences between polynomials hold coefficientwise.
+with their Bézout cofactors. Below, $m \ge 2$ and $m_1 \ge 1$ are
+integers with $m_1 \mid m$ (for example $m = p^e$ and $m_1 = p^{e'}$
+with $e' \le e$), and congruences between polynomials hold
+coefficientwise.
 
 ::: theorem Hensel step {#thm-step}
 Let $f, g, h, a, b \in \Z[x]$ with $g$ and $h$ monic, $\deg f = \deg g
 + \deg h$, $\deg a < \deg h$, $\deg b < \deg g$, and
 
 $$
-f \equiv gh \pmod m, \qquad ag + bh \equiv 1 \pmod m.
+f \equiv gh \pmod m, \qquad ag + bh \equiv 1 \pmod m, \qquad
+\operatorname{lc}(f) \equiv 1 \pmod{m m_1}.
 $$
 
 Let $e = (f - gh)/m$, and let $\delta$, $\varepsilon$ be the remainders
@@ -45,6 +47,7 @@ $AG + BH \equiv 1 \pmod{m m_1}$.
 :::
 
 ::: proof
+The case $m_1=1$ is immediate, so assume $m_1>1$.
 All computations of $\delta$ and $\varepsilon$ are modulo $m_1$, where
 $ag + bh \equiv 1$ since $m_1 \mid m$. Write $be = q_1 g + \delta$ and
 $ae = q_2 h + \varepsilon$. Then, modulo $m_1$,
@@ -53,11 +56,13 @@ $$
 e = e(ag + bh) = g(ae) + h(be) = g \varepsilon + h \delta + gh(q_1 + q_2).
 $$
 
-Since $f$ and $gh$ have the same degree and $f \equiv gh \pmod m$ with
-$gh$ monic, $\deg e < \deg f$; also $\deg(g\varepsilon + h\delta) <
-\deg g + \deg h = \deg f$. Hence $gh(q_1 + q_2) \equiv e - g\varepsilon
-- h\delta$ has degree less than $\deg(gh)$ modulo $m_1$, and since $gh$
-is monic, $q_1 + q_2 \equiv 0 \pmod{m_1}$. So $e \equiv g\varepsilon +
+The coefficient of $x^{\deg f}$ in $e$ is
+$(\operatorname{lc}(f)-1)/m$, which vanishes modulo $m_1$ by the
+leading-coefficient hypothesis. Thus $e \bmod m_1$ has degree less
+than $\deg f$; also $\deg(g\varepsilon + h\delta) < \deg f$.
+Consequently $gh(q_1 + q_2) \equiv e - g\varepsilon - h\delta$ has
+degree less than $\deg(gh)$ modulo $m_1$. Since $gh$ is monic,
+$q_1 + q_2 \equiv 0 \pmod{m_1}$. So $e \equiv g\varepsilon +
 h\delta \pmod{m_1}$, and
 
 $$
@@ -73,23 +78,77 @@ of $g, h$ gives $e_2 \equiv G (a e_2 \bmod H) + H (b e_2 \bmod G)
 (\ldots)) \equiv 1 \pmod{m m_1}$.
 :::
 
-The lifted factors are unique: if $f \equiv G'H'$ modulo $m m_1$ with
-monic $G' \equiv g$, $H' \equiv h$ modulo $m$, and $g, h$ are coprime
-modulo $p$, then $G' = G$ and $H' = H$ modulo $m m_1$ [@GG2003, Ch. 15]. Taking $m_1 = m$ doubles the exponent at each step
+The leading-coefficient condition is necessary: a product of monic
+factors of degrees $\deg g$ and $\deg h$ has leading coefficient 1.
+It is automatic when $f$ is monic, and also allows other integer
+representatives of a monic polynomial modulo $m m_1$.
+
+::: proposition Uniqueness [@GG2003, Ch. 15] {#prop-unique}
+Under the hypotheses of [](#thm-step), let $G',H'$ be monic of the
+same degrees and residues modulo $m$ as $g,h$, with
+$f\equiv G'H'\pmod{m m_1}$. Then $G'\equiv G$ and $H'\equiv H$
+modulo $m m_1$.
+:::
+
+::: proof
+The case $m_1=1$ follows from the prescribed residues modulo $m$.
+Otherwise let $G',H'$ be another such pair, and write
+$G'=G+m u$, $H'=H+m v$. Since the factors are monic of the same
+degrees, $\deg u<\deg g$ and $\deg v<\deg h$. Subtracting the two
+factorisations and dividing by $m$ gives
+$$
+gv+hu \equiv 0 \pmod{m_1},
+$$
+because $m_1 \mid m$. In $(\Z/m_1\Z)[x]$, reduction modulo $g$ and
+$bh\equiv1\pmod g$ give $u\equiv0\pmod g$. The degree bound on $u$
+and monicity of $g$ imply $u=0$ in this coefficient ring. Similarly,
+reduction modulo $h$ and $ag\equiv1\pmod h$ give $v=0$. Hence
+$G'\equiv G$ and $H'\equiv H$ modulo $m m_1$.
+:::
+
+Taking $m_1 = m$ doubles the exponent at each step
 (quadratic lifting); taking $m_1 = p$ gains one power of $p$ (linear
 lifting). Quadratic lifting reaches $p^N$ in $\lceil \log_2 N \rceil$
 steps, and since the cost of a step grows with the size of the
 modulus, the total cost is dominated by the last step.
 
+### Normalising the target {#normalisation}
+
+For an initial factorisation $f\equiv\ell gh\pmod m$, where
+$\ell=\operatorname{lc}(f)$ is a unit modulo $m m_1$, choose a monic
+representative $F\equiv\ell^{-1}f\pmod{m m_1}$. Here $\ell^{-1}$ is
+the inverse in $\Z/(m m_1)\Z$. Now $F\equiv gh\pmod m$, so
+[](#thm-step) applies to $F$ with the same Bézout cofactors. The
+resulting factors satisfy $f\equiv\ell GH\pmod{m m_1}$.
+
+For example, take $m=m_1=5$, $f=6x^2-x$, $g=x$, $h=x-1$, $a=1$ and
+$b=-1$. Then $f\equiv gh\pmod5$ and $ag+bh=1$, but the leading
+coefficient of $f$ is not 1 modulo 25. Here $e=x^2$, $\delta=0$ and
+$\varepsilon=1$, so the correction formulas give $G=x$, $H=x+4$ and
+$$
+f-GH=5x(x-1)\not\equiv0\pmod{25}.
+$$
+The leading-coefficient hypothesis therefore cannot be omitted.
+
+Instead, $6^{-1}\equiv21\pmod{25}$ gives the monic target
+$F=x^2+4x\equiv21f\pmod{25}$. Now $e=(F-gh)/5=x$, and the same
+corrections give $GH=F$ and $6GH\equiv f\pmod{25}$. One choice of
+lifted cofactors is $A=6$, $B=-6$, for which
+$AG+BH=-24\equiv1\pmod{25}$. The start and continuation routines
+perform this modular normalisation before lifting the factor tree.
+
 ## Many factors: the factor tree {#tree}
 
-For $f \equiv \ell g_1 \cdots g_r \pmod p$ with $r > 2$ monic, pairwise
-coprime $g_i$, the factors are arranged in a binary tree whose leaves
-are the $g_i$ and whose inner nodes are the products of their two
-children; the root is $f / \ell$. Each pair of siblings $(v, w)$
-carries Bézout cofactors. One lifting step lifts the root pair, then
-the pairs below, using the lifted product at each node as the "$f$" of
-its children. By [](#thm-step), the factorisation lifts node by node.
+For $f \equiv \ell g_1 \cdots g_r \pmod p$, with
+$p\nmid\ell=\operatorname{lc}(f)$ and $r>2$ monic, pairwise coprime
+$g_i$, the factors are arranged in a binary tree whose leaves are the
+$g_i$ and whose inner nodes are the products of their two children.
+At target precision $p^N$, its root represents the monic polynomial
+$F\equiv\ell^{-1}f\pmod{p^N}$, with the inverse taken modulo $p^N$.
+Each pair of siblings $(v, w)$ carries Bézout cofactors. One lifting
+step lifts the root pair, then the pairs below, using the lifted
+product at each node as the "$f$" of its children. By [](#thm-step),
+the factorisation lifts node by node.
 If the tree is balanced, the polynomials at each level have total
 degree at most $n$, and a level costs $O(M(n))$ operations, so a step
 costs $O(M(n) \log r)$ operations modulo the new modulus [@GG2003, Ch. 15].
