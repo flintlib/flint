@@ -41,22 +41,97 @@ $x$.
 
 ## Terms from leading bits {#lehmer}
 
-The key observation, due to Lehmer [@Leh1938], is that the first terms of
-$x$ depend only on its leading bits.
+The first terms of a continued fraction can often be determined from
+leading bits. Lehmer [@Leh1938, pp. 228-229] obtains reliable terms by
+comparing two approximations enclosing the number and retaining their
+common initial quotients.
 
 ::: lemma {#lem-interval}
-Let $I = [l, r]$ be an interval with $l > 1$, and let $c = \lfloor l
-\rfloor = \lfloor r \rfloor$. Then every $x \in I$ has first term $c$,
-and $E_c^{-1}(I) = [1/(r - c), 1/(l - c)]$ is again an interval.
-More generally, the terms common to the expansions of $l$ and $r$ (as
-long as both remainders stay above 1) are terms of every $x \in I$.
+Let $I = [l,r]$ with $l > 1$, and let
+$c = \lfloor l \rfloor = \lfloor r \rfloor$. Every $x \in I$ has first
+quotient $c$. If $c < l$, then
+$$
+E_c^{-1}(I) = \left[\frac{1}{r-c},\frac{1}{l-c}\right]
+\subset (1,\infty)
+$$
+is a finite closed interval. Thus successive common quotients of the
+endpoints are quotients of every $x \in I$, provided that after each
+step both transformed endpoints are finite and greater than 1.
 :::
 
 ::: proof
-For $x \in I$, $c \le l \le x \le r < c + 1$, so $\lfloor x \rfloor = c$,
-and $x \mapsto 1/(x - c)$ is decreasing on $I$. The general statement
-follows by induction on the number of terms.
+The inequalities $c \le l \le x \le r < c+1$ give
+$\lfloor x \rfloor=c$. If $c<l$, the map $x \mapsto 1/(x-c)$ is
+defined, continuous and decreasing throughout $I$; its minimum is
+$1/(r-c)>1$. Applying this argument to each transformed interval proves
+the last assertion.
 :::
+
+The condition $c<l$ is needed for the inverse interval, even though it
+is not needed for the first quotient. For $I=[2,5/2]$, both endpoints
+have integer part 2, but $1/(x-2)$ is undefined at $x=2$. This endpoint
+has already reached its terminal quotient.
+
+The same condition can be checked for a whole block of quotients.
+
+::: proposition Common-prefix criterion {#prop-interval-prefix}
+Let $m\ge1$, and let $c_0,\ldots,c_{m-1}$ be positive integers.
+Write
+$$
+M=E_{c_0}\cdots E_{c_{m-1}}
+ =\begin{pmatrix}a&b\\c&d\end{pmatrix},
+\qquad \varepsilon=\det M=(-1)^m.
+$$
+For $I=[l,r]$ with $l>1$, set
+$$
+N(x)=\varepsilon(dx-b),\qquad D(x)=\varepsilon(a-cx).
+$$
+If $D(l),D(r)>0$ and $N(l)>D(l)$, $N(r)>D(r)$, then every $x\in I$
+has initial quotients $c_0,\ldots,c_{m-1}$ and a finite remaining
+complete quotient $M^{-1}(x)=N(x)/D(x)>1$.
+:::
+
+::: proof
+The functions $D$ and $N-D$ are affine. Their positivity at both
+endpoints implies their positivity throughout $I$, so $N(x)/D(x)$ is
+finite and greater than 1. Starting with this value and applying
+$E_{c_{m-1}},\ldots,E_{c_0}$ recovers $x$. At each step,
+$E_{c_j}(t)=c_j+1/t$ with $t>1$ lies strictly between $c_j$ and
+$c_j+1$, so its integer part is $c_j$ and its reciprocal remainder is
+$t$. This proves the asserted prefix.
+
+Moreover,
+$$
+\left(\frac{N(x)}{D(x)}\right)'=\frac{\varepsilon}{D(x)^2}.
+$$
+Hence $M^{-1}(I)$ has endpoints $M^{-1}(l),M^{-1}(r)$ in this order
+when $m$ is even, and in the opposite order when $m$ is odd.
+:::
+
+For example, take $I=[16/7,23/10]$ and the prefix $2,3$. Then
+$$
+M=E_2E_3=\begin{pmatrix}7&2\\3&1\end{pmatrix},
+\qquad M^{-1}(x)=\frac{x-2}{7-3x}.
+$$
+The denominators at the endpoints are $1/7$ and $1/10$, and the
+corresponding remaining complete quotients are 2 and 3. The criterion
+therefore certifies the prefix for every number in $I$. Equivalently,
+the two elementary inverse steps give
+$$
+[16/7,23/10] \xrightarrow{E_2^{-1}}
+[10/3,7/2] \xrightarrow{E_3^{-1}} [2,3].
+$$
+The endpoint expansions are $[2;3,2]$ and $[2;3,3]$.
+
+These inequalities explain the finite-interval invariant in
+`_fmpq_ball_get_cfrac`. Its elementary loop checks the transformed
+ball with `_fmpq_ball_gt_one` before appending the quotient; this
+requires positive denominators and endpoint values greater than 1.
+The inexact Lehmer step applies the sign-adjusted inverse matrix to
+both endpoints, reverses their order for determinant $-1$, and checks
+positivity and the lower endpoint before accepting the block.
+The public `fmpq_get_cfrac` caller completes terminal Euclidean steps
+separately.
 
 If $x = a/b$ with $a > b > 0$ of $n$ bits and $a', b'$ are the leading $k$
 bits of $a$ and $b$ (so $a = 2^{n-k} a' + \alpha$, $0 \le \alpha <
