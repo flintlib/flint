@@ -15,6 +15,7 @@
 #include "t-epstein_lattice.c"
 #include "t-epstein_shell.c"
 #include "t-epstein_theta.c"
+#include "t-g_suffixes.c"
 #include "t-gamma_upper_scaled.c"
 #include "t-madelung_nacl.c"
 #include "t-mzv.c"
@@ -28,6 +29,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_mzeta_epstein_lattice),
     TEST_FUNCTION(acb_mzeta_epstein_shell),
     TEST_FUNCTION(acb_mzeta_epstein_theta),
+    TEST_FUNCTION(acb_mzeta_G_suffixes),
     TEST_FUNCTION(acb_mzeta_gamma_upper_scaled),
     TEST_FUNCTION(acb_mzeta_madelung_nacl),
     TEST_FUNCTION(acb_mzeta_mzv),
