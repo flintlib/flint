@@ -228,13 +228,20 @@ program performs the transposed steps in the reverse order
   butterflies of [](#inverse) are separately derived maps (thirteen
   radix-4 and six radix-2 variants), and each is transposed separately.
 
-Each transposed transform therefore performs exactly the operations of
-the transform it transposes, and costs the same. `sd_fft_trunc_tr` reads
-the evaluation side and accepts the range $(-2p, 2p)$ of `sd_ifft_trunc`
-inputs, which pointwise products produce, because its butterflies have
-the inverse shape; it also returns values in $(-2p, 2p)$, which was
-checked by interval evaluation of its truncated butterflies and by
-propagating bounds through whole transforms up to depth 16.
+The transposition bound includes the input and output dimensions
+([](algorithms/polynomials/middle-product#thm-tellegen)); exact arithmetic
+counts need not agree for truncated transforms. For example, the
+single-input-block branch in `sd_fft.c` copies that block to the
+requested output blocks, whereas its transpose in `sd_fft_tr.c` sums
+those blocks. This is the block version of the constant-polynomial
+example in [](algorithms/polynomials/middle-product#transposed-fft).
+
+`sd_fft_trunc_tr` reads the evaluation side and accepts the range
+$(-2p, 2p)$ of `sd_ifft_trunc` inputs, which pointwise products produce,
+because its butterflies have the inverse shape; it also returns values
+in $(-2p, 2p)$, which was checked by interval evaluation of its truncated
+butterflies and by propagating bounds through whole transforms up to
+depth 16.
 `sd_ifft_trunc_tr` has the forward shape and maps $(-3p, 3p)$ into
 itself, as `sd_fft_trunc` does ([](#thm-forward)). The tests check the
 adjoint identity on random vectors over a range of depths and
