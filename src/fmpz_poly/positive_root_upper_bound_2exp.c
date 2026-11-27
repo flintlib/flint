@@ -44,6 +44,11 @@ slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slon
         bmin = WORD_MAX;
         for (j = i + 1; j < len; j++)
         {
+            /* pair p_i only with coefficients of the sign of the leading
+               one (which always qualifies, so jmin gets set) */
+            if (fmpz_sgn(pol + j) != sgn)
+                continue;
+
             /* compare the current bound with the log (in base 2) of */
             /* (- 2^coeffs[j] * p_i / p_j) ^ (1 / (j - i))           */
             /* which equals                                          */

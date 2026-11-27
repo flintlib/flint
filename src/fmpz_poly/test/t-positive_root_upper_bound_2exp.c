@@ -96,6 +96,80 @@ TEST_FUNCTION_START(fmpz_poly_positive_root_upper_bound_2exp, state)
         fmpz_poly_clear(q);
     }
 
+    /* 2x^4 - 2x^3 - 2x^2 - 3x - 4 has a root in (2, 3) */
+    {
+        fmpz_poly_t p;
+        slong bound;
+
+        fmpz_poly_init(p);
+        fmpz_poly_set_str(p, "5  -4 -3 -2 -2 2");
+
+        bound = fmpz_poly_positive_root_upper_bound_2exp(p);
+
+        if (bound < 2)
+        {
+            flint_printf("FAIL (root in (2, 3)):\n");
+            flint_printf("got bound = %wd\n", bound);
+            flint_abort();
+        }
+
+        fmpz_poly_clear(p);
+    }
+
+    /* small random polynomials: no root above 2^bound, by Sturm sequences */
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        fmpz_poly_t p, q;
+        fmpz_t one;
+        slong bound, n_neg, n_pos;
+
+        fmpz_poly_init(p);
+        fmpz_poly_init(q);
+        fmpz_init_set_ui(one, 1);
+
+        do {
+            fmpz_poly_randtest(p, state, 3 + n_randint(state, 7), 1 + n_randint(state, 4));
+        } while (fmpz_poly_degree(p) < 2 || fmpz_is_zero(p->coeffs)
+                    || !fmpz_poly_is_squarefree(p));
+
+        bound = fmpz_poly_positive_root_upper_bound_2exp(p);
+
+        if (bound == WORD_MIN)
+        {
+            _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, p->coeffs, p->length);
+        }
+        else
+        {
+            /* the positive roots of q(x) = c p(2^bound (x + 1)) are
+               the roots of p above 2^bound */
+            fmpz_poly_set(q, p);
+            _fmpz_poly_scale_2exp(q->coeffs, q->length, bound);
+            fmpz_poly_taylor_shift(q, q, one);
+
+            /* the bound need not be strict */
+            if (fmpz_is_zero(q->coeffs))
+                fmpz_poly_shift_right(q, q, 1);
+
+            if (fmpz_poly_degree(q) >= 2)
+                _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, q->coeffs, q->length);
+            else if (fmpz_poly_degree(q) == 1)
+                n_pos = (fmpz_sgn(q->coeffs) != fmpz_sgn(q->coeffs + 1));
+            else
+                n_pos = 0;
+        }
+
+        if (n_pos != 0)
+        {
+            flint_printf("FAIL (root above the bound):\n");
+            flint_printf("p = "); fmpz_poly_print(p); flint_printf("\n");
+            flint_printf("got bound = %wd\n", bound);
+            flint_abort();
+        }
+
+        fmpz_poly_clear(p);
+        fmpz_poly_clear(q);
+        fmpz_clear(one);
+    }
 
     TEST_FUNCTION_END(state);
 }
