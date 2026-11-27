@@ -248,16 +248,71 @@ gr_generic_pow4(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return status;
 }
 
-/* todo: optimize swaps */
+/* Assumes exp >= 2; res and tmp not aliased with x or exp. Like
+   _gr_generic_pow_ui_binexp, this only swaps pointers, so that the result
+   is written to res itself (which matters if res is e.g. a matrix window). */
+static int
+_gr_generic_pow_fmpz_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ptr R, S, T;
+    gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    int status;
+    slong i;
+
+    status = GR_SUCCESS;
+
+    /* Determine parity due to swaps: the number of zero bits below the
+       leading bit */
+    if ((fmpz_bits(exp) - fmpz_popcnt(exp)) % 2)
+    {
+        R = res;
+        S = tmp;
+    }
+    else
+    {
+        R = tmp;
+        S = res;
+    }
+
+    i = fmpz_bits(exp) - 2;
+
+    status |= sqr(R, x, ctx);
+
+    if (fmpz_tstbit(exp, i))
+    {
+        status |= mul(S, R, x, ctx);
+        T = R;
+        R = S;
+        S = T;
+    }
+
+    /* Stop at the first failure: res serves as scratch space, so its old
+       value could otherwise get squared repeatedly. */
+    for (i--; i >= 0 && status == GR_SUCCESS; i--)
+    {
+        status |= sqr(S, R, ctx);
+
+        if (fmpz_tstbit(exp, i))
+        {
+            status |= mul(R, S, x, ctx);
+        }
+        else
+        {
+            T = R;
+            R = S;
+            S = T;
+        }
+    }
+
+    return status;
+}
+
 int
 gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx)
 {
     gr_ptr t, u;
-    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
-    gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
-    gr_method_swap_op swap = GR_SWAP_OP(ctx, SWAP);
     int status;
-    slong i;
 
     if (*exp == 0)
         return gr_one(res, ctx);
@@ -273,25 +328,28 @@ gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t c
     if (fmpz_sgn(exp) < 0)
         return GR_UNABLE;
 
-    status = GR_SUCCESS;
-
-    GR_TMP_INIT2(t, u, ctx);
-
-    status |= gr_set(t, x, ctx);
-
-    for (i = fmpz_bits(exp) - 2; i >= 0; i--)
+    if (res == (gr_srcptr) exp)
     {
-        status |= sqr(u, t, ctx);
-
-        if (fmpz_tstbit(exp, i))
-            status |= mul(t, u, x, ctx);
-        else
-            swap(t, u, ctx);
+        fmpz_t e;
+        fmpz_init_set(e, exp);
+        status = gr_generic_pow_fmpz_binexp(res, x, e, ctx);
+        fmpz_clear(e);
+        return status;
     }
 
-    swap(res, t, ctx);
-
-    GR_TMP_CLEAR2(t, u, ctx);
+    if (res == x)
+    {
+        GR_TMP_INIT2(t, u, ctx);
+        status = gr_set(u, x, ctx);
+        status |= _gr_generic_pow_fmpz_binexp(res, t, u, exp, ctx);
+        GR_TMP_CLEAR2(t, u, ctx);
+    }
+    else
+    {
+        GR_TMP_INIT(t, ctx);
+        status = _gr_generic_pow_fmpz_binexp(res, t, x, exp, ctx);
+        GR_TMP_CLEAR(t, ctx);
+    }
 
     return status;
 }
