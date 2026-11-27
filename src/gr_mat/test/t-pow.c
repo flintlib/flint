@@ -13,6 +13,54 @@
 #include "fmpz.h"
 #include "gr_mat.h"
 
+/* Check gr_mat_pow_fmpz with a window of a larger matrix as output: the
+   result must be B (with status expected) and the entries outside the
+   window must not change. */
+static void
+check_pow_window(const gr_mat_t A, const fmpz_t e, const gr_mat_t B,
+    int expected, flint_rand_t state, gr_ctx_t ctx)
+{
+    slong n = gr_mat_nrows(A, ctx);
+    int status;
+    gr_mat_t P, Q, W;
+
+    gr_mat_init(P, n + 2, n + 2, ctx);
+    gr_mat_init(Q, n + 2, n + 2, ctx);
+    GR_MUST_SUCCEED(gr_mat_randtest(P, state, ctx));
+    GR_MUST_SUCCEED(gr_mat_set(Q, P, ctx));
+
+    gr_mat_window_init(W, P, 1, 1, n + 1, n + 1, ctx);
+    status = gr_mat_pow_fmpz(W, A, e, ctx);
+
+    if (status != expected
+        || (status == GR_SUCCESS && gr_mat_equal(W, B, ctx) == T_FALSE))
+    {
+        flint_printf("FAIL: window output (fmpz)\n");
+        flint_printf("e = "); fmpz_print(e); flint_printf("\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
+    gr_mat_window_clear(W, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        gr_mat_window_init(W, Q, 1, 1, n + 1, n + 1, ctx);
+        GR_MUST_SUCCEED(gr_mat_set(W, B, ctx));
+        gr_mat_window_clear(W, ctx);
+
+        if (gr_mat_equal(P, Q, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL: entries outside the window changed (fmpz)\n");
+            fflush(stdout);
+            flint_abort();
+        }
+    }
+
+    gr_mat_clear(P, ctx);
+    gr_mat_clear(Q, ctx);
+}
+
 TEST_FUNCTION_START(gr_mat_pow, state)
 {
     slong iter;
@@ -94,6 +142,8 @@ TEST_FUNCTION_START(gr_mat_pow, state)
                 }
             }
 
+            check_pow_window(A, e_fmpz, B, GR_SUCCESS, state, ctx);
+
             GR_MUST_SUCCEED(gr_mat_pow_fmpz(A, A, e_fmpz, ctx));
 
             if (gr_mat_equal(A, B, ctx) == T_FALSE)
@@ -115,6 +165,9 @@ TEST_FUNCTION_START(gr_mat_pow, state)
                 fflush(stdout);
                 flint_abort();
             }
+
+            check_pow_window(A, e_fmpz, B, status_pow, state, ctx);
+
             if (status_pow == GR_SUCCESS)
             {
                 fmpz_neg(neg_e_fmpz, e_fmpz);
