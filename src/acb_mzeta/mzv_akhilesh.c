@@ -76,7 +76,7 @@ _acb_mzeta_mzv_word(unsigned char * w, const ulong * s, slong r)
 
 /* res = floor(x / d), error count err -> ceil(err / d) + 1 */
 static inline void
-fdiv(nn_ptr res, nn_srcptr x, slong len, ulong d)
+mzv_fdiv(nn_ptr res, nn_srcptr x, slong len, ulong d)
 {
     mpn_divrem_1(res, 0, x, len, d);
 }
