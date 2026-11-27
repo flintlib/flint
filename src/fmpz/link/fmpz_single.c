@@ -18,6 +18,7 @@
 # include <windows.h> /* GetSystemInfo */
 #endif
 
+#include <string.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
 
@@ -82,6 +83,41 @@ void * flint_align_ptr(void * ptr, slong size)
     return (void *)((mask & (slong) ptr) + size);
 }
 
+/*
+   Make room for one more entry in mpz_free_arr.
+
+   The memory functions may call _fmpz_clear_mpz before they return, e.g. when
+   a garbage collector runs finalizers, which then appends to mpz_free_arr
+   or grows it itself. Hence we do not use realloc, which could free the
+   array that such a call writes to, and we only publish the new array once
+   it holds the current entries.
+*/
+static void _fmpz_mpz_free_arr_fit(void)
+{
+    while (mpz_free_num >= mpz_free_alloc)
+    {
+        mpz_ptr * new_arr, * old_arr;
+        ulong new_alloc = FLINT_MAX(MPZ_BLOCK, 2 * mpz_free_alloc);
+
+        new_arr = flint_malloc(new_alloc * sizeof(mpz_ptr));
+
+        /* the array may have been grown during flint_malloc */
+        if (new_alloc <= mpz_free_alloc)
+        {
+            flint_free(new_arr);
+            continue;
+        }
+
+        if (mpz_free_num != 0)
+            memcpy(new_arr, mpz_free_arr, mpz_free_num * sizeof(mpz_ptr));
+
+        old_arr = mpz_free_arr;
+        mpz_free_arr = new_arr;
+        mpz_free_alloc = new_alloc;
+        flint_free(old_arr);
+    }
+}
+
 mpz_ptr _fmpz_new_mpz(void)
 {
     if (mpz_free_num == 0) /* allocate more mpz's */
@@ -127,11 +163,7 @@ mpz_ptr _fmpz_new_mpz(void)
                    Cannot be lifted from loop due to possibility of
                    gc calling _fmpz_clear_mpz during call to mpz_init_2
                 */
-                if (mpz_free_num >= mpz_free_alloc)
-                {
-                    mpz_free_alloc = FLINT_MAX(mpz_free_num + 1, 2 * mpz_free_alloc);
-                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_ptr));
-                }
+                _fmpz_mpz_free_arr_fit();
 
                 mpz_free_arr[mpz_free_num++] = page_ptr + j;
             }
@@ -181,11 +213,7 @@ void _fmpz_clear_mpz(fmpz f)
             mpz_init2(ptr, MPZ_MIN_ALLOC * FLINT_BITS);
         }
 
-        if (mpz_free_num == mpz_free_alloc)
-        {
-            mpz_free_alloc = FLINT_MAX(MPZ_BLOCK, 2 * mpz_free_alloc);
-            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_ptr));
-        }
+        _fmpz_mpz_free_arr_fit();
 
         mpz_free_arr[mpz_free_num++] = ptr;
     }

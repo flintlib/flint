@@ -45,6 +45,7 @@
 #include "t-cdiv_q_ui.c"
 #include "t-cdiv_r_2exp.c"
 #include "t-cdiv_ui.c"
+#include "t-clear_mpz_reentrant.c"
 #include "t-clog.c"
 #include "t-clog_ui.c"
 #include "t-cmp2abs.c"
@@ -219,6 +220,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_cdiv_q_ui),
     TEST_FUNCTION(fmpz_cdiv_r_2exp),
     TEST_FUNCTION(fmpz_cdiv_ui),
+    TEST_FUNCTION(fmpz_clear_mpz_reentrant),
     TEST_FUNCTION(fmpz_clog),
     TEST_FUNCTION(fmpz_clog_ui),
     TEST_FUNCTION(fmpz_cmp2abs),
